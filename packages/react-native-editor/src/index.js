@@ -76,18 +76,28 @@ const setupInitHooks = () => {
 				postType = 'post';
 			}
 
-			if (
-				colors === undefined ||
-				colors.filter( ( c ) => c.color ).length === 0
-			) {
+			if ( colors === undefined ) {
 				colors = SETTINGS_DEFAULTS.colors;
+			} else {
+				const validColors = colors.filter( ( c ) => c.color );
+				if ( validColors.length === 0 ) {
+					colors = SETTINGS_DEFAULTS.colors;
+				} else if ( validColors.length < colors.length ) {
+					// Filter out invalid colors
+					colors = validColors;
+				}
 			}
 
-			if (
-				gradients === undefined ||
-				gradients.filter( ( c ) => c.gradient ).length === 0
-			) {
+			if ( gradients === undefined ) {
 				gradients = SETTINGS_DEFAULTS.gradients;
+			} else {
+				const validGradients = gradients.filter( ( c ) => c.gradient );
+				if ( validGradients.length === 0 ) {
+					gradients = SETTINGS_DEFAULTS.gradients;
+				} else if ( validGradients.length < gradients.length ) {
+					// Filter out invalid gradients
+					gradients = validGradients;
+				}
 			}
 
 			return {

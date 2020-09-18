@@ -116,18 +116,33 @@ class NativeEditorProvider extends Component {
 		this.subscriptionParentUpdateTheme = subscribeUpdateTheme(
 			( theme ) => {
 				// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
-				if (
-					theme.colors === undefined ||
-					theme.colors.filter( ( c ) => c.color ).length === 0
-				) {
+
+				if ( theme.colors === undefined ) {
 					theme.colors = SETTINGS_DEFAULTS.colors;
+				} else {
+					const validColors = theme.colors.filter( ( c ) => c.color );
+					if ( validColors.length === 0 ) {
+						theme.colors = SETTINGS_DEFAULTS.colors;
+					} else if ( validColors.length < theme.colors.length ) {
+						// Filter out invalid colors
+						theme.colors = validColors;
+					}
 				}
 
-				if (
-					theme.gradients === undefined ||
-					theme.gradients.filter( ( c ) => c.gradient ).length === 0
-				) {
+				if ( theme.gradients === undefined ) {
 					theme.gradients = SETTINGS_DEFAULTS.gradients;
+				} else {
+					const validGradients = theme.gradients.filter(
+						( c ) => c.gradient
+					);
+					if ( validGradients.length === 0 ) {
+						theme.gradients = SETTINGS_DEFAULTS.gradients;
+					} else if (
+						validGradients.length < theme.gradients.length
+					) {
+						// Filter out invalid gradients
+						theme.gradients = validGradients;
+					}
 				}
 
 				this.props.updateSettings( theme );
