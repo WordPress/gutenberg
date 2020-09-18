@@ -10,6 +10,7 @@ import './globals';
 import { getTranslation } from '../i18n-cache';
 import initialHtml from './initial-html';
 import setupApiFetch from './api-fetch-setup';
+import { SETTINGS_DEFAULTS } from '../../block-editor/src/store/defaults.js';
 
 const reactNativeSetup = () => {
 	// Disable warnings as they disrupt the user experience in dev mode
@@ -57,7 +58,13 @@ const setupInitHooks = () => {
 		'core/react-native-editor',
 		( props ) => {
 			const { capabilities = {} } = props;
-			let { initialData, initialTitle, postType } = props;
+			let {
+				initialData,
+				initialTitle,
+				postType,
+				colors,
+				gradients,
+			} = props;
 
 			if ( initialData === undefined && __DEV__ ) {
 				initialData = initialHtml;
@@ -69,14 +76,28 @@ const setupInitHooks = () => {
 				postType = 'post';
 			}
 
+			if (
+				colors === undefined ||
+				colors.filter( ( c ) => c.color ).length === 0
+			) {
+				colors = SETTINGS_DEFAULTS.colors;
+			}
+
+			if (
+				gradients === undefined ||
+				gradients.filter( ( c ) => c.gradient ).length === 0
+			) {
+				gradients = SETTINGS_DEFAULTS.gradients;
+			}
+
 			return {
 				initialHtml: initialData,
 				initialHtmlModeEnabled: props.initialHtmlModeEnabled,
 				initialTitle,
 				postType,
 				capabilities,
-				colors: props.colors,
-				gradients: props.gradients,
+				colors,
+				gradients,
 			};
 		}
 	);
