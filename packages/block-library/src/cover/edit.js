@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { noop } from 'lodash';
 import classnames from 'classnames';
 import FastAverageColor from 'fast-average-color';
 import tinycolor from 'tinycolor2';
@@ -19,6 +20,7 @@ import {
 	ResizableBox,
 	ToggleControl,
 	withNotices,
+	useColorExtract,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
@@ -304,9 +306,24 @@ function CoverEdit( {
 		}
 	}
 
+	const backgroundColorValue = overlayColor.color || gradientValue;
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
+
 	const showFocalPointPicker =
 		isVideoBackground || ( isImageBackground && ! hasParallax );
+
+	/**
+	 * Custom hook used for setting the initial background color.
+	 *
+	 * If a background image is set, this hook extracts the primary color from
+	 * that image and sets it as a background color.
+	 */
+	const { customColors } = useCoverColorExtract( {
+		color: backgroundColorValue,
+		isSelected,
+		onChange: setOverlayColor,
+		src: url,
+	} );
 
 	const controls = (
 		<>
@@ -395,6 +412,7 @@ function CoverEdit( {
 						<PanelColorGradientSettings
 							title={ __( 'Overlay' ) }
 							initialOpen={ true }
+							customColors={ customColors }
 							settings={ [
 								{
 									colorValue: overlayColor.color,
@@ -546,6 +564,53 @@ function CoverEdit( {
 			</Block.div>
 		</>
 	);
+}
+
+function useCoverColorExtract( {
+	backgroundColor,
+	onChange = noop,
+	isSelected = false,
+	src,
+} ) {
+	const [ customExtractedColor, setCustomExtractedColor ] = useState( null );
+	const [ didSelect, setDidSelect ] = useState( false );
+
+	const updateCustomOverlayColor = ( value ) => {
+		onChange( value );
+		setCustomExtractedColor( value );
+	};
+
+	const { extractColor } = useColorExtract( {
+		color: backgroundColor,
+		onChange: updateCustomOverlayColor,
+		src,
+	} );
+
+	useEffect( () => {
+		// Extracts color to add to color palette.
+		// Run when the block is first selected.
+		if ( ! didSelect && isSelected ) {
+			extractColor().then( ( [ value ] ) => {
+				setCustomExtractedColor( value );
+			} );
+			setDidSelect( true );
+		}
+	}, [ isSelected, didSelect ] );
+
+	let customColors = [];
+	if ( customExtractedColor ) {
+		customColors = [
+			{
+				name: __( 'Image dominant color' ),
+				slug: __( 'image-dominant-color' ),
+				color: customExtractedColor,
+			},
+		];
+	}
+
+	return {
+		customColors,
+	};
 }
 
 export default compose( [

@@ -85,6 +85,7 @@ export const PanelColorGradientSettingsInner = ( {
 	className,
 	colors,
 	gradients,
+	customColors = [],
 	disableCustomColors,
 	disableCustomGradients,
 	children,
@@ -111,11 +112,13 @@ export const PanelColorGradientSettingsInner = ( {
 		return null;
 	}
 
+	const mergedColors = [ ...customColors, ...colors ];
+
 	const titleElement = (
 		<span className="block-editor-panel-color-gradient-settings__panel-title">
 			{ title }
 			<Indicators
-				colors={ colors }
+				colors={ mergedColors }
 				gradients={ gradients }
 				settings={ settings }
 			/>
@@ -134,7 +137,7 @@ export const PanelColorGradientSettingsInner = ( {
 				<ColorGradientControl
 					key={ index }
 					{ ...{
-						colors,
+						colors: mergedColors,
 						gradients,
 						disableCustomColors,
 						disableCustomGradients,
