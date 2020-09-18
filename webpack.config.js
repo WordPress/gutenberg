@@ -6,7 +6,7 @@ const { DefinePlugin } = require( 'webpack' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const postcss = require( 'postcss' );
-const { get, escapeRegExp, compact } = require( 'lodash' );
+const { get, escapeRegExp, compact, toPairs } = require( 'lodash' );
 const { basename, sep } = require( 'path' );
 
 /**
@@ -57,9 +57,7 @@ const transformBlockContent = ( content ) => {
 				// other core prefix (e.g. "wp_").
 				return result.replace(
 					new RegExp( functionName, 'g' ),
-					( match ) =>
-						'gutenberg_' +
-						match.replace( /^wp_/, '' )
+					( match ) => 'gutenberg_' + match.replace( /^wp_/, '' )
 				);
 			}, content )
 			// The core blocks override procedure takes place in
@@ -76,6 +74,29 @@ const transformBlockContent = ( content ) => {
 			)
 	);
 };
+
+const blocksDirectoryMapping = toPairs( {
+	'./packages/block-library/src/': 'build/block-library/blocks/',
+	'./packages/edit-widgets/src/blocks/': 'build/edit-widgets/blocks/',
+} );
+
+const copyBlocksWebpackMapping = blocksDirectoryMapping.flatMap(
+	( [ from, to ] ) => [
+		{
+			from: `${ from }/**/index.php`,
+			test: new RegExp( `([\\w-]+)${ escapeRegExp( sep ) }index\\.php$` ),
+			to: `${ to }/[1].php`,
+			transform: transformBlockContent,
+		},
+		{
+			from: `${ from }/*/block.json`,
+			test: new RegExp(
+				`([\\w-]+)${ escapeRegExp( sep ) }block\\.json$`
+			),
+			to: `${ to }/[1]/block.json`,
+		},
+	]
+);
 
 module.exports = {
 	optimization: {
@@ -197,38 +218,7 @@ module.exports = {
 				},
 			} ) )
 		),
-		new CopyWebpackPlugin( [
-			{
-				from: './packages/block-library/src/**/index.php',
-				test: new RegExp(
-					`([\\w-]+)${ escapeRegExp( sep ) }index\\.php$`
-				),
-				to: 'build/block-library/blocks/[1].php',
-				transform: transformBlockContent,
-			},
-			{
-				from: './packages/block-library/src/*/block.json',
-				test: new RegExp(
-					`([\\w-]+)${ escapeRegExp( sep ) }block\\.json$`
-				),
-				to: 'build/block-library/blocks/[1]/block.json',
-			},
-			{
-				from: './packages/edit-widgets/src/blocks/**/index.php',
-				test: new RegExp(
-					`([\\w-]+)${ escapeRegExp( sep ) }index\\.php$`
-				),
-				to: 'build/edit-widgets/blocks/[1].php',
-				transform: transformBlockContent,
-			},
-			{
-				from: './packages/edit-widgets/src/blocks/*/block.json',
-				test: new RegExp(
-					`([\\w-]+)${ escapeRegExp( sep ) }block\\.json$`
-				),
-				to: 'build/edit-widgets/blocks/[1]/block.json',
-			},
-		] ),
+		new CopyWebpackPlugin( copyBlocksWebpackMapping ),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	].filter( Boolean ),
 	watchOptions: {
