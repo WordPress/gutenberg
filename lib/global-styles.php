@@ -597,7 +597,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 
 		// Create the CSS Custom Properties that are specific to the theme.
 		$computed_theme_props = gutenberg_experimental_get( $tree[ $block_name ]['settings'], ['custom'] );
-		$theme_props_prefix   = '--wp--theme' . $token;
+		$theme_props_prefix   = '--wp--custom' . $token;
 		$theme_variables      = gutenberg_experimental_global_styles_get_css_vars(
 			$computed_theme_props,
 			$theme_props_prefix,
