@@ -6,6 +6,18 @@
 		"openInNewTab": {
 			"type": "boolean",
 			"default": false
+		},
+		"iconColor": {
+			"type": "string"
+		},
+		"customIconColor": {
+			"type": "string"
+		},
+		"backgroundColor": {
+			"type": "string"
+		},
+		"customBackgroundColor": {
+			"type": "string"
 		}
 	},
 	"providesContext": {
