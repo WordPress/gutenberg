@@ -47,6 +47,12 @@ import { isString } from 'lodash';
  */
 
 /**
+ * Object containing a React node.
+ *
+ * @typedef {import('react').ReactNode} WPNode
+ */
+
+/**
  * Object that provides utilities for dealing with React children.
  */
 export { Children };
