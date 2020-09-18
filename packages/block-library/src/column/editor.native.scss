@@ -6,13 +6,13 @@
 	flex: 1;
 	padding: $block-selected-to-content;
 	background-color: $white;
-	border: $border-width dashed $border-color;
+	border: $border-width dashed $border-dashed-color;
 	border-radius: 4px;
 }
 
 .columnPlaceholderDark {
 	background-color: $black;
-	border: $border-width dashed $border-color-dark;
+	border: $border-width dashed $border-dashed-color-dark;
 }
 
 .innerBlocksBottomSpace {
