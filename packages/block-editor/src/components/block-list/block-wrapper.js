@@ -15,7 +15,7 @@ import {
 	forwardRef,
 } from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { ENTER } from '@wordpress/keycodes';
+import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -88,7 +88,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		},
 		[ isSelected ]
 	);
-	const { insertDefaultBlock } = useDispatch( 'core/block-editor' );
+	const { insertDefaultBlock, removeBlock } = useDispatch(
+		'core/block-editor'
+	);
 	const [ isHovered, setHovered ] = useState( false );
 
 	// Provide the selected node, or the first and last nodes of a multi-
@@ -182,7 +184,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		function onKeyDown( event ) {
 			const { keyCode, target } = event;
 
-			if ( keyCode !== ENTER ) {
+			if (
+				keyCode !== ENTER &&
+				keyCode !== BACKSPACE &&
+				keyCode !== DELETE
+			) {
 				return;
 			}
 
@@ -192,7 +198,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 			event.preventDefault();
 
-			insertDefaultBlock( {}, rootClientId, index + 1 );
+			if ( keyCode === ENTER ) {
+				insertDefaultBlock( {}, rootClientId, index + 1 );
+			} else {
+				removeBlock( clientId );
+			}
 		}
 
 		function onMouseLeave( { which, buttons } ) {
@@ -213,7 +223,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			ref.current.removeEventListener( 'mouseleave', onMouseLeave );
 			ref.current.removeEventListener( 'keydown', onKeyDown );
 		};
-	}, [ isSelected, onSelectionStart, insertDefaultBlock ] );
+	}, [ isSelected, onSelectionStart, insertDefaultBlock, removeBlock ] );
 
 	useEffect( () => {
 		if ( ! isNavigationMode ) {
