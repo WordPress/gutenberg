@@ -30,13 +30,13 @@ function Example() {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 
-  const [ delayedBadge, setDelayedBadge ] = useState();
+	const [ delayedBadge, setDelayedBadge ] = useState();
 	useEffect( () => {
 		const timeout = setTimeout( () => setDelayedBadge( 2 ), 1500 );
 		return () => clearInterval( timeout );
 	} );
 
-  // Mock navigation link
+	// Mock navigation link
 	const Link = ( { href, children } ) => (
 		<a
 			className="components-button"
@@ -83,7 +83,7 @@ function Example() {
 							navigateToMenu="category"
 							title="Delayed badge"
 						/>
-            <NavigationItem
+						<NavigationItem
 							item="item-pointing-non-existing-menu"
 							title="Navigate to a non existing menu"
 							navigateToMenu="non-existing-menu"
