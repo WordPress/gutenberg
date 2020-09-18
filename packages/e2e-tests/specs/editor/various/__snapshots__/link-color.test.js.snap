@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Link color control serializes markup properly 1`] = `
+"<!-- wp:paragraph {\\"style\\":{\\"color\\":{\\"link\\":\\"var:preset|color|black\\"}}} -->
+<p class=\\"has-link-color\\" style=\\"--wp--style--color--link:var(--wp--preset--color--black)\\">This is <a href=\\"https://wordpress.org/gutenberg\\">Gutenberg</a></p>
+<!-- /wp:paragraph -->"
+`;
