@@ -1,12 +1,11 @@
 /**
  * External dependencies
  */
-import ReactDatePicker from "react-datepicker";
+import ReactDatePicker from 'react-datepicker';
 
 /**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
 
 /**
  * Module Constants
@@ -14,13 +13,17 @@ import { Component, createRef } from '@wordpress/element';
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const isRTL = () => document.documentElement.dir === 'rtl';
 
-const DatePicker = ( { onDateChange, currentDate, isInvalidDate } ) => {
+const DatePicker = ( { onChange, currentDate, isInvalidDate } ) => {
+	const selected = typeof currentDate === 'string' ? new Date( currentDate ) : currentDate;
+
 	return (
 		<ReactDatePicker
-			selected={ currentDate }
-			onChange={ onDateChange }
+			calendarClassName={ 'components-datetime__date' }
+			selected={ selected }
+			onChange={ onChange }
 			inline
-		/>);
+		/>
+	);
 };
 /*
 class DatePicker extends Component {
