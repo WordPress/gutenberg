@@ -9,7 +9,6 @@ import { isEmpty } from 'lodash';
  */
 import { BaseControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -24,11 +23,7 @@ export default function GradientPickerControl( {
 	label = __( 'Gradient Presets' ),
 	...props
 } ) {
-	const gradients =
-		useSelect(
-			( select ) => select( 'core/block-editor' ).getSettings().gradients,
-			[]
-		) ?? [];
+	const gradients = useEditorFeature( 'color.gradients' );
 	const disableCustomGradients = ! useEditorFeature( 'color.customGradient' );
 	if ( isEmpty( gradients ) && disableCustomGradients ) {
 		return null;
