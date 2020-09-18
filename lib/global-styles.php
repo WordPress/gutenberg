@@ -900,16 +900,24 @@ function gutenberg_experimental_global_styles_allow_css_var_name( $allowed_attr 
  * @return boolean Filtered result.
  */
 function gutenberg_experimental_global_styles_allow_css_var_value( $allow_css, $css_test_string ) {
-	$parts = explode( ':', $css_test_string, 2 );
+	$parts          = explode( ':', $css_test_string, 2 );
+	$property_name  = trim( $parts[0] );
+	$property_value = trim( $parts[1] );
 
-	if ( '--wp--style--color--link' !== $parts[0] ) {
+	// Pass through if we're not processing the link color property.
+	if ( '--wp--style--color--link' !== $property_name ) {
 		return $allow_css;
 	}
 
-	// The only value the block editor attaches to link color is
-	// var(--wp--preset--color--<value-with-alphanumeric-chars-or-hyphen>)
-	// so be specific in testing for that value.
-	return preg_match( '/^var\(--wp--preset--color--[A-Za-z0-9-]*\)$/', $parts[1] );
+	// Pass through if $allow_css true. This means the link color has a valid color value
+	// (the user selected a custom color).
+	if ( $allow_css ) {
+		return $allow_css;
+	}
+
+	// We want to be specific in testing that the value for link color
+	// matches this: var(--wp--preset--color--<value-with-alphanumeric-chars-or-hyphen>)
+	return preg_match( '/^var\(--wp--preset--color--[A-Za-z0-9-]*\)$/', $property_value );
 }
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
