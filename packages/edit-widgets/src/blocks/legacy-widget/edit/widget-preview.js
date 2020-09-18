@@ -8,14 +8,15 @@ import { get } from 'lodash';
  */
 import { addQueryArgs } from '@wordpress/url';
 import { Disabled, FocusableIframe } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
-function WidgetPreview( { postLink, widgetAreaId, attributes, ...props } ) {
+function WidgetPreview( { widgetAreaId, attributes, ...props } ) {
 	const DEFAULT_HEIGHT = 300;
-	const HEIGTH_MARGIN = 20;
+	const HEIGHT_MARGIN = 20;
 	const [ height, setHeight ] = useState( DEFAULT_HEIGHT );
-	const iframeUrl = addQueryArgs( postLink, {
+	const currentUrl = document.location.href;
+	const siteUrl = currentUrl.substr( 0, currentUrl.indexOf( 'wp-admin/' ) );
+	const iframeUrl = addQueryArgs( siteUrl, {
 		widgetPreview: {
 			...attributes,
 			sidebarId: widgetAreaId,
@@ -36,16 +37,11 @@ function WidgetPreview( { postLink, widgetAreaId, attributes, ...props } ) {
 					}
 				} }
 				src={ iframeUrl }
-				height={ height + HEIGTH_MARGIN }
+				height={ height + HEIGHT_MARGIN }
 				{ ...props }
 			/>
 		</Disabled>
 	);
 }
 
-export default withSelect( () => {
-	return {
-		// @TODO: Don't hardcode preview URL
-		postLink: '/?p=1',
-	};
-} )( WidgetPreview );
+export default WidgetPreview;
