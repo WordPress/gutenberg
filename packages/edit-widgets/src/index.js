@@ -47,6 +47,7 @@ export function initialize( id, settings ) {
  */
 export function customizerInitialize( id, settings ) {
 	registerCoreBlocks();
+	registerBlock( legacyWidget );
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
