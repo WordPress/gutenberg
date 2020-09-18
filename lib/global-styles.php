@@ -916,7 +916,7 @@ function gutenberg_experimental_global_styles_allow_css_var_value( $allow_css, $
 	}
 
 	// We want to be specific in testing that the value for link color
-	// matches this: var(--wp--preset--color--<value-with-alphanumeric-chars-or-hyphen>)
+	// matches this: var(--wp--preset--color--<value-with-alphanumeric-chars-or-hyphen>).
 	return preg_match( '/^var\(--wp--preset--color--[A-Za-z0-9-]*\)$/', $property_value );
 }
 
