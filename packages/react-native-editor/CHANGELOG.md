@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.38.0
+
+[***] Add support for selecting user's post when configuring the link
+
 ## 1.37.0
 
 * [**] Add support for rounded style in Image block

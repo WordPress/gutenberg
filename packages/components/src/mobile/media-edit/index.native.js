@@ -44,10 +44,10 @@ export class MediaEdit extends React.Component {
 	}
 
 	getMediaOptionsItems() {
-		const { pickerOptions, openReplaceMediaOptions } = this.props;
+		const { pickerOptions, openReplaceMediaOptions, source } = this.props;
 
 		return compact( [
-			editOption,
+			source?.uri && editOption,
 			openReplaceMediaOptions && replaceOption,
 			...( pickerOptions ? pickerOptions : [] ),
 		] );
