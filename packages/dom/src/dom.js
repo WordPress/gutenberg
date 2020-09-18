@@ -1,3 +1,4 @@
+/* globals Node */
 /**
  * External dependencies
  */
@@ -7,18 +8,6 @@ import { includes, noop } from 'lodash';
  * Internal dependencies
  */
 import { isPhrasingContent } from './phrasing-content';
-
-/**
- * Browser dependencies
- */
-
-const { DOMParser, getComputedStyle } = window;
-const {
-	TEXT_NODE,
-	ELEMENT_NODE,
-	DOCUMENT_POSITION_PRECEDING,
-	DOCUMENT_POSITION_FOLLOWING,
-} = window.Node;
 
 /**
  * Returns true if the given selection object is in the forward direction, or
@@ -40,11 +29,11 @@ function isSelectionForward( selection ) {
 	/* eslint-disable no-bitwise */
 	// Compare whether anchor node precedes focus node. If focus node (where
 	// end of selection occurs) is after the anchor node, it is forward.
-	if ( position & DOCUMENT_POSITION_PRECEDING ) {
+	if ( position & Node.DOCUMENT_POSITION_PRECEDING ) {
 		return false;
 	}
 
-	if ( position & DOCUMENT_POSITION_FOLLOWING ) {
+	if ( position & Node.DOCUMENT_POSITION_FOLLOWING ) {
 		return true;
 	}
 	/* eslint-enable no-bitwise */
@@ -604,7 +593,7 @@ export function isEntirelySelected( element ) {
 
 	const lastChild = element.lastChild;
 	const lastChildContentLength =
-		lastChild.nodeType === TEXT_NODE
+		lastChild.nodeType === Node.TEXT_NODE
 			? lastChild.data.length
 			: lastChild.childNodes.length;
 
@@ -657,7 +646,7 @@ export function getOffsetParent( node ) {
 	// an element node, so find the closest element node.
 	let closestElement;
 	while ( ( closestElement = node.parentNode ) ) {
-		if ( closestElement.nodeType === ELEMENT_NODE ) {
+		if ( closestElement.nodeType === Node.ELEMENT_NODE ) {
 			break;
 		}
 	}
@@ -668,7 +657,7 @@ export function getOffsetParent( node ) {
 
 	// If the closest element is already positioned, return it, as offsetParent
 	// does not otherwise consider the node itself.
-	if ( getComputedStyle( closestElement ).position !== 'static' ) {
+	if ( window.getComputedStyle( closestElement ).position !== 'static' ) {
 		return closestElement;
 	}
 
@@ -765,7 +754,15 @@ export function wrap( newNode, referenceNode ) {
  * @return {string} The text content with any html removed.
  */
 export function __unstableStripHTML( html ) {
-	const document = new DOMParser().parseFromString( html, 'text/html' );
+	if ( ! window ) {
+		return '';
+	}
+
+	const document = new window.DOMParser().parseFromString(
+		html,
+		'text/html'
+	);
+
 	return document.body.textContent || '';
 }
 
@@ -788,7 +785,7 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 			schema.hasOwnProperty( tag ) &&
 			( ! schema[ tag ].isMatch || schema[ tag ].isMatch( node ) )
 		) {
-			if ( node.nodeType === ELEMENT_NODE ) {
+			if ( node.nodeType === Node.ELEMENT_NODE ) {
 				const {
 					attributes = [],
 					classes = [],
@@ -936,11 +933,11 @@ export function isEmpty( element ) {
 	}
 
 	return Array.from( element.childNodes ).every( ( node ) => {
-		if ( node.nodeType === TEXT_NODE ) {
+		if ( node.nodeType === Node.TEXT_NODE ) {
 			return ! node.nodeValue.trim();
 		}
 
-		if ( node.nodeType === ELEMENT_NODE ) {
+		if ( node.nodeType === Node.ELEMENT_NODE ) {
 			if ( node.nodeName === 'BR' ) {
 				return true;
 			} else if ( node.hasAttributes() ) {
