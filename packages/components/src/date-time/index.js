@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-
 /**
  * WordPress dependencies
  */
@@ -16,8 +15,6 @@ import { default as DatePicker } from './date';
 import { default as TimePicker } from './time';
 
 export { DatePicker, TimePicker };
-
-// export { DatePicker, TimePicker };
 
 export class DateTimePicker extends Component {
 	constructor() {
@@ -49,12 +46,20 @@ export class DateTimePicker extends Component {
 		return (
 			<div className="components-datetime">
 				{ ! this.state.calendarHelpIsVisible && (
-					<DatePicker
-						calendarClassName="components-datetime__datepicker"
-						selected={ currentDate }
-						onChange={ onChange }
-						inline
-					/>
+					<>
+						<TimePicker
+							currentTime={ currentDate }
+							onChange={ onChange }
+							is12Hour={ is12Hour }
+						/>
+						<DatePicker
+							currentDate={ currentDate }
+							onChange={ onChange }
+							isInvalidDate={ isInvalidDate }
+							onMonthPreviewed={ onMonthPreviewed }
+							events={ events }
+						/>
+					</>
 				) }
 
 				{ this.state.calendarHelpIsVisible && (
