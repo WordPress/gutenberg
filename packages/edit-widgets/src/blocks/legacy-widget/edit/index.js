@@ -104,7 +104,7 @@ class LegacyWidgetEdit extends Component {
 								icon={ update }
 							/>
 						) }
-						{ hasEditForm && ! WPWidget?.isReferenceWidget && (
+						{ hasEditForm && (
 							<>
 								<Button
 									className="components-tab-button"
@@ -162,7 +162,10 @@ class LegacyWidgetEdit extends Component {
 						} }
 					/>
 				) }
-				{ ( isPreview || ! hasEditForm ) && this.renderWidgetPreview() }
+				{ ( isPreview || ! hasEditForm ) &&
+					( widgetObject.isReferenceWidget
+						? this.renderWidgetPreviewUnavailable()
+						: this.renderWidgetPreview() ) }
 			</>
 		);
 	}
@@ -196,6 +199,10 @@ class LegacyWidgetEdit extends Component {
 				attributes={ omit( attributes, 'widgetId' ) }
 			/>
 		);
+	}
+
+	renderWidgetPreviewUnavailable() {
+		return <p>{ __( 'Reference widgets cannot be previewed.' ) }</p>;
 	}
 }
 
