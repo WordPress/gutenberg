@@ -35,19 +35,21 @@ class WpEmbedPreview extends Component {
 	 * @param {WPSyntheticEvent} event Message event.
 	 */
 	resizeWPembeds( { data: { secret, message, value } = {} } ) {
-		if ( [ secret, message, value ].some( ( attribute ) => ! attribute ) )
+		if (
+			[ secret, message, value ].some( ( attribute ) => ! attribute ) ||
+			message !== 'height'
+		) {
 			return;
-
-		if ( message === 'height' ) {
-			const iframes = document.querySelectorAll(
-				`iframe[data-secret="${ secret }"`
-			);
-			( iframes || [] ).forEach( ( iframe ) => {
-				if ( +iframe.height !== value ) {
-					iframe.height = value;
-				}
-			} );
 		}
+
+		const iframes = document.querySelectorAll(
+			`iframe[data-secret="${ secret }"`
+		);
+		( iframes || [] ).forEach( ( iframe ) => {
+			if ( +iframe.height !== value ) {
+				iframe.height = value;
+			}
+		} );
 	}
 
 	/**
