@@ -21,8 +21,6 @@ import * as legacyWidget from './blocks/legacy-widget';
 import EditWidgetsInitializer from './components/edit-widgets-initializer';
 import CustomizerEditWidgetsInitializer from './components/customizer-edit-widgets-initializer';
 
-let registered = false;
-
 /**
  * Initializes the block editor in the widgets screen.
  *
@@ -30,11 +28,8 @@ let registered = false;
  * @param {Object} settings Block editor settings.
  */
 export function initialize( id, settings ) {
-	registerCoreBlocks();
-	registerBlock( legacyWidget );
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
-	}
+	registerWidgetsEditorBlocks( settings );
+
 	render(
 		<EditWidgetsInitializer settings={ settings } />,
 		document.getElementById( id )
@@ -49,16 +44,7 @@ export function initialize( id, settings ) {
  * @param {string} widgetID ID of the widget being rendered.
  */
 export function customizerInitialize( id, settings, widgetID ) {
-	// The customizer can has many widgets, it should only register blocks once.
-	if ( ! registered ) {
-		registerCoreBlocks();
-		registerBlock( legacyWidget );
-		if ( process.env.GUTENBERG_PHASE === 2 ) {
-			__experimentalRegisterExperimentalCoreBlocks( settings );
-		}
-	}
-
-	registered = true;
+	registerWidgetsEditorBlocks( settings );
 
 	render(
 		<CustomizerEditWidgetsInitializer
@@ -69,6 +55,25 @@ export function customizerInitialize( id, settings, widgetID ) {
 			`.${ id }${ widgetID ? `[data-widget-id="${ widgetID }"]` : '' }`
 		)
 	);
+}
+
+let registered = false;
+/**
+ * Register the blocks needed in the Widgets Editor. Will be a no-op if it's already been registered.
+ *
+ * @param {Object} settings Block editor settings.
+ */
+function registerWidgetsEditorBlocks( settings ) {
+	// The customizer can has many widgets, it should only register blocks once.
+	if ( ! registered ) {
+		registerCoreBlocks();
+		registerBlock( legacyWidget );
+		if ( process.env.GUTENBERG_PHASE === 2 ) {
+			__experimentalRegisterExperimentalCoreBlocks( settings );
+		}
+	}
+
+	registered = true;
 }
 
 /**
