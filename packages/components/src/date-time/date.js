@@ -15,7 +15,7 @@ import { Icon, Button } from '../';
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const isRTL = () => document.documentElement.dir === 'rtl';
 
-const DatePickerHeader = ( { date, decreaseMonth, increaseMonth } ) => (
+const DatePickerHeader = ( { date, decreaseMonth, increaseMonth ,locale } ) => (
 	<div className={ 'components-datetime__date-header' }>
 		<Button
 			className={ `components-datetime__date-header-month-button is-previous-month` }
@@ -24,7 +24,7 @@ const DatePickerHeader = ( { date, decreaseMonth, increaseMonth } ) => (
 			onClick={ increaseMonth }
 		/>
 		<div className={ 'components-datetime__date-header-month' }>
-			<strong>{ format( date, 'MMMM YYYY' ) }</strong>
+			<strong>{ format( date, 'MMMM yyyy', { locale } ) }</strong>
 		</div>
 		<Button
 			className={ `components-datetime__date-header-month-button is-previous-month` }
@@ -35,15 +35,23 @@ const DatePickerHeader = ( { date, decreaseMonth, increaseMonth } ) => (
 	</div>
 );
 
-const DatePicker = ( { onChange, currentDate, isInvalidDate } ) => {
+const DatePicker = ( {
+	onChange,
+	currentDate,
+	isInvalidDate,
+	locale,
+} ) => {
 	const selected = typeof currentDate === 'string' ? new Date( currentDate ) : currentDate;
+	
 	return (
 		<ReactDatePicker
 			calendarClassName={ 'components-datetime__date' }
 			selected={ selected }
 			onChange={ onChange }
 			inline
+			renderCustomHeader={ ( props ) => <DatePickerHeader { ...props } locale={ locale } /> }
 			useWeekdaysShort={ true }
+			locale={ locale }
 		/>
 	);
 };
@@ -154,7 +162,7 @@ class DatePicker extends Component {
 					key={ key }
 					noBorder
 					numberOfMonths={ 1 }
-					onDateChange={ this.onChangeMoment }
+					onChange={ this.onDateChangeMoment }
 					transitionDuration={ 0 }
 					weekDayFormat="ddd"
 					isRTL={ isRTL() }
