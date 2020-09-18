@@ -13,12 +13,6 @@
 		},
 		"label": {
 			"type": "string"
-		},
-		"linkTarget": {
-			"type": "string"
-		},
-		"rel": {
-			"type": "string"
 		}
 	},
 	"supports": {
