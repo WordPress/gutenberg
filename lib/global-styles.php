@@ -579,7 +579,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 		}
 
 		// Create the CSS Custom Properties for the presets.
-		$computed_presets = array();
+		$computed_presets  = array();
 		$presets_structure = gutenberg_experimental_global_styles_get_presets_structure();
 		foreach ( $presets_structure as $token => $preset_meta ) {
 			$block_preset = gutenberg_experimental_get( $tree[ $block_name ]['settings'], $preset_meta['path'] );
@@ -596,7 +596,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 		$preset_variables = gutenberg_experimental_global_styles_get_css_vars( $computed_presets, $preset_prefix, $token );
 
 		// Create the CSS Custom Properties that are specific to the theme.
-		$computed_theme_props = gutenberg_experimental_get( $tree[ $block_name ]['settings'], ['custom'] );
+		$computed_theme_props = gutenberg_experimental_get( $tree[ $block_name ]['settings'], array( 'custom' ) );
 		$theme_props_prefix   = '--wp--custom' . $token;
 		$theme_variables      = gutenberg_experimental_global_styles_get_css_vars(
 			$computed_theme_props,
