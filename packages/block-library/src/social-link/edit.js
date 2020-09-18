@@ -10,7 +10,7 @@ import {
 	InspectorControls,
 	URLPopover,
 	URLInput,
-	__experimentalUseBlockProps as useBlockProps,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { Fragment, useState } from '@wordpress/element';
 import {
@@ -62,7 +62,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
-			<li { ...useBlockProps( { className: classes } ) }>
+			<li { ...useBlockWrapperProps( { className: classes } ) }>
 				<Button onClick={ () => setPopover( true ) }>
 					<IconComponent />
 					{ isSelected && showURLPopover && (

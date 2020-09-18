@@ -8,12 +8,12 @@ import { __ } from '@wordpress/i18n';
  */
 import {
 	PlainText,
-	__experimentalUseBlockProps as useBlockProps,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 
 export default function CodeEdit( { attributes, setAttributes } ) {
 	return (
-		<pre { ...useBlockProps() }>
+		<pre { ...useBlockWrapperProps() }>
 			<PlainText
 				__experimentalVersion={ 2 }
 				tagName="code"

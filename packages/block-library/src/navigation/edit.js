@@ -13,7 +13,7 @@ import {
 	InspectorControls,
 	BlockControls,
 	__experimentalUseColors,
-	__experimentalUseBlockProps as useBlockProps,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import {
@@ -55,7 +55,7 @@ function Navigation( {
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 
-	const blockProps = useBlockProps( { ref } );
+	const blockProps = useBlockWrapperProps( { ref } );
 
 	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
 		[

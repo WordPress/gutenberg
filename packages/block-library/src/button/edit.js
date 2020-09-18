@@ -22,7 +22,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalUseBlockProps as useBlockProps,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 	__experimentalLinkControl as LinkControl,
 	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
@@ -201,7 +201,7 @@ function ButtonEdit( props ) {
 	return (
 		<>
 			<ColorEdit { ...props } />
-			<div { ...useBlockProps() }>
+			<div { ...useBlockWrapperProps() }>
 				<RichText
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }

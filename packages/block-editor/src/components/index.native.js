@@ -57,7 +57,7 @@ export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export {
 	Block as __experimentalBlock,
-	useBlockProps as __experimentalUseBlockProps,
+	useBlockWrapperProps as __experimentalUseBlockWrapperProps,
 } from './block-list/block-wrapper';
 export { default as FloatingToolbar } from './floating-toolbar';
 

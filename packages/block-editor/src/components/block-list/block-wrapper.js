@@ -43,7 +43,7 @@ import ELEMENTS from './block-wrapper-elements';
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
-export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
+export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 	const fallbackRef = useRef();
 	const ref = props.ref || fallbackRef;
 	const onSelectionStart = useContext( Context );
@@ -296,7 +296,10 @@ const BlockComponent = forwardRef(
 		ref
 	) => (
 		<TagName
-			{ ...useBlockProps( { ...props, ref }, { __unstableIsHtml } ) }
+			{ ...useBlockWrapperProps(
+				{ ...props, ref },
+				{ __unstableIsHtml }
+			) }
 		>
 			{ children }
 		</TagName>
