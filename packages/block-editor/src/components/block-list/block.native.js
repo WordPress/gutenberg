@@ -217,7 +217,11 @@ class BlockListBlock extends Component {
 									}
 									blockWidth={ blockWidth }
 									anchorNodeRef={ this.anchorNodeRef.current }
-									isFullWidth={ isFullWidth }
+									isFullWidth={
+										isFullWidth && hasParents
+											? isParentFullWidth
+											: isFullWidth
+									}
 								/>
 							) }
 						</View>

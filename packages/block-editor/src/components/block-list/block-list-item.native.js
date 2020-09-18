@@ -58,6 +58,13 @@ export class BlockListItem extends Component {
 		const { blockWidth } = this.state;
 		const isColumns = name === 'core/columns';
 
+		if ( blockAlignment === WIDE_ALIGNMENTS.alignments.wide ) {
+			if ( hasParents ) {
+				return 0;
+			}
+			return marginHorizontal;
+		}
+
 		if (
 			blockAlignment === WIDE_ALIGNMENTS.alignments.full &&
 			! hasParents
@@ -79,6 +86,7 @@ export class BlockListItem extends Component {
 
 		if (
 			blockAlignment === WIDE_ALIGNMENTS.alignments.full &&
+			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full &&
 			! isColumns
 		) {
 			return 0;
