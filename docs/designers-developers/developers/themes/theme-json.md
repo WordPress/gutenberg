@@ -96,7 +96,8 @@ The settings section has the following structure and default values:
         "customLineHeight": false, /* true to opt-in, as in add_theme_support( 'custom-line-height' ) */
         "dropCap": true, /* false to opt-out */
         "fontSizes": [ ... ], /* font size presets, as in add_theme_support('editor-font-sizes', ... ) */
-      }
+      },
+      "custom": { ... }
     }
   }
 }
@@ -189,6 +190,42 @@ The output to be enqueued will be:
 ```
 
 The goal is that presets can be defined using this format, although, right now, the name property (used in the editor) can't be translated from this file. For that reason, and to maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `experimental-theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
+
+### Theme-only CSS Custom Properties
+
+Besides the presets becoming CSS Custom Properties, the theme.json also allows for themes to create their own, so they don't have to be enqueued separately. Any values declared within the `settings.custom` section will be transformed to CSS Custom Properties following this naming schema: `--wp--theme--<variable-name>`.
+
+For example, for this input:
+
+```json
+{
+  "global": {
+    "settings": {
+      "custom": {
+        "base-font": 16,
+        "line-height": {
+          "small": 1.2,
+          "medium": 1.4,
+          "large": 1.8
+        }
+      }
+    }
+  }
+}
+```
+
+The output will be:
+
+```css
+:root {
+  --wp--theme--base-font: 16;
+  --wp--theme--line-height--small: 1.2;
+  --wp--theme--line-height--medium: 1.4;
+  --wp--theme--line-height--large: 1.8;
+}
+```
+
+Note that, the name of the variable is created by adding `--` in between each nesting level.
 
 ### Styles
 
