@@ -23,7 +23,7 @@ See the [repository management document](/docs/contributors/repository-managemen
 
 ## Git Workflow Walkthrough
 
-The workflow for code and documentation is the same—since both are managed in GitHub—so you can watch a [video walk-through of contributing documentation](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing to Gutenberg](https://mkaz.blog/wordpress/contribute-documentation-to-gutenberg/).
+The workflow for code and documentation is the same, since both are managed in GitHub. You can watch a [video walk-through of contributing documentation](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing to Gutenberg](https://mkaz.blog/wordpress/contribute-documentation-to-gutenberg/).
 
 
 Here is a visual overview of the Git workflow:
@@ -51,7 +51,7 @@ git switch -c update/my-branch
 
 **Step 4**: Make the code changes. Build, confirm, and test your change thoroughly. See [coding guidelines](/docs/contributors/coding-guidelines.md) and [testing overview](/docs/contributors/testing-overview.md) for guidance.
 
-**Step 5**: Commit your change with a [good commmit message](https://make.wordpress.org/core/handbook/best-practices/commit-messages/). This will commit your change to your local copy of the repository. 
+**Step 5**: Commit your change with a [good commmit message](https://make.wordpress.org/core/handbook/best-practices/commit-messages/). This will commit your change to your local copy of the repository.
 
 ```bash
 git commit -m "Your Good Commit Message" path/to/FILE
@@ -78,7 +78,7 @@ That’s it, once approved and merged your copy will be incorporated into the ma
 
 ## Branch Naming
 
-You should name your branches using a prefixes and short description, like this: `[type]/[change]`. 
+You should name your branches using a prefixes and short description, like this: `[type]/[change]`.
 
 Suggested prefixes:
 
