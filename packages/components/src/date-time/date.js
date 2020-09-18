@@ -2,10 +2,12 @@
  * External dependencies
  */
 import ReactDatePicker from 'react-datepicker';
+import { format, setMonth, getMonth, getYear } from 'date-fns';
 
 /**
  * WordPress dependencies
  */
+import { Icon, Button } from '../';
 
 /**
  * Module Constants
@@ -13,15 +15,35 @@ import ReactDatePicker from 'react-datepicker';
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const isRTL = () => document.documentElement.dir === 'rtl';
 
+const DatePickerHeader = ( { date, decreaseMonth, increaseMonth } ) => (
+	<div className={ 'components-datetime__date-header' }>
+		<Button
+			className={ `components-datetime__date-header-month-button is-previous-month` }
+			icon={ 'arrow-left-alt' }
+			isSmall={ true }
+			onClick={ increaseMonth }
+		/>
+		<div className={ 'components-datetime__date-header-month' }>
+			<strong>{ format( date, 'MMMM YYYY' ) }</strong>
+		</div>
+		<Button
+			className={ `components-datetime__date-header-month-button is-previous-month` }
+			icon={ 'arrow-right-alt' }
+			isSmall={ true }
+			onClick={ decreaseMonth }
+		/>
+	</div>
+);
+
 const DatePicker = ( { onChange, currentDate, isInvalidDate } ) => {
 	const selected = typeof currentDate === 'string' ? new Date( currentDate ) : currentDate;
-
 	return (
 		<ReactDatePicker
 			calendarClassName={ 'components-datetime__date' }
 			selected={ selected }
 			onChange={ onChange }
 			inline
+			useWeekdaysShort={ true }
 		/>
 	);
 };

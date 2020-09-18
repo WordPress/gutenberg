@@ -55,18 +55,44 @@ $date-picker-date-size: 30px;
 	.react-datepicker__header {
 		background-color: transparent;
 		border: 0;
+	}
 
-		.react-datepicker__current-month {
-			color: $gray-800;
-			font-size: $default-font-size;
+	.components-datetime__date-header {
+		height: 25px;
+		display: flex;
+	}
+	
+	.components-datetime__date-header-month {
+		color: $gray-800;
+		font-size: $default-font-size;
+		flex-grow: 2;
+		align-self: center;
+	}
+
+	.components-datetime__date-header-month-button {
+		color: $gray-400;
+		border: 1px solid $gray-100;
+		border-radius: 3px;
+		&:hover {
+			border-color: $gray-400;
 		}
+	}
+
+	.react-datepicker__day-names {
+		margin-top: 5px;
+	}
+
+	.react-datepicker__day-name {
+		width: $date-picker-date-size;
+		color: $gray-700;
+		margin: 0 1px;
 	}
 
 	.react-datepicker__day {
 		width: $date-picker-date-size;
 		height: $date-picker-date-size;
 		line-height: $date-picker-date-size;
-		margin: 3px;
+		margin: 2px 1px;
 		padding-right: 1px;
 		vertical-align: middle;
 		font-size: $default-font-size;

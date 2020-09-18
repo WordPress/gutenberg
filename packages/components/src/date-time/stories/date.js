@@ -22,12 +22,7 @@ export default {
 const DatePickerInstance = () => {
 	const [ date, setDate ] = useState();
 
-	return (
-		<DatePicker
-			currentDate={ date }
-			onDateChange={ setDate }
-		/>
-	);
+	return <DatePicker currentDate={ date } onDateChange={ setDate } />;
 };
 
 export const _default = () => {
