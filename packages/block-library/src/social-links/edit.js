@@ -37,7 +37,7 @@ export function SocialLinksEdit( props ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link Settings' ) }>
 					<ToggleControl
-						label={ __( 'Open Links in new Tab' ) }
+						label={ __( 'Open links in new tab' ) }
 						checked={ openInNewTab }
 						onChange={ () =>
 							setAttributes( { openInNewTab: ! openInNewTab } )
