@@ -164,7 +164,7 @@ function ColumnsEditContainer( {
 						updateInnerColumnWidth( value, column.clientId )
 					}
 					cellContainerStyle={ styles.cellContainerStyle }
-					toFixed={ 1 }
+					decimalNum={ 1 }
 					rangePreview={
 						<ColumnsPreview
 							columnWidths={ columnWidths }
