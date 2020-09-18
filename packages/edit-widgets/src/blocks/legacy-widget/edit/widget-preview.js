@@ -11,12 +11,15 @@ import { Disabled, FocusableIframe } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
-function WidgetPreview( { postLink, attributes, ...props } ) {
+function WidgetPreview( { postLink, widgetAreaId, attributes, ...props } ) {
 	const DEFAULT_HEIGHT = 300;
 	const HEIGTH_MARGIN = 20;
 	const [ height, setHeight ] = useState( DEFAULT_HEIGHT );
 	const iframeUrl = addQueryArgs( postLink, {
-		widgetPreview: attributes,
+		widgetPreview: {
+			...attributes,
+			sidebarId: widgetAreaId,
+		},
 	} );
 	return (
 		<Disabled>

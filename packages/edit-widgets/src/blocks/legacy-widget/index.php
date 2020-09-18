@@ -27,64 +27,50 @@ function register_block_core_legacy_widget() {
  *
  */
 function render_block_core_legacy_widget( $attributes ) {
+	global $wp_widget_factory, $wp_registered_sidebars;
+
 	if ( isset( $attributes['widgetId'] ) ) {
 		return 'Rendering legacy widget block using a widget ID is unsupported';
 	}
-	if ( ! isset( $attributes['widgetClass'] ) ) {
+	$widget_id = - 1;
+
+	if ( ! isset( $attributes['sidebarId'] ) || ! isset( $wp_registered_sidebars[ $attributes['sidebarId'] ] ) ) {
 		return '';
 	}
+	$sidebar_id = $attributes['sidebarId'];
 
-	$instance = null;
-	if ( isset( $attributes['instance'] ) ) {
-		$instance = $attributes['instance'];
+	if ( ! isset( $attributes['widgetClass'] ) || ! isset( $wp_widget_factory->widgets[ $attributes['widgetClass'] ] ) ) {
+		return '';
 	}
+	$widget_class = $attributes['widgetClass'];
+	$widget_obj   = $wp_widget_factory->widgets[ $widget_class ];
 
-	global $wp_widget_factory;
-	$widget_id = '0';
-	$widget_obj = $wp_widget_factory->widgets[ $attributes['widgetClass'] ];
-	return render_single_widget(
-		'sidebar-1',
-		$widget_id,
-		array_merge(
-			array(
-				'classname' => '',
-			),
-			$widget_obj->widget_options,
-			array(
-				'instance' => $instance,
-			)
-		),
-		function ( $params ) use ( $widget_obj, $instance ) {
-			$widget_obj->_set( - 1 );
-			$widget_obj->widget( $params, $instance );
-		},
+	$instance = isset( $attributes['instance'] ) ? $attributes['instance'] : null;
+
+	$widget_params = array_merge(
 		array(
-			'widget_id'   => $widget_id,
-			'widget_name' => $widget_obj->name,
-		)
+			'classname' => array(),
+		),
+		$widget_obj->widget_options
 	);
-}
-
-add_action( 'init', 'register_block_core_legacy_widget' );
-
-
-function render_single_widget( $sidebar_id, $widget_id, $widget_params, $callback, $sidebar_params ) {
-	global $wp_registered_sidebars;
-
-	$index = $sidebar_id;
 
 	/** This filter is documented in wp-includes/widgets/widgets.php */
-	do_action( 'dynamic_sidebar_before', $index, true );
-	$sidebar = $wp_registered_sidebars[ $index ];
+	do_action( 'dynamic_sidebar_before', $sidebar_id, true );
+	$sidebar = $wp_registered_sidebars[ $sidebar_id ];
 
 	$params = array_merge(
 		array(
 			array_merge(
 				$sidebar,
-				$sidebar_params
+				array(
+					'widget_id'   => $widget_id,
+					'widget_name' => $widget_obj->name,
+				)
 			),
 		),
-		$widget_params
+		array(
+			$instance,
+		)
 	);
 
 	// Substitute HTML `id` and `class` attributes into `before_widget`.
@@ -105,9 +91,15 @@ function render_single_widget( $sidebar_id, $widget_id, $widget_params, $callbac
 	/** This filter is documented in wp-includes/widgets/widgets.php */
 	do_action( 'dynamic_sidebar', $widget_params );
 
-	if ( is_callable( $callback ) ) {
-		ob_start();
-		call_user_func_array( $callback, $params );
-		return ob_get_clean();
-	}
+	$callback = function ( $params ) use ( $widget_obj, $instance ) {
+		$widget_obj->widget( $params, $instance );
+	};
+
+	ob_start();
+	$widget_obj->_set( - 1 );
+	call_user_func_array( array( $widget_obj, 'widget' ), $params );
+
+	return ob_get_clean();
 }
+
+add_action( 'init', 'register_block_core_legacy_widget' );
