@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, set, flatten, partialRight } from 'lodash';
+import { map, set, flatten, omit, partialRight } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,11 +12,12 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
-import { addFilter, removeFilter } from '@wordpress/hooks';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -30,6 +31,43 @@ function disableInsertingNonNavigationBlocks( settings, name ) {
 	}
 	return settings;
 }
+
+function removeNavigationBlockSettingsUnsupportedFeatures( settings, name ) {
+	if ( name !== 'core/navigation' ) {
+		return settings;
+	}
+
+	return {
+		...settings,
+		supports: {
+			...omit( settings.supports, [
+				'anchor',
+				'customClassName',
+				'__experimentalColor',
+				'__experimentalFontSize',
+			] ),
+			customClassName: false,
+		},
+	};
+}
+
+const removeNavigationBlockEditUnsupportedFeatures = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => {
+		if ( props.name !== 'core/navigation' ) {
+			return <BlockEdit { ...props } />;
+		}
+
+		return (
+			<BlockEdit
+				{ ...props }
+				hasSubmenuIndicatorSetting={ false }
+				hasItemJustificationControls={ false }
+				hasListViewModal={ false }
+			/>
+		);
+	},
+	'removeNavigationBlockEditUnsupportedFeatures'
+);
 
 /**
  * Fetches link suggestions from the API. This function is an exact copy of a function found at:
@@ -106,26 +144,6 @@ const fetchLinkSuggestions = (
 	} );
 };
 
-removeFilter(
-	'navigation.BlockEdit',
-	'core/block-library/navigation/with-inspector-controls'
-);
-
-removeFilter(
-	'navigation.BlockEdit',
-	'core/block-library/navigation/with-block-controls'
-);
-
-removeFilter(
-	'navigation.BlockEdit',
-	'core/block-library/navigation/with-list-view'
-);
-
-removeFilter(
-	'navigation.BlockEdit',
-	'core/block-library/navigation/with-formatting-controls'
-);
-
 export function initialize( id, settings ) {
 	if ( ! settings.blockNavMenus ) {
 		addFilter(
@@ -134,6 +152,18 @@ export function initialize( id, settings ) {
 			disableInsertingNonNavigationBlocks
 		);
 	}
+
+	addFilter(
+		'blocks.registerBlockType',
+		'core/edit-navigation/remove-navigation-block-settings-unsupported-features',
+		removeNavigationBlockSettingsUnsupportedFeatures
+	);
+
+	addFilter(
+		'editor.BlockEdit',
+		'core/edit-navigation/remove-navigation-block-edit-unsupported-features',
+		removeNavigationBlockEditUnsupportedFeatures
+	);
 
 	registerCoreBlocks();
 
