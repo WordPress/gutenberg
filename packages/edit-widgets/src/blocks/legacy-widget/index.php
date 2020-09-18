@@ -24,13 +24,12 @@ function register_block_core_legacy_widget() {
  *
  * @return string Returns the post content with the legacy widget added.
  * @see WP_Widget
- *
  */
 function render_block_core_legacy_widget( $attributes ) {
 	global $wp_widget_factory, $wp_registered_sidebars;
 
 	if ( isset( $attributes['widgetId'] ) ) {
-		return 'Rendering legacy widget block using a widget ID is unsupported';
+		return __( 'Rendering legacy widget block using widgetId is unsupported.', 'gutenberg' );
 	}
 	$widget_id = - 1;
 
@@ -90,10 +89,6 @@ function render_block_core_legacy_widget( $attributes ) {
 
 	/** This filter is documented in wp-includes/widgets/widgets.php */
 	do_action( 'dynamic_sidebar', $widget_params );
-
-	$callback = function ( $params ) use ( $widget_obj, $instance ) {
-		$widget_obj->widget( $params, $instance );
-	};
 
 	ob_start();
 	$widget_obj->_set( - 1 );
