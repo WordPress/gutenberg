@@ -32,7 +32,7 @@ import {
 	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
-	__experimentalBlock as Block,
+	__experimentalUseBlockProps as useBlockProps,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import {
@@ -295,27 +295,29 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<Block.li
-				className={ classnames( {
-					'is-editing':
-						( isSelected || isParentOfSelectedBlock ) &&
-						// Don't show the element as editing while dragging.
-						! isDraggingBlocks,
-					// Don't select the element while dragging.
-					'is-selected': isSelected && ! isDraggingBlocks,
-					'is-dragging-within': isDraggingWithin,
-					'has-link': !! url,
-					'has-child': hasDescendants,
-					'has-text-color': rgbTextColor,
-					[ `has-${ textColor }-color` ]: !! textColor,
-					'has-background': rgbBackgroundColor,
-					[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+			<li
+				{ ...useBlockProps( {
+					ref: listItemRef,
+					className: classnames( {
+						'is-editing':
+							( isSelected || isParentOfSelectedBlock ) &&
+							// Don't show the element as editing while dragging.
+							! isDraggingBlocks,
+						// Don't select the element while dragging.
+						'is-selected': isSelected && ! isDraggingBlocks,
+						'is-dragging-within': isDraggingWithin,
+						'has-link': !! url,
+						'has-child': hasDescendants,
+						'has-text-color': rgbTextColor,
+						[ `has-${ textColor }-color` ]: !! textColor,
+						'has-background': rgbBackgroundColor,
+						[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+					} ),
+					style: {
+						color: rgbTextColor,
+						backgroundColor: rgbBackgroundColor,
+					},
 				} ) }
-				style={ {
-					color: rgbTextColor,
-					backgroundColor: rgbBackgroundColor,
-				} }
-				ref={ listItemRef }
 			>
 				<div className="wp-block-navigation-link__content">
 					<RichText
@@ -443,7 +445,7 @@ function NavigationLinkEdit( {
 						),
 					} }
 				/>
-			</Block.li>
+			</li>
 		</Fragment>
 	);
 }

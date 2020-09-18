@@ -13,13 +13,13 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalBlock as Block,
+	__experimentalUseBlockProps as useBlockProps,
 	getFontSize,
 	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { formatLtr } from '@wordpress/icons';
 
 function getComputedStyle( node, pseudo ) {
@@ -106,7 +106,6 @@ function ParagraphBlock( {
 		fontSize,
 		style,
 	} = attributes;
-	const ref = useRef();
 	const [ isDropCapEnabled, dropCapMinimumHeight ] = useDropCap(
 		dropCap,
 		fontSize,
@@ -155,14 +154,15 @@ function ParagraphBlock( {
 				) }
 			</InspectorControls>
 			<RichText
-				ref={ ref }
 				identifier="content"
-				tagName={ Block.p }
-				className={ classnames( {
-					'has-drop-cap': dropCap,
-					[ `has-text-align-${ align }` ]: align,
+				tagName="p"
+				{ ...useBlockProps( {
+					className: classnames( {
+						'has-drop-cap': dropCap,
+						[ `has-text-align-${ align }` ]: align,
+					} ),
+					style: styles,
 				} ) }
-				style={ styles }
 				value={ content }
 				onChange={ ( newContent ) =>
 					setAttributes( { content: newContent } )

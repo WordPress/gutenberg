@@ -11,6 +11,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	RichText,
+	__experimentalUseBlockProps as useBlockProps,
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
@@ -37,8 +38,10 @@ export default function QuoteEdit( {
 				/>
 			</BlockControls>
 			<BlockQuotation
-				className={ classnames( className, {
-					[ `has-text-align-${ align }` ]: align,
+				{ ...useBlockProps( {
+					className: classnames( className, {
+						[ `has-text-align-${ align }` ]: align,
+					} ),
 				} ) }
 			>
 				<RichText

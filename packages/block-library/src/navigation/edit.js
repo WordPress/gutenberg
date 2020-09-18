@@ -13,7 +13,7 @@ import {
 	InspectorControls,
 	BlockControls,
 	__experimentalUseColors,
-	__experimentalBlock as Block,
+	__experimentalUseBlockProps as useBlockProps,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import {
@@ -54,6 +54,8 @@ function Navigation( {
 	);
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
+
+	const blockProps = useBlockProps( { ref } );
 
 	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
 		[
@@ -97,7 +99,7 @@ function Navigation( {
 
 	if ( isPlaceholderShown ) {
 		return (
-			<Block.div>
+			<div { ...blockProps }>
 				<NavigationPlaceholder
 					ref={ ref }
 					onCreate={ ( blocks, selectNavigationBlock ) => {
@@ -108,7 +110,7 @@ function Navigation( {
 						}
 					} }
 				/>
-			</Block.div>
+			</div>
 		);
 	}
 
@@ -176,7 +178,13 @@ function Navigation( {
 			</InspectorControls>
 			<TextColor>
 				<BackgroundColor>
-					<Block.nav className={ blockClassNames }>
+					<nav
+						{ ...blockProps }
+						className={ classnames(
+							blockProps.className,
+							blockClassNames
+						) }
+					>
 						<InnerBlocks
 							ref={ ref }
 							allowedBlocks={ [
@@ -206,7 +214,7 @@ function Navigation( {
 							// inherit templateLock={ 'all' }.
 							templateLock={ false }
 						/>
-					</Block.nav>
+					</nav>
 				</BackgroundColor>
 			</TextColor>
 		</>

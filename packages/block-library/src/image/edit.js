@@ -15,7 +15,7 @@ import {
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
-	__experimentalBlock as Block,
+	__experimentalUseBlockProps as useBlockProps,
 } from '@wordpress/block-editor';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -272,10 +272,12 @@ export function ImageEdit( {
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 	} );
 
+	const blockProps = useBlockProps( { ref, className: classes } );
+
 	return (
 		<>
 			{ controls }
-			<Block.figure ref={ ref } className={ classes }>
+			<figure { ...blockProps }>
 				{ url && (
 					<Image
 						attributes={ attributes }
@@ -290,7 +292,7 @@ export function ImageEdit( {
 					/>
 				) }
 				{ mediaPlaceholder }
-			</Block.figure>
+			</figure>
 		</>
 	);
 }

@@ -22,7 +22,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalBlock as Block,
+	__experimentalUseBlockProps as useBlockProps,
 	__experimentalLinkControl as LinkControl,
 	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
@@ -201,7 +201,7 @@ function ButtonEdit( props ) {
 	return (
 		<>
 			<ColorEdit { ...props } />
-			<Block.div>
+			<div { ...useBlockProps() }>
 				<RichText
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
@@ -231,7 +231,7 @@ function ButtonEdit( props ) {
 					onMerge={ mergeBlocks }
 					identifier="text"
 				/>
-			</Block.div>
+			</div>
 			<URLPicker
 				url={ url }
 				setAttributes={ setAttributes }
