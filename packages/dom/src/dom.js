@@ -249,12 +249,12 @@ export function getRectangleFromRange( range ) {
 /**
  * Get the rectangle for the selection in a container.
  *
- * @param {Window} window The window of the selection.
+ * @param {Window} win The window of the selection.
  *
  * @return {?DOMRect} The rectangle.
  */
-export function computeCaretRect( window ) {
-	const selection = window.getSelection();
+export function computeCaretRect( win ) {
+	const selection = win.getSelection();
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( ! range ) {
@@ -501,10 +501,12 @@ export function isNumberInput( element ) {
  *
  * See: https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects.
  *
+ * @param {Document} doc The document to check.
+ *
  * @return {boolean} True if there is selection, false if not.
  */
-export function documentHasTextSelection( document ) {
-	const selection = document.defaultView.getSelection();
+export function documentHasTextSelection( doc ) {
+	const selection = doc.defaultView.getSelection();
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 	return range && ! range.collapsed;
 }
@@ -548,12 +550,14 @@ function inputFieldHasUncollapsedSelection( element ) {
  * ranges of text across elements and any selection inside <input> and
  * <textarea> elements.
  *
+ * @param {Document} doc The document to check.
+ *
  * @return {boolean} Whether there is any sort of "selection" in the document.
  */
-export function documentHasUncollapsedSelection( document ) {
+export function documentHasUncollapsedSelection( doc ) {
 	return (
-		documentHasTextSelection( document ) ||
-		inputFieldHasUncollapsedSelection( document.activeElement )
+		documentHasTextSelection( doc ) ||
+		inputFieldHasUncollapsedSelection( doc.activeElement )
 	);
 }
 
@@ -561,15 +565,15 @@ export function documentHasUncollapsedSelection( document ) {
  * Check whether the current document has a selection. This checks for both
  * focus in an input field and general text selection.
  *
- * @param {Document} document The document to check.
+ * @param {Document} doc The document to check.
  *
  * @return {boolean} True if there is selection, false if not.
  */
-export function documentHasSelection( document ) {
+export function documentHasSelection( doc ) {
 	return (
-		isTextField( document.activeElement ) ||
-		isNumberInput( document.activeElement ) ||
-		documentHasTextSelection( document )
+		isTextField( doc.activeElement ) ||
+		isNumberInput( doc.activeElement ) ||
+		documentHasTextSelection( doc )
 	);
 }
 
