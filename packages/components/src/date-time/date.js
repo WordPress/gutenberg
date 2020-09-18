@@ -2,6 +2,7 @@
  * External dependencies
  */
 import ReactDatePicker from 'react-datepicker';
+import { map } from 'lodash';
 import { format, setMonth, getMonth, getYear } from 'date-fns';
 
 /**
@@ -21,7 +22,7 @@ const DatePickerHeader = ( { date, decreaseMonth, increaseMonth ,locale } ) => (
 			className={ `components-datetime__date-header-month-button is-previous-month` }
 			icon={ 'arrow-left-alt' }
 			isSmall={ true }
-			onClick={ increaseMonth }
+			onClick={ decreaseMonth }
 		/>
 		<div className={ 'components-datetime__date-header-month' }>
 			<strong>{ format( date, 'MMMM yyyy', { locale } ) }</strong>
@@ -30,7 +31,7 @@ const DatePickerHeader = ( { date, decreaseMonth, increaseMonth ,locale } ) => (
 			className={ `components-datetime__date-header-month-button is-previous-month` }
 			icon={ 'arrow-right-alt' }
 			isSmall={ true }
-			onClick={ decreaseMonth }
+			onClick={ increaseMonth }
 		/>
 	</div>
 );
@@ -40,18 +41,22 @@ const DatePicker = ( {
 	currentDate,
 	isInvalidDate,
 	locale,
+	events,
 } ) => {
 	const selected = typeof currentDate === 'string' ? new Date( currentDate ) : currentDate;
-	
+	const highlightDates = events?.length ? map( events, 'date' ) : [];
 	return (
 		<ReactDatePicker
 			calendarClassName={ 'components-datetime__date' }
 			selected={ selected }
 			onChange={ onChange }
 			inline
-			renderCustomHeader={ ( props ) => <DatePickerHeader { ...props } locale={ locale } /> }
+			renderCustomHeader={ ( props ) =>
+				<DatePickerHeader { ...props } locale={ locale } />
+			}
 			useWeekdaysShort={ true }
 			locale={ locale }
+			highlightDates={ highlightDates }
 		/>
 	);
 };
