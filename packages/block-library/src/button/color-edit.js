@@ -225,6 +225,7 @@ function ColorEdit( props ) {
 				).color,
 				gradientValue,
 				onGradientChange: onChangeGradient,
+				disableAlpha: false,
 			},
 		];
 	}, [

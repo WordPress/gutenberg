@@ -353,6 +353,7 @@ export function ColorEdit( props ) {
 								onGradientChange: hasGradient
 									? onChangeGradient
 									: undefined,
+								disableAlpha: false,
 							},
 					  ]
 					: [] ),
