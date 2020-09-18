@@ -23,7 +23,8 @@ describe( 'Multi-entity save flow', () => {
 	const templatePartSelector = '*[data-type="core/template-part"]';
 	const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-block-list__layout`;
 	const savePanelSelector = '.entities-saved-states__panel';
-	const closePanelButtonSelector = 'button[aria-label="Close panel"]';
+	const closePanelButtonSelector =
+		'.editor-post-publish-panel__header-cancel-button button';
 	const createNewButtonSelector =
 		'//button[contains(text(), "New template part")]';
 

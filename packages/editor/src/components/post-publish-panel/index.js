@@ -95,10 +95,7 @@ export class PostPublishPanel extends Component {
 								/>
 							</div>
 							<div className="editor-post-publish-panel__header-cancel-button">
-								<Button
-									onClick={ onClose }									
-									isSecondary
-								>
+								<Button onClick={ onClose } isSecondary>
 									{ __( 'Cancel' ) }
 								</Button>
 							</div>
