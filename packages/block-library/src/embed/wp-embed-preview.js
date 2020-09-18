@@ -4,11 +4,13 @@
 import { Component, createRef } from '@wordpress/element';
 import { withGlobalEvents } from '@wordpress/compose';
 
+/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+
 /**
  * Browser dependencies
  */
 
-const { FocusEvent, DOMParser } = window;
+const { FocusEvent } = window;
 
 class WpEmbedPreview extends Component {
 	constructor() {
@@ -16,6 +18,36 @@ class WpEmbedPreview extends Component {
 
 		this.checkFocus = this.checkFocus.bind( this );
 		this.node = createRef();
+	}
+
+	componentDidMount() {
+		window.addEventListener( 'message', this.resizeWPembeds );
+	}
+
+	componentWillUnmount() {
+		window.removeEventListener( 'message', this.resizeWPembeds );
+	}
+
+	/**
+	 * Checks for WordPress embed event signaling the height
+	 * change when content loads.
+	 *
+	 * @param {WPSyntheticEvent} event Message event.
+	 */
+	resizeWPembeds( { data: { secret, message, value } = {} } ) {
+		if ( [ secret, message, value ].some( ( attribute ) => ! attribute ) )
+			return;
+
+		if ( message === 'height' ) {
+			const iframes = document.querySelectorAll(
+				`iframe[data-secret="${ secret }"`
+			);
+			( iframes || [] ).forEach( ( iframe ) => {
+				if ( +iframe.height !== value ) {
+					iframe.height = value;
+				}
+			} );
+		}
 	}
 
 	/**
@@ -38,15 +70,21 @@ class WpEmbedPreview extends Component {
 
 	render() {
 		const { html } = this.props;
-		const doc = new DOMParser().parseFromString( html, 'text/html' );
-		doc.querySelector( 'iframe' ).removeAttribute( 'style' );
-		doc.querySelector( 'blockquote' ).style.display = 'none';
+		if ( this.node.current ) {
+			this.node.current.querySelector( 'blockquote' ).style.display =
+				'none';
+			this.node.current
+				.querySelector( 'iframe' )
+				.removeAttribute( 'style' );
+		}
 
 		return (
 			<div
 				ref={ this.node }
 				className="wp-block-embed__wrapper"
-				dangerouslySetInnerHTML={ { __html: doc.body.innerHTML } }
+				dangerouslySetInnerHTML={ {
+					__html: html,
+				} }
 			/>
 		);
 	}
