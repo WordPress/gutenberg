@@ -25,6 +25,7 @@ const DatePicker = ( { onChange, currentDate, isInvalidDate } ) => {
 		/>
 	);
 };
+
 /*
 class DatePicker extends Component {
 	constructor() {
