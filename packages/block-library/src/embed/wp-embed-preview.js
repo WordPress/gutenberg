@@ -84,9 +84,7 @@ class WpEmbedPreview extends Component {
 			<div
 				ref={ this.node }
 				className="wp-block-embed__wrapper"
-				dangerouslySetInnerHTML={ {
-					__html: html,
-				} }
+				dangerouslySetInnerHTML={ { __html: html } }
 			/>
 		);
 	}
