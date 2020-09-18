@@ -1237,6 +1237,7 @@ _Parameters_
 -   _blocks_ `(Object|Array<Object>)`: Replacement block(s).
 -   _indexToSelect_ `number`: Index of replacement block to select.
 -   _initialPosition_ `number`: Index of caret after in the selected block after the operation.
+-   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 <a name="replaceInnerBlocks" href="#replaceInnerBlocks">#</a> **replaceInnerBlocks**
 
