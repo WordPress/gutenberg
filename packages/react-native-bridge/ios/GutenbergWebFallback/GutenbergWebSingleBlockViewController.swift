@@ -109,7 +109,7 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
         ])
     }
 
-    func removeCoverViewAnimated() {
+    public func removeCoverViewAnimated() {
         UIView.animate(withDuration: 1, animations: {
             self.coverView.alpha = 0
         }) { _ in
@@ -144,7 +144,7 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
 }
 
 extension GutenbergWebSingleBlockViewController: WKNavigationDelegate {
-    public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+    open func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
         // At this point, user scripts are not loaded yet, so we need to inject the
         // script that inject css manually before actually injecting the css.
         evaluateJavascript(jsInjection.injectCssScript)
