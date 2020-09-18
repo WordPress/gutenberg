@@ -11,8 +11,8 @@
  */
 function gutenberg_reregister_core_block_types() {
 	// Blocks directory may not exist if working from a fresh clone.
-	$blocks_dirs = [
-		dirname( __FILE__ ) . '/../build/block-library/blocks/' => [
+	$blocks_dirs = array(
+		dirname( __FILE__ ) . '/../build/block-library/blocks/' => array(
 			'block_folders' => array(
 				'audio',
 				'button',
@@ -47,22 +47,24 @@ function gutenberg_reregister_core_block_types() {
 				'video',
 				'widget-area',
 			),
-			'block_names'   => array_merge( array(
-				'archives.php'        => 'core/archives',
-				'block.php'           => 'core/block',
-				'calendar.php'        => 'core/calendar',
-				'categories.php'      => 'core/categories',
-				'cover.php'           => 'core/cover',
-				'latest-comments.php' => 'core/latest-comments',
-				'latest-posts.php'    => 'core/latest-posts',
-				'navigation.php'      => 'core/navigation',
-				'navigation-link.php' => 'core/navigation-link',
-				'rss.php'             => 'core/rss',
-				'search.php'          => 'core/search',
-				'shortcode.php'       => 'core/shortcode',
-				'social-link.php'     => 'core/social-link',
-				'tag-cloud.php'       => 'core/tag-cloud',
-			), ! gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' )
+			'block_names'   => array_merge(
+				array(
+					'archives.php'        => 'core/archives',
+					'block.php'           => 'core/block',
+					'calendar.php'        => 'core/calendar',
+					'categories.php'      => 'core/categories',
+					'cover.php'           => 'core/cover',
+					'latest-comments.php' => 'core/latest-comments',
+					'latest-posts.php'    => 'core/latest-posts',
+					'navigation.php'      => 'core/navigation',
+					'navigation-link.php' => 'core/navigation-link',
+					'rss.php'             => 'core/rss',
+					'search.php'          => 'core/search',
+					'shortcode.php'       => 'core/shortcode',
+					'social-link.php'     => 'core/social-link',
+					'tag-cloud.php'       => 'core/tag-cloud',
+				),
+				! gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' )
 				? array()
 				:
 				array(
@@ -88,8 +90,9 @@ function gutenberg_reregister_core_block_types() {
 					'site-tagline.php'            => 'core/site-tagline',
 					'site-title.php'              => 'core/site-title',
 					'template-part.php'           => 'core/template-part',
-				) ),
-		],
+				)
+			),
+		),
 		dirname( __FILE__ ) . '/../build/edit-widgets/blocks/'  => array(
 			'block_folders' => array(
 				'legacy-widget',
@@ -98,7 +101,7 @@ function gutenberg_reregister_core_block_types() {
 				'legacy-widget.php' => 'core/legacy-widget',
 			),
 		),
-	];
+	);
 	foreach ( $blocks_dirs as $blocks_dir => $details ) {
 		if ( ! file_exists( $blocks_dir ) ) {
 			return;
