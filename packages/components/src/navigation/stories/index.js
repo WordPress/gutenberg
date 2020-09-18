@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -29,6 +29,12 @@ const Container = styled.div`
 function Example() {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
+
+	const [ delayedBadge, setDelayedBadge ] = useState();
+	useEffect( () => {
+		const timeout = setTimeout( () => setDelayedBadge( 2 ), 1500 );
+		return () => clearInterval( timeout );
+	} );
 
 	// Mock navigation link
 	const Link = ( { href, children } ) => (
@@ -70,6 +76,12 @@ function Example() {
 							item="item-3"
 							navigateToMenu="category"
 							title="Category"
+						/>
+						<NavigationItem
+							badge={ delayedBadge }
+							item="item-3-fetching-badge"
+							navigateToMenu="category"
+							title="Delayed badge"
 						/>
 						<NavigationItem
 							item="item-pointing-non-existing-menu"
