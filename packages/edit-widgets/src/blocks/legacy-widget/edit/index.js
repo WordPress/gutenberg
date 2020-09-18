@@ -104,7 +104,7 @@ class LegacyWidgetEdit extends Component {
 								icon={ update }
 							/>
 						) }
-						{ hasEditForm && (
+						{ hasEditForm && ! WPWidget?.isReferenceWidget && (
 							<>
 								<Button
 									className="components-tab-button"
