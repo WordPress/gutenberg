@@ -18,7 +18,7 @@ class WP_Customize_Widget_Blocks_Control extends WP_Customize_Control {
 	 * @since 6.1.0
 	 */
 	public function enqueue() {
-		gutenberg_widgets_init( 'gutenberg_customizer' );
+		gutenberg_widgets_init( 'gutenberg_customizer', $this->id );
 	}
 
 	/**
@@ -29,12 +29,12 @@ class WP_Customize_Widget_Blocks_Control extends WP_Customize_Control {
 	public function render_content() {
 		?>
 			<input
-				id="_customize-input-gutenberg_widget_blocks"
+				id="_customize-input-gutenberg_widget_blocks_<?php echo esc_attr( $this->id ); ?>"
 				type="hidden"
 				value="<?php echo esc_attr( $this->value() ); ?>"
 				<?php $this->link(); ?>
 			/>
 		<?php
-		the_gutenberg_widgets( 'gutenberg_customizer' );
+		the_gutenberg_widgets( 'gutenberg_customizer', $this->id );
 	}
 }

@@ -19,7 +19,7 @@ import Header from '../header';
 import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
 import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 
-function CustomizerEditWidgetsInitializer( { settings } ) {
+function CustomizerEditWidgetsInitializer( { widgetID, settings } ) {
 	useSimulatedMediaQuery( 'resizable-editor-section', 360 );
 	const blockEditorSettings = useMemo(
 		() => ( {
@@ -29,7 +29,7 @@ function CustomizerEditWidgetsInitializer( { settings } ) {
 		[ settings ]
 	);
 	return (
-		<WidgetAreasBlockEditorProvider>
+		<WidgetAreasBlockEditorProvider widgetID={ widgetID }>
 			<div
 				className="edit-widgets-customizer-edit-widgets-initializer__content"
 				role="region"

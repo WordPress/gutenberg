@@ -24,10 +24,16 @@ import {
  */
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import { useEntityBlockEditor } from '@wordpress/core-data';
-import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
+import {
+	buildWidgetAreasPostId,
+	buildWidgetAreaPostId,
+	KIND,
+	POST_TYPE,
+} from '../../store/utils';
 
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
+	widgetID,
 	...props
 } ) {
 	const { hasUploadPermissions } = useSelect( ( select ) => ( {
@@ -59,7 +65,11 @@ export default function WidgetAreasBlockEditorProvider( {
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		KIND,
 		POST_TYPE,
-		{ id: buildWidgetAreasPostId() }
+		{
+			id: widgetID
+				? buildWidgetAreaPostId( widgetID )
+				: buildWidgetAreasPostId(),
+		}
 	);
 
 	return (

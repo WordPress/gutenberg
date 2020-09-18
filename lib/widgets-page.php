@@ -10,19 +10,20 @@
  *
  * @since 5.2.0
  *
- * @param string $page The page name the function is being called for, `'gutenberg_customizer'` for the Customizer.
+ * @param string $page      The page name the function is being called for, `'gutenberg_customizer'` for the Customizer.
+ * @param string $widget_id The widget ID the function is rendering, used in customizer.
  */
-function the_gutenberg_widgets( $page = 'appearance_page_gutenberg-widgets' ) {
+function the_gutenberg_widgets( $page = 'appearance_page_gutenberg-widgets', $widget_id = '' ) {
 	?>
 	<div
-		id="widgets-editor"
-		class="blocks-widgets-container
+		class="blocks-widgets-container widgets-editor
 		<?php
 		echo 'gutenberg_customizer' === $page
 			? ' is-in-customizer'
 			: '';
 		?>
 		"
+		<?php echo $widget_id ? 'data-widget-id="' . $widget_id . '"' : '' ?>
 	>
 	</div>
 	<?php
@@ -35,7 +36,7 @@ function the_gutenberg_widgets( $page = 'appearance_page_gutenberg-widgets' ) {
  *
  * @param string $hook Page.
  */
-function gutenberg_widgets_init( $hook ) {
+function gutenberg_widgets_init( $hook, $widget_id = '' ) {
 	if ( 'widgets.php' === $hook ) {
 		wp_enqueue_style( 'wp-block-library' );
 		wp_enqueue_style( 'wp-block-library-theme' );
@@ -98,10 +99,11 @@ function gutenberg_widgets_init( $hook ) {
 		'wp-edit-widgets',
 		sprintf(
 			'wp.domReady( function() {
-				wp.editWidgets.%s( "widgets-editor", %s );
+				wp.editWidgets.%s( "widgets-editor", %s, %s );
 			} );',
 			$initializer_name,
-			wp_json_encode( gutenberg_experiments_editor_settings( $settings ) )
+			wp_json_encode( gutenberg_experiments_editor_settings( $settings ) ),
+			wp_json_encode( $widget_id )
 		)
 	);
 

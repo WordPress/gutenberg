@@ -44,6 +44,8 @@ function gutenberg_customize_sanitize( $value ) {
  * @since 6.1.0
  */
 function gutenberg_customize_register( $wp_customize ) {
+	global $wp_registered_sidebars;
+
 	require dirname( __FILE__ ) . '/class-wp-customize-widget-blocks-control.php';
 	$wp_customize->add_setting(
 		'gutenberg_widget_blocks',
@@ -57,21 +59,46 @@ function gutenberg_customize_register( $wp_customize ) {
 	);
 
 	if ( gutenberg_use_widgets_block_editor() ) {
-		$wp_customize->add_section(
+		$wp_customize->add_panel(
 			'gutenberg_widget_blocks',
 			array( 'title' => __( 'Widget Blocks', 'gutenberg' ) )
 		);
-		$wp_customize->add_control(
-			new WP_Customize_Widget_Blocks_Control(
-				$wp_customize,
-				'gutenberg_widget_blocks',
+
+		foreach ( $wp_registered_sidebars as $widget_id => $sidebar_widget ) {
+			$section_id = 'gutenberg_widget_sidebar_' . $widget_id;
+
+			$wp_customize->add_section(
+				$section_id,
 				array(
-					'section'  => 'gutenberg_widget_blocks',
-					'settings' => 'gutenberg_widget_blocks',
+					'title' => $sidebar_widget[ 'name' ],
+					'panel' => 'gutenberg_widget_blocks'
 				)
-			)
-		);
+			);
+
+			$wp_customize->add_setting(
+				'gutenberg_widget_blocks_' . $widget_id,
+				array(
+					'default'           => '{}',
+					'type'              => 'gutenberg_widget_blocks',
+					'capability'        => 'edit_theme_options',
+					'transport'         => 'postMessage',
+					'sanitize_callback' => 'gutenberg_customize_sanitize',
+				)
+			);
+
+			$wp_customize->add_control(
+				new WP_Customize_Widget_Blocks_Control(
+					$wp_customize,
+					$widget_id,
+					array(
+						'section' => $section_id,
+						'settings' => 'gutenberg_widget_blocks_' . $widget_id,
+					)
+				)
+			);
+		}
 	}
+
 }
 add_action( 'customize_register', 'gutenberg_customize_register' );
 
