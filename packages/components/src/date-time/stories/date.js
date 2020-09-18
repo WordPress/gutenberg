@@ -2,7 +2,6 @@
 /**
  * External dependencies
  */
-import { boolean } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -20,19 +19,17 @@ export default {
 	component: DatePicker,
 }
 
-const DatePickerInstance = ( { is12Hour } ) => {
+const DatePickerInstance = () => {
 	const [ date, setDate ] = useState();
 
 	return (
 		<DatePicker
 			currentDate={ date }
 			onDateChange={ setDate }
-			is12Hour={ is12Hour }
 		/>
 	);
 };
 
 export const _default = () => {
-	const is12Hour = boolean( 'Is 12 hour (shows AM/PM)', false );
-	return <DatePickerInstance is12Hour={ is12Hour } />;
+	return <DatePickerInstance />;
 };
