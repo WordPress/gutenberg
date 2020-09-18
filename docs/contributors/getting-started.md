@@ -59,7 +59,11 @@ See the [relevant section in `wp-env` docs](https://github.com/WordPress/gutenbe
 
 ## Using MAMP
 
-You can also develop with MAMP by cloning and installing Gutenberg as a regular plugin in a WP install, but you'll require some extra configuration to be able to run the e2e tests.
+You can also develop with MAMP by cloning and installing Gutenberg as a regular plugin in a WP install, but it comes with its caveats and will require some extra configuration to be able to run the e2e tests.
+
+### E2E testing
+
+Ensure that Gutenberg's E2E-dedicated plugins are available in the WordPress installation's `plugins` directory. For this, you can either copy the plugins as a whole, or you can create links from the Gutenberg project directory. This method is better in the long run but requires that link following be enabled. See section _Linking to other directories_ below, then come back and follow these instructions:
 
 Change the current directory to the plugins folder and symlink all e2e test plugins:
 
@@ -73,17 +77,15 @@ You'll need to run this again if new plugins are added. To run e2e tests:
 WP_BASE_URL=http://localhost:8888/gutenberg npm run test-e2e
 ```
 
-### Caveats
+### Caching of PHP files
 
-#### Caching of PHP files
-
-You'll need to disable OPCache in order to correctly work on PHP files. **To fix:**
+You'll need to disable OPCache in order to correctly work on PHP files. To fix:
 
 - Go to **MAMP > Preferences > PHP**
 - Under **Cache**, select **off**
 - Confirm with **OK**
 
-#### Incoming connections
+### Incoming connections
 
 By default, the web server (Apache) launched by MAMP will listen to all incoming connections, not just local ones. This means that anyone on the same local network (and, in certain cases, anyone on the Internet) can access your web server. This may be intentional and useful for testing sites on other devices, but most often this can be a privacy or security issue. Keep this in mind and don't store sensitive information in this server.
 
@@ -92,7 +94,7 @@ While it is possible to fix this, you should fix it at your own risk, since it b
 - Edit `/Applications/MAMP/conf/apache/httpd.conf`
 - Change `Listen 8888` to `Listen 127.0.0.1:8888`
 
-#### Linking to other directories
+### Linking to other directories
 
 You may like to create links in your `plugins` and `themes` directories to other folders, e.g.
 
