@@ -32,7 +32,7 @@ export function initialize( id, settings ) {
 
 	render(
 		<EditWidgetsInitializer settings={ settings } />,
-		document.getElementById( id )
+		document.querySelector( `.${ id }` )
 	);
 }
 
