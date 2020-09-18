@@ -9,6 +9,7 @@ import styled from '@emotion/styled';
 import { G2, UI } from '../../utils/colors-values';
 import Button from '../../button';
 import Text from '../../text';
+import { reduceMotion } from '../../utils';
 
 export const NavigationUI = styled.div`
 	width: 100%;
@@ -105,6 +106,8 @@ export const ItemBadgeUI = styled.span`
 			opacity: 1;
 		}
 	}
+
+	${ reduceMotion( 'animation' ) };
 `;
 
 export const ItemTitleUI = styled( Text )`
