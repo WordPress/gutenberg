@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import moment from 'moment';
-import ReactDatePicker from 'react-datepicker';
+import ReactDatePicker from "react-datepicker";
 
 /**
  * WordPress dependencies
@@ -15,6 +14,15 @@ import { Component, createRef } from '@wordpress/element';
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const isRTL = () => document.documentElement.dir === 'rtl';
 
+const DatePicker = ( { onDateChange, currentDate, isInvalidDate } ) => {
+	return (
+		<ReactDatePicker
+			selected={ currentDate }
+			onChange={ onDateChange }
+			inline
+		/>);
+};
+/*
 class DatePicker extends Component {
 	constructor() {
 		super( ...arguments );
@@ -30,7 +38,7 @@ class DatePicker extends Component {
 	 * It is kept because focus is lost when we click on the previous and next month buttons.
 	 * This focus loss closes the date picker popover.
 	 * Ideally we should add an upstream commit on react-dates to fix this issue.
-	 */
+	 *
 	keepFocusInside( newMonthDate ) {
 		// Trigger onMonthChange callback.
 		if ( this.props.onMonthChange ) {
@@ -77,7 +85,7 @@ class DatePicker extends Component {
 	 *
 	 * @param {?string} currentDate Date representing the currently selected date or null to signify no selection.
 	 * @return {?moment.Moment} Moment object for selected date or null.
-	 */
+	 *
 	getMomentDate( currentDate ) {
 		if ( null === currentDate ) {
 			return null;
@@ -103,17 +111,39 @@ class DatePicker extends Component {
 
 	render() {
 		const { currentDate, isInvalidDate, events } = this.props;
+		const momentDate = this.getMomentDate( currentDate );
+		const key = `datepicker-controller-${
+			momentDate ? momentDate.format( 'MM-YYYY' ) : 'null'
+		}${ events?.length ? '-events-' + events.length : '' }`;
+
 		return (
 			<div className="components-datetime__date" ref={ this.nodeRef }>
-				<ReactDatePicker
-					selected={ currentDate }
-					onChange={ console.log }
-					inline
+				<DayPickerSingleDateController
+					date={ momentDate }
+					daySize={ 30 }
+					focused
+					hideKeyboardShortcutsPanel
+					// This is a hack to force the calendar to update on month or year change
+					// https://github.com/airbnb/react-dates/issues/240#issuecomment-361776665
+					key={ key }
+					noBorder
+					numberOfMonths={ 1 }
+					onDateChange={ this.onChangeMoment }
+					transitionDuration={ 0 }
+					weekDayFormat="ddd"
+					isRTL={ isRTL() }
+					isOutsideRange={ ( date ) => {
+						return isInvalidDate && isInvalidDate( date.toDate() );
+					} }
+					isDayHighlighted={ this.isDayHighlighted }
+					onPrevMonthClick={ this.keepFocusInside }
+					onNextMonthClick={ this.keepFocusInside }
 				/>
 			</div>
 		);
 	}
 }
+*/
 
 export default DatePicker;
 
