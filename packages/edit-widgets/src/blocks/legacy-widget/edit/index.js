@@ -11,7 +11,6 @@ import { Button, PanelBody, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
-import ServerSideRender from '@wordpress/server-side-render';
 import { update } from '@wordpress/icons';
 
 /**
@@ -19,6 +18,7 @@ import { update } from '@wordpress/icons';
  */
 import LegacyWidgetEditHandler from './handler';
 import LegacyWidgetPlaceholder from './placeholder';
+import WidgetPreview from './widget-preview';
 
 class LegacyWidgetEdit extends Component {
 	constructor() {
@@ -187,15 +187,11 @@ class LegacyWidgetEdit extends Component {
 	}
 
 	renderWidgetPreview() {
-		const { widgetId, attributes } = this.props;
+		const { attributes } = this.props;
 		return (
-			<ServerSideRender
+			<WidgetPreview
 				className="wp-block-legacy-widget__preview"
-				block="core/legacy-widget"
-				attributes={ {
-					widgetId,
-					...omit( attributes, 'id' ),
-				} }
+				attributes={ omit( attributes, 'widgetId' ) }
 			/>
 		);
 	}
