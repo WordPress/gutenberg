@@ -20,19 +20,23 @@ export default {
 	component: DatePicker,
 }
 
-const DatePickerInstance = ( { currentDate, onDateChange } ) => {
-	return <DatePicker
-		currentDate={ currentDate }
-		onDateChange={ onDateChange }
-	/>;
+const DatePickerInstance = ( { currentDate, onChange } ) => {
+	return (
+		<DatePicker
+			currentDate={ currentDate }
+			onChange={ onChange }
+		/>
+	);
 };
 
 export const _default = () => {
 	const [ date, setDate ] = useState();
 
 	button( 'Select Today', () => setDate( new Date() ) );
-	return <DatePickerInstance
-		currentDate={ date }
-		onDateChange={ setDate }
-	/>;
+	return (
+		<DatePickerInstance
+			currentDate={ date }
+			onChange={ setDate }
+		/>
+	);
 };

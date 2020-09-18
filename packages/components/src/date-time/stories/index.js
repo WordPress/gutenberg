@@ -18,9 +18,9 @@ export default {
 	component: DateTimePicker,
 };
 
-const DateTimePickerWithState = ( { is12Hour } ) => {
+export const _default = () => {
 	const [ date, setDate ] = useState();
-
+	const is12Hour = boolean( 'Is 12 hour (shows AM/PM)', false );
 	return (
 		<DateTimePicker
 			currentDate={ date }
@@ -28,9 +28,4 @@ const DateTimePickerWithState = ( { is12Hour } ) => {
 			is12Hour={ is12Hour }
 		/>
 	);
-};
-
-export const _default = () => {
-	const is12Hour = boolean( 'Is 12 hour (shows AM/PM)', false );
-	return <DateTimePickerWithState is12Hour={ is12Hour } />;
 };
