@@ -38,7 +38,7 @@ function BlocksTab( { onSelect, rootClientId, listProps } ) {
 			);
 
 			// Add copied blocks in the clipboard as extra items
-			const itemsWithClipboard = shouldAddClipboardBlock
+			const blockItemsWithClipboard = shouldAddClipboardBlock
 				? [
 						{
 							...pick( getBlockType( clipboardBlock.name ), [
@@ -53,7 +53,7 @@ function BlocksTab( { onSelect, rootClientId, listProps } ) {
 				  ]
 				: blockItems;
 
-			return { items: itemsWithClipboard };
+			return { items: blockItemsWithClipboard };
 		},
 		[ rootClientId ]
 	);
