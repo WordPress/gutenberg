@@ -13,6 +13,7 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { useEntityProp } from '@wordpress/core-data';
+import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -21,8 +22,8 @@ import getGlobalStyles from './global-styles-renderer';
 
 const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
-	getProperty: ( context, path ) => {},
-	setProperty: ( context, newValues ) => {},
+	getStyleProperty: ( context, propertyName ) => {},
+	setStyleProperty: ( context, propertyName, newValue ) => {},
 	globalContext: {},
 	/* eslint-enable no-unused-vars */
 } );
@@ -44,17 +45,19 @@ export default ( { children, baseStyles, contexts } ) => {
 	const nextValue = useMemo(
 		() => ( {
 			contexts,
-			getProperty: ( context, path ) =>
-				get( userStyles?.[ context ]?.styles, path ),
-			setProperty: ( context, newValues ) => {
+			getStyleProperty: ( context, propertyName ) =>
+				get(
+					userStyles?.[ context ]?.styles,
+					STYLE_PROPERTY[ propertyName ]
+				),
+			setStyleProperty: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
-				Object.keys( newValues ).forEach( ( key ) => {
-					set(
-						newContent,
-						`${ context }.styles.${ key }`,
-						newValues[ key ]
-					);
-				} );
+				let contextStyles = newContent?.[ context ]?.styles;
+				if ( ! contextStyles ) {
+					contextStyles = {};
+					set( newContent, [ context, 'styles' ], contextStyles );
+				}
+				set( contextStyles, STYLE_PROPERTY[ propertyName ], newValue );
 				setContent( JSON.stringify( newContent ) );
 			},
 		} ),

@@ -41,7 +41,7 @@ $tree-item-height: 36px;
 		margin-top: auto;
 		margin-bottom: auto;
 		text-align: left;
-		color: $dark-gray-600;
+		color: $gray-900;
 		border-radius: 2px;
 		position: relative;
 
@@ -254,7 +254,7 @@ $tree-item-height: 36px;
 			top: 1px;
 			bottom: -2px;
 			right: -1px;
-			border-right: 2px solid $light-gray-900;
+			border-right: 2px solid $gray-600;
 		}
 
 		// If a vertical line has terminated, don't draw it.
@@ -275,7 +275,7 @@ $tree-item-height: 36px;
 			top: 26px;
 			left: 100%;
 			width: 5px;
-			border-bottom: 2px solid $light-gray-900;
+			border-bottom: 2px solid $gray-600;
 		}
 	}
 }

@@ -5,37 +5,16 @@ import { memo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Fieldset, Legend, LegendText } from './styles/input-control-styles';
+import { BackdropUI } from './styles/input-control-styles';
 
-function Backdrop( {
-	disabled = false,
-	isFloating = false,
-	isFloatingLabel = false,
-	isFocused = false,
-	label,
-	size = 'default',
-} ) {
+function Backdrop( { disabled = false, isFocused = false } ) {
 	return (
-		<Fieldset
+		<BackdropUI
 			aria-hidden="true"
 			className="components-input-control__backdrop"
 			disabled={ disabled }
-			isFloatingLabel={ isFloatingLabel }
 			isFocused={ isFocused }
-		>
-			{ isFloatingLabel && (
-				<Legend
-					aria-hidden="true"
-					className="components-input-control__backdrop-label"
-					isFloating={ isFloating }
-					size={ size }
-				>
-					<LegendText className="components-input-control__backdrop-text">
-						{ label }
-					</LegendText>
-				</Legend>
-			) }
-		</Fieldset>
+		/>
 	);
 }
 

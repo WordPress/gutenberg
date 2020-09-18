@@ -7,22 +7,17 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	BACKGROUND_COLOR,
-	LINK_COLOR,
-	TEXT_COLOR,
-	GRADIENT_COLOR,
-} from '../editor/utils';
+import { LINK_COLOR } from '../editor/utils';
 
 export default ( {
 	context: { supports, name },
-	getProperty,
-	setProperty,
+	getStyleProperty,
+	setStyleProperty,
 } ) => {
 	if (
-		! supports.includes( TEXT_COLOR ) &&
-		! supports.includes( BACKGROUND_COLOR ) &&
-		! supports.includes( GRADIENT_COLOR ) &&
+		! supports.includes( 'color' ) &&
+		! supports.includes( 'backgrounColor' ) &&
+		! supports.includes( 'background' ) &&
 		! supports.includes( LINK_COLOR )
 	) {
 		return null;
@@ -30,62 +25,36 @@ export default ( {
 
 	const settings = [];
 
-	if ( supports.includes( TEXT_COLOR ) ) {
+	if ( supports.includes( 'color' ) ) {
 		settings.push( {
-			colorValue: getProperty( name, 'color.text' ),
+			colorValue: getStyleProperty( name, 'color' ),
 			onColorChange: ( value ) =>
-				setProperty( name, { 'color.text': value } ),
+				setStyleProperty( name, 'color', value ),
 			label: __( 'Text color' ),
 		} );
 	}
 
-	/*
-	 * We want to send the entities API both colors
-	 * in a single request. This is to avod race conditions
-	 * that override the previous callback.
-	 */
-	let setBackground;
-	let backgroundSettings;
-	const backgroundPromise = new Promise(
-		( resolve ) => ( setBackground = ( value ) => resolve( value ) )
-	);
-	let setGradient;
-	let gradientSettings;
-	const gradientPromise = new Promise(
-		( resolve ) => ( setGradient = ( value ) => resolve( value ) )
-	);
-	Promise.all( [ backgroundPromise, gradientPromise ] ).then( ( values ) => {
-		setProperty( name, { ...values[ 0 ], ...values[ 1 ] } );
-	} );
-	if ( supports.includes( BACKGROUND_COLOR ) ) {
+	let backgroundSettings = {};
+	if ( supports.includes( 'backgroundColor' ) ) {
 		backgroundSettings = {
-			colorValue: getProperty( name, 'color.background' ),
+			colorValue: getStyleProperty( name, 'backgroundColor' ),
 			onColorChange: ( value ) =>
-				setBackground( { 'color.background': value } ),
+				setStyleProperty( name, 'backgroundColor', value ),
 		};
-	} else {
-		backgroundSettings = {};
-		// Resolve the background promise, as to fire the setProperty
-		// callback when the gradient promise is resolved.
-		setBackground( undefined );
 	}
-	if ( supports.includes( GRADIENT_COLOR ) ) {
+
+	let gradientSettings = {};
+	if ( supports.includes( 'background' ) ) {
 		gradientSettings = {
-			gradientValue: getProperty( name, 'color.gradient' ),
+			gradientValue: getStyleProperty( name, 'background' ),
 			onGradientChange: ( value ) =>
-				setGradient( { 'color.gradient': value } ),
-			disableCustomGradients: true,
+				setStyleProperty( name, 'background', value ),
 		};
-	} else {
-		gradientSettings = {};
-		// Resolve the gradient promise, as to fire the setProperty
-		// callback when the background promise is resolved.
-		setGradient( undefined );
 	}
 
 	if (
-		supports.includes( GRADIENT_COLOR ) ||
-		supports.includes( BACKGROUND_COLOR )
+		supports.includes( 'background' ) ||
+		supports.includes( 'backgroundColor' )
 	) {
 		settings.push( {
 			...backgroundSettings,
@@ -96,9 +65,9 @@ export default ( {
 
 	if ( supports.includes( LINK_COLOR ) ) {
 		settings.push( {
-			colorValue: getProperty( name, 'color.link' ),
+			colorValue: getStyleProperty( name, LINK_COLOR ),
 			onColorChange: ( value ) =>
-				setProperty( name, { 'color.link': value } ),
+				setStyleProperty( name, LINK_COLOR, value ),
 			label: __( 'Link color' ),
 		} );
 	}
