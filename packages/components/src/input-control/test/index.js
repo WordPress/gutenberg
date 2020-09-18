@@ -41,16 +41,6 @@ describe( 'InputControl', () => {
 
 			expect( input ).toBeTruthy();
 		} );
-
-		it( 'should render label, if floating', () => {
-			render(
-				<InputControl isFloatingLabel label="Hello" value="There" />
-			);
-
-			const input = screen.getAllByText( 'Hello' );
-
-			expect( input ).toBeTruthy();
-		} );
 	} );
 
 	describe( 'Value', () => {

@@ -1,21 +1,57 @@
 [
 	{
-		"title": "Block Editor Handbook",
+		"title": "Project Overview",
 		"slug": "handbook",
 		"markdown_source": "../docs/readme.md",
 		"parent": null
 	},
 	{
-		"title": "Project Overview",
-		"slug": "principles",
-		"markdown_source": "../docs/contributors/principles.md",
-		"parent": null
+		"title": "Glossary",
+		"slug": "glossary",
+		"markdown_source": "../docs/designers-developers/glossary.md",
+		"parent": "handbook"
+	},
+	{
+		"title": "Frequently Asked Questions",
+		"slug": "faq",
+		"markdown_source": "../docs/designers-developers/faq.md",
+		"parent": "handbook"
+	},
+	{
+		"title": "Versions in WordPress",
+		"slug": "versions-in-wordpress",
+		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
+		"parent": "handbook"
+	},
+	{
+		"title": "History",
+		"slug": "history",
+		"markdown_source": "../docs/contributors/history.md",
+		"parent": "handbook"
+	},
+	{
+		"title": "Outreach",
+		"slug": "outreach",
+		"markdown_source": "../docs/contributors/outreach.md",
+		"parent": "handbook"
 	},
 	{
 		"title": "Architecture",
 		"slug": "architecture",
 		"markdown_source": "../docs/architecture/readme.md",
-		"parent": "principles"
+		"parent": null
+	},
+	{
+		"title": "Key Concepts",
+		"slug": "key-concepts",
+		"markdown_source": "../docs/architecture/key-concepts.md",
+		"parent": "architecture"
+	},
+	{
+		"title": "Data Flow and Data Format",
+		"slug": "data-flow",
+		"markdown_source": "../docs/architecture/data-flow.md",
+		"parent": "architecture"
 	},
 	{
 		"title": "Folder Structure",
@@ -40,42 +76,6 @@
 		"slug": "automated-testing",
 		"markdown_source": "../docs/architecture/automated-testing.md",
 		"parent": "architecture"
-	},
-	{
-		"title": "Key Concepts",
-		"slug": "key-concepts",
-		"markdown_source": "../docs/designers-developers/key-concepts.md",
-		"parent": "principles"
-	},
-	{
-		"title": "Glossary",
-		"slug": "glossary",
-		"markdown_source": "../docs/designers-developers/glossary.md",
-		"parent": "principles"
-	},
-	{
-		"title": "Frequently Asked Questions",
-		"slug": "faq",
-		"markdown_source": "../docs/designers-developers/faq.md",
-		"parent": "principles"
-	},
-	{
-		"title": "Versions in WordPress",
-		"slug": "versions-in-wordpress",
-		"markdown_source": "../docs/contributors/versions-in-wordpress.md",
-		"parent": "principles"
-	},
-	{
-		"title": "History",
-		"slug": "history",
-		"markdown_source": "../docs/contributors/history.md",
-		"parent": "principles"
-	},
-	{
-		"title": "Outreach",
-		"slug": "outreach",
-		"markdown_source": "../docs/contributors/outreach.md",
-		"parent": "principles"
 	},
 	{
 		"title": "Developer Documentation",
@@ -422,7 +422,7 @@
 	{
 		"title": "Blocks are the Interface",
 		"slug": "the-block",
-		"markdown_source": "../docs/contributors/principles/the-block.md",
+		"markdown_source": "../docs/contributors/the-block.md",
 		"parent": "design"
 	},
 	{

@@ -123,7 +123,7 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 				</BottomSheetNavigationProvider>
 			</View>
 		);
-	}, [ currentHeight ] );
+	}, [ currentHeight, _theme ] );
 }
 
 export default BottomSheetNavigationContainer;

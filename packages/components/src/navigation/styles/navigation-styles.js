@@ -64,6 +64,10 @@ export const ItemUI = styled.li`
 
 	button,
 	a {
+		margin: 0;
+		font-weight: 400;
+		font-size: 14px;
+		line-height: 20px;
 		padding-left: 16px;
 		padding-right: 16px;
 		width: 100%;
