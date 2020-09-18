@@ -578,11 +578,9 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 			continue;
 		}
 
-		$presets_structure = gutenberg_experimental_global_styles_get_presets_structure();
-
+		// Create the CSS Custom Properties for the presets.
 		$computed_presets = array();
-
-		// Extract the relevant preset info before converting them to CSS Custom Properties.
+		$presets_structure = gutenberg_experimental_global_styles_get_presets_structure();
 		foreach ( $presets_structure as $token => $preset_meta ) {
 			$block_preset = gutenberg_experimental_get( $tree[ $block_name ]['settings'], $preset_meta['path'] );
 			if ( ! empty( $block_preset ) ) {
@@ -593,17 +591,26 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 				}
 			}
 		}
+		$token            = '--';
+		$preset_prefix    = '--wp--preset' . $token;
+		$preset_variables = gutenberg_experimental_global_styles_get_css_vars( $computed_presets, $preset_prefix, $token );
 
-		$token         = '--';
-		$prefix        = '--wp--preset' . $token;
-		$css_variables = gutenberg_experimental_global_styles_get_css_vars( $computed_presets, $prefix, $token );
+		// Create the CSS Custom Properties that are specific to the theme.
+		$computed_theme_props = gutenberg_experimental_get( $tree[ $block_name ]['settings'], ['custom'] );
+		$theme_props_prefix   = '--wp--theme' . $token;
+		$theme_variables      = gutenberg_experimental_global_styles_get_css_vars(
+			$computed_theme_props,
+			$theme_props_prefix,
+			$token
+		);
 
 		$stylesheet .= gutenberg_experimental_global_styles_resolver_styles(
 			$block_data[ $block_name ]['selector'],
 			$block_data[ $block_name ]['supports'],
 			array_merge(
 				gutenberg_experimental_global_styles_flatten_styles_tree( $tree[ $block_name ]['styles'] ),
-				$css_variables
+				$preset_variables,
+				$theme_variables
 			)
 		);
 	}
@@ -719,6 +726,7 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 		),
 		'settings' => array(
 			'color'      => array(),
+			'custom'     => array(),
 			'typography' => array(),
 			'spacing'    => array(),
 		),
