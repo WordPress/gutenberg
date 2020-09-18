@@ -19,7 +19,7 @@ import { GLOBAL_CONTEXT } from '../editor/utils';
 import TypographyPanel from './typography-panel';
 import ColorPanel from './color-panel';
 
-export default ( { identifier, title, icon } ) => {
+export default ( { identifier, title, icon, closeLabel } ) => {
 	const {
 		contexts,
 		getStyleProperty,
@@ -32,7 +32,12 @@ export default ( { identifier, title, icon } ) => {
 	}
 
 	return (
-		<DefaultSidebar identifier={ identifier } title={ title } icon={ icon }>
+		<DefaultSidebar
+			identifier={ identifier }
+			title={ title }
+			icon={ icon }
+			closeLabel={ closeLabel }
+		>
 			<TabPanel
 				tabs={ [
 					{ name: 'global', title: __( 'Global' ) },

@@ -506,7 +506,7 @@
 	overflow: hidden;
 	font-family: $editor-html-font;
 	font-size: $text-editor-font-size;
-	line-height: 150%;
+	line-height: 1.5;
 	transition: padding 0.2s linear;
 	@include reduce-motion("transition");
 
