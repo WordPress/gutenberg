@@ -2,6 +2,7 @@
 /**
  * External dependencies
  */
+import { button } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -19,12 +20,19 @@ export default {
 	component: DatePicker,
 }
 
-const DatePickerInstance = () => {
-	const [ date, setDate ] = useState();
-
-	return <DatePicker currentDate={ date } onDateChange={ setDate } />;
+const DatePickerInstance = ( { currentDate, onDateChange } ) => {
+	return <DatePicker
+		currentDate={ currentDate }
+		onDateChange={ onDateChange }
+	/>;
 };
 
 export const _default = () => {
-	return <DatePickerInstance />;
+	const [ date, setDate ] = useState();
+
+	button( 'Select Today', () => setDate( new Date() ) );
+	return <DatePickerInstance
+		currentDate={ date }
+		onDateChange={ setDate }
+	/>;
 };
