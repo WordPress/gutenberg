@@ -52,10 +52,14 @@ describe( 'Link color', () => {
 		} );
 
 		// Open color panel
-		await page.click('.block-editor-panel-color-gradient-settings .components-panel__body-toggle');
+		await page.click(
+			'.block-editor-panel-color-gradient-settings .components-panel__body-toggle'
+		);
 
 		// Select first color
-		await page.click('.block-editor-panel-color-gradient-settings > .block-editor-color-gradient-control:last-child .components-circular-option-picker__option:first-child');
+		await page.click(
+			'.block-editor-panel-color-gradient-settings > .block-editor-color-gradient-control:last-child .components-circular-option-picker__option:first-child'
+		);
 
 		// Save post.
 		// We want to test that the link color control data
