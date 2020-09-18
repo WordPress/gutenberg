@@ -36,6 +36,7 @@ export default function PostSettingsButton( { showIconLabels } ) {
 			onClick={ () => {
 				openModal( 'edit-post/post-settings' );
 			} }
+			aria-haspopup="dialog"
 		/>
 	);
 }
