@@ -124,7 +124,7 @@ export default ( blockData, baseTree, userTree ) => {
 			return [];
 		}
 
-		return flattenTree( blockCustom, '--wp--theme--', '--' );
+		return flattenTree( blockCustom, '--wp--custom--', '--' );
 	};
 
 	const getBlockSelector = ( selector ) => {
