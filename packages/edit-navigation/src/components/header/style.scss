@@ -16,20 +16,9 @@
 	display: flex;
 
 	// Spacing out the actions a little.
-	.edit-navigation-header__current-menu,
 	.components-dropdown {
 		margin-right: $grid-unit-20;
 	}
-}
-
-.edit-navigation-header__current-menu {
-	display: flex;
-	align-items: center;
-}
-
-// The select menu for choosing which menu to edit.
-.edit-navigation-header__current-menu .components-base-control__field {
-	margin: 0 $grid-unit-10 0 0;
 }
 
 .edit-navigation-header__create-menu-button {
