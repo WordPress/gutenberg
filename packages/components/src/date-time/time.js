@@ -76,7 +76,7 @@ function IntegerValidatedField( { as, value, onUpdate, ...props } ) {
 					onChange: handleUpdate,
 			  };
 
-	return createElement( as || 'input', {
+	return createElement( element, {
 		key: props.name + value,
 		...elementProps,
 		...props,
