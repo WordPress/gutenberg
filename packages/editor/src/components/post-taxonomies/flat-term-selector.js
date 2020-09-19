@@ -371,7 +371,7 @@ class FlatTermSelector extends Component {
 							className="editor-post-taxonomies__flat-terms-related-list"
 						>
 							{ this.state.relatedTerms.map( ( term, index ) => (
-								<li key={index}>
+								<li key={ index }>
 									<Button
 										aria-label={ this.getTermScreenReaderString(
 											term.name,
