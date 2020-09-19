@@ -515,7 +515,7 @@ You can tell `wp-env` to use a specific PHP version for compatibility and testin
 
 ```json
 {
-  "phpVersion": "7.2",
+	"phpVersion": "7.2",
 	"plugins": [ "." ]
 }
 ```
