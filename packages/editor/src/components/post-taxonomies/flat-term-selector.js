@@ -34,7 +34,7 @@ const DEFAULT_QUERY = {
 	_fields: 'id,name,count',
 };
 const MAX_TERMS_SUGGESTIONS = 20;
-const MAX_RELATED_TERMS_SUGGESTIONS = 10;
+const MAX_RELATED_TERMS_SUGGESTIONS = 20;
 const isSameTermName = ( termA, termB ) =>
 	termA.toLowerCase() === termB.toLowerCase();
 
@@ -370,8 +370,8 @@ class FlatTermSelector extends Component {
 							role="list"
 							className="editor-post-taxonomies__flat-terms-related-list"
 						>
-							{ this.state.relatedTerms.map( ( term ) => (
-								<li key={ term }>
+							{ this.state.relatedTerms.map( ( term, index ) => (
+								<li key={index}>
 									<Button
 										aria-label={ this.getTermScreenReaderString(
 											term.name,
