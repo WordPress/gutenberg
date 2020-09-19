@@ -71,12 +71,9 @@ function validateConfig( config, envLocation ) {
 		}
 	}
 
-	if (
-		typeof config.phpVersion !== 'undefined' &&
-		typeof config.phpVersion !== 'number'
-	) {
+	if ( config.phpVersion && config.phpVersion.length !== 3 ) {
 		throw new ValidationError(
-			`Invalid .wp-env.json: "${ envPrefix }phpVersion" must be a number.`
+			`Invalid .wp-env.json: "${ envPrefix }phpVersion" must be a string of the format "0.0".`
 		);
 	}
 
