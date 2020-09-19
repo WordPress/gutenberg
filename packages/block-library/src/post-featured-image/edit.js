@@ -4,6 +4,7 @@
 import { useEntityProp, useEntityId } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 import { ResponsiveWrapper } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 function PostFeaturedImageDisplay() {
 	const [ featuredImage ] = useEntityProp(
@@ -28,7 +29,7 @@ function PostFeaturedImageDisplay() {
 
 export default function PostFeaturedImageEdit() {
 	if ( ! useEntityId( 'postType', 'post' ) ) {
-		return 'Post Featured Image Placeholder';
+		return __( 'Post Featured Image' );
 	}
 	return <PostFeaturedImageDisplay />;
 }

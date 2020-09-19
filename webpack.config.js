@@ -1,8 +1,10 @@
 /**
  * External dependencies
  */
+const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
 const { DefinePlugin } = require( 'webpack' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
+const TerserPlugin = require( 'terser-webpack-plugin' );
 const postcss = require( 'postcss' );
 const { get, escapeRegExp, compact } = require( 'lodash' );
 const { basename, sep } = require( 'path' );
@@ -15,7 +17,7 @@ const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-w
 const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const {
 	camelCaseDash,
-} = require( '@wordpress/dependency-extraction-webpack-plugin/util' );
+} = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
 
 /**
  * Internal dependencies
@@ -34,11 +36,30 @@ const gutenbergPackages = Object.keys( dependencies )
 	.filter(
 		( packageName ) =>
 			! BUNDLED_PACKAGES.includes( packageName ) &&
-			packageName.startsWith( WORDPRESS_NAMESPACE )
+			packageName.startsWith( WORDPRESS_NAMESPACE ) &&
+			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' )
 	)
 	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
 
 module.exports = {
+	optimization: {
+		// Only concatenate modules in production, when not analyzing bundles.
+		concatenateModules:
+			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
+		minimizer: [
+			new TerserPlugin( {
+				cache: true,
+				parallel: true,
+				sourceMap: mode !== 'production',
+				terserOptions: {
+					output: {
+						comments: /translators:/i,
+					},
+				},
+				extractComments: false,
+			} ),
+		],
+	},
 	mode,
 	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
 		const name = camelCaseDash( packageName );
@@ -62,6 +83,9 @@ module.exports = {
 		] ),
 	},
 	plugins: [
+		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents bundle
+		// content as a convenient interactive zoomable treemap.
+		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		new DefinePlugin( {
 			// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
 			'process.env.GUTENBERG_PHASE': JSON.stringify(
@@ -137,61 +161,68 @@ module.exports = {
 				},
 			} ) )
 		),
-		new CopyWebpackPlugin( [
-			{
-				from: './packages/block-library/src/**/index.php',
-				test: new RegExp(
-					`([\\w-]+)${ escapeRegExp( sep ) }index\\.php$`
-				),
-				to: 'build/block-library/blocks/[1].php',
-				transform( content ) {
-					content = content.toString();
+		new CopyWebpackPlugin(
+			Object.entries( {
+				'./packages/block-library/src/': 'build/block-library/blocks/',
+				'./packages/edit-widgets/src/blocks/':
+					'build/edit-widgets/blocks/',
+			} ).flatMap( ( [ from, to ] ) => [
+				{
+					from: `${ from }/**/index.php`,
+					test: new RegExp(
+						`([\\w-]+)${ escapeRegExp( sep ) }index\\.php$`
+					),
+					to: `${ to }/[1].php`,
+					transform: ( content ) => {
+						content = content.toString();
 
-					// Within content, search for any function definitions. For
-					// each, replace every other reference to it in the file.
-					return (
-						content
-							.match( /^function [^\(]+/gm )
-							.reduce( ( result, functionName ) => {
-								// Trim leading "function " prefix from match.
-								functionName = functionName.slice( 9 );
+						// Within content, search for any function definitions. For
+						// each, replace every other reference to it in the file.
+						return (
+							content
+								.match( /^function [^\(]+/gm )
+								.reduce( ( result, functionName ) => {
+									// Trim leading "function " prefix from match.
+									functionName = functionName.slice( 9 );
 
-								// Prepend the Gutenberg prefix, substituting any
-								// other core prefix (e.g. "wp_").
-								return result.replace(
-									new RegExp( functionName, 'g' ),
-									( match ) =>
-										'gutenberg_' +
-										match.replace( /^wp_/, '' )
-								);
-							}, content )
-							// The core blocks override procedure takes place in
-							// the init action default priority to ensure that core
-							// blocks would have been registered already. Since the
-							// blocks implementations occur at the default priority
-							// and due to WordPress hooks behavior not considering
-							// mutations to the same priority during another's
-							// callback, the Gutenberg build blocks are modified
-							// to occur at a later priority.
-							.replace(
-								/(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/,
-								'$1, 20'
-							)
-					);
+									// Prepend the Gutenberg prefix, substituting any
+									// other core prefix (e.g. "wp_").
+									return result.replace(
+										new RegExp( functionName, 'g' ),
+										( match ) =>
+											'gutenberg_' +
+											match.replace( /^wp_/, '' )
+									);
+								}, content )
+								// The core blocks override procedure takes place in
+								// the init action default priority to ensure that core
+								// blocks would have been registered already. Since the
+								// blocks implementations occur at the default priority
+								// and due to WordPress hooks behavior not considering
+								// mutations to the same priority during another's
+								// callback, the Gutenberg build blocks are modified
+								// to occur at a later priority.
+								.replace(
+									/(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/,
+									'$1, 20'
+								)
+						);
+					},
 				},
-			},
-			{
-				from: './packages/block-library/src/*/block.json',
-				test: new RegExp(
-					`([\\w-]+)${ escapeRegExp( sep ) }block\\.json$`
-				),
-				to: 'build/block-library/blocks/[1]/block.json',
-			},
-		] ),
+				{
+					from: `${ from }/*/block.json`,
+					test: new RegExp(
+						`([\\w-]+)${ escapeRegExp( sep ) }block\\.json$`
+					),
+					to: `${ to }/[1]/block.json`,
+				},
+			] )
+		),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
-	],
+	].filter( Boolean ),
 	watchOptions: {
 		ignored: '!packages/*/!(src)/**/*',
+		aggregateTimeout: 500,
 	},
 	devtool,
 };

@@ -20,12 +20,12 @@ const { sync: spawn } = require( 'cross-spawn' );
  * Internal dependencies
  */
 const {
+	getJestOverrideConfigFile,
 	fromConfigRoot,
 	getArgFromCLI,
 	getArgsFromCLI,
 	hasArgInCLI,
 	hasProjectFile,
-	hasJestConfig,
 } = require( '../utils' );
 
 const result = spawn( 'node', [ require.resolve( 'puppeteer/install' ) ], {
@@ -46,11 +46,10 @@ if (
 	process.env.JEST_PUPPETEER_CONFIG = fromConfigRoot( 'puppeteer.config.js' );
 }
 
-const config = ! hasJestConfig()
-	? [
-			'--config',
-			JSON.stringify( require( fromConfigRoot( 'jest-e2e.config.js' ) ) ),
-	  ]
+const configFile = getJestOverrideConfigFile( 'e2e' );
+
+const config = configFile
+	? [ '--config', JSON.stringify( require( configFile ) ) ]
 	: [];
 
 const hasRunInBand = hasArgInCLI( '--runInBand' ) || hasArgInCLI( '-i' );
@@ -59,6 +58,11 @@ const runInBand = ! hasRunInBand ? [ '--runInBand' ] : [];
 if ( hasArgInCLI( '--puppeteer-interactive' ) ) {
 	process.env.PUPPETEER_HEADLESS = 'false';
 	process.env.PUPPETEER_SLOWMO = getArgFromCLI( '--puppeteer-slowmo' ) || 80;
+}
+
+if ( hasArgInCLI( '--puppeteer-devtools' ) ) {
+	process.env.PUPPETEER_HEADLESS = 'false';
+	process.env.PUPPETEER_DEVTOOLS = 'true';
 }
 
 const configsMapping = {

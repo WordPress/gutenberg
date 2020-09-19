@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, pick, defaultTo } from 'lodash';
+import { map, pick, defaultTo, flatten, partialRight } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -29,21 +29,89 @@ import { mediaUpload } from '../../utils';
 import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
 
-const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
-	const posts = await apiFetch( {
-		path: addQueryArgs( '/wp/v2/search', {
-			search,
-			per_page: perPage,
-			type: 'post',
-		} ),
-	} );
+/**
+ * Fetches link suggestions from the API. This function is an exact copy of a function found at:
+ *
+ * packages/edit-navigation/src/index.js
+ *
+ * It seems like there is no suitable package to import this from. Ideally it would be either part of core-data.
+ * Until we refactor it, just copying the code is the simplest solution.
+ *
+ * @param {string} search
+ * @param {Object} [searchArguments]
+ * @param {number} [searchArguments.isInitialSuggestions]
+ * @param {number} [searchArguments.type]
+ * @param {number} [searchArguments.subtype]
+ * @param {number} [searchArguments.page]
+ * @param {Object} [editorSettings]
+ * @param {boolean} [editorSettings.disablePostFormats=false]
+ * @return {Promise<Object[]>} List of suggestions
+ */
 
-	return map( posts, ( post ) => ( {
-		id: post.id,
-		url: post.url,
-		title: decodeEntities( post.title ) || __( '(no title)' ),
-		type: post.subtype || post.type,
-	} ) );
+const fetchLinkSuggestions = async (
+	search,
+	{ isInitialSuggestions, type, subtype, page, perPage: perPageArg } = {},
+	{ disablePostFormats = false } = {}
+) => {
+	const perPage = perPageArg || isInitialSuggestions ? 3 : 20;
+
+	const queries = [];
+
+	if ( ! type || type === 'post' ) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/search', {
+					search,
+					page,
+					per_page: perPage,
+					type: 'post',
+					subtype,
+				} ),
+			} )
+		);
+	}
+
+	if ( ! type || type === 'term' ) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/search', {
+					search,
+					page,
+					per_page: perPage,
+					type: 'term',
+					subtype,
+				} ),
+			} )
+		);
+	}
+
+	if ( ! disablePostFormats && ( ! type || type === 'post-format' ) ) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/search', {
+					search,
+					page,
+					per_page: perPage,
+					type: 'post-format',
+					subtype,
+				} ),
+			} )
+		);
+	}
+
+	return Promise.all( queries ).then( ( results ) => {
+		return map(
+			flatten( results )
+				.filter( ( result ) => !! result.id )
+				.slice( 0, perPage ),
+			( result ) => ( {
+				id: result.id,
+				url: result.url,
+				title: decodeEntities( result.title ) || __( '(no title)' ),
+				type: result.subtype || result.type,
+			} )
+		);
+	} );
 };
 
 class EditorProvider extends Component {
@@ -99,9 +167,19 @@ class EditorProvider extends Component {
 	) {
 		return {
 			...pick( settings, [
+				'__experimentalBlockDirectory',
+				'__experimentalBlockPatterns',
+				'__experimentalBlockPatternCategories',
+				'__experimentalEnableFullSiteEditing',
+				'__experimentalEnableFullSiteEditingDemo',
+				'__experimentalFeatures',
+				'__experimentalGlobalStylesUserEntityId',
+				'__experimentalGlobalStylesBaseStyles',
+				'__experimentalGlobalStylesContexts',
+				'__experimentalPreferredStyleVariations',
+				'__experimentalSetIsInserterOpened',
 				'alignWide',
 				'allowedBlockTypes',
-				'__experimentalPreferredStyleVariations',
 				'availableLegacyWidgets',
 				'bodyPlaceholder',
 				'codeEditingEnabled',
@@ -109,34 +187,32 @@ class EditorProvider extends Component {
 				'disableCustomColors',
 				'disableCustomFontSizes',
 				'disableCustomGradients',
+				'enableCustomUnits',
+				'enableCustomLineHeight',
 				'focusMode',
 				'fontSizes',
+				'gradients',
 				'hasFixedToolbar',
 				'hasPermissionsToManageWidgets',
+				'imageEditing',
 				'imageSizes',
 				'imageDimensions',
 				'isRTL',
+				'keepCaretInsideBlock',
 				'maxWidth',
+				'onUpdateDefaultBlockStyles',
 				'styles',
 				'template',
 				'templateLock',
 				'titlePlaceholder',
-				'onUpdateDefaultBlockStyles',
-				'__experimentalDisableCustomUnits',
-				'__experimentalEnableLegacyWidgetBlock',
-				'__experimentalBlockDirectory',
-				'__experimentalEnableFullSiteEditing',
-				'__experimentalEnableFullSiteEditingDemo',
-				'__experimentalGlobalStylesUserEntityId',
-				'__experimentalGlobalStylesBase',
-				'__experimentalDisableCustomLineHeight',
-				'__experimentalBlockPatterns',
-				'gradients',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalFetchReusableBlocks,
-			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
+			__experimentalFetchLinkSuggestions: partialRight(
+				fetchLinkSuggestions,
+				settings
+			),
 			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,

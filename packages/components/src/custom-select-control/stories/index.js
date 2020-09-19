@@ -8,7 +8,7 @@ export default {
 	component: CustomSelectControl,
 };
 
-const options = [
+const defaultOptions = [
 	{
 		key: 'small',
 		name: 'Small',
@@ -18,6 +18,7 @@ const options = [
 		key: 'normal',
 		name: 'Normal',
 		style: { fontSize: '100%' },
+		className: 'can-apply-custom-class-to-option',
 	},
 	{
 		key: 'large',
@@ -31,5 +32,28 @@ const options = [
 	},
 ];
 export const _default = () => (
-	<CustomSelectControl label="Font size" options={ options } />
+	<CustomSelectControl label="Font size" options={ defaultOptions } />
+);
+
+const longLabelOptions = [
+	{
+		key: 'reallylonglabel1',
+		name: 'Really long labels are good for stress testing',
+	},
+	{
+		key: 'reallylonglabel2',
+		name: 'But they can take a long time to type.',
+	},
+	{
+		key: 'reallylonglabel3',
+		name:
+			'That really is ok though because you should stress test your UIs.',
+	},
+];
+
+export const longLabels = () => (
+	<CustomSelectControl
+		label="Testing long labels"
+		options={ longLabelOptions }
+	/>
 );

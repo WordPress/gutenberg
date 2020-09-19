@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/editor",
-	"version": "9.14.1",
+	"version": "9.21.0",
 	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"editor"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/editor/README.md",
@@ -20,12 +21,15 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"sideEffects": [
+		"build-style/**",
+		"!((src|build|build-module)/(components|utils)/**)"
+	],
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
+		"@babel/runtime": "^7.11.2",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
-		"@wordpress/block-directory": "file:../block-directory",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
@@ -51,7 +55,7 @@
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.15",
+		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^3.0.2",
 		"redux-optimist": "^1.0.0",

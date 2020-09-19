@@ -21,7 +21,7 @@ import {
 	WritingFlow,
 	ObserveTyping
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
+import { SlotFillProvider, Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 function MyEditorComponent () {
@@ -33,12 +33,15 @@ function MyEditorComponent () {
 			onInput={ updateBlocks }
 			onChange={ updateBlocks }
 		>
-			<WritingFlow>
-				<ObserveTyping>
-					<BlockList />
-				</ObserveTyping>
-			</WritingFlow>
-			<Popover.Slot />
+			<SlotFillProvider>
+				<Popover.Slot name="block-toolbar" />
+				<WritingFlow>
+					<ObserveTyping>
+						<BlockList />
+					</ObserveTyping>
+				</WritingFlow>
+				<Popover.Slot />
+			</SlotFillProvider>
 		</BlockEditorProvider>
 	);
 }
@@ -48,11 +51,13 @@ function MyEditorComponent () {
 // import '@wordpress/block-editor/build-style/style.css';
 ```
 
-In this example, we're instantiating a block editor. A block editor is composed by a `BlockEditorProvider` wrapper component where you passe the current array of blocks and on each change the `onInput` or `onChange` callbacks are called depending on whether the change is considered persistent or not.
+In this example, we're instantiating a block editor. A block editor is composed by a `BlockEditorProvider` wrapper component where you pass the current array of blocks and on each change the `onInput` or `onChange` callbacks are called depending on whether the change is considered persistent or not.
 
 Inside `BlockEditorProvider`, you can nest any of the available `@wordpress/block-editor` UI components to build the UI of your editor.
 
 In the example above we're rendering the `BlockList` to show and edit the block list. For instance we could add a custom sidebar and use the `BlockInspector` component to be able to edit the advanced settings for the currently selected block. (See the [API](#API) for the list of all the available components).
+
+The `Popover.Slot` with the `name="block-toolbar"` prop is used to render the toolbar for a selected block.
 
 In the example above, there's no registered block type, in order to use the block editor successfully make sure to register some block types. For instance, registering the core block types can be done like so:
 
@@ -92,6 +97,10 @@ Block breadcrumb component, displaying the hierarchy of the current block select
 _Returns_
 
 -   `WPElement`: Block Breadcrumb.
+
+<a name="BlockColorsStyleSelector" href="#BlockColorsStyleSelector">#</a> **BlockColorsStyleSelector**
+
+Undocumented declaration.
 
 <a name="BlockContextProvider" href="#BlockContextProvider">#</a> **BlockContextProvider**
 
@@ -179,7 +188,23 @@ _Related_
 
 <a name="BlockTitle" href="#BlockTitle">#</a> **BlockTitle**
 
-Undocumented declaration.
+Renders the block's configured title as a string, or empty if the title
+cannot be determined.
+
+_Usage_
+
+```jsx
+<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+```
+
+_Parameters_
+
+-   _props_ `Object`: 
+-   _props.clientId_ `string`: Client ID of block.
+
+_Returns_
+
+-   `?string`: Block title.
 
 <a name="BlockToolbar" href="#BlockToolbar">#</a> **BlockToolbar**
 
@@ -452,10 +477,8 @@ _Properties_
 
 -   _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
 -   _availableLegacyWidgets_ `Array`: Array of objects representing the legacy widgets available.
--   _colors_ `Array`: Palette colors
--   _disableCustomColors_ `boolean`: Whether or not the custom colors are disabled
 -   _fontSizes_ `Array`: Available font sizes
--   _disableCustomFontSizes_ `boolean`: Whether or not the custom font sizes are disabled
+-   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
@@ -464,14 +487,16 @@ _Properties_
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
 -   _isRTL_ `boolean`: Whether the editor is in RTL mode
+-   _keepCaretInsideBlock_ `boolean`: Whether caret should move between blocks in edit mode
 -   _bodyPlaceholder_ `string`: Empty post placeholder
 -   _titlePlaceholder_ `string`: Empty title placeholder
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
--   _\_\_experimentalEnableLegacyWidgetBlock_ `boolean`: Whether the user has enabled the Legacy Widget Block
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
 -   _\_\_experimentalEnableFullSiteEditingDemo_ `boolean`: Whether the user has enabled Full Site Editing Demo Templates
+-   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
+-   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
@@ -534,15 +559,6 @@ _Related_
 
 Undocumented declaration.
 
-<a name="useSimulatedMediaQuery" href="#useSimulatedMediaQuery">#</a> **useSimulatedMediaQuery**
-
-Function that manipulates media queries from stylesheets to simulate a given viewport width.
-
-_Parameters_
-
--   _marker_ `string`: CSS selector string defining start and end of manipulable styles.
--   _width_ `number`: Viewport width to simulate.
-
 <a name="Warning" href="#Warning">#</a> **Warning**
 
 Undocumented declaration.
@@ -591,6 +607,11 @@ _Returns_
 
 Handles selection and navigation across blocks. This component should be
 wrapped around BlockList.
+
+_Parameters_
+
+-   _props_ `Object`: Component properties.
+-   _props.children_ `WPElement`: Children to be rendered.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

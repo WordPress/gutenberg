@@ -1,8 +1,8 @@
 .components-snackbar {
 	font-family: $default-font;
 	font-size: $default-font-size;
-	background-color: $dark-gray-700;
-	border-radius: $radius-round-rectangle;
+	background-color: $gray-900;
+	border-radius: $radius-block-ui;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 	color: $white;
 	padding: 16px 24px;
@@ -15,15 +15,10 @@
 		width: fit-content;
 	}
 
-	&:hover {
-		background-color: $dark-gray-900;
-	}
-
 	&:focus {
-		background-color: $dark-gray-900;
 		box-shadow:
 			0 0 0 1px $white,
-			0 0 0 3px $blue-medium-focus;
+			0 0 0 3px var(--wp-admin-theme-color);
 	}
 }
 
@@ -46,7 +41,7 @@
 		}
 
 		&:hover {
-			color: $blue-medium-400;
+			color: var(--wp-admin-theme-color);
 		}
 	}
 }

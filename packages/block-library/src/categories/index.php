@@ -33,7 +33,13 @@ function render_block_core_categories( $attributes ) {
 		$type                     = 'dropdown';
 
 		if ( ! is_admin() ) {
-			$wrapper_markup .= build_dropdown_script_block_core_categories( $id );
+			// Inject the dropdown script immediately after the select dropdown.
+			$items_markup = preg_replace(
+				'#(?<=</select>)#',
+				build_dropdown_script_block_core_categories( $id ),
+				$items_markup,
+				1
+			);
 		}
 	} else {
 		$wrapper_markup = '<ul class="%1$s">%2$s</ul>';
@@ -41,15 +47,7 @@ function render_block_core_categories( $attributes ) {
 		$type           = 'list';
 	}
 
-	$class = "wp-block-categories wp-block-categories-{$type}";
-
-	if ( isset( $attributes['align'] ) ) {
-		$class .= " align{$attributes['align']}";
-	}
-
-	if ( isset( $attributes['className'] ) ) {
-		$class .= " {$attributes['className']}";
-	}
+	$class = "wp-block-categories-{$type}";
 
 	return sprintf(
 		$wrapper_markup,
@@ -89,30 +87,9 @@ function build_dropdown_script_block_core_categories( $dropdown_id ) {
  * Registers the `core/categories` block on server.
  */
 function register_block_core_categories() {
-	register_block_type(
-		'core/categories',
+	register_block_type_from_metadata(
+		__DIR__ . '/categories',
 		array(
-			'attributes'      => array(
-				'align'             => array(
-					'type' => 'string',
-					'enum' => array( 'left', 'center', 'right', 'wide', 'full' ),
-				),
-				'className'         => array(
-					'type' => 'string',
-				),
-				'displayAsDropdown' => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'showHierarchy'     => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-				'showPostCounts'    => array(
-					'type'    => 'boolean',
-					'default' => false,
-				),
-			),
 			'render_callback' => 'render_block_core_categories',
 		)
 	);

@@ -9,7 +9,7 @@ import {
 	isEmpty,
 	map,
 	throttle,
-	unescape as unescapeString,
+	unescape as lodashUnescapeString,
 	uniqBy,
 } from 'lodash';
 
@@ -27,16 +27,22 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Module constants
  */
+const MAX_TERMS_SUGGESTIONS = 20;
+const MAX_RELATED_TERMS_SUGGESTIONS = 20;
 const DEFAULT_QUERY = {
-	per_page: -1,
+	per_page: MAX_TERMS_SUGGESTIONS,
 	orderby: 'count',
 	order: 'desc',
 	_fields: 'id,name,count',
 };
-const MAX_TERMS_SUGGESTIONS = 20;
-const MAX_RELATED_TERMS_SUGGESTIONS = 20;
+
+// Lodash unescape function handles &#39; but not &#039; which may be return in some API requests.
+const unescapeString = ( arg ) => {
+	return lodashUnescapeString( arg.replace( '&#039;', "'" ) );
+};
 const isSameTermName = ( termA, termB ) =>
-	termA.toLowerCase() === termB.toLowerCase();
+	unescapeString( termA ).toLowerCase() ===
+	unescapeString( termB ).toLowerCase();
 
 /**
  * Returns a term object with name unescaped.
@@ -270,7 +276,9 @@ class FlatTermSelector extends Component {
 
 	searchTerms( search = '' ) {
 		invoke( this.searchRequest, [ 'abort' ] );
-		this.searchRequest = this.fetchTerms( { search } );
+		if ( search.length >= 3 ) {
+			this.searchRequest = this.fetchTerms( { search } );
+		}
 	}
 
 	appendTerm( newTerm ) {

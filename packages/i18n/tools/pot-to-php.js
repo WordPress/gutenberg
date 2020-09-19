@@ -1,5 +1,8 @@
 #!/usr/bin/env node
 
+/**
+ * External dependencies
+ */
 const gettextParser = require( 'gettext-parser' );
 const { isEmpty } = require( 'lodash' );
 const fs = require( 'fs' );

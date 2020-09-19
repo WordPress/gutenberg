@@ -1,6 +1,6 @@
 {
 	"name": "core/list",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"ordered": {
 			"type": "boolean",
@@ -23,5 +23,14 @@
 		"reversed": {
 			"type": "boolean"
 		}
+	},
+	"supports": {
+		"anchor": true,
+		"className": false,
+		"__experimentalColor": {
+			"gradients": true
+		},
+		"__unstablePasteTextInline": true,
+		"lightBlockWrapper": true
 	}
 }

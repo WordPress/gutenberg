@@ -1,9 +1,21 @@
 /**
+ * External dependencies
+ */
+import { debounce } from 'lodash';
+
+/**
  * WordPress dependencies
  */
+import { BlockControls } from '@wordpress/block-editor';
+import { ToolbarGroup } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { __, _x } from '@wordpress/i18n';
-import { BACKSPACE, DELETE, F10 } from '@wordpress/keycodes';
+import { __ } from '@wordpress/i18n';
+import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
+
+/**
+ * Internal dependencies
+ */
+import ConvertToBlocksButton from './convert-to-blocks-button';
 
 const { wp } = window;
 
@@ -42,7 +54,11 @@ export default class ClassicEdit extends Component {
 		if ( document.readyState === 'complete' ) {
 			this.initialize();
 		} else {
-			window.addEventListener( 'DOMContentLoaded', this.initialize );
+			document.addEventListener( 'readystatechange', () => {
+				if ( document.readyState === 'complete' ) {
+					this.initialize();
+				}
+			} );
 		}
 	}
 
@@ -58,8 +74,12 @@ export default class ClassicEdit extends Component {
 		} = this.props;
 
 		const editor = window.tinymce.get( `editor-${ clientId }` );
+		const currentContent = editor?.getContent();
 
-		if ( prevProps.attributes.content !== content ) {
+		if (
+			prevProps.attributes.content !== content &&
+			currentContent !== content
+		) {
 			editor.setContent( content || '' );
 		}
 	}
@@ -83,7 +103,6 @@ export default class ClassicEdit extends Component {
 			attributes: { content },
 			setAttributes,
 		} = this.props;
-		const { ref } = this;
 		let bookmark;
 
 		this.editor = editor;
@@ -94,6 +113,13 @@ export default class ClassicEdit extends Component {
 
 		editor.on( 'blur', () => {
 			bookmark = editor.selection.getBookmark( 2, true );
+			// There is an issue with Chrome and the editor.focus call in core at https://core.trac.wordpress.org/browser/trunk/src/js/_enqueues/lib/link.js#L451.
+			// This causes a scroll to the top of editor content on return from some content updating dialogs so tracking
+			// scroll position until this is fixed in core.
+			const scrollContainer = document.querySelector(
+				'.interface-interface-skeleton__content'
+			);
+			const scrollPosition = scrollContainer.scrollTop;
 
 			setAttributes( {
 				content: editor.getContent(),
@@ -102,6 +128,9 @@ export default class ClassicEdit extends Component {
 			editor.once( 'focus', () => {
 				if ( bookmark ) {
 					editor.selection.moveToBookmark( bookmark );
+					if ( scrollContainer.scrollTop !== scrollPosition ) {
+						scrollContainer.scrollTop = scrollPosition;
+					}
 				}
 			} );
 
@@ -112,7 +141,29 @@ export default class ClassicEdit extends Component {
 			bookmark = null;
 		} );
 
+		const debouncedOnChange = debounce( () => {
+			const value = editor.getContent();
+
+			if ( value !== editor._lastChange ) {
+				editor._lastChange = value;
+				setAttributes( {
+					content: value,
+				} );
+			}
+		}, 250 );
+		editor.on( 'Paste Change input Undo Redo', debouncedOnChange );
+
+		// We need to cancel the debounce call because when we remove
+		// the editor (onUnmount) this callback is executed in
+		// another tick. This results in setting the content to empty.
+		editor.on( 'remove', debouncedOnChange.cancel );
+
 		editor.on( 'keydown', ( event ) => {
+			if ( isKeyboardEvent.primary( event, 'z' ) ) {
+				// Prevent the gutenberg undo kicking in so TinyMCE undo stack works as expected
+				event.stopPropagation();
+			}
+
 			if (
 				( event.keyCode === BACKSPACE || event.keyCode === DELETE ) &&
 				isTmceEmpty( editor )
@@ -132,36 +183,6 @@ export default class ClassicEdit extends Component {
 				event.stopPropagation();
 			}
 		} );
-
-		// TODO: the following is for back-compat with WP 4.9, not needed in WP 5.0. Remove it after the release.
-		editor.addButton( 'kitchensink', {
-			tooltip: _x( 'More', 'button to expand options' ),
-			icon: 'dashicon dashicons-editor-kitchensink',
-			onClick() {
-				const button = this;
-				const active = ! button.active();
-
-				button.active( active );
-				editor.dom.toggleClass( ref, 'has-advanced-toolbar', active );
-			},
-		} );
-
-		// Show the second, third, etc. toolbars when the `kitchensink` button is removed by a plugin.
-		editor.on( 'init', function() {
-			if (
-				editor.settings.toolbar1 &&
-				editor.settings.toolbar1.indexOf( 'kitchensink' ) === -1
-			) {
-				editor.dom.addClass( ref, 'has-advanced-toolbar' );
-			}
-		} );
-
-		editor.addButton( 'wp_add_media', {
-			tooltip: __( 'Insert Media' ),
-			icon: 'dashicon dashicons-admin-media',
-			cmd: 'WP_Medialib',
-		} );
-		// End TODO.
 
 		editor.on( 'init', () => {
 			const rootNode = this.editor.getBody();
@@ -197,22 +218,28 @@ export default class ClassicEdit extends Component {
 		//    from the KeyboardShortcuts component to stop their propagation.
 
 		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		return [
-			<div
-				key="toolbar"
-				id={ `toolbar-${ clientId }` }
-				ref={ ( ref ) => ( this.ref = ref ) }
-				className="block-library-classic__toolbar"
-				onClick={ this.focus }
-				data-placeholder={ __( 'Classic' ) }
-				onKeyDown={ this.onToolbarKeyDown }
-			/>,
-			<div
-				key="editor"
-				id={ `editor-${ clientId }` }
-				className="wp-block-freeform block-library-rich-text__tinymce"
-			/>,
-		];
+		return (
+			<>
+				<BlockControls>
+					<ToolbarGroup>
+						<ConvertToBlocksButton clientId={ clientId } />
+					</ToolbarGroup>
+				</BlockControls>
+				<div
+					key="toolbar"
+					id={ `toolbar-${ clientId }` }
+					className="block-library-classic__toolbar"
+					onClick={ this.focus }
+					data-placeholder={ __( 'Classic' ) }
+					onKeyDown={ this.onToolbarKeyDown }
+				/>
+				<div
+					key="editor"
+					id={ `editor-${ clientId }` }
+					className="wp-block-freeform block-library-rich-text__tinymce"
+				/>
+			</>
+		);
 		/* eslint-enable jsx-a11y/no-static-element-interactions */
 	}
 }

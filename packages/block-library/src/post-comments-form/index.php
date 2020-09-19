@@ -8,18 +8,26 @@
 /**
  * Renders the `core/post-comments-form` block on the server.
  *
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  * @return string Returns the filtered post comments form for the current post.
  */
-function render_block_core_post_comments_form() {
-	$post = gutenberg_get_post_from_context();
-	if ( ! $post ) {
+function render_block_core_post_comments_form( $attributes, $content, $block ) {
+	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
+
+	$classes = '';
+	if ( isset( $attributes['textAlign'] ) ) {
+		$classes .= 'has-text-align-' . $attributes['textAlign'];
+	}
+
 	ob_start();
-	comment_form( array(), $post->ID );
+	comment_form( array(), $block->context['postId'] );
 	$form = ob_get_clean();
 
-	return $form;
+	return sprintf( '<div class="%1$s">%2$s</div>', esc_attr( $classes ), $form );
 }
 
 /**

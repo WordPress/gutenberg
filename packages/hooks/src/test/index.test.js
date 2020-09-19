@@ -716,7 +716,7 @@ test( 'Test `this` context via composition', () => {
 
 	testObject.hooks = createHooks();
 
-	const theCallback = function() {
+	const theCallback = function () {
 		expect( this.test ).toBe( 'test this' );
 	};
 	addAction( 'test.action', 'my_callback', theCallback.bind( testObject ) );

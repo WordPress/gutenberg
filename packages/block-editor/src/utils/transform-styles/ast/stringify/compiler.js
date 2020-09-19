@@ -19,7 +19,7 @@ function Compiler( opts ) {
  * Emit `str`
  */
 
-Compiler.prototype.emit = function( str ) {
+Compiler.prototype.emit = function ( str ) {
 	return str;
 };
 
@@ -27,7 +27,7 @@ Compiler.prototype.emit = function( str ) {
  * Visit `node`.
  */
 
-Compiler.prototype.visit = function( node ) {
+Compiler.prototype.visit = function ( node ) {
 	return this[ node.type ]( node );
 };
 
@@ -35,7 +35,7 @@ Compiler.prototype.visit = function( node ) {
  * Map visit over array of `nodes`, optionally using a `delim`
  */
 
-Compiler.prototype.mapVisit = function( nodes, delim ) {
+Compiler.prototype.mapVisit = function ( nodes, delim ) {
 	let buf = '';
 	delim = delim || '';
 

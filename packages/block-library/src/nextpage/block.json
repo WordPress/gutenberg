@@ -1,4 +1,10 @@
 {
 	"name": "core/nextpage",
-	"category": "layout"
+	"category": "design",
+	"parent": [ "core/post-content" ],
+	"supports": {
+		"customClassName": false,
+		"className": false,
+		"html": false
+	}
 }

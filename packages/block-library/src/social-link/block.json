@@ -1,6 +1,9 @@
 {
 	"name": "core/social-link",
 	"category": "widgets",
+	"parent": [
+		"core/social-links"
+	],
 	"attributes": {
 		"url": {
 			"type": "string"
@@ -11,5 +14,13 @@
 		"label": {
 			"type": "string"
 		}
+	},
+	"usesContext": [
+		"openInNewTab"
+	],
+	"supports": {
+		"reusable": false,
+		"html": false,
+		"lightBlockWrapper": true
 	}
 }

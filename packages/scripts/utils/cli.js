@@ -7,7 +7,7 @@ const spawn = require( 'cross-spawn' );
 /**
  * Internal dependencies
  */
-const { fromScriptsRoot, hasScriptFile } = require( './file' );
+const { fromScriptsRoot, hasScriptFile, getScripts } = require( './file' );
 const { exit, getArgsFromCLI } = require( './process' );
 
 const getArgFromCLI = ( arg ) => {
@@ -22,6 +22,17 @@ const getArgFromCLI = ( arg ) => {
 const hasArgInCLI = ( arg ) => getArgFromCLI( arg ) !== undefined;
 
 const getFileArgsFromCLI = () => minimist( getArgsFromCLI() )._;
+
+const getNodeArgsFromCLI = () => {
+	const args = getArgsFromCLI();
+	const scripts = getScripts();
+	const scriptIndex = args.findIndex( ( arg ) => scripts.includes( arg ) );
+	return {
+		nodeArgs: args.slice( 0, scriptIndex ),
+		scriptName: args[ scriptIndex ],
+		scriptArgs: args.slice( scriptIndex + 1 ),
+	};
+};
 
 const hasFileArgInCLI = () => getFileArgsFromCLI().length > 0;
 
@@ -44,7 +55,7 @@ const handleSignal = ( signal ) => {
 	exit( 1 );
 };
 
-const spawnScript = ( scriptName, args = [] ) => {
+const spawnScript = ( scriptName, args = [], nodeArgs = [] ) => {
 	if ( ! scriptName ) {
 		// eslint-disable-next-line no-console
 		console.log( 'Script name is missing.' );
@@ -64,7 +75,7 @@ const spawnScript = ( scriptName, args = [] ) => {
 
 	const { signal, status } = spawn.sync(
 		'node',
-		[ fromScriptsRoot( scriptName ), ...args ],
+		[ ...nodeArgs, fromScriptsRoot( scriptName ), ...args ],
 		{
 			stdio: 'inherit',
 		}
@@ -81,6 +92,7 @@ module.exports = {
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
+	getNodeArgsFromCLI,
 	hasArgInCLI,
 	hasFileArgInCLI,
 	spawnScript,

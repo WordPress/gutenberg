@@ -21,6 +21,7 @@ export function PostPublishButtonOrToggle( {
 	isPublishSidebarOpened,
 	isScheduled,
 	togglePublishSidebar,
+	setEntitiesSavedStatesCallback,
 } ) {
 	const IS_TOGGLE = 'toggle';
 	const IS_BUTTON = 'button';
@@ -70,6 +71,7 @@ export function PostPublishButtonOrToggle( {
 			isOpen={ isPublishSidebarOpened }
 			isToggle={ component === IS_TOGGLE }
 			onToggle={ togglePublishSidebar }
+			setEntitiesSavedStatesCallback={ setEntitiesSavedStatesCallback }
 		/>
 	);
 }

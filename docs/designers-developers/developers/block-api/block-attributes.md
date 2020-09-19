@@ -185,6 +185,16 @@ attributes: {
 From here, meta attributes can be read and written by a block using the same interface as any attribute:
 
 {% codetabs %}
+{% ESNext %}
+```js
+edit( { attributes, setAttributes } ) {
+	function onChange( event ) {
+		setAttributes( { author: event.target.value } );
+	}
+
+	return <input value={ attributes.author } onChange={ onChange } type="text" />;
+},
+```
 {% ES5 %}
 ```js
 edit: function( props ) {
@@ -196,16 +206,6 @@ edit: function( props ) {
 		value: props.attributes.author,
 		onChange: onChange,
 	} );
-},
-```
-{% ESNext %}
-```js
-edit( { attributes, setAttributes } ) {
-	function onChange( event ) {
-		setAttributes( { author: event.target.value } );
-	}
-
-	return <input value={ attributes.author } onChange={ onChange } type="text" />;
 },
 ```
 {% end %}

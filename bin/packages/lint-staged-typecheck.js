@@ -11,8 +11,6 @@ const execa = require( 'execa' );
  */
 require( './validate-typescript-version' );
 
-/* eslint-disable no-console */
-
 const repoRoot = path.join( __dirname, '..', '..' );
 const tscPath = path.join( repoRoot, 'node_modules', '.bin', 'tsc' );
 
@@ -35,5 +33,3 @@ try {
 	console.error( err.stdout );
 	process.exitCode = 1;
 }
-
-/* eslint-enable no-console */

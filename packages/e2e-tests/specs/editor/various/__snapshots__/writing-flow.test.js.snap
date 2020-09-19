@@ -116,6 +116,12 @@ exports[`Writing Flow should merge forwards 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Writing Flow should merge paragraphs 1`] = `
+"<!-- wp:paragraph -->
+<p>12</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Writing Flow should navigate around inline boundaries 1`] = `
 "<!-- wp:paragraph -->
 <p>FirstAfter</p>

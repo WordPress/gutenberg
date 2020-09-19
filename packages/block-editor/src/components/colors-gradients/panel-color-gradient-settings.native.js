@@ -1,17 +1,47 @@
 /**
+ * External dependencies
+ */
+import { useNavigation } from '@react-navigation/native';
+
+/**
  * WordPress dependencies
  */
-import { PanelBody, UnsupportedFooterControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { ColorControl, PanelBody } from '@wordpress/components';
 
-const PanelColorGradientSettings = () => {
+/**
+ * Internal dependencies
+ */
+import { blockSettingsScreens } from '../block-settings';
+
+export default function PanelColorGradientSettings( { settings, title } ) {
+	const navigation = useNavigation();
+
 	return (
-		<PanelBody>
-			<UnsupportedFooterControl
-				label={ __( 'Color settings are coming soon.' ) }
-				separatorType="none"
-			/>
+		<PanelBody title={ title }>
+			{ settings.map(
+				( {
+					onColorChange,
+					colorValue,
+					onGradientChange,
+					gradientValue,
+					label,
+				} ) => (
+					<ColorControl
+						onPress={ () => {
+							navigation.navigate( blockSettingsScreens.color, {
+								onColorChange,
+								colorValue: gradientValue || colorValue,
+								gradientValue,
+								onGradientChange,
+								label,
+							} );
+						} }
+						key={ `color-setting-${ label }` }
+						label={ label }
+						color={ gradientValue || colorValue }
+					/>
+				)
+			) }
 		</PanelBody>
 	);
-};
-export default PanelColorGradientSettings;
+}

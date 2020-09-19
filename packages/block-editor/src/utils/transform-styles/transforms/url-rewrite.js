@@ -67,20 +67,17 @@ function getResourcePath( str, baseURL ) {
  * @return {Promise}         the Promise
  */
 function processURL( baseURL ) {
-	return function( meta ) {
-		const URL = getResourcePath( meta.value, baseURL );
-		return {
-			...meta,
-			newUrl:
-				'url(' +
-				meta.before +
-				meta.quote +
-				URL +
-				meta.quote +
-				meta.after +
-				')',
-		};
-	};
+	return ( meta ) => ( {
+		...meta,
+		newUrl:
+			'url(' +
+			meta.before +
+			meta.quote +
+			getResourcePath( meta.value, baseURL ) +
+			meta.quote +
+			meta.after +
+			')',
+	} );
 }
 
 /**

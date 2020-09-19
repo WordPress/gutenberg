@@ -16,8 +16,8 @@ export default function useSlot( name ) {
 	const fills = useMemo( () => slotFills || [], [ slotFills ] );
 
 	const updateSlot = useCallback(
-		( slotRef, slotFillProps ) => {
-			registry.updateSlot( name, slotRef, slotFillProps );
+		( fillProps ) => {
+			registry.updateSlot( name, fillProps );
 		},
 		[ name, registry.updateSlot ]
 	);

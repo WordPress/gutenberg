@@ -20,7 +20,7 @@ const getHeadingIndex = ( ast, index ) => {
  * @param {Object} newContentAst The new contents to be embedded in remark AST format.
  * @return {boolean} Whether the contents were embedded or not.
  */
-const embed = function( token, targetAst, newContentAst ) {
+const embed = ( token, targetAst, newContentAst ) => {
 	let headingIndex = -1;
 
 	const START_TOKEN = `<!-- START TOKEN(${ token }) -->`;

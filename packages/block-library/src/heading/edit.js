@@ -4,74 +4,51 @@
 import classnames from 'classnames';
 
 /**
- * Internal dependencies
- */
-import HeadingToolbar from './heading-toolbar';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, __experimentalText as Text } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import {
 	AlignmentToolbar,
 	BlockControls,
-	InspectorControls,
 	RichText,
 	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
-import { Platform } from '@wordpress/element';
+import { ToolbarGroup } from '@wordpress/components';
 
-function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
-	const { align, content, level, placeholder, style } = attributes;
+/**
+ * Internal dependencies
+ */
+import HeadingLevelDropdown from './heading-level-dropdown';
+
+function HeadingEdit( {
+	attributes,
+	setAttributes,
+	mergeBlocks,
+	onReplace,
+	mergedStyle,
+} ) {
+	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
-	const isAndroid = Platform.select( {
-		android: true,
-		native: false,
-		web: false,
-	} );
-
-	const styles = {
-		color: style && style.color && style.color.text,
-	};
 
 	return (
 		<>
 			<BlockControls>
-				<HeadingToolbar
-					minLevel={ Platform.OS === 'web' ? 2 : 1 }
-					maxLevel={ Platform.OS === 'web' ? 5 : 7 }
-					selectedLevel={ level }
-					onChange={ ( newLevel ) =>
-						setAttributes( { level: newLevel } )
-					}
-				/>
-				{ ! isAndroid && (
-					<AlignmentToolbar
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
+				<ToolbarGroup>
+					<HeadingLevelDropdown
+						selectedLevel={ level }
+						onChange={ ( newLevel ) =>
+							setAttributes( { level: newLevel } )
+						}
 					/>
-				) }
+				</ToolbarGroup>
+				<AlignmentToolbar
+					value={ align }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { align: nextAlign } );
+					} }
+				/>
 			</BlockControls>
-			{ Platform.OS === 'web' && (
-				<InspectorControls>
-					<PanelBody title={ __( 'Heading settings' ) }>
-						<Text variant="label">{ __( 'Level' ) }</Text>
-						<HeadingToolbar
-							isCollapsed={ false }
-							minLevel={ 1 }
-							maxLevel={ 7 }
-							selectedLevel={ level }
-							onChange={ ( newLevel ) =>
-								setAttributes( { level: newLevel } )
-							}
-						/>
-					</PanelBody>
-				</InspectorControls>
-			) }
 			<RichText
 				identifier="content"
 				tagName={ Block[ tagName ] }
@@ -95,7 +72,7 @@ function HeadingEdit( { attributes, setAttributes, mergeBlocks, onReplace } ) {
 				} ) }
 				placeholder={ placeholder || __( 'Write heading…' ) }
 				textAlign={ align }
-				style={ styles }
+				style={ mergedStyle }
 			/>
 		</>
 	);

@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
-import { PostPreviewButton, PostSavedState } from '@wordpress/editor';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { cog } from '@wordpress/icons';
-import { PinnedItems } from '@wordpress/interface';
+import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
+import {
+	PinnedItems,
+	__experimentalMainDashboardButton as MainDashboardButton,
+} from '@wordpress/interface';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -15,55 +16,37 @@ import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
-import PreviewOptions from '../preview-options';
+import { default as DevicePreview } from '../device-preview';
 
-function Header( { onToggleInserter, isInserterOpen } ) {
+function Header( { setEntitiesSavedStatesCallback } ) {
 	const {
-		shortcut,
 		hasActiveMetaboxes,
-		isEditorSidebarOpened,
 		isPublishSidebarOpened,
 		isSaving,
-		getBlockSelectionStart,
+		showIconLabels,
 	} = useSelect(
 		( select ) => ( {
-			shortcut: select(
-				'core/keyboard-shortcuts'
-			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isEditorSidebarOpened: select(
-				'core/edit-post'
-			).isEditorSidebarOpened(),
 			isPublishSidebarOpened: select(
 				'core/edit-post'
 			).isPublishSidebarOpened(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-			getBlockSelectionStart: select( 'core/block-editor' )
-				.getBlockSelectionStart,
+			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+				'showIconLabels'
+			),
 		} ),
 		[]
 	);
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch(
-		'core/edit-post'
-	);
 
-	const toggleGeneralSidebar = isEditorSidebarOpened
-		? closeGeneralSidebar
-		: () =>
-				openGeneralSidebar(
-					getBlockSelectionStart()
-						? 'edit-post/block'
-						: 'edit-post/document'
-				);
+	const isLargeViewport = useViewportMatch( 'large' );
 
 	return (
 		<div className="edit-post-header">
-			<FullscreenModeClose />
+			<MainDashboardButton.Slot>
+				<FullscreenModeClose />
+			</MainDashboardButton.Slot>
 			<div className="edit-post-header__toolbar">
-				<HeaderToolbar
-					onToggleInserter={ onToggleInserter }
-					isInserterOpen={ isInserterOpen }
-				/>
+				<HeaderToolbar />
 			</div>
 			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (
@@ -75,12 +58,10 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 					<PostSavedState
 						forceIsDirty={ hasActiveMetaboxes }
 						forceIsSaving={ isSaving }
+						showIconLabels={ showIconLabels }
 					/>
 				) }
-				<PreviewOptions
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-				/>
+				<DevicePreview />
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
 					forcePreviewLink={ isSaving ? null : undefined }
@@ -88,17 +69,19 @@ function Header( { onToggleInserter, isInserterOpen } ) {
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
+					setEntitiesSavedStatesCallback={
+						setEntitiesSavedStatesCallback
+					}
 				/>
-				<Button
-					icon={ cog }
-					label={ __( 'Settings' ) }
-					onClick={ toggleGeneralSidebar }
-					isPressed={ isEditorSidebarOpened }
-					aria-expanded={ isEditorSidebarOpened }
-					shortcut={ shortcut }
-				/>
-				<PinnedItems.Slot scope="core/edit-post" />
-				<MoreMenu />
+				{ ( isLargeViewport || ! showIconLabels ) && (
+					<>
+						<PinnedItems.Slot scope="core/edit-post" />
+						<MoreMenu showIconLabels={ showIconLabels } />
+					</>
+				) }
+				{ showIconLabels && ! isLargeViewport && (
+					<MoreMenu showIconLabels={ showIconLabels } />
+				) }
 			</div>
 		</div>
 	);

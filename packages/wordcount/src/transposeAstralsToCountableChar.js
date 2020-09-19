@@ -6,7 +6,7 @@
  *
  * @return {string} The manipulated text.
  */
-export default function( settings, text ) {
+export default function transposeAstralsToCountableChar( settings, text ) {
 	if ( settings.astralRegExp ) {
 		return text.replace( settings.astralRegExp, 'a' );
 	}

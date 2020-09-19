@@ -2,7 +2,6 @@
 	display: flex;
 	flex-direction: column;
 	padding: $block-padding;
-	background-color: $dark-opacity-light-200;
 	font-size: $default-font-size;
 	font-family: $default-font;
 	margin-bottom: $default-block-margin;
@@ -22,4 +21,9 @@
 	.dashicon {
 		margin-right: $grid-unit-10;
 	}
+}
+
+.block-editor .blocks-shortcode__textarea,
+.blocks-shortcode__textarea {
+	@include input-control;
 }

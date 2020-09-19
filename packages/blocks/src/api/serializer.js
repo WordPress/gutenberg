@@ -36,7 +36,7 @@ import BlockContentProvider from '../block-content-provider';
  */
 export function getBlockDefaultClassName( blockName ) {
 	// Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature.
-	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
+	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (historically used in 'core-embed/').
 	const className =
 		'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
 
@@ -56,7 +56,7 @@ export function getBlockDefaultClassName( blockName ) {
  */
 export function getBlockMenuDefaultClassName( blockName ) {
 	// Generated HTML classes for blocks follow the `editor-block-list-item-{name}` nomenclature.
-	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
+	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (historically used in 'core-embed/').
 	const className =
 		'editor-block-list-item-' +
 		blockName.replace( /\//, '-' ).replace( /^core-/, '' );

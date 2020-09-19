@@ -2,37 +2,37 @@
  * WordPress dependencies
  */
 import { createSlotFill } from '@wordpress/components';
-import { ComplementaryArea } from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
-import { cog, pencil } from '@wordpress/icons';
+import { cog, typography } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import DefaultSidebar from './default-sidebar';
+import GlobalStylesSidebar from './global-styles-sidebar';
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
 );
-function Sidebar() {
+export const SidebarInspectorFill = InspectorFill;
+
+export function SidebarComplementaryAreaFills() {
 	return (
 		<>
-			<ComplementaryArea.Slot scope="core/edit-site" />
-			<ComplementaryArea
-				scope="core/edit-site"
-				complementaryAreaIdentifier="edit-site/block-inspector"
+			<DefaultSidebar
+				identifier="edit-site/block-inspector"
 				title={ __( 'Block Inspector' ) }
 				icon={ cog }
+				closeLabel={ __( 'Close block inspector sidebar' ) }
 			>
 				<InspectorSlot bubblesVirtually />
-			</ComplementaryArea>
-			<ComplementaryArea
-				scope="core/edit-site"
-				complementaryAreaIdentifier="edit-site/global-styles"
+			</DefaultSidebar>
+			<GlobalStylesSidebar
+				identifier="edit-site/global-styles"
 				title={ __( 'Global Styles' ) }
-				icon={ pencil }
-			>
-				<p>Global Styles area</p>
-			</ComplementaryArea>
+				closeLabel={ __( 'Close global styles sidebar' ) }
+				icon={ typography }
+			/>
 		</>
 	);
 }
-
-Sidebar.InspectorFill = InspectorFill;
-
-export default Sidebar;

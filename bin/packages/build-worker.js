@@ -8,7 +8,6 @@ const babel = require( '@babel/core' );
 const makeDir = require( 'make-dir' );
 const sass = require( 'node-sass' );
 const postcss = require( 'postcss' );
-
 /**
  * Internal dependencies
  */
@@ -97,7 +96,6 @@ const BUILD_TASK_BY_EXTENSION = {
 			makeDir( path.dirname( outputFile ) ),
 			readFile( file, 'utf8' ),
 		] );
-
 		const builtSass = await renderSass( {
 			file,
 			includePaths: [ path.join( PACKAGES_DIR, 'base-styles' ) ],
@@ -110,17 +108,22 @@ const BUILD_TASK_BY_EXTENSION = {
 					'animations',
 					'z-index',
 				]
+					// Editor styles should be excluded from the default CSS vars output.
+					.concat(
+						file.includes( 'editor-styles.scss' )
+							? []
+							: [ 'default-custom-properties' ]
+					)
 					.map( ( imported ) => `@import "${ imported }";` )
 					.join( ' ' ) + contents,
 		} );
 
-		const result = await postcss( require( './post-css-config' ) ).process(
-			builtSass.css,
-			{
-				from: 'src/app.css',
-				to: 'dest/app.css',
-			}
-		);
+		const result = await postcss(
+			require( '@wordpress/postcss-plugins-preset' )
+		).process( builtSass.css, {
+			from: 'src/app.css',
+			to: 'dest/app.css',
+		} );
 
 		const resultRTL = await postcss( [ require( 'rtlcss' )() ] ).process(
 			result.css,

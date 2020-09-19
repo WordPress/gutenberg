@@ -13,4 +13,8 @@
 	.block-editor-writing-flow {
 		display: block;
 	}
+
+	.components-disabled .block-list-appender {
+		display: none;
+	}
 }

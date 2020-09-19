@@ -18,6 +18,11 @@
 	border-color: $gray-70;
 }
 
+.borderFullWidth {
+	left: 0;
+	right: 0;
+}
+
 .dimmed {
 	opacity: $dimmed-opacity;
 }
@@ -39,23 +44,6 @@
 
 .blockText {
 	min-height: 50px;
-}
-
-.toolbar {
-	border-left-width: 0;
-	margin-right: auto;
-	padding-left: 2px;
-	height: 44px;
-}
-
-.pipe {
-	margin-top: auto;
-	margin-bottom: auto;
-	margin-left: 2px;
-	height: 28px;
-	width: 1px;
-	background-color: #e9eff3;
-	opacity: 0.4;
 }
 
 .neutralToolbar {
@@ -83,4 +71,8 @@
 	border-width: $block-selected-border-width;
 	border-radius: 2px;
 	border-style: dashed;
+}
+
+.fullWidthPadding {
+	padding: $block-selected-to-content;
 }

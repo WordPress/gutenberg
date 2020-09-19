@@ -1,20 +1,19 @@
 /**
  * External dependencies
  */
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-import { ToolbarButton, Toolbar } from '@wordpress/components';
+import { Component, createRef } from '@wordpress/element';
+import { GlobalStylesContext, WIDE_ALIGNMENTS } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	getBlockType,
 	__experimentalGetAccessibleBlockLabel as getAccessibleBlockLabel,
 } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -23,9 +22,6 @@ import styles from './block.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
-import FloatingToolbar from './block-mobile-floating-toolbar';
-import Breadcrumbs from './breadcrumb';
-import NavigateUpSVG from './nav-up-icon';
 
 class BlockListBlock extends Component {
 	constructor() {
@@ -33,6 +29,13 @@ class BlockListBlock extends Component {
 
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onFocus = this.onFocus.bind( this );
+		this.getBlockWidth = this.getBlockWidth.bind( this );
+
+		this.state = {
+			blockWidth: 0,
+		};
+
+		this.anchorNodeRef = createRef();
 	}
 
 	onFocus() {
@@ -51,25 +54,51 @@ class BlockListBlock extends Component {
 		}
 	}
 
+	getBlockWidth( { nativeEvent } ) {
+		const { layout } = nativeEvent;
+		const { blockWidth } = this.state;
+
+		if ( blockWidth !== layout.width ) {
+			this.setState( { blockWidth: layout.width } );
+		}
+	}
+
 	getBlockForType() {
 		return (
-			<BlockEdit
-				name={ this.props.name }
-				isSelected={ this.props.isSelected }
-				attributes={ this.props.attributes }
-				setAttributes={ this.props.onChange }
-				onFocus={ this.onFocus }
-				onReplace={ this.props.onReplace }
-				insertBlocksAfter={ this.insertBlocksAfter }
-				mergeBlocks={ this.props.mergeBlocks }
-				onCaretVerticalPositionChange={
-					this.props.onCaretVerticalPositionChange
-				}
-				clientId={ this.props.clientId }
-				parentWidth={ this.props.parentWidth }
-				contentStyle={ this.props.contentStyle }
-				onDeleteBlock={ this.props.onDeleteBlock }
-			/>
+			<GlobalStylesContext.Consumer>
+				{ ( globalStyle ) => {
+					const mergedStyle = {
+						...globalStyle,
+						...this.props.wrapperProps.style,
+					};
+					return (
+						<GlobalStylesContext.Provider value={ mergedStyle }>
+							<BlockEdit
+								name={ this.props.name }
+								isSelected={ this.props.isSelected }
+								attributes={ this.props.attributes }
+								setAttributes={ this.props.onChange }
+								onFocus={ this.onFocus }
+								onReplace={ this.props.onReplace }
+								insertBlocksAfter={ this.insertBlocksAfter }
+								mergeBlocks={ this.props.mergeBlocks }
+								onCaretVerticalPositionChange={
+									this.props.onCaretVerticalPositionChange
+								}
+								// Block level styles
+								wrapperProps={ this.props.wrapperProps }
+								// inherited styles merged with block level styles
+								mergedStyle={ mergedStyle }
+								clientId={ this.props.clientId }
+								parentWidth={ this.props.parentWidth }
+								contentStyle={ this.props.contentStyle }
+								onDeleteBlock={ this.props.onDeleteBlock }
+							/>
+							<View onLayout={ this.getBlockWidth } />
+						</GlobalStylesContext.Provider>
+					);
+				} }
+			</GlobalStylesContext.Consumer>
 		);
 	}
 
@@ -91,21 +120,23 @@ class BlockListBlock extends Component {
 			isValid,
 			order,
 			title,
-			parentId,
 			isDimmed,
 			isTouchable,
 			onDeleteBlock,
 			isStackedHorizontally,
-			hasParent,
 			isParentSelected,
-			onSelect,
-			showFloatingToolbar,
 			getStylesFromColorScheme,
 			marginVertical,
 			marginHorizontal,
 			isInnerBlockSelected,
 		} = this.props;
 
+		if ( ! attributes || ! blockType ) {
+			return null;
+		}
+
+		const { blockWidth } = this.state;
+		const { align } = attributes;
 		const accessibilityLabel = getAccessibleBlockLabel(
 			blockType,
 			attributes,
@@ -113,6 +144,8 @@ class BlockListBlock extends Component {
 		);
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
+		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
+		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 
 		return (
 			<TouchableWithoutFeedback
@@ -124,21 +157,6 @@ class BlockListBlock extends Component {
 					style={ { flex: 1 } }
 					accessibilityLabel={ accessibilityLabel }
 				>
-					{ showFloatingToolbar && (
-						<FloatingToolbar>
-							{ hasParent && (
-								<Toolbar passedStyle={ styles.toolbar }>
-									<ToolbarButton
-										title={ __( 'Navigate Up' ) }
-										onClick={ () => onSelect( parentId ) }
-										icon={ NavigateUpSVG }
-									/>
-									<View style={ styles.pipe } />
-								</Toolbar>
-							) }
-							<Breadcrumbs clientId={ clientId } />
-						</FloatingToolbar>
-					) }
 					<View
 						pointerEvents={ isTouchable ? 'auto' : 'box-only' }
 						accessibilityLabel={ accessibilityLabel }
@@ -151,6 +169,9 @@ class BlockListBlock extends Component {
 							<View
 								style={ [
 									styles.solidBorder,
+									isFullWidth &&
+										blockWidth < screenWidth &&
+										styles.borderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,
 										styles.solidBorderColorDark
@@ -177,7 +198,10 @@ class BlockListBlock extends Component {
 								icon={ icon }
 							/>
 						) }
-						<View style={ styles.neutralToolbar }>
+						<View
+							style={ styles.neutralToolbar }
+							ref={ this.anchorNodeRef }
+						>
 							{ isSelected && (
 								<BlockMobileToolbar
 									clientId={ clientId }
@@ -185,6 +209,9 @@ class BlockListBlock extends Component {
 									isStackedHorizontally={
 										isStackedHorizontally
 									}
+									blockWidth={ blockWidth }
+									anchorNodeRef={ this.anchorNodeRef.current }
+									isFullWidth={ isFullWidth }
 								/>
 							) }
 						</View>
@@ -195,16 +222,29 @@ class BlockListBlock extends Component {
 	}
 }
 
+// Helper function to memoize the wrapperProps since getEditWrapperProps always returns a new reference
+const wrapperPropsCache = new WeakMap();
+const emptyObj = {};
+function getWrapperProps( value, getWrapperPropsFunction ) {
+	if ( ! getWrapperPropsFunction ) {
+		return emptyObj;
+	}
+	const cachedValue = wrapperPropsCache.get( value );
+	if ( ! cachedValue ) {
+		const wrapperProps = getWrapperPropsFunction( value );
+		wrapperPropsCache.set( value, wrapperProps );
+		return wrapperProps;
+	}
+	return cachedValue;
+}
+
 export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
 			getBlockIndex,
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
-			getBlockHierarchyRootClientId,
 			getSelectedBlockClientId,
-			getBlock,
-			getBlockRootClientId,
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
 			hasSelectedInnerBlock,
@@ -223,12 +263,6 @@ export default compose( [
 		const parents = getBlockParents( clientId, true );
 		const parentId = parents[ 0 ] || '';
 
-		const rootBlockId = getBlockHierarchyRootClientId( clientId );
-		const rootBlock = getBlock( rootBlockId );
-		const hasRootInnerBlocks = rootBlock.innerBlocks.length !== 0;
-
-		const showFloatingToolbar = isSelected && hasRootInnerBlocks;
-
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		const commonAncestor = getLowestCommonAncestorWithSelectedBlock(
@@ -239,19 +273,14 @@ export default compose( [
 			? parents[ commonAncestorIndex ]
 			: parents[ parents.length - 1 ];
 
-		const hasParent = !! parentId;
 		const isParentSelected =
-			selectedBlockClientId && selectedBlockClientId === parentId;
-		const isAncestorSelected =
-			selectedBlockClientId && parents.includes( selectedBlockClientId );
-		const isSelectedBlockNested = !! getBlockRootClientId(
-			selectedBlockClientId
-		);
+			// set false as a default value to prevent re-render when it's changed from null to false
+			( selectedBlockClientId || false ) &&
+			selectedBlockClientId === parentId;
 
 		const selectedParents = selectedBlockClientId
 			? getBlockParents( selectedBlockClientId )
 			: [];
-		const isDescendantSelected = selectedParents.includes( clientId );
 		const isDescendantOfParentSelected = selectedParents.includes(
 			parentId
 		);
@@ -260,13 +289,6 @@ export default compose( [
 			isDescendantOfParentSelected ||
 			isParentSelected ||
 			parentId === '';
-		const isDimmed =
-			! isSelected &&
-			isSelectedBlockNested &&
-			! isAncestorSelected &&
-			! isDescendantSelected &&
-			( isDescendantOfParentSelected || rootBlockId === clientId );
-
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -277,14 +299,13 @@ export default compose( [
 			isSelected,
 			isInnerBlockSelected,
 			isValid,
-			parentId,
 			isParentSelected,
 			firstToSelectId,
-			hasParent,
-			isAncestorSelected,
 			isTouchable,
-			isDimmed,
-			showFloatingToolbar,
+			wrapperProps: getWrapperProps(
+				attributes,
+				blockType.getEditWrapperProps
+			),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {

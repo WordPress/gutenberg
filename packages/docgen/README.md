@@ -38,6 +38,12 @@ This command will generate a file named `entry-point-api.md` containing all the 
 * **--use-token** `(String)`: This options allows you to customize the string between the tokens. For example, `--use-token my-api` will look up for the start token <code>&lt;!-- START TOKEN(my-api) --&gt;</code> and the end token <code>&lt;!-- END TOKEN(my-api) --&gt;</code>. Depends on `--to-token`.
 * **--debug**: Run in debug mode, which outputs some intermediate files useful for debugging.
 
+### Babel Configuration
+
+`@wordpress/docgen` follows the default [project-wide configuration of Babel](https://babeljs.io/docs/en/next/config-files#project-wide-configuration). Like Babel, it will automatically search for a `babel.config.json` file, or an equivalent one using the [supported extensions](https://babeljs.io/docs/en/next/config-files#supported-file-extensions), in the project root directory.
+
+Without it, `@wordpress/docgen` runs with the default option. In other words, it cannot parse JSX or other advanced syntaxes.
+
 ## Examples
 
 ### Default export

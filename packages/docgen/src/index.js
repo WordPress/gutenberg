@@ -87,7 +87,7 @@ const runCustomFormatter = (
 // To keep track of file being processed.
 const currentFileStack = [];
 
-module.exports = function( sourceFile, options ) {
+module.exports = ( sourceFile, options ) => {
 	// Input: process CLI args, prepare files, etc
 	const processDir = process.cwd();
 	if ( sourceFile === undefined ) {

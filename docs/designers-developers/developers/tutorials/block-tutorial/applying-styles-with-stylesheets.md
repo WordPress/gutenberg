@@ -14,7 +14,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 
 	icon: 'universal-access-alt',
 
-	category: 'layout',
+	category: 'design',
 
 	example: {},
 
@@ -35,7 +35,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 	blocks.registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 		title: 'Example: Stylesheets',
 		icon: 'universal-access-alt',
-		category: 'layout',
+		category: 'design',
 		example: {},
 		edit: function( props ) {
 			return el(

@@ -1,6 +1,6 @@
 {
 	"name": "core/subhead",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -10,5 +10,9 @@
 			"source": "html",
 			"selector": "p"
 		}
+	},
+	"supports": {
+		"inserter": false,
+		"multiple": false
 	}
 }

@@ -1,15 +1,14 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { isEmpty } from './utils';
-import { isPhrasingContent } from './phrasing-content';
+import { isEmpty, isPhrasingContent } from '@wordpress/dom';
 
 /**
  * Browser dependencies
  */
 const { ELEMENT_NODE, TEXT_NODE } = window.Node;
 
-export default function( HTML ) {
+export default function normaliseBlocks( HTML ) {
 	const decuDoc = document.implementation.createHTMLDocument( '' );
 	const accuDoc = document.implementation.createHTMLDocument( '' );
 

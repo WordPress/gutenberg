@@ -8,16 +8,36 @@
 /**
  * Renders the `core/post-title` block on the server.
  *
- * @param WP_Block $block The block instance.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  *
  * @return string Returns the filtered post title for the current post wrapped inside "h1" tags.
  */
-function render_block_core_post_title( $block ) {
+function render_block_core_post_title( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
 
-	return '<h1>' . get_the_title( $block->context['postId'] ) . '</h1>';
+	$post_ID          = $block->context['postId'];
+	$tag_name         = 'h2';
+	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
+
+	if ( isset( $attributes['level'] ) ) {
+		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
+	}
+
+	$title = get_the_title( $post_ID );
+	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
+		$title = sprintf( '<a href="%1s" target="%2s" rel="%3s">%4s</a>', get_the_permalink( $post_ID ), $attributes['linkTarget'], $attributes['rel'], $title );
+	}
+
+	return sprintf(
+		'<%1$s class="%2$s">%3$s</%1$s>',
+		$tag_name,
+		esc_attr( $align_class_name ),
+		$title
+	);
 }
 
 /**

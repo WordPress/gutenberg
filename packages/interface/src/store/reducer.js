@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flow, get, isEmpty, omit } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,27 +9,14 @@ import { flow, get, isEmpty, omit } from 'lodash';
 import { combineReducers } from '@wordpress/data';
 
 /**
- * Internal dependencies
- */
-import { DEFAULTS } from './defaults';
-
-/**
- * Higher-order reducer creator which provides the given initial state for the
- * original reducer.
- *
- * @param {*} initialState Initial state to provide to reducer.
- *
- * @return {Function} Higher-order reducer.
- */
-const createWithInitialState = ( initialState ) => ( reducer ) => {
-	return ( state = initialState, action ) => reducer( state, action );
-};
-
-/**
  * Reducer to keep tract of the active area per scope.
  *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
+ * @param {boolean} state           Previous state.
+ * @param {Object}  action          Action object.
+ * @param {string}  action.type     Action type.
+ * @param {string}  action.itemType Type of item.
+ * @param {string}  action.scope    Item scope.
+ * @param {string}  action.item     Item name.
  *
  * @return {Object} Updated state.
  */
@@ -41,18 +28,6 @@ export function singleEnableItems(
 		return state;
 	}
 
-	if (
-		! item &&
-		! get( DEFAULTS.enableItems.singleEnableItems, [ itemType, scope ] )
-	) {
-		const newTypeState = omit( state[ itemType ], [ scope ] );
-		return isEmpty( newTypeState )
-			? omit( state, [ itemType ] )
-			: {
-					...state,
-					[ itemType ]: newTypeState,
-			  };
-	}
 	return {
 		...state,
 		[ itemType ]: {
@@ -63,10 +38,15 @@ export function singleEnableItems(
 }
 
 /**
- * Reducer keeping track of the "pinned" items per scope
+ * Reducer keeping track of the "pinned" items per scope.
  *
- * @param {boolean}  state   Previous state.
- * @param {Object}   action  Action Object.
+ * @param {boolean} state           Previous state.
+ * @param {Object}  action          Action object.
+ * @param {string}  action.type     Action type.
+ * @param {string}  action.itemType Type of item.
+ * @param {string}  action.scope    Item scope.
+ * @param {string}  action.item     Item name.
+ * @param {boolean} action.isEnable Whether the item is pinned.
  *
  * @return {Object} Updated state.
  */
@@ -103,8 +83,6 @@ const enableItems = combineReducers( {
 	multipleEnableItems,
 } );
 
-export default flow( [ combineReducers, createWithInitialState( DEFAULTS ) ] )(
-	{
-		enableItems,
-	}
-);
+export default combineReducers( {
+	enableItems,
+} );

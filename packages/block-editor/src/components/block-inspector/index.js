@@ -30,11 +30,15 @@ const BlockInspector = ( {
 	selectedBlockClientId,
 	selectedBlockName,
 	showNoBlockSelectedMessage = true,
+	bubblesVirtually = true,
 } ) => {
-	const slot = useSlot( InspectorAdvancedControls.slotName );
-
 	if ( count > 1 ) {
-		return <MultiSelectionInspector />;
+		return (
+			<div className="block-editor-block-inspector">
+				<MultiSelectionInspector />
+				<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
+			</div>
+		);
 	}
 
 	const isSelectedBlockUnregistered =
@@ -59,8 +63,6 @@ const BlockInspector = ( {
 		return null;
 	}
 
-	const hasFills = Boolean( slot.fills && slot.fills.length );
-
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard blockType={ blockType } />
@@ -78,20 +80,36 @@ const BlockInspector = ( {
 					</PanelBody>
 				</div>
 			) }
-			<InspectorControls.Slot bubblesVirtually />
+			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
 			<div>
-				{ hasFills && (
-					<PanelBody
-						className="block-editor-block-inspector__advanced"
-						title={ __( 'Advanced' ) }
-						initialOpen={ false }
-					>
-						<InspectorAdvancedControls.Slot bubblesVirtually />
-					</PanelBody>
-				) }
+				<AdvancedControls
+					slotName={ InspectorAdvancedControls.slotName }
+					bubblesVirtually={ bubblesVirtually }
+				/>
 			</div>
 			<SkipToSelectedBlock key="back" />
 		</div>
+	);
+};
+
+const AdvancedControls = ( { slotName, bubblesVirtually } ) => {
+	const slot = useSlot( slotName );
+	const hasFills = Boolean( slot.fills && slot.fills.length );
+
+	if ( ! hasFills ) {
+		return null;
+	}
+
+	return (
+		<PanelBody
+			className="block-editor-block-inspector__advanced"
+			title={ __( 'Advanced' ) }
+			initialOpen={ false }
+		>
+			<InspectorAdvancedControls.Slot
+				bubblesVirtually={ bubblesVirtually }
+			/>
+		</PanelBody>
 	);
 };
 

@@ -305,8 +305,6 @@ export function isSavingMetaBoxes( state ) {
 
 /**
  * Returns the current editing canvas device type.
- * It's marked as experimental because, potentially, we'll need this
- * in several pages including edit-site.
  *
  * @param {Object} state Global application state.
  *
@@ -314,4 +312,15 @@ export function isSavingMetaBoxes( state ) {
  */
 export function __experimentalGetPreviewDeviceType( state ) {
 	return state.deviceType;
+}
+
+/**
+ * Returns true if the inserter is opened.
+ *
+ * @param  {Object}  state Global application state.
+ *
+ * @return {boolean} Whether the inserter is opened.
+ */
+export function isInserterOpened( state ) {
+	return state.isInserterOpened;
 }

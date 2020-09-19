@@ -1,3 +1,5 @@
+<!-- Learn the overall process and best practices for pull requests at https://github.com/WordPress/gutenberg/blob/master/docs/contributors/repository-management.md#pull-requests. -->
+
 ## Description
 <!-- Please describe what you have changed or added -->
 

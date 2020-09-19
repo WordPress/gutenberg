@@ -19,6 +19,7 @@ import {
 	ResizableBox,
 	ToggleControl,
 	withNotices,
+	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
@@ -30,9 +31,11 @@ import {
 	MediaReplaceFlow,
 	withColors,
 	ColorPalette,
+	__experimentalBlock as Block,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
+	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
@@ -49,6 +52,8 @@ import {
 	CSS_UNITS,
 	backgroundImageStyles,
 	dimRatioToClass,
+	isContentPositionCenter,
+	getPositionClassName,
 } from './shared';
 
 /**
@@ -65,6 +70,8 @@ const INNER_BLOCKS_TEMPLATE = [
 		},
 	],
 ];
+
+const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
@@ -96,6 +103,9 @@ function CoverHeightInput( {
 		}
 		setTemporaryInput( null );
 		onChange( inputValue );
+		if ( inputValue === undefined ) {
+			onUnitChange();
+		}
 	};
 
 	const handleOnBlur = () => {
@@ -111,6 +121,7 @@ function CoverHeightInput( {
 		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
 			<UnitControl
 				id={ inputId }
+				isResetValueOnUnitChange
 				min={ min }
 				onBlur={ handleOnBlur }
 				onChange={ handleOnChange }
@@ -138,10 +149,10 @@ const RESIZABLE_BOX_ENABLE_OPTION = {
 
 function ResizableCover( {
 	className,
-	children,
 	onResizeStart,
 	onResize,
 	onResizeStop,
+	...props
 } ) {
 	const [ isResizing, setIsResizing ] = useState( false );
 
@@ -151,24 +162,23 @@ function ResizableCover( {
 				'is-resizing': isResizing,
 			} ) }
 			enable={ RESIZABLE_BOX_ENABLE_OPTION }
-			onResizeStart={ ( event, direction, elt ) => {
+			onResizeStart={ ( _event, _direction, elt ) => {
 				onResizeStart( elt.clientHeight );
 				onResize( elt.clientHeight );
 			} }
-			onResize={ ( event, direction, elt ) => {
+			onResize={ ( _event, _direction, elt ) => {
 				onResize( elt.clientHeight );
 				if ( ! isResizing ) {
 					setIsResizing( true );
 				}
 			} }
-			onResizeStop={ ( event, direction, elt ) => {
+			onResizeStop={ ( _event, _direction, elt ) => {
 				onResizeStop( elt.clientHeight );
 				setIsResizing( false );
 			} }
 			minHeight={ COVER_MIN_HEIGHT }
-		>
-			{ children }
-		</ResizableBox>
+			{ ...props }
+		/>
 	);
 }
 
@@ -225,7 +235,6 @@ function CoverEdit( {
 	attributes,
 	setAttributes,
 	isSelected,
-	className,
 	noticeUI,
 	overlayColor,
 	setOverlayColor,
@@ -233,6 +242,7 @@ function CoverEdit( {
 	noticeOperations,
 } ) {
 	const {
+		contentPosition,
 		id,
 		backgroundType,
 		dimRatio,
@@ -240,6 +250,7 @@ function CoverEdit( {
 		hasParallax,
 		minHeight,
 		minHeightUnit,
+		style: styleAttribute,
 		url,
 	} = attributes;
 	const {
@@ -264,6 +275,9 @@ function CoverEdit( {
 		isDarkElement
 	);
 
+	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+
 	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
 	const { removeAllNotices, createErrorNotice } = noticeOperations;
 
@@ -272,9 +286,7 @@ function CoverEdit( {
 		: minHeight;
 
 	const style = {
-		...( backgroundType === IMAGE_BACKGROUND_TYPE
-			? backgroundImageStyles( url )
-			: {} ),
+		...( isImageBackground ? backgroundImageStyles( url ) : {} ),
 		backgroundColor: overlayColor.color,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
@@ -283,51 +295,65 @@ function CoverEdit( {
 		style.background = gradientValue;
 	}
 
+	let positionValue;
+
 	if ( focalPoint ) {
-		style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y *
-			100 }%`;
+		positionValue = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
+		if ( isImageBackground ) {
+			style.backgroundPosition = positionValue;
+		}
 	}
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
+	const showFocalPointPicker =
+		isVideoBackground || ( isImageBackground && ! hasParallax );
 
 	const controls = (
 		<>
 			<BlockControls>
 				{ hasBackground && (
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ url }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept="image/*,video/*"
-						onSelect={ onSelectMedia }
-					/>
+					<>
+						<BlockAlignmentMatrixToolbar
+							label={ __( 'Change content position' ) }
+							value={ contentPosition }
+							onChange={ ( nextPosition ) =>
+								setAttributes( {
+									contentPosition: nextPosition,
+								} )
+							}
+						/>
+
+						<MediaReplaceFlow
+							mediaId={ id }
+							mediaURL={ url }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							accept="image/*,video/*"
+							onSelect={ onSelectMedia }
+						/>
+					</>
 				) }
 			</BlockControls>
 			<InspectorControls>
 				{ !! url && (
 					<PanelBody title={ __( 'Media settings' ) }>
-						{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+						{ isImageBackground && (
 							<ToggleControl
 								label={ __( 'Fixed background' ) }
 								checked={ hasParallax }
 								onChange={ toggleParallax }
 							/>
 						) }
-						{ IMAGE_BACKGROUND_TYPE === backgroundType &&
-							! hasParallax && (
-								<FocalPointPicker
-									label={ __( 'Focal point picker' ) }
-									url={ url }
-									value={ focalPoint }
-									onChange={ ( newFocalPoint ) =>
-										setAttributes( {
-											focalPoint: newFocalPoint,
-										} )
-									}
-								/>
-							) }
-						{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-							<video autoPlay muted loop src={ url } />
+						{ showFocalPointPicker && (
+							<FocalPointPicker
+								label={ __( 'Focal point picker' ) }
+								url={ url }
+								value={ focalPoint }
+								onChange={ ( newFocalPoint ) =>
+									setAttributes( {
+										focalPoint: newFocalPoint,
+									} )
+								}
+							/>
 						) }
 						<PanelRow>
 							<Button
@@ -381,7 +407,7 @@ function CoverEdit( {
 						>
 							{ !! url && (
 								<RangeControl
-									label={ __( 'Background opacity' ) }
+									label={ __( 'Opacity' ) }
 									value={ dimRatio }
 									onChange={ ( newDimRation ) =>
 										setAttributes( {
@@ -390,7 +416,6 @@ function CoverEdit( {
 									}
 									min={ 0 }
 									max={ 100 }
-									step={ 10 }
 									required
 								/>
 							) }
@@ -408,105 +433,117 @@ function CoverEdit( {
 		return (
 			<>
 				{ controls }
-				<MediaPlaceholder
-					icon={ placeholderIcon }
-					className={ className }
-					labels={ {
-						title: label,
-						instructions: __(
-							'Upload an image or video file, or pick one from your media library.'
-						),
-					} }
-					onSelect={ onSelectMedia }
-					accept="image/*,video/*"
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					notices={ noticeUI }
-					onError={ ( message ) => {
-						removeAllNotices();
-						createErrorNotice( message );
-					} }
-				>
-					<div className="wp-block-cover__placeholder-background-options">
-						<ColorPalette
-							disableCustomColors={ true }
-							value={ overlayColor.color }
-							onChange={ setOverlayColor }
-							clearable={ false }
-						/>
-					</div>
-				</MediaPlaceholder>
+				<Block.div className="is-placeholder">
+					<MediaPlaceholder
+						icon={ placeholderIcon }
+						labels={ {
+							title: label,
+							instructions: __(
+								'Upload an image or video file, or pick one from your media library.'
+							),
+						} }
+						onSelect={ onSelectMedia }
+						accept="image/*,video/*"
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						notices={ noticeUI }
+						onError={ ( message ) => {
+							removeAllNotices();
+							createErrorNotice( message );
+						} }
+					>
+						<div className="wp-block-cover__placeholder-background-options">
+							<ColorPalette
+								disableCustomColors={ true }
+								value={ overlayColor.color }
+								onChange={ setOverlayColor }
+								clearable={ false }
+							/>
+						</div>
+					</MediaPlaceholder>
+				</Block.div>
 			</>
 		);
 	}
 
-	const classes = classnames( className, dimRatioToClass( dimRatio ), {
-		'is-dark-theme': isDark,
-		'has-background-dim': dimRatio !== 0,
-		'has-parallax': hasParallax,
-		[ overlayColor.class ]: overlayColor.class,
-		'has-background-gradient': gradientValue,
-		[ gradientClass ]: ! url && gradientClass,
-	} );
+	const classes = classnames(
+		dimRatioToClass( dimRatio ),
+		{
+			'is-dark-theme': isDark,
+			'has-background-dim': dimRatio !== 0,
+			'has-parallax': hasParallax,
+			[ overlayColor.class ]: overlayColor.class,
+			'has-background-gradient': gradientValue,
+			[ gradientClass ]: ! url && gradientClass,
+			'has-custom-content-position': ! isContentPositionCenter(
+				contentPosition
+			),
+		},
+		getPositionClassName( contentPosition )
+	);
 
 	return (
 		<>
 			{ controls }
-			<ResizableCover
-				className={ classnames(
-					'block-library-cover__resize-container',
-					{
-						'is-selected': isSelected,
-					}
+			<Block.div className={ classes } data-url={ url } style={ style }>
+				<BoxControlVisualizer
+					values={ styleAttribute?.spacing?.padding }
+					showValues={ styleAttribute?.visualizers?.padding }
+				/>
+				<ResizableCover
+					className="block-library-cover__resize-container"
+					onResizeStart={ () => {
+						setAttributes( { minHeightUnit: 'px' } );
+						toggleSelection( false );
+					} }
+					onResize={ setTemporaryMinHeight }
+					onResizeStop={ ( newMinHeight ) => {
+						toggleSelection( true );
+						setAttributes( { minHeight: newMinHeight } );
+						setTemporaryMinHeight( null );
+					} }
+					showHandle={ isSelected }
+				/>
+				{ isImageBackground && (
+					// Used only to programmatically check if the image is dark or not
+					<img
+						ref={ isDarkElement }
+						aria-hidden
+						alt=""
+						style={ {
+							display: 'none',
+						} }
+						src={ url }
+					/>
 				) }
-				onResizeStart={ () => {
-					setAttributes( { minHeightUnit: 'px' } );
-					toggleSelection( false );
-				} }
-				onResize={ setTemporaryMinHeight }
-				onResizeStop={ ( newMinHeight ) => {
-					toggleSelection( true );
-					setAttributes( { minHeight: newMinHeight } );
-					setTemporaryMinHeight( null );
-				} }
-			>
-				<div data-url={ url } style={ style } className={ classes }>
-					{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-						// Used only to programmatically check if the image is dark or not
-						<img
-							ref={ isDarkElement }
-							aria-hidden
-							alt=""
-							style={ {
-								display: 'none',
-							} }
-							src={ url }
-						/>
-					) }
-					{ url && gradientValue && dimRatio !== 0 && (
-						<span
-							aria-hidden="true"
-							className={ classnames(
-								'wp-block-cover__gradient-background',
-								gradientClass
-							) }
-							style={ { background: gradientValue } }
-						/>
-					) }
-					{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-						<video
-							ref={ isDarkElement }
-							className="wp-block-cover__video-background"
-							autoPlay
-							muted
-							loop
-							src={ url }
-						/>
-					) }
-					<div className="wp-block-cover__inner-container">
-						<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
-					</div>
-				</div>
-			</ResizableCover>
+				{ url && gradientValue && dimRatio !== 0 && (
+					<span
+						aria-hidden="true"
+						className={ classnames(
+							'wp-block-cover__gradient-background',
+							gradientClass
+						) }
+						style={ { background: gradientValue } }
+					/>
+				) }
+				{ isVideoBackground && (
+					<video
+						ref={ isDarkElement }
+						className="wp-block-cover__video-background"
+						autoPlay
+						muted
+						loop
+						src={ url }
+						style={ { objectPosition: positionValue } }
+					/>
+				) }
+				<InnerBlocks
+					__experimentalTagName="div"
+					__experimentalPassedProps={ {
+						className: 'wp-block-cover__inner-container',
+					} }
+					template={ INNER_BLOCKS_TEMPLATE }
+				/>
+			</Block.div>
 		</>
 	);
 }

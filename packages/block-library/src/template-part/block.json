@@ -1,6 +1,6 @@
 {
 	"name": "core/template-part",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"postId": {
 			"type": "number"
@@ -10,6 +10,19 @@
 		},
 		"theme": {
 			"type": "string"
+		},
+		"tagName": {
+			"type": "string",
+			"default": "div"
+		}
+	},
+	"supports": {
+		"align": true,
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"gradients": true,
+			"linkColor": true
 		}
 	}
 }

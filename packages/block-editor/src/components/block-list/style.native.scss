@@ -7,7 +7,7 @@
 .horizontalContentContainer {
 	flex-direction: row;
 	flex-wrap: wrap;
-	justify-content: space-between;
+	justify-content: flex-start;
 	align-items: stretch;
 	max-width: $content-width;
 	overflow: visible;
@@ -79,6 +79,10 @@
 
 .blockToolbar {
 	height: $mobile-block-toolbar-height;
+}
+
+.floatingToolbar {
+	height: $mobile-floating-toolbar-height + 2 * $mobile-floating-toolbar-margin;
 }
 
 .horizontal {

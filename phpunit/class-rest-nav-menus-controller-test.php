@@ -25,6 +25,11 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * @var int
 	 */
+	protected static $editor_id;
+
+	/**
+	 * @var int
+	 */
 	protected static $subscriber_id;
 
 	/**
@@ -46,6 +51,11 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		self::$admin_id      = $factory->user->create(
 			array(
 				'role' => 'administrator',
+			)
+		);
+		self::$editor_id     = $factory->user->create(
+			array(
+				'role' => 'editor',
 			)
 		);
 		self::$subscriber_id = $factory->user->create(
@@ -216,6 +226,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request = new WP_REST_Request( 'POST', '/__experimental/menus/' . $this->menu_id );
 		$request->set_param( 'name', 'New Name' );
 		$request->set_param( 'description', 'New Description' );
+		$request->set_param( 'auto_add', true );
 		$request->set_param(
 			'meta',
 			array(
@@ -227,6 +238,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$data = $response->get_data();
 		$this->assertEquals( 'New Name', $data['name'] );
 		$this->assertEquals( 'New Description', $data['description'] );
+		$this->assertEquals( true, $data['auto_add'] );
 		$this->assertEquals( 'new-name', $data['slug'] );
 		$this->assertEquals( 'just meta', $data['meta']['test_single_menu'] );
 		$this->assertFalse( isset( $data['meta']['test_cat_meta'] ) );
@@ -286,7 +298,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertEquals( 6, count( $properties ) );
+		$this->assertEquals( 7, count( $properties ) );
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
 		$this->assertArrayHasKey( 'meta', $properties );
@@ -317,7 +329,7 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 *
 	 */
 	public function test_create_item_with_location_permission_incorrect() {
-		wp_set_current_user( self::$subscriber_id );
+		wp_set_current_user( self::$editor_id );
 		$request = new WP_REST_Request( 'POST', '/__experimental/menus' );
 		$request->set_param( 'name', 'My Awesome Term' );
 		$request->set_param( 'slug', 'so-awesome' );
@@ -325,6 +337,20 @@ class REST_Nav_Menus_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertEquals( rest_authorization_required_code(), $response->get_status() );
 		$this->assertErrorResponse( 'rest_cannot_assign_location', $response, rest_authorization_required_code() );
+	}
+
+	/**
+	 *
+	 */
+	public function test_create_item_with_auto_add_permission_incorrect() {
+		wp_set_current_user( self::$editor_id );
+		$request = new WP_REST_Request( 'POST', '/__experimental/menus' );
+		$request->set_param( 'name', 'My Awesome Term' );
+		$request->set_param( 'slug', 'so-awesome' );
+		$request->set_param( 'auto_add', true );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertEquals( rest_authorization_required_code(), $response->get_status() );
+		$this->assertErrorResponse( 'rest_cannot_set_auto_add', $response, rest_authorization_required_code() );
 	}
 
 	/**

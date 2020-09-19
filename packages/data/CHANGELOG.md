@@ -1,3 +1,7 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
 ## 4.6.0 (2019-06-12)
 
 ### New Feature
@@ -16,7 +20,7 @@
 
 - Restore functionality of action-generators returning a Promise.  Clarify intent and behaviour for `wp.data.dispatch` behaviour. Dispatch actions now always
  return a promise ([#14830](https://github.com/WordPress/gutenberg/pull/14830)
- 
+
 ### Enhancements
 
 - Expose `hasResolver` property on returned selectors indicating whether the selector has a corresponding resolver.

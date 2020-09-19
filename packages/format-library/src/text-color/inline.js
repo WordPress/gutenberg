@@ -34,7 +34,10 @@ export function getActiveColor( formatName, formatValue, colors ) {
 	}
 	const currentClass = activeColorFormat.attributes.class;
 	if ( currentClass ) {
-		const colorSlug = currentClass.replace( /.*has-(.*?)-color.*/, '$1' );
+		const colorSlug = currentClass.replace(
+			/.*has-([^\s]*)-color.*/,
+			'$1'
+		);
 		return getColorObjectByAttributeValues( colors, colorSlug ).color;
 	}
 }
@@ -116,18 +119,10 @@ const ColorPicker = ( { name, value, onChange } ) => {
 	return <ColorPalette value={ activeColor } onChange={ onColorChange } />;
 };
 
-const InlineColorUI = ( {
-	name,
-	value,
-	onChange,
-	onClose,
-	isActive,
-	addingColor,
-} ) => {
+const InlineColorUI = ( { name, value, onChange, onClose, addingColor } ) => {
 	return (
 		<ColorPopoverAtLink
 			value={ value }
-			isActive={ isActive }
 			addingColor={ addingColor }
 			onClose={ onClose }
 			className="components-inline-color-popover"

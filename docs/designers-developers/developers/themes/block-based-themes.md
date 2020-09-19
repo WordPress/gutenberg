@@ -71,9 +71,23 @@ Here's an example of a block template:
 
 Ultimately, any WordPress user with the correct capabilities (example: `administrator` WordPress role) will be able to access these templates in the WordPress admin, edit them in dedicated views and potentially export them as a theme.
 
-In the current iteration (at the time of writing this doc), you can navigate to the temporary "Templates" admin menu under "Appearance" `wp-admin/edit.php?post_type=wp_template` and use this as a playground to edit your templates.
+As of Gutenberg 8.5, there are two ways to create and edit templates within Gutenberg. 
 
-When ready, switch to the code editor mode and grab the HTML of the template from there and put it in the right file in your theme directory.
+### Edit templates within The "Appearance" section of WP-Admin
+
+You can navigate to the temporary "Templates" admin menu under "Appearance" `wp-admin/edit.php?post_type=wp_template` and use this as a playground to edit your templates. Add blocks here and switch to the code editor mode to grab the HTML of the template when you are done. Afterwards, you can paste that markup into a file within in your theme directory.
+
+Please note that the "Templates" admin menu under "Appearance" will _not_ list templates that are bundled with your theme. It only lists new templates created by the specific WordPress site you're working on. 
+
+### Edit Templates within the Full-site Editor
+
+To begin, create a blank template file within your theme. For example: `mytheme/block-templates/index.html`. Afterwards, open the Full-site editor. Your new template should appear as the active template, and should be blank. Add blocks as you normally would using Gutenberg. You can add and create template parts directly using the "Template Parts" block. 
+
+Repeat for any additional templates you'd like to bundle with your theme. 
+
+When you're done, click the "Export Theme" option in the "Tools" (ellipsis) menu of the site editor. This will provide you with a ZIP download of all the templates and template parts you've created in the site editor. These new HTML files can be placed directly into your theme. 
+
+Note that when you export template parts this way, the template part block markup will include a `postID` attribute that can be safely removed when distributing your theme. 
 
 ## Templates CPT
 
@@ -87,7 +101,23 @@ Note that it won't take precedence over any of your theme's templates with highe
 
 Some blocks have been made specifically for block-based themes. For example, you'll most likely use the **Site Title** block in your site's header while your **single** block template will most likely include a **Post Title** and a **Post Content** block.
 
-As we're still early in the process, the number of blocks specifically dedicated to these block templates is relatively small but more will be added as we move forward with the project.
+As we're still early in the process, the number of blocks specifically dedicated to these block templates is relatively small but more will be added as we move forward with the project. As of Gutenberg 8.5, the following blocks are currently available: 
+
+- Site Title
+- Template Part
+- Query
+- Query Loop
+- Query Pagination
+- Post Title
+- Post Content
+- Post Author
+- Post Comments
+- Post CommentsCount
+- Post CommentsForm
+- Post Date
+- Post Excerpt
+- Post Featured Image
+- Post Tags
 
 ## Styling
 
@@ -96,3 +126,4 @@ One of the most important aspects of themes (if not the most important) is the s
 ## Resources
 
 - [Full Site Editing](https://github.com/WordPress/gutenberg/labels/%5BFeature%5D%20Full%20Site%20Editing) label.
+- [Theme Experiments](https://github.com/WordPress/theme-experiments) repository, full of block-based theme examples created by the WordPress community.

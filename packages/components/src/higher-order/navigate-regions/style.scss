@@ -11,7 +11,7 @@
 		right: 0;
 		pointer-events: none;
 		outline: 4px solid transparent; // Shown in Windows High Contrast mode.
-		box-shadow: inset 0 0 0 4px $blue-medium-400;
+		box-shadow: inset 0 0 0 4px var(--wp-admin-theme-color);
 	}
 
 	@supports ( outline-offset: 1px ) {
@@ -21,7 +21,7 @@
 
 		&:focus {
 			outline-style: solid;
-			outline-color: $blue-medium-400;
+			outline-color: var(--wp-admin-theme-color);
 			outline-width: 4px;
 			outline-offset: -4px;
 		}

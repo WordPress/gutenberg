@@ -1,0 +1,15 @@
+{
+	"name": "core/calendar",
+	"category": "widgets",
+	"attributes": {
+		"month": {
+			"type": "integer"
+		},
+		"year": {
+			"type": "integer"
+		}
+	},
+	"supports": {
+		"align": true
+	}
+}

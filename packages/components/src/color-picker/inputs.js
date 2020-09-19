@@ -175,11 +175,12 @@ export class Inputs extends Component {
 				</div>
 			);
 		} else if ( this.state.view === 'rgb' ) {
+			const legend = disableAlpha
+				? __( 'Color value in RGB' )
+				: __( 'Color value in RGBA' );
 			return (
 				<fieldset>
-					<VisuallyHidden as="legend">
-						{ __( 'Color value in RGB' ) }
-					</VisuallyHidden>
+					<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
 					<div className="components-color-picker__inputs-fields">
 						<Input
 							source={ this.state.view }
@@ -221,18 +222,19 @@ export class Inputs extends Component {
 								type="number"
 								min="0"
 								max="1"
-								step="0.05"
+								step="0.01"
 							/>
 						) }
 					</div>
 				</fieldset>
 			);
 		} else if ( this.state.view === 'hsl' ) {
+			const legend = disableAlpha
+				? __( 'Color value in HSL' )
+				: __( 'Color value in HSLA' );
 			return (
 				<fieldset>
-					<VisuallyHidden as="legend">
-						{ __( 'Color value in HSL' ) }
-					</VisuallyHidden>
+					<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
 					<div className="components-color-picker__inputs-fields">
 						<Input
 							source={ this.state.view }

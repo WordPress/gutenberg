@@ -34,6 +34,8 @@ export const link = {
 	className: null,
 	attributes: {
 		url: 'href',
+		type: 'data-type',
+		id: 'data-id',
 		target: 'target',
 	},
 	__unstablePasteRule( value, { html, plainText } ) {

@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { omit, startsWith, get } from 'lodash';
+import glob from 'fast-glob';
+import { fromPairs, omit, startsWith, get } from 'lodash';
 import { format } from 'util';
 
 /**
@@ -53,12 +54,18 @@ function normalizeParsedBlocks( blocks ) {
 }
 
 describe( 'full post content fixture', () => {
-	beforeAll( () => {
-		unstable__bootstrapServerSideBlockDefinitions(
-			require( './server-registered.json' )
+	beforeAll( async () => {
+		const blockMetadataFiles = await glob(
+			'packages/block-library/src/*/block.json'
 		);
+		const blockDefinitions = fromPairs(
+			blockMetadataFiles.map( ( file ) => {
+				const { name, ...metadata } = require( file );
+				return [ name, metadata ];
+			} )
+		);
+		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
 		const settings = {
-			__experimentalEnableLegacyWidgetBlock: true,
 			__experimentalEnableFullSiteEditing: true,
 		};
 		// Load all hooks that modify blocks
@@ -209,9 +216,7 @@ describe( 'full post content fixture', () => {
 			// `save` functions and attributes.
 			// The `core/template` is not worth testing here because it's never saved, it's covered better in e2e tests.
 			.filter(
-				( name ) =>
-					name.indexOf( 'core-embed' ) !== 0 &&
-					name !== 'core/template'
+				( name ) => ! [ 'core/embed', 'core/template' ].includes( name )
 			)
 			.forEach( ( name ) => {
 				const nameToFilename = blockNameToFixtureBasename( name );

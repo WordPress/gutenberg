@@ -25,6 +25,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
+import TouchableRipple from './ripple.native.js';
 
 class BottomSheetCell extends Component {
 	constructor( props ) {
@@ -39,8 +40,8 @@ class BottomSheetCell extends Component {
 		);
 	}
 
-	componentDidUpdate() {
-		if ( this.state.isEditingValue ) {
+	componentDidUpdate( prevProps, prevState ) {
+		if ( ! prevState.isEditingValue && this.state.isEditingValue ) {
 			this._valueTextInput.focus();
 		}
 	}
@@ -110,6 +111,7 @@ class BottomSheetCell extends Component {
 			customActionButton,
 			type,
 			step,
+			borderless,
 			...valueProps
 		} = this.props;
 
@@ -191,7 +193,7 @@ class BottomSheetCell extends Component {
 				case 'none':
 					return undefined;
 				case undefined:
-					if ( showValue && icon !== undefined ) {
+					if ( showValue && icon ) {
 						return leftMarginStyle;
 					}
 					return defaultSeparatorStyle;
@@ -282,7 +284,7 @@ class BottomSheetCell extends Component {
 				: get( platformStyles, 'activeOpacity.opacity' );
 
 		return (
-			<TouchableOpacity
+			<TouchableRipple
 				accessible={
 					accessible !== undefined
 						? accessible
@@ -300,6 +302,7 @@ class BottomSheetCell extends Component {
 				activeOpacity={ opacity }
 				onPress={ onCellPress }
 				style={ [ styles.clipToBounds, style ] }
+				borderless={ borderless }
 			>
 				{ drawTopSeparator && <View style={ separatorStyle() } /> }
 				<View
@@ -313,7 +316,7 @@ class BottomSheetCell extends Component {
 									<Icon
 										icon={ icon }
 										size={ 24 }
-										color={ iconStyle.color }
+										fill={ iconStyle.color }
 										isPressed={ false }
 									/>
 									<View
@@ -323,9 +326,13 @@ class BottomSheetCell extends Component {
 									/>
 								</View>
 							) }
-							<Text style={ [ defaultLabelStyle, labelStyle ] }>
-								{ label }
-							</Text>
+							{ label && (
+								<Text
+									style={ [ defaultLabelStyle, labelStyle ] }
+								>
+									{ label }
+								</Text>
+							) }
 						</View>
 						{ customActionButton && (
 							<TouchableOpacity
@@ -348,7 +355,7 @@ class BottomSheetCell extends Component {
 					{ children }
 				</View>
 				{ ! drawTopSeparator && <View style={ separatorStyle() } /> }
-			</TouchableOpacity>
+			</TouchableRipple>
 		);
 	}
 }

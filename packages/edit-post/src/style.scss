@@ -1,7 +1,4 @@
-$footer-height: $button-size-small;
-
 @import "../../interface/src/style.scss";
-
 @import "./components/header/style.scss";
 @import "./components/header/fullscreen-mode-close/style.scss";
 @import "./components/header/header-toolbar/style.scss";
@@ -10,7 +7,6 @@ $footer-height: $button-size-small;
 @import "./components/layout/style.scss";
 @import "./components/manage-blocks-modal/style.scss";
 @import "./components/meta-boxes/meta-boxes-area/style.scss";
-@import "./components/preview-options/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar/last-revision/style.scss";
 @import "./components/sidebar/post-author/style.scss";
@@ -24,7 +20,6 @@ $footer-height: $button-size-small;
 @import "./components/visual-editor/style.scss";
 @import "./components/options-modal/style.scss";
 @import "./components/welcome-guide/style.scss";
-
 
 /**
  * Animations
@@ -59,7 +54,8 @@ body.block-editor-page {
 .edit-post-sidebar,
 .editor-post-publish-panel,
 .components-popover,
-.components-modal__frame {
+.components-modal__frame,
+.edit-post-layout__inserter-panel {
 	@include reset;
 }
 
@@ -103,13 +99,13 @@ body.block-editor-page {
 .wp-block {
 	max-width: $content-width;
 
-	&[data-align="wide"],
-	&.alignwide {
+	&[data-align="wide"] {
 		max-width: 1100px;
 	}
 
-	&[data-align="full"],
-	&.alignfull {
+	&[data-align="full"] {
 		max-width: none;
 	}
 }
+
+@include wordpress-admin-schemes();

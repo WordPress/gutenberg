@@ -37,10 +37,7 @@ describe( 'PageControl', () => {
 				setCurrentPage={ setCurrentPage }
 			/>
 		);
-		wrapper
-			.find( Button )
-			.at( 1 )
-			.simulate( 'click' );
+		wrapper.find( Button ).at( 1 ).simulate( 'click' );
 		expect( setCurrentPage ).toHaveBeenCalledWith( 1 );
 	} );
 } );

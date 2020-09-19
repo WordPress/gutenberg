@@ -1,13 +1,11 @@
 /**
  * External dependencies
  */
-
 const { basename } = require( 'path' );
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 
 module.exports = {

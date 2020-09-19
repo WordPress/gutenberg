@@ -9,8 +9,6 @@ const tscDetectedVersion = require( 'typescript' ).version;
 const tscDependencyVersion = require( '../../package.json' ).devDependencies
 	.typescript;
 
-/* eslint-disable no-console */
-
 if ( tscDependencyVersion !== tscDetectedVersion ) {
 	console.error(
 		[
@@ -24,5 +22,3 @@ if ( tscDependencyVersion !== tscDetectedVersion ) {
 	);
 	process.exit( 1 );
 }
-
-/* eslint-enable no-console */

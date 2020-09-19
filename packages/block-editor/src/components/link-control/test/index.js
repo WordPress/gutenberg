@@ -3,7 +3,8 @@
  */
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
-import { first, last, nth } from 'lodash';
+import { queryByText, queryByRole } from '@testing-library/react';
+import { first, last, nth, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -19,6 +20,10 @@ const mockFetchSearchSuggestions = jest.fn();
 
 jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {
 	fetchSearchSuggestions: mockFetchSearchSuggestions,
+} ) );
+
+jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
+	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
 } ) );
 
 /**
@@ -83,6 +88,56 @@ describe( 'Basic rendering', () => {
 
 		expect( searchInput ).not.toBeNull();
 		expect( container.innerHTML ).toMatchSnapshot();
+	} );
+
+	it( 'should not render protocol in links', async () => {
+		mockFetchSearchSuggestions.mockImplementation( () =>
+			Promise.resolve( [
+				{
+					id: uniqueId(),
+					title: 'Hello Page',
+					type: 'Page',
+					info: '2 days ago',
+					url: `http://example.com/?p=${ uniqueId() }`,
+				},
+				{
+					id: uniqueId(),
+					title: 'Hello Post',
+					type: 'Post',
+					info: '19 days ago',
+					url: `https://example.com/${ uniqueId() }`,
+				},
+			] )
+		);
+
+		const searchTerm = 'Hello';
+
+		act( () => {
+			render( <LinkControl />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = getURLInput();
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		// Find all elements with link
+		// Filter out the element with the text 'ENTER' because it doesn't contain link
+		const linkElements = Array.from(
+			container.querySelectorAll(
+				'.block-editor-link-control__search-item-info'
+			)
+		).filter( ( elem ) => ! elem.innerHTML.includes( 'ENTER' ) );
+
+		linkElements.forEach( ( elem ) => {
+			expect( elem.innerHTML ).not.toContain( '://' );
+		} );
 	} );
 
 	describe( 'forceIsEditingLink', () => {
@@ -226,6 +281,8 @@ describe( 'Searching for a link', () => {
 			fauxEntitySuggestions.length
 		);
 
+		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
+
 		// Sanity check that a search suggestion shows up corresponding to the data
 		expect( firstSearchResultItemHTML ).toEqual(
 			expect.stringContaining( firstFauxSuggestion.title )
@@ -338,6 +395,33 @@ describe( 'Searching for a link', () => {
 			);
 		}
 	);
+
+	it( 'should not display a URL suggestion as a default fallback when noURLSuggestion is passed.', async () => {
+		act( () => {
+			render( <LinkControl noURLSuggestion />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = getURLInput();
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: 'couldbeurlorentitysearchterm' },
+			} );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+
+		const searchResultElements = getSearchResults();
+
+		// We should see a search result for each of the expect search suggestions and nothing else
+		expect( searchResultElements ).toHaveLength(
+			fauxEntitySuggestions.length
+		);
+	} );
 } );
 
 describe( 'Manual link entry', () => {
@@ -516,6 +600,8 @@ describe( 'Default search suggestions', () => {
 		// it should match any url that's like ?p= and also include a URL option
 		expect( searchResultElements ).toHaveLength( 5 );
 
+		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'true' );
+
 		expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 	} );
 
@@ -566,6 +652,34 @@ describe( 'Default search suggestions', () => {
 
 		expect( searchResultElements ).toHaveLength( 3 );
 	} );
+
+	it( 'should not display initial suggestions when there are no recently updated pages/posts', async () => {
+		const noResults = [];
+		// Force API returning empty results for recently updated Pages.
+		mockFetchSearchSuggestions.mockImplementation( () =>
+			Promise.resolve( noResults )
+		);
+
+		act( () => {
+			render( <LinkControl showInitialSuggestions />, container );
+		} );
+
+		await eventLoopTick();
+
+		const searchInput = getURLInput();
+
+		const searchResultElements = getSearchResults();
+
+		const searchResultLabel = container.querySelector(
+			'.block-editor-link-control__search-results-label'
+		);
+
+		expect( searchResultLabel ).toBeFalsy();
+
+		expect( searchResultElements ).toHaveLength( 0 );
+
+		expect( searchInput.getAttribute( 'aria-expanded' ) ).toBe( 'false' );
+	} );
 } );
 
 describe( 'Creating Entities (eg: Posts, Pages)', () => {
@@ -589,7 +703,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			const createSuggestion = ( title ) =>
 				new Promise( ( resolve ) => {
-					resolver = resolve;
+					resolver = ( arg ) => {
+						resolve( arg );
+					};
 					resolvedEntity = {
 						title,
 						id: 123,
@@ -637,7 +753,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			const createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'New page' )
+					result.innerHTML.includes( 'Create:' )
 				)
 			);
 
@@ -734,7 +850,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		const createButton = first(
 			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'New page' )
+				result.innerHTML.includes( 'Create:' )
 			)
 		);
 
@@ -807,7 +923,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const form = container.querySelector( 'form' );
 		const createButton = first(
 			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'New page' )
+				result.innerHTML.includes( 'Create:' )
 			)
 		);
 
@@ -837,6 +953,50 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		);
 	} );
 
+	it( 'should allow customisation of button text', async () => {
+		const entityNameText = 'A new page to be created';
+
+		const LinkControlConsumer = () => {
+			return (
+				<LinkControl
+					createSuggestion={ () => {} }
+					createSuggestionButtonText="Custom suggestion text"
+				/>
+			);
+		};
+
+		act( () => {
+			render( <LinkControlConsumer />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: entityNameText },
+			} );
+		} );
+
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+		const searchResultElements = container.querySelectorAll(
+			'[role="listbox"] [role="option"]'
+		);
+
+		const createButton = first(
+			Array.from( searchResultElements ).filter( ( result ) =>
+				result.innerHTML.includes( 'Custom suggestion text' )
+			)
+		);
+
+		expect( createButton ).not.toBeNull();
+	} );
+
 	describe( 'Do not show create option', () => {
 		it.each( [ [ undefined ], [ null ], [ false ] ] )(
 			'should not show not show an option to create an entity when "createSuggestion" handler is %s',
@@ -861,7 +1021,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				);
 				const createButton = first(
 					Array.from( searchResultElements ).filter( ( result ) =>
-						result.innerHTML.includes( 'New page' )
+						result.innerHTML.includes( 'Create:' )
 					)
 				);
 
@@ -986,7 +1146,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 			let createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'New page' )
+					result.innerHTML.includes( 'Create:' )
 				)
 			);
 
@@ -1030,8 +1190,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 					result.innerHTML.includes( 'New page' )
 				)
 			);
-
-			expect( createButton ).not.toBeFalsy(); // shouldn't exist!
 		} );
 	} );
 } );
@@ -1060,10 +1218,9 @@ describe( 'Selecting links', () => {
 		expect( currentLinkHTML ).toEqual(
 			expect.stringContaining( selectedLink.title )
 		);
-		expect( currentLinkHTML ).toEqual(
-			expect.stringContaining( selectedLink.type )
-		);
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
+		expect(
+			queryByRole( currentLink, 'button', { name: 'Edit' } )
+		).toBeTruthy();
 		expect( currentLinkAnchor ).not.toBeNull();
 	} );
 
@@ -1528,4 +1685,71 @@ describe( 'Addition Settings UI', () => {
 		expect( settingControlsInputs[ 0 ].checked ).toEqual( false );
 		expect( settingControlsInputs[ 1 ].checked ).toEqual( true );
 	} );
+} );
+
+describe( 'Post types', () => {
+	it( 'should display post type in search results of link', async () => {
+		const searchTerm = 'Hello world';
+
+		act( () => {
+			render( <LinkControl />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = getURLInput();
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		const searchResultElements = getSearchResults();
+
+		searchResultElements.forEach( ( resultItem, index ) => {
+			expect(
+				queryByText( resultItem, fauxEntitySuggestions[ index ].type )
+			).toBeTruthy();
+		} );
+	} );
+
+	it.each( [ 'page', 'post', 'tag', 'post_tag', 'category' ] )(
+		'should NOT display post type in search results of %s',
+		async ( postType ) => {
+			const searchTerm = 'Hello world';
+
+			act( () => {
+				render(
+					<LinkControl suggestionsQuery={ { type: postType } } />,
+					container
+				);
+			} );
+
+			// Search Input UI
+			const searchInput = getURLInput();
+
+			// Simulate searching for a term
+			act( () => {
+				Simulate.change( searchInput, {
+					target: { value: searchTerm },
+				} );
+			} );
+
+			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+			await eventLoopTick();
+
+			const searchResultElements = getSearchResults();
+
+			searchResultElements.forEach( ( resultItem, index ) => {
+				expect(
+					queryByText(
+						resultItem,
+						fauxEntitySuggestions[ index ].type
+					)
+				).toBeFalsy();
+			} );
+		}
+	);
 } );

@@ -16,6 +16,7 @@ import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -545,7 +546,8 @@ export function isEditedPostSaveable( state ) {
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostAttribute( state, 'excerpt' ) ||
-		! isEditedPostEmpty( state )
+		! isEditedPostEmpty( state ) ||
+		Platform.OS === 'native'
 	);
 }
 
@@ -607,64 +609,63 @@ export function isEditedPostEmpty( state ) {
  * @return {boolean} Whether the post can be autosaved.
  */
 export const isEditedPostAutosaveable = createRegistrySelector(
-	( select ) =>
-		function( state ) {
-			// A post must contain a title, an excerpt, or non-empty content to be valid for autosaving.
-			if ( ! isEditedPostSaveable( state ) ) {
-				return false;
-			}
-
-			// A post is not autosavable when there is a post autosave lock.
-			if ( isPostAutosavingLocked( state ) ) {
-				return false;
-			}
-
-			const postType = getCurrentPostType( state );
-			const postId = getCurrentPostId( state );
-			const hasFetchedAutosave = select( 'core' ).hasFetchedAutosaves(
-				postType,
-				postId
-			);
-			const currentUserId = get( select( 'core' ).getCurrentUser(), [
-				'id',
-			] );
-
-			// Disable reason - this line causes the side-effect of fetching the autosave
-			// via a resolver, moving below the return would result in the autosave never
-			// being fetched.
-			// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-			const autosave = select( 'core' ).getAutosave(
-				postType,
-				postId,
-				currentUserId
-			);
-
-			// If any existing autosaves have not yet been fetched, this function is
-			// unable to determine if the post is autosaveable, so return false.
-			if ( ! hasFetchedAutosave ) {
-				return false;
-			}
-
-			// If we don't already have an autosave, the post is autosaveable.
-			if ( ! autosave ) {
-				return true;
-			}
-
-			// To avoid an expensive content serialization, use the content dirtiness
-			// flag in place of content field comparison against the known autosave.
-			// This is not strictly accurate, and relies on a tolerance toward autosave
-			// request failures for unnecessary saves.
-			if ( hasChangedContent( state ) ) {
-				return true;
-			}
-
-			// If the title or excerpt has changed, the post is autosaveable.
-			return [ 'title', 'excerpt' ].some(
-				( field ) =>
-					getPostRawValue( autosave[ field ] ) !==
-					getEditedPostAttribute( state, field )
-			);
+	( select ) => ( state ) => {
+		// A post must contain a title, an excerpt, or non-empty content to be valid for autosaving.
+		if ( ! isEditedPostSaveable( state ) ) {
+			return false;
 		}
+
+		// A post is not autosavable when there is a post autosave lock.
+		if ( isPostAutosavingLocked( state ) ) {
+			return false;
+		}
+
+		const postType = getCurrentPostType( state );
+		const postId = getCurrentPostId( state );
+		const hasFetchedAutosave = select( 'core' ).hasFetchedAutosaves(
+			postType,
+			postId
+		);
+		const currentUserId = get( select( 'core' ).getCurrentUser(), [
+			'id',
+		] );
+
+		// Disable reason - this line causes the side-effect of fetching the autosave
+		// via a resolver, moving below the return would result in the autosave never
+		// being fetched.
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const autosave = select( 'core' ).getAutosave(
+			postType,
+			postId,
+			currentUserId
+		);
+
+		// If any existing autosaves have not yet been fetched, this function is
+		// unable to determine if the post is autosaveable, so return false.
+		if ( ! hasFetchedAutosave ) {
+			return false;
+		}
+
+		// If we don't already have an autosave, the post is autosaveable.
+		if ( ! autosave ) {
+			return true;
+		}
+
+		// To avoid an expensive content serialization, use the content dirtiness
+		// flag in place of content field comparison against the known autosave.
+		// This is not strictly accurate, and relies on a tolerance toward autosave
+		// request failures for unnecessary saves.
+		if ( hasChangedContent( state ) ) {
+			return true;
+		}
+
+		// If the title or excerpt has changed, the post is autosaveable.
+		return [ 'title', 'excerpt' ].some(
+			( field ) =>
+				getPostRawValue( autosave[ field ] ) !==
+				getEditedPostAttribute( state, field )
+		);
+	}
 );
 
 /**
@@ -760,7 +761,7 @@ export function isEditedPostDateFloating( state ) {
 		status === 'auto-draft' ||
 		status === 'pending'
 	) {
-		return date === modified;
+		return date === modified || date === null;
 	}
 	return false;
 }
@@ -890,19 +891,28 @@ export function getEditedPostPreviewLink( state ) {
 export function getSuggestedPostFormat( state ) {
 	const blocks = getEditorBlocks( state );
 
+	if ( blocks.length > 2 ) return null;
+
 	let name;
 	// If there is only one block in the content of the post grab its name
 	// so we can derive a suitable post format from it.
 	if ( blocks.length === 1 ) {
 		name = blocks[ 0 ].name;
+		// check for core/embed `video` and `audio` eligible suggestions
+		if ( name === 'core/embed' ) {
+			const provider = blocks[ 0 ].attributes?.providerNameSlug;
+			if ( [ 'youtube', 'vimeo' ].includes( provider ) ) {
+				name = 'core/video';
+			} else if ( [ 'spotify', 'soundcloud' ].includes( provider ) ) {
+				name = 'core/audio';
+			}
+		}
 	}
 
 	// If there are two blocks in the content and the last one is a text blocks
 	// grab the name of the first one to also suggest a post format from it.
-	if ( blocks.length === 2 ) {
-		if ( blocks[ 1 ].name === 'core/paragraph' ) {
-			name = blocks[ 0 ].name;
-		}
+	if ( blocks.length === 2 && blocks[ 1 ].name === 'core/paragraph' ) {
+		name = blocks[ 0 ].name;
 	}
 
 	// We only convert to default post formats in core.
@@ -915,16 +925,12 @@ export function getSuggestedPostFormat( state ) {
 		case 'core/gallery':
 			return 'gallery';
 		case 'core/video':
-		case 'core-embed/youtube':
-		case 'core-embed/vimeo':
 			return 'video';
 		case 'core/audio':
-		case 'core-embed/spotify':
-		case 'core-embed/soundcloud':
 			return 'audio';
+		default:
+			return null;
 	}
-
-	return null;
 }
 
 /**

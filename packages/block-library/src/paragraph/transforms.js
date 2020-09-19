@@ -18,7 +18,7 @@ const transforms = {
 			schema: ( { phrasingContentSchema, isPaste } ) => ( {
 				p: {
 					children: phrasingContentSchema,
-					attributes: isPaste ? [] : [ 'style' ],
+					attributes: isPaste ? [] : [ 'style', 'id' ],
 				},
 			} ),
 			transform( node ) {

@@ -55,10 +55,11 @@ function gutenberg_customize_register( $wp_customize ) {
 			'sanitize_callback' => 'gutenberg_customize_sanitize',
 		)
 	);
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
+
+	if ( gutenberg_use_widgets_block_editor() ) {
 		$wp_customize->add_section(
 			'gutenberg_widget_blocks',
-			array( 'title' => __( 'Widget Blocks (Experimental)', 'gutenberg' ) )
+			array( 'title' => __( 'Widget Blocks', 'gutenberg' ) )
 		);
 		$wp_customize->add_control(
 			new WP_Customize_Widget_Blocks_Control(
@@ -75,30 +76,23 @@ function gutenberg_customize_register( $wp_customize ) {
 add_action( 'customize_register', 'gutenberg_customize_register' );
 
 /**
- * Specifies how to save the `gutenberg_widget_blocks` setting. It parses the JSON string and updates the
- * referenced widget areas with the new content.
+ * Removes the core 'Widgets' panel from the Customizer if block based widgets are enabled.
  *
- * @param string                $value   The value that is being published.
- * @param \WP_Customize_Setting $setting The setting instance.
+ * @param array $components Core Customizer components list.
+ * @return array (Maybe) modified components list.
  */
-function gutenberg_customize_update( $value, $setting ) {
-	foreach ( json_decode( $value ) as $sidebar_id => $sidebar_content ) {
-		$id_referenced_in_sidebar = Experimental_WP_Widget_Blocks_Manager::get_post_id_referenced_in_sidebar( $sidebar_id );
-
-		$post_id = wp_insert_post(
-			array(
-				'ID'           => $id_referenced_in_sidebar,
-				'post_content' => $sidebar_content,
-				'post_type'    => 'wp_area',
-			)
-		);
-
-		if ( 0 === $id_referenced_in_sidebar ) {
-			Experimental_WP_Widget_Blocks_Manager::reference_post_id_in_sidebar( $sidebar_id, $post_id );
-		}
+function gutenberg_remove_widgets_panel( $components ) {
+	if ( ! gutenberg_use_widgets_block_editor() ) {
+		return $components;
 	}
+
+	$i = array_search( 'widgets', $components, true );
+	if ( false !== $i ) {
+		unset( $components[ $i ] );
+	}
+	return $components;
 }
-add_action( 'customize_update_gutenberg_widget_blocks', 'gutenberg_customize_update', 10, 2 );
+add_filter( 'customize_loaded_components', 'gutenberg_remove_widgets_panel' );
 
 /**
  * Filters the Customizer widget settings arguments.

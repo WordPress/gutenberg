@@ -12,17 +12,10 @@ import {
 	BASE_DEFAULT_VALUE,
 	RESET_VALUE,
 	STEP,
-	useIsLineHeightControlsDisabled,
 	isLineHeightDefined,
 } from './utils';
 
 export default function LineHeightControl( { value: lineHeight, onChange } ) {
-	// Don't render the controls if disabled by editor settings
-	const isDisabled = useIsLineHeightControlsDisabled();
-	if ( isDisabled ) {
-		return null;
-	}
-
 	const isDefined = isLineHeightDefined( lineHeight );
 
 	const handleOnKeyDown = ( event ) => {

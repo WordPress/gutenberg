@@ -1,4 +1,4 @@
-# Disallow collapsible whitespace in translatable strings. (i18n-no-collapsible-whitespace)
+# Disallow collapsible whitespace in translatable strings (i18n-no-collapsible-whitespace)
 
 Using complex whitespace in translatable strings and relying on HTML to collapse it can make translation more difficult and lead to unnecessary retranslation.
 

@@ -15,7 +15,7 @@ import { isObjectLike } from 'lodash';
 function withWeakMapCache( fn ) {
 	const cache = new WeakMap();
 
-	return function( key ) {
+	return ( key ) => {
 		let value;
 		if ( cache.has( key ) ) {
 			value = cache.get( key );

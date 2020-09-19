@@ -4,6 +4,7 @@
 import { createStore, applyMiddleware } from 'redux';
 import { flowRight, get, mapValues } from 'lodash';
 import combineReducers from 'turbo-combine-reducers';
+import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
  * WordPress dependencies
@@ -18,6 +19,34 @@ import createResolversCacheMiddleware from '../resolvers-cache-middleware';
 import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
+
+/**
+ * Create a cache to track whether resolvers started running or not.
+ *
+ * @return {Object} Resolvers Cache.
+ */
+function createResolversCache() {
+	const cache = {};
+	return {
+		isRunning( selectorName, args ) {
+			return cache[ selectorName ] && cache[ selectorName ].get( args );
+		},
+
+		clear( selectorName, args ) {
+			if ( cache[ selectorName ] ) {
+				cache[ selectorName ].delete( args );
+			}
+		},
+
+		markAsRunning( selectorName, args ) {
+			if ( ! cache[ selectorName ] ) {
+				cache[ selectorName ] = new EquivalentKeyMap();
+			}
+
+			cache[ selectorName ].set( args, true );
+		},
+	};
+}
 
 /**
  * @typedef {WPDataRegistry} WPDataRegistry
@@ -37,6 +66,7 @@ import * as metadataActions from './metadata/actions';
 export default function createNamespace( key, options, registry ) {
 	const reducer = options.reducer;
 	const store = createReduxStore( key, options, registry );
+	const resolversCache = createResolversCache();
 
 	let resolvers;
 	const actions = mapActions(
@@ -64,7 +94,12 @@ export default function createNamespace( key, options, registry ) {
 		store
 	);
 	if ( options.resolvers ) {
-		const result = mapResolvers( options.resolvers, selectors, store );
+		const result = mapResolvers(
+			options.resolvers,
+			selectors,
+			store,
+			resolversCache
+		);
 		resolvers = result.resolvers;
 		selectors = result.selectors;
 	}
@@ -82,7 +117,7 @@ export default function createNamespace( key, options, registry ) {
 	// not on every dispatch.
 	const subscribe =
 		store &&
-		function( listener ) {
+		( ( listener ) => {
 			let lastState = store.__unstableOriginalGetState();
 			store.subscribe( () => {
 				const state = store.__unstableOriginalGetState();
@@ -93,7 +128,7 @@ export default function createNamespace( key, options, registry ) {
 					listener();
 				}
 			} );
-		};
+		} );
 
 	// This can be simplified to just { subscribe, getSelectors, getActions }
 	// Once we remove the use function.
@@ -166,7 +201,6 @@ function createReduxStore( key, options, registry ) {
  *                           public facing API. Selectors will get passed the
  *                           state as first argument.
  * @param {Object} store     The store to which the selectors should be mapped.
- *
  * @return {Object} Selectors mapped to the provided store.
  */
 function mapSelectors( selectors, store ) {
@@ -215,15 +249,24 @@ function mapActions( actions, store ) {
  * Resolvers are side effects invoked once per argument set of a given selector call,
  * used in ensuring that the data needs for the selector are satisfied.
  *
- * @param {Object} resolvers   Resolvers to register.
- * @param {Object} selectors   The current selectors to be modified.
- * @param {Object} store       The redux store to which the resolvers should be mapped.
- * @return {Object}            An object containing updated selectors and resolvers.
+ * @param {Object} resolvers      Resolvers to register.
+ * @param {Object} selectors      The current selectors to be modified.
+ * @param {Object} store          The redux store to which the resolvers should be mapped.
+ * @param {Object} resolversCache Resolvers Cache.
  */
-function mapResolvers( resolvers, selectors, store ) {
+function mapResolvers( resolvers, selectors, store, resolversCache ) {
+	// The `resolver` can be either a function that does the resolution, or, in more advanced
+	// cases, an object with a `fullfill` method and other optional methods like `isFulfilled`.
+	// Here we normalize the `resolver` function to an object with `fulfill` method.
 	const mappedResolvers = mapValues( resolvers, ( resolver ) => {
-		const { fulfill: resolverFulfill = resolver } = resolver;
-		return { ...resolver, fulfill: resolverFulfill };
+		if ( resolver.fulfill ) {
+			return resolver;
+		}
+
+		return {
+			...resolver, // copy the enumerable properties of the resolver function
+			fulfill: resolver, // add the fulfill method
+		};
 	} );
 
 	const mapSelector = ( selector, selectorName ) => {
@@ -237,13 +280,15 @@ function mapResolvers( resolvers, selectors, store ) {
 			async function fulfillSelector() {
 				const state = store.getState();
 				if (
-					typeof resolver.isFulfilled === 'function' &&
-					resolver.isFulfilled( state, ...args )
+					resolversCache.isRunning( selectorName, args ) ||
+					( typeof resolver.isFulfilled === 'function' &&
+						resolver.isFulfilled( state, ...args ) )
 				) {
 					return;
 				}
 
 				const { metadata } = store.__unstableOriginalGetState();
+
 				if (
 					metadataSelectors.hasStartedResolution(
 						metadata,
@@ -254,18 +299,23 @@ function mapResolvers( resolvers, selectors, store ) {
 					return;
 				}
 
-				store.dispatch(
-					metadataActions.startResolution( selectorName, args )
-				);
-				await fulfillResolver(
-					store,
-					mappedResolvers,
-					selectorName,
-					...args
-				);
-				store.dispatch(
-					metadataActions.finishResolution( selectorName, args )
-				);
+				resolversCache.markAsRunning( selectorName, args );
+
+				setTimeout( async () => {
+					resolversCache.clear( selectorName, args );
+					store.dispatch(
+						metadataActions.startResolution( selectorName, args )
+					);
+					await fulfillResolver(
+						store,
+						mappedResolvers,
+						selectorName,
+						...args
+					);
+					store.dispatch(
+						metadataActions.finishResolution( selectorName, args )
+					);
+				} );
 			}
 
 			fulfillSelector( ...args );

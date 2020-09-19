@@ -1,6 +1,6 @@
 {
 	"name": "core/paragraph",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -25,5 +25,17 @@
 				"rtl"
 			]
 		}
+	},
+	"supports": {
+		"anchor": true,
+		"className": false,
+		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"linkColor": true
+		},
+		"__experimentalFontSize": true,
+		"__experimentalLineHeight": true,
+		"__experimentalSelector": "p",
+		"__unstablePasteTextInline": true
 	}
 }

@@ -1,5 +1,5 @@
 /**
- * Node dependencies
+ * External dependencies
  */
 const { exit, stdout } = require( 'process' );
 

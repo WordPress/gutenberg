@@ -11,7 +11,6 @@ import {
 	LocalAutosaveMonitor,
 	UnsavedChangesWarning,
 	EditorNotices,
-	PostPublishPanel,
 	EditorKeyboardShortcutsRegister,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -33,7 +32,7 @@ import {
 	FullscreenMode,
 	InterfaceSkeleton,
 } from '@wordpress/interface';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { close } from '@wordpress/icons';
 
 /**
@@ -49,59 +48,66 @@ import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
-import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
-import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
 import WelcomeGuide from '../welcome-guide';
+import ActionsPanel from './actions-panel';
+import PopoverWrapper from './popover-wrapper';
 
 const interfaceLabels = {
-	leftSidebar: __( 'Block Library' ),
+	leftSidebar: __( 'Block library' ),
+	/* translators: accessibility text for the editor top bar landmark region. */
+	header: __( 'Editor top bar' ),
+	/* translators: accessibility text for the editor content landmark region. */
+	body: __( 'Editor content' ),
+	/* translators: accessibility text for the editor settings landmark region. */
+	sidebar: __( 'Editor settings' ),
+	/* translators: accessibility text for the editor publish landmark region. */
+	actions: __( 'Editor publish' ),
+	/* translators: accessibility text for the editor footer landmark region. */
+	footer: __( 'Editor footer' ),
 };
 
 function Layout() {
-	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const {
-		closePublishSidebar,
 		openGeneralSidebar,
 		closeGeneralSidebar,
-		togglePublishSidebar,
+		setIsInserterOpened,
 	} = useDispatch( 'core/edit-post' );
 	const {
 		mode,
 		isFullscreenActive,
 		isRichEditingEnabled,
-		editorSidebarOpened,
-		pluginSidebarOpened,
-		publishSidebarOpened,
+		sidebarIsOpened,
 		hasActiveMetaboxes,
-		isSaving,
 		hasFixedToolbar,
 		previousShortcut,
 		nextShortcut,
 		hasBlockSelected,
+		showMostUsedBlocks,
+		isInserterOpened,
+		showIconLabels,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
 				'fixedToolbar'
 			),
-			editorSidebarOpened: select(
-				'core/edit-post'
-			).isEditorSidebarOpened(),
-			pluginSidebarOpened: select(
-				'core/edit-post'
-			).isPluginSidebarOpened(),
-			publishSidebarOpened: select(
-				'core/edit-post'
-			).isPublishSidebarOpened(),
+			sidebarIsOpened: !! (
+				select( 'core/interface' ).getActiveComplementaryArea(
+					'core/edit-post'
+				) || select( 'core/edit-post' ).isPublishSidebarOpened()
+			),
 			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
 				'fullscreenMode'
 			),
+			showMostUsedBlocks: select( 'core/edit-post' ).isFeatureActive(
+				'mostUsedBlocks'
+			),
+			isInserterOpened: select( 'core/edit-post' ).isInserterOpened(),
 			mode: select( 'core/edit-post' ).getEditorMode(),
 			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
 				.richEditingEnabled,
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
 			previousShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations(
@@ -110,14 +116,16 @@ function Layout() {
 			nextShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
+			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+				'showIconLabels'
+			),
 		};
 	}, [] );
-	const sidebarIsOpened =
-		editorSidebarOpened || pluginSidebarOpened || publishSidebarOpened;
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
+		'show-icon-labels': showIconLabels,
 	} );
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
@@ -127,14 +135,30 @@ function Layout() {
 	// Inserter and Sidebars are mutually exclusive
 	useEffect( () => {
 		if ( sidebarIsOpened && ! isHugeViewport ) {
-			setIsInserterOpen( false );
+			setIsInserterOpened( false );
 		}
 	}, [ sidebarIsOpened, isHugeViewport ] );
 	useEffect( () => {
-		if ( isInserterOpen && ! isHugeViewport ) {
+		if ( isInserterOpened && ! isHugeViewport ) {
 			closeGeneralSidebar();
 		}
-	}, [ isInserterOpen, isHugeViewport ] );
+	}, [ isInserterOpened, isHugeViewport ] );
+
+	// Local state for save panel.
+	// Note 'thruthy' callback implies an open panel.
+	const [
+		entitiesSavedStatesCallback,
+		setEntitiesSavedStatesCallback,
+	] = useState( false );
+	const closeEntitiesSavedStates = useCallback(
+		( arg ) => {
+			if ( typeof entitiesSavedStatesCallback === 'function' ) {
+				entitiesSavedStatesCallback( arg );
+			}
+			setEntitiesSavedStatesCallback( false );
+		},
+		[ entitiesSavedStatesCallback ]
+	);
 
 	return (
 		<>
@@ -145,41 +169,51 @@ function Layout() {
 			<LocalAutosaveMonitor />
 			<EditPostKeyboardShortcuts />
 			<EditorKeyboardShortcutsRegister />
+			<SettingsSidebar />
 			<FocusReturnProvider>
 				<InterfaceSkeleton
 					className={ className }
 					labels={ interfaceLabels }
 					header={
 						<Header
-							isInserterOpen={ isInserterOpen }
-							onToggleInserter={ () =>
-								setIsInserterOpen( ! isInserterOpen )
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
 							}
 						/>
 					}
 					leftSidebar={
 						mode === 'visual' &&
-						isInserterOpen && (
-							<div className="edit-post-layout__inserter-panel">
-								<div className="edit-post-layout__inserter-panel-header">
-									<Button
-										icon={ close }
-										onClick={ () =>
-											setIsInserterOpen( false )
-										}
-									/>
-								</div>
-								<div className="edit-post-layout__inserter-panel-content">
-									<Library
-										showInserterHelpPanel
-										onSelect={ () => {
-											if ( isMobileViewport ) {
-												setIsInserterOpen( false );
+						isInserterOpened && (
+							<PopoverWrapper
+								className="edit-post-layout__inserter-panel-popover-wrapper"
+								onClose={ () => setIsInserterOpened( false ) }
+							>
+								<div className="edit-post-layout__inserter-panel">
+									<div className="edit-post-layout__inserter-panel-header">
+										<Button
+											icon={ close }
+											onClick={ () =>
+												setIsInserterOpened( false )
 											}
-										} }
-									/>
+										/>
+									</div>
+									<div className="edit-post-layout__inserter-panel-content">
+										<Library
+											showMostUsedBlocks={
+												showMostUsedBlocks
+											}
+											showInserterHelpPanel
+											onSelect={ () => {
+												if ( isMobileViewport ) {
+													setIsInserterOpened(
+														false
+													);
+												}
+											} }
+										/>
+									</div>
 								</div>
-							</div>
+							</PopoverWrapper>
 						)
 					}
 					sidebar={
@@ -201,7 +235,6 @@ function Layout() {
 										</Button>
 									</div>
 								) }
-								<SettingsSidebar />
 								<ComplementaryArea.Slot scope="core/edit-post" />
 							</>
 						)
@@ -234,30 +267,17 @@ function Layout() {
 						)
 					}
 					actions={
-						publishSidebarOpened ? (
-							<PostPublishPanel
-								onClose={ closePublishSidebar }
-								forceIsDirty={ hasActiveMetaboxes }
-								forceIsSaving={ isSaving }
-								PrePublishExtension={
-									PluginPrePublishPanel.Slot
-								}
-								PostPublishExtension={
-									PluginPostPublishPanel.Slot
-								}
-							/>
-						) : (
-							<div className="edit-post-layout__toggle-publish-panel">
-								<Button
-									isSecondary
-									className="edit-post-layout__toggle-publish-panel-button"
-									onClick={ togglePublishSidebar }
-									aria-expanded={ false }
-								>
-									{ __( 'Open publish panel' ) }
-								</Button>
-							</div>
-						)
+						<ActionsPanel
+							closeEntitiesSavedStates={
+								closeEntitiesSavedStates
+							}
+							isEntitiesSavedStatesOpen={
+								entitiesSavedStatesCallback
+							}
+							setEntitiesSavedStatesCallback={
+								setEntitiesSavedStatesCallback
+							}
+						/>
 					}
 					shortcuts={ {
 						previous: previousShortcut,

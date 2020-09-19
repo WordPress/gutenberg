@@ -9,6 +9,12 @@
 	width: 100%;
 
 	overflow: hidden;
+
+	// Overrides the default padding applied in editor styles otherwise preview centering break.
+	&.editor-styles-wrapper {
+		padding: 0;
+		margin: 0;
+	}
 }
 
 .block-editor-block-preview__content {
@@ -44,10 +50,7 @@
 		padding-left: 0;
 		padding-right: 0;
 
-		> div:not(.block-editor-block-list__block) > .block-editor-block-list__block[data-align="full"],
-		> div:not(.block-editor-block-list__block) > .block-editor-block-list__block.alignfull,
-		> .block-editor-block-list__block[data-align="full"],
-		> .block-editor-block-list__block.alignfull {
+		> .wp-block[data-align="full"] {
 			margin-left: 0;
 			margin-right: 0;
 		}

@@ -7,20 +7,20 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
-import { NavigableMenu } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import BlockNavigationList from './list';
+import BlockNavigationTree from './tree';
 
 function BlockNavigation( {
 	rootBlock,
 	rootBlocks,
 	selectedBlockClientId,
 	selectBlock,
+	__experimentalFeatures,
 } ) {
 	if ( ! rootBlocks || rootBlocks.length === 0 ) {
 		return null;
@@ -32,29 +32,28 @@ function BlockNavigation( {
 			( rootBlock.innerBlocks && rootBlock.innerBlocks.length !== 0 ) );
 
 	return (
-		<NavigableMenu
-			role="presentation"
-			className="block-editor-block-navigation__container"
-		>
+		<div className="block-editor-block-navigation__container">
 			<p className="block-editor-block-navigation__label">
-				{ __( 'Block navigation' ) }
+				{ __( 'List view' ) }
 			</p>
 			{ hasHierarchy && (
-				<BlockNavigationList
+				<BlockNavigationTree
 					blocks={ [ rootBlock ] }
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
+					__experimentalFeatures={ __experimentalFeatures }
 					showNestedBlocks
 				/>
 			) }
 			{ ! hasHierarchy && (
-				<BlockNavigationList
+				<BlockNavigationTree
 					blocks={ rootBlocks }
 					selectedBlockClientId={ selectedBlockClientId }
 					selectBlock={ selectBlock }
+					__experimentalFeatures={ __experimentalFeatures }
 				/>
 			) }
-		</NavigableMenu>
+		</div>
 	);
 }
 
@@ -63,14 +62,14 @@ export default compose(
 		const {
 			getSelectedBlockClientId,
 			getBlockHierarchyRootClientId,
-			getBlock,
-			getBlocks,
+			__unstableGetBlockWithBlockTree,
+			__unstableGetBlockTree,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
-			rootBlocks: getBlocks(),
+			rootBlocks: __unstableGetBlockTree(),
 			rootBlock: selectedBlockClientId
-				? getBlock(
+				? __unstableGetBlockWithBlockTree(
 						getBlockHierarchyRootClientId( selectedBlockClientId )
 				  )
 				: null,

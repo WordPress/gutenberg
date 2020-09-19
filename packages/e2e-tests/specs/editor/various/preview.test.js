@@ -22,9 +22,9 @@ import {
 async function openPreviewPage( editorPage ) {
 	let openTabs = await browser.pages();
 	const expectedTabsCount = openTabs.length + 1;
-	await editorPage.click( '.editor-post-preview__button-toggle' );
-	await editorPage.waitFor( '.editor-post-preview__button-external' );
-	await editorPage.click( '.editor-post-preview__button-external' );
+	await editorPage.click( '.block-editor-post-preview__button-toggle' );
+	await editorPage.waitFor( '.edit-post-header-preview__button-external' );
+	await editorPage.click( '.edit-post-header-preview__button-external' );
 
 	// Wait for the new tab to open.
 	while ( openTabs.length < expectedTabsCount ) {
@@ -49,9 +49,9 @@ async function openPreviewPage( editorPage ) {
  * @return {Promise} Promise resolving once selector is visible on page.
  */
 async function waitForPreviewDropdownOpen( editorPage ) {
-	await editorPage.click( '.editor-post-preview__button-toggle' );
+	await editorPage.click( '.block-editor-post-preview__button-toggle' );
 	return editorPage.waitForSelector(
-		'.editor-post-preview__button-external'
+		'.edit-post-header-preview__button-external'
 	);
 }
 
@@ -64,7 +64,7 @@ async function waitForPreviewDropdownOpen( editorPage ) {
  * @return {Promise} Promise resolving once navigation completes.
  */
 async function waitForPreviewNavigation( previewPage ) {
-	await page.click( '.editor-post-preview__button-external' );
+	await page.click( '.edit-post-header-preview__button-external' );
 	return previewPage.waitForNavigation();
 }
 
@@ -115,7 +115,7 @@ describe( 'Preview', () => {
 
 		// Disabled until content present.
 		const isPreviewDisabled = await editorPage.$$eval(
-			'.editor-post-preview__button-toggle:not( :disabled ):not( [aria-disabled="true"] )',
+			'.block-editor-post-preview__button-toggle:not( :disabled ):not( [aria-disabled="true"] )',
 			( enabledButtons ) => ! enabledButtons.length
 		);
 		expect( isPreviewDisabled ).toBe( true );
@@ -342,10 +342,10 @@ describe( 'Preview with private custom post type', () => {
 		await page.keyboard.press( 'Tab' );
 
 		// Open the preview menu.
-		await page.click( '.editor-post-preview__button-toggle' );
+		await page.click( '.block-editor-post-preview__button-toggle' );
 
 		const previewDropdownContents = await page.$(
-			'.editor-post-preview__dropdown-content'
+			'.block-editor-post-preview__dropdown-content'
 		);
 
 		// Expect the Preview Externally link not to be present.

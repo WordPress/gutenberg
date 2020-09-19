@@ -4,7 +4,7 @@
 import './index.test';
 
 jest.mock( './fixtures/wpt-data.json', () => {
-	const data = require.requireActual( './fixtures/wpt-data.json' );
+	const data = jest.requireActual( './fixtures/wpt-data.json' );
 
 	/**
 	 * Test items to exclude by input. Ideally this should be empty, but are

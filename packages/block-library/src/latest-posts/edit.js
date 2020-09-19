@@ -21,7 +21,7 @@ import {
 } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { dateI18n, format, __experimentalGetSettings } from '@wordpress/date';
 import {
 	InspectorControls,
@@ -47,12 +47,16 @@ import {
 const CATEGORIES_LIST_QUERY = {
 	per_page: -1,
 };
+const USERS_LIST_QUERY = {
+	per_page: -1,
+};
 
 class LatestPostsEdit extends Component {
 	constructor() {
 		super( ...arguments );
 		this.state = {
 			categoriesList: [],
+			authorList: [],
 		};
 	}
 
@@ -71,6 +75,19 @@ class LatestPostsEdit extends Component {
 					this.setState( { categoriesList: [] } );
 				}
 			} );
+		this.fetchRequest = apiFetch( {
+			path: addQueryArgs( `/wp/v2/users`, USERS_LIST_QUERY ),
+		} )
+			.then( ( authorList ) => {
+				if ( this.isStillMounted ) {
+					this.setState( { authorList } );
+				}
+			} )
+			.catch( () => {
+				if ( this.isStillMounted ) {
+					this.setState( { authorList: [] } );
+				}
+			} );
 	}
 
 	componentWillUnmount() {
@@ -86,23 +103,26 @@ class LatestPostsEdit extends Component {
 			defaultImageWidth,
 			defaultImageHeight,
 		} = this.props;
-		const { categoriesList } = this.state;
+		const { categoriesList, authorList } = this.state;
 		const {
 			displayFeaturedImage,
 			displayPostContentRadio,
 			displayPostContent,
 			displayPostDate,
+			displayAuthor,
 			postLayout,
 			columns,
 			order,
 			orderBy,
 			categories,
+			selectedAuthor,
 			postsToShow,
 			excerptLength,
 			featuredImageAlign,
 			featuredImageSizeSlug,
 			featuredImageSizeWidth,
 			featuredImageSizeHeight,
+			addLinkToFeaturedImage,
 		} = attributes;
 		const categorySuggestions = categoriesList.reduce(
 			( accumulator, category ) => ( {
@@ -178,6 +198,13 @@ class LatestPostsEdit extends Component {
 
 				<PanelBody title={ __( 'Post meta settings' ) }>
 					<ToggleControl
+						label={ __( 'Display author name' ) }
+						checked={ displayAuthor }
+						onChange={ ( value ) =>
+							setAttributes( { displayAuthor: value } )
+						}
+					/>
+					<ToggleControl
 						label={ __( 'Display post date' ) }
 						checked={ displayPostDate }
 						onChange={ ( value ) =>
@@ -223,7 +250,7 @@ class LatestPostsEdit extends Component {
 									} )
 								}
 							/>
-							<BaseControl>
+							<BaseControl className="block-editor-image-alignment-control__row">
 								<BaseControl.VisualLabel>
 									{ __( 'Image alignment' ) }
 								</BaseControl.VisualLabel>
@@ -238,6 +265,15 @@ class LatestPostsEdit extends Component {
 									isCollapsed={ false }
 								/>
 							</BaseControl>
+							<ToggleControl
+								label={ __( 'Add link to featured image' ) }
+								checked={ addLinkToFeaturedImage }
+								onChange={ ( value ) =>
+									setAttributes( {
+										addLinkToFeaturedImage: value,
+									} )
+								}
+							/>
 						</>
 					) }
 				</PanelBody>
@@ -258,6 +294,14 @@ class LatestPostsEdit extends Component {
 						categorySuggestions={ categorySuggestions }
 						onCategoryChange={ selectCategories }
 						selectedCategories={ categories }
+						onAuthorChange={ ( value ) =>
+							setAttributes( {
+								selectedAuthor:
+									'' !== value ? Number( value ) : undefined,
+							} )
+						}
+						authorList={ authorList }
+						selectedAuthorId={ selectedAuthor }
 					/>
 
 					{ postLayout === 'grid' && (
@@ -333,6 +377,7 @@ class LatestPostsEdit extends Component {
 						'wp-block-latest-posts__list': true,
 						'is-grid': postLayout === 'grid',
 						'has-dates': displayPostDate,
+						'has-author': displayAuthor,
 						[ `columns-${ columns }` ]: postLayout === 'grid',
 					} ) }
 				>
@@ -343,6 +388,9 @@ class LatestPostsEdit extends Component {
 							'trim',
 						] );
 						let excerpt = post.excerpt.rendered;
+						const currentAuthor = authorList.find(
+							( author ) => author.id === post.author
+						);
 
 						const excerptElement = document.createElement( 'div' );
 						excerptElement.innerHTML = excerpt;
@@ -352,12 +400,28 @@ class LatestPostsEdit extends Component {
 							excerptElement.innerText ||
 							'';
 
-						const imageSourceUrl = post.featuredImageSourceUrl;
-
+						const {
+							featuredImageInfo: {
+								url: imageSourceUrl,
+								alt: featuredImageAlt,
+							} = {},
+						} = post;
 						const imageClasses = classnames( {
 							'wp-block-latest-posts__featured-image': true,
 							[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
 						} );
+						const renderFeaturedImage =
+							displayFeaturedImage && imageSourceUrl;
+						const featuredImage = renderFeaturedImage && (
+							<img
+								src={ imageSourceUrl }
+								alt={ featuredImageAlt }
+								style={ {
+									maxWidth: featuredImageSizeWidth,
+									maxHeight: featuredImageSizeHeight,
+								} }
+							/>
+						);
 
 						const needsReadMore =
 							excerptLength <
@@ -386,17 +450,18 @@ class LatestPostsEdit extends Component {
 
 						return (
 							<li key={ i }>
-								{ displayFeaturedImage && (
+								{ renderFeaturedImage && (
 									<div className={ imageClasses }>
-										{ imageSourceUrl && (
-											<img
-												src={ imageSourceUrl }
-												alt=""
-												style={ {
-													maxWidth: featuredImageSizeWidth,
-													maxHeight: featuredImageSizeHeight,
-												} }
-											/>
+										{ addLinkToFeaturedImage ? (
+											<a
+												href={ post.link }
+												target="_blank"
+												rel="noreferrer noopener"
+											>
+												{ featuredImage }
+											</a>
+										) : (
+											featuredImage
 										) }
 									</div>
 								) }
@@ -411,6 +476,15 @@ class LatestPostsEdit extends Component {
 										__( '(no title)' )
 									) }
 								</a>
+								{ displayAuthor && currentAuthor && (
+									<div className="wp-block-latest-posts__post-author">
+										{ sprintf(
+											/* translators: byline. %s: current author. */
+											__( 'by %s' ),
+											currentAuthor.name
+										) }
+									</div>
+								) }
 								{ displayPostDate && post.date_gmt && (
 									<time
 										dateTime={ format(
@@ -455,6 +529,7 @@ export default withSelect( ( select, props ) => {
 		order,
 		orderBy,
 		categories,
+		selectedAuthor,
 	} = props.attributes;
 	const { getEntityRecords, getMedia } = select( 'core' );
 	const { getSettings } = select( 'core/block-editor' );
@@ -466,6 +541,7 @@ export default withSelect( ( select, props ) => {
 	const latestPostsQuery = pickBy(
 		{
 			categories: catIds,
+			author: selectedAuthor,
 			order,
 			orderby: orderBy,
 			per_page: postsToShow,
@@ -493,24 +569,28 @@ export default withSelect( ( select, props ) => {
 		latestPosts: ! Array.isArray( posts )
 			? posts
 			: posts.map( ( post ) => {
-					if ( post.featured_media ) {
-						const image = getMedia( post.featured_media );
-						let url = get(
-							image,
-							[
-								'media_details',
-								'sizes',
-								featuredImageSizeSlug,
-								'source_url',
-							],
-							null
-						);
-						if ( ! url ) {
-							url = get( image, 'source_url', null );
-						}
-						return { ...post, featuredImageSourceUrl: url };
+					if ( ! post.featured_media ) return post;
+
+					const image = getMedia( post.featured_media );
+					let url = get(
+						image,
+						[
+							'media_details',
+							'sizes',
+							featuredImageSizeSlug,
+							'source_url',
+						],
+						null
+					);
+					if ( ! url ) {
+						url = get( image, 'source_url', null );
 					}
-					return post;
+					const featuredImageInfo = {
+						url,
+						// eslint-disable-next-line camelcase
+						alt: image?.alt_text,
+					};
+					return { ...post, featuredImageInfo };
 			  } ),
 	};
 } )( LatestPostsEdit );

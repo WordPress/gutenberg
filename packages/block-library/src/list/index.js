@@ -25,11 +25,6 @@ export const settings = {
 		__( 'ordered list' ),
 		__( 'numbered list' ),
 	],
-	supports: {
-		className: false,
-		__unstablePasteTextInline: true,
-		lightBlockWrapper: true,
-	},
 	example: {
 		attributes: {
 			values:

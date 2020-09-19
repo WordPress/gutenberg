@@ -19,13 +19,6 @@ export const settings = {
 	title: _x( 'Classic', 'block title' ),
 	description: __( 'Use the classic WordPress editor.' ),
 	icon,
-	supports: {
-		className: false,
-		customClassName: false,
-		// Hide 'Add to Reusable blocks' on Classic blocks. Showing it causes a
-		// confusing UX, because of its similarity to the 'Convert to Blocks' button.
-		reusable: false,
-	},
 	edit,
 	save,
 };

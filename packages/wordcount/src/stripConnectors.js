@@ -6,7 +6,7 @@
  *
  * @return {string} The manipulated text.
  */
-export default function( settings, text ) {
+export default function stripConnectors( settings, text ) {
 	if ( settings.connectorRegExp ) {
 		return text.replace( settings.connectorRegExp, ' ' );
 	}

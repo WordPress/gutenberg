@@ -14,13 +14,65 @@ const Example = () => (
 );
 ```
 
+### Flex
+
+Underneath, CardFooter uses the layout component [`<Flex/>`](../../flex/README.md). This improves the alignment of child items within the component.
+
+```jsx
+import {
+	Button,
+	Card,
+	CardFooter,
+	FlexItem,
+	FlexBlock,
+} from '@wordpress/components';
+
+const Example = () => (
+	<Card>
+		<CardFooter>
+			<FlexBlock>Content</FlexBlock>
+			<FlexItem>
+				<Button>Action</Button>
+			</FlexItem>
+		</CardFooter>
+	</Card>
+);
+```
+
+Check out [the documentation](../../flex/README.md) on `<Flex/>` for more details on layout composition.
+
 ## Props
 
-Name | Type | Default | Description
---- | --- | --- | ---
-`isBorderless` | `boolean` | `false` | Determines the border style of the card.
-`isElevated` | `boolean` | `false` | Determines the elevation style of the card.
-`isShady` | `boolean` | `false` | Renders with a light gray background color.
-`size` | `string` | `medium` | Determines the amount of padding within the component.
+### isBorderless
+
+Determines the border style of the card.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+### isElevated
+
+Determines the elevation style of the card.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+### isShady
+
+Renders with a light gray background color.
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
+### size
+
+Determines the amount of padding within the component.
+
+-   Type: `String`
+-   Required: No
+-   Default: `medium`
 
 Note: This component is connected to [`<Card />`'s Context](../README.md#context). Passing props directly to this component will override the props derived from context.

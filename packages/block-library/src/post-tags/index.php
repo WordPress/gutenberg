@@ -8,20 +8,33 @@
 /**
  * Renders the `core/post-tags` block on the server.
  *
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  * @return string Returns the filtered post tags for the current post wrapped inside "a" tags.
  */
-function render_block_core_post_tags() {
-	$post = gutenberg_get_post_from_context();
-	if ( ! $post ) {
+function render_block_core_post_tags( $attributes, $content, $block ) {
+	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
-	$post_tags = get_the_tags();
+
+	$post_tags = get_the_tags( $block->context['postId'] );
 	if ( ! empty( $post_tags ) ) {
-		$output = '';
+		$classes = '';
+		if ( isset( $attributes['textAlign'] ) ) {
+			$classes .= 'has-text-align-' . $attributes['textAlign'];
+		}
+
+		$output = sprintf( '<div class="%1$s">', esc_attr( $classes ) );
+
 		foreach ( $post_tags as $tag ) {
 			$output .= '<a href="' . get_tag_link( $tag->term_id ) . '">' . $tag->name . '</a>' . ' | ';
 		}
-		return trim( $output, ' | ' );
+
+		$output  = trim( $output, ' | ' );
+		$output .= '</div>';
+
+		return $output;
 	}
 }
 

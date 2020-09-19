@@ -16,7 +16,6 @@ import {
 	findTransform,
 	isWildcardBlockTransform,
 	isContainerGroupBlock,
-	isBlockSelectionOfSameType,
 } from '../factory';
 import {
 	getBlockType,
@@ -34,7 +33,7 @@ describe( 'block factory', () => {
 			},
 		},
 		save: noop,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 
@@ -66,7 +65,7 @@ describe( 'block factory', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			const block = createBlock( 'core/test-block', { align: 'left' }, [
@@ -174,7 +173,7 @@ describe( 'block factory', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			const block = deepFreeze(
@@ -209,7 +208,7 @@ describe( 'block factory', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			const block = deepFreeze(
@@ -241,7 +240,7 @@ describe( 'block factory', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			const block = deepFreeze(
@@ -293,7 +292,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -329,7 +328,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -363,7 +362,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -401,7 +400,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType(
@@ -443,7 +442,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -485,7 +484,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType(
@@ -536,7 +535,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -578,7 +577,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/another-text-block', {
@@ -598,7 +597,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'another text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -640,7 +639,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -682,7 +681,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -719,7 +718,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -753,7 +752,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -788,7 +787,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -824,7 +823,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -859,7 +858,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -898,7 +897,7 @@ describe( 'block factory', () => {
 						],
 					},
 					save: noop,
-					category: 'common',
+					category: 'text',
 					title: 'A block that groups other blocks.',
 				} );
 			} );
@@ -987,7 +986,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1037,7 +1036,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'text-block',
 			} );
 
@@ -1096,7 +1095,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1129,7 +1128,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1168,7 +1167,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1212,7 +1211,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/text-block', defaultBlockSettings );
@@ -1253,7 +1252,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'text block',
 			} );
 
@@ -1298,7 +1297,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'text block',
 			} );
 
@@ -1344,7 +1343,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'text block',
 			} );
 
@@ -1408,7 +1407,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated columns block',
 			} );
 			registerBlockType( 'core/columns-block', defaultBlockSettings );
@@ -1467,7 +1466,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated columns block',
 			} );
 			registerBlockType( 'core/columns-block', defaultBlockSettings );
@@ -1532,7 +1531,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'Test Group Block',
 			} );
 
@@ -1557,6 +1556,183 @@ describe( 'block factory', () => {
 			expect( transformedBlocks[ 0 ].innerBlocks ).toHaveLength(
 				numOfBlocksToGroup
 			);
+		} );
+
+		it( 'should call "__experimentalConvert" with mixed block types and wildcard', () => {
+			const convertSpy = jest.fn( ( blocks ) => {
+				const groupInnerBlocks = blocks.map(
+					( { name, attributes, innerBlocks } ) => {
+						return createBlock( name, attributes, innerBlocks );
+					}
+				);
+
+				return createBlock(
+					'core/test-group-block',
+					{},
+					groupInnerBlocks
+				);
+			} );
+			const transformSpy = jest.fn();
+
+			registerBlockType( 'core/test-group-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [
+						{
+							type: 'block',
+							blocks: [ '*' ],
+							isMultiBlock: true,
+							__experimentalConvert: convertSpy,
+							transform: transformSpy,
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'Test Group Block',
+			} );
+
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+			registerBlockType( 'core/image-block', defaultBlockSettings );
+
+			const numOfBlocksToGroup = 4;
+			const blocks = times( numOfBlocksToGroup, ( index ) => {
+				return createBlock(
+					index % 2 ? 'core/text-block' : 'core/image-block',
+					{
+						value: `block-value-${ index + 1 }`,
+					}
+				);
+			} );
+
+			const transformedBlocks = switchToBlockType(
+				blocks,
+				'core/test-group-block'
+			);
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( convertSpy.mock.calls ).toHaveLength( 1 );
+			expect( transformSpy.mock.calls ).toHaveLength( 0 );
+		} );
+
+		it( 'should call "__experimentalConvert" with same block types', () => {
+			const convertSpy = jest.fn( ( blocks ) => {
+				const groupInnerBlocks = blocks.map(
+					( { name, attributes, innerBlocks } ) => {
+						return createBlock( name, attributes, innerBlocks );
+					}
+				);
+
+				return createBlock(
+					'core/test-group-block',
+					{},
+					groupInnerBlocks
+				);
+			} );
+			const transformSpy = jest.fn();
+
+			registerBlockType( 'core/test-group-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/text-block' ],
+							isMultiBlock: true,
+							__experimentalConvert: convertSpy,
+							transform: transformSpy,
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'Test Group Block',
+			} );
+
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+			registerBlockType( 'core/image-block', defaultBlockSettings );
+
+			const numOfBlocksToGroup = 4;
+			const blocks = times( numOfBlocksToGroup, ( index ) => {
+				return createBlock( 'core/text-block', {
+					value: `block-value-${ index + 1 }`,
+				} );
+			} );
+
+			const transformedBlocks = switchToBlockType(
+				blocks,
+				'core/test-group-block'
+			);
+
+			expect( transformedBlocks ).toHaveLength( 1 );
+			expect( convertSpy.mock.calls ).toHaveLength( 1 );
+			expect( transformSpy.mock.calls ).toHaveLength( 0 );
+		} );
+
+		it( 'should not call "__experimentalConvert" with non-matching block types', () => {
+			const convertSpy = jest.fn( ( blocks ) => {
+				const groupInnerBlocks = blocks.map(
+					( { name, attributes, innerBlocks } ) => {
+						return createBlock( name, attributes, innerBlocks );
+					}
+				);
+
+				return createBlock(
+					'core/test-group-block',
+					{},
+					groupInnerBlocks
+				);
+			} );
+			const transformSpy = jest.fn();
+
+			registerBlockType( 'core/test-group-block', {
+				attributes: {
+					value: {
+						type: 'string',
+					},
+				},
+				transforms: {
+					from: [
+						{
+							type: 'block',
+							blocks: [ 'core/image-block' ],
+							isMultiBlock: true,
+							__experimentalConvert: convertSpy,
+							transform: transformSpy,
+						},
+					],
+				},
+				save: noop,
+				category: 'text',
+				title: 'Test Group Block',
+			} );
+
+			registerBlockType( 'core/text-block', defaultBlockSettings );
+			registerBlockType( 'core/image-block', defaultBlockSettings );
+
+			const numOfBlocksToGroup = 4;
+			const blocks = times( numOfBlocksToGroup, ( index ) => {
+				return createBlock( 'core/text-block', {
+					value: `block-value-${ index + 1 }`,
+				} );
+			} );
+
+			const transformedBlocks = switchToBlockType(
+				blocks,
+				'core/test-group-block'
+			);
+
+			expect( transformedBlocks ).toEqual( null );
+			expect( convertSpy.mock.calls ).toHaveLength( 0 );
+			expect( transformSpy.mock.calls ).toHaveLength( 0 );
 		} );
 
 		it( 'should prefer "__experimentalConvert" method over "transform" method when running a transformation', () => {
@@ -1593,7 +1769,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'Test Group Block',
 			} );
 
@@ -1629,7 +1805,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 			registerBlockType( 'core/transform-from-text-block-2', {
@@ -1641,7 +1817,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'updated text block',
 			} );
 		} );
@@ -1811,7 +1987,7 @@ describe( 'block factory', () => {
 					],
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'A Block with InnerBlocks that supports grouping',
 			} );
 		} );
@@ -1826,49 +2002,6 @@ describe( 'block factory', () => {
 		it( 'should return false when passed block name does not match the registered "Grouping" Block', () => {
 			setGroupingBlockName( 'registered-grouping-block' );
 			expect( isContainerGroupBlock( 'core/group' ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isBlockSelectionOfSameType', () => {
-		it( 'should return false when all blocks do not match the name of the first block', () => {
-			const blocks = [
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/another-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-			];
-
-			expect( isBlockSelectionOfSameType( blocks ) ).toBe( false );
-		} );
-
-		it( 'should return true when all blocks match the name of the first block', () => {
-			const blocks = [
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-				{
-					name: 'core/test-block',
-				},
-			];
-
-			expect( isBlockSelectionOfSameType( blocks ) ).toBe( true );
 		} );
 	} );
 } );

@@ -33,14 +33,14 @@ describe( 'templates', () => {
 		registerBlockType( 'core/test-block', {
 			attributes: {},
 			save: noop,
-			category: 'common',
+			category: 'text',
 			title: 'test block',
 		} );
 
 		registerBlockType( 'core/test-block-2', {
 			attributes: {},
 			save: noop,
-			category: 'common',
+			category: 'text',
 			title: 'test block',
 		} );
 	} );

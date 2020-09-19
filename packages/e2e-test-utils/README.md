@@ -30,7 +30,7 @@ Verifies if publish checks are enabled.
 
 _Returns_
 
--   `boolean`: Boolean which represents the state of prepublish checks.
+-   `Promise<boolean>`: Boolean which represents the state of prepublish checks.
 
 <a name="clearLocalStorage" href="#clearLocalStorage">#</a> **clearLocalStorage**
 
@@ -46,7 +46,8 @@ Clicks a block toolbar button.
 
 _Parameters_
 
--   _buttonAriaLabel_ `string`: The aria label of the button to click.
+-   _label_ `string`: The text string of the button label.
+-   _type_ `[string]`: The type of button label: 'ariaLabel' or 'content'.
 
 <a name="clickButton" href="#clickButton">#</a> **clickButton**
 
@@ -106,7 +107,12 @@ Creates new post.
 
 _Parameters_
 
--   _obj_ `Object`: Object to create new post, along with tips enabling option.
+-   _object_ `Object`: Object to create new post, along with tips enabling option.
+-   _object.postType_ `[string]`: Post type of the new post.
+-   _object.title_ `[string]`: Title of the new post.
+-   _object.content_ `[string]`: Content of the new post.
+-   _object.excerpt_ `[string]`: Excerpt of the new post.
+-   _object.showWelcomeGuide_ `[boolean]`: Whether to show the welcome guide.
 
 <a name="createURL" href="#createURL">#</a> **createURL**
 
@@ -248,6 +254,14 @@ _Returns_
 
 -   `Promise`: Promise resolving with a string containing the block title.
 
+<a name="getCurrentPostContent" href="#getCurrentPostContent">#</a> **getCurrentPostContent**
+
+Returns a promise which resolves with the current post content (HTML string).
+
+_Returns_
+
+-   `Promise`: Promise resolving with current post content markup.
+
 <a name="getEditedPostContent" href="#getEditedPostContent">#</a> **getEditedPostContent**
 
 Returns a promise which resolves with the edited post content (HTML string).
@@ -282,7 +296,36 @@ _Returns_
 <a name="insertBlock" href="#insertBlock">#</a> **insertBlock**
 
 Opens the inserter, searches for the given term, then selects the first
-result that appears.
+result that appears. It then waits briefly for the block list to update.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
+<a name="insertBlockDirectoryBlock" href="#insertBlockDirectoryBlock">#</a> **insertBlockDirectoryBlock**
+
+Opens the inserter, searches for the given block, then selects the
+first result that appears from the block directory. It then waits briefly for the block list to
+update.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
+<a name="insertPattern" href="#insertPattern">#</a> **insertPattern**
+
+Opens the inserter, searches for the given pattern, then selects the first
+result that appears. It then waits briefly for the block list to update.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
+<a name="insertReusableBlock" href="#insertReusableBlock">#</a> **insertReusableBlock**
+
+Opens the inserter, searches for the given reusable block, then selects the
+first result that appears. It then waits briefly for the block list to
+update.
 
 _Parameters_
 
@@ -412,6 +455,22 @@ _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
 
+<a name="searchForPattern" href="#searchForPattern">#</a> **searchForPattern**
+
+Search for pattern in the global inserter
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
+<a name="searchForReusableBlock" href="#searchForReusableBlock">#</a> **searchForReusableBlock**
+
+Search for reusable block in the global inserter.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
 <a name="selectBlockByClientId" href="#selectBlockByClientId">#</a> **selectBlockByClientId**
 
 Given the clientId of a block, selects the block on the editor.
@@ -469,6 +528,11 @@ _Parameters_
 
 -   _mocks_ `Array`: Array of mock settings.
 
+<a name="showBlockToolbar" href="#showBlockToolbar">#</a> **showBlockToolbar**
+
+The block toolbar is not always visible while typing.
+Call this function to reveal it.
+
 <a name="switchEditorModeTo" href="#switchEditorModeTo">#</a> **switchEditorModeTo**
 
 Switches editor mode.
@@ -511,6 +575,18 @@ Converts editor's block type.
 _Parameters_
 
 -   _name_ `string`: Block name.
+
+<a name="trashAllPosts" href="#trashAllPosts">#</a> **trashAllPosts**
+
+Navigates to the post listing screen and bulk-trashes any posts which exist.
+
+_Parameters_
+
+-   _postType_ `string`: String slug for type of post to trash.
+
+_Returns_
+
+-   `Promise`: Promise resolving once posts have been trashed.
 
 <a name="uninstallPlugin" href="#uninstallPlugin">#</a> **uninstallPlugin**
 

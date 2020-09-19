@@ -1,9 +1,22 @@
 {
 	"name": "core/columns",
-	"category": "layout",
+	"category": "design",
 	"attributes": {
 		"verticalAlignment": {
 			"type": "string"
+		}
+	},
+	"supports": {
+		"anchor": true,
+		"align": [
+			"wide",
+			"full"
+		],
+		"html": false,
+		"lightBlockWrapper": true,
+		"__experimentalColor": {
+			"gradients": true,
+			"linkColor": true
 		}
 	}
 }

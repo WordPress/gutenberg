@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useMemo, useCallback, useState } from '@wordpress/element';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 /**
  * Internal dependencies
@@ -13,14 +14,17 @@ function useSlotRegistry() {
 	const [ fills, setFills ] = useState( {} );
 
 	const registerSlot = useCallback( ( name, ref, fillProps ) => {
-		setSlots( ( prevSlots ) => ( {
-			...prevSlots,
-			[ name ]: {
-				...prevSlots[ name ],
-				ref: ref || prevSlots[ name ].ref,
-				fillProps: fillProps || prevSlots[ name ].fillProps || {},
-			},
-		} ) );
+		setSlots( ( prevSlots ) => {
+			const slot = prevSlots[ name ] || {};
+			return {
+				...prevSlots,
+				[ name ]: {
+					...slot,
+					ref: ref || slot.ref,
+					fillProps: fillProps || slot.fillProps || {},
+				},
+			};
+		} );
 	}, [] );
 
 	const unregisterSlot = useCallback( ( name, ref ) => {
@@ -34,6 +38,24 @@ function useSlotRegistry() {
 			return prevSlots;
 		} );
 	}, [] );
+
+	const updateSlot = useCallback(
+		( name, fillProps ) => {
+			const slot = slots[ name ];
+			if ( ! slot ) {
+				return;
+			}
+			if ( ! isShallowEqual( slot.fillProps, fillProps ) ) {
+				slot.fillProps = fillProps;
+				const slotFills = fills[ name ];
+				if ( slotFills ) {
+					// Force update fills
+					slotFills.map( ( fill ) => fill.current.rerender() );
+				}
+			}
+		},
+		[ slots, fills ]
+	);
 
 	const registerFill = useCallback( ( name, ref ) => {
 		setFills( ( prevFills ) => ( {
@@ -62,8 +84,7 @@ function useSlotRegistry() {
 			slots,
 			fills,
 			registerSlot,
-			// Just for readability
-			updateSlot: registerSlot,
+			updateSlot,
 			unregisterSlot,
 			registerFill,
 			unregisterFill,
@@ -72,6 +93,7 @@ function useSlotRegistry() {
 			slots,
 			fills,
 			registerSlot,
+			updateSlot,
 			unregisterSlot,
 			registerFill,
 			unregisterFill,

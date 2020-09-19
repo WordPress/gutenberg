@@ -6,51 +6,50 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { downloadableBlocks, blockManagement, hasPermission } from '../reducer';
-import { installedItem, downloadableBlock } from './fixtures';
+import { blockManagement, downloadableBlocks, errorNotices } from '../reducer';
+import { blockTypeInstalled, downloadableBlock } from './fixtures';
 
 describe( 'state', () => {
 	describe( 'downloadableBlocks()', () => {
 		it( 'should update state to reflect active search', () => {
-			const initialState = deepFreeze( {
-				isRequestingDownloadableBlocks: false,
-			} );
+			const initialState = deepFreeze( {} );
+			const filterValue = 'Awesome Block';
+
 			const state = downloadableBlocks( initialState, {
 				type: 'FETCH_DOWNLOADABLE_BLOCKS',
+				filterValue,
 			} );
 
-			expect( state.isRequestingDownloadableBlocks ).toBe( true );
+			expect( state[ filterValue ].isRequesting ).toEqual( true );
 		} );
 
 		it( 'should update state to reflect search results have returned', () => {
-			const state = downloadableBlocks( undefined, {
+			const query = downloadableBlock.title;
+			const initialState = deepFreeze( {
+				[ query ]: {
+					isRequesting: true,
+				},
+			} );
+
+			const state = downloadableBlocks( initialState, {
 				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
-				filterValue: downloadableBlock.title,
+				filterValue: query,
 				downloadableBlocks: [ downloadableBlock ],
 			} );
 
-			expect( state.isRequestingDownloadableBlocks ).toBe( false );
+			expect( state[ query ].isRequesting ).toEqual( false );
 		} );
 
 		it( "should set user's search term and save results", () => {
-			const state = downloadableBlocks( undefined, {
+			const query = downloadableBlock.title;
+			const initialState = deepFreeze( {} );
+			const state = downloadableBlocks( initialState, {
 				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
-				filterValue: downloadableBlock.title,
+				filterValue: query,
 				downloadableBlocks: [ downloadableBlock ],
 			} );
-			expect( state.results ).toHaveProperty( downloadableBlock.title );
-			expect( state.results[ downloadableBlock.title ] ).toHaveLength(
-				1
-			);
-
-			// It should append to the results
-			const updatedState = downloadableBlocks( state, {
-				type: 'RECEIVE_DOWNLOADABLE_BLOCKS',
-				filterValue: 'Test 1',
-				downloadableBlocks: [ downloadableBlock ],
-			} );
-
-			expect( Object.keys( updatedState.results ) ).toHaveLength( 2 );
+			expect( state ).toHaveProperty( query );
+			expect( state[ query ].results ).toHaveLength( 1 );
 		} );
 	} );
 
@@ -66,7 +65,7 @@ describe( 'state', () => {
 			const initialState = deepFreeze( { installedBlockTypes: [] } );
 			const state = blockManagement( initialState, {
 				type: 'ADD_INSTALLED_BLOCK_TYPE',
-				item: installedItem,
+				item: blockTypeInstalled,
 			} );
 
 			expect( state.installedBlockTypes ).toHaveLength( 1 );
@@ -74,25 +73,91 @@ describe( 'state', () => {
 
 		it( 'should remove item from the installedBlockTypesList', () => {
 			const initialState = deepFreeze( {
-				installedBlockTypes: [ installedItem ],
+				installedBlockTypes: [ blockTypeInstalled ],
 			} );
 			const state = blockManagement( initialState, {
 				type: 'REMOVE_INSTALLED_BLOCK_TYPE',
-				item: installedItem,
+				item: blockTypeInstalled,
 			} );
 
 			expect( state.installedBlockTypes ).toHaveLength( 0 );
 		} );
 	} );
 
-	describe( 'hasPermission()', () => {
-		it( 'should update permissions appropriately', () => {
-			const state = hasPermission( true, {
-				type: 'SET_INSTALL_BLOCKS_PERMISSION',
-				hasPermission: false,
+	describe( 'errorNotices()', () => {
+		it( 'should set an error notice', () => {
+			const initialState = deepFreeze( {} );
+			const error = {
+				message: 'error',
+				isFatal: false,
+			};
+
+			const state = errorNotices( initialState, {
+				type: 'SET_ERROR_NOTICE',
+				blockId: 'block/has-error',
+				...error,
 			} );
 
-			expect( state ).toBe( false );
+			expect( state ).toEqual( {
+				'block/has-error': error,
+			} );
+		} );
+
+		it( 'should set a second error notice', () => {
+			const initialState = deepFreeze( {
+				'block/has-error': {
+					message: 'error',
+					isFatal: false,
+				},
+			} );
+			const state = errorNotices( initialState, {
+				type: 'SET_ERROR_NOTICE',
+				blockId: 'block/another-error',
+				message: 'error',
+				isFatal: true,
+			} );
+
+			expect( state ).toEqual( {
+				'block/has-error': {
+					message: 'error',
+					isFatal: false,
+				},
+				'block/another-error': {
+					message: 'error',
+					isFatal: true,
+				},
+			} );
+		} );
+
+		it( 'should clear an existing error notice', () => {
+			const initialState = deepFreeze( {
+				'block/has-error': {
+					message: 'existing error',
+					isFatal: false,
+				},
+			} );
+
+			const state = errorNotices( initialState, {
+				type: 'CLEAR_ERROR_NOTICE',
+				blockId: 'block/has-error',
+			} );
+
+			expect( state ).toEqual( {} );
+		} );
+
+		it( 'should clear a nonexistent error notice', () => {
+			const initialState = deepFreeze( {
+				'block/has-error': {
+					message: 'new error',
+					isFatal: true,
+				},
+			} );
+			const state = errorNotices( initialState, {
+				type: 'CLEAR_ERROR_NOTICE',
+				blockId: 'block/no-error',
+			} );
+
+			expect( state ).toEqual( initialState );
 		} );
 	} );
 } );

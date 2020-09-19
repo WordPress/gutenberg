@@ -30,7 +30,7 @@ describe( 'preferences', () => {
 
 	it( 'remembers sidebar dismissal between sessions', async () => {
 		// Open by default.
-		expect( await getActiveSidebarTabText() ).toBe( 'Document' );
+		expect( await getActiveSidebarTabText() ).toBe( 'Post' );
 
 		// Change to "Block" tab.
 		await page.click( '.edit-post-sidebar__panel-tab[aria-label="Block"]' );
@@ -41,7 +41,8 @@ describe( 'preferences', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/6377
 		// See: https://github.com/WordPress/gutenberg/pull/8995
 		await page.reload();
-		expect( await getActiveSidebarTabText() ).toBe( 'Document' );
+		await page.waitForSelector( '.edit-post-layout' );
+		expect( await getActiveSidebarTabText() ).toBe( 'Post' );
 
 		// Dismiss
 		await page.click(
@@ -51,6 +52,7 @@ describe( 'preferences', () => {
 
 		// Remember after reload.
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 		expect( await getActiveSidebarTabText() ).toBe( null );
 	} );
 } );

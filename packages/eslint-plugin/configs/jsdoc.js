@@ -4,7 +4,7 @@
 const globals = require( 'globals' );
 
 /**
- * The temporary list of types defined in Gutenberg which are whitelisted to avoid
+ * The temporary list of types defined in Gutenberg which are allowed to avoid
  * ESLint warnings. It should be removed once importing is going to be implemented
  * in the tool which generates public APIs from JSDoc comments. Related issue to
  * fix the root cause `@wordpress/docgen`:
@@ -27,7 +27,7 @@ const temporaryWordPressInternalTypes = [
 ];
 
 /**
- * The temporary list of external types used in Gutenberg which are whitelisted
+ * The temporary list of external types used in Gutenberg which are allowed
  * to avoid ESLint warnings. It's similar to `wordpressInternalTypes` and it
  * should be removed once the related issues is fixed:
  * https://github.com/WordPress/gutenberg/issues/18045
@@ -63,6 +63,8 @@ const typescriptUtilityTypes = [
 	'unknown',
 	'never',
 	'NodeJS',
+	'AsyncIterableIterator',
+	'NodeRequire',
 ];
 
 module.exports = {
@@ -80,7 +82,7 @@ module.exports = {
 	},
 	rules: {
 		'jsdoc/no-undefined-types': [
-			'warn',
+			'error',
 			{
 				definedTypes: [
 					// Required to reference browser types because we don't have the `browser` environment enabled for the project.
@@ -93,6 +95,7 @@ module.exports = {
 					...temporaryWordPressInternalTypes,
 					...temporaryExternalTypes,
 					'void',
+					'JSX',
 				],
 			},
 		],

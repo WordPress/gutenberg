@@ -59,7 +59,6 @@ export default function QueryControls( {
 						onOrderByChange( newOrderBy );
 					}
 				} }
-				{ ...{ separatorType: 'fullWidth' } }
 			/>
 		),
 		onCategoryChange && (
@@ -69,7 +68,6 @@ export default function QueryControls( {
 				noOptionLabel={ __( 'All' ) }
 				selectedCategoryId={ selectedCategoryId }
 				onChange={ onCategoryChange }
-				{ ...{ separatorType: 'fullWidth' } }
 			/>
 		),
 		onNumberOfItemsChange && (
@@ -80,7 +78,6 @@ export default function QueryControls( {
 				min={ minItems }
 				max={ maxItems }
 				required
-				{ ...{ separatorType: 'none' } }
 			/>
 		),
 	];

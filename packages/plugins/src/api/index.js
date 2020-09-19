@@ -168,7 +168,7 @@ export function registerPlugin( name, settings ) {
  * <caption>ESNext</caption>
  * ```js
  * // Using ESNext syntax
- * const { unregisterPlugin } = wp.plugins;
+ * import { unregisterPlugin } from '@wordpress/plugins';
  *
  * unregisterPlugin( 'plugin-name' );
  * ```

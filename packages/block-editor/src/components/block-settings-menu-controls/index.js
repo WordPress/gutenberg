@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, map } from 'lodash';
+import { compact, isEmpty, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,18 +13,21 @@ const { Fill: BlockSettingsMenuControls, Slot } = createSlotFill(
 	'BlockSettingsMenuControls'
 );
 
-const BlockSettingsMenuControlsSlot = ( { fillProps } ) => {
-	const { selectedBlocks } = useSelect( ( select ) => {
-		const { getBlocksByClientId, getSelectedBlockClientIds } = select(
-			'core/block-editor'
-		);
-		return {
-			selectedBlocks: map(
-				getBlocksByClientId( getSelectedBlockClientIds() ),
+const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
+	const selectedBlocks = useSelect(
+		( select ) => {
+			const { getBlocksByClientId, getSelectedBlockClientIds } = select(
+				'core/block-editor'
+			);
+			const ids =
+				clientIds !== null ? clientIds : getSelectedBlockClientIds();
+			return map(
+				compact( getBlocksByClientId( ids ) ),
 				( block ) => block.name
-			),
-		};
-	}, [] );
+			);
+		},
+		[ clientIds ]
+	);
 
 	return (
 		<Slot fillProps={ { ...fillProps, selectedBlocks } }>

@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { includes } from 'lodash';
+import { includes, noop } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
+import { isPhrasingContent } from './phrasing-content';
 
 /**
  * Browser dependencies
@@ -448,25 +453,24 @@ export function placeCaretAtVerticalEdge(
  * @return {boolean} True if the element is an text field, false if not.
  */
 export function isTextField( element ) {
-	try {
-		const { nodeName, selectionStart, contentEditable } = element;
-
-		return (
-			( nodeName === 'INPUT' && selectionStart !== null ) ||
-			nodeName === 'TEXTAREA' ||
-			contentEditable === 'true'
-		);
-	} catch ( error ) {
-		// Safari throws an exception when trying to get `selectionStart`
-		// on non-text <input> elements (which, understandably, don't
-		// have the text selection API). We catch this via a try/catch
-		// block, as opposed to a more explicit check of the element's
-		// input types, because of Safari's non-standard behavior. This
-		// also means we don't have to worry about the list of input
-		// types that support `selectionStart` changing as the HTML spec
-		// evolves over time.
-		return false;
-	}
+	const { nodeName, contentEditable } = element;
+	const nonTextInputs = [
+		'button',
+		'checkbox',
+		'hidden',
+		'file',
+		'radio',
+		'image',
+		'range',
+		'reset',
+		'submit',
+		'number',
+	];
+	return (
+		( nodeName === 'INPUT' && ! nonTextInputs.includes( element.type ) ) ||
+		nodeName === 'TEXTAREA' ||
+		contentEditable === 'true'
+	);
 }
 
 /**
@@ -484,24 +488,80 @@ export function isNumberInput( element ) {
 }
 
 /**
- * Check wether the current document has a selection.
- * This checks both for focus in an input field and general text selection.
+ * Check whether the current document has selected text. This applies to ranges
+ * of text in the document, and not selection inside <input> and <textarea>
+ * elements.
+ *
+ * See: https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects.
+ *
+ * @return {boolean} True if there is selection, false if not.
+ */
+export function documentHasTextSelection() {
+	const selection = window.getSelection();
+	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
+	return range && ! range.collapsed;
+}
+
+/**
+ * Check whether the given element, assumed an input field or textarea,
+ * contains a (uncollapsed) selection of text.
+ *
+ * Note: this is perhaps an abuse of the term "selection", since these elements
+ * manage selection differently and aren't covered by Selection#collapsed.
+ *
+ * See: https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects.
+ *
+ * @param {HTMLElement} element The HTML element.
+ *
+ * @return {boolean} Whether the input/textareaa element has some "selection".
+ */
+function inputFieldHasUncollapsedSelection( element ) {
+	if ( ! isTextField( element ) && ! isNumberInput( element ) ) {
+		return false;
+	}
+	try {
+		const { selectionStart, selectionEnd } = element;
+
+		return selectionStart !== null && selectionStart !== selectionEnd;
+	} catch ( error ) {
+		// Safari throws an exception when trying to get `selectionStart`
+		// on non-text <input> elements (which, understandably, don't
+		// have the text selection API). We catch this via a try/catch
+		// block, as opposed to a more explicit check of the element's
+		// input types, because of Safari's non-standard behavior. This
+		// also means we don't have to worry about the list of input
+		// types that support `selectionStart` changing as the HTML spec
+		// evolves over time.
+		return false;
+	}
+}
+
+/**
+ * Check whether the current document has any sort of selection. This includes
+ * ranges of text across elements and any selection inside <input> and
+ * <textarea> elements.
+ *
+ * @return {boolean} Whether there is any sort of "selection" in the document.
+ */
+export function documentHasUncollapsedSelection() {
+	return (
+		documentHasTextSelection() ||
+		inputFieldHasUncollapsedSelection( document.activeElement )
+	);
+}
+
+/**
+ * Check whether the current document has a selection. This checks for both
+ * focus in an input field and general text selection.
  *
  * @return {boolean} True if there is selection, false if not.
  */
 export function documentHasSelection() {
-	if ( isTextField( document.activeElement ) ) {
-		return true;
-	}
-
-	if ( isNumberInput( document.activeElement ) ) {
-		return true;
-	}
-
-	const selection = window.getSelection();
-	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-
-	return range && ! range.collapsed;
+	return (
+		isTextField( document.activeElement ) ||
+		isNumberInput( document.activeElement ) ||
+		documentHasTextSelection()
+	);
 }
 
 /**
@@ -707,4 +767,208 @@ export function wrap( newNode, referenceNode ) {
 export function __unstableStripHTML( html ) {
 	const document = new DOMParser().parseFromString( html, 'text/html' );
 	return document.body.textContent || '';
+}
+
+/**
+ * Given a schema, unwraps or removes nodes, attributes and classes on a node
+ * list.
+ *
+ * @param {NodeList} nodeList The nodeList to filter.
+ * @param {Document} doc      The document of the nodeList.
+ * @param {Object}   schema   An array of functions that can mutate with the provided node.
+ * @param {Object}   inline   Whether to clean for inline mode.
+ */
+function cleanNodeList( nodeList, doc, schema, inline ) {
+	Array.from( nodeList ).forEach( ( node ) => {
+		const tag = node.nodeName.toLowerCase();
+
+		// It's a valid child, if the tag exists in the schema without an isMatch
+		// function, or with an isMatch function that matches the node.
+		if (
+			schema.hasOwnProperty( tag ) &&
+			( ! schema[ tag ].isMatch || schema[ tag ].isMatch( node ) )
+		) {
+			if ( node.nodeType === ELEMENT_NODE ) {
+				const {
+					attributes = [],
+					classes = [],
+					children,
+					require = [],
+					allowEmpty,
+				} = schema[ tag ];
+
+				// If the node is empty and it's supposed to have children,
+				// remove the node.
+				if ( children && ! allowEmpty && isEmpty( node ) ) {
+					remove( node );
+					return;
+				}
+
+				if ( node.hasAttributes() ) {
+					// Strip invalid attributes.
+					Array.from( node.attributes ).forEach( ( { name } ) => {
+						if (
+							name !== 'class' &&
+							! includes( attributes, name )
+						) {
+							node.removeAttribute( name );
+						}
+					} );
+
+					// Strip invalid classes.
+					// In jsdom-jscore, 'node.classList' can be undefined.
+					// TODO: Explore patching this in jsdom-jscore.
+					if ( node.classList && node.classList.length ) {
+						const mattchers = classes.map( ( item ) => {
+							if ( typeof item === 'string' ) {
+								return ( className ) => className === item;
+							} else if ( item instanceof RegExp ) {
+								return ( className ) => item.test( className );
+							}
+
+							return noop;
+						} );
+
+						Array.from( node.classList ).forEach( ( name ) => {
+							if (
+								! mattchers.some( ( isMatch ) =>
+									isMatch( name )
+								)
+							) {
+								node.classList.remove( name );
+							}
+						} );
+
+						if ( ! node.classList.length ) {
+							node.removeAttribute( 'class' );
+						}
+					}
+				}
+
+				if ( node.hasChildNodes() ) {
+					// Do not filter any content.
+					if ( children === '*' ) {
+						return;
+					}
+
+					// Continue if the node is supposed to have children.
+					if ( children ) {
+						// If a parent requires certain children, but it does
+						// not have them, drop the parent and continue.
+						if (
+							require.length &&
+							! node.querySelector( require.join( ',' ) )
+						) {
+							cleanNodeList(
+								node.childNodes,
+								doc,
+								schema,
+								inline
+							);
+							unwrap( node );
+							// If the node is at the top, phrasing content, and
+							// contains children that are block content, unwrap
+							// the node because it is invalid.
+						} else if (
+							node.parentNode.nodeName === 'BODY' &&
+							isPhrasingContent( node )
+						) {
+							cleanNodeList(
+								node.childNodes,
+								doc,
+								schema,
+								inline
+							);
+
+							if (
+								Array.from( node.childNodes ).some(
+									( child ) => ! isPhrasingContent( child )
+								)
+							) {
+								unwrap( node );
+							}
+						} else {
+							cleanNodeList(
+								node.childNodes,
+								doc,
+								children,
+								inline
+							);
+						}
+						// Remove children if the node is not supposed to have any.
+					} else {
+						while ( node.firstChild ) {
+							remove( node.firstChild );
+						}
+					}
+				}
+			}
+			// Invalid child. Continue with schema at the same place and unwrap.
+		} else {
+			cleanNodeList( node.childNodes, doc, schema, inline );
+
+			// For inline mode, insert a line break when unwrapping nodes that
+			// are not phrasing content.
+			if (
+				inline &&
+				! isPhrasingContent( node ) &&
+				node.nextElementSibling
+			) {
+				insertAfter( doc.createElement( 'br' ), node );
+			}
+
+			unwrap( node );
+		}
+	} );
+}
+
+/**
+ * Recursively checks if an element is empty. An element is not empty if it
+ * contains text or contains elements with attributes such as images.
+ *
+ * @param {Element} element The element to check.
+ *
+ * @return {boolean} Wether or not the element is empty.
+ */
+export function isEmpty( element ) {
+	if ( ! element.hasChildNodes() ) {
+		return true;
+	}
+
+	return Array.from( element.childNodes ).every( ( node ) => {
+		if ( node.nodeType === TEXT_NODE ) {
+			return ! node.nodeValue.trim();
+		}
+
+		if ( node.nodeType === ELEMENT_NODE ) {
+			if ( node.nodeName === 'BR' ) {
+				return true;
+			} else if ( node.hasAttributes() ) {
+				return false;
+			}
+
+			return isEmpty( node );
+		}
+
+		return true;
+	} );
+}
+
+/**
+ * Given a schema, unwraps or removes nodes, attributes and classes on HTML.
+ *
+ * @param {string} HTML   The HTML to clean up.
+ * @param {Object} schema Schema for the HTML.
+ * @param {Object} inline Whether to clean for inline mode.
+ *
+ * @return {string} The cleaned up HTML.
+ */
+export function removeInvalidHTML( HTML, schema, inline ) {
+	const doc = document.implementation.createHTMLDocument( '' );
+
+	doc.body.innerHTML = HTML;
+
+	cleanNodeList( doc.body.childNodes, doc, schema, inline );
+
+	return doc.body.innerHTML;
 }

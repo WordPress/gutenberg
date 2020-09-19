@@ -38,7 +38,14 @@ export class DateTimePicker extends Component {
 	}
 
 	render() {
-		const { currentDate, is12Hour, isInvalidDate, onChange } = this.props;
+		const {
+			currentDate,
+			is12Hour,
+			isInvalidDate,
+			onMonthPreviewed,
+			onChange,
+			events,
+		} = this.props;
 
 		return (
 			<div className="components-datetime">
@@ -53,6 +60,8 @@ export class DateTimePicker extends Component {
 							currentDate={ currentDate }
 							onChange={ onChange }
 							isInvalidDate={ isInvalidDate }
+							onMonthPreviewed={ onMonthPreviewed }
+							events={ events }
 						/>
 					</>
 				) }
@@ -149,26 +158,30 @@ export class DateTimePicker extends Component {
 									) }
 								</li>
 							</ul>
-
-							<Button
-								isSmall
-								onClick={ this.onClickDescriptionToggle }
-							>
-								{ __( 'Close' ) }
-							</Button>
 						</div>
 					</>
 				) }
 
-				{ ! this.state.calendarHelpIsVisible && (
+				<div className="components-datetime__buttons">
+					{ ! this.state.calendarHelpIsVisible && currentDate && (
+						<Button
+							className="components-datetime__date-reset-button"
+							isLink
+							onClick={ () => onChange( null ) }
+						>
+							{ __( 'Reset' ) }
+						</Button>
+					) }
 					<Button
-						className="components-datetime__date-help-button"
+						className="components-datetime__date-help-toggle"
 						isLink
 						onClick={ this.onClickDescriptionToggle }
 					>
-						{ __( 'Calendar Help' ) }
+						{ this.state.calendarHelpIsVisible
+							? __( 'Close' )
+							: __( 'Calendar Help' ) }
 					</Button>
-				) }
+				</div>
 			</div>
 		);
 	}

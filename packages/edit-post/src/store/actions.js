@@ -273,8 +273,6 @@ export function metaBoxUpdatesSuccess() {
 
 /**
  * Returns an action object used to toggle the width of the editing canvas.
- * It's marked as experimental because, potentially, we'll need this
- * in several pages including edit-site.
  *
  * @param {string} deviceType
  *
@@ -284,5 +282,18 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
 	return {
 		type: 'SET_PREVIEW_DEVICE_TYPE',
 		deviceType,
+	};
+}
+
+/**
+ * Returns an action object used to open/close the inserter.
+ *
+ * @param {boolean} value A boolean representing whether the inserter should be opened or closed.
+ * @return {Object} Action object.
+ */
+export function setIsInserterOpened( value ) {
+	return {
+		type: 'SET_IS_INSERTER_OPENED',
+		value,
 	};
 }

@@ -1,17 +1,11 @@
 /**
- * External dependencies
- */
-import { includes, pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { TabPanel } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -19,8 +13,11 @@ import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import Tips from './tips';
 import InserterSearchForm from './search-form';
 import InserterPreviewPanel from './preview-panel';
-import InserterBlockList from './block-list';
-import BlockPatterns from './block-patterns';
+import BlockTypesTab from './block-types-tab';
+import BlockPatternsTabs from './block-patterns-tab';
+import ReusableBlocksTab from './reusable-blocks-tab';
+import useInsertionPoint from './hooks/use-insertion-point';
+import InserterTabs from './tabs';
 
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
@@ -31,56 +28,42 @@ function InserterMenu( {
 	__experimentalSelectBlockOnInsert,
 	onSelect,
 	showInserterHelpPanel,
+	showMostUsedBlocks,
 } ) {
+	const [ activeTab, setActiveTab ] = useState( 'blocks' );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
-	const {
-		destinationRootClientId,
-		patterns,
-		getSelectedBlock,
-		getBlockIndex,
-		getBlockSelectionEnd,
-		getBlockOrder,
-	} = useSelect( ( select ) => {
-		const {
-			getSettings,
-			getBlockRootClientId,
-			getBlockSelectionEnd: _getBlockSelectionEnd,
-		} = select( 'core/block-editor' );
+	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
+		null
+	);
 
-		let destRootClientId = rootClientId;
-		if ( ! destRootClientId && ! clientId && ! isAppender ) {
-			const end = _getBlockSelectionEnd();
-			if ( end ) {
-				destRootClientId = getBlockRootClientId( end ) || undefined;
-			}
-		}
+	const [
+		destinationRootClientId,
+		onInsertBlocks,
+		onToggleInsertionPoint,
+	] = useInsertionPoint( {
+		rootClientId,
+		clientId,
+		isAppender,
+		selectBlockOnInsert: __experimentalSelectBlockOnInsert,
+	} );
+	const { hasPatterns, hasReusableBlocks } = useSelect( ( select ) => {
+		const {
+			__experimentalBlockPatterns,
+			__experimentalReusableBlocks,
+		} = select( 'core/block-editor' ).getSettings();
+
 		return {
-			patterns: getSettings().__experimentalBlockPatterns,
-			destinationRootClientId: destRootClientId,
-			...pick( select( 'core/block-editor' ), [
-				'getSelectedBlock',
-				'getBlockIndex',
-				'getBlockSelectionEnd',
-				'getBlockOrder',
-			] ),
+			hasPatterns: !! __experimentalBlockPatterns?.length,
+			hasReusableBlocks: !! __experimentalReusableBlocks?.length,
 		};
 	}, [] );
-	const {
-		replaceBlocks,
-		insertBlocks,
-		showInsertionPoint,
-		hideInsertionPoint,
-	} = useDispatch( 'core/block-editor' );
-	const hasPatterns =
-		! destinationRootClientId &&
-		!! patterns &&
-		!! patterns.length &&
-		! filterValue;
+
+	const showPatterns = ! destinationRootClientId && hasPatterns;
+
 	const onKeyDown = ( event ) => {
 		if (
-			includes(
-				[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ],
+			[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].includes(
 				event.keyCode
 			)
 		) {
@@ -89,74 +72,41 @@ function InserterMenu( {
 		}
 	};
 
-	// To avoid duplication, getInsertionIndex is extracted and used in two event handlers
-	// This breaks the withDispatch not containing any logic rule.
-	// Since it's a function only called when the event handlers are called,
-	// it's fine to extract it.
-	// eslint-disable-next-line no-restricted-syntax
-	function getInsertionIndex() {
-		// If the clientId is defined, we insert at the position of the block.
-		if ( clientId ) {
-			return getBlockIndex( clientId, destinationRootClientId );
-		}
+	const onInsert = ( blocks ) => {
+		onInsertBlocks( blocks );
+		onSelect();
+	};
 
-		// If there a selected block, we insert after the selected block.
-		const end = getBlockSelectionEnd();
-		if ( ! isAppender && end ) {
-			return getBlockIndex( end, destinationRootClientId ) + 1;
-		}
-
-		// Otherwise, we insert at the end of the current rootClientId
-		return getBlockOrder( destinationRootClientId ).length;
-	}
-
-	const onInsertBlocks = ( blocks ) => {
-		const selectedBlock = getSelectedBlock();
-		if (
-			! isAppender &&
-			selectedBlock &&
-			isUnmodifiedDefaultBlock( selectedBlock )
-		) {
-			replaceBlocks( selectedBlock.clientId, blocks );
-		} else {
-			insertBlocks(
-				blocks,
-				getInsertionIndex(),
-				destinationRootClientId,
-				__experimentalSelectBlockOnInsert
-			);
-		}
-
+	const onInsertPattern = ( blocks, patternName ) => {
+		onInsertBlocks( blocks, { patternName } );
 		onSelect();
 	};
 
 	const onHover = ( item ) => {
+		onToggleInsertionPoint( !! item );
 		setHoveredItem( item );
-		if ( item ) {
-			const index = getInsertionIndex();
-			showInsertionPoint( destinationRootClientId, index );
-		} else {
-			hideInsertionPoint();
-		}
+	};
+
+	const onClickPatternCategory = ( patternCategory ) => {
+		setSelectedPatternCategory( patternCategory );
 	};
 
 	const blocksTab = (
 		<>
 			<div className="block-editor-inserter__block-list">
-				<div className="block-editor-inserter__scrollable">
-					<InserterBlockList
-						rootClientId={ destinationRootClientId }
-						onInsert={ onInsertBlocks }
-						onHover={ onHover }
-						__experimentalSelectBlockOnInsert={
-							__experimentalSelectBlockOnInsert
-						}
-						filterValue={ filterValue }
-					/>
-				</div>
+				<BlockTypesTab
+					rootClientId={ destinationRootClientId }
+					onInsert={ onInsert }
+					onHover={ onHover }
+					filterValue={ filterValue }
+					showMostUsedBlocks={ showMostUsedBlocks }
+				/>
 			</div>
 			{ showInserterHelpPanel && (
 				<div className="block-editor-inserter__tips">
+					<VisuallyHidden as="h2">
+						{ __( 'A tip for using the block editor' ) }
+					</VisuallyHidden>
 					<Tips />
 				</div>
 			) }
@@ -164,10 +114,34 @@ function InserterMenu( {
 	);
 
 	const patternsTab = (
-		<div className="block-editor-inserter__scrollable">
-			<BlockPatterns patterns={ patterns } onInsert={ onInsertBlocks } />
-		</div>
+		<BlockPatternsTabs
+			onInsert={ onInsertPattern }
+			filterValue={ filterValue }
+			onClickCategory={ onClickPatternCategory }
+			selectedCategory={ selectedPatternCategory }
+		/>
 	);
+
+	const reusableBlocksTab = (
+		<ReusableBlocksTab
+			rootClientId={ destinationRootClientId }
+			onInsert={ onInsert }
+			onHover={ onHover }
+			filterValue={ filterValue }
+		/>
+	);
+
+	const searchFormPlaceholder = () => {
+		if ( activeTab === 'reusable' ) {
+			return __( 'Search for a reusable block' );
+		}
+
+		if ( activeTab === 'patterns' ) {
+			return __( 'Search for a pattern' );
+		}
+
+		return __( 'Search for a block' );
+	};
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 	// is always visible, and one which already incurs this behavior of autoFocus via
@@ -182,37 +156,37 @@ function InserterMenu( {
 			onKeyDown={ onKeyDown }
 		>
 			<div className="block-editor-inserter__main-area">
-				<InserterSearchForm onChange={ setFilterValue } />
-				{ hasPatterns && (
-					<TabPanel
-						className="block-editor-inserter__tabs"
-						tabs={ [
-							{
-								name: 'blocks',
-								/* translators: Blocks tab title in the block inserter. */
-								title: __( 'Blocks' ),
-							},
-							{
-								name: 'patterns',
-								/* translators: Patterns tab title in the block inserter. */
-								title: __( 'Patterns' ),
-							},
-						] }
-					>
-						{ ( tab ) => {
-							if ( tab.name === 'blocks' ) {
-								return blocksTab;
-							}
-							return patternsTab;
+				{ /* the following div is necessary to fix the sticky position of the search form */ }
+				<div className="block-editor-inserter__content">
+					<InserterSearchForm
+						onChange={ ( value ) => {
+							if ( hoveredItem ) setHoveredItem( null );
+							setFilterValue( value );
 						} }
-					</TabPanel>
-				) }
-				{ ! hasPatterns && blocksTab }
+						value={ filterValue }
+						placeholder={ searchFormPlaceholder() }
+					/>
+					{ ( showPatterns || hasReusableBlocks ) && (
+						<InserterTabs
+							showPatterns={ showPatterns }
+							showReusableBlocks={ hasReusableBlocks }
+							onSelect={ setActiveTab }
+						>
+							{ ( tab ) => {
+								if ( tab.name === 'blocks' ) {
+									return blocksTab;
+								} else if ( tab.name === 'patterns' ) {
+									return patternsTab;
+								}
+								return reusableBlocksTab;
+							} }
+						</InserterTabs>
+					) }
+					{ ! showPatterns && ! hasReusableBlocks && blocksTab }
+				</div>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
-				<div className="block-editor-inserter__preview-container">
-					<InserterPreviewPanel item={ hoveredItem } />
-				</div>
+				<InserterPreviewPanel item={ hoveredItem } />
 			) }
 		</div>
 	);

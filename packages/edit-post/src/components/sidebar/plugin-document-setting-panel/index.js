@@ -9,6 +9,7 @@ import { createSlotFill, PanelBody } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withPluginContext } from '@wordpress/plugins';
 import { withDispatch, withSelect } from '@wordpress/data';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
@@ -88,8 +89,8 @@ const PluginDocumentSettingFill = ( {
  * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * const { registerPlugin } = wp.plugins;
- * const { PluginDocumentSettingPanel } = wp.editPost;
+ * import { registerPlugin } from '@wordpress/plugins';
+ * import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
  *
  * const MyDocumentSettingTest = () => (
  * 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
@@ -104,6 +105,9 @@ const PluginDocumentSettingFill = ( {
  */
 const PluginDocumentSettingPanel = compose(
 	withPluginContext( ( context, ownProps ) => {
+		if ( undefined === ownProps.name ) {
+			warning( 'PluginDocumentSettingPanel requires a name property.' );
+		}
 		return {
 			icon: ownProps.icon || context.icon,
 			panelName: `${ context.name }/${ ownProps.name }`,

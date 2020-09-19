@@ -16,8 +16,5 @@ export { metadata, name };
 export const settings = {
 	title: __( 'Site Title' ),
 	icon,
-	supports: {
-		html: false,
-	},
 	edit,
 };

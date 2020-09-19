@@ -59,12 +59,13 @@ export const link = {
 				const text = getTextContent( slice( value ) );
 
 				if ( text && isURL( text ) ) {
-					onChange(
-						applyFormat( value, {
-							type: name,
-							attributes: { url: text },
-						} )
-					);
+					const newValue = applyFormat( value, {
+						type: name,
+						attributes: { url: text },
+					} );
+					newValue.start = newValue.end;
+					newValue.activeFormats = [];
+					onChange( { ...newValue, needsSelectionUpdate: true } );
 				} else {
 					this.setState( { addingLink: true } );
 					this.getURLFromClipboard();

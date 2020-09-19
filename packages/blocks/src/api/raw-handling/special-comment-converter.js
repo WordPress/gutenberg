@@ -24,7 +24,7 @@ const { COMMENT_NODE } = window.Node;
  * @param {Document} doc  The document of the node.
  * @return {void}
  */
-export default function( node, doc ) {
+export default function specialCommentConverter( node, doc ) {
 	if ( node.nodeType !== COMMENT_NODE ) {
 		return;
 	}

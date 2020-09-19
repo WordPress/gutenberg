@@ -3,8 +3,8 @@
  */
 const postcss = require( 'postcss' );
 
-module.exports = postcss.plugin( 'postcss-themes', function( options ) {
-	return function( root ) {
+module.exports = postcss.plugin( 'postcss-themes', ( options ) => {
+	return ( root ) => {
 		root.walkRules( ( rule ) => {
 			const themeDecls = {};
 			let hasThemeDecls = false;

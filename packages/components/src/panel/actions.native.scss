@@ -1,5 +1,10 @@
 .panelActionsContainer {
-	padding-top: 24;
+	border-top-color: $light-gray-400;
+	border-top-width: 1px;
+}
+
+.panelActionsContainerDark {
+	border-top-color: $gray-70;
 }
 
 .defaultLabelStyle {

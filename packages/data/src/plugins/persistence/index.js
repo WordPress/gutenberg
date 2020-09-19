@@ -121,7 +121,7 @@ export function createPersistenceInterface( options ) {
  *
  * @return {WPDataPlugin} Data plugin.
  */
-const persistencePlugin = function( registry, pluginOptions ) {
+function persistencePlugin( registry, pluginOptions ) {
 	const persistence = createPersistenceInterface( pluginOptions );
 
 	/**
@@ -181,7 +181,7 @@ const persistencePlugin = function( registry, pluginOptions ) {
 			// Load from persistence to use as initial state.
 			const persistedState = persistence.get()[ reducerKey ];
 			if ( persistedState !== undefined ) {
-				let initialState = options.reducer( undefined, {
+				let initialState = options.reducer( options.initialState, {
 					type: '@@WP/PERSISTENCE_RESTORE',
 				} );
 
@@ -220,7 +220,7 @@ const persistencePlugin = function( registry, pluginOptions ) {
 			return store;
 		},
 	};
-};
+}
 
 /**
  * Deprecated: Remove this function and the code in WordPress Core that calls

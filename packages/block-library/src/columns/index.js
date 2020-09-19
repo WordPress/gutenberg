@@ -23,12 +23,6 @@ export const settings = {
 	description: __(
 		'Add a block that displays content in multiple columns, then add whatever content blocks you’d like.'
 	),
-	supports: {
-		align: [ 'wide', 'full' ],
-		html: false,
-		lightBlockWrapper: true,
-		__experimentalColor: { gradients: true },
-	},
 	variations,
 	example: {
 		innerBlocks: [

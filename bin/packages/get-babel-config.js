@@ -1,4 +1,4 @@
-module.exports = function( environment = '', file ) {
+module.exports = ( environment = '', file ) => {
 	/*
 	 * Specific options to be passed using the caller config option:
 	 * https://babeljs.io/docs/en/options#caller

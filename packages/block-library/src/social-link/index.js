@@ -17,11 +17,6 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Social Icon' ),
-	parent: [ 'core/social-links' ],
-	supports: {
-		reusable: false,
-		html: false,
-	},
 	icon,
 	edit,
 	description: __(

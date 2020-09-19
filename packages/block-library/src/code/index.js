@@ -32,10 +32,6 @@ export const settings = {
 			/* eslint-enable @wordpress/i18n-no-collapsible-whitespace */
 		},
 	},
-	supports: {
-		html: false,
-		lightBlockWrapper: true,
-	},
 	transforms,
 	edit,
 	save,

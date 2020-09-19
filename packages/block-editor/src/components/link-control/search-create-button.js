@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,9 +16,24 @@ export const LinkControlSearchCreate = ( {
 	onClick,
 	itemProps,
 	isSelected,
+	buttonText,
 } ) => {
 	if ( ! searchTerm ) {
 		return null;
+	}
+
+	let text;
+	if ( buttonText ) {
+		text = isFunction( buttonText ) ? buttonText( searchTerm ) : buttonText;
+	} else {
+		text = createInterpolateElement(
+			sprintf(
+				/* translators: %s: search term. */
+				__( 'Create: <mark>%s</mark>' ),
+				searchTerm
+			),
+			{ mark: <mark /> }
+		);
 	}
 
 	return (
@@ -38,14 +54,7 @@ export const LinkControlSearchCreate = ( {
 
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
-					{ createInterpolateElement(
-						sprintf(
-							/* translators: %s: search term. */
-							__( 'New page: <mark>%s</mark>' ),
-							searchTerm
-						),
-						{ mark: <mark /> }
-					) }
+					{ text }
 				</span>
 			</span>
 		</Button>

@@ -66,7 +66,7 @@ function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
 
 	const isCustomMarks = Array.isArray( marks );
 
-	const markCount = ( max - min ) / step;
+	const markCount = Math.round( ( max - min ) / step );
 	const marksArray = isCustomMarks
 		? marks
 		: [ ...Array( markCount + 1 ) ].map( ( _, index ) => ( {
@@ -77,7 +77,7 @@ function useMarks( { marks, min = 0, max = 100, step = 1, value = 0 } ) {
 		const markValue = mark.value !== undefined ? mark.value : value;
 
 		const key = `mark-${ index }`;
-		const isFilled = markValue * step <= value;
+		const isFilled = markValue * step + min <= value;
 		const offset = `${ ( markValue / markCount ) * 100 }%`;
 
 		const offsetStyle = {

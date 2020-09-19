@@ -35,3 +35,4 @@ register_post_meta( 'post', '_myguten_protected_key', array(
 	}
 ) );
 ```
+**Note:** Your post type needs to support `custom-fields` for `register_post_meta` function to work.

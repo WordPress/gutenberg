@@ -6,17 +6,20 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { withWeakMapCache } from '../utils';
+import { withWeakMapCache, getNormalizedCommaSeparable } from '../utils';
 
 /**
  * An object of properties describing a specific query.
  *
  * @typedef {Object} WPQueriedDataQueryParts
  *
- * @property {number} page      The query page (1-based index, default 1).
- * @property {number} perPage   Items per page for query (default 10).
- * @property {string} stableKey An encoded stable string of all non-pagination
- *                              query parameters.
+ * @property {number}      page      The query page (1-based index, default 1).
+ * @property {number}      perPage   Items per page for query (default 10).
+ * @property {string}      stableKey An encoded stable string of all non-
+ *                                   pagination, non-fields query parameters.
+ * @property {?(string[])} fields    Target subset of fields to derive from
+ *                                   item objects.
+ * @property {?(number[])} include   Specific item IDs to include.
  */
 
 /**
@@ -36,6 +39,8 @@ export function getQueryParts( query ) {
 		stableKey: '',
 		page: 1,
 		perPage: 10,
+		fields: null,
+		include: null,
 	};
 
 	// Ensure stable key by sorting keys. Also more efficient for iterating.
@@ -49,8 +54,19 @@ export function getQueryParts( query ) {
 			case 'page':
 				parts[ key ] = Number( value );
 				break;
+
 			case 'per_page':
 				parts.perPage = Number( value );
+				break;
+
+			case 'include':
+				parts.include = getNormalizedCommaSeparable( value ).map(
+					Number
+				);
+				break;
+
+			case '_fields':
+				parts.fields = getNormalizedCommaSeparable( value );
 				break;
 
 			default:

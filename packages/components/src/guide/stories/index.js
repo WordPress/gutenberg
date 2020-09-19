@@ -14,7 +14,6 @@ import { useState } from '@wordpress/element';
  */
 import Button from '../../button';
 import Guide from '../';
-import GuidePage from '../page';
 
 export default { title: 'Components/Guide', component: Guide };
 
@@ -33,16 +32,20 @@ const ModalExample = ( { numberOfPages, ...props } ) => {
 				Open Guide
 			</Button>
 			{ isOpen && (
-				<Guide { ...props } onFinish={ closeGuide }>
-					{ times( numberOfPages, ( page ) => (
-						<GuidePage key={ page }>
-							<h1>
-								Page { page + 1 } of { numberOfPages }
-							</h1>
-							<p>{ loremIpsum }</p>
-						</GuidePage>
-					) ) }
-				</Guide>
+				<Guide
+					{ ...props }
+					onFinish={ closeGuide }
+					pages={ times( numberOfPages, ( page ) => ( {
+						content: (
+							<>
+								<h1>
+									Page { page + 1 } of { numberOfPages }
+								</h1>
+								<p>{ loremIpsum }</p>
+							</>
+						),
+					} ) ) }
+				/>
 			) }
 		</>
 	);

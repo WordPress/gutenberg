@@ -5,7 +5,7 @@
 	registerBlockType( 'test/test-meta-attribute-block-early', {
 		title: 'Test Meta Attribute Block (Early Registration)',
 		icon: 'star',
-		category: 'common',
+		category: 'text',
 
 		attributes: {
 			content: {

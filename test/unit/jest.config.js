@@ -30,9 +30,14 @@ module.exports = {
 		'<rootDir>/.*/build/',
 		'<rootDir>/.*/build-module/',
 		'<rootDir>/.+.native.js$',
+		'/packages/react-native-*',
 	],
 	transform: {
 		'^.+\\.[jt]sx?$': '<rootDir>/test/unit/scripts/babel-transformer.js',
 	},
 	snapshotSerializers: [ 'enzyme-to-json/serializer', 'jest-emotion' ],
+	watchPlugins: [
+		'jest-watch-typeahead/filename',
+		'jest-watch-typeahead/testname',
+	],
 };
