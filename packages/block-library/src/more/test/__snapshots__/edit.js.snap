@@ -16,7 +16,7 @@ exports[`core/more/edit should match snapshot when noTeaser is false 1`] = `
     className="wp-block-more"
   >
     <input
-      aria-label="Read more link label"
+      aria-label="Read more link text"
       onChange={[Function]}
       onKeyDown={[Function]}
       placeholder="Read more"
@@ -48,7 +48,7 @@ exports[`core/more/edit should match snapshot when noTeaser is true 1`] = `
     className="wp-block-more"
   >
     <input
-      aria-label="Read more link label"
+      aria-label="Read more link text"
       onChange={[Function]}
       onKeyDown={[Function]}
       placeholder="Read more"

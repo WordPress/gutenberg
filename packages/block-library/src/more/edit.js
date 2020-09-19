@@ -54,7 +54,7 @@ export default function MoreEdit( {
 			</InspectorControls>
 			<div className="wp-block-more">
 				<input
-					aria-label={ __( 'Read more link label' ) }
+					aria-label={ __( 'Read more link text' ) }
 					type="text"
 					value={ customText }
 					placeholder={ DEFAULT_TEXT }
