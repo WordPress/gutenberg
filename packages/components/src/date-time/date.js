@@ -14,7 +14,7 @@ import { __, _n } from '@wordpress/i18n';
 /**
  * Module Constants
  */
-const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+const TIMEZONELESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 const isRTL = () => document.documentElement.dir === 'rtl';
 
 const DatePickerHeader = ( { date, decreaseMonth, increaseMonth ,locale } ) => (
@@ -70,35 +70,58 @@ const renderDayContents = ( day, date, events ) => {
 	</>;
 };
 
+const handleChange = ( newDate, { currentDate, onChange } ) => {
+	// If currentDate is null, use now as momentTime to designate hours, minutes, seconds.
+	const momentDate = new Date( currentDate ?? null );
+	const momentTime = {
+		hours: momentDate.getHours(),
+		minutes: momentDate.getMinutes(),
+		seconds: 0,
+		milliseconds: 0,
+	};
+
+	onChange( format( set( newDate, momentTime ), TIMEZONELESS_FORMAT ) );
+};
+
 const DatePicker = ( {
-	onChange,
 	onMonthChange,
 	currentDate,
 	isInvalidDate,
 	locale,
 	events,
 } ) => {
-	const selected = typeof currentDate === 'string' ? new Date( currentDate ) : currentDate;
+	const currentDateObj =
+		currentDate instanceof Date
+			? currentDate
+			: new Date( currentDate ?? null );
+
 	const highlightDates = events?.length ? map( events, 'date' ) : [];
 	return (
-		<ReactDatePicker
-			calendarClassName={ 'components-datetime__date' }
-			selected={ selected }
-			onChange={ onChange }
-			inline
-			renderCustomHeader={ ( props ) =>
-				<DatePickerHeader { ...props } locale={ locale } />
-			}
-			renderDayContents={ ( ...props ) =>
-				renderDayContents( ...props, events )
-			}
-			useWeekdaysShort={ true }
-			locale={ locale }
-			highlightDates={ highlightDates }
-			onMonthChange={ onMonthChange }
-		/>
+		<div
+			className="components-datetime__date"
+			dir={ isRTL() ? 'rtl' : 'ltr' }
+		>
+			<ReactDatePicker
+				calendarClassName={ 'components-datetime__date' }
+				selected={ currentDateObj }
+				onChange={ ( newDate ) => handleChange( newDate, props ) }
+				filterDate={ ( date ) => {
+					return ! isInvalidDate || ! isInvalidDate( date );
+				} }
+				inline
+				renderCustomHeader={ ( props ) =>
+					<DatePickerHeader { ...props } locale={ locale } />
+				}
+				renderDayContents={ ( ...props ) =>
+					renderDayContents( ...props, events )
+				}
+				useWeekdaysShort={ true }
+				locale={ locale }
+				highlightDates={ highlightDates }
+				onMonthChange={ onMonthChange }
+			/>
+		</div>
 	);
 };
 
 export default DatePicker;
-

@@ -35,7 +35,7 @@ export class DateTimePicker extends Component {
 
 	render() {
 		const {
-			currentDate,
+			currentDate = new Date(),
 			is12Hour,
 			isInvalidDate,
 			onMonthChange,
