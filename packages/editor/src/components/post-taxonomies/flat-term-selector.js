@@ -365,7 +365,9 @@ class FlatTermSelector extends Component {
 						{ tagsButtonLabel }
 					</Button>
 					{ ! this.state.areRelatedTermsHidden ? (
+						/* eslint-disable jsx-a11y/no-redundant-roles */
 						<ul
+							role="list"
 							className="editor-post-taxonomies__flat-terms-related-list"
 						>
 							{ this.state.relatedTerms.map( ( term ) => (
@@ -388,6 +390,7 @@ class FlatTermSelector extends Component {
 						</ul>
 					) : (
 						<ul></ul>
+						/* eslint-enable jsx-a11y/no-redundant-roles */
 					) }
 				</div>
 			</div>
