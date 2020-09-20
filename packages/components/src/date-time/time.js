@@ -10,7 +10,12 @@ import format from 'date-fns/format';
 /**
  * WordPress dependencies
  */
-import { createElement, useMemo } from '@wordpress/element';
+import {
+	createElement,
+	useMemo,
+	useEffect,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -37,6 +42,12 @@ const TIMEZONELESS_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
 function IntegerValidatedField( { as, value, onUpdate, ...props } ) {
 	const element = as ?? 'input';
 
+	const [ rawValue, setRawValue ] = useState( value );
+
+	useEffect( () => {
+		setRawValue( value );
+	}, [ value ] );
+
 	const handleUpdate = ( event ) => {
 		const { target } = event;
 
@@ -53,7 +64,7 @@ function IntegerValidatedField( { as, value, onUpdate, ...props } ) {
 			( typeof props.min !== 'undefined' && parsedValue < props.min )
 		) {
 			// If validation failed, reset the value to the previous valid value.
-			target.value = value;
+			setRawValue( value );
 		} else if ( onUpdate ) {
 			// Otherwise, it's valid, call onUpdate.
 			onUpdate( target.name, parsedValue );
@@ -63,21 +74,20 @@ function IntegerValidatedField( { as, value, onUpdate, ...props } ) {
 	const elementProps =
 		'input' === element
 			? {
-					defaultValue: value,
 					onBlur: handleUpdate,
 					onKeyDown: ( event ) => {
 						if ( 'Enter' === event.key ) {
 							handleUpdate( event );
 						}
 					},
+					onChange: ( e ) => setRawValue( e.target.value ),
 			  }
 			: {
-					value,
 					onChange: handleUpdate,
 			  };
 
 	return createElement( element, {
-		key: props.name + value,
+		value: rawValue,
 		...elementProps,
 		...props,
 	} );
