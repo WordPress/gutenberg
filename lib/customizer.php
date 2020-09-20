@@ -70,8 +70,8 @@ function gutenberg_customize_register( $wp_customize ) {
 			$wp_customize->add_section(
 				$section_id,
 				array(
-					'title' => $sidebar_widget[ 'name' ],
-					'panel' => 'gutenberg_widget_blocks'
+					'title' => $sidebar_widget['name'],
+					'panel' => 'gutenberg_widget_blocks',
 				)
 			);
 
@@ -91,7 +91,7 @@ function gutenberg_customize_register( $wp_customize ) {
 					$wp_customize,
 					$widget_id,
 					array(
-						'section' => $section_id,
+						'section'  => $section_id,
 						'settings' => 'gutenberg_widget_blocks_' . $widget_id,
 					)
 				)

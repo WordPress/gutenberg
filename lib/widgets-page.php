@@ -23,7 +23,7 @@ function the_gutenberg_widgets( $page = 'appearance_page_gutenberg-widgets', $wi
 			: '';
 		?>
 		"
-		<?php echo $widget_id ? 'data-widget-id="' . $widget_id . '"' : '' ?>
+		<?php echo $widget_id ? 'data-widget-id="' . $widget_id . '"' : ''; ?>
 	>
 	</div>
 	<?php
@@ -34,7 +34,8 @@ function the_gutenberg_widgets( $page = 'appearance_page_gutenberg-widgets', $wi
  *
  * @since 5.2.0
  *
- * @param string $hook Page.
+ * @param string $hook      Page.
+ * @param string $widget_id The widget ID.
  */
 function gutenberg_widgets_init( $hook, $widget_id = '' ) {
 	if ( 'widgets.php' === $hook ) {
