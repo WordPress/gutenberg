@@ -33,7 +33,7 @@ function Example() {
 	const [ delayedBadge, setDelayedBadge ] = useState();
 	useEffect( () => {
 		const timeout = setTimeout( () => setDelayedBadge( 2 ), 1500 );
-		return () => clearInterval( timeout );
+		return () => clearTimeout( timeout );
 	} );
 
 	// Mock navigation link
