@@ -57,6 +57,7 @@ export default function DocumentActions( { documentTitle } ) {
 	const editTitle = ( title ) => {
 		editEntityRecord( 'postType', 'page', page.id, {
 			title,
+			slug: title,
 		} );
 	};
 
@@ -111,7 +112,7 @@ export default function DocumentActions( { documentTitle } ) {
 							>
 								{ /* TODO: Replace inline styles */ }
 								<span style={ { marginRight: '12px' } }>
-									URL
+									Name
 								</span>
 								{ /* TODO: Don't allow input when there is no page context */ }
 								<input
