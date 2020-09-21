@@ -1,6 +1,6 @@
 .components-panel {
 	background: $white;
-	border: $border-width solid $gray-100;
+	border: $border-width solid $gray-200;
 
 	> .components-panel__header:first-child,
 	> .components-panel__body:first-child {
@@ -18,8 +18,8 @@
 }
 
 .components-panel__body {
-	border-top: $border-width solid $gray-100;
-	border-bottom: $border-width solid $gray-100;
+	border-top: $border-width solid $gray-200;
+	border-bottom: $border-width solid $gray-200;
 
 	h3 {
 		margin: 0 0 0.5em;
