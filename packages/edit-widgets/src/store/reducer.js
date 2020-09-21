@@ -17,6 +17,13 @@ export function mapping( state, action ) {
 	if ( type === 'SET_WIDGET_TO_CLIENT_ID_MAPPING' ) {
 		return rest.mapping;
 	}
+	if ( type === 'SET_WIDGET_ID_FOR_CLIENT_ID' ) {
+		const newMapping = {
+			...state,
+		};
+		newMapping[ action.widgetId ] = action.clientId;
+		return newMapping;
+	}
 
 	return state || {};
 }

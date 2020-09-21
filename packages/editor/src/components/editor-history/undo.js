@@ -19,6 +19,7 @@ function EditorHistoryUndo( props, ref ) {
 			{ ...props }
 			ref={ ref }
 			icon={ undoIcon }
+			/* translators: button label text should, if possible, be under 16 characters. */
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }
 			// If there are no undo levels we don't want to actually disable this

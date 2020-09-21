@@ -70,9 +70,7 @@ public class Gutenberg: NSObject {
 
         let capabilities = dataSource.gutenbergCapabilities()
         if capabilities.isEmpty == false {
-            initialProps["capabilities"] = Dictionary<String, Bool>(uniqueKeysWithValues: capabilities.map { key, value in
-                (key.rawValue, value)
-            })
+            initialProps["capabilities"] = capabilities.toJSPayload()
         }
 
         let editorTheme = dataSource.gutenbergEditorTheme()
@@ -117,6 +115,11 @@ public class Gutenberg: NSObject {
 
     public func replace(block: Block) {
         sendEvent(.replaceBlock, body: ["html": block.content, "clientId": block.id])
+    }
+
+    public func updateCapabilities() {
+        let capabilites = dataSource.gutenbergCapabilities()
+        sendEvent(.updateCapabilities, body: capabilites.toJSPayload())
     }
 
     private func sendEvent(_ event: RNReactNativeGutenbergBridge.EventName, body: [String: Any]? = nil) {
@@ -231,5 +234,13 @@ public extension Gutenberg.MediaSource {
         self.id = id
         self.label = label
         self.types = Set(types)
+    }
+}
+
+private extension Dictionary where Key == Capabilities, Value == Bool {
+    func toJSPayload() -> [String: Bool] {
+        Dictionary<String, Bool>(uniqueKeysWithValues: self.map { key, value in
+            (key.rawValue, value)
+        })
     }
 }

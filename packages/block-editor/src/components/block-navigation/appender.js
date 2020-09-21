@@ -1,9 +1,15 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -20,6 +26,19 @@ export default function BlockNavigationAppender( {
 	terminatedLevels,
 	path,
 } ) {
+	const isDragging = useSelect(
+		( select ) => {
+			const { isBlockBeingDragged, isAncestorBeingDragged } = select(
+				'core/block-editor'
+			);
+
+			return (
+				isBlockBeingDragged( parentBlockClientId ) ||
+				isAncestorBeingDragged( parentBlockClientId )
+			);
+		},
+		[ parentBlockClientId ]
+	);
 	const instanceId = useInstanceId( BlockNavigationAppender );
 	const descriptionId = `block-navigation-appender-row__description_${ instanceId }`;
 
@@ -32,6 +51,7 @@ export default function BlockNavigationAppender( {
 
 	return (
 		<BlockNavigationLeaf
+			className={ classnames( { 'is-dragging': isDragging } ) }
 			level={ level }
 			position={ position }
 			rowCount={ rowCount }

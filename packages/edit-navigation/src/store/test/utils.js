@@ -216,6 +216,8 @@ describe( 'computeCustomizedAttribute', () => {
 					label: 'wp.org',
 					opensInNewTab: false,
 					url: 'http://wp.org',
+					className: 'block classnames',
+					rel: 'external',
 				},
 				clientId: 'navigation-link-block-client-id-1',
 				innerBlocks: [],
@@ -227,6 +229,8 @@ describe( 'computeCustomizedAttribute', () => {
 					label: 'wp.com',
 					opensInNewTab: false,
 					url: 'http://wp.com',
+					className: '',
+					rel: '',
 				},
 				clientId: 'navigation-link-block-client-id-2',
 				innerBlocks: [],
@@ -271,7 +275,7 @@ describe( 'computeCustomizedAttribute', () => {
 		).toEqual( {
 			'nav_menu_item[100]': {
 				_invalid: false,
-				classes: '',
+				classes: [ 'block', 'classnames' ],
 				id: 100,
 				menu_item_parent: 0,
 				menu_order: 1,
@@ -282,11 +286,11 @@ describe( 'computeCustomizedAttribute', () => {
 				title: 'wp.org',
 				type: 'custom',
 				url: 'http://wp.org',
-				xfn: '',
+				xfn: [ 'external' ],
 			},
 			'nav_menu_item[101]': {
 				_invalid: false,
-				classes: '',
+				classes: [ '' ],
 				id: 101,
 				menu_item_parent: 0,
 				menu_order: 2,
@@ -297,7 +301,7 @@ describe( 'computeCustomizedAttribute', () => {
 				title: 'wp.com',
 				type: 'custom',
 				url: 'http://wp.com',
-				xfn: '',
+				xfn: [ '' ],
 			},
 		} );
 	} );

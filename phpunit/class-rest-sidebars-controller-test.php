@@ -274,7 +274,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * Test a GET request in edit context. In particular, we expect rendered_form to be served correctly.
 	 */
 	public function test_get_items_active_sidebar_with_widgets_edit_context() {
 		$this->setup_widget(

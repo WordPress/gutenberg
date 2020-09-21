@@ -154,6 +154,10 @@ export function computeCustomizedAttribute(
 				title: block.attributes?.label,
 				original_title: '',
 				url: block.attributes.url,
+				description: block.attributes.description,
+				xfn: block.attributes.rel?.split( ' ' ),
+				classes: block.attributes.className?.split( ' ' ),
+				attr_title: block.attributes.title,
 			};
 		} else {
 			attributes = {
@@ -166,8 +170,6 @@ export function computeCustomizedAttribute(
 			...menuItem,
 			...attributes,
 			position,
-			classes: ( menuItem.classes || [] ).join( ' ' ),
-			xfn: ( menuItem.xfn || [] ).join( ' ' ),
 			nav_menu_term_id: menuId,
 			menu_item_parent: parentId,
 			status: 'publish',

@@ -33,6 +33,20 @@ Determines if the unit `<select>` is tabbable.
 -   Required: No
 -   Default: `true`
 
+### label
+
+If this property is added, a label will be generated using label property as the content.
+
+-   Type: `String`
+-   Required: No
+
+### labelPosition
+
+The position of the label (`top`, `side`, or `bottom`).
+
+-   Type: `String`
+-   Required: No
+
 ### onChange
 
 Callback when the `value` changes.

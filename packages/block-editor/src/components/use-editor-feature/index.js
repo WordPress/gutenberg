@@ -14,10 +14,35 @@ import { useSelect } from '@wordpress/data';
 import { useBlockEditContext } from '../block-edit';
 
 const deprecatedFlags = {
-	'colors.custom': ( settings ) =>
+	'color.palette': ( settings ) =>
+		settings.colors === undefined ? undefined : settings.colors,
+	'color.gradients': ( settings ) =>
+		settings.gradients === undefined ? undefined : settings.gradients,
+	'color.custom': ( settings ) =>
 		settings.disableCustomColors === undefined
 			? undefined
 			: ! settings.disableCustomColors,
+	'color.customGradient': ( settings ) =>
+		settings.disableCustomGradients === undefined
+			? undefined
+			: ! settings.disableCustomGradients,
+	'typography.customFontSize': ( settings ) =>
+		settings.disableCustomFontSizes === undefined
+			? undefined
+			: ! settings.disableCustomFontSizes,
+	'typography.customLineHeight': ( settings ) =>
+		settings.enableCustomLineHeight,
+	'spacing.units': ( settings ) => {
+		if ( settings.enableCustomUnits === undefined ) {
+			return;
+		}
+
+		if ( settings.enableCustomUnits === true ) {
+			return [ 'px', 'em', 'rem', 'vh', 'vw' ];
+		}
+
+		return settings.enableCustomUnits;
+	},
 };
 
 /**
@@ -38,18 +63,23 @@ export default function useEditorFeature( featurePath ) {
 
 	const setting = useSelect(
 		( select ) => {
-			const path = `__experimentalFeatures.${ featurePath }`;
-			const { getSettings } = select( 'core/block-editor' );
-			const settings = getSettings();
-
+			// 1 - Use deprecated settings, if available.
+			const settings = select( 'core/block-editor' ).getSettings();
 			const deprecatedSettingsValue = deprecatedFlags[ featurePath ]
 				? deprecatedFlags[ featurePath ]( settings )
 				: undefined;
-
 			if ( deprecatedSettingsValue !== undefined ) {
 				return deprecatedSettingsValue;
 			}
-			return get( settings, path );
+
+			// 2 - Use __experimental features otherwise.
+			// We cascade to the global value if the block one is not available.
+			//
+			// TODO: make it work for blocks that define multiple selectors
+			// such as core/heading or core/post-title.
+			const globalPath = `__experimentalFeatures.global.${ featurePath }`;
+			const blockPath = `__experimentalFeatures.${ blockName }.${ featurePath }`;
+			return get( settings, blockPath ) ?? get( settings, globalPath );
 		},
 		[ blockName, featurePath ]
 	);

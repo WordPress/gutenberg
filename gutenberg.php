@@ -5,7 +5,7 @@
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
  * Requires at least: 5.3
  * Requires PHP: 5.6
- * Version: 8.8.0
+ * Version: 9.0.0
  * Author: Gutenberg Team
  * Text Domain: gutenberg
  *
@@ -26,8 +26,6 @@ gutenberg_pre_init();
  * @since 0.1.0
  */
 function gutenberg_menu() {
-	global $submenu;
-
 	add_menu_page(
 		'Gutenberg',
 		'Gutenberg',
@@ -45,17 +43,18 @@ function gutenberg_menu() {
 		'gutenberg'
 	);
 
+	if ( gutenberg_use_widgets_block_editor() ) {
+		add_theme_page(
+			__( 'Widgets', 'gutenberg' ),
+			__( 'Widgets', 'gutenberg' ),
+			'edit_theme_options',
+			'gutenberg-widgets',
+			'the_gutenberg_widgets'
+		);
+		remove_submenu_page( 'themes.php', 'widgets.php' );
+	}
+
 	if ( get_option( 'gutenberg-experiments' ) ) {
-		if ( array_key_exists( 'gutenberg-widget-experiments', get_option( 'gutenberg-experiments' ) ) ) {
-			add_submenu_page(
-				'gutenberg',
-				__( 'Widgets (beta)', 'gutenberg' ),
-				__( 'Widgets (beta)', 'gutenberg' ),
-				'edit_theme_options',
-				'gutenberg-widgets',
-				'the_gutenberg_widgets'
-			);
-		}
 		if ( array_key_exists( 'gutenberg-navigation', get_option( 'gutenberg-experiments' ) ) ) {
 			add_submenu_page(
 				'gutenberg',
@@ -79,16 +78,19 @@ function gutenberg_menu() {
 	}
 
 	if ( current_user_can( 'edit_posts' ) ) {
-		$submenu['gutenberg'][] = array(
+		add_submenu_page(
+			'gutenberg',
+			__( 'Support', 'gutenberg' ),
 			__( 'Support', 'gutenberg' ),
 			'edit_posts',
-			__( 'https://wordpress.org/support/plugin/gutenberg', 'gutenberg' ),
+			__( 'https://wordpress.org/support/plugin/gutenberg/', 'gutenberg' )
 		);
-
-		$submenu['gutenberg'][] = array(
+		add_submenu_page(
+			'gutenberg',
+			__( 'Documentation', 'gutenberg' ),
 			__( 'Documentation', 'gutenberg' ),
 			'edit_posts',
-			'https://developer.wordpress.org/block-editor/',
+			'https://developer.wordpress.org/block-editor/'
 		);
 	}
 
@@ -101,7 +103,7 @@ function gutenberg_menu() {
 		'the_gutenberg_experiments'
 	);
 }
-add_action( 'admin_menu', 'gutenberg_menu' );
+add_action( 'admin_menu', 'gutenberg_menu', 9 );
 
 /**
  * Display a version notice and deactivate the Gutenberg plugin.
@@ -182,45 +184,4 @@ function register_site_icon_url( $response ) {
 
 add_filter( 'rest_index', 'register_site_icon_url' );
 
-/**
- * Registers the WP_Widget_Block widget
- */
-function gutenberg_register_widgets() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ) ) {
-		return;
-	}
-
-	register_widget( 'WP_Widget_Block' );
-	// By default every widget on widgets.php is wrapped with a <form>.
-	// This means that you can sometimes end up with invalid HTML, e.g. when
-	// one of the widgets is a Search block.
-	//
-	// To fix the problem, let's add a filter that moves the form below the actual
-	// widget content.
-	global $pagenow;
-	if ( 'widgets.php' === $pagenow ) {
-		add_filter(
-			'dynamic_sidebar_params',
-			'gutenberg_override_sidebar_params_for_block_widget'
-		);
-	}
-}
-
-/**
- * Overrides dynamic_sidebar_params to make sure Blocks are not wrapped in <form> tag.
- *
- * @param  array $arg Dynamic sidebar params.
- * @return array Updated dynamic sidebar params.
- */
-function gutenberg_override_sidebar_params_for_block_widget( $arg ) {
-	if ( 'Block' === $arg[0]['widget_name'] ) {
-		$arg[0]['before_form']           = '';
-		$arg[0]['before_widget_content'] = '<div class="widget-content">';
-		$arg[0]['after_widget_content']  = '</div><form class="block-widget-form">';
-		$arg[0]['after_form']            = '</form>';
-	}
-
-	return $arg;
-}
-
-add_action( 'widgets_init', 'gutenberg_register_widgets' );
+add_theme_support( 'widgets-block-editor' );
