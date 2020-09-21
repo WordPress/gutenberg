@@ -110,7 +110,6 @@ function BlockListBlock( {
 		},
 		[ clientId ]
 	);
-
 	const { removeBlock } = useDispatch( 'core/block-editor' );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
