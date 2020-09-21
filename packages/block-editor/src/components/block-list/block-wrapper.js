@@ -133,15 +133,13 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 		}
 
 		// Find all tabbables within node.
-		const textInputs = focus.tabbable
-			.find( ref.current )
-			.filter( isTextField )
-			// Exclude inner blocks and block appenders
-			.filter(
-				( node ) =>
-					isInsideRootBlock( ref.current, node ) &&
-					! node.closest( '.block-list-appender' )
-			);
+		const textInputs = focus.tabbable.find( ref.current ).filter(
+			( node ) =>
+				isTextField( node ) &&
+				// Exclude inner blocks and block appenders
+				isInsideRootBlock( ref.current, node ) &&
+				! node.closest( '.block-list-appender' )
+		);
 
 		// If reversed (e.g. merge via backspace), use the last in the set of
 		// tabbables.

@@ -55,7 +55,7 @@ function Navigation( {
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 
-	const blockProps = useBlockWrapperProps( { ref } );
+	const blockProps = useBlockWrapperProps();
 
 	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
 		[
