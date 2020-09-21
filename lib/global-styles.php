@@ -411,7 +411,7 @@ function gutenberg_experimental_global_styles_get_support_keys() {
  * @return array Presets structure
  */
 function gutenberg_experimental_global_styles_get_presets_structure() {
-	return array(
+	$structure = array(
 		'color'    => array(
 			'path' => array( 'color', 'palette' ),
 			'key'  => 'color',
@@ -425,6 +425,13 @@ function gutenberg_experimental_global_styles_get_presets_structure() {
 			'key'  => 'size',
 		),
 	);
+
+	/**
+	 * Filter the global styles presets structure.
+	 *
+	 * @param array $structure The structure array.
+	 */
+	return apply_filters( 'global_styles_get_presets_structure', $structure );
 }
 
 /**
@@ -531,7 +538,12 @@ function gutenberg_experimental_global_styles_get_block_data() {
 		}
 	}
 
-	return $block_data;
+	/**
+	 * Filter the global styles array for blocks.
+	 *
+	 * @param array $block_data The block-data array.
+	 */
+	return apply_filters( 'global_styles_get_block_data', $block_data );
 }
 
 /**
@@ -617,7 +629,12 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 		$stylesheet .= 'a{color:var(--wp--style--color--link, #00e);}';
 	}
 
-	return $stylesheet;
+	/**
+	 * Filter the generated styles.
+	 *
+	 * @param string $stylesheet The generated CSS.
+	 */
+	return apply_filters( 'global_styles_get_stylesheet', $stylesheet );
 }
 
 /**
