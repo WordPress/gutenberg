@@ -87,12 +87,7 @@ function gutenberg_widgets_init( $hook ) {
 		gutenberg_get_legacy_widget_settings()
 	);
 
-	list( $color_palette, ) = (array) get_theme_support( 'editor-color-palette' );
-	list( $font_sizes, )    = (array) get_theme_support( 'editor-font-sizes' );
-
-	if ( false !== $color_palette ) {
-		$settings['colors'] = $color_palette;
-	}
+	list( $font_sizes, ) = (array) get_theme_support( 'editor-font-sizes' );
 
 	if ( false !== $font_sizes ) {
 		$settings['fontSizes'] = $font_sizes;

@@ -17,7 +17,7 @@ import {
  */
 import './store';
 import './hooks';
-import * as legacyWidget from './blocks/legacy-widget';
+import { create as createLegacyWidget } from './blocks/legacy-widget';
 import EditWidgetsInitializer from './components/edit-widgets-initializer';
 import CustomizerEditWidgetsInitializer from './components/customizer-edit-widgets-initializer';
 
@@ -29,9 +29,9 @@ import CustomizerEditWidgetsInitializer from './components/customizer-edit-widge
  */
 export function initialize( id, settings ) {
 	registerCoreBlocks();
-	registerBlock( legacyWidget );
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
+		registerBlock( createLegacyWidget( settings ) );
 	}
 	render(
 		<EditWidgetsInitializer settings={ settings } />,
@@ -49,6 +49,7 @@ export function customizerInitialize( id, settings ) {
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
+		registerBlock( createLegacyWidget( settings ) );
 	}
 	render(
 		<CustomizerEditWidgetsInitializer settings={ settings } />,
