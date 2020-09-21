@@ -41,6 +41,7 @@ export class DateTimePicker extends Component {
 			onMonthChange,
 			onChange,
 			events,
+			locale,
 		} = this.props;
 
 		return (
@@ -58,6 +59,7 @@ export class DateTimePicker extends Component {
 							isInvalidDate={ isInvalidDate }
 							onMonthChange={ onMonthChange }
 							events={ events }
+							locale={ locale }
 						/>
 					</>
 				) }

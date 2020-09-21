@@ -75,6 +75,7 @@ export function PostSchedule() {
 			.join( '' ) // Reverse the string and test for "a" not followed by a slash
 	);
 
+	const siteLocale = settings?.l10n?.locale || 'en';
 	return (
 		<DateTimePicker
 			key="date-time-picker"
@@ -83,6 +84,7 @@ export function PostSchedule() {
 			onMonthChange={ setCurrentMonthHandler }
 			is12Hour={ is12HourTime }
 			events={ events }
+			locale={ siteLocale }
 		/>
 	);
 }
