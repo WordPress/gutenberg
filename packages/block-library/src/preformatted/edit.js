@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 
 export default function PreformattedEdit( {
@@ -15,10 +15,11 @@ export default function PreformattedEdit( {
 	style,
 } ) {
 	const { content } = attributes;
+	const blockWrapperProps = useBlockWrapperProps( { className, style } );
 
 	return (
 		<RichText
-			tagName={ Block.pre }
+			tagName="pre"
 			identifier="content"
 			preserveWhiteSpace
 			value={ content }
@@ -28,9 +29,8 @@ export default function PreformattedEdit( {
 				} );
 			} }
 			placeholder={ __( 'Write preformatted text…' ) }
-			className={ className }
-			style={ style }
 			onMerge={ mergeBlocks }
+			{ ...blockWrapperProps }
 		/>
 	);
 }
