@@ -1,7 +1,7 @@
-IconButton
+InserterButton
 =============================
 
-Proved the IconButton style button for the mobile editor used in the inserter. 
+InserterButton is a typo of button component. 
 
 ## Usage
 
@@ -11,7 +11,7 @@ function render() {
 	return (
 		<View>
 			<Text>Some rendered content here</Text>
-			<IconButton item={ { title: "Short Text", icon: <SVG></SVG> } } onSelect={ function( item ) { console.log( 'selected' ); } } />
+			<InserterButton item={ { title: "Short Text", icon: <SVG></SVG> } } onSelect={ function( item ) { console.log( 'selected' ); } } />
 		</View>
 	);
 }
@@ -37,7 +37,7 @@ The button width.
 * **Type:** `Function`
 * **Required** `true`
 
-The function that is called once the IconButton has been selected.
+The function that is called once the InserterButton has been selected.
 
 ### `item`
 * **Type:** `Object`
@@ -47,7 +47,7 @@ The object that gets selected.
 
 ## Examples
 
-<IconButton
+<InserterButton
     item={ item }
     itemWidth={ itemWidth }
     maxWidth={ maxWidth }

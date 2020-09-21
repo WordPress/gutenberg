@@ -21,7 +21,7 @@ import {
 	PanelBody,
 	BottomSheet,
 	FooterMessageControl,
-	IconButton,
+	InserterButton,
 } from '@wordpress/components';
 import { Icon, close } from '@wordpress/icons';
 import { useMemo } from '@wordpress/element';
@@ -103,7 +103,7 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 			>
 				{ variations.map( ( v ) => {
 					return (
-						<IconButton
+						<InserterButton
 							item={ v }
 							key={ v.name }
 							onSelect={ () => onVariationSelect( v ) }

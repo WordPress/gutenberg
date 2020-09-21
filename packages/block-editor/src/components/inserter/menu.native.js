@@ -20,8 +20,8 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import {
 	BottomSheet,
 	BottomSheetConsumer,
-	IconButton,
-	iconButtonStyles,
+	InserterButton,
+	inserterButtonStyles,
 } from '@wordpress/components';
 
 /**
@@ -66,8 +66,8 @@ export class InserterMenu extends Component {
 		const {
 			paddingLeft: itemPaddingLeft,
 			paddingRight: itemPaddingRight,
-		} = iconButtonStyles.modalItem;
-		const { width: itemWidth } = iconButtonStyles.modalIconWrapper;
+		} = inserterButtonStyles.modalItem;
+		const { width: itemWidth } = inserterButtonStyles.modalIconWrapper;
 		return itemWidth + itemPaddingLeft + itemPaddingRight;
 	}
 
@@ -116,7 +116,7 @@ export class InserterMenu extends Component {
 		const { itemWidth, maxWidth } = this.state;
 		const { onSelect } = this.props;
 		return (
-			<IconButton
+			<InserterButton
 				item={ item }
 				itemWidth={ itemWidth }
 				maxWidth={ maxWidth }

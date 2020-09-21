@@ -16,7 +16,7 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './style.scss';
 
-export const iconButtonStyles = {
+export const inserterButtonStyles = {
 	modalItem: styles.modalItem,
 	modalIconWrapper: styles.modalIconWrapper,
 };
