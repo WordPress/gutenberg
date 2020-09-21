@@ -1,6 +1,6 @@
 # Copy Handler
 
-The `CopyHandler` component handles the behaviors of the editor when the user copies or cuts a block or a selection of blocks.
+The `CopyHandler` component handles the copy, cut and paste events of its children blocks. It handles multiple selection of blocks as well.
 
 Concretely, it handles the display of success messages and takes care of copying the block to the clipboard using the [raw handling API](https://github.com/WordPress/gutenberg/tree/master/packages/blocks/src/api/raw-handling).
 
@@ -27,15 +27,15 @@ const MyCopyHandler = () => (
 );
 ```
 
-_Note:_ The `CopyHandler` only catch cut/copy events coming from its props.children. In this example, the child is the `BlockList` component.
+_Note:_ The `CopyHandler` only catch cut, copy and paste events coming from its props.children. In this example, the child is the `BlockList` component.
 
 ### Props
 
 ### `children`
 
--   **Type:** `Object`
+-  Type: `Element`
 
-An object that contains the component children.
+Children are passed as children of `CopyHandler`.
 
 ## Related components
 
