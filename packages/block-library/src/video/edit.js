@@ -18,7 +18,7 @@ import {
 	MediaUploadCheck,
 	MediaReplaceFlow,
 	RichText,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -110,9 +110,11 @@ function VideoEdit( {
 		noticeOperations.createErrorNotice( message );
 	}
 
+	const blockWrapperProps = useBlockWrapperProps();
+
 	if ( ! src ) {
 		return (
-			<Block.div>
+			<div { ...blockWrapperProps }>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
 					onSelect={ onSelectVideo }
@@ -123,7 +125,7 @@ function VideoEdit( {
 					notices={ noticeUI }
 					onError={ onUploadError }
 				/>
-			</Block.div>
+			</div>
 		);
 	}
 
@@ -207,7 +209,7 @@ function VideoEdit( {
 					</MediaUploadCheck>
 				</PanelBody>
 			</InspectorControls>
-			<Block.figure>
+			<figure { ...blockWrapperProps }>
 				{ /*
 					Disable the video tag so the user clicking on it won't play the
 					video when the controls are enabled.
@@ -234,7 +236,7 @@ function VideoEdit( {
 						}
 					/>
 				) }
-			</Block.figure>
+			</figure>
 		</>
 	);
 }
