@@ -2,13 +2,20 @@
 	width: 100%;
 	position: relative;
 	justify-content: left;
+}
 
-	span {
-		display: block;
-		width: 45%;
-	}
+.edit-post-post-schedule__status {
+	padding-right: 5px;
+	display: inline-flex;
+}
+
+.components-dropdown {
+	display: inline-flex;
+	flex-grow: 2;
 }
 
 .components-button.edit-post-post-schedule__toggle {
+	display: block;
+	width: 100%;
 	text-align: right;
 }

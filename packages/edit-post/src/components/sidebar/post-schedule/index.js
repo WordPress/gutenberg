@@ -13,7 +13,7 @@ export function PostSchedule() {
 	return (
 		<PostScheduleCheck>
 			<PanelRow className="edit-post-post-schedule">
-				<span>{ __( 'Publish' ) }</span>
+				<span className="edit-post-post-schedule__status">{ __( 'Publish' ) }</span>
 				<Dropdown
 					position="bottom left"
 					contentClassName="edit-post-post-schedule__dialog"
