@@ -27,7 +27,7 @@ const MyCopyHandler = () => (
 );
 ```
 
-_Note:_ The `CopyHandler` only catch cut, copy and paste events coming from its props.children. In this example, the child is the `BlockList` component.
+_Note:_ The `CopyHandler` only catches cut, copy and paste events coming from its props.children. In this example, the child is the `BlockList` component.
 
 ### Props
 
