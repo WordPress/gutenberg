@@ -208,9 +208,9 @@ export default withSelect(
 			clientId
 		);
 		const widget = select( 'core/edit-widgets' ).getWidget( widgetId );
-		const widgetArea = select( 'core/edit-widgets' ).getWidgetAreaForClientId(
-			clientId
-		);
+		const widgetArea = select(
+			'core/edit-widgets'
+		).getWidgetAreaForClientId( clientId );
 		const editorSettings = select( 'core/block-editor' ).getSettings();
 		const {
 			availableLegacyWidgets,
