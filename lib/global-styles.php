@@ -765,7 +765,41 @@ function gutenberg_experimental_global_styles_get_editor_settings( $config ) {
 		} else {
 			$settings[ $context ] = $config[ $context ]['settings'];
 		}
+
+		// Adapt color presets to proper format
+		$settings[ $context ]['color']['palette'] = array();
+		$preset_colors = gutenberg_experimental_get( $config[ $context ], ['settings', 'color', 'palette'], [] );
+		foreach( $preset_colors as $preset_slug ) {
+			$settings[ $context ]['color']['palette'][] = array(
+				'name'  => $preset_slug, // TODO: fix i18n
+				'slug'  => $preset_slug,
+				'color' => $config[ $context ]['vars']['color'][ $preset_slug ],
+			);
+		}
+
+		// Adapt gradient presets to proper format
+		$settings[ $context ]['color']['gradients'] = array();
+		$preset_gradients = gutenberg_experimental_get( $config[ $context ], ['settings', 'color', 'gradients'], [] );
+		foreach( $preset_gradients as $preset_slug ) {
+			$settings[ $context ]['color']['gradients'][] = array(
+				'name'     => $preset_slug, // TODO: fix i18n
+				'slug'     => $preset_slug,
+				'gradient' => $config[ $context ]['vars']['gradient'][ $preset_slug ],
+			);
+		}
+
+		// Adapt font-size presets to proper format
+		$settings[ $context ]['typography']['fontSizes'] = array();
+		$preset_font_sizes = gutenberg_experimental_get( $config[ $context ], ['settings', 'color', 'palette'], [] );
+		foreach( $preset_font_sizes as $preset_slug ) {
+			$settings[ $context ]['typography']['fontSizes'][] = array(
+				'name' => $preset_slug, // TODO: fix i18n
+				'slug' => $preset_slug,
+				'size' => $config[ $context ]['vars']['font-size'][ $preset_slug ],
+			);
+		}
 	}
+
 	return $settings;
 }
 
