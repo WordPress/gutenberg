@@ -10,7 +10,7 @@ import { withGlobalEvents } from '@wordpress/compose';
  * Browser dependencies
  */
 
-const { FocusEvent } = window;
+const { FocusEvent, DOMParser } = window;
 
 class WpEmbedPreview extends Component {
 	constructor() {
@@ -77,16 +77,15 @@ class WpEmbedPreview extends Component {
 
 	render() {
 		const { html } = this.props;
-		const blockquote = this.node.current?.querySelector( 'blockquote' );
-		if ( blockquote ) blockquote.style.display = 'none';
-		const iframe = this.node.current?.querySelector( 'iframe' );
-		if ( iframe ) iframe.removeAttribute( 'style' );
+		const doc = new DOMParser().parseFromString( html, 'text/html' );
+		doc.querySelector( 'iframe' ).removeAttribute( 'style' );
+		doc.querySelector( 'blockquote' ).style.display = 'none';
 
 		return (
 			<div
 				ref={ this.node }
 				className="wp-block-embed__wrapper"
-				dangerouslySetInnerHTML={ { __html: html } }
+				dangerouslySetInnerHTML={ { __html: doc.body.innerHTML } }
 			/>
 		);
 	}
