@@ -98,7 +98,7 @@ function PostFeaturedImage( {
 				{ media && (
 					<div
 						id={ `editor-post-featured-image-${ featuredImageId }-describedby` }
-						className={ 'hidden' }
+						className="hidden"
 					>
 						{ media.alt_text &&
 							sprintf(
@@ -112,7 +112,7 @@ function PostFeaturedImage( {
 								__(
 									'The current image has no alternative text. The file name is: %s'
 								),
-								media.slug
+								media.media_details.sizes.full.file
 							) }
 					</div>
 				) }
