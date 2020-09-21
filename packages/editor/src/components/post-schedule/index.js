@@ -8,7 +8,6 @@ import { DateTimePicker } from '@wordpress/components';
 
 export function PostSchedule( { date, onUpdateDate } ) {
 	const onChange = ( newDate ) => {
-		console.log( { newDate } );
 		onUpdateDate( newDate );
 		document.activeElement.blur();
 	};
