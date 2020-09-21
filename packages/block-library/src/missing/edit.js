@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
+import { compose } from '@wordpress/compose';
 import { RawHTML } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { Button, withFilters } from '@wordpress/components';
 import { getBlockType, createBlock } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
 import { Warning } from '@wordpress/block-editor';
@@ -24,7 +25,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 			originalName
 		);
 		actions.push(
-			<Button key="convert" onClick={ convertToHTML } isLarge isPrimary>
+			<Button key="convert" onClick={ convertToHTML } isPrimary>
 				{ __( 'Keep as HTML' ) }
 			</Button>
 		);
@@ -46,18 +47,21 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	);
 }
 
-const MissingEdit = withDispatch( ( dispatch, { clientId, attributes } ) => {
-	const { replaceBlock } = dispatch( 'core/block-editor' );
-	return {
-		convertToHTML() {
-			replaceBlock(
-				clientId,
-				createBlock( 'core/html', {
-					content: attributes.originalUndelimitedContent,
-				} )
-			);
-		},
-	};
-} )( MissingBlockWarning );
+const MissingEdit = compose(
+	withDispatch( ( dispatch, { clientId, attributes } ) => {
+		const { replaceBlock } = dispatch( 'core/block-editor' );
+		return {
+			convertToHTML() {
+				replaceBlock(
+					clientId,
+					createBlock( 'core/html', {
+						content: attributes.originalUndelimitedContent,
+					} )
+				);
+			},
+		};
+	} ),
+	withFilters( 'editor.missingEdit' )
+)( MissingBlockWarning );
 
 export default MissingEdit;

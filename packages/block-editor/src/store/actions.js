@@ -480,10 +480,11 @@ export function insertBlock(
  * Returns an action object used in signalling that an array of blocks should
  * be inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object[]} blocks          Block objects to insert.
- * @param {?number}  index           Index at which block should be inserted.
- * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
- * @param {?boolean} updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
+ * @param {Object[]}   blocks          Block objects to insert.
+ * @param {?number}    index           Index at which block should be inserted.
+ * @param {?string}    rootClientId    Optional root client ID of block list on which to insert.
+ * @param {?boolean}   updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
+ * @param {?Object}  meta             Optional Meta values to be passed to the action object.
  *
  *  @return {Object} Action object.
  */
@@ -491,7 +492,8 @@ export function* insertBlocks(
 	blocks,
 	index,
 	rootClientId,
-	updateSelection = true
+	updateSelection = true,
+	meta
 ) {
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
@@ -517,6 +519,7 @@ export function* insertBlocks(
 			rootClientId,
 			time: Date.now(),
 			updateSelection,
+			meta,
 		};
 	}
 }

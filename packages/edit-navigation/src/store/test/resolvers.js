@@ -35,7 +35,7 @@ describe( 'getNavigationPostForMenu', () => {
 			slug: id,
 			status: 'draft',
 			type: 'page',
-			blocks: [ undefined ],
+			blocks: [],
 			meta: {
 				menuId,
 			},
@@ -76,6 +76,10 @@ describe( 'getNavigationPostForMenu', () => {
 				menu_order: 1,
 				menus: [ 1 ],
 				parent: 0,
+				classes: [ 'menu', 'classes' ],
+				xfn: [ 'nofollow' ],
+				description: 'description',
+				attr_title: 'link title',
 			},
 			{
 				id: 101,
@@ -87,6 +91,10 @@ describe( 'getNavigationPostForMenu', () => {
 				menu_order: 2,
 				menus: [ 1 ],
 				parent: 0,
+				classes: [],
+				xfn: [],
+				description: '',
+				attr_title: '',
 			},
 		];
 
@@ -113,6 +121,10 @@ describe( 'getNavigationPostForMenu', () => {
 							attributes: {
 								label: 'wp.com',
 								url: 'http://wp.com',
+								className: 'menu classes',
+								rel: 'nofollow',
+								description: 'description',
+								title: 'link title',
 							},
 							clientId: 'client-id-0',
 							innerBlocks: [],
@@ -122,6 +134,10 @@ describe( 'getNavigationPostForMenu', () => {
 							attributes: {
 								label: 'wp.org',
 								url: 'http://wp.org',
+								className: '',
+								rel: '',
+								description: '',
+								title: '',
 							},
 							clientId: 'client-id-1',
 							innerBlocks: [],

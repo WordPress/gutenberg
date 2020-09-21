@@ -148,7 +148,7 @@ function create_auto_draft_for_template_part_block( $block ) {
 				array(
 					'post_type'      => 'wp_template_part',
 					'post_status'    => array( 'publish', 'auto-draft' ),
-					'name'           => $block['attrs']['slug'],
+					'title'          => $block['attrs']['slug'],
 					'meta_key'       => 'theme',
 					'meta_value'     => $block['attrs']['theme'],
 					'posts_per_page' => 1,

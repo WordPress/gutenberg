@@ -209,6 +209,11 @@ export function ImageEdit( {
 				allowedTypes: ALLOWED_MEDIA_TYPES,
 				onError: ( message ) => {
 					noticeOperations.createErrorNotice( message );
+					setAttributes( {
+						src: undefined,
+						id: undefined,
+						url: undefined,
+					} );
 				},
 			} );
 		}
