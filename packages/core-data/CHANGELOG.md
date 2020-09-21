@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.21.0 (2020-09-03)
+
 ### New Feature
 
 - The `deleteEntityRecord` and `removeItems` actions have been added.

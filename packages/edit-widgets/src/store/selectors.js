@@ -28,6 +28,19 @@ export const getWidgets = createRegistrySelector( ( select ) => () => {
 	);
 } );
 
+/**
+ * Returns API widget data for a particular widget ID.
+ *
+ * @param  {number} id  Widget ID
+ * @return {Object}     API widget data for a particular widget ID.
+ */
+export const getWidget = createRegistrySelector(
+	( select ) => ( state, id ) => {
+		const widgets = select( 'core/edit-widgets' ).getWidgets();
+		return widgets[ id ];
+	}
+);
+
 export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 	if ( ! hasResolvedWidgetAreas( query ) ) {
 		return null;

@@ -15,7 +15,6 @@ export function transformWidgetToBlock( widget ) {
 	return createBlock(
 		'core/legacy-widget',
 		{
-			rendered: widget.rendered,
 			form: widget.form,
 			widgetClass: widget.widget_class,
 			instance: widget.settings,

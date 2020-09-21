@@ -149,6 +149,7 @@ const registerBlockVariations = ( block ) => {
 			...settings,
 			icon: v.icon(),
 			title: v.title,
+			variations: [],
 		} );
 	} );
 };
@@ -157,6 +158,7 @@ const registerBlockVariations = ( block ) => {
 // eslint-disable-next-line no-undef
 const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 
+// eslint-disable-next-line no-unused-vars
 const iOSOnly = ( block ) =>
 	Platform.OS === 'ios' ? block : devOnly( block );
 
@@ -219,7 +221,7 @@ export const registerCoreBlocks = () => {
 		cover,
 		socialLink,
 		socialLinks,
-		iOSOnly( pullquote ),
+		pullquote,
 	].forEach( registerBlock );
 
 	registerBlockVariations( socialLink );

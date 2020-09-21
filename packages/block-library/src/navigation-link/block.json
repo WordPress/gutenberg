@@ -1,9 +1,7 @@
 {
 	"name": "core/navigation-link",
 	"category": "design",
-	"parent": [
-		"core/navigation"
-	],
+	"parent": [ "core/navigation" ],
 	"attributes": {
 		"label": {
 			"type": "string"
@@ -25,6 +23,9 @@
 			"default": false
 		},
 		"url": {
+			"type": "string"
+		},
+		"title": {
 			"type": "string"
 		}
 	},
