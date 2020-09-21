@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, kebabCase, reduce } from 'lodash';
+import { get, kebabCase } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,7 @@ import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/bloc
 /**
  * Internal dependencies
  */
-import { PRESET_CATEGORIES, LINK_COLOR_DECLARATION } from './utils';
+import { LINK_COLOR_DECLARATION } from './utils';
 
 const mergeTrees = ( baseData, userData ) => {
 	// Deep clone from base data.
@@ -75,31 +75,6 @@ export default ( blockData, baseTree, userTree ) => {
 		return declarations;
 	};
 
-	/**
-	 * Transform given preset tree into a set of style declarations.
-	 *
-	 * @param {Object} blockPresets
-	 *
-	 * @return {Array} An array of style declarations.
-	 */
-	const getBlockPresetsDeclarations = ( blockPresets ) => {
-		return reduce(
-			PRESET_CATEGORIES,
-			( declarations, { path, key }, category ) => {
-				const preset = get( blockPresets, path, [] );
-				preset.forEach( ( value ) => {
-					declarations.push(
-						`--wp--preset--${ kebabCase( category ) }--${
-							value.slug
-						}: ${ value[ key ] }`
-					);
-				} );
-				return declarations;
-			},
-			[]
-		);
-	};
-
 	const flattenTree = ( input, prefix, token ) => {
 		let result = [];
 		Object.keys( input ).forEach( ( key ) => {
@@ -119,14 +94,6 @@ export default ( blockData, baseTree, userTree ) => {
 		return result;
 	};
 
-	const getCustomDeclarations = ( blockCustom ) => {
-		if ( Object.keys( blockCustom ).length === 0 ) {
-			return [];
-		}
-
-		return flattenTree( blockCustom, '--wp--custom--', '--' );
-	};
-
 	const getBlockSelector = ( selector ) => {
 		// Can we hook into the styles generation mechanism
 		// so we can avoid having to increase the class specificity here
@@ -144,8 +111,7 @@ export default ( blockData, baseTree, userTree ) => {
 				blockData[ context ].supports,
 				tree[ context ].styles
 			),
-			...getBlockPresetsDeclarations( tree[ context ].settings ),
-			...getCustomDeclarations( tree[ context ].settings.custom ),
+			...flattenTree( baseTree[ context ].vars, '--wp--', '--' ),
 		];
 		if ( blockDeclarations.length > 0 ) {
 			styles.push(
