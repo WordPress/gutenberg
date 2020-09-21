@@ -30,7 +30,7 @@ export const withLocales = () => {
 		<DatePicker
 			currentDate={ date }
 			onChange={ setDate }
-			locale={ locales[ select( 'locale', Object.keys( locales ) ) ] }
+			locale={ select( 'locale', Object.keys( locales ) ) }
 		/>
 	);
 };

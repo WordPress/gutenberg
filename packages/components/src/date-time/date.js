@@ -4,6 +4,7 @@
 import ReactDatePicker from 'react-datepicker';
 import { isSameDay, format, setMonth, getMonth, getYear, getDate } from 'date-fns';
 import { map, filter } from 'lodash';
+import * as locales from 'date-fns/esm/locale';
 
 /**
  * WordPress dependencies
@@ -17,7 +18,7 @@ import { __, _n } from '@wordpress/i18n';
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const isRTL = () => document.documentElement.dir === 'rtl';
 
-const DatePickerHeader = ( { date, decreaseMonth, increaseMonth ,locale } ) => (
+const DatePickerHeader = ( { date, decreaseMonth, increaseMonth, locale } ) => (
 	<div className={ 'components-datetime__date-header' }>
 		<Button
 			className={ `components-datetime__date-header-month-button is-previous-month` }
@@ -75,11 +76,13 @@ const DatePicker = ( {
 	onMonthChange,
 	currentDate,
 	isInvalidDate,
-	locale,
+	locale = 'en',
 	events,
 } ) => {
 	const selected = typeof currentDate === 'string' ? new Date( currentDate ) : currentDate;
 	const highlightDates = events?.length ? map( events, 'date' ) : [];
+	const localeObject = locales[ locale ] ? locales[ locale ] : locales[ 'en' ];
+	
 	return (
 		<ReactDatePicker
 			calendarClassName={ 'components-datetime__date' }
@@ -87,13 +90,12 @@ const DatePicker = ( {
 			onChange={ onChange }
 			inline
 			renderCustomHeader={ ( props ) =>
-				<DatePickerHeader { ...props } locale={ locale } />
+				<DatePickerHeader { ...props } locale={ localeObject } />
 			}
 			renderDayContents={ ( ...props ) =>
 				renderDayContents( ...props, events )
 			}
 			useWeekdaysShort={ true }
-			locale={ locale }
 			highlightDates={ highlightDates }
 			onMonthChange={ onMonthChange }
 		/>
