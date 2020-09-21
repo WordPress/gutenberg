@@ -24,7 +24,7 @@ Renders a list of blocks types.
 ```jsx
 import { BlockTypesList } from '@wordpress/block-editor';
 
-const MyBlockTypesList = () => <BlockTypesList items={ filteredItems } />;;
+const MyBlockTypesList = () => <BlockTypesList items={ filteredItems } />;
 ```
 
 ### Props
@@ -35,6 +35,25 @@ The blocks that will be displayed in the block list.
 
 -   Type: `Array<Block>`
 -   Required: Yes
+-   Platform: Web | Mobile
+
+#### name
+
+Name of the list to be used as part of component's key.
+
+-   Type: `String`
+-   Required: Yes
+-   Platform: Mobile
+
+#### listProps
+
+Extra `FlatList` props for customizing the list.
+
+On Mobile usually this component is rendered inside `BottomSheet` component, which already [generates these props](<(https://github.com/WordPress/gutenberg/blob/c3c514ba1123be5a7cf881c223c038cfc31b3f59/packages/components/src/mobile/bottom-sheet/index.native.js#L335-L354)>) for this component.
+
+-   Type: `String`
+-   Required: No
+-   Platform: Mobile
 
 ## Related components
 
