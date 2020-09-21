@@ -7,9 +7,9 @@
 This is documentation for the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
 
 - Rationale
-    - Presets become CSS Custom Properties
-    - Some block styles are managed
     - Settings can be controlled per block
+    - Some block styles are managed
+    - Define CSS Custom Properties
 - Specification
     - Settings
     - Styles
@@ -20,19 +20,19 @@ The Block Editor surface API has evolved at different velocities, and it's now a
 
 This describes the current efforts to consolidate the various APIs into a single point – a `experimental-theme.json` file that should be located inside the root of the theme directory.
 
-### Presets become CSS Custom Properties
+### Settings can be controlled per block
 
-Presets such as [color palettes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), [font sizes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), and [gradients](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets) will be enqueued as CSS Custom Properties for themes to use.
-
-These will be enqueued to the front-end and editor.
+The Block Editor already allows the control of specific settings such as alignment, drop cap, whether it's present in the inserter, etc at the block level. The goal is to surface these for themes to control.
 
 ### Some block styles are managed
 
 By providing the block style properties in a structured way, the Block Editor can "manage" the CSS that comes from different origins (user, theme, and core CSS), reducing the amount of CSS loaded in the page and preventing specificity wars due to the competing needs of the components involved (themes, blocks, plugins).
 
-### Settings can be controlled per block
+### Define CSS Custom Properties
 
-The Block Editor already allows the control of specific settings such as alignment, drop cap, whether it's present in the inserter, etc at the block level. The goal is to surface these for themes to control.
+There's a mechanism to declare CSS Custom Properties that can be used in the `styles` and as values for the presets to declare within `settings`. The existing presets such as [color palettes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), [font sizes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), and [gradients](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets) will also become CSS Custom Properties.
+
+These will be enqueued to the front-end and editor.
 
 ## Specification
 
@@ -52,7 +52,7 @@ The `experimental-theme.json` file is divided into sections known as "contexts",
 }
 ```
 
-Every context has the same structure, divided in two sections: `settings` and `styles`. The `settings` are used to control the editor (enable/disable certain features, declare presets), taking over what was previously declared via `add_theme_support`. The `styles` will be used to create new style rules to be appended to a new stylesheet `global-styles-inline-css` enqueued in the front-end and post editor.
+Every context has the same structure, divided in three sections: `settings`, `styles`, and `vars`. The `settings` are used to control the editor (enable/disable certain features, declare presets), taking over what was previously declared via `add_theme_support`. The `styles` will be used to create new style rules to be appended to a new stylesheet `global-styles-inline-css` enqueued in the front-end and post editor. The values within `vars` are used to generate CSS Custom Properties.
 
 ```
 {
@@ -65,6 +65,11 @@ Every context has the same structure, divided in two sections: `settings` and `s
     "styles": {
       "color": { ... },
       "typography": { ... }
+    },
+    "vars": {
+      "color": { ... },
+      "font-size": { ... },
+      "gradient": { ... }
     }
   }
 }
@@ -83,9 +88,9 @@ The settings section has the following structure and default values:
       "color": {
         "custom": true, /* false to opt-out, as in add_theme_support('disable-custom-colors') */
         "customGradient": true, /* false to opt-out, as in add_theme_support('disable-custom-gradients') */
-        "gradients": [ ... ], /* gradient presets, as in add_theme_support('editor-gradient-presets', ... ) */
+        "gradients": [ ... ], /* list of gradients declared in the vars.gradient section */
         "link": false, /* true to opt-in, as in add_theme_support('experimental-link-color') */
-        "palette": [ ... ], /* color presets, as in add_theme_support('editor-color-palette', ... ) */
+        "palette": [ ... ], /* list of colors declared in the vars.color section */
       },
       "spacing": {
         "customPadding": false, /* true to opt-in, as in add_theme_support('experimental-custom-spacing') */
@@ -95,7 +100,7 @@ The settings section has the following structure and default values:
         "customFontSize": true, /* false to opt-out, as in add_theme_support( 'disable-custom-font-sizes' ) */
         "customLineHeight": false, /* true to opt-in, as in add_theme_support( 'custom-line-height' ) */
         "dropCap": true, /* false to opt-out */
-        "fontSizes": [ ... ], /* font size presets, as in add_theme_support('editor-font-sizes', ... ) */
+        "fontSizes": [ ... ], /* list of font sizes declared in the vars.font-size section */
       },
       "custom": { ... }
     }
@@ -126,106 +131,6 @@ Settings can also be controlled by context, providing a more fine-grained contro
 ```
 
 Note, however, that not all settings are relevant for all contexts and the blocks they represent. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `experimental-theme.json`.
-
-### Presets
-
-Presets are part of the settings section. At the moment, they only work within the `global` context. Each preset value will generate a CSS Custom Property that will be added to the new stylesheet, which follow this naming schema: `--wp--preset--{preset-category}--{preset-slug}`.
-
-For example, for this input:
-
-```json
-{
-  "global": {
-    "settings": {
-      "color": {
-        "palette": [
-          {
-            "slug": "strong-magenta",
-            "color": "#a156b4"
-          },
-          {
-            "slug": "very-dark-grey",
-            "color": "rgb(131, 12, 8)"
-          }
-        ],
-        "gradients": [
-          {
-            "slug": "blush-bordeaux",
-            "gradient": "linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%)"
-          },
-          {
-            "slug": "blush-light-purple",
-            "gradient": "linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)"
-          },
-        ]
-      },
-      "typography": {
-        "fontSizes": [
-          {
-            "slug": "normal",
-            "size": 16
-          },
-          {
-            "slug": "big",
-            "size": 32
-          }
-        ]
-      }
-    }
-  }
-}
-```
-
-The output to be enqueued will be:
-
-```css
-:root {
-  --wp--preset--color--strong-magenta: #a156b4;
-  --wp--preset--color--very-dark-gray: #444;
-  --wp--preset--font-size--big: 32;
-  --wp--preset--font-size--normal: 16;
-  --wp--preset--gradient--blush-bordeaux: linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%);
-  --wp--preset--gradient--blush-light-purple: linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%);
-}
-```
-
-The goal is that presets can be defined using this format, although, right now, the name property (used in the editor) can't be translated from this file. For that reason, and to maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `experimental-theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
-
-### Theme-only CSS Custom Properties
-
-Besides the presets becoming CSS Custom Properties, the theme.json also allows for themes to create their own, so they don't have to be enqueued separately. Any values declared within the `settings.custom` section will be transformed to CSS Custom Properties following this naming schema: `--wp--theme--<variable-name>`.
-
-For example, for this input:
-
-```json
-{
-  "global": {
-    "settings": {
-      "custom": {
-        "base-font": 16,
-        "line-height": {
-          "small": 1.2,
-          "medium": 1.4,
-          "large": 1.8
-        }
-      }
-    }
-  }
-}
-```
-
-The output will be:
-
-```css
-:root {
-  --wp--theme--base-font: 16;
-  --wp--theme--line-height--small: 1.2;
-  --wp--theme--line-height--medium: 1.4;
-  --wp--theme--line-height--large: 1.8;
-}
-```
-
-Note that, the name of the variable is created by adding `--` in between each nesting level.
 
 ### Styles
 
@@ -339,3 +244,83 @@ These are the current typography properties supported by blocks:
 | Site Title | Yes | Yes |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
+
+### CSS Custom Properties, aka CSS Variables
+
+Each context can declare CSS variables to be enqueued in addition to the `styles`, and that can be used there as well. These are declared within the `var` section and follow this naming schema: `--wp--<variable-name>`.
+
+For example, for this input:
+
+```json
+{
+  "global": {
+    "vars": {
+      "color": {
+        "primary": "#000000",
+        "primary-hover": "#3C8067",
+        "secondary": "#3C8067",
+        "secondary-hover": "#336D58",
+        "tertiary": "rgb(209, 207, 203)",
+        "border": "#EFEFEF",
+        "text-selection": "#EBF2F0",
+        "alert": {
+          "success": "yellowgreen",
+          "info": "skyblue",
+          "warning": "gold",
+          "error": "salmon"
+        }
+      },
+      "font-size": {
+        "ratio": 1.2,
+        "base": 18,
+        "xs": "calc(var(--wp--font-size--sm) / var(--wp--font-size--ratio))",
+        "sm": "calc(var(--wp--font-size--base) / var(--wp--font-size--ratio))",
+        "md": "var(--wp--font-size--base)",
+        "lg": "calc(var(--wp--font-size--base) * var(--wp--font-size--ratio))",
+        "xl": "calc(var(--wp--font-size--lg) * var(--wp--font-size--ratio))",
+        "xxl": "calc(var(--wp--font-size--xl) * 2 * var(--wp--font-size--ratio))"
+      },
+      "line-height": {
+        "base": 1,
+        "body": 1.7,
+        "heading": 1.3
+      }
+    }
+  }
+}
+
+```
+
+The output will be:
+
+```css
+:root {
+  --wp--style--color--link: var(--wp--color--secondary);
+  background-color: var(--wp--color--background-dark);
+  --wp--color--primary: #000000;
+  --wp--color--primary-hover: #3C8067;
+  --wp--color--secondary: #3C8067;
+  --wp--color--secondary-hover: #336D58;
+  --wp--color--tertiary: rgb(209, 207, 203);
+  --wp--color--border: #EFEFEF;
+  --wp--color--text-selection: #EBF2F0;
+  --wp--color--alert--success: yellowgreen;
+  --wp--color--alert--info: skyblue;
+  --wp--color--alert--warning: gold;
+  --wp--color--alert--error: salmon;
+  --wp--font-size--ratio: 1.2;
+  --wp--font-size--base: 18;
+  --wp--font-size--xs: calc(var(--wp--font-size--sm) / var(--wp--font-size--ratio));
+  --wp--font-size--sm: calc(var(--wp--font-size--base) / var(--wp--font-size--ratio));
+  --wp--font-size--md: var(--wp--font-size--base);
+  --wp--font-size--lg: calc(var(--wp--font-size--base) * var(--wp--font-size--ratio));
+  --wp--font-size--xl: calc(var(--wp--font-size--lg) * var(--wp--font-size--ratio));
+  --wp--font-size--xxl: calc(var(--wp--font-size--xl) * 2 * var(--wp--font-size--ratio));
+  --wp--line-height--base: 1;
+  --wp--line-height--body: 1.7;
+  --wp--line-height--heading: 1.3;
+}
+```
+
+Note that, the name of the variable is created by adding `--` in between each nesting level.
+
