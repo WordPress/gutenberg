@@ -45,6 +45,7 @@ export function PostSchedule() {
 					status: 'publish,future',
 					after: getDayOfTheMonth( currentMonth ),
 					before: getDayOfTheMonth( currentMonth, false ),
+					per_page: 4,
 				} ),
 				( { title, type, date } ) => ( {
 					title: title?.raw ? title.raw : title,

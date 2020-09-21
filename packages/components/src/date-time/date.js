@@ -38,11 +38,11 @@ const DatePickerHeader = ( { date, decreaseMonth, increaseMonth ,locale } ) => (
 );
 
 const renderTooltipContent = ( events ) => {
-	const needToPrune = events?.length > 4;
+	const needToPrune = events?.length > 3;
 	const eventsToRender = needToPrune ? events.slice( 0, 3 ) : events; 
 	if ( needToPrune ) {
 		eventsToRender.push( {
-			title: _n( '%s more events', '%s more events', events.length - eventsToRender.length, 'gutenberg' )
+			title: __( '… and more', 'gutenberg' )
 		} );
 	}
 
