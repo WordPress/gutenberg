@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/nux",
-	"version": "3.21.0",
+	"version": "3.21.1",
 	"description": "NUX (New User eXperience) module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -26,7 +26,7 @@
 		"!((src|build|build-module)/components/**)"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
+		"@babel/runtime": "^7.11.2",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",

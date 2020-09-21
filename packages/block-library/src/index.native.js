@@ -149,6 +149,7 @@ const registerBlockVariations = ( block ) => {
 			...settings,
 			icon: v.icon(),
 			title: v.title,
+			variations: [],
 		} );
 	} );
 };

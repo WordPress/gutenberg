@@ -7,7 +7,6 @@ import { get, isString, kebabCase, reduce, upperFirst } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { withSelect } from '@wordpress/data';
 import { compose, createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -19,6 +18,7 @@ import {
 	getColorObjectByAttributeValues,
 	getMostReadableColor,
 } from './utils';
+import useEditorFeature from '../use-editor-feature';
 
 const DEFAULT_COLORS = [];
 
@@ -45,12 +45,14 @@ const withCustomColorPalette = ( colorsArray ) =>
  * @return {Function} The higher order component.
  */
 const withEditorColorPalette = () =>
-	withSelect( ( select ) => {
-		const settings = select( 'core/block-editor' ).getSettings();
-		return {
-			colors: get( settings, [ 'colors' ], DEFAULT_COLORS ),
-		};
-	} );
+	createHigherOrderComponent(
+		( WrappedComponent ) => ( props ) => {
+			const colors =
+				useEditorFeature( 'color.palette' ) || DEFAULT_COLORS;
+			return <WrappedComponent { ...props } colors={ colors } />;
+		},
+		'withEditorColorPalette'
+	);
 
 /**
  * Helper function used with `createHigherOrderComponent` to create

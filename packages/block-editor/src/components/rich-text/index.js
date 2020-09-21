@@ -128,6 +128,22 @@ function RichTextWrapper(
 		__unstableEmbedURLOnPaste,
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
+		unstableOnFocus,
+		__unstableAllowPrefixTransformations,
+		__unstableMultilineRootTag,
+		// Native props.
+		__unstableMobileNoFocusOnMount,
+		deleteEnter,
+		placeholderTextColor,
+		textAlign,
+		selectionColor,
+		tagsToEliminate,
+		rootTagsToEliminate,
+		disableEditingMenu,
+		fontSize,
+		fontFamily,
+		fontWeight,
+		fontStyle,
 		...props
 	},
 	forwardedRef
@@ -528,7 +544,6 @@ function RichTextWrapper(
 
 	const content = (
 		<RichText
-			{ ...props }
 			clientId={ clientId }
 			identifier={ identifier }
 			ref={ ref }
@@ -563,6 +578,11 @@ function RichTextWrapper(
 			disabled={ disabled }
 			start={ startAttr }
 			reversed={ reversed }
+			unstableOnFocus={ unstableOnFocus }
+			__unstableAllowPrefixTransformations={
+				__unstableAllowPrefixTransformations
+			}
+			__unstableMultilineRootTag={ __unstableMultilineRootTag }
 			// Native props.
 			onCaretVerticalPositionChange={ onCaretVerticalPositionChange }
 			blockIsSelected={
@@ -571,6 +591,18 @@ function RichTextWrapper(
 					: blockIsSelected
 			}
 			shouldBlurOnUnmount={ shouldBlurOnUnmount }
+			__unstableMobileNoFocusOnMount={ __unstableMobileNoFocusOnMount }
+			deleteEnter={ deleteEnter }
+			placeholderTextColor={ placeholderTextColor }
+			textAlign={ textAlign }
+			selectionColor={ selectionColor }
+			tagsToEliminate={ tagsToEliminate }
+			rootTagsToEliminate={ rootTagsToEliminate }
+			disableEditingMenu={ disableEditingMenu }
+			fontSize={ fontSize }
+			fontFamily={ fontFamily }
+			fontWeight={ fontWeight }
+			fontStyle={ fontStyle }
 		>
 			{ ( {
 				isSelected: nestedIsSelected,
@@ -599,6 +631,7 @@ function RichTextWrapper(
 						{ ( { listBoxId, activeId, onKeyDown } ) => (
 							<TagName
 								{ ...editableProps }
+								{ ...props }
 								aria-autocomplete={
 									listBoxId ? 'list' : undefined
 								}

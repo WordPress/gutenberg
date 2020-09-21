@@ -6,16 +6,18 @@ import { getTextContent } from './get-text-content';
 import { insert } from './insert';
 import { LINE_SEPARATOR } from './special-characters';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
  * Insert a line break character into a Rich Text value at the given
  * `startIndex`. Any content between `startIndex` and `endIndex` will be
  * removed. Indices are retrieved from the selection if none are provided.
  *
- * @param {Object} value        Value to modify.
- * @param {number} [startIndex] Start index.
- * @param {number} [endIndex]   End index.
+ * @param {RichTextValue} value        Value to modify.
+ * @param {number}        [startIndex] Start index.
+ * @param {number}        [endIndex]   End index.
  *
- * @return {Object} A new value with the value inserted.
+ * @return {RichTextValue} A new value with the value inserted.
  */
 export function insertLineSeparator(
 	value,

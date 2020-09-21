@@ -221,7 +221,6 @@ const ImageComponent = ( {
 
 				{ editButton &&
 					isSelected &&
-					imageData &&
 					! isUploadInProgress &&
 					! isUploadFailed && (
 						<ImageEditingButton
@@ -229,7 +228,7 @@ const ImageComponent = ( {
 								onSelectMediaUploadOption
 							}
 							openMediaOptions={ openMediaOptions }
-							url={ url }
+							url={ imageData && url }
 							pickerOptions={ mediaPickerOptions }
 						/>
 					) }

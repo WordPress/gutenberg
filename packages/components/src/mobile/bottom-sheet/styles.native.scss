@@ -30,9 +30,8 @@
 	margin-top: $grid-unit-20 / 2;
 }
 
-
 .background {
-	background-color: $white;
+	background-color: $modal-background;
 	border-top-right-radius: 8px;
 	border-top-left-radius: 8px;
 	width: 100%;
@@ -41,7 +40,13 @@
 }
 
 .backgroundDark {
-	background-color: $background-dark-elevated;
+	background-color: $modal-background-dark;
+}
+
+.backgroundFullScreen {
+	border-top-right-radius: 0;
+	border-top-left-radius: 0;
+	padding-top: 8;
 }
 
 .content {
@@ -50,29 +55,6 @@
 
 .scrollableContent {
 	padding-bottom: 20px;
-}
-
-.head {
-	flex-direction: row;
-	width: 100%;
-	margin-bottom: 5px;
-	justify-content: space-between;
-	align-items: center;
-	align-content: center;
-	min-height: 48;
-}
-
-.title {
-	color: $dark-gray-600;
-	font-size: 18px;
-	font-weight: 600;
-	text-align: center;
-}
-
-.titleContainer {
-	justify-content: center;
-	flex: 2;
-	align-content: center;
 }
 
 // Button
@@ -118,10 +100,6 @@
 	flex-direction: row;
 	align-items: center;
 	flex-shrink: 0;
-}
-
-.cellIcon {
-	padding-right: 0;
 }
 
 .cellLabel {
@@ -210,6 +188,12 @@
 	flex: 1;
 }
 
+.bottomSheetApplyButton {
+	flex-direction: row;
+	justify-content: flex-end;
+	flex: 1;
+}
+
 .chevronLeftIcon {
 	color: $blue-50;
 	margin-left: -11px;
@@ -250,6 +234,20 @@
 
 .arrowLeftIconDark {
 	color: $dark-secondary;
+}
+
+// used in both light and dark modes
+.placeholderColor {
+	color: #87a6bc;
+}
+
+.applyButton {
+	color: $blue-50;
+	font-size: 17px;
+}
+
+.applyButtonDark {
+	color: $blue-30;
 }
 
 .flex {
