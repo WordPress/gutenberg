@@ -30,7 +30,13 @@ class WpEmbedPreview extends Component {
 
 	/**
 	 * Checks for WordPress embed event signaling the height
-	 * change when content loads.
+	 * change when iframe content loads or iframe's window is resized.
+	 * The event is send from WordPress core with window.postMessage function.
+	 *
+	 * References:
+	 * window.postMessage: https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
+	 * WordPress core embed-template on load: https://github.com/WordPress/WordPress/blob/master/wp-includes/js/wp-embed-template.js#L143
+	 * WordPress core embed-template on resize: https://github.com/WordPress/WordPress/blob/master/wp-includes/js/wp-embed-template.js#L187
 	 *
 	 * @param {WPSyntheticEvent} event Message event.
 	 */
@@ -42,14 +48,13 @@ class WpEmbedPreview extends Component {
 			return;
 		}
 
-		const iframes = document.querySelectorAll(
-			`iframe[data-secret="${ secret }"`
-		);
-		( iframes || [] ).forEach( ( iframe ) => {
-			if ( +iframe.height !== value ) {
-				iframe.height = value;
-			}
-		} );
+		document
+			.querySelectorAll( `iframe[data-secret="${ secret }"` )
+			.forEach( ( iframe ) => {
+				if ( +iframe.height !== value ) {
+					iframe.height = value;
+				}
+			} );
 	}
 
 	/**
