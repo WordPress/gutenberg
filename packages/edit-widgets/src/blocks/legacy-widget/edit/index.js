@@ -163,7 +163,7 @@ class LegacyWidgetEdit extends Component {
 					/>
 				) }
 				{ ( isPreview || ! hasEditForm ) &&
-					( widgetObject.isReferenceWidget
+					( WPWidget?.isReferenceWidget
 						? this.renderWidgetPreviewUnavailable()
 						: this.renderWidgetPreview() ) }
 			</>
