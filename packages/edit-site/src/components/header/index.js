@@ -16,7 +16,6 @@ import {
 import { _x } from '@wordpress/i18n';
 import { plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -80,92 +79,64 @@ export default function Header( {
 	const displayBlockToolbar =
 		! isLargeViewport || deviceType !== 'Desktop' || hasFixedToolbar;
 
-	// Testing logic for hovered name...
-	const { hoveredBlockIds, getBlock, getBlockName } = useSelect(
-		( select ) => {
-			const { getHoveredBlocks, getBlock, getBlockName } = select(
-				'core/block-editor'
-			);
-
-			return {
-				hoveredBlockIds: getHoveredBlocks(),
-				getBlock,
-				getBlockName,
-			};
-		}
-	);
-	const nameToDisplay = useMemo( () => {
-		// Go through hovered blocks and see if one is of interest.
-		const templatePartBlockId = hoveredBlockIds.find(
-			( blockId ) => getBlockName( blockId ) === 'core/template-part'
-		);
-		const templatePartBlock = getBlock( templatePartBlockId );
-		return templatePartBlock?.attributes.slug || '';
-	}, [ hoveredBlockIds ] );
-
 	return (
-		<>
-			<div className="edit-site-header">{ nameToDisplay }</div>
-			<div className="edit-site-header">
-				<MainDashboardButton.Slot>
-					<FullscreenModeClose />
-				</MainDashboardButton.Slot>
-				<div className="edit-site-header__toolbar">
-					<Button
-						isPrimary
-						isPressed={ isInserterOpen }
-						className="edit-site-header-toolbar__inserter-toggle"
-						onClick={ onToggleInserter }
-						icon={ plus }
-						label={ _x(
-							'Add block',
-							'Generic label for block inserter button'
-						) }
-					/>
-					<ToolSelector />
-					<UndoButton />
-					<RedoButton />
-					<BlockNavigationDropdown />
-					{ displayBlockToolbar && (
-						<div className="edit-site-header-toolbar__block-toolbar">
-							<BlockToolbar hideDragHandle />
-						</div>
+		<div className="edit-site-header">
+			<MainDashboardButton.Slot>
+				<FullscreenModeClose />
+			</MainDashboardButton.Slot>
+			<div className="edit-site-header__toolbar">
+				<Button
+					isPrimary
+					isPressed={ isInserterOpen }
+					className="edit-site-header-toolbar__inserter-toggle"
+					onClick={ onToggleInserter }
+					icon={ plus }
+					label={ _x(
+						'Add block',
+						'Generic label for block inserter button'
 					) }
-					<div className="edit-site-header__toolbar-switchers">
-						<PageSwitcher
-							showOnFront={ showOnFront }
-							activePage={ page }
-							onActivePageChange={ setPage }
-						/>
-						<div className="edit-site-header__toolbar-switchers-separator">
-							/
-						</div>
-						<TemplateSwitcher
-							page={ page }
-							activeId={ templateId }
-							activeTemplatePartId={ templatePartId }
-							isTemplatePart={
-								templateType === 'wp_template_part'
-							}
-							onActiveIdChange={ setTemplate }
-							onActiveTemplatePartIdChange={ setTemplatePart }
-							onAddTemplate={ addTemplate }
-							onRemoveTemplate={ removeTemplate }
-						/>
+				/>
+				<ToolSelector />
+				<UndoButton />
+				<RedoButton />
+				<BlockNavigationDropdown />
+				{ displayBlockToolbar && (
+					<div className="edit-site-header-toolbar__block-toolbar">
+						<BlockToolbar hideDragHandle />
 					</div>
-				</div>
-				<div className="edit-site-header__actions">
-					<PreviewOptions
-						deviceType={ deviceType }
-						setDeviceType={ setPreviewDeviceType }
+				) }
+				<div className="edit-site-header__toolbar-switchers">
+					<PageSwitcher
+						showOnFront={ showOnFront }
+						activePage={ page }
+						onActivePageChange={ setPage }
 					/>
-					<SaveButton
-						openEntitiesSavedStates={ openEntitiesSavedStates }
+					<div className="edit-site-header__toolbar-switchers-separator">
+						/
+					</div>
+					<TemplateSwitcher
+						page={ page }
+						activeId={ templateId }
+						activeTemplatePartId={ templatePartId }
+						isTemplatePart={ templateType === 'wp_template_part' }
+						onActiveIdChange={ setTemplate }
+						onActiveTemplatePartIdChange={ setTemplatePart }
+						onAddTemplate={ addTemplate }
+						onRemoveTemplate={ removeTemplate }
 					/>
-					<PinnedItems.Slot scope="core/edit-site" />
-					<MoreMenu />
 				</div>
 			</div>
-		</>
+			<div className="edit-site-header__actions">
+				<PreviewOptions
+					deviceType={ deviceType }
+					setDeviceType={ setPreviewDeviceType }
+				/>
+				<SaveButton
+					openEntitiesSavedStates={ openEntitiesSavedStates }
+				/>
+				<PinnedItems.Slot scope="core/edit-site" />
+				<MoreMenu />
+			</div>
+		</div>
 	);
 }

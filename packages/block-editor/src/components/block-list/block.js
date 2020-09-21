@@ -110,9 +110,7 @@ function BlockListBlock( {
 		[ clientId ]
 	);
 
-	const { removeBlock, addHoveredBlock, removeHoveredBlock } = useDispatch(
-		'core/block-editor'
-	);
+	const { removeBlock } = useDispatch( 'core/block-editor' );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
 	// Handling the error state
@@ -171,24 +169,19 @@ function BlockListBlock( {
 	// (InspectorControls, etc.) which are inside `BlockEdit` but not
 	// `BlockHTML`, even in HTML mode.
 	let blockEdit = (
-		<div
-			onMouseEnter={ () => addHoveredBlock( clientId ) }
-			onMouseLeave={ () => removeHoveredBlock( clientId ) }
-		>
-			<BlockEdit
-				name={ name }
-				isSelected={ isSelected }
-				attributes={ attributes }
-				setAttributes={ setAttributes }
-				insertBlocksAfter={ isLocked ? undefined : onInsertBlocksAfter }
-				onReplace={ isLocked ? undefined : onReplace }
-				onRemove={ isLocked ? undefined : onRemove }
-				mergeBlocks={ isLocked ? undefined : onMerge }
-				clientId={ clientId }
-				isSelectionEnabled={ isSelectionEnabled }
-				toggleSelection={ toggleSelection }
-			/>
-		</div>
+		<BlockEdit
+			name={ name }
+			isSelected={ isSelected }
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+			insertBlocksAfter={ isLocked ? undefined : onInsertBlocksAfter }
+			onReplace={ isLocked ? undefined : onReplace }
+			onRemove={ isLocked ? undefined : onRemove }
+			mergeBlocks={ isLocked ? undefined : onMerge }
+			clientId={ clientId }
+			isSelectionEnabled={ isSelectionEnabled }
+			toggleSelection={ toggleSelection }
+		/>
 	);
 
 	// For aligned blocks, provide a wrapper element so the block can be
