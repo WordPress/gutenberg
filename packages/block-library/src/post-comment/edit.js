@@ -7,7 +7,10 @@ import { useState } from '@wordpress/element';
 import { blockDefault } from '@wordpress/icons';
 import { InnerBlocks } from '@wordpress/block-editor';
 
-const ALLOWED_BLOCKS = [ [ 'core/post-comment-content' ] ];
+const ALLOWED_BLOCKS = [
+	'core/post-comment-content',
+	'core/post-comment-author',
+];
 
 // TODO: JSDOC types
 export default function Edit( { className, attributes, setAttributes } ) {

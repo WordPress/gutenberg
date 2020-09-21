@@ -10,7 +10,7 @@
 	.blocks-gallery-image,
 	.blocks-gallery-item {
 		// Add space between thumbnails, and unset right most thumbnails later.
-		margin: 0 $grid-unit-20 $grid-unit-20 0;
+		margin: 0 1em 1em 0;
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
@@ -51,11 +51,12 @@
 			width: 100%;
 			max-height: 100%;
 			overflow: auto;
-			padding: 40px 10px 9px;
+			padding: 3em 0.77em 0.7em;
 			color: $white;
 			text-align: center;
-			font-size: $default-font-size;
+			font-size: 0.8em;
 			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
+			box-sizing: border-box;
 
 			img {
 				display: inline;
@@ -84,7 +85,7 @@
 	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
 	& .blocks-gallery-image,
 	& .blocks-gallery-item {
-		width: calc(50% - #{ $grid-unit-20 });
+		width: calc(50% - 1em);
 
 		&:nth-of-type(even) {
 			margin-right: 0;
@@ -102,8 +103,8 @@
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } .blocks-gallery-image,
 			&.columns-#{ $i } .blocks-gallery-item {
-				width: calc(#{ 100% / $i } - #{ $grid-unit-20 * ( $i - 1 ) / $i });
-				margin-right: $grid-unit-20;
+				width: calc(#{ 100% / $i } - #{ 1em * ( $i - 1 ) / $i });
+				margin-right: 1em;
 			}
 		}
 

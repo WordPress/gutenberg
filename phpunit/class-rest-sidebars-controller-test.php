@@ -274,6 +274,60 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * Test a GET request in edit context. In particular, we expect rendered_form to be served correctly.
+	 */
+	public function test_get_items_active_sidebar_with_widgets_edit_context() {
+		$this->setup_widget(
+			'widget_text',
+			1,
+			array(
+				'text' => 'Custom text test',
+			)
+		);
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			),
+			array( 'text-1' )
+		);
+
+		$request            = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
+		$request['context'] = 'edit';
+		$response           = rest_get_server()->dispatch( $request );
+		$data               = $response->get_data();
+		$this->assertEquals(
+			array(
+				array(
+					'id'          => 'sidebar-1',
+					'name'        => 'Test sidebar',
+					'description' => '',
+					'status'      => 'active',
+					'widgets'     => array(
+						array(
+							'id'            => 'text-1',
+							'settings'      => array(
+								'text' => 'Custom text test',
+							),
+							'id_base'       => 'text',
+							'widget_class'  => 'WP_Widget_Text',
+							'name'          => 'Text',
+							'description'   => 'Arbitrary text.',
+							'number'        => 1,
+							'rendered'      => '<div class="textwidget">Custom text test</div>',
+							'rendered_form' => '<input id="widget-text-1-title" name="widget-text[1][title]" class="title sync-input" type="hidden" value="">' . "\n" .
+																							'			<textarea id="widget-text-1-text" name="widget-text[1][text]" class="text sync-input" hidden>Custom text test</textarea>' . "\n" .
+																							'			<input id="widget-text-1-filter" name="widget-text[1][filter]" class="filter sync-input" type="hidden" value="on">' . "\n" .
+																							'			<input id="widget-text-1-visual" name="widget-text[1][visual]" class="visual sync-input" type="hidden" value="on">',
+						),
+					),
+				),
+			),
+			$data
+		);
+	}
+
+	/**
 	 *
 	 */
 	public function test_get_item() {
@@ -581,7 +635,8 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 
-		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
+		$request = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
+		$request->set_param( 'context', 'view' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertEquals(
@@ -680,6 +735,60 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * Tests if the endpoint correctly handles "slashable" characters such as " or '.
+	 */
+	public function test_update_item_slashing() {
+		$this->setup_widget( 'widget_text', 1, array( 'text' => 'Custom text test' ) );
+		$this->setup_sidebar( 'sidebar-1', array( 'name' => 'Test sidebar' ), array( 'text-1', 'rss-1' ) );
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
+		$request->set_body_params(
+			array(
+				'widgets' => array(
+					array(
+						'id'           => 'text-1',
+						'settings'     => array(
+							'text' => 'Updated \\" \\\' text test',
+						),
+						'id_base'      => 'text',
+						'widget_class' => 'WP_Widget_Text',
+						'name'         => 'Text',
+						'description'  => 'Arbitrary text.',
+						'number'       => 1,
+					),
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals(
+			array(
+				'id'          => 'sidebar-1',
+				'name'        => 'Test sidebar',
+				'description' => '',
+				'status'      => 'active',
+				'widgets'     => array(
+					array(
+						'id'           => 'text-1',
+						'settings'     => array(
+							'text'   => 'Updated \\" \\\' text test',
+							'title'  => '',
+							'filter' => false,
+						),
+						'id_base'      => 'text',
+						'widget_class' => 'WP_Widget_Text',
+						'name'         => 'Text',
+						'description'  => 'Arbitrary text.',
+						'number'       => 1,
+						'rendered'     => '<div class="textwidget">Updated \\" \\\' text test</div>',
+					),
+				),
+			),
+			$data
+		);
+	}
+
+	/**
 	 * The test_delete_item() method does not exist for sidebar.
 	 */
 	public function test_delete_item() {
@@ -708,5 +817,4 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'status', $properties );
 		$this->assertArrayHasKey( 'widgets', $properties );
 	}
-
 }
