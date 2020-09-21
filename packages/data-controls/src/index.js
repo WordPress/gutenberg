@@ -31,15 +31,15 @@ export const apiFetch = ( request ) => {
 };
 
 /**
- * Dispatches a control action for triggering a registry select.
+ * Dispatches a control action for triggering and resolving a registry select.
  *
  * Note: when this control action is handled, it automatically considers
- * selectors that may have a resolver. It will await and return the resolved
- * value when the selector has not been resolved yet.
+ * selectors that may have a resolver. In such case, it will return a `Promise` that resolves
+ * after the selector finishes resolving, with the final result value.
  *
  * @param {string} storeKey      The key for the store the selector belongs to
  * @param {string} selectorName  The name of the selector
- * @param {Array}  args          Arguments for the select.
+ * @param {Array}  args          Arguments for the selector.
  *
  * @example
  * ```js
@@ -64,29 +64,29 @@ export function select( storeKey, selectorName, ...args ) {
 }
 
 /**
- * Dispatches a control action for triggering a registry select.
+ * Dispatches a control action for triggering a synchronous registry select.
  *
- * Note: This functions like the `select` control, but does not wait
- * for resolvers.
+ * Note: This control synchronously returns the current selector value, triggering the
+ * resolution, but not waiting for it.
  *
  * @param {string} storeKey     The key for the store the selector belongs to.
  * @param {string} selectorName The name of the selector.
- * @param {Array}  args         Arguments for the select.
+ * @param {Array}  args         Arguments for the selector.
  *
  * @example
  * ```js
- * import { __unstableSyncSelect } from '@wordpress/data-controls';
+ * import { syncSelect } from '@wordpress/data-controls';
  *
- * // Action generator using `__unstableSyncSelect`.
+ * // Action generator using `syncSelect`.
  * export function* myAction() {
- * 	const isEditorSideBarOpened = yield __unstableSyncSelect( 'core/edit-post', 'isEditorSideBarOpened' );
- * 	// Do stuff with the result from the `__unstableSyncSelect`.
+ * 	const isEditorSideBarOpened = yield syncSelect( 'core/edit-post', 'isEditorSideBarOpened' );
+ * 	// Do stuff with the result from the `syncSelect`.
  * }
  * ```
  *
  * @return {Object} The control descriptor.
  */
-export function __unstableSyncSelect( storeKey, selectorName, ...args ) {
+export function syncSelect( storeKey, selectorName, ...args ) {
 	return {
 		type: 'SYNC_SELECT',
 		storeKey,
