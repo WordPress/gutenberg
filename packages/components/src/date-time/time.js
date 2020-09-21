@@ -3,9 +3,7 @@
  */
 import classnames from 'classnames';
 import { isInteger } from 'lodash';
-import startOfMinute from 'date-fns/startOfMinute';
-import set from 'date-fns/set';
-import format from 'date-fns/format';
+import { startOfMinute, set, format } from 'date-fns';
 
 /**
  * WordPress dependencies

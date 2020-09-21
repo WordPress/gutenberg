@@ -2,14 +2,18 @@
  * External dependencies
  */
 import ReactDatePicker from 'react-datepicker';
-import { isSameDay, format, setMonth, getMonth, getYear, getDate } from 'date-fns';
+import { isSameDay, format, set, getDate } from 'date-fns';
 import { map, filter } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Icon, Button, Tooltip } from '../';
-import { __, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { Button, Tooltip } from '../';
 
 /**
  * Module Constants
@@ -42,7 +46,7 @@ const renderTooltipContent = ( events ) => {
 	const eventsToRender = needToPrune ? events.slice( 0, 3 ) : events; 
 	if ( needToPrune ) {
 		eventsToRender.push( {
-			title: __( '… and more', 'gutenberg' )
+			title: __( '… and more' )
 		} );
 	}
 
@@ -50,14 +54,14 @@ const renderTooltipContent = ( events ) => {
 		<div className="components-datetime__date--day-events">
 			<ul>
 				{ map( eventsToRender, ( event ) => (
-					<li>{ event.title || __( 'No title', 'gutenberg' ) }</li>
+					<li>{ event.title || __( 'No title' ) }</li>
 				) ) }
 			</ul>
 		</div>
 	)
 };
 
-const renderDayContents = ( day, date, events ) => {
+const renderDayContents = ( date, events ) => {
 	const eventsByDay = filter( events, ( ev ) => isSameDay( date, ev.date ) );
 	if ( ! eventsByDay?.length ) {
 		return getDate( date );
@@ -70,7 +74,7 @@ const renderDayContents = ( day, date, events ) => {
 	</>;
 };
 
-const handleChange = ( newDate, { currentDate, onChange } ) => {
+const handleChange = ( newDate, currentDate, onChange  ) => {
 	// If currentDate is null, use now as momentTime to designate hours, minutes, seconds.
 	const momentDate = new Date( currentDate ?? null );
 	const momentTime = {
@@ -89,6 +93,7 @@ const DatePicker = ( {
 	isInvalidDate,
 	locale,
 	events,
+	onChange,
 } ) => {
 	const currentDateObj =
 		currentDate instanceof Date
@@ -104,7 +109,7 @@ const DatePicker = ( {
 			<ReactDatePicker
 				calendarClassName={ 'components-datetime__date' }
 				selected={ currentDateObj }
-				onChange={ ( newDate ) => handleChange( newDate, props ) }
+				onChange={ ( newDate ) => handleChange( newDate, currentDate, onChange ) }
 				filterDate={ ( date ) => {
 					return ! isInvalidDate || ! isInvalidDate( date );
 				} }
@@ -112,8 +117,8 @@ const DatePicker = ( {
 				renderCustomHeader={ ( props ) =>
 					<DatePickerHeader { ...props } locale={ locale } />
 				}
-				renderDayContents={ ( ...props ) =>
-					renderDayContents( ...props, events )
+				renderDayContents={ ( _, date ) =>
+					renderDayContents( date, events )
 				}
 				useWeekdaysShort={ true }
 				locale={ locale }
