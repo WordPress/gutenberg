@@ -8,17 +8,9 @@ import { includes, noop } from 'lodash';
  */
 import { isPhrasingContent } from './phrasing-content';
 
-/**
- * Browser dependencies
- */
-
-const { DOMParser, getComputedStyle } = window;
-const {
-	TEXT_NODE,
-	ELEMENT_NODE,
-	DOCUMENT_POSITION_PRECEDING,
-	DOCUMENT_POSITION_FOLLOWING,
-} = window.Node;
+function getComputedStyle( node ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
 
 /**
  * Returns true if the given selection object is in the forward direction, or
@@ -40,11 +32,11 @@ function isSelectionForward( selection ) {
 	/* eslint-disable no-bitwise */
 	// Compare whether anchor node precedes focus node. If focus node (where
 	// end of selection occurs) is after the anchor node, it is forward.
-	if ( position & DOCUMENT_POSITION_PRECEDING ) {
+	if ( position & anchorNode.DOCUMENT_POSITION_PRECEDING ) {
 		return false;
 	}
 
-	if ( position & DOCUMENT_POSITION_FOLLOWING ) {
+	if ( position & anchorNode.DOCUMENT_POSITION_FOLLOWING ) {
 		return true;
 	}
 	/* eslint-enable no-bitwise */
@@ -87,7 +79,10 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return true;
 	}
 
-	const selection = window.getSelection();
+	const { ownerDocument } = container;
+	const { defaultView } = ownerDocument;
+
+	const selection = defaultView.getSelection();
 
 	if ( ! selection.rangeCount ) {
 		return false;
@@ -109,7 +104,7 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return false;
 	}
 
-	const computedStyle = window.getComputedStyle( container );
+	const computedStyle = getComputedStyle( container );
 	const lineHeight = parseInt( computedStyle.lineHeight, 10 ) || 0;
 
 	// Only consider the multiline selection at the edge if the direction is
@@ -160,7 +155,12 @@ function isEdge( container, isReverse, onlyVertical ) {
 	const y = isReverse
 		? containerRect.top + buffer
 		: containerRect.bottom - buffer;
-	const testRange = hiddenCaretRangeFromPoint( document, x, y, container );
+	const testRange = hiddenCaretRangeFromPoint(
+		ownerDocument,
+		x,
+		y,
+		container
+	);
 
 	if ( ! testRange ) {
 		return false;
@@ -213,6 +213,7 @@ export function getRectangleFromRange( range ) {
 	}
 
 	const { startContainer } = range;
+	const { ownerDocument } = startContainer;
 
 	// Correct invalid "BR" ranges. The cannot contain any children.
 	if ( startContainer.nodeName === 'BR' ) {
@@ -221,7 +222,7 @@ export function getRectangleFromRange( range ) {
 			startContainer
 		);
 
-		range = document.createRange();
+		range = ownerDocument.createRange();
 		range.setStart( parentNode, index );
 		range.setEnd( parentNode, index );
 	}
@@ -234,7 +235,7 @@ export function getRectangleFromRange( range ) {
 	//
 	// See: https://stackoverflow.com/a/6847328/995445
 	if ( ! rect ) {
-		const padNode = document.createTextNode( '\u200b' );
+		const padNode = ownerDocument.createTextNode( '\u200b' );
 		// Do not modify the live range.
 		range = range.cloneRange();
 		range.insertNode( padNode );
@@ -248,10 +249,12 @@ export function getRectangleFromRange( range ) {
 /**
  * Get the rectangle for the selection in a container.
  *
+ * @param {Window} win The window of the selection.
+ *
  * @return {?DOMRect} The rectangle.
  */
-export function computeCaretRect() {
-	const selection = window.getSelection();
+export function computeCaretRect( win ) {
+	const selection = win.getSelection();
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( ! range ) {
@@ -301,8 +304,10 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 		return;
 	}
 
-	const selection = window.getSelection();
-	const range = document.createRange();
+	const { ownerDocument } = container;
+	const { defaultView } = ownerDocument;
+	const selection = defaultView.getSelection();
+	const range = ownerDocument.createRange();
 
 	range.selectNodeContents( rangeTarget );
 	range.collapse( ! isReverse );
@@ -317,9 +322,9 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/API/Document/caretRangeFromPoint
  *
- * @param {Document} doc The document of the range.
- * @param {number}    x   Horizontal position within the current viewport.
- * @param {number}    y   Vertical position within the current viewport.
+ * @param {Document} doc  The document of the range.
+ * @param {number}   x    Horizontal position within the current viewport.
+ * @param {number}   y    Vertical position within the current viewport.
  *
  * @return {?Range} The best range for the given point.
  */
@@ -412,7 +417,9 @@ export function placeCaretAtVerticalEdge(
 		? editableRect.bottom - buffer
 		: editableRect.top + buffer;
 
-	const range = hiddenCaretRangeFromPoint( document, x, y, container );
+	const { ownerDocument } = container;
+	const { defaultView } = ownerDocument;
+	const range = hiddenCaretRangeFromPoint( ownerDocument, x, y, container );
 
 	if ( ! range || ! container.contains( range.startContainer ) ) {
 		if (
@@ -432,7 +439,7 @@ export function placeCaretAtVerticalEdge(
 		return;
 	}
 
-	const selection = window.getSelection();
+	const selection = defaultView.getSelection();
 	selection.removeAllRanges();
 	selection.addRange( range );
 	container.focus();
@@ -494,10 +501,12 @@ export function isNumberInput( element ) {
  *
  * See: https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects.
  *
+ * @param {Document} doc The document to check.
+ *
  * @return {boolean} True if there is selection, false if not.
  */
-export function documentHasTextSelection() {
-	const selection = window.getSelection();
+export function documentHasTextSelection( doc ) {
+	const selection = doc.defaultView.getSelection();
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 	return range && ! range.collapsed;
 }
@@ -541,12 +550,14 @@ function inputFieldHasUncollapsedSelection( element ) {
  * ranges of text across elements and any selection inside <input> and
  * <textarea> elements.
  *
+ * @param {Document} doc The document to check.
+ *
  * @return {boolean} Whether there is any sort of "selection" in the document.
  */
-export function documentHasUncollapsedSelection() {
+export function documentHasUncollapsedSelection( doc ) {
 	return (
-		documentHasTextSelection() ||
-		inputFieldHasUncollapsedSelection( document.activeElement )
+		documentHasTextSelection( doc ) ||
+		inputFieldHasUncollapsedSelection( doc.activeElement )
 	);
 }
 
@@ -554,13 +565,15 @@ export function documentHasUncollapsedSelection() {
  * Check whether the current document has a selection. This checks for both
  * focus in an input field and general text selection.
  *
+ * @param {Document} doc The document to check.
+ *
  * @return {boolean} True if there is selection, false if not.
  */
-export function documentHasSelection() {
+export function documentHasSelection( doc ) {
 	return (
-		isTextField( document.activeElement ) ||
-		isNumberInput( document.activeElement ) ||
-		documentHasTextSelection()
+		isTextField( doc.activeElement ) ||
+		isNumberInput( doc.activeElement ) ||
+		documentHasTextSelection( doc )
 	);
 }
 
@@ -584,7 +597,9 @@ export function isEntirelySelected( element ) {
 		return true;
 	}
 
-	const selection = window.getSelection();
+	const { ownerDocument } = element;
+	const { defaultView } = ownerDocument;
+	const selection = defaultView.getSelection();
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( ! range ) {
@@ -604,7 +619,7 @@ export function isEntirelySelected( element ) {
 
 	const lastChild = element.lastChild;
 	const lastChildContentLength =
-		lastChild.nodeType === TEXT_NODE
+		lastChild.nodeType === lastChild.TEXT_NODE
 			? lastChild.data.length
 			: lastChild.childNodes.length;
 
@@ -631,7 +646,7 @@ export function getScrollContainer( node ) {
 	// Scrollable if scrollable height exceeds displayed...
 	if ( node.scrollHeight > node.clientHeight ) {
 		// ...except when overflow is defined to be hidden or visible
-		const { overflowY } = window.getComputedStyle( node );
+		const { overflowY } = getComputedStyle( node );
 		if ( /(auto|scroll)/.test( overflowY ) ) {
 			return node;
 		}
@@ -657,7 +672,7 @@ export function getOffsetParent( node ) {
 	// an element node, so find the closest element node.
 	let closestElement;
 	while ( ( closestElement = node.parentNode ) ) {
-		if ( closestElement.nodeType === ELEMENT_NODE ) {
+		if ( closestElement.nodeType === closestElement.ELEMENT_NODE ) {
 			break;
 		}
 	}
@@ -765,7 +780,10 @@ export function wrap( newNode, referenceNode ) {
  * @return {string} The text content with any html removed.
  */
 export function __unstableStripHTML( html ) {
-	const document = new DOMParser().parseFromString( html, 'text/html' );
+	const document = new window.DOMParser().parseFromString(
+		html,
+		'text/html'
+	);
 	return document.body.textContent || '';
 }
 
@@ -788,7 +806,7 @@ function cleanNodeList( nodeList, doc, schema, inline ) {
 			schema.hasOwnProperty( tag ) &&
 			( ! schema[ tag ].isMatch || schema[ tag ].isMatch( node ) )
 		) {
-			if ( node.nodeType === ELEMENT_NODE ) {
+			if ( node.nodeType === node.ELEMENT_NODE ) {
 				const {
 					attributes = [],
 					classes = [],
@@ -936,11 +954,11 @@ export function isEmpty( element ) {
 	}
 
 	return Array.from( element.childNodes ).every( ( node ) => {
-		if ( node.nodeType === TEXT_NODE ) {
+		if ( node.nodeType === node.TEXT_NODE ) {
 			return ! node.nodeValue.trim();
 		}
 
-		if ( node.nodeType === ELEMENT_NODE ) {
+		if ( node.nodeType === node.ELEMENT_NODE ) {
 			if ( node.nodeName === 'BR' ) {
 				return true;
 			} else if ( node.hasAttributes() ) {

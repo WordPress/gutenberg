@@ -5,12 +5,12 @@ module.exports = {
 	},
 	create( context ) {
 		return {
-			'CallExpression[callee.object.callee.property.name="getSelection"][callee.property.name="getRangeAt"]'(
+			'MemberExpression[object.name="document"][property.name="activeElement"]'(
 				node
 			) {
 				context.report( {
 					node,
-					message: 'Avoid unguarded getRangeAt',
+					message: 'Avoid global active element',
 				} );
 			},
 		};
