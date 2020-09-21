@@ -24,8 +24,6 @@ function InputField(
 		dragThreshold = 10,
 		id,
 		isDragEnabled = false,
-		isFloating = false,
-		isFloatingLabelSet = false,
 		isPressEnterToChange = false,
 		onBlur = noop,
 		onChange = noop,
@@ -34,7 +32,6 @@ function InputField(
 		onDragStart = noop,
 		onFocus = noop,
 		onKeyDown = noop,
-		onUpdateValue,
 		onValidate = noop,
 		size = 'default',
 		stateReducer = ( state ) => state,
@@ -88,7 +85,6 @@ function InputField(
 		 */
 		if ( value !== valueRef.current && ! isDirty ) {
 			onChange( value, { event: _event } );
-			onUpdateValue( ! isValueEmpty( value ) );
 
 			valueRef.current = value;
 		}
@@ -195,8 +191,6 @@ function InputField(
 			dragCursor={ dragCursor }
 			isDragging={ isDragging }
 			id={ id }
-			isFloating={ isFloating }
-			isFloatingLabel={ isFloatingLabelSet }
 			onBlur={ handleOnBlur }
 			onChange={ handleOnChange }
 			onFocus={ handleOnFocus }

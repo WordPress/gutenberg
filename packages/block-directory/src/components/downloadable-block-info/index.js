@@ -1,16 +1,34 @@
 /**
  * WordPress dependencies
  */
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import { Fragment } from '@wordpress/element';
 import { Icon, update, chartLine } from '@wordpress/icons';
 
 function DownloadableBlockInfo( {
-	description,
 	activeInstalls,
+	description,
 	humanizedUpdated,
 } ) {
+	let activeInstallsString;
+
+	if ( activeInstalls > 1000000 ) {
+		activeInstallsString = sprintf(
+			/* translators: %d: number of active installations. */
+			__( '%d+ Million active installations' ),
+			Math.floor( activeInstalls / 1000000 )
+		);
+	} else if ( 0 === activeInstalls ) {
+		activeInstallsString = __( 'Less than 10 active installations' );
+	} else {
+		activeInstallsString = sprintf(
+			/* translators: %d: number of active installations. */
+			__( '%d+ active installations' ),
+			activeInstalls
+		);
+	}
+
 	return (
 		<Fragment>
 			<p className="block-directory-downloadable-block-info__content">
@@ -21,15 +39,7 @@ function DownloadableBlockInfo( {
 					className="block-directory-downloadable-block-info__icon"
 					icon={ chartLine }
 				/>
-				{ sprintf(
-					/* translators: %s: number of active installations. */
-					_n(
-						'%d active installation',
-						'%d active installations',
-						activeInstalls
-					),
-					activeInstalls
-				) }
+				{ activeInstallsString }
 			</div>
 			<div className="block-directory-downloadable-block-info__meta">
 				<Icon

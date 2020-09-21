@@ -39,7 +39,6 @@ import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
-import * as legacyWidget from './legacy-widget';
 import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
@@ -76,6 +75,7 @@ import * as postTitle from './post-title';
 import * as postContent from './post-content';
 import * as postAuthor from './post-author';
 import * as postComment from './post-comment';
+import * as postCommentAuthor from './post-comment-author';
 import * as postCommentContent from './post-comment-content';
 import * as postCommentDate from './post-comment-date';
 import * as postComments from './post-comments';
@@ -188,14 +188,10 @@ export const registerCoreBlocks = () => {
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
 		? ( settings ) => {
-				const {
-					__experimentalEnableLegacyWidgetBlock,
-					__experimentalEnableFullSiteEditing,
-				} = settings;
+				const { __experimentalEnableFullSiteEditing } = settings;
 
 				[
 					widgetArea,
-					__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
 					navigation,
 					navigationLink,
 
@@ -213,6 +209,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postContent,
 								postAuthor,
 								postComment,
+								postCommentAuthor,
 								postCommentContent,
 								postCommentDate,
 								postComments,

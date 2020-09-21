@@ -209,6 +209,11 @@ export function ImageEdit( {
 				allowedTypes: ALLOWED_MEDIA_TYPES,
 				onError: ( message ) => {
 					noticeOperations.createErrorNotice( message );
+					setAttributes( {
+						src: undefined,
+						id: undefined,
+						url: undefined,
+					} );
 				},
 			} );
 		}
@@ -267,14 +272,10 @@ export function ImageEdit( {
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 	} );
 
-	// Focussing the image caption after inserting an image relies on the
-	// component remounting. This needs to be fixed.
-	const key = !! url;
-
 	return (
 		<>
 			{ controls }
-			<Block.figure ref={ ref } className={ classes } key={ key }>
+			<Block.figure ref={ ref } className={ classes }>
 				{ url && (
 					<Image
 						attributes={ attributes }

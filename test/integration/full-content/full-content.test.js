@@ -66,7 +66,6 @@ describe( 'full post content fixture', () => {
 		);
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
 		const settings = {
-			__experimentalEnableLegacyWidgetBlock: true,
 			__experimentalEnableFullSiteEditing: true,
 		};
 		// Load all hooks that modify blocks

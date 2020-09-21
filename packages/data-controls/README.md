@@ -104,11 +104,11 @@ _Returns_
 
 <a name="select" href="#select">#</a> **select**
 
-Dispatches a control action for triggering a registry select.
+Dispatches a control action for triggering and resolving a registry select.
 
 Note: when this control action is handled, it automatically considers
-selectors that may have a resolver. It will await and return the resolved
-value when the selector has not been resolved yet.
+selectors that may have a resolver. In such case, it will return a `Promise` that resolves
+after the selector finishes resolving, with the final result value.
 
 _Usage_
 
@@ -126,7 +126,36 @@ _Parameters_
 
 -   _storeKey_ `string`: The key for the store the selector belongs to
 -   _selectorName_ `string`: The name of the selector
--   _args_ `Array`: Arguments for the select.
+-   _args_ `Array`: Arguments for the selector.
+
+_Returns_
+
+-   `Object`: The control descriptor.
+
+<a name="syncSelect" href="#syncSelect">#</a> **syncSelect**
+
+Dispatches a control action for triggering a synchronous registry select.
+
+Note: This control synchronously returns the current selector value, triggering the
+resolution, but not waiting for it.
+
+_Usage_
+
+```js
+import { syncSelect } from '@wordpress/data-controls';
+
+// Action generator using `syncSelect`.
+export function* myAction() {
+	const isEditorSideBarOpened = yield syncSelect( 'core/edit-post', 'isEditorSideBarOpened' );
+	// Do stuff with the result from the `syncSelect`.
+}
+```
+
+_Parameters_
+
+-   _storeKey_ `string`: The key for the store the selector belongs to.
+-   _selectorName_ `string`: The name of the selector.
+-   _args_ `Array`: Arguments for the selector.
 
 _Returns_
 

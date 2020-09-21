@@ -4,6 +4,7 @@
 import { Popover } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
+import { PluginArea } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
@@ -39,6 +40,7 @@ function Layout( { blockEditorSettings } ) {
 			/>
 			<Sidebar />
 			<Popover.Slot />
+			<PluginArea />
 		</WidgetAreasBlockEditorProvider>
 	);
 }

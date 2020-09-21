@@ -22,10 +22,10 @@ import { useSelect } from '@wordpress/data';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { formatLtr } from '@wordpress/icons';
 
-/**
- * Browser dependencies
- */
-const { getComputedStyle } = window;
+function getComputedStyle( node, pseudo ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node, pseudo );
+}
+
 const querySelector = window.document.querySelector.bind( document );
 
 const name = 'core/paragraph';

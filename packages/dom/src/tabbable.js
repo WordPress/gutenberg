@@ -151,8 +151,8 @@ export function find( context ) {
  * @param {Element} element The focusable element before which to look. Defaults
  *                          to the active element.
  */
-export function findPrevious( element = document.activeElement ) {
-	const focusables = findFocusable( document.body );
+export function findPrevious( element ) {
+	const focusables = findFocusable( element.ownerDocument.body );
 	const index = focusables.indexOf( element );
 
 	// Remove all focusables after and including `element`.
@@ -167,8 +167,8 @@ export function findPrevious( element = document.activeElement ) {
  * @param {Element} element The focusable element after which to look. Defaults
  *                          to the active element.
  */
-export function findNext( element = document.activeElement ) {
-	const focusables = findFocusable( document.body );
+export function findNext( element ) {
+	const focusables = findFocusable( element.ownerDocument.body );
 	const index = focusables.indexOf( element );
 
 	// Remove all focusables before and inside `element`.

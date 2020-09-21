@@ -205,7 +205,7 @@
 }
 
 @mixin caption-style-theme() {
-	color: $dark-gray-500;
+	color: #555;
 	font-size: $default-font-size;
 	text-align: center;
 }
@@ -676,10 +676,4 @@
 		background: linear-gradient(135deg,rgb(2,3,129) 0%,rgb(40,116,252) 100%);
 	}
 	/* stylelint-enable function-comma-space-after */
-}
-
-// It is important to include these styles in all built stylesheets.
-// This allows to CSS variables post CSS plugin to generate fallbacks.
-:root {
-	@include admin-scheme(#007cba);
 }

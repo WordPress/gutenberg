@@ -7,6 +7,7 @@ import {
 	PinnedItems,
 	__experimentalMainDashboardButton as MainDashboardButton,
 } from '@wordpress/interface';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -18,16 +19,26 @@ import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
-	const { hasActiveMetaboxes, isPublishSidebarOpened, isSaving } = useSelect(
+	const {
+		hasActiveMetaboxes,
+		isPublishSidebarOpened,
+		isSaving,
+		showIconLabels,
+	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isPublishSidebarOpened: select(
 				'core/edit-post'
 			).isPublishSidebarOpened(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+				'showIconLabels'
+			),
 		} ),
 		[]
 	);
+
+	const isLargeViewport = useViewportMatch( 'large' );
 
 	return (
 		<div className="edit-post-header">
@@ -47,6 +58,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					<PostSavedState
 						forceIsDirty={ hasActiveMetaboxes }
 						forceIsSaving={ isSaving }
+						showIconLabels={ showIconLabels }
 					/>
 				) }
 				<DevicePreview />
@@ -61,8 +73,15 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 						setEntitiesSavedStatesCallback
 					}
 				/>
-				<PinnedItems.Slot scope="core/edit-post" />
-				<MoreMenu />
+				{ ( isLargeViewport || ! showIconLabels ) && (
+					<>
+						<PinnedItems.Slot scope="core/edit-post" />
+						<MoreMenu showIconLabels={ showIconLabels } />
+					</>
+				) }
+				{ showIconLabels && ! isLargeViewport && (
+					<MoreMenu showIconLabels={ showIconLabels } />
+				) }
 			</div>
 		</div>
 	);

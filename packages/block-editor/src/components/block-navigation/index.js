@@ -62,16 +62,15 @@ export default compose(
 		const {
 			getSelectedBlockClientId,
 			getBlockHierarchyRootClientId,
-			getBlock,
-			getBlocks,
+			__unstableGetBlockWithBlockTree,
+			__unstableGetBlockTree,
 		} = select( 'core/block-editor' );
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
-			rootBlocks: getBlocks( '', { includeControlledInnerBlocks: true } ),
+			rootBlocks: __unstableGetBlockTree(),
 			rootBlock: selectedBlockClientId
-				? getBlock(
-						getBlockHierarchyRootClientId( selectedBlockClientId ),
-						{ includeControlledInnerBlocks: true }
+				? __unstableGetBlockWithBlockTree(
+						getBlockHierarchyRootClientId( selectedBlockClientId )
 				  )
 				: null,
 			selectedBlockClientId,

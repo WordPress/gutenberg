@@ -6,7 +6,7 @@ import { fromPairs } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback, useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 
@@ -14,19 +14,21 @@ import { useAsyncList } from '@wordpress/compose';
  * Internal dependencies
  */
 import InserterPanel from './panel';
+import PatternInserterPanel from './pattern-panel';
 import { searchItems } from './search-items';
 import InserterNoResults from './no-results';
 import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 
 function BlockPatternsSearchResults( { filterValue, onInsert } ) {
-	const [ patterns, , onClick ] = usePatternsState( onInsert );
-	const currentShownPatterns = useAsyncList( patterns );
+	const [ allPatterns, , onClick ] = usePatternsState( onInsert );
 
 	const filteredPatterns = useMemo(
-		() => searchItems( patterns, filterValue ),
-		[ filterValue, patterns ]
+		() => searchItems( allPatterns, filterValue ),
+		[ filterValue, allPatterns ]
 	);
+
+	const currentShownPatterns = useAsyncList( filteredPatterns );
 
 	if ( filterValue ) {
 		return !! filteredPatterns.length ? (
@@ -43,8 +45,45 @@ function BlockPatternsSearchResults( { filterValue, onInsert } ) {
 	}
 }
 
-function BlockPatternsPerCategories( { onInsert } ) {
-	const [ patterns, categories, onClick ] = usePatternsState( onInsert );
+function BlockPatternsCategory( {
+	onInsert,
+	selectedCategory,
+	onClickCategory,
+} ) {
+	const [ allPatterns, allCategories, onClick ] = usePatternsState(
+		onInsert
+	);
+
+	// Remove any empty categories
+	const populatedCategories = useMemo(
+		() =>
+			allCategories.filter( ( category ) =>
+				allPatterns.some( ( pattern ) =>
+					pattern.categories.includes( category.name )
+				)
+			),
+		[ allPatterns, allCategories ]
+	);
+
+	const patternCategory = selectedCategory
+		? selectedCategory
+		: populatedCategories[ 0 ];
+
+	useEffect( () => {
+		if (
+			allPatterns.some(
+				( pattern ) => getPatternIndex( pattern ) === Infinity
+			) &&
+			! populatedCategories.find(
+				( category ) => category.name === 'uncategorized'
+			)
+		) {
+			populatedCategories.push( {
+				name: 'uncategorized',
+				label: _x( 'Uncategorized' ),
+			} );
+		}
+	}, [ populatedCategories, allPatterns ] );
 
 	const getPatternIndex = useCallback(
 		( pattern ) => {
@@ -52,82 +91,80 @@ function BlockPatternsPerCategories( { onInsert } ) {
 				return Infinity;
 			}
 			const indexedCategories = fromPairs(
-				categories.map( ( { name }, index ) => [ name, index ] )
+				populatedCategories.map( ( { name }, index ) => [
+					name,
+					index,
+				] )
 			);
 			return Math.min(
-				...pattern.categories.map( ( category ) =>
-					indexedCategories[ category ] !== undefined
-						? indexedCategories[ category ]
+				...pattern.categories.map( ( cat ) =>
+					indexedCategories[ cat ] !== undefined
+						? indexedCategories[ cat ]
 						: Infinity
 				)
 			);
 		},
-		[ categories ]
+		[ populatedCategories ]
 	);
 
-	// Ordering the patterns per category is important for the async rendering.
+	const currentCategoryPatterns = useMemo(
+		() =>
+			allPatterns.filter( ( pattern ) =>
+				patternCategory.name === 'uncategorized'
+					? getPatternIndex( pattern ) === Infinity
+					: pattern.categories &&
+					  pattern.categories.includes( patternCategory.name )
+			),
+		[ allPatterns, patternCategory ]
+	);
+
+	// Ordering the patterns is important for the async rendering.
 	const orderedPatterns = useMemo( () => {
-		return patterns.sort( ( a, b ) => {
+		return currentCategoryPatterns.sort( ( a, b ) => {
 			return getPatternIndex( a ) - getPatternIndex( b );
 		} );
-	}, [ patterns, getPatternIndex ] );
+	}, [ currentCategoryPatterns, getPatternIndex ] );
 
 	const currentShownPatterns = useAsyncList( orderedPatterns );
 
-	// Uncategorized Patterns
-	const uncategorizedPatterns = useMemo(
-		() =>
-			patterns.filter(
-				( pattern ) => getPatternIndex( pattern ) === Infinity
-			),
-		[ patterns, getPatternIndex ]
-	);
-
 	return (
 		<>
-			{ categories.map( ( patternCategory ) => {
-				const categoryPatterns = patterns.filter(
-					( pattern ) =>
-						pattern.categories &&
-						pattern.categories.includes( patternCategory.name )
-				);
-				return (
-					!! categoryPatterns.length && (
-						<InserterPanel
-							key={ patternCategory.name }
-							title={ patternCategory.label }
-						>
-							<BlockPatternList
-								shownPatterns={ currentShownPatterns }
-								blockPatterns={ categoryPatterns }
-								onClickPattern={ onClick }
-							/>
-						</InserterPanel>
-					)
-				);
-			} ) }
-
-			{ !! uncategorizedPatterns.length && (
-				<InserterPanel title={ _x( 'Uncategorized' ) }>
+			{ !! currentCategoryPatterns.length && (
+				<PatternInserterPanel
+					key={ patternCategory.name }
+					title={ patternCategory.title }
+					selectedCategory={ patternCategory }
+					patternCategories={ populatedCategories }
+					onClickCategory={ onClickCategory }
+				>
 					<BlockPatternList
 						shownPatterns={ currentShownPatterns }
-						blockPatterns={ uncategorizedPatterns }
+						blockPatterns={ currentCategoryPatterns }
 						onClickPattern={ onClick }
 					/>
-				</InserterPanel>
+				</PatternInserterPanel>
 			) }
 		</>
 	);
 }
 
-function BlockPatternsTabs( { onInsert, filterValue } ) {
+function BlockPatternsTabs( {
+	onInsert,
+	onClickCategory,
+	filterValue,
+	selectedCategory,
+} ) {
 	return filterValue ? (
 		<BlockPatternsSearchResults
 			onInsert={ onInsert }
 			filterValue={ filterValue }
 		/>
 	) : (
-		<BlockPatternsPerCategories onInsert={ onInsert } />
+		<BlockPatternsCategory
+			selectedCategory={ selectedCategory }
+			onInsert={ onInsert }
+			onClickCategory={ onClickCategory }
+		/>
 	);
 }
 

@@ -6,6 +6,11 @@
 	margin-right: 2px;
 }
 
+.toolbarFullWidth {
+	padding-left: $block-edge-to-content / 2;
+	padding-right: $block-edge-to-content / 2;
+}
+
 .spacer {
 	flex-grow: 1;
 }
