@@ -9,7 +9,7 @@
   - add filtering by author support in Query block. ([25149](https://github.com/WordPress/gutenberg/pull/25149))
   - add order and order by support. ([24691](https://github.com/WordPress/gutenberg/pull/24691))
   - add tags support. ([25005](https://github.com/WordPress/gutenberg/pull/25005))
-- Navigation screen: 
+- Navigation screen:
   - add drag and drop to List View. ([23952](https://github.com/WordPress/gutenberg/pull/23952))
   - implement redesign of screen. ([25178](https://github.com/WordPress/gutenberg/pull/25178))
   - add support for advanced menu item properties. ([25062](https://github.com/WordPress/gutenberg/pull/25062))
@@ -7044,7 +7044,7 @@ Add knobs to the [ColorIndicator Story](https://github.com/WordPress/gutenberg/p
 
 = 2.8.0 =
 
-* Add a pasting schema in raw content handling. It simplifies whitelisting and reduces the amount of filters run. Should improve reliability, clarity, markdown conversion, and usage in blocks.
+* Add a pasting schema in raw content handling. It simplifies allowed tags and reduces the amount of filters run. Should improve reliability, clarity, markdown conversion, and usage in blocks.
 * Add “Spacer” block to create empty areas.
 * Add Server Side Render component.
 * Expand public InnerBlocks API with support for template configuration and allowedBlocks logic.

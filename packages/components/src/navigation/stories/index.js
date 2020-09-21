@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -29,6 +29,12 @@ const Container = styled.div`
 function Example() {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
+
+	const [ delayedBadge, setDelayedBadge ] = useState();
+	useEffect( () => {
+		const timeout = setTimeout( () => setDelayedBadge( 2 ), 1500 );
+		return () => clearInterval( timeout );
+	} );
 
 	// Mock navigation link
 	const Link = ( { href, children } ) => (
@@ -70,6 +76,17 @@ function Example() {
 							item="item-3"
 							navigateToMenu="category"
 							title="Category"
+						/>
+						<NavigationItem
+							badge={ delayedBadge }
+							item="item-3-fetching-badge"
+							navigateToMenu="category"
+							title="Delayed badge"
+						/>
+						<NavigationItem
+							item="item-pointing-non-existing-menu"
+							title="Navigate to a non existing menu"
+							navigateToMenu="non-existing-menu"
 						/>
 					</NavigationGroup>
 					<NavigationGroup title="Group 2">
@@ -120,6 +137,16 @@ function Example() {
 						item="child-3"
 						title="Nested Category"
 					/>
+					<NavigationItem
+						navigateToMenu="custom-back"
+						item="child-4"
+						title="Custom back"
+					/>
+					<NavigationItem
+						navigateToMenu="automatic-back"
+						item="child-5"
+						title="Automatic back"
+					/>
 				</NavigationMenu>
 
 				<NavigationMenu
@@ -138,6 +165,25 @@ function Example() {
 						title="Sub Child 2"
 						onClick={ () => setActiveItem( 'sub-child-2' ) }
 					/>
+				</NavigationMenu>
+
+				<NavigationMenu
+					backButtonLabel="Custom back"
+					menu="custom-back"
+					parentMenu="category"
+					title="Custom backButtonLabel"
+				>
+					<NavigationItem item="sub-2-child-1" title="Sub Child 1" />
+					<NavigationItem item="sub-2-child-2" title="Sub Child 2" />
+				</NavigationMenu>
+
+				<NavigationMenu
+					menu="automatic-back"
+					parentMenu="category"
+					title="Automatic backButtonLabel"
+				>
+					<NavigationItem item="sub-3-child-1" title="Sub Child 1" />
+					<NavigationItem item="sub-3-child-2" title="Sub Child 2" />
 				</NavigationMenu>
 			</Navigation>
 

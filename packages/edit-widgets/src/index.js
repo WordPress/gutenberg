@@ -1,10 +1,13 @@
 /**
  * WordPress dependencies
  */
+import {
+	registerBlockType,
+	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
+} from '@wordpress/blocks';
 import '@wordpress/notices';
 import { render } from '@wordpress/element';
 import {
-	registerBlock,
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
@@ -44,6 +47,7 @@ export function initialize( id, settings ) {
  */
 export function customizerInitialize( id, settings ) {
 	registerCoreBlocks();
+	registerBlock( legacyWidget );
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
@@ -52,3 +56,20 @@ export function customizerInitialize( id, settings ) {
 		document.getElementById( id )
 	);
 }
+
+/**
+ * Function to register an individual block.
+ *
+ * @param {Object} block The block to be registered.
+ *
+ */
+const registerBlock = ( block ) => {
+	if ( ! block ) {
+		return;
+	}
+	const { metadata, settings, name } = block;
+	if ( metadata ) {
+		unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } );
+	}
+	registerBlockType( name, settings );
+};
