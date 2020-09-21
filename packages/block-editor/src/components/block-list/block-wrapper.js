@@ -292,16 +292,13 @@ const BlockComponent = forwardRef(
 	(
 		{ children, tagName: TagName = 'div', __unstableIsHtml, ...props },
 		ref
-	) => (
-		<TagName
-			{ ...useBlockWrapperProps(
-				{ ...props, ref },
-				{ __unstableIsHtml }
-			) }
-		>
-			{ children }
-		</TagName>
-	)
+	) => {
+		const blockWrapperProps = useBlockWrapperProps(
+			{ ...props, ref },
+			{ __unstableIsHtml }
+		);
+		return <TagName { ...blockWrapperProps }>{ children }</TagName>;
+	}
 );
 
 const ExtendedBlockComponent = ELEMENTS.reduce( ( acc, element ) => {
