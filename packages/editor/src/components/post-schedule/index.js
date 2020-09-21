@@ -30,8 +30,9 @@ export function PostSchedule() {
 		getDayOfTheMonth( postDate )
 	);
 
-	const setCurrentMonthHandler = ( date ) =>
+	const setCurrentMonthHandler = ( date ) => {
 		setCurrentMonth( getDayOfTheMonth( date ) );
+	};
 
 	/*
 	 * Pick up published and schduled post from site,
@@ -46,7 +47,7 @@ export function PostSchedule() {
 					before: getDayOfTheMonth( currentMonth, false ),
 				} ),
 				( { title, type, date } ) => ( {
-					title,
+					title: title?.raw ? title.raw : title,
 					type,
 					date: new Date( date ),
 				} )
@@ -78,7 +79,7 @@ export function PostSchedule() {
 			key="date-time-picker"
 			currentDate={ postDate }
 			onChange={ updatePostDate }
-			onMonthPreviewed={ setCurrentMonthHandler }
+			onMonthChange={ setCurrentMonthHandler }
 			is12Hour={ is12HourTime }
 			events={ events }
 		/>
