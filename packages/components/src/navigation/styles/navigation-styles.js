@@ -15,7 +15,7 @@ export const NavigationUI = styled.div`
 	width: 100%;
 	background-color: ${ G2.darkGray.primary };
 	color: #f0f0f0;
-	padding: 8px;
+	padding: 0 8px;
 	overflow: hidden;
 `;
 
@@ -51,6 +51,10 @@ export const MenuTitleUI = styled( Text )`
 	padding: 4px 0 4px 16px;
 	margin-bottom: 8px;
 	color: ${ G2.gray[ 100 ] };
+
+	&:not( :first-child ) {
+		margin-top: 24px;
+	}
 `;
 
 export const GroupTitleUI = styled( Text )`
