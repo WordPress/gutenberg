@@ -117,6 +117,14 @@ function ParagraphBlock( {
 		minHeight: dropCapMinimumHeight,
 	};
 
+	const blockWrapperProps = useBlockWrapperProps( {
+		className: classnames( {
+			'has-drop-cap': dropCap,
+			[ `has-text-align-${ align }` ]: align,
+		} ),
+		style: styles,
+	} );
+
 	return (
 		<>
 			<BlockControls>
@@ -156,13 +164,7 @@ function ParagraphBlock( {
 			<RichText
 				identifier="content"
 				tagName="p"
-				{ ...useBlockWrapperProps( {
-					className: classnames( {
-						'has-drop-cap': dropCap,
-						[ `has-text-align-${ align }` ]: align,
-					} ),
-					style: styles,
-				} ) }
+				{ ...blockWrapperProps }
 				value={ content }
 				onChange={ ( newContent ) =>
 					setAttributes( { content: newContent } )

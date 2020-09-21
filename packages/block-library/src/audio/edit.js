@@ -41,7 +41,7 @@ function AudioEdit( {
 	insertBlocksAfter,
 } ) {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
-	const blockProps = useBlockWrapperProps();
+	const blockWrapperProps = useBlockWrapperProps();
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return getSettings().mediaUpload;
@@ -116,7 +116,7 @@ function AudioEdit( {
 	}
 	if ( ! src ) {
 		return (
-			<div { ...blockProps }>
+			<div { ...blockWrapperProps }>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
 					onSelect={ onSelectAudio }
@@ -175,7 +175,7 @@ function AudioEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<figure { ...blockProps }>
+			<figure { ...blockWrapperProps }>
 				{ /*
 					Disable the audio tag so the user clicking on it won't play the
 					file or change the position slider when the controls are enabled.

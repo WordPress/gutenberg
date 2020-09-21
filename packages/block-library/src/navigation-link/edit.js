@@ -239,6 +239,29 @@ function NavigationLinkEdit( {
 		};
 	}
 
+	const blockWrapperProps = useBlockWrapperProps( {
+		ref: listItemRef,
+		className: classnames( {
+			'is-editing':
+				( isSelected || isParentOfSelectedBlock ) &&
+				// Don't show the element as editing while dragging.
+				! isDraggingBlocks,
+			// Don't select the element while dragging.
+			'is-selected': isSelected && ! isDraggingBlocks,
+			'is-dragging-within': isDraggingWithin,
+			'has-link': !! url,
+			'has-child': hasDescendants,
+			'has-text-color': rgbTextColor,
+			[ `has-${ textColor }-color` ]: !! textColor,
+			'has-background': rgbBackgroundColor,
+			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+		} ),
+		style: {
+			color: rgbTextColor,
+			backgroundColor: rgbBackgroundColor,
+		},
+	} );
+
 	return (
 		<Fragment>
 			<BlockControls>
@@ -295,30 +318,7 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<li
-				{ ...useBlockWrapperProps( {
-					ref: listItemRef,
-					className: classnames( {
-						'is-editing':
-							( isSelected || isParentOfSelectedBlock ) &&
-							// Don't show the element as editing while dragging.
-							! isDraggingBlocks,
-						// Don't select the element while dragging.
-						'is-selected': isSelected && ! isDraggingBlocks,
-						'is-dragging-within': isDraggingWithin,
-						'has-link': !! url,
-						'has-child': hasDescendants,
-						'has-text-color': rgbTextColor,
-						[ `has-${ textColor }-color` ]: !! textColor,
-						'has-background': rgbBackgroundColor,
-						[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
-					} ),
-					style: {
-						color: rgbTextColor,
-						backgroundColor: rgbBackgroundColor,
-					},
-				} ) }
-			>
+			<li { ...blockWrapperProps }>
 				<div className="wp-block-navigation-link__content">
 					<RichText
 						ref={ ref }

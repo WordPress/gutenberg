@@ -12,8 +12,9 @@ import {
 } from '@wordpress/block-editor';
 
 export default function CodeEdit( { attributes, setAttributes } ) {
+	const blockWrapperProps = useBlockWrapperProps();
 	return (
-		<pre { ...useBlockWrapperProps() }>
+		<pre { ...blockWrapperProps }>
 			<PlainText
 				__experimentalVersion={ 2 }
 				tagName="code"

@@ -197,11 +197,12 @@ function ButtonEdit( props ) {
 	);
 
 	const colorProps = getColorAndStyleProps( attributes, colors, true );
+	const blockWrapperProps = useBlockWrapperProps();
 
 	return (
 		<>
 			<ColorEdit { ...props } />
-			<div { ...useBlockWrapperProps() }>
+			<div { ...blockWrapperProps }>
 				<RichText
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }

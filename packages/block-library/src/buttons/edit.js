@@ -21,8 +21,9 @@ const alignmentHooksSetting = {
 };
 
 function ButtonsEdit() {
+	const blockWrapperProps = useBlockWrapperProps();
 	return (
-		<div { ...useBlockWrapperProps() }>
+		<div { ...blockWrapperProps }>
 			<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
 				<InnerBlocks
 					allowedBlocks={ ALLOWED_BLOCKS }

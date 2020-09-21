@@ -26,6 +26,11 @@ export default function QuoteEdit( {
 	insertBlocksAfter,
 } ) {
 	const { align, value, citation } = attributes;
+	const blockWrapperProps = useBlockWrapperProps( {
+		className: classnames( className, {
+			[ `has-text-align-${ align }` ]: align,
+		} ),
+	} );
 
 	return (
 		<>
@@ -37,13 +42,7 @@ export default function QuoteEdit( {
 					} }
 				/>
 			</BlockControls>
-			<BlockQuotation
-				{ ...useBlockWrapperProps( {
-					className: classnames( className, {
-						[ `has-text-align-${ align }` ]: align,
-					} ),
-				} ) }
-			>
+			<BlockQuotation { ...blockWrapperProps }>
 				<RichText
 					identifier="value"
 					multiline

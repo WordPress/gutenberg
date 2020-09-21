@@ -36,6 +36,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );
+	const blockWrapperProps = useBlockWrapperProps( { className: classes } );
 
 	return (
 		<Fragment>
@@ -62,7 +63,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
-			<li { ...useBlockWrapperProps( { className: classes } ) }>
+			<li { ...blockWrapperProps }>
 				<Button onClick={ () => setPopover( true ) }>
 					<IconComponent />
 					{ isSelected && showURLPopover && (

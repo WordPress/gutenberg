@@ -271,6 +271,10 @@ export function ImageEdit( {
 		'is-focused': isSelected,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 	} );
+	const blockWrapperProps = useBlockWrapperProps( {
+		ref,
+		className: classes,
+	} );
 
 	const blockWrapperProps = useBlockWrapperProps( {
 		ref,

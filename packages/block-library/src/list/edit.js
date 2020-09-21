@@ -154,6 +154,8 @@ export default function ListEdit( {
 		</>
 	);
 
+	const blockWrapperProps = useBlockWrapperProps();
+
 	return (
 		<>
 			<RichText
@@ -178,7 +180,7 @@ export default function ListEdit( {
 				start={ start }
 				reversed={ reversed }
 				type={ type }
-				{ ...useBlockWrapperProps() }
+				{ ...blockWrapperProps }
 			>
 				{ controls }
 			</RichText>
