@@ -100,11 +100,11 @@ $app-background-dark-alt: $background-dark-elevated;
 $modal-background: $white;
 $modal-background-dark: $background-dark-elevated;
 
-$border-color: rgba($black, 0.15);
-$border-color-dark: rgba($white, 0.25);
+$border-color: $seperator;
+$border-color-dark: $seperator-dark;
 
-$border-dashed-color: $seperator;
-$border-dashed-color-dark: $seperator-dark;
+$border-dashed-color: rgba($black, 0.25);
+$border-dashed-color-dark: rgba($white, 0.27);
 
 $modal-border-color: $seperator;
 $modal-border-color-dark: $seperator-dark;
