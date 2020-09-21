@@ -14,9 +14,37 @@ import {
 import { useSelect } from '@wordpress/data';
 
 function useSecondaryText() {
-	const selectedBlock = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSelectedBlock();
+	const {
+		selectedBlock,
+		hoveredBlockIds,
+		getBlockName,
+		getBlock,
+	} = useSelect( ( select ) => {
+		const {
+			getSelectedBlock,
+			getHoveredBlocks,
+			getBlockName: _getBlockName,
+			getBlock: _getBlock,
+		} = select( 'core/block-editor' );
+		return {
+			selectedBlock: getSelectedBlock(),
+			hoveredBlockIds: getHoveredBlocks(),
+			getBlockName: _getBlockName,
+			getBlock: _getBlock,
+		};
 	} );
+
+	// Go through hovered blocks and see if one is of interest.
+	const hoveredTemplatePartBlockId = hoveredBlockIds.find(
+		( blockId ) => getBlockName( blockId ) === 'core/template-part'
+	);
+	const hoveredTemplatePartBlock = getBlock( hoveredTemplatePartBlockId );
+	const hoveredLabel = hoveredTemplatePartBlock
+		? getBlockLabel(
+				getBlockType( hoveredTemplatePartBlock.name ),
+				hoveredTemplatePartBlock.attributes
+		  )
+		: '';
 
 	// TODO: Handle if parent is template part too.
 	const selectedBlockLabel =
@@ -27,9 +55,9 @@ function useSecondaryText() {
 			  )
 			: null;
 
-	if ( selectedBlockLabel ) {
+	if ( hoveredLabel || selectedBlockLabel ) {
 		return {
-			label: selectedBlockLabel,
+			label: hoveredLabel || selectedBlockLabel,
 			isActive: true,
 		};
 	}

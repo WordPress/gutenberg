@@ -88,9 +88,12 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 		},
 		[ isSelected ]
 	);
-	const { insertDefaultBlock, removeBlock } = useDispatch(
-		'core/block-editor'
-	);
+	const {
+		insertDefaultBlock,
+		removeBlock,
+		addHoveredBlock,
+		removeHoveredBlock,
+	} = useDispatch( 'core/block-editor' );
 	const [ isHovered, setHovered ] = useState( false );
 
 	// Provide the selected node, or the first and last nodes of a multi-
@@ -264,6 +267,23 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 			ref.current.removeEventListener( 'mouseout', onMouseOut );
 		};
 	}, [ isNavigationMode, isHovered, setHovered ] );
+
+	useEffect( () => {
+		function onMouseEnter() {
+			addHoveredBlock( clientId );
+		}
+		function onMouseLeave() {
+			removeHoveredBlock( clientId );
+		}
+
+		ref.current.addEventListener( 'mouseenter', onMouseEnter );
+		ref.current.addEventListener( 'mouseleave', onMouseLeave );
+
+		return () => {
+			ref.current.removeEventListener( 'mouseenter', onMouseEnter );
+			ref.current.removeEventListener( 'mouseleave', onMouseLeave );
+		};
+	}, [] );
 
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 
