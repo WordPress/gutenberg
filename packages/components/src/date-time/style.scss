@@ -63,7 +63,7 @@ $date-picker-date-size: 30px;
 	}
 	
 	.components-datetime__date-header-month {
-		color: $gray-800;
+		color: $gray-700;
 		font-size: $default-font-size;
 		flex-grow: 2;
 		align-self: center;
@@ -97,7 +97,7 @@ $date-picker-date-size: 30px;
 		vertical-align: middle;
 		font-size: $default-font-size;
 		border-radius: $radius-round;
-		color: $gray-800;
+		color: $gray-700;
 		box-sizing: border-box;
 
 		&:focus {
