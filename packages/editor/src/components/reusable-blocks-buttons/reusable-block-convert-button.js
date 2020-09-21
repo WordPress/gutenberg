@@ -4,6 +4,7 @@
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 import { MenuItem } from '@wordpress/components';
+import { reusableBlock } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -68,6 +69,7 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 		<BlockSettingsMenuControls>
 			{ ( { onClose } ) => (
 				<MenuItem
+					icon={ reusableBlock }
 					onClick={ () => {
 						convertBlockToReusable( clientIds );
 						onClose();

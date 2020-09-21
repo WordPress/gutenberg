@@ -80,7 +80,6 @@ function QuickInserterList( {
 						onSelect={ onSelectBlockType }
 						onHover={ onHover }
 						label={ __( 'Blocks' ) }
-						limit={ SHOWN_BLOCK_TYPES }
 					/>
 				</InserterPanel>
 			) }
@@ -226,6 +225,7 @@ function QuickInserter( {
 					onChange={ ( value ) => {
 						setFilterValue( value );
 					} }
+					placeholder={ __( 'Search for a block' ) }
 				/>
 			) }
 

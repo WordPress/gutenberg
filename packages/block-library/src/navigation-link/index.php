@@ -140,11 +140,14 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		$html .= ' target="_blank"  ';
 	}
 
-	// Start appending HTML attributes to anchor tag.
 	if ( isset( $attributes['rel'] ) ) {
 		$html .= ' rel="' . esc_attr( $attributes['rel'] ) . '"';
 	} elseif ( isset( $attributes['nofollow'] ) && $attributes['nofollow'] ) {
 		$html .= ' rel="nofollow"';
+	}
+
+	if ( isset( $attributes['title'] ) ) {
+		$html .= ' title="' . esc_attr( $attributes['title'] ) . '"';
 	}
 
 	// End appending HTML attributes to anchor tag.

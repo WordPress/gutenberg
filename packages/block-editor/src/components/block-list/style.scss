@@ -506,7 +506,7 @@
 	overflow: hidden;
 	font-family: $editor-html-font;
 	font-size: $text-editor-font-size;
-	line-height: 150%;
+	line-height: 1.5;
 	transition: padding 0.2s linear;
 	@include reduce-motion("transition");
 
@@ -539,16 +539,64 @@
 	.block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
 		min-width: $block-toolbar-height/2;
 		width: $block-toolbar-height/2;
+
+		// Animate buttons on hover.
+		&.is-up-button {
+			svg {
+				transition: ease-in-out transform 0.1s;
+				@include reduce-motion("transition");
+			}
+			&:focus,
+			&:hover {
+				svg {
+					transform: translateX(-2px);
+				}
+			}
+		}
+
+		&.is-down-button {
+			svg {
+				transition: ease-in-out transform 0.1s;
+				@include reduce-motion("transition");
+			}
+			&:focus,
+			&:hover {
+				svg {
+					transform: translateX(2px);
+				}
+			}
+		}
 	}
 
 	.block-editor-block-mover:not(.is-horizontal) {
+		// Position SVGs. Animate buttons on hover.
 		.block-editor-block-mover-button {
-			&.is-up-button svg {
-				margin-top: 3px;
+			&.is-up-button {
+				svg {
+					margin-top: 2px;
+					transition: ease-in-out transform 0.1s;
+					@include reduce-motion("transition");
+				}
+				&:focus,
+				&:hover {
+					svg {
+						transform: translateY(-2px);
+					}
+				}
 			}
 
-			&.is-down-button svg {
-				margin-bottom: 3px;
+			&.is-down-button {
+				svg {
+					margin-bottom: 3px;
+					transition: ease-in-out transform 0.1s;
+					@include reduce-motion("transition");
+				}
+				&:focus,
+				&:hover {
+					svg {
+						transform: translateY(2px);
+					}
+				}
 			}
 
 			&:focus::before {
@@ -629,7 +677,11 @@
 }
 
 // Hide the popover block editor list while dragging.
-// Using a hacky animation to delay hiding the element so that dragging can still work.
+// Using a hacky animation to delay hiding the element.
+// It's needed because if we hide the element immediately upon dragging,
+// the dragging will end immediately since there are no elements to be dragged anymore.
+// Fortunately, we only have to keep it visible for a frame immediately after dragging,
+// after that, we can safely hide it altogether.
 @keyframes hide-during-dragging {
 	to {
 		position: fixed;
@@ -667,6 +719,7 @@
 	.is-dragging-components-draggable & {
 		opacity: 0;
 		// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.
+		// It's essential to hide the toolbar/popover so that `dragEnter` events can pass through them to the underlying elements.
 		animation: hide-during-dragging 1ms linear forwards;
 	}
 }

@@ -7,7 +7,10 @@ import { has, get, startsWith } from 'lodash';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport } from '@wordpress/blocks';
+import {
+	hasBlockSupport,
+	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+} from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -15,11 +18,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  */
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
-import {
-	PADDING_SUPPORT_KEY,
-	PaddingEdit,
-	paddingStyleMappings,
-} from './padding';
+import { PADDING_SUPPORT_KEY, PaddingEdit } from './padding';
 import SpacingPanelControl from '../components/spacing-panel-control';
 
 const styleSupportKeys = [
@@ -52,18 +51,8 @@ function compileStyleValue( uncompiledValue ) {
  * @return {Object}        Flattened CSS variables declaration
  */
 export function getInlineStyles( styles = {} ) {
-	const mappings = {
-		...paddingStyleMappings,
-		lineHeight: [ 'typography', 'lineHeight' ],
-		fontSize: [ 'typography', 'fontSize' ],
-		background: [ 'color', 'gradient' ],
-		backgroundColor: [ 'color', 'background' ],
-		color: [ 'color', 'text' ],
-		'--wp--style--color--link': [ 'color', 'link' ],
-	};
-
 	const output = {};
-	Object.entries( mappings ).forEach(
+	Object.entries( STYLE_PROPERTY ).forEach(
 		( [ styleKey, ...otherObjectKeys ] ) => {
 			const [ objectKeys ] = otherObjectKeys;
 

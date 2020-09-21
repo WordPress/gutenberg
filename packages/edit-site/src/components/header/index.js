@@ -27,6 +27,7 @@ import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import FullscreenModeClose from './fullscreen-mode-close';
+import DocumentActions from './document-actions';
 
 export default function Header( {
 	openEntitiesSavedStates,
@@ -36,6 +37,7 @@ export default function Header( {
 	const {
 		deviceType,
 		hasFixedToolbar,
+		template,
 		templateId,
 		templatePartId,
 		templateType,
@@ -51,14 +53,18 @@ export default function Header( {
 			getPage,
 		} = select( 'core/edit-site' );
 
-		const { show_on_front: _showOnFront } = select(
-			'core'
-		).getEditedEntityRecord( 'root', 'site' );
+		const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
+		const { show_on_front: _showOnFront } = getEditedEntityRecord(
+			'root',
+			'site'
+		);
 
+		const _templateId = getTemplateId();
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
-			templateId: getTemplateId(),
+			templateId: _templateId,
+			template: getEntityRecord( 'postType', 'wp_template', _templateId ),
 			templatePartId: getTemplatePartId(),
 			templateType: getTemplateType(),
 			page: getPage(),
@@ -81,61 +87,72 @@ export default function Header( {
 
 	return (
 		<div className="edit-site-header">
-			<MainDashboardButton.Slot>
-				<FullscreenModeClose />
-			</MainDashboardButton.Slot>
-			<div className="edit-site-header__toolbar">
-				<Button
-					isPrimary
-					isPressed={ isInserterOpen }
-					className="edit-site-header-toolbar__inserter-toggle"
-					onClick={ onToggleInserter }
-					icon={ plus }
-					label={ _x(
-						'Add block',
-						'Generic label for block inserter button'
+			<div className="edit-site-header_start">
+				<MainDashboardButton.Slot>
+					<FullscreenModeClose />
+				</MainDashboardButton.Slot>
+				<div className="edit-site-header__toolbar">
+					<Button
+						isPrimary
+						isPressed={ isInserterOpen }
+						className="edit-site-header-toolbar__inserter-toggle"
+						onClick={ onToggleInserter }
+						icon={ plus }
+						label={ _x(
+							'Add block',
+							'Generic label for block inserter button'
+						) }
+					/>
+					<ToolSelector />
+					<UndoButton />
+					<RedoButton />
+					<BlockNavigationDropdown />
+					{ displayBlockToolbar && (
+						<div className="edit-site-header-toolbar__block-toolbar">
+							<BlockToolbar hideDragHandle />
+						</div>
 					) }
-				/>
-				<ToolSelector />
-				<UndoButton />
-				<RedoButton />
-				<BlockNavigationDropdown />
-				{ displayBlockToolbar && (
-					<div className="edit-site-header-toolbar__block-toolbar">
-						<BlockToolbar hideDragHandle />
+					<div className="edit-site-header__toolbar-switchers">
+						<PageSwitcher
+							showOnFront={ showOnFront }
+							activePage={ page }
+							onActivePageChange={ setPage }
+						/>
+						<div className="edit-site-header__toolbar-switchers-separator">
+							/
+						</div>
+						<TemplateSwitcher
+							page={ page }
+							activeId={ templateId }
+							activeTemplatePartId={ templatePartId }
+							isTemplatePart={
+								templateType === 'wp_template_part'
+							}
+							onActiveIdChange={ setTemplate }
+							onActiveTemplatePartIdChange={ setTemplatePart }
+							onAddTemplate={ addTemplate }
+							onRemoveTemplate={ removeTemplate }
+						/>
 					</div>
-				) }
-				<div className="edit-site-header__toolbar-switchers">
-					<PageSwitcher
-						showOnFront={ showOnFront }
-						activePage={ page }
-						onActivePageChange={ setPage }
-					/>
-					<div className="edit-site-header__toolbar-switchers-separator">
-						/
-					</div>
-					<TemplateSwitcher
-						page={ page }
-						activeId={ templateId }
-						activeTemplatePartId={ templatePartId }
-						isTemplatePart={ templateType === 'wp_template_part' }
-						onActiveIdChange={ setTemplate }
-						onActiveTemplatePartIdChange={ setTemplatePart }
-						onAddTemplate={ addTemplate }
-						onRemoveTemplate={ removeTemplate }
-					/>
 				</div>
 			</div>
-			<div className="edit-site-header__actions">
-				<PreviewOptions
-					deviceType={ deviceType }
-					setDeviceType={ setPreviewDeviceType }
-				/>
-				<SaveButton
-					openEntitiesSavedStates={ openEntitiesSavedStates }
-				/>
-				<PinnedItems.Slot scope="core/edit-site" />
-				<MoreMenu />
+
+			<div className="edit-site-header_center">
+				<DocumentActions documentTitle={ template?.slug } />
+			</div>
+
+			<div className="edit-site-header_end">
+				<div className="edit-site-header__actions">
+					<PreviewOptions
+						deviceType={ deviceType }
+						setDeviceType={ setPreviewDeviceType }
+					/>
+					<SaveButton
+						openEntitiesSavedStates={ openEntitiesSavedStates }
+					/>
+					<PinnedItems.Slot scope="core/edit-site" />
+					<MoreMenu />
+				</div>
 			</div>
 		</div>
 	);

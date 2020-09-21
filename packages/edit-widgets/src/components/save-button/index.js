@@ -30,7 +30,7 @@ function SaveButton() {
 			onClick={ isSaving ? undefined : saveEditedWidgetAreas }
 			disabled={ ! hasEditedWidgetAreaIds }
 		>
-			{ __( 'Update' ) }
+			{ isSaving ? __( 'Saving…' ) : __( 'Update' ) }
 		</Button>
 	);
 }

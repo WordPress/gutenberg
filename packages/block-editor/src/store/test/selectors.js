@@ -50,6 +50,10 @@ const {
 	isFirstMultiSelectedBlock,
 	getBlockMode,
 	isTyping,
+	isDraggingBlocks,
+	getDraggedBlockClientIds,
+	isBlockBeingDragged,
+	isAncestorBeingDragged,
 	isCaretWithinFormattedText,
 	getBlockInsertionPoint,
 	isBlockInsertionPointVisible,
@@ -1846,6 +1850,96 @@ describe( 'selectors', () => {
 			};
 
 			expect( isTyping( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isDraggingBlocks', () => {
+		it( 'should return true if a block is being dragged', () => {
+			const state = {
+				draggedBlocks: [ 'block-client-id' ],
+			};
+			expect( isDraggingBlocks( state ) ).toBe( true );
+		} );
+
+		it( 'should return false if a block is not being dragged', () => {
+			const state = {
+				draggedBlocks: [],
+			};
+			expect( isDraggingBlocks( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'getDraggedBlockClientIds', () => {
+		it( 'returns the draggedBlocks state', () => {
+			const draggedBlocks = [ 'block-client-id' ];
+			const state = {
+				draggedBlocks,
+			};
+			expect( getDraggedBlockClientIds( state ) ).toBe( draggedBlocks );
+		} );
+	} );
+
+	describe( 'isBlockBeingDragged', () => {
+		it( 'returns true if the given client id is one of the blocks being dragged', () => {
+			const state = {
+				draggedBlocks: [ 'block-1', 'block-2', 'block-3' ],
+			};
+			expect( isBlockBeingDragged( state, 'block-2' ) ).toBe( true );
+		} );
+
+		it( 'returns false if the given client id is not one of the blocks being dragged', () => {
+			const state = {
+				draggedBlocks: [ 'block-1', 'block-2', 'block-3' ],
+			};
+			expect( isBlockBeingDragged( state, 'block-4' ) ).toBe( false );
+		} );
+
+		it( 'returns false if no blocks are being dragged', () => {
+			const state = {
+				draggedBlocks: [],
+			};
+			expect( isBlockBeingDragged( state, 'block-1' ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isAncestorBeingDragged', () => {
+		it( 'returns true if the given client id is a child of one of the blocks being dragged', () => {
+			const state = {
+				draggedBlocks: [ 'block-1_grandparent' ],
+				blocks: {
+					parents: {
+						'block-1': 'block-1_parent',
+						'block-1_parent': 'block-1_grandparent',
+					},
+				},
+			};
+			expect( isAncestorBeingDragged( state, 'block-1' ) ).toBe( true );
+		} );
+
+		it( 'returns false if the given client id does not have an ancestor being dragged', () => {
+			const state = {
+				draggedBlocks: [ 'block-2_grandparent' ],
+				blocks: {
+					parents: {
+						'block-1': 'block-1_parent',
+						'block-1_parent': 'block-1_grandparent',
+					},
+				},
+			};
+			expect( isAncestorBeingDragged( state, 'block-1' ) ).toBe( false );
+		} );
+
+		it( 'returns false if no blocks are being dragged', () => {
+			const state = {
+				draggedBlocks: [],
+				blocks: {
+					parents: {
+						'block-1': 'block-1_parent',
+						'block-1_parent': 'block-1_grandparent',
+					},
+				},
+			};
+			expect( isAncestorBeingDragged( state, 'block-1' ) ).toBe( false );
 		} );
 	} );
 

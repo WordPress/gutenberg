@@ -47,8 +47,8 @@ export default function DevicePreview() {
 						forcePreviewLink={ isSaving ? null : undefined }
 						textContent={
 							<>
-								<Icon icon={ external } />
 								{ __( 'Preview in new tab' ) }
+								<Icon icon={ external } />
 							</>
 						}
 					/>

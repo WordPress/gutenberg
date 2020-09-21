@@ -24,6 +24,8 @@ import {
 	startTyping,
 	stopMultiSelect,
 	stopTyping,
+	startDraggingBlocks,
+	stopDraggingBlocks,
 	toggleBlockMode,
 	toggleSelection,
 	updateBlock,
@@ -566,6 +568,68 @@ describe( 'actions', () => {
 				value: undefined,
 			} );
 		} );
+
+		it( 'should pass patternName through metadata to INSERT_BLOCKS action', () => {
+			const ribsBlock = {
+				clientId: 'ribs',
+				name: 'core/test-ribs',
+			};
+			const chickenBlock = {
+				clientId: 'chicken',
+				name: 'core/test-chicken',
+			};
+			const chickenRibsBlock = {
+				clientId: 'chicken-ribs',
+				name: 'core/test-chicken-ribs',
+			};
+			const blocks = [ ribsBlock, chickenBlock, chickenRibsBlock ];
+			const meta = { patternName: 'core/chicken-ribs-pattern' };
+
+			const insertBlocksGenerator = insertBlocks(
+				blocks,
+				5,
+				'testrootid',
+				false,
+				meta
+			);
+
+			// Skip getSettings select.
+			insertBlocksGenerator.next();
+
+			expect( insertBlocksGenerator.next().value ).toEqual( {
+				args: [ 'core/test-ribs', 'testrootid' ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect( insertBlocksGenerator.next( true ).value ).toEqual( {
+				args: [ 'core/test-chicken', 'testrootid' ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect( insertBlocksGenerator.next( false ).value ).toEqual( {
+				args: [ 'core/test-chicken-ribs', 'testrootid' ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect( insertBlocksGenerator.next( true ) ).toEqual( {
+				done: true,
+				value: {
+					type: 'INSERT_BLOCKS',
+					blocks: [ ribsBlock, chickenRibsBlock ],
+					index: 5,
+					rootClientId: 'testrootid',
+					time: expect.any( Number ),
+					updateSelection: false,
+					meta: { patternName: 'core/chicken-ribs-pattern' },
+				},
+			} );
+		} );
 	} );
 
 	describe( 'showInsertionPoint', () => {
@@ -843,6 +907,24 @@ describe( 'actions', () => {
 		it( 'should return the STOP_TYPING action', () => {
 			expect( stopTyping() ).toEqual( {
 				type: 'STOP_TYPING',
+			} );
+		} );
+	} );
+
+	describe( 'startDraggingBlocks', () => {
+		it( 'should return the START_DRAGGING_BLOCKS action with the list of clientIds passed', () => {
+			const clientIds = [ 'block-1', 'block-2', 'block-3' ];
+			expect( startDraggingBlocks( clientIds ) ).toEqual( {
+				type: 'START_DRAGGING_BLOCKS',
+				clientIds,
+			} );
+		} );
+	} );
+
+	describe( 'stopDraggingBlocks', () => {
+		it( 'should return the STOP_DRAGGING_BLOCKS action', () => {
+			expect( stopDraggingBlocks() ).toEqual( {
+				type: 'STOP_DRAGGING_BLOCKS',
 			} );
 		} );
 	} );

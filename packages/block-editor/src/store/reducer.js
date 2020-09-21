@@ -1131,20 +1131,20 @@ export function isTyping( state = false, action ) {
 }
 
 /**
- * Reducer returning dragging state.
+ * Reducer returning dragged block client id.
  *
- * @param {boolean} state  Current state.
+ * @param {string[]} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return {string[]} Updated state.
  */
-export function isDraggingBlocks( state = false, action ) {
+export function draggedBlocks( state = [], action ) {
 	switch ( action.type ) {
 		case 'START_DRAGGING_BLOCKS':
-			return true;
+			return action.clientIds;
 
 		case 'STOP_DRAGGING_BLOCKS':
-			return false;
+			return [];
 	}
 
 	return state;
@@ -1653,7 +1653,7 @@ export function highlightedBlock( state, action ) {
 export default combineReducers( {
 	blocks,
 	isTyping,
-	isDraggingBlocks,
+	draggedBlocks,
 	isCaretWithinFormattedText,
 	selectionStart,
 	selectionEnd,

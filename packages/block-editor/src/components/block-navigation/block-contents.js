@@ -1,6 +1,12 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -9,6 +15,7 @@ import { forwardRef } from '@wordpress/element';
 import { useBlockNavigationContext } from './context';
 import BlockNavigationBlockSlot from './block-slot';
 import BlockNavigationBlockSelectButton from './block-select-button';
+import BlockDraggable from '../block-draggable';
 
 const BlockNavigationBlockContents = forwardRef(
 	(
@@ -24,33 +31,85 @@ const BlockNavigationBlockContents = forwardRef(
 		ref
 	) => {
 		const {
-			__experimentalFeatures: withBlockNavigationSlots,
+			__experimentalFeatures,
+			blockDropTarget = {},
 		} = useBlockNavigationContext();
 
-		return withBlockNavigationSlots ? (
-			<BlockNavigationBlockSlot
-				ref={ ref }
-				className="block-editor-block-navigation-block-contents"
-				block={ block }
-				onClick={ onClick }
-				isSelected={ isSelected }
-				position={ position }
-				siblingBlockCount={ siblingBlockCount }
-				level={ level }
-				{ ...props }
-			/>
-		) : (
-			<BlockNavigationBlockSelectButton
-				ref={ ref }
-				className="block-editor-block-navigation-block-contents"
-				block={ block }
-				onClick={ onClick }
-				isSelected={ isSelected }
-				position={ position }
-				siblingBlockCount={ siblingBlockCount }
-				level={ level }
-				{ ...props }
-			/>
+		const { clientId } = block;
+
+		const rootClientId = useSelect(
+			( select ) =>
+				select( 'core/block-editor' ).getBlockRootClientId(
+					clientId
+				) || '',
+			[ clientId ]
+		);
+
+		const {
+			rootClientId: dropTargetRootClientId,
+			clientId: dropTargetClientId,
+			dropPosition,
+		} = blockDropTarget;
+
+		const isDroppingBefore =
+			dropTargetRootClientId === rootClientId &&
+			dropTargetClientId === clientId &&
+			dropPosition === 'top';
+		const isDroppingAfter =
+			dropTargetRootClientId === rootClientId &&
+			dropTargetClientId === clientId &&
+			dropPosition === 'bottom';
+		const isDroppingToInnerBlocks =
+			dropTargetRootClientId === clientId && dropPosition === 'inside';
+
+		const className = classnames(
+			'block-editor-block-navigation-block-contents',
+			{
+				'is-dropping-before': isDroppingBefore,
+				'is-dropping-after': isDroppingAfter,
+				'is-dropping-to-inner-blocks': isDroppingToInnerBlocks,
+			}
+		);
+
+		return (
+			<BlockDraggable
+				clientIds={ [ block.clientId ] }
+				elementId={ `block-navigation-block-${ block.clientId }` }
+			>
+				{ ( { isDraggable, onDraggableStart, onDraggableEnd } ) =>
+					__experimentalFeatures ? (
+						<BlockNavigationBlockSlot
+							ref={ ref }
+							className={ className }
+							block={ block }
+							onClick={ onClick }
+							isSelected={ isSelected }
+							position={ position }
+							siblingBlockCount={ siblingBlockCount }
+							level={ level }
+							draggable={ isDraggable && __experimentalFeatures }
+							onDragStart={ onDraggableStart }
+							onDragEnd={ onDraggableEnd }
+							{ ...props }
+						/>
+					) : (
+						<BlockNavigationBlockSelectButton
+							ref={ ref }
+							className={ className }
+							block={ block }
+							onClick={ onClick }
+							isSelected={ isSelected }
+							position={ position }
+							siblingBlockCount={ siblingBlockCount }
+							level={ level }
+							draggable={ isDraggable && __experimentalFeatures }
+							onDragStart={ onDraggableStart }
+							onDragEnd={ onDraggableEnd }
+							{ ...props }
+						/>
+					)
+				}
+			</BlockDraggable>
 		);
 	}
 );

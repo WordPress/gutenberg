@@ -34,7 +34,10 @@ export function getActiveColor( formatName, formatValue, colors ) {
 	}
 	const currentClass = activeColorFormat.attributes.class;
 	if ( currentClass ) {
-		const colorSlug = currentClass.replace( /.*has-(.*?)-color.*/, '$1' );
+		const colorSlug = currentClass.replace(
+			/.*has-([^\s]*)-color.*/,
+			'$1'
+		);
 		return getColorObjectByAttributeValues( colors, colorSlug ).color;
 	}
 }
