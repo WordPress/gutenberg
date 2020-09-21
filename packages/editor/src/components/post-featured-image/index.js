@@ -104,11 +104,7 @@ function PostFeaturedImage( {
 						onSelect={ onUpdateImage }
 						unstableFeaturedImageFlow
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						modalClass={
-							! featuredImageId
-								? 'editor-post-featured-image__media-modal'
-								: 'editor-post-featured-image__media-modal'
-						}
+						modalClass="editor-post-featured-image__media-modal"
 						render={ ( { open } ) => (
 							<div className="editor-post-featured-image__container">
 								<Button
