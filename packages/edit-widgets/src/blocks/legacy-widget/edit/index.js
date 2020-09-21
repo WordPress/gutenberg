@@ -11,7 +11,6 @@ import { Button, PanelBody, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
-import ServerSideRender from '@wordpress/server-side-render';
 import { update } from '@wordpress/icons';
 
 /**
@@ -19,6 +18,7 @@ import { update } from '@wordpress/icons';
  */
 import LegacyWidgetEditHandler from './handler';
 import LegacyWidgetPlaceholder from './placeholder';
+import WidgetPreview from './widget-preview';
 
 class LegacyWidgetEdit extends Component {
 	constructor() {
@@ -188,15 +188,12 @@ class LegacyWidgetEdit extends Component {
 	}
 
 	renderWidgetPreview() {
-		const { widgetId, attributes } = this.props;
+		const { attributes, widgetAreaId } = this.props;
 		return (
-			<ServerSideRender
+			<WidgetPreview
 				className="wp-block-legacy-widget__preview"
-				block="core/legacy-widget"
-				attributes={ {
-					widgetId,
-					...omit( attributes, 'referenceWidgetName' ),
-				} }
+				widgetAreaId={ widgetAreaId }
+				attributes={ omit( attributes, 'widgetId' ) }
 			/>
 		);
 	}
@@ -211,6 +208,9 @@ export default withSelect(
 			clientId
 		);
 		const widget = select( 'core/edit-widgets' ).getWidget( widgetId );
+		const widgetArea = select(
+			'core/edit-widgets'
+		).getWidgetAreaForClientId( clientId );
 		const editorSettings = select( 'core/block-editor' ).getSettings();
 		const {
 			availableLegacyWidgets,
@@ -231,6 +231,7 @@ export default withSelect(
 			hasPermissionsToManageWidgets,
 			availableLegacyWidgets,
 			widgetId,
+			widgetAreaId: widgetArea?.id,
 			WPWidget,
 			prerenderedEditForm: widget ? widget.rendered_form : '',
 		};
