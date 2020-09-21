@@ -19,9 +19,9 @@ function PostFeaturedImageDisplay( { context: { postId, postType } } ) {
 		[ featuredImage ]
 	);
 	if ( ! media ) {
-		return __( 'Featured Image is not set' );
+		return __( 'No Featured Image is set' );
 	}
-	const alt = media.alt_text || `{postType} Featured Media`;
+	const alt = media.alt_text || __( 'No alternative text set' );
 	return (
 		<ResponsiveWrapper
 			naturalWidth={ media.media_details.width }
