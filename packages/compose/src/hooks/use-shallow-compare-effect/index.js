@@ -10,7 +10,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
  * This hook is only used for backward-compatibility reason. Consider using `useEffect` wherever possible.
  *
  * @param {Function} effect The effect callback passed to `useEffect`.
- * @param {Array} deps The dependency array that is compared against shallowly.
+ * @param {Array}    deps   The dependency array that is compared against shallowly.
  */
 function useShallowCompareEffect( effect, deps ) {
 	const ref = useRef();

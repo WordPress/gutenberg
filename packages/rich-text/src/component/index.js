@@ -135,6 +135,7 @@ function fixPlaceholderSelection( defaultView ) {
 	selection.collapseToStart();
 }
 
+// These effects are better grouped together as they serve the same logic.
 function useReapply( {
 	TagName,
 	placeholder,
