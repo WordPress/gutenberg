@@ -196,6 +196,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
+    public void storySaveSync() {
+        mGutenbergBridgeJS2Parent.storySaveSync(getNewMediaSelectedCallback(true,null));
+    }
+
+    @ReactMethod
     public void requestImageFailedRetryDialog(final int mediaId) {
         mGutenbergBridgeJS2Parent.requestImageFailedRetryDialog(mediaId);
     }

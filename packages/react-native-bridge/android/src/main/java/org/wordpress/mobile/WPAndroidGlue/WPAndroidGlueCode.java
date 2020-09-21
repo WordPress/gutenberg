@@ -84,6 +84,7 @@ public class WPAndroidGlueCode {
 
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachQueryListener mOnReattachQueryListener;
+    private OnStorySavingReattachQueryListener mOnStorySavingReattachQueryListener;
     private OnEditorMountListener mOnEditorMountListener;
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
@@ -158,6 +159,10 @@ public class WPAndroidGlueCode {
 
     public interface OnReattachQueryListener {
         void onQueryCurrentProgressForUploadingMedia();
+    }
+
+    public interface OnStorySavingReattachQueryListener {
+        void onQueryCurrentProgressForStoryMediaSaving();
     }
 
     public interface OnEditorMountListener {
@@ -269,6 +274,12 @@ public class WPAndroidGlueCode {
             public void mediaUploadSync(MediaSelectedCallback mediaSelectedCallback) {
                 mMediaSelectedCallback = mediaSelectedCallback;
                 mOnReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
+            }
+
+            @Override
+            public void storySaveSync(MediaSelectedCallback mediaSelectedCallback) {
+                mMediaSelectedCallback = mediaSelectedCallback;
+                mOnStorySavingReattachQueryListener.onQueryCurrentProgressForStoryMediaSaving();
             }
 
             @Override
@@ -469,6 +480,7 @@ public class WPAndroidGlueCode {
     public void attachToContainer(ViewGroup viewGroup,
                                   OnMediaLibraryButtonListener onMediaLibraryButtonListener,
                                   OnReattachQueryListener onReattachQueryListener,
+                                  OnStorySavingReattachQueryListener onStorySavingReattachQueryListener,
                                   OnEditorMountListener onEditorMountListener,
                                   OnEditorAutosaveListener onEditorAutosaveListener,
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
@@ -486,6 +498,7 @@ public class WPAndroidGlueCode {
 
         mOnMediaLibraryButtonListener = onMediaLibraryButtonListener;
         mOnReattachQueryListener = onReattachQueryListener;
+        mOnStorySavingReattachQueryListener = onStorySavingReattachQueryListener;
         mOnEditorMountListener = onEditorMountListener;
         mOnEditorAutosaveListener = onEditorAutosaveListener;
         mRequestExecutor = fetchExecutor;
@@ -853,6 +866,22 @@ public class WPAndroidGlueCode {
 
     public void clearMediaFileURL(final int mediaId) {
         mDeferredEventEmitter.onUploadMediaFileClear(mediaId);
+    }
+
+    public void clearFileSaveStatus(final int mediaId) {
+        mDeferredEventEmitter.onSaveMediaFileClear(mediaId);
+    }
+
+    public void mediaFileSaveProgress(final int mediaId, final float progress) {
+        mDeferredEventEmitter.onMediaFileSaveProgress(mediaId, progress);
+    }
+
+    public void mediaFileSaveFailed(final int mediaId) {
+        mDeferredEventEmitter.onMediaFileSaveFailed(mediaId);
+    }
+
+    public void mediaFileSaveSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId) {
+        mDeferredEventEmitter.onMediaFileSaveSucceeded(mediaId, mediaUrl, serverMediaId);
     }
 
     public void replaceUnsupportedBlock(String content, String blockId) {

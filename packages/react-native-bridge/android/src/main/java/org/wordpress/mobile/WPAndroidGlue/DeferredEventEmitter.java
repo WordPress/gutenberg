@@ -9,6 +9,7 @@ import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadEventEmitter;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.StorySaveEventEmitter;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -16,7 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID;
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL;
 
-public class DeferredEventEmitter implements MediaUploadEventEmitter {
+public class DeferredEventEmitter implements MediaUploadEventEmitter, StorySaveEventEmitter {
     public interface JSEventEmitter {
         void emitToJS(String eventName, @Nullable WritableMap data);
     }
@@ -25,6 +26,11 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter {
     private static final int MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
     private static final int MEDIA_UPLOAD_STATE_FAILED = 3;
     private static final int MEDIA_UPLOAD_STATE_RESET = 4;
+
+    private static final int STORY_SAVE_STATE_SAVING = 5;
+    private static final int STORY_SAVE_STATE_SUCCEEDED = 6;
+    private static final int STORY_SAVE_STATE_FAILED = 7;
+    private static final int STORY_SAVE_STATE_RESET = 8;
 
     private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
 
@@ -122,6 +128,27 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter {
     @Override
     public void onMediaFileUploadFailed(int mediaId) {
         setMediaFileUploadDataInJS(MEDIA_UPLOAD_STATE_FAILED, mediaId, null, 0);
+    }
+
+    // Story save events emitter
+    @Override
+    public void onSaveMediaFileClear(int mediaId) {
+        setMediaFileUploadDataInJS(STORY_SAVE_STATE_RESET, mediaId, null, 0);
+    }
+
+    @Override
+    public void onMediaFileSaveProgress(int mediaId, float progress) {
+        setMediaFileUploadDataInJS(STORY_SAVE_STATE_SAVING, mediaId, null, progress);
+    }
+
+    @Override
+    public void onMediaFileSaveSucceeded(int mediaId, String mediaUrl, int mediaServerId) {
+        setMediaFileUploadDataInJS(STORY_SAVE_STATE_SUCCEEDED, mediaId, mediaUrl, 1, mediaServerId);
+    }
+
+    @Override
+    public void onMediaFileSaveFailed(int mediaId) {
+        setMediaFileUploadDataInJS(STORY_SAVE_STATE_FAILED, mediaId, null, 0);
     }
 
     public void updateCapabilities(GutenbergProps gutenbergProps) {
