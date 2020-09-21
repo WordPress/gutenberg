@@ -10,7 +10,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	Warning,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
@@ -25,6 +25,12 @@ export default function PostCommentsCountEdit( {
 	const { textAlign } = attributes;
 	const { postId } = context;
 	const [ commentsCount, setCommentsCount ] = useState();
+	const blockWrapperProps = useBlockWrapperProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
+
 	useEffect( () => {
 		if ( ! postId ) {
 			return;
@@ -53,11 +59,7 @@ export default function PostCommentsCountEdit( {
 					} }
 				/>
 			</BlockControls>
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
+			<div { ...blockWrapperProps }>
 				{ postId && commentsCount !== undefined ? (
 					commentsCount
 				) : (
@@ -65,7 +67,7 @@ export default function PostCommentsCountEdit( {
 						{ __( 'Post Comments Count block: post not found.' ) }
 					</Warning>
 				) }
-			</Block.div>
+			</div>
 		</>
 	);
 }
