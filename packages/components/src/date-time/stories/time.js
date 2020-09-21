@@ -7,20 +7,21 @@ import TimePicker from '../time';
  * External dependencies
  */
 import { date, boolean } from '@storybook/addon-knobs';
-import { noop } from 'lodash';
+import { useState, createElement } from 'react';
 
 export default { title: 'Components/TimePicker', component: TimePicker };
 
-export const _default = () => {
+const TimePickerWithState = () => {
+	const [ currentTime, setCurrentTime ] = useState(
+		new Date( date( 'currentTime', new Date( '1986-10-18T11:00:00' ) ) )
+	);
 	return (
 		<TimePicker
-			currentTime={
-				new Date(
-					date( 'currentTime', new Date( '1986-10-18T11:00:00' ) )
-				)
-			}
+			currentTime={ currentTime }
 			is12Hour={ boolean( 'is12Hour', false ) }
-			onChange={ noop }
+			onChange={ setCurrentTime }
 		/>
 	);
 };
+
+export const _default = () => createElement( TimePickerWithState );
