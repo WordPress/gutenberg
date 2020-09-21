@@ -11,48 +11,35 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { FONT_SIZE, LINE_HEIGHT, fromPx, toPx } from '../editor/utils';
+import { fromPx, toPx } from '../editor/utils';
 
 export default ( {
 	context: { supports, name },
-	getProperty,
-	setProperty,
+	getStyleProperty,
+	setStyleProperty,
 } ) => {
 	if (
-		! supports.includes( FONT_SIZE ) &&
-		! supports.includes( LINE_HEIGHT )
+		! supports.includes( 'fontSize' ) &&
+		! supports.includes( 'lineHeight' )
 	) {
 		return null;
 	}
 
 	return (
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
-			{ supports.includes( FONT_SIZE ) && (
+			{ supports.includes( 'fontSize' ) && (
 				<FontSizePicker
-					value={ fromPx(
-						getProperty( name, [ 'typography', 'fontSize' ] )
-					) }
+					value={ fromPx( getStyleProperty( name, 'fontSize' ) ) }
 					onChange={ ( value ) =>
-						setProperty(
-							name,
-							[ 'typography', 'fontSize' ],
-							toPx( value )
-						)
+						setStyleProperty( name, 'fontSize', toPx( value ) )
 					}
 				/>
 			) }
-			{ supports.includes( LINE_HEIGHT ) && (
+			{ supports.includes( 'lineHeight' ) && (
 				<LineHeightControl
-					value={ getProperty( name, [
-						'typography',
-						'lineHeight',
-					] ) }
+					value={ getStyleProperty( name, 'lineHeight' ) }
 					onChange={ ( value ) =>
-						setProperty(
-							name,
-							[ 'typography', 'lineHeight' ],
-							value
-						)
+						setStyleProperty( name, 'lineHeight', value )
 					}
 				/>
 			) }

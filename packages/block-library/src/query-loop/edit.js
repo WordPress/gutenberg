@@ -27,6 +27,7 @@ export default function QueryLoopEdit( {
 			order,
 			orderBy,
 			author,
+			search,
 		} = {},
 		queryContext,
 	},
@@ -49,6 +50,9 @@ export default function QueryLoopEdit( {
 			if ( author ) {
 				query.author = author;
 			}
+			if ( search ) {
+				query.search = search;
+			}
 			return {
 				posts: select( 'core' ).getEntityRecords(
 					'postType',
@@ -68,6 +72,7 @@ export default function QueryLoopEdit( {
 			orderBy,
 			clientId,
 			author,
+			search,
 		]
 	);
 
