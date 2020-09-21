@@ -34,7 +34,7 @@ export const settings = {
  * @return {Object} Block object.
  */
 export const create = ( editorSettings ) => {
-	const legacyWidgets = editorSettings?.availableLegacyWidgets || {};
+	const legacyWidgets = editorSettings?.availableLegacyWidgets ?? {};
 	return {
 		metadata,
 		name,
