@@ -2,7 +2,7 @@
 	border-radius: 8px 8px 8px 8px;
 }
 
-.modalItem {
+.item {
 	flex-direction: column;
 	justify-content: flex-start;
 	align-items: center;
@@ -12,7 +12,7 @@
 	padding-bottom: 0;
 }
 
-.modalIconWrapper {
+.iconWrapper {
 	width: 104px;
 	height: 64px;
 	background-color: $gray-light; //#f3f6f8
@@ -25,7 +25,7 @@
 	background-color: rgba( $white, 0.07 );
 }
 
-.modalIcon {
+.icon {
 	width: 32px;
 	height: 32px;
 	justify-content: center;
@@ -33,11 +33,11 @@
 	fill: $gray-dark;
 }
 
-.modalIconDark {
+.iconDark {
 	fill: $white;
 }
 
-.modalItemLabel {
+.itemLabel {
 	background-color: transparent;
 	padding-left: 2;
 	padding-right: 2;
@@ -48,7 +48,7 @@
 	color: $gray-dark;
 }
 
-.modalItemLabelDark {
+.itemLabelDark {
 	color: $white;
 }
 

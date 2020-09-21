@@ -26,17 +26,14 @@ function InserterListItem( {
 		onSelect( item );
 	};
 
-	const modalIconWrapperStyle = getStylesFromColorScheme(
-		styles.modalIconWrapper,
-		styles.modalIconWrapperDark
+	const iconWrapperStyle = getStylesFromColorScheme(
+		styles.iconWrapper,
+		styles.iconWrapperDark
 	);
-	const modalIconStyle = getStylesFromColorScheme(
-		styles.modalIcon,
-		styles.modalIconDark
-	);
-	const modalItemLabelStyle = getStylesFromColorScheme(
-		styles.modalItemLabel,
-		styles.modalItemLabelDark
+	const iconStyle = getStylesFromColorScheme( styles.icon, styles.iconDark );
+	const itemLabelStyle = getStylesFromColorScheme(
+		styles.itemLabel,
+		styles.itemLabelDark
 	);
 
 	const clipboardBlockStyles = getStylesFromColorScheme(
@@ -54,25 +51,25 @@ function InserterListItem( {
 			accessibilityLabel={ item.title }
 			onPress={ onPress }
 		>
-			<View style={ [ styles.modalItem, { width: maxWidth } ] }>
+			<View style={ [ styles.item, { width: maxWidth } ] }>
 				<View
 					style={ [
-						modalIconWrapperStyle,
+						iconWrapperStyle,
 						itemWidth && {
 							width: itemWidth,
 						},
 						isClipboardBlock && clipboardBlockStyles,
 					] }
 				>
-					<View style={ modalIconStyle }>
+					<View style={ iconStyle }>
 						<Icon
 							icon={ item.icon.src || item.icon }
-							fill={ modalIconStyle.fill }
-							size={ modalIconStyle.width }
+							fill={ iconStyle.fill }
+							size={ iconStyle.width }
 						/>
 					</View>
 				</View>
-				<Text style={ modalItemLabelStyle }>
+				<Text style={ itemLabelStyle }>
 					{ isClipboardBlock ? __( 'Copied block' ) : item.title }
 				</Text>
 			</View>
@@ -84,8 +81,8 @@ function getWidth() {
 	const {
 		paddingLeft: itemPaddingLeft,
 		paddingRight: itemPaddingRight,
-	} = styles.modalItem;
-	const { width: itemWidth } = styles.modalIconWrapper;
+	} = styles.item;
+	const { width: itemWidth } = styles.iconWrapper;
 	return itemWidth + itemPaddingLeft + itemPaddingRight;
 }
 
