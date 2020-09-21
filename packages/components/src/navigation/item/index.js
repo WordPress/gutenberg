@@ -45,12 +45,12 @@ export default function NavigationItem( props ) {
 		'is-active': item && activeItem === item,
 	} );
 
-	const onItemClick = () => {
+	const onItemClick = ( event ) => {
 		if ( navigateToMenu ) {
 			setActiveMenu( navigateToMenu );
 		}
 
-		onClick();
+		onClick( event );
 	};
 
 	return (
