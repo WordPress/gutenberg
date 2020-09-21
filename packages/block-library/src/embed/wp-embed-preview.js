@@ -78,8 +78,10 @@ class WpEmbedPreview extends Component {
 	render() {
 		const { html } = this.props;
 		const doc = new DOMParser().parseFromString( html, 'text/html' );
-		doc.querySelector( 'iframe' ).removeAttribute( 'style' );
-		doc.querySelector( 'blockquote' ).style.display = 'none';
+		const iframe = doc.querySelector( 'iframe' );
+		if ( iframe ) iframe.removeAttribute( 'style' );
+		const blockQuote = doc.querySelector( 'blockquote' );
+		if ( blockQuote ) blockQuote.style.display = 'none';
 
 		return (
 			<div
