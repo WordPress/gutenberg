@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, kebabCase } from 'lodash';
+import { get, kebabCase, reduce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -83,17 +83,21 @@ export default ( blockData, baseTree, userTree ) => {
 	 * @return {Array} An array of style declarations.
 	 */
 	const getBlockPresetsDeclarations = ( blockPresets ) => {
-		const declarations = [];
-		PRESET_CATEGORIES.forEach( ( category ) => {
-			if ( blockPresets?.[ category ] ) {
-				blockPresets[ category ].forEach( ( { slug, value } ) =>
+		return reduce(
+			PRESET_CATEGORIES,
+			( declarations, { path, key }, category ) => {
+				const preset = get( blockPresets, path, [] );
+				preset.forEach( ( value ) => {
 					declarations.push(
-						`--wp--preset--${ category }--${ slug }: ${ value }`
-					)
-				);
-			}
-		} );
-		return declarations;
+						`--wp--preset--${ kebabCase( category ) }--${
+							value.slug
+						}: ${ value[ key ] }`
+					);
+				} );
+				return declarations;
+			},
+			[]
+		);
 	};
 
 	const getBlockSelector = ( selector ) => {
@@ -113,7 +117,7 @@ export default ( blockData, baseTree, userTree ) => {
 				blockData[ context ].supports,
 				tree[ context ].styles
 			),
-			...getBlockPresetsDeclarations( tree[ context ].presets ),
+			...getBlockPresetsDeclarations( tree[ context ].settings ),
 		];
 		if ( blockDeclarations.length > 0 ) {
 			styles.push(

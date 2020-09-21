@@ -52,6 +52,13 @@ If this property is added, a label will be generated using label property as the
 -   Type: `String`
 -   Required: No
 
+### labelPosition
+
+The position of the label (`top`, `side`, or `bottom`).
+
+-   Type: `String`
+-   Required: No
+
 ### onChange
 
 A function that receives the value of the input.

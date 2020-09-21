@@ -40,7 +40,7 @@ function SelectControl(
 		options = [],
 		size = 'default',
 		value: valueProp,
-		labelPosition,
+		labelPosition = 'top',
 		...props
 	},
 	ref

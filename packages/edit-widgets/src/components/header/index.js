@@ -11,12 +11,12 @@ import {
 } from '@wordpress/block-editor';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import SaveButton from '../save-button';
+import useLastSelectedRootId from '../../hooks/use-last-selected-root-id';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 
@@ -24,12 +24,7 @@ const inserterToggleProps = { isPrimary: true };
 
 function Header( { isCustomizer } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const rootClientId = useSelect( ( select ) => {
-		const { getBlockRootClientId, getBlockSelectionEnd } = select(
-			'core/block-editor'
-		);
-		return getBlockRootClientId( getBlockSelectionEnd() );
-	}, [] );
+	const rootClientId = useLastSelectedRootId();
 
 	return (
 		<>
