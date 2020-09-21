@@ -692,7 +692,6 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 		),
 		'settings' => array(
 			'color'      => array(),
-			'custom'     => array(),
 			'typography' => array(),
 			'spacing'    => array(),
 		),
