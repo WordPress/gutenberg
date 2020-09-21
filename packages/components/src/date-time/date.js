@@ -72,6 +72,7 @@ const renderDayContents = ( day, date, events ) => {
 
 const DatePicker = ( {
 	onChange,
+	onMonthChange,
 	currentDate,
 	isInvalidDate,
 	locale,
@@ -94,6 +95,7 @@ const DatePicker = ( {
 			useWeekdaysShort={ true }
 			locale={ locale }
 			highlightDates={ highlightDates }
+			onMonthChange={ onMonthChange }
 		/>
 	);
 };
