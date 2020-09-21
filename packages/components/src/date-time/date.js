@@ -47,7 +47,7 @@ const renderTooltipContent = ( events ) => {
 	}
 
 	return (
-		<div>
+		<div className="components-datetime__date--day-events">
 			<ul>
 				{ map( eventsToRender, ( event ) => (
 					<li>{ event.title || __( 'No title', 'gutenberg' ) }</li>
