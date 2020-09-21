@@ -10,8 +10,13 @@
 // @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
 // When that happens, leverage that instead of the following overrides.
 .editor-styles-wrapper .wp-block-social-link {
-	margin: 0;
-	margin-right: 8px;
+	margin: 0 8px 8px 0;
+
+	// Prevent toolbar from jumping when selecting / hovering a link.
+	&.is-selected,
+	&.is-hovered {
+		transform: none;
+	}
 }
 
 .editor-styles-wrapper .wp-block-social-links {

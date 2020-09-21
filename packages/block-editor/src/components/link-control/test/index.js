@@ -3,6 +3,7 @@
  */
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
+import { queryByText, queryByRole } from '@testing-library/react';
 import { first, last, nth, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
@@ -1217,10 +1218,9 @@ describe( 'Selecting links', () => {
 		expect( currentLinkHTML ).toEqual(
 			expect.stringContaining( selectedLink.title )
 		);
-		expect( currentLinkHTML ).toEqual(
-			expect.stringContaining( selectedLink.type )
-		);
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
+		expect(
+			queryByRole( currentLink, 'button', { name: 'Edit' } )
+		).toBeTruthy();
 		expect( currentLinkAnchor ).not.toBeNull();
 	} );
 
@@ -1685,4 +1685,71 @@ describe( 'Addition Settings UI', () => {
 		expect( settingControlsInputs[ 0 ].checked ).toEqual( false );
 		expect( settingControlsInputs[ 1 ].checked ).toEqual( true );
 	} );
+} );
+
+describe( 'Post types', () => {
+	it( 'should display post type in search results of link', async () => {
+		const searchTerm = 'Hello world';
+
+		act( () => {
+			render( <LinkControl />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = getURLInput();
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		const searchResultElements = getSearchResults();
+
+		searchResultElements.forEach( ( resultItem, index ) => {
+			expect(
+				queryByText( resultItem, fauxEntitySuggestions[ index ].type )
+			).toBeTruthy();
+		} );
+	} );
+
+	it.each( [ 'page', 'post', 'tag', 'post_tag', 'category' ] )(
+		'should NOT display post type in search results of %s',
+		async ( postType ) => {
+			const searchTerm = 'Hello world';
+
+			act( () => {
+				render(
+					<LinkControl suggestionsQuery={ { type: postType } } />,
+					container
+				);
+			} );
+
+			// Search Input UI
+			const searchInput = getURLInput();
+
+			// Simulate searching for a term
+			act( () => {
+				Simulate.change( searchInput, {
+					target: { value: searchTerm },
+				} );
+			} );
+
+			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+			await eventLoopTick();
+
+			const searchResultElements = getSearchResults();
+
+			searchResultElements.forEach( ( resultItem, index ) => {
+				expect(
+					queryByText(
+						resultItem,
+						fauxEntitySuggestions[ index ].type
+					)
+				).toBeFalsy();
+			} );
+		}
+	);
 } );

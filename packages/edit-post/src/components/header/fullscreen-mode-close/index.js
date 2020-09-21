@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { wordpress } from '@wordpress/icons';
 
-function FullscreenModeClose() {
+function FullscreenModeClose( { showTooltip } ) {
 	const { isActive, isRequestingSiteIcon, postType, siteIconUrl } = useSelect(
 		( select ) => {
 			const { getCurrentPostType } = select( 'core/editor' );
@@ -61,7 +61,7 @@ function FullscreenModeClose() {
 				post_type: postType.slug,
 			} ) }
 			label={ get( postType, [ 'labels', 'view_items' ], __( 'Back' ) ) }
-			showTooltip
+			showTooltip={ showTooltip }
 		>
 			{ buttonIcon }
 		</Button>

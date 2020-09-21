@@ -28,7 +28,6 @@ const config = require( '../config' );
  * @typedef WPRawPerformanceResults
  *
  * @property {number[]} load             Load Time.
- * @property {number[]} domcontentloaded DOM Contentloaded time.
  * @property {number[]} type             Average type time.
  * @property {number[]} focus            Average block selection time.
  */
@@ -37,7 +36,6 @@ const config = require( '../config' );
  * @typedef WPPerformanceResults
  *
  * @property {number} load             Load Time.
- * @property {number} domcontentloaded DOM Contentloaded time.
  * @property {number} type             Average type time.
  * @property {number} minType          Minium type time.
  * @property {number} maxType          Maximum type time.
@@ -49,7 +47,6 @@ const config = require( '../config' );
  * @typedef WPFormattedPerformanceResults
  *
  * @property {string=} load             Load Time.
- * @property {string=} domcontentloaded DOM Contentloaded time.
  * @property {string=} type             Average type time.
  * @property {string=} minType          Minium type time.
  * @property {string=} maxType          Maximum type time.
@@ -106,7 +103,6 @@ function formatTime( number ) {
 function curateResults( results ) {
 	return {
 		load: average( results.load ),
-		domcontentloaded: average( results.domcontentloaded ),
 		type: average( results.type ),
 		minType: Math.min( ...results.type ),
 		maxType: Math.max( ...results.type ),
@@ -164,7 +160,6 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 	const medians = mapValues(
 		{
 			load: results.map( ( r ) => r.load ),
-			domcontentloaded: results.map( ( r ) => r.domcontentloaded ),
 			type: results.map( ( r ) => r.type ),
 			minType: results.map( ( r ) => r.minType ),
 			maxType: results.map( ( r ) => r.maxType ),

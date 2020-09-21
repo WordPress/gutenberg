@@ -81,6 +81,7 @@ const LinkControlSearchInput = forwardRef(
 				withCreateSuggestion,
 				currentInputValue: value,
 				createSuggestionButtonText,
+				suggestionsQuery,
 				handleSuggestionClick: ( suggestion ) => {
 					if ( props.handleSuggestionClick ) {
 						props.handleSuggestionClick( suggestion );

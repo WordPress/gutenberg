@@ -1,0 +1,37 @@
+.edit-navigation-header {
+	padding: $grid-unit-20;
+	background: #f1f1f1; // Need to find a variable for this
+
+	.edit-navigation-header__title {
+		font-size: 23px;
+		font-weight: 400;
+		line-height: $default-line-height;
+		margin: 0 0 $grid-unit-10;
+	}
+}
+
+// Lining up all the actions in a nice row.
+.edit-navigation-header__actions {
+	align-items: center;
+	display: flex;
+
+	// Spacing out the actions a little.
+	.edit-navigation-header__current-menu,
+	.components-dropdown {
+		margin-right: $grid-unit-20;
+	}
+}
+
+// The select menu for choosing which menu to edit.
+.edit-navigation-header__current-menu .components-base-control__field {
+	margin: 0;
+}
+
+.edit-navigation-header__create-menu-button {
+	margin-top: $grid-unit-10;
+}
+
+.edit-navigation-header__manage-locations .components-spinner {
+	display: block;
+	margin: $grid-unit-20 auto;
+}

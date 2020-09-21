@@ -51,7 +51,7 @@ import { useState } from '@wordpress/element';
 const MyControlledRadioRadioGroup = () => {
 	const [ checked, setChecked ] = useState( '25' );
 	return (
-		<RadioGroup accessibilityLabel="Width" onChange={ setChecked } checked={ checked }>
+		<RadioGroup label="Width" onChange={ setChecked } checked={ checked }>
 			<Radio value="25">25%</Radio>
 			<Radio value="50">50%</Radio>
 			<Radio value="75">75%</Radio>
@@ -66,12 +66,12 @@ const MyControlledRadioRadioGroup = () => {
 When using the RadioGroup component as an uncontrolled component, the default value can be set with the `defaultChecked` prop.
 
 ```jsx
-import { Radio, RadioGroup } from '@wordpress/components';
+import { __experimentalRadio as Radio, __experimentalRadioGroup as RadioGroup } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 const MyUncontrolledRadioRadioGroup = () => {
 	return (
-		<RadioGroup accessibilityLabel="Width" defaultChecked="25">
+		<RadioGroup label="Width" defaultChecked="25">
 			<Radio value="25">25%</Radio>
 			<Radio value="50">50%</Radio>
 			<Radio value="75">75%</Radio>

@@ -99,7 +99,7 @@ $block-inserter-tabs-height: 44px;
 		}
 
 		&::placeholder {
-			color: $dark-gray-400;
+			color: $gray-700;
 		}
 
 		&::-webkit-search-decoration,
@@ -157,16 +157,30 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20 $grid-unit-20 0;
 }
 
+.block-editor-inserter__panel-header-patterns {
+	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-10;
+}
+
 .block-editor-inserter__panel-content {
 	padding: $grid-unit-20;
 }
 
-.block-editor-inserter__panel-title {
+.block-editor-inserter__panel-title,
+.block-editor-inserter__panel-title button,
+.components-custom-select-control__menu li {
 	margin: 0 $grid-unit-15 0 0;
 	color: $gray-700;
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: 500;
+}
+
+.block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
+	line-height: 1.2;
+}
+
+.block-editor-inserter__panel-dropdown select {
+	border: none;
 }
 
 .block-editor-inserter__block-list {
@@ -195,7 +209,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__no-results-icon {
-	fill: $light-gray-800;
+	fill: $gray-600;
 }
 
 .block-editor-inserter__child-blocks {
@@ -224,6 +238,8 @@ $block-inserter-tabs-height: 44px;
 	position: absolute;
 	top: $grid-unit-20;
 	left: calc(100% + #{$grid-unit-20});
+	max-height: calc(100% - #{$grid-unit-40});
+	overflow-y: hidden;
 
 	@include break-medium {
 		display: block;
@@ -252,7 +268,7 @@ $block-inserter-tabs-height: 44px;
 	justify-content: center;
 	align-items: center;
 	min-height: $grid-unit-60 * 3;
-	color: $dark-gray-400;
+	color: $gray-700;
 	background: $gray-100;
 }
 
@@ -268,6 +284,10 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__quick-inserter {
 	width: 100%;
+
+	// Constrain to container. Avoids overflow bug on FF 79
+	// see https://github.com/WordPress/gutenberg/issues/24529.
+	max-width: 100%;
 
 	@include break-medium {
 		width: $block-inserter-width;

@@ -13,7 +13,7 @@ This tutorial was written for Gutenberg version 8.5.
  1. [What is needed to create a block-based theme?](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#what-is-needed-to-create-a-block-based-theme)
  2. [Creating the theme](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#creating-the-theme)
  3. [Creating the templates and template parts](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#creating-the-templates-and-template-parts)
- 4. [Experimental-theme.json -Global styles](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#experimental-themejson--global-styles)
+ 4. [Experimental-theme.json -Global styles](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#experimental-theme-json-global-styles)
  5. [Adding blocks](/docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-2-adding-blocks.md)
 
 ## What is needed to create a block-based theme?
