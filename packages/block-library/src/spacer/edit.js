@@ -13,8 +13,9 @@ import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
-const MIN_SPACER_HEIGHT = 20;
+const MIN_SPACER_HEIGHT = 1;
 const MAX_SPACER_HEIGHT = 500;
+const MIN_SPACER_HEIGHT_EDITOR = 48;
 
 const SpacerEdit = ( {
 	attributes,
@@ -29,6 +30,20 @@ const SpacerEdit = ( {
 		setAttributes( {
 			height: value,
 		} );
+	};
+
+	const style = {};
+
+	const updateStyle = ( newHeight ) => {
+		const cheat = Math.max( 0, MIN_SPACER_HEIGHT_EDITOR - newHeight ) / 2;
+		style.top = `${ cheat }px`;
+		style.margin = `-${ cheat }px 0`;
+	};
+
+	updateStyle( height );
+
+	const handleOnResize = ( event, direction, elt, delta ) => {
+		updateStyle( parseInt( height + delta.height, 10 ) );
 	};
 
 	const handleOnResizeStart = ( ...args ) => {
@@ -58,6 +73,7 @@ const SpacerEdit = ( {
 				size={ {
 					height,
 				} }
+				style={ style }
 				minHeight={ MIN_SPACER_HEIGHT }
 				enable={ {
 					top: false,
@@ -69,6 +85,7 @@ const SpacerEdit = ( {
 					bottomLeft: false,
 					topLeft: false,
 				} }
+				onResize={ handleOnResize }
 				onResizeStart={ handleOnResizeStart }
 				onResizeStop={ handleOnResizeStop }
 				showHandle={ isSelected }
