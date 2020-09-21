@@ -34,11 +34,22 @@ export const WithDaysHighlighted = () => {
 		{ date: aFewDaysAfter( now ) },
 	] );
 
+	console.log( { highlights } );
+
 	button( 'Add random highlight', () => {
 		const lastHighlight = highlights[ highlights.length - 1 ];
 		setHighlights( [
 			...highlights,
-			{ date: aFewDaysAfter( lastHighlight.date ) },
+			{
+				date: aFewDaysAfter( lastHighlight.date ),
+				title: 'Event Title',
+				type: 'test',
+			},
+			{
+				date: aFewDaysAfter( lastHighlight.date ),
+				title: 'Duplicated Event Title',
+				type: 'duplicated',
+			},
 		] );
 	} );
 

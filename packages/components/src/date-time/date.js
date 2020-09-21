@@ -2,13 +2,13 @@
  * External dependencies
  */
 import ReactDatePicker from 'react-datepicker';
-import { map } from 'lodash';
 import { format, setMonth, getMonth, getYear } from 'date-fns';
+import { isSameDay, format, setMonth, getMonth, getYear, getDate } from 'date-fns';
 
 /**
  * WordPress dependencies
  */
-import { Icon, Button } from '../';
+import { Icon, Button, Tooltup } from '../';
 
 /**
  * Module Constants
@@ -36,6 +36,36 @@ const DatePickerHeader = ( { date, decreaseMonth, increaseMonth ,locale } ) => (
 	</div>
 );
 
+const renderTooltipContent = ( events ) => {
+	return (
+		<div>
+			<ul>
+				{ map( events, ( event ) => (
+					<li>{ event.title }</li>
+				) ) }
+			</ul>
+		</div>
+	)
+};
+
+const renderDayContents = ( day, date, events ) => {
+	console.log( { events } );
+	console.log( { day } );
+	console.log( { date } );
+	const eventsByDay = filter( events, ( ev ) => isSameDay( date, ev.date ) );
+	console.log( { eventsByDay } );
+
+	if ( ! eventsByDay?.length ) {
+		return getDate( date );
+	}
+	
+	return <>
+		<Tooltip text={ renderTooltipContent( eventsByDay ) }>
+			<span>{ getDate( date ).toString() }</span>
+		</Tooltip>
+	</>;
+};
+
 const DatePicker = ( {
 	onChange,
 	currentDate,
@@ -53,6 +83,9 @@ const DatePicker = ( {
 			inline
 			renderCustomHeader={ ( props ) =>
 				<DatePickerHeader { ...props } locale={ locale } />
+			}
+			renderDayContents={ ( ...props ) =>
+				renderDayContents( ...props, events )
 			}
 			useWeekdaysShort={ true }
 			locale={ locale }
