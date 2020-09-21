@@ -39,14 +39,32 @@ import { SidebarComplementaryAreaFills } from '../sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
+import NavigationSidebar from '../navigation-sidebar';
 
 const interfaceLabels = {
 	leftSidebar: __( 'Block Library' ),
 };
 
 function Editor() {
-	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
+	const [ isInserterOpen, _setIsInserterOpen ] = useState( false );
+	const [ isNavigationOpen, _setIsNavigationOpen ] = useState( false );
 	const isMobile = useViewportMatch( 'medium', '<' );
+
+	const setIsInserterOpen = ( value ) => {
+		if ( isNavigationOpen && value ) {
+			_setIsNavigationOpen( false );
+		}
+
+		_setIsInserterOpen( value );
+	};
+
+	const setIsNavigationOpen = ( value ) => {
+		if ( isInserterOpen && value ) {
+			_setIsInserterOpen( false );
+		}
+
+		_setIsNavigationOpen( value );
+	};
 
 	const {
 		isFullscreenActive,
@@ -156,6 +174,32 @@ function Editor() {
 		[ page?.context ]
 	);
 
+	let leftSidebar = null;
+	if ( isNavigationOpen ) {
+		leftSidebar = <NavigationSidebar />;
+	} else if ( isInserterOpen ) {
+		leftSidebar = (
+			<div className="edit-site-editor__inserter-panel">
+				<div className="edit-site-editor__inserter-panel-header">
+					<Button
+						icon={ close }
+						onClick={ () => setIsInserterOpen( false ) }
+					/>
+				</div>
+				<div className="edit-site-editor__inserter-panel-content">
+					<Library
+						showInserterHelpPanel
+						onSelect={ () => {
+							if ( isMobile ) {
+								setIsInserterOpen( false );
+							}
+						} }
+					/>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<>
 			<EditorStyles styles={ settings.styles } />
@@ -190,38 +234,7 @@ function Editor() {
 											<SidebarComplementaryAreaFills />
 											<InterfaceSkeleton
 												labels={ interfaceLabels }
-												leftSidebar={
-													isInserterOpen && (
-														<div className="edit-site-editor__inserter-panel">
-															<div className="edit-site-editor__inserter-panel-header">
-																<Button
-																	icon={
-																		close
-																	}
-																	onClick={ () =>
-																		setIsInserterOpen(
-																			false
-																		)
-																	}
-																/>
-															</div>
-															<div className="edit-site-editor__inserter-panel-content">
-																<Library
-																	showInserterHelpPanel
-																	onSelect={ () => {
-																		if (
-																			isMobile
-																		) {
-																			setIsInserterOpen(
-																				false
-																			);
-																		}
-																	} }
-																/>
-															</div>
-														</div>
-													)
-												}
+												leftSidebar={ leftSidebar }
 												sidebar={
 													sidebarIsOpened && (
 														<ComplementaryArea.Slot scope="core/edit-site" />
@@ -238,6 +251,14 @@ function Editor() {
 														onToggleInserter={ () =>
 															setIsInserterOpen(
 																! isInserterOpen
+															)
+														}
+														isNavigationOpen={
+															isNavigationOpen
+														}
+														onToggleNavigation={ () =>
+															setIsNavigationOpen(
+																! isNavigationOpen
 															)
 														}
 													/>
