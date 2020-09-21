@@ -147,8 +147,7 @@ class BlockListBlock extends Component {
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
-		const isParentFullWidth =
-			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
+		const hasParentBlockAlignment = parentBlockAlignment !== undefined;
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 
 		return (
@@ -175,7 +174,7 @@ class BlockListBlock extends Component {
 									styles.solidBorder,
 									isFullWidth &&
 										hasParents &&
-										isParentFullWidth &&
+										hasParentBlockAlignment &&
 										blockWidth < screenWidth &&
 										styles.borderFullWidth,
 									getStylesFromColorScheme(
@@ -219,7 +218,7 @@ class BlockListBlock extends Component {
 									anchorNodeRef={ this.anchorNodeRef.current }
 									isFullWidth={
 										isFullWidth && hasParents
-											? isParentFullWidth
+											? hasParentBlockAlignment
 											: isFullWidth
 									}
 								/>

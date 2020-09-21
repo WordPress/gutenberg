@@ -86,6 +86,7 @@ function ColumnsEditContainer( {
 	onDeleteBlock,
 	innerColumns,
 	updateInnerColumnWidth,
+	hasParents,
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUM );
@@ -114,18 +115,24 @@ function ColumnsEditContainer( {
 	}, [ width ] );
 
 	const getContainerWidth = ( containerWidth ) =>
-		2 * MARGIN + containerWidth - columnsInRow * 2 * MARGIN - DELTA;
+		2 * MARGIN + containerWidth - columnsInRow * 2 * MARGIN - DELTA * 2;
 
-	const columnWidths = Object.values(
+	const columnWidths = getColumnWidths( innerColumns, columnCount );
+
+	const columnWidthsValues = Object.values(
 		getColumnWidths( innerColumns, columnCount )
 	);
 
-	const columnWidthsSum = columnWidths.reduce(
+	const columnWidthsSum = columnWidthsValues.reduce(
 		( acc, curr ) => acc + curr,
 		0
 	);
 
-	const columnWidthsPerRatio = columnWidths.map(
+	const columnRatios = columnWidthsValues.map(
+		( colWidth ) => colWidth / columnWidthsSum
+	);
+
+	const columnWidthsPerRatio = columnWidthsValues.map(
 		( columnWidth ) =>
 			( columnWidth / columnWidthsSum ) * getContainerWidth( width )
 	);
@@ -134,90 +141,87 @@ function ColumnsEditContainer( {
 		( columnWidthPerRatio ) => columnWidthPerRatio < MIN_WIDTH
 	);
 
-	const newParentWidth =
+	const baseContainerWidth =
 		width - filteredColumnWidthsPerRatio.length * MIN_WIDTH;
+
+	const minPercentageRatio = MIN_WIDTH / baseContainerWidth;
+
+	const largeColumnsWidthsSum = columnRatios
+		.map( ( ratio, index ) => {
+			if ( ratio > minPercentageRatio ) {
+				return columnWidthsValues[ index ];
+			}
+			return 0;
+		} )
+		.reduce( ( acc, curr ) => acc + curr, 0 );
 
 	const calculateWidths = useMemo( () => {
 		const widths = {};
+		const containerWidth = getContainerWidth( baseContainerWidth );
 
-		let columnWidth = width / columnsInRow;
+		let columnWidth = containerWidth / columnsInRow;
 		let maxColumnWidth = columnWidth;
 
-		innerColumns.forEach( ( innerColumn ) => {
-			if ( columnsInRow > 1 ) {
-				if ( width > ALIGNMENT_BREAKPOINTS.medium ) {
-					const attributeWidth =
-						innerColumn.attributes.width ||
-						getColumnWidths( innerColumns, columnCount )[
-							innerColumn.clientId
-						];
+		innerColumns.forEach(
+			( { attributes: innerColumnAttributes, clientId } ) => {
+				const attributeWidth =
+					innerColumnAttributes.width || columnWidths[ clientId ];
+				const propotionalRatio = attributeWidth / columnWidthsSum;
+				const percentageRatio = attributeWidth / 100;
+				const initialColumnWidth = Math.floor(
+					propotionalRatio * containerWidth
+				);
 
-					const containerWidth = getContainerWidth(
-						filteredColumnWidthsPerRatio.length > 0
-							? newParentWidth
-							: width
-					);
+				if (
+					columnCount === 1 &&
+					width > ALIGNMENT_BREAKPOINTS.medium
+				) {
+					columnWidth = percentageRatio * containerWidth;
+				} else if ( columnsInRow > 1 ) {
+					if ( width > ALIGNMENT_BREAKPOINTS.medium ) {
+						if ( initialColumnWidth <= MIN_WIDTH ) {
+							columnWidth = MIN_WIDTH;
+						} else if ( initialColumnWidth > MIN_WIDTH ) {
+							columnWidth = Math.floor(
+								( attributeWidth / largeColumnsWidthsSum ) *
+									containerWidth
+							);
+						}
 
-					const percentageRatio = attributeWidth / columnWidthsSum;
-					const minPercentageRatio = MIN_WIDTH / containerWidth;
+						maxColumnWidth = columnWidth;
 
-					const initialColumnWidth = Math.floor(
-						percentageRatio * containerWidth
-					);
-
-					const columnRatios = columnWidths.map(
-						( colWidth ) => colWidth / columnWidthsSum
-					);
-
-					const largeColumnsWidthsSum = columnRatios
-						.map( ( ratio, index ) => {
-							if ( ratio > minPercentageRatio ) {
-								return columnWidths[ index ];
+						if ( Math.round( columnWidthsSum ) < 100 ) {
+							const newColumnWidth =
+								percentageRatio * containerWidth;
+							if ( newColumnWidth < MIN_WIDTH ) {
+								columnWidth = MIN_WIDTH;
+							} else {
+								columnWidth = newColumnWidth;
 							}
-							return 0;
-						} )
-						.reduce( ( acc, curr ) => acc + curr, 0 );
+						}
 
-					columnWidth =
-						initialColumnWidth <= MIN_WIDTH
-							? MIN_WIDTH
-							: Math.floor(
-									( attributeWidth / largeColumnsWidthsSum ) *
-										containerWidth
-							  );
-
-					maxColumnWidth = columnWidth;
-
-					if ( Math.round( columnWidthsSum ) < 100 ) {
-						const newColumnWidth =
-							( attributeWidth / 100 ) * containerWidth;
-						columnWidth =
-							newColumnWidth < MIN_WIDTH
-								? MIN_WIDTH
-								: newColumnWidth;
+						widths[ clientId ] = {
+							width: columnWidth,
+							maxWidth: maxColumnWidth,
+						};
+					} else if ( width < ALIGNMENT_BREAKPOINTS.medium ) {
+						columnWidth = Math.floor(
+							getContainerWidth( width ) / columnsInRow
+						);
+						widths[ clientId ] = {
+							width: columnWidth,
+							maxWidth: maxColumnWidth,
+						};
 					}
-
-					widths[ innerColumn.clientId ] = {
-						width: columnWidth,
-						maxWidth: maxColumnWidth,
-					};
-				} else if ( width < ALIGNMENT_BREAKPOINTS.medium ) {
-					columnWidth = Math.floor(
-						getContainerWidth( width ) / columnsInRow
-					);
-					widths[ innerColumn.clientId ] = {
-						width: columnWidth,
-						maxWidth: maxColumnWidth,
-					};
 				}
+				widths[ clientId ] = {
+					width: columnWidth,
+					maxWidth: maxColumnWidth,
+				};
 			}
-			widths[ innerColumn.clientId ] = {
-				width: columnWidth,
-				maxWidth: maxColumnWidth,
-			};
-		} );
+		);
 		return widths;
-	}, [ columnWidths ] );
+	}, [ columnWidthsValues ] );
 
 	const getColumnsInRow = ( containerWidth, columnsNumber ) => {
 		if ( containerWidth < ALIGNMENT_BREAKPOINTS.mobile ) {
@@ -236,12 +240,14 @@ function ColumnsEditContainer( {
 
 	const renderAppender = () => {
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
+
 		if ( isSelected ) {
 			return (
 				<View
 					style={ [
 						isFullWidth &&
-							width > ALIGNMENT_BREAKPOINTS.medium &&
+							! hasParents &&
+							width > ALIGNMENT_BREAKPOINTS.mobile &&
 							styles.fullWidthAppender,
 						columnCount === 0 && { width },
 					] }
@@ -257,30 +263,29 @@ function ColumnsEditContainer( {
 		return null;
 	};
 
-	const getColumnsSliders = () =>
-		innerColumns.map( ( column, index ) => {
-			return (
-				<RangeControl
-					min={ 1 }
-					max={ 100 }
-					step={ 0.1 }
-					value={ columnWidths[ index ] }
-					onChange={ ( value ) =>
-						updateInnerColumnWidth( value, column.clientId )
-					}
-					cellContainerStyle={ styles.cellContainerStyle }
-					toFixed={ 1 }
-					rangePreview={
-						<ColumnsPreview
-							columnWidths={ columnWidths }
-							selectedColumnIndex={ index }
-						/>
-					}
-					key={ `${ column.clientId }-${ columnWidths.length }` }
-					shouldDisplayTextInput={ false }
-				/>
-			);
-		} );
+	const getColumnsSliders = useMemo( () => {
+		return innerColumns.map( ( column, index ) => (
+			<RangeControl
+				min={ 1 }
+				max={ 100 }
+				step={ 0.1 }
+				value={ columnWidthsValues[ index ] }
+				onChange={ ( value ) =>
+					updateInnerColumnWidth( value, column.clientId )
+				}
+				cellContainerStyle={ styles.cellContainerStyle }
+				toFixed={ 1 }
+				rangePreview={
+					<ColumnsPreview
+						columnWidths={ columnWidthsValues }
+						selectedColumnIndex={ index }
+					/>
+				}
+				key={ `${ column.clientId }-${ columnWidthsValues.length }` }
+				shouldDisplayTextInput={ false }
+			/>
+		) );
+	}, [ innerColumns, columnWidthsValues ] );
 
 	return (
 		<>
@@ -297,7 +302,7 @@ function ColumnsEditContainer( {
 						max={ columnCount + 1 }
 						type="stepper"
 					/>
-					{ getColumnsSliders() }
+					{ getColumnsSliders }
 				</PanelBody>
 				<PanelBody>
 					<FooterMessageControl
@@ -332,7 +337,7 @@ function ColumnsEditContainer( {
 						}
 						blockWidth={ width }
 						contentStyle={ calculateWidths }
-						parentWidth={ getContainerWidth( newParentWidth ) }
+						parentWidth={ getContainerWidth( baseContainerWidth ) }
 					/>
 				) }
 			</View>
@@ -477,20 +482,29 @@ const ColumnsEditContainerWrapper = withDispatch(
 
 const ColumnsEdit = ( props ) => {
 	const { clientId, isSelected } = props;
-	const { columnCount, isDefaultColumns, innerColumns = [] } = useSelect(
+	const {
+		columnCount,
+		isDefaultColumns,
+		innerColumns = [],
+		hasParents,
+	} = useSelect(
 		( select ) => {
-			const { getBlockCount, getBlock } = select( 'core/block-editor' );
+			const { getBlockCount, getBlock, getBlockParents } = select(
+				'core/block-editor'
+			);
 			const block = getBlock( clientId );
 			const innerBlocks = block?.innerBlocks;
 			const isContentEmpty = map(
 				innerBlocks,
 				( innerBlock ) => innerBlock.innerBlocks.length
 			);
+			const parents = getBlockParents( clientId, true );
 
 			return {
 				columnCount: getBlockCount( clientId ),
 				isDefaultColumns: ! compact( isContentEmpty ).length,
 				innerColumns: innerBlocks,
+				hasParents: !! parents.length,
 			};
 		},
 		[ clientId ]
@@ -509,6 +523,7 @@ const ColumnsEdit = ( props ) => {
 			<ColumnsEditContainerWrapper
 				columnCount={ columnCount }
 				innerColumns={ innerColumns }
+				hasParents={ hasParents }
 				{ ...props }
 			/>
 			<BlockVariationPicker

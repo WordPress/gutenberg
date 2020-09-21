@@ -57,18 +57,15 @@ export class BlockListItem extends Component {
 		} = this.props;
 		const { blockWidth } = this.state;
 		const isColumns = name === 'core/columns';
+		const isFullWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.full;
+		const isParentFullWidth =
+			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
 
 		if ( blockAlignment === WIDE_ALIGNMENTS.alignments.wide ) {
-			if ( hasParents ) {
-				return 0;
-			}
 			return marginHorizontal;
 		}
 
-		if (
-			blockAlignment === WIDE_ALIGNMENTS.alignments.full &&
-			! hasParents
-		) {
+		if ( isFullWidth && ! hasParents ) {
 			if ( blockWidth > ALIGNMENT_BREAKPOINTS.medium ) {
 				return -1;
 			} else if (
@@ -80,22 +77,11 @@ export class BlockListItem extends Component {
 			return 0;
 		}
 
-		if ( blockAlignment === WIDE_ALIGNMENTS.alignments.wide ) {
-			return marginHorizontal;
-		}
-
-		if (
-			blockAlignment === WIDE_ALIGNMENTS.alignments.full &&
-			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full &&
-			! isColumns
-		) {
+		if ( isFullWidth && isParentFullWidth && ! isColumns ) {
 			return 0;
 		}
 
-		if (
-			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full &&
-			blockWidth <= ALIGNMENT_BREAKPOINTS.medium
-		) {
+		if ( isParentFullWidth && blockWidth <= ALIGNMENT_BREAKPOINTS.medium ) {
 			if ( parentWidth ) {
 				return marginHorizontal;
 			}
