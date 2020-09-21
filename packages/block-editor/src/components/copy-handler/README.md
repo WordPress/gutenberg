@@ -1,10 +1,11 @@
 # Copy Handler
 
-The `CopyHandler` component handles the copy, cut and paste events of its children blocks. It handles multiple selection of blocks as well.
+The `CopyHandler` component handles the copy/cut and paste events of its children blocks. It handles multiple selection of blocks as well.
 
-Concretely, it handles the display of success messages and takes care of copying the block to the clipboard using the [raw handling API](https://github.com/WordPress/gutenberg/tree/master/packages/blocks/src/api/raw-handling).
+Concretely, it handles the display of success messages and takes care of copying the block to the clipboard. It uses for that the [serialize function](https://github.com/WordPress/gutenberg/blob/master/packages/blocks/src/api/serializer.js), which outputs HTML augmented with the HTML-comment demarcations to denote blocks.
 
-![Copy cut behaviours](https://make.wordpress.org/core/files/2020/09/copy-cut-behaviour.gif)
+
+![Copy/cut behaviours](https://user-images.githubusercontent.com/150562/81698101-6e341d80-945d-11ea-9bfb-b20781f55033.gif)
 
 ## Table of contents
 
@@ -15,7 +16,7 @@ Concretely, it handles the display of success messages and takes care of copying
 
 ### Usage
 
-Adds the copy handler functionnalities to the editor.
+Adds block-level copy-and-paste support to the editor.
 
 ```jsx
 import { BlockList, CopyHandler } from '@wordpress/block-editor';
@@ -27,7 +28,7 @@ const MyCopyHandler = () => (
 );
 ```
 
-_Note:_ The `CopyHandler` only catches cut, copy and paste events coming from its props.children. In this example, the child is the `BlockList` component.
+_Note:_ The `CopyHandler` only catches copy/cut and paste events coming from its props.children. In this example, the child is the `BlockList` component. These events are intercepted only when there is a block-editing context and at least one block is currently selected.
 
 ### Props
 
@@ -35,7 +36,7 @@ _Note:_ The `CopyHandler` only catches cut, copy and paste events coming from it
 
 -  Type: `Element`
 
-Children are passed as children of `CopyHandler`.
+The elements to be rendered and whose `cut`, `copy` and `paste` events we'd like to intercept.
 
 ## Related components
 
