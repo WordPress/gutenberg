@@ -10,7 +10,10 @@ import './globals';
 import { getTranslation } from '../i18n-cache';
 import initialHtml from './initial-html';
 import setupApiFetch from './api-fetch-setup';
-import { SETTINGS_DEFAULTS } from '../../block-editor/src/store/defaults.js';
+import {
+	validateThemeColors,
+	validateThemeGradients,
+} from '../../block-editor/src/utils/theme.js';
 
 const reactNativeSetup = () => {
 	// Disable warnings as they disrupt the user experience in dev mode
@@ -76,29 +79,9 @@ const setupInitHooks = () => {
 				postType = 'post';
 			}
 
-			if ( colors === undefined ) {
-				colors = SETTINGS_DEFAULTS.colors;
-			} else {
-				const validColors = colors.filter( ( c ) => c.color );
-				if ( validColors.length === 0 ) {
-					colors = SETTINGS_DEFAULTS.colors;
-				} else if ( validColors.length < colors.length ) {
-					// Filter out invalid colors
-					colors = validColors;
-				}
-			}
+			colors = validateThemeColors( colors );
 
-			if ( gradients === undefined ) {
-				gradients = SETTINGS_DEFAULTS.gradients;
-			} else {
-				const validGradients = gradients.filter( ( c ) => c.gradient );
-				if ( validGradients.length === 0 ) {
-					gradients = SETTINGS_DEFAULTS.gradients;
-				} else if ( validGradients.length < gradients.length ) {
-					// Filter out invalid gradients
-					gradients = validGradients;
-				}
-			}
+			gradients = validateThemeGradients( gradients );
 
 			return {
 				initialHtml: initialData,

@@ -29,7 +29,10 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
-import { SETTINGS_DEFAULTS } from '@wordpress/block-editor';
+import {
+	validateThemeColors,
+	validateThemeGradients,
+} from '@wordpress/block-editor';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -117,33 +120,9 @@ class NativeEditorProvider extends Component {
 			( theme ) => {
 				// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
 
-				if ( theme.colors === undefined ) {
-					theme.colors = SETTINGS_DEFAULTS.colors;
-				} else {
-					const validColors = theme.colors.filter( ( c ) => c.color );
-					if ( validColors.length === 0 ) {
-						theme.colors = SETTINGS_DEFAULTS.colors;
-					} else if ( validColors.length < theme.colors.length ) {
-						// Filter out invalid colors
-						theme.colors = validColors;
-					}
-				}
+				theme.colors = validateThemeColors( theme.colors );
 
-				if ( theme.gradients === undefined ) {
-					theme.gradients = SETTINGS_DEFAULTS.gradients;
-				} else {
-					const validGradients = theme.gradients.filter(
-						( c ) => c.gradient
-					);
-					if ( validGradients.length === 0 ) {
-						theme.gradients = SETTINGS_DEFAULTS.gradients;
-					} else if (
-						validGradients.length < theme.gradients.length
-					) {
-						// Filter out invalid gradients
-						theme.gradients = validGradients;
-					}
-				}
+				theme.gradients = validateThemeGradients( theme.gradients );
 
 				this.props.updateSettings( theme );
 			}
