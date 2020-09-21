@@ -13,7 +13,7 @@ import setupApiFetch from './api-fetch-setup';
 import {
 	validateThemeColors,
 	validateThemeGradients,
-} from '../../block-editor/src/utils/theme.js';
+} from '../../block-editor/src/utils/theme';
 
 const reactNativeSetup = () => {
 	// Disable warnings as they disrupt the user experience in dev mode

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { SETTINGS_DEFAULTS } from '../store/defaults.js';
+import { SETTINGS_DEFAULTS } from '../store/defaults';
 
 /**
  * Given an array of theme colors checks colors for validity
