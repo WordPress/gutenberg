@@ -23,15 +23,15 @@ const alignmentHooksSetting = {
 function ButtonsEdit() {
 	const blockWrapperProps = useBlockWrapperProps();
 	return (
-		<div { ...blockWrapperProps }>
-			<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
-				<InnerBlocks
-					allowedBlocks={ ALLOWED_BLOCKS }
-					template={ BUTTONS_TEMPLATE }
-					orientation="horizontal"
-				/>
-			</AlignmentHookSettingsProvider>
-		</div>
+		<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
+			<InnerBlocks
+				allowedBlocks={ ALLOWED_BLOCKS }
+				__experimentalPassedProps={ blockWrapperProps }
+				__experimentalTagName="div"
+				template={ BUTTONS_TEMPLATE }
+				orientation="horizontal"
+			/>
+		</AlignmentHookSettingsProvider>
 	);
 }
 
