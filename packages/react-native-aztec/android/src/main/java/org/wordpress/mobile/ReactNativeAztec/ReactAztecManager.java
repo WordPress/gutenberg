@@ -3,6 +3,7 @@ package org.wordpress.mobile.ReactNativeAztec;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.text.LineBreaker;
 import android.os.Build;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.ColorUtils;
@@ -370,12 +371,12 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     public void setTextAlign(ReactAztecText view, @Nullable String textAlign) {
         if ("justify".equals(textAlign)) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                view.setJustificationMode(Layout.JUSTIFICATION_MODE_INTER_WORD);
+                view.setJustificationMode(LineBreaker.JUSTIFICATION_MODE_INTER_WORD);
             }
             view.setGravity(Gravity.START);
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                view.setJustificationMode(Layout.JUSTIFICATION_MODE_NONE);
+                view.setJustificationMode(LineBreaker.JUSTIFICATION_MODE_NONE);
             }
 
             if (textAlign == null || "auto".equals(textAlign)) {
