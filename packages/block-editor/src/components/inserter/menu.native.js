@@ -24,7 +24,7 @@ import {
 /**
  * Internal dependencies
  */
-import BlocksTab from './blocks-tab';
+import BlocksTypesTab from './blocks-types-tab';
 import ReusableBlocksTab from './reusable-blocks-tab';
 import styles from './style.scss';
 
@@ -76,7 +76,7 @@ export class InserterMenu extends Component {
 
 		switch ( tab ) {
 			case 0:
-				return <BlocksTab { ...tabProps } />;
+				return <BlocksTypesTab { ...tabProps } />;
 			case 1:
 				return <ReusableBlocksTab { ...tabProps } />;
 		}
