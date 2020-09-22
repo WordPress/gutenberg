@@ -9,6 +9,7 @@
 ### Breaking Change
 
 - `NumberControl` no longer automatically transforms values when rendering `value` into a `<input />` HTML element.
+- `Dashicon` component no longer renders SVGs. If you rely on this component, make sure to load the dashicon font.
 
 ## 9.6.0 (2020-05-14)
 

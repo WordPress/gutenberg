@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -319,8 +319,12 @@ export default function SearchEdit( {
 		</>
 	);
 
+	const blockWrapperProps = useBlockWrapperProps( {
+		className: getBlockClassNames(),
+	} );
+
 	return (
-		<Block.div className={ getBlockClassNames() }>
+		<div { ...blockWrapperProps }>
 			{ controls }
 
 			{ showLabel && (
@@ -368,6 +372,6 @@ export default function SearchEdit( {
 				{ 'button-only' === buttonPosition && renderButton() }
 				{ 'no-button' === buttonPosition && renderTextField() }
 			</ResizableBox>
-		</Block.div>
+		</div>
 	);
 }

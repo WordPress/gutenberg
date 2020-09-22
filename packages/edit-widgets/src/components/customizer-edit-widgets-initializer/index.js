@@ -29,7 +29,9 @@ function CustomizerEditWidgetsInitializer( { settings } ) {
 		[ settings ]
 	);
 	return (
-		<WidgetAreasBlockEditorProvider>
+		<WidgetAreasBlockEditorProvider
+			blockEditorSettings={ blockEditorSettings }
+		>
 			<div
 				className="edit-widgets-customizer-edit-widgets-initializer__content"
 				role="region"
@@ -37,9 +39,7 @@ function CustomizerEditWidgetsInitializer( { settings } ) {
 				tabIndex="-1"
 			>
 				<Header isCustomizer />
-				<WidgetAreasBlockEditorContent
-					blockEditorSettings={ blockEditorSettings }
-				/>
+				<WidgetAreasBlockEditorContent />
 				<ComplementaryArea.Slot scope="core/edit-widgets-customizer" />
 				<ComplementaryArea
 					className="edit-widgets-sidebar"

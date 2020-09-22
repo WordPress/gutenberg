@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -210,7 +211,7 @@ function BlockListBlock( {
 		name,
 		mode,
 		blockTitle: blockType.title,
-		wrapperProps,
+		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 

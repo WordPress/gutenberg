@@ -50,12 +50,14 @@ export const MenuBackButtonUI = styled( Button )`
 export const MenuTitleUI = styled( Text )`
 	padding: 4px 0 4px 16px;
 	margin-bottom: 8px;
+	color: ${ G2.gray[ 100 ] };
 `;
 
 export const GroupTitleUI = styled( Text )`
 	margin-top: 8px;
 	padding: 4px 0 4px 16px;
 	text-transform: uppercase;
+	color: ${ G2.gray[ 100 ] };
 `;
 
 export const ItemUI = styled.li`

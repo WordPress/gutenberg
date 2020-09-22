@@ -15,7 +15,7 @@ import {
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -272,14 +272,15 @@ export function ImageEdit( {
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 	} );
 
-	// Focussing the image caption after inserting an image relies on the
-	// component remounting. This needs to be fixed.
-	const key = !! url;
+	const blockWrapperProps = useBlockWrapperProps( {
+		ref,
+		className: classes,
+	} );
 
 	return (
 		<>
 			{ controls }
-			<Block.figure ref={ ref } className={ classes } key={ key }>
+			<figure { ...blockWrapperProps }>
 				{ url && (
 					<Image
 						attributes={ attributes }
@@ -294,7 +295,7 @@ export function ImageEdit( {
 					/>
 				) }
 				{ mediaPlaceholder }
-			</Block.figure>
+			</figure>
 		</>
 	);
 }
