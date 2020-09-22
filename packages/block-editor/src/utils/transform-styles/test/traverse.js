@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import csstree from 'css-tree';
+import csstree from 'css-tree/dist/csstree';
 
 /**
  * Internal dependencies
