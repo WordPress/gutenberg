@@ -38,13 +38,19 @@ function useSecondaryText() {
 	const hoveredTemplatePartBlockId = hoveredBlockIds.find(
 		( blockId ) => getBlockName( blockId ) === 'core/template-part'
 	);
-	const hoveredTemplatePartBlock = getBlock( hoveredTemplatePartBlockId );
-	const hoveredLabel = hoveredTemplatePartBlock
-		? getBlockLabel(
-				getBlockType( hoveredTemplatePartBlock.name ),
-				hoveredTemplatePartBlock.attributes
-		  )
-		: '';
+	if ( hoveredTemplatePartBlockId ) {
+		const hoveredTemplatePartBlock = getBlock( hoveredTemplatePartBlockId );
+		const hoveredLabel = hoveredTemplatePartBlock
+			? getBlockLabel(
+					getBlockType( hoveredTemplatePartBlock.name ),
+					hoveredTemplatePartBlock.attributes
+			  )
+			: null;
+		return {
+			label: hoveredLabel,
+			isActive: true,
+		};
+	}
 
 	// TODO: Handle if parent is template part too.
 	const selectedBlockLabel =
@@ -55,9 +61,9 @@ function useSecondaryText() {
 			  )
 			: null;
 
-	if ( hoveredLabel || selectedBlockLabel ) {
+	if ( selectedBlockLabel ) {
 		return {
-			label: hoveredLabel || selectedBlockLabel,
+			label: selectedBlockLabel,
 			isActive: true,
 		};
 	}
