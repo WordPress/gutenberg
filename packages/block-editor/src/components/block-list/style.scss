@@ -501,7 +501,8 @@
 	width: 100%;
 	border: none;
 	outline: none;
-	box-shadow: none;
+	border-radius: 2px;
+	box-shadow: inset 0 0 0 $border-width $gray-900;
 	resize: none;
 	overflow: hidden;
 	font-family: $editor-html-font;
@@ -511,7 +512,7 @@
 	@include reduce-motion("transition");
 
 	&:focus {
-		box-shadow: none;
+		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 	}
 }
 
