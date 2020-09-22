@@ -23,7 +23,7 @@ function render_block_core_template_part( $attributes ) {
 		$template_part_query = new WP_Query(
 			array(
 				'post_type'      => 'wp_template_part',
-				'post_status'    => 'publish',
+				'post_status'    => array( 'publish', 'auto-draft' ),
 				'name'           => $attributes['slug'],
 				'tax_query'      => array(
 					array(
