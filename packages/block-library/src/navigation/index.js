@@ -17,26 +17,26 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Navigation' ),
+	title: __('Navigation'),
 
 	icon,
 
-	description: __( 'Add a navigation block to your site.' ),
+	description: __('A collection of blocks that allow visitors to get around your site.'),
 
-	keywords: [ __( 'menu' ), __( 'navigation' ), __( 'links' ) ],
+	keywords: [__('menu'), __('navigation'), __('links')],
 
 	variations: [
 		{
 			name: 'horizontal',
 			isDefault: true,
-			title: __( 'Navigation (horizontal)' ),
-			description: __( 'Links shown in a row.' ),
+			title: __('Navigation (horizontal)'),
+			description: __('Links shown in a row.'),
 			attributes: { orientation: 'horizontal' },
 		},
 		{
 			name: 'vertical',
-			title: __( 'Navigation (vertical)' ),
-			description: __( 'Links shown in a column.' ),
+			title: __('Navigation (vertical)'),
+			description: __('Links shown in a column.'),
 			attributes: { orientation: 'vertical' },
 		},
 	],
@@ -47,7 +47,7 @@ export const settings = {
 				name: 'core/navigation-link',
 				attributes: {
 					// translators: 'Home' as in a website's home page.
-					label: __( 'Home' ),
+					label: __('Home'),
 					url: 'https://make.wordpress.org/',
 				},
 			},
@@ -55,7 +55,7 @@ export const settings = {
 				name: 'core/navigation-link',
 				attributes: {
 					// translators: 'About' as in a website's about page.
-					label: __( 'About' ),
+					label: __('About'),
 					url: 'https://make.wordpress.org/',
 				},
 			},
@@ -63,7 +63,7 @@ export const settings = {
 				name: 'core/navigation-link',
 				attributes: {
 					// translators: 'Contact' as in a website's contact page.
-					label: __( 'Contact' ),
+					label: __('Contact'),
 					url: 'https://make.wordpress.org/',
 				},
 			},
