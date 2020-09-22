@@ -66,4 +66,4 @@ export function initialize( id, settings ) {
 	render( <Editor />, document.getElementById( id ) );
 }
 
-export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
+export { default as __experimentalDashboardButton } from './components/header/dashboard-button';
