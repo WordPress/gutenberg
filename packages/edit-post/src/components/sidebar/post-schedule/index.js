@@ -15,7 +15,7 @@ export function PostSchedule() {
 			<PanelRow className="edit-post-post-schedule">
 				<span className="edit-post-post-schedule__status">{ __( 'Publish' ) }</span>
 				<Dropdown
-					position="bottom left"
+					position="bottom center"
 					contentClassName="edit-post-post-schedule__dialog"
 					renderToggle={ ( { onToggle, isOpen } ) => (
 						<>
