@@ -1,14 +1,14 @@
 # Getting Started
 
-The following guide is for setting up your local environment to contribute to the Gutenberg project. There is significant overlap between an environment to contribute, and an environment used to extend WordPress block editor. You can review the [Development Enviornment tutorial](/docs/designers-developers/developers/tutorials/devenv/readme.md) for additional setup information.
+The following guide is for setting up your local environment to contribute to the Gutenberg project. There is significant overlap between an environment to contribute and an environment used to extend the WordPress block editor. You can review the [Development Enviornment tutorial](/docs/designers-developers/developers/tutorials/devenv/readme.md) for additional setup information.
 
 ## Development Tools (Node)
 
 Gutenberg is a JavaScript project and requires [Node.js](https://nodejs.org/). The project is built using the latest active LTS release of node, and the latest verion of NPM. See the [LTS release schedule](https://github.com/nodejs/Release#release-schedule) for details.
 
-We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm), it is the easiest way to install and manage node for macOS, Linux, and Windows 10 using WSL2. See [our Development Tools guide](/docs/designers-developers/developers/tutorials/devenv/readme.md#development-tools) or the Nodejs site for additional installation instructions.
+We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) since it is the easiest way to install and manage node for macOS, Linux, and Windows 10 using WSL2. See [our Development Tools guide](/docs/designers-developers/developers/tutorials/devenv/readme.md#development-tools) or the Nodejs site for additional installation instructions.
 
-With Node installed, to build Gutenberg run the following from within the cloned repository:
+After installing Node, you can build Gutenberg by running the following from within the cloned repository:
 
 
 ```bash
@@ -20,13 +20,13 @@ npm run build
 
 Once built, Gutenberg is ready to be used as a WordPress plugin!
 
-`npm run build` does a single build and exit of the project. While developing, you probably will want to use `npm run dev` to run continuous builds automatically as source files change. Using the dev build also includes additional warnings and errors to help troubleshoot while developing.
+`npm run build` creates a single build of the project once. While developing, you probably will want to use `npm run dev` to run continuous builds automatically as source files change. The dev build also includes additional warnings and errors to help troubleshoot while developing.
 
 ## Local Environment
 
 If you are familiar with WordPress and already have an environment setup, use the above build as a standard WordPress plugin by putting the gutenberg directory in your wp-content/plugins/ directory.
 
-The rest of this section is if you do not have a local WordPress environment setup.
+If you do not have a local WordPress environment setup, follow the steps in the rest of this section to create one.
 
 ### Using wp-env to Install a Local Environment
 
@@ -42,7 +42,7 @@ Once Docker is installed and running: To install WordPress, run the following fr
 npm run wp-env start
 ```
 
-> Note: Using `npm run` will use the version specifed within the Gutenberg project, making sure you are using the latest installed package.
+> Note: `npm run` will use the version specified within the Gutenberg project, making sure you are running the latest wp-env version.
 
 To stop the running environment:
 
