@@ -229,6 +229,20 @@ function gutenberg_experimental_global_styles_get_core() {
 			$gradient['name'] = $default_gradients_i18n[ $gradient['slug'] ];
 		}
 	}
+
+	$default_font_sizes_i18n = array(
+		'small'  => __( 'Small', 'gutenberg' ),
+		'normal' => __( 'Normal', 'gutenberg' ),
+		'medium' => __( 'Medium', 'gutenberg' ),
+		'large'  => __( 'Large', 'gutenberg' ),
+		'huge'   => __( 'Huge', 'gutenberg' ),
+	);
+
+	if ( ! empty( $config['global']['settings']['typography']['fontSizes'] ) ) {
+		foreach ( $config['global']['settings']['typography']['fontSizes'] as &$font_size ) {
+			$font_size['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
+		}
+	}
 	// End i18n logic to remove when JSON i18 strings are extracted.
 	return $config;
 }
@@ -806,6 +820,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 	unset( $settings['colors'] );
 	unset( $settings['gradients'] );
+	unset( $settings['fontSizes'] );
 	unset( $settings['disableCustomColors'] );
 	unset( $settings['disableCustomGradients'] );
 	unset( $settings['disableCustomFontSizes'] );
