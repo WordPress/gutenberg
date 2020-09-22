@@ -46,25 +46,8 @@ const interfaceLabels = {
 };
 
 function Editor() {
-	const [ isInserterOpen, _setIsInserterOpen ] = useState( false );
-	const [ isNavigationOpen, _setIsNavigationOpen ] = useState( false );
+	const [ leftSidebarContent, setLeftSidebarContent ] = useState( null );
 	const isMobile = useViewportMatch( 'medium', '<' );
-
-	const setIsInserterOpen = ( value ) => {
-		if ( isNavigationOpen && value ) {
-			_setIsNavigationOpen( false );
-		}
-
-		_setIsInserterOpen( value );
-	};
-
-	const setIsNavigationOpen = ( value ) => {
-		if ( isInserterOpen && value ) {
-			_setIsInserterOpen( false );
-		}
-
-		_setIsNavigationOpen( value );
-	};
 
 	const {
 		isFullscreenActive,
@@ -174,16 +157,19 @@ function Editor() {
 		[ page?.context ]
 	);
 
+	const toggleLeftSidebarContent = ( value ) =>
+		setLeftSidebarContent( leftSidebarContent === value ? null : value );
+
 	let leftSidebar = null;
-	if ( isNavigationOpen ) {
+	if ( leftSidebarContent === 'navigation' ) {
 		leftSidebar = <NavigationSidebar />;
-	} else if ( isInserterOpen ) {
+	} else if ( leftSidebarContent === 'inserter' ) {
 		leftSidebar = (
 			<div className="edit-site-editor__inserter-panel">
 				<div className="edit-site-editor__inserter-panel-header">
 					<Button
 						icon={ close }
-						onClick={ () => setIsInserterOpen( false ) }
+						onClick={ () => setLeftSidebarContent( null ) }
 					/>
 				</div>
 				<div className="edit-site-editor__inserter-panel-content">
@@ -191,7 +177,7 @@ function Editor() {
 						showInserterHelpPanel
 						onSelect={ () => {
 							if ( isMobile ) {
-								setIsInserterOpen( false );
+								setLeftSidebarContent( null );
 							}
 						} }
 					/>
@@ -246,19 +232,21 @@ function Editor() {
 															openEntitiesSavedStates
 														}
 														isInserterOpen={
-															isInserterOpen
+															leftSidebarContent ===
+															'inserter'
 														}
 														onToggleInserter={ () =>
-															setIsInserterOpen(
-																! isInserterOpen
+															toggleLeftSidebarContent(
+																'inserter'
 															)
 														}
 														isNavigationOpen={
-															isNavigationOpen
+															leftSidebarContent ===
+															'navigation'
 														}
 														onToggleNavigation={ () =>
-															setIsNavigationOpen(
-																! isNavigationOpen
+															toggleLeftSidebarContent(
+																'navigation'
 															)
 														}
 													/>
@@ -272,8 +260,14 @@ function Editor() {
 														<Popover.Slot name="block-toolbar" />
 														{ template && (
 															<BlockEditor
-																setIsInserterOpen={
-																	setIsInserterOpen
+																setIsInserterOpen={ (
+																	isInserterOpen
+																) =>
+																	setLeftSidebarContent(
+																		isInserterOpen
+																			? 'inserter'
+																			: null
+																	)
 																}
 															/>
 														) }
