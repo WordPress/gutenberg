@@ -57,7 +57,7 @@
 		034874811302E030BA1637A1 /* Pods-gutenbergTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-gutenbergTests.debug.xcconfig"; path = "Target Support Files/Pods-gutenbergTests/Pods-gutenbergTests.debug.xcconfig"; sourceTree = "<group>"; };
 		083D3CAD9B26701AE0659EEB /* Pods-gutenberg.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-gutenberg.release.xcconfig"; path = "Target Support Files/Pods-gutenberg/Pods-gutenberg.release.xcconfig"; sourceTree = "<group>"; };
 		0EB766FE2F6D446A80AC6E6A /* libRNSVG.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNSVG.a; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* GutenbergDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GutenbergDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* gutenberg.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = gutenberg.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB21A68108700A75B9A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = gutenberg/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = gutenberg/Info.plist; sourceTree = "<group>"; };
@@ -218,7 +218,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* GutenbergDemo.app */,
+				13B07F961A680F5B00A75B9A /* gutenberg.app */,
 				00E356EE1AD99517003FC87E /* gutenbergTests.xctest */,
 				2D02E47B1E0B4A5D006451C7 /* gutenberg-tvOS.app */,
 				2D02E4901E0B4A5D006451C7 /* gutenberg-tvOSTests.xctest */,
@@ -312,7 +312,7 @@
 			);
 			name = gutenberg;
 			productName = "Hello World";
-			productReference = 13B07F961A680F5B00A75B9A /* GutenbergDemo.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* gutenberg.app */;
 			productType = "com.apple.product-type.application";
 		};
 		2D02E47A1E0B4A5D006451C7 /* gutenberg-tvOS */ = {
@@ -823,7 +823,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.wordpress.gutenberg.development;
-				PRODUCT_NAME = GutenbergDemo;
+				PRODUCT_NAME = gutenberg;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "gutenberg-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -857,7 +857,7 @@
 					"-lc++",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.wordpress.gutenberg.development;
-				PRODUCT_NAME = GutenbergDemo;
+				PRODUCT_NAME = gutenberg;
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "gutenberg-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
