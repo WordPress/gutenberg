@@ -80,8 +80,8 @@ function BlockList(
 
 	return (
 		<Container
-			ref={ ref }
 			{ ...__experimentalPassedProps }
+			ref={ ref }
 			className={ classnames(
 				'block-editor-block-list__layout',
 				className,

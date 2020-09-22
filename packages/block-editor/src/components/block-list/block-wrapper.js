@@ -18,7 +18,6 @@ import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -288,9 +287,6 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 
 const BlockComponent = forwardRef(
 	( { children, tagName: TagName = 'div', ...props }, ref ) => {
-		deprecated( 'wp.blockEditor.__experimentalBlock', {
-			alternative: 'wp.blockEditor.__experimentalUseBlockWrapperProps',
-		} );
 		const blockWrapperProps = useBlockWrapperProps( { ...props, ref } );
 		return <TagName { ...blockWrapperProps }>{ children }</TagName>;
 	}

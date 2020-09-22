@@ -5,7 +5,7 @@ import { useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { Dropdown, ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -21,7 +21,7 @@ import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
 
 export default function TemplatePartEdit( {
-	attributes: { postId: _postId, slug, theme, tagName: TagName },
+	attributes: { postId: _postId, slug, theme, tagName },
 	setAttributes,
 	clientId,
 } ) {
@@ -64,12 +64,12 @@ export default function TemplatePartEdit( {
 		}
 	}, [ innerBlocks ] );
 
-	const blockWrapperProps = useBlockWrapperProps();
+	const BlockWrapper = Block[ tagName ];
 
 	if ( postId ) {
 		// Part of a template file, post ID already resolved.
 		return (
-			<TagName { ...blockWrapperProps }>
+			<BlockWrapper>
 				<BlockControls>
 					<ToolbarGroup className="wp-block-template-part__block-control-group">
 						<TemplatePartNamePanel
@@ -104,15 +104,15 @@ export default function TemplatePartEdit( {
 					postId={ postId }
 					hasInnerBlocks={ innerBlocks.length > 0 }
 				/>
-			</TagName>
+			</BlockWrapper>
 		);
 	}
 	if ( ! initialSlug.current && ! initialTheme.current ) {
 		// Fresh new block.
 		return (
-			<TagName { ...blockWrapperProps }>
+			<BlockWrapper>
 				<TemplatePartPlaceholder setAttributes={ setAttributes } />
-			</TagName>
+			</BlockWrapper>
 		);
 	}
 	// Part of a template file, post ID not resolved yet.

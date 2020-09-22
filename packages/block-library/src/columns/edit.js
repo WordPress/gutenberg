@@ -16,7 +16,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -63,10 +63,6 @@ function ColumnsEditContainer( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
-	const blockWrapperProps = useBlockWrapperProps( {
-		className: classes,
-	} );
-
 	return (
 		<>
 			<BlockControls>
@@ -96,8 +92,10 @@ function ColumnsEditContainer( {
 			<InnerBlocks
 				allowedBlocks={ ALLOWED_BLOCKS }
 				orientation="horizontal"
-				__experimentalTagName="div"
-				__experimentalPassedProps={ blockWrapperProps }
+				__experimentalTagName={ Block.div }
+				__experimentalPassedProps={ {
+					className: classes,
+				} }
 				renderAppender={ false }
 			/>
 		</>
@@ -210,8 +208,14 @@ const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
 	);
 };
 
-function Placeholder( { clientId, name, setAttributes } ) {
-	const { blockType, defaultVariation, variations } = useSelect(
+const ColumnsEdit = ( props ) => {
+	const { clientId, name } = props;
+	const {
+		blockType,
+		defaultVariation,
+		hasInnerBlocks,
+		variations,
+	} = useSelect(
 		( select ) => {
 			const {
 				getBlockVariations,
@@ -222,27 +226,34 @@ function Placeholder( { clientId, name, setAttributes } ) {
 			return {
 				blockType: getBlockType( name ),
 				defaultVariation: getDefaultBlockVariation( name, 'block' ),
+				hasInnerBlocks:
+					select( 'core/block-editor' ).getBlocks( clientId ).length >
+					0,
 				variations: getBlockVariations( name, 'block' ),
 			};
 		},
-		[ name ]
+		[ clientId, name ]
 	);
+
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
-	const blockWrapperProps = useBlockWrapperProps();
+
+	if ( hasInnerBlocks ) {
+		return <ColumnsEditContainerWrapper { ...props } />;
+	}
 
 	return (
-		<div { ...blockWrapperProps }>
+		<Block.div>
 			<__experimentalBlockVariationPicker
 				icon={ get( blockType, [ 'icon', 'src' ] ) }
 				label={ get( blockType, [ 'title' ] ) }
 				variations={ variations }
 				onSelect={ ( nextVariation = defaultVariation ) => {
 					if ( nextVariation.attributes ) {
-						setAttributes( nextVariation.attributes );
+						props.setAttributes( nextVariation.attributes );
 					}
 					if ( nextVariation.innerBlocks ) {
 						replaceInnerBlocks(
-							clientId,
+							props.clientId,
 							createBlocksFromInnerBlocksTemplate(
 								nextVariation.innerBlocks
 							)
@@ -251,22 +262,8 @@ function Placeholder( { clientId, name, setAttributes } ) {
 				} }
 				allowSkip
 			/>
-		</div>
+		</Block.div>
 	);
-}
-
-const ColumnsEdit = ( props ) => {
-	const { clientId } = props;
-	const hasInnerBlocks = useSelect(
-		( select ) =>
-			select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
-		[ clientId ]
-	);
-	const Component = hasInnerBlocks
-		? ColumnsEditContainerWrapper
-		: Placeholder;
-
-	return <Component { ...props } />;
 };
 
 export default ColumnsEdit;
