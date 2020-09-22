@@ -289,6 +289,45 @@ describe( 'actions', () => {
 				done: true,
 			} );
 		} );
+
+		it( 'should pass patternName through metadata to REPLACE_BLOCKS action', () => {
+			const blocks = [
+				{
+					clientId: 'ribs',
+					name: 'core/test-ribs',
+				},
+				{
+					clientId: 'chicken',
+					name: 'core/test-chicken',
+				},
+			];
+
+			const meta = { patternName: 'core/chicken-ribs-pattern' };
+
+			const replaceBlockGenerator = replaceBlocks(
+				[ 'chicken' ],
+				blocks,
+				null,
+				null,
+				meta
+			);
+
+			// Skip to action yield.
+			replaceBlockGenerator.next();
+			replaceBlockGenerator.next();
+			replaceBlockGenerator.next();
+			replaceBlockGenerator.next( true );
+
+			expect( replaceBlockGenerator.next( true ).value ).toEqual( {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'chicken' ],
+				blocks,
+				time: expect.any( Number ),
+				indexToSelect: null,
+				initialPosition: null,
+				meta: { patternName: 'core/chicken-ribs-pattern' },
+			} );
+		} );
 	} );
 
 	describe( 'insertBlock', () => {

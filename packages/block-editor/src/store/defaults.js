@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 
 export const PREFERENCES_DEFAULTS = {
 	insertUsage: {},
@@ -13,7 +13,6 @@ export const PREFERENCES_DEFAULTS = {
  * @typedef {Object} SETTINGS_DEFAULT
  * @property {boolean} alignWide Enable/Disable Wide/Full Alignments
  * @property {Array} availableLegacyWidgets Array of objects representing the legacy widgets available.
- * @property {Array} fontSizes Available font sizes
  * @property {boolean} imageEditing Image Editing settings set to false to disable.
  * @property {Array} imageSizes Available image sizes
  * @property {number} maxWidth Max width to constraint resizing
@@ -36,34 +35,6 @@ export const PREFERENCES_DEFAULTS = {
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
-
-	fontSizes: [
-		{
-			name: _x( 'Small', 'font size name' ),
-			size: 13,
-			slug: 'small',
-		},
-		{
-			name: _x( 'Normal', 'font size name' ),
-			size: 16,
-			slug: 'normal',
-		},
-		{
-			name: _x( 'Medium', 'font size name' ),
-			size: 20,
-			slug: 'medium',
-		},
-		{
-			name: _x( 'Large', 'font size name' ),
-			size: 36,
-			slug: 'large',
-		},
-		{
-			name: _x( 'Huge', 'font size name' ),
-			size: 42,
-			slug: 'huge',
-		},
-	],
 
 	imageSizes: [
 		{ slug: 'thumbnail', name: __( 'Thumbnail' ) },

@@ -5,9 +5,14 @@ import { useCombobox } from 'downshift';
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { chevronDown, check, Icon } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
-import { Button, Dashicon } from '../';
+import { Button } from '../';
 
 const itemToString = ( item ) => item && item.name;
 export default function ComboboxControl( {
@@ -86,8 +91,8 @@ export default function ComboboxControl( {
 						className: 'components-combobox-control__button-button',
 					} ) }
 				>
-					<Dashicon
-						icon="arrow-down-alt2"
+					<Icon
+						icon={ chevronDown }
 						className="components-combobox-control__button-icon"
 					/>
 				</Button>
@@ -112,8 +117,8 @@ export default function ComboboxControl( {
 							} ) }
 						>
 							{ item === selectedItem && (
-								<Dashicon
-									icon="saved"
+								<Icon
+									icon={ check }
 									className="components-combobox-control__item-icon"
 								/>
 							) }

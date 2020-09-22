@@ -26,9 +26,10 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { trash } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -302,7 +303,7 @@ export default function LogoEdit( {
 				) }
 				{ !! logoUrl && (
 					<ToolbarButton
-						icon="trash"
+						icon={ trash }
 						onClick={ () => deleteLogo() }
 						label={ __( 'Delete Site Logo' ) }
 					/>
@@ -363,11 +364,17 @@ export default function LogoEdit( {
 
 	const key = !! logoUrl;
 
+	const blockWrapperProps = useBlockWrapperProps( {
+		ref,
+		className: classes,
+		key,
+	} );
+
 	return (
-		<Block.div ref={ ref } className={ classes } key={ key }>
+		<div { ...blockWrapperProps }>
 			{ controls }
 			{ logoUrl && logoImage }
 			{ ! logoUrl && mediaPlaceholder }
-		</Block.div>
+		</div>
 	);
 }

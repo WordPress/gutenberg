@@ -36,19 +36,6 @@ describe( 'RangeControl', () => {
 			expect( onChange ).toHaveBeenCalledWith( 10 );
 		} );
 
-		it( 'should not render with icons, by default', () => {
-			const { container } = render(
-				<RangeControl
-					beforeIcon="format-image"
-					afterIcon="format-video"
-				/>
-			);
-
-			const icon = container.querySelector( '.dashicons' );
-
-			expect( icon ).toBeFalsy();
-		} );
-
 		it( 'should render with icons', () => {
 			const { container } = render(
 				<RangeControl

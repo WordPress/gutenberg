@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, ToggleControl } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/block-editor';
 import { ENTER } from '@wordpress/keycodes';
 import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
@@ -15,12 +14,11 @@ export default function MoreEdit( {
 	insertBlocksAfter,
 	setAttributes,
 } ) {
-	const [ placeholder, setPlaceholder ] = useState( DEFAULT_TEXT );
-
 	const onChangeInput = ( event ) => {
-		// Set defaultText to an empty string, allowing the user to clear/replace the input field's text
-		setPlaceholder( '' );
-		setAttributes( { customText: event.target.value || undefined } );
+		setAttributes( {
+			customText:
+				event.target.value !== '' ? event.target.value : undefined,
+		} );
 	};
 
 	const onKeyDown = ( { keyCode } ) => {
@@ -35,8 +33,10 @@ export default function MoreEdit( {
 			: __( 'The excerpt is visible.' );
 
 	const toggleHideExcerpt = () => setAttributes( { noTeaser: ! noTeaser } );
-	const value = customText ?? placeholder;
-	const style = { width: `${ value.length + 1.2 }em` };
+
+	const style = {
+		width: `${ ( customText ? customText : DEFAULT_TEXT ).length + 1.2 }em`,
+	};
 
 	return (
 		<>
@@ -54,8 +54,10 @@ export default function MoreEdit( {
 			</InspectorControls>
 			<div className="wp-block-more">
 				<input
+					aria-label={ __( 'Read more link text' ) }
 					type="text"
-					value={ value }
+					value={ customText }
+					placeholder={ DEFAULT_TEXT }
 					onChange={ onChangeInput }
 					onKeyDown={ onKeyDown }
 					style={ style }

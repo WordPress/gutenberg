@@ -43,7 +43,7 @@ function getNoticeHTML( element ) {
 	const fragments = [];
 
 	for ( const child of element.childNodes ) {
-		if ( child.nodeType !== window.Node.ELEMENT_NODE ) {
+		if ( child.nodeType !== child.ELEMENT_NODE ) {
 			const value = child.nodeValue.trim();
 			if ( value ) {
 				fragments.push( child.nodeValue );
