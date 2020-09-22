@@ -54,8 +54,6 @@ function ColumnEdit( {
 		} );
 	};
 
-	const hasWidth = ( isNaN( width ) && width ) || Number.isFinite( width );
-
 	return (
 		<>
 			<BlockControls>
@@ -92,7 +90,7 @@ function ColumnEdit( {
 				__experimentalTagName={ Block.div }
 				__experimentalPassedProps={ {
 					className: classes,
-					style: hasWidth ? { flexBasis: width } : undefined,
+					style: width ? { flexBasis: width } : undefined,
 				} }
 			/>
 		</>
