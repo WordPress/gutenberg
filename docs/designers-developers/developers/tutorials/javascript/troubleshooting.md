@@ -23,7 +23,7 @@ Your first step in debugging should be to check the JavaScript console for any e
 
 ### Display your message in console log
 
-You can also write directly to the console from your JavaScript code, this is useful for debugging and checking values of items. The function used is `console.log`, for example:
+You can also write directly to the console from your JavaScript code for debugging and checking variable values. Use the `console.log` function like so:
 
 ```js
 console.log( 'My message' );
@@ -37,13 +37,17 @@ console.log( 'Settings value:', settings );
 
 ### Using console log
 
-You can also write JavaScript in the console log, this is useful if you want to test a short command. The commands you run apply to the open browser window. Try this example to count how many blocks are in the editor. This uses the [wp.data package](/packages/data/README.md), play with it and try to use the console to browse available functions also.
+You can also write JavaScript directly in the console if you want to test a short command. The commands you run apply to the open browser window. Try this example with the [wp.data package](/packages/data/README.md) to count how many blocks are in the editor. Play with it and also try to use the console to browse available functions.
 
 ```js
 wp.data.select( 'core/block-editor' ).getBlockCount();
 ```
 
 ![JavaScript example command](https://developer.wordpress.org/files/2020/07/js-console-cmd.gif)
+
+### Using the `debugger` statement
+
+If you would like to pause code execution at a certain line of code, you can write `debugger;` anywhere in your code. Once the browser sees the statement `debugger;`, it will pause execution of your code. This allows you to inspect all variables around the `debugger`  statement, which is very useful. [See this MDN page for more information](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/debugger).
 
 ## Confirm JavaScript is loading
 
