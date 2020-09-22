@@ -26,7 +26,7 @@ const rewrite = ( rootURL ) => ( node ) => {
 	urlValue.value = urlQuote + basedUrl.toString() + urlQuote;
 };
 
-const trimOutmostChars = function( str ) {
+const trimOutmostChars = function ( str ) {
 	return str.slice( 1, -1 );
 };
 
