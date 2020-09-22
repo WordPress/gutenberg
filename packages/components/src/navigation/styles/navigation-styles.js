@@ -29,6 +29,9 @@ export const MenuUI = styled.div`
 		margin: 0;
 		list-style: none;
 	}
+	.components-navigation__back-button {
+		margin-bottom: 24px;
+	}
 `;
 
 export const MenuBackButtonUI = styled( Button )`
@@ -51,10 +54,6 @@ export const MenuTitleUI = styled( Text )`
 	padding: 4px 0 4px 16px;
 	margin-bottom: 8px;
 	color: ${ G2.gray[ 100 ] };
-
-	&:not( :first-child ) {
-		margin-top: 24px;
-	}
 `;
 
 export const GroupTitleUI = styled( Text )`

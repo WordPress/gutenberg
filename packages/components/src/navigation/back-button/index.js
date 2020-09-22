@@ -15,8 +15,13 @@ import { Icon, chevronLeft } from '@wordpress/icons';
 import { useNavigationContext } from '../context';
 import { MenuBackButtonUI } from '../styles/navigation-styles';
 
-export default function NavigationMenu( props ) {
-	const { backButtonLabel, className, href, onClick, parentMenu } = props;
+export default function NavigationMenu( {
+	backButtonLabel,
+	className,
+	href,
+	onClick,
+	parentMenu,
+} ) {
 	const { setActiveMenu, navigationTree } = useNavigationContext();
 
 	const classes = classnames(
