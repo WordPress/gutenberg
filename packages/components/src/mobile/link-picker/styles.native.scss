@@ -1,12 +1,12 @@
 .omniCell {
 	border-bottom-width: 1px;
-	border-bottom-color: $light-gray-400;
+	border-bottom-color: $border-color;
 	padding-left: 16px;
 	padding-right: 16px;
 }
 
 .omniCellDark {
-	border-bottom-color: $gray-70;
+	border-bottom-color: $border-color-dark;
 }
 
 .omniInput {
