@@ -15,7 +15,7 @@ export const NavigationUI = styled.div`
 	width: 100%;
 	background-color: ${ G2.darkGray.primary };
 	color: #f0f0f0;
-	padding: 8px;
+	padding: 0 8px;
 	overflow: hidden;
 `;
 
@@ -28,6 +28,9 @@ export const MenuUI = styled.div`
 		padding: 0;
 		margin: 0;
 		list-style: none;
+	}
+	.components-navigation__back-button {
+		margin-bottom: 24px;
 	}
 `;
 
