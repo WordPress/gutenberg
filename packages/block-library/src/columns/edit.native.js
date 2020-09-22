@@ -159,7 +159,7 @@ function ColumnsEditContainer( {
 		const widths = {};
 		const containerWidth = getContainerWidth( baseContainerWidth );
 
-		let columnWidth = containerWidth / columnsInRow;
+		let columnWidth = width / columnsInRow;
 		let maxColumnWidth = columnWidth;
 
 		innerColumns.forEach(

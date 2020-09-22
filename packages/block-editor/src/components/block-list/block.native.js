@@ -131,6 +131,7 @@ class BlockListBlock extends Component {
 			isInnerBlockSelected,
 			parentBlockAlignment,
 			hasParents,
+			name,
 		} = this.props;
 
 		if ( ! attributes || ! blockType ) {
@@ -149,6 +150,11 @@ class BlockListBlock extends Component {
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 		const hasParentBlockAlignment = parentBlockAlignment !== undefined;
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+		const isColumnsRelated = name.includes( 'core/column' );
+		const shouldShowBorderFullWidth =
+			blockWidth < screenWidth &&
+			isFullWidth &&
+			( ! isColumnsRelated || ! hasParents || hasParentBlockAlignment );
 
 		return (
 			<TouchableWithoutFeedback
@@ -172,10 +178,7 @@ class BlockListBlock extends Component {
 							<View
 								style={ [
 									styles.solidBorder,
-									isFullWidth &&
-										hasParents &&
-										hasParentBlockAlignment &&
-										blockWidth < screenWidth &&
+									shouldShowBorderFullWidth &&
 										styles.borderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,

@@ -51,40 +51,45 @@ export class BlockListItem extends Component {
 			blockAlignment,
 			marginHorizontal,
 			parentBlockAlignment,
-			parentWidth,
 			hasParents,
 			name,
+			isInnerBlockSelected,
 		} = this.props;
 		const { blockWidth } = this.state;
-		const isColumns = name === 'core/columns';
 		const isFullWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.full;
+		const isWideWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.wide;
 		const isParentFullWidth =
 			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
+		const isColumnsRelated = name.includes( 'core/column' );
 
-		if ( blockAlignment === WIDE_ALIGNMENTS.alignments.wide ) {
+		if ( isFullWidth ) {
+			if (
+				! hasParents &&
+				isColumnsRelated &&
+				blockWidth < ALIGNMENT_BREAKPOINTS.mobile
+			) {
+				if ( isInnerBlockSelected ) {
+					return 0;
+				}
+				return marginHorizontal;
+			} else if (
+				! hasParents &&
+				blockWidth > ALIGNMENT_BREAKPOINTS.medium
+			) {
+				return -2;
+			}
+			return 0;
+		}
+
+		if ( isWideWidth ) {
 			return marginHorizontal;
 		}
 
-		if ( isFullWidth && ! hasParents ) {
-			if ( blockWidth > ALIGNMENT_BREAKPOINTS.medium ) {
-				return -1;
-			} else if (
-				blockWidth < ALIGNMENT_BREAKPOINTS.mobile &&
-				isColumns
-			) {
-				return marginHorizontal;
-			}
-			return 0;
-		}
-
-		if ( isFullWidth && isParentFullWidth && ! isColumns ) {
-			return 0;
-		}
-
-		if ( isParentFullWidth && blockWidth <= ALIGNMENT_BREAKPOINTS.medium ) {
-			if ( parentWidth ) {
-				return marginHorizontal;
-			}
+		if (
+			isParentFullWidth &&
+			blockWidth <= ALIGNMENT_BREAKPOINTS.medium &&
+			! isColumnsRelated
+		) {
 			return marginHorizontal * 2;
 		}
 
@@ -92,10 +97,8 @@ export class BlockListItem extends Component {
 	}
 
 	getContentStyles( readableContentViewStyle ) {
-		const { blockAlignment, hasParents, parentBlockAlignment } = this.props;
+		const { blockAlignment, hasParents } = this.props;
 		const isFullWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.full;
-		const isParentFullWidth =
-			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
 
 		return [
 			readableContentViewStyle,
@@ -104,7 +107,6 @@ export class BlockListItem extends Component {
 					width: styles.fullAlignment.width,
 				},
 			isFullWidth &&
-				isParentFullWidth &&
 				hasParents && {
 					paddingHorizontal: styles.fullAlignmentPadding.paddingLeft,
 				},
@@ -168,6 +170,9 @@ export default compose( [
 				getSettings,
 				getBlockParents,
 				__unstableGetBlockWithoutInnerBlocks,
+				getSelectedBlockClientId,
+				hasSelectedInnerBlock,
+				getBlock,
 			} = select( 'core/block-editor' );
 
 			const blockClientIds = getBlockOrder( rootClientId );
@@ -204,6 +209,14 @@ export default compose( [
 			const { align: parentBlockAlignment } =
 				parentBlock?.attributes || {};
 
+			const selectedBlockId = getSelectedBlockClientId();
+
+			const isInnerBlockSelected = ! getBlock(
+				getBlockParents( selectedBlockId )[ 0 ]
+			)?.name.includes( 'core/column' )
+				? true
+				: hasSelectedInnerBlock( rootClientId );
+
 			return {
 				shouldShowInsertionPointBefore,
 				shouldShowInsertionPointAfter,
@@ -212,6 +225,8 @@ export default compose( [
 				blockAlignment: align,
 				parentBlockAlignment,
 				name,
+				selectedBlockId,
+				isInnerBlockSelected,
 			};
 		}
 	),
