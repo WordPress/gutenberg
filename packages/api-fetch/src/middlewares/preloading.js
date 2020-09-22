@@ -35,7 +35,10 @@ export function getStablePath( path ) {
 
 function createPreloadingMiddleware( preloadedData ) {
 	const cache = Object.keys( preloadedData ).reduce( ( result, path ) => {
-		result[ getStablePath( path ) ] = preloadedData[ path ];
+		result[ getStablePath( path ) ] = {
+			...preloadedData[ path ],
+			hasBeenPreloaded: false,
+		};
 		return result;
 	}, {} );
 
@@ -45,7 +48,12 @@ function createPreloadingMiddleware( preloadedData ) {
 			const method = options.method || 'GET';
 			const path = getStablePath( options.path );
 
-			if ( 'GET' === method && cache[ path ] ) {
+			if (
+				'GET' === method &&
+				cache[ path ] &&
+				! cache[ path ].hasBeenPreloaded
+			) {
+				cache[ path ].hasBeenPreloaded = true;
 				return Promise.resolve(
 					parse
 						? cache[ path ].body
