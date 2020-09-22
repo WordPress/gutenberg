@@ -88,12 +88,9 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 		},
 		[ isSelected ]
 	);
-	const {
-		insertDefaultBlock,
-		removeBlock,
-		addHoveredBlock,
-		removeHoveredBlock,
-	} = useDispatch( 'core/block-editor' );
+	const { insertDefaultBlock, removeBlock, setHoveredBlocks } = useDispatch(
+		'core/block-editor'
+	);
 	const [ isHovered, setHovered ] = useState( false );
 
 	// Provide the selected node, or the first and last nodes of a multi-
@@ -269,11 +266,24 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 	}, [ isNavigationMode, isHovered, setHovered ] );
 
 	useEffect( () => {
-		function onMouseEnter() {
-			addHoveredBlock( clientId );
+		function getHoveredBlocksFromCursor( event ) {
+			const hoveredElements = document.elementsFromPoint(
+				event.clientX,
+				event.clientY
+			);
+			const blockIds = [];
+			hoveredElements.forEach( ( element ) => {
+				if ( element.dataset.block ) {
+					blockIds.push( element.dataset.block );
+				}
+			} );
+			return blockIds;
 		}
-		function onMouseLeave() {
-			removeHoveredBlock( clientId );
+		function onMouseEnter( event ) {
+			setHoveredBlocks( getHoveredBlocksFromCursor( event ) );
+		}
+		function onMouseLeave( event ) {
+			setHoveredBlocks( getHoveredBlocksFromCursor( event ) );
 		}
 
 		ref.current.addEventListener( 'mouseenter', onMouseEnter );

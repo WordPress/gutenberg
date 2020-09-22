@@ -1653,11 +1653,8 @@ export function highlightedBlock( state, action ) {
 
 export function hoveredBlocks( state = [], action ) {
 	switch ( action.type ) {
-		case 'HOVERED_BLOCKS_ADD':
-			return [ action.clientId, ...state ];
-
-		case 'HOVERED_BLOCKS_REMOVE':
-			return filter( state, ( blockId ) => blockId !== action.clientId );
+		case 'HOVERED_BLOCKS_SET':
+			return action.hoveredBlockIds;
 	}
 
 	return state;

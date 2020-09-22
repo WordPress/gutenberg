@@ -1110,16 +1110,9 @@ export function setHasControlledInnerBlocks(
 	};
 }
 
-export function addHoveredBlock( clientId ) {
+export function setHoveredBlocks( hoveredBlockIds ) {
 	return {
-		type: 'HOVERED_BLOCKS_ADD',
-		clientId,
-	};
-}
-
-export function removeHoveredBlock( clientId ) {
-	return {
-		type: 'HOVERED_BLOCKS_REMOVE',
-		clientId,
+		type: 'HOVERED_BLOCKS_SET',
+		hoveredBlockIds,
 	};
 }
