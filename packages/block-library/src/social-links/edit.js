@@ -41,7 +41,7 @@ export function SocialLinksEdit( props ) {
 		templateLock: false,
 		__experimentalAppenderTagName: 'li',
 	} );
-	const logosOnly = className.indexOf( 'is-style-logos-only' ) >= 0;
+	const logosOnly = className?.indexOf( 'is-style-logos-only' ) >= 0;
 
 	useEffect( () => {
 		if ( logosOnly ) {
