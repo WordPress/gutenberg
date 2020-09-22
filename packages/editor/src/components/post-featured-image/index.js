@@ -108,7 +108,7 @@ function PostFeaturedImage( {
 							) }
 						{ ! media.alt_text &&
 							sprintf(
-								// Translators: %s: The selected image slug.
+								// Translators: %s: The selected image filename.
 								__(
 									'The current image has no alternative text. The file name is: %s'
 								),
