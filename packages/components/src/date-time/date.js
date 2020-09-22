@@ -56,7 +56,7 @@ const renderDatePickerHeader = ( { date, decreaseMonth, increaseMonth } ) => (
 );
 
 const renderTooltipContent = ( events ) => {
-	const needToPrune = events?.length > 3;
+	const needToPrune = events?.length > 4;
 	const eventsToRender = needToPrune ? events.slice( 0, 3 ) : events; 
 	if ( needToPrune ) {
 		eventsToRender.push( {
