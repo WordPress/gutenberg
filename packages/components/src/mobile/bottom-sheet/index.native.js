@@ -333,11 +333,11 @@ class BottomSheet extends Component {
 
 		let listStyle = {};
 		if ( isFullScreen ) {
-			listStyle = { ...dragIndicatorStyle, flexGrow: 1 };
+			listStyle = { flexGrow: 1 };
 		} else if ( isMaxHeightSet ) {
-			listStyle = { ...dragIndicatorStyle, maxHeight };
+			listStyle = { maxHeight };
 		}
-		
+
 		const listProps = {
 			disableScrollViewPanResponder: true,
 			bounces,
@@ -423,7 +423,7 @@ class BottomSheet extends Component {
 					keyboardVerticalOffset={ -safeAreaBottomInset }
 				>
 					{ ! ( Platform.OS === 'android' && isFullScreen ) && (
-						<View style={ listStyle } />
+						<View style={ dragIndicatorStyle } />
 					) }
 					{ ! hideHeader && getHeader() }
 					<WrapperView
