@@ -16,17 +16,41 @@ function flipDirection( direction ) {
 
 function createBlockClientIdManager( shouldMapBlocks ) {
 	const clientIdMap = { [ DIRECTION_IN ]: {}, [ DIRECTION_OUT ]: {} };
+	const blockMap = {};
 
 	const mapBlocks = ( blocks, direction ) => {
 		if ( ! Array.isArray( blocks ) || ! shouldMapBlocks ) {
 			return blocks;
 		}
 
-		return blocks.map( ( block ) => ( {
-			...block,
-			innerBlocks: mapBlocks( block.innerBlocks, direction ),
-			clientId: mapBlockId( block.clientId, direction ),
-		} ) );
+		const reversedDirection = flipDirection( direction );
+		return blocks.map( ( block ) => {
+			// If the block object is not different, return the same object
+			// which was passed originally in the opposite direction.
+			if ( blockMap[ block.clientId ]?.[ direction ] === block ) {
+				return blockMap[ block.clientId ][ reversedDirection ];
+			}
+
+			const updatedBlock = {
+				...block,
+				innerBlocks: mapBlocks( block.innerBlocks, direction ),
+				clientId: mapBlockId( block.clientId, direction ),
+			};
+
+			// A reference to both the internal and external blocks are kept so
+			// that both can be compared by reference.
+			const blockRef = {
+				[ direction ]: block,
+				[ reversedDirection ]: updatedBlock,
+			};
+
+			// Make sure we can access that reference via either clientId.
+			blockMap[ block.clientId ] = blockRef;
+			blockMap[ updatedBlock.clientId ] = blockRef;
+
+			// Return the freshly updated block for use by the consumer.
+			return updatedBlock;
+		} );
 	};
 
 	const mapBlockId = ( blockClientId, direction ) => {
