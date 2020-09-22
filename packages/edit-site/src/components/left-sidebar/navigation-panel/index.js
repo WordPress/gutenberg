@@ -25,6 +25,12 @@ const NavigationPanel = () => {
 					onActivateMenu={ setActiveMenu }
 				>
 					<NavigationMenu title="Home">
+						<NavigationItem
+							item="item-back"
+							title="Back to dashboard"
+							href="index.php"
+						/>
+
 						<NavigationGroup title="Group 1">
 							<NavigationItem
 								item="item-preview"
