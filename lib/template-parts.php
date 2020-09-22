@@ -196,11 +196,9 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 	if ( $request['theme'] ) {
 		$tax_query   = isset( $args['tax_query'] ) ? $args['tax_query'] : array();
 		$tax_query[] = array(
-			array(
-				'taxonomy' => 'wp_theme',
-				'field'    => 'slug',
-				'terms'    => $request['theme'],
-			),
+			'taxonomy' => 'wp_theme',
+			'field'    => 'slug',
+			'terms'    => $request['theme'],
 		);
 
 		// Ensure auto-drafts of all theme supplied template parts are created.
