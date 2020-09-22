@@ -12,28 +12,32 @@ export function transformWidgetToBlock( widget ) {
 		return parsedBlocks[ 0 ];
 	}
 
-	return createBlock(
-		'core/legacy-widget',
-		{
-			form: widget.form,
-			widgetClass: widget.widget_class,
-			instance: widget.settings,
-			idBase: widget.id_base,
-			number: widget.number,
-		},
-		[]
-	);
+	const attributes = {
+		form: widget.form,
+		instance: widget.settings,
+		idBase: widget.id_base,
+		number: widget.number,
+	};
+
+	const isReferenceWidget = ! widget.widget_class;
+	if ( isReferenceWidget ) {
+		attributes.referenceWidgetName = widget.id;
+	} else {
+		attributes.widgetClass = widget.widget_class;
+	}
+
+	return createBlock( 'core/legacy-widget', attributes, [] );
 }
 
 export function transformBlockToWidget( block, relatedWidget = {} ) {
-	const { name, attributes } = block;
+	const { name } = block;
 	if ( name === 'core/legacy-widget' ) {
-		const widget = {
-			...relatedWidget,
-			widget_class: attributes.widgetClass,
-			id_base: attributes.idBase,
-			settings: attributes.instance,
-		};
+		let widget;
+		if ( block.attributes.referenceWidgetName ) {
+			widget = transformReferenceBlockToWidget( block, relatedWidget );
+		} else {
+			widget = transformClassBlockToWidget( block, relatedWidget );
+		}
 		delete widget.form;
 		delete widget.rendered;
 		return widget;
@@ -46,5 +50,22 @@ export function transformBlockToWidget( block, relatedWidget = {} ) {
 		settings: {
 			content: serialize( block ),
 		},
+	};
+}
+
+function transformClassBlockToWidget( { attributes }, relatedWidget ) {
+	return {
+		...relatedWidget,
+		widget_class: attributes.widgetClass,
+		id_base: attributes.idBase,
+		settings: attributes.instance,
+	};
+}
+
+function transformReferenceBlockToWidget( { attributes }, relatedWidget ) {
+	return {
+		...relatedWidget,
+		id: attributes.referenceWidgetName,
+		settings: attributes.instance,
 	};
 }

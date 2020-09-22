@@ -477,9 +477,7 @@ _Properties_
 
 -   _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
 -   _availableLegacyWidgets_ `Array`: Array of objects representing the legacy widgets available.
--   _colors_ `Array`: Palette colors
 -   _fontSizes_ `Array`: Available font sizes
--   _disableCustomFontSizes_ `boolean`: Whether or not the custom font sizes are disabled
 -   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing

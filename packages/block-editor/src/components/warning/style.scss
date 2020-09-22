@@ -3,8 +3,7 @@
 	display: flex;
 	flex-wrap: wrap;
 	font-family: $default-font;
-	font-size: $default-font-size;
-	padding: ($grid-unit-10 - $border-width - $border-width) $grid-unit-15;
+	padding: 1em;
 
 	// Block UI appearance.
 	border: $border-width solid $gray-900;
@@ -15,7 +14,7 @@
 		line-height: $default-line-height;
 		font-family: $default-font;
 		font-size: $default-font-size;
-		margin: 1em 0;
+		margin: 0 0 1em;
 
 	}
 
@@ -38,7 +37,7 @@
 	}
 
 	.block-editor-warning__action {
-		margin: 0 0 0 $grid-unit-10;
+		margin: 0 $grid-unit-10 0 0;
 	}
 }
 

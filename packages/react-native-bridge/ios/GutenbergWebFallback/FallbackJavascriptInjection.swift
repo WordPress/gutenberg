@@ -4,6 +4,7 @@ public struct FallbackJavascriptInjection {
     enum JSMessage: String, CaseIterable {
         case htmlPostContent
         case log
+        case gutenbergReady
     }
 
     private let userContentScripts: [WKUserScript]
@@ -17,6 +18,7 @@ public struct FallbackJavascriptInjection {
     public let injectLocalStorageScript: WKUserScript
     public let preventAutosavesScript: WKUserScript
     public let getHtmlContentScript = "window.getHTMLPostContent()".toJsScript()
+    public let gutenbergObserverScript: WKUserScript
 
     /// Init an instance of GutenbergWebJavascriptInjection or throws if any of the required sources doesn't exist.
     /// This helps to cach early any possible error due to missing source files.
@@ -25,7 +27,7 @@ public struct FallbackJavascriptInjection {
     /// - Throws: Throws an error if any required source doesn't exist.
     public init(blockHTML: String, userId: String) throws {
         func script(with source: SourceFile, argument: String? = nil) throws -> WKUserScript {
-            String(format: try source.getContent(), argument ?? []).toJsScript()
+            try source.jsScript(with: argument)
         }
 
         func getInjectCssScript(with source: SourceFile) throws -> WKUserScript {
@@ -41,6 +43,7 @@ public struct FallbackJavascriptInjection {
         injectWPBarsCssScript = try getInjectCssScript(with: .wpBarsStyle)
         injectEditorCssScript = try getInjectCssScript(with: .editorStyle)
         preventAutosavesScript = try script(with: .preventAutosaves)
+        gutenbergObserverScript = try script(with: .gutenbergObserver)
 
         let localStorageJsonString = try SourceFile.localStorage.getContent().removingSpacesAndNewLines()
         let scriptString = String(format: injectLocalStorageScriptTemplate, userId, localStorageJsonString)
@@ -57,7 +60,7 @@ public struct FallbackJavascriptInjection {
     }
 }
 
-private extension String {
+internal extension String {
     func toJsScript() -> WKUserScript {
         WKUserScript(source: self, injectionTime: .atDocumentEnd, forMainFrameOnly: false)
     }

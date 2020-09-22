@@ -13,7 +13,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	InspectorControls,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import {
 	ToolbarGroup,
@@ -24,6 +24,7 @@ import {
 	CustomSelectControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { edit } from '@wordpress/icons';
 
 export default function PostDateEdit( { attributes, context, setAttributes } ) {
 	const { textAlign, format } = attributes;
@@ -55,6 +56,11 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 		} )
 	);
 	const resolvedFormat = format || siteFormat || settings.formats.date;
+	const blockWrapperProps = useBlockWrapperProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 
 	return (
 		<>
@@ -69,7 +75,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 				{ date && (
 					<ToolbarGroup>
 						<ToolbarButton
-							icon="edit"
+							icon={ edit }
 							title={ __( 'Change Date' ) }
 							onClick={ () =>
 								setIsPickerOpen(
@@ -99,11 +105,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 				</PanelBody>
 			</InspectorControls>
 
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
+			<div { ...blockWrapperProps }>
 				{ date && (
 					<time dateTime={ dateI18n( 'c', date ) }>
 						{ dateI18n( resolvedFormat, date ) }
@@ -122,7 +124,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 					</time>
 				) }
 				{ ! date && __( 'No Date' ) }
-			</Block.div>
+			</div>
 		</>
 	);
 }

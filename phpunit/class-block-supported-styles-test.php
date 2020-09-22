@@ -103,9 +103,13 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	private function assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles ) {
 		$styled_block = apply_filters( 'render_block', self::BLOCK_MARKUP, $block );
-		$content      = $this->get_content_from_block( $styled_block );
-		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
-		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
+
+		// Ensure blocks to not add extra whitespace.
+		$this->assertEquals( $styled_block, trim( $styled_block ) );
+
+		$content    = $this->get_content_from_block( $styled_block );
+		$class_list = $this->get_attribute_from_block( 'class', $styled_block );
+		$style_list = $this->get_attribute_from_block( 'style', $styled_block );
 
 		$this->assertEquals( self::BLOCK_CONTENT, $content );
 		$this->assertEquals( $expected_classes, $class_list );
@@ -812,5 +816,99 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		restore_error_handler();
 
 		$this->assertEmpty( $errors, 'Libxml errors should be dropped.' );
+	}
+
+	/**
+	 * Ensures block attributes are output correctly.
+	 *
+	 * Some blocks saved with valid attributes were broken after the block was rendered. Ensure that
+	 * block attributes are escaped correctly and safely.
+	 */
+	public function test_render_block_attribute() {
+		$this->register_block_type( 'core/example', array( 'render_callback' => true ) );
+
+		$block = array(
+			'blockName' => 'core/example',
+			'attrs'     => array(),
+		);
+
+		// Tests of shape [ [ $input, $expected_result ], … ].
+		$tests = array(
+
+			// Valid single quotes in double-quoted attribute.
+			array(
+				'<div style="background-image:url(\'https://example.com/image.png?example=query&amp;args\')"></div>',
+				'<div style="background-image: url(\'https://example.com/image.png?example=query&amp;args\');" class="wp-block-example"></div>',
+			),
+
+			// Valid double quotes in single-quoted attribute.
+			array(
+				'<div style=\'background-image:url("https://example.com/image.png?example=query&amp;args")\'></div>',
+				'<div style=\'background-image: url("https://example.com/image.png?example=query&amp;args");\' class="wp-block-example"></div>',
+			),
+
+			// Encode attributes.
+			array(
+				'<div style="&quot;><script>alert(1)</script>"></div>',
+				'<div style=\'"&gt;&lt;script&gt;alert(1)&lt;/script&gt;;\' class="wp-block-example"></div>',
+			),
+		);
+
+		foreach ( $tests as $test ) {
+			$input    = $test[0];
+			$expected = $test[1];
+			$result   = apply_filters( 'render_block', $input, $block );
+			$this->assertEquals( $expected, $result );
+		}
+	}
+
+	/**
+	 * Ensure that HTML appended to the block content is preserved.
+	 */
+	public function test_render_block_includes_appended_html() {
+		$this->register_block_type(
+			'core/example',
+			array(
+				'render_callback' => function( $attributes, $content ) {
+					return $content . '<div>Appended</div>';
+				},
+			)
+		);
+
+		$result = do_blocks( '<!-- wp:core/example --><p>Hello from the block content!</p><!-- /wp:core/example -->' );
+
+		$this->assertEquals( '<p class="wp-block-example">Hello from the block content!</p><div>Appended</div>', $result );
+	}
+
+	/**
+	 * Ensure that HTML is correctly extracted with multibyte contents.
+	 */
+	public function test_render_block_mb_html() {
+		$this->register_block_type(
+			'core/example',
+			array( 'render_callback' => true )
+		);
+
+		$result = do_blocks( '<!-- wp:core/example --><ul><li>🙂</li><li>😕</li><li>😵</li><li>😎</li></ul><!-- /wp:core/example -->' );
+
+		$this->assertEquals( '<ul class="wp-block-example"><li>🙂</li><li>😕</li><li>😵</li><li>😎</li></ul>', $result );
+	}
+
+	/**
+	 * Should not error when the rendered block is text only.
+	 */
+	public function test_render_block_rendered_text_node() {
+		$this->register_block_type(
+			'core/example',
+			array(
+				'render_callback' => function() {
+					return 'This is rendered as just text.';
+				},
+			)
+		);
+
+		$result = do_blocks( '<!-- wp:core/example /-->' );
+
+		$this->assertEquals( 'This is rendered as just text.', $result );
 	}
 }

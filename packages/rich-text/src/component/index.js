@@ -826,7 +826,7 @@ function RichText( {
 			return;
 		}
 
-		if ( document.activeElement !== ref.current ) {
+		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
 			return;
 		}
 

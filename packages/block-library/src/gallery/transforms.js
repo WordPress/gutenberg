@@ -87,6 +87,9 @@ const transforms = {
 					},
 				},
 			},
+			isMatch( { named } ) {
+				return undefined !== named.ids;
+			},
 		},
 		{
 			// When created by drag and dropping multiple files on an insertion point

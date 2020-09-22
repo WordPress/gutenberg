@@ -13,9 +13,7 @@ import {
 
 const __experimentalWithPageTemplatePicker = createHigherOrderComponent(
 	( WrappedComponent ) => ( props ) => {
-		const isTemplatePickerEnabled = ! (
-			props.capabilities.modalLayoutPicker ?? false
-		);
+		const isTemplatePickerEnabled = ! ( props.modalLayoutPicker ?? false );
 		const isTemplatePickerVisible =
 			isTemplatePickerEnabled &&
 			__experimentalUsePageTemplatePickerVisible();

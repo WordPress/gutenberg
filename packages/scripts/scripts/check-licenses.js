@@ -176,7 +176,11 @@ const child = spawn.sync(
 		...( prod ? [ '--prod' ] : [] ),
 		...( dev ? [ '--dev' ] : [] ),
 	],
-	{ maxBuffer: 1024 * 1024 * 100 } // output size for prod is ~21 MB and dev is ~76 MB
+	/*
+	 * Set the max buffer to ~157MB, since the output size for
+	 * prod is ~21 MB and dev is ~110 MB
+	 */
+	{ maxBuffer: 1024 * 1024 * 150 }
 );
 
 const result = JSON.parse( child.stdout.toString() );

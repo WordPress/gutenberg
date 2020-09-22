@@ -58,19 +58,13 @@ function gutenberg_navigation_init( $hook ) {
 	}
 
 	$settings = array(
-		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
-		'imageSizes'             => $available_image_sizes,
-		'isRTL'                  => is_rtl(),
-		'maxUploadFileSize'      => $max_upload_size,
-		'blockNavMenus'          => get_theme_support( 'block-nav-menus' ),
+		'imageSizes'        => $available_image_sizes,
+		'isRTL'             => is_rtl(),
+		'maxUploadFileSize' => $max_upload_size,
+		'blockNavMenus'     => get_theme_support( 'block-nav-menus' ),
 	);
 
-	list( $color_palette, ) = (array) get_theme_support( 'editor-color-palette' );
-	list( $font_sizes, )    = (array) get_theme_support( 'editor-font-sizes' );
-
-	if ( false !== $color_palette ) {
-		$settings['colors'] = $color_palette;
-	}
+	list( $font_sizes, ) = (array) get_theme_support( 'editor-font-sizes' );
 
 	if ( false !== $font_sizes ) {
 		$settings['fontSizes'] = $font_sizes;

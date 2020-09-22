@@ -4,10 +4,16 @@ $color-palette-circle-spacing: 12px;
 .components-circular-option-picker {
 	display: inline-block;
 	width: 100%;
+	margin-right: -10px;
 
 	.components-circular-option-picker__custom-clear-wrapper {
 		display: flex;
 		justify-content: flex-end;
+	}
+
+	// Account for scrollbar or no scrollbar.
+	.components-circular-option-picker__swatches {
+		margin-right: -$grid-unit-20;
 	}
 }
 
@@ -30,11 +36,6 @@ $color-palette-circle-spacing: 12px;
 	& > div {
 		height: 100%;
 		width: 100%;
-	}
-
-	// Remove right margin on every 6th item so it aligns with gradient control.
-	&:nth-child(6n+6) {
-		margin-right: 0;
 	}
 }
 
@@ -103,7 +104,7 @@ $color-palette-circle-spacing: 12px;
 	&:focus {
 		&::after {
 			content: "";
-			border: #{ $border-width * 2 } solid $dark-gray-400;
+			border: #{ $border-width * 2 } solid $gray-700;
 			width: 32px;
 			height: 32px;
 			position: absolute;
