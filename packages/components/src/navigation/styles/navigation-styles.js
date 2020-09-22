@@ -52,6 +52,7 @@ export const MenuBackButtonUI = styled( Button )`
 
 export const MenuTitleUI = styled( Text )`
 	align-items: center;
+	color: ${ G2.gray[ 100 ] };
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: 8px;
@@ -68,7 +69,6 @@ export const MenuTitleUI = styled( Text )`
 `;
 
 export const MenuTitleSearchUI = styled.div`
-	color: ${ G2.gray[ 100 ] };
 	margin-bottom: 2px;
 	padding: 4px;
 	position: relative;
