@@ -370,13 +370,19 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     @ReactProp(name = ViewProps.TEXT_ALIGN)
     public void setTextAlign(ReactAztecText view, @Nullable String textAlign) {
         if ("justify".equals(textAlign)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                view.setJustificationMode(LineBreaker.JUSTIFICATION_MODE_INTER_WORD);
+            // Value is hardcoded because Lint is failing with a false positive "Unnecessary; SDK_INT is never < 21"
+            if (Build.VERSION.SDK_INT >= 29) {
+                setJustificationModeSdk29(view, LineBreaker.JUSTIFICATION_MODE_INTER_WORD);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                setJustificationModeSDK26(view, Layout.JUSTIFICATION_MODE_INTER_WORD);
             }
             view.setGravity(Gravity.START);
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                view.setJustificationMode(LineBreaker.JUSTIFICATION_MODE_NONE);
+            // Value is hardcoded because Lint is failing with a false positive "Unnecessary; SDK_INT is never < 21"
+            if (Build.VERSION.SDK_INT >= 29) {
+                setJustificationModeSdk29(view, LineBreaker.JUSTIFICATION_MODE_NONE);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                setJustificationModeSDK26(view, Layout.JUSTIFICATION_MODE_NONE);
             }
 
             if (textAlign == null || "auto".equals(textAlign)) {
@@ -391,6 +397,17 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                 throw new JSApplicationIllegalArgumentException("Invalid textAlign: " + textAlign);
             }
         }
+    }
+
+    @RequiresApi(api = VERSION_CODES.O)
+    private void setJustificationModeSDK26(ReactAztecText view, int justificationModeInterWord) {
+        view.setJustificationMode(justificationModeInterWord);
+    }
+
+    // Value is hardcoded because Lint is failing with a false positive "Unnecessary; SDK_INT is never < 21"
+    @RequiresApi(api = 29)
+    private void setJustificationModeSdk29(ReactAztecText view, int justificationModeInterWord) {
+        view.setJustificationMode(justificationModeInterWord);
     }
 
     private void setLinkTextColor(ReactAztecText view, @Nullable Integer color) {
