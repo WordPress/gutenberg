@@ -11,11 +11,9 @@ export default function PreformattedEdit( {
 	attributes,
 	mergeBlocks,
 	setAttributes,
-	className,
-	style,
 } ) {
 	const { content } = attributes;
-	const blockWrapperProps = useBlockWrapperProps( { className, style } );
+	const blockWrapperProps = useBlockWrapperProps();
 
 	return (
 		<RichText

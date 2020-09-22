@@ -17,12 +17,11 @@ import {
 export default function VerseEdit( {
 	attributes,
 	setAttributes,
-	className,
 	mergeBlocks,
 } ) {
 	const { textAlign, content } = attributes;
 	const blockWrapperProps = useBlockWrapperProps( {
-		className: classnames( className, {
+		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
