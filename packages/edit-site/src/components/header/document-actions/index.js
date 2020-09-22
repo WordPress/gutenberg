@@ -20,6 +20,9 @@ function getBlockDisplayText( block ) {
 		: null;
 }
 
+// We want to show information in the header if we are editing a "template area."
+const TEMPLATE_AREAS = [ 'core/template-part', 'core/post-content' ];
+
 function useSecondaryText() {
 	const {
 		selectedBlock,
@@ -35,11 +38,10 @@ function useSecondaryText() {
 		};
 	} );
 
-	// Check if current block is a template part:
-	const selectedBlockLabel =
-		selectedBlock?.name === 'core/template-part'
-			? getBlockDisplayText( selectedBlock )
-			: null;
+	// Check if current block is a template area:
+	const selectedBlockLabel = TEMPLATE_AREAS.includes( selectedBlock?.name )
+		? getBlockDisplayText( selectedBlock )
+		: null;
 
 	if ( selectedBlockLabel ) {
 		return {
@@ -48,12 +50,9 @@ function useSecondaryText() {
 		};
 	}
 
-	// Check if an ancestor of the current block is a template part:
+	// Check if an ancestor of the current block is a template area:
 	const templatePartParents = !! selectedBlock
-		? getBlockParentsByBlockName(
-				selectedBlock?.clientId,
-				'core/template-part'
-		  )
+		? getBlockParentsByBlockName( selectedBlock?.clientId, TEMPLATE_AREAS )
 		: [];
 
 	if ( templatePartParents.length ) {
