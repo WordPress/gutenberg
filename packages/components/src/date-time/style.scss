@@ -127,7 +127,7 @@ $date-picker-date-size: 30px;
 	}
 
 	.react-datepicker__day--highlighted {
-		border: 1px solid $gray-600;
+		border: 2px solid $gray-600;
 		&:not(.react-datepicker__day--selected) {
 			background-color: $white;
 		}
