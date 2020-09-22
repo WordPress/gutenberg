@@ -112,7 +112,8 @@ function PostFeaturedImage( {
 								__(
 									'The current image has no alternative text. The file name is: %s'
 								),
-								media.media_details.sizes.full.file
+								media.media_details.sizes?.full?.file ||
+									media.slug
 							) }
 					</div>
 				) }
