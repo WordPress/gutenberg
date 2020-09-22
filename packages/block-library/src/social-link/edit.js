@@ -12,6 +12,7 @@ import {
 	URLPopover,
 	URLInput,
 	useBlockProps,
+	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { Fragment, useState, useEffect } from '@wordpress/element';
 import {
@@ -20,7 +21,6 @@ import {
 	PanelRow,
 	TextControl,
 } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 import { keyboardReturn } from '@wordpress/icons';
 
@@ -34,12 +34,32 @@ const SocialLinkEdit = ( {
 	setAttributes,
 	isSelected,
 	context,
-	rgbIconColor,
-	rgbBackgroundColor,
 } ) => {
 	const { url, service, label } = attributes;
 	const [ showURLPopover, setPopover ] = useState( false );
-	const { iconColor, backgroundColor } = context;
+
+	const getColorBySlug = ( colors, slug, customColor ) => {
+		return customColor || get( find( colors, { slug } ), 'color' ) || null;
+	};
+
+	// Determine colors for this link passed via context from parent.
+	const {
+		iconColor,
+		customIconColor,
+		backgroundColor,
+		customBackgroundColor,
+	} = context;
+	const colors = useEditorFeature( 'color.palette' ) || [];
+	const rgbIconColor = getColorBySlug( colors, iconColor, customIconColor );
+	const rgbBackgroundColor = getColorBySlug(
+		colors,
+		backgroundColor,
+		customBackgroundColor
+	);
+
+	useEffect( () => {
+		setAttributes( { rgbIconColor, rgbBackgroundColor } );
+	}, [ rgbIconColor, rgbBackgroundColor, setAttributes ] );
 
 	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
@@ -49,18 +69,15 @@ const SocialLinkEdit = ( {
 		[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
 	} );
 
-	const styles = {
-		color: rgbIconColor,
-		backgroundColor: rgbBackgroundColor,
-	};
-
-	useEffect( () => {
-		setAttributes( { rgbIconColor, rgbBackgroundColor } );
-	}, [ rgbIconColor, rgbBackgroundColor, setAttributes ] );
-
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );
-	const blockProps = useBlockProps( { className: classes, style: styles } );
+	const blockProps = useBlockProps( {
+		className: classes,
+		style: {
+			color: rgbIconColor,
+			backgroundColor: rgbBackgroundColor,
+		},
+	} );
 
 	return (
 		<Fragment>
@@ -123,26 +140,4 @@ const SocialLinkEdit = ( {
 	);
 };
 
-const getColorBySlug = ( colors, slug, customColor ) => {
-	return customColor || get( find( colors, { slug } ), 'color' ) || null;
-};
-
-export default withSelect( ( select, ownProps ) => {
-	const {
-		iconColor,
-		customIconColor,
-		backgroundColor,
-		customBackgroundColor,
-	} = ownProps.context;
-	const { getSettings } = select( 'core/block-editor' );
-	const colors = get( getSettings(), 'colors', [] );
-
-	return {
-		rgbIconColor: getColorBySlug( colors, iconColor, customIconColor ),
-		rgbBackgroundColor: getColorBySlug(
-			colors,
-			backgroundColor,
-			customBackgroundColor
-		),
-	};
-} )( SocialLinkEdit );
+export default SocialLinkEdit;
