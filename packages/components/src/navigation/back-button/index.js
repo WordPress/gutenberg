@@ -15,7 +15,7 @@ import { Icon, chevronLeft } from '@wordpress/icons';
 import { useNavigationContext } from '../context';
 import { MenuBackButtonUI } from '../styles/navigation-styles';
 
-export default function NavigationMenu( {
+export default function NavigationBackButton( {
 	backButtonLabel,
 	className,
 	href,
