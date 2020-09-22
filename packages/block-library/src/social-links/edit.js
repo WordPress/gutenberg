@@ -4,10 +4,10 @@
 import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
+	ContrastChecker,
 	InspectorControls,
 	PanelColorSettings,
 	withColors,
-	__experimentalBlock as Block,
 } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody } from '@wordpress/components';
 import { Fragment, useEffect } from '@wordpress/element';
@@ -76,6 +76,15 @@ export function SocialLinksEdit( props ) {
 						},
 					] }
 				/>
+				{ ! logosOnly && (
+					<ContrastChecker
+						{ ...{
+							textColor: iconColor.color,
+							backgroundColor: backgroundColor.color,
+						} }
+						isLargeText={ false }
+					/>
+				) }
 			</InspectorControls>
 			<ul { ...innerBlocksProps } />
 		</Fragment>
