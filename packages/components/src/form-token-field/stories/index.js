@@ -31,7 +31,7 @@ const FormTokenFieldExample = () => {
 			value={ selectedContinents }
 			suggestions={ continents }
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
-			placeholder="Type a continent"
+			label="Type a continent"
 		/>
 	);
 };
@@ -60,7 +60,7 @@ const FormTokenFieldAsyncExample = () => {
 			suggestions={ availableContinents }
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
 			onInputChange={ searchContinents }
-			placeholder="Type a continent"
+			label="Type a continent"
 		/>
 	);
 };
@@ -90,7 +90,7 @@ const ComboboxExample = () => {
 				suggestions={ availableContinents }
 				onChange={ ( tokens ) => setSelectedContinent( tokens ) }
 				onInputChange={ searchContinents }
-				placeholder="Type a continent"
+				label="Type a continent"
 			/>
 			<p>Value: { selectedContinent }</p>
 		</>
