@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import ReactDatePicker from 'react-datepicker';
+import ReactDatePicker, { registerLocale } from 'react-datepicker';
 import { isSameDay, format, getDate } from 'date-fns';
 import { map, filter } from 'lodash';
 import * as locales from 'date-fns/esm/locale';
@@ -10,6 +10,7 @@ import * as locales from 'date-fns/esm/locale';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { __experimentalGetSettings as getSettings } from '@wordpress/date';
 
 /**
  * Internal dependencies
@@ -23,7 +24,16 @@ import { mapLocaleCode } from './utils';
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 const isRTL = () => document.documentElement.dir === 'rtl';
 
-const DatePickerHeader = ( { date, decreaseMonth, increaseMonth, locale } ) => (
+/*
+ * Register locale
+ */
+const settings = getSettings();
+const siteLocale = settings?.l10n?.locale || 'en';
+const _l = mapLocaleCode( siteLocale );
+const localeObject = locales[ _l ] ? locales[ _l ] : locales.en_US;
+registerLocale( _l, localeObject );
+
+const renderDatePickerHeader = ( { date, decreaseMonth, increaseMonth } ) => (
 	<div className={ 'components-datetime__date-header' }>
 		<Button
 			className={ `components-datetime__date-header-month-button is-previous-month` }
@@ -32,7 +42,9 @@ const DatePickerHeader = ( { date, decreaseMonth, increaseMonth, locale } ) => (
 			onClick={ decreaseMonth }
 		/>
 		<div className={ 'components-datetime__date-header-month' }>
-			<strong>{ format( date, 'MMMM yyyy', { locale } ) }</strong>
+			<strong>
+				{ format( date, 'MMMM yyyy', { locale: localeObject } ) }
+			</strong>
 		</div>
 		<Button
 			className={ `components-datetime__date-header-month-button is-previous-month` }
@@ -81,14 +93,10 @@ const DatePicker = ( {
 	onMonthChange,
 	currentDate,
 	isInvalidDate,
-	locale = 'en_US',
 	events,
 } ) => {
 	const selected = typeof currentDate === 'string' ? new Date( currentDate ) : currentDate;
 	const highlightDates = events;
-
-	const _l = mapLocaleCode( locale );
-	const localeObject = locales[ _l ] ? locales[ _l ] : locales.en_US;
 
 	return (
 		<ReactDatePicker
@@ -96,15 +104,14 @@ const DatePicker = ( {
 			selected={ selected }
 			onChange={ onChange }
 			inline
-			renderCustomHeader={ ( props ) => (
-				<DatePickerHeader { ...props } locale={ localeObject } />
-			) }
+			renderCustomHeader={ renderDatePickerHeader }
 			renderDayContents={ ( ...props ) =>
 				renderDayContents( ...props, events )
 			}
 			useWeekdaysShort={ true }
 			highlightDates={ highlightDates }
 			onMonthChange={ onMonthChange }
+			locale={ _l }
 		/>
 	);
 };
