@@ -2,7 +2,7 @@
 
 The Gutenberg project follows a standard pull request process for contributions. See GitHub's documentation for [additional details about pull requests](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests).
 
-This documentation is intended to help you get started using git with Gutenberg. Git is a powerful source code management tool, to learn git deeply, check out the [Pro Git book](https://git-scm.com/book/en/v2) available free online under CC BY-NC-SA 3.0 license.
+This documentation is intended to help you get started using git with Gutenberg. Git is a powerful source code management tool; to learn git deeply, check out the [Pro Git book](https://git-scm.com/book/en/v2) available free online under CC BY-NC-SA 3.0 license.
 
 If you are unfamiliar with using git, it is worthwhile to explore and play with it. Try out the [git tutorial](https://git-scm.com/docs/gittutorial) as well as the [git user manual](https://git-scm.com/docs/user-manual) for help getting started.
 
@@ -35,15 +35,15 @@ Here is a visual overview of the Git workflow:
 
 ![Screenshot showing fork button on GitHub](https://developer.wordpress.org/files/2020/09/gutenberg-fork.png)
 
-**Step 2**: Clone your forked repository locally, it is located at: `https://github.com/YOUR-USER-NAME/gutenberg`. Cloning copies all the files to your computer. Open a terminal and run:
+**Step 2**: Clone your forked repository locally. It is located at: `https://github.com/YOUR-USER-NAME/gutenberg`. Cloning copies all the files to your computer. Open a terminal and run:
 
 ```bash
 git clone https://github.com/YOUR-USER-NAME/gutenberg
 ```
 
-This will create a directory called `gutenberg` with all the files for the project. It might take a couple of minutes, it is downloading the entire history of the Gutenberg project.
+This will create a directory called `gutenberg` with all the files for the project. It might take a couple of minutes because it is downloading the entire history of the Gutenberg project.
 
-**Step 3**: Create a branch for your change, see below for branch naming. For this example the branch name is the complete string: `update/my-branch`
+**Step 3**: Create a branch for your change (see below for branch naming). For this example, the branch name is the complete string: `update/my-branch`
 
 ```bash
 git switch -c update/my-branch
@@ -57,23 +57,23 @@ git switch -c update/my-branch
 git commit -m "Your Good Commit Message" path/to/FILE
 ```
 
-**Step 6**: Push your change up to GitHub. The change will be pushed to your copy of the repository on the GitHub
+**Step 6**: Push your change up to GitHub. The change will be pushed to your fork of the repository on the GitHub
 
 ```bash
 git push -u origin upgrade/my-branch
 ```
 
-**Step 7**: Go to your repository on GitHub, it will automatically detect the change and give you a link to create a pull request.
+**Step 7**: Go to your forked repository on GitHub -- it will automatically detect the change and give you a link to create a pull request.
 
 ![Screenshot showing pull request link](https://developer.wordpress.org/files/2020/09/pull-request-create.png)
 
-**Step 8**: Create the pull request, this will create the request on the WordPress Gutenberg repository to integrate the change from your repository.
+**Step 8**: Create the pull request. This will create the request on the WordPress Gutenberg repository to integrate the change from your forked repository.
 
-**Step 9**: Keep up on the pull request, if any additional changes or updates are requested than make the changes locally and push them up, following Steps 4-6.
+**Step 9**: Keep up with new activity on the pull request. If any additional changes or updates are requested, then make the changes locally and push them up, following Steps 4-6.
 
 Do not make a new pull request for updates; by pushing your change to your respotiroy it will update the same PR. In this sense, the PR is a pointer on the WordPress Gutenberg repository to your copy. So when you update your copy, the PR is also updated.
 
-That’s it, once approved and merged your copy will be incorporated into the main repository. 🎉
+That’s it! Once approved and merged, your change will be incorporated into the main repository. 🎉
 
 
 ## Branch Naming
@@ -137,4 +137,3 @@ git push
 ```
 
 The above commands will update your `master` branch from _upstream_. To update any other branch replace `master` with the respective branch name.
-
