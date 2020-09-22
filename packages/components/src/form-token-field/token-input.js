@@ -36,7 +36,7 @@ class TokenInput extends Component {
 			selectedSuggestionIndex,
 			...props
 		} = this.props;
-		const size = value.length + 1;
+		const size = value ? value.length + 1 : 0;
 
 		return (
 			<input
@@ -44,7 +44,7 @@ class TokenInput extends Component {
 				id={ `components-form-token-input-${ instanceId }` }
 				type="text"
 				{ ...props }
-				value={ value }
+				value={ value || '' }
 				onChange={ this.onChange }
 				size={ size }
 				className="components-form-token-field__input"

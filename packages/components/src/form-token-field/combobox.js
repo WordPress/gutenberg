@@ -231,7 +231,7 @@ class ComboboxControl extends Component {
 		const startsWithMatch = [];
 		const containsMatch = [];
 
-		if ( match.length === 0 ) {
+		if ( ! match || match.length === 0 ) {
 			suggestions = difference( suggestions, value );
 		} else {
 			match = match.toLocaleLowerCase();
@@ -254,7 +254,8 @@ class ComboboxControl extends Component {
 	updateSuggestions() {
 		const { incompleteTokenValue } = this.state;
 
-		const inputHasMinimumChars = incompleteTokenValue.trim().length > 1;
+		const inputHasMinimumChars =
+			!! incompleteTokenValue && incompleteTokenValue.trim().length > 1;
 		const matchingSuggestions = this.getMatchingSuggestions(
 			incompleteTokenValue
 		);
