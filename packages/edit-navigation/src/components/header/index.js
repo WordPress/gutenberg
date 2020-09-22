@@ -7,12 +7,17 @@ import { find } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, Dropdown } from '@wordpress/components';
+import {
+	Button,
+	Dropdown,
+	DropdownMenu,
+	MenuGroup,
+	MenuItemsChoice,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import MenuSelector from './menu-selector';
 import ManageLocations from './manage-locations';
 import AddMenuForm from './add-menu-form';
 
@@ -38,11 +43,32 @@ export default function Header( { menus, selectedMenuId, onSelectMenu } ) {
 				) }
 
 				<div className="edit-navigation-header__actions">
-					<MenuSelector
-						menus={ menus }
-						activeMenuId={ selectedMenuId }
-						onSelectMenu={ onSelectMenu }
-					/>
+					<DropdownMenu
+						icon={ null }
+						toggleProps={ {
+							showTooltip: false,
+							children: __( 'Select menu' ),
+							isTertiary: true,
+							disabled: ! menus,
+							__experimentalIsFocusable: true,
+						} }
+						popoverProps={ {
+							position: 'bottom center',
+						} }
+					>
+						{ () => (
+							<MenuGroup>
+								<MenuItemsChoice
+									value={ selectedMenuId }
+									onSelect={ onSelectMenu }
+									choices={ menus.map( ( menu ) => ( {
+										value: menu.id,
+										label: menu.name,
+									} ) ) }
+								/>
+							</MenuGroup>
+						) }
+					</DropdownMenu>
 
 					<Dropdown
 						position="bottom center"
