@@ -50,7 +50,12 @@ export const MenuBackButtonUI = styled( Button )`
 	}
 `;
 
-export const MenuTitleUI = styled( Text )`
+export const MenuTitleUI = styled.div`
+	overflow: hidden;
+	width: 100%;
+`;
+
+export const MenuTitleHeadingUI = styled( Text )`
 	align-items: center;
 	color: ${ G2.gray[ 100 ] };
 	display: flex;
@@ -70,14 +75,15 @@ export const MenuTitleUI = styled( Text )`
 
 export const MenuTitleSearchUI = styled.div`
 	margin-bottom: 2px;
-	padding: 4px;
+	padding: 0;
 	position: relative;
 
 	.components-base-control .components-base-control__field {
-		margin: 0;
+		margin-bottom: 8px;
 
 		input {
-			padding-left: 26px;
+			height: 36px;
+			padding-left: 30px;
 			padding-right: 40px;
 		}
 	}
@@ -85,14 +91,15 @@ export const MenuTitleSearchUI = styled.div`
 	> svg {
 		left: 6px;
 		position: absolute;
-		top: 7px;
+		top: 6px;
 	}
 
 	.components-button.is-small {
 		height: 30px;
+		padding: 0;
 		position: absolute;
 		right: 4px;
-		top: 4px;
+		top: 3px;
 
 		&:active {
 			background: none;
