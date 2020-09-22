@@ -8,13 +8,15 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import Animate from '../../animate';
 import Button from '../../button';
+import TextControl from '../../text-control';
+import { useNavigationMenuContext } from './context';
 import {
 	MenuTitleHeadingUI,
 	MenuTitleSearchUI,
 	MenuTitleUI,
 } from '../styles/navigation-styles';
-import TextControl from '../../text-control';
 
 export default function NavigationMenuTitle( {
 	hasSearch,
@@ -23,6 +25,7 @@ export default function NavigationMenuTitle( {
 	title,
 } ) {
 	const [ isSearching, setIsSearching ] = useState( false );
+	const { menu } = useNavigationMenuContext();
 
 	if ( ! title ) {
 		return null;
@@ -37,11 +40,11 @@ export default function NavigationMenuTitle( {
 	const placeholder = sprintf( __( 'Search in %s' ), title );
 
 	return (
-		<MenuTitleUI>
+		<MenuTitleUI className="components-navigation__menu-title">
 			{ ! isSearching && (
 				<MenuTitleHeadingUI
 					as="h2"
-					className="components-navigation__menu-title"
+					className="components-navigation__menu-title-heading"
 					variant="title.small"
 				>
 					{ title }
@@ -59,22 +62,34 @@ export default function NavigationMenuTitle( {
 			) }
 
 			{ isSearching && (
-				<MenuTitleSearchUI>
-					<Icon icon={ searchIcon } />
+				<Animate type="slide-in" options={ { origin: 'left' } }>
+					{ ( { className: animateClassName } ) => (
+						<div className={ animateClassName }>
+							<MenuTitleSearchUI className="components-navigation__menu-title-search">
+								<Icon icon={ searchIcon } />
 
-					<TextControl
-						autocomplete="off"
-						// eslint-disable-next-line jsx-a11y/no-autofocus
-						autoFocus
-						onChange={ ( value ) => setSearch( value ) }
-						placeholder={ placeholder }
-						value={ search }
-					/>
+								<TextControl
+									autoComplete="off"
+									hideLabelFromVision
+									id={ `components-navigation__menu-title-search-${ menu }` }
+									label={ placeholder }
+									onChange={ ( value ) => setSearch( value ) }
+									placeholder={ placeholder }
+									type="search"
+									value={ search }
+								/>
 
-					<Button isSmall isTertiary onClick={ onSearchClose }>
-						<Icon icon={ closeSmall } />
-					</Button>
-				</MenuTitleSearchUI>
+								<Button
+									isSmall
+									isTertiary
+									onClick={ onSearchClose }
+								>
+									<Icon icon={ closeSmall } />
+								</Button>
+							</MenuTitleSearchUI>
+						</div>
+					) }
+				</Animate>
 			) }
 		</MenuTitleUI>
 	);
