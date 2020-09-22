@@ -26,12 +26,6 @@ public struct SourceFile {
         }
         return try String(contentsOfFile: path, encoding: .utf8)
     }
-
-    public func jsScript(with argument: String? = nil) throws -> WKUserScript {
-        let content = try getContent()
-        let formatted = String(format: content, argument ?? [])
-        return formatted.toJsScript()
-    }
 }
 
 extension SourceFile {
