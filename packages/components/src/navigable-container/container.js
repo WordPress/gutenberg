@@ -111,7 +111,9 @@ class NavigableContainer extends Component {
 			return;
 		}
 
-		const context = getFocusableContext( document.activeElement );
+		const context = getFocusableContext(
+			event.target.ownerDocument.activeElement
+		);
 		if ( ! context ) {
 			return;
 		}

@@ -15,7 +15,7 @@ class TokenInput extends Component {
 	}
 
 	hasFocus() {
-		return this.input === document.activeElement;
+		return this.input === this.input.ownerDocument.activeElement;
 	}
 
 	bindInput( ref ) {

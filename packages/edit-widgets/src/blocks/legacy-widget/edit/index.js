@@ -9,9 +9,8 @@ import { get, omit } from 'lodash';
 import { Component } from '@wordpress/element';
 import { Button, PanelBody, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
-import ServerSideRender from '@wordpress/server-side-render';
 import { update } from '@wordpress/icons';
 
 /**
@@ -19,6 +18,7 @@ import { update } from '@wordpress/icons';
  */
 import LegacyWidgetEditHandler from './handler';
 import LegacyWidgetPlaceholder from './placeholder';
+import WidgetPreview from './widget-preview';
 
 class LegacyWidgetEdit extends Component {
 	constructor() {
@@ -40,16 +40,11 @@ class LegacyWidgetEdit extends Component {
 			isSelected,
 			prerenderedEditForm,
 			setAttributes,
-			setWidgetId,
 			widgetId,
+			WPWidget,
 		} = this.props;
 		const { isPreview, hasEditForm } = this.state;
-		const { widgetClass } = attributes;
-		const widgetObject =
-			( widgetId && availableLegacyWidgets[ widgetId ] ) ||
-			( widgetClass && availableLegacyWidgets[ widgetClass ] );
-
-		if ( ! widgetId && ! widgetClass ) {
+		if ( ! WPWidget ) {
 			return (
 				<LegacyWidgetPlaceholder
 					availableLegacyWidgets={ availableLegacyWidgets }
@@ -61,25 +56,31 @@ class LegacyWidgetEdit extends Component {
 							isReferenceWidget,
 							id_base: idBase,
 						} = availableLegacyWidgets[ newWidget ];
+
 						if ( isReferenceWidget ) {
-							setWidgetId( newWidget );
+							setAttributes( {
+								instance: {},
+								idBase,
+								referenceWidgetName: newWidget,
+								widgetClass: undefined,
+							} );
+						} else {
+							setAttributes( {
+								instance: {},
+								idBase,
+								referenceWidgetName: undefined,
+								widgetClass: newWidget,
+							} );
 						}
-						setAttributes( {
-							instance: {},
-							idBase,
-							widgetClass: isReferenceWidget
-								? undefined
-								: newWidget,
-						} );
 					} }
 				/>
 			);
 		}
 
-		const inspectorControls = widgetObject ? (
+		const inspectorControls = WPWidget ? (
 			<InspectorControls>
-				<PanelBody title={ widgetObject.name }>
-					{ widgetObject.description }
+				<PanelBody title={ WPWidget.name }>
+					{ WPWidget.description }
 				</PanelBody>
 			</InspectorControls>
 		) : null;
@@ -96,7 +97,7 @@ class LegacyWidgetEdit extends Component {
 			<>
 				<BlockControls>
 					<ToolbarGroup>
-						{ widgetObject && ! widgetObject.isHidden && (
+						{ WPWidget && ! WPWidget.isHidden && (
 							<Button
 								onClick={ this.changeWidget }
 								label={ __( 'Change widget' ) }
@@ -132,7 +133,7 @@ class LegacyWidgetEdit extends Component {
 						idBase={ attributes.idBase || widgetId }
 						number={ attributes.number }
 						prerenderedEditForm={ prerenderedEditForm }
-						widgetName={ get( widgetObject, [ 'name' ] ) }
+						widgetName={ get( WPWidget, [ 'name' ] ) }
 						widgetClass={ attributes.widgetClass }
 						instance={ attributes.instance }
 						onFormMount={ ( formData ) => {
@@ -161,7 +162,10 @@ class LegacyWidgetEdit extends Component {
 						} }
 					/>
 				) }
-				{ ( isPreview || ! hasEditForm ) && this.renderWidgetPreview() }
+				{ ( isPreview || ! hasEditForm ) &&
+					( WPWidget?.isReferenceWidget
+						? this.renderWidgetPreviewUnavailable()
+						: this.renderWidgetPreview() ) }
 			</>
 		);
 	}
@@ -187,45 +191,56 @@ class LegacyWidgetEdit extends Component {
 	}
 
 	renderWidgetPreview() {
-		const { widgetId, attributes } = this.props;
+		const { attributes, widgetAreaId } = this.props;
 		return (
-			<ServerSideRender
+			<WidgetPreview
 				className="wp-block-legacy-widget__preview"
-				block="core/legacy-widget"
-				attributes={ {
-					widgetId,
-					...omit( attributes, 'id' ),
-				} }
+				widgetAreaId={ widgetAreaId }
+				attributes={ omit( attributes, 'widgetId' ) }
 			/>
 		);
 	}
+
+	renderWidgetPreviewUnavailable() {
+		return <p>{ __( 'Reference widgets cannot be previewed.' ) }</p>;
+	}
 }
 
-export default withSelect( ( select, { clientId } ) => {
-	const widgetId = select( 'core/edit-widgets' ).getWidgetIdForClientId(
-		clientId
-	);
-	const widget = select( 'core/edit-widgets' ).getWidget( widgetId );
-	const editorSettings = select( 'core/block-editor' ).getSettings();
-	const {
-		availableLegacyWidgets,
-		hasPermissionsToManageWidgets,
-	} = editorSettings;
-	return {
-		hasPermissionsToManageWidgets,
-		availableLegacyWidgets,
-		widgetId,
-		prerenderedEditForm: widget ? widget.rendered_form : '',
-	};
-} )(
-	withDispatch( ( dispatch, { clientId } ) => {
+export default withSelect(
+	(
+		select,
+		{ clientId, attributes: { widgetClass, referenceWidgetName } }
+	) => {
+		let widgetId = select( 'core/edit-widgets' ).getWidgetIdForClientId(
+			clientId
+		);
+		const widget = select( 'core/edit-widgets' ).getWidget( widgetId );
+		const widgetArea = select(
+			'core/edit-widgets'
+		).getWidgetAreaForClientId( clientId );
+		const editorSettings = select( 'core/block-editor' ).getSettings();
+		const {
+			availableLegacyWidgets,
+			hasPermissionsToManageWidgets,
+		} = editorSettings;
+
+		let WPWidget;
+		if ( widgetId && availableLegacyWidgets[ widgetId ] ) {
+			WPWidget = availableLegacyWidgets[ widgetId ];
+		} else if ( widgetClass && availableLegacyWidgets[ widgetClass ] ) {
+			WPWidget = availableLegacyWidgets[ widgetClass ];
+		} else if ( referenceWidgetName ) {
+			WPWidget = availableLegacyWidgets[ referenceWidgetName ];
+			widgetId = referenceWidgetName;
+		}
+
 		return {
-			setWidgetId( id ) {
-				dispatch( 'core/edit-widgets' ).setWidgetIdForClientId(
-					clientId,
-					id
-				);
-			},
+			hasPermissionsToManageWidgets,
+			availableLegacyWidgets,
+			widgetId,
+			widgetAreaId: widgetArea?.id,
+			WPWidget,
+			prerenderedEditForm: widget ? widget.rendered_form : '',
 		};
-	} )( LegacyWidgetEdit )
-);
+	}
+)( LegacyWidgetEdit );

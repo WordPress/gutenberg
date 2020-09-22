@@ -65,17 +65,17 @@ describe( 'Toolbar roving tabindex', () => {
 	it( 'ensures heading block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'Heading' );
 		await page.keyboard.type( 'Heading' );
-		await testBlockToolbarKeyboardNavigation( 'Write heading…' );
+		await testBlockToolbarKeyboardNavigation( 'Block: Heading' );
 		await wrapCurrentBlockWithGroup();
-		await testGroupKeyboardNavigation( 'Write heading…' );
+		await testGroupKeyboardNavigation( 'Block: Heading' );
 	} );
 
 	it( 'ensures list block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'List' );
-		await testBlockToolbarKeyboardNavigation( 'Write list…' );
+		await testBlockToolbarKeyboardNavigation( 'Block: List' );
 		await wrapCurrentBlockWithGroup();
-		await testGroupKeyboardNavigation( 'Write list…' );
+		await testGroupKeyboardNavigation( 'Block: List' );
 	} );
 
 	it( 'ensures image block toolbar uses roving tabindex', async () => {

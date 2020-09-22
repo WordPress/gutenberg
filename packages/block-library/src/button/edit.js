@@ -22,7 +22,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 	__experimentalLinkControl as LinkControl,
 	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
@@ -197,11 +197,12 @@ function ButtonEdit( props ) {
 	);
 
 	const colorProps = getColorAndStyleProps( attributes, colors, true );
+	const blockWrapperProps = useBlockWrapperProps();
 
 	return (
 		<>
 			<ColorEdit { ...props } />
-			<Block.div>
+			<div { ...blockWrapperProps }>
 				<RichText
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
@@ -231,7 +232,7 @@ function ButtonEdit( props ) {
 					onMerge={ mergeBlocks }
 					identifier="text"
 				/>
-			</Block.div>
+			</div>
 			<URLPicker
 				url={ url }
 				setAttributes={ setAttributes }
