@@ -64,8 +64,10 @@ function BlockPopover( {
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const blockNodes = useContext( BlockNodes );
 
+	// Controls when the side inserter on empty lines should
+	// be shown, including writing and selection modes.
 	const showEmptyBlockSideInserter =
-		! isNavigationMode && isEmptyDefaultBlock && isValid;
+		! isTyping && ! isNavigationMode && isEmptyDefaultBlock && isValid;
 	const shouldShowBreadcrumb = isNavigationMode;
 	const shouldShowContextualToolbar =
 		! isNavigationMode &&
