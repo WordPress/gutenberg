@@ -11,7 +11,7 @@ import {
 import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
 import { BlockPreview } from '@wordpress/block-editor';
 
-const NavigationSidebar = () => {
+const NavigationPanel = () => {
 	const [ activeItem, setActiveItem ] = useState( 'item-1' );
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 	const [ showPreview, setShowPreview ] = useState( false );
@@ -177,4 +177,4 @@ const NavigationSidebar = () => {
 	);
 };
 
-export default NavigationSidebar;
+export default NavigationPanel;
