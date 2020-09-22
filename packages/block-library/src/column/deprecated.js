@@ -24,7 +24,7 @@ const deprecated = [
 			return attributes.width && 'string' !== typeof attributes.width;
 		},
 		save( { attributes } ) {
-			attributes.width = attributes.width.toString() + '%';
+			attributes.width = `${attributes.width}%`;
 			const { verticalAlignment, width } = attributes;
 
 			const wrapperClasses = classnames( {
