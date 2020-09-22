@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import FullscreenModeClose from '../';
+import DashboardButton from '../';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	// This allows us to tweak the returned value on each test
@@ -21,7 +21,7 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 
 jest.mock( '@wordpress/core-data' );
 
-describe( 'FullscreenModeClose', () => {
+describe( 'DashboardButton', () => {
 	describe( 'when in full screen mode', () => {
 		it( 'should display a user uploaded site icon if it exists', () => {
 			useSelect.mockImplementation( ( cb ) => {
@@ -34,9 +34,9 @@ describe( 'FullscreenModeClose', () => {
 				} ) );
 			} );
 
-			const { container } = render( <FullscreenModeClose /> );
+			const { container } = render( <DashboardButton /> );
 			const siteIcon = container.querySelector(
-				'.edit-site-fullscreen-mode-close_site-icon'
+				'.edit-site-dashboard-button_site-icon'
 			);
 
 			expect( siteIcon ).toBeTruthy();
@@ -53,9 +53,9 @@ describe( 'FullscreenModeClose', () => {
 				} ) );
 			} );
 
-			const { container } = render( <FullscreenModeClose /> );
+			const { container } = render( <DashboardButton /> );
 			const siteIcon = container.querySelector(
-				'.edit-site-fullscreen-mode-close_site-icon'
+				'.edit-site-dashboard-button_site-icon'
 			);
 			const defaultIcon = container.querySelector( 'svg' );
 

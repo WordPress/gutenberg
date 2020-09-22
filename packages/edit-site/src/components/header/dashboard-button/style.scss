@@ -1,29 +1,33 @@
-.edit-site-navigation-button_wrapper {
-	display: flex;
-	align-items: center;
-	background-color: #1e1e1e;
-	height: 61px;
-	border-radius: 0;
+.edit-site-dashboard-button_wrapper {
+	display: none;
+
+	@include break-medium() {
+		display: flex;
+		align-items: center;
+		background-color: #1e1e1e;
+		height: 61px;
+		border-radius: 0;
+	}
 }
 
-.edit-site-navigation-button {
+.edit-site-dashboard-button {
 	color: #fff;
 	margin-left: 14px;
 	margin-right: 14px;
 }
 
-.edit-site-navigation-button.components-button.has-icon {
+.edit-site-dashboard-button.components-button.has-icon {
 	justify-content: flex-start;
 	padding: 0;
 	height: 32px;
 	width: 32px;
 }
 
-.edit-site-navigation-button_wrapper.is-open {
+.edit-site-dashboard-button_wrapper.is-open {
 	width: 300px;
 }
 
-.edit-site-navigation-name {
+.edit-site-dashboard-name {
 	font-style: normal;
 	font-weight: 600;
 	font-size: 13px;

@@ -6,7 +6,7 @@ import { Button, Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 
-function NavigationButton( { icon, isOpen, onClick } ) {
+function DashboardButton( { icon, isOpen, onClick } ) {
 	const {
 		isActive,
 		isRequestingSiteIcon,
@@ -41,7 +41,7 @@ function NavigationButton( { icon, isOpen, onClick } ) {
 		buttonIcon = (
 			<img
 				alt={ __( 'Site Icon' ) }
-				className="edit-site-navigation-button_site-icon"
+				className="edit-site-dashboard-button_site-icon"
 				src={ siteIconUrl }
 			/>
 		);
@@ -54,13 +54,13 @@ function NavigationButton( { icon, isOpen, onClick } ) {
 	return (
 		<div
 			className={
-				'edit-site-navigation-button_wrapper' +
+				'edit-site-dashboard-button_wrapper' +
 				( isOpen ? ' is-open' : '' )
 			}
 		>
 			<Button
-				className="edit-site-navigation-button has-icon"
-				label={ __( 'Open navigation' ) }
+				className="edit-site-dashboard-button has-icon"
+				label={ __( 'Open dashboard' ) }
 				onClick={ onClick }
 				showTooltip
 			>
@@ -68,10 +68,10 @@ function NavigationButton( { icon, isOpen, onClick } ) {
 			</Button>
 
 			{ isOpen && (
-				<div className="edit-site-navigation-name">{ siteTitle }</div>
+				<div className="edit-site-dashboard-name">{ siteTitle }</div>
 			) }
 		</div>
 	);
 }
 
-export default NavigationButton;
+export default DashboardButton;
