@@ -40,6 +40,7 @@ import {
 	MediaUploadProgress,
 	withColors,
 	__experimentalUseGradient,
+	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -83,7 +84,6 @@ const Cover = ( {
 	overlayColor,
 	setAttributes,
 	openGeneralSidebar,
-	settings,
 	closeSettingsBottomSheet,
 } ) => {
 	const {
@@ -100,8 +100,9 @@ const Cover = ( {
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
+	const colorsDefault = useEditorFeature( 'color.palette' ) || [];
 	const coverDefaultPalette = {
-		colors: settings.colors.slice( 0, THEME_COLORS_COUNT ),
+		colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
 	};
 
 	const { gradientValue } = __experimentalUseGradient();

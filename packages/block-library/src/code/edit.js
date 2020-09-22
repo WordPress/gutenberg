@@ -8,12 +8,13 @@ import { __ } from '@wordpress/i18n';
  */
 import {
 	PlainText,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 
 export default function CodeEdit( { attributes, setAttributes } ) {
+	const blockWrapperProps = useBlockWrapperProps();
 	return (
-		<Block.pre>
+		<pre { ...blockWrapperProps }>
 			<PlainText
 				__experimentalVersion={ 2 }
 				tagName="code"
@@ -22,6 +23,6 @@ export default function CodeEdit( { attributes, setAttributes } ) {
 				placeholder={ __( 'Write code…' ) }
 				aria-label={ __( 'Code' ) }
 			/>
-		</Block.pre>
+		</pre>
 	);
 }

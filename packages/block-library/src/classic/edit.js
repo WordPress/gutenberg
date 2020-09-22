@@ -188,7 +188,7 @@ export default class ClassicEdit extends Component {
 			const rootNode = this.editor.getBody();
 
 			// Create the toolbar by refocussing the editor.
-			if ( document.activeElement === rootNode ) {
+			if ( rootNode.ownerDocument.activeElement === rootNode ) {
 				rootNode.blur();
 				this.editor.focus();
 			}

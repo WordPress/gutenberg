@@ -13,19 +13,19 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 	getFontSize,
 	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { formatLtr } from '@wordpress/icons';
 
-/**
- * Browser dependencies
- */
-const { getComputedStyle } = window;
+function getComputedStyle( node, pseudo ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node, pseudo );
+}
+
 const querySelector = window.document.querySelector.bind( document );
 
 const name = 'core/paragraph';
@@ -106,7 +106,6 @@ function ParagraphBlock( {
 		fontSize,
 		style,
 	} = attributes;
-	const ref = useRef();
 	const [ isDropCapEnabled, dropCapMinimumHeight ] = useDropCap(
 		dropCap,
 		fontSize,
@@ -117,6 +116,14 @@ function ParagraphBlock( {
 		direction,
 		minHeight: dropCapMinimumHeight,
 	};
+
+	const blockWrapperProps = useBlockWrapperProps( {
+		className: classnames( {
+			'has-drop-cap': dropCap,
+			[ `has-text-align-${ align }` ]: align,
+		} ),
+		style: styles,
+	} );
 
 	return (
 		<>
@@ -155,14 +162,9 @@ function ParagraphBlock( {
 				) }
 			</InspectorControls>
 			<RichText
-				ref={ ref }
 				identifier="content"
-				tagName={ Block.p }
-				className={ classnames( {
-					'has-drop-cap': dropCap,
-					[ `has-text-align-${ align }` ]: align,
-				} ) }
-				style={ styles }
+				tagName="p"
+				{ ...blockWrapperProps }
 				value={ content }
 				onChange={ ( newContent ) =>
 					setAttributes( { content: newContent } )
