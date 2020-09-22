@@ -133,11 +133,6 @@ function gutenberg_edit_site_init( $hook ) {
 		'siteUrl'           => site_url(),
 	);
 
-	list( $font_sizes, ) = (array) get_theme_support( 'editor-font-sizes' );
-
-	if ( false !== $font_sizes ) {
-		$settings['fontSizes'] = $font_sizes;
-	}
 	$settings['styles'] = gutenberg_get_editor_styles();
 	$settings           = gutenberg_experimental_global_styles_settings( $settings );
 

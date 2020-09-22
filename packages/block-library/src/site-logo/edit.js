@@ -29,6 +29,7 @@ import {
 	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { trash } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -302,7 +303,7 @@ export default function LogoEdit( {
 				) }
 				{ !! logoUrl && (
 					<ToolbarButton
-						icon="trash"
+						icon={ trash }
 						onClick={ () => deleteLogo() }
 						label={ __( 'Delete Site Logo' ) }
 					/>
