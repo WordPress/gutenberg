@@ -10,14 +10,45 @@
 	}
 }
 
+.edit-navigation-header__status_bar {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: baseline;
+	flex-wrap: wrap;
+
+	@include break-medium() {
+		flex-direction: row;
+		justify-content: space-between;
+	}
+}
+
+.edit-navigation-header__status_header {
+	font-weight: normal;
+	font-size: inherit;
+	margin: 0;
+}
+
 // Lining up all the actions in a nice row.
 .edit-navigation-header__actions {
-	align-items: center;
 	display: flex;
+	flex-grow: 1;
+	align-items: center;
+	justify-content: flex-start;
+	margin-top: $grid-unit-10;
+
+	@include break-medium() {
+		margin-top: 0;
+		justify-content: flex-end;
+	}
 
 	// Spacing out the actions a little.
 	.components-dropdown {
 		margin-right: $grid-unit-20;
+	}
+
+	.components-dropdown:last-child {
+		margin-right: 0;
 	}
 }
 
