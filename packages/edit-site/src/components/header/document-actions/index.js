@@ -52,15 +52,10 @@ function useSecondaryText() {
 		( blockId ) => getBlockName( blockId ) === 'core/template-part'
 	);
 	if ( hoveredTemplatePartBlockId ) {
-		const hoveredTemplatePartBlock = getBlock( hoveredTemplatePartBlockId );
-		const hoveredLabel = hoveredTemplatePartBlock
-			? getBlockLabel(
-					getBlockType( hoveredTemplatePartBlock.name ),
-					hoveredTemplatePartBlock.attributes
-			  )
-			: null;
 		return {
-			label: hoveredLabel,
+			label: getBlockDisplayText(
+				getBlock( hoveredTemplatePartBlockId )
+			),
 			isActive: true,
 		};
 	}
