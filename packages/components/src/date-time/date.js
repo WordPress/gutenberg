@@ -96,7 +96,7 @@ const DatePicker = ( {
 	events,
 } ) => {
 	const selected = typeof currentDate === 'string' ? new Date( currentDate ) : currentDate;
-	const highlightDates = events;
+	const highlightDates = events?.length ? map( events, 'date' ) : [];
 
 	return (
 		<ReactDatePicker
