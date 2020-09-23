@@ -15,4 +15,8 @@
 
 .edit-post-post-schedule-warning {
 	margin: 0;
+
+	.edit-post-post-status & {
+		margin-top: $grid-unit;
+	}
 }
