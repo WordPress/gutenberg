@@ -407,7 +407,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         }
     }
 
-    @RequiresApi(api = VERSION_CODES.O)
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void setJustificationModeSDK26(ReactAztecText view, int justificationModeInterWord) {
         view.setJustificationMode(justificationModeInterWord);
     }
