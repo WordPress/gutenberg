@@ -229,8 +229,8 @@ class GalleryImage extends Component {
 		} );
 
 		return (
-			<figure className={ className }>
-				{ ! isEditing && ( href ? <a href={ href }>{ img }</a> : img ) }
+			<figure className={ className } aria-describedby={ 'caption-' + id }>
+				{ ! isEditing && ( href ? <a href={ href } title={ caption }>{ img }</a> : img ) }
 				{ isEditing && (
 					<MediaPlaceholder
 						labels={ { title: __( 'Edit gallery image' ) } }
@@ -285,6 +285,7 @@ class GalleryImage extends Component {
 						}
 						unstableOnFocus={ this.onSelectCaption }
 						inlineToolbar
+						id={ 'caption' + id }
 					/>
 				) }
 			</figure>

@@ -50,6 +50,7 @@ export default function save( { attributes } ) {
 							className={
 								image.id ? `wp-image-${ image.id }` : null
 							}
+							aria-label={ image.caption }
 						/>
 					);
 
@@ -58,13 +59,14 @@ export default function save( { attributes } ) {
 							key={ image.id || image.url }
 							className="blocks-gallery-item"
 						>
-							<figure>
-								{ href ? <a href={ href }>{ img }</a> : img }
+							<figure aria-describedby={ 'caption-' + image.id }>
+								{ href ? <a href={ href } title={ image.caption }>{ img }</a> : img }
 								{ ! RichText.isEmpty( image.caption ) && (
 									<RichText.Content
 										tagName="figcaption"
 										className="blocks-gallery-item__caption"
 										value={ image.caption }
+										id={ 'caption-' + image.id }
 									/>
 								) }
 							</figure>
