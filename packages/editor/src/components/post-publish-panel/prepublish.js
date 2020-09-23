@@ -80,7 +80,7 @@ function PostPublishPanelPrepublish( {
 					>
 						<PostSchedule />
 					</PanelBody>
-					<PanelBody>
+					<PanelBody className="editor-post-publish-panel_warning">
 						<PostSchedule.Warning />
 					</PanelBody>
 				</>
