@@ -140,21 +140,21 @@ For example, for this input:
         "palette": [
           {
             "slug": "strong-magenta",
-            "value": "#a156b4"
+            "color": "#a156b4"
           },
           {
             "slug": "very-dark-grey",
-            "value": "rgb(131, 12, 8)"
+            "color": "rgb(131, 12, 8)"
           }
         ],
         "gradients": [
           {
             "slug": "blush-bordeaux",
-            "value": "linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%)"
+            "gradient": "linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%)"
           },
           {
             "slug": "blush-light-purple",
-            "value": "linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)"
+            "gradient": "linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)"
           },
         ]
       },
@@ -162,11 +162,11 @@ For example, for this input:
         "fontSizes": [
           {
             "slug": "normal",
-            "value": 16
+            "size": 16
           },
           {
             "slug": "big",
-            "value": 32
+            "size": 32
           }
         ]
       }

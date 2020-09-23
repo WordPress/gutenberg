@@ -7,7 +7,7 @@ import {
 	RichText,
 	BlockControls,
 	RichTextShortcut,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
 import {
@@ -154,13 +154,15 @@ export default function ListEdit( {
 		</>
 	);
 
+	const blockWrapperProps = useBlockWrapperProps();
+
 	return (
 		<>
 			<RichText
 				identifier="values"
 				multiline="li"
 				__unstableMultilineRootTag={ tagName }
-				tagName={ Block[ tagName ] }
+				tagName={ tagName }
 				onChange={ ( nextValues ) =>
 					setAttributes( { values: nextValues } )
 				}
@@ -178,6 +180,7 @@ export default function ListEdit( {
 				start={ start }
 				reversed={ reversed }
 				type={ type }
+				{ ...blockWrapperProps }
 			>
 				{ controls }
 			</RichText>

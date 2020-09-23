@@ -20,6 +20,7 @@ function FeatureToggle( {
 	messageActivated,
 	messageDeactivated,
 	speak,
+	shortcut,
 } ) {
 	const speakMessage = () => {
 		if ( isActive ) {
@@ -36,6 +37,7 @@ function FeatureToggle( {
 			onClick={ flow( onToggle, speakMessage ) }
 			role="menuitemcheckbox"
 			info={ info }
+			shortcut={ shortcut }
 		>
 			{ label }
 		</MenuItem>

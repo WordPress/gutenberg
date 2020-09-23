@@ -9,7 +9,7 @@ import { debounce } from 'lodash';
 import { BlockControls } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
 
 /**
@@ -103,7 +103,6 @@ export default class ClassicEdit extends Component {
 			attributes: { content },
 			setAttributes,
 		} = this.props;
-		const { ref } = this;
 		let bookmark;
 
 		this.editor = editor;
@@ -185,41 +184,11 @@ export default class ClassicEdit extends Component {
 			}
 		} );
 
-		// TODO: the following is for back-compat with WP 4.9, not needed in WP 5.0. Remove it after the release.
-		editor.addButton( 'kitchensink', {
-			tooltip: _x( 'More', 'button to expand options' ),
-			icon: 'dashicon dashicons-editor-kitchensink',
-			onClick() {
-				const button = this;
-				const active = ! button.active();
-
-				button.active( active );
-				editor.dom.toggleClass( ref, 'has-advanced-toolbar', active );
-			},
-		} );
-
-		// Show the second, third, etc. toolbars when the `kitchensink` button is removed by a plugin.
-		editor.on( 'init', () => {
-			if (
-				editor.settings.toolbar1 &&
-				editor.settings.toolbar1.indexOf( 'kitchensink' ) === -1
-			) {
-				editor.dom.addClass( ref, 'has-advanced-toolbar' );
-			}
-		} );
-
-		editor.addButton( 'wp_add_media', {
-			tooltip: __( 'Insert Media' ),
-			icon: 'dashicon dashicons-admin-media',
-			cmd: 'WP_Medialib',
-		} );
-		// End TODO.
-
 		editor.on( 'init', () => {
 			const rootNode = this.editor.getBody();
 
 			// Create the toolbar by refocussing the editor.
-			if ( document.activeElement === rootNode ) {
+			if ( rootNode.ownerDocument.activeElement === rootNode ) {
 				rootNode.blur();
 				this.editor.focus();
 			}
@@ -259,7 +228,6 @@ export default class ClassicEdit extends Component {
 				<div
 					key="toolbar"
 					id={ `toolbar-${ clientId }` }
-					ref={ ( ref ) => ( this.ref = ref ) }
 					className="block-library-classic__toolbar"
 					onClick={ this.focus }
 					data-placeholder={ __( 'Classic' ) }

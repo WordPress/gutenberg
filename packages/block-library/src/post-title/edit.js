@@ -27,7 +27,7 @@ import { __ } from '@wordpress/i18n';
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
 export default function PostTitleEdit( {
-	attributes: { level, textAlign, makeLink, rel, linkTarget },
+	attributes: { level, textAlign, isLink, rel, linkTarget },
 	setAttributes,
 	context: { postType, postId },
 } ) {
@@ -49,7 +49,7 @@ export default function PostTitleEdit( {
 
 	const BlockWrapper = Block[ tagName ];
 	let title = post.title || __( 'Post Title' );
-	if ( makeLink ) {
+	if ( isLink ) {
 		title = (
 			<a href={ post.link } target={ linkTarget } rel={ rel }>
 				{ title }
@@ -79,12 +79,10 @@ export default function PostTitleEdit( {
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
 						label={ __( 'Make title a link' ) }
-						onChange={ () =>
-							setAttributes( { makeLink: ! makeLink } )
-						}
-						checked={ makeLink }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
 					/>
-					{ makeLink && (
+					{ isLink && (
 						<>
 							<ToggleControl
 								label={ __( 'Open in new tab' ) }

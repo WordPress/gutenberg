@@ -66,7 +66,7 @@ const fetchLinkSuggestions = (
 					type: 'post',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] ) // fail by returning no results
 		);
 	}
 
@@ -79,7 +79,7 @@ const fetchLinkSuggestions = (
 					type: 'term',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] )
 		);
 	}
 
@@ -92,7 +92,7 @@ const fetchLinkSuggestions = (
 					type: 'post-format',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] )
 		);
 	}
 

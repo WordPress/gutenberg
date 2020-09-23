@@ -9,7 +9,7 @@ describe( 'TypeWriter', () => {
 	} );
 
 	const getCaretPosition = async () =>
-		await page.evaluate( () => wp.dom.computeCaretRect().y );
+		await page.evaluate( () => wp.dom.computeCaretRect( window ).y );
 
 	// Allow the scroll position to be 1px off.
 	const BUFFER = 1;
