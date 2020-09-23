@@ -84,7 +84,14 @@ export const MenuTitleSearchUI = styled.div`
 		input {
 			height: 36px;
 			padding-left: 30px;
-			padding-right: 40px;
+			padding-right: 30px;
+
+			&::-webkit-search-decoration,
+			&::-webkit-search-cancel-button,
+			&::-webkit-search-results-button,
+			&::-webkit-search-results-decoration {
+				-webkit-appearance: none;
+			}
 		}
 	}
 
