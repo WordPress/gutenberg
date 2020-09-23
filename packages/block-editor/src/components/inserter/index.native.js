@@ -27,7 +27,7 @@ import styles from './style.scss';
 import InserterMenu from './menu';
 import BlockInsertionPoint from '../block-list/insertion-point';
 
-const VOICE_OVER_ANNOUNCEMENT_DELAY = 3000;
+const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
 const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
 	<ToolbarButton
