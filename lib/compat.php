@@ -327,7 +327,7 @@ function gutenberg_add_media_default_link_type( $scripts ) {
 	$scripts->add_inline_script(
 		'wp-mediaelement',
 		sprintf(
-			'var wp.media.defaultLink = %s;',
+			'var wp.media.defaultLinkType = %s;',
 			wp_json_encode( $default_link_type )
 		),
 		'after'
