@@ -82,8 +82,8 @@ const transforms = {
 				},
 				linkTo: {
 					type: 'string',
-					shortcode: ( { named: { link = 'attachment' } } ) => {
-						return link === 'file' ? 'media' : link;
+					shortcode: ( { named: { link } } ) => {
+						return link;
 					},
 				},
 			},
