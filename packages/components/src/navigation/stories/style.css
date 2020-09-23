@@ -1,0 +1,14 @@
+.navigation-story {
+	max-width: 300px;
+}
+
+.navigation-story__aside {
+	margin: 48px 0 0 24px;
+}
+
+.navigation-story__wordpress-icon svg {
+	fill: #949494;
+}
+.navigation-story__wordpress-icon:hover svg {
+	fill: #ddd;
+}
