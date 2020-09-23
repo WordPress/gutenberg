@@ -28,7 +28,7 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 	}
 
 	$title = get_the_title( $post_ID );
-	if ( isset( $attributes['makeLink'] ) && $attributes['makeLink'] ) {
+	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
 		$title = sprintf( '<a href="%1s" target="%2s" rel="%3s">%4s</a>', get_the_permalink( $post_ID ), $attributes['linkTarget'], $attributes['rel'], $title );
 	}
 

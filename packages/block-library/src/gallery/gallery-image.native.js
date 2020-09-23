@@ -24,7 +24,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { Caption, MediaUploadProgress } from '@wordpress/block-editor';
 import { getProtocol } from '@wordpress/url';
 import { withPreferredColorScheme } from '@wordpress/compose';
-import { arrowLeft, arrowRight } from '@wordpress/icons';
+import { arrowLeft, arrowRight, warning } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -239,7 +239,7 @@ class GalleryImage extends Component {
 					<View style={ style.uploadFailedContainer }>
 						<View style={ style.uploadFailed }>
 							<Icon
-								icon={ 'warning' }
+								icon={ warning }
 								{ ...style.uploadFailedIcon }
 							/>
 						</View>

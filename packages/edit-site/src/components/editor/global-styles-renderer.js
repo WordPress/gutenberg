@@ -85,13 +85,13 @@ export default ( blockData, baseTree, userTree ) => {
 	const getBlockPresetsDeclarations = ( blockPresets ) => {
 		return reduce(
 			PRESET_CATEGORIES,
-			( declarations, path, category ) => {
+			( declarations, { path, key }, category ) => {
 				const preset = get( blockPresets, path, [] );
-				preset.forEach( ( { slug, value } ) => {
+				preset.forEach( ( value ) => {
 					declarations.push(
-						`--wp--preset--${ kebabCase(
-							category
-						) }--${ slug }: ${ value }`
+						`--wp--preset--${ kebabCase( category ) }--${
+							value.slug
+						}: ${ value[ key ] }`
 					);
 				} );
 				return declarations;

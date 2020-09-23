@@ -10,7 +10,6 @@ import { isObject } from 'lodash';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import { useRef, useEffect, Platform } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
@@ -32,6 +31,7 @@ import ColorPanel from './color-panel';
 import useEditorFeature from '../components/use-editor-feature';
 
 export const COLOR_SUPPORT_KEY = '__experimentalColor';
+const EMPTY_ARRAY = [];
 
 const hasColorSupport = ( blockType ) => {
 	if ( Platform.OS !== 'web' ) {
@@ -214,9 +214,8 @@ const getLinkColorFromAttributeValue = ( colors, value ) => {
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
 	const isLinkColorEnabled = useEditorFeature( 'color.link' );
-	const { colors, gradients } = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings();
-	}, [] );
+	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
+	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
@@ -386,10 +385,7 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const colors = useSelect( ( select ) => {
-			return select( 'core/block-editor' ).getSettings().colors;
-		}, [] );
-
+		const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 		if ( ! hasColorSupport( name ) ) {
 			return <BlockListBlock { ...props } />;
 		}

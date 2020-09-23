@@ -31,9 +31,6 @@ const {
 	NOT_FOUND_ERR,
 } = core;
 
-// Node types
-const { ATTRIBUTE_NODE, DOCUMENT_FRAGMENT_NODE } = Node;
-
 /**
  * Simple recursive implementation of Node.contains method
  *
@@ -93,7 +90,7 @@ Node.prototype.insertBefore = function (
 	}
 	*/
 
-	if ( newChild.nodeType && newChild.nodeType === ATTRIBUTE_NODE ) {
+	if ( newChild.nodeType && newChild.nodeType === newChild.ATTRIBUTE_NODE ) {
 		throw new core.DOMException( HIERARCHY_REQUEST_ERR );
 	}
 
@@ -106,7 +103,7 @@ Node.prototype.insertBefore = function (
 	} while ( ( current = current._parentNode ) );
 
 	// fragments are merged into the element
-	if ( newChild.nodeType === DOCUMENT_FRAGMENT_NODE ) {
+	if ( newChild.nodeType === newChild.DOCUMENT_FRAGMENT_NODE ) {
 		let tmpNode,
 			i = newChild._childNodes.length;
 		while ( i-- > 0 ) {
@@ -200,7 +197,7 @@ Object.defineProperties( Node.prototype, {
 		get() {
 			const parent = this.parentNode;
 
-			if ( parent && parent.nodeType === Node.ELEMENT_NODE ) {
+			if ( parent && parent.nodeType === parent.ELEMENT_NODE ) {
 				return parent;
 			}
 
@@ -221,7 +218,7 @@ Object.defineProperties( Node.prototype, {
 
 			let sibling = this.previousSibling;
 
-			while ( sibling && sibling.nodeType !== Node.ELEMENT_NODE ) {
+			while ( sibling && sibling.nodeType !== sibling.ELEMENT_NODE ) {
 				sibling = sibling.previousSibling;
 			}
 
@@ -242,7 +239,7 @@ Object.defineProperties( Node.prototype, {
 
 			let sibling = this.nextSibling;
 
-			while ( sibling && sibling.nodeType !== Node.ELEMENT_NODE ) {
+			while ( sibling && sibling.nodeType !== sibling.ELEMENT_NODE ) {
 				sibling = sibling.nextSibling;
 			}
 

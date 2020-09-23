@@ -135,7 +135,7 @@ $block-inserter-tabs-height: 44px;
 		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60;
 		background: $white;
 		z-index: 1;
-		border-bottom: $border-width solid $gray-200;
+		border-bottom: $border-width solid $gray-300;
 
 		.components-tab-panel__tabs-item {
 			flex-grow: 1;
@@ -234,7 +234,7 @@ $block-inserter-tabs-height: 44px;
 	width: 300px;
 	background: $white;
 	border-radius: $radius-block-ui;
-	border: $border-width solid $gray-200;
+	border: $border-width solid $gray-300;
 	position: absolute;
 	top: $grid-unit-20;
 	left: calc(100% + #{$grid-unit-20});
@@ -273,7 +273,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__tips {
-	border-top: $border-width solid $gray-200;
+	border-top: $border-width solid $gray-300;
 	padding: $grid-unit-20;
 	flex-shrink: 0;
 }
@@ -316,7 +316,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__quick-inserter-separator {
-	border-top: $border-width solid $gray-200;
+	border-top: $border-width solid $gray-300;
 }
 
 .block-editor-inserter__popover.is-quick > .components-popover__content > div {

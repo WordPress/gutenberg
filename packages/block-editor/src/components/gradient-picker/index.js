@@ -2,19 +2,16 @@
  * WordPress dependencies
  */
 import { __experimentalGradientPicker as GradientPicker } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import useEditorFeature from '../use-editor-feature';
 
+const EMPTY_ARRAY = [];
+
 function GradientPickerWithGradients( props ) {
-	const gradients =
-		useSelect(
-			( select ) => select( 'core/block-editor' ).getSettings().gradients,
-			[]
-		) ?? [];
+	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
 	const disableCustomGradients = ! useEditorFeature( 'color.customGradient' );
 
 	return (

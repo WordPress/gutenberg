@@ -93,7 +93,7 @@ import * as postTags from './post-tags';
  * @param {Object} block The block to be registered.
  *
  */
-export const registerBlock = ( block ) => {
+const registerBlock = ( block ) => {
 	if ( ! block ) {
 		return;
 	}

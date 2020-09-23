@@ -14,6 +14,10 @@ import { useSelect } from '@wordpress/data';
 import { useBlockEditContext } from '../block-edit';
 
 const deprecatedFlags = {
+	'color.palette': ( settings ) =>
+		settings.colors === undefined ? undefined : settings.colors,
+	'color.gradients': ( settings ) =>
+		settings.gradients === undefined ? undefined : settings.gradients,
 	'color.custom': ( settings ) =>
 		settings.disableCustomColors === undefined
 			? undefined
@@ -22,6 +26,8 @@ const deprecatedFlags = {
 		settings.disableCustomGradients === undefined
 			? undefined
 			: ! settings.disableCustomGradients,
+	'typography.fontSizes': ( settings ) =>
+		settings.fontSizes === undefined ? undefined : settings.fontSizes,
 	'typography.customFontSize': ( settings ) =>
 		settings.disableCustomFontSizes === undefined
 			? undefined
