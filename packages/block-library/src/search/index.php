@@ -114,7 +114,7 @@ function render_block_core_search( $attributes ) {
 
 	if ( ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] ) ) {
 		if ( ! empty( $attributes['buttonPosition'] ) && 'button-only' !== $attributes['buttonPosition'] ) {
-			$field_styles .= ' width: ' . esc_attr( $attributes['width'] ) . esc_attr( $attributes['widthUnit'] ) . ';"';
+			$field_styles .= ' width: ' . esc_attr( $attributes['width'] ) . esc_attr( $attributes['widthUnit'] ) . ';';
 		}
 	}
 
