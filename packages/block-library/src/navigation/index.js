@@ -29,8 +29,8 @@ export const settings = {
 		{
 			name: 'horizontal',
 			isDefault: true,
-			title: __('Navigation (horizontal)'),
-			description: __('Links shown in a row.'),
+			title: __( 'Navigation (horizontal)' ),
+			description: __( 'Links shown in a row.' ),
 			attributes: { orientation: 'horizontal' },
 		},
 		{
