@@ -69,3 +69,8 @@ function MyColorfulComponent() {
 ### Note on sunsetting.
 
 The functionality provided by the `useColors` hook is also available in the form of a—[also currently experimental](https://github.com/WordPress/gutenberg/pull/21021)—support key, `__experimentalColor`. It's expected that the support key version of this feature sunsets the hook.
+
+## Related components.
+
+-   [`PanelColorSettings`](https://github.com/WordPress/gutenberg/blob/bb00ad891db9937862b16867dcebd2a4d830ea86/packages/block-editor/src/components/panel-color-settings/index.js).
+-   [`InspectorControls`](https://github.com/WordPress/gutenberg/blob/bb00ad891db9937862b16867dcebd2a4d830ea86/packages/block-editor/src/components/inspector-controls/README.md).
