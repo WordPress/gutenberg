@@ -23,7 +23,7 @@ export const settings = {
 
 	description: __( 'A collection of blocks that allow visitors to get around your site.' ),
 
-	keywords: [__('menu'), __('navigation'), __('links')],
+	keywords: [ __( 'menu' ), __( 'navigation' ), __( 'links' ) ],
 
 	variations: [
 		{
