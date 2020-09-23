@@ -108,7 +108,7 @@ Collection of available units. These units must be one of the units defined in t
 -   Type: `Array<Object>`
 -   Required: No
 
-Example
+Example:
 
 ```jsx
 import { __experimentalUnitControl as UnitControl } from '@wordpress/block-editor/';
