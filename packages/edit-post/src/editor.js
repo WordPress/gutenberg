@@ -52,7 +52,9 @@ class Editor extends Component {
 		keepCaretInsideBlock
 	) {
 		settings = {
-			...( hesThemeStyles ? settings : omit( settings, [ 'styles' ] ) ),
+			...( hesThemeStyles
+				? settings
+				: omit( settings, [ 'defaultEditorStyles' ] ) ),
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -64,6 +66,9 @@ class Editor extends Component {
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened,
 			keepCaretInsideBlock,
+			styles: hesThemeStyles
+				? settings.styles
+				: settings.defaultEditorStyles,
 		};
 
 		// Omit hidden block types if exists and non-empty.
