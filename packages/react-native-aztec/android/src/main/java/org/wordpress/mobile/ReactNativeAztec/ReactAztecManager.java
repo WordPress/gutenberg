@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.graphics.text.LineBreaker;
 import android.os.Build;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.util.Consumer;
 
@@ -370,6 +371,13 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     @ReactProp(name = ViewProps.TEXT_ALIGN)
     public void setTextAlign(ReactAztecText view, @Nullable String textAlign) {
         if ("justify".equals(textAlign)) {
+            /*
+                JUSTIFICATION_MODE_XYZ constants were moved from Layout to LineBreaker in
+                SDK 29. The values of the constants haven't changed, but Lint is complaining that we
+                 can't use constants which were introduced in SDK 29 on older version. Separating
+                  the calls into two methods per SDK version annotated with RequiresApi was the
+                  only way how to make lint happy.
+             */
             // Value is hardcoded because Lint is failing with a false positive "Unnecessary; SDK_INT is never < 21"
             if (Build.VERSION.SDK_INT >= 29) {
                 setJustificationModeSdk29(view, LineBreaker.JUSTIFICATION_MODE_INTER_WORD);
