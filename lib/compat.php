@@ -305,6 +305,37 @@ function gutenberg_add_date_settings_timezone( $scripts ) {
 add_action( 'wp_default_scripts', 'gutenberg_add_date_settings_timezone', 20 );
 
 /**
+ * Adds Media Setting for default link type
+ *
+ * This can be removed when plugin support requires WordPress 5.6.0+.
+ *
+ * The script registration occurs in core wp-includes/script-loader.php
+ * wp_default_packages_inline_scripts()
+ *
+ * @since 9.?
+ *
+ * @param WP_Scripts $scripts WP_Scripts object.
+ */
+function gutenberg_add_media_default_link_type( $scripts ) {
+	if ( ! did_action( 'init' ) ) {
+		return;
+	}
+
+	// Read option from WordPress
+	$default_link_type = get_option( 'image_default_link_type', '' );
+
+	$scripts->add_inline_script(
+		'wp-mediaelement',
+		sprintf(
+			'var wp.media.defaultLink = %s;',
+			wp_json_encode( $default_link_type )
+		),
+		'after'
+	);
+}
+add_action( 'wp_default_scripts', 'gutenberg_add_media_default_link_type', 20 );
+
+/**
  * Filters default block categories to substitute legacy category names with new
  * block categories.
  *
