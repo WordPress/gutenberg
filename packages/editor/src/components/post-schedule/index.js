@@ -7,11 +7,17 @@ import { DateTimePicker, Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export function Warning() {
-	const date = useSelect( ( select ) =>
-		select( 'core/editor' ).getEditedPostAttribute( 'date' )
-	);
+	const { date, isFloating } = useSelect( ( select ) => {
+		const { getEditedPostAttribute, isEditedPostDateFloating } = select(
+			'core/editor'
+		);
+		return {
+			date: getEditedPostAttribute( 'date' ),
+			isFloating: isEditedPostDateFloating(),
+		};
+	} );
 
-	if ( Date.parse( date ) >= Date.now() ) {
+	if ( isFloating || Date.parse( date ) >= Date.now() ) {
 		return null;
 	}
 
