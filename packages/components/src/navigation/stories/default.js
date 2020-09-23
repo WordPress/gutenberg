@@ -58,7 +58,6 @@ export function DefaultStory() {
 			</NavigationMenu>
 
 			<NavigationMenu
-				backButtonLabel="Custom Back Button Label"
 				menu="nested-sub-menu"
 				parentMenu="sub-menu"
 				title="Nested Sub-Menu"

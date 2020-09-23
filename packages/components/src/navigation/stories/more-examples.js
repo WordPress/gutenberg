@@ -23,6 +23,11 @@ export function MoreExamplesStory() {
 				<NavigationItem item="item-1" title="Item 1" />
 				<NavigationItem item="item-2" title="Item 2" />
 				<NavigationItem
+					item="item-sub-menu"
+					navigateToMenu="sub-menu"
+					title="Sub-Menu"
+				/>
+				<NavigationItem
 					item="item-nonexistent-menu"
 					navigateToMenu="nonexistent-menu"
 					title="Navigate to Nonexistent Menu"
@@ -32,6 +37,16 @@ export function MoreExamplesStory() {
 					item="item-delayed-badge"
 					title="Item with a Delayed Badge"
 				/>
+			</NavigationMenu>
+
+			<NavigationMenu
+				backButtonLabel="Custom Back Button Label"
+				menu="sub-menu"
+				parentMenu="root"
+				title="Sub-Menu"
+			>
+				<NavigationItem item="child-1" title="Child 1" />
+				<NavigationItem item="child-2" title="Child 2" />
 			</NavigationMenu>
 		</Navigation>
 	);
