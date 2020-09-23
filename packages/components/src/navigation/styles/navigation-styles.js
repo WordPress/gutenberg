@@ -78,20 +78,17 @@ export const MenuTitleSearchUI = styled.div`
 	padding: 0;
 	position: relative;
 
-	.components-base-control .components-base-control__field {
-		margin-bottom: 8px;
+	input {
+		height: 36px;
+		margin-bottom: 6px;
+		padding-left: 30px;
+		padding-right: 30px;
 
-		input {
-			height: 36px;
-			padding-left: 30px;
-			padding-right: 30px;
-
-			&::-webkit-search-decoration,
-			&::-webkit-search-cancel-button,
-			&::-webkit-search-results-button,
-			&::-webkit-search-results-decoration {
-				-webkit-appearance: none;
-			}
+		&::-webkit-search-decoration,
+		&::-webkit-search-cancel-button,
+		&::-webkit-search-results-button,
+		&::-webkit-search-results-decoration {
+			-webkit-appearance: none;
 		}
 	}
 
