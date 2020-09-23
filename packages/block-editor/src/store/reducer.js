@@ -17,7 +17,6 @@ import {
 	difference,
 	omitBy,
 	pickBy,
-	filter,
 } from 'lodash';
 
 /**
