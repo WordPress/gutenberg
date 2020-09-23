@@ -11,10 +11,10 @@ const InserterPanel = ( { closeInserter } ) => {
 
 	return (
 		<div className="edit-site-inserter-panel">
-			<div className="edit-site-inserter-panel_header">
+			<div className="edit-site-inserter-panel__header">
 				<Button icon={ close } onClick={ closeInserter } />
 			</div>
-			<div className="edit-site-inserter-panel_content">
+			<div className="edit-site-inserter-panel__content">
 				<Library
 					showInserterHelpPanel
 					onSelect={ () => {

@@ -4,7 +4,7 @@
 	flex-direction: column;
 }
 
-.edit-site-inserter-panel_header {
+.edit-site-inserter-panel__header {
 	padding-top: $grid-unit-10;
 	padding-right: $grid-unit-10;
 	display: flex;
@@ -15,7 +15,7 @@
 	}
 }
 
-.edit-site-inserter-panel_content {
+.edit-site-inserter-panel__content {
 	// Leave space for the close button
 	height: calc(100% - #{$button-size} - #{$grid-unit-10});
 
