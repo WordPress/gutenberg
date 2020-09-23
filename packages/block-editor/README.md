@@ -392,7 +392,9 @@ Undocumented declaration.
 
 <a name="InspectorAdvancedControls" href="#InspectorAdvancedControls">#</a> **InspectorAdvancedControls**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls-advanced/README.md>
 
 <a name="InspectorControls" href="#InspectorControls">#</a> **InspectorControls**
 
