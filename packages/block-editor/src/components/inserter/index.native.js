@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { AccessibilityInfo } from 'react-native';
+import { delay } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -142,7 +143,10 @@ export class Inserter extends Component {
 		const announcement = isOpen
 			? __( 'Scrollable block menu opened. Select a block.' )
 			: __( 'Scrollable block menu closed.' );
-		AccessibilityInfo.announceForAccessibility( announcement );
+		delay(
+			AccessibilityInfo.announceForAccessibility( announcement ),
+			100
+		);
 	}
 
 	/**
