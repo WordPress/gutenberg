@@ -47,7 +47,7 @@ export const settings = {
 				name: 'core/navigation-link',
 				attributes: {
 					// translators: 'Home' as in a website's home page.
-					label: __('Home'),
+					label: __( 'Home' ),
 					url: 'https://make.wordpress.org/',
 				},
 			},
