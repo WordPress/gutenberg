@@ -77,7 +77,7 @@ describe( 'Image', () => {
 		);
 
 		const regex3 = new RegExp(
-			`<!-- wp:image {"id":\\d+,"sizeSlug":"large"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename2 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
+			`<!-- wp:image {"id":\\d+,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="[^"]+\\/${ filename2 }\\.png" alt="" class="wp-image-\\d+"/></figure>\\s*<!-- \\/wp:image -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex3 );
 
