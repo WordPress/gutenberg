@@ -6,7 +6,7 @@ import { Button, Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 
-function DashboardButton( { icon, isOpen, onClick } ) {
+function NavigationToggle( { icon, isOpen, onClick } ) {
 	const {
 		isActive,
 		isRequestingSiteIcon,
@@ -41,7 +41,7 @@ function DashboardButton( { icon, isOpen, onClick } ) {
 		buttonIcon = (
 			<img
 				alt={ __( 'Site Icon' ) }
-				className="edit-site-dashboard-button_site-icon"
+				className="edit-site-navigation-toggle__site-icon"
 				src={ siteIconUrl }
 			/>
 		);
@@ -54,12 +54,11 @@ function DashboardButton( { icon, isOpen, onClick } ) {
 	return (
 		<div
 			className={
-				'edit-site-dashboard-button_wrapper' +
-				( isOpen ? ' is-open' : '' )
+				'edit-site-navigation-toggle' + ( isOpen ? ' is-open' : '' )
 			}
 		>
 			<Button
-				className="edit-site-dashboard-button has-icon"
+				className="edit-site-navigation-toggle__button has-icon"
 				label={ __( 'Open dashboard' ) }
 				onClick={ onClick }
 				showTooltip
@@ -68,10 +67,12 @@ function DashboardButton( { icon, isOpen, onClick } ) {
 			</Button>
 
 			{ isOpen && (
-				<div className="edit-site-dashboard-name">{ siteTitle }</div>
+				<div className="edit-site-navigation-toggle__site-title">
+					{ siteTitle }
+				</div>
 			) }
 		</div>
 	);
 }
 
-export default DashboardButton;
+export default NavigationToggle;

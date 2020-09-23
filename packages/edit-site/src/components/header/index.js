@@ -27,7 +27,7 @@ import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
-import DashboardButton from './dashboard-button';
+import NavigationToggle from './navigation-toggle';
 
 export default function Header( {
 	openEntitiesSavedStates,
@@ -91,7 +91,7 @@ export default function Header( {
 		<div className="edit-site-header">
 			<div className="edit-site-header_start">
 				<MainDashboardButton.Slot>
-					<DashboardButton
+					<NavigationToggle
 						isOpen={ isNavigationOpen }
 						onClick={ onToggleNavigation }
 					/>

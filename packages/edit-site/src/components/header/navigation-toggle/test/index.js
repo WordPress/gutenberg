@@ -11,7 +11,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import DashboardButton from '../';
+import NavigationToggle from '..';
 
 jest.mock( '@wordpress/data/src/components/use-select', () => {
 	// This allows us to tweak the returned value on each test
@@ -21,7 +21,7 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 
 jest.mock( '@wordpress/core-data' );
 
-describe( 'DashboardButton', () => {
+describe( 'NavigationToggle', () => {
 	describe( 'when in full screen mode', () => {
 		it( 'should display a user uploaded site icon if it exists', () => {
 			useSelect.mockImplementation( ( cb ) => {
@@ -34,9 +34,9 @@ describe( 'DashboardButton', () => {
 				} ) );
 			} );
 
-			const { container } = render( <DashboardButton /> );
+			const { container } = render( <NavigationToggle /> );
 			const siteIcon = container.querySelector(
-				'.edit-site-dashboard-button_site-icon'
+				'.edit-site-navigation-toggle__site-icon'
 			);
 
 			expect( siteIcon ).toBeTruthy();
@@ -53,9 +53,9 @@ describe( 'DashboardButton', () => {
 				} ) );
 			} );
 
-			const { container } = render( <DashboardButton /> );
+			const { container } = render( <NavigationToggle /> );
 			const siteIcon = container.querySelector(
-				'.edit-site-dashboard-button_site-icon'
+				'.edit-site-navigation-toggle__site-icon'
 			);
 			const defaultIcon = container.querySelector( 'svg' );
 

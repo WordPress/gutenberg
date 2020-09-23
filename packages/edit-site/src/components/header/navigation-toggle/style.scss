@@ -1,4 +1,4 @@
-.edit-site-dashboard-button_wrapper {
+.edit-site-navigation-toggle {
 	display: none;
 
 	@include break-medium() {
@@ -10,7 +10,11 @@
 	}
 }
 
-.edit-site-dashboard-button {
+.edit-site-navigation-toggle.is-open {
+	width: 300px;
+}
+
+.edit-site-navigation-toggle__button {
 	color: #fff;
 	margin-left: 14px;
 	margin-right: 14px;
@@ -20,7 +24,7 @@
 	}
 }
 
-.edit-site-dashboard-button.components-button.has-icon {
+.edit-site-navigation-toggle.components-button.has-icon {
 	justify-content: flex-start;
 	padding: 0;
 	height: 32px;
@@ -28,11 +32,7 @@
 	min-width: 32px;
 }
 
-.edit-site-dashboard-button_wrapper.is-open {
-	width: 300px;
-}
-
-.edit-site-dashboard-name {
+.edit-site-navigation-toggle__site-title {
 	font-style: normal;
 	font-weight: 600;
 	font-size: 13px;
