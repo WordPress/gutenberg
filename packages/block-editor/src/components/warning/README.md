@@ -2,7 +2,11 @@
 
 Displays a warning message, typically in the context of a particular block. It may present given _actions_ to the user.
 
+_As seen in [BlockInvalidWarning](https://github.com/WordPress/gutenberg/blob/e92672936a3c8c3e20cf7b98a442f311af7b45fe/packages/block-editor/src/components/block-list/block-invalid-warning.js#L53-L66):_
+
 <img width="614" alt="warning-block-invalid" src="https://user-images.githubusercontent.com/150562/94034403-e6223500-fdb9-11ea-8166-c73629f42e38.png">
+
+_As seen in [withMultipleValidation](https://github.com/WordPress/gutenberg/blob/e92672936a3c8c3e20cf7b98a442f311af7b45fe/packages/edit-post/src/hooks/validate-multiple-use/index.js#L78-L115):_
 
 <img width="625" alt="warning-block-use-once" src="https://user-images.githubusercontent.com/150562/94034410-e7ebf880-fdb9-11ea-8873-9df9ef194825.png">
 
