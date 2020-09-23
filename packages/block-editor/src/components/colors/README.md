@@ -2,7 +2,7 @@
 
 Set of functions to enable color functionality in Blocks.
 
-## withColors HOC
+## `withColors` HOC
 
 A higher-order component, which handles color logic for class generation color value, retrieval and color attribute setting.
 
@@ -15,7 +15,7 @@ export default compose(
 );
 ```
 
-## createCustomColors HOC
+## `createCustomColors` HOC
 
 A higher-order component factory for creating a 'withCustomColors' HOC, which handles color logic for class generation color value, retrieval and color attribute setting. Use this higher-order component to work with a custom set of colors.
 
@@ -36,7 +36,7 @@ export default compose(
 );
 ```
 
-## useColors hook
+## `useColors` hook
 
 Experimental hook that combines the functionality of the `withColors` HOC and `PanelColorSettings`, with `InspectorControls` into an easy to use `useColors` hook.
 It takes an array of color configuration objects for its first parameter. The second parameter is an optional hooks dependency array for cases where you have closures in your configuration objects, and the third is an optional string to overwrite the default panel title, `__( 'Color Settings' )`.
