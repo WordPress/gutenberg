@@ -12,6 +12,12 @@
 	.components-menu-item__shortcut + .components-menu-items__item-icon {
 		margin-left: $grid-unit-10;
 	}
+
+	// If a block item is shown inline (such as transforms), space it correctly.
+	.block-editor-block-icon {
+		margin-left: -2px; // This optically balances the icon.
+		margin-right: $grid-unit-10;
+	}
 }
 
 .components-menu-item__info-wrapper {

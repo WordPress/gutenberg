@@ -57,7 +57,7 @@ const transforms = {
 				return createBlock( name, attributes );
 			},
 		},
-		...[ 2, 3, 4, 5, 6 ].map( ( level ) => ( {
+		...[ 1, 2, 3, 4, 5, 6 ].map( ( level ) => ( {
 			type: 'prefix',
 			prefix: Array( level + 1 ).join( '#' ),
 			transform( content ) {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flowRight, omit, has } from 'lodash';
+import { omit, has } from 'lodash';
 import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
@@ -20,7 +20,7 @@ import { onSubKey } from './utils';
  *
  * @return {Object} Next state.
  */
-const subKeysIsResolved = flowRight( [ onSubKey( 'selectorName' ) ] )(
+const subKeysIsResolved = onSubKey( 'selectorName' )(
 	( state = new EquivalentKeyMap(), action ) => {
 		switch ( action.type ) {
 			case 'START_RESOLUTION':

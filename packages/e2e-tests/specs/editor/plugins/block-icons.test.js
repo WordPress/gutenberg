@@ -46,7 +46,7 @@ async function selectFirstBlock() {
 }
 
 describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
-	const dashIconRegex = /<svg.*?class=".*?dashicons-cart.*?">.*?<\/svg>/;
+	const dashIconRegex = /<span.*?class=".*?dashicons-cart.*?">.*?<\/span>/;
 	const circleString =
 		'<circle cx="10" cy="10" r="10" fill="red" stroke="blue" stroke-width="10"></circle>';
 	const svgIcon = new RegExp(

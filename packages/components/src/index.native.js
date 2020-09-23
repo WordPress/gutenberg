@@ -73,6 +73,7 @@ export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as Gradient } from './mobile/gradient';
 export { default as ColorSettings } from './mobile/color-settings';
+export { LinkPicker } from './mobile/link-picker';
 export { default as LinkSettings } from './mobile/link-settings';
 export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
@@ -89,5 +90,3 @@ export {
 	useGlobalStyles,
 	withGlobalStyles,
 } from './mobile/global-styles-context';
-
-export * from './mobile/site-capabilities';

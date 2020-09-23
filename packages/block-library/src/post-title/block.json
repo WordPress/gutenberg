@@ -12,6 +12,19 @@
 		"level": {
 			"type": "number",
 			"default": 2
+		},
+		"isLink": {
+			"type": "boolean",
+			"default": false
+		},
+		"rel": {
+			"type": "string",
+			"attribute": "rel",
+			"default": ""
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": "_blank"
 		}
 	},
 	"supports": {

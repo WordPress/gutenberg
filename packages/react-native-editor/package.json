@@ -1,6 +1,6 @@
 {
   "name": "@wordpress/react-native-editor",
-  "version": "1.35.0",
+  "version": "1.37.1",
   "description": "Mobile WordPress gutenberg editor.",
   "author": "The WordPress Contributors",
   "license": "GPL-2.0-or-later",
@@ -29,7 +29,7 @@
   "main": "src/index.js",
   "react-native": "src/index",
   "dependencies": {
-    "@babel/runtime": "^7.9.2",
+    "@babel/runtime": "^7.11.2",
     "@react-native-community/blur": "3.6.0",
     "@react-native-community/masked-view": "git+https://github.com/wordpress-mobile/react-native-masked-view.git#098004d0968f853fc7d96c2aa5f96afe7a133c58",
     "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#d263ff16cdd9fb7352b354342522ff030f220f42",

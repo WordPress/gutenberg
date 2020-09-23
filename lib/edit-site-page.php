@@ -130,16 +130,9 @@ function gutenberg_edit_site_init( $hook ) {
 		'imageSizes'        => $available_image_sizes,
 		'isRTL'             => is_rtl(),
 		'maxUploadFileSize' => $max_upload_size,
+		'siteUrl'           => site_url(),
 	);
 
-	list( $color_palette, ) = (array) get_theme_support( 'editor-color-palette' );
-	list( $font_sizes, )    = (array) get_theme_support( 'editor-font-sizes' );
-	if ( false !== $color_palette ) {
-		$settings['colors'] = $color_palette;
-	}
-	if ( false !== $font_sizes ) {
-		$settings['fontSizes'] = $font_sizes;
-	}
 	$settings['styles'] = gutenberg_get_editor_styles();
 	$settings           = gutenberg_experimental_global_styles_settings( $settings );
 
