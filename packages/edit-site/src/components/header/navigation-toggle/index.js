@@ -59,7 +59,7 @@ function NavigationToggle( { icon, isOpen, onClick } ) {
 		>
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
-				label={ __( 'Open dashboard' ) }
+				label={ __( 'Toggle navigation' ) }
 				onClick={ onClick }
 				showTooltip
 			>
