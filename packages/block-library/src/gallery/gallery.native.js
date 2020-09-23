@@ -85,12 +85,7 @@ export const Gallery = ( props ) => {
 	};
 
 	return (
-		<View
-			style={ [
-				{ flex: 1 },
-				align === WIDE_ALIGNMENTS.alignments.full && styles.fullWidth,
-			] }
-		>
+		<View style={ [ { flex: 1 } ] }>
 			<Tiles
 				columns={ displayedColumns }
 				spacing={ TILE_SPACING }
@@ -134,7 +129,14 @@ export const Gallery = ( props ) => {
 					);
 				} ) }
 			</Tiles>
-			{ mediaPlaceholder }
+			<View
+				style={ [
+					align === WIDE_ALIGNMENTS.alignments.full &&
+						styles.fullWidth,
+				] }
+			>
+				{ mediaPlaceholder }
+			</View>
 			<BlockCaption
 				clientId={ clientId }
 				isSelected={ isCaptionSelected }
