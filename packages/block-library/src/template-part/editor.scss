@@ -8,7 +8,7 @@
 }
 
 .wp-block-template-part__selection-preview-search-form {
-	border-bottom: $border-width solid $gray-200;
+	border-bottom: $border-width solid $gray-300;
 }
 
 .wp-block-template-part__selection-preview-container {
@@ -118,7 +118,7 @@
 
 	&.has-child-selected {
 		&::after {
-			box-shadow: 0 0 0 $border-width $gray-200;
+			box-shadow: 0 0 0 $border-width $gray-300;
 
 			.is-dark-theme & {
 				box-shadow: 0 0 0 $border-width-focus $gray-700;

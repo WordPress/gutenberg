@@ -48,6 +48,7 @@ import {
 	image as placeholderIcon,
 	textColor,
 	replace,
+	expand,
 } from '@wordpress/icons';
 
 /**
@@ -409,7 +410,7 @@ export class ImageEdit extends React.Component {
 					/>
 					{ image && sizeOptionsValid && (
 						<CycleSelectControl
-							icon={ 'editor-expand' }
+							icon={ expand }
 							label={ __( 'Size' ) }
 							value={ sizeSlug || DEFAULT_SIZE_SLUG }
 							onChangeValue={ ( newValue ) =>

@@ -98,7 +98,7 @@ function useInsertionPoint( {
 			selectedBlock &&
 			isUnmodifiedDefaultBlock( selectedBlock )
 		) {
-			replaceBlocks( selectedBlock.clientId, blocks );
+			replaceBlocks( selectedBlock.clientId, blocks, null, null, meta );
 		} else {
 			insertBlocks(
 				blocks,

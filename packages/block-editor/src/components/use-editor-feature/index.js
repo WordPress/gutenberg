@@ -26,6 +26,8 @@ const deprecatedFlags = {
 		settings.disableCustomGradients === undefined
 			? undefined
 			: ! settings.disableCustomGradients,
+	'typography.fontSizes': ( settings ) =>
+		settings.fontSizes === undefined ? undefined : settings.fontSizes,
 	'typography.customFontSize': ( settings ) =>
 		settings.disableCustomFontSizes === undefined
 			? undefined

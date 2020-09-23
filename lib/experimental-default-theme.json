@@ -136,24 +136,29 @@
 				"customLineHeight": false,
 				"fontSizes": [
 					{
+						"name": "Small",
 						"slug": "small",
 						"size": 13
 					},
 					{
+						"name": "Normal",
 						"slug": "normal",
 						"size": 16
 					},
 					{
+						"name": "Medium",
 						"slug": "medium",
 						"size": 20
 					},
 					{
+						"name": "Large",
 						"slug": "large",
 						"size": 36
 					},
 					{
+						"name": "Huge",
 						"slug": "huge",
-						"size": 48
+						"size": 42
 					}
 				]
 			},
