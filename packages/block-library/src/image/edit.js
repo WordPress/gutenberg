@@ -177,7 +177,6 @@ export function ImageEdit( {
 					linkDestination = LINK_DESTINATION_CUSTOM;
 					break;
 				case LINK_DESTINATION_NONE:
-				default:
 					linkDestination = LINK_DESTINATION_NONE;
 					break;
 			}
