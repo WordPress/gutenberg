@@ -203,13 +203,11 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 			}
 		}
 
-		function onMouseLeave( { which, buttons } ) {
-			// The primary button must be pressed to initiate selection. Fall back
-			// to `which` if the standard `buttons` property is falsy. There are
-			// cases where Firefox might always set `buttons` to `0`.
+		function onMouseLeave( { buttons } ) {
+			// The primary button must be pressed to initiate selection.
 			// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
 			// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/which
-			if ( ( buttons || which ) === 1 ) {
+			if ( buttons === 1 ) {
 				onSelectionStart( clientId );
 			}
 		}
