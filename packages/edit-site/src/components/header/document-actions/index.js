@@ -12,19 +12,33 @@ import {
 	getBlockType,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import { last } from 'lodash';
+
+function getBlockDisplayText( block ) {
+	return block
+		? getBlockLabel( getBlockType( block.name ), block.attributes )
+		: null;
+}
 
 function useSecondaryText() {
-	const selectedBlock = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSelectedBlock();
+	const {
+		selectedBlock,
+		getBlockParentsByBlockName,
+		getBlockWithoutInnerBlocks,
+	} = useSelect( ( select ) => {
+		return {
+			selectedBlock: select( 'core/block-editor' ).getSelectedBlock(),
+			getBlockParentsByBlockName: select( 'core/block-editor' )
+				.getBlockParentsByBlockName,
+			getBlockWithoutInnerBlocks: select( 'core/block-editor' )
+				.__unstableGetBlockWithoutInnerBlocks,
+		};
 	} );
 
-	// TODO: Handle if parent is template part too.
+	// Check if current block is a template part:
 	const selectedBlockLabel =
 		selectedBlock?.name === 'core/template-part'
-			? getBlockLabel(
-					getBlockType( selectedBlock?.name ),
-					selectedBlock?.attributes
-			  )
+			? getBlockDisplayText( selectedBlock )
 			: null;
 
 	if ( selectedBlockLabel ) {
@@ -33,6 +47,27 @@ function useSecondaryText() {
 			isActive: true,
 		};
 	}
+
+	// Check if an ancestor of the current block is a template part:
+	const templatePartParents = !! selectedBlock
+		? getBlockParentsByBlockName(
+				selectedBlock?.clientId,
+				'core/template-part'
+		  )
+		: [];
+
+	if ( templatePartParents.length ) {
+		// templatePartParents is in order from top to bottom, so the closest
+		// parent is at the end.
+		const closestParent = getBlockWithoutInnerBlocks(
+			last( templatePartParents )
+		);
+		return {
+			label: getBlockDisplayText( closestParent ),
+			isActive: true,
+		};
+	}
+
 	return {};
 }
 
