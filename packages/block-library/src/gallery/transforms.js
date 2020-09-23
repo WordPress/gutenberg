@@ -13,6 +13,7 @@ import { createBlobURL } from '@wordpress/blob';
  * Internal dependencies
  */
 import { pickRelevantMediaFiles } from './shared';
+import { LINK_DESTINATION_ATTACHMENT } from './constants';
 
 const parseShortcodeIds = ( ids ) => {
 	if ( ! ids ) {
@@ -82,7 +83,9 @@ const transforms = {
 				},
 				linkTo: {
 					type: 'string',
-					shortcode: ( { named: { link } } ) => {
+					shortcode: ( {
+						named: { link = LINK_DESTINATION_ATTACHMENT },
+					} ) => {
 						return link;
 					},
 				},
