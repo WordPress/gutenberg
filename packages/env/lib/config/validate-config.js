@@ -71,7 +71,11 @@ function validateConfig( config, envLocation ) {
 		}
 	}
 
-	if ( config.phpVersion && config.phpVersion.length !== 3 ) {
+	if (
+		config.phpVersion &&
+		typeof config.phpVersion === 'string' &&
+		config.phpVersion.length !== 3
+	) {
 		throw new ValidationError(
 			`Invalid .wp-env.json: "${ envPrefix }phpVersion" must be a string of the format "0.0".`
 		);

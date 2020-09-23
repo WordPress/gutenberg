@@ -35,7 +35,7 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
 module.exports = function parseConfig( config, options ) {
 	return {
 		port: config.port,
-		phpVersion: config.phpVersion,
+		phpVersion: config.phpVersion.toString(),
 		coreSource: includeTestsPath(
 			parseSourceString( config.core, options ),
 			options

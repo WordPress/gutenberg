@@ -114,32 +114,36 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
 
 	// Set the WordPress, WP-CLI, PHPUnit PHP version if defined.
+	// The same PHP version is to be used with development & test environments.
 	const phpVersion = config.env.development.phpVersion
-		? config.env.development.phpVersion.toString()
+		? config.env.development.phpVersion
 		: '';
+
+	// Set the WordPress image with the PHP version tag.
 	const wpImage = `wordpress${
 		! phpVersion || phpVersion.length === 0 ? '' : ':php' + phpVersion
 	}`;
+	// Set the WordPress CLI image with the PHP version tag.
 	const cliImage = `wordpress:cli${
 		! phpVersion || phpVersion.length === 0 ? '' : '-php' + phpVersion
 	}`;
+
 	// Defaults are to use the most recent version of PHPUnit that provides
 	// support for the specified version of PHP.
-	let phpunitVersion = '8';
+	let phpunitTag = 'latest';
+	const phpunitPhpVersion = '-php-' + phpVersion + '-fpm';
 	if ( phpVersion === '5.6' ) {
-		phpunitVersion = '5';
+		phpunitTag = '5' + phpunitPhpVersion;
 	} else if ( phpVersion === '7.0' ) {
-		phpunitVersion = '6';
+		phpunitTag = '6' + phpunitPhpVersion;
 	} else if ( phpVersion === '7.1' ) {
-		phpunitVersion = '7';
+		phpunitTag = '7' + phpunitPhpVersion;
+	} else if ( [ '7.2', '7.3', '7.4' ].indexOf( phpVersion ) >= 0 ) {
+		phpunitTag = '8' + phpunitPhpVersion;
 	} else if ( phpVersion === '8.0' ) {
-		phpunitVersion = '9';
+		phpunitTag = '9' + phpunitPhpVersion;
 	}
-	const phpunitImage = `wordpressdevelop/phpunit:${
-		! phpVersion || phpVersion.length === 0
-			? 'latest'
-			: phpunitVersion + '-php-' + phpVersion + '-fpm'
-	}`;
+	const phpunitImage = `wordpressdevelop/phpunit:${ phpunitTag }`;
 
 	// The www-data user in wordpress:cli has a different UID (82) to the
 	// www-data user in wordpress (33). Ensure we use the wordpress www-data
