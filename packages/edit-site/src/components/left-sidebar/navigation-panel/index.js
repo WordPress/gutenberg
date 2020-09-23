@@ -16,7 +16,7 @@ const NavigationPanel = () => {
 
 	return (
 		<>
-			<div style={ { position: 'relative', height: '100%' } }>
+			<div className="edit-site-navigation-panel">
 				<Navigation>
 					<NavigationMenu title="Home">
 						<NavigationItem
@@ -37,7 +37,7 @@ const NavigationPanel = () => {
 				</Navigation>
 
 				{ showPreview && (
-					<div className="edit-site-navigation-sidebar_preview">
+					<div className="edit-site-navigation-panel__preview">
 						<BlockPreview
 							blocks={ [
 								getBlockFromExample(
