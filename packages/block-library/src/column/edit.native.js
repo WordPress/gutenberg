@@ -123,7 +123,6 @@ function ColumnEdit( {
 					renderAppender={
 						isSelected && InnerBlocks.ButtonBlockAppender
 					}
-					parentWidth={ contentStyle[ clientId ].width }
 				/>
 			</View>
 		</>
@@ -168,6 +167,7 @@ export default compose( [
 			selectedBlockClientId && selectedBlockClientId === parentId;
 
 		const blockOrder = getBlockOrder( parentId );
+
 		const selectedColumnIndex = blockOrder.indexOf( clientId );
 		const columnCount = getBlockCount( parentId );
 		const columns = getBlocks( parentId );
