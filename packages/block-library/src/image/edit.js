@@ -21,6 +21,8 @@ import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 
+/* global wp */
+
 /**
  * Internal dependencies
  */
@@ -83,7 +85,6 @@ export function ImageEdit( {
 		caption,
 		align,
 		id,
-		linkDestination,
 		width,
 		height,
 		sizeSlug,
@@ -152,6 +153,21 @@ export function ImageEdit( {
 			additionalAttributes = { url };
 		}
 
+		// Check if default link setting should be used.
+		let linkDestination = attributes.linkDestination;
+
+		if ( ! linkDestination && wp.media.view.settings.defaultProps.link ) {
+			// The constants used in Gutenberg do not match WP options.
+			// TODO: fix this
+			if ( wp.media.view.settings.defaultProps.link === 'file' ) {
+				linkDestination = LINK_DESTINATION_MEDIA;
+			} else if ( wp.media.view.settings.defaultProps.link === 'post' ) {
+				linkDestination = LINK_DESTINATION_ATTACHMENT;
+			} else {
+				linkDestination = wp.media.view.settings.defaultProps.link;
+			}
+		}
+
 		// Check if the image is linked to it's media.
 		if ( linkDestination === LINK_DESTINATION_MEDIA ) {
 			// Update the media link.
@@ -167,6 +183,7 @@ export function ImageEdit( {
 		setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,
+			linkDestination,
 		} );
 	}
 
