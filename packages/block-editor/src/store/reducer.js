@@ -1652,7 +1652,7 @@ export function highlightedBlock( state, action ) {
 
 export function hoveredBlocks( state = [], action ) {
 	switch ( action.type ) {
-		case 'HOVERED_BLOCKS_SET':
+		case 'SET_HOVERED_BLOCKS':
 			return action.hoveredBlockIds;
 	}
 

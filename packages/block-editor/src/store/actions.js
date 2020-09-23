@@ -1112,7 +1112,7 @@ export function setHasControlledInnerBlocks(
 
 export function setHoveredBlocks( hoveredBlockIds ) {
 	return {
-		type: 'HOVERED_BLOCKS_SET',
+		type: 'SET_HOVERED_BLOCKS',
 		hoveredBlockIds,
 	};
 }
