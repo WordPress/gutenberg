@@ -19,10 +19,12 @@ import {
 } from '../styles/navigation-styles';
 
 export default function NavigationMenuTitle( {
+	controlledSearch,
 	hasSearch,
-	search,
-	setSearch,
+	onControlledSearch,
+	setUncontrolledSearch,
 	title,
+	uncontrolledSearch,
 } ) {
 	const [ isSearching, setIsSearching ] = useState( false );
 	const { menu } = useNavigationMenuContext();
@@ -31,8 +33,22 @@ export default function NavigationMenuTitle( {
 		return null;
 	}
 
+	const isControlledSearch = !! onControlledSearch;
+
+	const onChange = ( value ) => {
+		if ( isControlledSearch ) {
+			onControlledSearch( value );
+		} else {
+			setUncontrolledSearch( value );
+		}
+	};
+
 	const onSearchClose = () => {
-		setSearch( '' );
+		if ( isControlledSearch ) {
+			onControlledSearch( '' );
+		} else {
+			setUncontrolledSearch( '' );
+		}
 		setIsSearching( false );
 	};
 
@@ -73,10 +89,14 @@ export default function NavigationMenuTitle( {
 									hideLabelFromVision
 									id={ `components-navigation__menu-title-search-${ menu }` }
 									label={ placeholder }
-									onChange={ ( value ) => setSearch( value ) }
+									onChange={ onChange }
 									placeholder={ placeholder }
 									type="search"
-									value={ search }
+									value={
+										isControlledSearch
+											? controlledSearch
+											: uncontrolledSearch
+									}
 								/>
 
 								<Button
