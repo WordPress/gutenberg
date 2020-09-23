@@ -187,10 +187,8 @@ class AztecView extends React.Component {
 	}
 
 	isFocused() {
-		const focusedField = TextInputState.currentlyFocusedField();
-		return (
-			focusedField && focusedField === ReactNative.findNodeHandle( this )
-		);
+		const focusedInput = TextInputState.currentlyFocusedInput();
+		return focusedInput && focusedInput === this.nativeComponentRef.current;
 	}
 
 	_onPress( event ) {
