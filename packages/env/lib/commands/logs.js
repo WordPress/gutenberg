@@ -35,7 +35,10 @@ module.exports = async function logs( { environment, watch, spinner, debug } ) {
 	const output = await Promise.all( [
 		...servicesToWatch.map( ( service ) =>
 			dockerCompose.logs( service, {
-				config: config.dockerComposeConfigPath,
+				config: [
+					config.dockerComposeConfigPath,
+					config.dockerComposeOverridePath,
+				],
 				log: watch, // Must log inline if we are watching the log output.
 				commandOptions: watch ? [ '--follow' ] : [],
 			} )

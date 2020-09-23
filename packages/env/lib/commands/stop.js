@@ -21,10 +21,15 @@ module.exports = async function stop( { spinner, debug } ) {
 		debug,
 	} );
 
+	const { dockerComposeOverridePath } = await initConfig( {
+		spinner,
+		debug,
+	} );
+
 	spinner.text = 'Stopping WordPress.';
 
 	await dockerCompose.down( {
-		config: dockerComposeConfigPath,
+		config: [ dockerComposeConfigPath, dockerComposeOverridePath ],
 		log: debug,
 	} );
 

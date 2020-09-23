@@ -10,7 +10,7 @@ const yaml = require( 'js-yaml' );
  */
 const { readConfig } = require( './config' );
 const buildDockerComposeConfig = require( './build-docker-compose-config' );
-
+const readDockerComposeOverride = require( './read-docker-compose-override' );
 /**
  * @typedef {import('./config').WPConfig} WPConfig
  */
@@ -38,6 +38,11 @@ module.exports = async function initConfig( { spinner, debug } ) {
 		yaml.dump( dockerComposeConfig )
 	);
 
+	const dockerComposeOverride = readDockerComposeOverride( config, {
+		spinner,
+		debug,
+	} );
+
 	if ( config.debug ) {
 		spinner.info(
 			`Config:\n${ JSON.stringify(
@@ -46,6 +51,10 @@ module.exports = async function initConfig( { spinner, debug } ) {
 				4
 			) }\n\nDocker Compose Config:\n${ JSON.stringify(
 				dockerComposeConfig,
+				null,
+				4
+			) }\n\nDocker Composer Override Config:\n${ JSON.stringify(
+				dockerComposeOverride,
 				null,
 				4
 			) }`

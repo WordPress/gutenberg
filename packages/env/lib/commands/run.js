@@ -52,6 +52,8 @@ function spawnCommandDirectly( { container, command, config, spinner } ) {
 	const composeCommand = [
 		'-f',
 		config.dockerComposeConfigPath,
+		'-f',
+		config.dockerComposeOverridePath,
 		'run',
 		'--rm',
 		container,
