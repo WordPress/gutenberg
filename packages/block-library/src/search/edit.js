@@ -56,6 +56,9 @@ const CSS_UNITS = [
 	{ value: 'px', label: 'px', default: PX_WIDTH_DEFAULT },
 ];
 
+// Used to calculate adjustment to inner button border radius.
+const DEFAULT_INPUT_PADDING = 4;
+
 export default function SearchEdit( {
 	className,
 	attributes,
@@ -127,8 +130,22 @@ export default function SearchEdit( {
 		};
 	};
 
+	const getInnerBorderRadiusStyle = () => {
+		if ( ! borderRadius ) {
+			return undefined;
+		}
+
+		if ( 'button-inside' === buttonPosition ) {
+			// Uses min value of 1 as having no radius when the outer does is jarring.
+			const radius = Math.max( borderRadius - DEFAULT_INPUT_PADDING, 1 );
+			return radius ? radius + 'px' : undefined;
+		}
+
+		return borderRadius + 'px';
+	};
+
 	const sharedStyles = {
-		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+		borderRadius: getInnerBorderRadiusStyle(),
 	};
 
 	const sharedClasses = {
@@ -203,7 +220,13 @@ export default function SearchEdit( {
 
 	const renderInputs = () => {
 		const wrapperStyles =
-			'button-inside' === buttonPosition ? { ...sharedStyles } : {};
+			'button-inside' === buttonPosition
+				? {
+						borderRadius: borderRadius
+							? borderRadius + 'px'
+							: undefined,
+				  }
+				: {};
 
 		const wrapperClasses = classnames(
 			'wp-block-search__inside-wrapper',

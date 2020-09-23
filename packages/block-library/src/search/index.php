@@ -41,6 +41,7 @@ function render_block_core_search( $attributes ) {
 
 	$shared_classes = block_core_search_build_css_border_radius( $attributes )['css_classes'];
 	$shared_styles  = block_core_search_build_css_border_radius( $attributes )['inline_styles'];
+	$wrapper_styles = block_core_search_build_css_border_radius( $attributes )['wrapper_styles'];
 
 	if ( $show_label ) {
 		if ( ! empty( $attributes['label'] ) ) {
@@ -111,12 +112,12 @@ function render_block_core_search( $attributes ) {
 	);
 
 	$field_styles = ( array_key_exists( 'buttonPosition', $attributes ) && 'button-inside' === $attributes['buttonPosition'] )
-		? $shared_styles
+		? $wrapper_styles
 		: '';
 
 	if ( $has_width && $has_width_unit ) {
 		if ( ! empty( $attributes['buttonPosition'] ) && 'button-only' !== $attributes['buttonPosition'] ) {
-			$field_styles .= ' width: ' . esc_attr( $attributes['width'] ) . esc_attr( $attributes['widthUnit'] ) . ';"';
+			$field_styles .= ' width: ' . esc_attr( $attributes['width'] ) . esc_attr( $attributes['widthUnit'] ) . ';';
 		}
 	}
 
@@ -156,23 +157,40 @@ add_action( 'init', 'register_block_core_search' );
  * @return array Border radius CSS classes and inline styles.
  */
 function block_core_search_build_css_border_radius( $attributes ) {
+	$padding       = 4;
 	$border_radius = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
+		'css_classes'    => array(),
+		'inline_styles'  => '',
+		'wrapper_styles' => '',
 	);
 
 	$has_border_radius = array_key_exists( 'borderRadius', $attributes );
 
-	if ( $has_border_radius ) {
-		$border_radius['css_classes'][] = ( 0 === $attributes['borderRadius'] )
-			? 'no-border-radius'
-			: '';
-
-		$border_radius['inline_styles'] = sprintf(
-			'border-radius: %spx;',
-			esc_attr( $attributes['borderRadius'] )
-		);
+	if ( ! $has_border_radius ) {
+		return $border_radius;
 	}
+
+	$border_radius['css_classes'][] = ( 0 === $attributes['borderRadius'] )
+		? 'no-border-radius'
+		: '';
+
+	$button_inside = array_key_exists( 'buttonPosition', $attributes )
+		&& 'button-inside' === $attributes['buttonPosition'];
+
+	// Uses min value of 1 as having no radius when the outer does is jarring.
+	$radius = $button_inside
+		? max( $attributes['borderRadius'] - $padding, 1 )
+		: $attributes['borderRadius'];
+
+	$border_radius['inline_styles'] = sprintf(
+		'border-radius: %spx;',
+		esc_attr( $radius )
+	);
+
+	$border_radius['wrapper_styles'] = sprintf(
+		'border-radius: %spx;',
+		esc_attr( $attributes['borderRadius'] )
+	);
 
 	return $border_radius;
 }
