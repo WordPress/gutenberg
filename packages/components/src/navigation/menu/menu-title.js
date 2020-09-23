@@ -13,12 +13,10 @@ import MenuTitleSearch from './menu-title-search';
 import { MenuTitleHeadingUI, MenuTitleUI } from '../styles/navigation-styles';
 
 export default function NavigationMenuTitle( {
-	controlledSearch,
 	hasSearch,
-	onControlledSearch,
-	setUncontrolledSearch,
+	onSearch,
+	search,
 	title,
-	uncontrolledSearch,
 } ) {
 	const [ isSearching, setIsSearching ] = useState( false );
 
@@ -53,12 +51,10 @@ export default function NavigationMenuTitle( {
 					{ ( { className: animateClassName } ) => (
 						<div className={ animateClassName }>
 							<MenuTitleSearch
-								controlledSearch={ controlledSearch }
-								onControlledSearch={ onControlledSearch }
-								setIsSearching={ setIsSearching }
-								setUncontrolledSearch={ setUncontrolledSearch }
+								closeSearch={ () => setIsSearching( false ) }
+								onSearch={ onSearch }
+								search={ search }
 								title={ title }
-								uncontrolledSearch={ uncontrolledSearch }
 							/>
 						</div>
 					) }

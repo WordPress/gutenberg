@@ -135,7 +135,7 @@ The parent menu slug; used by nested menus to indicate their parent menu.
 -   Type: `string`
 -   Required: No
 
-When `hasSearch` is active and `onSearch` is provided, this controls the value of the search input.
+When `hasSearch` is active and `onSearch` is provided, this controls the value of the search input. Required when the `onSearch` prop is provided.
 
 ### `title`
 

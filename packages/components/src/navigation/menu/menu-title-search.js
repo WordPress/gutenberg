@@ -13,12 +13,10 @@ import { useNavigationMenuContext } from './context';
 import { MenuTitleSearchUI } from '../styles/navigation-styles';
 
 export default function MenuTitleSearch( {
-	controlledSearch,
-	onControlledSearch,
-	setIsSearching,
-	setUncontrolledSearch,
+	closeSearch,
+	onSearch,
+	search,
 	title,
-	uncontrolledSearch,
 } ) {
 	const { menu } = useNavigationMenuContext();
 	const inputRef = useRef();
@@ -35,23 +33,9 @@ export default function MenuTitleSearch( {
 		};
 	}, [] );
 
-	const isControlledSearch = !! onControlledSearch;
-
-	const onChange = ( event ) => {
-		if ( isControlledSearch ) {
-			onControlledSearch( event.target.value );
-		} else {
-			setUncontrolledSearch( event.target.value );
-		}
-	};
-
 	const onSearchClose = () => {
-		if ( isControlledSearch ) {
-			onControlledSearch( '' );
-		} else {
-			setUncontrolledSearch( '' );
-		}
-		setIsSearching( false );
+		onSearch( '' );
+		closeSearch();
 	};
 
 	/* translators: placeholder for sidebar search box. %s: menu title */
@@ -65,13 +49,11 @@ export default function MenuTitleSearch( {
 				autoComplete="off"
 				className="components-text-control__input"
 				id={ `components-navigation__menu-title-search-${ menu }` }
-				onChange={ onChange }
+				onChange={ ( event ) => onSearch( event.target.value ) }
 				placeholder={ placeholder }
 				ref={ inputRef }
 				type="search"
-				value={
-					isControlledSearch ? controlledSearch : uncontrolledSearch
-				}
+				value={ search }
 			/>
 
 			<Button isSmall isTertiary onClick={ onSearchClose }>
