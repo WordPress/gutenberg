@@ -161,7 +161,10 @@ export function ImageEdit( {
 			// Use the WordPress option to determine the proper default.
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
 			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
-			switch ( wp.media.view.settings.defaultProps.link ) {
+			switch (
+				wp?.media?.view?.settings?.defaultProps?.link ||
+				LINK_DESTINATION_NONE
+			) {
 				case 'file':
 				case LINK_DESTINATION_MEDIA:
 					linkDestination = LINK_DESTINATION_MEDIA;
