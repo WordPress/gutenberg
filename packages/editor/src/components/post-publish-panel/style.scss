@@ -151,6 +151,7 @@
 	margin: 0;
 }
 
-.editor-post-publish-panel_warning {
+.editor-post-publish-panel_warning.is-opened {
 	border-top: 0;
+	padding-top: $grid-unit-05;
 }
