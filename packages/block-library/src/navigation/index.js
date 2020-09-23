@@ -17,7 +17,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __('Navigation'),
+	title: __( 'Navigation' ),
 
 	icon,
 
