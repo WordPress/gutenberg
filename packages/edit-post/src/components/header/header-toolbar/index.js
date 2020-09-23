@@ -78,10 +78,6 @@ function HeaderToolbar() {
 	const displayBlockToolbar =
 		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;
 
-	if ( hasReducedUI && ! displayBlockToolbar ) {
-		return null;
-	}
-
 	const toolbarAriaLabel = displayBlockToolbar
 		? /* translators: accessibility text for the editor toolbar when Top Toolbar is on */
 		  __( 'Document and block tools' )
@@ -115,62 +111,63 @@ function HeaderToolbar() {
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			<ToolbarItem
-				ref={ inserterButton }
-				as={ Button }
-				className="edit-post-header-toolbar__inserter-toggle"
-				isPrimary
-				isPressed={ isInserterOpened }
-				onMouseDown={ ( event ) => {
-					event.preventDefault();
-				} }
-				onClick={ () => {
-					if ( isInserterOpened ) {
-						// Focusing the inserter button closes the inserter popover
-						inserterButton.current.focus();
-					} else {
-						setIsInserterOpened( true );
-					}
-				} }
-				disabled={ ! isInserterEnabled }
-				icon={ plus }
-				/* translators: button label text should, if possible, be under 16
+			<div className="edit-post-header-toolbar__left">
+				<ToolbarItem
+					ref={ inserterButton }
+					as={ Button }
+					className="edit-post-header-toolbar__inserter-toggle"
+					isPrimary
+					isPressed={ isInserterOpened }
+					onMouseDown={ ( event ) => {
+						event.preventDefault();
+					} }
+					onClick={ () => {
+						if ( isInserterOpened ) {
+							// Focusing the inserter button closes the inserter popover
+							inserterButton.current.focus();
+						} else {
+							setIsInserterOpened( true );
+						}
+					} }
+					disabled={ ! isInserterEnabled }
+					icon={ plus }
+					/* translators: button label text should, if possible, be under 16
 			characters. */
-				label={ _x(
-					'Add block',
-					'Generic label for block inserter button'
-				) }
-				showTooltip={ ! showIconLabels }
-			>
-				{ showIconLabels && __( 'Add' ) }
-			</ToolbarItem>
-
-			{ ! hasReducedUI && (
-				<div className="edit-post-header-toolbar__left">
-					{ ( isWideViewport || ! showIconLabels ) && (
-						<>
-							{ isLargeViewport && (
-								<ToolbarItem
-									as={ ToolSelector }
-									showTooltip={ ! showIconLabels }
-									isTertiary={ showIconLabels }
-									disabled={ isTextModeEnabled }
-								/>
-							) }
-							<ToolbarItem
-								as={ EditorHistoryUndo }
-								showTooltip={ ! showIconLabels }
-								isTertiary={ showIconLabels }
-							/>
-							<ToolbarItem
-								as={ EditorHistoryRedo }
-								showTooltip={ ! showIconLabels }
-								isTertiary={ showIconLabels }
-							/>
-							{ overflowItems }
-						</>
+					label={ _x(
+						'Add block',
+						'Generic label for block inserter button'
 					) }
-					{ ! isWideViewport && ! isSmallViewport && showIconLabels && (
+					showTooltip={ ! showIconLabels }
+				>
+					{ showIconLabels && __( 'Add' ) }
+				</ToolbarItem>
+				{ ! hasReducedUI && ( isWideViewport || ! showIconLabels ) && (
+					<>
+						{ isLargeViewport && (
+							<ToolbarItem
+								as={ ToolSelector }
+								showTooltip={ ! showIconLabels }
+								isTertiary={ showIconLabels }
+								disabled={ isTextModeEnabled }
+							/>
+						) }
+						<ToolbarItem
+							as={ EditorHistoryUndo }
+							showTooltip={ ! showIconLabels }
+							isTertiary={ showIconLabels }
+						/>
+						<ToolbarItem
+							as={ EditorHistoryRedo }
+							showTooltip={ ! showIconLabels }
+							isTertiary={ showIconLabels }
+						/>
+						{ overflowItems }
+					</>
+				) }
+				{ ! hasReducedUI &&
+					! isWideViewport &&
+					! isSmallViewport &&
+					showIconLabels && (
 						<DropdownMenu
 							position="bottom right"
 							label={
@@ -216,8 +213,7 @@ function HeaderToolbar() {
 							) }
 						</DropdownMenu>
 					) }
-				</div>
-			) }
+			</div>
 
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
