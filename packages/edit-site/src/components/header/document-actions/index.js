@@ -32,15 +32,15 @@ function useSecondaryText() {
 		const {
 			getSelectedBlock,
 			getHoveredBlocks,
+			getBlockParentsByBlockName: _getBlockParentsByBlockName,
+			__unstableGetBlockWithoutInnerBlocks,
 			getBlockName: _getBlockName,
 			getBlock: _getBlock,
 		} = select( 'core/block-editor' );
 		return {
 			selectedBlock: getSelectedBlock(),
-			getBlockParentsByBlockName: select( 'core/block-editor' )
-				.getBlockParentsByBlockName,
-			getBlockWithoutInnerBlocks: select( 'core/block-editor' )
-				.__unstableGetBlockWithoutInnerBlocks,
+			getBlockParentsByBlockName: _getBlockParentsByBlockName,
+			getBlockWithoutInnerBlocks: __unstableGetBlockWithoutInnerBlocks,
 			hoveredBlockIds: getHoveredBlocks(),
 			getBlockName: _getBlockName,
 			getBlock: _getBlock,
