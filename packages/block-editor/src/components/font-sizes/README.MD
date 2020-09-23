@@ -2,12 +2,13 @@
 
 FontSizePicker is a React component that renders a UI that allows users to select a font size.
 The component renders a user interface that allows the user to select predefined (common) font sizes and contains an option that allows users to select custom font sizes (by choosing the value) if that functionality is enabled.
+There is an equivalent component exposed under @wordpress/components. The difference between this component and the @wordpress components one is that this component does not require the `fontSizes` and `disableCustomFontSizes` properties. The editor settings are used to compute the value of these props.
 
 ## Usage
 
 
 ```jsx
-import { FontSizePicker } from '@wordpress/components';
+import { FontSizePicker } from '@wordpress/block-editor';
 import { withState } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
@@ -31,7 +32,6 @@ const MyFontSizePicker = withState( {
 
 	return (
 		<FontSizePicker
-			fontSizes={ fontSizes }
 			value={ fontSize }
 			fallbackFontSize={ fallbackFontSize }
 			onChange={ ( newFontSize ) => {
@@ -50,31 +50,12 @@ const MyFontSizePicker = withState( {
 
 The component accepts the following props:
 
-### disableCustomFontSizes
-
-If `true`, it will not be possible to choose a custom fontSize. The user will be forced to pick one of the pre-defined sizes passed in fontSizes.
-
-- Type: `Boolean`
-- Required: no
-- Default: `false`
 
 ### fallbackFontSize
 
 If no value exists, this prop defines the starting position for the font size picker slider. Only relevant if `withSlider` is `true`.
 
 - Type: `Number`
-- Required: No
-
-### fontSizes
-
-An array of font size objects. The object should contain properties size, name, and slug.
-The property `size` contains a number with the font size value, in `px`.
-The `name` property includes a label for that font size e.g.: `Small`.
-The `slug` property is a string with a unique identifier for the font size. Used for the class generation process.
-
-**Note:** The slugs `default` and `custom` are reserved and cannot be used.
-
-- Type: `Array`
 - Required: No
 
 ### onChange
