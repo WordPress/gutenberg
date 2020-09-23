@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelRow, Dropdown, Button, Notice } from '@wordpress/components';
+import { PanelRow, Dropdown, Button } from '@wordpress/components';
 import {
 	PostSchedule as PostScheduleForm,
 	PostScheduleLabel,
@@ -32,13 +32,7 @@ export function PostSchedule() {
 					renderContent={ () => <PostScheduleForm /> }
 				/>
 			</PanelRow>
-			<Notice
-				status="warning"
-				isDismissible={ false }
-				className="edit-post-post-schedule-warning"
-			>
-				{ __( 'Your post will be backdated.' ) }
-			</Notice>
+			<PostScheduleForm.Warning />
 		</PostScheduleCheck>
 	);
 }

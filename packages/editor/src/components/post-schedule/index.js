@@ -2,13 +2,37 @@
  * WordPress dependencies
  */
 import { __experimentalGetSettings } from '@wordpress/date';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
-import { DateTimePicker } from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { DateTimePicker, Notice } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
-export function PostSchedule( { date, onUpdateDate } ) {
+export function Warning() {
+	const date = useSelect( ( select ) =>
+		select( 'core/editor' ).getEditedPostAttribute( 'date' )
+	);
+
+	if ( Date.parse( date ) >= Date.now() ) {
+		return null;
+	}
+
+	return (
+		<Notice
+			status="warning"
+			isDismissible={ false }
+			className="edit-post-post-schedule-warning"
+		>
+			{ __( 'Your post will be backdated.' ) }
+		</Notice>
+	);
+}
+
+export function PostSchedule() {
+	const date = useSelect( ( select ) =>
+		select( 'core/editor' ).getEditedPostAttribute( 'date' )
+	);
+	const { editPost } = useDispatch( 'core/editor' );
 	const onChange = ( newDate ) => {
-		onUpdateDate( newDate );
+		editPost( { date: newDate } );
 		document.activeElement.blur();
 	};
 	const settings = __experimentalGetSettings();
@@ -33,17 +57,6 @@ export function PostSchedule( { date, onUpdateDate } ) {
 	);
 }
 
-export default compose( [
-	withSelect( ( select ) => {
-		return {
-			date: select( 'core/editor' ).getEditedPostAttribute( 'date' ),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		return {
-			onUpdateDate( date ) {
-				dispatch( 'core/editor' ).editPost( { date } );
-			},
-		};
-	} ),
-] )( PostSchedule );
+PostSchedule.Warning = Warning;
+
+export default PostSchedule;

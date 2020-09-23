@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, Notice } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
 /**
@@ -80,13 +80,9 @@ function PostPublishPanelPrepublish( {
 					>
 						<PostSchedule />
 					</PanelBody>
-					<Notice
-						status="warning"
-						isDismissible={ false }
-						className="editor-post-publish-panel__warning"
-					>
-						{ __( 'Your post will be backdated.' ) }
-					</Notice>
+					<PanelBody>
+						<PostSchedule.Warning />
+					</PanelBody>
 				</>
 			) }
 			<MaybePostFormatPanel />
