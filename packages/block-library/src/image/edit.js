@@ -168,6 +168,9 @@ export function ImageEdit( {
 			}
 		}
 
+		// If still not set, set to "none" for back compat.
+		linkDestination = linkDestination ? linkDestination : 'none';
+
 		// Check if the image is linked to it's media.
 		if ( linkDestination === LINK_DESTINATION_MEDIA ) {
 			// Update the media link.
