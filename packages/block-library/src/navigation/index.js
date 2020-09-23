@@ -63,7 +63,7 @@ export const settings = {
 				name: 'core/navigation-link',
 				attributes: {
 					// translators: 'Contact' as in a website's contact page.
-					label: __('Contact'),
+					label: __( 'Contact' ),
 					url: 'https://make.wordpress.org/',
 				},
 			},
