@@ -55,7 +55,7 @@ export const settings = {
 				name: 'core/navigation-link',
 				attributes: {
 					// translators: 'About' as in a website's about page.
-					label: __('About'),
+					label: __( 'About' ),
 					url: 'https://make.wordpress.org/',
 				},
 			},
