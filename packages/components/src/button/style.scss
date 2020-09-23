@@ -107,7 +107,7 @@
 	&.is-secondary,
 	&.is-tertiary {
 		&:active:not(:disabled) {
-			background: $gray-200;
+			background: $gray-300;
 			color: var(--wp-admin-theme-color-darker-10);
 			box-shadow: none;
 		}
@@ -121,7 +121,7 @@
 		&[aria-disabled="true"],
 		&[aria-disabled="true"]:hover {
 			color: lighten($gray-700, 5%);
-			background: lighten($gray-200, 5%);
+			background: lighten($gray-300, 5%);
 			transform: none;
 			opacity: 1;
 			box-shadow: none;
@@ -177,7 +177,7 @@
 		}
 
 		&:active:not(:disabled) {
-			background: $light-gray-600;
+			background: $gray-400;
 		}
 	}
 

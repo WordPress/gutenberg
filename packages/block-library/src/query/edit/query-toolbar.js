@@ -1,12 +1,19 @@
 /**
+ * External dependencies
+ */
+import { debounce } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import {
 	Toolbar,
 	Dropdown,
 	ToolbarButton,
 	RangeControl,
+	TextControl,
 	FormTokenField,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -33,6 +40,15 @@ export default function QueryToolbar( { query, setQuery } ) {
 			tags: getTermsInfo( _tags ),
 		};
 	}, [] );
+	const [ querySearch, setQuerySearch ] = useState( query.search );
+	const onChangeDebounced = useCallback(
+		debounce( () => setQuery( { search: querySearch } ), 250 ),
+		[ querySearch ]
+	);
+	useEffect( () => {
+		onChangeDebounced();
+		return onChangeDebounced.cancel;
+	}, [ querySearch, onChangeDebounced ] );
 
 	// Handles categories and tags changes.
 	const onTermsChange = ( terms, queryProperty ) => ( newTermValues ) => {
@@ -113,6 +129,11 @@ export default function QueryToolbar( { query, setQuery } ) {
 								onChange={ onTagsChange }
 							/>
 						) }
+						<TextControl
+							label={ __( 'Search' ) }
+							value={ querySearch }
+							onChange={ ( value ) => setQuerySearch( value ) }
+						/>
 					</>
 				) }
 			/>

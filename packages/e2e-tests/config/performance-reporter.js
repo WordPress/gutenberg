@@ -28,16 +28,13 @@ class PerformanceReporter {
 		}
 
 		const results = readFileSync( filepath, 'utf8' );
-		const { load, domcontentloaded, type, focus } = JSON.parse( results );
+		const { load, type, focus } = JSON.parse( results );
 
 		if ( load && load.length ) {
 			// eslint-disable-next-line no-console
 			console.log( `
 ${ title( 'Loading Time:' ) }
-Average time to load: ${ success( round( average( load ) ) + 'ms' ) }
-Average time to DOM content load: ${ success(
-				round( average( domcontentloaded ) ) + 'ms'
-			) }` );
+Average time to load: ${ success( round( average( load ) ) + 'ms' ) }` );
 		}
 
 		if ( type && type.length ) {

@@ -40,11 +40,12 @@ import {
 	MediaUploadProgress,
 	withColors,
 	__experimentalUseGradient,
+	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState, useRef } from '@wordpress/element';
-import { cover as icon, replace, image } from '@wordpress/icons';
+import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 
 /**
@@ -83,7 +84,6 @@ const Cover = ( {
 	overlayColor,
 	setAttributes,
 	openGeneralSidebar,
-	settings,
 	closeSettingsBottomSheet,
 } ) => {
 	const {
@@ -100,8 +100,9 @@ const Cover = ( {
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
+	const colorsDefault = useEditorFeature( 'color.palette' ) || [];
 	const coverDefaultPalette = {
-		colors: settings.colors.slice( 0, THEME_COLORS_COUNT ),
+		colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
 	};
 
 	const { gradientValue } = __experimentalUseGradient();
@@ -536,10 +537,7 @@ const Cover = ( {
 					style={ styles.uploadFailedContainer }
 				>
 					<View style={ styles.uploadFailed }>
-						<Icon
-							icon={ 'warning' }
-							{ ...styles.uploadFailedIcon }
-						/>
+						<Icon icon={ warning } { ...styles.uploadFailedIcon } />
 					</View>
 				</View>
 			) }

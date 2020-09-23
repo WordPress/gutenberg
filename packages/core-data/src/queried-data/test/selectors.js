@@ -106,6 +106,47 @@ describe( 'getQueriedItems', () => {
 		] );
 	} );
 
+	it( 'should dynamically construct fields-filtered item from available data with nested fields', () => {
+		const state = {
+			items: {
+				1: {
+					id: 1,
+					content: 'chicken',
+					author: 'bob',
+					meta: {
+						template: 'single',
+						_private: 'unused',
+					},
+				},
+				2: {
+					id: 2,
+					content: 'ribs',
+					author: 'sally',
+					meta: {
+						template: 'single',
+						_private: 'unused',
+					},
+				},
+			},
+			itemIsComplete: {
+				1: true,
+				2: true,
+			},
+			queries: {
+				'': [ 1, 2 ],
+			},
+		};
+
+		const result = getQueriedItems( state, {
+			_fields: [ 'content', 'meta.template' ],
+		} );
+
+		expect( result ).toEqual( [
+			{ content: 'chicken', meta: { template: 'single' } },
+			{ content: 'ribs', meta: { template: 'single' } },
+		] );
+	} );
+
 	it( 'should return null if attempting to filter by yet-unknown fields', () => {
 		const state = {
 			items: {

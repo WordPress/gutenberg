@@ -7,7 +7,7 @@ import {
 	BlockContextProvider,
 	InnerBlocks,
 	BlockPreview,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -27,6 +27,7 @@ export default function QueryLoopEdit( {
 			order,
 			orderBy,
 			author,
+			search,
 		} = {},
 		queryContext,
 	},
@@ -49,6 +50,9 @@ export default function QueryLoopEdit( {
 			if ( author ) {
 				query.author = author;
 			}
+			if ( search ) {
+				query.search = search;
+			}
 			return {
 				posts: select( 'core' ).getEntityRecords(
 					'postType',
@@ -68,6 +72,7 @@ export default function QueryLoopEdit( {
 			orderBy,
 			clientId,
 			author,
+			search,
 		]
 	);
 
@@ -79,8 +84,10 @@ export default function QueryLoopEdit( {
 			} ) ),
 		[ posts ]
 	);
+	const blockWrapperProps = useBlockWrapperProps();
+
 	return (
-		<Block.div>
+		<div { ...blockWrapperProps }>
 			{ blockContexts &&
 				blockContexts.map( ( blockContext ) => (
 					<BlockContextProvider
@@ -101,6 +108,6 @@ export default function QueryLoopEdit( {
 						) }
 					</BlockContextProvider>
 				) ) }
-		</Block.div>
+		</div>
 	);
 }

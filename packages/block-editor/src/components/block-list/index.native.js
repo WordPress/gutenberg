@@ -265,7 +265,6 @@ export class BlockList extends Component {
 			parentWidth,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
-			__experimentalItemCallback,
 		} = this.props;
 		return (
 			<BlockListItem
@@ -285,7 +284,6 @@ export class BlockList extends Component {
 				onCaretVerticalPositionChange={
 					this.onCaretVerticalPositionChange
 				}
-				__experimentalRenderCallback={ __experimentalItemCallback }
 			/>
 		);
 	}

@@ -1,16 +1,17 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, kebabCase, reduce } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import {
-	STYLE_PROPS,
-	PRESET_CATEGORIES,
-	LINK_COLOR_DECLARATION,
-} from './utils';
+import { PRESET_CATEGORIES, LINK_COLOR_DECLARATION } from './utils';
 
 const mergeTrees = ( baseData, userData ) => {
 	// Deep clone from base data.
@@ -56,13 +57,17 @@ export default ( blockData, baseTree, userTree ) => {
 	 */
 	const getBlockStylesDeclarations = ( blockSupports, blockStyles ) => {
 		const declarations = [];
-		Object.keys( STYLE_PROPS ).forEach( ( key ) => {
+		Object.keys( STYLE_PROPERTY ).forEach( ( key ) => {
+			const cssProperty = key.startsWith( '--' ) ? key : kebabCase( key );
 			if (
 				blockSupports.includes( key ) &&
-				get( blockStyles, STYLE_PROPS[ key ], false )
+				get( blockStyles, STYLE_PROPERTY[ key ], false )
 			) {
 				declarations.push(
-					`${ key }: ${ get( blockStyles, STYLE_PROPS[ key ] ) }`
+					`${ cssProperty }: ${ get(
+						blockStyles,
+						STYLE_PROPERTY[ key ]
+					) }`
 				);
 			}
 		} );
@@ -78,17 +83,21 @@ export default ( blockData, baseTree, userTree ) => {
 	 * @return {Array} An array of style declarations.
 	 */
 	const getBlockPresetsDeclarations = ( blockPresets ) => {
-		const declarations = [];
-		PRESET_CATEGORIES.forEach( ( category ) => {
-			if ( blockPresets?.[ category ] ) {
-				blockPresets[ category ].forEach( ( { slug, value } ) =>
+		return reduce(
+			PRESET_CATEGORIES,
+			( declarations, { path, key }, category ) => {
+				const preset = get( blockPresets, path, [] );
+				preset.forEach( ( value ) => {
 					declarations.push(
-						`--wp--preset--${ category }--${ slug }: ${ value }`
-					)
-				);
-			}
-		} );
-		return declarations;
+						`--wp--preset--${ kebabCase( category ) }--${
+							value.slug
+						}: ${ value[ key ] }`
+					);
+				} );
+				return declarations;
+			},
+			[]
+		);
 	};
 
 	const getBlockSelector = ( selector ) => {
@@ -108,7 +117,7 @@ export default ( blockData, baseTree, userTree ) => {
 				blockData[ context ].supports,
 				tree[ context ].styles
 			),
-			...getBlockPresetsDeclarations( tree[ context ].presets ),
+			...getBlockPresetsDeclarations( tree[ context ].settings ),
 		];
 		if ( blockDeclarations.length > 0 ) {
 			styles.push(

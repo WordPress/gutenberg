@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -93,7 +94,6 @@ function BlockListBlock( {
 	toggleSelection,
 	index,
 	enableAnimation,
-	__experimentalRenderCallback: renderCallback,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
@@ -211,7 +211,7 @@ function BlockListBlock( {
 		name,
 		mode,
 		blockTitle: blockType.title,
-		wrapperProps,
+		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 
@@ -239,10 +239,6 @@ function BlockListBlock( {
 		block = blockEdit;
 	} else {
 		block = <Block.div { ...wrapperProps }>{ blockEdit }</Block.div>;
-	}
-
-	if ( renderCallback ) {
-		block = renderCallback( block );
 	}
 
 	return (

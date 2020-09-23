@@ -322,7 +322,7 @@ import { MyComponent } from '..';
 // run those MyComponent tests…
 ```
 
-The connected props will need need to be manually provided. This is a good opportunity to audit the connected state.
+The connected props will need to be manually provided. This is a good opportunity to audit the connected state.
 
 #### Best practices
 
