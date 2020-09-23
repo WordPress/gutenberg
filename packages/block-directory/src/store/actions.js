@@ -12,7 +12,7 @@ import getPluginUrl from './utils/get-plugin-url';
 
 /**
  * Returns an action object used in signalling that the downloadable blocks
- * have been requested and is loading.
+ * have been requested and are loading.
  *
  * @param {string} filterValue Search string.
  *
