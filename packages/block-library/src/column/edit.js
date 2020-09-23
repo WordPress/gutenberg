@@ -68,6 +68,8 @@ function ColumnEdit( {
 						label={ __( 'Width' ) }
 						value={ width || '' }
 						onChange={ ( nextWidth ) => {
+							nextWidth =
+								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
 							setAttributes( { width: nextWidth } );
 						} }
 						units={ [
