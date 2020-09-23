@@ -34,10 +34,10 @@ function NavigationBackButton(
 			className={ classes }
 			href={ href }
 			isTertiary
-			onClick={ ( ...args ) =>
+			onClick={
 				parentMenu
-					? setActiveMenu( parentMenu, 'right' )
-					: onClick( ...args )
+					? () => setActiveMenu( parentMenu, 'right' )
+					: onClick
 			}
 			ref={ ref }
 		>
