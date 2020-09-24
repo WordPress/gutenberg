@@ -77,6 +77,7 @@ const setupInitHooks = () => {
 				capabilities,
 				colors: props.colors,
 				gradients: props.gradients,
+				editorMode: props.editorMode,
 			};
 		}
 	);

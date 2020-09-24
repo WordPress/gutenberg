@@ -17,8 +17,9 @@ import {
 	capturePhoto,
 	captureVideo,
 	image,
+	video,
 	wordpress,
-	close,
+    close,
 } from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
@@ -141,9 +142,9 @@ export class MediaUpload extends React.Component {
 		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
 
 		if ( isImage || ! isOneType ) {
-			return 'format-image';
+			return image;
 		} else if ( isVideo ) {
-			return 'format-video';
+			return video;
 		}
 	}
 

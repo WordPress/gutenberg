@@ -46,7 +46,7 @@
 }
 
 .edit-post-manage-blocks-modal__disabled-blocks-count {
-	border-top: 1px solid $gray-200;
+	border-top: 1px solid $gray-300;
 	margin-left: -$grid-unit-30;
 	margin-right: -$grid-unit-30;
 	padding-top: 0.6rem;
@@ -88,10 +88,10 @@
 .edit-post-manage-blocks-modal__checklist-item {
 	margin-bottom: 0;
 	padding-left: $grid-unit-20;
-	border-top: 1px solid $gray-200;
+	border-top: 1px solid $gray-300;
 
 	&:last-child {
-		border-bottom: 1px solid $gray-200;
+		border-bottom: 1px solid $gray-300;
 	}
 
 	.components-base-control__field {
@@ -114,7 +114,7 @@
 
 	.block-editor-block-icon {
 		margin-right: 10px;
-		fill: $dark-gray-500;
+		fill: $gray-900;
 	}
 }
 
@@ -125,5 +125,5 @@
 	margin-right: -$grid-unit-30;
 	padding-left: $grid-unit-30;
 	padding-right: $grid-unit-30;
-	border-top: $border-width solid $gray-200;
+	border-top: $border-width solid $gray-300;
 }

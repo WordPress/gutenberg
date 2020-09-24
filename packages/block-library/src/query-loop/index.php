@@ -20,16 +20,38 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 
 	$query = array(
 		'post_type' => 'post',
-		'offset'    => isset( $block->context['query']['perPage'] ) ? ( $block->context['query']['perPage'] * ( $page - 1 ) + $block->context['query']['offset'] ) : 0,
-		'order'     => isset( $block->context['query']['order'] ) ? strtoupper( $block->context['query']['order'] ) : 'DESC',
-		'orderby'   => isset( $block->context['query']['orderBy'] ) ? $block->context['query']['orderBy'] : 'date',
+		'offset'    => 0,
+		'order'     => 'DESC',
+		'orderby'   => 'date',
 	);
-	if ( isset( $block->context['query']['categoryIds'] ) ) {
-		$query['category__in'] = $block->context['query']['categoryIds'];
+
+	if ( isset( $block->context['query'] ) ) {
+		if ( isset( $block->context['query']['perPage'] ) ) {
+			$query['offset'] = ( $block->context['query']['perPage'] * ( $page - 1 ) ) + $block->context['query']['offset'];
+		}
+		if ( isset( $block->context['query']['categoryIds'] ) ) {
+			$query['category__in'] = $block->context['query']['categoryIds'];
+		}
+		if ( isset( $block->context['query']['tagIds'] ) ) {
+			$query['tag__in'] = $block->context['query']['tagIds'];
+		}
+		if ( isset( $block->context['query']['order'] ) ) {
+			$query['order'] = strtoupper( $block->context['query']['order'] );
+		}
+		if ( isset( $block->context['query']['orderBy'] ) ) {
+			$query['orderby'] = $block->context['query']['orderBy'];
+		}
+		if ( isset( $block->context['query']['perPage'] ) ) {
+			$query['posts_per_page'] = $block->context['query']['perPage'];
+		}
+		if ( isset( $block->context['query']['author'] ) ) {
+			$query['author'] = $block->context['query']['author'];
+		}
+		if ( isset( $block->context['query']['search'] ) ) {
+			$query['s'] = $block->context['query']['search'];
+		}
 	}
-	if ( isset( $block->context['query']['perPage'] ) ) {
-		$query['posts_per_page'] = $block->context['query']['perPage'];
-	}
+
 	$posts = get_posts( $query );
 
 	$content = '';

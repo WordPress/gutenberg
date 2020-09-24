@@ -46,15 +46,20 @@ function createPreloadingMiddleware( preloadedData ) {
 			const path = getStablePath( options.path );
 
 			if ( 'GET' === method && cache[ path ] ) {
+				const cacheData = cache[ path ];
+
+				// Unsetting the cache key ensures that the data is only preloaded a single time
+				delete cache[ path ];
+
 				return Promise.resolve(
 					parse
-						? cache[ path ].body
+						? cacheData.body
 						: new window.Response(
-								JSON.stringify( cache[ path ].body ),
+								JSON.stringify( cacheData.body ),
 								{
 									status: 200,
 									statusText: 'OK',
-									headers: cache[ path ].headers,
+									headers: cacheData.headers,
 								}
 						  )
 				);

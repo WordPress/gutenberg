@@ -2,8 +2,12 @@
 
 @import "./components/block-editor/style.scss";
 @import "./components/header/style.scss";
+@import "./components/header/document-actions/style.scss";
 @import "./components/header/fullscreen-mode-close/style.scss";
 @import "./components/header/more-menu/style.scss";
+@import "./components/header/navigation-toggle/style.scss";
+@import "./components/left-sidebar/inserter-panel/style.scss";
+@import "./components/left-sidebar/navigation-panel/style.scss";
 @import "./components/notices/style.scss";
 @import "./components/page-switcher/style.scss";
 @import "./components/sidebar/style.scss";
@@ -54,7 +58,7 @@ body.toplevel_page_gutenberg-edit-site {
 	}
 
 	.interface-interface-skeleton__content {
-		background-color: $light-gray-700;
+		background-color: $gray-400;
 	}
 }
 

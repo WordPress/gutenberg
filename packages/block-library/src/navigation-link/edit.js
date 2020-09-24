@@ -32,7 +32,7 @@ import {
 	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import {
@@ -139,7 +139,15 @@ function NavigationLinkEdit( {
 	mergeBlocks,
 	onReplace,
 } ) {
-	const { label, type, opensInNewTab, url, description, rel } = attributes;
+	const {
+		label,
+		type,
+		opensInNewTab,
+		url,
+		description,
+		rel,
+		title,
+	} = attributes;
 	const link = {
 		url,
 		opensInNewTab,
@@ -198,8 +206,10 @@ function NavigationLinkEdit( {
 	 */
 	function selectLabelText() {
 		ref.current.focus();
-		const selection = window.getSelection();
-		const range = document.createRange();
+		const { ownerDocument } = ref.current;
+		const { defaultView } = ownerDocument;
+		const selection = defaultView.getSelection();
+		const range = ownerDocument.createRange();
 		// Get the range of the current ref contents so we can add this range to the selection.
 		range.selectNodeContents( ref.current );
 		selection.removeAllRanges();
@@ -228,6 +238,29 @@ function NavigationLinkEdit( {
 			url: page.link,
 		};
 	}
+
+	const blockWrapperProps = useBlockWrapperProps( {
+		ref: listItemRef,
+		className: classnames( {
+			'is-editing':
+				( isSelected || isParentOfSelectedBlock ) &&
+				// Don't show the element as editing while dragging.
+				! isDraggingBlocks,
+			// Don't select the element while dragging.
+			'is-selected': isSelected && ! isDraggingBlocks,
+			'is-dragging-within': isDraggingWithin,
+			'has-link': !! url,
+			'has-child': hasDescendants,
+			'has-text-color': rgbTextColor,
+			[ `has-${ textColor }-color` ]: !! textColor,
+			'has-background': rgbBackgroundColor,
+			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+		} ),
+		style: {
+			color: rgbTextColor,
+			backgroundColor: rgbBackgroundColor,
+		},
+	} );
 
 	return (
 		<Fragment>
@@ -268,6 +301,14 @@ function NavigationLinkEdit( {
 						) }
 					/>
 					<TextControl
+						value={ title || '' }
+						onChange={ ( titleValue ) => {
+							setAttributes( { title: titleValue } );
+						} }
+						label={ __( 'Link title' ) }
+						autoComplete="off"
+					/>
+					<TextControl
 						value={ rel || '' }
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );
@@ -277,28 +318,7 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<Block.li
-				className={ classnames( {
-					'is-editing':
-						( isSelected || isParentOfSelectedBlock ) &&
-						// Don't show the element as editing while dragging.
-						! isDraggingBlocks,
-					// Don't select the element while dragging.
-					'is-selected': isSelected && ! isDraggingBlocks,
-					'is-dragging-within': isDraggingWithin,
-					'has-link': !! url,
-					'has-child': hasDescendants,
-					'has-text-color': rgbTextColor,
-					[ `has-${ textColor }-color` ]: !! textColor,
-					'has-background': rgbBackgroundColor,
-					[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
-				} ) }
-				style={ {
-					color: rgbTextColor,
-					backgroundColor: rgbBackgroundColor,
-				} }
-				ref={ listItemRef }
-			>
+			<li { ...blockWrapperProps }>
 				<div className="wp-block-navigation-link__content">
 					<RichText
 						ref={ ref }
@@ -425,7 +445,7 @@ function NavigationLinkEdit( {
 						),
 					} }
 				/>
-			</Block.li>
+			</li>
 		</Fragment>
 	);
 }

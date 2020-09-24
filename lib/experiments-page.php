@@ -129,8 +129,6 @@ function gutenberg_experiments_editor_settings( $settings ) {
 		$experiments_settings['gradients'] = $gradient_presets;
 	}
 
-	$experiments_settings['disableCustomGradients'] = get_theme_support( 'disable-custom-gradients' );
-
 	return array_merge( $settings, $experiments_settings );
 }
 add_filter( 'block_editor_settings', 'gutenberg_experiments_editor_settings' );

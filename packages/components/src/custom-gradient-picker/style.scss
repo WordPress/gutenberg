@@ -92,7 +92,7 @@ $components-custom-gradient-picker__padding: 6px; // 36px container, 24px handle
 		&.is-pressed {
 			> svg {
 				background: $white;
-				border: 1px solid $dark-gray-200;
+				border: 1px solid $gray-600;
 				border-radius: 2px;
 			}
 		}

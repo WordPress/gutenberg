@@ -1,23 +1,19 @@
 /**
- * External dependencies
- */
-import { pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __experimentalGradientPicker as GradientPicker } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import useEditorFeature from '../use-editor-feature';
+
+const EMPTY_ARRAY = [];
 
 function GradientPickerWithGradients( props ) {
-	const { gradients, disableCustomGradients } = useSelect(
-		( select ) =>
-			pick( select( 'core/block-editor' ).getSettings(), [
-				'gradients',
-				'disableCustomGradients',
-			] ),
-		[]
-	);
+	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
+	const disableCustomGradients = ! useEditorFeature( 'color.customGradient' );
+
 	return (
 		<GradientPicker
 			gradients={

@@ -111,7 +111,7 @@ export function getEntity( state, kind, name ) {
  * @param {number}  key   Record's key
  * @param {?Object} query Optional query.
  *
- * @return {Object?|null} Record.
+ * @return {Object?} Record.
  */
 export function getEntityRecord( state, kind, name, key, query ) {
 	const queriedState = get( state.entities.data, [
@@ -120,20 +120,20 @@ export function getEntityRecord( state, kind, name, key, query ) {
 		'queriedData',
 	] );
 	if ( ! queriedState ) {
-		return null;
+		return undefined;
 	}
 
 	if ( query === undefined ) {
 		// If expecting a complete item, validate that completeness.
 		if ( ! queriedState.itemIsComplete[ key ] ) {
-			return null;
+			return undefined;
 		}
 
-		return queriedState.items[ key ] || null;
+		return queriedState.items[ key ];
 	}
 
 	query = { ...query, include: [ key ] };
-	return first( getQueriedItems( queriedState, query ) ) || null;
+	return first( getQueriedItems( queriedState, query ) );
 }
 
 /**

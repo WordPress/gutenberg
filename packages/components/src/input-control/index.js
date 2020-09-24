@@ -15,7 +15,6 @@ import { useState, forwardRef } from '@wordpress/element';
  */
 import InputBase from './input-base';
 import InputField from './input-field';
-import { isValueEmpty } from '../utils/values';
 
 function useUniqueId( idProp ) {
 	const instanceId = useInstanceId( InputControl );
@@ -32,7 +31,6 @@ export function InputControl(
 		hideLabelFromVision = false,
 		id: idProp,
 		isPressEnterToChange = false,
-		isFloatingLabel = false,
 		label,
 		labelPosition = 'top',
 		onBlur = noop,
@@ -49,7 +47,6 @@ export function InputControl(
 	ref
 ) {
 	const [ isFocused, setIsFocused ] = useState( false );
-	const [ isFilled, setIsFilled ] = useState( ! isValueEmpty( value ) );
 
 	const id = useUniqueId( idProp );
 	const classes = classNames( 'components-input-control', className );
@@ -64,12 +61,6 @@ export function InputControl(
 		setIsFocused( true );
 	};
 
-	const isInputFilled = isFilled || ! isValueEmpty( value );
-
-	const isFloating = isFloatingLabel ? isInputFilled || isFocused : false;
-	const isFloatingLabelSet =
-		! hideLabelFromVision && isFloatingLabel && label;
-
 	return (
 		<InputBase
 			className={ classes }
@@ -77,8 +68,6 @@ export function InputControl(
 			gap={ 3 }
 			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
-			isFilled={ isInputFilled }
-			isFloatingLabel={ isFloatingLabel }
 			isFocused={ isFocused }
 			justify="left"
 			label={ label }
@@ -92,14 +81,11 @@ export function InputControl(
 				className="components-input-control__input"
 				disabled={ disabled }
 				id={ id }
-				isFloating={ isFloating }
-				isFloatingLabelSet={ isFloatingLabelSet }
 				isPressEnterToChange={ isPressEnterToChange }
 				onBlur={ handleOnBlur }
 				onChange={ onChange }
 				onFocus={ handleOnFocus }
 				onKeyDown={ onKeyDown }
-				onUpdateValue={ setIsFilled }
 				onValidate={ onValidate }
 				ref={ ref }
 				setIsFocused={ setIsFocused }
