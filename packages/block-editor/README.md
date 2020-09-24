@@ -560,7 +560,9 @@ Undocumented declaration.
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/warning/README.md>
 
 <a name="withColorContext" href="#withColorContext">#</a> **withColorContext**
 

@@ -1,0 +1,26 @@
+.edit-site-navigation-panel {
+	position: relative;
+	height: 100%;
+	width: 300px;
+
+	.components-navigation {
+		height: 100%;
+	}
+}
+
+.edit-site-navigation-panel__preview {
+	display: none;
+	border: $border-width solid $gray-400;
+	width: 300px;
+	padding: $grid-unit-20;
+	background: $white;
+	box-shadow: $shadow-popover;
+	border-radius: $radius-block-ui;
+	position: absolute;
+	top: $grid-unit-15;
+	left: calc(100% + #{$grid-unit-15});
+
+	@include break-medium {
+		display: block;
+	}
+}

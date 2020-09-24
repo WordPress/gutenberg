@@ -51,7 +51,7 @@ export default function Navigation( {
 		if ( activeMenu !== menu ) {
 			setActiveMenu( activeMenu );
 		}
-	}, [ activeItem, activeMenu ] );
+	}, [ activeMenu ] );
 
 	const context = {
 		activeItem,
