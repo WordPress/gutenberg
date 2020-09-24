@@ -120,12 +120,6 @@ export default function TemplateSwitcher( {
 		content: template?.content,
 	};
 
-	const templatePartItems = templateParts?.map( ( templatePart ) => ( {
-		label: <TemplateLabel template={ templatePart } />,
-		value: templatePart.id,
-		slug: templatePart.slug,
-	} ) );
-
 	const overwriteSlug =
 		page &&
 		TEMPLATE_OVERRIDES[ page.type ] &&
@@ -169,21 +163,21 @@ export default function TemplateSwitcher( {
 			</NavigationGroup>
 
 			<NavigationGroup title={ __( 'Template Parts' ) }>
-				{ templatePartItems?.map( ( templatePart ) => {
-					const key = `template-part-${ templatePart.value }`;
+				{ templateParts?.map( ( templatePart ) => {
+					const key = `template-part-${ templatePart.id }`;
 
 					return (
 						<NavigationItem
 							key={ key }
 							item={ key }
-							title={ templatePart.label }
+							title={
+								<TemplateLabel template={ templatePart } />
+							}
 							onClick={ () =>
-								onActiveTemplatePartIdChange(
-									templatePart.value
-								)
+								onActiveTemplatePartIdChange( templatePart.id )
 							}
 							onMouseEnter={ () =>
-								onMouseEnterTemplatePart( templatePart.value )
+								onMouseEnterTemplatePart( templatePart.id )
 							}
 							onMouseLeave={ onMouseLeaveTemplatePart }
 						/>
