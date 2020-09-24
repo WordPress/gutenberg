@@ -3,6 +3,7 @@
 	display: flex;
 	height: $header-height;
 	box-sizing: border-box;
+	position: relative;
 
 	.edit-site-header_start,
 	.edit-site-header_end {
@@ -13,10 +14,25 @@
 	.edit-site-header_center {
 		display: flex;
 		height: 100%;
+		left: 50%;
+		top: 50%;
+		transform: translate(-50%, -50%);
+		position: absolute;
 	}
 
 	.edit-site-header_end {
 		justify-content: flex-end;
+	}
+}
+
+.navigation-open {
+	position: initial;
+
+	.edit-site-header_center {
+		left: auto;
+		top: auto;
+		transform: none;
+		position: initial;
 	}
 }
 

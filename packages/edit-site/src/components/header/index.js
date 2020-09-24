@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
@@ -80,14 +85,18 @@ export default function Header( {
 		! isLargeViewport || deviceType !== 'Desktop' || hasFixedToolbar;
 
 	return (
-		<div className="edit-site-header">
+		<div
+			className={ classnames( 'edit-site-header', {
+				'navigation-open': isNavigationOpen,
+			} ) }
+		>
+			<MainDashboardButton.Slot>
+				<NavigationToggle
+					isOpen={ isNavigationOpen }
+					onClick={ onToggleNavigation }
+				/>
+			</MainDashboardButton.Slot>
 			<div className="edit-site-header_start">
-				<MainDashboardButton.Slot>
-					<NavigationToggle
-						isOpen={ isNavigationOpen }
-						onClick={ onToggleNavigation }
-					/>
-				</MainDashboardButton.Slot>
 				<div className="edit-site-header__toolbar">
 					<Button
 						isPrimary
