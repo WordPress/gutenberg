@@ -8,14 +8,12 @@ import { useMemo } from '@wordpress/element';
 
 export default function TemplatePreview( { item } ) {
 	const template = useSelect(
-		( select ) => {
-			return select( 'core' ).getEntityRecord(
+		( select ) =>
+			select( 'core' ).getEntityRecord(
 				'postType',
 				item.type === 'template' ? 'wp_template' : 'wp_template_part',
 				item.id
-			);
-		},
-		[ item ]
+			)[ item ]
 	);
 	const blocks = useMemo(
 		() => ( template ? parse( template?.content?.raw || '' ) : [] ),
