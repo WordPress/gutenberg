@@ -21,11 +21,14 @@ export default function TemplatePreview( { item } ) {
 		() => ( template ? parse( template?.content?.raw || '' ) : [] ),
 		[ template ]
 	);
+
+	if ( ! blocks || blocks.length === 0 ) {
+		return null;
+	}
+
 	return (
 		<div className="edit-site-navigation-panel__preview">
-			{ !! blocks && (
-				<BlockPreview blocks={ blocks } viewportWidth={ 1200 } />
-			) }
+			<BlockPreview blocks={ blocks } viewportWidth={ 1200 } />
 		</div>
 	);
 }
