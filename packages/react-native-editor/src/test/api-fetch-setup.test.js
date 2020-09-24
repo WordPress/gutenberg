@@ -11,7 +11,6 @@ const supportedPaths = [
 	'wp/v2/media?context=edit&_locale=user',
 	'wp/v2/categories/',
 	'wp/v2/types/wp_block?_locale=user',
-	'wp/v2/posts/1?context=edit&_locale=user',
 	'wp/v2/blocks/28?_locale=user',
 ];
 
