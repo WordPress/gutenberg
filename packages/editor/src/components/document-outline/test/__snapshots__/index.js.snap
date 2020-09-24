@@ -10,18 +10,16 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       isValid={true}
       key="0"
       level="H2"
-      path={Array []}
     >
-      Heading parent
+      Heading 2
     </TableOfContentsItem>
     <TableOfContentsItem
       href="#block-clientId_1"
       isValid={true}
       key="1"
       level="H3"
-      path={Array []}
     >
-      Heading child
+      Heading 3
     </TableOfContentsItem>
   </ul>
 </div>
@@ -37,7 +35,6 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       isValid={false}
       key="0"
       level="H1"
-      path={Array []}
     >
       Heading 1
       <br
@@ -54,7 +51,6 @@ exports[`DocumentOutline header blocks present should render warnings for multip
       isValid={false}
       key="1"
       level="H1"
-      path={Array []}
     >
       Heading 1
       <br
