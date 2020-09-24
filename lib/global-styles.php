@@ -591,10 +591,9 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 		foreach ( $presets_structure as $token => $preset_meta ) {
 			$block_preset = gutenberg_experimental_get( $tree[ $block_name ]['settings'], $preset_meta['path'] );
 			if ( ! empty( $block_preset ) ) {
-				$css_var_token                      = gutenberg_experimental_global_styles_get_css_property( $token );
-				$computed_presets[ $css_var_token ] = array();
+				$computed_presets[ $token ] = array();
 				foreach ( $block_preset as $preset_value ) {
-					$computed_presets[ $css_var_token ][ $preset_value['slug'] ] = $preset_value[ $preset_meta['key'] ];
+					$computed_presets[ $token ][ $preset_value['slug'] ] = $preset_value[ $preset_meta['key'] ];
 				}
 			}
 		}
