@@ -114,33 +114,50 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
 
 	// Set the WordPress, WP-CLI, PHPUnit PHP version if defined.
-	// The same PHP version is to be used with development & test environments.
-	const phpVersion = config.env.development.phpVersion
+	const developmentPhpVersion = config.env.development.phpVersion
 		? config.env.development.phpVersion
 		: '';
+	const testsPhpVersion = config.env.tests.phpVersion
+		? config.env.tests.phpVersion
+		: '';
 
-	// Set the WordPress image with the PHP version tag.
-	const wpImage = `wordpress${
-		! phpVersion || phpVersion.length === 0 ? '' : ':php' + phpVersion
+	// Set the WordPress images with the PHP version tag.
+	const developmentWpImage = `wordpress${
+		! developmentPhpVersion || developmentPhpVersion.length === 0
+			? ''
+			: ':php' + developmentPhpVersion
 	}`;
-	// Set the WordPress CLI image with the PHP version tag.
-	const cliImage = `wordpress:cli${
-		! phpVersion || phpVersion.length === 0 ? '' : '-php' + phpVersion
+	const testsWpImage = `wordpress${
+		! testsPhpVersion || testsPhpVersion.length === 0
+			? ''
+			: ':php' + testsPhpVersion
+	}`;
+	// Set the WordPress CLI images with the PHP version tag.
+	const developmentWpCliImage = `wordpress:cli${
+		! developmentPhpVersion || developmentPhpVersion.length === 0
+			? ''
+			: '-php' + developmentPhpVersion
+	}`;
+	const testsWpCliImage = `wordpress:cli${
+		! testsPhpVersion || testsPhpVersion.length === 0
+			? ''
+			: '-php' + testsPhpVersion
 	}`;
 
 	// Defaults are to use the most recent version of PHPUnit that provides
 	// support for the specified version of PHP.
+	// PHP Unit is assumed to be for Tests so use the testsPhpVersion.
 	let phpunitTag = 'latest';
-	const phpunitPhpVersion = '-php-' + phpVersion + '-fpm';
-	if ( phpVersion === '5.6' ) {
+	const phpunitPhpVersion = '-php-' + testsPhpVersion + '-fpm';
+	if ( testsPhpVersion === '5.6' ) {
 		phpunitTag = '5' + phpunitPhpVersion;
-	} else if ( phpVersion === '7.0' ) {
+	} else if ( testsPhpVersion === '7.0' ) {
 		phpunitTag = '6' + phpunitPhpVersion;
-	} else if ( phpVersion === '7.1' ) {
+	} else if ( testsPhpVersion === '7.1' ) {
 		phpunitTag = '7' + phpunitPhpVersion;
-	} else if ( [ '7.2', '7.3', '7.4' ].indexOf( phpVersion ) >= 0 ) {
+	} else if ( [ '7.2', '7.3', '7.4' ].indexOf( testsPhpVersion ) >= 0 ) {
 		phpunitTag = '8' + phpunitPhpVersion;
-	} else if ( phpVersion === '8.0' ) {
+	} else if ( testsPhpVersion === '8.0' ) {
 		phpunitTag = '9' + phpunitPhpVersion;
 	}
 	const phpunitImage = `wordpressdevelop/phpunit:${ phpunitTag }`;
@@ -164,7 +181,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			wordpress: {
 				depends_on: [ 'mysql' ],
-				image: wpImage,
+				image: developmentWpImage,
 				ports: [ developmentPorts ],
 				environment: {
 					WORDPRESS_DB_NAME: 'wordpress',
@@ -173,7 +190,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			'tests-wordpress': {
 				depends_on: [ 'mysql' ],
-				image: wpImage,
+				image: testsWpImage,
 				ports: [ testsPorts ],
 				environment: {
 					WORDPRESS_DB_NAME: 'tests-wordpress',
@@ -182,13 +199,13 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			cli: {
 				depends_on: [ 'wordpress' ],
-				image: cliImage,
+				image: developmentWpCliImage,
 				volumes: developmentMounts,
 				user: cliUser,
 			},
 			'tests-cli': {
 				depends_on: [ 'tests-wordpress' ],
-				image: cliImage,
+				image: testsWpCliImage,
 				volumes: testsMounts,
 				user: cliUser,
 			},
