@@ -26,7 +26,7 @@ const TEMPLATE_OVERRIDES = {
 function TemplateLabel( { template, homeId } ) {
 	return (
 		<>
-			{ template.slug }{ ' ' }
+			{ template.slug }
 			{ template.id === homeId && (
 				<Tooltip text={ __( 'Home' ) }>
 					<div className="edit-site-template-switcher__label-home-icon">
@@ -48,7 +48,7 @@ function NavigationItemWithIcon( { icon, title, ...props } ) {
 		<NavigationItem
 			title={
 				<>
-					{ title }{ ' ' }
+					{ title }
 					{ icon && (
 						<div className="edit-site-template-switcher__label-home-icon">
 							<Icon icon={ icon } />
