@@ -356,7 +356,7 @@ export class ImageEdit extends React.Component {
 			image,
 			imageSizes,
 			clientId,
-            onDelete,
+			onDelete,
 		} = this.props;
 		const {
 			align,

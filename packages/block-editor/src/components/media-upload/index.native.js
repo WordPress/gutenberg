@@ -19,7 +19,7 @@ import {
 	image,
 	video,
 	wordpress,
-    close,
+	close,
 } from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
