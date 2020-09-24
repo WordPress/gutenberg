@@ -206,7 +206,6 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 		function onMouseLeave( { buttons } ) {
 			// The primary button must be pressed to initiate selection.
 			// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
-			// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/which
 			if ( buttons === 1 ) {
 				onSelectionStart( clientId );
 			}
