@@ -40,7 +40,7 @@ describe( 'cpt locking', () => {
 		);
 		await clickBlockToolbarButton( 'More options' );
 		expect(
-			await page.$x( '//button[contains(text(), "Remove Block")]' )
+			await page.$x( '//button[contains(text(), "Remove block")]' )
 		).toHaveLength( 0 );
 	};
 
@@ -172,7 +172,7 @@ describe( 'cpt locking', () => {
 			);
 			await clickBlockToolbarButton( 'More options' );
 			const [ removeBlock ] = await page.$x(
-				'//button[contains(text(), "Remove Block")]'
+				'//button[contains(text(), "Remove block")]'
 			);
 			await removeBlock.click();
 			expect( await getEditedPostContent() ).toMatchSnapshot();

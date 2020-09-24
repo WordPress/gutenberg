@@ -100,6 +100,33 @@ export default ( blockData, baseTree, userTree ) => {
 		);
 	};
 
+	const flattenTree = ( input, prefix, token ) => {
+		let result = [];
+		Object.keys( input ).forEach( ( key ) => {
+			const newKey = prefix + kebabCase( key.replace( '/', '-' ) );
+			const newLeaf = input[ key ];
+
+			if ( newLeaf instanceof Object ) {
+				const newPrefix = newKey + token;
+				result = [
+					...result,
+					...flattenTree( newLeaf, newPrefix, token ),
+				];
+			} else {
+				result.push( `${ newKey }: ${ newLeaf }` );
+			}
+		} );
+		return result;
+	};
+
+	const getCustomDeclarations = ( blockCustom ) => {
+		if ( Object.keys( blockCustom ).length === 0 ) {
+			return [];
+		}
+
+		return flattenTree( blockCustom, '--wp--custom--', '--' );
+	};
+
 	const getBlockSelector = ( selector ) => {
 		// Can we hook into the styles generation mechanism
 		// so we can avoid having to increase the class specificity here
@@ -118,6 +145,7 @@ export default ( blockData, baseTree, userTree ) => {
 				tree[ context ].styles
 			),
 			...getBlockPresetsDeclarations( tree[ context ].settings ),
+			...getCustomDeclarations( tree[ context ].settings.custom ),
 		];
 		if ( blockDeclarations.length > 0 ) {
 			styles.push(
