@@ -27,12 +27,12 @@ export function isRequestingDownloadableBlocks( state, filterValue ) {
 }
 
 /**
- * Returns the available uninstalled blocks
+ * Returns the available uninstalled blocks.
  *
  * @param {Object} state       Global application state.
  * @param {string} filterValue Search string.
  *
- * @return {Array} Downloadable blocks
+ * @return {Array} Downloadable blocks.
  */
 export function getDownloadableBlocks( state, filterValue ) {
 	if (
@@ -95,7 +95,7 @@ export const getUnusedBlockTypes = createRegistrySelector(
 );
 
 /**
- * Returns true if application is calling install endpoint.
+ * Returns true if a block plugin install is in progress.
  *
  * @param {Object} state   Global application state.
  * @param {string} blockId Id of the block.
@@ -107,7 +107,7 @@ export function isInstalling( state, blockId ) {
 }
 
 /**
- * Returns the error notices
+ * Returns all block error notices.
  *
  * @param {Object} state Global application state.
  *

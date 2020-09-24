@@ -30,7 +30,8 @@ The following set of dispatching action creators are available on the object ret
 
 <a name="addInstalledBlockType" href="#addInstalledBlockType">#</a> **addInstalledBlockType**
 
-Returns an action object used to add a newly installed block type.
+Returns an action object used to add a block type to the "newly installed"
+tracking list.
 
 _Parameters_
 
@@ -42,7 +43,7 @@ _Returns_
 
 <a name="clearErrorNotice" href="#clearErrorNotice">#</a> **clearErrorNotice**
 
-Sets the error notice to empty for specific block
+Sets the error notice to empty for specific block.
 
 _Parameters_
 
@@ -93,7 +94,8 @@ _Returns_
 
 <a name="removeInstalledBlockType" href="#removeInstalledBlockType">#</a> **removeInstalledBlockType**
 
-Returns an action object used to remove a newly installed block type.
+Returns an action object used to remove a block type from the "newly installed"
+tracking list.
 
 _Parameters_
 
@@ -105,13 +107,13 @@ _Returns_
 
 <a name="setErrorNotice" href="#setErrorNotice">#</a> **setErrorNotice**
 
-Sets an error notice string to be displayed to the user
+Sets an error notice to be displayed to the user for a given block.
 
 _Parameters_
 
 -   _blockId_ `string`: The ID of the block plugin. eg: my-block
 -   _message_ `string`: The message shown in the notice.
--   _isFatal_ `boolean`: Whether the user can recover from the error
+-   _isFatal_ `boolean`: Whether the user can recover from the error.
 
 _Returns_
 
@@ -119,7 +121,7 @@ _Returns_
 
 <a name="setIsInstalling" href="#setIsInstalling">#</a> **setIsInstalling**
 
-Returns an action object used to indicate install in progress
+Returns an action object used to indicate install in progress.
 
 _Parameters_
 
@@ -148,7 +150,7 @@ The following selectors are available on the object returned by `wp.data.select(
 
 <a name="getDownloadableBlocks" href="#getDownloadableBlocks">#</a> **getDownloadableBlocks**
 
-Returns the available uninstalled blocks
+Returns the available uninstalled blocks.
 
 _Parameters_
 
@@ -157,7 +159,7 @@ _Parameters_
 
 _Returns_
 
--   `Array`: Downloadable blocks
+-   `Array`: Downloadable blocks.
 
 <a name="getErrorNoticeForBlock" href="#getErrorNoticeForBlock">#</a> **getErrorNoticeForBlock**
 
@@ -174,7 +176,7 @@ _Returns_
 
 <a name="getErrorNotices" href="#getErrorNotices">#</a> **getErrorNotices**
 
-Returns the error notices
+Returns all block error notices.
 
 _Parameters_
 
@@ -225,7 +227,7 @@ _Returns_
 
 <a name="isInstalling" href="#isInstalling">#</a> **isInstalling**
 
-Returns true if application is calling install endpoint.
+Returns true if a block plugin install is in progress.
 
 _Parameters_
 
