@@ -152,7 +152,9 @@ function LinkControl( {
 		const hadFocusLoss =
 			isEndingEditWithFocus.current &&
 			wrapperNode.current &&
-			! wrapperNode.current.contains( document.activeElement );
+			! wrapperNode.current.contains(
+				wrapperNode.current.ownerDocument.activeElement
+			);
 
 		if ( hadFocusLoss ) {
 			// Prefer to focus a natural focusable descendent of the wrapper,
@@ -173,7 +175,7 @@ function LinkControl( {
 	 */
 	function stopEditing() {
 		isEndingEditWithFocus.current = !! wrapperNode.current?.contains(
-			document.activeElement
+			wrapperNode.current.ownerDocument.activeElement
 		);
 
 		setIsEditingLink( false );

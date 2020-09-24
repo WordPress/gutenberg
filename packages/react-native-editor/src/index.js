@@ -91,6 +91,7 @@ const setupInitHooks = () => {
 				capabilities,
 				colors,
 				gradients,
+				editorMode: props.editorMode,
 			};
 		}
 	);

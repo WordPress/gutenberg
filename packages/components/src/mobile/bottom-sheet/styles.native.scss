@@ -43,6 +43,12 @@
 	background-color: $modal-background-dark;
 }
 
+.backgroundFullScreen {
+	border-top-right-radius: 0;
+	border-top-left-radius: 0;
+	padding-top: 8;
+}
+
 .content {
 	padding: 0 16px 0 16px;
 }
@@ -182,6 +188,12 @@
 	flex: 1;
 }
 
+.bottomSheetApplyButton {
+	flex-direction: row;
+	justify-content: flex-end;
+	flex: 1;
+}
+
 .chevronLeftIcon {
 	color: $blue-50;
 	margin-left: -11px;
@@ -222,6 +234,20 @@
 
 .arrowLeftIconDark {
 	color: $dark-secondary;
+}
+
+// used in both light and dark modes
+.placeholderColor {
+	color: #87a6bc;
+}
+
+.applyButton {
+	color: $blue-50;
+	font-size: 17px;
+}
+
+.applyButtonDark {
+	color: $blue-30;
 }
 
 .flex {

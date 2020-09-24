@@ -20,19 +20,19 @@ describe( 'Nonce middleware', () => {
 		nonceMiddleware( requestOptions, callback );
 	} );
 
-	it( 'should not add a nonce header to requests with nonces', () => {
+	it( 'should update the nonce in requests with outdated nonces', () => {
 		expect.hasAssertions();
 
-		const nonce = 'nonce';
+		const nonce = 'new nonce';
 		const nonceMiddleware = createNonceMiddleware( nonce );
 		const requestOptions = {
 			method: 'GET',
 			path: '/wp/v2/posts',
 			headers: { 'X-WP-Nonce': 'existing nonce' },
 		};
+
 		const callback = ( options ) => {
-			expect( options ).toBe( requestOptions );
-			expect( options.headers[ 'X-WP-Nonce' ] ).toBe( 'existing nonce' );
+			expect( options.headers[ 'X-WP-Nonce' ] ).toBe( 'new nonce' );
 		};
 
 		nonceMiddleware( requestOptions, callback );

@@ -218,61 +218,6 @@ function gutenberg_legacy_widget_settings( $settings ) {
 add_filter( 'block_editor_settings', 'gutenberg_legacy_widget_settings' );
 
 /**
- * Registers a wp_area post type.
- */
-function gutenberg_create_wp_area_post_type() {
-	register_post_type(
-		'wp_area',
-		array(
-			'description'  => __( 'Experimental custom post type that will store block areas referenced by themes.', 'gutenberg' ),
-			'labels'       => array(
-				'name'                     => _x( 'Block Area (Experimental)', 'post type general name', 'gutenberg' ),
-				'singular_name'            => _x( 'Block Area (Experimental)', 'post type singular name', 'gutenberg' ),
-				'menu_name'                => _x( 'Block Areas', 'admin menu', 'gutenberg' ),
-				'name_admin_bar'           => _x( 'Block Area', 'add new on admin bar', 'gutenberg' ),
-				'add_new'                  => _x( 'Add New', 'Block', 'gutenberg' ),
-				'add_new_item'             => __( 'Add New Block Area', 'gutenberg' ),
-				'new_item'                 => __( 'New Block Area', 'gutenberg' ),
-				'edit_item'                => __( 'Edit Block Area', 'gutenberg' ),
-				'view_item'                => __( 'View Block Area', 'gutenberg' ),
-				'all_items'                => __( 'All Block Areas', 'gutenberg' ),
-				'search_items'             => __( 'Search Block Areas', 'gutenberg' ),
-				'not_found'                => __( 'No block area found.', 'gutenberg' ),
-				'not_found_in_trash'       => __( 'No block areas found in Trash.', 'gutenberg' ),
-				'filter_items_list'        => __( 'Filter block areas list', 'gutenberg' ),
-				'items_list_navigation'    => __( 'Block areas list navigation', 'gutenberg' ),
-				'items_list'               => __( 'Block areas list', 'gutenberg' ),
-				'item_published'           => __( 'Block area published.', 'gutenberg' ),
-				'item_published_privately' => __( 'Block area published privately.', 'gutenberg' ),
-				'item_reverted_to_draft'   => __( 'Block area reverted to draft.', 'gutenberg' ),
-				'item_scheduled'           => __( 'Block area scheduled.', 'gutenberg' ),
-				'item_updated'             => __( 'Block area updated.', 'gutenberg' ),
-			),
-			'public'       => false,
-			'show_ui'      => false,
-			'show_in_menu' => false,
-			'show_in_rest' => true,
-			'rest_base'    => '__experimental/block-areas',
-			'capabilities' => array(
-				'read'                   => 'edit_posts',
-				'create_posts'           => 'edit_theme_options',
-				'edit_posts'             => 'edit_theme_options',
-				'edit_published_posts'   => 'edit_theme_options',
-				'delete_published_posts' => 'edit_theme_options',
-				'edit_others_posts'      => 'edit_theme_options',
-				'delete_others_posts'    => 'edit_theme_options',
-			),
-			'map_meta_cap' => true,
-			'supports'     => array(
-				'title',
-				'editor',
-			),
-		)
-	);
-}
-add_action( 'init', 'gutenberg_create_wp_area_post_type' );
-
-/**
  * Function to enqueue admin-widgets as part of the block editor assets.
  */
 function gutenberg_enqueue_widget_scripts() {
@@ -323,3 +268,24 @@ function gutenberg_register_widgets() {
 }
 
 add_action( 'widgets_init', 'gutenberg_register_widgets' );
+
+/**
+ * Overwrites the template WordPress would use to render the currrent request,
+ * to a widget preview template if widgetPreview parameter was passed in the url.
+ *
+ * @param string $template Original template.
+ *
+ * @return string The original or the path of widget-preview-template.php file.
+ */
+function change_post_template_to_widget_preview( $template ) {
+	if (
+		isset( $_GET['widgetPreview'] ) &&
+		current_user_can( 'edit_theme_options' )
+	) {
+		add_filter( 'show_admin_bar', '__return_false' );
+		return dirname( __FILE__ ) . '/widget-preview-template.php';
+	}
+	return $template;
+}
+add_filter( 'template_include', 'change_post_template_to_widget_preview' );
+

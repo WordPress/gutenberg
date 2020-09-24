@@ -85,19 +85,46 @@ export default ( blockData, baseTree, userTree ) => {
 	const getBlockPresetsDeclarations = ( blockPresets ) => {
 		return reduce(
 			PRESET_CATEGORIES,
-			( declarations, path, category ) => {
+			( declarations, { path, key }, category ) => {
 				const preset = get( blockPresets, path, [] );
-				preset.forEach( ( { slug, value } ) => {
+				preset.forEach( ( value ) => {
 					declarations.push(
-						`--wp--preset--${ kebabCase(
-							category
-						) }--${ slug }: ${ value }`
+						`--wp--preset--${ kebabCase( category ) }--${
+							value.slug
+						}: ${ value[ key ] }`
 					);
 				} );
 				return declarations;
 			},
 			[]
 		);
+	};
+
+	const flattenTree = ( input, prefix, token ) => {
+		let result = [];
+		Object.keys( input ).forEach( ( key ) => {
+			const newKey = prefix + kebabCase( key.replace( '/', '-' ) );
+			const newLeaf = input[ key ];
+
+			if ( newLeaf instanceof Object ) {
+				const newPrefix = newKey + token;
+				result = [
+					...result,
+					...flattenTree( newLeaf, newPrefix, token ),
+				];
+			} else {
+				result.push( `${ newKey }: ${ newLeaf }` );
+			}
+		} );
+		return result;
+	};
+
+	const getCustomDeclarations = ( blockCustom ) => {
+		if ( Object.keys( blockCustom ).length === 0 ) {
+			return [];
+		}
+
+		return flattenTree( blockCustom, '--wp--custom--', '--' );
 	};
 
 	const getBlockSelector = ( selector ) => {
@@ -118,6 +145,7 @@ export default ( blockData, baseTree, userTree ) => {
 				tree[ context ].styles
 			),
 			...getBlockPresetsDeclarations( tree[ context ].settings ),
+			...getCustomDeclarations( tree[ context ].settings.custom ),
 		];
 		if ( blockDeclarations.length > 0 ) {
 			styles.push(

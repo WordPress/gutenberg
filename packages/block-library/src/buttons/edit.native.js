@@ -13,6 +13,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { useState, useEffect, useRef } from '@wordpress/element';
+import { debounce } from 'lodash';
 
 /**
  * Internal dependencies
@@ -45,11 +46,13 @@ function ButtonsEdit( {
 		}
 	}, [ sizes ] );
 
+	const debounceAddNextButton = debounce( onAddNextButton, 200 );
+
 	const renderFooterAppender = useRef( () => (
 		<View style={ styles.appenderContainer }>
 			<InnerBlocks.ButtonBlockAppender
 				isFloating={ true }
-				onAddBlock={ onAddNextButton }
+				onAddBlock={ debounceAddNextButton }
 			/>
 		</View>
 	) );
@@ -71,7 +74,7 @@ function ButtonsEdit( {
 				orientation="horizontal"
 				horizontalAlignment={ align }
 				onDeleteBlock={ shouldDelete ? onDelete : undefined }
-				onAddBlock={ onAddNextButton }
+				onAddBlock={ debounceAddNextButton }
 				parentWidth={ maxWidth }
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
