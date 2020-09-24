@@ -138,10 +138,10 @@ export default function SearchEdit( {
 		if ( 'button-inside' === buttonPosition ) {
 			// Uses min value of 1 as having no radius when the outer does is jarring.
 			const radius = Math.max( borderRadius - DEFAULT_INPUT_PADDING, 1 );
-			return radius ? radius + 'px' : undefined;
+			return radius ? `${ radius }px` : undefined;
 		}
 
-		return borderRadius + 'px';
+		return `${ borderRadius }px`;
 	};
 
 	const sharedStyles = {
@@ -223,7 +223,7 @@ export default function SearchEdit( {
 			'button-inside' === buttonPosition
 				? {
 						borderRadius: borderRadius
-							? borderRadius + 'px'
+							? `${ borderRadius }px`
 							: undefined,
 				  }
 				: {};
