@@ -94,10 +94,10 @@ export const settings = {
 				isMultiBlock: true,
 				blocks: [ '*' ],
 				__experimentalConvert( blocks ) {
-					// Avoid transforming a single `core/group` Block
+					// Avoid transforming a single instance of this block
 					if (
 						blocks.length === 1 &&
-						blocks[ 0 ].name === 'core/group'
+						blocks[ 0 ].name === this.blockName
 					) {
 						return;
 					}
@@ -130,7 +130,7 @@ export const settings = {
 					} );
 
 					return createBlock(
-						'core/group',
+						this.blockName,
 						{
 							align: widestAlignment,
 						},
