@@ -151,8 +151,7 @@ class BlockListBlock extends Component {
 		const hasParentBlockAlignment = parentBlockAlignment !== undefined;
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isColumnsRelated = name.includes( 'core/column' );
-		const shouldShowBorderFullWidth =
-			blockWidth < screenWidth &&
+		const shouldBeFullWidth =
 			isFullWidth &&
 			( ! isColumnsRelated || ! hasParents || hasParentBlockAlignment );
 
@@ -178,7 +177,8 @@ class BlockListBlock extends Component {
 							<View
 								style={ [
 									styles.solidBorder,
-									shouldShowBorderFullWidth &&
+									shouldBeFullWidth &&
+										blockWidth < screenWidth &&
 										styles.borderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,
@@ -219,11 +219,7 @@ class BlockListBlock extends Component {
 									}
 									blockWidth={ blockWidth }
 									anchorNodeRef={ this.anchorNodeRef.current }
-									isFullWidth={
-										isFullWidth && hasParents
-											? hasParentBlockAlignment
-											: isFullWidth
-									}
+									isFullWidth={ shouldBeFullWidth }
 								/>
 							) }
 						</View>

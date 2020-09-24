@@ -119,33 +119,42 @@ function ColumnsEditContainer( {
 
 	const columnWidths = getColumnWidths( innerColumns, columnCount );
 
+	// Array of column width attribute values
 	const columnWidthsValues = Object.values(
 		getColumnWidths( innerColumns, columnCount )
 	);
 
+	// The sum of column width attribute values
 	const columnWidthsSum = columnWidthsValues.reduce(
 		( acc, curr ) => acc + curr,
 		0
 	);
 
+	// Array of ratios of each column width attribute value to their sum
 	const columnRatios = columnWidthsValues.map(
 		( colWidth ) => colWidth / columnWidthsSum
 	);
 
-	const columnWidthsPerRatio = columnWidthsValues.map(
-		( columnWidth ) =>
-			( columnWidth / columnWidthsSum ) * getContainerWidth( width )
+	// Array of calculated column width for its ratio
+	const columnWidthsPerRatio = columnRatios.map(
+		( columnRatio ) => columnRatio * getContainerWidth( width )
 	);
 
+	//  Array of columns whose calculated width is lower than minimum width value
 	const filteredColumnWidthsPerRatio = columnWidthsPerRatio.filter(
 		( columnWidthPerRatio ) => columnWidthPerRatio < MIN_WIDTH
 	);
 
+	// Container width to be divided. If there are some results within `filteredColumnWidthsPerRatio`
+	// there is a need to reduce the main width by multiplying number
+	// of results in `filteredColumnWidthsPerRatio` and minimum width value
 	const baseContainerWidth =
 		width - filteredColumnWidthsPerRatio.length * MIN_WIDTH;
 
+	// The minimum percentage ratio for which column width is equal minimum width value
 	const minPercentageRatio = MIN_WIDTH / baseContainerWidth;
 
+	// The sum of column widths which ratio is higher than `minPercentageRatio`
 	const largeColumnsWidthsSum = columnRatios
 		.map( ( ratio, index ) => {
 			if ( ratio > minPercentageRatio ) {
@@ -176,12 +185,17 @@ function ColumnsEditContainer( {
 					columnCount === 1 &&
 					width > ALIGNMENT_BREAKPOINTS.medium
 				) {
+					// Exactly one column inside columns on the breakpoint higher than medium
+					// has to take a percentage of the full width
 					columnWidth = percentageRatio * containerWidth;
 				} else if ( columnsInRow > 1 ) {
 					if ( width > ALIGNMENT_BREAKPOINTS.medium ) {
 						if ( initialColumnWidth <= MIN_WIDTH ) {
+							// Column width cannot be lower than minimum 32px
 							columnWidth = MIN_WIDTH;
 						} else if ( initialColumnWidth > MIN_WIDTH ) {
+							// Column width has to be the result of multiplying the container width and
+							// the ratio of attribute and the sum of widths of columns wider than 32px
 							columnWidth = Math.floor(
 								( attributeWidth / largeColumnsWidthsSum ) *
 									containerWidth
@@ -191,6 +205,8 @@ function ColumnsEditContainer( {
 						maxColumnWidth = columnWidth;
 
 						if ( Math.round( columnWidthsSum ) < 100 ) {
+							// In case that column width attribute values does not exceed 100, each column
+							// should have attribute percentage of container width
 							const newColumnWidth =
 								percentageRatio * containerWidth;
 							if ( newColumnWidth < MIN_WIDTH ) {
@@ -199,19 +215,12 @@ function ColumnsEditContainer( {
 								columnWidth = newColumnWidth;
 							}
 						}
-
-						widths[ clientId ] = {
-							width: columnWidth,
-							maxWidth: maxColumnWidth,
-						};
 					} else if ( width < ALIGNMENT_BREAKPOINTS.medium ) {
+						// On the breakpoint lower than medium each column inside columns
+						// has to take equal part of container width
 						columnWidth = Math.floor(
 							getContainerWidth( width ) / columnsInRow
 						);
-						widths[ clientId ] = {
-							width: columnWidth,
-							maxWidth: maxColumnWidth,
-						};
 					}
 				}
 				widths[ clientId ] = {
@@ -240,15 +249,14 @@ function ColumnsEditContainer( {
 
 	const renderAppender = () => {
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
+		const isFullWidthAppender =
+			isFullWidth && ! hasParents && width > ALIGNMENT_BREAKPOINTS.mobile;
 
 		if ( isSelected ) {
 			return (
 				<View
 					style={ [
-						isFullWidth &&
-							! hasParents &&
-							width > ALIGNMENT_BREAKPOINTS.mobile &&
-							styles.fullWidthAppender,
+						isFullWidthAppender && styles.fullWidthAppender,
 						columnCount === 0 && { width },
 					] }
 				>

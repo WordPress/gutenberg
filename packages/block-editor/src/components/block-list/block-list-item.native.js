@@ -52,31 +52,29 @@ export class BlockListItem extends Component {
 			marginHorizontal,
 			parentBlockAlignment,
 			hasParents,
-			name,
-			isInnerBlockSelected,
+			blockName,
+			isColumnsDescendantSelected,
 		} = this.props;
 		const { blockWidth } = this.state;
 		const isFullWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.full;
 		const isWideWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.wide;
 		const isParentFullWidth =
 			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
-		const isColumnsRelated = name.includes( 'core/column' );
+		const isColumnsRelated = blockName.includes( 'core/column' );
 
 		if ( isFullWidth ) {
-			if (
-				! hasParents &&
-				isColumnsRelated &&
-				blockWidth < ALIGNMENT_BREAKPOINTS.mobile
-			) {
-				if ( isInnerBlockSelected ) {
-					return 0;
+			if ( ! hasParents ) {
+				if (
+					isColumnsRelated &&
+					blockWidth < ALIGNMENT_BREAKPOINTS.mobile
+				) {
+					if ( isColumnsDescendantSelected ) {
+						return 0;
+					}
+					return marginHorizontal;
+				} else if ( blockWidth > ALIGNMENT_BREAKPOINTS.medium ) {
+					return -2;
 				}
-				return marginHorizontal;
-			} else if (
-				! hasParents &&
-				blockWidth > ALIGNMENT_BREAKPOINTS.medium
-			) {
-				return -2;
 			}
 			return 0;
 		}
@@ -172,7 +170,6 @@ export default compose( [
 				__unstableGetBlockWithoutInnerBlocks,
 				getSelectedBlockClientId,
 				hasSelectedInnerBlock,
-				getBlock,
 			} = select( 'core/block-editor' );
 
 			const blockClientIds = getBlockOrder( rootClientId );
@@ -210,12 +207,22 @@ export default compose( [
 				parentBlock?.attributes || {};
 
 			const selectedBlockId = getSelectedBlockClientId();
+			const selectedBlockParents = getBlockParents(
+				selectedBlockId
+			)[ 0 ];
+			const { name: selectedBlockParentsName } =
+				__unstableGetBlockWithoutInnerBlocks( selectedBlockParents ) ||
+				{};
 
-			const isInnerBlockSelected = ! getBlock(
-				getBlockParents( selectedBlockId )[ 0 ]
-			)?.name.includes( 'core/column' )
-				? true
-				: hasSelectedInnerBlock( rootClientId );
+			const isRootInnerBlockSelected = hasSelectedInnerBlock(
+				rootClientId
+			);
+
+			const isColumnsDescendantSelected = selectedBlockParentsName?.includes(
+				'core/column'
+			)
+				? isRootInnerBlockSelected
+				: true;
 
 			return {
 				shouldShowInsertionPointBefore,
@@ -224,9 +231,8 @@ export default compose( [
 				hasParents,
 				blockAlignment: align,
 				parentBlockAlignment,
-				name,
-				selectedBlockId,
-				isInnerBlockSelected,
+				blockName: name,
+				isColumnsDescendantSelected,
 			};
 		}
 	),
