@@ -65,7 +65,7 @@ export const withToolbarControls = createHigherOrderComponent(
 			const node = document.createElement( 'style' );
 			node.innerHTML = replace(
 				attributes.css,
-				':self',
+				/:self/g,
 				`[data-block="${ clientId }"]`
 			);
 			document.body.appendChild( node );
