@@ -4,12 +4,14 @@
 import { useState } from '@wordpress/element';
 import {
 	__experimentalNavigation as Navigation,
+	__experimentalNavigationBackButton as NavigationBackButton,
 	__experimentalNavigationGroup as NavigationGroup,
 	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
 import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
 import { BlockPreview } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 
 const NavigationPanel = () => {
 	const [ showPreview, setShowPreview ] = useState( false );
@@ -17,13 +19,13 @@ const NavigationPanel = () => {
 	return (
 		<div className="edit-site-navigation-panel">
 			<Navigation>
-				<NavigationMenu title="Home">
-					<NavigationItem
-						item="item-back"
-						title="Back to dashboard"
-						href="index.php"
-					/>
+				<NavigationBackButton
+					backButtonLabel={ __( 'Dashboard' ) }
+					className="edit-site-navigation-panel__back-to-dashboard"
+					href="index.php"
+				/>
 
+				<NavigationMenu title="Home">
 					<NavigationGroup title="Example group">
 						<NavigationItem
 							item="item-preview"
