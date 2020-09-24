@@ -19,6 +19,9 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
  * by merging the keys and binding the leaf values
  * to the new keys.
  *
+ * It also transforms camelCase names into kebab-case
+ * and substitutes '/' by '-'.
+ *
  * This is thought to be useful to generate
  * CSS Custom Properties from a tree,
  * although there's nothing in the implementation
@@ -28,8 +31,8 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
  * and the token is '--', for this input tree:
  *
  * {
- *   'property': 'value',
- *   'nested-property': {
+ *   'some/property': 'value',
+ *   'nestedProperty': {
  *     'sub-property': 'value'
  *   }
  * }
@@ -37,7 +40,7 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
  * it'll return this output:
  *
  * {
- *   '--wp--property': 'value',
+ *   '--wp--some-property': 'value',
  *   '--wp--nested-property--sub-property': 'value'
  * }
  *
@@ -50,7 +53,11 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
 function gutenberg_experimental_global_styles_get_css_vars( $tree, $prefix = '', $token = '--' ) {
 	$result = array();
 	foreach ( $tree as $property => $value ) {
-		$new_key = $prefix . str_replace( '/', '-', $property );
+		$new_key = $prefix . str_replace(
+			'/',
+			'-',
+			strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $property ) ) // CamelCase to kebab-case.
+		);
 
 		if ( is_array( $value ) ) {
 			$new_prefix = $new_key . $token;
@@ -187,7 +194,63 @@ function gutenberg_experimental_global_styles_get_core() {
 	$config = gutenberg_experimental_global_styles_get_from_file(
 		__DIR__ . '/experimental-default-theme.json'
 	);
+	// Start i18n logic to remove when JSON i18 strings are extracted.
+	$default_colors_i18n = array(
+		'black'                 => __( 'Black', 'gutenberg' ),
+		'cyan-bluish-gray'      => __( 'Cyan bluish gray', 'gutenberg' ),
+		'white'                 => __( 'White', 'gutenberg' ),
+		'pale-pink'             => __( 'Pale pink', 'gutenberg' ),
+		'vivid-red'             => __( 'Vivid red', 'gutenberg' ),
+		'luminous-vivid-orange' => __( 'Luminous vivid orange', 'gutenberg' ),
+		'luminous-vivid-amber'  => __( 'Luminous vivid amber', 'gutenberg' ),
+		'light-green-cyan'      => __( 'Light green cyan', 'gutenberg' ),
+		'vivid-green-cyan'      => __( 'Vivid green cyan', 'gutenberg' ),
+		'pale-cyan-blue'        => __( 'Pale cyan blue', 'gutenberg' ),
+		'vivid-cyan-blue'       => __( 'Vivid cyan blue', 'gutenberg' ),
+		'vivid-purple'          => __( 'Vivid purple', 'gutenberg' ),
+	);
 
+	if ( ! empty( $config['global']['settings']['color']['palette'] ) ) {
+		foreach ( $config['global']['settings']['color']['palette'] as &$color ) {
+			$color['name'] = $default_colors_i18n[ $color['slug'] ];
+		}
+	}
+
+	$default_gradients_i18n = array(
+		'vivid-cyan-blue-to-vivid-purple'               => __( 'Vivid cyan blue to vivid purple', 'gutenberg' ),
+		'light-green-cyan-to-vivid-green-cyan'          => __( 'Light green cyan to vivid green cyan', 'gutenberg' ),
+		'luminous-vivid-amber-to-luminous-vivid-orange' => __( 'Luminous vivid amber to luminous vivid orange', 'gutenberg' ),
+		'luminous-vivid-orange-to-vivid-red'            => __( 'Luminous vivid orange to vivid red', 'gutenberg' ),
+		'very-light-gray-to-cyan-bluish-gray'           => __( 'Very light gray to cyan bluish gray', 'gutenberg' ),
+		'cool-to-warm-spectrum'                         => __( 'Cool to warm spectrum', 'gutenberg' ),
+		'blush-light-purple'                            => __( 'Blush light purple', 'gutenberg' ),
+		'blush-bordeaux'                                => __( 'Blush bordeaux', 'gutenberg' ),
+		'luminous-dusk'                                 => __( 'Luminous dusk', 'gutenberg' ),
+		'pale-ocean'                                    => __( 'Pale ocean', 'gutenberg' ),
+		'electric-grass'                                => __( 'Electric grass', 'gutenberg' ),
+		'midnight'                                      => __( 'Midnight', 'gutenberg' ),
+	);
+
+	if ( ! empty( $config['global']['settings']['color']['gradients'] ) ) {
+		foreach ( $config['global']['settings']['color']['gradients'] as &$gradient ) {
+			$gradient['name'] = $default_gradients_i18n[ $gradient['slug'] ];
+		}
+	}
+
+	$default_font_sizes_i18n = array(
+		'small'  => __( 'Small', 'gutenberg' ),
+		'normal' => __( 'Normal', 'gutenberg' ),
+		'medium' => __( 'Medium', 'gutenberg' ),
+		'large'  => __( 'Large', 'gutenberg' ),
+		'huge'   => __( 'Huge', 'gutenberg' ),
+	);
+
+	if ( ! empty( $config['global']['settings']['typography']['fontSizes'] ) ) {
+		foreach ( $config['global']['settings']['typography']['fontSizes'] as &$font_size ) {
+			$font_size['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
+		}
+	}
+	// End i18n logic to remove when JSON i18 strings are extracted.
 	return $config;
 }
 
@@ -196,34 +259,85 @@ function gutenberg_experimental_global_styles_get_core() {
  *
  * @return array Config that adheres to the theme.json schema.
  */
-function gutenberg_experimental_global_styles_get_theme_presets() {
-	$theme_presets = array();
+function gutenberg_experimental_global_styles_get_theme_support_settings() {
+	$theme_settings                       = array();
+	$theme_settings['global']             = array();
+	$theme_settings['global']['settings'] = array();
 
-	$theme_colors = gutenberg_experimental_get( get_theme_support( 'editor-color-palette' ), array( '0' ) );
-	foreach ( $theme_colors as $color ) {
-		$theme_presets['global']['presets']['color'][] = array(
-			'slug'  => $color['slug'],
-			'value' => $color['color'],
-		);
+	// Deprecated theme supports.
+	if ( get_theme_support( 'disable-custom-colors' ) ) {
+		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
+			$theme_settings['global']['settings']['color'] = array();
+		}
+		$theme_settings['global']['settings']['color']['custom'] = false;
+	}
+	if ( get_theme_support( 'disable-custom-gradients' ) ) {
+		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
+			$theme_settings['global']['settings']['color'] = array();
+		}
+		$theme_settings['global']['settings']['color']['customGradient'] = false;
+	}
+	if ( get_theme_support( 'disable-custom-font-sizes' ) ) {
+		if ( ! isset( $theme_settings['global']['settings']['typography'] ) ) {
+			$theme_settings['global']['settings']['typography'] = array();
+		}
+		$theme_settings['global']['settings']['typography']['customFontSize'] = false;
+	}
+	if ( get_theme_support( 'custom-line-height' ) ) {
+		if ( ! isset( $theme_settings['global']['settings']['typography'] ) ) {
+			$theme_settings['global']['settings']['typography'] = array();
+		}
+		$theme_settings['global']['settings']['typography']['customLineHeight'] = true;
+	}
+	if ( get_theme_support( 'experimental-custom-spacing' ) ) {
+		if ( ! isset( $theme_settings['global']['settings']['spacing'] ) ) {
+			$theme_settings['global']['settings']['spacing'] = array();
+		}
+		$theme_settings['global']['settings']['spacing']['custom'] = true;
+	}
+	if ( get_theme_support( 'experimental-link-color' ) ) {
+		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
+			$theme_settings['global']['settings']['color'] = array();
+		}
+		$theme_settings['global']['settings']['color']['link'] = true;
 	}
 
-	$theme_gradients = gutenberg_experimental_get( get_theme_support( 'editor-gradient-presets' ), array( '0' ) );
-	foreach ( $theme_gradients as $gradient ) {
-		$theme_presets['global']['presets']['gradient'][] = array(
-			'slug'  => $gradient['slug'],
-			'value' => $gradient['gradient'],
-		);
+	$custom_units_theme_support = get_theme_support( 'custom-units' );
+	if ( $custom_units_theme_support ) {
+		if ( ! isset( $theme_settings['global']['settings']['spacing'] ) ) {
+			$theme_settings['global']['settings']['spacing'] = array();
+		}
+		$theme_settings['global']['settings']['spacing'] ['units'] = true === $custom_units_theme_support ? array( 'px', 'em', 'rem', 'vh', 'vw' ) : $custom_units_theme_support;
 	}
 
-	$theme_font_sizes = gutenberg_experimental_get( get_theme_support( 'editor-font-sizes' ), array( '0' ) );
-	foreach ( $theme_font_sizes as $font_size ) {
-		$theme_presets['global']['presets']['font-size'][] = array(
-			'slug'  => $font_size['slug'],
-			'value' => $font_size['size'],
-		);
+	$theme_colors = get_theme_support( 'editor-color-palette' );
+	if ( ! empty( $theme_colors[0] ) ) {
+		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
+			$theme_settings['global']['settings']['color'] = array();
+		}
+		$theme_settings['global']['settings']['color']['palette'] = array();
+		$theme_settings['global']['settings']['color']['palette'] = $theme_colors[0];
 	}
 
-	return $theme_presets;
+	$theme_gradients = get_theme_support( 'editor-gradient-presets' );
+	if ( ! empty( $theme_gradients[0] ) ) {
+		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
+			$theme_settings['global']['settings']['color'] = array();
+		}
+		$theme_settings['global']['settings']['color']['gradients'] = array();
+		$theme_settings['global']['settings']['color']['gradients'] = $theme_gradients[0];
+	}
+
+	$theme_font_sizes = get_theme_support( 'editor-font-sizes' );
+	if ( ! empty( $theme_font_sizes[0] ) ) {
+		if ( ! isset( $theme_settings['global']['settings']['typography'] ) ) {
+			$theme_settings['global']['settings']['typography'] = array();
+		}
+		$theme_settings['global']['settings']['typography']['fontSizes'] = array();
+		$theme_settings['global']['settings']['typography']['fontSizes'] = $theme_font_sizes[0];
+	}
+
+	return $theme_settings;
 }
 
 /**
@@ -235,8 +349,8 @@ function gutenberg_experimental_global_styles_get_theme_presets() {
  * @return array Config that adheres to the theme.json schema.
  */
 function gutenberg_experimental_global_styles_get_theme() {
-	$theme_presets = gutenberg_experimental_global_styles_get_theme_presets();
-	$theme_config  = gutenberg_experimental_global_styles_get_from_file(
+	$theme_support_settings = gutenberg_experimental_global_styles_get_theme_support_settings();
+	$theme_config           = gutenberg_experimental_global_styles_get_from_file(
 		locate_template( 'experimental-theme.json' )
 	);
 
@@ -254,11 +368,30 @@ function gutenberg_experimental_global_styles_get_theme() {
 	 *
 	 */
 	$theme_config = gutenberg_experimental_global_styles_merge_trees(
-		$theme_presets,
+		$theme_support_settings,
 		$theme_config
 	);
 
 	return $theme_config;
+}
+
+/**
+ * Convert style property to its CSS name.
+ *
+ * @param string $style_property Style property name.
+ * @return string CSS property name.
+ */
+function gutenberg_experimental_global_styles_get_css_property( $style_property ) {
+	switch ( $style_property ) {
+		case 'backgroundColor':
+			return 'background-color';
+		case 'fontSize':
+			return 'font-size';
+		case 'lineHeight':
+			return 'line-height';
+		default:
+			return $style_property;
+	}
 }
 
 /**
@@ -268,12 +401,12 @@ function gutenberg_experimental_global_styles_get_theme() {
  */
 function gutenberg_experimental_global_styles_get_style_property() {
 	return array(
-		'line-height'              => array( 'typography', 'lineHeight' ),
-		'font-size'                => array( 'typography', 'fontSize' ),
-		'background'               => array( 'color', 'gradient' ),
-		'background-color'         => array( 'color', 'background' ),
-		'color'                    => array( 'color', 'text' ),
 		'--wp--style--color--link' => array( 'color', 'link' ),
+		'background'               => array( 'color', 'gradient' ),
+		'backgroundColor'          => array( 'color', 'background' ),
+		'color'                    => array( 'color', 'text' ),
+		'fontSize'                 => array( 'typography', 'fontSize' ),
+		'lineHeight'               => array( 'typography', 'lineHeight' ),
 	);
 }
 
@@ -285,11 +418,33 @@ function gutenberg_experimental_global_styles_get_style_property() {
 function gutenberg_experimental_global_styles_get_support_keys() {
 	return array(
 		'--wp--style--color--link' => array( '__experimentalColor', 'linkColor' ),
-		'backgroundColor'          => array( '__experimentalColor' ),
 		'background'               => array( '__experimentalColor', 'gradients' ),
+		'backgroundColor'          => array( '__experimentalColor' ),
 		'color'                    => array( '__experimentalColor' ),
 		'fontSize'                 => array( '__experimentalFontSize' ),
 		'lineHeight'               => array( '__experimentalLineHeight' ),
+	);
+}
+
+/**
+ * Returns how the presets css variables are structured on the global styles data.
+ *
+ * @return array Presets structure
+ */
+function gutenberg_experimental_global_styles_get_presets_structure() {
+	return array(
+		'color'    => array(
+			'path' => array( 'color', 'palette' ),
+			'key'  => 'color',
+		),
+		'gradient' => array(
+			'path' => array( 'color', 'gradients' ),
+			'key'  => 'gradient',
+		),
+		'fontSize' => array(
+			'path' => array( 'typography', 'fontSizes' ),
+			'key'  => 'size',
+		),
 	);
 }
 
@@ -444,25 +599,38 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 			continue;
 		}
 
-		// Extract the relevant preset info before converting them to CSS Custom Properties.
-		foreach ( array_keys( $tree[ $block_name ]['presets'] ) as $preset_category ) {
-			$flattened_values = array();
-			foreach ( $tree[ $block_name ]['presets'][ $preset_category ] as $preset_value ) {
-				$flattened_values[ $preset_value['slug'] ] = $preset_value['value'];
+		// Create the CSS Custom Properties for the presets.
+		$computed_presets  = array();
+		$presets_structure = gutenberg_experimental_global_styles_get_presets_structure();
+		foreach ( $presets_structure as $token => $preset_meta ) {
+			$block_preset = gutenberg_experimental_get( $tree[ $block_name ]['settings'], $preset_meta['path'] );
+			if ( ! empty( $block_preset ) ) {
+				$computed_presets[ $token ] = array();
+				foreach ( $block_preset as $preset_value ) {
+					$computed_presets[ $token ][ $preset_value['slug'] ] = $preset_value[ $preset_meta['key'] ];
+				}
 			}
-			$tree[ $block_name ]['presets'][ $preset_category ] = $flattened_values;
 		}
+		$token            = '--';
+		$preset_prefix    = '--wp--preset' . $token;
+		$preset_variables = gutenberg_experimental_global_styles_get_css_vars( $computed_presets, $preset_prefix, $token );
 
-		$token         = '--';
-		$prefix        = '--wp--preset' . $token;
-		$css_variables = gutenberg_experimental_global_styles_get_css_vars( $tree[ $block_name ]['presets'], $prefix, $token );
+		// Create the CSS Custom Properties that are specific to the theme.
+		$computed_theme_props = gutenberg_experimental_get( $tree[ $block_name ]['settings'], array( 'custom' ) );
+		$theme_props_prefix   = '--wp--custom' . $token;
+		$theme_variables      = gutenberg_experimental_global_styles_get_css_vars(
+			$computed_theme_props,
+			$theme_props_prefix,
+			$token
+		);
 
 		$stylesheet .= gutenberg_experimental_global_styles_resolver_styles(
 			$block_data[ $block_name ]['selector'],
 			$block_data[ $block_name ]['supports'],
 			array_merge(
 				gutenberg_experimental_global_styles_flatten_styles_tree( $tree[ $block_name ]['styles'] ),
-				$css_variables
+				$preset_variables,
+				$theme_variables
 			)
 		);
 	}
@@ -489,6 +657,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
  * @return string The corresponding CSS rule.
  */
 function gutenberg_experimental_global_styles_resolver_styles( $block_selector, $block_supports, $block_styles ) {
+	$css_property     = '';
 	$css_rule         = '';
 	$css_declarations = '';
 
@@ -497,12 +666,18 @@ function gutenberg_experimental_global_styles_resolver_styles( $block_selector, 
 		//
 		// 1) The style attributes the block has declared support for.
 		// 2) Any CSS custom property attached to the node.
-		if ( in_array( $property, $block_supports, true ) || strstr( $property, '--' ) ) {
+		if (
+			in_array( $property, $block_supports, true ) ||
+			strstr( $property, '--' )
+		) {
+			$css_property = gutenberg_experimental_global_styles_get_css_property( $property );
 
 			// Add whitespace if SCRIPT_DEBUG is defined and set to true.
-			$css_declarations .= ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG )
-				? "\t" . $property . ': ' . $value . ";\n"
-				: $property . ':' . $value . ';';
+			if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+				$css_declarations .= "\t" . $css_property . ': ' . $value . ";\n";
+			} else {
+				$css_declarations .= $css_property . ':' . $value . ';';
+			}
 		}
 	}
 
@@ -537,16 +712,11 @@ function gutenberg_experimental_global_styles_merge_trees( $core, $theme, $user 
 	$result = gutenberg_experimental_global_styles_normalize_schema( array() );
 
 	foreach ( array_keys( $core ) as $block_name ) {
-		$result[ $block_name ]['presets'] = array_merge(
-			$core[ $block_name ]['presets'],
-			$theme[ $block_name ]['presets'],
-			$user[ $block_name ]['presets']
-		);
-		foreach ( array_keys( $core[ $block_name ]['features'] ) as $subtree ) {
-			$result[ $block_name ]['features'][ $subtree ] = array_merge(
-				$core[ $block_name ]['features'][ $subtree ],
-				$theme[ $block_name ]['features'][ $subtree ],
-				$user[ $block_name ]['features'][ $subtree ]
+		foreach ( array_keys( $core[ $block_name ]['settings'] ) as $subtree ) {
+			$result[ $block_name ]['settings'][ $subtree ] = array_merge(
+				$core[ $block_name ]['settings'][ $subtree ],
+				$theme[ $block_name ]['settings'][ $subtree ],
+				$user[ $block_name ]['settings'][ $subtree ]
 			);
 		}
 		foreach ( array_keys( $core[ $block_name ]['styles'] ) as $subtree ) {
@@ -574,18 +744,11 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 			'typography' => array(),
 			'color'      => array(),
 		),
-		'features' => array(
-			'typography' => array(),
+		'settings' => array(
 			'color'      => array(),
-			'gradient'   => array(),
-			'fontSize'   => array(),
-			'lineHeight' => array(),
+			'custom'     => array(),
+			'typography' => array(),
 			'spacing'    => array(),
-		),
-		'presets'  => array(
-			'color'     => array(),
-			'font-size' => array(),
-			'gradient'  => array(),
 		),
 	);
 
@@ -640,58 +803,19 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @param array $config Config to extract values from.
  * @return array Default features config for the editor.
  */
-function gutenberg_experimental_global_styles_get_editor_features( $config ) {
-	$features = array();
+function gutenberg_experimental_global_styles_get_editor_settings( $config ) {
+	$settings = array();
 	foreach ( array_keys( $config ) as $context ) {
 		if (
-			empty( $config[ $context ]['features'] ) ||
-			! is_array( $config[ $context ]['features'] )
+			empty( $config[ $context ]['settings'] ) ||
+			! is_array( $config[ $context ]['settings'] )
 		) {
-			$features[ $context ] = array();
+			$settings[ $context ] = array();
 		} else {
-			$features[ $context ] = $config[ $context ]['features'];
+			$settings[ $context ] = $config[ $context ]['settings'];
 		}
 	}
-
-	// Deprecated theme supports.
-	if ( get_theme_support( 'disable-custom-colors' ) ) {
-		if ( ! isset( $features['global']['color'] ) ) {
-			$features['global']['color'] = array();
-		}
-		$features['global']['color']['custom'] = false;
-	}
-	if ( get_theme_support( 'disable-custom-gradients' ) ) {
-		if ( ! isset( $features['global']['gradient'] ) ) {
-			$features['global']['gradient'] = array();
-		}
-		$features['global']['gradient']['custom'] = false;
-	}
-	if ( get_theme_support( 'disable-custom-font-sizes' ) ) {
-		if ( ! isset( $features['global']['fontSize'] ) ) {
-			$features['global']['fontSize'] = array();
-		}
-		$features['global']['fontSize']['custom'] = false;
-	}
-	if ( get_theme_support( 'custom-line-height' ) ) {
-		if ( ! isset( $features['global']['lineHeight'] ) ) {
-			$features['global']['lineHeight'] = array();
-		}
-		$features['global']['lineHeight']['custom'] = true;
-	}
-	if ( get_theme_support( 'experimental-custom-spacing' ) ) {
-		if ( ! isset( $features['global']['spacing'] ) ) {
-			$features['global']['spacing'] = array();
-		}
-		$features['global']['spacing']['custom'] = true;
-	}
-	if ( get_theme_support( 'experimental-link-color' ) ) {
-		if ( ! isset( $features['global']['color'] ) ) {
-			$features['global']['color'] = array();
-		}
-		$features['global']['color']['link'] = true;
-	}
-
-	return $features;
+	return $settings;
 }
 
 /**
@@ -706,12 +830,16 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// STEP 1: ADD FEATURES
 	// These need to be added to settings always.
 	// We also need to unset the deprecated settings defined by core.
-	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_features( $merged );
+	$settings['__experimentalFeatures'] = gutenberg_experimental_global_styles_get_editor_settings( $merged );
 
+	unset( $settings['colors'] );
+	unset( $settings['gradients'] );
+	unset( $settings['fontSizes'] );
 	unset( $settings['disableCustomColors'] );
 	unset( $settings['disableCustomGradients'] );
 	unset( $settings['disableCustomFontSizes'] );
 	unset( $settings['enableCustomLineHeight'] );
+	unset( $settings['enableCustomUnits'] );
 
 	// STEP 2 - IF EDIT-SITE, ADD DATA REQUIRED FOR GLOBAL STYLES SIDEBAR
 	// The client needs some information to be able to access/update the user styles.

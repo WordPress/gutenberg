@@ -477,8 +477,6 @@ _Properties_
 
 -   _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
 -   _availableLegacyWidgets_ `Array`: Array of objects representing the legacy widgets available.
--   _colors_ `Array`: Palette colors
--   _fontSizes_ `Array`: Available font sizes
 -   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing
@@ -562,7 +560,9 @@ Undocumented declaration.
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/warning/README.md>
 
 <a name="withColorContext" href="#withColorContext">#</a> **withColorContext**
 

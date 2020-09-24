@@ -303,6 +303,7 @@ extension RNReactNativeGutenbergBridge {
         case mediaAppend
         case updateTheme
         case replaceBlock
+        case updateCapabilities
         case showNotice
     }
 

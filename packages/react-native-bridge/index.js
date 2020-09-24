@@ -88,6 +88,10 @@ export function subscribePreferredColorScheme( callback ) {
 	);
 }
 
+export function subscribeUpdateCapabilities( callback ) {
+	return gutenbergBridgeEvents.addListener( 'updateCapabilities', callback );
+}
+
 export function subscribeShowNotice( callback ) {
 	return gutenbergBridgeEvents.addListener( 'showNotice', callback );
 }

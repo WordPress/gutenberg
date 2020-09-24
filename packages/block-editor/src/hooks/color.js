@@ -8,9 +8,8 @@ import { isObject } from 'lodash';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { hasBlockSupport, getBlockSupport } from '@wordpress/blocks';
+import { getBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import { useRef, useEffect, Platform } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
@@ -32,9 +31,21 @@ import ColorPanel from './color-panel';
 import useEditorFeature from '../components/use-editor-feature';
 
 export const COLOR_SUPPORT_KEY = '__experimentalColor';
+const EMPTY_ARRAY = [];
 
-const hasColorSupport = ( blockType ) =>
-	Platform.OS === 'web' && hasBlockSupport( blockType, COLOR_SUPPORT_KEY );
+const hasColorSupport = ( blockType ) => {
+	if ( Platform.OS !== 'web' ) {
+		return false;
+	}
+	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+	return (
+		colorSupport &&
+		( colorSupport.linkColor === true ||
+			colorSupport.gradient === true ||
+			colorSupport.background !== false ||
+			colorSupport.text !== false )
+	);
+};
 
 const hasLinkColorSupport = ( blockType ) => {
 	if ( Platform.OS !== 'web' ) {
@@ -54,6 +65,26 @@ const hasGradientSupport = ( blockType ) => {
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
 	return isObject( colorSupport ) && !! colorSupport.gradients;
+};
+
+const hasBackgroundColorSupport = ( blockType ) => {
+	if ( Platform.OS !== 'web' ) {
+		return false;
+	}
+
+	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+
+	return colorSupport && colorSupport.background !== false;
+};
+
+const hasTextColorSupport = ( blockType ) => {
+	if ( Platform.OS !== 'web' ) {
+		return false;
+	}
+
+	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
+
+	return colorSupport && colorSupport.text !== false;
 };
 
 /**
@@ -183,9 +214,8 @@ const getLinkColorFromAttributeValue = ( colors, value ) => {
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
 	const isLinkColorEnabled = useEditorFeature( 'color.link' );
-	const { colors, gradients } = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings();
-	}, [] );
+	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
+	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
@@ -200,6 +230,7 @@ export function ColorEdit( props ) {
 		return null;
 	}
 
+	const hasBackground = hasBackgroundColorSupport( blockName );
 	const hasGradient = hasGradientSupport( blockName );
 
 	const { style, textColor, backgroundColor, gradient } = attributes;
@@ -292,28 +323,38 @@ export function ColorEdit( props ) {
 			}
 			clientId={ props.clientId }
 			settings={ [
-				{
-					label: __( 'Text Color' ),
-					onColorChange: onChangeColor( 'text' ),
-					colorValue: getColorObjectByAttributeValues(
-						colors,
-						textColor,
-						style?.color?.text
-					).color,
-				},
-				{
-					label: __( 'Background Color' ),
-					onColorChange: onChangeColor( 'background' ),
-					colorValue: getColorObjectByAttributeValues(
-						colors,
-						backgroundColor,
-						style?.color?.background
-					).color,
-					gradientValue,
-					onGradientChange: hasGradient
-						? onChangeGradient
-						: undefined,
-				},
+				...( hasTextColorSupport( blockName )
+					? [
+							{
+								label: __( 'Text Color' ),
+								onColorChange: onChangeColor( 'text' ),
+								colorValue: getColorObjectByAttributeValues(
+									colors,
+									textColor,
+									style?.color?.text
+								).color,
+							},
+					  ]
+					: [] ),
+				...( hasBackground || hasGradient
+					? [
+							{
+								label: __( 'Background Color' ),
+								onColorChange: hasBackground
+									? onChangeColor( 'background' )
+									: undefined,
+								colorValue: getColorObjectByAttributeValues(
+									colors,
+									backgroundColor,
+									style?.color?.background
+								).color,
+								gradientValue,
+								onGradientChange: hasGradient
+									? onChangeGradient
+									: undefined,
+							},
+					  ]
+					: [] ),
 				...( isLinkColorEnabled && hasLinkColorSupport( blockName )
 					? [
 							{
@@ -344,10 +385,7 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const colors = useSelect( ( select ) => {
-			return select( 'core/block-editor' ).getSettings().colors;
-		}, [] );
-
+		const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 		if ( ! hasColorSupport( name ) ) {
 			return <BlockListBlock { ...props } />;
 		}

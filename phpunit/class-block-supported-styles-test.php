@@ -881,6 +881,20 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Ensure that HTML is correctly extracted with multibyte contents.
+	 */
+	public function test_render_block_mb_html() {
+		$this->register_block_type(
+			'core/example',
+			array( 'render_callback' => true )
+		);
+
+		$result = do_blocks( '<!-- wp:core/example --><ul><li>🙂</li><li>😕</li><li>😵</li><li>😎</li></ul><!-- /wp:core/example -->' );
+
+		$this->assertEquals( '<ul class="wp-block-example"><li>🙂</li><li>😕</li><li>😵</li><li>😎</li></ul>', $result );
+	}
+
+	/**
 	 * Should not error when the rendered block is text only.
 	 */
 	public function test_render_block_rendered_text_node() {
