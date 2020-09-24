@@ -296,7 +296,7 @@ class GalleryImage extends Component {
 						}
 						unstableOnFocus={ this.onSelectCaption }
 						inlineToolbar
-						id={ 'caption' + id }
+						id={ 'caption-' + id }
 					/>
 				) }
 			</figure>
