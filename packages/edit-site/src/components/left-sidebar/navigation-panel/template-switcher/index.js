@@ -9,7 +9,7 @@ import {
 	__experimentalNavigationGroup as NavigationGroup,
 	__experimentalNavigationItem as NavigationItem,
 } from '@wordpress/components';
-import { Icon, home, plus, undo, check } from '@wordpress/icons';
+import { Icon, home, plus, undo } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -64,8 +64,6 @@ function NavigationItemWithIcon( { icon, title, ...props } ) {
 export default function TemplateSwitcher( {
 	page,
 	activeId,
-	activeTemplatePartId,
-	isTemplatePart,
 	onActiveIdChange,
 	onActiveTemplatePartIdChange,
 	onAddTemplate,
@@ -175,25 +173,26 @@ export default function TemplateSwitcher( {
 			</NavigationGroup>
 
 			<NavigationGroup title={ __( 'Template Parts' ) }>
-				{ templatePartItems?.map( ( templatePart ) => (
-					<NavigationItemWithIcon
-						icon={
-							isTemplatePart &&
-							activeTemplatePartId === templatePart.value
-								? check
-								: null
-						}
-						key={ `template-part-${ templatePart.value }` }
-						title={ templatePart.label }
-						onClick={ () =>
-							onActiveTemplatePartIdChange( templatePart.value )
-						}
-						onMouseEnter={ () =>
-							onHoverTemplatePart( templatePart.value )
-						}
-						onMouseLeave={ () => onHoverTemplatePart( null ) }
-					/>
-				) ) }
+				{ templatePartItems?.map( ( templatePart ) => {
+					const key = `template-part-${ templatePart.value }`;
+
+					return (
+						<NavigationItemWithIcon
+							key={ key }
+							item={ key }
+							title={ templatePart.label }
+							onClick={ () =>
+								onActiveTemplatePartIdChange(
+									templatePart.value
+								)
+							}
+							onMouseEnter={ () =>
+								onHoverTemplatePart( templatePart.value )
+							}
+							onMouseLeave={ () => onHoverTemplatePart( null ) }
+						/>
+					);
+				} ) }
 			</NavigationGroup>
 
 			<NavigationGroup title={ __( 'Current theme' ) }>
