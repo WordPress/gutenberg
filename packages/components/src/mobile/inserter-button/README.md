@@ -1,7 +1,7 @@
 InserterButton
 =============================
 
-InserterButton is a typo of button component. 
+InserterButton is a type of button component. 
 
 ## Usage
 
