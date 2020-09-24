@@ -160,7 +160,7 @@ export class MediaUpload extends React.Component {
 	}
 
 	render() {
-		const { allowedTypes = [], isReplacingMedia } = this.props;
+		const { allowedTypes = [], isReplacingMedia, multiple } = this.props;
 		const isOneType = allowedTypes.length === 1;
 		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
 		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
@@ -174,7 +174,9 @@ export class MediaUpload extends React.Component {
 			if ( isReplacingMedia ) {
 				pickerTitle = __( 'Replace image' );
 			} else {
-				pickerTitle = __( 'Choose image' );
+				pickerTitle = multiple
+					? __( 'Choose images' )
+					: __( 'Choose image' );
 			}
 		} else if ( isVideo ) {
 			if ( isReplacingMedia ) {
