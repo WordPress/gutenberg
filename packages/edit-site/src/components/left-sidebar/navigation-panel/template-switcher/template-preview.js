@@ -13,7 +13,8 @@ export default function TemplatePreview( { item } ) {
 				'postType',
 				item.type === 'template' ? 'wp_template' : 'wp_template_part',
 				item.id
-			)[ item ]
+			),
+		[ item ]
 	);
 
 	const blocks = useMemo(
