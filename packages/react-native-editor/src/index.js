@@ -10,10 +10,14 @@ import './globals';
 import { getTranslation } from '../i18n-cache';
 import initialHtml from './initial-html';
 import setupApiFetch from './api-fetch-setup';
+
+/**
+ * WordPress dependencies
+ */
 import {
 	validateThemeColors,
 	validateThemeGradients,
-} from '../../block-editor/src/utils/theme';
+} from '@wordpress/block-editor';
 
 const reactNativeSetup = () => {
 	// Disable warnings as they disrupt the user experience in dev mode
