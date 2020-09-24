@@ -30,7 +30,7 @@ class LegacyWidgetEditDomManager extends Component {
 	shouldComponentUpdate( nextProps ) {
 		let shouldTriggerWidgetUpdateEvent = false;
 		// We can not leverage react render otherwise we would destroy dom changes applied by the plugins.
-		// We manually update the required dom node replicating what the widget screen and the customizer do.
+		// We manually update the required dom node replicating what the widget screen do.
 		if (
 			nextProps.idBase !== this.props.idBase &&
 			this.idBaseInputRef.current

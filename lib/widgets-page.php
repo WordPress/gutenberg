@@ -10,19 +10,13 @@
  *
  * @since 5.2.0
  *
- * @param string $page The page name the function is being called for, `'gutenberg_customizer'` for the Customizer.
+ * @param string $page The page name the function is being called for.
  */
 function the_gutenberg_widgets( $page = 'appearance_page_gutenberg-widgets' ) {
 	?>
 	<div
 		id="widgets-editor"
-		class="blocks-widgets-container
-		<?php
-		echo 'gutenberg_customizer' === $page
-			? ' is-in-customizer'
-			: '';
-		?>
-		"
+		class="blocks-widgets-container"
 	>
 	</div>
 	<?php
@@ -45,13 +39,11 @@ function gutenberg_widgets_init( $hook ) {
 		);
 		return;
 	}
-	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets', 'gutenberg_customizer' ), true ) ) {
+	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets', ), true ) ) {
 		return;
 	}
 
-	$initializer_name = 'appearance_page_gutenberg-widgets' === $hook
-		? 'initialize'
-		: 'customizerInitialize';
+	$initializer_name = 'initialize';
 
 	// Media settings.
 	$max_upload_size = wp_max_upload_size();
