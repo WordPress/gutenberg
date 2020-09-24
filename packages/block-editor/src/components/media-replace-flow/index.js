@@ -121,6 +121,7 @@ const MediaReplaceFlow = ( {
 					<ToolbarButton
 						ref={ editMediaButtonRef }
 						aria-expanded={ isOpen }
+						aria-haspopup="true"
 						onClick={ onToggle }
 						onKeyDown={ openOnArrowDown }
 					>
