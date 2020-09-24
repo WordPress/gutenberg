@@ -42,6 +42,7 @@ class Editor extends Component {
 		settings,
 		hasFixedToolbar,
 		focusMode,
+		hasReducedUI,
 		hesThemeStyles,
 		hiddenBlockTypes,
 		blockTypes,
@@ -61,6 +62,7 @@ class Editor extends Component {
 			},
 			hasFixedToolbar,
 			focusMode,
+			hasReducedUI,
 			__experimentalLocalAutosaveInterval,
 
 			// This is marked as experimental to give time for the quick inserter to mature.
@@ -95,6 +97,7 @@ class Editor extends Component {
 			settings,
 			hasFixedToolbar,
 			focusMode,
+			hasReducedUI,
 			hesThemeStyles,
 			post,
 			postId,
@@ -118,6 +121,7 @@ class Editor extends Component {
 			settings,
 			hasFixedToolbar,
 			focusMode,
+			hasReducedUI,
 			hesThemeStyles,
 			hiddenBlockTypes,
 			blockTypes,
@@ -172,6 +176,7 @@ export default compose( [
 				isFeatureActive( 'fixedToolbar' ) ||
 				__experimentalGetPreviewDeviceType() !== 'Desktop',
 			focusMode: isFeatureActive( 'focusMode' ),
+			hasReducedUI: isFeatureActive( 'reducedUI' ),
 			hesThemeStyles: isFeatureActive( 'themeStyles' ),
 			post: getEntityRecord( 'postType', postType, postId ),
 			preferredStyleVariations: getPreference(
