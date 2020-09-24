@@ -5,13 +5,13 @@
 	box-sizing: border-box;
 	position: relative;
 
-	.edit-site-header_start,
-	.edit-site-header_end {
+	.edit-site-header_toolbar-container,
+	.edit-site-header_actions-container {
 		flex: 1;
 		display: flex;
 	}
 
-	.edit-site-header_center {
+	.edit-site-header_document-actions-container {
 		display: flex;
 		height: 100%;
 		left: 50%;
@@ -20,7 +20,7 @@
 		position: absolute;
 	}
 
-	.edit-site-header_end {
+	.edit-site-header_actions-container {
 		justify-content: flex-end;
 	}
 }
@@ -28,7 +28,7 @@
 .navigation-open {
 	position: initial;
 
-	.edit-site-header_center {
+	.edit-site-header_document-actions-container {
 		left: auto;
 		top: auto;
 		transform: none;

@@ -96,7 +96,7 @@ export default function Header( {
 					onClick={ onToggleNavigation }
 				/>
 			</MainDashboardButton.Slot>
-			<div className="edit-site-header_start">
+			<div className="edit-site-header_toolbar-container">
 				<div className="edit-site-header__toolbar">
 					<Button
 						isPrimary
@@ -128,11 +128,11 @@ export default function Header( {
 				</div>
 			</div>
 
-			<div className="edit-site-header_center">
+			<div className="edit-site-header_document-actions-container">
 				<DocumentActions documentTitle={ template?.slug } />
 			</div>
 
-			<div className="edit-site-header_end">
+			<div className="edit-site-header_actions-container">
 				<div className="edit-site-header__actions">
 					<PreviewOptions
 						deviceType={ deviceType }
