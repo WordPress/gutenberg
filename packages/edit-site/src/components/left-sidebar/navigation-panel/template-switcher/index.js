@@ -177,7 +177,7 @@ export default function TemplateSwitcher( {
 					const key = `template-part-${ templatePart.value }`;
 
 					return (
-						<NavigationItemWithIcon
+						<NavigationItem
 							key={ key }
 							item={ key }
 							title={ templatePart.label }
