@@ -67,10 +67,3 @@ index 40c0cda..646f137 100644
    }
    return ancestor == shadowView;
  }
-diff --git a/node_modules/react-native/scripts/.packager.env b/node_modules/react-native/scripts/.packager.env
-new file mode 100644
-index 0000000..361f5fb
---- /dev/null
-+++ b/node_modules/react-native/scripts/.packager.env
-@@ -0,0 +1 @@
-+export RCT_METRO_PORT=8081
