@@ -103,7 +103,7 @@ export default ( blockData, baseTree, userTree ) => {
 	const flattenTree = ( input, prefix, token ) => {
 		let result = [];
 		Object.keys( input ).forEach( ( key ) => {
-			const newKey = prefix + key.replace( '/', '-' );
+			const newKey = prefix + kebabCase( key.replace( '/', '-' ) );
 			const newLeaf = input[ key ];
 
 			if ( newLeaf instanceof Object ) {
