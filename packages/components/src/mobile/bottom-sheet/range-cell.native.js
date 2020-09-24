@@ -23,6 +23,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  * Internal dependencies
  */
 import Cell from './cell';
+import { toFixed, removeNonDigit } from '../utils';
 import styles from './range-cell.scss';
 import borderStyles from './borderStyles.scss';
 
@@ -60,12 +61,6 @@ class BottomSheetRangeCell extends Component {
 		AppState.removeEventListener( 'change', this.handleChangePixelRatio );
 	}
 
-	toFixed( num ) {
-		const { toFixed = 0 } = this.props;
-		const fixed = Math.pow( 10, toFixed );
-		return Math.floor( num * fixed ) / fixed;
-	}
-
 	getFontScale() {
 		return PixelRatio.getFontScale() < 1 ? 1 : PixelRatio.getFontScale();
 	}
@@ -90,7 +85,7 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	validateInput( text ) {
-		const { minimumValue, maximumValue } = this.props;
+		const { minimumValue, maximumValue, decimalNum } = this.props;
 		if ( ! text ) {
 			return minimumValue;
 		}
@@ -98,16 +93,9 @@ class BottomSheetRangeCell extends Component {
 			return Math.min( Math.max( text, minimumValue ), maximumValue );
 		}
 		return Math.min(
-			Math.max( this.removeNonDigit( text ), minimumValue ),
+			Math.max( removeNonDigit( text, decimalNum ), minimumValue ),
 			maximumValue
 		);
-	}
-
-	removeNonDigit( text ) {
-		const { toFixed } = this.props;
-		const regex = toFixed > 0 ? /^(\d+\.?(\d+)?)/ : /^([\d]+)/;
-		const result = text.match( regex );
-		return result ? result[ 0 ] : '';
 	}
 
 	updateValue( value ) {
@@ -119,15 +107,17 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	onChangeValue( initialValue ) {
-		initialValue = this.toFixed( initialValue );
+		const { decimalNum } = this.props;
+		initialValue = toFixed( initialValue, decimalNum );
 		this.setState( { inputValue: initialValue } );
 		this.updateValue( initialValue );
 	}
 
 	onChangeText( textValue ) {
-		const inputValue = this.removeNonDigit( textValue );
+		const { decimalNum } = this.props;
+		const inputValue = removeNonDigit( textValue, decimalNum );
 		textValue = inputValue.replace( ',', '.' );
-		textValue = this.toFixed( textValue );
+		textValue = toFixed( textValue, decimalNum );
 		const value = this.validateInput( textValue );
 		this.setState( {
 			inputValue,
@@ -145,8 +135,9 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	onSubmitEditing( { nativeEvent: { text } } ) {
+		const { decimalNum } = this.props;
 		if ( ! isNaN( Number( text ) ) ) {
-			text = this.toFixed( text.replace( ',', '.' ) );
+			text = toFixed( text.replace( ',', '.' ), decimalNum );
 			const validValue = this.validateInput( text );
 
 			if ( this.state.inputValue !== validValue ) {
