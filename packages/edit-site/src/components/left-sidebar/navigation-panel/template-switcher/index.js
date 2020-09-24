@@ -69,18 +69,14 @@ export default function TemplateSwitcher( {
 	onAddTemplate,
 	onRemoveTemplate,
 } ) {
-	const [ hoveredTemplate, setHoveredTemplate ] = useState();
+	const [ hoveredTemplatePartId, setHoveredTemplatePartId ] = useState();
 	const [ themePreviewVisible, setThemePreviewVisible ] = useState( false );
 
-	const onHoverTemplatePart = ( id ) => {
-		setHoveredTemplate( { id, type: 'template-part' } );
-	};
-	const onMouseEnterTheme = () => {
-		setThemePreviewVisible( () => true );
-	};
-	const onMouseLeaveTheme = () => {
-		setThemePreviewVisible( () => false );
-	};
+	const onMouseEnterTemplatePart = ( id ) => setHoveredTemplatePartId( id );
+	const onMouseLeaveTemplatePart = () => setHoveredTemplatePartId( null );
+
+	const onMouseEnterTheme = () => setThemePreviewVisible( true );
+	const onMouseLeaveTheme = () => setThemePreviewVisible( false );
 
 	const { currentTheme, template, templateParts, homeId } = useSelect(
 		( select ) => {
@@ -187,9 +183,9 @@ export default function TemplateSwitcher( {
 								)
 							}
 							onMouseEnter={ () =>
-								onHoverTemplatePart( templatePart.value )
+								onMouseEnterTemplatePart( templatePart.value )
 							}
-							onMouseLeave={ () => onHoverTemplatePart( null ) }
+							onMouseLeave={ onMouseLeaveTemplatePart }
 						/>
 					);
 				} ) }
@@ -203,8 +199,8 @@ export default function TemplateSwitcher( {
 				/>
 			</NavigationGroup>
 
-			{ !! hoveredTemplate?.id && (
-				<TemplatePreview item={ hoveredTemplate } />
+			{ hoveredTemplatePartId && (
+				<TemplatePreview entityId={ hoveredTemplatePartId } />
 			) }
 
 			{ themePreviewVisible && <ThemePreview theme={ currentTheme } /> }
