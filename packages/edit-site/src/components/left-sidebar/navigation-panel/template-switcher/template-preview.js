@@ -15,6 +15,7 @@ export default function TemplatePreview( { item } ) {
 				item.id
 			)[ item ]
 	);
+
 	const blocks = useMemo(
 		() => ( template ? parse( template?.content?.raw || '' ) : [] ),
 		[ template ]
