@@ -29,9 +29,9 @@ class WpEmbedPreview extends Component {
 	}
 
 	/**
-	 * Checks for WordPress embed event signaling the height
-	 * change when iframe content loads or iframe's window is resized.
-	 * The event is send from WordPress core with window.postMessage function.
+	 * Checks for WordPress embed events signaling the height change when iframe
+	 * content loads or iframe's window is resized.  The event is sent from
+	 * WordPress core via the window.postMessage API.
 	 *
 	 * References:
 	 * window.postMessage: https://developer.mozilla.org/en-US/docs/Web/API/Window/postMessage
