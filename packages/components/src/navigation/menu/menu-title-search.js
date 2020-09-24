@@ -9,6 +9,7 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Button from '../../button';
+import VisuallyHidden from '../../visually-hidden';
 import { useNavigationMenuContext } from './context';
 import { MenuTitleSearchUI } from '../styles/navigation-styles';
 
@@ -38,6 +39,7 @@ export default function MenuTitleSearch( {
 		closeSearch();
 	};
 
+	const inputId = `components-navigation__menu-title-search-${ menu }`;
 	/* translators: placeholder for sidebar search box. %s: menu title */
 	const placeholder = sprintf( __( 'Search in %s' ), title );
 
@@ -45,10 +47,14 @@ export default function MenuTitleSearch( {
 		<MenuTitleSearchUI className="components-navigation__menu-title-search">
 			<Icon icon={ searchIcon } />
 
+			<VisuallyHidden as="label" htmlFor={ inputId }>
+				{ placeholder }
+			</VisuallyHidden>
+
 			<input
 				autoComplete="off"
 				className="components-text-control__input"
-				id={ `components-navigation__menu-title-search-${ menu }` }
+				id={ inputId }
 				onChange={ ( event ) => onSearch( event.target.value ) }
 				placeholder={ placeholder }
 				ref={ inputRef }
