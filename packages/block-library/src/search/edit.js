@@ -240,7 +240,6 @@ export default function SearchEdit( {
 				} }
 				className={ wrapperClasses }
 				style={ wrapperStyles }
-				isResetValueOnUnitChange
 				minWidth={ MIN_WIDTH }
 				enable={ getResizableSides() }
 				onResizeStart={ ( event, direction, elt ) => {
