@@ -44,6 +44,7 @@
 	position: absolute;
 	top: $grid-unit-15;
 	left: calc(100% + #{$grid-unit-15});
+	color: $gray-900;
 
 	@include break-medium {
 		display: block;
