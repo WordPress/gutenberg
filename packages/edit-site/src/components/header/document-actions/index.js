@@ -47,48 +47,49 @@ function useSecondaryText() {
 		};
 	} );
 
-	// Go through hovered blocks and see if one is of interest.
-	const hoveredTemplatePartBlockId = hoveredBlockIds.find(
-		( blockId ) => getBlockName( blockId ) === 'core/template-part'
-	);
-	if ( hoveredTemplatePartBlockId ) {
-		return {
-			label: getBlockDisplayText(
-				getBlock( hoveredTemplatePartBlockId )
-			),
-			isActive: true,
-		};
-	}
-
 	// Check if current block is a template part:
-	const selectedBlockLabel =
+	let selectedBlockLabel =
 		selectedBlock?.name === 'core/template-part'
 			? getBlockDisplayText( selectedBlock )
 			: null;
 
-	if ( selectedBlockLabel ) {
+	// Check if an ancestor of the current block is a template part:
+	if ( ! selectedBlockLabel ) {
+		const templatePartParents = !! selectedBlock
+			? getBlockParentsByBlockName(
+					selectedBlock?.clientId,
+					'core/template-part'
+			  )
+			: [];
+
+		if ( templatePartParents.length ) {
+			// templatePartParents is in order from top to bottom, so the closest
+			// parent is at the end.
+			const closestParent = getBlockWithoutInnerBlocks(
+				last( templatePartParents )
+			);
+			selectedBlockLabel = getBlockDisplayText( closestParent );
+		}
+	}
+
+	// Go through hovered blocks and see if one is of interest.
+	const hoveredTemplatePartBlockId = hoveredBlockIds.find(
+		( blockId ) => getBlockName( blockId ) === 'core/template-part'
+	);
+
+	if ( hoveredTemplatePartBlockId ) {
+		const hoveredBlockLabel = getBlockDisplayText(
+			getBlock( hoveredTemplatePartBlockId )
+		);
 		return {
-			label: selectedBlockLabel,
-			isActive: true,
+			label: hoveredBlockLabel,
+			isActive: hoveredBlockLabel === selectedBlockLabel,
 		};
 	}
 
-	// Check if an ancestor of the current block is a template part:
-	const templatePartParents = !! selectedBlock
-		? getBlockParentsByBlockName(
-				selectedBlock?.clientId,
-				'core/template-part'
-		  )
-		: [];
-
-	if ( templatePartParents.length ) {
-		// templatePartParents is in order from top to bottom, so the closest
-		// parent is at the end.
-		const closestParent = getBlockWithoutInnerBlocks(
-			last( templatePartParents )
-		);
+	if ( selectedBlockLabel ) {
 		return {
-			label: getBlockDisplayText( closestParent ),
+			label: selectedBlockLabel,
 			isActive: true,
 		};
 	}
