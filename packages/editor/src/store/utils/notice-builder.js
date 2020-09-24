@@ -31,18 +31,11 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 	const publishStatus = [ 'publish', 'private', 'future' ];
 	const isPublished = includes( publishStatus, previousPost.status );
 	const willPublish = includes( publishStatus, post.status );
-	const isTrashed = post.status === 'trash';
 
 	let noticeMessage;
 	let shouldShowLink = get( postType, [ 'viewable' ], false );
 
-	// Since there is not a label for a post_type `trash` action,
-	// we add the message manually.
-	// Reference: https://developer.wordpress.org/reference/functions/get_post_type_labels/
-	if ( isTrashed ) {
-		noticeMessage = `${ postType.labels.singular_name } trashed.`;
-		shouldShowLink = false;
-	} else if ( ! isPublished && ! willPublish ) {
+	if ( ! isPublished && ! willPublish ) {
 		// If saving a non-published post, don't show notice.
 		noticeMessage = null;
 	} else if ( isPublished && ! willPublish ) {
