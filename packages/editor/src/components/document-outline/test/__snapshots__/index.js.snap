@@ -11,7 +11,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       key="0"
       level="H2"
     >
-      Heading parent
+      Heading 2
     </TableOfContentsItem>
     <TableOfContentsItem
       href="#block-clientId_1"
@@ -19,7 +19,7 @@ exports[`DocumentOutline header blocks present should match snapshot 1`] = `
       key="1"
       level="H3"
     >
-      Heading child
+      Heading 3
     </TableOfContentsItem>
   </ul>
 </div>
