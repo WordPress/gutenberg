@@ -17,7 +17,7 @@ import {
 import { getBlockType } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { _n } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -44,9 +44,6 @@ function BlockMover( {
 		return null;
 	}
 
-	const label =
-		clientIds.length === 1 ? __( 'Drag Block' ) : __( 'Drag Blocks' );
-
 	// We emulate a disabled state because forcefully applying the `disabled`
 	// attribute on the buttons while it has focus causes the screen to change
 	// to an unfocused state (body as active element) without firing blur on,
@@ -68,7 +65,11 @@ function BlockMover( {
 							icon={ dragHandle }
 							className="block-editor-block-mover__drag-handle"
 							aria-hidden="true"
-							label={ label }
+							label={ _n(
+								'Drag block',
+								'Drag blocks',
+								clientIds.length
+							) }
 							// Should not be able to tab to drag handle as this
 							// button can only be used with a pointer device.
 							tabIndex="-1"
