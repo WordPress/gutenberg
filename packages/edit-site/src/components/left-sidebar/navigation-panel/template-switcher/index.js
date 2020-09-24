@@ -23,36 +23,37 @@ const TEMPLATE_OVERRIDES = {
 	post: ( slug ) => `single-post-${ slug }`,
 };
 
-function TemplateLabel( { template, homeId } ) {
-	return (
-		<>
-			{ template.slug }
-			{ template.id === homeId && (
-				<Tooltip text={ __( 'Home' ) }>
-					<div className="edit-site-template-switcher__label-home-icon">
-						<Icon icon={ home } />
-					</div>
-				</Tooltip>
-			) }
-			{ template.status !== 'auto-draft' && (
-				<Tooltip text={ __( 'Customized' ) }>
-					<span className="edit-site-template-switcher__label-customized-dot" />
-				</Tooltip>
-			) }
-		</>
-	);
-}
+function TemplateNavigationItemWithIcon( {
+	icon,
+	iconLabel,
+	homeId,
+	template,
+	title,
+	...props
+} ) {
+	if ( ! icon && ! iconLabel && template ) {
+		if ( template.id === homeId ) {
+			icon = home;
+			iconLabel = __( 'Home' );
+		} else if ( template.status !== 'auto-draft' ) {
+			icon = (
+				<span className="edit-site-template-switcher__label-customized-dot" />
+			);
+			iconLabel = __( 'Customized' );
+		}
+	}
 
-function NavigationItemWithIcon( { icon, title, ...props } ) {
 	return (
 		<NavigationItem
 			title={
 				<>
 					{ title }
 					{ icon && (
-						<div className="edit-site-template-switcher__label-home-icon">
-							<Icon icon={ icon } />
-						</div>
+						<Tooltip text={ iconLabel || title }>
+							<div className="edit-site-template-switcher__label-home-icon">
+								<Icon icon={ icon } />
+							</div>
+						</Tooltip>
 					) }
 				</>
 			}
@@ -109,17 +110,6 @@ export default function TemplateSwitcher( {
 		[ activeId ]
 	);
 
-	const templateItem = {
-		label: template ? (
-			<TemplateLabel template={ template } homeId={ homeId } />
-		) : (
-			__( 'Loading…' )
-		),
-		value: activeId,
-		slug: template ? template.slug : __( 'Loading…' ),
-		content: template?.content,
-	};
-
 	const overwriteSlug =
 		page &&
 		TEMPLATE_OVERRIDES[ page.type ] &&
@@ -131,7 +121,7 @@ export default function TemplateSwitcher( {
 			slug: overwriteSlug,
 			title: overwriteSlug,
 			status: 'publish',
-			content: templateItem.content.raw,
+			content: template.content.raw,
 		} );
 	const revertToParent = () => {
 		onRemoveTemplate( activeId );
@@ -140,21 +130,25 @@ export default function TemplateSwitcher( {
 	return (
 		<>
 			<NavigationGroup title={ __( 'Template' ) }>
-				<NavigationItem
+				<TemplateNavigationItemWithIcon
+					template={ template }
+					title={ template?.slug || __( 'Loading…' ) }
+					homeId={ homeId }
 					onClick={ () => onActiveIdChange( activeId ) }
-					title={ templateItem.label }
 				/>
 
-				{ overwriteSlug && overwriteSlug !== templateItem.slug && (
-					<NavigationItemWithIcon
-						icon={ plus }
-						onClick={ overwriteTemplate }
-						title={ __( 'Overwrite Template' ) }
-					/>
-				) }
+				{ overwriteSlug &&
+					template &&
+					overwriteSlug !== template.slug && (
+						<TemplateNavigationItemWithIcon
+							icon={ plus }
+							onClick={ overwriteTemplate }
+							title={ __( 'Overwrite Template' ) }
+						/>
+					) }
 
-				{ overwriteSlug === templateItem.slug && (
-					<NavigationItemWithIcon
+				{ template && overwriteSlug === template.slug && (
+					<TemplateNavigationItemWithIcon
 						icon={ undo }
 						onClick={ revertToParent }
 						title={ __( 'Revert to Parent' ) }
@@ -167,12 +161,11 @@ export default function TemplateSwitcher( {
 					const key = `template-part-${ templatePart.id }`;
 
 					return (
-						<NavigationItem
+						<TemplateNavigationItemWithIcon
 							key={ key }
 							item={ key }
-							title={
-								<TemplateLabel template={ templatePart } />
-							}
+							title={ templatePart.slug }
+							template={ templatePart }
 							onClick={ () =>
 								onActiveTemplatePartIdChange( templatePart.id )
 							}
