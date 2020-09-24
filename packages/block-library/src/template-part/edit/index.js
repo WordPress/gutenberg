@@ -7,7 +7,12 @@ import {
 	BlockControls,
 	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
-import { Dropdown, ToolbarGroup, ToolbarButton } from '@wordpress/components';
+import {
+	Dropdown,
+	ToolbarGroup,
+	ToolbarButton,
+	Spinner,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 
@@ -117,7 +122,7 @@ export default function TemplatePartEdit( {
 					hasInnerBlocks={ innerBlocks.length > 0 }
 				/>
 			) }
-			{ isUnresolvedTemplateFile && __( 'Loading…' ) }
+			{ isUnresolvedTemplateFile && <Spinner /> }
 		</TagName>
 	);
 }
