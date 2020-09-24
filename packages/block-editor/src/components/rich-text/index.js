@@ -146,6 +146,9 @@ function RichTextWrapper(
 		fontStyle,
 		minWidth,
 		maxWidth,
+		onBlur,
+		setRef,
+		id,
 		...props
 	},
 	forwardedRef
@@ -607,6 +610,9 @@ function RichTextWrapper(
 			fontStyle={ fontStyle }
 			minWidth={ minWidth }
 			maxWidth={ maxWidth }
+			onBlur={ onBlur }
+			setRef={ setRef }
+			id={ id }
 		>
 			{ ( {
 				isSelected: nestedIsSelected,
