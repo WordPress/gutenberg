@@ -8,46 +8,52 @@ import { useState } from '@wordpress/element';
  */
 import ComboboxControl from '../';
 
-export default { title: 'ComboboxControl', component: ComboboxControl };
+export default {
+	title: 'Components/ComboboxControl',
+	component: ComboboxControl,
+};
 
 const options = [
 	{
-		key: 'small',
-		name: 'Small',
-		style: { fontSize: '50%' },
+		value: 'small',
+		label: 'Small',
 	},
 	{
-		key: 'normal',
-		name: 'Normal',
-		style: { fontSize: '100%' },
+		value: 'normal',
+		label: 'Normal',
 	},
 	{
-		key: 'large',
-		name: 'Large',
-		style: { fontSize: '200%' },
+		value: 'large',
+		label: 'Large',
 	},
 	{
-		key: 'huge',
-		name: 'Huge',
-		style: { fontSize: '300%' },
+		value: 'huge',
+		label: 'Huge',
 	},
 ];
 function ComboboxControlWithState() {
 	const [ filteredOptions, setFilteredOptions ] = useState( options );
+	const [ value, setValue ] = useState( null );
+
 	return (
-		<ComboboxControl
-			label="Font Size"
-			options={ filteredOptions }
-			onInputValueChange={ ( { inputValue } ) =>
-				setFilteredOptions(
-					options.filter( ( option ) =>
-						option.name
-							.toLowerCase()
-							.startsWith( inputValue.toLowerCase() )
+		<>
+			<ComboboxControl
+				value={ value }
+				onChange={ setValue }
+				label="Font Size"
+				options={ filteredOptions }
+				onInputChange={ ( filter ) =>
+					setFilteredOptions(
+						options.filter( ( option ) =>
+							option.label
+								.toLowerCase()
+								.startsWith( filter.toLowerCase() )
+						)
 					)
-				)
-			}
-		/>
+				}
+			/>
+			<p>Value: { value }</p>
+		</>
 	);
 }
 export const _default = () => <ComboboxControlWithState />;
