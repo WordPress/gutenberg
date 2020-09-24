@@ -67,12 +67,14 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 		initialPosition,
 		shouldFocusFirstElement,
 		isNavigationMode,
+		getHoveredBlocksTimeStamp,
 	} = useSelect(
 		( select ) => {
 			const {
 				getSelectedBlocksInitialCaretPosition,
 				isMultiSelecting: _isMultiSelecting,
 				isNavigationMode: _isNavigationMode,
+				getHoveredBlocksTimeStamp: _getHoveredBlocksTimeStamp,
 			} = select( 'core/block-editor' );
 
 			return {
@@ -84,10 +86,12 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 					? getSelectedBlocksInitialCaretPosition()
 					: undefined,
 				isNavigationMode: _isNavigationMode,
+				getHoveredBlocksTimeStamp: _getHoveredBlocksTimeStamp,
 			};
 		},
 		[ isSelected ]
 	);
+
 	const { insertDefaultBlock, removeBlock, setHoveredBlocks } = useDispatch(
 		'core/block-editor'
 	);
@@ -279,19 +283,27 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 			} );
 			return blockIds;
 		}
-		function onMouseEnter( event ) {
-			setHoveredBlocks( getHoveredBlocksFromCursor( event ) );
-		}
-		function onMouseLeave( event ) {
-			setHoveredBlocks( getHoveredBlocksFromCursor( event ) );
+		function evaluateHoveredBlocks( event ) {
+			if ( event.timeStamp !== getHoveredBlocksTimeStamp() ) {
+				setHoveredBlocks( {
+					hoveredBlockIds: getHoveredBlocksFromCursor( event ),
+					eventTimeStamp: event.timeStamp,
+				} );
+			}
 		}
 
-		ref.current.addEventListener( 'mouseenter', onMouseEnter );
-		ref.current.addEventListener( 'mouseleave', onMouseLeave );
+		ref.current.addEventListener( 'mouseenter', evaluateHoveredBlocks );
+		ref.current.addEventListener( 'mouseleave', evaluateHoveredBlocks );
 
 		return () => {
-			ref.current.removeEventListener( 'mouseenter', onMouseEnter );
-			ref.current.removeEventListener( 'mouseleave', onMouseLeave );
+			ref.current.removeEventListener(
+				'mouseenter',
+				evaluateHoveredBlocks
+			);
+			ref.current.removeEventListener(
+				'mouseleave',
+				evaluateHoveredBlocks
+			);
 		};
 	}, [] );
 

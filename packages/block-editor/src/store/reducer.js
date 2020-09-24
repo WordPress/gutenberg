@@ -1650,10 +1650,13 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
-export function hoveredBlocks( state = [], action ) {
+export function hoveredBlocks( state = { hoveredBlockIds: [] }, action ) {
 	switch ( action.type ) {
 		case 'SET_HOVERED_BLOCKS':
-			return action.hoveredBlockIds;
+			return {
+				hoveredBlockIds: action.hoveredBlockIds,
+				eventTimeStamp: action.eventTimeStamp,
+			};
 	}
 
 	return state;

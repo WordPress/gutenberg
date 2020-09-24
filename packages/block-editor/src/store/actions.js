@@ -1110,9 +1110,10 @@ export function setHasControlledInnerBlocks(
 	};
 }
 
-export function setHoveredBlocks( hoveredBlockIds ) {
+export function setHoveredBlocks( { hoveredBlockIds, eventTimeStamp } ) {
 	return {
 		type: 'SET_HOVERED_BLOCKS',
 		hoveredBlockIds,
+		eventTimeStamp,
 	};
 }

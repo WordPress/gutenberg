@@ -1800,5 +1800,9 @@ export function areInnerBlocksControlled( state, clientId ) {
 }
 
 export function getHoveredBlocks( state ) {
-	return state.hoveredBlocks;
+	return state.hoveredBlocks.hoveredBlockIds;
+}
+
+export function getHoveredBlocksTimeStamp( state ) {
+	return state.hoveredBlocks.eventTimeStamp;
 }
