@@ -19,6 +19,9 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
  * by merging the keys and binding the leaf values
  * to the new keys.
  *
+ * It also transforms camelCase names into kebab-case
+ * and substitutes '/' by '-'.
+ *
  * This is thought to be useful to generate
  * CSS Custom Properties from a tree,
  * although there's nothing in the implementation
@@ -28,8 +31,8 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
  * and the token is '--', for this input tree:
  *
  * {
- *   'property': 'value',
- *   'nested-property': {
+ *   'some/property': 'value',
+ *   'nestedProperty': {
  *     'sub-property': 'value'
  *   }
  * }
@@ -37,7 +40,7 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
  * it'll return this output:
  *
  * {
- *   '--wp--property': 'value',
+ *   '--wp--some-property': 'value',
  *   '--wp--nested-property--sub-property': 'value'
  * }
  *
@@ -50,7 +53,11 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
 function gutenberg_experimental_global_styles_get_css_vars( $tree, $prefix = '', $token = '--' ) {
 	$result = array();
 	foreach ( $tree as $property => $value ) {
-		$new_key = $prefix . str_replace( '/', '-', $property );
+		$new_key = $prefix . str_replace(
+			'/',
+			'-',
+			strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $property ) ) // CamelCase to kebab-case
+		);
 
 		if ( is_array( $value ) ) {
 			$new_prefix = $new_key . $token;
