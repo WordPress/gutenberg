@@ -6,8 +6,13 @@
 	margin: 48px 0 0 24px;
 }
 
+.navigation-story__wordpress-icon {
+	align-items: center;
+	display: inline-flex;
+}
 .navigation-story__wordpress-icon svg {
 	fill: #949494;
+	margin-right: 8px;
 }
 .navigation-story__wordpress-icon:hover svg {
 	fill: #ddd;
