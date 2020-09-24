@@ -107,19 +107,12 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, StorySaveE
         }
     }
 
-    private void setStorySaveDataInJS(int state, int mediaId, String mediaUrl, float progress) {
-        setStorySaveDataInJS(state, mediaId, mediaUrl, progress, MEDIA_SERVER_ID_UNKNOWN);
-    }
-
-    private void setStorySaveDataInJS(int state, int mediaId, String mediaUrl, float progress, int mediaServerId) {
+    private void setStorySaveDataInJS(int state, String mediaId, String mediaUrl, float progress) {
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_STATE, state);
-        writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUrl);
         writableMap.putDouble(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS, progress);
-        if (mediaServerId != MEDIA_SERVER_ID_UNKNOWN) {
-            writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_SERVER_ID, mediaServerId);
-        }
         if (isCriticalMessage(state)) {
             queueActionToJS(EVENT_NAME_MEDIA_SAVE, writableMap);
         } else {
@@ -154,22 +147,22 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, StorySaveE
 
     // Story save events emitter
     @Override
-    public void onSaveMediaFileClear(int mediaId) {
+    public void onSaveMediaFileClear(String mediaId) {
         setStorySaveDataInJS(STORY_SAVE_STATE_RESET, mediaId, null, 0);
     }
 
     @Override
-    public void onMediaFileSaveProgress(int mediaId, float progress) {
+    public void onMediaFileSaveProgress(String mediaId, float progress) {
         setStorySaveDataInJS(STORY_SAVE_STATE_SAVING, mediaId, null, progress);
     }
 
     @Override
-    public void onMediaFileSaveSucceeded(int mediaId, String mediaUrl, int mediaServerId) {
-        setStorySaveDataInJS(STORY_SAVE_STATE_SUCCEEDED, mediaId, mediaUrl, 1, mediaServerId);
+    public void onMediaFileSaveSucceeded(String mediaId, String mediaUrl) {
+        setStorySaveDataInJS(STORY_SAVE_STATE_SUCCEEDED, mediaId, mediaUrl, 1);
     }
 
     @Override
-    public void onMediaFileSaveFailed(int mediaId) {
+    public void onMediaFileSaveFailed(String mediaId) {
         setStorySaveDataInJS(STORY_SAVE_STATE_FAILED, mediaId, null, 0);
     }
 

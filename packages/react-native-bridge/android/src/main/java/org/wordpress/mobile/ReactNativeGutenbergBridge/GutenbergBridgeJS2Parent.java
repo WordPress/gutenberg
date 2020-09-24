@@ -35,10 +35,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     }
 
     interface StorySaveEventEmitter {
-        void onSaveMediaFileClear(int mediaId);
-        void onMediaFileSaveProgress(int mediaId, float progress);
-        void onMediaFileSaveSucceeded(int mediaId, String mediaUrl, int serverId);
-        void onMediaFileSaveFailed(int mediaId);
+        void onSaveMediaFileClear(String mediaId);
+        void onMediaFileSaveProgress(String mediaId, float progress);
+        void onMediaFileSaveSucceeded(String mediaId, String mediaUrl);
+        void onMediaFileSaveFailed(String mediaId);
     }
 
     interface ReplaceUnsupportedBlockCallback {
@@ -162,7 +162,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
                                                      String blockTitle);
 
     void onAddMention(Consumer<String> onSuccess);
-    
+
     void setStarterPageTemplatesTooltipShown(boolean tooltipShown);
 
     void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback);

@@ -868,20 +868,20 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onUploadMediaFileClear(mediaId);
     }
 
-    public void clearFileSaveStatus(final int mediaId) {
+    public void clearFileSaveStatus(final String mediaId) {
         mDeferredEventEmitter.onSaveMediaFileClear(mediaId);
     }
 
-    public void mediaFileSaveProgress(final int mediaId, final float progress) {
+    public void mediaFileSaveProgress(final String mediaId, final float progress) {
         mDeferredEventEmitter.onMediaFileSaveProgress(mediaId, progress);
     }
 
-    public void mediaFileSaveFailed(final int mediaId) {
+    public void mediaFileSaveFailed(final String mediaId) {
         mDeferredEventEmitter.onMediaFileSaveFailed(mediaId);
     }
 
-    public void mediaFileSaveSucceeded(final int mediaId, final String mediaUrl, final int serverMediaId) {
-        mDeferredEventEmitter.onMediaFileSaveSucceeded(mediaId, mediaUrl, serverMediaId);
+    public void mediaFileSaveSucceeded(final String mediaId, final String mediaUrl) {
+        mDeferredEventEmitter.onMediaFileSaveSucceeded(mediaId, mediaUrl);
     }
 
     public void replaceUnsupportedBlock(String content, String blockId) {
