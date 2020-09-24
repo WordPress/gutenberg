@@ -74,7 +74,9 @@ function InputField(
 	 * propagates the value and event through onChange.
 	 */
 	useUpdateEffect( () => {
-		if ( valueProp === value ) return;
+		if ( valueProp === value ) {
+			return;
+		}
 		if ( ! isFocused ) {
 			update( valueProp );
 		} else if ( ! isDirty ) {

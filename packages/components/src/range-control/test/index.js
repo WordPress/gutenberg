@@ -82,7 +82,7 @@ describe( 'RangeControl', () => {
 			expect( rangeInput.value ).not.toBe( '21' );
 		} );
 
-		it( 'should call onChange if new value is invalid', () => {
+		it( 'should not call onChange if new value is invalid', () => {
 			const onChange = jest.fn();
 			const { container } = render(
 				<RangeControl onChange={ onChange } min={ 10 } max={ 20 } />
@@ -93,7 +93,7 @@ describe( 'RangeControl', () => {
 			numberInput.focus();
 			fireEvent.change( numberInput, { target: { value: '25' } } );
 
-			expect( onChange ).toHaveBeenCalledWith( 25 );
+			expect( onChange ).not.toHaveBeenCalled();
 		} );
 
 		it( 'should keep invalid values in number input until loss of focus', () => {
@@ -112,7 +112,7 @@ describe( 'RangeControl', () => {
 			expect( rangeInput.value ).toBe( '-1' );
 
 			fireEvent.blur( numberInput );
-			expect( onChange ).toHaveBeenCalledWith( -1.1 );
+			expect( onChange ).toHaveBeenCalledWith( -1 );
 			expect( numberInput.value ).toBe( '-1' );
 		} );
 
@@ -126,6 +126,7 @@ describe( 'RangeControl', () => {
 
 			numberInput.focus();
 			fireEvent.change( numberInput, { target: { value: '1' } } );
+			fireEvent.blur( numberInput );
 
 			expect( rangeInput.value ).toBe( '0' );
 		} );
