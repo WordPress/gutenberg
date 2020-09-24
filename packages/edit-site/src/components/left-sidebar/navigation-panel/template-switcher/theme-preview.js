@@ -8,7 +8,7 @@ import { truncate } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 
-function ThemePreview( {
+export default function ThemePreview( {
 	theme: { author, description, name, screenshot, version },
 } ) {
 	return (
@@ -47,5 +47,3 @@ function ThemePreview( {
 		</div>
 	);
 }
-
-export default ThemePreview;

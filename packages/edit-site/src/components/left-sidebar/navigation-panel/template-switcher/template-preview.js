@@ -6,7 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { BlockPreview } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 
-function TemplatePreview( { item } ) {
+export default function TemplatePreview( { item } ) {
 	const template = useSelect(
 		( select ) => {
 			return select( 'core' ).getEntityRecord(
@@ -29,5 +29,3 @@ function TemplatePreview( { item } ) {
 		</div>
 	);
 }
-
-export default TemplatePreview;
