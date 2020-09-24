@@ -144,6 +144,8 @@ function RichTextWrapper(
 		fontFamily,
 		fontWeight,
 		fontStyle,
+		minWidth,
+		maxWidth,
 		...props
 	},
 	forwardedRef
@@ -603,6 +605,8 @@ function RichTextWrapper(
 			fontFamily={ fontFamily }
 			fontWeight={ fontWeight }
 			fontStyle={ fontStyle }
+			minWidth={ minWidth }
+			maxWidth={ maxWidth }
 		>
 			{ ( {
 				isSelected: nestedIsSelected,
