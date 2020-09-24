@@ -18,6 +18,7 @@ import { __ } from '@wordpress/i18n';
 import TemplatesMenu from './menus/templates';
 import TemplatePartsMenu from './menus/template-parts';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS, MENU_TEMPLATES } from './constants';
+import PageSwitcher from './page-switcher';
 
 export const {
 	Fill: NavigationPanelPreviewFill,
@@ -33,29 +34,35 @@ const NavigationPanel = () => {
 		}
 	}, [ ref ] );
 
-	const { templateId, templatePartId, templateType, activeMenu } = useSelect(
-		( select ) => {
-			const {
-				getTemplateId,
-				getTemplatePartId,
-				getTemplateType,
-				getNavigationPanelActiveMenu,
-			} = select( 'core/edit-site' );
+	const {
+		templateId,
+		templatePartId,
+		templateType,
+		activeMenu,
+		page,
+	} = useSelect( ( select ) => {
+		const {
+			getTemplateId,
+			getTemplatePartId,
+			getTemplateType,
+			getNavigationPanelActiveMenu,
+			getPage,
+		} = select( 'core/edit-site' );
 
-			return {
-				templateId: getTemplateId(),
-				templatePartId: getTemplatePartId(),
-				templateType: getTemplateType(),
-				activeMenu: getNavigationPanelActiveMenu(),
-			};
-		},
-		[]
-	);
+		return {
+			page: getPage(),
+			templateId: getTemplateId(),
+			templatePartId: getTemplatePartId(),
+			templateType: getTemplateType(),
+			activeMenu: getNavigationPanelActiveMenu(),
+		};
+	}, [] );
 
 	const {
 		setTemplate,
 		setTemplatePart,
 		setNavigationPanelActiveMenu,
+		setPage,
 	} = useDispatch( 'core/edit-site' );
 
 	return (
@@ -92,6 +99,8 @@ const NavigationPanel = () => {
 					<TemplatesMenu onActivateItem={ setTemplate } />
 
 					<TemplatePartsMenu onActivateItem={ setTemplatePart } />
+
+					<PageSwitcher onChangePage={ setPage } />
 				</NavigationMenu>
 			</Navigation>
 
