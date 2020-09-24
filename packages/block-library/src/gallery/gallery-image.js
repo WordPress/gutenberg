@@ -217,7 +217,7 @@ class GalleryImage extends Component {
 					tabIndex="0"
 					aria-label={ ariaLabel }
 					ref={ this.bindContainer }
-					aria-describedby={ 'caption-' + id }
+					aria-describedby={ `caption-${ id }` }
 				/>
 				{ isBlobURL( url ) && <Spinner /> }
 			</>
