@@ -9,6 +9,9 @@ import { __experimentalNavigationGroup as NavigationGroup } from '@wordpress/com
  */
 import NavigationEntityItems from './navigation-entity-items';
 
+const pathKeyExtractor = ( { entity: { link } } ) =>
+	getPathAndQueryString( link );
+
 export default function PageSwitcher( { onChangePage } ) {
 	const onPageSelect = ( { type, slug, link, id }, item ) => {
 		onChangePage(
@@ -25,16 +28,13 @@ export default function PageSwitcher( { onChangePage } ) {
 		);
 	};
 
-	const keyExtractor = ( { entity: { link } } ) =>
-		getPathAndQueryString( link );
-
 	return (
 		<>
 			<NavigationGroup title="Pages">
 				<NavigationEntityItems
 					kind="postType"
 					name="page"
-					getKey={ keyExtractor }
+					getKey={ pathKeyExtractor }
 					renderItem={ ( { ItemComponent, entity, item, props } ) => (
 						<ItemComponent
 							{ ...props }
@@ -49,7 +49,7 @@ export default function PageSwitcher( { onChangePage } ) {
 				<NavigationEntityItems
 					kind="taxonomy"
 					name="category"
-					getKey={ keyExtractor }
+					getKey={ pathKeyExtractor }
 					renderItem={ ( { ItemComponent, entity, item, props } ) => (
 						<ItemComponent
 							{ ...props }
@@ -64,7 +64,7 @@ export default function PageSwitcher( { onChangePage } ) {
 				<NavigationEntityItems
 					kind="postType"
 					name="post"
-					getKey={ keyExtractor }
+					getKey={ pathKeyExtractor }
 					renderItem={ ( { ItemComponent, entity, item, props } ) => (
 						<ItemComponent
 							{ ...props }
