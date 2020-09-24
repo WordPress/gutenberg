@@ -49,7 +49,7 @@ describe( 'InputControl', () => {
 			render( <InputControl value="Hello" onChange={ spy } /> );
 
 			const input = getInput();
-			input.focus();
+
 			fireEvent.change( input, { target: { value: 'There' } } );
 
 			expect( input.value ).toBe( 'There' );
@@ -59,23 +59,21 @@ describe( 'InputControl', () => {
 		it( 'should work as a controlled component', () => {
 			const spy = jest.fn();
 			const { rerender } = render(
-				<InputControl value="one" onChange={ spy } />
+				<InputControl value="Original" onChange={ spy } />
 			);
 
 			const input = getInput();
 
-			input.focus();
-			fireEvent.change( input, { target: { value: 'two' } } );
+			fireEvent.change( input, { target: { value: 'State' } } );
 
-			// Ensuring <InputControl /> is controlled
-			fireEvent.blur( input );
+			// Assuming <InputControl /> is controlled...
 
 			// Updating the value
-			rerender( <InputControl value="three" onChange={ spy } /> );
+			rerender( <InputControl value="New" onChange={ spy } /> );
 
-			expect( input.value ).toBe( 'three' );
+			expect( input.value ).toBe( 'New' );
 
-			/*
+			/**
 			 * onChange called only once. onChange is not called when a
 			 * parent component explicitly passed a (new value) change down to
 			 * the <InputControl />.
@@ -91,7 +89,7 @@ describe( 'InputControl', () => {
 
 			const input = getInput();
 
-			// Assuming <InputControl /> is controlled (not focused)
+			// Assuming <InputControl /> is controlled...
 
 			// Updating the value
 			rerender( <InputControl value="New" onChange={ spy } /> );
