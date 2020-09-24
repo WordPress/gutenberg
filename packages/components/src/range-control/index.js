@@ -26,13 +26,13 @@ import {
 	ActionRightWrapper,
 	AfterIconWrapper,
 	BeforeIconWrapper,
+	InputNumber,
 	Root,
 	Track,
 	ThumbWrapper,
 	Thumb,
 	Wrapper,
 } from './styles/range-control-styles';
-import InputField from './input-field';
 import { useRTL } from '../utils/rtl';
 
 function RangeControl(
@@ -119,10 +119,12 @@ function RangeControl(
 
 	const handleOnRangeChange = ( event ) => {
 		const nextValue = parseFloat( event.target.value );
-		handleOnChange( nextValue );
+		setValue( nextValue );
+		onChange( nextValue );
 	};
 
 	const handleOnChange = ( nextValue ) => {
+		nextValue = parseFloat( nextValue );
 		if ( isNaN( nextValue ) ) {
 			handleOnReset();
 			return;
@@ -256,16 +258,19 @@ function RangeControl(
 					</AfterIconWrapper>
 				) }
 				{ withInputField && (
-					<InputField
+					<InputNumber
+						aria-label={ label }
+						className="components-range-control__number"
 						disabled={ disabled }
+						inputMode="decimal"
 						isShiftStepEnabled={ isShiftStepEnabled }
-						label={ label }
 						max={ max }
 						min={ min }
 						onChange={ handleOnChange }
 						onReset={ handleOnReset }
 						shiftStep={ shiftStep }
 						step={ step }
+						type={ 'number' }
 						value={ inputSliderValue }
 					/>
 				) }
