@@ -7,9 +7,9 @@
 This is documentation for the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
 
 - Rationale
-    - Presets become CSS Custom Properties
-    - Some block styles are managed
     - Settings can be controlled per block
+    - CSS Custom Properties: presets & custom
+    - Some block styles are managed
 - Specification
     - Settings
     - Styles
@@ -20,19 +20,17 @@ The Block Editor surface API has evolved at different velocities, and it's now a
 
 This describes the current efforts to consolidate the various APIs into a single point – a `experimental-theme.json` file that should be located inside the root of the theme directory.
 
-### Presets become CSS Custom Properties
+### Settings can be controlled per block
 
-Presets such as [color palettes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), [font sizes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), and [gradients](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets) will be enqueued as CSS Custom Properties for themes to use.
+The Block Editor already allows the control of specific settings such as alignment, drop cap, whether it's present in the inserter, etc at the block level. The goal is to surface these for themes to control at a block level.
 
-These will be enqueued to the front-end and editor.
+### CSS Custom Properties
+
+Presets such as [color palettes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), [font sizes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), and [gradients](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets) become CSS Custom Properties, and will be enqueued by the system for themes to use in both the front-end and the editors. There's also a mechanism to create your own CSS Custom Properties.
 
 ### Some block styles are managed
 
 By providing the block style properties in a structured way, the Block Editor can "manage" the CSS that comes from different origins (user, theme, and core CSS), reducing the amount of CSS loaded in the page and preventing specificity wars due to the competing needs of the components involved (themes, blocks, plugins).
-
-### Settings can be controlled per block
-
-The Block Editor already allows the control of specific settings such as alignment, drop cap, whether it's present in the inserter, etc at the block level. The goal is to surface these for themes to control.
 
 ## Specification
 
@@ -60,7 +58,8 @@ Every context has the same structure, divided in two sections: `settings` and `s
     "settings": {
       "color": [ ... ],
       "typography": [ ... ],
-      "spacing": [ ... ]
+      "spacing": [ ... ],
+      "custom": [ ... ]
     },
     "styles": {
       "color": { ... },
@@ -96,13 +95,14 @@ The settings section has the following structure and default values:
         "customLineHeight": false, /* true to opt-in, as in add_theme_support( 'custom-line-height' ) */
         "dropCap": true, /* false to opt-out */
         "fontSizes": [ ... ], /* font size presets, as in add_theme_support('editor-font-sizes', ... ) */
-      }
+      },
+      "custom": { ... }
     }
   }
 }
 ```
 
-To retain backward compatibility, `add_theme_support` declarations are considered as well. If a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as set `global.settings.color.custom` to `false`. If the `experimental-theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`.
+To retain backward compatibility, `add_theme_support` declarations are retrofit in the proper categories. If a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as set `global.settings.color.custom` to `false`. If the `experimental-theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`.
 
 Settings can also be controlled by context, providing a more fine-grained control over what exists via `add_theme_support`. As an example, let's say that a theme author wants to enable custom colors for the paragraph block exclusively. This is how it'd be done:
 
@@ -126,7 +126,7 @@ Settings can also be controlled by context, providing a more fine-grained contro
 
 Note, however, that not all settings are relevant for all contexts and the blocks they represent. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `experimental-theme.json`.
 
-### Presets
+#### Presets
 
 Presets are part of the settings section. At the moment, they only work within the `global` context. Each preset value will generate a CSS Custom Property that will be added to the new stylesheet, which follow this naming schema: `--wp--preset--{preset-category}--{preset-slug}`.
 
@@ -189,6 +189,42 @@ The output to be enqueued will be:
 ```
 
 The goal is that presets can be defined using this format, although, right now, the name property (used in the editor) can't be translated from this file. For that reason, and to maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `experimental-theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
+
+#### Free-form CSS Custom Properties
+
+In addition to create CSS Custom Properties for the presets, the theme.json also allows for themes to create their own, so they don't have to be enqueued separately. Any values declared within the `settings.custom` section will be transformed to CSS Custom Properties following this naming schema: `--wp--custom--<variable-name>`.
+
+For example, for this input:
+
+```json
+{
+  "global": {
+    "settings": {
+      "custom": {
+        "base-font": 16,
+        "line-height": {
+          "small": 1.2,
+          "medium": 1.4,
+          "large": 1.8
+        }
+      }
+    }
+  }
+}
+```
+
+The output will be:
+
+```css
+:root {
+  --wp--custom--base-font: 16;
+  --wp--custom--line-height--small: 1.2;
+  --wp--custom--line-height--medium: 1.4;
+  --wp--custom--line-height--large: 1.8;
+}
+```
+
+Note that, the name of the variable is created by adding `--` in between each nesting level.
 
 ### Styles
 
