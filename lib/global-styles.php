@@ -56,7 +56,7 @@ function gutenberg_experimental_global_styles_get_css_vars( $tree, $prefix = '',
 		$new_key = $prefix . str_replace(
 			'/',
 			'-',
-			strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $property ) ) // CamelCase to kebab-case
+			strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $property ) ) // CamelCase to kebab-case.
 		);
 
 		if ( is_array( $value ) ) {
