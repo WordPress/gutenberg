@@ -1,0 +1,4 @@
+diff --git a/node_modules/react-dates/lib/css/_datepicker.css b/node_modules/react-dates/lib/css/_datepicker.scss
+similarity index 100%
+rename from node_modules/react-dates/lib/css/_datepicker.css
+rename to node_modules/react-dates/lib/css/_datepicker.scss
