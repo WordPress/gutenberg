@@ -66,10 +66,20 @@ export default function TemplatePartEdit( {
 
 	const blockWrapperProps = useBlockWrapperProps();
 
-	if ( postId ) {
-		// Part of a template file, post ID already resolved.
-		return (
-			<TagName { ...blockWrapperProps }>
+	// Part of a template file, post ID already resolved.
+	const isTemplateFile = !! postId;
+	// Fresh new block.
+	const isPlaceholder =
+		! postId && ! initialSlug.current && ! initialTheme.current;
+	// Part of a template file, post ID not resolved yet.
+	const isUnresolvedTemplateFile = ! isPlaceholder && ! postId;
+
+	return (
+		<TagName { ...blockWrapperProps }>
+			{ isPlaceholder && (
+				<TemplatePartPlaceholder setAttributes={ setAttributes } />
+			) }
+			{ isTemplateFile && (
 				<BlockControls>
 					<ToolbarGroup className="wp-block-template-part__block-control-group">
 						<TemplatePartNamePanel
@@ -100,21 +110,14 @@ export default function TemplatePartEdit( {
 						/>
 					</ToolbarGroup>
 				</BlockControls>
+			) }
+			{ isTemplateFile && (
 				<TemplatePartInnerBlocks
 					postId={ postId }
 					hasInnerBlocks={ innerBlocks.length > 0 }
 				/>
-			</TagName>
-		);
-	}
-	if ( ! initialSlug.current && ! initialTheme.current ) {
-		// Fresh new block.
-		return (
-			<TagName { ...blockWrapperProps }>
-				<TemplatePartPlaceholder setAttributes={ setAttributes } />
-			</TagName>
-		);
-	}
-	// Part of a template file, post ID not resolved yet.
-	return null;
+			) }
+			{ isUnresolvedTemplateFile && __( 'Loading…' ) }
+		</TagName>
+	);
 }
