@@ -155,7 +155,6 @@ class ComboboxControl extends Component {
 
 	onInputChange( event ) {
 		const text = event.value;
-
 		this.setState( { incompleteTokenValue: text }, this.updateSuggestions );
 		this.props.onInputChange( text );
 	}
@@ -252,8 +251,7 @@ class ComboboxControl extends Component {
 	}
 
 	updateSuggestions() {
-		const { incompleteTokenValue } = this.state;
-
+		const { incompleteTokenValue, selectedSuggestion } = this.state;
 		const inputHasMinimumChars =
 			!! incompleteTokenValue && incompleteTokenValue.trim().length > 1;
 		const matchingSuggestions = this.getMatchingSuggestions(
@@ -264,10 +262,16 @@ class ComboboxControl extends Component {
 		const newState = {
 			isExpanded: inputHasMinimumChars && hasMatchingSuggestions,
 		};
-		if (
-			matchingSuggestions.indexOf( this.state.selectedSuggestion ) === -1
-		) {
+
+		if ( matchingSuggestions.indexOf( selectedSuggestion ) === -1 ) {
 			newState.selectedSuggestion = null;
+		}
+
+		if (
+			! incompleteTokenValue ||
+			matchingSuggestions.indexOf( this.props.value ) === -1
+		) {
+			this.props.onChange( null );
 		}
 
 		this.setState( newState );
@@ -330,7 +334,11 @@ class ComboboxControl extends Component {
 			instanceId,
 			className,
 		} = this.props;
-		const { isExpanded } = this.state;
+		const {
+			isExpanded,
+			selectedSuggestion,
+			incompleteTokenValue,
+		} = this.state;
 		const classes = classnames(
 			className,
 			'components-form-token-field__input-container',
@@ -377,12 +385,12 @@ class ComboboxControl extends Component {
 						<SuggestionsList
 							instanceId={ instanceId }
 							match={ this.props.saveTransform(
-								this.state.incompleteTokenValue
+								incompleteTokenValue
 							) }
 							displayTransform={ this.props.displayTransform }
 							suggestions={ matchingSuggestions }
 							selectedIndex={ matchingSuggestions.indexOf(
-								this.state.selectedSuggestion
+								selectedSuggestion
 							) }
 							onHover={ this.onSuggestionHovered }
 							onSelect={ this.onSuggestionSelected }
