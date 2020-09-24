@@ -3,6 +3,7 @@
  */
 import { getPathAndQueryString } from '@wordpress/url';
 import { __experimentalNavigationGroup as NavigationGroup } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -30,7 +31,7 @@ export default function PageSwitcher( { onChangePage } ) {
 
 	return (
 		<>
-			<NavigationGroup title="Pages">
+			<NavigationGroup title={ __( 'Pages' ) }>
 				<NavigationEntityItems
 					kind="postType"
 					name="page"
@@ -45,7 +46,7 @@ export default function PageSwitcher( { onChangePage } ) {
 				/>
 			</NavigationGroup>
 
-			<NavigationGroup title="Categories">
+			<NavigationGroup title={ __( 'Categories' ) }>
 				<NavigationEntityItems
 					kind="taxonomy"
 					name="category"
@@ -60,7 +61,7 @@ export default function PageSwitcher( { onChangePage } ) {
 				/>
 			</NavigationGroup>
 
-			<NavigationGroup title="Posts">
+			<NavigationGroup title={ __( 'Posts' ) }>
 				<NavigationEntityItems
 					kind="postType"
 					name="post"
