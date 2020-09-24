@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { select, dispatch, apiFetch } from '@wordpress/data-controls';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -147,6 +148,7 @@ export function* showHomepage() {
 
 	const page = {
 		path: '/',
+		label: showOnFront === 'page' ? __( 'Homepage' ) : __( 'All Posts' ),
 		context:
 			showOnFront === 'page'
 				? {

@@ -37,7 +37,6 @@ export default function Header( {
 	const {
 		deviceType,
 		hasFixedToolbar,
-		template,
 		templateId,
 		templatePartId,
 		templateType,
@@ -53,7 +52,7 @@ export default function Header( {
 			getPage,
 		} = select( 'core/edit-site' );
 
-		const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
+		const { getEditedEntityRecord } = select( 'core' );
 		const { show_on_front: _showOnFront } = getEditedEntityRecord(
 			'root',
 			'site'
@@ -64,7 +63,6 @@ export default function Header( {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 			templateId: _templateId,
-			template: getEntityRecord( 'postType', 'wp_template', _templateId ),
 			templatePartId: getTemplatePartId(),
 			templateType: getTemplateType(),
 			page: getPage(),
@@ -138,7 +136,7 @@ export default function Header( {
 			</div>
 
 			<div className="edit-site-header_center">
-				<DocumentActions documentTitle={ template?.slug } />
+				<DocumentActions documentTitle={ page?.label } />
 			</div>
 
 			<div className="edit-site-header_end">

@@ -104,6 +104,7 @@ export default function PageSwitcher( {
 			slug: post.slug,
 			path: getPathAndQueryString( post.url ),
 			context: { postType: post.type, postId: post.id },
+			label: post.title,
 		} );
 
 	const activePath = activePage?.path;
