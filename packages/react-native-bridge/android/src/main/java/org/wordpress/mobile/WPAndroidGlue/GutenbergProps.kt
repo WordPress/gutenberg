@@ -5,6 +5,7 @@ import android.os.Bundle
 data class GutenbergProps @JvmOverloads constructor(
     val enableMentions: Boolean,
     val enableUnsupportedBlockEditor: Boolean,
+    val unsupportedBlockEditorSwitch: Boolean,
     val localeSlug: String,
     val postType: String,
     val editorTheme: Bundle?,
@@ -33,6 +34,7 @@ data class GutenbergProps @JvmOverloads constructor(
     fun getUpdatedCapabilitiesProps() = Bundle().apply {
         putBoolean(PROP_CAPABILITIES_MENTIONS, enableMentions)
         putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
+        putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR_SWITCH, unsupportedBlockEditorSwitch)
         putBoolean(PROP_CAPABILITIES_MODAL_LAYOUT_PICKER, isModalLayoutPickerEnabled)
     }
 
@@ -56,6 +58,7 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_MENTIONS = "mentions"
         const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"
+        const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR_SWITCH = "unsupportedBlockEditorSwitch"
         const val PROP_CAPABILITIES_MODAL_LAYOUT_PICKER = "modalLayoutPicker"
     }
 }
