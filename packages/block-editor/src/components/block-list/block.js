@@ -40,7 +40,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
-import { Block } from './block-wrapper';
+import { useBlockWrapperProps } from './block-wrapper';
 
 export const BlockListBlockContext = createContext();
 
@@ -66,6 +66,14 @@ function mergeWrapperProps( propsA, propsB ) {
 	}
 
 	return newProps;
+}
+
+function Block( { children, isHtml, ...props } ) {
+	return (
+		<div { ...useBlockWrapperProps( props, { __unstableIsHtml: isHtml } ) }>
+			{ children }
+		</div>
+	);
 }
 
 function BlockListBlock( {
@@ -219,10 +227,10 @@ function BlockListBlock( {
 
 	if ( ! isValid ) {
 		block = (
-			<Block.div>
+			<Block>
 				<BlockInvalidWarning clientId={ clientId } />
 				<div>{ getSaveElement( blockType, attributes ) }</div>
-			</Block.div>
+			</Block>
 		);
 	} else if ( mode === 'html' ) {
 		// Render blockEdit so the inspector controls don't disappear.
@@ -230,15 +238,15 @@ function BlockListBlock( {
 		block = (
 			<>
 				<div style={ { display: 'none' } }>{ blockEdit }</div>
-				<Block.div __unstableIsHtml>
+				<Block isHtml>
 					<BlockHtml clientId={ clientId } />
-				</Block.div>
+				</Block>
 			</>
 		);
 	} else if ( lightBlockWrapper ) {
 		block = blockEdit;
 	} else {
-		block = <Block.div { ...wrapperProps }>{ blockEdit }</Block.div>;
+		block = <Block { ...wrapperProps }>{ blockEdit }</Block>;
 	}
 
 	return (
@@ -247,9 +255,9 @@ function BlockListBlock( {
 				{ block }
 			</BlockCrashBoundary>
 			{ !! hasError && (
-				<Block.div>
+				<Block>
 					<BlockCrashWarning />
-				</Block.div>
+				</Block>
 			) }
 		</BlockListBlockContext.Provider>
 	);

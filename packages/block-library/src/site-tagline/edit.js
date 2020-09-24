@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { useEntityProp } from '@wordpress/core-data';
 import {
 	AlignmentToolbar,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 	BlockControls,
 	RichText,
 } from '@wordpress/block-editor';
@@ -22,6 +22,7 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 		'site',
 		'description'
 	);
+	const blockWrapperProps = useBlockWrapperProps();
 
 	return (
 		<>
@@ -41,8 +42,9 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 				} ) }
 				onChange={ setSiteTagline }
 				placeholder={ __( 'Site Tagline' ) }
-				tagName={ Block.p }
+				tagName="p"
 				value={ siteTagline }
+				{ ...blockWrapperProps }
 			/>
 		</>
 	);
