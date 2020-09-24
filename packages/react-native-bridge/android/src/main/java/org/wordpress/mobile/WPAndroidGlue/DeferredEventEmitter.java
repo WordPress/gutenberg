@@ -33,6 +33,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, StorySaveE
     private static final int STORY_SAVE_STATE_RESET = 8;
 
     private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
+    private static final String EVENT_NAME_MEDIA_SAVE = "mediaSave";
 
     private static final String MAP_KEY_MEDIA_FILE_UPLOAD_STATE = "state";
     private static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS = "progress";
@@ -106,8 +107,29 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, StorySaveE
         }
     }
 
+    private void setStorySaveDataInJS(int state, int mediaId, String mediaUrl, float progress) {
+        setStorySaveDataInJS(state, mediaId, mediaUrl, progress, MEDIA_SERVER_ID_UNKNOWN);
+    }
+
+    private void setStorySaveDataInJS(int state, int mediaId, String mediaUrl, float progress, int mediaServerId) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_STATE, state);
+        writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, mediaUrl);
+        writableMap.putDouble(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS, progress);
+        if (mediaServerId != MEDIA_SERVER_ID_UNKNOWN) {
+            writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_SERVER_ID, mediaServerId);
+        }
+        if (isCriticalMessage(state)) {
+            queueActionToJS(EVENT_NAME_MEDIA_SAVE, writableMap);
+        } else {
+            emitOrDrop(EVENT_NAME_MEDIA_SAVE, writableMap);
+        }
+    }
+
     private boolean isCriticalMessage(int state) {
-        return state == MEDIA_UPLOAD_STATE_SUCCEEDED || state == MEDIA_UPLOAD_STATE_FAILED;
+        return state == MEDIA_UPLOAD_STATE_SUCCEEDED || state == MEDIA_UPLOAD_STATE_FAILED
+                || state == STORY_SAVE_STATE_SUCCEEDED || state == STORY_SAVE_STATE_FAILED;
     }
 
     @Override
@@ -133,22 +155,22 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, StorySaveE
     // Story save events emitter
     @Override
     public void onSaveMediaFileClear(int mediaId) {
-        setMediaFileUploadDataInJS(STORY_SAVE_STATE_RESET, mediaId, null, 0);
+        setStorySaveDataInJS(STORY_SAVE_STATE_RESET, mediaId, null, 0);
     }
 
     @Override
     public void onMediaFileSaveProgress(int mediaId, float progress) {
-        setMediaFileUploadDataInJS(STORY_SAVE_STATE_SAVING, mediaId, null, progress);
+        setStorySaveDataInJS(STORY_SAVE_STATE_SAVING, mediaId, null, progress);
     }
 
     @Override
     public void onMediaFileSaveSucceeded(int mediaId, String mediaUrl, int mediaServerId) {
-        setMediaFileUploadDataInJS(STORY_SAVE_STATE_SUCCEEDED, mediaId, mediaUrl, 1, mediaServerId);
+        setStorySaveDataInJS(STORY_SAVE_STATE_SUCCEEDED, mediaId, mediaUrl, 1, mediaServerId);
     }
 
     @Override
     public void onMediaFileSaveFailed(int mediaId) {
-        setMediaFileUploadDataInJS(STORY_SAVE_STATE_FAILED, mediaId, null, 0);
+        setStorySaveDataInJS(STORY_SAVE_STATE_FAILED, mediaId, null, 0);
     }
 
     public void updateCapabilities(GutenbergProps gutenbergProps) {
