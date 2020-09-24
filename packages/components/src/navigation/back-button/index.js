@@ -34,7 +34,7 @@ export default function NavigationBackButton( {
 	return (
 		<MenuBackButtonUI
 			className={ classes }
-			isTertiary
+			isSecondary
 			href={ href }
 			onClick={ () =>
 				parentMenu ? setActiveMenu( parentMenu, 'right' ) : onClick

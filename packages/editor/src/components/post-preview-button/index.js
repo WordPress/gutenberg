@@ -196,7 +196,7 @@ export class PostPreviewButton extends Component {
 
 		return (
 			<Button
-				isTertiary={ ! this.props.className }
+				isSecondary={ ! this.props.className }
 				className={ classNames }
 				href={ href }
 				target={ this.getWindowTarget() }

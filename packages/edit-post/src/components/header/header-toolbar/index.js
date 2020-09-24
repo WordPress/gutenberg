@@ -92,13 +92,13 @@ function HeaderToolbar() {
 				hasOutlineItemsDisabled={ isTextModeEnabled }
 				repositionDropdown={ showIconLabels && ! isWideViewport }
 				showTooltip={ ! showIconLabels }
-				isTertiary={ showIconLabels }
+				isSecondary={ showIconLabels }
 			/>
 			<ToolbarItem
 				as={ BlockNavigationDropdown }
 				isDisabled={ isTextModeEnabled }
 				showTooltip={ ! showIconLabels }
-				isTertiary={ showIconLabels }
+				isSecondary={ showIconLabels }
 			/>
 		</>
 	);
@@ -143,19 +143,19 @@ function HeaderToolbar() {
 						<ToolbarItem
 							as={ ToolSelector }
 							showTooltip={ ! showIconLabels }
-							isTertiary={ showIconLabels }
+							isSecondary={ showIconLabels }
 							disabled={ isTextModeEnabled }
 						/>
 					) }
 					<ToolbarItem
 						as={ EditorHistoryUndo }
 						showTooltip={ ! showIconLabels }
-						isTertiary={ showIconLabels }
+						isSecondary={ showIconLabels }
 					/>
 					<ToolbarItem
 						as={ EditorHistoryRedo }
 						showTooltip={ ! showIconLabels }
-						isTertiary={ showIconLabels }
+						isSecondary={ showIconLabels }
 					/>
 					{ overflowItems }
 				</>
@@ -192,11 +192,11 @@ function HeaderToolbar() {
 							<MenuGroup label={ __( 'Edit' ) }>
 								<EditorHistoryUndo
 									showTooltip={ ! showIconLabels }
-									isTertiary={ showIconLabels }
+									isSecondary={ showIconLabels }
 								/>
 								<EditorHistoryRedo
 									showTooltip={ ! showIconLabels }
-									isTertiary={ showIconLabels }
+									isSecondary={ showIconLabels }
 								/>
 							</MenuGroup>
 							<MenuGroup>{ overflowItems }</MenuGroup>

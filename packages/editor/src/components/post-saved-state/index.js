@@ -166,7 +166,7 @@ export default function PostSavedState( {
 			className="editor-post-save-draft"
 			onClick={ () => savePost() }
 			shortcut={ displayShortcut.primary( 's' ) }
-			isTertiary
+			isSecondary
 		>
 			{ label }
 		</Button>

@@ -1,8 +1,9 @@
 .editor-post-saved-state {
 	display: flex;
 	align-items: center;
+	min-width: $button-size;
 	width: $button-size - $grid-unit-10;
-	padding: #{ $grid-unit-05 * 3 } $grid-unit-05;
+	padding: #{ $grid-unit-15 / 2 } $grid-unit-15;
 	color: $gray-700;
 	overflow: hidden;
 	white-space: nowrap;
@@ -16,7 +17,6 @@
 
 	@include break-small() {
 		width: auto;
-		padding: $grid-unit-10 #{ $grid-unit-05 * 3 };
 		text-indent: inherit;
 
 		svg {

@@ -282,7 +282,7 @@ export function MediaPlaceholder( {
 						className="block-editor-media-placeholder__button"
 						onClick={ openURLInput }
 						isPressed={ isURLInputVisible }
-						isTertiary
+						isSecondary
 					>
 						{ __( 'Insert from URL' ) }
 					</Button>
@@ -315,7 +315,7 @@ export function MediaPlaceholder( {
 				render={ ( { open } ) => {
 					return (
 						<Button
-							isTertiary
+							isSecondary
 							onClick={ ( event ) => {
 								event.stopPropagation();
 								open();

@@ -35,7 +35,7 @@ export const MenuUI = styled.div`
 `;
 
 export const MenuBackButtonUI = styled( Button )`
-	&.is-tertiary {
+	&.is-secondary {
 		color: ${ G2.lightGray.ui };
 
 		&:hover:not( :disabled ) {

@@ -201,7 +201,7 @@ function VideoEdit( {
 									  ) }
 							</p>
 							{ !! poster && (
-								<Button onClick={ onRemovePoster } isTertiary>
+								<Button onClick={ onRemovePoster } isSecondary>
 									{ __( 'Remove' ) }
 								</Button>
 							) }

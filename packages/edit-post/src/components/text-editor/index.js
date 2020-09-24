@@ -19,7 +19,7 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 				<div className="edit-post-text-editor__toolbar">
 					<h2>{ __( 'Editing code' ) }</h2>
 					<Button
-						isTertiary
+						isSecondary
 						onClick={ onExit }
 						shortcut={ displayShortcut.secondary( 'm' ) }
 					>
