@@ -90,13 +90,13 @@ export default function Header( {
 				'navigation-open': isNavigationOpen,
 			} ) }
 		>
-			<MainDashboardButton.Slot>
-				<NavigationToggle
-					isOpen={ isNavigationOpen }
-					onClick={ onToggleNavigation }
-				/>
-			</MainDashboardButton.Slot>
-			<div className="edit-site-header_toolbar-container">
+			<div className="edit-site-header_start">
+				<MainDashboardButton.Slot>
+					<NavigationToggle
+						isOpen={ isNavigationOpen }
+						onClick={ onToggleNavigation }
+					/>
+				</MainDashboardButton.Slot>
 				<div className="edit-site-header__toolbar">
 					<Button
 						isPrimary
@@ -128,11 +128,11 @@ export default function Header( {
 				</div>
 			</div>
 
-			<div className="edit-site-header_document-actions-container">
+			<div className="edit-site-header_center">
 				<DocumentActions documentTitle={ template?.slug } />
 			</div>
 
-			<div className="edit-site-header_actions-container">
+			<div className="edit-site-header_end">
 				<div className="edit-site-header__actions">
 					<PreviewOptions
 						deviceType={ deviceType }
