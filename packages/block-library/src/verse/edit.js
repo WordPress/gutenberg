@@ -11,7 +11,7 @@ import {
 	RichText,
 	BlockControls,
 	AlignmentToolbar,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockWrapperProps,
 } from '@wordpress/block-editor';
 
 export default function VerseEdit( {

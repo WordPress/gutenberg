@@ -5,7 +5,7 @@ import { useEntityProp } from '@wordpress/core-data';
 import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
 import {
 	InspectorControls,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { PanelBody, CustomSelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';

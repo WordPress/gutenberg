@@ -7,7 +7,7 @@ import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	InnerBlocks,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockWrapperProps,
 } from '@wordpress/block-editor';
 
 /**

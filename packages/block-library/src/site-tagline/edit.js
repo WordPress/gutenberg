@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { useEntityProp } from '@wordpress/core-data';
 import {
 	AlignmentToolbar,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockWrapperProps,
 	BlockControls,
 	RichText,
 } from '@wordpress/block-editor';

@@ -558,6 +558,25 @@ _Related_
 
 Undocumented declaration.
 
+<a name="useBlockWrapperProps" href="#useBlockWrapperProps">#</a> **useBlockWrapperProps**
+
+This hook is used to lighly mark an element as a block element. Call this
+hook and pass the returned props to the element to mark as a block. If you
+define a ref for the element, it is important to pass the ref to this hook,
+which the hooks in turn will pass to the component through the props it
+returns. Optionally, you can also pass any other props through this hook, and
+they will be merged and returned.
+
+_Parameters_
+
+-   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
+-   _options_ `Object`: Options for internal use only.
+-   _options.\_\_unstableIsHtml_ `boolean`: 
+
+_Returns_
+
+-   `Object`: Props to pass to the element to mark as a block.
+
 <a name="validateThemeColors" href="#validateThemeColors">#</a> **validateThemeColors**
 
 Given an array of theme colors checks colors for validity

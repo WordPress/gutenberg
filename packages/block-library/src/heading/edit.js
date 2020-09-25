@@ -12,7 +12,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	RichText,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
 

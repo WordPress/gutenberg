@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import {
-	InnerBlocks,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
-} from '@wordpress/block-editor';
+import { InnerBlocks, useBlockWrapperProps } from '@wordpress/block-editor';
 import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 const { __Visualizer: BoxControlVisualizer } = BoxControl;
 

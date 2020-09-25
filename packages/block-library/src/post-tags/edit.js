@@ -10,7 +10,7 @@ import { useEntityProp } from '@wordpress/core-data';
 import {
 	BlockControls,
 	Warning,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockWrapperProps,
 	AlignmentToolbar,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';

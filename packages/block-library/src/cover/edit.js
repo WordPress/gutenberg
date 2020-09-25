@@ -31,7 +31,7 @@ import {
 	MediaReplaceFlow,
 	withColors,
 	ColorPalette,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockWrapperProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,

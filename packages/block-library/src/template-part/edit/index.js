@@ -3,10 +3,7 @@
  */
 import { useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	BlockControls,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
-} from '@wordpress/block-editor';
+import { BlockControls, useBlockWrapperProps } from '@wordpress/block-editor';
 import {
 	Dropdown,
 	ToolbarGroup,

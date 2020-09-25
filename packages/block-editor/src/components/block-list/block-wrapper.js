@@ -311,7 +311,7 @@ useBlockWrapperProps.save = getBlockProps;
 const BlockComponent = forwardRef(
 	( { children, tagName: TagName = 'div', ...props }, ref ) => {
 		deprecated( 'wp.blockEditor.__experimentalBlock', {
-			alternative: 'wp.blockEditor.__experimentalUseBlockWrapperProps',
+			alternative: 'wp.blockEditor.useBlockWrapperProps',
 		} );
 		const blockWrapperProps = useBlockWrapperProps( { ...props, ref } );
 		return <TagName { ...blockWrapperProps }>{ children }</TagName>;
