@@ -38,7 +38,7 @@ import {
 	BlockStyles,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
-import { getProtocol } from '@wordpress/url';
+import { getProtocol, hasQueryArg } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
@@ -541,9 +541,16 @@ export default compose( [
 			isSelected,
 		} = props;
 		const { imageSizes } = getSettings();
+		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
 
 		const shouldGetMedia =
-			id && isSelected && getProtocol( url ) !== 'file:';
+			( isSelected && isNotFileUrl ) ||
+			// Edge case to update the image after uploading if the block gets unselected
+			// Check if it's the original image and not the resized one with queryparams
+			( ! isSelected &&
+				isNotFileUrl &&
+				url &&
+				! hasQueryArg( url, 'w' ) );
 		return {
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
