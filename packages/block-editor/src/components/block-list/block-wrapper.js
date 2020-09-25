@@ -288,10 +288,10 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 			// This prevents needlessly rerunning the parse and dispatch for nested blocks
 			// who share boundaries that trigger the mouse events at the same time.
 			if ( event.timeStamp !== getHoveredBlocksTimeStamp() ) {
-				setHoveredBlocks( {
-					hoveredBlockIds: getHoveredBlocksFromCursor( event ),
-					eventTimeStamp: event.timeStamp,
-				} );
+				setHoveredBlocks(
+					getHoveredBlocksFromCursor( event ),
+					event.timeStamp
+				);
 			}
 		}
 
