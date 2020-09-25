@@ -142,7 +142,7 @@ When `hasSearch` is active and `onSearch` is provided, this controls the value o
 -   Type: `string`
 -   Required: No
 
-The menu title.
+The menu title. It's also the field used by the menu search function. 
 
 ## Navigation Group Props
 
