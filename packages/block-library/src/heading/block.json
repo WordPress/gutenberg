@@ -1,4 +1,5 @@
 {
+	"apiVersion": 1,
 	"name": "core/heading",
 	"category": "text",
 	"attributes": {
@@ -22,7 +23,6 @@
 	"supports": {
 		"anchor": true,
 		"className": false,
-		"lightBlockWrapper": true,
 		"color": {
 			"link": true
 		},

@@ -1,4 +1,5 @@
 {
+	"apiVersion": 1,
 	"name": "core/site-tagline",
 	"category": "design",
 	"attributes": {
@@ -8,7 +9,6 @@
 	},
 	"supports": {
 		"html": false,
-		"lightBlockWrapper": true,
 		"color": {
 			"gradients": true
 		},

@@ -1,4 +1,5 @@
 {
+	"apiVersion": 1,
 	"name": "core/navigation",
 	"category": "design",
 	"attributes": {
@@ -48,7 +49,6 @@
 		"anchor": true,
 		"html": false,
 		"inserter": true,
-		"lightBlockWrapper": true,
 		"fontSize": true,
 		"color": {
 			"textColor": true,
