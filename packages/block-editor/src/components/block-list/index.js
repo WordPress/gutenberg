@@ -36,6 +36,8 @@ function BlockList(
 ) {
 	function selector( select ) {
 		const {
+			getBlockName,
+			getBlockParentsByBlockName,
 			getBlockOrder,
 			getBlockListSettings,
 			getSelectedBlockClientId,
@@ -46,16 +48,30 @@ function BlockList(
 			isDraggingBlocks,
 		} = select( 'core/block-editor' );
 
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
+		const isTemplatePartOrChildSelected =
+			getBlockName( selectedBlockClientId ) === 'core/template-part' ||
+			getBlockParentsByBlockName(
+				selectedBlockClientId,
+				'core/template-part'
+			).length ||
+			getBlockParentsByBlockName(
+				multiSelectedBlockClientIds[ 0 ],
+				'core/template-part'
+			).length;
+
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
-			selectedBlockClientId: getSelectedBlockClientId(),
-			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
+			selectedBlockClientId,
+			multiSelectedBlockClientIds,
 			orientation: getBlockListSettings( rootClientId )?.orientation,
 			hasMultiSelection: hasMultiSelection(),
 			enableAnimation:
 				! isTyping() &&
 				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 			isDraggingBlocks: isDraggingBlocks(),
+			isTemplatePartOrChildSelected,
 		};
 	}
 
@@ -67,6 +83,7 @@ function BlockList(
 		hasMultiSelection,
 		enableAnimation,
 		isDraggingBlocks,
+		isTemplatePartOrChildSelected,
 	} = useSelect( selector, [ rootClientId ] );
 
 	const fallbackRef = useRef();
@@ -117,6 +134,7 @@ function BlockList(
 								'is-dropping-horizontally':
 									isDropTarget &&
 									orientation === 'horizontal',
+								'template-part-highlighting': isTemplatePartOrChildSelected,
 							} ) }
 						/>
 					</AsyncModeProvider>
