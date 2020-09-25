@@ -27,7 +27,7 @@ function Header( { isCustomizer } ) {
 	const rootClientId = useLastSelectedRootId();
 
 	return (
-		<>
+		<div className="edit-widgets-header-container">
 			<div className="edit-widgets-header">
 				<NavigableToolbar
 					className="edit-widgets-header-toolbar"
@@ -71,7 +71,7 @@ function Header( { isCustomizer } ) {
 					<BlockToolbar hideDragHandle />
 				</div>
 			) }
-		</>
+		</div>
 	);
 }
 

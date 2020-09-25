@@ -1,5 +1,21 @@
+// Disable the lint rule since the id has "_" in it, and this is the only way to select it.
+// stylelint-disable selector-id-pattern
+#customize-theme-controls #sub-accordion-section-gutenberg_widget_blocks.open {
+	// To make position: sticky work, we have to provide a fixed height to the overflow parent.
+	height: 100%;
+}
+
 .edit-widgets-customizer-edit-widgets-initializer__content {
 	position: relative;
+
+	.edit-widgets-header-container {
+		position: sticky;
+		// customize-pane-child has a 12px padding.
+		top: -12px;
+		// The blue outline for active blocks has z-index of 1, we want to be greater than that.
+		z-index: 2;
+	}
+
 	.edit-widgets-header {
 		margin-top: -16px;
 		border-top: 1px solid $gray-300;
@@ -10,6 +26,12 @@
 		background: #fff;
 		margin-left: -12px;
 		margin-right: -12px;
+
+		.block-editor-block-toolbar {
+			// Use auto instead of scroll so that it won't show the scroll bar if it doesn't have to.
+			overflow-x: auto;
+			overflow-y: hidden;
+		}
 	}
 	.edit-widgets-sidebar {
 		margin-left: -12px;
