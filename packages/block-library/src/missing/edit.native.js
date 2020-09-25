@@ -247,7 +247,7 @@ export default compose( [
 			isUnsupportedBlockEditorSupported:
 				getSettings( 'capabilities' ).unsupportedBlockEditor === true,
 			canEnableUnsupportedBlockEditor:
-				getSettings( 'capabilities' ).unsupportedBlockEditorSwitch ===
+				getSettings( 'capabilities' ).canEnableUnsupportedBlockEditor ===
 				true,
 		};
 	} ),
