@@ -17,6 +17,7 @@ import {
 	getBlockType,
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
+	hasBlockSupport,
 } from './registration';
 import { normalizeBlockType } from './utils';
 import BlockContentProvider from '../block-content-provider';
@@ -94,11 +95,21 @@ export function getSaveElement(
 		save = instance.render.bind( instance );
 	}
 
-	let element = save( { attributes, innerBlocks } );
+	function getBlockProps( props ) {
+		return applyFilters(
+			'blocks.getSaveContent.extraProps',
+			{ ...props },
+			blockType,
+			attributes
+		);
+	}
+
+	let element = save( { attributes, innerBlocks, getBlockProps } );
 
 	if (
 		isObject( element ) &&
-		hasFilter( 'blocks.getSaveContent.extraProps' )
+		hasFilter( 'blocks.getSaveContent.extraProps' ) &&
+		! hasBlockSupport( blockType, 'lightBlockWrapper', false )
 	) {
 		/**
 		 * Filters the props applied to the block save result element.

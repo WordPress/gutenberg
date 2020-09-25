@@ -13,7 +13,7 @@ import { RichText } from '@wordpress/block-editor';
  */
 import getColorAndStyleProps from './color-props';
 
-export default function save( { attributes } ) {
+export default function save( { attributes, getBlockProps } ) {
 	const { borderRadius, linkTarget, rel, text, title, url } = attributes;
 	const colorProps = getColorAndStyleProps( attributes );
 	const buttonClasses = classnames(
@@ -33,7 +33,7 @@ export default function save( { attributes } ) {
 	// A title will no longer be assigned for new or updated button block links.
 
 	return (
-		<div>
+		<div { ...getBlockProps() }>
 			<RichText.Content
 				tagName="a"
 				className={ buttonClasses }

@@ -8,19 +8,17 @@ import classnames from 'classnames';
  */
 import { RichText } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
+export default function save( { attributes, getBlockProps } ) {
 	const { align, content, level } = attributes;
-	const tagName = 'h' + level;
+	const TagName = 'h' + level;
 
 	const className = classnames( {
 		[ `has-text-align-${ align }` ]: align,
 	} );
 
 	return (
-		<RichText.Content
-			className={ className ? className : undefined }
-			tagName={ tagName }
-			value={ content }
-		/>
+		<TagName { ...getBlockProps( { className } ) }>
+			<RichText.Content value={ content } />
+		</TagName>
 	);
 }

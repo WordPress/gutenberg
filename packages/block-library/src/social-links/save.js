@@ -3,9 +3,9 @@
  */
 import { InnerBlocks } from '@wordpress/block-editor';
 
-export default function save( { className } ) {
+export default function save( { getBlockProps } ) {
 	return (
-		<ul className={ className }>
+		<ul { ...getBlockProps() }>
 			<InnerBlocks.Content />
 		</ul>
 	);

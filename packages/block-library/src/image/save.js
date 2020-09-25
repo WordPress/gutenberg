@@ -9,7 +9,7 @@ import { isEmpty } from 'lodash';
  */
 import { RichText } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
+export default function save( { attributes, getBlockProps } ) {
 	const {
 		url,
 		alt,
@@ -67,11 +67,15 @@ export default function save( { attributes } ) {
 
 	if ( 'left' === align || 'right' === align || 'center' === align ) {
 		return (
-			<div>
+			<div { ...getBlockProps() }>
 				<figure className={ classes }>{ figure }</figure>
 			</div>
 		);
 	}
 
-	return <figure className={ classes }>{ figure }</figure>;
+	return (
+		<figure { ...getBlockProps( { className: classes } ) }>
+			{ figure }
+		</figure>
+	);
 }

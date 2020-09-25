@@ -24,7 +24,7 @@ import {
 	getPositionClassName,
 } from './shared';
 
-export default function save( { attributes } ) {
+export default function save( { attributes, getBlockProps } ) {
 	const {
 		backgroundType,
 		gradient,
@@ -95,7 +95,7 @@ export default function save( { attributes } ) {
 	);
 
 	return (
-		<div className={ classes } style={ style }>
+		<div { ...getBlockProps( { className: classes, style } ) }>
 			{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
 				<span
 					aria-hidden="true"

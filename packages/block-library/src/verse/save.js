@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { RichText } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
+export default function save( { attributes, getBlockProps } ) {
 	const { textAlign, content } = attributes;
 
 	const className = classnames( {
@@ -16,10 +16,8 @@ export default function save( { attributes } ) {
 	} );
 
 	return (
-		<RichText.Content
-			tagName="pre"
-			className={ className }
-			value={ content }
-		/>
+		<pre { ...getBlockProps( { className } ) }>
+			<RichText.Content value={ content } />
+		</pre>
 	);
 }

@@ -8,9 +8,9 @@ import { RichText } from '@wordpress/block-editor';
  */
 import { escape } from './utils';
 
-export default function save( { attributes } ) {
+export default function save( { attributes, getBlockProps } ) {
 	return (
-		<pre>
+		<pre { ...getBlockProps() }>
 			<RichText.Content
 				tagName="code"
 				value={ escape( attributes.content ) }

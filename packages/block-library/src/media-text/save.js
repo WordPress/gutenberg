@@ -17,7 +17,7 @@ import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
 const DEFAULT_MEDIA_WIDTH = 50;
 
-export default function save( { attributes } ) {
+export default function save( { attributes, getBlockProps } ) {
 	const {
 		isStackedOnMobile,
 		mediaAlt,
@@ -88,7 +88,7 @@ export default function save( { attributes } ) {
 		gridTemplateColumns,
 	};
 	return (
-		<div className={ className } style={ style }>
+		<div { ...getBlockProps( { className, style } ) }>
 			<figure
 				className="wp-block-media-text__media"
 				style={ backgroundStyles }

@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { RichText } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
+export default function save( { attributes, getBlockProps } ) {
 	const { align, value, citation } = attributes;
 
 	const className = classnames( {
@@ -16,7 +16,7 @@ export default function save( { attributes } ) {
 	} );
 
 	return (
-		<blockquote className={ className }>
+		<blockquote { ...getBlockProps( { className } ) }>
 			<RichText.Content multiline value={ value } />
 			{ ! RichText.isEmpty( citation ) && (
 				<RichText.Content tagName="cite" value={ citation } />

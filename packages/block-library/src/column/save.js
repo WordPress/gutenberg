@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { InnerBlocks } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
+export default function save( { attributes, getBlockProps } ) {
 	const { verticalAlignment, width } = attributes;
 
 	const wrapperClasses = classnames( {
@@ -21,7 +21,7 @@ export default function save( { attributes } ) {
 	}
 
 	return (
-		<div className={ wrapperClasses } style={ style }>
+		<div { ...getBlockProps( { className: wrapperClasses, style } ) }>
 			<InnerBlocks.Content />
 		</div>
 	);

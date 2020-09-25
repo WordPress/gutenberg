@@ -3,7 +3,7 @@
  */
 import { RichText } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
+export default function save( { attributes, getBlockProps } ) {
 	const {
 		autoplay,
 		caption,
@@ -16,7 +16,7 @@ export default function save( { attributes } ) {
 		playsInline,
 	} = attributes;
 	return (
-		<figure>
+		<figure { ...getBlockProps() }>
 			{ src && (
 				<video
 					autoPlay={ autoplay }

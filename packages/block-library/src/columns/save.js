@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { InnerBlocks } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
+export default function save( { attributes, getBlockProps } ) {
 	const { verticalAlignment } = attributes;
 
 	const className = classnames( {
@@ -16,7 +16,7 @@ export default function save( { attributes } ) {
 	} );
 
 	return (
-		<div className={ className ? className : undefined }>
+		<div { ...getBlockProps( { className } ) }>
 			<InnerBlocks.Content />
 		</div>
 	);
