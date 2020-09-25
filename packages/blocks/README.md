@@ -298,14 +298,6 @@ _Returns_
 
 -   `string`: The block's default menu item class.
 
-<a name="getBlockProps" href="#getBlockProps">#</a> **getBlockProps**
-
-Call within a save function to get the props for the block wrapper.
-
-_Parameters_
-
--   _props_ `Object`: Optional. Props to pass to the element.
-
 <a name="getBlockSupport" href="#getBlockSupport">#</a> **getBlockSupport**
 
 Returns the block support value for a feature, if defined.

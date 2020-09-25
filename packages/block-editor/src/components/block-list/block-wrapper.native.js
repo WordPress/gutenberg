@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getBlockProps } from '@wordpress/blocks';
+import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 
 /**
  * Internal dependencies

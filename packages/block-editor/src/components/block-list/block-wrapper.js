@@ -19,7 +19,7 @@ import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
-import { getBlockProps } from '@wordpress/blocks';
+import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
