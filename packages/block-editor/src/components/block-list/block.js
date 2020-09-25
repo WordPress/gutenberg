@@ -126,7 +126,7 @@ function BlockListBlock( {
 	const onBlockError = () => setErrorState( true );
 
 	const blockType = getBlockType( name );
-	const lightBlockWrapper = blockType.apiVersion >= 1;
+	const lightBlockWrapper = blockType.apiVersion > 1;
 	const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 
 	// Determine whether the block has props to apply to the wrapper.
