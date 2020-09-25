@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	__experimentalNavigation as Navigation,
 	__experimentalNavigationBackButton as NavigationBackButton,
@@ -15,6 +15,11 @@ import { __ } from '@wordpress/i18n';
 
 const NavigationPanel = () => {
 	const [ showPreview, setShowPreview ] = useState( false );
+	const ref = useRef();
+
+	useEffect( () => {
+		ref.current.focus();
+	}, [ ref ] );
 
 	return (
 		<div className="edit-site-navigation-panel">
@@ -23,8 +28,8 @@ const NavigationPanel = () => {
 					backButtonLabel={ __( 'Dashboard' ) }
 					className="edit-site-navigation-panel__back-to-dashboard"
 					href="index.php"
+					ref={ ref }
 				/>
-
 				<NavigationMenu title="Home">
 					<NavigationGroup title="Example group">
 						<NavigationItem
