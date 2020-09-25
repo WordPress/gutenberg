@@ -7,6 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
+import { VisuallyHidden } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { withInstanceId } from '@wordpress/compose';
 
@@ -14,7 +15,6 @@ import { withInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import LegacyWidgetEditDomManager from './dom-manager';
-import classNames from 'classnames';
 
 const { XMLHttpRequest, FormData } = window;
 
@@ -84,12 +84,11 @@ class LegacyWidgetEditHandler extends Component {
 			title = widgetTitle;
 		}
 
+		const RootComponent = isVisible ? 'div' : VisuallyHidden;
 		return (
-			<div
-				className={ classNames(
-					'wp-block-legacy-widget__edit-handler',
-					{ 'is-hidden': ! isVisible }
-				) }
+			<RootComponent
+				key="edit-handler"
+				className="wp-block-legacy-widget__edit-handler"
 			>
 				{ title && (
 					<div className="wp-block-legacy-widget__edit-widget-title">
@@ -119,7 +118,7 @@ class LegacyWidgetEditHandler extends Component {
 						form={ form }
 					/>
 				</div>
-			</div>
+			</RootComponent>
 		);
 	}
 

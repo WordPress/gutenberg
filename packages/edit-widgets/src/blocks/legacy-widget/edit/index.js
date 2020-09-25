@@ -31,7 +31,6 @@ function LegacyWidgetEdit( {
 	widgetAreaId,
 } ) {
 	const [ hasEditForm, setHasEditForm ] = useState( true );
-	// If the block is not selected, defaults to show the preview, otherwise show the edit form.
 	const [ isPreview, setIsPreview ] = useState( false );
 	const shouldHidePreview = ! isPreview && hasEditForm;
 
