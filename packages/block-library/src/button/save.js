@@ -7,13 +7,14 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
+import { getBlockProps } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import getColorAndStyleProps from './color-props';
 
-export default function save( { attributes, getBlockProps } ) {
+export default function save( { attributes } ) {
 	const { borderRadius, linkTarget, rel, text, title, url } = attributes;
 	const colorProps = getColorAndStyleProps( attributes );
 	const buttonClasses = classnames(

@@ -8,6 +8,7 @@ import { noop, isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { InnerBlocks } from '@wordpress/block-editor';
+import { getBlockProps } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -17,7 +18,7 @@ import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
 const DEFAULT_MEDIA_WIDTH = 50;
 
-export default function save( { attributes, getBlockProps } ) {
+export default function save( { attributes } ) {
 	const {
 		isStackedOnMobile,
 		mediaAlt,

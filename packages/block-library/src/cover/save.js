@@ -11,6 +11,7 @@ import {
 	getColorClassName,
 	__experimentalGetGradientClass,
 } from '@wordpress/block-editor';
+import { getBlockProps } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -24,7 +25,7 @@ import {
 	getPositionClassName,
 } from './shared';
 
-export default function save( { attributes, getBlockProps } ) {
+export default function save( { attributes } ) {
 	const {
 		backgroundType,
 		gradient,

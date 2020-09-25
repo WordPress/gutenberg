@@ -298,6 +298,10 @@ _Returns_
 
 -   `string`: The block's default menu item class.
 
+<a name="getBlockProps" href="#getBlockProps">#</a> **getBlockProps**
+
+Undocumented declaration.
+
 <a name="getBlockSupport" href="#getBlockSupport">#</a> **getBlockSupport**
 
 Returns the block support value for a feature, if defined.
