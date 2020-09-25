@@ -611,7 +611,9 @@ function RichTextWrapper(
 			maxWidth={ maxWidth }
 			onBlur={ onBlur }
 			setRef={ setRef }
-			id={ props.id } // Destructuring the id prop breaks the editor
+			// Destructuring the id prop before { ...props } doesn't work
+			// correctly on web https://github.com/WordPress/gutenberg/pull/25624
+			id={ props.id }
 		>
 			{ ( {
 				isSelected: nestedIsSelected,
