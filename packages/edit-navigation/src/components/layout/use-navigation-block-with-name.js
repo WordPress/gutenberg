@@ -17,10 +17,7 @@ export default function useNavigationBlockWithName( { menuId } ) {
 
 	const { saveMenu } = useDispatch( 'core' );
 
-	removeFilter(
-		'editor.BlockEdit',
-		'core/edit-navigation/with-menu-name'
-	);
+	removeFilter( 'editor.BlockEdit', 'core/edit-navigation/with-menu-name' );
 
 	const withMenuName = createHigherOrderComponent(
 		( BlockEdit ) => ( props ) => {
