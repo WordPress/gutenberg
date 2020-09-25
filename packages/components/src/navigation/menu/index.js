@@ -17,6 +17,7 @@ import { useNavigationContext } from '../context';
 import { useNavigationTreeMenu } from './use-navigation-tree-menu';
 import NavigationBackButton from '../back-button';
 import NavigationMenuTitle from './menu-title';
+import { NavigableMenu } from '../../navigable-container';
 import { MenuUI } from '../styles/navigation-styles';
 
 export default function NavigationMenu( props ) {
@@ -76,7 +77,9 @@ export default function NavigationMenu( props ) {
 					title={ title }
 				/>
 
-				<ul>{ children }</ul>
+				<NavigableMenu>
+					<ul>{ children }</ul>
+				</NavigableMenu>
 			</MenuUI>
 		</NavigationMenuContext.Provider>
 	);
