@@ -7,7 +7,6 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { VisuallyHidden } from '@wordpress/components';
 import apiFetch from '@wordpress/api-fetch';
 import { withInstanceId } from '@wordpress/compose';
 
@@ -84,11 +83,17 @@ class LegacyWidgetEditHandler extends Component {
 			title = widgetTitle;
 		}
 
-		const RootComponent = isVisible ? 'div' : VisuallyHidden;
+		const componentProps = isVisible
+			? {}
+			: {
+					style: { display: 'none' },
+					hidden: true,
+					'aria-hidden': 'true',
+			  };
 		return (
-			<RootComponent
-				key="edit-handler"
+			<div
 				className="wp-block-legacy-widget__edit-handler"
+				{ ...componentProps }
 			>
 				{ title && (
 					<div className="wp-block-legacy-widget__edit-widget-title">
@@ -118,7 +123,7 @@ class LegacyWidgetEditHandler extends Component {
 						form={ form }
 					/>
 				</div>
-			</RootComponent>
+			</div>
 		);
 	}
 
