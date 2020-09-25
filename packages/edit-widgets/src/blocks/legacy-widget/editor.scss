@@ -26,10 +26,15 @@
 }
 
 .wp-block-legacy-widget__edit-widget-title {
-	background: $gray-300;
-	color: $gray-900;
+	color: $black;
 	font-family: $default-font;
 	font-size: $default-font-size;
-	padding: $grid-unit-10 $block-padding;
+	padding: $block-padding 18px;
 	font-weight: 600;
+	border-bottom: $border-width solid $gray-900;
+}
+
+.block-editor-block-list__block.is-selected {
+	border: $border-width solid $gray-900;
+	border-radius: $radius-block-ui;
 }
