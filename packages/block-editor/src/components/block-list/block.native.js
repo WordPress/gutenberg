@@ -7,7 +7,11 @@ import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { GlobalStylesContext, WIDE_ALIGNMENTS } from '@wordpress/components';
+import {
+	GlobalStylesContext,
+	WIDE_ALIGNMENTS,
+	ALIGNMENT_BREAKPOINTS,
+} from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -153,7 +157,10 @@ class BlockListBlock extends Component {
 		const isColumnsRelated = name.includes( 'core/column' );
 		const shouldBeFullWidth =
 			isFullWidth &&
-			( ! isColumnsRelated || ! hasParents || hasParentBlockAlignment );
+			( ! isColumnsRelated ||
+				! hasParents ||
+				( hasParentBlockAlignment &&
+					blockWidth > ALIGNMENT_BREAKPOINTS.mobile ) );
 
 		return (
 			<TouchableWithoutFeedback

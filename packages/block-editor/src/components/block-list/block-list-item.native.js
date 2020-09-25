@@ -22,6 +22,8 @@ import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
 import styles from './block-list-item.native.scss';
 
+export const INNER_CONTAINERS = [ 'core/columns', 'core/column', 'core/group' ];
+
 const stretchStyle = {
 	flex: 1,
 };
@@ -53,22 +55,22 @@ export class BlockListItem extends Component {
 			parentBlockAlignment,
 			hasParents,
 			blockName,
-			isColumnsDescendantSelected,
+			isContainerDescendantSelected,
 		} = this.props;
 		const { blockWidth } = this.state;
 		const isFullWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.full;
 		const isWideWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.wide;
 		const isParentFullWidth =
 			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
-		const isColumnsRelated = blockName.includes( 'core/column' );
+		const isContainerRelated = INNER_CONTAINERS.includes( blockName );
 
 		if ( isFullWidth ) {
 			if ( ! hasParents ) {
 				if (
-					isColumnsRelated &&
+					isContainerRelated &&
 					blockWidth < ALIGNMENT_BREAKPOINTS.mobile
 				) {
-					if ( isColumnsDescendantSelected ) {
+					if ( isContainerDescendantSelected ) {
 						return 0;
 					}
 					return marginHorizontal;
@@ -86,7 +88,7 @@ export class BlockListItem extends Component {
 		if (
 			isParentFullWidth &&
 			blockWidth <= ALIGNMENT_BREAKPOINTS.medium &&
-			! isColumnsRelated
+			! isContainerRelated
 		) {
 			return marginHorizontal * 2;
 		}
@@ -207,21 +209,22 @@ export default compose( [
 				parentBlock?.attributes || {};
 
 			const selectedBlockId = getSelectedBlockClientId();
-			const selectedBlockParents = getBlockParents(
+			const selectedBlockParentId = getBlockParents(
 				selectedBlockId
 			)[ 0 ];
 			const { name: selectedBlockParentsName } =
-				__unstableGetBlockWithoutInnerBlocks( selectedBlockParents ) ||
+				__unstableGetBlockWithoutInnerBlocks( selectedBlockParentId ) ||
 				{};
 
-			const isRootInnerBlockSelected = hasSelectedInnerBlock(
-				rootClientId
+			const isInnerBlockSelected =
+				hasParents && hasSelectedInnerBlock( clientId );
+
+			const isContainerBlock = INNER_CONTAINERS.includes(
+				selectedBlockParentsName
 			);
 
-			const isColumnsDescendantSelected = selectedBlockParentsName?.includes(
-				'core/column'
-			)
-				? isRootInnerBlockSelected
+			const isContainerDescendantSelected = isContainerBlock
+				? isInnerBlockSelected
 				: true;
 
 			return {
@@ -232,7 +235,7 @@ export default compose( [
 				blockAlignment: align,
 				parentBlockAlignment,
 				blockName: name,
-				isColumnsDescendantSelected,
+				isContainerDescendantSelected,
 			};
 		}
 	),
