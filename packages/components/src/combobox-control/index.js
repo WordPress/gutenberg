@@ -12,6 +12,7 @@ import { speak } from '@wordpress/a11y';
  */
 import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
+import BaseControl from '../base-control';
 
 function ComboboxControl( {
 	value,
@@ -19,6 +20,8 @@ function ComboboxControl( {
 	options,
 	onChange,
 	onInputChange: onInputChangeProp = () => {},
+	hideLabelFromVision,
+	help,
 	messages = {
 		selected: __( 'Item selected.' ),
 	},
@@ -165,23 +168,22 @@ function ComboboxControl( {
 	// TODO: Refactor click detection to use blur to stop propagation.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<div
-			className="components-form-token-field"
+		<BaseControl
+			className="components-combobox-control"
 			tabIndex="-1"
-			onKeyDown={ onKeyDown }
+			label={ label }
+			id={ `components-form-token-input-${ instanceId }` }
+			hideLabelFromVision={ hideLabelFromVision }
+			help={ help }
 		>
-			<label
-				htmlFor={ `components-form-token-input-${ instanceId }` }
-				className="components-form-token-field__label"
-			>
-				{ label }
-			</label>
 			<div
-				className="components-form-token-field__input-container"
+				className="components-combobox-control__suggestions-container"
 				tabIndex="-1"
 				onFocus={ onFocus }
+				onKeyDown={ onKeyDown }
 			>
 				<TokenInput
+					className="components-combobox-control__input"
 					instanceId={ instanceId }
 					ref={ inputContainer }
 					value={ inputValue }
@@ -207,7 +209,7 @@ function ComboboxControl( {
 					/>
 				) }
 			</div>
-		</div>
+		</BaseControl>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }

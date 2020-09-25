@@ -72,6 +72,18 @@ The label for the control.
 - Type: `String`
 - Required: Yes
 
+#### hideLabelFromVision
+If true, the label will only be visible to screen readers.
+
+- Type: `Boolean`
+- Required: No
+
+#### help
+If this property is added, a help text will be generated using help property as the content.
+
+- Type: `String`
+- Required: No
+
 #### options
 
 The options that can be chosen from.

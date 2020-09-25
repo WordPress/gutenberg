@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -34,6 +39,7 @@ class TokenInput extends Component {
 			isExpanded,
 			instanceId,
 			selectedSuggestionIndex,
+			className,
 			...props
 		} = this.props;
 		const size = value ? value.length + 1 : 0;
@@ -47,7 +53,10 @@ class TokenInput extends Component {
 				value={ value || '' }
 				onChange={ this.onChange }
 				size={ size }
-				className="components-form-token-field__input"
+				className={ classnames(
+					className,
+					'components-form-token-field__input'
+				) }
 				role="combobox"
 				aria-expanded={ isExpanded }
 				aria-autocomplete="list"
