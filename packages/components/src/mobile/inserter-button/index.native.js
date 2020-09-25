@@ -16,11 +16,6 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './style.scss';
 
-export const inserterButtonStyles = {
-	modalItem: styles.modalItem,
-	modalIconWrapper: styles.modalIconWrapper,
-};
-
 class MenuItem extends Component {
 	constructor() {
 		super( ...arguments );
@@ -95,4 +90,11 @@ class MenuItem extends Component {
 	}
 }
 
-export default withPreferredColorScheme( MenuItem );
+const InserterButton = withPreferredColorScheme( MenuItem );
+
+InserterButton.Styles = {
+	modalItem: styles.modalItem,
+	modalIconWrapper: styles.modalIconWrapper,
+};
+
+export default InserterButton;

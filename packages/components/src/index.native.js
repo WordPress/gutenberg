@@ -75,10 +75,7 @@ export { default as ColorSettings } from './mobile/color-settings';
 export { default as LinkSettings } from './mobile/link-settings';
 export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
-export {
-	default as InserterButton,
-	inserterButtonStyles,
-} from './mobile/inserter-button';
+export { default as InserterButton } from './mobile/inserter-button';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';

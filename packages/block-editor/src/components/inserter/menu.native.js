@@ -21,7 +21,6 @@ import {
 	BottomSheet,
 	BottomSheetConsumer,
 	InserterButton,
-	inserterButtonStyles,
 } from '@wordpress/components';
 
 /**
@@ -66,8 +65,8 @@ export class InserterMenu extends Component {
 		const {
 			paddingLeft: itemPaddingLeft,
 			paddingRight: itemPaddingRight,
-		} = inserterButtonStyles.modalItem;
-		const { width: itemWidth } = inserterButtonStyles.modalIconWrapper;
+		} = InserterButton.Styles.modalItem;
+		const { width: itemWidth } = InserterButton.Styles.modalIconWrapper;
 		return itemWidth + itemPaddingLeft + itemPaddingRight;
 	}
 
