@@ -8,7 +8,6 @@ Some block supports — for example, `anchor` or `className` — apply their att
 
 - Type: `boolean`
 - Default value: `false`
-- Related attribute: none
 
 Anchors let you link directly to a specific block on a page. This property adds a field to define an id for the block and a button to copy the direct link.
 
@@ -23,7 +22,6 @@ supports: {
 
 - Type: `boolean` or `array`
 - Default value: `false`
-- Related attribute: `align`
 
 This property adds block controls which allow to change block's alignment. _Important: It doesn't work with dynamic blocks yet._
 
@@ -58,7 +56,6 @@ attributes: {
 
 - Type: `boolean`
 - Default value: `true`
-- Related attribute: none
 
 This property allows to enable [wide alignment](/docs/designers-developers/developers/themes/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
 
@@ -73,7 +70,6 @@ supports: {
 
 - Type: `boolean`
 - Default value: `true`
-- Related attribute: none
 
 By default, the class `.wp-block-your-block-name` is added to the root element of your saved markup. This helps having a consistent mechanism for styling blocks that themes and plugins can rely on. If, for whatever reason, a class is not desired on the markup, this functionality can be disabled.
 
@@ -88,7 +84,6 @@ supports: {
 
 - Type: `boolean`
 - Default value: `true`
-- Related attribute: none
 
 This property adds a field to define a custom className for the block's wrapper.
 
@@ -103,7 +98,6 @@ supports: {
 
 - Type: `boolean`
 - Default value: `true`
-- Related attribute: none
 
 When the style picker is shown, a dropdown is displayed so the user can select a default style for this block type. If you prefer not to show the dropdown, set this property to `false`.
 
@@ -118,7 +112,6 @@ supports: {
 
 - Type: `boolean`
 - Default value: `true`
-- Related attribute: none
 
 By default, a block's markup can be edited individually. To disable this behavior, set `html` to `false`.
 
@@ -133,7 +126,6 @@ supports: {
 
 - Type: `boolean`
 - Default value: `true`
-- Related attribute: none
 
 By default, all blocks will appear in the inserter. To hide a block so that it can only be inserted programmatically, set `inserter` to `false`.
 
@@ -148,7 +140,6 @@ supports: {
 
 - Type: `boolean`
 - Default value: `true`
-- Related attribute: none
 
 A non-multiple block can be inserted into each post, one time only. For example, the built-in 'More' block cannot be inserted again if it already exists in the post being edited. A non-multiple block's icon is automatically dimmed (unclickable) to prevent multiple instances.
 
@@ -163,7 +154,6 @@ supports: {
 
 - Type: `boolean`
 - Default value: `true`
-- Related attribute: none
 
 A block may want to disable the ability of being converted into a reusable block. By default all blocks can be converted to a reusable block. If supports reusable is set to false, the option to convert the block into a reusable block will not appear.
 
