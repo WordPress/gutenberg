@@ -142,14 +142,21 @@ export class Inserter extends Component {
 	}
 
 	onInserterToggledAnnouncement( isOpen ) {
-		const isIOS = Platform.OS === 'ios';
-		const announcement = isOpen
-			? __( 'Scrollable block menu opened. Select a block.' )
-			: __( 'Scrollable block menu closed.' );
-		delay(
-			() => AccessibilityInfo.announceForAccessibility( announcement ),
-			isIOS ? VOICE_OVER_ANNOUNCEMENT_DELAY : 0
-		);
+		AccessibilityInfo.fetch().done( ( isEnabled ) => {
+			if ( isEnabled ) {
+				const isIOS = Platform.OS === 'ios';
+				const announcement = isOpen
+					? __( 'Scrollable block menu opened. Select a block.' )
+					: __( 'Scrollable block menu closed.' );
+				delay(
+					() =>
+						AccessibilityInfo.announceForAccessibility(
+							announcement
+						),
+					isIOS ? VOICE_OVER_ANNOUNCEMENT_DELAY : 0
+				);
+			}
+		} );
 	}
 
 	/**
