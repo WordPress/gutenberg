@@ -34,7 +34,7 @@ function LegacyWidgetEdit( {
 	const [ hasEditForm, setHasEditForm ] = useState( true );
 	// If the block is not selected, defaults to show the preview, otherwise show the edit form.
 	const [ isPreview, setIsPreview ] = useState( ! isSelected );
-	const shouldShowPreview = isPreview || ! hasEditForm;
+	const shouldHidePreview = ! isPreview && hasEditForm;
 
 	// If isSelected changed, reset isPreview based on isSelected.
 	useEffect( () => {
@@ -177,18 +177,12 @@ function LegacyWidgetEdit( {
 				/>
 			) }
 			{ WPWidget?.isReferenceWidget ? (
-				<p
-					style={
-						shouldShowPreview ? undefined : { display: 'none' }
-					}
-				>
+				<p hidden={ shouldHidePreview }>
 					{ __( 'Reference widgets cannot be previewed.' ) }
 				</p>
 			) : (
 				<WidgetPreview
-					style={
-						shouldShowPreview ? undefined : { display: 'none' }
-					}
+					hidden={ shouldHidePreview }
 					className="wp-block-legacy-widget__preview"
 					widgetAreaId={ widgetAreaId }
 					attributes={ omit( attributes, 'widgetId' ) }
