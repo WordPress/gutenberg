@@ -313,7 +313,7 @@ class ButtonEdit extends Component {
 		// different than empty string.
 		const minWidth =
 			isButtonFocused || ( ! isButtonFocused && text && text !== '' )
-				? 1
+				? 40
 				: placeholderTextWidth;
 		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 		// a `placeholder` as an empty string when `RichText` is focused,
