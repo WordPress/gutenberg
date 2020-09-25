@@ -7,6 +7,7 @@ import { button as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import deprecated from './deprecated';
 import transforms from './transforms';
 import edit from './edit';
 import metadata from './block.json';
@@ -35,6 +36,7 @@ export const settings = {
 			},
 		],
 	},
+	deprecated,
 	transforms,
 	edit,
 	save,
