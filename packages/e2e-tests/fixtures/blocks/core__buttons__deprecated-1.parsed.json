@@ -2,8 +2,7 @@
     {
         "blockName": "core/buttons",
         "attrs": {
-            "align": "wide",
-            "contentJustification": "center"
+            "align": "center"
         },
         "innerBlocks": [
             {
@@ -25,9 +24,9 @@
                 ]
             }
         ],
-        "innerHTML": "\n<div class=\"wp-block-buttons alignwide is-content-justification-center\">\n\t\n\n\t\n</div>\n",
+        "innerHTML": "\n<div class=\"wp-block-buttons aligncenter\">\n\t\n\n\t\n</div>\n",
         "innerContent": [
-            "\n<div class=\"wp-block-buttons alignwide is-content-justification-center\">\n\t",
+            "\n<div class=\"wp-block-buttons aligncenter\">\n\t",
             null,
             "\n\n\t",
             null,
