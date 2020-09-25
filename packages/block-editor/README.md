@@ -558,6 +558,30 @@ _Related_
 
 Undocumented declaration.
 
+<a name="validateThemeColors" href="#validateThemeColors">#</a> **validateThemeColors**
+
+Given an array of theme colors checks colors for validity
+
+_Parameters_
+
+-   _colors_ `Array`: The array of theme colors
+
+_Returns_
+
+-   `Array`: The array of valid theme colors or the default colors
+
+<a name="validateThemeGradients" href="#validateThemeGradients">#</a> **validateThemeGradients**
+
+Given an array of theme gradients checks gradients for validity
+
+_Parameters_
+
+-   _gradients_ `Array`: The array of theme gradients
+
+_Returns_
+
+-   `Array`: The array of valid theme gradients or the default gradients
+
 <a name="Warning" href="#Warning">#</a> **Warning**
 
 _Related_
