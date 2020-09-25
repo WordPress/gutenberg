@@ -12,9 +12,14 @@
 	border-radius: 0;
 	border-bottom: $border-width solid $gray-700;
 	height: auto;
-	margin-left: -#{$grid-unit};
+	margin-left: -6px; // +2px to display the focus box-shadow
+	margin-top: 2px; // +2px to display the focus box-shadow
 	padding: $grid-unit $grid-unit-20;
-	width: calc(100% + #{$grid-unit-20});
+	width: calc(100% + #{$grid-unit-15});
+
+	&:focus:not(:disabled) {
+		border-bottom-color: transparent;
+	}
 }
 
 .edit-site-navigation-panel__preview {
