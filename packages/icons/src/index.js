@@ -103,6 +103,7 @@ export { default as lifesaver } from './library/lifesaver';
 export { default as link } from './library/link';
 export { default as linkOff } from './library/link-off';
 export { default as list } from './library/list';
+export { default as lock } from './library/lock';
 export { default as loop } from './library/loop';
 export { default as mapMarker } from './library/map-marker';
 export { default as media } from './library/media';
