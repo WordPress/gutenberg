@@ -6,8 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
-import { getBlockProps } from '@wordpress/blocks';
+import {
+	RichText,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { align, content, dropCap, direction } = attributes;
@@ -17,7 +19,7 @@ export default function save( { attributes } ) {
 	} );
 
 	return (
-		<p { ...getBlockProps( { className, dir: direction } ) }>
+		<p { ...useBlockWrapperProps.save( { className, dir: direction } ) }>
 			<RichText.Content value={ content } />
 		</p>
 	);

@@ -10,8 +10,8 @@ import {
 	InnerBlocks,
 	getColorClassName,
 	__experimentalGetGradientClass,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
-import { getBlockProps } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -96,7 +96,7 @@ export default function save( { attributes } ) {
 	);
 
 	return (
-		<div { ...getBlockProps( { className: classes, style } ) }>
+		<div { ...useBlockWrapperProps.save( { className: classes, style } ) }>
 			{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
 				<span
 					aria-hidden="true"

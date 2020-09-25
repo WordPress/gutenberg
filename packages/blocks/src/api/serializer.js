@@ -71,7 +71,12 @@ export function getBlockMenuDefaultClassName( blockName ) {
 
 const blockPropsProvider = {};
 
-export function getBlockProps( props ) {
+/**
+ * Call within a save function to get the props for the block wrapper.
+ *
+ * @param {Object} props Optional. Props to pass to the element.
+ */
+export function getBlockProps( props = {} ) {
 	const { blockType, attributes } = blockPropsProvider;
 	return applyFilters(
 		'blocks.getSaveContent.extraProps',
