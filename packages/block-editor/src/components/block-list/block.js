@@ -40,7 +40,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
-import { useBlockWrapperProps } from './block-wrapper';
+import { useBlockProps } from './block-wrapper';
 
 export const BlockListBlockContext = createContext();
 
@@ -70,7 +70,7 @@ function mergeWrapperProps( propsA, propsB ) {
 
 function Block( { children, isHtml, ...props } ) {
 	return (
-		<div { ...useBlockWrapperProps( props, { __unstableIsHtml: isHtml } ) }>
+		<div { ...useBlockProps( props, { __unstableIsHtml: isHtml } ) }>
 			{ children }
 		</div>
 	);

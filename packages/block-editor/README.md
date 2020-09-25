@@ -558,7 +558,7 @@ _Related_
 
 Undocumented declaration.
 
-<a name="useBlockWrapperProps" href="#useBlockWrapperProps">#</a> **useBlockWrapperProps**
+<a name="useBlockProps" href="#useBlockProps">#</a> **useBlockProps**
 
 This hook is used to lighly mark an element as a block element. Call this
 hook and pass the returned props to the element to mark as a block. If you

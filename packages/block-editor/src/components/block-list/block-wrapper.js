@@ -45,7 +45,7 @@ import ELEMENTS from './block-wrapper-elements';
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
-export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
+export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const fallbackRef = useRef();
 	const ref = props.ref || fallbackRef;
 	const onSelectionStart = useContext( Context );
@@ -311,10 +311,10 @@ useBlockWrapperProps.save = getBlockProps;
 const BlockComponent = forwardRef(
 	( { children, tagName: TagName = 'div', ...props }, ref ) => {
 		deprecated( 'wp.blockEditor.__experimentalBlock', {
-			alternative: 'wp.blockEditor.useBlockWrapperProps',
+			alternative: 'wp.blockEditor.useBlockProps',
 		} );
-		const blockWrapperProps = useBlockWrapperProps( { ...props, ref } );
-		return <TagName { ...blockWrapperProps }>{ children }</TagName>;
+		const blockProps = useBlockProps( { ...props, ref } );
+		return <TagName { ...blockProps }>{ children }</TagName>;
 	}
 );
 
