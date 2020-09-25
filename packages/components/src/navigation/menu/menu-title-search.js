@@ -4,6 +4,7 @@
 import { useEffect, useRef } from '@wordpress/element';
 import { Icon, closeSmall, search as searchIcon } from '@wordpress/icons';
 import { __, sprintf } from '@wordpress/i18n';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -39,6 +40,13 @@ export default function MenuTitleSearch( {
 		closeSearch();
 	};
 
+	function onKeyDown( event ) {
+		if ( event.keyCode === ESCAPE ) {
+			event.stopPropagation();
+			onSearchClose();
+		}
+	}
+
 	const inputId = `components-navigation__menu-title-search-${ menu }`;
 	/* translators: placeholder for sidebar search box. %s: menu title */
 	const placeholder = sprintf( __( 'Search in %s' ), title );
@@ -56,6 +64,7 @@ export default function MenuTitleSearch( {
 				className="components-text-control__input"
 				id={ inputId }
 				onChange={ ( event ) => onSearch( event.target.value ) }
+				onKeyDown={ onKeyDown }
 				placeholder={ placeholder }
 				ref={ inputRef }
 				type="search"
