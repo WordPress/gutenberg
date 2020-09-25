@@ -19,15 +19,15 @@ import {
  */
 import styles from './styles.scss';
 
-export const STORY_SAVE_STATE_SAVING = 1;
-export const STORY_SAVE_STATE_SUCCEEDED = 2;
-export const STORY_SAVE_STATE_FAILED = 3;
-export const STORY_SAVE_STATE_RESET = 4;
+export const STORY_UPLOAD_STATE_UPLOADING = 1;
+export const STORY_UPLOAD_STATE_SUCCEEDED = 2;
+export const STORY_UPLOAD_STATE_FAILED = 3;
+export const STORY_UPLOAD_STATE_RESET = 4;
 
-export const STORY_UPLOAD_STATE_UPLOADING = 5;
-export const STORY_UPLOAD_STATE_SUCCEEDED = 6;
-export const STORY_UPLOAD_STATE_FAILED = 7;
-export const STORY_UPLOAD_STATE_RESET = 8;
+export const STORY_SAVE_STATE_SAVING = 5;
+export const STORY_SAVE_STATE_SUCCEEDED = 6;
+export const STORY_SAVE_STATE_FAILED = 7;
+export const STORY_SAVE_STATE_RESET = 8;
 
 export class StoryUpdateProgress extends React.Component {
 	constructor( props ) {
@@ -78,7 +78,7 @@ export class StoryUpdateProgress extends React.Component {
 
 		switch ( payload.state ) {
 			case STORY_UPLOAD_STATE_UPLOADING:
-				this.updateMediaProgress( payload );
+				this.updateMediaUploadProgress( payload );
 				break;
 			case STORY_UPLOAD_STATE_SUCCEEDED:
 				this.finishMediaUploadWithSuccess( payload );
@@ -157,7 +157,7 @@ export class StoryUpdateProgress extends React.Component {
 	}
 
 	// ---- Story upload actions
-	updateMediaProgress( payload ) {
+	updateMediaUploadProgress( payload ) {
 		this.setState( {
 			progress: payload.progress,
 			isUploadInProgress: true,
@@ -165,8 +165,8 @@ export class StoryUpdateProgress extends React.Component {
 			isSaveInProgress: false,
 			isSaveFailed: false,
 		} );
-		if ( this.props.onUpdateMediaProgress ) {
-			this.props.onUpdateMediaProgress( payload );
+		if ( this.props.onUpdateMediaUploadProgress ) {
+			this.props.onUpdateMediaUploadProgress( payload );
 		}
 	}
 

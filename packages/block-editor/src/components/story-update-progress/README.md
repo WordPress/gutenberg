@@ -1,7 +1,7 @@
-MediaUploadProgress
+StoryUpdateProgress
 ===================
 
-`MediaUploadProgress` shows a progress bar while a media file associated with a block is being uploaded.
+`StoryUpdateProgress` shows a progress bar while the media files associated with a Story block are being saved
 
 ## Usage
 
@@ -10,12 +10,12 @@ Usage example
 ```jsx
 import { ImageBackground, Text, View } from 'react-native';
 import {
-	MediaUploadProgress,
+	StoryUpdateProgress,
 } from '@wordpress/block-editor';
 
 function MediaProgress( { url, id } ) {
 	return (
-		<MediaUploadProgress
+		<StoryUpdateProgress
 			mediaId={ id }
 			renderContent={ ( { isUploadFailed, retryMessage } ) => {
 				return (
