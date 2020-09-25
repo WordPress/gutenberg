@@ -32,9 +32,7 @@ function WidgetPreview( { widgetAreaId, attributes, ...props } ) {
 						'body',
 						'scrollHeight',
 					] );
-					if ( iframeContentHeight !== height ) {
-						setHeight( iframeContentHeight );
-					}
+					setHeight( iframeContentHeight );
 				} }
 				src={ iframeUrl }
 				height={ height + HEIGHT_MARGIN }

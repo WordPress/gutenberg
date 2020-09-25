@@ -6,7 +6,7 @@ import { get, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { Button, PanelBody, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
@@ -20,201 +20,182 @@ import LegacyWidgetEditHandler from './handler';
 import LegacyWidgetPlaceholder from './placeholder';
 import WidgetPreview from './widget-preview';
 
-class LegacyWidgetEdit extends Component {
-	constructor( props ) {
-		super( props );
-		this.state = {
-			hasEditForm: true,
-			// If the block is not selected, defaults to show the preview, otherwise show the edit form.
-			isPreview: ! props.isSelected,
-		};
-		this.switchToEdit = this.switchToEdit.bind( this );
-		this.switchToPreview = this.switchToPreview.bind( this );
-		this.changeWidget = this.changeWidget.bind( this );
-	}
+function LegacyWidgetEdit( {
+	attributes,
+	availableLegacyWidgets,
+	hasPermissionsToManageWidgets,
+	isSelected,
+	prerenderedEditForm,
+	setAttributes,
+	widgetId,
+	WPWidget,
+	widgetAreaId,
+} ) {
+	const [ hasEditForm, setHasEditForm ] = useState( true );
+	// If the block is not selected, defaults to show the preview, otherwise show the edit form.
+	const [ isPreview, setIsPreview ] = useState( ! isSelected );
+	const shouldShowPreview = isPreview || ! hasEditForm;
 
-	componentDidUpdate( prevProps ) {
-		// If isSelected changed, reset isPreview based on isSelected.
-		if ( this.props.isSelected !== prevProps.isSelected ) {
-			this.setState( {
-				isPreview: ! this.props.isSelected,
-			} );
-		}
-	}
+	// If isSelected changed, reset isPreview based on isSelected.
+	useEffect( () => {
+		setIsPreview( ! isSelected );
+	}, [ isSelected ] );
 
-	render() {
-		const {
-			attributes,
-			availableLegacyWidgets,
-			hasPermissionsToManageWidgets,
-			isSelected,
-			prerenderedEditForm,
-			setAttributes,
-			widgetId,
-			WPWidget,
-			widgetAreaId,
-		} = this.props;
-		const { isPreview, hasEditForm } = this.state;
-		const shouldShowPreview = isPreview || ! hasEditForm;
-		if ( ! WPWidget ) {
-			return (
-				<LegacyWidgetPlaceholder
-					availableLegacyWidgets={ availableLegacyWidgets }
-					hasPermissionsToManageWidgets={
-						hasPermissionsToManageWidgets
-					}
-					onChangeWidget={ ( newWidget ) => {
-						const {
-							isReferenceWidget,
-							id_base: idBase,
-						} = availableLegacyWidgets[ newWidget ];
+	function changeWidget() {
+		switchToEdit();
 
-						if ( isReferenceWidget ) {
-							setAttributes( {
-								instance: {},
-								idBase,
-								referenceWidgetName: newWidget,
-								widgetClass: undefined,
-							} );
-						} else {
-							setAttributes( {
-								instance: {},
-								idBase,
-								referenceWidgetName: undefined,
-								widgetClass: newWidget,
-							} );
-						}
-					} }
-				/>
-			);
-		}
-
-		const inspectorControls = WPWidget ? (
-			<InspectorControls>
-				<PanelBody title={ WPWidget.name }>
-					{ WPWidget.description }
-				</PanelBody>
-			</InspectorControls>
-		) : null;
-		if ( ! hasPermissionsToManageWidgets ) {
-			return (
-				<>
-					{ inspectorControls }
-					{ this.renderWidgetPreview() }
-				</>
-			);
-		}
-
-		return (
-			<>
-				<BlockControls>
-					<ToolbarGroup>
-						{ WPWidget && ! WPWidget.isHidden && (
-							<Button
-								onClick={ this.changeWidget }
-								label={ __( 'Change widget' ) }
-								icon={ update }
-							/>
-						) }
-						{ hasEditForm && (
-							<>
-								<Button
-									className="components-tab-button"
-									isPressed={ ! isPreview }
-									onClick={ this.switchToEdit }
-								>
-									<span>{ __( 'Edit' ) }</span>
-								</Button>
-								<Button
-									className="components-tab-button"
-									isPressed={ isPreview }
-									onClick={ this.switchToPreview }
-								>
-									<span>{ __( 'Preview' ) }</span>
-								</Button>
-							</>
-						) }
-					</ToolbarGroup>
-				</BlockControls>
-				{ inspectorControls }
-				{ hasEditForm && (
-					<LegacyWidgetEditHandler
-						isSelected={ isSelected }
-						isVisible={ ! isPreview }
-						id={ widgetId }
-						idBase={ attributes.idBase || widgetId }
-						number={ attributes.number }
-						prerenderedEditForm={ prerenderedEditForm }
-						widgetName={ get( WPWidget, [ 'name' ] ) }
-						widgetClass={ attributes.widgetClass }
-						instance={ attributes.instance }
-						onFormMount={ ( formData ) => {
-							// Function-based widgets don't come with an object of settings, only
-							// with a pre-rendered HTML form. Extracting settings from that HTML
-							// before this stage is not trivial (think embedded <script>). An alternative
-							// proposed here serializes the form back into widget settings immediately after
-							// it's mounted.
-							if ( ! attributes.widgetClass ) {
-								this.props.setAttributes( {
-									instance: formData,
-								} );
-							}
-						} }
-						onInstanceChange={ ( newInstance, newHasEditForm ) => {
-							if ( newInstance ) {
-								this.props.setAttributes( {
-									instance: newInstance,
-								} );
-							}
-							if ( newHasEditForm !== this.hasEditForm ) {
-								this.setState( {
-									hasEditForm: newHasEditForm,
-								} );
-							}
-						} }
-					/>
-				) }
-				{ WPWidget?.isReferenceWidget ? (
-					<p
-						style={
-							shouldShowPreview ? undefined : { display: 'none' }
-						}
-					>
-						{ __( 'Reference widgets cannot be previewed.' ) }
-					</p>
-				) : (
-					<WidgetPreview
-						style={
-							shouldShowPreview ? undefined : { display: 'none' }
-						}
-						className="wp-block-legacy-widget__preview"
-						widgetAreaId={ widgetAreaId }
-						attributes={ omit( attributes, 'widgetId' ) }
-					/>
-				) }
-			</>
-		);
-	}
-
-	changeWidget() {
-		this.switchToEdit();
-		this.props.setAttributes( {
+		setAttributes( {
 			instance: {},
 			id: undefined,
 			widgetClass: undefined,
 		} );
-		this.setState( {
-			hasEditForm: true,
-		} );
+		setHasEditForm( true );
 	}
 
-	switchToEdit() {
-		this.setState( { isPreview: false } );
+	function switchToEdit() {
+		setIsPreview( false );
 	}
 
-	switchToPreview() {
-		this.setState( { isPreview: true } );
+	function switchToPreview() {
+		setIsPreview( true );
 	}
+
+	if ( ! WPWidget ) {
+		return (
+			<LegacyWidgetPlaceholder
+				availableLegacyWidgets={ availableLegacyWidgets }
+				hasPermissionsToManageWidgets={ hasPermissionsToManageWidgets }
+				onChangeWidget={ ( newWidget ) => {
+					const {
+						isReferenceWidget,
+						id_base: idBase,
+					} = availableLegacyWidgets[ newWidget ];
+
+					if ( isReferenceWidget ) {
+						setAttributes( {
+							instance: {},
+							idBase,
+							referenceWidgetName: newWidget,
+							widgetClass: undefined,
+						} );
+					} else {
+						setAttributes( {
+							instance: {},
+							idBase,
+							referenceWidgetName: undefined,
+							widgetClass: newWidget,
+						} );
+					}
+				} }
+			/>
+		);
+	}
+
+	const inspectorControls = WPWidget ? (
+		<InspectorControls>
+			<PanelBody title={ WPWidget.name }>
+				{ WPWidget.description }
+			</PanelBody>
+		</InspectorControls>
+	) : null;
+	if ( ! hasPermissionsToManageWidgets ) {
+		return (
+			<>
+				{ inspectorControls }
+				<WidgetPreview
+					className="wp-block-legacy-widget__preview"
+					widgetAreaId={ widgetAreaId }
+					attributes={ omit( attributes, 'widgetId' ) }
+				/>
+			</>
+		);
+	}
+
+	return (
+		<>
+			<BlockControls>
+				<ToolbarGroup>
+					{ WPWidget && ! WPWidget.isHidden && (
+						<Button
+							onClick={ changeWidget }
+							label={ __( 'Change widget' ) }
+							icon={ update }
+						/>
+					) }
+					{ hasEditForm && (
+						<>
+							<Button
+								className="components-tab-button"
+								isPressed={ ! isPreview }
+								onClick={ switchToEdit }
+							>
+								<span>{ __( 'Edit' ) }</span>
+							</Button>
+							<Button
+								className="components-tab-button"
+								isPressed={ isPreview }
+								onClick={ switchToPreview }
+							>
+								<span>{ __( 'Preview' ) }</span>
+							</Button>
+						</>
+					) }
+				</ToolbarGroup>
+			</BlockControls>
+			{ inspectorControls }
+			{ hasEditForm && (
+				<LegacyWidgetEditHandler
+					isSelected={ isSelected }
+					isVisible={ ! isPreview }
+					id={ widgetId }
+					idBase={ attributes.idBase || widgetId }
+					number={ attributes.number }
+					prerenderedEditForm={ prerenderedEditForm }
+					widgetName={ get( WPWidget, [ 'name' ] ) }
+					widgetClass={ attributes.widgetClass }
+					instance={ attributes.instance }
+					onFormMount={ ( formData ) => {
+						// Function-based widgets don't come with an object of settings, only
+						// with a pre-rendered HTML form. Extracting settings from that HTML
+						// before this stage is not trivial (think embedded <script>). An alternative
+						// proposed here serializes the form back into widget settings immediately after
+						// it's mounted.
+						if ( ! attributes.widgetClass ) {
+							setAttributes( {
+								instance: formData,
+							} );
+						}
+					} }
+					onInstanceChange={ ( newInstance, newHasEditForm ) => {
+						if ( newInstance ) {
+							setAttributes( {
+								instance: newInstance,
+							} );
+						}
+						setHasEditForm( newHasEditForm );
+					} }
+				/>
+			) }
+			{ WPWidget?.isReferenceWidget ? (
+				<p
+					style={
+						shouldShowPreview ? undefined : { display: 'none' }
+					}
+				>
+					{ __( 'Reference widgets cannot be previewed.' ) }
+				</p>
+			) : (
+				<WidgetPreview
+					style={
+						shouldShowPreview ? undefined : { display: 'none' }
+					}
+					className="wp-block-legacy-widget__preview"
+					widgetAreaId={ widgetAreaId }
+					attributes={ omit( attributes, 'widgetId' ) }
+				/>
+			) }
+		</>
+	);
 }
 
 export default withSelect(
