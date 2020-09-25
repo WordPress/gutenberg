@@ -16,7 +16,7 @@ export function ControlledStateStory() {
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 
 	// Mock navigation link
-	const Link = ( { href, children } ) => (
+	const MockLink = ( { href, children } ) => (
 		<Button
 			href={ href }
 			// Since we're not actually navigating pages, simulate it with on onClick
@@ -40,10 +40,14 @@ export function ControlledStateStory() {
 			>
 				<NavigationMenu title="Home">
 					<NavigationItem item="item-1" title="Item 1">
-						<Link href="https://example.com/item-1">Item 1</Link>
+						<MockLink href="https://example.com/item-1">
+							Item 1
+						</MockLink>
 					</NavigationItem>
 					<NavigationItem item="item-2">
-						<Link href="https://example.com/item-2">Item 2</Link>
+						<MockLink href="https://example.com/item-2">
+							Item 2
+						</MockLink>
 					</NavigationItem>
 					<NavigationItem
 						item="item-sub-menu"
