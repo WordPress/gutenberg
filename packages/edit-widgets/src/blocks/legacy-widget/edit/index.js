@@ -6,7 +6,7 @@ import { get, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { Button, PanelBody, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
@@ -24,7 +24,6 @@ function LegacyWidgetEdit( {
 	attributes,
 	availableLegacyWidgets,
 	hasPermissionsToManageWidgets,
-	isSelected,
 	prerenderedEditForm,
 	setAttributes,
 	widgetId,
@@ -33,13 +32,8 @@ function LegacyWidgetEdit( {
 } ) {
 	const [ hasEditForm, setHasEditForm ] = useState( true );
 	// If the block is not selected, defaults to show the preview, otherwise show the edit form.
-	const [ isPreview, setIsPreview ] = useState( ! isSelected );
+	const [ isPreview, setIsPreview ] = useState( false );
 	const shouldHidePreview = ! isPreview && hasEditForm;
-
-	// If isSelected changed, reset isPreview based on isSelected.
-	useEffect( () => {
-		setIsPreview( ! isSelected );
-	}, [ isSelected ] );
 
 	function changeWidget() {
 		switchToEdit();
@@ -145,7 +139,6 @@ function LegacyWidgetEdit( {
 			{ inspectorControls }
 			{ hasEditForm && (
 				<LegacyWidgetEditHandler
-					isSelected={ isSelected }
 					isVisible={ ! isPreview }
 					id={ widgetId }
 					idBase={ attributes.idBase || widgetId }

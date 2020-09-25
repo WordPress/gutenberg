@@ -38,3 +38,12 @@
 	border: $border-width solid $gray-900;
 	border-radius: $radius-block-ui;
 }
+
+.wp-block:not(.is-selected) > .wp-block-legacy-widget__edit-handler {
+	border: 1px solid #1e1e1e;
+	border-radius: 2px;
+}
+
+.wp-block-legacy-widget__edit-handler.is-hidden {
+	display: none;
+}

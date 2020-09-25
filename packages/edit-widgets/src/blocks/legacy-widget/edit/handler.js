@@ -14,6 +14,7 @@ import { withInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import LegacyWidgetEditDomManager from './dom-manager';
+import classNames from 'classnames';
 
 const { XMLHttpRequest, FormData } = window;
 
@@ -64,7 +65,7 @@ class LegacyWidgetEditHandler extends Component {
 			number,
 			idBase,
 			instance,
-			isSelected,
+			isVisible,
 			widgetName,
 		} = this.props;
 		const { form } = this.state;
@@ -75,17 +76,21 @@ class LegacyWidgetEditHandler extends Component {
 
 		const widgetTitle = get( instance, [ 'title' ] );
 		let title = null;
-		if ( isSelected ) {
-			if ( widgetTitle && widgetName ) {
-				title = `${ widgetName }: ${ widgetTitle }`;
-			} else if ( ! widgetTitle && widgetName ) {
-				title = widgetName;
-			} else if ( widgetTitle && ! widgetName ) {
-				title = widgetTitle;
-			}
+		if ( widgetTitle && widgetName ) {
+			title = `${ widgetName }: ${ widgetTitle }`;
+		} else if ( ! widgetTitle && widgetName ) {
+			title = widgetName;
+		} else if ( widgetTitle && ! widgetName ) {
+			title = widgetTitle;
 		}
+
 		return (
-			<>
+			<div
+				className={ classNames(
+					'wp-block-legacy-widget__edit-handler',
+					{ 'is-hidden': ! isVisible }
+				) }
+			>
 				{ title && (
 					<div className="wp-block-legacy-widget__edit-widget-title">
 						{ title }
@@ -114,7 +119,7 @@ class LegacyWidgetEditHandler extends Component {
 						form={ form }
 					/>
 				</div>
-			</>
+			</div>
 		);
 	}
 
