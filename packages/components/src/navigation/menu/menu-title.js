@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { Icon, search as searchIcon } from '@wordpress/icons';
 
 /**
@@ -19,10 +19,21 @@ export default function NavigationMenuTitle( {
 	title,
 } ) {
 	const [ isSearching, setIsSearching ] = useState( false );
+	const searchButtonRef = useRef();
 
 	if ( ! title ) {
 		return null;
 	}
+
+	const onCloseSearch = () => {
+		setIsSearching( false );
+
+		// Wait for the slide-in animation to complete before focusing the search button.
+		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+		setTimeout( () => {
+			searchButtonRef.current.focus();
+		}, 100 );
+	};
 
 	return (
 		<MenuTitleUI className="components-navigation__menu-title">
@@ -39,6 +50,7 @@ export default function NavigationMenuTitle( {
 							isSmall
 							isTertiary
 							onClick={ () => setIsSearching( true ) }
+							ref={ searchButtonRef }
 						>
 							<Icon icon={ searchIcon } />
 						</Button>
@@ -51,7 +63,7 @@ export default function NavigationMenuTitle( {
 					{ ( { className: animateClassName } ) => (
 						<div className={ animateClassName }>
 							<MenuTitleSearch
-								closeSearch={ () => setIsSearching( false ) }
+								onCloseSearch={ onCloseSearch }
 								onSearch={ onSearch }
 								search={ search }
 								title={ title }

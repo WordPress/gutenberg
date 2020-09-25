@@ -15,7 +15,7 @@ import { useNavigationMenuContext } from './context';
 import { MenuTitleSearchUI } from '../styles/navigation-styles';
 
 export default function MenuTitleSearch( {
-	closeSearch,
+	onCloseSearch,
 	onSearch,
 	search,
 	title,
@@ -35,15 +35,15 @@ export default function MenuTitleSearch( {
 		};
 	}, [] );
 
-	const onSearchClose = () => {
+	const onClose = () => {
 		onSearch( '' );
-		closeSearch();
+		onCloseSearch();
 	};
 
 	function onKeyDown( event ) {
 		if ( event.keyCode === ESCAPE ) {
 			event.stopPropagation();
-			onSearchClose();
+			onClose();
 		}
 	}
 
@@ -71,7 +71,7 @@ export default function MenuTitleSearch( {
 				value={ search }
 			/>
 
-			<Button isSmall isTertiary onClick={ onSearchClose }>
+			<Button isSmall isTertiary onClick={ onClose }>
 				<Icon icon={ closeSmall } />
 			</Button>
 		</MenuTitleSearchUI>
