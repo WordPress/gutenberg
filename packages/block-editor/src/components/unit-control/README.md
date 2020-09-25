@@ -1,11 +1,32 @@
 # UnitControl
 
-UnitControl allows the user to set a value as well as a unit (e.g. `px`).
+UnitControl component allows the user to set a value as well as a unit (e.g. `px`). The allowed units are derived from the (experimental) `theme.json` settings file .
 
-## Usage
+```js
+// theme.json
+{
+	"global": {
+		"settings": {
+			"spacing": {
+				"units": [ "px", "em", "rem", "vh", "vw" ]
+			}
+		}
+	}
+}
+```
+
+## Table of contents
+
+1. [Development guidelines](#development-guidelines)
+
+## Developer guidelines
+
+### Usage
+
+Renders a control (`input` and `select`) with the values `10` and `px` parsed from `10px`.
 
 ```jsx
-import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
+import { __experimentalUnitControl as UnitControl } from '@wordpress/block-editor/';
 import { useState } from '@wordpress/element';
 
 const Example = () => {
@@ -15,9 +36,9 @@ const Example = () => {
 };
 ```
 
-## Props
+### Props
 
-### disabledUnits
+#### disabledUnits
 
 If true, the unit `<select>` is hidden.
 
@@ -33,7 +54,7 @@ If true, the `ENTER` key press is required in order to trigger an `onChange`. If
 -   Required: No
 -   Default: `false`
 
-### isUnitSelectTabbable
+#### isUnitSelectTabbable
 
 Determines if the unit `<select>` is tabbable.
 
@@ -41,21 +62,21 @@ Determines if the unit `<select>` is tabbable.
 -   Required: No
 -   Default: `true`
 
-### label
+#### label
 
 If this property is added, a label will be generated using label property as the content.
 
 -   Type: `String`
 -   Required: No
 
-### labelPosition
+#### labelPosition
 
 The position of the label (`top`, `side`, or `bottom`).
 
 -   Type: `String`
 -   Required: No
 
-### onChange
+#### onChange
 
 Callback when the `value` changes.
 
@@ -63,7 +84,7 @@ Callback when the `value` changes.
 -   Required: No
 -   Default: `noop`
 
-### onUnitChange
+#### onUnitChange
 
 Callback when the `unit` changes.
 
@@ -71,7 +92,7 @@ Callback when the `unit` changes.
 -   Required: No
 -   Default: `noop`
 
-### size
+#### size
 
 Adjusts the size of the input.
 Sizes include: `default`, `small`
@@ -80,23 +101,9 @@ Sizes include: `default`, `small`
 -   Required: No
 -   Default: `default`
 
-### unit
+#### units
 
-Deprecated: Current unit value.
-Instead, provide a unit with a value through the `value` prop.
-
-Example:
-
-```jsx
-<UnitControl value="50%" />
-```
-
--   Type: `String`
--   Required: No
-
-### units
-
-Collection of available units.
+Collection of available units. These units must be one of the units defined in the `theme.json` settings file.
 
 -   Type: `Array<Object>`
 -   Required: No
@@ -120,7 +127,7 @@ const Example = () => {
 
 A `default` value for (in the example above, `10` for `%`), if defined, is set as the new `value` when a unit changes. This is helpful in scenarios where changing a unit may cause drastic results, such as changing from `px` to `vh`.
 
-### value
+#### value
 
 Current value. To set a unit, provide a unit with a value through the `value` prop.
 
