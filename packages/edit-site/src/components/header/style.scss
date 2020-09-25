@@ -20,10 +20,10 @@
 	}
 }
 
-// TODO: Figure out where to place variable for 300px sidebar width
+// Keeps the document title centered when the sidebar is open
 .navigation-open {
 	.edit-site-header_center {
-		margin-left: 300px;
+		margin-left: $nav-sidebar-width;
 	}
 }
 

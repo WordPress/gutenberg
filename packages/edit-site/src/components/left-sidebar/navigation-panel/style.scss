@@ -2,7 +2,7 @@
 	animation: edit-site-navigation-panel__slide-in 0.1s linear;
 	height: 100%;
 	position: relative;
-	width: 300px;
+	width: $nav-sidebar-width;
 	@include reduce-motion("animation");
 
 	@keyframes edit-site-navigation-panel__slide-in {
@@ -59,7 +59,7 @@
 .edit-site-navigation-panel__preview {
 	display: none;
 	border: $border-width solid $gray-400;
-	width: 300px;
+	width: $nav-sidebar-width;
 	padding: $grid-unit-20;
 	background: $white;
 	box-shadow: $shadow-popover;
