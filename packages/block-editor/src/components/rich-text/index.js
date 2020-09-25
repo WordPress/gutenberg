@@ -611,7 +611,7 @@ function RichTextWrapper(
 			maxWidth={ maxWidth }
 			onBlur={ onBlur }
 			setRef={ setRef }
-			id={ props.id }
+			id={ props.id } // Destructuring the id prop breaks the editor
 		>
 			{ ( {
 				isSelected: nestedIsSelected,
