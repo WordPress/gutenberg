@@ -17,6 +17,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	backgroundColor: [ 'color', 'background' ],
 	color: [ 'color', 'text' ],
 	fontSize: [ 'typography', 'fontSize' ],
+	fontStyle: [ 'typography', 'fontStyle' ],
 	lineHeight: [ 'typography', 'lineHeight' ],
 	paddingBottom: [ 'spacing', 'padding', 'bottom' ],
 	paddingLeft: [ 'spacing', 'padding', 'left' ],

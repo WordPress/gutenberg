@@ -160,6 +160,18 @@
 						"slug": "huge",
 						"size": 42
 					}
+				],
+				"fontStyles": [
+					{
+						"name": "Normal",
+						"slug": "normal",
+						"style": "normal"
+					},
+					{
+						"name": "Italics",
+						"slug": "italics",
+						"style": "italic"
+					}
 				]
 			},
 			"spacing": {
