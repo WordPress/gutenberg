@@ -1,8 +1,14 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useRef, useState } from '@wordpress/element';
 import {
+	Animate,
 	__experimentalNavigation as Navigation,
 	__experimentalNavigationBackButton as NavigationBackButton,
 	__experimentalNavigationGroup as NavigationGroup,
@@ -22,40 +28,53 @@ const NavigationPanel = () => {
 	}, [ ref ] );
 
 	return (
-		<div className="edit-site-navigation-panel">
-			<Navigation>
-				<NavigationBackButton
-					backButtonLabel={ __( 'Dashboard' ) }
-					className="edit-site-navigation-panel__back-to-dashboard"
-					href="index.php"
-					ref={ ref }
-				/>
-				<NavigationMenu title="Home">
-					<NavigationGroup title="Example group">
-						<NavigationItem
-							item="item-preview"
-							title="Hover to show preview"
-							onMouseEnter={ () => setShowPreview( true ) }
-							onMouseLeave={ () => setShowPreview( false ) }
+		<Animate type="slide-in" options={ { origin: 'right' } }>
+			{ ( { className: animateClassName } ) => (
+				<div
+					className={ classnames(
+						'edit-site-navigation-panel',
+						animateClassName
+					) }
+				>
+					<Navigation>
+						<NavigationBackButton
+							backButtonLabel={ __( 'Dashboard' ) }
+							className="edit-site-navigation-panel__back-to-dashboard"
+							href="index.php"
+							ref={ ref }
 						/>
-					</NavigationGroup>
-				</NavigationMenu>
-			</Navigation>
+						<NavigationMenu title="Home">
+							<NavigationGroup title="Example group">
+								<NavigationItem
+									item="item-preview"
+									title="Hover to show preview"
+									onMouseEnter={ () =>
+										setShowPreview( true )
+									}
+									onMouseLeave={ () =>
+										setShowPreview( false )
+									}
+								/>
+							</NavigationGroup>
+						</NavigationMenu>
+					</Navigation>
 
-			{ showPreview && (
-				<div className="edit-site-navigation-panel__preview">
-					<BlockPreview
-						blocks={ [
-							getBlockFromExample(
-								'core/paragraph',
-								getBlockType( 'core/paragraph' ).example
-							),
-						] }
-						viewportWidth={ 1200 }
-					/>
+					{ showPreview && (
+						<div className="edit-site-navigation-panel__preview">
+							<BlockPreview
+								blocks={ [
+									getBlockFromExample(
+										'core/paragraph',
+										getBlockType( 'core/paragraph' ).example
+									),
+								] }
+								viewportWidth={ 1200 }
+							/>
+						</div>
+					) }
 				</div>
 			) }
-		</div>
+		</Animate>
 	);
 };
 

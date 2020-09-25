@@ -6,7 +6,8 @@
 		background: $gray-900;
 		border-radius: 0;
 		display: flex;
-		height: $header-height;
+		height: $header-height + $border-width; // Cover header border
+		width: $header-height;
 	}
 }
 
@@ -14,6 +15,10 @@
 	flex-shrink: 0;
 	height: $header-height + $border-width; // Cover header border
 	width: 300px;
+
+	// Delay to sync with `NavigationPanel` animation
+	transition: 93ms cubic-bezier(0, 0, 0.2, 1);
+	transition-delay: 7ms;
 
 	.edit-site-navigation-toggle__button {
 		background: $gray-900;
