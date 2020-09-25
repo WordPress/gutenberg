@@ -270,6 +270,9 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 	}, [ isNavigationMode, isHovered, setHovered ] );
 
 	useEffect( () => {
+		// To accurately determine which blocks are hovered we must look at the elements under the cursor.
+		// Internal block inserters will fire events like mouseleave for blocks they are visually contained within,
+		// which makes an add/remove by clientId per individual block approach inaccurate.
 		function getHoveredBlocksFromCursor( event ) {
 			const hoveredElements = document.elementsFromPoint(
 				event.clientX,
