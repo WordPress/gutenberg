@@ -19,6 +19,7 @@ import { parse } from '@wordpress/blocks';
  * Internal dependencies
  */
 import styles from './editor.scss';
+import EditTitle from './edit-title';
 
 class ReusableBlockEdit extends Component {
 	constructor( { reusableBlock } ) {
@@ -89,7 +90,7 @@ class ReusableBlockEdit extends Component {
 				onChange={ this.setBlocks }
 				onInput={ this.setBlocks }
 			>
-				<BlockList withFooter={ false } />
+				<BlockList withFooter={ false } marginHorizontal={ 0 } />
 			</BlockEditorProvider>
 		);
 
@@ -99,7 +100,7 @@ class ReusableBlockEdit extends Component {
 
 		return (
 			<View>
-				{ isSelected && <Text style={ styles.title }>{ title }</Text> }
+				{ isSelected && <EditTitle title={ title } /> }
 				{ element }
 			</View>
 		);

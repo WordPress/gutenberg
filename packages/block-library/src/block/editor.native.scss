@@ -1,3 +1,52 @@
+.titleContainer {
+	flex-direction: row;
+	align-items: center;
+	padding-bottom: 12;
+}
+
 .title {
 	font-weight: bold;
+	color: $light-secondary;
+	flex-grow: 1;
+}
+
+.titleDark {
+	color: $dark-secondary;
+}
+
+.separator {
+	background-color: $light-gray-400;
+	height: 1px;
+	width: 100%;
+}
+
+.separatorDark {
+	background-color: $gray-70;
+}
+
+.lockIconContainer {
+	justify-content: flex-start;
+	align-items: flex-end;
+	padding-right: 8;
+}
+
+.lockIcon {
+	color: $light-secondary;
+}
+
+.lockIconDark {
+	color: $dark-secondary;
+}
+
+.helpIconContainer {
+	justify-content: flex-start;
+	align-items: flex-end;
+}
+
+.infoIcon {
+	color: $light-secondary;
+}
+
+.infoIconDark {
+	color: $dark-secondary;
 }
