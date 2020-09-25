@@ -21,15 +21,25 @@ import LegacyWidgetPlaceholder from './placeholder';
 import WidgetPreview from './widget-preview';
 
 class LegacyWidgetEdit extends Component {
-	constructor() {
-		super( ...arguments );
+	constructor( props ) {
+		super( props );
 		this.state = {
 			hasEditForm: true,
-			isPreview: false,
+			// If the block is not selected, defaults to show the preview, otherwise show the edit form.
+			isPreview: ! props.isSelected,
 		};
 		this.switchToEdit = this.switchToEdit.bind( this );
 		this.switchToPreview = this.switchToPreview.bind( this );
 		this.changeWidget = this.changeWidget.bind( this );
+	}
+
+	componentDidUpdate( prevProps ) {
+		// If isSelected changed, reset isPreview based on isSelected.
+		if ( this.props.isSelected !== prevProps.isSelected ) {
+			this.setState( {
+				isPreview: ! this.props.isSelected,
+			} );
+		}
 	}
 
 	render() {
@@ -42,8 +52,10 @@ class LegacyWidgetEdit extends Component {
 			setAttributes,
 			widgetId,
 			WPWidget,
+			widgetAreaId,
 		} = this.props;
 		const { isPreview, hasEditForm } = this.state;
+		const shouldShowPreview = isPreview || ! hasEditForm;
 		if ( ! WPWidget ) {
 			return (
 				<LegacyWidgetPlaceholder
@@ -162,10 +174,24 @@ class LegacyWidgetEdit extends Component {
 						} }
 					/>
 				) }
-				{ ( isPreview || ! hasEditForm ) &&
-					( WPWidget?.isReferenceWidget
-						? this.renderWidgetPreviewUnavailable()
-						: this.renderWidgetPreview() ) }
+				{ WPWidget?.isReferenceWidget ? (
+					<p
+						style={
+							shouldShowPreview ? undefined : { display: 'none' }
+						}
+					>
+						{ __( 'Reference widgets cannot be previewed.' ) }
+					</p>
+				) : (
+					<WidgetPreview
+						style={
+							shouldShowPreview ? undefined : { display: 'none' }
+						}
+						className="wp-block-legacy-widget__preview"
+						widgetAreaId={ widgetAreaId }
+						attributes={ omit( attributes, 'widgetId' ) }
+					/>
+				) }
 			</>
 		);
 	}
@@ -188,21 +214,6 @@ class LegacyWidgetEdit extends Component {
 
 	switchToPreview() {
 		this.setState( { isPreview: true } );
-	}
-
-	renderWidgetPreview() {
-		const { attributes, widgetAreaId } = this.props;
-		return (
-			<WidgetPreview
-				className="wp-block-legacy-widget__preview"
-				widgetAreaId={ widgetAreaId }
-				attributes={ omit( attributes, 'widgetId' ) }
-			/>
-		);
-	}
-
-	renderWidgetPreviewUnavailable() {
-		return <p>{ __( 'Reference widgets cannot be previewed.' ) }</p>;
 	}
 }
 
