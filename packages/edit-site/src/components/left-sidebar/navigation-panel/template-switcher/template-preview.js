@@ -17,9 +17,10 @@ export default function TemplatePreview( { entityId } ) {
 		[ entityId ]
 	);
 
+	const templateRawContent = template?.content?.raw || '';
 	const blocks = useMemo(
-		() => ( template ? parse( template?.content?.raw || '' ) : [] ),
-		[ template ]
+		() => ( template ? parse( templateRawContent ) : [] ),
+		[ templateRawContent ]
 	);
 
 	if ( ! blocks || blocks.length === 0 ) {
