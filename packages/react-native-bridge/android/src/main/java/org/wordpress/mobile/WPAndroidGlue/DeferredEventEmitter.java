@@ -16,6 +16,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID;
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL;
+import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_STORY_SAVE_RESULT;
 
 public class DeferredEventEmitter implements MediaUploadEventEmitter, StorySaveEventEmitter {
     public interface JSEventEmitter {
@@ -27,10 +28,11 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, StorySaveE
     private static final int MEDIA_UPLOAD_STATE_FAILED = 3;
     private static final int MEDIA_UPLOAD_STATE_RESET = 4;
 
-    private static final int STORY_SAVE_STATE_SAVING = 5;
-    private static final int STORY_SAVE_STATE_SUCCEEDED = 6;
-    private static final int STORY_SAVE_STATE_FAILED = 7;
-    private static final int STORY_SAVE_STATE_RESET = 8;
+    private static final int MEDIA_SAVE_STATE_SAVING = 5;
+    private static final int MEDIA_SAVE_STATE_SUCCEEDED = 6;
+    private static final int MEDIA_SAVE_STATE_FAILED = 7;
+    private static final int MEDIA_SAVE_STATE_RESET = 8;
+    private static final int STORY_SAVE_STATE_RESULT = 9;
 
     private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
     private static final String EVENT_NAME_MEDIA_SAVE = "mediaSave";
@@ -120,9 +122,22 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, StorySaveE
         }
     }
 
+    private void setStorySaveDataInJS(int state, String mediaId, boolean success, float progress) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_STATE, state);
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
+        writableMap.putBoolean(MAP_KEY_STORY_SAVE_RESULT, success);
+        writableMap.putDouble(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_PROGRESS, progress);
+        if (isCriticalMessage(state)) {
+            queueActionToJS(EVENT_NAME_MEDIA_SAVE, writableMap);
+        } else {
+            emitOrDrop(EVENT_NAME_MEDIA_SAVE, writableMap);
+        }
+    }
+
     private boolean isCriticalMessage(int state) {
         return state == MEDIA_UPLOAD_STATE_SUCCEEDED || state == MEDIA_UPLOAD_STATE_FAILED
-                || state == STORY_SAVE_STATE_SUCCEEDED || state == STORY_SAVE_STATE_FAILED;
+               || state == MEDIA_SAVE_STATE_SUCCEEDED || state == MEDIA_SAVE_STATE_FAILED;
     }
 
     @Override
@@ -148,22 +163,27 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, StorySaveE
     // Story save events emitter
     @Override
     public void onSaveMediaFileClear(String mediaId) {
-        setStorySaveDataInJS(STORY_SAVE_STATE_RESET, mediaId, null, 0);
+        setStorySaveDataInJS(MEDIA_SAVE_STATE_RESET, mediaId, null, 0);
     }
 
     @Override
     public void onMediaFileSaveProgress(String mediaId, float progress) {
-        setStorySaveDataInJS(STORY_SAVE_STATE_SAVING, mediaId, null, progress);
+        setStorySaveDataInJS(MEDIA_SAVE_STATE_SAVING, mediaId, null, progress);
     }
 
     @Override
     public void onMediaFileSaveSucceeded(String mediaId, String mediaUrl) {
-        setStorySaveDataInJS(STORY_SAVE_STATE_SUCCEEDED, mediaId, mediaUrl, 1);
+        setStorySaveDataInJS(MEDIA_SAVE_STATE_SUCCEEDED, mediaId, mediaUrl, 1);
     }
 
     @Override
     public void onMediaFileSaveFailed(String mediaId) {
-        setStorySaveDataInJS(STORY_SAVE_STATE_FAILED, mediaId, null, 0);
+        setStorySaveDataInJS(MEDIA_SAVE_STATE_FAILED, mediaId, null, 0);
+    }
+
+    @Override
+    public void onStorySaveResult(String storyFirstMediaId, boolean success) {
+        setStorySaveDataInJS(STORY_SAVE_STATE_RESULT, storyFirstMediaId, success, success ? 1 : 0);
     }
 
     public void updateCapabilities(GutenbergProps gutenbergProps) {

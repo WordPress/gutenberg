@@ -24,10 +24,11 @@ export const STORY_UPLOAD_STATE_SUCCEEDED = 2;
 export const STORY_UPLOAD_STATE_FAILED = 3;
 export const STORY_UPLOAD_STATE_RESET = 4;
 
-export const STORY_SAVE_STATE_SAVING = 5;
-export const STORY_SAVE_STATE_SUCCEEDED = 6;
-export const STORY_SAVE_STATE_FAILED = 7;
-export const STORY_SAVE_STATE_RESET = 8;
+export const MEDIA_SAVE_STATE_SAVING = 5;
+export const MEDIA_SAVE_STATE_SUCCEEDED = 6;
+export const MEDIA_SAVE_STATE_FAILED = 7;
+export const MEDIA_SAVE_STATE_RESET = 8;
+export const STORY_SAVE_STATE_RESULT = 9;
 
 export class StoryUpdateProgress extends React.Component {
 	constructor( props ) {
@@ -106,17 +107,20 @@ export class StoryUpdateProgress extends React.Component {
 		// }
 
 		switch ( payload.state ) {
-			case STORY_SAVE_STATE_SAVING:
+			case MEDIA_SAVE_STATE_SAVING:
 				this.updateMediaSaveProgress( payload );
 				break;
-			case STORY_SAVE_STATE_SUCCEEDED:
+			case MEDIA_SAVE_STATE_SUCCEEDED:
 				this.finishMediaSaveWithSuccess( payload );
 				break;
-			case STORY_SAVE_STATE_FAILED:
+			case MEDIA_SAVE_STATE_FAILED:
 				this.finishMediaSaveWithFailure( payload );
 				break;
-			case STORY_SAVE_STATE_RESET:
-				this.mediaUploadStateReset( payload );
+			case MEDIA_SAVE_STATE_RESET:
+				this.mediaSaveStateReset( payload );
+				break;
+			case STORY_SAVE_STATE_RESULT:
+				this.storySaveResult( payload );
 				break;
 		}
 	}
@@ -153,6 +157,19 @@ export class StoryUpdateProgress extends React.Component {
 		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
 		if ( this.props.onMediaSaveStateReset ) {
 			this.props.onMediaSaveStateReset( payload );
+		}
+	}
+	
+	storySaveResult( payload ) {
+		this.setState( {
+			progress: payload.progress,
+			isUploadInProgress: false,
+			isUploadFailed: false,
+			isSaveInProgress: false,
+			isSaveFailed: (! payload.success),
+		} );
+		if ( this.props.onStorySaveResult ) {
+			this.props.onStorySaveResult( payload );
 		}
 	}
 
@@ -238,7 +255,7 @@ export class StoryUpdateProgress extends React.Component {
 		const progress = this.state.progress * 100;
 		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
 		const retryMessage = __(
-			'Failed to insert media.\nPlease tap for options.'
+			'Failed to save Story.\nPlease tap for options.'
 		);
 
 		return (

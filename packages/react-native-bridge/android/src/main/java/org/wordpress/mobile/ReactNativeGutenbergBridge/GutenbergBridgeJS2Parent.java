@@ -39,6 +39,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void onMediaFileSaveProgress(String mediaId, float progress);
         void onMediaFileSaveSucceeded(String mediaId, String mediaUrl);
         void onMediaFileSaveFailed(String mediaId);
+        void onStorySaveResult(String storyFirstMediaId, boolean success);
     }
 
     interface ReplaceUnsupportedBlockCallback {
