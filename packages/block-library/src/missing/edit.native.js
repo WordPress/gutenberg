@@ -247,8 +247,8 @@ export default compose( [
 			isUnsupportedBlockEditorSupported:
 				getSettings( 'capabilities' ).unsupportedBlockEditor === true,
 			canEnableUnsupportedBlockEditor:
-				getSettings( 'capabilities' ).canEnableUnsupportedBlockEditor ===
-				true,
+				getSettings( 'capabilities' )
+					.canEnableUnsupportedBlockEditor === true,
 		};
 	} ),
 	withPreferredColorScheme,
