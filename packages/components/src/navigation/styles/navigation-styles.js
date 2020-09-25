@@ -64,11 +64,17 @@ export const MenuTitleHeadingUI = styled( Text )`
 	padding: 4px 0 4px 16px;
 
 	.components-button.is-small {
-		&:active {
+		color: ${ G2.lightGray.ui };
+		margin-right: 2px;
+		padding: 0;
+
+		&:active:not( :disabled ) {
 			background: none;
+			color: ${ G2.gray[ 200 ] };
 		}
-		&:hover {
+		&:hover:not( :disabled ) {
 			box-shadow: none;
+			color: ${ G2.gray[ 200 ] };
 		}
 	}
 `;
@@ -105,10 +111,10 @@ export const MenuTitleSearchUI = styled.div`
 		right: 4px;
 		top: 3px;
 
-		&:active {
+		&:active:not( :disabled ) {
 			background: none;
 		}
-		&:hover {
+		&:hover:not( :disabled ) {
 			box-shadow: none;
 		}
 	}
