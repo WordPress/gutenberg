@@ -32,7 +32,7 @@ export default function ThemePreview( {
 			<img
 				className="edit-site-template-switcher__theme-preview-screenshot"
 				src={ screenshot }
-				alt={ 'Theme Preview' }
+				alt={ __( 'Theme Preview' ) }
 			/>
 			<div className="edit-site-template-switcher__theme-preview-description">
 				{ truncate(
