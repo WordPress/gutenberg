@@ -65,7 +65,7 @@ export class UnsupportedBlockEdit extends Component {
 
 	requestFallback() {
 		if (
-			this.props.isUnsupportedBlockSwitchable &&
+			this.props.canEnableUnsupportedBlockEditor &&
 			this.props.isUnsupportedBlockEditorSupported === false
 		) {
 			this.toggleSheet();
@@ -82,7 +82,7 @@ export class UnsupportedBlockEdit extends Component {
 			attributes,
 			clientId,
 			isUnsupportedBlockEditorSupported,
-			isUnsupportedBlockSwitchable,
+			canEnableUnsupportedBlockEditor,
 		} = this.props;
 		const infoTextStyle = getStylesFromColorScheme(
 			styles.infoText,
@@ -160,7 +160,7 @@ export class UnsupportedBlockEdit extends Component {
 					</Text>
 				</View>
 				{ ( isUnsupportedBlockEditorSupported ||
-					isUnsupportedBlockSwitchable ) && (
+					canEnableUnsupportedBlockEditor ) && (
 					<>
 						<BottomSheet.Cell
 							label={
@@ -246,7 +246,7 @@ export default compose( [
 		return {
 			isUnsupportedBlockEditorSupported:
 				getSettings( 'capabilities' ).unsupportedBlockEditor === true,
-			isUnsupportedBlockSwitchable:
+			canEnableUnsupportedBlockEditor:
 				getSettings( 'capabilities' ).unsupportedBlockEditorSwitch ===
 				true,
 		};
