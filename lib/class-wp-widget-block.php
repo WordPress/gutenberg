@@ -38,7 +38,7 @@ class WP_Widget_Block extends WP_Widget {
 			'height' => 350,
 		);
 		parent::__construct( 'block', __( 'Block', 'gutenberg' ), $widget_ops, $control_ops );
-		add_action( 'is_wide_widget_in_customizer', [ $this, 'set_is_wide_widget_in_customizer' ], 10, 2 );
+		add_action( 'is_wide_widget_in_customizer', array( $this, 'set_is_wide_widget_in_customizer' ), 10, 2 );
 	}
 
 	/**
@@ -51,7 +51,6 @@ class WP_Widget_Block extends WP_Widget {
 	 * @since 4.8.1
 	 *
 	 * @global WP_Post $post Global post object.
-	 *
 	 */
 	public function widget( $args, $instance ) {
 		echo do_blocks( $instance['content'] );
@@ -66,7 +65,6 @@ class WP_Widget_Block extends WP_Widget {
 	 *
 	 * @return array Settings to save or bool false to cancel saving.
 	 * @since 4.8.1
-	 *
 	 */
 	public function update( $new_instance, $old_instance ) {
 		$instance            = array_merge( $this->default_instance, $old_instance );
@@ -81,7 +79,6 @@ class WP_Widget_Block extends WP_Widget {
 	 * @param array $instance Current instance.
 	 *
 	 * @see WP_Widget_Custom_HTML::render_control_template_scripts()
-	 *
 	 */
 	public function form( $instance ) {
 		$instance = wp_parse_args( (array) $instance, $this->default_instance );
@@ -89,12 +86,12 @@ class WP_Widget_Block extends WP_Widget {
 		$textarea_id = $this->get_field_id( 'content' );
 		?>
 		<br/>
-		<textarea id="<?php echo $textarea_id ?>" name="<?php echo $this->get_field_name( 'content' ); ?>"
-		          class="content sync-input" hidden><?php echo esc_textarea( $instance['content'] ); ?></textarea>
+		<textarea id="<?php echo $textarea_id; ?>" name="<?php echo $this->get_field_name( 'content' ); ?>"
+				class="content sync-input" hidden><?php echo esc_textarea( $instance['content'] ); ?></textarea>
 		<script>
 			(function() {
-				var link = "<?php echo esc_js(admin_url( 'themes.php?page=gutenberg-widgets' )) ?>";
-				var container = jQuery('#<?php echo $textarea_id ?>').closest(".form").find('.widget-control-actions .alignleft');
+				var link = "<?php echo esc_js( admin_url( 'themes.php?page=gutenberg-widgets' ) ); ?>";
+				var container = jQuery('#<?php echo $textarea_id; ?>').closest(".form").find('.widget-control-actions .alignleft');
 				container.prepend(jQuery('<span> |</span>'));
 				container.prepend(jQuery('<a href="'+link+'" class="button-link">Edit</a>'));
 			})();
@@ -105,8 +102,8 @@ class WP_Widget_Block extends WP_Widget {
 	/**
 	 * Make sure no block widget is considered to be wide.
 	 *
-	 * @param boolean $is_wide Is regarded wide?
-	 * @param string $widget_id Widget ID
+	 * @param boolean $is_wide Is regarded wide.
+	 * @param string  $widget_id Widget ID.
 	 *
 	 * @return bool Updated is_wide value.
 	 */

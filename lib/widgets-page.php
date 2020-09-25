@@ -9,10 +9,8 @@
  * The main entry point for the Gutenberg widgets page.
  *
  * @since 5.2.0
- *
- * @param string $page The page name the function is being called for.
  */
-function the_gutenberg_widgets( $page = 'appearance_page_gutenberg-widgets' ) {
+function the_gutenberg_widgets() {
 	?>
 	<div
 		id="widgets-editor"
@@ -39,7 +37,7 @@ function gutenberg_widgets_init( $hook ) {
 		);
 		return;
 	}
-	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets', ), true ) ) {
+	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets' ), true ) ) {
 		return;
 	}
 
