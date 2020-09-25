@@ -25,25 +25,21 @@ function useSecondaryText() {
 		selectedBlock,
 		getBlockParentsByBlockName,
 		getBlockWithoutInnerBlocks,
-		hoveredBlockIds,
-		getBlockName,
-		getBlock,
+		hoveredTemplatePartBlock,
 	} = useSelect( ( select ) => {
 		const {
 			getSelectedBlock,
-			getHoveredBlocks,
 			getBlockParentsByBlockName: _getBlockParentsByBlockName,
 			__unstableGetBlockWithoutInnerBlocks,
-			getBlockName: _getBlockName,
-			getBlock: _getBlock,
+			getHoveredBlockByBlockName,
 		} = select( 'core/block-editor' );
 		return {
 			selectedBlock: getSelectedBlock(),
 			getBlockParentsByBlockName: _getBlockParentsByBlockName,
 			getBlockWithoutInnerBlocks: __unstableGetBlockWithoutInnerBlocks,
-			hoveredBlockIds: getHoveredBlocks(),
-			getBlockName: _getBlockName,
-			getBlock: _getBlock,
+			hoveredTemplatePartBlock: getHoveredBlockByBlockName(
+				'core/template-part'
+			),
 		};
 	} );
 
@@ -72,14 +68,9 @@ function useSecondaryText() {
 		}
 	}
 
-	// Go through hovered blocks and see if one is of interest.
-	const hoveredTemplatePartBlockId = hoveredBlockIds.find(
-		( blockId ) => getBlockName( blockId ) === 'core/template-part'
-	);
-
-	if ( hoveredTemplatePartBlockId ) {
+	if ( hoveredTemplatePartBlock ) {
 		const hoveredBlockLabel = getBlockDisplayText(
-			getBlock( hoveredTemplatePartBlockId )
+			hoveredTemplatePartBlock
 		);
 		return {
 			label: hoveredBlockLabel,

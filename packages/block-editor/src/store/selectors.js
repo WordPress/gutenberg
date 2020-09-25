@@ -1803,6 +1803,13 @@ export function getHoveredBlocks( state ) {
 	return state.hoveredBlocks.hoveredBlockIds;
 }
 
+export function getHoveredBlockByBlockName( state, blockName ) {
+	const matchingBlockClientId = state.hoveredBlocks.hoveredBlockIds.find(
+		( blockId ) => getBlockName( state, blockId ) === blockName
+	);
+	return getBlock( state, matchingBlockClientId );
+}
+
 export function getHoveredBlocksTimeStamp( state ) {
 	return state.hoveredBlocks.eventTimeStamp;
 }
