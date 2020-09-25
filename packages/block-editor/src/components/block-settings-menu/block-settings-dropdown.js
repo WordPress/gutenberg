@@ -6,18 +6,18 @@ import { castArray, flow, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _n } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
 	ClipboardButton,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
 
 import { Children, cloneElement, useCallback } from '@wordpress/element';
-import { serialize } from '@wordpress/blocks';
+import { getBlockType, serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -44,23 +44,41 @@ export function BlockSettingsDropdown( {
 	const count = blockClientIds.length;
 	const firstBlockClientId = blockClientIds[ 0 ];
 
-	const shortcuts = useSelect( ( select ) => {
-		const { getShortcutRepresentation } = select(
-			'core/keyboard-shortcuts'
-		);
-		return {
-			duplicate: getShortcutRepresentation(
-				'core/block-editor/duplicate'
-			),
-			remove: getShortcutRepresentation( 'core/block-editor/remove' ),
-			insertAfter: getShortcutRepresentation(
-				'core/block-editor/insert-after'
-			),
-			insertBefore: getShortcutRepresentation(
-				'core/block-editor/insert-before'
-			),
-		};
-	}, [] );
+	const { selectBlock } = useDispatch( 'core/block-editor' );
+
+	const { parentBlockType, firstParentClientId, shortcuts } = useSelect(
+		( select ) => {
+			const { getBlockName, getBlockParents } = select(
+				'core/block-editor'
+			);
+			const { getShortcutRepresentation } = select(
+				'core/keyboard-shortcuts'
+			);
+			const parents = getBlockParents( firstBlockClientId );
+			const _firstParentClientId = parents[ parents.length - 1 ];
+			const parentBlockName = getBlockName( _firstParentClientId );
+
+			return {
+				parentBlockType: getBlockType( parentBlockName ),
+				firstParentClientId: _firstParentClientId,
+				shortcuts: {
+					duplicate: getShortcutRepresentation(
+						'core/block-editor/duplicate'
+					),
+					remove: getShortcutRepresentation(
+						'core/block-editor/remove'
+					),
+					insertAfter: getShortcutRepresentation(
+						'core/block-editor/insert-after'
+					),
+					insertBefore: getShortcutRepresentation(
+						'core/block-editor/insert-before'
+					),
+				},
+			};
+		},
+		[ firstBlockClientId ]
+	);
 
 	const updateSelection = useCallback(
 		__experimentalSelectBlock
@@ -105,6 +123,19 @@ export function BlockSettingsDropdown( {
 								<__experimentalBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }
 								/>
+								{ firstParentClientId !== undefined && (
+									<MenuItem
+										onClick={ () =>
+											selectBlock( firstParentClientId )
+										}
+									>
+										{ sprintf(
+											/* translators: %s: Name of the block's parent. */
+											__( 'Select parent (%s)' ),
+											parentBlockType.title
+										) }
+									</MenuItem>
+								) }
 								{ count === 1 && (
 									<BlockHTMLConvertButton
 										clientId={ firstBlockClientId }
