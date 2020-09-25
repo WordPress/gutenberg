@@ -67,12 +67,12 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 			</Section>
 			<Section title={ __( 'Writing Mode' ) }>
 				<EnableFeature
-					featureName="reducedUI"
-					label={ __( 'Reduced UI' ) }
-				/>
-				<EnableFeature
 					featureName="themeStyles"
 					label={ __( 'Theme Styles' ) }
+				/>
+				<EnableFeature
+					featureName="reducedUI"
+					label={ __( 'Compact UI' ) }
 				/>
 				<EnableFeature
 					featureName="focusMode"
