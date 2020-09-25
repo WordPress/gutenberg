@@ -38,7 +38,8 @@ export default compose(
 
 ## `useColors` hook
 
-Experimental hook that combines the functionality of the `withColors` HOC and `PanelColorSettings`, with `InspectorControls` into an easy to use `useColors` hook.
+Provides the functionality of `withColors` as a React hook.
+
 It takes an array of color configuration objects for its first parameter. The second parameter is an optional hooks dependency array for cases where you have closures in your configuration objects, and the third is an optional string to overwrite the default panel title, `__( 'Color Settings' )`.
 
 ### Usage
