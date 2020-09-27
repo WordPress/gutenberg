@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useRef, useState } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { Icon, search as searchIcon } from '@wordpress/icons';
 
 /**
@@ -35,6 +36,9 @@ export default function NavigationMenuTitle( {
 		}, 100 );
 	};
 
+	/* translators: search button label for menu search box. %s: menu title */
+	const searchButtonLabel = sprintf( __( 'Search in %s' ), title );
+
 	return (
 		<MenuTitleUI className="components-navigation__menu-title">
 			{ ! isSearching && (
@@ -49,8 +53,10 @@ export default function NavigationMenuTitle( {
 						<Button
 							isSmall
 							isTertiary
+							label={ searchButtonLabel }
 							onClick={ () => setIsSearching( true ) }
 							ref={ searchButtonRef }
+							showTooltip
 						>
 							<Icon icon={ searchIcon } />
 						</Button>

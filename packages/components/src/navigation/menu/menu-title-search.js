@@ -48,7 +48,7 @@ export default function MenuTitleSearch( {
 	}
 
 	const inputId = `components-navigation__menu-title-search-${ menu }`;
-	/* translators: placeholder for sidebar search box. %s: menu title */
+	/* translators: placeholder for menu search box. %s: menu title */
 	const placeholder = sprintf( __( 'Search in %s' ), title );
 
 	return (
@@ -71,7 +71,13 @@ export default function MenuTitleSearch( {
 				value={ search }
 			/>
 
-			<Button isSmall isTertiary onClick={ onClose }>
+			<Button
+				isSmall
+				isTertiary
+				label={ __( 'Close search' ) }
+				onClick={ onClose }
+				showTooltip
+			>
 				<Icon icon={ closeSmall } />
 			</Button>
 		</MenuTitleSearchUI>
