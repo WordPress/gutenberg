@@ -1,7 +1,18 @@
 .edit-site-navigation-panel {
-	position: relative;
+	animation: edit-site-navigation-panel__slide-in 0.1s linear;
 	height: 100%;
+	position: relative;
 	width: 300px;
+	@include reduce-motion("animation");
+
+	@keyframes edit-site-navigation-panel__slide-in {
+		from {
+			transform: translateX(-100%);
+		}
+		to {
+			transform: translateX(0%);
+		}
+	}
 
 	.components-navigation {
 		height: 100%;
