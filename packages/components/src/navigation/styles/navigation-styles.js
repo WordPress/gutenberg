@@ -65,7 +65,7 @@ export const MenuTitleHeadingUI = styled( Text )`
 
 	.components-button.is-small {
 		color: ${ G2.lightGray.ui };
-		margin-right: 2px;
+		margin-right: 2px; // Avoid hiding the focus outline
 		padding: 0;
 
 		&:active:not( :disabled ) {
@@ -80,13 +80,12 @@ export const MenuTitleHeadingUI = styled( Text )`
 `;
 
 export const MenuTitleSearchUI = styled.div`
-	margin-bottom: 2px;
 	padding: 0;
 	position: relative;
 
 	input {
 		height: 36px;
-		margin-bottom: 6px;
+		margin-bottom: 8px;
 		padding-left: 30px;
 		padding-right: 30px;
 
@@ -99,7 +98,7 @@ export const MenuTitleSearchUI = styled.div`
 	}
 
 	> svg {
-		left: 6px;
+		left: 4px;
 		position: absolute;
 		top: 6px;
 	}
