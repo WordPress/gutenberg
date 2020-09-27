@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
 import { G2, UI } from '../../utils/colors-values';
 import Button from '../../button';
 import Text from '../../text';
-import { reduceMotion } from '../../utils';
+import { reduceMotion, space } from '../../utils';
 
 export const NavigationUI = styled.div`
 	width: 100%;
@@ -60,8 +60,8 @@ export const MenuTitleHeadingUI = styled( Text )`
 	color: ${ G2.gray[ 100 ] };
 	display: flex;
 	justify-content: space-between;
-	margin-bottom: 8px;
-	padding: 4px 0 4px 16px;
+	margin-bottom: ${ space( 1 ) };
+	padding: ${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) };
 
 	.components-button.is-small {
 		color: ${ G2.lightGray.ui };
@@ -84,10 +84,10 @@ export const MenuTitleSearchUI = styled.div`
 	position: relative;
 
 	input {
-		height: 36px;
-		margin-bottom: 8px;
-		padding-left: 30px;
-		padding-right: 30px;
+		height: 36px; // Same height as MenuTitle
+		margin-bottom: ${ space( 1 ) };
+		padding-left: 30px; // Leave room for the search icon
+		padding-right: 30px; // Leave room for the close search button
 
 		&::-webkit-search-decoration,
 		&::-webkit-search-cancel-button,
@@ -98,7 +98,7 @@ export const MenuTitleSearchUI = styled.div`
 	}
 
 	> svg {
-		left: 4px;
+		left: ${ space( 0.5 ) };
 		position: absolute;
 		top: 6px;
 	}
@@ -107,7 +107,7 @@ export const MenuTitleSearchUI = styled.div`
 		height: 30px;
 		padding: 0;
 		position: absolute;
-		right: 4px;
+		right: ${ space( 1 ) };
 		top: 3px;
 
 		&:active:not( :disabled ) {
