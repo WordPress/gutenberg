@@ -58,7 +58,7 @@ describe( 'RangeControl', () => {
 	} );
 
 	describe( 'validation', () => {
-		it( 'should not apply new value is lower than minimum', () => {
+		it( 'should not apply if new value is lower than minimum', () => {
 			const { container } = render( <RangeControl min={ 11 } /> );
 
 			const rangeInput = getRangeInput( container );
@@ -70,7 +70,7 @@ describe( 'RangeControl', () => {
 			expect( rangeInput.value ).not.toBe( '10' );
 		} );
 
-		it( 'should not apply new value is greater than maximum', () => {
+		it( 'should not apply if new value is greater than maximum', () => {
 			const { container } = render( <RangeControl max={ 20 } /> );
 
 			const rangeInput = getRangeInput( container );
@@ -91,7 +91,7 @@ describe( 'RangeControl', () => {
 			const numberInput = getNumberInput( container );
 
 			numberInput.focus();
-			fireEvent.change( numberInput, { target: { value: '25' } } );
+			fireEvent.change( numberInput, { target: { value: '25e' } } );
 
 			expect( onChange ).not.toHaveBeenCalled();
 		} );

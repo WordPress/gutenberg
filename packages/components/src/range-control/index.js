@@ -77,7 +77,7 @@ function RangeControl(
 		value: valueProp,
 		initial: initialPosition,
 	} );
-	const pendentValue = useRef();
+	const isResetPendent = useRef( false );
 	const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
 	const [ isFocused, setIsFocused ] = useState( false );
 
@@ -128,25 +128,24 @@ function RangeControl(
 		nextValue = parseFloat( nextValue );
 		setValue( nextValue );
 		/*
-		 * Calls onChange only if nextValue is valid,
-		 * otherwise tracks it for resolution on blur
+		 * Calls onChange only when nextValue is numeric
+		 * otherwise may queue a reset for the blur event.
 		 */
-		if ( ! isNaN( nextValue ) && nextValue >= min && nextValue <= max ) {
+		if ( ! isNaN( nextValue ) ) {
+			if ( nextValue < min || nextValue > max ) {
+				nextValue = floatClamp( nextValue, min, max );
+			}
 			onChange( nextValue );
-		} else {
-			pendentValue.current = nextValue;
+			isResetPendent.current = false;
+		} else if ( allowReset ) {
+			isResetPendent.current = true;
 		}
 	};
 
 	const handleOnInputNumberBlur = () => {
-		if ( pendentValue.current !== null ) {
-			// Resets NaN values or clamps out-of-range values
-			const nextValue = isNaN( pendentValue.current )
-				? resetFallbackValue ?? initialPosition ?? valueProp
-				: floatClamp( pendentValue.current, min, max );
-			setValue( nextValue );
-			onChange( nextValue );
-			pendentValue.current = null;
+		if ( isResetPendent.current ) {
+			handleOnReset();
+			isResetPendent.current = false;
 		}
 	};
 
@@ -286,7 +285,6 @@ function RangeControl(
 						onChange={ handleOnChange }
 						shiftStep={ shiftStep }
 						step={ step }
-						type={ 'number' }
 						value={ inputSliderValue }
 					/>
 				) }
