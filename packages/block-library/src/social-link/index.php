@@ -15,7 +15,7 @@
  * @return string Rendered HTML of the referenced block.
  */
 function render_block_core_social_link( $attributes, $content, $block ) {
-	$open_in_new_tab = $block->context['openInNewTab'];
+	$open_in_new_tab = array_key_exists( 'openInNewTab', $block->context ) ? $block->context['openInNewTab'] : false;
 
 	$service    = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
 	$url        = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
