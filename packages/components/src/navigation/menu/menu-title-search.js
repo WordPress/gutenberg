@@ -1,9 +1,14 @@
 /**
+ * External dependencies
+ */
+import { filter } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
 import { Icon, closeSmall, search as searchIcon } from '@wordpress/icons';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
 
 /**
@@ -11,15 +16,21 @@ import { ESCAPE } from '@wordpress/keycodes';
  */
 import Button from '../../button';
 import VisuallyHidden from '../../visually-hidden';
+import withSpokenMessages from '../../higher-order/with-spoken-messages';
 import { useNavigationMenuContext } from './context';
+import { useNavigationContext } from '../context';
 import { MenuTitleSearchUI } from '../styles/navigation-styles';
 
-export default function MenuTitleSearch( {
+function MenuTitleSearch( {
+	debouncedSpeak,
 	onCloseSearch,
 	onSearch,
 	search,
 	title,
 } ) {
+	const {
+		navigationTree: { items },
+	} = useNavigationContext();
 	const { menu } = useNavigationMenuContext();
 	const inputRef = useRef();
 
@@ -34,6 +45,20 @@ export default function MenuTitleSearch( {
 			clearTimeout( delayedFocus );
 		};
 	}, [] );
+
+	useEffect( () => {
+		if ( ! search ) {
+			return;
+		}
+
+		const count = filter( items, '_isVisible' ).length;
+		const resultsFoundMessage = sprintf(
+			/* translators: %d: number of results. */
+			_n( '%d result found.', '%d results found.', count ),
+			count
+		);
+		debouncedSpeak( resultsFoundMessage );
+	}, [ items, search ] );
 
 	const onClose = () => {
 		onSearch( '' );
@@ -83,3 +108,5 @@ export default function MenuTitleSearch( {
 		</MenuTitleSearchUI>
 	);
 }
+
+export default withSpokenMessages( MenuTitleSearch );
