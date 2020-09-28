@@ -130,7 +130,7 @@ export default function TemplateSwitcher( {
 		<>
 			<NavigationGroup title={ __( 'Template' ) }>
 				<TemplateNavigationItemWithIcon
-					item={ `template-${ template.id }` }
+					item={ template && `template-${ template.id }` }
 					template={ template }
 					title={ template?.slug || __( 'Loading…' ) }
 					homeId={ homeId }
