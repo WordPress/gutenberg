@@ -6,6 +6,7 @@ import {
 	Dropdown,
 	ToolbarButton,
 	RangeControl,
+	BaseControl,
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -25,39 +26,47 @@ export default function QueryToolbar( { query, setQuery } ) {
 				) }
 				renderContent={ () => (
 					<>
-						<NumberControl
-							label={ __( 'Items per Page' ) }
-							labelPosition="side"
-							min={ 1 }
-							max={ 100 }
-							onChange={ ( value ) =>
-								setQuery( { perPage: +value ?? -1 } )
-							}
-							step="1"
-							value={ query.perPage }
-							isDragEnabled={ false }
-						/>
-						<NumberControl
-							label={ __( 'Offset' ) }
-							labelPosition="side"
-							min={ 0 }
-							max={ 100 }
-							onChange={ ( value ) =>
-								setQuery( { offset: +value } )
-							}
-							step="1"
-							value={ query.offset }
-							isDragEnabled={ false }
-						/>
-						<RangeControl
-							label={ __( 'Number of Pages' ) }
-							min={ 1 }
-							allowReset
-							value={ query.pages }
-							onChange={ ( value ) =>
-								setQuery( { pages: value ?? -1 } )
-							}
-						/>
+						<BaseControl>
+							<NumberControl
+								__unstableInputWidth="60px"
+								label={ __( 'Items per Page' ) }
+								labelPosition="edge"
+								min={ 1 }
+								max={ 100 }
+								onChange={ ( value ) =>
+									setQuery( { perPage: +value ?? -1 } )
+								}
+								step="1"
+								value={ query.perPage }
+								isDragEnabled={ false }
+							/>
+						</BaseControl>
+						<BaseControl>
+							<NumberControl
+								__unstableInputWidth="60px"
+								label={ __( 'Offset' ) }
+								labelPosition="edge"
+								min={ 0 }
+								max={ 100 }
+								onChange={ ( value ) =>
+									setQuery( { offset: +value } )
+								}
+								step="1"
+								value={ query.offset }
+								isDragEnabled={ false }
+							/>
+						</BaseControl>
+						<BaseControl>
+							<RangeControl
+								label={ __( 'Number of Pages' ) }
+								min={ 1 }
+								allowReset
+								value={ query.pages }
+								onChange={ ( value ) =>
+									setQuery( { pages: value ?? -1 } )
+								}
+							/>
+						</BaseControl>
 					</>
 				) }
 			/>
