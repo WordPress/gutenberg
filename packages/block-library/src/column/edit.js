@@ -54,10 +54,9 @@ function ColumnEdit( {
 		} );
 	};
 
-	const hasWidth = Number.isFinite( width );
 	const blockWrapperProps = useBlockWrapperProps( {
 		className: classes,
-		style: hasWidth ? { flexBasis: width + '%' } : undefined,
+		style: width ? { flexBasis: width } : undefined,
 	} );
 
 	return (
