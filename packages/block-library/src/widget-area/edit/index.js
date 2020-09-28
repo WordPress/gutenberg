@@ -26,6 +26,8 @@ export default function WidgetAreaEdit( {
 		<Panel className={ className }>
 			<PanelBody
 				title={ name }
+				// This workaround is required to ensure LegacyWidget blocks are not unmounted when the panel is collapsed.
+				// Unmounting legacy widgets may have unintended consequences (e.g. TinyMCE not being properly reinitialized)
 				opened={ true }
 				onToggle={ () => {
 					setIsWidgetAreaOpen( clientId, ! isOpen );
