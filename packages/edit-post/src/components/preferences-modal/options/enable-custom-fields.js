@@ -16,13 +16,13 @@ export function CustomFieldsConfirmation( { willEnable } ) {
 
 	return (
 		<>
-			<p className="edit-post-options-modal__custom-fields-confirmation-message">
+			<p className="edit-post-preferences-modal__custom-fields-confirmation-message">
 				{ __(
 					'A page reload is required for this change. Make sure your content is saved before reloading.'
 				) }
 			</p>
 			<Button
-				className="edit-post-options-modal__custom-fields-confirmation-button"
+				className="edit-post-preferences-modal__custom-fields-confirmation-button"
 				isSecondary
 				isBusy={ isReloading }
 				disabled={ isReloading }

@@ -30,17 +30,17 @@ import {
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
 
-const MODAL_NAME = 'edit-post/options';
+const MODAL_NAME = 'edit-post/preferences';
 
-export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
+export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
 
 	return (
 		<Modal
-			className="edit-post-options-modal"
-			title={ __( 'Options' ) }
+			className="edit-post-preferences-modal"
+			title={ __( 'Preferences' ) }
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ closeModal }
 		>
@@ -145,4 +145,4 @@ export default compose(
 			closeModal: () => dispatch( 'core/edit-post' ).closeModal(),
 		};
 	} )
-)( OptionsModal );
+)( PreferencesModal );
