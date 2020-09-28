@@ -164,7 +164,7 @@ export function setWidgetAreasOpenState( widgetAreasOpenState ) {
 /**
  * Sets the open state of the widget area.
  *
- * @param  {number}  clientId   The clientId of the widget area.
+ * @param  {string}  clientId   The clientId of the widget area.
  * @param  {boolean} isOpen     Whether the widget area should be opened.
  * @return {Object}             Action.
  */

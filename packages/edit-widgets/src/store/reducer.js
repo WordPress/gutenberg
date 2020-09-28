@@ -31,7 +31,7 @@ export function mapping( state, action ) {
 /**
  * Controls the open state of the widget areas.
  *
- * @param {Object}  state  Redux state
+ * @param {Object} state   Redux state
  * @param {Object} action  Redux action
  * @return {Array}         Updated state
  */

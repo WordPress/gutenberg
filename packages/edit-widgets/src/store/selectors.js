@@ -165,7 +165,7 @@ export const hasResolvedWidgetAreas = createRegistrySelector(
  * Gets whether the widget area is opened.
  *
  * @param {Array}  state    The open state of the widget areas.
- * @param {number} clientId The clientId of the widget area.
+ * @param {string} clientId The clientId of the widget area.
  * @return {boolean}        True if the widget area is open.
  */
 export const getIsWidgetAreaOpen = ( state, clientId ) => {
