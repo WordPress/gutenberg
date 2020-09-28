@@ -1,3 +1,13 @@
 .editor-styles-wrapper .wp-block.wp-block-query {
 	max-width: 100%;
 }
+
+.block-library-query-toolbar__popover {
+	.components-number-control {
+		justify-content: space-between;
+		margin-bottom: $grid-unit-10;
+		.components-input-control__container {
+			flex: 0 0 60px;
+		}
+	}
+}

@@ -15,7 +15,11 @@ import {
  */
 import { useQueryContext } from '../query';
 
-const TEMPLATE = [ [ 'core/post-title' ], [ 'core/post-content' ] ];
+const TEMPLATE = [
+	[ 'core/post-title' ],
+	[ 'core/post-date' ],
+	[ 'core/post-excerpt' ],
+];
 export default function QueryLoopEdit( {
 	clientId,
 	context: {
