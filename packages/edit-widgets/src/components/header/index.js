@@ -32,10 +32,13 @@ function Header( { isCustomizer } ) {
 		[ rootClientId ]
 	);
 	const { setIsWidgetAreaOpen } = useDispatch( 'core/edit-widgets' );
+	const { selectBlock } = useDispatch( 'core/block-editor' );
 
 	function handleInserterOpen( isOpen ) {
-		// Open the last selected widget area when opening the inserter.
 		if ( isOpen && ! isLastSelectedWidgetAreaOpen ) {
+			// Select the last selected block if hasn't already.
+			selectBlock( rootClientId );
+			// Open the last selected widget area when opening the inserter.
 			setIsWidgetAreaOpen( rootClientId, isOpen );
 		}
 	}
