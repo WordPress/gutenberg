@@ -23,7 +23,8 @@ describe( 'Multi-entity save flow', () => {
 	const templatePartSelector = '*[data-type="core/template-part"]';
 	const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-block-list__layout`;
 	const savePanelSelector = '.entities-saved-states__panel';
-	const closePanelButtonSelector = 'button[aria-label="Close panel"]';
+	const closePanelButtonSelector =
+		'.editor-post-publish-panel__header-cancel-button button';
 	const createNewButtonSelector =
 		'//button[contains(text(), "New template part")]';
 
@@ -124,6 +125,11 @@ describe( 'Multi-entity save flow', () => {
 				await page.keyboard.type( 'some words...' );
 
 				await assertMultiSaveEnabled();
+
+				// TODO: Remove when toolbar supports text fields
+				expect( console ).toHaveWarnedWith(
+					'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
+				);
 			} );
 
 			it( 'Should only have save panel a11y button active after child entities edited', async () => {

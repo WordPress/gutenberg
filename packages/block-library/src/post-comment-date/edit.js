@@ -5,7 +5,7 @@ import { useEntityProp } from '@wordpress/core-data';
 import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
 import {
 	InspectorControls,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { PanelBody, CustomSelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -25,6 +25,7 @@ export default function Edit( { attributes, context, setAttributes } ) {
 		} )
 	);
 	const resolvedFormat = format || siteDateFormat || settings.formats.date;
+	const blockWrapperProps = useBlockWrapperProps( { className } );
 
 	return (
 		<>
@@ -46,11 +47,11 @@ export default function Edit( { attributes, context, setAttributes } ) {
 				</PanelBody>
 			</InspectorControls>
 
-			<Block.div className={ className }>
+			<div { ...blockWrapperProps }>
 				<time dateTime={ dateI18n( 'c', date ) }>
 					{ dateI18n( resolvedFormat, date ) }
 				</time>
-			</Block.div>
+			</div>
 		</>
 	);
 }

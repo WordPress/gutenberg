@@ -95,7 +95,7 @@ function ColumnEdit( {
 						max={ 100 }
 						value={ columnWidths[ selectedColumnIndex ] }
 						onChange={ onWidthChange }
-						toFixed={ 1 }
+						decimalNum={ 1 }
 						rangePreview={
 							<ColumnsPreview
 								columnWidths={ columnWidths }
