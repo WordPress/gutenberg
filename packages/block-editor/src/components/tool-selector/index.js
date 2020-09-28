@@ -44,6 +44,7 @@ function ToolSelector( props, ref ) {
 					ref={ ref }
 					icon={ isNavigationTool ? selectIcon : editIcon }
 					aria-expanded={ isOpen }
+					aria-haspopup="true"
 					onClick={ onToggle }
 					/* translators: button label text should, if possible, be under 16 characters. */
 					label={ __( 'Modes' ) }
