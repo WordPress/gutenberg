@@ -1,13 +1,29 @@
-.edit-site-template-switcher__label-home-icon {
+.edit-site-template-switcher__navigation-item {
+	position: relative;
+
+	&.is-active {
+		.edit-site-template-switcher__customized-dot {
+			background: #fff;
+		}
+	}
+
+	.edit-site-template-switcher__navigation-item-icon svg path {
+		color: inherit;
+	}
+}
+
+.edit-site-template-switcher__navigation-item-icon {
 	width: 24px;
 	height: 24px;
 	position: absolute;
 	right: 20px;
+	top: 50%;
+	transform: translateY(-50%);
 }
 
-.edit-site-template-switcher__label-customized-dot {
+.edit-site-template-switcher__customized-dot {
 	position: absolute;
-	right: 4px;
+	right: 8px;
 	top: 50%;
 	margin-top: -4px;
 	width: 8px;

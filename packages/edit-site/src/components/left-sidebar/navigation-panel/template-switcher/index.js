@@ -39,19 +39,23 @@ function TemplateNavigationItemWithIcon( {
 			iconLabel = __( 'Home' );
 		} else if ( template.status !== 'auto-draft' ) {
 			icon = (
-				<span className="edit-site-template-switcher__label-customized-dot" />
+				<span className="edit-site-template-switcher__customized-dot" />
 			);
 			iconLabel = __( 'Customized' );
 		}
 	}
 
 	return (
-		<NavigationItem item={ item } title={ title }>
+		<NavigationItem
+			item={ item }
+			title={ title }
+			className="edit-site-template-switcher__navigation-item"
+		>
 			<Button { ...props }>
 				{ title }
 				{ icon && (
 					<Tooltip text={ iconLabel || title }>
-						<div className="edit-site-template-switcher__label-home-icon">
+						<div className="edit-site-template-switcher__navigation-item-icon">
 							<Icon icon={ icon } />
 						</div>
 					</Tooltip>
