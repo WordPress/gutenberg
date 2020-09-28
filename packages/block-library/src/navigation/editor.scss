@@ -28,6 +28,11 @@ $navigation-item-height: 46px;
 	padding: $grid-unit-20;
 }
 
+// Ensure that navigation links get selected color
+.editor-styles-wrapper .wp-block-navigation.has-text-color .wp-block-navigation-link {
+	color: currentColor;
+}
+
 // Ensure that an empty block has space around the appender.
 .wp-block-navigation__container {
 	min-height: $navigation-item-height;

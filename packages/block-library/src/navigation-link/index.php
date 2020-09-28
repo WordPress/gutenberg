@@ -6,86 +6,6 @@
  */
 
 /**
- * Build an array with CSS classes and inline styles defining the colors
- * which will be applied to the navigation markup in the front-end.
- *
- * @param  array $context Navigation block context.
- * @return array Colors CSS classes and inline styles.
- */
-function block_core_navigation_link_build_css_colors( $context ) {
-	$colors = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-
-	// Text color.
-	$has_named_text_color  = array_key_exists( 'textColor', $context );
-	$has_custom_text_color = array_key_exists( 'customTextColor', $context );
-
-	// If has text color.
-	if ( $has_custom_text_color || $has_named_text_color ) {
-		// Add has-text-color class.
-		$colors['css_classes'][] = 'has-text-color';
-	}
-
-	if ( $has_named_text_color ) {
-		// Add the color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-color', $context['textColor'] );
-	} elseif ( $has_custom_text_color ) {
-		// Add the custom color inline style.
-		$colors['inline_styles'] .= sprintf( 'color: %s;', $context['customTextColor'] );
-	}
-
-	// Background color.
-	$has_named_background_color  = array_key_exists( 'backgroundColor', $context );
-	$has_custom_background_color = array_key_exists( 'customBackgroundColor', $context );
-
-	// If has background color.
-	if ( $has_custom_background_color || $has_named_background_color ) {
-		// Add has-background class.
-		$colors['css_classes'][] = 'has-background';
-	}
-
-	if ( $has_named_background_color ) {
-		// Add the background-color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $context['backgroundColor'] );
-	} elseif ( $has_custom_background_color ) {
-		// Add the custom background-color inline style.
-		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $context['customBackgroundColor'] );
-	}
-
-	return $colors;
-}
-
-/**
- * Build an array with CSS classes and inline styles defining the font sizes
- * which will be applied to the navigation markup in the front-end.
- *
- * @param  array $context Navigation block context.
- * @return array Font size CSS classes and inline styles.
- */
-function block_core_navigation_link_build_css_font_sizes( $context ) {
-	// CSS classes.
-	$font_sizes = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-
-	$has_named_font_size  = array_key_exists( 'fontSize', $context );
-	$has_custom_font_size = array_key_exists( 'customFontSize', $context );
-
-	if ( $has_named_font_size ) {
-		// Add the font size class.
-		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $context['fontSize'] );
-	} elseif ( $has_custom_font_size ) {
-		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $context['customFontSize'] );
-	}
-
-	return $font_sizes;
-}
-
-/**
  * Returns the top-level submenu SVG chevron icon.
  *
  * @return string
@@ -109,31 +29,14 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$colors          = block_core_navigation_link_build_css_colors( $block->context );
-	$font_sizes      = block_core_navigation_link_build_css_font_sizes( $block->context );
-	$classes         = array_merge(
-		$colors['css_classes'],
-		$font_sizes['css_classes']
-	);
-	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] );
-
-	$css_classes = trim( implode( ' ', $classes ) );
+	$css_classes = ! empty( $attributes['className'] ) ? implode( ' ', (array) $attributes['className'] ) : '';
 	$has_submenu = count( $block->inner_blocks ) > 0;
 	$is_active   = ! empty( $attributes['id'] ) && ( get_the_ID() === $attributes['id'] );
 
-	$class_name = ! empty( $attributes['className'] ) ? implode( ' ', (array) $attributes['className'] ) : false;
+	$css_classes .= $has_submenu ? ' has-child' : '';
+	$css_classes .= $is_active ? ' current-menu-item' : '';
 
-	if ( false !== $class_name ) {
-		$css_classes .= ' ' . $class_name;
-	};
-
-	$wrapper_attributes = get_block_wrapper_attributes(
-		array(
-			'class' => $css_classes . ( $has_submenu ? ' has-child' : '' ) .
-				( $is_active ? ' current-menu-item' : '' ),
-			'style' => $style_attribute,
-		)
-	);
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $css_classes ) );
 	$html               = '<li ' . $wrapper_attributes . '>' .
 		'<a class="wp-block-navigation-link__content" ';
 
