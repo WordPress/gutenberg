@@ -37,22 +37,6 @@ export function useFormatTypes( { clientId, identifier } ) {
 		[ formatTypes, clientId, identifier ]
 	);
 	const dispatch = useDispatch();
-	const keyedDispatchers = formatTypes.reduce( ( accumulator, type ) => {
-		if ( type.__experimentalGetPropsForEditableTreeChangeHandler ) {
-			accumulator[
-				type.name
-			] = type.__experimentalGetPropsForEditableTreeChangeHandler(
-				dispatch,
-				{
-					richTextIdentifier: identifier,
-					blockClientId: clientId,
-				}
-			);
-		}
-
-		return accumulator;
-	}, {} );
-
 	const prepareHandlers = [];
 	const valueHandlers = [];
 	const changeHandlers = [];
@@ -81,11 +65,23 @@ export function useFormatTypes( { clientId, identifier } ) {
 		}
 
 		if ( type.__experimentalCreateOnChangeEditableValue ) {
+			let dispatchers = {};
+
+			if ( type.__experimentalGetPropsForEditableTreeChangeHandler ) {
+				dispatchers = type.__experimentalGetPropsForEditableTreeChangeHandler(
+					dispatch,
+					{
+						richTextIdentifier: identifier,
+						blockClientId: clientId,
+					}
+				);
+			}
+
 			changeHandlers.push(
 				type.__experimentalCreateOnChangeEditableValue(
 					{
 						...( keyedSelected[ type.name ] || {} ),
-						...( keyedDispatchers[ type.name ] || {} ),
+						...dispatchers,
 					},
 					{
 						richTextIdentifier: identifier,
