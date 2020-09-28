@@ -71,6 +71,7 @@ function ColumnEdit( {
 				<PanelBody title={ __( 'Column settings' ) }>
 					<UnitControl
 						label={ __( 'Width' ) }
+						labelPosition="side"
 						value={ width || '' }
 						onChange={ ( nextWidth ) => {
 							nextWidth =
