@@ -477,8 +477,6 @@ _Properties_
 
 -   _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
 -   _availableLegacyWidgets_ `Array`: Array of objects representing the legacy widgets available.
--   _colors_ `Array`: Palette colors
--   _fontSizes_ `Array`: Available font sizes
 -   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing
@@ -560,9 +558,35 @@ _Related_
 
 Undocumented declaration.
 
+<a name="validateThemeColors" href="#validateThemeColors">#</a> **validateThemeColors**
+
+Given an array of theme colors checks colors for validity
+
+_Parameters_
+
+-   _colors_ `Array`: The array of theme colors
+
+_Returns_
+
+-   `Array`: The array of valid theme colors or the default colors
+
+<a name="validateThemeGradients" href="#validateThemeGradients">#</a> **validateThemeGradients**
+
+Given an array of theme gradients checks gradients for validity
+
+_Parameters_
+
+-   _gradients_ `Array`: The array of theme gradients
+
+_Returns_
+
+-   `Array`: The array of valid theme gradients or the default gradients
+
 <a name="Warning" href="#Warning">#</a> **Warning**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/warning/README.md>
 
 <a name="withColorContext" href="#withColorContext">#</a> **withColorContext**
 

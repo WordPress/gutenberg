@@ -12,7 +12,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -54,6 +54,12 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 			} );
 		} );
 	}
+
+	const blockWrapperProps = useBlockWrapperProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 
 	return (
 		<>
@@ -112,11 +118,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 				/>
 			</BlockControls>
 
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
+			<div { ...blockWrapperProps }>
 				{ showAvatar && authorDetails && (
 					<div className="wp-block-post-author__avatar">
 						<img
@@ -151,7 +153,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 						</p>
 					) }
 				</div>
-			</Block.div>
+			</div>
 		</>
 	);
 }

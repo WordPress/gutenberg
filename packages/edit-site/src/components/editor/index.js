@@ -17,9 +17,7 @@ import {
 	BlockBreadcrumb,
 	__unstableEditorStyles as EditorStyles,
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
-import { useViewportMatch } from '@wordpress/compose';
 import {
 	FullscreenMode,
 	InterfaceSkeleton,
@@ -28,7 +26,6 @@ import {
 import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
-import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -39,14 +36,14 @@ import { SidebarComplementaryAreaFills } from '../sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
+import LeftSidebar from '../left-sidebar';
 
 const interfaceLabels = {
 	leftSidebar: __( 'Block Library' ),
 };
 
 function Editor() {
-	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
-	const isMobile = useViewportMatch( 'medium', '<' );
+	const [ leftSidebarContent, setLeftSidebarContent ] = useState( null );
 
 	const {
 		isFullscreenActive,
@@ -156,6 +153,9 @@ function Editor() {
 		[ page?.context ]
 	);
 
+	const toggleLeftSidebarContent = ( value ) =>
+		setLeftSidebarContent( leftSidebarContent === value ? null : value );
+
 	return (
 		<>
 			<EditorStyles styles={ settings.styles } />
@@ -191,36 +191,14 @@ function Editor() {
 											<InterfaceSkeleton
 												labels={ interfaceLabels }
 												leftSidebar={
-													isInserterOpen && (
-														<div className="edit-site-editor__inserter-panel">
-															<div className="edit-site-editor__inserter-panel-header">
-																<Button
-																	icon={
-																		close
-																	}
-																	onClick={ () =>
-																		setIsInserterOpen(
-																			false
-																		)
-																	}
-																/>
-															</div>
-															<div className="edit-site-editor__inserter-panel-content">
-																<Library
-																	showInserterHelpPanel
-																	onSelect={ () => {
-																		if (
-																			isMobile
-																		) {
-																			setIsInserterOpen(
-																				false
-																			);
-																		}
-																	} }
-																/>
-															</div>
-														</div>
-													)
+													<LeftSidebar
+														content={
+															leftSidebarContent
+														}
+														setContent={
+															setLeftSidebarContent
+														}
+													/>
 												}
 												sidebar={
 													sidebarIsOpened && (
@@ -233,11 +211,21 @@ function Editor() {
 															openEntitiesSavedStates
 														}
 														isInserterOpen={
-															isInserterOpen
+															leftSidebarContent ===
+															'inserter'
 														}
 														onToggleInserter={ () =>
-															setIsInserterOpen(
-																! isInserterOpen
+															toggleLeftSidebarContent(
+																'inserter'
+															)
+														}
+														isNavigationOpen={
+															leftSidebarContent ===
+															'navigation'
+														}
+														onToggleNavigation={ () =>
+															toggleLeftSidebarContent(
+																'navigation'
 															)
 														}
 													/>
@@ -251,8 +239,14 @@ function Editor() {
 														<Popover.Slot name="block-toolbar" />
 														{ template && (
 															<BlockEditor
-																setIsInserterOpen={
-																	setIsInserterOpen
+																setIsInserterOpen={ (
+																	isInserterOpen
+																) =>
+																	setLeftSidebarContent(
+																		isInserterOpen
+																			? 'inserter'
+																			: null
+																	)
 																}
 															/>
 														) }

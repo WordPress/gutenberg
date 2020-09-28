@@ -3,11 +3,13 @@
  */
 import { LINE_SEPARATOR } from './special-characters';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
  * Check if a Rich Text value is Empty, meaning it contains no text or any
  * objects (such as images).
  *
- * @param {Object} value Value to use.
+ * @param {RichTextValue} value Value to use.
  *
  * @return {boolean} True if the value is empty, false if not.
  */
@@ -19,7 +21,7 @@ export function isEmpty( { text } ) {
  * Check if the current collapsed selection is on an empty line in case of a
  * multiline value.
  *
- * @param  {Object} value Value te check.
+ * @param  {RichTextValue} value Value te check.
  *
  * @return {boolean} True if the line is empty, false if not.
  */
