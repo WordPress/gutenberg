@@ -52,8 +52,9 @@ const NavigationPanel = () => {
 		<div className="edit-site-navigation-panel">
 			<Navigation
 				activeItem={
-					templateType === 'wp_template_part' &&
-					`template-part-${ templatePartId }`
+					'wp_template' === templateType
+						? `template-${ templateId }`
+						: `template-part-${ templatePartId }`
 				}
 			>
 				<NavigationBackButton
