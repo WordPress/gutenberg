@@ -71,6 +71,7 @@ export default function save( { attributes } ) {
 										tagName="figcaption"
 										className="blocks-gallery-item__caption"
 										value={ image.caption }
+										aria-hidden={ !! imageLabel || null }
 									/>
 								) }
 							</figure>
