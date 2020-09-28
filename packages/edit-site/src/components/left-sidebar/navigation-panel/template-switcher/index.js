@@ -5,6 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import {
+	Button,
 	Tooltip,
 	__experimentalNavigationGroup as NavigationGroup,
 	__experimentalNavigationItem as NavigationItem,
@@ -24,6 +25,7 @@ const TEMPLATE_OVERRIDES = {
 };
 
 function TemplateNavigationItemWithIcon( {
+	item,
 	icon,
 	iconLabel,
 	homeId,
@@ -44,21 +46,18 @@ function TemplateNavigationItemWithIcon( {
 	}
 
 	return (
-		<NavigationItem
-			title={
-				<>
-					{ title }
-					{ icon && (
-						<Tooltip text={ iconLabel || title }>
-							<div className="edit-site-template-switcher__label-home-icon">
-								<Icon icon={ icon } />
-							</div>
-						</Tooltip>
-					) }
-				</>
-			}
-			{ ...props }
-		/>
+		<NavigationItem item={ item } title={ title }>
+			<Button { ...props }>
+				{ title }
+				{ icon && (
+					<Tooltip text={ iconLabel || title }>
+						<div className="edit-site-template-switcher__label-home-icon">
+							<Icon icon={ icon } />
+						</div>
+					</Tooltip>
+				) }
+			</Button>
+		</NavigationItem>
 	);
 }
 
