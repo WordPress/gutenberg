@@ -4,7 +4,6 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { EntityProvider } from '@wordpress/core-data';
 import { Panel, PanelBody } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,8 +27,8 @@ export default function WidgetAreaEdit( {
 			<PanelBody
 				title={ name }
 				opened={ true }
-				onToggle={ ( opened ) => {
-					setIsWidgetAreaOpen( clientId, opened );
+				onToggle={ () => {
+					setIsWidgetAreaOpen( clientId, ! isOpen );
 				} }
 				className={ isOpen ? 'widget-area-is-opened' : '' }
 			>
@@ -38,15 +37,15 @@ export default function WidgetAreaEdit( {
 					type="postType"
 					id={ `widget-area-${ id }` }
 				>
-					<InnerBlocksContainer isOpened={ isOpened } />
+					<InnerBlocksContainer isOpen={ isOpen } />
 				</EntityProvider>
 			</PanelBody>
 		</Panel>
 	);
 }
 
-function InnerBlocksContainer( { isOpened } ) {
-	const props = isOpened
+function InnerBlocksContainer( { isOpen } ) {
+	const props = isOpen
 		? {}
 		: {
 				hidden: true,
