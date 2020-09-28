@@ -15,19 +15,9 @@ export default function WidgetAreaEdit( {
 	className,
 	attributes: { id, name },
 } ) {
-	const { index, isOpen } = useSelect(
-		( select ) => {
-			const blockIndex = select( 'core/block-editor' ).getBlockIndex(
-				clientId
-			);
-
-			return {
-				index: blockIndex,
-				isOpen: select( 'core/edit-widgets' ).getIsWidgetAreaOpen(
-					blockIndex
-				),
-			};
-		},
+	const isOpen = useSelect(
+		( select ) =>
+			select( 'core/edit-widgets' ).getIsWidgetAreaOpen( clientId ),
 		[ clientId ]
 	);
 	const { setIsWidgetAreaOpen } = useDispatch( 'core/edit-widgets' );
@@ -38,7 +28,7 @@ export default function WidgetAreaEdit( {
 				title={ name }
 				opened={ isOpen }
 				onToggle={ ( opened ) => {
-					setIsWidgetAreaOpen( index, opened );
+					setIsWidgetAreaOpen( clientId, opened );
 				} }
 			>
 				<EntityProvider

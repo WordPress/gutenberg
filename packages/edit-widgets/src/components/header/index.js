@@ -26,14 +26,17 @@ const inserterToggleProps = { isPrimary: true };
 function Header( { isCustomizer } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const rootClientId = useLastSelectedRootId();
-	const isAllWidgetAreasClosed = useSelect( ( select ) =>
-		select( 'core/edit-widgets' ).getIsAllWidgetAreasClosed()
+	const isLastSelectedWidgetAreaOpen = useSelect(
+		( select ) =>
+			select( 'core/edit-widgets' ).getIsWidgetAreaOpen( rootClientId ),
+		[ rootClientId ]
 	);
 	const { setIsWidgetAreaOpen } = useDispatch( 'core/edit-widgets' );
 
 	function handleInserterOpen( isOpen ) {
-		if ( isOpen && isAllWidgetAreasClosed ) {
-			setIsWidgetAreaOpen( 0, isOpen );
+		// Open the last selected widget area when opening the inserter.
+		if ( isOpen && ! isLastSelectedWidgetAreaOpen ) {
+			setIsWidgetAreaOpen( rootClientId, isOpen );
 		}
 	}
 

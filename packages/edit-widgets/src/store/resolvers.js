@@ -62,9 +62,12 @@ export function* getWidgetAreas() {
 		);
 	}
 
-	yield setWidgetAreasOpenState(
-		widgetAreaBlocks.map( ( _, index ) => index === 0 )
-	);
+	const widgetAreasOpenState = {};
+	widgetAreaBlocks.forEach( ( widgetAreaBlock, index ) => {
+		// Defaults to open the first widget area.
+		widgetAreasOpenState[ widgetAreaBlock.clientId ] = index === 0;
+	} );
+	yield setWidgetAreasOpenState( widgetAreasOpenState );
 
 	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
 
