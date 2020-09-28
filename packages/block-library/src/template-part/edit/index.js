@@ -5,9 +5,14 @@ import { useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
-import { Dropdown, ToolbarButton } from '@wordpress/components';
+import {
+	Dropdown,
+	ToolbarGroup,
+	ToolbarButton,
+	Spinner,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronUp, chevronDown } from '@wordpress/icons';
 
@@ -21,7 +26,7 @@ import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
 
 export default function TemplatePartEdit( {
-	attributes: { postId: _postId, slug, theme, tagName },
+	attributes: { postId: _postId, slug, theme, tagName: TagName = 'div' },
 	setAttributes,
 	clientId,
 } ) {
@@ -64,14 +69,24 @@ export default function TemplatePartEdit( {
 		}
 	}, [ innerBlocks ] );
 
-	const BlockWrapper = Block[ tagName ];
+	const blockWrapperProps = useBlockWrapperProps();
 
-	if ( postId ) {
-		// Part of a template file, post ID already resolved.
-		return (
-			<BlockWrapper>
+	// Part of a template file, post ID already resolved.
+	const isTemplateFile = !! postId;
+	// Fresh new block.
+	const isPlaceholder =
+		! postId && ! initialSlug.current && ! initialTheme.current;
+	// Part of a template file, post ID not resolved yet.
+	const isUnresolvedTemplateFile = ! isPlaceholder && ! postId;
+
+	return (
+		<TagName { ...blockWrapperProps }>
+			{ isPlaceholder && (
+				<TemplatePartPlaceholder setAttributes={ setAttributes } />
+			) }
+			{ isTemplateFile && (
 				<BlockControls>
-					<div className="wp-block-template-part__block-control-group">
+					<ToolbarGroup className="wp-block-template-part__block-control-group">
 						<TemplatePartNamePanel
 							postId={ postId }
 							setAttributes={ setAttributes }
@@ -98,23 +113,16 @@ export default function TemplatePartEdit( {
 								/>
 							) }
 						/>
-					</div>
+					</ToolbarGroup>
 				</BlockControls>
+			) }
+			{ isTemplateFile && (
 				<TemplatePartInnerBlocks
 					postId={ postId }
 					hasInnerBlocks={ innerBlocks.length > 0 }
 				/>
-			</BlockWrapper>
-		);
-	}
-	if ( ! initialSlug.current && ! initialTheme.current ) {
-		// Fresh new block.
-		return (
-			<BlockWrapper>
-				<TemplatePartPlaceholder setAttributes={ setAttributes } />
-			</BlockWrapper>
-		);
-	}
-	// Part of a template file, post ID not resolved yet.
-	return null;
+			) }
+			{ isUnresolvedTemplateFile && <Spinner /> }
+		</TagName>
+	);
 }

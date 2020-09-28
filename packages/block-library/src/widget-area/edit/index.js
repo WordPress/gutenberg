@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { EntityProvider } from '@wordpress/core-data';
 import { Panel, PanelBody } from '@wordpress/components';
 
@@ -15,14 +15,22 @@ export default function WidgetAreaEdit( {
 	className,
 	attributes: { id, name },
 } ) {
-	const index = useSelect(
-		( select ) => select( 'core/block-editor' ).getBlockIndex( clientId ),
+	const isOpen = useSelect(
+		( select ) =>
+			select( 'core/edit-widgets' ).getIsWidgetAreaOpen( clientId ),
 		[ clientId ]
 	);
+	const { setIsWidgetAreaOpen } = useDispatch( 'core/edit-widgets' );
 
 	return (
 		<Panel className={ className }>
-			<PanelBody title={ name } initialOpen={ index === 0 }>
+			<PanelBody
+				title={ name }
+				opened={ isOpen }
+				onToggle={ ( opened ) => {
+					setIsWidgetAreaOpen( clientId, opened );
+				} }
+			>
 				<EntityProvider
 					kind="root"
 					type="postType"

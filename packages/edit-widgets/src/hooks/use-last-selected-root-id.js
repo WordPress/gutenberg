@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -18,28 +17,21 @@ const useLastSelectedRootId = () => {
 			POST_TYPE,
 			buildWidgetAreasPostId()
 		);
-		if ( widgetAreasPost ) {
-			return widgetAreasPost?.blocks[ 0 ]?.clientId;
-		}
+		return widgetAreasPost?.blocks[ 0 ]?.clientId;
 	}, [] );
-
-	const lastSelectedRootIdRef = useRef();
-	if ( ! lastSelectedRootIdRef.current && firstRootId ) {
-		lastSelectedRootIdRef.current = firstRootId;
-	}
 
 	const selectedRootId = useSelect( ( select ) => {
 		const { getBlockRootClientId, getBlockSelectionEnd } = select(
 			'core/block-editor'
 		);
-		return getBlockRootClientId( getBlockSelectionEnd() );
+		const blockSelectionEnd = getBlockSelectionEnd();
+		const blockRootClientId = getBlockRootClientId( blockSelectionEnd );
+		// getBlockRootClientId returns an empty string for top-level blocks, in which case just return the block id.
+		return blockRootClientId === '' ? blockSelectionEnd : blockRootClientId;
 	}, [] );
 
-	if ( selectedRootId ) {
-		lastSelectedRootIdRef.current = selectedRootId;
-	}
-
-	return lastSelectedRootIdRef.current;
+	// Fallbacks to the first widget area.
+	return selectedRootId || firstRootId;
 };
 
 export default useLastSelectedRootId;

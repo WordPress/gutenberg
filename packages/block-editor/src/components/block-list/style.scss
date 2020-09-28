@@ -357,7 +357,7 @@
 .block-editor-block-list__insertion-point {
 	position: relative;
 	z-index: z-index(".block-editor-block-list__insertion-point");
-	margin-top: -$block-padding;
+	margin-top: -$block-padding * 2;
 }
 
 .block-editor-block-list__insertion-point-indicator {
@@ -378,9 +378,6 @@
 	}
 
 	justify-content: center;
-
-	// Clicks on the inserter are redirected to the nearest tabbable element.
-	cursor: text;
 
 	// Hide the inserter above the selected block.
 	&.is-inserter-hidden .block-editor-inserter__toggle {
@@ -412,8 +409,8 @@
 		padding: 0;
 
 		// Special dimensions for this button.
-		min-width: 24px;
-		height: 24px;
+		min-width: $button-size-small;
+		height: $button-size-small;
 
 		&:hover {
 			color: $white;

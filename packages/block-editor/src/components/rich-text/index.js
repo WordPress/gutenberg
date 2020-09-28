@@ -144,6 +144,10 @@ function RichTextWrapper(
 		fontFamily,
 		fontWeight,
 		fontStyle,
+		minWidth,
+		maxWidth,
+		onBlur,
+		setRef,
 		...props
 	},
 	forwardedRef
@@ -603,6 +607,13 @@ function RichTextWrapper(
 			fontFamily={ fontFamily }
 			fontWeight={ fontWeight }
 			fontStyle={ fontStyle }
+			minWidth={ minWidth }
+			maxWidth={ maxWidth }
+			onBlur={ onBlur }
+			setRef={ setRef }
+			// Destructuring the id prop before { ...props } doesn't work
+			// correctly on web https://github.com/WordPress/gutenberg/pull/25624
+			id={ props.id }
 		>
 			{ ( {
 				isSelected: nestedIsSelected,

@@ -6,15 +6,25 @@ import {
 	ComplementaryAreaMoreMenuItem,
 } from '@wordpress/interface';
 
-export default ( { identifier, title, icon, children, closeLabel } ) => {
+export default ( {
+	className,
+	identifier,
+	title,
+	icon,
+	children,
+	closeLabel,
+	header,
+} ) => {
 	return (
 		<>
 			<ComplementaryArea
+				className={ className }
 				scope="core/edit-site"
 				identifier={ identifier }
 				title={ title }
 				icon={ icon }
 				closeLabel={ closeLabel }
+				header={ header }
 			>
 				{ children }
 			</ComplementaryArea>
