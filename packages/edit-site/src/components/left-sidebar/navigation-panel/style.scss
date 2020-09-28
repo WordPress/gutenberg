@@ -20,6 +20,16 @@
 
 	.components-navigation__item {
 		position: relative;
+
+		.edit-site-template-switcher__label-home-icon svg path {
+			color: inherit;
+		}
+
+		&.is-active {
+			.edit-site-template-switcher__label-customized-dot {
+				background: #fff;
+			}
+		}
 	}
 
 	.edit-site-template-switcher__label-home-icon {
