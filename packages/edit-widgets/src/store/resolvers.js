@@ -7,6 +7,7 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { resolveWidgetAreas, select, dispatch } from './controls';
+import { setWidgetAreasOpenState } from './actions';
 import {
 	KIND,
 	POST_TYPE,
@@ -60,6 +61,10 @@ export function* getWidgetAreas() {
 			} )
 		);
 	}
+
+	yield setWidgetAreasOpenState(
+		widgetAreaBlocks.map( ( _, index ) => index === 0 )
+	);
 
 	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
 

@@ -160,3 +160,28 @@ export const hasResolvedWidgetAreas = createRegistrySelector(
 		return true;
 	}
 );
+
+/**
+ * Gets whether the widget area is opened.
+ *
+ * @param {Array}  state The open state of the widget areas.
+ * @param {number} index The index of the widget area.
+ * @return {boolean}     True if the widget area is open.
+ */
+export const getIsWidgetAreaOpen = ( state, index ) => {
+	const { widgetAreasOpenState } = state;
+	return !! widgetAreasOpenState[ index ];
+};
+
+/**
+ * Returns true if all the widget areas is closed.
+ *
+ * @param {Array} state The open state of the widget areas.
+ * @return {boolean}    True if all the widget area is closed.
+ */
+export const getIsAllWidgetAreasClosed = ( state ) => {
+	const { widgetAreasOpenState } = state;
+	return Object.values( widgetAreasOpenState ).every(
+		( isOpen ) => ! isOpen
+	);
+};

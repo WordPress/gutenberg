@@ -28,6 +28,32 @@ export function mapping( state, action ) {
 	return state || {};
 }
 
+/**
+ * Controls the open state of the widget areas.
+ *
+ * @param {Array}  state  Redux state
+ * @param {Object} action Redux action
+ * @return {Array}        Updated state
+ */
+export function widgetAreasOpenState( state = [], action ) {
+	const { type } = action;
+	switch ( type ) {
+		case 'SET_WIDGET_AREAS_OPEN_STATE': {
+			return action.widgetAreasOpenState;
+		}
+		case 'SET_IS_WIDGET_AREA_OPEN': {
+			const { index, isOpen } = action;
+			const list = state.slice();
+			list[ index ] = isOpen;
+			return list;
+		}
+		default: {
+			return state;
+		}
+	}
+}
+
 export default combineReducers( {
 	mapping,
+	widgetAreasOpenState,
 } );
