@@ -1,6 +1,6 @@
 # Block Alignment Toolbar
 
-The `BlockAlignmentToolbar` component is used to render image block alignment options in the editor. The different alignment options it provides are `left`, `center`, `right`, `wide` and `full`.
+The `BlockAlignmentToolbar` component is used to render block alignment options in the editor. The different alignment options it provides are `left`, `center`, `right`, `wide` and `full`.
 
 ![Image block alignment options](https://make.wordpress.org/core/files/2020/09/image-block-alignment-options.png)
 
@@ -13,7 +13,7 @@ The `BlockAlignmentToolbar` component is used to render image block alignment op
 
 ### Usage
 
-Renders an block alignment toolbar with alignments options.
+Renders a block alignment toolbar with alignments options.
 
 ```jsx
 import { BlockAlignmentToolbar } from '@wordpress/block-editor';
