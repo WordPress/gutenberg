@@ -57,9 +57,12 @@ export class StoryUpdateProgress extends React.Component {
 	}
 
 	mediaIdContainedInMediaFiles( mediaId, mediaFiles ) {
-		// TODO check here
 		if ( mediaId !== undefined && mediaFiles !== undefined ) {
-			return true;
+			for ( let i = 0; i < this.props.mediaFiles.length; i++ ) {
+				if ( mediaFiles[ i ].id === mediaId ) {
+					return true;
+				}
+			}
 		}
 		return false;
 	}
@@ -159,14 +162,14 @@ export class StoryUpdateProgress extends React.Component {
 			this.props.onMediaSaveStateReset( payload );
 		}
 	}
-	
+
 	storySaveResult( payload ) {
 		this.setState( {
 			progress: payload.progress,
 			isUploadInProgress: false,
 			isUploadFailed: false,
 			isSaveInProgress: false,
-			isSaveFailed: (! payload.success),
+			isSaveFailed: ! payload.success,
 		} );
 		if ( this.props.onStorySaveResult ) {
 			this.props.onStorySaveResult( payload );
