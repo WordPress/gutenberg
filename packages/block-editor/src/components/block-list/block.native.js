@@ -154,10 +154,12 @@ class BlockListBlock extends Component {
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 		const hasParentBlockAlignment = parentBlockAlignment !== undefined;
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
-		const isColumnsRelated = name.includes( 'core/column' );
+		const isContainerRelated = WIDE_ALIGNMENTS.innerContainers.includes(
+			name
+		);
 		const shouldBeFullWidth =
 			isFullWidth &&
-			( ! isColumnsRelated ||
+			( ! isContainerRelated ||
 				! hasParents ||
 				( hasParentBlockAlignment &&
 					blockWidth > ALIGNMENT_BREAKPOINTS.mobile ) );

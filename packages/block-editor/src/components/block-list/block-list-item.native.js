@@ -22,8 +22,6 @@ import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
 import styles from './block-list-item.native.scss';
 
-export const INNER_CONTAINERS = [ 'core/columns', 'core/column', 'core/group' ];
-
 const stretchStyle = {
 	flex: 1,
 };
@@ -55,28 +53,28 @@ export class BlockListItem extends Component {
 			parentBlockAlignment,
 			hasParents,
 			blockName,
-			isContainerDescendantSelected,
+			isSelected,
 		} = this.props;
 		const { blockWidth } = this.state;
-		const isFullWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.full;
-		const isWideWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.wide;
-		const isParentFullWidth =
-			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
-		const isContainerRelated = INNER_CONTAINERS.includes( blockName );
+		const { mobile, medium } = ALIGNMENT_BREAKPOINTS;
+		const { alignments, innerContainers } = WIDE_ALIGNMENTS;
+		const isFullWidth = blockAlignment === alignments.full;
+		const isWideWidth = blockAlignment === alignments.wide;
+		const isParentFullWidth = parentBlockAlignment === alignments.full;
+		const isContainerRelated = innerContainers.includes( blockName );
 
 		if ( isFullWidth ) {
 			if ( ! hasParents ) {
-				if (
-					isContainerRelated &&
-					blockWidth < ALIGNMENT_BREAKPOINTS.mobile
-				) {
-					if ( isContainerDescendantSelected ) {
+				if ( isContainerRelated && blockWidth < mobile ) {
+					if ( isSelected ) {
 						return 0;
 					}
 					return marginHorizontal;
-				} else if ( blockWidth > ALIGNMENT_BREAKPOINTS.medium ) {
+				} else if ( blockWidth > medium ) {
 					return -2;
 				}
+			} else if ( blockWidth > mobile ) {
+				return -2;
 			}
 			return 0;
 		}
@@ -85,11 +83,10 @@ export class BlockListItem extends Component {
 			return marginHorizontal;
 		}
 
-		if (
-			isParentFullWidth &&
-			blockWidth <= ALIGNMENT_BREAKPOINTS.medium &&
-			! isContainerRelated
-		) {
+		if ( isParentFullWidth && blockWidth <= medium ) {
+			if ( isContainerRelated ) {
+				return marginHorizontal;
+			}
 			return marginHorizontal * 2;
 		}
 
@@ -98,7 +95,9 @@ export class BlockListItem extends Component {
 
 	getContentStyles( readableContentViewStyle ) {
 		const { blockAlignment, hasParents } = this.props;
-		const isFullWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.full;
+		const { alignments } = WIDE_ALIGNMENTS;
+
+		const isFullWidth = blockAlignment === alignments.full;
 
 		return [
 			readableContentViewStyle,
@@ -171,7 +170,6 @@ export default compose( [
 				getBlockParents,
 				__unstableGetBlockWithoutInnerBlocks,
 				getSelectedBlockClientId,
-				hasSelectedInnerBlock,
 			} = select( 'core/block-editor' );
 
 			const blockClientIds = getBlockOrder( rootClientId );
@@ -208,24 +206,9 @@ export default compose( [
 			const { align: parentBlockAlignment } =
 				parentBlock?.attributes || {};
 
-			const selectedBlockId = getSelectedBlockClientId();
-			const selectedBlockParentId = getBlockParents(
-				selectedBlockId
-			)[ 0 ];
-			const { name: selectedBlockParentsName } =
-				__unstableGetBlockWithoutInnerBlocks( selectedBlockParentId ) ||
-				{};
+			const selectedBlockClientId = getSelectedBlockClientId();
 
-			const isInnerBlockSelected =
-				hasParents && hasSelectedInnerBlock( clientId );
-
-			const isContainerBlock = INNER_CONTAINERS.includes(
-				selectedBlockParentsName
-			);
-
-			const isContainerDescendantSelected = isContainerBlock
-				? isInnerBlockSelected
-				: true;
+			const isSelected = selectedBlockClientId === clientId;
 
 			return {
 				shouldShowInsertionPointBefore,
@@ -235,7 +218,7 @@ export default compose( [
 				blockAlignment: align,
 				parentBlockAlignment,
 				blockName: name,
-				isContainerDescendantSelected,
+				isSelected,
 			};
 		}
 	),
