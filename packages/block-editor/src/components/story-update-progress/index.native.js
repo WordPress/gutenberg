@@ -29,6 +29,7 @@ export const MEDIA_SAVE_STATE_SUCCEEDED = 6;
 export const MEDIA_SAVE_STATE_FAILED = 7;
 export const MEDIA_SAVE_STATE_RESET = 8;
 export const STORY_SAVE_STATE_RESULT = 9;
+export const MEDIA_SAVE_MEDIAMODEL_CREATED = 10;
 
 export class StoryUpdateProgress extends React.Component {
 	constructor( props ) {
@@ -125,7 +126,10 @@ export class StoryUpdateProgress extends React.Component {
 			case STORY_SAVE_STATE_RESULT:
 				this.storySaveResult( payload );
 				break;
-		}
+			case MEDIA_SAVE_MEDIAMODEL_CREATED:
+				this.mediaModelCreated( payload );
+				break;
+			}
 	}
 
 	// ---- Story (media) save actions
@@ -173,6 +177,18 @@ export class StoryUpdateProgress extends React.Component {
 		} );
 		if ( this.props.onStorySaveResult ) {
 			this.props.onStorySaveResult( payload );
+		}
+	}
+
+	mediaModelCreated( payload ) {
+		this.setState( {
+			isUploadInProgress: false,
+			isUploadFailed: false,
+			isSaveInProgress: false,
+			isSaveFailed: false,
+		} );
+		if ( this.props.onMediaModelCreated ) {
+			this.props.onMediaModelCreated( payload );
 		}
 	}
 

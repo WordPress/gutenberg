@@ -15,6 +15,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID;
+import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_NEW_ID;
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL;
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_STORY_SAVE_RESULT;
 
@@ -33,6 +34,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, StorySaveE
     private static final int MEDIA_SAVE_STATE_FAILED = 7;
     private static final int MEDIA_SAVE_STATE_RESET = 8;
     private static final int STORY_SAVE_STATE_RESULT = 9;
+    private static final int MEDIA_SAVE_MEDIAMODEL_CREATED = 10;
 
     private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
     private static final String EVENT_NAME_MEDIA_SAVE = "mediaSave";
@@ -137,7 +139,8 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, StorySaveE
 
     private boolean isCriticalMessage(int state) {
         return state == MEDIA_UPLOAD_STATE_SUCCEEDED || state == MEDIA_UPLOAD_STATE_FAILED
-               || state == MEDIA_SAVE_STATE_SUCCEEDED || state == MEDIA_SAVE_STATE_FAILED;
+               || state == MEDIA_SAVE_STATE_SUCCEEDED || state == MEDIA_SAVE_STATE_FAILED
+               || state == MEDIA_SAVE_MEDIAMODEL_CREATED;
     }
 
     @Override
@@ -184,6 +187,19 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, StorySaveE
     @Override
     public void onStorySaveResult(String storyFirstMediaId, boolean success) {
         setStorySaveDataInJS(STORY_SAVE_STATE_RESULT, storyFirstMediaId, success, success ? 1 : 0);
+    }
+
+    @Override public void onMediaModelCreatedForFile(String oldId, String newId, String oldUrl) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putInt(MAP_KEY_MEDIA_FILE_UPLOAD_STATE, MEDIA_SAVE_MEDIAMODEL_CREATED);
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, oldId);
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_NEW_ID, newId);
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, oldUrl);
+        if (isCriticalMessage(MEDIA_SAVE_MEDIAMODEL_CREATED)) {
+            queueActionToJS(EVENT_NAME_MEDIA_SAVE, writableMap);
+        } else {
+            emitOrDrop(EVENT_NAME_MEDIA_SAVE, writableMap);
+        }
     }
 
     public void updateCapabilities(GutenbergProps gutenbergProps) {
