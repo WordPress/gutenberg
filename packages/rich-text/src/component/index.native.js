@@ -17,12 +17,7 @@ import memize from 'memize';
  */
 import { BlockFormatControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import {
-	Toolbar,
-	ToolbarButton,
-	withSiteCapabilities,
-	isMentionsSupported,
-} from '@wordpress/components';
+import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
@@ -761,8 +756,8 @@ export class RichText extends Component {
 			parentBlockStyles,
 			withoutInteractiveFormatting,
 			accessibilityLabel,
-			capabilities,
 			disableEditingMenu = false,
+			isMentionsSupported,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -874,8 +869,7 @@ export class RichText extends Component {
 					onBlur={ this.onBlur }
 					onKeyDown={ this.onKeyDown }
 					triggerKeyCodes={
-						disableEditingMenu === false &&
-						isMentionsSupported( capabilities )
+						disableEditingMenu === false && isMentionsSupported
 							? [ '@' ]
 							: []
 					}
@@ -921,7 +915,7 @@ export class RichText extends Component {
 						<BlockFormatControls>
 							{
 								// eslint-disable-next-line no-undef
-								isMentionsSupported( capabilities ) && (
+								isMentionsSupported && (
 									<Toolbar>
 										<ToolbarButton
 											title={ __( 'Insert mention' ) }
@@ -947,7 +941,9 @@ RichText.defaultProps = {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockParents, getBlock } = select( 'core/block-editor' );
+		const { getBlockParents, getBlock, getSettings } = select(
+			'core/block-editor'
+		);
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
 		const parentBlockStyles =
@@ -955,9 +951,10 @@ export default compose( [
 
 		return {
 			formatTypes: select( 'core/rich-text' ).getFormatTypes(),
+			isMentionsSupported:
+				getSettings( 'capabilities' ).mentions === true,
 			...{ parentBlockStyles },
 		};
 	} ),
 	withPreferredColorScheme,
-	withSiteCapabilities,
 ] )( RichText );

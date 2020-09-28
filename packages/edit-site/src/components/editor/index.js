@@ -17,9 +17,7 @@ import {
 	BlockBreadcrumb,
 	__unstableEditorStyles as EditorStyles,
 	__experimentalUseResizeCanvas as useResizeCanvas,
-	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
-import { useViewportMatch } from '@wordpress/compose';
 import {
 	FullscreenMode,
 	InterfaceSkeleton,
@@ -28,7 +26,6 @@ import {
 import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
-import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -38,14 +35,15 @@ import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
+import GlobalStylesProvider from './global-styles-provider';
+import LeftSidebar from '../left-sidebar';
 
 const interfaceLabels = {
 	leftSidebar: __( 'Block Library' ),
 };
 
 function Editor() {
-	const [ isInserterOpen, setIsInserterOpen ] = useState( false );
-	const isMobile = useViewportMatch( 'medium', '<' );
+	const [ leftSidebarContent, setLeftSidebarContent ] = useState( null );
 
 	const {
 		isFullscreenActive,
@@ -136,7 +134,7 @@ function Editor() {
 	const blockContext = useMemo(
 		() => ( {
 			...page?.context,
-			query: page?.context.query || { categoryIds: [] },
+			query: page?.context.query || { categoryIds: [], tagIds: [] },
 			queryContext: [
 				page?.context.queryContext || { page: 1 },
 				( newQueryContext ) =>
@@ -155,6 +153,9 @@ function Editor() {
 		[ page?.context ]
 	);
 
+	const toggleLeftSidebarContent = ( value ) =>
+		setLeftSidebarContent( leftSidebarContent === value ? null : value );
+
 	return (
 		<>
 			<EditorStyles styles={ settings.styles } />
@@ -168,115 +169,128 @@ function Editor() {
 							type={ templateType }
 							id={ entityId }
 						>
-							<BlockContextProvider value={ blockContext }>
-								<FocusReturnProvider>
-									<KeyboardShortcuts.Register />
-									<SidebarComplementaryAreaFills />
-									<InterfaceSkeleton
-										labels={ interfaceLabels }
-										leftSidebar={
-											isInserterOpen && (
-												<div className="edit-site-editor__inserter-panel">
-													<div className="edit-site-editor__inserter-panel-header">
-														<Button
-															icon={ close }
-															onClick={ () =>
-																setIsInserterOpen(
-																	false
-																)
-															}
-														/>
-													</div>
-													<div className="edit-site-editor__inserter-panel-content">
-														<Library
-															showInserterHelpPanel
-															onSelect={ () => {
-																if (
-																	isMobile
-																) {
-																	setIsInserterOpen(
-																		false
-																	);
-																}
-															} }
-														/>
-													</div>
-												</div>
-											)
-										}
-										sidebar={
-											sidebarIsOpened && (
-												<ComplementaryArea.Slot scope="core/edit-site" />
-											)
-										}
-										header={
-											<Header
-												openEntitiesSavedStates={
-													openEntitiesSavedStates
-												}
-												isInserterOpen={
-													isInserterOpen
-												}
-												onToggleInserter={ () =>
-													setIsInserterOpen(
-														! isInserterOpen
-													)
-												}
-											/>
-										}
-										content={
-											<BlockSelectionClearer
-												className="edit-site-visual-editor"
-												style={ inlineStyles }
-											>
-												<Notices />
-												<Popover.Slot name="block-toolbar" />
-												{ template && (
-													<BlockEditor
-														setIsInserterOpen={
-															setIsInserterOpen
+							<EntityProvider
+								kind="postType"
+								type="wp_global_styles"
+								id={
+									settings.__experimentalGlobalStylesUserEntityId
+								}
+							>
+								<BlockContextProvider value={ blockContext }>
+									<FocusReturnProvider>
+										<GlobalStylesProvider
+											baseStyles={
+												settings.__experimentalGlobalStylesBaseStyles
+											}
+											contexts={
+												settings.__experimentalGlobalStylesContexts
+											}
+										>
+											<KeyboardShortcuts.Register />
+											<SidebarComplementaryAreaFills />
+											<InterfaceSkeleton
+												labels={ interfaceLabels }
+												leftSidebar={
+													<LeftSidebar
+														content={
+															leftSidebarContent
+														}
+														setContent={
+															setLeftSidebarContent
 														}
 													/>
-												) }
-												<KeyboardShortcuts />
-											</BlockSelectionClearer>
-										}
-										actions={
-											<>
-												<EntitiesSavedStates
-													isOpen={
-														isEntitiesSavedStatesOpen
-													}
-													close={
-														closeEntitiesSavedStates
-													}
-												/>
-												{ ! isEntitiesSavedStatesOpen && (
-													<div className="edit-site-editor__toggle-save-panel">
-														<Button
-															isSecondary
-															className="edit-site-editor__toggle-save-panel-button"
-															onClick={
-																openEntitiesSavedStates
+												}
+												sidebar={
+													sidebarIsOpened && (
+														<ComplementaryArea.Slot scope="core/edit-site" />
+													)
+												}
+												header={
+													<Header
+														openEntitiesSavedStates={
+															openEntitiesSavedStates
+														}
+														isInserterOpen={
+															leftSidebarContent ===
+															'inserter'
+														}
+														onToggleInserter={ () =>
+															toggleLeftSidebarContent(
+																'inserter'
+															)
+														}
+														isNavigationOpen={
+															leftSidebarContent ===
+															'navigation'
+														}
+														onToggleNavigation={ () =>
+															toggleLeftSidebarContent(
+																'navigation'
+															)
+														}
+													/>
+												}
+												content={
+													<BlockSelectionClearer
+														className="edit-site-visual-editor"
+														style={ inlineStyles }
+													>
+														<Notices />
+														<Popover.Slot name="block-toolbar" />
+														{ template && (
+															<BlockEditor
+																setIsInserterOpen={ (
+																	isInserterOpen
+																) =>
+																	setLeftSidebarContent(
+																		isInserterOpen
+																			? 'inserter'
+																			: null
+																	)
+																}
+															/>
+														) }
+														<KeyboardShortcuts />
+													</BlockSelectionClearer>
+												}
+												actions={
+													<>
+														<EntitiesSavedStates
+															isOpen={
+																isEntitiesSavedStatesOpen
 															}
-															aria-expanded={
-																false
+															close={
+																closeEntitiesSavedStates
 															}
-														>
-															{ __(
-																'Open save panel'
-															) }
-														</Button>
-													</div>
-												) }
-											</>
-										}
-										footer={ <BlockBreadcrumb /> }
-									/>
-									<Popover.Slot />
-									<PluginArea />
-								</FocusReturnProvider>
-							</BlockContextProvider>
+														/>
+														{ ! isEntitiesSavedStatesOpen && (
+															<div className="edit-site-editor__toggle-save-panel">
+																<Button
+																	isSecondary
+																	className="edit-site-editor__toggle-save-panel-button"
+																	onClick={
+																		openEntitiesSavedStates
+																	}
+																	aria-expanded={
+																		false
+																	}
+																>
+																	{ __(
+																		'Open save panel'
+																	) }
+																</Button>
+															</div>
+														) }
+													</>
+												}
+												footer={ <BlockBreadcrumb /> }
+											/>
+											<Popover.Slot />
+											<PluginArea />
+										</GlobalStylesProvider>
+									</FocusReturnProvider>
+								</BlockContextProvider>
+							</EntityProvider>
 						</EntityProvider>
 					</EntityProvider>
 				</DropZoneProvider>

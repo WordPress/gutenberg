@@ -23,8 +23,8 @@ import { select, dispatch } from '@wordpress/data';
  * @param {string}   name                 Format name.
  * @param {WPFormat} settings             Format settings.
  *
- * @return {WPFormat|undefined} The format, if it has been successfully registered;
- *                              otherwise `undefined`.
+ * @return {WPFormat|undefined} The format, if it has been successfully
+ *                              registered; otherwise `undefined`.
  */
 export function registerFormatType( name, settings ) {
 	settings = {

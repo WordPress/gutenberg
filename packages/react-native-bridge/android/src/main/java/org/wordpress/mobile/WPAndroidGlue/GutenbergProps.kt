@@ -5,6 +5,7 @@ import android.os.Bundle
 data class GutenbergProps @JvmOverloads constructor(
     val enableMentions: Boolean,
     val enableUnsupportedBlockEditor: Boolean,
+    val canEnableUnsupportedBlockEditor: Boolean,
     val localeSlug: String,
     val postType: String,
     val editorTheme: Bundle?,
@@ -22,16 +23,19 @@ data class GutenbergProps @JvmOverloads constructor(
         putBundle(PROP_TRANSLATIONS, translations)
         putBoolean(PROP_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled)
 
-        putBundle(PROP_CAPABILITIES, Bundle().apply {
-            putBoolean(PROP_CAPABILITIES_MENTIONS, enableMentions)
-            putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
-            putBoolean(PROP_CAPABILITIES_MODAL_LAYOUT_PICKER, isModalLayoutPickerEnabled)
-        })
+        putBundle(PROP_CAPABILITIES, getUpdatedCapabilitiesProps())
 
         editorTheme?.also { theme ->
             theme.getSerializable(PROP_COLORS)?.let { putSerializable(PROP_COLORS, it) }
             theme.getSerializable(PROP_GRADIENTS)?.let { putSerializable(PROP_GRADIENTS, it) }
         }
+    }
+
+    fun getUpdatedCapabilitiesProps() = Bundle().apply {
+        putBoolean(PROP_CAPABILITIES_MENTIONS, enableMentions)
+        putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
+        putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
+        putBoolean(PROP_CAPABILITIES_MODAL_LAYOUT_PICKER, isModalLayoutPickerEnabled)
     }
 
     companion object {
@@ -54,6 +58,7 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_MENTIONS = "mentions"
         const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"
+        const val PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR = "canEnableUnsupportedBlockEditor"
         const val PROP_CAPABILITIES_MODAL_LAYOUT_PICKER = "modalLayoutPicker"
     }
 }

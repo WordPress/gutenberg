@@ -2,10 +2,15 @@
  * WordPress dependencies
  */
 
+import { Fragment } from '@wordpress/element';
+
 import {
 	InnerBlocks,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	InspectorControls,
 } from '@wordpress/block-editor';
+import { ToggleControl, PanelBody } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 const ALLOWED_BLOCKS = [ 'core/social-link' ];
 
@@ -22,16 +27,35 @@ const TEMPLATE = [
 	[ 'core/social-link', { service: 'youtube' } ],
 ];
 
-export function SocialLinksEdit() {
+export function SocialLinksEdit( props ) {
+	const {
+		attributes: { openInNewTab },
+		setAttributes,
+	} = props;
+	const blockWrapperProps = useBlockWrapperProps();
 	return (
-		<InnerBlocks
-			allowedBlocks={ ALLOWED_BLOCKS }
-			templateLock={ false }
-			template={ TEMPLATE }
-			orientation="horizontal"
-			__experimentalTagName={ Block.ul }
-			__experimentalAppenderTagName="li"
-		/>
+		<Fragment>
+			<InspectorControls>
+				<PanelBody title={ __( 'Link settings' ) }>
+					<ToggleControl
+						label={ __( 'Open links in new tab' ) }
+						checked={ openInNewTab }
+						onChange={ () =>
+							setAttributes( { openInNewTab: ! openInNewTab } )
+						}
+					/>
+				</PanelBody>
+			</InspectorControls>
+			<InnerBlocks
+				allowedBlocks={ ALLOWED_BLOCKS }
+				templateLock={ false }
+				template={ TEMPLATE }
+				orientation="horizontal"
+				__experimentalTagName="ul"
+				__experimentalPassedProps={ blockWrapperProps }
+				__experimentalAppenderTagName="li"
+			/>
+		</Fragment>
 	);
 }
 

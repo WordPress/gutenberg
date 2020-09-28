@@ -289,6 +289,45 @@ describe( 'actions', () => {
 				done: true,
 			} );
 		} );
+
+		it( 'should pass patternName through metadata to REPLACE_BLOCKS action', () => {
+			const blocks = [
+				{
+					clientId: 'ribs',
+					name: 'core/test-ribs',
+				},
+				{
+					clientId: 'chicken',
+					name: 'core/test-chicken',
+				},
+			];
+
+			const meta = { patternName: 'core/chicken-ribs-pattern' };
+
+			const replaceBlockGenerator = replaceBlocks(
+				[ 'chicken' ],
+				blocks,
+				null,
+				null,
+				meta
+			);
+
+			// Skip to action yield.
+			replaceBlockGenerator.next();
+			replaceBlockGenerator.next();
+			replaceBlockGenerator.next();
+			replaceBlockGenerator.next( true );
+
+			expect( replaceBlockGenerator.next( true ).value ).toEqual( {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'chicken' ],
+				blocks,
+				time: expect.any( Number ),
+				indexToSelect: null,
+				initialPosition: null,
+				meta: { patternName: 'core/chicken-ribs-pattern' },
+			} );
+		} );
 	} );
 
 	describe( 'insertBlock', () => {
@@ -566,6 +605,68 @@ describe( 'actions', () => {
 			expect( insertBlocksGenerator.next( false ) ).toEqual( {
 				done: true,
 				value: undefined,
+			} );
+		} );
+
+		it( 'should pass patternName through metadata to INSERT_BLOCKS action', () => {
+			const ribsBlock = {
+				clientId: 'ribs',
+				name: 'core/test-ribs',
+			};
+			const chickenBlock = {
+				clientId: 'chicken',
+				name: 'core/test-chicken',
+			};
+			const chickenRibsBlock = {
+				clientId: 'chicken-ribs',
+				name: 'core/test-chicken-ribs',
+			};
+			const blocks = [ ribsBlock, chickenBlock, chickenRibsBlock ];
+			const meta = { patternName: 'core/chicken-ribs-pattern' };
+
+			const insertBlocksGenerator = insertBlocks(
+				blocks,
+				5,
+				'testrootid',
+				false,
+				meta
+			);
+
+			// Skip getSettings select.
+			insertBlocksGenerator.next();
+
+			expect( insertBlocksGenerator.next().value ).toEqual( {
+				args: [ 'core/test-ribs', 'testrootid' ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect( insertBlocksGenerator.next( true ).value ).toEqual( {
+				args: [ 'core/test-chicken', 'testrootid' ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect( insertBlocksGenerator.next( false ).value ).toEqual( {
+				args: [ 'core/test-chicken-ribs', 'testrootid' ],
+				selectorName: 'canInsertBlockType',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect( insertBlocksGenerator.next( true ) ).toEqual( {
+				done: true,
+				value: {
+					type: 'INSERT_BLOCKS',
+					blocks: [ ribsBlock, chickenRibsBlock ],
+					index: 5,
+					rootClientId: 'testrootid',
+					time: expect.any( Number ),
+					updateSelection: false,
+					meta: { patternName: 'core/chicken-ribs-pattern' },
+				},
 			} );
 		} );
 	} );

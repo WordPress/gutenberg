@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
-import '@wordpress/block-editor';
+import { Preview } from '@wordpress/block-editor';
 import '@wordpress/viewport';
 import '@wordpress/notices';
 import '@wordpress/format-library';
 import { render } from '@wordpress/element';
+import { rawHandler } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -31,5 +32,15 @@ export function initializeEditor( id, postType, postId ) {
 
 	editorInitialized = true;
 
-	render( <Editor postId={ postId } postType={ postType } />, id );
+	render( <EditorMode postId={ postId } postType={ postType } />, id );
+}
+
+function EditorMode( props ) {
+	const { initialHtml, editorMode } = props;
+
+	if ( editorMode === 'preview' ) {
+		return <Preview blocks={ rawHandler( { HTML: initialHtml } ) } />;
+	}
+
+	return <Editor { ...props } />;
 }

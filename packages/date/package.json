@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/date",
-	"version": "3.11.0",
+	"version": "3.11.1",
 	"description": "Date module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,7 +22,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
+		"@babel/runtime": "^7.11.2",
 		"moment": "^2.22.1",
 		"moment-timezone": "^0.5.31"
 	},

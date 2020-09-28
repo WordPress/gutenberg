@@ -161,57 +161,63 @@ module.exports = {
 				},
 			} ) )
 		),
-		new CopyWebpackPlugin( [
-			{
-				from: './packages/block-library/src/**/index.php',
-				test: new RegExp(
-					`([\\w-]+)${ escapeRegExp( sep ) }index\\.php$`
-				),
-				to: 'build/block-library/blocks/[1].php',
-				transform( content ) {
-					content = content.toString();
+		new CopyWebpackPlugin(
+			Object.entries( {
+				'./packages/block-library/src/': 'build/block-library/blocks/',
+				'./packages/edit-widgets/src/blocks/':
+					'build/edit-widgets/blocks/',
+			} ).flatMap( ( [ from, to ] ) => [
+				{
+					from: `${ from }/**/index.php`,
+					test: new RegExp(
+						`([\\w-]+)${ escapeRegExp( sep ) }index\\.php$`
+					),
+					to: `${ to }/[1].php`,
+					transform: ( content ) => {
+						content = content.toString();
 
-					// Within content, search for any function definitions. For
-					// each, replace every other reference to it in the file.
-					return (
-						content
-							.match( /^function [^\(]+/gm )
-							.reduce( ( result, functionName ) => {
-								// Trim leading "function " prefix from match.
-								functionName = functionName.slice( 9 );
+						// Within content, search for any function definitions. For
+						// each, replace every other reference to it in the file.
+						return (
+							content
+								.match( /^function [^\(]+/gm )
+								.reduce( ( result, functionName ) => {
+									// Trim leading "function " prefix from match.
+									functionName = functionName.slice( 9 );
 
-								// Prepend the Gutenberg prefix, substituting any
-								// other core prefix (e.g. "wp_").
-								return result.replace(
-									new RegExp( functionName, 'g' ),
-									( match ) =>
-										'gutenberg_' +
-										match.replace( /^wp_/, '' )
-								);
-							}, content )
-							// The core blocks override procedure takes place in
-							// the init action default priority to ensure that core
-							// blocks would have been registered already. Since the
-							// blocks implementations occur at the default priority
-							// and due to WordPress hooks behavior not considering
-							// mutations to the same priority during another's
-							// callback, the Gutenberg build blocks are modified
-							// to occur at a later priority.
-							.replace(
-								/(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/,
-								'$1, 20'
-							)
-					);
+									// Prepend the Gutenberg prefix, substituting any
+									// other core prefix (e.g. "wp_").
+									return result.replace(
+										new RegExp( functionName, 'g' ),
+										( match ) =>
+											'gutenberg_' +
+											match.replace( /^wp_/, '' )
+									);
+								}, content )
+								// The core blocks override procedure takes place in
+								// the init action default priority to ensure that core
+								// blocks would have been registered already. Since the
+								// blocks implementations occur at the default priority
+								// and due to WordPress hooks behavior not considering
+								// mutations to the same priority during another's
+								// callback, the Gutenberg build blocks are modified
+								// to occur at a later priority.
+								.replace(
+									/(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/,
+									'$1, 20'
+								)
+						);
+					},
 				},
-			},
-			{
-				from: './packages/block-library/src/*/block.json',
-				test: new RegExp(
-					`([\\w-]+)${ escapeRegExp( sep ) }block\\.json$`
-				),
-				to: 'build/block-library/blocks/[1]/block.json',
-			},
-		] ),
+				{
+					from: `${ from }/*/block.json`,
+					test: new RegExp(
+						`([\\w-]+)${ escapeRegExp( sep ) }block\\.json$`
+					),
+					to: `${ to }/[1]/block.json`,
+				},
+			] )
+		),
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	].filter( Boolean ),
 	watchOptions: {
