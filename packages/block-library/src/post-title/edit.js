@@ -11,7 +11,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	InspectorControls,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import {
 	ToolbarGroup,
@@ -31,7 +31,7 @@ export default function PostTitleEdit( {
 	setAttributes,
 	context: { postType, postId },
 } ) {
-	const tagName = 0 === level ? 'p' : 'h' + level;
+	const TagName = 0 === level ? 'p' : 'h' + level;
 
 	const post = useSelect(
 		( select ) =>
@@ -43,11 +43,16 @@ export default function PostTitleEdit( {
 		[ postType, postId ]
 	);
 
+	const blockWrapperProps = useBlockWrapperProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
+
 	if ( ! post ) {
 		return null;
 	}
 
-	const BlockWrapper = Block[ tagName ];
 	let title = post.title || __( 'Post Title' );
 	if ( isLink ) {
 		title = (
@@ -104,13 +109,7 @@ export default function PostTitleEdit( {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<BlockWrapper
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
-				{ title }
-			</BlockWrapper>
+			<TagName { ...blockWrapperProps }>{ title }</TagName>
 		</>
 	);
 }
