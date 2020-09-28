@@ -180,6 +180,10 @@ export default function TemplateSwitcher( {
 						/>
 					);
 				} ) }
+
+				{ ( ! templateParts || templateParts.length === 0 ) && (
+					<NavigationItem title={ __( 'Loading…' ) } />
+				) }
 			</NavigationGroup>
 
 			<NavigationGroup title={ __( 'Current theme' ) }>
