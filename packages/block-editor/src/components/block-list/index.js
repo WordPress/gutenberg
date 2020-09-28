@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
+import { last } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -50,16 +50,23 @@ function BlockList(
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
-		const isTemplatePartOrChildSelected =
-			getBlockName( selectedBlockClientId ) === 'core/template-part' ||
-			getBlockParentsByBlockName(
-				selectedBlockClientId,
+
+		// Determine if there is a template part block to highlight.
+		const activeTemplatePartId = ( function () {
+			if (
+				getBlockName( selectedBlockClientId ) === 'core/template-part'
+			) {
+				return selectedBlockClientId;
+			}
+			const templatePartParents = getBlockParentsByBlockName(
+				selectedBlockClientId || multiSelectedBlockClientIds[ 0 ],
 				'core/template-part'
-			).length ||
-			getBlockParentsByBlockName(
-				multiSelectedBlockClientIds[ 0 ],
-				'core/template-part'
-			).length;
+			);
+			if ( templatePartParents ) {
+				return last( templatePartParents );
+			}
+			return null;
+		} )();
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
@@ -71,7 +78,7 @@ function BlockList(
 				! isTyping() &&
 				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 			isDraggingBlocks: isDraggingBlocks(),
-			isTemplatePartOrChildSelected,
+			activeTemplatePartId,
 		};
 	}
 
@@ -83,7 +90,7 @@ function BlockList(
 		hasMultiSelection,
 		enableAnimation,
 		isDraggingBlocks,
-		isTemplatePartOrChildSelected,
+		activeTemplatePartId,
 	} = useSelect( selector, [ rootClientId ] );
 
 	const fallbackRef = useRef();
@@ -134,8 +141,9 @@ function BlockList(
 								'is-dropping-horizontally':
 									isDropTarget &&
 									orientation === 'horizontal',
-								'template-part-highlighting': isTemplatePartOrChildSelected,
+								'template-part-highlighting': activeTemplatePartId,
 							} ) }
+							activeTemplatePartId={ activeTemplatePartId }
 						/>
 					</AsyncModeProvider>
 				);
