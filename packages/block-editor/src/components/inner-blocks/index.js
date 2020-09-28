@@ -28,28 +28,27 @@ import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 
-/**
- * InnerBlocks is a component which allows a single block to have multiple blocks
- * as children. The UncontrolledInnerBlocks component is used whenever the inner
- * blocks are not controlled by another entity. In other words, it is normally
- * used for inner blocks in the post editor
- *
- * @param {Object} props The component props.
- */
-function UncontrolledInnerBlocks( props ) {
+const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
+	const { clientId } = useBlockEditContext();
+	const fallbackRef = useRef();
+	const forwardedRef = ref || fallbackRef;
+
+	// This hook keeps the innerBlocks of the block in the block-editor store in
+	// sync with the blocks of the controlling entity. An example of an inner
+	// block controller is a template part block, which provides its own blocks
+	// from the template part entity data source.
+	useBlockSync( props );
+
 	const {
-		clientId,
 		allowedBlocks,
 		template,
 		templateLock,
-		forwardedRef,
 		templateInsertUpdatesSelection,
 		__experimentalCaptureToolbars: captureToolbars,
 		orientation,
 	} = props;
 
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
-
 	const { hasOverlay, block, enableClickThrough } = useSelect( ( select ) => {
 		const {
 			getBlock,
@@ -114,42 +113,6 @@ function UncontrolledInnerBlocks( props ) {
 	}
 
 	return <div className="block-editor-inner-blocks">{ blockList }</div>;
-}
-
-/**
- * The controlled inner blocks component wraps the uncontrolled inner blocks
- * component with the blockSync hook. This keeps the innerBlocks of the block in
- * the block-editor store in sync with the blocks of the controlling entity. An
- * example of an inner block controller is a template part block, which provides
- * its own blocks from the template part entity data source.
- *
- * @param {Object} props The component props.
- */
-function ControlledInnerBlocks( props ) {
-	useBlockSync( props );
-	return <UncontrolledInnerBlocks { ...props } />;
-}
-
-/**
- * Wrapped InnerBlocks component which detects whether to use the controlled or
- * uncontrolled variations of the InnerBlocks component. This is the component
- * which should be used throughout the application.
- */
-const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
-	const { clientId } = useBlockEditContext();
-	const fallbackRef = useRef();
-
-	const allProps = {
-		clientId,
-		forwardedRef: ref || fallbackRef,
-		...props,
-	};
-
-	// Detects if the InnerBlocks should be controlled by an incoming value.
-	if ( props.value && props.onChange ) {
-		return <ControlledInnerBlocks { ...allProps } />;
-	}
-	return <UncontrolledInnerBlocks { ...allProps } />;
 } );
 
 // Expose default appender placeholders as components.

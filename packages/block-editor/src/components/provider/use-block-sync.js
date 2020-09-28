@@ -71,6 +71,7 @@ export default function useBlockSync( {
 	onChange = noop,
 	onInput = noop,
 } ) {
+	const isControlled = !! controlledBlocks;
 	const registry = useRegistry();
 
 	const {
@@ -114,6 +115,10 @@ export default function useBlockSync( {
 	}, [ onInput, onChange ] );
 
 	useEffect( () => {
+		if ( ! isControlled ) {
+			return;
+		}
+
 		const {
 			getSelectionStart,
 			getSelectionEnd,
@@ -183,10 +188,14 @@ export default function useBlockSync( {
 		} );
 
 		return () => unsubscribe();
-	}, [ registry, clientId ] );
+	}, [ registry, clientId, isControlled ] );
 
 	// Determine if blocks need to be reset when they change.
 	useEffect( () => {
+		if ( ! isControlled ) {
+			return;
+		}
+
 		if ( pendingChanges.current.outgoing.includes( controlledBlocks ) ) {
 			// Skip block reset if the value matches expected outbound sync
 			// triggered by this component by a preceding change detection.
@@ -215,5 +224,5 @@ export default function useBlockSync( {
 				);
 			}
 		}
-	}, [ controlledBlocks, clientId ] );
+	}, [ controlledBlocks, clientId, isControlled ] );
 }
