@@ -276,7 +276,7 @@ function ComboboxControlWithState() {
 				onChange={ setValue }
 				label="Select a country"
 				options={ filteredOptions }
-				onInputChange={ ( filter ) =>
+				onFilterValueChange={ ( filter ) =>
 					setFilteredOptions(
 						countries
 							.filter( ( country ) =>

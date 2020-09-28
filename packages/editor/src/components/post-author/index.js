@@ -19,16 +19,15 @@ import PostAuthorCheck from './check';
 function PostAuthor() {
 	const [ fieldValue, setFieldValue ] = useState();
 
-	const { isLoading, authors, postAuthor } = useSelect(
+	const { authorId, isLoading, authors, postAuthor } = useSelect(
 		( select ) => {
 			const { getUser, getUsers, isResolving } = select( 'core' );
 			const { getEditedPostAttribute } = select( 'core/editor' );
 			const author = getUser( getEditedPostAttribute( 'author' ) );
 			const query =
-				! fieldValue || '' === fieldValue || fieldValue === author?.name
-					? {}
-					: { search: fieldValue };
+				! fieldValue || '' === fieldValue ? {} : { search: fieldValue };
 			return {
+				authorId: getEditedPostAttribute( 'author' ),
 				postAuthor: author,
 				authors: getUsers( { who: 'authors', ...query } ),
 				isLoading: isResolving( 'core', 'getUsers', [
@@ -43,18 +42,19 @@ function PostAuthor() {
 	const authorOptions = useMemo( () => {
 		const fetchedAuthors = ( authors ?? [] ).map( ( author ) => {
 			return {
-				key: author.id,
-				name: author.name,
+				value: author.id,
+				label: author.name,
 			};
 		} );
 
 		// Ensure the current author is included in the dropdown list.
 		const foundAuthor = fetchedAuthors.findIndex(
-			( { key } ) => postAuthor?.id === key
+			( { value } ) => postAuthor?.id === value
 		);
+
 		if ( foundAuthor < 0 && postAuthor ) {
 			return [
-				{ key: postAuthor.id, name: postAuthor.name },
+				{ value: postAuthor.id, label: postAuthor.name },
 				...fetchedAuthors,
 			];
 		}
@@ -73,15 +73,13 @@ function PostAuthor() {
 	/**
 	 * Handle author selection.
 	 *
-	 * @param {Object} value The selected Author.
-	 * @param {Object} value.selectedItem The selected Author.
+	 * @param {number} postAuthorId The selected Author.
 	 */
-	const handleSelect = ( { selectedItem } ) => {
-		if ( ! selectedItem ) {
+	const handleSelect = ( postAuthorId ) => {
+		if ( ! postAuthorId ) {
 			return;
 		}
-		setFieldValue( selectedItem.name );
-		editPost( { author: selectedItem.key } );
+		editPost( { author: postAuthorId } );
 	};
 
 	/**
@@ -89,7 +87,7 @@ function PostAuthor() {
 	 *
 	 * @param {string} inputValue The current value of the input field.
 	 */
-	const handleKeydown = ( { inputValue } ) => {
+	const handleKeydown = ( inputValue ) => {
 		setFieldValue( inputValue );
 	};
 
@@ -102,13 +100,9 @@ function PostAuthor() {
 			<ComboboxControl
 				label={ __( 'Author' ) }
 				options={ authorOptions }
-				initialInputValue={ postAuthor?.name }
-				onInputValueChange={ debounce( handleKeydown, 300 ) }
+				value={ authorId }
+				onFilterValueChange={ debounce( handleKeydown, 300 ) }
 				onChange={ handleSelect }
-				initialSelectedItem={ {
-					key: postAuthor.id,
-					name: postAuthor.name,
-				} }
 				isLoading={ isLoading }
 			/>
 		</PostAuthorCheck>

@@ -2,10 +2,14 @@
 	width: 100%;
 }
 
-.components-combobox-control__input {
+input.components-combobox-control__input[type="text"] {
 	width: 100%;
 	border: none;
 	box-shadow: none;
+	padding: 2px;
+	margin: 0;
+	line-height: inherit;
+	min-height: auto;
 
 	&:focus {
 		outline: none;
