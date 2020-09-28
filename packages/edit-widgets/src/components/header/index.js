@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { ToolbarItem } from '@wordpress/components';
 import {
@@ -25,6 +26,22 @@ const inserterToggleProps = { isPrimary: true };
 function Header( { isCustomizer } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const rootClientId = useLastSelectedRootId();
+	const isLastSelectedWidgetAreaOpen = useSelect(
+		( select ) =>
+			select( 'core/edit-widgets' ).getIsWidgetAreaOpen( rootClientId ),
+		[ rootClientId ]
+	);
+	const { setIsWidgetAreaOpen } = useDispatch( 'core/edit-widgets' );
+	const { selectBlock } = useDispatch( 'core/block-editor' );
+
+	function handleInserterOpen( isOpen ) {
+		if ( isOpen && ! isLastSelectedWidgetAreaOpen ) {
+			// Select the last selected block if hasn't already.
+			selectBlock( rootClientId );
+			// Open the last selected widget area when opening the inserter.
+			setIsWidgetAreaOpen( rootClientId, isOpen );
+		}
+	}
 
 	return (
 		<>
@@ -43,6 +60,7 @@ function Header( { isCustomizer } ) {
 									...toolbarItemProps,
 								} }
 								rootClientId={ rootClientId }
+								onToggle={ handleInserterOpen }
 							/>
 						) }
 					</ToolbarItem>

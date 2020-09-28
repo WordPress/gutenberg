@@ -147,3 +147,31 @@ export function setWidgetIdForClientId( clientId, widgetId ) {
 		widgetId,
 	};
 }
+
+/**
+ * Sets the open state of all the widget areas.
+ *
+ * @param  {Object} widgetAreasOpenState The open states of all the widget areas.
+ * @return {Object}                      Action.
+ */
+export function setWidgetAreasOpenState( widgetAreasOpenState ) {
+	return {
+		type: 'SET_WIDGET_AREAS_OPEN_STATE',
+		widgetAreasOpenState,
+	};
+}
+
+/**
+ * Sets the open state of the widget area.
+ *
+ * @param  {string}  clientId   The clientId of the widget area.
+ * @param  {boolean} isOpen     Whether the widget area should be opened.
+ * @return {Object}             Action.
+ */
+export function setIsWidgetAreaOpen( clientId, isOpen ) {
+	return {
+		type: 'SET_IS_WIDGET_AREA_OPEN',
+		clientId,
+		isOpen,
+	};
+}
