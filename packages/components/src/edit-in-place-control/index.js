@@ -14,7 +14,7 @@ import { ENTER, ESCAPE } from '@wordpress/keycodes';
  */
 import Button from '../button';
 
-function EditInPlaceControl( { label = '', onClick = noop, onChange = noop } ) {
+function EditInPlaceControl( { label = '', onClick = noop, onUpdate = noop } ) {
 	const [ edit, setEdit ] = useState( false );
 	const [ value, setValue ] = useState( label );
 	const prevValue = useRef();
@@ -56,7 +56,7 @@ function EditInPlaceControl( { label = '', onClick = noop, onChange = noop } ) {
 					} }
 					onBlur={ () => {
 						setEdit( false );
-						onChange( value );
+						onUpdate( value );
 					} }
 					onKeyDown={ ( event ) => {
 						if (
@@ -69,7 +69,7 @@ function EditInPlaceControl( { label = '', onClick = noop, onChange = noop } ) {
 								setValue( prevValue.current );
 							} else {
 								setEdit( ! edit );
-								onChange( value );
+								onUpdate( value );
 							}
 						}
 					} }
