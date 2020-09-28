@@ -31,7 +31,7 @@ export default function TemplatePartPlaceholder( { setAttributes } ) {
 		setAttributes( {
 			postId: templatePart.id,
 			slug: templatePart.slug,
-			theme: templatePart.meta.theme,
+			theme: templatePart.wp_theme,
 		} );
 	}, [ setAttributes ] );
 

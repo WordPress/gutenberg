@@ -34,7 +34,8 @@ export default function useTemplatePartPost( postId, slug, theme ) {
 					}
 				);
 				const foundPosts = posts?.filter(
-					( post ) => post.slug === cleanedSlug
+					( post ) =>
+						post.slug === cleanedSlug && post.wp_theme === theme
 				);
 				// A published post might already exist if this template part was customized elsewhere
 				// or if it's part of a customized template.
