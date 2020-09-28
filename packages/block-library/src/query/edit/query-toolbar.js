@@ -31,20 +31,23 @@ export default function QueryToolbar( { query, setQuery } ) {
 							min={ 1 }
 							max={ 100 }
 							onChange={ ( value ) =>
-								setQuery( { perPage: value ?? -1 } )
+								setQuery( { perPage: +value ?? -1 } )
 							}
 							step="1"
 							value={ query.perPage }
+							isDragEnabled={ false }
 						/>
 						<NumberControl
 							label={ __( 'Offset' ) }
 							labelPosition="side"
 							min={ 0 }
+							max={ 100 }
 							onChange={ ( value ) =>
-								setQuery( { offset: value } )
+								setQuery( { offset: +value } )
 							}
 							step="1"
 							value={ query.offset }
+							isDragEnabled={ false }
 						/>
 						<RangeControl
 							label={ __( 'Number of Pages' ) }
