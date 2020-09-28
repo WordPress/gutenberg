@@ -41,11 +41,18 @@
 		"showSubmenuIcon": "showSubmenuIcon"
 	},
 	"supports": {
-		"align": [ "wide", "full" ],
+		"align": [
+			"wide",
+			"full"
+		],
 		"anchor": true,
 		"html": false,
 		"inserter": true,
 		"lightBlockWrapper": true,
-		"__experimentalFontSize": true
+		"__experimentalFontSize": true,
+		"__experimentalColor": {
+			"textColor": true,
+			"backgroundColor": true
+		}
 	}
 }

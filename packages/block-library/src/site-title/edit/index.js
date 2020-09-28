@@ -12,7 +12,7 @@ import {
 	RichText,
 	AlignmentToolbar,
 	BlockControls,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -24,6 +24,11 @@ export default function SiteTitleEdit( { attributes, setAttributes } ) {
 	const { level, textAlign } = attributes;
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
 	const tagName = level === 0 ? 'p' : `h${ level }`;
+	const blockWrapperProps = useBlockWrapperProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 
 	return (
 		<>
@@ -44,15 +49,13 @@ export default function SiteTitleEdit( { attributes, setAttributes } ) {
 			</BlockControls>
 
 			<RichText
-				tagName={ Block[ tagName ] }
+				tagName={ tagName }
 				placeholder={ __( 'Site Title' ) }
 				value={ title }
 				onChange={ setTitle }
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
 				allowedFormats={ [] }
 				disableLineBreaks
+				{ ...blockWrapperProps }
 			/>
 		</>
 	);

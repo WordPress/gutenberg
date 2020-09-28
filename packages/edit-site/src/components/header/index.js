@@ -26,13 +26,15 @@ import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
-import FullscreenModeClose from './fullscreen-mode-close';
 import DocumentActions from './document-actions';
+import NavigationToggle from './navigation-toggle';
 
 export default function Header( {
 	openEntitiesSavedStates,
 	isInserterOpen,
 	onToggleInserter,
+	isNavigationOpen,
+	onToggleNavigation,
 } ) {
 	const {
 		deviceType,
@@ -89,7 +91,10 @@ export default function Header( {
 		<div className="edit-site-header">
 			<div className="edit-site-header_start">
 				<MainDashboardButton.Slot>
-					<FullscreenModeClose />
+					<NavigationToggle
+						isOpen={ isNavigationOpen }
+						onClick={ onToggleNavigation }
+					/>
 				</MainDashboardButton.Slot>
 				<div className="edit-site-header__toolbar">
 					<Button
