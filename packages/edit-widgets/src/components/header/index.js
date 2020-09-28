@@ -23,7 +23,7 @@ import RedoButton from './undo-redo/redo';
 
 const inserterToggleProps = { isPrimary: true };
 
-function Header( { isCustomizer } ) {
+function Header() {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const rootClientId = useLastSelectedRootId();
 	const isLastSelectedWidgetAreaOpen = useSelect(
@@ -68,23 +68,15 @@ function Header( { isCustomizer } ) {
 					<ToolbarItem as={ RedoButton } />
 					<ToolbarItem as={ BlockNavigationDropdown } />
 				</NavigableToolbar>
-				{ ! isCustomizer && (
-					<h1 className="edit-widgets-header__title">
-						{ __( 'Block Areas' ) }
-					</h1>
-				) }
+				<h1 className="edit-widgets-header__title">
+					{ __( 'Block Areas' ) }
+				</h1>
 				<div className="edit-widgets-header__actions">
-					{ ! isCustomizer && <SaveButton /> }
-					<PinnedItems.Slot
-						scope={
-							isCustomizer
-								? 'core/edit-widgets-customizer'
-								: 'core/edit-widgets'
-						}
-					/>
+					<SaveButton />
+					<PinnedItems.Slot scope="core/edit-widgets" />
 				</div>
 			</div>
-			{ ( ! isLargeViewport || isCustomizer ) && (
+			{ ! isLargeViewport && (
 				<div className="edit-widgets-header__block-toolbar">
 					<BlockToolbar hideDragHandle />
 				</div>
