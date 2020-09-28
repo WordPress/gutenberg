@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, __unstableUseDispatchWithMap } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 function formatTypesSelector( select ) {
 	return select( 'core/rich-text' ).getFormatTypes();
@@ -36,25 +36,22 @@ export function useFormatTypes( { clientId, identifier } ) {
 			}, {} ),
 		[ formatTypes, clientId, identifier ]
 	);
-	const keyedDispatchers = __unstableUseDispatchWithMap(
-		( dispatch ) =>
-			formatTypes.reduce( ( accumulator, type ) => {
-				if ( type.__experimentalGetPropsForEditableTreeChangeHandler ) {
-					accumulator[
-						type.name
-					] = type.__experimentalGetPropsForEditableTreeChangeHandler(
-						dispatch,
-						{
-							richTextIdentifier: identifier,
-							blockClientId: clientId,
-						}
-					);
+	const dispatch = useDispatch();
+	const keyedDispatchers = formatTypes.reduce( ( accumulator, type ) => {
+		if ( type.__experimentalGetPropsForEditableTreeChangeHandler ) {
+			accumulator[
+				type.name
+			] = type.__experimentalGetPropsForEditableTreeChangeHandler(
+				dispatch,
+				{
+					richTextIdentifier: identifier,
+					blockClientId: clientId,
 				}
+			);
+		}
 
-				return accumulator;
-			}, {} ),
-		[ formatTypes, clientId, identifier ]
-	);
+		return accumulator;
+	}, {} );
 
 	const prepareHandlers = [];
 	const valueHandlers = [];
