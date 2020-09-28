@@ -26,19 +26,37 @@ export default function WidgetAreaEdit( {
 		<Panel className={ className }>
 			<PanelBody
 				title={ name }
-				opened={ isOpen }
-				onToggle={ ( opened ) => {
-					setIsWidgetAreaOpen( clientId, opened );
+				// This workaround is required to ensure LegacyWidget blocks are not unmounted when the panel is collapsed.
+				// Unmounting legacy widgets may have unintended consequences (e.g. TinyMCE not being properly reinitialized)
+				opened={ true }
+				onToggle={ () => {
+					setIsWidgetAreaOpen( clientId, ! isOpen );
 				} }
+				className={ isOpen ? 'widget-area-is-opened' : '' }
 			>
 				<EntityProvider
 					kind="root"
 					type="postType"
 					id={ `widget-area-${ id }` }
 				>
-					<WidgetAreaInnerBlocks />
+					<InnerBlocksContainer isOpen={ isOpen } />
 				</EntityProvider>
 			</PanelBody>
 		</Panel>
+	);
+}
+
+function InnerBlocksContainer( { isOpen } ) {
+	const props = isOpen
+		? {}
+		: {
+				hidden: true,
+				'aria-hidden': true,
+				style: { display: 'none' },
+		  };
+	return (
+		<div { ...props }>
+			<WidgetAreaInnerBlocks />
+		</div>
 	);
 }
