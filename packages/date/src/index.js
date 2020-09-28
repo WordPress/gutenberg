@@ -506,7 +506,7 @@ function buildMoment( dateValue, timezone = '' ) {
 		return dateMoment.tz( settings.timezone.string );
 	}
 
-	return dateMoment.utcOffset( settings.timezone.offset );
+	return dateMoment.utcOffset( Number( settings.timezone.offset ) );
 }
 
 /**
