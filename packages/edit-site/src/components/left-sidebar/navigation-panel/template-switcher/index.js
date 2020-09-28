@@ -182,7 +182,7 @@ export default function TemplateSwitcher( {
 				<NavigationItem
 					onMouseEnter={ onMouseEnterTheme }
 					onMouseLeave={ onMouseLeaveTheme }
-					title={ currentTheme.name.raw }
+					title={ currentTheme?.name?.raw || __( 'Loading…' ) }
 				/>
 			</NavigationGroup>
 
@@ -190,7 +190,9 @@ export default function TemplateSwitcher( {
 				<TemplatePreview entityId={ hoveredTemplatePartId } />
 			) }
 
-			{ themePreviewVisible && <ThemePreview theme={ currentTheme } /> }
+			{ currentTheme && themePreviewVisible && (
+				<ThemePreview theme={ currentTheme } />
+			) }
 		</>
 	);
 }
