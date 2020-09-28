@@ -32,12 +32,9 @@ export default function useNavigationBlockWithName( { menuId } ) {
 							<EditInPlaceControl
 								label={ menu?.name ?? '(untitled menu)' }
 								onChange={ ( value ) => {
-									if ( value === '' ) {
-										value = null;
-									}
 									saveMenu( {
 										...menu,
-										name: value ?? '(untitled menu)',
+										name: value || '(untitled menu)',
 									} );
 								} }
 							/>
