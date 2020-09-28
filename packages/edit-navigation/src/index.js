@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, set, flatten, partialRight } from 'lodash';
+import { map, set, flatten, omit, partialRight } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,6 +12,7 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render } from '@wordpress/element';
+import { createHigherOrderComponent } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -30,6 +31,43 @@ function disableInsertingNonNavigationBlocks( settings, name ) {
 	}
 	return settings;
 }
+
+function removeNavigationBlockSettingsUnsupportedFeatures( settings, name ) {
+	if ( name !== 'core/navigation' ) {
+		return settings;
+	}
+
+	return {
+		...settings,
+		supports: {
+			...omit( settings.supports, [
+				'anchor',
+				'customClassName',
+				'__experimentalColor',
+				'__experimentalFontSize',
+			] ),
+			customClassName: false,
+		},
+	};
+}
+
+const removeNavigationBlockEditUnsupportedFeatures = createHigherOrderComponent(
+	( BlockEdit ) => ( props ) => {
+		if ( props.name !== 'core/navigation' ) {
+			return <BlockEdit { ...props } />;
+		}
+
+		return (
+			<BlockEdit
+				{ ...props }
+				hasSubmenuIndicatorSetting={ false }
+				hasItemJustificationControls={ false }
+				hasListViewModal={ false }
+			/>
+		);
+	},
+	'removeNavigationBlockEditUnsupportedFeatures'
+);
 
 /**
  * Fetches link suggestions from the API. This function is an exact copy of a function found at:
@@ -66,7 +104,7 @@ const fetchLinkSuggestions = (
 					type: 'post',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] ) // fail by returning no results
 		);
 	}
 
@@ -79,7 +117,7 @@ const fetchLinkSuggestions = (
 					type: 'term',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] )
 		);
 	}
 
@@ -92,7 +130,7 @@ const fetchLinkSuggestions = (
 					type: 'post-format',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] )
 		);
 	}
 
@@ -114,6 +152,18 @@ export function initialize( id, settings ) {
 			disableInsertingNonNavigationBlocks
 		);
 	}
+
+	addFilter(
+		'blocks.registerBlockType',
+		'core/edit-navigation/remove-navigation-block-settings-unsupported-features',
+		removeNavigationBlockSettingsUnsupportedFeatures
+	);
+
+	addFilter(
+		'editor.BlockEdit',
+		'core/edit-navigation/remove-navigation-block-edit-unsupported-features',
+		removeNavigationBlockEditUnsupportedFeatures
+	);
 
 	registerCoreBlocks();
 

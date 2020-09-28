@@ -71,7 +71,7 @@ function InlineLinkUI( {
 		// If the caret is right before the element, select the next element.
 		element = element.nextElementSibling || element;
 
-		while ( element.nodeType !== window.Node.ELEMENT_NODE ) {
+		while ( element.nodeType !== element.ELEMENT_NODE ) {
 			element = element.parentNode;
 		}
 

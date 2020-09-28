@@ -60,6 +60,29 @@ export const getWidgetIdForClientId = ( state, clientId ) => {
 	return clientIdToWidgetId[ clientId ];
 };
 
+/**
+ * Returns widgetArea containing a block identify by given clientId
+ *
+ * @param {string} clientId The ID of the block.
+ * @return {Object} Containing widget area.
+ */
+export const getWidgetAreaForClientId = createRegistrySelector(
+	( select ) => ( state, clientId ) => {
+		const widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
+		for ( const widgetArea of widgetAreas ) {
+			const post = select( 'core' ).getEditedEntityRecord(
+				KIND,
+				POST_TYPE,
+				buildWidgetAreaPostId( widgetArea.id )
+			);
+			const clientIds = post.blocks.map( ( block ) => block.clientId );
+			if ( clientIds.includes( clientId ) ) {
+				return widgetArea;
+			}
+		}
+	}
+);
+
 export const getEditedWidgetAreas = createRegistrySelector(
 	( select ) => ( state, ids ) => {
 		let widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
@@ -137,3 +160,15 @@ export const hasResolvedWidgetAreas = createRegistrySelector(
 		return true;
 	}
 );
+
+/**
+ * Gets whether the widget area is opened.
+ *
+ * @param {Array}  state    The open state of the widget areas.
+ * @param {string} clientId The clientId of the widget area.
+ * @return {boolean}        True if the widget area is open.
+ */
+export const getIsWidgetAreaOpen = ( state, clientId ) => {
+	const { widgetAreasOpenState } = state;
+	return !! widgetAreasOpenState[ clientId ];
+};

@@ -1,76 +1,32 @@
 .components-combobox-control {
-	position: relative;
-	margin-bottom: $grid-unit-15;
+	width: 100%;
 }
 
-.components-combobox-control__label {
-	display: block;
-	margin-bottom: $grid-unit-05;
-}
+input.components-combobox-control__input[type="text"] {
+	width: 100%;
+	border: none;
+	box-shadow: none;
+	padding: 2px;
+	margin: 0;
+	line-height: inherit;
+	min-height: auto;
 
-.components-combobox-control__button {
-	border: 1px solid $gray-600;
-	border-radius: 4px;
-	display: inline-block;
-	min-height: $button-size-small;
-	min-width: 140px;
-	position: relative;
-	text-align: left;
-
-	.components-combobox-control__button-input {
-		height: 100%;
-		width: 100%;
-		left: 0;
-		top: 0;
-		position: absolute;
-		margin: 0;
-
-		@include input-control;
-	}
-
-	.components-combobox-control__button-icon {
-		height: 100%;
-		padding: 0;
-		position: absolute;
-		right: 0;
-		top: 0;
-	}
-
-	.components-combobox-control__button-button {
-		height: $button-size-small + $border-width + $border-width;
-
-		&:focus:not(:disabled) {
-			box-shadow: none;
-		}
+	&:focus {
+		outline: none;
+		box-shadow: none;
 	}
 }
 
-.components-combobox-control__menu {
-	background: $white;
-	min-width: 100%;
-	padding: 0;
-	position: absolute;
-	z-index: z-index(".components-popover");
-
-	&:not(:empty) {
-		margin: $grid-unit-15 0 0 0;
-		border-radius: $radius-block-ui;
-		border: $border-width solid $gray-900;
-	}
-}
-
-.components-combobox-control__item {
-	align-items: center;
+.components-combobox-control__suggestions-container {
+	@include input-control;
 	display: flex;
-	list-style-type: none;
-	padding: $grid-unit-10 $grid-unit-15 $grid-unit-10 ($button-size-small + $grid-unit-15);
+	flex-wrap: wrap;
+	align-items: flex-start;
+	width: 100%;
+	margin: 0 0 $grid-unit-10 0;
+	padding: $grid-unit-05;
 
-	&.is-highlighted {
-		background: $gray-200;
-	}
-
-	.components-combobox-control__item-icon {
-		margin-left: -$button-size-small - $grid-unit-05;
-		margin-right: $grid-unit-05;
+	&:focus-within {
+		@include input-style__focus();
 	}
 }

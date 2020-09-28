@@ -13,27 +13,25 @@ import NavigationMenu from '../menu';
 const testNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
 	<Navigation activeItem={ activeItem }>
 		<NavigationMenu title={ rootTitle }>
-			<ul>
-				<NavigationItem
-					badge={ showBadge && 21 }
-					item="item-1"
-					title="Item 1"
-				/>
-				<NavigationItem
-					href="http://example.com"
-					item="item-2"
-					target="_blank"
-					title="Item 2"
-				/>
-				<NavigationItem
-					navigateToMenu="category"
-					item="category"
-					title="Category"
-				/>
-				<NavigationItem item="item-3">
-					<span>customize me</span>
-				</NavigationItem>
-			</ul>
+			<NavigationItem
+				badge={ showBadge && 21 }
+				item="item-1"
+				title="Item 1"
+			/>
+			<NavigationItem
+				href="http://example.com"
+				item="item-2"
+				target="_blank"
+				title="Item 2"
+			/>
+			<NavigationItem
+				navigateToMenu="category"
+				item="category"
+				title="Category"
+			/>
+			<NavigationItem item="item-3">
+				<span>customize me</span>
+			</NavigationItem>
 		</NavigationMenu>
 		<NavigationMenu
 			backButtonLabel="Home"
@@ -41,10 +39,8 @@ const testNavigation = ( { activeItem, rootTitle, showBadge } = {} ) => (
 			parentMenu="root"
 			title="Category"
 		>
-			<ul>
-				<NavigationItem item="child-1" title="Child 1" />
-				<NavigationItem item="child-2" title="Child 2" />
-			</ul>
+			<NavigationItem item="child-1" title="Child 1" />
+			<NavigationItem item="child-2" title="Child 2" />
 		</NavigationMenu>
 	</Navigation>
 );
@@ -78,9 +74,7 @@ describe( 'Navigation', () => {
 	it( 'should render a custom component when menu item supplies one', async () => {
 		render( testNavigation() );
 
-		const customItem = screen.getByRole( 'button', {
-			name: 'customize me',
-		} );
+		const customItem = screen.getByText( 'customize me' );
 
 		expect( customItem ).toBeDefined();
 	} );

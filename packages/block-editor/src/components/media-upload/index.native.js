@@ -13,7 +13,13 @@ import {
 	requestMediaPicker,
 	mediaSources,
 } from '@wordpress/react-native-bridge';
-import { capturePhoto, captureVideo, image, wordpress } from '@wordpress/icons';
+import {
+	capturePhoto,
+	captureVideo,
+	image,
+	video,
+	wordpress,
+} from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
@@ -125,9 +131,9 @@ export class MediaUpload extends React.Component {
 		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
 
 		if ( isImage || ! isOneType ) {
-			return 'format-image';
+			return image;
 		} else if ( isVideo ) {
-			return 'format-video';
+			return video;
 		}
 	}
 

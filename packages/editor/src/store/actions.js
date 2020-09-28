@@ -10,7 +10,7 @@ import deprecated from '@wordpress/deprecated';
 import {
 	dispatch,
 	select,
-	__unstableSyncSelect,
+	syncSelect,
 	apiFetch,
 } from '@wordpress/data-controls';
 import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
@@ -679,7 +679,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 	if ( __unstableShouldCreateUndoLevel !== false ) {
 		const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
 		const noChange =
-			( yield __unstableSyncSelect(
+			( yield syncSelect(
 				'core',
 				'getEditedEntityRecord',
 				'postType',

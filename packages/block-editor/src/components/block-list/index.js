@@ -43,6 +43,7 @@ function BlockList(
 			hasMultiSelection,
 			getGlobalBlockCount,
 			isTyping,
+			isDraggingBlocks,
 		} = select( 'core/block-editor' );
 
 		return {
@@ -54,6 +55,7 @@ function BlockList(
 			enableAnimation:
 				! isTyping() &&
 				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+			isDraggingBlocks: isDraggingBlocks(),
 		};
 	}
 
@@ -64,6 +66,7 @@ function BlockList(
 		orientation,
 		hasMultiSelection,
 		enableAnimation,
+		isDraggingBlocks,
 	} = useSelect( selector, [ rootClientId ] );
 
 	const Container = rootClientId ? __experimentalTagName : RootContainer;
@@ -72,12 +75,13 @@ function BlockList(
 		rootClientId,
 	} );
 
-	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
+	const isAppenderDropTarget =
+		dropTargetIndex === blockClientIds.length && isDraggingBlocks;
 
 	return (
 		<Container
-			{ ...__experimentalPassedProps }
 			ref={ ref }
+			{ ...__experimentalPassedProps }
 			className={ classnames(
 				'block-editor-block-list__layout',
 				className,
@@ -89,7 +93,8 @@ function BlockList(
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
 
-				const isDropTarget = dropTargetIndex === index;
+				const isDropTarget =
+					dropTargetIndex === index && isDraggingBlocks;
 
 				return (
 					<AsyncModeProvider

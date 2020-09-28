@@ -24,21 +24,19 @@ import { buildTermsTree } from '../../utils/terms';
 
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( 'core/editor' );
-	const { parentPost } = useSelect(
-		( select ) => {
-			const { getEntityRecords } = select( 'core' );
-			const { getEditedPostAttribute } = select( 'core/editor' );
-			const postTypeSlug = getEditedPostAttribute( 'type' );
-			const theParentID = getEditedPostAttribute( 'parent' );
+	const { parentPost, parentPostId } = useSelect( ( select ) => {
+		const { getEntityRecords } = select( 'core' );
+		const { getEditedPostAttribute } = select( 'core/editor' );
+		const postTypeSlug = getEditedPostAttribute( 'type' );
+		const pageId = getEditedPostAttribute( 'parent' );
 
-			return {
-				parentPost: getEntityRecords( 'postType', postTypeSlug, {
-					include: [ theParentID ],
-				} ),
-			};
-		},
-		[ parent ]
-	);
+		return {
+			parentPostId: pageId,
+			parentPost: getEntityRecords( 'postType', postTypeSlug, {
+				include: [ pageId ],
+			} ),
+		};
+	}, [] );
 	const [ fieldValue, setFieldValue ] = useState(
 		parentPost ? parentPost[ 0 ].title.raw : false
 	);
@@ -46,7 +44,9 @@ export function PageAttributesParent() {
 		( select ) => {
 			const { getPostType, getEntityRecords } = select( 'core' );
 			const { isResolving } = select( 'core/data' );
-			const { getCurrentPostId, getEditedPostAttribute } = select( 'core/editor' );
+			const { getCurrentPostId, getEditedPostAttribute } = select(
+				'core/editor'
+			);
 			const postTypeSlug = getEditedPostAttribute( 'type' );
 			const pType = getPostType( postTypeSlug );
 			const postId = getCurrentPostId();
@@ -59,12 +59,7 @@ export function PageAttributesParent() {
 				order: 'asc',
 				_fields: 'id,title,parent',
 			};
-			if (
-				parentPost &&
-				fieldValue &&
-				( '' !== fieldValue ||
-					fieldValue !== parentPost[ 0 ].title.raw )
-			) {
+			if ( parentPost && fieldValue && '' !== fieldValue ) {
 				query.search = fieldValue;
 			}
 			const theParentID = getEditedPostAttribute( 'parent' );
@@ -90,12 +85,13 @@ export function PageAttributesParent() {
 	const getOptionsFromTree = ( tree, level = 0 ) => {
 		return flatMap( tree, ( treeNode ) => [
 			{
-				key: treeNode.id,
-				name: repeat( '— ', level ) + unescapeString( treeNode.name ),
+				value: treeNode.id,
+				label: repeat( '— ', level ) + unescapeString( treeNode.name ),
 			},
 			...getOptionsFromTree( treeNode.children || [], level + 1 ),
 		] );
 	};
+
 	const parentOptions = useMemo( () => {
 		const tree = buildTermsTree(
 			pageItems.map( ( item ) => ( {
@@ -120,8 +116,8 @@ export function PageAttributesParent() {
 		) {
 			return [
 				{
-					key: parentPost[ 0 ].id,
-					name: parentPost[ 0 ].title.rendered,
+					value: parentPost[ 0 ].id,
+					label: parentPost[ 0 ].title.rendered,
 				},
 				...opts,
 			];
@@ -137,45 +133,27 @@ export function PageAttributesParent() {
 	 *
 	 * @param {string} inputValue The current value of the input field.
 	 */
-	const handleKeydown = ( { inputValue } ) => {
+	const handleKeydown = ( inputValue ) => {
 		setFieldValue( inputValue );
 	};
 
 	/**
 	 * Handle author selection.
 	 *
-	 * @param {Object} value The selected Author.
-	 * @param {Object} value.selectedItem The selected Author.
+	 * @param {Object} selectedPostId The selected Author.
 	 */
-	const handleChange = ( { selectedItem } ) => {
-		if ( ! selectedItem ) {
-			return;
-		}
-		setFieldValue( selectedItem.name );
-		editPost( { parent: selectedItem.key } );
+	const handleChange = ( selectedPostId ) => {
+		editPost( { parent: selectedPostId } );
 	};
 
-	const inputValue = parentPost ? parentPost[ 0 ].title.raw : fieldValue;
-	const selected = parentPost
-		? parentOptions.findIndex( ( { key } ) => parentPost[ 0 ].id === key )
-		: false;
-	const initialSelectedItem =
-		false !== selected && parentPost && parentOptions[ selected ]
-			? parentOptions[ selected ]
-			: parentOptions[ 0 ];
-
-	if ( ! fieldValue && isLoading ) {
-		return null;
-	}
 	return (
 		<ComboboxControl
 			className="editor-page-attributes__parent"
 			label={ parentPageLabel }
+			value={ parentPostId }
 			options={ parentOptions }
-			initialInputValue={ inputValue }
-			onInputValueChange={ debounce( handleKeydown, 300 ) }
+			onFilterValueChange={ debounce( handleKeydown, 300 ) }
 			onChange={ handleChange }
-			initialSelectedItem={ initialSelectedItem }
 			isLoading={ isLoading }
 		/>
 	);

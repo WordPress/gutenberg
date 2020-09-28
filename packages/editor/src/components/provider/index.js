@@ -42,16 +42,18 @@ import ConvertToGroupButtons from '../convert-to-group-buttons';
  * @param {number} [searchArguments.isInitialSuggestions]
  * @param {number} [searchArguments.type]
  * @param {number} [searchArguments.subtype]
+ * @param {number} [searchArguments.page]
  * @param {Object} [editorSettings]
  * @param {boolean} [editorSettings.disablePostFormats=false]
  * @return {Promise<Object[]>} List of suggestions
  */
-const fetchLinkSuggestions = (
+
+const fetchLinkSuggestions = async (
 	search,
-	{ isInitialSuggestions, type, subtype } = {},
+	{ isInitialSuggestions, type, subtype, page, perPage: perPageArg } = {},
 	{ disablePostFormats = false } = {}
 ) => {
-	const perPage = isInitialSuggestions ? 3 : 20;
+	const perPage = perPageArg || isInitialSuggestions ? 3 : 20;
 
 	const queries = [];
 
@@ -60,11 +62,12 @@ const fetchLinkSuggestions = (
 			apiFetch( {
 				path: addQueryArgs( '/wp/v2/search', {
 					search,
+					page,
 					per_page: perPage,
 					type: 'post',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] ) // fail by returning no results
 		);
 	}
 
@@ -73,11 +76,12 @@ const fetchLinkSuggestions = (
 			apiFetch( {
 				path: addQueryArgs( '/wp/v2/search', {
 					search,
+					page,
 					per_page: perPage,
 					type: 'term',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] )
 		);
 	}
 
@@ -86,21 +90,27 @@ const fetchLinkSuggestions = (
 			apiFetch( {
 				path: addQueryArgs( '/wp/v2/search', {
 					search,
+					page,
 					per_page: perPage,
 					type: 'post-format',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] )
 		);
 	}
 
 	return Promise.all( queries ).then( ( results ) => {
-		return map( flatten( results ).slice( 0, perPage ), ( result ) => ( {
-			id: result.id,
-			url: result.url,
-			title: decodeEntities( result.title ) || __( '(no title)' ),
-			type: result.subtype || result.type,
-		} ) );
+		return map(
+			flatten( results )
+				.filter( ( result ) => !! result.id )
+				.slice( 0, perPage ),
+			( result ) => ( {
+				id: result.id,
+				url: result.url,
+				title: decodeEntities( result.title ) || __( '(no title)' ),
+				type: result.subtype || result.type,
+			} )
+		);
 	} );
 };
 

@@ -11,7 +11,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	Warning,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 	__experimentalBlockVariationPicker as BlockVariationPicker,
 } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
@@ -81,20 +81,25 @@ export default function PostHierarchicalTermsEdit( {
 	const hasPost = postId && postType;
 	const hasHierarchicalTermLinks =
 		hierarchicalTermLinks && hierarchicalTermLinks.length > 0;
+	const blockWrapperProps = useBlockWrapperProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 
 	if ( ! hasPost ) {
 		return (
-			<Block.div>
+			<div { ...blockWrapperProps }>
 				<Warning>
 					{ __( 'Post Hierarchical Terms block: post not found.' ) }
 				</Warning>
-			</Block.div>
+			</div>
 		);
 	}
 
 	if ( ! term ) {
 		return (
-			<Block.div>
+			<div { ...blockWrapperProps }>
 				<BlockVariationPicker
 					icon={ blockType?.icon?.src }
 					label={ blockType?.title }
@@ -103,7 +108,7 @@ export default function PostHierarchicalTermsEdit( {
 					} }
 					variations={ variations }
 				/>
-			</Block.div>
+			</div>
 		);
 	}
 
@@ -117,11 +122,7 @@ export default function PostHierarchicalTermsEdit( {
 					} }
 				/>
 			</BlockControls>
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
+			<div { ...blockWrapperProps }>
 				{ isLoadingHierarchicalTermLinks && <Spinner /> }
 
 				{ hasHierarchicalTermLinks &&
@@ -137,7 +138,7 @@ export default function PostHierarchicalTermsEdit( {
 					// eslint-disable-next-line camelcase
 					( selectedTerm?.labels?.no_terms ||
 						__( 'Term items not found.' ) ) }
-			</Block.div>
+			</div>
 		</>
 	);
 }

@@ -91,20 +91,21 @@ function useInsertionPoint( {
 		return getBlockOrder( destinationRootClientId ).length;
 	}
 
-	const onInsertBlocks = ( blocks ) => {
+	const onInsertBlocks = ( blocks, meta ) => {
 		const selectedBlock = getSelectedBlock();
 		if (
 			! isAppender &&
 			selectedBlock &&
 			isUnmodifiedDefaultBlock( selectedBlock )
 		) {
-			replaceBlocks( selectedBlock.clientId, blocks );
+			replaceBlocks( selectedBlock.clientId, blocks, null, null, meta );
 		} else {
 			insertBlocks(
 				blocks,
 				getInsertionIndex(),
 				destinationRootClientId,
-				selectBlockOnInsert
+				selectBlockOnInsert,
+				meta
 			);
 		}
 

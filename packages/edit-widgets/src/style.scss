@@ -1,6 +1,6 @@
 @import "../../interface/src/style.scss";
 
-@import "./components/customizer-edit-widgets-initializer/style.scss";
+@import "./blocks/legacy-widget/editor.scss";
 @import "./components/header/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/notices/style.scss";
@@ -42,12 +42,6 @@ body.appearance_page_gutenberg-widgets {
 	> .components-navigate-regions {
 		height: 100%;
 	}
-
-	&.is-in-customizer {
-		min-height: initial;
-		position: initial;
-	}
-
 
 	.interface-interface-skeleton__content {
 		background-color: #f1f1f1;

@@ -38,9 +38,7 @@ function BlockListAppender( {
 	if ( CustomAppender ) {
 		// Prefer custom render prop if provided.
 		appender = <CustomAppender />;
-	} else if ( canInsertDefaultBlock ) {
-		// Render the default block appender when renderAppender has not been
-		// provided and the context supports use of the default appender.
+	} else {
 		const isDocumentAppender = ! rootClientId;
 		const isParentSelected = selectedBlockClientId === rootClientId;
 		const isAnotherDefaultAppenderAlreadyDisplayed =
@@ -50,26 +48,31 @@ function BlockListAppender( {
 		if (
 			! isDocumentAppender &&
 			! isParentSelected &&
-			isAnotherDefaultAppenderAlreadyDisplayed
+			( ! selectedBlockClientId ||
+				isAnotherDefaultAppenderAlreadyDisplayed )
 		) {
 			return null;
 		}
 
-		appender = (
-			<DefaultBlockAppender
-				rootClientId={ rootClientId }
-				lastBlockClientId={ last( blockClientIds ) }
-			/>
-		);
-	} else {
-		// Fallback in the case no renderAppender has been provided and the
-		// default block can't be inserted.
-		appender = (
-			<ButtonBlockAppender
-				rootClientId={ rootClientId }
-				className="block-list-appender__toggle"
-			/>
-		);
+		if ( canInsertDefaultBlock ) {
+			// Render the default block appender when renderAppender has not been
+			// provided and the context supports use of the default appender.
+			appender = (
+				<DefaultBlockAppender
+					rootClientId={ rootClientId }
+					lastBlockClientId={ last( blockClientIds ) }
+				/>
+			);
+		} else {
+			// Fallback in the case no renderAppender has been provided and the
+			// default block can't be inserted.
+			appender = (
+				<ButtonBlockAppender
+					rootClientId={ rootClientId }
+					className="block-list-appender__toggle"
+				/>
+			);
+		}
 	}
 
 	return (
