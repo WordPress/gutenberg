@@ -40,6 +40,7 @@ function BlockList(
 			getBlockParentsByBlockName,
 			getBlockOrder,
 			getBlockListSettings,
+			getSettings,
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
@@ -51,22 +52,27 @@ function BlockList(
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
 
+		const isFullSiteEditingEnabled = getSettings()
+			.__experimentalEnableFullSiteEditing;
 		// Determine if there is a template part block to highlight.
-		const activeTemplatePartId = ( function () {
-			if (
-				getBlockName( selectedBlockClientId ) === 'core/template-part'
-			) {
-				return selectedBlockClientId;
-			}
-			const templatePartParents = getBlockParentsByBlockName(
-				selectedBlockClientId || multiSelectedBlockClientIds[ 0 ],
-				'core/template-part'
-			);
-			if ( templatePartParents ) {
-				return last( templatePartParents );
-			}
-			return null;
-		} )();
+		const activeTemplatePartId =
+			isFullSiteEditingEnabled &&
+			( function () {
+				if (
+					getBlockName( selectedBlockClientId ) ===
+					'core/template-part'
+				) {
+					return selectedBlockClientId;
+				}
+				const templatePartParents = getBlockParentsByBlockName(
+					selectedBlockClientId || multiSelectedBlockClientIds[ 0 ],
+					'core/template-part'
+				);
+				if ( templatePartParents ) {
+					return last( templatePartParents );
+				}
+				return null;
+			} )();
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
