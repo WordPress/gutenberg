@@ -68,6 +68,7 @@ function ComboboxControl( {
 			nextIndex = 0;
 		}
 		setSelectedSuggestion( matchingSuggestions[ nextIndex ] );
+		setIsExpanded( true );
 	};
 
 	const onKeyDown = ( event ) => {
@@ -103,17 +104,11 @@ function ComboboxControl( {
 		}
 	};
 
-	const updateExpandedState = () => {
-		const inputHasMinimumChars =
-			!! inputValue && inputValue.trim().length > 1;
-		setIsExpanded( inputHasMinimumChars );
-	};
-
 	const onFocus = () => {
 		// Avoid focus loss when touching the container.
 		// TODO: TokenInput should preferably forward ref
 		inputContainer.current.input.focus();
-		updateExpandedState();
+		setIsExpanded( true );
 	};
 
 	const onBlur = () => {
@@ -128,10 +123,8 @@ function ComboboxControl( {
 		const text = event.value;
 		setInputValue( text );
 		onInputChangeProp( text );
+		setIsExpanded( true );
 	};
-
-	// Expand the suggetions
-	useEffect( updateExpandedState, [ inputValue ] );
 
 	// Reset the value on change
 	useEffect( () => {

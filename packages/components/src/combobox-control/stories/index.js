@@ -284,7 +284,7 @@ function ComboboxControlWithState() {
 									.toLowerCase()
 									.startsWith( filter.toLowerCase() )
 							)
-							.split( 0, 20 )
+							.slice( 0, 20 )
 							.map( mapCountryOption )
 					)
 				}
