@@ -108,6 +108,7 @@ export { default as moreHorizontal } from './library/more-horizontal';
 export { default as moreHorizontalMobile } from './library/more-horizontal-mobile';
 export { default as moreVertical } from './library/more-vertical';
 export { default as navigation } from './library/navigation';
+export { default as noFilter } from './library/no-filter';
 export { default as pageBreak } from './library/page-break';
 export { default as page } from './library/page';
 export { default as paragraph } from './library/paragraph';
