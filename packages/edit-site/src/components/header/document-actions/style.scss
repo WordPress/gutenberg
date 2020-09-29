@@ -14,31 +14,26 @@
 	&.has-secondary-label {
 		.edit-site-document-actions__title {
 			animation: titleAnimation 0.2s;
-			transform: translateY(-12px);
 			color: $gray-900;
 			font-weight: bold;
+			transform: translateY(-12px);
 
 			&.is-secondary-title-active {
-				animation: titleAnimation 0.2s;
-				transform: translateY(-12px);
 				color: $gray-700;
 				font-weight: normal;
 			}
 		}
 
 		.edit-site-document-actions__secondary-item {
+			animation: secondaryTitleAnimation 0.2s;
 			color: $gray-700;
 			font-weight: normal;
 			position: absolute;
-			animation: secondaryTitleAnimation 0.2s;
 			transform: translateY(12px);
 
 			&.is-secondary-title-active {
-				position: absolute;
-				animation: secondaryTitleAnimation 0.2s;
-				transform: translateY(12px);
-				font-weight: bold;
 				color: $gray-900;
+				font-weight: bold;
 			}
 		}
 	}
