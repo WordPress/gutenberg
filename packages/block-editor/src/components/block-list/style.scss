@@ -87,7 +87,7 @@
 	}
 
 	// Active template part highlighting.
-	&.template-part-highlighting:not(.is-focus-mode) {
+	&.has-active-entity:not(.is-focus-mode) {
 		opacity: 0.5;
 		transition: opacity 0.1s linear;
 		@include reduce-motion("transition");
@@ -95,8 +95,8 @@
 		&.is-selected,
 		&.has-child-selected,
 		&:not(.is-selected):not(.has-child-selected) .block-editor-block-list__block,
-		&.is-active-template-part .block-editor-block-list__block,
-		.is-active-template-part .block-editor-block-list__block {
+		&.is-active-entity .block-editor-block-list__block,
+		.is-active-entity .block-editor-block-list__block {
 			opacity: 1;
 		}
 	}

@@ -22,6 +22,8 @@ import useBlockDropZone from '../use-block-drop-zone';
  * to avoid laginess.
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
+// List of blocks to 'spotlight' when active in Full Site Editing.
+const ENTITY_AREAS = [ 'core/template-part' ];
 
 function BlockList(
 	{
@@ -52,24 +54,29 @@ function BlockList(
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
 
+		// Determine if there is an active template part (or other entity) to spotlight.
+		// Restrict to Full Site Editing experiment.
 		const isFullSiteEditingEnabled = getSettings()
 			.__experimentalEnableFullSiteEditing;
-		// Determine if there is a template part block to highlight.
-		const activeTemplatePartId =
+		const activeEntityBlockId =
 			isFullSiteEditingEnabled &&
 			( function () {
+				// Check if selected block is a valid entity area.
 				if (
-					getBlockName( selectedBlockClientId ) ===
-					'core/template-part'
+					ENTITY_AREAS.includes(
+						getBlockName( selectedBlockClientId )
+					)
 				) {
 					return selectedBlockClientId;
 				}
-				const templatePartParents = getBlockParentsByBlockName(
+				// Check if first selected block is a child of a valid entity area.
+				const entityAreaParents = getBlockParentsByBlockName(
 					selectedBlockClientId || multiSelectedBlockClientIds[ 0 ],
-					'core/template-part'
+					ENTITY_AREAS
 				);
-				if ( templatePartParents ) {
-					return last( templatePartParents );
+				if ( entityAreaParents ) {
+					// Last parent closest/most interior.
+					return last( entityAreaParents );
 				}
 				return null;
 			} )();
@@ -84,7 +91,7 @@ function BlockList(
 				! isTyping() &&
 				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 			isDraggingBlocks: isDraggingBlocks(),
-			activeTemplatePartId,
+			activeEntityBlockId,
 		};
 	}
 
@@ -96,7 +103,7 @@ function BlockList(
 		hasMultiSelection,
 		enableAnimation,
 		isDraggingBlocks,
-		activeTemplatePartId,
+		activeEntityBlockId,
 	} = useSelect( selector, [ rootClientId ] );
 
 	const fallbackRef = useRef();
@@ -147,9 +154,9 @@ function BlockList(
 								'is-dropping-horizontally':
 									isDropTarget &&
 									orientation === 'horizontal',
-								'template-part-highlighting': activeTemplatePartId,
+								'has-active-entity': activeEntityBlockId,
 							} ) }
-							activeTemplatePartId={ activeTemplatePartId }
+							activeEntityBlockId={ activeEntityBlockId }
 						/>
 					</AsyncModeProvider>
 				);

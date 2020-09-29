@@ -102,7 +102,7 @@ function BlockListBlock( {
 	toggleSelection,
 	index,
 	enableAnimation,
-	activeTemplatePartId,
+	activeEntityBlockId,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
@@ -167,7 +167,7 @@ function BlockListBlock( {
 				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
-			'is-active-template-part': activeTemplatePartId === clientId,
+			'is-active-entity': activeEntityBlockId === clientId,
 		},
 		className
 	);
