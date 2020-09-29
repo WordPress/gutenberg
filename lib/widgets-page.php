@@ -77,7 +77,7 @@ function gutenberg_widgets_init( $hook ) {
 		gutenberg_get_legacy_widget_settings()
 	);
 
-	$settings = gutenberg_experimental_global_styles_settings( $settings );
+	$settings = apply_filters( 'block_editor_settings', $settings, null );
 
 	wp_add_inline_script(
 		'wp-edit-widgets',
