@@ -115,7 +115,7 @@ function ColumnsEditContainer( {
 	}, [ width ] );
 
 	const getContainerWidth = ( containerWidth ) =>
-		2 * MARGIN + containerWidth - columnsInRow * 2 * MARGIN - DELTA * 2;
+		2 * MARGIN + containerWidth - columnsInRow * 2 * MARGIN - DELTA;
 
 	const columnWidths = getColumnWidths( innerColumns, columnCount );
 
@@ -218,7 +218,7 @@ function ColumnsEditContainer( {
 					} else if ( width < ALIGNMENT_BREAKPOINTS.medium ) {
 						// On the breakpoint lower than medium each column inside columns
 						// has to take equal part of container width
-						columnWidth = Math.floor(
+						columnWidth = Math.round(
 							getContainerWidth( width ) / columnsInRow
 						);
 					}

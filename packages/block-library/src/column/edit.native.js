@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Dimensions } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -19,8 +19,6 @@ import {
 	PanelBody,
 	RangeControl,
 	FooterMessageControl,
-	ALIGNMENT_BREAKPOINTS,
-	WIDE_ALIGNMENTS,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -29,8 +27,6 @@ import { __ } from '@wordpress/i18n';
 import styles from './editor.scss';
 import ColumnsPreview from './column-preview';
 import { getColumnWidths } from '../columns/utils';
-
-const MARGIN = 16;
 
 function ColumnEdit( {
 	attributes,
@@ -45,12 +41,8 @@ function ColumnEdit( {
 	selectedColumnIndex,
 	parentAlignment,
 	clientId,
-	isDeepParentSelected,
-	parentsOfParents,
-	parentBlockAlignment,
 } ) {
 	const { verticalAlignment } = attributes;
-	const { width: screenWidth } = Dimensions.get( 'window' );
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -73,9 +65,6 @@ function ColumnEdit( {
 	);
 
 	if ( ! isSelected && ! hasChildren ) {
-		const shouldHaveMargin = isParentSelected && parentsOfParents;
-		const isParentFullWidth =
-			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
 		return (
 			<View
 				style={ [
@@ -86,20 +75,6 @@ function ColumnEdit( {
 						),
 					styles.columnPlaceholderNotSelected,
 					contentStyle[ clientId ],
-					isParentFullWidth &&
-						screenWidth < ALIGNMENT_BREAKPOINTS.mobile &&
-						! isDeepParentSelected && {
-							marginLeft:
-								! isParentSelected || shouldHaveMargin
-									? -MARGIN
-									: 0,
-							maxWidth:
-								screenWidth +
-								( shouldHaveMargin ? -MARGIN : 0 ),
-							width:
-								screenWidth +
-								( shouldHaveMargin ? -MARGIN : 0 ),
-						},
 				] }
 			/>
 		);
@@ -181,8 +156,6 @@ export default compose( [
 			getBlocks,
 			getBlockOrder,
 			getBlockAttributes,
-			getBlockParents,
-			__unstableGetBlockWithoutInnerBlocks,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -194,27 +167,6 @@ export default compose( [
 		const isParentSelected =
 			selectedBlockClientId && selectedBlockClientId === parentId;
 
-		const parentsOfParents = !! getBlockParents( parentId ).length;
-
-		const getDeepParentSelected = (
-			columnParentId,
-			isSelectedResult = false
-		) => {
-			if ( getBlockParents( columnParentId ).length === 0 ) {
-				return isSelectedResult;
-			}
-
-			const newParentId = getBlockRootClientId( columnParentId );
-			const isSelectedFinalResult =
-				isSelectedResult ||
-				( selectedBlockClientId &&
-					selectedBlockClientId === newParentId );
-
-			return getDeepParentSelected( newParentId, isSelectedFinalResult );
-		};
-
-		const isDeepParentSelected = getDeepParentSelected( parentId );
-
 		const blockOrder = getBlockOrder( parentId );
 
 		const selectedColumnIndex = blockOrder.indexOf( clientId );
@@ -224,13 +176,6 @@ export default compose( [
 		const parentAlignment = getBlockAttributes( parentId )
 			?.verticalAlignment;
 
-		const parents = getBlockParents( clientId, true );
-		const hasParents = !! parents.length;
-		const parentBlock = hasParents
-			? __unstableGetBlockWithoutInnerBlocks( parents[ 0 ] )
-			: {};
-		const { align: parentBlockAlignment } = parentBlock?.attributes || {};
-
 		return {
 			hasChildren,
 			isParentSelected,
@@ -239,10 +184,6 @@ export default compose( [
 			columns,
 			columnCount,
 			parentAlignment,
-			parentId,
-			isDeepParentSelected,
-			parentsOfParents,
-			parentBlockAlignment,
 		};
 	} ),
 	withPreferredColorScheme,

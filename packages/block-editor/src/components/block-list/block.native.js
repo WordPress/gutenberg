@@ -7,11 +7,7 @@ import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import {
-	GlobalStylesContext,
-	WIDE_ALIGNMENTS,
-	ALIGNMENT_BREAKPOINTS,
-} from '@wordpress/components';
+import { GlobalStylesContext, WIDE_ALIGNMENTS } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -133,7 +129,6 @@ class BlockListBlock extends Component {
 			marginVertical,
 			marginHorizontal,
 			isInnerBlockSelected,
-			parentBlockAlignment,
 			hasParents,
 			name,
 		} = this.props;
@@ -152,17 +147,12 @@ class BlockListBlock extends Component {
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
-		const hasParentBlockAlignment = parentBlockAlignment !== undefined;
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isContainerRelated = WIDE_ALIGNMENTS.innerContainers.includes(
 			name
 		);
 		const shouldBeFullWidth =
-			isFullWidth &&
-			( ! isContainerRelated ||
-				! hasParents ||
-				( hasParentBlockAlignment &&
-					blockWidth > ALIGNMENT_BREAKPOINTS.mobile ) );
+			isFullWidth && ( isContainerRelated ? ! hasParents : true );
 
 		return (
 			<TouchableWithoutFeedback
@@ -184,6 +174,7 @@ class BlockListBlock extends Component {
 					>
 						{ isSelected && (
 							<View
+								pointerEvents="box-none"
 								style={ [
 									styles.solidBorder,
 									shouldBeFullWidth &&
