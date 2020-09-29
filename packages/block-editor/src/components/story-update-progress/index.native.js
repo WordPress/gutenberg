@@ -60,7 +60,7 @@ export class StoryUpdateProgress extends React.Component {
 	mediaIdContainedInMediaFiles( mediaId, mediaFiles ) {
 		if ( mediaId !== undefined && mediaFiles !== undefined ) {
 			for ( let i = 0; i < this.props.mediaFiles.length; i++ ) {
-				if ( mediaFiles[ i ].id === mediaId ) {
+				if ( mediaFiles[ i ].id === mediaId.toString() ) {
 					return true;
 				}
 			}
