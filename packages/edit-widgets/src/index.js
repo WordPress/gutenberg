@@ -18,6 +18,7 @@ import {
 import './store';
 import './hooks';
 import { create as createLegacyWidget } from './blocks/legacy-widget';
+import * as widgetArea from './blocks/widget-area';
 import EditWidgetsInitializer from './components/edit-widgets-initializer';
 
 /**
@@ -32,6 +33,7 @@ export function initialize( id, settings ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
 	registerBlock( createLegacyWidget( settings ) );
+	registerBlock( widgetArea );
 	render(
 		<EditWidgetsInitializer settings={ settings } />,
 		document.getElementById( id )
