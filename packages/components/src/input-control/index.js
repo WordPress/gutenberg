@@ -26,6 +26,7 @@ function useUniqueId( idProp ) {
 export function InputControl(
 	{
 		__unstableStateReducer: stateReducer = ( state ) => state,
+		__unstableInputWidth,
 		className,
 		disabled = false,
 		hideLabelFromVision = false,
@@ -51,6 +52,7 @@ export function InputControl(
 
 	return (
 		<InputBase
+			__unstableInputWidth={ __unstableInputWidth }
 			className={ classes }
 			disabled={ disabled }
 			gap={ 3 }
