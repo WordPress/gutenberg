@@ -33,6 +33,10 @@ const rootLabelPositionStyles = ( { labelPosition } ) => {
 				align-items: flex-start;
 				flex-direction: column-reverse;
 			`;
+		case 'edge':
+			return css`
+				justify-content: space-between;
+			`;
 		default:
 			return '';
 	}
@@ -42,9 +46,9 @@ export const Root = styled( Flex )`
 	position: relative;
 	border-radius: 2px;
 
-	${ rootFloatLabelStyles };
-	${ rootFocusedStyles };
-	${ rootLabelPositionStyles };
+	${ rootFloatLabelStyles }
+	${ rootFocusedStyles }
+	${ rootLabelPositionStyles }
 `;
 
 const containerDisabledStyles = ( { disabled } ) => {
@@ -55,12 +59,18 @@ const containerDisabledStyles = ( { disabled } ) => {
 	return css( { backgroundColor } );
 };
 
-const containerWidthStyles = ( { labelPosition } ) => {
+const containerWidthStyles = ( { __unstableInputWidth, labelPosition } ) => {
+	if ( ! __unstableInputWidth ) return css( { width: '100%' } );
+
 	if ( labelPosition === 'side' ) return '';
 
-	return css`
-		width: 100%;
-	`;
+	if ( labelPosition === 'edge' ) {
+		return css( {
+			flex: `0 0 ${ __unstableInputWidth }`,
+		} );
+	}
+
+	return css( { width: __unstableInputWidth } );
 };
 
 export const Container = styled.div`
@@ -71,8 +81,8 @@ export const Container = styled.div`
 	flex: 1;
 	position: relative;
 
-	${ containerDisabledStyles };
-	${ containerWidthStyles };
+	${ containerDisabledStyles }
+	${ containerWidthStyles }
 `;
 
 const disabledStyles = ( { disabled } ) => {
@@ -156,8 +166,8 @@ const dragStyles = ( { isDragging, dragCursor } ) => {
 	}
 
 	return css`
-		${ defaultArrowStyles };
-		${ activeDragCursorStyles };
+		${ defaultArrowStyles }
+		${ activeDragCursorStyles }
 	`;
 };
 
@@ -178,12 +188,12 @@ export const Input = styled.input`
 		padding-right: 8px;
 		width: 100%;
 
-		${ dragStyles };
-		${ disabledStyles };
-		${ fontSizeStyles };
-		${ sizeStyles };
+		${ dragStyles }
+		${ disabledStyles }
+		${ fontSizeStyles }
+		${ sizeStyles }
 
-		${ placeholderStyles };
+		${ placeholderStyles }
 	}
 `;
 
@@ -206,7 +216,7 @@ const BaseLabel = styled( Text )`
 		padding-top: 0;
 		z-index: 1;
 
-		${ labelTruncation };
+		${ labelTruncation }
 	}
 `;
 
@@ -252,7 +262,7 @@ export const BackdropUI = styled.div`
 		right: 0;
 		top: 0;
 
-		${ backdropFocusedStyles };
+		${ backdropFocusedStyles }
 		${ rtl( { paddingLeft: 2 } ) }
 	}
 `;

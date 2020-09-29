@@ -30,7 +30,7 @@ class LegacyWidgetEditDomManager extends Component {
 	shouldComponentUpdate( nextProps ) {
 		let shouldTriggerWidgetUpdateEvent = false;
 		// We can not leverage react render otherwise we would destroy dom changes applied by the plugins.
-		// We manually update the required dom node replicating what the widget screen and the customizer do.
+		// We manually update the required dom node replicating what the widget screen do.
 		if (
 			nextProps.idBase !== this.props.idBase &&
 			this.idBaseInputRef.current
@@ -59,7 +59,7 @@ class LegacyWidgetEditDomManager extends Component {
 	}
 
 	render() {
-		const { id, idBase, number, form, isReferenceWidget } = this.props;
+		const { id, idBase, number, form } = this.props;
 		return (
 			<div className="widget open" ref={ this.containerRef }>
 				<div className="widget-inside">
@@ -76,42 +76,39 @@ class LegacyWidgetEditDomManager extends Component {
 							className="widget-content"
 							dangerouslySetInnerHTML={ { __html: form } }
 						/>
-						{ isReferenceWidget && (
-							<>
-								<input
-									type="hidden"
-									name="widget-id"
-									className="widget-id"
-									value={ id }
-								/>
-								<input
-									ref={ this.idBaseInputRef }
-									type="hidden"
-									name="id_base"
-									className="id_base"
-									value={ idBase }
-								/>
-								<input
-									ref={ this.widgetNumberInputRef }
-									type="hidden"
-									name="widget_number"
-									className="widget_number"
-									value={ number }
-								/>
-								<input
-									type="hidden"
-									name="multi_number"
-									className="multi_number"
-									value=""
-								/>
-								<input
-									type="hidden"
-									name="add_new"
-									className="add_new"
-									value=""
-								/>
-							</>
-						) }
+
+						<input
+							type="hidden"
+							name="widget-id"
+							className="widget-id"
+							value={ id || idBase + number }
+						/>
+						<input
+							ref={ this.idBaseInputRef }
+							type="hidden"
+							name="id_base"
+							className="id_base"
+							value={ idBase }
+						/>
+						<input
+							ref={ this.widgetNumberInputRef }
+							type="hidden"
+							name="widget_number"
+							className="widget_number"
+							value={ number }
+						/>
+						<input
+							type="hidden"
+							name="multi_number"
+							className="multi_number"
+							value=""
+						/>
+						<input
+							type="hidden"
+							name="add_new"
+							className="add_new"
+							value=""
+						/>
 					</form>
 				</div>
 			</div>

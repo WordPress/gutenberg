@@ -1,0 +1,16 @@
+.wp-block[data-type="core/widget-area"] {
+	max-width: $widget-area-width;
+}
+
+.wp-block-widget-area > .components-panel__body {
+	&.is-opened:not(.widget-area-is-opened) {
+		padding: 0;
+		> .components-panel__body-title {
+			padding: 0;
+			margin: 0;
+		}
+	}
+	> .block-editor-inner-blocks {
+		padding-top: $grid-unit-30;
+	}
+}

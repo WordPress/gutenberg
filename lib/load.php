@@ -113,7 +113,6 @@ require dirname( __FILE__ ) . '/widgets.php';
 require dirname( __FILE__ ) . '/navigation.php';
 require dirname( __FILE__ ) . '/navigation-page.php';
 require dirname( __FILE__ ) . '/experiments-page.php';
-require dirname( __FILE__ ) . '/customizer.php';
 require dirname( __FILE__ ) . '/global-styles.php';
 require dirname( __FILE__ ) . '/block-supports/index.php';
 require dirname( __FILE__ ) . '/block-supports/align.php';

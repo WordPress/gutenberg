@@ -26,10 +26,12 @@ function useUniqueId( idProp ) {
 
 export function InputBase(
 	{
+		__unstableInputWidth,
 		children,
 		className,
 		disabled = false,
 		hideLabelFromVision = false,
+		labelPosition,
 		id: idProp,
 		isFocused = false,
 		label,
@@ -47,6 +49,7 @@ export function InputBase(
 			{ ...props }
 			className={ className }
 			isFocused={ isFocused }
+			labelPosition={ labelPosition }
 			ref={ ref }
 		>
 			<LabelWrapper>
@@ -60,9 +63,11 @@ export function InputBase(
 				</Label>
 			</LabelWrapper>
 			<Container
+				__unstableInputWidth={ __unstableInputWidth }
 				className="components-input-control__container"
 				disabled={ disabled }
 				isFocused={ isFocused }
+				labelPosition={ labelPosition }
 			>
 				{ prefix && (
 					<Prefix className="components-input-control__prefix">

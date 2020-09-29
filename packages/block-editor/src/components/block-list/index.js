@@ -69,9 +69,12 @@ function BlockList(
 		isDraggingBlocks,
 	} = useSelect( selector, [ rootClientId ] );
 
+	const fallbackRef = useRef();
+	const element = __experimentalPassedProps.ref || ref || fallbackRef;
+
 	const Container = rootClientId ? __experimentalTagName : RootContainer;
 	const dropTargetIndex = useBlockDropZone( {
-		element: ref,
+		element,
 		rootClientId,
 	} );
 
@@ -80,8 +83,8 @@ function BlockList(
 
 	return (
 		<Container
-			ref={ ref }
 			{ ...__experimentalPassedProps }
+			ref={ element }
 			className={ classnames(
 				'block-editor-block-list__layout',
 				className,
@@ -139,10 +142,9 @@ const ForwardedBlockList = forwardRef( BlockList );
 // as it's the one changing the async mode
 // depending on the block selection.
 export default forwardRef( ( props, ref ) => {
-	const fallbackRef = useRef();
 	return (
 		<AsyncModeProvider value={ false }>
-			<ForwardedBlockList ref={ ref || fallbackRef } { ...props } />
+			<ForwardedBlockList ref={ ref } { ...props } />
 		</AsyncModeProvider>
 	);
 } );

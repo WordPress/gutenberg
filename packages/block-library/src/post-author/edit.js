@@ -23,7 +23,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 
 	const { authorId, authorDetails, authors } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getUser, getAuthors } = select(
+			const { getEditedEntityRecord, getUser, getUsers } = select(
 				'core'
 			);
 			const _authorId = getEditedEntityRecord(
@@ -35,7 +35,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 			return {
 				authorId: _authorId,
 				authorDetails: _authorId ? getUser( _authorId ) : null,
-				authors: getAuthors(),
+				authors: getUsers( { who: 'authors' } ),
 			};
 		},
 		[ postType, postId ]
