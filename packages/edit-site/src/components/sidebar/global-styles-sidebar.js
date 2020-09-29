@@ -27,6 +27,8 @@ export default ( { identifier, title, icon, closeLabel } ) => {
 		contexts,
 		getStyleProperty,
 		setStyleProperty,
+		getSetting,
+		setSetting,
 	} = useGlobalStylesContext();
 	const [ canRestart, onReset ] = useGlobalStylesReset();
 
@@ -131,6 +133,8 @@ export default ( { identifier, title, icon, closeLabel } ) => {
 												setStyleProperty={
 													setStyleProperty
 												}
+												getSetting={ getSetting }
+												setSetting={ setSetting }
 											/>,
 										].filter( Boolean ) }
 									</PanelBody>
@@ -159,6 +163,8 @@ export default ( { identifier, title, icon, closeLabel } ) => {
 							} }
 							getStyleProperty={ getStyleProperty }
 							setStyleProperty={ setStyleProperty }
+							getSetting={ getSetting }
+							setSetting={ setSetting }
 						/>,
 					].filter( Boolean );
 				} }
