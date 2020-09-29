@@ -39,7 +39,7 @@ const ImageComponent = ( {
 	isUploadInProgress,
 	onSelectMediaUploadOption,
 	openMediaOptions,
-	onClearMedia,
+	mediaPickerOptions,
 	resizeMode,
 	retryMessage,
 	url,
@@ -229,7 +229,7 @@ const ImageComponent = ( {
 							}
 							openMediaOptions={ openMediaOptions }
 							url={ imageData && url }
-							onClearMedia={ onClearMedia }
+							pickerOptions={ mediaPickerOptions }
 						/>
 					) }
 			</View>

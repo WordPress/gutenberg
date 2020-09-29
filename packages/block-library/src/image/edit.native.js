@@ -509,8 +509,17 @@ export class ImageEdit extends React.Component {
 										onSelectMediaUploadOption={
 											this.onSelectMediaUploadOption
 										}
-										onClearMedia={ this.onClearMedia }
 										openMediaOptions={ openMediaOptions }
+										mediaPickerOptions={ [
+											{
+												destructiveButton: true,
+												id: 'clearMedia',
+												label: __( 'Clear Media' ),
+												onPress: this.onClearMedia,
+												separated: true,
+												value: 'clearMedia',
+											},
+										] }
 										retryMessage={ retryMessage }
 										url={ url }
 										shapeStyle={ styles[ className ] }
