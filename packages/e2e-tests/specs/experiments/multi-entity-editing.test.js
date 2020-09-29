@@ -18,7 +18,10 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { useExperimentalFeatures } from '../../experimental-features';
+import {
+	useExperimentalFeatures,
+	openNavigation,
+} from '../../experimental-features';
 
 const visitSiteEditor = async () => {
 	const query = addQueryArgs( '', {
@@ -29,17 +32,6 @@ const visitSiteEditor = async () => {
 	await page.waitForSelector(
 		'.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
 	);
-};
-
-const openNavigation = async () => {
-	const isOpen = !! ( await page.$(
-		'.edit-site-navigation-toggle.is-open'
-	) );
-
-	if ( ! isOpen ) {
-		await page.click( '.edit-site-navigation-toggle__button' );
-		await page.waitForSelector( '.edit-site-navigation-panel' );
-	}
 };
 
 const getTemplateDropdownElement = async ( itemName ) => {

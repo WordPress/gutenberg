@@ -13,18 +13,10 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { useExperimentalFeatures } from '../../experimental-features';
-
-const openNavigation = async () => {
-	const isOpen = !! ( await page.$(
-		'.edit-site-navigation-toggle.is-open'
-	) );
-
-	if ( ! isOpen ) {
-		await page.click( '.edit-site-navigation-toggle__button' );
-		await page.waitForSelector( '.edit-site-navigation-panel' );
-	}
-};
+import {
+	useExperimentalFeatures,
+	openNavigation,
+} from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
