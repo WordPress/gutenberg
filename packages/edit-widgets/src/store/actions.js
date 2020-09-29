@@ -175,3 +175,29 @@ export function setIsWidgetAreaOpen( clientId, isOpen ) {
 		isOpen,
 	};
 }
+
+/**
+ * Returns an action object used to open/close the inserter.
+ *
+ * @param {boolean} value A boolean representing whether the inserter should be opened or closed.
+ * @return {Object} Action object.
+ */
+export function setIsInserterOpened( value ) {
+	return {
+		type: 'SET_IS_INSERTER_OPENED',
+		value,
+	};
+}
+
+/**
+ * Returns an action object signalling that the user closed the sidebar.
+ *
+ * @yield {Object} Action object.
+ */
+export function* closeGeneralSidebar() {
+	yield dispatch(
+		'core/interface',
+		'disableComplementaryArea',
+		'core/edit-widgets'
+	);
+}
