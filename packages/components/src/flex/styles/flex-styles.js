@@ -60,6 +60,7 @@ const reversedStyles = ( { isReversed } ) => {
 export const Flex = styled.div`
 	box-sizing: border-box;
 	display: flex;
+	width: 100%;
 
 	${ alignStyle };
 	${ justifyStyle };
@@ -71,6 +72,7 @@ export const Item = styled.div`
 	box-sizing: border-box;
 	min-width: 0;
 	max-width: 100%;
+	flex-grow: ${ ( props ) => props.grow };
 `;
 
 export const Block = styled( Item )`
