@@ -81,6 +81,7 @@ export class BlockListItem extends Component {
 			if ( isContainerRelated ) {
 				return marginHorizontal;
 			}
+			return marginHorizontal * 2;
 		}
 
 		return marginHorizontal;
@@ -113,7 +114,7 @@ export class BlockListItem extends Component {
 			parentBlockAlignment,
 			blockName,
 			hasParents,
-			isParentHasParent,
+			parentWidth,
 			...restProps
 		} = this.props;
 		const { mobile } = ALIGNMENT_BREAKPOINTS;
@@ -126,6 +127,10 @@ export class BlockListItem extends Component {
 			blockName
 		);
 
+		const marginHorizontal = this.getMarginHorizontal();
+		const contentViewWidth =
+			parentWidth + 2 * marginHorizontal || screenWidth;
+
 		return (
 			<ReadableContentView
 				align={ blockAlignment }
@@ -133,14 +138,13 @@ export class BlockListItem extends Component {
 				style={ [
 					readableContentViewStyle,
 					screenWidth < mobile &&
-						isContainerRelated &&
 						hasParents &&
-						isParentHasParent && {
-							width: screenWidth,
-							maxWidth: screenWidth,
+						isContainerRelated && {
+							width: contentViewWidth,
+							maxWidth: contentViewWidth,
 						},
 				] }
-				parentWidth={ restProps.parentWidth }
+				parentWidth={ parentWidth }
 			>
 				<View
 					style={ this.getContentStyles( readableContentViewStyle ) }
@@ -218,9 +222,6 @@ export default compose( [
 
 			const isSelected = selectedBlockClientId === clientId;
 
-			const isParentHasParent =
-				getBlockParents( parents[ 0 ] ).length === 1;
-
 			return {
 				shouldShowInsertionPointBefore,
 				shouldShowInsertionPointAfter,
@@ -230,7 +231,6 @@ export default compose( [
 				parentBlockAlignment,
 				blockName: name,
 				isSelected,
-				isParentHasParent,
 				parentBlockName,
 			};
 		}

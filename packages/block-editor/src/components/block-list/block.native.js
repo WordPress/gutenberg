@@ -299,11 +299,6 @@ export default compose( [
 			parentId === '';
 		const hasParents = !! parents.length;
 
-		const parentBlock = hasParents
-			? __unstableGetBlockWithoutInnerBlocks( parents[ 0 ] )
-			: {};
-
-		const { align: parentBlockAlignment } = parentBlock?.attributes || {};
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -318,7 +313,6 @@ export default compose( [
 			firstToSelectId,
 			isTouchable,
 			hasParents,
-			parentBlockAlignment,
 			wrapperProps: getWrapperProps(
 				attributes,
 				blockType.getEditWrapperProps
