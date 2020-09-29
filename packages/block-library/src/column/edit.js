@@ -72,6 +72,7 @@ function ColumnEdit( {
 					<UnitControl
 						label={ __( 'Width' ) }
 						labelPosition="edge"
+						__unstableInputWidth="80px"
 						value={ width || '' }
 						onChange={ ( nextWidth ) => {
 							nextWidth =
