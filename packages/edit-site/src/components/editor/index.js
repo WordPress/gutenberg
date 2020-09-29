@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, useCallback } from '@wordpress/element';
+import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
@@ -153,6 +153,16 @@ function Editor() {
 		[ page?.context ]
 	);
 
+	const isNavigationOpen = leftSidebarContent === 'navigation';
+
+	useEffect( () => {
+		if ( isNavigationOpen ) {
+			document.body.classList.add( 'is-navigation-sidebar-open' );
+		} else {
+			document.body.classList.remove( 'is-navigation-sidebar-open' );
+		}
+	}, [ isNavigationOpen ] );
+
 	const toggleLeftSidebarContent = ( value ) =>
 		setLeftSidebarContent( leftSidebarContent === value ? null : value );
 
@@ -220,8 +230,7 @@ function Editor() {
 															)
 														}
 														isNavigationOpen={
-															leftSidebarContent ===
-															'navigation'
+															isNavigationOpen
 														}
 														onToggleNavigation={ () =>
 															toggleLeftSidebarContent(
