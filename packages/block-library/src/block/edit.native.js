@@ -1,19 +1,21 @@
 /**
  * External dependencies
  */
-import { Text, View } from 'react-native';
+import { Platform, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { partial } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { Spinner, Disabled } from '@wordpress/components';
+import { BottomSheet, Icon, Spinner, Disabled } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
-import { compose } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { parse } from '@wordpress/blocks';
+import { help } from '@wordpress/icons';
+import { requestUnsupportedBlockFallback } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -26,6 +28,8 @@ class ReusableBlockEdit extends Component {
 		super( ...arguments );
 
 		this.setBlocks = this.setBlocks.bind( this );
+		this.toggleSheet = this.toggleSheet.bind( this );
+		this.requestFallback = this.requestFallback.bind( this );
 
 		if ( reusableBlock ) {
 			// Start in edit mode when we're working with a newly created reusable block
@@ -34,6 +38,8 @@ class ReusableBlockEdit extends Component {
 				isEditing: false,
 				title: reusableBlock.title,
 				blocks: parse( reusableBlock.content ),
+				showHelp: false,
+				sendFallbackMessage: false,
 			};
 		} else {
 			// Start in preview mode when we're working with an existing reusable block
@@ -41,6 +47,8 @@ class ReusableBlockEdit extends Component {
 				isEditing: false,
 				title: null,
 				blocks: [],
+				showHelp: false,
+				sendFallbackMessage: false,
 			};
 		}
 	}
@@ -63,8 +71,97 @@ class ReusableBlockEdit extends Component {
 		}
 	}
 
+	toggleSheet() {
+		this.setState( {
+			showHelp: ! this.state.showHelp,
+		} );
+	}
+
+	requestFallback() {
+		this.toggleSheet();
+		this.setState( { sendFallbackMessage: true } );
+	}
+
 	setBlocks( blocks ) {
 		this.setState( { blocks } );
+	}
+
+	renderSheet() {
+		const { name, reusableBlock } = this.props;
+		const { showHelp, title } = this.state;
+
+		const { getStylesFromColorScheme, clientId } = this.props;
+		const infoTextStyle = getStylesFromColorScheme(
+			styles.infoText,
+			styles.infoTextDark
+		);
+		const infoTitleStyle = getStylesFromColorScheme(
+			styles.infoTitle,
+			styles.infoTitleDark
+		);
+		const infoSheetIconStyle = getStylesFromColorScheme(
+			styles.infoSheetIcon,
+			styles.infoSheetIconDark
+		);
+		const actionButtonStyle = getStylesFromColorScheme(
+			styles.actionButton,
+			styles.actionButtonDark
+		);
+
+		const infoTitle =
+			Platform.OS === 'android'
+				? __(
+						"'Reusable blocks aren't editable on WordPress for Android"
+				  )
+				: __( "Reusable blocks aren't editable on WordPress for iOS" );
+
+		return (
+			<BottomSheet
+				isVisible={ showHelp }
+				hideHeader
+				onClose={ this.toggleSheet }
+				onModalHide={ () => {
+					if ( this.state.sendFallbackMessage ) {
+						// On iOS, onModalHide is called when the controller is still part of the hierarchy.
+						// A small delay will ensure that the controller has already been removed.
+						this.timeout = setTimeout( () => {
+							requestUnsupportedBlockFallback(
+								reusableBlock.content,
+								clientId,
+								name,
+								title
+							);
+						}, 100 );
+						this.setState( { sendFallbackMessage: false } );
+					}
+				} }
+			>
+				<View style={ styles.infoContainer }>
+					<Icon
+						icon={ help }
+						color={ infoSheetIconStyle.color }
+						size={ styles.infoSheetIcon.size }
+					/>
+					<Text style={ [ infoTextStyle, infoTitleStyle ] }>
+						{ infoTitle }
+					</Text>
+				</View>
+				<>
+					<BottomSheet.Cell
+						label={ __( 'Edit block in web browser' ) }
+						separatorType="topFullWidth"
+						onPress={ this.requestFallback }
+						labelStyle={ actionButtonStyle }
+					/>
+					<BottomSheet.Cell
+						label={ __( 'Dismiss' ) }
+						separatorType="topFullWidth"
+						onPress={ this.toggleSheet }
+						labelStyle={ actionButtonStyle }
+					/>
+				</>
+			</BottomSheet>
+		);
 	}
 
 	render() {
@@ -99,10 +196,19 @@ class ReusableBlockEdit extends Component {
 		}
 
 		return (
-			<View>
-				{ isSelected && <EditTitle title={ title } /> }
-				{ element }
-			</View>
+			<TouchableWithoutFeedback
+				disabled={ ! isSelected }
+				accessibilityLabel={ __( 'Help button' ) }
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Tap here to show help' ) }
+				onPress={ this.toggleSheet }
+			>
+				<View>
+					{ isSelected && <EditTitle title={ title } /> }
+					{ element }
+					{ this.renderSheet( title ) }
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }
@@ -153,4 +259,5 @@ export default compose( [
 			},
 		};
 	} ),
+	withPreferredColorScheme,
 ] )( ReusableBlockEdit );
