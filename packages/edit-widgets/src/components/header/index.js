@@ -38,6 +38,25 @@ function Header() {
 	);
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const rootClientId = useLastSelectedRootId();
+	const handleClick = () => {
+		if ( isInserterOpened ) {
+			// Focusing the inserter button closes the inserter popover
+			inserterButton.current.focus();
+		} else {
+			if ( ! isLastSelectedWidgetAreaOpen ) {
+				// Select the last selected block if hasn't already.
+				selectBlock( rootClientId );
+				// Open the last selected widget area when opening the inserter.
+				setIsWidgetAreaOpen( rootClientId, true );
+			}
+			// The DOM updates resulting from selectBlock() and setIsInserterOpened() calls are applied the
+			// same tick and pretty much in a random order. The inserter is closed if any other part of the
+			// app receives focus. If selectBlock() happens to take effect after setIsInserterOpened() then
+			// the inserter is visible for a brief moment and then gets auto-closed due to focus moving to
+			// the selected block.
+			window.requestAnimationFrame( () => setIsInserterOpened( true ) );
+		}
+	};
 
 	return (
 		<>
@@ -59,26 +78,7 @@ function Header() {
 							onMouseDown={ ( event ) => {
 								event.preventDefault();
 							} }
-							onClick={ () => {
-								if ( isInserterOpened ) {
-									// Focusing the inserter button closes the inserter popover
-									inserterButton.current.focus();
-								} else {
-									if ( ! isLastSelectedWidgetAreaOpen ) {
-										// Select the last selected block if hasn't already.
-										selectBlock( rootClientId );
-										// Open the last selected widget area when opening the inserter.
-										setIsWidgetAreaOpen(
-											rootClientId,
-											true
-										);
-									}
-									// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
-									setTimeout( () =>
-										setIsInserterOpened( true )
-									);
-								}
-							} }
+							onClick={ handleClick }
 							icon={ plus }
 							/* translators: button label text should, if possible, be under 16
 					characters. */
