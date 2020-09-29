@@ -81,10 +81,12 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 				{ categories?.terms?.length > 0 && (
 					<FormTokenField
 						label={ __( 'Categories' ) }
-						value={ query.categoryIds.map( ( categoryId ) => ( {
-							id: categoryId,
-							value: categories.mapById[ categoryId ].name,
-						} ) ) }
+						value={ ( query.categoryIds || [] ).map(
+							( categoryId ) => ( {
+								id: categoryId,
+								value: categories.mapById[ categoryId ].name,
+							} )
+						) }
 						suggestions={ categories.names }
 						onChange={ onCategoriesChange }
 					/>
