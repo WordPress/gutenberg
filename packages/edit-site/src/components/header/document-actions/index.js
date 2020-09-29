@@ -44,13 +44,15 @@ function useSecondaryText() {
 	} );
 
 	// Check if current block is a template part:
-	let selectedBlockLabel =
+	const activeTemplatePart = {};
+	activeTemplatePart.label =
 		selectedBlock?.name === 'core/template-part'
 			? getBlockDisplayText( selectedBlock )
 			: null;
-
+	activeTemplatePart.clientId =
+		activeTemplatePart.label && selectedBlock?.clientId;
 	// Check if an ancestor of the current block is a template part:
-	if ( ! selectedBlockLabel ) {
+	if ( ! activeTemplatePart.label ) {
 		const templatePartParents = !! selectedBlock
 			? getBlockParentsByBlockName(
 					selectedBlock?.clientId,
@@ -64,7 +66,9 @@ function useSecondaryText() {
 			const closestParent = getBlockWithoutInnerBlocks(
 				last( templatePartParents )
 			);
-			selectedBlockLabel = getBlockDisplayText( closestParent );
+			activeTemplatePart.label = getBlockDisplayText( closestParent );
+			activeTemplatePart.clientId =
+				activeTemplatePart.label && closestParent?.clientId;
 		}
 	}
 
@@ -74,13 +78,15 @@ function useSecondaryText() {
 		);
 		return {
 			label: hoveredBlockLabel,
-			isActive: hoveredBlockLabel === selectedBlockLabel,
+			isActive:
+				hoveredTemplatePartBlock.clientId ===
+				activeTemplatePart.clientId,
 		};
 	}
 
-	if ( selectedBlockLabel ) {
+	if ( activeTemplatePart.label ) {
 		return {
-			label: selectedBlockLabel,
+			label: activeTemplatePart.label,
 			isActive: true,
 		};
 	}
