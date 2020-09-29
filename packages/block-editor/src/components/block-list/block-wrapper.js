@@ -68,6 +68,7 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 		shouldFocusFirstElement,
 		isNavigationMode,
 		getHoveredBlocksTimeStamp,
+		isFullSiteEditingActive,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -75,6 +76,7 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 				isMultiSelecting: _isMultiSelecting,
 				isNavigationMode: _isNavigationMode,
 				getHoveredBlocksTimeStamp: _getHoveredBlocksTimeStamp,
+				getSettings,
 			} = select( 'core/block-editor' );
 
 			return {
@@ -87,6 +89,8 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 					: undefined,
 				isNavigationMode: _isNavigationMode,
 				getHoveredBlocksTimeStamp: _getHoveredBlocksTimeStamp,
+				isFullSiteEditingActive: getSettings()
+					.__experimentalEnableFullSiteEditing,
 			};
 		},
 		[ isSelected ]
@@ -298,18 +302,22 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 			}
 		}
 
-		ref.current.addEventListener( 'mouseenter', evaluateHoveredBlocks );
-		ref.current.addEventListener( 'mouseleave', evaluateHoveredBlocks );
+		if ( isFullSiteEditingActive ) {
+			ref.current.addEventListener( 'mouseenter', evaluateHoveredBlocks );
+			ref.current.addEventListener( 'mouseleave', evaluateHoveredBlocks );
+		}
 
 		return () => {
-			ref.current.removeEventListener(
-				'mouseenter',
-				evaluateHoveredBlocks
-			);
-			ref.current.removeEventListener(
-				'mouseleave',
-				evaluateHoveredBlocks
-			);
+			if ( isFullSiteEditingActive ) {
+				ref.current.removeEventListener(
+					'mouseenter',
+					evaluateHoveredBlocks
+				);
+				ref.current.removeEventListener(
+					'mouseleave',
+					evaluateHoveredBlocks
+				);
+			}
 		};
 	}, [] );
 
