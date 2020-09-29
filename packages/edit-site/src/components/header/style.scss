@@ -21,7 +21,7 @@
 }
 
 // Keeps the document title centered when the sidebar is open
-.navigation-open {
+body.is-navigation-sidebar-open {
 	.edit-site-header_start {
 		flex-basis: $nav-sidebar-width;
 	}
