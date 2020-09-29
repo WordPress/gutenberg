@@ -3,8 +3,9 @@
  */
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { ResponsiveWrapper } from '@wordpress/components';
+import { ResponsiveWrapper, Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { postFeaturedImage as icon } from '@wordpress/icons';
 
 function PostFeaturedImageDisplay( { context: { postId, postType } } ) {
 	const [ featuredImage ] = useEntityProp(
@@ -19,7 +20,12 @@ function PostFeaturedImageDisplay( { context: { postId, postType } } ) {
 		[ featuredImage ]
 	);
 	if ( ! media ) {
-		return __( 'No Featured Image is set' );
+		return (
+			<div className="post-featured-image_placeholder">
+				<Icon icon={ icon } />
+				<p> { __( 'Featured Image' ) }</p>
+			</div>
+		);
 	}
 	const alt = media.alt_text || __( 'No alternative text set' );
 	return (
