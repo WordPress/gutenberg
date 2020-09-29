@@ -296,8 +296,11 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 			function evaluateHoveredBlocks( event ) {
 				// Check the timeStamp of the last time this was set.
 				// This prevents needlessly rerunning the parse and dispatch for nested blocks
-				// who share boundaries that trigger the mouse events at the same time.
-				if ( event.timeStamp !== getHoveredBlocksTimeStamp() ) {
+				// who share boundaries that trigger the mouse events at or around the same time.
+				if (
+					event.timeStamp - ( getHoveredBlocksTimeStamp() || 0 ) >
+					10
+				) {
 					setHoveredBlocks(
 						getHoveredBlocksFromCursor( event ),
 						event.timeStamp
