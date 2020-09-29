@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
@@ -77,6 +77,17 @@ function Navigation( {
 			templateLock: false,
 		}
 	);
+
+	const {
+		style: { color, backgroundColor },
+	} = blockProps;
+
+	useEffect( () => {
+		setAttributes( {
+			customTextColor: color,
+			customBackgroundColor: backgroundColor,
+		} );
+	}, [ color, backgroundColor, setAttributes ] );
 
 	if ( isPlaceholderShown ) {
 		return (
