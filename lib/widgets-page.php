@@ -77,7 +77,11 @@ function gutenberg_widgets_init( $hook ) {
 		gutenberg_get_legacy_widget_settings()
 	);
 
-	$settings = apply_filters( 'block_editor_settings', $settings, null );
+	// This purposefully does not rely on apply_filters( 'block_editor_settings', $settings, null );
+	// Applying that filter would bring over multitude of features from the post editor, some of which
+	// may be undesirable. Instead of using that filter, we simply pick just the settings that are needed.
+	$settings = gutenberg_experimental_global_styles_settings( $settings );
+	$settings = gutenberg_extend_block_editor_styles( $settings );
 
 	wp_add_inline_script(
 		'wp-edit-widgets',
