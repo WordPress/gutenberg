@@ -50,7 +50,7 @@
 		"inserter": true,
 		"lightBlockWrapper": true,
 		"__experimentalFontSize": true,
-		"__experimentalColor": {
+		"color": {
 			"textColor": true,
 			"backgroundColor": true
 		}

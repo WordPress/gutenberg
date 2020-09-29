@@ -9,7 +9,7 @@
 	"supports": {
 		"html": false,
 		"lightBlockWrapper": true,
-		"__experimentalColor": {
+		"color": {
 			"gradients": true
 		},
 		"__experimentalFontSize": true,

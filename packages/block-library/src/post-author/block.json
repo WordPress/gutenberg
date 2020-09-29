@@ -28,9 +28,9 @@
 		"html": false,
 		"lightBlockWrapper": true,
 		"__experimentalFontSize": true,
-		"__experimentalColor": {
+		"color": {
 			"gradients": true,
-			"linkColor": true
+			"link": true
 		},
 		"__experimentalLineHeight": true
 	}
