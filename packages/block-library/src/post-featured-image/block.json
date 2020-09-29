@@ -2,7 +2,8 @@
 	"name": "core/post-featured-image",
 	"category": "design",
 	"usesContext": [
-		"postId"
+		"postId",
+		"postType"
 	],
 	"supports": {
 		"html": false
