@@ -16,6 +16,7 @@ function gutenberg_register_block_supports() {
 	foreach ( $registered_block_types as $block_type ) {
 		gutenberg_register_alignment_support( $block_type );
 		gutenberg_register_colors_support( $block_type );
+		gutenberg_register_duotone_support( $block_type );
 		gutenberg_register_typography_support( $block_type );
 		gutenberg_register_custom_classname_support( $block_type );
 	}
@@ -44,6 +45,7 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	$attributes = array();
 	$attributes = gutenberg_apply_generated_classname_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_colors_support( $attributes, $block['attrs'], $block_type );
+	$attributes = gutenberg_apply_duotone_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_typography_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_alignment_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_custom_classname_support( $attributes, $block['attrs'], $block_type );
@@ -51,6 +53,8 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	if ( ! count( $attributes ) ) {
 		return $block_content;
 	}
+
+	$block_content = gutenberg_render_duotone_support( $block_content, $block['attrs'] );
 
 	$dom = new DOMDocument( '1.0', 'utf-8' );
 
