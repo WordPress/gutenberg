@@ -138,7 +138,7 @@ export class Inserter extends Component {
 		if ( onToggle ) {
 			onToggle( isOpen );
 		}
-		this.onInserterToggledAnnouncement( isOpen );
+		//this.onInserterToggledAnnouncement( isOpen );
 	}
 
 	onInserterToggledAnnouncement( isOpen ) {
