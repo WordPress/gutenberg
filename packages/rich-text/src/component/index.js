@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
 import { find, isNil } from 'lodash';
 
 /**
@@ -139,8 +138,6 @@ function RichText(
 		children,
 		allowedFormats,
 		withoutInteractiveFormatting,
-		style,
-		className,
 		placeholder,
 		disabled,
 		preserveWhiteSpace,
@@ -168,7 +165,6 @@ function RichText(
 		__unstableOnExitFormattedText: onExitFormattedText,
 		__unstableOnCreateUndoLevel: onCreateUndoLevel,
 		__unstableIsSelected: isSelected,
-		...remainingProps
 	},
 	ref
 ) {
@@ -1103,10 +1099,9 @@ function RichText(
 		role: 'textbox',
 		'aria-multiline': true,
 		'aria-label': placeholder,
-		...remainingProps,
 		ref,
-		style: style ? { ...style, whiteSpace } : defaultStyle,
-		className: classnames( 'rich-text', className ),
+		style: defaultStyle,
+		className: 'rich-text',
 		onPaste: handlePaste,
 		onInput: handleInput,
 		onCompositionStart: handleCompositionStart,
