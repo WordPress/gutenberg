@@ -15,7 +15,7 @@ import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
 import BaseControl from '../base-control';
 import Button from '../button';
-import { Flex, FlexItem } from '../flex';
+import { Flex, FlexBlock, FlexItem } from '../flex';
 
 function ComboboxControl( {
 	value,
@@ -168,7 +168,7 @@ function ComboboxControl( {
 				onKeyDown={ onKeyDown }
 			>
 				<Flex>
-					<FlexItem grow="1">
+					<FlexBlock>
 						<TokenInput
 							className="components-combobox-control__input"
 							instanceId={ instanceId }
@@ -182,18 +182,16 @@ function ComboboxControl( {
 							) }
 							onChange={ onInputChange }
 						/>
-					</FlexItem>
+					</FlexBlock>
 					{ allowReset && (
 						<FlexItem>
-							<Flex>
-								<Button
-									className="components-combobox-control__reset"
-									icon={ closeSmall }
-									disabled={ ! value }
-									onClick={ handleOnReset }
-									label={ __( 'Reset' ) }
-								/>
-							</Flex>
+							<Button
+								className="components-combobox-control__reset"
+								icon={ closeSmall }
+								disabled={ ! value }
+								onClick={ handleOnReset }
+								label={ __( 'Reset' ) }
+							/>
 						</FlexItem>
 					) }
 				</Flex>

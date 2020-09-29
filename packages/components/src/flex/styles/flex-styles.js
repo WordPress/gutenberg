@@ -62,17 +62,16 @@ export const Flex = styled.div`
 	display: flex;
 	width: 100%;
 
-	${ alignStyle };
-	${ justifyStyle };
-	${ gapStyle };
-	${ reversedStyles };
+	${ alignStyle }
+	${ justifyStyle }
+	${ gapStyle }
+	${ reversedStyles }
 `;
 
 export const Item = styled.div`
 	box-sizing: border-box;
 	min-width: 0;
 	max-width: 100%;
-	flex-grow: ${ ( props ) => props.grow };
 `;
 
 export const Block = styled( Item )`
