@@ -17,6 +17,29 @@
 	.components-navigation {
 		height: 100%;
 	}
+
+	.components-navigation__item {
+		position: relative;
+
+		.edit-site-template-switcher__label-home-icon svg path {
+			color: inherit;
+		}
+
+		&.is-active {
+			.edit-site-template-switcher__label-customized-dot {
+				background: #fff;
+			}
+		}
+	}
+
+	.edit-site-template-switcher__label-home-icon {
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
+	.edit-site-template-switcher__label-customized-dot {
+		right: 8px;
+	}
 }
 
 .edit-site-navigation-panel__back-to-dashboard.components-button.is-tertiary {
@@ -44,6 +67,7 @@
 	position: absolute;
 	top: $grid-unit-15;
 	left: calc(100% + #{$grid-unit-15});
+	color: $gray-900;
 
 	@include break-medium {
 		display: block;

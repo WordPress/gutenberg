@@ -1,60 +1,80 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	__experimentalNavigation as Navigation,
-	__experimentalNavigationBackButton as NavigationBackButton,
-	__experimentalNavigationGroup as NavigationGroup,
-	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationMenu as NavigationMenu,
+	__experimentalNavigationBackButton as NavigationBackButton,
 } from '@wordpress/components';
-import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
-import { BlockPreview } from '@wordpress/block-editor';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import TemplateSwitcher from './template-switcher';
+
 const NavigationPanel = () => {
-	const [ showPreview, setShowPreview ] = useState( false );
 	const ref = useRef();
 
 	useEffect( () => {
 		ref.current.focus();
 	}, [ ref ] );
 
+	const { templateId, templatePartId, templateType, page } = useSelect(
+		( select ) => {
+			const {
+				getTemplateId,
+				getTemplatePartId,
+				getTemplateType,
+				getPage,
+			} = select( 'core/edit-site' );
+
+			return {
+				templateId: getTemplateId(),
+				templatePartId: getTemplatePartId(),
+				templateType: getTemplateType(),
+				page: getPage(),
+			};
+		},
+		[]
+	);
+
+	const {
+		setTemplate,
+		addTemplate,
+		removeTemplate,
+		setTemplatePart,
+	} = useDispatch( 'core/edit-site' );
+
 	return (
 		<div className="edit-site-navigation-panel">
-			<Navigation>
+			<Navigation
+				activeItem={
+					'wp_template' === templateType
+						? `template-${ templateId }`
+						: `template-part-${ templatePartId }`
+				}
+			>
 				<NavigationBackButton
 					backButtonLabel={ __( 'Dashboard' ) }
 					className="edit-site-navigation-panel__back-to-dashboard"
 					href="index.php"
 					ref={ ref }
 				/>
+
 				<NavigationMenu title="Home">
-					<NavigationGroup title="Example group">
-						<NavigationItem
-							item="item-preview"
-							title="Hover to show preview"
-							onMouseEnter={ () => setShowPreview( true ) }
-							onMouseLeave={ () => setShowPreview( false ) }
-						/>
-					</NavigationGroup>
+					<TemplateSwitcher
+						page={ page }
+						activeId={ templateId }
+						onActiveIdChange={ setTemplate }
+						onActiveTemplatePartIdChange={ setTemplatePart }
+						onAddTemplate={ addTemplate }
+						onRemoveTemplate={ removeTemplate }
+					/>
 				</NavigationMenu>
 			</Navigation>
-
-			{ showPreview && (
-				<div className="edit-site-navigation-panel__preview">
-					<BlockPreview
-						blocks={ [
-							getBlockFromExample(
-								'core/paragraph',
-								getBlockType( 'core/paragraph' ).example
-							),
-						] }
-						viewportWidth={ 1200 }
-					/>
-				</div>
-			) }
 		</div>
 	);
 };
