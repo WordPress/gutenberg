@@ -31,12 +31,6 @@
 		}
 	},
 	"usesContext": [
-		"textColor",
-		"customTextColor",
-		"backgroundColor",
-		"customBackgroundColor",
-		"fontSize",
-		"customFontSize",
 		"showSubmenuIcon"
 	],
 	"supports": {

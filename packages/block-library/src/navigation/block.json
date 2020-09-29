@@ -33,12 +33,6 @@
 		}
 	},
 	"providesContext": {
-		"textColor": "textColor",
-		"customTextColor": "customTextColor",
-		"backgroundColor": "backgroundColor",
-		"customBackgroundColor": "customBackgroundColor",
-		"fontSize": "fontSize",
-		"customFontSize": "customFontSize",
 		"showSubmenuIcon": "showSubmenuIcon"
 	},
 	"supports": {
