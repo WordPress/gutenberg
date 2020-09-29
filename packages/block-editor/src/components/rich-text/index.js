@@ -600,8 +600,9 @@ function RichTextWrapper(
 			maxWidth={ maxWidth }
 			onBlur={ onBlur }
 			setRef={ setRef }
-			// Destructuring the id prop before { ...props } doesn't work
-			// correctly on web https://github.com/WordPress/gutenberg/pull/25624
+			// Props to be set on the editable container are destructured on the
+			// element itself for web (see below), but passed through rich text
+			// for native.
 			id={ props.id }
 			style={ props.style }
 		>
