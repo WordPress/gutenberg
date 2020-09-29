@@ -39,12 +39,6 @@ export const secondary = () => {
 	return <Button isSecondary>{ label }</Button>;
 };
 
-export const tertiary = () => {
-	const label = text( 'Label', 'Tertiary Button' );
-
-	return <Button isTertiary>{ label }</Button>;
-};
-
 export const isDestructive = () => {
 	const label = text( 'Label', 'Destructive Button' );
 	const isSmall = boolean( 'isSmall', false );
@@ -165,13 +159,9 @@ export const buttons = () => {
 				<Button isSecondary isSmall>
 					Secondary Button
 				</Button>
-				<Button isTertiary isSmall>
-					Tertiary Button
-				</Button>
 				<Button isSmall icon={ more } />
 				<Button isSmall isPrimary icon={ more } />
 				<Button isSmall isSecondary icon={ more } />
-				<Button isSmall isTertiary icon={ more } />
 				<Button isSmall isPrimary icon={ more }>
 					Icon & Text
 				</Button>
@@ -182,11 +172,9 @@ export const buttons = () => {
 				<Button>Button</Button>
 				<Button isPrimary>Primary Button</Button>
 				<Button isSecondary>Secondary Button</Button>
-				<Button isTertiary>Tertiary Button</Button>
 				<Button icon={ more } />
 				<Button isPrimary icon={ more } />
 				<Button isSecondary icon={ more } />
-				<Button isTertiary icon={ more } />
 				<Button isPrimary icon={ more }>
 					Icon & Text
 				</Button>

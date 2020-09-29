@@ -4,10 +4,9 @@
 .edit-site-block-editor__editor-styles-wrapper  .components-button {
 	font-family: $default-font;
 	font-size: $default-font-size;
-	padding: 6px 12px;
+	padding: #{ $grid-unit-15 / 2 } $grid-unit-15;
 
-	&.is-tertiary,
 	&.has-icon {
-		padding: 6px;
+		padding: #{ $grid-unit-15 / 2 };
 	}
 }

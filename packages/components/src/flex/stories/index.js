@@ -222,7 +222,7 @@ export const exampleActions = () => {
 	return (
 		<EnhancedFlex { ...props }>
 			<FlexItem>
-				<Button icon={ arrowLeft } isTertiary />
+				<Button icon={ arrowLeft } isSecondary />
 			</FlexItem>
 			<FlexItem>
 				<Flex justify="left" gap="small">

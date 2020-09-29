@@ -50,11 +50,16 @@ export function Button( props, ref ) {
 		} );
 	}
 
+	if ( isTertiary ) {
+		deprecated( 'Button isTertiary prop', {
+			alternative: 'isSecondary',
+		} );
+	}
+
 	const classes = classnames( 'components-button', className, {
-		'is-secondary': isDefault || isSecondary,
+		'is-secondary': isSecondary || isDefault || isTertiary,
 		'is-primary': isPrimary,
 		'is-small': isSmall,
-		'is-tertiary': isTertiary,
 		'is-pressed': isPressed,
 		'is-busy': isBusy,
 		'is-link': isLink,

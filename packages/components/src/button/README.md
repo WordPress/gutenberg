@@ -153,14 +153,6 @@ Renders a primary button style.
 -   Required: No
 -   Default: `false`
 
-#### isTertiary
-
-Renders a text-based button style.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
 #### isDestructive
 
 Renders a red text-based button style to indicate destructive behavior.

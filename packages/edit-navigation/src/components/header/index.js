@@ -48,7 +48,7 @@ export default function Header( { menus, selectedMenuId, onSelectMenu } ) {
 					position="bottom center"
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button
-							isTertiary
+							isSecondary
 							aria-expanded={ isOpen }
 							onClick={ onToggle }
 						>
@@ -68,7 +68,7 @@ export default function Header( { menus, selectedMenuId, onSelectMenu } ) {
 					position="bottom center"
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<Button
-							isTertiary
+							isSecondary
 							aria-expanded={ isOpen }
 							onClick={ onToggle }
 						>

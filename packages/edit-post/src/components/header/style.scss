@@ -66,23 +66,19 @@
  */
 
 .edit-post-header__settings {
-	// Adjust button paddings to scale better to mobile.
-	.editor-post-saved-state,
-	.components-button.components-button {
-		margin-right: $grid-unit-05;
-
-		@include break-small() {
-			margin-right: $grid-unit-15;
-		}
+	> * {
+		margin-right: $grid-unit-15;
 	}
 
-	.editor-post-saved-state,
-	.components-button.is-tertiary {
-		padding: 0 #{ $grid-unit-15 / 2 };
+	> :last-child {
+		margin-right: 0;
 	}
 
-	.edit-post-more-menu .components-button,
-	.interface-pinned-items .components-button {
+	.interface-pinned-items {
+		margin-right: 0;
+	}
+
+	.edit-post-more-menu .components-button {
 		margin-right: 0;
 	}
 }
@@ -130,12 +126,7 @@
 			background-color: transparent;
 		}
 	}
-	.is-tertiary {
-		&:active {
-			box-shadow: 0 0 0 1.5px var(--wp-admin-theme-color);
-			background-color: transparent;
-		}
-	}
+
 	// Exception for drodpdown toggle buttons.
 	// Exception for the fullscreen mode button.
 	// Temporary exception for block toolbar (pending design).
@@ -168,12 +159,10 @@
 		}
 	}
 	.components-dropdown-menu__toggle {
-		margin-left: $grid-unit;
 		padding-left: $grid-unit;
 		padding-right: $grid-unit;
 
 		@include break-small {
-			margin-left: $grid-unit-15;
 			padding-left: $grid-unit-15;
 			padding-right: $grid-unit-15;
 		}
@@ -197,6 +186,33 @@
 	}
 }
 
+.show-icon-labels .edit-post-header-toolbar {
+	> * {
+		margin-right: $grid-unit-05;
+	}
+
+	> :last-child {
+		margin-right: 0;
+	}
+}
+
+.show-icon-labels .interface-pinned-items {
+	margin-right: $grid-unit-15;
+
+	// Apply standard secondary button styles, but only when the button isn't pressed.
+	> .components-button:not(.is-pressed) {
+		&:not(:focus) {
+			box-shadow: inset 0 0 0 $border-width currentColor;
+		}
+
+		&:active:not(:disabled) {
+			background: $gray-300;
+			color: var(--wp-admin-theme-color-darker-10);
+			box-shadow: none;
+		}
+	}
+}
+
 .edit-post-header__dropdown {
 	.components-menu-item__button.components-menu-item__button,
 	.components-button.editor-history__undo,
@@ -208,6 +224,12 @@
 		width: 14.625rem;
 		text-align: left;
 		justify-content: flex-start;
+	}
+
+	// Remove default secondary button border.
+	.components-button.is-secondary:not(:focus),
+	.components-button.is-secondary:hover:not(:focus) {
+		box-shadow: none;
 	}
 }
 
@@ -223,7 +245,7 @@
 	> .components-button.has-icon {
 		margin: 0;
 		padding: 6px 6px 6px $grid-unit;
-		width: 14.625rem;
+		width: 100%;
 		justify-content: flex-start;
 
 		&[aria-expanded="true"] svg {

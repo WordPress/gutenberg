@@ -17,7 +17,7 @@ function PostTrash( { isNew, postId, postType, ...props } ) {
 		<Button
 			className="editor-post-trash"
 			isDestructive
-			isTertiary
+			isSecondary
 			onClick={ onClick }
 		>
 			{ __( 'Move to trash' ) }

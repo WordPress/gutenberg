@@ -86,7 +86,7 @@ function Snackbar(
 						<Button
 							key={ index }
 							href={ url }
-							isTertiary
+							isSecondary
 							onClick={ ( event ) => {
 								event.stopPropagation();
 								if ( onClick ) {

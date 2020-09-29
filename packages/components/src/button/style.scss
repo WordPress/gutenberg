@@ -12,7 +12,7 @@
 	height: $button-size;
 	align-items: center;
 	box-sizing: border-box;
-	padding: 6px 12px;
+	padding: #{ $grid-unit-15 / 2 } $grid-unit-15;
 	border-radius: $radius-block-ui;
 	color: $gray-900;
 
@@ -101,11 +101,16 @@
 	}
 
 	/**
-	 * Secondary and tertiary buttons.
+	 * Secondary button style.
 	 */
 
-	&.is-secondary,
-	&.is-tertiary {
+	&.is-secondary {
+		box-shadow: inset 0 0 0 $border-width currentColor;
+		outline: 1px solid transparent; // Shown in high contrast mode.
+		white-space: nowrap;
+		color: $gray-900;
+		background: transparent;
+
 		&:active:not(:disabled) {
 			background: $gray-300;
 			color: var(--wp-admin-theme-color-darker-10);
@@ -126,37 +131,11 @@
 			opacity: 1;
 			box-shadow: none;
 		}
-	}
-
-	/**
-	 * Secondary button style.
-	 */
-
-	&.is-secondary {
-		box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
-		outline: 1px solid transparent; // Shown in high contrast mode.
-		white-space: nowrap;
-		color: var(--wp-admin-theme-color);
-		background: transparent;
-	}
-
-	/**
-	 * Tertiary buttons.
-	 */
-
-	&.is-tertiary {
-		white-space: nowrap;
-		color: var(--wp-admin-theme-color);
-		background: transparent;
-		padding: 6px; // This reduces the horizontal padding on tertiary/text buttons, so as to space them optically.
 
 		.dashicon {
 			display: inline-block;
 			flex: 0 0 auto;
 		}
-
-		// Windows High Contrast mode.
-		outline: 1px dotted transparent;
 	}
 
 	/**
