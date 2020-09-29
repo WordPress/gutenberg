@@ -111,6 +111,20 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 		}
 	}, [ isSelected, isFirstMultiSelected, isLastMultiSelected ] );
 
+	// Set new block node if it changes.
+	// This effect should happen on every render, so no dependencies should be
+	// added.
+	useEffect( () => {
+		const node = ref.current;
+		setBlockNodes( ( nodes ) => {
+			if ( ! nodes[ clientId ] || nodes[ clientId ] === node ) {
+				return nodes;
+			}
+
+			return { ...nodes, [ clientId ]: node };
+		} );
+	} );
+
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 
