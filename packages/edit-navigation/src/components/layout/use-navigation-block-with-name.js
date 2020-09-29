@@ -53,7 +53,7 @@ export default function useNavigationBlockWithName( menuId ) {
 			);
 			return () => removeFilter( 'editor.BlockEdit', 'core/edit-navigation/with-menu-name',  withMenuName );
 		}
-	}, [ menu ] );
+	}, [ menuId ] );
 
 
 }
