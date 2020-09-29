@@ -77,9 +77,6 @@ export class StoryUpdateProgress extends React.Component {
 		) {
 			return;
 		}
-		// if ( payload.mediaId !== mediaId ) {
-		// 	return;
-		// }
 
 		switch ( payload.state ) {
 			case STORY_UPLOAD_STATE_UPLOADING:
@@ -106,9 +103,6 @@ export class StoryUpdateProgress extends React.Component {
 		) {
 			return;
 		}
-		// if ( payload.mediaId !== mediaId ) {
-		// 	return;
-		// }
 
 		switch ( payload.state ) {
 			case MEDIA_SAVE_STATE_SAVING:
