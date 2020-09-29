@@ -3,32 +3,64 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: space-evenly;
+	position: relative;
 
 	.edit-site-document-actions__label {
-		color: $gray-700;
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		transition: height 0.25s;
-
-		&.is-active {
-			color: inherit;
-		}
-
-		&.edit-site-document-actions__title {
-			height: 100%;
-			// Otherwise, the secondary item still takes up space with height 0:
-			flex-grow: 1;
-		}
-
-		&.edit-site-document-actions__secondary-item {
-			height: 0;
-		}
 	}
 
 	&.has-secondary-label {
-		.edit-site-document-actions__label {
-			height: 50%;
+		.edit-site-document-actions__title {
+			animation: titleAnimation 0.2s;
+			transform: translateY(-12px);
+			color: $gray-900;
+			font-weight: bold;
+
+			&.is-secondary-title-active {
+				animation: titleAnimation 0.2s;
+				transform: translateY(-12px);
+				color: $gray-700;
+				font-weight: normal;
+			}
 		}
+
+		.edit-site-document-actions__secondary-item {
+			color: $gray-700;
+			font-weight: normal;
+			position: absolute;
+			animation: secondaryTitleAnimation 0.2s;
+			transform: translateY(12px);
+
+			&.is-secondary-title-active {
+				position: absolute;
+				animation: secondaryTitleAnimation 0.2s;
+				transform: translateY(12px);
+				font-weight: bold;
+				color: $gray-900;
+			}
+		}
+	}
+}
+
+@keyframes titleAnimation {
+	from {
+		transform: translateY(0);
+	}
+	to {
+		transform: translateY(-12px);
+	}
+}
+
+@keyframes secondaryTitleAnimation {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY(12px);
 	}
 }
