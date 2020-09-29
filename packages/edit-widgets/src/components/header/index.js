@@ -42,7 +42,7 @@ function Header() {
 	return (
 		<>
 			<div className="edit-widgets-header">
-				<div>
+				<div className="edit-widgets-header__navigable-toolbar-wrapper">
 					<h1 className="edit-widgets-header__title">
 						{ __( 'Widgets' ) }
 					</h1>
