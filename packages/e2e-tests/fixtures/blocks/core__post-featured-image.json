@@ -3,7 +3,11 @@
         "clientId": "_clientId_0",
         "name": "core/post-featured-image",
         "isValid": true,
-        "attributes": {},
+		"attributes": {
+			"isLink": false,
+			"linkTarget": "_blank",
+			"rel": ""
+		},
         "innerBlocks": [],
         "originalContent": ""
     }

@@ -16,4 +16,15 @@ div[data-type="core/post-featured-image"] {
 			margin: 0;
 		}
 	}
+	.post-featured-image__link {
+		line-height: 0;
+		a {
+			display: inline-block;
+		}
+	}
+	img {
+		max-width: 100%;
+		height: auto;
+		display: block;
+	}
 }
