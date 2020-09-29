@@ -26,7 +26,7 @@
 		"color": {
 			"link": true
 		},
-		"__experimentalFontSize": true,
+		"fontSize": true,
 		"__experimentalLineHeight": true,
 		"__experimentalSelector": {
 			"core/heading/h1": "h1",

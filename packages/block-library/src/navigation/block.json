@@ -49,7 +49,7 @@
 		"html": false,
 		"inserter": true,
 		"lightBlockWrapper": true,
-		"__experimentalFontSize": true,
+		"fontSize": true,
 		"color": {
 			"textColor": true,
 			"backgroundColor": true

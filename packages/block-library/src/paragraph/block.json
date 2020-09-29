@@ -33,7 +33,7 @@
 		"color": {
 			"link": true
 		},
-		"__experimentalFontSize": true,
+		"fontSize": true,
 		"__experimentalLineHeight": true,
 		"__experimentalSelector": "p",
 		"__unstablePasteTextInline": true
