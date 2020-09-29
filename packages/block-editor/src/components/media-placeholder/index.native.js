@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Platform } from 'react-native';
 import { uniqWith } from 'lodash';
 
 /**
@@ -142,6 +142,7 @@ function MediaPlaceholder( props ) {
 		styles.emptyStateContainer,
 		styles.emptyStateContainerDark
 	);
+	const isIOS = Platform.OS === 'ios';
 
 	return (
 		<View style={ { flex: 1 } }>
@@ -153,6 +154,7 @@ function MediaPlaceholder( props ) {
 				}
 				multiple={ multiple }
 				isReplacingMedia={ false }
+				delayPickerOpening={ autoOpenMediaUpload && isIOS }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<TouchableWithoutFeedback

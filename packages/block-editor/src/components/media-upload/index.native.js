@@ -2,6 +2,7 @@
  * External dependencies
  */
 import React from 'react';
+import { delay } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -28,6 +29,8 @@ export const MEDIA_UPLOAD_CANCEL = `cancel_media_upload`;
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
 export const OPTION_TAKE_PHOTO_OR_VIDEO = __( 'Take a Photo or Video' );
+
+const PICKER_OPENING_DELAY = 200;
 
 export class MediaUpload extends React.Component {
 	constructor( props ) {
@@ -139,8 +142,16 @@ export class MediaUpload extends React.Component {
 	}
 
 	onPickerPresent() {
+		const { delayPickerOpening } = this.props;
 		if ( this.picker ) {
-			this.picker.presentPicker();
+			if ( delayPickerOpening ) {
+				delay(
+					() => this.picker.presentPicker(),
+					PICKER_OPENING_DELAY
+				);
+			} else {
+				this.picker.presentPicker();
+			}
 		}
 	}
 
