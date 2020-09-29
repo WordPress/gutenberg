@@ -53,6 +53,9 @@ class BottomSheet extends Component {
 		);
 
 		this.setIsFullScreen = this.setIsFullScreen.bind( this );
+		this.setIsChildrenScrollable = this.setIsChildrenScrollable.bind(
+			this
+		);
 
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
 		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
@@ -78,6 +81,7 @@ class BottomSheet extends Component {
 			handleHardwareButtonPress: null,
 			isMaxHeightSet: true,
 			isFullScreen: this.props.isFullScreen || false,
+			isChildrenScrollable: this.props.isChildrenScrollable || false,
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
@@ -253,6 +257,10 @@ class BottomSheet extends Component {
 		}
 	}
 
+	setIsChildrenScrollable( isChildrenScrollable ) {
+		this.setState( { isChildrenScrollable } );
+	}
+
 	onHardwareButtonPress() {
 		const { onClose } = this.props;
 		const { handleHardwareButtonPress } = this.state;
@@ -284,7 +292,6 @@ class BottomSheet extends Component {
 			contentStyle = {},
 			getStylesFromColorScheme,
 			onDismiss,
-			isChildrenScrollable,
 			children,
 			withHeaderSeparator = false,
 			...rest
@@ -298,6 +305,7 @@ class BottomSheet extends Component {
 			scrollEnabled,
 			isMaxHeightSet,
 			isFullScreen,
+			isChildrenScrollable,
 		} = this.state;
 
 		const panResponder = PanResponder.create( {
@@ -446,6 +454,8 @@ class BottomSheet extends Component {
 									.onHandleHardwareButtonPress,
 								listProps,
 								setIsFullScreen: this.setIsFullScreen,
+								setIsChildrenScrollable: this
+									.setIsChildrenScrollable,
 							} }
 						>
 							<View style={ { width: '100%' } }>
