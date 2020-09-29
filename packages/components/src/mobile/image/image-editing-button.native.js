@@ -7,7 +7,6 @@ import { TouchableWithoutFeedback, View } from 'react-native';
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -19,7 +18,7 @@ import styles from './style.scss';
 const ImageEditingButton = ( {
 	onSelectMediaUploadOption,
 	openMediaOptions,
-	onClearMedia,
+	pickerOptions,
 	url,
 } ) => {
 	return (
@@ -41,16 +40,7 @@ const ImageEditingButton = ( {
 					</View>
 				</TouchableWithoutFeedback>
 			) }
-			pickerOptions={ [
-				{
-					destructiveButton: true,
-					id: 'clearMedia',
-					label: __( 'Clear Media' ),
-					onPress: onClearMedia,
-					separated: true,
-					value: 'clearMedia',
-				},
-			] }
+			pickerOptions={ pickerOptions }
 		/>
 	);
 };
