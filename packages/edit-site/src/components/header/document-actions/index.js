@@ -31,13 +31,13 @@ function useSecondaryText() {
 			getSelectedBlock,
 			getBlockParentsByBlockName: _getBlockParentsByBlockName,
 			__unstableGetBlockWithoutInnerBlocks,
-			getHoveredBlockByBlockName,
+			__experimentalGetHoveredBlockByBlockName,
 		} = select( 'core/block-editor' );
 		return {
 			selectedBlock: getSelectedBlock(),
 			getBlockParentsByBlockName: _getBlockParentsByBlockName,
 			getBlockWithoutInnerBlocks: __unstableGetBlockWithoutInnerBlocks,
-			hoveredTemplatePartBlock: getHoveredBlockByBlockName(
+			hoveredTemplatePartBlock: __experimentalGetHoveredBlockByBlockName(
 				'core/template-part'
 			),
 		};

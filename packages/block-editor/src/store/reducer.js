@@ -1650,6 +1650,14 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning hovered blocks state.
+ *
+ * @param {Object} state  Current hovered blocks state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
 export function hoveredBlocks( state = { hoveredBlockIds: [] }, action ) {
 	switch ( action.type ) {
 		case 'SET_HOVERED_BLOCKS':

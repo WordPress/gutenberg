@@ -75,7 +75,7 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 				getSelectedBlocksInitialCaretPosition,
 				isMultiSelecting: _isMultiSelecting,
 				isNavigationMode: _isNavigationMode,
-				getHoveredBlocksTimeStamp: _getHoveredBlocksTimeStamp,
+				__experimentalGetHoveredBlocksTimeStamp: _getHoveredBlocksTimeStamp,
 				getSettings,
 			} = select( 'core/block-editor' );
 
@@ -96,9 +96,11 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 		[ isSelected ]
 	);
 
-	const { insertDefaultBlock, removeBlock, setHoveredBlocks } = useDispatch(
-		'core/block-editor'
-	);
+	const {
+		insertDefaultBlock,
+		removeBlock,
+		__experimentalSetHoveredBlocks: setHoveredBlocks,
+	} = useDispatch( 'core/block-editor' );
 	const [ isHovered, setHovered ] = useState( false );
 
 	// Provide the selected node, or the first and last nodes of a multi-

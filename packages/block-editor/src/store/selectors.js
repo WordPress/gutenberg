@@ -1799,17 +1799,44 @@ export function areInnerBlocksControlled( state, clientId ) {
 	return !! state.blocks.controlledInnerBlocks[ clientId ];
 }
 
-export function getHoveredBlocks( state ) {
+/**
+ * Returns an array of clientIds for hovered blocks set in full site editing.
+ * Block Ids set in FSE are ordered from child to parent.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string[]} Array of clientIds for hovered blocks.
+ */
+export function __experimentalGetHoveredBlocks( state ) {
 	return state.hoveredBlocks.hoveredBlockIds;
 }
 
-export function getHoveredBlockByBlockName( state, blockName ) {
-	const matchingBlockClientId = state.hoveredBlocks.hoveredBlockIds.find(
-		( blockId ) => getBlockName( state, blockId ) === blockName
-	);
-	return getBlock( state, matchingBlockClientId );
-}
+/**
+ * Returns the most interior hovered block of the given blockName (such as 'core/group').
+ *
+ * @param {Object} state     Global application state.
+ * @param {string} blockName Name of block type to return.
+ *
+ * @return {Object} Parsed block object.
+ */
+export const __experimentalGetHoveredBlockByBlockName = createSelector(
+	( state, blockName ) => {
+		const matchingBlockClientId = state.hoveredBlocks.hoveredBlockIds.find(
+			( blockId ) => getBlockName( state, blockId ) === blockName
+		);
+		return getBlock( state, matchingBlockClientId );
+	},
+	( state ) => [ state.hoveredBlocks.hoveredBlockIds, state.blocks.cache ]
+);
 
-export function getHoveredBlocksTimeStamp( state ) {
+/**
+ * Returns the timestamp corresponding to when hoveredBlocks were most recently set.
+ * This can be used to limit unnecessary evalutaions and dispatches of the action.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {number} Timestamp corresponding to when hoveredBlocks state was set.
+ */
+export function __experimentalGetHoveredBlocksTimeStamp( state ) {
 	return state.hoveredBlocks.eventTimeStamp;
 }
