@@ -19,7 +19,6 @@ import {
 	image,
 	video,
 	wordpress,
-	close,
 } from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
@@ -93,13 +92,6 @@ export class MediaUpload extends React.Component {
 			mediaLibrary: true,
 		};
 
-		const cancelMediaUpload = {
-			value: MEDIA_UPLOAD_CANCEL,
-			label: __( 'Cancel' ),
-			types: [ MEDIA_TYPE_IMAGE ],
-			icon: close,
-		};
-
 		const internalSources = [
 			deviceLibrarySource,
 			cameraImageSource,
@@ -107,9 +99,7 @@ export class MediaUpload extends React.Component {
 			siteLibrarySource,
 		];
 
-		return internalSources
-			.concat( this.state.otherMediaOptions )
-			.concat( cancelMediaUpload );
+		return internalSources.concat( this.state.otherMediaOptions );
 	}
 
 	getMediaOptionsItems() {
@@ -155,17 +145,7 @@ export class MediaUpload extends React.Component {
 	}
 
 	onPickerSelect( value ) {
-		const {
-			allowedTypes = [],
-			onSelect,
-			multiple = false,
-			onMediaUploadCanceled,
-		} = this.props;
-
-		if ( value === MEDIA_UPLOAD_CANCEL ) {
-			onMediaUploadCanceled();
-			return;
-		}
+		const { allowedTypes = [], onSelect, multiple = false } = this.props;
 
 		const mediaSource = this.getAllSources()
 			.filter( ( source ) => source.value === value )

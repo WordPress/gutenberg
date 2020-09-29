@@ -41,7 +41,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getProtocol } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import {
 	external,
 	link,
@@ -356,7 +356,6 @@ export class ImageEdit extends React.Component {
 			image,
 			imageSizes,
 			clientId,
-			onDelete,
 		} = this.props;
 		const {
 			align,
@@ -450,7 +449,6 @@ export class ImageEdit extends React.Component {
 						icon={ this.getPlaceholderIcon() }
 						onFocus={ this.props.onFocus }
 						autoOpenMediaUpload={ autoOpenMediaUpload }
-						onMediaUploadCanceled={ onDelete }
 					/>
 				</View>
 			);
@@ -570,13 +568,6 @@ export default compose( [
 		return {
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
-		};
-	} ),
-	withDispatch( ( dispatch, { clientId, rootClientId, onDelete } ) => {
-		const { removeBlock } = dispatch( 'core/block-editor' );
-		return {
-			onDelete:
-				onDelete || ( () => removeBlock( clientId, rootClientId ) ),
 		};
 	} ),
 	withPreferredColorScheme,
