@@ -31,19 +31,22 @@ const visitSiteEditor = async () => {
 	);
 };
 
-const openTemplateDropdown = async () => {
-	// Open the dropdown menu.
-	const templateDropdown =
-		'button.components-dropdown-menu__toggle[aria-label="Switch Template"]';
-	await page.click( templateDropdown );
-	await page.waitForSelector( '.edit-site-template-switcher__popover' );
+const openNavigation = async () => {
+	const isOpen = !! ( await page.$(
+		'.edit-site-navigation-toggle.is-open'
+	) );
+
+	if ( ! isOpen ) {
+		await page.click( '.edit-site-navigation-toggle__button' );
+		await page.waitForSelector( '.edit-site-navigation-panel' );
+	}
 };
 
 const getTemplateDropdownElement = async ( itemName ) => {
-	await openTemplateDropdown();
-	const [ item ] = await page.$x(
-		`//div[contains(@class, "edit-site-template-switcher__popover")]//button[contains(., "${ itemName }")]`
-	);
+	await openNavigation();
+	const selector = `//div[contains(@class, "edit-site-navigation-panel")]//button[contains(., "${ itemName }")]`;
+	await page.waitForXPath( selector );
+	const [ item ] = await page.$x( selector );
 	return item;
 };
 
