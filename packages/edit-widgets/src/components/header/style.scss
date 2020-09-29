@@ -4,6 +4,11 @@
 	justify-content: space-between;
 	height: $header-height;
 	padding: 0 $grid-unit-20;
+	overflow: auto;
+
+	@include break-small {
+		overflow: visible;
+	}
 }
 
 .edit-widgets-header__navigable-toolbar-wrapper {
