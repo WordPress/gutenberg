@@ -15,6 +15,17 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import { useExperimentalFeatures } from '../../experimental-features';
 
+const openNavigation = async () => {
+	const isOpen = !! ( await page.$(
+		'.edit-site-navigation-toggle.is-open'
+	) );
+
+	if ( ! isOpen ) {
+		await page.click( '.edit-site-navigation-toggle__button' );
+		await page.waitForSelector( '.edit-site-navigation-panel' );
+	}
+};
+
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
 	const checkedBoxSelector = '.components-checkbox-control__checked';
@@ -222,8 +233,6 @@ describe( 'Multi-entity save flow', () => {
 		const saveSiteSelector = '.edit-site-save-button__button';
 		const activeSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=false]`;
 		const disabledSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=true]`;
-		const templateDropdownSelector =
-			'.components-dropdown-menu__toggle[aria-label="Switch Template"]';
 		const saveA11ySelector = '.edit-site-editor__toggle-save-panel-button';
 
 		it( 'Should be enabled after edits', async () => {
@@ -234,7 +243,7 @@ describe( 'Multi-entity save flow', () => {
 			await visitAdminPage( 'admin.php', query );
 
 			// Ensure we are on 'front-page' demo template.
-			await page.click( templateDropdownSelector );
+			await openNavigation();
 			const demoTemplateButton = await page.waitForXPath(
 				demoTemplateSelector
 			);
