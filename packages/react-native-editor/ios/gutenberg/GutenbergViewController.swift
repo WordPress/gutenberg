@@ -352,13 +352,13 @@ extension GutenbergViewController {
             title: "Toggle Missing Block Alert UI",
             style: .default,
             handler: { [unowned self] action in
-                if unsupportedBlockEnabled || (unsupportedBlockEnabled == unsupportedBlockCanBeActivated) {
-                    unsupportedBlockEnabled.toggle()
+                if self.unsupportedBlockEnabled || (self.unsupportedBlockEnabled == self.unsupportedBlockCanBeActivated) {
+                    self.unsupportedBlockEnabled.toggle()
                 }
-                if !unsupportedBlockEnabled || unsupportedBlockCanBeActivated {
-                    unsupportedBlockCanBeActivated.toggle()
+                if !self.unsupportedBlockEnabled || self.unsupportedBlockCanBeActivated {
+                    self.unsupportedBlockCanBeActivated.toggle()
                 }
-                gutenberg.updateCapabilities()
+                self.gutenberg.updateCapabilities()
         })
     }
     
