@@ -39,22 +39,29 @@ import getColorAndStyleProps from './color-props';
 const NEW_TAB_REL = 'noreferrer noopener';
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
-const INITIAL_BORDER_RADIUS_POSITION = 5;
 
 const EMPTY_ARRAY = [];
 
-function BorderPanel( { borderRadius = '', setAttributes } ) {
-	const initialBorderRadius = borderRadius;
-	const setBorderRadius = useCallback(
-		( newBorderRadius ) => {
-			if ( newBorderRadius === undefined )
-				setAttributes( {
-					borderRadius: initialBorderRadius,
-				} );
-			else setAttributes( { borderRadius: newBorderRadius } );
-		},
-		[ setAttributes ]
+let computedBorderRadius;
+document.addEventListener( 'readystatechange', () => {
+	// returns early until styles are loaded
+	if ( document.readyState !== 'complete' ) return;
+	const sample = document.createElement( 'a' );
+	sample.className = 'wp-block-button__link';
+	const wrapper = document.createElement( 'div' );
+	wrapper.className = 'editor-styles-wrapper';
+	wrapper.hidden = true;
+	wrapper.appendChild( sample );
+	document.body.appendChild( wrapper );
+	computedBorderRadius = parseFloat(
+		window.getComputedStyle( sample ).getPropertyValue( 'border-radius' )
 	);
+	document.body.removeChild( wrapper );
+} );
+
+function BorderPanel( { borderRadius = '', setAttributes } ) {
+	const setBorderRadius = ( value ) =>
+		setAttributes( { borderRadius: value } );
 	return (
 		<PanelBody title={ __( 'Border settings' ) }>
 			<RangeControl
@@ -62,7 +69,7 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 				label={ __( 'Border radius' ) }
 				min={ MIN_BORDER_RADIUS_VALUE }
 				max={ MAX_BORDER_RADIUS_VALUE }
-				initialPosition={ INITIAL_BORDER_RADIUS_POSITION }
+				initialPosition={ computedBorderRadius }
 				allowReset
 				onChange={ setBorderRadius }
 			/>
