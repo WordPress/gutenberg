@@ -35,28 +35,26 @@ function EditTitle( { getStylesFromColorScheme, title } ) {
 	);
 
 	return (
-		<>
-			<View style={ styles.titleContainer }>
-				<View style={ styles.lockIconContainer }>
-					<Icon
-						label={ __( 'Lock icon' ) }
-						icon={ lock }
-						size={ 16 }
-						style={ lockIconStyle }
-					/>
-				</View>
-				<Text style={ titleStyle }>{ title }</Text>
-				<View style={ styles.helpIconContainer }>
-					<Icon
-						label={ __( 'Help icon' ) }
-						icon={ help }
-						size={ 20 }
-						style={ infoIconStyle }
-					/>
-				</View>
+		<View style={ styles.titleContainer }>
+			<View style={ styles.lockIconContainer }>
+				<Icon
+					label={ __( 'Lock icon' ) }
+					icon={ lock }
+					size={ 16 }
+					style={ lockIconStyle }
+				/>
+			</View>
+			<Text style={ titleStyle }>{ title }</Text>
+			<View style={ styles.helpIconContainer }>
+				<Icon
+					label={ __( 'Help icon' ) }
+					icon={ help }
+					size={ 20 }
+					style={ infoIconStyle }
+				/>
 			</View>
 			<View style={ separatorStyle } />
-		</>
+		</View>
 	);
 }
 
