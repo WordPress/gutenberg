@@ -157,7 +157,6 @@ export class MediaUpload extends React.Component {
 
 	onPickerSelect( value ) {
 		const { allowedTypes = [], onSelect, multiple = false } = this.props;
-
 		const mediaSource = this.getAllSources()
 			.filter( ( source ) => source.value === value )
 			.shift();
