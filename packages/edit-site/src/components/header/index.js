@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	BlockNavigationDropdown,
@@ -75,14 +74,6 @@ export default function Header( {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setPage,
 	} = useDispatch( 'core/edit-site' );
-
-	useEffect( () => {
-		if ( isNavigationOpen ) {
-			document.body.classList.add( 'is-navigation-sidebar-open' );
-		} else {
-			document.body.classList.remove( 'is-navigation-sidebar-open' );
-		}
-	}, [ isNavigationOpen ] );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const displayBlockToolbar =
