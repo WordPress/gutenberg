@@ -70,7 +70,7 @@ export function PanelBody(
 				title={ title }
 			/>
 			{ typeof children === 'function'
-				? children( { isOpened } )
+				? children( { opened: isOpened } )
 				: isOpened && children }
 		</div>
 	);

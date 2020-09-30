@@ -35,12 +35,11 @@ export default function WidgetAreaEdit( {
 				onToggle={ () => {
 					setIsWidgetAreaOpen( clientId, ! isOpen );
 				} }
-				isVisuallyHidden
 			>
-				{ ( { isOpened } ) => (
+				{ ( { opened } ) => (
 					// This is required to ensure LegacyWidget blocks are not unmounted when the panel is collapsed.
 					// Unmounting legacy widgets may have unintended consequences (e.g. TinyMCE not being properly reinitialized)
-					<DisclosureContent visible={ isOpened }>
+					<DisclosureContent visible={ opened }>
 						<EntityProvider
 							kind="root"
 							type="postType"
