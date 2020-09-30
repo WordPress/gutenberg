@@ -86,7 +86,12 @@ const BlockNavigationBlockSelectButton = ( {
 			'is-dropping-after': isDroppingAfter,
 			'is-dropping-to-inner-blocks': isDroppingToInnerBlocks,
 		} );
-	}, [ isDroppingBefore, isDroppingAfter, isDroppingToInnerBlocks ] );
+	}, [
+		isDroppingBefore,
+		isDroppingAfter,
+		isDroppingToInnerBlocks,
+		isBlockMoveTarget,
+	] );
 
 	const clientIds = useMemo( () => [ clientId ], [ clientId ] );
 	const instanceId = useInstanceId( BlockNavigationBlockSelectButton );
