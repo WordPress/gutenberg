@@ -11,9 +11,14 @@
 		align-items: center;
 	}
 
+	&.has-no-secondary-label {
+		animation: titleSlideDown 0.2s;
+		transform: translateY(0);
+	}
+
 	&.has-secondary-label {
 		.edit-site-document-actions__title {
-			animation: titleAnimation 0.2s;
+			animation: titleSlideUp 0.2s;
 			color: $gray-900;
 			font-weight: bold;
 			transform: translateY(-12px);
@@ -25,7 +30,7 @@
 		}
 
 		.edit-site-document-actions__secondary-item {
-			animation: secondaryTitleAnimation 0.2s;
+			animation: secondaryTitleSlideUpAndFadeIn 0.2s;
 			color: $gray-700;
 			font-weight: normal;
 			position: absolute;
@@ -39,7 +44,7 @@
 	}
 }
 
-@keyframes titleAnimation {
+@keyframes titleSlideUp {
 	from {
 		transform: translateY(0);
 	}
@@ -48,7 +53,16 @@
 	}
 }
 
-@keyframes secondaryTitleAnimation {
+@keyframes titleSlideDown {
+	from {
+		transform: translateY(-12px);
+	}
+	to {
+		transform: translateY(-0);
+	}
+}
+
+@keyframes secondaryTitleSlideUpAndFadeIn {
 	from {
 		opacity: 0;
 		transform: translateY(20px);
