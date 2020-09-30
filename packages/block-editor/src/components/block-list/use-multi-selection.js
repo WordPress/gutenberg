@@ -218,6 +218,9 @@ export default function useMultiSelection( ref ) {
 			'selectionchange',
 			onSelectionChange
 		);
+
+		if ( ! defaultView ) return;
+
 		// Equivalent to attaching the listener once.
 		defaultView.removeEventListener( 'mouseup', onSelectionEnd );
 		// The browser selection won't have updated yet at this point, so wait
@@ -237,6 +240,9 @@ export default function useMultiSelection( ref ) {
 				'selectionchange',
 				onSelectionChange
 			);
+
+			if ( ! defaultView ) return;
+
 			defaultView.removeEventListener( 'mouseup', onSelectionEnd );
 			defaultView.cancelAnimationFrame( rafId.current );
 		},
