@@ -9,12 +9,22 @@
  * Register legacy widget block.
  */
 function register_block_core_legacy_widget() {
-	register_block_type_from_metadata(
+	$block_type     = register_block_type_from_metadata(
 		__DIR__ . '/legacy-widget',
 		array(
 			'render_callback' => 'render_block_core_legacy_widget',
 		)
 	);
+	$settings       = gutenberg_get_legacy_widget_settings();
+	$legacy_widgets = $settings['availableLegacyWidgets'];
+	foreach ( $legacy_widgets as $widget_id => $legacy_widget ) {
+		if ( ! $legacy_widget['isReferenceWidget'] ) {
+			continue;
+		}
+		$legacy_block       = clone $block_type;
+		$legacy_block->name = $legacy_widget['blockName'];
+		WP_Block_Type_Registry::get_instance()->register( $legacy_block );
+	}
 }
 
 /**

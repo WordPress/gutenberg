@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pickBy, isEmpty, map } from 'lodash';
+import { isEmpty, map, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { SelectControl, Placeholder } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 import { brush } from '@wordpress/icons';
+import { useSelect } from '@wordpress/data';
 
 export default function LegacyWidgetPlaceholder( {
 	availableLegacyWidgets,
@@ -18,10 +19,36 @@ export default function LegacyWidgetPlaceholder( {
 	hasPermissionsToManageWidgets,
 	onChangeWidget,
 } ) {
-	const visibleLegacyWidgets = useMemo(
-		() => pickBy( availableLegacyWidgets, ( { isHidden } ) => ! isHidden ),
-		[ availableLegacyWidgets ]
+	const blocksByClientId = useSelect( ( select ) =>
+		select( 'core/block-editor' ).getBlocksByClientId(
+			select( 'core/block-editor' ).getClientIdsWithDescendants()
+		)
 	);
+
+	const visibleLegacyWidgets = useMemo( () => {
+		const visible = {};
+		for ( const widgetName in availableLegacyWidgets ) {
+			const {
+				isReferenceWidget,
+				blockName,
+				isHidden,
+			} = availableLegacyWidgets[ widgetName ];
+			if ( isHidden ) {
+				continue;
+			}
+			if ( isReferenceWidget ) {
+				const blockExists = some( blocksByClientId, {
+					name: blockName,
+				} );
+				if ( blockExists ) {
+					continue;
+				}
+			}
+			visible[ widgetName ] = availableLegacyWidgets[ widgetName ];
+		}
+		return visible;
+	}, [ availableLegacyWidgets, blocksByClientId ] );
+
 	let placeholderContent;
 	if ( ! hasPermissionsToManageWidgets ) {
 		placeholderContent = __(

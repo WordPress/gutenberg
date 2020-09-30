@@ -6,10 +6,11 @@ import { get, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { createBlock } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
 import { Button, PanelBody, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { withSelect } from '@wordpress/data';
+import { useDispatch, withSelect } from '@wordpress/data';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
 import { update } from '@wordpress/icons';
 
@@ -23,6 +24,7 @@ import WidgetPreview from './widget-preview';
 function LegacyWidgetEdit( {
 	attributes,
 	availableLegacyWidgets,
+	clientId,
 	hasPermissionsToManageWidgets,
 	prerenderedEditForm,
 	setAttributes,
@@ -33,6 +35,7 @@ function LegacyWidgetEdit( {
 	const [ hasEditForm, setHasEditForm ] = useState( true );
 	const [ isPreview, setIsPreview ] = useState( false );
 	const shouldHidePreview = ! isPreview && hasEditForm;
+	const { replaceBlocks } = useDispatch( 'core/block-editor' );
 
 	function changeWidget() {
 		switchToEdit();
@@ -59,26 +62,8 @@ function LegacyWidgetEdit( {
 				availableLegacyWidgets={ availableLegacyWidgets }
 				hasPermissionsToManageWidgets={ hasPermissionsToManageWidgets }
 				onChangeWidget={ ( newWidget ) => {
-					const {
-						isReferenceWidget,
-						id_base: idBase,
-					} = availableLegacyWidgets[ newWidget ];
-
-					if ( isReferenceWidget ) {
-						setAttributes( {
-							instance: {},
-							idBase,
-							referenceWidgetName: newWidget,
-							widgetClass: undefined,
-						} );
-					} else {
-						setAttributes( {
-							instance: {},
-							idBase,
-							referenceWidgetName: undefined,
-							widgetClass: newWidget,
-						} );
-					}
+					const { blockName } = availableLegacyWidgets[ newWidget ];
+					replaceBlocks( clientId, createBlock( blockName, {} ) );
 				} }
 			/>
 		);

@@ -174,6 +174,7 @@ function gutenberg_get_legacy_widget_settings() {
 					null,
 				'isReferenceWidget' => false,
 				'isHidden'          => in_array( $class, $widgets_to_exclude_from_legacy_widget_block, true ),
+				'blockName'         => 'core/legacy-widget',
 			);
 		}
 	}
@@ -195,6 +196,7 @@ function gutenberg_get_legacy_widget_settings() {
 				'name'              => html_entity_decode( $widget_obj['name'] ),
 				'description'       => html_entity_decode( wp_widget_description( $widget_id ) ),
 				'isReferenceWidget' => true,
+				'blockName'         => 'core/legacy-widget-' . preg_replace( '#[^a-zA-Z0-9-]#', '-', $widget_id ),
 			);
 		}
 	}
@@ -288,4 +290,3 @@ function change_post_template_to_widget_preview( $template ) {
 	return $template;
 }
 add_filter( 'template_include', 'change_post_template_to_widget_preview' );
-

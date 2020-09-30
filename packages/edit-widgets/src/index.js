@@ -17,7 +17,7 @@ import {
  */
 import './store';
 import './hooks';
-import { create as createLegacyWidget } from './blocks/legacy-widget';
+import { create as createLegacyWidgetBlocks } from './blocks/legacy-widget';
 import * as widgetArea from './blocks/widget-area';
 import EditWidgetsInitializer from './components/edit-widgets-initializer';
 
@@ -31,7 +31,8 @@ export function initialize( id, settings ) {
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
-		registerBlock( createLegacyWidget( settings ) );
+		const blocks = createLegacyWidgetBlocks( settings );
+		blocks.forEach( registerBlock );
 		registerBlock( widgetArea );
 	}
 	render(
