@@ -15,11 +15,40 @@ import { dispatch, select, getWidgetToClientIdMapping } from './controls';
 import { transformBlockToWidget } from './transformers';
 import {
 	buildWidgetAreaPostId,
+	buildWidgetAreasPostId,
 	buildWidgetAreasQuery,
+	createStubPost,
 	KIND,
 	POST_TYPE,
 	WIDGET_AREA_ENTITY_TYPE,
 } from './utils';
+
+/**
+ * Initializes the stub post before rendering the widgets editor.
+ * Required in order to ensure the data layer won't try to resolve the stub post.
+ *
+ * @access private
+ */
+export function* initializeState() {
+	yield persistStubPost( buildWidgetAreasPostId(), [] );
+}
+
+export const persistStubPost = function* ( id, blocks ) {
+	const stubPost = createStubPost( id, blocks );
+	const args = [ KIND, POST_TYPE, id ];
+	yield dispatch( 'core', 'startResolution', 'getEntityRecord', args );
+	yield dispatch(
+		'core',
+		'receiveEntityRecords',
+		KIND,
+		POST_TYPE,
+		stubPost,
+		{ id: stubPost.id },
+		false
+	);
+	yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
+	return stubPost;
+};
 
 export function* saveEditedWidgetAreas() {
 	const editedWidgetAreas = yield select(
