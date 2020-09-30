@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { DisclosureContent } from 'reakit/Disclosure';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -26,37 +31,26 @@ export default function WidgetAreaEdit( {
 		<Panel className={ className }>
 			<PanelBody
 				title={ name }
-				// This workaround is required to ensure LegacyWidget blocks are not unmounted when the panel is collapsed.
-				// Unmounting legacy widgets may have unintended consequences (e.g. TinyMCE not being properly reinitialized)
-				opened={ true }
+				opened={ isOpen }
 				onToggle={ () => {
 					setIsWidgetAreaOpen( clientId, ! isOpen );
 				} }
-				className={ isOpen ? 'widget-area-is-opened' : '' }
+				isVisuallyHidden
 			>
-				<EntityProvider
-					kind="root"
-					type="postType"
-					id={ `widget-area-${ id }` }
-				>
-					<InnerBlocksContainer isOpen={ isOpen } />
-				</EntityProvider>
+				{ ( { isOpened } ) => (
+					// This is required to ensure LegacyWidget blocks are not unmounted when the panel is collapsed.
+					// Unmounting legacy widgets may have unintended consequences (e.g. TinyMCE not being properly reinitialized)
+					<DisclosureContent visible={ isOpened }>
+						<EntityProvider
+							kind="root"
+							type="postType"
+							id={ `widget-area-${ id }` }
+						>
+							<WidgetAreaInnerBlocks />
+						</EntityProvider>
+					</DisclosureContent>
+				) }
 			</PanelBody>
 		</Panel>
-	);
-}
-
-function InnerBlocksContainer( { isOpen } ) {
-	const props = isOpen
-		? {}
-		: {
-				hidden: true,
-				'aria-hidden': true,
-				style: { display: 'none' },
-		  };
-	return (
-		<div { ...props }>
-			<WidgetAreaInnerBlocks />
-		</div>
 	);
 }
