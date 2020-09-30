@@ -24,7 +24,7 @@
 		},
 		"linkTarget": {
 			"type": "string",
-			"default": "_self"
+			"default": "_blank"
 		}
 	},
 	"supports": {
