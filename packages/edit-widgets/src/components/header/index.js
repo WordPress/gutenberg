@@ -25,6 +25,7 @@ import useLastSelectedRootId from '../../hooks/use-last-selected-root-id';
 function Header() {
 	const inserterButton = useRef();
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const rootClientId = useLastSelectedRootId();
 	const isLastSelectedWidgetAreaOpen = useSelect(
 		( select ) =>
 			select( 'core/edit-widgets' ).getIsWidgetAreaOpen( rootClientId ),
@@ -37,7 +38,6 @@ function Header() {
 		'core/edit-widgets'
 	);
 	const { selectBlock } = useDispatch( 'core/block-editor' );
-	const rootClientId = useLastSelectedRootId();
 	const handleClick = () => {
 		if ( isInserterOpened ) {
 			// Focusing the inserter button closes the inserter popover
