@@ -4,6 +4,11 @@
 import { isFunction } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
+/**
  * Internal dependencies
  */
 import {
@@ -28,9 +33,14 @@ function Animate( { type, options = {}, children } ) {
 		const { origin = 'top' } = options;
 		const [ yAxis, xAxis = 'center' ] = origin.split( ' ' );
 
+		if ( yAxis === 'middle' ) {
+			deprecated( 'Using "middle" for the y-axis value of origin', {
+				alternative: 'center',
+			} );
+		}
+
 		return (
 			<AppearingWrapper
-				// @todo(saramarcondes) deprecate "middle"
 				yAxis={ yAxis === 'middle' ? 'center' : yAxis }
 				xAxis={ xAxis }
 			>

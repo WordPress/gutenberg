@@ -30,6 +30,9 @@ export const appearTopRight = () => <Appear origin="top right" />;
 export const appearBottomLeft = () => <Appear origin="bottom left" />;
 export const appearBottomRight = () => <Appear origin="bottom right" />;
 export const appearCenterCenter = () => <Appear origin="center center" />;
+export const deprecatedAppearMiddleCenter = () => (
+	<Appear origin="middle center" />
+);
 
 export const loading = () => (
 	<Animate type="loading">
