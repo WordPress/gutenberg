@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import {
@@ -9,6 +10,7 @@ import {
 	__experimentalNavigationGroup as NavigationGroup,
 } from '@wordpress/components';
 import { plus, undo } from '@wordpress/icons';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Internal dependencies
@@ -23,6 +25,7 @@ const TEMPLATE_OVERRIDES = {
 };
 
 const GENERAL_TEMPLATE_SLUGS = [
+	'front-page',
 	'archive',
 	'single',
 	'singular',
@@ -38,7 +41,17 @@ export default function TemplatesMenu( {
 	onAddTemplate,
 	onRemoveTemplate,
 } ) {
-	const { currentTemplate, templates } = useSelect(
+	const [ templateFiles, setTemplateFiles ] = useState( null );
+
+	useEffect( () => {
+		apiFetch( {
+			path: '/__experimental/edit-site/v1/page-templates',
+		} ).then( ( res ) => {
+			setTemplateFiles( res );
+		} );
+	}, [] );
+
+	const { currentTemplate, templateEntities } = useSelect(
 		( select ) => {
 			const { getEntityRecord, getEntityRecords } = select( 'core' );
 
@@ -48,11 +61,23 @@ export default function TemplatesMenu( {
 					'wp_template',
 					activeId
 				),
-				templates: getEntityRecords( 'postType', 'wp_template' ),
+				templateEntities: getEntityRecords( 'postType', 'wp_template' ),
 			};
 		},
 		[ activeId ]
 	);
+
+	const templates = [
+		...( templateFiles || [] )
+			.filter(
+				( slug ) =>
+					! templateEntities?.find(
+						( entity ) => slug === entity.slug
+					)
+			)
+			.map( ( slug ) => ( { id: slug, slug } ) ),
+		...( templateEntities || [] ),
+	];
 
 	const overwriteSlug =
 		page &&
@@ -82,7 +107,7 @@ export default function TemplatesMenu( {
 			{ generalTemplates?.map( ( template ) => (
 				<NavigationItemWithIcon
 					key={ `template-${ template.id }` }
-					item={ `template-${ template.id }` }
+					item={ `template-${ template.slug }` }
 					title={ template.slug }
 					onClick={ () => onActiveIdChange( template.id ) }
 				/>

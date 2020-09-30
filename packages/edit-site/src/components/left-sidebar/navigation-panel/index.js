@@ -27,6 +27,7 @@ const NavigationPanel = () => {
 
 	const { templateId, templatePartId, templateType, page } = useSelect(
 		( select ) => {
+			const { getEntityRecord } = select( 'core' );
 			const {
 				getTemplateId,
 				getTemplatePartId,
@@ -34,14 +35,33 @@ const NavigationPanel = () => {
 				getPage,
 			} = select( 'core/edit-site' );
 
+			const _templateId = getTemplateId();
 			return {
-				templateId: getTemplateId(),
+				template: getEntityRecord(
+					'postType',
+					'wp_template',
+					templateId
+				),
+				templateId: _templateId,
 				templatePartId: getTemplatePartId(),
 				templateType: getTemplateType(),
 				page: getPage(),
 			};
 		},
 		[]
+	);
+
+	const { template } = useSelect(
+		( select ) => {
+			return {
+				template: select( 'core' ).getEntityRecord(
+					'postType',
+					'wp_template',
+					templateId
+				),
+			};
+		},
+		[ templateId ]
 	);
 
 	const {
@@ -56,7 +76,7 @@ const NavigationPanel = () => {
 			<Navigation
 				activeItem={
 					'wp_template' === templateType
-						? `template-${ templateId }`
+						? `template-${ template?.slug }`
 						: `template-part-${ templatePartId }`
 				}
 				onActivateMenu={ setActiveMenu }

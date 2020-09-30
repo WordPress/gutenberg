@@ -43,7 +43,25 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
  *
  * @return {Object} Action object.
  */
-export function setTemplate( templateId ) {
+export function* setTemplate( templateId ) {
+	if ( Number.isNaN( Number( templateId ) ) ) {
+		templateId = yield apiFetch( {
+			path:
+				'/__experimental/edit-site/v1/edit-page-template?wp_template=' +
+				templateId,
+		} );
+
+		templateId = templateId.ID;
+
+		yield dispatch(
+			'core/data',
+			'invalidateResolution',
+			'core',
+			'getEntityRecords',
+			[ 'postType', 'wp_template' ]
+		);
+	}
+
 	return {
 		type: 'SET_TEMPLATE',
 		templateId,

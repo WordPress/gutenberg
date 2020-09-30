@@ -34,7 +34,7 @@ export default function TemplatesPagesMenu( { templates, onActiveIdChange } ) {
 				{ specificPageTemplates?.map( ( template ) => (
 					<TemplateNavigationItemWithIcon
 						key={ `template-${ template.id }` }
-						item={ `template-${ template.id }` }
+						item={ `template-${ template.slug }` }
 						title={ template.slug }
 						onClick={ () => onActiveIdChange( template.id ) }
 					/>
@@ -46,7 +46,7 @@ export default function TemplatesPagesMenu( { templates, onActiveIdChange } ) {
 					{ [ defaultTemplate ].map( ( template ) => (
 						<TemplateNavigationItemWithIcon
 							key={ `template-${ template.id }` }
-							item={ `template-${ template.id }` }
+							item={ `template-${ template.slug }` }
 							title={ template.slug }
 							onClick={ () => onActiveIdChange( template.id ) }
 						/>
