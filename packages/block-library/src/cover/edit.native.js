@@ -455,19 +455,26 @@ const Cover = ( {
 					onFocus={ onFocus }
 				>
 					<View style={ styles.colorPaletteWrapper }>
-						<ColorPalette
-							customColorIndicatorStyles={
-								styles.paletteColorIndicator
-							}
-							customIndicatorWrapperStyles={
-								styles.paletteCustomIndicatorWrapper
-							}
-							setColor={ setColor }
-							onCustomPress={ openColorPicker }
-							defaultSettings={ coverDefaultPalette }
-							shouldShowCustomLabel={ false }
-							shouldShowCustomVerticalSeparator={ false }
-						/>
+						<BottomSheetConsumer>
+							{ ( { shouldEnableBottomSheetScroll } ) => (
+								<ColorPalette
+									customColorIndicatorStyles={
+										styles.paletteColorIndicator
+									}
+									customIndicatorWrapperStyles={
+										styles.paletteCustomIndicatorWrapper
+									}
+									setColor={ setColor }
+									onCustomPress={ openColorPicker }
+									defaultSettings={ coverDefaultPalette }
+									shouldShowCustomLabel={ false }
+									shouldShowCustomVerticalSeparator={ false }
+									shouldEnableBottomSheetScroll={
+										shouldEnableBottomSheetScroll
+									}
+								/>
+							) }
+						</BottomSheetConsumer>
 					</View>
 				</MediaPlaceholder>
 			</View>
