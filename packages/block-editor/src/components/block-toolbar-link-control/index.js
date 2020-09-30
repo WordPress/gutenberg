@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 
@@ -9,8 +9,8 @@ import { useCallback, useMemo, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import BlockToolbarInlineEdit from '../block-toolbar-inline-edit';
-import SettingsToolbarItem from './settings-toolbar-item';
-import LinkInputToolbarItem from './link-input-toolbar-item';
+import SearchInput from './search-input';
+import SettingsMenu from './settings-menu';
 import computeDisplayUrl from './compute-display-url';
 import ToolbarLinkControlContext from './context';
 
@@ -72,19 +72,9 @@ export default function ToolbarLinkControl( {
 	return (
 		<BlockToolbarInlineEdit.Fill onClose={ close }>
 			<ToolbarLinkControlContext.Provider value={ contextValue }>
-				<ToolbarGroup>
-					<LinkInputToolbarItem />
-					<SettingsToolbarItem />
-				</ToolbarGroup>
-				<ToolbarGroup>
-					<ToolbarButton
-						name="done"
-						title={ __( 'Done' ) }
-						onClick={ close }
-					>
-						Done
-					</ToolbarButton>
-				</ToolbarGroup>
+				<SearchInput />
+				<SettingsMenu />
+				<Button onClick={ close }>{ __( 'Done' ) }</Button>
 			</ToolbarLinkControlContext.Provider>
 		</BlockToolbarInlineEdit.Fill>
 	);
