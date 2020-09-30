@@ -3,6 +3,7 @@
  */
 import triggerFetch from '@wordpress/api-fetch';
 import { controls as dataControls } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Dispatches a control action for triggering an api fetch call.
@@ -23,30 +24,54 @@ import { controls as dataControls } from '@wordpress/data';
  *
  * @return {Object} The control descriptor.
  */
-export const apiFetch = ( request ) => {
+export function apiFetch( request ) {
 	return {
 		type: 'API_FETCH',
 		request,
 	};
-};
+}
 
 /**
  * Control for resolving a selector in a registered data store.
  * Alias for the `resolveSelect` built-in control in the `@wordpress/data` package.
+ *
+ * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
  */
-export const select = dataControls.resolveSelect;
+export function select( ...args ) {
+	deprecated( '`select` control in `@wordpress/data-controls`', {
+		alternative: 'built-in `resolveSelect` control in `@wordpress/data`',
+	} );
+
+	return dataControls.resolveSelect( ...args );
+}
 
 /**
  * Control for calling a selector in a registered data store.
  * Alias for the `select` built-in control in the `@wordpress/data` package.
+ *
+ * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
  */
-export const syncSelect = dataControls.select;
+export function syncSelect( ...args ) {
+	deprecated( '`syncSelect` control in `@wordpress/data-controls`', {
+		alternative: 'built-in `select` control in `@wordpress/data`',
+	} );
+
+	return dataControls.select( ...args );
+}
 
 /**
  * Control for dispatching an action in a registered data store.
  * Alias for the `dispatch` control in the `@wordpress/data` package.
+ *
+ * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
  */
-export const dispatch = dataControls.dispatch;
+export function dispatch( ...args ) {
+	deprecated( '`dispatch` control in `@wordpress/data-controls`', {
+		alternative: 'built-in `dispatch` control in `@wordpress/data`',
+	} );
+
+	return dataControls.dispatch( ...args );
+}
 
 /**
  * The default export is what you use to register the controls with your custom
