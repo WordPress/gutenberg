@@ -89,6 +89,16 @@ function get_template_hierarchy( $template_type ) {
 function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
 	global $_wp_current_template_content;
 
+	if ( isset( $_GET['_wp-find-template'] ) ) {
+		if ( ! empty( $_GET['_wp-find-template-type'] ) ) {
+			$type = $_GET['_wp-find-template-type'];
+		}
+
+		if ( ! empty( $_GET['_wp-find-template-templates'] ) ) {
+			$templates = $_GET['_wp-find-template-templates'];
+		}
+	}
+
 	$current_template = gutenberg_find_template_post_and_parts( $type, $templates );
 
 	if ( $current_template ) {

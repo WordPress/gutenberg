@@ -45,13 +45,7 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
  */
 export function* setTemplate( templateId ) {
 	if ( Number.isNaN( Number( templateId ) ) ) {
-		templateId = yield apiFetch( {
-			path:
-				'/__experimental/edit-site/v1/edit-page-template?wp_template=' +
-				templateId,
-		} );
-
-		templateId = templateId.ID;
+		templateId = yield findTemplate( '', templateId, [ templateId ] );
 
 		yield dispatch(
 			'core/data',

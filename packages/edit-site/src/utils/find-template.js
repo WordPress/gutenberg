@@ -16,10 +16,17 @@ const { fetch } = window;
  *
  * @return {number} The found template ID.
  */
-export default async function findTemplate( path, getEntityRecords ) {
+export default async function findTemplate(
+	path,
+	type,
+	templates,
+	getEntityRecords
+) {
 	const { data } = await fetch(
 		addQueryArgs( findTemplate.siteUrl + path, {
 			'_wp-find-template': true,
+			'_wp-find-template-type': type,
+			'_wp-find-template-templates': templates,
 		} )
 	).then( ( res ) => res.json() );
 

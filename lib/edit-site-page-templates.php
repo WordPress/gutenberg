@@ -29,17 +29,6 @@ function gutenberg_edit_site_get_page_templates() {
 	return $slugs;
 }
 
-function gutenberg_edit_site_edit_page_template() {
-	$slug    = $_GET['wp_template'];
-	$current = gutenberg_find_template_post_and_parts( $slug, array( $slug ) );
-
-	if ( $current !== null && $current['template_post']->post_name === $slug ) {
-		return $current['template_post'];
-	}
-
-	return null;
-}
-
 add_action(
 	'rest_api_init',
 	function () {
@@ -56,21 +45,3 @@ add_action(
 		);
 	}
 );
-
-add_action(
-	'rest_api_init',
-	function () {
-		register_rest_route(
-			'__experimental/edit-site/v1',
-			'/edit-page-template',
-			array(
-				'methods'             => 'GET',
-				'callback'            => 'gutenberg_edit_site_edit_page_template',
-				'permission_callback' => function () {
-					return current_user_can( 'edit_theme_options' );
-				},
-			)
-		);
-	}
-);
-
