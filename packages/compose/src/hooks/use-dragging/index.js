@@ -12,6 +12,21 @@ import {
 const useIsomorphicLayoutEffect =
 	typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
+/**
+ * @template {Array<any>} T
+ * @typedef {(...args: T) => void} OnDragStart
+ */
+/** @typedef {(e: MouseEvent) => void} OnDragMove */
+/**
+ * @template {Array<any>} T
+ * @typedef {} OnDragEnd
+ */
+
+/**
+ * @template {Array<any>} StartArgs
+ * @template {Array<any>} EndArgs
+ * @param {{onDragStart: OnDragStart<StartArgs>, onDragMove: OnDragMove,  onDragEnd: OnDragEnd<EndArgs>}} _
+ */
 export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 	const [ isDragging, setIsDragging ] = useState( false );
 
@@ -40,6 +55,7 @@ export default function useDragging( { onDragStart, onDragMove, onDragEnd } ) {
 		document.removeEventListener( 'mouseup', endDrag );
 		setIsDragging( false );
 	}, [] );
+	/** @type {(...args: StartArgs) => void}  */
 	const startDrag = useCallback( ( ...args ) => {
 		if ( eventsRef.current.onDragStart ) {
 			eventsRef.current.onDragStart( ...args );
