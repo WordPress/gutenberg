@@ -30,43 +30,14 @@ function gutenberg_edit_site_get_page_templates() {
 }
 
 function gutenberg_edit_site_edit_page_template() {
-	$current_template_post = gutenberg_find_template_post_and_parts( $_GET['wp_template'] );
+	$slug    = $_GET['wp_template'];
+	$current = gutenberg_find_template_post_and_parts( $slug, array( $slug ) );
 
-	if ( $current_template_post->post_name === $_GET['wp_template'] ) {
-		return $current_template_post;
+	if ( $current !== null && $current['template_post']->post_name === $slug ) {
+		return $current['template_post'];
 	}
 
-	$template_query        = new WP_Query(
-		array(
-			'post_type'      => 'wp_template',
-			'post_status'    => 'auto-draft',
-			'name'           => $post_name,
-			'posts_per_page' => 1,
-			'no_found_rows'  => true,
-		)
-	);
-	$current_template_post = $template_query->have_posts() ? $template_query->next_post() : null;
-	if ( $current_template_post !== null ) {
-		return $current_template_post;
-	}
-
-	$theme_file          = get_template_directory() . '/block-templates/' + $_GET['wp_template'] + '.html';
-	$theme_file_contents = '';
-	if ( file_exists( $theme_file ) ) {
-		$theme_file_contents = file_get_contents( $theme_file );
-	}
-	$current_template_post = array(
-		'post_title'   => $_GET['wp_template'],
-		'post_status'  => 'auto-draft',
-		'post_type'    => 'wp_template',
-		'post_name'    => $_GET['wp_template'],
-		'post_content' => $theme_file_contents,
-	);
-	$current_template_post = get_post(
-		wp_insert_post( $current_template_post )
-	);
-
-	return $current_template_post;
+	return null;
 }
 
 add_action(
