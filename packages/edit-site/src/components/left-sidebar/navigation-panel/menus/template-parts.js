@@ -15,33 +15,16 @@ import {
 import TemplatePreview from '../template-preview';
 import NavigationItemWithIcon from '../navigation-item-with-icon';
 
-export default function TemplatePartsMenu( {
-	activeId,
-	onActiveTemplatePartIdChange,
-} ) {
+export default function TemplatePartsMenu( { onActiveTemplatePartIdChange } ) {
 	const [ hoveredTemplatePartId, setHoveredTemplatePartId ] = useState();
 
 	const onMouseEnterTemplatePart = ( id ) => setHoveredTemplatePartId( id );
 	const onMouseLeaveTemplatePart = () => setHoveredTemplatePartId( null );
 
 	const templateParts = useSelect(
-		( select ) => {
-			const { getEntityRecord, getEntityRecords } = select( 'core' );
-
-			const currentTemplate = getEntityRecord(
-				'postType',
-				'wp_template',
-				activeId
-			);
-
-			return currentTemplate
-				? getEntityRecords( 'postType', 'wp_template_part', {
-						resolved: true,
-						template: currentTemplate.slug,
-				  } )
-				: null;
-		},
-		[ activeId ]
+		( select ) =>
+			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part' ),
+		[]
 	);
 
 	return (
@@ -70,9 +53,7 @@ export default function TemplatePartsMenu( {
 				);
 			} ) }
 
-			{ ( ! templateParts || templateParts.length === 0 ) && (
-				<NavigationItem title={ __( 'Loading…' ) } />
-			) }
+			{ ! templateParts && <NavigationItem title={ __( 'Loading…' ) } /> }
 
 			{ hoveredTemplatePartId && (
 				<TemplatePreview entityId={ hoveredTemplatePartId } />
