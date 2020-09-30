@@ -2,6 +2,8 @@
  * External dependencies
  */
 import React from 'react';
+import { Platform } from 'react-native';
+
 import { delay } from 'lodash';
 
 /**
@@ -38,14 +40,13 @@ export class MediaUpload extends React.Component {
 		this.onPickerPresent = this.onPickerPresent.bind( this );
 		this.onPickerSelect = this.onPickerSelect.bind( this );
 		this.getAllSources = this.getAllSources.bind( this );
-
 		this.state = {
 			otherMediaOptions: [],
 		};
 	}
 
 	componentDidMount() {
-		const { allowedTypes = [] } = this.props;
+		const { allowedTypes = [], autoOpenMediaUpload } = this.props;
 		getOtherMediaOptions( allowedTypes, ( otherMediaOptions ) => {
 			const otherMediaOptionsWithIcons = otherMediaOptions.map(
 				( option ) => {
@@ -59,6 +60,10 @@ export class MediaUpload extends React.Component {
 
 			this.setState( { otherMediaOptions: otherMediaOptionsWithIcons } );
 		} );
+
+		if ( autoOpenMediaUpload ) {
+			this.onPickerPresent();
+		}
 	}
 
 	getAllSources() {
@@ -142,9 +147,11 @@ export class MediaUpload extends React.Component {
 	}
 
 	onPickerPresent() {
-		const { delayPickerOpening } = this.props;
+		const { autoOpenMediaUpload } = this.props;
+		const isIOS = Platform.OS === 'ios';
+
 		if ( this.picker ) {
-			if ( delayPickerOpening ) {
+			if ( autoOpenMediaUpload && isIOS ) {
 				delay(
 					() => this.picker.presentPicker(),
 					PICKER_OPENING_DELAY
