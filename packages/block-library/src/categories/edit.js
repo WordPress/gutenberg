@@ -99,7 +99,11 @@ class CategoriesEdit extends Component {
 
 		return (
 			<li key={ category.id }>
-				<a href={ category.link }>
+				<a
+					href={ category.link }
+					target="_blank"
+					rel="noreferrer noopener"
+				>
 					{ this.renderCategoryName( category ) }
 				</a>
 				{ showPostCounts && (
