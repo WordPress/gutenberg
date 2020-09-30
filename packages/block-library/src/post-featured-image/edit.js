@@ -13,6 +13,13 @@ import { __ } from '@wordpress/i18n';
 import { postFeaturedImage as icon } from '@wordpress/icons';
 import { InspectorControls } from '@wordpress/block-editor';
 
+const placeholderChip = (
+	<div className="post-featured-image_placeholder">
+		<Icon icon={ icon } />
+		<p> { __( 'Featured Image' ) }</p>
+	</div>
+);
+
 function PostFeaturedImageDisplay( {
 	attributes: { isLink, rel, linkTarget },
 	setAttributes,
@@ -35,12 +42,7 @@ function PostFeaturedImageDisplay( {
 		[ postType, postId, featuredImage ]
 	);
 	if ( ! media ) {
-		return (
-			<div className="post-featured-image_placeholder">
-				<Icon icon={ icon } />
-				<p> { __( 'Featured Image' ) }</p>
-			</div>
-		);
+		return placeholderChip;
 	}
 	const alt = media.alt_text || __( 'No alternative text set' );
 	let image = <img src={ media.source_url } alt={ alt } />;
@@ -91,7 +93,7 @@ function PostFeaturedImageDisplay( {
 
 export default function PostFeaturedImageEdit( props ) {
 	if ( ! props.context?.postId ) {
-		return __( 'Featured Image' );
+		return placeholderChip;
 	}
 	return <PostFeaturedImageDisplay { ...props } />;
 }
