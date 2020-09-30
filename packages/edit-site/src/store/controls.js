@@ -29,9 +29,9 @@ const controls = {
 		( registry ) => ( { path, templateType, templates } ) =>
 			findTemplateUtil(
 				path,
+				registry.__experimentalResolveSelect( 'core' ).getEntityRecords,
 				templateType,
-				templates,
-				registry.__experimentalResolveSelect( 'core' ).getEntityRecords
+				templates
 			)
 	),
 };

@@ -18,9 +18,9 @@ const { fetch } = window;
  */
 export default async function findTemplate(
 	path,
+	getEntityRecords,
 	templateType,
-	templates,
-	getEntityRecords
+	templates
 ) {
 	const { data } = await fetch(
 		addQueryArgs( findTemplate.siteUrl + path, {
