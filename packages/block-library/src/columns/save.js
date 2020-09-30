@@ -6,7 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { verticalAlignment } = attributes;
@@ -16,7 +19,7 @@ export default function save( { attributes } ) {
 	} );
 
 	return (
-		<div className={ className ? className : undefined }>
+		<div { ...useBlockWrapperProps.save( { className } ) }>
 			<InnerBlocks.Content />
 		</div>
 	);

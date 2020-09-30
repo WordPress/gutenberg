@@ -17,6 +17,7 @@ import {
 	getBlockType,
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
+	hasBlockSupport,
 } from './registration';
 import { normalizeBlockType } from './utils';
 import BlockContentProvider from '../block-content-provider';
@@ -68,6 +69,23 @@ export function getBlockMenuDefaultClassName( blockName ) {
 	);
 }
 
+const blockPropsProvider = {};
+
+/**
+ * Call within a save function to get the props for the block wrapper.
+ *
+ * @param {Object} props Optional. Props to pass to the element.
+ */
+export function getBlockProps( props = {} ) {
+	const { blockType, attributes } = blockPropsProvider;
+	return applyFilters(
+		'blocks.getSaveContent.extraProps',
+		{ ...props },
+		blockType,
+		attributes
+	);
+}
+
 /**
  * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
@@ -94,11 +112,15 @@ export function getSaveElement(
 		save = instance.render.bind( instance );
 	}
 
+	blockPropsProvider.blockType = blockType;
+	blockPropsProvider.attributes = attributes;
+
 	let element = save( { attributes, innerBlocks } );
 
 	if (
 		isObject( element ) &&
-		hasFilter( 'blocks.getSaveContent.extraProps' )
+		hasFilter( 'blocks.getSaveContent.extraProps' ) &&
+		! hasBlockSupport( blockType, 'lightBlockWrapper', false )
 	) {
 		/**
 		 * Filters the props applied to the block save result element.

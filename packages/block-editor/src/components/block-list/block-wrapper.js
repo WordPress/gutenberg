@@ -19,6 +19,7 @@ import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -299,6 +300,13 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 		style: { ...wrapperProps.style, ...props.style },
 	};
 }
+
+/**
+ * Call within a save function to get the props for the block wrapper.
+ *
+ * @param {Object} props Optional. Props to pass to the element.
+ */
+useBlockWrapperProps.save = getBlockProps;
 
 const BlockComponent = forwardRef(
 	( { children, tagName: TagName = 'div', ...props }, ref ) => {

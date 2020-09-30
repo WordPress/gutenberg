@@ -1,13 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { tagName: Tag } = attributes;
 
 	return (
-		<Tag>
+		<Tag { ...useBlockWrapperProps.save() }>
 			<div className="wp-block-group__inner-container">
 				<InnerBlocks.Content />
 			</div>
