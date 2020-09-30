@@ -542,32 +542,17 @@
 	}
 
 	.block-editor-block-mover:not(.is-horizontal) {
+		// Position SVGs.
 		.block-editor-block-mover-button {
 			&.is-up-button {
 				svg {
 					margin-top: 2px;
-					transition: ease-in-out transform 0.1s;
-					@include reduce-motion("transition");
-				}
-				&:focus,
-				&:hover {
-					svg {
-						transform: translateY(-2px);
-					}
 				}
 			}
 
 			&.is-down-button {
 				svg {
 					margin-bottom: 3px;
-					transition: ease-in-out transform 0.1s;
-					@include reduce-motion("transition");
-				}
-				&:focus,
-				&:hover {
-					svg {
-						transform: translateY(2px);
-					}
 				}
 			}
 
