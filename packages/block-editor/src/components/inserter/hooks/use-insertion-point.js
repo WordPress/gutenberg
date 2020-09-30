@@ -81,9 +81,9 @@ function useInsertionPoint( {
 			return getBlockIndex( clientId, destinationRootClientId );
 		}
 
-		// If there a selected block, we insert after the selected block.
+		// If there's a selected block, and the selected block is not the destination root block, we insert after the selected block.
 		const end = getBlockSelectionEnd();
-		if ( ! isAppender && end ) {
+		if ( ! isAppender && end && end !== destinationRootClientId ) {
 			return getBlockIndex( end, destinationRootClientId ) + 1;
 		}
 
