@@ -229,19 +229,19 @@ export default function useMultiSelection( ref ) {
 	}, [ onSelectionChange, stopMultiSelect ] );
 
 	// Only clean up when unmounting, these are added and cleaned up elsewhere.
-	useEffect(
-		() => () => {
-			const { ownerDocument } = ref.current;
-			const { defaultView } = ownerDocument;
+	useEffect( () => {
+		const { ownerDocument } = ref.current;
+		const { defaultView } = ownerDocument;
+
+		return () => {
 			ownerDocument.removeEventListener(
 				'selectionchange',
 				onSelectionChange
 			);
 			defaultView.removeEventListener( 'mouseup', onSelectionEnd );
 			defaultView.cancelAnimationFrame( rafId.current );
-		},
-		[ onSelectionChange, onSelectionEnd ]
-	);
+		};
+	}, [ onSelectionChange, onSelectionEnd ] );
 
 	/**
 	 * Binds event handlers to the document for tracking a pending multi-select
