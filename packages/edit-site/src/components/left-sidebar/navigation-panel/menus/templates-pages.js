@@ -9,7 +9,7 @@ import {
 /**
  * Internal dependencies
  */
-import TemplateNavigationItemWithIcon from '../navigation-item-with-icon';
+import NavigationItemWithIcon from '../navigation-item-with-icon';
 
 export default function TemplatesPagesMenu( { templates, onActiveIdChange } ) {
 	const defaultTemplate = templates?.find( ( { slug } ) => slug === 'page' );
@@ -32,7 +32,7 @@ export default function TemplatesPagesMenu( { templates, onActiveIdChange } ) {
 		>
 			<NavigationGroup title="Specific">
 				{ specificPageTemplates?.map( ( template ) => (
-					<TemplateNavigationItemWithIcon
+					<NavigationItemWithIcon
 						key={ `template-${ template.id }` }
 						item={ `template-${ template.slug }` }
 						title={ template.slug }
@@ -44,7 +44,7 @@ export default function TemplatesPagesMenu( { templates, onActiveIdChange } ) {
 			{ defaultTemplate && (
 				<NavigationGroup title="General">
 					{ [ defaultTemplate ].map( ( template ) => (
-						<TemplateNavigationItemWithIcon
+						<NavigationItemWithIcon
 							key={ `template-${ template.id }` }
 							item={ `template-${ template.slug }` }
 							title={ template.slug }
