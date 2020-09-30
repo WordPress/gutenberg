@@ -85,7 +85,7 @@ class ReusableBlockEdit extends Component {
 	}
 
 	renderSheet() {
-		const { reusableBlock } = this.props;
+		const { name, reusableBlock } = this.props;
 		const { showHelp } = this.state;
 
 		const { getStylesFromColorScheme, clientId } = this.props;
@@ -109,7 +109,7 @@ class ReusableBlockEdit extends Component {
 		const infoTitle =
 			Platform.OS === 'android'
 				? __(
-						"'Reusable blocks aren't editable on WordPress for Android"
+						"Reusable blocks aren't editable on WordPress for Android"
 				  )
 				: __( "Reusable blocks aren't editable on WordPress for iOS" );
 
