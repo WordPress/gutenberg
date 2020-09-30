@@ -7,9 +7,11 @@ import { createQueue } from '@wordpress/priority-queue';
 /**
  * Returns the first items from list that are present on state.
  *
- * @param {Array} list  New array.
- * @param {Array} state Current state.
- * @return {Array} First items present iin state.
+ * @template T
+ *
+ * @param {Array<T>} list  New array.
+ * @param {Array<T>} state Current state.
+ * @return {Array<T>} First items present in state.
  */
 function getFirstItemsPresentInState( list, state ) {
 	const firstItems = [];
@@ -27,12 +29,19 @@ function getFirstItemsPresentInState( list, state ) {
 }
 
 /**
+ * @template T
+ * @typedef {{type: 'reset', list: Array<T>}|{type: 'append', item: T}} Action
+ */
+
+/**
  * Reducer keeping track of a list of appended items.
  *
- * @param {Array}  state  Current state
- * @param {Object} action Action
+ * @template T
  *
- * @return {Array} update state.
+ * @param {Array<T>} state   Current state
+ * @param {Action<T>} action Action
+ *
+ * @return {Array<T>} Updated state
  */
 function listReducer( state, action ) {
 	if ( action.type === 'reset' ) {
@@ -50,11 +59,17 @@ function listReducer( state, action ) {
  * React hook returns an array which items get asynchronously appended from a source array.
  * This behavior is useful if we want to render a list of items asynchronously for performance reasons.
  *
- * @param {Array} list Source array.
- * @return {Array} Async array.
+ * @template T
+ *
+ * @param {Array<T>} list Source array.
+ * @return {Array<T>} Async array.
  */
 function useAsyncList( list ) {
-	const [ current, dispatch ] = useReducer( listReducer, [] );
+	const reducer = useReducer( listReducer, [] );
+	/* eslint-disable jsdoc/no-undefined-types */
+	const current = /** @type {Array<T>} */ ( reducer[ 0 ] );
+	const dispatch = /** @type {Dispatch<Action<T>>} */ reducer[ 1 ];
+	/* eslint-enable jsdoc/no-undefined-types */
 
 	useEffect( () => {
 		// On reset, we keep the first items that were previously rendered.
@@ -64,6 +79,9 @@ function useAsyncList( list ) {
 			list: firstItems,
 		} );
 		const asyncQueue = createQueue();
+		/**
+		 * @param {number} index
+		 */
 		const append = ( index ) => () => {
 			if ( list.length <= index ) {
 				return;

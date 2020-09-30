@@ -85,12 +85,12 @@ name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
--   _mapComponentToEnhancedComponent_ `Function`: Function mapping component to enhanced component.
+-   _mapComponentToEnhancedComponent_ (unknown type): Function mapping component to enhanced component.
 -   _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
 
--   `WPComponent`: Component class with generated display name assigned.
+-   (unknown type): Component class with generated display name assigned.
 
 <a name="ifCondition" href="#ifCondition">#</a> **ifCondition**
 
@@ -126,11 +126,11 @@ This behavior is useful if we want to render a list of items asynchronously for 
 
 _Parameters_
 
--   _list_ `Array`: Source array.
+-   _list_ `Array<T>`: Source array.
 
 _Returns_
 
--   `Array`: Async array.
+-   `Array<T>`: Async array.
 
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
@@ -139,7 +139,7 @@ Copies the text to the clipboard when the element is clicked.
 _Parameters_
 
 -   _ref_ (unknown type): Reference with the element.
--   _text_ `(string|Function)`: The text to copy.
+-   _text_ (unknown type): The text to copy or a function that returns the text.
 -   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
 
 _Returns_
@@ -205,9 +205,9 @@ _Returns_
 
 Hook returning whether the user has a preference for reduced motion.
 
-_Returns_
+_Type_
 
--   `boolean`: Reduced motion preference value.
+-   (unknown type) Reduced motion preference value.
 
 <a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
 
@@ -311,11 +311,11 @@ that ought to be bound to a component's lifecycle.
 
 _Parameters_
 
--   _OriginalComponent_ `WPComponent`: Component requiring setTimeout
+-   _OriginalComponent_ (unknown type): Component requiring setTimeout
 
 _Returns_
 
--   `WPComponent`: Wrapped component.
+-   (unknown type): Wrapped component.
 
 <a name="withState" href="#withState">#</a> **withState**
 
