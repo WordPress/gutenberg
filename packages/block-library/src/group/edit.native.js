@@ -7,7 +7,11 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import {
+	compose,
+	withPreferredColorScheme,
+	useResizeObserver,
+} from '@wordpress/compose';
 import { InnerBlocks, withColors } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
@@ -24,6 +28,8 @@ function GroupEdit( {
 	getStylesFromColorScheme,
 } ) {
 	const { align } = attributes;
+	const [ resizeObserver, sizes ] = useResizeObserver();
+	const { width } = sizes || { width: 0 };
 	const { alignments } = WIDE_ALIGNMENTS;
 	const isFullWidth = align === alignments.full;
 
@@ -59,7 +65,11 @@ function GroupEdit( {
 
 	return (
 		<View style={ [ isSelected && hasInnerBlocks && styles.innerBlocks ] }>
-			<InnerBlocks renderAppender={ isSelected && renderAppender } />
+			{ resizeObserver }
+			<InnerBlocks
+				renderAppender={ isSelected && renderAppender }
+				parentWidth={ width }
+			/>
 		</View>
 	);
 }

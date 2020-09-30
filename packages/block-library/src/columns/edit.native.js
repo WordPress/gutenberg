@@ -86,7 +86,6 @@ function ColumnsEditContainer( {
 	onDeleteBlock,
 	innerColumns,
 	updateInnerColumnWidth,
-	hasParents,
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUM );
@@ -249,17 +248,12 @@ function ColumnsEditContainer( {
 
 	const renderAppender = () => {
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
-		const isFullWidthAppender =
-			isFullWidth &&
-			( ! hasParents
-				? width > ALIGNMENT_BREAKPOINTS.mobile
-				: width > ALIGNMENT_BREAKPOINTS.medium );
 
 		if ( isSelected ) {
 			return (
 				<View
 					style={ [
-						isFullWidthAppender && styles.fullWidthAppender,
+						isFullWidth && styles.fullWidthAppender,
 						columnCount === 0 && { width },
 					] }
 				>

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -19,6 +19,7 @@ import {
 	PanelBody,
 	RangeControl,
 	FooterMessageControl,
+	WIDE_ALIGNMENTS,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -40,9 +41,11 @@ function ColumnEdit( {
 	columnCount,
 	selectedColumnIndex,
 	parentAlignment,
+	parentBlockAlignment,
 	clientId,
 } ) {
 	const { verticalAlignment } = attributes;
+	const { width: screenWidth } = Dimensions.get( 'window' );
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -63,6 +66,29 @@ function ColumnEdit( {
 	const columnWidths = Object.values(
 		getColumnWidths( columns, columnCount )
 	);
+
+	const renderAppender = () => {
+		const isFullWidth =
+			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
+
+		if ( isSelected ) {
+			return (
+				<View
+					style={
+						screenWidth < 480 &&
+						isFullWidth &&
+						hasChildren && {
+							left: 16,
+							width: screenWidth - 16,
+						}
+					}
+				>
+					<InnerBlocks.ButtonBlockAppender />
+				</View>
+			);
+		}
+		return null;
+	};
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
@@ -119,11 +145,7 @@ function ColumnEdit( {
 					contentStyle[ clientId ],
 				] }
 			>
-				<InnerBlocks
-					renderAppender={
-						isSelected && InnerBlocks.ButtonBlockAppender
-					}
-				/>
+				<InnerBlocks renderAppender={ renderAppender } />
 			</View>
 		</>
 	);
@@ -176,6 +198,8 @@ export default compose( [
 		const parentAlignment = getBlockAttributes( parentId )
 			?.verticalAlignment;
 
+		const parentBlockAlignment = getBlockAttributes( parentId )?.align;
+
 		return {
 			hasChildren,
 			isParentSelected,
@@ -184,6 +208,7 @@ export default compose( [
 			columns,
 			columnCount,
 			parentAlignment,
+			parentBlockAlignment,
 		};
 	} ),
 	withPreferredColorScheme,

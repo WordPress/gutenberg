@@ -75,7 +75,9 @@ const ReadableContentView = ( {
 					style,
 					styles[ align ],
 					parentWidth && {
-						maxWidth: containerWidth + 2 * MARGIN,
+						maxWidth: containerWidth
+							? containerWidth + 2 * MARGIN
+							: styles.centeredContent.maxWidth,
 					},
 					align === WIDE_ALIGNMENTS.alignments.wide &&
 						getWideStyles(),

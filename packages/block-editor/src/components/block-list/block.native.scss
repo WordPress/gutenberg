@@ -23,6 +23,11 @@
 	right: 0;
 }
 
+.containerBorderFullWidth {
+	left: -6px;
+	right: -6px;
+}
+
 .dimmed {
 	opacity: $dimmed-opacity;
 }

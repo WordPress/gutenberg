@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Dimensions } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -53,6 +53,7 @@ export class BlockListItem extends Component {
 			parentBlockAlignment,
 			hasParents,
 			blockName,
+			parentBlockName,
 		} = this.props;
 		const { blockWidth } = this.state;
 		const { medium } = ALIGNMENT_BREAKPOINTS;
@@ -77,8 +78,11 @@ export class BlockListItem extends Component {
 
 		if ( isParentFullWidth && blockWidth <= medium ) {
 			const isContainerRelated = innerContainers.includes( blockName );
+			const isParentContainerRelated = innerContainers.includes(
+				parentBlockName
+			);
 
-			if ( isContainerRelated ) {
+			if ( isContainerRelated || isParentContainerRelated ) {
 				return marginHorizontal;
 			}
 			return marginHorizontal * 2;
@@ -88,16 +92,25 @@ export class BlockListItem extends Component {
 	}
 
 	getContentStyles( readableContentViewStyle ) {
-		const { blockAlignment, hasParents } = this.props;
-		const { alignments } = WIDE_ALIGNMENTS;
+		const { blockAlignment, hasParents, parentBlockName } = this.props;
+		const { alignments, innerContainers } = WIDE_ALIGNMENTS;
 
 		const isFullWidth = blockAlignment === alignments.full;
+
+		const isParentContainerRelated = innerContainers.includes(
+			parentBlockName
+		);
 
 		return [
 			readableContentViewStyle,
 			isFullWidth &&
 				! hasParents && {
 					width: styles.fullAlignment.width,
+				},
+			! blockAlignment &&
+				hasParents &&
+				! isParentContainerRelated && {
+					paddingHorizontal: styles.fullAlignmentPadding.paddingLeft,
 				},
 		];
 	}
@@ -112,38 +125,18 @@ export class BlockListItem extends Component {
 			contentResizeMode,
 			shouldShowInnerBlockAppender,
 			parentBlockAlignment,
-			blockName,
-			hasParents,
 			parentWidth,
 			...restProps
 		} = this.props;
-		const { mobile } = ALIGNMENT_BREAKPOINTS;
-		const { width: screenWidth } = Dimensions.get( 'window' );
 
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
-
-		const isContainerRelated = WIDE_ALIGNMENTS.innerContainers.includes(
-			blockName
-		);
-
-		const marginHorizontal = this.getMarginHorizontal();
-		const contentViewWidth =
-			parentWidth + 2 * marginHorizontal || screenWidth;
 
 		return (
 			<ReadableContentView
 				align={ blockAlignment }
 				parentBlockAlignment={ parentBlockAlignment }
-				style={ [
-					readableContentViewStyle,
-					screenWidth < mobile &&
-						hasParents &&
-						isContainerRelated && {
-							width: contentViewWidth,
-							maxWidth: contentViewWidth,
-						},
-				] }
+				style={ [ readableContentViewStyle ] }
 				parentWidth={ parentWidth }
 			>
 				<View
@@ -215,8 +208,9 @@ export default compose( [
 			const parentBlock = hasParents
 				? __unstableGetBlockWithoutInnerBlocks( parents[ 0 ] )
 				: {};
-			const { align: parentBlockAlignment, name: parentBlockName } =
+			const { align: parentBlockAlignment } =
 				parentBlock?.attributes || {};
+			const { name: parentBlockName } = parentBlock || {};
 
 			const selectedBlockClientId = getSelectedBlockClientId();
 

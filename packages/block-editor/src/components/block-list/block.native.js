@@ -129,7 +129,6 @@ class BlockListBlock extends Component {
 			marginVertical,
 			marginHorizontal,
 			isInnerBlockSelected,
-			hasParents,
 			name,
 		} = this.props;
 
@@ -151,8 +150,6 @@ class BlockListBlock extends Component {
 		const isContainerRelated = WIDE_ALIGNMENTS.innerContainers.includes(
 			name
 		);
-		const shouldBeFullWidth =
-			isFullWidth && ( isContainerRelated ? ! hasParents : true );
 
 		return (
 			<TouchableWithoutFeedback
@@ -177,9 +174,13 @@ class BlockListBlock extends Component {
 								pointerEvents="box-none"
 								style={ [
 									styles.solidBorder,
-									shouldBeFullWidth &&
+									isFullWidth &&
 										blockWidth < screenWidth &&
 										styles.borderFullWidth,
+									isFullWidth &&
+										isContainerRelated &&
+										blockWidth < screenWidth &&
+										styles.containerBorderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,
 										styles.solidBorderColorDark
@@ -219,7 +220,7 @@ class BlockListBlock extends Component {
 									}
 									blockWidth={ blockWidth }
 									anchorNodeRef={ this.anchorNodeRef.current }
-									isFullWidth={ shouldBeFullWidth }
+									isFullWidth={ isFullWidth }
 								/>
 							) }
 						</View>
