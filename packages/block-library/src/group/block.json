@@ -15,9 +15,9 @@
 		"anchor": true,
 		"html": false,
 		"lightBlockWrapper": true,
-		"__experimentalColor": {
+		"color": {
 			"gradients": true,
-			"linkColor": true
+			"link": true
 		},
 		"__experimentalPadding": true
 	}
