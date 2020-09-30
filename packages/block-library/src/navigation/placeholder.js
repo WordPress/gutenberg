@@ -194,6 +194,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 					parent: 0,
 					order: 'asc',
 					orderby: 'id',
+					per_page: -1,
 				},
 			];
 			const menusParameters = [ { per_page: -1 } ];
