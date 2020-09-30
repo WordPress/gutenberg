@@ -55,45 +55,10 @@ export default function Navigation( {
 		}
 	}, [ activeMenu ] );
 
-	const traverseMenu = ( startMenu, callback ) => {
-		const visited = [];
-		let queue = [ startMenu ];
-		let current;
-
-		while ( queue.length ) {
-			current = navigationTree.getMenu( queue.shift() );
-
-			if ( ! current || visited.includes( current.menu ) ) {
-				continue;
-			}
-
-			visited.push( current.menu );
-			queue = [
-				...queue,
-				...( navigationTree.parentMenuToMenu[ current.menu ] || [] ),
-			];
-
-			callback( current );
-		}
-	};
-
-	const isMenuEmpty = ( menuToCheck ) => {
-		let count = 0;
-
-		traverseMenu( menuToCheck, ( current ) => {
-			if ( ! current.isEmpty ) {
-				count++;
-			}
-		} );
-
-		return count === 0;
-	};
-
 	const context = {
 		activeItem,
 		activeMenu: menu,
 		setActiveMenu,
-		isMenuEmpty,
 		navigationTree,
 	};
 

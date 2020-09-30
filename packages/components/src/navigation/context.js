@@ -29,6 +29,9 @@ export const NavigationContext = createContext( {
 		getMenu: noop,
 		addMenu: noop,
 		removeMenu: noop,
+		menusDirectChildren: {},
+		traverseMenu: noop,
+		isMenuEmpty: noop,
 	},
 } );
 export const useNavigationContext = () => useContext( NavigationContext );

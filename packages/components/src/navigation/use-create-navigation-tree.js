@@ -16,13 +16,48 @@ export const useCreateNavigationTree = () => {
 		removeNode: removeItem,
 	} = useNavigationTreeNodes();
 
-	const [ parentMenuToMenu, setParentMenuToMenu ] = useState( {} );
 	const {
 		nodes: menus,
 		getNode: getMenu,
 		addNode: addMenu,
 		removeNode: removeMenu,
 	} = useNavigationTreeNodes();
+
+	const [ menusDirectChildren, setMenusDirectChildren ] = useState( {} );
+
+	const getDirectChildrenOfMenu = ( menu ) =>
+		menusDirectChildren[ menu ] || [];
+
+	const traverseMenu = ( startMenu, callback ) => {
+		const visited = [];
+		let queue = [ startMenu ];
+		let current;
+
+		while ( queue.length > 0 ) {
+			current = getMenu( queue.shift() );
+
+			if ( ! current || visited.includes( current.menu ) ) {
+				continue;
+			}
+
+			visited.push( current.menu );
+			queue = [ ...queue, ...getDirectChildrenOfMenu( current.menu ) ];
+
+			callback( current );
+		}
+	};
+
+	const isMenuEmpty = ( menuToCheck ) => {
+		let count = 0;
+
+		traverseMenu( menuToCheck, ( current ) => {
+			if ( ! current.isEmpty ) {
+				count++;
+			}
+		} );
+
+		return count === 0;
+	};
 
 	return {
 		items,
@@ -33,15 +68,23 @@ export const useCreateNavigationTree = () => {
 		menus,
 		getMenu,
 		addMenu: ( key, value ) => {
-			setParentMenuToMenu( ( state ) => ( {
-				...state,
-				[ value.parentMenu ]: state[ value.parentMenu ]
-					? [ ...state[ value.parentMenu ], key ]
-					: [ key ],
-			} ) );
+			setMenusDirectChildren( ( state ) => {
+				const newState = { ...state };
+
+				if ( ! newState[ value.parentMenu ] ) {
+					newState[ value.parentMenu ] = [];
+				}
+
+				newState[ value.parentMenu ].push( key );
+
+				return newState;
+			} );
+
 			addMenu( key, value );
 		},
 		removeMenu,
-		parentMenuToMenu,
+		menusDirectChildren,
+		traverseMenu,
+		isMenuEmpty,
 	};
 };
