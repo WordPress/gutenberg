@@ -436,13 +436,7 @@ class LatestPostsEdit extends Component {
 									.join( ' ' ) }
 								{ /* translators: excerpt truncation character, default …  */ }
 								{ __( ' … ' ) }
-								<a
-									href={ post.link }
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									{ __( 'Read more' ) }
-								</a>
+								<a href={ post.link }>{ __( 'Read more' ) }</a>
 							</>
 						) : (
 							excerpt
@@ -453,11 +447,7 @@ class LatestPostsEdit extends Component {
 								{ renderFeaturedImage && (
 									<div className={ imageClasses }>
 										{ addLinkToFeaturedImage ? (
-											<a
-												href={ post.link }
-												target="_blank"
-												rel="noreferrer noopener"
-											>
+											<a href={ post.link }>
 												{ featuredImage }
 											</a>
 										) : (
@@ -465,11 +455,7 @@ class LatestPostsEdit extends Component {
 										) }
 									</div>
 								) }
-								<a
-									href={ post.link }
-									target="_blank"
-									rel="noreferrer noopener"
-								>
+								<a href={ post.link }>
 									{ titleTrimmed ? (
 										<RawHTML>{ titleTrimmed }</RawHTML>
 									) : (
