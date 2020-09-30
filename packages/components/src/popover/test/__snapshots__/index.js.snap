@@ -1,6 +1,37 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Popover should pass additional props to portaled element 1`] = `
+@keyframes animation-0 {
+  from {
+    -webkit-transform: translateY(-2em) scaleY(0) scaleX(0);
+    -ms-transform: translateY(-2em) scaleY(0) scaleX(0);
+    transform: translateY(-2em) scaleY(0) scaleX(0);
+  }
+
+  to {
+    -webkit-transform: translateY(0%) scaleY(1) scaleX(1);
+    -ms-transform: translateY(0%) scaleY(1) scaleX(1);
+    transform: translateY(0%) scaleY(1) scaleX(1);
+  }
+}
+
+.emotion-0 {
+  -webkit-animation: animation-0 0.1s cubic-bezier( 0,0,0.2,1 ) 0s;
+  animation: animation-0 0.1s cubic-bezier( 0,0,0.2,1 ) 0s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+  -webkit-transform-origin: left top;
+  -ms-transform-origin: left top;
+  transform-origin: left top;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-animation-duration: 1ms;
+    animation-duration: 1ms;
+  }
+}
+
 <span>
   <div
     tabindex="-1"
@@ -8,20 +39,24 @@ exports[`Popover should pass additional props to portaled element 1`] = `
     <div>
       <div>
         <div
-          class="components-popover components-animate__appear is-from-top is-from-left is-without-arrow"
-          data-x-axis="right"
-          data-y-axis="bottom"
-          role="tooltip"
-          style="top: 0px; left: 0px;"
+          class="emotion-0 emotion-1"
         >
           <div
-            class="components-popover__content"
-            tabindex="-1"
+            class="components-popover is-without-arrow"
+            data-x-axis="right"
+            data-y-axis="bottom"
+            role="tooltip"
+            style="top: 0px; left: 0px;"
           >
             <div
-              style="position: relative;"
+              class="components-popover__content"
+              tabindex="-1"
             >
-              Hello
+              <div
+                style="position: relative;"
+              >
+                Hello
+              </div>
             </div>
           </div>
         </div>
@@ -32,6 +67,37 @@ exports[`Popover should pass additional props to portaled element 1`] = `
 `;
 
 exports[`Popover should render content 1`] = `
+@keyframes animation-0 {
+  from {
+    -webkit-transform: translateY(-2em) scaleY(0) scaleX(0);
+    -ms-transform: translateY(-2em) scaleY(0) scaleX(0);
+    transform: translateY(-2em) scaleY(0) scaleX(0);
+  }
+
+  to {
+    -webkit-transform: translateY(0%) scaleY(1) scaleX(1);
+    -ms-transform: translateY(0%) scaleY(1) scaleX(1);
+    transform: translateY(0%) scaleY(1) scaleX(1);
+  }
+}
+
+.emotion-0 {
+  -webkit-animation: animation-0 0.1s cubic-bezier( 0,0,0.2,1 ) 0s;
+  animation: animation-0 0.1s cubic-bezier( 0,0,0.2,1 ) 0s;
+  -webkit-animation-fill-mode: forwards;
+  animation-fill-mode: forwards;
+  -webkit-transform-origin: left top;
+  -ms-transform-origin: left top;
+  transform-origin: left top;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-animation-duration: 1ms;
+    animation-duration: 1ms;
+  }
+}
+
 <span>
   <div
     tabindex="-1"
@@ -39,19 +105,23 @@ exports[`Popover should render content 1`] = `
     <div>
       <div>
         <div
-          class="components-popover components-animate__appear is-from-top is-from-left is-without-arrow"
-          data-x-axis="right"
-          data-y-axis="bottom"
-          style="top: 0px; left: 0px;"
+          class="emotion-0 emotion-1"
         >
           <div
-            class="components-popover__content"
-            tabindex="-1"
+            class="components-popover is-without-arrow"
+            data-x-axis="right"
+            data-y-axis="bottom"
+            style="top: 0px; left: 0px;"
           >
             <div
-              style="position: relative;"
+              class="components-popover__content"
+              tabindex="-1"
             >
-              Hello
+              <div
+                style="position: relative;"
+              >
+                Hello
+              </div>
             </div>
           </div>
         </div>
