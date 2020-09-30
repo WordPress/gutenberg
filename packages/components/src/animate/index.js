@@ -1,39 +1,59 @@
 /**
  * External dependencies
  */
-import classnames from 'classnames';
+import { isFunction } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
+import {
+	AppearingWrapper,
+	SlidingWrapper,
+	LoadingWrapper,
+} from './styles/animate-styles';
 
 function Animate( { type, options = {}, children } ) {
+	/**
+	 * For backwards compatability we need to handle when
+	 * children as a function is passed in. By passing an
+	 * empty string for className we should prevent any
+	 * conventional usage of this component from before the
+	 * change from breaking.
+	 */
+	const safeChildren = isFunction( children )
+		? () => children( { className: '' } )
+		: () => children;
+
 	if ( type === 'appear' ) {
 		const { origin = 'top' } = options;
 		const [ yAxis, xAxis = 'center' ] = origin.split( ' ' );
 
-		return children( {
-			className: classnames( 'components-animate__appear', {
-				[ 'is-from-' + xAxis ]: xAxis !== 'center',
-				[ 'is-from-' + yAxis ]: yAxis !== 'middle',
-			} ),
-		} );
+		return (
+			<AppearingWrapper
+				// @todo(saramarcondes) deprecate "middle"
+				yAxis={ yAxis === 'middle' ? 'center' : yAxis }
+				xAxis={ xAxis }
+			>
+				{ safeChildren() }
+			</AppearingWrapper>
+		);
 	}
 
 	if ( type === 'slide-in' ) {
 		const { origin = 'left' } = options;
 
-		return children( {
-			className: classnames(
-				'components-animate__slide-in',
-				'is-from-' + origin
-			),
-		} );
+		return (
+			<SlidingWrapper origin={ origin }>
+				{ safeChildren() }
+			</SlidingWrapper>
+		);
 	}
 
 	if ( type === 'loading' ) {
-		return children( {
-			className: classnames( 'components-animate__loading' ),
-		} );
+		return <LoadingWrapper>{ safeChildren() }</LoadingWrapper>;
 	}
 
-	return children( {} );
+	return safeChildren( {} );
 }
 
 export default Animate;
