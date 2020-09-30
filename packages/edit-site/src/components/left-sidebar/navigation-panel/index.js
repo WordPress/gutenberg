@@ -1,10 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import {
 	__experimentalNavigation as Navigation,
 	__experimentalNavigationMenu as NavigationMenu,
+	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationBackButton as NavigationBackButton,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -13,9 +14,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import TemplateSwitcher from './template-switcher';
+import TemplatesMenu from './menus/templates';
+import TemplatePartsMenu from './menus/template-parts';
 
 const NavigationPanel = () => {
+	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 	const ref = useRef();
 
 	useEffect( () => {
@@ -56,22 +59,39 @@ const NavigationPanel = () => {
 						? `template-${ templateId }`
 						: `template-part-${ templatePartId }`
 				}
+				onActivateMenu={ setActiveMenu }
 			>
-				<NavigationBackButton
-					backButtonLabel={ __( 'Dashboard' ) }
-					className="edit-site-navigation-panel__back-to-dashboard"
-					href="index.php"
-					ref={ ref }
-				/>
+				{ activeMenu === 'root' && (
+					<NavigationBackButton
+						backButtonLabel={ __( 'Dashboard' ) }
+						className="edit-site-navigation-panel__back-to-dashboard"
+						href="index.php"
+						ref={ ref }
+					/>
+				) }
 
-				<NavigationMenu title="Home">
-					<TemplateSwitcher
+				<NavigationMenu title="Theme">
+					<NavigationItem
+						title="Templates"
+						navigateToMenu="templates"
+					/>
+
+					<NavigationItem
+						title="Template parts"
+						navigateToMenu="template-parts"
+					/>
+
+					<TemplatesMenu
 						page={ page }
 						activeId={ templateId }
 						onActiveIdChange={ setTemplate }
-						onActiveTemplatePartIdChange={ setTemplatePart }
 						onAddTemplate={ addTemplate }
 						onRemoveTemplate={ removeTemplate }
+					/>
+
+					<TemplatePartsMenu
+						activeId={ templateId }
+						onActiveTemplatePartIdChange={ setTemplatePart }
 					/>
 				</NavigationMenu>
 			</Navigation>
