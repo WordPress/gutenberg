@@ -15,22 +15,22 @@ import { findTemplate as findTemplateUtil } from '../utils';
  *
  * @return {number} The found template ID.
  */
-export function findTemplate( path, type, templates ) {
+export function findTemplate( path, templateType, templates ) {
 	return {
 		type: 'FIND_TEMPLATE',
 		path,
-		argType: type,
-		argTemplates: templates,
+		templateType,
+		templates,
 	};
 }
 
 const controls = {
 	FIND_TEMPLATE: createRegistryControl(
-		( registry ) => ( { path, argType, argTemplates } ) =>
+		( registry ) => ( { path, templateType, templates } ) =>
 			findTemplateUtil(
 				path,
-				argType,
-				argTemplates,
+				templateType,
+				templates,
 				registry.__experimentalResolveSelect( 'core' ).getEntityRecords
 			)
 	),

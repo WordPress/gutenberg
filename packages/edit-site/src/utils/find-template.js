@@ -18,14 +18,14 @@ const { fetch } = window;
  */
 export default async function findTemplate(
 	path,
-	type,
+	templateType,
 	templates,
 	getEntityRecords
 ) {
 	const { data } = await fetch(
 		addQueryArgs( findTemplate.siteUrl + path, {
 			'_wp-find-template': true,
-			'_wp-find-template-type': type,
+			'_wp-find-template-type': templateType,
 			'_wp-find-template-templates': templates,
 		} )
 	).then( ( res ) => res.json() );
