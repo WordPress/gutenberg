@@ -33,7 +33,7 @@ export default function NavigationItem( props ) {
 		...restProps
 	} = props;
 	useNavigationTreeItem( props );
-	const { activeItem, setActiveMenu, isEmpty } = useNavigationContext();
+	const { activeItem, setActiveMenu, isMenuEmpty } = useNavigationContext();
 	const { isActive } = useNavigationMenuContext();
 
 	const [ itemId ] = useState( uniqueId( 'item-' ) );
@@ -53,7 +53,7 @@ export default function NavigationItem( props ) {
 	if (
 		hideIfTargetMenuEmpty &&
 		navigateToMenu &&
-		isEmpty( navigateToMenu )
+		isMenuEmpty( navigateToMenu )
 	) {
 		return null;
 	}

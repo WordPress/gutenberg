@@ -58,7 +58,7 @@ export default function Navigation( {
 	const findByParentMenu = ( parentMenu ) =>
 		navigationTree.parentMenuToMenu[ parentMenu ] || [];
 
-	const isEmpty = ( menuToCheck ) => {
+	const isMenuEmpty = ( menuToCheck ) => {
 		let count = 0;
 
 		if ( ! navigationTree.menus[ menuToCheck ]?.isEmpty ) {
@@ -88,8 +88,8 @@ export default function Navigation( {
 		activeItem,
 		activeMenu: menu,
 		setActiveMenu,
+		isMenuEmpty,
 		navigationTree,
-		isEmpty,
 	};
 
 	const classes = classnames( 'components-navigation', className );

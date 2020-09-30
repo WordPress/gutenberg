@@ -17,7 +17,7 @@ export const NavigationContext = createContext( {
 	activeItem: undefined,
 	activeMenu: ROOT_MENU,
 	setActiveMenu: noop,
-	isEmpty: noop,
+	isMenuEmpty: noop,
 
 	navigationTree: {
 		items: {},
