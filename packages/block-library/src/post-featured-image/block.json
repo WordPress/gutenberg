@@ -13,7 +13,7 @@
 		},
 		"linkTarget": {
 			"type": "string",
-			"default": "_blank"
+			"default": "_self"
 		}
 	},
 	"usesContext": [

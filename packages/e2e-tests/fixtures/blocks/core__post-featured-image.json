@@ -5,7 +5,7 @@
         "isValid": true,
 		"attributes": {
 			"isLink": false,
-			"linkTarget": "_blank",
+			"linkTarget": "_self",
 			"rel": ""
 		},
         "innerBlocks": [],
