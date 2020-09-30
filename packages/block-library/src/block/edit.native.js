@@ -36,7 +36,6 @@ class ReusableBlockEdit extends Component {
 			this.state = {
 				// Since edition is not supported yet isEditing is always false
 				isEditing: false,
-				title: reusableBlock.title,
 				blocks: parse( reusableBlock.content ),
 				showHelp: false,
 				sendFallbackMessage: false,
@@ -45,7 +44,6 @@ class ReusableBlockEdit extends Component {
 			// Start in preview mode when we're working with an existing reusable block
 			this.state = {
 				isEditing: false,
-				title: null,
 				blocks: [],
 				showHelp: false,
 				sendFallbackMessage: false,
@@ -54,18 +52,18 @@ class ReusableBlockEdit extends Component {
 	}
 
 	componentDidMount() {
-		if ( ! this.props.reusableBlock ) {
-			this.props.fetchReusableBlock();
-		}
+		this.props.fetchReusableBlock();
 	}
 
 	componentDidUpdate( prevProps ) {
-		if (
-			prevProps.reusableBlock !== this.props.reusableBlock &&
-			this.state.title === null
-		) {
+		const hasBlockFetchCompleted =
+			! prevProps.reusableBlock && this.props.reusableBlock;
+		const hasBlockContentChanged =
+			prevProps.reusableBlock?.content !==
+			this.props.reusableBlock?.content;
+
+		if ( hasBlockFetchCompleted || hasBlockContentChanged ) {
 			this.setState( {
-				title: this.props.reusableBlock.title,
 				blocks: parse( this.props.reusableBlock.content ),
 			} );
 		}
@@ -87,8 +85,8 @@ class ReusableBlockEdit extends Component {
 	}
 
 	renderSheet() {
-		const { name, reusableBlock } = this.props;
-		const { showHelp, title } = this.state;
+		const { reusableBlock } = this.props;
+		const { showHelp } = this.state;
 
 		const { getStylesFromColorScheme, clientId } = this.props;
 		const infoTextStyle = getStylesFromColorScheme(
@@ -126,10 +124,10 @@ class ReusableBlockEdit extends Component {
 						// A small delay will ensure that the controller has already been removed.
 						this.timeout = setTimeout( () => {
 							requestUnsupportedBlockFallback(
-								reusableBlock.content,
+								`<!-- wp:block {"ref":${ reusableBlock.id }} /-->`,
 								clientId,
 								name,
-								title
+								reusableBlock.title
 							);
 						}, 100 );
 						this.setState( { sendFallbackMessage: false } );
@@ -166,7 +164,7 @@ class ReusableBlockEdit extends Component {
 
 	render() {
 		const { isSelected, reusableBlock, isFetching, settings } = this.props;
-		const { isEditing, title, blocks } = this.state;
+		const { isEditing, blocks } = this.state;
 
 		if ( ! reusableBlock && isFetching ) {
 			return <Spinner />;
@@ -180,6 +178,7 @@ class ReusableBlockEdit extends Component {
 			);
 		}
 
+		const { title } = reusableBlock;
 		let element = (
 			<BlockEditorProvider
 				settings={ settings }
