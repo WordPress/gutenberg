@@ -18,7 +18,8 @@ import usePrevious from '../use-previous';
  * }
  * ```
  *
- * @param {Object} object Object which changes to compare.
+ * @template {Record<string, unknown>} T
+ * @param {T} object Object which changes to compare.
  * @param {string} prefix Just a prefix to show when console logging.
  */
 function useWarnOnChange( object, prefix = 'Change detection' ) {
