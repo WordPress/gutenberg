@@ -1,7 +1,7 @@
 StoryUpdateProgress
 ===================
 
-`StoryUpdateProgress` shows a progress bar while the media files associated with a Story block are being saved
+`StoryUpdateProgress` shows a progress bar while the media files associated with a Story block are being saved and uploaded
 
 ## Usage
 
@@ -13,17 +13,17 @@ import {
 	StoryUpdateProgress,
 } from '@wordpress/block-editor';
 
-function MediaProgress( { url, id } ) {
+function StoryProgress( { url, id } ) {
 	return (
 		<StoryUpdateProgress
 			mediaId={ id }
-			renderContent={ ( { isUploadFailed, retryMessage } ) => {
+			renderContent={ ( { isSaveFailed, retryMessage } ) => {
 				return (
 					<ImageBackground
 						resizeMethod="scale"
 						source={ { uri: url } }
 					>
-						{ isUploadFailed &&
+						{ isSaveFailed &&
 							<View>
 								<Text>{ retryMessage }</Text>
 							</View>
@@ -38,11 +38,11 @@ function MediaProgress( { url, id } ) {
 
 ## Props
 
-### mediaId
+### mediaFiles
 
-A media ID that identifies the current upload.
+A collection of media ID that identifies the current story upload.
 
-- Type: `Number`
+- Type: `Array`
 - Required: Yes
 - Platform: Mobile
 
@@ -56,7 +56,7 @@ Content to be rendered along with the progress bar, usually the thumbnail of the
 
 It passes an object containing the following properties:
 
-`{ isUploadInProgress, isUploadFailed, retryMessage }`
+`{ isUploadInProgress, isUploadFailed, isSaveInProgress, isSaveFailed, retryMessage }`
 
 ### onUpdateMediaProgress
 
