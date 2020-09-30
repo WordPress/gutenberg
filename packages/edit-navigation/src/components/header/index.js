@@ -41,7 +41,7 @@ export default function Header( {
 		// Loading text won't be displayed if menus are preloaded.
 		actionHeaderText = __( 'Loading …' );
 	} else {
-		actionHeaderText = __( 'Create new menu' );
+		actionHeaderText = __( 'No menus available' );
 	}
 
 	return (
