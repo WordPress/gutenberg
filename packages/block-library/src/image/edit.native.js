@@ -323,8 +323,8 @@ export class ImageEdit extends React.Component {
 	}
 
 	onClearMedia() {
-		this.props.setAttributes( { id: null, url: null } );
 		this.setState( { autoOpenMediaUpload: false } );
+		this.props.setAttributes( { id: null, url: null } );
 	}
 
 	getPlaceholderIcon() {
