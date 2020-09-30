@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { useNavigationTreeNodes } from './use-navigation-tree-nodes';
@@ -11,6 +16,7 @@ export const useCreateNavigationTree = () => {
 		removeNode: removeItem,
 	} = useNavigationTreeNodes();
 
+	const [ parentMenuToMenu, setParentMenuToMenu ] = useState( {} );
 	const {
 		nodes: menus,
 		getNode: getMenu,
@@ -26,7 +32,16 @@ export const useCreateNavigationTree = () => {
 
 		menus,
 		getMenu,
-		addMenu,
+		addMenu: ( key, value ) => {
+			setParentMenuToMenu( ( state ) => ( {
+				...state,
+				[ value.parentMenu ]: state[ value.parentMenu ]
+					? [ ...state[ value.parentMenu ], key ]
+					: [ key ],
+			} ) );
+			addMenu( key, value );
+		},
 		removeMenu,
+		parentMenuToMenu,
 	};
 };

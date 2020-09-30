@@ -55,11 +55,41 @@ export default function Navigation( {
 		}
 	}, [ activeMenu ] );
 
+	const findByParentMenu = ( parentMenu ) =>
+		navigationTree.parentMenuToMenu[ parentMenu ] || [];
+
+	const isEmpty = ( menuToCheck ) => {
+		let count = 0;
+
+		if ( ! navigationTree.menus[ menuToCheck ]?.isEmpty ) {
+			count++;
+		}
+
+		const visited = [];
+		let queue = findByParentMenu( menuToCheck );
+		let current;
+		while ( queue.length ) {
+			current = queue.shift();
+
+			if ( current && ! visited.includes( current.menu ) ) {
+				if ( ! current.isEmpty ) {
+					count++;
+				}
+
+				visited.push( current.menu );
+				queue = [ ...queue, ...findByParentMenu( current.menu ) ];
+			}
+		}
+
+		return count === 0;
+	};
+
 	const context = {
 		activeItem,
 		activeMenu: menu,
 		setActiveMenu,
 		navigationTree,
+		isEmpty,
 	};
 
 	const classes = classnames( 'components-navigation', className );
