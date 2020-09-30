@@ -233,6 +233,7 @@ export default function useMultiSelection( ref ) {
 		() => () => {
 			const { ownerDocument } = ref.current;
 			const { defaultView } = ownerDocument;
+			console.log( 'unmount, no error?', ref.current );
 			ownerDocument.removeEventListener(
 				'selectionchange',
 				onSelectionChange

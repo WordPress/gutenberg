@@ -23,11 +23,34 @@ import { Popover } from '@wordpress/components';
  */
 import BlockInspectorButton from './block-inspector-button';
 import { useSelect } from '@wordpress/data';
+import { useRef, useEffect, useState } from '@wordpress/element';
+
+const useInterval = ( callback, delay ) => {
+	const savedCallback = useRef();
+
+	useEffect( () => {
+		savedCallback.current = callback;
+	}, [ callback ] );
+
+	useEffect( () => {
+		const handler = ( ...args ) => savedCallback.current( ...args );
+
+		if ( delay !== null ) {
+			const id = setInterval( handler, delay );
+			return () => clearInterval( id );
+		}
+	}, [ delay ] );
+};
 
 function VisualEditor() {
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
 	}, [] );
+	const [ count, setCount ] = useState( 0 );
+
+	useInterval( () => {
+		setCount( count + 1 );
+	}, 1000 );
 
 	const inlineStyles = useResizeCanvas( deviceType );
 
@@ -46,7 +69,7 @@ function VisualEditor() {
 							<div className="edit-post-visual-editor__post-title-wrapper">
 								<PostTitle />
 							</div>
-							<BlockList />
+							<BlockList key={ count } />
 						</ObserveTyping>
 					</WritingFlow>
 				</CopyHandler>
