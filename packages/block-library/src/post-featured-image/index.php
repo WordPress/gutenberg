@@ -22,7 +22,7 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 	$featured_image = get_the_post_thumbnail( $post_ID );
 
 	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
-		$featured_image = sprintf( '<a href="%1s" target="%2s" rel="%3s">%4s</a>', get_the_permalink( $post_ID ), $attributes['linkTarget'], $attributes['rel'], $featured_image );
+		$featured_image = sprintf( '<a href="%1s">%2s</a>', get_the_permalink( $post_ID ), $featured_image );
 	}
 
 	return '<p>' . $featured_image . '</p>';

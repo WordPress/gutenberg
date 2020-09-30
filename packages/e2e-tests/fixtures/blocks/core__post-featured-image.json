@@ -4,9 +4,7 @@
         "name": "core/post-featured-image",
         "isValid": true,
 		"attributes": {
-			"isLink": false,
-			"linkTarget": "_self",
-			"rel": ""
+			"isLink": false
 		},
         "innerBlocks": [],
         "originalContent": ""

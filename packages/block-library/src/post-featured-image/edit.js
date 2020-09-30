@@ -3,13 +3,8 @@
  */
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import {
-	Icon,
-	ToggleControl,
-	TextControl,
-	PanelBody,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { Icon, ToggleControl, PanelBody } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 import { postFeaturedImage as icon } from '@wordpress/icons';
 import { InspectorControls } from '@wordpress/block-editor';
 
@@ -21,7 +16,7 @@ const placeholderChip = (
 );
 
 function PostFeaturedImageDisplay( {
-	attributes: { isLink, rel, linkTarget },
+	attributes: { isLink },
 	setAttributes,
 	context: { postId, postType },
 } ) {
@@ -31,62 +26,36 @@ function PostFeaturedImageDisplay( {
 		'featured_media',
 		postId
 	);
-	const { media, post } = useSelect(
-		( select ) => {
-			const { getMedia, getEditedEntityRecord } = select( 'core' );
-			return {
-				media: featuredImage && getMedia( featuredImage ),
-				post: getEditedEntityRecord( 'postType', postType, postId ),
-			};
-		},
-		[ postType, postId, featuredImage ]
+	const media = useSelect(
+		( select ) =>
+			featuredImage && select( 'core' ).getMedia( featuredImage ),
+		[ featuredImage ]
 	);
-	if ( ! media ) {
-		return placeholderChip;
-	}
-	const alt = media.alt_text || __( 'No alternative text set' );
-	let image = <img src={ media.source_url } alt={ alt } />;
-	if ( isLink ) {
-		image = (
-			<a href={ post.link } target={ linkTarget } rel={ rel }>
-				{ image }
-			</a>
-		);
-	}
+	const image = ! media ? (
+		placeholderChip
+	) : (
+		<img
+			src={ media.source_url }
+			alt={ media.alt_text || __( 'No alternative text set' ) }
+		/>
+	);
+
 	return (
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
-						label={ __( 'Make featured image a link' ) }
+						label={ sprintf(
+							// translators: %s: Name of the post type e.g: "post".
+							__( 'Link to %s' ),
+							postType
+						) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
 					/>
-					{ isLink && (
-						<>
-							<ToggleControl
-								label={ __( 'Open in new tab' ) }
-								onChange={ ( value ) =>
-									setAttributes( {
-										linkTarget: value ? '_blank' : '_self',
-									} )
-								}
-								checked={ linkTarget === '_blank' }
-							/>
-							<TextControl
-								label={ __( 'Link rel' ) }
-								value={ rel }
-								onChange={ ( newRel ) =>
-									setAttributes( { rel: newRel } )
-								}
-							/>
-						</>
-					) }
 				</PanelBody>
 			</InspectorControls>
-			<div className={ isLink ? 'post-featured-image__link' : '' }>
-				{ image }
-			</div>
+			{ image }
 		</>
 	);
 }
