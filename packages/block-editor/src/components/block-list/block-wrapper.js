@@ -32,11 +32,12 @@ import ELEMENTS from './block-wrapper-elements';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
- * should be the outer element of a block. Call this hook and pass the returned
- * props to the element to mark as a block. If you define a ref for the element,
- * it is important to pass the ref to this hook, which the hooks in turn will
- * pass to the component through the props it returns. Optionally, you can also
- * pass any other props through this hook, and they will be merged and returned.
+ * should be the outermost element of a block. Call this hook and pass the
+ * returned props to the element to mark as a block. If you define a ref for the
+ * element, it is important to pass the ref to this hook, which the hook in turn
+ * will pass to the component through the props it returns. Optionally, you can
+ * also pass any other props through this hook, and they will be merged and
+ * returned.
  *
  * @param {Object}  props   Optional. Props to pass to the element. Must contain
  *                          the ref if one is defined.
@@ -306,7 +307,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
  *
  * @param {Object} props Optional. Props to pass to the element.
  */
-useBlockWrapperProps.save = getBlockProps;
+useBlockProps.save = getBlockProps;
 
 const BlockComponent = forwardRef(
 	( { children, tagName: TagName = 'div', ...props }, ref ) => {

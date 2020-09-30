@@ -12,7 +12,7 @@ export function useBlockProps( props = {} ) {
 	return props;
 }
 
-useBlockWrapperProps.save = getBlockProps;
+useBlockProps.save = getBlockProps;
 
 const ExtendedBlockComponent = ELEMENTS.reduce( ( acc, element ) => {
 	acc[ element ] = element;
