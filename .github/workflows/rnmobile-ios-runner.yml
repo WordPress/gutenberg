@@ -30,7 +30,7 @@ jobs:
     - name: Restore build cache
       uses: actions/cache@v2
       with:
-        path: packages/react-native-editor/ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app
+        path: packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app
         key: ${{ runner.os }}-ios-build-${{ hashFiles('ios-checksums.txt') }}
 
     - name: Restore pods cache
@@ -55,13 +55,13 @@ jobs:
       run: sudo xcode-select --switch /Applications/Xcode_11.4.1.app
 
     - name: Build (if needed)
-      run: test -e packages/react-native-editor/ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app/gutenberg || SKIP_BUNDLING=true npm run native test:e2e:build-app:ios
+      run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/gutenberg || SKIP_BUNDLING=true npm run native test:e2e:build-app:ios
 
     - name: Run iOS Device Tests
       run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
 
     - name: Prepare build cache
-      run: rm packages/react-native-editor/ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle
+      run: rm packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle
 
     - uses: actions/upload-artifact@v2
       if: always()
