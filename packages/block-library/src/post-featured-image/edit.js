@@ -3,11 +3,23 @@
  */
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
-import { ResponsiveWrapper, Icon } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { Icon, ToggleControl, PanelBody } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 import { postFeaturedImage as icon } from '@wordpress/icons';
+import { InspectorControls } from '@wordpress/block-editor';
 
-function PostFeaturedImageDisplay( { context: { postId, postType } } ) {
+const placeholderChip = (
+	<div className="post-featured-image_placeholder">
+		<Icon icon={ icon } />
+		<p> { __( 'Featured Image' ) }</p>
+	</div>
+);
+
+function PostFeaturedImageDisplay( {
+	attributes: { isLink },
+	setAttributes,
+	context: { postId, postType },
+} ) {
 	const [ featuredImage ] = useEntityProp(
 		'postType',
 		postType,
@@ -19,28 +31,38 @@ function PostFeaturedImageDisplay( { context: { postId, postType } } ) {
 			featuredImage && select( 'core' ).getMedia( featuredImage ),
 		[ featuredImage ]
 	);
-	if ( ! media ) {
-		return (
-			<div className="post-featured-image_placeholder">
-				<Icon icon={ icon } />
-				<p> { __( 'Featured Image' ) }</p>
-			</div>
-		);
-	}
-	const alt = media.alt_text || __( 'No alternative text set' );
+	const image = ! media ? (
+		placeholderChip
+	) : (
+		<img
+			src={ media.source_url }
+			alt={ media.alt_text || __( 'No alternative text set' ) }
+		/>
+	);
+
 	return (
-		<ResponsiveWrapper
-			naturalWidth={ media.media_details.width }
-			naturalHeight={ media.media_details.height }
-		>
-			<img src={ media.source_url } alt={ alt } />
-		</ResponsiveWrapper>
+		<>
+			<InspectorControls>
+				<PanelBody title={ __( 'Link settings' ) }>
+					<ToggleControl
+						label={ sprintf(
+							// translators: %s: Name of the post type e.g: "post".
+							__( 'Link to %s' ),
+							postType
+						) }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
+					/>
+				</PanelBody>
+			</InspectorControls>
+			{ image }
+		</>
 	);
 }
 
 export default function PostFeaturedImageEdit( props ) {
 	if ( ! props.context?.postId ) {
-		return __( 'Featured Image' );
+		return placeholderChip;
 	}
 	return <PostFeaturedImageDisplay { ...props } />;
 }

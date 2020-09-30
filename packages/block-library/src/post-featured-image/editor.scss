@@ -16,4 +16,9 @@ div[data-type="core/post-featured-image"] {
 			margin: 0;
 		}
 	}
+	img {
+		max-width: 100%;
+		height: auto;
+		display: block;
+	}
 }
