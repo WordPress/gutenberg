@@ -19,13 +19,13 @@ export default function NavigationItemWithIcon( {
 		<NavigationItem
 			item={ item }
 			title={ title }
-			className="edit-site-template-switcher__navigation-item"
+			className="edit-site-navigation-item-with-icon"
 		>
 			<Button { ...props }>
 				{ title }
 				{ icon && (
 					<Tooltip text={ iconLabel || title }>
-						<div className="edit-site-template-switcher__navigation-item-icon">
+						<div className="edit-site-navigation-item-with-icon__icon">
 							<Icon icon={ icon } />
 						</div>
 					</Tooltip>

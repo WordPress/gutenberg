@@ -1,16 +1,17 @@
-.edit-site-template-switcher__navigation-item {
+.edit-site-navigation-item-with-icon {
 	position: relative;
 
-	.edit-site-template-switcher__navigation-item-icon svg path {
+	&__icon {
+		width: 24px;
+		height: 24px;
+		position: absolute;
+		right: 20px;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
+	// We need extra specificity to override other CSS
+	& &__icon svg path {
 		color: inherit;
 	}
-}
-
-.edit-site-template-switcher__navigation-item-icon {
-	width: 24px;
-	height: 24px;
-	position: absolute;
-	right: 20px;
-	top: 50%;
-	transform: translateY(-50%);
 }
