@@ -92,9 +92,9 @@
 		transition: opacity 0.1s linear;
 		@include reduce-motion("transition");
 
-		&.is-selected,
+		&.is-active-entity,
 		&.has-child-selected,
-		&:not(.is-selected):not(.has-child-selected) .block-editor-block-list__block,
+		&:not(.has-child-selected) .block-editor-block-list__block,
 		&.is-active-entity .block-editor-block-list__block,
 		.is-active-entity .block-editor-block-list__block {
 			opacity: 1;
