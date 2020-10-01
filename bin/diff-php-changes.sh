@@ -12,6 +12,8 @@ Enable filtering by passing one or more of the following options:
  -a	Show added files [default]
  -d	Show deleted files [default]
  -m	Show modified files [default]
+
+Other options:
  -h	Show this help screen
 EOD
 	exit 1
