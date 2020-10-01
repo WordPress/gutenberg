@@ -30,30 +30,56 @@ class Typewriter extends Component {
 		this.isSelectionEligibleForScroll = this.isSelectionEligibleForScroll.bind(
 			this
 		);
+		this.getDocument = this.getDocument.bind( this );
+		this.getWindow = this.getWindow.bind( this );
 	}
 
 	componentDidMount() {
 		// When the user scrolls or resizes, the scroll position should be
 		// reset.
-		window.addEventListener( 'scroll', this.onScrollResize, true );
-		window.addEventListener( 'resize', this.onScrollResize, true );
+		this.getWindow().addEventListener(
+			'scroll',
+			this.onScrollResize,
+			true
+		);
+		this.getWindow().addEventListener(
+			'resize',
+			this.onScrollResize,
+			true
+		);
 	}
 
 	componentWillUnmount() {
-		window.removeEventListener( 'scroll', this.onScrollResize, true );
-		window.removeEventListener( 'resize', this.onScrollResize, true );
-		document.removeEventListener(
+		this.getWindow().removeEventListener(
+			'scroll',
+			this.onScrollResize,
+			true
+		);
+		this.getWindow().removeEventListener(
+			'resize',
+			this.onScrollResize,
+			true
+		);
+		this.getDocument().removeEventListener(
 			'selectionchange',
 			this.computeCaretRectOnSelectionChange
 		);
 
 		if ( this.onScrollResize.rafId ) {
-			window.cancelAnimationFrame( this.onScrollResize.rafId );
+			this.getWindow().cancelAnimationFrame( this.onScrollResize.rafId );
 		}
 
 		if ( this.onKeyDown.rafId ) {
-			window.cancelAnimationFrame( this.onKeyDown.rafId );
+			this.getWindow().cancelAnimationFrame( this.onKeyDown.rafId );
 		}
+	}
+
+	getDocument() {
+		return this.ref.current.ownerDocument;
+	}
+
+	getWindow() {
+		return this.getDocument().defaultView;
 	}
 
 	/**
@@ -61,7 +87,7 @@ class Typewriter extends Component {
 	 */
 	computeCaretRect() {
 		if ( this.isSelectionEligibleForScroll() ) {
-			this.caretRect = computeCaretRect();
+			this.caretRect = computeCaretRect( this.getWindow() );
 		}
 	}
 
@@ -70,7 +96,7 @@ class Typewriter extends Component {
 	 * event. Also removes the listener, so it acts as a one-time listener.
 	 */
 	computeCaretRectOnSelectionChange() {
-		document.removeEventListener(
+		this.getDocument().removeEventListener(
 			'selectionchange',
 			this.computeCaretRectOnSelectionChange
 		);
@@ -82,10 +108,12 @@ class Typewriter extends Component {
 			return;
 		}
 
-		this.onScrollResize.rafId = window.requestAnimationFrame( () => {
-			this.computeCaretRect();
-			delete this.onScrollResize.rafId;
-		} );
+		this.onScrollResize.rafId = this.getWindow().requestAnimationFrame(
+			() => {
+				this.computeCaretRect();
+				delete this.onScrollResize.rafId;
+			}
+		);
 	}
 
 	/**
@@ -97,8 +125,8 @@ class Typewriter extends Component {
 	isSelectionEligibleForScroll() {
 		return (
 			this.props.selectedBlockClientId &&
-			this.ref.current.contains( document.activeElement ) &&
-			document.activeElement.isContentEditable
+			this.ref.current.contains( this.getDocument().activeElement ) &&
+			this.getDocument().activeElement.isContentEditable
 		);
 	}
 
@@ -107,7 +135,7 @@ class Typewriter extends Component {
 			'[contenteditable="true"]'
 		);
 		const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
-		return lastEditableNode === document.activeElement;
+		return lastEditableNode === this.getDocument().activeElement;
 	}
 
 	/**
@@ -121,7 +149,7 @@ class Typewriter extends Component {
 			return;
 		}
 
-		const currentCaretRect = computeCaretRect();
+		const currentCaretRect = computeCaretRect( this.getWindow() );
 
 		if ( ! currentCaretRect ) {
 			return;
@@ -156,17 +184,17 @@ class Typewriter extends Component {
 			return;
 		}
 
-		const windowScroll = scrollContainer === document.body;
+		const windowScroll = scrollContainer === this.getDocument().body;
 		const scrollY = windowScroll
-			? window.scrollY
+			? this.getWindow().scrollY
 			: scrollContainer.scrollTop;
 		const scrollContainerY = windowScroll
 			? 0
 			: scrollContainer.getBoundingClientRect().top;
 		const relativeScrollPosition = windowScroll
-			? this.caretRect.top / window.innerHeight
+			? this.caretRect.top / this.getWindow().innerHeight
 			: ( this.caretRect.top - scrollContainerY ) /
-			  ( window.innerHeight - scrollContainerY );
+			  ( this.getWindow().innerHeight - scrollContainerY );
 
 		// If the scroll position is at the start, the active editable element
 		// is the last one, and the caret is positioned within the initial
@@ -185,7 +213,7 @@ class Typewriter extends Component {
 		}
 
 		const scrollContainerHeight = windowScroll
-			? window.innerHeight
+			? this.getWindow().innerHeight
 			: scrollContainer.clientHeight;
 
 		// Abort if the target scroll position would scroll the caret out of
@@ -203,7 +231,7 @@ class Typewriter extends Component {
 		}
 
 		if ( windowScroll ) {
-			window.scrollBy( 0, diff );
+			this.getWindow().scrollBy( 0, diff );
 		} else {
 			scrollContainer.scrollTop += diff;
 		}
@@ -214,7 +242,7 @@ class Typewriter extends Component {
 	 * maintained.
 	 */
 	addSelectionChangeListener() {
-		document.addEventListener(
+		this.getDocument().addEventListener(
 			'selectionchange',
 			this.computeCaretRectOnSelectionChange
 		);
@@ -225,11 +253,11 @@ class Typewriter extends Component {
 
 		// Ensure the any remaining request is cancelled.
 		if ( this.onKeyDown.rafId ) {
-			window.cancelAnimationFrame( this.onKeyDown.rafId );
+			this.getWindow().cancelAnimationFrame( this.onKeyDown.rafId );
 		}
 
 		// Use an animation frame for a smooth result.
-		this.onKeyDown.rafId = window.requestAnimationFrame( () => {
+		this.onKeyDown.rafId = this.getWindow().requestAnimationFrame( () => {
 			this.maintainCaretPosition( event );
 			delete this.onKeyDown.rafId;
 		} );

@@ -90,6 +90,7 @@ public class WPAndroidGlueCode {
     private OnMediaEditorListener mOnMediaEditorListener;
     private OnLogGutenbergUserEventListener mOnLogGutenbergUserEventListener;
     private OnGutenbergDidRequestUnsupportedBlockFallbackListener mOnGutenbergDidRequestUnsupportedBlockFallbackListener;
+    private OnGutenbergDidSendButtonPressedActionListener mOnGutenbergDidSendButtonPressedActionListener;
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnStarterPageTemplatesTooltipShownEventListener mOnStarterPageTemplatesTooltipShownListener;
     private OnStoryCreatorLoadRequestListener mOnStoryCreatorLoadRequestListener;
@@ -182,6 +183,10 @@ public class WPAndroidGlueCode {
 
     public interface OnGutenbergDidRequestUnsupportedBlockFallbackListener {
         void gutenbergDidRequestUnsupportedBlockFallback(UnsupportedBlock unsupportedBlock);
+    }
+
+    public interface OnGutenbergDidSendButtonPressedActionListener {
+        void gutenbergDidSendButtonPressedAction(String buttonType);
     }
 
     public interface OnStarterPageTemplatesTooltipShownEventListener {
@@ -381,6 +386,11 @@ public class WPAndroidGlueCode {
             }
 
             @Override
+            public void gutenbergDidSendButtonPressedAction(String buttonType) {
+                mOnGutenbergDidSendButtonPressedActionListener.gutenbergDidSendButtonPressedAction(buttonType);
+            }
+
+            @Override
             public void onAddMention(Consumer<String> onSuccess) {
                 mAddMentionUtil.getMention(onSuccess);
             }
@@ -477,6 +487,7 @@ public class WPAndroidGlueCode {
                                   OnMediaEditorListener onMediaEditorListener,
                                   OnLogGutenbergUserEventListener onLogGutenbergUserEventListener,
                                   OnGutenbergDidRequestUnsupportedBlockFallbackListener onGutenbergDidRequestUnsupportedBlockFallbackListener,
+                                  OnGutenbergDidSendButtonPressedActionListener onGutenbergDidSendButtonPressedActionListener,
                                   AddMentionUtil addMentionUtil,
                                   OnStarterPageTemplatesTooltipShownEventListener onStarterPageTemplatesTooltipListener,
                                   OnStoryCreatorLoadRequestListener onStoryCreatorLoadRequestListener,
@@ -493,6 +504,7 @@ public class WPAndroidGlueCode {
         mOnMediaEditorListener = onMediaEditorListener;
         mOnLogGutenbergUserEventListener = onLogGutenbergUserEventListener;
         mOnGutenbergDidRequestUnsupportedBlockFallbackListener = onGutenbergDidRequestUnsupportedBlockFallbackListener;
+        mOnGutenbergDidSendButtonPressedActionListener = onGutenbergDidSendButtonPressedActionListener;
         mAddMentionUtil = addMentionUtil;
         mOnStarterPageTemplatesTooltipShownListener = onStarterPageTemplatesTooltipListener;
         mOnStoryCreatorLoadRequestListener = onStoryCreatorLoadRequestListener;

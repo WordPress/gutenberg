@@ -33,6 +33,8 @@ import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
 import ColorCell from './color-cell';
+import LinkCell from './link-cell';
+import LinkSuggestionItemCell from './link-suggestion-item-cell';
 import RadioCell from './radio-cell';
 import NavigationScreen from './bottom-sheet-navigation/navigation-screen';
 import NavigationContainer from './bottom-sheet-navigation/navigation-container';
@@ -50,6 +52,8 @@ class BottomSheet extends Component {
 			this
 		);
 
+		this.setIsFullScreen = this.setIsFullScreen.bind( this );
+
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
 		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
 		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
@@ -64,6 +68,7 @@ class BottomSheet extends Component {
 
 		this.state = {
 			safeAreaBottomInset: 0,
+			safeAreaTopInset: 0,
 			bounces: false,
 			maxHeight: 0,
 			keyboardHeight: 0,
@@ -72,6 +77,7 @@ class BottomSheet extends Component {
 			handleClosingBottomSheet: null,
 			handleHardwareButtonPress: null,
 			isMaxHeightSet: true,
+			isFullScreen: this.props.isFullScreen || false,
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
@@ -136,13 +142,19 @@ class BottomSheet extends Component {
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
-		const { safeAreaBottomInset } = this.state;
+		const { safeAreaBottomInset, safeAreaTopInset } = this.state;
 		if ( this.safeAreaEventSubscription === null ) {
 			return;
 		}
 		const { safeAreaInsets } = result;
-		if ( safeAreaBottomInset !== safeAreaInsets.bottom ) {
-			this.setState( { safeAreaBottomInset: safeAreaInsets.bottom } );
+		if (
+			safeAreaBottomInset !== safeAreaInsets.bottom ||
+			safeAreaTopInset !== safeAreaInsets.top
+		) {
+			this.setState( {
+				safeAreaBottomInset: safeAreaInsets.bottom,
+				safeAreaTopInset: safeAreaInsets.top,
+			} );
 		}
 	}
 
@@ -231,6 +243,16 @@ class BottomSheet extends Component {
 		this.onShouldSetBottomSheetMaxHeight( true );
 	}
 
+	setIsFullScreen( isFullScreen ) {
+		if ( isFullScreen !== this.state.isFullScreen ) {
+			if ( isFullScreen ) {
+				this.setState( { isFullScreen, isMaxHeightSet: false } );
+			} else {
+				this.setState( { isFullScreen, isMaxHeightSet: true } );
+			}
+		}
+	}
+
 	onHardwareButtonPress() {
 		const { onClose } = this.props;
 		const { handleHardwareButtonPress } = this.state;
@@ -245,7 +267,6 @@ class BottomSheet extends Component {
 	getContentStyle() {
 		const { safeAreaBottomInset } = this.state;
 		return {
-			flexGrow: 1,
 			paddingBottom:
 				( safeAreaBottomInset || 0 ) +
 				styles.scrollableContent.paddingBottom,
@@ -272,9 +293,11 @@ class BottomSheet extends Component {
 			maxHeight,
 			bounces,
 			safeAreaBottomInset,
+			safeAreaTopInset,
 			isScrolling,
 			scrollEnabled,
 			isMaxHeightSet,
+			isFullScreen,
 		} = this.state;
 
 		const panResponder = PanResponder.create( {
@@ -303,6 +326,12 @@ class BottomSheet extends Component {
 			styles.bottomSheetHeaderTitleDark
 		);
 
+		let listStyle = {};
+		if ( isFullScreen ) {
+			listStyle = { flexGrow: 1 };
+		} else if ( isMaxHeightSet ) {
+			listStyle = { maxHeight };
+		}
 		const listProps = {
 			disableScrollViewPanResponder: true,
 			bounces,
@@ -316,8 +345,10 @@ class BottomSheet extends Component {
 				contentStyle,
 				isChildrenScrollable && this.getContentStyle(),
 				contentStyle,
+				isFullScreen && { flexGrow: 1 },
 			],
-			style: isMaxHeightSet ? { maxHeight } : {},
+			style: listStyle,
+			safeAreaBottomInset,
 			scrollEnabled,
 			automaticallyAdjustContentInsets: false,
 		};
@@ -373,11 +404,21 @@ class BottomSheet extends Component {
 					style={ {
 						...backgroundStyle,
 						borderColor: 'rgba(0, 0, 0, 0.1)',
+						marginTop:
+							Platform.OS === 'ios' && isFullScreen
+								? safeAreaTopInset
+								: 0,
+						flex: isFullScreen ? 1 : undefined,
+						...( Platform.OS === 'android' && isFullScreen
+							? styles.backgroundFullScreen
+							: {} ),
 						...style,
 					} }
 					keyboardVerticalOffset={ -safeAreaBottomInset }
 				>
-					<View style={ styles.dragIndicator } />
+					{ ! ( Platform.OS === 'android' && isFullScreen ) && (
+						<View style={ styles.dragIndicator } />
+					) }
 					{ ! hideHeader && getHeader() }
 					<WrapperView
 						{ ...( isChildrenScrollable
@@ -396,6 +437,7 @@ class BottomSheet extends Component {
 								onHandleHardwareButtonPress: this
 									.onHandleHardwareButtonPress,
 								listProps,
+								setIsFullScreen: this.setIsFullScreen,
 							} }
 						>
 							<TouchableHighlight accessible={ false }>
@@ -429,6 +471,8 @@ ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
 ThemedBottomSheet.ColorCell = ColorCell;
+ThemedBottomSheet.LinkCell = LinkCell;
+ThemedBottomSheet.LinkSuggestionItemCell = LinkSuggestionItemCell;
 ThemedBottomSheet.RadioCell = RadioCell;
 ThemedBottomSheet.NavigationScreen = NavigationScreen;
 ThemedBottomSheet.NavigationContainer = NavigationContainer;

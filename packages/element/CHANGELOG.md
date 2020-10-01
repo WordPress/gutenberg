@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.17.1 (2020-09-17)
+
 ### Bug fix
 
 - Declare @types/react and @types/react-dom dependencies which could cause type errors when using

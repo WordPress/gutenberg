@@ -24,5 +24,6 @@ RCT_EXTERN_METHOD(addMention:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromis
 RCT_EXTERN_METHOD(requestStarterPageTemplatesTooltipShown:(RCTResponseSenderBlock)callback)
 RCT_EXTERN_METHOD(setStarterPageTemplatesTooltipShown:(BOOL)tooltipShown)
 RCT_EXTERN_METHOD(requestStoryCreatorLoad:(NSArray *)mediaFiles blockId:(NSString *)blockId)
+RCT_EXTERN_METHOD(actionButtonPressed:(NSString *)buttonType)
 
 @end

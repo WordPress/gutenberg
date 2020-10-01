@@ -183,6 +183,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
                 Toast.makeText(MainApplication.this, "requestStoryCreatorLoad called", Toast.LENGTH_SHORT).show();
             }
 
+            @Override
+            public void gutenbergDidSendButtonPressedAction(String buttonType) {
+
+            }
+            
         }, isDarkMode());
 
         return new ReactNativeHost(this) {

@@ -74,9 +74,7 @@ describe( 'Navigation', () => {
 	it( 'should render a custom component when menu item supplies one', async () => {
 		render( testNavigation() );
 
-		const customItem = screen.getByRole( 'button', {
-			name: 'customize me',
-		} );
+		const customItem = screen.getByText( 'customize me' );
 
 		expect( customItem ).toBeDefined();
 	} );

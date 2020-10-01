@@ -6,7 +6,7 @@ import { upperFirst, camelCase, map, find, get, startCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { apiFetch, __unstableSyncSelect } from '@wordpress/data-controls';
+import { apiFetch, syncSelect } from '@wordpress/data-controls';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -188,11 +188,7 @@ export const getMethodName = (
  * @return {Array} Entities
  */
 export function* getKindEntities( kind ) {
-	let entities = yield __unstableSyncSelect(
-		'core',
-		'getEntitiesByKind',
-		kind
-	);
+	let entities = yield syncSelect( 'core', 'getEntitiesByKind', kind );
 	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}

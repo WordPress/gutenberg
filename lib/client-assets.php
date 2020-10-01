@@ -330,7 +330,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-components',
 		gutenberg_url( 'build/components/style.css' ),
-		array(),
+		array( 'dashicons' ),
 		filemtime( gutenberg_dir_path() . 'build/components/style.css' )
 	);
 	$styles->add_data( 'wp-components', 'rtl', 'replace' );
@@ -619,17 +619,3 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
-
-/**
- * Extends block editor settings to determine whether to use custom unit controls.
- * Currently experimental.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_custom_units( $settings ) {
-	$settings['enableCustomUnits'] = get_theme_support( 'custom-units' );
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
