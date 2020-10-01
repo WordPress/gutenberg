@@ -1,12 +1,6 @@
 .edit-site-template-switcher__navigation-item {
 	position: relative;
 
-	&.is-active {
-		.edit-site-template-switcher__customized-dot {
-			background: #fff;
-		}
-	}
-
 	.edit-site-template-switcher__navigation-item-icon svg path {
 		color: inherit;
 	}
@@ -19,16 +13,4 @@
 	right: 20px;
 	top: 50%;
 	transform: translateY(-50%);
-}
-
-.edit-site-template-switcher__customized-dot {
-	position: absolute;
-	right: 8px;
-	top: 50%;
-	margin-top: -4px;
-	width: 8px;
-	height: 8px;
-	display: block;
-	background: var(--wp-admin-theme-color);
-	border-radius: 50%;
 }
