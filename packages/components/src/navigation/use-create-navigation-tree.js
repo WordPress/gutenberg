@@ -23,6 +23,13 @@ export const useCreateNavigationTree = () => {
 		removeNode: removeMenu,
 	} = useNavigationTreeNodes();
 
+	/**
+	 * Stores direct nested menus of menus
+	 * This makes it easy to traverse menu tree
+	 *
+	 * Key is the menu prop of the menu
+	 * Value is an array of menu keys
+	 */
 	const [ directSubMenus, setDirectSubMenus ] = useState( {} );
 	const getDirectSubMenus = ( menu ) => directSubMenus[ menu ] || [];
 
