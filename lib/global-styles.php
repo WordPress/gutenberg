@@ -422,7 +422,7 @@ function gutenberg_experimental_global_styles_get_support_keys() {
 		'backgroundColor'          => array( 'color' ),
 		'color'                    => array( 'color' ),
 		'fontSize'                 => array( 'fontSize' ),
-		'lineHeight'               => array( '__experimentalLineHeight' ),
+		'lineHeight'               => array( 'lineHeight' ),
 	);
 }
 

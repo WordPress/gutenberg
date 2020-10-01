@@ -34,7 +34,7 @@
 			"link": true
 		},
 		"fontSize": true,
-		"__experimentalLineHeight": true,
+		"lineHeight": true,
 		"__experimentalSelector": "p",
 		"__unstablePasteTextInline": true
 	}

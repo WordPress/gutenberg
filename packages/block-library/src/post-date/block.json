@@ -20,6 +20,6 @@
 			"gradients": true
 		},
 		"fontSize": true,
-		"__experimentalLineHeight": true
+		"lineHeight": true
 	}
 }
