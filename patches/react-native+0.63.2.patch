@@ -1,0 +1,100 @@
+diff --git a/node_modules/react-native/Libraries/ActionSheetIOS/ActionSheetIOS.js b/node_modules/react-native/Libraries/ActionSheetIOS/ActionSheetIOS.js
+index e330253..ebf9e57 100644
+--- a/node_modules/react-native/Libraries/ActionSheetIOS/ActionSheetIOS.js
++++ b/node_modules/react-native/Libraries/ActionSheetIOS/ActionSheetIOS.js
+@@ -33,6 +33,7 @@ const ActionSheetIOS = {
+    * - `destructiveButtonIndex` (int or array of ints) - index or indices of destructive buttons in `options`
+    * - `title` (string) - a title to show above the action sheet
+    * - `message` (string) - a message to show below the title
++   * - `disabledButtonIndices` (array of numbers) - a list of button indices which should be disabled
+    *
+    * The 'callback' function takes one parameter, the zero-based index
+    * of the selected item.
+@@ -49,6 +50,7 @@ const ActionSheetIOS = {
+       +anchor?: ?number,
+       +tintColor?: ColorValue | ProcessedColorValue,
+       +userInterfaceStyle?: string,
++      +disabledButtonIndices?: Array<number>,
+     |},
+     callback: (buttonIndex: number) => void,
+   ) {
+diff --git a/node_modules/react-native/Libraries/ActionSheetIOS/NativeActionSheetManager.js b/node_modules/react-native/Libraries/ActionSheetIOS/NativeActionSheetManager.js
+index 063d914..6d86200 100644
+--- a/node_modules/react-native/Libraries/ActionSheetIOS/NativeActionSheetManager.js
++++ b/node_modules/react-native/Libraries/ActionSheetIOS/NativeActionSheetManager.js
+@@ -25,6 +25,7 @@ export interface Spec extends TurboModule {
+       +anchor?: ?number,
+       +tintColor?: ?number,
+       +userInterfaceStyle?: ?string,
++      +disabledButtonIndices?: Array<number>,
+     |},
+     callback: (buttonIndex: number) => void,
+   ) => void;
+diff --git a/node_modules/react-native/Libraries/FBReactNativeSpec/FBReactNativeSpec/FBReactNativeSpec.h b/node_modules/react-native/Libraries/FBReactNativeSpec/FBReactNativeSpec/FBReactNativeSpec.h
+index 2da6323..883f728 100644
+--- a/node_modules/react-native/Libraries/FBReactNativeSpec/FBReactNativeSpec/FBReactNativeSpec.h
++++ b/node_modules/react-native/Libraries/FBReactNativeSpec/FBReactNativeSpec/FBReactNativeSpec.h
+@@ -114,6 +114,7 @@ namespace JS {
+       NSString *message() const;
+       folly::Optional<facebook::react::LazyVector<NSString *>> options() const;
+       folly::Optional<facebook::react::LazyVector<double>> destructiveButtonIndices() const;
++      folly::Optional<facebook::react::LazyVector<double>> disabledButtonIndices() const;
+       folly::Optional<double> cancelButtonIndex() const;
+       folly::Optional<double> anchor() const;
+       folly::Optional<double> tintColor() const;
+@@ -2922,6 +2923,11 @@ inline folly::Optional<facebook::react::LazyVector<double>> JS::NativeActionShee
+   id const p = _v[@"destructiveButtonIndices"];
+   return RCTBridgingToOptionalVec(p, ^double(id itemValue_0) { return RCTBridgingToDouble(itemValue_0); });
+ }
++inline folly::Optional<facebook::react::LazyVector<double>> JS::NativeActionSheetManager::SpecShowActionSheetWithOptionsOptions::disabledButtonIndices() const
++{
++  id const p = _v[@"disabledButtonIndices"];
++  return RCTBridgingToOptionalVec(p, ^double(id itemValue_0) { return RCTBridgingToDouble(itemValue_0); });
++}
+ inline folly::Optional<double> JS::NativeActionSheetManager::SpecShowActionSheetWithOptionsOptions::cancelButtonIndex() const
+ {
+   id const p = _v[@"cancelButtonIndex"];
+diff --git a/node_modules/react-native/React/CoreModules/RCTActionSheetManager.mm b/node_modules/react-native/React/CoreModules/RCTActionSheetManager.mm
+index 04a150c..5cfbb12 100644
+--- a/node_modules/react-native/React/CoreModules/RCTActionSheetManager.mm
++++ b/node_modules/react-native/React/CoreModules/RCTActionSheetManager.mm
+@@ -75,7 +75,13 @@ - (void)presentViewController:(UIViewController *)alertController
+   });
+   NSInteger cancelButtonIndex =
+       options.cancelButtonIndex() ? [RCTConvert NSInteger:@(*options.cancelButtonIndex())] : -1;
++  NSArray<NSNumber *> *disabledButtonIndices;
+   NSArray<NSNumber *> *destructiveButtonIndices;
++  if (options.disabledButtonIndices()) {
++    disabledButtonIndices = RCTConvertVecToArray(*options.disabledButtonIndices(), ^id(double element) {
++      return @(element);
++    });
++  }
+   if (options.destructiveButtonIndices()) {
+     destructiveButtonIndices = RCTConvertVecToArray(*options.destructiveButtonIndices(), ^id(double element) {
+       return @(element);
+@@ -98,6 +104,7 @@ - (void)presentViewController:(UIViewController *)alertController
+       @"destructiveButtonIndices" : destructiveButtonIndices,
+       @"anchor" : anchor,
+       @"tintColor" : tintColor,
++      @"disabledButtonIndices" : disabledButtonIndices,
+     });
+     return;
+   }
+@@ -132,6 +139,17 @@ - (void)presentViewController:(UIViewController *)alertController
+     index++;
+   }
+ 
++  if (disabledButtonIndices) {
++    for (NSNumber *disabledButtonIndex in disabledButtonIndices) {
++      if ([disabledButtonIndex integerValue] < buttons.count) {
++        [alertController.actions[[disabledButtonIndex integerValue]] setEnabled:false];
++      } else {
++        RCTLogError(@"Index %@ from `disabledButtonIndices` is out of bounds. Maximum index value is %@.", @([disabledButtonIndex integerValue]), @(buttons.count - 1));
++        return;
++      }
++    }
++  }
++
+   alertController.view.tintColor = tintColor;
+ #if defined(__IPHONE_OS_VERSION_MAX_ALLOWED) && defined(__IPHONE_13_0) && \
+     __IPHONE_OS_VERSION_MAX_ALLOWED >= __IPHONE_13_0
