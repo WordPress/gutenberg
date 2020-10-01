@@ -383,6 +383,7 @@ class GalleryEdit extends Component {
 				onError={ this.onUploadError }
 				notices={ hasImages ? undefined : noticeUI }
 				onFocus={ this.props.onFocus }
+				autoOpenMediaUpload={ ! hasImages && isSelected }
 			/>
 		);
 
