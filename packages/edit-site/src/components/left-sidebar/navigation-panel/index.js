@@ -25,14 +25,13 @@ const NavigationPanel = () => {
 		ref.current.focus();
 	}, [ ref ] );
 
-	const { templateId, templatePartId, templateType, page } = useSelect(
+	const { templateId, templatePartId, templateType } = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( 'core' );
 			const {
 				getTemplateId,
 				getTemplatePartId,
 				getTemplateType,
-				getPage,
 			} = select( 'core/edit-site' );
 
 			const _templateId = getTemplateId();
@@ -45,7 +44,6 @@ const NavigationPanel = () => {
 				templateId: _templateId,
 				templatePartId: getTemplatePartId(),
 				templateType: getTemplateType(),
-				page: getPage(),
 			};
 		},
 		[]
@@ -64,12 +62,7 @@ const NavigationPanel = () => {
 		[ templateId ]
 	);
 
-	const {
-		setTemplate,
-		addTemplate,
-		removeTemplate,
-		setTemplatePart,
-	} = useDispatch( 'core/edit-site' );
+	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
 
 	return (
 		<div className="edit-site-navigation-panel">
@@ -102,11 +95,8 @@ const NavigationPanel = () => {
 					/>
 
 					<TemplatesMenu
-						page={ page }
 						activeId={ templateId }
 						onActiveIdChange={ setTemplate }
-						onAddTemplate={ addTemplate }
-						onRemoveTemplate={ removeTemplate }
 					/>
 
 					<TemplatePartsMenu
