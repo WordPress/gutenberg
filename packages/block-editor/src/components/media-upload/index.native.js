@@ -150,6 +150,8 @@ export class MediaUpload extends React.Component {
 		const isIOS = Platform.OS === 'ios';
 
 		if ( this.picker ) {
+			// the delay below is required because on iOS this action sheet gets dismissed by the close event of the Inserter
+			// so this delay allows the Inserter to be closed fully before presenting action sheet.
 			if ( autoOpenMediaUpload && isIOS ) {
 				delay(
 					() => this.picker.presentPicker(),
