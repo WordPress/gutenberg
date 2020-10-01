@@ -21,7 +21,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 function ColumnEdit( {
-	attributes: { verticalAlignment, width },
+	attributes: { verticalAlignment, width, allowedBlocks },
 	setAttributes,
 	clientId,
 } ) {
@@ -96,6 +96,8 @@ function ColumnEdit( {
 				}
 				__experimentalTagName="div"
 				__experimentalPassedProps={ blockWrapperProps }
+				//Specify the blocks allowed to be placed within this column
+				allowedBlocks={ allowedBlocks }
 			/>
 		</>
 	);

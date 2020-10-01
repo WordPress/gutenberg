@@ -10,6 +10,9 @@
 		},
 		"width": {
 			"type": "string"
+		},
+		"allowedBlocks": {
+			"type": "array"
 		}
 	},
 	"supports": {
