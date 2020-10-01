@@ -66,12 +66,8 @@ const getUrlForSlug = ( image, { sizeSlug } ) => {
 export class ImageEdit extends React.Component {
 	constructor( props ) {
 		super( props );
-
-		const { attributes, isSelected } = this.props;
-		const { url } = attributes;
 		this.state = {
 			isCaptionSelected: false,
-			autoOpenMediaUpload: isSelected && ! url,
 		};
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
@@ -322,7 +318,6 @@ export class ImageEdit extends React.Component {
 	}
 
 	onClearMedia() {
-		this.setState( { autoOpenMediaUpload: false } );
 		this.props.setAttributes( { id: null, url: null } );
 	}
 
@@ -348,7 +343,7 @@ export class ImageEdit extends React.Component {
 	}
 
 	render() {
-		const { isCaptionSelected, autoOpenMediaUpload } = this.state;
+		const { isCaptionSelected } = this.state;
 		const {
 			attributes,
 			isSelected,
@@ -447,7 +442,7 @@ export class ImageEdit extends React.Component {
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getPlaceholderIcon() }
 						onFocus={ this.props.onFocus }
-						autoOpenMediaUpload={ autoOpenMediaUpload }
+						autoOpenMediaUpload={ isSelected && ! url }
 					/>
 				</View>
 			);
