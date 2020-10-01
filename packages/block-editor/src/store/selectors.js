@@ -1835,5 +1835,5 @@ export const getActiveBlockIdByBlockNames = createSelector(
 		}
 		return null;
 	},
-	( state ) => [ state.selectionStart.clientId ]
+	( state ) => [ state.selectionStart.clientId, state.selectionEnd.clientId ]
 );
