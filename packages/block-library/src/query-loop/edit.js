@@ -7,7 +7,7 @@ import {
 	BlockContextProvider,
 	InnerBlocks,
 	BlockPreview,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -88,10 +88,10 @@ export default function QueryLoopEdit( {
 			} ) ),
 		[ posts ]
 	);
-	const blockWrapperProps = useBlockWrapperProps();
+	const blockProps = useBlockProps();
 
 	return (
-		<div { ...blockWrapperProps }>
+		<div { ...blockProps }>
 			{ blockContexts &&
 				blockContexts.map( ( blockContext ) => (
 					<BlockContextProvider

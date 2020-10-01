@@ -12,7 +12,7 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	BlockControls,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
@@ -46,7 +46,7 @@ function Navigation( {
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 
-	const blockProps = useBlockWrapperProps();
+	const blockProps = useBlockProps();
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
 	);

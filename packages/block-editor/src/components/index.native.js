@@ -59,7 +59,7 @@ export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export {
 	Block as __experimentalBlock,
-	useBlockWrapperProps as __experimentalUseBlockWrapperProps,
+	useBlockProps,
 } from './block-list/block-wrapper';
 export { default as FloatingToolbar } from './floating-toolbar';
 

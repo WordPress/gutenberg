@@ -31,7 +31,7 @@ import {
 	MediaReplaceFlow,
 	withColors,
 	ColorPalette,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
@@ -426,7 +426,7 @@ function CoverEdit( {
 		</>
 	);
 
-	const blockWrapperProps = useBlockWrapperProps();
+	const blockProps = useBlockProps();
 
 	if ( ! hasBackground ) {
 		const placeholderIcon = <BlockIcon icon={ icon } />;
@@ -436,10 +436,10 @@ function CoverEdit( {
 			<>
 				{ controls }
 				<div
-					{ ...blockWrapperProps }
+					{ ...blockProps }
 					className={ classnames(
 						'is-placeholder',
-						blockWrapperProps.className
+						blockProps.className
 					) }
 				>
 					<MediaPlaceholder
@@ -493,9 +493,9 @@ function CoverEdit( {
 		<>
 			{ controls }
 			<div
-				{ ...blockWrapperProps }
-				className={ classnames( classes, blockWrapperProps.className ) }
-				style={ { ...style, ...blockWrapperProps.style } }
+				{ ...blockProps }
+				className={ classnames( classes, blockProps.className ) }
+				style={ { ...style, ...blockProps.style } }
 				data-url={ url }
 			>
 				<BoxControlVisualizer

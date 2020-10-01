@@ -11,7 +11,7 @@ import {
 	RichText,
 	BlockControls,
 	AlignmentToolbar,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
 export default function VerseEdit( {
@@ -20,7 +20,7 @@ export default function VerseEdit( {
 	mergeBlocks,
 } ) {
 	const { textAlign, content } = attributes;
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
@@ -49,7 +49,7 @@ export default function VerseEdit( {
 				placeholder={ __( 'Write…' ) }
 				onMerge={ mergeBlocks }
 				textAlign={ textAlign }
-				{ ...blockWrapperProps }
+				{ ...blockProps }
 			/>
 		</>
 	);
