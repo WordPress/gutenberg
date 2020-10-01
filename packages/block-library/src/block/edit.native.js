@@ -8,7 +8,7 @@ import { partial } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { BottomSheet, Icon, Spinner, Disabled } from '@wordpress/components';
+import { BottomSheet, Icon, Disabled } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { BlockEditorProvider, BlockList } from '@wordpress/block-editor';
@@ -85,7 +85,7 @@ class ReusableBlockEdit extends Component {
 	}
 
 	renderSheet() {
-		const { name, reusableBlock } = this.props;
+		const { reusableBlock } = this.props;
 		const { showHelp } = this.state;
 
 		const { getStylesFromColorScheme, clientId } = this.props;
@@ -126,7 +126,7 @@ class ReusableBlockEdit extends Component {
 							requestUnsupportedBlockFallback(
 								`<!-- wp:block {"ref":${ reusableBlock.id }} /-->`,
 								clientId,
-								name,
+								reusableBlock.name,
 								reusableBlock.title
 							);
 						}, 100 );
@@ -167,7 +167,7 @@ class ReusableBlockEdit extends Component {
 		const { isEditing, blocks } = this.state;
 
 		if ( ! reusableBlock && isFetching ) {
-			return <Spinner />;
+			return null;
 		}
 
 		if ( ! reusableBlock ) {
