@@ -50,6 +50,8 @@
 		"anchor": true,
 		"align": true,
 		"html": false,
-		"__experimentalPadding": true
+		"spacing": {
+			"padding": true
+		}
 	}
 }
