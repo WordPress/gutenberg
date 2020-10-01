@@ -13,7 +13,6 @@ import {
  * Internal dependencies
  */
 import TemplatePreview from '../template-preview';
-import NavigationItemWithIcon from '../navigation-item-with-icon';
 
 export default function TemplatePartsMenu( { onActiveTemplatePartIdChange } ) {
 	const [ hoveredTemplatePartId, setHoveredTemplatePartId ] = useState();
@@ -37,7 +36,7 @@ export default function TemplatePartsMenu( { onActiveTemplatePartIdChange } ) {
 				const key = `template-part-${ templatePart.id }`;
 
 				return (
-					<NavigationItemWithIcon
+					<NavigationItem
 						key={ key }
 						item={ key }
 						title={ templatePart.slug }

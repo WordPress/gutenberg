@@ -13,7 +13,6 @@ import apiFetch from '@wordpress/api-fetch';
  * Internal dependencies
  */
 import TemplatesPagesMenu from './templates-pages';
-import NavigationItemWithIcon from '../navigation-item-with-icon';
 
 const GENERAL_TEMPLATE_SLUGS = [
 	'front-page',
@@ -63,7 +62,7 @@ export default function TemplatesMenu( { activeId, onActiveIdChange } ) {
 			<NavigationItem navigateToMenu="templates-pages" title="Pages" />
 
 			{ generalTemplates?.map( ( template ) => (
-				<NavigationItemWithIcon
+				<NavigationItem
 					key={ `template-${ template.id }` }
 					item={ `template-${ template.slug }` }
 					title={ template.slug }
