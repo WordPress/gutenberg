@@ -17,7 +17,7 @@
 			"wide",
 			"full"
 		],
-		"__experimentalFontSize": true,
+		"fontSize": true,
 		"color": {
 			"gradients": true,
 			"link": true

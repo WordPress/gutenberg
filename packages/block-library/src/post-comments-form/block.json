@@ -17,7 +17,7 @@
 			"gradients": true,
 			"link": true
 		},
-		"__experimentalFontSize": true,
+		"fontSize": true,
 		"__experimentalLineHeight": true
 	}
 }
