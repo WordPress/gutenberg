@@ -2,16 +2,17 @@
 
 _usage() {
 	cat <<EOD
-usage: $0 [-adm] <range>
+usage: $0 [--filter=<filter>] <range>
     List PHP files that have been added, deleted and/or modified files
     within Git range <range>. For example:
 
-    $(basename $0) origin/wp/5.5..origin/wp/trunk
+	$(basename $0) --filter=Ar origin/wp/5.5..origin/wp/trunk
 
-Enable filtering by passing one or more of the following options:
- -a	Show added files [default]
- -d	Show deleted files [default]
- -m	Show modified files [default]
+Optionally filter according to \`git diff --diff-filter\`, e.g.
+ --filter=A	Show added paths
+ --filter=AD	Show added and deleted paths
+ --filter=MR	Show modified and renamed paths
+ --filter=d	Exclude deleted paths
 
 Other options:
  -h	Show this help screen
@@ -19,61 +20,25 @@ EOD
 	exit 1
 }
 
-_diff_php() {
-	git diff "$range" -- '*.php'
-}
-
-_diff_php_plus() {
-	_diff_php | grep ^+++ | cut -c 6-
-}
-
-_diff_php_minus() {
-	_diff_php | grep ^--- | cut -c 6-
-}
-
-_compare() {
-	comm "$1" <(_diff_php_minus | sort) <(_diff_php_plus | sort) \
-		| grep -v ^dev/null
-}
-
-_print_added() {
-	_compare -13 | sed "s/^/added:		/"
-}
-
-_print_deleted() {
-	_compare -23 | sed "s/^/deleted:	/"
-}
-
-_print_modified() {
-	_compare -12 | sed "s/^/modified:	/"
+_diff() {
+	filter="$1"
+	git diff "$range" --name-status --diff-filter="$filter" '**/*.php'
 }
 
 _main() {
-	local args
-	if ! args=$(getopt hadm "$@"); then
-		_usage
-		exit 2
-	fi
-
-	# shellcheck disable=2086
-	set -- $args
+	# shellcheck disable=2068
+	set -- $@
+	filter=""
 	for arg; do
 		case "$arg" in
-			-h|--help) _usage; shift;;
-			-a|--added) has_filter=true; show_added=true; shift;;
-			-d|--deleted) has_filter=true; show_deleted=true; shift;;
-			-m|--modified) has_filter=true; show_modified=true; shift;;
-			--) shift; break;;
+			--filter=*) filter="${arg#--filter=}"; shift;;
+			-*) _usage; shift; break;;
 		esac
 	done
-
 	[ $# != 1 ] && _usage
-
 	range="$1"
 	echo "### $range"
-	[ -z "$has_filter" ] || [ -n "$show_added" ] && _print_added
-	[ -z "$has_filter" ] || [ -n "$show_deleted" ] && _print_deleted
-	[ -z "$has_filter" ] || [ -n "$show_modified" ] && _print_modified
+	_diff "$filter"
 }
 
 _main "$@"
