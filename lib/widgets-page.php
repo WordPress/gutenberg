@@ -9,20 +9,12 @@
  * The main entry point for the Gutenberg widgets page.
  *
  * @since 5.2.0
- *
- * @param string $page The page name the function is being called for, `'gutenberg_customizer'` for the Customizer.
  */
-function the_gutenberg_widgets( $page = 'appearance_page_gutenberg-widgets' ) {
+function the_gutenberg_widgets() {
 	?>
 	<div
 		id="widgets-editor"
-		class="blocks-widgets-container
-		<?php
-		echo 'gutenberg_customizer' === $page
-			? ' is-in-customizer'
-			: '';
-		?>
-		"
+		class="blocks-widgets-container"
 	>
 	</div>
 	<?php
@@ -45,13 +37,11 @@ function gutenberg_widgets_init( $hook ) {
 		);
 		return;
 	}
-	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets', 'gutenberg_customizer' ), true ) ) {
+	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets' ), true ) ) {
 		return;
 	}
 
-	$initializer_name = 'appearance_page_gutenberg-widgets' === $hook
-		? 'initialize'
-		: 'customizerInitialize';
+	$initializer_name = 'initialize';
 
 	// Media settings.
 	$max_upload_size = wp_max_upload_size();
@@ -87,7 +77,29 @@ function gutenberg_widgets_init( $hook ) {
 		gutenberg_get_legacy_widget_settings()
 	);
 
+	// This purposefully does not rely on apply_filters( 'block_editor_settings', $settings, null );
+	// Applying that filter would bring over multitude of features from the post editor, some of which
+	// may be undesirable. Instead of using that filter, we simply pick just the settings that are needed.
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
+	$settings = gutenberg_extend_block_editor_styles( $settings );
+
+	$preload_paths = array(
+		array( '/wp/v2/media', 'OPTIONS' ),
+		'/__experimental/sidebars?context=edit',
+	);
+	$preload_data  = array_reduce(
+		$preload_paths,
+		'rest_preload_api_request',
+		array()
+	);
+	wp_add_inline_script(
+		'wp-api-fetch',
+		sprintf(
+			'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );',
+			wp_json_encode( $preload_data )
+		),
+		'after'
+	);
 
 	wp_add_inline_script(
 		'wp-edit-widgets',

@@ -13,7 +13,10 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { useExperimentalFeatures } from '../../experimental-features';
+import {
+	useExperimentalFeatures,
+	openNavigation,
+} from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -125,6 +128,11 @@ describe( 'Multi-entity save flow', () => {
 				await page.keyboard.type( 'some words...' );
 
 				await assertMultiSaveEnabled();
+
+				// TODO: Remove when toolbar supports text fields
+				expect( console ).toHaveWarnedWith(
+					'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
+				);
 			} );
 
 			it( 'Should only have save panel a11y button active after child entities edited', async () => {
@@ -217,8 +225,6 @@ describe( 'Multi-entity save flow', () => {
 		const saveSiteSelector = '.edit-site-save-button__button';
 		const activeSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=false]`;
 		const disabledSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=true]`;
-		const templateDropdownSelector =
-			'.components-dropdown-menu__toggle[aria-label="Switch Template"]';
 		const saveA11ySelector = '.edit-site-editor__toggle-save-panel-button';
 
 		it( 'Should be enabled after edits', async () => {
@@ -229,7 +235,7 @@ describe( 'Multi-entity save flow', () => {
 			await visitAdminPage( 'admin.php', query );
 
 			// Ensure we are on 'front-page' demo template.
-			await page.click( templateDropdownSelector );
+			await openNavigation();
 			const demoTemplateButton = await page.waitForXPath(
 				demoTemplateSelector
 			);

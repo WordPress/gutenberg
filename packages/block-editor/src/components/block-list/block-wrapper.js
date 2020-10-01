@@ -18,6 +18,8 @@ import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
+import deprecated from '@wordpress/deprecated';
+import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -29,12 +31,13 @@ import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-wrapper-elements';
 
 /**
- * This hook is used to lighly mark an element as a block element. Call this
- * hook and pass the returned props to the element to mark as a block. If you
- * define a ref for the element, it is important to pass the ref to this hook,
- * which the hooks in turn will pass to the component through the props it
- * returns. Optionally, you can also pass any other props through this hook, and
- * they will be merged and returned.
+ * This hook is used to lightly mark an element as a block element. The element
+ * should be the outermost element of a block. Call this hook and pass the
+ * returned props to the element to mark as a block. If you define a ref for the
+ * element, it is important to pass the ref to this hook, which the hook in turn
+ * will pass to the component through the props it returns. Optionally, you can
+ * also pass any other props through this hook, and they will be merged and
+ * returned.
  *
  * @param {Object}  props   Optional. Props to pass to the element. Must contain
  *                          the ref if one is defined.
@@ -43,7 +46,7 @@ import ELEMENTS from './block-wrapper-elements';
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
-export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
+export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const fallbackRef = useRef();
 	const ref = props.ref || fallbackRef;
 	const onSelectionStart = useContext( Context );
@@ -109,6 +112,20 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 			};
 		}
 	}, [ isSelected, isFirstMultiSelected, isLastMultiSelected ] );
+
+	// Set new block node if it changes.
+	// This effect should happen on every render, so no dependencies should be
+	// added.
+	useEffect( () => {
+		const node = ref.current;
+		setBlockNodes( ( nodes ) => {
+			if ( ! nodes[ clientId ] || nodes[ clientId ] === node ) {
+				return nodes;
+			}
+
+			return { ...nodes, [ clientId ]: node };
+		} );
+	} );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
@@ -285,16 +302,20 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 	};
 }
 
+/**
+ * Call within a save function to get the props for the block wrapper.
+ *
+ * @param {Object} props Optional. Props to pass to the element.
+ */
+useBlockProps.save = getBlockProps;
+
 const BlockComponent = forwardRef(
-	(
-		{ children, tagName: TagName = 'div', __unstableIsHtml, ...props },
-		ref
-	) => {
-		const blockWrapperProps = useBlockWrapperProps(
-			{ ...props, ref },
-			{ __unstableIsHtml }
-		);
-		return <TagName { ...blockWrapperProps }>{ children }</TagName>;
+	( { children, tagName: TagName = 'div', ...props }, ref ) => {
+		deprecated( 'wp.blockEditor.__experimentalBlock', {
+			alternative: 'wp.blockEditor.useBlockProps',
+		} );
+		const blockProps = useBlockProps( { ...props, ref } );
+		return <TagName { ...blockProps }>{ children }</TagName>;
 	}
 );
 

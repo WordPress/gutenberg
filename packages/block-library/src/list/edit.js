@@ -7,7 +7,7 @@ import {
 	RichText,
 	BlockControls,
 	RichTextShortcut,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
 import {
@@ -154,7 +154,7 @@ export default function ListEdit( {
 		</>
 	);
 
-	const blockWrapperProps = useBlockWrapperProps();
+	const blockProps = useBlockProps();
 
 	return (
 		<>
@@ -180,7 +180,7 @@ export default function ListEdit( {
 				start={ start }
 				reversed={ reversed }
 				type={ type }
-				{ ...blockWrapperProps }
+				{ ...blockProps }
 			>
 				{ controls }
 			</RichText>

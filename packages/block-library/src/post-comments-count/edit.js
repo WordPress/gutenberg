@@ -10,7 +10,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	Warning,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
@@ -25,7 +25,7 @@ export default function PostCommentsCountEdit( {
 	const { textAlign } = attributes;
 	const { postId } = context;
 	const [ commentsCount, setCommentsCount ] = useState();
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
@@ -59,7 +59,7 @@ export default function PostCommentsCountEdit( {
 					} }
 				/>
 			</BlockControls>
-			<div { ...blockWrapperProps }>
+			<div { ...blockProps }>
 				{ postId && commentsCount !== undefined ? (
 					commentsCount
 				) : (

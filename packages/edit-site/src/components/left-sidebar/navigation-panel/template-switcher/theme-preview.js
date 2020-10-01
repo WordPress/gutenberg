@@ -8,11 +8,11 @@ import { truncate } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 
-function ThemePreview( {
+export default function ThemePreview( {
 	theme: { author, description, name, screenshot, version },
 } ) {
 	return (
-		<div className="edit-site-template-switcher__theme-preview">
+		<div className="edit-site-navigation-panel__preview">
 			<span
 				className="edit-site-template-switcher__theme-preview-name"
 				dangerouslySetInnerHTML={ {
@@ -32,11 +32,14 @@ function ThemePreview( {
 			<img
 				className="edit-site-template-switcher__theme-preview-screenshot"
 				src={ screenshot }
-				alt={ 'Theme Preview' }
+				alt={ __( 'Theme Preview' ) }
 			/>
 			<div className="edit-site-template-switcher__theme-preview-description">
 				{ truncate(
-					/* Not using description.rendered here, as we might contain after an opening HTML tag. */
+					// We can't use `description.rendered` here because we are truncating the string
+					// `description.rendered` might contain HTML tags which doesn't play nicely with truncating
+					// truncate function might truncate in the middle of an HTML tag so we never
+					// close the HTML tag we are already in
 					description.raw,
 					{
 						length: 120,
@@ -47,5 +50,3 @@ function ThemePreview( {
 		</div>
 	);
 }
-
-export default ThemePreview;
