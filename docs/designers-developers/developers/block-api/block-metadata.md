@@ -255,9 +255,7 @@ See [the block context documentation](/docs/designers-developers/developers/bloc
 -   Property: `supports`
 -   Default: `{}`
 
-It contains as set of options to control features used in the editor.
-
-See the [the supports documentation](/docs/designers-developers/developers/block-api/block-registration.md#supports-optional) for more details.
+It contains as set of options to control features used in the editor. See the [the supports documentation](/docs/designers-developers/developers/block-api/block-supports.md) for more details.
 
 ### Style Variations
 

@@ -148,8 +148,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
                                                      String blockName,
                                                      String blockTitle);
 
+    void gutenbergDidSendButtonPressedAction(String buttonType);
+
     void onAddMention(Consumer<String> onSuccess);
-    
+
     void setStarterPageTemplatesTooltipShown(boolean tooltipShown);
 
     void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback);

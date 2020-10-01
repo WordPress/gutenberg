@@ -9,10 +9,10 @@
 	"supports": {
 		"html": false,
 		"lightBlockWrapper": true,
-		"__experimentalColor": {
+		"color": {
 			"gradients": true
 		},
-		"__experimentalFontSize": true,
+		"fontSize": true,
 		"__experimentalLineHeight": true
 	}
 }

@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { FontSizePicker as BaseFontSizePicker } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,11 +9,10 @@ import { useSelect } from '@wordpress/data';
 import useEditorFeature from '../use-editor-feature';
 
 function FontSizePicker( props ) {
-	const fontSizes = useSelect(
-		( select ) => select( 'core/block-editor' ).getSettings().fontSizes,
-		[]
+	const fontSizes = useEditorFeature( 'typography.fontSizes' );
+	const disableCustomFontSizes = ! useEditorFeature(
+		'typography.customFontSize'
 	);
-	const disableCustomFontSizes = ! useEditorFeature( 'fontSize.custom' );
 
 	return (
 		<BaseFontSizePicker

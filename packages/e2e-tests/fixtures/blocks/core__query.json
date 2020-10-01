@@ -5,14 +5,15 @@
 		"isValid": true,
 		"attributes": {
 			"query": {
-				"perPage": 3,
+				"perPage": null,
 				"pages": 1,
 				"offset": 0,
 				"categoryIds": [],
 				"tagIds": [],
 				"order": "desc",
 				"orderBy": "date",
-				"author": null
+				"author": "",
+				"search": ""
 			}
 		},
 		"innerBlocks": [],

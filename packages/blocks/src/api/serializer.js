@@ -6,12 +6,7 @@ import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	Component,
-	RawHTML,
-	cloneElement,
-	renderToString,
-} from '@wordpress/element';
+import { Component, cloneElement, renderToString } from '@wordpress/element';
 import { hasFilter, applyFilters } from '@wordpress/hooks';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -22,20 +17,15 @@ import {
 	getBlockType,
 	getFreeformContentHandlerName,
 	getUnregisteredTypeHandlerName,
+	hasBlockSupport,
 } from './registration';
 import { normalizeBlockType } from './utils';
 import BlockContentProvider from '../block-content-provider';
 
-/** @typedef {import('@wordpress/element').WPElement} WPElement */
-
 /**
  * @typedef {Object} WPBlockSerializationOptions Serialization Options.
  *
- * @property {boolean}   isInnerBlocks
- * Whether we are serializing inner blocks.
- * @property {WPElement} [__experimentalRenderCallback]
- * Callback to define HTML surrounding block, outside of the comment
- * delimiters. Used by InnerBlocks API.
+ * @property {boolean} isInnerBlocks Whether we are serializing inner blocks.
  */
 
 /**
@@ -79,6 +69,23 @@ export function getBlockMenuDefaultClassName( blockName ) {
 	);
 }
 
+const blockPropsProvider = {};
+
+/**
+ * Call within a save function to get the props for the block wrapper.
+ *
+ * @param {Object} props Optional. Props to pass to the element.
+ */
+export function getBlockProps( props = {} ) {
+	const { blockType, attributes } = blockPropsProvider;
+	return applyFilters(
+		'blocks.getSaveContent.extraProps',
+		{ ...props },
+		blockType,
+		attributes
+	);
+}
+
 /**
  * Given a block type containing a save render implementation and attributes, returns the
  * enhanced element to be saved or string when raw HTML expected.
@@ -105,11 +112,15 @@ export function getSaveElement(
 		save = instance.render.bind( instance );
 	}
 
+	blockPropsProvider.blockType = blockType;
+	blockPropsProvider.attributes = attributes;
+
 	let element = save( { attributes, innerBlocks } );
 
 	if (
 		isObject( element ) &&
-		hasFilter( 'blocks.getSaveContent.extraProps' )
+		hasFilter( 'blocks.getSaveContent.extraProps' ) &&
+		! hasBlockSupport( blockType, 'lightBlockWrapper', false )
 	) {
 		/**
 		 * Filters the props applied to the block save result element.
@@ -318,41 +329,20 @@ export function getCommentDelimitedContent(
  *
  * @return {string} Serialized block.
  */
-export function serializeBlock(
-	block,
-	{ isInnerBlocks = false, __experimentalRenderCallback: renderCallback } = {}
-) {
+export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 	const blockName = block.name;
 	const saveContent = getBlockContent( block );
-
-	// Serialized block content before wrapping it with an InnerBlocks item
-	// wrapper.
-	let unwrappedContent;
 
 	if (
 		blockName === getUnregisteredTypeHandlerName() ||
 		( ! isInnerBlocks && blockName === getFreeformContentHandlerName() )
 	) {
-		unwrappedContent = saveContent;
-	} else {
-		const blockType = getBlockType( blockName );
-		const saveAttributes = getCommentAttributes(
-			blockType,
-			block.attributes
-		);
-		unwrappedContent = getCommentDelimitedContent(
-			blockName,
-			saveAttributes,
-			saveContent
-		);
+		return saveContent;
 	}
 
-	if ( renderCallback ) {
-		return renderToString(
-			renderCallback( <RawHTML>{ unwrappedContent }</RawHTML> )
-		);
-	}
-	return unwrappedContent;
+	const blockType = getBlockType( blockName );
+	const saveAttributes = getCommentAttributes( blockType, block.attributes );
+	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
 }
 
 /**

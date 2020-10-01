@@ -17,10 +17,10 @@
 			"wide",
 			"full"
 		],
-		"__experimentalFontSize": true,
-		"__experimentalColor": {
+		"fontSize": true,
+		"color": {
 			"gradients": true,
-			"linkColor": true
+			"link": true
 		},
 		"__experimentalLineHeight": true
 	}

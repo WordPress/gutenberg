@@ -8,33 +8,46 @@ import { set, get } from 'lodash';
  */
 import {
 	createContext,
+	useCallback,
 	useContext,
 	useEffect,
 	useMemo,
 } from '@wordpress/element';
 import { useEntityProp } from '@wordpress/core-data';
+import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import getGlobalStyles from './global-styles-renderer';
 
+const EMPTY_CONTENT = '{}';
+
 const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
-	getProperty: ( context, path ) => {},
-	setProperty: ( context, newValues ) => {},
+	getStyleProperty: ( context, propertyName ) => {},
+	setStyleProperty: ( context, propertyName, newValue ) => {},
 	globalContext: {},
 	/* eslint-enable no-unused-vars */
 } );
 
 export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
 
+const useGlobalStylesEntityContent = () => {
+	return useEntityProp( 'postType', 'wp_global_styles', 'content' );
+};
+
+export const useGlobalStylesReset = () => {
+	const [ content, setContent ] = useGlobalStylesEntityContent();
+	const canRestart = !! content && content !== EMPTY_CONTENT;
+	return [
+		canRestart,
+		useCallback( () => setContent( EMPTY_CONTENT ), [ setContent ] ),
+	];
+};
+
 export default ( { children, baseStyles, contexts } ) => {
-	const [ content, setContent ] = useEntityProp(
-		'postType',
-		'wp_global_styles',
-		'content'
-	);
+	const [ content, setContent ] = useGlobalStylesEntityContent();
 
 	const userStyles = useMemo(
 		() => ( content ? JSON.parse( content ) : {} ),
@@ -44,17 +57,19 @@ export default ( { children, baseStyles, contexts } ) => {
 	const nextValue = useMemo(
 		() => ( {
 			contexts,
-			getProperty: ( context, path ) =>
-				get( userStyles?.[ context ]?.styles, path ),
-			setProperty: ( context, newValues ) => {
+			getStyleProperty: ( context, propertyName ) =>
+				get(
+					userStyles?.[ context ]?.styles,
+					STYLE_PROPERTY[ propertyName ]
+				),
+			setStyleProperty: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
-				Object.keys( newValues ).forEach( ( key ) => {
-					set(
-						newContent,
-						`${ context }.styles.${ key }`,
-						newValues[ key ]
-					);
-				} );
+				let contextStyles = newContent?.[ context ]?.styles;
+				if ( ! contextStyles ) {
+					contextStyles = {};
+					set( newContent, [ context, 'styles' ], contextStyles );
+				}
+				set( contextStyles, STYLE_PROPERTY[ propertyName ], newValue );
 				setContent( JSON.stringify( newContent ) );
 			},
 		} ),

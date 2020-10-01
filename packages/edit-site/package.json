@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-site",
-	"version": "1.12.0",
+	"version": "1.13.0",
 	"description": "Edit Site Page module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -27,7 +27,7 @@
 		"!((src|build|build-module)/components/**)"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
+		"@babel/runtime": "^7.11.2",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
@@ -50,6 +50,7 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/url": "file:../url",
+		"classnames": "^2.2.5",
 		"downloadjs": "^1.4.7",
 		"file-saver": "^2.0.2",
 		"jszip": "^3.2.2",

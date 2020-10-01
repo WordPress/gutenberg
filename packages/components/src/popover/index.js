@@ -116,13 +116,17 @@ function computeAnchorRect(
 	return withoutPadding( rect, parentNode );
 }
 
+function getComputedStyle( node ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
+
 function withoutPadding( rect, element ) {
 	const {
 		paddingTop,
 		paddingBottom,
 		paddingLeft,
 		paddingRight,
-	} = window.getComputedStyle( element );
+	} = getComputedStyle( element );
 	const top = paddingTop ? parseInt( paddingTop, 10 ) : 0;
 	const bottom = paddingBottom ? parseInt( paddingBottom, 10 ) : 0;
 	const left = paddingLeft ? parseInt( paddingLeft, 10 ) : 0;

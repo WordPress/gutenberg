@@ -7,12 +7,16 @@ import { noop, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import { imageFillStyles } from './media-container';
+import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
 const DEFAULT_MEDIA_WIDTH = 50;
 
@@ -33,17 +37,19 @@ export default function save( { attributes } ) {
 		linkTarget,
 		rel,
 	} = attributes;
+	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 	const newRel = isEmpty( rel ) ? undefined : rel;
+
+	const imageClasses = classnames( {
+		[ `wp-image-${ mediaId }` ]: mediaId && mediaType === 'image',
+		[ `size-${ mediaSizeSlug }` ]: mediaId && mediaType === 'image',
+	} );
 
 	let image = (
 		<img
 			src={ mediaUrl }
 			alt={ mediaAlt }
-			className={
-				mediaId && mediaType === 'image'
-					? `wp-image-${ mediaId }`
-					: null
-			}
+			className={ imageClasses || null }
 		/>
 	);
 
@@ -85,7 +91,7 @@ export default function save( { attributes } ) {
 		gridTemplateColumns,
 	};
 	return (
-		<div className={ className } style={ style }>
+		<div { ...useBlockWrapperProps.save( { className, style } ) }>
 			<figure
 				className="wp-block-media-text__media"
 				style={ backgroundStyles }

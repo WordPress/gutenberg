@@ -12,15 +12,28 @@
 		"level": {
 			"type": "number",
 			"default": 2
+		},
+		"isLink": {
+			"type": "boolean",
+			"default": false
+		},
+		"rel": {
+			"type": "string",
+			"attribute": "rel",
+			"default": ""
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": "_self"
 		}
 	},
 	"supports": {
 		"html": false,
 		"lightBlockWrapper": true,
-		"__experimentalColor": {
+		"color": {
 			"gradients": true
 		},
-		"__experimentalFontSize": true,
+		"fontSize": true,
 		"__experimentalLineHeight": true,
 		"__experimentalSelector": {
 			"core/post-title/h1": "h1",

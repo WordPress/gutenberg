@@ -1,14 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	deburr,
-	differenceWith,
-	find,
-	intersectionWith,
-	isEmpty,
-	words,
-} from 'lodash';
+import { deburr, differenceWith, find, words } from 'lodash';
 
 // Default search helpers
 const defaultGetName = ( item ) => item.name || '';
@@ -16,7 +9,6 @@ const defaultGetTitle = ( item ) => item.title;
 const defaultGetKeywords = ( item ) => item.keywords || [];
 const defaultGetCategory = ( item ) => item.category;
 const defaultGetCollection = () => null;
-const defaultGetVariations = () => [];
 
 /**
  * Sanitizes the search input string.
@@ -92,33 +84,8 @@ export const searchBlockItems = (
 				)
 			),
 	};
-	return searchItems( items, searchInput, config ).map( ( item ) => {
-		if ( isEmpty( item.variations ) ) {
-			return item;
-		}
 
-		const matchedVariations = item.variations.filter(
-			( { title, keywords = [] } ) => {
-				return (
-					intersectionWith(
-						normalizedSearchTerms,
-						getNormalizedSearchTerms( title ).concat( keywords ),
-						( termToMatch, labelTerm ) =>
-							labelTerm.includes( termToMatch )
-					).length > 0
-				);
-			}
-		);
-		// When no variations matched, fallback to all variations.
-		if ( isEmpty( matchedVariations ) ) {
-			return item;
-		}
-
-		return {
-			...item,
-			variations: matchedVariations,
-		};
-	} );
+	return searchItems( items, searchInput, config );
 };
 
 /**
@@ -162,7 +129,6 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 		getKeywords = defaultGetKeywords,
 		getCategory = defaultGetCategory,
 		getCollection = defaultGetCollection,
-		getVariations = defaultGetVariations,
 	} = config;
 
 	const name = getName( item );
@@ -170,7 +136,6 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 	const keywords = getKeywords( item );
 	const category = getCategory( item );
 	const collection = getCollection( item );
-	const variations = getVariations( item );
 
 	const normalizedSearchInput = normalizeSearchInput( searchTerm );
 	const normalizedTitle = normalizeSearchInput( title );
@@ -185,14 +150,9 @@ export function getItemSearchRank( item, searchTerm, config = {} ) {
 	} else if ( normalizedTitle.startsWith( normalizedSearchInput ) ) {
 		rank += 20;
 	} else {
-		const terms = [
-			name,
-			title,
-			...keywords,
-			category,
-			collection,
-			...variations,
-		].join( ' ' );
+		const terms = [ name, title, ...keywords, category, collection ].join(
+			' '
+		);
 		const normalizedSearchTerms = words( normalizedSearchInput );
 		const unmatchedTerms = removeMatchingTerms(
 			normalizedSearchTerms,

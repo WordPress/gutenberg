@@ -15,11 +15,13 @@ import {
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
-	__experimentalBlock as Block,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
 } from '@wordpress/block-editor';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
+
+/* global wp */
 
 /**
  * Internal dependencies
@@ -30,8 +32,10 @@ import Image from './image';
  * Module constants
  */
 import {
-	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
 	DEFAULT_SIZE_SLUG,
 } from './constants';
@@ -83,7 +87,6 @@ export function ImageEdit( {
 		caption,
 		align,
 		id,
-		linkDestination,
 		width,
 		height,
 		sizeSlug,
@@ -152,21 +155,49 @@ export function ImageEdit( {
 			additionalAttributes = { url };
 		}
 
-		// Check if the image is linked to it's media.
-		if ( linkDestination === LINK_DESTINATION_MEDIA ) {
-			// Update the media link.
-			mediaAttributes.href = media.url;
+		// Check if default link setting should be used.
+		let linkDestination = attributes.linkDestination;
+		if ( ! linkDestination ) {
+			// Use the WordPress option to determine the proper default.
+			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
+			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
+			switch (
+				wp?.media?.view?.settings?.defaultProps?.link ||
+				LINK_DESTINATION_NONE
+			) {
+				case 'file':
+				case LINK_DESTINATION_MEDIA:
+					linkDestination = LINK_DESTINATION_MEDIA;
+					break;
+				case 'post':
+				case LINK_DESTINATION_ATTACHMENT:
+					linkDestination = LINK_DESTINATION_ATTACHMENT;
+					break;
+				case LINK_DESTINATION_CUSTOM:
+					linkDestination = LINK_DESTINATION_CUSTOM;
+					break;
+				case LINK_DESTINATION_NONE:
+					linkDestination = LINK_DESTINATION_NONE;
+					break;
+			}
 		}
 
-		// Check if the image is linked to the attachment page.
-		if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
-			// Update the media link.
-			mediaAttributes.href = media.link;
+		// Check if the image is linked to it's media.
+		let href;
+		switch ( linkDestination ) {
+			case LINK_DESTINATION_MEDIA:
+				href = media.url;
+				break;
+			case LINK_DESTINATION_ATTACHMENT:
+				href = media.link;
+				break;
 		}
+		mediaAttributes.href = href;
 
 		setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,
+			linkDestination,
 		} );
 	}
 
@@ -272,14 +303,15 @@ export function ImageEdit( {
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 	} );
 
-	// Focussing the image caption after inserting an image relies on the
-	// component remounting. This needs to be fixed.
-	const key = !! url;
+	const blockWrapperProps = useBlockWrapperProps( {
+		ref,
+		className: classes,
+	} );
 
 	return (
 		<>
 			{ controls }
-			<Block.figure ref={ ref } className={ classes } key={ key }>
+			<figure { ...blockWrapperProps }>
 				{ url && (
 					<Image
 						attributes={ attributes }
@@ -294,7 +326,7 @@ export function ImageEdit( {
 					/>
 				) }
 				{ mediaPlaceholder }
-			</Block.figure>
+			</figure>
 		</>
 	);
 }

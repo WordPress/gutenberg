@@ -49,7 +49,7 @@ $resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // M
 .is-dark-theme {
 	.components-resizable-box__side-handle::before,
 	.components-resizable-box__handle::after {
-		border-color: $light-gray-600;
+		border-color: $gray-300;
 	}
 }
 

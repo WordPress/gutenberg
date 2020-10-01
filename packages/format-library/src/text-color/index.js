@@ -1,13 +1,12 @@
 /**
  * External dependencies
  */
-import { get, isEmpty } from 'lodash';
+import { isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 import { useCallback, useMemo, useState } from '@wordpress/element';
 import {
 	RichTextToolbarButton,
@@ -28,18 +27,7 @@ const EMPTY_ARRAY = [];
 
 function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 	const allowCustomControl = useEditorFeature( 'color.custom' );
-	const { colors } = useSelect( ( select ) => {
-		const blockEditorSelect = select( 'core/block-editor' );
-		let settings;
-		if ( blockEditorSelect && blockEditorSelect.getSettings ) {
-			settings = blockEditorSelect.getSettings();
-		} else {
-			settings = {};
-		}
-		return {
-			colors: get( settings, [ 'colors' ], EMPTY_ARRAY ),
-		};
-	} );
+	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
 	const enableIsAddingColor = useCallback( () => setIsAddingColor( true ), [
 		setIsAddingColor,

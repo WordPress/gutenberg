@@ -28,7 +28,6 @@ function BlockList(
 		className,
 		rootClientId,
 		renderAppender,
-		__experimentalItemCallback,
 		__experimentalTagName = 'div',
 		__experimentalAppenderTagName,
 		__experimentalPassedProps = {},
@@ -44,6 +43,7 @@ function BlockList(
 			hasMultiSelection,
 			getGlobalBlockCount,
 			isTyping,
+			isDraggingBlocks,
 		} = select( 'core/block-editor' );
 
 		return {
@@ -55,6 +55,7 @@ function BlockList(
 			enableAnimation:
 				! isTyping() &&
 				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+			isDraggingBlocks: isDraggingBlocks(),
 		};
 	}
 
@@ -65,20 +66,25 @@ function BlockList(
 		orientation,
 		hasMultiSelection,
 		enableAnimation,
+		isDraggingBlocks,
 	} = useSelect( selector, [ rootClientId ] );
+
+	const fallbackRef = useRef();
+	const element = __experimentalPassedProps.ref || ref || fallbackRef;
 
 	const Container = rootClientId ? __experimentalTagName : RootContainer;
 	const dropTargetIndex = useBlockDropZone( {
-		element: ref,
+		element,
 		rootClientId,
 	} );
 
-	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
+	const isAppenderDropTarget =
+		dropTargetIndex === blockClientIds.length && isDraggingBlocks;
 
 	return (
 		<Container
 			{ ...__experimentalPassedProps }
-			ref={ ref }
+			ref={ element }
 			className={ classnames(
 				'block-editor-block-list__layout',
 				className,
@@ -90,7 +96,8 @@ function BlockList(
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
 
-				const isDropTarget = dropTargetIndex === index;
+				const isDropTarget =
+					dropTargetIndex === index && isDraggingBlocks;
 
 				return (
 					<AsyncModeProvider
@@ -111,9 +118,6 @@ function BlockList(
 									isDropTarget &&
 									orientation === 'horizontal',
 							} ) }
-							__experimentalRenderCallback={
-								__experimentalItemCallback
-							}
 						/>
 					</AsyncModeProvider>
 				);
@@ -138,10 +142,9 @@ const ForwardedBlockList = forwardRef( BlockList );
 // as it's the one changing the async mode
 // depending on the block selection.
 export default forwardRef( ( props, ref ) => {
-	const fallbackRef = useRef();
 	return (
 		<AsyncModeProvider value={ false }>
-			<ForwardedBlockList ref={ ref || fallbackRef } { ...props } />
+			<ForwardedBlockList ref={ ref } { ...props } />
 		</AsyncModeProvider>
 	);
 } );

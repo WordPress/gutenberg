@@ -12,6 +12,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeMediaAppend,
 	subscribeReplaceBlock,
 	subscribeUpdateTheme,
+	subscribeUpdateCapabilities,
 } from '@wordpress/react-native-bridge';
 
 /**
@@ -28,7 +29,10 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
-import { SETTINGS_DEFAULTS } from '@wordpress/block-editor';
+import {
+	validateThemeColors,
+	validateThemeGradients,
+} from '@wordpress/block-editor';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -68,6 +72,10 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
+		const { capabilities } = this.props;
+
+		this.props.updateSettings( capabilities );
+
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
 			this.serializeToNativeAction();
 		} );
@@ -115,15 +123,18 @@ class NativeEditorProvider extends Component {
 		this.subscriptionParentUpdateTheme = subscribeUpdateTheme(
 			( theme ) => {
 				// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
-				if ( theme.colors === undefined ) {
-					theme.colors = SETTINGS_DEFAULTS.colors;
-				}
 
-				if ( theme.gradients === undefined ) {
-					theme.gradients = SETTINGS_DEFAULTS.gradients;
-				}
+				theme.colors = validateThemeColors( theme.colors );
+
+				theme.gradients = validateThemeGradients( theme.gradients );
 
 				this.props.updateSettings( theme );
+			}
+		);
+
+		this.subscriptionParentUpdateCapabilities = subscribeUpdateCapabilities(
+			( payload ) => {
+				this.updateCapabilitiesAction( payload );
 			}
 		);
 	}
@@ -155,6 +166,10 @@ class NativeEditorProvider extends Component {
 
 		if ( this.subscriptionParentUpdateTheme ) {
 			this.subscriptionParentUpdateTheme.remove();
+		}
+
+		if ( this.subscriptionParentUpdateCapabilities ) {
+			this.subscriptionParentUpdateCapabilities.remove();
 		}
 	}
 
@@ -226,6 +241,10 @@ class NativeEditorProvider extends Component {
 		// make sure to blur the selected block and dismiss the keyboard
 		this.props.clearSelectedBlock();
 		switchMode( mode === 'visual' ? 'text' : 'visual' );
+	}
+
+	updateCapabilitiesAction( capabilities ) {
+		this.props.updateSettings( capabilities );
 	}
 
 	render() {
