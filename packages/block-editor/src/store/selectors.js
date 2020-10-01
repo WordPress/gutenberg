@@ -1800,21 +1800,21 @@ export function areInnerBlocksControlled( state, clientId ) {
 }
 
 /**
- * Returns the clientId for the first 'active' block of a given array of block types.
+ * Returns the clientId for the first 'active' block of a given array of block names.
  * A block is 'active' if it (or a child) is the selected block.
  * Returns the first match moving up the DOM from the selected block.
  *
  * @param {Object} state Global application state.
- * @param {string[]} validBlocksTypes The parent block types to check for.
+ * @param {string[]} validBlocksNames The names of block types to check for.
  *
  * @return {string} The matching block's clientId.
  */
-export const getActiveBlockIdByBlockType = createSelector(
-	( state, validBlocksTypes ) => {
+export const getActiveBlockIdByBlockNames = createSelector(
+	( state, validBlocksNames ) => {
 		// Check if selected block is a valid entity area.
 		const selectedBlockClientId = getSelectedBlockClientId( state );
 		if (
-			validBlocksTypes.includes(
+			validBlocksNames.includes(
 				getBlockName( state, selectedBlockClientId )
 			)
 		) {
@@ -1827,7 +1827,7 @@ export const getActiveBlockIdByBlockType = createSelector(
 		const entityAreaParents = getBlockParentsByBlockName(
 			state,
 			selectedBlockClientId || multiSelectedBlockClientIds[ 0 ],
-			validBlocksTypes
+			validBlocksNames
 		);
 		if ( entityAreaParents ) {
 			// Last parent closest/most interior.

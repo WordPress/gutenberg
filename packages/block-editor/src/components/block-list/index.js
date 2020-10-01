@@ -47,16 +47,17 @@ function BlockList(
 			getGlobalBlockCount,
 			isTyping,
 			isDraggingBlocks,
-			getActiveBlockIdByBlockType,
+			getActiveBlockIdByBlockNames,
 		} = select( 'core/block-editor' );
 
 		// Determine if there is an active template part (or other entity) to spotlight.
-		// Restrict to Full Site Editing experiment.
+		// Restrict to Full Site Editing experiment while the currently defined ENTITY_AREAS
+		// only exist in FSE.
 		const isFullSiteEditingEnabled = getSettings()
 			.__experimentalEnableFullSiteEditing;
 		const activeEntityBlockId =
 			isFullSiteEditingEnabled &&
-			getActiveBlockIdByBlockType( ENTITY_AREAS );
+			getActiveBlockIdByBlockNames( ENTITY_AREAS );
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
