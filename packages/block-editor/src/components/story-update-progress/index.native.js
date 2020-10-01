@@ -123,7 +123,7 @@ export class StoryUpdateProgress extends React.Component {
 			case MEDIA_SAVE_MEDIAMODEL_CREATED:
 				this.mediaModelCreated( payload );
 				break;
-			}
+		}
 	}
 
 	// ---- Story (media) save actions
