@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { last } from 'lodash';
+
 /**
  * WordPress dependencies
  */
@@ -38,8 +38,6 @@ function BlockList(
 ) {
 	function selector( select ) {
 		const {
-			getBlockName,
-			getBlockParentsByBlockName,
 			getBlockOrder,
 			getBlockListSettings,
 			getSettings,
@@ -49,42 +47,20 @@ function BlockList(
 			getGlobalBlockCount,
 			isTyping,
 			isDraggingBlocks,
+			getActiveEntityBlockId,
 		} = select( 'core/block-editor' );
-
-		const selectedBlockClientId = getSelectedBlockClientId();
-		const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
 
 		// Determine if there is an active template part (or other entity) to spotlight.
 		// Restrict to Full Site Editing experiment.
 		const isFullSiteEditingEnabled = getSettings()
 			.__experimentalEnableFullSiteEditing;
 		const activeEntityBlockId =
-			isFullSiteEditingEnabled &&
-			( function () {
-				// Check if selected block is a valid entity area.
-				if (
-					ENTITY_AREAS.includes(
-						getBlockName( selectedBlockClientId )
-					)
-				) {
-					return selectedBlockClientId;
-				}
-				// Check if first selected block is a child of a valid entity area.
-				const entityAreaParents = getBlockParentsByBlockName(
-					selectedBlockClientId || multiSelectedBlockClientIds[ 0 ],
-					ENTITY_AREAS
-				);
-				if ( entityAreaParents ) {
-					// Last parent closest/most interior.
-					return last( entityAreaParents );
-				}
-				return null;
-			} )();
+			isFullSiteEditingEnabled && getActiveEntityBlockId( ENTITY_AREAS );
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
-			selectedBlockClientId,
-			multiSelectedBlockClientIds,
+			selectedBlockClientId: getSelectedBlockClientId(),
+			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			orientation: getBlockListSettings( rootClientId )?.orientation,
 			hasMultiSelection: hasMultiSelection(),
 			enableAnimation:
