@@ -7,6 +7,7 @@
 	position: relative;
 
 	.edit-site-document-actions__title {
+		font-weight: bold;
 		transition: transform 0.2s;
 		@include reduce-motion(transition);
 	}
