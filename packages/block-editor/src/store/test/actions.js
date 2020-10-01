@@ -144,6 +144,15 @@ describe( 'actions', () => {
 
 			expect( replaceBlockGenerator.next().value ).toEqual( {
 				args: [ 'chicken' ],
+				selectorName: 'getBlockName',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				replaceBlockGenerator.next( 'core/test-chicken' ).value
+			).toEqual( {
+				args: [ 'chicken' ],
 				selectorName: 'getBlockRootClientId',
 				storeName: 'core/block-editor',
 				type: 'SELECT',
@@ -178,6 +187,59 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'replaceBlocks', () => {
+		it( 'should not validate the insertion if a reusable block is being inserted', () => {
+			const blocks = [
+				{
+					clientId: 'ribs',
+					name: 'core/test-ribs',
+				},
+				{
+					clientId: 'chicken',
+					name: 'core/block',
+				},
+			];
+
+			const replaceBlockGenerator = replaceBlocks(
+				[ 'chicken' ],
+				blocks
+			);
+
+			expect( replaceBlockGenerator.next().value ).toEqual( {
+				args: [],
+				selectorName: 'getSettings',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect( replaceBlockGenerator.next().value ).toEqual( {
+				args: [ 'chicken' ],
+				selectorName: 'getBlockName',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect( replaceBlockGenerator.next( 'core/block' ).value ).toEqual(
+				{
+					type: 'REPLACE_BLOCKS',
+					clientIds: [ 'chicken' ],
+					blocks,
+					time: expect.any( Number ),
+				}
+			);
+
+			expect( replaceBlockGenerator.next().value ).toEqual( {
+				args: [],
+				selectorName: 'getBlockCount',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect( replaceBlockGenerator.next( 1 ) ).toEqual( {
+				value: undefined,
+				done: true,
+			} );
+		} );
+
 		it( 'should not yield the REPLACE_BLOCKS action if the replacement is not possible', () => {
 			const blocks = [
 				{
@@ -203,6 +265,15 @@ describe( 'actions', () => {
 			} );
 
 			expect( replaceBlockGenerator.next().value ).toEqual( {
+				args: [ 'chicken' ],
+				selectorName: 'getBlockName',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				replaceBlockGenerator.next( 'core/test-chicken' ).value
+			).toEqual( {
 				args: [ 'chicken' ],
 				selectorName: 'getBlockRootClientId',
 				storeName: 'core/block-editor',
@@ -250,6 +321,15 @@ describe( 'actions', () => {
 			replaceBlockGenerator.next();
 
 			expect( replaceBlockGenerator.next().value ).toEqual( {
+				args: [ 'chicken' ],
+				selectorName: 'getBlockName',
+				storeName: 'core/block-editor',
+				type: 'SELECT',
+			} );
+
+			expect(
+				replaceBlockGenerator.next( 'core/test-chicken' ).value
+			).toEqual( {
 				args: [ 'chicken' ],
 				selectorName: 'getBlockRootClientId',
 				storeName: 'core/block-editor',
