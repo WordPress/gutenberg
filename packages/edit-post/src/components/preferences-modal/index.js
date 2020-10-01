@@ -59,7 +59,7 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 					label={ __( 'Show button text labels' ) }
 				/>
 			</Section>
-			<Section title={ __( 'Keyboard options' ) }>
+			<Section title={ __( 'Keyboard' ) }>
 				<EnableFeature
 					featureName="keepCaretInsideBlock"
 					label={ __( 'Contain text cursor inside active block' ) }
