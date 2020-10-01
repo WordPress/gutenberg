@@ -14,7 +14,7 @@ import {
 	getEditedPostContent,
 	createNewPost,
 	clickButton,
-	openDocumentSettingsSidebar,
+	openBlockInspector,
 } from '@wordpress/e2e-test-utils';
 
 async function upload( selector ) {
@@ -62,7 +62,7 @@ describe( 'Image', () => {
 		);
 		expect( await getEditedPostContent() ).toMatch( regex1 );
 
-		await openDocumentSettingsSidebar();
+		await openBlockInspector();
 		await page.click( '[aria-label="Image size presets"] button' );
 
 		const regex2 = new RegExp(

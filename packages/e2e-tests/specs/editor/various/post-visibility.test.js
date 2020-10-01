@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import {
+	clickOnCloseModalButton,
 	setBrowserViewport,
 	createNewPost,
-	openDocumentSettingsSidebar,
+	openDocumentSettings,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Post visibility', () => {
@@ -17,7 +18,7 @@ describe( 'Post visibility', () => {
 
 			await createNewPost();
 
-			await openDocumentSettingsSidebar();
+			await openDocumentSettings();
 
 			await page.click( '.edit-post-post-visibility__toggle' );
 
@@ -42,7 +43,7 @@ describe( 'Post visibility', () => {
 		// Enter a title for this post.
 		await page.type( '.editor-post-title__input', 'Title' );
 
-		await openDocumentSettingsSidebar();
+		await openDocumentSettings();
 
 		// Set a publish date for the next month.
 		await page.click( '.edit-post-post-schedule__toggle' );
@@ -59,6 +60,9 @@ describe( 'Post visibility', () => {
 
 		const [ privateLabel ] = await page.$x( '//label[text()="Private"]' );
 		await privateLabel.click();
+
+		// Close document settings modal.
+		await clickOnCloseModalButton();
 
 		// Enter a title for this post.
 		await page.type( '.editor-post-title__input', ' Changed' );

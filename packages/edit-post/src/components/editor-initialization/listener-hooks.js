@@ -20,13 +20,8 @@ import {
  * @param {number} postId  The current post id.
  */
 export const useBlockSelectionListener = ( postId ) => {
-	const { hasBlockSelection, isEditorSidebarOpened } = useSelect(
-		( select ) => ( {
-			hasBlockSelection: !! select(
-				'core/block-editor'
-			).getBlockSelectionStart(),
-			isEditorSidebarOpened: select( STORE_KEY ).isEditorSidebarOpened(),
-		} ),
+	const isEditorSidebarOpened = useSelect(
+		( select ) => select( STORE_KEY ).isEditorSidebarOpened(),
 		[ postId ]
 	);
 
@@ -36,12 +31,8 @@ export const useBlockSelectionListener = ( postId ) => {
 		if ( ! isEditorSidebarOpened ) {
 			return;
 		}
-		if ( hasBlockSelection ) {
-			openGeneralSidebar( 'edit-post/block' );
-		} else {
-			openGeneralSidebar( 'edit-post/document' );
-		}
-	}, [ hasBlockSelection, isEditorSidebarOpened ] );
+		openGeneralSidebar( 'edit-post/block' );
+	}, [ isEditorSidebarOpened ] );
 };
 
 /**

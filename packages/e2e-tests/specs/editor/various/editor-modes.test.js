@@ -111,21 +111,12 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( title ).toBe( 'Paragraph' );
 
 		// The Block inspector should be active
-		let blockInspectorTab = await page.$(
-			'.edit-post-sidebar__panel-tab.is-active[data-label="Block"]'
-		);
-		expect( blockInspectorTab ).not.toBeNull();
+		const blockInspector = await page.$( '.block-editor-block-inspector' );
+		expect( blockInspector ).not.toBeNull();
 
 		await switchEditorModeTo( 'Code' );
 
-		// The Block inspector should not be active anymore
-		blockInspectorTab = await page.$(
-			'.edit-post-sidebar__panel-tab.is-active[data-label="Block"]'
-		);
-		expect( blockInspectorTab ).toBeNull();
-
-		// No block is selected
-		await page.click( '.edit-post-sidebar__panel-tab[data-label="Block"]' );
+		// The Block inspector should indicate that no block is selected.
 		const noBlocksElement = await page.$(
 			'.block-editor-block-inspector__no-blocks'
 		);

@@ -5,7 +5,8 @@ import {
 	activatePlugin,
 	createNewPost,
 	deactivatePlugin,
-	findSidebarPanelWithTitle,
+	findDocumentSettingsSectionWithTitle,
+	openDocumentSettings,
 	publishPost,
 } from '@wordpress/e2e-test-utils';
 
@@ -30,6 +31,7 @@ describe( 'Sidebar Permalink Panel', () => {
 			const { removeEditorPanel } = wp.data.dispatch( 'core/edit-post' );
 			removeEditorPanel( 'post-link' );
 		} );
+		await openDocumentSettings();
 		expect( await page.$x( permalinkPanelXPath ) ).toEqual( [] );
 	} );
 
@@ -39,6 +41,7 @@ describe( 'Sidebar Permalink Panel', () => {
 		await publishPost();
 		// Start editing again.
 		await page.type( '.editor-post-title__input', ' (Updated)' );
+		await openDocumentSettings();
 		expect( await page.$x( permalinkPanelXPath ) ).toEqual( [] );
 	} );
 
@@ -48,6 +51,7 @@ describe( 'Sidebar Permalink Panel', () => {
 		await publishPost();
 		// Start editing again.
 		await page.type( '.editor-post-title__input', ' (Updated)' );
+		await openDocumentSettings();
 		expect( await page.$x( permalinkPanelXPath ) ).toEqual( [] );
 	} );
 
@@ -57,6 +61,9 @@ describe( 'Sidebar Permalink Panel', () => {
 		await publishPost();
 		// Start editing again.
 		await page.type( '.editor-post-title__input', ' (Updated)' );
-		expect( await findSidebarPanelWithTitle( 'Permalink' ) ).toBeDefined();
+		await openDocumentSettings();
+		expect(
+			await findDocumentSettingsSectionWithTitle( 'Permalink' )
+		).toBeDefined();
 	} );
 } );

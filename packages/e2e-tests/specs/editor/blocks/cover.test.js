@@ -4,7 +4,7 @@
 import {
 	insertBlock,
 	createNewPost,
-	openDocumentSettingsSidebar,
+	openBlockInspector,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Cover', () => {
@@ -17,7 +17,7 @@ describe( 'Cover', () => {
 		// Close the inserter
 		await page.click( '.edit-post-header-toolbar__inserter-toggle' );
 		// Open the sidebar
-		await openDocumentSettingsSidebar();
+		await openBlockInspector();
 		// Choose the first solid color as the background of the cover.
 		await page.click(
 			'.components-circular-option-picker__option-wrapper:first-child button'

@@ -3,11 +3,11 @@
  */
 import {
 	activatePlugin,
+	clickOnCloseModalButton,
 	createNewPost,
 	deactivatePlugin,
-	findSidebarPanelToggleButtonWithTitle,
 	insertBlock,
-	openDocumentSettingsSidebar,
+	openDocumentSettingsSection,
 	publishPost,
 	saveDraft,
 } from '@wordpress/e2e-test-utils';
@@ -91,14 +91,8 @@ describe( 'Meta boxes', () => {
 		await page.keyboard.type( 'Excerpt from content.' );
 		await page.type( '.editor-post-title__input', 'A published post' );
 
-		// Open the excerpt panel
-		await openDocumentSettingsSidebar();
-		const excerptButton = await findSidebarPanelToggleButtonWithTitle(
-			'Excerpt'
-		);
-		if ( excerptButton ) {
-			await excerptButton.click( 'button' );
-		}
+		// Open the excerpt panel.
+		await openDocumentSettingsSection( 'Excerpt' );
 
 		await page.waitForSelector( '.editor-post-excerpt textarea' );
 
@@ -106,6 +100,9 @@ describe( 'Meta boxes', () => {
 			'.editor-post-excerpt textarea',
 			'Explicitly set excerpt.'
 		);
+
+		// Close document settings modal.
+		await clickOnCloseModalButton();
 
 		await publishPost();
 

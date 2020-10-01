@@ -4,50 +4,31 @@
 import {
 	clearLocalStorage,
 	createNewPost,
-	findSidebarPanelWithTitle,
+	findDocumentSettingsSectionWithTitle,
 	enableFocusLossObservation,
 	disableFocusLossObservation,
-	openDocumentSettingsSidebar,
-	pressKeyWithModifier,
+	openDocumentSettings,
 	setBrowserViewport,
 } from '@wordpress/e2e-test-utils';
 
 const SIDEBAR_SELECTOR = '.edit-post-sidebar';
-const ACTIVE_SIDEBAR_TAB_SELECTOR = '.edit-post-sidebar__panel-tab.is-active';
-const ACTIVE_SIDEBAR_BUTTON_TEXT = 'Post';
 
 describe( 'Sidebar', () => {
 	afterEach( () => {
 		disableFocusLossObservation();
 	} );
 
-	it( 'should have sidebar visible at the start with document sidebar active on desktop', async () => {
+	it( 'should have sidebar visible at the start with block inspector active on desktop', async () => {
 		await setBrowserViewport( 'large' );
 		await clearLocalStorage();
 		await createNewPost();
 		await enableFocusLossObservation();
-		const { nodesCount, content, height, width } = await page.$$eval(
-			ACTIVE_SIDEBAR_TAB_SELECTOR,
-			( nodes ) => {
-				const firstNode = nodes[ 0 ];
-				return {
-					nodesCount: nodes.length,
-					content: firstNode.innerText,
-					height: firstNode.offsetHeight,
-					width: firstNode.offsetWidth,
-				};
-			}
+
+		// Expect block inspector sidebar to be open.
+		const blockInspector = await page.$(
+			'.block-editor-block-inspector__no-blocks'
 		);
-
-		// should have only one active sidebar tab.
-		expect( nodesCount ).toBe( 1 );
-
-		// the active sidebar tab should be document.
-		expect( content ).toBe( ACTIVE_SIDEBAR_BUTTON_TEXT );
-
-		// the active sidebar tab should be visible
-		expect( width ).toBeGreaterThan( 10 );
-		expect( height ).toBeGreaterThan( 10 );
+		expect( blockInspector ).not.toBeNull();
 	} );
 
 	it( 'should have the sidebar closed by default on mobile', async () => {
@@ -90,49 +71,28 @@ describe( 'Sidebar', () => {
 		await page.waitForSelector( SIDEBAR_SELECTOR );
 	} );
 
-	it( 'should preserve tab order while changing active tab', async () => {
-		await createNewPost();
-		await enableFocusLossObservation();
-
-		// Region navigate to Sidebar.
-		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyWithModifier( 'ctrl', '`' );
-
-		// Tab lands at first (presumed selected) option "Post".
-		await page.keyboard.press( 'Tab' );
-		const isActiveDocumentTab = await page.evaluate(
-			() =>
-				document.activeElement.textContent === 'Post' &&
-				document.activeElement.classList.contains( 'is-active' )
-		);
-		expect( isActiveDocumentTab ).toBe( true );
-
-		// Tab into and activate "Block".
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Space' );
-		const isActiveBlockTab = await page.evaluate(
-			() =>
-				document.activeElement.textContent === 'Block' &&
-				document.activeElement.classList.contains( 'is-active' )
-		);
-		expect( isActiveBlockTab ).toBe( true );
-	} );
-
 	it( 'should be possible to programmatically remove Document Settings panels', async () => {
 		await createNewPost();
 		await enableFocusLossObservation();
-		await openDocumentSettingsSidebar();
+		await openDocumentSettings();
 
-		expect( await findSidebarPanelWithTitle( 'Categories' ) ).toBeDefined();
-		expect( await findSidebarPanelWithTitle( 'Tags' ) ).toBeDefined();
 		expect(
-			await findSidebarPanelWithTitle( 'Featured image' )
+			await findDocumentSettingsSectionWithTitle( 'Categories' )
 		).toBeDefined();
-		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeDefined();
-		expect( await findSidebarPanelWithTitle( 'Discussion' ) ).toBeDefined();
 		expect(
-			await findSidebarPanelWithTitle( 'Status & visibility' )
+			await findDocumentSettingsSectionWithTitle( 'Tags' )
+		).toBeDefined();
+		expect(
+			await findDocumentSettingsSectionWithTitle( 'Featured image' )
+		).toBeDefined();
+		expect(
+			await findDocumentSettingsSectionWithTitle( 'Excerpt' )
+		).toBeDefined();
+		expect(
+			await findDocumentSettingsSectionWithTitle( 'Discussion' )
+		).toBeDefined();
+		expect(
+			await findDocumentSettingsSectionWithTitle( 'Status & visibility' )
 		).toBeDefined();
 
 		await page.evaluate( () => {

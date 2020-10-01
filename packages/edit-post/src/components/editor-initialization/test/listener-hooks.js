@@ -103,7 +103,7 @@ describe( 'listener hook tests', () => {
 				getSpyedFunction( STORE_KEY, 'openGeneralSidebar' )
 			).toHaveBeenCalledWith( 'edit-post/block' );
 		} );
-		it( 'opens document sidebar if block is not selected', () => {
+		it( 'opens block sidebar if block is not selected', () => {
 			setMockReturnValue( STORE_KEY, 'isEditorSidebarOpened', true );
 			setMockReturnValue(
 				'core/block-editor',
@@ -115,7 +115,7 @@ describe( 'listener hook tests', () => {
 			} );
 			expect(
 				getSpyedFunction( STORE_KEY, 'openGeneralSidebar' )
-			).toHaveBeenCalledWith( 'edit-post/document' );
+			).toHaveBeenCalledWith( 'edit-post/block' );
 		} );
 	} );
 

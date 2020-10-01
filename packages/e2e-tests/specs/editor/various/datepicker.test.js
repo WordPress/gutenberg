@@ -1,11 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createNewPost } from '@wordpress/e2e-test-utils';
+import { createNewPost, openDocumentSettings } from '@wordpress/e2e-test-utils';
 
 describe( 'Datepicker', () => {
 	beforeEach( async () => {
 		await createNewPost();
+		await openDocumentSettings();
 	} );
 
 	it( 'should show the publishing date as "Immediately" if the date is not altered', async () => {

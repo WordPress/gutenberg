@@ -8,7 +8,6 @@ import { __ } from '@wordpress/i18n';
 
 function KeyboardShortcuts() {
 	const {
-		getBlockSelectionStart,
 		getEditorMode,
 		isEditorSidebarOpened,
 		richEditingEnabled,
@@ -16,8 +15,6 @@ function KeyboardShortcuts() {
 	} = useSelect( ( select ) => {
 		const settings = select( 'core/editor' ).getEditorSettings();
 		return {
-			getBlockSelectionStart: select( 'core/block-editor' )
-				.getBlockSelectionStart,
 			getEditorMode: select( 'core/edit-post' ).getEditorMode,
 			isEditorSidebarOpened: select( 'core/edit-post' )
 				.isEditorSidebarOpened,
@@ -151,10 +148,7 @@ function KeyboardShortcuts() {
 			if ( isEditorSidebarOpened() ) {
 				closeGeneralSidebar();
 			} else {
-				const sidebarToOpen = getBlockSelectionStart()
-					? 'edit-post/block'
-					: 'edit-post/document';
-				openGeneralSidebar( sidebarToOpen );
+				openGeneralSidebar( 'edit-post/block' );
 			}
 		},
 		{ bindGlobal: true }
