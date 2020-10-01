@@ -20,6 +20,7 @@ import {
 	RangeControl,
 	FooterMessageControl,
 	WIDE_ALIGNMENTS,
+	ALIGNMENT_BREAKPOINTS,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -68,20 +69,37 @@ function ColumnEdit( {
 	);
 
 	const renderAppender = () => {
-		const isFullWidth =
+		const { width } = contentStyle[ clientId ];
+		const isParentFullWidth =
 			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
+		const isWidthEqual = width === screenWidth;
 
 		if ( isSelected ) {
 			return (
 				<View
-					style={
-						screenWidth < 480 &&
-						isFullWidth &&
-						hasChildren && {
-							left: 16,
-							width: screenWidth - 16,
-						}
-					}
+					style={ [
+						width > ALIGNMENT_BREAKPOINTS.mobile &&
+							isParentFullWidth &&
+							! hasChildren &&
+							styles.widerColumnAppender,
+						width > ALIGNMENT_BREAKPOINTS.mobile &&
+							isParentFullWidth &&
+							hasChildren &&
+							styles.columnAppender,
+						isWidthEqual && styles.widerColumnAppender,
+						isWidthEqual &&
+							isParentFullWidth &&
+							! hasChildren &&
+							styles.widerColumnAppender,
+						isWidthEqual &&
+							isParentFullWidth &&
+							hasChildren &&
+							styles.columnAppender,
+						isWidthEqual &&
+							! isParentFullWidth &&
+							hasChildren &&
+							styles.columnAppender,
+					] }
 				>
 					<InnerBlocks.ButtonBlockAppender />
 				</View>
@@ -145,7 +163,10 @@ function ColumnEdit( {
 					contentStyle[ clientId ],
 				] }
 			>
-				<InnerBlocks renderAppender={ renderAppender } />
+				<InnerBlocks
+					renderAppender={ renderAppender }
+					parentWidth={ contentStyle[ clientId ].width }
+				/>
 			</View>
 		</>
 	);

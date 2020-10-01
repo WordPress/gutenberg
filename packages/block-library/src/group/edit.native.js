@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -26,24 +26,37 @@ function GroupEdit( {
 	hasInnerBlocks,
 	isSelected,
 	getStylesFromColorScheme,
+	parentBlockAlignment,
 } ) {
 	const { align } = attributes;
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const { width } = sizes || { width: 0 };
 	const { alignments } = WIDE_ALIGNMENTS;
+	const { width: screenWidth } = Dimensions.get( 'window' );
 	const isFullWidth = align === alignments.full;
+	const isParentFullWidth = parentBlockAlignment === alignments.full;
 
 	const renderAppender = useCallback(
 		() => (
 			<View
 				style={ [
-					isFullWidth && hasInnerBlocks && styles.fullWidthAppender,
+					isParentFullWidth &&
+						! hasInnerBlocks &&
+						styles.widerColumnAppender,
+					width === screenWidth &&
+						! hasInnerBlocks &&
+						styles.widerColumnAppender,
+					width === screenWidth &&
+						hasInnerBlocks &&
+						styles.columnAppender,
+					isFullWidth && styles.widerColumnAppender,
+					isFullWidth && hasInnerBlocks && styles.columnAppender,
 				] }
 			>
 				<InnerBlocks.ButtonBlockAppender />
 			</View>
 		),
-		[ align, hasInnerBlocks ]
+		[ align, hasInnerBlocks, width ]
 	);
 
 	if ( ! isSelected && ! hasInnerBlocks ) {
@@ -77,9 +90,11 @@ function GroupEdit( {
 export default compose( [
 	withColors( 'backgroundColor' ),
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockRootClientId, getSelectedBlockClientId } = select(
-			'core/block-editor'
-		);
+		const {
+			getBlockRootClientId,
+			getSelectedBlockClientId,
+			getBlockAttributes,
+		} = select( 'core/block-editor' );
 
 		const { getBlock } = select( 'core/block-editor' );
 
@@ -89,6 +104,7 @@ export default compose( [
 		const isSelected = selectedBlockClientId === clientId;
 
 		const parentId = getBlockRootClientId( clientId );
+		const parentBlockAlignment = getBlockAttributes( parentId )?.align;
 
 		const isParentSelected =
 			selectedBlockClientId && selectedBlockClientId === parentId;
@@ -98,6 +114,7 @@ export default compose( [
 			isSelected,
 			parentId,
 			hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+			parentBlockAlignment,
 		};
 	} ),
 	withPreferredColorScheme,

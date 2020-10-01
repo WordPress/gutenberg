@@ -32,7 +32,12 @@
 	margin-right: $block-edge-to-content;
 }
 
-.fullWidthAppender {
-	margin-left: $block-edge-to-content;
-	margin-right: $block-edge-to-content;
+.columnAppender {
+	margin-left: 16px;
+	margin-right: 16px;
+}
+
+.widerColumnAppender {
+	margin-left: 8px;
+	margin-right: 8px;
 }

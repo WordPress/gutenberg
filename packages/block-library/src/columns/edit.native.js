@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 import { dropRight, times, map, compact, delay } from 'lodash';
 
 /**
@@ -86,9 +86,11 @@ function ColumnsEditContainer( {
 	onDeleteBlock,
 	innerColumns,
 	updateInnerColumnWidth,
+	parentBlockAlignment,
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUM );
+	const { width: screenWidth } = Dimensions.get( 'window' );
 
 	const { verticalAlignment, align } = attributes;
 	const { width } = sizes || {};
@@ -248,13 +250,29 @@ function ColumnsEditContainer( {
 
 	const renderAppender = () => {
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
+		const isParentFullWidth =
+			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
+		const isEqualWidth = width === screenWidth;
 
 		if ( isSelected ) {
 			return (
 				<View
 					style={ [
-						isFullWidth && styles.fullWidthAppender,
-						columnCount === 0 && { width },
+						isFullWidth && styles.columnAppender,
+						! isEqualWidth &&
+							isParentFullWidth &&
+							styles.columnAppender,
+						isEqualWidth &&
+							isFullWidth &&
+							innerColumns &&
+							styles.columnAppender,
+						isEqualWidth &&
+							! isFullWidth &&
+							innerColumns &&
+							styles.columnAppender,
+						columnCount === 0 && {
+							width,
+						},
 					] }
 				>
 					<InnerBlocks.ButtonBlockAppender
@@ -492,11 +510,15 @@ const ColumnsEdit = ( props ) => {
 		isDefaultColumns,
 		innerColumns = [],
 		hasParents,
+		parentBlockAlignment,
 	} = useSelect(
 		( select ) => {
-			const { getBlockCount, getBlock, getBlockParents } = select(
-				'core/block-editor'
-			);
+			const {
+				getBlockCount,
+				getBlock,
+				getBlockParents,
+				getBlockAttributes,
+			} = select( 'core/block-editor' );
 			const block = getBlock( clientId );
 			const innerBlocks = block?.innerBlocks;
 			const isContentEmpty = map(
@@ -510,6 +532,7 @@ const ColumnsEdit = ( props ) => {
 				isDefaultColumns: ! compact( isContentEmpty ).length,
 				innerColumns: innerBlocks,
 				hasParents: !! parents.length,
+				parentBlockAlignment: getBlockAttributes( parents[ 0 ] )?.align,
 			};
 		},
 		[ clientId ]
@@ -529,6 +552,7 @@ const ColumnsEdit = ( props ) => {
 				columnCount={ columnCount }
 				innerColumns={ innerColumns }
 				hasParents={ hasParents }
+				parentBlockAlignment={ parentBlockAlignment }
 				{ ...props }
 			/>
 			<BlockVariationPicker

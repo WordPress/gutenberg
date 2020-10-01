@@ -7,7 +7,11 @@ import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { GlobalStylesContext, WIDE_ALIGNMENTS } from '@wordpress/components';
+import {
+	GlobalStylesContext,
+	WIDE_ALIGNMENTS,
+	ALIGNMENT_BREAKPOINTS,
+} from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -130,6 +134,7 @@ class BlockListBlock extends Component {
 			marginHorizontal,
 			isInnerBlockSelected,
 			name,
+			parentBlockAlignement,
 		} = this.props;
 
 		if ( ! attributes || ! blockType ) {
@@ -146,6 +151,9 @@ class BlockListBlock extends Component {
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
+		const isParentFullWidth =
+			parentBlockAlignement === WIDE_ALIGNMENTS.alignments.full;
+
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isContainerRelated = WIDE_ALIGNMENTS.innerContainers.includes(
 			name
@@ -220,7 +228,13 @@ class BlockListBlock extends Component {
 									}
 									blockWidth={ blockWidth }
 									anchorNodeRef={ this.anchorNodeRef.current }
-									isFullWidth={ isFullWidth }
+									isFullWidth={
+										isFullWidth ||
+										( isParentFullWidth &&
+											blockWidth >
+												ALIGNMENT_BREAKPOINTS.mobile ) ||
+										screenWidth === blockWidth
+									}
 								/>
 							) }
 						</View>
@@ -257,6 +271,7 @@ export default compose( [
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
 			hasSelectedInnerBlock,
+			getBlockAttributes,
 		} = select( 'core/block-editor' );
 
 		const order = getBlockIndex( clientId, rootClientId );
@@ -271,6 +286,7 @@ export default compose( [
 
 		const parents = getBlockParents( clientId, true );
 		const parentId = parents[ 0 ] || '';
+		const parentBlockAlignement = getBlockAttributes( parentId )?.align;
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
@@ -314,6 +330,7 @@ export default compose( [
 			firstToSelectId,
 			isTouchable,
 			hasParents,
+			parentBlockAlignement,
 			wrapperProps: getWrapperProps(
 				attributes,
 				blockType.getEditWrapperProps
