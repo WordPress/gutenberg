@@ -60,6 +60,21 @@ _Returns_
 
 -   `boolean`: Whether the last change was automatic.
 
+<a name="getActiveBlockIdByBlockType" href="#getActiveBlockIdByBlockType">#</a> **getActiveBlockIdByBlockType**
+
+Returns the clientId for the first 'active' block of a given array of block types.
+A block is 'active' if it (or a child) is the selected block.
+Returns the first match moving up the DOM from the selected block.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _validBlocksTypes_ `Array<string>`: The parent block types to check for.
+
+_Returns_
+
+-   `string`: The matching block's clientId.
+
 <a name="getAdjacentBlockClientId" href="#getAdjacentBlockClientId">#</a> **getAdjacentBlockClientId**
 
 Returns the client ID of the block adjacent one at the given reference
