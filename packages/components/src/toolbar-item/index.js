@@ -21,18 +21,18 @@ import warning from '@wordpress/warning';
 import ToolbarContext from '../toolbar-context';
 
 function ToolbarItem( { children, as: Component, ...props }, ref ) {
-	const { subscribe, ...initialState } = useContext( ToolbarContext );
+	const initialState = useContext( ToolbarContext );
 	const [ state, setState ] = useState( initialState );
 	const id = useInstanceId( ToolbarItem, 'toolbar-item' );
 
 	useEffect( () => {
-		if ( ! subscribe ) return;
-		return subscribe( ( nextState ) => {
+		if ( ! initialState?.subscribe ) return;
+		return initialState?.subscribe( ( nextState ) => {
 			if ( id === state.currentId || id === nextState.currentId ) {
 				setState( nextState );
 			}
 		} );
-	}, [ subscribe, state?.currentId, id ] );
+	}, [ initialState?.subscribe, state?.currentId, id ] );
 
 	if ( typeof children !== 'function' && ! Component ) {
 		warning(
@@ -51,9 +51,12 @@ function ToolbarItem( { children, as: Component, ...props }, ref ) {
 		return children( allProps );
 	}
 
+	// eslint-disable-next-line no-unused-vars
+	const { subscribe, ...toolbarState } = state;
+
 	return (
 		<BaseToolbarItem
-			{ ...state }
+			{ ...toolbarState }
 			{ ...allProps }
 			as={ Component }
 			id={ id }
