@@ -73,21 +73,3 @@
 		display: block;
 	}
 }
-
-.edit-site-navigation-item-with-icon {
-	position: relative;
-
-	&__icon {
-		width: 24px;
-		height: 24px;
-		position: absolute;
-		right: 20px;
-		top: 50%;
-		transform: translateY(-50%);
-	}
-
-	// We need extra specificity to override other CSS
-	& &__icon svg path {
-		color: inherit;
-	}
-}
