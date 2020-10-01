@@ -23,10 +23,8 @@ export const useCreateNavigationTree = () => {
 		removeNode: removeMenu,
 	} = useNavigationTreeNodes();
 
-	const [ menusDirectChildren, setMenusDirectChildren ] = useState( {} );
-
-	const getDirectChildrenOfMenu = ( menu ) =>
-		menusDirectChildren[ menu ] || [];
+	const [ directSubMenus, setDirectSubMenus ] = useState( {} );
+	const getDirectSubMenus = ( menu ) => directSubMenus[ menu ] || [];
 
 	const traverseMenu = ( startMenu, callback ) => {
 		const visited = [];
@@ -41,7 +39,7 @@ export const useCreateNavigationTree = () => {
 			}
 
 			visited.push( current.menu );
-			queue = [ ...queue, ...getDirectChildrenOfMenu( current.menu ) ];
+			queue = [ ...queue, ...getDirectSubMenus( current.menu ) ];
 
 			callback( current );
 		}
@@ -68,7 +66,7 @@ export const useCreateNavigationTree = () => {
 		menus,
 		getMenu,
 		addMenu: ( key, value ) => {
-			setMenusDirectChildren( ( state ) => {
+			setDirectSubMenus( ( state ) => {
 				const newState = { ...state };
 
 				if ( ! newState[ value.parentMenu ] ) {
@@ -83,7 +81,7 @@ export const useCreateNavigationTree = () => {
 			addMenu( key, value );
 		},
 		removeMenu,
-		menusDirectChildren,
+		directSubMenus,
 		traverseMenu,
 		isMenuEmpty,
 	};
