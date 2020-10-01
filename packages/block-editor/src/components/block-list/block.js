@@ -128,7 +128,7 @@ function BlockListBlock( {
 	const blockType = getBlockType( name );
 	const lightBlockWrapper =
 		blockType.apiVersion > 1 ||
-		hasBlockSupport( blockType, 'lightBlockWrapper', true );
+		hasBlockSupport( blockType, 'lightBlockWrapper', false );
 	const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 
 	// Determine whether the block has props to apply to the wrapper.

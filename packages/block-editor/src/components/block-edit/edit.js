@@ -53,7 +53,7 @@ export const Edit = ( props ) => {
 
 	if (
 		blockType.apiVersion > 1 ||
-		hasBlockSupport( blockType, 'lightBlockWrapper', true )
+		hasBlockSupport( blockType, 'lightBlockWrapper', false )
 	) {
 		return <Component { ...props } context={ context } />;
 	}
