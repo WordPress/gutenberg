@@ -65,7 +65,8 @@ function gutenberg_register_wp_theme_taxonomy() {
 		'wp_theme',
 		array( 'wp_template', 'wp_template_part' ),
 		array(
-			'public' => false,
+			'public'       => false,
+			'show_in_rest' => true,
 		)
 	);
 }
