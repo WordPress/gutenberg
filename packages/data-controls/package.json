@@ -24,8 +24,7 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated"
+		"@wordpress/data": "file:../data"
 	},
 	"publishConfig": {
 		"access": "public"
