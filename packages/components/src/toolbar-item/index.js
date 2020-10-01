@@ -28,7 +28,11 @@ function ToolbarItem( { children, as: Component, ...props }, ref ) {
 	useEffect( () => {
 		if ( ! initialState?.subscribe ) return;
 		return initialState?.subscribe( ( nextState ) => {
-			if ( id === state.currentId || id === nextState.currentId ) {
+			if (
+				! state.currentId ||
+				id === state.currentId ||
+				id === nextState.currentId
+			) {
 				setState( nextState );
 			}
 		} );
