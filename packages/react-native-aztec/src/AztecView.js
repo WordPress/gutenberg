@@ -17,8 +17,6 @@ import { ENTER, BACKSPACE } from '@wordpress/keycodes';
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
 
 class AztecView extends React.Component {
-	nativeComponentRef = React.createRef();
-
 	constructor() {
 		super( ...arguments );
 		this._onContentSizeChange = this._onContentSizeChange.bind( this );
@@ -127,7 +125,7 @@ class AztecView extends React.Component {
 
 	_onBlur( event ) {
 		this.selectionEndCaretY = null;
-		TextInputState.blurTextInput( this.nativeComponentRef.current );
+		TextInputState.blurTextInput( ReactNative.findNodeHandle( this ) );
 
 		if ( ! this.props.onBlur ) {
 			return;
@@ -179,11 +177,11 @@ class AztecView extends React.Component {
 	}
 
 	blur() {
-		TextInputState.blurTextInput( this.nativeComponentRef.current );
+		TextInputState.blurTextInput( ReactNative.findNodeHandle( this ) );
 	}
 
 	focus() {
-		TextInputState.focusTextInput( this.nativeComponentRef.current );
+		TextInputState.focusTextInput( ReactNative.findNodeHandle( this ) );
 	}
 
 	isFocused() {
@@ -246,7 +244,6 @@ class AztecView extends React.Component {
 					// combination generate an infinite loop as described in https://github.com/wordpress-mobile/gutenberg-mobile/issues/302
 					onFocus={ this._onAztecFocus }
 					onBlur={ this._onBlur }
-					ref={ this.nativeComponentRef }
 				/>
 			</TouchableWithoutFeedback>
 		);
