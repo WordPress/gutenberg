@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	RichText,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
-} from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -19,7 +16,7 @@ export default function save( { attributes } ) {
 		playsInline,
 	} = attributes;
 	return (
-		<figure { ...useBlockWrapperProps.save() }>
+		<figure { ...useBlockProps.save() }>
 			{ src && (
 				<video
 					autoPlay={ autoplay }

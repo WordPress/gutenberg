@@ -7,7 +7,7 @@ import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	InnerBlocks,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -24,7 +24,7 @@ export default function QueryEdit( {
 	setAttributes,
 } ) {
 	const instanceId = useInstanceId( QueryEdit );
-	const blockWrapperProps = useBlockWrapperProps();
+	const blockProps = useBlockProps();
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return {
@@ -52,7 +52,7 @@ export default function QueryEdit( {
 			<BlockControls>
 				<QueryToolbar query={ query } setQuery={ updateQuery } />
 			</BlockControls>
-			<div { ...blockWrapperProps }>
+			<div { ...blockProps }>
 				<QueryProvider>
 					<InnerBlocks template={ TEMPLATE } />
 				</QueryProvider>

@@ -12,7 +12,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	RichText,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
 
@@ -30,7 +30,7 @@ function HeadingEdit( {
 } ) {
 	const { align, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ align }` ]: align,
 		} ),
@@ -75,7 +75,7 @@ function HeadingEdit( {
 				onRemove={ () => onReplace( [] ) }
 				placeholder={ placeholder || __( 'Write heading…' ) }
 				textAlign={ align }
-				{ ...blockWrapperProps }
+				{ ...blockProps }
 			/>
 		</>
 	);

@@ -7,10 +7,7 @@ import { noop, isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	InnerBlocks,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
-} from '@wordpress/block-editor';
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -91,7 +88,7 @@ export default function save( { attributes } ) {
 		gridTemplateColumns,
 	};
 	return (
-		<div { ...useBlockWrapperProps.save( { className, style } ) }>
+		<div { ...useBlockProps.save( { className, style } ) }>
 			<figure
 				className="wp-block-media-text__media"
 				style={ backgroundStyles }
