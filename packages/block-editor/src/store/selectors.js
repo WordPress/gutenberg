@@ -1809,7 +1809,7 @@ export function areInnerBlocksControlled( state, clientId ) {
  *
  * @return {string} The matching block's clientId.
  */
-export const getActiveBlockIdByBlockNames = createSelector(
+export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 	( state, validBlocksNames ) => {
 		// Check if selected block is a valid entity area.
 		const selectedBlockClientId = getSelectedBlockClientId( state );
@@ -1835,5 +1835,9 @@ export const getActiveBlockIdByBlockNames = createSelector(
 		}
 		return null;
 	},
-	( state ) => [ state.selectionStart.clientId, state.selectionEnd.clientId ]
+	( state, validBlockNames ) => [
+		state.selectionStart.clientId,
+		state.selectionEnd.clientId,
+		validBlockNames,
+	]
 );

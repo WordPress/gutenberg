@@ -68,7 +68,7 @@ const {
 	__experimentalGetBlockListSettingsForBlocks,
 	__experimentalGetLastBlockAttributeChanges,
 	getLowestCommonAncestorWithSelectedBlock,
-	getActiveBlockIdByBlockNames,
+	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
 } = selectors;
 
 describe( 'selectors', () => {

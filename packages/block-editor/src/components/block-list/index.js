@@ -47,7 +47,7 @@ function BlockList(
 			getGlobalBlockCount,
 			isTyping,
 			isDraggingBlocks,
-			getActiveBlockIdByBlockNames,
+			__experimentalGetActiveBlockIdByBlockNames,
 		} = select( 'core/block-editor' );
 
 		// Determine if there is an active template part (or other entity) to spotlight.
@@ -57,7 +57,7 @@ function BlockList(
 			.__experimentalEnableFullSiteEditing;
 		const activeEntityBlockId =
 			isFullSiteEditingEnabled &&
-			getActiveBlockIdByBlockNames( ENTITY_AREAS );
+			__experimentalGetActiveBlockIdByBlockNames( ENTITY_AREAS );
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),

@@ -24,7 +24,9 @@ function useSecondaryText() {
 		return {
 			activeEntityBlockId: select(
 				'core/block-editor'
-			).getActiveBlockIdByBlockNames( [ 'core/template-part' ] ),
+			).__experimentalGetActiveBlockIdByBlockNames( [
+				'core/template-part',
+			] ),
 			getBlock: select( 'core/block-editor' ).getBlock,
 		};
 	} );
