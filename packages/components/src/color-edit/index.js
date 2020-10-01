@@ -222,7 +222,7 @@ function ColorInserter( { onInsert, onCancel } ) {
 	);
 }
 
-export default function ColorEdit( { colors = [], onChange } ) {
+export default function ColorEdit( { colors, onChange, emptyUI } ) {
 	const [ isInsertingColor, setIsInsertingColor ] = useState( false );
 	return (
 		<BaseControl>
@@ -246,54 +246,61 @@ export default function ColorEdit( { colors = [], onChange } ) {
 					) }
 				</div>
 				<div>
-					{ colors.map( ( color, index ) => {
-						return (
-							<ColorOption
-								key={ index }
-								color={ color.color }
-								name={ color.name }
-								slug={ color.slug }
-								onChange={ ( newColor ) => {
-									onChange(
-										colors.map(
-											( currentColor, currentIndex ) => {
-												if ( currentIndex === index ) {
-													return newColor;
+					{ ! isEmpty( colors ) &&
+						colors.map( ( color, index ) => {
+							return (
+								<ColorOption
+									key={ index }
+									color={ color.color }
+									name={ color.name }
+									slug={ color.slug }
+									onChange={ ( newColor ) => {
+										onChange(
+											colors.map(
+												(
+													currentColor,
+													currentIndex
+												) => {
+													if (
+														currentIndex === index
+													) {
+														return newColor;
+													}
+													return currentColor;
 												}
-												return currentColor;
-											}
-										)
-									);
-								} }
-								onRemove={ () => {
-									onChange(
-										colors.filter(
-											( _currentColor, currentIndex ) => {
-												if ( currentIndex === index ) {
-													return false;
+											)
+										);
+									} }
+									onRemove={ () => {
+										onChange(
+											colors.filter(
+												(
+													_currentColor,
+													currentIndex
+												) => {
+													if (
+														currentIndex === index
+													) {
+														return false;
+													}
+													return true;
 												}
-												return true;
-											}
-										)
-									);
-								} }
-							/>
-						);
-					} ) }
-					{ ! isInsertingColor &&
-						isEmpty( colors ) &&
-						__(
-							'There are no user-defined colors. Add some colors and create your palette!'
-						) }
+											)
+										);
+									} }
+								/>
+							);
+						} ) }
 					{ isInsertingColor && (
 						<ColorInserter
 							onInsert={ ( newColor ) => {
 								setIsInsertingColor( false );
-								onChange( [ ...colors, newColor ] );
+								onChange( [ ...( colors || [] ), newColor ] );
 							} }
 							onCancel={ () => setIsInsertingColor( false ) }
 						/>
 					) }
+					{ ! isInsertingColor && isEmpty( colors ) && emptyUI }
 				</div>
 			</fieldset>
 		</BaseControl>
