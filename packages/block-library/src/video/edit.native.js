@@ -53,9 +53,13 @@ class VideoEdit extends React.Component {
 	constructor( props ) {
 		super( props );
 
+		const { attributes, isSelected } = this.props;
+		const { src } = attributes;
+
 		this.state = {
 			isCaptionSelected: false,
 			videoContainerHeight: 0,
+			autoOpenMediaUpload: isSelected && ! src,
 		};
 
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
@@ -191,7 +195,7 @@ class VideoEdit extends React.Component {
 	render() {
 		const { setAttributes, attributes, isSelected } = this.props;
 		const { id, src } = attributes;
-		const { videoContainerHeight } = this.state;
+		const { videoContainerHeight, autoOpenMediaUpload } = this.state;
 
 		const toolbarEditButton = (
 			<MediaUpload
@@ -221,6 +225,7 @@ class VideoEdit extends React.Component {
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 						onFocus={ this.props.onFocus }
+						autoOpenMediaUpload={ autoOpenMediaUpload }
 					/>
 				</View>
 			);
