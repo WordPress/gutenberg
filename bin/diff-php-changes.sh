@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 _usage() {
 	cat <<EOD
@@ -6,8 +6,8 @@ usage: $0 [--filter=<filter>] <range>
     List PHP files that have been added, deleted and/or modified files
     within Git range <range>. For example:
 
-	$(basename $0) origin/wp/5.5..origin/wp/trunk
-	$(basename $0) --filter=Ar origin/wp/5.5..origin/wp/trunk
+	$(basename "$0") origin/wp/5.5..origin/wp/trunk
+	$(basename "$0") --filter=Ar origin/wp/5.5..origin/wp/trunk
 
 Optionally filter according to \`git diff --diff-filter\`, e.g.
  --filter=A	Show added paths
