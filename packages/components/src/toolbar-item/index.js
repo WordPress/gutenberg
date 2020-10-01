@@ -6,7 +6,13 @@ import { ToolbarItem as BaseToolbarItem } from 'reakit/Toolbar';
 /**
  * WordPress dependencies
  */
-import { forwardRef, useContext } from '@wordpress/element';
+import {
+	forwardRef,
+	useContext,
+	useEffect,
+	useState,
+} from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
 import warning from '@wordpress/warning';
 
 /**
@@ -15,7 +21,18 @@ import warning from '@wordpress/warning';
 import ToolbarContext from '../toolbar-context';
 
 function ToolbarItem( { children, as: Component, ...props }, ref ) {
-	const accessibleToolbarState = useContext( ToolbarContext );
+	const { subscribe, ...initialState } = useContext( ToolbarContext );
+	const [ state, setState ] = useState( initialState );
+	const id = useInstanceId( ToolbarItem, 'toolbar-item' );
+
+	useEffect( () => {
+		if ( ! subscribe ) return;
+		return subscribe( ( nextState ) => {
+			if ( id === state.currentId || id === nextState.currentId ) {
+				setState( nextState );
+			}
+		} );
+	}, [ subscribe, state?.currentId, id ] );
 
 	if ( typeof children !== 'function' && ! Component ) {
 		warning(
@@ -27,7 +44,7 @@ function ToolbarItem( { children, as: Component, ...props }, ref ) {
 
 	const allProps = { ...props, ref, 'data-toolbar-item': true };
 
-	if ( ! accessibleToolbarState ) {
+	if ( ! initialState ) {
 		if ( Component ) {
 			return <Component { ...allProps }>{ children }</Component>;
 		}
@@ -36,9 +53,10 @@ function ToolbarItem( { children, as: Component, ...props }, ref ) {
 
 	return (
 		<BaseToolbarItem
-			{ ...accessibleToolbarState }
+			{ ...state }
 			{ ...allProps }
 			as={ Component }
+			id={ id }
 		>
 			{ children }
 		</BaseToolbarItem>
