@@ -15,6 +15,6 @@
 			"gradients": true,
 			"link": true
 		},
-		"__experimentalLineHeight": true
+		"lineHeight": true
 	}
 }

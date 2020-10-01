@@ -400,6 +400,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls/README.md>
 
+<a name="LineHeightControl" href="#LineHeightControl">#</a> **LineHeightControl**
+
+Undocumented declaration.
+
 <a name="MediaPlaceholder" href="#MediaPlaceholder">#</a> **MediaPlaceholder**
 
 _Related_
