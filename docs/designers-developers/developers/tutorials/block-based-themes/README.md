@@ -238,9 +238,10 @@ Add the following global presets to the experimental-theme.json file:
 					"slug": "large",
 					"value": "2.5"
 				}
-			],
-		},
-	},
+			]
+		}
+	}
+}
 ```
 
 This code generates the following variables:

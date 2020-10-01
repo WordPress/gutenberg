@@ -37,3 +37,14 @@ export function useExperimentalFeatures( features ) {
 	beforeAll( () => setExperimentalFeaturesState( features, true ) );
 	afterAll( () => setExperimentalFeaturesState( features, false ) );
 }
+
+export const openNavigation = async () => {
+	const isOpen = !! ( await page.$(
+		'.edit-site-navigation-toggle.is-open'
+	) );
+
+	if ( ! isOpen ) {
+		await page.click( '.edit-site-navigation-toggle__button' );
+		await page.waitForSelector( '.edit-site-navigation-panel' );
+	}
+};

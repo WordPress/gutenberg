@@ -10,6 +10,9 @@ import { find, reject } from 'lodash';
 
 import { normaliseFormats } from './normalise-formats';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./create').RichTextFormat} RichTextFormat */
+
 function replace( array, index, value ) {
 	array = array.slice();
 	array[ index ] = value;
@@ -21,12 +24,12 @@ function replace( array, index, value ) {
  * given `endIndex`. Indices are retrieved from the selection if none are
  * provided.
  *
- * @param {Object} value        Value to modify.
- * @param {Object} format       Format to apply.
- * @param {number} [startIndex] Start index.
- * @param {number} [endIndex]   End index.
+ * @param {RichTextValue}  value        Value to modify.
+ * @param {RichTextFormat} format       Format to apply.
+ * @param {number}         [startIndex] Start index.
+ * @param {number}         [endIndex]   End index.
  *
- * @return {Object} A new value with the format applied.
+ * @return {RichTextValue} A new value with the format applied.
  */
 export function applyFormat(
 	value,

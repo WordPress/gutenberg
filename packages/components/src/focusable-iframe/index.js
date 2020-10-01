@@ -31,7 +31,7 @@ class FocusableIframe extends Component {
 	checkFocus() {
 		const iframe = this.node.current;
 
-		if ( document.activeElement !== iframe ) {
+		if ( iframe.ownerDocument.activeElement !== iframe ) {
 			return;
 		}
 

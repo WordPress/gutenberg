@@ -296,9 +296,26 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         //     self.delegate?.gutenbergDidRequestStoryCreatorLoad(mediaFiles: mediaFiles, blockId: blockId)
         // }
     }
+
+    @objc
+    func actionButtonPressed(_ buttonType: String) {
+        guard let button = Gutenberg.ActionButtonType(rawValue: buttonType) else {
+            return
+        }
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidSendButtonPressedAction(button)
+        }
+    }
+
 }
 
 // MARK: - RCTBridgeModule delegate
+
+public extension Gutenberg {
+    public enum ActionButtonType: String {
+        case missingBlockAlertActionButton = "missing_block_alert_action_button"
+    }
+}
 
 extension RNReactNativeGutenbergBridge {
     enum EventName: String, CaseIterable {

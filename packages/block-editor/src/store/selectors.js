@@ -5,7 +5,6 @@ import {
 	castArray,
 	flatMap,
 	first,
-	get,
 	isArray,
 	isBoolean,
 	last,
@@ -1273,9 +1272,7 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	const parentAllowedBlocks = get( parentBlockListSettings, [
-		'allowedBlocks',
-	] );
+	const parentAllowedBlocks = parentBlockListSettings?.allowedBlocks;
 	const hasParentAllowedBlock = checkAllowList(
 		parentAllowedBlocks,
 		blockName
@@ -1345,7 +1342,7 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
  *                                            the number of inserts that have occurred.
  */
 function getInsertUsage( state, id ) {
-	return get( state.preferences.insertUsage, [ id ], null );
+	return state.preferences.insertUsage?.[ id ] ?? null;
 }
 
 /**
@@ -1735,11 +1732,7 @@ export function __experimentalGetLastBlockAttributeChanges( state ) {
  * @return {Array} Reusable blocks
  */
 function getReusableBlocks( state ) {
-	return get(
-		state,
-		[ 'settings', '__experimentalReusableBlocks' ],
-		EMPTY_ARRAY
-	);
+	return state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
 }
 
 /**
