@@ -8,12 +8,18 @@
 
 	.edit-site-document-actions__title {
 		transition: transform 0.2s;
+		@media ( prefers-reduced-motion: reduce ) {
+			transition-duration: 0ms;
+		}
 	}
 
 	.edit-site-document-actions__secondary-item {
 		opacity: 0;
 		transform: translateY(20px);
 		transition: transform 0.2s;
+		@media ( prefers-reduced-motion: reduce ) {
+			transition-duration: 0ms;
+		}
 	}
 
 	&.has-secondary-label {
