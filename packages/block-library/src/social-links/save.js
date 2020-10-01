@@ -1,11 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+} from '@wordpress/block-editor';
 
-export default function save( { className } ) {
+export default function save() {
 	return (
-		<ul className={ className }>
+		<ul { ...useBlockWrapperProps.save() }>
 			<InnerBlocks.Content />
 		</ul>
 	);

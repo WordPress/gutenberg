@@ -20,6 +20,13 @@
 	}
 }
 
+// Keeps the document title centered when the sidebar is open
+body.is-navigation-sidebar-open {
+	.edit-site-header_start {
+		flex-basis: $nav-sidebar-width;
+	}
+}
+
 .edit-site-header__toolbar {
 	display: flex;
 	padding-left: $grid-unit-30;

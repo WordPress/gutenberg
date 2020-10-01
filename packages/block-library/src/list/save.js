@@ -1,20 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import {
+	RichText,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { ordered, values, type, reversed, start } = attributes;
-	const tagName = ordered ? 'ol' : 'ul';
+	const TagName = ordered ? 'ol' : 'ul';
 
 	return (
-		<RichText.Content
-			tagName={ tagName }
-			value={ values }
-			type={ type }
-			reversed={ reversed }
-			start={ start }
-			multiline="li"
-		/>
+		<TagName { ...useBlockWrapperProps.save( { type, reversed, start } ) }>
+			<RichText.Content value={ values } multiline="li" />
+		</TagName>
 	);
 }

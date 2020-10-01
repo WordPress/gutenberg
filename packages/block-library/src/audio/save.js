@@ -1,14 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import {
+	RichText,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { autoplay, caption, loop, preload, src } = attributes;
 
 	return (
 		src && (
-			<figure>
+			<figure { ...useBlockWrapperProps.save() }>
 				<audio
 					controls="controls"
 					src={ src }

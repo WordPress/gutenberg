@@ -19,6 +19,7 @@ import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -110,6 +111,20 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 			};
 		}
 	}, [ isSelected, isFirstMultiSelected, isLastMultiSelected ] );
+
+	// Set new block node if it changes.
+	// This effect should happen on every render, so no dependencies should be
+	// added.
+	useEffect( () => {
+		const node = ref.current;
+		setBlockNodes( ( nodes ) => {
+			if ( ! nodes[ clientId ] || nodes[ clientId ] === node ) {
+				return nodes;
+			}
+
+			return { ...nodes, [ clientId ]: node };
+		} );
+	} );
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
@@ -285,6 +300,13 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 		style: { ...wrapperProps.style, ...props.style },
 	};
 }
+
+/**
+ * Call within a save function to get the props for the block wrapper.
+ *
+ * @param {Object} props Optional. Props to pass to the element.
+ */
+useBlockWrapperProps.save = getBlockProps;
 
 const BlockComponent = forwardRef(
 	( { children, tagName: TagName = 'div', ...props }, ref ) => {

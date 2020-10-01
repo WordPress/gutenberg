@@ -6,7 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import {
+	RichText,
+	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -33,7 +36,7 @@ export default function save( { attributes } ) {
 	// A title will no longer be assigned for new or updated button block links.
 
 	return (
-		<div>
+		<div { ...useBlockWrapperProps.save() }>
 			<RichText.Content
 				tagName="a"
 				className={ buttonClasses }

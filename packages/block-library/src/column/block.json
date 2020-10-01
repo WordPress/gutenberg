@@ -9,9 +9,7 @@
 			"type": "string"
 		},
 		"width": {
-			"type": "number",
-			"min": 0,
-			"max": 100
+			"type": "string"
 		}
 	},
 	"supports": {

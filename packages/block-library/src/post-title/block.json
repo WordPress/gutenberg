@@ -24,13 +24,13 @@
 		},
 		"linkTarget": {
 			"type": "string",
-			"default": "_blank"
+			"default": "_self"
 		}
 	},
 	"supports": {
 		"html": false,
 		"lightBlockWrapper": true,
-		"__experimentalColor": {
+		"color": {
 			"gradients": true
 		},
 		"__experimentalFontSize": true,

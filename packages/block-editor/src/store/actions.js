@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, first, get, last, some } from 'lodash';
+import { castArray, first, last, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -252,11 +252,9 @@ export function toggleSelection( isSelectionEnabled = true ) {
 }
 
 function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
-	const preferredStyleVariations = get(
-		blockEditorSettings,
-		[ '__experimentalPreferredStyleVariations', 'value' ],
-		{}
-	);
+	const preferredStyleVariations =
+		blockEditorSettings?.__experimentalPreferredStyleVariations?.value ??
+		{};
 	return blocks.map( ( block ) => {
 		const blockName = block.name;
 		if ( ! hasBlockSupport( blockName, 'defaultStylePicker', true ) ) {
@@ -265,7 +263,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 		if ( ! preferredStyleVariations[ blockName ] ) {
 			return block;
 		}
-		const className = get( block, [ 'attributes', 'className' ] );
+		const className = block.attributes?.className;
 		if ( className?.includes( 'is-style-' ) ) {
 			return block;
 		}

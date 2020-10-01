@@ -30,7 +30,7 @@ const FormTokenFieldExample = () => {
 			value={ selectedContinents }
 			suggestions={ continents }
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
-			placeholder="Type a continent"
+			label="Type a continent"
 		/>
 	);
 };
@@ -43,12 +43,14 @@ const FormTokenFieldAsyncExample = () => {
 	const [ selectedContinents, setSelectedContinents ] = useState( [] );
 	const [ availableContinents, setAvailableContinents ] = useState( [] );
 	const searchContinents = ( input ) => {
-		setTimeout( () => {
+		const timeout = setTimeout( () => {
 			const available = continents.filter( ( continent ) =>
 				continent.toLowerCase().includes( input.toLowerCase() )
 			);
 			setAvailableContinents( available );
 		}, 1000 );
+
+		return () => clearTimeout( timeout );
 	};
 
 	return (
@@ -57,7 +59,7 @@ const FormTokenFieldAsyncExample = () => {
 			suggestions={ availableContinents }
 			onChange={ ( tokens ) => setSelectedContinents( tokens ) }
 			onInputChange={ searchContinents }
-			placeholder="Type a continent"
+			label="Type a continent"
 		/>
 	);
 };

@@ -417,10 +417,10 @@ function gutenberg_experimental_global_styles_get_style_property() {
  */
 function gutenberg_experimental_global_styles_get_support_keys() {
 	return array(
-		'--wp--style--color--link' => array( '__experimentalColor', 'linkColor' ),
-		'background'               => array( '__experimentalColor', 'gradients' ),
-		'backgroundColor'          => array( '__experimentalColor' ),
-		'color'                    => array( '__experimentalColor' ),
+		'--wp--style--color--link' => array( 'color', 'link' ),
+		'background'               => array( 'color', 'gradients' ),
+		'backgroundColor'          => array( 'color' ),
+		'color'                    => array( 'color' ),
 		'fontSize'                 => array( '__experimentalFontSize' ),
 		'lineHeight'               => array( '__experimentalLineHeight' ),
 	);
@@ -485,8 +485,8 @@ function gutenberg_experimental_global_styles_get_block_data() {
 					'supports' => array(
 						'__experimentalSelector' => ':root',
 						'__experimentalFontSize' => true,
-						'__experimentalColor'    => array(
-							'linkColor' => true,
+						'color'                  => array(
+							'link'      => true,
 							'gradients' => true,
 						),
 					),

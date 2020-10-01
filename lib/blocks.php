@@ -45,7 +45,6 @@ function gutenberg_reregister_core_block_types() {
 				'text-columns',
 				'verse',
 				'video',
-				'widget-area',
 			),
 			'block_names'   => array_merge(
 				array(
@@ -96,9 +95,11 @@ function gutenberg_reregister_core_block_types() {
 		dirname( __FILE__ ) . '/../build/edit-widgets/blocks/'  => array(
 			'block_folders' => array(
 				'legacy-widget',
+				'widget-area',
 			),
 			'block_names'   => array(
 				'legacy-widget.php' => 'core/legacy-widget',
+				'widget-area.php'   => 'core/widget-area',
 			),
 		),
 	);
