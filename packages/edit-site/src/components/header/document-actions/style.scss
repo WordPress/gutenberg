@@ -12,9 +12,17 @@
 
 	.edit-site-document-actions__title {
 		font-size: $default-font-size;
+		display: flex;
+		justify-content: center;
+		align-items: center;
 		font-weight: bold;
 		transition: transform 0.2s;
 		@include reduce-motion(transition);
+	}
+
+	.edit-site-document-actions__get-info {
+		// Add a bit of margin for better spacing with title when focused.
+		margin-left: $grid-unit-05;
 	}
 
 	.edit-site-document-actions__secondary-item {
