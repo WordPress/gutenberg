@@ -525,6 +525,60 @@ describe( 'selectors', () => {
 				)
 			).toEqual( [] );
 		} );
+		it( 'Should optionally accept an array of parent types and return parents of multiple types', () => {
+			const state = {
+				blocks: {
+					parents: {
+						'client-id-01': '',
+						'client-id-02': 'client-id-01',
+						'client-id-03': 'client-id-02',
+						'client-id-04': 'client-id-03',
+						'client-id-05': 'client-id-04',
+					},
+					byClientId: {
+						'client-id-01': {
+							clientId: 'client-id-01',
+							name: 'core/navigation',
+						},
+						'client-id-02': {
+							clientId: 'client-id-02',
+							name: 'core/columns',
+						},
+						'client-id-03': {
+							clientId: 'client-id-03',
+							name: 'core/navigation',
+						},
+						'client-id-04': {
+							clientId: 'client-id-04',
+							name: 'core/navigation-link',
+						},
+						'client-id-05': {
+							clientId: 'client-id-05',
+							name: 'core/navigation-link',
+						},
+					},
+					cache: {
+						'client-id-01': {},
+						'client-id-02': {},
+						'client-id-03': {},
+						'client-id-04': {},
+						'client-id-05': {},
+					},
+					controlledInnerBlocks: {},
+				},
+			};
+			expect(
+				getBlockParentsByBlockName( state, 'client-id-05', [
+					'core/navigation',
+				] )
+			).toEqual( [ 'client-id-01', 'client-id-03' ] );
+			expect(
+				getBlockParentsByBlockName( state, 'client-id-05', [
+					'core/columns',
+					'core/navigation',
+				] )
+			).toEqual( [ 'client-id-01', 'client-id-02', 'client-id-03' ] );
+		} );
 	} );
 
 	describe( 'getClientIdsOfDescendants', () => {
