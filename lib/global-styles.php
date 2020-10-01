@@ -485,7 +485,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
 					'supports' => array(
 						'__experimentalSelector' => ':root',
 						'fontSize'               => true,
-						'color'    => array(
+						'color'                  => array(
 							'linkColor' => true,
 							'gradients' => true,
 						),
