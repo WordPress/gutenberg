@@ -24,7 +24,7 @@ const GENERAL_TEMPLATE_SLUGS = [
 	'404',
 ];
 
-export default function TemplatesMenu( { activeId, onActiveIdChange } ) {
+export default function TemplatesMenu( { onActiveIdChange } ) {
 	const [ templateFiles, setTemplateFiles ] = useState( null );
 
 	useEffect( () => {
@@ -38,7 +38,7 @@ export default function TemplatesMenu( { activeId, onActiveIdChange } ) {
 	const templateEntities = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template' ),
-		[ activeId ]
+		[]
 	);
 
 	const templates = [

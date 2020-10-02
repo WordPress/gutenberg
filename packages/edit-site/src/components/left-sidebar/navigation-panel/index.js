@@ -94,13 +94,9 @@ const NavigationPanel = () => {
 						navigateToMenu="template-parts"
 					/>
 
-					<TemplatesMenu
-						activeId={ templateId }
-						onActiveIdChange={ setTemplate }
-					/>
+					<TemplatesMenu onActiveIdChange={ setTemplate } />
 
 					<TemplatePartsMenu
-						activeId={ templateId }
 						onActiveTemplatePartIdChange={ setTemplatePart }
 					/>
 				</NavigationMenu>
