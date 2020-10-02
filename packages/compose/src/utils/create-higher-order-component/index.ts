@@ -5,11 +5,9 @@ import { camelCase, upperFirst } from 'lodash';
 
 import type { ComponentType } from 'react';
 
-interface MapComponentFunction< P, Q > {
-	( OriginalComponent: ComponentType< P > ): ComponentType< Q >;
-	name?: string;
-	displayName?: string;
-}
+export type MapComponentFunction< P, Q > = (
+	OriginalComponent: ComponentType< P >
+) => ComponentType< Q >;
 
 /**
  * Given a function mapping a component to an enhanced component and modifier
@@ -20,7 +18,7 @@ interface MapComponentFunction< P, Q > {
  *
  * @return Component class with generated display name assigned.
  */
-function createHigherOrderComponent< P = {}, Q = {} >(
+function createHigherOrderComponent< P = {}, Q = P >(
 	mapComponentToEnhancedComponent: MapComponentFunction< P, Q >,
 	modifierName: string
 ) {
