@@ -276,57 +276,55 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 	}, [ isNavigationMode, isHovered, setHovered ] );
 
 	useEffect( () => {
-		if ( isFullSiteEditingActive ) {
-			// To accurately determine which blocks are hovered we must look at the elements under the cursor.
-			// Internal block inserters will fire events like mouseleave for blocks they are visually contained within,
-			// which makes an add/remove by clientId per individual block approach inaccurate.
-			function getHoveredBlocksFromCursor( event ) {
-				const hoveredElements = document.elementsFromPoint(
-					event.clientX,
-					event.clientY
-				);
-				const blockIds = [];
-				hoveredElements.forEach( ( element ) => {
-					if ( element.dataset.block ) {
-						blockIds.push( element.dataset.block );
-					}
-				} );
-				return blockIds;
-			}
-			async function evaluateHoveredBlocks( event ) {
-				// Check the timeStamp of the last time this was set.
-				// This prevents needlessly rerunning the parse and dispatch for nested blocks
-				// who share boundaries that trigger the mouse events at or around the same time.
-				if (
-					event.timeStamp - ( getHoveredBlocksTimeStamp() || 0 ) >
-					10
-				) {
-					const hoveredBlocks = getHoveredBlocksFromCursor( event );
-					// Get an updated timeStamp to set on the dispatch.
-					// The event.timeStamp may be outdated after parsing.
-					// In some browsers, simultaneously triggered events may not have the same timestamp,
-					// and the difference may correspond to processing time for the previous event.
-
-					// eslint-disable-next-line no-undef
-					const dispatchTimeStamp = new Event( 'foobar' ).timeStamp;
-					setHoveredBlocks( hoveredBlocks, dispatchTimeStamp );
-				}
-			}
-
-			ref.current.addEventListener( 'mouseenter', evaluateHoveredBlocks );
-			ref.current.addEventListener( 'mouseleave', evaluateHoveredBlocks );
-
-			return () => {
-				ref.current.removeEventListener(
-					'mouseenter',
-					evaluateHoveredBlocks
-				);
-				ref.current.removeEventListener(
-					'mouseleave',
-					evaluateHoveredBlocks
-				);
-			};
+		if ( ! isFullSiteEditingActive ) {
+			return;
 		}
+		// To accurately determine which blocks are hovered we must look at the elements under the cursor.
+		// Internal block inserters will fire events like mouseleave for blocks they are visually contained within,
+		// which makes an add/remove by clientId per individual block approach inaccurate.
+		function getHoveredBlocksFromCursor( event ) {
+			const hoveredElements = document.elementsFromPoint(
+				event.clientX,
+				event.clientY
+			);
+			const blockIds = [];
+			hoveredElements.forEach( ( element ) => {
+				if ( element.dataset.block ) {
+					blockIds.push( element.dataset.block );
+				}
+			} );
+			return blockIds;
+		}
+		function evaluateHoveredBlocks( event ) {
+			// Check the timeStamp of the last time this was set.
+			// This prevents needlessly rerunning the parse and dispatch for nested blocks
+			// who share boundaries that trigger the mouse events at or around the same time.
+			if ( event.timeStamp - ( getHoveredBlocksTimeStamp() || 0 ) > 10 ) {
+				const hoveredBlocks = getHoveredBlocksFromCursor( event );
+				// Get an updated timeStamp to set on the dispatch.
+				// The event.timeStamp may be outdated after parsing.
+				// In some browsers, simultaneously triggered events may not have the same timestamp,
+				// and the difference may correspond to processing time for the previous event.
+
+				// eslint-disable-next-line no-undef
+				const dispatchTimeStamp = new Event( 'foobar' ).timeStamp;
+				setHoveredBlocks( hoveredBlocks, dispatchTimeStamp );
+			}
+		}
+
+		ref.current.addEventListener( 'mouseenter', evaluateHoveredBlocks );
+		ref.current.addEventListener( 'mouseleave', evaluateHoveredBlocks );
+
+		return () => {
+			ref.current.removeEventListener(
+				'mouseenter',
+				evaluateHoveredBlocks
+			);
+			ref.current.removeEventListener(
+				'mouseleave',
+				evaluateHoveredBlocks
+			);
+		};
 	}, [] );
 
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
