@@ -12,7 +12,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -23,7 +23,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 
 	const { authorId, authorDetails, authors } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getUser, getAuthors } = select(
+			const { getEditedEntityRecord, getUser, getUsers } = select(
 				'core'
 			);
 			const _authorId = getEditedEntityRecord(
@@ -35,7 +35,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 			return {
 				authorId: _authorId,
 				authorDetails: _authorId ? getUser( _authorId ) : null,
-				authors: getAuthors(),
+				authors: getUsers( { who: 'authors' } ),
 			};
 		},
 		[ postType, postId ]
@@ -55,7 +55,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 		} );
 	}
 
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
@@ -118,7 +118,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 				/>
 			</BlockControls>
 
-			<div { ...blockWrapperProps }>
+			<div { ...blockProps }>
 				{ showAvatar && authorDetails && (
 					<div className="wp-block-post-author__avatar">
 						<img

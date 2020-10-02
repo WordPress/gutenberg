@@ -79,6 +79,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
           >
             <button
               aria-expanded={false}
+              aria-haspopup="true"
               aria-label="Custom color picker"
               className="components-button is-link"
               onClick={[Function]}

@@ -18,7 +18,7 @@ import {
 	MediaUploadCheck,
 	MediaReplaceFlow,
 	RichText,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -110,11 +110,11 @@ function VideoEdit( {
 		noticeOperations.createErrorNotice( message );
 	}
 
-	const blockWrapperProps = useBlockWrapperProps();
+	const blockProps = useBlockProps();
 
 	if ( ! src ) {
 		return (
-			<div { ...blockWrapperProps }>
+			<div { ...blockProps }>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
 					onSelect={ onSelectVideo }
@@ -209,7 +209,7 @@ function VideoEdit( {
 					</MediaUploadCheck>
 				</PanelBody>
 			</InspectorControls>
-			<figure { ...blockWrapperProps }>
+			<figure { ...blockProps }>
 				{ /*
 					Disable the video tag so the user clicking on it won't play the
 					video when the controls are enabled.

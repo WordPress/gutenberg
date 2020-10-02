@@ -40,7 +40,7 @@ describe( 'actions', () => {
 
 			const it = addTemplate( template );
 			expect( it.next().value ).toEqual( {
-				type: 'DISPATCH',
+				type: '@@data/DISPATCH',
 				storeKey: 'core',
 				actionName: 'saveEntityRecord',
 				args: [ 'postType', 'wp_template', template ],
@@ -69,13 +69,13 @@ describe( 'actions', () => {
 				},
 			} );
 			expect( it.next().value ).toEqual( {
-				type: 'SELECT',
+				type: '@@data/RESOLVE_SELECT',
 				storeKey: 'core/edit-site',
 				selectorName: 'getPage',
 				args: [],
 			} );
 			expect( it.next( page ).value ).toEqual( {
-				type: 'DISPATCH',
+				type: '@@data/DISPATCH',
 				storeKey: 'core/edit-site',
 				actionName: 'setPage',
 				args: [ page ],
@@ -123,7 +123,7 @@ describe( 'actions', () => {
 				args: [ 'root', 'site' ],
 				selectorName: 'getEntityRecord',
 				storeKey: 'core',
-				type: 'SELECT',
+				type: '@@data/RESOLVE_SELECT',
 			} );
 
 			const page = {
@@ -156,7 +156,7 @@ describe( 'actions', () => {
 				args: [ 'root', 'site' ],
 				selectorName: 'getEntityRecord',
 				storeKey: 'core',
-				type: 'SELECT',
+				type: '@@data/RESOLVE_SELECT',
 			} );
 
 			const page = {

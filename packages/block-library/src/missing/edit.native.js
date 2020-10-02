@@ -1,13 +1,17 @@
 /**
  * External dependencies
  */
-import { Platform, View, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { requestUnsupportedBlockFallback } from '@wordpress/react-native-bridge';
-import { BottomSheet, Icon } from '@wordpress/components';
+import {
+	requestUnsupportedBlockFallback,
+	sendActionButtonPressedAction,
+	actionButtons,
+} from '@wordpress/react-native-bridge';
+import { BottomSheet, Icon, withUIStrings } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
@@ -60,8 +64,16 @@ export class UnsupportedBlockEdit extends Component {
 	}
 
 	requestFallback() {
-		this.toggleSheet();
-		this.setState( { sendFallbackMessage: true } );
+		if (
+			this.props.canEnableUnsupportedBlockEditor &&
+			this.props.isUnsupportedBlockEditorSupported === false
+		) {
+			this.toggleSheet();
+			this.setState( { sendButtonPressMessage: true } );
+		} else {
+			this.toggleSheet();
+			this.setState( { sendFallbackMessage: true } );
+		}
 	}
 
 	renderSheet( blockTitle, blockName ) {
@@ -70,6 +82,7 @@ export class UnsupportedBlockEdit extends Component {
 			attributes,
 			clientId,
 			isUnsupportedBlockEditorSupported,
+			canEnableUnsupportedBlockEditor,
 		} = this.props;
 		const infoTextStyle = getStylesFromColorScheme(
 			styles.infoText,
@@ -88,12 +101,8 @@ export class UnsupportedBlockEdit extends Component {
 			styles.infoSheetIconDark
 		);
 
-		const titleFormat =
-			Platform.OS === 'android'
-				? // translators: %s: Name of the block
-				  __( "'%s' isn't yet supported on WordPress for Android" )
-				: // translators: %s: Name of the block
-				  __( "'%s' isn't yet supported on WordPress for iOS" );
+		/* translators: Missing block alert title. %s: The localized block name */
+		const titleFormat = __( "'%s' is not fully-supported" );
 		const infoTitle = sprintf( titleFormat, blockTitle );
 
 		const actionButtonStyle = getStylesFromColorScheme(
@@ -124,6 +133,13 @@ export class UnsupportedBlockEdit extends Component {
 							);
 						}, 100 );
 						this.setState( { sendFallbackMessage: false } );
+					} else if ( this.state.sendButtonPressMessage ) {
+						this.timeout = setTimeout( () => {
+							sendActionButtonPressedAction(
+								actionButtons.missingBlockAlertActionButton
+							);
+						}, 100 );
+						this.setState( { sendButtonPressMessage: false } );
 					}
 				} }
 			>
@@ -137,19 +153,21 @@ export class UnsupportedBlockEdit extends Component {
 						{ infoTitle }
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ isUnsupportedBlockEditorSupported
-							? __(
-									"We are working hard to add more blocks with each release. In the meantime, you can also edit this block using your device's web browser."
-							  )
-							: __(
-									'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.'
-							  ) }
+						{ this.props.uiStrings[ 'missing-block-detail' ] ??
+							__(
+								'We are working hard to add more blocks with each release.'
+							) }
 					</Text>
 				</View>
-				{ isUnsupportedBlockEditorSupported && (
+				{ ( isUnsupportedBlockEditorSupported ||
+					canEnableUnsupportedBlockEditor ) && (
 					<>
 						<BottomSheet.Cell
-							label={ __( 'Edit block in web browser' ) }
+							label={
+								this.props.uiStrings[
+									'missing-block-action-button'
+								] ?? __( 'Edit using web editor' )
+							}
 							separatorType="topFullWidth"
 							onPress={ this.requestFallback }
 							labelStyle={ actionButtonStyle }
@@ -228,7 +246,11 @@ export default compose( [
 		return {
 			isUnsupportedBlockEditorSupported:
 				getSettings( 'capabilities' ).unsupportedBlockEditor === true,
+			canEnableUnsupportedBlockEditor:
+				getSettings( 'capabilities' )
+					.canEnableUnsupportedBlockEditor === true,
 		};
 	} ),
 	withPreferredColorScheme,
+	withUIStrings,
 ] )( UnsupportedBlockEdit );

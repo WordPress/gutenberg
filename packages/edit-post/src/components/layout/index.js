@@ -87,6 +87,7 @@ function Layout() {
 		showMostUsedBlocks,
 		isInserterOpened,
 		showIconLabels,
+		hasReducedUI,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -118,6 +119,9 @@ function Layout() {
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
 			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
 				'showIconLabels'
+			),
+			hasReducedUI: select( 'core/edit-post' ).isFeatureActive(
+				'reducedUI'
 			),
 		};
 	}, [] );
@@ -258,6 +262,7 @@ function Layout() {
 						</>
 					}
 					footer={
+						! hasReducedUI &&
 						! isMobileViewport &&
 						isRichEditingEnabled &&
 						mode === 'visual' && (

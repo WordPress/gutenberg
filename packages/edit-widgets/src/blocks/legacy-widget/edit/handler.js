@@ -64,7 +64,7 @@ class LegacyWidgetEditHandler extends Component {
 			number,
 			idBase,
 			instance,
-			isSelected,
+			isVisible,
 			widgetName,
 		} = this.props;
 		const { form } = this.state;
@@ -75,21 +75,30 @@ class LegacyWidgetEditHandler extends Component {
 
 		const widgetTitle = get( instance, [ 'title' ] );
 		let title = null;
-		if ( isSelected ) {
-			if ( widgetTitle && widgetName ) {
-				title = `${ widgetName }: ${ widgetTitle }`;
-			} else if ( ! widgetTitle && widgetName ) {
-				title = widgetName;
-			} else if ( widgetTitle && ! widgetName ) {
-				title = widgetTitle;
-			}
+		if ( widgetTitle && widgetName ) {
+			title = `${ widgetName }: ${ widgetTitle }`;
+		} else if ( ! widgetTitle && widgetName ) {
+			title = widgetName;
+		} else if ( widgetTitle && ! widgetName ) {
+			title = widgetTitle;
 		}
+
+		const componentProps = isVisible
+			? {}
+			: {
+					style: { display: 'none' },
+					hidden: true,
+					'aria-hidden': 'true',
+			  };
 		return (
-			<>
+			<div
+				className="wp-block-legacy-widget__edit-handler"
+				{ ...componentProps }
+			>
 				{ title && (
-					<div className="wp-block-legacy-widget__edit-widget-title">
+					<h3 className="wp-block-legacy-widget__edit-widget-title">
 						{ title }
-					</div>
+					</h3>
 				) }
 				<div
 					className="wp-block-legacy-widget__edit-container"
@@ -114,7 +123,7 @@ class LegacyWidgetEditHandler extends Component {
 						form={ form }
 					/>
 				</div>
-			</>
+			</div>
 		);
 	}
 

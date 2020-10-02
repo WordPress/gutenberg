@@ -54,12 +54,27 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
         completion(request)
     }
 
+    /// Requests a set of JS Scripts to be added to the web view when the page has started loading.
+    /// - Returns: Array of all the scripts to be added
     open func onPageLoadScripts() -> [WKUserScript] {
         return []
     }
 
+    /// Requests a set of JS Scripts to be added to the web view when Gutenberg has been initialized.
+    /// - Returns: Array of all the scripts to be added
     open func onGutenbergReadyScripts() -> [WKUserScript] {
         return []
+    }
+
+    /// Called when Gutenberg Web editor is loaded in the web view.
+    /// If overriden, is required to call super.onGutenbergReady()
+    open func onGutenbergReady() {
+        onGutenbergReadyScripts().forEach(evaluateJavascript)
+        evaluateJavascript(jsInjection.preventAutosavesScript)
+        evaluateJavascript(jsInjection.insertBlockScript)
+        DispatchQueue.main.async { [weak self] in
+            self?.removeCoverViewAnimated()
+        }
     }
 
     public func cleanUp() {
@@ -131,15 +146,6 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
 
     private func save(_ newContent: String) {
         delegate?.webController(controller: self, didPressSave: block.replacingContent(with: newContent))
-    }
-
-    private func onGutenbergReady() {
-        onGutenbergReadyScripts().forEach(evaluateJavascript)
-        evaluateJavascript(jsInjection.preventAutosavesScript)
-        evaluateJavascript(jsInjection.insertBlockScript)
-        DispatchQueue.main.async { [weak self] in
-            self?.removeCoverViewAnimated()
-        }
     }
 }
 
