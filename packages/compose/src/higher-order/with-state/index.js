@@ -12,16 +12,21 @@ import createHigherOrderComponent from '../../utils/create-higher-order-componen
  * A Higher Order Component used to provide and manage internal component state
  * via props.
  *
- * @param {?Object} initialState Optional initial state of the component.
+ * @template {Object} State
+ * @template {Object} Props
+ * @param {Partial<State>} [initialState={}] Optional initial state of the component.
  *
- * @return {WPComponent} Wrapped component.
+ * @return {ReturnType<import('../../types').MapComponentFunction<Props, State & { setState: React.Component['setState']}>>} Wrapped component.
  */
 export default function withState( initialState = {} ) {
-	return createHigherOrderComponent( ( OriginalComponent ) => {
+	/** @param {Component<Props & State>} OriginalComponent */
+	const f = ( OriginalComponent ) => {
 		return class WrappedComponent extends Component {
-			constructor() {
-				super( ...arguments );
+			/** @param {Props} props */
+			constructor( props ) {
+				super( props );
 
+				/** @type {Component['setState']} */
 				this.setState = this.setState.bind( this );
 
 				this.state = initialState;
@@ -37,5 +42,6 @@ export default function withState( initialState = {} ) {
 				);
 			}
 		};
-	}, 'withState' );
+	};
+	return createHigherOrderComponent( f, 'withState' );
 }
