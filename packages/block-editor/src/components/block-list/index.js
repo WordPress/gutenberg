@@ -22,8 +22,6 @@ import useBlockDropZone from '../use-block-drop-zone';
  * to avoid laginess.
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
-// List of blocks to 'spotlight' when active in Full Site Editing.
-const ENTITY_AREAS = [ 'core/template-part' ];
 
 function BlockList(
 	{
@@ -50,14 +48,10 @@ function BlockList(
 			__experimentalGetActiveBlockIdByBlockNames,
 		} = select( 'core/block-editor' );
 
-		// Determine if there is an active template part (or other entity) to spotlight.
-		// Restrict to Full Site Editing experiment while the currently defined ENTITY_AREAS
-		// only exist in FSE.
-		const isFullSiteEditingEnabled = getSettings()
-			.__experimentalEnableFullSiteEditing;
-		const activeEntityBlockId =
-			isFullSiteEditingEnabled &&
-			__experimentalGetActiveBlockIdByBlockNames( ENTITY_AREAS );
+		// Determine if there is an active entity area to spotlight.
+		const activeEntityBlockId = __experimentalGetActiveBlockIdByBlockNames(
+			getSettings().__experimentalSpotlightBlocks
+		);
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
