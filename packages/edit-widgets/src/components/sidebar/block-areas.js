@@ -4,7 +4,7 @@
 import { useDispatch, useSelect } from '@wordpress/data';
 import { blockDefault } from '@wordpress/icons';
 import { BlockIcon } from '@wordpress/block-editor';
-import { Button, Slot } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 function BlockArea( { block } ) {
@@ -62,8 +62,6 @@ export default function BlockAreas() {
 						) }
 					</div>
 				</div>
-
-				<Slot name="WidgetAreas.Sidebar" />
 
 				{ hasBlockAreas && (
 					<ul>
