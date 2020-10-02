@@ -211,3 +211,17 @@ export function setIsInserterOpened( isOpen ) {
 		isOpen,
 	};
 }
+
+/**
+ * Returns an action object used to update the settings.
+ *
+ * @param {Object} settings New settings.
+ *
+ * @return {Object} Action object.
+ */
+export function updateSettings( settings ) {
+	return {
+		type: 'UPDATE_SETTINGS',
+		settings,
+	};
+}
