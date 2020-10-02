@@ -1,9 +1,11 @@
 // Default background and font color
-.wp-block-navigation:not(.has-background):not(.has-text-color) .wp-block-navigation__container {
-	.wp-block-navigation-link {
+.wp-block-navigation:not(.has-background) {
+	&:not(.has-text-color) .wp-block-navigation__container .wp-block-navigation-link {
 		color: $gray-900;
 	}
-	.wp-block-navigation__container {
+
+	// Only default submenu backgrounds
+	.wp-block-navigation__container .wp-block-navigation__container {
 		background-color: $white;
 	}
 }
