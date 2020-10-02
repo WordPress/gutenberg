@@ -42,16 +42,13 @@ const NavigationPanel = () => {
 		[]
 	);
 
-	const { template } = useSelect(
-		( select ) => {
-			return {
-				template: select( 'core' ).getEntityRecord(
-					'postType',
-					'wp_template',
-					templateId
-				),
-			};
-		},
+	const template = useSelect(
+		( select ) =>
+			select( 'core' ).getEntityRecord(
+				'postType',
+				'wp_template',
+				templateId
+			),
 		[ templateId ]
 	);
 
