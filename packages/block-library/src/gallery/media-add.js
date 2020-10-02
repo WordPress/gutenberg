@@ -16,8 +16,13 @@ import { __ } from '@wordpress/i18n';
 import { media as mediaIcon, upload } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
 
-export default function MediaAddButton( props ) {
-	const { allowedTypes, images, onError, onSelect, value } = props;
+export default function MediaAddButton( {
+	allowedTypes,
+	images,
+	onError,
+	onSelect,
+	value
+} ) {
 
 	const mediaUpload = useSelect(
 		( select ) => select( 'core/block-editor' ).getSettings().mediaUpload,
