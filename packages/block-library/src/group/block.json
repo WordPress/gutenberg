@@ -19,6 +19,8 @@
 			"gradients": true,
 			"link": true
 		},
-		"__experimentalPadding": true
+		"spacing": {
+			"padding": true
+		}
 	}
 }
