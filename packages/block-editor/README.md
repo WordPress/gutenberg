@@ -112,7 +112,7 @@ _Related_
 
 _Parameters_
 
--   _props_ `BlockContextProviderProps`:
+-   _props_ `BlockContextProviderProps`: 
 
 <a name="BlockControls" href="#BlockControls">#</a> **BlockControls**
 
@@ -199,7 +199,7 @@ _Usage_
 
 _Parameters_
 
--   _props_ `Object`:
+-   _props_ `Object`: 
 -   _props.clientId_ `string`: Client ID of block.
 
 _Returns_
@@ -512,7 +512,7 @@ _Related_
 
 _Type_
 
--   `Object`
+-   `Object` 
 
 <a name="ToolSelector" href="#ToolSelector">#</a> **ToolSelector**
 
