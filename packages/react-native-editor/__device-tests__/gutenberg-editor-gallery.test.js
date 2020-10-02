@@ -34,6 +34,11 @@ describe( 'Gutenberg Editor Gallery Block tests', () => {
 
 	it( 'should be able to add a gallery block', async () => {
 		await editorPage.addNewBlock( galleryBlockName );
+		await driver.sleep( 1000 );
+		await editorPage.closePicker();
+		// wait for the Picker to be closed
+		await driver.sleep( 1000 );
+
 		const galleryBlock = await editorPage.getBlockAtPosition(
 			galleryBlockName
 		);

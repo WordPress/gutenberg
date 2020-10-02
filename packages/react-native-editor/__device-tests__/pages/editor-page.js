@@ -477,4 +477,15 @@ export default class EditorPage {
 		);
 		return await typeString( this.driver, textViewElement, text, clear );
 	}
+
+	async closePicker() {
+		if ( isAndroid() ) {
+			await swipeDown( this.driver );
+		} else {
+			const cancelButton = await this.driver.elementByAccessibilityId(
+				'Cancel'
+			);
+			await cancelButton.click();
+		}
+	}
 }
