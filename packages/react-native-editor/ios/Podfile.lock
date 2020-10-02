@@ -243,7 +243,7 @@ PODS:
     - ReactCommon/jscallinvoker (= 0.61.5)
   - ReactNativeDarkMode (0.0.10):
     - React
-  - RNCMaskedView (0.1.10):
+  - RNCMaskedView (0.1.10-wp):
     - React
   - RNGestureHandler (1.6.0):
     - React
@@ -430,7 +430,7 @@ SPEC CHECKSUMS:
   React-RCTVibration: a49a1f42bf8f5acf1c3e297097517c6b3af377ad
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
   ReactNativeDarkMode: f61376360c5d983907e5c316e8e1c853a8c2f348
-  RNCMaskedView: f5c7d14d6847b7b44853f7acb6284c1da30a3459
+  RNCMaskedView: 744eb642f5d96bd670ea93f59e7a1346ea50976a
   RNGestureHandler: dde546180bf24af0b5f737c8ad04b6f3fa51609a
   RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
   RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
@@ -441,4 +441,4 @@ SPEC CHECKSUMS:
 
 PODFILE CHECKSUM: fb5a2c8eab8e33d063643370988400ebad0a71d2
 
-COCOAPODS: 1.8.4
+COCOAPODS: 1.9.3
