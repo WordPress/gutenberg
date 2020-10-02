@@ -299,7 +299,7 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 				// who share boundaries that trigger the mouse events at or around the same time.
 				if (
 					event.timeStamp - ( getHoveredBlocksTimeStamp() || 0 ) >
-					10
+					3
 				) {
 					const hoveredBlocks = getHoveredBlocksFromCursor( event );
 
