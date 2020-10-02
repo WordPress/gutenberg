@@ -39,7 +39,7 @@ const NavigationPanel = () => {
 				template: getEntityRecord(
 					'postType',
 					'wp_template',
-					templateId
+					_templateId
 				),
 				templateId: _templateId,
 				templatePartId: getTemplatePartId(),
