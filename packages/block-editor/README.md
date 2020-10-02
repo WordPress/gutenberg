@@ -30,8 +30,8 @@ function MyEditorComponent () {
 	return (
 		<BlockEditorProvider
 			value={ blocks }
-			onInput={ updateBlocks }
-			onChange={ updateBlocks }
+			onInput={ ( blocks ) => updateBlocks( blocks ) }
+			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
 			<SlotFillProvider>
 				<Popover.Slot name="block-toolbar" />
