@@ -299,10 +299,9 @@ export function useBlockWrapperProps( props = {}, { __unstableIsHtml } = {} ) {
 				// who share boundaries that trigger the mouse events at or around the same time.
 				if (
 					event.timeStamp - ( getHoveredBlocksTimeStamp() || 0 ) >
-					3
+					10
 				) {
 					const hoveredBlocks = getHoveredBlocksFromCursor( event );
-
 					// Get an updated timeStamp to set on the dispatch.
 					// The event.timeStamp may be outdated after parsing.
 					// In some browsers, simultaneously triggered events may not have the same timestamp,
