@@ -11,6 +11,7 @@
 	padding: 1em;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
+	background-color: transparent;
 
 	&.has-parallax {
 		background-attachment: fixed;
@@ -52,15 +53,19 @@
 		background-color: inherit;
 	}
 
-	&.has-background-dim:not(.has-background-gradient)::before,
-	.wp-block-cover__gradient-background {
+	.has-background-dim .wp-block-cover__background {
+		background-color: $black;
+	}
+
+	.has-background-dim:not(.has-background-gradient),
+	.wp-block-cover__gradient-background,
+	.wp-block-cover__background {
 		position: absolute;
 		top: 0;
 		left: 0;
 		bottom: 0;
 		right: 0;
 		z-index: z-index(".wp-block-cover.has-background-dim::before");
-		opacity: 0.5;
 	}
 
 
@@ -68,6 +73,12 @@
 		&.has-background-dim.has-background-dim-#{ $i * 10 } {
 			&:not(.has-background-gradient)::before,
 			.wp-block-cover__gradient-background {
+				opacity: $i * 0.1;
+			}
+		}
+		.has-background-dim.has-background-dim-#{ $i * 10 } {
+			&.wp-block-cover__background,
+			&.wp-block-cover__gradient-background {
 				opacity: $i * 0.1;
 			}
 		}

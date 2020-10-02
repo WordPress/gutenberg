@@ -387,7 +387,6 @@ function CoverEdit( {
 			: {
 					backgroundImage: gradientValue ? gradientValue : undefined,
 			  } ),
-		backgroundColor: overlayColor.color,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
@@ -526,24 +525,21 @@ function CoverEdit( {
 									onColorChange: setOverlayColor,
 									onGradientChange: setGradient,
 									label: __( 'Color' ),
-									disableAlpha: false,
 								},
 							] }
 						>
-							{ !! url && (
-								<RangeControl
-									label={ __( 'Opacity' ) }
-									value={ dimRatio }
-									onChange={ ( newDimRation ) =>
-										setAttributes( {
-											dimRatio: newDimRation,
-										} )
-									}
-									min={ 0 }
-									max={ 100 }
-									required
-								/>
-							) }
+							<RangeControl
+								label={ __( 'Opacity' ) }
+								value={ dimRatio }
+								onChange={ ( newDimRation ) =>
+									setAttributes( {
+										dimRatio: newDimRation,
+									} )
+								}
+								min={ 0 }
+								max={ 100 }
+								required
+							/>
 						</PanelColorGradientSettings>
 					</>
 				) }
@@ -643,7 +639,7 @@ function CoverEdit( {
 						aria-hidden="true"
 						className={ classnames(
 							'wp-block-cover__gradient-background',
-							gradientClass
+							classes
 						) }
 						style={ { backgroundImage: gradientValue } }
 					/>
