@@ -29,6 +29,7 @@ class ReusableBlockEdit extends Component {
 
 		this.setBlocks = this.setBlocks.bind( this );
 		this.toggleSheet = this.toggleSheet.bind( this );
+		this.closeSheet = this.closeSheet.bind( this );
 		this.requestFallback = this.requestFallback.bind( this );
 
 		if ( reusableBlock ) {
@@ -75,6 +76,10 @@ class ReusableBlockEdit extends Component {
 		} );
 	}
 
+	closeSheet() {
+		this.setState( { showHelp: false } );
+	}
+
 	requestFallback() {
 		this.toggleSheet();
 		this.setState( { sendFallbackMessage: true } );
@@ -117,7 +122,7 @@ class ReusableBlockEdit extends Component {
 			<BottomSheet
 				isVisible={ showHelp }
 				hideHeader
-				onClose={ this.toggleSheet }
+				onClose={ this.closeSheet }
 				onModalHide={ () => {
 					if ( this.state.sendFallbackMessage ) {
 						// On iOS, onModalHide is called when the controller is still part of the hierarchy.
