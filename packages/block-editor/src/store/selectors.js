@@ -1812,21 +1812,21 @@ export function __experimentalGetHoveredBlocks( state ) {
 }
 
 /**
- * Returns the most interior hovered block of the given blockName (such as 'core/group').
+ * Returns the clientId for the most interior hovered block of the given block name.
  *
  * @param {Object} state     Global application state.
  * @param {string} blockName Name of block type to return.
  *
- * @return {Object} Parsed block object.
+ * @return {string} Parsed block object.
  */
-export const __experimentalGetHoveredBlockByBlockName = createSelector(
+export const __experimentalGetHoveredBlockIdByBlockName = createSelector(
 	( state, blockName ) => {
 		const matchingBlockClientId = state.hoveredBlocks.hoveredBlockIds.find(
 			( blockId ) => getBlockName( state, blockId ) === blockName
 		);
-		return getBlock( state, matchingBlockClientId );
+		return matchingBlockClientId;
 	},
-	( state ) => [ state.hoveredBlocks.hoveredBlockIds, state.blocks.cache ]
+	( state ) => [ state.hoveredBlocks.hoveredBlockIds ]
 );
 
 /**
