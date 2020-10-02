@@ -74,7 +74,6 @@ const MIN_COLUMNS_NUM = 1;
 const MAX_COLUMNS_NUM_IN_ROW = 3;
 
 const MARGIN = 16;
-const DELTA = 1;
 const MIN_WIDTH = 32;
 
 function ColumnsEditContainer( {
@@ -116,7 +115,7 @@ function ColumnsEditContainer( {
 	}, [ width ] );
 
 	const getContainerWidth = ( containerWidth ) =>
-		2 * MARGIN + containerWidth - columnsInRow * 2 * MARGIN - DELTA;
+		2 * MARGIN + containerWidth - columnsInRow * 2 * MARGIN;
 
 	const columnWidths = getColumnWidths( innerColumns, columnCount );
 
@@ -143,7 +142,7 @@ function ColumnsEditContainer( {
 
 	//  Array of columns whose calculated width is lower than minimum width value
 	const filteredColumnWidthsPerRatio = columnWidthsPerRatio.filter(
-		( columnWidthPerRatio ) => columnWidthPerRatio < MIN_WIDTH
+		( columnWidthPerRatio ) => columnWidthPerRatio <= MIN_WIDTH
 	);
 
 	// Container width to be divided. If there are some results within `filteredColumnWidthsPerRatio`
@@ -153,7 +152,7 @@ function ColumnsEditContainer( {
 		width - filteredColumnWidthsPerRatio.length * MIN_WIDTH;
 
 	// The minimum percentage ratio for which column width is equal minimum width value
-	const minPercentageRatio = MIN_WIDTH / baseContainerWidth;
+	const minPercentageRatio = MIN_WIDTH / getContainerWidth( width );
 
 	// The sum of column widths which ratio is higher than `minPercentageRatio`
 	const largeColumnsWidthsSum = columnRatios
@@ -176,11 +175,9 @@ function ColumnsEditContainer( {
 			( { attributes: innerColumnAttributes, clientId } ) => {
 				const attributeWidth =
 					innerColumnAttributes.width || columnWidths[ clientId ];
-				const propotionalRatio = attributeWidth / columnWidthsSum;
+				const proportionalRatio = attributeWidth / columnWidthsSum;
 				const percentageRatio = attributeWidth / 100;
-				const initialColumnWidth = Math.floor(
-					propotionalRatio * containerWidth
-				);
+				const initialColumnWidth = proportionalRatio * containerWidth;
 
 				if (
 					columnCount === 1 &&
@@ -197,10 +194,9 @@ function ColumnsEditContainer( {
 						} else if ( initialColumnWidth > MIN_WIDTH ) {
 							// Column width has to be the result of multiplying the container width and
 							// the ratio of attribute and the sum of widths of columns wider than 32px
-							columnWidth = Math.floor(
+							columnWidth =
 								( attributeWidth / largeColumnsWidthsSum ) *
-									containerWidth
-							);
+								containerWidth;
 						}
 
 						maxColumnWidth = columnWidth;
@@ -210,7 +206,7 @@ function ColumnsEditContainer( {
 							// should have attribute percentage of container width
 							const newColumnWidth =
 								percentageRatio * containerWidth;
-							if ( newColumnWidth < MIN_WIDTH ) {
+							if ( newColumnWidth <= MIN_WIDTH ) {
 								columnWidth = MIN_WIDTH;
 							} else {
 								columnWidth = newColumnWidth;
@@ -219,14 +215,12 @@ function ColumnsEditContainer( {
 					} else if ( width < ALIGNMENT_BREAKPOINTS.medium ) {
 						// On the breakpoint lower than medium each column inside columns
 						// has to take equal part of container width
-						columnWidth = Math.round(
-							getContainerWidth( width ) / columnsInRow
-						);
+						columnWidth = getContainerWidth( width ) / columnsInRow;
 					}
 				}
 				widths[ clientId ] = {
-					width: columnWidth,
-					maxWidth: maxColumnWidth,
+					width: Math.floor( columnWidth ),
+					maxWidth: Math.floor( maxColumnWidth ),
 				};
 			}
 		);
@@ -258,17 +252,7 @@ function ColumnsEditContainer( {
 			return (
 				<View
 					style={ [
-						isFullWidth && styles.columnAppender,
-						! isEqualWidth &&
-							isParentFullWidth &&
-							styles.columnAppender,
-						isEqualWidth &&
-							isFullWidth &&
-							innerColumns &&
-							styles.columnAppender,
-						isEqualWidth &&
-							! isFullWidth &&
-							innerColumns &&
+						( isFullWidth || isParentFullWidth || isEqualWidth ) &&
 							styles.columnAppender,
 						columnCount === 0 && {
 							width,

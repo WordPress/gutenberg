@@ -35,22 +35,16 @@ function GroupEdit( {
 	const { width: screenWidth } = Dimensions.get( 'window' );
 	const isFullWidth = align === alignments.full;
 	const isParentFullWidth = parentBlockAlignment === alignments.full;
+	const isEqualWidth = width === screenWidth;
 
 	const renderAppender = useCallback(
 		() => (
 			<View
 				style={ [
-					isParentFullWidth &&
-						! hasInnerBlocks &&
-						styles.widerColumnAppender,
-					width === screenWidth &&
-						! hasInnerBlocks &&
-						styles.widerColumnAppender,
-					width === screenWidth &&
-						hasInnerBlocks &&
-						styles.columnAppender,
-					isFullWidth && styles.widerColumnAppender,
-					isFullWidth && hasInnerBlocks && styles.columnAppender,
+					( isEqualWidth || isFullWidth || isParentFullWidth ) &&
+						( hasInnerBlocks
+							? styles.columnAppender
+							: styles.widerColumnAppender ),
 				] }
 			>
 				<InnerBlocks.ButtonBlockAppender />
@@ -81,7 +75,7 @@ function GroupEdit( {
 			{ resizeObserver }
 			<InnerBlocks
 				renderAppender={ isSelected && renderAppender }
-				parentWidth={ width }
+				parentWidth={ isFullWidth ? screenWidth : width }
 			/>
 		</View>
 	);

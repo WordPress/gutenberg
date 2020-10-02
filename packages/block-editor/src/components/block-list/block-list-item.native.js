@@ -151,6 +151,7 @@ export class BlockListItem extends Component {
 						key={ clientId }
 						showTitle={ false }
 						clientId={ clientId }
+						parentWidth={ parentWidth }
 						{ ...restProps }
 						marginHorizontal={ this.getMarginHorizontal() }
 					/>

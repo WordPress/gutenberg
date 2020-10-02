@@ -8,7 +8,6 @@ import { View, Dimensions } from 'react-native';
  */
 import { useState, useEffect } from '@wordpress/element';
 import { ALIGNMENT_BREAKPOINTS, WIDE_ALIGNMENTS } from '@wordpress/components';
-import { useResizeObserver } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,8 +25,6 @@ const ReadableContentView = ( {
 	parentWidth,
 } ) => {
 	const { width, height } = Dimensions.get( 'window' );
-	const [ resizeObserver, sizes ] = useResizeObserver();
-	const { width: containerWidth } = sizes || { width: 0 };
 	const [ windowWidth, setWindowWidth ] = useState( width );
 	const [ windowRatio, setWindowRatio ] = useState( width / height );
 
@@ -66,7 +63,6 @@ const ReadableContentView = ( {
 
 	return (
 		<View style={ styles.container }>
-			{ resizeObserver }
 			<View
 				style={ [
 					reversed
@@ -75,9 +71,7 @@ const ReadableContentView = ( {
 					style,
 					styles[ align ],
 					parentWidth && {
-						maxWidth: containerWidth
-							? containerWidth + 2 * MARGIN
-							: styles.centeredContent.maxWidth,
+						maxWidth: parentWidth + 2 * MARGIN,
 					},
 					align === WIDE_ALIGNMENTS.alignments.wide &&
 						getWideStyles(),

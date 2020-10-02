@@ -19,8 +19,6 @@ import {
 	PanelBody,
 	RangeControl,
 	FooterMessageControl,
-	WIDE_ALIGNMENTS,
-	ALIGNMENT_BREAKPOINTS,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -42,7 +40,6 @@ function ColumnEdit( {
 	columnCount,
 	selectedColumnIndex,
 	parentAlignment,
-	parentBlockAlignment,
 	clientId,
 } ) {
 	const { verticalAlignment } = attributes;
@@ -70,35 +67,16 @@ function ColumnEdit( {
 
 	const renderAppender = () => {
 		const { width } = contentStyle[ clientId ];
-		const isParentFullWidth =
-			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
 		const isWidthEqual = width === screenWidth;
 
 		if ( isSelected ) {
 			return (
 				<View
 					style={ [
-						width > ALIGNMENT_BREAKPOINTS.mobile &&
-							isParentFullWidth &&
-							! hasChildren &&
-							styles.widerColumnAppender,
-						width > ALIGNMENT_BREAKPOINTS.mobile &&
-							isParentFullWidth &&
-							hasChildren &&
-							styles.columnAppender,
-						isWidthEqual && styles.widerColumnAppender,
 						isWidthEqual &&
-							isParentFullWidth &&
-							! hasChildren &&
-							styles.widerColumnAppender,
-						isWidthEqual &&
-							isParentFullWidth &&
-							hasChildren &&
-							styles.columnAppender,
-						isWidthEqual &&
-							! isParentFullWidth &&
-							hasChildren &&
-							styles.columnAppender,
+							( hasChildren
+								? styles.columnAppender
+								: styles.widerColumnAppender ),
 					] }
 				>
 					<InnerBlocks.ButtonBlockAppender />
@@ -219,8 +197,6 @@ export default compose( [
 		const parentAlignment = getBlockAttributes( parentId )
 			?.verticalAlignment;
 
-		const parentBlockAlignment = getBlockAttributes( parentId )?.align;
-
 		return {
 			hasChildren,
 			isParentSelected,
@@ -229,7 +205,6 @@ export default compose( [
 			columns,
 			columnCount,
 			parentAlignment,
-			parentBlockAlignment,
 		};
 	} ),
 	withPreferredColorScheme,
