@@ -87,14 +87,14 @@ function PanelGroup( { title, icon, children } ) {
 
 function TemplatePartsByTheme( { templateParts, setAttributes, onClose } ) {
 	const templatePartsByTheme = useMemo( () => {
-		return Object.values( groupBy( templateParts, 'wp_theme' ) );
+		return Object.values( groupBy( templateParts, 'wp_theme_slug' ) );
 	}, [ templateParts ] );
 	const currentShownTPs = useAsyncList( templateParts );
 
 	return templatePartsByTheme.map( ( templatePartList ) => (
 		<PanelGroup
-			key={ templatePartList[ 0 ].wp_theme }
-			title={ templatePartList[ 0 ].wp_theme }
+			key={ templatePartList[ 0 ].wp_theme_slug }
+			title={ templatePartList[ 0 ].wp_theme_slug }
 		>
 			{ templatePartList.map( ( templatePart ) => {
 				return currentShownTPs.includes( templatePart ) ? (
@@ -147,10 +147,10 @@ function TemplatePartSearchResults( {
 			// Second prioritize index found in theme.
 			// Since diacritics can be used in theme names, remove them for the comparison.
 			return (
-				deburr( a.wp_theme )
+				deburr( a.wp_theme_slug )
 					.toLowerCase()
 					.indexOf( normalizedFilterValue ) -
-				deburr( b.wp_theme )
+				deburr( b.wp_theme_slug )
 					.toLowerCase()
 					.indexOf( normalizedFilterValue )
 			);
@@ -161,7 +161,10 @@ function TemplatePartSearchResults( {
 	const currentShownTPs = useAsyncList( filteredTPs );
 
 	return filteredTPs.map( ( templatePart ) => (
-		<PanelGroup key={ templatePart.id } title={ templatePart.wp_theme }>
+		<PanelGroup
+			key={ templatePart.id }
+			title={ templatePart.wp_theme_slug }
+		>
 			{ currentShownTPs.includes( templatePart ) ? (
 				<TemplatePartItem
 					key={ templatePart.id }

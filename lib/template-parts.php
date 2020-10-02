@@ -260,14 +260,14 @@ add_filter( 'rest_wp_template_part_query', 'filter_rest_wp_template_part_query',
  */
 function filter_rest_prepare_wp_template_part( $response ) {
 	if ( isset( $response->data ) && is_array( $response->data ) && isset( $response->data['id'] ) ) {
-		$response->data['wp_theme'] = 'false';
+		$response->data['wp_theme_slug'] = 'false';
 
 		// Get the wp_theme terms.
 		$wp_themes = wp_get_post_terms( $response->data['id'], 'wp_theme' );
 
 		// If a theme is assigned, add it to the REST response.
 		if ( $wp_themes && is_array( $wp_themes ) && isset( $wp_themes[0] ) ) {
-			$response->data['wp_theme'] = $wp_themes[0]->slug;
+			$response->data['wp_theme_slug'] = $wp_themes[0]->slug;
 		}
 	}
 
