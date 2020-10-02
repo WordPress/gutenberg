@@ -25,10 +25,6 @@ export default function ToolbarLinkControl( {
 		url: computeDisplayUrl( initialLink.url ),
 	} );
 
-	const [ preferredDropdown, setPreferredDropdown ] = useState(
-		'suggestions'
-	);
-
 	const updateCurrentLink = useCallback(
 		( data ) => {
 			const newLink = {
@@ -57,16 +53,8 @@ export default function ToolbarLinkControl( {
 			createSuggestion,
 			currentLink,
 			updateCurrentLink,
-			preferredDropdown,
-			setPreferredDropdown,
 		} ),
-		[
-			createSuggestion,
-			currentLink,
-			updateCurrentLink,
-			preferredDropdown,
-			setPreferredDropdown,
-		]
+		[ createSuggestion, currentLink, updateCurrentLink ]
 	);
 
 	return (

@@ -15,7 +15,7 @@ import { useContext } from '@wordpress/element';
 import ToolbarLinkControlContext from './context';
 
 export default function SettingsMenu() {
-	const { currentLink, updateCurrentLink, setPreferredDropdown } = useContext(
+	const { currentLink, updateCurrentLink } = useContext(
 		ToolbarLinkControlContext
 	);
 	const { opensInNewTab, rel } = currentLink;
@@ -25,11 +25,6 @@ export default function SettingsMenu() {
 			className="link-option"
 			contentClassName="link-options__popover"
 			icon={ arrowDownIcon }
-			onToggle={ ( isOpen ) => {
-				if ( isOpen ) {
-					setPreferredDropdown( 'settings' );
-				}
-			} }
 			toggleProps={ {
 				label: __( 'Link options' ),
 			} }
