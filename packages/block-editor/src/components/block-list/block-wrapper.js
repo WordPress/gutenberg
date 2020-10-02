@@ -70,7 +70,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		initialPosition,
 		shouldFocusFirstElement,
 		isNavigationMode,
-		getHoveredBlocksTimeStamp,
+		getHoveredBlocksEventData,
 		isFullSiteEditingActive,
 	} = useSelect(
 		( select ) => {
@@ -78,7 +78,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				getSelectedBlocksInitialCaretPosition,
 				isMultiSelecting: _isMultiSelecting,
 				isNavigationMode: _isNavigationMode,
-				__experimentalGetHoveredBlocksTimeStamp: _getHoveredBlocksTimeStamp,
+				__experimentalGetHoveredBlocksEventData: _getHoveredBlocksEventData,
 				getSettings,
 			} = select( 'core/block-editor' );
 
@@ -91,7 +91,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					? getSelectedBlocksInitialCaretPosition()
 					: undefined,
 				isNavigationMode: _isNavigationMode,
-				getHoveredBlocksTimeStamp: _getHoveredBlocksTimeStamp,
+				getHoveredBlocksEventData: _getHoveredBlocksEventData,
 				isFullSiteEditingActive: getSettings()
 					.__experimentalEnableFullSiteEditing,
 			};
@@ -310,19 +310,28 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			return blockIds;
 		}
 		function evaluateHoveredBlocks( event ) {
-			// Check the timeStamp of the last time this was set.
+			// Check event data for the last time this was set.
 			// This prevents needlessly rerunning the parse and dispatch for nested blocks
 			// who share boundaries that trigger the mouse events at or around the same time.
-			if ( event.timeStamp - ( getHoveredBlocksTimeStamp() || 0 ) > 10 ) {
+			const { time, mouseCoords } = getHoveredBlocksEventData() || {};
+			const eventCoords = `${ event.clientX }-${ event.clientY }`;
+			if (
+				mouseCoords !== eventCoords ||
+				event.timeStamp - ( time || 0 ) > 50
+			) {
 				const hoveredBlocks = getHoveredBlocksFromCursor( event );
 				// Get an updated timeStamp to set on the dispatch.
-				// The event.timeStamp may be outdated after parsing.
+				// The event.timeStamp may be outdated by this time.
 				// In some browsers, simultaneously triggered events may not have the same timestamp,
-				// and the difference may correspond to processing time for the previous event.
+				// and the difference may correspond to queue and processing time for the previous event.
 
 				// eslint-disable-next-line no-undef
 				const dispatchTimeStamp = new Event( 'foobar' ).timeStamp;
-				setHoveredBlocks( hoveredBlocks, dispatchTimeStamp );
+				setHoveredBlocks(
+					hoveredBlocks,
+					dispatchTimeStamp,
+					eventCoords
+				);
 			}
 		}
 

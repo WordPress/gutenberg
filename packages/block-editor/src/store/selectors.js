@@ -1823,13 +1823,14 @@ export const __experimentalGetHoveredBlockIdByBlockName = createSelector(
 );
 
 /**
- * Returns the timestamp corresponding to when hoveredBlocks were most recently set.
- * This can be used to limit unnecessary evalutaions and dispatches of the action.
+ * Returns an object containing time and position corresponding to the last
+ * hoveredBlocks calculation.  This can be used to limit unnecessary evalations and
+ * action dispatches.
  *
  * @param {Object} state Global application state.
  *
- * @return {number} Timestamp corresponding to when hoveredBlocks state was set.
+ * @return {Object} Object containing time and position of last evaluation.
  */
-export function __experimentalGetHoveredBlocksTimeStamp( state ) {
-	return state.hoveredBlocks.eventTimeStamp;
+export function __experimentalGetHoveredBlocksEventData( state ) {
+	return state.hoveredBlocks.eventData;
 }

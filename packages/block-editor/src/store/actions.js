@@ -1109,15 +1109,18 @@ export function setHasControlledInnerBlocks(
  * Returns an action object that sets whether the block has controlled innerblocks.
  *
  * @param {string[]} hoveredBlockIds Array of block clientIds.
- * @param {?number}  eventTimeStamp Optional timestamp of last evaluation.
+ * @param {number} timeStamp Timestamp of last evaluation.
+ * @param {string} mouseCoords Mouse position 'x-y' of last evaluation.
  */
 export function __experimentalSetHoveredBlocks(
 	hoveredBlockIds,
-	eventTimeStamp
+	timeStamp,
+	mouseCoords
 ) {
 	return {
 		type: 'SET_HOVERED_BLOCKS',
 		hoveredBlockIds,
-		eventTimeStamp,
+		timeStamp,
+		mouseCoords,
 	};
 }
