@@ -102,10 +102,11 @@ export default function MediaAddButton( props ) {
 			<ToolbarButton
 				ref={ createRef() }
 				aria-expanded={ isOpen }
+				aria-haspopup="true"
 				onClick={ onToggle }
 				onKeyDown={ onKeyDown }
 			>
-				{ __( 'Add' ) }
+				{ __( 'Add image' ) }
 			</ToolbarButton>
 		</ToolbarGroup>
 	);
