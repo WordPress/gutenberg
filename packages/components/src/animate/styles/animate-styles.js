@@ -8,6 +8,7 @@ import styled from '@emotion/styled';
  */
 import * as animations from './animate-keyframe-styles';
 import { reduceMotion } from '../../utils';
+import { getRTLSafeTranslateX, getRTLSafeXAxis } from './utils';
 
 export const AppearingWrapper = styled.div`
 	animation: ${ animations.appear } 0.1s cubic-bezier( 0, 0, 0.2, 1 ) 0s;
@@ -15,7 +16,7 @@ export const AppearingWrapper = styled.div`
 
 	${ reduceMotion( 'animation' ) }
     
-	transform-origin: ${ ( p ) => p.yAxis } ${ ( p ) => p.xAxis };
+	transform-origin: ${ ( p ) => p.yAxis } ${ getRTLSafeXAxis };
 `;
 
 export const SlidingWrapper = styled.div`
@@ -24,8 +25,7 @@ export const SlidingWrapper = styled.div`
 
 	${ reduceMotion( 'animation' ) }
 
-	transform: translateX( ${ ( p ) =>
-		p.origin === 'right' ? '-100%' : '+100%' } );
+	transform: translateX( ${ getRTLSafeTranslateX } );
 `;
 
 export const LoadingWrapper = styled.div`
