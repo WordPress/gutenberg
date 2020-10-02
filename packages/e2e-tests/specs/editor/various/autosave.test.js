@@ -103,7 +103,7 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).localAutosave()
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
 		// Reload without saving on the server
 		await page.reload();
@@ -205,7 +205,7 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).localAutosave()
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
@@ -229,7 +229,7 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).localAutosave()
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
@@ -254,7 +254,7 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).localAutosave()
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
@@ -275,7 +275,7 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).localAutosave()
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
@@ -304,7 +304,7 @@ describe( 'autosave', () => {
 
 		// Force conflicting local autosave
 		await page.evaluate( () =>
-			window.wp.data.dispatch( 'core/editor' ).localAutosave()
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )

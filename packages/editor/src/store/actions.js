@@ -342,40 +342,46 @@ export function* trashPost() {
 }
 
 /**
- * Action generator used in signalling that the post should autosave.
+ * Action generator used in signalling that the post should autosave.  This
+ * includes server-side autosaving (default) and client-side (a.k.a. local)
+ * autosaving (e.g. on the Web, the post might be committed to Session
+ * Storage).
  *
  * @param {Object?} options Extra flags to identify the autosave.
  */
-export function* autosave( options ) {
-	yield dispatch( STORE_KEY, 'savePost', { isAutosave: true, ...options } );
-}
-
-/**
- * Action generator used in signalling that the post should be locally
- * autosaved (e.g. on the Web, it might be committed to Session Storage).
- */
-export function* localAutosave() {
-	const post = yield select( STORE_KEY, 'getCurrentPost' );
-	const isPostNew = yield select( STORE_KEY, 'isEditedPostNew' );
-	const title = yield select( STORE_KEY, 'getEditedPostAttribute', 'title' );
-	const content = yield select(
-		STORE_KEY,
-		'getEditedPostAttribute',
-		'content'
-	);
-	const excerpt = yield select(
-		STORE_KEY,
-		'getEditedPostAttribute',
-		'excerpt'
-	);
-	yield {
-		type: 'LOCAL_AUTOSAVE_SET',
-		postId: post.id,
-		isPostNew,
-		title,
-		content,
-		excerpt,
-	};
+export function* autosave( { local = false, ...options } = {} ) {
+	if ( local ) {
+		const post = yield select( STORE_KEY, 'getCurrentPost' );
+		const isPostNew = yield select( STORE_KEY, 'isEditedPostNew' );
+		const title = yield select(
+			STORE_KEY,
+			'getEditedPostAttribute',
+			'title'
+		);
+		const content = yield select(
+			STORE_KEY,
+			'getEditedPostAttribute',
+			'content'
+		);
+		const excerpt = yield select(
+			STORE_KEY,
+			'getEditedPostAttribute',
+			'excerpt'
+		);
+		yield {
+			type: 'LOCAL_AUTOSAVE_SET',
+			postId: post.id,
+			isPostNew,
+			title,
+			content,
+			excerpt,
+		};
+	} else {
+		yield dispatch( STORE_KEY, 'savePost', {
+			isAutosave: true,
+			...options,
+		} );
+	}
 }
 
 /**
