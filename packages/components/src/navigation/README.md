@@ -34,14 +34,8 @@ const MyNavigation = () => (
 			parentMenu="root"
 			title="Category"
 		>
-			<ul>
-				<NavigationItem
-					badge="1"
-					item="child-1"
-					title="Child 1"
-				/>
-				<NavigationItem item="child-2" title="Child 2" />
-			</ul>
+			<NavigationItem badge="1" item="child-1" title="Child 1" />
+			<NavigationItem item="child-2" title="Child 2" />
 		</NavigationMenu>
 	</Navigation>
 );
@@ -73,13 +67,6 @@ The active menu slug.
 
 Optional className for the `Navigation` component.
 
-### `onActivateItem`
-
--   Type: `function`
--   Required: No
-
-Sync the active item between the external state and the Navigation's internal state.
-
 ### `onActivateMenu`
 
 -   Type: `function`
@@ -95,9 +82,10 @@ Sync the active menu between the external state and the Navigation's internal st
 
 -   Type: `string`
 -   Required: No
--   Default: "Back"
+-   Default: parent menu's title or "Back"
 
-The back button label used in nested menus.
+The back button label used in nested menus. If not provided, the label will be inferred from the parent menu's title.
+If for some reason the parent menu's title is not available then it will default to "Back".
 
 ### className
 
@@ -112,7 +100,7 @@ Optional className for the `NavigationMenu` component.
 -   Required: No
 -   Default: "root"
 
-The menu slug.
+The unique identifier of the menu. The root menu can omit this, and it will default to "root"; all other menus need to specify it.
 
 ### `parentMenu`
 
@@ -170,6 +158,13 @@ Optional className for the `NavigationItem` component.
 -   Required: No
 
 If provided, renders `a` instead of `button`.
+
+### `item`
+
+-   Type: `string`
+-   Required: Yes
+
+The unique identifier of the item.
 
 ### `navigateToMenu`
 

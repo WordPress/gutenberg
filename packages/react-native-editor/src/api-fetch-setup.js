@@ -4,6 +4,12 @@
 import { fetchRequest } from '@wordpress/react-native-bridge';
 import apiFetch from '@wordpress/api-fetch';
 
+// Please add only wp.org API paths here!
+const SUPPORTED_ENDPOINTS = [
+	/wp\/v2\/(media|categories)\/?\d*?.*/i,
+	/wp\/v2\/search\?.*/i,
+];
+
 const setTimeoutPromise = ( delay ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, delay ) );
 
@@ -36,10 +42,7 @@ const fetchHandler = ( { path }, retries = 20, retryCount = 1 ) => {
 };
 
 export const isPathSupported = ( path ) =>
-	[
-		// Please add only wp.org API paths here!
-		/wp\/v2\/(media|categories)\/?\d*?.*/i,
-	].some( ( pattern ) => pattern.test( path ) );
+	SUPPORTED_ENDPOINTS.some( ( pattern ) => pattern.test( path ) );
 
 export default () => {
 	apiFetch.setFetchHandler( ( options ) => fetchHandler( options ) );

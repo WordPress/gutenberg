@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	FontSizePicker,
-	__experimentalLineHeightControl as LineHeightControl,
-} from '@wordpress/block-editor';
+import { FontSizePicker, LineHeightControl } from '@wordpress/block-editor';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 

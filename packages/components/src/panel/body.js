@@ -69,7 +69,9 @@ export function PanelBody(
 				onClick={ handleOnToggle }
 				title={ title }
 			/>
-			{ isOpened && children }
+			{ typeof children === 'function'
+				? children( { opened: isOpened } )
+				: isOpened && children }
 		</div>
 	);
 }
