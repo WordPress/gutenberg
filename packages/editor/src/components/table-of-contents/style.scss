@@ -1,3 +1,7 @@
+.table-of-contents__popover.components-popover .components-popover__content {
+	min-width: 220px;
+}
+
 .components-popover.table-of-contents__popover {
 	z-index: z-index(".components-popover.table-of-contents__popover");
 }
@@ -32,32 +36,48 @@
 
 .table-of-contents__counts {
 	margin: 0;
+	display: table;
+	width: 100%;
 }
 
 .table-of-contents__count {
-	display: flex;
+	display: table-row;
 	align-items: center;
-	justify-content: space-between;
 	font-size: $default-font-size;
 	color: $gray-900;
 	margin-bottom: 0;
 
-	// add a horionztal line between rows
-	// and some spacing to keep the spacing consistent
-	& + & {
+	& > span {
 		border-top: $border-width solid $gray-200;
-		margin-top: $grid-unit-10;
+		padding-bottom: $grid-unit-10;
 		padding-top: $grid-unit-10;
+	}
+
+	&:first-child > span {
+		padding-top: 0;
+		border-top: 0;
+	}
+
+	&:last-child > span {
+		padding-bottom: 0;
 	}
 }
 
 .table-of-contents__number,
 .table-of-contents__popover .word-count {
+	display: table-cell;
 	font-size: 21px;
 	font-weight: 400;
 	line-height: 30px;
 	color: $gray-900;
-	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
+	text-align: right;
+}
+
+.table-of-contents__label {
+	display: table-cell;
+	vertical-align: middle;
+	width: 100%;
 }
 
 .table-of-contents__title {
