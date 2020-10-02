@@ -49,8 +49,8 @@ class WP_Block_Styles {
 
 		// Add split styles if the theme supports it.
 		if ( current_theme_supports( 'split-block-styles' ) ) {
+			add_action( 'wp_head', array( $this, 'print_common_styles' ), 5 );
 			add_filter( 'render_block', array( $this, 'add_styles' ), 10, 2 );
-			return;
 		} else {
 			// If we got here we need to add all styles for all blocks.
 			add_action( 'init', array( $this, 'print_concat_styles' ) );
@@ -58,7 +58,7 @@ class WP_Block_Styles {
 		}
 
 		// Add editor styles.
-		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_concat_styles' ], 1 );
+		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_concat_styles' ), 1 );
 	}
 
 	/**
@@ -69,55 +69,25 @@ class WP_Block_Styles {
 	 * @return array
 	 */
 	public function get_blocks_styles() {
-		$styles      = array();
-		$core_blocks = array(
-			'core/audio',
-			'core/button',
-			'core/buttons',
-			'core/calendar',
-			'core/categories',
-			'core/columns',
-			'core/cover',
-			'core/embed',
-			'core/file',
-			'core/gallery',
-			'core/heading',
-			'core/image',
-			'core/latest-comments',
-			'core/latest-posts',
-			'core/list',
-			'core/media-text',
-			'core/navigation',
-			'core/navigation-link',
-			'core/paragraph',
-			'core/post-author',
-			'core/pullquote',
-			'core/quote',
-			'core/rss',
-			'core/search',
-			'core/separator',
-			'core/site-logo',
-			'core/social-links',
-			'core/spacer',
-			'core/subhead',
-			'core/table',
-			'core/text-columns',
-			'core/video',
-		);
+		$styles = array();
 
-		foreach ( $core_blocks as $block ) {
-			$filename  = str_replace( 'core/', '', $block );
-			$filename .= is_rtl() ? '-rtl' : '';
-
-			if ( file_exists( gutenberg_dir_path() . "packages/block-library/build-style/$filename.css" ) ) {
-				$styles[ $block ] = array(
+		$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( gutenberg_dir_path() . 'build/block-library/blocks' ) );
+		$nested_html_files = new RegexIterator( $nested_files, '/^.+\.css$/i', RecursiveRegexIterator::GET_MATCH );
+		foreach ( $nested_html_files as $path => $file ) {
+			$basename = basename( $path );
+			$block    = basename( dirname( $path ) );
+			if (
+				( 'style.css' === $basename && ! is_rtl() ) ||
+				( 'style-rtl.css' === $basename && is_rtl() )
+			) {
+				$styles[ 'core/' . $block ] = array(
 					array(
-						'handle' => "core-$filename-block-styles",
-						'src'    => gutenberg_url( "packages/block-library/build-style/$filename.css" ),
-						'ver'    => filemtime( gutenberg_dir_path() . "packages/block-library/build-style/$filename.css" ),
+						'handle' => "core-$block-block-styles",
+						'src'    => gutenberg_url( "build/block-library/blocks/$block/$basename" ),
+						'ver'    => filemtime( $path ),
 						'media'  => 'all',
 						'method' => in_array( $block, $this->layout_shift_blocks, true ) ? 'inline' : 'inject',
-						'path'   => gutenberg_dir_path() . "packages/block-library/build-style/$filename.css",
+						'path'   => $path,
 					),
 				);
 			}
@@ -357,5 +327,21 @@ class WP_Block_Styles {
 			}
 		}
 		exit();
+	}
+
+	/**
+	 * Print the common styles.
+	 *
+	 * @access public
+	 *
+	 * @return void
+	 */
+	public function print_common_styles() {
+		echo '<style id="core-block-styles-common">';
+		$file_path = is_rtl()
+			? gutenberg_dir_path() . 'build/block-library/common-rtl.css'
+			: gutenberg_dir_path() . 'build/block-library/common.css';
+		include $file_path;
+		echo '</style>';
 	}
 }
