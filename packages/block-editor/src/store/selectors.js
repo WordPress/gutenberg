@@ -1810,11 +1810,14 @@ export function areInnerBlocksControlled( state, clientId ) {
  * @return {string} The matching block's clientId.
  */
 export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
-	( state, validBlocksNames ) => {
+	( state, validBlockNames ) => {
+		if ( ! validBlockNames.length ) {
+			return null;
+		}
 		// Check if selected block is a valid entity area.
 		const selectedBlockClientId = getSelectedBlockClientId( state );
 		if (
-			validBlocksNames.includes(
+			validBlockNames.includes(
 				getBlockName( state, selectedBlockClientId )
 			)
 		) {
@@ -1827,7 +1830,7 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 		const entityAreaParents = getBlockParentsByBlockName(
 			state,
 			selectedBlockClientId || multiSelectedBlockClientIds[ 0 ],
-			validBlocksNames
+			validBlockNames
 		);
 		if ( entityAreaParents ) {
 			// Last parent closest/most interior.
