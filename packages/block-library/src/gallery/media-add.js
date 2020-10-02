@@ -21,9 +21,8 @@ export default function MediaAddButton( {
 	images,
 	onError,
 	onSelect,
-	value
+	value,
 } ) {
-
 	const mediaUpload = useSelect(
 		( select ) => select( 'core/block-editor' ).getSettings().mediaUpload,
 		[]
