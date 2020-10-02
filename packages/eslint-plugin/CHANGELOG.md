@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 7.2.1 (2020-09-17)
+
 ### Bug Fixes
 
 -   Fix TypeError for projects without a local Prettier configuration.
@@ -48,7 +50,7 @@
 
 ### Improvements
 
--   `'AsyncIterableIterator'` is now whitelisted as a valid TypeScript utility type.
+-   `'AsyncIterableIterator'` is now allowed as a valid TypeScript utility type.
 
 ## 5.1.0 (2020-04-30)
 

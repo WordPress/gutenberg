@@ -8,8 +8,9 @@ import { isFunction } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, Icon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
+import { Icon, plusCircle } from '@wordpress/icons';
 
 export const LinkControlSearchCreate = ( {
 	searchTerm,
@@ -49,7 +50,7 @@ export const LinkControlSearchCreate = ( {
 		>
 			<Icon
 				className="block-editor-link-control__search-item-icon"
-				icon="insert"
+				icon={ plusCircle }
 			/>
 
 			<span className="block-editor-link-control__search-item-header">

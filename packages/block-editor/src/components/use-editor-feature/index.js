@@ -14,19 +14,37 @@ import { useSelect } from '@wordpress/data';
 import { useBlockEditContext } from '../block-edit';
 
 const deprecatedFlags = {
+	'color.palette': ( settings ) =>
+		settings.colors === undefined ? undefined : settings.colors,
+	'color.gradients': ( settings ) =>
+		settings.gradients === undefined ? undefined : settings.gradients,
 	'color.custom': ( settings ) =>
 		settings.disableCustomColors === undefined
 			? undefined
 			: ! settings.disableCustomColors,
-	'gradient.custom': ( settings ) =>
+	'color.customGradient': ( settings ) =>
 		settings.disableCustomGradients === undefined
 			? undefined
 			: ! settings.disableCustomGradients,
-	'fontSize.custom': ( settings ) =>
+	'typography.fontSizes': ( settings ) =>
+		settings.fontSizes === undefined ? undefined : settings.fontSizes,
+	'typography.customFontSize': ( settings ) =>
 		settings.disableCustomFontSizes === undefined
 			? undefined
 			: ! settings.disableCustomFontSizes,
-	'lineHeight.custom': ( settings ) => settings.enableCustomLineHeight,
+	'typography.customLineHeight': ( settings ) =>
+		settings.enableCustomLineHeight,
+	'spacing.units': ( settings ) => {
+		if ( settings.enableCustomUnits === undefined ) {
+			return;
+		}
+
+		if ( settings.enableCustomUnits === true ) {
+			return [ 'px', 'em', 'rem', 'vh', 'vw' ];
+		}
+
+		return settings.enableCustomUnits;
+	},
 };
 
 /**

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -16,7 +16,7 @@ export default function save( { attributes } ) {
 		playsInline,
 	} = attributes;
 	return (
-		<figure>
+		<figure { ...useBlockProps.save() }>
 			{ src && (
 				<video
 					autoPlay={ autoplay }

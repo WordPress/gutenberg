@@ -7,6 +7,7 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { resolveWidgetAreas, select, dispatch } from './controls';
+import { setWidgetAreasOpenState } from './actions';
 import {
 	KIND,
 	POST_TYPE,
@@ -61,12 +62,19 @@ export function* getWidgetAreas() {
 		);
 	}
 
-	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
+	const widgetAreasOpenState = {};
+	widgetAreaBlocks.forEach( ( widgetAreaBlock, index ) => {
+		// Defaults to open the first widget area.
+		widgetAreasOpenState[ widgetAreaBlock.clientId ] = index === 0;
+	} );
+	yield setWidgetAreasOpenState( widgetAreasOpenState );
 
 	yield {
 		type: 'SET_WIDGET_TO_CLIENT_ID_MAPPING',
 		mapping: widgetIdToClientId,
 	};
+
+	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
 }
 
 const persistStubPost = function* ( id, blocks ) {

@@ -5,17 +5,26 @@ import {
 	ComplementaryArea,
 	ComplementaryAreaMoreMenuItem,
 } from '@wordpress/interface';
-import { __ } from '@wordpress/i18n';
 
-export default ( { identifier, title, icon, children } ) => {
+export default ( {
+	className,
+	identifier,
+	title,
+	icon,
+	children,
+	closeLabel,
+	header,
+} ) => {
 	return (
 		<>
 			<ComplementaryArea
+				className={ className }
 				scope="core/edit-site"
 				identifier={ identifier }
 				title={ title }
 				icon={ icon }
-				closeLabel={ __( 'Close global styles sidebar' ) }
+				closeLabel={ closeLabel }
+				header={ header }
 			>
 				{ children }
 			</ComplementaryArea>

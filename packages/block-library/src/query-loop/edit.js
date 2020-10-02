@@ -7,7 +7,7 @@ import {
 	BlockContextProvider,
 	InnerBlocks,
 	BlockPreview,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -15,7 +15,11 @@ import {
  */
 import { useQueryContext } from '../query';
 
-const TEMPLATE = [ [ 'core/post-title' ], [ 'core/post-content' ] ];
+const TEMPLATE = [
+	[ 'core/post-title' ],
+	[ 'core/post-date' ],
+	[ 'core/post-excerpt' ],
+];
 export default function QueryLoopEdit( {
 	clientId,
 	context: {
@@ -84,8 +88,10 @@ export default function QueryLoopEdit( {
 			} ) ),
 		[ posts ]
 	);
+	const blockProps = useBlockProps();
+
 	return (
-		<Block.div>
+		<div { ...blockProps }>
 			{ blockContexts &&
 				blockContexts.map( ( blockContext ) => (
 					<BlockContextProvider
@@ -106,6 +112,6 @@ export default function QueryLoopEdit( {
 						) }
 					</BlockContextProvider>
 				) ) }
-		</Block.div>
+		</div>
 	);
 }
