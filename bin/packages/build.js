@@ -124,7 +124,12 @@ if ( files.length ) {
 	bar.tick( 0 );
 
 	stream = glob.stream(
-		[ `${ PACKAGES_DIR }/*/src/**/*.js`, `${ PACKAGES_DIR }/*/src/*.scss` ],
+		[
+			`${ PACKAGES_DIR }/*/src/**/*.js`,
+			`${ PACKAGES_DIR }/*/src/*.scss`,
+			`${ PACKAGES_DIR }/block-library/src/**/*.js`,
+			`${ PACKAGES_DIR }/block-library/src/**/style.scss`,
+		],
 		{
 			ignore: [
 				`**/benchmark/**`,

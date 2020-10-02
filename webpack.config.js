@@ -161,6 +161,35 @@ module.exports = {
 				},
 			} ) )
 		),
+		new CopyWebpackPlugin( [
+			{
+				from: './**/*.css',
+				to: './build/block-library/styles/',
+				context: './packages/block-library/build-style/',
+				transform: ( content ) => {
+					if ( mode === 'production' ) {
+						return postcss( [
+							require( 'cssnano' )( {
+								preset: [
+									'default',
+									{
+										discardComments: {
+											removeAll: true,
+										},
+									},
+								],
+							} ),
+						] )
+							.process( content, {
+								from: 'src/app.css',
+								to: 'dest/app.css',
+							} )
+							.then( ( result ) => result.css );
+					}
+					return content;
+				},
+			},
+		] ),
 		new CopyWebpackPlugin(
 			Object.entries( {
 				'./packages/block-library/src/': 'build/block-library/blocks/',
