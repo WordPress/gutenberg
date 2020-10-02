@@ -31,10 +31,14 @@ function InsertionPointInserter( {
 				getMultiSelectedBlockClientIds,
 				getSelectedBlockClientId,
 				hasMultiSelection,
+				getSettings,
 			} = select( 'core/block-editor' );
+			const { hasReducedUI } = getSettings();
+			if ( hasReducedUI ) {
+				return true;
+			}
 			const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
 			const selectedBlockClientId = getSelectedBlockClientId();
-
 			return hasMultiSelection()
 				? multiSelectedBlockClientIds.includes( clientId )
 				: clientId === selectedBlockClientId;

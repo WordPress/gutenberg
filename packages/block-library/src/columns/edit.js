@@ -16,7 +16,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
@@ -63,7 +63,7 @@ function ColumnsEditContainer( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		className: classes,
 	} );
 
@@ -97,7 +97,7 @@ function ColumnsEditContainer( {
 				allowedBlocks={ ALLOWED_BLOCKS }
 				orientation="horizontal"
 				__experimentalTagName="div"
-				__experimentalPassedProps={ blockWrapperProps }
+				__experimentalPassedProps={ blockProps }
 				renderAppender={ false }
 			/>
 		</>
@@ -228,10 +228,10 @@ function Placeholder( { clientId, name, setAttributes } ) {
 		[ name ]
 	);
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
-	const blockWrapperProps = useBlockWrapperProps();
+	const blockProps = useBlockProps();
 
 	return (
-		<div { ...blockWrapperProps }>
+		<div { ...blockProps }>
 			<__experimentalBlockVariationPicker
 				icon={ get( blockType, [ 'icon', 'src' ] ) }
 				label={ get( blockType, [ 'title' ] ) }

@@ -81,7 +81,7 @@ describe( 'actions', () => {
 				args: [],
 				selectorName: 'getBlockTypes',
 				storeKey: 'core/blocks',
-				type: 'SELECT',
+				type: '@@data/RESOLVE_SELECT',
 			} );
 
 			expect( generator.next( [ block ] ).value ).toEqual( {
@@ -143,7 +143,7 @@ describe( 'actions', () => {
 				args: [],
 				selectorName: 'getBlockTypes',
 				storeKey: 'core/blocks',
-				type: 'SELECT',
+				type: '@@data/RESOLVE_SELECT',
 			} );
 
 			expect( generator.next( [ inactiveBlock ] ).value ).toEqual( {
@@ -274,7 +274,7 @@ describe( 'actions', () => {
 				data: null,
 			};
 			expect( generator.throw( apiError ).value ).toMatchObject( {
-				type: 'DISPATCH',
+				type: '@@data/DISPATCH',
 				actionName: 'createErrorNotice',
 				storeKey: 'core/notices',
 			} );
