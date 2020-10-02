@@ -261,6 +261,7 @@ function CoverEdit( {
 		setGradient,
 	} = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes );
+	const isBlogUrl = isBlobURL( url );
 
 	const toggleParallax = () => {
 		setAttributes( {
@@ -472,7 +473,7 @@ function CoverEdit( {
 		{
 			'is-dark-theme': isDark,
 			'has-background-dim': dimRatio !== 0,
-			'is-transient': isBlobURL( url ),
+			'is-transient': isBlogUrl,
 			'has-parallax': hasParallax,
 			[ overlayColor.class ]: overlayColor.class,
 			'has-background-gradient': gradientValue,
@@ -539,7 +540,7 @@ function CoverEdit( {
 						style={ { objectPosition: positionValue } }
 					/>
 				) }
-				{ isBlobURL( url ) && <Spinner /> }
+				{ isBlogUrl && <Spinner /> }
 				<InnerBlocks
 					__experimentalTagName="div"
 					__experimentalPassedProps={ {
