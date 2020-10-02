@@ -25,7 +25,7 @@ const NavigationPanel = () => {
 		ref.current.focus();
 	}, [ ref ] );
 
-	const { templateId, templatePartId, templateType } = useSelect(
+	const { template, templatePartId, templateType } = useSelect(
 		( select ) => {
 			const {
 				getTemplateId,
@@ -34,22 +34,16 @@ const NavigationPanel = () => {
 			} = select( 'core/edit-site' );
 
 			return {
-				templateId: getTemplateId(),
+				template: select( 'core' ).getEntityRecord(
+					'postType',
+					'wp_template',
+					getTemplateId()
+				),
 				templatePartId: getTemplatePartId(),
 				templateType: getTemplateType(),
 			};
 		},
 		[]
-	);
-
-	const template = useSelect(
-		( select ) =>
-			select( 'core' ).getEntityRecord(
-				'postType',
-				'wp_template',
-				templateId
-			),
-		[ templateId ]
 	);
 
 	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
