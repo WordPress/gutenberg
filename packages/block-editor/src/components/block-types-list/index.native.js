@@ -17,7 +17,6 @@ import { BottomSheet, InserterButton } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import InserterListItem from '../inserter-list-item';
 import styles from './style.scss';
 
 const MIN_COL_NUM = 3;
