@@ -335,7 +335,7 @@ function gutenberg_register_packages_styles( $styles ) {
 	);
 	$styles->add_data( 'wp-components', 'rtl', 'replace' );
 
-	$block_library_filename = current_theme_supports( 'split-block-styles' ) ? 'style-no-blocks' : 'style';
+	$block_library_filename = current_theme_supports( 'split-block-styles' ) ? 'common' : 'style';
 	gutenberg_override_style(
 		$styles,
 		'wp-block-library',
