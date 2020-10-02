@@ -174,11 +174,11 @@ function gutenberg_register_core_block_styles( $block_name ) {
 	$block_name = str_replace( 'core/', '', $block_name );
 
 	$style_path        = is_rtl()
-		? "packages/block-library/build-style/$block_name-rtl.css"
-		: "packages/block-library/build-style/$block_name.css";
+		? "build/block-library/blocks/$block_name/style-rtl.css"
+		: "build/block-library/blocks/$block_name/style.css";
 	$editor_style_path = is_rtl()
-		? "packages/block-library/build-style/$block_name-editor-rtl.css"
-		: "packages/block-library/build-style/$block_name-editor.css";
+		? "build/block-library/blocks/$block_name/style-editor-rtl.css"
+		: "build/block-library/blocks/$block_name/style-editor.css";
 
 	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
 		wp_register_style(

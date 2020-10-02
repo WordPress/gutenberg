@@ -129,6 +129,7 @@ if ( files.length ) {
 			`${ PACKAGES_DIR }/*/src/*.scss`,
 			`${ PACKAGES_DIR }/block-library/src/**/*.js`,
 			`${ PACKAGES_DIR }/block-library/src/*/style.scss`,
+			`${ PACKAGES_DIR }/block-library/src/*/editor.scss`,
 			`${ PACKAGES_DIR }/block-library/src/*.scss`,
 		],
 		{
