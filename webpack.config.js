@@ -164,7 +164,7 @@ module.exports = {
 		new CopyWebpackPlugin( [
 			{
 				from: './**/*.css',
-				to: './build/block-library/styles/',
+				to: './build/block-library/blocks/',
 				context: './packages/block-library/build-style/',
 				transform: ( content ) => {
 					if ( mode === 'production' ) {
