@@ -43,7 +43,7 @@ class Editor extends Component {
 		hasFixedToolbar,
 		focusMode,
 		hasReducedUI,
-		hesThemeStyles,
+		hasThemeStyles,
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
@@ -53,7 +53,7 @@ class Editor extends Component {
 		keepCaretInsideBlock
 	) {
 		settings = {
-			...( hesThemeStyles
+			...( hasThemeStyles
 				? settings
 				: omit( settings, [ 'defaultEditorStyles' ] ) ),
 			__experimentalPreferredStyleVariations: {
@@ -68,7 +68,7 @@ class Editor extends Component {
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened,
 			keepCaretInsideBlock,
-			styles: hesThemeStyles
+			styles: hasThemeStyles
 				? settings.styles
 				: settings.defaultEditorStyles,
 		};
@@ -98,7 +98,7 @@ class Editor extends Component {
 			hasFixedToolbar,
 			focusMode,
 			hasReducedUI,
-			hesThemeStyles,
+			hasThemeStyles,
 			post,
 			postId,
 			initialEdits,
@@ -122,7 +122,7 @@ class Editor extends Component {
 			hasFixedToolbar,
 			focusMode,
 			hasReducedUI,
-			hesThemeStyles,
+			hasThemeStyles,
 			hiddenBlockTypes,
 			blockTypes,
 			preferredStyleVariations,
@@ -177,7 +177,7 @@ export default compose( [
 				__experimentalGetPreviewDeviceType() !== 'Desktop',
 			focusMode: isFeatureActive( 'focusMode' ),
 			hasReducedUI: isFeatureActive( 'reducedUI' ),
-			hesThemeStyles: isFeatureActive( 'themeStyles' ),
+			hasThemeStyles: isFeatureActive( 'themeStyles' ),
 			post: getEntityRecord( 'postType', postType, postId ),
 			preferredStyleVariations: getPreference(
 				'preferredStyleVariations'
