@@ -161,6 +161,66 @@ module.exports = {
 				},
 			} ) )
 		),
+		new CopyWebpackPlugin( [
+			{
+				from: './packages/block-library/build-style/*/style.css',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }style\\.css$`
+				),
+				to: 'build/block-library/blocks/[1]/style.css',
+				transform: ( content ) => {
+					if ( mode === 'production' ) {
+						return postcss( [
+							require( 'cssnano' )( {
+								preset: [
+									'default',
+									{
+										discardComments: {
+											removeAll: true,
+										},
+									},
+								],
+							} ),
+						] )
+							.process( content, {
+								from: 'src/app.css',
+								to: 'dest/app.css',
+							} )
+							.then( ( result ) => result.css );
+					}
+					return content;
+				},
+			},
+			{
+				from: './packages/block-library/build-style/*/style-rtl.css',
+				test: new RegExp(
+					`([\\w-]+)${ escapeRegExp( sep ) }style-rtl\\.css$`
+				),
+				to: 'build/block-library/blocks/[1]/style-rtl.css',
+				transform: ( content ) => {
+					if ( mode === 'production' ) {
+						return postcss( [
+							require( 'cssnano' )( {
+								preset: [
+									'default',
+									{
+										discardComments: {
+											removeAll: true,
+										},
+									},
+								],
+							} ),
+						] )
+							.process( content, {
+								from: 'src/app.css',
+								to: 'dest/app.css',
+							} )
+							.then( ( result ) => result.css );
+					}
+					return content;
+				},
+			},
+		] ),
 		new CopyWebpackPlugin(
 			Object.entries( {
 				'./packages/block-library/src/': 'build/block-library/blocks/',
