@@ -8,7 +8,7 @@ import {
 	Spinner,
 } from '@wordpress/components';
 import { link as linkIcon } from '@wordpress/icons';
-import { useContext, useEffect, useRef } from '@wordpress/element';
+import { useContext, useEffect, useRef, useState } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 
 /**
@@ -26,6 +26,7 @@ const renderSuggestions = ( suggestionsProps ) => (
 );
 
 export default function SearchInput() {
+	const [ hasFocus, setHasFocus ] = useState( false );
 	const { createSuggestion, currentLink, updateCurrentLink } = useContext(
 		ToolbarLinkControlContext
 	);
@@ -49,6 +50,7 @@ export default function SearchInput() {
 			currentLink={ currentLink }
 			placeholder="Start typing"
 			renderSuggestions={ renderSuggestions }
+			showSuggestions={ hasFocus }
 			value={ currentLink.url }
 			onCreateSuggestion={ createPage }
 			onChange={ ( url ) => {
@@ -68,6 +70,12 @@ export default function SearchInput() {
 						className="toolbar-link-control__input-control"
 						onChange={ ( value, { event } ) => {
 							inputProps.onChange( event );
+						} }
+						onFocus={ () => {
+							setHasFocus( true );
+						} }
+						onBlur={ () => {
+							setHasFocus( false );
 						} }
 						prefix={
 							<div className="toolbar-link-control__affix-wrapper">
