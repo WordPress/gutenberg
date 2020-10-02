@@ -27,21 +27,14 @@ const NavigationPanel = () => {
 
 	const { templateId, templatePartId, templateType } = useSelect(
 		( select ) => {
-			const { getEntityRecord } = select( 'core' );
 			const {
 				getTemplateId,
 				getTemplatePartId,
 				getTemplateType,
 			} = select( 'core/edit-site' );
 
-			const _templateId = getTemplateId();
 			return {
-				template: getEntityRecord(
-					'postType',
-					'wp_template',
-					_templateId
-				),
-				templateId: _templateId,
+				templateId: getTemplateId(),
 				templatePartId: getTemplatePartId(),
 				templateType: getTemplateType(),
 			};
