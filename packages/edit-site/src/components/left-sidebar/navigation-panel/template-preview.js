@@ -6,12 +6,12 @@ import { useSelect } from '@wordpress/data';
 import { BlockPreview } from '@wordpress/block-editor';
 import { useMemo } from '@wordpress/element';
 
-export default function TemplatePreview( { entityId } ) {
+export default function TemplatePreview( { entityType, entityId } ) {
 	const template = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecord(
 				'postType',
-				'wp_template_part',
+				entityType,
 				entityId
 			),
 		[ entityId ]
