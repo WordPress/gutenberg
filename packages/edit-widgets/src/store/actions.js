@@ -33,6 +33,14 @@ export function* initializeState() {
 	yield persistStubPost( buildWidgetAreasPostId(), [] );
 }
 
+/**
+ * Persists a stub post with given ID to core data store. The post is meant to be in-memory only and
+ * shouldn't be saved via the API.
+ *
+ * @param  {string} id Post ID.
+ * @param  {Array}  blocks Blocks the post should consist of.
+ * @return {Object} The post object.
+ */
 export const persistStubPost = function* ( id, blocks ) {
 	const stubPost = createStubPost( id, blocks );
 	const args = [ KIND, POST_TYPE, id ];
