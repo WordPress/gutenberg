@@ -182,6 +182,7 @@ function LinkSettings( {
 			<>
 				{ options.url && (
 					<BottomSheet.LinkCell
+						showIcon={ showIcon }
 						value={ url }
 						onPress={ onLinkCellPressed }
 					/>
@@ -224,11 +225,7 @@ function LinkSettings( {
 	}
 
 	return (
-		<BottomSheet
-			isVisible={ isVisible }
-			onClose={ onCloseSettingsSheet }
-			hideHeader
-		>
+		<>
 			<PanelBody style={ styles.linkSettingsPanel }>
 				{ getSettings() }
 			</PanelBody>
@@ -241,7 +238,7 @@ function LinkSettings( {
 				</PanelBody>
 			) }
 			{ actions && <PanelActions actions={ actions } /> }
-		</BottomSheet>
+		</>
 	);
 }
 

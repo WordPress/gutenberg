@@ -19,8 +19,7 @@ import {
 	RangeControl,
 	ToolbarGroup,
 	ToolbarButton,
-	LinkSettingsScreen,
-	LinkSettings,
+	LinkSettingsNavigation,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -242,23 +241,13 @@ class ButtonEdit extends Component {
 			},
 		};
 
-		return ! isCompatibleWithSettings ? (
-			<LinkSettings
+		return (
+			<LinkSettingsNavigation
 				isVisible={ isLinkSheetVisible }
 				attributes={ attributes }
 				onClose={ this.dismissSheet }
 				setAttributes={ setAttributes }
 				withBottomSheet={ ! isCompatibleWithSettings }
-				actions={ actions }
-				options={ options }
-				showIcon={ ! isCompatibleWithSettings }
-			/>
-		) : (
-			<LinkSettingsScreen
-				isVisible={ isLinkSheetVisible }
-				attributes={ attributes }
-				onClose={ this.dismissSheet }
-				setAttributes={ setAttributes }
 				actions={ actions }
 				options={ options }
 				showIcon={ ! isCompatibleWithSettings }
