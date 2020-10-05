@@ -14,19 +14,8 @@ import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../store/utils';
  *
  * @return {string} clientId of the widget area last selected.
  */
-const useLastSelectedWidgetArea = () => {
-	const firstRootId = useSelect( ( select ) => {
-		// Default to the first widget area
-		const { getEntityRecord } = select( 'core' );
-		const widgetAreasPost = getEntityRecord(
-			KIND,
-			POST_TYPE,
-			buildWidgetAreasPostId()
-		);
-		return widgetAreasPost?.blocks[ 0 ]?.clientId;
-	}, [] );
-
-	const selectedRootId = useSelect( ( select ) => {
+const useLastSelectedWidgetArea = () =>
+	useSelect( ( select ) => {
 		const { getBlockSelectionEnd, getBlockParents, getBlockName } = select(
 			'core/block-editor'
 		);
@@ -49,11 +38,16 @@ const useLastSelectedWidgetArea = () => {
 		if ( rootWidgetAreaClientId ) {
 			return rootWidgetAreaClientId;
 		}
-	}, [] );
 
-	// If no widget area has been selected, return the clientId of the first
-	// area.
-	return selectedRootId || firstRootId;
-};
+		// If no widget area has been selected, return the clientId of the first
+		// area.
+		const { getEntityRecord } = select( 'core' );
+		const widgetAreasPost = getEntityRecord(
+			KIND,
+			POST_TYPE,
+			buildWidgetAreasPostId()
+		);
+		return widgetAreasPost?.blocks[ 0 ]?.clientId;
+	}, [] );
 
 export default useLastSelectedWidgetArea;
