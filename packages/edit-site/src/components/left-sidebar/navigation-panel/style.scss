@@ -59,9 +59,12 @@
 	}
 
 	button {
-		display: block;
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: center;
 		height: auto;
-		text-align: left;
+		min-height: $button-size;
 	}
 }
 
