@@ -126,6 +126,8 @@ export function initialize( id, settings ) {
 		settings
 	);
 
+	settings.__experimentalNavigationScreen = true;
+
 	render(
 		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )
