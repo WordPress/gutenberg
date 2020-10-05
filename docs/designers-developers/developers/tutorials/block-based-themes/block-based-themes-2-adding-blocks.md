@@ -7,7 +7,6 @@ There is more than one way to add blocks to the theme files:
 - Adding and editing blocks in the site editor and exporting the theme.
 - Adding block HTML and comments to the HTML files manually.
 
-
 ## Working with blocks and templates in the site editor
 
 The beta site editor is available from the WordPress admin area when full site editing is enabled. To use the site editor, a full site editing theme must be installed and active.
