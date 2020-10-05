@@ -6,18 +6,22 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../store/utils';
+import {
+	buildWidgetAreasEditorRecordId,
+	KIND,
+	EDITOR_TYPE,
+} from '../store/utils';
 
 const useLastSelectedRootId = () => {
 	const firstRootId = useSelect( ( select ) => {
 		// Default to the first widget area
 		const { getEntityRecord } = select( 'core' );
-		const widgetAreasPost = getEntityRecord(
+		const widgetAreasEditor = getEntityRecord(
 			KIND,
-			POST_TYPE,
-			buildWidgetAreasPostId()
+			EDITOR_TYPE,
+			buildWidgetAreasEditorRecordId()
 		);
-		return widgetAreasPost?.blocks[ 0 ]?.clientId;
+		return widgetAreasEditor?.blocks[ 0 ]?.clientId;
 	}, [] );
 
 	const selectedRootId = useSelect( ( select ) => {

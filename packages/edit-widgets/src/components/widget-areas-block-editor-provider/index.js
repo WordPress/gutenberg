@@ -25,7 +25,11 @@ import {
  */
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import { useEntityBlockEditor } from '@wordpress/core-data';
-import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
+import {
+	buildWidgetAreasEditorRecordId,
+	KIND,
+	EDITOR_TYPE,
+} from '../../store/utils';
 
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
@@ -59,8 +63,8 @@ export default function WidgetAreasBlockEditorProvider( {
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		KIND,
-		POST_TYPE,
-		{ id: buildWidgetAreasPostId() }
+		EDITOR_TYPE,
+		{ id: buildWidgetAreasEditorRecordId() }
 	);
 
 	return (

@@ -14,6 +14,7 @@ import { Panel, PanelBody } from '@wordpress/components';
  * Internal dependencies
  */
 import WidgetAreaInnerBlocks from './inner-blocks';
+import { KIND, EDITOR_TYPE } from '../../../store/utils';
 
 export default function WidgetAreaEdit( {
 	clientId,
@@ -41,8 +42,8 @@ export default function WidgetAreaEdit( {
 					// Unmounting legacy widgets may have unintended consequences (e.g. TinyMCE not being properly reinitialized)
 					<DisclosureContent visible={ opened }>
 						<EntityProvider
-							kind="root"
-							type="postType"
+							kind={ KIND }
+							type={ EDITOR_TYPE }
 							id={ `widget-area-${ id }` }
 						>
 							<WidgetAreaInnerBlocks />

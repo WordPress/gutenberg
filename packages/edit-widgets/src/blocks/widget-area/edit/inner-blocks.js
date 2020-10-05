@@ -4,10 +4,15 @@
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import { InnerBlocks } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { KIND, EDITOR_TYPE } from '../../../store/utils';
+
 export default function WidgetAreaInnerBlocks() {
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
-		'root',
-		'postType'
+		KIND,
+		EDITOR_TYPE
 	);
 	return (
 		<InnerBlocks

@@ -55,6 +55,12 @@ export const defaultEntities = [
 		label: __( 'Taxonomy' ),
 	},
 	{
+		label: __( 'Editor' ),
+		kind: 'root',
+		name: 'editor',
+		ephemeral: true,
+	},
+	{
 		name: 'sidebar',
 		kind: 'root',
 		baseURL: '/__experimental/sidebars',

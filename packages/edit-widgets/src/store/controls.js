@@ -22,29 +22,29 @@ export function apiFetch( request ) {
 }
 
 /**
- * Returns a list of pending actions for given post id.
+ * Returns a list of pending actions for given id.
  *
- * @param {number} postId Post ID.
+ * @param {number} editorId Post ID.
  * @return {Array} List of pending actions.
  */
-export function getPendingActions( postId ) {
+export function getPendingActions( editorId ) {
 	return {
 		type: 'GET_PENDING_ACTIONS',
-		postId,
+		editorId,
 	};
 }
 
 /**
  * Returns boolean indicating whether or not an action processing specified
- * post is currently running.
+ * editor is currently running.
  *
- * @param {number} postId Post ID.
+ * @param {number} editorId Post ID.
  * @return {Object} Action.
  */
-export function isProcessingPost( postId ) {
+export function isProcessingPost( editorId ) {
 	return {
-		type: 'IS_PROCESSING_POST',
-		postId,
+		type: 'IS_PROCESSING_ENTITY',
+		editorId,
 	};
 }
 
@@ -56,22 +56,6 @@ export function isProcessingPost( postId ) {
 export function getWidgetToClientIdMapping() {
 	return {
 		type: 'GET_WIDGET_TO_CLIENT_ID_MAPPING',
-	};
-}
-
-/**
- * Resolves navigation post for given menuId.
- *
- * @see selectors.js
- * @param {number} menuId Menu ID.
- * @return {Object} Action.
- */
-export function getNavigationPostForMenu( menuId ) {
-	return {
-		type: 'SELECT',
-		registryName: 'core/edit-navigation',
-		selectorName: 'getNavigationPostForMenu',
-		args: [ menuId ],
 	};
 }
 
@@ -130,17 +114,17 @@ const controls = {
 	),
 
 	GET_PENDING_ACTIONS: createRegistryControl(
-		( registry ) => ( { postId } ) => {
+		( registry ) => ( { editorId } ) => {
 			return (
-				getState( registry ).processingQueue[ postId ]
+				getState( registry ).processingQueue[ editorId ]
 					?.pendingActions || []
 			);
 		}
 	),
 
-	IS_PROCESSING_POST: createRegistryControl(
-		( registry ) => ( { postId } ) => {
-			return getState( registry ).processingQueue[ postId ]?.inProgress;
+	IS_PROCESSING_ENTITY: createRegistryControl(
+		( registry ) => ( { editorId } ) => {
+			return getState( registry ).processingQueue[ editorId ]?.inProgress;
 		}
 	),
 

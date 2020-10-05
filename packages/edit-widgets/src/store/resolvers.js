@@ -6,14 +6,15 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { resolveWidgetAreas, select } from './controls';
-import { persistStubPost, setWidgetAreasOpenState } from './actions';
+import { dispatch, resolveWidgetAreas, select } from './controls';
+import { setWidgetAreasOpenState } from './actions';
 import {
 	KIND,
+	EDITOR_TYPE,
 	WIDGET_AREA_ENTITY_TYPE,
 	buildWidgetAreasQuery,
-	buildWidgetAreaPostId,
-	buildWidgetAreasPostId,
+	buildWidgetAreaEditorRecordId,
+	buildWidgetAreasEditorRecordId,
 } from './utils';
 import { transformWidgetToBlock } from './transformers';
 
@@ -47,9 +48,9 @@ export function* getWidgetAreas() {
 			widgetBlocks.push( block );
 		}
 
-		// Persist the actual post containing the navigation block
-		yield persistStubPost(
-			buildWidgetAreaPostId( widgetArea.id ),
+		// Persist the editor entity containing the navigation block
+		yield persistEditorEntity(
+			buildWidgetAreaEditorRecordId( widgetArea.id ),
 			widgetBlocks
 		);
 
@@ -73,5 +74,41 @@ export function* getWidgetAreas() {
 		mapping: widgetIdToClientId,
 	};
 
-	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
+	yield persistEditorEntity(
+		buildWidgetAreasEditorRecordId(),
+		widgetAreaBlocks
+	);
 }
+
+/**
+ * Persists an editor with given ID to core data store. The post is ephemeral and
+ * shouldn't be saved via the API.
+ *
+ * @param  {string} id Editor ID.
+ * @param  {Array}  blocks Blocks the editor should contain.
+ * @return {Object} The editor object.
+ */
+const persistEditorEntity = function* ( id, blocks ) {
+	const entity = createEditorEntity( id, blocks );
+	yield dispatch(
+		'core',
+		'receiveEntityRecords',
+		KIND,
+		EDITOR_TYPE,
+		entity,
+		{ id: entity.id },
+		false
+	);
+	return entity;
+};
+
+const createEditorEntity = ( id, blocks ) => ( {
+	id,
+	slug: id,
+	status: 'draft',
+	type: 'page',
+	blocks,
+	meta: {
+		widgetAreaId: id,
+	},
+} );

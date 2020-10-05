@@ -13,9 +13,9 @@ import { createRegistrySelector } from '@wordpress/data';
  */
 import {
 	buildWidgetAreasQuery,
-	buildWidgetAreaPostId,
+	buildWidgetAreaEditorRecordId,
 	KIND,
-	POST_TYPE,
+	EDITOR_TYPE,
 	WIDGET_AREA_ENTITY_TYPE,
 } from './utils';
 
@@ -42,10 +42,6 @@ export const getWidget = createRegistrySelector(
 );
 
 export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
-	if ( ! hasResolvedWidgetAreas( query ) ) {
-		return null;
-	}
-
 	const query = buildWidgetAreasQuery();
 	return select( 'core' ).getEntityRecords(
 		KIND,
@@ -70,12 +66,12 @@ export const getWidgetAreaForClientId = createRegistrySelector(
 	( select ) => ( state, clientId ) => {
 		const widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
 		for ( const widgetArea of widgetAreas ) {
-			const post = select( 'core' ).getEditedEntityRecord(
+			const editor = select( 'core' ).getEditedEntityRecord(
 				KIND,
-				POST_TYPE,
-				buildWidgetAreaPostId( widgetArea.id )
+				EDITOR_TYPE,
+				buildWidgetAreaEditorRecordId( widgetArea.id )
 			);
-			const clientIds = post.blocks.map( ( block ) => block.clientId );
+			const clientIds = editor.blocks.map( ( block ) => block.clientId );
 			if ( clientIds.includes( clientId ) ) {
 				return widgetArea;
 			}
@@ -98,8 +94,8 @@ export const getEditedWidgetAreas = createRegistrySelector(
 			.filter( ( { id } ) =>
 				select( 'core' ).hasEditsForEntityRecord(
 					KIND,
-					POST_TYPE,
-					buildWidgetAreaPostId( id )
+					EDITOR_TYPE,
+					buildWidgetAreaEditorRecordId( id )
 				)
 			)
 			.map( ( { id } ) =>
@@ -133,31 +129,6 @@ export const isSavingWidgetAreas = createRegistrySelector(
 			}
 		}
 		return false;
-	}
-);
-
-/**
- * Returns true if the navigation post related to menuId was already resolved.
- *
- * @param {number} menuId The id of menu.
- * @return {boolean} True if the navigation post related to menuId was already resolved, false otherwise.
- */
-export const hasResolvedWidgetAreas = createRegistrySelector(
-	( select, query = buildWidgetAreasQuery() ) => () => {
-		const areas = select( 'core' ).getEntityRecords(
-			KIND,
-			WIDGET_AREA_ENTITY_TYPE,
-			query
-		);
-		if ( ! areas?.length ) {
-			return select( 'core' ).hasFinishedResolution( 'getEntityRecords', [
-				KIND,
-				WIDGET_AREA_ENTITY_TYPE,
-				query,
-			] );
-		}
-
-		return true;
 	}
 );
 
