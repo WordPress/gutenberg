@@ -66,27 +66,35 @@ export default function TemplateNavigationItems( {
 
 	return (
 		<>
-			{ templates.map( ( template ) => (
-				<NavigationItem
-					className="edit-site-navigation-panel__template-item"
-					key={ `${ itemPrefix }-${ template.id }` }
-					item={ `${ itemPrefix }-${ template.slug }` }
-					title={ TITLES[ template.slug ]?.title ?? template.slug }
-				>
-					<Button
-						onClick={ () => onActivate( template.id ) }
-						onMouseEnter={ () =>
-							onMouseEnterTemplate( template.id )
+			{ templates.map( ( template ) => {
+				const { title, description } = TITLES[ template.slug ] ?? {};
+
+				return (
+					<NavigationItem
+						className="edit-site-navigation-panel__template-item"
+						key={ `${ itemPrefix }-${ template.id }` }
+						item={ `${ itemPrefix }-${ template.slug }` }
+						title={
+							TITLES[ template.slug ]?.title ?? template.slug
 						}
-						onMouseLeave={ onMouseLeaveTemplate }
 					>
-						{ TITLES[ template.slug ]?.title ?? template.slug }
-						<div className="edit-site-navigation-panel__template-item-description">
-							{ TITLES[ template.slug ]?.description }
-						</div>
-					</Button>
-				</NavigationItem>
-			) ) }
+						<Button
+							onClick={ () => onActivate( template.id ) }
+							onMouseEnter={ () =>
+								onMouseEnterTemplate( template.id )
+							}
+							onMouseLeave={ onMouseLeaveTemplate }
+						>
+							{ title || template.slug }
+							{ description && (
+								<div className="edit-site-navigation-panel__template-item-description">
+									{ TITLES[ template.slug ]?.description }
+								</div>
+							) }
+						</Button>
+					</NavigationItem>
+				);
+			} ) }
 
 			{ hoveredTemplateId && (
 				<TemplatePreview
