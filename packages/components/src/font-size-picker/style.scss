@@ -15,7 +15,7 @@
 		margin-left: 0;
 		margin-right: $grid-unit-10;
 		margin-top: $grid-unit-10;
-		width: 54px;
+		width: 56px;
 
 		// Show the reset button as disabled until a value is entered.
 		&[value=""] + .components-button {
@@ -29,11 +29,10 @@
 			flex-direction: column;
 			flex-grow: 1;
 		}
-	}
 
-	.components-font-size-picker__number-full-size {
-		@extend .components-font-size-picker__number;
-		width: calc(100% - #{$grid-unit-10 + 2 * $border-width});
+		&--full-size {
+			width: auto;
+		}
 	}
 
 	// Allow the font-size picker dropdown to grow in width.
@@ -44,6 +43,10 @@
 	.components-color-palette__clear {
 		height: 30px;
 		margin-top: 26px;
+	}
+
+	&--full-size {
+		flex: 0 0 100%;
 	}
 }
 

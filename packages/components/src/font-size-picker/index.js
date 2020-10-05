@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -61,7 +66,9 @@ export default function FontSizePicker( {
 		[ fontSizes, disableCustomFontSizes ]
 	);
 
-	const [ advancedFontSizing, setAdvancedFontSizing ] = useState( false );
+	const [ advancedFontSizing, setAdvancedFontSizing ] = useState(
+		! Number.isFinite( value ) && value !== undefined
+	);
 
 	if ( ! options ) {
 		return null;
@@ -74,7 +81,11 @@ export default function FontSizePicker( {
 	const customInputProps = advancedFontSizing
 		? {
 				id: fontSizePickerNumberId,
-				className: 'components-font-size-picker__number-full-size',
+				className: classnames(
+					'components-font-size-picker__number',
+					advancedFontSizing &&
+						'components-font-size-picker__number--full-size'
+				),
 				onChange: ( event ) => onChange( event.target.value ),
 				ariaLabel: __( 'Custom' ),
 				value: value || '',
@@ -93,7 +104,13 @@ export default function FontSizePicker( {
 	return (
 		<fieldset className="components-font-size-picker">
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
-			<div className="components-font-size-picker__controls">
+			<div
+				className={ classnames(
+					'components-font-size-picker__controls',
+					advancedFontSizing &&
+						'components-font-size-picker__controls--full-size'
+				) }
+			>
 				{ fontSizes.length > 0 && ! advancedFontSizing && (
 					<CustomSelectControl
 						className={ 'components-font-size-picker__select' }
@@ -133,7 +150,10 @@ export default function FontSizePicker( {
 			<div>
 				<ToggleControl
 					label="Advanced font sizing"
-					onChange={ () => setAdvancedFontSizing( !advancedFontSizing ) }
+					onChange={ () =>
+						setAdvancedFontSizing( ! advancedFontSizing )
+					}
+					help="Toggle to activate custom font-sizing settings"
 					checked={ advancedFontSizing }
 				/>
 			</div>
