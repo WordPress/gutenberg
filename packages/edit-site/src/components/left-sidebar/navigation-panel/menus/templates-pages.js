@@ -2,10 +2,14 @@
  * WordPress dependencies
  */
 import {
-	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationGroup as NavigationGroup,
 	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
+
+/**
+ * Internal dependencies
+ */
+import TemplateNavigationItems from '../template-navigation-items';
 
 export default function TemplatesPagesMenu( { templates, onActiveIdChange } ) {
 	const defaultTemplate = templates?.find( ( { slug } ) => slug === 'page' );
@@ -27,26 +31,18 @@ export default function TemplatesPagesMenu( { templates, onActiveIdChange } ) {
 			parentMenu="templates"
 		>
 			<NavigationGroup title="Specific">
-				{ specificPageTemplates?.map( ( template ) => (
-					<NavigationItem
-						key={ `template-${ template.id }` }
-						item={ `template-${ template.slug }` }
-						title={ template.slug }
-						onClick={ () => onActiveIdChange( template.id ) }
-					/>
-				) ) }
+				<TemplateNavigationItems
+					templates={ specificPageTemplates }
+					onActivate={ onActiveIdChange }
+				/>
 			</NavigationGroup>
 
 			{ defaultTemplate && (
 				<NavigationGroup title="General">
-					{ [ defaultTemplate ].map( ( template ) => (
-						<NavigationItem
-							key={ `template-${ template.id }` }
-							item={ `template-${ template.slug }` }
-							title={ template.slug }
-							onClick={ () => onActiveIdChange( template.id ) }
-						/>
-					) ) }
+					<TemplateNavigationItems
+						templates={ defaultTemplate }
+						onActivate={ onActiveIdChange }
+					/>
 				</NavigationGroup>
 			) }
 		</NavigationMenu>

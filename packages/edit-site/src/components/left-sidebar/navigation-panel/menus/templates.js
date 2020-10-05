@@ -11,6 +11,7 @@ import {
  */
 import TemplatesPagesMenu from './templates-pages';
 import useTemplates from '../use-templates';
+import TemplateNavigationItems from '../template-navigation-items';
 
 const GENERAL_TEMPLATE_SLUGS = [
 	'front-page',
@@ -32,14 +33,10 @@ export default function TemplatesMenu( { onActiveIdChange } ) {
 		<NavigationMenu menu="templates" title="Templates" parentMenu="root">
 			<NavigationItem navigateToMenu="templates-pages" title="Pages" />
 
-			{ generalTemplates?.map( ( template ) => (
-				<NavigationItem
-					key={ `template-${ template.id }` }
-					item={ `template-${ template.slug }` }
-					title={ template.slug }
-					onClick={ () => onActiveIdChange( template.id ) }
-				/>
-			) ) }
+			<TemplateNavigationItems
+				templates={ generalTemplates }
+				onActivate={ onActiveIdChange }
+			/>
 
 			<TemplatesPagesMenu
 				templates={ templates }
