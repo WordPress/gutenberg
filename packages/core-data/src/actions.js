@@ -157,7 +157,7 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
 	const entity = find( entities, { kind, name } );
 	let error;
 	let deletedRecord = false;
-	if ( ! entity ) {
+	if ( ! entity || entity.ephemeral ) {
 		return;
 	}
 
@@ -327,7 +327,7 @@ export function* saveEntityRecord(
 ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
-	if ( ! entity ) {
+	if ( ! entity || entity.ephemeral ) {
 		return;
 	}
 	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
