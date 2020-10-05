@@ -32,6 +32,7 @@ function useInsertionPoint( {
 	clientId,
 	isAppender,
 	selectBlockOnInsert,
+	insertionIndex,
 } ) {
 	const {
 		destinationRootClientId,
@@ -76,6 +77,10 @@ function useInsertionPoint( {
 	} = useDispatch( 'core/block-editor' );
 
 	function getInsertionIndex() {
+		if ( insertionIndex !== undefined ) {
+			return insertionIndex;
+		}
+
 		// If the clientId is defined, we insert at the position of the block.
 		if ( clientId ) {
 			return getBlockIndex( clientId, destinationRootClientId );
@@ -83,7 +88,7 @@ function useInsertionPoint( {
 
 		// If there's a selected block, and the selected block is not the destination root block, we insert after the selected block.
 		const end = getBlockSelectionEnd();
-		if ( ! isAppender && end && end !== destinationRootClientId ) {
+		if ( ! isAppender && end ) {
 			return getBlockIndex( end, destinationRootClientId ) + 1;
 		}
 

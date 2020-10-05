@@ -15,7 +15,7 @@ import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
 import Header from '../header';
 import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 import PopoverWrapper from './popover-wrapper';
-import useLastSelectedRootId from '../../hooks/use-last-selected-root-id';
+import useWidgetLibraryInsertionPoint from '../../hooks/use-widget-library-insertion-point';
 
 function Interface( { blockEditorSettings } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -23,7 +23,7 @@ function Interface( { blockEditorSettings } ) {
 	const { setIsInserterOpened, closeGeneralSidebar } = useDispatch(
 		'core/edit-widgets'
 	);
-	const rootClientId = useLastSelectedRootId( 'layout' );
+	const { rootClientId, insertionIndex } = useWidgetLibraryInsertionPoint();
 
 	const { hasSidebarEnabled, isInserterOpened } = useSelect( ( select ) => ( {
 		hasSidebarEnabled: !! select(
@@ -72,6 +72,9 @@ function Interface( { blockEditorSettings } ) {
 										}
 									} }
 									rootClientId={ rootClientId }
+									__experimentalInsertionIndex={
+										insertionIndex
+									}
 								/>
 							</div>
 						</div>
