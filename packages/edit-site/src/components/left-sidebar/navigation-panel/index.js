@@ -7,6 +7,7 @@ import {
 	__experimentalNavigationMenu as NavigationMenu,
 	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationBackButton as NavigationBackButton,
+	createSlotFill,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -16,6 +17,11 @@ import { __ } from '@wordpress/i18n';
  */
 import TemplatesMenu from './menus/templates';
 import TemplatePartsMenu from './menus/template-parts';
+
+export const {
+	Fill: NavigationPanelPreviewFill,
+	Slot: NavigationPanelPreviewSlot,
+} = createSlotFill( 'EditSiteNavigationPanelPreview' );
 
 const NavigationPanel = () => {
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
@@ -88,6 +94,8 @@ const NavigationPanel = () => {
 					/>
 				</NavigationMenu>
 			</Navigation>
+
+			<NavigationPanelPreviewSlot />
 		</div>
 	);
 };

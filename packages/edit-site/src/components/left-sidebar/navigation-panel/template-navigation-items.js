@@ -11,6 +11,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import TemplatePreview from './template-preview';
+import { NavigationPanelPreviewFill } from '.';
 
 const TITLES = {
 	'front-page': {
@@ -97,10 +98,12 @@ export default function TemplateNavigationItems( {
 			} ) }
 
 			{ hoveredTemplateId && (
-				<TemplatePreview
-					entityType={ entityType }
-					entityId={ hoveredTemplateId }
-				/>
+				<NavigationPanelPreviewFill>
+					<TemplatePreview
+						entityType={ entityType }
+						entityId={ hoveredTemplateId }
+					/>
+				</NavigationPanelPreviewFill>
 			) }
 		</>
 	);
