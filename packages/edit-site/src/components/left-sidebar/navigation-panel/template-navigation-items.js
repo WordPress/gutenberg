@@ -14,25 +14,27 @@ import TemplatePreview from './template-preview';
 import { NavigationPanelPreviewFill } from '.';
 
 const TITLES = {
+	// General
 	'front-page': {
 		title: 'Front page',
 		description: '',
 	},
 	archive: {
 		title: 'Archive',
-		description: 'Just some description here',
+		description:
+			'displays he content lists when no other template is found',
 	},
 	single: {
 		title: 'Single',
-		description: '',
+		description: 'Displays the content of a single post',
 	},
 	singular: {
 		title: 'Singular',
-		description: '',
+		description: 'Displays the content of a single page',
 	},
 	index: {
 		title: 'Default (index)',
-		description: '',
+		description: 'Displays the content of a single page',
 	},
 	search: {
 		title: 'Search results',
@@ -40,7 +42,21 @@ const TITLES = {
 	},
 	'404': {
 		title: '404',
-		description: '',
+		description: 'Displayed when a non-existing page requested',
+	},
+
+	// Posts
+	home: {
+		title: 'Posts (home)',
+		description: 'Displayed on your homepage',
+	},
+	'archive-post': {
+		title: 'Default (Post archive)',
+		description: 'Displays a list of posts',
+	},
+	'single-post': {
+		title: 'Default (Single post)',
+		description: 'Displays the content of a single post',
 	},
 };
 
