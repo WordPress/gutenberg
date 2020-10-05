@@ -25,26 +25,29 @@ const NavigationPanel = () => {
 		ref.current.focus();
 	}, [ ref ] );
 
-	const { template, templatePartId, templateType } = useSelect(
-		( select ) => {
-			const {
-				getTemplateId,
-				getTemplatePartId,
-				getTemplateType,
-			} = select( 'core/edit-site' );
+	const { template, templatePart, templateType } = useSelect( ( select ) => {
+		const { getEntityRecord } = select( 'core' );
+		const { getTemplateId, getTemplatePartId, getTemplateType } = select(
+			'core/edit-site'
+		);
 
-			return {
-				template: select( 'core' ).getEntityRecord(
-					'postType',
-					'wp_template',
-					getTemplateId()
-				),
-				templatePartId: getTemplatePartId(),
-				templateType: getTemplateType(),
-			};
-		},
-		[]
-	);
+		const templateId = getTemplateId();
+		const templatePartId = getTemplatePartId();
+
+		return {
+			template: templateId
+				? getEntityRecord( 'postType', 'wp_template', templateId )
+				: null,
+			templatePart: templatePartId
+				? getEntityRecord(
+						'postType',
+						'wp_template_part',
+						templatePartId
+				  )
+				: null,
+			templateType: getTemplateType(),
+		};
+	}, [] );
 
 	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
 
@@ -54,7 +57,7 @@ const NavigationPanel = () => {
 				activeItem={
 					'wp_template' === templateType
 						? `template-${ template?.slug }`
-						: `template-part-${ templatePartId }`
+						: `template-part-${ templatePart?.slug }`
 				}
 				onActivateMenu={ setActiveMenu }
 			>
