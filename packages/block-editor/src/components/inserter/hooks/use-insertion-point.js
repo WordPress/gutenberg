@@ -7,6 +7,7 @@ import { pick } from 'lodash';
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
+import { useCallback, useRef } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { _n } from '@wordpress/i18n';
 import { speak } from '@wordpress/a11y';
@@ -68,12 +69,7 @@ function useInsertionPoint( {
 		},
 		[ isAppender, clientId, rootClientId ]
 	);
-	const {
-		replaceBlocks,
-		insertBlocks,
-		showInsertionPoint,
-		hideInsertionPoint,
-	} = useDispatch( 'core/block-editor' );
+	const { replaceBlocks, insertBlocks } = useDispatch( 'core/block-editor' );
 
 	function getInsertionIndex() {
 		// If the clientId is defined, we insert at the position of the block.
@@ -124,16 +120,58 @@ function useInsertionPoint( {
 		}
 	};
 
-	const onToggleInsertionPoint = ( show ) => {
-		if ( show ) {
+	const memoizedShowInsertionPoint = useMemoizedToggleInsertionPoint(
+		destinationRootClientId
+	);
+
+	const onToggleInsertionPoint = useCallback(
+		( show ) => {
 			const index = getInsertionIndex();
-			showInsertionPoint( destinationRootClientId, index );
-		} else {
-			hideInsertionPoint();
-		}
-	};
+			memoizedShowInsertionPoint( show, index );
+		},
+		[ destinationRootClientId ]
+	);
 
 	return [ destinationRootClientId, onInsertBlocks, onToggleInsertionPoint ];
 }
+
+/**
+ * Temporary work around.
+ *
+ * Ensures that the showInsertionPoint and hideInsertionPoint actions are only
+ * called when the destinationRootClientId or index changes.
+ * Otherwise, the store data will update for every mouse hover interaction.
+ *
+ * @param {string?} destinationRootClientId
+ */
+const useMemoizedToggleInsertionPoint = ( destinationRootClientId ) => {
+	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
+		'core/block-editor'
+	);
+
+	const destinationRef = useRef( destinationRootClientId );
+	const indexRef = useRef();
+
+	return useCallback(
+		( show, index ) => {
+			if (
+				destinationRef.current === destinationRootClientId &&
+				indexRef.current === index
+			) {
+				return;
+			}
+
+			destinationRef.current = destinationRootClientId;
+			indexRef.current = index;
+
+			if ( show ) {
+				showInsertionPoint( destinationRootClientId, index );
+			} else {
+				hideInsertionPoint();
+			}
+		},
+		[ destinationRootClientId ]
+	);
+};
 
 export default useInsertionPoint;

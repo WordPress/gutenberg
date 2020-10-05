@@ -77,6 +77,7 @@ function InserterMenu( {
 		onInsertBlocks( blocks );
 		onSelect();
 	}, [] );
+
 	const onInsertPattern = ( blocks, patternName ) => {
 		onInsertBlocks( blocks, { patternName } );
 		onSelect();
@@ -87,9 +88,12 @@ function InserterMenu( {
 		setHoveredItem( item );
 	}, [] );
 
-	const onClickPatternCategory = ( patternCategory ) => {
-		setSelectedPatternCategory( patternCategory );
-	};
+	const onClickPatternCategory = useCallback(
+		( patternCategory ) => {
+			setSelectedPatternCategory( patternCategory );
+		},
+		[ setSelectedPatternCategory ]
+	);
 
 	const blocksTab = (
 		<>

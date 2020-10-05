@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Disabled } from '@wordpress/components';
+import { memo, useMemo } from '@wordpress/element';
 import { useResizeObserver, pure } from '@wordpress/compose';
 
 /**
@@ -28,23 +29,31 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	const scale =
 		( containerWidth - 2 * __experimentalPadding ) / viewportWidth;
 
+	const containerStyles = useMemo( () => {
+		return {
+			height: contentHeight * scale + 2 * __experimentalPadding,
+		};
+	}, [ contentHeight, __experimentalPadding, scale ] );
+
+	const containtStyles = useMemo( () => {
+		return {
+			transform: `scale(${ scale })`,
+			width: viewportWidth,
+			left: __experimentalPadding,
+			right: __experimentalPadding,
+			top: __experimentalPadding,
+		};
+	}, [ __experimentalPadding, viewportWidth, scale ] );
+
 	return (
 		<div
 			className="block-editor-block-preview__container editor-styles-wrapper"
 			aria-hidden
-			style={ {
-				height: contentHeight * scale + 2 * __experimentalPadding,
-			} }
+			style={ containerStyles }
 		>
 			{ containerResizeListener }
 			<Disabled
-				style={ {
-					transform: `scale(${ scale })`,
-					width: viewportWidth,
-					left: __experimentalPadding,
-					right: __experimentalPadding,
-					top: __experimentalPadding,
-				} }
+				style={ containtStyles }
 				className="block-editor-block-preview__content"
 			>
 				{ containtResizeListener }
@@ -54,4 +63,6 @@ function AutoBlockPreview( { viewportWidth, __experimentalPadding } ) {
 	);
 }
 
-export default AutoBlockPreview;
+const memoizedAutoBlockPreview = memo( AutoBlockPreview );
+
+export default memoizedAutoBlockPreview;

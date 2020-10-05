@@ -10,7 +10,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { VisuallyHidden, Button } from '@wordpress/components';
 import { Icon, search, closeSmall } from '@wordpress/icons';
-import { memo, useRef, useCallback } from '@wordpress/element';
+import { memo, useEffect, useRef, useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -32,6 +32,12 @@ function InserterSearchForm( { className, placeholder } ) {
 		setValue( '' );
 		searchInput.current.focus();
 	}, [ setValue ] );
+
+	useEffect( () => {
+		return () => {
+			setValue( '' );
+		};
+	}, [] );
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 	// is always visible, and one which already incurs this behavior of autoFocus via

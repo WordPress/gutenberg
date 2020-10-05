@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { useRef, forwardRef } from '@wordpress/element';
+import { memo, useRef, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -136,7 +136,7 @@ function BlockList(
 	);
 }
 
-const ForwardedBlockList = forwardRef( BlockList );
+const ForwardedBlockList = memo( forwardRef( BlockList ) );
 
 // This component needs to always be synchronous
 // as it's the one changing the async mode

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { memo, useMemo } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { VisuallyHidden } from '@wordpress/components';
@@ -45,6 +45,8 @@ function BlockPattern( { pattern, onClick } ) {
 	);
 }
 
+const MemoizedBlockPattern = memo( BlockPattern );
+
 function BlockPatternPlaceholder() {
 	return (
 		<div className="block-editor-block-patterns-list__item is-placeholder" />
@@ -55,7 +57,7 @@ function BlockPatternList( { blockPatterns, shownPatterns, onClickPattern } ) {
 	return blockPatterns.map( ( pattern ) => {
 		const isShown = shownPatterns.includes( pattern );
 		return isShown ? (
-			<BlockPattern
+			<MemoizedBlockPattern
 				key={ pattern.name }
 				pattern={ pattern }
 				onClick={ onClickPattern }
@@ -66,4 +68,6 @@ function BlockPatternList( { blockPatterns, shownPatterns, onClickPattern } ) {
 	} );
 }
 
-export default BlockPatternList;
+const memoizedBlockPatternList = memo( BlockPatternList );
+
+export default memoizedBlockPatternList;

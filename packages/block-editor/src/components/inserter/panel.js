@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Icon } from '@wordpress/components';
+import { memo } from '@wordpress/element';
 
 function InserterPanel( { title, icon, children } ) {
 	return (
@@ -19,4 +20,6 @@ function InserterPanel( { title, icon, children } ) {
 	);
 }
 
-export default InserterPanel;
+const memoizedInserterPanel = memo( InserterPanel );
+
+export default memoizedInserterPanel;
