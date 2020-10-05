@@ -36,7 +36,6 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
-
 	return (
 		<Modal
 			className="edit-post-preferences-modal"
@@ -46,37 +45,43 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 		>
 			<Section title={ __( 'General' ) }>
 				<EnablePublishSidebarOption
-					label={ __( 'Pre-publish checks' ) }
+					help={ __(
+						'Allow setting of tags, check dates for instance.'
+					) }
+					label={ __( 'Pre-publish checklist' ) }
 				/>
 				<EnableFeature
 					featureName="mostUsedBlocks"
-					label={ __(
-						'Enable the Most Used Blocks category in the block library'
-					) }
+					label={ __( 'Most used blocks in library' ) }
 				/>
 				<EnableFeature
 					featureName="showIconLabels"
-					label={ __( 'Show button text labels' ) }
+					label={ __( 'Button text labels' ) }
 				/>
 			</Section>
 			<Section title={ __( 'Keyboard' ) }>
 				<EnableFeature
 					featureName="keepCaretInsideBlock"
-					label={ __( 'Contain text cursor inside active block' ) }
+					help={ __(
+						'When using the keyboard contains to active block.'
+					) }
+					label={ __( 'Contain the text cursor' ) }
 				/>
 			</Section>
-			<Section title={ __( 'Writing Mode' ) }>
+			<Section title={ __( 'Appearance' ) }>
 				<EnableFeature
 					featureName="themeStyles"
-					label={ __( 'Theme Styles' ) }
+					label={ __( 'Use theme styles' ) }
 				/>
 				<EnableFeature
 					featureName="reducedUI"
-					label={ __( 'Compact UI' ) }
+					help={ __( 'Reduces toolbar and outlines.' ) }
+					label={ __( 'Compact interface' ) }
 				/>
 				<EnableFeature
 					featureName="focusMode"
-					label={ __( 'Spotlight' ) }
+					help={ __( 'Highlights the current block.' ) }
+					label={ __( 'Activate spotlight mode' ) }
 				/>
 			</Section>
 			<Section title={ __( 'Document panels' ) }>
