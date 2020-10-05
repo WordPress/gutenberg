@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
+
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
 	'top center': 'is-position-top-center',
@@ -38,6 +43,11 @@ export function attributesFromMedia( setAttributes ) {
 			setAttributes( { url: undefined, id: undefined } );
 			return;
 		}
+
+		if ( isBlobURL( media.url ) ) {
+			media.type = getBlobTypeByURL( media.url );
+		}
+
 		let mediaType;
 		// for media selections originated from a file upload.
 		if ( media.media_type ) {
