@@ -24,8 +24,8 @@ const GENERAL_TEMPLATE_SLUGS = [
 	'404',
 ];
 
-export default function TemplatesMenu( { onActiveIdChange } ) {
-	const [ templateFiles, setTemplateFiles ] = useState( null );
+function useTemplates() {
+	const [ templateFiles, setTemplateFiles ] = useState( [] );
 
 	useEffect( () => {
 		apiFetch( {
@@ -37,22 +37,27 @@ export default function TemplatesMenu( { onActiveIdChange } ) {
 
 	const templateEntities = useSelect(
 		( select ) =>
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template' ),
+			select( 'core' ).getEntityRecords( 'postType', 'wp_template' ) ||
+			[],
 		[]
 	);
 
-	const templates = [
-		...( templateFiles || [] )
-			.filter(
-				( slug ) =>
-					! templateEntities?.find(
-						( entity ) => slug === entity.slug
-					)
-			)
-			.map( ( slug ) => ( { id: slug, slug } ) ),
-		...( templateEntities || [] ),
-	];
+	const templatesFilesWithoutEntities = templateFiles.filter(
+		( slug ) =>
+			! templateEntities?.find( ( entity ) => slug === entity.slug )
+	);
 
+	return [
+		...templatesFilesWithoutEntities.map( ( slug ) => ( {
+			id: slug,
+			slug,
+		} ) ),
+		...templateEntities,
+	];
+}
+
+export default function TemplatesMenu( { onActiveIdChange } ) {
+	const templates = useTemplates();
 	const generalTemplates = templates?.filter( ( { slug } ) =>
 		GENERAL_TEMPLATE_SLUGS.includes( slug )
 	);
