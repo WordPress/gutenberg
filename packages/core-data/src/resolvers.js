@@ -56,7 +56,7 @@ export function* getCurrentUser() {
 export function* getEntityRecord( kind, name, key = '', query ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
-	if ( ! entity ) {
+	if ( ! entity || entity.ephemeral ) {
 		return;
 	}
 
@@ -133,7 +133,7 @@ export const getEditedEntityRecord = ifNotResolved(
 export function* getEntityRecords( kind, name, query = {} ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
-	if ( ! entity ) {
+	if ( ! entity || entity.ephemeral ) {
 		return;
 	}
 
