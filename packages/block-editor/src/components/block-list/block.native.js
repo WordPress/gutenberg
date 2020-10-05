@@ -61,9 +61,10 @@ class BlockListBlock extends Component {
 	getBlockWidth( { nativeEvent } ) {
 		const { layout } = nativeEvent;
 		const { blockWidth } = this.state;
+		const layoutWidth = Math.floor( layout.width );
 
-		if ( blockWidth !== layout.width ) {
-			this.setState( { blockWidth: layout.width } );
+		if ( blockWidth !== layoutWidth ) {
+			this.setState( { blockWidth: layoutWidth } );
 		}
 	}
 
@@ -155,6 +156,8 @@ class BlockListBlock extends Component {
 			parentBlockAlignement === WIDE_ALIGNMENTS.alignments.full;
 
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+		const isScreenWidthEqual = blockWidth === screenWidth;
+
 		const isContainerRelated = WIDE_ALIGNMENTS.innerContainers.includes(
 			name
 		);
@@ -233,7 +236,7 @@ class BlockListBlock extends Component {
 										( isParentFullWidth &&
 											blockWidth >
 												ALIGNMENT_BREAKPOINTS.mobile ) ||
-										screenWidth === blockWidth
+										isScreenWidthEqual
 									}
 								/>
 							) }

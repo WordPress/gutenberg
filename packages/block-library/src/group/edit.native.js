@@ -32,7 +32,7 @@ function GroupEdit( {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const { width } = sizes || { width: 0 };
 	const { alignments } = WIDE_ALIGNMENTS;
-	const { width: screenWidth } = Dimensions.get( 'window' );
+	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 	const isFullWidth = align === alignments.full;
 	const isParentFullWidth = parentBlockAlignment === alignments.full;
 	const isEqualWidth = width === screenWidth;

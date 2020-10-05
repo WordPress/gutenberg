@@ -8,7 +8,7 @@ import { View, Dimensions } from 'react-native';
  */
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useCallback } from '@wordpress/element';
 import {
 	InnerBlocks,
 	BlockControls,
@@ -43,7 +43,7 @@ function ColumnEdit( {
 	clientId,
 } ) {
 	const { verticalAlignment } = attributes;
-	const { width: screenWidth } = Dimensions.get( 'window' );
+	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -65,15 +65,15 @@ function ColumnEdit( {
 		getColumnWidths( columns, columnCount )
 	);
 
-	const renderAppender = () => {
+	const renderAppender = useCallback( () => {
 		const { width } = contentStyle[ clientId ];
-		const isWidthEqual = width === screenWidth;
+		const isScreenWidthEqual = width === screenWidth;
 
 		if ( isSelected ) {
 			return (
 				<View
 					style={ [
-						isWidthEqual &&
+						isScreenWidthEqual &&
 							( hasChildren
 								? styles.columnAppender
 								: styles.widerColumnAppender ),
@@ -84,7 +84,7 @@ function ColumnEdit( {
 			);
 		}
 		return null;
-	};
+	}, [ isSelected, contentStyle[ clientId ], screenWidth ] );
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (

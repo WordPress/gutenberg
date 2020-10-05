@@ -23,7 +23,7 @@ import {
 	BlockVariationPicker,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState, useMemo } from '@wordpress/element';
+import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 /**
@@ -86,10 +86,12 @@ function ColumnsEditContainer( {
 	innerColumns,
 	updateInnerColumnWidth,
 	parentBlockAlignment,
+	parentWidth,
+	editorSidebarOpened,
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUM );
-	const { width: screenWidth } = Dimensions.get( 'window' );
+	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 
 	const { verticalAlignment, align } = attributes;
 	const { width } = sizes || {};
@@ -104,15 +106,11 @@ function ColumnsEditContainer( {
 
 	useEffect( () => {
 		if ( width ) {
-			setColumnsInRow( getColumnsInRow( width, newColumnCount ) );
+			if ( getColumnsInRow !== columnsInRow ) {
+				setColumnsInRow( getColumnsInRow );
+			}
 		}
-	}, [ columnCount ] );
-
-	useEffect( () => {
-		if ( width ) {
-			setColumnsInRow( getColumnsInRow( width, columnCount ) );
-		}
-	}, [ width ] );
+	}, [ width, columnCount ] );
 
 	const getContainerWidth = ( containerWidth ) =>
 		2 * MARGIN + containerWidth - columnsInRow * 2 * MARGIN;
@@ -227,22 +225,24 @@ function ColumnsEditContainer( {
 		return widths;
 	}, [ columnWidthsValues ] );
 
-	const getColumnsInRow = ( containerWidth, columnsNumber ) => {
-		if ( containerWidth < ALIGNMENT_BREAKPOINTS.mobile ) {
-			// show only 1 Column in row for mobile breakpoint container width
-			return 1;
-		} else if ( containerWidth < ALIGNMENT_BREAKPOINTS.medium ) {
-			// show the maximum number of columns in a row for large breakpoint container width
-			return Math.min(
-				Math.max( 1, columnCount ),
-				MAX_COLUMNS_NUM_IN_ROW
-			);
+	const getColumnsInRow = useMemo( () => {
+		if ( width ) {
+			if ( width < ALIGNMENT_BREAKPOINTS.mobile ) {
+				// show only 1 Column in row for mobile breakpoint container width
+				return 1;
+			} else if ( width < ALIGNMENT_BREAKPOINTS.medium ) {
+				// show the maximum number of columns in a row for large breakpoint container width
+				return Math.min(
+					Math.max( 1, columnCount ),
+					MAX_COLUMNS_NUM_IN_ROW
+				);
+			}
+			// show all Column in one row
+			return Math.max( 1, innerColumns.length, columnCount );
 		}
-		// show all Column in one row
-		return Math.max( 1, columnsNumber );
-	};
+	}, [ width, innerColumns.length ] );
 
-	const renderAppender = () => {
+	const renderAppender = useCallback( () => {
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 		const isParentFullWidth =
 			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
@@ -268,9 +268,13 @@ function ColumnsEditContainer( {
 			);
 		}
 		return null;
-	};
+	}, [ isSelected, width, screenWidth, parentWidth, columnCount ] );
 
 	const getColumnsSliders = useMemo( () => {
+		if ( ! editorSidebarOpened || ! isSelected ) {
+			return null;
+		}
+
 		return innerColumns.map( ( column, index ) => (
 			<RangeControl
 				min={ 1 }
@@ -292,7 +296,7 @@ function ColumnsEditContainer( {
 				shouldDisplayTextInput={ false }
 			/>
 		) );
-	}, [ innerColumns, columnWidthsValues ] );
+	}, [ innerColumns, columnWidthsValues, editorSidebarOpened ] );
 
 	return (
 		<>
@@ -344,7 +348,12 @@ function ColumnsEditContainer( {
 						}
 						blockWidth={ width }
 						contentStyle={ calculateWidths }
-						parentWidth={ getContainerWidth( baseContainerWidth ) }
+						parentWidth={
+							align === WIDE_ALIGNMENTS.alignments.full &&
+							columnCount === 0
+								? screenWidth
+								: getContainerWidth( baseContainerWidth )
+						}
 					/>
 				) }
 			</View>
@@ -495,6 +504,7 @@ const ColumnsEdit = ( props ) => {
 		innerColumns = [],
 		hasParents,
 		parentBlockAlignment,
+		editorSidebarOpened,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -503,6 +513,7 @@ const ColumnsEdit = ( props ) => {
 				getBlockParents,
 				getBlockAttributes,
 			} = select( 'core/block-editor' );
+			const { isEditorSidebarOpened } = select( 'core/edit-post' );
 			const block = getBlock( clientId );
 			const innerBlocks = block?.innerBlocks;
 			const isContentEmpty = map(
@@ -517,6 +528,7 @@ const ColumnsEdit = ( props ) => {
 				innerColumns: innerBlocks,
 				hasParents: !! parents.length,
 				parentBlockAlignment: getBlockAttributes( parents[ 0 ] )?.align,
+				editorSidebarOpened: isEditorSidebarOpened(),
 			};
 		},
 		[ clientId ]
@@ -537,6 +549,7 @@ const ColumnsEdit = ( props ) => {
 				innerColumns={ innerColumns }
 				hasParents={ hasParents }
 				parentBlockAlignment={ parentBlockAlignment }
+				editorSidebarOpened={ editorSidebarOpened }
 				{ ...props }
 			/>
 			<BlockVariationPicker
