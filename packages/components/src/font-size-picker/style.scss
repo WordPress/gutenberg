@@ -27,7 +27,13 @@
 		&-container {
 			display: flex;
 			flex-direction: column;
+			flex-grow: 1;
 		}
+	}
+
+	.components-font-size-picker__number-full-size {
+		@extend .components-font-size-picker__number;
+		width: calc(100% - #{$grid-unit-10 + 2 * $border-width});
 	}
 
 	// Allow the font-size picker dropdown to grow in width.

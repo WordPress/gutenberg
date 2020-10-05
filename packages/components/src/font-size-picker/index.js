@@ -4,7 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import { textColor } from '@wordpress/icons';
-import { useMemo } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -13,6 +13,7 @@ import Button from '../button';
 import RangeControl from '../range-control';
 import CustomSelectControl from '../custom-select-control';
 import VisuallyHidden from '../visually-hidden';
+import ToggleControl from '../toggle-control';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';
@@ -60,6 +61,8 @@ export default function FontSizePicker( {
 		[ fontSizes, disableCustomFontSizes ]
 	);
 
+	const [ advancedFontSizing, setAdvancedFontSizing ] = useState( false );
+
 	if ( ! options ) {
 		return null;
 	}
@@ -68,11 +71,30 @@ export default function FontSizePicker( {
 
 	const fontSizePickerNumberId = `components-font-size-picker__number#${ instanceId }`;
 
+	const customInputProps = advancedFontSizing
+		? {
+				id: fontSizePickerNumberId,
+				className: 'components-font-size-picker__number-full-size',
+				onChange: ( event ) => onChange( event.target.value ),
+				ariaLabel: __( 'Custom' ),
+				value: value || '',
+				placeholder: 'e.g. calc(2rem - 13.5px)',
+		  }
+		: {
+				id: fontSizePickerNumberId,
+				className: 'components-font-size-picker__number',
+				type: 'number',
+				min: 1,
+				onChange: ( event ) => onChange( Number( event.target.value ) ),
+				ariaLabel: __( 'Custom' ),
+				value: value || '',
+		  };
+
 	return (
 		<fieldset className="components-font-size-picker">
 			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
 			<div className="components-font-size-picker__controls">
-				{ fontSizes.length > 0 && (
+				{ fontSizes.length > 0 && ! advancedFontSizing && (
 					<CustomSelectControl
 						className={ 'components-font-size-picker__select' }
 						label={ __( 'Font size' ) }
@@ -93,17 +115,7 @@ export default function FontSizePicker( {
 						<label htmlFor={ fontSizePickerNumberId }>
 							{ __( 'Custom' ) }
 						</label>
-						<input
-							id={ fontSizePickerNumberId }
-							className="components-font-size-picker__number"
-							type="number"
-							min={ 1 }
-							onChange={ ( event ) => {
-								onChange( Number( event.target.value ) );
-							} }
-							aria-label={ __( 'Custom' ) }
-							value={ value || '' }
-						/>
+						<input { ...customInputProps } />
 					</div>
 				) }
 				<Button
@@ -117,6 +129,13 @@ export default function FontSizePicker( {
 				>
 					{ __( 'Reset' ) }
 				</Button>
+			</div>
+			<div>
+				<ToggleControl
+					label="Advanced font sizing"
+					onChange={ () => setAdvancedFontSizing( !advancedFontSizing ) }
+					checked={ advancedFontSizing }
+				/>
 			</div>
 			{ withSlider && (
 				<RangeControl
