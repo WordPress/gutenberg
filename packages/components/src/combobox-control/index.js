@@ -19,7 +19,7 @@ function ComboboxControl( {
 	label,
 	options,
 	onChange,
-	onInputChange: onInputChangeProp = () => {},
+	onFilterValueChange,
 	hideLabelFromVision,
 	help,
 	messages = {
@@ -31,11 +31,10 @@ function ComboboxControl( {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ inputValue, setInputValue ] = useState( '' );
 	const inputContainer = useRef();
+	const currentOption = options.find( ( option ) => option.value === value );
+	const currentLabel = currentOption?.label ?? '';
 
 	const matchingSuggestions = useMemo( () => {
-		if ( ! inputValue || inputValue.length === 0 ) {
-			return options.filter( ( option ) => option.value !== value );
-		}
 		const startsWithMatch = [];
 		const containsMatch = [];
 		const match = inputValue.toLocaleLowerCase();
@@ -55,7 +54,7 @@ function ComboboxControl( {
 		onChange( newSelectedSuggestion.value );
 		speak( messages.selected, 'assertive' );
 		setSelectedSuggestion( newSelectedSuggestion );
-		setInputValue( selectedSuggestion.label );
+		setInputValue( '' );
 		setIsExpanded( false );
 	};
 
@@ -109,32 +108,19 @@ function ComboboxControl( {
 		// TODO: TokenInput should preferably forward ref
 		inputContainer.current.input.focus();
 		setIsExpanded( true );
+		onFilterValueChange( '' );
 	};
 
 	const onBlur = () => {
-		const currentOption = options.find(
-			( option ) => option.value === value
-		);
-		setInputValue( currentOption?.label ?? '' );
 		setIsExpanded( false );
 	};
 
 	const onInputChange = ( event ) => {
 		const text = event.value;
 		setInputValue( text );
-		onInputChangeProp( text );
+		onFilterValueChange( text );
 		setIsExpanded( true );
 	};
-
-	// Reset the value on change
-	useEffect( () => {
-		if ( matchingSuggestions.indexOf( selectedSuggestion ) === -1 ) {
-			setSelectedSuggestion( null );
-		}
-		if ( ! inputValue || matchingSuggestions.length === 0 ) {
-			onChange( null );
-		}
-	}, [ matchingSuggestions, inputValue, value ] );
 
 	// Announcements
 	useEffect( () => {
@@ -179,7 +165,7 @@ function ComboboxControl( {
 					className="components-combobox-control__input"
 					instanceId={ instanceId }
 					ref={ inputContainer }
-					value={ inputValue }
+					value={ isExpanded ? inputValue : currentLabel }
 					onBlur={ onBlur }
 					isExpanded={ isExpanded }
 					selectedSuggestionIndex={ matchingSuggestions.indexOf(

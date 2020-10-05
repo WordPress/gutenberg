@@ -1,17 +1,65 @@
 .edit-site-navigation-panel {
-	position: relative;
+	animation: edit-site-navigation-panel__slide-in 0.1s linear;
 	height: 100%;
-	width: 300px;
+	position: relative;
+	width: $nav-sidebar-width;
+	@include reduce-motion("animation");
+
+	@keyframes edit-site-navigation-panel__slide-in {
+		from {
+			transform: translateX(-100%);
+		}
+		to {
+			transform: translateX(0%);
+		}
+	}
 
 	.components-navigation {
 		height: 100%;
+	}
+
+	.components-navigation__item {
+		position: relative;
+
+		.edit-site-template-switcher__label-home-icon svg path {
+			color: inherit;
+		}
+
+		&.is-active {
+			.edit-site-template-switcher__label-customized-dot {
+				background: #fff;
+			}
+		}
+	}
+
+	.edit-site-template-switcher__label-home-icon {
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
+	.edit-site-template-switcher__label-customized-dot {
+		right: 8px;
+	}
+}
+
+.edit-site-navigation-panel__back-to-dashboard.components-button.is-tertiary {
+	border-radius: 0;
+	border-bottom: $border-width solid $gray-700;
+	height: auto;
+	margin-left: -6px; // +2px to display the focus box-shadow
+	margin-top: 2px; // +2px to display the focus box-shadow
+	padding: $grid-unit $grid-unit-20;
+	width: calc(100% + #{$grid-unit-15});
+
+	&:focus:not(:disabled) {
+		border-bottom-color: transparent;
 	}
 }
 
 .edit-site-navigation-panel__preview {
 	display: none;
 	border: $border-width solid $gray-400;
-	width: 300px;
+	width: $nav-sidebar-width;
 	padding: $grid-unit-20;
 	background: $white;
 	box-shadow: $shadow-popover;
@@ -19,6 +67,7 @@
 	position: absolute;
 	top: $grid-unit-15;
 	left: calc(100% + #{$grid-unit-15});
+	color: $gray-900;
 
 	@include break-medium {
 		display: block;

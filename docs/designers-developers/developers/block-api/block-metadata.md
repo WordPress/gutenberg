@@ -11,6 +11,7 @@ To register a new block type using metadata that can be shared between codebase 
 
 ```json
 {
+	"apiVersion": 2,
 	"name": "my-plugin/notice",
 	"title": "Notice",
 	"category": "text",
@@ -32,7 +33,6 @@ To register a new block type using metadata that can be shared between codebase 
 	"usesContext": [ "groupId" ],
 	"supports": {
 		"align": true,
-		"lightBlockWrapper": true
 	},
 	"styles": [
 		{ "name": "default", "label": "Default", "isDefault": true },

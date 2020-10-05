@@ -30,6 +30,22 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
     />
   </Section>
   <Section
+    title="Writing Mode"
+  >
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="themeStyles"
+      label="Theme Styles"
+    />
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="reducedUI"
+      label="Compact UI"
+    />
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="focusMode"
+      label="Spotlight"
+    />
+  </Section>
+  <Section
     title="Document panels"
   >
     <EnablePluginDocumentSettingPanelOptionSlot />

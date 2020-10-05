@@ -69,12 +69,12 @@ export function* getWidgetAreas() {
 	} );
 	yield setWidgetAreasOpenState( widgetAreasOpenState );
 
-	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
-
 	yield {
 		type: 'SET_WIDGET_TO_CLIENT_ID_MAPPING',
 		mapping: widgetIdToClientId,
 	};
+
+	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
 }
 
 const persistStubPost = function* ( id, blocks ) {

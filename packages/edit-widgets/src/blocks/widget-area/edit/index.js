@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { DisclosureContent } from 'reakit/Disclosure';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -27,17 +32,23 @@ export default function WidgetAreaEdit( {
 			<PanelBody
 				title={ name }
 				opened={ isOpen }
-				onToggle={ ( opened ) => {
-					setIsWidgetAreaOpen( clientId, opened );
+				onToggle={ () => {
+					setIsWidgetAreaOpen( clientId, ! isOpen );
 				} }
 			>
-				<EntityProvider
-					kind="root"
-					type="postType"
-					id={ `widget-area-${ id }` }
-				>
-					<WidgetAreaInnerBlocks />
-				</EntityProvider>
+				{ ( { opened } ) => (
+					// This is required to ensure LegacyWidget blocks are not unmounted when the panel is collapsed.
+					// Unmounting legacy widgets may have unintended consequences (e.g. TinyMCE not being properly reinitialized)
+					<DisclosureContent visible={ opened }>
+						<EntityProvider
+							kind="root"
+							type="postType"
+							id={ `widget-area-${ id }` }
+						>
+							<WidgetAreaInnerBlocks />
+						</EntityProvider>
+					</DisclosureContent>
+				) }
 			</PanelBody>
 		</Panel>
 	);

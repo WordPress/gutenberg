@@ -495,10 +495,12 @@
 .block-editor-block-list__block .block-editor-block-list__block-html-textarea {
 	display: block;
 	margin: 0;
+	padding: $grid-unit-15;
 	width: 100%;
 	border: none;
 	outline: none;
-	box-shadow: none;
+	border-radius: 2px;
+	box-shadow: inset 0 0 0 $border-width $gray-900;
 	resize: none;
 	overflow: hidden;
 	font-family: $editor-html-font;
@@ -508,7 +510,7 @@
 	@include reduce-motion("transition");
 
 	&:focus {
-		box-shadow: none;
+		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 	}
 }
 
@@ -536,63 +538,20 @@
 	.block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
 		min-width: $block-toolbar-height/2;
 		width: $block-toolbar-height/2;
-
-		// Animate buttons on hover.
-		&.is-up-button {
-			svg {
-				transition: ease-in-out transform 0.1s;
-				@include reduce-motion("transition");
-			}
-			&:focus,
-			&:hover {
-				svg {
-					transform: translateX(-2px);
-				}
-			}
-		}
-
-		&.is-down-button {
-			svg {
-				transition: ease-in-out transform 0.1s;
-				@include reduce-motion("transition");
-			}
-			&:focus,
-			&:hover {
-				svg {
-					transform: translateX(2px);
-				}
-			}
-		}
 	}
 
 	.block-editor-block-mover:not(.is-horizontal) {
-		// Position SVGs. Animate buttons on hover.
+		// Position SVGs.
 		.block-editor-block-mover-button {
 			&.is-up-button {
 				svg {
 					margin-top: 2px;
-					transition: ease-in-out transform 0.1s;
-					@include reduce-motion("transition");
-				}
-				&:focus,
-				&:hover {
-					svg {
-						transform: translateY(-2px);
-					}
 				}
 			}
 
 			&.is-down-button {
 				svg {
 					margin-bottom: 3px;
-					transition: ease-in-out transform 0.1s;
-					@include reduce-motion("transition");
-				}
-				&:focus,
-				&:hover {
-					svg {
-						transform: translateY(2px);
-					}
 				}
 			}
 

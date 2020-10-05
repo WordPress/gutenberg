@@ -18,7 +18,7 @@ import {
 import { cleanEmptyObject } from './utils';
 import useEditorFeature from '../components/use-editor-feature';
 
-export const FONT_SIZE_SUPPORT_KEY = '__experimentalFontSize';
+export const FONT_SIZE_SUPPORT_KEY = 'fontSize';
 
 /**
  * Filters registered block settings, extending attributes to include
