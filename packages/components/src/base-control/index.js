@@ -7,6 +7,12 @@ import classnames from 'classnames';
  * Internal dependencies
  */
 import VisuallyHidden from '../visually-hidden';
+import {
+	Wrapper,
+	StyledField,
+	StyledLabel,
+	StyledHelp,
+} from './styles/base-control-styles';
 
 function BaseControl( {
 	id,
@@ -17,8 +23,10 @@ function BaseControl( {
 	children,
 } ) {
 	return (
-		<div className={ classnames( 'components-base-control', className ) }>
-			<div className="components-base-control__field">
+		<Wrapper
+			className={ classnames( 'components-base-control', className ) }
+		>
+			<StyledField className="components-base-control__field">
 				{ label &&
 					id &&
 					( hideLabelFromVision ? (
@@ -26,12 +34,12 @@ function BaseControl( {
 							{ label }
 						</VisuallyHidden>
 					) : (
-						<label
+						<StyledLabel
 							className="components-base-control__label"
 							htmlFor={ id }
 						>
 							{ label }
-						</label>
+						</StyledLabel>
 					) ) }
 				{ label &&
 					! id &&
@@ -43,16 +51,16 @@ function BaseControl( {
 						</BaseControl.VisualLabel>
 					) ) }
 				{ children }
-			</div>
+			</StyledField>
 			{ !! help && (
-				<p
+				<StyledHelp
 					id={ id + '__help' }
 					className="components-base-control__help"
 				>
 					{ help }
-				</p>
+				</StyledHelp>
 			) }
-		</div>
+		</Wrapper>
 	);
 }
 

@@ -1,18 +1,14 @@
-/**
- * External dependencies
- */
-import { css } from '@emotion/core';
-
 const DEFAULT = {
-	fontFamily: css`
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-			Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
-	`,
-	fontSize: css`
-		font-size: 13px;
-	`,
+	fontFamily:
+		"-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif",
+	fontSize: '13px',
+};
+
+const HELP_TEXT = {
+	fontSize: '12px',
 };
 
 export default {
 	default: DEFAULT,
+	helpText: HELP_TEXT,
 };
