@@ -45,6 +45,12 @@ const TITLES = {
 		description: 'Displayed when a non-existing page requested',
 	},
 
+	// Pages
+	page: {
+		title: 'Default (Page)',
+		description: 'Displays the content of a single page',
+	},
+
 	// Posts
 	home: {
 		title: 'Posts (home)',
