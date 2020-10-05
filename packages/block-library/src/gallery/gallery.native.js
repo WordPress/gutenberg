@@ -84,6 +84,8 @@ export const Gallery = ( props ) => {
 		onFocusGalleryCaption();
 	};
 
+	const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
+
 	return (
 		<View style={ { flex: 1 } }>
 			<Tiles
@@ -129,12 +131,7 @@ export const Gallery = ( props ) => {
 					);
 				} ) }
 			</Tiles>
-			<View
-				style={ [
-					align === WIDE_ALIGNMENTS.alignments.full &&
-						styles.fullWidth,
-				] }
-			>
+			<View style={ [ isFullWidth && styles.fullWidth ] }>
 				{ mediaPlaceholder }
 			</View>
 			<BlockCaption
