@@ -206,31 +206,32 @@ Add the following global presets to the `experimental-theme.json` file:
 ```
 {
 	"global": {
-		"presets": {
-			"color": [
-				{
-					"slug": "strong-magenta",
-					"value": "#a156b4"
-				},
-				{
-					"slug": "very-dark-gray",
-					"value": "#444"
-				},
-			],
-			"line-height": [
-				{
-					"slug": "small",
-					"value": "1.3"
-				},
-				{
-					"slug": "medium",
-					"value": "2"
-				},
-				{
-					"slug": "large",
-					"value": "2.5"
-				}
-			]
+		"setttings": {
+			"color": {
+				"palette": [
+					{
+						"slug": "strong-magenta",
+						"color": "#a156b4"
+					},
+					{
+						"slug": "very-dark-gray",
+						"color": "#444"
+					},
+				]
+			},
+			"custom": {
+				"line-height": [
+					{
+						"small": "1.3"
+					},
+					{
+						"medium": "2"
+					},
+					{
+						large": "2.5"
+					}
+				]
+			}
 		}
 	}
 }
@@ -241,9 +242,9 @@ This code generates the following variables:
 	--wp--preset--color--strong-magenta: #a156b4;
 	--wp--preset--color--very-dark-gray: #444;
 	
-	--wp--preset--line-height--small: 1.3;
-	--wp--preset--line-height--medium: 2;
-	--wp--preset--line-height--large: 2.5;
+	--wp--custom--line-height--small: 1.3;
+	--wp--custom--line-height--medium: 2;
+	--wp--custom--line-height--large: 2.5;
 ```
 
 **Global styles** are used to set default values for the website and for the blocks.
@@ -275,7 +276,7 @@ Block styles are separate from global styles. Add the code after the globals, bu
 		},
 		"typography": {
 			"fontSize": "2.5rem",
-			"lineHeight": "var(--wp--preset--line-height--medium)"
+			"lineHeight": "var(--wp--custom--line-height--medium)"
 		}
 	}
 },
@@ -317,35 +318,31 @@ Below are the presets and styles combined:
 ```
 {
 	"global": {
-		"presets": {
-			"color": [
-				{
-					"slug": "strong-magenta",
-					"value": "#a156b4"
-				},
-				{
-					"slug": "very-dark-gray",
-					"value": "#444"
-				}
-			],
-			"line-height": [
-				{
-					"slug": "small",
-					"value": "1.3"
-				},
-				{
-					"slug": "medium",
-					"value": "2"
-				},
-				{
-					"slug": "large",
-					"value": "2.5"
-				}
-			]
-		},
-		"styles": {
+		"setttings": {
 			"color": {
-				"background": "var(--wp--preset--color--very-dark-gray)"
+				"palette": [
+					{
+						"slug": "strong-magenta",
+						"color": "#a156b4"
+					},
+					{
+						"slug": "very-dark-gray",
+						"color": "#444"
+					},
+				]
+			},
+			"custom": {
+				"line-height": [
+					{
+						"small": "1.3"
+					},
+					{
+						"medium": "2"
+					},
+					{
+						large": "2.5"
+					}
+				]
 			}
 		}
 	},
@@ -357,7 +354,7 @@ Below are the presets and styles combined:
 			},
 			"typography": {
 				"fontSize": "2.5rem",
-				"lineHeight": "var(--wp--preset--line-height--medium)"
+				"lineHeight": "var(--wp--custom--line-height--medium)"
 			}
 		}
 	},
