@@ -18,8 +18,10 @@ export default function useTemplates() {
 
 	const templateEntities = useSelect(
 		( select ) =>
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template' ) ||
-			[],
+			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
+				status: [ 'publish', 'auto-draft' ],
+				per_page: -1,
+			} ) || [],
 		[]
 	);
 
