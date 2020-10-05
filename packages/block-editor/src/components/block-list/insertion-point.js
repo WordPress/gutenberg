@@ -103,6 +103,7 @@ function InsertionPointPopover( {
 	setIsInserterForced,
 	containerRef,
 	showInsertionPoint,
+	shouldInsertAfter,
 } ) {
 	const element = getBlockDOMNode( clientId );
 
@@ -111,13 +112,16 @@ function InsertionPointPopover( {
 			noArrow
 			animate={ false }
 			anchorRef={ element }
-			position="top right left"
+			position={ `${ shouldInsertAfter ? 'bottom' : 'top' } right left` }
 			focusOnMount={ false }
 			className="block-editor-block-list__insertion-point-popover"
 			__unstableSlotName="block-toolbar"
 		>
 			<div
-				className="block-editor-block-list__insertion-point"
+				className={ classnames(
+					'block-editor-block-list__insertion-point',
+					shouldInsertAfter && 'is-insert-after'
+				) }
 				style={ { width: element?.offsetWidth } }
 			>
 				{ showInsertionPoint && (
@@ -139,26 +143,33 @@ export default function InsertionPoint( { children, containerRef } ) {
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const [ isInserterForced, setIsInserterForced ] = useState( false );
 	const [ inserterClientId, setInserterClientId ] = useState( null );
-	const { isMultiSelecting, isInserterVisible, selectedClientId } = useSelect(
-		( select ) => {
-			const {
-				isMultiSelecting: _isMultiSelecting,
-				isBlockInsertionPointVisible,
-				getBlockInsertionPoint,
-				getBlockOrder,
-			} = select( 'core/block-editor' );
+	const {
+		isMultiSelecting,
+		isInserterVisible,
+		selectedClientId,
+		shouldInsertAfter,
+	} = useSelect( ( select ) => {
+		const {
+			isMultiSelecting: _isMultiSelecting,
+			isBlockInsertionPointVisible,
+			getBlockInsertionPoint,
+			getBlockOrder,
+		} = select( 'core/block-editor' );
 
-			const insertionPoint = getBlockInsertionPoint();
-			const order = getBlockOrder( insertionPoint.rootClientId );
+		const insertionPoint = getBlockInsertionPoint();
+		const order = getBlockOrder( insertionPoint.rootClientId );
 
-			return {
-				isMultiSelecting: _isMultiSelecting(),
-				isInserterVisible: isBlockInsertionPointVisible(),
-				selectedClientId: order[ insertionPoint.index ],
-			};
-		},
-		[]
-	);
+		const shouldInsertAtTheEnd = insertionPoint.index === order.length;
+
+		return {
+			isMultiSelecting: _isMultiSelecting(),
+			isInserterVisible: isBlockInsertionPointVisible(),
+			selectedClientId: shouldInsertAtTheEnd
+				? order[ insertionPoint.index - 1 ]
+				: order[ insertionPoint.index ],
+			shouldInsertAfter: shouldInsertAtTheEnd,
+		};
+	}, [] );
 
 	function onMouseMove( event ) {
 		if (
@@ -220,6 +231,7 @@ export default function InsertionPoint( { children, containerRef } ) {
 					setIsInserterForced={ setIsInserterForced }
 					containerRef={ containerRef }
 					showInsertionPoint={ isInserterVisible }
+					shouldInsertAfter={ shouldInsertAfter }
 				/>
 			) }
 			<div
