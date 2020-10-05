@@ -61,7 +61,6 @@ import * as tagCloud from './tag-cloud';
 import * as classic from './classic';
 import * as socialLinks from './social-links';
 import * as socialLink from './social-link';
-import * as widgetArea from './widget-area';
 
 // Full Site Editing Blocks
 import * as siteLogo from './site-logo';
@@ -191,7 +190,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 				const { __experimentalEnableFullSiteEditing } = settings;
 
 				[
-					widgetArea,
 					navigation,
 					navigationLink,
 

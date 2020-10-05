@@ -22,6 +22,7 @@ const ModalLinkUI = ( { isVisible, ...restProps } ) => {
 				isChildrenScrollable
 				isVisible={ isVisible }
 				hideHeader
+				onClose={ restProps.onClose }
 			>
 				<BottomSheet.NavigationContainer animate main>
 					<BottomSheet.NavigationScreen name={ screens.settings }>

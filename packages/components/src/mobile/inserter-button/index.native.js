@@ -55,13 +55,14 @@ class MenuItem extends Component {
 		);
 
 		const isClipboardBlock = item.id === 'clipboard';
+		const blockTitle = isClipboardBlock ? __( 'Copied block' ) : item.title;
 
 		return (
 			<TouchableHighlight
 				style={ styles.touchableArea }
 				underlayColor="transparent"
 				activeOpacity={ 0.5 }
-				accessibilityLabel={ item.title }
+				accessibilityLabel={ blockTitle }
 				onPress={ this.onPress }
 			>
 				<View style={ [ styles.modalItem, { width: maxWidth } ] }>
@@ -82,13 +83,18 @@ class MenuItem extends Component {
 							/>
 						</View>
 					</View>
-					<Text style={ modalItemLabelStyle }>
-						{ isClipboardBlock ? __( 'Copied block' ) : item.title }
-					</Text>
+					<Text style={ modalItemLabelStyle }>{ blockTitle }</Text>
 				</View>
 			</TouchableHighlight>
 		);
 	}
 }
 
-export default withPreferredColorScheme( MenuItem );
+const InserterButton = withPreferredColorScheme( MenuItem );
+
+InserterButton.Styles = {
+	modalItem: styles.modalItem,
+	modalIconWrapper: styles.modalIconWrapper,
+};
+
+export default InserterButton;

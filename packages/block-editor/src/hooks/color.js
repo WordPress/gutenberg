@@ -30,7 +30,7 @@ import { cleanEmptyObject } from './utils';
 import ColorPanel from './color-panel';
 import useEditorFeature from '../components/use-editor-feature';
 
-export const COLOR_SUPPORT_KEY = '__experimentalColor';
+export const COLOR_SUPPORT_KEY = 'color';
 const EMPTY_ARRAY = [];
 
 const hasColorSupport = ( blockType ) => {
@@ -40,7 +40,7 @@ const hasColorSupport = ( blockType ) => {
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 	return (
 		colorSupport &&
-		( colorSupport.linkColor === true ||
+		( colorSupport.link === true ||
 			colorSupport.gradient === true ||
 			colorSupport.background !== false ||
 			colorSupport.text !== false )
@@ -54,7 +54,7 @@ const hasLinkColorSupport = ( blockType ) => {
 
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 
-	return isObject( colorSupport ) && !! colorSupport.linkColor;
+	return isObject( colorSupport ) && !! colorSupport.link;
 };
 
 const hasGradientSupport = ( blockType ) => {

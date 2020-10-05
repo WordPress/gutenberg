@@ -18,13 +18,13 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  */
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
-import { PADDING_SUPPORT_KEY, PaddingEdit } from './padding';
+import { SPACING_SUPPORT_KEY, PaddingEdit } from './padding';
 import SpacingPanelControl from '../components/spacing-panel-control';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
 	COLOR_SUPPORT_KEY,
-	PADDING_SUPPORT_KEY,
+	SPACING_SUPPORT_KEY,
 ];
 
 const hasStyleSupport = ( blockType ) =>
@@ -148,16 +148,16 @@ export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
 
-		const hasPaddingSupport = hasBlockSupport(
+		const hasSpacingSupport = hasBlockSupport(
 			blockName,
-			PADDING_SUPPORT_KEY
+			SPACING_SUPPORT_KEY
 		);
 
 		return [
 			<TypographyPanel key="typography" { ...props } />,
 			<ColorEdit key="colors" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
-			hasPaddingSupport && (
+			hasSpacingSupport && (
 				<SpacingPanelControl key="spacing">
 					<PaddingEdit { ...props } />
 				</SpacingPanelControl>

@@ -17,6 +17,7 @@ import {
 	PanelRow,
 	RangeControl,
 	ResizableBox,
+	Spinner,
 	ToggleControl,
 	withNotices,
 	__experimentalBoxControl as BoxControl,
@@ -31,7 +32,7 @@ import {
 	MediaReplaceFlow,
 	withColors,
 	ColorPalette,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
@@ -40,6 +41,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
+import { isBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -259,6 +261,7 @@ function CoverEdit( {
 		setGradient,
 	} = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes );
+	const isBlogUrl = isBlobURL( url );
 
 	const toggleParallax = () => {
 		setAttributes( {
@@ -426,7 +429,7 @@ function CoverEdit( {
 		</>
 	);
 
-	const blockWrapperProps = useBlockWrapperProps();
+	const blockProps = useBlockProps();
 
 	if ( ! hasBackground ) {
 		const placeholderIcon = <BlockIcon icon={ icon } />;
@@ -436,10 +439,10 @@ function CoverEdit( {
 			<>
 				{ controls }
 				<div
-					{ ...blockWrapperProps }
+					{ ...blockProps }
 					className={ classnames(
 						'is-placeholder',
-						blockWrapperProps.className
+						blockProps.className
 					) }
 				>
 					<MediaPlaceholder
@@ -478,6 +481,7 @@ function CoverEdit( {
 		{
 			'is-dark-theme': isDark,
 			'has-background-dim': dimRatio !== 0,
+			'is-transient': isBlogUrl,
 			'has-parallax': hasParallax,
 			[ overlayColor.class ]: overlayColor.class,
 			'has-background-gradient': gradientValue,
@@ -493,9 +497,9 @@ function CoverEdit( {
 		<>
 			{ controls }
 			<div
-				{ ...blockWrapperProps }
-				className={ classnames( classes, blockWrapperProps.className ) }
-				style={ { ...style, ...blockWrapperProps.style } }
+				{ ...blockProps }
+				className={ classnames( classes, blockProps.className ) }
+				style={ { ...style, ...blockProps.style } }
 				data-url={ url }
 			>
 				<BoxControlVisualizer
@@ -549,6 +553,7 @@ function CoverEdit( {
 						style={ { objectPosition: positionValue } }
 					/>
 				) }
+				{ isBlogUrl && <Spinner /> }
 				<InnerBlocks
 					__experimentalTagName="div"
 					__experimentalPassedProps={ {
