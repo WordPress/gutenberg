@@ -8,6 +8,12 @@ import { useSelect } from '@wordpress/data';
  */
 import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../store/utils';
 
+/**
+ * A react hook that returns the client id of the last widget area to have
+ * been selected, or to have a selected block within it.
+ *
+ * @return {string} clientId of the widget area last selected.
+ */
 const useLastSelectedWidgetArea = () => {
 	const firstRootId = useSelect( ( select ) => {
 		// Default to the first widget area
@@ -26,12 +32,15 @@ const useLastSelectedWidgetArea = () => {
 		);
 		const blockSelectionEndClientId = getBlockSelectionEnd();
 
+		// If the selected block is a widget area, return its clientId.
 		if (
 			getBlockName( blockSelectionEndClientId ) === 'core/widget-area'
 		) {
 			return blockSelectionEndClientId;
 		}
 
+		// Otherwise, find the clientId of the top-level widget area by looking
+		// through the selected block's parents.
 		const blockParents = getBlockParents( blockSelectionEndClientId );
 		const rootWidgetAreaClientId = blockParents.find(
 			( clientId ) => getBlockName( clientId ) === 'core/widget-area'
@@ -42,7 +51,8 @@ const useLastSelectedWidgetArea = () => {
 		}
 	}, [] );
 
-	// Fallbacks to the first widget area.
+	// If no widget area has been selected, return the clientId of the first
+	// area.
 	return selectedRootId || firstRootId;
 };
 
