@@ -16,7 +16,7 @@ import {
  */
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { withSpokenMessages } from '@wordpress/components';
-import { useMemo, useEffect } from '@wordpress/element';
+import { memo, useMemo, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -232,4 +232,6 @@ export function BlockTypesTab( {
 	);
 }
 
-export default withSpokenMessages( BlockTypesTab );
+const memoizedBlockTypesTab = memo( BlockTypesTab );
+
+export default withSpokenMessages( memoizedBlockTypesTab );

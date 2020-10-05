@@ -10,11 +10,16 @@ import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { VisuallyHidden, Button } from '@wordpress/components';
 import { Icon, search, closeSmall } from '@wordpress/icons';
-import { useRef } from '@wordpress/element';
+import { memo, useRef, useCallback } from '@wordpress/element';
 
 function InserterSearchForm( { className, onChange, value, placeholder } ) {
 	const instanceId = useInstanceId( InserterSearchForm );
 	const searchInput = useRef();
+
+	const handleOnChange = useCallback( () => {
+		onChange( '' );
+		searchInput.current.focus();
+	}, [ onChange ] );
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 	// is always visible, and one which already incurs this behavior of autoFocus via
@@ -49,10 +54,7 @@ function InserterSearchForm( { className, onChange, value, placeholder } ) {
 					<Button
 						icon={ closeSmall }
 						label={ __( 'Reset search' ) }
-						onClick={ () => {
-							onChange( '' );
-							searchInput.current.focus();
-						} }
+						onClick={ handleOnChange }
 					/>
 				) }
 				{ ! value && <Icon icon={ search } /> }
@@ -62,4 +64,6 @@ function InserterSearchForm( { className, onChange, value, placeholder } ) {
 	/* eslint-enable jsx-a11y/no-autofocus */
 }
 
-export default InserterSearchForm;
+const memoizedInserterSearchForm = memo( InserterSearchForm );
+
+export default memoizedInserterSearchForm;

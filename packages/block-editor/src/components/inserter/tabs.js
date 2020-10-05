@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { TabPanel } from '@wordpress/components';
+import { memo, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 const blocksTab = {
@@ -26,14 +27,18 @@ function InserterTabs( {
 	showReusableBlocks = false,
 	onSelect,
 } ) {
-	const tabs = [ blocksTab ];
+	const tabs = useMemo( () => {
+		const tabList = [ blocksTab ];
 
-	if ( showPatterns ) {
-		tabs.push( patternsTab );
-	}
-	if ( showReusableBlocks ) {
-		tabs.push( reusableBlocksTab );
-	}
+		if ( showPatterns ) {
+			tabList.push( patternsTab );
+		}
+		if ( showReusableBlocks ) {
+			tabList.push( reusableBlocksTab );
+		}
+
+		return tabList;
+	}, [ showPatterns, showReusableBlocks ] );
 
 	return (
 		<TabPanel
@@ -46,4 +51,6 @@ function InserterTabs( {
 	);
 }
 
-export default InserterTabs;
+const memoizedInserterTabs = memo( InserterTabs );
+
+export default memoizedInserterTabs;

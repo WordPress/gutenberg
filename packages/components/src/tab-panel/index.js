@@ -7,7 +7,7 @@ import { partial, noop, find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { memo, useState, useEffect } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -16,7 +16,7 @@ import { useInstanceId } from '@wordpress/compose';
 import { NavigableMenu } from '../navigable-container';
 import Button from '../button';
 
-const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
+const TabButton = memo( ( { tabId, onClick, children, selected, ...rest } ) => (
 	<Button
 		role="tab"
 		tabIndex={ selected ? null : -1 }
@@ -27,9 +27,9 @@ const TabButton = ( { tabId, onClick, children, selected, ...rest } ) => (
 	>
 		{ children }
 	</Button>
-);
+) );
 
-export default function TabPanel( {
+function TabPanel( {
 	className,
 	children,
 	tabs,
@@ -101,3 +101,5 @@ export default function TabPanel( {
 		</div>
 	);
 }
+
+export default memo( TabPanel );

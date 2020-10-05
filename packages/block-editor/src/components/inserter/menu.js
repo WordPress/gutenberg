@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { memo, useState, useCallback } from '@wordpress/element';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -72,20 +72,29 @@ function InserterMenu( {
 		}
 	};
 
-	const onInsert = ( blocks ) => {
+	const onInsert = useCallback( ( blocks ) => {
 		onInsertBlocks( blocks );
 		onSelect();
-	};
-
+	}, [] );
 	const onInsertPattern = ( blocks, patternName ) => {
 		onInsertBlocks( blocks, { patternName } );
 		onSelect();
 	};
 
-	const onHover = ( item ) => {
+	const onHover = useCallback( ( item ) => {
 		onToggleInsertionPoint( !! item );
 		setHoveredItem( item );
-	};
+	}, [] );
+
+	const onChangeSearch = useCallback(
+		( value ) => {
+			if ( hoveredItem ) {
+				setHoveredItem( null );
+			}
+			setFilterValue( value );
+		},
+		[ hoveredItem ]
+	);
 
 	const onClickPatternCategory = ( patternCategory ) => {
 		setSelectedPatternCategory( patternCategory );
@@ -159,10 +168,7 @@ function InserterMenu( {
 				{ /* the following div is necessary to fix the sticky position of the search form */ }
 				<div className="block-editor-inserter__content">
 					<InserterSearchForm
-						onChange={ ( value ) => {
-							if ( hoveredItem ) setHoveredItem( null );
-							setFilterValue( value );
-						} }
+						onChange={ onChangeSearch }
 						value={ filterValue }
 						placeholder={ searchFormPlaceholder() }
 					/>
@@ -193,4 +199,6 @@ function InserterMenu( {
 	/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 }
 
-export default InserterMenu;
+const memoizedInserterMenu = memo( InserterMenu );
+
+export default memoizedInserterMenu;
