@@ -166,7 +166,7 @@ function ColumnsEditContainer( {
 		const widths = {};
 		const containerWidth = getContainerWidth( baseContainerWidth );
 
-		let columnWidth = width / columnsInRow;
+		let columnWidth = getContainerWidth( width ) / columnsInRow;
 		let maxColumnWidth = columnWidth;
 
 		innerColumns.forEach(
@@ -230,7 +230,7 @@ function ColumnsEditContainer( {
 			if ( width < ALIGNMENT_BREAKPOINTS.mobile ) {
 				// show only 1 Column in row for mobile breakpoint container width
 				return 1;
-			} else if ( width < ALIGNMENT_BREAKPOINTS.medium ) {
+			} else if ( width <= ALIGNMENT_BREAKPOINTS.medium ) {
 				// show the maximum number of columns in a row for large breakpoint container width
 				return Math.min(
 					Math.max( 1, columnCount ),
