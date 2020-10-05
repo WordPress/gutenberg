@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useMemo } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { placeCaretAtVerticalEdge } from '@wordpress/dom';
 
@@ -98,30 +98,40 @@ function InsertionPointInserter( {
 
 function InsertionPointPopover( {
 	clientId,
+	rootClientId,
 	isInserterShown,
 	isInserterForced,
 	setIsInserterForced,
 	containerRef,
 	showInsertionPoint,
-	shouldInsertAfter,
 } ) {
-	const element = getBlockDOMNode( clientId );
+	const element = useMemo( () => {
+		if ( clientId ) {
+			return getBlockDOMNode( clientId );
+		}
+
+		// Can't find the element, might be at the end of the block list, or inside an empty block list.
+		// We instead try to place the indicator at the end of the list, where the "Appender" usually lives.
+		const rootElement = getBlockDOMNode( rootClientId );
+		const blocks = rootElement?.querySelectorAll( '.wp-block' );
+
+		if ( blocks ) {
+			return blocks[ blocks.length - 1 ];
+		}
+	}, [ clientId, rootClientId ] );
 
 	return (
 		<Popover
 			noArrow
 			animate={ false }
 			anchorRef={ element }
-			position={ `${ shouldInsertAfter ? 'bottom' : 'top' } right left` }
+			position="top right left"
 			focusOnMount={ false }
 			className="block-editor-block-list__insertion-point-popover"
 			__unstableSlotName="block-toolbar"
 		>
 			<div
-				className={ classnames(
-					'block-editor-block-list__insertion-point',
-					shouldInsertAfter && 'is-insert-after'
-				) }
+				className="block-editor-block-list__insertion-point"
 				style={ { width: element?.offsetWidth } }
 			>
 				{ showInsertionPoint && (
@@ -147,7 +157,7 @@ export default function InsertionPoint( { children, containerRef } ) {
 		isMultiSelecting,
 		isInserterVisible,
 		selectedClientId,
-		shouldInsertAfter,
+		selectedRootClientId,
 	} = useSelect( ( select ) => {
 		const {
 			isMultiSelecting: _isMultiSelecting,
@@ -159,15 +169,11 @@ export default function InsertionPoint( { children, containerRef } ) {
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
 
-		const shouldInsertAtTheEnd = insertionPoint.index === order.length;
-
 		return {
 			isMultiSelecting: _isMultiSelecting(),
 			isInserterVisible: isBlockInsertionPointVisible(),
-			selectedClientId: shouldInsertAtTheEnd
-				? order[ insertionPoint.index - 1 ]
-				: order[ insertionPoint.index ],
-			shouldInsertAfter: shouldInsertAtTheEnd,
+			selectedClientId: order[ insertionPoint.index ],
+			selectedRootClientId: insertionPoint.rootClientId,
 		};
 	}, [] );
 
@@ -226,12 +232,12 @@ export default function InsertionPoint( { children, containerRef } ) {
 					clientId={
 						isInserterVisible ? selectedClientId : inserterClientId
 					}
+					rootClientId={ selectedRootClientId }
 					isInserterShown={ isInserterShown }
 					isInserterForced={ isInserterForced }
 					setIsInserterForced={ setIsInserterForced }
 					containerRef={ containerRef }
 					showInsertionPoint={ isInserterVisible }
-					shouldInsertAfter={ shouldInsertAfter }
 				/>
 			) }
 			<div
