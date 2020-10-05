@@ -3,10 +3,7 @@
  */
 import { __experimentalNavigationItem as NavigationItem } from '@wordpress/components';
 
-export default function TemplateNavigationItems( {
-	items: templates,
-	onActivate,
-} ) {
+export default function TemplateNavigationItems( { templates, onActivate } ) {
 	if ( ! templates ) {
 		return null;
 	}
