@@ -15,11 +15,49 @@ import { dispatch, select, getWidgetToClientIdMapping } from './controls';
 import { transformBlockToWidget } from './transformers';
 import {
 	buildWidgetAreaPostId,
+	buildWidgetAreasPostId,
 	buildWidgetAreasQuery,
+	createStubPost,
 	KIND,
 	POST_TYPE,
 	WIDGET_AREA_ENTITY_TYPE,
 } from './utils';
+
+/**
+ * Initializes the stub post before rendering the widgets editor.
+ * Required in order to ensure the data layer won't try to resolve the stub post.
+ *
+ * @access private
+ */
+export function* initializeState() {
+	yield persistStubPost( buildWidgetAreasPostId(), [] );
+}
+
+/**
+ * Persists a stub post with given ID to core data store. The post is meant to be in-memory only and
+ * shouldn't be saved via the API.
+ *
+ * @param  {string} id Post ID.
+ * @param  {Array}  blocks Blocks the post should consist of.
+ * @return {Object} The post object.
+ */
+export const persistStubPost = function* ( id, blocks ) {
+	const stubPost = createStubPost( id, blocks );
+	const args = [ KIND, POST_TYPE, id ];
+	// This is the magic that prevents core-data from trying to resolve the entity
+	yield dispatch( 'core', 'startResolution', 'getEntityRecord', args );
+	yield dispatch(
+		'core',
+		'receiveEntityRecords',
+		KIND,
+		POST_TYPE,
+		stubPost,
+		{ id: stubPost.id },
+		false
+	);
+	yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
+	return stubPost;
+};
 
 export function* saveEditedWidgetAreas() {
 	const editedWidgetAreas = yield select(
@@ -146,4 +184,58 @@ export function setWidgetIdForClientId( clientId, widgetId ) {
 		clientId,
 		widgetId,
 	};
+}
+
+/**
+ * Sets the open state of all the widget areas.
+ *
+ * @param  {Object} widgetAreasOpenState The open states of all the widget areas.
+ * @return {Object}                      Action.
+ */
+export function setWidgetAreasOpenState( widgetAreasOpenState ) {
+	return {
+		type: 'SET_WIDGET_AREAS_OPEN_STATE',
+		widgetAreasOpenState,
+	};
+}
+
+/**
+ * Sets the open state of the widget area.
+ *
+ * @param  {string}  clientId   The clientId of the widget area.
+ * @param  {boolean} isOpen     Whether the widget area should be opened.
+ * @return {Object}             Action.
+ */
+export function setIsWidgetAreaOpen( clientId, isOpen ) {
+	return {
+		type: 'SET_IS_WIDGET_AREA_OPEN',
+		clientId,
+		isOpen,
+	};
+}
+
+/**
+ * Returns an action object used to open/close the inserter.
+ *
+ * @param {boolean} value A boolean representing whether the inserter should be opened or closed.
+ * @return {Object} Action object.
+ */
+export function setIsInserterOpened( value ) {
+	return {
+		type: 'SET_IS_INSERTER_OPENED',
+		value,
+	};
+}
+
+/**
+ * Returns an action object signalling that the user closed the sidebar.
+ *
+ * @yield {Object} Action object.
+ */
+export function* closeGeneralSidebar() {
+	yield dispatch(
+		'core/interface',
+		'disableComplementaryArea',
+		'core/edit-widgets'
+	);
 }

@@ -38,12 +38,17 @@ import { withViewportMatch } from '@wordpress/viewport';
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import Gallery from './gallery';
+import {
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_NONE,
+} from './constants';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
-	{ value: 'attachment', label: __( 'Attachment Page' ) },
-	{ value: 'media', label: __( 'Media File' ) },
-	{ value: 'none', label: __( 'None' ) },
+	{ value: LINK_DESTINATION_ATTACHMENT, label: __( 'Attachment Page' ) },
+	{ value: LINK_DESTINATION_MEDIA, label: __( 'Media File' ) },
+	{ value: LINK_DESTINATION_NONE, label: __( 'None' ) },
 ];
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
@@ -329,6 +334,14 @@ class GalleryEdit extends Component {
 			this.setState( {
 				selectedImage: null,
 				captionSelected: false,
+			} );
+		}
+		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php
+		if ( ! this.props.attributes.linkTo ) {
+			this.setAttributes( {
+				linkTo:
+					window?.wp?.media?.view?.settings?.defaultProps?.link ||
+					LINK_DESTINATION_NONE,
 			} );
 		}
 	}

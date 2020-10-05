@@ -105,11 +105,6 @@
 		opacity: 1;
 		transform: translateY(-($block-toolbar-height + $grid-unit-15));
 	}
-
-	// Hide the Parent button in Top Toolbar mode.
-	.edit-post-header-toolbar__block-toolbar & {
-		display: none;
-	}
 }
 
 .block-editor-block-toolbar-animated-width-container {

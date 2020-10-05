@@ -18,7 +18,10 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { useExperimentalFeatures } from '../../experimental-features';
+import {
+	useExperimentalFeatures,
+	openNavigation,
+} from '../../experimental-features';
 
 const visitSiteEditor = async () => {
 	const query = addQueryArgs( '', {
@@ -31,19 +34,11 @@ const visitSiteEditor = async () => {
 	);
 };
 
-const openTemplateDropdown = async () => {
-	// Open the dropdown menu.
-	const templateDropdown =
-		'button.components-dropdown-menu__toggle[aria-label="Switch Template"]';
-	await page.click( templateDropdown );
-	await page.waitForSelector( '.edit-site-template-switcher__popover' );
-};
-
 const getTemplateDropdownElement = async ( itemName ) => {
-	await openTemplateDropdown();
-	const [ item ] = await page.$x(
-		`//div[contains(@class, "edit-site-template-switcher__popover")]//button[contains(., "${ itemName }")]`
-	);
+	await openNavigation();
+	const selector = `//div[contains(@class, "edit-site-navigation-panel")]//button[contains(., "${ itemName }")]`;
+	await page.waitForXPath( selector );
+	const [ item ] = await page.$x( selector );
 	return item;
 };
 

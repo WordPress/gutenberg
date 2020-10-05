@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Icon, chevronLeft } from '@wordpress/icons';
 
@@ -15,13 +16,10 @@ import { Icon, chevronLeft } from '@wordpress/icons';
 import { useNavigationContext } from '../context';
 import { MenuBackButtonUI } from '../styles/navigation-styles';
 
-export default function NavigationBackButton( {
-	backButtonLabel,
-	className,
-	href,
-	onClick,
-	parentMenu,
-} ) {
+function NavigationBackButton(
+	{ backButtonLabel, className, href, onClick, parentMenu },
+	ref
+) {
 	const { setActiveMenu, navigationTree } = useNavigationContext();
 
 	const classes = classnames(
@@ -34,14 +32,17 @@ export default function NavigationBackButton( {
 	return (
 		<MenuBackButtonUI
 			className={ classes }
-			isTertiary
 			href={ href }
+			isTertiary
 			onClick={ () =>
 				parentMenu ? setActiveMenu( parentMenu, 'right' ) : onClick
 			}
+			ref={ ref }
 		>
 			<Icon icon={ chevronLeft } />
 			{ backButtonLabel || parentMenuTitle || __( 'Back' ) }
 		</MenuBackButtonUI>
 	);
 }
+
+export default forwardRef( NavigationBackButton );
