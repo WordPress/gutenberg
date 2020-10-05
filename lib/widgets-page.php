@@ -134,7 +134,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_widgets_init' );
  */
 function widgets_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
 	global $current_screen;
-	if ( $current_screen->base === 'appearance_page_gutenberg-widgets' ) {
+	if ( 'appearance_page_gutenberg-widgets' === $current_screen->base ) {
 		return true;
 	}
 
