@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
+import '@wordpress/notices';
 import '@wordpress/block-editor';
 import {
 	registerBlockType,
@@ -38,7 +39,6 @@ import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
-import * as legacyWidget from './legacy-widget';
 import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
@@ -46,7 +46,6 @@ import * as nextpage from './nextpage';
 import * as preformatted from './preformatted';
 import * as pullquote from './pullquote';
 import * as reusableBlock from './block';
-import * as richImage from './rich-image';
 import * as rss from './rss';
 import * as search from './search';
 import * as group from './group';
@@ -62,9 +61,10 @@ import * as tagCloud from './tag-cloud';
 import * as classic from './classic';
 import * as socialLinks from './social-links';
 import * as socialLink from './social-link';
-import * as widgetArea from './widget-area';
 
 // Full Site Editing Blocks
+import * as siteLogo from './site-logo';
+import * as siteTagline from './site-tagline';
 import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
 import * as query from './query';
@@ -73,12 +73,17 @@ import * as queryPagination from './query-pagination';
 import * as postTitle from './post-title';
 import * as postContent from './post-content';
 import * as postAuthor from './post-author';
+import * as postComment from './post-comment';
+import * as postCommentAuthor from './post-comment-author';
+import * as postCommentContent from './post-comment-content';
+import * as postCommentDate from './post-comment-date';
 import * as postComments from './post-comments';
 import * as postCommentsCount from './post-comments-count';
 import * as postCommentsForm from './post-comments-form';
 import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
+import * as postHierarchicalTerms from './post-hierarchical-terms';
 import * as postTags from './post-tags';
 
 /**
@@ -132,8 +137,6 @@ export const registerCoreBlocks = () => {
 		column,
 		cover,
 		embed,
-		...embed.common,
-		...embed.others,
 		file,
 		group,
 		window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
@@ -184,21 +187,17 @@ export const registerCoreBlocks = () => {
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
 		? ( settings ) => {
-				const {
-					__experimentalEnableLegacyWidgetBlock,
-					__experimentalEnableFullSiteEditing,
-					__experimentalEnableRichImageEditing,
-				} = settings;
+				const { __experimentalEnableFullSiteEditing } = settings;
 
 				[
-					widgetArea,
-					__experimentalEnableLegacyWidgetBlock ? legacyWidget : null,
 					navigation,
 					navigationLink,
 
 					// Register Full Site Editing Blocks.
 					...( __experimentalEnableFullSiteEditing
 						? [
+								siteLogo,
+								siteTagline,
 								siteTitle,
 								templatePart,
 								query,
@@ -207,20 +206,20 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postTitle,
 								postContent,
 								postAuthor,
+								postComment,
+								postCommentAuthor,
+								postCommentContent,
+								postCommentDate,
 								postComments,
 								postCommentsCount,
 								postCommentsForm,
 								postDate,
 								postExcerpt,
 								postFeaturedImage,
+								postHierarchicalTerms,
 								postTags,
 						  ]
 						: [] ),
 				].forEach( registerBlock );
-
-				if ( __experimentalEnableRichImageEditing ) {
-					// Attach rich image tools to the image block.
-					richImage.registerBlock();
-				}
 		  }
 		: undefined;

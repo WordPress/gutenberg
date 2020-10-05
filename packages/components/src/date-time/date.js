@@ -24,6 +24,7 @@ class DatePicker extends Component {
 		this.onChangeMoment = this.onChangeMoment.bind( this );
 		this.nodeRef = createRef();
 		this.keepFocusInside = this.keepFocusInside.bind( this );
+		this.isDayHighlighted = this.isDayHighlighted.bind( this );
 	}
 
 	/*
@@ -81,9 +82,24 @@ class DatePicker extends Component {
 		return currentDate ? moment( currentDate ) : moment();
 	}
 
+	// todo change reference to `isDayHighlighted` every time, `events` prop change
+	isDayHighlighted( date ) {
+		// Do not highlight when no events.
+		if ( ! this.props.events?.length ) {
+			return false;
+		}
+		if ( this.props.onMonthPreviewed ) {
+			this.props.onMonthPreviewed( date.toDate() );
+		}
+
+		// Compare date against highlighted events.
+		return this.props.events.some( ( highlighted ) =>
+			date.isSame( highlighted.date, 'day' )
+		);
+	}
+
 	render() {
 		const { currentDate, isInvalidDate } = this.props;
-
 		const momentDate = this.getMomentDate( currentDate );
 
 		return (
@@ -107,6 +123,7 @@ class DatePicker extends Component {
 					isOutsideRange={ ( date ) => {
 						return isInvalidDate && isInvalidDate( date.toDate() );
 					} }
+					isDayHighlighted={ this.isDayHighlighted }
 					onPrevMonthClick={ this.keepFocusInside }
 					onNextMonthClick={ this.keepFocusInside }
 				/>

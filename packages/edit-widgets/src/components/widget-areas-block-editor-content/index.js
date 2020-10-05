@@ -3,10 +3,10 @@
  */
 import { Popover } from '@wordpress/components';
 import {
+	BlockList,
 	BlockEditorKeyboardShortcuts,
 	WritingFlow,
 	ObserveTyping,
-	BlockList,
 } from '@wordpress/block-editor';
 import { useDispatch } from '@wordpress/data';
 
@@ -18,6 +18,7 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 
 export default function WidgetAreasBlockEditorContent() {
 	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
+
 	return (
 		<>
 			<KeyboardShortcuts />

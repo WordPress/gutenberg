@@ -10,7 +10,7 @@ import deprecated from '@wordpress/deprecated';
 import {
 	dispatch,
 	select,
-	__unstableSyncSelect,
+	syncSelect,
 	apiFetch,
 } from '@wordpress/data-controls';
 import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
@@ -352,6 +352,7 @@ export function* autosave( options ) {
 
 export function* __experimentalLocalAutosave() {
 	const post = yield select( STORE_KEY, 'getCurrentPost' );
+	const isPostNew = yield select( STORE_KEY, 'isEditedPostNew' );
 	const title = yield select( STORE_KEY, 'getEditedPostAttribute', 'title' );
 	const content = yield select(
 		STORE_KEY,
@@ -366,6 +367,7 @@ export function* __experimentalLocalAutosave() {
 	yield {
 		type: 'LOCAL_AUTOSAVE_SET',
 		postId: post.id,
+		isPostNew,
 		title,
 		content,
 		excerpt,
@@ -677,7 +679,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 	if ( __unstableShouldCreateUndoLevel !== false ) {
 		const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
 		const noChange =
-			( yield __unstableSyncSelect(
+			( yield syncSelect(
 				'core',
 				'getEditedEntityRecord',
 				'postType',

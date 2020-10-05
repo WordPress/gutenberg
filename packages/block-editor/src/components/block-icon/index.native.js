@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
 import { View } from 'react-native';
 
 /**
@@ -11,7 +10,7 @@ import { Icon } from '@wordpress/components';
 import { blockDefault } from '@wordpress/icons';
 
 export default function BlockIcon( { icon, showColors = false } ) {
-	if ( get( icon, [ 'src' ] ) === 'block-default' ) {
+	if ( icon?.src === 'block-default' ) {
 		icon = {
 			src: blockDefault,
 		};

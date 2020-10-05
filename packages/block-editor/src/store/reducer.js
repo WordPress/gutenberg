@@ -12,7 +12,6 @@ import {
 	keys,
 	isEqual,
 	isEmpty,
-	get,
 	identity,
 	difference,
 	omitBy,
@@ -332,8 +331,8 @@ const withBlockCache = ( reducer ) => ( state = {}, action ) => {
 				),
 			};
 			break;
-		case 'MOVE_BLOCK_TO_POSITION': {
-			const updatedBlockUids = [ action.clientId ];
+		case 'MOVE_BLOCKS_TO_POSITION': {
+			const updatedBlockUids = [ ...action.clientIds ];
 			if ( action.fromRootClientId ) {
 				updatedBlockUids.push( action.fromRootClientId );
 			}
@@ -411,11 +410,7 @@ function withPersistentBlockChange( reducer ) {
 			markNextChangeAsNotPersistent =
 				action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 
-			const nextIsPersistentChange = get(
-				state,
-				[ 'isPersistentChange' ],
-				true
-			);
+			const nextIsPersistentChange = state?.isPersistentChange ?? true;
 			if ( state.isPersistentChange === nextIsPersistentChange ) {
 				return state;
 			}
@@ -905,24 +900,25 @@ export const blocks = flow(
 				};
 			}
 
-			case 'MOVE_BLOCK_TO_POSITION': {
+			case 'MOVE_BLOCKS_TO_POSITION': {
 				const {
 					fromRootClientId = '',
 					toRootClientId = '',
-					clientId,
+					clientIds,
 				} = action;
 				const { index = state[ toRootClientId ].length } = action;
 
 				// Moving inside the same parent block
 				if ( fromRootClientId === toRootClientId ) {
 					const subState = state[ toRootClientId ];
-					const fromIndex = subState.indexOf( clientId );
+					const fromIndex = subState.indexOf( clientIds[ 0 ] );
 					return {
 						...state,
 						[ toRootClientId ]: moveTo(
 							state[ toRootClientId ],
 							fromIndex,
-							index
+							index,
+							clientIds.length
 						),
 					};
 				}
@@ -932,11 +928,11 @@ export const blocks = flow(
 					...state,
 					[ fromRootClientId ]: without(
 						state[ fromRootClientId ],
-						clientId
+						...clientIds
 					),
 					[ toRootClientId ]: insertAt(
 						state[ toRootClientId ],
-						clientId,
+						clientIds,
 						index
 					),
 				};
@@ -1069,10 +1065,13 @@ export const blocks = flow(
 					),
 				};
 
-			case 'MOVE_BLOCK_TO_POSITION': {
+			case 'MOVE_BLOCKS_TO_POSITION': {
 				return {
 					...state,
-					[ action.clientId ]: action.toRootClientId || '',
+					...action.clientIds.reduce( ( accumulator, id ) => {
+						accumulator[ id ] = action.toRootClientId || '';
+						return accumulator;
+					}, {} ),
 				};
 			}
 
@@ -1127,20 +1126,20 @@ export function isTyping( state = false, action ) {
 }
 
 /**
- * Reducer returning dragging state.
+ * Reducer returning dragged block client id.
  *
- * @param {boolean} state  Current state.
+ * @param {string[]} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return {string[]} Updated state.
  */
-export function isDraggingBlocks( state = false, action ) {
+export function draggedBlocks( state = [], action ) {
 	switch ( action.type ) {
 		case 'START_DRAGGING_BLOCKS':
-			return true;
+			return action.clientIds;
 
 		case 'STOP_DRAGGING_BLOCKS':
-			return false;
+			return [];
 	}
 
 	return state;
@@ -1532,6 +1531,24 @@ export function isNavigationMode( state = false, action ) {
 }
 
 /**
+ * Reducer returning whether the block moving mode is enabled or not.
+ *
+ * @param {string|null} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string|null} Updated state.
+ */
+export function hasBlockMovingClientId( state = null, action ) {
+	// Let inserting block always trigger Edit mode.
+
+	if ( action.type === 'SET_BLOCK_MOVING_MODE' ) {
+		return action.hasBlockMovingClientId;
+	}
+
+	return state;
+}
+
+/**
  * Reducer return an updated state representing the most recent block attribute
  * update. The state is structured as an object where the keys represent the
  * client IDs of blocks, the values a subset of attributes from the most recent
@@ -1608,14 +1625,21 @@ export function automaticChangeStatus( state, action ) {
  * @return {string} Updated state.
  */
 export function highlightedBlock( state, action ) {
-	const { clientId, isHighlighted } = action;
+	switch ( action.type ) {
+		case 'TOGGLE_BLOCK_HIGHLIGHT':
+			const { clientId, isHighlighted } = action;
 
-	if ( action.type === 'TOGGLE_BLOCK_HIGHLIGHT' ) {
-		if ( isHighlighted ) {
-			return clientId;
-		} else if ( state === clientId ) {
-			return null;
-		}
+			if ( isHighlighted ) {
+				return clientId;
+			} else if ( state === clientId ) {
+				return null;
+			}
+
+			return state;
+		case 'SELECT_BLOCK':
+			if ( action.clientId !== state ) {
+				return null;
+			}
 	}
 
 	return state;
@@ -1624,7 +1648,7 @@ export function highlightedBlock( state, action ) {
 export default combineReducers( {
 	blocks,
 	isTyping,
-	isDraggingBlocks,
+	draggedBlocks,
 	isCaretWithinFormattedText,
 	selectionStart,
 	selectionEnd,
@@ -1639,6 +1663,7 @@ export default combineReducers( {
 	preferences,
 	lastBlockAttributesChange,
 	isNavigationMode,
+	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
 } );

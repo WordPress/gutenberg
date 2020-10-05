@@ -30,6 +30,7 @@ describe( 'WP Editor Meta Boxes', () => {
 		await publishPost();
 
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		await expect( page ).toClick( '#test_tinymce_id-html' );
 		await page.waitForSelector( '#test_tinymce_id' );

@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
-import { Button } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -41,7 +41,7 @@ export default function BlockParentSelector() {
 				className="block-editor-block-parent-selector"
 				key={ firstParentClientId }
 			>
-				<Button
+				<ToolbarButton
 					className="block-editor-block-parent-selector__button"
 					onClick={ () => selectBlock( firstParentClientId ) }
 					label={ sprintf(

@@ -59,7 +59,7 @@ function Layout() {
 
 ```js
 // Using ESNext syntax
-const { PluginArea } = wp.plugins;
+import { PluginArea } from '@wordpress/plugins';
 
 const Layout = () => (
 	<div>
@@ -167,7 +167,7 @@ unregisterPlugin( 'plugin-name' );
 
 ```js
 // Using ESNext syntax
-const { unregisterPlugin } = wp.plugins;
+import { unregisterPlugin } from '@wordpress/plugins';
 
 unregisterPlugin( 'plugin-name' );
 ```

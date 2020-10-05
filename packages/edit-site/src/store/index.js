@@ -14,7 +14,7 @@ import controls from './controls';
 import { STORE_KEY } from './constants';
 
 export default function registerEditSiteStore( initialState ) {
-	return registerStore( STORE_KEY, {
+	const store = registerStore( STORE_KEY, {
 		reducer,
 		actions,
 		selectors,
@@ -22,4 +22,8 @@ export default function registerEditSiteStore( initialState ) {
 		persist: [ 'preferences' ],
 		initialState,
 	} );
+
+	store.dispatch( actions.showHomepage() );
+
+	return store;
 }

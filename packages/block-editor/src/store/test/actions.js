@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { controls } from '@wordpress/data';
+
+/**
  * Internal dependencies
  */
 import {
@@ -9,7 +14,7 @@ import {
 	insertBlock,
 	insertBlocks,
 	mergeBlocks,
-	moveBlockToPosition,
+	moveBlocksToPosition,
 	multiSelect,
 	removeBlock,
 	removeBlocks,
@@ -24,13 +29,14 @@ import {
 	startTyping,
 	stopMultiSelect,
 	stopTyping,
+	startDraggingBlocks,
+	stopDraggingBlocks,
 	toggleBlockMode,
 	toggleSelection,
 	updateBlock,
 	updateBlockAttributes,
 	updateBlockListSettings,
 } from '../actions';
-import { select } from '../controls';
 
 describe( 'actions', () => {
 	describe( 'resetBlocks', () => {
@@ -140,19 +146,22 @@ describe( 'actions', () => {
 			// Skip getSettings select.
 			replaceBlockGenerator.next();
 
-			expect( replaceBlockGenerator.next().value ).toEqual( {
-				args: [ 'chicken' ],
-				selectorName: 'getBlockRootClientId',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( replaceBlockGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'getBlockRootClientId',
+					'chicken'
+				)
+			);
 
-			expect( replaceBlockGenerator.next().value ).toEqual( {
-				args: [ 'core/test-block', undefined ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( replaceBlockGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-block',
+					undefined
+				)
+			);
 
 			expect( replaceBlockGenerator.next( true ).value ).toEqual( {
 				type: 'REPLACE_BLOCKS',
@@ -161,12 +170,9 @@ describe( 'actions', () => {
 				time: expect.any( Number ),
 			} );
 
-			expect( replaceBlockGenerator.next().value ).toEqual( {
-				args: [],
-				selectorName: 'getBlockCount',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( replaceBlockGenerator.next().value ).toEqual(
+				controls.select( 'core/block-editor', 'getBlockCount' )
+			);
 
 			expect( replaceBlockGenerator.next( 1 ) ).toEqual( {
 				value: undefined,
@@ -193,33 +199,35 @@ describe( 'actions', () => {
 				blocks
 			);
 
-			expect( replaceBlockGenerator.next().value ).toEqual( {
-				args: [],
-				selectorName: 'getSettings',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( replaceBlockGenerator.next().value ).toEqual(
+				controls.select( 'core/block-editor', 'getSettings' )
+			);
 
-			expect( replaceBlockGenerator.next().value ).toEqual( {
-				args: [ 'chicken' ],
-				selectorName: 'getBlockRootClientId',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( replaceBlockGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'getBlockRootClientId',
+					'chicken'
+				)
+			);
 
-			expect( replaceBlockGenerator.next().value ).toEqual( {
-				args: [ 'core/test-ribs', undefined ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( replaceBlockGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-ribs',
+					undefined
+				)
+			);
 
-			expect( replaceBlockGenerator.next( true ).value ).toEqual( {
-				args: [ 'core/test-chicken', undefined ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( replaceBlockGenerator.next( true ).value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-chicken',
+					undefined
+				)
+			);
 
 			expect( replaceBlockGenerator.next( false ) ).toEqual( {
 				value: undefined,
@@ -247,26 +255,31 @@ describe( 'actions', () => {
 			// Skip getSettings select.
 			replaceBlockGenerator.next();
 
-			expect( replaceBlockGenerator.next().value ).toEqual( {
-				args: [ 'chicken' ],
-				selectorName: 'getBlockRootClientId',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( replaceBlockGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'getBlockRootClientId',
+					'chicken'
+				)
+			);
 
-			expect( replaceBlockGenerator.next().value ).toEqual( {
-				args: [ 'core/test-ribs', undefined ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( replaceBlockGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-ribs',
+					undefined
+				)
+			);
 
-			expect( replaceBlockGenerator.next( true ).value ).toEqual( {
-				args: [ 'core/test-chicken', undefined ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( replaceBlockGenerator.next( true ).value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-chicken',
+					undefined
+				)
+			);
 
 			expect( replaceBlockGenerator.next( true ).value ).toEqual( {
 				type: 'REPLACE_BLOCKS',
@@ -275,16 +288,52 @@ describe( 'actions', () => {
 				time: expect.any( Number ),
 			} );
 
-			expect( replaceBlockGenerator.next().value ).toEqual( {
-				args: [],
-				selectorName: 'getBlockCount',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( replaceBlockGenerator.next().value ).toEqual(
+				controls.select( 'core/block-editor', 'getBlockCount' )
+			);
 
 			expect( replaceBlockGenerator.next( 1 ) ).toEqual( {
 				value: undefined,
 				done: true,
+			} );
+		} );
+
+		it( 'should pass patternName through metadata to REPLACE_BLOCKS action', () => {
+			const blocks = [
+				{
+					clientId: 'ribs',
+					name: 'core/test-ribs',
+				},
+				{
+					clientId: 'chicken',
+					name: 'core/test-chicken',
+				},
+			];
+
+			const meta = { patternName: 'core/chicken-ribs-pattern' };
+
+			const replaceBlockGenerator = replaceBlocks(
+				[ 'chicken' ],
+				blocks,
+				null,
+				null,
+				meta
+			);
+
+			// Skip to action yield.
+			replaceBlockGenerator.next();
+			replaceBlockGenerator.next();
+			replaceBlockGenerator.next();
+			replaceBlockGenerator.next( true );
+
+			expect( replaceBlockGenerator.next( true ).value ).toEqual( {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'chicken' ],
+				blocks,
+				time: expect.any( Number ),
+				indexToSelect: null,
+				initialPosition: null,
+				meta: { patternName: 'core/chicken-ribs-pattern' },
 			} );
 		} );
 	} );
@@ -307,12 +356,14 @@ describe( 'actions', () => {
 			// Skip getSettings select.
 			insertBlockGenerator.next();
 
-			expect( insertBlockGenerator.next().value ).toEqual( {
-				args: [ 'core/test-block', 'testclientid' ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( insertBlockGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-block',
+					'testclientid'
+				)
+			);
 
 			expect( insertBlockGenerator.next( true ) ).toEqual( {
 				done: true,
@@ -351,12 +402,9 @@ describe( 'actions', () => {
 				false
 			);
 
-			expect( insertBlocksGenerator.next().value ).toEqual( {
-				args: [],
-				selectorName: 'getSettings',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( insertBlocksGenerator.next().value ).toEqual(
+				controls.select( 'core/block-editor', 'getSettings' )
+			);
 
 			expect(
 				insertBlocksGenerator.next( {
@@ -367,26 +415,32 @@ describe( 'actions', () => {
 						},
 					},
 				} ).value
-			).toEqual( {
-				args: [ 'core/test-ribs', 'testrootid' ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-ribs',
+					'testrootid'
+				)
+			);
 
-			expect( insertBlocksGenerator.next( true ).value ).toEqual( {
-				args: [ 'core/test-chicken', 'testrootid' ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( insertBlocksGenerator.next( true ).value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-chicken',
+					'testrootid'
+				)
+			);
 
-			expect( insertBlocksGenerator.next( true ).value ).toEqual( {
-				args: [ 'core/test-chicken-ribs', 'testrootid' ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( insertBlocksGenerator.next( true ).value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-chicken-ribs',
+					'testrootid'
+				)
+			);
 
 			expect( insertBlocksGenerator.next( true ) ).toEqual( {
 				done: true,
@@ -428,12 +482,9 @@ describe( 'actions', () => {
 				false
 			);
 
-			expect( insertBlocksGenerator.next().value ).toEqual( {
-				args: [],
-				selectorName: 'getSettings',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( insertBlocksGenerator.next().value ).toEqual(
+				controls.select( 'core/block-editor', 'getSettings' )
+			);
 
 			expect(
 				insertBlocksGenerator.next( {
@@ -443,12 +494,14 @@ describe( 'actions', () => {
 						},
 					},
 				} ).value
-			).toEqual( {
-				args: [ 'core/test-ribs', 'testrootid' ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-ribs',
+					'testrootid'
+				)
+			);
 
 			expect( insertBlocksGenerator.next( true ) ).toEqual( {
 				done: true,
@@ -492,26 +545,32 @@ describe( 'actions', () => {
 			// Skip getSettings select.
 			insertBlocksGenerator.next();
 
-			expect( insertBlocksGenerator.next().value ).toEqual( {
-				args: [ 'core/test-ribs', 'testrootid' ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( insertBlocksGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-ribs',
+					'testrootid'
+				)
+			);
 
-			expect( insertBlocksGenerator.next( true ).value ).toEqual( {
-				args: [ 'core/test-chicken', 'testrootid' ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( insertBlocksGenerator.next( true ).value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-chicken',
+					'testrootid'
+				)
+			);
 
-			expect( insertBlocksGenerator.next( false ).value ).toEqual( {
-				args: [ 'core/test-chicken-ribs', 'testrootid' ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( insertBlocksGenerator.next( false ).value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-chicken-ribs',
+					'testrootid'
+				)
+			);
 
 			expect( insertBlocksGenerator.next( true ) ).toEqual( {
 				done: true,
@@ -547,23 +606,95 @@ describe( 'actions', () => {
 			// Skip getSettings select.
 			insertBlocksGenerator.next();
 
-			expect( insertBlocksGenerator.next().value ).toEqual( {
-				args: [ 'core/test-ribs', 'testrootid' ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( insertBlocksGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-ribs',
+					'testrootid'
+				)
+			);
 
-			expect( insertBlocksGenerator.next( false ).value ).toEqual( {
-				args: [ 'core/test-chicken', 'testrootid' ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( insertBlocksGenerator.next( false ).value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-chicken',
+					'testrootid'
+				)
+			);
 
 			expect( insertBlocksGenerator.next( false ) ).toEqual( {
 				done: true,
 				value: undefined,
+			} );
+		} );
+
+		it( 'should pass patternName through metadata to INSERT_BLOCKS action', () => {
+			const ribsBlock = {
+				clientId: 'ribs',
+				name: 'core/test-ribs',
+			};
+			const chickenBlock = {
+				clientId: 'chicken',
+				name: 'core/test-chicken',
+			};
+			const chickenRibsBlock = {
+				clientId: 'chicken-ribs',
+				name: 'core/test-chicken-ribs',
+			};
+			const blocks = [ ribsBlock, chickenBlock, chickenRibsBlock ];
+			const meta = { patternName: 'core/chicken-ribs-pattern' };
+
+			const insertBlocksGenerator = insertBlocks(
+				blocks,
+				5,
+				'testrootid',
+				false,
+				meta
+			);
+
+			// Skip getSettings select.
+			insertBlocksGenerator.next();
+
+			expect( insertBlocksGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-ribs',
+					'testrootid'
+				)
+			);
+
+			expect( insertBlocksGenerator.next( true ).value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-chicken',
+					'testrootid'
+				)
+			);
+
+			expect( insertBlocksGenerator.next( false ).value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlockType',
+					'core/test-chicken-ribs',
+					'testrootid'
+				)
+			);
+
+			expect( insertBlocksGenerator.next( true ) ).toEqual( {
+				done: true,
+				value: {
+					type: 'INSERT_BLOCKS',
+					blocks: [ ribsBlock, chickenRibsBlock ],
+					index: 5,
+					rootClientId: 'testrootid',
+					time: expect.any( Number ),
+					updateSelection: false,
+					meta: { patternName: 'core/chicken-ribs-pattern' },
+				},
 			} );
 		} );
 	} );
@@ -605,61 +736,71 @@ describe( 'actions', () => {
 			const actions = Array.from( removeBlocks( clientIds ) );
 
 			expect( actions ).toEqual( [
-				select( 'core/block-editor', 'getBlockRootClientId', clientId ),
-				select( 'core/block-editor', 'getTemplateLock', undefined ),
+				controls.select(
+					'core/block-editor',
+					'getBlockRootClientId',
+					clientId
+				),
+				controls.select(
+					'core/block-editor',
+					'getTemplateLock',
+					undefined
+				),
 				selectPreviousBlock( clientId ),
 				{
 					type: 'REMOVE_BLOCKS',
 					clientIds,
 				},
-				select( 'core/block-editor', 'getBlockCount' ),
+				controls.select( 'core/block-editor', 'getBlockCount' ),
 			] );
 		} );
 	} );
 
-	describe( 'moveBlockToPosition', () => {
-		it( 'should yield MOVE_BLOCK_TO_POSITION action if locking is insert and move is not changing the root block', () => {
-			const moveBlockToPositionGenerator = moveBlockToPosition(
-				'chicken',
+	describe( 'moveBlocksToPosition', () => {
+		it( 'should yield MOVE_BLOCKS_TO_POSITION action if locking is insert and move is not changing the root block', () => {
+			const moveBlockToPositionGenerator = moveBlocksToPosition(
+				[ 'chicken' ],
 				'ribs',
 				'ribs',
 				5
 			);
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
-				args: [ 'ribs' ],
-				selectorName: 'getTemplateLock',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( moveBlockToPositionGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'getTemplateLock',
+					'ribs'
+				)
+			);
 
 			expect(
 				moveBlockToPositionGenerator.next( 'insert' ).value
 			).toEqual( {
-				type: 'MOVE_BLOCK_TO_POSITION',
+				type: 'MOVE_BLOCKS_TO_POSITION',
 				fromRootClientId: 'ribs',
 				toRootClientId: 'ribs',
-				clientId: 'chicken',
+				clientIds: [ 'chicken' ],
 				index: 5,
 			} );
 
 			expect( moveBlockToPositionGenerator.next().done ).toBe( true );
 		} );
 
-		it( 'should not yield MOVE_BLOCK_TO_POSITION action if locking is all', () => {
-			const moveBlockToPositionGenerator = moveBlockToPosition(
-				'chicken',
+		it( 'should not yield MOVE_BLOCKS_TO_POSITION action if locking is all', () => {
+			const moveBlockToPositionGenerator = moveBlocksToPosition(
+				[ 'chicken' ],
 				'ribs',
 				'ribs',
 				5
 			);
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
-				args: [ 'ribs' ],
-				selectorName: 'getTemplateLock',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( moveBlockToPositionGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'getTemplateLock',
+					'ribs'
+				)
+			);
 
 			expect( moveBlockToPositionGenerator.next( 'all' ) ).toEqual( {
 				done: true,
@@ -667,20 +808,21 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should not yield MOVE_BLOCK_TO_POSITION action if locking is insert and move is changing the root block', () => {
-			const moveBlockToPositionGenerator = moveBlockToPosition(
-				'chicken',
+		it( 'should not yield MOVE_BLOCKS_TO_POSITION action if locking is insert and move is changing the root block', () => {
+			const moveBlockToPositionGenerator = moveBlocksToPosition(
+				[ 'chicken' ],
 				'ribs',
 				'chicken-ribs',
 				5
 			);
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
-				args: [ 'ribs' ],
-				selectorName: 'getTemplateLock',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( moveBlockToPositionGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'getTemplateLock',
+					'ribs'
+				)
+			);
 
 			expect( moveBlockToPositionGenerator.next( 'insert' ) ).toEqual( {
 				done: true,
@@ -688,43 +830,36 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should yield MOVE_BLOCK_TO_POSITION action if there is not locking in the original root block and block can be inserted in the destination', () => {
-			const moveBlockToPositionGenerator = moveBlockToPosition(
-				'chicken',
+		it( 'should yield MOVE_BLOCKS_TO_POSITION action if there is not locking in the original root block and block can be inserted in the destination', () => {
+			const moveBlockToPositionGenerator = moveBlocksToPosition(
+				[ 'chicken' ],
 				'ribs',
 				'chicken-ribs',
 				5
 			);
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
-				args: [ 'ribs' ],
-				selectorName: 'getTemplateLock',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( moveBlockToPositionGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'getTemplateLock',
+					'ribs'
+				)
+			);
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
-				args: [ 'chicken' ],
-				selectorName: 'getBlockName',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
-
-			expect(
-				moveBlockToPositionGenerator.next( 'myblock/chicken-block' )
-					.value
-			).toEqual( {
-				args: [ 'myblock/chicken-block', 'chicken-ribs' ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( moveBlockToPositionGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlocks',
+					[ 'chicken' ],
+					'chicken-ribs'
+				)
+			);
 
 			expect( moveBlockToPositionGenerator.next( true ).value ).toEqual( {
-				type: 'MOVE_BLOCK_TO_POSITION',
+				type: 'MOVE_BLOCKS_TO_POSITION',
 				fromRootClientId: 'ribs',
 				toRootClientId: 'chicken-ribs',
-				clientId: 'chicken',
+				clientIds: [ 'chicken' ],
 				index: 5,
 			} );
 
@@ -734,42 +869,64 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should not yield MOVE_BLOCK_TO_POSITION action if there is not locking in the original root block and block can be inserted in the destination', () => {
-			const moveBlockToPositionGenerator = moveBlockToPosition(
-				'chicken',
+		it( 'should not yield MOVE_BLOCKS_TO_POSITION action if there is not locking in the original root block and block can be inserted in the destination', () => {
+			const moveBlockToPositionGenerator = moveBlocksToPosition(
+				[ 'chicken' ],
 				'ribs',
 				'chicken-ribs',
 				5
 			);
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
-				args: [ 'ribs' ],
-				selectorName: 'getTemplateLock',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( moveBlockToPositionGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'getTemplateLock',
+					'ribs'
+				)
+			);
 
-			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
-				args: [ 'chicken' ],
-				selectorName: 'getBlockName',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
-
-			expect(
-				moveBlockToPositionGenerator.next( 'myblock/chicken-block' )
-					.value
-			).toEqual( {
-				args: [ 'myblock/chicken-block', 'chicken-ribs' ],
-				selectorName: 'canInsertBlockType',
-				storeName: 'core/block-editor',
-				type: 'SELECT',
-			} );
+			expect( moveBlockToPositionGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'canInsertBlocks',
+					[ 'chicken' ],
+					'chicken-ribs'
+				)
+			);
 
 			expect( moveBlockToPositionGenerator.next( false ) ).toEqual( {
 				done: true,
 				value: undefined,
 			} );
+		} );
+	} );
+
+	describe( 'moveBlockToPosition', () => {
+		it( 'should yield MOVE_BLOCKS_TO_POSITION action with a single block', () => {
+			const moveBlockToPositionGenerator = moveBlocksToPosition(
+				'chicken',
+				'ribs',
+				'ribs',
+				5
+			);
+
+			expect( moveBlockToPositionGenerator.next().value ).toEqual(
+				controls.select(
+					'core/block-editor',
+					'getTemplateLock',
+					'ribs'
+				)
+			);
+
+			expect( moveBlockToPositionGenerator.next().value ).toEqual( {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				fromRootClientId: 'ribs',
+				toRootClientId: 'ribs',
+				clientIds: 'chicken',
+				index: 5,
+			} );
+
+			expect( moveBlockToPositionGenerator.next().done ).toBe( true );
 		} );
 	} );
 
@@ -780,14 +937,22 @@ describe( 'actions', () => {
 			const actions = Array.from( removeBlock( clientId ) );
 
 			expect( actions ).toEqual( [
-				select( 'core/block-editor', 'getBlockRootClientId', clientId ),
-				select( 'core/block-editor', 'getTemplateLock', undefined ),
+				controls.select(
+					'core/block-editor',
+					'getBlockRootClientId',
+					clientId
+				),
+				controls.select(
+					'core/block-editor',
+					'getTemplateLock',
+					undefined
+				),
 				selectPreviousBlock( clientId ),
 				{
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],
 				},
-				select( 'core/block-editor', 'getBlockCount' ),
+				controls.select( 'core/block-editor', 'getBlockCount' ),
 			] );
 		} );
 
@@ -797,13 +962,26 @@ describe( 'actions', () => {
 			const actions = Array.from( removeBlock( clientId, false ) );
 
 			expect( actions ).toEqual( [
-				select( 'core/block-editor', 'getBlockRootClientId', clientId ),
-				select( 'core/block-editor', 'getTemplateLock', undefined ),
+				controls.select(
+					'core/block-editor',
+					'getBlockRootClientId',
+					clientId
+				),
+				controls.select(
+					'core/block-editor',
+					'getTemplateLock',
+					undefined
+				),
+				controls.select(
+					'core/block-editor',
+					'getPreviousBlockClientId',
+					'myclientid'
+				),
 				{
 					type: 'REMOVE_BLOCKS',
 					clientIds: [ clientId ],
 				},
-				select( 'core/block-editor', 'getBlockCount' ),
+				controls.select( 'core/block-editor', 'getBlockCount' ),
 			] );
 		} );
 	} );
@@ -830,6 +1008,24 @@ describe( 'actions', () => {
 		it( 'should return the STOP_TYPING action', () => {
 			expect( stopTyping() ).toEqual( {
 				type: 'STOP_TYPING',
+			} );
+		} );
+	} );
+
+	describe( 'startDraggingBlocks', () => {
+		it( 'should return the START_DRAGGING_BLOCKS action with the list of clientIds passed', () => {
+			const clientIds = [ 'block-1', 'block-2', 'block-3' ];
+			expect( startDraggingBlocks( clientIds ) ).toEqual( {
+				type: 'START_DRAGGING_BLOCKS',
+				clientIds,
+			} );
+		} );
+	} );
+
+	describe( 'stopDraggingBlocks', () => {
+		it( 'should return the STOP_DRAGGING_BLOCKS action', () => {
+			expect( stopDraggingBlocks() ).toEqual( {
+				type: 'STOP_DRAGGING_BLOCKS',
 			} );
 		} );
 	} );

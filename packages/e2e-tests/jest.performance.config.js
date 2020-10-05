@@ -3,7 +3,7 @@ module.exports = {
 	testMatch: [ '**/performance/*.test.js' ],
 	setupFiles: [ '<rootDir>/config/gutenberg-phase.js' ],
 	setupFilesAfterEnv: [
-		'<rootDir>/config/setup-test-framework.js',
+		'<rootDir>/config/setup-performance-test.js',
 		'@wordpress/jest-console',
 		'@wordpress/jest-puppeteer-axe',
 		'expect-puppeteer',

@@ -24,7 +24,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 			originalName
 		);
 		actions.push(
-			<Button key="convert" onClick={ convertToHTML } isLarge isPrimary>
+			<Button key="convert" onClick={ convertToHTML } isPrimary>
 				{ __( 'Keep as HTML' ) }
 			</Button>
 		);

@@ -11,26 +11,53 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
-import { PanelBody, RangeControl } from '@wordpress/components';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import {
+	PanelBody,
+	__experimentalUnitControl as UnitControl,
+} from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 function ColumnEdit( {
-	attributes,
+	attributes: { verticalAlignment, width },
 	setAttributes,
-	updateAlignment,
-	hasChildBlocks,
+	clientId,
 } ) {
-	const { verticalAlignment, width } = attributes;
-
 	const classes = classnames( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
-	const hasWidth = Number.isFinite( width );
+	const { hasChildBlocks, rootClientId } = useSelect(
+		( select ) => {
+			const { getBlockOrder, getBlockRootClientId } = select(
+				'core/block-editor'
+			);
+
+			return {
+				hasChildBlocks: getBlockOrder( clientId ).length > 0,
+				rootClientId: getBlockRootClientId( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+
+	const updateAlignment = ( value ) => {
+		// Update own alignment.
+		setAttributes( { verticalAlignment: value } );
+		// Reset parent Columns block.
+		updateBlockAttributes( rootClientId, {
+			verticalAlignment: null,
+		} );
+	};
+
+	const blockProps = useBlockProps( {
+		className: classes,
+		style: width ? { flexBasis: width } : undefined,
+	} );
 
 	return (
 		<>
@@ -42,69 +69,36 @@ function ColumnEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Column settings' ) }>
-					<RangeControl
-						label={ __( 'Percentage width' ) }
+					<UnitControl
+						label={ __( 'Width' ) }
+						labelPosition="edge"
+						__unstableInputWidth="80px"
 						value={ width || '' }
 						onChange={ ( nextWidth ) => {
+							nextWidth =
+								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
 							setAttributes( { width: nextWidth } );
 						} }
-						min={ 0 }
-						max={ 100 }
-						step={ 0.1 }
-						required
-						allowReset
-						placeholder={
-							width === undefined ? __( 'Auto' ) : undefined
-						}
+						units={ [
+							{ value: '%', label: '%', default: '' },
+							{ value: 'px', label: 'px', default: '' },
+							{ value: 'em', label: 'em', default: '' },
+							{ value: 'rem', label: 'rem', default: '' },
+							{ value: 'vw', label: 'vw', default: '' },
+						] }
 					/>
 				</PanelBody>
 			</InspectorControls>
 			<InnerBlocks
 				templateLock={ false }
 				renderAppender={
-					hasChildBlocks
-						? undefined
-						: () => <InnerBlocks.ButtonBlockAppender />
+					hasChildBlocks ? undefined : InnerBlocks.ButtonBlockAppender
 				}
-				__experimentalTagName={ Block.div }
-				__experimentalPassedProps={ {
-					className: classes,
-					style: hasWidth ? { flexBasis: width + '%' } : undefined,
-				} }
+				__experimentalTagName="div"
+				__experimentalPassedProps={ blockProps }
 			/>
 		</>
 	);
 }
 
-export default compose(
-	withSelect( ( select, ownProps ) => {
-		const { clientId } = ownProps;
-		const { getBlockOrder } = select( 'core/block-editor' );
-
-		return {
-			hasChildBlocks: getBlockOrder( clientId ).length > 0,
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps, registry ) => {
-		return {
-			updateAlignment( verticalAlignment ) {
-				const { clientId, setAttributes } = ownProps;
-				const { updateBlockAttributes } = dispatch(
-					'core/block-editor'
-				);
-				const { getBlockRootClientId } = registry.select(
-					'core/block-editor'
-				);
-
-				// Update own alignment.
-				setAttributes( { verticalAlignment } );
-
-				// Reset Parent Columns Block
-				const rootClientId = getBlockRootClientId( clientId );
-				updateBlockAttributes( rootClientId, {
-					verticalAlignment: null,
-				} );
-			},
-		};
-	} )
-)( ColumnEdit );
+export default ColumnEdit;

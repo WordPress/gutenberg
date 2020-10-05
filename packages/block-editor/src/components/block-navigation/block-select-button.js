@@ -28,10 +28,13 @@ function BlockNavigationBlockSelectButton(
 		isSelected,
 		onClick,
 		position,
-		siblingCount,
+		siblingBlockCount,
 		level,
 		tabIndex,
 		onFocus,
+		onDragStart,
+		onDragEnd,
+		draggable,
 	},
 	ref
 ) {
@@ -43,7 +46,7 @@ function BlockNavigationBlockSelectButton(
 	const descriptionId = `block-navigation-block-select-button__${ instanceId }`;
 	const blockPositionDescription = getBlockPositionDescription(
 		position,
-		siblingCount,
+		siblingBlockCount,
 		level
 	);
 
@@ -59,6 +62,9 @@ function BlockNavigationBlockSelectButton(
 				ref={ ref }
 				tabIndex={ tabIndex }
 				onFocus={ onFocus }
+				onDragStart={ onDragStart }
+				onDragEnd={ onDragEnd }
+				draggable={ draggable }
 			>
 				<BlockIcon icon={ blockType.icon } showColors />
 				{ blockDisplayName }

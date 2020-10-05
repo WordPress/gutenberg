@@ -142,6 +142,13 @@ Whether or not the panel will start open.
 -   Required: No
 -   Default: true
 
+###### children
+
+The rendered children. If the children is a `Function`, it will be called with an object with the `opened` property and return its value.
+
+-   Type: `React.ReactNode | Function`
+-   Required: No
+
 ---
 
 #### PanelRow

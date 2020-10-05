@@ -18,6 +18,7 @@ import './plugins';
 import './hooks';
 import registerEditSiteStore from './store';
 import Editor from './components/editor';
+import { findTemplate } from './utils';
 
 const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
 	apiFetch( {
@@ -52,12 +53,10 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
  * @param {Object} settings Editor settings.
  */
 export function initialize( id, settings ) {
+	findTemplate.siteUrl = settings.siteUrl;
 	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
 
-	const initialState = settings.editSiteInitialState;
-	delete settings.editSiteInitialState;
-	initialState.settings = settings;
-	registerEditSiteStore( initialState );
+	registerEditSiteStore( { settings } );
 
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
@@ -68,3 +67,4 @@ export function initialize( id, settings ) {
 }
 
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
+export { default as __experimentalNavigationToggle } from './components/header/navigation-toggle';

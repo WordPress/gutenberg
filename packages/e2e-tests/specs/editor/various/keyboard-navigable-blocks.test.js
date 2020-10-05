@@ -7,6 +7,7 @@ import {
 	pressKeyWithModifier,
 	clickBlockAppender,
 	getEditedPostContent,
+	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
 async function getActiveLabel() {
@@ -20,7 +21,6 @@ async function getActiveLabel() {
 
 const navigateToContentEditorTop = async () => {
 	// Use 'Ctrl+`' to return to the top of the editor
-	await pressKeyWithModifier( 'ctrl', '`' );
 	await pressKeyWithModifier( 'ctrl', '`' );
 	await pressKeyWithModifier( 'ctrl', '`' );
 };
@@ -89,10 +89,7 @@ describe( 'Order of block keyboard navigation', () => {
 
 		// Select the middle block.
 		await page.keyboard.press( 'ArrowUp' );
-		// Move the mouse to show the block toolbar
-		await page.mouse.move( 0, 0 );
-		await page.mouse.move( 10, 10 );
-
+		await showBlockToolbar();
 		await navigateToContentEditorTop();
 		await tabThroughParagraphBlock( 'Paragraph 1' );
 
@@ -189,7 +186,7 @@ describe( 'Order of block keyboard navigation', () => {
 		expect( await getActiveLabel() ).toBe( 'Multiple selected blocks' );
 
 		await page.keyboard.press( 'Tab' );
-		await expect( await getActiveLabel() ).toBe( 'Document' );
+		await expect( await getActiveLabel() ).toBe( 'Post' );
 
 		await pressKeyWithModifier( 'shift', 'Tab' );
 		await expect( await getActiveLabel() ).toBe(

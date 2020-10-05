@@ -2,6 +2,8 @@
  * External dependencies
  */
 import { size } from 'lodash';
+import classnames from 'classnames';
+
 /**
  * WordPress dependencies
  */
@@ -18,6 +20,7 @@ import { plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import InserterMenu from './menu';
+import QuickInserter from './quick-inserter';
 
 const defaultRenderToggle = ( {
 	onToggle,
@@ -25,7 +28,7 @@ const defaultRenderToggle = ( {
 	isOpen,
 	blockTitle,
 	hasSingleBlockType,
-	toggleProps,
+	toggleProps = {},
 } ) => {
 	let label;
 	if ( hasSingleBlockType ) {
@@ -37,17 +40,30 @@ const defaultRenderToggle = ( {
 	} else {
 		label = _x( 'Add block', 'Generic label for block inserter button' );
 	}
+
+	const { onClick, ...rest } = toggleProps;
+
+	// Handle both onClick functions from the toggle and the parent component
+	function handleClick( event ) {
+		if ( onToggle ) {
+			onToggle( event );
+		}
+		if ( onClick ) {
+			onClick( event );
+		}
+	}
+
 	return (
 		<Button
 			icon={ plus }
 			label={ label }
 			tooltipPosition="bottom"
-			onClick={ onToggle }
+			onClick={ handleClick }
 			className="block-editor-inserter__toggle"
 			aria-haspopup={ ! hasSingleBlockType ? 'true' : false }
 			aria-expanded={ ! hasSingleBlockType ? isOpen : false }
 			disabled={ disabled }
-			{ ...toggleProps }
+			{ ...rest }
 		/>
 	);
 };
@@ -116,7 +132,23 @@ class Inserter extends Component {
 			isAppender,
 			showInserterHelpPanel,
 			__experimentalSelectBlockOnInsert: selectBlockOnInsert,
+
+			// This prop is experimental to give some time for the quick inserter to mature
+			// Feel free to make them stable after a few releases.
+			__experimentalIsQuick: isQuick,
 		} = this.props;
+
+		if ( isQuick ) {
+			return (
+				<QuickInserter
+					onSelect={ onClose }
+					rootClientId={ rootClientId }
+					clientId={ clientId }
+					isAppender={ isAppender }
+					selectBlockOnInsert={ selectBlockOnInsert }
+				/>
+			);
+		}
 
 		return (
 			<InserterMenu
@@ -135,6 +167,7 @@ class Inserter extends Component {
 			position,
 			hasSingleBlockType,
 			insertOnlyAllowedBlock,
+			__experimentalIsQuick: isQuick,
 		} = this.props;
 
 		if ( hasSingleBlockType ) {
@@ -144,7 +177,10 @@ class Inserter extends Component {
 		return (
 			<Dropdown
 				className="block-editor-inserter"
-				contentClassName="block-editor-inserter__popover"
+				contentClassName={ classnames(
+					'block-editor-inserter__popover',
+					{ 'is-quick': isQuick }
+				) }
 				position={ position }
 				onToggle={ this.onToggle }
 				expandOnMobile
@@ -162,14 +198,11 @@ export default compose( [
 			getBlockRootClientId,
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
-			getBlockSelectionEnd,
 		} = select( 'core/block-editor' );
 		const { getBlockVariations } = select( 'core/blocks' );
 
 		rootClientId =
-			rootClientId ||
-			getBlockRootClientId( clientId || getBlockSelectionEnd() ) ||
-			undefined;
+			rootClientId || getBlockRootClientId( clientId ) || undefined;
 
 		const allowedBlocks = __experimentalGetAllowedBlocks( rootClientId );
 

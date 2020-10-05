@@ -6,14 +6,17 @@ import {
 	insertBlock,
 	publishPost,
 	visitAdminPage,
+	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { useExperimentalFeatures } from '../../experimental-features';
-import { trashExistingPosts } from '../../config/setup-test-framework';
+import {
+	useExperimentalFeatures,
+	openNavigation,
+} from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -21,9 +24,12 @@ describe( 'Multi-entity save flow', () => {
 	const checkboxInputSelector = '.components-checkbox-control__input';
 	const entitiesSaveSelector = '.editor-entities-saved-states__save-button';
 	const templatePartSelector = '*[data-type="core/template-part"]';
-	const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
+	const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-block-list__layout`;
 	const savePanelSelector = '.entities-saved-states__panel';
-	const closePanelButtonSelector = 'button[aria-label="Close panel"]';
+	const closePanelButtonSelector =
+		'.editor-post-publish-panel__header-cancel-button button';
+	const createNewButtonSelector =
+		'//button[contains(text(), "New template part")]';
 
 	// Reusable assertions across Post/Site editors.
 	const assertAllBoxesChecked = async () => {
@@ -57,8 +63,8 @@ describe( 'Multi-entity save flow', () => {
 	] );
 
 	beforeAll( async () => {
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 
 	describe( 'Post Editor', () => {
@@ -108,18 +114,25 @@ describe( 'Multi-entity save flow', () => {
 			it( 'Should trigger multi-entity save button once template part edited', async () => {
 				// Create new template part.
 				await insertBlock( 'Template Part' );
+				const [ createNewButton ] = await page.$x(
+					createNewButtonSelector
+				);
+				await createNewButton.click();
+				await page.waitForSelector( activatedTemplatePartSelector );
+				await page.keyboard.press( 'Tab' );
 				await page.keyboard.type( 'test-template-part' );
-				await page.keyboard.press( 'Tab' );
-				await page.keyboard.type( 'test-theme' );
-				await page.keyboard.press( 'Tab' );
-				await page.keyboard.press( 'Enter' );
 
 				// Make some changes in new Template Part.
-				await page.waitForSelector( activatedTemplatePartSelector );
-				await page.click( templatePartSelector );
+				await page.click( '.block-editor-button-block-appender' );
+				await page.click( '.editor-block-list-item-paragraph' );
 				await page.keyboard.type( 'some words...' );
 
 				await assertMultiSaveEnabled();
+
+				// TODO: Remove when toolbar supports text fields
+				expect( console ).toHaveWarnedWith(
+					'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
+				);
 			} );
 
 			it( 'Should only have save panel a11y button active after child entities edited', async () => {
@@ -212,8 +225,6 @@ describe( 'Multi-entity save flow', () => {
 		const saveSiteSelector = '.edit-site-save-button__button';
 		const activeSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=false]`;
 		const disabledSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=true]`;
-		const templateDropdownSelector =
-			'.components-dropdown-menu__toggle[aria-label="Switch Template"]';
 		const saveA11ySelector = '.edit-site-editor__toggle-save-panel-button';
 
 		it( 'Should be enabled after edits', async () => {
@@ -224,8 +235,8 @@ describe( 'Multi-entity save flow', () => {
 			await visitAdminPage( 'admin.php', query );
 
 			// Ensure we are on 'front-page' demo template.
-			await page.click( templateDropdownSelector );
-			const [ demoTemplateButton ] = await page.$x(
+			await openNavigation();
+			const demoTemplateButton = await page.waitForXPath(
 				demoTemplateSelector
 			);
 			await demoTemplateButton.click();

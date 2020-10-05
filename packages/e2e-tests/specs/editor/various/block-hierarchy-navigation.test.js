@@ -30,12 +30,12 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'First column' );
 
 		// Navigate to the columns blocks.
-		await page.click( '[aria-label="Block navigation"]' );
+		await page.click( '[aria-label="Outline"]' );
 		const columnsBlockMenuItem = (
 			await page.$x(
 				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Columns')]"
@@ -46,7 +46,7 @@ describe( 'Navigating the block hierarchy', () => {
 		// Tweak the columns count.
 		await openDocumentSettingsSidebar();
 		await page.focus(
-			'.block-editor-block-inspector .components-range-control__number[aria-label="Columns"]'
+			'.block-editor-block-inspector [aria-label="Columns"][type="number"]'
 		);
 		await page.keyboard.down( 'Shift' );
 		await page.keyboard.press( 'ArrowLeft' );
@@ -54,7 +54,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.type( '3' );
 
 		// Navigate to the last column block.
-		await page.click( '[aria-label="Block navigation"]' );
+		await page.click( '[aria-label="Outline"]' );
 		const lastColumnsBlockMenuItem = (
 			await page.$x(
 				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Column')]"
@@ -66,7 +66,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'Third column' );
 
@@ -82,7 +82,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'First column' );
 
@@ -109,7 +109,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.press( 'Tab' ); // Tab to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
-		await pressKeyTimes( 'Tab', 3 ); // Tab to paragraph result.
+		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
 		await page.keyboard.press( 'Enter' ); // Insert paragraph.
 		await page.keyboard.type( 'Third column' );
 
@@ -159,8 +159,8 @@ describe( 'Navigating the block hierarchy', () => {
 		// Unselect the blocks
 		await page.click( '.editor-post-title' );
 
-		// Try selecting the group block using the block navigation
-		await page.click( '[aria-label="Block navigation"]' );
+		// Try selecting the group block using the Outline
+		await page.click( '[aria-label="Outline"]' );
 		const groupMenuItem = (
 			await page.$x(
 				"//button[contains(@class,'block-editor-block-navigation-block-select-button') and contains(text(), 'Group')]"

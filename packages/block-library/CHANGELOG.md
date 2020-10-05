@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 2.23.0 (2020-09-03)
+
+### Enhancement
+
+- Site title is now a link.
+
+### New Features
+
+- Add heading level controls to Site Title block.
+
 ## 2.12.0 (2020-01-13)
 
 ### Bug Fixes

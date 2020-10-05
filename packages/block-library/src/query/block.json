@@ -1,4 +1,5 @@
 {
+	"apiVersion": 2,
 	"name": "core/query",
 	"category": "design",
 	"attributes": {
@@ -8,10 +9,15 @@
 		"query": {
 			"type": "object",
 			"default": {
-				"perPage": 3,
+				"perPage": null,
 				"pages": 1,
 				"offset": 0,
-				"categoryIds": []
+				"categoryIds": [],
+				"tagIds": [],
+				"order": "desc",
+				"orderBy": "date",
+				"author": "",
+				"search": ""
 			}
 		}
 	},

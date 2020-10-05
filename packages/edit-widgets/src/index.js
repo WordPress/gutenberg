@@ -1,6 +1,10 @@
 /**
  * WordPress dependencies
  */
+import {
+	registerBlockType,
+	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
+} from '@wordpress/blocks';
 import '@wordpress/notices';
 import { render } from '@wordpress/element';
 import {
@@ -11,9 +15,11 @@ import {
 /**
  * Internal dependencies
  */
+import './store';
 import './hooks';
+import { create as createLegacyWidget } from './blocks/legacy-widget';
+import * as widgetArea from './blocks/widget-area';
 import EditWidgetsInitializer from './components/edit-widgets-initializer';
-import CustomizerEditWidgetsInitializer from './components/customizer-edit-widgets-initializer';
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -25,6 +31,8 @@ export function initialize( id, settings ) {
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
+		registerBlock( createLegacyWidget( settings ) );
+		registerBlock( widgetArea );
 	}
 	render(
 		<EditWidgetsInitializer settings={ settings } />,
@@ -33,18 +41,18 @@ export function initialize( id, settings ) {
 }
 
 /**
- * Initializes the block editor in the widgets Customizer section.
+ * Function to register an individual block.
  *
- * @param {string} id       ID of the root element to render the section in.
- * @param {Object} settings Block editor settings.
+ * @param {Object} block The block to be registered.
+ *
  */
-export function customizerInitialize( id, settings ) {
-	registerCoreBlocks();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+const registerBlock = ( block ) => {
+	if ( ! block ) {
+		return;
 	}
-	render(
-		<CustomizerEditWidgetsInitializer settings={ settings } />,
-		document.getElementById( id )
-	);
-}
+	const { metadata, settings, name } = block;
+	if ( metadata ) {
+		unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } );
+	}
+	registerBlockType( name, settings );
+};

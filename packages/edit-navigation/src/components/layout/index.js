@@ -6,56 +6,87 @@ import {
 	FocusReturnProvider,
 	Popover,
 	SlotFillProvider,
-	TabPanel,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import {
+	BlockEditorKeyboardShortcuts,
+	BlockEditorProvider,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
+import useNavigationEditor from './use-navigation-editor';
+import useNavigationBlockEditor from './use-navigation-block-editor';
+import useMenuNotifications from './use-menu-notifications';
+import ErrorBoundary from '../error-boundary';
+import NavigationEditorShortcuts from './shortcuts';
+import Header from '../header';
 import Notices from '../notices';
-import MenusEditor from '../menus-editor';
-import MenuLocationsEditor from '../menu-locations-editor';
+import Toolbar from '../toolbar';
+import Editor from '../editor';
+import InspectorAdditions from '../inspector-additions';
 
 export default function Layout( { blockEditorSettings } ) {
+	const {
+		menus,
+		selectedMenuId,
+		navigationPost,
+		selectMenu,
+		deleteMenu,
+	} = useNavigationEditor();
+
+	const [ blocks, onInput, onChange ] = useNavigationBlockEditor(
+		navigationPost
+	);
+
+	useMenuNotifications( selectedMenuId );
+
 	return (
-		<>
+		<ErrorBoundary>
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<FocusReturnProvider>
+						<BlockEditorKeyboardShortcuts.Register />
+						<NavigationEditorShortcuts.Register />
+
 						<Notices />
-						<TabPanel
-							className="edit-navigation-layout__tab-panel"
-							tabs={ [
-								{
-									name: 'menus',
-									title: __( 'Edit Navigation' ),
-								},
-								{
-									name: 'menu-locations',
-									title: __( 'Manage Locations' ),
-								},
-							] }
-						>
-							{ ( tab ) => (
-								<>
-									{ tab.name === 'menus' && (
-										<MenusEditor
-											blockEditorSettings={
-												blockEditorSettings
-											}
-										/>
-									) }
-									{ tab.name === 'menu-locations' && (
-										<MenuLocationsEditor />
-									) }
-								</>
-							) }
-						</TabPanel>
+
+						<div className="edit-navigation-layout">
+							<Header
+								menus={ menus }
+								selectedMenuId={ selectedMenuId }
+								onSelectMenu={ selectMenu }
+							/>
+
+							<BlockEditorProvider
+								value={ blocks }
+								onInput={ onInput }
+								onChange={ onChange }
+								settings={ {
+									...blockEditorSettings,
+									templateLock: 'all',
+									hasFixedToolbar: true,
+								} }
+							>
+								<Toolbar
+									isPending={ ! navigationPost }
+									navigationPost={ navigationPost }
+								/>
+								<Editor
+									isPending={ ! navigationPost }
+									blocks={ blocks }
+								/>
+								<InspectorAdditions
+									menuId={ selectedMenuId }
+									onDeleteMenu={ deleteMenu }
+								/>
+							</BlockEditorProvider>
+						</div>
+
 						<Popover.Slot />
 					</FocusReturnProvider>
 				</DropZoneProvider>
 			</SlotFillProvider>
-		</>
+		</ErrorBoundary>
 	);
 }

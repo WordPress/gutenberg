@@ -40,8 +40,8 @@ export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
  * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
- * const { __ } = wp.i18n;
- * const { PluginPostStatusInfo } = wp.editPost;
+ * import { __ } from '@wordpress/i18n';
+ * import { PluginPostStatusInfo } from '@wordpress/edit-post';
  *
  * const MyPluginPostStatusInfo = () => (
  * 	<PluginPostStatusInfo

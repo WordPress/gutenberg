@@ -68,8 +68,7 @@
 			"default": true
 		},
 		"linkTo": {
-			"type": "string",
-			"default": "none"
+			"type": "string"
 		},
 		"sizeSlug": {
 			"type": "string",
@@ -77,6 +76,7 @@
 		}
 	},
 	"supports": {
+		"anchor": true,
 		"align": true
 	}
 }

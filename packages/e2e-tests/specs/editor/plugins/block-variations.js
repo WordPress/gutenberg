@@ -41,14 +41,14 @@ describe( 'Block variations', () => {
 		).toHaveLength( 1 );
 	};
 
-	test( 'Search for the overriden default Quote block', async () => {
+	test( 'Search for the overridden default Quote block', async () => {
 		await searchForBlock( 'Quote' );
 
 		expect( await page.$( '.editor-block-list-item-quote' ) ).toBeNull();
 		expectInserterItem( 'quote', 'Large Quote', 'large' );
 	} );
 
-	test( 'Insert the overriden default Quote block variation', async () => {
+	test( 'Insert the overridden default Quote block variation', async () => {
 		await insertBlock( 'Large Quote' );
 
 		expect(
@@ -58,7 +58,20 @@ describe( 'Block variations', () => {
 		).toBeDefined();
 	} );
 
-	test( 'Search for the Paragraph block with 2 additioanl variations', async () => {
+	test( 'Insert the Large Quote block variation with slash command', async () => {
+		await insertBlock( 'Paragraph' );
+
+		await page.keyboard.type( '/large' );
+		await page.keyboard.press( 'Enter' );
+
+		expect(
+			await page.$(
+				'.wp-block[data-type="core/quote"] blockquote.is-style-large'
+			)
+		).toBeDefined();
+	} );
+
+	test( 'Search for the Paragraph block with 2 additional variations', async () => {
 		await searchForBlock( 'Paragraph' );
 
 		expectInserterItem( 'core/paragraph', 'Paragraph' );

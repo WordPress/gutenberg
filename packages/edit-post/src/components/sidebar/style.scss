@@ -1,13 +1,23 @@
 .components-panel__header.edit-post-sidebar__panel-tabs {
 	justify-content: flex-start;
 	padding-left: 0;
-	padding-right: $grid-unit-05;
+	padding-right: $grid-unit-20;
 	border-top: 0;
 	margin-top: 0;
 
+	ul {
+		display: flex;
+	}
+	li {
+		margin: 0;
+	}
+
 	.components-button.has-icon {
 		display: none;
-		margin-left: auto;
+		margin: 0 0 0 auto;
+		padding: 0;
+		min-width: $icon-size;
+		height: $icon-size;
 
 		@include break-medium() {
 			display: flex;

@@ -86,7 +86,7 @@ describe( 'Edit', () => {
 		registerBlockType( 'core/test-block', {
 			category: 'text',
 			title: 'block title',
-			context: [ 'value' ],
+			usesContext: [ 'value' ],
 			edit,
 			save: noop,
 		} );
@@ -104,12 +104,10 @@ describe( 'Edit', () => {
 		it( 'should assign context', () => {
 			const edit = ( { context } ) => context.value;
 			registerBlockType( 'core/test-block', {
+				apiVersion: 2,
 				category: 'text',
 				title: 'block title',
-				context: [ 'value' ],
-				supports: {
-					lightBlockWrapper: true,
-				},
+				usesContext: [ 'value' ],
 				edit,
 				save: noop,
 			} );

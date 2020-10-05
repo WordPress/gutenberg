@@ -25,6 +25,7 @@ import {
 	TextControl,
 	ToggleControl,
 	ToolbarGroup,
+	ToolbarItem,
 } from '@wordpress/components';
 import {
 	alignLeft,
@@ -82,17 +83,17 @@ const BACKGROUND_COLORS = [
 const ALIGNMENT_CONTROLS = [
 	{
 		icon: alignLeft,
-		title: __( 'Align Column Left' ),
+		title: __( 'Align column left' ),
 		align: 'left',
 	},
 	{
 		icon: alignCenter,
-		title: __( 'Align Column Center' ),
+		title: __( 'Align column center' ),
 		align: 'center',
 	},
 	{
 		icon: alignRight,
-		title: __( 'Align Column Right' ),
+		title: __( 'Align column right' ),
 		align: 'right',
 	},
 ];
@@ -290,14 +291,23 @@ export class TableEdit extends Component {
 
 		const { attributes, setAttributes } = this.props;
 		const { sectionName, rowIndex } = selectedCell;
+		const newRowIndex = rowIndex + delta;
 
-		this.setState( { selectedCell: null } );
 		setAttributes(
 			insertRow( attributes, {
 				sectionName,
-				rowIndex: rowIndex + delta,
+				rowIndex: newRowIndex,
 			} )
 		);
+		// Select the first cell of the new row
+		this.setState( {
+			selectedCell: {
+				sectionName,
+				rowIndex: newRowIndex,
+				columnIndex: 0,
+				type: 'cell',
+			},
+		} );
 	}
 
 	/**
@@ -345,13 +355,21 @@ export class TableEdit extends Component {
 
 		const { attributes, setAttributes } = this.props;
 		const { columnIndex } = selectedCell;
+		const newColumnIndex = columnIndex + delta;
 
-		this.setState( { selectedCell: null } );
 		setAttributes(
 			insertColumn( attributes, {
-				columnIndex: columnIndex + delta,
+				columnIndex: newColumnIndex,
 			} )
 		);
+		// Select the first cell of the new column
+		this.setState( {
+			selectedCell: {
+				rowIndex: 0,
+				columnIndex: newColumnIndex,
+				type: 'cell',
+			},
+		} );
 	}
 
 	/**
@@ -417,37 +435,37 @@ export class TableEdit extends Component {
 		return [
 			{
 				icon: tableRowBefore,
-				title: __( 'Add Row Before' ),
+				title: __( 'Insert row before' ),
 				isDisabled: ! selectedCell,
 				onClick: this.onInsertRowBefore,
 			},
 			{
 				icon: tableRowAfter,
-				title: __( 'Add Row After' ),
+				title: __( 'Insert row after' ),
 				isDisabled: ! selectedCell,
 				onClick: this.onInsertRowAfter,
 			},
 			{
 				icon: tableRowDelete,
-				title: __( 'Delete Row' ),
+				title: __( 'Delete row' ),
 				isDisabled: ! selectedCell,
 				onClick: this.onDeleteRow,
 			},
 			{
 				icon: tableColumnBefore,
-				title: __( 'Add Column Before' ),
+				title: __( 'Insert column before' ),
 				isDisabled: ! selectedCell,
 				onClick: this.onInsertColumnBefore,
 			},
 			{
 				icon: tableColumnAfter,
-				title: __( 'Add Column After' ),
+				title: __( 'Insert column after' ),
 				isDisabled: ! selectedCell,
 				onClick: this.onInsertColumnAfter,
 			},
 			{
 				icon: tableColumnDelete,
-				title: __( 'Delete Column' ),
+				title: __( 'Delete column' ),
 				isDisabled: ! selectedCell,
 				onClick: this.onDeleteColumn,
 			},
@@ -562,7 +580,7 @@ export class TableEdit extends Component {
 					>
 						<TextControl
 							type="number"
-							label={ __( 'Column Count' ) }
+							label={ __( 'Column count' ) }
 							value={ initialColumnCount }
 							onChange={ this.onChangeInitialColumnCount }
 							min="1"
@@ -570,7 +588,7 @@ export class TableEdit extends Component {
 						/>
 						<TextControl
 							type="number"
-							label={ __( 'Row Count' ) }
+							label={ __( 'Row count' ) }
 							value={ initialRowCount }
 							onChange={ this.onChangeInitialRowCount }
 							min="1"
@@ -597,12 +615,17 @@ export class TableEdit extends Component {
 			<>
 				<BlockControls>
 					<ToolbarGroup>
-						<DropdownMenu
-							hasArrowIndicator
-							icon={ table }
-							label={ __( 'Edit table' ) }
-							controls={ this.getTableControls() }
-						/>
+						<ToolbarItem>
+							{ ( toggleProps ) => (
+								<DropdownMenu
+									hasArrowIndicator
+									icon={ table }
+									toggleProps={ toggleProps }
+									label={ __( 'Edit table' ) }
+									controls={ this.getTableControls() }
+								/>
+							) }
+						</ToolbarItem>
 					</ToolbarGroup>
 					<AlignmentToolbar
 						label={ __( 'Change column alignment' ) }

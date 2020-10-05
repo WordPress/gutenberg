@@ -7,12 +7,12 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { subscribeAndroidModalClosed } from '@wordpress/react-native-bridge';
 
 /**
  * External dependencies
  */
 import { Modal, Platform, View, SafeAreaView } from 'react-native';
-import { subscribeAndroidModalClosed } from 'react-native-gutenberg-bridge';
 
 /**
  * Internal dependencies
@@ -46,15 +46,11 @@ const BlockPreview = ( { blocks } ) => {
 };
 BlockPreview.displayName = 'BlockPreview';
 
-const Preview = ( props ) => {
+const ModalPreview = ( props ) => {
 	const { template, onDismiss, onApply } = props;
 	const previewContainerStyle = usePreferredColorSchemeStyle(
 		styles.previewContainer,
 		styles.previewContainerDark
-	);
-	const previewContentStyle = usePreferredColorSchemeStyle(
-		styles.previewContent,
-		styles.previewContentDark
 	);
 	const androidModalClosedSubscription = useRef();
 
@@ -105,13 +101,28 @@ const Preview = ( props ) => {
 					title={ template.name }
 					subtitle={ __( 'Template Preview' ) }
 				/>
-				<View style={ previewContentStyle }>
-					<BlockPreview blocks={ template.blocks } />
-				</View>
+				<Preview blocks={ template.blocks } />
 			</SafeAreaView>
 		</Modal>
 	);
 };
-Preview.displayName = 'TemplatePreview';
+ModalPreview.displayName = 'TemplatePreview';
 
-export default Preview;
+export const Preview = ( props ) => {
+	const { blocks } = props;
+	const previewContentStyle = usePreferredColorSchemeStyle(
+		styles.previewContent,
+		styles.previewContentDark
+	);
+
+	if ( blocks === undefined ) {
+		return null;
+	}
+	return (
+		<View style={ previewContentStyle }>
+			<BlockPreview blocks={ blocks } />
+		</View>
+	);
+};
+
+export default ModalPreview;

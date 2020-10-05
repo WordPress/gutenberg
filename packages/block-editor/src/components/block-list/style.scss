@@ -1,15 +1,4 @@
 .block-editor-block-list__layout .block-editor-block-list__block { // Needs specificity to override inherited styles.
-	// While block is being dragged, dim the slot dragged from, and hide some UI.
-	&.is-dragging {
-		> * {
-			background: $light-gray-100;
-		}
-
-		> * > * {
-			visibility: hidden;
-		}
-	}
-
 	.reusable-block-edit-panel * {
 		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
 	}
@@ -75,12 +64,12 @@
 			right: $border-width;
 
 			// 2px outside.
-			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
+			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 
 			// Show a light color for dark themes.
 			.is-dark-theme & {
-				box-shadow: 0 0 0 $border-width-focus $blue-medium-focus-dark;
+				box-shadow: 0 0 0 $border-width-focus $dark-theme-focus;
 			}
 		}
 	}
@@ -96,6 +85,11 @@
 			opacity: 1;
 		}
 	}
+}
+
+.block-editor-block-list__layout .block-editor-block-list__block,
+.block-editor-block-list__layout .block-list-appender {
+	position: relative;
 
 	// Between-blocks dropzone line indicator.
 	&.is-drop-target::before {
@@ -104,13 +98,21 @@
 		z-index: 0;
 		pointer-events: none;
 		transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
+		top: -$default-block-margin / 2;
 		right: 0;
 		left: 0;
-		top: -$default-block-margin / 2;
-		border-top: 4px solid $blue-medium-focus;
+		border-top: 4px solid var(--wp-admin-theme-color);
+	}
+
+	&.is-drop-target.is-dropping-horizontally::before {
+		top: 0;
+		bottom: 0;
+		// Drop target border-width plus a couple of pixels so that the border looks between blocks.
+		left: -6px;
+		border-top: none;
+		border-left: 4px solid var(--wp-admin-theme-color);
 	}
 }
-
 
 /**
  * Cross-Block Selection
@@ -122,6 +124,7 @@
 	// The primary indicator of selection in text is the native selection marker.
 	// When selecting multiple blocks, we provide an additional selection indicator.
 	.is-navigate-mode & .block-editor-block-list__block.is-selected,
+	.is-navigate-mode & .block-editor-block-list__block.is-hovered,
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-multi-selected {
 
@@ -139,7 +142,7 @@
 
 		&::after { // Everything else.
 			// 2px outside.
-			box-shadow: 0 0 0 $border-width-focus $blue-medium-focus;
+			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 			transition: box-shadow 0.2s ease-out;
 			@include reduce-motion("transition");
@@ -149,7 +152,7 @@
 
 			// Show a lighter color for dark themes.
 			.is-dark-theme & {
-				box-shadow: 0 0 0 $border-width-focus $blue-medium-focus-dark;
+				box-shadow: 0 0 0 $border-width-focus $dark-theme-focus;
 			}
 		}
 
@@ -160,8 +163,54 @@
 			}
 		}
 	}
+
+	.is-navigate-mode & .block-editor-block-list__block.is-hovered:not(.is-selected)::after {
+		box-shadow: 0 0 0 1px $gray-600;
+	}
+
+	.is-block-moving-mode & .block-editor-block-list__block.has-child-selected {
+		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		outline: $border-width-focus solid transparent;
+	}
+
+	.is-block-moving-mode & .block-editor-block-list__block.is-selected {
+
+		&::before {
+			content: "";
+			position: absolute;
+			z-index: 0;
+			pointer-events: none;
+			transition:
+				border-color 0.1s linear,
+				border-style 0.1s linear,
+				box-shadow 0.1s linear;
+			right: 0;
+			left: 0;
+			top: -$default-block-margin / 2;
+			border-radius: $radius-block-ui;
+			border-top: 4px solid $gray-400;
+		}
+
+		&::after {
+			content: none;
+		}
+	}
+
+	.is-block-moving-mode.can-insert-moving-block & .block-editor-block-list__block.is-selected {
+		&::before {
+			border-color: var(--wp-admin-theme-color);
+		}
+	}
 }
 
+
+.is-block-moving-mode.block-editor-block-list__block-selection-button {
+	// Should be invisible but not unfocusable.
+	opacity: 0;
+	font-size: 1px;
+	height: 1px;
+	padding: 0;
+}
 
 /**
  * Block styles and alignments
@@ -315,7 +364,7 @@
 .block-editor-block-list__insertion-point {
 	position: relative;
 	z-index: z-index(".block-editor-block-list__insertion-point");
-	margin-top: -$block-padding;
+	margin-top: -$block-padding * 2;
 }
 
 .block-editor-block-list__insertion-point-indicator {
@@ -324,7 +373,7 @@
 	height: $border-width-focus;
 	left: 0;
 	right: 0;
-	background: theme(primary);
+	background: var(--wp-admin-theme-color);
 }
 
 // This is the clickable plus.
@@ -337,12 +386,9 @@
 
 	justify-content: center;
 
-	// Clicks on the inserter are redirected to the nearest tabbable element.
-	cursor: text;
-
 	// Hide the inserter above the selected block.
 	&.is-inserter-hidden .block-editor-inserter__toggle {
-		opacity: 0;
+		visibility: hidden;
 		pointer-events: none;
 	}
 }
@@ -362,16 +408,16 @@
 .block-editor-default-block-appender,
 .block-editor-block-list__insertion-point-inserter,
 .block-editor-block-list__block-popover-inserter {
-	.block-editor-inserter__toggle.components-button {
+	.block-editor-inserter__toggle.components-button.has-icon {
 		// Basic look
-		background: $dark-gray-primary;
+		background: $gray-900;
 		border-radius: $radius-block-ui;
 		color: $white;
 		padding: 0;
 
 		// Special dimensions for this button.
-		min-width: 24px;
-		height: 24px;
+		min-width: $button-size-small;
+		height: $button-size-small;
 
 		&:hover {
 			color: $white;
@@ -384,7 +430,7 @@
 .block-editor-block-list__block-popover-inserter {
 	.block-editor-inserter__toggle.components-button {
 		// Fade it in after a delay.
-		animation: block-editor-inserter__toggle__fade-in-animation-delayed 1.2s ease;
+		animation: block-editor-inserter__toggle__fade-in-animation-delayed 0.3s ease;
 		animation-fill-mode: forwards;
 		@include reduce-motion("animation");
 	}
@@ -421,7 +467,7 @@
 	@include reduce-motion("animation");
 }
 
-.wp-block:not(.is-selected):not(.has-child-selected) .block-editor-default-block-appender {
+.block-editor-block-list__block:not(.is-selected):not(.has-child-selected) .block-editor-default-block-appender {
 	display: none;
 
 	.block-editor-inserter__toggle {
@@ -449,30 +495,25 @@
 .block-editor-block-list__block .block-editor-block-list__block-html-textarea {
 	display: block;
 	margin: 0;
+	padding: $grid-unit-15;
 	width: 100%;
 	border: none;
 	outline: none;
-	box-shadow: none;
+	border-radius: 2px;
+	box-shadow: inset 0 0 0 $border-width $gray-900;
 	resize: none;
 	overflow: hidden;
 	font-family: $editor-html-font;
 	font-size: $text-editor-font-size;
-	line-height: 150%;
+	line-height: 1.5;
 	transition: padding 0.2s linear;
 	@include reduce-motion("transition");
 
 	&:focus {
-		box-shadow: none;
+		box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 	}
 }
 
-
-/**
- * Block Toolbar, top and contextual.
- */
-.block-editor-block-contextual-toolbar-wrapper {
-	padding-left: $block-toolbar-height; // Provide space for the mover control on full-wide items.
-}
 
 /**
  * Block Toolbar when contextual.
@@ -480,88 +521,44 @@
 
 .block-editor-block-contextual-toolbar {
 	// Block UI appearance.
-	border: $border-width solid $dark-gray-primary;
+	border: $border-width solid $gray-900;
 	border-radius: $radius-block-ui;
 	background-color: $white;
 
 	.block-editor-block-toolbar .components-toolbar-group,
-	.block-editor-block-toolbar .components-toolbar,
-	.block-editor-block-toolbar__mover-switcher-container {
-		border-right-color: $dark-gray-primary;
+	.block-editor-block-toolbar .components-toolbar {
+		border-right-color: $gray-900;
 	}
 
-	.block-editor-block-toolbar__mover-switcher-container {
-		border-right-style: solid;
-		border-right-width: $border-width;
+	.block-editor-block-mover-button {
+		overflow: hidden;
 	}
 
-	// Adjust the mover control to fit as a unit next to the block switcher.
-	.block-editor-block-toolbar__block-switcher-wrapper {
-		// Adjust the focus rectangle for the switcher.
-		.block-editor-block-switcher__no-switcher-icon::before,
-		.block-editor-block-switcher__toggle::before {
-			width: $grid-unit-60 - $grid-unit-10 - $grid-unit-15;
-		}
-
-		// Adjust the positioning of the icon to better balance the new unit.
-		.block-editor-block-icon svg {
-			margin-left: 10px;
-		}
-
-		.block-editor-block-switcher:last-child .block-editor-block-icon svg {
-			margin-left: auto;
-		}
-
-		.components-toolbar,
-		.components-toolbar-group {
-			border-right: none;
-		}
-	}
-
-	.block-editor-block-mover {
-		margin-left: -$grid-unit-15;
-		width: $button-size;
-
-		&.is-horizontal {
-			width: $block-toolbar-height;
-		}
-
-		// Needs specificity to override a first-child rule.
-		.components-button.has-icon.block-editor-block-mover-button.block-editor-block-mover-button {
-			min-width: $button-size;
-			width: $button-size;
-			cursor: grab;
-
-			&:active {
-				cursor: grabbing;
-			}
-		}
-
-		&.is-horizontal .components-button.has-icon.block-editor-block-mover-button.block-editor-block-mover-button {
-			min-width: $block-toolbar-height/2;
-			width: $block-toolbar-height/2;
-		}
+	// Extra specificity to override standard toolbar button styles.
+	.block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
+		min-width: $block-toolbar-height/2;
+		width: $block-toolbar-height/2;
 	}
 
 	.block-editor-block-mover:not(.is-horizontal) {
-
+		// Position SVGs.
 		.block-editor-block-mover-button {
-			> svg {
-				margin-left: 2px;
+			&.is-up-button {
+				svg {
+					margin-top: 2px;
+				}
 			}
 
-			&.is-up-button svg {
-				margin-top: 3px;
-			}
-
-			&.is-down-button svg {
-				margin-bottom: 3px;
+			&.is-down-button {
+				svg {
+					margin-bottom: 3px;
+				}
 			}
 
 			&:focus::before {
 				left: 0 !important;
 				min-width: 0;
-				width: 28px;
+				width: 100%;
 			}
 		}
 	}
@@ -587,16 +584,13 @@
 		top: -$border-width;
 
 		// Block UI appearance.
-		box-shadow: 0 0 0 $border-width $dark-gray-primary;
+		box-shadow: 0 0 0 $border-width $gray-900;
 		border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
 		background-color: $white;
 
-		// Indent to align with block toolbar.
-		margin-left: $block-toolbar-height + $border-width;
-
 		// When button is focused, it receives a box-shadow instead of the border.
 		&:focus {
-			box-shadow: 0 0 0 $border-width-focus $theme-color;
+			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 		}
 	}
 }
@@ -627,6 +621,7 @@
 
 .block-editor-block-list__insertion-point-popover.is-without-arrow {
 	z-index: z-index(".block-editor-block-list__insertion-point-popover");
+	position: absolute;
 
 	.components-popover__content.components-popover__content { // Needs specificity.
 		background: none;
@@ -637,8 +632,22 @@
 	}
 }
 
+// Hide the popover block editor list while dragging.
+// Using a hacky animation to delay hiding the element.
+// It's needed because if we hide the element immediately upon dragging,
+// the dragging will end immediately since there are no elements to be dragged anymore.
+// Fortunately, we only have to keep it visible for a frame immediately after dragging,
+// after that, we can safely hide it altogether.
+@keyframes hide-during-dragging {
+	to {
+		position: fixed;
+		transform: translate(9999px, 9999px);
+	}
+}
+
 .components-popover.block-editor-block-list__block-popover {
 	z-index: z-index(".block-editor-block-list__block-popover");
+	position: absolute;
 
 	.components-popover__content {
 		margin: 0 !important;
@@ -660,48 +669,17 @@
 		.block-editor-block-list__block-selection-button,
 		.block-editor-block-contextual-toolbar {
 			margin-bottom: $grid-unit-15;
-			margin-left: - $block-toolbar-height;
-		}
-
-		.block-editor-block-contextual-toolbar[data-align="full"],
-		.block-editor-block-list__block-selection-button[data-align="full"] {
-			margin-left: 0;
 		}
 	}
 
 	.is-dragging-components-draggable & {
 		opacity: 0;
+		// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.
+		// It's essential to hide the toolbar/popover so that `dragEnter` events can pass through them to the underlying elements.
+		animation: hide-during-dragging 1ms linear forwards;
 	}
 }
 
 .is-dragging-components-draggable .components-tooltip {
 	display: none;
-}
-
-
-// Add side padding for the canvas, currently edit-post-visual-editor.
-// The purpose of this padding is to ensure that on small viewports, there is
-// room for the block border that sits 14px ($block-padding) offset from the
-// block footprint.
-// These paddings and margins are removed from the BlockPreview component's style
-// Any change need to be reflected there.
-.block-editor-block-list__layout.is-root-container {
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-
-	@include break-small() {
-		padding-left: $block-side-ui-width;
-		padding-right: $block-side-ui-width;
-	}
-
-	// Full-wide. (to account for the paddings added above)
-	> .wp-block[data-align="full"] {
-		margin-left: -$block-padding;
-		margin-right: -$block-padding;
-
-		@include break-small() {
-			margin-left: -$block-side-ui-width;
-			margin-right: -$block-side-ui-width;
-		}
-	}
 }

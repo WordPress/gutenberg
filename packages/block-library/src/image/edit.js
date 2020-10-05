@@ -2,56 +2,40 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, filter, map, last, omit, pick, includes } from 'lodash';
+import { get, omit, pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import {
-	ExternalLink,
-	PanelBody,
-	ResizableBox,
-	Spinner,
-	TextareaControl,
-	TextControl,
-	ToolbarGroup,
-	withNotices,
-} from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { withNotices } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import {
 	BlockAlignmentToolbar,
 	BlockControls,
 	BlockIcon,
-	InspectorControls,
-	InspectorAdvancedControls,
 	MediaPlaceholder,
-	MediaReplaceFlow,
-	RichText,
-	__experimentalBlock as Block,
-	__experimentalImageSizeControl as ImageSizeControl,
-	__experimentalImageURLInputUI as ImageURLInputUI,
+	useBlockProps,
 } from '@wordpress/block-editor';
-import { useEffect, useState, useRef } from '@wordpress/element';
-import { __, sprintf } from '@wordpress/i18n';
-import { getPath } from '@wordpress/url';
+import { useEffect, useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
-import { createBlock } from '@wordpress/blocks';
+
+/* global wp */
 
 /**
  * Internal dependencies
  */
-import { createUpgradedEmbedBlock } from '../embed/util';
-import useImageSize from './image-size';
+import Image from './image';
 
 /**
  * Module constants
  */
 import {
-	MIN_SIZE,
-	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
 	DEFAULT_SIZE_SLUG,
 } from './constants';
@@ -85,32 +69,10 @@ const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
  *
  * @return {boolean} Is the url an externally hosted url?
  */
-const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
-
-function getFilename( url ) {
-	const path = getPath( url );
-	if ( path ) {
-		return last( path.split( '/' ) );
-	}
-}
+export const isExternalImage = ( id, url ) => url && ! id && ! isBlobURL( url );
 
 export function ImageEdit( {
-	attributes: {
-		url = '',
-		alt,
-		caption,
-		align,
-		id,
-		href,
-		rel,
-		linkClass,
-		linkDestination,
-		title,
-		width,
-		height,
-		linkTarget,
-		sizeSlug,
-	},
+	attributes,
 	setAttributes,
 	isSelected,
 	className,
@@ -119,35 +81,32 @@ export function ImageEdit( {
 	noticeOperations,
 	onReplace,
 } ) {
+	const {
+		url = '',
+		alt,
+		caption,
+		align,
+		id,
+		width,
+		height,
+		sizeSlug,
+	} = attributes;
+
+	const altRef = useRef();
+	useEffect( () => {
+		altRef.current = alt;
+	}, [ alt ] );
+
+	const captionRef = useRef();
+	useEffect( () => {
+		captionRef.current = caption;
+	}, [ caption ] );
+
 	const ref = useRef();
-	const { image, maxWidth, isRTL, imageSizes, mediaUpload } = useSelect(
-		( select ) => {
-			const { getMedia } = select( 'core' );
-			const { getSettings } = select( 'core/block-editor' );
-			return {
-				...pick( getSettings(), [
-					'mediaUpload',
-					'imageSizes',
-					'isRTL',
-					'maxWidth',
-				] ),
-				image: id && isSelected ? getMedia( id ) : null,
-			};
-		},
-		[ id, isSelected ]
-	);
-	const { toggleSelection } = useDispatch( 'core/block-editor' );
-	const isLargeViewport = useViewportMatch( 'medium' );
-	const [ captionFocused, setCaptionFocused ] = useState( false );
-	const isWideAligned = includes( [ 'wide', 'full' ], align );
-
-	function onResizeStart() {
-		toggleSelection( false );
-	}
-
-	function onResizeStop() {
-		toggleSelection( true );
-	}
+	const mediaUpload = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return getSettings().mediaUpload;
+	} );
 
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
@@ -171,14 +130,14 @@ export function ImageEdit( {
 		// If the current image is temporary but an alt text was meanwhile
 		// written by the user, make sure the text is not overwritten.
 		if ( isTemporaryImage( id, url ) ) {
-			if ( alt ) {
+			if ( altRef.current ) {
 				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
 			}
 		}
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
-		if ( caption && ! get( mediaAttributes, [ 'caption' ] ) ) {
+		if ( captionRef.current && ! get( mediaAttributes, [ 'caption' ] ) ) {
 			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
 		}
 
@@ -196,21 +155,49 @@ export function ImageEdit( {
 			additionalAttributes = { url };
 		}
 
-		// Check if the image is linked to it's media.
-		if ( linkDestination === LINK_DESTINATION_MEDIA ) {
-			// Update the media link.
-			mediaAttributes.href = media.url;
+		// Check if default link setting should be used.
+		let linkDestination = attributes.linkDestination;
+		if ( ! linkDestination ) {
+			// Use the WordPress option to determine the proper default.
+			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
+			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
+			switch (
+				wp?.media?.view?.settings?.defaultProps?.link ||
+				LINK_DESTINATION_NONE
+			) {
+				case 'file':
+				case LINK_DESTINATION_MEDIA:
+					linkDestination = LINK_DESTINATION_MEDIA;
+					break;
+				case 'post':
+				case LINK_DESTINATION_ATTACHMENT:
+					linkDestination = LINK_DESTINATION_ATTACHMENT;
+					break;
+				case LINK_DESTINATION_CUSTOM:
+					linkDestination = LINK_DESTINATION_CUSTOM;
+					break;
+				case LINK_DESTINATION_NONE:
+					linkDestination = LINK_DESTINATION_NONE;
+					break;
+			}
 		}
 
-		// Check if the image is linked to the attachment page.
-		if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
-			// Update the media link.
-			mediaAttributes.href = media.link;
+		// Check if the image is linked to it's media.
+		let href;
+		switch ( linkDestination ) {
+			case LINK_DESTINATION_MEDIA:
+				href = media.url;
+				break;
+			case LINK_DESTINATION_ATTACHMENT:
+				href = media.link;
+				break;
 		}
+		mediaAttributes.href = href;
 
 		setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,
+			linkDestination,
 		} );
 	}
 
@@ -224,40 +211,6 @@ export function ImageEdit( {
 		}
 	}
 
-	function onImageError() {
-		// Check if there's an embed block that handles this URL.
-		const embedBlock = createUpgradedEmbedBlock( { attributes: { url } } );
-		if ( undefined !== embedBlock ) {
-			onReplace( embedBlock );
-		}
-	}
-
-	function onSetHref( props ) {
-		setAttributes( props );
-	}
-
-	function onSetTitle( value ) {
-		// This is the HTML title attribute, separate from the media object
-		// title.
-		setAttributes( { title: value } );
-	}
-
-	function onFocusCaption() {
-		if ( ! captionFocused ) {
-			setCaptionFocused( true );
-		}
-	}
-
-	function onImageClick() {
-		if ( captionFocused ) {
-			setCaptionFocused( false );
-		}
-	}
-
-	function updateAlt( newAlt ) {
-		setAttributes( { alt: newAlt } );
-	}
-
 	function updateAlignment( nextAlign ) {
 		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
 			? { width: undefined, height: undefined }
@@ -266,34 +219,6 @@ export function ImageEdit( {
 			...extraUpdatedAttributes,
 			align: nextAlign,
 		} );
-	}
-
-	function updateImage( newSizeSlug ) {
-		const newUrl = get( image, [
-			'media_details',
-			'sizes',
-			newSizeSlug,
-			'source_url',
-		] );
-		if ( ! newUrl ) {
-			return null;
-		}
-
-		setAttributes( {
-			url,
-			width: undefined,
-			height: undefined,
-			sizeSlug: newSizeSlug,
-		} );
-	}
-
-	function getImageSizeOptions() {
-		return map(
-			filter( imageSizes, ( { slug } ) =>
-				get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )
-			),
-			( { name, slug } ) => ( { value: slug, label: name } )
-		);
 	}
 
 	const isTemp = isTemporaryImage( id, url );
@@ -315,6 +240,11 @@ export function ImageEdit( {
 				allowedTypes: ALLOWED_MEDIA_TYPES,
 				onError: ( message ) => {
 					noticeOperations.createErrorNotice( message );
+					setAttributes( {
+						src: undefined,
+						id: undefined,
+						url: undefined,
+					} );
 				},
 			} );
 		}
@@ -332,12 +262,6 @@ export function ImageEdit( {
 		};
 	}, [ isTemp ] );
 
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setCaptionFocused( false );
-		}
-	}, [ isSelected ] );
-
 	const isExternal = isExternalImage( id, url );
 	const controls = (
 		<BlockControls>
@@ -345,31 +269,6 @@ export function ImageEdit( {
 				value={ align }
 				onChange={ updateAlignment }
 			/>
-			{ url && (
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ url }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="image/*"
-					onSelect={ onSelectImage }
-					onSelectURL={ onSelectURL }
-					onError={ onUploadError }
-				/>
-			) }
-			{ url && (
-				<ToolbarGroup>
-					<ImageURLInputUI
-						url={ href || '' }
-						onChangeUrl={ onSetHref }
-						linkDestination={ linkDestination }
-						mediaUrl={ ( image && image.source_url) || url }
-						mediaLink={ image && image.link }
-						linkTarget={ linkTarget }
-						linkClass={ linkClass }
-						rel={ rel }
-					/>
-				</ToolbarGroup>
-			) }
 		</BlockControls>
 	);
 	const src = isExternal ? url : undefined;
@@ -397,22 +296,6 @@ export function ImageEdit( {
 		/>
 	);
 
-	const {
-		imageWidthWithinContainer,
-		imageHeightWithinContainer,
-		imageWidth,
-		imageHeight,
-	} = useImageSize( ref, url, [ align ] );
-
-	if ( ! url ) {
-		return (
-			<>
-				{ controls }
-				<Block.div>{ mediaPlaceholder }</Block.div>
-			</>
-		);
-	}
-
 	const classes = classnames( className, {
 		'is-transient': isBlobURL( url ),
 		'is-resized': !! width || !! height,
@@ -420,200 +303,30 @@ export function ImageEdit( {
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 	} );
 
-	const isResizable = ! isWideAligned && isLargeViewport;
-	const imageSizeOptions = getImageSizeOptions();
-
-	const inspectorControls = (
-		<>
-			<InspectorControls>
-				<PanelBody title={ __( 'Image settings' ) }>
-					<TextareaControl
-						label={ __( 'Alt text (alternative text)' ) }
-						value={ alt }
-						onChange={ updateAlt }
-						help={
-							<>
-								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
-									{ __(
-										'Describe the purpose of the image'
-									) }
-								</ExternalLink>
-								{ __(
-									'Leave empty if the image is purely decorative.'
-								) }
-							</>
-						}
-					/>
-					<ImageSizeControl
-						onChangeImage={ updateImage }
-						onChange={ ( value ) => setAttributes( value ) }
-						slug={ sizeSlug }
-						width={ width }
-						height={ height }
-						imageSizeOptions={ imageSizeOptions }
-						isResizable={ isResizable }
-						imageWidth={ imageWidth }
-						imageHeight={ imageHeight }
-					/>
-				</PanelBody>
-			</InspectorControls>
-			<InspectorAdvancedControls>
-				<TextControl
-					label={ __( 'Title attribute' ) }
-					value={ title || '' }
-					onChange={ onSetTitle }
-					help={
-						<>
-							{ __(
-								'Describe the role of this image on the page.'
-							) }
-							<ExternalLink href="https://www.w3.org/TR/html52/dom.html#the-title-attribute">
-								{ __(
-									'(Note: many devices and browsers do not display this text.)'
-								) }
-							</ExternalLink>
-						</>
-					}
-				/>
-			</InspectorAdvancedControls>
-		</>
-	);
-
-	const filename = getFilename( url );
-	let defaultedAlt;
-
-	if ( alt ) {
-		defaultedAlt = alt;
-	} else if ( filename ) {
-		defaultedAlt = sprintf(
-			/* translators: %s: file name */
-			__( 'This image has an empty alt attribute; its file name is %s' ),
-			filename
-		);
-	} else {
-		defaultedAlt = __( 'This image has an empty alt attribute' );
-	}
-
-	let img = (
-		// Disable reason: Image itself is not meant to be interactive, but
-		// should direct focus to block.
-		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-		<>
-			{ inspectorControls }
-			<img
-				src={ url }
-				alt={ defaultedAlt }
-				onClick={ onImageClick }
-				onError={ () => onImageError() }
-			/>
-			{ isBlobURL( url ) && <Spinner /> }
-		</>
-		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-	);
-
-	if ( ! isResizable || ! imageWidthWithinContainer ) {
-		img = <div style={ { width, height } }>{ img }</div>;
-	} else {
-		const currentWidth = width || imageWidthWithinContainer;
-		const currentHeight = height || imageHeightWithinContainer;
-
-		const ratio = imageWidth / imageHeight;
-		const minWidth = imageWidth < imageHeight ? MIN_SIZE : MIN_SIZE * ratio;
-		const minHeight =
-			imageHeight < imageWidth ? MIN_SIZE : MIN_SIZE / ratio;
-
-		// With the current implementation of ResizableBox, an image needs an
-		// explicit pixel value for the max-width. In absence of being able to
-		// set the content-width, this max-width is currently dictated by the
-		// vanilla editor style. The following variable adds a buffer to this
-		// vanilla style, so 3rd party themes have some wiggleroom. This does,
-		// in most cases, allow you to scale the image beyond the width of the
-		// main column, though not infinitely.
-		// @todo It would be good to revisit this once a content-width variable
-		// becomes available.
-		const maxWidthBuffer = maxWidth * 2.5;
-
-		let showRightHandle = false;
-		let showLeftHandle = false;
-
-		/* eslint-disable no-lonely-if */
-		// See https://github.com/WordPress/gutenberg/issues/7584.
-		if ( align === 'center' ) {
-			// When the image is centered, show both handles.
-			showRightHandle = true;
-			showLeftHandle = true;
-		} else if ( isRTL ) {
-			// In RTL mode the image is on the right by default.
-			// Show the right handle and hide the left handle only when it is
-			// aligned left. Otherwise always show the left handle.
-			if ( align === 'left' ) {
-				showRightHandle = true;
-			} else {
-				showLeftHandle = true;
-			}
-		} else {
-			// Show the left handle and hide the right handle only when the
-			// image is aligned right. Otherwise always show the right handle.
-			if ( align === 'right' ) {
-				showLeftHandle = true;
-			} else {
-				showRightHandle = true;
-			}
-		}
-		/* eslint-enable no-lonely-if */
-
-		img = (
-			<ResizableBox
-				size={ { width, height } }
-				showHandle={ isSelected }
-				minWidth={ minWidth }
-				maxWidth={ maxWidthBuffer }
-				minHeight={ minHeight }
-				maxHeight={ maxWidthBuffer / ratio }
-				lockAspectRatio
-				enable={ {
-					top: false,
-					right: showRightHandle,
-					bottom: true,
-					left: showLeftHandle,
-				} }
-				onResizeStart={ onResizeStart }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					onResizeStop();
-					setAttributes( {
-						width: parseInt( currentWidth + delta.width, 10 ),
-						height: parseInt( currentHeight + delta.height, 10 ),
-					} );
-				} }
-			>
-				{ img }
-			</ResizableBox>
-		);
-	}
+	const blockProps = useBlockProps( {
+		ref,
+		className: classes,
+	} );
 
 	return (
 		<>
 			{ controls }
-			<Block.figure ref={ ref } className={ classes }>
-				{ img }
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-					<RichText
-						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
-						value={ caption }
-						unstableOnFocus={ onFocusCaption }
-						onChange={ ( value ) =>
-							setAttributes( { caption: value } )
-						}
-						isSelected={ captionFocused }
-						inlineToolbar
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
-						}
+			<figure { ...blockProps }>
+				{ url && (
+					<Image
+						attributes={ attributes }
+						setAttributes={ setAttributes }
+						isSelected={ isSelected }
+						insertBlocksAfter={ insertBlocksAfter }
+						onReplace={ onReplace }
+						onSelectImage={ onSelectImage }
+						onSelectURL={ onSelectURL }
+						onUploadError={ onUploadError }
+						containerRef={ ref }
 					/>
 				) }
 				{ mediaPlaceholder }
-			</Block.figure>
+			</figure>
 		</>
 	);
 }

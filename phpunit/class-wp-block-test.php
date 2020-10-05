@@ -5,6 +5,12 @@
  * @package Gutenberg
  */
 
+/**
+ * This test file can be removed when plugin support requires WordPress 5.5.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/49926
+ * @see https://core.trac.wordpress.org/changeset/48159
+ */
 class WP_Block_Test extends WP_UnitTestCase {
 
 	/**
@@ -133,7 +139,7 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$this->registry->register(
 			'core/example',
 			array(
-				'context' => array( 'requested' ),
+				'uses_context' => array( 'requested' ),
 			)
 		);
 
@@ -164,12 +170,12 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$this->registry->register(
 			'core/outer',
 			array(
-				'attributes'      => array(
+				'attributes'       => array(
 					'recordId' => array(
 						'type' => 'number',
 					),
 				),
-				'providesContext' => array(
+				'provides_context' => array(
 					'core/recordId' => 'recordId',
 				),
 			)
@@ -177,7 +183,7 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$this->registry->register(
 			'core/inner',
 			array(
-				'context' => array( 'core/recordId' ),
+				'uses_context' => array( 'core/recordId' ),
 			)
 		);
 
@@ -197,15 +203,15 @@ class WP_Block_Test extends WP_UnitTestCase {
 		$this->registry->register(
 			'core/example',
 			array(
-				'attributes'      => array(
+				'attributes'       => array(
 					'value' => array(
 						'type' => array( 'string', 'null' ),
 					),
 				),
-				'providesContext' => array(
+				'provides_context' => array(
 					'core/value' => 'value',
 				),
-				'context'         => array( 'core/value' ),
+				'uses_context'     => array( 'core/value' ),
 			)
 		);
 

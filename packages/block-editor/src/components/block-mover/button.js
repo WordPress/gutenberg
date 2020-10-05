@@ -57,12 +57,7 @@ const getMovementDirectionLabel = ( moveDirection, orientation, isRTL ) => {
 
 const BlockMoverButton = forwardRef(
 	(
-		{
-			clientIds,
-			direction,
-			__experimentalOrientation: orientation,
-			...props
-		},
+		{ clientIds, direction, orientation: moverOrientation, ...props },
 		ref
 	) => {
 		const instanceId = useInstanceId( BlockMoverButton );
@@ -76,7 +71,7 @@ const BlockMoverButton = forwardRef(
 			isLast,
 			firstIndex,
 			isRTL,
-			moverOrientation,
+			orientation = 'vertical',
 		} = useSelect(
 			( select ) => {
 				const {
@@ -102,7 +97,7 @@ const BlockMoverButton = forwardRef(
 				const block = getBlock( firstClientId );
 				const isFirstBlock = firstBlockIndex === 0;
 				const isLastBlock = lastBlockIndex === blockOrder.length - 1;
-				const { __experimentalMoverDirection = 'vertical' } =
+				const { orientation: blockListOrientation } =
 					getBlockListSettings( blockRootClientId ) || {};
 
 				return {
@@ -113,8 +108,7 @@ const BlockMoverButton = forwardRef(
 					isFirst: isFirstBlock,
 					isLast: isLastBlock,
 					isRTL: getSettings().isRTL,
-					moverOrientation:
-						orientation || __experimentalMoverDirection,
+					orientation: moverOrientation || blockListOrientation,
 				};
 			},
 			[ clientIds, direction ]
@@ -143,10 +137,10 @@ const BlockMoverButton = forwardRef(
 						'block-editor-block-mover-button',
 						`is-${ direction }-button`
 					) }
-					icon={ getArrowIcon( direction, moverOrientation, isRTL ) }
+					icon={ getArrowIcon( direction, orientation, isRTL ) }
 					label={ getMovementDirectionLabel(
 						direction,
-						moverOrientation,
+						orientation,
 						isRTL
 					) }
 					aria-describedby={ descriptionId }
@@ -165,7 +159,7 @@ const BlockMoverButton = forwardRef(
 						isFirst,
 						isLast,
 						direction === 'up' ? -1 : 1,
-						moverOrientation,
+						orientation,
 						isRTL
 					) }
 				</span>

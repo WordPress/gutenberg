@@ -208,32 +208,31 @@ function gutenberg_override_style( $styles, $handle, $src, $deps = array(), $ver
 function gutenberg_register_vendor_scripts( $scripts ) {
 	$suffix = SCRIPT_DEBUG ? '' : '.min';
 
-	/*
-	 * This script registration and the corresponding function should be removed
-	 * once the plugin is updated to support WordPress 5.4.0 and newer.
-	 *
-	 * See: `gutenberg_add_url_polyfill`
-	 */
+	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
 	gutenberg_register_vendor_script(
 		$scripts,
-		'wp-polyfill-url',
-		'https://unpkg.com/core-js-url-browser@3.6.4/url' . $suffix . '.js',
-		array(),
-		'3.6.4'
+		'react',
+		'https://unpkg.com/react@16.13.1/umd/react' . $react_suffix . '.js',
+		array( 'wp-polyfill' )
+	);
+	gutenberg_register_vendor_script(
+		$scripts,
+		'react-dom',
+		'https://unpkg.com/react-dom@16.13.1/umd/react-dom' . $react_suffix . '.js',
+		array( 'react' )
 	);
 
 	/*
 	 * This script registration and the corresponding function should be removed
-	 * removed once the plugin is updated to support WordPress 5.4.0 and newer.
-	 *
-	 * See: `gutenberg_add_dom_rect_polyfill`
+	 * removed once the plugin is updated to support WordPress 5.6.0 and newer.
 	 */
 	gutenberg_register_vendor_script(
 		$scripts,
-		'wp-polyfill-dom-rect',
-		'https://unpkg.com/polyfill-library@3.42.0/polyfills/DOMRect/polyfill.js',
+		'lodash',
+		'https://unpkg.com/lodash@4.17.19/lodash.js',
 		array(),
-		'3.42.0'
+		'4.17.19',
+		true
 	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
@@ -331,7 +330,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-components',
 		gutenberg_url( 'build/components/style.css' ),
-		array(),
+		array( 'dashicons' ),
 		filemtime( gutenberg_dir_path() . 'build/components/style.css' )
 	);
 	$styles->add_data( 'wp-components', 'rtl', 'replace' );
@@ -622,113 +621,21 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
 
 /**
- * Load a block pattern by name.
- *
- * @param string $name Block Pattern File name.
- *
- * @return array Block Pattern Array.
- */
-function gutenberg_load_block_pattern( $name ) {
-	return require( __DIR__ . '/patterns/' . $name . '.php' );
-}
-
-/**
- * Extends block editor settings to include a list of default patterns.
+ * Load the default editor styles.
+ * These styles are used if the "no theme styles" options is triggered.
  *
  * @param array $settings Default editor settings.
  *
  * @return array Filtered editor settings.
  */
-function gutenberg_extend_settings_block_patterns( $settings ) {
-	if ( empty( $settings['__experimentalBlockPatterns'] ) ) {
-		$settings['__experimentalBlockPatterns'] = array();
-	}
-
-	$settings['__experimentalBlockPatterns'] = array_merge(
-		WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
-		$settings['__experimentalBlockPatterns']
-	);
-
-	if ( empty( $settings['__experimentalBlockPatternCategories'] ) ) {
-		$settings['__experimentalBlockPatternCategories'] = array();
-	}
-
-	$settings['__experimentalBlockPatternCategories'] = array_merge(
-		WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
-		$settings['__experimentalBlockPatternCategories']
+function gutenberg_extend_block_editor_settings_with_default_editor_styles( $settings ) {
+	$editor_styles_file              = gutenberg_dir_path() . 'build/editor/editor-styles.css';
+	$settings['defaultEditorStyles'] = array(
+		array(
+			'css' => file_get_contents( $editor_styles_file ),
+		),
 	);
 
 	return $settings;
 }
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_block_patterns', 0 );
-
-/**
- * Extends block editor settings to determine whether to use custom line height controls.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_custom_line_height( $settings ) {
-	$settings['__experimentalDisableCustomLineHeight'] = get_theme_support( 'disable-custom-line-height' );
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_line_height' );
-
-/**
- * Extends block editor settings to determine whether to use custom unit controls.
- * Currently experimental.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_custom_units( $settings ) {
-	$settings['__experimentalDisableCustomUnits'] = get_theme_support( 'experimental-custom-units' );
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
-
-/**
- * Extends block editor settings to determine whether to use custom spacing controls.
- * Currently experimental.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_custom_spacing( $settings ) {
-	$settings['__experimentalEnableCustomSpacing'] = get_theme_support( 'experimental-custom-spacing' );
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_spacing' );
-
-/*
- * Register default patterns if not registered in Core already.
- */
-
-if ( class_exists( 'WP_Block_Patterns_Registry' ) && ! WP_Block_Patterns_Registry::get_instance()->is_registered( 'text-two-columns' ) ) {
-	register_block_pattern( 'core/text-two-columns', gutenberg_load_block_pattern( 'text-two-columns' ) );
-	register_block_pattern( 'core/two-buttons', gutenberg_load_block_pattern( 'two-buttons' ) );
-	register_block_pattern( 'core/cover-abc', gutenberg_load_block_pattern( 'cover-abc' ) );
-	register_block_pattern( 'core/two-images', gutenberg_load_block_pattern( 'two-images' ) );
-	register_block_pattern( 'core/hero-two-columns', gutenberg_load_block_pattern( 'hero-two-columns' ) );
-	register_block_pattern( 'core/numbered-features', gutenberg_load_block_pattern( 'numbered-features' ) );
-	register_block_pattern( 'core/its-time', gutenberg_load_block_pattern( 'its-time' ) );
-	register_block_pattern( 'core/hero-right-column', gutenberg_load_block_pattern( 'hero-right-column' ) );
-	register_block_pattern( 'core/testimonials', gutenberg_load_block_pattern( 'testimonials' ) );
-	register_block_pattern( 'core/features-services', gutenberg_load_block_pattern( 'features-services' ) );
-}
-
-/*
- * Register default pattern categories if not registered in Core already.
- */
-if ( class_exists( 'WP_Block_Pattern_Categories_Registry' ) ) {
-	register_block_pattern_category( 'text', array( 'label' => _x( 'Text', 'Block pattern category', 'gutenberg' ) ) );
-	register_block_pattern_category( 'hero', array( 'label' => _x( 'Hero', 'Block pattern category', 'gutenberg' ) ) );
-	register_block_pattern_category( 'columns', array( 'label' => _x( 'Columns', 'Block pattern category', 'gutenberg' ) ) );
-	register_block_pattern_category( 'buttons', array( 'label' => _x( 'Buttons', 'Block pattern category', 'gutenberg' ) ) );
-	register_block_pattern_category( 'gallery', array( 'label' => _x( 'Gallery', 'Block pattern category', 'gutenberg' ) ) );
-	register_block_pattern_category( 'features', array( 'label' => _x( 'Features', 'Block pattern category', 'gutenberg' ) ) );
-	register_block_pattern_category( 'testimonials', array( 'label' => _x( 'Testimonials', 'Block pattern category', 'gutenberg' ) ) );
-}
+add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_default_editor_styles' );

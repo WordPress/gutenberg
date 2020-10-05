@@ -2,11 +2,17 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { useState, createContext, useMemo } from '@wordpress/element';
+import {
+	useState,
+	createContext,
+	useMemo,
+	useCallback,
+} from '@wordpress/element';
 import {
 	getBlockType,
 	getSaveElement,
@@ -34,9 +40,41 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
-import { Block } from './block-wrapper';
+import { useBlockProps } from './block-wrapper';
 
 export const BlockListBlockContext = createContext();
+
+/**
+ * Merges wrapper props with special handling for classNames and styles.
+ *
+ * @param {Object} propsA
+ * @param {Object} propsB
+ *
+ * @return {Object} Merged props.
+ */
+function mergeWrapperProps( propsA, propsB ) {
+	const newProps = {
+		...propsA,
+		...propsB,
+	};
+
+	if ( propsA && propsB && propsA.className && propsB.className ) {
+		newProps.className = classnames( propsA.className, propsB.className );
+	}
+	if ( propsA && propsB && propsA.style && propsB.style ) {
+		newProps.style = { ...propsA.style, ...propsB.style };
+	}
+
+	return newProps;
+}
+
+function Block( { children, isHtml, ...props } ) {
+	return (
+		<div { ...useBlockProps( props, { __unstableIsHtml: isHtml } ) }>
+			{ children }
+		</div>
+	);
+}
 
 function BlockListBlock( {
 	mode,
@@ -64,42 +102,41 @@ function BlockListBlock( {
 	toggleSelection,
 	index,
 	enableAnimation,
-	isNavigationMode,
-	isMultiSelecting,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
 	// (editor.BlockListBlock filter)
-	const { isDragging, isHighlighted } = useSelect( ( select ) => {
-		const { isDraggingBlocks, isBlockHighlighted } = select(
-			'core/block-editor'
-		);
-		return {
-			isDragging: isDraggingBlocks(),
-			isHighlighted: isBlockHighlighted( clientId ),
-		};
-	}, [] );
+	const { isDragging, isHighlighted } = useSelect(
+		( select ) => {
+			const { isBlockBeingDragged, isBlockHighlighted } = select(
+				'core/block-editor'
+			);
+			return {
+				isDragging: isBlockBeingDragged( clientId ),
+				isHighlighted: isBlockHighlighted( clientId ),
+			};
+		},
+		[ clientId ]
+	);
 	const { removeBlock } = useDispatch( 'core/block-editor' );
-	const onRemove = () => removeBlock( clientId );
+	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 
 	// Handling the error state
 	const [ hasError, setErrorState ] = useState( false );
 	const onBlockError = () => setErrorState( true );
 
 	const blockType = getBlockType( name );
-	const lightBlockWrapper = hasBlockSupport(
-		blockType,
-		'lightBlockWrapper',
-		false
-	);
+	const lightBlockWrapper =
+		blockType.apiVersion > 1 ||
+		hasBlockSupport( blockType, 'lightBlockWrapper', false );
 	const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 
 	// Determine whether the block has props to apply to the wrapper.
 	if ( blockType.getEditWrapperProps ) {
-		wrapperProps = {
-			...wrapperProps,
-			...blockType.getEditWrapperProps( attributes ),
-		};
+		wrapperProps = mergeWrapperProps(
+			wrapperProps,
+			blockType.getEditWrapperProps( attributes )
+		);
 	}
 
 	const generatedClassName =
@@ -107,6 +144,7 @@ function BlockListBlock( {
 			? getBlockDefaultClassName( name )
 			: null;
 	const customClassName = lightBlockWrapper ? attributes.className : null;
+	const isAligned = wrapperProps && !! wrapperProps[ 'data-align' ];
 
 	// The wp-block className is important for editor styles.
 	// Generate the wrapper class names handling the different states of the
@@ -116,18 +154,18 @@ function BlockListBlock( {
 		customClassName,
 		'block-editor-block-list__block',
 		{
+			'wp-block': ! isAligned,
 			'has-warning': ! isValid || !! hasError || isUnregisteredBlock,
-			'is-selected': isSelected,
+			'is-selected': isSelected && ! isDragging,
 			'is-highlighted': isHighlighted,
 			'is-multi-selected': isMultiSelected,
 			'is-reusable': isReusableBlock( blockType ),
-			'is-dragging':
-				isDragging && ( isSelected || isPartOfMultiSelection ),
+			'is-dragging': isDragging,
 			'is-typing': isTypingWithinBlock,
 			'is-focused':
 				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
-			'has-child-selected': isAncestorOfSelectedBlock,
+			'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
 		},
 		className
 	);
@@ -152,8 +190,17 @@ function BlockListBlock( {
 		/>
 	);
 
-	if ( mode !== 'visual' ) {
-		blockEdit = <div style={ { display: 'none' } }>{ blockEdit }</div>;
+	// For aligned blocks, provide a wrapper element so the block can be
+	// positioned relative to the block column.
+	if ( isAligned ) {
+		const alignmentWrapperProps = {
+			'data-align': wrapperProps[ 'data-align' ],
+		};
+		blockEdit = (
+			<div className="wp-block" { ...alignmentWrapperProps }>
+				{ blockEdit }
+			</div>
+		);
 	}
 
 	const value = {
@@ -162,8 +209,6 @@ function BlockListBlock( {
 		isSelected,
 		isFirstMultiSelected,
 		isLastMultiSelected,
-		isMultiSelecting,
-		isNavigationMode,
 		isPartOfMultiSelection,
 		enableAnimation,
 		index,
@@ -172,42 +217,45 @@ function BlockListBlock( {
 		name,
 		mode,
 		blockTitle: blockType.title,
-		wrapperProps,
+		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
+
+	let block;
+
+	if ( ! isValid ) {
+		block = (
+			<Block>
+				<BlockInvalidWarning clientId={ clientId } />
+				<div>{ getSaveElement( blockType, attributes ) }</div>
+			</Block>
+		);
+	} else if ( mode === 'html' ) {
+		// Render blockEdit so the inspector controls don't disappear.
+		// See #8969.
+		block = (
+			<>
+				<div style={ { display: 'none' } }>{ blockEdit }</div>
+				<Block isHtml>
+					<BlockHtml clientId={ clientId } />
+				</Block>
+			</>
+		);
+	} else if ( lightBlockWrapper ) {
+		block = blockEdit;
+	} else {
+		block = <Block { ...wrapperProps }>{ blockEdit }</Block>;
+	}
 
 	return (
 		<BlockListBlockContext.Provider value={ memoizedValue }>
 			<BlockCrashBoundary onError={ onBlockError }>
-				{ isValid && lightBlockWrapper && (
-					<>
-						{ blockEdit }
-						{ mode === 'html' && (
-							<Block.div __unstableIsHtml>
-								<BlockHtml clientId={ clientId } />
-							</Block.div>
-						) }
-					</>
-				) }
-				{ isValid && ! lightBlockWrapper && (
-					<Block.div { ...wrapperProps }>
-						{ blockEdit }
-						{ mode === 'html' && (
-							<BlockHtml clientId={ clientId } />
-						) }
-					</Block.div>
-				) }
-				{ ! isValid && (
-					<Block.div>
-						<BlockInvalidWarning clientId={ clientId } />
-						<div>{ getSaveElement( blockType, attributes ) }</div>
-					</Block.div>
-				) }
+				{ block }
 			</BlockCrashBoundary>
 			{ !! hasError && (
-				<Block.div>
+				<Block>
 					<BlockCrashWarning />
-				</Block.div>
+				</Block>
 			) }
 		</BlockListBlockContext.Provider>
 	);
@@ -228,7 +276,6 @@ const applyWithSelect = withSelect(
 			hasSelectedInnerBlock,
 			getTemplateLock,
 			__unstableGetBlockWithoutInnerBlocks,
-			isNavigationMode,
 			getMultiSelectedBlockClientIds,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
@@ -274,7 +321,6 @@ const applyWithSelect = withSelect(
 			isSelectionEnabled: isSelectionEnabled(),
 			isLocked: !! templateLock,
 			isFocusMode: focusMode && isLargeViewport,
-			isNavigationMode: isNavigationMode(),
 			isRTL,
 
 			// Users of the editor.BlockListBlock filter used to be able to

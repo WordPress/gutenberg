@@ -284,3 +284,16 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
 		deviceType,
 	};
 }
+
+/**
+ * Returns an action object used to open/close the inserter.
+ *
+ * @param {boolean} value A boolean representing whether the inserter should be opened or closed.
+ * @return {Object} Action object.
+ */
+export function setIsInserterOpened( value ) {
+	return {
+		type: 'SET_IS_INSERTER_OPENED',
+		value,
+	};
+}

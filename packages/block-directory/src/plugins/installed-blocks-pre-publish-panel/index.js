@@ -4,6 +4,7 @@
 import { _n, sprintf } from '@wordpress/i18n';
 import { PluginPrePublishPanel } from '@wordpress/edit-post';
 import { useSelect } from '@wordpress/data';
+import { blockDefault } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -11,8 +12,9 @@ import { useSelect } from '@wordpress/data';
 import CompactList from '../../components/compact-list';
 
 export default function InstalledBlocksPrePublishPanel() {
-	const newBlockTypes = useSelect( ( select ) =>
-		select( 'core/block-directory' ).getInstalledBlockTypes()
+	const newBlockTypes = useSelect(
+		( select ) => select( 'core/block-directory' ).getNewBlockTypes(),
+		[]
 	);
 
 	if ( ! newBlockTypes.length ) {
@@ -21,7 +23,7 @@ export default function InstalledBlocksPrePublishPanel() {
 
 	return (
 		<PluginPrePublishPanel
-			icon="block-default"
+			icon={ blockDefault }
 			title={ sprintf(
 				// translators: %d: number of blocks (number).
 				_n(

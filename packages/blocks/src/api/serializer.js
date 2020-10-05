@@ -36,7 +36,7 @@ import BlockContentProvider from '../block-content-provider';
  */
 export function getBlockDefaultClassName( blockName ) {
 	// Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature.
-	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
+	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (historically used in 'core-embed/').
 	const className =
 		'wp-block-' + blockName.replace( /\//, '-' ).replace( /^core-/, '' );
 
@@ -56,7 +56,7 @@ export function getBlockDefaultClassName( blockName ) {
  */
 export function getBlockMenuDefaultClassName( blockName ) {
 	// Generated HTML classes for blocks follow the `editor-block-list-item-{name}` nomenclature.
-	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (used in 'core-embed/').
+	// Blocks provided by WordPress drop the prefixes 'core/' or 'core-' (historically used in 'core-embed/').
 	const className =
 		'editor-block-list-item-' +
 		blockName.replace( /\//, '-' ).replace( /^core-/, '' );
@@ -65,6 +65,23 @@ export function getBlockMenuDefaultClassName( blockName ) {
 		'blocks.getBlockMenuDefaultClassName',
 		className,
 		blockName
+	);
+}
+
+const blockPropsProvider = {};
+
+/**
+ * Call within a save function to get the props for the block wrapper.
+ *
+ * @param {Object} props Optional. Props to pass to the element.
+ */
+export function getBlockProps( props = {} ) {
+	const { blockType, attributes } = blockPropsProvider;
+	return applyFilters(
+		'blocks.getSaveContent.extraProps',
+		{ ...props },
+		blockType,
+		attributes
 	);
 }
 
@@ -94,11 +111,15 @@ export function getSaveElement(
 		save = instance.render.bind( instance );
 	}
 
+	blockPropsProvider.blockType = blockType;
+	blockPropsProvider.attributes = attributes;
+
 	let element = save( { attributes, innerBlocks } );
 
 	if (
 		isObject( element ) &&
-		hasFilter( 'blocks.getSaveContent.extraProps' )
+		hasFilter( 'blocks.getSaveContent.extraProps' ) &&
+		! blockType.apiVersion
 	) {
 		/**
 		 * Filters the props applied to the block save result element.

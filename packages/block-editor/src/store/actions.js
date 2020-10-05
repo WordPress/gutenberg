@@ -1,24 +1,20 @@
 /**
  * External dependencies
  */
-import { castArray, first, get, includes, last, some } from 'lodash';
+import { castArray, first, last, some } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import {
-	getDefaultBlockName,
-	createBlock,
-	hasBlockSupport,
 	cloneBlock,
+	createBlock,
+	getDefaultBlockName,
+	hasBlockSupport,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { select } from './controls';
+import { controls } from '@wordpress/data';
 
 /**
  * Generator which will yield a default block insert action if there
@@ -27,12 +23,12 @@ import { select } from './controls';
  * replacement, etc).
  */
 function* ensureDefaultBlock() {
-	const count = yield select( 'core/block-editor', 'getBlockCount' );
+	const count = yield controls.select( 'core/block-editor', 'getBlockCount' );
 
 	// To avoid a focus loss when removing the last block, assure there is
 	// always a default block if the last of the blocks have been removed.
 	if ( count === 0 ) {
-		yield insertDefaultBlock();
+		return yield insertDefaultBlock();
 	}
 }
 
@@ -157,7 +153,7 @@ export function selectBlock( clientId, initialPosition = null ) {
  * @param {string} clientId Block client ID.
  */
 export function* selectPreviousBlock( clientId ) {
-	const previousBlockClientId = yield select(
+	const previousBlockClientId = yield controls.select(
 		'core/block-editor',
 		'getPreviousBlockClientId',
 		clientId
@@ -165,6 +161,7 @@ export function* selectPreviousBlock( clientId ) {
 
 	if ( previousBlockClientId ) {
 		yield selectBlock( previousBlockClientId, -1 );
+		return [ previousBlockClientId ];
 	}
 }
 
@@ -175,7 +172,7 @@ export function* selectPreviousBlock( clientId ) {
  * @param {string} clientId Block client ID.
  */
 export function* selectNextBlock( clientId ) {
-	const nextBlockClientId = yield select(
+	const nextBlockClientId = yield controls.select(
 		'core/block-editor',
 		'getNextBlockClientId',
 		clientId
@@ -183,6 +180,7 @@ export function* selectNextBlock( clientId ) {
 
 	if ( nextBlockClientId ) {
 		yield selectBlock( nextBlockClientId );
+		return [ nextBlockClientId ];
 	}
 }
 
@@ -251,11 +249,9 @@ export function toggleSelection( isSelectionEnabled = true ) {
 }
 
 function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
-	const preferredStyleVariations = get(
-		blockEditorSettings,
-		[ '__experimentalPreferredStyleVariations', 'value' ],
-		{}
-	);
+	const preferredStyleVariations =
+		blockEditorSettings?.__experimentalPreferredStyleVariations?.value ??
+		{};
 	return blocks.map( ( block ) => {
 		const blockName = block.name;
 		if ( ! hasBlockSupport( blockName, 'defaultStylePicker', true ) ) {
@@ -264,8 +260,8 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 		if ( ! preferredStyleVariations[ blockName ] ) {
 			return block;
 		}
-		const className = get( block, [ 'attributes', 'className' ] );
-		if ( includes( className, 'is-style-' ) ) {
+		const className = block.attributes?.className;
+		if ( className?.includes( 'is-style-' ) ) {
 			return block;
 		}
 		const { attributes = {} } = block;
@@ -286,10 +282,11 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
  *
- * @param {(string|string[])} clientIds     Block client ID(s) to replace.
- * @param {(Object|Object[])} blocks        Replacement block(s).
- * @param {number}            indexToSelect Index of replacement block to select.
+ * @param {(string|string[])} clientIds       Block client ID(s) to replace.
+ * @param {(Object|Object[])} blocks          Replacement block(s).
+ * @param {number}            indexToSelect   Index of replacement block to select.
  * @param {number}            initialPosition Index of caret after in the selected block after the operation.
+ * @param {?Object}           meta            Optional Meta values to be passed to the action object.
  *
  * @yield {Object} Action object.
  */
@@ -297,14 +294,15 @@ export function* replaceBlocks(
 	clientIds,
 	blocks,
 	indexToSelect,
-	initialPosition
+	initialPosition,
+	meta
 ) {
 	clientIds = castArray( clientIds );
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
-		yield select( 'core/block-editor', 'getSettings' )
+		yield controls.select( 'core/block-editor', 'getSettings' )
 	);
-	const rootClientId = yield select(
+	const rootClientId = yield controls.select(
 		'core/block-editor',
 		'getBlockRootClientId',
 		first( clientIds )
@@ -312,7 +310,7 @@ export function* replaceBlocks(
 	// Replace is valid if the new blocks can be inserted in the root block.
 	for ( let index = 0; index < blocks.length; index++ ) {
 		const block = blocks[ index ];
-		const canInsertBlock = yield select(
+		const canInsertBlock = yield controls.select(
 			'core/block-editor',
 			'canInsertBlockType',
 			block.name,
@@ -329,6 +327,7 @@ export function* replaceBlocks(
 		time: Date.now(),
 		indexToSelect,
 		initialPosition,
+		meta,
 	};
 	yield* ensureDefaultBlock();
 }
@@ -368,23 +367,23 @@ export const moveBlocksDown = createOnMove( 'MOVE_BLOCKS_DOWN' );
 export const moveBlocksUp = createOnMove( 'MOVE_BLOCKS_UP' );
 
 /**
- * Returns an action object signalling that an indexed block should be moved
- * to a new index.
+ * Returns an action object signalling that the given blocks should be moved to
+ * a new position.
  *
- * @param  {?string} clientId         The client ID of the block.
+ * @param  {?string} clientIds        The client IDs of the blocks.
  * @param  {?string} fromRootClientId Root client ID source.
  * @param  {?string} toRootClientId   Root client ID destination.
- * @param  {number}  index            The index to move the block into.
+ * @param  {number}  index            The index to move the blocks to.
  *
  * @yield {Object} Action object.
  */
-export function* moveBlockToPosition(
-	clientId,
+export function* moveBlocksToPosition(
+	clientIds,
 	fromRootClientId = '',
 	toRootClientId = '',
 	index
 ) {
-	const templateLock = yield select(
+	const templateLock = yield controls.select(
 		'core/block-editor',
 		'getTemplateLock',
 		fromRootClientId
@@ -397,12 +396,13 @@ export function* moveBlockToPosition(
 	}
 
 	const action = {
-		type: 'MOVE_BLOCK_TO_POSITION',
+		type: 'MOVE_BLOCKS_TO_POSITION',
 		fromRootClientId,
 		toRootClientId,
-		clientId,
+		clientIds,
 		index,
 	};
+
 	// If moving inside the same root block the move is always possible.
 	if ( fromRootClientId === toRootClientId ) {
 		yield action;
@@ -410,28 +410,48 @@ export function* moveBlockToPosition(
 	}
 
 	// If templateLock is insert we can not remove the block from the parent.
-	// Given that here we know that we are moving the block to a different parent, the move should not be possible if the condition is true.
+	// Given that here we know that we are moving the block to a different
+	// parent, the move should not be possible if the condition is true.
 	if ( templateLock === 'insert' ) {
 		return;
 	}
 
-	const blockName = yield select(
+	const canInsertBlocks = yield controls.select(
 		'core/block-editor',
-		'getBlockName',
-		clientId
-	);
-
-	const canInsertBlock = yield select(
-		'core/block-editor',
-		'canInsertBlockType',
-		blockName,
+		'canInsertBlocks',
+		clientIds,
 		toRootClientId
 	);
 
 	// If moving to other parent block, the move is possible if we can insert a block of the same type inside the new parent block.
-	if ( canInsertBlock ) {
+	if ( canInsertBlocks ) {
 		yield action;
 	}
+}
+
+/**
+ * Returns an action object signalling that the given block should be moved to a
+ * new position.
+ *
+ * @param  {?string} clientId         The client ID of the block.
+ * @param  {?string} fromRootClientId Root client ID source.
+ * @param  {?string} toRootClientId   Root client ID destination.
+ * @param  {number}  index            The index to move the block to.
+ *
+ * @yield {Object} Action object.
+ */
+export function* moveBlockToPosition(
+	clientId,
+	fromRootClientId = '',
+	toRootClientId = '',
+	index
+) {
+	yield moveBlocksToPosition(
+		[ clientId ],
+		fromRootClientId,
+		toRootClientId,
+		index
+	);
 }
 
 /**
@@ -458,10 +478,11 @@ export function insertBlock(
  * Returns an action object used in signalling that an array of blocks should
  * be inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object[]} blocks          Block objects to insert.
- * @param {?number}  index           Index at which block should be inserted.
- * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
- * @param {?boolean} updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
+ * @param {Object[]}   blocks          Block objects to insert.
+ * @param {?number}    index           Index at which block should be inserted.
+ * @param {?string}    rootClientId    Optional root client ID of block list on which to insert.
+ * @param {?boolean}   updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
+ * @param {?Object}  meta             Optional Meta values to be passed to the action object.
  *
  *  @return {Object} Action object.
  */
@@ -469,15 +490,16 @@ export function* insertBlocks(
 	blocks,
 	index,
 	rootClientId,
-	updateSelection = true
+	updateSelection = true,
+	meta
 ) {
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
-		yield select( 'core/block-editor', 'getSettings' )
+		yield controls.select( 'core/block-editor', 'getSettings' )
 	);
 	const allowedBlocks = [];
 	for ( const block of blocks ) {
-		const isValid = yield select(
+		const isValid = yield controls.select(
 			'core/block-editor',
 			'canInsertBlockType',
 			block.name,
@@ -495,6 +517,7 @@ export function* insertBlocks(
 			rootClientId,
 			time: Date.now(),
 			updateSelection,
+			meta,
 		};
 	}
 }
@@ -582,12 +605,12 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 	}
 
 	clientIds = castArray( clientIds );
-	const rootClientId = yield select(
+	const rootClientId = yield controls.select(
 		'core/block-editor',
 		'getBlockRootClientId',
 		clientIds[ 0 ]
 	);
-	const isLocked = yield select(
+	const isLocked = yield controls.select(
 		'core/block-editor',
 		'getTemplateLock',
 		rootClientId
@@ -596,8 +619,15 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 		return;
 	}
 
+	let previousBlockId;
 	if ( selectPrevious ) {
-		yield selectPreviousBlock( clientIds[ 0 ] );
+		previousBlockId = yield selectPreviousBlock( clientIds[ 0 ] );
+	} else {
+		previousBlockId = yield controls.select(
+			'core/block-editor',
+			'getPreviousBlockClientId',
+			clientIds[ 0 ]
+		);
 	}
 
 	yield {
@@ -607,7 +637,8 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 
 	// To avoid a focus loss when removing the last block, assure there is
 	// always a default block if the last of the blocks have been removed.
-	yield* ensureDefaultBlock();
+	const defaultBlockId = yield* ensureDefaultBlock();
+	return [ previousBlockId || defaultBlockId ];
 }
 
 /**
@@ -688,11 +719,14 @@ export function stopTyping() {
 /**
  * Returns an action object used in signalling that the user has begun to drag blocks.
  *
+ * @param {string[]} clientIds An array of client ids being dragged
+ *
  * @return {Object} Action object.
  */
-export function startDraggingBlocks() {
+export function startDraggingBlocks( clientIds = [] ) {
 	return {
 		type: 'START_DRAGGING_BLOCKS',
+		clientIds,
 	};
 }
 
@@ -885,20 +919,41 @@ export function* setNavigationMode( isNavigationMode = true ) {
 }
 
 /**
+ * Generator that triggers an action used to enable or disable the block moving mode.
+ *
+ * @param {string|null} hasBlockMovingClientId Enable/Disable block moving mode.
+ */
+export function* setBlockMovingClientId( hasBlockMovingClientId = null ) {
+	yield {
+		type: 'SET_BLOCK_MOVING_MODE',
+		hasBlockMovingClientId,
+	};
+
+	if ( hasBlockMovingClientId ) {
+		speak(
+			__(
+				'Use the Tab key and Arrow keys to choose new block location. Use Left and Right Arrow keys to move between nesting levels. Once location is selected press Enter or Space to move the block.'
+			)
+		);
+	}
+}
+
+/**
  * Generator that triggers an action used to duplicate a list of blocks.
  *
  * @param {string[]} clientIds
+ * @param {boolean} updateSelection
  */
-export function* duplicateBlocks( clientIds ) {
+export function* duplicateBlocks( clientIds, updateSelection = true ) {
 	if ( ! clientIds && ! clientIds.length ) {
 		return;
 	}
-	const blocks = yield select(
+	const blocks = yield controls.select(
 		'core/block-editor',
 		'getBlocksByClientId',
 		clientIds
 	);
-	const rootClientId = yield select(
+	const rootClientId = yield controls.select(
 		'core/block-editor',
 		'getBlockRootClientId',
 		clientIds[ 0 ]
@@ -908,7 +963,7 @@ export function* duplicateBlocks( clientIds ) {
 		return;
 	}
 	const blockNames = blocks.map( ( block ) => block.name );
-	// Return early if blocks don't support multipe  usage.
+	// Return early if blocks don't support multiple usage.
 	if (
 		some(
 			blockNames,
@@ -918,20 +973,26 @@ export function* duplicateBlocks( clientIds ) {
 		return;
 	}
 
-	const lastSelectedIndex = yield select(
+	const lastSelectedIndex = yield controls.select(
 		'core/block-editor',
 		'getBlockIndex',
 		last( castArray( clientIds ) ),
 		rootClientId
 	);
 	const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
-	yield insertBlocks( clonedBlocks, lastSelectedIndex + 1, rootClientId );
-	if ( clonedBlocks.length > 1 ) {
+	yield insertBlocks(
+		clonedBlocks,
+		lastSelectedIndex + 1,
+		rootClientId,
+		updateSelection
+	);
+	if ( clonedBlocks.length > 1 && updateSelection ) {
 		yield multiSelect(
 			first( clonedBlocks ).clientId,
 			last( clonedBlocks ).clientId
 		);
 	}
+	return clonedBlocks.map( ( block ) => block.clientId );
 }
 
 /**
@@ -943,12 +1004,12 @@ export function* insertBeforeBlock( clientId ) {
 	if ( ! clientId ) {
 		return;
 	}
-	const rootClientId = yield select(
+	const rootClientId = yield controls.select(
 		'core/block-editor',
 		'getBlockRootClientId',
 		clientId
 	);
-	const isLocked = yield select(
+	const isLocked = yield controls.select(
 		'core/block-editor',
 		'getTemplateLock',
 		rootClientId
@@ -957,13 +1018,13 @@ export function* insertBeforeBlock( clientId ) {
 		return;
 	}
 
-	const firstSelectedIndex = yield select(
+	const firstSelectedIndex = yield controls.select(
 		'core/block-editor',
 		'getBlockIndex',
 		clientId,
 		rootClientId
 	);
-	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
+	return yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex );
 }
 
 /**
@@ -975,12 +1036,12 @@ export function* insertAfterBlock( clientId ) {
 	if ( ! clientId ) {
 		return;
 	}
-	const rootClientId = yield select(
+	const rootClientId = yield controls.select(
 		'core/block-editor',
 		'getBlockRootClientId',
 		clientId
 	);
-	const isLocked = yield select(
+	const isLocked = yield controls.select(
 		'core/block-editor',
 		'getTemplateLock',
 		rootClientId
@@ -989,13 +1050,13 @@ export function* insertAfterBlock( clientId ) {
 		return;
 	}
 
-	const firstSelectedIndex = yield select(
+	const firstSelectedIndex = yield controls.select(
 		'core/block-editor',
 		'getBlockIndex',
 		clientId,
 		rootClientId
 	);
-	yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
+	return yield insertDefaultBlock( {}, rootClientId, firstSelectedIndex + 1 );
 }
 
 /**

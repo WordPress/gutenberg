@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, pick, defaultTo } from 'lodash';
+import { map, pick, defaultTo, flatten, partialRight } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -32,30 +32,86 @@ import ConvertToGroupButtons from '../convert-to-group-buttons';
 /**
  * Fetches link suggestions from the API. This function is an exact copy of a function found at:
  *
- * wordpress/editor/src/components/provider/index.js
+ * packages/edit-navigation/src/index.js
  *
  * It seems like there is no suitable package to import this from. Ideally it would be either part of core-data.
  * Until we refactor it, just copying the code is the simplest solution.
  *
- * @param {Object} search
- * @param {number} perPage
+ * @param {string} search
+ * @param {Object} [searchArguments]
+ * @param {number} [searchArguments.isInitialSuggestions]
+ * @param {number} [searchArguments.type]
+ * @param {number} [searchArguments.subtype]
+ * @param {number} [searchArguments.page]
+ * @param {Object} [editorSettings]
+ * @param {boolean} [editorSettings.disablePostFormats=false]
  * @return {Promise<Object[]>} List of suggestions
  */
-const fetchLinkSuggestions = async ( search, { perPage = 20 } = {} ) => {
-	const posts = await apiFetch( {
-		path: addQueryArgs( '/wp/v2/search', {
-			search,
-			per_page: perPage,
-			type: 'post',
-		} ),
-	} );
 
-	return map( posts, ( post ) => ( {
-		id: post.id,
-		url: post.url,
-		title: decodeEntities( post.title ) || __( '(no title)' ),
-		type: post.subtype || post.type,
-	} ) );
+const fetchLinkSuggestions = async (
+	search,
+	{ isInitialSuggestions, type, subtype, page, perPage: perPageArg } = {},
+	{ disablePostFormats = false } = {}
+) => {
+	const perPage = perPageArg || isInitialSuggestions ? 3 : 20;
+
+	const queries = [];
+
+	if ( ! type || type === 'post' ) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/search', {
+					search,
+					page,
+					per_page: perPage,
+					type: 'post',
+					subtype,
+				} ),
+			} ).catch( () => [] ) // fail by returning no results
+		);
+	}
+
+	if ( ! type || type === 'term' ) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/search', {
+					search,
+					page,
+					per_page: perPage,
+					type: 'term',
+					subtype,
+				} ),
+			} ).catch( () => [] )
+		);
+	}
+
+	if ( ! disablePostFormats && ( ! type || type === 'post-format' ) ) {
+		queries.push(
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/search', {
+					search,
+					page,
+					per_page: perPage,
+					type: 'post-format',
+					subtype,
+				} ),
+			} ).catch( () => [] )
+		);
+	}
+
+	return Promise.all( queries ).then( ( results ) => {
+		return map(
+			flatten( results )
+				.filter( ( result ) => !! result.id )
+				.slice( 0, perPage ),
+			( result ) => ( {
+				id: result.id,
+				url: result.url,
+				title: decodeEntities( result.title ) || __( '(no title)' ),
+				type: result.subtype || result.type,
+			} )
+		);
+	} );
 };
 
 class EditorProvider extends Component {
@@ -114,16 +170,14 @@ class EditorProvider extends Component {
 				'__experimentalBlockDirectory',
 				'__experimentalBlockPatterns',
 				'__experimentalBlockPatternCategories',
-				'__experimentalDisableCustomUnits',
-				'__experimentalDisableCustomLineHeight',
-				'__experimentalEnableCustomSpacing',
-				'__experimentalEnableLegacyWidgetBlock',
 				'__experimentalEnableFullSiteEditing',
 				'__experimentalEnableFullSiteEditingDemo',
 				'__experimentalFeatures',
 				'__experimentalGlobalStylesUserEntityId',
-				'__experimentalGlobalStylesBase',
+				'__experimentalGlobalStylesBaseStyles',
+				'__experimentalGlobalStylesContexts',
 				'__experimentalPreferredStyleVariations',
+				'__experimentalSetIsInserterOpened',
 				'alignWide',
 				'allowedBlockTypes',
 				'availableLegacyWidgets',
@@ -133,14 +187,19 @@ class EditorProvider extends Component {
 				'disableCustomColors',
 				'disableCustomFontSizes',
 				'disableCustomGradients',
+				'enableCustomUnits',
+				'enableCustomLineHeight',
 				'focusMode',
 				'fontSizes',
 				'gradients',
 				'hasFixedToolbar',
+				'hasReducedUI',
 				'hasPermissionsToManageWidgets',
+				'imageEditing',
 				'imageSizes',
 				'imageDimensions',
 				'isRTL',
+				'keepCaretInsideBlock',
 				'maxWidth',
 				'onUpdateDefaultBlockStyles',
 				'styles',
@@ -151,7 +210,10 @@ class EditorProvider extends Component {
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalFetchReusableBlocks,
-			__experimentalFetchLinkSuggestions: fetchLinkSuggestions,
+			__experimentalFetchLinkSuggestions: partialRight(
+				fetchLinkSuggestions,
+				settings
+			),
 			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,

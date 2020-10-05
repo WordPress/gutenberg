@@ -9,7 +9,7 @@ describe( 'TypeWriter', () => {
 	} );
 
 	const getCaretPosition = async () =>
-		await page.evaluate( () => wp.dom.computeCaretRect().y );
+		await page.evaluate( () => wp.dom.computeCaretRect( window ).y );
 
 	// Allow the scroll position to be 1px off.
 	const BUFFER = 1;
@@ -19,6 +19,9 @@ describe( 'TypeWriter', () => {
 
 	it( 'should maintain caret position', async () => {
 		// Create first block.
+		await page.keyboard.press( 'Enter' );
+
+		// Create second block.
 		await page.keyboard.press( 'Enter' );
 
 		const initialPosition = await getCaretPosition();
@@ -118,7 +121,10 @@ describe( 'TypeWriter', () => {
 		await page.keyboard.press( 'Enter' );
 		// Create second block.
 		await page.keyboard.press( 'Enter' );
+		// Create third block.
+		await page.keyboard.press( 'Enter' );
 		// Move to first block.
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 
 		const initialPosition = await getCaretPosition();

@@ -1,0 +1,32 @@
+.components-combobox-control {
+	width: 100%;
+}
+
+input.components-combobox-control__input[type="text"] {
+	width: 100%;
+	border: none;
+	box-shadow: none;
+	padding: 2px;
+	margin: 0;
+	line-height: inherit;
+	min-height: auto;
+
+	&:focus {
+		outline: none;
+		box-shadow: none;
+	}
+}
+
+.components-combobox-control__suggestions-container {
+	@include input-control;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: flex-start;
+	width: 100%;
+	margin: 0 0 $grid-unit-10 0;
+	padding: $grid-unit-05;
+
+	&:focus-within {
+		@include input-style__focus();
+	}
+}

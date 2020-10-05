@@ -4,7 +4,7 @@
 import {
 	__experimentalAlignmentHookSettingsProvider as AlignmentHookSettingsProvider,
 	InnerBlocks,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -21,16 +21,17 @@ const alignmentHooksSetting = {
 };
 
 function ButtonsEdit() {
+	const blockProps = useBlockProps();
 	return (
-		<Block.div>
-			<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
-				<InnerBlocks
-					allowedBlocks={ ALLOWED_BLOCKS }
-					template={ BUTTONS_TEMPLATE }
-					__experimentalMoverDirection="horizontal"
-				/>
-			</AlignmentHookSettingsProvider>
-		</Block.div>
+		<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
+			<InnerBlocks
+				allowedBlocks={ ALLOWED_BLOCKS }
+				__experimentalPassedProps={ blockProps }
+				__experimentalTagName="div"
+				template={ BUTTONS_TEMPLATE }
+				orientation="horizontal"
+			/>
+		</AlignmentHookSettingsProvider>
 	);
 }
 

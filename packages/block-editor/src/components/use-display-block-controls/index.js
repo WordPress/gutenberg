@@ -31,7 +31,7 @@ export default function useDisplayBlockControls() {
 				( id ) => getBlockName( id ) === name
 			);
 		},
-		[ clientId, name ]
+		[ clientId, isSelected, name ]
 	);
 
 	return isSelected || isFirstAndSameTypeMultiSelected;

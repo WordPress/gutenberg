@@ -13,6 +13,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { useState, useEffect, useRef } from '@wordpress/element';
+import { debounce } from 'lodash';
 
 /**
  * Internal dependencies
@@ -45,11 +46,13 @@ function ButtonsEdit( {
 		}
 	}, [ sizes ] );
 
+	const debounceAddNextButton = debounce( onAddNextButton, 200 );
+
 	const renderFooterAppender = useRef( () => (
 		<View style={ styles.appenderContainer }>
 			<InnerBlocks.ButtonBlockAppender
 				isFloating={ true }
-				onAddBlock={ onAddNextButton }
+				onAddBlock={ debounceAddNextButton }
 			/>
 		</View>
 	) );
@@ -68,10 +71,10 @@ function ButtonsEdit( {
 				renderFooterAppender={
 					shouldRenderFooterAppender && renderFooterAppender.current
 				}
-				__experimentalMoverDirection="horizontal"
+				orientation="horizontal"
 				horizontalAlignment={ align }
 				onDeleteBlock={ shouldDelete ? onDelete : undefined }
-				onAddBlock={ onAddNextButton }
+				onAddBlock={ debounceAddNextButton }
 				parentWidth={ maxWidth }
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
@@ -103,13 +106,10 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId }, registry ) => {
-		const { replaceInnerBlocks, selectBlock, removeBlock } = dispatch(
+		const { selectBlock, removeBlock, insertBlock } = dispatch(
 			'core/block-editor'
 		);
-		const { getBlocks, getBlockOrder } = registry.select(
-			'core/block-editor'
-		);
-		const innerBlocks = getBlocks( clientId );
+		const { getBlockOrder } = registry.select( 'core/block-editor' );
 
 		return {
 			// The purpose of `onAddNextButton` is giving the ability to automatically
@@ -127,9 +127,7 @@ export default compose(
 
 				const insertedBlock = createBlock( 'core/button' );
 
-				innerBlocks.splice( index + 1, 0, insertedBlock );
-
-				replaceInnerBlocks( clientId, innerBlocks, true );
+				insertBlock( insertedBlock, index, clientId );
 				selectBlock( insertedBlock.clientId );
 			},
 			onDelete: () => {

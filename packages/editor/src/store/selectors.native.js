@@ -55,3 +55,25 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 		return false;
 	}
 );
+
+/**
+ * Returns the current clipboard data.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} Current clipboard data.
+ */
+export function getClipboard( state ) {
+	return state.clipboard;
+}
+
+/**
+ * Returns the current notice data.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} Current notice data.
+ */
+export function getNotices( state ) {
+	return state.notices;
+}

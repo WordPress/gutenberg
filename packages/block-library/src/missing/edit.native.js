@@ -1,19 +1,25 @@
 /**
  * External dependencies
  */
-import { Platform, View, Text, TouchableWithoutFeedback } from 'react-native';
-import { requestUnsupportedBlockFallback } from 'react-native-gutenberg-bridge';
+import { View, Text, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
  */
+import {
+	requestUnsupportedBlockFallback,
+	sendActionButtonPressedAction,
+	actionButtons,
+} from '@wordpress/react-native-bridge';
 import { BottomSheet, Icon } from '@wordpress/components';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { help, plugins } from '@wordpress/icons';
+import { withSelect } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -47,31 +53,38 @@ export class UnsupportedBlockEdit extends Component {
 		);
 
 		return (
-			<TouchableWithoutFeedback
-				accessibilityLabel={ __( 'Help icon' ) }
-				accessibilityRole={ 'button' }
-				accessibilityHint={ __( 'Tap here to show help' ) }
-				onPress={ this.toggleSheet }
-			>
-				<View style={ styles.helpIconContainer }>
-					<Icon
-						className="unsupported-icon-help"
-						label={ __( 'Help icon' ) }
-						icon={ help }
-						color={ infoIconStyle.color }
-					/>
-				</View>
-			</TouchableWithoutFeedback>
+			<View style={ styles.helpIconContainer }>
+				<Icon
+					className="unsupported-icon-help"
+					label={ __( 'Help icon' ) }
+					icon={ help }
+					color={ infoIconStyle.color }
+				/>
+			</View>
 		);
 	}
 
 	requestFallback() {
-		this.toggleSheet();
-		this.setState( { sendFallbackMessage: true } );
+		if (
+			this.props.canEnableUnsupportedBlockEditor &&
+			this.props.isUnsupportedBlockEditorSupported === false
+		) {
+			this.toggleSheet();
+			this.setState( { sendButtonPressMessage: true } );
+		} else {
+			this.toggleSheet();
+			this.setState( { sendFallbackMessage: true } );
+		}
 	}
 
-	renderSheet( title ) {
-		const { getStylesFromColorScheme, attributes, clientId } = this.props;
+	renderSheet( blockTitle, blockName ) {
+		const {
+			getStylesFromColorScheme,
+			attributes,
+			clientId,
+			isUnsupportedBlockEditorSupported,
+			canEnableUnsupportedBlockEditor,
+		} = this.props;
 		const infoTextStyle = getStylesFromColorScheme(
 			styles.infoText,
 			styles.infoTextDark
@@ -89,13 +102,17 @@ export class UnsupportedBlockEdit extends Component {
 			styles.infoSheetIconDark
 		);
 
-		const titleFormat =
-			Platform.OS === 'android'
-				? // translators: %s: Name of the block
-				  __( "'%s' isn't yet supported on WordPress for Android" )
-				: // translators: %s: Name of the block
-				  __( "'%s' isn't yet supported on WordPress for iOS" );
-		const infoTitle = sprintf( titleFormat, title );
+		/* translators: Missing block alert title. %s: The localized block name */
+		const titleFormat = __( "'%s' is not fully-supported" );
+		const infoTitle = sprintf( titleFormat, blockTitle );
+		const missingBlockDetail = applyFilters(
+			'native.missing_block_detail',
+			__( 'We are working hard to add more blocks with each release.' )
+		);
+		const missingBlockActionButton = applyFilters(
+			'native.missing_block_action_button',
+			__( 'Edit using web editor' )
+		);
 
 		const actionButtonStyle = getStylesFromColorScheme(
 			styles.actionButton,
@@ -112,13 +129,26 @@ export class UnsupportedBlockEdit extends Component {
 						// On iOS, onModalHide is called when the controller is still part of the hierarchy.
 						// A small delay will ensure that the controller has already been removed.
 						this.timeout = setTimeout( () => {
+							// for the Classic block, the content is kept in the `content` attribute
+							const content =
+								blockName === 'core/freeform'
+									? attributes.content
+									: attributes.originalContent;
 							requestUnsupportedBlockFallback(
-								attributes.originalContent,
+								content,
 								clientId,
-								title
+								blockName,
+								blockTitle
 							);
 						}, 100 );
 						this.setState( { sendFallbackMessage: false } );
+					} else if ( this.state.sendButtonPressMessage ) {
+						this.timeout = setTimeout( () => {
+							sendActionButtonPressedAction(
+								actionButtons.missingBlockAlertActionButton
+							);
+						}, 100 );
+						this.setState( { sendButtonPressMessage: false } );
 					}
 				} }
 			>
@@ -132,37 +162,26 @@ export class UnsupportedBlockEdit extends Component {
 						{ infoTitle }
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{
-							// eslint-disable-next-line no-undef
-							__DEV__
-								? __(
-										"We are working hard to add more blocks with each release. In the meantime, you can also edit this block using your device's web browser."
-								  )
-								: __(
-										'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.'
-								  )
-						}
+						{ missingBlockDetail }
 					</Text>
 				</View>
-				{
-					// eslint-disable-next-line no-undef
-					__DEV__ && (
-						<>
-							<BottomSheet.Cell
-								label={ __( 'Edit block in web browser' ) }
-								separatorType="topFullWidth"
-								onPress={ this.requestFallback }
-								labelStyle={ actionButtonStyle }
-							/>
-							<BottomSheet.Cell
-								label={ __( 'Dismiss' ) }
-								separatorType="topFullWidth"
-								onPress={ this.toggleSheet }
-								labelStyle={ actionButtonStyle }
-							/>
-						</>
-					)
-				}
+				{ ( isUnsupportedBlockEditorSupported ||
+					canEnableUnsupportedBlockEditor ) && (
+					<>
+						<BottomSheet.Cell
+							label={ missingBlockActionButton }
+							separatorType="topFullWidth"
+							onPress={ this.requestFallback }
+							labelStyle={ actionButtonStyle }
+						/>
+						<BottomSheet.Cell
+							label={ __( 'Dismiss' ) }
+							separatorType="topFullWidth"
+							onPress={ this.toggleSheet }
+							labelStyle={ actionButtonStyle }
+						/>
+					</>
+				) }
 			</BottomSheet>
 		);
 	}
@@ -195,24 +214,44 @@ export class UnsupportedBlockEdit extends Component {
 		);
 		const iconClassName = 'unsupported-icon' + '-' + preferredColorScheme;
 		return (
-			<View
-				style={ getStylesFromColorScheme(
-					styles.unsupportedBlock,
-					styles.unsupportedBlockDark
-				) }
+			<TouchableWithoutFeedback
+				disabled={ ! this.props.isSelected }
+				accessibilityLabel={ __( 'Help button' ) }
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Tap here to show help' ) }
+				onPress={ this.toggleSheet }
 			>
-				{ this.renderHelpIcon() }
-				<Icon
-					className={ iconClassName }
-					icon={ icon && icon.src ? icon.src : icon }
-					color={ iconStyle.color }
-				/>
-				<Text style={ titleStyle }>{ title }</Text>
-				{ subtitle }
-				{ this.renderSheet( title ) }
-			</View>
+				<View
+					style={ getStylesFromColorScheme(
+						styles.unsupportedBlock,
+						styles.unsupportedBlockDark
+					) }
+				>
+					{ this.renderHelpIcon() }
+					<Icon
+						className={ iconClassName }
+						icon={ icon && icon.src ? icon.src : icon }
+						color={ iconStyle.color }
+					/>
+					<Text style={ titleStyle }>{ title }</Text>
+					{ subtitle }
+					{ this.renderSheet( title, originalName ) }
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }
 
-export default withPreferredColorScheme( UnsupportedBlockEdit );
+export default compose( [
+	withSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return {
+			isUnsupportedBlockEditorSupported:
+				getSettings( 'capabilities' ).unsupportedBlockEditor === true,
+			canEnableUnsupportedBlockEditor:
+				getSettings( 'capabilities' )
+					.canEnableUnsupportedBlockEditor === true,
+		};
+	} ),
+	withPreferredColorScheme,
+] )( UnsupportedBlockEdit );

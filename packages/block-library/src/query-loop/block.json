@@ -1,7 +1,8 @@
 {
+	"apiVersion": 2,
 	"name": "core/query-loop",
 	"category": "design",
-	"context": [
+	"usesContext": [
 		"queryId",
 		"query",
 		"queryContext"

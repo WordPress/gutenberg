@@ -4,11 +4,13 @@
 
 import { normaliseFormats } from './normalise-formats';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
  * Search a Rich Text value and replace the match(es) with `replacement`. This
  * is similar to `String.prototype.replace`.
  *
- * @param {Object}         value        The value to modify.
+ * @param {RichTextValue}  value        The value to modify.
  * @param {RegExp|string}  pattern      A RegExp object or literal. Can also be
  *                                      a string. It is treated as a verbatim
  *                                      string and is not interpreted as a
@@ -18,7 +20,7 @@ import { normaliseFormats } from './normalise-formats';
  *                                      the specified or the value returned by
  *                                      the specified function.
  *
- * @return {Object} A new value with replacements applied.
+ * @return {RichTextValue} A new value with replacements applied.
  */
 export function replace(
 	{ formats, replacements, text, start, end },

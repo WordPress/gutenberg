@@ -11,14 +11,17 @@ import {
 	visitAdminPage,
 	createNewPost,
 	publishPost,
+	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { useExperimentalFeatures } from '../../experimental-features';
-import { trashExistingPosts } from '../../config/setup-test-framework';
+import {
+	useExperimentalFeatures,
+	openNavigation,
+} from '../../experimental-features';
 
 const visitSiteEditor = async () => {
 	const query = addQueryArgs( '', {
@@ -27,51 +30,46 @@ const visitSiteEditor = async () => {
 	await visitAdminPage( 'admin.php', query );
 	// Waits for the template part to load...
 	await page.waitForSelector(
-		'.wp-block[data-type="core/template-part"] .block-editor-inner-blocks'
+		'.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
 	);
-};
-
-const openTemplateDropdown = async () => {
-	// Open the dropdown menu.
-	const templateDropdown =
-		'button.components-dropdown-menu__toggle[aria-label="Switch Template"]';
-	await page.click( templateDropdown );
-	await page.waitForSelector( '.edit-site-template-switcher__popover' );
 };
 
 const getTemplateDropdownElement = async ( itemName ) => {
-	await openTemplateDropdown();
-	const [ item ] = await page.$x(
-		`//div[contains(@class, "edit-site-template-switcher__popover")]//button[contains(., "${ itemName }")]`
-	);
+	await openNavigation();
+	const selector = `//div[contains(@class, "edit-site-navigation-panel")]//button[contains(., "${ itemName }")]`;
+	await page.waitForXPath( selector );
+	const [ item ] = await page.$x( selector );
 	return item;
 };
 
 const createTemplatePart = async (
 	templatePartName = 'test-template-part',
-	themeName = 'test-theme',
 	isNested = false
 ) => {
 	// Create new template part.
 	await insertBlock( 'Template Part' );
-	await page.keyboard.type( templatePartName );
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.type( themeName );
-	await page.keyboard.press( 'Tab' );
-	await page.keyboard.press( 'Enter' );
+	const [ createNewButton ] = await page.$x(
+		'//button[contains(text(), "New template part")]'
+	);
+	await createNewButton.click();
 	await page.waitForSelector(
 		isNested
-			? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"] .block-editor-inner-blocks'
-			: '.wp-block[data-type="core/template-part"] .block-editor-inner-blocks'
+			? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
+			: '.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
 	);
+	await page.focus( '.wp-block-template-part__name-panel input' );
+	await page.keyboard.type( templatePartName );
 };
 
 const editTemplatePart = async ( textToAdd, isNested = false ) => {
 	await page.click(
-		isNested
-			? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"]'
-			: '.wp-block[data-type="core/template-part"]'
+		`${
+			isNested
+				? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"]'
+				: '.wp-block[data-type="core/template-part"]'
+		} .block-editor-button-block-appender`
 	);
+	await page.click( '.editor-block-list-item-paragraph' );
 	for ( const text of textToAdd ) {
 		await page.keyboard.type( text );
 		await page.keyboard.press( 'Enter' );
@@ -161,8 +159,8 @@ describe( 'Multi-entity editor states', () => {
 	] );
 
 	beforeAll( async () => {
-		await trashExistingPosts( 'wp_template' );
-		await trashExistingPosts( 'wp_template_part' );
+		await trashAllPosts( 'wp_template' );
+		await trashAllPosts( 'wp_template_part' );
 	} );
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
@@ -191,8 +189,8 @@ describe( 'Multi-entity editor states', () => {
 
 	describe( 'Multi-entity edit', () => {
 		beforeAll( async () => {
-			await trashExistingPosts( 'wp_template' );
-			await trashExistingPosts( 'wp_template_part' );
+			await trashAllPosts( 'wp_template' );
+			await trashAllPosts( 'wp_template_part' );
 			await createNewPost( {
 				postType: 'wp_template',
 				title: kebabCase( templateName ),
@@ -203,7 +201,7 @@ describe( 'Multi-entity editor states', () => {
 				'Default template part test text.',
 				'Second paragraph test.',
 			] );
-			await createTemplatePart( nestedTPName, 'test-theme', true );
+			await createTemplatePart( nestedTPName, true );
 			await editTemplatePart(
 				[ 'Nested Template Part Text.', 'Second Nested test.' ],
 				true

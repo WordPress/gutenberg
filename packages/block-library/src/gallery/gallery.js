@@ -84,6 +84,7 @@ export const Gallery = ( props ) => {
 								}
 								caption={ img.caption }
 								aria-label={ ariaLabel }
+								sizeSlug={ attributes.sizeSlug }
 							/>
 						</li>
 					);

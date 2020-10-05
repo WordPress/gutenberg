@@ -4,9 +4,7 @@
 import { cloneElement } from '@wordpress/element';
 
 // Disable reason: JSDoc linter doesn't seem to parse the union (`&`) correctly.
-/* eslint-disable jsdoc/valid-types */
 /** @typedef {{icon: JSX.Element, size?: number} & import('react').ComponentPropsWithoutRef<'SVG'>} IconProps */
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * Return an SVG icon.

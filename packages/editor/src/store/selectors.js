@@ -16,6 +16,7 @@ import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { Platform } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -545,7 +546,8 @@ export function isEditedPostSaveable( state ) {
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostAttribute( state, 'excerpt' ) ||
-		! isEditedPostEmpty( state )
+		! isEditedPostEmpty( state ) ||
+		Platform.OS === 'native'
 	);
 }
 
@@ -889,19 +891,28 @@ export function getEditedPostPreviewLink( state ) {
 export function getSuggestedPostFormat( state ) {
 	const blocks = getEditorBlocks( state );
 
+	if ( blocks.length > 2 ) return null;
+
 	let name;
 	// If there is only one block in the content of the post grab its name
 	// so we can derive a suitable post format from it.
 	if ( blocks.length === 1 ) {
 		name = blocks[ 0 ].name;
+		// check for core/embed `video` and `audio` eligible suggestions
+		if ( name === 'core/embed' ) {
+			const provider = blocks[ 0 ].attributes?.providerNameSlug;
+			if ( [ 'youtube', 'vimeo' ].includes( provider ) ) {
+				name = 'core/video';
+			} else if ( [ 'spotify', 'soundcloud' ].includes( provider ) ) {
+				name = 'core/audio';
+			}
+		}
 	}
 
 	// If there are two blocks in the content and the last one is a text blocks
 	// grab the name of the first one to also suggest a post format from it.
-	if ( blocks.length === 2 ) {
-		if ( blocks[ 1 ].name === 'core/paragraph' ) {
-			name = blocks[ 0 ].name;
-		}
+	if ( blocks.length === 2 && blocks[ 1 ].name === 'core/paragraph' ) {
+		name = blocks[ 0 ].name;
 	}
 
 	// We only convert to default post formats in core.
@@ -914,16 +925,12 @@ export function getSuggestedPostFormat( state ) {
 		case 'core/gallery':
 			return 'gallery';
 		case 'core/video':
-		case 'core-embed/youtube':
-		case 'core-embed/vimeo':
 			return 'video';
 		case 'core/audio':
-		case 'core-embed/spotify':
-		case 'core-embed/soundcloud':
 			return 'audio';
+		default:
+			return null;
 	}
-
-	return null;
 }
 
 /**

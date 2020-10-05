@@ -54,8 +54,7 @@ class PullQuoteEdit extends Component {
 		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
 		const needTextColor =
 			! textColor.color || this.wasTextColorAutomaticallyComputed;
-		const shouldSetTextColor =
-			isSolidColorStyle && needTextColor && colorValue;
+		const shouldSetTextColor = isSolidColorStyle && needTextColor;
 
 		if ( isSolidColorStyle ) {
 			// If we use the solid color style, set the color using the normal mechanism.
@@ -67,8 +66,14 @@ class PullQuoteEdit extends Component {
 		}
 
 		if ( shouldSetTextColor ) {
-			this.wasTextColorAutomaticallyComputed = true;
-			setTextColor( colorUtils.getMostReadableColor( colorValue ) );
+			if ( colorValue ) {
+				this.wasTextColorAutomaticallyComputed = true;
+				setTextColor( colorUtils.getMostReadableColor( colorValue ) );
+			} else if ( this.wasTextColorAutomaticallyComputed ) {
+				// We have to unset our previously computed text color on unsetting the main color.
+				this.wasTextColorAutomaticallyComputed = false;
+				setTextColor();
+			}
 		}
 	}
 

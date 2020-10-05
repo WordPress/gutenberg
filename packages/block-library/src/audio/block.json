@@ -1,4 +1,5 @@
 {
+	"apiVersion": 2,
 	"name": "core/audio",
 	"category": "media",
 	"attributes": {
@@ -36,7 +37,7 @@
 		}
 	},
 	"supports": {
-		"align": true,
-		"lightBlockWrapper": true
+		"anchor": true,
+		"align": true
 	}
 }

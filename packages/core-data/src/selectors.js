@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { map, find, get, filter, compact, defaultTo } from 'lodash';
+import { first, map, find, get, filter, compact, defaultTo } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -44,6 +44,9 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  * @return {Array} Authors list.
  */
 export function getAuthors( state ) {
+	deprecated( "select( 'core' ).getAuthors()", {
+		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
+	} );
 	return getUserQueryResults( state, 'authors' );
 }
 
@@ -101,23 +104,39 @@ export function getEntity( state, kind, name ) {
 }
 
 /**
- * Returns the Entity's record object by key.
+ * Returns the Entity's record object by key. Returns `null` if the value is not
+ * yet received, undefined if the value entity is known to not exist, or the
+ * entity object if it exists and is received.
  *
- * @param {Object} state  State tree
- * @param {string} kind   Entity kind.
- * @param {string} name   Entity name.
- * @param {number} key    Record's key
+ * @param {Object}  state State tree
+ * @param {string}  kind  Entity kind.
+ * @param {string}  name  Entity name.
+ * @param {number}  key   Record's key
+ * @param {?Object} query Optional query.
  *
  * @return {Object?} Record.
  */
-export function getEntityRecord( state, kind, name, key ) {
-	return get( state.entities.data, [
+export function getEntityRecord( state, kind, name, key, query ) {
+	const queriedState = get( state.entities.data, [
 		kind,
 		name,
 		'queriedData',
-		'items',
-		key,
 	] );
+	if ( ! queriedState ) {
+		return undefined;
+	}
+
+	if ( query === undefined ) {
+		// If expecting a complete item, validate that completeness.
+		if ( ! queriedState.itemIsComplete[ key ] ) {
+			return undefined;
+		}
+
+		return queriedState.items[ key ];
+	}
+
+	query = { ...query, include: [ key ] };
+	return first( getQueriedItems( queriedState, query ) );
 }
 
 /**
@@ -128,7 +147,7 @@ export function getEntityRecord( state, kind, name, key ) {
  * @param {string} name   Entity name.
  * @param {number} key    Record's key
  *
- * @return {Object?} Record.
+ * @return {Object|null} Record.
  */
 export function __experimentalGetEntityRecordNoResolver(
 	state,
@@ -172,16 +191,35 @@ export const getRawEntityRecord = createSelector(
 );
 
 /**
+ * Returns true if records have been received for the given set of parameters,
+ * or false otherwise.
+ *
+ * @param {Object}  state State tree
+ * @param {string}  kind  Entity kind.
+ * @param {string}  name  Entity name.
+ * @param {?Object} query Optional terms query.
+ *
+ * @return {boolean} Whether entity records have been received.
+ */
+export function hasEntityRecords( state, kind, name, query ) {
+	return Array.isArray( getEntityRecords( state, kind, name, query ) );
+}
+
+/**
  * Returns the Entity's records.
  *
- * @param {Object}  state  State tree
- * @param {string}  kind   Entity kind.
- * @param {string}  name   Entity name.
- * @param {?Object} query  Optional terms query.
+ * @param {Object}  state State tree
+ * @param {string}  kind  Entity kind.
+ * @param {string}  name  Entity name.
+ * @param {?Object} query Optional terms query.
  *
  * @return {?Array} Records.
  */
 export function getEntityRecords( state, kind, name, query ) {
+	// Queried data state is prepopulated for all known entities. If this is not
+	// assigned for the given parameters, then it is known to not exist. Thus, a
+	// return value of an empty array is used instead of `null` (where `null` is
+	// otherwise used to represent an unknown state).
 	const queriedState = get( state.entities.data, [
 		kind,
 		name,
@@ -217,7 +255,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 				if ( primaryKeys.length ) {
 					const entity = getEntity( state, kind, name );
 					primaryKeys.forEach( ( primaryKey ) => {
-						const entityRecord = getEntityRecord(
+						const entityRecord = getEditedEntityRecord(
 							state,
 							kind,
 							name,
@@ -367,6 +405,24 @@ export function isSavingEntityRecord( state, kind, name, recordId ) {
 }
 
 /**
+ * Returns true if the specified entity record is deleting, and false otherwise.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {boolean} Whether the entity record is deleting or not.
+ */
+export function isDeletingEntityRecord( state, kind, name, recordId ) {
+	return get(
+		state.entities.data,
+		[ kind, name, 'deleting', recordId, 'pending' ],
+		false
+	);
+}
+
+/**
  * Returns the specified entity record's last save error.
  *
  * @param {Object} state    State tree.
@@ -381,6 +437,26 @@ export function getLastEntitySaveError( state, kind, name, recordId ) {
 		kind,
 		name,
 		'saving',
+		recordId,
+		'error',
+	] );
+}
+
+/**
+ * Returns the specified entity record's last delete error.
+ *
+ * @param {Object} state    State tree.
+ * @param {string} kind     Entity kind.
+ * @param {string} name     Entity name.
+ * @param {number} recordId Record ID.
+ *
+ * @return {Object?} The entity record's save error.
+ */
+export function getLastEntityDeleteError( state, kind, name, recordId ) {
+	return get( state.entities.data, [
+		kind,
+		name,
+		'deleting',
 		recordId,
 		'error',
 	] );
@@ -622,5 +698,9 @@ export const hasFetchedAutosaves = createRegistrySelector(
  */
 export const getReferenceByDistinctEdits = createSelector(
 	() => [],
-	( state ) => [ state.undo.length, state.undo.offset ]
+	( state ) => [
+		state.undo.length,
+		state.undo.offset,
+		state.undo.flattenedUndo,
+	]
 );

@@ -12,7 +12,7 @@ $ npm -g i @wordpress/env
 $ wp-env start
 ```
 
-The local environment will be available at http://localhost:8888.
+The local environment will be available at http://localhost:8888 (Username: `admin`, Password: `password`).
 
 ## Prerequisites
 
@@ -51,13 +51,14 @@ Then modify your package.json and add an extra command to npm `scripts` (https:/
 When installing `wp-env` in this way, all `wp-env` commands detailed in these docs must be prefixed with `npm run`, for example:
 
 ```sh
-$ npm run wp-env start
+# You must add another dash to pass the "update" flag to wp-env
+$ npm run wp-env start -- --update
 ```
 
 instead of:
 
 ```sh
-$ wp-env start
+$ wp-env start --update
 ```
 
 ## Usage
@@ -168,24 +169,45 @@ $ wp-env destroy
 $ wp-env start
 ```
 
+### 7. Debug mode and inspecting the generated dockerfile.
+
+`wp-env` uses docker behind the scenes. Inspecting the generated docker-compose file can help to understand what's going on.
+
+Start `wp-env` in debug mode
+
+```sh
+wp-env start --debug
+```
+
+`wp-env` will output its config which includes `dockerComposeConfigPath`. 
+
+```sh
+ℹ Config:
+	...
+	"dockerComposeConfigPath": "/Users/$USERNAME/.wp-env/5a619d332a92377cd89feb339c67b833/docker-compose.yml",
+	...
+```
+
 ## Command reference
 
 `wp-env` creates generated files in the `wp-env` home directory. By default, this is `~/.wp-env`. The exception is Linux, where files are placed at `~/wp-env` [for compatibility with Snap Packages](https://github.com/WordPress/gutenberg/issues/20180#issuecomment-587046325). The `wp-env` home directory contains a subdirectory for each project named `/$md5_of_project_path`. To change the `wp-env` home directory, set the `WP_ENV_HOME` environment variable. For example, running `WP_ENV_HOME="something" wp-env start` will download the project files to the directory `./something/$md5_of_project_path` (relative to the current directory).
 
-### `wp-env start [ref]`
+### `wp-env start`
+
+The start command installs and initalizes the WordPress environment, which includes downloading any specified remote sources. By default, `wp-env` will not update or re-configure the environment except when the configuration file changes. Tell `wp-env` to update sources and apply the configuration options again with `wp-env start --update`. This will not overrwrite any existing content.
 
 ```sh
 wp-env start
 
-Starts WordPress for development on port 8888 (​http://localhost:8888​)
-(override with WP_ENV_PORT) and tests on port 8889 (​http://localhost:8889​)
-(override with WP_ENV_TESTS_PORT). The current working directory must be a
-WordPress installation, a plugin, a theme, or contain a .wp-env.json file.
+Starts WordPress for development on port 8888 (override with WP_ENV_PORT) and
+tests on port 8889 (override with WP_ENV_TESTS_PORT). The current working
+directory must be a WordPress installation, a plugin, a theme, or contain a
+.wp-env.json file. After first insall, use the '--update' flag to download updates
+to mapped sources and to re-apply WordPress configuration options.
 
-
-Positionals:
-  ref  A `https://github.com/WordPress/WordPress` git repo branch or commit for
-       choosing a specific version.                 [string] [default: "master"]
+Options:
+  --update   Download source updates and apply WordPress configuration.
+                                                      [boolean] [default: false]
 ```
 
 ### `wp-env stop`
@@ -258,7 +280,8 @@ wp> ^C
 ```sh
 wp-env destroy
 
-Destroy the WordPress environment. Delete docker containers and remove local files.
+Destroy the WordPress environment. Deletes docker containers, volumes, and
+networks associated with the WordPress environment and removes local files.
 ```
 
 ### `wp-env logs [environment]`
@@ -283,17 +306,16 @@ Options:
 
 You can customize the WordPress installation, plugins and themes that the development environment will use by specifying a `.wp-env.json` file in the directory that you run `wp-env` from.
 
-`.wp-env.json` supports five fields:
+`.wp-env.json` supports six fields for options applicable to both the tests and development instances.
 
-| Field         | Type           | Default                                    | Description                                                                                                               |
-| ------------- | -------------- | ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `"core"`      | `string\|null` | `null`                                     | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.  |
-| `"plugins"`   | `string[]`     | `[]`                                       | A list of plugins to install and activate in the environment.                                                             |
-| `"themes"`    | `string[]`     | `[]`                                       | A list of themes to install in the environment. The first theme in the list will be activated.                            |
-| `"port"`      | `integer`      | `8888`                                     | The primary port number to use for the insallation. You'll access the instance through the port: 'http://localhost:8888'. |
-| `"testsPort"` | `integer`      | `8889`                                     | The port number to use for the tests instance.                                                                            |
-| `"config"`    | `Object`       | `"{ WP_DEBUG: true, SCRIPT_DEBUG: true }"` | Mapping of wp-config.php constants to their desired values.                                                               |
-| `"mappings"`  | `Object`       | `"{}"`                                     | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                            |
+| Field        | Type           | Default                                | Description                                                                                                                |
+| ------------ | -------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `"core"`     | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.   |
+| `"plugins"`  | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                              |
+| `"themes"`   | `string[]`     | `[]`                                   | A list of themes to install in the environment. The first theme in the list will be activated.                             |
+| `"port"`     | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'. |
+| `"config"`   | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                |
+| `"mappings"` | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                             |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
@@ -308,9 +330,57 @@ Several types of strings can be passed into the `core`, `plugins`, `themes`, and
 
 Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.
 
+Additionally, the key `env` is available to override any of the above options on an individual-environment basis. For example, take the following `.wp-env.json` file:
+
+```json
+{
+	"plugins": [ "." ],
+	"config": {
+		"KEY_1": true,
+		"KEY_2": false
+	},
+	"env": {
+		"development": {
+			"themes": [ "./one-theme" ]
+		},
+		"tests": {
+			"config": {
+				"KEY_1": false
+			},
+			"port": 3000
+		}
+	}
+}
+```
+
+On the development instance, `cwd` will be mapped as a plugin, `one-theme` will be mapped as a theme, KEY_1 will be set to true, and KEY_2 will be set to false. Also note that the default port, 8888, will be used as well.
+
+On the tests instance, `cwd` is still mapped as a plugin, but no theme is mapped. Additionaly, while KEY_2 is still set to false, KEY_1 is overriden and set to false. 3000 overrides the default port as well.
+
+This gives you a lot of power to change the options appliciable to each environment.
+
 ## .wp-env.override.json
 
-Any fields here will take precedence over .wp-env.json. This file is useful, when ignored from version control, to persist local development overrides.
+Any fields here will take precedence over .wp-env.json. This file is useful when ignored from version control, to persist local development overrides. Note that options like `plugins` and `themes` are not merged. As a result, if you set `plugins` in your override file, this will override all of the plugins listed in the base-level config. The only keys which are merged are `config` and `mappings`. This means that you can set your own wp-config values without losing any of the default values.
+
+## Default wp-config values.
+
+On the development instance, these wp-config values are defined by default:
+
+```
+WP_DEBUG: true,
+SCRIPT_DEBUG: true,
+WP_PHP_BINARY: 'php',
+WP_TESTS_EMAIL: 'admin@example.org',
+WP_TESTS_TITLE: 'Test Blog',
+WP_TESTS_DOMAIN: 'http://localhost',
+WP_SITEURL: 'http://localhost',
+WP_HOME: 'http://localhost',
+```
+
+On the test instance, all of the above are still defined, but `WP_DEBUG` and `SCRIPT_DEBUG` are set to false.
+
+Additionally, the values referencing a URL include the specified port for the given environment. So if you set `testsPort: 3000, port: 2000`, `WP_HOME` (for example) will be `http://localhost:3000` on the tests instance and `http://localhost:2000` on the development instance.
 
 ### Examples
 
@@ -387,6 +457,21 @@ Since all plugins in the `plugins` key are activated by default, you should use 
 }
 ```
 
+#### Map a plugin only in the tests environment
+
+If you need a plugin active in one environment but not the other, you can use `env.<envName>` to set options specific to one environment. Here, we activate cwd and a test plugin on the tests instance. This plugin is not activated on any other instances.
+
+```json
+{
+	"plugins": [ "." ],
+	"env": {
+		"tests": {
+			"plugins": [ ".", "path/to/test/plugin" ]
+		}
+	}
+}
+```
+
 #### Custom Port Numbers
 
 You can tell `wp-env` to use a custom port number so that your instance does not conflict with other `wp-env` instances.
@@ -395,7 +480,11 @@ You can tell `wp-env` to use a custom port number so that your instance does not
 {
 	"plugins": [ "." ],
 	"port": 4013,
-	"testsPort": 4012
+	"env": {
+		"tests": {
+			"port": 4012
+		}
+	}
 }
 ```
 

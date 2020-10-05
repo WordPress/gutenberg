@@ -72,8 +72,8 @@ function MyPluginBlockSettingsMenuItem() {
 
 ```jsx
 // Using ESNext syntax
-import { __ } from wp.i18n;
-import { PluginBlockSettingsMenuItem } from wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginBlockSettingsMenuItem } from '@wordpress/edit-post';
 
 const doOnClick = ( ) => {
     // To be called when the user clicks the menu item.
@@ -91,7 +91,7 @@ const MyPluginBlockSettingsMenuItem = () => (
 _Parameters_
 
 -   _props_ `Object`: Component props.
--   _props.allowedBlocks_ `[Array]`: An array containing a list of block names for which the item should be shown. If not present, it'll be rendered for any block. If multiple blocks are selected, it'll be shown if and only if all of them are in the whitelist.
+-   _props.allowedBlocks_ `[Array]`: An array containing a list of block names for which the item should be shown. If not present, it'll be rendered for any block. If multiple blocks are selected, it'll be shown if and only if all of them are in the allowed list.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
 -   _props.label_ `string`: The menu item text.
 -   _props.onClick_ `Function`: Callback function to be executed when the user click the menu item.
@@ -133,8 +133,8 @@ registerPlugin( 'my-document-setting-plugin', {
 
 ```jsx
 // Using ESNext syntax
-const { registerPlugin } = wp.plugins;
-const { PluginDocumentSettingPanel } = wp.editPost;
+import { registerPlugin } from '@wordpress/plugins';
+import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 
 const MyDocumentSettingTest = () => (
 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
@@ -245,8 +245,8 @@ function MyPluginPostPublishPanel() {
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PluginPostPublishPanel } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginPostPublishPanel } from '@wordpress/edit-post';
 
 const MyPluginPostPublishPanel = () => (
 	<PluginPostPublishPanel
@@ -297,8 +297,8 @@ function MyPluginPostStatusInfo() {
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PluginPostStatusInfo } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginPostStatusInfo } from '@wordpress/edit-post';
 
 const MyPluginPostStatusInfo = () => (
 	<PluginPostStatusInfo
@@ -346,8 +346,8 @@ function MyPluginPrePublishPanel() {
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PluginPrePublishPanel } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginPrePublishPanel } from '@wordpress/edit-post';
 
 const MyPluginPrePublishPanel = () => (
 	<PluginPrePublishPanel

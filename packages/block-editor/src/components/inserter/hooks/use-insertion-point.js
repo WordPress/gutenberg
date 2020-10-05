@@ -27,6 +27,7 @@ import { speak } from '@wordpress/a11y';
  * @return {Array} Insertion Point State (rootClientID, onInsertBlocks and onToggle).
  */
 function useInsertionPoint( {
+	onSelect,
 	rootClientId,
 	clientId,
 	isAppender,
@@ -90,20 +91,21 @@ function useInsertionPoint( {
 		return getBlockOrder( destinationRootClientId ).length;
 	}
 
-	const onInsertBlocks = ( blocks ) => {
+	const onInsertBlocks = ( blocks, meta ) => {
 		const selectedBlock = getSelectedBlock();
 		if (
 			! isAppender &&
 			selectedBlock &&
 			isUnmodifiedDefaultBlock( selectedBlock )
 		) {
-			replaceBlocks( selectedBlock.clientId, blocks );
+			replaceBlocks( selectedBlock.clientId, blocks, null, null, meta );
 		} else {
 			insertBlocks(
 				blocks,
 				getInsertionIndex(),
 				destinationRootClientId,
-				selectBlockOnInsert
+				selectBlockOnInsert,
+				meta
 			);
 		}
 
@@ -111,10 +113,14 @@ function useInsertionPoint( {
 			// translators: %d: the name of the block that has been added
 			const message = _n(
 				'%d block added.',
-				'%d blocks added',
+				'%d blocks added.',
 				blocks.length
 			);
 			speak( message );
+		}
+
+		if ( onSelect ) {
+			onSelect();
 		}
 	};
 

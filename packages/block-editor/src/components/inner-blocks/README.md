@@ -70,6 +70,13 @@ The previous code block restricts all blocks, so only child blocks explicitly re
 
 If `allowedBlocks` is set to `true`, all blocks are allowed. `false` means no blocks are allowed.
 
+### `orientation`
+* **Type:** `"horizontal"|"vertical"|undefined`
+
+Indicates whether inner blocks are shown horizontally or vertically. Use the string 'horizontal' or 'vertical' as a value. When left unspecified, defaults to 'vertical'.
+
+While this prop doesn't change any styles for the inner blocks themselves, it does display the Block Movers in the correct orientation, and also ensures drag and drop works correctly.
+
 ### `template`
 * **Type:** `Array<Array<Object>>`
 

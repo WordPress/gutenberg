@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { noop, omit } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useState, forwardRef } from '@wordpress/element';
+import { forwardRef, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,6 +19,7 @@ import {
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
+import { useControlledState } from '../utils/hooks';
 
 function UnitControl(
 	{
@@ -29,7 +30,7 @@ function UnitControl(
 		disableUnits = false,
 		isPressEnterToChange = false,
 		isResetValueOnUnitChange = false,
-		isUnitSelectTabbable = false,
+		isUnitSelectTabbable = true,
 		label,
 		onChange = noop,
 		onUnitChange = noop,
@@ -43,12 +44,25 @@ function UnitControl(
 	ref
 ) {
 	const [ value, initialUnit ] = getParsedValue( valueProp, unitProp, units );
-	const [ unit, setUnit ] = useState( initialUnit );
+	const [ unit, setUnit ] = useControlledState( unitProp, {
+		initial: initialUnit,
+	} );
+
+	/*
+	 * Storing parsed unit changes to be applied during the onChange callback
+	 * cycle.
+	 */
+	const nextParsedUnitRef = useRef();
 
 	const classes = classnames( 'components-unit-control', className );
 
 	const handleOnChange = ( next, changeProps ) => {
-		/**
+		if ( next === '' ) {
+			onChange( '', changeProps );
+			return;
+		}
+
+		/*
 		 * Customizing the onChange callback.
 		 * This allows as to broadcast a combined value+unit to onChange.
 		 */
@@ -58,7 +72,22 @@ function UnitControl(
 			value,
 			unit
 		);
-		const nextValue = `${ parsedValue }${ parsedUnit }`;
+		const nextParsedUnit = nextParsedUnitRef.current;
+
+		/*
+		 * If we've noticed a (parsed) unit change, which would have been
+		 * stored in nextParsedUnitRef, we'll update our local unit set,
+		 * as well as fire the onUnitChange callback.
+		 */
+		if ( nextParsedUnit ) {
+			onUnitChange( nextParsedUnit, changeProps );
+			setUnit( nextParsedUnit );
+			// We have to reset this ref value to properly track new changes.
+			nextParsedUnitRef.current = null;
+		}
+
+		const nextUnit = nextParsedUnit || parsedUnit;
+		const nextValue = `${ parsedValue }${ nextUnit }`;
 
 		onChange( nextValue, changeProps );
 	};
@@ -91,7 +120,7 @@ function UnitControl(
 		const { type, payload } = action;
 		const event = payload?.event;
 
-		/**
+		/*
 		 * Customizes the commit interaction.
 		 *
 		 * This occurs when pressing ENTER to fire a change.
@@ -112,7 +141,15 @@ function UnitControl(
 
 			// Update unit if the incoming parsed unit is different.
 			if ( unit !== parsedUnit ) {
-				handleOnUnitChange( parsedUnit, { event } );
+				/*
+				 * We start by storing the next parsedUnit value in our
+				 * nextParsedUnitRef. We can't set the unit during this
+				 * stateReducer callback as it cause state update
+				 * conflicts within React's render cycle.
+				 *
+				 * https://github.com/facebook/react/issues/18178
+				 */
+				nextParsedUnitRef.current = parsedUnit;
 			}
 		}
 
@@ -135,7 +172,7 @@ function UnitControl(
 			<ValueInput
 				aria-label={ label }
 				type={ isPressEnterToChange ? 'text' : 'number' }
-				{ ...props }
+				{ ...omit( props, [ 'children' ] ) }
 				autoComplete={ autoComplete }
 				className={ classes }
 				disabled={ disabled }
