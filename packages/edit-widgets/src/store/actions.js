@@ -44,6 +44,7 @@ export function* initializeState() {
 export const persistStubPost = function* ( id, blocks ) {
 	const stubPost = createStubPost( id, blocks );
 	const args = [ KIND, POST_TYPE, id ];
+	// This is the magic that prevents core-data from trying to resolve the entity
 	yield dispatch( 'core', 'startResolution', 'getEntityRecord', args );
 	yield dispatch(
 		'core',
