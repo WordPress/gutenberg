@@ -22,7 +22,7 @@ const TITLES = {
 	archive: {
 		title: 'Archive',
 		description:
-			'displays he content lists when no other template is found',
+			'Displays the content lists when no other template is found',
 	},
 	single: {
 		title: 'Single',
