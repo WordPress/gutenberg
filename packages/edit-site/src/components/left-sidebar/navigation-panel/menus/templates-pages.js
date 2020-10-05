@@ -17,13 +17,6 @@ export default function TemplatesPagesMenu( { templates, onActiveIdChange } ) {
 		slug.startsWith( 'page-' )
 	);
 
-	if (
-		! defaultTemplate &&
-		( ! specificPageTemplates || specificPageTemplates.length === 0 )
-	) {
-		return null;
-	}
-
 	return (
 		<NavigationMenu
 			menu="templates-pages"
