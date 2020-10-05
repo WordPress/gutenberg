@@ -20,7 +20,7 @@ function EditWidgetsInitializer( { settings } ) {
 	}, [] );
 
 	if ( ! stateInitialized ) {
-		return <div></div>;
+		return null;
 	}
 
 	return <Layout blockEditorSettings={ settings } />;
