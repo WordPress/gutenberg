@@ -39,11 +39,6 @@ export default function save( { attributes } ) {
 							href = image.link;
 							break;
 					}
-					// The image should only have an aria-label if it's within a link and has no alt text.
-					const imageLabel =
-						! image.alt && image.caption && href
-							? image.caption
-							: null;
 
 					const img = (
 						<img
@@ -55,7 +50,6 @@ export default function save( { attributes } ) {
 							className={
 								image.id ? `wp-image-${ image.id }` : null
 							}
-							aria-label={ imageLabel || null }
 						/>
 					);
 
