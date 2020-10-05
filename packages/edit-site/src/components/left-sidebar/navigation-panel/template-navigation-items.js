@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalNavigationItem as NavigationItem } from '@wordpress/components';
+import {
+	Button,
+	__experimentalNavigationItem as NavigationItem,
+} from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 /**
@@ -16,7 +19,7 @@ const TITLES = {
 	},
 	archive: {
 		title: 'Archive',
-		description: '',
+		description: 'Just some description here',
 	},
 	single: {
 		title: 'Single',
@@ -65,13 +68,24 @@ export default function TemplateNavigationItems( {
 		<>
 			{ templates.map( ( template ) => (
 				<NavigationItem
+					className="edit-site-navigation-panel__template-item"
 					key={ `${ itemPrefix }-${ template.id }` }
 					item={ `${ itemPrefix }-${ template.slug }` }
 					title={ TITLES[ template.slug ]?.title ?? template.slug }
-					onClick={ () => onActivate( template.id ) }
-					onMouseEnter={ () => onMouseEnterTemplate( template.id ) }
-					onMouseLeave={ onMouseLeaveTemplate }
-				/>
+				>
+					<Button
+						onClick={ () => onActivate( template.id ) }
+						onMouseEnter={ () =>
+							onMouseEnterTemplate( template.id )
+						}
+						onMouseLeave={ onMouseLeaveTemplate }
+					>
+						{ TITLES[ template.slug ]?.title ?? template.slug }
+						<div className="edit-site-navigation-panel__template-item-description">
+							{ TITLES[ template.slug ]?.description }
+						</div>
+					</Button>
+				</NavigationItem>
 			) ) }
 
 			{ hoveredTemplateId && (

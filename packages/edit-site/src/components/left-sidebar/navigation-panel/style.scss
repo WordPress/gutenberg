@@ -50,3 +50,22 @@
 		display: block;
 	}
 }
+
+.edit-site-navigation-panel__template-item {
+	display: block;
+
+	&.is-active .edit-site-navigation-panel__template-item-description {
+		color: $gray-100;
+	}
+
+	button {
+		display: block;
+		height: auto;
+		text-align: left;
+	}
+}
+
+.edit-site-navigation-panel__template-item-description {
+	padding-top: $grid-unit-05;
+	color: $gray-700;
+}
