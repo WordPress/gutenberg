@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { isNil, isNumber } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -67,7 +68,7 @@ export default function FontSizePicker( {
 	);
 
 	const [ advancedFontSizing, setAdvancedFontSizing ] = useState(
-		! Number.isFinite( value ) && value !== undefined
+		! isNumber( value ) && ! isNil( value )
 	);
 
 	if ( ! options ) {
