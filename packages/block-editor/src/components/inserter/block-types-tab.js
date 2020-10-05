@@ -29,6 +29,7 @@ import { searchBlockItems } from './search-items';
 import InserterPanel from './panel';
 import InserterNoResults from './no-results';
 import useBlockTypesState from './hooks/use-block-types-state';
+import { useSearchQuery } from './store';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -38,10 +39,10 @@ export function BlockTypesTab( {
 	rootClientId,
 	onInsert,
 	onHover,
-	filterValue,
 	debouncedSpeak,
 	showMostUsedBlocks,
 } ) {
+	const [ filterValue ] = useSearchQuery();
 	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
 		rootClientId,
 		onInsert

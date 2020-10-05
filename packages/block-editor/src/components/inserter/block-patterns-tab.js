@@ -6,7 +6,7 @@ import { fromPairs } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useMemo, useCallback, useEffect } from '@wordpress/element';
+import { memo, useMemo, useCallback, useEffect } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 
@@ -19,6 +19,7 @@ import { searchItems } from './search-items';
 import InserterNoResults from './no-results';
 import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
+import { useSearchQuery } from './store';
 
 function BlockPatternsSearchResults( { filterValue, onInsert } ) {
 	const [ allPatterns, , onClick ] = usePatternsState( onInsert );
@@ -148,12 +149,9 @@ function BlockPatternsCategory( {
 	);
 }
 
-function BlockPatternsTabs( {
-	onInsert,
-	onClickCategory,
-	filterValue,
-	selectedCategory,
-} ) {
+function BlockPatternsTabs( { onInsert, onClickCategory, selectedCategory } ) {
+	const [ filterValue ] = useSearchQuery();
+
 	return filterValue ? (
 		<BlockPatternsSearchResults
 			onInsert={ onInsert }
@@ -168,4 +166,6 @@ function BlockPatternsTabs( {
 	);
 }
 
-export default BlockPatternsTabs;
+const memoizedBlockPatternsTab = memo( BlockPatternsTabs );
+
+export default memoizedBlockPatternsTab;

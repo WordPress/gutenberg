@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { withSpokenMessages } from '@wordpress/components';
-import { useMemo, useEffect } from '@wordpress/element';
+import { memo, useMemo, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -14,10 +14,10 @@ import { searchBlockItems } from './search-items';
 import InserterPanel from './panel';
 import InserterNoResults from './no-results';
 import useBlockTypesState from './hooks/use-block-types-state';
+import { useSearchQuery } from './store';
 
 function ReusableBlocksList( {
 	debouncedSpeak,
-	filterValue,
 	onHover,
 	onInsert,
 	rootClientId,
@@ -26,6 +26,7 @@ function ReusableBlocksList( {
 		rootClientId,
 		onInsert
 	);
+	const [ filterValue ] = useSearchQuery();
 
 	const filteredItems = useMemo( () => {
 		const reusableItems = items.filter(
@@ -120,4 +121,6 @@ export function ReusableBlocksTab( {
 	);
 }
 
-export default withSpokenMessages( ReusableBlocksTab );
+const memoizedReusableBlocksTab = memo( ReusableBlocksTab );
+
+export default withSpokenMessages( memoizedReusableBlocksTab );

@@ -7,6 +7,7 @@ import {
 	getBlockFromExample,
 	getBlockType,
 } from '@wordpress/blocks';
+import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -14,9 +15,14 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockCard from '../block-card';
 import BlockPreview from '../block-preview';
+import { useHoveredItem } from './store';
 
-function InserterPreviewPanel( { item } ) {
+function InserterPreviewPanel() {
+	const [ item ] = useHoveredItem();
+	if ( ! item ) return null;
+
 	const hoveredItemBlockType = getBlockType( item.name );
+
 	return (
 		<div className="block-editor-inserter__preview-container">
 			<div className="block-editor-inserter__preview">
@@ -55,4 +61,6 @@ function InserterPreviewPanel( { item } ) {
 	);
 }
 
-export default InserterPreviewPanel;
+const memoizedInserterPreviewPanel = memo( InserterPreviewPanel );
+
+export default memoizedInserterPreviewPanel;

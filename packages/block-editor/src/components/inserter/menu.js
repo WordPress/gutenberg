@@ -19,6 +19,8 @@ import ReusableBlocksTab from './reusable-blocks-tab';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 
+import { useSetHoveredItem } from './store';
+
 const stopKeyPropagation = ( event ) => event.stopPropagation();
 
 function InserterMenu( {
@@ -31,8 +33,7 @@ function InserterMenu( {
 	showMostUsedBlocks,
 } ) {
 	const [ activeTab, setActiveTab ] = useState( 'blocks' );
-	const [ filterValue, setFilterValue ] = useState( '' );
-	const [ hoveredItem, setHoveredItem ] = useState( null );
+	const setHoveredItem = useSetHoveredItem();
 	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
 		null
 	);
@@ -86,16 +87,6 @@ function InserterMenu( {
 		setHoveredItem( item );
 	}, [] );
 
-	const onChangeSearch = useCallback(
-		( value ) => {
-			if ( hoveredItem ) {
-				setHoveredItem( null );
-			}
-			setFilterValue( value );
-		},
-		[ hoveredItem ]
-	);
-
 	const onClickPatternCategory = ( patternCategory ) => {
 		setSelectedPatternCategory( patternCategory );
 	};
@@ -107,7 +98,6 @@ function InserterMenu( {
 					rootClientId={ destinationRootClientId }
 					onInsert={ onInsert }
 					onHover={ onHover }
-					filterValue={ filterValue }
 					showMostUsedBlocks={ showMostUsedBlocks }
 				/>
 			</div>
@@ -125,7 +115,6 @@ function InserterMenu( {
 	const patternsTab = (
 		<BlockPatternsTabs
 			onInsert={ onInsertPattern }
-			filterValue={ filterValue }
 			onClickCategory={ onClickPatternCategory }
 			selectedCategory={ selectedPatternCategory }
 		/>
@@ -136,7 +125,6 @@ function InserterMenu( {
 			rootClientId={ destinationRootClientId }
 			onInsert={ onInsert }
 			onHover={ onHover }
-			filterValue={ filterValue }
 		/>
 	);
 
@@ -168,8 +156,6 @@ function InserterMenu( {
 				{ /* the following div is necessary to fix the sticky position of the search form */ }
 				<div className="block-editor-inserter__content">
 					<InserterSearchForm
-						onChange={ onChangeSearch }
-						value={ filterValue }
 						placeholder={ searchFormPlaceholder() }
 					/>
 					{ ( showPatterns || hasReusableBlocks ) && (
@@ -191,9 +177,7 @@ function InserterMenu( {
 					{ ! showPatterns && ! hasReusableBlocks && blocksTab }
 				</div>
 			</div>
-			{ showInserterHelpPanel && hoveredItem && (
-				<InserterPreviewPanel item={ hoveredItem } />
-			) }
+			{ showInserterHelpPanel && <InserterPreviewPanel /> }
 		</div>
 	);
 	/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */

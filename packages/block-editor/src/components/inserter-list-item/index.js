@@ -8,6 +8,7 @@ import { CompositeItem } from 'reakit';
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
+import { memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -61,4 +62,6 @@ function InserterListItem( {
 	);
 }
 
-export default InserterListItem;
+const memoizedInserterListItem = memo( InserterListItem );
+
+export default memoizedInserterListItem;

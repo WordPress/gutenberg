@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useMemo, useEffect } from '@wordpress/element';
+import { useMemo, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import {
 	VisuallyHidden,
@@ -20,6 +20,7 @@ import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
+import { useSearchQuery } from './store';
 import BlockTypesList from '../block-types-list';
 import BlockPatternsList from '../block-patterns-list';
 import InserterSearchForm from './search-form';
@@ -115,7 +116,7 @@ function QuickInserter( {
 	selectBlockOnInsert,
 	debouncedSpeak,
 } ) {
-	const [ filterValue, setFilterValue ] = useState( '' );
+	const [ filterValue, setFilterValue ] = useSearchQuery();
 	const [
 		destinationRootClientId,
 		onInsertBlocks,
@@ -190,6 +191,12 @@ function QuickInserter( {
 		);
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak ] );
+
+	useEffect( () => {
+		return () => {
+			setFilterValue( '' );
+		};
+	}, [] );
 
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected
