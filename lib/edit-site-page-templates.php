@@ -19,14 +19,17 @@ function gutenberg_edit_site_get_page_templates() {
 		$block_template_files      = array_merge( $block_template_files, $demo_block_template_files );
 	}
 
-	$slugs = array_map(
+	return array_map(
 		function ( $path ) {
-			return basename( $path, '.html' );
+			return [
+				"slug" => basename( $path, '.html' ),
+				"content" => [
+					"raw" => file_get_contents( $path )
+				]
+			];
 		},
 		$block_template_files
 	);
-
-	return $slugs;
 }
 
 add_action(

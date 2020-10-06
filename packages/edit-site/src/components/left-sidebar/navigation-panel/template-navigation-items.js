@@ -71,10 +71,10 @@ export default function TemplateNavigationItems( {
 	templates,
 	onActivate,
 } ) {
-	const [ hoveredTemplateId, setHoveredTemplateId ] = useState();
+	const [ hoveredTemplate, setHoveredTemplate ] = useState();
 
-	const onMouseEnterTemplate = ( id ) => setHoveredTemplateId( id );
-	const onMouseLeaveTemplate = () => setHoveredTemplateId( null );
+	const onMouseEnterTemplate = ( template ) => setHoveredTemplate( template );
+	const onMouseLeaveTemplate = () => setHoveredTemplate( null );
 
 	if ( ! templates ) {
 		return null;
@@ -105,7 +105,7 @@ export default function TemplateNavigationItems( {
 						<Button
 							onClick={ () => onActivate( template.id ) }
 							onMouseEnter={ () =>
-								onMouseEnterTemplate( template.id )
+								onMouseEnterTemplate( template )
 							}
 							onMouseLeave={ onMouseLeaveTemplate }
 						>
@@ -120,11 +120,10 @@ export default function TemplateNavigationItems( {
 				);
 			} ) }
 
-			{ hoveredTemplateId && (
+			{ hoveredTemplate?.content?.raw && (
 				<NavigationPanelPreviewFill>
 					<TemplatePreview
-						entityType={ entityType }
-						entityId={ hoveredTemplateId }
+						rawContent={ hoveredTemplate.content.raw }
 					/>
 				</NavigationPanelPreviewFill>
 			) }

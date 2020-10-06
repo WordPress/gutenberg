@@ -26,14 +26,15 @@ export default function useTemplates() {
 	);
 
 	const templatesFilesWithoutEntities = templateFiles.filter(
-		( slug ) =>
+		( { slug } ) =>
 			! templateEntities?.find( ( entity ) => slug === entity.slug )
 	);
 
 	return [
-		...templatesFilesWithoutEntities.map( ( slug ) => ( {
-			id: slug,
-			slug,
+		...templatesFilesWithoutEntities.map( ( template ) => ( {
+			id: template.slug,
+			isFile: true,
+			...template,
 		} ) ),
 		...templateEntities,
 	];
