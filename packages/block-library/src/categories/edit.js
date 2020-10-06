@@ -15,7 +15,6 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
 import { InspectorControls } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
@@ -39,21 +38,18 @@ export default function CategoriesEdit( {
 			] ),
 		};
 	}, [] );
-	const getCategoriesList = useCallback(
-		( parentId ) => {
-			if ( ! categories?.length ) {
-				return [];
-			}
-			if ( parentId === null ) {
-				return categories;
-			}
-			return categories.filter( ( { parent } ) => parent === parentId );
-		},
-		[ categories ]
-	);
-	const getCategoryListClassName = useCallback( ( level ) => {
+	const getCategoriesList = ( parentId ) => {
+		if ( ! categories?.length ) {
+			return [];
+		}
+		if ( parentId === null ) {
+			return categories;
+		}
+		return categories.filter( ( { parent } ) => parent === parentId );
+	};
+	const getCategoryListClassName = ( level ) => {
 		return `wp-block-categories__list wp-block-categories__list-level-${ level }`;
-	}, [] );
+	};
 	const toggleAttribute = ( attributeName ) => ( newValue ) =>
 		setAttributes( { [ attributeName ]: newValue } );
 	const renderCategoryName = ( name ) =>
@@ -93,7 +89,6 @@ export default function CategoriesEdit( {
 			</li>
 		);
 	};
-
 	const renderCategoryDropdown = () => {
 		const parentId = showHierarchy ? 0 : null;
 		const categoriesList = getCategoriesList( parentId );
