@@ -81,7 +81,7 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 				<EnableFeature
 					featureName="focusMode"
 					help={ __( 'Highlights the current block.' ) }
-					label={ __( 'Activate spotlight mode' ) }
+					label={ __( 'Spotlight mode' ) }
 				/>
 			</Section>
 			<Section title={ __( 'Document panels' ) }>
