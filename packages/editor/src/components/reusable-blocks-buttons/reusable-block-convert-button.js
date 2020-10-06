@@ -24,7 +24,7 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 				'core/block-editor'
 			);
 			const { __experimentalGetReusableBlock: getReusableBlock } = select(
-				'core/editor'
+				'core/reusable-blocks'
 			);
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
@@ -59,7 +59,7 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 
 	const {
 		__experimentalConvertBlockToReusable: convertBlockToReusable,
-	} = useDispatch( 'core/editor' );
+	} = useDispatch( 'core/reusable-blocks' );
 
 	if ( ! canConvert ) {
 		return null;

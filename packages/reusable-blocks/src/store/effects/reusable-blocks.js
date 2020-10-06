@@ -15,9 +15,10 @@ import {
 	isReusableBlock,
 } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
+
 // TODO: Ideally this would be the only dispatch in scope. This requires either
-// refactoring editor actions to yielded controls, or replacing direct dispatch
-// on the editor store with action creators (e.g. `REMOVE_REUSABLE_BLOCK`).
+// refactoring reusable-blocks actions to yielded controls, or replacing direct dispatch
+// on the reusable-blocks store with action creators (e.g. `REMOVE_REUSABLE_BLOCK`).
 import { dispatch as dataDispatch, select } from '@wordpress/data';
 
 /**

@@ -316,9 +316,11 @@ export default compose( [
 			getEditorBlocks,
 			getEditorSelectionStart,
 			getEditorSelectionEnd,
-			__experimentalGetReusableBlocks,
 			isPostTitleSelected,
 		} = select( 'core/editor' );
+		const { __experimentalGetReusableBlocks } = select(
+			'core/reusable-blocks'
+		);
 		const { canUser } = select( 'core' );
 
 		return {
@@ -342,10 +344,12 @@ export default compose( [
 			updatePostLock,
 			resetEditorBlocks,
 			updateEditorSettings,
-			__experimentalFetchReusableBlocks,
 			__experimentalTearDownEditor,
 			undo,
 		} = dispatch( 'core/editor' );
+		const { __experimentalFetchReusableBlocks } = dispatch(
+			'core/reusable-blocks'
+		);
 		const { createWarningNotice } = dispatch( 'core/notices' );
 
 		return {

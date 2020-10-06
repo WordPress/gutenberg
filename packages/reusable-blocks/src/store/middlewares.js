@@ -9,7 +9,7 @@ import refx from 'refx';
 import effects from './effects';
 
 /**
- * Applies the custom middlewares used specifically in the editor module.
+ * Applies the custom middlewares used specifically in the reusable-blocks module.
  *
  * @param {Object} store Store Object.
  *

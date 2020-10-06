@@ -192,7 +192,7 @@ export default compose( [
 			__experimentalGetReusableBlock: getReusableBlock,
 			__experimentalIsFetchingReusableBlock: isFetchingReusableBlock,
 			__experimentalIsSavingReusableBlock: isSavingReusableBlock,
-		} = select( 'core/editor' );
+		} = select( 'core/reusable-blocks' );
 		const { canUser } = select( 'core' );
 		const { __experimentalGetParsedReusableBlock, getSettings } = select(
 			'core/block-editor'
@@ -220,7 +220,7 @@ export default compose( [
 			__experimentalFetchReusableBlocks: fetchReusableBlocks,
 			__experimentalUpdateReusableBlock: updateReusableBlock,
 			__experimentalSaveReusableBlock: saveReusableBlock,
-		} = dispatch( 'core/editor' );
+		} = dispatch( 'core/reusable-blocks' );
 		const { ref } = ownProps.attributes;
 
 		return {
