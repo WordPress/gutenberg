@@ -97,9 +97,7 @@ export default function TemplateNavigationItems( {
 						className="edit-site-navigation-panel__template-item"
 						key={ `${ itemPrefix }-${ template.id }` }
 						item={ `${ itemPrefix }-${ template.slug }` }
-						title={
-							TITLES[ template.slug ]?.title ?? template.slug
-						}
+						title={ title || template.slug }
 					>
 						<Button
 							onClick={ () => onActivate( template.id ) }
@@ -111,7 +109,7 @@ export default function TemplateNavigationItems( {
 							{ title || template.slug }
 							{ description && (
 								<div className="edit-site-navigation-panel__template-item-description">
-									{ TITLES[ template.slug ]?.description }
+									{ description }
 								</div>
 							) }
 						</Button>
