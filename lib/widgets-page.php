@@ -133,8 +133,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_widgets_init' );
  * @return bool Filtered decision about loading block assets.
  */
 function widgets_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
-	global $current_screen;
-	if ( 'appearance_page_gutenberg-widgets' === $current_screen->base ) {
+	if ( 'appearance_page_gutenberg-widgets' === get_current_screen()->base ) {
 		return true;
 	}
 
@@ -142,4 +141,3 @@ function widgets_editor_load_block_editor_scripts_and_styles( $is_block_editor_s
 }
 
 add_filter( 'should_load_block_editor_scripts_and_styles', 'widgets_editor_load_block_editor_scripts_and_styles' );
-
