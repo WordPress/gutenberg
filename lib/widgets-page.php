@@ -132,7 +132,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_widgets_init' );
  * @param bool $is_block_editor_screen Current decision about loading block assets.
  * @return bool Filtered decision about loading block assets.
  */
-function widgets_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
+function gutenberg_widgets_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
 	if ( 'appearance_page_gutenberg-widgets' === get_current_screen()->base ) {
 		return true;
 	}
@@ -140,4 +140,5 @@ function widgets_editor_load_block_editor_scripts_and_styles( $is_block_editor_s
 	return $is_block_editor_screen;
 }
 
-add_filter( 'should_load_block_editor_scripts_and_styles', 'widgets_editor_load_block_editor_scripts_and_styles' );
+add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_widgets_editor_load_block_editor_scripts_and_styles' );
+
