@@ -7,6 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { createContext, useContext } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
 
@@ -15,6 +16,9 @@ import { getDefaultBlockName } from '@wordpress/blocks';
  */
 import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
+
+// A Context to store the map of the appender map.
+export const AppenderContext = createContext();
 
 function stopPropagation( event ) {
 	event.stopPropagation();
@@ -30,6 +34,8 @@ function BlockListAppender( {
 	selectedBlockClientId,
 	tagName: TagName = 'div',
 } ) {
+	const appenderMap = useContext( AppenderContext );
+
 	if ( isLocked || CustomAppender === false ) {
 		return null;
 	}
@@ -94,6 +100,15 @@ function BlockListAppender( {
 				'wp-block',
 				className
 			) }
+			ref={ ( ref ) => {
+				if ( ref ) {
+					// Set the reference of the "Appender" with `rootClientId` as key.
+					appenderMap.set( rootClientId || '', ref );
+				} else {
+					// If it un-mounts, cleanup the map.
+					appenderMap.delete( rootClientId || '' );
+				}
+			} }
 		>
 			{ appender }
 		</TagName>

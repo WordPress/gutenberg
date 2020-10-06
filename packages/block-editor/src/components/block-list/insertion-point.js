@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useRef, useMemo } from '@wordpress/element';
+import { useState, useRef, useMemo, useContext } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { placeCaretAtVerticalEdge } from '@wordpress/dom';
 
@@ -17,6 +17,7 @@ import { placeCaretAtVerticalEdge } from '@wordpress/dom';
 import Inserter from '../inserter';
 import { getClosestTabbable } from '../writing-flow';
 import { getBlockDOMNode } from '../../utils/dom';
+import { AppenderContext } from '../block-list-appender';
 
 function InsertionPointInserter( {
 	clientId,
@@ -105,20 +106,17 @@ function InsertionPointPopover( {
 	containerRef,
 	showInsertionPoint,
 } ) {
+	const appenderMap = useContext( AppenderContext );
 	const element = useMemo( () => {
 		if ( clientId ) {
 			return getBlockDOMNode( clientId );
 		}
 
 		// Can't find the element, might be at the end of the block list, or inside an empty block list.
-		// We instead try to place the indicator at the end of the list, where the "Appender" usually lives.
-		const rootElement = getBlockDOMNode( rootClientId );
-		const blocks = rootElement?.querySelectorAll( '.wp-block' );
-
-		if ( blocks ) {
-			return blocks[ blocks.length - 1 ];
-		}
-	}, [ clientId, rootClientId ] );
+		// We instead try to find the "Appender" and place the indicator above it.
+		// `rootClientId` could be null or undefined when there's no parent block, we normalize it to an empty string.
+		return appenderMap.get( rootClientId || '' );
+	}, [ clientId, rootClientId, appenderMap ] );
 
 	return (
 		<Popover
