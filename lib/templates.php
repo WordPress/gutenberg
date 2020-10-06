@@ -203,10 +203,10 @@ apply_filters( 'rest_wp_template_collection_params', 'filter_rest_wp_template_co
  */
 function filter_rest_wp_template_query( $args, $request ) {
 	// Create auto-drafts for each theme template files
-	$block_template_files = gutenberg_get_template_paths(); 
-	foreach ($block_template_files as $path) {
+	$block_template_files = gutenberg_get_template_paths();
+	foreach ( $block_template_files as $path ) {
 		$template_type = basename( $path, '.html' );
-		gutenberg_find_template_post_and_parts( $template_type, [ $template_type ] );
+		gutenberg_find_template_post_and_parts( $template_type, array( $template_type ) );
 	}
 
 	if ( $request['resolved'] ) {

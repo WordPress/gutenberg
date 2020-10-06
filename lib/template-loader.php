@@ -255,7 +255,7 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 	// See if there is a theme block template with higher priority than the resolved template post.
 	$higher_priority_block_template_path     = null;
 	$higher_priority_block_template_priority = PHP_INT_MAX;
-	$block_template_files                    = gutenberg_get_template_paths(); 
+	$block_template_files                    = gutenberg_get_template_paths();
 	foreach ( $block_template_files as $path ) {
 		if ( ! isset( $slug_priorities[ basename( $path, '.html' ) ] ) ) {
 			continue;
