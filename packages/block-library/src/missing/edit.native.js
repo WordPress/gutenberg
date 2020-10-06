@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import {
+	View,
+	Text,
+	TouchableWithoutFeedback,
+	TouchableHighlight,
+} from 'react-native';
 
 /**
  * WordPress dependencies
@@ -18,7 +23,7 @@ import { normalizeIconObject } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { help, plugins } from '@wordpress/icons';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -32,6 +37,7 @@ export class UnsupportedBlockEdit extends Component {
 		this.state = { showHelp: false };
 		this.toggleSheet = this.toggleSheet.bind( this );
 		this.requestFallback = this.requestFallback.bind( this );
+		this.onHelpButtonPressed = this.onHelpButtonPressed.bind( this );
 	}
 
 	toggleSheet() {
@@ -53,15 +59,25 @@ export class UnsupportedBlockEdit extends Component {
 		);
 
 		return (
-			<View style={ styles.helpIconContainer }>
+			<TouchableHighlight
+				onPress={ this.onHelpButtonPressed }
+				style={ styles.helpIconContainer }
+			>
 				<Icon
 					className="unsupported-icon-help"
 					label={ __( 'Help icon' ) }
 					icon={ help }
 					color={ infoIconStyle.color }
 				/>
-			</View>
+			</TouchableHighlight>
 		);
+	}
+
+	onHelpButtonPressed() {
+		if ( ! this.props.isSelected ) {
+			this.props.selectBlock();
+		}
+		this.toggleSheet();
 	}
 
 	requestFallback() {
@@ -251,6 +267,14 @@ export default compose( [
 			canEnableUnsupportedBlockEditor:
 				getSettings( 'capabilities' )
 					.canEnableUnsupportedBlockEditor === true,
+		};
+	} ),
+	withDispatch( ( dispatch, ownProps ) => {
+		const { selectBlock } = dispatch( 'core/block-editor' );
+		return {
+			selectBlock() {
+				selectBlock( ownProps.clientId );
+			},
 		};
 	} ),
 	withPreferredColorScheme,
