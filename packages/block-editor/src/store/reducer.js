@@ -1531,6 +1531,22 @@ export function isNavigationMode( state = false, action ) {
 }
 
 /**
+ * Reducer returning whether the toolbar is showing an inline editing UI.
+ *
+ * @param {boolean} state  Whether inline editing UI is displayed.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {boolean} Updated state denoting whether inline editing UI is shown.
+ */
+export function isEditingInToolbar( state = false, action ) {
+	if ( action.type === 'SET_IS_EDITING_IN_TOOLBAR' ) {
+		return action.isEditingInToolbar;
+	}
+
+	return state;
+}
+
+/**
  * Reducer returning whether the block moving mode is enabled or not.
  *
  * @param {string|null} state  Current state.
