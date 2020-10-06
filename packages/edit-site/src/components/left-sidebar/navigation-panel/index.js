@@ -55,8 +55,8 @@ const NavigationPanel = () => {
 			<Navigation
 				activeItem={
 					'wp_template' === templateType
-						? `template-${ templateId }`
-						: `template-part-${ templatePartId }`
+						? `${ templateType }-${ templateId }`
+						: `${ templateType }-${ templatePartId }`
 				}
 				onActivateMenu={ setActiveMenu }
 			>

@@ -32,15 +32,13 @@ export default function TemplateNavigationItems( {
 		templates = [ templates ];
 	}
 
-	const itemPrefix =
-		entityType === 'wp_template_part' ? 'template-part' : 'template';
-
 	return (
 		<>
 			{ templates.map( ( template ) => {
 				const { title, description } =
 					ITEM_CONTENTS[ template.slug ] ?? {};
-				const key = `${ itemPrefix }-${ template.id }`;
+				const key = `${ entityType }-${ template.id }`;
+
 
 				return (
 					<NavigationItem
