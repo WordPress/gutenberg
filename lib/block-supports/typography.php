@@ -94,6 +94,7 @@ function gutenberg_apply_typography_support( $attributes, $block_attributes, $bl
 
 		// Apply required class or style.
 		if ( $has_font_style ) {
+			$attributes['css_classes'][] = 'has-font-style';
 			$attributes['css_classes'][] = sprintf( 'has-%s-font-style', $block_attributes['fontStyle'] );
 		}
 	}

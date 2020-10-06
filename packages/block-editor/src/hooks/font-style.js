@@ -22,14 +22,18 @@ export const FONT_STYLE_SUPPORT_KEY = '__experimentalFontStyle';
  * @param  {Object} settings Original block settings
  * @return {Object}          Filtered block settings
  */
-function addAttributes( settings ) {
+function addAttribute( settings ) {
 	if ( ! hasBlockSupport( settings, FONT_STYLE_SUPPORT_KEY ) ) {
 		return settings;
 	}
 
 	// Allow blocks to specify a default value if needed.
-	if ( ! settings.attributes.fontStyle ) {
-		Object.assign( settings.attributes, { fontStyle: { type: 'string' } } );
+	if ( ! settings.attributes?.fontStyle ) {
+		// Handle edge case where attributes is undefined as well.
+		settings.attributes = {
+			...settings.attributes,
+			fontStyle: { type: 'string' },
+		};
 	}
 
 	return settings;
@@ -48,11 +52,14 @@ function addSaveProps( props, blockType, attributes ) {
 		return props;
 	}
 
-	// Use TokenList to de-dupe classes.
-	const classes = new TokenList( props.className );
-	classes.add( `has-${ attributes.fontStyle }-font-style` );
-	const newClassName = classes.value;
-	props.className = newClassName ? newClassName : undefined;
+	if ( attributes.fontStyle ) {
+		// Use TokenList to de-dupe classes.
+		const classes = new TokenList( props.className );
+		classes.add( `has-font-style` );
+		classes.add( `has-${ attributes.fontStyle }-font-style` );
+		const newClassName = classes.value;
+		props.className = newClassName ? newClassName : undefined;
+	}
 
 	return props;
 }
@@ -153,14 +160,18 @@ export function useIsFontStyleDisabled( { name: blockName } = {} ) {
 
 addFilter(
 	'blocks.registerBlockType',
-	'core/font/addAttribute',
-	addAttributes
+	'core/font-style/addAttribute',
+	addAttribute
 );
 
 addFilter(
 	'blocks.getSaveContent.extraProps',
-	'core/font/addSaveProps',
+	'core/font-style/addSaveProps',
 	addSaveProps
 );
 
-addFilter( 'blocks.registerBlockType', 'core/font/addEditProps', addEditProps );
+addFilter(
+	'blocks.registerBlockType',
+	'core/font-style/addEditProps',
+	addEditProps
+);
