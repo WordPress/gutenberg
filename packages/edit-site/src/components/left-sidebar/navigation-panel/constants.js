@@ -1,4 +1,4 @@
-export const ITEM_CONTENTS = {
+export const TEMPLATES_DEFAULT_DETAILS = {
 	// General
 	'front-page': {
 		title: 'Front page',
@@ -51,7 +51,7 @@ export const ITEM_CONTENTS = {
 	},
 };
 
-export const GENERAL_TEMPLATES = [
+export const TEMPLATES_GENERAL = [
 	'front-page',
 	'archive',
 	'single',
@@ -61,8 +61,4 @@ export const GENERAL_TEMPLATES = [
 	'404',
 ];
 
-export const POSTS_GENERAL_TEMPLATES = [
-	'single-post',
-	'archive-post',
-	'home',
-];
+export const TEMPLATES_POSTS = [ 'single-post', 'archive-post', 'home' ];

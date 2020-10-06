@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
  */
 import TemplatePreview from './template-preview';
 import { NavigationPanelPreviewFill } from '.';
-import { ITEM_CONTENTS } from './constants';
+import { TEMPLATES_DEFAULT_DETAILS } from './constants';
 
 export default function TemplateNavigationItems( {
 	entityType = 'wp_template',
@@ -36,7 +36,7 @@ export default function TemplateNavigationItems( {
 		<>
 			{ templates.map( ( template ) => {
 				const { title: defaultTitle, description: defaultDescription } =
-					ITEM_CONTENTS[ template.slug ] ?? {};
+					TEMPLATES_DEFAULT_DETAILS[ template.slug ] ?? {};
 				const key = `${ entityType }-${ template.id }`;
 
 				let title = template.slug;

@@ -12,7 +12,7 @@ import {
 import TemplatesPagesMenu from './templates-pages';
 import TemplateNavigationItems from '../template-navigation-items';
 import TemplatePostsMenu from './templates-posts';
-import { GENERAL_TEMPLATES } from '../constants';
+import { TEMPLATES_GENERAL } from '../constants';
 import { useSelect } from '@wordpress/data';
 
 export default function TemplatesMenu( { onActiveIdChange } ) {
@@ -26,7 +26,7 @@ export default function TemplatesMenu( { onActiveIdChange } ) {
 	);
 
 	const generalTemplates = templates?.filter( ( { slug } ) =>
-		GENERAL_TEMPLATES.includes( slug )
+		TEMPLATES_GENERAL.includes( slug )
 	);
 
 	return (

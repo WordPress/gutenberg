@@ -10,11 +10,11 @@ import {
  * Internal dependencies
  */
 import TemplateNavigationItems from '../template-navigation-items';
-import { POSTS_GENERAL_TEMPLATES } from '../constants';
+import { TEMPLATES_POSTS } from '../constants';
 
 export default function TemplatePostsMenu( { templates, onActiveIdChange } ) {
 	const generalTemplates = templates?.find( ( { slug } ) =>
-		POSTS_GENERAL_TEMPLATES.includes( slug )
+		TEMPLATES_POSTS.includes( slug )
 	);
 	const specificTemplates = templates?.filter( ( { slug } ) =>
 		slug.startsWith( 'post-' )
