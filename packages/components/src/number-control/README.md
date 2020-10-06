@@ -72,7 +72,7 @@ If this property is added, a label will be generated using label property as the
 
 ### labelPosition
 
-The position of the label (`top`, `side`, or `bottom`).
+The position of the label (`top`, `side`, `bottom`, or `edge`).
 
 -   Type: `String`
 -   Required: No

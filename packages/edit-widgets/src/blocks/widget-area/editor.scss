@@ -1,0 +1,7 @@
+.wp-block[data-type="core/widget-area"] {
+	max-width: $widget-area-width;
+}
+
+.wp-block-widget-area > .components-panel__body > .block-editor-inner-blocks {
+	padding-top: $grid-unit-30;
+}

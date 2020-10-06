@@ -14,7 +14,7 @@ import {
 	InspectorControls,
 	RichText,
 	Warning,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -57,7 +57,7 @@ function PostExcerptEditor( {
 		postId,
 		postType
 	);
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
@@ -97,7 +97,7 @@ function PostExcerptEditor( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...blockWrapperProps }>
+			<div { ...blockProps }>
 				<RichText
 					className={
 						! showMoreOnNewLine &&

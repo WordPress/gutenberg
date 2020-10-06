@@ -11,7 +11,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	RichText,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
@@ -26,7 +26,7 @@ export default function QuoteEdit( {
 	insertBlocksAfter,
 } ) {
 	const { align, value, citation } = attributes;
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		className: classnames( className, {
 			[ `has-text-align-${ align }` ]: align,
 		} ),
@@ -42,7 +42,7 @@ export default function QuoteEdit( {
 					} }
 				/>
 			</BlockControls>
-			<BlockQuotation { ...blockWrapperProps }>
+			<BlockQuotation { ...blockProps }>
 				<RichText
 					identifier="value"
 					multiline

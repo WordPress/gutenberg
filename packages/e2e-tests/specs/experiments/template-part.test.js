@@ -13,7 +13,10 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { useExperimentalFeatures } from '../../experimental-features';
+import {
+	useExperimentalFeatures,
+	openNavigation,
+} from '../../experimental-features';
 
 describe( 'Template Part', () => {
 	useExperimentalFeatures( [
@@ -43,9 +46,7 @@ describe( 'Template Part', () => {
 
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
 			// Switch to editing the header template part.
-			await page.click(
-				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
-			);
+			await openNavigation();
 			const switchToHeaderTemplatePartButton = await page.waitForXPath(
 				'//button[contains(text(), "header")]'
 			);
@@ -63,9 +64,7 @@ describe( 'Template Part', () => {
 			);
 
 			// Switch back to the front page template.
-			await page.click(
-				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
-			);
+			await openNavigation();
 			const [ switchToFrontPageTemplateButton ] = await page.$x(
 				'//button[contains(text(), "front-page")]'
 			);

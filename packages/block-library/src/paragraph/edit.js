@@ -13,7 +13,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 	getFontSize,
 	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
@@ -117,7 +117,7 @@ function ParagraphBlock( {
 		minHeight: dropCapMinimumHeight,
 	};
 
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		className: classnames( {
 			'has-drop-cap': dropCap,
 			[ `has-text-align-${ align }` ]: align,
@@ -164,7 +164,7 @@ function ParagraphBlock( {
 			<RichText
 				identifier="content"
 				tagName="p"
-				{ ...blockWrapperProps }
+				{ ...blockProps }
 				value={ content }
 				onChange={ ( newContent ) =>
 					setAttributes( { content: newContent } )

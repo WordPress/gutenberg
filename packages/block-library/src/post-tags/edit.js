@@ -10,7 +10,7 @@ import { useEntityProp } from '@wordpress/core-data';
 import {
 	BlockControls,
 	Warning,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 	AlignmentToolbar,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
@@ -77,7 +77,7 @@ export default function PostTagsEdit( { context, attributes, setAttributes } ) {
 		);
 	}
 
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
@@ -93,7 +93,7 @@ export default function PostTagsEdit( { context, attributes, setAttributes } ) {
 					} }
 				/>
 			</BlockControls>
-			<div { ...blockWrapperProps }>{ display }</div>
+			<div { ...blockProps }>{ display }</div>
 		</>
 	);
 }

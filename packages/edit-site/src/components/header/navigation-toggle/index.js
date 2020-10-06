@@ -35,7 +35,7 @@ function NavigationToggle( { icon, isOpen, onClick } ) {
 		return null;
 	}
 
-	let buttonIcon = <Icon size="32px" icon={ wordpress } />;
+	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
 
 	if ( siteIconUrl ) {
 		buttonIcon = (
@@ -48,7 +48,7 @@ function NavigationToggle( { icon, isOpen, onClick } ) {
 	} else if ( isRequestingSiteIcon ) {
 		buttonIcon = null;
 	} else if ( icon ) {
-		buttonIcon = <Icon size="32px" icon={ icon } />;
+		buttonIcon = <Icon size="36px" icon={ icon } />;
 	}
 
 	return (

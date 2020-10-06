@@ -172,3 +172,14 @@ export const getIsWidgetAreaOpen = ( state, clientId ) => {
 	const { widgetAreasOpenState } = state;
 	return !! widgetAreasOpenState[ clientId ];
 };
+
+/**
+ * Returns true if the inserter is opened.
+ *
+ * @param  {Object}  state Global application state.
+ *
+ * @return {boolean} Whether the inserter is opened.
+ */
+export function isInserterOpened( state ) {
+	return state.isInserterOpened;
+}
