@@ -60,7 +60,6 @@ function ColumnEdit( {
 		style: width ? { flexBasis: width } : undefined,
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock: false,
 		renderAppender: hasChildBlocks
 			? undefined
 			: InnerBlocks.ButtonBlockAppender,

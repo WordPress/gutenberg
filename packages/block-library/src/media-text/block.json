@@ -79,6 +79,9 @@
 		},
 		"focalPoint": {
 			"type": "object"
+		},
+		"templateLock": {
+			"type": "string"
 		}
 	},
 	"supports": {

@@ -88,7 +88,6 @@ function SocialLinksEdit( {
 	return (
 		<InnerBlocks
 			allowedBlocks={ ALLOWED_BLOCKS }
-			templateLock={ false }
 			template={ initialCreation && TEMPLATE }
 			renderFooterAppender={
 				shouldRenderFooterAppender && renderFooterAppender.current

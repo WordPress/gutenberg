@@ -2,6 +2,11 @@
 	"apiVersion": 2,
 	"name": "core/buttons",
 	"category": "design",
+	"attributes": {
+		"templateLock": {
+			"type": "string"
+		}
+	},
 	"supports": {
 		"anchor": true,
 		"align": true,

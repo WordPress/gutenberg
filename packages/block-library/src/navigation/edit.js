@@ -72,10 +72,6 @@ function Navigation( {
 			templateInsertUpdatesSelection: false,
 			__experimentalAppenderTagName: 'li',
 			__experimentalCaptureToolbars: true,
-			// Template lock set to false here so that the Nav
-			// Block on the experimental menus screen does not
-			// inherit templateLock={ 'all' }.
-			templateLock: false,
 		}
 	);
 

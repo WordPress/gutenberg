@@ -6,6 +6,9 @@
 		"openInNewTab": {
 			"type": "boolean",
 			"default": false
+		},
+		"templateLock": {
+			"type": "string"
 		}
 	},
 	"providesContext": {

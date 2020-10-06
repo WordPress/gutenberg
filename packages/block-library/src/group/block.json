@@ -6,6 +6,9 @@
 		"tagName": {
 			"type": "string",
 			"default": "div"
+		},
+		"templateLock": {
+			"type": "string"
 		}
 	},
 	"supports": {

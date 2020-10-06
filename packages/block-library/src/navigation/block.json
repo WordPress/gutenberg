@@ -30,6 +30,9 @@
 		"showSubmenuIcon": {
 			"type": "boolean",
 			"default": true
+		},
+		"templateLock": {
+			"type": "string"
 		}
 	},
 	"providesContext": {

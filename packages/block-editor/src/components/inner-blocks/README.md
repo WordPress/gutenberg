@@ -119,9 +119,10 @@ Template locking allows locking the `InnerBlocks` area for the current template.
 - `'insert'` — prevents inserting or removing blocks, but allows moving existing ones.
 - `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking. ( Boolean )
 
-If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used.
+If locking is not set in an `InnerBlocks` area and an attribute named `templateLock` exists the value of the attribute is used as `templateLock`. If locking is not set either as property of the `InnerBlocks` area or as an attribute, the `templateLock` default value of `false`is used.
 
-If the block is a top level block: the locking of the Custom Post Type is used.
+The `template` property allows setting the attributes of the child blocks and can set `templateLock` of the descent blocks. This allows an ancestor to control the locking of child block areas part of its template.
+
 
 ### `renderAppender`
 * **Type:** `Function|false`

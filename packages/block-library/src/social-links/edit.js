@@ -35,7 +35,6 @@ export function SocialLinksEdit( props ) {
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-		templateLock: false,
 		template: TEMPLATE,
 		orientation: 'horizontal',
 		__experimentalAppenderTagName: 'li',

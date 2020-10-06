@@ -32,18 +32,15 @@ export default function useNestedSettingsUpdate(
 ) {
 	const { updateBlockListSettings } = useDispatch( 'core/block-editor' );
 
-	const { blockListSettings, parentLock } = useSelect(
+	const { blockListSettings, templateLockAttribute } = useSelect(
 		( select ) => {
-			const rootClientId = select(
+			const { getBlockListSettings, getBlockAttributes } = select(
 				'core/block-editor'
-			).getBlockRootClientId( clientId );
+			);
 			return {
-				blockListSettings: select(
-					'core/block-editor'
-				).getBlockListSettings( clientId ),
-				parentLock: select( 'core/block-editor' ).getTemplateLock(
-					rootClientId
-				),
+				blockListSettings: getBlockListSettings( clientId ),
+				templateLockAttribute: getBlockAttributes( clientId )
+					.templateLock,
 			};
 		},
 		[ clientId ]
@@ -53,7 +50,9 @@ export default function useNestedSettingsUpdate(
 		const newSettings = {
 			allowedBlocks,
 			templateLock:
-				templateLock === undefined ? parentLock : templateLock,
+				templateLock === undefined
+					? templateLockAttribute
+					: templateLock,
 		};
 
 		// These values are not defined for RN, so only include them if they
@@ -74,9 +73,9 @@ export default function useNestedSettingsUpdate(
 		blockListSettings,
 		allowedBlocks,
 		templateLock,
-		parentLock,
 		captureToolbars,
 		orientation,
 		updateBlockListSettings,
+		templateLockAttribute,
 	] );
 }
