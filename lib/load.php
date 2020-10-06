@@ -102,7 +102,6 @@ if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
 	require dirname( __FILE__ ) . '/template-loader.php';
 	require dirname( __FILE__ ) . '/edit-site-page.php';
 	require dirname( __FILE__ ) . '/edit-site-export.php';
-	require dirname( __FILE__ ) . '/edit-site-page-templates.php';
 }
 
 require dirname( __FILE__ ) . '/block-patterns.php';

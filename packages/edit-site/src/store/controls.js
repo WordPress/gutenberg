@@ -11,30 +11,23 @@ import { findTemplate as findTemplateUtil } from '../utils';
 /**
  * Find the template for a given page path.
  *
- * @param {string}   path The page path.
- * @param {string}   [templateType] Filter by template type to find a specific template.
- * @param {string[]} [templates] Filter by template hierarchy to find a specific template.
+ * @param {string} path The page path.
  *
  * @return {number} The found template ID.
  */
-export function findTemplate( path, templateType, templates ) {
+export function findTemplate( path ) {
 	return {
 		type: 'FIND_TEMPLATE',
 		path,
-		templateType,
-		templates,
 	};
 }
 
 const controls = {
-	FIND_TEMPLATE: createRegistryControl(
-		( registry ) => ( { path, templateType, templates } ) =>
-			findTemplateUtil(
-				path,
-				registry.__experimentalResolveSelect( 'core' ).getEntityRecords,
-				templateType,
-				templates
-			)
+	FIND_TEMPLATE: createRegistryControl( ( registry ) => ( { path } ) =>
+		findTemplateUtil(
+			path,
+			registry.__experimentalResolveSelect( 'core' ).getEntityRecords
+		)
 	),
 };
 

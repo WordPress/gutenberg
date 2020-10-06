@@ -1,41 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import apiFetch from '@wordpress/api-fetch';
 
 export default function useTemplates() {
-	const [ templateFiles, setTemplateFiles ] = useState( [] );
-
-	useEffect( () => {
-		apiFetch( {
-			path: '/__experimental/edit-site/v1/page-templates',
-		} ).then( ( res ) => {
-			setTemplateFiles( res );
-		} );
-	}, [] );
-
-	const templateEntities = useSelect(
+	const templates = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
 				status: [ 'publish', 'auto-draft' ],
 				per_page: -1,
-			} ) || [],
+			} ),
 		[]
 	);
 
-	const templatesFilesWithoutEntities = templateFiles.filter(
-		( { slug } ) =>
-			! templateEntities?.find( ( entity ) => slug === entity.slug )
-	);
-
-	return [
-		...templatesFilesWithoutEntities.map( ( template ) => ( {
-			id: template.slug,
-			isFile: true,
-			...template,
-		} ) ),
-		...templateEntities,
-	].sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
+	return templates || [];
 }
