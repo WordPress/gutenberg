@@ -37,5 +37,5 @@ export default function useTemplates() {
 			...template,
 		} ) ),
 		...templateEntities,
-	];
+	].sort( ( a, b ) => a.slug.localeCompare( b.slug ) );
 }
