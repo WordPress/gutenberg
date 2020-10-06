@@ -220,10 +220,6 @@ else:
 <!-- /wp:shortcode -->
 
 <!-- wp:heading -->
-<h2>Jetpack</h2>
-<!-- /wp:heading -->
-
-<!-- wp:heading -->
 <h2>Unsupported</h2>
 <!-- /wp:heading -->
 
