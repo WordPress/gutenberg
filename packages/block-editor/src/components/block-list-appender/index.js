@@ -18,7 +18,7 @@ import DefaultBlockAppender from '../default-block-appender';
 import ButtonBlockAppender from '../button-block-appender';
 
 // A Context to store the map of the appender map.
-export const AppenderContext = createContext();
+export const AppenderNodesContext = createContext();
 
 function stopPropagation( event ) {
 	event.stopPropagation();
@@ -34,7 +34,7 @@ function BlockListAppender( {
 	selectedBlockClientId,
 	tagName: TagName = 'div',
 } ) {
-	const appenderMap = useContext( AppenderContext );
+	const appenderNodesMap = useContext( AppenderNodesContext );
 
 	if ( isLocked || CustomAppender === false ) {
 		return null;
@@ -103,10 +103,10 @@ function BlockListAppender( {
 			ref={ ( ref ) => {
 				if ( ref ) {
 					// Set the reference of the "Appender" with `rootClientId` as key.
-					appenderMap.set( rootClientId || '', ref );
+					appenderNodesMap.set( rootClientId || '', ref );
 				} else {
 					// If it un-mounts, cleanup the map.
-					appenderMap.delete( rootClientId || '' );
+					appenderNodesMap.delete( rootClientId || '' );
 				}
 			} }
 		>

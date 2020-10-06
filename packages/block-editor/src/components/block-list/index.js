@@ -13,14 +13,16 @@ import { useRef, forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import BlockListBlock from './block';
-import BlockListAppender, { AppenderContext } from '../block-list-appender';
+import BlockListAppender, {
+	AppenderNodesContext,
+} from '../block-list-appender';
 import RootContainer from './root-container';
 import useBlockDropZone from '../use-block-drop-zone';
 
 /**
  * A map to store the reference of each "Appenders" rendered with `rootClientId` as key.
  */
-const appenderMap = new Map();
+const appenderNodesMap = new Map();
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -87,7 +89,7 @@ function BlockList(
 		dropTargetIndex === blockClientIds.length && isDraggingBlocks;
 
 	return (
-		<AppenderContext.Provider value={ appenderMap }>
+		<AppenderNodesContext.Provider value={ appenderNodesMap }>
 			<Container
 				{ ...__experimentalPassedProps }
 				ref={ element }
@@ -140,7 +142,7 @@ function BlockList(
 					} ) }
 				/>
 			</Container>
-		</AppenderContext.Provider>
+		</AppenderNodesContext.Provider>
 	);
 }
 
