@@ -106,6 +106,12 @@ The current value of the input.
 - Type: `String | Number`
 - Required: Yes
 
+#### placeholder
+The placeholder text in the input field.
+
+- Type: `String`
+- Required: No
+
 #### className
 The class that will be added with "components-base-control" to the classes of the wrapper div.
 If no className is passed only components-base-control is used.
