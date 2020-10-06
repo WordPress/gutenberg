@@ -9,7 +9,7 @@ $block-inserter-tabs-height: 44px;
 	padding: 0;
 	font-family: $default-font;
 	font-size: $default-font-size;
-	line-height: $default-line-height;
+	line-height: 0;
 
 	@include break-medium {
 		position: relative;

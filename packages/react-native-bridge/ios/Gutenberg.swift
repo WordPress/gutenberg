@@ -96,6 +96,8 @@ public class Gutenberg: NSObject {
             initialProps["gradients"] = gradients
         }
 
+        initialProps["editorMode"] = dataSource.isPreview ? "preview" : "editor"
+
         return initialProps
     }
 
@@ -182,6 +184,10 @@ public class Gutenberg: NSObject {
         }
 
         bridgeModule.sendEventIfNeeded(.updateTheme, body:themeUpdates)
+    }
+
+    public func showNotice(_ message: String) {
+        sendEvent(.showNotice, body: ["message": message])
     }
 }
 

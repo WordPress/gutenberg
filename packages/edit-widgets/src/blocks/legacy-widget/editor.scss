@@ -3,6 +3,7 @@
 		border: none;
 		display: block;
 		box-shadow: none;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 	}
 	// Reset z-index set on https://github.com/WordPress/wordpress-develop/commit/f26d4d37351a55fd1fc5dad0f5fef8f0f964908c.
 	.widget.open {
@@ -25,11 +26,17 @@
 	padding: $grid-unit-10 $block-padding;
 }
 
-.wp-block-legacy-widget__edit-widget-title {
-	background: $gray-300;
-	color: $gray-900;
+.components-panel__body .wp-block-legacy-widget__edit-widget-title {
+	color: $black;
 	font-family: $default-font;
 	font-size: $default-font-size;
-	padding: $grid-unit-10 $block-padding;
+	padding: $block-padding 18px;
+	margin: 0;
 	font-weight: 600;
+	border-bottom: $border-width solid $gray-900;
+}
+
+.wp-block > .wp-block-legacy-widget__edit-handler {
+	border: $border-width solid $gray-900;
+	border-radius: $radius-block-ui;
 }

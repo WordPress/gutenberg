@@ -13,7 +13,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	InspectorControls,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import {
 	ToolbarGroup,
@@ -56,7 +56,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 		} )
 	);
 	const resolvedFormat = format || siteFormat || settings.formats.date;
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
@@ -105,7 +105,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 				</PanelBody>
 			</InspectorControls>
 
-			<div { ...blockWrapperProps }>
+			<div { ...blockProps }>
 				{ date && (
 					<time dateTime={ dateI18n( 'c', date ) }>
 						{ dateI18n( resolvedFormat, date ) }

@@ -13,7 +13,7 @@ import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
-const MIN_SPACER_HEIGHT = 20;
+const MIN_SPACER_HEIGHT = 1;
 const MAX_SPACER_HEIGHT = 500;
 
 const SpacerEdit = ( {

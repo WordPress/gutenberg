@@ -186,8 +186,8 @@ export function BlockSettingsDropdown( {
 										shortcut={ shortcuts.remove }
 									>
 										{ _n(
-											'Remove Block',
-											'Remove Blocks',
+											'Remove block',
+											'Remove blocks',
 											count
 										) }
 									</MenuItem>
