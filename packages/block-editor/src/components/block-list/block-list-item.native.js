@@ -64,9 +64,6 @@ export class BlockListItem extends Component {
 
 		if ( isFullWidth ) {
 			if ( ! hasParents ) {
-				if ( blockWidth > medium ) {
-					return -2;
-				}
 				return 0;
 			}
 			return marginHorizontal;
