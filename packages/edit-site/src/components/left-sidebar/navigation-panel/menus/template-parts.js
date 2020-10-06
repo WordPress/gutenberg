@@ -13,7 +13,7 @@ import {
  */
 import TemplateNavigationItems from '../template-navigation-items';
 
-export default function TemplatePartsMenu( { onActiveTemplatePartIdChange } ) {
+export default function TemplatePartsMenu( { onActivateItem } ) {
 	const templateParts = useSelect( ( select ) => {
 		const currentTheme = select( 'core' ).getCurrentTheme()?.textdomain;
 
@@ -37,7 +37,7 @@ export default function TemplatePartsMenu( { onActiveTemplatePartIdChange } ) {
 			<TemplateNavigationItems
 				entityType="wp_template_part"
 				templates={ templateParts }
-				onActivate={ onActiveTemplatePartIdChange }
+				onActivateItem={ onActivateItem }
 			/>
 
 			{ ! templateParts && <NavigationItem title={ __( 'Loading…' ) } /> }

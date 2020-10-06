@@ -15,7 +15,7 @@ import TemplatePostsMenu from './templates-posts';
 import { TEMPLATES_GENERAL } from '../constants';
 import { useSelect } from '@wordpress/data';
 
-export default function TemplatesMenu( { onActiveIdChange } ) {
+export default function TemplatesMenu( { onActivateItem } ) {
 	const templates = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
@@ -36,17 +36,17 @@ export default function TemplatesMenu( { onActiveIdChange } ) {
 
 			<TemplateNavigationItems
 				templates={ generalTemplates }
-				onActivate={ onActiveIdChange }
+				onActivateItem={ onActivateItem }
 			/>
 
 			<TemplatePostsMenu
 				templates={ templates }
-				onActiveIdChange={ onActiveIdChange }
+				onActivateItem={ onActivateItem }
 			/>
 
 			<TemplatesPagesMenu
 				templates={ templates }
-				onActiveIdChange={ onActiveIdChange }
+				onActivateItem={ onActivateItem }
 			/>
 		</NavigationMenu>
 	);

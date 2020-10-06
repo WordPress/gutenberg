@@ -17,7 +17,7 @@ import { TEMPLATES_DEFAULT_DETAILS } from './constants';
 export default function TemplateNavigationItems( {
 	entityType = 'wp_template',
 	templates,
-	onActivate,
+	onActivateItem,
 } ) {
 	const [ hoveredTemplate, setHoveredTemplate ] = useState();
 
@@ -57,7 +57,7 @@ export default function TemplateNavigationItems( {
 						title={ title }
 					>
 						<Button
-							onClick={ () => onActivate( template.id ) }
+							onClick={ () => onActivateItem( template.id ) }
 							onMouseEnter={ () =>
 								onMouseEnterTemplate( template )
 							}

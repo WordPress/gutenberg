@@ -12,7 +12,7 @@ import {
 import TemplateNavigationItems from '../template-navigation-items';
 import { TEMPLATES_POSTS } from '../constants';
 
-export default function TemplatePostsMenu( { templates, onActiveIdChange } ) {
+export default function TemplatePostsMenu( { templates, onActivateItem } ) {
 	const generalTemplates = templates?.find( ( { slug } ) =>
 		TEMPLATES_POSTS.includes( slug )
 	);
@@ -29,14 +29,14 @@ export default function TemplatePostsMenu( { templates, onActiveIdChange } ) {
 			<NavigationGroup title="Specific">
 				<TemplateNavigationItems
 					templates={ specificTemplates }
-					onActivate={ onActiveIdChange }
+					onActivateItem={ onActivateItem }
 				/>
 			</NavigationGroup>
 
 			<NavigationGroup title="General">
 				<TemplateNavigationItems
 					templates={ generalTemplates }
-					onActivate={ onActiveIdChange }
+					onActivateItem={ onActivateItem }
 				/>
 			</NavigationGroup>
 		</NavigationMenu>

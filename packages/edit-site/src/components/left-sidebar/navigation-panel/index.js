@@ -80,11 +80,9 @@ const NavigationPanel = () => {
 						navigateToMenu="template-parts"
 					/>
 
-					<TemplatesMenu onActiveIdChange={ setTemplate } />
+					<TemplatesMenu onActivateItem={ setTemplate } />
 
-					<TemplatePartsMenu
-						onActiveTemplatePartIdChange={ setTemplatePart }
-					/>
+					<TemplatePartsMenu onActivateItem={ setTemplatePart } />
 				</NavigationMenu>
 			</Navigation>
 

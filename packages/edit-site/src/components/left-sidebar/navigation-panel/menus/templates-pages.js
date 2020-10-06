@@ -11,7 +11,7 @@ import {
  */
 import TemplateNavigationItems from '../template-navigation-items';
 
-export default function TemplatesPagesMenu( { templates, onActiveIdChange } ) {
+export default function TemplatesPagesMenu( { templates, onActivateItem } ) {
 	const defaultTemplate = templates?.find( ( { slug } ) => slug === 'page' );
 	const specificPageTemplates = templates?.filter( ( { slug } ) =>
 		slug.startsWith( 'page-' )
@@ -26,7 +26,7 @@ export default function TemplatesPagesMenu( { templates, onActiveIdChange } ) {
 			<NavigationGroup title="Specific">
 				<TemplateNavigationItems
 					templates={ specificPageTemplates }
-					onActivate={ onActiveIdChange }
+					onActivateItem={ onActivateItem }
 				/>
 			</NavigationGroup>
 
@@ -34,7 +34,7 @@ export default function TemplatesPagesMenu( { templates, onActiveIdChange } ) {
 				<NavigationGroup title="General">
 					<TemplateNavigationItems
 						templates={ defaultTemplate }
-						onActivate={ onActiveIdChange }
+						onActivateItem={ onActivateItem }
 					/>
 				</NavigationGroup>
 			) }
