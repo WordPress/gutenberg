@@ -35,17 +35,26 @@ export default function TemplateNavigationItems( {
 	return (
 		<>
 			{ templates.map( ( template ) => {
-				const { title, description } =
+				const { title: defaultTitle, description: defaultDescription } =
 					ITEM_CONTENTS[ template.slug ] ?? {};
 				const key = `${ entityType }-${ template.id }`;
 
+				let title = template.slug;
+				if ( template?.title?.rendered !== template.slug ) {
+					title = template.title.rendered;
+				} else if ( defaultTitle ) {
+					title = defaultTitle;
+				}
+
+				const description =
+					template?.excerpt?.rendered || defaultDescription;
 
 				return (
 					<NavigationItem
 						className="edit-site-navigation-panel__template-item"
 						key={ key }
 						item={ key }
-						title={ title || template.slug }
+						title={ title }
 					>
 						<Button
 							onClick={ () => onActivate( template.id ) }
@@ -54,7 +63,7 @@ export default function TemplateNavigationItems( {
 							}
 							onMouseLeave={ onMouseLeaveTemplate }
 						>
-							{ title || template.slug }
+							{ title }
 							{ description && (
 								<div className="edit-site-navigation-panel__template-item-description">
 									{ description }
