@@ -113,6 +113,7 @@ html.interface-interface-skeleton__html-container {
 	border-bottom: $border-width solid $gray-200;
 	z-index: z-index(".interface-interface-skeleton__header");
 	color: $gray-900;
+	flex-grow: 1;
 
 	// On Mobile the header is sticky.
 	position: sticky;

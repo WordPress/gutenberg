@@ -63,25 +63,28 @@ function InterfaceSkeleton( {
 				'interface-interface-skeleton'
 			) }
 		>
-			{ !! navigationSidebar && (
-				<div
-					className="interface-interface-skeleton__navigation-sidebar"
-					role="region"
-					aria-label={ mergedLabels.navigationSidebar }
-				>
-					{ navigationSidebar }
-				</div>
-			) }
-			{ !! header && (
-				<div
-					className="interface-interface-skeleton__header"
-					role="region"
-					aria-label={ mergedLabels.header }
-					tabIndex="-1"
-				>
-					{ header }
-				</div>
-			) }
+			{ /* TODO: Refactor flex layout so that content respects expanded sidebar */ }
+			<div style={ { display: 'flex' } }>
+				{ !! navigationSidebar && (
+					<div
+						className="interface-interface-skeleton__navigation-sidebar"
+						role="region"
+						aria-label={ mergedLabels.navigationSidebar }
+					>
+						{ navigationSidebar }
+					</div>
+				) }
+				{ !! header && (
+					<div
+						className="interface-interface-skeleton__header"
+						role="region"
+						aria-label={ mergedLabels.header }
+						tabIndex="-1"
+					>
+						{ header }
+					</div>
+				) }
+			</div>
 			<div className="interface-interface-skeleton__body">
 				{ !! leftSidebar && (
 					<div
