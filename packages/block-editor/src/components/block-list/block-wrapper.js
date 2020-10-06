@@ -29,6 +29,7 @@ import useMovingAnimation from '../use-moving-animation';
 import { Context, SetBlockNodes } from './root-container';
 import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-wrapper-elements';
+import { evaluateHoveredBlocks } from './hovered-blocks';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -70,7 +71,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		initialPosition,
 		shouldFocusFirstElement,
 		isNavigationMode,
-		getHoveredBlocksEventData,
 		isFullSiteEditingActive,
 	} = useSelect(
 		( select ) => {
@@ -78,7 +78,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				getSelectedBlocksInitialCaretPosition,
 				isMultiSelecting: _isMultiSelecting,
 				isNavigationMode: _isNavigationMode,
-				__experimentalGetHoveredBlocksEventData: _getHoveredBlocksEventData,
 				getSettings,
 			} = select( 'core/block-editor' );
 
@@ -91,7 +90,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					? getSelectedBlocksInitialCaretPosition()
 					: undefined,
 				isNavigationMode: _isNavigationMode,
-				getHoveredBlocksEventData: _getHoveredBlocksEventData,
 				isFullSiteEditingActive: getSettings()
 					.__experimentalEnableFullSiteEditing,
 			};
@@ -99,11 +97,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		[ isSelected ]
 	);
 
-	const {
-		insertDefaultBlock,
-		removeBlock,
-		__experimentalSetHoveredBlocks: setHoveredBlocks,
-	} = useDispatch( 'core/block-editor' );
+	const { insertDefaultBlock, removeBlock } = useDispatch(
+		'core/block-editor'
+	);
 	const [ isHovered, setHovered ] = useState( false );
 
 	// Provide the selected node, or the first and last nodes of a multi-
@@ -292,47 +288,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	useEffect( () => {
 		if ( ! isFullSiteEditingActive ) {
 			return;
-		}
-		// To accurately determine which blocks are hovered we must look at the elements under the cursor.
-		// Internal block inserters will fire events like mouseleave for blocks they are visually contained within,
-		// which makes an add/remove by clientId per individual block approach inaccurate.
-		function getHoveredBlocksFromCursor( event ) {
-			const hoveredElements = document.elementsFromPoint(
-				event.clientX,
-				event.clientY
-			);
-			const blockIds = [];
-			hoveredElements.forEach( ( element ) => {
-				if ( element.dataset.block ) {
-					blockIds.push( element.dataset.block );
-				}
-			} );
-			return blockIds;
-		}
-		function evaluateHoveredBlocks( event ) {
-			// Check event data for the last time this was set.
-			// This prevents needlessly rerunning the parse and dispatch for nested blocks
-			// who share boundaries that trigger the mouse events at or around the same time.
-			const { time, mouseCoords } = getHoveredBlocksEventData() || {};
-			const eventCoords = `${ event.clientX }-${ event.clientY }`;
-			if (
-				mouseCoords !== eventCoords ||
-				event.timeStamp - ( time || 0 ) > 50
-			) {
-				const hoveredBlocks = getHoveredBlocksFromCursor( event );
-				// Get an updated timeStamp to set on the dispatch.
-				// The event.timeStamp may be outdated by this time.
-				// In some browsers, simultaneously triggered events may not have the same timestamp,
-				// and the difference may correspond to queue and processing time for the previous event.
-
-				// eslint-disable-next-line no-undef
-				const dispatchTimeStamp = new Event( 'foobar' ).timeStamp;
-				setHoveredBlocks(
-					hoveredBlocks,
-					dispatchTimeStamp,
-					eventCoords
-				);
-			}
 		}
 
 		ref.current.addEventListener( 'mouseenter', evaluateHoveredBlocks );
