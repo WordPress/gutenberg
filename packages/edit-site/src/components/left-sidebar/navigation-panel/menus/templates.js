@@ -14,6 +14,7 @@ import TemplateNavigationItems from '../template-navigation-items';
 import TemplatePostsMenu from './templates-posts';
 import { TEMPLATES_GENERAL } from '../constants';
 import { useSelect } from '@wordpress/data';
+import TemplatesAllMenu from './templates-all';
 
 export default function TemplatesMenu( { onActivateItem } ) {
 	const templates = useSelect(
@@ -31,6 +32,7 @@ export default function TemplatesMenu( { onActivateItem } ) {
 
 	return (
 		<NavigationMenu menu="templates" title="Templates" parentMenu="root">
+			<NavigationItem navigateToMenu="templates-all" title="All" />
 			<NavigationItem navigateToMenu="templates-pages" title="Pages" />
 			<NavigationItem navigateToMenu="templates-posts" title="Posts" />
 
@@ -45,6 +47,11 @@ export default function TemplatesMenu( { onActivateItem } ) {
 			/>
 
 			<TemplatesPagesMenu
+				templates={ templates }
+				onActivateItem={ onActivateItem }
+			/>
+
+			<TemplatesAllMenu
 				templates={ templates }
 				onActivateItem={ onActivateItem }
 			/>
