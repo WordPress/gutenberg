@@ -91,12 +91,13 @@ export default function TemplateNavigationItems( {
 		<>
 			{ templates.map( ( template ) => {
 				const { title, description } = TITLES[ template.slug ] ?? {};
+				const key = `${ itemPrefix }-${ template.id }`;
 
 				return (
 					<NavigationItem
 						className="edit-site-navigation-panel__template-item"
-						key={ `${ itemPrefix }-${ template.id }` }
-						item={ `${ itemPrefix }-${ template.slug }` }
+						key={ key }
+						item={ key }
 						title={
 							TITLES[ template.slug ]?.title ?? template.slug
 						}
