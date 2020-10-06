@@ -40,8 +40,9 @@
 	}
 
 	.components-base-control__help {
-		margin: -8px 0 $grid-unit-05 ( $grid-unit-50 + 2px );
+		margin: -$grid-unit-10 0 $grid-unit-10 ( $grid-unit-50 + 2px );
 		font-size: $default-font-size - 1px;
+		font-style: normal;
 		color: $gray-700;
 	}
 }
