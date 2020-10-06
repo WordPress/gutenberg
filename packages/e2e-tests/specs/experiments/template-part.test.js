@@ -15,7 +15,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import {
 	useExperimentalFeatures,
-	openNavigation,
+	navigationPanel,
 } from '../../experimental-features';
 
 describe( 'Template Part', () => {
@@ -46,11 +46,10 @@ describe( 'Template Part', () => {
 
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
 			// Switch to editing the header template part.
-			await openNavigation();
-			const switchToHeaderTemplatePartButton = await page.waitForXPath(
-				'//button[contains(text(), "header")]'
-			);
-			await switchToHeaderTemplatePartButton.click();
+			await navigationPanel.open();
+			await navigationPanel.backToRoot();
+			await navigationPanel.navigate( 'Template parts' );
+			await navigationPanel.clickItemByText( 'header' );
 
 			// Edit it.
 			await insertBlock( 'Paragraph' );
@@ -64,11 +63,10 @@ describe( 'Template Part', () => {
 			);
 
 			// Switch back to the front page template.
-			await openNavigation();
-			const [ switchToFrontPageTemplateButton ] = await page.$x(
-				'//button[contains(text(), "front-page")]'
-			);
-			await switchToFrontPageTemplateButton.click();
+			await navigationPanel.open();
+			await navigationPanel.backToRoot();
+			await navigationPanel.navigate( 'Templates' );
+			await navigationPanel.clickItemByText( 'Front page' );
 
 			// Verify that the header template part is updated.
 			const [ headerTemplatePart ] = await page.$x(

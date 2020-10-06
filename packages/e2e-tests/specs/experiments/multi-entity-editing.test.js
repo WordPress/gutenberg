@@ -20,7 +20,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import {
 	useExperimentalFeatures,
-	openNavigation,
+	navigationPanel,
 } from '../../experimental-features';
 
 const visitSiteEditor = async () => {
@@ -34,12 +34,11 @@ const visitSiteEditor = async () => {
 	);
 };
 
-const getTemplateDropdownElement = async ( itemName ) => {
-	await openNavigation();
-	const selector = `//div[contains(@class, "edit-site-navigation-panel")]//button[contains(., "${ itemName }")]`;
-	await page.waitForXPath( selector );
-	const [ item ] = await page.$x( selector );
-	return item;
+const clickTemplateItem = async ( menus, itemName ) => {
+	await navigationPanel.open();
+	await navigationPanel.backToRoot();
+	await navigationPanel.navigate( menus );
+	await navigationPanel.clickItemByText( itemName );
 };
 
 const createTemplatePart = async (
@@ -169,8 +168,7 @@ describe( 'Multi-entity editor states', () => {
 	} );
 
 	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
-		const templatePartButton = await getTemplateDropdownElement( 'header' );
-		await templatePartButton.click();
+		await clickTemplateItem( 'Template parts', 'header' );
 
 		// Wait for blocks to load.
 		await page.waitForSelector( '.wp-block' );
@@ -178,8 +176,7 @@ describe( 'Multi-entity editor states', () => {
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
 
 		// Switch back and make sure it is still clean.
-		const templateButton = await getTemplateDropdownElement( 'front-page' );
-		await templateButton.click();
+		await clickTemplateItem( 'Templates', 'Front page' );
 		await page.waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
