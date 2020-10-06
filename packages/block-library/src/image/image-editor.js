@@ -9,7 +9,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 
-import { BlockControls } from '@wordpress/block-editor';
+import { __experimentalBlockToolbarInlineEdit } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import {
 	search,
@@ -319,7 +319,7 @@ export default function ImageEditor( {
 				/>
 				{ inProgress && <Spinner /> }
 			</div>
-			<BlockControls>
+			<__experimentalBlockToolbarInlineEdit>
 				<ToolbarGroup>
 					<Dropdown
 						contentClassName="wp-block-image__zoom"
@@ -370,7 +370,7 @@ export default function ImageEditor( {
 						{ __( 'Cancel' ) }
 					</ToolbarButton>
 				</ToolbarGroup>
-			</BlockControls>
+			</__experimentalBlockToolbarInlineEdit>
 		</>
 	);
 }
