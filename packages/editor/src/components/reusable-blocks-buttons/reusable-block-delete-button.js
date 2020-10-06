@@ -41,7 +41,7 @@ export default compose( [
 		const { getBlock } = select( 'core/block-editor' );
 		const { canUser } = select( 'core' );
 		const { __experimentalGetReusableBlock: getReusableBlock } = select(
-			'core/editor'
+			'core/reusable-blocks'
 		);
 		const block = getBlock( clientId );
 
@@ -61,7 +61,7 @@ export default compose( [
 	withDispatch( ( dispatch, { clientId }, { select } ) => {
 		const {
 			__experimentalDeleteReusableBlock: deleteReusableBlock,
-		} = dispatch( 'core/editor' );
+		} = dispatch( 'core/reusable-blocks' );
 		const { getBlock } = select( 'core/block-editor' );
 
 		return {

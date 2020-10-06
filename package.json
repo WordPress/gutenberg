@@ -69,6 +69,7 @@
 		"@wordpress/react-native-bridge": "file:packages/react-native-bridge",
 		"@wordpress/react-native-editor": "file:packages/react-native-editor",
 		"@wordpress/redux-routine": "file:packages/redux-routine",
+		"@wordpress/reusable-blocks": "file:packages/reusable-blocks",
 		"@wordpress/rich-text": "file:packages/rich-text",
 		"@wordpress/server-side-render": "file:packages/server-side-render",
 		"@wordpress/shortcode": "file:packages/shortcode",

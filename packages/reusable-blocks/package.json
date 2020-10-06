@@ -1,0 +1,44 @@
+{
+	"name": "@wordpress/reusable-blocks",
+	"version": "9.22.0",
+	"description": "Reusable blocks utilities.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"reusable blocks"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/reusable-blocks/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/reusable-blocks"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"sideEffects": [
+		"build-style/**",
+		"!((src|build|build-module)/(components|utils)/**)"
+	],
+	"dependencies": {
+		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/block-editor": "file:../block-editor",
+		"@wordpress/blocks": "file:../blocks",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/notices": "file:../notices",
+		"lodash": "^4.17.19",
+		"redux-optimist": "^1.0.0",
+		"refx": "^3.0.0",
+		"rememo": "^3.0.0"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
