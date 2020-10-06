@@ -23,12 +23,14 @@ export function SidebarComplementaryAreaFills() {
 				identifier="edit-site/block-inspector"
 				title={ __( 'Block Inspector' ) }
 				icon={ cog }
+				closeLabel={ __( 'Close block inspector sidebar' ) }
 			>
 				<InspectorSlot bubblesVirtually />
 			</DefaultSidebar>
 			<GlobalStylesSidebar
 				identifier="edit-site/global-styles"
 				title={ __( 'Global Styles' ) }
+				closeLabel={ __( 'Close global styles sidebar' ) }
 				icon={ typography }
 			/>
 		</>

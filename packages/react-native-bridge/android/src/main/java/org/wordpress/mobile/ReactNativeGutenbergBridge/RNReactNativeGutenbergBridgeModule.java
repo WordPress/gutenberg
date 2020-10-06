@@ -263,6 +263,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
                 replaceBlock(savedContent, savedBlockId), content, blockId, blockName, blockTitle);
     }
 
+    @ReactMethod
+    public void actionButtonPressed(String buttonType) {
+        mGutenbergBridgeJS2Parent.gutenbergDidSendButtonPressedAction(buttonType);
+    }
+
     private void replaceBlock(String content, String blockId) {
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putString(MAP_KEY_REPLACE_BLOCK_HTML, content);

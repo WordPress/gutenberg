@@ -3,7 +3,7 @@
  */
 import { useEffect } from '@wordpress/element';
 
-/**
+/*
  * Calculates and renders the format boundary style when the active formats
  * change.
  */

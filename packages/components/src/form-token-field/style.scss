@@ -10,8 +10,8 @@
 
 
 	&.is-disabled {
-		background: $gray-200;
-		border-color: $gray-200;
+		background: $gray-300;
+		border-color: $gray-300;
 	}
 
 	&.is-active {
@@ -130,7 +130,7 @@
 	display: inline-block;
 	line-height: 24px;
 	height: auto;
-	background: $gray-200;
+	background: $gray-300;
 	transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
 	@include reduce-motion;
 }
@@ -161,13 +161,13 @@
 	flex: 1 0 100%;
 	min-width: 100%;
 	max-height: 9em;
-	overflow-y: scroll;
+	overflow-y: auto;
 	transition: all 0.15s ease-in-out;
 	@include reduce-motion("transition");
 	list-style: none;
 	border-top: $border-width solid $gray-700;
 	margin: $grid-unit-05 (-$grid-unit-05) (-$grid-unit-05);
-	padding-top: 3px;
+	padding: 0;
 }
 
 .components-form-token-field__suggestion {
@@ -175,6 +175,7 @@
 	display: block;
 	font-size: $default-font-size;
 	padding: 4px 8px;
+	margin: 0;
 	cursor: pointer;
 
 	&.is-selected {

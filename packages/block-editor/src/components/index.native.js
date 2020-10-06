@@ -34,6 +34,7 @@ export { default as BlockCaption } from './block-caption';
 export { default as Caption } from './caption';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
+export { default as __experimentalUseEditorFeature } from './use-editor-feature';
 
 export {
 	BottomSheetSettings,
@@ -46,6 +47,7 @@ export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 export {
 	__experimentalPageTemplatePicker,
 	__experimentalWithPageTemplatePicker,
+	Preview,
 } from './page-template-picker';
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
@@ -55,7 +57,10 @@ export { default as BlockStyles } from './block-styles';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
-export { Block as __experimentalBlock } from './block-list/block-wrapper';
+export {
+	Block as __experimentalBlock,
+	useBlockWrapperProps as __experimentalUseBlockWrapperProps,
+} from './block-list/block-wrapper';
 export { default as FloatingToolbar } from './floating-toolbar';
 
 // State Related Components

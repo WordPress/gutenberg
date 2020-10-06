@@ -8,7 +8,7 @@
 }
 
 .wp-block-template-part__selection-preview-search-form {
-	border-bottom: $border-width solid $gray-200;
+	border-bottom: $border-width solid $gray-300;
 }
 
 .wp-block-template-part__selection-preview-container {
@@ -64,7 +64,6 @@
 	display: flex;
 
 	.wp-block-template-part__name-panel {
-		background-color: $white;
 		outline: 1px solid transparent;
 		padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-15;
 
@@ -78,10 +77,6 @@
 			margin-bottom: 0;
 			margin-right: 8px;
 		}
-	}
-
-	.wp-block-template-part__preview-dropdown-button {
-		border-right: $border-width solid $gray-900;
 	}
 }
 
@@ -118,7 +113,7 @@
 
 	&.has-child-selected {
 		&::after {
-			box-shadow: 0 0 0 $border-width $gray-200;
+			box-shadow: 0 0 0 $border-width $gray-300;
 
 			.is-dark-theme & {
 				box-shadow: 0 0 0 $border-width-focus $gray-700;

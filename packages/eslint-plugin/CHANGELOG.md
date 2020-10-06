@@ -50,7 +50,7 @@
 
 ### Improvements
 
--   `'AsyncIterableIterator'` is now whitelisted as a valid TypeScript utility type.
+-   `'AsyncIterableIterator'` is now allowed as a valid TypeScript utility type.
 
 ## 5.1.0 (2020-04-30)
 

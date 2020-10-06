@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, kebabCase } from 'lodash';
+import { get, kebabCase, reduce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -83,17 +83,48 @@ export default ( blockData, baseTree, userTree ) => {
 	 * @return {Array} An array of style declarations.
 	 */
 	const getBlockPresetsDeclarations = ( blockPresets ) => {
-		const declarations = [];
-		PRESET_CATEGORIES.forEach( ( category ) => {
-			if ( blockPresets?.[ category ] ) {
-				blockPresets[ category ].forEach( ( { slug, value } ) =>
+		return reduce(
+			PRESET_CATEGORIES,
+			( declarations, { path, key }, category ) => {
+				const preset = get( blockPresets, path, [] );
+				preset.forEach( ( value ) => {
 					declarations.push(
-						`--wp--preset--${ category }--${ slug }: ${ value }`
-					)
-				);
+						`--wp--preset--${ kebabCase( category ) }--${
+							value.slug
+						}: ${ value[ key ] }`
+					);
+				} );
+				return declarations;
+			},
+			[]
+		);
+	};
+
+	const flattenTree = ( input, prefix, token ) => {
+		let result = [];
+		Object.keys( input ).forEach( ( key ) => {
+			const newKey = prefix + kebabCase( key.replace( '/', '-' ) );
+			const newLeaf = input[ key ];
+
+			if ( newLeaf instanceof Object ) {
+				const newPrefix = newKey + token;
+				result = [
+					...result,
+					...flattenTree( newLeaf, newPrefix, token ),
+				];
+			} else {
+				result.push( `${ newKey }: ${ newLeaf }` );
 			}
 		} );
-		return declarations;
+		return result;
+	};
+
+	const getCustomDeclarations = ( blockCustom ) => {
+		if ( Object.keys( blockCustom ).length === 0 ) {
+			return [];
+		}
+
+		return flattenTree( blockCustom, '--wp--custom--', '--' );
 	};
 
 	const getBlockSelector = ( selector ) => {
@@ -113,7 +144,8 @@ export default ( blockData, baseTree, userTree ) => {
 				blockData[ context ].supports,
 				tree[ context ].styles
 			),
-			...getBlockPresetsDeclarations( tree[ context ].presets ),
+			...getBlockPresetsDeclarations( tree[ context ].settings ),
+			...getCustomDeclarations( tree[ context ].settings.custom ),
 		];
 		if ( blockDeclarations.length > 0 ) {
 			styles.push(

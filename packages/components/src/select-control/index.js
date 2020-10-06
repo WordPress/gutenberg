@@ -32,7 +32,6 @@ function SelectControl(
 		help,
 		hideLabelFromVision,
 		id: idProp,
-		isFloatingLabel = false,
 		label,
 		multiple = false,
 		onBlur = noop,
@@ -41,7 +40,7 @@ function SelectControl(
 		options = [],
 		size = 'default',
 		value: valueProp,
-		labelPosition,
+		labelPosition = 'top',
 		...props
 	},
 	ref
@@ -76,11 +75,6 @@ function SelectControl(
 		onChange( event.target.value, { event } );
 	};
 
-	const isFilled = true;
-	const isFloating = isFloatingLabel ? isFilled || isFocused : false;
-	const isFloatingLabelSet =
-		! hideLabelFromVision && isFloatingLabel && label;
-
 	const classes = classNames( 'components-select-control', className );
 
 	/* eslint-disable jsx-a11y/no-onchange */
@@ -91,8 +85,6 @@ function SelectControl(
 				disabled={ disabled }
 				hideLabelFromVision={ hideLabelFromVision }
 				id={ id }
-				isFilled={ isFilled }
-				isFloatingLabel={ isFloatingLabel }
 				isFocused={ isFocused }
 				label={ label }
 				size={ size }
@@ -109,8 +101,6 @@ function SelectControl(
 					className="components-select-control__input"
 					disabled={ disabled }
 					id={ id }
-					isFloating={ isFloating }
-					isFloatingLabelSet={ isFloatingLabelSet }
 					multiple={ multiple }
 					onBlur={ handleOnBlur }
 					onChange={ handleOnChange }

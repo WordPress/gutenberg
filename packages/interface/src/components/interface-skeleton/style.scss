@@ -97,20 +97,20 @@ html.interface-interface-skeleton__html-container {
 .interface-interface-skeleton__sidebar {
 	@include break-medium() {
 		overflow: auto;
-		border-left: $border-width solid $gray-100;
+		border-left: $border-width solid $gray-200;
 	}
 }
 
 .interface-interface-skeleton__left-sidebar {
 	@include break-medium() {
-		border-right: $border-width solid $gray-100;
+		border-right: $border-width solid $gray-200;
 	}
 }
 
 .interface-interface-skeleton__header {
 	flex-shrink: 0;
 	height: auto;  // Keep the height flexible.
-	border-bottom: $border-width solid $gray-100;
+	border-bottom: $border-width solid $gray-200;
 	z-index: z-index(".interface-interface-skeleton__header");
 	color: $gray-900;
 
@@ -126,15 +126,25 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton__footer {
-	height: auto;  // Keep the height flexible.
+	height: auto; // Keep the height flexible.
 	flex-shrink: 0;
-	border-top: $border-width solid $gray-100;
+	border-top: $border-width solid $gray-200;
 	color: $gray-900;
 
 	// On Mobile the footer is hidden
 	display: none;
 	@include break-medium() {
-		display: block;
+		display: flex;
+	}
+
+	.block-editor-block-breadcrumb {
+		z-index: z-index(".edit-post-layout__footer");
+		display: flex;
+		background: $white;
+		height: $button-size-small;
+		align-items: center;
+		font-size: $default-font-size;
+		padding: 0 ($grid-unit-15 + 6px);
 	}
 }
 
