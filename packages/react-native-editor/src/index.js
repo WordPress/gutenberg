@@ -136,5 +136,8 @@ const setupLocale = ( locale, extraTranslations ) => {
 	blocksRegistered = true;
 };
 
-reactNativeSetup();
-gutenbergSetup();
+export initialHtml from './initial-html';
+export const setupGutenberg = () => {
+	reactNativeSetup();
+	gutenbergSetup();
+};
