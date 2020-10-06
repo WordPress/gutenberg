@@ -50,7 +50,7 @@ function UncontrolledInnerBlocks( props ) {
 
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 
-	const { hasOverlay, enableClickThrough } = useSelect(
+	const hasOverlay = useSelect(
 		( select ) => {
 			const {
 				getBlockName,
@@ -58,21 +58,20 @@ function UncontrolledInnerBlocks( props ) {
 				hasSelectedInnerBlock,
 				isNavigationMode,
 			} = select( 'core/block-editor' );
-			return {
-				hasOverlay:
-					getBlockName( clientId ) !== 'core/template' &&
-					! isBlockSelected( clientId ) &&
-					! hasSelectedInnerBlock( clientId, true ),
-				enableClickThrough: isNavigationMode() || isSmallScreen,
-			};
+			const enableClickThrough = isNavigationMode() || isSmallScreen;
+			return (
+				getBlockName( clientId ) !== 'core/template' &&
+				! isBlockSelected( clientId ) &&
+				! hasSelectedInnerBlock( clientId, true ) &&
+				enableClickThrough
+			);
 		},
-		[ clientId ]
+		[ clientId, isSmallScreen ]
 	);
 
 	const context = useSelect(
 		( select ) => {
-			const { getBlock } = select( 'core/block-editor' );
-			const block = getBlock( clientId );
+			const block = select( 'core/block-editor' ).getBlock( clientId );
 			const blockType = getBlockType( block.name );
 
 			if ( ! blockType || ! blockType.providesContext ) {
@@ -100,7 +99,7 @@ function UncontrolledInnerBlocks( props ) {
 	);
 
 	const classes = classnames( {
-		'has-overlay': enableClickThrough && hasOverlay,
+		'has-overlay': hasOverlay,
 		'is-capturing-toolbar': captureToolbars,
 	} );
 
