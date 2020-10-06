@@ -31,34 +31,22 @@ const NavigationPanel = () => {
 		ref.current.focus();
 	}, [ ref ] );
 
-	const { template, templatePart, templateType } = useSelect( ( select ) => {
-		const { getEntityRecord } = select( 'core' );
-		const { getTemplateId, getTemplatePartId, getTemplateType } = select(
-			'core/edit-site'
-		);
+	const { templateId, templatePartId, templateType } = useSelect(
+		( select ) => {
+			const {
+				getTemplateId,
+				getTemplatePartId,
+				getTemplateType,
+			} = select( 'core/edit-site' );
 
-		const templateId = getTemplateId();
-		const templatePartId = getTemplatePartId();
-
-		// We need to retrieve full entity records to know the slug of templates.
-		// Slugs are essential to determine the `activeItem` since theme template files' ID defaults to slug.
-		// Which means when we auto-draft a theme template file then it receives an auto-increment ID.
-		// We use slug because that's always the same. If we would use ID
-		// then we would have a brief moment without an activeItem (when theme template files is replaced by the auto-draft).
-		return {
-			template: templateId
-				? getEntityRecord( 'postType', 'wp_template', templateId )
-				: null,
-			templatePart: templatePartId
-				? getEntityRecord(
-						'postType',
-						'wp_template_part',
-						templatePartId
-				  )
-				: null,
-			templateType: getTemplateType(),
-		};
-	}, [] );
+			return {
+				templateId: getTemplateId(),
+				templatePartId: getTemplatePartId(),
+				templateType: getTemplateType(),
+			};
+		},
+		[]
+	);
 
 	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
 
@@ -67,8 +55,8 @@ const NavigationPanel = () => {
 			<Navigation
 				activeItem={
 					'wp_template' === templateType
-						? `template-${ template?.slug }`
-						: `template-part-${ templatePart?.slug }`
+						? `template-${ templateId }`
+						: `template-part-${ templatePartId }`
 				}
 				onActivateMenu={ setActiveMenu }
 			>
