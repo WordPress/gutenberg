@@ -301,7 +301,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 							onChangeUrl={ onSetHref }
 							linkDestination={ linkDestination }
 							mediaType={ mediaType }
-							mediaUrl={ ( image && image.source_url ) || href }
+							mediaUrl={ image && image.source_url }
 							mediaLink={ image && image.link }
 							linkTarget={ linkTarget }
 							linkClass={ linkClass }
