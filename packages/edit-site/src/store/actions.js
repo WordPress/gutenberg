@@ -39,13 +39,22 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
 /**
  * Returns an action object used to set a template.
  *
- * @param {number} templateId The template ID.
+ * If a string (template slug) is passed, then it will try to resolve
+ * that specific template without taking the template hierarchy into account.
+ *
+ * This allows us to create an auto-draft template from a template
+ * that is only available as a theme file. E.g. `my-theme/block-templates/singular.html`
+ * Similiar to how we create auto-drafts with {@link setPage}.
+ *
+ * @param {number|string} templateIdOrSlug The template ID or slug.
  *
  * @return {Object} Action object.
  */
-export function* setTemplate( templateId ) {
-	if ( Number.isNaN( Number( templateId ) ) ) {
-		templateId = yield findTemplate( '', templateId, [ templateId ] );
+export function* setTemplate( templateIdOrSlug ) {
+	if ( typeof templateIdOrSlug === 'string' ) {
+		templateIdOrSlug = yield findTemplate( '', templateIdOrSlug, [
+			templateIdOrSlug,
+		] );
 
 		yield dispatch(
 			'core/data',
@@ -62,7 +71,7 @@ export function* setTemplate( templateId ) {
 
 	return {
 		type: 'SET_TEMPLATE',
-		templateId,
+		templateId: templateIdOrSlug,
 	};
 }
 

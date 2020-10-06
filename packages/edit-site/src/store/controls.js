@@ -11,7 +11,9 @@ import { findTemplate as findTemplateUtil } from '../utils';
 /**
  * Find the template for a given page path.
  *
- * @param {string} path The page path.
+ * @param {string}   path The page path.
+ * @param {string}   [templateType] Filter by template type to find a specific template.
+ * @param {string[]} [templates] Filter by template hierarchy to find a specific template.
  *
  * @return {number} The found template ID.
  */
