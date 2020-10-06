@@ -12,8 +12,8 @@ import {
 	FocusReturnProvider,
 } from '@wordpress/components';
 import { uploadMedia } from '@wordpress/media-utils';
-import { useSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useEffect, useMemo } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
@@ -31,13 +31,29 @@ export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
 	...props
 } ) {
-	const { hasUploadPermissions } = useSelect( ( select ) => ( {
-		hasUploadPermissions: defaultTo(
-			select( 'core' ).canUser( 'create', 'media' ),
-			true
-		),
-		widgetAreas: select( 'core/edit-widgets' ).getWidgetAreas(),
-	} ) );
+	const { hasUploadPermissions, reusableBlocks } = useSelect(
+		( select ) => ( {
+			hasUploadPermissions: defaultTo(
+				select( 'core' ).canUser( 'create', 'media' ),
+				true
+			),
+			widgetAreas: select( 'core/edit-widgets' ).getWidgetAreas(),
+			reusableBlocks: select(
+				'core/reusable-blocks'
+			).__experimentalGetReusableBlocks(),
+		} )
+	);
+
+	const { __experimentalFetchReusableBlocks } = useDispatch(
+		'core/reusable-blocks'
+	);
+
+	// Fetch resuable blocks on mount
+	useEffect( () => {
+		if ( __experimentalFetchReusableBlocks ) {
+			__experimentalFetchReusableBlocks();
+		}
+	}, [] );
 
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
@@ -52,10 +68,12 @@ export default function WidgetAreasBlockEditorProvider( {
 		}
 		return {
 			...blockEditorSettings,
+			__experimentalFetchReusableBlocks,
+			__experimentalReusableBlocks: reusableBlocks,
 			mediaUpload: mediaUploadBlockEditor,
 			templateLock: 'all',
 		};
-	}, [ blockEditorSettings, hasUploadPermissions ] );
+	}, [ blockEditorSettings, hasUploadPermissions, reusableBlocks ] );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		KIND,
