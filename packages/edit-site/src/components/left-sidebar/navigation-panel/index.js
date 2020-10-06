@@ -40,6 +40,11 @@ const NavigationPanel = () => {
 		const templateId = getTemplateId();
 		const templatePartId = getTemplatePartId();
 
+		// We need to retrieve full entity records to know the slug of templates.
+		// Slugs are essential to determine the `activeItem` since theme template files' ID defaults to slug.
+		// Which means when we auto-draft a theme template file then it receives an auto-increment ID.
+		// We use slug because that's always the same. If we would use ID
+		// then we would have a brief moment without an activeItem (when theme template files is replaced by the auto-draft).
 		return {
 			template: templateId
 				? getEntityRecord( 'postType', 'wp_template', templateId )
