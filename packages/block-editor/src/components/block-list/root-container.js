@@ -14,7 +14,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import useMultiSelection from './use-multi-selection';
 import { getBlockClientId } from '../../utils/dom';
-import InsertionPoint from './insertion-point';
+import useInsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
@@ -49,13 +49,12 @@ function onDragStart( event ) {
 	}
 }
 
-function RootContainer( { children, className }, ref ) {
+function useBlockFocus() {
 	const { selectedBlockClientId, hasMultiSelection } = useSelect(
 		selector,
 		[]
 	);
 	const { selectBlock } = useDispatch( 'core/block-editor' );
-	const onSelectionStart = useMultiSelection( ref );
 
 	/**
 	 * Marks the block as selected when focused and not already selected. This
@@ -64,7 +63,7 @@ function RootContainer( { children, className }, ref ) {
 	 *
 	 * @param {WPSyntheticEvent} event
 	 */
-	function onFocus( event ) {
+	return function onFocus( event ) {
 		if ( hasMultiSelection ) {
 			return;
 		}
@@ -74,28 +73,33 @@ function RootContainer( { children, className }, ref ) {
 		if ( clientId && clientId !== selectedBlockClientId ) {
 			selectBlock( clientId );
 		}
-	}
+	};
+}
 
+function RootContainer( { children, className }, ref ) {
 	const [ blockNodes, setBlockNodes ] = useState( {} );
+	const { onMouseMove, popover } = useInsertionPoint( ref );
+	const onSelectionStart = useMultiSelection( ref );
+	const onFocus = useBlockFocus();
 
 	return (
-		<InsertionPoint containerRef={ ref }>
-			<BlockNodes.Provider value={ blockNodes }>
-				<BlockPopover />
-				<div
-					ref={ ref }
-					className={ classnames( className, 'is-root-container' ) }
-					onFocus={ onFocus }
-					onDragStart={ onDragStart }
-				>
-					<SetBlockNodes.Provider value={ setBlockNodes }>
-						<Context.Provider value={ onSelectionStart }>
-							{ children }
-						</Context.Provider>
-					</SetBlockNodes.Provider>
-				</div>
-			</BlockNodes.Provider>
-		</InsertionPoint>
+		<BlockNodes.Provider value={ blockNodes }>
+			{ popover }
+			<BlockPopover />
+			<div
+				ref={ ref }
+				className={ classnames( className, 'is-root-container' ) }
+				onFocus={ onFocus }
+				onDragStart={ onDragStart }
+				onMouseMove={ onMouseMove }
+			>
+				<SetBlockNodes.Provider value={ setBlockNodes }>
+					<Context.Provider value={ onSelectionStart }>
+						{ children }
+					</Context.Provider>
+				</SetBlockNodes.Provider>
+			</div>
+		</BlockNodes.Provider>
 	);
 }
 

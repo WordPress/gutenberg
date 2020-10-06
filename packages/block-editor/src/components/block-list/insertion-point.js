@@ -135,7 +135,7 @@ function InsertionPointPopover( {
 	);
 }
 
-export default function InsertionPoint( { children, containerRef } ) {
+export default function useInsertionPoint( containerRef ) {
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const [ isInserterForced, setIsInserterForced ] = useState( false );
 	const [ inserterClientId, setInserterClientId ] = useState( null );
@@ -208,29 +208,20 @@ export default function InsertionPoint( { children, containerRef } ) {
 
 	const isVisible = isInserterShown || isInserterForced || isInserterVisible;
 
-	return (
-		<>
-			{ ! isMultiSelecting && isVisible && (
-				<InsertionPointPopover
-					clientId={
-						isInserterVisible ? selectedClientId : inserterClientId
-					}
-					isInserterShown={ isInserterShown }
-					isInserterForced={ isInserterForced }
-					setIsInserterForced={ setIsInserterForced }
-					containerRef={ containerRef }
-					showInsertionPoint={ isInserterVisible }
-				/>
-			) }
-			<div
-				onMouseMove={
-					! isInserterForced && ! isMultiSelecting
-						? onMouseMove
-						: undefined
+	return {
+		onMouseMove:
+			! isInserterForced && ! isMultiSelecting ? onMouseMove : undefined,
+		popover: ! isMultiSelecting && isVisible && (
+			<InsertionPointPopover
+				clientId={
+					isInserterVisible ? selectedClientId : inserterClientId
 				}
-			>
-				{ children }
-			</div>
-		</>
-	);
+				isInserterShown={ isInserterShown }
+				isInserterForced={ isInserterForced }
+				setIsInserterForced={ setIsInserterForced }
+				containerRef={ containerRef }
+				showInsertionPoint={ isInserterVisible }
+			/>
+		),
+	};
 }
