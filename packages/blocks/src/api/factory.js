@@ -101,7 +101,9 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
  *
  * @return {Object[]} Array of Block objects.
  */
-export function createBlocksFromInnerBlocksTemplate( innerBlocksOrTemplate ) {
+export function createBlocksFromInnerBlocksTemplate(
+	innerBlocksOrTemplate = []
+) {
 	return innerBlocksOrTemplate.map( ( innerBlock ) => {
 		const innerBlockTemplate = Array.isArray( innerBlock )
 			? innerBlock
