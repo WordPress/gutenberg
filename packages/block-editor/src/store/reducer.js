@@ -1679,6 +1679,7 @@ export default combineReducers( {
 	preferences,
 	lastBlockAttributesChange,
 	isNavigationMode,
+	isEditingInToolbar,
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
