@@ -81,6 +81,10 @@ export default function Header( {
 
 	return (
 		<div className="edit-site-header">
+			<div className="edit-site-header_center">
+				<DocumentActions documentTitle={ template?.slug } />
+			</div>
+
 			<div className="edit-site-header_start">
 				<MainDashboardButton.Slot>
 					<NavigationToggle
@@ -117,10 +121,6 @@ export default function Header( {
 						/>
 					</div>
 				</div>
-			</div>
-
-			<div className="edit-site-header_center">
-				<DocumentActions documentTitle={ template?.slug } />
 			</div>
 
 			<div className="edit-site-header_end">

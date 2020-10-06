@@ -8,10 +8,12 @@
 	.edit-site-header_start,
 	.edit-site-header_end {
 		flex: 1;
+		order: 1;
 		display: flex;
 	}
 
 	.edit-site-header_center {
+		order: 2;
 		display: flex;
 		align-items: center;
 		height: 100%;
@@ -19,6 +21,7 @@
 
 	.edit-site-header_end {
 		justify-content: flex-end;
+		order: 3;
 	}
 }
 
