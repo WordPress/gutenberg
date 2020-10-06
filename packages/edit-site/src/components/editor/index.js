@@ -317,7 +317,7 @@ function Editor() {
 										</FocusReturnProvider>
 									</BlockContextProvider>
 								</EntityProvider>
-							</EntityProvider>{ ' ' }
+							</EntityProvider>
 						</EntityProvider>
 					</EntityProvider>
 				</DropZoneProvider>
