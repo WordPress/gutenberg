@@ -202,7 +202,7 @@ apply_filters( 'rest_wp_template_collection_params', 'filter_rest_wp_template_co
  * @return array Filtered $args.
  */
 function filter_rest_wp_template_query( $args, $request ) {
-	// Create auto-drafts for each theme template files
+	// Create auto-drafts for each theme template files.
 	$block_template_files = gutenberg_get_template_paths();
 	foreach ( $block_template_files as $path ) {
 		$template_type = basename( $path, '.html' );
