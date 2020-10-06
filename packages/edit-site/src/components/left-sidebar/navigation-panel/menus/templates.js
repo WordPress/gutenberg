@@ -10,13 +10,21 @@ import {
  * Internal dependencies
  */
 import TemplatesPagesMenu from './templates-pages';
-import useTemplates from '../use-templates';
 import TemplateNavigationItems from '../template-navigation-items';
 import TemplatePostsMenu from './templates-posts';
 import { GENERAL_TEMPLATES } from '../constants';
+import { useSelect } from '@wordpress/data';
 
 export default function TemplatesMenu( { onActiveIdChange } ) {
-	const templates = useTemplates();
+	const templates = useSelect(
+		( select ) =>
+			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
+				status: [ 'publish', 'auto-draft' ],
+				per_page: -1,
+			} ),
+		[]
+	);
+
 	const generalTemplates = templates?.filter( ( { slug } ) =>
 		GENERAL_TEMPLATES.includes( slug )
 	);
