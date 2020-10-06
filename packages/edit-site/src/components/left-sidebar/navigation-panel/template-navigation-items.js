@@ -12,59 +12,7 @@ import { useState } from '@wordpress/element';
  */
 import TemplatePreview from './template-preview';
 import { NavigationPanelPreviewFill } from '.';
-
-const TITLES = {
-	// General
-	'front-page': {
-		title: 'Front page',
-		description: '',
-	},
-	archive: {
-		title: 'Archive',
-		description:
-			'Displays the content lists when no other template is found',
-	},
-	single: {
-		title: 'Single',
-		description: 'Displays the content of a single post',
-	},
-	singular: {
-		title: 'Singular',
-		description: 'Displays the content of a single page',
-	},
-	index: {
-		title: 'Default (index)',
-		description: 'Displays the content of a single page',
-	},
-	search: {
-		title: 'Search results',
-		description: '',
-	},
-	'404': {
-		title: '404',
-		description: 'Displayed when a non-existing page requested',
-	},
-
-	// Pages
-	page: {
-		title: 'Default (Page)',
-		description: 'Displays the content of a single page',
-	},
-
-	// Posts
-	home: {
-		title: 'Posts (home)',
-		description: 'Displayed on your homepage',
-	},
-	'archive-post': {
-		title: 'Default (Post archive)',
-		description: 'Displays a list of posts',
-	},
-	'single-post': {
-		title: 'Default (Single post)',
-		description: 'Displays the content of a single post',
-	},
-};
+import { ITEM_CONTENTS } from './constants';
 
 export default function TemplateNavigationItems( {
 	entityType = 'wp_template',
@@ -90,7 +38,8 @@ export default function TemplateNavigationItems( {
 	return (
 		<>
 			{ templates.map( ( template ) => {
-				const { title, description } = TITLES[ template.slug ] ?? {};
+				const { title, description } =
+					ITEM_CONTENTS[ template.slug ] ?? {};
 
 				return (
 					<NavigationItem
