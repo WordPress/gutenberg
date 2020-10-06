@@ -52,7 +52,11 @@ export function* setTemplate( templateId ) {
 			'invalidateResolution',
 			'core',
 			'getEntityRecords',
-			[ 'postType', 'wp_template' ]
+			[
+				'postType',
+				'wp_template',
+				{ status: [ 'publish', 'auto-draft' ], per_page: -1 },
+			]
 		);
 	}
 
