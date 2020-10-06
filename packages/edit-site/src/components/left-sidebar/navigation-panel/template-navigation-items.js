@@ -39,8 +39,8 @@ export default function TemplateNavigationItems( {
 					TEMPLATES_DEFAULT_DETAILS[ template.slug ] ?? {};
 				const key = `${ entityType }-${ template.id }`;
 
-				let title = template.slug;
-				if ( template?.title?.rendered !== template.slug ) {
+				let title = template?.title?.rendered ?? template.slug;
+				if ( title !== template.slug ) {
 					title = template.title.rendered;
 				} else if ( defaultTitle ) {
 					title = defaultTitle;
