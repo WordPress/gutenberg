@@ -562,6 +562,11 @@
 			}
 		}
 	}
+
+	&.is-editing-in-toolbar {
+		width: 0;
+		opacity: 0;
+	}
 }
 
 
