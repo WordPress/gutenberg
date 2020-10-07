@@ -18,7 +18,10 @@ import { Composite, useCompositeState, CompositeItem } from 'reakit';
 
 function PreviewPlaceholder() {
 	return (
-		<div className="wp-block-template-part__selection-preview-item is-placeholder" />
+		<div
+			className="wp-block-template-part__selection-preview-item is-placeholder"
+			tabIndex={ 0 }
+		/>
 	);
 }
 
@@ -57,7 +60,7 @@ function TemplatePartItem( {
 	return (
 		<CompositeItem
 			className="wp-block-template-part__selection-preview-item"
-			role="button"
+			role="listitem"
 			onClick={ onClick }
 			onKeyDown={ ( event ) => {
 				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
@@ -232,7 +235,11 @@ export default function TemplateParts( {
 
 	if ( filterValue ) {
 		return (
-			<Composite { ...composite }>
+			<Composite
+				{ ...composite }
+				role="list"
+				aria-label={ __( 'List of template parts' ) }
+			>
 				<TemplatePartSearchResults
 					templateParts={ templateParts }
 					setAttributes={ setAttributes }
@@ -245,7 +252,11 @@ export default function TemplateParts( {
 	}
 
 	return (
-		<Composite { ...composite }>
+		<Composite
+			{ ...composite }
+			role="list"
+			aria-label={ __( 'List of template parts' ) }
+		>
 			<TemplatePartsByTheme
 				templateParts={ templateParts }
 				setAttributes={ setAttributes }
