@@ -34,10 +34,10 @@
 /packages/server-side-render
 
 # Widgets
-/packages/edit-widgets                          @youknowriad
+/packages/edit-widgets                          @youknowriad @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
 
 # Navigation
-/packages/edit-navigation
+/packages/edit-navigation                       @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
 
 # Full Site Editing
 /packages/edit-site                             @youknowriad
