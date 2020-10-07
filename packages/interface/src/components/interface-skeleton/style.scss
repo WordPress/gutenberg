@@ -33,6 +33,17 @@ html.interface-interface-skeleton__html-container {
 	}
 }
 
+.interface-interface-skeleton__layout {
+	display: flex;
+	height: 100%;
+}
+
+.interface-interface-skeleton__site {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+}
+
 @include editor-left(".interface-interface-skeleton");
 
 .interface-interface-skeleton__body {
@@ -113,7 +124,6 @@ html.interface-interface-skeleton__html-container {
 	border-bottom: $border-width solid $gray-200;
 	z-index: z-index(".interface-interface-skeleton__header");
 	color: $gray-900;
-	flex-grow: 1;
 
 	// On Mobile the header is sticky.
 	position: sticky;
@@ -131,6 +141,10 @@ html.interface-interface-skeleton__html-container {
 	flex-shrink: 0;
 	border-top: $border-width solid $gray-200;
 	color: $gray-900;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	background-color: $white;
 
 	// On Mobile the footer is hidden
 	display: none;
