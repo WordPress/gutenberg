@@ -13,7 +13,7 @@ import { __, _x } from '@wordpress/i18n';
 import TemplatesPagesMenu from './templates-pages';
 import TemplateNavigationItems from '../template-navigation-items';
 import TemplatePostsMenu from './templates-posts';
-import { TEMPLATES_GENERAL } from '../constants';
+import { TEMPLATES_GENERAL } from '../../../../constants';
 import { useSelect } from '@wordpress/data';
 import TemplatesAllMenu from './templates-all';
 

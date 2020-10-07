@@ -3,21 +3,24 @@
  */
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import getTemplateInfo from '../../utils';
+
 export default function TemplateDetails( { template } ) {
 	if ( ! template ) {
 		return null;
 	}
-	const templateDescription = __(
-		'In the future, we will display more information about the template here.'
-	);
+	const { title, description } = getTemplateInfo( template );
 
 	return (
 		<div className="edit-site-template-details">
 			<p className="edit-site-template-details__heading">
 				{ __( 'Template details' ) }
 			</p>
-			<p>{ `${ __( 'Name' ) }: ${ template.slug }` }</p>
-			<p>{ `${ __( 'Description' ) }: ${ templateDescription }` }</p>
+			<p>{ `${ __( 'Name' ) }: ${ title }` }</p>
+			<p>{ `${ __( 'Description' ) }: ${ description }` }</p>
 		</div>
 	);
 }
