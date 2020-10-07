@@ -39,15 +39,17 @@ function BlockContextualToolbar( { focusOnMount, ...props } ) {
 		}
 	}
 	return (
-		<div className="block-editor-block-contextual-toolbar-wrapper">
+		<div
+			className={ classnames(
+				'block-editor-block-contextual-toolbar-wrapper',
+				{
+					'is-editing-in-toolbar': isEditingInToolbar,
+				}
+			) }
+		>
 			<NavigableToolbar
 				focusOnMount={ focusOnMount }
-				className={ classnames(
-					'block-editor-block-contextual-toolbar',
-					{
-						'is-editing-in-toolbar': isEditingInToolbar,
-					}
-				) }
+				className="block-editor-block-contextual-toolbar"
 				/* translators: accessibility text for the block toolbar */
 				aria-label={ __( 'Block tools' ) }
 				{ ...props }
