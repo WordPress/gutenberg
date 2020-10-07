@@ -25,14 +25,14 @@
 - Improve the Audio block shortcode transform to account for all sources. ([25114](https://github.com/WordPress/gutenberg/pull/25114))
 - Code block: Allow HTML editing & rich text content. ([24689](https://github.com/WordPress/gutenberg/pull/24689))
 - Remove appender from unselected Buttons and Social Icons block. ([25518](https://github.com/WordPress/gutenberg/pull/25518))
-- Widgets Screen:
+- Widgets Screen: 
   - Register legacy widgets as block variations. ([24905](https://github.com/WordPress/gutenberg/pull/24905))
   - Use the default block list appender for the widget areas. ([25635](https://github.com/WordPress/gutenberg/pull/25635))
   - Add titles to Legacy Widgets. ([25638](https://github.com/WordPress/gutenberg/pull/25638))
 - Buttons block: Lighten editor DOM. ([23222](https://github.com/WordPress/gutenberg/pull/23222))
 - Copy: Reword block settings menu item labels. ([22955](https://github.com/WordPress/gutenberg/pull/22955))
 - Add a tooltip to the Drag & Drop handle. ([25606](https://github.com/WordPress/gutenberg/pull/25606)) ([25614](https://github.com/WordPress/gutenberg/pull/25614))
-- A11y:
+- A11y: 
   - Add aria-haspopup property to the BlockNavigation component. ([25605](https://github.com/WordPress/gutenberg/pull/25605))
   - Add aria-haspopup property to the TableOfContents component. ([25603](https://github.com/WordPress/gutenberg/pull/25603))
   - Add aria-haspopup to the ToolSelector. ([25600](https://github.com/WordPress/gutenberg/pull/25600))
@@ -70,7 +70,7 @@
 - Remove Embed block aspect ratio classes on url change. ([25295](https://github.com/WordPress/gutenberg/pull/25295))
 - Remove duplicate help item. ([25283](https://github.com/WordPress/gutenberg/pull/25283))
 - Fix Block Directory author average rating formating. ([24732](https://github.com/WordPress/gutenberg/pull/24732))
-- @wordpress/api-fetch:
+- @wordpress/api-fetch: 
   - Fix preloading middleware referencing stale data. ([25550](https://github.com/WordPress/gutenberg/pull/25550))
   - Check nonce header value before skipping adding it. ([25458](https://github.com/WordPress/gutenberg/pull/25458))
 - Use esc_html instead of esc_attr in the Archives block. ([25476](https://github.com/WordPress/gutenberg/pull/25476))
@@ -121,7 +121,7 @@
 - Add new block supports page to the handbook. ([25647](https://github.com/WordPress/gutenberg/pull/25647))
 - Block Directory: Add developer documentation. ([25591](https://github.com/WordPress/gutenberg/pull/25591))
 - Move custom-fields note to the 'Register Meta Field' documentation. ([25584](https://github.com/WordPress/gutenberg/pull/25584))
-- Add Block Editor Components documentation:
+- Add Block Editor Components documentation: 
   - Warning ([25574](https://github.com/WordPress/gutenberg/pull/25574))
   - FontSizePicker ([25568](https://github.com/WordPress/gutenberg/pull/25568))
   - UnitControl ([25565](https://github.com/WordPress/gutenberg/pull/25565))
