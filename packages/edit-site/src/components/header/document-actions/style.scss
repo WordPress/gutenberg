@@ -7,12 +7,14 @@
 	position: relative;
 
 	.edit-site-document-actions__title {
+		font-size: $default-font-size;
 		font-weight: bold;
 		transition: transform 0.2s;
 		@include reduce-motion(transition);
 	}
 
 	.edit-site-document-actions__secondary-item {
+		font-size: $default-font-size;
 		opacity: 0;
 		transform: translateY(20px);
 		transition: transform 0.2s;

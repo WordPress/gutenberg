@@ -83,7 +83,7 @@ export default function DocumentActions( { documentTitle } ) {
 			} ) }
 		>
 			{ documentTitle ? (
-				<>
+				<h1>
 					<div
 						className={ classnames(
 							'edit-site-document-actions__title',
@@ -105,7 +105,7 @@ export default function DocumentActions( { documentTitle } ) {
 					>
 						{ label ?? '' }
 					</div>
-				</>
+				</h1>
 			) : (
 				__( 'Loading…' )
 			) }
