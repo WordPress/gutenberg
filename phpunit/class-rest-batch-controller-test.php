@@ -13,7 +13,7 @@ class REST_Batch_Controller_Test extends WP_Test_REST_TestCase {
 	/**
 	 * Administrator user ID.
 	 *
-	 * @since 9.0.0
+	 * @since 9.2.0
 	 *
 	 * @var int
 	 */
@@ -22,7 +22,7 @@ class REST_Batch_Controller_Test extends WP_Test_REST_TestCase {
 	/**
 	 * Tag id.
 	 *
-	 * @since 9.0.0
+	 * @since 9.2.0
 	 *
 	 * @var int
 	 */
@@ -31,7 +31,7 @@ class REST_Batch_Controller_Test extends WP_Test_REST_TestCase {
 	/**
 	 * Menu id.
 	 *
-	 * @since 9.0.0
+	 * @since 9.2.0
 	 *
 	 * @var int
 	 */
@@ -40,7 +40,7 @@ class REST_Batch_Controller_Test extends WP_Test_REST_TestCase {
 	/**
 	 * Menu item id.
 	 *
-	 * @since 9.0.0
+	 * @since 9.2.0
 	 *
 	 * @var int
 	 */
@@ -49,7 +49,7 @@ class REST_Batch_Controller_Test extends WP_Test_REST_TestCase {
 	/**
 	 * Create test data before the tests run.
 	 *
-	 * @since 9.0.0
+	 * @since 9.2.0
 	 *
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
@@ -64,14 +64,14 @@ class REST_Batch_Controller_Test extends WP_Test_REST_TestCase {
 	/**
 	 * Delete test data after our tests run.
 	 *
-	 * @since 9.0.0
+	 * @since 9.2.0
 	 */
 	public static function wpTearDownAfterClass() {
 		self::delete_user( self::$administrator_id );
 	}
 
 	/**
-	 * @since 9.0.0
+	 * @since 9.2.0
 	 */
 	public function setUp() {
 		parent::setUp();
@@ -96,7 +96,7 @@ class REST_Batch_Controller_Test extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * @since 9.0.0
+	 * @since 9.2.0
 	 */
 	public function tearDown() {
 		parent::tearDown();
