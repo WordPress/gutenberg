@@ -12,9 +12,5 @@ export default { title: 'Components/Tip', component: Tip };
 
 export const _default = () => {
 	const tipText = text( 'Text', 'An example tip' );
-	return (
-		<Tip>
-			<p>{ tipText }</p>
-		</Tip>
-	);
+	return <Tip>{ tipText }</Tip>;
 };
