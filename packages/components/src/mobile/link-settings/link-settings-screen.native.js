@@ -21,7 +21,7 @@ const LinkSettingsScreen = ( props ) => {
 	const { inputValue = url } = route.params || {};
 
 	const onLinkCellPressed = () => {
-		setIsChildrenScrollable( true );
+		// setIsChildrenScrollable( true );
 		navigation.navigate( 'linkPicker', { inputValue } );
 	};
 

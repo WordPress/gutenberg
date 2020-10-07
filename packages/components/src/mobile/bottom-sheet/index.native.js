@@ -350,7 +350,6 @@ class BottomSheet extends Component {
 			contentContainerStyle: [
 				styles.content,
 				hideHeader && styles.emptyHeader,
-				contentStyle,
 				isChildrenScrollable && this.getContentStyle(),
 				contentStyle,
 				isFullScreen && { flexGrow: 1 },
@@ -360,7 +359,6 @@ class BottomSheet extends Component {
 			scrollEnabled,
 			automaticallyAdjustContentInsets: false,
 		};
-
 		const getHeader = () => (
 			<>
 				<View style={ styles.bottomSheetHeader }>
@@ -376,7 +374,6 @@ class BottomSheet extends Component {
 				{ withHeaderSeparator && <View style={ styles.separator } /> }
 			</>
 		);
-
 		return (
 			<Modal
 				isVisible={ isVisible }
@@ -430,10 +427,13 @@ class BottomSheet extends Component {
 						{ ...( isChildrenScrollable
 							? {
 									style: listProps.style,
-									contentContainerStyle: {
-										width: '100%',
-										height: '100%',
-									},
+									contentContainerStyle: [
+										...listProps.contentContainerStyle,
+										{
+											width: '100%',
+											height: '100%',
+										},
+									],
 									scrollEnabled: false,
 									horizontal: true,
 									keyboardShouldPersistTaps: 'always',

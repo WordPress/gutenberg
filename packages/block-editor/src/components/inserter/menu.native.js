@@ -154,6 +154,10 @@ export class InserterMenu extends Component {
 								keyExtractor={ ( item ) => item.name }
 								renderItem={ this.renderItem }
 								{ ...listProps }
+								contentContainerStyle={ [
+									...listProps.contentContainerStyle,
+									{ paddingLeft: 0, paddingRight: 0 },
+								] }
 							/>
 						) }
 					</BottomSheetConsumer>

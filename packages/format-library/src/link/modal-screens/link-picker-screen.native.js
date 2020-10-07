@@ -2,15 +2,15 @@
  * External dependencies
  */
 import React from 'react';
-import { Platform, Keyboard } from 'react-native';
+import { Platform, Keyboard, InteractionManager } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { delay } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
+import { useMemo, useContext } from '@wordpress/element';
 
-import { LinkPicker } from '@wordpress/components';
+import { LinkPicker, BottomSheetContext } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -20,6 +20,7 @@ import linkSettingsScreens from './screens';
 const LinkPickerScreen = () => {
 	const navigation = useNavigation();
 	const route = useRoute();
+	const { setIsChildrenScrollable } = useContext( BottomSheetContext );
 	const onLinkPicked = ( { url, title } ) => {
 		if ( Platform.OS === 'android' ) {
 			Keyboard.dismiss();
@@ -29,11 +30,17 @@ const LinkPickerScreen = () => {
 					text: title,
 				} );
 			}, 100 );
+			InteractionManager.runAfterInteractions( () => {
+				setIsChildrenScrollable( false );
+			} );
 			return;
 		}
 		navigation.navigate( linkSettingsScreens.settings, {
 			inputValue: url,
 			text: title,
+		} );
+		InteractionManager.runAfterInteractions( () => {
+			setIsChildrenScrollable( false );
 		} );
 	};
 
@@ -43,8 +50,14 @@ const LinkPickerScreen = () => {
 			delay( () => {
 				navigation.goBack();
 			}, 100 );
+			InteractionManager.runAfterInteractions( () => {
+				setIsChildrenScrollable( false );
+			} );
 			return;
 		}
+		InteractionManager.runAfterInteractions( () => {
+			setIsChildrenScrollable( false );
+		} );
 		navigation.goBack();
 	};
 

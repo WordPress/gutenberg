@@ -114,10 +114,8 @@ export default function LinkPickerResults( {
 					initialNumToRender={ PER_PAGE }
 					ListFooterComponent={ spinner }
 					{ ...listProps }
-					contentContainerStyle={ [
-						...listProps.contentContainerStyle,
-						styles.contentContainer,
-					] }
+					contentContainerStyle={ {} }
+					style={ {} }
 				/>
 			) }
 		</BottomSheetConsumer>

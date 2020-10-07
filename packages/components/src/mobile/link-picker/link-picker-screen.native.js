@@ -7,7 +7,7 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 /**
  * WordPress dependencies
  */
-import { useMemo, useContext } from '@wordpress/element';
+import { useMemo, useContext, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,7 +15,7 @@ import { useMemo, useContext } from '@wordpress/element';
 import { LinkPicker } from './';
 import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
 
-const LinkPickerScreen = ( { returnScreenName } ) => {
+const LinkPickerScreen = ( { returnScreenName, withPadding } ) => {
 	const navigation = useNavigation();
 	const route = useRoute();
 	const { setIsChildrenScrollable } = useContext( BottomSheetContext );
@@ -29,6 +29,12 @@ const LinkPickerScreen = ( { returnScreenName } ) => {
 			setIsChildrenScrollable( false );
 		} );
 	};
+
+	useEffect( () => {
+		setIsChildrenScrollable( true );
+
+		return () => {};
+	}, [] );
 
 	const onCancel = () => {
 		navigation.goBack();
@@ -44,6 +50,7 @@ const LinkPickerScreen = ( { returnScreenName } ) => {
 				value={ inputValue }
 				onLinkPicked={ onLinkPicked }
 				onCancel={ onCancel }
+				withPadding={ withPadding }
 			/>
 		);
 	}, [ inputValue ] );

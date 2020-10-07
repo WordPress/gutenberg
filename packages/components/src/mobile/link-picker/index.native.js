@@ -52,6 +52,7 @@ export const LinkPicker = ( {
 	value: initialValue,
 	onLinkPicked,
 	onCancel: cancel,
+	withPadding = true,
 } ) => {
 	const [ value, setValue ] = useState( initialValue );
 	const directEntry = createDirectEntry( value );
@@ -81,7 +82,13 @@ export const LinkPicker = ( {
 	);
 
 	return (
-		<SafeAreaView style={ { height: '100%' } }>
+		<SafeAreaView
+			style={ {
+				height: '100%',
+				marginLeft: withPadding ? 16 : 0,
+				marginRight: withPadding ? 16 : 0,
+			} }
+		>
 			<NavigationHeader
 				screen={ __( 'Link to' ) }
 				leftButtonOnPress={ cancel }

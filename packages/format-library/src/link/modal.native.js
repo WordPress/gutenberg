@@ -19,7 +19,6 @@ const ModalLinkUI = ( { isVisible, ...restProps } ) => {
 	return useMemo( () => {
 		return (
 			<BottomSheet
-				isChildrenScrollable
 				isVisible={ isVisible }
 				hideHeader
 				onClose={ restProps.onClose }
