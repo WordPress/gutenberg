@@ -12,6 +12,8 @@ import {
 	getBlockType,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
+import { VisuallyHidden } from '@wordpress/components';
+
 import { last } from 'lodash';
 
 function getBlockDisplayText( block ) {
@@ -83,18 +85,23 @@ export default function DocumentActions( { documentTitle } ) {
 			} ) }
 		>
 			{ documentTitle ? (
-				<h1>
-					<div
-						className={ classnames(
-							'edit-site-document-actions__title',
-							{
-								'is-active': isTitleActive,
-								'is-secondary-title-active': isActive,
-							}
-						) }
-					>
-						{ documentTitle }
-					</div>
+				<>
+					<h1 className="edit-site-document-actions__title-wrapper">
+						<VisuallyHidden>
+							{ __( 'Edit document:' ) }
+						</VisuallyHidden>
+						<div
+							className={ classnames(
+								'edit-site-document-actions__title',
+								{
+									'is-active': isTitleActive,
+									'is-secondary-title-active': isActive,
+								}
+							) }
+						>
+							{ documentTitle }
+						</div>
+					</h1>
 					<div
 						className={ classnames(
 							'edit-site-document-actions__secondary-item',
@@ -105,7 +112,7 @@ export default function DocumentActions( { documentTitle } ) {
 					>
 						{ label ?? '' }
 					</div>
-				</h1>
+				</>
 			) : (
 				__( 'Loading…' )
 			) }
