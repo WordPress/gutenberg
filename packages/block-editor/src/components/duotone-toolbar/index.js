@@ -43,7 +43,7 @@ function DuotoneToolbar( { value, onChange, options = DEFAULT_OPTIONS } ) {
 		gradient: getGradientFromColors( colors ),
 	} ) );
 
-	const setDuotoneColors = ( newGradient ) => {
+	const setDuotoneValues = ( newGradient ) => {
 		onChange( parseGradient( newGradient ) );
 	};
 
@@ -95,7 +95,7 @@ function DuotoneToolbar( { value, onChange, options = DEFAULT_OPTIONS } ) {
 						disableCustomGradients
 						gradients={ gradients }
 						value={ gradient }
-						onChange={ setDuotoneColors }
+						onChange={ setDuotoneValues }
 					/>
 				</BaseControl>
 			) }

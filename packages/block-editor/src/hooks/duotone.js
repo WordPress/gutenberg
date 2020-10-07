@@ -62,7 +62,7 @@ function parseGradientColors( cssGradient = '' ) {
 
 /**
  * Filters registered block settings, extending attributes to include
- * `duotoneId` and `duotoneColors` attributes.
+ * `duotoneId` and `duotoneValues` attributes.
  *
  * @param  {Object} settings Original block settings
  * @return {Object}          Filtered block settings
@@ -81,9 +81,9 @@ function addDuotoneAttributes( settings ) {
 			},
 		} );
 	}
-	if ( ! settings.attributes.duotoneColors ) {
+	if ( ! settings.attributes.duotoneValues ) {
 		Object.assign( settings.attributes, {
-			duotoneColors: {
+			duotoneValues: {
 				type: 'object',
 			},
 		} );
@@ -97,14 +97,14 @@ function addDuotoneAttributes( settings ) {
  *
  * @param  {Object} props          Duotone props.
  * @param  {string} props.id       Unique id for this duotone filter.
- * @param  {Object} props.colors   R, G, and B values to filter with.
+ * @param  {Object} props.values   R, G, and B values to filter with.
  * @param  {string} props.selector CSS selector to apply the filter to.
  * @return {WPElement}             Duotone element.
  */
-function Duotone( { id: duotoneId, colors: duotoneColors, selector } ) {
+function Duotone( { id, values, selector } ) {
 	const stylesheet = `
 ${ selector } {
-	filter: url( #${ duotoneId } );
+	filter: url( #${ id } );
 }
 `;
 
@@ -125,9 +125,10 @@ ${ selector } {
 				} }
 			>
 				<defs>
-					<filter id={ duotoneId }>
+					<filter id={ id }>
 						<feColorMatrix
 							type="matrix"
+							// Use perceptual brightness to convert to grayscale.
 							// prettier-ignore
 							values=".299 .587 .114 0 0
 							        .299 .587 .114 0 0
@@ -137,15 +138,15 @@ ${ selector } {
 						<feComponentTransfer colorInterpolationFilters="sRGB">
 							<feFuncR
 								type="table"
-								tableValues={ duotoneColors.r.join( ' ' ) }
+								tableValues={ values.r.join( ' ' ) }
 							/>
 							<feFuncG
 								type="table"
-								tableValues={ duotoneColors.g.join( ' ' ) }
+								tableValues={ values.g.join( ' ' ) }
 							/>
 							<feFuncB
 								type="table"
-								tableValues={ duotoneColors.b.join( ' ' ) }
+								tableValues={ values.b.join( ' ' ) }
 							/>
 						</feComponentTransfer>
 					</filter>
@@ -186,11 +187,11 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 		const instanceId = useInstanceId( BlockEdit );
 		useEffect( () => {
 			setAttributes( {
-				duotoneId: attributes.duotoneColors
+				duotoneId: attributes.duotoneValues
 					? `duotone-filter-${ instanceId }`
 					: undefined,
 			} );
-		}, [ instanceId, attributes.duotoneColors ] );
+		}, [ instanceId, attributes.duotoneValues ] );
 
 		// TODO: Remove this as it was an experiment for using theme gradients.
 		// It will be replaced with custom duotone/multitone color lists.
@@ -207,19 +208,19 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ attributes.duotoneColors && attributes.duotoneId ? (
+				{ attributes.duotoneValues && attributes.duotoneId ? (
 					<Duotone
 						selector={ duotoneSelector }
 						id={ attributes.duotoneId }
-						colors={ attributes.duotoneColors }
+						values={ attributes.duotoneValues }
 					/>
 				) : null }
 				<BlockControls>
 					<DuotoneToolbar
-						value={ attributes.duotoneColors }
+						value={ attributes.duotoneValues }
 						options={ options }
-						onChange={ ( duotoneColors ) => {
-							setAttributes( { duotoneColors } );
+						onChange={ ( duotoneValues ) => {
+							setAttributes( { duotoneValues } );
 						} }
 					/>
 				</BlockControls>
@@ -244,7 +245,7 @@ function addDuotoneFilterStyle( props, blockType, attributes ) {
 	if (
 		! hasDuotoneSupport ||
 		! attributes.duotoneId ||
-		! attributes.duotoneColors
+		! attributes.duotoneValues
 	) {
 		return props;
 	}
