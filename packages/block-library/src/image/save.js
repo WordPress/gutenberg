@@ -24,7 +24,7 @@ export default function save( { attributes } ) {
 		linkTarget,
 		sizeSlug,
 		title,
-		isInGallery,
+		isListItem,
 	} = attributes;
 
 	const newRel = isEmpty( rel ) ? undefined : rel;
@@ -74,7 +74,7 @@ export default function save( { attributes } ) {
 		);
 	}
 
-	if ( true === isInGallery ) {
+	if ( isListItem ) {
 		return (
 			<li className={ classes }>
 				<figure>{ figure }</figure>

@@ -27,7 +27,10 @@ export default function save( { attributes } ) {
 				imageCrop ? 'is-cropped' : ''
 			}` }
 		>
-			<InnerBlocks.Content />
+			<ul>
+				<InnerBlocks.Content />
+			</ul>
+
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
 					tagName="figcaption"
