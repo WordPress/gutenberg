@@ -69,14 +69,14 @@ const NavigationPanel = () => {
 					/>
 				) }
 
-				<NavigationMenu title="Theme">
+				<NavigationMenu title={ __( 'Theme' ) }>
 					<NavigationItem
-						title="Templates"
+						title={ __( 'Templates' ) }
 						navigateToMenu="templates"
 					/>
 
 					<NavigationItem
-						title="Template parts"
+						title={ __( 'Template Parts' ) }
 						navigateToMenu="template-parts"
 					/>
 

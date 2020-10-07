@@ -1,53 +1,51 @@
+/**
+ * WordPress dependencies
+ */
+import { __, _x } from '@wordpress/i18n';
+
 export const TEMPLATES_DEFAULT_DETAILS = {
 	// General
 	'front-page': {
-		title: 'Front page',
-		description: '',
+		title: _x( 'Front Page', 'template name' ),
+		description: __(
+			'Front page template, for both a static page or blog posts index'
+		),
 	},
 	archive: {
-		title: 'Archive',
-		description:
-			'Displays the content lists when no other template is found',
-	},
-	single: {
-		title: 'Single',
-		description: 'Displays the content of a single post',
+		title: _x( 'Archive', 'template name' ),
+		description: __( 'Generic archive template' ),
 	},
 	singular: {
-		title: 'Singular',
-		description: 'Displays the content of a single page',
+		title: _x( 'Singular', 'template name' ),
+		description: __( 'Default template for both single posts and pages' ),
 	},
 	index: {
-		title: 'Default (index)',
-		description: 'Displays the content of a single page',
+		title: _x( 'Index', 'template name' ),
+		description: __( 'Default template' ),
 	},
 	search: {
-		title: 'Search results',
-		description: '',
+		title: _x( 'Search Results', 'template name' ),
+		description: __( 'Search results template' ),
 	},
 	'404': {
-		title: '404',
-		description: 'Displayed when a non-existing page requested',
+		title: _x( '404 (Not Found)', 'template name' ),
+		description: __( 'Template for "not found" errors' ),
 	},
 
 	// Pages
 	page: {
-		title: 'Default (Page)',
-		description: 'Displays the content of a single page',
+		title: __( 'Page' ),
+		description: __( 'Single page template' ),
 	},
 
 	// Posts
 	home: {
-		title: 'Posts (home)',
-		description: 'Displayed on your homepage',
+		title: __( 'Home Page' ),
+		description: __( 'Template for the latest blog posts' ),
 	},
-	'archive-post': {
-		title: 'Default (Post archive)',
-		description: 'Displays a list of posts',
-	},
-	'single-post': {
-		title: 'Default (Single post)',
-		description: 'Displays the content of a single post',
+	single: {
+		title: _x( 'Single', 'template name' ),
+		description: __( 'Single post template' ),
 	},
 };
 

@@ -31,7 +31,7 @@ export default function TemplatePartsMenu( { onActivateItem } ) {
 	return (
 		<NavigationMenu
 			menu="template-parts"
-			title="Template Parts"
+			title={ __( 'Template Parts' ) }
 			parentMenu="root"
 		>
 			<TemplateNavigationItems
