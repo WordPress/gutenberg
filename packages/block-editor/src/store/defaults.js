@@ -68,5 +68,5 @@ export const SETTINGS_DEFAULTS = {
 	__mobileEnablePageTemplates: false,
 	__experimentalBlockPatterns: [],
 	__experimentalBlockPatternCategories: [],
-	__experimentalSpotlightBlocks: [],
+	__experimentalSpotlightEntityBlocks: [],
 };

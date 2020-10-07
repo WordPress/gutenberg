@@ -50,7 +50,7 @@ function BlockList(
 
 		// Determine if there is an active entity area to spotlight.
 		const activeEntityBlockId = __experimentalGetActiveBlockIdByBlockNames(
-			getSettings().__experimentalSpotlightBlocks
+			getSettings().__experimentalSpotlightEntityBlocks
 		);
 
 		return {

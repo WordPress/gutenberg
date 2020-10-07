@@ -55,7 +55,7 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
 export function initialize( id, settings ) {
 	findTemplate.siteUrl = settings.siteUrl;
 	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
-	settings.__experimentalSpotlightBlocks = [ 'core/template-part' ];
+	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
 
 	registerEditSiteStore( { settings } );
 
