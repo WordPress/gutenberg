@@ -71,6 +71,10 @@
 		}
 	},
 	"supports": {
-		"anchor": true
+		"anchor": true,
+		"duotone": {
+			"edit": "img",
+			"save": true
+		}
 	}
 }

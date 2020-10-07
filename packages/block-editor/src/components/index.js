@@ -87,6 +87,8 @@ export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
 export { default as CopyHandler } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
+export { default as Duotone } from './duotone';
+export { default as DuotoneToolbar } from './duotone-toolbar';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export { default as __experimentalLibrary } from './inserter/library';

@@ -37,8 +37,15 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	}
 
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+	if ( ! $block_type ) {
+		return $block_content;
+	}
+
+	// Apply server-side rendered components
+	$block_content = gutenberg_render_duotone_support( $block_content, $block['attrs'], $block_type );
+
 	// If no render_callback, assume styles have been previously handled.
-	if ( ! $block_type || ! $block_type->render_callback ) {
+	if ( ! $block_type->render_callback ) {
 		return $block_content;
 	}
 
@@ -53,8 +60,6 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	if ( ! count( $attributes ) ) {
 		return $block_content;
 	}
-
-	$block_content = gutenberg_render_duotone_support( $block_content, $block['attrs'] );
 
 	$dom = new DOMDocument( '1.0', 'utf-8' );
 
