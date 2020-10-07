@@ -7,7 +7,7 @@ import { useDrag } from 'react-use-gesture';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { forwardRef, useRef } from '@wordpress/element';
 import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
@@ -66,22 +66,26 @@ function InputField(
 	} );
 
 	const { _event, value, isDragging, isDirty } = state;
+	const wasDirtyOnBlur = useRef( false );
 
 	const dragCursor = useDragCursor( isDragging, dragDirection );
 
 	/*
-	 * Syncs value state using the focus state to determine the direction.
-	 * Without focus it updates the value from the props. With focus it
-	 * propagates the value and event through onChange.
+	 * Handles syncronization of external and internal value state.
+	 * If not focused and did not hold a dirty value[1] on blur
+	 * updates the value from the props. Otherwise if not holding
+	 * a dirty value[1] propagates the value and event through onChange.
+	 * [1] value is only made dirty if isPressEnterToChange is true
 	 */
 	useUpdateEffect( () => {
 		if ( valueProp === value ) {
 			return;
 		}
-		if ( ! isFocused ) {
+		if ( ! isFocused && ! wasDirtyOnBlur.current ) {
 			update( valueProp );
 		} else if ( ! isDirty ) {
 			onChange( value, { event: _event } );
+			wasDirtyOnBlur.current = false;
 		}
 	}, [ value, isDirty, isFocused, valueProp ] );
 
@@ -94,8 +98,9 @@ function InputField(
 		 * the onChange callback.
 		 */
 		if ( isPressEnterToChange && isDirty ) {
+			wasDirtyOnBlur.current = true;
 			if ( ! isValueEmpty( value ) ) {
-				handleOnCommit( { target: { value } }, event );
+				handleOnCommit( event );
 			} else {
 				reset( valueProp );
 			}
@@ -116,10 +121,10 @@ function InputField(
 		const nextValue = event.target.value;
 
 		try {
-			onValidate( nextValue, { event } );
+			onValidate( nextValue, event );
 			commit( nextValue, event );
 		} catch ( err ) {
-			invalidate( err, { event } );
+			invalidate( err, event );
 		}
 	};
 
