@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -29,6 +30,7 @@ export default function NavigationGroup( { children, className, title } ) {
 		return children;
 	}
 
+	const groupId = uniqueId( 'navigation_group_' );
 	const classes = classnames( 'components-navigation__group', className );
 
 	return (
@@ -37,12 +39,15 @@ export default function NavigationGroup( { children, className, title } ) {
 				<GroupTitleUI
 					as="h3"
 					className="components-navigation__group-title"
+					id={ groupId }
 					variant="caption"
 				>
 					{ title }
 				</GroupTitleUI>
 			) }
-			<ul>{ children }</ul>
+			<ul aria-labelledby={ groupId } role="group">
+				{ children }
+			</ul>
 		</li>
 	);
 }
