@@ -112,14 +112,8 @@ describe( 'Block Switcher', () => {
 				await page.keyboard.type( 'Fourth paragraph' );
 				await page.keyboard.press( 'Enter' );
 				await page.keyboard.type( 'Fifth paragraph' );
-				await page.keyboard.down( 'Shift' );
-				await page.keyboard.press( 'ArrowUp' );
-				await page.keyboard.press( 'ArrowUp' );
-				await page.keyboard.press( 'ArrowUp' );
-				await page.keyboard.press( 'ArrowUp' );
-				await page.keyboard.press( 'ArrowUp' );
-				await page.keyboard.press( 'ArrowUp' );
-				await page.keyboard.up( 'Shift' );
+				await pressKeyWithModifier( 'primary', 'a' );
+				await pressKeyWithModifier( 'primary', 'a' );
 				expect( await getAvailableBlockTransforms() ).not.toEqual(
 					expect.arrayContaining( [ 'Columns' ] )
 				);
