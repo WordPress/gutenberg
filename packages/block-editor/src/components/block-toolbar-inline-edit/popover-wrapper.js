@@ -33,7 +33,7 @@ const FocusManaged = withConstrainedTabbing(
 
 export default function PopoverWrapper( { onClose, children, className } ) {
 	// Event handlers
-	const maybeClose = ( event ) => {
+	const onKeyDown = ( event ) => {
 		if ( ARROW_KEYCODES.includes( event.keyCode ) ) {
 			// Prevent WritingFlow from triggering a block focus change.
 			event.stopPropagation();
@@ -52,7 +52,7 @@ export default function PopoverWrapper( { onClose, children, className } ) {
 	return (
 		<div
 			className={ className }
-			onKeyDown={ maybeClose }
+			onKeyDown={ onKeyDown }
 			onMouseDown={ stopPropagation }
 		>
 			<DetectOutside onFocusOutside={ onClose }>
