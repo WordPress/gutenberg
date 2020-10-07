@@ -32,7 +32,7 @@
 - Buttons block: Lighten editor DOM. ([23222](https://github.com/WordPress/gutenberg/pull/23222))
 - Copy: Reword block settings menu item labels. ([22955](https://github.com/WordPress/gutenberg/pull/22955))
 - Add a tooltip to the Drag & Drop handle. ([25606](https://github.com/WordPress/gutenberg/pull/25606)) ([25614](https://github.com/WordPress/gutenberg/pull/25614))
-- A11y: 
+- A11y:
   - Add aria-haspopup property to the BlockNavigation component. ([25605](https://github.com/WordPress/gutenberg/pull/25605))
   - Add aria-haspopup property to the TableOfContents component. ([25603](https://github.com/WordPress/gutenberg/pull/25603))
   - Add aria-haspopup to the ToolSelector. ([25600](https://github.com/WordPress/gutenberg/pull/25600))
@@ -52,14 +52,14 @@
 
 ### Bug Fixes
 
-- Widgets Screen:
+- Widgets Screen: 
   - Auto expand the last selected widget area when opening the inserter. ([25669](https://github.com/WordPress/gutenberg/pull/25669))
   - Ensure all widgets are properly initialized when they're added, do not unmount widgets once they're mounted. ([25645](https://github.com/WordPress/gutenberg/pull/25645))
   - Fix Legacy widget block previews and use iFrames. ([25443](https://github.com/WordPress/gutenberg/pull/25443)) ([14643](https://github.com/WordPress/gutenberg/pull/14643))
   - Report save errors. ([25408](https://github.com/WordPress/gutenberg/pull/25408))
   - Fix global inserter. ([24908](https://github.com/WordPress/gutenberg/pull/24908))
 - Fix RangeControl direct entry in input field. ([25609](https://github.com/WordPress/gutenberg/pull/25609))
-- A11y:
+- A11y: 
   - Fix the color contrast in the code editor. ([25593](https://github.com/WordPress/gutenberg/pull/25593))
   - Fix Publish sidebar Cancel button not usable through screen readers. ([25441](https://github.com/WordPress/gutenberg/pull/25441))
   - Fix keyboard navigation on the Image block toolbar. ([25127](https://github.com/WordPress/gutenberg/pull/25127))
