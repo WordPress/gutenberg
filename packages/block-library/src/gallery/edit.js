@@ -4,7 +4,6 @@
 import {
 	every,
 	filter,
-	find,
 	forEach,
 	get,
 	isEmpty,
@@ -37,7 +36,7 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { sharedIcon } from './shared-icon';
-import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
+import { defaultColumnsNumber } from './shared';
 import Gallery from './gallery';
 import {
 	LINK_DESTINATION_ATTACHMENT,
@@ -75,7 +74,6 @@ class GalleryEdit extends Component {
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
-		this.setImageAttributes = this.setImageAttributes.bind( this );
 		this.setAttributes = this.setAttributes.bind( this );
 		this.getImagesSizeOptions = this.getImagesSizeOptions.bind( this );
 		this.updateImagesSize = this.updateImagesSize.bind( this );
@@ -107,7 +105,7 @@ class GalleryEdit extends Component {
 
 	onSelectImages( newImages ) {
 		const { clientId, replaceInnerBlocks } = this.props;
-		const { columns, sizeSlug, linkTo } = this.props.attributes;
+		const { columns, linkTo } = this.props.attributes;
 
 		const newBlocks = newImages.map( ( image ) => {
 			return createBlock( 'core/image', {
@@ -150,26 +148,6 @@ class GalleryEdit extends Component {
 		return checked
 			? __( 'Thumbnails are cropped to align.' )
 			: __( 'Thumbnails are not cropped.' );
-	}
-
-	setImageAttributes( index, attributes ) {
-		const {
-			attributes: { images },
-		} = this.props;
-		const { setAttributes } = this;
-		if ( ! images[ index ] ) {
-			return;
-		}
-		setAttributes( {
-			images: [
-				...images.slice( 0, index ),
-				{
-					...images[ index ],
-					...attributes,
-				},
-				...images.slice( index + 1 ),
-			],
-		} );
 	}
 
 	getImagesSizeOptions() {

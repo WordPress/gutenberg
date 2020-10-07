@@ -8,13 +8,12 @@ import classnames from 'classnames';
  */
 import { RichText, InnerBlocks } from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import GalleryImage from './gallery-image';
 import { defaultColumnsNumber } from './shared';
 
 export const Gallery = ( props ) => {
@@ -23,14 +22,7 @@ export const Gallery = ( props ) => {
 		className,
 		isSelected,
 		setAttributes,
-		selectedImage,
 		mediaPlaceholder,
-		onMoveBackward,
-		onMoveForward,
-		onRemoveImage,
-		onSelectImage,
-		onDeselectImage,
-		onSetImageAttributes,
 		onFocusGalleryCaption,
 		insertBlocksAfter,
 	} = props;
@@ -40,7 +32,6 @@ export const Gallery = ( props ) => {
 		columns = defaultColumnsNumber( attributes ),
 		caption,
 		imageCrop,
-		images,
 	} = attributes;
 
 	return (
