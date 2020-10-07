@@ -6,6 +6,8 @@
 		background: $gray-900;
 		border-radius: 0;
 		display: flex;
+		position: absolute;
+		z-index: 31;
 		height: $header-height + $border-width; // Cover header border
 		width: $header-height;
 	}
@@ -15,6 +17,7 @@
 	flex-shrink: 0;
 	height: $header-height + $border-width; // Cover header border
 	width: 300px;
+	position: static;
 
 	// Delay to sync with `NavigationPanel` animation
 	transition: width 80ms linear;
