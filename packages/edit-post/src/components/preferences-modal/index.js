@@ -62,9 +62,7 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 			<Section title={ __( 'Keyboard' ) }>
 				<EnableFeature
 					featureName="keepCaretInsideBlock"
-					help={ __(
-						'Keeps keyboard cursor inside active block.'
-					) }
+					help={ __( 'Keeps keyboard cursor inside active block.' ) }
 					label={ __( 'Contain the text cursor' ) }
 				/>
 			</Section>
