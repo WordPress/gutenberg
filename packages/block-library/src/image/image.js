@@ -266,6 +266,8 @@ export default function Image( {
 							onClick={ () => setIsEditingImage( true ) }
 							icon={ crop }
 							label={ __( 'Crop' ) }
+							aria-haspopup="dialog"
+							aria-expanded={ isEditingImage }
 						/>
 					</ToolbarGroup>
 				) }
