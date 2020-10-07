@@ -20,6 +20,7 @@ import {
 
 const deprecated = [
 
+
 	// {
 	// 	attributes: {
 	// 		images: {
@@ -517,6 +518,7 @@ const deprecated = [
 	// 	},
 	// },
 
-//];
+];
+
 
 export default deprecated;

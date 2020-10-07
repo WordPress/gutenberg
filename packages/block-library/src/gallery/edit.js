@@ -69,15 +69,10 @@ class GalleryEdit extends Component {
 	constructor() {
 		super( ...arguments );
 
-		this.onSelectImage = this.onSelectImage.bind( this );
 		this.onSelectImages = this.onSelectImages.bind( this );
-		this.onDeselectImage = this.onDeselectImage.bind( this );
 		this.setLinkTo = this.setLinkTo.bind( this );
 		this.setColumnsNumber = this.setColumnsNumber.bind( this );
 		this.toggleImageCrop = this.toggleImageCrop.bind( this );
-		this.onMove = this.onMove.bind( this );
-		this.onMoveForward = this.onMoveForward.bind( this );
-		this.onMoveBackward = this.onMoveBackward.bind( this );
 		this.onRemoveImage = this.onRemoveImage.bind( this );
 		this.onUploadError = this.onUploadError.bind( this );
 		this.setImageAttributes = this.setImageAttributes.bind( this );
@@ -111,52 +106,6 @@ class GalleryEdit extends Component {
 		this.props.setAttributes( attributes );
 	}
 
-	onSelectImage( index ) {
-		return () => {
-			if ( this.state.selectedImage !== index ) {
-				this.setState( {
-					selectedImage: index,
-				} );
-			}
-		};
-	}
-
-	onDeselectImage( index ) {
-		return () => {
-			if ( this.state.selectedImage === index ) {
-				this.setState( {
-					selectedImage: null,
-				} );
-			}
-		};
-	}
-
-	onMove( oldIndex, newIndex ) {
-		const images = [ ...this.props.attributes.images ];
-		images.splice( newIndex, 1, this.props.attributes.images[ oldIndex ] );
-		images.splice( oldIndex, 1, this.props.attributes.images[ newIndex ] );
-		this.setState( { selectedImage: newIndex } );
-		this.setAttributes( { images } );
-	}
-
-	onMoveForward( oldIndex ) {
-		return () => {
-			if ( oldIndex === this.props.attributes.images.length - 1 ) {
-				return;
-			}
-			this.onMove( oldIndex, oldIndex + 1 );
-		};
-	}
-
-	onMoveBackward( oldIndex ) {
-		return () => {
-			if ( oldIndex === 0 ) {
-				return;
-			}
-			this.onMove( oldIndex, oldIndex - 1 );
-		};
-	}
-
 	onRemoveImage( index ) {
 		return () => {
 			const images = filter(
@@ -172,51 +121,21 @@ class GalleryEdit extends Component {
 		};
 	}
 
-	selectCaption( newImage, images, attachmentCaptions ) {
-		// The image id in both the images and attachmentCaptions arrays is a
-		// string, so ensure comparison works correctly by converting the
-		// newImage.id to a string.
-		const newImageId = toString( newImage.id );
-		const currentImage = find( images, { id: newImageId } );
-
-		const currentImageCaption = currentImage
-			? currentImage.caption
-			: newImage.caption;
-
-		if ( ! attachmentCaptions ) {
-			return currentImageCaption;
-		}
-
-		const attachment = find( attachmentCaptions, {
-			id: newImageId,
-		} );
-
-		// if the attachment caption is updated
-		if ( attachment && attachment.caption !== newImage.caption ) {
-			return newImage.caption;
-		}
-
-		return currentImageCaption;
-	}
-
 	onSelectImages( newImages ) {
 		const { clientId, insertBlocks } = this.props;
+		const { columns, images, sizeSlug, linkTo } = this.props.attributes;
+
 		const newBlocks = newImages.map( ( image ) => {
 			return createBlock( 'core/image', {
+				id: image.id,
+				caption: image.caption,
 				url: image.url,
+				link: image.link,
+				linkDestination: linkTo,
 				alt: image.alt,
 			} );
 		} );
-		const { columns, images, sizeSlug } = this.props.attributes;
-		const { attachmentCaptions } = this.state;
-		this.setState( {
-			attachmentCaptions: newImages.map( ( newImage ) => ( {
-				// Store the attachmentCaption id as a string for consistency
-				// with the type of the id in the images attribute.
-				id: toString( newImage.id ),
-				caption: newImage.caption,
-			} ) ),
-		} );
+
 		this.setAttributes( {
 			images: newImages.map( ( newImage ) => ( {
 				...pickRelevantMediaFiles( newImage, sizeSlug ),
@@ -232,6 +151,7 @@ class GalleryEdit extends Component {
 			} ) ),
 			columns: columns ? Math.min( newImages.length, columns ) : columns,
 		} );
+
 		insertBlocks( newBlocks, 0, clientId );
 	}
 
@@ -257,12 +177,6 @@ class GalleryEdit extends Component {
 		return checked
 			? __( 'Thumbnails are cropped to align.' )
 			: __( 'Thumbnails are not cropped.' );
-	}
-
-	onFocusGalleryCaption() {
-		this.setState( {
-			selectedImage: null,
-		} );
 	}
 
 	setImageAttributes( index, attributes ) {
