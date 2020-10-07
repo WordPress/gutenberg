@@ -1,5 +1,15 @@
 == Changelog ==
 
+= 9.1.1 =
+
+### Bug Fixes
+
+- Widgets Screen:
+  - Include edit-widgets php files in build ([25792](https://github.com/WordPress/gutenberg/pull/25792))
+  - Fix PHP warining in widget utils controller ([25797](https://github.com/WordPress/gutenberg/pull/25797))
+  - Initialize the state before rendering widgets editor ([25736](https://github.com/WordPress/gutenberg/pull/25736))
+  - Fix insertion point in widget areas ([25727](https://github.com/WordPress/gutenberg/pull/25727))
+
 = 9.1.0 =
 
 ### Features
