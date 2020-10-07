@@ -24,6 +24,7 @@ export default function save( { attributes } ) {
 		linkTarget,
 		sizeSlug,
 		title,
+		isInGallery,
 	} = attributes;
 
 	const newRel = isEmpty( rel ) ? undefined : rel;
@@ -73,9 +74,12 @@ export default function save( { attributes } ) {
 		);
 	}
 
-	return (
-		<figure { ...useBlockProps.save( { className: classes } ) }>
-			{ figure }
-		</figure>
-	);
+	if ( true === isInGallery ) {
+		return (
+			<li className={ classes }>
+				<figure>{ figure }</figure>
+			</li>
+		);
+	}
+	return <figure className={ classes }>{ figure }</figure>;
 }

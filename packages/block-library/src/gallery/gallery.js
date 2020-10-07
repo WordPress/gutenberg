@@ -42,7 +42,10 @@ export const Gallery = ( props ) => {
 				'is-cropped': imageCrop,
 			} ) }
 		>
-			<InnerBlocks allowedBlocks={ [ 'core/image' ] }></InnerBlocks>
+			<InnerBlocks
+				allowedBlocks={ [ 'core/image' ] }
+				__experimentalTagName="ul"
+			></InnerBlocks>
 
 			{ mediaPlaceholder }
 			<RichTextVisibilityHelper

@@ -115,6 +115,7 @@ class GalleryEdit extends Component {
 				link: image.link,
 				linkDestination: linkTo,
 				alt: image.alt,
+				isInGallery: true,
 			} );
 		} );
 

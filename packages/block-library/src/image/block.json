@@ -69,6 +69,10 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
+		},
+		"isInGallery": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {

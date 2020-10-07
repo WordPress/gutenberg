@@ -91,6 +91,7 @@ export function ImageEdit( {
 		width,
 		height,
 		sizeSlug,
+		isInGallery,
 	} = attributes;
 
 	const altRef = useRef();
@@ -316,6 +317,33 @@ export function ImageEdit( {
 		ref,
 		className: classes,
 	} );
+
+	if ( isInGallery ) {
+		return (
+			<>
+				{ controls }
+				<Block.li ref={ ref } className={ classes } key={ key }>
+					<figure>
+						{ url && (
+							<Image
+								attributes={ attributes }
+								setAttributes={ setAttributes }
+								isSelected={ isSelected }
+								insertBlocksAfter={ insertBlocksAfter }
+								onReplace={ onReplace }
+								onSelectImage={ onSelectImage }
+								onSelectURL={ onSelectURL }
+								onUploadError={ onUploadError }
+								containerRef={ ref }
+								allowResize={ allowResize }
+							/>
+						) }
+						{ mediaPlaceholder }
+					</figure>
+				</Block.li>
+			</>
+		);
+	}
 
 	return (
 		<>
