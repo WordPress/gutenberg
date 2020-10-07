@@ -52,11 +52,10 @@ export const TEMPLATES_DEFAULT_DETAILS = {
 export const TEMPLATES_GENERAL = [
 	'front-page',
 	'archive',
-	'single',
 	'singular',
 	'index',
 	'search',
 	'404',
 ];
 
-export const TEMPLATES_POSTS = [ 'single-post', 'archive-post', 'home' ];
+export const TEMPLATES_POSTS = [ 'home', 'single' ];
