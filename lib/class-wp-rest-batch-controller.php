@@ -16,7 +16,7 @@ class WP_REST_Batch_Controller {
 	/**
 	 * Registers the REST API route.
 	 *
-	 * @since 9.0.0
+	 * @since 9.2.0
 	 */
 	public function register_routes() {
 		register_rest_route(
