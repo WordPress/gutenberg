@@ -44,6 +44,7 @@ describe( 'Template Part', () => {
 			await page.waitForSelector( '.edit-site-visual-editor' );
 		} );
 
+		// eslint-disable-next-line jest/no-disabled-tests
 		it.skip( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
 			// Switch to editing the header template part.
 			await navigationPanel.open();
