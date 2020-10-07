@@ -24,7 +24,6 @@ export default function save( { attributes } ) {
 		linkTarget,
 		sizeSlug,
 		title,
-		isListItem,
 	} = attributes;
 
 	const newRel = isEmpty( rel ) ? undefined : rel;
@@ -74,12 +73,5 @@ export default function save( { attributes } ) {
 		);
 	}
 
-	if ( isListItem ) {
-		return (
-			<li className={ classes }>
-				<figure>{ figure }</figure>
-			</li>
-		);
-	}
 	return <figure className={ classes }>{ figure }</figure>;
 }

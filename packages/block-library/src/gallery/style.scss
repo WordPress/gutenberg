@@ -1,78 +1,80 @@
 .wp-block-gallery {
-	ul {
+	ul.block-editor-block-list__layout {
 		display: flex;
 		flex-wrap: wrap;
 		list-style-type: none;
 		padding: 0;
 		// Some themes give all <ul> default margin instead of padding.
 		margin: 0;
-	}
 
-	.wp-block-image {
-		// Add space between thumbnails, and unset right most thumbnails later.
-		margin: 0 $grid-unit-20 $grid-unit-20 0;
-		display: flex;
-		flex-grow: 1;
-		flex-direction: column;
-		justify-content: center;
-		position: relative;
-
-		figure,
-		figure > div {
-			margin: 0;
-			height: 100%;
-
-			// IE doesn't support flex so omit that.
-			@supports ( position: sticky ) {
-				display: flex;
-				align-items: flex-end;
-				justify-content: flex-start;
+		li.wp-block-gallery__image {
+			// Add space between thumbnails, and unset right most thumbnails later.
+			margin: 0 $grid-unit-20 $grid-unit-20 0;
+			display: flex;
+			flex-grow: 1;
+			flex-direction: column;
+			justify-content: center;
+			position: relative;
+	
+			figure,
+			figure > div {
+				margin: 0;
+				height: 100%;
+	
+				// IE doesn't support flex so omit that.
+				@supports ( position: sticky ) {
+					display: flex;
+					align-items: flex-end;
+					justify-content: flex-start;
+				}
 			}
-		}
-
-		img {
-			display: block;
-			max-width: 100%;
-			height: auto;
-		}
-
-
-		// IE doesn't handle cropping, so we need an explicit width here.
-		img {
-			width: 100%;
-
-			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
-			@supports ( position: sticky ) {
-				width: auto;
-			}
-		}
-
-		figcaption {
-			position: absolute;
-			margin-bottom: 0;
-			bottom: 0;
-			width: 100%;
-			max-height: 100%;
-			overflow: auto;
-			padding: 40px 10px 9px;
-			color: $white;
-			text-align: center;
-			font-size: $default-font-size;
-			background: linear-gradient(
-				0deg,
-				rgba( $color: $black, $alpha: 0.7 ) 0,
-				rgba( $color: $black, $alpha: 0.3 ) 70%,
-				transparent
-			);
-
+	
 			img {
-				display: inline;
+				display: block;
+				max-width: 100%;
+				height: auto;
+
+			}
+	
+			// IE doesn't handle cropping, so we need an explicit width here.
+			img {
+				width: 100%;
+	
+				// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
+				@supports ( position: sticky ) {
+					width: auto;
+				}
+			}
+	
+			figcaption {
+				position: absolute;
+				margin-bottom: 0;
+				bottom: 0;
+				width: 100%;
+				max-height: 100%;
+				overflow: auto;
+				padding: 40px 10px 9px;
+				color: $white;
+				text-align: center;
+				font-size: $default-font-size;
+				background: linear-gradient(
+					0deg,
+					rgba( $color: $black, $alpha: 0.7 ) 0,
+					rgba( $color: $black, $alpha: 0.3 ) 70%,
+					transparent
+				);
+	
+				img {
+					display: inline;
+				}
 			}
 		}
 	}
+
+
 
 	// Cropped
-	&.is-cropped .wp-block-image {
+	&.is-cropped ul.block-editor-block-list__layout li.wp-block-gallery__image {
 		a,
 		img {
 			// IE11 doesn't support object-fit, so just make sure images aren't skewed.
@@ -89,7 +91,7 @@
 	}
 
 	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
-	& .wp-block-image {
+	& .wp-block-gallery__image {
 		width: calc( 50% - #{$grid-unit-20} );
 
 		&:nth-of-type( even ) {
@@ -97,7 +99,7 @@
 		}
 	}
 
-	&.columns-1 .wp-block-image {
+	&.columns-1 .wp-block-gallery__image {
 		width: 100%;
 		margin-right: 0;
 	}
@@ -105,7 +107,7 @@
 	// Beyond mobile viewports, we allow up to 8 columns.
 	@include break-small {
 		@for $i from 3 through 8 {
-			&.columns-#{ $i } .wp-block-image {
+			&.columns-#{ $i } .wp-block-gallery__image {
 				width: calc(
 					#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i}
 				);
@@ -118,14 +120,14 @@
 			&.columns-#{
 				$column-count
 				}
-				.wp-block-image:nth-of-type( #{ $column-count }n ) {
+				.wp-block-gallery__image:nth-of-type( #{ $column-count }n ) {
 				margin-right: 0;
 			}
 		}
 	}
 
 	// Last item always needs margins reset.
-	.wp-block-image:last-child {
+	.wp-block-gallery__image:last-child {
 		margin-right: 0;
 	}
 
@@ -138,7 +140,7 @@
 
 	// If the gallery is centered, center the content inside as well.
 	&.aligncenter {
-		figure.wp-block-image {
+		figure.wp-block-gallery__image {
 			justify-content: center;
 		}
 	}

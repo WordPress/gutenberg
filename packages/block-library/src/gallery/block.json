@@ -45,8 +45,7 @@
 	},
 	"providesContext": {
 		"allowBlockAlign": "allowBlockAlign",
-		"allowResize": "allowResize",
-		"isList": "isList"
+		"allowResize": "allowResize"
 	},
 	"supports": {
 		"anchor": true,

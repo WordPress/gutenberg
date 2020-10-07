@@ -91,7 +91,6 @@ export function ImageEdit( {
 		width,
 		height,
 		sizeSlug,
-		isListItem,
 	} = attributes;
 
 	const altRef = useRef();
@@ -270,12 +269,6 @@ export function ImageEdit( {
 		};
 	}, [ isTemp ] );
 
-	useEffect( () => {
-		if ( context?.isList ) {
-			setAttributes( { isListItem: context.isList } );
-		}
-	}, [ context ] );
-
 	const isExternal = isExternalImage( id, url );
 	const controls = (
 		<BlockControls>
@@ -338,20 +331,6 @@ export function ImageEdit( {
 			allowResize={ allowResize }
 		/>
 	);
-
-	if ( isListItem ) {
-		return (
-			<>
-				{ controls }
-				<Block.li ref={ ref } className={ classes } key={ key }>
-					<figure>
-						{ image }
-						{ mediaPlaceholder }
-					</figure>
-				</Block.li>
-			</>
-		);
-	}
 
 	return (
 		<>
