@@ -6,7 +6,7 @@
 			"type": "array",
 			"default": [],
 			"source": "query",
-			"selector": ".blocks-gallery-item",
+			"selector": ".wp-block-image",
 			"query": {
 				"url": {
 					"type": "string",

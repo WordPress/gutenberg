@@ -116,7 +116,7 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
-	const isResizable = ! isWideAligned && isLargeViewport;
+	const isResizable = false;
 	const imageSizeOptions = map(
 		filter( imageSizes, ( { slug } ) =>
 			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )

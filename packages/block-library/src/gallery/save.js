@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { RichText, InnerBlocks } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -27,57 +27,7 @@ export default function save( { attributes } ) {
 				imageCrop ? 'is-cropped' : ''
 			}` }
 		>
-			<ul className="blocks-gallery-grid">
-				{ images.map( ( image ) => {
-					let href;
-
-					switch ( linkTo ) {
-						case LINK_DESTINATION_MEDIA:
-							href = image.fullUrl || image.url;
-							break;
-						case LINK_DESTINATION_ATTACHMENT:
-							href = image.link;
-							break;
-					}
-					// The image should only have an aria-label if it's within a link and has no alt text.
-					const imageLabel =
-						! image.alt && image.caption && href
-							? image.caption
-							: null;
-
-					const img = (
-						<img
-							src={ image.url }
-							alt={ image.alt }
-							data-id={ image.id }
-							data-full-url={ image.fullUrl }
-							data-link={ image.link }
-							className={
-								image.id ? `wp-image-${ image.id }` : null
-							}
-							aria-label={ imageLabel || null }
-						/>
-					);
-
-					return (
-						<li
-							key={ image.id || image.url }
-							className="blocks-gallery-item"
-						>
-							<figure>
-								{ href ? <a href={ href }>{ img }</a> : img }
-								{ ! RichText.isEmpty( image.caption ) && (
-									<RichText.Content
-										tagName="figcaption"
-										className="blocks-gallery-item__caption"
-										value={ image.caption }
-									/>
-								) }
-							</figure>
-						</li>
-					);
-				} ) }
-			</ul>
+			<InnerBlocks.Content />
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content
 					tagName="figcaption"

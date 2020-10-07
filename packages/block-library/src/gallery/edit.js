@@ -29,8 +29,9 @@ import { MediaPlaceholder, InspectorControls } from '@wordpress/block-editor';
 import { Component, Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -199,6 +200,13 @@ class GalleryEdit extends Component {
 	}
 
 	onSelectImages( newImages ) {
+		const { clientId, insertBlocks } = this.props;
+		const newBlocks = newImages.map( ( image ) => {
+			return createBlock( 'core/image', {
+				url: image.url,
+				alt: image.alt,
+			} );
+		} );
 		const { columns, images, sizeSlug } = this.props.attributes;
 		const { attachmentCaptions } = this.state;
 		this.setState( {
@@ -224,6 +232,7 @@ class GalleryEdit extends Component {
 			} ) ),
 			columns: columns ? Math.min( newImages.length, columns ) : columns,
 		} );
+		insertBlocks( newBlocks, 0, clientId );
 	}
 
 	onUploadError( message ) {
@@ -360,9 +369,10 @@ class GalleryEdit extends Component {
 			images,
 			linkTo,
 			sizeSlug,
+			ids,
 		} = attributes;
 
-		const hasImages = !! images.length;
+		const hasImages = !! ids.length;
 
 		const mediaPlaceholder = (
 			<MediaPlaceholder
@@ -398,13 +408,13 @@ class GalleryEdit extends Component {
 			<>
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery settings' ) }>
-						{ images.length > 1 && (
+						{ ids.length > 1 && (
 							<RangeControl
 								label={ __( 'Columns' ) }
 								value={ columns }
 								onChange={ this.setColumnsNumber }
 								min={ 1 }
-								max={ Math.min( MAX_COLUMNS, images.length ) }
+								max={ Math.min( MAX_COLUMNS, ids.length ) }
 								{ ...MOBILE_CONTROL_PROPS_RANGE_CONTROL }
 								required
 							/>
@@ -504,4 +514,10 @@ export default compose( [
 	} ),
 	withNotices,
 	withViewportMatch( { isNarrow: '< small' } ),
+	withDispatch( ( dispatch ) => {
+		const { insertBlocks } = dispatch( 'core/block-editor' );
+		return {
+			insertBlocks,
+		};
+	} ),
 ] )( GalleryEdit );

@@ -1,5 +1,5 @@
 .wp-block-gallery,
-.blocks-gallery-grid {
+.blocks-gallery-grid, .block-editor-block-list__layout {
 	display: flex;
 	flex-wrap: wrap;
 	list-style-type: none;
@@ -8,7 +8,8 @@
 	margin: 0;
 
 	.blocks-gallery-image,
-	.blocks-gallery-item {
+	.blocks-gallery-item,
+	.wp-block-image {
 		// Add space between thumbnails, and unset right most thumbnails later.
 		margin: 0 1em 1em 0;
 		display: flex;
@@ -17,7 +18,7 @@
 		justify-content: center;
 		position: relative;
 
-		figure {
+		figure, > div {
 			margin: 0;
 			height: 100%;
 
@@ -67,7 +68,8 @@
 
 	// Cropped
 	&.is-cropped .blocks-gallery-image,
-	&.is-cropped .blocks-gallery-item {
+	&.is-cropped .blocks-gallery-item,
+	&.is-cropped .wp-block-image {
 		a,
 		img {
 			// IE11 doesn't support object-fit, so just make sure images aren't skewed.
@@ -85,8 +87,10 @@
 
 	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
 	& .blocks-gallery-image,
-	& .blocks-gallery-item {
-		width: calc(50% - 1em);
+
+	& .blocks-gallery-item,
+	& .wp-block-image {
+		width: calc(50% - #{ $grid-unit-20 });
 
 		&:nth-of-type(even) {
 			margin-right: 0;
@@ -94,7 +98,8 @@
 	}
 
 	&.columns-1 .blocks-gallery-image,
-	&.columns-1 .blocks-gallery-item {
+	&.columns-1 .blocks-gallery-item,
+	&.columns-1 .wp-block-image  {
 		width: 100%;
 		margin-right: 0;
 	}
@@ -103,16 +108,18 @@
 	@include break-small {
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } .blocks-gallery-image,
-			&.columns-#{ $i } .blocks-gallery-item {
-				width: calc(#{ 100% / $i } - #{ 1em * ( $i - 1 ) / $i });
-				margin-right: 1em;
+			&.columns-#{ $i } .blocks-gallery-item,
+			&.columns-#{ $i } .wp-block-image  {
+				width: calc(#{ 100% / $i } - #{ $grid-unit-20 * ( $i - 1 ) / $i });
+				margin-right: $grid-unit-20;
 			}
 		}
 
 		// Unset the right margin on every rightmost gallery item to ensure center balance.
 		@for $column-count from 1 through 8 {
 			&.columns-#{ $column-count } .blocks-gallery-image:nth-of-type(#{ $column-count }n),
-			&.columns-#{ $column-count } .blocks-gallery-item:nth-of-type(#{ $column-count }n) {
+			&.columns-#{ $column-count } .blocks-gallery-item:nth-of-type(#{ $column-count }n),
+			&.columns-#{ $column-count } .wp-block-image:nth-of-type(#{ $column-count }n) {
 				margin-right: 0;
 			}
 		}
@@ -120,7 +127,8 @@
 
 	// Last item always needs margins reset.
 	.blocks-gallery-image:last-child,
-	.blocks-gallery-item:last-child {
+	.blocks-gallery-item:last-child,
+	.wp-block-image:last-child {
 		margin-right: 0;
 	}
 
