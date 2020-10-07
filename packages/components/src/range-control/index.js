@@ -26,13 +26,13 @@ import {
 	ActionRightWrapper,
 	AfterIconWrapper,
 	BeforeIconWrapper,
-	InputNumber,
 	Root,
 	Track,
 	ThumbWrapper,
 	Thumb,
 	Wrapper,
 } from './styles/range-control-styles';
+import InputField from './input-field';
 import { useRTL } from '../utils/rtl';
 
 function RangeControl(
@@ -77,7 +77,6 @@ function RangeControl(
 		value: valueProp,
 		initial: initialPosition,
 	} );
-	const isResetPendent = useRef( false );
 	const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
 	const [ isFocused, setIsFocused ] = useState( false );
 
@@ -120,33 +119,17 @@ function RangeControl(
 
 	const handleOnRangeChange = ( event ) => {
 		const nextValue = parseFloat( event.target.value );
-		setValue( nextValue );
-		onChange( nextValue );
+		handleOnChange( nextValue );
 	};
 
 	const handleOnChange = ( nextValue ) => {
-		nextValue = parseFloat( nextValue );
-		setValue( nextValue );
-		/*
-		 * Calls onChange only when nextValue is numeric
-		 * otherwise may queue a reset for the blur event.
-		 */
-		if ( ! isNaN( nextValue ) ) {
-			if ( nextValue < min || nextValue > max ) {
-				nextValue = floatClamp( nextValue, min, max );
-			}
-			onChange( nextValue );
-			isResetPendent.current = false;
-		} else if ( allowReset ) {
-			isResetPendent.current = true;
-		}
-	};
-
-	const handleOnInputNumberBlur = () => {
-		if ( isResetPendent.current ) {
+		if ( isNaN( nextValue ) ) {
 			handleOnReset();
-			isResetPendent.current = false;
+			return;
 		}
+
+		setValue( nextValue );
+		onChange( nextValue );
 	};
 
 	const handleOnReset = () => {
@@ -273,16 +256,14 @@ function RangeControl(
 					</AfterIconWrapper>
 				) }
 				{ withInputField && (
-					<InputNumber
-						aria-label={ label }
-						className="components-range-control__number"
+					<InputField
 						disabled={ disabled }
-						inputMode="decimal"
 						isShiftStepEnabled={ isShiftStepEnabled }
+						label={ label }
 						max={ max }
 						min={ min }
-						onBlur={ handleOnInputNumberBlur }
 						onChange={ handleOnChange }
+						onReset={ handleOnReset }
 						shiftStep={ shiftStep }
 						step={ step }
 						value={ inputSliderValue }

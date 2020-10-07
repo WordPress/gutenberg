@@ -7,7 +7,7 @@ import { useDrag } from 'react-use-gesture';
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { useEffect, useRef, forwardRef } from '@wordpress/element';
 import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
@@ -16,7 +16,6 @@ import { useDragCursor } from './utils';
 import { Input } from './styles/input-control-styles';
 import { useInputControlStateReducer } from './state';
 import { isValueEmpty } from '../utils/values';
-import { useUpdateEffect } from '../utils';
 
 function InputField(
 	{
@@ -25,7 +24,6 @@ function InputField(
 		dragThreshold = 10,
 		id,
 		isDragEnabled = false,
-		isFocused,
 		isPressEnterToChange = false,
 		onBlur = noop,
 		onChange = noop,
@@ -36,7 +34,6 @@ function InputField(
 		onKeyDown = noop,
 		onValidate = noop,
 		size = 'default',
-		setIsFocused,
 		stateReducer = ( state ) => state,
 		value: valueProp,
 		...props
@@ -66,27 +63,35 @@ function InputField(
 
 	const { _event, value, isDragging, isDirty } = state;
 
+	const valueRef = useRef( value );
 	const dragCursor = useDragCursor( isDragging, dragDirection );
 
-	/*
-	 * Syncs value state using the focus state to determine the direction.
-	 * Without focus it updates the value from the props. With focus it
-	 * propagates the value and event through onChange.
-	 */
-	useUpdateEffect( () => {
-		if ( valueProp === value ) {
+	useEffect( () => {
+		/**
+		 * Handles syncing incoming value changes with internal state.
+		 * This effectively enables a "controlled" state.
+		 * https://reactjs.org/docs/forms.html#controlled-components
+		 */
+		if ( valueProp !== valueRef.current ) {
+			update( valueProp );
+			valueRef.current = valueProp;
+
+			// Quick return to avoid firing the onChange callback
 			return;
 		}
-		if ( ! isFocused ) {
-			update( valueProp );
-		} else if ( ! isDirty ) {
+
+		/**
+		 * Fires the onChange callback when internal state value changes.
+		 */
+		if ( value !== valueRef.current && ! isDirty ) {
 			onChange( value, { event: _event } );
+
+			valueRef.current = value;
 		}
-	}, [ value, isDirty, isFocused, valueProp ] );
+	}, [ value, isDirty, valueProp ] );
 
 	const handleOnBlur = ( event ) => {
 		onBlur( event );
-		setIsFocused( false );
 
 		/**
 		 * If isPressEnterToChange is set, this commits the value to
@@ -103,7 +108,6 @@ function InputField(
 
 	const handleOnFocus = ( event ) => {
 		onFocus( event );
-		setIsFocused( true );
 	};
 
 	const handleOnChange = ( event ) => {
