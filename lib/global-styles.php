@@ -575,7 +575,7 @@ function gutenberg_experimental_global_styles_flatten_styles_tree( $styles ) {
 }
 
 /**
- * Given a seletor for a block, and the settings of the block, returns a string
+ * Given a selector for a block, and the settings of the block, returns a string
  * with the stylesheet of the preset classes required for that block.
  *
  * @param string $selector  String with the CSS selector for the block.
