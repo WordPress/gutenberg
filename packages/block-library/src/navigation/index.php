@@ -31,9 +31,7 @@ function block_core_navigation_build_css_colors( $attributes ) {
 	if ( $has_named_text_color ) {
 		// Add the color class.
 		$colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
-	}
-
-	if ( $has_custom_text_color ) {
+	} elseif ( $has_custom_text_color ) {
 		// Add the custom color inline style.
 		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
 	}
@@ -51,9 +49,7 @@ function block_core_navigation_build_css_colors( $attributes ) {
 	if ( $has_named_background_color ) {
 		// Add the background-color class.
 		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
-	}
-
-	if ( $has_custom_background_color ) {
+	} elseif ( $has_custom_background_color ) {
 		// Add the custom background-color inline style.
 		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
 	}
