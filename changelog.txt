@@ -1,5 +1,15 @@
 == Changelog ==
 
+= 9.1.1 =
+
+### Bug Fixes
+
+- Widgets Screen:
+  - Include edit-widgets php files in build ([25792](https://github.com/WordPress/gutenberg/pull/25792)
+  - Fix PHP warining in widget utils controller ([25797])(https://github.com/WordPress/gutenberg/pull/25797)
+  - Initialize the state before rendering widgets editor ([25736])(https://github.com/WordPress/gutenberg/pull/25736)
+  - Fix insertion point in widget areas ([25727])(https://github.com/WordPress/gutenberg/pull/25727)
+
 = 9.1.0 =
 
 ### Features
@@ -15,7 +25,7 @@
 - Improve the Audio block shortcode transform to account for all sources. ([25114](https://github.com/WordPress/gutenberg/pull/25114))
 - Code block: Allow HTML editing & rich text content. ([24689](https://github.com/WordPress/gutenberg/pull/24689))
 - Remove appender from unselected Buttons and Social Icons block. ([25518](https://github.com/WordPress/gutenberg/pull/25518))
-- Widgets Screen: 
+- Widgets Screen:
   - Register legacy widgets as block variations. ([24905](https://github.com/WordPress/gutenberg/pull/24905))
   - Use the default block list appender for the widget areas. ([25635](https://github.com/WordPress/gutenberg/pull/25635))
   - Add titles to Legacy Widgets. ([25638](https://github.com/WordPress/gutenberg/pull/25638))
@@ -42,14 +52,14 @@
 
 ### Bug Fixes
 
-- Widgets Screen: 
+- Widgets Screen:
   - Auto expand the last selected widget area when opening the inserter. ([25669](https://github.com/WordPress/gutenberg/pull/25669))
   - Ensure all widgets are properly initialized when they're added, do not unmount widgets once they're mounted. ([25645](https://github.com/WordPress/gutenberg/pull/25645))
   - Fix Legacy widget block previews and use iFrames. ([25443](https://github.com/WordPress/gutenberg/pull/25443)) ([14643](https://github.com/WordPress/gutenberg/pull/14643))
   - Report save errors. ([25408](https://github.com/WordPress/gutenberg/pull/25408))
   - Fix global inserter. ([24908](https://github.com/WordPress/gutenberg/pull/24908))
 - Fix RangeControl direct entry in input field. ([25609](https://github.com/WordPress/gutenberg/pull/25609))
-- A11y: 
+- A11y:
   - Fix the color contrast in the code editor. ([25593](https://github.com/WordPress/gutenberg/pull/25593))
   - Fix Publish sidebar Cancel button not usable through screen readers. ([25441](https://github.com/WordPress/gutenberg/pull/25441))
   - Fix keyboard navigation on the Image block toolbar. ([25127](https://github.com/WordPress/gutenberg/pull/25127))
@@ -60,7 +70,7 @@
 - Remove Embed block aspect ratio classes on url change. ([25295](https://github.com/WordPress/gutenberg/pull/25295))
 - Remove duplicate help item. ([25283](https://github.com/WordPress/gutenberg/pull/25283))
 - Fix Block Directory author average rating formating. ([24732](https://github.com/WordPress/gutenberg/pull/24732))
-- @wordpress/api-fetch: 
+- @wordpress/api-fetch:
   - Fix preloading middleware referencing stale data. ([25550](https://github.com/WordPress/gutenberg/pull/25550))
   - Check nonce header value before skipping adding it. ([25458](https://github.com/WordPress/gutenberg/pull/25458))
 - Use esc_html instead of esc_attr in the Archives block. ([25476](https://github.com/WordPress/gutenberg/pull/25476))
@@ -111,7 +121,7 @@
 - Add new block supports page to the handbook. ([25647](https://github.com/WordPress/gutenberg/pull/25647))
 - Block Directory: Add developer documentation. ([25591](https://github.com/WordPress/gutenberg/pull/25591))
 - Move custom-fields note to the 'Register Meta Field' documentation. ([25584](https://github.com/WordPress/gutenberg/pull/25584))
-- Add Block Editor Components documentation: 
+- Add Block Editor Components documentation:
   - Warning ([25574](https://github.com/WordPress/gutenberg/pull/25574))
   - FontSizePicker ([25568](https://github.com/WordPress/gutenberg/pull/25568))
   - UnitControl ([25565](https://github.com/WordPress/gutenberg/pull/25565))
