@@ -15,6 +15,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
 } from '@wordpress/react-native-bridge';
+import { rawHandler } from '@wordpress/blocks';
 
 /**
  * WordPress dependencies
