@@ -318,7 +318,9 @@ export default function ImageEditor( {
 				/>
 				{ inProgress && <Spinner /> }
 			</div>
-			<__experimentalBlockToolbarInlineEdit>
+			<__experimentalBlockToolbarInlineEdit
+				onClose={ () => setIsEditingImage( false ) }
+			>
 				<ToolbarGroup>
 					<Dropdown
 						contentClassName="wp-block-image__zoom"
