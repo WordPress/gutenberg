@@ -69,7 +69,7 @@ class WP_REST_Batch_Controller {
 	/**
 	 * Serves the batch request.
 	 *
-	 * @since 9.0.0
+	 * @since 9.2.0
 	 *
 	 * @param WP_REST_Request $batch_request The batch request object.
 	 * @return WP_REST_Response
@@ -228,7 +228,7 @@ class WP_REST_Batch_Controller {
 	/**
 	 * Polyfills a simple form of batching for compatibility for non-trunk installs.
 	 *
-	 * @since 9.0.0
+	 * @since 9.2.0
 	 *
 	 * @param WP_REST_Request[] $requests The list of requests to perform.
 	 * @return WP_REST_Response The response object.
@@ -262,7 +262,7 @@ class WP_REST_Batch_Controller {
 	 *
 	 * @see   WP_REST_Server::error_to_response() This is a temporary copy of that method due to visibility.
 	 *
-	 * @since 9.0.0
+	 * @since 9.2.0
 	 *
 	 * @param WP_Error $error WP_Error instance.
 	 * @return WP_REST_Response List of associative arrays with code and message keys.
