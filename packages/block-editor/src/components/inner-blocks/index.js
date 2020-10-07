@@ -23,7 +23,7 @@ import getBlockContext from './get-block-context';
 /**
  * Internal dependencies
  */
-import BlockList from '../block-list';
+import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
@@ -46,6 +46,11 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection,
 		__experimentalCaptureToolbars: captureToolbars,
 		orientation,
+		renderAppender,
+		__experimentalTagName: TagName = 'div',
+		__experimentalPassedProps: passedProps = {},
+		__experimentalAppenderTagName,
+		className,
 	} = props;
 
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
@@ -98,19 +103,29 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
-	const classes = classnames( {
-		'has-overlay': hasOverlay,
-		'is-capturing-toolbar': captureToolbars,
-	} );
-
 	const blockList = (
 		<BlockContextProvider value={ context }>
-			<BlockList
-				{ ...props }
-				ref={ forwardedRef }
-				rootClientId={ clientId }
-				className={ classes }
-			/>
+			<TagName
+				{ ...passedProps }
+				className={ classnames(
+					'block-editor-block-list__layout',
+					className,
+					passedProps.className,
+					{
+						'has-overlay': hasOverlay,
+						'is-capturing-toolbar': captureToolbars,
+					}
+				) }
+			>
+				<BlockListItems
+					wrapperRef={ forwardedRef }
+					rootClientId={ clientId }
+					renderAppender={ renderAppender }
+					__experimentalAppenderTagName={
+						__experimentalAppenderTagName
+					}
+				/>
+			</TagName>
 		</BlockContextProvider>
 	);
 

@@ -23,17 +23,34 @@ import useBlockDropZone from '../use-block-drop-zone';
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
-function BlockList(
-	{
-		className,
-		rootClientId,
-		renderAppender,
-		__experimentalTagName = 'div',
-		__experimentalAppenderTagName,
-		__experimentalPassedProps = {},
-	},
-	ref
-) {
+function BlockList( { className, rootClientId, renderAppender }, ref ) {
+	const Container = rootClientId ? 'div' : RootContainer;
+	const fallbackRef = useRef();
+	const wrapperRef = ref || fallbackRef;
+
+	return (
+		<Container
+			ref={ wrapperRef }
+			className={ classnames(
+				'block-editor-block-list__layout',
+				className
+			) }
+		>
+			<BlockListItems
+				rootClientId={ rootClientId }
+				renderAppender={ renderAppender }
+				wrapperRef={ wrapperRef }
+			/>
+		</Container>
+	);
+}
+
+export function BlockListItems( {
+	rootClientId,
+	renderAppender,
+	__experimentalAppenderTagName,
+	wrapperRef,
+} ) {
 	function selector( select ) {
 		const {
 			getBlockOrder,
@@ -69,12 +86,8 @@ function BlockList(
 		isDraggingBlocks,
 	} = useSelect( selector, [ rootClientId ] );
 
-	const fallbackRef = useRef();
-	const element = __experimentalPassedProps.ref || ref || fallbackRef;
-
-	const Container = rootClientId ? __experimentalTagName : RootContainer;
 	const dropTargetIndex = useBlockDropZone( {
-		element,
+		element: wrapperRef,
 		rootClientId,
 	} );
 
@@ -82,15 +95,7 @@ function BlockList(
 		dropTargetIndex === blockClientIds.length && isDraggingBlocks;
 
 	return (
-		<Container
-			{ ...__experimentalPassedProps }
-			ref={ element }
-			className={ classnames(
-				'block-editor-block-list__layout',
-				className,
-				__experimentalPassedProps.className
-			) }
-		>
+		<>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection
 					? multiSelectedBlockClientIds.includes( clientId )
@@ -132,7 +137,7 @@ function BlockList(
 						isAppenderDropTarget && orientation === 'horizontal',
 				} ) }
 			/>
-		</Container>
+		</>
 	);
 }
 
