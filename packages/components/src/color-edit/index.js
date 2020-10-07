@@ -37,7 +37,7 @@ function ColorOption( {
 	onChange,
 	onRemove,
 	onConfirm,
-	confirmLabel = __( 'Ok' ),
+	confirmLabel = __( 'OK' ),
 	isEditingNameOnMount = false,
 	isEditingColorOnMount = false,
 	onCancel,
