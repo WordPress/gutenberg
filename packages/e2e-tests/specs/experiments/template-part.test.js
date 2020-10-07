@@ -49,7 +49,7 @@ describe( 'Template Part', () => {
 			// Switch to editing the header template part.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
-			await navigationPanel.navigate( 'Template parts' );
+			await navigationPanel.navigate( 'Template Parts' );
 			await navigationPanel.clickItemByText( 'header' );
 
 			// Edit it.
