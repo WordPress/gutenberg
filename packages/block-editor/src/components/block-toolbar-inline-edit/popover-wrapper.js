@@ -7,7 +7,9 @@ import {
 	withFocusOutside,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
-import { ESCAPE } from '@wordpress/keycodes';
+import { ESCAPE, UP, RIGHT, DOWN, LEFT } from '@wordpress/keycodes';
+
+const ARROW_KEYCODES = [ UP, RIGHT, DOWN, LEFT ];
 
 function stopPropagation( event ) {
 	event.stopPropagation();
@@ -32,8 +34,13 @@ const FocusManaged = withConstrainedTabbing(
 export default function PopoverWrapper( { onClose, children, className } ) {
 	// Event handlers
 	const maybeClose = ( event ) => {
-		// Close on escape
+		if ( ARROW_KEYCODES.includes( event.keyCode ) ) {
+			// Prevent WritingFlow from triggering a block focus change.
+			event.stopPropagation();
+		}
+
 		if ( event.keyCode === ESCAPE && onClose ) {
+			// Close on escape
 			event.stopPropagation();
 			onClose();
 		}
