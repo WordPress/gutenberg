@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import getTemplateInfo from '../../utils';
+import { getTemplateInfo } from '../../utils';
 
 export default function TemplateDetails( { template } ) {
 	if ( ! template ) {
