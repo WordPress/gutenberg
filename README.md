@@ -1,6 +1,6 @@
 # Gutenberg
 
-[![Build Status](https://img.shields.io/travis/com/WordPress/gutenberg/master.svg)](https://travis-ci.com/WordPress/gutenberg)
+[![End-to-End Tests](https://github.com/WordPress/gutenberg/workflows/End-to-End%20Tests/badge.svg)](https://github.com/WordPress/gutenberg/actions?query=workflow%3A%22End-to-End+Tests%22+branch%3Amaster)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org)
 
 ![Screenshot of the Gutenberg Editor, editing a post in WordPress](https://user-images.githubusercontent.com/1204802/73433964-2540d900-4346-11ea-94f3-5df2e9d876bc.png)
