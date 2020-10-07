@@ -5,6 +5,7 @@
 	height: $header-height;
 	box-sizing: border-box;
 	width: 100%;
+	padding-left: $header-height;
 
 	.edit-site-header_start,
 	.edit-site-header_end {
@@ -28,6 +29,7 @@
 
 	.edit-site-header_end {
 		justify-content: flex-end;
+		flex-basis: $header-height;
 	}
 }
 
