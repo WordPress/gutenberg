@@ -5,6 +5,7 @@ import {
 	__experimentalNavigationGroup as NavigationGroup,
 	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -20,10 +21,10 @@ export default function TemplatesPagesMenu( { templates, onActivateItem } ) {
 	return (
 		<NavigationMenu
 			menu="templates-pages"
-			title="Pages"
+			title={ __( 'Pages' ) }
 			parentMenu="templates"
 		>
-			<NavigationGroup title="Specific">
+			<NavigationGroup title={ _x( 'Specific', 'specific templates' ) }>
 				<TemplateNavigationItems
 					templates={ specificPageTemplates }
 					onActivateItem={ onActivateItem }
@@ -31,7 +32,7 @@ export default function TemplatesPagesMenu( { templates, onActivateItem } ) {
 			</NavigationGroup>
 
 			{ defaultTemplate && (
-				<NavigationGroup title="General">
+				<NavigationGroup title={ _x( 'General', 'general templates' ) }>
 					<TemplateNavigationItems
 						templates={ defaultTemplate }
 						onActivateItem={ onActivateItem }
