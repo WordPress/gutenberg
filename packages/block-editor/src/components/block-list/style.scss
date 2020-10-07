@@ -514,10 +514,16 @@
 	}
 }
 
-
 /**
  * Block Toolbar when contextual.
  */
+
+.block-editor-block-contextual-toolbar-wrapper.is-editing-in-toolbar {
+	width: 0;
+	height: 0;
+	opacity: 0;
+	overflow: hidden;
+}
 
 .block-editor-block-contextual-toolbar {
 	// Block UI appearance.
@@ -561,11 +567,6 @@
 				width: 100%;
 			}
 		}
-	}
-
-	&.is-editing-in-toolbar {
-		width: 0;
-		opacity: 0;
 	}
 }
 
