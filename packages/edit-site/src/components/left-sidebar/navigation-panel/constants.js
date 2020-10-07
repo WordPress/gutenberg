@@ -8,7 +8,7 @@ export const TEMPLATES_DEFAULT_DETAILS = {
 	'front-page': {
 		title: _x( 'Front Page', 'template name' ),
 		description: __(
-			'Front page template, for both a static page or blog posts index'
+			'Front page template, whether it displays the blog posts index or a static page'
 		),
 	},
 	archive: {
@@ -34,8 +34,8 @@ export const TEMPLATES_DEFAULT_DETAILS = {
 
 	// Pages
 	page: {
-		title: __( 'Page' ),
-		description: __( 'Single page template' ),
+		title: __( 'Single Page' ),
+		description: __( 'Template for single pages' ),
 	},
 
 	// Posts
@@ -44,8 +44,8 @@ export const TEMPLATES_DEFAULT_DETAILS = {
 		description: __( 'Template for the latest blog posts' ),
 	},
 	single: {
-		title: _x( 'Single', 'template name' ),
-		description: __( 'Single post template' ),
+		title: __( 'Single Post' ),
+		description: __( 'Template for single posts' ),
 	},
 };
 
