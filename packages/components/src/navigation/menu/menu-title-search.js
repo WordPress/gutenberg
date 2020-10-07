@@ -72,6 +72,7 @@ function MenuTitleSearch( {
 		}
 	}
 
+	const menuTitleId = `components-navigation__menu-title-${ menu }`;
 	const inputId = `components-navigation__menu-title-search-${ menu }`;
 	/* translators: placeholder for menu search box. %s: menu title */
 	const placeholder = sprintf( __( 'Search in %s' ), title );
@@ -80,7 +81,7 @@ function MenuTitleSearch( {
 		<MenuTitleSearchUI className="components-navigation__menu-title-search">
 			<Icon icon={ searchIcon } />
 
-			<VisuallyHidden as="label" htmlFor={ inputId }>
+			<VisuallyHidden as="label" htmlFor={ inputId } id={ menuTitleId }>
 				{ placeholder }
 			</VisuallyHidden>
 

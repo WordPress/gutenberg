@@ -30,7 +30,7 @@ export default function NavigationGroup( { children, className, title } ) {
 		return children;
 	}
 
-	const groupId = uniqueId( 'navigation_group_' );
+	const groupTitleId = uniqueId( 'components-navigation__group-title-' );
 	const classes = classnames( 'components-navigation__group', className );
 
 	return (
@@ -39,13 +39,13 @@ export default function NavigationGroup( { children, className, title } ) {
 				<GroupTitleUI
 					as="h3"
 					className="components-navigation__group-title"
-					id={ groupId }
+					id={ groupTitleId }
 					variant="caption"
 				>
 					{ title }
 				</GroupTitleUI>
 			) }
-			<ul aria-labelledby={ groupId } role="group">
+			<ul aria-labelledby={ groupTitleId } role="group">
 				{ children }
 			</ul>
 		</li>

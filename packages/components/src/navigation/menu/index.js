@@ -57,6 +57,7 @@ export default function NavigationMenu( props ) {
 		? setControlledSearch
 		: setUncontrolledSearch;
 
+	const menuTitleId = `components-navigation__menu-title-${ menu }`;
 	const classes = classnames( 'components-navigation__menu', className );
 
 	return (
@@ -78,7 +79,7 @@ export default function NavigationMenu( props ) {
 				/>
 
 				<NavigableMenu>
-					<ul>{ children }</ul>
+					<ul aria-labelledby={ menuTitleId }>{ children }</ul>
 				</NavigableMenu>
 			</MenuUI>
 		</NavigationMenuContext.Provider>

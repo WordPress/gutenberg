@@ -12,6 +12,7 @@ import Animate from '../../animate';
 import Button from '../../button';
 import MenuTitleSearch from './menu-title-search';
 import { MenuTitleHeadingUI, MenuTitleUI } from '../styles/navigation-styles';
+import { useNavigationMenuContext } from './context';
 
 export default function NavigationMenuTitle( {
 	hasSearch,
@@ -20,6 +21,7 @@ export default function NavigationMenuTitle( {
 	title,
 } ) {
 	const [ isSearching, setIsSearching ] = useState( false );
+	const { menu } = useNavigationMenuContext();
 	const searchButtonRef = useRef();
 
 	if ( ! title ) {
@@ -36,6 +38,7 @@ export default function NavigationMenuTitle( {
 		}, 100 );
 	};
 
+	const menuTitleId = `components-navigation__menu-title-${ menu }`;
 	/* translators: search button label for menu search box. %s: menu title */
 	const searchButtonLabel = sprintf( __( 'Search in %s' ), title );
 
@@ -47,7 +50,7 @@ export default function NavigationMenuTitle( {
 					className="components-navigation__menu-title-heading"
 					variant="title.small"
 				>
-					{ title }
+					<span id={ menuTitleId }>{ title }</span>
 
 					{ hasSearch && (
 						<Button
