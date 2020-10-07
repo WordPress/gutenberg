@@ -137,7 +137,7 @@ const setupLocale = ( locale, extraTranslations ) => {
 };
 
 export { initialHtml as initialHtmlGutenberg };
-export function setupGutenberg() {
+export function doGutenbergNativeSetup() {
 	reactNativeSetup();
 	gutenbergSetup();
 }

@@ -5,6 +5,6 @@ import 'react-native-gesture-handler';
 /**
  * Internal dependencies
  */
-import { setupGutenberg } from './src';
+import { doGutenbergNativeSetup } from './src';
 
-setupGutenberg();
+doGutenbergNativeSetup();
