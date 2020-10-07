@@ -20,7 +20,6 @@ import {
 import {
 	ToolbarGroup,
 	ToolbarButton,
-	ToolbarItem,
 	Spinner,
 	RangeControl,
 	DropdownMenu,
@@ -342,17 +341,12 @@ export default function ImageEditor( {
 							/>
 						) }
 					/>
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<AspectMenu
-								toggleProps={ toggleProps }
-								isDisabled={ inProgress }
-								onClick={ setAspect }
-								value={ aspect }
-								defaultValue={ naturalWidth / naturalHeight }
-							/>
-						) }
-					</ToolbarItem>
+					<AspectMenu
+						isDisabled={ inProgress }
+						onClick={ setAspect }
+						value={ aspect }
+						defaultValue={ naturalWidth / naturalHeight }
+					/>
 				</ToolbarGroup>
 				<ToolbarGroup>
 					<ToolbarButton
