@@ -1,3 +1,8 @@
+.wp-social-link {
+	--social-link-size: 36px;
+	--social-link-logo-size: 24px;
+}
+
 .wp-block-social-links {
 	display: flex;
 	flex-wrap: wrap;
@@ -20,8 +25,8 @@
 
 .wp-social-link {
 	display: block;
-	width: 36px;
-	height: 36px;
+	width: var(--social-link-size);
+	height: var(--social-link-size);
 	border-radius: 9999px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
 	margin: 0 8px 8px 0;
 	transition: transform 0.1s ease;
@@ -41,6 +46,8 @@
 	svg {
 		color: currentColor;
 		fill: currentColor;
+		width: var(--social-link-logo-size);
+		height: var(--social-link-logo-size);
 	}
 
 	&:hover {
@@ -69,10 +76,6 @@
 
 		// Make these bigger.
 		padding: 4px;
-		svg {
-			width: 28px;
-			height: 28px;
-		}
 	}
 
 	@import "../social-link/socials-without-bg.scss";
