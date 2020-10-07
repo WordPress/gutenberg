@@ -25,7 +25,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	/**
 	 * Overrides the route registration to support "allow_batch".
 	 *
-	 * @since 9.0.0
+	 * @since 9.2.0
 	 */
 	public function register_routes() {
 		register_rest_route(
