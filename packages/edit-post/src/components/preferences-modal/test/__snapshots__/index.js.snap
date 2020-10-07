@@ -10,7 +10,7 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
     title="General"
   >
     <WithSelect(WithDispatch(IfViewportMatches(BaseOption)))
-      help="Allow setting of tags, check dates for instance."
+      help="Allows review of document settings before publishing."
       label="Pre-publish checklist"
     />
     <WithSelect(WithDispatch(BaseOption))
@@ -27,7 +27,7 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
   >
     <WithSelect(WithDispatch(BaseOption))
       featureName="keepCaretInsideBlock"
-      help="When using the keyboard contains to active block."
+      help="Keeps keyboard cursor inside active block."
       label="Contain the text cursor"
     />
   </Section>
@@ -40,7 +40,7 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
     />
     <WithSelect(WithDispatch(BaseOption))
       featureName="reducedUI"
-      help="Reduces toolbar and outlines."
+      help="Reduces options in toolbar and outlines."
       label="Compact interface"
     />
     <WithSelect(WithDispatch(BaseOption))

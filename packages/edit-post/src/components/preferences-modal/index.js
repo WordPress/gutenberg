@@ -46,7 +46,7 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 			<Section title={ __( 'General' ) }>
 				<EnablePublishSidebarOption
 					help={ __(
-						'Allow setting of tags, check dates for instance.'
+						'Allows review of document settings before publishing.'
 					) }
 					label={ __( 'Pre-publish checklist' ) }
 				/>
@@ -63,7 +63,7 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 				<EnableFeature
 					featureName="keepCaretInsideBlock"
 					help={ __(
-						'When using the keyboard contains to active block.'
+						'Keeps keyboard cursor inside active block.'
 					) }
 					label={ __( 'Contain the text cursor' ) }
 				/>
@@ -75,7 +75,7 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 				/>
 				<EnableFeature
 					featureName="reducedUI"
-					help={ __( 'Reduces toolbar and outlines.' ) }
+					help={ __( 'Reduces options in toolbar and outlines.' ) }
 					label={ __( 'Compact interface' ) }
 				/>
 				<EnableFeature
