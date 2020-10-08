@@ -1234,7 +1234,8 @@ export function getTemplateLock( state, rootClientId ) {
  * inside another memoized selector is just a waste of time.
  *
  * @param {Object}         state        Editor state.
- * @param {string|Object}  blockName    The block type object, or a string name of
+ * @param {string|Object}  blockName    The block type object, e.g., the response
+ *                                      from the block directory; or a string name of
  *                                      an installed block type, e.g.' core/paragraph'.
  * @param {?string}        rootClientId Optional root client ID of block list.
  *
