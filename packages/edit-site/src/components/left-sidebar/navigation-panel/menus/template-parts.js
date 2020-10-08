@@ -15,13 +15,10 @@ import TemplateNavigationItems from '../template-navigation-items';
 
 export default function TemplatePartsMenu( { onActivateItem } ) {
 	const templateParts = useSelect( ( select ) => {
-		const currentTheme = select( 'core' ).getCurrentTheme()?.textdomain;
-
 		return select( 'core' ).getEntityRecords(
 			'postType',
 			'wp_template_part',
 			{
-				theme: currentTheme,
 				status: [ 'publish', 'auto-draft' ],
 				per_page: -1,
 			}
