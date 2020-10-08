@@ -26,13 +26,13 @@ import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
-	InnerBlocks,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	withColors,
 	ColorPalette,
 	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
@@ -430,6 +430,12 @@ function CoverEdit( {
 	);
 
 	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-cover__inner-container',
+		},
+		{ template: INNER_BLOCKS_TEMPLATE }
+	);
 
 	if ( ! hasBackground ) {
 		const placeholderIcon = <BlockIcon icon={ icon } />;
@@ -554,13 +560,7 @@ function CoverEdit( {
 					/>
 				) }
 				{ isBlogUrl && <Spinner /> }
-				<InnerBlocks
-					__experimentalTagName="div"
-					__experimentalPassedProps={ {
-						className: 'wp-block-cover__inner-container',
-					} }
-					template={ INNER_BLOCKS_TEMPLATE }
-				/>
+				<div { ...innerBlocksProps } />
 			</div>
 		</>
 	);

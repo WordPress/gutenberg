@@ -12,7 +12,7 @@ import { PanelBody, RangeControl, Notice } from '@wordpress/components';
 
 import {
 	InspectorControls,
-	InnerBlocks,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
@@ -66,6 +66,11 @@ function ColumnsEditContainer( {
 	const blockProps = useBlockProps( {
 		className: classes,
 	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+		orientation: 'horizontal',
+		renderAppender: false,
+	} );
 
 	return (
 		<>
@@ -93,13 +98,7 @@ function ColumnsEditContainer( {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<InnerBlocks
-				allowedBlocks={ ALLOWED_BLOCKS }
-				orientation="horizontal"
-				__experimentalTagName="div"
-				__experimentalPassedProps={ blockProps }
-				renderAppender={ false }
-			/>
+			<div { ...innerBlocksProps } />
 		</>
 	);
 }

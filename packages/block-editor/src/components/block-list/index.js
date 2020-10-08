@@ -30,17 +30,36 @@ const appenderNodesMap = new Map();
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
-function BlockList(
-	{
-		className,
-		rootClientId,
-		renderAppender,
-		__experimentalTagName = 'div',
-		__experimentalAppenderTagName,
-		__experimentalPassedProps = {},
-	},
-	ref
-) {
+function BlockList( { className, rootClientId, renderAppender }, ref ) {
+	const Container = rootClientId ? 'div' : RootContainer;
+	const fallbackRef = useRef();
+	const wrapperRef = ref || fallbackRef;
+
+	return (
+		<AppenderNodesContext.Provider value={ appenderNodesMap }>
+			<Container
+				ref={ wrapperRef }
+				className={ classnames(
+					'block-editor-block-list__layout',
+					className
+				) }
+			>
+				<BlockListItems
+					rootClientId={ rootClientId }
+					renderAppender={ renderAppender }
+					wrapperRef={ wrapperRef }
+				/>
+			</Container>
+		</AppenderNodesContext.Provider>
+	);
+}
+
+function Items( {
+	rootClientId,
+	renderAppender,
+	__experimentalAppenderTagName,
+	wrapperRef,
+} ) {
 	function selector( select ) {
 		const {
 			getBlockOrder,
@@ -76,12 +95,8 @@ function BlockList(
 		isDraggingBlocks,
 	} = useSelect( selector, [ rootClientId ] );
 
-	const fallbackRef = useRef();
-	const element = __experimentalPassedProps.ref || ref || fallbackRef;
-
-	const Container = rootClientId ? __experimentalTagName : RootContainer;
 	const dropTargetIndex = useBlockDropZone( {
-		element,
+		element: wrapperRef,
 		rootClientId,
 	} );
 
@@ -89,72 +104,60 @@ function BlockList(
 		dropTargetIndex === blockClientIds.length && isDraggingBlocks;
 
 	return (
-		<AppenderNodesContext.Provider value={ appenderNodesMap }>
-			<Container
-				{ ...__experimentalPassedProps }
-				ref={ element }
-				className={ classnames(
-					'block-editor-block-list__layout',
-					className,
-					__experimentalPassedProps.className
-				) }
-			>
-				{ blockClientIds.map( ( clientId, index ) => {
-					const isBlockInSelection = hasMultiSelection
-						? multiSelectedBlockClientIds.includes( clientId )
-						: selectedBlockClientId === clientId;
+		<>
+			{ blockClientIds.map( ( clientId, index ) => {
+				const isBlockInSelection = hasMultiSelection
+					? multiSelectedBlockClientIds.includes( clientId )
+					: selectedBlockClientId === clientId;
 
-					const isDropTarget =
-						dropTargetIndex === index && isDraggingBlocks;
+				const isDropTarget =
+					dropTargetIndex === index && isDraggingBlocks;
 
-					return (
-						<AsyncModeProvider
-							key={ clientId }
-							value={ ! isBlockInSelection }
-						>
-							<BlockListBlock
-								rootClientId={ rootClientId }
-								clientId={ clientId }
-								// This prop is explicitely computed and passed down
-								// to avoid being impacted by the async mode
-								// otherwise there might be a small delay to trigger the animation.
-								index={ index }
-								enableAnimation={ enableAnimation }
-								className={ classnames( {
-									'is-drop-target': isDropTarget,
-									'is-dropping-horizontally':
-										isDropTarget &&
-										orientation === 'horizontal',
-								} ) }
-							/>
-						</AsyncModeProvider>
-					);
+				return (
+					<AsyncModeProvider
+						key={ clientId }
+						value={ ! isBlockInSelection }
+					>
+						<BlockListBlock
+							rootClientId={ rootClientId }
+							clientId={ clientId }
+							// This prop is explicitely computed and passed down
+							// to avoid being impacted by the async mode
+							// otherwise there might be a small delay to trigger the animation.
+							index={ index }
+							enableAnimation={ enableAnimation }
+							className={ classnames( {
+								'is-drop-target': isDropTarget,
+								'is-dropping-horizontally':
+									isDropTarget &&
+									orientation === 'horizontal',
+							} ) }
+						/>
+					</AsyncModeProvider>
+				);
+			} ) }
+			<BlockListAppender
+				tagName={ __experimentalAppenderTagName }
+				rootClientId={ rootClientId }
+				renderAppender={ renderAppender }
+				className={ classnames( {
+					'is-drop-target': isAppenderDropTarget,
+					'is-dropping-horizontally':
+						isAppenderDropTarget && orientation === 'horizontal',
 				} ) }
-				<BlockListAppender
-					tagName={ __experimentalAppenderTagName }
-					rootClientId={ rootClientId }
-					renderAppender={ renderAppender }
-					className={ classnames( {
-						'is-drop-target': isAppenderDropTarget,
-						'is-dropping-horizontally':
-							isAppenderDropTarget &&
-							orientation === 'horizontal',
-					} ) }
-				/>
-			</Container>
-		</AppenderNodesContext.Provider>
+			/>
+		</>
 	);
 }
 
-const ForwardedBlockList = forwardRef( BlockList );
-
-// This component needs to always be synchronous
-// as it's the one changing the async mode
-// depending on the block selection.
-export default forwardRef( ( props, ref ) => {
+export function BlockListItems( props ) {
+	// This component needs to always be synchronous as it's the one changing
+	// the async mode depending on the block selection.
 	return (
 		<AsyncModeProvider value={ false }>
-			<ForwardedBlockList ref={ ref } { ...props } />
+			<Items { ...props } />
 		</AsyncModeProvider>
 	);
-} );
+}
+
+export default forwardRef( BlockList );
