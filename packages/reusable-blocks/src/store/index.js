@@ -7,7 +7,6 @@ import { registerStore } from '@wordpress/data';
  * Internal dependencies
  */
 import reducer from './reducer';
-import * as selectors from './selectors';
 import * as actions from './actions';
 import { STORE_KEY } from './constants';
 import applyMiddlewares from './middlewares';
@@ -21,7 +20,6 @@ import applyMiddlewares from './middlewares';
  */
 export const storeConfig = {
 	reducer,
-	selectors,
 	actions,
 };
 
