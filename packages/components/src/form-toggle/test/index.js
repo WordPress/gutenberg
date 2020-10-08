@@ -8,6 +8,7 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import FormToggle from '../';
+import { StyledToggleInput } from '../styles/form-toggle-styles';
 
 describe( 'FormToggle', () => {
 	describe( 'basic rendering', () => {
@@ -17,16 +18,14 @@ describe( 'FormToggle', () => {
 				true
 			);
 			expect( formToggle.hasClass( 'is-checked' ) ).toBe( false );
-			expect( formToggle.type() ).toBe( 'span' );
+			expect( formToggle.type().__emotion_base ).toBe( 'span' );
 		} );
 
 		it( 'should render a checked checkbox and change the accessibility text to On when providing checked prop', () => {
 			const formToggle = shallow( <FormToggle checked /> );
 			expect( formToggle.hasClass( 'is-checked' ) ).toBe( true );
 			expect(
-				formToggle
-					.find( '.components-form-toggle__input' )
-					.prop( 'checked' )
+				formToggle.find( StyledToggleInput ).prop( 'checked' )
 			).toBe( true );
 		} );
 
@@ -40,21 +39,18 @@ describe( 'FormToggle', () => {
 			// `withInstanceId`. In this case, it's fine to use literal IDs.
 			// eslint-disable-next-line no-restricted-syntax
 			const formToggle = shallow( <FormToggle id="test" /> );
-			expect(
-				formToggle.find( '.components-form-toggle__input' ).prop( 'id' )
-			).toBe( 'test' );
+			expect( formToggle.find( StyledToggleInput ).prop( 'id' ) ).toBe(
+				'test'
+			);
 		} );
 
 		it( 'should render a checkbox with a noop onChange', () => {
 			const formToggle = shallow( <FormToggle /> );
-			const checkBox = formToggle
-				.prop( 'children' )
-				.find(
-					( child ) =>
-						'input' === child.type &&
-						'checkbox' === child.props.type
-				);
-			expect( checkBox.props.onChange ).toBe( noop );
+			expect( formToggle ).toMatchSnapshot();
+
+			expect(
+				formToggle.find( StyledToggleInput ).prop( 'onChange' )
+			).toBe( noop );
 		} );
 
 		it( 'should render a checkbox with a user-provided onChange', () => {
@@ -62,14 +58,11 @@ describe( 'FormToggle', () => {
 			const formToggle = shallow(
 				<FormToggle onChange={ testFunction } />
 			);
-			const checkBox = formToggle
-				.prop( 'children' )
-				.find(
-					( child ) =>
-						'input' === child.type &&
-						'checkbox' === child.props.type
-				);
-			expect( checkBox.props.onChange ).toBe( testFunction );
+			expect( formToggle ).toMatchSnapshot();
+
+			expect(
+				formToggle.find( StyledToggleInput ).prop( 'onChange' )
+			).toBe( testFunction );
 		} );
 	} );
 } );
