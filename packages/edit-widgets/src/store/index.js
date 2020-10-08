@@ -40,7 +40,7 @@ const store = registerStore( MODULE_KEY, storeConfig );
 // bound to fail anyway.
 apiFetch.use( function ( options, next ) {
 	if ( options.path?.indexOf( '/wp/v2/types/widget-area' ) === 0 ) {
-		return {};
+		return Promise.resolve( {} );
 	}
 
 	return next( options );

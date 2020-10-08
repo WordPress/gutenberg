@@ -34,7 +34,10 @@ export function initialize( id, settings ) {
 		registerBlock( createLegacyWidget( settings ) );
 		registerBlock( widgetArea );
 	}
-	render( <Layout blockEditorSettings={ settings } />, document.getElementById( id ) );
+	render(
+		<Layout blockEditorSettings={ settings } />,
+		document.getElementById( id )
+	);
 }
 
 /**
