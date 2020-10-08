@@ -20,13 +20,13 @@ import {
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
+import { ReusableBlocksButtons } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
  */
 import withRegistryProvider from './with-registry-provider';
 import { mediaUpload } from '../../utils';
-import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
 
 /**

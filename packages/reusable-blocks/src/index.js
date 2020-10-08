@@ -10,4 +10,5 @@ import '@wordpress/notices';
  */
 import './store';
 
+export * from './components';
 export { storeConfig } from './store';
