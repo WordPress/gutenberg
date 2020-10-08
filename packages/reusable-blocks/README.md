@@ -27,9 +27,6 @@ const { __experimentalReusableBlocks } = useSelect(
     } )
 );
 
-const { __experimentalFetchReusableBlocks } = useDispatch(
-    'core/reusable-blocks'
-);
 return (
     <BlockEditorProvider
         value={ blocks }
@@ -38,7 +35,6 @@ return (
         settings={ {
             ...settings,
             __experimentalReusableBlocks,
-            __experimentalFetchReusableBlocks,
         } }
         { ...props }
     />

@@ -159,7 +159,6 @@ class EditorProvider extends Component {
 	getBlockEditorSettings(
 		settings,
 		reusableBlocks,
-		__experimentalFetchReusableBlocks,
 		hasUploadPermissions,
 		canUserUseUnfilteredHTML,
 		undo,
@@ -213,7 +212,6 @@ class EditorProvider extends Component {
 				content: c.content.raw,
 				title: c.title.raw,
 			} ) ),
-			__experimentalFetchReusableBlocks: () => Promise.resolve(),
 			__experimentalFetchLinkSuggestions: partialRight(
 				fetchLinkSuggestions,
 				settings
@@ -257,7 +255,6 @@ class EditorProvider extends Component {
 			resetEditorBlocksWithoutUndoLevel,
 			hasUploadPermissions,
 			isPostTitleSelected,
-			__experimentalFetchReusableBlocks,
 			undo,
 		} = this.props;
 
@@ -268,7 +265,6 @@ class EditorProvider extends Component {
 		const editorSettings = this.getBlockEditorSettings(
 			settings,
 			reusableBlocks,
-			__experimentalFetchReusableBlocks,
 			hasUploadPermissions,
 			canUserUseUnfilteredHTML,
 			undo,
