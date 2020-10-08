@@ -80,12 +80,20 @@
 }
 
 // Font Styles.
-.has-normal-font-style {
-	font-style: normal;
+.has-bold-font-weight {
+	font-weight: bold;
 }
 
 .has-italic-font-style {
 	font-style: italic;
+}
+
+.has-underline-text-decoration {
+	text-decoration: underline;
+}
+
+.has-strikethrough-text-decoration {
+	text-decoration: line-through;
 }
 
 // Text alignments.

@@ -387,8 +387,6 @@ function gutenberg_experimental_global_styles_get_css_property( $style_property 
 			return 'background-color';
 		case 'fontSize':
 			return 'font-size';
-		case 'fontStyle':
-			return 'font-style';
 		case 'lineHeight':
 			return 'line-height';
 		default:
@@ -408,7 +406,6 @@ function gutenberg_experimental_global_styles_get_style_property() {
 		'backgroundColor'          => array( 'color', 'background' ),
 		'color'                    => array( 'color', 'text' ),
 		'fontSize'                 => array( 'typography', 'fontSize' ),
-		'fontStyle'                => array( 'typography', 'fontStyle' ),
 		'lineHeight'               => array( 'typography', 'lineHeight' ),
 	);
 }
@@ -425,7 +422,6 @@ function gutenberg_experimental_global_styles_get_support_keys() {
 		'backgroundColor'          => array( '__experimentalColor' ),
 		'color'                    => array( '__experimentalColor' ),
 		'fontSize'                 => array( '__experimentalFontSize' ),
-		'fontStyle'                => array( '__experimentalFontStyle' ),
 		'lineHeight'               => array( '__experimentalLineHeight' ),
 	);
 }
@@ -448,10 +444,6 @@ function gutenberg_experimental_global_styles_get_presets_structure() {
 		'fontSize'  => array(
 			'path' => array( 'typography', 'fontSizes' ),
 			'key'  => 'size',
-		),
-		'fontStyle' => array(
-			'path' => array( 'typography', 'fontStyles' ),
-			'key'  => 'style',
 		),
 	);
 }

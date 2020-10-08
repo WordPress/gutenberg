@@ -52,3 +52,16 @@
 		display: none;
 	}
 }
+
+// Font Styles: Text Decorations
+.wp-block-navigation.has-underline-text-decoration {
+	.wp-block-navigation-link__content {
+		text-decoration: underline;
+	}
+}
+
+.wp-block-navigation.has-strikethrough-text-decoration {
+	.wp-block-navigation-link__content {
+		text-decoration: line-through;
+	}
+}

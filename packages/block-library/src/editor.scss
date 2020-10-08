@@ -95,13 +95,22 @@
 }
 
 // Font Styles.
-.editor-styles-wrapper .has-normal-font-style {
-	font-style: normal;
+.editor-styles-wrapper .has-bold-font-weight {
+	font-weight: bold;
 }
 
 .editor-styles-wrapper .has-italic-font-style {
 	font-style: italic;
 }
+
+.editor-styles-wrapper .has-underline-text-decoration {
+	text-decoration: underline;
+}
+
+.editor-styles-wrapper .has-strikethrough-text-decoration {
+	text-decoration: line-through;
+}
+
 
 /**
  * Editor Normalization Styles

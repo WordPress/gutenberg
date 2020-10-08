@@ -1,11 +1,16 @@
 /**
  * WordPress dependencies
  */
-import TokenList from '@wordpress/token-list';
-import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { SelectControl } from '@wordpress/components';
+import { Button, ButtonGroup, Icon } from '@wordpress/components';
+import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
+import {
+	formatBold,
+	formatItalic,
+	formatStrikethrough,
+} from '@wordpress/icons';
+import TokenList from '@wordpress/token-list';
 
 /**
  * Internal dependencies
@@ -16,28 +21,18 @@ import { cleanEmptyObject } from './utils';
 export const FONT_STYLE_SUPPORT_KEY = '__experimentalFontStyle';
 
 /**
- * Filters registered block settings, extending attributes to include
- * `fontStyle`.
+ * Collection of CSS classes to apply the various font styling options.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * Rather than use a simple `has-<something>-font-style` format, this option
+ * was chosen so that the CSS classes were more explicit in what they would be
+ * setting.
  */
-function addAttribute( settings ) {
-	if ( ! hasBlockSupport( settings, FONT_STYLE_SUPPORT_KEY ) ) {
-		return settings;
-	}
-
-	// Allow blocks to specify a default value if needed.
-	if ( ! settings.attributes?.fontStyle ) {
-		// Handle edge case where attributes is undefined as well.
-		settings.attributes = {
-			...settings.attributes,
-			fontStyle: { type: 'string' },
-		};
-	}
-
-	return settings;
-}
+export const fontStyleClasses = {
+	bold: 'has-bold-font-weight',
+	italic: 'has-italic-font-style',
+	underline: 'has-underline-text-decoration',
+	strikethrough: 'has-strikethrough-text-decoration',
+};
 
 /**
  * Override props assigned to save component to inject font style.
@@ -52,11 +47,19 @@ function addSaveProps( props, blockType, attributes ) {
 		return props;
 	}
 
-	if ( attributes.fontStyle ) {
+	if ( attributes.style?.typography?.fontStyles ) {
+		const styles = attributes.style.typography.fontStyles;
+
 		// Use TokenList to de-dupe classes.
 		const classes = new TokenList( props.className );
 		classes.add( `has-font-style` );
-		classes.add( `has-${ attributes.fontStyle }-font-style` );
+
+		for ( const style in styles ) {
+			if ( styles[ style ] ) {
+				classes.add( fontStyleClasses[ style ] );
+			}
+		}
+
 		const newClassName = classes.value;
 		props.className = newClassName ? newClassName : undefined;
 	}
@@ -100,45 +103,92 @@ export function FontStyleEdit( props ) {
 		setAttributes,
 	} = props;
 
+	const allowedFontStyles = useEditorFeature( 'typography.fontStyles' );
 	const isDisabled = useIsFontStyleDisabled( props );
 
 	if ( isDisabled ) {
 		return null;
 	}
 
-	const onChange = ( fontStyle ) => {
+	// Need to force the size related styles to be applied to dashicon.
+	const underlineIcon = () => (
+		<Icon
+			icon="editor-underline"
+			size={ 24 }
+			style={ { width: '24px', height: '24px', fontSize: '24px' } }
+		/>
+	);
+
+	const fontStyles = style?.typography?.fontStyles || {};
+	const { bold, italic, underline, strikethrough } = fontStyles;
+
+	const updateFontStyles = ( toggledStyles ) => {
 		const newStyle = {
 			...style,
 			typography: {
 				...style?.typography,
-				fontStyle: fontStyle ? fontStyle : undefined,
+				fontStyles: {
+					...fontStyles,
+					...toggledStyles,
+				},
 			},
 		};
 
-		setAttributes( {
-			style: cleanEmptyObject( newStyle ),
-			fontStyle,
-		} );
+		setAttributes( { style: cleanEmptyObject( newStyle ) } );
 	};
 
-	const styleOptions = [
-		{
-			label: __( 'Normal' ),
-			value: '',
-		},
-		{
-			label: __( 'Italics' ),
-			value: 'italic',
-		},
-	];
-
 	return (
-		<SelectControl
-			options={ styleOptions }
-			value={ style?.typography?.fontStyle }
-			label={ __( 'Font Style' ) }
-			onChange={ onChange }
-		/>
+		<>
+			<p>{ __( 'Font Styles' ) }</p>
+			<ButtonGroup>
+				{ allowedFontStyles.bold && (
+					<Button
+						icon={ formatBold }
+						label="Bold"
+						isPressed={ bold }
+						onClick={ () => updateFontStyles( { bold: ! bold } ) }
+					/>
+				) }
+				{ allowedFontStyles.italic && (
+					<Button
+						icon={ formatItalic }
+						label="Italic"
+						isPressed={ italic }
+						onClick={ () =>
+							updateFontStyles( { italic: ! italic } )
+						}
+					/>
+				) }
+				{ allowedFontStyles.underline && (
+					<Button
+						icon={ underlineIcon }
+						label="Underline"
+						isPressed={ underline }
+						onClick={ () =>
+							updateFontStyles( {
+								underline: ! underline,
+								strikethrough: ! underline
+									? false
+									: strikethrough,
+							} )
+						}
+					/>
+				) }
+				{ allowedFontStyles.strikethrough && (
+					<Button
+						icon={ formatStrikethrough }
+						label="Strikethrough"
+						isPressed={ strikethrough }
+						onClick={ () =>
+							updateFontStyles( {
+								strikethrough: ! strikethrough,
+								underline: ! strikethrough ? false : underline,
+							} )
+						}
+					/>
+				) }
+			</ButtonGroup>
+		</>
 	);
 }
 
@@ -150,19 +200,14 @@ export function FontStyleEdit( props ) {
  */
 export function useIsFontStyleDisabled( { name: blockName } = {} ) {
 	const fontStyles = useEditorFeature( 'typography.fontStyles' );
-	const hasFontStyles = fontStyles.length;
+	const hasFontStyles =
+		Object.values( fontStyles ).filter( ( style ) => style ).length >= 1;
 
 	return (
 		! hasBlockSupport( blockName, FONT_STYLE_SUPPORT_KEY ) ||
 		! hasFontStyles
 	);
 }
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/font-style/addAttribute',
-	addAttribute
-);
 
 addFilter(
 	'blocks.getSaveContent.extraProps',

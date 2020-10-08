@@ -103,10 +103,15 @@
 	}
 }
 
+.wp-block-navigation:not(.has-underline-text-decoration):not(.has-strikethrough-text-decoration) {
+	.wp-block-navigation-link__content {
+		text-decoration: none;
+	}
+}
+
 // All links
 .wp-block-navigation-link__content {
 	color: inherit;
-	text-decoration: none;
 	padding: 0.5em 1em;
 
 	+ .wp-block-navigation-link__content {

@@ -161,18 +161,12 @@
 						"size": 42
 					}
 				],
-				"fontStyles": [
-					{
-						"name": "Normal",
-						"slug": "normal",
-						"style": "normal"
-					},
-					{
-						"name": "Italics",
-						"slug": "italics",
-						"style": "italic"
-					}
-				]
+				"fontStyles": {
+					"bold": true,
+					"italic": true,
+					"underline": true,
+					"strikethrough": true
+				}
 			},
 			"spacing": {
 				"customPadding": false,

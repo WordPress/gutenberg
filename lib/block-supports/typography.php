@@ -41,12 +41,6 @@ function gutenberg_register_typography_support( $block_type ) {
 			'type' => 'string',
 		);
 	}
-
-	if ( $has_font_style_support && ! array_key_exists( 'fontStyle', $block_type->attributes ) ) {
-		$block_type->attributes['fontStyle'] = array(
-			'type' => 'string',
-		);
-	}
 }
 
 /**
@@ -88,14 +82,29 @@ function gutenberg_apply_typography_support( $attributes, $block_attributes, $bl
 		}
 	}
 
-	// Font Style.
+	// Font Styles e.g. bold, italic, underline & strikethrough.
 	if ( $has_font_style_support ) {
-		$has_font_style = array_key_exists( 'fontStyle', $block_attributes );
+		$has_font_styles = isset( $block_attributes['style']['typography']['fontStyles'] );
 
-		// Apply required class or style.
-		if ( $has_font_style ) {
+		// Apply required CSS classes.
+		if ( $has_font_styles ) {
 			$attributes['css_classes'][] = 'has-font-style';
-			$attributes['css_classes'][] = sprintf( 'has-%s-font-style', $block_attributes['fontStyle'] );
+
+			// CSS class names chosen to be more explicit than generic `has-<something>-font-style`.
+			$font_style_classes = array(
+				'bold'          => 'has-bold-font-weight',
+				'italic'        => 'has-italic-font-style',
+				'underline'     => 'has-underline-text-decoration',
+				'strikethrough' => 'has-strikethrough-text-decoration',
+			);
+
+			$style_selections = $block_attributes['style']['typography']['fontStyles'];
+
+			foreach ( $style_selections as $style => $turned_on ) {
+				if ( $turned_on ) {
+					$attributes['css_classes'][] = $font_style_classes[ $style ];
+				}
+			}
 		}
 	}
 
