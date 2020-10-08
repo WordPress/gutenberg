@@ -7,18 +7,19 @@ import { flow } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { MenuItem, withSpokenMessages } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
+import { useSpeak } from '@wordpress/compose';
 
-function FeatureToggle( {
+export default function FeatureToggle( {
 	feature,
 	label,
 	info,
 	messageActivated,
 	messageDeactivated,
-	speak,
 } ) {
+	const speak = useSpeak();
 	const speakMessage = () => {
 		if ( isActive ) {
 			speak( messageDeactivated || __( 'Feature deactivated' ) );
@@ -48,5 +49,3 @@ function FeatureToggle( {
 		</MenuItem>
 	);
 }
-
-export default withSpokenMessages( FeatureToggle );

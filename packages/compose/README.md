@@ -146,6 +146,14 @@ _Returns_
 
 -   `boolean`: Whether or not the text has been copied. Resets after the timeout.
 
+<a name="useDebouncedSpeak" href="#useDebouncedSpeak">#</a> **useDebouncedSpeak**
+
+Returns a debounced speak function.
+
+_Related_
+
+-   <https://developer.wordpress.org/block-editor/packages/packages-a11y/#speak>
+
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
 Provides a unique instance ID.
@@ -221,6 +229,14 @@ const App = () => {
 _Returns_
 
 -   `Array`: An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
+
+<a name="useSpeak" href="#useSpeak">#</a> **useSpeak**
+
+Returns a speak function.
+
+_Related_
+
+-   <https://developer.wordpress.org/block-editor/packages/packages-a11y/#speak>
 
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
