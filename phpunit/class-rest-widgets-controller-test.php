@@ -402,15 +402,11 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request = new WP_REST_Request( 'POST', '/__experimental/widgets' );
 		$request->set_body_params(
 			array(
-				'sidebar'      => 'sidebar-1',
-				'settings'     => array(
+				'sidebar'  => 'sidebar-1',
+				'settings' => array(
 					'text' => 'Updated text test',
 				),
-				'id_base'      => 'text',
-				'widget_class' => 'WP_Widget_Text',
-				'name'         => 'Text',
-				'description'  => 'Arbitrary text.',
-				'number'       => 1,
+				'id_base'  => 'text',
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
@@ -418,6 +414,49 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 'text-1', $data['id'] );
 		$this->assertEquals( 'sidebar-1', $data['sidebar'] );
 		$this->assertEquals( 1, $data['number'] );
+		$this->assertEquals(
+			array(
+				'text'   => 'Updated text test',
+				'title'  => '',
+				'filter' => false,
+			),
+			$data['settings']
+		);
+	}
+
+	/**
+	 *
+	 */
+	public function test_create_item_second_instance() {
+		$this->setup_widget(
+			'widget_text',
+			1,
+			array(
+				'text' => 'Custom text test',
+			)
+		);
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/widgets' );
+		$request->set_body_params(
+			array(
+				'sidebar'  => 'sidebar-1',
+				'settings' => array(
+					'text' => 'Updated text test',
+				),
+				'id_base'  => 'text',
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals( 'text-2', $data['id'] );
+		$this->assertEquals( 'sidebar-1', $data['sidebar'] );
+		$this->assertEquals( 2, $data['number'] );
 		$this->assertEquals(
 			array(
 				'text'   => 'Updated text test',
@@ -775,17 +814,21 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		$this->assertEquals(
 			array(
-				'id'           => 'text-1',
-				'sidebar'      => 'wp_inactive_widgets',
-				'settings'     => array(
+				'id'            => 'text-1',
+				'sidebar'       => 'wp_inactive_widgets',
+				'settings'      => array(
 					'text' => 'Custom text test',
 				),
-				'id_base'      => 'text',
-				'widget_class' => 'WP_Widget_Text',
-				'name'         => 'Text',
-				'description'  => 'Arbitrary text.',
-				'number'       => 1,
-				'rendered'     => '<div class="textwidget">Custom text test</div>',
+				'id_base'       => 'text',
+				'widget_class'  => 'WP_Widget_Text',
+				'name'          => 'Text',
+				'description'   => 'Arbitrary text.',
+				'number'        => 1,
+				'rendered'      => '<div class="textwidget">Custom text test</div>',
+				'rendered_form' => '<input id="widget-text-1-title" name="widget-text[1][title]" class="title sync-input" type="hidden" value="">' . "\n" .
+				                   '			<textarea id="widget-text-1-text" name="widget-text[1][text]" class="text sync-input" hidden>Custom text test</textarea>' . "\n" .
+				                   '			<input id="widget-text-1-filter" name="widget-text[1][filter]" class="filter sync-input" type="hidden" value="on">' . "\n" .
+				                   '			<input id="widget-text-1-visual" name="widget-text[1][visual]" class="visual sync-input" type="hidden" value="on">',
 			),
 			$response->get_data()
 		);

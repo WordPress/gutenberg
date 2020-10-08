@@ -170,10 +170,12 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function create_item( $request ) {
+		$sidebar_id = $request['sidebar'];
+
 		$backup_post = $_POST;
-		$sidebar_id  = $request['sidebar'];
 		$widget_id   = $this->save_widget( $request );
 		$_POST       = $backup_post;
+
 		$this->assign_to_sidebar( $widget_id, $sidebar_id );
 
 		$request['context'] = 'edit';
@@ -258,9 +260,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			return $sidebar_id;
 		}
 
+		$request['context'] = 'edit';
+
 		if ( $request['force'] ) {
-			$request['context'] = 'edit';
-			$prepared           = $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
+			$prepared = $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
 			$this->assign_to_sidebar( $widget_id, null );
 			$prepared->set_data(
 				array(
@@ -269,10 +272,10 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 				)
 			);
 		} else {
-			$this->assign_to_sidebar( $widget_id, 'wp_inactive_sidebar' );
+			$this->assign_to_sidebar( $widget_id, 'wp_inactive_widgets' );
 			$prepared = $this->prepare_item_for_response(
 				array(
-					'sidebar_id' => 'wp_inactive_sidebar',
+					'sidebar_id' => 'wp_inactive_widgets',
 					'widget_id'  => $widget_id,
 				),
 				$request
@@ -355,14 +358,6 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	protected function save_widget( $request ) {
 		global $wp_registered_widget_updates, $wp_registered_widgets;
 
-		// Initialize $numbers.
-		$numbers = array();
-		foreach ( $wp_registered_widget_updates as $id_base => $control ) {
-			if ( is_array( $control['callback'] ) ) {
-				$numbers[ $id_base ] = $control['callback'][0]->number + 1;
-			}
-		}
-
 		$input_widget = $request->get_params();
 
 		ob_start();
@@ -370,7 +365,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			// Class-based widget.
 			$update_control = $wp_registered_widget_updates[ $input_widget['id_base'] ];
 			if ( ! isset( $input_widget['id'] ) ) {
-				$number = $numbers[ $input_widget['id_base'] ] ++;
+				$number = $this->get_last_number_for_widget( $input_widget['id_base'] ) + 1;
 				$id     = $input_widget['id_base'] . '-' . $number;
 
 				$input_widget['id']     = $id;
@@ -385,7 +380,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 
 			// Just because we saved new widget doesn't mean it was added to $wp_registered_widgets.
 			// Let's make sure it's there so that it's included in the response.
-			if ( ! isset( $wp_registered_widgets[ $input_widget['id'] ] ) ) {
+			if ( ! isset( $wp_registered_widgets[ $input_widget['id'] ] ) || $number === 1 ) {
 				$first_widget_id = substr( $input_widget['id'], 0, strrpos( $input_widget['id'], '-' ) ) . '-1';
 
 				if ( isset( $wp_registered_widgets[ $first_widget_id ] ) ) {
@@ -422,6 +417,33 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		ob_end_clean();
 
 		return $input_widget['id'];
+	}
+
+	/**
+	 * Gets the last number used by the given widget.
+	 *
+	 * @param string $id_base The widget id base.
+	 * @return int The last number, or zero if the widget has not been used.
+	 */
+	protected function get_last_number_for_widget( $id_base ) {
+		global $wp_registered_widget_updates;
+
+		if ( ! is_array( $wp_registered_widget_updates[ $id_base ]['callback'] ) ) {
+			return 0;
+		}
+
+		if ( ! $wp_registered_widget_updates[ $id_base ]['callback'][0] instanceof WP_Widget ) {
+			return 0;
+		}
+
+		$widget    = $wp_registered_widget_updates[ $id_base ]['callback'][0];
+		$instances = array_filter( $widget->get_settings(), 'is_numeric', ARRAY_FILTER_USE_KEY );
+
+		if ( ! $instances ) {
+			return 0;
+		}
+
+		return $widget->number;
 	}
 
 	/**
@@ -473,7 +495,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			$widget_parameters = array_merge(
 				array(
 					array_merge(
-						$registered_sidebar,
+						(array) $registered_sidebar,
 						array(
 							'widget_id'   => $widget_id,
 							'widget_name' => $widget['name'],
