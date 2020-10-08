@@ -168,7 +168,7 @@ describe( 'Multi-entity editor states', () => {
 	} );
 
 	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
-		await clickTemplateItem( 'Template parts', 'header' );
+		await clickTemplateItem( 'Template Parts', 'header' );
 
 		// Wait for blocks to load.
 		await page.waitForSelector( '.wp-block' );
