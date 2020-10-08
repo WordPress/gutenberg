@@ -88,7 +88,7 @@ export default function DocumentActions( { documentTitle } ) {
 				<>
 					<h1 className="edit-site-document-actions__title-wrapper">
 						<VisuallyHidden>
-							{ __( 'Edit document:' ) }
+							{ __( 'Edit template:' ) }
 						</VisuallyHidden>
 						<div
 							className={ classnames(
