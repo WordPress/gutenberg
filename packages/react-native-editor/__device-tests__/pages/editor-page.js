@@ -482,10 +482,10 @@ export default class EditorPage {
 		if ( isAndroid() ) {
 			await swipeDown( this.driver );
 		} else {
-			const cancelButton = await this.driver.elementByAccessibilityId(
-				'Cancel'
+			const dismissButton = await this.driver.elementByAccessibilityId(
+				'Dismiss'
 			);
-			await cancelButton.click();
+			await dismissButton.click();
 		}
 	}
 }
