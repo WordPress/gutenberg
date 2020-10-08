@@ -18,7 +18,7 @@ import QueryProvider from './query-provider';
 import QueryInspectorControls from './query-inspector-controls';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
-const TEMPLATE = [ [ 'core/query-loop' ], [ 'core/query-pagination' ] ];
+const TEMPLATE = [ [ 'core/query-loop' ] ];
 export default function QueryEdit( {
 	attributes: { queryId, query },
 	context: { postId },
