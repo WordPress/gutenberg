@@ -63,7 +63,6 @@ function InterfaceSkeleton( {
 				'interface-interface-skeleton'
 			) }
 		>
-			{ /* TODO: Refactor flex layout so that content respects expanded sidebar */ }
 			<div className="interface-interface-skeleton__layout">
 				{ !! navigationSidebar && (
 					<div
