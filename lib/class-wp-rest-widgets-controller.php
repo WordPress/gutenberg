@@ -679,7 +679,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 */
 	public function get_item_schema() {
 		if ( $this->schema ) {
-			return $this->schema;
+			return $this->add_additional_fields_schema( $this->schema );
 		}
 
 		$this->schema = array(
@@ -745,6 +745,6 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			),
 		);
 
-		return $this->schema;
+		return $this->add_additional_fields_schema( $this->schema );
 	}
 }
