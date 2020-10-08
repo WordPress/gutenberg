@@ -14,7 +14,9 @@ class GutenbergViewController: UIViewController {
     }()
     fileprivate var longPressGesture: UILongPressGestureRecognizer!
     fileprivate var contentInfo: ContentInfo?
-    
+    private var unsupportedBlockCanBeActivated = false
+    private var unsupportedBlockEnabled = true
+
     override func loadView() {
         view = gutenberg.rootView
     }
@@ -266,7 +268,8 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergCapabilities() -> [Capabilities : Bool] {
         return [
             .mentions: true,
-            .unsupportedBlockEditor: true,
+            .unsupportedBlockEditor: unsupportedBlockEnabled,
+            .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
         ]
     }
 
@@ -315,6 +318,7 @@ extension GutenbergViewController {
         let cancelAction = UIAlertAction(title: "Keep Editing", style: .cancel)
         alert.addAction(toggleHTMLModeAction)
         alert.addAction(updateHtmlAction)
+        alert.addAction(unsupportedBlockUIAction)
         alert.addAction(cancelAction)
 
         present(alert, animated: true)
@@ -340,6 +344,21 @@ extension GutenbergViewController {
                     }
                 })
                 self.present(alert, animated: true, completion: nil)
+        })
+    }
+
+    var unsupportedBlockUIAction: UIAlertAction {
+        return UIAlertAction(
+            title: "Toggle Missing Block Alert UI",
+            style: .default,
+            handler: { [unowned self] action in
+                if self.unsupportedBlockEnabled || (self.unsupportedBlockEnabled == self.unsupportedBlockCanBeActivated) {
+                    self.unsupportedBlockEnabled.toggle()
+                }
+                if !self.unsupportedBlockEnabled || self.unsupportedBlockCanBeActivated {
+                    self.unsupportedBlockCanBeActivated.toggle()
+                }
+                self.gutenberg.updateCapabilities()
         })
     }
     

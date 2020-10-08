@@ -27,11 +27,13 @@ export default function QueryLoopEdit( {
 			perPage,
 			offset,
 			categoryIds,
+			postType,
 			tagIds = [],
 			order,
 			orderBy,
 			author,
 			search,
+			exclude,
 		} = {},
 		queryContext,
 	},
@@ -57,10 +59,13 @@ export default function QueryLoopEdit( {
 			if ( search ) {
 				query.search = search;
 			}
+			if ( exclude?.length ) {
+				query.exclude = exclude;
+			}
 			return {
 				posts: select( 'core' ).getEntityRecords(
 					'postType',
-					'post',
+					postType,
 					query
 				),
 				blocks: select( 'core/block-editor' ).getBlocks( clientId ),
@@ -77,6 +82,8 @@ export default function QueryLoopEdit( {
 			clientId,
 			author,
 			search,
+			postType,
+			exclude,
 		]
 	);
 

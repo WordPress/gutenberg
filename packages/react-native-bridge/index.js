@@ -96,6 +96,10 @@ export function subscribeUpdateCapabilities( callback ) {
 	return gutenbergBridgeEvents.addListener( 'updateCapabilities', callback );
 }
 
+export function subscribeShowNotice( callback ) {
+	return gutenbergBridgeEvents.addListener( 'showNotice', callback );
+}
+
 /**
  * @callback FnReplaceBlockCompletion
  * @param {string} html the HTML to replace the block.

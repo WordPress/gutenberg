@@ -104,6 +104,7 @@ function PostAuthor() {
 				onFilterValueChange={ debounce( handleKeydown, 300 ) }
 				onChange={ handleSelect }
 				isLoading={ isLoading }
+				allowReset={ false }
 			/>
 		</PostAuthorCheck>
 	);
