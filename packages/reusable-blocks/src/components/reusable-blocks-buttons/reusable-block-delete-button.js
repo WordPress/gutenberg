@@ -8,6 +8,11 @@ import { isReusableBlock } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { STORE_KEY } from '../../store/constants';
+
 export function ReusableBlockDeleteButton( {
 	isVisible,
 	isDisabled,
@@ -62,7 +67,7 @@ export default compose( [
 	withDispatch( ( dispatch, { clientId }, { select } ) => {
 		const {
 			__experimentalDeleteReusableBlock: deleteReusableBlock,
-		} = dispatch( 'core/reusable-blocks' );
+		} = dispatch( STORE_KEY );
 		const { getBlock } = select( 'core/block-editor' );
 
 		return {

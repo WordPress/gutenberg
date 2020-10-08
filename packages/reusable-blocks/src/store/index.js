@@ -23,9 +23,4 @@ export const storeConfig = {
 	reducer: () => {},
 };
 
-const store = registerStore( STORE_KEY, {
-	...storeConfig,
-	persist: [ 'preferences' ],
-} );
-
-export default store;
+export default registerStore( STORE_KEY, storeConfig );

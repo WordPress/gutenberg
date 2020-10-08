@@ -9,6 +9,11 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
+ * Internal dependencies
+ */
+import { STORE_KEY } from '../../store/constants';
+
+/**
  * Menu control to convert block(s) to reusable block.
  *
  * @param {Object}   props           Component props.
@@ -60,7 +65,7 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 
 	const {
 		__experimentalConvertBlockToReusable: convertBlockToReusable,
-	} = useDispatch( 'core/reusable-blocks' );
+	} = useDispatch( STORE_KEY );
 
 	if ( ! canConvert ) {
 		return null;
