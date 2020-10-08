@@ -22,6 +22,13 @@
 .editor-styles-wrapper .wp-block-social-links {
 	padding: 0;
 }
+.wp-block-social-links__social-placeholder {
+	background-color: #aaa;
+	border-radius: 8px;
+	margin: 8px;
+	padding: 4px;
+	font-size: 13px;
+}
 
 // Polish the Appender.
 .wp-block-social-links .block-list-appender {

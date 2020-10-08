@@ -14,30 +14,25 @@ import { __ } from '@wordpress/i18n';
 
 const ALLOWED_BLOCKS = [ 'core/social-link' ];
 
-// Template contains the links that show when start.
-const TEMPLATE = [
-	[
-		'core/social-link',
-		{ service: 'wordpress', url: 'https://wordpress.org' },
-	],
-	[ 'core/social-link', { service: 'facebook' } ],
-	[ 'core/social-link', { service: 'twitter' } ],
-	[ 'core/social-link', { service: 'instagram' } ],
-	[ 'core/social-link', { service: 'linkedin' } ],
-	[ 'core/social-link', { service: 'youtube' } ],
-];
-
 export function SocialLinksEdit( props ) {
 	const {
 		attributes: { openInNewTab },
 		setAttributes,
 	} = props;
+
+	const SocialPlaceholder = (
+		<div className="wp-block-social-links__social-placeholder">
+			Use [+] to add icons.
+		</div>
+	);
+
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
+		orientation: 'horizontal',
+		placeholder={ SocialPlaceholder }
 		templateLock: false,
 		template: TEMPLATE,
-		orientation: 'horizontal',
 		__experimentalAppenderTagName: 'li',
 	} );
 	return (
