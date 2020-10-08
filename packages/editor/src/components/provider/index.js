@@ -53,6 +53,15 @@ const fetchLinkSuggestions = async (
 	{ isInitialSuggestions, type, subtype, page, perPage: perPageArg } = {},
 	{ disablePostFormats = false } = {}
 ) => {
+	// Only allow specifying a type argument in the Gutenberg plugin. This is
+	// because WordPress Core does not yet support type=term or type=post-format
+	// when hitting /wp/v2/search. This if() can be removed once the PHP code
+	// added in https://github.com/WordPress/gutenberg/pull/22600 has been
+	// committed to WordPress Core.
+	if ( process.env.GUTENBERG_PHASE === 1 ) {
+		type = 'post';
+	}
+
 	const perPage = perPageArg || isInitialSuggestions ? 3 : 20;
 
 	const queries = [];
