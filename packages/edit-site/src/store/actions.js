@@ -170,6 +170,6 @@ export function* showHomepage() {
 export function setNavigationPanelActiveMenu( menu ) {
 	return {
 		type: 'SET_NAVIGATION_PANEL_ACTIVE_MENU',
-		value: menu,
+		menu,
 	};
 }

@@ -185,7 +185,7 @@ export function homeTemplateId( state, action ) {
 function navigationPanelActiveMenu( state = 'root', action ) {
 	switch ( action.type ) {
 		case 'SET_NAVIGATION_PANEL_ACTIVE_MENU':
-			return action.value;
+			return action.menu;
 	}
 	return state;
 }
