@@ -194,18 +194,18 @@ If no string is returned, the script handle is assumed to be the same as the req
 
 ```js
 /**
- * Map 'my-module' request to 'my-module-script-handle'
+ * Map 'my-module' request to a global variable
  *
  * @param {string} request Requested module
  *
- * @return {(string|undefined)} Script global
+ * @return {(any|undefined)} Variable to map the requested module to
  */
-function requestToHandle( request ) {
+function requestToExternal( request ) {
 
   // Handle imports like `import myModule from 'my-module'`
   if ( request === 'my-module' ) {
-    // `my-module` depends on the script with the 'my-module-script-handle' handle.
-    return 'my-module-script-handle';
+    // MyModule is made available by another enqueued script or localised data.
+    return MyModule;
   }
 }
 
