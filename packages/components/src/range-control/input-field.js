@@ -38,7 +38,11 @@ export default function InputField( {
 	 * Syncs incoming value (prop) within internal state.
 	 */
 	useEffect( () => {
-		setValue( valueProp );
+		if ( ! isNaN( valueProp ) ) {
+			setValue( ( prev ) => {
+				return valueProp !== prev ? valueProp : prev;
+			} );
+		}
 	}, [ valueProp ] );
 
 	const handleOnReset = ( event ) => {
@@ -64,8 +68,22 @@ export default function InputField( {
 	};
 
 	const handleOnChange = ( next, { event } ) => {
+		/**
+		 * Update internal state. This allows for `InputNumber` to store
+		 * values before a valid "commit". Example for these cases my include
+		 * users typing in larger numbers, such as "123" (which would be parsed
+		 * one character at a time).
+		 */
+		setValue( next );
+
 		const nextValue = parseFloat( next );
-		setValue( nextValue );
+
+		/**
+		 * Only commit values if the value is a number.
+		 * This prevents committing values such as "" (empty string), which
+		 * occurs when the input is cleared.
+		 */
+		if ( isNaN( nextValue ) ) return;
 
 		/**
 		 * Prevent submitting if changes are invalid.
@@ -79,7 +97,16 @@ export default function InputField( {
 			return;
 		}
 
-		handleOnCommit( event );
+		/**
+		 * We're passing in the next value in the shape of an event, as
+		 * that is what the handleOnCommit callback expects.
+		 *
+		 * We have to use the "next" value (provided by `InputNumber`) as
+		 * it my vary from the value from the input in the DOM. This occurs
+		 * if the value is adjusted by enhanced mechanics such as "step" jumping
+		 * or dragging to update.
+		 */
+		handleOnCommit( { target: { value: nextValue } } );
 	};
 
 	const handleOnKeyDown = ( event ) => {
