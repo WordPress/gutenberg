@@ -228,7 +228,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response $data
 	 */
 	public function prepare_item_for_response( $raw_sidebar, $request ) {
-		global $wp_registered_sidebars;
+		global $wp_registered_sidebars, $wp_registered_widgets;
 
 		$id      = $raw_sidebar['id'];
 		$sidebar = array( 'id' => $id );
@@ -257,9 +257,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			$sidebars = wp_get_sidebars_widgets();
 			$widgets  = array_filter(
 				isset( $sidebars[ $sidebar['id'] ] ) ? $sidebars[ $sidebar['id'] ] : array(),
-				function ( $widget_id ) {
-					global $wp_registered_widgets;
-
+				function ( $widget_id ) use ( $wp_registered_widgets ) {
 					return isset( $wp_registered_widgets[ $widget_id ] );
 				}
 			);
