@@ -74,7 +74,7 @@
 	}
 }
 
-.edit-widgets-block-areas__top-container {
+.edit-widgets-widget-areas__top-container {
 	display: flex;
 	padding: $grid-unit-20;
 	.block-editor-block-icon {
@@ -82,7 +82,7 @@
 	}
 }
 
-.edit-widgets-block-areas {
+.edit-widgets-widget-areas {
 	ul {
 		list-style: none;
 		margin-bottom: -$border-width;
@@ -106,7 +106,7 @@
 	}
 }
 
-.edit-widgets-block-areas__edit {
+.edit-widgets-widget-areas__edit {
 	float: right;
 	/* Mimics the default link style in common.css */
 	color: #0073aa;

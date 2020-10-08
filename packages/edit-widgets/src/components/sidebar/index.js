@@ -23,10 +23,10 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 /**
  * Internal dependencies
  */
-import BlockAreas from './block-areas';
+import WidgetAreas from './widget-areas';
 
 const CORE_WIDGET_COMPLEMENTARY_AREAS = {
-	'edit-widgets/block-areas': __( 'Block areas' ),
+	'edit-widgets/widget-areas': __( 'Widget Areas' ),
 	'edit-widgets/block-inspector': __( 'Block' ),
 };
 
@@ -53,7 +53,7 @@ function ComplementaryAreaHeader( { activeComplementaryArea } ) {
 							) }
 							aria-label={
 								isActive
-									? // translators: %s: sidebar label e.g: "Block areas".
+									? // translators: %s: sidebar label e.g: "Widget Areas".
 									  sprintf( __( '%s (selected)' ), label )
 									: label
 							}
@@ -85,7 +85,7 @@ export default function Sidebar() {
 		const selectionStart = getBlockSelectionStart();
 		if ( ! CORE_WIDGET_COMPLEMENTARY_AREAS[ activeArea ] ) {
 			if ( ! selectionStart ) {
-				activeArea = 'edit-widgets/block-areas';
+				activeArea = 'edit-widgets/widget-areas';
 			} else {
 				activeArea = 'edit-widgets/block-inspector';
 			}
@@ -104,7 +104,7 @@ export default function Sidebar() {
 	useEffect( () => {
 		if (
 			hasSelectedNonAreaBlock &&
-			currentArea === 'edit-widgets/block-areas' &&
+			currentArea === 'edit-widgets/widget-areas' &&
 			isGeneralSidebarOpen
 		) {
 			enableComplementaryArea(
@@ -119,7 +119,7 @@ export default function Sidebar() {
 		) {
 			enableComplementaryArea(
 				'core/edit-widgets',
-				'edit-widgets/block-areas'
+				'edit-widgets/widget-areas'
 			);
 		}
 	}, [ hasSelectedNonAreaBlock, enableComplementaryArea ] );
@@ -141,7 +141,7 @@ export default function Sidebar() {
 			icon={ cog }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
-			{ currentArea === 'edit-widgets/block-areas' && <BlockAreas /> }
+			{ currentArea === 'edit-widgets/widget-areas' && <WidgetAreas /> }
 			{ currentArea === 'edit-widgets/block-inspector' && (
 				<BlockInspector />
 			) }
