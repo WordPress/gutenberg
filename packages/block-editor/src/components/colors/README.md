@@ -1,8 +1,8 @@
-# Color HOC and Hook
+# Color Higher-Order Component and Hook
 
 A set of functions to enable color functionality in blocks. The first two functions use the concept of a higher-order component (HOC), see [React's Higher-Order Components documentation](https://reactjs.org/docs/higher-order-components.html) for additional details.
 
-## `withColors` HOC
+## `withColors` Higher-Order Component
 
 A higher-order component, which handles color logic for class generation color value, retrieval and color attribute setting.
 
