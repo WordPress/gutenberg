@@ -293,7 +293,7 @@ The following properties are provided by URLInput:
 * suggestions
 * selectedSuggestion
 * suggestionsListProps
-				
+
 The following extra properties are provided by LinkControlSearchInput:
 
 * currentInputValue
@@ -310,7 +310,7 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
     renderSuggestions={( { suggestions } ) => {
         return (
            	<Popover focusOnMount={ false } position="bottom">
-           		<ul>
+                <ul>
                     { suggestions.map( () => <li key={ `${ suggestion.id }-${ suggestion.type }` }>{ suggestion.title }</li> ) }
                 </ul>
            	</Popover>
