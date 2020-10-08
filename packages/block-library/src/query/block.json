@@ -27,6 +27,9 @@
 		"queryId": "queryId",
 		"query": "query"
 	},
+	"usesContext": [
+		"postId"
+	],
 	"supports": {
 		"html": false
 	}

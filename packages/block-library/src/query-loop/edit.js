@@ -33,9 +33,9 @@ export default function QueryLoopEdit( {
 			orderBy,
 			author,
 			search,
+			exclude,
 		} = {},
 		queryContext,
-		postId,
 	},
 } ) {
 	const [ { page } ] = useQueryContext() || queryContext || [ {} ];
@@ -59,8 +59,8 @@ export default function QueryLoopEdit( {
 			if ( search ) {
 				query.search = search;
 			}
-			if ( postId ) {
-				query.exclude = [ postId ];
+			if ( exclude?.length ) {
+				query.exclude = exclude;
 			}
 			return {
 				posts: select( 'core' ).getEntityRecords(
@@ -83,7 +83,7 @@ export default function QueryLoopEdit( {
 			author,
 			search,
 			postType,
-			postId,
+			exclude,
 		]
 	);
 

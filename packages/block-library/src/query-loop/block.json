@@ -5,8 +5,7 @@
 	"usesContext": [
 		"queryId",
 		"query",
-		"queryContext",
-		"postId"
+		"queryContext"
 	],
 	"supports": {
 		"reusable": false,

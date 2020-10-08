@@ -21,6 +21,7 @@ import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 const TEMPLATE = [ [ 'core/query-loop' ], [ 'core/query-pagination' ] ];
 export default function QueryEdit( {
 	attributes: { queryId, query },
+	context: { postId },
 	setAttributes,
 } ) {
 	const instanceId = useInstanceId( QueryEdit );
@@ -33,10 +34,17 @@ export default function QueryEdit( {
 		};
 	}, [] );
 	useEffect( () => {
-		if ( ! query.perPage && postsPerPage ) {
-			updateQuery( { perPage: postsPerPage } );
+		const newQuery = {};
+		if ( postId && ! query.exclude.length ) {
+			newQuery.exclude = [ postId ];
 		}
-	}, [ query.perPage ] );
+		if ( ! query.perPage && postsPerPage ) {
+			newQuery.perPage = postsPerPage;
+		}
+		if ( Object.keys( newQuery ).length ) {
+			updateQuery( newQuery );
+		}
+	}, [ query.perPage, query.exclude, postId ] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
@@ -44,8 +52,9 @@ export default function QueryEdit( {
 			setAttributes( { queryId: instanceId } );
 		}
 	}, [ queryId, instanceId ] );
-	const updateQuery = ( newQuery ) =>
+	const updateQuery = ( newQuery ) => {
 		setAttributes( { query: { ...query, ...newQuery } } );
+	};
 	return (
 		<>
 			<QueryInspectorControls query={ query } setQuery={ updateQuery } />
