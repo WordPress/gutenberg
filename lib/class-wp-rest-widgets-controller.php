@@ -552,9 +552,42 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			$prepared['rendered_form'] = trim( ob_get_clean() );
 		}
 
-		$prepared = $this->filter_response_by_context( $prepared, $request['context'] );
+		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$prepared = $this->add_additional_fields_to_object( $prepared, $request );
+		$prepared = $this->filter_response_by_context( $prepared, $context );
 
-		return new WP_REST_Response( $prepared );
+		$response = rest_ensure_response( $prepared );
+
+		$response->add_links( $this->prepare_links( $prepared ) );
+
+		/**
+		 * Filter widget REST API response.
+		 *
+		 * @param WP_REST_Response $response   The response object.
+		 * @param array            $prepared   Widget data.
+		 * @param WP_REST_Request  $request    Request used to generate the response.
+		 */
+		return apply_filters( 'rest_prepare_widget', $response, $prepared, $request );
+	}
+
+	/**
+	 * Prepares links for the request.
+	 *
+	 * @param Array $prepared Widget.
+	 * @return array Links for the given widget.
+	 */
+	protected function prepare_links( $prepared ) {
+		return array(
+			'collection'                => array(
+				'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ),
+			),
+			'self'                      => array(
+				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $prepared['id'] ) ),
+			),
+			'https://api.w.org/sidebar' => array(
+				'href' => rest_url( sprintf( '__experimental/sidebars/%s/', $prepared['sidebar'] ) ),
+			),
+		);
 	}
 
 	/**
