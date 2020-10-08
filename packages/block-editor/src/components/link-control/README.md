@@ -179,6 +179,10 @@ The search input used by `LinkControl`. It is a wrapper over `<URLInput />` that
 
 ### allowDirectEntry
 
+- Type: `boolean`
+- Required: No
+- Default: `true`
+
 The opposite of `noDirectEntry` from LinkControl, refer to an earlier section of this README file for more details.
 
 ### children
@@ -201,7 +205,18 @@ If passed, children are rendered after the input.
 </LinkControlSearchInput>
 ```
 
+### createSuggestionButtonText
+
+- Type: `string`
+- Required: No
+
+The same as in LinkControl, refer to an earlier section of this README file for more details.
+
 ### currentLink
+
+- Type: `Object`
+- Required: No
+- Default: `{}`
 
 The same as `value` in LinkControl, refer to an earlier section of this README file for more details.
 
@@ -210,7 +225,7 @@ The same as `value` in LinkControl, refer to an earlier section of this README f
 - Type: `Function`
 - Required: No
 
-Custom search handler for suggestions. If specified, it's passed to `URLInput` as `__experimentalFetchLinkSuggestions`.
+Custom search handler for suggestions. If specified, it's passed to `URLInput` as `__experimentalFetchLinkSuggestions`, if not, a generic handler is.
 
 See the [createSuggestion](#createSuggestion) section of this file to learn more about suggestions.
 
@@ -250,9 +265,9 @@ Suggestion selection handler, called when the user chooses one of the suggested 
 
 - Type: `Function`
 - Required: No
+- Default: `(props) => <LinkControlSearchResults {...props} />`
 
-Function used to render search suggestions, defaults to `props => <LinkControlSearchResults {...props} />`. It decorated with extra properties,
-and passed as `__experimentalRenderSuggestions` to `URLInput`.
+Function used to render search suggestions. It is decorated with extra properties and passed to `URLInput` as `__experimentalRenderSuggestions`.
 
 The following properties are provided by URLInput:
 
@@ -289,18 +304,65 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
 />
 ```
 
-### createSuggestionButtonText
-### showInitialSuggestions
-### showSuggestions
-### suggestionsQuery
 ### withCreateSuggestion
+
+- Type: `boolean`
+- Required: No
+- Default: `true`
 
 The same as in LinkControl, refer to an earlier section of this README file for more details.
 
 ### className
-### placeholder
+
+- Type: `string`
+- Required: No
+- Default: `null`
+
+Passed verbatim to URLInput, refer to it's README.md for more details.
+
 ### showInitialSuggestions
+
+- Type: `boolean`
+- Required: No
+- Default: `false`
+
+Passed verbatim to URLInput, refer to it's README.md for more details.
+
+### placeholder
+
+- Type: `string`
+- Required: No
+
+Passed verbatim to URLInput, refer to it's README.md for more details.
+
+### showInitialSuggestions
+
+- Type: `boolean`
+- Required: No
+- Default: `false`
+
+The same as in LinkControl, refer to an earlier section of this README file for more details.
+
+### showSuggestions
+
+- Type: `boolean`
+- Required: No
+- Default: `true`
+
+The same as in LinkControl, refer to an earlier section of this README file for more details.
+
+### suggestionsQuery
+
+- Type: `Object`
+- Required: No
+- Default: `{}`
+
+The same as in LinkControl, refer to an earlier section of this README file for more details.
+
 ### value
+
+- Type: `string`
+- Required: No
 
 Passed verbatim to URLInput, refer to it's README.md for more details.
 
@@ -376,8 +438,23 @@ The list of suggestions to render. When this component is used with `LinkControl
 List of additional HTML properties passed to the element wrapping the list of suggestions. When this component is used with `LinkControlSearchInput`, this property is provided by `URLInput`.
 
 ### createSuggestionButtonText
+
+- Type: `string`
+- Required: No
+
+The same as in LinkControl, refer to an earlier section of this README file for more details.
+
 ### suggestionsQuery
+
+- Type: `Object`
+- Required: No
+
+The same as in LinkControl, refer to an earlier section of this README file for more details.
+
 ### withCreateSuggestion
+
+- Type: `boolean`
+- Required: No
 
 The same as in LinkControl, refer to an earlier section of this README file for more details.
 
@@ -398,6 +475,7 @@ A list of extra HTML properties for the root element rendered by this component.
 
 - Type: `boolean`
 - Required: No
+- Default: `false`
 
 Whether this item represents a selected suggestion.
 
@@ -405,6 +483,7 @@ Whether this item represents a selected suggestion.
 
 - Type: `boolean`
 - Required: No
+- Default: `false`
 
 Whether this item represents a suggestion referring to a URL (e.g. post, page).
 
@@ -426,6 +505,7 @@ The search term as specified by the user. Used for highlighting the matching par
 
 - Type: `boolean`
 - Required: No
+- Default: `false`
 
 If true, type of the suggestion is rendered (e.g. post, tag)
 
