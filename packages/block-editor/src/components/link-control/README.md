@@ -233,9 +233,9 @@ The same as `value` in LinkControl, refer to an earlier section of this README f
 - Type: `Function`
 - Required: No
 
-Custom search handler for suggestions. If specified, it's passed to `URLInput` as `__experimentalFetchLinkSuggestions`, if not, a generic handler is.
+Custom search handler for suggestions. If specified, it's passed to `URLInput` as `__experimentalFetchLinkSuggestions`, if not, the default handler is used.
 
-See the [createSuggestion](#createSuggestion) section of this file to learn more about suggestions.
+Refer to URLInput's README.md for more details about `__experimentalFetchLinkSuggestions` and see the [createSuggestion](#createSuggestion) section of this file to learn more about suggestions.
 
 ### onChange
 
