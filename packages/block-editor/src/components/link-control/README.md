@@ -205,6 +205,14 @@ If passed, children are rendered after the input.
 </LinkControlSearchInput>
 ```
 
+### className
+
+- Type: `string`
+- Required: No
+- Default: `null`
+
+Passed verbatim to URLInput, refer to it's README.md for more details.
+
 ### createSuggestionButtonText
 
 - Type: `string`
@@ -261,6 +269,13 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
 
 Suggestion selection handler, called when the user chooses one of the suggested items with `selectedValues` as the argument. 
 
+### placeholder
+
+- Type: `string`
+- Required: No
+
+Passed verbatim to URLInput, refer to it's README.md for more details.
+
 ### renderSuggestions
 
 - Type: `Function`
@@ -304,37 +319,6 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
 />
 ```
 
-### withCreateSuggestion
-
-- Type: `boolean`
-- Required: No
-- Default: `true`
-
-The same as in LinkControl, refer to an earlier section of this README file for more details.
-
-### className
-
-- Type: `string`
-- Required: No
-- Default: `null`
-
-Passed verbatim to URLInput, refer to it's README.md for more details.
-
-### showInitialSuggestions
-
-- Type: `boolean`
-- Required: No
-- Default: `false`
-
-Passed verbatim to URLInput, refer to it's README.md for more details.
-
-### placeholder
-
-- Type: `string`
-- Required: No
-
-Passed verbatim to URLInput, refer to it's README.md for more details.
-
 ### showInitialSuggestions
 
 - Type: `boolean`
@@ -356,6 +340,14 @@ The same as in LinkControl, refer to an earlier section of this README file for 
 - Type: `Object`
 - Required: No
 - Default: `{}`
+
+The same as in LinkControl, refer to an earlier section of this README file for more details.
+
+### withCreateSuggestion
+
+- Type: `boolean`
+- Required: No
+- Default: `true`
 
 The same as in LinkControl, refer to an earlier section of this README file for more details.
 
