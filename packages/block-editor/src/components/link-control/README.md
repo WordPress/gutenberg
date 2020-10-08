@@ -210,7 +210,9 @@ The same as `value` in LinkControl, refer to an earlier section of this README f
 - Type: `Function`
 - Required: No
 
-Custom search handler for suggestions. If specified, it's passed to `URLInput` as `__experimentalFetchLinkSuggestions`. 
+Custom search handler for suggestions. If specified, it's passed to `URLInput` as `__experimentalFetchLinkSuggestions`.
+
+See the [createSuggestion](#createSuggestion) section of this file to learn more about suggestions.
 
 ### onChange
 
@@ -226,6 +228,8 @@ Value change handler passed to the underlying `<URLInput />`. Refer to URLInput'
 
 By default, when there are no matching results, LinkControlSearchInput proposes creating a new page by rendering a suggestion with
 `{ type: __CREATE__, title: <<User input>> }` properties. This function is called when that suggestion is selected. 
+
+See the [createSuggestion](#createSuggestion) section of this file to learn more about suggestions.
 
 ```jsx
 <LinkControlSearchInput
@@ -268,6 +272,8 @@ The following extra properties are provided by LinkControlSearchInput:
 * instanceId
 * suggestionsQuery
 * withCreateSuggestion
+
+See the [createSuggestion](#createSuggestion) section of this file to learn more about suggestions.
 
 ```jsx
 <LinkControlSearchInput
@@ -314,7 +320,7 @@ Function that takes `suggestion` and `index` as arguments, and returns HTML prop
 ### currentInputValue
 
 - Type: `string`
-- Required: yes
+- Required: Yes
 
 Current value of the related search input, used e.g. for highlighting matching part of the page title. When this component used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
 
@@ -325,10 +331,12 @@ Current value of the related search input, used e.g. for highlighting matching p
 
 Called with `suggestion` as the argument, when said suggestion is clicked by the user. When this component used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
 
+See the [createSuggestion](#createSuggestion) section of this file to learn more about suggestions.
+
 ### instanceId
 
 - Type: `string`
-- Required: yes
+- Required: Yes
 
 Unique ID of parent component, used for the aria-label property.  When this component used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
 
@@ -342,9 +350,9 @@ Whether or not the suggestions are currently being fetched. When this component 
 ### isInitialSuggestions
 
 - Type: `boolean`
-- Required: Yes
+- Required: No
 
-Whether or not the suggestions are currently being fetched. When this component used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
+Whether this component was rendered to show initial suggestions (the ones displayed right after mounting, before the user even started interacting with LinkControl). 
 
 ### selectedSuggestion
 
@@ -363,7 +371,7 @@ The list of suggestions to render. When this component used with `LinkControlSea
 ### suggestionsListProps
 
 - Type: `Object`
-- Required: no
+- Required: No
 
 List of additional HTML properties passed to the element wrapping the list of suggestions. When this component used with `LinkControlSearchInput`, this property is provided by `URLInput`.
 
@@ -382,48 +390,50 @@ A single suggestion rendered by `LinkControlSearchResults`.
 ### itemProps
 
 - Type: `Object`
-- Required: no
+- Required: No
 
 A list of extra HTML properties for the root element rendered by this component. 
 
 ### isSelected
 
 - Type: `boolean`
-- Required: no
+- Required: No
 
 Whether this item represents a selected suggestion.
 
 ### isURL
 
 - Type: `boolean`
-- Required: no
+- Required: No
 
 Whether this item represents a suggestion referring to a URL (e.g. post, page).
 
 ### onClick
 
 - Type: `Function`
-- Required: yes
+- Required: Yes
 
 Click handler, called with click event as the only argument.
 
 ### searchTerm
 
 - Type: `string`
-- Required: yes
+- Required: Yes
 
 The search term as specified by the user. Used for highlighting the matching part of the suggestion title.
 
 ### shouldShowType
 
 - Type: `boolean`
-- Required: no
+- Required: No
 
 If true, type of the suggestion is rendered (e.g. post, tag)
 
 ### suggestion
 
 - Type: `Object`
-- Required: yes
+- Required: Yes
 
 The suggestion to render.
+
+See the [createSuggestion](#createSuggestion) section of this file to learn more about suggestions.
