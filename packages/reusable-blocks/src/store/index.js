@@ -6,10 +6,9 @@ import { registerStore } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import reducer from './reducer';
+import controls from './controls';
 import * as actions from './actions';
 import { STORE_KEY } from './constants';
-import applyMiddlewares from './middlewares';
 
 /**
  * Data store configuration.
@@ -19,14 +18,14 @@ import applyMiddlewares from './middlewares';
  * @type {Object}
  */
 export const storeConfig = {
-	reducer,
 	actions,
+	controls,
+	reducer: () => {},
 };
 
 const store = registerStore( STORE_KEY, {
 	...storeConfig,
 	persist: [ 'preferences' ],
 } );
-applyMiddlewares( store );
 
 export default store;
