@@ -271,9 +271,14 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 				$data[ $property_id ] = $property['default'];
 			}
 		}
+		
+		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data = $this->add_additional_fields_to_object( $data, $request );
+		$data = $this->filter_response_by_context( $data, $context );
 
-		$data     = $this->filter_response_by_context( $data, $request['context'] );
 		$response = rest_ensure_response( $data );
+
+		$response->add_links( $this->prepare_links( $sidebar ) );
 
 		/**
 		 * Filters a sidebar location returned from the REST API.
@@ -286,6 +291,28 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		 * @param WP_REST_Request  $request  Request used to generate the response.
 		 */
 		return apply_filters( 'rest_prepare_sidebar', $response, $sidebar, $request );
+	}
+
+	/**
+	 * Prepares links for the request.
+	 *
+	 * @param Array $sidebar Sidebar.
+	 *
+	 * @return array Links for the given widget.
+	 */
+	protected function prepare_links( $sidebar ) {
+		return array(
+			'collection'               => array(
+				'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ),
+			),
+			'self'                     => array(
+				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $sidebar['id'] ) ),
+			),
+			'https://api.w.org/widget' => array(
+				'href'       => add_query_arg( 'sidebar', $sidebar['id'], rest_url( sprintf( '%s/%s', '__experimental', 'widgets' ) ) ),
+				'embeddable' => true,
+			),
+		);
 	}
 
 	/**
