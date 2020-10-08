@@ -91,6 +91,7 @@ function ColumnsEditContainer( {
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUM );
+	const [ tempWidth, setTempWidth ] = useState( 0 );
 	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 
 	const { verticalAlignment, align } = attributes;
@@ -281,8 +282,9 @@ function ColumnsEditContainer( {
 				max={ 100 }
 				step={ 0.1 }
 				value={ columnWidthsValues[ index ] }
-				onChange={ ( value ) =>
-					updateInnerColumnWidth( value, column.clientId )
+				onChange={ ( value ) => setTempWidth( value ) }
+				onComplete={ () =>
+					updateInnerColumnWidth( tempWidth, column.clientId )
 				}
 				cellContainerStyle={ styles.cellContainerStyle }
 				toFixed={ 1 }

@@ -8,7 +8,7 @@ import { View, Dimensions } from 'react-native';
  */
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { useEffect, useCallback } from '@wordpress/element';
+import { useEffect, useCallback, useState } from '@wordpress/element';
 import {
 	InnerBlocks,
 	BlockControls,
@@ -44,6 +44,7 @@ function ColumnEdit( {
 } ) {
 	const { verticalAlignment } = attributes;
 	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+	const [ tempWidth, setTempWidth ] = useState( 0 );
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -55,9 +56,9 @@ function ColumnEdit( {
 		}
 	}, [] );
 
-	const onWidthChange = ( width ) => {
+	const onWidthChange = () => {
 		setAttributes( {
-			width,
+			width: tempWidth,
 		} );
 	};
 
@@ -117,7 +118,8 @@ function ColumnEdit( {
 						min={ 1 }
 						max={ 100 }
 						value={ columnWidths[ selectedColumnIndex ] }
-						onChange={ onWidthChange }
+						onChange={ ( value ) => setTempWidth( value ) }
+						onComplete={ onWidthChange }
 						toFixed={ 1 }
 						rangePreview={
 							<ColumnsPreview

@@ -180,6 +180,7 @@ class BottomSheetRangeCell extends Component {
 			getStylesFromColorScheme,
 			rangePreview,
 			cellContainerStyle,
+			onComplete,
 			shouldDisplayTextInput = true,
 			...cellProps
 		} = this.props;
@@ -245,6 +246,7 @@ class BottomSheetRangeCell extends Component {
 						maximumTrackTintColor={ maximumTrackTintColor }
 						thumbTintColor={ thumbTintColor }
 						onValueChange={ this.onChangeValue }
+						onSlidingComplete={ onComplete }
 						ref={ ( slider ) => {
 							this.sliderRef = slider;
 						} }
