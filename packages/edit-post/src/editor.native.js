@@ -105,7 +105,7 @@ class Editor extends Component {
 		if ( editorMode === 'preview' ) {
 			return <Preview blocks={ rawHandler( { HTML: initialHtml } ) } />;
 		}
-		return <Layout setTitleRef={ this.setTitleRef } />
+		return <Layout setTitleRef={ this.setTitleRef } />;
 	}
 
 	render() {
