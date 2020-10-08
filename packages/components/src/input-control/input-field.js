@@ -21,7 +21,7 @@ function InputField(
 	{
 		disabled = false,
 		dragDirection = 'n',
-		dragThreshold = 10,
+		dragThreshold = 15,
 		id,
 		isDragEnabled = false,
 		isPressEnterToChange = false,
