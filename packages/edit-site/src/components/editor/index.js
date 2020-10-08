@@ -38,8 +38,7 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
 import LeftSidebar from '../left-sidebar';
 // TODO: Refactor directory and file structure
-import NavigationPanel from '../left-sidebar/navigation-panel';
-import NavigationToggle from '../header/navigation-toggle';
+import NavigationSidebar from '../navigation-sidebar';
 
 const interfaceLabels = {
 	leftSidebar: __( 'Block Library' ),
@@ -213,21 +212,19 @@ function Editor() {
 												<InterfaceSkeleton
 													labels={ interfaceLabels }
 													navigationSidebar={
-														<>
-															<NavigationToggle
-																isOpen={
-																	isNavigationOpen
-																}
-																onClick={ () =>
-																	toggleLeftSidebarContent(
-																		'navigation'
-																	)
-																}
-															/>
-															{ isNavigationOpen && (
-																<NavigationPanel />
-															) }
-														</>
+														<NavigationSidebar
+															content={
+																leftSidebarContent
+															}
+															isOpen={
+																isNavigationOpen
+															}
+															onNavigationToggle={ () =>
+																toggleLeftSidebarContent(
+																	'navigation'
+																)
+															}
+														/>
 													}
 													leftSidebar={
 														<LeftSidebar />
