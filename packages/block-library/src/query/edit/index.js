@@ -38,7 +38,7 @@ export default function QueryEdit( {
 	// would cause to overide previous wanted changes.
 	useEffect( () => {
 		const newQuery = {};
-		if ( postId && ! query.exclude.length ) {
+		if ( postId && ! query.exclude?.length ) {
 			newQuery.exclude = [ postId ];
 		}
 		if ( ! query.perPage && postsPerPage ) {
@@ -55,9 +55,8 @@ export default function QueryEdit( {
 			setAttributes( { queryId: instanceId } );
 		}
 	}, [ queryId, instanceId ] );
-	const updateQuery = ( newQuery ) => {
+	const updateQuery = ( newQuery ) =>
 		setAttributes( { query: { ...query, ...newQuery } } );
-	};
 	return (
 		<>
 			<QueryInspectorControls query={ query } setQuery={ updateQuery } />
