@@ -11,7 +11,7 @@ import { applyFilters } from '@wordpress/hooks';
 /**
  * Internal dependencies
  */
-import '../font-style';
+import { fontStyleClasses } from '../font-style';
 
 describe( 'custom font styles', () => {
 	const blockSettings = {
@@ -35,27 +35,18 @@ describe( 'custom font styles', () => {
 		},
 	};
 
-	describe( 'addAttribute()', () => {
-		const addAttribute = applyFilters.bind(
-			null,
-			'blocks.registerBlockType'
-		);
-
-		it( 'should do nothing if the settings do not define font style support', () => {
-			const settings = addAttribute( blockSettings );
-			expect( settings.attributes ).toBeUndefined();
-		} );
-
-		it( 'should do nothing if the settings disable font style support', () => {
-			const settings = addAttribute( settingsWithoutSupport );
-			expect( settings.attributes ).toBeUndefined();
-		} );
-
-		it( 'should assign a new font style attribute', () => {
-			const settings = addAttribute( settingsWithSupport );
-			expect( settings.attributes ).toHaveProperty( 'fontStyle' );
-		} );
-	} );
+	const styles = {
+		style: {
+			typography: {
+				fontStyles: {
+					bold: true,
+					italic: true,
+					underline: true,
+					strikethrough: true,
+				},
+			},
+		}
+	};
 
 	describe( 'addSaveProps', () => {
 		const addSaveProps = applyFilters.bind(
@@ -64,23 +55,22 @@ describe( 'custom font styles', () => {
 		);
 
 		it( 'should do nothing if font style support disabled', () => {
-			const extraProps = addSaveProps( {}, settingsWithoutSupport, {
-				fontStyle: 'italic',
-			} );
-			expect( extraProps ).not.toHaveProperty( 'className' );
+			const props = addSaveProps( {}, settingsWithoutSupport, styles );
+			expect( props ).not.toHaveProperty( 'className' );
 		} );
 
 		it( 'should not add CSS class if font style is not set', () => {
-			const extraProps = addSaveProps( {}, settingsWithSupport, {} );
-			expect( extraProps ).not.toHaveProperty( 'className' );
+			const props = addSaveProps( {}, settingsWithSupport, {} );
+			expect( props ).not.toHaveProperty( 'className' );
 		} );
 
 		it( 'should add CSS classes if font style is present', () => {
-			const extraProps = addSaveProps( {}, settingsWithSupport, {
-				fontStyle: 'italic',
-			} );
-			expect( extraProps.className ).toMatch( 'has-font-style' );
-			expect( extraProps.className ).toMatch( 'has-italic-font-style' );
+			const props = addSaveProps( {}, settingsWithSupport, styles );
+			expect( props.className ).toMatch( 'has-font-style' );
+			expect( props.className ).toMatch( fontStyleClasses.bold );
+			expect( props.className ).toMatch( fontStyleClasses.italic );
+			expect( props.className ).toMatch( fontStyleClasses.underline );
+			expect( props.className ).toMatch( fontStyleClasses.strikethrough );
 		} );
 	} );
 
@@ -103,11 +93,12 @@ describe( 'custom font styles', () => {
 
 		it( 'should add css classes to edit props when font style is supported', () => {
 			const settings = addEditProps( settingsWithSupport );
-			const props = settings.getEditWrapperProps( {
-				fontStyle: 'italic',
-			} );
+			const props = settings.getEditWrapperProps( styles );
 			expect( props.className ).toMatch( 'has-font-style' );
-			expect( props.className ).toMatch( 'has-italic-font-style' );
+			expect( props.className ).toMatch( fontStyleClasses.bold );
+			expect( props.className ).toMatch( fontStyleClasses.italic );
+			expect( props.className ).toMatch( fontStyleClasses.underline );
+			expect( props.className ).toMatch( fontStyleClasses.strikethrough );
 		} );
 	} );
 } );
