@@ -175,7 +175,8 @@ const variations = [
 	{
 		name: 'mail',
 		attributes: { service: 'mail' },
-		title: 'Email',
+		title: 'Mail',
+		keywords: [ 'email', 'e-mail' ],
 		icon: MailIcon,
 	},
 	{
