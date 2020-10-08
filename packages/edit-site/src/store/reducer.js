@@ -182,7 +182,7 @@ export function homeTemplateId( state, action ) {
  *
  * @return {Object} Updated state.
  */
-function navigationPanelActiveMenu( state = 'root', action ) {
+function navigationPanelActiveMenu( state, action ) {
 	switch ( action.type ) {
 		case 'SET_NAVIGATION_PANEL_ACTIVE_MENU':
 			return action.menu;
