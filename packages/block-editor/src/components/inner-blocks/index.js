@@ -50,23 +50,38 @@ function UncontrolledInnerBlocks( props ) {
 
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 
-	const { hasOverlay, block, enableClickThrough } = useSelect( ( select ) => {
-		const {
-			getBlock,
-			isBlockSelected,
-			hasSelectedInnerBlock,
-			isNavigationMode,
-		} = select( 'core/block-editor' );
-		const theBlock = getBlock( clientId );
-		return {
-			block: theBlock,
-			hasOverlay:
-				theBlock.name !== 'core/template' &&
+	const hasOverlay = useSelect(
+		( select ) => {
+			const {
+				getBlockName,
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				isNavigationMode,
+			} = select( 'core/block-editor' );
+			const enableClickThrough = isNavigationMode() || isSmallScreen;
+			return (
+				getBlockName( clientId ) !== 'core/template' &&
 				! isBlockSelected( clientId ) &&
-				! hasSelectedInnerBlock( clientId, true ),
-			enableClickThrough: isNavigationMode() || isSmallScreen,
-		};
-	} );
+				! hasSelectedInnerBlock( clientId, true ) &&
+				enableClickThrough
+			);
+		},
+		[ clientId, isSmallScreen ]
+	);
+
+	const context = useSelect(
+		( select ) => {
+			const block = select( 'core/block-editor' ).getBlock( clientId );
+			const blockType = getBlockType( block.name );
+
+			if ( ! blockType || ! blockType.providesContext ) {
+				return;
+			}
+
+			return getBlockContext( block.attributes, blockType );
+		},
+		[ clientId ]
+	);
 
 	useNestedSettingsUpdate(
 		clientId,
@@ -84,30 +99,20 @@ function UncontrolledInnerBlocks( props ) {
 	);
 
 	const classes = classnames( {
-		'has-overlay': enableClickThrough && hasOverlay,
+		'has-overlay': hasOverlay,
 		'is-capturing-toolbar': captureToolbars,
 	} );
 
-	let blockList = (
-		<BlockList
-			{ ...props }
-			ref={ forwardedRef }
-			rootClientId={ clientId }
-			className={ classes }
-		/>
+	const blockList = (
+		<BlockContextProvider value={ context }>
+			<BlockList
+				{ ...props }
+				ref={ forwardedRef }
+				rootClientId={ clientId }
+				className={ classes }
+			/>
+		</BlockContextProvider>
 	);
-
-	// Wrap context provider if (and only if) block has context to provide.
-	const blockType = getBlockType( block.name );
-	if ( blockType && blockType.providesContext ) {
-		const context = getBlockContext( block.attributes, blockType );
-
-		blockList = (
-			<BlockContextProvider value={ context }>
-				{ blockList }
-			</BlockContextProvider>
-		);
-	}
 
 	if ( props.__experimentalTagName ) {
 		return blockList;

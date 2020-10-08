@@ -76,6 +76,7 @@ export default function WidgetAreasBlockEditorProvider( {
 							onInput={ onInput }
 							onChange={ onChange }
 							settings={ settings }
+							useSubRegistry={ false }
 							{ ...props }
 						/>
 					</FocusReturnProvider>
