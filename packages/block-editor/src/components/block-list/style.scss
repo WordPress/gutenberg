@@ -365,10 +365,6 @@
 	position: relative;
 	z-index: z-index(".block-editor-block-list__insertion-point");
 	margin-top: -$block-padding * 2;
-
-	&.is-insert-after {
-		margin-top: $block-padding;
-	}
 }
 
 .block-editor-block-list__insertion-point-indicator {

@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useRef, useMemo, useContext } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { Popover } from '@wordpress/components';
 import { placeCaretAtVerticalEdge } from '@wordpress/dom';
 
@@ -17,7 +17,6 @@ import { placeCaretAtVerticalEdge } from '@wordpress/dom';
 import Inserter from '../inserter';
 import { getClosestTabbable } from '../writing-flow';
 import { getBlockDOMNode } from '../../utils/dom';
-import { AppenderNodesContext } from '../block-list-appender';
 
 function InsertionPointInserter( {
 	clientId,
@@ -99,24 +98,13 @@ function InsertionPointInserter( {
 
 function InsertionPointPopover( {
 	clientId,
-	rootClientId,
 	isInserterShown,
 	isInserterForced,
 	setIsInserterForced,
 	containerRef,
 	showInsertionPoint,
 } ) {
-	const appenderNodesMap = useContext( AppenderNodesContext );
-	const element = useMemo( () => {
-		if ( clientId ) {
-			return getBlockDOMNode( clientId );
-		}
-
-		// Can't find the element, might be at the end of the block list, or inside an empty block list.
-		// We instead try to find the "Appender" and place the indicator above it.
-		// `rootClientId` could be null or undefined when there's no parent block, we normalize it to an empty string.
-		return appenderNodesMap.get( rootClientId || '' );
-	}, [ clientId, rootClientId, appenderNodesMap ] );
+	const element = getBlockDOMNode( clientId );
 
 	return (
 		<Popover
@@ -151,29 +139,26 @@ export default function InsertionPoint( { children, containerRef } ) {
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const [ isInserterForced, setIsInserterForced ] = useState( false );
 	const [ inserterClientId, setInserterClientId ] = useState( null );
-	const {
-		isMultiSelecting,
-		isInserterVisible,
-		selectedClientId,
-		selectedRootClientId,
-	} = useSelect( ( select ) => {
-		const {
-			isMultiSelecting: _isMultiSelecting,
-			isBlockInsertionPointVisible,
-			getBlockInsertionPoint,
-			getBlockOrder,
-		} = select( 'core/block-editor' );
+	const { isMultiSelecting, isInserterVisible, selectedClientId } = useSelect(
+		( select ) => {
+			const {
+				isMultiSelecting: _isMultiSelecting,
+				isBlockInsertionPointVisible,
+				getBlockInsertionPoint,
+				getBlockOrder,
+			} = select( 'core/block-editor' );
 
-		const insertionPoint = getBlockInsertionPoint();
-		const order = getBlockOrder( insertionPoint.rootClientId );
+			const insertionPoint = getBlockInsertionPoint();
+			const order = getBlockOrder( insertionPoint.rootClientId );
 
-		return {
-			isMultiSelecting: _isMultiSelecting(),
-			isInserterVisible: isBlockInsertionPointVisible(),
-			selectedClientId: order[ insertionPoint.index ],
-			selectedRootClientId: insertionPoint.rootClientId,
-		};
-	}, [] );
+			return {
+				isMultiSelecting: _isMultiSelecting(),
+				isInserterVisible: isBlockInsertionPointVisible(),
+				selectedClientId: order[ insertionPoint.index ],
+			};
+		},
+		[]
+	);
 
 	function onMouseMove( event ) {
 		if (
@@ -230,7 +215,6 @@ export default function InsertionPoint( { children, containerRef } ) {
 					clientId={
 						isInserterVisible ? selectedClientId : inserterClientId
 					}
-					rootClientId={ selectedRootClientId }
 					isInserterShown={ isInserterShown }
 					isInserterForced={ isInserterForced }
 					setIsInserterForced={ setIsInserterForced }

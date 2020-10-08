@@ -13,16 +13,9 @@ import { useRef, forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import BlockListBlock from './block';
-import BlockListAppender, {
-	AppenderNodesContext,
-} from '../block-list-appender';
+import BlockListAppender from '../block-list-appender';
 import RootContainer from './root-container';
 import useBlockDropZone from '../use-block-drop-zone';
-
-/**
- * A map to store the reference of each "Appenders" rendered with `rootClientId` as key.
- */
-const appenderNodesMap = new Map();
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -89,60 +82,57 @@ function BlockList(
 		dropTargetIndex === blockClientIds.length && isDraggingBlocks;
 
 	return (
-		<AppenderNodesContext.Provider value={ appenderNodesMap }>
-			<Container
-				{ ...__experimentalPassedProps }
-				ref={ element }
-				className={ classnames(
-					'block-editor-block-list__layout',
-					className,
-					__experimentalPassedProps.className
-				) }
-			>
-				{ blockClientIds.map( ( clientId, index ) => {
-					const isBlockInSelection = hasMultiSelection
-						? multiSelectedBlockClientIds.includes( clientId )
-						: selectedBlockClientId === clientId;
+		<Container
+			{ ...__experimentalPassedProps }
+			ref={ element }
+			className={ classnames(
+				'block-editor-block-list__layout',
+				className,
+				__experimentalPassedProps.className
+			) }
+		>
+			{ blockClientIds.map( ( clientId, index ) => {
+				const isBlockInSelection = hasMultiSelection
+					? multiSelectedBlockClientIds.includes( clientId )
+					: selectedBlockClientId === clientId;
 
-					const isDropTarget =
-						dropTargetIndex === index && isDraggingBlocks;
+				const isDropTarget =
+					dropTargetIndex === index && isDraggingBlocks;
 
-					return (
-						<AsyncModeProvider
-							key={ clientId }
-							value={ ! isBlockInSelection }
-						>
-							<BlockListBlock
-								rootClientId={ rootClientId }
-								clientId={ clientId }
-								// This prop is explicitely computed and passed down
-								// to avoid being impacted by the async mode
-								// otherwise there might be a small delay to trigger the animation.
-								index={ index }
-								enableAnimation={ enableAnimation }
-								className={ classnames( {
-									'is-drop-target': isDropTarget,
-									'is-dropping-horizontally':
-										isDropTarget &&
-										orientation === 'horizontal',
-								} ) }
-							/>
-						</AsyncModeProvider>
-					);
+				return (
+					<AsyncModeProvider
+						key={ clientId }
+						value={ ! isBlockInSelection }
+					>
+						<BlockListBlock
+							rootClientId={ rootClientId }
+							clientId={ clientId }
+							// This prop is explicitely computed and passed down
+							// to avoid being impacted by the async mode
+							// otherwise there might be a small delay to trigger the animation.
+							index={ index }
+							enableAnimation={ enableAnimation }
+							className={ classnames( {
+								'is-drop-target': isDropTarget,
+								'is-dropping-horizontally':
+									isDropTarget &&
+									orientation === 'horizontal',
+							} ) }
+						/>
+					</AsyncModeProvider>
+				);
+			} ) }
+			<BlockListAppender
+				tagName={ __experimentalAppenderTagName }
+				rootClientId={ rootClientId }
+				renderAppender={ renderAppender }
+				className={ classnames( {
+					'is-drop-target': isAppenderDropTarget,
+					'is-dropping-horizontally':
+						isAppenderDropTarget && orientation === 'horizontal',
 				} ) }
-				<BlockListAppender
-					tagName={ __experimentalAppenderTagName }
-					rootClientId={ rootClientId }
-					renderAppender={ renderAppender }
-					className={ classnames( {
-						'is-drop-target': isAppenderDropTarget,
-						'is-dropping-horizontally':
-							isAppenderDropTarget &&
-							orientation === 'horizontal',
-					} ) }
-				/>
-			</Container>
-		</AppenderNodesContext.Provider>
+			/>
+		</Container>
 	);
 }
 
