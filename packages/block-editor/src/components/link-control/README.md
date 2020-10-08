@@ -170,3 +170,260 @@ A `suggestion` should have the following shape:
 	)}
 />
 ```
+
+# LinkControlSearchInput
+
+The search input used by `LinkControl`. It is a wrapper over `<URLInput />` that caters it to `LinkControl`'s needs. 
+
+## Props
+
+### allowDirectEntry
+
+The opposite of `noDirectEntry` from LinkControl, refer to an earlier section of this README file for more details.
+
+### children
+
+- Type: `Element`
+- Required: No
+
+If passed, children are rendered after the input.
+
+```jsx 
+<LinkControlSearchInput>
+    <div className="block-editor-link-control__search-actions">
+        <Button
+            type="submit"
+            label={ __( 'Submit' ) }
+            icon={ keyboardReturn }
+            className="block-editor-link-control__search-submit"
+        />
+    </div>
+</LinkControlSearchInput>
+```
+
+### currentLink
+
+The same as `value` in LinkControl, refer to an earlier section of this README file for more details.
+
+### fetchSuggestions
+
+- Type: `Function`
+- Required: No
+
+Custom search handler for suggestions. If specified, it's passed to `URLInput` as `__experimentalFetchLinkSuggestions`. 
+
+### onChange
+
+- Type: `Function`
+- Required: No
+
+Value change handler passed to the underlying `<URLInput />`. Refer to URLInput's README.md for more details. 
+
+### onCreateSuggestion
+
+- Type: `Function`
+- Required: No
+
+By default, when there are no matching results, LinkControlSearchInput proposes creating a new page by rendering a suggestion with
+`{ type: __CREATE__, title: <<User input>> }` properties. This function is called when that suggestion is selected. 
+
+```jsx
+<LinkControlSearchInput
+    onCreateSuggestion={( inputValue ) => {
+        createNewPage( inputValue );
+    })
+/>
+```
+
+### onSelect
+
+- Type: `Function`
+- Required: No
+
+Suggestion selection handler, called when the user chooses one of the suggested items with `selectedValues` as the argument. 
+
+### renderSuggestions
+
+- Type: `Function`
+- Required: No
+
+Function used to render search suggestions, defaults to `props => <LinkControlSearchResults {...props} />`. It decorated with extra properties,
+and passed as `__experimentalRenderSuggestions` to `URLInput`.
+
+The following properties are provided by URLInput:
+
+* buildSuggestionItemProps
+* handleSuggestionClick
+* isInitialSuggestions
+* isLoading
+* suggestions
+* selectedSuggestion
+* suggestionsListProps
+				
+The following extra properties are provided by LinkControlSearchInput:
+
+* currentInputValue
+* createSuggestionButtonText
+* handleSuggestionClick
+* instanceId
+* suggestionsQuery
+* withCreateSuggestion
+
+```jsx
+<LinkControlSearchInput
+    renderSuggestions={( { suggestions } ) => {
+        return (
+           	<Popover focusOnMount={ false } position="bottom">
+           		<ul>
+                    { suggestions.map( () => <li key={ `${ suggestion.id }-${ suggestion.type }` }>{ suggestion.title }</li> }
+                </ul>
+           	</Popover>
+        );
+    })
+/>
+```
+
+### createSuggestionButtonText
+### showInitialSuggestions
+### showSuggestions
+### suggestionsQuery
+### withCreateSuggestion
+
+The same as in LinkControl, refer to an earlier section of this README file for more details.
+
+### className
+### placeholder
+### showInitialSuggestions
+### value
+
+Passed verbatim to URLInput, refer to it's README.md for more details.
+
+# LinkControlSearchResults
+
+The list of search results used by `LinkControlSearchInput`. 
+
+## Props
+
+### buildSuggestionItemProps
+
+- Type: `Function`
+- Required: Yes
+
+Function that takes `suggestion` and `index` as arguments, and returns HTML props of the suggestion item.  When this component used with `LinkControlSearchInput`, this property is provided by `URLInput`.
+
+### currentInputValue
+
+- Type: `string`
+- Required: yes
+
+Current value of the related search input, used e.g. for highlighting matching part of the page title. When this component used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
+
+### handleSuggestionClick
+	
+- Type: `Function`
+- Required: Yes
+
+Called with `suggestion` as the argument, when said suggestion is clicked by the user. When this component used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
+
+### instanceId
+
+- Type: `string`
+- Required: yes
+
+Unique ID of parent component, used for the aria-label property.  When this component used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
+
+### isLoading
+
+- Type: `boolean`
+- Required: Yes
+
+Whether or not the suggestions are currently being fetched. When this component used with `LinkControlSearchInput`, this property is provided by `URLInput`.
+
+### isInitialSuggestions
+
+- Type: `boolean`
+- Required: Yes
+
+Whether or not the suggestions are currently being fetched. When this component used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
+
+### selectedSuggestion
+
+- Type: `Object`
+- Required: Yes
+
+The suggestions that is currently selected. When this component used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
+
+### suggestions
+
+- Type: `Array`
+- Required: Yes
+
+The list of suggestions to render. When this component used with `LinkControlSearchInput`, this property is provided by `URLInput`.
+
+### suggestionsListProps
+
+- Type: `Object`
+- Required: no
+
+List of additional HTML properties passed to the element wrapping the list of suggestions. When this component used with `LinkControlSearchInput`, this property is provided by `URLInput`.
+
+### createSuggestionButtonText
+### suggestionsQuery
+### withCreateSuggestion
+
+The same as in LinkControl, refer to an earlier section of this README file for more details.
+
+# LinkControlSearchItem
+
+A single suggestion rendered by `LinkControlSearchResults`.
+
+## Props
+
+### itemProps
+
+- Type: `Object`
+- Required: no
+
+A list of extra HTML properties for the root element rendered by this component. 
+
+### isSelected
+
+- Type: `boolean`
+- Required: no
+
+Whether this item represents a selected suggestion.
+
+### isURL
+
+- Type: `boolean`
+- Required: no
+
+Whether this item represents a suggestion referring to a URL (e.g. post, page).
+
+### onClick
+
+- Type: `Function`
+- Required: yes
+
+Click handler, called with click event as the only argument.
+
+### searchTerm
+
+- Type: `string`
+- Required: yes
+
+The search term as specified by the user. Used for highlighting the matching part of the suggestion title.
+
+### shouldShowType
+
+- Type: `boolean`
+- Required: no
+
+If true, type of the suggestion is rendered (e.g. post, tag)
+
+### suggestion
+
+- Type: `Object`
+- Required: yes
+
+The suggestion to render.
