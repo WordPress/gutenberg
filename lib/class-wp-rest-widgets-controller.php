@@ -1,7 +1,12 @@
 <?php
+/**
+ * REST API: WP_REST_Widgets_Controller class
+ *
+ * @package Gutenberg
+ */
 
 /**
- * Class WP_REST_Widgets_Controller
+ * Core class representing a controller for widgets.
  */
 class WP_REST_Widgets_Controller extends WP_REST_Controller {
 
@@ -13,6 +18,9 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$this->rest_base = 'widgets';
 	}
 
+	/**
+	 * Registers the widget routes for the controller.
+	 */
 	public function register_routes() {
 		register_rest_route(
 			$this->namespace,
@@ -59,7 +67,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'delete_item_permissions_check' ),
 					'args'                => array(
 						'force' => array(
-							'description' => __( 'Whether to force removal of the widget, or move it to the inactive sidebar.' ),
+							'description' => __( 'Whether to force removal of the widget, or move it to the inactive sidebar.', 'gutenberg' ),
 							'type'        => 'boolean',
 						),
 					),
@@ -70,14 +78,34 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		);
 	}
 
-	public function get_items_permissions_check( $request ) {
+	/**
+	 * Checks if a given request has access to get widgets.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+	 */
+	public function get_items_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		return $this->permissions_check();
 	}
 
+	/**
+	 * Retrieves a collection of widgets.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
 	public function get_items( $request ) {
 		$prepared = array();
 
 		foreach ( wp_get_sidebars_widgets() as $sidebar_id => $widget_ids ) {
+			if ( isset( $request['sidebar'] ) && $sidebar_id !== $request['sidebar'] ) {
+				continue;
+			}
+
 			foreach ( $widget_ids as $widget_id ) {
 				$response = $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
 
@@ -90,10 +118,26 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		return new WP_REST_Response( $prepared );
 	}
 
-	public function get_item_permissions_check( $request ) {
+	/**
+	 * Checks if a given request has access to get a widget.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+	 */
+	public function get_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		return $this->permissions_check();
 	}
 
+	/**
+	 * Gets an individual widget.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
 	public function get_item( $request ) {
 		$widget_id  = $request['id'];
 		$sidebar_id = $this->find_widgets_sidebar( $widget_id );
@@ -105,10 +149,26 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		return $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
 	}
 
-	public function create_item_permissions_check( $request ) {
+	/**
+	 * Checks if a given request has access to create widgets.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+	 */
+	public function create_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		return $this->permissions_check();
 	}
 
+	/**
+	 * Creates a widget.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
 	public function create_item( $request ) {
 		$backup_post = $_POST;
 		$sidebar_id  = $request['sidebar'];
@@ -122,10 +182,26 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		return $response;
 	}
 
-	public function update_item_permissions_check( $request ) {
+	/**
+	 * Checks if a given request has access to update widgets.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+	 */
+	public function update_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		return $this->permissions_check();
 	}
 
+	/**
+	 * Updates an existing widget.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
 	public function update_item( $request ) {
 		$widget_id  = $request['id'];
 		$sidebar_id = $this->find_widgets_sidebar( $widget_id );
@@ -146,10 +222,26 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		return $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
 	}
 
-	public function delete_item_permissions_check( $request ) {
+	/**
+	 * Checks if a given request has access to delete widgets.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return true|WP_Error True if the request has read access, WP_Error object otherwise.
+	 */
+	public function delete_item_permissions_check( $request ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		return $this->permissions_check();
 	}
 
+	/**
+	 * Deletes a widget.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
 	public function delete_item( $request ) {
 		$widget_id  = $request['id'];
 		$sidebar_id = $this->find_widgets_sidebar( $widget_id );
@@ -175,6 +267,12 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		return $prepared;
 	}
 
+	/**
+	 * Assigns a widget to the given sidebar.
+	 *
+	 * @param string $widget_id  The widget id to assign.
+	 * @param string $sidebar_id The sidebar id to assign to.
+	 */
 	protected function assign_to_sidebar( $widget_id, $sidebar_id ) {
 		$sidebars = wp_get_sidebars_widgets();
 
@@ -188,7 +286,9 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			}
 		}
 
-		$sidebars[ $sidebar_id ][] = $widget_id;
+		if ( $sidebar_id ) {
+			$sidebars[ $sidebar_id ][] = $widget_id;
+		}
 
 		wp_set_sidebars_widgets( $sidebars );
 	}
@@ -231,7 +331,9 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * @param WP_REST_Request $request
+	 * Saves the widget in the request object.
+	 *
+	 * @param WP_REST_Request $request Full details about the request.
 	 *
 	 * @return string
 	 */
@@ -307,6 +409,15 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		return $input_widget['id'];
 	}
 
+	/**
+	 * Prepares the widget for the REST response.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @param array           $item    An array containing a widget_id and sidebar_id.
+	 * @param WP_REST_Request $request Request object.
+	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
+	 */
 	public function prepare_item_for_response( $item, $request ) {
 		global $wp_registered_widgets, $wp_registered_sidebars, $wp_registered_widget_controls;
 
@@ -314,7 +425,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$sidebar_id = $item['sidebar_id'];
 
 		if ( ! isset( $wp_registered_widgets[ $widget_id ] ) ) {
-			return new WP_Error( 'rest_invalid_widget', __( 'The requested widget is invalid.' ), array( 'status' => 500 ) );
+			return new WP_Error( 'rest_invalid_widget', __( 'The requested widget is invalid.', 'gutenberg' ), array( 'status' => 500 ) );
 		}
 
 		$fields = $this->get_fields_for_response( $request );
@@ -416,7 +527,6 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 * @param string $id      Identifier of the widget instance.
 	 *
 	 * @return array Array containing the widget instance.
-	 * @since 5.7.0
 	 */
 	protected function get_sidebar_widget_instance( $sidebar, $id ) {
 		list( $object, $number, $name ) = $this->get_widget_info( $id );
@@ -473,18 +583,30 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		return array( $object, $number, $name );
 	}
 
+	/**
+	 * Gets the list of collection params.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @return array[]
+	 */
 	public function get_collection_params() {
-		$params = array(
+		return array(
 			'context' => $this->get_context_param( array( 'default' => 'view' ) ),
 			'sidebar' => array(
-				'description' => __( 'The sidebar to return widgets for.' ),
+				'description' => __( 'The sidebar to return widgets for.', 'gutenberg' ),
 				'type'        => 'string',
 			),
 		);
-
-		return $params;
 	}
 
+	/**
+	 * Retrieves the widget's schema, conforming to JSON Schema.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @return array Item schema data.
+	 */
 	public function get_item_schema() {
 		if ( $this->schema ) {
 			return $this->schema;
