@@ -345,7 +345,7 @@ Unique ID of parent component, used for the aria-label property.  When this comp
 - Type: `boolean`
 - Required: Yes
 
-Whether or not the suggestions are currently being fetched. When this component used with `LinkControlSearchInput`, this property is provided by `URLInput`.
+Whether the suggestions are being fetched at the moment. When this component used with `LinkControlSearchInput`, this property is provided by `URLInput`.
 
 ### isInitialSuggestions
 
