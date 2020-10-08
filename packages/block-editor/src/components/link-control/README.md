@@ -309,11 +309,11 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
 <LinkControlSearchInput
     renderSuggestions={( { suggestions } ) => {
         return (
-           	<Popover focusOnMount={ false } position="bottom">
+            <Popover focusOnMount={ false } position="bottom">
                 <ul>
                     { suggestions.map( () => <li key={ `${ suggestion.id }-${ suggestion.type }` }>{ suggestion.title }</li> ) }
                 </ul>
-           	</Popover>
+            </Popover>
         );
     })
 />
@@ -323,9 +323,9 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
 <LinkControlSearchInput
     renderSuggestions={( suggestionsProps ) => {
         return (
-           	<Popover focusOnMount={ false } position="bottom">
-           		<LinkControlSearchResults { ...suggestionsProps } />
-           	</Popover>
+            <Popover focusOnMount={ false } position="bottom">
+                <LinkControlSearchResults { ...suggestionsProps } />
+            </Popover>
         );
     })
 />
