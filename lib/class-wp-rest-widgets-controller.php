@@ -213,12 +213,16 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		}
 
 		$backup_post = $_POST;
-		$this->save_widget( $request );
+
+		if ( isset( $request['settings'] ) ) {
+			$this->save_widget( $request );
+		}
+
 		$_POST = $backup_post;
 
 		if ( isset( $request['sidebar'] ) && $request['sidebar'] !== $sidebar_id ) {
-			$this->assign_to_sidebar( $widget_id, $sidebar_id );
 			$sidebar_id = $request['sidebar'];
+			$this->assign_to_sidebar( $widget_id, $sidebar_id );
 		}
 
 		$request['context'] = 'edit';
@@ -255,7 +259,8 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		}
 
 		if ( $request['force'] ) {
-			$prepared = $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
+			$request['context'] = 'edit';
+			$prepared           = $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
 			$this->assign_to_sidebar( $widget_id, null );
 			$prepared->set_data(
 				array(
@@ -265,7 +270,13 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			);
 		} else {
 			$this->assign_to_sidebar( $widget_id, 'wp_inactive_sidebar' );
-			$prepared = $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
+			$prepared = $this->prepare_item_for_response(
+				array(
+					'sidebar_id' => 'wp_inactive_sidebar',
+					'widget_id'  => $widget_id,
+				),
+				$request
+			);
 		}
 
 		return $prepared;
@@ -449,7 +460,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			'sidebar'       => $sidebar_id,
 			'widget_class'  => '',
 			'name'          => $widget['name'],
-			'description'   => $widget['description'],
+			'description'   => ! empty( $widget['description'] ) ? $widget['description'] : '',
 			'number'        => 0,
 			'rendered'      => '',
 			'rendered_form' => '',
@@ -661,7 +672,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 				'rendered'      => array(
 					'description' => __( 'HTML representation of the widget.', 'gutenberg' ),
 					'type'        => 'string',
-					'context'     => array( 'view', 'embed' ),
+					'context'     => array( 'view', 'edit', 'embed' ),
 					'readonly'    => true,
 				),
 				'rendered_form' => array(

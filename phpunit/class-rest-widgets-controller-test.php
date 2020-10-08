@@ -117,8 +117,11 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		global $wp_registered_sidebars;
 		update_option(
 			'sidebars_widgets',
-			array(
-				$id => $widgets,
+			array_merge(
+				(array) get_option( 'sidebars_widgets', array() ),
+				array(
+					$id => $widgets,
+				)
 			)
 		);
 		$wp_registered_sidebars[ $id ] = array_merge(
@@ -286,9 +289,9 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					'number'        => 1,
 					'rendered'      => '<div class="textwidget">Custom text test</div>',
 					'rendered_form' => '<input id="widget-text-1-title" name="widget-text[1][title]" class="title sync-input" type="hidden" value="">' . "\n" .
-									'			<textarea id="widget-text-1-text" name="widget-text[1][text]" class="text sync-input" hidden>Custom text test</textarea>' . "\n" .
-									'			<input id="widget-text-1-filter" name="widget-text[1][filter]" class="filter sync-input" type="hidden" value="on">' . "\n" .
-									'			<input id="widget-text-1-visual" name="widget-text[1][visual]" class="visual sync-input" type="hidden" value="on">',
+					                   '			<textarea id="widget-text-1-text" name="widget-text[1][text]" class="text sync-input" hidden>Custom text test</textarea>' . "\n" .
+					                   '			<input id="widget-text-1-filter" name="widget-text[1][filter]" class="filter sync-input" type="hidden" value="on">' . "\n" .
+					                   '			<input id="widget-text-1-visual" name="widget-text[1][visual]" class="visual sync-input" type="hidden" value="on">',
 				),
 			),
 			$data
@@ -310,7 +313,8 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			'sidebar-1',
 			array(
 				'name' => 'Test sidebar',
-			)
+			),
+			array( 'text-1' )
 		);
 
 		$request  = new WP_REST_Request( 'GET', '/__experimental/widgets/text-1' );
@@ -338,6 +342,8 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 *
 	 */
 	public function test_get_item_no_permission() {
+		wp_set_current_user( 0 );
+
 		$this->setup_widget(
 			'widget_text',
 			1,
@@ -349,7 +355,8 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			'sidebar-1',
 			array(
 				'name' => 'Test sidebar',
-			)
+			),
+			array( 'text-1' )
 		);
 
 		$request  = new WP_REST_Request( 'GET', '/__experimental/widgets/text-1' );
@@ -389,11 +396,10 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			'sidebar-1',
 			array(
 				'name' => 'Test sidebar',
-			),
-			array( 'rss-1' )
+			)
 		);
 
-		$request = new WP_REST_Request( 'POST', '/__experimental/widgets/' );
+		$request = new WP_REST_Request( 'POST', '/__experimental/widgets' );
 		$request->set_body_params(
 			array(
 				'sidebar'      => 'sidebar-1',
@@ -409,23 +415,16 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
+		$this->assertEquals( 'text-1', $data['id'] );
+		$this->assertEquals( 'sidebar-1', $data['sidebar'] );
+		$this->assertEquals( 1, $data['number'] );
 		$this->assertEquals(
 			array(
-				'id'           => 'text-1',
-				'sidebar'      => 'sidebar-1',
-				'settings'     => array(
-					'text'   => 'Updated text test',
-					'title'  => '',
-					'filter' => false,
-				),
-				'id_base'      => 'text',
-				'widget_class' => 'WP_Widget_Text',
-				'name'         => 'Text',
-				'description'  => 'Arbitrary text.',
-				'number'       => 1,
-				'rendered'     => '<div class="textwidget">Updated text test</div>',
+				'text'   => 'Updated text test',
+				'title'  => '',
+				'filter' => false,
 			),
-			$data
+			$data['settings']
 		);
 	}
 
@@ -465,23 +464,17 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
+
+		$this->assertEquals( 'text-1', $data['id'] );
+		$this->assertEquals( 'sidebar-1', $data['sidebar'] );
+		$this->assertEquals( 1, $data['number'] );
 		$this->assertEquals(
 			array(
-				'id'           => 'text-1',
-				'sidebar'      => 'sidebar-1',
-				'settings'     => array(
-					'text'   => 'Updated text test',
-					'title'  => '',
-					'filter' => false,
-				),
-				'id_base'      => 'text',
-				'widget_class' => 'WP_Widget_Text',
-				'name'         => 'Text',
-				'description'  => 'Arbitrary text.',
-				'number'       => 1,
-				'rendered'     => '<div class="textwidget">Updated text test</div>',
+				'text'   => 'Updated text test',
+				'title'  => '',
+				'filter' => false,
 			),
-			$data
+			$data['settings']
 		);
 	}
 
@@ -514,10 +507,12 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request = new WP_REST_Request( 'PUT', '/__experimental/widgets/text-1' );
 		$request->set_body_params(
 			array(
-				'sidebar' => 'sidebar-1',
+				'sidebar' => 'sidebar-2',
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
+		$error    = $response->as_error();
+		$this->assertNotWPError( $error, $error ? $error->get_error_message() : '' );
 		$this->assertEquals( 'sidebar-2', $response->get_data()['sidebar'] );
 
 		$sidebar1 = rest_do_request( '/__experimental/sidebars/sidebar-1' );
@@ -595,7 +590,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		return $data['widgets'][0]['rendered'];
+		return $data['rendered'];
 	}
 
 	/**
@@ -669,11 +664,16 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$data     = $response->get_data();
 		$this->assertEquals(
 			array(
-				'id'       => $widget_id,
-				'sidebar'  => 'sidebar-1',
-				'settings' => array(),
-				'rendered' => '<h1>My test id</h1><span>My test title</span>',
-				'name'     => 'WP test widget',
+				'id'            => $widget_id,
+				'sidebar'       => 'sidebar-1',
+				'settings'      => array(),
+				'rendered'      => '<h1>My test id</h1><span>My test title</span>',
+				'name'          => 'WP test widget',
+				'number'        => 0,
+				'rendered_form' => '',
+				'widget_class'  => '',
+				'id_base'       => '',
+				'description'   => '',
 			),
 			$data
 		);
@@ -735,23 +735,19 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
+
 		$this->assertEquals(
 			array(
-				'id'           => 'text-1',
-				'sidebar'      => 'sidebar-1',
-				'settings'     => array(
-					'text'   => 'Updated \\" \\\' text test',
-					'title'  => '',
-					'filter' => false,
-				),
-				'id_base'      => 'text',
-				'widget_class' => 'WP_Widget_Text',
-				'name'         => 'Text',
-				'description'  => 'Arbitrary text.',
-				'number'       => 1,
-				'rendered'     => '<div class="textwidget">Updated \\" \\\' text test</div>',
+				'text'   => 'Updated \\" \\\' text test',
+				'title'  => '',
+				'filter' => false,
 			),
-			$data
+			$data['settings']
+		);
+
+		$this->assertEquals(
+			'<div class="textwidget">Updated \\" \\\' text test</div>',
+			$data['rendered']
 		);
 	}
 
@@ -823,17 +819,22 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'deleted'  => true,
 				'previous' => array(
 
-					'id'           => 'text-1',
-					'sidebar'      => 'sidebar-1',
-					'settings'     => array(
+					'id'            => 'text-1',
+					'sidebar'       => 'sidebar-1',
+					'settings'      => array(
 						'text' => 'Custom text test',
 					),
-					'id_base'      => 'text',
-					'widget_class' => 'WP_Widget_Text',
-					'name'         => 'Text',
-					'description'  => 'Arbitrary text.',
-					'number'       => 1,
-					'rendered'     => '<div class="textwidget">Custom text test</div>',
+					'id_base'       => 'text',
+					'widget_class'  => 'WP_Widget_Text',
+					'name'          => 'Text',
+					'description'   => 'Arbitrary text.',
+					'number'        => 1,
+					'rendered'      => '<div class="textwidget">Custom text test</div>',
+					'rendered_form' => '<input id="widget-text-1-title" name="widget-text[1][title]" class="title sync-input" type="hidden" value="">' . "\n" .
+					                   '			<textarea id="widget-text-1-text" name="widget-text[1][text]" class="text sync-input" hidden>Custom text test</textarea>' . "\n" .
+					                   '			<input id="widget-text-1-filter" name="widget-text[1][filter]" class="filter sync-input" type="hidden" value="on">' . "\n" .
+					                   '			<input id="widget-text-1-visual" name="widget-text[1][visual]" class="visual sync-input" type="hidden" value="on">',
+
 				),
 			),
 			$response->get_data()
@@ -847,6 +848,8 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 *
 	 */
 	public function test_delete_item_logged_out() {
+		wp_set_current_user( 0 );
+
 		$this->setup_widget(
 			'widget_text',
 			1,

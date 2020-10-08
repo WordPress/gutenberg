@@ -386,7 +386,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array( 'text-1', 'rss-1' )
 		);
 
-		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
+		$request = new WP_REST_Request( 'PUT', '/__experimental/sidebars/sidebar-1' );
 		$request->set_body_params(
 			array(
 				'widgets' => array(
@@ -411,21 +411,6 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			$data
 		);
 	}
-
-	/**
-	 *
-	 */
-	public function test_update_item_legacy_widget_1() {
-		$this->do_test_update_item_legacy_widget( 'testwidget-1' );
-	}
-
-	/**
-	 *
-	 */
-	public function test_update_item_legacy_widget_2() {
-		$this->do_test_update_item_legacy_widget( 'testwidget' );
-	}
-
 
 	/**
 	 *

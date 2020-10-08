@@ -77,11 +77,8 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'permissions_check' ),
 					'args'                => array(
 						'id'      => array(
-							'description'       => __( 'The id of a registered sidebar', 'gutenberg' ),
-							'type'              => 'string',
-							'validate_callback' => function ( $id ) {
-								return $this->get_sidebar( $id )[0];
-							},
+							'description' => __( 'The id of a registered sidebar', 'gutenberg' ),
+							'type'        => 'string',
 						),
 						'context' => $this->get_context_param( array( 'default' => 'view' ) ),
 					),
@@ -130,7 +127,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	public function get_items( $request ) {
 		$data = array();
 		foreach ( (array) wp_get_sidebars_widgets() as $id => $widgets ) {
-			$sidebar = $this->get_sidebar( $id )[1];
+			list( , $sidebar ) = $this->get_sidebar( $id );
 
 			$data[] = $this->prepare_response_for_collection(
 				$this->prepare_item_for_response( $sidebar, $request )
@@ -145,10 +142,14 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	 *
 	 * @param WP_REST_Request $request The request instance.
 	 *
-	 * @return WP_REST_Response
+	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_item( $request ) {
-		$sidebar = $this->get_sidebar( $request['id'] )[1];
+		list( $exists, $sidebar ) = $this->get_sidebar( $request['id'] );
+
+		if ( ! $exists && 'wp_inactive_widgets' !== $request['id'] ) {
+			return new WP_Error( 'rest_sidebar_not_found', __( 'No sidebar exists with that id.', 'gutenberg' ), array( 'status' => 404 ) );
+		}
 
 		return $this->prepare_item_for_response( $sidebar, $request );
 	}
@@ -166,7 +167,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 
 			foreach ( $sidebars as $sidebar_id => $widgets ) {
 				foreach ( $widgets as $i => $widget_id ) {
-					if ( in_array( $widget_id, $request['widgets'], true ) ) {
+					if ( $sidebar_id !== $request['id'] && in_array( $widget_id, $request['widgets'], true ) ) {
 						unset( $sidebars[ $sidebar_id ][ $i ] );
 						$sidebars['wp_inactive_widgets'][] = $widget_id;
 					}
@@ -174,11 +175,14 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			}
 
 			$sidebars[ $request['id'] ] = $request['widgets'];
+
+			wp_set_sidebars_widgets( $sidebars );
 		}
 
 		$request['context'] = 'edit';
 
-		return $this->prepare_item_for_response( $this->get_sidebar( $request['id'] ), $request );
+		list( , $sidebar ) = $this->get_sidebar( $request['id'] );
+		return $this->prepare_item_for_response( $sidebar, $request );
 	}
 
 	/**
@@ -245,9 +249,17 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 
 		$fields = $this->get_fields_for_response( $request );
 		if ( rest_is_field_included( 'widgets', $fields ) ) {
-			$widgets = wp_get_sidebars_widgets();
+			$sidebars = wp_get_sidebars_widgets();
+			$widgets  = array_filter(
+				isset( $sidebars[ $sidebar['id'] ] ) ? $sidebars[ $sidebar['id'] ] : array(),
+				function ( $widget_id ) {
+					global $wp_registered_widgets;
 
-			$sidebar['widgets'] = isset( $widgets[ $sidebar['id'] ] ) ? $widgets[ $sidebar['id'] ] : array();
+					return isset( $wp_registered_widgets[ $widget_id ] );
+				}
+			);
+
+			$sidebar['widgets'] = $widgets;
 		}
 
 		$schema = $this->get_item_schema();
