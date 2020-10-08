@@ -24,9 +24,9 @@ export function convertBlockToStatic( clientId ) {
  * @param {Array}  clientIds Block IDs.
  * @return {Object} control descriptor.
  */
-export function convertBlockToReusable( clientIds ) {
+export function convertBlocksToReusable( clientIds ) {
 	return {
-		type: 'CONVERT_BLOCK_TO_REUSABLE',
+		type: 'CONVERT_BLOCKS_TO_REUSABLE',
 		clientIds,
 	};
 }
@@ -52,7 +52,7 @@ const controls = {
 		}
 	),
 
-	CONVERT_BLOCK_TO_REUSABLE: createRegistryControl(
+	CONVERT_BLOCKS_TO_REUSABLE: createRegistryControl(
 		( registry ) =>
 			async function ( { clientIds } ) {
 				const reusableBlock = {

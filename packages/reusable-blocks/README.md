@@ -20,11 +20,10 @@ The most basic usage of this package would involve only telling the `<BlockEdito
 
 ```js
 const { __experimentalReusableBlocks } = useSelect(
-    ( select ) => ( {
-        __experimentalReusableBlocks: select(
-            'core/reusable-blocks'
-        ).__experimentalGetReusableBlocks(),
-    } )
+    ( select ) => select( 'core' ).getEntityRecords(
+        'postType',
+        'wp_block',
+    )
 );
 
 return (

@@ -64,7 +64,7 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 	);
 
 	const {
-		__experimentalConvertBlockToReusable: convertBlockToReusable,
+		__experimentalConvertBlocksToReusable: convertBlocksToReusable,
 	} = useDispatch( STORE_KEY );
 
 	if ( ! canConvert ) {
@@ -77,7 +77,7 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 				<MenuItem
 					icon={ reusableBlock }
 					onClick={ () => {
-						convertBlockToReusable( clientIds );
+						convertBlocksToReusable( clientIds );
 						onClose();
 					} }
 				>

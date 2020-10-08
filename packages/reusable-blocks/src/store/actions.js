@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { convertBlockToStatic, convertBlockToReusable } from './controls';
+import { convertBlockToStatic, convertBlocksToReusable } from './controls';
 
 /**
  * Returns a generator converting a reusable block into a static block.
@@ -17,6 +17,6 @@ export function* __experimentalConvertBlockToStatic( clientId ) {
  *
  * @param {string} clientIds The client IDs of the block to detach.
  */
-export function* __experimentalConvertBlockToReusable( clientIds ) {
-	yield convertBlockToReusable( clientIds );
+export function* __experimentalConvertBlocksToReusable( clientIds ) {
+	yield convertBlocksToReusable( clientIds );
 }
