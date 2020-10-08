@@ -268,7 +268,7 @@ function ColumnsEditContainer( {
 			);
 		}
 		return null;
-	}, [ isSelected, width, screenWidth, parentWidth, columnCount ] );
+	}, [ isSelected, width, screenWidth, parentWidth, columnCount, align ] );
 
 	const getColumnsSliders = useMemo( () => {
 		if ( ! editorSidebarOpened || ! isSelected ) {

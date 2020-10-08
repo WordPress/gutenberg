@@ -7,11 +7,7 @@ import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import {
-	GlobalStylesContext,
-	WIDE_ALIGNMENTS,
-	ALIGNMENT_BREAKPOINTS,
-} from '@wordpress/components';
+import { GlobalStylesContext, WIDE_ALIGNMENTS } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -135,7 +131,6 @@ class BlockListBlock extends Component {
 			marginHorizontal,
 			isInnerBlockSelected,
 			name,
-			parentBlockAlignement,
 		} = this.props;
 
 		if ( ! attributes || ! blockType ) {
@@ -152,8 +147,6 @@ class BlockListBlock extends Component {
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
-		const isParentFullWidth =
-			parentBlockAlignement === WIDE_ALIGNMENTS.alignments.full;
 
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isScreenWidthEqual = blockWidth === screenWidth;
@@ -232,11 +225,7 @@ class BlockListBlock extends Component {
 									blockWidth={ blockWidth }
 									anchorNodeRef={ this.anchorNodeRef.current }
 									isFullWidth={
-										isFullWidth ||
-										( isParentFullWidth &&
-											blockWidth >
-												ALIGNMENT_BREAKPOINTS.mobile ) ||
-										isScreenWidthEqual
+										isFullWidth || isScreenWidthEqual
 									}
 								/>
 							) }
