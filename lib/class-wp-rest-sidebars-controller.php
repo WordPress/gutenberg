@@ -236,9 +236,14 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		if ( isset( $wp_registered_sidebars[ $id ] ) ) {
 			$registered_sidebar = $wp_registered_sidebars[ $id ];
 
-			$sidebar['status']      = 'active';
-			$sidebar['name']        = isset( $registered_sidebar['name'] ) ? $registered_sidebar['name'] : '';
-			$sidebar['description'] = isset( $registered_sidebar['description'] ) ? $registered_sidebar['description'] : '';
+			$sidebar['status']        = 'active';
+			$sidebar['name']          = isset( $registered_sidebar['name'] ) ? $registered_sidebar['name'] : '';
+			$sidebar['description']   = isset( $registered_sidebar['description'] ) ? $registered_sidebar['description'] : '';
+			$sidebar['class']         = isset( $registered_sidebar['class'] ) ? $registered_sidebar['class'] : '';
+			$sidebar['before_widget'] = isset( $registered_sidebar['before_widget'] ) ? $registered_sidebar['before_widget'] : '';
+			$sidebar['after_widget']  = isset( $registered_sidebar['after_widget'] ) ? $registered_sidebar['after_widget'] : '';
+			$sidebar['before_title']  = isset( $registered_sidebar['before_title'] ) ? $registered_sidebar['before_title'] : '';
+			$sidebar['after_title']   = isset( $registered_sidebar['after_title'] ) ? $registered_sidebar['after_title'] : '';
 		} else {
 			$sidebar['status'] = 'inactive';
 		}
@@ -271,10 +276,10 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 				$data[ $property_id ] = $property['default'];
 			}
 		}
-		
-		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
-		$data = $this->add_additional_fields_to_object( $data, $request );
-		$data = $this->filter_response_by_context( $data, $context );
+
+		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
+		$data    = $this->add_additional_fields_to_object( $data, $request );
+		$data    = $this->filter_response_by_context( $data, $context );
 
 		$response = rest_ensure_response( $data );
 
@@ -330,28 +335,63 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			'title'      => 'sidebar',
 			'type'       => 'object',
 			'properties' => array(
-				'id'          => array(
+				'id'            => array(
 					'description' => __( 'ID of sidebar.', 'gutenberg' ),
 					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'name'        => array(
+				'name'          => array(
 					'description' => __( 'Unique name identifying the sidebar.', 'gutenberg' ),
 					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'description' => array(
+				'description'   => array(
 					'description' => __( 'Description of sidebar.', 'gutenberg' ),
 					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'status'      => array(
+				'class'         => array(
+					'description' => __( 'Extra CSS class to assign to the sidebar in the Widgets interface.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'before_widget' => array(
+					'description' => __( 'HTML content to prepend to each widget\'s HTML output when assigned to this sidebar. Default is an opening list item element.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'after_widget'  => array(
+					'description' => __( 'HTML content to append to each widget\'s HTML output when assigned to this sidebar. Default is a closing list item element.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'before_title'  => array(
+					'description' => __( 'HTML content to prepend to the sidebar title when displayed. Default is an opening h2 element.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'after_title'   => array(
+					'description' => __( 'HTML content to append to the sidebar title when displayed. Default is a closing h2 element.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'status'        => array(
 					'description' => __( 'Status of sidebar.', 'gutenberg' ),
 					'type'        => 'string',
 					'enum'        => array( 'active', 'inactive' ),
@@ -359,7 +399,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'widgets'     => array(
+				'widgets'       => array(
 					'description' => __( 'Nested widgets.', 'gutenberg' ),
 					'type'        => 'array',
 					'items'       => array(
