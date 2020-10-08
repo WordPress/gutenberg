@@ -35,3 +35,100 @@ exports[`FormToggle basic rendering should render a checkbox with a user-provide
   />
 </StyledFormToggle>
 `;
+
+exports[`FormToggle basic rendering should render a span element with an unchecked checkbox 1`] = `
+.emotion-6 {
+  position: relative;
+  display: inline-block;
+}
+
+.emotion-6 .emotion-1:focus + .emotion-3 {
+  box-shadow: 0 0 0 2px #fff,0 0 0 3.5px var( --wp-admin-theme-color );
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.components-disabled .emotion-6 {
+  opacity: 0.3;
+}
+
+.emotion-0 {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  margin: 0;
+  padding: 0;
+  z-index: z-index( '.components-form-toggle__input' );
+  border: none;
+}
+
+.emotion-0:checked {
+  background: none;
+}
+
+.emotion-0::before {
+  content: '';
+}
+
+.emotion-2 {
+  content: '';
+  display: inline-block;
+  box-sizing: border-box;
+  vertical-align: top;
+  background-color: #fff;
+  border: 1px solid #1e1e1e;
+  width: 36px;
+  height: 18px;
+  border-radius: 9px;
+  -webkit-transition: 0.2s background ease;
+  transition: 0.2s background ease;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-2 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-4 {
+  display: block;
+  position: absolute;
+  box-sizing: border-box;
+  top: 3px;
+  left: 3px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  -webkit-transition: 0.1s -webkit-transform ease;
+  -webkit-transition: 0.1s transform ease;
+  transition: 0.1s transform ease;
+  background-color: #1e1e1e;
+  border: 5px solid #1e1e1e;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-4 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+<span
+  class="components-form-toggle emotion-6 emotion-7"
+>
+  <input
+    class="components-form-toggle__input emotion-0 emotion-1"
+    type="checkbox"
+  />
+  <span
+    class="components-form-toggle__track emotion-2 emotion-3"
+  />
+  <span
+    class="components-form-toggle__thumb emotion-4 emotion-5"
+  />
+</span>
+`;

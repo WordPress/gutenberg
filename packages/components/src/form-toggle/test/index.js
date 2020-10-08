@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { shallow, render } from 'enzyme';
 import { noop } from 'lodash';
 
 /**
@@ -13,12 +13,8 @@ import { StyledToggleInput } from '../styles/form-toggle-styles';
 describe( 'FormToggle', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render a span element with an unchecked checkbox', () => {
-			const formToggle = shallow( <FormToggle /> );
-			expect( formToggle.hasClass( 'components-form-toggle' ) ).toBe(
-				true
-			);
-			expect( formToggle.hasClass( 'is-checked' ) ).toBe( false );
-			expect( formToggle.type().__emotion_base ).toBe( 'span' );
+			const formToggle = render( <FormToggle /> );
+			expect( formToggle ).toMatchSnapshot();
 		} );
 
 		it( 'should render a checked checkbox and change the accessibility text to On when providing checked prop', () => {
