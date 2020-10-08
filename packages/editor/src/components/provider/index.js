@@ -208,8 +208,12 @@ class EditorProvider extends Component {
 				'titlePlaceholder',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
-			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalFetchReusableBlocks,
+			__experimentalReusableBlocks: reusableBlocks?.map( ( c ) => ( {
+				...c,
+				content: c.content.raw,
+				title: c.title.raw,
+			} ) ),
+			__experimentalFetchReusableBlocks: () => Promise.resolve(),
 			__experimentalFetchLinkSuggestions: partialRight(
 				fetchLinkSuggestions,
 				settings
@@ -318,9 +322,6 @@ export default compose( [
 			getEditorSelectionEnd,
 			isPostTitleSelected,
 		} = select( 'core/editor' );
-		const { __experimentalGetReusableBlocks } = select(
-			'core/reusable-blocks'
-		);
 		const { canUser } = select( 'core' );
 
 		return {
@@ -329,7 +330,10 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			selectionStart: getEditorSelectionStart(),
 			selectionEnd: getEditorSelectionEnd(),
-			reusableBlocks: __experimentalGetReusableBlocks(),
+			reusableBlocks: select( 'core' ).getEntityRecords(
+				'postType',
+				'wp_block'
+			),
 			hasUploadPermissions: defaultTo(
 				canUser( 'create', 'media' ),
 				true
@@ -347,9 +351,6 @@ export default compose( [
 			__experimentalTearDownEditor,
 			undo,
 		} = dispatch( 'core/editor' );
-		const { __experimentalFetchReusableBlocks } = dispatch(
-			'core/reusable-blocks'
-		);
 		const { createWarningNotice } = dispatch( 'core/notices' );
 
 		return {
@@ -365,7 +366,6 @@ export default compose( [
 				} );
 			},
 			tearDownEditor: __experimentalTearDownEditor,
-			__experimentalFetchReusableBlocks,
 			undo,
 		};
 	} ),
