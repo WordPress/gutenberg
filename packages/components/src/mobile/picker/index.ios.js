@@ -20,7 +20,7 @@ class Picker extends Component {
 			anchor,
 		} = this.props;
 		const labels = options.map( ( { label } ) => label );
-		const fullOptions = [ __( 'Cancel' ) ].concat( labels );
+		const fullOptions = [ __( 'Dismiss' ) ].concat( labels );
 
 		ActionSheetIOS.showActionSheetWithOptions(
 			{
