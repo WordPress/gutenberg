@@ -45,7 +45,7 @@ describe( 'custom font styles', () => {
 					strikethrough: true,
 				},
 			},
-		}
+		},
 	};
 
 	describe( 'addSaveProps', () => {
