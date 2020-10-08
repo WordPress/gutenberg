@@ -142,9 +142,16 @@ export default function Sidebar() {
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
 			{ currentArea === 'edit-widgets/widget-areas' && <WidgetAreas /> }
-			{ currentArea === 'edit-widgets/block-inspector' && (
-				<BlockInspector />
-			) }
+			{ currentArea === 'edit-widgets/block-inspector' &&
+				( hasSelectedNonAreaBlock ? (
+					<BlockInspector />
+				) : (
+					// Pretend that Widget Areas are part of the UI by not
+					// showing the Block Inspector when one is selected.
+					<span className="block-editor-block-inspector__no-blocks">
+						{ __( 'No block selected.' ) }
+					</span>
+				) ) }
 		</ComplementaryArea>
 	);
 }
