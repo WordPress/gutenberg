@@ -48,6 +48,7 @@ function UncontrolledInnerBlocks( props ) {
 		__experimentalAppenderTagName,
 		renderAppender,
 		orientation,
+		placeholder,
 	} = props;
 
 	useNestedSettingsUpdate(
@@ -88,6 +89,8 @@ function UncontrolledInnerBlocks( props ) {
 				renderAppender={ renderAppender }
 				__experimentalAppenderTagName={ __experimentalAppenderTagName }
 				wrapperRef={ wrapperRef }
+				className={ classes }
+				placeholder={ placeholder }
 			/>
 		</BlockContextProvider>
 	);
