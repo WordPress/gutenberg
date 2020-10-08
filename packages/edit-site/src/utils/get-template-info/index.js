@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { TEMPLATES_DEFAULT_DETAILS } from '../constants';
+import { TEMPLATES_DEFAULT_DETAILS } from './constants';
 
 export default function getTemplateInfo( template ) {
 	if ( ! template ) {

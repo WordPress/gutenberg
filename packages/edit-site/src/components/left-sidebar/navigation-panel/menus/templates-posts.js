@@ -11,7 +11,7 @@ import { __, _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import TemplateNavigationItems from '../template-navigation-items';
-import { TEMPLATES_POSTS } from '../../../../constants';
+import { TEMPLATES_POSTS } from '../constants';
 
 export default function TemplatePostsMenu( { templates, onActivateItem } ) {
 	const generalTemplates = templates?.find( ( { slug } ) =>
