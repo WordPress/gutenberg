@@ -20,7 +20,17 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 * @var int
 	 */
+	protected static $superadmin_id;
+
+	/**
+	 * @var int
+	 */
 	protected static $admin_id;
+
+	/**
+	 * @var int
+	 */
+	protected static $admin_id_without_unfiltered_html;
 
 	/**
 	 * @var int
@@ -48,6 +58,15 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
+		self::$superadmin_id = $factory->user->create(
+			array(
+				'role'       => 'administrator',
+				'user_login' => 'superadmin',
+			)
+		);
+		if ( is_multisite() ) {
+			update_site_option( 'site_admins', array( 'superadmin' ) );
+		}
 		self::$admin_id      = $factory->user->create(
 			array(
 				'role' => 'administrator',
@@ -506,6 +525,80 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			),
 			$data
 		);
+	}
+
+	/**
+	 * @group multisite
+	 */
+	public function test_store_html_as_admin() {
+		if ( is_multisite() ) {
+			$this->assertEquals(
+				'<div class="textwidget">alert(1)</div>',
+				$this->update_text_widget_with_raw_html( '<script>alert(1)</script>' )
+			);
+		} else {
+			$this->assertEquals(
+				'<div class="textwidget"><script>alert(1)</script></div>',
+				$this->update_text_widget_with_raw_html( '<script>alert(1)</script>' )
+			);
+		}
+	}
+
+	/**
+	 * @group multisite
+	 */
+	public function test_store_html_as_superadmin() {
+		wp_set_current_user( self::$superadmin_id );
+		if ( is_multisite() ) {
+			$this->assertEquals(
+				'<div class="textwidget"><script>alert(1)</script></div>',
+				$this->update_text_widget_with_raw_html( '<script>alert(1)</script>' )
+			);
+		} else {
+			$this->assertEquals(
+				'<div class="textwidget"><script>alert(1)</script></div>',
+				$this->update_text_widget_with_raw_html( '<script>alert(1)</script>' )
+			);
+		}
+	}
+
+	protected function update_text_widget_with_raw_html( $html ) {
+		$this->setup_widget(
+			'widget_text',
+			1,
+			array(
+				'text' => 'Custom text test',
+			)
+		);
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			),
+			array( 'text-1' )
+		);
+
+		$request = new WP_REST_Request( 'POST', '/__experimental/sidebars/sidebar-1' );
+		$request->set_body_params(
+			array(
+				'widgets' => array(
+					array(
+						'id'           => 'text-1',
+						'settings'     => array(
+							'text' => $html,
+						),
+						'id_base'      => 'text',
+						'widget_class' => 'WP_Widget_Text',
+						'name'         => 'Text',
+						'description'  => 'Arbitrary text.',
+						'number'       => 1,
+					),
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		return $data['widgets'][0]['rendered'];
 	}
 
 	/**
