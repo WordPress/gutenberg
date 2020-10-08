@@ -321,7 +321,7 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
 
 ```jsx
 <LinkControlSearchInput
-    renderSuggestions={( { suggestions } ) => {
+    renderSuggestions={( suggestionsProps ) => {
         return (
            	<Popover focusOnMount={ false } position="bottom">
            		<LinkControlSearchResults { ...suggestionsProps } />
