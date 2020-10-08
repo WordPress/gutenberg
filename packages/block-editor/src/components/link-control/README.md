@@ -315,21 +315,21 @@ The list of search results used by `LinkControlSearchInput`.
 - Type: `Function`
 - Required: Yes
 
-Function that takes `suggestion` and `index` as arguments, and returns HTML props of the suggestion item.  When this component used with `LinkControlSearchInput`, this property is provided by `URLInput`.
+Function that takes `suggestion` and `index` as arguments, and returns HTML props of the suggestion item.  When this component is used with `LinkControlSearchInput`, this property is provided by `URLInput`.
 
 ### currentInputValue
 
 - Type: `string`
 - Required: Yes
 
-Current value of the related search input, used e.g. for highlighting matching part of the page title. When this component used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
+Current value of the related search input, used e.g. for highlighting matching part of the page title. When this component is used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
 
 ### handleSuggestionClick
 	
 - Type: `Function`
 - Required: Yes
 
-Called with `suggestion` as the argument, when said suggestion is clicked by the user. When this component used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
+Called with `suggestion` as the argument, when said suggestion is clicked by the user. When this component is used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
 
 See the [createSuggestion](#createSuggestion) section of this file to learn more about suggestions.
 
@@ -338,14 +338,14 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
 - Type: `string`
 - Required: Yes
 
-Unique ID of parent component, used for the aria-label property.  When this component used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
+Unique ID of parent component, used for the aria-label property. When this component is used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
 
 ### isLoading
 
 - Type: `boolean`
 - Required: Yes
 
-Whether the suggestions are being fetched at the moment. When this component used with `LinkControlSearchInput`, this property is provided by `URLInput`.
+Whether the suggestions are being fetched at the moment. When this component is used with `LinkControlSearchInput`, this property is provided by `URLInput`.
 
 ### isInitialSuggestions
 
@@ -359,21 +359,21 @@ Whether this component was rendered to show initial suggestions (the ones displa
 - Type: `Object`
 - Required: Yes
 
-The suggestions that is currently selected. When this component used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
+The suggestions that is currently selected. When this component is used with `LinkControlSearchInput`, this property is provided by `LinkControlSearchInput`.
 
 ### suggestions
 
 - Type: `Array`
 - Required: Yes
 
-The list of suggestions to render. When this component used with `LinkControlSearchInput`, this property is provided by `URLInput`.
+The list of suggestions to render. When this component is used with `LinkControlSearchInput`, this property is provided by `URLInput`.
 
 ### suggestionsListProps
 
 - Type: `Object`
 - Required: No
 
-List of additional HTML properties passed to the element wrapping the list of suggestions. When this component used with `LinkControlSearchInput`, this property is provided by `URLInput`.
+List of additional HTML properties passed to the element wrapping the list of suggestions. When this component is used with `LinkControlSearchInput`, this property is provided by `URLInput`.
 
 ### createSuggestionButtonText
 ### suggestionsQuery
