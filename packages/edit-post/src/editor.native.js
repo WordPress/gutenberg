@@ -10,13 +10,12 @@ import { I18nManager } from 'react-native';
  */
 import { Component } from '@wordpress/element';
 import { EditorProvider } from '@wordpress/editor';
-import { parse, serialize } from '@wordpress/blocks';
+import { parse, serialize, rawHandler } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
 import { SlotFillProvider } from '@wordpress/components';
 import { Preview } from '@wordpress/block-editor';
-import { rawHandler } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
