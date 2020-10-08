@@ -7,17 +7,26 @@
 	position: relative;
 
 	.edit-site-document-actions__title-wrapper {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		transition: transform 0.2s;
+		@include reduce-motion(transition);
+	}
+
+	.edit-site-document-actions__title-wrapper > h1 {
+		display: flex;
+		justify-content: center;
 		margin: 0;
 	}
 
 	.edit-site-document-actions__title {
-		font-size: $default-font-size;
 		display: flex;
 		justify-content: center;
 		align-items: center;
+		font-size: $default-font-size;
 		font-weight: bold;
-		transition: transform 0.2s;
-		@include reduce-motion(transition);
 	}
 
 	.edit-site-document-actions__get-info {
@@ -34,12 +43,14 @@
 	}
 
 	&.has-secondary-label {
+		.edit-site-document-actions__title-wrapper {
+			transform: translateY(-12px);
+		}
+
 		.edit-site-document-actions__title {
 			position: absolute;
-			left: 0;
 			color: $gray-900;
 			font-weight: bold;
-			transform: translateY(-12px);
 
 			&.is-secondary-title-active {
 				color: $gray-700;

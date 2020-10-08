@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -71,8 +72,11 @@ export default function DocumentActions( { template } ) {
 		>
 			{ documentTitle ? (
 				<>
-					<div ref={ titleRef }>
-						<h1 className="edit-site-document-actions__title-wrapper">
+					<div
+						ref={ titleRef }
+						className="edit-site-document-actions__title-wrapper"
+					>
+						<h1>
 							<VisuallyHidden>
 								{ __( 'Edit template:' ) }
 							</VisuallyHidden>
@@ -88,10 +92,11 @@ export default function DocumentActions( { template } ) {
 								{ documentTitle }
 							</div>
 						</h1>
-
 						{ ! isActive && (
 							<Dropdown
-								popoverProps={ { anchorRef: titleRef.current } }
+								popoverProps={ {
+									anchorRef: titleRef.current,
+								} }
 								position="bottom center"
 								renderToggle={ ( { isOpen, onToggle } ) => (
 									<Button
@@ -109,6 +114,7 @@ export default function DocumentActions( { template } ) {
 							/>
 						) }
 					</div>
+
 					<div
 						className={ classnames(
 							'edit-site-document-actions__secondary-item',
