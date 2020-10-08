@@ -145,6 +145,7 @@ html.interface-interface-skeleton__html-container {
 	bottom: 0;
 	width: 100%;
 	background-color: $white;
+	z-index: 90;
 
 	// On Mobile the footer is hidden
 	display: none;
