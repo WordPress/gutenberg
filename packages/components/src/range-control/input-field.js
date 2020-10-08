@@ -7,11 +7,11 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { ENTER } from '@wordpress/keycodes';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import { useControlledState } from '../utils/hooks';
 import { InputNumber } from './styles/range-control-styles';
 
 export default function InputField( {
@@ -32,7 +32,14 @@ export default function InputField( {
 	 * necessary to accommodate individual keystroke values that may not
 	 * be considered "valid" (e.g. within the min - max range).
 	 */
-	const [ value, setValue ] = useControlledState( valueProp );
+	const [ value, setValue ] = useState( valueProp );
+
+	/**
+	 * Syncs incoming value (prop) within internal state.
+	 */
+	useEffect( () => {
+		setValue( valueProp );
+	}, [ valueProp ] );
 
 	const handleOnReset = ( event ) => {
 		onReset( event );
@@ -56,8 +63,23 @@ export default function InputField( {
 		handleOnCommit( event );
 	};
 
-	const handleOnChange = ( next ) => {
-		handleOnCommit( { target: { value: next } } );
+	const handleOnChange = ( next, { event } ) => {
+		const nextValue = parseFloat( next );
+		setValue( nextValue );
+
+		/**
+		 * Prevent submitting if changes are invalid.
+		 * This only applies to values being entered via KEY_DOWN.
+		 *
+		 * Pressing the up/down arrows of the HTML input also triggers a
+		 * change event. However, those values will be (pre)validated by the
+		 * HTML input.
+		 */
+		if ( event.target.checkValidity && ! event.target.checkValidity() ) {
+			return;
+		}
+
+		handleOnCommit( event );
 	};
 
 	const handleOnKeyDown = ( event ) => {

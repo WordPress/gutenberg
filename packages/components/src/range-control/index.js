@@ -129,7 +129,7 @@ function RangeControl(
 		}
 
 		setValue( nextValue );
-		onChange( nextValue );
+		onChange( clamp( nextValue, min, max ) );
 	};
 
 	const handleOnReset = () => {
