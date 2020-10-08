@@ -1,0 +1,37 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`FormToggle basic rendering should render a checkbox with a noop onChange 1`] = `
+<StyledFormToggle
+  className="components-form-toggle"
+>
+  <StyledToggleInput
+    className="components-form-toggle__input"
+    onChange={[Function]}
+    type="checkbox"
+  />
+  <StyledToggleTrack
+    className="components-form-toggle__track"
+  />
+  <StyledToggleThumb
+    className="components-form-toggle__thumb"
+  />
+</StyledFormToggle>
+`;
+
+exports[`FormToggle basic rendering should render a checkbox with a user-provided onChange 1`] = `
+<StyledFormToggle
+  className="components-form-toggle"
+>
+  <StyledToggleInput
+    className="components-form-toggle__input"
+    onChange={[Function]}
+    type="checkbox"
+  />
+  <StyledToggleTrack
+    className="components-form-toggle__track"
+  />
+  <StyledToggleThumb
+    className="components-form-toggle__thumb"
+  />
+</StyledFormToggle>
+`;
