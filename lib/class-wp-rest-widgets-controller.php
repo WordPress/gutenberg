@@ -176,6 +176,8 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$_POST       = $backup_post;
 		$this->assign_to_sidebar( $widget_id, $sidebar_id );
 
+		$request['context'] = 'edit';
+
 		$response = $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
 		$response->set_status( 201 );
 
@@ -218,6 +220,8 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			$this->assign_to_sidebar( $widget_id, $sidebar_id );
 			$sidebar_id = $request['sidebar'];
 		}
+
+		$request['context'] = 'edit';
 
 		return $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
 	}

@@ -58,6 +58,9 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 					'methods'             => WP_REST_Server::READABLE,
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
+					'args'                => array(
+						'context' => $this->get_context_param( array( 'default' => 'view' ) ),
+					),
 				),
 				'schema' => array( $this, 'get_public_item_schema' ),
 			)
@@ -73,13 +76,14 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 					'callback'            => array( $this, 'get_item' ),
 					'permission_callback' => array( $this, 'permissions_check' ),
 					'args'                => array(
-						'id' => array(
+						'id'      => array(
 							'description'       => __( 'The id of a registered sidebar', 'gutenberg' ),
 							'type'              => 'string',
 							'validate_callback' => function ( $id ) {
 								return $this->get_sidebar( $id )[0];
 							},
 						),
+						'context' => $this->get_context_param( array( 'default' => 'view' ) ),
 					),
 				),
 				array(
@@ -128,7 +132,9 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		foreach ( (array) wp_get_sidebars_widgets() as $id => $widgets ) {
 			$sidebar = $this->get_sidebar( $id )[1];
 
-			$data[] = $this->prepare_item_for_response( $sidebar, $request )->get_data();
+			$data[] = $this->prepare_response_for_collection(
+				$this->prepare_item_for_response( $sidebar, $request )
+			);
 		}
 
 		return rest_ensure_response( $data );
@@ -169,6 +175,8 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 
 			$sidebars[ $request['id'] ] = $request['widgets'];
 		}
+
+		$request['context'] = 'edit';
 
 		return $this->prepare_item_for_response( $this->get_sidebar( $request['id'] ), $request );
 	}
