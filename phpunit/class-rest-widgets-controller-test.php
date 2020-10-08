@@ -218,7 +218,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request  = new WP_REST_Request( 'GET', '/__experimental/widgets' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertEquals(
+		$this->assertEqualSets(
 			array(
 				array(
 					'id'           => 'text-1',
@@ -274,7 +274,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request['context'] = 'edit';
 		$response           = rest_get_server()->dispatch( $request );
 		$data               = $response->get_data();
-		$this->assertEquals(
+		$this->assertEqualSets(
 			array(
 				array(
 					'id'            => 'text-1',
@@ -320,7 +320,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request  = new WP_REST_Request( 'GET', '/__experimental/widgets/text-1' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertEquals(
+		$this->assertEqualSets(
 			array(
 				'id'           => 'text-1',
 				'sidebar'      => 'sidebar-1',
@@ -414,7 +414,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 'text-1', $data['id'] );
 		$this->assertEquals( 'sidebar-1', $data['sidebar'] );
 		$this->assertEquals( 1, $data['number'] );
-		$this->assertEquals(
+		$this->assertEqualSets(
 			array(
 				'text'   => 'Updated text test',
 				'title'  => '',
@@ -457,7 +457,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 'text-2', $data['id'] );
 		$this->assertEquals( 'sidebar-1', $data['sidebar'] );
 		$this->assertEquals( 2, $data['number'] );
-		$this->assertEquals(
+		$this->assertEqualSets(
 			array(
 				'text'   => 'Updated text test',
 				'title'  => '',
@@ -507,7 +507,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 'text-1', $data['id'] );
 		$this->assertEquals( 'sidebar-1', $data['sidebar'] );
 		$this->assertEquals( 1, $data['number'] );
-		$this->assertEquals(
+		$this->assertEqualSets(
 			array(
 				'text'   => 'Updated text test',
 				'title'  => '',
@@ -701,7 +701,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertEquals(
+		$this->assertEqualSets(
 			array(
 				'id'            => $widget_id,
 				'sidebar'       => 'sidebar-1',
@@ -775,7 +775,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals(
+		$this->assertEqualSets(
 			array(
 				'text'   => 'Updated \\" \\\' text test',
 				'title'  => '',
@@ -812,7 +812,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request  = new WP_REST_Request( 'DELETE', '/__experimental/widgets/text-1' );
 		$response = rest_do_request( $request );
 
-		$this->assertEquals(
+		$this->assertEqualSets(
 			array(
 				'id'            => 'text-1',
 				'sidebar'       => 'wp_inactive_widgets',
@@ -857,7 +857,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request->set_query_params( array( 'force' => true ) );
 		$response = rest_do_request( $request );
 
-		$this->assertEquals(
+		$this->assertEqualSets(
 			array(
 				'deleted'  => true,
 				'previous' => array(
