@@ -311,8 +311,20 @@ See the [createSuggestion](#createSuggestion) section of this file to learn more
         return (
            	<Popover focusOnMount={ false } position="bottom">
            		<ul>
-                    { suggestions.map( () => <li key={ `${ suggestion.id }-${ suggestion.type }` }>{ suggestion.title }</li> }
+                    { suggestions.map( () => <li key={ `${ suggestion.id }-${ suggestion.type }` }>{ suggestion.title }</li> ) }
                 </ul>
+           	</Popover>
+        );
+    })
+/>
+```
+
+```jsx
+<LinkControlSearchInput
+    renderSuggestions={( { suggestions } ) => {
+        return (
+           	<Popover focusOnMount={ false } position="bottom">
+           		<LinkControlSearchResults { ...suggestionsProps } />
            	</Popover>
         );
     })
