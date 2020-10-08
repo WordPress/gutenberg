@@ -33,7 +33,7 @@ export const Gallery = ( props ) => {
 		caption,
 		imageCrop,
 	} = attributes;
-	const blockProps = useBlockProps();
+
 	return (
 		<figure
 			className={ classnames( className, {
@@ -45,8 +45,6 @@ export const Gallery = ( props ) => {
 			<InnerBlocks
 				allowedBlocks={ [ 'core/image' ] }
 				__experimentalTagName="ul"
-				__experimentalAppenderTagName="li"
-				__experimentalPassedProps={ blockProps }
 			/>
 
 			{ mediaPlaceholder }

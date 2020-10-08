@@ -1,5 +1,5 @@
 .wp-block-gallery {
-	ul.block-editor-block-list__layout {
+	ul {
 		display: flex;
 		flex-wrap: wrap;
 		list-style-type: none;
@@ -75,7 +75,7 @@
 	}
 
 	// Cropped
-	&.is-cropped ul.block-editor-block-list__layout li.wp-block-image {
+	&.is-cropped ul li.wp-block-image {
 		a,
 		img {
 			// IE11 doesn't support object-fit, so just make sure images aren't skewed.
