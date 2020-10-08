@@ -268,6 +268,8 @@ describe( 'Preview with Custom Fields enabled', () => {
 	it( 'displays edits to the post title and content in the preview', async () => {
 		const editorPage = page;
 
+		// Make sure input is mounted in editor before adding content.
+		await editorPage.waitForSelector( '.editor-post-title__input' );
 		// Add an initial title and content.
 		await editorPage.type( '.editor-post-title__input', 'title 1' );
 		await editorPage.keyboard.press( 'Tab' );
