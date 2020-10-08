@@ -380,7 +380,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 
 			// Just because we saved new widget doesn't mean it was added to $wp_registered_widgets.
 			// Let's make sure it's there so that it's included in the response.
-			if ( ! isset( $wp_registered_widgets[ $input_widget['id'] ] ) || $number === 1 ) {
+			if ( ! isset( $wp_registered_widgets[ $input_widget['id'] ] ) || 1 === $number ) {
 				$first_widget_id = substr( $input_widget['id'], 0, strrpos( $input_widget['id'], '-' ) ) . '-1';
 
 				if ( isset( $wp_registered_widgets[ $first_widget_id ] ) ) {
