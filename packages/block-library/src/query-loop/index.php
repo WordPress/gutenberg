@@ -26,6 +26,12 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 	);
 
 	if ( isset( $block->context['query'] ) ) {
+		if ( isset( $block->context['query']['postType'] ) ) {
+			$query['post_type'] = $block->context['query']['postType'];
+		}
+		if ( isset( $block->context['query']['exclude'] ) ) {
+			$query['post__not_in'] = $block->context['query']['exclude'];
+		}
 		if ( isset( $block->context['query']['perPage'] ) ) {
 			$query['offset'] = ( $block->context['query']['perPage'] * ( $page - 1 ) ) + $block->context['query']['offset'];
 		}
