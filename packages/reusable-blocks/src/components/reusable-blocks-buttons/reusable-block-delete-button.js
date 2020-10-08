@@ -40,14 +40,15 @@ export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlock } = select( 'core/block-editor' );
 		const { canUser } = select( 'core' );
-		const { __experimentalGetReusableBlock: getReusableBlock } = select(
-			'core/reusable-blocks'
-		);
 		const block = getBlock( clientId );
 
 		const reusableBlock =
 			block && isReusableBlock( block )
-				? getReusableBlock( block.attributes.ref )
+				? select( 'core' ).getEntityRecord(
+						'postType',
+						'wp_block',
+						block.attributes.ref
+				  )
 				: null;
 
 		return {

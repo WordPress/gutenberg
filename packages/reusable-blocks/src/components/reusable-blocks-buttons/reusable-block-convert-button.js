@@ -23,9 +23,6 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 			const { getBlocksByClientId, canInsertBlockType } = select(
 				'core/block-editor'
 			);
-			const { __experimentalGetReusableBlock: getReusableBlock } = select(
-				'core/reusable-blocks'
-			);
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
 
@@ -33,7 +30,11 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 				blocks.length === 1 &&
 				blocks[ 0 ] &&
 				isReusableBlock( blocks[ 0 ] ) &&
-				!! getReusableBlock( blocks[ 0 ].attributes.ref );
+				!! select( 'core' ).getEntityRecord(
+					'postType',
+					'wp_block',
+					blocks[ 0 ].attributes.ref
+				);
 
 			const _canConvert =
 				// Hide when this is already a reusable block.
