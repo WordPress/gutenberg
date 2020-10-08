@@ -1,3 +1,10 @@
+.wp-block-gallery {
+
+	figcaption {
+		flex-grow: 1;
+	}
+}
+
 .wp-block-gallery,
 .blocks-gallery-grid {
 	display: flex;
