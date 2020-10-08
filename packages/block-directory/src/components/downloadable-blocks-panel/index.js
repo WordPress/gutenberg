@@ -90,13 +90,15 @@ export default compose( [
 			'block-directory/search'
 		);
 
-		const searchResultBlocks = getDownloadableBlocks( filterValue ).filter(
-			( block ) => {
-				return canInsertBlockType( block, rootClientId, true );
-			}
-		);
+		function getInstallableBlocks( term ) {
+			return getDownloadableBlocks( term ).filter( ( block ) =>
+				canInsertBlockType( block, rootClientId, true )
+			);
+		}
 
-		const downloadableItems = hasPermission ? searchResultBlocks : [];
+		const downloadableItems = hasPermission
+			? getInstallableBlocks( filterValue )
+			: [];
 		const isLoading = isRequestingDownloadableBlocks( filterValue );
 
 		return {
