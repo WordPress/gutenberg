@@ -54,10 +54,6 @@ Unlike `fetch`, the `Promise` return value of `apiFetch` will resolve to the par
 
 Shorthand to be used in place of `body`, accepts an object value to be stringified to JSON.
 
-#### `responseBody` (`object`)
-
-If specified, the default fetch handler will short-circuit and return the value of this option as a response. This is especially useful in middlewares.
-
 ### Middlewares
 
 the `api-fetch` package supports middlewares. Middlewares are functions you can use to wrap the `apiFetch` calls to perform any pre/post process to the API requests.

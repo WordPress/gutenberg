@@ -66,10 +66,6 @@ const defaultFetchHandler = ( nextOptions ) => {
 	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
 	let { body, headers } = nextOptions;
 
-	if ( nextOptions?.responseBody ) {
-		return nextOptions.responseBody;
-	}
-
 	// Merge explicitly-provided headers with default values.
 	headers = { ...DEFAULT_HEADERS, ...headers };
 
