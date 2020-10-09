@@ -11,7 +11,7 @@ import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { STORE_KEY, REUSABLE_BLOCK_NOTICE_ID } from '../../store/constants';
+import { STORE_KEY } from '../../store/constants';
 
 export function ReusableBlockDeleteButton( { clientId } ) {
 	const { isVisible, isDisabled, block } = useSelect(
@@ -53,12 +53,10 @@ export function ReusableBlockDeleteButton( { clientId } ) {
 			try {
 				await deleteReusableBlock( block.attributes.ref );
 				createSuccessNotice( __( 'Block deleted.' ), {
-					id: REUSABLE_BLOCK_NOTICE_ID,
 					type: 'snackbar',
 				} );
 			} catch ( error ) {
 				createErrorNotice( error.message, {
-					id: REUSABLE_BLOCK_NOTICE_ID,
 					type: 'snackbar',
 				} );
 			}

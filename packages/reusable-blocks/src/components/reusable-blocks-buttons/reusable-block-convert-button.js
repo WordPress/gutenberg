@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { STORE_KEY, REUSABLE_BLOCK_NOTICE_ID } from '../../store/constants';
+import { STORE_KEY } from '../../store/constants';
 
 /**
  * Menu control to convert block(s) to reusable block.
@@ -76,12 +76,10 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 			try {
 				await convertBlocksToReusable( clientIds );
 				createSuccessNotice( __( 'Block created.' ), {
-					id: REUSABLE_BLOCK_NOTICE_ID,
 					type: 'snackbar',
 				} );
 			} catch ( error ) {
 				createErrorNotice( error.message, {
-					id: REUSABLE_BLOCK_NOTICE_ID,
 					type: 'snackbar',
 				} );
 			}
