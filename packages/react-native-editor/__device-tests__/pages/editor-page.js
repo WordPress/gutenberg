@@ -221,7 +221,7 @@ export default class EditorPage {
 		}
 
 		const blockButton = await this.driver.elementByAccessibilityId(
-			blockName
+			blockAccessibilityLabel
 		);
 		const size = await this.driver.getWindowSize();
 		const height = size.height - 5;
