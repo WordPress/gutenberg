@@ -21,6 +21,8 @@
 		margin-top: $grid-unit-20;
 		transition: all 0.05s ease-in-out;
 		border: $border-width solid transparent;
+		width: 100%;
+		background-color: $white;
 
 		&:hover {
 			border: $border-width solid var(--wp-admin-theme-color);

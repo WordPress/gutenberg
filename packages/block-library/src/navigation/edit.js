@@ -10,6 +10,7 @@ import classnames from 'classnames';
 import { useState } from '@wordpress/element';
 import {
 	InnerBlocks,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	BlockControls,
 	useBlockProps,
@@ -49,6 +50,33 @@ function Navigation( {
 	const blockProps = useBlockProps();
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
+	);
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-navigation__container',
+		},
+		{
+			allowedBlocks: [
+				'core/navigation-link',
+				'core/search',
+				'core/social-links',
+			],
+			orientation: attributes.orientation || 'horizontal',
+			renderAppender:
+				( isImmediateParentOfSelectedBlock &&
+					! selectedBlockHasDescendants ) ||
+				isSelected
+					? InnerBlocks.DefaultAppender
+					: false,
+			templateInsertUpdatesSelection: false,
+			__experimentalAppenderTagName: 'li',
+			__experimentalCaptureToolbars: true,
+			// Template lock set to false here so that the Nav
+			// Block on the experimental menus screen does not
+			// inherit templateLock={ 'all' }.
+			templateLock: false,
+		}
 	);
 
 	if ( isPlaceholderShown ) {
@@ -150,32 +178,7 @@ function Navigation( {
 					blockClassNames
 				) }
 			>
-				<InnerBlocks
-					allowedBlocks={ [
-						'core/navigation-link',
-						'core/search',
-						'core/social-links',
-					] }
-					renderAppender={
-						( isImmediateParentOfSelectedBlock &&
-							! selectedBlockHasDescendants ) ||
-						isSelected
-							? InnerBlocks.DefaultAppender
-							: false
-					}
-					templateInsertUpdatesSelection={ false }
-					orientation={ attributes.orientation || 'horizontal' }
-					__experimentalTagName="ul"
-					__experimentalAppenderTagName="li"
-					__experimentalPassedProps={ {
-						className: 'wp-block-navigation__container',
-					} }
-					__experimentalCaptureToolbars={ true }
-					// Template lock set to false here so that the Nav
-					// Block on the experimental menus screen does not
-					// inherit templateLock={ 'all' }.
-					templateLock={ false }
-				/>
+				<ul { ...innerBlocksProps } />
 			</nav>
 		</>
 	);
