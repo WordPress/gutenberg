@@ -91,11 +91,7 @@ export default function useEditorFeature( featurePath ) {
 			// This is only necessary to support typography.dropCap.
 			// when __experimentalFeatures are not present (core without plugin).
 			// To remove when __experimentalFeatures are ported to core.
-			if ( featurePath === 'typography.dropCap' ) {
-				return true;
-			}
-
-			return experimentalFeature;
+			return featurePath === 'typography.dropCap' ? true : undefined;
 		},
 		[ blockName, featurePath ]
 	);
