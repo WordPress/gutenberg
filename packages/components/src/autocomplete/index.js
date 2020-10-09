@@ -8,14 +8,14 @@ import { escapeRegExp, find, map, debounce, deburr } from 'lodash';
  * WordPress dependencies
  */
 import {
-	Component,
 	renderToString,
+	useEffect,
 	useLayoutEffect,
 	useState,
 } from '@wordpress/element';
 import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import {
 	create,
 	slice,
@@ -61,7 +61,7 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
  * @callback FnGetOptionLabel
  * @param {CompleterOption} option a completer option.
  *
- * @return {(string|Array.<(string|Component)>)} list of react components to render.
+ * @return {(string|Array.<(string|WPElement)>)} list of react components to render.
  */
 
 /**
@@ -277,31 +277,23 @@ const getAutoCompleterUI = ( autocompleter ) => {
 	return AutocompleterUI;
 };
 
-export class Autocomplete extends Component {
-	static getInitialState() {
-		return {
-			selectedIndex: 0,
-			filteredOptions: [],
-			filterValue: '',
-			autocompleter: null,
-			AutocompleterUI: null,
-		};
-	}
+function Autocomplete( {
+	children,
+	isSelected,
+	record,
+	onChange,
+	onReplace,
+	completers,
+	debouncedSpeak,
+} ) {
+	const instanceId = useInstanceId( Autocomplete );
+	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
+	const [ filteredOptions, setFilteredOptions ] = useState( [] );
+	const [ filterValue, setFilterValue ] = useState( '' );
+	const [ autocompleter, setAutocompleter ] = useState( null );
+	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
 
-	constructor() {
-		super( ...arguments );
-
-		this.select = this.select.bind( this );
-		this.reset = this.reset.bind( this );
-		this.onChangeOptions = this.onChangeOptions.bind( this );
-		this.handleKeyDown = this.handleKeyDown.bind( this );
-
-		this.state = this.constructor.getInitialState();
-	}
-
-	insertCompletion( replacement ) {
-		const { autocompleter, filterValue } = this.state;
-		const { record, onChange } = this.props;
+	function insertCompletion( replacement ) {
 		const end = record.start;
 		const start =
 			end - autocompleter.triggerPrefix.length - filterValue.length;
@@ -310,9 +302,7 @@ export class Autocomplete extends Component {
 		onChange( insert( record, toInsert, start, end ) );
 	}
 
-	select( option ) {
-		const { onReplace } = this.props;
-		const { autocompleter, filterValue } = this.state;
+	function select( option ) {
 		const { getOptionCompletion } = autocompleter || {};
 
 		if ( option.isDisabled ) {
@@ -331,34 +321,37 @@ export class Autocomplete extends Component {
 			if ( 'replace' === action ) {
 				onReplace( [ value ] );
 			} else if ( 'insert-at-caret' === action ) {
-				this.insertCompletion( value );
+				insertCompletion( value );
 			}
 		}
 
 		// Reset autocomplete state after insertion rather than before
 		// so insertion events don't cause the completion menu to redisplay.
-		this.reset();
+		reset();
 	}
 
-	reset() {
-		this.setState( this.constructor.getInitialState() );
+	function reset() {
+		setSelectedIndex( 0 );
+		setFilteredOptions( [] );
+		setFilterValue( '' );
+		setAutocompleter( null );
+		setAutocompleterUI( null );
 	}
 
-	announce( filteredOptions ) {
-		const { debouncedSpeak } = this.props;
+	function announce( options ) {
 		if ( ! debouncedSpeak ) {
 			return;
 		}
-		if ( !! filteredOptions.length ) {
+		if ( !! options.length ) {
 			debouncedSpeak(
 				sprintf(
 					/* translators: %d: number of results. */
 					_n(
 						'%d result found, use up and down arrow keys to navigate.',
 						'%d results found, use up and down arrow keys to navigate.',
-						filteredOptions.length
+						options.length
 					),
-					filteredOptions.length
+					options.length
 				),
 				'assertive'
 			);
@@ -370,55 +363,50 @@ export class Autocomplete extends Component {
 	/**
 	 * Load options for an autocompleter.
 	 *
-	 * @param {Array} filteredOptions
+	 * @param {Array} options
 	 */
-	onChangeOptions( filteredOptions ) {
-		const selectedIndex =
-			filteredOptions.length === this.state.filteredOptions.length
-				? this.state.selectedIndex
-				: 0;
-		this.setState( {
-			filteredOptions,
-			selectedIndex,
-		} );
-		this.announce( filteredOptions );
+	function onChangeOptions( options ) {
+		setSelectedIndex(
+			options.length === filteredOptions.length ? selectedIndex : 0
+		);
+		setFilteredOptions( options );
+		announce( options );
 	}
 
-	handleKeyDown( event ) {
-		const { autocompleter, selectedIndex, filteredOptions } = this.state;
+	function handleKeyDown( event ) {
 		if ( ! autocompleter ) {
 			return;
 		}
 		if ( filteredOptions.length === 0 ) {
 			return;
 		}
-		let nextSelectedIndex;
 		switch ( event.keyCode ) {
 			case UP:
-				nextSelectedIndex =
+				setSelectedIndex(
 					( selectedIndex === 0
 						? filteredOptions.length
-						: selectedIndex ) - 1;
-				this.setState( { selectedIndex: nextSelectedIndex } );
+						: selectedIndex ) - 1
+				);
 				break;
 
 			case DOWN:
-				nextSelectedIndex =
-					( selectedIndex + 1 ) % filteredOptions.length;
-				this.setState( { selectedIndex: nextSelectedIndex } );
+				setSelectedIndex(
+					( selectedIndex + 1 ) % filteredOptions.length
+				);
 				break;
 
 			case ESCAPE:
-				this.setState( { autocompleter: null, AutocompleterUI: null } );
+				setAutocompleter( null );
+				setAutocompleterUI( null );
 				break;
 
 			case ENTER:
-				this.select( filteredOptions[ selectedIndex ] );
+				select( filteredOptions[ selectedIndex ] );
 				break;
 
 			case LEFT:
 			case RIGHT:
-				this.reset();
+				reset();
 				return;
 
 			default:
@@ -431,110 +419,92 @@ export class Autocomplete extends Component {
 		event.stopPropagation();
 	}
 
-	componentDidUpdate( prevProps ) {
-		const { record, completers } = this.props;
-		const { record: prevRecord } = prevProps;
+	let textContent;
 
-		if ( isCollapsed( record ) ) {
-			const text = deburr( getTextContent( slice( record, 0 ) ) );
-			const prevText = deburr( getTextContent( slice( prevRecord, 0 ) ) );
+	if ( isCollapsed( record ) ) {
+		textContent = getTextContent( slice( record, 0 ) );
+	}
 
-			if ( text !== prevText ) {
-				const textAfterSelection = getTextContent(
-					slice( record, undefined, getTextContent( record ).length )
-				);
-				const autocompleter = find(
-					completers,
-					( { triggerPrefix, allowContext } ) => {
-						const index = text.lastIndexOf( triggerPrefix );
+	useEffect( () => {
+		if ( ! textContent ) {
+			return;
+		}
 
-						if ( index === -1 ) {
-							return false;
-						}
+		const text = deburr( textContent );
+		const textAfterSelection = getTextContent(
+			slice( record, undefined, getTextContent( record ).length )
+		);
+		const completer = find(
+			completers,
+			( { triggerPrefix, allowContext } ) => {
+				const index = text.lastIndexOf( triggerPrefix );
 
-						if (
-							allowContext &&
-							! allowContext(
-								text.slice( 0, index ),
-								textAfterSelection
-							)
-						) {
-							return false;
-						}
-
-						return /^\S*$/.test(
-							text.slice( index + triggerPrefix.length )
-						);
-					}
-				);
-
-				if ( ! autocompleter ) {
-					this.reset();
-					return;
+				if ( index === -1 ) {
+					return false;
 				}
 
-				const safeTrigger = escapeRegExp( autocompleter.triggerPrefix );
-				const match = text.match(
-					new RegExp( `${ safeTrigger }(\\S*)$` )
+				if (
+					allowContext &&
+					! allowContext( text.slice( 0, index ), textAfterSelection )
+				) {
+					return false;
+				}
+
+				return /^\S*$/.test(
+					text.slice( index + triggerPrefix.length )
 				);
-				const query = match && match[ 1 ];
-				this.setState( {
-					autocompleter,
-					AutocompleterUI:
-						autocompleter !== this.state.autocompleter
-							? getAutoCompleterUI( autocompleter )
-							: this.state.AutocompleterUI,
-					filterValue: query,
-				} );
 			}
-		}
-	}
-
-	render() {
-		const { children, instanceId, isSelected } = this.props;
-		const {
-			autocompleter,
-			selectedIndex,
-			filteredOptions,
-			AutocompleterUI,
-			filterValue,
-		} = this.state;
-		const { key: selectedKey = '' } =
-			filteredOptions[ selectedIndex ] || {};
-		const { className } = autocompleter || {};
-		const isExpanded = !! autocompleter && filteredOptions.length > 0;
-		const listBoxId = isExpanded
-			? `components-autocomplete-listbox-${ instanceId }`
-			: null;
-		const activeId = isExpanded
-			? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
-			: null;
-
-		return (
-			<>
-				{ children( {
-					isExpanded,
-					listBoxId,
-					activeId,
-					onKeyDown: this.handleKeyDown,
-				} ) }
-				{ isSelected && AutocompleterUI && (
-					<AutocompleterUI
-						className={ className }
-						filterValue={ filterValue }
-						instanceId={ instanceId }
-						listBoxId={ listBoxId }
-						selectedIndex={ selectedIndex }
-						onChangeOptions={ this.onChangeOptions }
-						onSelect={ this.select }
-						onReset={ this.onReset }
-					/>
-				) }
-			</>
 		);
-	}
+
+		if ( ! completer ) {
+			reset();
+			return;
+		}
+
+		const safeTrigger = escapeRegExp( completer.triggerPrefix );
+		const match = text.match( new RegExp( `${ safeTrigger }(\\S*)$` ) );
+		const query = match && match[ 1 ];
+
+		setAutocompleter( completer );
+		setAutocompleterUI( () =>
+			completer !== autocompleter
+				? getAutoCompleterUI( completer )
+				: AutocompleterUI
+		);
+		setFilterValue( query );
+	}, [ textContent ] );
+
+	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
+	const { className } = autocompleter || {};
+	const isExpanded = !! autocompleter && filteredOptions.length > 0;
+	const listBoxId = isExpanded
+		? `components-autocomplete-listbox-${ instanceId }`
+		: null;
+	const activeId = isExpanded
+		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
+		: null;
+
+	return (
+		<>
+			{ children( {
+				isExpanded,
+				listBoxId,
+				activeId,
+				onKeyDown: handleKeyDown,
+			} ) }
+			{ isSelected && AutocompleterUI && (
+				<AutocompleterUI
+					className={ className }
+					filterValue={ filterValue }
+					instanceId={ instanceId }
+					listBoxId={ listBoxId }
+					selectedIndex={ selectedIndex }
+					onChangeOptions={ onChangeOptions }
+					onSelect={ select }
+				/>
+			) }
+		</>
+	);
 }
 
-export default compose( [ withSpokenMessages, withInstanceId ] )(
-	Autocomplete
-);
+export default withSpokenMessages( Autocomplete );

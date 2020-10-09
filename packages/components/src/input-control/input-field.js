@@ -39,6 +39,7 @@ function InputField(
 		setIsFocused,
 		stateReducer = ( state ) => state,
 		value: valueProp,
+		type,
 		...props
 	},
 	ref
@@ -100,6 +101,19 @@ function InputField(
 			}
 		}
 	};
+
+	/*
+	 * Works around the odd UA (e.g. Firefox) that does not focus inputs of
+	 * type=number when their spinner arrows are pressed.
+	 */
+	let handleOnMouseDown;
+	if ( type === 'number' ) {
+		handleOnMouseDown = ( event ) => {
+			if ( event.target !== event.target.ownerDocument.activeElement ) {
+				event.target.focus();
+			}
+		};
+	}
 
 	const handleOnFocus = ( event ) => {
 		onFocus( event );
@@ -191,9 +205,11 @@ function InputField(
 			onChange={ handleOnChange }
 			onFocus={ handleOnFocus }
 			onKeyDown={ handleOnKeyDown }
+			onMouseDown={ handleOnMouseDown }
 			ref={ ref }
 			size={ size }
 			value={ value }
+			type={ type }
 		/>
 	);
 }

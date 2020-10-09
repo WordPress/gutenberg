@@ -50,7 +50,9 @@
 		"anchor": true,
 		"align": true,
 		"html": false,
-		"__experimentalPadding": true
+		"spacing": {
+			"padding": true
+		}
 	},
 	"editorStyle": "wp-block-cover-editor",
 	"style": "wp-block-cover"

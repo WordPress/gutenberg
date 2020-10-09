@@ -5,7 +5,9 @@ import { useEffect, useRef } from '@wordpress/element';
 import {
 	__experimentalNavigation as Navigation,
 	__experimentalNavigationMenu as NavigationMenu,
+	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationBackButton as NavigationBackButton,
+	createSlotFill,
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -13,29 +15,37 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import TemplateSwitcher from './template-switcher';
+import TemplatesMenu from './menus/templates';
+import TemplatePartsMenu from './menus/template-parts';
+
+export const {
+	Fill: NavigationPanelPreviewFill,
+	Slot: NavigationPanelPreviewSlot,
+} = createSlotFill( 'EditSiteNavigationPanelPreview' );
 
 const NavigationPanel = () => {
 	const ref = useRef();
 
 	useEffect( () => {
-		ref.current.focus();
+		if ( ref.current ) {
+			ref.current.focus();
+		}
 	}, [ ref ] );
 
-	const { templateId, templatePartId, templateType, page } = useSelect(
+	const { templateId, templatePartId, templateType, activeMenu } = useSelect(
 		( select ) => {
 			const {
 				getTemplateId,
 				getTemplatePartId,
 				getTemplateType,
-				getPage,
+				getNavigationPanelActiveMenu,
 			} = select( 'core/edit-site' );
 
 			return {
 				templateId: getTemplateId(),
 				templatePartId: getTemplatePartId(),
 				templateType: getTemplateType(),
-				page: getPage(),
+				activeMenu: getNavigationPanelActiveMenu(),
 			};
 		},
 		[]
@@ -43,9 +53,8 @@ const NavigationPanel = () => {
 
 	const {
 		setTemplate,
-		addTemplate,
-		removeTemplate,
 		setTemplatePart,
+		setNavigationPanelActiveMenu,
 	} = useDispatch( 'core/edit-site' );
 
 	return (
@@ -53,28 +62,39 @@ const NavigationPanel = () => {
 			<Navigation
 				activeItem={
 					'wp_template' === templateType
-						? `template-${ templateId }`
-						: `template-part-${ templatePartId }`
+						? `${ templateType }-${ templateId }`
+						: `${ templateType }-${ templatePartId }`
 				}
+				activeMenu={ activeMenu }
+				onActivateMenu={ setNavigationPanelActiveMenu }
 			>
-				<NavigationBackButton
-					backButtonLabel={ __( 'Dashboard' ) }
-					className="edit-site-navigation-panel__back-to-dashboard"
-					href="index.php"
-					ref={ ref }
-				/>
-
-				<NavigationMenu title="Home">
-					<TemplateSwitcher
-						page={ page }
-						activeId={ templateId }
-						onActiveIdChange={ setTemplate }
-						onActiveTemplatePartIdChange={ setTemplatePart }
-						onAddTemplate={ addTemplate }
-						onRemoveTemplate={ removeTemplate }
+				{ activeMenu === 'root' && (
+					<NavigationBackButton
+						backButtonLabel={ __( 'Dashboard' ) }
+						className="edit-site-navigation-panel__back-to-dashboard"
+						href="index.php"
+						ref={ ref }
 					/>
+				) }
+
+				<NavigationMenu title={ __( 'Theme' ) }>
+					<NavigationItem
+						title={ __( 'Templates' ) }
+						navigateToMenu="templates"
+					/>
+
+					<NavigationItem
+						title={ __( 'Template Parts' ) }
+						navigateToMenu="template-parts"
+					/>
+
+					<TemplatesMenu onActivateItem={ setTemplate } />
+
+					<TemplatePartsMenu onActivateItem={ setTemplatePart } />
 				</NavigationMenu>
 			</Navigation>
+
+			<NavigationPanelPreviewSlot />
 		</div>
 	);
 };

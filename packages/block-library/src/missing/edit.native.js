@@ -11,7 +11,7 @@ import {
 	sendActionButtonPressedAction,
 	actionButtons,
 } from '@wordpress/react-native-bridge';
-import { BottomSheet, Icon, withUIStrings } from '@wordpress/components';
+import { BottomSheet, Icon } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
 import { normalizeIconObject } from '@wordpress/blocks';
@@ -19,6 +19,7 @@ import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { help, plugins } from '@wordpress/icons';
 import { withSelect } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -104,6 +105,14 @@ export class UnsupportedBlockEdit extends Component {
 		/* translators: Missing block alert title. %s: The localized block name */
 		const titleFormat = __( "'%s' is not fully-supported" );
 		const infoTitle = sprintf( titleFormat, blockTitle );
+		const missingBlockDetail = applyFilters(
+			'native.missing_block_detail',
+			__( 'We are working hard to add more blocks with each release.' )
+		);
+		const missingBlockActionButton = applyFilters(
+			'native.missing_block_action_button',
+			__( 'Edit using web editor' )
+		);
 
 		const actionButtonStyle = getStylesFromColorScheme(
 			styles.actionButton,
@@ -153,21 +162,14 @@ export class UnsupportedBlockEdit extends Component {
 						{ infoTitle }
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ this.props.uiStrings[ 'missing-block-detail' ] ??
-							__(
-								'We are working hard to add more blocks with each release.'
-							) }
+						{ missingBlockDetail }
 					</Text>
 				</View>
 				{ ( isUnsupportedBlockEditorSupported ||
 					canEnableUnsupportedBlockEditor ) && (
 					<>
 						<BottomSheet.Cell
-							label={
-								this.props.uiStrings[
-									'missing-block-action-button'
-								] ?? __( 'Edit using web editor' )
-							}
+							label={ missingBlockActionButton }
 							separatorType="topFullWidth"
 							onPress={ this.requestFallback }
 							labelStyle={ actionButtonStyle }
@@ -252,5 +254,4 @@ export default compose( [
 		};
 	} ),
 	withPreferredColorScheme,
-	withUIStrings,
 ] )( UnsupportedBlockEdit );

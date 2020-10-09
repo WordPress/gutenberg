@@ -19,7 +19,9 @@
 			"gradients": true,
 			"link": true
 		},
-		"__experimentalPadding": true
+		"spacing": {
+			"padding": true
+		}
 	},
 	"editorStyle": "wp-block-group-editor"
 }

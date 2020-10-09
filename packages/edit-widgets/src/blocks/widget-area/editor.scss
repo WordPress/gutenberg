@@ -1,5 +1,10 @@
 .wp-block[data-type="core/widget-area"] {
 	max-width: $widget-area-width;
+
+	// Remove default hover background in panel title. See #25752.
+	.components-panel__body > .components-panel__body-title:hover {
+		background: inherit;
+	}
 }
 
 .wp-block-widget-area > .components-panel__body > .block-editor-inner-blocks {

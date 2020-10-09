@@ -7,7 +7,7 @@
 			"type": "string"
 		},
 		"showLabel": {
-			"type": "bool",
+			"type": "boolean",
 			"default": true
 		},
 		"placeholder": {
@@ -28,7 +28,7 @@
 			"default": "button-outside"
 		},
 		"buttonUseIcon": {
-			"type": "bool",
+			"type": "boolean",
 			"default": false
 		}
 	},
