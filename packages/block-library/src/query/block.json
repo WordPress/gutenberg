@@ -12,12 +12,14 @@
 				"perPage": null,
 				"pages": 1,
 				"offset": 0,
+				"postType": "post",
 				"categoryIds": [],
 				"tagIds": [],
 				"order": "desc",
 				"orderBy": "date",
 				"author": "",
-				"search": ""
+				"search": "",
+				"exclude": []
 			}
 		}
 	},
@@ -25,6 +27,9 @@
 		"queryId": "queryId",
 		"query": "query"
 	},
+	"usesContext": [
+		"postId"
+	],
 	"supports": {
 		"html": false
 	}

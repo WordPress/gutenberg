@@ -17,29 +17,6 @@
 	.components-navigation {
 		height: 100%;
 	}
-
-	.components-navigation__item {
-		position: relative;
-
-		.edit-site-template-switcher__label-home-icon svg path {
-			color: inherit;
-		}
-
-		&.is-active {
-			.edit-site-template-switcher__label-customized-dot {
-				background: #fff;
-			}
-		}
-	}
-
-	.edit-site-template-switcher__label-home-icon {
-		top: 50%;
-		transform: translateY(-50%);
-	}
-
-	.edit-site-template-switcher__label-customized-dot {
-		right: 8px;
-	}
 }
 
 .edit-site-navigation-panel__back-to-dashboard.components-button.is-tertiary {
@@ -72,4 +49,27 @@
 	@include break-medium {
 		display: block;
 	}
+}
+
+.edit-site-navigation-panel__template-item {
+	display: block;
+
+	&.is-active .edit-site-navigation-panel__template-item-description {
+		color: $gray-100;
+	}
+
+	button {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: center;
+		height: auto;
+		min-height: $button-size;
+		text-align: left;
+	}
+}
+
+.edit-site-navigation-panel__template-item-description {
+	padding-top: $grid-unit-05;
+	color: $gray-700;
 }

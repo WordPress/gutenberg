@@ -8,14 +8,13 @@ import {
 	TouchableWithoutFeedback,
 	Platform,
 } from 'react-native';
-import { map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { withSelect, useDispatch } from '@wordpress/data';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { createBlock } from '@wordpress/blocks';
+import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
@@ -32,18 +31,6 @@ import { useMemo } from '@wordpress/element';
 import styles from './style.scss';
 
 const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
-
-function createBlocksFromInnerBlocksTemplate( innerBlocksTemplate ) {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock(
-				name,
-				attributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
-			)
-	);
-}
 
 function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );

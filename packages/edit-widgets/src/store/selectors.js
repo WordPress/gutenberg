@@ -42,10 +42,6 @@ export const getWidget = createRegistrySelector(
 );
 
 export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
-	if ( ! hasResolvedWidgetAreas( query ) ) {
-		return null;
-	}
-
 	const query = buildWidgetAreasQuery();
 	return select( 'core' ).getEntityRecords(
 		KIND,
@@ -133,31 +129,6 @@ export const isSavingWidgetAreas = createRegistrySelector(
 			}
 		}
 		return false;
-	}
-);
-
-/**
- * Returns true if the navigation post related to menuId was already resolved.
- *
- * @param {number} menuId The id of menu.
- * @return {boolean} True if the navigation post related to menuId was already resolved, false otherwise.
- */
-export const hasResolvedWidgetAreas = createRegistrySelector(
-	( select, query = buildWidgetAreasQuery() ) => () => {
-		const areas = select( 'core' ).getEntityRecords(
-			KIND,
-			WIDGET_AREA_ENTITY_TYPE,
-			query
-		);
-		if ( ! areas?.length ) {
-			return select( 'core' ).hasFinishedResolution( 'getEntityRecords', [
-				KIND,
-				WIDGET_AREA_ENTITY_TYPE,
-				query,
-			] );
-		}
-
-		return true;
 	}
 );
 
