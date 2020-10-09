@@ -84,6 +84,9 @@ $z-layers: (
 	".edit-site-sidebar {greater than small}": 90,
 	".edit-widgets-sidebar {greater than small}": 90,
 
+	// Show interface skeleton footer above interface skeleton drawer
+	".interface-interface-skeleton__footer": 90,
+
 	// Show notices below expanded editor bar
 	// .edit-post-header { z-index: 30 }
 	".components-notice-list": 29,
