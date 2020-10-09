@@ -41,7 +41,7 @@ export const buildWidgetAreasPostId = () => `widget-areas`;
  * @return {Object} Query.
  */
 export function buildWidgetAreasQuery() {
-	return {};
+	return { per_page: -1 };
 }
 
 /**
