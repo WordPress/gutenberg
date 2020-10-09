@@ -40,7 +40,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
-import { useBlockWrapperProps } from './block-wrapper';
+import { useBlockProps } from './block-wrapper';
 
 export const BlockListBlockContext = createContext();
 
@@ -70,7 +70,7 @@ function mergeWrapperProps( propsA, propsB ) {
 
 function Block( { children, isHtml, ...props } ) {
 	return (
-		<div { ...useBlockWrapperProps( props, { __unstableIsHtml: isHtml } ) }>
+		<div { ...useBlockProps( props, { __unstableIsHtml: isHtml } ) }>
 			{ children }
 		</div>
 	);
@@ -102,6 +102,7 @@ function BlockListBlock( {
 	toggleSelection,
 	index,
 	enableAnimation,
+	activeEntityBlockId,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
@@ -126,11 +127,9 @@ function BlockListBlock( {
 	const onBlockError = () => setErrorState( true );
 
 	const blockType = getBlockType( name );
-	const lightBlockWrapper = hasBlockSupport(
-		blockType,
-		'lightBlockWrapper',
-		false
-	);
+	const lightBlockWrapper =
+		blockType.apiVersion > 1 ||
+		hasBlockSupport( blockType, 'lightBlockWrapper', false );
 	const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 
 	// Determine whether the block has props to apply to the wrapper.
@@ -168,6 +167,7 @@ function BlockListBlock( {
 				isFocusMode && ( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode,
 			'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
+			'is-active-entity': activeEntityBlockId === clientId,
 		},
 		className
 	);

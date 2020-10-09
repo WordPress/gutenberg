@@ -619,3 +619,23 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
+
+/**
+ * Load the default editor styles.
+ * These styles are used if the "no theme styles" options is triggered.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_block_editor_settings_with_default_editor_styles( $settings ) {
+	$editor_styles_file              = gutenberg_dir_path() . 'build/editor/editor-styles.css';
+	$settings['defaultEditorStyles'] = array(
+		array(
+			'css' => file_get_contents( $editor_styles_file ),
+		),
+	);
+
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_default_editor_styles' );

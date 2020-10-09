@@ -21,6 +21,7 @@ export default function NavigationMenu( props ) {
 		menu = ROOT_MENU,
 		parentMenu,
 		title,
+		onBackButtonClick,
 	} = props;
 	useNavigationTreeMenu( props );
 	const { activeMenu } = useNavigationContext();
@@ -45,10 +46,11 @@ export default function NavigationMenu( props ) {
 	return (
 		<NavigationMenuContext.Provider value={ context }>
 			<MenuUI className={ classes }>
-				{ parentMenu && (
+				{ ( parentMenu || onBackButtonClick ) && (
 					<NavigationBackButton
 						backButtonLabel={ backButtonLabel }
 						parentMenu={ parentMenu }
+						onClick={ onBackButtonClick }
 					/>
 				) }
 				{ title && (

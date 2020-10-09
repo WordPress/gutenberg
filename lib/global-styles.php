@@ -289,7 +289,7 @@ function gutenberg_experimental_global_styles_get_theme_support_settings() {
 		}
 		$theme_settings['global']['settings']['typography']['customLineHeight'] = true;
 	}
-	if ( get_theme_support( 'experimental-custom-spacing' ) ) {
+	if ( get_theme_support( 'custom-spacing' ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['spacing'] ) ) {
 			$theme_settings['global']['settings']['spacing'] = array();
 		}
@@ -417,12 +417,12 @@ function gutenberg_experimental_global_styles_get_style_property() {
  */
 function gutenberg_experimental_global_styles_get_support_keys() {
 	return array(
-		'--wp--style--color--link' => array( 'color', 'link' ),
+		'--wp--style--color--link' => array( 'color', 'linkColor' ),
 		'background'               => array( 'color', 'gradients' ),
 		'backgroundColor'          => array( 'color' ),
 		'color'                    => array( 'color' ),
-		'fontSize'                 => array( '__experimentalFontSize' ),
-		'lineHeight'               => array( '__experimentalLineHeight' ),
+		'fontSize'                 => array( 'fontSize' ),
+		'lineHeight'               => array( 'lineHeight' ),
 	);
 }
 
@@ -484,9 +484,9 @@ function gutenberg_experimental_global_styles_get_block_data() {
 				array(
 					'supports' => array(
 						'__experimentalSelector' => ':root',
-						'__experimentalFontSize' => true,
+						'fontSize'               => true,
 						'color'                  => array(
-							'link'      => true,
+							'linkColor' => true,
 							'gradients' => true,
 						),
 					),

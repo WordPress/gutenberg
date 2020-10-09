@@ -30,7 +30,7 @@ function UnitControl(
 		disableUnits = false,
 		isPressEnterToChange = false,
 		isResetValueOnUnitChange = false,
-		isUnitSelectTabbable = false,
+		isUnitSelectTabbable = true,
 		label,
 		onChange = noop,
 		onUnitChange = noop,

@@ -29,15 +29,23 @@ function NavigationBackButton(
 
 	const parentMenuTitle = navigationTree.getMenu( parentMenu )?.title;
 
+	const handleOnClick = ( event ) => {
+		if ( typeof onClick === 'function' ) {
+			onClick( event );
+		}
+
+		if ( parentMenu && ! event.defaultPrevented ) {
+			setActiveMenu( parentMenu, 'right' );
+		}
+	};
+
 	return (
 		<MenuBackButtonUI
 			className={ classes }
 			href={ href }
 			isTertiary
-			onClick={ () =>
-				parentMenu ? setActiveMenu( parentMenu, 'right' ) : onClick
-			}
 			ref={ ref }
+			onClick={ handleOnClick }
 		>
 			<Icon icon={ chevronLeft } />
 			{ backButtonLabel || parentMenuTitle || __( 'Back' ) }

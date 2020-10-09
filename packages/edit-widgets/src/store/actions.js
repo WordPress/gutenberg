@@ -16,10 +16,33 @@ import { transformBlockToWidget } from './transformers';
 import {
 	buildWidgetAreaPostId,
 	buildWidgetAreasQuery,
+	createStubPost,
 	KIND,
 	POST_TYPE,
 	WIDGET_AREA_ENTITY_TYPE,
 } from './utils';
+
+/**
+ * Persists a stub post with given ID to core data store. The post is meant to be in-memory only and
+ * shouldn't be saved via the API.
+ *
+ * @param  {string} id Post ID.
+ * @param  {Array}  blocks Blocks the post should consist of.
+ * @return {Object} The post object.
+ */
+export const persistStubPost = function* ( id, blocks ) {
+	const stubPost = createStubPost( id, blocks );
+	yield dispatch(
+		'core',
+		'receiveEntityRecords',
+		KIND,
+		POST_TYPE,
+		stubPost,
+		{ id: stubPost.id },
+		false
+	);
+	return stubPost;
+};
 
 export function* saveEditedWidgetAreas() {
 	const editedWidgetAreas = yield select(
