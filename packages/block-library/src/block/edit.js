@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEntityBlockEditor } from '@wordpress/core-data';
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import {
 	Placeholder,
 	Spinner,
@@ -58,6 +58,22 @@ export default function ReusableBlockEdit( {
 	const {
 		__experimentalConvertBlockToStatic: convertBlockToStatic,
 	} = useDispatch( 'core/reusable-blocks' );
+
+	const { createSuccessNotice, createErrorNotice } = useDispatch(
+		'core/notices'
+	);
+	const save = useCallback( async function () {
+		try {
+			await saveEditedEntityRecord( ...recordArgs );
+			createSuccessNotice( __( 'Block updated.' ), {
+				type: 'snackbar',
+			} );
+		} catch ( error ) {
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+			} );
+		}
+	}, recordArgs );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -124,7 +140,7 @@ export default function ReusableBlockEdit( {
 							editEntityRecord( ...recordArgs, { title } )
 						}
 						onSave={ () => {
-							saveEditedEntityRecord( ...recordArgs );
+							save();
 							setIsEditing( false );
 						} }
 					/>
