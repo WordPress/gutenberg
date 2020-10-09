@@ -8,16 +8,14 @@ import { __experimentalNavigationItem as NavigationItem } from '@wordpress/compo
 const defaultKeyExtractor = ( { kind, name, entity } ) =>
 	`${ kind }-${ name }-${ entity.id }`;
 
-export default function NavigationEntityItems( props ) {
-	const {
-		kind,
-		name,
-		query = {},
+export default function NavigationEntityItems( {
+	kind,
+	name,
+	query = {},
 
-		getKey = defaultKeyExtractor,
-		renderItem,
-	} = props;
-
+	getKey = defaultKeyExtractor,
+	renderItem,
+} ) {
 	const entities = useSelect(
 		( select ) => {
 			const { getEntityRecords } = select( 'core' );
