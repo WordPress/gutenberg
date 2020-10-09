@@ -6,8 +6,10 @@ import { registerStore } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import controls from './controls';
 import * as actions from './actions';
+import controls from './controls';
+import reducer from './reducer';
+import * as selectors from './selectors';
 import { STORE_KEY } from './constants';
 
 /**
@@ -20,5 +22,6 @@ import { STORE_KEY } from './constants';
 export default registerStore( STORE_KEY, {
 	actions,
 	controls,
-	reducer: () => {},
+	reducer,
+	selectors,
 } );

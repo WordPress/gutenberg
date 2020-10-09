@@ -87,12 +87,18 @@ const controls = {
 					.dispatch( 'core' )
 					.saveEntityRecord( 'postType', 'wp_block', reusableBlock );
 
-				registry.dispatch( 'core/block-editor' ).replaceBlocks(
-					clientIds,
-					createBlock( 'core/block', {
-						ref: updatedRecord.id,
-					} )
-				);
+				const newBlock = createBlock( 'core/block', {
+					ref: updatedRecord.id,
+				} );
+				registry
+					.dispatch( 'core/block-editor' )
+					.replaceBlocks( clientIds, newBlock );
+				registry
+					.dispatch( 'core/reusable-blocks' )
+					.__experimentalSetEditingReusableBlock(
+						newBlock.clientId,
+						true
+					);
 			}
 	),
 

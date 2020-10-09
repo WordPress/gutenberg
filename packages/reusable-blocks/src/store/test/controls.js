@@ -51,6 +51,7 @@ describe( 'reusable blocks effects', () => {
 			} );
 			const saveEntityRecord = jest.fn( () => ( { id: 456 } ) );
 			const replaceBlocks = jest.fn();
+			const __experimentalSetEditingReusableBlock = jest.fn();
 			const getBlocksByClientId = jest.fn( () => [ staticBlock ] );
 			const registry = {
 				select: jest.fn( () => ( {
@@ -59,6 +60,7 @@ describe( 'reusable blocks effects', () => {
 				dispatch: jest.fn( () => ( {
 					saveEntityRecord,
 					replaceBlocks,
+					__experimentalSetEditingReusableBlock,
 				} ) ),
 			};
 
@@ -83,6 +85,7 @@ describe( 'reusable blocks effects', () => {
 					name: 'core/block',
 				} )
 			);
+			expect( __experimentalSetEditingReusableBlock ).toHaveBeenCalled();
 		} );
 
 		describe( 'CONVERT_BLOCK_TO_STATIC', () => {

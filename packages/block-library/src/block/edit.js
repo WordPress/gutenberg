@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEntityBlockEditor } from '@wordpress/core-data';
-import { useState, useCallback } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import {
 	Placeholder,
 	Spinner,
@@ -34,6 +34,7 @@ export default function ReusableBlockEdit( {
 	const {
 		reusableBlock,
 		hasResolved,
+		isEditing,
 		isSaving,
 		canUserUpdate,
 		settings,
@@ -48,12 +49,24 @@ export default function ReusableBlockEdit( {
 			),
 			isSaving: select( 'core' ).isSavingEntityRecord( ...recordArgs ),
 			canUserUpdate: select( 'core' ).canUser( 'update', 'blocks', ref ),
+			isEditing: select(
+				'core/reusable-blocks'
+			).__experimentalIsEditingReusableBlock( clientId ),
 			settings: select( 'core/block-editor' ).getSettings(),
 		} ),
-		[ ref ]
+		[ ref, clientId ]
 	);
 
 	const { editEntityRecord, saveEditedEntityRecord } = useDispatch( 'core' );
+	const { __experimentalSetEditingReusableBlock } = useDispatch(
+		'core/reusable-blocks'
+	);
+	const setIsEditing = useCallback(
+		( value ) => {
+			__experimentalSetEditingReusableBlock( clientId, value );
+		},
+		[ clientId ]
+	);
 
 	const {
 		__experimentalConvertBlockToStatic: convertBlockToStatic,
@@ -80,8 +93,6 @@ export default function ReusableBlockEdit( {
 		'wp_block',
 		{ id: ref }
 	);
-
-	const [ isEditing, setIsEditing ] = useState( false ); // TODO: Start in edit mode when newly created
 
 	if ( ! hasResolved ) {
 		return (

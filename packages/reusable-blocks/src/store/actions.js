@@ -33,3 +33,18 @@ export function* __experimentalConvertBlocksToReusable( clientIds ) {
 export function* __experimentalDeleteReusableBlock( id ) {
 	yield deleteReusableBlock( id );
 }
+
+/**
+ * Returns an action descriptor for SET_EDITING_REUSABLE_BLOCK action.
+ *
+ * @param {string} clientId The clientID of the reusable block to target.
+ * @param {boolean} isEditing Whether the block should be in editing state.
+ * @return {Object} Action descriptor.
+ */
+export function __experimentalSetEditingReusableBlock( clientId, isEditing ) {
+	return {
+		type: 'SET_EDITING_REUSABLE_BLOCK',
+		clientId,
+		isEditing,
+	};
+}
