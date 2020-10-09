@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import apiFetch from '@wordpress/api-fetch';
 import { registerStore } from '@wordpress/data';
 
 /**
@@ -33,5 +34,16 @@ export const storeConfig = {
 };
 
 const store = registerStore( MODULE_KEY, storeConfig );
+
+// This package uses a few in-memory post types as wrappers for convenience.
+// This middleware prevents any network requests related to these types as they are
+// bound to fail anyway.
+apiFetch.use( function ( options, next ) {
+	if ( options.path?.indexOf( '/wp/v2/types/widget-area' ) === 0 ) {
+		return Promise.resolve( {} );
+	}
+
+	return next( options );
+} );
 
 export default store;

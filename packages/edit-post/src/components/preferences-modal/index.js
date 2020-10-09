@@ -30,17 +30,17 @@ import {
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
 
-const MODAL_NAME = 'edit-post/options';
+const MODAL_NAME = 'edit-post/preferences';
 
-export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
+export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 	if ( ! isModalActive ) {
 		return null;
 	}
 
 	return (
 		<Modal
-			className="edit-post-options-modal"
-			title={ __( 'Options' ) }
+			className="edit-post-preferences-modal"
+			title={ __( 'Preferences' ) }
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ closeModal }
 		>
@@ -59,7 +59,7 @@ export function OptionsModal( { isModalActive, isViewable, closeModal } ) {
 					label={ __( 'Show button text labels' ) }
 				/>
 			</Section>
-			<Section title={ __( 'Keyboard options' ) }>
+			<Section title={ __( 'Keyboard' ) }>
 				<EnableFeature
 					featureName="keepCaretInsideBlock"
 					label={ __( 'Contain text cursor inside active block' ) }
@@ -145,4 +145,4 @@ export default compose(
 			closeModal: () => dispatch( 'core/edit-post' ).closeModal(),
 		};
 	} )
-)( OptionsModal );
+)( PreferencesModal );

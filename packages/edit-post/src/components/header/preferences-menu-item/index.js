@@ -5,14 +5,14 @@ import { withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 
-export function OptionsMenuItem( { openModal } ) {
+export function PreferencesMenuItem( { openModal } ) {
 	return (
 		<MenuItem
 			onClick={ () => {
-				openModal( 'edit-post/options' );
+				openModal( 'edit-post/preferences' );
 			} }
 		>
-			{ __( 'Options' ) }
+			{ __( 'Preferences' ) }
 		</MenuItem>
 	);
 }
@@ -23,4 +23,4 @@ export default withDispatch( ( dispatch ) => {
 	return {
 		openModal,
 	};
-} )( OptionsMenuItem );
+} )( PreferencesMenuItem );

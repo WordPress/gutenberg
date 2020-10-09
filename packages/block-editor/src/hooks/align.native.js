@@ -20,7 +20,7 @@ addFilter(
 	'core/react-native-editor/align',
 	( settings, name ) => {
 		if (
-			! WIDE_ALIGNMENTS.supportedBlocks.includes( name ) &&
+			WIDE_ALIGNMENTS.excludeBlocks.includes( name ) &&
 			hasBlockSupport( settings, 'align' )
 		) {
 			const blockAlign = settings.supports.align;

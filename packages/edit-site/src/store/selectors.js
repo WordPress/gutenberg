@@ -137,3 +137,14 @@ export function getTemplateType( state ) {
 export function getPage( state ) {
 	return state.page;
 }
+
+/**
+ * Returns the active menu in the navigation panel.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} Active menu.
+ */
+export function getNavigationPanelActiveMenu( state ) {
+	return state.navigationPanelActiveMenu;
+}
