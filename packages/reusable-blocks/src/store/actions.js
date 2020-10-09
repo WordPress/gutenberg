@@ -28,7 +28,7 @@ export function* __experimentalConvertBlocksToReusable( clientIds ) {
 /**
  * Returns a generator deleting a reusable block.
  *
- * @param {string} id The client IDs of the block to detach.
+ * @param {string} id The ID of the reusable block to delete.
  */
 export function* __experimentalDeleteReusableBlock( id ) {
 	yield deleteReusableBlock( id );
