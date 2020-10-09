@@ -131,7 +131,7 @@ function useToolbarFocus(
 			// pass the focused toolbar item index so it can be hydrated later.
 			const items = getAllToolbarItemsIn( ref.current );
 			const index = items.findIndex( ( item ) => item.tabIndex === 0 );
-			// onIndexChange( index );
+			onIndexChange( index );
 		};
 	}, [ initialIndex, initialFocusOnMount ] );
 }
@@ -143,11 +143,11 @@ function NavigableToolbar( {
 	__experimentalOnIndexChange: onIndexChange,
 	...props
 } ) {
-	const wrapper = useRef();
-	const isAccessibleToolbar = useIsAccessibleToolbar( wrapper );
+	const ref = useRef();
+	const isAccessibleToolbar = useIsAccessibleToolbar( ref );
 
 	useToolbarFocus(
-		wrapper,
+		ref,
 		focusOnMount,
 		isAccessibleToolbar,
 		initialIndex,
@@ -156,11 +156,7 @@ function NavigableToolbar( {
 
 	if ( isAccessibleToolbar ) {
 		return (
-			<Toolbar
-				label={ props[ 'aria-label' ] }
-				ref={ wrapper }
-				{ ...props }
-			>
+			<Toolbar label={ props[ 'aria-label' ] } ref={ ref } { ...props }>
 				{ children }
 			</Toolbar>
 		);
@@ -170,7 +166,7 @@ function NavigableToolbar( {
 		<NavigableMenu
 			orientation="horizontal"
 			role="toolbar"
-			ref={ wrapper }
+			ref={ ref }
 			{ ...props }
 		>
 			{ children }

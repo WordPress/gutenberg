@@ -41,9 +41,9 @@ function Toolbar( { className, label, ...props }, ref ) {
 	);
 	return (
 		<ToolbarContainer
-			ref={ ref }
 			className={ finalClassName }
 			label={ label }
+			ref={ ref }
 			{ ...props }
 		/>
 	);
