@@ -11,7 +11,7 @@ buildscript {
         jSoupVersion = '1.10.3'
         wordpressUtilsVersion = '1.22'
         espressoVersion = '3.0.1'
-        aztecVersion = 'b8fa76f10346f6e8b979697154d3680f96cb79ff'
+        aztecVersion = 'v1.3.45'
     }
 
     repositories {

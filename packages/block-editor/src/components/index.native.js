@@ -13,7 +13,7 @@ export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
-export { default as __experimentalLineHeightControl } from './line-height-control';
+export { default as LineHeightControl } from './line-height-control';
 export { default as PlainText } from './plain-text';
 export {
 	default as RichText,
@@ -59,7 +59,7 @@ export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export {
 	Block as __experimentalBlock,
-	useBlockWrapperProps as __experimentalUseBlockWrapperProps,
+	useBlockProps,
 } from './block-list/block-wrapper';
 export { default as FloatingToolbar } from './floating-toolbar';
 

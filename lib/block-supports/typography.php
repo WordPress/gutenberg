@@ -13,12 +13,12 @@
 function gutenberg_register_typography_support( $block_type ) {
 	$has_font_size_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_font_size_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontSize' ), false );
+		$has_font_size_support = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
 	}
 
 	$has_line_height_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_line_height_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalLineHeight' ), false );
+		$has_line_height_support = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
 	}
 
 	if ( ! $block_type->attributes ) {
@@ -51,12 +51,12 @@ function gutenberg_register_typography_support( $block_type ) {
 function gutenberg_apply_typography_support( $attributes, $block_attributes, $block_type ) {
 	$has_font_size_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_font_size_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontSize' ), false );
+		$has_font_size_support = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
 	}
 
 	$has_line_height_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_line_height_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalLineHeight' ), false );
+		$has_line_height_support = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
 	}
 
 	// Font Size.

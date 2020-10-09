@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import { escape } from './utils';
 
 export default function save( { attributes } ) {
 	return (
-		<pre>
+		<pre { ...useBlockProps.save() }>
 			<RichText.Content
 				tagName="code"
 				value={ escape( attributes.content ) }

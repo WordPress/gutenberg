@@ -96,9 +96,9 @@ class LegacyWidgetEditHandler extends Component {
 				{ ...componentProps }
 			>
 				{ title && (
-					<div className="wp-block-legacy-widget__edit-widget-title">
+					<h3 className="wp-block-legacy-widget__edit-widget-title">
 						{ title }
-					</div>
+					</h3>
 				) }
 				<div
 					className="wp-block-legacy-widget__edit-container"

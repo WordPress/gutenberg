@@ -30,3 +30,10 @@ input.components-combobox-control__input[type="text"] {
 		@include input-style__focus();
 	}
 }
+
+.components-combobox-control__reset.components-button {
+	display: flex;
+	height: $grid-unit-30;
+	min-width: $grid-unit-30;
+	padding: 0;
+}

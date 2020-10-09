@@ -159,3 +159,17 @@ export function* showHomepage() {
 	const homeTemplate = yield* setPage( page );
 	yield setHomeTemplateId( homeTemplate );
 }
+
+/**
+ * Returns an action object used to set the active navigation panel menu.
+ *
+ * @param {string} menu Menu prop of active menu.
+ *
+ * @return {Object} Action object.
+ */
+export function setNavigationPanelActiveMenu( menu ) {
+	return {
+		type: 'SET_NAVIGATION_PANEL_ACTIVE_MENU',
+		menu,
+	};
+}

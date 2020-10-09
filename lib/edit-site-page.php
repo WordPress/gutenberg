@@ -131,6 +131,7 @@ function gutenberg_edit_site_init( $hook ) {
 		'isRTL'             => is_rtl(),
 		'maxUploadFileSize' => $max_upload_size,
 		'siteUrl'           => site_url(),
+		'postsPerPage'      => get_option( 'posts_per_page' ),
 	);
 
 	$settings['styles'] = gutenberg_get_editor_styles();
