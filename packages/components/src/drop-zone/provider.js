@@ -90,6 +90,8 @@ class DropZoneProvider extends Component {
 		const { defaultView } = ownerDocument;
 		defaultView.addEventListener( 'dragover', this.onDragOver );
 		defaultView.addEventListener( 'mouseup', this.resetDragState );
+		// The `dragend` event could be used for this, but only has partial
+		// support in firefox.
 		defaultView.addEventListener( 'keyup', this.onKeyUp );
 	}
 
