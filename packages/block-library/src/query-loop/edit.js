@@ -99,7 +99,7 @@ export default function QueryLoopEdit( {
 	const blockProps = useBlockProps();
 
 	if ( ! posts?.length ) {
-		return <div { ...blockProps }> { __( 'No results found.' ) }</div>;
+		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
 	}
 
 	return (
