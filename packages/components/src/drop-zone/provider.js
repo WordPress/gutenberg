@@ -6,6 +6,7 @@ import { isEqual, find, some, filter, throttle, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { ESCAPE } from '@wordpress/keycodes';
 import { Component, createContext, createRef } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -60,6 +61,7 @@ class DropZoneProvider extends Component {
 		// Event listeners
 		this.onDragOver = this.onDragOver.bind( this );
 		this.onDrop = this.onDrop.bind( this );
+		this.onKeyUp = this.onKeyUp.bind( this );
 		// Context methods so this component can receive data from consumers
 		this.addDropZone = this.addDropZone.bind( this );
 		this.removeDropZone = this.removeDropZone.bind( this );
@@ -88,6 +90,7 @@ class DropZoneProvider extends Component {
 		const { defaultView } = ownerDocument;
 		defaultView.addEventListener( 'dragover', this.onDragOver );
 		defaultView.addEventListener( 'mouseup', this.resetDragState );
+		defaultView.addEventListener( 'keyup', this.onKeyUp );
 	}
 
 	componentWillUnmount() {
@@ -95,6 +98,7 @@ class DropZoneProvider extends Component {
 		const { defaultView } = ownerDocument;
 		defaultView.removeEventListener( 'dragover', this.onDragOver );
 		defaultView.removeEventListener( 'mouseup', this.resetDragState );
+		defaultView.removeEventListener( 'keyup', this.onKeyUp );
 	}
 
 	addDropZone( dropZone ) {
@@ -224,6 +228,14 @@ class DropZoneProvider extends Component {
 	onDragOver( event ) {
 		this.toggleDraggingOverDocument( event, getDragEventType( event ) );
 		event.preventDefault();
+	}
+
+	onKeyUp( event ) {
+		const { isDraggingOverDocument } = this.state;
+		// If the user presses escape while dragging, cancel the drag.
+		if ( isDraggingOverDocument && event.keyCode === ESCAPE ) {
+			this.resetDragState();
+		}
 	}
 
 	onDrop( event ) {
