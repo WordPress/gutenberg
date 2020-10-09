@@ -72,7 +72,7 @@ function InterfaceSkeleton( {
 					{ navigationSidebar }
 				</div>
 			) }
-			<div className="interface-interface-skeleton__site">
+			<div className="interface-interface-skeleton__editor">
 				{ !! header && (
 					<div
 						className="interface-interface-skeleton__header"
