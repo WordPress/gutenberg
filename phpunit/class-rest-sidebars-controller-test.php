@@ -210,14 +210,20 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
+		unset( $data[0]['_links'] );
 		$this->assertEquals(
 			array(
 				array(
-					'id'          => 'sidebar-1',
-					'name'        => 'Test sidebar',
-					'description' => '',
-					'status'      => 'active',
-					'widgets'     => array(),
+					'id'            => 'sidebar-1',
+					'name'          => 'Test sidebar',
+					'description'   => '',
+					'status'        => 'active',
+					'widgets'       => array(),
+					'class'         => '',
+					'before_widget' => '',
+					'after_widget'  => '',
+					'before_title'  => '',
+					'after_title'   => '',
 				),
 			),
 			$data
@@ -253,17 +259,23 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
+		unset( $data[0]['_links'] );
 		$this->assertEquals(
 			array(
 				array(
-					'id'          => 'sidebar-1',
-					'name'        => 'Test sidebar',
-					'description' => '',
-					'status'      => 'active',
-					'widgets'     => array(
+					'id'            => 'sidebar-1',
+					'name'          => 'Test sidebar',
+					'description'   => '',
+					'status'        => 'active',
+					'widgets'       => array(
 						'text-1',
 						'rss-1',
 					),
+					'class'         => '',
+					'before_widget' => '',
+					'after_widget'  => '',
+					'before_title'  => '',
+					'after_title'   => '',
 				),
 			),
 			$data
@@ -284,13 +296,19 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars/sidebar-1' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
+		unset( $data[0]['_links'] );
 		$this->assertEquals(
 			array(
-				'id'          => 'sidebar-1',
-				'name'        => 'Test sidebar',
-				'description' => '',
-				'status'      => 'active',
-				'widgets'     => array(),
+				'id'            => 'sidebar-1',
+				'name'          => 'Test sidebar',
+				'description'   => '',
+				'status'        => 'active',
+				'widgets'       => array(),
+				'class'         => '',
+				'before_widget' => '',
+				'after_widget'  => '',
+				'before_title'  => '',
+				'after_title'   => '',
 			),
 			$data
 		);
@@ -397,16 +415,22 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
+		unset( $data[0]['_links'] );
 		$this->assertEquals(
 			array(
-				'id'          => 'sidebar-1',
-				'name'        => 'Test sidebar',
-				'description' => '',
-				'status'      => 'active',
-				'widgets'     => array(
+				'id'            => 'sidebar-1',
+				'name'          => 'Test sidebar',
+				'description'   => '',
+				'status'        => 'active',
+				'widgets'       => array(
 					'text-1',
 					'text-2',
 				),
+				'class'         => '',
+				'before_widget' => '',
+				'after_widget'  => '',
+				'before_title'  => '',
+				'after_title'   => '',
 			),
 			$data
 		);
@@ -451,25 +475,37 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request->set_param( 'context', 'view' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
+		unset( $data[0]['_links'] );
+		unset( $data[1]['_links'] );
 		$this->assertEquals(
 			array(
 				array(
-					'id'          => 'sidebar-1',
-					'name'        => 'Test sidebar',
-					'description' => '',
-					'status'      => 'active',
-					'widgets'     => array(
+					'id'            => 'sidebar-1',
+					'name'          => 'Test sidebar',
+					'description'   => '',
+					'status'        => 'active',
+					'widgets'       => array(
 						'text-1',
 					),
+					'class'         => '',
+					'before_widget' => '',
+					'after_widget'  => '',
+					'before_title'  => '',
+					'after_title'   => '',
 				),
 				array(
-					'id'          => 'wp_inactive_widgets',
-					'name'        => 'Inactive widgets',
-					'description' => '',
-					'status'      => 'inactive',
-					'widgets'     => array(
+					'id'            => 'wp_inactive_widgets',
+					'name'          => 'Inactive widgets',
+					'description'   => '',
+					'status'        => 'inactive',
+					'widgets'       => array(
 						'rss-1',
 					),
+					'class'         => '',
+					'before_widget' => '',
+					'after_widget'  => '',
+					'before_title'  => '',
+					'after_title'   => '',
 				),
 			),
 			$data
@@ -546,11 +582,16 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
 
-		$this->assertEquals( 5, count( $properties ) );
+		$this->assertEquals( 10, count( $properties ) );
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'name', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
 		$this->assertArrayHasKey( 'status', $properties );
 		$this->assertArrayHasKey( 'widgets', $properties );
+		$this->assertArrayHasKey( 'class', $properties );
+		$this->assertArrayHasKey( 'before_widget', $properties );
+		$this->assertArrayHasKey( 'after_widget', $properties );
+		$this->assertArrayHasKey( 'before_title', $properties );
+		$this->assertArrayHasKey( 'after_title', $properties );
 	}
 }

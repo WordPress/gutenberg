@@ -218,6 +218,8 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request  = new WP_REST_Request( 'GET', '/__experimental/widgets' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
+		unset( $data[0]['_links'] );
+		unset( $data[1]['_links'] );
 		$this->assertEqualSets(
 			array(
 				array(
@@ -274,6 +276,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request['context'] = 'edit';
 		$response           = rest_get_server()->dispatch( $request );
 		$data               = $response->get_data();
+		unset( $data[0]['_links'] );
 		$this->assertEqualSets(
 			array(
 				array(
@@ -701,7 +704,8 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertEqualSets(
+		unset( $data[0]['_links'] );
+		$this->assertEquals(
 			array(
 				'id'            => $widget_id,
 				'sidebar'       => 'sidebar-1',
