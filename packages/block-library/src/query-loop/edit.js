@@ -3,6 +3,7 @@
  */
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import {
 	BlockContextProvider,
 	InnerBlocks,
@@ -96,6 +97,10 @@ export default function QueryLoopEdit( {
 		[ posts ]
 	);
 	const blockProps = useBlockProps();
+
+	if ( ! posts?.length ) {
+		return <div { ...blockProps }> { __( 'No results found.' ) }</div>;
+	}
 
 	return (
 		<div { ...blockProps }>
