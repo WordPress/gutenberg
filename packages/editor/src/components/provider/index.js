@@ -207,11 +207,7 @@ class EditorProvider extends Component {
 				'titlePlaceholder',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
-			__experimentalReusableBlocks: reusableBlocks?.map( ( c ) => ( {
-				...c,
-				content: c.content.raw,
-				title: c.title.raw,
-			} ) ),
+			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalFetchLinkSuggestions: partialRight(
 				fetchLinkSuggestions,
 				settings
