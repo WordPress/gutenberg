@@ -1,5 +1,6 @@
 .edit-site-header {
 	align-items: center;
+	background-color: $white;
 	display: flex;
 	height: $header-height;
 	box-sizing: border-box;
@@ -12,11 +13,19 @@
 
 	.edit-site-header_center {
 		display: flex;
+		align-items: center;
 		height: 100%;
 	}
 
 	.edit-site-header_end {
 		justify-content: flex-end;
+	}
+}
+
+// Keeps the document title centered when the sidebar is open
+body.is-navigation-sidebar-open {
+	.edit-site-header_start {
+		flex-basis: $nav-sidebar-width;
 	}
 }
 

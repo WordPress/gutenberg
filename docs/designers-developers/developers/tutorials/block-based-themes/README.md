@@ -7,9 +7,11 @@ You will learn about the required files, how to combine templates and template p
 how to add presets for global styles, and how to add blocks and export the templates in the site editor.
 
 Full site editing is an experimental feature and the workflow in this tutorial is likely to change.
-This tutorial was written for Gutenberg version 8.5.
+
+This tutorial is up to date as of Gutenberg version 9.1.
 
 ## Table of Contents
+
  1. [What is needed to create a block-based theme?](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#what-is-needed-to-create-a-block-based-theme)
  2. [Creating the theme](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#creating-the-theme)
  3. [Creating the templates and template parts](/docs/designers-developers/developers/tutorials/block-based-themes/README.md#creating-the-templates-and-template-parts)
@@ -19,24 +21,20 @@ This tutorial was written for Gutenberg version 8.5.
 ## What is needed to create a block-based theme?
 
 To use a block based theme you need to have Gutenberg installed and full site editing must be enabled.
+
 Full site editing can be enabled from the Gutenberg experiments menu in the WordPress admin area.
 
-A block-based theme is built using HTML templates and template parts.
-Templates are the main files used in the [template hierarchy](https://developer.wordpress.org/themes/basics/template-hierarchy/), 
-for example index, single or archive.
-Templates can optionally include structural template parts, for example a header, footer or sidebar.
+A block-based theme is built using HTML templates and template parts. Templates are the main files used in the [template hierarchy](https://developer.wordpress.org/themes/basics/template-hierarchy/), for example index, single or archive. Templates can optionally include structural template parts, for example a header, footer or sidebar.
 
-Each template or template part contains the [block grammar](https://developer.wordpress.org/block-editor/principles/key-concepts/#blocks), the HTML, for the selected blocks.
-The block HTML is generated in and exported from the **site editor**. It can also be added to the theme's HTML files manually.
+Each template or template part contains the [block grammar](https://developer.wordpress.org/block-editor/principles/key-concepts/#blocks), the HTML, for the selected blocks. The block HTML is generated in and exported from the **site editor**. It can also be added to the theme's HTML files manually.
 
 ### Required files and file structure
-A block based theme requires an index.php file, an index template file, a style.css file, and a functions.php file.
 
-The theme may optionally include an experimental-theme.json file to manage global styles.
-You decide what additional templates and template parts to include in your theme.
+A block based theme requires an `index.php` file, an index template file, a `style.css` file, and a `functions.php` file.
 
-Templates are placed inside the block-templates folder, 
-and template parts are placed inside the block-template-parts folder:
+The theme may optionally include an [experimental-theme.json file](/docs/designers-developers/developers/themes/theme-json.md) to manage global styles. You decide what additional templates and template parts to include in your theme.
+
+Templates are placed inside the block-templates folder, and template parts are placed inside the block-template-parts folder:
 
 ```
 theme
@@ -58,12 +56,10 @@ theme
 
 ## Creating the theme
 
-Create a new folder for your theme in /wp-content/themes/.
+Create a new folder for your theme in `/wp-content/themes/`.
 Inside this folder, create the block-templates and block-template-parts folders.
 
-Create a style.css file.
-The file header in the style.css file has the same items that you would use in a traditional theme.
-https://developer.wordpress.org/themes/basics/main-stylesheet-style-css/#explanations
+Create a `style.css` file. The file header in the `style.css` file has [the same items that you would use in a traditional theme](https://developer.wordpress.org/themes/basics/main-stylesheet-style-css/#explanations).
 
 ```
 /*
@@ -86,12 +82,11 @@ Use it to make something cool, have fun, and share what you've learned with othe
 */
 ```
 
-Create a functions.php file.
+Create a `functions.php` file.
 
-In this file, you will enqueue the style.css file and add any theme support that you want to use.
-For example colors, wide blocks and featured images.
+In this file, you will enqueue the `style.css` file and add any theme support that you want to use. For example colors, wide blocks and featured images.
 
--You no longer need to add theme support for the title tag. It is already enabled with full site editing.
+_You no longer need to add theme support for the title tag. It is already enabled with full site editing._
 
 https://developer.wordpress.org/themes/basics/theme-functions/#what-is-functions-php
 
@@ -152,7 +147,7 @@ function myfirsttheme_scripts() {
 add_action( 'wp_enqueue_scripts', 'myfirsttheme_scripts' );
 ```
 
-Create an index.php file.
+Create an `index.php` file.
 This file is used as a fallback if the theme is activated when full site editing is not enabled. 
 You may leave the file empty for this tutorial.
 
@@ -171,15 +166,13 @@ theme
 
 ### Creating the templates and template parts
 
-Create two template parts called footer.html and header.html and place them inside the block-template-parts folder.
-You can leave the files empty for now.
+Create two template parts called `footer.html` and `header.html` and place them inside the block-template-parts folder. You can leave the files empty for now.
 
-Inside the block-templates folder, create an index.html file.
+Inside the block-templates folder, create an `index.html` file.
 
-In index.html, include the template parts by adding two HTML comments.
+In `index.html`, include the template parts by adding two HTML comments.
 
-The HTML comments starts with `wp:template-part` which is the name of the template-part block type.
-Inside the curly brackets are two keys and their values: The slug of the template part, and the theme name.
+The HTML comments starts with `wp:template-part` which is the name of the template-part block type. Inside the curly brackets are two keys and their values: The slug of the template part, and the theme name.
 
 ```
 <!-- wp:template-part {"slug":"header","theme":"myfirsttheme"} /-->
@@ -193,7 +186,7 @@ Eventually, you will be able to create and combine templates and template parts 
 
 ### Experimental-theme.json - Global styles
 
-The purpose of the experimental-theme.json file is to make it easier to style blocks by setting defaults.
+The purpose of the `experimental-theme.json` file is to make it easier to style blocks by setting defaults.
 
 It is used to:
  * Create CSS variables (also called CSS custom properties) that can be used to style blocks both on the front and in the editor.
@@ -202,45 +195,46 @@ It is used to:
 
 [The documentation for global styles contains a list of available block and style combinations.](https://developer.wordpress.org/block-editor/developers/themes/theme-json/)
 
-Create a file called experimental-theme.json and save it inside the main folder.
+Create a file called `experimental-theme.json` and save it inside the main folder.
 
-CSS variables are generated using **Global presets**.
-The variables are added to the `:root` on the front, and to the `.editor-styles-wrapper` class in the editor.
+CSS variables are generated using **Global presets**. The variables are added to the `:root` on the front, and to the `.editor-styles-wrapper` class in the editor.
 
-Styles that are added to the themes style.css file or an editor style sheet are loaded after global styles.
+Styles that are added to the themes `style.css` file or an editor style sheet are loaded after global styles.
 
-Add the following global presets to the experimental-theme.json file:
+Add the following global presets to the `experimental-theme.json` file:
 
 ```
 {
 	"global": {
-		"presets": {
-			"color": [
-				{
-					"slug": "strong-magenta",
-					"value": "#a156b4"
-				},
-				{
-					"slug": "very-dark-gray",
-					"value": "#444"
-				},
-			],
-			"line-height": [
-				{
-					"slug": "small",
-					"value": "1.3"
-				},
-				{
-					"slug": "medium",
-					"value": "2"
-				},
-				{
-					"slug": "large",
-					"value": "2.5"
-				}
-			],
-		},
-	},
+		"setttings": {
+			"color": {
+				"palette": [
+					{
+						"slug": "strong-magenta",
+						"color": "#a156b4"
+					},
+					{
+						"slug": "very-dark-gray",
+						"color": "#444"
+					},
+				]
+			},
+			"custom": {
+				"line-height": [
+					{
+						"small": "1.3"
+					},
+					{
+						"medium": "2"
+					},
+					{
+						large": "2.5"
+					}
+				]
+			}
+		}
+	}
+}
 ```
 
 This code generates the following variables:
@@ -248,9 +242,9 @@ This code generates the following variables:
 	--wp--preset--color--strong-magenta: #a156b4;
 	--wp--preset--color--very-dark-gray: #444;
 	
-	--wp--preset--line-height--small: 1.3;
-	--wp--preset--line-height--medium: 2;
-	--wp--preset--line-height--large: 2.5;
+	--wp--custom--line-height--small: 1.3;
+	--wp--custom--line-height--medium: 2;
+	--wp--custom--line-height--large: 2.5;
 ```
 
 **Global styles** are used to set default values for the website and for the blocks.
@@ -282,20 +276,20 @@ Block styles are separate from global styles. Add the code after the globals, bu
 		},
 		"typography": {
 			"fontSize": "2.5rem",
-			"lineHeight": "var(--wp--preset--line-height--medium)"
+			"lineHeight": "var(--wp--custom--line-height--medium)"
 		}
 	}
 },
 ```
 
 CSS variables for font sizes are generated using the `editor-font-sizes` theme support or by adding a global preset.
+
 https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes
 
 If the theme does not add any custom font sizes, variables are created using the default sizes.
 This example adds the default medium font size to the paragraph block.
 
-The font sizes are unit less, which is why calc is used:
-https://developer.mozilla.org/en-US/docs/Web/CSS/calc
+The font sizes are unitless, which is why calc is used: https://developer.mozilla.org/en-US/docs/Web/CSS/calc
 
 ```
 "core/paragraph": {
@@ -307,8 +301,7 @@ https://developer.mozilla.org/en-US/docs/Web/CSS/calc
 },
 ```
 
-Using the CSS variables is optional.
-In this example, the default background color for the group block is changed to white using a color code:
+Using the CSS variables is optional. In this example, the default background color for the group block is changed to white using a color code:
 
 ```
 "core/group": {
@@ -325,35 +318,31 @@ Below are the presets and styles combined:
 ```
 {
 	"global": {
-		"presets": {
-			"color": [
-				{
-					"slug": "strong-magenta",
-					"value": "#a156b4"
-				},
-				{
-					"slug": "very-dark-gray",
-					"value": "#444"
-				}
-			],
-			"line-height": [
-				{
-					"slug": "small",
-					"value": "1.3"
-				},
-				{
-					"slug": "medium",
-					"value": "2"
-				},
-				{
-					"slug": "large",
-					"value": "2.5"
-				}
-			]
-		},
-		"styles": {
+		"setttings": {
 			"color": {
-				"background": "var(--wp--preset--color--very-dark-gray)"
+				"palette": [
+					{
+						"slug": "strong-magenta",
+						"color": "#a156b4"
+					},
+					{
+						"slug": "very-dark-gray",
+						"color": "#444"
+					},
+				]
+			},
+			"custom": {
+				"line-height": [
+					{
+						"small": "1.3"
+					},
+					{
+						"medium": "2"
+					},
+					{
+						large": "2.5"
+					}
+				]
 			}
 		}
 	},
@@ -365,7 +354,7 @@ Below are the presets and styles combined:
 			},
 			"typography": {
 				"fontSize": "2.5rem",
-				"lineHeight": "var(--wp--preset--line-height--medium)"
+				"lineHeight": "var(--wp--custom--line-height--medium)"
 			}
 		}
 	},

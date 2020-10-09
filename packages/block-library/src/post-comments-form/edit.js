@@ -10,7 +10,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	Warning,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -28,7 +28,7 @@ export default function PostCommentsFormEdit( {
 		'comment_status',
 		postId
 	);
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
@@ -44,7 +44,7 @@ export default function PostCommentsFormEdit( {
 					} }
 				/>
 			</BlockControls>
-			<div { ...blockWrapperProps }>
+			<div { ...blockProps }>
 				{ ! commentStatus && (
 					<Warning>
 						{ __(

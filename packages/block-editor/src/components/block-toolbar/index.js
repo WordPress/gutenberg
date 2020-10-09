@@ -33,6 +33,7 @@ export default function BlockToolbar( {
 		blockClientId,
 		blockType,
 		hasFixedToolbar,
+		hasReducedUI,
 		isValid,
 		isVisual,
 	} = useSelect( ( select ) => {
@@ -47,6 +48,7 @@ export default function BlockToolbar( {
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		const blockRootClientId = getBlockRootClientId( selectedBlockClientId );
+		const settings = getSettings();
 
 		return {
 			blockClientIds: selectedBlockClientIds,
@@ -54,7 +56,8 @@ export default function BlockToolbar( {
 			blockType:
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
-			hasFixedToolbar: getSettings().hasFixedToolbar,
+			hasFixedToolbar: settings.hasFixedToolbar,
+			hasReducedUI: settings.hasReducedUI,
 			rootClientId: blockRootClientId,
 			isValid: selectedBlockClientIds.every( ( id ) =>
 				isBlockValid( id )
@@ -72,6 +75,9 @@ export default function BlockToolbar( {
 		{
 			ref: nodeRef,
 			onChange( isFocused ) {
+				if ( isFocused && hasReducedUI ) {
+					return;
+				}
 				toggleBlockHighlight( blockClientId, isFocused );
 			},
 		}
@@ -117,7 +123,7 @@ export default function BlockToolbar( {
 						<BlockSwitcher clientIds={ blockClientIds } />
 						<BlockMover
 							clientIds={ blockClientIds }
-							hideDragHandle={ hideDragHandle }
+							hideDragHandle={ hideDragHandle || hasReducedUI }
 						/>
 					</ToolbarGroup>
 				) }

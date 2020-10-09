@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -319,12 +319,12 @@ export default function SearchEdit( {
 		</>
 	);
 
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		className: getBlockClassNames(),
 	} );
 
 	return (
-		<div { ...blockWrapperProps }>
+		<div { ...blockProps }>
 			{ controls }
 
 			{ showLabel && (

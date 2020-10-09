@@ -5,7 +5,6 @@
 		"allowSyntheticDefaultImports": true,
 		"jsx": "preserve",
 		"target": "esnext",
-		"types": ["react", "node", "requestidlecallback"],
 		"module": "esnext",
 		"lib": [ "dom", "esnext" ],
 		"declaration": true,

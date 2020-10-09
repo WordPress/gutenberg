@@ -388,12 +388,12 @@ To make the content resize and keep its aspect ratio, the `<body>` element needs
 add_theme_support( 'responsive-embeds' );
 ```
 
-## Experimental — Cover block padding
+## Cover block padding
 
-Using the Gutenberg plugin (version 8.3 or later), Cover blocks can provide padding controls in the editor for users. This is off by default, and requires the theme to opt in by declaring support:
+Some blocks can provide padding controls in the editor for users. This is off by default, and requires the theme to opt in by declaring support:
 
 ```php
-add_theme_support('experimental-custom-spacing');
+add_theme_support('custom-spacing');
 ```
 
 ## Experimental — Link color control

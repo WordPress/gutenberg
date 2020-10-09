@@ -1,6 +1,6 @@
 {
   "name": "@wordpress/react-native-editor",
-  "version": "1.37.1",
+  "version": "1.38.0",
   "description": "Mobile WordPress gutenberg editor.",
   "author": "The WordPress Contributors",
   "license": "GPL-2.0-or-later",
@@ -31,7 +31,7 @@
   "dependencies": {
     "@babel/runtime": "^7.11.2",
     "@react-native-community/blur": "3.6.0",
-    "@react-native-community/masked-view": "git+https://github.com/wordpress-mobile/react-native-masked-view.git#098004d0968f853fc7d96c2aa5f96afe7a133c58",
+    "@react-native-community/masked-view": "git+https://github.com/wordpress-mobile/react-native-masked-view.git#f65a51a3320e58404d7f38d967bfd1f42b439ca9",
     "@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#d263ff16cdd9fb7352b354342522ff030f220f42",
     "@react-navigation/native": "^5.6.1",
     "@react-navigation/stack": "5.6.2",
@@ -114,7 +114,7 @@
     "test:e2e:bundle:android": "mkdir -p android/app/src/main/assets && npm run rn-bundle -- --reset-cache --platform android --dev false --minify false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
     "test:e2e:build-app:android": "npm run test:e2e:bundle:android && cd android && ./gradlew clean && ./gradlew assembleDebug",
     "test:e2e:install-app:android": "cd android && ./gradlew installDebug",
-    "test:e2e:bundle:ios": "mkdir -p ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app && npm run rn-bundle -- --reset-cache --platform=ios --dev=false --minify false --entry-file=index.js --bundle-output=./ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app/main.jsbundle --assets-dest=./ios/build/gutenberg/Build/Products/Release-iphonesimulator/gutenberg.app",
+    "test:e2e:bundle:ios": "mkdir -p ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app && npm run rn-bundle -- --reset-cache --platform=ios --dev=false --minify false --entry-file=index.js --bundle-output=./ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle --assets-dest=./ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app",
     "test:e2e:build-app:ios": "npm run ios -- --configuration Release --no-packager --simulator 'iPhone 11 (13.4)'",
     "build:gutenberg": "cd gutenberg && npm ci && npm run build",
     "clean": "npm run clean:build-artifacts; npm run clean:aztec; npm run clean:haste; npm run clean:jest; npm run clean:metro; npm run clean:react; npm run clean:watchman",

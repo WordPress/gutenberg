@@ -26,7 +26,7 @@ import {
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { trash } from '@wordpress/icons';
@@ -364,14 +364,14 @@ export default function LogoEdit( {
 
 	const key = !! logoUrl;
 
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		ref,
 		className: classes,
 		key,
 	} );
 
 	return (
-		<div { ...blockWrapperProps }>
+		<div { ...blockProps }>
 			{ controls }
 			{ logoUrl && logoImage }
 			{ ! logoUrl && mediaPlaceholder }

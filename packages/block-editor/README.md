@@ -30,8 +30,8 @@ function MyEditorComponent () {
 	return (
 		<BlockEditorProvider
 			value={ blocks }
-			onInput={ updateBlocks }
-			onChange={ updateBlocks }
+			onInput={ ( blocks ) => updateBlocks( blocks ) }
+			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
 			<SlotFillProvider>
 				<Popover.Slot name="block-toolbar" />
@@ -400,6 +400,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls/README.md>
 
+<a name="LineHeightControl" href="#LineHeightControl">#</a> **LineHeightControl**
+
+Undocumented declaration.
+
 <a name="MediaPlaceholder" href="#MediaPlaceholder">#</a> **MediaPlaceholder**
 
 _Related_
@@ -557,6 +561,26 @@ _Related_
 <a name="useBlockEditContext" href="#useBlockEditContext">#</a> **useBlockEditContext**
 
 Undocumented declaration.
+
+<a name="useBlockProps" href="#useBlockProps">#</a> **useBlockProps**
+
+This hook is used to lightly mark an element as a block element. The element
+should be the outermost element of a block. Call this hook and pass the
+returned props to the element to mark as a block. If you define a ref for the
+element, it is important to pass the ref to this hook, which the hook in turn
+will pass to the component through the props it returns. Optionally, you can
+also pass any other props through this hook, and they will be merged and
+returned.
+
+_Parameters_
+
+-   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
+-   _options_ `Object`: Options for internal use only.
+-   _options.\_\_unstableIsHtml_ `boolean`: 
+
+_Returns_
+
+-   `Object`: Props to pass to the element to mark as a block.
 
 <a name="validateThemeColors" href="#validateThemeColors">#</a> **validateThemeColors**
 

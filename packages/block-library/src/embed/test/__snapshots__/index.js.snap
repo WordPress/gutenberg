@@ -1,6 +1,14 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`core/embed block edit matches snapshot 1`] = `
+.emotion-0 {
+  width: 1.4em;
+  height: 1.4em;
+  margin: -0.2em 0.1em 0;
+  vertical-align: middle;
+  fill: currentColor;
+}
+
 <div
   class="components-placeholder wp-block-embed is-large"
 >
@@ -66,7 +74,7 @@ exports[`core/embed block edit matches snapshot 1`] = `
         </span>
         <svg
           aria-hidden="true"
-          class="components-external-link__icon"
+          class="components-external-link__icon emotion-0 emotion-1"
           focusable="false"
           height="24"
           role="img"

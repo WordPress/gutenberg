@@ -29,6 +29,7 @@ function HeaderToolbar() {
 	const inserterButton = useRef();
 	const { setIsInserterOpened } = useDispatch( 'core/edit-post' );
 	const {
+		hasReducedUI,
 		hasFixedToolbar,
 		isInserterEnabled,
 		isInserterOpened,
@@ -64,11 +65,15 @@ function HeaderToolbar() {
 				'showIconLabels'
 			),
 			isNavigationTool: select( 'core/block-editor' ).isNavigationMode(),
+			hasReducedUI: select( 'core/edit-post' ).isFeatureActive(
+				'reducedUI'
+			),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
 	const isSmallViewport = useViewportMatch( 'small', '<' );
+	const { setNavigationMode } = useDispatch( 'core/block-editor' );
 
 	const displayBlockToolbar =
 		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;
@@ -78,8 +83,6 @@ function HeaderToolbar() {
 		  __( 'Document and block tools' )
 		: /* translators: accessibility text for the editor toolbar when Top Toolbar is off */
 		  __( 'Document tools' );
-
-	const { setNavigationMode } = useDispatch( 'core/block-editor' );
 
 	const onSwitchMode = ( mode ) => {
 		setNavigationMode( mode === 'edit' ? false : true );
@@ -108,102 +111,110 @@ function HeaderToolbar() {
 			className="edit-post-header-toolbar"
 			aria-label={ toolbarAriaLabel }
 		>
-			<ToolbarItem
-				ref={ inserterButton }
-				as={ Button }
-				className="edit-post-header-toolbar__inserter-toggle"
-				isPrimary
-				isPressed={ isInserterOpened }
-				onMouseDown={ ( event ) => {
-					event.preventDefault();
-				} }
-				onClick={ () => {
-					if ( isInserterOpened ) {
-						// Focusing the inserter button closes the inserter popover
-						inserterButton.current.focus();
-					} else {
-						setIsInserterOpened( true );
-					}
-				} }
-				disabled={ ! isInserterEnabled }
-				icon={ plus }
-				/* translators: button label text should, if possible, be under 16
+			<div className="edit-post-header-toolbar__left">
+				<ToolbarItem
+					ref={ inserterButton }
+					as={ Button }
+					className="edit-post-header-toolbar__inserter-toggle"
+					isPrimary
+					isPressed={ isInserterOpened }
+					onMouseDown={ ( event ) => {
+						event.preventDefault();
+					} }
+					onClick={ () => {
+						if ( isInserterOpened ) {
+							// Focusing the inserter button closes the inserter popover
+							inserterButton.current.focus();
+						} else {
+							setIsInserterOpened( true );
+						}
+					} }
+					disabled={ ! isInserterEnabled }
+					icon={ plus }
+					/* translators: button label text should, if possible, be under 16
 			characters. */
-				label={ _x(
-					'Add block',
-					'Generic label for block inserter button'
-				) }
-				showTooltip={ ! showIconLabels }
-			>
-				{ showIconLabels && __( 'Add' ) }
-			</ToolbarItem>
-			{ ( isWideViewport || ! showIconLabels ) && (
-				<>
-					{ isLargeViewport && (
+					label={ _x(
+						'Add block',
+						'Generic label for block inserter button'
+					) }
+					showTooltip={ ! showIconLabels }
+				>
+					{ showIconLabels && __( 'Add' ) }
+				</ToolbarItem>
+				{ ! hasReducedUI && ( isWideViewport || ! showIconLabels ) && (
+					<>
+						{ isLargeViewport && (
+							<ToolbarItem
+								as={ ToolSelector }
+								showTooltip={ ! showIconLabels }
+								isTertiary={ showIconLabels }
+								disabled={ isTextModeEnabled }
+							/>
+						) }
 						<ToolbarItem
-							as={ ToolSelector }
+							as={ EditorHistoryUndo }
 							showTooltip={ ! showIconLabels }
 							isTertiary={ showIconLabels }
-							disabled={ isTextModeEnabled }
 						/>
-					) }
-					<ToolbarItem
-						as={ EditorHistoryUndo }
-						showTooltip={ ! showIconLabels }
-						isTertiary={ showIconLabels }
-					/>
-					<ToolbarItem
-						as={ EditorHistoryRedo }
-						showTooltip={ ! showIconLabels }
-						isTertiary={ showIconLabels }
-					/>
-					{ overflowItems }
-				</>
-			) }
-			{ ! isWideViewport && ! isSmallViewport && showIconLabels && (
-				<DropdownMenu
-					position="bottom right"
-					label={
-						/* translators: button label text should, if possible, be under 16
+						<ToolbarItem
+							as={ EditorHistoryRedo }
+							showTooltip={ ! showIconLabels }
+							isTertiary={ showIconLabels }
+						/>
+						{ overflowItems }
+					</>
+				) }
+				{ ! hasReducedUI &&
+					! isWideViewport &&
+					! isSmallViewport &&
+					showIconLabels && (
+						<DropdownMenu
+							position="bottom right"
+							label={
+								/* translators: button label text should, if possible, be under 16
 	characters. */
-						__( 'Tools' )
-					}
-				>
-					{ () => (
-						<div className="edit-post-header__dropdown">
-							<MenuGroup label={ __( 'Modes' ) }>
-								<MenuItemsChoice
-									value={
-										isNavigationTool ? 'select' : 'edit'
-									}
-									onSelect={ onSwitchMode }
-									choices={ [
-										{
-											value: 'edit',
-											label: __( 'Edit' ),
-										},
-										{
-											value: 'select',
-											label: __( 'Select' ),
-										},
-									] }
-								/>
-							</MenuGroup>
-							<MenuGroup label={ __( 'Edit' ) }>
-								<EditorHistoryUndo
-									showTooltip={ ! showIconLabels }
-									isTertiary={ showIconLabels }
-								/>
-								<EditorHistoryRedo
-									showTooltip={ ! showIconLabels }
-									isTertiary={ showIconLabels }
-								/>
-							</MenuGroup>
-							<MenuGroup>{ overflowItems }</MenuGroup>
-						</div>
+								__( 'Tools' )
+							}
+						>
+							{ () => (
+								<div className="edit-post-header__dropdown">
+									<MenuGroup label={ __( 'Modes' ) }>
+										<MenuItemsChoice
+											value={
+												isNavigationTool
+													? 'select'
+													: 'edit'
+											}
+											onSelect={ onSwitchMode }
+											choices={ [
+												{
+													value: 'edit',
+													label: __( 'Edit' ),
+												},
+												{
+													value: 'select',
+													label: __( 'Select' ),
+												},
+											] }
+										/>
+									</MenuGroup>
+									<MenuGroup label={ __( 'Edit' ) }>
+										<EditorHistoryUndo
+											showTooltip={ ! showIconLabels }
+											isTertiary={ showIconLabels }
+										/>
+										<EditorHistoryRedo
+											showTooltip={ ! showIconLabels }
+											isTertiary={ showIconLabels }
+										/>
+									</MenuGroup>
+									<MenuGroup>{ overflowItems }</MenuGroup>
+								</div>
+							) }
+						</DropdownMenu>
 					) }
-				</DropdownMenu>
-			) }
+			</div>
+
 			{ displayBlockToolbar && (
 				<div className="edit-post-header-toolbar__block-toolbar">
 					<BlockToolbar hideDragHandle />

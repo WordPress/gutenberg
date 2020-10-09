@@ -87,7 +87,7 @@ The settings section has the following structure and default values:
         "palette": [ ... ], /* color presets, as in add_theme_support('editor-color-palette', ... ) */
       },
       "spacing": {
-        "customPadding": false, /* true to opt-in, as in add_theme_support('experimental-custom-spacing') */
+        "customPadding": false, /* true to opt-in, as in add_theme_support('custom-spacing') */
         "units": [ "px", "em", "rem", "vh", "vw" ], /* filter values, as in add_theme_support('custom-units', ... ) */
       },
       "typography": {
