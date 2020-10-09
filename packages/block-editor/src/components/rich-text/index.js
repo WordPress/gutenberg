@@ -106,7 +106,6 @@ function RichTextWrapper(
 		multiline,
 		inlineToolbar,
 		wrapperClassName,
-		className,
 		autocompleters,
 		onReplace,
 		placeholder,
@@ -120,10 +119,6 @@ function RichTextWrapper(
 		__unstableOnSplitAtEnd: onSplitAtEnd,
 		__unstableOnSplitMiddle: onSplitMiddle,
 		identifier,
-		// To do: find a better way to implicitly inherit props.
-		start: startAttr,
-		reversed,
-		style,
 		preserveWhiteSpace,
 		__unstableEmbedURLOnPaste,
 		__unstableDisableFormats: disableFormats,
@@ -144,6 +139,10 @@ function RichTextWrapper(
 		fontFamily,
 		fontWeight,
 		fontStyle,
+		minWidth,
+		maxWidth,
+		onBlur,
+		setRef,
 		...props
 	},
 	forwardedRef
@@ -553,9 +552,6 @@ function RichTextWrapper(
 			selectionEnd={ selectionEnd }
 			onSelectionChange={ onSelectionChange }
 			tagName={ tagName }
-			className={ classnames( classes, className, {
-				'keep-placeholder-on-focus': keepPlaceholderOnFocus,
-			} ) }
 			placeholder={ placeholder }
 			allowedFormats={ adjustedAllowedFormats }
 			withoutInteractiveFormatting={ withoutInteractiveFormatting }
@@ -573,11 +569,8 @@ function RichTextWrapper(
 			__unstableDidAutomaticChange={ didAutomaticChange }
 			__unstableUndo={ undo }
 			__unstableDisableFormats={ disableFormats }
-			style={ style }
 			preserveWhiteSpace={ preserveWhiteSpace }
 			disabled={ disabled }
-			start={ startAttr }
-			reversed={ reversed }
 			unstableOnFocus={ unstableOnFocus }
 			__unstableAllowPrefixTransformations={
 				__unstableAllowPrefixTransformations
@@ -603,6 +596,15 @@ function RichTextWrapper(
 			fontFamily={ fontFamily }
 			fontWeight={ fontWeight }
 			fontStyle={ fontStyle }
+			minWidth={ minWidth }
+			maxWidth={ maxWidth }
+			onBlur={ onBlur }
+			setRef={ setRef }
+			// Props to be set on the editable container are destructured on the
+			// element itself for web (see below), but passed through rich text
+			// for native.
+			id={ props.id }
+			style={ props.style }
 		>
 			{ ( {
 				isSelected: nestedIsSelected,
@@ -632,13 +634,27 @@ function RichTextWrapper(
 							<TagName
 								{ ...editableProps }
 								{ ...props }
+								style={
+									props.style
+										? {
+												...props.style,
+												...editableProps.style,
+										  }
+										: editableProps.style
+								}
+								className={ classnames(
+									classes,
+									props.className,
+									editableProps.className,
+									{
+										'keep-placeholder-on-focus': keepPlaceholderOnFocus,
+									}
+								) }
 								aria-autocomplete={
 									listBoxId ? 'list' : undefined
 								}
 								aria-owns={ listBoxId }
 								aria-activedescendant={ activeId }
-								start={ startAttr }
-								reversed={ reversed }
 								onKeyDown={ ( event ) => {
 									onKeyDown( event );
 									editableProps.onKeyDown( event );

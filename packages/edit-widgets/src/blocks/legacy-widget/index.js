@@ -73,7 +73,7 @@ function legacyWidgetToBlockVariation( className, widget ) {
 		};
 	} else {
 		blockVariation.attributes = {
-			id_base: widget.id_base,
+			idBase: widget.id_base,
 			widgetClass: className,
 			instance: {},
 		};

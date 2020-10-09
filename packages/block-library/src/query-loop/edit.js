@@ -7,7 +7,7 @@ import {
 	BlockContextProvider,
 	InnerBlocks,
 	BlockPreview,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -15,7 +15,11 @@ import {
  */
 import { useQueryContext } from '../query';
 
-const TEMPLATE = [ [ 'core/post-title' ], [ 'core/post-content' ] ];
+const TEMPLATE = [
+	[ 'core/post-title' ],
+	[ 'core/post-date' ],
+	[ 'core/post-excerpt' ],
+];
 export default function QueryLoopEdit( {
 	clientId,
 	context: {
@@ -23,11 +27,13 @@ export default function QueryLoopEdit( {
 			perPage,
 			offset,
 			categoryIds,
+			postType,
 			tagIds = [],
 			order,
 			orderBy,
 			author,
 			search,
+			exclude,
 		} = {},
 		queryContext,
 	},
@@ -53,10 +59,13 @@ export default function QueryLoopEdit( {
 			if ( search ) {
 				query.search = search;
 			}
+			if ( exclude?.length ) {
+				query.exclude = exclude;
+			}
 			return {
 				posts: select( 'core' ).getEntityRecords(
 					'postType',
-					'post',
+					postType,
 					query
 				),
 				blocks: select( 'core/block-editor' ).getBlocks( clientId ),
@@ -73,6 +82,8 @@ export default function QueryLoopEdit( {
 			clientId,
 			author,
 			search,
+			postType,
+			exclude,
 		]
 	);
 
@@ -84,10 +95,10 @@ export default function QueryLoopEdit( {
 			} ) ),
 		[ posts ]
 	);
-	const blockWrapperProps = useBlockWrapperProps();
+	const blockProps = useBlockProps();
 
 	return (
-		<div { ...blockWrapperProps }>
+		<div { ...blockProps }>
 			{ blockContexts &&
 				blockContexts.map( ( blockContext ) => (
 					<BlockContextProvider

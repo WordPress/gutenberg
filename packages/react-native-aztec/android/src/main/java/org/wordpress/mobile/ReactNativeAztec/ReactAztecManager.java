@@ -108,7 +108,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     protected ReactAztecText createViewInstance(ThemedReactContext reactContext) {
         ReactAztecText aztecText = new ReactAztecText(reactContext);
         aztecText.setFocusableInTouchMode(false);
-        aztecText.setFocusable(false);
+        aztecText.setEnabled(true);
         aztecText.setCalypsoMode(false);
         aztecText.setPadding(0, 0, 0, 0);
         // This is a temporary hack that sets the correct GB link color and underline

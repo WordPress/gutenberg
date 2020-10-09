@@ -16,6 +16,7 @@ public struct MediaInfo {
 public enum Capabilities: String {
     case mentions
     case unsupportedBlockEditor
+    case canEnableUnsupportedBlockEditor
     case modalLayoutPicker
 }
 
@@ -227,6 +228,8 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate that the editor requested to set the tooltip's visibility
     /// - Parameter tooltipShown: Tooltip's visibility value    
     func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool)
+
+    func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType)
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
@@ -235,4 +238,5 @@ public extension GutenbergBridgeDelegate {
     func gutenbergDidLoad() { }
     func gutenbergDidLayout() { }
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block) { }
+    func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType) { }
 }
