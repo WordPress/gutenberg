@@ -1,10 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`OptionsModal should match snapshot when the modal is active 1`] = `
+exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
 <WithInstanceId(Modal)
-  className="edit-post-options-modal"
+  className="edit-post-preferences-modal"
   closeLabel="Close"
-  title="Options"
+  title="Preferences"
 >
   <Section
     title="General"
@@ -22,7 +22,7 @@ exports[`OptionsModal should match snapshot when the modal is active 1`] = `
     />
   </Section>
   <Section
-    title="Keyboard options"
+    title="Keyboard"
   >
     <WithSelect(WithDispatch(BaseOption))
       featureName="keepCaretInsideBlock"
