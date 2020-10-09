@@ -37,6 +37,7 @@ import getColorAndStyleProps from './color-props';
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_MAX_WIDTH = 108;
+const MIN_WIDTH = 40;
 
 class ButtonEdit extends Component {
 	constructor( props ) {
@@ -313,7 +314,7 @@ class ButtonEdit extends Component {
 		// different than empty string.
 		const minWidth =
 			isButtonFocused || ( ! isButtonFocused && text && text !== '' )
-				? 1
+				? MIN_WIDTH
 				: placeholderTextWidth;
 		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 		// a `placeholder` as an empty string when `RichText` is focused,

@@ -63,9 +63,10 @@ export default function Dropdown( {
 	 * in case when focus is moved to the modal dialog.
 	 */
 	function closeIfFocusOutside() {
+		const { ownerDocument } = containerRef.current;
 		if (
-			! containerRef.current.contains( document.activeElement ) &&
-			! document.activeElement.closest( '[role="dialog"]' )
+			! containerRef.current.contains( ownerDocument.activeElement ) &&
+			! ownerDocument.activeElement.closest( '[role="dialog"]' )
 		) {
 			close();
 		}

@@ -26,6 +26,10 @@ import {
  * Internal dependencies
  */
 import { pickRelevantMediaFiles } from './shared';
+import {
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA,
+} from './constants';
 
 const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 
@@ -153,10 +157,10 @@ export default function GalleryImage( {
 	let href;
 
 	switch ( linkTo ) {
-		case 'media':
+		case LINK_DESTINATION_MEDIA:
 			href = url;
 			break;
-		case 'attachment':
+		case LINK_DESTINATION_ATTACHMENT:
 			href = link;
 			break;
 	}

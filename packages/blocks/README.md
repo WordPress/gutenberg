@@ -205,6 +205,21 @@ _Returns_
 
 -   `Object`: Block object.
 
+<a name="createBlocksFromInnerBlocksTemplate" href="#createBlocksFromInnerBlocksTemplate">#</a> **createBlocksFromInnerBlocksTemplate**
+
+Given an array of InnerBlocks templates or Block Objects,
+returns an array of created Blocks from them.
+It handles the case of having InnerBlocks as Blocks by
+converting them to the proper format to continue recursively.
+
+_Parameters_
+
+-   _innerBlocksOrTemplate_ `Array`: Nested blocks or InnerBlocks templates.
+
+_Returns_
+
+-   `Array<Object>`: Array of Block objects.
+
 <a name="doBlocksMatchTemplate" href="#doBlocksMatchTemplate">#</a> **doBlocksMatchTemplate**
 
 Checks whether a list of blocks matches a template by comparing the block names.

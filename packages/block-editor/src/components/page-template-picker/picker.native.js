@@ -26,7 +26,7 @@ import { Animated, Dimensions, Keyboard } from 'react-native';
 import Button from './button';
 import Container from './container';
 import getDefaultTemplates from './default-templates';
-import Preview from './preview';
+import ModalPreview from './preview';
 
 // Used to hide the picker if there's no enough space in the window
 const PICKER_HEIGHT_OFFSET = 150;
@@ -155,7 +155,7 @@ const __experimentalPageTemplatePicker = ( {
 					/>
 				) ) }
 			</Container>
-			<Preview
+			<ModalPreview
 				template={ templatePreview }
 				onDismiss={ () => setTemplatePreview( undefined ) }
 				onApply={ onApply }

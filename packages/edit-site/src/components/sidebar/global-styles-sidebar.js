@@ -6,25 +6,31 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { PanelBody, TabPanel } from '@wordpress/components';
+import { Button, PanelBody, TabPanel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { useGlobalStylesContext } from '../editor/global-styles-provider';
+import {
+	useGlobalStylesContext,
+	useGlobalStylesReset,
+} from '../editor/global-styles-provider';
 import DefaultSidebar from './default-sidebar';
 import { GLOBAL_CONTEXT } from '../editor/utils';
 import TypographyPanel from './typography-panel';
 import ColorPanel from './color-panel';
 
-export default ( { identifier, title, icon } ) => {
+export default ( { identifier, title, icon, closeLabel } ) => {
 	const {
 		contexts,
 		getStyleProperty,
 		setStyleProperty,
+		getSetting,
+		setSetting,
 	} = useGlobalStylesContext();
+	const [ canRestart, onReset ] = useGlobalStylesReset();
 
 	if ( typeof contexts !== 'object' || ! contexts?.[ GLOBAL_CONTEXT ] ) {
 		// No sidebar is shown.
@@ -32,7 +38,27 @@ export default ( { identifier, title, icon } ) => {
 	}
 
 	return (
-		<DefaultSidebar identifier={ identifier } title={ title } icon={ icon }>
+		<DefaultSidebar
+			className="edit-site-global-styles-sidebar"
+			identifier={ identifier }
+			title={ title }
+			icon={ icon }
+			closeLabel={ closeLabel }
+			header={
+				<>
+					<strong>{ title }</strong>
+					<Button
+						className="edit-site-global-styles-sidebar__reset-button"
+						isSmall
+						isTertiary
+						disabled={ ! canRestart }
+						onClick={ onReset }
+					>
+						{ __( 'Reset to defaults' ) }
+					</Button>
+				</>
+			}
+		>
 			<TabPanel
 				tabs={ [
 					{ name: 'global', title: __( 'Global' ) },
@@ -107,6 +133,8 @@ export default ( { identifier, title, icon } ) => {
 												setStyleProperty={
 													setStyleProperty
 												}
+												getSetting={ getSetting }
+												setSetting={ setSetting }
 											/>,
 										].filter( Boolean ) }
 									</PanelBody>
@@ -135,6 +163,8 @@ export default ( { identifier, title, icon } ) => {
 							} }
 							getStyleProperty={ getStyleProperty }
 							setStyleProperty={ setStyleProperty }
+							getSetting={ getSetting }
+							setSetting={ setSetting }
 						/>,
 					].filter( Boolean );
 				} }

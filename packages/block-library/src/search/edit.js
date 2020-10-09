@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	__experimentalBlock as Block,
+	useBlockProps,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -319,8 +319,12 @@ export default function SearchEdit( {
 		</>
 	);
 
+	const blockProps = useBlockProps( {
+		className: getBlockClassNames(),
+	} );
+
 	return (
-		<Block.div className={ getBlockClassNames() }>
+		<div { ...blockProps }>
 			{ controls }
 
 			{ showLabel && (
@@ -368,6 +372,6 @@ export default function SearchEdit( {
 				{ 'button-only' === buttonPosition && renderButton() }
 				{ 'no-button' === buttonPosition && renderTextField() }
 			</ResizableBox>
-		</Block.div>
+		</div>
 	);
 }

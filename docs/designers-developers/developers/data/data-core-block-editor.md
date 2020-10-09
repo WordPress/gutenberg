@@ -1095,6 +1095,7 @@ _Parameters_
 -   _index_ `?number`: Index at which block should be inserted.
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _updateSelection_ `?boolean`: If true block selection will be updated.  If false, block selection will not change. Defaults to true.
+-   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 _Returns_
 
@@ -1236,6 +1237,7 @@ _Parameters_
 -   _blocks_ `(Object|Array<Object>)`: Replacement block(s).
 -   _indexToSelect_ `number`: Index of replacement block to select.
 -   _initialPosition_ `number`: Index of caret after in the selected block after the operation.
+-   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 <a name="replaceInnerBlocks" href="#replaceInnerBlocks">#</a> **replaceInnerBlocks**
 

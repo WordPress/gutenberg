@@ -9,12 +9,13 @@ import { compact, uniq } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-import { external, Icon } from '@wordpress/icons';
+import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import VisuallyHidden from '../visually-hidden';
+import { StyledIcon } from './styles/external-link-styles';
 
 export function ExternalLink(
 	{ href, children, className, rel = '', ...additionalProps },
@@ -41,7 +42,7 @@ export function ExternalLink(
 					__( '(opens in a new tab)' )
 				}
 			</VisuallyHidden>
-			<Icon
+			<StyledIcon
 				icon={ external }
 				className="components-external-link__icon"
 			/>

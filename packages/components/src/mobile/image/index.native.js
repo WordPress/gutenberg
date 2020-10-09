@@ -42,6 +42,7 @@ const ImageComponent = ( {
 	openMediaOptions,
 	resizeMode,
 	retryMessage,
+	retryIcon,
 	url,
 	shapeStyle,
 	width: imageWidth,
@@ -78,7 +79,12 @@ const ImageComponent = ( {
 		let iconStyle;
 		switch ( iconType ) {
 			case ICON_TYPE.RETRY:
-				return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
+				return (
+					<Icon
+						icon={ retryIcon || SvgIconRetry }
+						{ ...styles.iconRetry }
+					/>
+				);
 			case ICON_TYPE.PLACEHOLDER:
 				iconStyle = iconPlaceholderStyles;
 				break;
@@ -210,7 +216,12 @@ const ImageComponent = ( {
 							styles.retryContainer,
 						] }
 					>
-						<View style={ styles.modalIcon }>
+						<View
+							style={ [
+								styles.retryIcon,
+								retryIcon && styles.customRetryIcon,
+							] }
+						>
 							{ getIcon( ICON_TYPE.RETRY ) }
 						</View>
 						<Text style={ styles.uploadFailedText }>
@@ -219,20 +230,14 @@ const ImageComponent = ( {
 					</View>
 				) }
 
-				{ editButton &&
-					isSelected &&
-					imageData &&
-					! isUploadInProgress &&
-					! isUploadFailed && (
-						<ImageEditingButton
-							onSelectMediaUploadOption={
-								onSelectMediaUploadOption
-							}
-							openMediaOptions={ openMediaOptions }
-							url={ url }
-							pickerOptions={ mediaPickerOptions }
-						/>
-					) }
+				{ editButton && isSelected && ! isUploadInProgress && (
+					<ImageEditingButton
+						onSelectMediaUploadOption={ onSelectMediaUploadOption }
+						openMediaOptions={ openMediaOptions }
+						url={ ! isUploadFailed && imageData && url }
+						pickerOptions={ mediaPickerOptions }
+					/>
+				) }
 			</View>
 		</View>
 	);
