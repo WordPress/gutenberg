@@ -8,7 +8,7 @@ import { View } from 'react-native';
  */
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { InnerBlocks, withColors } from '@wordpress/block-editor';
+import { InnerBlocks } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
 
@@ -22,6 +22,7 @@ function GroupEdit( {
 	hasInnerBlocks,
 	isSelected,
 	getStylesFromColorScheme,
+	mergedStyle,
 } ) {
 	const { align } = attributes;
 	const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
@@ -64,6 +65,12 @@ function GroupEdit( {
 					! hasInnerBlocks &&
 					isFullWidth &&
 					styles.fullWidth,
+				mergedStyle,
+				isSelected &&
+					mergedStyle?.backgroundColor && {
+						paddingBottom:
+							styles.hasBackgroundAppender.paddingBottom,
+					},
 			] }
 		>
 			<InnerBlocks renderAppender={ isSelected && renderAppender } />
@@ -72,7 +79,6 @@ function GroupEdit( {
 }
 
 export default compose( [
-	withColors( 'backgroundColor' ),
 	withSelect( ( select, { clientId } ) => {
 		const { getBlock } = select( 'core/block-editor' );
 

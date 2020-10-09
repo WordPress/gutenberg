@@ -34,9 +34,6 @@ export const COLOR_SUPPORT_KEY = 'color';
 const EMPTY_ARRAY = [];
 
 const hasColorSupport = ( blockType ) => {
-	if ( Platform.OS !== 'web' ) {
-		return false;
-	}
 	const colorSupport = getBlockSupport( blockType, COLOR_SUPPORT_KEY );
 	return (
 		colorSupport &&
@@ -226,7 +223,7 @@ export function ColorEdit( props ) {
 		localAttributes.current = attributes;
 	}, [ attributes ] );
 
-	if ( ! hasColorSupport( blockName ) ) {
+	if ( ! hasColorSupport( blockName ) && Platform.OS !== 'web' ) {
 		return null;
 	}
 
