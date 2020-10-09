@@ -7,21 +7,25 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { justifyCenterIcon, justifyLeftIcon, justifyRightIcon } from './icons';
+import {
+	contentJustificationCenterIcon,
+	contentJustificationLeftIcon,
+	contentJustificationRightIcon,
+} from './icons';
 
 const DEFAULT_ALLOWED_VALUES = [ 'left', 'center', 'right' ];
 
 const CONTROLS = {
 	left: {
-		icon: justifyLeftIcon,
+		icon: contentJustificationLeftIcon,
 		title: __( 'Justify items left' ),
 	},
 	center: {
-		icon: justifyCenterIcon,
+		icon: contentJustificationCenterIcon,
 		title: __( 'Justify items center' ),
 	},
 	right: {
-		icon: justifyRightIcon,
+		icon: contentJustificationRightIcon,
 		title: __( 'Justify items right' ),
 	},
 };
