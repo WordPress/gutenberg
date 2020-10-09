@@ -10,6 +10,7 @@ import { useViewportMatch } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { getBlockType, withBlockContentContext } from '@wordpress/blocks';
+import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -28,6 +29,8 @@ import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { defaultLayout, LayoutProvider } from './layout';
+
+const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -179,11 +182,17 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			}
 		),
 		children: (
-			<InnerBlocks
-				{ ...options }
-				clientId={ clientId }
-				wrapperRef={ ref }
-			/>
+			<>
+				<InnerBlocks
+					{ ...options }
+					clientId={ clientId }
+					wrapperRef={ ref }
+				/>
+				<BoxControlVisualizer
+					values={ props.style?.spacing }
+					showValues={ props.style?.visualizers }
+				/>
+			</>
 		),
 	};
 }

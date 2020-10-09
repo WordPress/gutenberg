@@ -28,7 +28,7 @@ export const HeaderControlWrapper = styled( Flex )`
 
 export const UnitControlWrapper = styled.div`
 	box-sizing: border-box;
-	max-width: 80px;
+	max-width: 100px;
 `;
 
 export const LayoutContainer = styled( Flex )`
@@ -65,7 +65,7 @@ const unitControlMarginStyles = ( { isFirst } ) => {
 };
 
 export const UnitControl = styled( BaseUnitControl )`
-	max-width: 60px;
+	max-width: 100px;
 	${ unitControlBorderRadiusStyles };
 	${ unitControlMarginStyles };
 `;

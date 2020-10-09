@@ -16,6 +16,7 @@ export default function BoxInputControls( {
 	onHoverOn = noop,
 	onHoverOff = noop,
 	values,
+	type,
 	...props
 } ) {
 	const createHandleOnFocus = ( side ) => ( event ) => {
@@ -39,7 +40,6 @@ export default function BoxInputControls( {
 	const createHandleOnChange = ( side ) => ( next, { event } ) => {
 		const { altKey } = event;
 		const nextValues = { ...values };
-
 		nextValues[ side ] = next;
 
 		/**
@@ -82,6 +82,8 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'top' ) }
 					onHoverOff={ createHandleOnHoverOff( 'top' ) }
 					label={ LABELS.top }
+					disableUnits={ top?.match( /^(auto|calc)/ ) }
+					type={ `${ type }Top` }
 				/>
 				<UnitControl
 					{ ...props }
@@ -91,6 +93,8 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'right' ) }
 					onHoverOff={ createHandleOnHoverOff( 'right' ) }
 					label={ LABELS.right }
+					disableUnits={ right?.match( /^(auto|calc)/ ) }
+					type={ `${ type }Right` }
 				/>
 				<UnitControl
 					{ ...props }
@@ -100,6 +104,8 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'bottom' ) }
 					onHoverOff={ createHandleOnHoverOff( 'bottom' ) }
 					label={ LABELS.bottom }
+					disableUnits={ bottom?.match( /^(auto|calc)/ ) }
+					type={ `${ type }Bottom` }
 				/>
 				<UnitControl
 					{ ...props }
@@ -110,6 +116,8 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'left' ) }
 					onHoverOff={ createHandleOnHoverOff( 'left' ) }
 					label={ LABELS.left }
+					disableUnits={ left?.match( /^(auto|calc)/ ) }
+					type={ `${ type }Left` }
 				/>
 			</Layout>
 		</LayoutContainer>

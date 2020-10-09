@@ -55,7 +55,8 @@
 		"align": true,
 		"html": false,
 		"spacing": {
-			"padding": true
+			"padding": true,
+			"margin": true
 		}
 	},
 	"editorStyle": "wp-block-cover-editor",

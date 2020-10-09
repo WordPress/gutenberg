@@ -24,12 +24,17 @@ export const DEFAULT_UNIT = CSS_UNITS[ 0 ];
  * @param {number|string} value Value
  * @param {string} unit Unit value
  * @param {Array<Object>} units Units to derive from.
- * @return {Array<number, string>} The extracted number and unit.
+ * @param {string} type Proptype.
+ * @return {Array<string>} The extracted number and unit.
  */
-export function getParsedValue( value, unit, units ) {
+export function getParsedValue( value, unit, units, type ) {
 	const initialValue = unit ? `${ value }${ unit }` : value;
 
-	return parseUnit( initialValue, units );
+	if ( value && type && getCSSValues( value, type ) ) {
+		return getCSSValues( value, type );
+	}
+
+	return parseUnit( initialValue );
 }
 
 /**
@@ -47,12 +52,18 @@ export function hasUnits( units ) {
  *
  * @param {string} initialValue Value to parse
  * @param {Array<Object>} units Units to derive from.
+ * @param {string} fallbackUnit fallback unit
  * @return {Array<number, string>} The extracted number and unit.
  */
-export function parseUnit( initialValue, units = CSS_UNITS ) {
+export function parseUnit( initialValue, units = CSS_UNITS, fallbackUnit ) {
 	const value = String( initialValue ).trim();
-
 	let num = parseFloat( value, 10 );
+
+	if ( typeof initialValue === 'number' ) {
+		const fallBack = fallbackUnit || DEFAULT_UNIT.value;
+		return [ num, fallBack ];
+	}
+
 	num = isNaN( num ) ? '' : num;
 
 	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
@@ -78,26 +89,80 @@ export function parseUnit( initialValue, units = CSS_UNITS ) {
  * @param {Array<Object>} units Units to derive from.
  * @param {number|string} fallbackValue The fallback value.
  * @param {string} fallbackUnit The fallback value.
- * @return {Array<number, string>} The extracted number and unit.
+ * @param {string?} type The styleType.
+ * @return {Array<string>} The extracted number and unit.
  */
-export function getValidParsedUnit( next, units, fallbackValue, fallbackUnit ) {
-	const [ parsedValue, parsedUnit ] = parseUnit( next, units );
-	let baseValue = parsedValue;
-	let baseUnit;
-
-	if ( isNaN( parsedValue ) || parsedValue === '' ) {
-		baseValue = fallbackValue;
+export function getValidParsedUnit(
+	next,
+	units,
+	fallbackValue,
+	fallbackUnit,
+	type
+) {
+	if ( ! parseUnit( next, units, fallbackUnit )[ 0 ] ) {
+		return (
+			( next && type && getCSSValues( next, type ) ) || [
+				fallbackValue,
+				fallbackUnit,
+			]
+		);
 	}
 
-	baseUnit = parsedUnit || fallbackUnit;
+	const [ parsedValue, parsedUnit ] = parseUnit( next, units, fallbackUnit );
 
-	/**
-	 * If no unit is found, attempt to use the first value from the collection
-	 * of units as a default fallback.
-	 */
-	if ( hasUnits( units ) && ! baseUnit ) {
-		baseUnit = units[ 0 ]?.value;
+	return ! parsedUnit
+		? [ parsedValue, fallbackUnit ]
+		: [ parsedValue, parsedUnit ];
+}
+
+function getCSSValues( value, styleKey ) {
+	const element = document.createElement( 'div' ).style;
+
+	element[ styleKey ] = value;
+
+	if ( value && isExpression( value ) && isUsingTheSameUnits( value ) ) {
+		const units = getUnits( value )[ 0 ];
+		const expression = getArithmeticExpression( value );
+
+		// eslint-disable-next-line no-eval
+		const result = `${ eval( expression ) }${ units }`;
+
+		element[ styleKey ] = result;
+
+		return (
+			element[ styleKey ].includes( result ) && [
+				// eslint-disable-next-line no-eval
+				eval( expression ),
+				units,
+			]
+		);
 	}
 
-	return [ baseValue, baseUnit ];
+	if ( parseUnit( value )[ 1 ] ) {
+		return parseUnit( value );
+	}
+
+	return element[ styleKey ].includes( value ) && [ value ];
+}
+
+function isExpression( value ) {
+	return value.match( /^calc\(/g )?.length;
+}
+
+function isUsingTheSameUnits( value ) {
+	return Array.from( new Set( getUnits( value ) ) ).length === 1;
+}
+
+function getUnits( value ) {
+	return value.match( /[px|r?em]{2,3}/g );
+}
+
+/**
+ * Leaves only arithmetic symbols from a string.
+ *
+ * @param {string} value
+ * @return {string} expression
+ */
+function getArithmeticExpression( value ) {
+	return value.replace( /[^-()\d/*+.]/g, '' );
 }

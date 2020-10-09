@@ -45,7 +45,12 @@ function UnitControl(
 	},
 	ref
 ) {
-	const [ value, initialUnit ] = getParsedValue( valueProp, unitProp, units );
+	const [ value, initialUnit ] = getParsedValue(
+		valueProp,
+		unitProp,
+		units,
+		props.type
+	);
 	const [ unit, setUnit ] = useControlledState( unitProp, {
 		initial: initialUnit,
 	} );
@@ -65,7 +70,8 @@ function UnitControl(
 		 * Customizing the onChange callback.
 		 * This allows as to broadcast a combined value+unit to onChange.
 		 */
-		next = getValidParsedUnit( next, units, value, unit ).join( '' );
+		const { type } = props;
+		next = getValidParsedUnit( next, units, value, unit, type ).join( '' );
 
 		onChange( next, changeProps );
 	};
@@ -90,11 +96,13 @@ function UnitControl(
 			refParsedValue.current = null;
 			return;
 		}
+
 		const [ parsedValue, parsedUnit ] = getValidParsedUnit(
 			event.target.value,
 			units,
 			value,
-			unit
+			unit,
+			props.type
 		);
 
 		refParsedValue.current = parsedValue;
@@ -105,7 +113,7 @@ function UnitControl(
 			);
 			const changeProps = { event, data };
 
-			onChange( `${ parsedValue }${ parsedUnit }`, changeProps );
+			onChange( `${ parsedValue }`, changeProps );
 			onUnitChange( parsedUnit, changeProps );
 
 			setUnit( parsedUnit );
@@ -163,7 +171,7 @@ function UnitControl(
 			<ValueInput
 				aria-label={ label }
 				type={ isPressEnterToChange ? 'text' : 'number' }
-				{ ...omit( props, [ 'children' ] ) }
+				{ ...omit( props, [ 'children', 'type' ] ) }
 				autoComplete={ autoComplete }
 				className={ classes }
 				disabled={ disabled }

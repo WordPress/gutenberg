@@ -22,6 +22,10 @@ export const LABELS = {
 	mixed: __( 'Mixed' ),
 };
 
+export const CUSTOM_VALUES = {
+	AUTO: 'auto',
+};
+
 export const DEFAULT_VALUES = {
 	top: null,
 	right: null,
@@ -34,6 +38,11 @@ export const DEFAULT_VISUALIZER_VALUES = {
 	right: false,
 	bottom: false,
 	left: false,
+};
+
+export const DEFAULT_VISUALIZER_SPACING_VALUES = {
+	padding: DEFAULT_VISUALIZER_VALUES,
+	margin: DEFAULT_VISUALIZER_VALUES,
 };
 
 /**
@@ -82,7 +91,6 @@ export function getAllValue( values = {} ) {
 	 * simple truthy check.
 	 */
 	const allValue = isNumber( value ) ? `${ value }${ unit }` : null;
-
 	return allValue;
 }
 
@@ -93,10 +101,8 @@ export function getAllValue( values = {} ) {
  * @return {boolean} Whether values are mixed.
  */
 export function isValuesMixed( values = {} ) {
-	const allValue = getAllValue( values );
-	const isMixed = isNaN( parseFloat( allValue ) );
-
-	return isMixed;
+	const vals = Object.values( values );
+	return vals.some( ( val ) => val !== vals[ 0 ] );
 }
 
 /**
@@ -111,4 +117,41 @@ export function isValuesDefined( values ) {
 		values !== undefined &&
 		! isEmpty( Object.values( values ).filter( Boolean ) )
 	);
+}
+
+const sideStyles = {
+	margin: {
+		top: { transform: 'translateY(-100%)' },
+		right: { transform: 'translateX(100%)' },
+		bottom: { transform: 'translateY(100%)' },
+		left: { transform: 'translateX(-100%)' },
+	},
+	padding: {
+		top: null,
+		right: null,
+		bottom: null,
+		left: null,
+	},
+};
+
+/**
+ * Modifies the style properties of each side.
+ *
+ * @param {string} type of field
+ * @return {function(*, [*, *]): *} reducer function adding additional styles
+ */
+
+export function extendStyles( type ) {
+	return ( acc, [ side, value ] ) => {
+		const styles = sideStyles[ type ][ side ];
+		return {
+			...acc,
+			[ side ]: {
+				style: {
+					...styles,
+					[ side ]: value,
+				},
+			},
+		};
+	};
 }

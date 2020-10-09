@@ -564,8 +564,8 @@ function CoverEdit( {
 				data-url={ url }
 			>
 				<BoxControlVisualizer
-					values={ styleAttribute?.spacing?.padding }
-					showValues={ styleAttribute?.visualizers?.padding }
+					values={ styleAttribute?.spacing }
+					showValues={ styleAttribute?.visualizers }
 				/>
 				<ResizableCover
 					className="block-library-cover__resize-container"

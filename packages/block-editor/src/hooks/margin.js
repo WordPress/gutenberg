@@ -10,13 +10,12 @@ import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
  * Internal dependencies
  */
 import { cleanEmptyObject } from './utils';
+import { SPACING_SUPPORT_KEY } from './padding';
 import useEditorFeature from '../components/use-editor-feature';
 
-export const SPACING_SUPPORT_KEY = 'spacing';
-
-const hasPaddingSupport = ( blockName ) => {
+const hasMarginSupport = ( blockName ) => {
 	const spacingSupport = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
-	return spacingSupport && spacingSupport.padding;
+	return spacingSupport && spacingSupport.margin;
 };
 
 /**
@@ -26,19 +25,20 @@ const hasPaddingSupport = ( blockName ) => {
  *
  * @return {WPElement} Line height edit element.
  */
-export function PaddingEdit( props ) {
+export function MarginEdit( props ) {
 	const {
 		name: blockName,
 		attributes: { style },
 		setAttributes,
 	} = props;
+
 	const customUnits = useEditorFeature( 'spacing.units' );
 	const units = customUnits?.map( ( unit ) => ( {
 		value: unit,
 		label: unit,
 	} ) );
 
-	if ( ! hasPaddingSupport( blockName ) ) {
+	if ( ! hasMarginSupport( blockName ) ) {
 		return null;
 	}
 
@@ -48,7 +48,7 @@ export function PaddingEdit( props ) {
 			...style,
 			spacing: {
 				...spacing,
-				padding: next,
+				margin: next,
 			},
 		};
 
@@ -63,7 +63,7 @@ export function PaddingEdit( props ) {
 			...style,
 			visualizers: {
 				...spacing,
-				padding: next,
+				margin: next,
 			},
 		};
 
@@ -76,11 +76,11 @@ export function PaddingEdit( props ) {
 		web: (
 			<>
 				<BoxControl
-					values={ style?.spacing?.padding }
+					values={ style?.spacing?.margin }
 					onChange={ onChange }
 					onChangeShowVisualizer={ onChangeShowVisualizer }
-					label={ __( 'Padding' ) }
-					type="padding"
+					label={ __( 'Margin' ) }
+					type="margin"
 					units={ units }
 				/>
 			</>
