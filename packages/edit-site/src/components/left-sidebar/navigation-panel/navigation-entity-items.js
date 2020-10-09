@@ -17,10 +17,7 @@ export default function NavigationEntityItems( {
 	renderItem,
 } ) {
 	const entities = useSelect(
-		( select ) => {
-			const { getEntityRecords } = select( 'core' );
-			return getEntityRecords( kind, name, query );
-		},
+		( select ) => select( 'core' ).getEntityRecords( kind, name, query ),
 		[ kind, name, query ]
 	);
 
