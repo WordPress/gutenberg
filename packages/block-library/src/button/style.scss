@@ -35,7 +35,7 @@ $blocks-button__height: 3.1em;
 
 .wp-block-button {
 	&.wp-block-button__width-25 {
-		width: 25%;
+		flex: 0 0 25%;
 
 		.wp-block-button__link {
 			width: 100%;
@@ -43,7 +43,7 @@ $blocks-button__height: 3.1em;
 	}
 
 	&.wp-block-button__width-50 {
-		width: 50%;
+		flex: 0 0 50%;
 
 		.wp-block-button__link {
 			width: 100%;
@@ -51,7 +51,7 @@ $blocks-button__height: 3.1em;
 	}
 
 	&.wp-block-button__width-75 {
-		width: 75%;
+		flex: 0 0 75%;
 
 		.wp-block-button__link {
 			width: 100%;
@@ -59,7 +59,7 @@ $blocks-button__height: 3.1em;
 	}
 
 	&.wp-block-button__width-100 {
-		width: 100%;
+		flex: 0 0 100%;
 
 		.wp-block-button__link {
 			width: 100%;
@@ -75,7 +75,6 @@ $blocks-button__height: 3.1em;
 
 
 // the first selector is required for old buttons markup
-
 .wp-block-button.no-border-radius,
 .wp-block-button__link.no-border-radius {
 	border-radius: 0 !important;

@@ -3,6 +3,11 @@
 	margin-left: 0;
 }
 
+.wp-block > .wp-block-buttons {
+	display: flex;
+	flex-wrap: wrap;
+}
+
 .wp-block[data-align="center"] > .wp-block-buttons {
 	display: flex;
 	align-items: center;
