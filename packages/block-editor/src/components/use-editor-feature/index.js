@@ -81,7 +81,18 @@ export default function useEditorFeature( featurePath ) {
 			// such as core/heading or core/post-title.
 			const globalPath = `__experimentalFeatures.global.${ featurePath }`;
 			const blockPath = `__experimentalFeatures.${ blockName }.${ featurePath }`;
-			return get( settings, blockPath ) ?? get( settings, globalPath );
+			const experimentalFeature =
+				get( settings, blockPath ) ?? get( settings, globalPath );
+			if ( experimentalFeature !== undefined ) {
+				return experimentalFeature;
+			}
+
+			// 3 - Fall back to block support.
+			// This is only necessary to support typography.dropCap.
+			// when __experimentalFeatures are not present (core without plugin).
+			// To remove when __experimentalFeatures are ported to core.
+			const { getBlockSupport } = select( 'core/blocks' );
+			return getBlockSupport( blockName, featurePath );
 		},
 		[ blockName, featurePath ]
 	);

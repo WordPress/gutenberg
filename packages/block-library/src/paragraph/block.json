@@ -36,6 +36,9 @@
 		"fontSize": true,
 		"lineHeight": true,
 		"__experimentalSelector": "p",
-		"__unstablePasteTextInline": true
+		"__unstablePasteTextInline": true,
+		"typography": {
+			"dropCap": true
+		}
 	}
 }
