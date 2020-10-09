@@ -43,6 +43,8 @@ describe( 'Gutenberg Editor Image Block tests @canary', () => {
 
 	it( 'should be able to add an image block', async () => {
 		await editorPage.addNewBlock( imageBlockName );
+		await driver.sleep( 1000 );
+		await editorPage.closePicker();
 		let imageBlock = await editorPage.getBlockAtPosition( imageBlockName );
 
 		// Can only add image from media library on iOS
