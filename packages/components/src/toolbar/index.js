@@ -23,14 +23,9 @@ import ToolbarContainer from './toolbar-container';
  * @param {Object} props Component props.
  * @param {string} [props.className] Class to set on the container div.
  * @param {string} [props.label] ARIA label for toolbar container.
- * @param {string} [props.initialIndex] TODO
- * @param {string} [props.onIndexChange] TODO
  * @param {Object} ref React Element ref.
  */
-function Toolbar(
-	{ className, label, initialIndex, onIndexChange, ...props },
-	ref
-) {
+function Toolbar( { className, label, ...props }, ref ) {
 	if ( ! label ) {
 		deprecated( 'Using Toolbar without label prop', {
 			alternative: 'ToolbarGroup component',
@@ -49,8 +44,6 @@ function Toolbar(
 			ref={ ref }
 			className={ finalClassName }
 			label={ label }
-			initialIndex={ initialIndex }
-			onIndexChange={ onIndexChange }
 			{ ...props }
 		/>
 	);

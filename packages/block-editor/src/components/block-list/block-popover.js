@@ -59,7 +59,7 @@ function BlockPopover( {
 		hasFixedToolbar,
 		lastClientId,
 	} = useSelect( selector, [] );
-	const initialIndexRef = useRef();
+	const initialToolbarItemIndexRef = useRef();
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
@@ -189,9 +189,11 @@ function BlockPopover( {
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
 					focusOnMount={ isToolbarForced }
-					initialIndex={ initialIndexRef.current }
-					onIndexChange={ ( index ) => {
-						initialIndexRef.current = index;
+					__experimentalInitialIndex={
+						initialToolbarItemIndexRef.current
+					}
+					__experimentalOnIndexChange={ ( index ) => {
+						initialToolbarItemIndexRef.current = index;
 					} }
 				/>
 			) }
