@@ -14,9 +14,6 @@ import {
 import { useSelect } from '@wordpress/data';
 import { VisuallyHidden } from '@wordpress/components';
 
-import { last } from 'lodash';
-
-
 function getBlockDisplayText( block ) {
 	return block
 		? getBlockLabel( getBlockType( block.name ), block.attributes )
