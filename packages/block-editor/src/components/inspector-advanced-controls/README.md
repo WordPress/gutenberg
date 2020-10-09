@@ -7,30 +7,6 @@ Inspector Advanced Controls appear under the _Advanced_ panel of a block's [Insp
 ## Usage
 
 {% codetabs %}
-{% ES5 %}
-```js
-var el = wp.element.createElement,
-	Fragment = wp.element.Fragment,
-	InspectorControls = wp.editor.InspectorControls,
-	InspectorAdvancedControlsControls = wp.editor.InspectorAdvancedControls,
-	TextControl = wp.components.TextControl,
-
-function MyBlockEdit( props ) {
-	return el( Fragment, null, 
-		el( 'div', null, /* Block markup goes here */ null ),
-		el( InspectorControls, null, /* Regular control goes here */ null ),
-		el( InspectorAdvancedControls, null,
-			el( TextControl, {
-				label: 'HTML anchor',
-				value: props.attributes.anchor,
-				onChange: function( nextValue ) {
-					props.setAttributes( { anchor: nextValue } );
-				}
-			} )
-		)
-	);
-}
-```
 {% ESNext %}
 ```js
 const {
@@ -62,6 +38,30 @@ function MyBlockEdit( { attributes, setAttributes } ) {
 				/>
 			</InspectorAdvancedControls>
 		</>
+	);
+}
+```
+{% ES5 %}
+```js
+var el = wp.element.createElement,
+	Fragment = wp.element.Fragment,
+	InspectorControls = wp.editor.InspectorControls,
+	InspectorAdvancedControlsControls = wp.editor.InspectorAdvancedControls,
+	TextControl = wp.components.TextControl,
+
+function MyBlockEdit( props ) {
+	return el( Fragment, null, 
+		el( 'div', null, /* Block markup goes here */ null ),
+		el( InspectorControls, null, /* Regular control goes here */ null ),
+		el( InspectorAdvancedControls, null,
+			el( TextControl, {
+				label: 'HTML anchor',
+				value: props.attributes.anchor,
+				onChange: function( nextValue ) {
+					props.setAttributes( { anchor: nextValue } );
+				}
+			} )
+		)
 	);
 }
 ```
