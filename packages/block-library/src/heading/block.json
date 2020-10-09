@@ -21,6 +21,7 @@
 		}
 	},
 	"supports": {
+		"align": [ "full", "wide" ],
 		"anchor": true,
 		"className": false,
 		"color": {

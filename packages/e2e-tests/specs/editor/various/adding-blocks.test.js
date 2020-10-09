@@ -8,6 +8,7 @@ import {
 	pressKeyTimes,
 	setBrowserViewport,
 	closeGlobalBlockInserter,
+	searchForBlock,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
@@ -261,5 +262,37 @@ describe( 'adding blocks', () => {
 		);
 		await coverBlock.click();
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/25785
+	it( 'inserts a block should show a blue line indicator', async () => {
+		// First insert a random Paragraph.
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'First paragraph' );
+
+		// Open the global inserter and search for the Heading block.
+		await searchForBlock( 'Heading' );
+
+		const headingButton = (
+			await page.$x( `//button//span[contains(text(), 'Heading')]` )
+		 )[ 0 ];
+
+		// Hover over the block should show the blue line indicator.
+		await headingButton.hover();
+
+		// Should show the blue line indicator somewhere.
+		const indicator = await page.$(
+			'.block-editor-block-list__insertion-point-indicator'
+		);
+		const indicatorRect = await indicator.boundingBox();
+
+		const paragraphBlock = await page.$(
+			'p[aria-label="Paragraph block"]'
+		);
+		const paragraphRect = await paragraphBlock.boundingBox();
+
+		// The blue line indicator should be below the last block.
+		expect( indicatorRect.x ).toBe( paragraphRect.x );
+		expect( indicatorRect.y > paragraphRect.y ).toBe( true );
 	} );
 } );
