@@ -1,27 +1,12 @@
 /**
- * External dependencies
- */
-import { map } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useEffect } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
+} from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-
-// Copied over from the Columns block. It seems like it should become part of public API.
-const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock(
-				name,
-				attributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
-			)
-	);
-};
 
 /**
  * Retrieves the block types inserter state.

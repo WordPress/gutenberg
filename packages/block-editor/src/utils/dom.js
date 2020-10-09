@@ -95,7 +95,7 @@ export function hasInnerBlocksContext( element ) {
  *                            a block.
  */
 export function getBlockClientId( node ) {
-	while ( node && node.nodeType !== window.Node.ELEMENT_NODE ) {
+	while ( node && node.nodeType !== node.ELEMENT_NODE ) {
 		node = node.parentNode;
 	}
 
