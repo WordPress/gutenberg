@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createBlock, parse, serialize } from '@wordpress/blocks';
+import {
+	isReusableBlock,
+	createBlock,
+	parse,
+	serialize,
+} from '@wordpress/blocks';
 import { createRegistryControl } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -28,6 +33,19 @@ export function convertBlocksToReusable( clientIds ) {
 	return {
 		type: 'CONVERT_BLOCKS_TO_REUSABLE',
 		clientIds,
+	};
+}
+
+/**
+ * Deletes a reusable block.
+ *
+ * @param {string} id Reusable block ID.
+ * @return {Object} control descriptor.
+ */
+export function deleteReusableBlock( id ) {
+	return {
+		type: 'DELETE_REUSABLE_BLOCK',
+		id,
 	};
 }
 
@@ -75,6 +93,43 @@ const controls = {
 						ref: updatedRecord.id,
 					} )
 				);
+			}
+	),
+
+	DELETE_REUSABLE_BLOCK: createRegistryControl(
+		( registry ) =>
+			async function ( { id } ) {
+				const reusableBlock = registry
+					.select( 'core' )
+					.getEditedEntityRecord( 'postType', 'wp_block', id );
+
+				// Don't allow a reusable block with a temporary ID to be deleted
+				if ( ! reusableBlock || reusableBlock.isTemporary ) {
+					return;
+				}
+
+				// Remove any other blocks that reference this reusable block
+				const allBlocks = registry
+					.select( 'core/block-editor' )
+					.getBlocks();
+				const associatedBlocks = allBlocks.filter(
+					( block ) =>
+						isReusableBlock( block ) && block.attributes.ref === id
+				);
+				const associatedBlockClientIds = associatedBlocks.map(
+					( block ) => block.clientId
+				);
+
+				// Remove the parsed block.
+				if ( associatedBlockClientIds.length ) {
+					registry
+						.dispatch( 'core/block-editor' )
+						.removeBlocks( associatedBlockClientIds );
+				}
+
+				await registry
+					.dispatch( 'core' )
+					.deleteEntityRecord( 'postType', 'wp_block', id );
 			}
 	),
 };

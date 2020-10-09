@@ -12,7 +12,11 @@ import {
  */
 import controls from '../controls';
 
-const { CONVERT_BLOCK_TO_STATIC, CONVERT_BLOCKS_TO_REUSABLE } = controls;
+const {
+	CONVERT_BLOCK_TO_STATIC,
+	CONVERT_BLOCKS_TO_REUSABLE,
+	DELETE_REUSABLE_BLOCK,
+} = controls;
 
 describe( 'reusable blocks effects', () => {
 	beforeAll( () => {
@@ -126,6 +130,62 @@ describe( 'reusable blocks effects', () => {
 						} ),
 					]
 				);
+			} );
+		} );
+
+		describe( 'DELETE_REUSABLE_BLOCK', () => {
+			it( 'should delete a reusable block and remove all its instances from the store', async () => {
+				const associatedBlock = createBlock( 'core/block', {
+					ref: 123,
+				} );
+				const reusableBlock = {
+					id: 123,
+				};
+				const availableBlocks = [
+					createBlock( 'core/block' ),
+					createBlock( 'core/block', {
+						ref: 123,
+					} ),
+					createBlock( 'core/block', {
+						ref: 456,
+					} ),
+					createBlock( 'core/block', {
+						ref: 123,
+					} ),
+					createBlock( 'core/test-block', {
+						ref: 123,
+					} ),
+				];
+				const removeBlocks = jest.fn();
+				const deleteEntityRecord = jest.fn();
+				const getBlock = jest.fn( () => associatedBlock );
+				const getBlocks = jest.fn( () => availableBlocks );
+				const getEditedEntityRecord = jest.fn( () => reusableBlock );
+				const registry = {
+					select: jest.fn( () => ( {
+						getBlock,
+						getBlocks,
+						getEditedEntityRecord,
+					} ) ),
+					dispatch: jest.fn( () => ( {
+						removeBlocks,
+						deleteEntityRecord,
+					} ) ),
+				};
+
+				DELETE_REUSABLE_BLOCK( registry )( {
+					id: reusableBlock.id,
+				} );
+
+				expect( deleteEntityRecord ).toHaveBeenCalledWith(
+					'postType',
+					'wp_block',
+					123
+				);
+				expect( removeBlocks ).toHaveBeenCalledWith( [
+					availableBlocks[ 1 ].clientId,
+					availableBlocks[ 3 ].clientId,
+				] );
 			} );
 		} );
 	} );
