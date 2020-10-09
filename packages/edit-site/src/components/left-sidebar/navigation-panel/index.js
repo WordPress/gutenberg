@@ -1,53 +1,100 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	__experimentalNavigation as Navigation,
-	__experimentalNavigationGroup as NavigationGroup,
-	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationMenu as NavigationMenu,
+	__experimentalNavigationItem as NavigationItem,
+	__experimentalNavigationBackButton as NavigationBackButton,
+	createSlotFill,
 } from '@wordpress/components';
-import { getBlockType, getBlockFromExample } from '@wordpress/blocks';
-import { BlockPreview } from '@wordpress/block-editor';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import TemplatesMenu from './menus/templates';
+import TemplatePartsMenu from './menus/template-parts';
+
+export const {
+	Fill: NavigationPanelPreviewFill,
+	Slot: NavigationPanelPreviewSlot,
+} = createSlotFill( 'EditSiteNavigationPanelPreview' );
 
 const NavigationPanel = () => {
-	const [ showPreview, setShowPreview ] = useState( false );
+	const ref = useRef();
+
+	useEffect( () => {
+		if ( ref.current ) {
+			ref.current.focus();
+		}
+	}, [ ref ] );
+
+	const { templateId, templatePartId, templateType, activeMenu } = useSelect(
+		( select ) => {
+			const {
+				getTemplateId,
+				getTemplatePartId,
+				getTemplateType,
+				getNavigationPanelActiveMenu,
+			} = select( 'core/edit-site' );
+
+			return {
+				templateId: getTemplateId(),
+				templatePartId: getTemplatePartId(),
+				templateType: getTemplateType(),
+				activeMenu: getNavigationPanelActiveMenu(),
+			};
+		},
+		[]
+	);
+
+	const {
+		setTemplate,
+		setTemplatePart,
+		setNavigationPanelActiveMenu,
+	} = useDispatch( 'core/edit-site' );
 
 	return (
 		<div className="edit-site-navigation-panel">
-			<Navigation>
-				<NavigationMenu title="Home">
-					<NavigationItem
-						item="item-back"
-						title="Back to dashboard"
+			<Navigation
+				activeItem={
+					'wp_template' === templateType
+						? `${ templateType }-${ templateId }`
+						: `${ templateType }-${ templatePartId }`
+				}
+				activeMenu={ activeMenu }
+				onActivateMenu={ setNavigationPanelActiveMenu }
+			>
+				{ activeMenu === 'root' && (
+					<NavigationBackButton
+						backButtonLabel={ __( 'Dashboard' ) }
+						className="edit-site-navigation-panel__back-to-dashboard"
 						href="index.php"
+						ref={ ref }
+					/>
+				) }
+
+				<NavigationMenu title={ __( 'Theme' ) }>
+					<NavigationItem
+						title={ __( 'Templates' ) }
+						navigateToMenu="templates"
 					/>
 
-					<NavigationGroup title="Example group">
-						<NavigationItem
-							item="item-preview"
-							title="Hover to show preview"
-							onMouseEnter={ () => setShowPreview( true ) }
-							onMouseLeave={ () => setShowPreview( false ) }
-						/>
-					</NavigationGroup>
+					<NavigationItem
+						title={ __( 'Template Parts' ) }
+						navigateToMenu="template-parts"
+					/>
+
+					<TemplatesMenu onActivateItem={ setTemplate } />
+
+					<TemplatePartsMenu onActivateItem={ setTemplatePart } />
 				</NavigationMenu>
 			</Navigation>
 
-			{ showPreview && (
-				<div className="edit-site-navigation-panel__preview">
-					<BlockPreview
-						blocks={ [
-							getBlockFromExample(
-								'core/paragraph',
-								getBlockType( 'core/paragraph' ).example
-							),
-						] }
-						viewportWidth={ 1200 }
-					/>
-				</div>
-			) }
+			<NavigationPanelPreviewSlot />
 		</div>
 	);
 };

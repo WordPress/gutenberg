@@ -1,8 +1,15 @@
 {
 	"name": "core/post-featured-image",
 	"category": "design",
+	"attributes": {
+		"isLink": {
+			"type": "boolean",
+			"default": false
+		}
+	},
 	"usesContext": [
-		"postId"
+		"postId",
+		"postType"
 	],
 	"supports": {
 		"html": false

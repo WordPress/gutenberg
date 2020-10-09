@@ -15,7 +15,7 @@ import {
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -303,7 +303,7 @@ export function ImageEdit( {
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 	} );
 
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		ref,
 		className: classes,
 	} );
@@ -311,7 +311,7 @@ export function ImageEdit( {
 	return (
 		<>
 			{ controls }
-			<figure { ...blockWrapperProps }>
+			<figure { ...blockProps }>
 				{ url && (
 					<Image
 						attributes={ attributes }

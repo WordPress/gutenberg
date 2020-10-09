@@ -13,7 +13,10 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { useExperimentalFeatures } from '../../experimental-features';
+import {
+	useExperimentalFeatures,
+	navigationPanel,
+} from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -218,12 +221,9 @@ describe( 'Multi-entity save flow', () => {
 
 	describe( 'Site Editor', () => {
 		// Selectors - Site editor specific.
-		const demoTemplateSelector = '//button[contains(., "front-page")]';
 		const saveSiteSelector = '.edit-site-save-button__button';
 		const activeSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=false]`;
 		const disabledSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=true]`;
-		const templateDropdownSelector =
-			'.components-dropdown-menu__toggle[aria-label="Switch Template"]';
 		const saveA11ySelector = '.edit-site-editor__toggle-save-panel-button';
 
 		it( 'Should be enabled after edits', async () => {
@@ -234,11 +234,10 @@ describe( 'Multi-entity save flow', () => {
 			await visitAdminPage( 'admin.php', query );
 
 			// Ensure we are on 'front-page' demo template.
-			await page.click( templateDropdownSelector );
-			const demoTemplateButton = await page.waitForXPath(
-				demoTemplateSelector
-			);
-			await demoTemplateButton.click();
+			await navigationPanel.open();
+			await navigationPanel.backToRoot();
+			await navigationPanel.navigate( 'Templates' );
+			await navigationPanel.clickItemByText( 'Front page' );
 
 			// Insert a new template part placeholder.
 			await insertBlock( 'Template Part' );

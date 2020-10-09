@@ -6,11 +6,10 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { resolveWidgetAreas, select, dispatch } from './controls';
-import { setWidgetAreasOpenState } from './actions';
+import { resolveWidgetAreas, select } from './controls';
+import { persistStubPost, setWidgetAreasOpenState } from './actions';
 import {
 	KIND,
-	POST_TYPE,
 	WIDGET_AREA_ENTITY_TYPE,
 	buildWidgetAreasQuery,
 	buildWidgetAreaPostId,
@@ -69,38 +68,10 @@ export function* getWidgetAreas() {
 	} );
 	yield setWidgetAreasOpenState( widgetAreasOpenState );
 
-	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
-
 	yield {
 		type: 'SET_WIDGET_TO_CLIENT_ID_MAPPING',
 		mapping: widgetIdToClientId,
 	};
+
+	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
 }
-
-const persistStubPost = function* ( id, blocks ) {
-	const stubPost = createStubPost( id, blocks );
-	const args = [ KIND, POST_TYPE, id ];
-	yield dispatch( 'core', 'startResolution', 'getEntityRecord', args );
-	yield dispatch(
-		'core',
-		'receiveEntityRecords',
-		KIND,
-		POST_TYPE,
-		stubPost,
-		{ id: stubPost.id },
-		false
-	);
-	yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
-	return stubPost;
-};
-
-const createStubPost = ( id, blocks ) => ( {
-	id,
-	slug: id,
-	status: 'draft',
-	type: 'page',
-	blocks,
-	meta: {
-		widgetAreaId: id,
-	},
-} );

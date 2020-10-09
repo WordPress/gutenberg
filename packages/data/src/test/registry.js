@@ -575,17 +575,6 @@ describe( 'createRegistry', () => {
 				'result1'
 			);
 		} );
-
-		it( 'gracefully stubs select on selector calls', () => {
-			const selector = createRegistrySelector( ( select ) => () =>
-				select
-			);
-
-			const maybeSelect = selector();
-
-			expect( maybeSelect ).toEqual( expect.any( Function ) );
-			expect( maybeSelect() ).toEqual( expect.any( Object ) );
-		} );
 	} );
 
 	describe( 'subscribe', () => {

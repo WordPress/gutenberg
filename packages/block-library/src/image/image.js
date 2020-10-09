@@ -254,7 +254,7 @@ export default function Image( {
 							url={ href || '' }
 							onChangeUrl={ onSetHref }
 							linkDestination={ linkDestination }
-							mediaUrl={ image && image.source_url }
+							mediaUrl={ ( image && image.source_url ) || url }
 							mediaLink={ image && image.link }
 							linkTarget={ linkTarget }
 							linkClass={ linkClass }

@@ -6,6 +6,7 @@ import { useState, useMemo, useRef, useEffect } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { ENTER, UP, DOWN, ESCAPE } from '@wordpress/keycodes';
 import { speak } from '@wordpress/a11y';
+import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -13,15 +14,18 @@ import { speak } from '@wordpress/a11y';
 import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
 import BaseControl from '../base-control';
+import Button from '../button';
+import { Flex, FlexBlock, FlexItem } from '../flex';
 
 function ComboboxControl( {
 	value,
 	label,
 	options,
 	onChange,
-	onInputChange: onInputChangeProp = () => {},
+	onFilterValueChange,
 	hideLabelFromVision,
 	help,
+	allowReset = true,
 	messages = {
 		selected: __( 'Item selected.' ),
 	},
@@ -31,11 +35,10 @@ function ComboboxControl( {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 	const [ inputValue, setInputValue ] = useState( '' );
 	const inputContainer = useRef();
+	const currentOption = options.find( ( option ) => option.value === value );
+	const currentLabel = currentOption?.label ?? '';
 
 	const matchingSuggestions = useMemo( () => {
-		if ( ! inputValue || inputValue.length === 0 ) {
-			return options.filter( ( option ) => option.value !== value );
-		}
 		const startsWithMatch = [];
 		const containsMatch = [];
 		const match = inputValue.toLocaleLowerCase();
@@ -55,7 +58,7 @@ function ComboboxControl( {
 		onChange( newSelectedSuggestion.value );
 		speak( messages.selected, 'assertive' );
 		setSelectedSuggestion( newSelectedSuggestion );
-		setInputValue( selectedSuggestion.label );
+		setInputValue( '' );
 		setIsExpanded( false );
 	};
 
@@ -105,36 +108,26 @@ function ComboboxControl( {
 	};
 
 	const onFocus = () => {
-		// Avoid focus loss when touching the container.
-		// TODO: TokenInput should preferably forward ref
-		inputContainer.current.input.focus();
 		setIsExpanded( true );
+		onFilterValueChange( '' );
+		setInputValue( '' );
 	};
 
 	const onBlur = () => {
-		const currentOption = options.find(
-			( option ) => option.value === value
-		);
-		setInputValue( currentOption?.label ?? '' );
 		setIsExpanded( false );
 	};
 
 	const onInputChange = ( event ) => {
 		const text = event.value;
 		setInputValue( text );
-		onInputChangeProp( text );
+		onFilterValueChange( text );
 		setIsExpanded( true );
 	};
 
-	// Reset the value on change
-	useEffect( () => {
-		if ( matchingSuggestions.indexOf( selectedSuggestion ) === -1 ) {
-			setSelectedSuggestion( null );
-		}
-		if ( ! inputValue || matchingSuggestions.length === 0 ) {
-			onChange( null );
-		}
-	}, [ matchingSuggestions, inputValue, value ] );
+	const handleOnReset = () => {
+		onChange( null );
+		inputContainer.current.input.focus();
+	};
 
 	// Announcements
 	useEffect( () => {
@@ -172,21 +165,36 @@ function ComboboxControl( {
 			<div
 				className="components-combobox-control__suggestions-container"
 				tabIndex="-1"
-				onFocus={ onFocus }
 				onKeyDown={ onKeyDown }
 			>
-				<TokenInput
-					className="components-combobox-control__input"
-					instanceId={ instanceId }
-					ref={ inputContainer }
-					value={ inputValue }
-					onBlur={ onBlur }
-					isExpanded={ isExpanded }
-					selectedSuggestionIndex={ matchingSuggestions.indexOf(
-						selectedSuggestion
+				<Flex>
+					<FlexBlock>
+						<TokenInput
+							className="components-combobox-control__input"
+							instanceId={ instanceId }
+							ref={ inputContainer }
+							value={ isExpanded ? inputValue : currentLabel }
+							onBlur={ onBlur }
+							onFocus={ onFocus }
+							isExpanded={ isExpanded }
+							selectedSuggestionIndex={ matchingSuggestions.indexOf(
+								selectedSuggestion
+							) }
+							onChange={ onInputChange }
+						/>
+					</FlexBlock>
+					{ allowReset && (
+						<FlexItem>
+							<Button
+								className="components-combobox-control__reset"
+								icon={ closeSmall }
+								disabled={ ! value }
+								onClick={ handleOnReset }
+								label={ __( 'Reset' ) }
+							/>
+						</FlexItem>
 					) }
-					onChange={ onInputChange }
-				/>
+				</Flex>
 				{ isExpanded && (
 					<SuggestionsList
 						instanceId={ instanceId }

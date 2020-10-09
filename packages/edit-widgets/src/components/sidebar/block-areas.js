@@ -7,34 +7,25 @@ import { BlockIcon } from '@wordpress/block-editor';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-function BlockArea( { clientId } ) {
-	const { name, selectedBlock } = useSelect(
-		( select ) => {
-			const { getBlockAttributes, getBlockSelectionStart } = select(
-				'core/block-editor'
-			);
-			return {
-				name: getBlockAttributes( clientId ).name,
-				selectedBlock: getBlockSelectionStart(),
-			};
-		},
-		[ clientId ]
+function BlockArea( { block } ) {
+	const selectedBlock = useSelect(
+		( select ) => select( 'core/block-editor' ).getBlockSelectionStart(),
+		[]
 	);
+
 	const { selectBlock } = useDispatch( 'core/block-editor' );
-	const isSelected = selectedBlock === clientId;
+
+	if ( block.name !== 'core/widget-area' ) {
+		return null;
+	}
+
 	return (
 		<li>
 			<Button
-				aria-expanded={ isSelected }
-				onClick={
-					isSelected
-						? undefined
-						: () => {
-								selectBlock( clientId );
-						  }
-				}
+				aria-expanded={ selectedBlock === block.clientId }
+				onClick={ () => selectBlock( block.clientId ) }
 			>
-				{ name }
+				{ block.attributes.name }
 				<span className="edit-widgets-block-areas__edit">
 					{ __( 'Edit' ) }
 				</span>
@@ -44,10 +35,13 @@ function BlockArea( { clientId } ) {
 }
 
 export default function BlockAreas() {
-	const blockOrder = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getBlockOrder();
-	} );
-	const hasBlockAreas = blockOrder.length > 0;
+	const blocks = useSelect(
+		( select ) => select( 'core/block-editor' ).getBlocks(),
+		[]
+	);
+
+	const hasBlockAreas = blocks.length > 0;
+
 	return (
 		<>
 			<div className="edit-widgets-block-areas">
@@ -68,10 +62,11 @@ export default function BlockAreas() {
 						) }
 					</div>
 				</div>
+
 				{ hasBlockAreas && (
 					<ul>
-						{ blockOrder.map( ( clientId ) => (
-							<BlockArea key={ clientId } clientId={ clientId } />
+						{ blocks.map( ( block ) => (
+							<BlockArea key={ block.clientId } block={ block } />
 						) ) }
 					</ul>
 				) }

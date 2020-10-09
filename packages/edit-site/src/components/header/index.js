@@ -22,7 +22,6 @@ import { Button } from '@wordpress/components';
  */
 import MoreMenu from './more-menu';
 import PageSwitcher from '../page-switcher';
-import TemplateSwitcher from '../template-switcher';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
@@ -40,9 +39,6 @@ export default function Header( {
 		deviceType,
 		hasFixedToolbar,
 		template,
-		templateId,
-		templatePartId,
-		templateType,
 		page,
 		showOnFront,
 	} = useSelect( ( select ) => {
@@ -76,10 +72,6 @@ export default function Header( {
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-		setTemplate,
-		addTemplate,
-		removeTemplate,
-		setTemplatePart,
 		setPage,
 	} = useDispatch( 'core/edit-site' );
 
@@ -122,21 +114,6 @@ export default function Header( {
 							showOnFront={ showOnFront }
 							activePage={ page }
 							onActivePageChange={ setPage }
-						/>
-						<div className="edit-site-header__toolbar-switchers-separator">
-							/
-						</div>
-						<TemplateSwitcher
-							page={ page }
-							activeId={ templateId }
-							activeTemplatePartId={ templatePartId }
-							isTemplatePart={
-								templateType === 'wp_template_part'
-							}
-							onActiveIdChange={ setTemplate }
-							onActiveTemplatePartIdChange={ setTemplatePart }
-							onAddTemplate={ addTemplate }
-							onRemoveTemplate={ removeTemplate }
 						/>
 					</div>
 				</div>
