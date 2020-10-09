@@ -11,34 +11,35 @@ import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { STORE_KEY } from '../../store/constants';
-
-const REUSABLE_BLOCK_NOTICE_ID = 'REUSABLE_BLOCK_NOTICE_ID';
+import { STORE_KEY, REUSABLE_BLOCK_NOTICE_ID } from '../../store/constants';
 
 export function ReusableBlockDeleteButton( { clientId } ) {
-	const { isVisible, isDisabled, block } = useSelect( ( select ) => {
-		const { getBlock } = select( 'core/block-editor' );
-		const { canUser } = select( 'core' );
-		const blockObj = getBlock( clientId );
+	const { isVisible, isDisabled, block } = useSelect(
+		( select ) => {
+			const { getBlock } = select( 'core/block-editor' );
+			const { canUser } = select( 'core' );
+			const blockObj = getBlock( clientId );
 
-		const reusableBlock =
-			blockObj && isReusableBlock( blockObj )
-				? select( 'core' ).getEntityRecord(
-						'postType',
-						'wp_block',
-						blockObj.attributes.ref
-				  )
-				: null;
+			const reusableBlock =
+				blockObj && isReusableBlock( blockObj )
+					? select( 'core' ).getEntityRecord(
+							'postType',
+							'wp_block',
+							blockObj.attributes.ref
+					  )
+					: null;
 
-		return {
-			block: blockObj,
-			isVisible:
-				!! reusableBlock &&
-				( reusableBlock.isTemporary ||
-					!! canUser( 'delete', 'blocks', reusableBlock.id ) ),
-			isDisabled: reusableBlock && reusableBlock.isTemporary,
-		};
-	} );
+			return {
+				block: blockObj,
+				isVisible:
+					!! reusableBlock &&
+					( reusableBlock.isTemporary ||
+						!! canUser( 'delete', 'blocks', reusableBlock.id ) ),
+				isDisabled: reusableBlock && reusableBlock.isTemporary,
+			};
+		},
+		[ clientId ]
+	);
 
 	const {
 		__experimentalDeleteReusableBlock: deleteReusableBlock,

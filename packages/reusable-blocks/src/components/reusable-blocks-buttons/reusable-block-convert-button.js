@@ -3,6 +3,7 @@
  */
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
+import { useCallback } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { reusableBlock } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -11,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { STORE_KEY } from '../../store/constants';
+import { STORE_KEY, REUSABLE_BLOCK_NOTICE_ID } from '../../store/constants';
 
 /**
  * Menu control to convert block(s) to reusable block.
@@ -67,6 +68,27 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 		__experimentalConvertBlocksToReusable: convertBlocksToReusable,
 	} = useDispatch( STORE_KEY );
 
+	const { createSuccessNotice, createErrorNotice } = useDispatch(
+		'core/notices'
+	);
+	const onConvert = useCallback(
+		async function () {
+			try {
+				await convertBlocksToReusable( clientIds );
+				createSuccessNotice( __( 'Block created.' ), {
+					id: REUSABLE_BLOCK_NOTICE_ID,
+					type: 'snackbar',
+				} );
+			} catch ( error ) {
+				createErrorNotice( error.message, {
+					id: REUSABLE_BLOCK_NOTICE_ID,
+					type: 'snackbar',
+				} );
+			}
+		},
+		[ clientIds ]
+	);
+
 	if ( ! canConvert ) {
 		return null;
 	}
@@ -77,7 +99,7 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 				<MenuItem
 					icon={ reusableBlock }
 					onClick={ () => {
-						convertBlocksToReusable( clientIds );
+						onConvert();
 						onClose();
 					} }
 				>
