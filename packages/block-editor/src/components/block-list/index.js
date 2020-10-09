@@ -30,7 +30,10 @@ const appenderNodesMap = new Map();
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
-function BlockList( { className, placeholder, rootClientId, renderAppender }, ref ) {
+function BlockList(
+	{ className, placeholder, rootClientId, renderAppender },
+	ref
+) {
 	const Container = rootClientId ? 'div' : RootContainer;
 	const fallbackRef = useRef();
 	const wrapperRef = ref || fallbackRef;
