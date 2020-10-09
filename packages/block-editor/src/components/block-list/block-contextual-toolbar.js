@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -12,14 +17,17 @@ import NavigableToolbar from '../navigable-toolbar';
 import { BlockToolbar } from '../';
 
 function BlockContextualToolbar( { focusOnMount, ...props } ) {
-	const { blockType } = useSelect( ( select ) => {
-		const { getBlockName, getSelectedBlockClientIds } = select(
-			'core/block-editor'
-		);
+	const { blockType, isEditingInToolbar } = useSelect( ( select ) => {
+		const {
+			getBlockName,
+			getSelectedBlockClientIds,
+			getIsEditingInToolbar,
+		} = select( 'core/block-editor' );
 		const { getBlockType } = select( 'core/blocks' );
 		const selectedBlockClientIds = getSelectedBlockClientIds();
 		const selectedBlockClientId = selectedBlockClientIds[ 0 ];
 		return {
+			isEditingInToolbar: getIsEditingInToolbar(),
 			blockType:
 				selectedBlockClientId &&
 				getBlockType( getBlockName( selectedBlockClientId ) ),
@@ -31,7 +39,14 @@ function BlockContextualToolbar( { focusOnMount, ...props } ) {
 		}
 	}
 	return (
-		<div className="block-editor-block-contextual-toolbar-wrapper">
+		<div
+			className={ classnames(
+				'block-editor-block-contextual-toolbar-wrapper',
+				{
+					'is-editing-in-toolbar': isEditingInToolbar,
+				}
+			) }
+		>
 			<NavigableToolbar
 				focusOnMount={ focusOnMount }
 				className="block-editor-block-contextual-toolbar"

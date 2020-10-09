@@ -1791,3 +1791,14 @@ export function isBlockHighlighted( state, clientId ) {
 export function areInnerBlocksControlled( state, clientId ) {
 	return !! state.blocks.controlledInnerBlocks[ clientId ];
 }
+
+/**
+ * Returns whether inline toolbar editing UI is visible.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} True if inline toolbar editing UI is visible.
+ */
+export function getIsEditingInToolbar( state ) {
+	return state.isEditingInToolbar;
+}

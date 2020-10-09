@@ -17,6 +17,7 @@ import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import BlockToolbarInlineEdit from '../block-toolbar-inline-edit';
 import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
@@ -184,11 +185,14 @@ function BlockPopover( {
 				</div>
 			) }
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (
-				<BlockContextualToolbar
-					// If the toolbar is being shown because of being forced
-					// it should focus the toolbar right after the mount.
-					focusOnMount={ isToolbarForced }
-				/>
+				<>
+					<BlockContextualToolbar
+						// If the toolbar is being shown because of being forced
+						// it should focus the toolbar right after the mount.
+						focusOnMount={ isToolbarForced }
+					/>
+					<BlockToolbarInlineEdit.Slot />
+				</>
 			) }
 			{ shouldShowBreadcrumb && (
 				<BlockSelectionButton

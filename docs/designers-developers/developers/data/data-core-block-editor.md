@@ -442,6 +442,18 @@ _Properties_
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
 -   _frecency_ `number`: Heuristic that combines frequency and recency.
 
+<a name="getIsEditingInToolbar" href="#getIsEditingInToolbar">#</a> **getIsEditingInToolbar**
+
+Returns whether inline toolbar editing UI is visible.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `boolean`: True if inline toolbar editing UI is visible.
+
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 
 Returns the client ID of the last block in the multi-selection set, or null
@@ -1348,6 +1360,18 @@ _Parameters_
 
 -   _clientId_ `string`: The block's clientId.
 -   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
+
+<a name="setIsEditingInToolbar" href="#setIsEditingInToolbar">#</a> **setIsEditingInToolbar**
+
+Returns an action that updates the toolbar inline editing state.
+
+_Parameters_
+
+-   _isEditingInToolbar_ `boolean`: Whether to show or hide inline editing.
+
+_Returns_
+
+-   `Object`: Action object.
 
 <a name="setNavigationMode" href="#setNavigationMode">#</a> **setNavigationMode**
 

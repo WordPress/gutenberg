@@ -552,6 +552,20 @@ export function hideInsertionPoint() {
 }
 
 /**
+ * Returns an action that updates the toolbar inline editing state.
+ *
+ * @param {boolean} isEditingInToolbar Whether to show or hide inline editing.
+ *
+ * @return {Object} Action object.
+ */
+export function setIsEditingInToolbar( isEditingInToolbar ) {
+	return {
+		type: 'SET_IS_EDITING_IN_TOOLBAR',
+		isEditingInToolbar,
+	};
+}
+
+/**
  * Returns an action object resetting the template validity.
  *
  * @param {boolean}  isValid  template validity flag.
