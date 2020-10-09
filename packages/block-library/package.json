@@ -59,6 +59,7 @@
 		"memize": "^1.1.0",
 		"moment": "^2.22.1",
 		"react-easy-crop": "^3.0.0",
+		"reakit": "1.1.0",
 		"tinycolor2": "^1.4.1"
 	},
 	"publishConfig": {

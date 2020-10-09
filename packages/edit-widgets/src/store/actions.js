@@ -15,23 +15,12 @@ import { dispatch, select, getWidgetToClientIdMapping } from './controls';
 import { transformBlockToWidget } from './transformers';
 import {
 	buildWidgetAreaPostId,
-	buildWidgetAreasPostId,
 	buildWidgetAreasQuery,
 	createStubPost,
 	KIND,
 	POST_TYPE,
 	WIDGET_AREA_ENTITY_TYPE,
 } from './utils';
-
-/**
- * Initializes the stub post before rendering the widgets editor.
- * Required in order to ensure the data layer won't try to resolve the stub post.
- *
- * @access private
- */
-export function* initializeState() {
-	yield persistStubPost( buildWidgetAreasPostId(), [] );
-}
 
 /**
  * Persists a stub post with given ID to core data store. The post is meant to be in-memory only and
@@ -43,9 +32,6 @@ export function* initializeState() {
  */
 export const persistStubPost = function* ( id, blocks ) {
 	const stubPost = createStubPost( id, blocks );
-	const args = [ KIND, POST_TYPE, id ];
-	// This is the magic that prevents core-data from trying to resolve the entity
-	yield dispatch( 'core', 'startResolution', 'getEntityRecord', args );
 	yield dispatch(
 		'core',
 		'receiveEntityRecords',
@@ -55,7 +41,6 @@ export const persistStubPost = function* ( id, blocks ) {
 		{ id: stubPost.id },
 		false
 	);
-	yield dispatch( 'core', 'finishResolution', 'getEntityRecord', args );
 	return stubPost;
 };
 

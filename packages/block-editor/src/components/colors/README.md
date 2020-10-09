@@ -1,8 +1,8 @@
-# Color HOC and Hook
+# Color Higher-Order Component and Hook
 
-Set of functions to enable color functionality in Blocks.
+A set of functions to enable color functionality in blocks. The first two functions use the concept of a higher-order component (HOC), see [React's Higher-Order Components documentation](https://reactjs.org/docs/higher-order-components.html) for additional details.
 
-## `withColors` HOC
+## `withColors` Higher-Order Component
 
 A higher-order component, which handles color logic for class generation color value, retrieval and color attribute setting.
 
@@ -38,7 +38,7 @@ export default compose(
 
 ## `useColors` hook
 
-Provides the functionality of `withColors` as a React hook.
+Provides the functionality of `withColors` as a React hook, see [React's hook overview](https://reactjs.org/docs/hooks-overview.html) for additional details on using hooks.
 
 It takes an array of color configuration objects for its first parameter. The second parameter is an optional hooks dependency array for cases where you have closures in your configuration objects, and the third is an optional string to overwrite the default panel title, `__( 'Color Settings' )`.
 
