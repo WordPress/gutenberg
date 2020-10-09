@@ -65,26 +65,27 @@ export default function useEditorFeature( featurePath ) {
 
 	const setting = useSelect(
 		( select ) => {
-			// 1 - Use deprecated settings, if available.
 			const settings = select( 'core/block-editor' ).getSettings();
-			const deprecatedSettingsValue = deprecatedFlags[ featurePath ]
-				? deprecatedFlags[ featurePath ]( settings )
-				: undefined;
-			if ( deprecatedSettingsValue !== undefined ) {
-				return deprecatedSettingsValue;
-			}
 
-			// 2 - Use __experimental features otherwise.
+			// 1 - Use __experimental features, if available.
 			// We cascade to the global value if the block one is not available.
 			//
 			// TODO: make it work for blocks that define multiple selectors
 			// such as core/heading or core/post-title.
 			const globalPath = `__experimentalFeatures.global.${ featurePath }`;
 			const blockPath = `__experimentalFeatures.${ blockName }.${ featurePath }`;
-			const experimentalFeature =
+			const experimentalFeaturesResult =
 				get( settings, blockPath ) ?? get( settings, globalPath );
-			if ( experimentalFeature !== undefined ) {
-				return experimentalFeature;
+			if ( experimentalFeaturesResult !== undefined ) {
+				return experimentalFeaturesResult;
+			}
+
+			// 2 - Use deprecated settings, otherwise.
+			const deprecatedSettingsValue = deprecatedFlags[ featurePath ]
+				? deprecatedFlags[ featurePath ]( settings )
+				: undefined;
+			if ( deprecatedSettingsValue !== undefined ) {
+				return deprecatedSettingsValue;
 			}
 
 			// 3 - Fall back for typography.dropCap:
