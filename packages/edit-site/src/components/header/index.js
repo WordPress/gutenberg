@@ -42,7 +42,6 @@ export default function Header( {
 			getTemplatePartId,
 			getTemplateType,
 		} = select( 'core/edit-site' );
-
 		const { getEntityRecord } = select( 'core' );
 
 		const _templateId = getTemplateId();
