@@ -54,6 +54,7 @@ export default function BlockActions( {
 		flashBlock,
 		setBlockMovingClientId,
 		setNavigationMode,
+		selectBlock,
 	} = useDispatch( 'core/block-editor' );
 
 	const notifyCopy = useNotifyCopy();
@@ -78,6 +79,7 @@ export default function BlockActions( {
 		},
 		onMoveTo() {
 			setNavigationMode( true );
+			selectBlock( clientIds[ 0 ] );
 			setBlockMovingClientId( clientIds[ 0 ] );
 		},
 		onGroup() {

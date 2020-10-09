@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -39,7 +40,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
-import { Block } from './block-wrapper';
+import { useBlockProps } from './block-wrapper';
 
 export const BlockListBlockContext = createContext();
 
@@ -65,6 +66,14 @@ function mergeWrapperProps( propsA, propsB ) {
 	}
 
 	return newProps;
+}
+
+function Block( { children, isHtml, ...props } ) {
+	return (
+		<div { ...useBlockProps( props, { __unstableIsHtml: isHtml } ) }>
+			{ children }
+		</div>
+	);
 }
 
 function BlockListBlock( {
@@ -117,11 +126,9 @@ function BlockListBlock( {
 	const onBlockError = () => setErrorState( true );
 
 	const blockType = getBlockType( name );
-	const lightBlockWrapper = hasBlockSupport(
-		blockType,
-		'lightBlockWrapper',
-		false
-	);
+	const lightBlockWrapper =
+		blockType.apiVersion > 1 ||
+		hasBlockSupport( blockType, 'lightBlockWrapper', false );
 	const isUnregisteredBlock = name === getUnregisteredTypeHandlerName();
 
 	// Determine whether the block has props to apply to the wrapper.
@@ -210,7 +217,7 @@ function BlockListBlock( {
 		name,
 		mode,
 		blockTitle: blockType.title,
-		wrapperProps,
+		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
 
@@ -218,10 +225,10 @@ function BlockListBlock( {
 
 	if ( ! isValid ) {
 		block = (
-			<Block.div>
+			<Block>
 				<BlockInvalidWarning clientId={ clientId } />
 				<div>{ getSaveElement( blockType, attributes ) }</div>
-			</Block.div>
+			</Block>
 		);
 	} else if ( mode === 'html' ) {
 		// Render blockEdit so the inspector controls don't disappear.
@@ -229,15 +236,15 @@ function BlockListBlock( {
 		block = (
 			<>
 				<div style={ { display: 'none' } }>{ blockEdit }</div>
-				<Block.div __unstableIsHtml>
+				<Block isHtml>
 					<BlockHtml clientId={ clientId } />
-				</Block.div>
+				</Block>
 			</>
 		);
 	} else if ( lightBlockWrapper ) {
 		block = blockEdit;
 	} else {
-		block = <Block.div { ...wrapperProps }>{ blockEdit }</Block.div>;
+		block = <Block { ...wrapperProps }>{ blockEdit }</Block>;
 	}
 
 	return (
@@ -246,9 +253,9 @@ function BlockListBlock( {
 				{ block }
 			</BlockCrashBoundary>
 			{ !! hasError && (
-				<Block.div>
+				<Block>
 					<BlockCrashWarning />
-				</Block.div>
+				</Block>
 			) }
 		</BlockListBlockContext.Provider>
 	);

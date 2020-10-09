@@ -120,6 +120,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Block Supports",
+		"slug": "block-supports",
+		"markdown_source": "../docs/designers-developers/developers/block-api/block-supports.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Block Transforms",
 		"slug": "block-transforms",
 		"markdown_source": "../docs/designers-developers/developers/block-api/block-transforms.md",

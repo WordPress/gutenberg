@@ -27,26 +27,82 @@ describe( 'Preloading Middleware', () => {
 		} );
 	} );
 
-	it( 'should return the preloaded data if provided', () => {
-		const body = {
-			status: 'this is the preloaded response',
-		};
-		const preloadedData = {
-			'wp/v2/posts': {
-				body,
-			},
-		};
-		const preloadingMiddleware = createPreloadingMiddleware(
-			preloadedData
-		);
-		const requestOptions = {
-			method: 'GET',
-			path: 'wp/v2/posts',
-		};
+	describe( 'given preloaded data', () => {
+		describe( 'when data is requested from a preloaded endpoint', () => {
+			describe( 'and it is requested for the first time', () => {
+				it( 'should return the preloaded data', () => {
+					const body = {
+						status: 'this is the preloaded response',
+					};
+					const preloadedData = {
+						'wp/v2/posts': {
+							body,
+						},
+					};
+					const preloadingMiddleware = createPreloadingMiddleware(
+						preloadedData
+					);
+					const requestOptions = {
+						method: 'GET',
+						path: 'wp/v2/posts',
+					};
 
-		const response = preloadingMiddleware( requestOptions );
-		return response.then( ( value ) => {
-			expect( value ).toEqual( body );
+					const response = preloadingMiddleware( requestOptions );
+					return response.then( ( value ) => {
+						expect( value ).toEqual( body );
+					} );
+				} );
+			} );
+
+			describe( 'and it has already been requested', () => {
+				it( 'should not return the preloaded data', () => {
+					const body = {
+						status: 'this is the preloaded response',
+					};
+					const preloadedData = {
+						'wp/v2/posts': {
+							body,
+						},
+					};
+					const preloadingMiddleware = createPreloadingMiddleware(
+						preloadedData
+					);
+					const requestOptions = {
+						method: 'GET',
+						path: 'wp/v2/posts',
+					};
+					const nextSpy = jest.fn();
+
+					preloadingMiddleware( requestOptions, nextSpy );
+					expect( nextSpy ).not.toHaveBeenCalled();
+					preloadingMiddleware( requestOptions, nextSpy );
+					expect( nextSpy ).toHaveBeenCalled();
+				} );
+			} );
+		} );
+
+		describe( 'when the requested data is not from a preloaded endpoint', () => {
+			it( 'should not return preloaded data', () => {
+				const body = {
+					status: 'this is the preloaded response',
+				};
+				const preloadedData = {
+					'wp/v2/posts': {
+						body,
+					},
+				};
+				const preloadingMiddleware = createPreloadingMiddleware(
+					preloadedData
+				);
+				const requestOptions = {
+					method: 'GET',
+					path: 'wp/v2/fake_resource',
+				};
+				const nextSpy = jest.fn();
+
+				preloadingMiddleware( requestOptions, nextSpy );
+				expect( nextSpy ).toHaveBeenCalled();
+			} );
 		} );
 	} );
 

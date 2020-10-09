@@ -171,6 +171,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
                 onSuccess.accept("matt");
             }
 
+            @Override
+            public void gutenbergDidSendButtonPressedAction(String buttonType) {
+
+            }
+            
         }, isDarkMode());
 
         return new ReactNativeHost(this) {

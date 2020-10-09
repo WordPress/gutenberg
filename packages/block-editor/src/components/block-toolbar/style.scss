@@ -34,7 +34,7 @@
 		border: 0;
 
 		// Add a border after item groups to show as separator in the block toolbar.
-		border-right: $border-width solid $gray-200;
+		border-right: $border-width solid $gray-300;
 	}
 
 	> :last-child,
@@ -104,11 +104,6 @@
 	.is-showing-movers & {
 		opacity: 1;
 		transform: translateY(-($block-toolbar-height + $grid-unit-15));
-	}
-
-	// Hide the Parent button in Top Toolbar mode.
-	.edit-post-header-toolbar__block-toolbar & {
-		display: none;
 	}
 }
 

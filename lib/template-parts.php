@@ -159,7 +159,7 @@ function filter_rest_wp_template_part_collection_params( $query_params ) {
 	);
 	return $query_params;
 }
-apply_filters( 'rest_wp_template_part_collection_params', 'filter_rest_wp_template_part_collection_params', 99, 1 );
+add_filter( 'rest_wp_template_part_collection_params', 'filter_rest_wp_template_part_collection_params', 99, 1 );
 
 /**
  * Filter for supporting the `resolved`, `template`, and `theme` parameters in `wp_template_part` queries.

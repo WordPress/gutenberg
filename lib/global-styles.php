@@ -19,6 +19,9 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
  * by merging the keys and binding the leaf values
  * to the new keys.
  *
+ * It also transforms camelCase names into kebab-case
+ * and substitutes '/' by '-'.
+ *
  * This is thought to be useful to generate
  * CSS Custom Properties from a tree,
  * although there's nothing in the implementation
@@ -28,8 +31,8 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
  * and the token is '--', for this input tree:
  *
  * {
- *   'property': 'value',
- *   'nested-property': {
+ *   'some/property': 'value',
+ *   'nestedProperty': {
  *     'sub-property': 'value'
  *   }
  * }
@@ -37,7 +40,7 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
  * it'll return this output:
  *
  * {
- *   '--wp--property': 'value',
+ *   '--wp--some-property': 'value',
  *   '--wp--nested-property--sub-property': 'value'
  * }
  *
@@ -50,7 +53,11 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
 function gutenberg_experimental_global_styles_get_css_vars( $tree, $prefix = '', $token = '--' ) {
 	$result = array();
 	foreach ( $tree as $property => $value ) {
-		$new_key = $prefix . str_replace( '/', '-', $property );
+		$new_key = $prefix . str_replace(
+			'/',
+			'-',
+			strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $property ) ) // CamelCase to kebab-case.
+		);
 
 		if ( is_array( $value ) ) {
 			$new_prefix = $new_key . $token;
@@ -229,6 +236,20 @@ function gutenberg_experimental_global_styles_get_core() {
 			$gradient['name'] = $default_gradients_i18n[ $gradient['slug'] ];
 		}
 	}
+
+	$default_font_sizes_i18n = array(
+		'small'  => __( 'Small', 'gutenberg' ),
+		'normal' => __( 'Normal', 'gutenberg' ),
+		'medium' => __( 'Medium', 'gutenberg' ),
+		'large'  => __( 'Large', 'gutenberg' ),
+		'huge'   => __( 'Huge', 'gutenberg' ),
+	);
+
+	if ( ! empty( $config['global']['settings']['typography']['fontSizes'] ) ) {
+		foreach ( $config['global']['settings']['typography']['fontSizes'] as &$font_size ) {
+			$font_size['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
+		}
+	}
 	// End i18n logic to remove when JSON i18 strings are extracted.
 	return $config;
 }
@@ -268,7 +289,7 @@ function gutenberg_experimental_global_styles_get_theme_support_settings() {
 		}
 		$theme_settings['global']['settings']['typography']['customLineHeight'] = true;
 	}
-	if ( get_theme_support( 'experimental-custom-spacing' ) ) {
+	if ( get_theme_support( 'custom-spacing' ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['spacing'] ) ) {
 			$theme_settings['global']['settings']['spacing'] = array();
 		}
@@ -396,12 +417,12 @@ function gutenberg_experimental_global_styles_get_style_property() {
  */
 function gutenberg_experimental_global_styles_get_support_keys() {
 	return array(
-		'--wp--style--color--link' => array( '__experimentalColor', 'linkColor' ),
-		'background'               => array( '__experimentalColor', 'gradients' ),
-		'backgroundColor'          => array( '__experimentalColor' ),
-		'color'                    => array( '__experimentalColor' ),
-		'fontSize'                 => array( '__experimentalFontSize' ),
-		'lineHeight'               => array( '__experimentalLineHeight' ),
+		'--wp--style--color--link' => array( 'color', 'linkColor' ),
+		'background'               => array( 'color', 'gradients' ),
+		'backgroundColor'          => array( 'color' ),
+		'color'                    => array( 'color' ),
+		'fontSize'                 => array( 'fontSize' ),
+		'lineHeight'               => array( 'lineHeight' ),
 	);
 }
 
@@ -463,8 +484,8 @@ function gutenberg_experimental_global_styles_get_block_data() {
 				array(
 					'supports' => array(
 						'__experimentalSelector' => ':root',
-						'__experimentalFontSize' => true,
-						'__experimentalColor'    => array(
+						'fontSize'               => true,
+						'color'                  => array(
 							'linkColor' => true,
 							'gradients' => true,
 						),
@@ -578,32 +599,38 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 			continue;
 		}
 
+		// Create the CSS Custom Properties for the presets.
+		$computed_presets  = array();
 		$presets_structure = gutenberg_experimental_global_styles_get_presets_structure();
-
-		$computed_presets = array();
-
-		// Extract the relevant preset info before converting them to CSS Custom Properties.
 		foreach ( $presets_structure as $token => $preset_meta ) {
 			$block_preset = gutenberg_experimental_get( $tree[ $block_name ]['settings'], $preset_meta['path'] );
 			if ( ! empty( $block_preset ) ) {
-				$css_var_token                      = gutenberg_experimental_global_styles_get_css_property( $token );
-				$computed_presets[ $css_var_token ] = array();
+				$computed_presets[ $token ] = array();
 				foreach ( $block_preset as $preset_value ) {
-					$computed_presets[ $css_var_token ][ $preset_value['slug'] ] = $preset_value[ $preset_meta['key'] ];
+					$computed_presets[ $token ][ $preset_value['slug'] ] = $preset_value[ $preset_meta['key'] ];
 				}
 			}
 		}
+		$token            = '--';
+		$preset_prefix    = '--wp--preset' . $token;
+		$preset_variables = gutenberg_experimental_global_styles_get_css_vars( $computed_presets, $preset_prefix, $token );
 
-		$token         = '--';
-		$prefix        = '--wp--preset' . $token;
-		$css_variables = gutenberg_experimental_global_styles_get_css_vars( $computed_presets, $prefix, $token );
+		// Create the CSS Custom Properties that are specific to the theme.
+		$computed_theme_props = gutenberg_experimental_get( $tree[ $block_name ]['settings'], array( 'custom' ) );
+		$theme_props_prefix   = '--wp--custom' . $token;
+		$theme_variables      = gutenberg_experimental_global_styles_get_css_vars(
+			$computed_theme_props,
+			$theme_props_prefix,
+			$token
+		);
 
 		$stylesheet .= gutenberg_experimental_global_styles_resolver_styles(
 			$block_data[ $block_name ]['selector'],
 			$block_data[ $block_name ]['supports'],
 			array_merge(
 				gutenberg_experimental_global_styles_flatten_styles_tree( $tree[ $block_name ]['styles'] ),
-				$css_variables
+				$preset_variables,
+				$theme_variables
 			)
 		);
 	}
@@ -719,6 +746,7 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 		),
 		'settings' => array(
 			'color'      => array(),
+			'custom'     => array(),
 			'typography' => array(),
 			'spacing'    => array(),
 		),
@@ -806,6 +834,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 	unset( $settings['colors'] );
 	unset( $settings['gradients'] );
+	unset( $settings['fontSizes'] );
 	unset( $settings['disableCustomColors'] );
 	unset( $settings['disableCustomGradients'] );
 	unset( $settings['disableCustomFontSizes'] );
