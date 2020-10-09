@@ -13,6 +13,7 @@
 .wp-block[data-align="right"] > .wp-block-buttons {
 	display: flex;
 	justify-content: flex-end;
+	flex-wrap: wrap;
 }
 
 .wp-block-buttons > .block-list-appender {

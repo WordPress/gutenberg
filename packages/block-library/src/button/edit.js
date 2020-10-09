@@ -2,13 +2,14 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useCallback, useState } from '@wordpress/element';
 import {
+	Button,
+	ButtonGroup,
 	KeyboardShortcuts,
 	PanelBody,
 	RangeControl,
@@ -66,6 +67,29 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 				allowReset
 				onChange={ setBorderRadius }
 			/>
+		</PanelBody>
+	);
+}
+
+function WidthPanel( { width, setAttributes } ) {
+	return (
+		<PanelBody title={ __( 'Width Settings' ) }>
+			<ButtonGroup aria-label={ __( 'Button Width' ) }>
+				{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
+					return (
+						<Button
+							key={ widthValue }
+							isSmall
+							isPrimary={ widthValue === width }
+							onClick={ () =>
+								setAttributes( { width: widthValue } )
+							}
+						>
+							{ widthValue }%
+						</Button>
+					);
+				} ) }
+			</ButtonGroup>
 		</PanelBody>
 	);
 }
@@ -168,6 +192,7 @@ function ButtonEdit( props ) {
 		rel,
 		text,
 		url,
+		width,
 	} = attributes;
 	const onSetLinkRel = useCallback(
 		( value ) => {
@@ -202,7 +227,12 @@ function ButtonEdit( props ) {
 	return (
 		<>
 			<ColorEdit { ...props } />
-			<div { ...blockProps }>
+			<div
+				{ ...blockProps }
+				className={ classnames( blockProps.className, {
+					[ `wp-block-button__width-${ width }` ]: width,
+				} ) }
+			>
 				<RichText
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
@@ -245,6 +275,7 @@ function ButtonEdit( props ) {
 					borderRadius={ borderRadius }
 					setAttributes={ setAttributes }
 				/>
+				<WidthPanel width={ width } setAttributes={ setAttributes } />
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
 						label={ __( 'Open in new tab' ) }
