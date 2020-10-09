@@ -57,7 +57,7 @@ describe( 'RangeControl', () => {
 	} );
 
 	describe( 'validation', () => {
-		it( 'should not apply new value is lower than minimum', () => {
+		it( 'should not apply if new value is lower than minimum', () => {
 			const { container } = render( <RangeControl min={ 11 } /> );
 
 			const rangeInput = getRangeInput( container );
