@@ -39,7 +39,7 @@ function NavigationToggle( { icon, isOpen, onClick } ) {
 
 	const handleClick = ( event ) => {
 		if ( isOpen ) {
-			setNavigationPanelActiveMenu();
+			setNavigationPanelActiveMenu( 'root' );
 		}
 		onClick( event );
 	};
