@@ -10,7 +10,7 @@ import {
 	InspectorControls,
 	URLPopover,
 	URLInput,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { Fragment, useState } from '@wordpress/element';
 import {
@@ -36,6 +36,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 
 	const IconComponent = getIconBySite( service );
 	const socialLinkName = getNameBySite( service );
+	const blockProps = useBlockProps( { className: classes } );
 
 	return (
 		<Fragment>
@@ -62,7 +63,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 					</PanelRow>
 				</PanelBody>
 			</InspectorControls>
-			<Block.li className={ classes }>
+			<li { ...blockProps }>
 				<Button onClick={ () => setPopover( true ) }>
 					<IconComponent />
 					{ isSelected && showURLPopover && (
@@ -93,7 +94,7 @@ const SocialLinkEdit = ( { attributes, setAttributes, isSelected } ) => {
 						</URLPopover>
 					) }
 				</Button>
-			</Block.li>
+			</li>
 		</Fragment>
 	);
 };

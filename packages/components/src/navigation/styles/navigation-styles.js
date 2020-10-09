@@ -15,7 +15,7 @@ export const NavigationUI = styled.div`
 	width: 100%;
 	background-color: ${ G2.darkGray.primary };
 	color: #f0f0f0;
-	padding: 8px;
+	padding: 0 8px;
 	overflow: hidden;
 `;
 
@@ -28,6 +28,9 @@ export const MenuUI = styled.div`
 		padding: 0;
 		margin: 0;
 		list-style: none;
+	}
+	.components-navigation__back-button {
+		margin-bottom: 24px;
 	}
 `;
 
@@ -50,12 +53,14 @@ export const MenuBackButtonUI = styled( Button )`
 export const MenuTitleUI = styled( Text )`
 	padding: 4px 0 4px 16px;
 	margin-bottom: 8px;
+	color: ${ G2.gray[ 100 ] };
 `;
 
 export const GroupTitleUI = styled( Text )`
 	margin-top: 8px;
 	padding: 4px 0 4px 16px;
 	text-transform: uppercase;
+	color: ${ G2.gray[ 100 ] };
 `;
 
 export const ItemUI = styled.li`

@@ -13,6 +13,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeReplaceBlock,
 	subscribeUpdateTheme,
 	subscribeUpdateCapabilities,
+	subscribeShowNotice,
 } from '@wordpress/react-native-bridge';
 
 /**
@@ -29,7 +30,10 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
-import { SETTINGS_DEFAULTS } from '@wordpress/block-editor';
+import {
+	validateThemeColors,
+	validateThemeGradients,
+} from '@wordpress/block-editor';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -69,6 +73,10 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
+		const { capabilities } = this.props;
+
+		this.props.updateSettings( capabilities );
+
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
 			this.serializeToNativeAction();
 		} );
@@ -116,13 +124,10 @@ class NativeEditorProvider extends Component {
 		this.subscriptionParentUpdateTheme = subscribeUpdateTheme(
 			( theme ) => {
 				// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
-				if ( theme.colors === undefined ) {
-					theme.colors = SETTINGS_DEFAULTS.colors;
-				}
 
-				if ( theme.gradients === undefined ) {
-					theme.gradients = SETTINGS_DEFAULTS.gradients;
-				}
+				theme.colors = validateThemeColors( theme.colors );
+
+				theme.gradients = validateThemeGradients( theme.gradients );
 
 				this.props.updateSettings( theme );
 			}
@@ -131,6 +136,12 @@ class NativeEditorProvider extends Component {
 		this.subscriptionParentUpdateCapabilities = subscribeUpdateCapabilities(
 			( payload ) => {
 				this.updateCapabilitiesAction( payload );
+			}
+		);
+
+		this.subscriptionParentShowNotice = subscribeShowNotice(
+			( payload ) => {
+				this.props.createInfoNotice( payload.message );
 			}
 		);
 	}
@@ -166,6 +177,10 @@ class NativeEditorProvider extends Component {
 
 		if ( this.subscriptionParentUpdateCapabilities ) {
 			this.subscriptionParentUpdateCapabilities.remove();
+		}
+
+		if ( this.subscriptionParentShowNotice ) {
+			this.subscriptionParentShowNotice.remove();
 		}
 	}
 
@@ -247,11 +262,9 @@ class NativeEditorProvider extends Component {
 		const {
 			children,
 			post, // eslint-disable-line no-unused-vars
-			capabilities,
 			...props
 		} = this.props;
 
-		this.props.updateSettings( capabilities );
 		return (
 			<EditorProvider post={ this.post } { ...props }>
 				{ children }
@@ -289,7 +302,9 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
+		const { editPost, resetEditorBlocks, createInfoNotice } = dispatch(
+			'core/editor'
+		);
 		const {
 			updateSettings,
 			clearSelectedBlock,
@@ -304,6 +319,7 @@ export default compose( [
 			addEntities,
 			clearSelectedBlock,
 			insertBlock,
+			createInfoNotice,
 			editTitle( title ) {
 				editPost( { title } );
 			},

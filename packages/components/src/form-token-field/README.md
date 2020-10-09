@@ -65,7 +65,6 @@ const MyFormTokenField = withState( {
 		value={ tokens } 
 		suggestions={ suggestions } 
 		onChange={ tokens => setState( { tokens } ) }
-		placeholder="Type a continent"
 	/>
 ) );
 ```

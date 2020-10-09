@@ -67,7 +67,7 @@ const fetchLinkSuggestions = async (
 					type: 'post',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] ) // fail by returning no results
 		);
 	}
 
@@ -81,7 +81,7 @@ const fetchLinkSuggestions = async (
 					type: 'term',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] )
 		);
 	}
 
@@ -95,7 +95,7 @@ const fetchLinkSuggestions = async (
 					type: 'post-format',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] )
 		);
 	}
 
@@ -193,6 +193,7 @@ class EditorProvider extends Component {
 				'fontSizes',
 				'gradients',
 				'hasFixedToolbar',
+				'hasReducedUI',
 				'hasPermissionsToManageWidgets',
 				'imageEditing',
 				'imageSizes',

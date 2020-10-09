@@ -87,6 +87,13 @@ Sync the active menu between the external state and the Navigation's internal st
 The back button label used in nested menus. If not provided, the label will be inferred from the parent menu's title.
 If for some reason the parent menu's title is not available then it will default to "Back".
 
+### `onBackButtonClick`
+
+-   Type: `function`
+-   Required: No
+
+A callback to handle clicking on the back button. If this prop is provided then the back button will be shown.
+
 ### className
 
 -   Type: `string`
