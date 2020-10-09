@@ -18,7 +18,6 @@ import {
 	BlockList,
 	BlockControls,
 } from '@wordpress/block-editor';
-import { parse } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -56,7 +55,9 @@ export default function ReusableBlockEdit( {
 
 	const { editEntityRecord, saveEditedEntityRecord } = useDispatch( 'core' );
 
-	const { replaceBlock } = useDispatch( 'core/block-editor' );
+	const {
+		__experimentalConvertBlockToStatic: convertBlockToStatic,
+	} = useDispatch( 'core/reusable-blocks' );
 
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
@@ -104,12 +105,7 @@ export default function ReusableBlockEdit( {
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
-						onClick={ () =>
-							replaceBlock(
-								clientId,
-								parse( reusableBlock.content )
-							)
-						}
+						onClick={ () => convertBlockToStatic( clientId ) }
 					>
 						{ __( 'Convert to regular blocks' ) }
 					</ToolbarButton>

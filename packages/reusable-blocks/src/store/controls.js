@@ -38,7 +38,7 @@ const controls = {
 				.select( 'core/block-editor' )
 				.getBlock( clientId );
 			const reusableBlock = registry
-				.select( 'core/block-editor' )
+				.select( 'core' )
 				.getEditedEntityRecord(
 					'postType',
 					'wp_block',
