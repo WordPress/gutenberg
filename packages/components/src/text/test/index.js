@@ -22,9 +22,13 @@ afterEach( () => {
 	container = null;
 } );
 
+function getComputedStyle( node ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
+
 function getTextStyle( node ) {
 	const text = node || container.children[ 0 ];
-	return window.getComputedStyle( text );
+	return getComputedStyle( text );
 }
 
 describe( 'Text', () => {

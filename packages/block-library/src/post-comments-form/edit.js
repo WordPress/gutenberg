@@ -10,7 +10,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	Warning,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
@@ -28,6 +28,11 @@ export default function PostCommentsFormEdit( {
 		'comment_status',
 		postId
 	);
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 
 	return (
 		<>
@@ -39,11 +44,7 @@ export default function PostCommentsFormEdit( {
 					} }
 				/>
 			</BlockControls>
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
+			<div { ...blockProps }>
 				{ ! commentStatus && (
 					<Warning>
 						{ __(
@@ -61,7 +62,7 @@ export default function PostCommentsFormEdit( {
 				) }
 
 				{ 'open' === commentStatus && __( 'Post Comments Form' ) }
-			</Block.div>
+			</div>
 		</>
 	);
 }
