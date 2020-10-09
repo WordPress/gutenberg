@@ -13,7 +13,7 @@ export function* __experimentalConvertBlockToStatic( clientId ) {
 }
 
 /**
- * Returns a generator converting a static block into a reusable block.
+ * Returns a generator converting one or more static blocks into a reusable block.
  *
  * @param {string} clientIds The client IDs of the block to detach.
  */

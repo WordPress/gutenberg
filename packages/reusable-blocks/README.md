@@ -1,6 +1,6 @@
 # Reusable blocks
 
-Building blocks for WordPress editors.
+Reusable blocks components and logic.  
 
 ## Installation
 
@@ -16,7 +16,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 This experimental module provides support for reusable blocks.
 
-The most basic usage of this package would involve only telling the `<BlockEditorProvider` how to request reusable blocks from the API, and also pass it a list of the retrieved reusable blocks:
+Reusable blocks are WordPress entities and the following is enough to ensure they are available in the inserter:
 
 ```js
 const { __experimentalReusableBlocks } = useSelect(
@@ -38,6 +38,57 @@ return (
         { ...props }
     />
 );
+```
+
+With the above configuration management features (such as creating new reusable blocks) are still missing from the editor. Enter `@wordpress/reusable-blocks`:
+
+```js
+import { ReusableBlocksButtons } from '@wordpress/reusable-blocks';
+
+const { __experimentalReusableBlocks } = useSelect(
+    ( select ) => select( 'core' ).getEntityRecords(
+        'postType',
+        'wp_block',
+    )
+);
+
+return (
+    <BlockEditorProvider
+        value={ blocks }
+        onInput={ onInput }
+        onChange={ onChange }
+        settings={ {
+            ...settings,
+            __experimentalReusableBlocks,
+        } }
+        { ...props }
+    >
+        <ReusableBlocksButtons />
+        { children }
+    </BlockEditorProvider>
+);
+```
+
+This package also provides convenient utilities for managing reusable blocks through redux actions:
+
+```js
+function MyConvertToStaticButton( { clientId } ) {
+    const { __experimentalConvertBlockToStatic } = useDispatch('@wordpress/reusable-blocks');
+    return (
+        <button onClick={() => __experimentalConvertBlockToStatic( clientId )} >
+            Convert to static
+        </button>
+    );
+}
+
+function MyConvertToReusableButton( { clientId } ) {
+    const { __experimentalConvertBlocksToReusable } = useDispatch('@wordpress/reusable-blocks');
+    return (
+        <button onClick={() => __experimentalConvertBlocksToReusable( [ clientId ] )} >
+            Convert to reusable
+        </button>
+    );
+}
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
