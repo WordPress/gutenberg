@@ -71,34 +71,64 @@ async function runReleaseBranchCreationStep(
 ) {
 	let version, releaseBranch, versionLabel;
 	await runStep( 'Creating the release branch', abortMessage, async () => {
+		let parsedMajorVersion;
+
+		const getComponentsOfRC = ( ver ) => ver.match( /(.+-rc\.)([0-9]+)/ );
 		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
 		const packageJson = readJSONFile( packageJsonPath );
-		const nextMajor = getNextMajorVersion( packageJson.version );
-		const parsedMajorVersion = semver.parse( nextMajor );
+		const rcComponents = getComponentsOfRC( packageJson.version );
+		const isRC = !! rcComponents;
 
-		version = nextMajor + '-rc.1';
+		// if the last tag is an RC then we can assume that we should generate a new rc with the same version number
+		if ( isRC ) {
+			const [ , current, rc ] = rcComponents;
+			const nextRC = Number( rc ) + 1;
+
+			version = `${ current }${ nextRC }`;
+			versionLabel = `${ current.split( '-' )[ 0 ] } RC${ nextRC }`;
+			parsedMajorVersion = semver.parse( packageJson.version );
+		} else {
+			const nextMajor = getNextMajorVersion( packageJson.version );
+
+			parsedMajorVersion = semver.parse( nextMajor );
+			version = nextMajor + '-rc.1';
+			versionLabel = nextMajor + ' RC1';
+		}
+
 		releaseBranch =
 			'release/' +
 			parsedMajorVersion.major +
 			'.' +
 			parsedMajorVersion.minor;
-		versionLabel = nextMajor + ' RC1';
 
-		await askForConfirmation(
-			'The Plugin version to be used is ' +
-				formats.success( version ) +
-				'. Proceed with the creation of the release branch?',
-			true,
-			abortMessage
-		);
+		if ( ! isRC ) {
+			await askForConfirmation(
+				'The Plugin version to be used is ' +
+					formats.success( version ) +
+					'. Proceed with the creation of the release branch?',
+				true,
+				abortMessage
+			);
 
-		// Creating the release branch
-		await git.createLocalBranch( gitWorkingDirectoryPath, releaseBranch );
-		log(
-			'>> The local release branch ' +
-				formats.success( releaseBranch ) +
-				' has been successfully created.'
-		);
+			// Creating the release branch
+			await git.createLocalBranch(
+				gitWorkingDirectoryPath,
+				releaseBranch
+			);
+
+			log(
+				'>> The local release branch ' +
+					formats.success( releaseBranch ) +
+					' has been successfully created.'
+			);
+		} else {
+			log(
+				'The Plugin version to be used is ' +
+					formats.success( version ) +
+					', in the release branch ' +
+					formats.success( releaseBranch )
+			);
+		}
 	} );
 
 	return {
