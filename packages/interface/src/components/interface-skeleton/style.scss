@@ -12,7 +12,7 @@ html.interface-interface-skeleton__html-container {
 
 .interface-interface-skeleton {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	height: auto;
 	max-height: 100%;
 
@@ -31,11 +31,6 @@ html.interface-interface-skeleton__html-container {
 			top: 0;
 		}
 	}
-}
-
-.interface-interface-skeleton__layout {
-	display: flex;
-	height: 100%;
 }
 
 .interface-interface-skeleton__site {
