@@ -26,7 +26,6 @@
 		"!((src|build|build-module)/(components|utils)/**)"
 	],
 	"dependencies": {
-		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
@@ -36,10 +35,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/notices": "file:../notices",
-		"lodash": "^4.17.19",
-		"redux-optimist": "^1.0.0",
-		"refx": "^3.0.0",
-		"rememo": "^3.0.0"
+		"lodash": "^4.17.19"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -14,8 +14,6 @@ import controls from '../controls';
 
 const { CONVERT_BLOCK_TO_STATIC, CONVERT_BLOCKS_TO_REUSABLE } = controls;
 
-jest.mock( '@wordpress/api-fetch', () => jest.fn() );
-
 describe( 'reusable blocks effects', () => {
 	beforeAll( () => {
 		registerBlockType( 'core/test-block', {
