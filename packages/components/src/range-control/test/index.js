@@ -66,7 +66,7 @@ describe( 'RangeControl', () => {
 			fireEvent.change( numberInput, { target: { value: '10' } } );
 			fireEvent.blur( numberInput );
 
-			expect( rangeInput.value ).not.toBe( '10' );
+			expect( rangeInput.value ).toBe( '11' );
 		} );
 
 		it( 'should not apply new value is greater than maximum', () => {
