@@ -41,6 +41,7 @@ import NavigationSidebar from '../navigation-sidebar';
 
 const interfaceLabels = {
 	leftSidebar: __( 'Block Library' ),
+	drawer: __( 'Navigation Sidebar' ),
 };
 
 function Editor() {
