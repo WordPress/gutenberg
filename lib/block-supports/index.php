@@ -6,6 +6,104 @@
  */
 
 /**
+ * Class used for interacting with block supports..
+ */
+class WP_Block_Supports_Registry {
+	/**
+	 * Registered block supports array.
+	 *
+	 * @var array
+	 */
+	private $registered_block_supports = array();
+
+	/**
+	 * Container for the main instance of the class.
+	 *
+	 * @var WP_Block_Supports_Registry|null
+	 */
+	private static $instance = null;
+
+	/**
+	 * Registers a block-supports feature.
+	 *
+	 * @param string $supports_name       Pattern name including namespace.
+	 * @param array  $supports_properties Array containing the properties of the feature.
+	 * @return boolean True if the block-supports feature was registered with success and false otherwise.
+	 */
+	public function register( $supports_name, $supports_properties ) {
+		/*
+		 * TODO validation
+		 */
+		$this->registered_block_supports[ $supports_name ] = array_merge(
+			$supports_properties,
+			array( 'name' => $supports_name )
+		);
+
+		return true;
+	}
+
+	/**
+	 * TODO.
+	 *
+	 * @param string $supports_name       TODO.
+	 * @return array TODO.
+	 */
+	public function get_registered( $supports_name ) {
+		if ( ! $this->is_registered( $supports_name ) ) {
+			return null;
+		}
+
+		return $this->registered_block_supports[ $supports_name ];
+	}
+
+	/**
+	 * TODO.
+	 *
+	 * @return array TODO.
+	 */
+	public function get_all_registered() {
+		return array_values( $this->registered_block_supports );
+	}
+
+	/**
+	 * Checks if a block-supports feature is registered.
+	 *
+	 * @param string $supports_name       TODO.
+	 * @return bool TODO.
+	 */
+	public function is_registered( $supports_name ) {
+		return isset( $this->registered_block_supports[ $supports_name ] );
+	}
+
+	/**
+	 * Utility method to retrieve the main instance of the class.
+	 *
+	 * The instance will be created if it does not exist yet.
+	 *
+	 * @return WP_Block_Supports_Registry The main instance.
+	 */
+	public static function get_instance() {
+		if ( null === self::$instance ) {
+			self::$instance = new self();
+		}
+
+		return self::$instance;
+	}
+}
+
+/**
+ * Registers a new pattern.
+ *
+ * @param string $supports_name       Pattern name including namespace.
+ * @param array  $supports_properties Array containing the properties of the pattern.
+ *
+ * @return boolean True if the pattern was registered with success and false otherwise.
+ */
+function register_block_supports( $supports_name, $supports_properties ) {
+	return WP_Block_Supports_Registry::get_instance()->register( $supports_name, $supports_properties );
+}
+
+/**
  * Filter the registered blocks to apply the block supports attributes registration.
  */
 function gutenberg_register_block_supports() {
