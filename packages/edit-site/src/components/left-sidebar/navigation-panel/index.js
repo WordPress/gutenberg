@@ -19,6 +19,7 @@ import TemplatesMenu from './menus/templates';
 import TemplatePartsMenu from './menus/template-parts';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS, MENU_TEMPLATES } from './constants';
 import PageSwitcher from './page-switcher';
+import ContentMenu from './menus/content';
 
 export const {
 	Fill: NavigationPanelPreviewFill,
@@ -100,11 +101,16 @@ const NavigationPanel = () => {
 						navigateToMenu={ MENU_TEMPLATE_PARTS }
 					/>
 
+					<NavigationItem
+						title={ __( 'Content' ) }
+						navigateToMenu="content"
+					/>
+
 					<TemplatesMenu onActivateItem={ setTemplate } />
 
 					<TemplatePartsMenu onActivateItem={ setTemplatePart } />
 
-					<PageSwitcher onChangePage={ setPage } />
+					<ContentMenu onChangePage={ setPage } />
 				</NavigationMenu>
 			</Navigation>
 

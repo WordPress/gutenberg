@@ -11,12 +11,12 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import NavigationEntityItems from './navigation-entity-items';
+import NavigationEntityItems from '../navigation-entity-items';
 
 const pathKeyExtractor = ( { entity: { link } } ) =>
 	getPathAndQueryString( link );
 
-export default function PageSwitcher( { onChangePage } ) {
+export default function ContentMenu( { onChangePage } ) {
 	const onPageSelect = ( { type, slug, link, id }, item ) => {
 		onChangePage(
 			{
