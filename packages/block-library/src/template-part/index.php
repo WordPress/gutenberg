@@ -15,7 +15,6 @@
 function render_block_core_template_part( $attributes ) {
 	$content = null;
 
-
 	if ( ! empty( $attributes['postId'] ) && get_post_status( $attributes['postId'] ) ) {
 		// If we have a post ID and the post exists, which means this template part
 		// is user-customized, render the corresponding post content.
