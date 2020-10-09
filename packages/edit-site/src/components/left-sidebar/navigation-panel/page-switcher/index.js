@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { getPathAndQueryString } from '@wordpress/url';
-import { __experimentalNavigationGroup as NavigationGroup } from '@wordpress/components';
+import {
+	__experimentalNavigationGroup as NavigationGroup,
+	__experimentalNavigationMenu as NavigationMenu,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -30,7 +33,11 @@ export default function PageSwitcher( { onChangePage } ) {
 	};
 
 	return (
-		<>
+		<NavigationMenu
+			menu="content"
+			title={ __( 'Content' ) }
+			parentMenu="root"
+		>
 			<NavigationGroup title={ __( 'Pages' ) }>
 				<NavigationEntityItems
 					kind="postType"
@@ -75,6 +82,6 @@ export default function PageSwitcher( { onChangePage } ) {
 					) }
 				/>
 			</NavigationGroup>
-		</>
+		</NavigationMenu>
 	);
 }
