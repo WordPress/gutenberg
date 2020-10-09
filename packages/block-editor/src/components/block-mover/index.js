@@ -13,6 +13,7 @@ import { ToolbarGroup, ToolbarItem, Button } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
 import { useState } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import { _n } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -60,6 +61,11 @@ function BlockMover( {
 							icon={ dragHandle }
 							className="block-editor-block-mover__drag-handle"
 							aria-hidden="true"
+							label={ _n(
+								'Drag block',
+								'Drag blocks',
+								clientIds.length
+							) }
 							// Should not be able to tab to drag handle as this
 							// button can only be used with a pointer device.
 							tabIndex="-1"

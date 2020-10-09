@@ -4,12 +4,13 @@
 import { useSelect } from '@wordpress/data';
 import {
 	InnerBlocks,
-	__experimentalBlock as Block,
+	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
-function GroupEdit( { attributes, className, clientId } ) {
+function GroupEdit( { attributes, clientId } ) {
 	const hasInnerBlocks = useSelect(
 		( select ) => {
 			const { getBlock } = select( 'core/block-editor' );
@@ -18,26 +19,27 @@ function GroupEdit( { attributes, className, clientId } ) {
 		},
 		[ clientId ]
 	);
-	const BlockWrapper = Block[ attributes.tagName ];
+	const blockProps = useBlockProps();
+	const { tagName: TagName = 'div' } = attributes;
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-group__inner-container',
+		},
+		{
+			renderAppender: hasInnerBlocks
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
+		}
+	);
 
 	return (
-		<BlockWrapper className={ className }>
+		<TagName { ...blockProps }>
 			<BoxControlVisualizer
 				values={ attributes.style?.spacing?.padding }
 				showValues={ attributes.style?.visualizers?.padding }
 			/>
-			<InnerBlocks
-				renderAppender={
-					hasInnerBlocks
-						? undefined
-						: () => <InnerBlocks.ButtonBlockAppender />
-				}
-				__experimentalTagName="div"
-				__experimentalPassedProps={ {
-					className: 'wp-block-group__inner-container',
-				} }
-			/>
-		</BlockWrapper>
+			<div { ...innerBlocksProps } />
+		</TagName>
 	);
 }
 

@@ -6,6 +6,31 @@
  */
 
 /**
+ * Returns all block template file path of the current theme and its parent theme.
+ * Includes demo block template files if demo experiment is enabled.
+ *
+ * @return array $block_template_files A list of paths to all template files.
+ */
+function gutenberg_get_template_paths() {
+	$block_template_files = glob( get_stylesheet_directory() . '/block-templates/*.html' );
+	$block_template_files = is_array( $block_template_files ) ? $block_template_files : array();
+
+	if ( is_child_theme() ) {
+		$child_block_template_files = glob( get_template_directory() . '/block-templates/*.html' );
+		$child_block_template_files = is_array( $child_block_template_files ) ? $child_block_template_files : array();
+		$block_template_files       = array_merge( $block_template_files, $child_block_template_files );
+	}
+
+	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
+		$demo_block_template_files = glob( dirname( __FILE__ ) . '/demo-block-templates/*.html' );
+		$demo_block_template_files = is_array( $demo_block_template_files ) ? $demo_block_template_files : array();
+		$block_template_files      = array_merge( $block_template_files, $demo_block_template_files );
+	}
+
+	return $block_template_files;
+}
+
+/**
  * Registers block editor 'wp_template' post type.
  */
 function gutenberg_register_template_post_type() {
@@ -177,6 +202,13 @@ apply_filters( 'rest_wp_template_collection_params', 'filter_rest_wp_template_co
  * @return array Filtered $args.
  */
 function filter_rest_wp_template_query( $args, $request ) {
+	// Create auto-drafts for each theme template files.
+	$block_template_files = gutenberg_get_template_paths();
+	foreach ( $block_template_files as $path ) {
+		$template_type = basename( $path, '.html' );
+		gutenberg_find_template_post_and_parts( $template_type, array( $template_type ) );
+	}
+
 	if ( $request['resolved'] ) {
 		$template_ids   = array( 0 ); // Return nothing by default (the 0 is needed for `post__in`).
 		$template_types = $request['slug'] ? $request['slug'] : get_template_types();

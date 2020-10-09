@@ -17,6 +17,7 @@ A very simple block-based theme is structured like so:
 ```
 theme
 |__ style.css
+|__ experimental-theme.json
 |__ functions.php
 |__ block-templates
     |__ index.html
@@ -30,7 +31,7 @@ theme
     |__ ...
 ```
 
-The difference with existing WordPress themes is that the different templates in the template hierarchy, and template parts, are block templates instead of php files.
+The difference with existing WordPress themes is that the different templates in the template hierarchy, and template parts, are block templates instead of php files. In addition, this example includes an [`experimental-theme.json`](/docs/designers-developers/developers/themes/theme-json.md) file for some styles.  
 
 ## What is a block template?
 
@@ -111,17 +112,21 @@ As we're still early in the process, the number of blocks specifically dedicated
 - Post Title
 - Post Content
 - Post Author
+- Post Comment
+- Post Comment Author
+- Post Comment Date
 - Post Comments
-- Post CommentsCount
-- Post CommentsForm
+- Post Comments Count
+- Post Comments Form
 - Post Date
 - Post Excerpt
 - Post Featured Image
+- Post Hierarchical Terms
 - Post Tags
 
 ## Styling
 
-One of the most important aspects of themes (if not the most important) is the styling. While initially you'll be able to provide styles and enqueue them using the same hooks themes have always used, this is an area that is still [being explored](https://github.com/WordPress/gutenberg/issues/9534).
+One of the most important aspects of themes (if not the most important) is the styling. While initially you'll be able to provide styles and enqueue them using the same hooks themes have always used, the [Global Styles](/docs/designers-developers/developers/themes/theme-json.md) effort will provide a scaffolding for adding many theme styles in the future. 
 
 ## Resources
 

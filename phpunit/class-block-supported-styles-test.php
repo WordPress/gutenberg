@@ -143,7 +143,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalColor' => true,
+				'color' => true,
 			),
 			'render_callback' => true,
 		);
@@ -175,7 +175,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalColor' => true,
+				'color' => true,
 			),
 			'render_callback' => true,
 		);
@@ -212,8 +212,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalColor' => array(
-					'linkColor' => true,
+				'color' => array(
+					'link' => true,
 				),
 			),
 			'render_callback' => true,
@@ -243,8 +243,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalColor' => array(
-					'linkColor' => true,
+				'color' => array(
+					'link' => true,
 				),
 			),
 			'render_callback' => true,
@@ -274,7 +274,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalColor' => array(
+				'color' => array(
 					'gradients' => true,
 				),
 			),
@@ -305,7 +305,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalColor' => array(
+				'color' => array(
 					'gradients' => true,
 				),
 			),
@@ -372,7 +372,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalFontSize' => true,
+				'fontSize' => true,
 			),
 			'render_callback' => true,
 		);
@@ -401,7 +401,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalFontSize' => true,
+				'fontSize' => true,
 			),
 			'render_callback' => true,
 		);
@@ -458,7 +458,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalLineHeight' => true,
+				'lineHeight' => true,
 			),
 			'render_callback' => true,
 		);
@@ -570,13 +570,13 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalColor'      => array(
+				'color'      => array(
 					'gradients' => true,
-					'linkColor' => true,
+					'link'      => true,
 				),
-				'__experimentalFontSize'   => true,
-				'__experimentalLineHeight' => true,
-				'align'                    => true,
+				'fontSize'   => true,
+				'lineHeight' => true,
+				'align'      => true,
 			),
 			'render_callback' => true,
 		);
@@ -618,7 +618,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalFontSize' => true,
+				'fontSize' => true,
 			),
 			'render_callback' => true,
 		);
@@ -659,13 +659,13 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes' => array(),
 			'supports'   => array(
-				'align'                    => true,
-				'__experimentalColor'      => array(
+				'align'      => true,
+				'color'      => array(
 					'gradients' => true,
-					'linkColor' => true,
+					'link'      => true,
 				),
-				'__experimentalFontSize'   => true,
-				'__experimentalLineHeight' => true,
+				'fontSize'   => true,
+				'lineHeight' => true,
 			),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
