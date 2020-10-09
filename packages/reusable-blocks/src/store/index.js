@@ -17,8 +17,10 @@ import { STORE_KEY } from './constants';
  *
  * @type {Object}
  */
-export default registerStore( STORE_KEY, {
+export const storeConfig = {
 	actions,
 	controls,
 	reducer: () => {},
-} );
+};
+
+export default registerStore( STORE_KEY, storeConfig );
