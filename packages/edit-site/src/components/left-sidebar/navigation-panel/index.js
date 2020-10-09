@@ -71,7 +71,7 @@ const NavigationPanel = () => {
 			? `${ templateType }-${ templateId }`
 			: `${ templateType }-${ templatePartId }`;
 	if ( activeMenu === 'content' && page ) {
-		activeItem = page.path;
+		activeItem = `content-${ page.path }`;
 	}
 
 	return (

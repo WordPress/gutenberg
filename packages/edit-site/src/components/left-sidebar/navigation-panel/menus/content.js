@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 import NavigationEntityItems from '../navigation-entity-items';
 
 const pathKeyExtractor = ( { entity: { link } } ) =>
-	getPathAndQueryString( link );
+	`content-${ getPathAndQueryString( link ) }`;
 
 export default function ContentMenu( { onChangePage } ) {
 	const onPageSelect = ( { type, slug, link, id }, item ) => {
