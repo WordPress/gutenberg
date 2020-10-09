@@ -17,6 +17,7 @@ import {
 	PanelRow,
 	RangeControl,
 	ResizableBox,
+	Spinner,
 	ToggleControl,
 	withNotices,
 	__experimentalBoxControl as BoxControl,
@@ -25,13 +26,13 @@ import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
-	InnerBlocks,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	withColors,
 	ColorPalette,
 	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
@@ -40,6 +41,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
+import { isBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -259,6 +261,7 @@ function CoverEdit( {
 		setGradient,
 	} = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes );
+	const isBlogUrl = isBlobURL( url );
 
 	const toggleParallax = () => {
 		setAttributes( {
@@ -427,6 +430,12 @@ function CoverEdit( {
 	);
 
 	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-cover__inner-container',
+		},
+		{ template: INNER_BLOCKS_TEMPLATE }
+	);
 
 	if ( ! hasBackground ) {
 		const placeholderIcon = <BlockIcon icon={ icon } />;
@@ -478,6 +487,7 @@ function CoverEdit( {
 		{
 			'is-dark-theme': isDark,
 			'has-background-dim': dimRatio !== 0,
+			'is-transient': isBlogUrl,
 			'has-parallax': hasParallax,
 			[ overlayColor.class ]: overlayColor.class,
 			'has-background-gradient': gradientValue,
@@ -549,13 +559,8 @@ function CoverEdit( {
 						style={ { objectPosition: positionValue } }
 					/>
 				) }
-				<InnerBlocks
-					__experimentalTagName="div"
-					__experimentalPassedProps={ {
-						className: 'wp-block-cover__inner-container',
-					} }
-					template={ INNER_BLOCKS_TEMPLATE }
-				/>
+				{ isBlogUrl && <Spinner /> }
+				<div { ...innerBlocksProps } />
 			</div>
 		</>
 	);

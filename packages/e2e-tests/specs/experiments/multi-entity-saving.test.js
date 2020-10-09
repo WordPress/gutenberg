@@ -15,7 +15,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import {
 	useExperimentalFeatures,
-	openNavigation,
+	navigationPanel,
 } from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
@@ -221,7 +221,6 @@ describe( 'Multi-entity save flow', () => {
 
 	describe( 'Site Editor', () => {
 		// Selectors - Site editor specific.
-		const demoTemplateSelector = '//button[contains(., "front-page")]';
 		const saveSiteSelector = '.edit-site-save-button__button';
 		const activeSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=false]`;
 		const disabledSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=true]`;
@@ -235,11 +234,10 @@ describe( 'Multi-entity save flow', () => {
 			await visitAdminPage( 'admin.php', query );
 
 			// Ensure we are on 'front-page' demo template.
-			await openNavigation();
-			const demoTemplateButton = await page.waitForXPath(
-				demoTemplateSelector
-			);
-			await demoTemplateButton.click();
+			await navigationPanel.open();
+			await navigationPanel.backToRoot();
+			await navigationPanel.navigate( 'Templates' );
+			await navigationPanel.clickItemByText( 'Front page' );
 
 			// Insert a new template part placeholder.
 			await insertBlock( 'Template Part' );
