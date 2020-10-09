@@ -63,67 +63,65 @@ function InterfaceSkeleton( {
 				'interface-interface-skeleton'
 			) }
 		>
-			<div className="interface-interface-skeleton__layout">
-				{ !! navigationSidebar && (
+			{ !! navigationSidebar && (
+				<div
+					className="interface-interface-skeleton__navigation-sidebar"
+					role="region"
+					aria-label={ mergedLabels.navigationSidebar }
+				>
+					{ navigationSidebar }
+				</div>
+			) }
+			<div className="interface-interface-skeleton__site">
+				{ !! header && (
 					<div
-						className="interface-interface-skeleton__navigation-sidebar"
+						className="interface-interface-skeleton__header"
 						role="region"
-						aria-label={ mergedLabels.navigationSidebar }
+						aria-label={ mergedLabels.header }
+						tabIndex="-1"
 					>
-						{ navigationSidebar }
+						{ header }
 					</div>
 				) }
-				<div className="interface-interface-skeleton__site">
-					{ !! header && (
+				<div className="interface-interface-skeleton__body">
+					{ !! leftSidebar && (
 						<div
-							className="interface-interface-skeleton__header"
+							className="interface-interface-skeleton__left-sidebar"
 							role="region"
-							aria-label={ mergedLabels.header }
+							aria-label={ mergedLabels.leftSidebar }
 							tabIndex="-1"
 						>
-							{ header }
+							{ leftSidebar }
 						</div>
 					) }
-					<div className="interface-interface-skeleton__body">
-						{ !! leftSidebar && (
-							<div
-								className="interface-interface-skeleton__left-sidebar"
-								role="region"
-								aria-label={ mergedLabels.leftSidebar }
-								tabIndex="-1"
-							>
-								{ leftSidebar }
-							</div>
-						) }
+					<div
+						className="interface-interface-skeleton__content"
+						role="region"
+						aria-label={ mergedLabels.body }
+						tabIndex="-1"
+					>
+						{ content }
+					</div>
+					{ !! sidebar && (
 						<div
-							className="interface-interface-skeleton__content"
+							className="interface-interface-skeleton__sidebar"
 							role="region"
-							aria-label={ mergedLabels.body }
+							aria-label={ mergedLabels.sidebar }
 							tabIndex="-1"
 						>
-							{ content }
+							{ sidebar }
 						</div>
-						{ !! sidebar && (
-							<div
-								className="interface-interface-skeleton__sidebar"
-								role="region"
-								aria-label={ mergedLabels.sidebar }
-								tabIndex="-1"
-							>
-								{ sidebar }
-							</div>
-						) }
-						{ !! actions && (
-							<div
-								className="interface-interface-skeleton__actions"
-								role="region"
-								aria-label={ mergedLabels.actions }
-								tabIndex="-1"
-							>
-								{ actions }
-							</div>
-						) }
-					</div>
+					) }
+					{ !! actions && (
+						<div
+							className="interface-interface-skeleton__actions"
+							role="region"
+							aria-label={ mergedLabels.actions }
+							tabIndex="-1"
+						>
+							{ actions }
+						</div>
+					) }
 				</div>
 			</div>
 			{ !! footer && (
