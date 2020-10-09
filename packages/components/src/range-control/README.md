@@ -230,6 +230,12 @@ The minimum value accepted. If smaller values are inserted onChange will not be 
 
 #### max
 
+The maximum value accepted. If higher values are inserted onChange will not be called and the value gets reverted when blur event fires.
+
+-   Type: `Number`
+-   Required: No
+-   Platform: Web | Mobile
+
 #### railColor
 
 Customizes the (background) color of the rail element.
@@ -237,12 +243,6 @@ Customizes the (background) color of the rail element.
 -   Type: `String`
 -   Required: No
 -   Platform: Web
-
-The maximum value accepted. If higher values are inserted onChange will not be called and the value gets reverted when blur event fires.
-
--   Type: `Number`
--   Required: No
--   Platform: Web | Mobile
 
 #### renderTooltipContent
 
