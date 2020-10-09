@@ -65,14 +65,18 @@ const NavigationPanel = () => {
 		setPage,
 	} = useDispatch( 'core/edit-site' );
 
+	let activeItem =
+		'wp_template' === templateType
+			? `${ templateType }-${ templateId }`
+			: `${ templateType }-${ templatePartId }`;
+	if ( activeMenu === 'content' && page ) {
+		activeItem = page.path;
+	}
+
 	return (
 		<div className="edit-site-navigation-panel">
 			<Navigation
-				activeItem={
-					'wp_template' === templateType
-						? `${ templateType }-${ templateId }`
-						: `${ templateType }-${ templatePartId }`
-				}
+				activeItem={ activeItem }
 				activeMenu={ activeMenu }
 				onActivateMenu={ setNavigationPanelActiveMenu }
 			>
