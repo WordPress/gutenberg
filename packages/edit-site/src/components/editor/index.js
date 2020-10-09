@@ -211,7 +211,7 @@ function Editor() {
 												<SidebarComplementaryAreaFills />
 												<InterfaceSkeleton
 													labels={ interfaceLabels }
-													navigationSidebar={
+													drawer={
 														<NavigationSidebar
 															content={
 																leftSidebarContent
