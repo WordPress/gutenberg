@@ -13,7 +13,7 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
  */
 import getColorAndStyleProps from './color-props';
 
-export default function save( { attributes } ) {
+export default function save( { attributes, className } ) {
 	const {
 		borderRadius,
 		linkTarget,
@@ -31,11 +31,7 @@ export default function save( { attributes } ) {
 			'no-border-radius': borderRadius === 0,
 		}
 	);
-	const buttonWrapperStyle = {
-		width: width ? width + '%' : undefined,
-	};
 	const buttonStyle = {
-		width: width ? '100%' : undefined,
 		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 		...colorProps.style,
 	};
@@ -44,8 +40,12 @@ export default function save( { attributes } ) {
 	// if it had already been assigned, for the sake of backward-compatibility.
 	// A title will no longer be assigned for new or updated button block links.
 
+	const wrapperClasses = classnames( className, {
+		[ `wp-block-button__width-${ width }` ]: width,
+	} );
+
 	return (
-		<div { ...useBlockProps.save() } style={ buttonWrapperStyle }>
+		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
 			<RichText.Content
 				tagName="a"
 				className={ buttonClasses }
