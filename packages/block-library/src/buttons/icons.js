@@ -3,7 +3,7 @@
  */
 import { Path, SVG } from '@wordpress/components';
 
-export const justifyLeftIcon = (
+export const contentJustificationLeftIcon = (
 	<SVG
 		width="20"
 		height="20"
@@ -14,7 +14,7 @@ export const justifyLeftIcon = (
 	</SVG>
 );
 
-export const justifyCenterIcon = (
+export const contentJustificationCenterIcon = (
 	<SVG
 		width="20"
 		height="20"
@@ -25,7 +25,7 @@ export const justifyCenterIcon = (
 	</SVG>
 );
 
-export const justifyRightIcon = (
+export const contentJustificationRightIcon = (
 	<SVG
 		width="20"
 		height="20"
