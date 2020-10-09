@@ -3,6 +3,7 @@
  */
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import {
 	BlockContextProvider,
 	InnerBlocks,
@@ -27,11 +28,13 @@ export default function QueryLoopEdit( {
 			perPage,
 			offset,
 			categoryIds,
+			postType,
 			tagIds = [],
 			order,
 			orderBy,
 			author,
 			search,
+			exclude,
 		} = {},
 		queryContext,
 	},
@@ -57,10 +60,13 @@ export default function QueryLoopEdit( {
 			if ( search ) {
 				query.search = search;
 			}
+			if ( exclude?.length ) {
+				query.exclude = exclude;
+			}
 			return {
 				posts: select( 'core' ).getEntityRecords(
 					'postType',
-					'post',
+					postType,
 					query
 				),
 				blocks: select( 'core/block-editor' ).getBlocks( clientId ),
@@ -77,6 +83,8 @@ export default function QueryLoopEdit( {
 			clientId,
 			author,
 			search,
+			postType,
+			exclude,
 		]
 	);
 
@@ -89,6 +97,10 @@ export default function QueryLoopEdit( {
 		[ posts ]
 	);
 	const blockProps = useBlockProps();
+
+	if ( ! posts?.length ) {
+		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
+	}
 
 	return (
 		<div { ...blockProps }>

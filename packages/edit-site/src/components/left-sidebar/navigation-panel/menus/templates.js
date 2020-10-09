@@ -5,6 +5,7 @@ import {
 	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -31,10 +32,23 @@ export default function TemplatesMenu( { onActivateItem } ) {
 	);
 
 	return (
-		<NavigationMenu menu="templates" title="Templates" parentMenu="root">
-			<NavigationItem navigateToMenu="templates-all" title="All" />
-			<NavigationItem navigateToMenu="templates-pages" title="Pages" />
-			<NavigationItem navigateToMenu="templates-posts" title="Posts" />
+		<NavigationMenu
+			menu="templates"
+			title={ __( 'Templates' ) }
+			parentMenu="root"
+		>
+			<NavigationItem
+				navigateToMenu="templates-all"
+				title={ _x( 'All', 'all templates' ) }
+			/>
+			<NavigationItem
+				navigateToMenu="templates-pages"
+				title={ __( 'Pages' ) }
+			/>
+			<NavigationItem
+				navigateToMenu="templates-posts"
+				title={ __( 'Posts' ) }
+			/>
 
 			<TemplateNavigationItems
 				templates={ generalTemplates }

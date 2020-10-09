@@ -79,8 +79,8 @@ async function waitForPreviewNavigation( previewPage ) {
  */
 async function toggleCustomFieldsOption( shouldBeChecked ) {
 	const checkboxXPath =
-		'//*[contains(@class, "edit-post-options-modal")]//label[contains(text(), "Custom fields")]';
-	await clickOnMoreMenuItem( 'Options' );
+		'//*[contains(@class, "edit-post-preferences-modal")]//label[contains(text(), "Custom fields")]';
+	await clickOnMoreMenuItem( 'Preferences' );
 	await page.waitForXPath( checkboxXPath );
 	const [ checkboxHandle ] = await page.$x( checkboxXPath );
 
@@ -102,7 +102,7 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 		return;
 	}
 
-	await clickOnCloseModalButton( '.edit-post-options-modal' );
+	await clickOnCloseModalButton( '.edit-post-preferences-modal' );
 }
 
 describe( 'Preview', () => {
@@ -268,6 +268,8 @@ describe( 'Preview with Custom Fields enabled', () => {
 	it( 'displays edits to the post title and content in the preview', async () => {
 		const editorPage = page;
 
+		// Make sure input is mounted in editor before adding content.
+		await editorPage.waitForSelector( '.editor-post-title__input' );
 		// Add an initial title and content.
 		await editorPage.type( '.editor-post-title__input', 'title 1' );
 		await editorPage.keyboard.press( 'Tab' );

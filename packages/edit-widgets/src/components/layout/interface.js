@@ -8,6 +8,7 @@ import { __experimentalLibrary as Library } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { InterfaceSkeleton, ComplementaryArea } from '@wordpress/interface';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -16,6 +17,15 @@ import Header from '../header';
 import WidgetAreasBlockEditorContent from '../widget-areas-block-editor-content';
 import PopoverWrapper from './popover-wrapper';
 import useWidgetLibraryInsertionPoint from '../../hooks/use-widget-library-insertion-point';
+
+const interfaceLabels = {
+	/* translators: accessibility text for the widgets screen top bar landmark region. */
+	header: __( 'Widgets top bar' ),
+	/* translators: accessibility text for the widgets screen content landmark region. */
+	body: __( 'Widgets and blocks' ),
+	/* translators: accessibility text for the widgets screen settings landmark region. */
+	sidebar: __( 'Widgets settings' ),
+};
 
 function Interface( { blockEditorSettings } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
@@ -47,6 +57,7 @@ function Interface( { blockEditorSettings } ) {
 
 	return (
 		<InterfaceSkeleton
+			labels={ interfaceLabels }
 			header={ <Header /> }
 			leftSidebar={
 				isInserterOpened && (

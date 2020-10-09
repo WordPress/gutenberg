@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import {
 	__experimentalNavigation as Navigation,
 	__experimentalNavigationMenu as NavigationMenu,
@@ -24,31 +24,38 @@ export const {
 } = createSlotFill( 'EditSiteNavigationPanelPreview' );
 
 const NavigationPanel = () => {
-	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 	const ref = useRef();
 
 	useEffect( () => {
-		ref.current.focus();
+		if ( ref.current ) {
+			ref.current.focus();
+		}
 	}, [ ref ] );
 
-	const { templateId, templatePartId, templateType } = useSelect(
+	const { templateId, templatePartId, templateType, activeMenu } = useSelect(
 		( select ) => {
 			const {
 				getTemplateId,
 				getTemplatePartId,
 				getTemplateType,
+				getNavigationPanelActiveMenu,
 			} = select( 'core/edit-site' );
 
 			return {
 				templateId: getTemplateId(),
 				templatePartId: getTemplatePartId(),
 				templateType: getTemplateType(),
+				activeMenu: getNavigationPanelActiveMenu(),
 			};
 		},
 		[]
 	);
 
-	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
+	const {
+		setTemplate,
+		setTemplatePart,
+		setNavigationPanelActiveMenu,
+	} = useDispatch( 'core/edit-site' );
 
 	return (
 		<div className="edit-site-navigation-panel">
@@ -58,7 +65,8 @@ const NavigationPanel = () => {
 						? `${ templateType }-${ templateId }`
 						: `${ templateType }-${ templatePartId }`
 				}
-				onActivateMenu={ setActiveMenu }
+				activeMenu={ activeMenu }
+				onActivateMenu={ setNavigationPanelActiveMenu }
 			>
 				{ activeMenu === 'root' && (
 					<NavigationBackButton
@@ -69,14 +77,14 @@ const NavigationPanel = () => {
 					/>
 				) }
 
-				<NavigationMenu title="Theme">
+				<NavigationMenu title={ __( 'Theme' ) }>
 					<NavigationItem
-						title="Templates"
+						title={ __( 'Templates' ) }
 						navigateToMenu="templates"
 					/>
 
 					<NavigationItem
-						title="Template parts"
+						title={ __( 'Template Parts' ) }
 						navigateToMenu="template-parts"
 					/>
 
