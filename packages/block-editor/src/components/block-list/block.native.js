@@ -146,8 +146,8 @@ class BlockListBlock extends Component {
 		);
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
-		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 
+		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isScreenWidthEqual = blockWidth === screenWidth;
 
@@ -263,7 +263,6 @@ export default compose( [
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
 			hasSelectedInnerBlock,
-			getBlockAttributes,
 		} = select( 'core/block-editor' );
 
 		const order = getBlockIndex( clientId, rootClientId );
@@ -278,7 +277,6 @@ export default compose( [
 
 		const parents = getBlockParents( clientId, true );
 		const parentId = parents[ 0 ] || '';
-		const parentBlockAlignement = getBlockAttributes( parentId )?.align;
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
@@ -306,7 +304,6 @@ export default compose( [
 			isDescendantOfParentSelected ||
 			isParentSelected ||
 			parentId === '';
-		const hasParents = !! parents.length;
 
 		return {
 			icon,
@@ -321,8 +318,6 @@ export default compose( [
 			isParentSelected,
 			firstToSelectId,
 			isTouchable,
-			hasParents,
-			parentBlockAlignement,
 			wrapperProps: getWrapperProps(
 				attributes,
 				blockType.getEditWrapperProps

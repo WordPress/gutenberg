@@ -121,19 +121,16 @@ export class BlockListItem extends Component {
 			shouldShowInsertionPointAfter,
 			contentResizeMode,
 			shouldShowInnerBlockAppender,
-			parentBlockAlignment,
 			parentWidth,
 			...restProps
 		} = this.props;
-
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
 
 		return (
 			<ReadableContentView
 				align={ blockAlignment }
-				parentBlockAlignment={ parentBlockAlignment }
-				style={ [ readableContentViewStyle ] }
+				style={ readableContentViewStyle }
 				parentWidth={ parentWidth }
 			>
 				<View
@@ -172,7 +169,6 @@ export default compose( [
 				getSettings,
 				getBlockParents,
 				__unstableGetBlockWithoutInnerBlocks,
-				getSelectedBlockClientId,
 			} = select( 'core/block-editor' );
 
 			const blockClientIds = getBlockOrder( rootClientId );
@@ -210,10 +206,6 @@ export default compose( [
 				parentBlock?.attributes || {};
 			const { name: parentBlockName } = parentBlock || {};
 
-			const selectedBlockClientId = getSelectedBlockClientId();
-
-			const isSelected = selectedBlockClientId === clientId;
-
 			return {
 				shouldShowInsertionPointBefore,
 				shouldShowInsertionPointAfter,
@@ -222,7 +214,6 @@ export default compose( [
 				blockAlignment: align,
 				parentBlockAlignment,
 				blockName: name,
-				isSelected,
 				parentBlockName,
 			};
 		}

@@ -43,8 +43,8 @@ function GroupEdit( {
 				style={ [
 					( isEqualWidth || isFullWidth || isParentFullWidth ) &&
 						( hasInnerBlocks
-							? styles.columnAppender
-							: styles.widerColumnAppender ),
+							? styles.groupAppender
+							: styles.wideGroupAppender ),
 				] }
 			>
 				<InnerBlocks.ButtonBlockAppender />
@@ -100,13 +100,8 @@ export default compose( [
 		const parentId = getBlockRootClientId( clientId );
 		const parentBlockAlignment = getBlockAttributes( parentId )?.align;
 
-		const isParentSelected =
-			selectedBlockClientId && selectedBlockClientId === parentId;
-
 		return {
-			isParentSelected,
 			isSelected,
-			parentId,
 			hasInnerBlocks: !! ( block && block.innerBlocks.length ),
 			parentBlockAlignment,
 		};
