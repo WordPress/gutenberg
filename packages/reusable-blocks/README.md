@@ -89,6 +89,15 @@ function MyConvertToReusableButton( { clientId } ) {
         </button>
     );
 }
+
+function MyDeleteReusableBlockButton( { id } ) {
+    const { __experimentalDeleteReusableBlock } = useDispatch( 'core/reusable-blocks' );
+    return (
+        <button onClick={() => __experimentalDeleteReusableBlock( id )} >
+            Delete reusable block
+        </button>
+    );
+}
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
