@@ -65,6 +65,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Term_Search_Handler' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-term-search-handler.php';
 	}
+	if ( ! class_exists( 'WP_REST_Batch_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-batch-controller.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/

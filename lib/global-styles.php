@@ -289,7 +289,7 @@ function gutenberg_experimental_global_styles_get_theme_support_settings() {
 		}
 		$theme_settings['global']['settings']['typography']['customLineHeight'] = true;
 	}
-	if ( get_theme_support( 'experimental-custom-spacing' ) ) {
+	if ( get_theme_support( 'custom-spacing' ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['spacing'] ) ) {
 			$theme_settings['global']['settings']['spacing'] = array();
 		}
