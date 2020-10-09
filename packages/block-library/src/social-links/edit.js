@@ -30,9 +30,8 @@ export function SocialLinksEdit( props ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
-		placeholder={ SocialPlaceholder }
+		placeholder: SocialPlaceholder,
 		templateLock: false,
-		template: TEMPLATE,
 		__experimentalAppenderTagName: 'li',
 	} );
 	return (
