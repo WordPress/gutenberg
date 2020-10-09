@@ -7,7 +7,7 @@
 		border-radius: 0;
 		display: flex;
 		position: absolute;
-		z-index: 31;
+		z-index: z-index(".edit-site-navigation-toggle");
 		height: $header-height + $border-width; // Cover header border
 		width: $header-height;
 	}
