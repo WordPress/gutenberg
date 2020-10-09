@@ -35,7 +35,7 @@ export default function htmlFormattingRemover( node ) {
 	let parent = node;
 	while ( ( parent = parent.parentNode ) ) {
 		if (
-			parent.nodeType === window.Node.ELEMENT_NODE &&
+			parent.nodeType === parent.ELEMENT_NODE &&
 			parent.nodeName === 'PRE'
 		) {
 			return;

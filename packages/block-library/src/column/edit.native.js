@@ -120,7 +120,7 @@ function ColumnEdit( {
 						value={ columnWidths[ selectedColumnIndex ] }
 						onChange={ ( value ) => setTempWidth( value ) }
 						onComplete={ onWidthChange }
-						toFixed={ 1 }
+						decimalNum={ 1 }
 						rangePreview={
 							<ColumnsPreview
 								columnWidths={ columnWidths }

@@ -15,6 +15,9 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Site Title' ),
+	description: __(
+		'Displays and allows editing the name of the site. The site title usually appears in the browser title bar, in search results, and more. Also available in Settings > General.'
+	),
 	icon,
 	edit,
 };

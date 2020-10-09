@@ -65,6 +65,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Term_Search_Handler' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-term-search-handler.php';
 	}
+	if ( ! class_exists( 'WP_REST_Batch_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-batch-controller.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/
@@ -113,7 +116,6 @@ require dirname( __FILE__ ) . '/widgets.php';
 require dirname( __FILE__ ) . '/navigation.php';
 require dirname( __FILE__ ) . '/navigation-page.php';
 require dirname( __FILE__ ) . '/experiments-page.php';
-require dirname( __FILE__ ) . '/customizer.php';
 require dirname( __FILE__ ) . '/global-styles.php';
 require dirname( __FILE__ ) . '/block-supports/index.php';
 require dirname( __FILE__ ) . '/block-supports/align.php';

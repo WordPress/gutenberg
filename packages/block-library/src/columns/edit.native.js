@@ -25,6 +25,7 @@ import { withDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState, useMemo } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
+import { columns } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
@@ -152,7 +153,7 @@ function ColumnsEditContainer( {
 					updateInnerColumnWidth( tempWidth, column.clientId )
 				}
 				cellContainerStyle={ styles.cellContainerStyle }
-				toFixed={ 1 }
+				decimalNum={ 1 }
 				rangePreview={
 					<ColumnsPreview
 						columnWidths={ columnWidthsValues }
@@ -178,7 +179,7 @@ function ColumnsEditContainer( {
 				<PanelBody title={ __( 'Columns Settings' ) }>
 					<RangeControl
 						label={ __( 'Number of columns' ) }
-						icon="columns"
+						icon={ columns }
 						value={ columnCount }
 						onChange={ ( value ) =>
 							updateColumns( columnCount, value )

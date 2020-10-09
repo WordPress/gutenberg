@@ -8,11 +8,7 @@ import { find, includes, get, hasIn, compact, uniq } from 'lodash';
  */
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
-import {
-	apiFetch,
-	select,
-	__unstableSyncSelect,
-} from '@wordpress/data-controls';
+import { apiFetch, select, syncSelect } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -95,7 +91,7 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 		// The resolution cache won't consider query as reusable based on the
 		// fields, so it's tested here, prior to initiating the REST request,
 		// and without causing `getEntityRecords` resolution to occur.
-		const hasRecords = yield __unstableSyncSelect(
+		const hasRecords = yield syncSelect(
 			'core',
 			'hasEntityRecords',
 			kind,

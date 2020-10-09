@@ -10,6 +10,7 @@ export const WIDE_ALIGNMENTS = {
 		'core/image',
 	],
 	innerContainers: [ 'core/group', 'core/columns', 'core/column' ],
+	excludeBlocks: [],
 };
 
 export const ALIGNMENT_BREAKPOINTS = {

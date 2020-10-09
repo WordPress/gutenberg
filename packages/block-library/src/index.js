@@ -39,7 +39,6 @@ import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
-import * as legacyWidget from './legacy-widget';
 import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
@@ -62,7 +61,6 @@ import * as tagCloud from './tag-cloud';
 import * as classic from './classic';
 import * as socialLinks from './social-links';
 import * as socialLink from './social-link';
-import * as widgetArea from './widget-area';
 
 // Full Site Editing Blocks
 import * as siteLogo from './site-logo';
@@ -192,8 +190,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 				const { __experimentalEnableFullSiteEditing } = settings;
 
 				[
-					widgetArea,
-					legacyWidget,
 					navigation,
 					navigationLink,
 
