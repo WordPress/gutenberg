@@ -73,7 +73,7 @@ This package also provides convenient utilities for managing reusable blocks thr
 
 ```js
 function MyConvertToStaticButton( { clientId } ) {
-    const { __experimentalConvertBlockToStatic } = useDispatch('@wordpress/reusable-blocks');
+    const { __experimentalConvertBlockToStatic } = useDispatch( 'core/reusable-blocks' );
     return (
         <button onClick={() => __experimentalConvertBlockToStatic( clientId )} >
             Convert to static
@@ -82,7 +82,7 @@ function MyConvertToStaticButton( { clientId } ) {
 }
 
 function MyConvertToReusableButton( { clientId } ) {
-    const { __experimentalConvertBlocksToReusable } = useDispatch('@wordpress/reusable-blocks');
+    const { __experimentalConvertBlocksToReusable } = useDispatch( 'core/reusable-blocks' );
     return (
         <button onClick={() => __experimentalConvertBlocksToReusable( [ clientId ] )} >
             Convert to reusable
