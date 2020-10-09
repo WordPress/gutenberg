@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,7 +24,7 @@ export default function TemplateDetails( { template } ) {
 				<p>
 					{ sprintf(
 						/* translators: %s: Name of the template. */
-						_x( 'Name: %s' ),
+						__( 'Name: %s' ),
 						title
 					) }
 				</p>
@@ -33,7 +33,7 @@ export default function TemplateDetails( { template } ) {
 				<p>
 					{ sprintf(
 						/* translators: %s: Description of the template. */
-						_x( 'Description: %s' ),
+						__( 'Description: %s' ),
 						description
 					) }
 				</p>
