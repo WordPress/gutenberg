@@ -87,12 +87,15 @@ export default function useEditorFeature( featurePath ) {
 				return experimentalFeature;
 			}
 
-			// 3 - Fall back to block support.
+			// 3 - Fall back for typography.dropCap:
 			// This is only necessary to support typography.dropCap.
 			// when __experimentalFeatures are not present (core without plugin).
 			// To remove when __experimentalFeatures are ported to core.
-			const { getBlockSupport } = select( 'core/blocks' );
-			return getBlockSupport( blockName, featurePath );
+			if ( featurePath === 'typography.dropCap' ) {
+				return true;
+			}
+
+			return experimentalFeature;
 		},
 		[ blockName, featurePath ]
 	);
