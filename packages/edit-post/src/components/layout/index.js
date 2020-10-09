@@ -43,7 +43,7 @@ import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
-import OptionsModal from '../options-modal';
+import PreferencesModal from '../preferences-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
@@ -290,7 +290,7 @@ function Layout() {
 					} }
 				/>
 				<ManageBlocksModal />
-				<OptionsModal />
+				<PreferencesModal />
 				<KeyboardShortcutHelpModal />
 				<WelcomeGuide />
 				<Popover.Slot />

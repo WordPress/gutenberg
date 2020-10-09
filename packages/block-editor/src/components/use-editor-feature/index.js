@@ -65,8 +65,22 @@ export default function useEditorFeature( featurePath ) {
 
 	const setting = useSelect(
 		( select ) => {
-			// 1 - Use deprecated settings, if available.
 			const settings = select( 'core/block-editor' ).getSettings();
+
+			// 1 - Use __experimental features, if available.
+			// We cascade to the global value if the block one is not available.
+			//
+			// TODO: make it work for blocks that define multiple selectors
+			// such as core/heading or core/post-title.
+			const globalPath = `__experimentalFeatures.global.${ featurePath }`;
+			const blockPath = `__experimentalFeatures.${ blockName }.${ featurePath }`;
+			const experimentalFeaturesResult =
+				get( settings, blockPath ) ?? get( settings, globalPath );
+			if ( experimentalFeaturesResult !== undefined ) {
+				return experimentalFeaturesResult;
+			}
+
+			// 2 - Use deprecated settings, otherwise.
 			const deprecatedSettingsValue = deprecatedFlags[ featurePath ]
 				? deprecatedFlags[ featurePath ]( settings )
 				: undefined;
@@ -74,14 +88,11 @@ export default function useEditorFeature( featurePath ) {
 				return deprecatedSettingsValue;
 			}
 
-			// 2 - Use __experimental features otherwise.
-			// We cascade to the global value if the block one is not available.
-			//
-			// TODO: make it work for blocks that define multiple selectors
-			// such as core/heading or core/post-title.
-			const globalPath = `__experimentalFeatures.global.${ featurePath }`;
-			const blockPath = `__experimentalFeatures.${ blockName }.${ featurePath }`;
-			return get( settings, blockPath ) ?? get( settings, globalPath );
+			// 3 - Fall back for typography.dropCap:
+			// This is only necessary to support typography.dropCap.
+			// when __experimentalFeatures are not present (core without plugin).
+			// To remove when __experimentalFeatures are ported to core.
+			return featurePath === 'typography.dropCap' ? true : undefined;
 		},
 		[ blockName, featurePath ]
 	);

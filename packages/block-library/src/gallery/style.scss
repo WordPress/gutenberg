@@ -65,6 +65,10 @@
 		}
 	}
 
+	figcaption {
+		flex-grow: 1;
+	}
+
 	// Cropped
 	&.is-cropped .blocks-gallery-image,
 	&.is-cropped .blocks-gallery-item {
