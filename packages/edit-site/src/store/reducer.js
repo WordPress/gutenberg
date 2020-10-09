@@ -174,6 +174,22 @@ export function homeTemplateId( state, action ) {
 	return state;
 }
 
+/**
+ * Reducer for navigation panel's active menu.
+ *
+ * @param {Object} state Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+function navigationPanelActiveMenu( state = 'root', action ) {
+	switch ( action.type ) {
+		case 'SET_NAVIGATION_PANEL_ACTIVE_MENU':
+			return action.menu;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	preferences,
 	deviceType,
@@ -183,4 +199,5 @@ export default combineReducers( {
 	templateType,
 	page,
 	homeTemplateId,
+	navigationPanelActiveMenu,
 } );

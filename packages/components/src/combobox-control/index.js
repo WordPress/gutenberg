@@ -6,6 +6,7 @@ import { useState, useMemo, useRef, useEffect } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { ENTER, UP, DOWN, ESCAPE } from '@wordpress/keycodes';
 import { speak } from '@wordpress/a11y';
+import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -13,6 +14,8 @@ import { speak } from '@wordpress/a11y';
 import TokenInput from '../form-token-field/token-input';
 import SuggestionsList from '../form-token-field/suggestions-list';
 import BaseControl from '../base-control';
+import Button from '../button';
+import { Flex, FlexBlock, FlexItem } from '../flex';
 
 function ComboboxControl( {
 	value,
@@ -22,6 +25,7 @@ function ComboboxControl( {
 	onFilterValueChange,
 	hideLabelFromVision,
 	help,
+	allowReset = true,
 	messages = {
 		selected: __( 'Item selected.' ),
 	},
@@ -104,11 +108,9 @@ function ComboboxControl( {
 	};
 
 	const onFocus = () => {
-		// Avoid focus loss when touching the container.
-		// TODO: TokenInput should preferably forward ref
-		inputContainer.current.input.focus();
 		setIsExpanded( true );
 		onFilterValueChange( '' );
+		setInputValue( '' );
 	};
 
 	const onBlur = () => {
@@ -120,6 +122,11 @@ function ComboboxControl( {
 		setInputValue( text );
 		onFilterValueChange( text );
 		setIsExpanded( true );
+	};
+
+	const handleOnReset = () => {
+		onChange( null );
+		inputContainer.current.input.focus();
 	};
 
 	// Announcements
@@ -158,21 +165,36 @@ function ComboboxControl( {
 			<div
 				className="components-combobox-control__suggestions-container"
 				tabIndex="-1"
-				onFocus={ onFocus }
 				onKeyDown={ onKeyDown }
 			>
-				<TokenInput
-					className="components-combobox-control__input"
-					instanceId={ instanceId }
-					ref={ inputContainer }
-					value={ isExpanded ? inputValue : currentLabel }
-					onBlur={ onBlur }
-					isExpanded={ isExpanded }
-					selectedSuggestionIndex={ matchingSuggestions.indexOf(
-						selectedSuggestion
+				<Flex>
+					<FlexBlock>
+						<TokenInput
+							className="components-combobox-control__input"
+							instanceId={ instanceId }
+							ref={ inputContainer }
+							value={ isExpanded ? inputValue : currentLabel }
+							onBlur={ onBlur }
+							onFocus={ onFocus }
+							isExpanded={ isExpanded }
+							selectedSuggestionIndex={ matchingSuggestions.indexOf(
+								selectedSuggestion
+							) }
+							onChange={ onInputChange }
+						/>
+					</FlexBlock>
+					{ allowReset && (
+						<FlexItem>
+							<Button
+								className="components-combobox-control__reset"
+								icon={ closeSmall }
+								disabled={ ! value }
+								onClick={ handleOnReset }
+								label={ __( 'Reset' ) }
+							/>
+						</FlexItem>
 					) }
-					onChange={ onInputChange }
-				/>
+				</Flex>
 				{ isExpanded && (
 					<SuggestionsList
 						instanceId={ instanceId }

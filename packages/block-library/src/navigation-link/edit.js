@@ -29,10 +29,11 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import {
@@ -239,7 +240,7 @@ function NavigationLinkEdit( {
 		};
 	}
 
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		ref: listItemRef,
 		className: classnames( {
 			'is-editing':
@@ -261,6 +262,29 @@ function NavigationLinkEdit( {
 			backgroundColor: rgbBackgroundColor,
 		},
 	} );
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: classnames( 'wp-block-navigation__container', {
+				'is-parent-of-selected-block':
+					isParentOfSelectedBlock &&
+					// Don't select as parent of selected block while dragging.
+					! isDraggingBlocks,
+			} ),
+		},
+		{
+			allowedBlocks: [ 'core/navigation-link' ],
+			renderAppender:
+				( isSelected && hasDescendants ) ||
+				( isImmediateParentOfSelectedBlock &&
+					! selectedBlockHasDescendants ) ||
+				// Show the appender while dragging to allow inserting element between item and the appender.
+				( isDraggingBlocks && hasDescendants )
+					? InnerBlocks.DefaultAppender
+					: false,
+			__experimentalAppenderTagName: 'li',
+		}
+	);
 
 	return (
 		<Fragment>
@@ -318,7 +342,7 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<li { ...blockWrapperProps }>
+			<li { ...blockProps }>
 				<div className="wp-block-navigation-link__content">
 					<RichText
 						ref={ ref }
@@ -420,31 +444,7 @@ function NavigationLinkEdit( {
 						<ItemSubmenuIcon />
 					</span>
 				) }
-				<InnerBlocks
-					allowedBlocks={ [ 'core/navigation-link' ] }
-					renderAppender={
-						( isSelected && hasDescendants ) ||
-						( isImmediateParentOfSelectedBlock &&
-							! selectedBlockHasDescendants ) ||
-						// Show the appender while dragging to allow inserting element between item and the appender.
-						( isDraggingBlocks && hasDescendants )
-							? InnerBlocks.DefaultAppender
-							: false
-					}
-					__experimentalTagName="ul"
-					__experimentalAppenderTagName="li"
-					__experimentalPassedProps={ {
-						className: classnames(
-							'wp-block-navigation__container',
-							{
-								'is-parent-of-selected-block':
-									isParentOfSelectedBlock &&
-									// Don't select as parent of selected block while dragging.
-									! isDraggingBlocks,
-							}
-						),
-					} }
-				/>
+				<ul { ...innerBlocksProps } />
 			</li>
 		</Fragment>
 	);

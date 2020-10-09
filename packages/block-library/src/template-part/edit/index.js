@@ -3,10 +3,7 @@
  */
 import { useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import {
-	BlockControls,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
-} from '@wordpress/block-editor';
+import { BlockControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	Dropdown,
 	ToolbarGroup,
@@ -69,7 +66,7 @@ export default function TemplatePartEdit( {
 		}
 	}, [ innerBlocks ] );
 
-	const blockWrapperProps = useBlockWrapperProps();
+	const blockProps = useBlockProps();
 
 	// Part of a template file, post ID already resolved.
 	const isTemplateFile = !! postId;
@@ -80,7 +77,7 @@ export default function TemplatePartEdit( {
 	const isUnresolvedTemplateFile = ! isPlaceholder && ! postId;
 
 	return (
-		<TagName { ...blockWrapperProps }>
+		<TagName { ...blockProps }>
 			{ isPlaceholder && (
 				<TemplatePartPlaceholder setAttributes={ setAttributes } />
 			) }

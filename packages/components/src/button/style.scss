@@ -307,6 +307,7 @@
 		}
 
 		&:hover:not(:disabled) {
+			color: $white;
 			background: $gray-900;
 		}
 	}

@@ -332,6 +332,10 @@ _Returns_
 
 -   `Function`: A reducer that invokes every reducer inside the reducers object, and constructs a state object with the same shape.
 
+<a name="controls" href="#controls">#</a> **controls**
+
+Undocumented declaration.
+
 <a name="createRegistry" href="#createRegistry">#</a> **createRegistry**
 
 Creates a new store registry, given an optional object of initial store

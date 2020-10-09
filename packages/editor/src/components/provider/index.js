@@ -193,6 +193,7 @@ class EditorProvider extends Component {
 				'fontSizes',
 				'gradients',
 				'hasFixedToolbar',
+				'hasReducedUI',
 				'hasPermissionsToManageWidgets',
 				'imageEditing',
 				'imageSizes',

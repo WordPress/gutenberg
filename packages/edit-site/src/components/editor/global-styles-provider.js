@@ -25,6 +25,8 @@ const EMPTY_CONTENT = '{}';
 
 const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
+	getSetting: ( context, path ) => {},
+	setSetting: ( context, path, newValue ) => {},
 	getStyleProperty: ( context, propertyName ) => {},
 	setStyleProperty: ( context, propertyName, newValue ) => {},
 	globalContext: {},
@@ -57,6 +59,18 @@ export default ( { children, baseStyles, contexts } ) => {
 	const nextValue = useMemo(
 		() => ( {
 			contexts,
+			getSetting: ( context, path ) =>
+				get( userStyles?.[ context ]?.settings, path ),
+			setSetting: ( context, path, newValue ) => {
+				const newContent = { ...userStyles };
+				let contextSettings = newContent?.[ context ]?.settings;
+				if ( ! contextSettings ) {
+					contextSettings = {};
+					set( newContent, [ context, 'settings' ], contextSettings );
+				}
+				set( contextSettings, path, newValue );
+				setContent( JSON.stringify( newContent ) );
+			},
 			getStyleProperty: ( context, propertyName ) =>
 				get(
 					userStyles?.[ context ]?.styles,
