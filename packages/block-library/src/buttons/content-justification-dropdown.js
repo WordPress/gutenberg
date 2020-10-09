@@ -52,10 +52,6 @@ export default function ContentJustificationDropdown( {
 	toggleProps,
 	value,
 } ) {
-	function applyOrUnset( align ) {
-		return () => onChange( value === align ? undefined : align );
-	}
-
 	return (
 		<DropdownMenu
 			icon={ CONTROLS[ value ]?.icon ?? DEFAULT_ICON }
@@ -65,7 +61,10 @@ export default function ContentJustificationDropdown( {
 					...CONTROLS[ allowedValue ],
 					isActive: value === allowedValue,
 					role: 'menuitemradio',
-					onClick: applyOrUnset( allowedValue ),
+					onClick: () =>
+						onChange(
+							value === allowedValue ? undefined : allowedValue
+						),
 				};
 			} ) }
 			toggleProps={ toggleProps }
