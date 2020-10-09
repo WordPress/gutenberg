@@ -210,7 +210,7 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 		);
 
 		// Ensure auto-drafts of all theme supplied template parts are created.
-		if ( wp_get_theme()->get( 'TextDomain' ) === $request['theme'] ) {
+		if ( wp_get_theme()->stylesheet === $request['theme'] ) {
 			/**
 			 * Finds all nested template part file paths in a theme's directory.
 			 *
