@@ -76,9 +76,14 @@ export const KeyboardAvoidingView = ( {
 	}
 
 	function onKeyboardWillHide( { duration, startCoordinates } ) {
+		// The startCoordinates.height is set to wrong value when we use cmd + k for hide the keyboard (Have no idea why).
+		// Because of that the `setIsKeyboardOpened` is not invoked and the state of keyboard is wrong.
+		// The keyboardIsOpenBreakpoint use 100 as a fallback if the startCoordinates.height is too small (cmd + k case)
+		const keyboardIsOpenBreakpoint =
+			startCoordinates.height > 100 ? startCoordinates.height / 3 : 100;
 		const animatedListenerId = animatedHeight.addListener(
 			( { value } ) => {
-				if ( value < startCoordinates.height / 3 ) {
+				if ( value < keyboardIsOpenBreakpoint ) {
 					setIsKeyboardOpen( false );
 				}
 			}

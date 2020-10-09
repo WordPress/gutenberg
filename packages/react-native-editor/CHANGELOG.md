@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.39.0
+
+* [***] Full-width and wide alignment support for Video, Latest-posts, Gallery, Media & text, and Pullquote block [https://github.com/WordPress/gutenberg/pull/25184/]
+
 ## 1.38.0
 
 [***] Add support for selecting user's post when configuring the link
