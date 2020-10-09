@@ -2,8 +2,8 @@
 	flex-direction: row;
 	height: $mobile-block-toolbar-height;
 	align-items: flex-start;
-	margin-left: 3px;
-	margin-right: 3px;
+	margin-left: $block-selected-margin;
+	margin-right: $block-selected-margin;
 }
 
 .toolbarFullWidth {

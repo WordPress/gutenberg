@@ -58,11 +58,11 @@
 }
 
 .columnAppender {
-	margin-left: 16px;
-	margin-right: 16px;
+	margin-left: $grid-unit-20;
+	margin-right: $grid-unit-20;
 }
 
-.widerColumnAppender {
-	margin-left: 8px;
-	margin-right: 8px;
+.wideColumnAppender {
+	margin-left: $grid-unit-10;
+	margin-right: $grid-unit-10;
 }

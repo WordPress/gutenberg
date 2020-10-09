@@ -77,7 +77,7 @@ function ColumnEdit( {
 						isScreenWidthEqual &&
 							( hasChildren
 								? styles.columnAppender
-								: styles.widerColumnAppender ),
+								: styles.wideColumnAppender ),
 					] }
 				>
 					<InnerBlocks.ButtonBlockAppender />
