@@ -13,39 +13,6 @@ import {
 	POST_UPDATE_TRANSACTION_ID,
 } from '../constants';
 
-jest.mock( '@wordpress/data-controls' );
-
-select.mockImplementation( ( ...args ) => {
-	const { select: actualSelect } = jest.requireActual(
-		'@wordpress/data-controls'
-	);
-	return actualSelect( ...args );
-} );
-
-dispatch.mockImplementation( ( ...args ) => {
-	const { dispatch: actualDispatch } = jest.requireActual(
-		'@wordpress/data-controls'
-	);
-	return actualDispatch( ...args );
-} );
-
-const apiFetchThrowError = ( error ) => {
-	apiFetch.mockClear();
-	apiFetch.mockImplementation( () => {
-		throw error;
-	} );
-};
-
-const apiFetchDoActual = () => {
-	apiFetch.mockClear();
-	apiFetch.mockImplementation( ( ...args ) => {
-		const { apiFetch: fetch } = jest.requireActual(
-			'@wordpress/data-controls'
-		);
-		return fetch( ...args );
-	} );
-};
-
 const postType = {
 	rest_base: 'posts',
 	labels: {
@@ -316,6 +283,7 @@ describe( 'Post generator actions', () => {
 			fulfillment.next( postTypeSlug );
 			fulfillment.next( postType );
 			fulfillment.next();
+			fulfillment.next( currentPost );
 		};
 		it( 'yields expected action for selecting the current post type slug', () => {
 			reset();
@@ -348,11 +316,19 @@ describe( 'Post generator actions', () => {
 			const { value } = fulfillment.next();
 			expect( value ).toEqual( select( STORE_KEY, 'getCurrentPost' ) );
 		} );
+		it( 'yields expected action object for the api fetch', () => {
+			const { value } = fulfillment.next( currentPost );
+			expect( value ).toEqual(
+				apiFetch( {
+					path: `/wp/v2/${ postType.rest_base }/${ currentPost.id }`,
+					method: 'DELETE',
+				} )
+			);
+		} );
 		describe( 'expected yields when fetch throws an error', () => {
 			it( 'yields expected action for dispatching an error notice', () => {
 				const error = { foo: 'bar', code: 'fail' };
-				apiFetchThrowError( error );
-				const { value } = fulfillment.next( currentPost );
+				const { value } = fulfillment.throw( error );
 				expect( value ).toEqual(
 					dispatch(
 						'core/notices',
@@ -366,18 +342,8 @@ describe( 'Post generator actions', () => {
 			} );
 		} );
 		describe( 'expected yields when fetch does not throw an error', () => {
-			it( 'yields expected action object for the api fetch', () => {
-				apiFetchDoActual();
-				rewind();
-				const { value } = fulfillment.next( currentPost );
-				expect( value ).toEqual(
-					apiFetch( {
-						path: `/wp/v2/${ postType.rest_base }/${ currentPost.id }`,
-						method: 'DELETE',
-					} )
-				);
-			} );
 			it( 'yields expected dispatch action for saving the post', () => {
+				rewind();
 				const { value } = fulfillment.next();
 				expect( value ).toEqual( dispatch( STORE_KEY, 'savePost' ) );
 			} );
@@ -406,7 +372,6 @@ describe( 'Post generator actions', () => {
 		} );
 		it( 'yields expected action for the api fetch call', () => {
 			const { value } = fulfillment.next( postType );
-			apiFetchDoActual();
 			// since the timestamp is a computed value we can't do a direct comparison.
 			// so we'll just see if the path has most of the value.
 			expect( value.request.path ).toEqual(
