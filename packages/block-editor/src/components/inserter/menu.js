@@ -26,6 +26,7 @@ function InserterMenu( {
 	clientId,
 	isAppender,
 	__experimentalSelectBlockOnInsert,
+	__experimentalInsertionIndex,
 	onSelect,
 	showInserterHelpPanel,
 	showMostUsedBlocks,
@@ -46,6 +47,7 @@ function InserterMenu( {
 		clientId,
 		isAppender,
 		selectBlockOnInsert: __experimentalSelectBlockOnInsert,
+		insertionIndex: __experimentalInsertionIndex,
 	} );
 	const { hasPatterns, hasReusableBlocks } = useSelect( ( select ) => {
 		const {

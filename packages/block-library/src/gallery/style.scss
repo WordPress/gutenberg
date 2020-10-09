@@ -62,6 +62,7 @@
 			font-size: 0.8em;
 			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
 			box-sizing: border-box;
+			margin: 0;
 
 			img {
 				display: inline;
@@ -132,4 +133,3 @@
 		}
 	}
 }
-

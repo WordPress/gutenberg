@@ -184,41 +184,37 @@ function LegacyWidgetEdit( {
 	);
 }
 
-export default withSelect(
-	(
-		select,
-		{ clientId, attributes: { widgetClass, referenceWidgetName } }
-	) => {
-		let widgetId = select( 'core/edit-widgets' ).getWidgetIdForClientId(
-			clientId
-		);
-		const widget = select( 'core/edit-widgets' ).getWidget( widgetId );
-		const widgetArea = select(
-			'core/edit-widgets'
-		).getWidgetAreaForClientId( clientId );
-		const editorSettings = select( 'core/block-editor' ).getSettings();
-		const {
-			availableLegacyWidgets,
-			hasPermissionsToManageWidgets,
-		} = editorSettings;
+export default withSelect( ( select, { clientId, attributes } ) => {
+	const { widgetClass, referenceWidgetName } = attributes;
+	let widgetId = select( 'core/edit-widgets' ).getWidgetIdForClientId(
+		clientId
+	);
+	const widget = select( 'core/edit-widgets' ).getWidget( widgetId );
+	const widgetArea = select( 'core/edit-widgets' ).getWidgetAreaForClientId(
+		clientId
+	);
+	const editorSettings = select( 'core/block-editor' ).getSettings();
+	const {
+		availableLegacyWidgets,
+		hasPermissionsToManageWidgets,
+	} = editorSettings;
 
-		let WPWidget;
-		if ( widgetId && availableLegacyWidgets[ widgetId ] ) {
-			WPWidget = availableLegacyWidgets[ widgetId ];
-		} else if ( widgetClass && availableLegacyWidgets[ widgetClass ] ) {
-			WPWidget = availableLegacyWidgets[ widgetClass ];
-		} else if ( referenceWidgetName ) {
-			WPWidget = availableLegacyWidgets[ referenceWidgetName ];
-			widgetId = referenceWidgetName;
-		}
-
-		return {
-			hasPermissionsToManageWidgets,
-			availableLegacyWidgets,
-			widgetId,
-			widgetAreaId: widgetArea?.id,
-			WPWidget,
-			prerenderedEditForm: widget ? widget.rendered_form : '',
-		};
+	let WPWidget;
+	if ( widgetId && availableLegacyWidgets[ widgetId ] ) {
+		WPWidget = availableLegacyWidgets[ widgetId ];
+	} else if ( widgetClass && availableLegacyWidgets[ widgetClass ] ) {
+		WPWidget = availableLegacyWidgets[ widgetClass ];
+	} else if ( referenceWidgetName ) {
+		WPWidget = availableLegacyWidgets[ referenceWidgetName ];
+		widgetId = referenceWidgetName;
 	}
-)( LegacyWidgetEdit );
+
+	return {
+		hasPermissionsToManageWidgets,
+		availableLegacyWidgets,
+		widgetId,
+		widgetAreaId: widgetArea?.id,
+		WPWidget,
+		prerenderedEditForm: widget ? widget.rendered_form : '',
+	};
+} )( LegacyWidgetEdit );

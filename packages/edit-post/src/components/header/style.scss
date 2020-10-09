@@ -34,11 +34,6 @@
 .edit-post-header__toolbar {
 	display: flex;
 	flex-grow: 1;
-	padding-left: $grid-unit-10;
-
-	@include break-small() {
-		padding-left: $grid-unit-30;
-	}
 
 	.table-of-contents {
 		display: none;

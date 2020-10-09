@@ -42,10 +42,6 @@ export const getWidget = createRegistrySelector(
 );
 
 export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
-	if ( ! hasResolvedWidgetAreas( query ) ) {
-		return null;
-	}
-
 	const query = buildWidgetAreasQuery();
 	return select( 'core' ).getEntityRecords(
 		KIND,
@@ -137,31 +133,6 @@ export const isSavingWidgetAreas = createRegistrySelector(
 );
 
 /**
- * Returns true if the navigation post related to menuId was already resolved.
- *
- * @param {number} menuId The id of menu.
- * @return {boolean} True if the navigation post related to menuId was already resolved, false otherwise.
- */
-export const hasResolvedWidgetAreas = createRegistrySelector(
-	( select, query = buildWidgetAreasQuery() ) => () => {
-		const areas = select( 'core' ).getEntityRecords(
-			KIND,
-			WIDGET_AREA_ENTITY_TYPE,
-			query
-		);
-		if ( ! areas?.length ) {
-			return select( 'core' ).hasFinishedResolution( 'getEntityRecords', [
-				KIND,
-				WIDGET_AREA_ENTITY_TYPE,
-				query,
-			] );
-		}
-
-		return true;
-	}
-);
-
-/**
  * Gets whether the widget area is opened.
  *
  * @param {Array}  state    The open state of the widget areas.
@@ -172,3 +143,14 @@ export const getIsWidgetAreaOpen = ( state, clientId ) => {
 	const { widgetAreasOpenState } = state;
 	return !! widgetAreasOpenState[ clientId ];
 };
+
+/**
+ * Returns true if the inserter is opened.
+ *
+ * @param  {Object}  state Global application state.
+ *
+ * @return {boolean} Whether the inserter is opened.
+ */
+export function isInserterOpened( state ) {
+	return state.isInserterOpened;
+}

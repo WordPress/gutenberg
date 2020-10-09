@@ -51,7 +51,7 @@ git switch -c update/my-branch
 
 **Step 4**: Make the code changes. Build, confirm, and test your change thoroughly. See [coding guidelines](/docs/contributors/coding-guidelines.md) and [testing overview](/docs/contributors/testing-overview.md) for guidance.
 
-**Step 5**: Commit your change with a [good commmit message](https://make.wordpress.org/core/handbook/best-practices/commit-messages/). This will commit your change to your local copy of the repository.
+**Step 5**: Commit your change with a [good commit message](https://make.wordpress.org/core/handbook/best-practices/commit-messages/). This will commit your change to your local copy of the repository.
 
 ```bash
 git commit -m "Your Good Commit Message" path/to/FILE
