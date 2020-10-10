@@ -85,7 +85,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void storySaveSync(MediaSelectedCallback mediaSelectedCallback) {
+            public void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback) {
             }
 
             @Override

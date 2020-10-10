@@ -49,7 +49,7 @@ import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceStoryEditedBlockCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceMediaFilesEditedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
@@ -83,8 +83,8 @@ public class WPAndroidGlueCode {
     private boolean mAppendsMultipleSelectedToSiblingBlocks = false;
 
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
-    private OnReattachQueryListener mOnReattachQueryListener;
-    private OnStorySavingReattachQueryListener mOnStorySavingReattachQueryListener;
+    private OnReattachMediaUploadQueryListener mOnReattachMediaUploadQueryListener;
+    private OnReattachMediaSavingQueryListener mOnReattachMediaSavingQueryListener;
     private OnEditorMountListener mOnEditorMountListener;
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
@@ -95,7 +95,7 @@ public class WPAndroidGlueCode {
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnStarterPageTemplatesTooltipShownEventListener mOnStarterPageTemplatesTooltipShownListener;
     private OnStoryCreatorLoadRequestListener mOnStoryCreatorLoadRequestListener;
-    private ReplaceStoryEditedBlockCallback mReplaceStoryEditedBlockCallback;
+    private ReplaceMediaFilesEditedBlockCallback mReplaceMediaFilesEditedBlockCallback;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -158,12 +158,12 @@ public class WPAndroidGlueCode {
         void onImageFullscreenPreviewClicked(String mediaUrl);
     }
 
-    public interface OnReattachQueryListener {
+    public interface OnReattachMediaUploadQueryListener {
         void onQueryCurrentProgressForUploadingMedia();
     }
 
-    public interface OnStorySavingReattachQueryListener {
-        void onQueryCurrentProgressForStoryMediaSaving();
+    public interface OnReattachMediaSavingQueryListener {
+        void onQueryCurrentProgressForSavingMedia();
     }
 
     public interface OnEditorMountListener {
@@ -278,13 +278,13 @@ public class WPAndroidGlueCode {
             @Override
             public void mediaUploadSync(MediaSelectedCallback mediaSelectedCallback) {
                 mMediaSelectedCallback = mediaSelectedCallback;
-                mOnReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
+                mOnReattachMediaUploadQueryListener.onQueryCurrentProgressForUploadingMedia();
             }
 
             @Override
-            public void storySaveSync(MediaSelectedCallback mediaSelectedCallback) {
+            public void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback) {
                 mMediaSelectedCallback = mediaSelectedCallback;
-                mOnStorySavingReattachQueryListener.onQueryCurrentProgressForStoryMediaSaving();
+                mOnReattachMediaSavingQueryListener.onQueryCurrentProgressForSavingMedia();
             }
 
             @Override
@@ -419,11 +419,11 @@ public class WPAndroidGlueCode {
 
             @Override
             public void requestStoryCreatorLoad(
-                    ReplaceStoryEditedBlockCallback replaceStoryEditedBlockCallback,
+                    ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
                     ReadableArray mediaFiles,
                     String blockId
             ) {
-                mReplaceStoryEditedBlockCallback = replaceStoryEditedBlockCallback;
+                mReplaceMediaFilesEditedBlockCallback = replaceMediaFilesEditedBlockCallback;
                 mOnStoryCreatorLoadRequestListener.onRequestStoryCreatorLoad(mediaFiles.toArrayList(), blockId);
             }
         }, mIsDarkMode);
@@ -489,8 +489,8 @@ public class WPAndroidGlueCode {
 
     public void attachToContainer(ViewGroup viewGroup,
                                   OnMediaLibraryButtonListener onMediaLibraryButtonListener,
-                                  OnReattachQueryListener onReattachQueryListener,
-                                  OnStorySavingReattachQueryListener onStorySavingReattachQueryListener,
+                                  OnReattachMediaUploadQueryListener onReattachMediaUploadQueryListener,
+                                  OnReattachMediaSavingQueryListener onReattachMediaSavingQueryListener,
                                   OnEditorMountListener onEditorMountListener,
                                   OnEditorAutosaveListener onEditorAutosaveListener,
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
@@ -508,8 +508,8 @@ public class WPAndroidGlueCode {
         contextWrapper.setBaseContext(viewGroup.getContext());
 
         mOnMediaLibraryButtonListener = onMediaLibraryButtonListener;
-        mOnReattachQueryListener = onReattachQueryListener;
-        mOnStorySavingReattachQueryListener = onStorySavingReattachQueryListener;
+        mOnReattachMediaUploadQueryListener = onReattachMediaUploadQueryListener;
+        mOnReattachMediaSavingQueryListener = onReattachMediaSavingQueryListener;
         mOnEditorMountListener = onEditorMountListener;
         mOnEditorAutosaveListener = onEditorAutosaveListener;
         mRequestExecutor = fetchExecutor;
@@ -896,8 +896,8 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onMediaFileSaveSucceeded(mediaId, mediaUrl);
     }
 
-    public void storySaveResult(final String storyFirstMediaId, final boolean success) {
-        mDeferredEventEmitter.onStorySaveResult(storyFirstMediaId, success);
+    public void mediaCollectionFinalSaveResult(final String blockFirstMediaId, final boolean success) {
+        mDeferredEventEmitter.onMediaCollectionSaveResult(blockFirstMediaId, success);
     }
 
     public void mediaModelCreatedForFile(final String oldId, final String newId, final String oldUrl) {
@@ -911,10 +911,10 @@ public class WPAndroidGlueCode {
         }
     }
 
-    public void replaceStoryEditedBlock(String mediaFiles, String blockId) {
-        if (mReplaceStoryEditedBlockCallback != null) {
-            mReplaceStoryEditedBlockCallback.replaceStoryBlock(mediaFiles, blockId);
-            mReplaceStoryEditedBlockCallback = null;
+    public void replaceMediaFilesEditedBlock(String mediaFiles, String blockId) {
+        if (mReplaceMediaFilesEditedBlockCallback != null) {
+            mReplaceMediaFilesEditedBlockCallback.replaceMediaFilesEditedBlock(mediaFiles, blockId);
+            mReplaceMediaFilesEditedBlockCallback = null;
         }
     }
 

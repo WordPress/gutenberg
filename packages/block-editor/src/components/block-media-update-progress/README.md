@@ -1,7 +1,7 @@
-StoryUpdateProgress
+BlockMediaUpdateProgress
 ===================
 
-`StoryUpdateProgress` shows a progress bar while the media files associated with a Story block are being saved and uploaded
+`BlockMediaUpdateProgress` shows a progress bar while the media files associated with a media-containing block are being saved first and uploaded later
 
 ## Usage
 
@@ -10,12 +10,12 @@ Usage example
 ```jsx
 import { ImageBackground, Text, View } from 'react-native';
 import {
-	StoryUpdateProgress,
+	BlockMediaUpdateProgress,
 } from '@wordpress/block-editor';
 
-function StoryProgress( { url, id } ) {
+function BlockUpdatingProgress( { url, id } ) {
 	return (
-		<StoryUpdateProgress
+		<BlockMediaUpdateProgress
 			mediaId={ id }
 			renderContent={ ( { isSaveFailed, retryMessage } ) => {
 				return (
@@ -40,7 +40,7 @@ function StoryProgress( { url, id } ) {
 
 ### mediaFiles
 
-A collection of media ID that identifies the current story upload.
+A collection of media ID that identifies the current colleciton of files represented in this media container block.
 
 - Type: `Array`
 - Required: Yes

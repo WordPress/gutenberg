@@ -179,8 +179,8 @@ export function mediaUploadSync() {
 	return RNReactNativeGutenbergBridge.mediaUploadSync();
 }
 
-export function storySaveSync() {
-	return RNReactNativeGutenbergBridge.storySaveSync();
+export function mediaSaveSync() {
+	return RNReactNativeGutenbergBridge.mediaSaveSync();
 }
 
 export function requestImageFailedRetryDialog( mediaId ) {

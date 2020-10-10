@@ -34,12 +34,12 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void onMediaFileUploadFailed(int mediaId);
     }
 
-    interface StorySaveEventEmitter {
+    interface MediaSaveEventEmitter {
         void onSaveMediaFileClear(String mediaId);
         void onMediaFileSaveProgress(String mediaId, float progress);
         void onMediaFileSaveSucceeded(String mediaId, String mediaUrl);
         void onMediaFileSaveFailed(String mediaId);
-        void onStorySaveResult(String storyFirstMediaId, boolean success);
+        void onMediaCollectionSaveResult(String storyFirstMediaIdInCollection, boolean success);
         void onMediaModelCreatedForFile(final String oldId, final String newId, final String oldUrl);
     }
 
@@ -47,8 +47,8 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void replaceUnsupportedBlock(String content, String blockId);
     }
 
-    interface ReplaceStoryEditedBlockCallback {
-        void replaceStoryBlock(String mediaFiles, String blockId);
+    interface ReplaceMediaFilesEditedBlockCallback {
+        void replaceMediaFilesEditedBlock(String mediaFiles, String blockId);
     }
 
     interface StarterPageTemplatesTooltipShownCallback {
@@ -135,7 +135,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void mediaUploadSync(MediaSelectedCallback mediaSelectedCallback);
 
-    void storySaveSync(MediaSelectedCallback mediaSelectedCallback);
+    void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback);
 
     void requestImageFailedRetryDialog(int mediaId);
 
@@ -171,7 +171,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback);
 
-    void requestStoryCreatorLoad(ReplaceStoryEditedBlockCallback replaceStoryEditedBlockCallback,
+    void requestStoryCreatorLoad(ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
                                                      ReadableArray mediaFiles,
                                                      String blockId
     );
