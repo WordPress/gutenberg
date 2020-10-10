@@ -168,8 +168,16 @@ export function requestUnsupportedBlockFallback(
  *
  * @param {string} htmlContent One of the values deffined on `actionButtons` constant object.
  */
-export function sendActionButtonPressedAction( buttonType, clientId, mediaFiles ) {
-	RNReactNativeGutenbergBridge.actionButtonPressed( buttonType, clientId, mediaFiles );
+export function sendActionButtonPressedAction(
+	buttonType,
+	clientId,
+	mediaFiles
+) {
+	RNReactNativeGutenbergBridge.actionButtonPressed(
+		buttonType,
+		clientId,
+		mediaFiles
+	);
 }
 
 export function requestMediaImport( url, callback ) {
