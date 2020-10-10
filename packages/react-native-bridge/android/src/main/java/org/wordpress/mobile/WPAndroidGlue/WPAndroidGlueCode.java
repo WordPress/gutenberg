@@ -94,7 +94,7 @@ public class WPAndroidGlueCode {
     private OnGutenbergDidSendButtonPressedActionListener mOnGutenbergDidSendButtonPressedActionListener;
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnStarterPageTemplatesTooltipShownEventListener mOnStarterPageTemplatesTooltipShownListener;
-    private OnStoryCreatorLoadRequestListener mOnStoryCreatorLoadRequestListener;
+    private OnMediaFilesEditorLoadRequestListener mOnMediaFilesEditorLoadRequestListener;
     private ReplaceMediaFilesEditedBlockCallback mReplaceMediaFilesEditedBlockCallback;
     private boolean mIsEditorMounted;
 
@@ -150,8 +150,8 @@ public class WPAndroidGlueCode {
         void onOtherMediaButtonClicked(String mediaSource, boolean allowMultipleSelection);
     }
 
-    public interface OnStoryCreatorLoadRequestListener {
-        void onRequestStoryCreatorLoad(ArrayList<Object> mediaFiles, String blockId);
+    public interface OnMediaFilesEditorLoadRequestListener {
+        void onRequestMediaFilesEditorLoad(ArrayList<Object> mediaFiles, String blockId);
     }
 
     public interface OnImageFullscreenPreviewListener {
@@ -418,13 +418,13 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void requestStoryCreatorLoad(
+            public void requestMediaFilesEditorLoad(
                     ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
                     ReadableArray mediaFiles,
                     String blockId
             ) {
                 mReplaceMediaFilesEditedBlockCallback = replaceMediaFilesEditedBlockCallback;
-                mOnStoryCreatorLoadRequestListener.onRequestStoryCreatorLoad(mediaFiles.toArrayList(), blockId);
+                mOnMediaFilesEditorLoadRequestListener.onRequestMediaFilesEditorLoad(mediaFiles.toArrayList(), blockId);
             }
         }, mIsDarkMode);
 
@@ -502,7 +502,7 @@ public class WPAndroidGlueCode {
                                   OnGutenbergDidSendButtonPressedActionListener onGutenbergDidSendButtonPressedActionListener,
                                   AddMentionUtil addMentionUtil,
                                   OnStarterPageTemplatesTooltipShownEventListener onStarterPageTemplatesTooltipListener,
-                                  OnStoryCreatorLoadRequestListener onStoryCreatorLoadRequestListener,
+                                  OnMediaFilesEditorLoadRequestListener onMediaFilesEditorLoadRequestListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -520,7 +520,7 @@ public class WPAndroidGlueCode {
         mOnGutenbergDidSendButtonPressedActionListener = onGutenbergDidSendButtonPressedActionListener;
         mAddMentionUtil = addMentionUtil;
         mOnStarterPageTemplatesTooltipShownListener = onStarterPageTemplatesTooltipListener;
-        mOnStoryCreatorLoadRequestListener = onStoryCreatorLoadRequestListener;
+        mOnMediaFilesEditorLoadRequestListener = onMediaFilesEditorLoadRequestListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 

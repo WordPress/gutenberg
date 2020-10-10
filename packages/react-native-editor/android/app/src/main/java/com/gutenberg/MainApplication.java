@@ -177,14 +177,14 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void requestStoryCreatorLoad(
+            public void requestMediaFilesEditorLoad(
                     ReplaceStoryEditedBlockCallback replaceStoryEditedBlockCallback,
                     ReadableArray mediaFiles,
                     String blockId
             ) {
                 // mReplaceStoryEditedBlockCallback = replaceStoryEditedBlockCallback;
-                // mOnStoryCreatorLoadRequestListener.onRequestStoryCreatorLoad(content, blockId);
-                Toast.makeText(MainApplication.this, "requestStoryCreatorLoad called", Toast.LENGTH_SHORT).show();
+                // mOnMediaFilesEditorLoadRequestListener.onRequestMediaFilesEditorLoad(content, blockId);
+                Toast.makeText(MainApplication.this, "requestMediaFilesEditorLoad called", Toast.LENGTH_SHORT).show();
             }
 
             @Override

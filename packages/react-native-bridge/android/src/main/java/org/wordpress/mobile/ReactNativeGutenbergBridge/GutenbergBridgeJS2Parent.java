@@ -171,7 +171,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
 
     void requestStarterPageTemplatesTooltipShown(StarterPageTemplatesTooltipShownCallback starterPageTemplatesTooltipShownCallback);
 
-    void requestStoryCreatorLoad(ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
+    void requestMediaFilesEditorLoad(ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
                                                      ReadableArray mediaFiles,
                                                      String blockId
     );

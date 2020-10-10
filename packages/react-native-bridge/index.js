@@ -252,8 +252,8 @@ export function setStarterPageTemplatesTooltipShown( tooltipShown ) {
 	);
 }
 
-export function requestStoryCreatorLoad( mediaFiles, blockClientId ) {
-	return RNReactNativeGutenbergBridge.requestStoryCreatorLoad(
+export function requestMediaFilesEditorLoad( mediaFiles, blockClientId ) {
+	return RNReactNativeGutenbergBridge.requestMediaFilesEditorLoad(
 		mediaFiles,
 		blockClientId
 	);
