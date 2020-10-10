@@ -188,7 +188,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void gutenbergDidSendButtonPressedAction(String buttonType) {
+            public void gutenbergDidSendButtonPressedAction(String buttonType, String blockId, ArrayList<Object> mediaFiles) {
 
             }
             

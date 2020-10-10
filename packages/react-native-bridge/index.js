@@ -26,6 +26,7 @@ export const userEvents = {
 
 export const actionButtons = {
 	missingBlockAlertActionButton: 'missing_block_alert_action_button',
+	mediaFilesEditorActionButton: 'media_files_editor_action_button',
 };
 
 // Console polyfill from react-native
@@ -167,8 +168,8 @@ export function requestUnsupportedBlockFallback(
  *
  * @param {string} htmlContent One of the values deffined on `actionButtons` constant object.
  */
-export function sendActionButtonPressedAction( buttonType ) {
-	RNReactNativeGutenbergBridge.actionButtonPressed( buttonType );
+export function sendActionButtonPressedAction( buttonType, clientId, mediaFiles ) {
+	RNReactNativeGutenbergBridge.actionButtonPressed( buttonType, clientId, mediaFiles );
 }
 
 export function requestMediaImport( url, callback ) {

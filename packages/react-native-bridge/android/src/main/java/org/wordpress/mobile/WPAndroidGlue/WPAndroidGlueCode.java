@@ -191,7 +191,7 @@ public class WPAndroidGlueCode {
     }
 
     public interface OnGutenbergDidSendButtonPressedActionListener {
-        void gutenbergDidSendButtonPressedAction(String buttonType);
+        void gutenbergDidSendButtonPressedAction(String buttonType, String blockId, ArrayList<Object> mediaFiles);
     }
 
     public interface OnStarterPageTemplatesTooltipShownEventListener {
@@ -397,8 +397,12 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void gutenbergDidSendButtonPressedAction(String buttonType) {
-                mOnGutenbergDidSendButtonPressedActionListener.gutenbergDidSendButtonPressedAction(buttonType);
+            public void gutenbergDidSendButtonPressedAction(String buttonType, String blockId, ReadableArray mediaFiles) {
+                mOnGutenbergDidSendButtonPressedActionListener.gutenbergDidSendButtonPressedAction(
+                        buttonType,
+                        blockId,
+                        mediaFiles.toArrayList()
+                );
             }
 
             @Override

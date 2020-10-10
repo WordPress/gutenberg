@@ -163,7 +163,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
                                                      String blockName,
                                                      String blockTitle);
 
-    void gutenbergDidSendButtonPressedAction(String buttonType);
+    void gutenbergDidSendButtonPressedAction(String buttonType, String blockId, ReadableArray mediaFiles);
 
     void onAddMention(Consumer<String> onSuccess);
 

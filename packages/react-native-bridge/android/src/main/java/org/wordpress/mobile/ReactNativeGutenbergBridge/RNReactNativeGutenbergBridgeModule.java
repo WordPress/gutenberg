@@ -277,8 +277,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void actionButtonPressed(String buttonType) {
-        mGutenbergBridgeJS2Parent.gutenbergDidSendButtonPressedAction(buttonType);
+    public void actionButtonPressed(String buttonType, String blockId, ReadableArray mediaFiles) {
+        mGutenbergBridgeJS2Parent.gutenbergDidSendButtonPressedAction(buttonType, blockId, mediaFiles);
     }
 
     private void replaceBlock(String content, String blockId) {

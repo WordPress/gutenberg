@@ -298,12 +298,12 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func actionButtonPressed(_ buttonType: String) {
+    func actionButtonPressed(_ buttonType: String, blockId: String, _ mediaFilesArray: [AnyObject]) {
         guard let button = Gutenberg.ActionButtonType(rawValue: buttonType) else {
             return
         }
         DispatchQueue.main.async {
-            self.delegate?.gutenbergDidSendButtonPressedAction(button)
+            self.delegate?.gutenbergDidSendButtonPressedAction(button, blockId, mediaFilesArray)
         }
     }
 
