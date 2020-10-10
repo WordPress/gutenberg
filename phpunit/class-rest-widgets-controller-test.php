@@ -218,8 +218,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request  = new WP_REST_Request( 'GET', '/__experimental/widgets' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		unset( $data[0]['_links'] );
-		unset( $data[1]['_links'] );
+		$data     = $this->remove_links( $data );
 		$this->assertEqualSets(
 			array(
 				array(
@@ -276,7 +275,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request['context'] = 'edit';
 		$response           = rest_get_server()->dispatch( $request );
 		$data               = $response->get_data();
-		unset( $data[0]['_links'] );
+		$data               = $this->remove_links( $data );
 		$this->assertEqualSets(
 			array(
 				array(
@@ -704,7 +703,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		unset( $data[0]['_links'] );
+		$data     = $this->remove_links( $data );
 		$this->assertEquals(
 			array(
 				'id'            => $widget_id,
@@ -972,5 +971,27 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'rendered', $properties );
 		$this->assertArrayHasKey( 'rendered_form', $properties );
 		$this->assertArrayHasKey( 'settings', $properties );
+	}
+
+	/**
+	 * Helper to remove links key.
+	 *
+	 * @param array $data Array of data.
+	 *
+	 * @return array
+	 */
+	protected function remove_links( $data ) {
+		if ( ! is_array( $data ) ) {
+			return $data;
+		}
+		$count = 0;
+		foreach ( $data as $item ) {
+			if ( isset( $item['_links'] ) ) {
+				unset( $data[ $count ]['_links'] );
+			}
+			$count ++;
+		}
+
+		return $data;
 	}
 }

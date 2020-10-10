@@ -210,7 +210,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		unset( $data[0]['_links'] );
+		$data     = $this->remove_links( $data );
 		$this->assertEquals(
 			array(
 				array(
@@ -259,7 +259,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		unset( $data[0]['_links'] );
+		$data     = $this->remove_links( $data );
 		$this->assertEquals(
 			array(
 				array(
@@ -296,7 +296,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request  = new WP_REST_Request( 'GET', '/__experimental/sidebars/sidebar-1' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		unset( $data[0]['_links'] );
+		$data     = $this->remove_links( $data );
 		$this->assertEquals(
 			array(
 				'id'            => 'sidebar-1',
@@ -415,7 +415,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		unset( $data[0]['_links'] );
+		$data     = $this->remove_links( $data );
 		$this->assertEquals(
 			array(
 				'id'            => 'sidebar-1',
@@ -475,8 +475,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request->set_param( 'context', 'view' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		unset( $data[0]['_links'] );
-		unset( $data[1]['_links'] );
+		$data     = $this->remove_links( $data );
 		$this->assertEquals(
 			array(
 				array(
@@ -593,5 +592,27 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'after_widget', $properties );
 		$this->assertArrayHasKey( 'before_title', $properties );
 		$this->assertArrayHasKey( 'after_title', $properties );
+	}
+
+	/**
+	 * Helper to remove links key.
+	 *
+	 * @param array $data Array of data.
+	 *
+	 * @return array
+	 */
+	protected function remove_links( $data ) {
+		if ( ! is_array( $data ) ) {
+			return $data;
+		}
+		$count = 0;
+		foreach ( $data as $item ) {
+			if ( isset( $item['_links'] ) ) {
+				unset( $data[ $count ]['_links'] );
+			}
+			$count ++;
+		}
+
+		return $data;
 	}
 }
