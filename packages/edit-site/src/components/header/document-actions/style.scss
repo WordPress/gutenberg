@@ -11,8 +11,6 @@
 		flex-direction: row;
 		justify-content: center;
 		align-items: center;
-		transition: transform 0.2s;
-		@include reduce-motion(transition);
 	}
 
 	.edit-site-document-actions__title-wrapper > h1 {
@@ -24,6 +22,8 @@
 	.edit-site-document-actions__title {
 		font-size: $default-font-size;
 		font-weight: bold;
+		transition: transform 0.2s;
+		@include reduce-motion(transition);
 	}
 
 	.edit-site-document-actions__get-info {
@@ -34,19 +34,19 @@
 	.edit-site-document-actions__secondary-item {
 		font-size: $default-font-size;
 		opacity: 0;
-		transform: translateY(20px);
+		transform: translateY(0);
 		transition: transform 0.2s;
 		@include reduce-motion(transition);
 	}
 
 	&.has-secondary-label {
-		.edit-site-document-actions__title-wrapper {
-			transform: translateY(-12px);
-		}
+		transform: translateY(10px);
 
 		.edit-site-document-actions__title {
 			color: $gray-900;
 			font-weight: bold;
+			white-space: nowrap;
+			transform: translateY(-14px);
 
 			&.is-secondary-title-active {
 				color: $gray-700;
@@ -59,7 +59,7 @@
 			font-weight: normal;
 			opacity: 1;
 			white-space: nowrap;
-			transform: translateY(12px);
+			transform: translateY(-8px);
 
 			&.is-secondary-title-active {
 				color: $gray-900;
