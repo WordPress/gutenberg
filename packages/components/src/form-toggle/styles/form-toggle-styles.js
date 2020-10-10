@@ -7,7 +7,7 @@ import { css } from '@emotion/core';
 /**
  * Internal dependencies
  */
-import { color, reduceMotion, rtl } from '../../utils';
+import { color, reduceMotion, rtl, zIndex } from '../../utils';
 import {
 	toggleBorderWidth,
 	toggleWidth,
@@ -55,7 +55,7 @@ export const StyledToggleInput = styled.input`
 	opacity: 0;
 	margin: 0;
 	padding: 0;
-	z-index: z-index( '.components-form-toggle__input' );
+	z-index: ${ zIndex( '.components-form-toggle__input' ) };
 
 	// This overrides a border style that is inherited from parent checkbox styles.
 	border: none;
@@ -69,27 +69,25 @@ export const StyledToggleInput = styled.input`
 	}
 `;
 
+const checkedStyles = css`
+	${ StyledToggleTrack } {
+		background-color: var( --wp-admin-theme-color );
+		border: ${ toggleBorderWidth }px solid var( --wp-admin-theme-color );
+		border: ${ toggleHeight / 2 }px solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
+	}
+
+	${ StyledToggleThumb } {
+		background-color: ${ color( 'white' ) };
+		border-width: 0; // Zero out the border color to make the thumb invisible in Windows High Contrast Mode.
+		${ appearTransform() }
+	}
+`;
+
 export const StyledFormToggle = styled.span`
 	position: relative;
 	display: inline-block;
 
-	${ ( props ) =>
-		props.isChecked
-			? css`
-					${ StyledToggleTrack } {
-						background-color: var( --wp-admin-theme-color );
-						border: ${ toggleBorderWidth }px solid
-							var( --wp-admin-theme-color );
-						border: ${ toggleHeight / 2 }px solid transparent; // Expand the border to fake a solid in Windows High Contrast Mode.
-					}
-
-					${ StyledToggleThumb } {
-						background-color: ${ color( 'white' ) };
-						border-width: 0; // Zero out the border color to make the thumb invisible in Windows High Contrast Mode.
-						${ appearTransform() }
-					}
-			  `
-			: '' }
+	${ ( props ) => ( props.isChecked ? checkedStyles : '' ) }
 
     ${ StyledToggleInput }:focus + ${ StyledToggleTrack } {
 		box-shadow: 0 0 0 2px ${ color( 'white' ) },
