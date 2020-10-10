@@ -5,3 +5,4 @@ export { space } from './space';
 export { font } from './font';
 export { breakpoint } from './breakpoint';
 export { config } from './config';
+export { zIndex } from './z-index';
