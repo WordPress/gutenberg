@@ -80,7 +80,7 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
-	context,
+	context: { allowAlign = true, allowResize = true, isList = false },
 } ) {
 	const {
 		url = '',
@@ -91,7 +91,6 @@ export function ImageEdit( {
 		width,
 		height,
 		sizeSlug,
-		isListItem,
 	} = attributes;
 
 	const altRef = useRef();
@@ -109,12 +108,6 @@ export function ImageEdit( {
 		const { getSettings } = select( 'core/block-editor' );
 		return getSettings().mediaUpload;
 	} );
-
-	const allowResize =
-		context.allowResize !== undefined ? context.allowResize : true;
-
-	const allowAlign =
-		context.allowBlockAlign !== undefined ? context.allowBlockAlign : true;
 
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
@@ -271,10 +264,10 @@ export function ImageEdit( {
 	}, [ isTemp ] );
 
 	useEffect( () => {
-		if ( context?.isList ) {
-			setAttributes( { isListItem: context.isList } );
+		if ( isList ) {
+			setAttributes( { isListItem: isList } );
 		}
-	}, [ context ] );
+	}, [ isList ] );
 
 	const isExternal = isExternalImage( id, url );
 	const controls = (
@@ -339,7 +332,7 @@ export function ImageEdit( {
 		/>
 	);
 
-	if ( isListItem ) {
+	if ( isList ) {
 		return (
 			<>
 				{ controls }
@@ -351,17 +344,17 @@ export function ImageEdit( {
 				</li>
 			</>
 		);
-	} else {
-		return (
-			<>
-				{ controls }
-				<figure { ...blockProps }>
-					{ image }
-					{ mediaPlaceholder }
-				</figure>
-			</>
-		);
 	}
+
+	return (
+		<>
+			{ controls }
+			<figure { ...blockProps }>
+				{ image }
+				{ mediaPlaceholder }
+			</figure>
+		</>
+	);
 }
 
 export default withNotices( ImageEdit );

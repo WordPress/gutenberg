@@ -66,7 +66,7 @@ export default function save( { attributes } ) {
 		</>
 	);
 
-	if ( true === isListItem ) {
+	if ( isListItem ) {
 		return (
 			<li { ...useBlockProps.save() }>
 				<figure className={ classes }>{ figure }</figure>
@@ -83,7 +83,7 @@ export default function save( { attributes } ) {
 	}
 
 	return (
-		<figure className={ classes } { ...useBlockProps.save() }>
+		<figure { ...useBlockProps.save( { className: classes } ) }>
 			{ figure }
 		</figure>
 	);
