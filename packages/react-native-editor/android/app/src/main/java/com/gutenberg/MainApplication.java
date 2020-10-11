@@ -178,7 +178,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void requestMediaFilesEditorLoad(
-                    ReplaceStoryEditedBlockCallback replaceStoryEditedBlockCallback,
+                    ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
                     ReadableArray mediaFiles,
                     String blockId
             ) {
