@@ -33,7 +33,7 @@ export const MEDIA_SAVE_MEDIAMODEL_CREATED = 10;
 
 export class BlockMediaUpdateProgress extends React.Component {
 	constructor( props ) {
-		super( props );	
+		super( props );
 
 		this.state = {
 			progress: 0,
