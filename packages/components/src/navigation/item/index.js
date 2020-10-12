@@ -53,7 +53,7 @@ export default function NavigationItem( props ) {
 	};
 
 	return (
-		<ItemUI className={ classes } role="listitem">
+		<ItemUI className={ classes }>
 			{ children || (
 				<Button href={ href } onClick={ onItemClick } { ...restProps }>
 					{ title && (
