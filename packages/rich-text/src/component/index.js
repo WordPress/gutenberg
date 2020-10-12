@@ -128,6 +128,27 @@ function fixPlaceholderSelection( defaultView ) {
 	selection.collapseToStart();
 }
 
+function getRef( ref, callback ) {
+	return {
+		get current() {
+			return this._current;
+		},
+		set current( value ) {
+			this._current = value;
+
+			if ( typeof ref === 'function' ) {
+				ref( value );
+			} else if ( ref ) {
+				ref.current = value;
+			}
+
+			callback( value );
+
+			return value;
+		},
+	};
+}
+
 /*
  * Renders a rich content input, providing users with the option to format the
  * content.
@@ -1103,7 +1124,7 @@ export default function useRichTextProps(
 		'aria-multiline': true,
 		'aria-label': placeholder,
 		...props,
-		ref,
+		ref: getRef( ref, ( newRef ) => newRef && applyFromProps() ),
 		style: props.style ? { ...props.style, ...defaultStyle } : defaultStyle,
 		className: 'rich-text ' + props.className,
 		onPaste: handlePaste,
