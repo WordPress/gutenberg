@@ -70,7 +70,9 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 		$this->assertArrayHasKey( '/__experimental/widget-types', $routes );
 		$this->assertCount( 1, $routes['/__experimental/widget-types'] );
 		$this->assertArrayHasKey( '/__experimental/widget-types/(?P<name>[a-zA-Z0-9_-]+)', $routes );
-		$this->assertCount( 2, $routes['/__experimental/widget-types/(?P<name>[a-zA-Z0-9_-]+)'] );
+		$this->assertCount( 1, $routes['/__experimental/widget-types/(?P<name>[a-zA-Z0-9_-]+)'] );
+		$this->assertArrayHasKey( '/__experimental/widget-types/(?P<name>[a-zA-Z0-9_-]+)/form-renderer', $routes );
+		$this->assertCount( 1, $routes['/__experimental/widget-types/(?P<name>[a-zA-Z0-9_-]+)/form-renderer'] );
 	}
 
 	/**
@@ -87,7 +89,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/widget-types/calendar' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertSame( 'edit', $data['endpoints'][0]['args']['context']['default'] );
+		$this->assertSame( 'view', $data['endpoints'][0]['args']['context']['default'] );
 		$this->assertSame( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
 	}
 

@@ -51,7 +51,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 
 		register_rest_route(
 			$this->namespace,
-			'/' . $this->rest_base . '/(?P<name>[a-zA-Z0-9_-]+)',
+			'/' . $this->rest_base . '/(?P<name>[a-zA-Z0-9_-]+)/form-renderer',
 			array(
 				'args' => array(
 					'name'     => array(
@@ -66,7 +66,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 					),
 				),
 				array(
-					'methods'             => WP_REST_Server::EDITABLE,
+					'methods'             => WP_REST_Server::READABLE,
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'callback'            => array( $this, 'get_widget_form' ),
 					'args'                => array(
@@ -341,7 +341,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 				),
 				'control_options' => array(
 					'description'          => __( 'Control options', 'gutenberg' ),
-					'type'                 => 'Object',
+					'type'                 => 'object',
 					'default'              => array(),
 					'properties'           => array(),
 					'context'              => array( 'embed', 'view', 'edit' ),
@@ -350,7 +350,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 				),
 				'widget_options'  => array(
 					'description'          => __( 'Widget options', 'gutenberg' ),
-					'type'                 => 'Object',
+					'type'                 => 'object',
 					'default'              => array(),
 					'properties'           => array(
 						'classname'                   => array(
@@ -374,9 +374,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 							'context'     => array( 'view', 'edit', 'embed' ),
 						),
 					),
-					'additionalProperties' => array(
-						'type' => 'Object',
-					),
+					'additionalProperties' => true,
 					'context'              => array( 'embed', 'view', 'edit' ),
 					'readonly'             => true,
 				),
