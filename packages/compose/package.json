@@ -26,7 +26,6 @@
 	"sideEffects": false,
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
-		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/element": "file:../element",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/priority-queue": "file:../priority-queue",
