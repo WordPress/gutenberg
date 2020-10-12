@@ -21,14 +21,8 @@ function gutenberg_register_duotone_support( $block_type ) {
 			$block_type->attributes = array();
 		}
 
-		if ( ! array_key_exists( 'duotoneId', $block_type->attributes ) ) {
-			$block_type->attributes['duotoneId'] = array(
-				'type' => 'string',
-			);
-		}
-
-		if ( ! array_key_exists( 'duotoneValues', $block_type->attributes ) ) {
-			$block_type->attributes['duotoneValues'] = array(
+		if ( ! array_key_exists( 'duotone', $block_type->attributes ) ) {
+			$block_type->attributes['duotone'] = array(
 				'type' => 'object',
 			);
 		}
@@ -52,11 +46,10 @@ function gutenberg_apply_duotone_support( $attributes, $block_attributes, $block
 		$has_duotone_support = gutenberg_experimental_get( $block_type->supports, array( 'duotone' ), false );
 	}
 	if ( $has_duotone_support ) {
-		$has_duotone_id     = array_key_exists( 'duotoneId', $block_attributes );
-		$has_duotone_colors = array_key_exists( 'duotoneValues', $block_attributes );
+		$has_duotone_attribute = array_key_exists( 'duotone', $block_attributes );
 
-		if ( $has_duotone_id && $has_duotone_colors ) {
-			$attributes['css_classes'][] = $block_attributes['duotoneId'];
+		if ( $has_duotone_attribute ) {
+			$attributes['css_classes'][] = 'duotone-filter-' . $block_attributes['duotone']['slug'];
 		}
 	}
 
@@ -73,31 +66,31 @@ function gutenberg_apply_duotone_support( $attributes, $block_attributes, $block
  * @return string filtered block content.
  */
 function gutenberg_render_duotone_support( $block_content, $block_attributes, $block_type ) {
-	$has_duotone_support = false;
+	$duotone_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_duotone_support = gutenberg_experimental_get( $block_type->supports, array( 'duotone' ), false );
+		$duotone_support = gutenberg_experimental_get( $block_type->supports, array( 'duotone' ), false );
 	}
 
-	$has_duotone_id     = array_key_exists( 'duotoneId', $block_attributes );
-	$has_duotone_colors = array_key_exists( 'duotoneValues', $block_attributes );
+	$has_duotone_attribute = array_key_exists( 'duotone', $block_attributes );
 
 	if (
-		! $has_duotone_support ||
-		! $has_duotone_id ||
-		! $has_duotone_colors
+		! $duotone_support ||
+		! $has_duotone_attribute
 	) {
 		return $block_content;
 	}
 
-	$duotone_id     = $block_attributes['duotoneId'];
-	$duotone_colors = $block_attributes['duotoneValues'];
+	$duotone_slug   = $block_attributes['duotone']['slug'];
+	$duotone_colors = $block_attributes['duotone']['values'];
+
+	$duotone_id = 'duotone-filter-' . $duotone_slug;
 
 	// TODO: Handle multiple selectors
 	$duotone_selector = '.' . $duotone_id;
-	if ( is_string( $has_duotone_support ) ) {
-		$duotone_selector .= ' ' . $has_duotone_support;
-	} elseif ( is_string( $has_duotone_support['save'] ) ) {
-		$duotone_selector .= ' ' . $has_duotone_support->save;
+	if ( is_string( $duotone_support ) ) {
+		$duotone_selector .= ' ' . $duotone_support;
+	} elseif ( is_string( $duotone_support['save'] ) ) {
+		$duotone_selector .= ' ' . $duotone_support['save'];
 	}
 
 	ob_start();

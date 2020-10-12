@@ -3,12 +3,12 @@
  */
 import {
 	BaseControl,
+	CircularOptionPicker,
 	Dropdown,
 	ToolbarButton,
 	ToolbarGroup,
-	__experimentalGradientPicker as GradientPicker,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { noFilter } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
 
@@ -16,35 +16,12 @@ import { DOWN } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import {
-	getGradientFromColors,
+	getGradientFromCSSColors,
 	getGradientFromValues,
-	parseGradient,
+	getValuesFromHexColors,
 } from './utils';
 
 function DuotoneToolbar( { value, onChange, options } ) {
-	const gradient = getGradientFromValues( value );
-	const gradients = options.map( ( { colors, ...rest } ) => ( {
-		...rest,
-		gradient: getGradientFromColors( colors ),
-	} ) );
-
-	const setDuotoneValues = ( newGradient ) => {
-		onChange( parseGradient( newGradient ) );
-	};
-
-	const toolbarIcon = gradient ? (
-		<span
-			style={ {
-				background: gradient,
-				color: 'transparent',
-				borderRadius: '50%',
-				width: '24px',
-				height: '24px',
-			} }
-		/>
-	) : (
-		noFilter
-	);
 	return (
 		<Dropdown
 			position="bottom right"
@@ -65,8 +42,21 @@ function DuotoneToolbar( { value, onChange, options } ) {
 							aria-haspopup="true"
 							aria-expanded={ isOpen }
 							onKeyDown={ openOnArrowDown }
-							label={ __( 'Change image color filter' ) }
-							icon={ toolbarIcon }
+							label={ __( 'Change image duotone filter' ) }
+							icon={
+								value ? (
+									<span
+										className="block-editor-duotone-toolbar-icon"
+										style={ {
+											background: getGradientFromValues(
+												value.values
+											),
+										} }
+									/>
+								) : (
+									noFilter
+								)
+							}
 						/>
 					</ToolbarGroup>
 				);
@@ -74,14 +64,61 @@ function DuotoneToolbar( { value, onChange, options } ) {
 			renderContent={ () => (
 				<BaseControl>
 					<BaseControl.VisualLabel>
-						{ __( 'Duotone' ) }
+						{ __( 'Duotone Presets' ) }
 					</BaseControl.VisualLabel>
-					<GradientPicker
-						disableCustomGradients
-						gradients={ gradients }
-						value={ gradient }
-						onChange={ setDuotoneValues }
-					/>
+					<CircularOptionPicker
+						options={ options.map( ( option ) => {
+							const isSelected = option.slug === value?.slug;
+							const style = {
+								background: getGradientFromCSSColors(
+									option.colors
+								),
+								color: 'transparent',
+							};
+							const code = sprintf(
+								// translators: %s: duotone code e.g: "dark-grayscale" or "7f7f7f-ffffff".
+								__( 'Duotone code: %s' ),
+								option.slug
+							);
+							const label = sprintf(
+								// translators: %s: The name of the option e.g: "Dark grayscale".
+								__( 'Duotone: %s' ),
+								option.name
+							);
+
+							return (
+								<CircularOptionPicker.Option
+									key={ option.slug }
+									value={ option.slug }
+									isSelected={ isSelected }
+									tooltipText={ option.name || code }
+									style={ style }
+									onClick={ () => {
+										const newValue = {
+											// TODO: Should values be precomputed here or computed in the PHP instead?
+											values: getValuesFromHexColors(
+												option.colors
+											),
+											slug: option.slug,
+										};
+										onChange(
+											isSelected ? undefined : newValue
+										);
+									} }
+									aria-label={ option.name ? label : code }
+								/>
+							);
+						} ) }
+						actions={
+							<CircularOptionPicker.ButtonAction
+								onClick={ () => onChange( undefined ) }
+							>
+								{ __( 'Clear' ) }
+							</CircularOptionPicker.ButtonAction>
+						}
+					>
+						<div />
+					</CircularOptionPicker>
 				</BaseControl>
 			) }
 		/>

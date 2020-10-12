@@ -1,9 +1,25 @@
 /**
+ * Object representation for a color
+ *
+ * @typedef {Object} RGBColor
+ * @property {number} r Red component of the color in the range [0,1].
+ * @property {number} g Green component of the color in the range [0,1].
+ * @property {number} b Blue component of the color in the range [0,1].
+ */
+
+/**
+ * @typedef {Object} RGBValues
+ * @property {number[]} r Array of red components of the colors in the range [0,1].
+ * @property {number[]} g Array of green components of the colors in the range [0,1].
+ * @property {number[]} b Array of blue components of the colors in the range [0,1].
+ */
+
+/**
  * Convert a CSS hex string to an RGB object, discarding any alpha component.
  *
  * @param {string} color CSS hex string.
  *
- * @return {Object} RGB values.
+ * @return {RGBColor} RGB values.
  */
 export function hex2rgb( color = '' ) {
 	let r = '0x00';
@@ -35,44 +51,9 @@ export function hex2rgb( color = '' ) {
 }
 
 /**
- * Convert a CSS rgb(a) string to an RGB object, ignoring any alpha component.
- *
- * @param {string} color CSS rgb(a) string.
- *
- * @return {Object} RGB values.
- */
-export function cssrgb2rgb( color = '' ) {
-	// Input string for reference: rgba( 127, 127, 127, 0.1 ).
-	const [ r, g, b ] = color.split( '(' )[ 1 ].split( ')' )[ 0 ].split( ',' );
-
-	// Doesn't support rgba( 127 127 127 / 10% ) format.
-
-	return {
-		r: r / 255,
-		g: g / 255,
-		b: b / 255,
-	};
-}
-
-/**
- * Parse a CSS color string. Currently only hex and rgb(a) are supported.
- *
- * @param {string} color Hex or rgb(a) color string
- *
- * @return {Object} RGB values.
- */
-export function parseColor( color = '' ) {
-	if ( color.startsWith( '#' ) ) {
-		return hex2rgb( color );
-	} else if ( color.startsWith( 'rgb' ) ) {
-		return cssrgb2rgb( color );
-	}
-}
-
-/**
  * Convert an RGB object to a CSS hex string.
  *
- * @param {Object} color RGB values.
+ * @param {RGBColor} color RGB values.
  *
  * @return {string} CSS hex string.
  */
@@ -91,11 +72,11 @@ export function rgb2hex( color = {} ) {
 /**
  * Generate a duotone gradient from a list of colors.
  *
- * @param {string[]} colors CSS color strings
+ * @param {string[]} colors CSS color strings.
  *
  * @return {string} CSS gradient string for the duotone swatch.
  */
-export function getGradientFromColors( colors = [] ) {
+export function getGradientFromCSSColors( colors = [] ) {
 	const l = 100 / colors.length;
 
 	const stops = colors
@@ -108,7 +89,7 @@ export function getGradientFromColors( colors = [] ) {
 /**
  * Create a CSS gradient for duotone swatches.
  *
- * @param {Object} values R, G, and B values.
+ * @param {RGBValues} values R, G, and B values.
  *
  * @return {string} CSS gradient string for the duotone swatch.
  */
@@ -122,42 +103,35 @@ export function getGradientFromValues( values = { r: [], g: [], b: [] } ) {
 		} );
 	} );
 
-	return getGradientFromColors( colors );
+	return getGradientFromCSSColors( colors );
 }
 
-const COLOR_REGEX = /rgba?\([0-9,\s]*\)|#[a-fA-F0-9]{3,8}/g;
+/**
+ * Convert a list of colors to an object of R, G, and B values.
+ *
+ * @param {RGBColor[]} colors Array of RBG color objects.
+ *
+ * @return {RGBValues} R, G, and B values.
+ */
+export function getValuesFromColors( colors = [] ) {
+	const values = { r: [], g: [], b: [] };
+
+	colors.forEach( ( { r, g, b } ) => {
+		values.r.push( r );
+		values.g.push( g );
+		values.b.push( b );
+	} );
+
+	return values;
+}
 
 /**
- * Parse out the colors from a CSS gradient.
+ * Convert a list of hex colors to an object of R, G, and B values.
  *
- * @param {string} cssGradient CSS gradient string.
+ * @param {string[]} colors Array of CSS hex color strings.
  *
- * @return {Object} R, G, and B values.
+ * @return {RGBValues} R, G, and B values.
  */
-export function parseGradient( cssGradient = '' ) {
-	const colors = { r: [], g: [], b: [] };
-
-	let match;
-	while ( ( match = COLOR_REGEX.exec( cssGradient ) ) ) {
-		const color = parseColor( match[ 0 ] );
-
-		const diffR =
-			Math.abs( color.r - colors.r[ colors.r.length - 1 ] ) >
-			Number.EPSILON;
-		const diffG =
-			Math.abs( color.g - colors.g[ colors.g.length - 1 ] ) >
-			Number.EPSILON;
-		const diffB =
-			Math.abs( color.b - colors.b[ colors.b.length - 1 ] ) >
-			Number.EPSILON;
-
-		// Only add colors that differ from the previous color.
-		if ( colors.r.length === 0 || diffR || diffG || diffB ) {
-			colors.r.push( color.r );
-			colors.g.push( color.g );
-			colors.b.push( color.b );
-		}
-	}
-
-	return colors;
+export function getValuesFromHexColors( colors = [] ) {
+	return getValuesFromColors( colors.map( hex2rgb ) );
 }
