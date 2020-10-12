@@ -5,6 +5,7 @@ import { fontFamily } from './font-family';
 import css from './emotion-css';
 
 const fontWeightNormal = `font-weight: 400;`;
+const fontWeightMedium = `font-weight: 500;`;
 const fontWeightSemibold = `font-weight: 600;`;
 
 const title = `
@@ -74,8 +75,16 @@ const label = `
 	line-height: 16px;
 `;
 
+const sectionHeading = `
+	${ fontWeightMedium }
+	font-size: 11px;
+	line-height: 1.4;
+	text-transform: uppercase;
+	color: #757575; // $gray-700
+`;
+
 /**
- * @typedef {'title.large'|'title.medium'|'title.small'|'subtitle'|'subtitle.small'|'body'|'body.large'|'body.small'|'button'|'caption'|'label'} TextVariant
+ * @typedef {'title.large'|'title.medium'|'title.small'|'subtitle'|'subtitle.small'|'body'|'body.large'|'body.small'|'button'|'caption'|'label'|'sectionheading'} TextVariant
  */
 
 /**
@@ -133,6 +142,9 @@ const variant = ( variantName = 'body' ) => {
 
 		case 'label':
 			return label;
+
+		case 'sectionheading':
+			return sectionHeading;
 	}
 };
 
