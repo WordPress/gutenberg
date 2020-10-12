@@ -194,6 +194,9 @@ add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
 function gutenberg_register_sidebars_endpoint() {
 	$sidebars = new WP_REST_Sidebars_Controller();
 	$sidebars->register_routes();
+
+	$widget_types = new WP_REST_Widget_Types_Controller();
+	$widget_types->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_sidebars_endpoint' );
 
