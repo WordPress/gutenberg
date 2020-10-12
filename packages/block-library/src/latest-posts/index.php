@@ -171,6 +171,8 @@ function render_block_core_latest_posts( $attributes ) {
 		$class .= ' has-author';
 	}
 
+	$class .= ' ' . gutenberg_block_supports_classes();
+
 	return sprintf(
 		'<ul class="%1$s">%2$s</ul>',
 		esc_attr( $class ),

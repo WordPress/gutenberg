@@ -366,6 +366,12 @@ function gutenberg_replace_default_block_categories( $default_categories ) {
 }
 add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
 
+global $current_parsed_block;
+$current_parsed_block = array(
+	'blockName'  => null,
+	'attributes' => null,
+);
+
 /**
  * Shim that hooks into `pre_render_block` so as to override `render_block` with
  * a function that assigns block context.
@@ -382,6 +388,7 @@ add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
  */
 function gutenberg_render_block_with_assigned_block_context( $pre_render, $parsed_block ) {
 	global $post, $wp_query;
+	global $current_parsed_block;
 
 	/*
 	 * If a non-null value is provided, a filter has run at an earlier priority
@@ -390,6 +397,8 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 	if ( null !== $pre_render ) {
 		return $pre_render;
 	}
+
+	$current_parsed_block = $parsed_block;
 
 	$source_block = $parsed_block;
 

@@ -6,102 +6,136 @@
  */
 
 /**
- * Class used for interacting with block supports..
+ * TODO.
+ *
+ * @param object $attributes Relevant block attributes.
+ * @param string $block_name Block name.
  */
-class WP_Block_Supports_Registry {
-	/**
-	 * Registered block supports array.
-	 *
-	 * @var array
-	 */
-	private $registered_block_supports = array();
-
-	/**
-	 * Container for the main instance of the class.
-	 *
-	 * @var WP_Block_Supports_Registry|null
-	 */
-	private static $instance = null;
-
-	/**
-	 * Registers a block-supports feature.
-	 *
-	 * @param string $supports_name       Pattern name including namespace.
-	 * @param array  $supports_properties Array containing the properties of the feature.
-	 * @return boolean True if the block-supports feature was registered with success and false otherwise.
-	 */
-	public function register( $supports_name, $supports_properties ) {
-		/*
-		 * TODO validation
-		 */
-		$this->registered_block_supports[ $supports_name ] = array_merge(
-			$supports_properties,
-			array( 'name' => $supports_name )
-		);
-
-		return true;
-	}
-
-	/**
-	 * TODO.
-	 *
-	 * @param string $supports_name       TODO.
-	 * @return array TODO.
-	 */
-	public function get_registered( $supports_name ) {
-		if ( ! $this->is_registered( $supports_name ) ) {
-			return null;
-		}
-
-		return $this->registered_block_supports[ $supports_name ];
-	}
-
-	/**
-	 * TODO.
-	 *
-	 * @return array TODO.
-	 */
-	public function get_all_registered() {
-		return array_values( $this->registered_block_supports );
-	}
-
-	/**
-	 * Checks if a block-supports feature is registered.
-	 *
-	 * @param string $supports_name       TODO.
-	 * @return bool TODO.
-	 */
-	public function is_registered( $supports_name ) {
-		return isset( $this->registered_block_supports[ $supports_name ] );
-	}
-
-	/**
-	 * Utility method to retrieve the main instance of the class.
-	 *
-	 * The instance will be created if it does not exist yet.
-	 *
-	 * @return WP_Block_Supports_Registry The main instance.
-	 */
-	public static function get_instance() {
-		if ( null === self::$instance ) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
-	}
+function foo_default( $attributes, $block_name ) {
+	return false;
 }
 
-/**
- * Registers a new pattern.
- *
- * @param string $supports_name       Pattern name including namespace.
- * @param array  $supports_properties Array containing the properties of the pattern.
- *
- * @return boolean True if the pattern was registered with success and false otherwise.
- */
-function register_block_supports( $supports_name, $supports_properties ) {
-	return WP_Block_Supports_Registry::get_instance()->register( $supports_name, $supports_properties );
-}
+global $block_supports_config;
+$block_supports_config = array(
+	'align'            => array(
+		'attributes' => array(
+			'align' => array(
+				'type' => 'string',
+				'enum' => array( 'left', 'center', 'right', 'wide', 'full', '' ),
+			),
+		),
+		'callback'   => function( $attributes ) {
+			if ( empty( $attributes['align'] ) ) {
+				return false;
+			}
+
+			return sprintf(
+				'align%s',
+				$attributes['align']
+			);
+		},
+		'default'    => false,
+	),
+	'className'        => array(
+		'attributes' => array(),
+		'callback'   => function( $attributes, $block_name ) {
+			return gutenberg_get_block_default_classname( $block_name );
+		},
+		'default'    => true,
+	),
+	'color.background' => array(
+		'attributes' => array(
+			'backgroundColor' => array(
+				'type' => 'string',
+			),
+		),
+		'callback'   => 'foo_default',
+		'default'    => array( false, true ),
+	),
+	'color.gradients'  => array(
+		'attributes' => array(
+			'gradient' => array(
+				'type' => 'string',
+			),
+		),
+		'callback'   => 'foo_default',
+		'default'    => array( false, false ),
+	),
+	'color.link'       => array(
+		'attributes' => array(),
+		'callback'   => 'foo_default',
+		'default'    => array( false, false ),
+	),
+	'color.text'       => array(
+		'attributes' => array(
+			'style'     => array(
+				'type' => 'object',
+			),
+			'textColor' => array(
+				'type' => 'string',
+			),
+		),
+		'callback'   => 'foo_default',
+		'default'    => array( false, true ),
+	),
+	'customClassName'  => array(
+		'attributes' => array(
+			'className' => array(
+				'type' => 'string',
+			),
+		),
+		'callback'   => function( $attributes ) {
+			return array_key_exists( 'className', $attributes ) ?
+				$attributes['className'] :
+				false;
+
+		},
+		'default'    => true,
+	),
+	'fontSize'         => array(
+		'attributes' => array(
+			'style'    => array(
+				'type' => 'object',
+			),
+			'fontSize' => array(
+				'type' => 'string',
+			),
+		),
+		'callback'   => function( $attributes, $block_name ) {
+			$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
+			$has_custom_font_size = isset( $attributes['style']['typography']['fontSize'] );
+
+			$classes = '';
+			if ( $has_named_font_size ) {
+				$classes = sprintf( 'has-%s-font-size', $attributes['fontSize'] );
+			} elseif ( $has_custom_font_size ) {
+				$generated_class_name = uniqid( 'wp-block-fontsize-' );
+				$classes = $generated_class_name;
+				wp_add_inline_style(
+					'wp-block-supports',
+					sprintf(
+						'.%s { font-size: %spx; }',
+						$generated_class_name,
+						$attributes['style']['typography']['fontSize']
+					)
+				);
+			}
+
+			return $classes;
+		},
+		'default'    => false,
+	),
+	'lineHeight'       => array(
+		'attributes' => array(
+			'style' => array(
+				'type' => 'object',
+			),
+		),
+		'callback'   => 'foo_default',
+		'default'    => false,
+	),
+);
+
 
 /**
  * Filter the registered blocks to apply the block supports attributes registration.
@@ -112,14 +146,115 @@ function gutenberg_register_block_supports() {
 	// Ideally we need a hook to extend the block registration
 	// instead of mutating the block type.
 	foreach ( $registered_block_types as $block_type ) {
-		gutenberg_register_alignment_support( $block_type );
+		/* gutenberg_register_alignment_support( $block_type ); */
 		gutenberg_register_colors_support( $block_type );
-		gutenberg_register_typography_support( $block_type );
-		gutenberg_register_custom_classname_support( $block_type );
+		/* gutenberg_register_typography_support( $block_type ); */
+		/* gutenberg_register_custom_classname_support( $block_type ); */
 	}
 }
-
 add_action( 'init', 'gutenberg_register_block_supports', 21 );
+
+/**
+ * TODO.
+ */
+function foo_register_block_supports() {
+	global $block_supports_config;
+
+	wp_register_style( 'wp-block-supports', false );
+	wp_enqueue_style( 'wp-block-supports' );
+
+	$block_registry         = WP_Block_Type_Registry::get_instance();
+	$registered_block_types = $block_registry->get_all_registered();
+	$registered_features    = array(
+		'align' => $block_supports_config['align'],
+	);
+	foreach ( $registered_block_types as $block_type ) {
+		if ( ! property_exists( $block_type, 'supports' ) ) {
+			continue;
+		}
+		if ( ! $block_type->attributes ) {
+			$block_type->attributes = array();
+		}
+		foreach ( $registered_features as $feature_name => $feature_config ) {
+			// TODO: split feature names like color.text.
+			// TODO: look at default value.
+			if (
+				! gutenberg_experimental_get(
+					$block_type->supports,
+					array( $feature_name ),
+					$feature_config['default']
+				)
+			) {
+				continue;
+			}
+			foreach ( $feature_config['attributes'] as $attribute_name => $attribute_schema ) {
+				if ( ! array_key_exists( $attribute_name, $block_type->attributes ) ) {
+					$block_type->attributes[ $attribute_name ] = $attribute_schema;
+				}
+			}
+		}
+	}
+}
+add_action( 'init', 'foo_register_block_supports', 22 );
+
+function foo_enqueue_style() {
+	wp_enqueue_style( 'wp-block-supports' );
+}
+add_action( 'get_footer', 'foo_enqueue_style' );
+
+/**
+ * TODO.
+ */
+function gutenberg_block_supports_classes() {
+	global $block_supports_config, $current_parsed_block;
+
+	if (
+		empty( $current_parsed_block ) ||
+		! isset( $current_parsed_block['attrs'] ) ||
+		! isset( $current_parsed_block['blockName'] )
+	) {
+		// TODO: handle as error?
+		return '';
+	}
+
+	$block_attributes = $current_parsed_block['attrs'];
+	$block_type       = WP_Block_Type_Registry::get_instance()->get_registered(
+		$current_parsed_block['blockName']
+	);
+
+	if ( empty( $block_type ) ) {
+		// TODO: handle as error?
+		return '';
+	}
+
+	$output = '';
+	foreach ( $block_supports_config as $feature_name => $feature_config ) {
+		// TODO: split feature names like color.text.
+		// TODO: look at default value.
+		if (
+			! gutenberg_experimental_get(
+				$block_type->supports,
+				array( $feature_name ),
+				$feature_config['default']
+			)
+		) {
+			continue;
+		}
+		$classes = call_user_func(
+			$feature_config['callback'],
+			// Pick from $block_attributes according to feature attributes.
+			array_intersect_key(
+				$block_attributes,
+				array_flip( array_keys( $feature_config['attributes'] ) )
+			),
+			$block_type->name
+		);
+		if ( ! empty( $classes ) ) {
+			$output .= " $classes";
+		}
+	}
+	return $output;
+}
 
 /**
  * Filters the frontend output of blocks and apply the block support flags transformations.
@@ -140,11 +275,11 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	}
 
 	$attributes = array();
-	$attributes = gutenberg_apply_generated_classname_support( $attributes, $block['attrs'], $block_type );
+	/* $attributes = gutenberg_apply_generated_classname_support( $attributes, $block['attrs'], $block_type ); */
 	$attributes = gutenberg_apply_colors_support( $attributes, $block['attrs'], $block_type );
-	$attributes = gutenberg_apply_typography_support( $attributes, $block['attrs'], $block_type );
-	$attributes = gutenberg_apply_alignment_support( $attributes, $block['attrs'], $block_type );
-	$attributes = gutenberg_apply_custom_classname_support( $attributes, $block['attrs'], $block_type );
+	/* $attributes = gutenberg_apply_typography_support( $attributes, $block['attrs'], $block_type ); */
+	/* $attributes = gutenberg_apply_alignment_support( $attributes, $block['attrs'], $block_type ); */
+	/* $attributes = gutenberg_apply_custom_classname_support( $attributes, $block['attrs'], $block_type ); */
 
 	if ( ! count( $attributes ) ) {
 		return $block_content;
