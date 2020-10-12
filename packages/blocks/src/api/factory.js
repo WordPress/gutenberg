@@ -56,10 +56,13 @@ export function createBlock( name, attributes = {}, innerBlocks = [] ) {
 		blockType.attributes,
 		( accumulator, schema, key ) => {
 			const value = attributes[ key ];
-
+			const hasDefault = schema.hasOwnProperty( 'default' );
 			if ( undefined !== value ) {
-				accumulator[ key ] = value;
-			} else if ( schema.hasOwnProperty( 'default' ) ) {
+				accumulator[ key ] =
+					schema.type === 'object' && hasDefault
+						? { ...schema.default, ...value }
+						: value;
+			} else if ( hasDefault ) {
 				accumulator[ key ] = schema.default;
 			}
 
