@@ -41,12 +41,12 @@
 		"isList": {
 			"type": "boolean",
 			"default": true
-		},
-		"providesContext": {
-			"allowBlockAlign": "allowBlockAlign",
-			"allowResize": "allowResize",
-			"isList": "isList"
 		}
+	},
+	"providesContext": {
+		"allowBlockAlign": "allowBlockAlign",
+		"allowResize": "allowResize",
+		"isList": "isList"
 	},
 	"supports": {
 		"anchor": true,
