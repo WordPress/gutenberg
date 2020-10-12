@@ -1068,7 +1068,10 @@ _Related_
 
 <a name="autosave" href="#autosave">#</a> **autosave**
 
-Action generator used in signalling that the post should autosave.
+Action generator used in signalling that the post should autosave.  This
+includes server-side autosaving (default) and client-side (a.k.a. local)
+autosaving (e.g. on the Web, the post might be committed to Session
+Storage).
 
 _Parameters_
 
