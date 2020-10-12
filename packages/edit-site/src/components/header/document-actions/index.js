@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 import {
 	__experimentalGetBlockLabel as getBlockLabel,
 	getBlockType,
@@ -15,12 +15,6 @@ import { useSelect } from '@wordpress/data';
 import { Dropdown, Button, VisuallyHidden } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import TemplateDetails from '../../template-details';
-import { getTemplateInfo } from '../../../utils';
 
 function getBlockDisplayText( block ) {
 	return block
@@ -50,8 +44,20 @@ function useSecondaryText() {
 	return {};
 }
 
-export default function DocumentActions( { template } ) {
-	const { title: documentTitle } = getTemplateInfo( template );
+/**
+ * @param {Object}   props             Props for the DocumentActions component.
+ * @param {string}   props.entityTitle The title to display.
+ * @param {string}   props.entityLabel A label to use for entity-related options.
+ *                                     E.g. "template" would be used for "edit
+ *                                     template" and "show template details".
+ * @param {Object[]} props.children    React component to use for the
+ *                                     information dropdown area.
+ */
+export default function DocumentActions( {
+	entityTitle,
+	entityLabel,
+	children: dropdownContent,
+} ) {
 	const { label, isActive } = useSecondaryText();
 
 	// Title is active when there is no secondary item, or when the secondary
@@ -69,7 +75,7 @@ export default function DocumentActions( { template } ) {
 				'has-secondary-label': !! label,
 			} ) }
 		>
-			{ documentTitle ? (
+			{ entityTitle ? (
 				<>
 					<div
 						ref={ titleRef }
@@ -77,7 +83,11 @@ export default function DocumentActions( { template } ) {
 					>
 						<h1>
 							<VisuallyHidden>
-								{ __( 'Edit template:' ) }
+								{ sprintf(
+									/* translators: %s: the entity being edited, like "template"*/
+									__( 'Edit %s:' ),
+									entityLabel
+								) }
 							</VisuallyHidden>
 							<div
 								className={ classnames(
@@ -88,10 +98,10 @@ export default function DocumentActions( { template } ) {
 									}
 								) }
 							>
-								{ documentTitle }
+								{ entityTitle }
 							</div>
 						</h1>
-						{ ! isActive && (
+						{ dropdownContent && ! isActive && (
 							<Dropdown
 								popoverProps={ {
 									anchorRef: titleRef.current,
@@ -104,12 +114,14 @@ export default function DocumentActions( { template } ) {
 										aria-expanded={ isOpen }
 										aria-haspopup="true"
 										onClick={ onToggle }
-										label={ __( 'Show template details' ) }
+										label={ sprintf(
+											/* translators: %s: the entity to see details about, like "template"*/
+											__( 'Show %s details' ),
+											entityLabel
+										) }
 									/>
 								) }
-								renderContent={ () => (
-									<TemplateDetails template={ template } />
-								) }
+								renderContent={ () => dropdownContent }
 							/>
 						) }
 					</div>

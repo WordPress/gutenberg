@@ -22,32 +22,44 @@ import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
+import TemplateDetails from '../template-details';
+import { getTemplateInfo } from '../../utils';
 
 export default function Header( { openEntitiesSavedStates } ) {
-	const { deviceType, hasFixedToolbar, template, isInserterOpen } = useSelect(
-		( select ) => {
-			const {
-				__experimentalGetPreviewDeviceType,
-				isFeatureActive,
-				getTemplateId,
-				isInserterOpened,
-			} = select( 'core/edit-site' );
-			const { getEntityRecord } = select( 'core' );
+	const {
+		deviceType,
+		hasFixedToolbar,
+		template,
+		templatePart,
+		templateType,
+		isInserterOpen,
+	} = useSelect( ( select ) => {
+		const {
+			__experimentalGetPreviewDeviceType,
+			isFeatureActive,
+			getTemplateId,
+			getTemplatePartId,
+			getTemplateType,
+			isInserterOpened,
+		} = select( 'core/edit-site' );
+		const { getEntityRecord } = select( 'core' );
 
-			const _templateId = getTemplateId();
-			return {
-				deviceType: __experimentalGetPreviewDeviceType(),
-				hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
-				template: getEntityRecord(
-					'postType',
-					'wp_template',
-					_templateId
-				),
-				isInserterOpen: isInserterOpened(),
-			};
-		},
-		[]
-	);
+		const templatePartId = getTemplatePartId();
+		const templateId = getTemplateId();
+
+		return {
+			deviceType: __experimentalGetPreviewDeviceType(),
+			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+			template: getEntityRecord( 'postType', 'wp_template', templateId ),
+			templatePart: getEntityRecord(
+				'postType',
+				'wp_template_part',
+				templatePartId
+			),
+			templateType: getTemplateType(),
+			isInserterOpen: isInserterOpened(),
+		};
+	}, [] );
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
@@ -57,6 +69,11 @@ export default function Header( { openEntitiesSavedStates } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const displayBlockToolbar =
 		! isLargeViewport || deviceType !== 'Desktop' || hasFixedToolbar;
+
+	let { title } = getTemplateInfo( template );
+	if ( 'wp_template_part' === templateType ) {
+		title = templatePart?.slug;
+	}
 
 	return (
 		<div className="edit-site-header">
@@ -88,7 +105,18 @@ export default function Header( { openEntitiesSavedStates } ) {
 			</div>
 
 			<div className="edit-site-header_center">
-				<DocumentActions template={ template } />
+				<DocumentActions
+					entityTitle={ title }
+					entityLabel={
+						templateType === 'wp_template'
+							? 'template'
+							: 'template part'
+					}
+				>
+					{ templateType === 'wp_template' && (
+						<TemplateDetails template={ template } />
+					) }
+				</DocumentActions>
 			</div>
 
 			<div className="edit-site-header_end">
