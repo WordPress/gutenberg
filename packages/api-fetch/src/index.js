@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import batchMiddleware from './middlewares/batch';
 import createNonceMiddleware from './middlewares/nonce';
 import createRootURLMiddleware from './middlewares/root-url';
 import createPreloadingMiddleware from './middlewares/preloading';
@@ -18,6 +19,7 @@ const middlewares = [
 	namespaceEndpointMiddleware,
 	httpV1Middleware,
 	fetchAllMiddleware,
+	batchMiddleware,
 ];
 
 function registerMiddleware( middleware ) {
@@ -54,6 +56,7 @@ function apiFetch( options ) {
 apiFetch.use = registerMiddleware;
 apiFetch.setFetchHandler = setFetchHandler;
 
+apiFetch.batchMiddleware = batchMiddleware;
 apiFetch.createNonceMiddleware = createNonceMiddleware;
 apiFetch.createPreloadingMiddleware = createPreloadingMiddleware;
 apiFetch.createRootURLMiddleware = createRootURLMiddleware;

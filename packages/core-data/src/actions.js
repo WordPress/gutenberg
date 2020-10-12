@@ -178,6 +178,8 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
 		deletedRecord = yield apiFetch( {
 			path,
 			method: 'DELETE',
+			// Just a placeholder to demonstrate the idea, this should come from the caller:
+			batchAs: `${ kind }-${ name }`,
 		} );
 
 		yield removeItems( kind, name, recordId, true );
@@ -413,6 +415,8 @@ export function* saveEntityRecord(
 				path: `${ path }/autosaves`,
 				method: 'POST',
 				data,
+				// Just a placeholder to demonstrate the idea, this should come from the caller:
+				batchAs: `${ kind }-${ name }`,
 			} );
 			// An autosave may be processed by the server as a regular save
 			// when its update is requested by the author and the post had
@@ -505,6 +509,8 @@ export function* saveEntityRecord(
 				path,
 				method: recordId ? 'PUT' : 'POST',
 				data,
+				// Just a placeholder to demonstrate the idea, this should come from the caller:
+				batchAs: `${ kind }-${ name }`,
 			} );
 			yield receiveEntityRecords(
 				kind,
