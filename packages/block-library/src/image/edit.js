@@ -82,6 +82,7 @@ export function ImageEdit( {
 	onReplace,
 	context,
 } ) {
+	console.log( context );
 	const {
 		url = '',
 		alt,
