@@ -89,6 +89,14 @@ body.is-navigation-sidebar-open {
 	flex-wrap: wrap;
 	padding-right: $grid-unit-05;
 
+	.interface-pinned-items {
+		display: none;
+
+		@include break-medium() {
+			display: block;
+		}
+	}
+
 	// Adjust button paddings to scale better to mobile.
 	.editor-post-saved-state,
 	.components-button.components-button {
