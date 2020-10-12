@@ -46,7 +46,6 @@ const LinkSettingsScreen = ( {
 	const {
 		shouldEnableBottomSheetMaxHeight,
 		onHandleClosingBottomSheet,
-		setIsChildrenScrollable,
 		listProps,
 	} = useContext( BottomSheetContext );
 
@@ -55,7 +54,6 @@ const LinkSettingsScreen = ( {
 	const { inputValue = activeAttributes.url || '' } = route.params || {};
 	const onLinkCellPressed = () => {
 		shouldEnableBottomSheetMaxHeight( false );
-		setIsChildrenScrollable( true );
 		navigation.navigate( linkSettingsScreens.picker, { inputValue } );
 	};
 	useEffect( () => {

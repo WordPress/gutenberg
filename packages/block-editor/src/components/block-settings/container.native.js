@@ -48,6 +48,7 @@ function BottomSheetSettings( {
 				<BottomSheet.NavigationScreen
 					name={ blockSettingsScreens.linkPicker }
 					fullScreen
+					isScrollable
 				>
 					<LinkPickerScreen
 						returnScreenName={ blockSettingsScreens.settings }

@@ -28,6 +28,7 @@ function LinkSettingsNavigation( props ) {
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
 					name={ linkSettingsScreens.linkPicker }
+					isScrollable
 					fullScreen
 				>
 					<LinkPickerScreen

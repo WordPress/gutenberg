@@ -29,6 +29,7 @@ const ModalLinkUI = ( { isVisible, ...restProps } ) => {
 					</BottomSheet.NavigationScreen>
 					<BottomSheet.NavigationScreen
 						name={ screens.picker }
+						isScrollable
 						fullScreen
 					>
 						<LinkPickerScreen />

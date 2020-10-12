@@ -6,7 +6,7 @@ import {
 	useNavigation,
 	useFocusEffect,
 } from '@react-navigation/native';
-import { View } from 'react-native';
+import { View, ScrollView, TouchableHighlight } from 'react-native';
 import { debounce } from 'lodash';
 
 /**
@@ -21,7 +21,11 @@ import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
  */
 import { BottomSheetNavigationContext } from './bottom-sheet-navigation-context';
 
-const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
+const BottomSheetNavigationScreen = ( {
+	children,
+	fullScreen,
+	isScrollable,
+} ) => {
 	const navigation = useNavigation();
 	const heightRef = useRef( { maxHeight: 0 } );
 	const isFocused = useIsFocused();
@@ -29,6 +33,8 @@ const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 		onHandleHardwareButtonPress,
 		shouldEnableBottomSheetMaxHeight,
 		setIsFullScreen,
+		listProps,
+		safeAreaBottomInset,
 	} = useContext( BottomSheetContext );
 
 	const { setHeight } = useContext( BottomSheetNavigationContext );
@@ -71,7 +77,18 @@ const BottomSheetNavigationScreen = ( { children, fullScreen } ) => {
 	};
 
 	return useMemo( () => {
-		return <View onLayout={ onLayout }>{ children }</View>;
+		return isScrollable ? (
+			<View onLayout={ onLayout }>{ children }</View>
+		) : (
+			<ScrollView { ...listProps }>
+				<TouchableHighlight accessible={ false }>
+					<View onLayout={ onLayout }>
+						{ children }
+						<View style={ { height: safeAreaBottomInset } } />
+					</View>
+				</TouchableHighlight>
+			</ScrollView>
+		);
 	}, [ children, isFocused ] );
 };
 
