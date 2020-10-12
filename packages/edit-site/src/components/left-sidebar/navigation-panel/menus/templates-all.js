@@ -8,13 +8,14 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import TemplateNavigationItems from '../template-navigation-items';
+import { MENU_TEMPLATES, MENU_TEMPLATES_ALL } from '../constants';
 
 export default function TemplatesAllMenu( { templates, onActivateItem } ) {
 	return (
 		<NavigationMenu
-			menu="templates-all"
+			menu={ MENU_TEMPLATES_ALL }
 			title={ __( 'All Templates' ) }
-			parentMenu="templates"
+			parentMenu={ MENU_TEMPLATES }
 		>
 			<TemplateNavigationItems
 				templates={ templates }
