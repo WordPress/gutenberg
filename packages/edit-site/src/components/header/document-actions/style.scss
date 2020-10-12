@@ -31,8 +31,6 @@
 	}
 
 	.edit-site-document-actions__title {
-		font-size: $default-font-size;
-		font-weight: bold;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -44,7 +42,6 @@
 	}
 
 	.edit-site-document-actions__secondary-item {
-		font-size: $default-font-size;
 		opacity: 0;
 		transform: translateY(0);
 		transition: transform 0.2s;
@@ -62,27 +59,10 @@
 			transform: translateY(-14px);
 		}
 
-		.edit-site-document-actions__title {
-			color: $gray-900;
-			font-weight: bold;
-
-			&.is-secondary-title-active {
-				color: $gray-700;
-				font-weight: normal;
-			}
-		}
-
 		.edit-site-document-actions__secondary-item {
-			color: $gray-700;
-			font-weight: normal;
 			opacity: 1;
 			white-space: nowrap;
 			transform: translateY(-8px);
-
-			&.is-secondary-title-active {
-				color: $gray-900;
-				font-weight: bold;
-			}
 		}
 	}
 }
