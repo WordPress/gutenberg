@@ -6,7 +6,6 @@ import { isEqual, find, some, filter, throttle, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { ESCAPE } from '@wordpress/keycodes';
 import { Component, createContext, createRef } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -61,7 +60,6 @@ class DropZoneProvider extends Component {
 		// Event listeners
 		this.onDragOver = this.onDragOver.bind( this );
 		this.onDrop = this.onDrop.bind( this );
-		this.onKeyUp = this.onKeyUp.bind( this );
 		// Context methods so this component can receive data from consumers
 		this.addDropZone = this.addDropZone.bind( this );
 		this.removeDropZone = this.removeDropZone.bind( this );
@@ -90,9 +88,10 @@ class DropZoneProvider extends Component {
 		const { defaultView } = ownerDocument;
 		defaultView.addEventListener( 'dragover', this.onDragOver );
 		defaultView.addEventListener( 'mouseup', this.resetDragState );
-		// The `dragend` event could be used for this, but only has partial
-		// support in firefox.
-		defaultView.addEventListener( 'keyup', this.onKeyUp );
+		// Note that `dragend` doesn't fire consistently for file and HTML drag
+		// events where the drag origin is outside the browser window.
+		// In Firefox it may also not fire if the originating node is removed.
+		defaultView.addEventListener( 'dragend', this.resetDragState );
 	}
 
 	componentWillUnmount() {
@@ -100,7 +99,7 @@ class DropZoneProvider extends Component {
 		const { defaultView } = ownerDocument;
 		defaultView.removeEventListener( 'dragover', this.onDragOver );
 		defaultView.removeEventListener( 'mouseup', this.resetDragState );
-		defaultView.removeEventListener( 'keyup', this.onKeyUp );
+		defaultView.removeEventListener( 'dragend', this.resetDragState );
 	}
 
 	addDropZone( dropZone ) {
@@ -230,14 +229,6 @@ class DropZoneProvider extends Component {
 	onDragOver( event ) {
 		this.toggleDraggingOverDocument( event, getDragEventType( event ) );
 		event.preventDefault();
-	}
-
-	onKeyUp( event ) {
-		const { isDraggingOverDocument } = this.state;
-		// If the user presses escape while dragging, cancel the drag.
-		if ( isDraggingOverDocument && event.keyCode === ESCAPE ) {
-			this.resetDragState();
-		}
 	}
 
 	onDrop( event ) {
