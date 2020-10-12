@@ -21,22 +21,7 @@ import {
 	parseGradient,
 } from './utils';
 
-const DEFAULT_OPTIONS = [
-	{
-		name: __( 'Dark grayscale' ),
-		colors: [ '#000000', '#7f7f7f' ],
-	},
-	{
-		name: __( 'Grayscale' ),
-		colors: [ '#000000', '#ffffff' ],
-	},
-	{
-		name: __( 'Light grayscale' ),
-		colors: [ '#7f7f7f', '#ffffff' ],
-	},
-];
-
-function DuotoneToolbar( { value, onChange, options = DEFAULT_OPTIONS } ) {
+function DuotoneToolbar( { value, onChange, options } ) {
 	const gradient = getGradientFromValues( value );
 	const gradients = options.map( ( { colors, ...rest } ) => ( {
 		...rest,

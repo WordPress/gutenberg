@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { SVG } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
-import { useEffect, useMemo } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
@@ -23,42 +23,25 @@ import {
 } from '../components';
 
 /**
- * Used so memoized function doesn't recompute for new empty arrays.
+ * Duotone colors used when the theme doesn't include any.
  */
-const EMPTY_ARRAY = [];
-
-// TODO: Remove when gradients are pulled from theme.json
-const GRAYSCALE_GRADIENTS = [
+const DEFAULT_DUOTONE_OPTIONS = [
 	{
 		name: __( 'Dark grayscale' ),
-		gradient: 'linear-gradient(135deg,#7f7f7f 0%,#000000 100%)',
+		colors: [ '#000000', '#7f7f7f' ],
 		slug: 'dark-grayscale',
 	},
 	{
 		name: __( 'Grayscale' ),
-		gradient: 'linear-gradient(135deg,#ffffff 0%,#000000 100%)',
+		colors: [ '#000000', '#ffffff' ],
 		slug: 'grayscale',
 	},
 	{
 		name: __( 'Light grayscale' ),
-		gradient: 'linear-gradient(135deg,#ffffff 0%,#7f7f7f 100%)',
+		colors: [ '#7f7f7f', '#ffffff' ],
 		slug: 'light-grayscale',
 	},
 ];
-
-// TODO: Remove when gradients are pulled from theme.json
-const COLOR_REGEX = /rgba?\([0-9,\s]*\)|#[a-fA-F0-9]{3,8}/g;
-function parseGradientColors( cssGradient = '' ) {
-	const stops = [];
-
-	let match;
-	while ( ( match = COLOR_REGEX.exec( cssGradient ) ) ) {
-		stops.push( match[ 0 ] );
-	}
-
-	// Reverse the list because most default gradients work better that way.
-	return stops.reverse();
-}
 
 /**
  * Filters registered block settings, extending attributes to include
@@ -193,17 +176,8 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 			} );
 		}, [ instanceId, attributes.duotoneValues ] );
 
-		// TODO: Remove this as it was an experiment for using theme gradients.
-		// It will be replaced with custom duotone/multitone color lists.
-		const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
-		const options = useMemo(
-			() =>
-				[ ...gradients, ...GRAYSCALE_GRADIENTS ].map( ( swatch ) => ( {
-					colors: parseGradientColors( swatch.gradient ),
-					...swatch,
-				} ) ),
-			[ gradients ]
-		);
+		const options =
+			useEditorFeature( 'color.duotone' ) || DEFAULT_DUOTONE_OPTIONS;
 
 		return (
 			<>
