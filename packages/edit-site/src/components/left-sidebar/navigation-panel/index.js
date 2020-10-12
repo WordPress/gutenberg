@@ -18,8 +18,7 @@ import { __ } from '@wordpress/i18n';
 import TemplatesMenu from './menus/templates';
 import TemplatePartsMenu from './menus/template-parts';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS, MENU_TEMPLATES } from './constants';
-import PageSwitcher from './page-switcher';
-import ContentMenu from './menus/content';
+import ContentNavigation from './content-navigation';
 
 export const {
 	Fill: NavigationPanelPreviewFill,
@@ -35,49 +34,39 @@ const NavigationPanel = () => {
 		}
 	}, [ ref ] );
 
-	const {
-		templateId,
-		templatePartId,
-		templateType,
-		activeMenu,
-		page,
-	} = useSelect( ( select ) => {
-		const {
-			getTemplateId,
-			getTemplatePartId,
-			getTemplateType,
-			getNavigationPanelActiveMenu,
-			getPage,
-		} = select( 'core/edit-site' );
+	const { templateId, templatePartId, templateType, activeMenu } = useSelect(
+		( select ) => {
+			const {
+				getTemplateId,
+				getTemplatePartId,
+				getTemplateType,
+				getNavigationPanelActiveMenu,
+			} = select( 'core/edit-site' );
 
-		return {
-			page: getPage(),
-			templateId: getTemplateId(),
-			templatePartId: getTemplatePartId(),
-			templateType: getTemplateType(),
-			activeMenu: getNavigationPanelActiveMenu(),
-		};
-	}, [] );
+			return {
+				templateId: getTemplateId(),
+				templatePartId: getTemplatePartId(),
+				templateType: getTemplateType(),
+				activeMenu: getNavigationPanelActiveMenu(),
+			};
+		},
+		[]
+	);
 
 	const {
 		setTemplate,
 		setTemplatePart,
 		setNavigationPanelActiveMenu,
-		setPage,
 	} = useDispatch( 'core/edit-site' );
-
-	let activeItem =
-		'wp_template' === templateType
-			? `${ templateType }-${ templateId }`
-			: `${ templateType }-${ templatePartId }`;
-	if ( activeMenu === 'content' && page ) {
-		activeItem = `content-${ page.path }`;
-	}
 
 	return (
 		<div className="edit-site-navigation-panel">
 			<Navigation
-				activeItem={ activeItem }
+				activeItem={
+					'wp_template' === templateType
+						? `${ templateType }-${ templateId }`
+						: `${ templateType }-${ templatePartId }`
+				}
 				activeMenu={ activeMenu }
 				onActivateMenu={ setNavigationPanelActiveMenu }
 			>
@@ -101,18 +90,13 @@ const NavigationPanel = () => {
 						navigateToMenu={ MENU_TEMPLATE_PARTS }
 					/>
 
-					<NavigationItem
-						title={ __( 'Content' ) }
-						navigateToMenu="content"
-					/>
-
 					<TemplatesMenu onActivateItem={ setTemplate } />
 
 					<TemplatePartsMenu onActivateItem={ setTemplatePart } />
-
-					<ContentMenu onChangePage={ setPage } />
 				</NavigationMenu>
 			</Navigation>
+
+			<ContentNavigation />
 
 			<NavigationPanelPreviewSlot />
 		</div>
