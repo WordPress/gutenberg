@@ -123,6 +123,7 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": true
+		"align": true,
+		"__experimentalSelector": ".wp-block-button > table"
 	}
 }

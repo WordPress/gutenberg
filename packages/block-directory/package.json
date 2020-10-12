@@ -26,6 +26,7 @@
 		"!((src|build|build-module)/components/**)"
 	],
 	"dependencies": {
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/blocks": "file:../blocks",

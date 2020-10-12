@@ -58,6 +58,7 @@
 		"anchor": true,
 		"align": true,
 		"alignWide": false,
-		"reusable": false
+		"reusable": false,
+		"__experimentalSelector": ".wp-block-button > a"
 	}
 }
