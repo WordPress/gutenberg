@@ -6,7 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, InnerBlocks } from '@wordpress/block-editor';
+import {
+	RichText,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+} from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
@@ -33,7 +36,15 @@ export const Gallery = ( props ) => {
 		caption,
 		imageCrop,
 	} = attributes;
-
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: classnames( 'wp-block-gallery__container' ),
+		},
+		{
+			allowedBlocks: [ 'core/image' ],
+			orientation: 'horizontal',
+		}
+	);
 	return (
 		<figure
 			className={ classnames( className, {
@@ -42,11 +53,7 @@ export const Gallery = ( props ) => {
 				'is-cropped': imageCrop,
 			} ) }
 		>
-			<InnerBlocks
-				allowedBlocks={ [ 'core/image' ] }
-				__experimentalTagName="ul"
-				orientation="horizontal"
-			/>
+			<ul { ...innerBlocksProps } />
 
 			{ mediaPlaceholder }
 			<RichTextVisibilityHelper

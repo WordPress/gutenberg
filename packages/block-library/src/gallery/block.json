@@ -30,7 +30,7 @@
 			"type": "string",
 			"default": "large"
 		},
-		"allowBlockAlign": {
+		"allowAlign": {
 			"type": "boolean",
 			"default": false
 		},
@@ -44,7 +44,7 @@
 		}
 	},
 	"providesContext": {
-		"allowBlockAlign": "allowBlockAlign",
+		"allowAlign": "allowAlign",
 		"allowResize": "allowResize",
 		"isList": "isList"
 	},
