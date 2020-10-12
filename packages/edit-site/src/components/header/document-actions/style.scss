@@ -3,6 +3,9 @@
 	flex-direction: column;
 	justify-content: center;
 	height: 100%;
+	// Flex items will, by default, refuse to shrink below a minimum intrinsic width. In
+	// order to shrink this flexbox item, and subsequently truncate child text, we set
+	// an explicit min-width. See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 	min-width: 0;
 
 	.edit-site-document-actions__title-wrapper {
@@ -10,6 +13,8 @@
 		flex-direction: row;
 		justify-content: center;
 		align-items: center;
+
+		// See comment above about min-width
 		min-width: 0;
 	}
 
@@ -17,6 +22,8 @@
 		display: flex;
 		justify-content: center;
 		margin: 0;
+
+		// See comment above about min-width
 		min-width: 0;
 	}
 
