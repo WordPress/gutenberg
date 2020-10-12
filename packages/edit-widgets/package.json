@@ -1,7 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "0.22.0",
-	"private": true,
+	"version": "0.23.0",
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -52,6 +51,7 @@
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",
+		"reakit": "^1.1.0",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {

@@ -53,7 +53,9 @@ class WP_Widget_Block extends WP_Widget {
 	 * @global WP_Post $post Global post object.
 	 */
 	public function widget( $args, $instance ) {
+		echo $args['before_widget'];
 		echo do_blocks( $instance['content'] );
+		echo $args['after_widget'];
 	}
 
 	/**

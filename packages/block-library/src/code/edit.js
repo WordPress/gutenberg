@@ -2,15 +2,12 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	RichText,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
-} from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function CodeEdit( { attributes, setAttributes } ) {
-	const blockWrapperProps = useBlockWrapperProps();
+	const blockProps = useBlockProps();
 	return (
-		<pre { ...blockWrapperProps }>
+		<pre { ...blockProps }>
 			<RichText
 				tagName="code"
 				value={ attributes.content }

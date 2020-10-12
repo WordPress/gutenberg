@@ -88,8 +88,9 @@ class WP_REST_Widget_Utils_Controller extends WP_REST_Controller {
 	 *
 	 * @return boolean| True if the widget being referenced exists and false otherwise.
 	 * @since 5.2.0
+	 * @access public
 	 */
-	private function is_valid_widget( $widget_class ) {
+	public function is_valid_widget( $widget_class ) {
 		$widget_class = urldecode( $widget_class );
 		global $wp_widget_factory;
 		if ( ! $widget_class ) {

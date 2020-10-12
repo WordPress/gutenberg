@@ -11,7 +11,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	InspectorControls,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import {
 	ToolbarGroup,
@@ -43,7 +43,7 @@ export default function PostTitleEdit( {
 		[ postType, postId ]
 	);
 
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
@@ -109,7 +109,7 @@ export default function PostTitleEdit( {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<TagName { ...blockWrapperProps }>{ title }</TagName>
+			<TagName { ...blockProps }>{ title }</TagName>
 		</>
 	);
 }

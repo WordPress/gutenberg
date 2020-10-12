@@ -9,6 +9,7 @@ export const DEPRECATED_ENTRY_KEYS = [
 	'save',
 	'migrate',
 	'isEligible',
+	'apiVersion',
 ];
 
 export const __EXPERIMENTAL_STYLE_PROPERTY = {

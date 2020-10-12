@@ -5,8 +5,8 @@
 import { Fragment } from '@wordpress/element';
 
 import {
-	InnerBlocks,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useBlockProps,
 	InspectorControls,
 } from '@wordpress/block-editor';
 import { ToggleControl, PanelBody } from '@wordpress/components';
@@ -32,7 +32,14 @@ export function SocialLinksEdit( props ) {
 		attributes: { openInNewTab },
 		setAttributes,
 	} = props;
-	const blockWrapperProps = useBlockWrapperProps();
+	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+		templateLock: false,
+		template: TEMPLATE,
+		orientation: 'horizontal',
+		__experimentalAppenderTagName: 'li',
+	} );
 	return (
 		<Fragment>
 			<InspectorControls>
@@ -46,15 +53,7 @@ export function SocialLinksEdit( props ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<InnerBlocks
-				allowedBlocks={ ALLOWED_BLOCKS }
-				templateLock={ false }
-				template={ TEMPLATE }
-				orientation="horizontal"
-				__experimentalTagName="ul"
-				__experimentalPassedProps={ blockWrapperProps }
-				__experimentalAppenderTagName="li"
-			/>
+			<ul { ...innerBlocksProps } />
 		</Fragment>
 	);
 }

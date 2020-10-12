@@ -185,6 +185,10 @@ public class Gutenberg: NSObject {
 
         bridgeModule.sendEventIfNeeded(.updateTheme, body:themeUpdates)
     }
+
+    public func showNotice(_ message: String) {
+        sendEvent(.showNotice, body: ["message": message])
+    }
 }
 
 extension Gutenberg: RCTBridgeDelegate {

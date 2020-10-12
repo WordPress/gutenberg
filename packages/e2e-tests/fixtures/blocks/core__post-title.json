@@ -6,7 +6,7 @@
 		"attributes": {
 			"level": 2,
 			"isLink": false,
-			"linkTarget": "_blank",
+			"linkTarget": "_self",
 			"rel": ""
 		},
 		"innerBlocks": [],

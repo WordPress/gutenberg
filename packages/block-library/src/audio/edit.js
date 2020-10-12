@@ -16,7 +16,7 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	RichText,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -41,7 +41,7 @@ function AudioEdit( {
 	insertBlocksAfter,
 } ) {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
-	const blockWrapperProps = useBlockWrapperProps();
+	const blockProps = useBlockProps();
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return getSettings().mediaUpload;
@@ -116,7 +116,7 @@ function AudioEdit( {
 	}
 	if ( ! src ) {
 		return (
-			<div { ...blockWrapperProps }>
+			<div { ...blockProps }>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
 					onSelect={ onSelectAudio }
@@ -175,7 +175,7 @@ function AudioEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<figure { ...blockWrapperProps }>
+			<figure { ...blockProps }>
 				{ /*
 					Disable the audio tag so the user clicking on it won't play the
 					file or change the position slider when the controls are enabled.

@@ -46,10 +46,6 @@
 		bottom: 0;
 		right: 0;
 		z-index: z-index(".wp-block-cover.has-background-dim::before");
-	}
-
-	&.has-background-dim:not(.has-background-gradient)::before,
-	& .wp-block-cover__gradient-background {
 		opacity: 0.5;
 	}
 
