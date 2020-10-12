@@ -120,7 +120,25 @@ $block_supports_config = array(
 				'type' => 'object',
 			),
 		),
-		'callback'   => 'foo_default',
+		'callback'   => function( $attributes, $block_name ) {
+			$has_line_height = isset( $attributes['style']['typography']['lineHeight'] );
+
+			$classes = '';
+			if ( $has_line_height ) {
+				$generated_class_name = uniqid( 'wp-block-lineheight-' );
+				$classes = $generated_class_name;
+				wp_add_inline_style(
+					'wp-block-supports',
+					sprintf(
+						'.%s { line-height: %s; }',
+						$generated_class_name,
+						$attributes['style']['typography']['lineHeight']
+					)
+				);
+			}
+
+			return $classes;
+		},
 		'default'    => false,
 	),
 );
@@ -136,7 +154,6 @@ function gutenberg_register_block_supports() {
 	// instead of mutating the block type.
 	foreach ( $registered_block_types as $block_type ) {
 		gutenberg_register_colors_support( $block_type );
-		/* gutenberg_register_typography_support( $block_type ); */
 	}
 }
 add_action( 'init', 'gutenberg_register_block_supports', 21 );
@@ -262,7 +279,6 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 
 	$attributes = array();
 	$attributes = gutenberg_apply_colors_support( $attributes, $block['attrs'], $block_type );
-	/* $attributes = gutenberg_apply_typography_support( $attributes, $block['attrs'], $block_type ); */
 
 	if ( ! count( $attributes ) ) {
 		return $block_content;
