@@ -267,9 +267,17 @@ export class BlockMediaUpdateProgress extends React.Component {
 			this.state.isUploadInProgress || this.state.isSaveInProgress;
 		const progress = this.state.progress * 100;
 		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
-		const retryMessage = __(
+		const retryMessageSave = __(
 			'Failed to save files.\nPlease tap for options.'
 		);
+		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
+		const retryMessageUpload = __(
+			'Failed to upload files.\nPlease tap for options.'
+		);
+		let retryMessage = retryMessageSave;
+		if ( isUploadFailed ) {
+			retryMessage = retryMessageUpload;
+		}
 
 		return (
 			<View style={ styles.mediaUploadProgress } pointerEvents="box-none">

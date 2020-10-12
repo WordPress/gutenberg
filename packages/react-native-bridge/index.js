@@ -259,4 +259,16 @@ export function requestMediaFilesEditorLoad( mediaFiles, blockClientId ) {
 	);
 }
 
+export function requestMediaFilesFailedRetryDialog( mediaFiles ) {
+	return RNReactNativeGutenbergBridge.requestMediaFilesFailedRetryDialog(
+		mediaFiles
+	);
+}
+
+export function requestMediaFilesUploadCancelDialog( mediaFiles ) {
+	return RNReactNativeGutenbergBridge.requestMediaFilesUploadCancelDialog(
+		mediaFiles
+	);
+}
+
 export default RNReactNativeGutenbergBridge;

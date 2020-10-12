@@ -188,6 +188,20 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles) {
+                // mReplaceStoryEditedBlockCallback = replaceStoryEditedBlockCallback;
+                // mOnMediaFilesEditorLoadRequestListener.onRequestMediaFilesEditorLoad(content, blockId);
+                Toast.makeText(MainApplication.this, "requestMediaFilesFailedRetryDialog called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles) {
+                // mReplaceStoryEditedBlockCallback = replaceStoryEditedBlockCallback;
+                // mOnMediaFilesEditorLoadRequestListener.onRequestMediaFilesEditorLoad(content, blockId);
+                Toast.makeText(MainApplication.this, "requestMediaFilesUploadCancelDialog called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
             public void gutenbergDidSendButtonPressedAction(String buttonType) {
 
             }
