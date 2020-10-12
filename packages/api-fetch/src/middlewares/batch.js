@@ -5,7 +5,7 @@ import apiFetch from '../index';
 
 const BATCH_TIME_WINDOW = 1000;
 const MAX_BATCH_SIZE = 20;
-const scheduledBatches = {};
+const awaitingBatches = {};
 
 /**
  * Middleware handling request batching.
@@ -38,19 +38,19 @@ function endpointSupportsBatch( path ) {
 }
 
 function addRequestToBatch( batchId, options ) {
-	if ( ! scheduledBatches[ batchId ] ) {
-		scheduledBatches[ batchId ] = {
+	if ( ! awaitingBatches[ batchId ] ) {
+		awaitingBatches[ batchId ] = {
 			promise: null,
 			requests: [],
 		};
 	}
 
-	scheduledBatches[ batchId ].requests.push( options );
-	return scheduledBatches[ batchId ].requests.length - 1;
+	awaitingBatches[ batchId ].requests.push( options );
+	return awaitingBatches[ batchId ].requests.length - 1;
 }
 
 function commitEventually( batchId ) {
-	const batch = scheduledBatches[ batchId ];
+	const batch = awaitingBatches[ batchId ];
 	if ( ! batch.promise ) {
 		batch.promise = new Promise( ( resolve ) => {
 			setTimeout( () => resolve( commit( batchId ) ), BATCH_TIME_WINDOW );
@@ -61,8 +61,8 @@ function commitEventually( batchId ) {
 
 function commit( batchId ) {
 	// Pop unit of work so it cannot be altered by outside code
-	const unitOfWork = scheduledBatches[ batchId ];
-	delete scheduledBatches[ batchId ];
+	const unitOfWork = awaitingBatches[ batchId ];
+	delete awaitingBatches[ batchId ];
 
 	// Clear eventual commit in case commit was called before commitEventually kicked in
 	clearTimeout( unitOfWork.promise );
