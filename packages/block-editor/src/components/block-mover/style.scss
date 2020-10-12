@@ -1,8 +1,3 @@
-.block-editor-block-mover {
-	display: inline-flex;
-	flex-direction: row;
-}
-
 .block-editor-block-mover-button__description {
 	display: none;
 }
@@ -13,6 +8,9 @@
 
 // Show the mover in a single button under the contextual toolbar.
 .block-editor-block-mover {
+	display: inline-flex;
+	flex-direction: row;
+
 	.block-editor-block-mover__move-button-container,
 	.components-toolbar {
 		flex: 1;

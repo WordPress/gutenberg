@@ -607,6 +607,14 @@ public class WPAndroidGlueCode {
         }
     }
 
+    public void showNotice(String message) {
+        if (message != null) {
+            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().showNoticeInJS(message);
+        } else {
+            AppLog.d(AppLog.T.EDITOR, "Notice not shown because message is null");
+        }
+    }
+
     public void setTitle(String title) {
         mTitleInitialized = true;
         mTitle = title;

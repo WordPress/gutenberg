@@ -57,6 +57,11 @@ body.is-navigation-sidebar-open {
  */
 
 .edit-site-header__actions {
+	display: inline-flex;
+	align-items: center;
+	flex-wrap: wrap;
+	padding-right: $grid-unit-05;
+
 	// Adjust button paddings to scale better to mobile.
 	.editor-post-saved-state,
 	.components-button.components-button {
@@ -76,13 +81,6 @@ body.is-navigation-sidebar-open {
 	.interface-pinned-items .components-button {
 		margin-right: 0;
 	}
-}
-
-.edit-site-header__actions {
-	display: inline-flex;
-	align-items: center;
-	flex-wrap: wrap;
-	padding-right: $grid-unit-05;
 
 	@include break-small () {
 		padding-right: $grid-unit-20;

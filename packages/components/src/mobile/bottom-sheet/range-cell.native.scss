@@ -1,5 +1,10 @@
-.slider {
+.sliderIOS {
 	flex-grow: 1;
+}
+
+.sliderAndroid {
+	flex-grow: 1;
+	margin-left: -6px;
 }
 
 .sliderTextInput {
