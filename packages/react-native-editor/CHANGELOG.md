@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.38.1
+------
+* [***] Unsupported Block Editor: Fixed issue when cannot view or interact with the classic block on Jetpack sites
+
 ## 1.38.0
 
 [***] Add support for selecting user's post when configuring the link
