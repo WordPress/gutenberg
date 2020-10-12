@@ -316,9 +316,8 @@ function CoverEdit( {
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 	const showFocalPointPicker =
-		isRepeated ||
 		isVideoBackground ||
-		( isImageBackground && ! hasParallax );
+		( isImageBackground && ( ! hasParallax || isRepeated ) );
 
 	const controls = (
 		<>
