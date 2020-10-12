@@ -1,9 +1,3 @@
-.block-editor-block-list__layout .block-editor-block-list__block { // Needs specificity to override inherited styles.
-	.reusable-block-edit-panel * {
-		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
-	}
-}
-
 // This remove the margins set here: https://github.com/WordPress/gutenberg/blob/17e5c2d870d84fb6de48dcd5bc3c38cd0c0fb0d0/packages/block-library/src/editor.scss#L56
 // It removes the margins around blocks when a BlockPreview is rendered in the block style selector
 .block-editor-block-styles .block-editor-block-list__block {
@@ -14,11 +8,137 @@
  * Notices & Block Selected/Hover Styles.
  */
 
+.block-editor-block-list__layout .block-editor-block-list__block,
+.block-editor-block-list__layout .block-list-appender {
+	position: relative;
+
+	// Between-blocks dropzone line indicator.
+	&.is-drop-target::before {
+		content: "";
+		position: absolute;
+		z-index: 0;
+		pointer-events: none;
+		transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
+		top: -$default-block-margin / 2;
+		right: 0;
+		left: 0;
+		border-top: 4px solid var(--wp-admin-theme-color);
+	}
+
+	&.is-drop-target.is-dropping-horizontally::before {
+		top: 0;
+		bottom: 0;
+		// Drop target border-width plus a couple of pixels so that the border looks between blocks.
+		left: -6px;
+		border-top: none;
+		border-left: 4px solid var(--wp-admin-theme-color);
+	}
+}
+
+/**
+ * Cross-Block Selection
+ */
+
+.block-editor-block-list__layout {
+	position: relative;
+
+	// The primary indicator of selection in text is the native selection marker.
+	// When selecting multiple blocks, we provide an additional selection indicator.
+	.is-navigate-mode & .block-editor-block-list__block.is-selected,
+	.is-navigate-mode & .block-editor-block-list__block.is-hovered,
+	.block-editor-block-list__block.is-highlighted,
+	.block-editor-block-list__block.is-multi-selected {
+
+		&::after {
+			// Show selection borders around every non-nested block's actual footprint.
+			position: absolute;
+			z-index: 1;
+			pointer-events: none;
+			content: "";
+			top: $border-width;
+			bottom: $border-width;
+			left: $border-width;
+			right: $border-width;
+
+			// Everything else.
+			// 2px outside.
+			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
+
+			// Windows High Contrast mode will show this outline.
+			outline: 2px solid transparent;
+
+			// Show a lighter color for dark themes.
+			.is-dark-theme & {
+				box-shadow: 0 0 0 $border-width-focus $dark-theme-focus;
+			}
+		}
+
+		// Provide exceptions for placeholders.
+		.components-placeholder {
+			::selection {
+				background: transparent;
+			}
+		}
+	}
+
+	.is-navigate-mode & .block-editor-block-list__block.is-hovered:not(.is-selected)::after {
+		box-shadow: 0 0 0 1px $gray-600;
+	}
+
+	.is-block-moving-mode & .block-editor-block-list__block.has-child-selected {
+		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		outline: $border-width-focus solid transparent;
+	}
+
+	.is-block-moving-mode & .block-editor-block-list__block.is-selected {
+
+		&::before {
+			content: "";
+			position: absolute;
+			z-index: 0;
+			pointer-events: none;
+			transition:
+				border-color 0.1s linear,
+				border-style 0.1s linear,
+				box-shadow 0.1s linear;
+			right: 0;
+			left: 0;
+			top: -$default-block-margin / 2;
+			border-radius: $radius-block-ui;
+			border-top: 4px solid $gray-400;
+		}
+
+		&::after {
+			content: none;
+		}
+	}
+
+	.is-block-moving-mode.can-insert-moving-block & .block-editor-block-list__block.is-selected {
+		&::before {
+			border-color: var(--wp-admin-theme-color);
+		}
+	}
+}
+
+
+.is-block-moving-mode.block-editor-block-list__block-selection-button {
+	// Should be invisible but not unfocusable.
+	opacity: 0;
+	font-size: 1px;
+	height: 1px;
+	padding: 0;
+}
+
 .block-editor-block-list__layout .block-editor-block-list__block {
 	position: relative;
 
 	// Break long strings of text without spaces so they don't overflow the block.
 	overflow-wrap: break-word;
+
+	.reusable-block-edit-panel * {
+		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
+	}
 
 	/**
 	 * Notices
@@ -100,140 +220,10 @@
 			opacity: 1;
 		}
 	}
-}
 
-.block-editor-block-list__layout .block-editor-block-list__block,
-.block-editor-block-list__layout .block-list-appender {
-	position: relative;
-
-	// Between-blocks dropzone line indicator.
-	&.is-drop-target::before {
-		content: "";
-		position: absolute;
-		z-index: 0;
-		pointer-events: none;
-		transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
-		top: -$default-block-margin / 2;
-		right: 0;
-		left: 0;
-		border-top: 4px solid var(--wp-admin-theme-color);
-	}
-
-	&.is-drop-target.is-dropping-horizontally::before {
-		top: 0;
-		bottom: 0;
-		// Drop target border-width plus a couple of pixels so that the border looks between blocks.
-		left: -6px;
-		border-top: none;
-		border-left: 4px solid var(--wp-admin-theme-color);
-	}
-}
-
-/**
- * Cross-Block Selection
- */
-
-.block-editor-block-list__layout {
-	position: relative;
-
-	// The primary indicator of selection in text is the native selection marker.
-	// When selecting multiple blocks, we provide an additional selection indicator.
-	.is-navigate-mode & .block-editor-block-list__block.is-selected,
-	.is-navigate-mode & .block-editor-block-list__block.is-hovered,
-	.block-editor-block-list__block.is-highlighted,
-	.block-editor-block-list__block.is-multi-selected {
-
-		// Show selection borders around every non-nested block's actual footprint.
-		&::after {
-			position: absolute;
-			z-index: 1;
-			pointer-events: none;
-			content: "";
-			top: $border-width;
-			bottom: $border-width;
-			left: $border-width;
-			right: $border-width;
-		}
-
-		&::after { // Everything else.
-			// 2px outside.
-			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
-			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
-
-			// Windows High Contrast mode will show this outline.
-			outline: 2px solid transparent;
-
-			// Show a lighter color for dark themes.
-			.is-dark-theme & {
-				box-shadow: 0 0 0 $border-width-focus $dark-theme-focus;
-			}
-		}
-
-		// Provide exceptions for placeholders.
-		.components-placeholder {
-			::selection {
-				background: transparent;
-			}
-		}
-	}
-
-	.is-navigate-mode & .block-editor-block-list__block.is-hovered:not(.is-selected)::after {
-		box-shadow: 0 0 0 1px $gray-600;
-	}
-
-	.is-block-moving-mode & .block-editor-block-list__block.has-child-selected {
-		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
-		outline: $border-width-focus solid transparent;
-	}
-
-	.is-block-moving-mode & .block-editor-block-list__block.is-selected {
-
-		&::before {
-			content: "";
-			position: absolute;
-			z-index: 0;
-			pointer-events: none;
-			transition:
-				border-color 0.1s linear,
-				border-style 0.1s linear,
-				box-shadow 0.1s linear;
-			right: 0;
-			left: 0;
-			top: -$default-block-margin / 2;
-			border-radius: $radius-block-ui;
-			border-top: 4px solid $gray-400;
-		}
-
-		&::after {
-			content: none;
-		}
-	}
-
-	.is-block-moving-mode.can-insert-moving-block & .block-editor-block-list__block.is-selected {
-		&::before {
-			border-color: var(--wp-admin-theme-color);
-		}
-	}
-}
-
-
-.is-block-moving-mode.block-editor-block-list__block-selection-button {
-	// Should be invisible but not unfocusable.
-	opacity: 0;
-	font-size: 1px;
-	height: 1px;
-	padding: 0;
-}
-
-/**
- * Block styles and alignments
- */
-
-.block-editor-block-list__layout .block-editor-block-list__block {
-	&.has-warning {
-		min-height: ( $block-padding + $block-spacing ) * 2;
-	}
-
+	/**
+	* Block styles and alignments
+	*/
 	&::after {
 		content: "";
 		pointer-events: none;
@@ -248,6 +238,8 @@
 
 	// Warnings
 	&.has-warning {
+		min-height: ( $block-padding + $block-spacing ) * 2;
+
 		// When a block has a warning, you shouldn't be able to manipulate the contents.
 		> * {
 			pointer-events: none;
