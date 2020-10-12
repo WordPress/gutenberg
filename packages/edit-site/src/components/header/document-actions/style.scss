@@ -1,27 +1,31 @@
 .edit-site-document-actions {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
 	justify-content: center;
 	height: 100%;
-	position: relative;
+	min-width: 0;
 
 	.edit-site-document-actions__title-wrapper {
 		display: flex;
 		flex-direction: row;
 		justify-content: center;
 		align-items: center;
+		min-width: 0;
 	}
 
 	.edit-site-document-actions__title-wrapper > h1 {
 		display: flex;
 		justify-content: center;
 		margin: 0;
+		min-width: 0;
 	}
 
 	.edit-site-document-actions__title {
 		font-size: $default-font-size;
 		font-weight: bold;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 		transition: transform 0.2s;
 		@include reduce-motion(transition);
 	}
@@ -36,6 +40,10 @@
 		opacity: 0;
 		transform: translateY(0);
 		transition: transform 0.2s;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		text-align: center;
 		@include reduce-motion(transition);
 	}
 
@@ -45,7 +53,6 @@
 		.edit-site-document-actions__title {
 			color: $gray-900;
 			font-weight: bold;
-			white-space: nowrap;
 			transform: translateY(-14px);
 
 			&.is-secondary-title-active {

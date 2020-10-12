@@ -7,7 +7,7 @@
 
 	.edit-site-header_start,
 	.edit-site-header_end {
-		flex: 1;
+		flex: 1 0 335px;
 		display: flex;
 	}
 
@@ -15,6 +15,8 @@
 		display: flex;
 		align-items: center;
 		height: 100%;
+		flex-shrink: 1;
+		min-width: 0;
 	}
 
 	.edit-site-header_end {
