@@ -29,6 +29,7 @@ export { default as CardFooter } from './card/footer';
 export { default as CardHeader } from './card/header';
 export { default as CardMedia } from './card/media';
 export { default as CheckboxControl } from './checkbox-control';
+export { default as CircularOptionPicker } from './circular-option-picker';
 export { default as ClipboardButton } from './clipboard-button';
 export { default as __experimentalColorEdit } from './color-edit';
 export { default as ColorIndicator } from './color-indicator';
