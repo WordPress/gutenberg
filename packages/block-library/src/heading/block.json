@@ -28,6 +28,7 @@
 			"link": true
 		},
 		"fontSize": true,
+		"__experimentalFontStyle": true,
 		"lineHeight": true,
 		"__experimentalSelector": {
 			"core/heading/h1": "h1",

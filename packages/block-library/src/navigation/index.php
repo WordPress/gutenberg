@@ -134,11 +134,12 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array()
 	);
 	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
-	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] )
-		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
-		: '';
 
+	$font_style        = block_core_navigation_inline_font_style( $attributes );
+	$inline_styles     = $colors['inline_styles'] . $font_sizes['inline_styles'] . $font_style;
+	$style_attribute   = $inline_styles ? sprintf( ' style="%s"', esc_attr( $inline_styles ) ) : '';
 	$inner_blocks_html = '';
+
 	foreach ( $block->inner_blocks as $inner_block ) {
 		$inner_blocks_html .= $inner_block->render();
 	}
@@ -149,6 +150,36 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$style_attribute,
 		$inner_blocks_html
 	);
+}
+
+/**
+ * Generates inline style for any selected font style within the block's
+ * style typography attributes.
+ */
+function block_core_navigation_inline_font_style( $attributes ) {
+	$has_font_style = isset( $attributes['style']['typography']['fontStyle'] );
+
+	if ( ! $has_font_style ) {
+		return '';
+	}
+
+	$font_style = $attributes['style']['typography']['fontStyle'];
+
+	if ( ! $font_style ) {
+		return '';
+	}
+
+	// If we don't have a preset font style CSS variable, we'll assume it's a regular CSS value.
+	if ( strpos( $font_style, 'var:preset|font-style|' ) === false ) {
+		return sprintf( 'font-style:%s;', $font_style );
+	}
+
+	// We have a preset CSS variable as the style.
+	// Get the style value from the string and return CSS style.
+	$index_to_splice = strrpos( $font_style, '|' ) + 1;
+	$font_style_slug = substr( $font_style, $index_to_splice );
+
+	return sprintf( 'font-style:var(--wp--preset--font-style--%s);', $font_style_slug );
 }
 
 /**

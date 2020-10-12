@@ -50,6 +50,7 @@
 		"html": false,
 		"inserter": true,
 		"fontSize": true,
+		"__experimentalFontStyle": true,
 		"color": {
 			"textColor": true,
 			"backgroundColor": true

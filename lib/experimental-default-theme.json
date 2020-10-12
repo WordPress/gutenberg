@@ -160,6 +160,16 @@
 						"slug": "huge",
 						"size": 42
 					}
+				],
+				"fontStyles": [
+					{
+						"name": "Italic",
+						"slug": "italic"
+					},
+					{
+						"name": "Oblique",
+						"slug": "oblique"
+					}
 				]
 			},
 			"spacing": {

@@ -387,6 +387,8 @@ function gutenberg_experimental_global_styles_get_css_property( $style_property 
 			return 'background-color';
 		case 'fontSize':
 			return 'font-size';
+		case 'fontStyle':
+			return 'font-style';
 		case 'lineHeight':
 			return 'line-height';
 		default:
@@ -406,6 +408,7 @@ function gutenberg_experimental_global_styles_get_style_property() {
 		'backgroundColor'          => array( 'color', 'background' ),
 		'color'                    => array( 'color', 'text' ),
 		'fontSize'                 => array( 'typography', 'fontSize' ),
+		'fontStyle'                => array( 'typography', 'fontStyle' ),
 		'lineHeight'               => array( 'typography', 'lineHeight' ),
 	);
 }
@@ -422,6 +425,7 @@ function gutenberg_experimental_global_styles_get_support_keys() {
 		'backgroundColor'          => array( 'color' ),
 		'color'                    => array( 'color' ),
 		'fontSize'                 => array( 'fontSize' ),
+		'fontStyle'                => array( '__experimentalFontStyle' ),
 		'lineHeight'               => array( 'lineHeight' ),
 	);
 }
@@ -433,17 +437,21 @@ function gutenberg_experimental_global_styles_get_support_keys() {
  */
 function gutenberg_experimental_global_styles_get_presets_structure() {
 	return array(
-		'color'    => array(
+		'color'     => array(
 			'path' => array( 'color', 'palette' ),
 			'key'  => 'color',
 		),
-		'gradient' => array(
+		'gradient'  => array(
 			'path' => array( 'color', 'gradients' ),
 			'key'  => 'gradient',
 		),
-		'fontSize' => array(
+		'fontSize'  => array(
 			'path' => array( 'typography', 'fontSizes' ),
 			'key'  => 'size',
+		),
+		'fontStyle' => array(
+			'path' => array( 'typography', 'fontStyles' ),
+			'key'  => 'slug',
 		),
 	);
 }
@@ -483,9 +491,10 @@ function gutenberg_experimental_global_styles_get_block_data() {
 				'global',
 				array(
 					'supports' => array(
-						'__experimentalSelector' => ':root',
-						'fontSize'               => true,
-						'color'                  => array(
+						'__experimentalSelector'  => ':root',
+						'fontSize'                => true,
+						'__experimentalFontStyle' => true,
+						'color'                   => array(
 							'linkColor' => true,
 							'gradients' => true,
 						),
