@@ -120,7 +120,7 @@ function modify_admin_bar( $wp_admin_bar ) {
 		);
 	}
 }
-add_action( 'admin_bar_menu', 'modify_admin_bar', 31 );
+add_action( 'admin_bar_menu', 'modify_admin_bar', 40 );
 
 /**
  * Display a version notice and deactivate the Gutenberg plugin.
