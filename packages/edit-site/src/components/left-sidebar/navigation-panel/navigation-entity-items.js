@@ -22,7 +22,7 @@ export default function NavigationEntityItems( { kind, name, query = {} } ) {
 		return null;
 	}
 
-	const changePage = ( { type, slug, link, id } ) => {
+	const onActivateItem = ( { type, slug, link, id } ) => {
 		setPage( {
 			type,
 			slug,
@@ -45,7 +45,7 @@ export default function NavigationEntityItems( { kind, name, query = {} } ) {
 				key={ key }
 				item={ key }
 				title={ titleExtractor( entity ) }
-				onClick={ () => changePage( entity ) }
+				onClick={ () => onActivateItem( entity ) }
 			/>
 		);
 	} );
