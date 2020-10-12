@@ -15,7 +15,8 @@ import {
 } from '@wordpress/element';
 import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useDebounce } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 import {
 	create,
 	slice,
@@ -29,7 +30,6 @@ import {
  */
 import Button from '../button';
 import Popover from '../popover';
-import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 /**
  * A raw completer option.
@@ -277,21 +277,14 @@ const getAutoCompleterUI = ( autocompleter ) => {
 	return AutocompleterUI;
 };
 
-function Autocomplete( {
-	children,
-	isSelected,
-	record,
-	onChange,
-	onReplace,
-	completers,
-	debouncedSpeak,
-} ) {
+export function useAutocomplete( { record, onChange, onReplace, completers } ) {
 	const instanceId = useInstanceId( Autocomplete );
 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
 	const [ filteredOptions, setFilteredOptions ] = useState( [] );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ autocompleter, setAutocompleter ] = useState( null );
 	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
+	const debouncedSpeak = useDebounce( speak );
 
 	function insertCompletion( replacement ) {
 		const end = record.start;
@@ -484,27 +477,31 @@ function Autocomplete( {
 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
 		: null;
 
+	return {
+		isExpanded,
+		listBoxId,
+		activeId,
+		onKeyDown: handleKeyDown,
+		popover: AutocompleterUI && (
+			<AutocompleterUI
+				className={ className }
+				filterValue={ filterValue }
+				instanceId={ instanceId }
+				listBoxId={ listBoxId }
+				selectedIndex={ selectedIndex }
+				onChangeOptions={ onChangeOptions }
+				onSelect={ select }
+			/>
+		),
+	};
+}
+
+export default function Autocomplete( { children, isSelected, ...options } ) {
+	const { popover, ...props } = useAutocomplete( options );
 	return (
 		<>
-			{ children( {
-				isExpanded,
-				listBoxId,
-				activeId,
-				onKeyDown: handleKeyDown,
-			} ) }
-			{ isSelected && AutocompleterUI && (
-				<AutocompleterUI
-					className={ className }
-					filterValue={ filterValue }
-					instanceId={ instanceId }
-					listBoxId={ listBoxId }
-					selectedIndex={ selectedIndex }
-					onChangeOptions={ onChangeOptions }
-					onSelect={ select }
-				/>
-			) }
+			{ children( props ) }
+			{ isSelected ? popover : null }
 		</>
 	);
 }
-
-export default withSpokenMessages( Autocomplete );

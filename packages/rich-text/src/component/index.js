@@ -7,7 +7,6 @@ import { find, isNil } from 'lodash';
  * WordPress dependencies
  */
 import {
-	forwardRef,
 	useEffect,
 	useRef,
 	useState,
@@ -129,13 +128,17 @@ function fixPlaceholderSelection( defaultView ) {
 	selection.collapseToStart();
 }
 
-function RichText(
+/*
+ * Renders a rich content input, providing users with the option to format the
+ * content.
+ */
+export default function useRichTextProps(
+	props,
 	{
-		tagName: TagName = 'div',
+		ref,
 		value = '',
 		selectionStart,
 		selectionEnd,
-		children,
 		allowedFormats,
 		withoutInteractiveFormatting,
 		placeholder,
@@ -165,8 +168,7 @@ function RichText(
 		__unstableOnExitFormattedText: onExitFormattedText,
 		__unstableOnCreateUndoLevel: onCreateUndoLevel,
 		__unstableIsSelected: isSelected,
-	},
-	ref
+	}
 ) {
 	const [ activeFormats = [], setActiveFormats ] = useState();
 	const {
@@ -179,12 +181,6 @@ function RichText(
 		clientId,
 		identifier,
 	} );
-
-	// For backward compatibility, fall back to tagName if it's a string.
-	// tagName can now be a component for light blocks.
-	if ( ! multilineRootTag && typeof TagName === 'string' ) {
-		multilineRootTag = TagName;
-	}
 
 	function getDoc() {
 		return ref.current.ownerDocument;
@@ -1040,7 +1036,7 @@ function RichText(
 		if ( didMount.current ) {
 			applyFromProps();
 		}
-	}, [ TagName, placeholder ] );
+	}, [ placeholder ] );
 
 	useEffect( () => {
 		if ( didMount.current && value !== _value.current ) {
@@ -1094,14 +1090,22 @@ function RichText(
 		applyRecord( record.current );
 	}
 
-	const editableProps = {
+	useBoundaryStyle( { ref, activeFormats } );
+	useInlineWarning( { ref } );
+
+	return {
+		isSelected,
+		value: record.current,
+		change: handleChange,
+		focus,
 		// Overridable props.
 		role: 'textbox',
 		'aria-multiline': true,
 		'aria-label': placeholder,
+		...props,
 		ref,
-		style: defaultStyle,
-		className: 'rich-text',
+		style: props.style ? { ...props.style, ...defaultStyle } : defaultStyle,
+		className: 'rich-text ' + props.className,
 		onPaste: handlePaste,
 		onInput: handleInput,
 		onCompositionStart: handleCompositionStart,
@@ -1121,41 +1125,15 @@ function RichText(
 		// Do not set the attribute if disabled.
 		contentEditable: disabled ? undefined : true,
 		suppressContentEditableWarning: ! disabled,
+		children: isSelected && (
+			<FormatEdit
+				allowedFormats={ allowedFormats }
+				withoutInteractiveFormatting={ withoutInteractiveFormatting }
+				value={ record.current }
+				onChange={ handleChange }
+				onFocus={ focus }
+				formatTypes={ formatTypes }
+			/>
+		),
 	};
-
-	useBoundaryStyle( { ref, activeFormats } );
-	useInlineWarning( { ref } );
-
-	return (
-		<>
-			{ isSelected && (
-				<FormatEdit
-					allowedFormats={ allowedFormats }
-					withoutInteractiveFormatting={
-						withoutInteractiveFormatting
-					}
-					value={ record.current }
-					onChange={ handleChange }
-					onFocus={ focus }
-					formatTypes={ formatTypes }
-				/>
-			) }
-			{ children &&
-				children( {
-					isSelected,
-					value: record.current,
-					onChange: handleChange,
-					onFocus: focus,
-					editableProps,
-					editableTagName: TagName,
-				} ) }
-			{ ! children && <TagName { ...editableProps } /> }
-		</>
-	);
 }
-
-/**
- * Renders a rich content input, providing users with the option to format the
- * content.
- */
-export default forwardRef( RichText );

@@ -24,7 +24,7 @@ import {
 } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import {
-	__experimentalRichText as RichText,
+	__experimentalUseRichTextProps as useRichTextProps,
 	__unstableCreateElement,
 	isEmpty,
 	__unstableIsEmptyLine as isEmptyLine,
@@ -44,7 +44,7 @@ import { regexp } from '@wordpress/shortcode';
 /**
  * Internal dependencies
  */
-import Autocomplete from '../autocomplete';
+import useAutocomplete from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
@@ -541,130 +541,109 @@ function RichTextWrapper(
 		[ onReplace, __unstableMarkAutomaticChange ]
 	);
 
+	const {
+		isSelected: nestedIsSelected,
+		value,
+		change,
+		focus,
+		children: richTextChildren,
+		...editableProps
+	} = useRichTextProps( props, {
+		clientId,
+		identifier,
+		ref,
+		value: adjustedValue,
+		onChange: adjustedOnChange,
+		selectionStart,
+		selectionEnd,
+		onSelectionChange,
+		placeholder,
+		allowedFormats: adjustedAllowedFormats,
+		withoutInteractiveFormatting,
+		onEnter,
+		onDelete,
+		onPaste,
+		__unstableIsSelected: isSelected,
+		__unstableInputRule: inputRule,
+		__unstableMultilineTag: multilineTag,
+		__unstableIsCaretWithinFormattedText: isCaretWithinFormattedText,
+		__unstableOnEnterFormattedText: enterFormattedText,
+		__unstableOnExitFormattedText: exitFormattedText,
+		__unstableOnCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
+		__unstableMarkAutomaticChange,
+		__unstableDidAutomaticChange: didAutomaticChange,
+		__unstableUndo: undo,
+		__unstableDisableFormats: disableFormats,
+		preserveWhiteSpace,
+		disabled,
+		unstableOnFocus,
+		__unstableAllowPrefixTransformations,
+		__unstableMultilineRootTag,
+		// Native props.
+		onCaretVerticalPositionChange,
+		blockIsSelected:
+			originalIsSelected !== undefined
+				? originalIsSelected
+				: blockIsSelected,
+		shouldBlurOnUnmount,
+		__unstableMobileNoFocusOnMount,
+		deleteEnter,
+		placeholderTextColor,
+		textAlign,
+		selectionColor,
+		tagsToEliminate,
+		rootTagsToEliminate,
+		disableEditingMenu,
+		fontSize,
+		fontFamily,
+		fontWeight,
+		fontStyle,
+		minWidth,
+		maxWidth,
+		onBlur,
+		setRef,
+		// Props to be set on the editable container are destructured on the
+		// element itself for web (see below), but passed through rich text
+		// for native.
+		id: props.id,
+		style: props.style,
+	} );
+
+	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
+		onReplace,
+		completers: autocompleters,
+		record: value,
+		onChange: change,
+	} );
+
+	const TagName = tagName || 'div';
 	const content = (
-		<RichText
-			clientId={ clientId }
-			identifier={ identifier }
-			ref={ ref }
-			value={ adjustedValue }
-			onChange={ adjustedOnChange }
-			selectionStart={ selectionStart }
-			selectionEnd={ selectionEnd }
-			onSelectionChange={ onSelectionChange }
-			tagName={ tagName }
-			placeholder={ placeholder }
-			allowedFormats={ adjustedAllowedFormats }
-			withoutInteractiveFormatting={ withoutInteractiveFormatting }
-			onEnter={ onEnter }
-			onDelete={ onDelete }
-			onPaste={ onPaste }
-			__unstableIsSelected={ isSelected }
-			__unstableInputRule={ inputRule }
-			__unstableMultilineTag={ multilineTag }
-			__unstableIsCaretWithinFormattedText={ isCaretWithinFormattedText }
-			__unstableOnEnterFormattedText={ enterFormattedText }
-			__unstableOnExitFormattedText={ exitFormattedText }
-			__unstableOnCreateUndoLevel={ __unstableMarkLastChangeAsPersistent }
-			__unstableMarkAutomaticChange={ __unstableMarkAutomaticChange }
-			__unstableDidAutomaticChange={ didAutomaticChange }
-			__unstableUndo={ undo }
-			__unstableDisableFormats={ disableFormats }
-			preserveWhiteSpace={ preserveWhiteSpace }
-			disabled={ disabled }
-			unstableOnFocus={ unstableOnFocus }
-			__unstableAllowPrefixTransformations={
-				__unstableAllowPrefixTransformations
-			}
-			__unstableMultilineRootTag={ __unstableMultilineRootTag }
-			// Native props.
-			onCaretVerticalPositionChange={ onCaretVerticalPositionChange }
-			blockIsSelected={
-				originalIsSelected !== undefined
-					? originalIsSelected
-					: blockIsSelected
-			}
-			shouldBlurOnUnmount={ shouldBlurOnUnmount }
-			__unstableMobileNoFocusOnMount={ __unstableMobileNoFocusOnMount }
-			deleteEnter={ deleteEnter }
-			placeholderTextColor={ placeholderTextColor }
-			textAlign={ textAlign }
-			selectionColor={ selectionColor }
-			tagsToEliminate={ tagsToEliminate }
-			rootTagsToEliminate={ rootTagsToEliminate }
-			disableEditingMenu={ disableEditingMenu }
-			fontSize={ fontSize }
-			fontFamily={ fontFamily }
-			fontWeight={ fontWeight }
-			fontStyle={ fontStyle }
-			minWidth={ minWidth }
-			maxWidth={ maxWidth }
-			onBlur={ onBlur }
-			setRef={ setRef }
-			// Props to be set on the editable container are destructured on the
-			// element itself for web (see below), but passed through rich text
-			// for native.
-			id={ props.id }
-			style={ props.style }
-		>
-			{ ( {
-				isSelected: nestedIsSelected,
-				value,
-				onChange,
-				onFocus,
-				editableProps,
-				editableTagName: TagName,
-			} ) => (
-				<>
-					{ children && children( { value, onChange, onFocus } ) }
-					{ nestedIsSelected && hasFormats && (
-						<FormatToolbarContainer
-							inline={ inlineToolbar }
-							anchorRef={ ref.current }
-						/>
-					) }
-					{ nestedIsSelected && <RemoveBrowserShortcuts /> }
-					<Autocomplete
-						onReplace={ onReplace }
-						completers={ autocompleters }
-						record={ value }
-						onChange={ onChange }
-						isSelected={ nestedIsSelected }
-					>
-						{ ( { listBoxId, activeId, onKeyDown } ) => (
-							<TagName
-								{ ...editableProps }
-								{ ...props }
-								style={
-									props.style
-										? {
-												...props.style,
-												...editableProps.style,
-										  }
-										: editableProps.style
-								}
-								className={ classnames(
-									classes,
-									props.className,
-									editableProps.className,
-									{
-										'keep-placeholder-on-focus': keepPlaceholderOnFocus,
-									}
-								) }
-								aria-autocomplete={
-									listBoxId ? 'list' : undefined
-								}
-								aria-owns={ listBoxId }
-								aria-activedescendant={ activeId }
-								onKeyDown={ ( event ) => {
-									onKeyDown( event );
-									editableProps.onKeyDown( event );
-								} }
-							/>
-						) }
-					</Autocomplete>
-				</>
+		<>
+			{ children &&
+				children( { value, onChange: change, onFocus: focus } ) }
+			{ nestedIsSelected && hasFormats && (
+				<FormatToolbarContainer
+					inline={ inlineToolbar }
+					anchorRef={ ref.current }
+				/>
 			) }
-		</RichText>
+			{ nestedIsSelected && <RemoveBrowserShortcuts /> }
+			{ popover }
+			{ richTextChildren }
+			<TagName
+				{ ...editableProps }
+				className={ classnames( editableProps.className, classes, {
+					'keep-placeholder-on-focus': keepPlaceholderOnFocus,
+				} ) }
+				aria-autocomplete={ listBoxId ? 'list' : undefined }
+				aria-owns={ listBoxId }
+				aria-activedescendant={ activeId }
+				onKeyDown={ ( event ) => {
+					onKeyDown( event );
+					editableProps.onKeyDown( event );
+				} }
+			/>
+		</>
 	);
 
 	if ( ! wrapperClassName ) {

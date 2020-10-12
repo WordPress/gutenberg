@@ -7,7 +7,7 @@ import { clone } from 'lodash';
  * WordPress dependencies
  */
 import { applyFilters, hasFilter } from '@wordpress/hooks';
-import { Autocomplete } from '@wordpress/components';
+import { __unstableUseAutocomplete as useAutocomplete } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
 import { getDefaultBlockName } from '@wordpress/blocks';
 
@@ -25,13 +25,11 @@ import blockAutocompleter from '../../autocompleters/block';
  */
 const EMPTY_ARRAY = [];
 
-/**
+/*
  * Wrap the default Autocomplete component with one that supports a filter hook
  * for customizing its list of autocompleters.
- *
- * @type {import('react').FC}
  */
-function BlockEditorAutocomplete( props ) {
+function useBlockEditorAutocomplete( props ) {
 	const { name } = useBlockEditContext();
 
 	let { completers = EMPTY_ARRAY } = props;
@@ -61,10 +59,10 @@ function BlockEditorAutocomplete( props ) {
 		return filteredCompleters;
 	}, [ completers, name ] );
 
-	return <Autocomplete { ...props } completers={ completers } />;
+	return useAutocomplete( { ...props, completers } );
 }
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/autocomplete/README.md
  */
-export default BlockEditorAutocomplete;
+export default useBlockEditorAutocomplete;
