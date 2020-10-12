@@ -34,6 +34,7 @@ export default function BlockToolbar( {
 		blockType,
 		hasFixedToolbar,
 		hasReducedUI,
+		hideParentSelector,
 		isValid,
 		isVisual,
 	} = useSelect( ( select ) => {
@@ -58,6 +59,7 @@ export default function BlockToolbar( {
 				getBlockType( getBlockName( selectedBlockClientId ) ),
 			hasFixedToolbar: settings.hasFixedToolbar,
 			hasReducedUI: settings.hasReducedUI,
+			hideParentSelector: !! settings.hideParentSelector,
 			rootClientId: blockRootClientId,
 			isValid: selectedBlockClientIds.every( ( id ) =>
 				isBlockValid( id )
@@ -113,7 +115,7 @@ export default function BlockToolbar( {
 	return (
 		<Wrapper className={ classes }>
 			<div ref={ nodeRef } { ...showMoversGestures }>
-				{ ! isMultiToolbar && (
+				{ ! hideParentSelector && ! isMultiToolbar && (
 					<div className="block-editor-block-toolbar__block-parent-selector-wrapper">
 						<BlockParentSelector clientIds={ blockClientIds } />
 					</div>
