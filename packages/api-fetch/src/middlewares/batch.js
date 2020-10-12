@@ -25,12 +25,11 @@ function batchRequestMiddleware( options, next ) {
 	}
 
 	const batchId = JSON.stringify( [ options.batchAs, options.method ] );
-	const idx = addRequestToBatch( batchId, options );
-	const save =
-		scheduledBatches[ batchId ].length >= MAX_BATCH_SIZE
-			? commit
-			: commitEventually;
-	return save( batchId ).then( ( subResponses ) => subResponses[ idx ] );
+	const requestIdx = addRequestToBatch( batchId, options );
+	const save = requestIdx + 1 >= MAX_BATCH_SIZE ? commit : commitEventually;
+	return save( batchId ).then(
+		( subResponses ) => subResponses[ requestIdx ]
+	);
 }
 
 function endpointSupportsBatch( path ) {
