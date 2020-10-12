@@ -26,6 +26,7 @@ function InserterMenu( {
 	clientId,
 	isAppender,
 	__experimentalSelectBlockOnInsert,
+	__experimentalInsertionIndex,
 	onSelect,
 	showInserterHelpPanel,
 	showMostUsedBlocks,
@@ -33,6 +34,10 @@ function InserterMenu( {
 	const [ activeTab, setActiveTab ] = useState( 'blocks' );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
+	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
+		null
+	);
+
 	const [
 		destinationRootClientId,
 		onInsertBlocks,
@@ -42,6 +47,7 @@ function InserterMenu( {
 		clientId,
 		isAppender,
 		selectBlockOnInsert: __experimentalSelectBlockOnInsert,
+		insertionIndex: __experimentalInsertionIndex,
 	} );
 	const { hasPatterns, hasReusableBlocks } = useSelect( ( select ) => {
 		const {
@@ -83,6 +89,10 @@ function InserterMenu( {
 		setHoveredItem( item );
 	};
 
+	const onClickPatternCategory = ( patternCategory ) => {
+		setSelectedPatternCategory( patternCategory );
+	};
+
 	const blocksTab = (
 		<>
 			<div className="block-editor-inserter__block-list">
@@ -109,6 +119,8 @@ function InserterMenu( {
 		<BlockPatternsTabs
 			onInsert={ onInsertPattern }
 			filterValue={ filterValue }
+			onClickCategory={ onClickPatternCategory }
+			selectedCategory={ selectedPatternCategory }
 		/>
 	);
 

@@ -1,14 +1,36 @@
 .edit-site-header {
 	align-items: center;
+	background-color: $white;
 	display: flex;
 	height: $header-height;
-	justify-content: space-between;
 	box-sizing: border-box;
+
+	.edit-site-header_start,
+	.edit-site-header_end {
+		flex: 1;
+		display: flex;
+	}
+
+	.edit-site-header_center {
+		display: flex;
+		align-items: center;
+		height: 100%;
+	}
+
+	.edit-site-header_end {
+		justify-content: flex-end;
+	}
+}
+
+// Keeps the document title centered when the sidebar is open
+body.is-navigation-sidebar-open {
+	.edit-site-header_start {
+		flex-basis: $nav-sidebar-width;
+	}
 }
 
 .edit-site-header__toolbar {
 	display: flex;
-	flex-grow: 1;
 	padding-left: $grid-unit-30;
 	align-items: center;
 
@@ -35,6 +57,11 @@
  */
 
 .edit-site-header__actions {
+	display: inline-flex;
+	align-items: center;
+	flex-wrap: wrap;
+	padding-right: $grid-unit-05;
+
 	// Adjust button paddings to scale better to mobile.
 	.editor-post-saved-state,
 	.components-button.components-button {
@@ -54,13 +81,6 @@
 	.interface-pinned-items .components-button {
 		margin-right: 0;
 	}
-}
-
-.edit-site-header__actions {
-	display: inline-flex;
-	align-items: center;
-	flex-wrap: wrap;
-	padding-right: $grid-unit-05;
 
 	@include break-small () {
 		padding-right: $grid-unit-20;
@@ -93,7 +113,7 @@
 	left: 0;
 	right: 0;
 	background: $white;
-	border-bottom: $border-width solid $gray-200;
+	border-bottom: $border-width solid $gray-300;
 
 	&:empty {
 		display: none;
@@ -130,7 +150,7 @@
 		}
 
 		.block-editor-block-toolbar {
-			border-left: $border-width solid $gray-200;
+			border-left: $border-width solid $gray-300;
 		}
 
 		.block-editor-block-toolbar .components-toolbar-group,

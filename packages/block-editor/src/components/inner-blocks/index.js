@@ -23,7 +23,7 @@ import getBlockContext from './get-block-context';
 /**
  * Internal dependencies
  */
-import BlockList from '../block-list';
+import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
@@ -42,31 +42,13 @@ function UncontrolledInnerBlocks( props ) {
 		allowedBlocks,
 		template,
 		templateLock,
-		forwardedRef,
+		wrapperRef,
 		templateInsertUpdatesSelection,
 		__experimentalCaptureToolbars: captureToolbars,
+		__experimentalAppenderTagName,
+		renderAppender,
 		orientation,
 	} = props;
-
-	const isSmallScreen = useViewportMatch( 'medium', '<' );
-
-	const { hasOverlay, block, enableClickThrough } = useSelect( ( select ) => {
-		const {
-			getBlock,
-			isBlockSelected,
-			hasSelectedInnerBlock,
-			isNavigationMode,
-		} = select( 'core/block-editor' );
-		const theBlock = getBlock( clientId );
-		return {
-			block: theBlock,
-			hasOverlay:
-				theBlock.name !== 'core/template' &&
-				! isBlockSelected( clientId ) &&
-				! hasSelectedInnerBlock( clientId, true ),
-			enableClickThrough: isNavigationMode() || isSmallScreen,
-		};
-	} );
 
 	useNestedSettingsUpdate(
 		clientId,
@@ -83,37 +65,32 @@ function UncontrolledInnerBlocks( props ) {
 		templateInsertUpdatesSelection
 	);
 
-	const classes = classnames( {
-		'has-overlay': enableClickThrough && hasOverlay,
-		'is-capturing-toolbar': captureToolbars,
-	} );
+	const context = useSelect(
+		( select ) => {
+			const block = select( 'core/block-editor' ).getBlock( clientId );
+			const blockType = getBlockType( block.name );
 
-	let blockList = (
-		<BlockList
-			{ ...props }
-			ref={ forwardedRef }
-			rootClientId={ clientId }
-			className={ classes }
-		/>
+			if ( ! blockType || ! blockType.providesContext ) {
+				return;
+			}
+
+			return getBlockContext( block.attributes, blockType );
+		},
+		[ clientId ]
 	);
 
-	// Wrap context provider if (and only if) block has context to provide.
-	const blockType = getBlockType( block.name );
-	if ( blockType && blockType.providesContext ) {
-		const context = getBlockContext( block.attributes, blockType );
-
-		blockList = (
-			<BlockContextProvider value={ context }>
-				{ blockList }
-			</BlockContextProvider>
-		);
-	}
-
-	if ( props.__experimentalTagName ) {
-		return blockList;
-	}
-
-	return <div className="block-editor-inner-blocks">{ blockList }</div>;
+	// This component needs to always be synchronous as it's the one changing
+	// the async mode depending on the block selection.
+	return (
+		<BlockContextProvider value={ context }>
+			<BlockListItems
+				rootClientId={ clientId }
+				renderAppender={ renderAppender }
+				__experimentalAppenderTagName={ __experimentalAppenderTagName }
+				wrapperRef={ wrapperRef }
+			/>
+		</BlockContextProvider>
+	);
 }
 
 /**
@@ -130,27 +107,78 @@ function ControlledInnerBlocks( props ) {
 	return <UncontrolledInnerBlocks { ...props } />;
 }
 
-/**
- * Wrapped InnerBlocks component which detects whether to use the controlled or
- * uncontrolled variations of the InnerBlocks component. This is the component
- * which should be used throughout the application.
- */
 const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
-	const { clientId } = useBlockEditContext();
-	const fallbackRef = useRef();
-
-	const allProps = {
-		clientId,
-		forwardedRef: ref || fallbackRef,
-		...props,
-	};
-
-	// Detects if the InnerBlocks should be controlled by an incoming value.
-	if ( props.value && props.onChange ) {
-		return <ControlledInnerBlocks { ...allProps } />;
-	}
-	return <UncontrolledInnerBlocks { ...allProps } />;
+	const innerBlocksProps = useInnerBlocksProps( { ref }, props );
+	return (
+		<div className="block-editor-inner-blocks">
+			<div { ...innerBlocksProps } />
+		</div>
+	);
 } );
+
+/**
+ * This hook is used to lightly mark an element as an inner blocks wrapper
+ * element. Call this hook and pass the returned props to the element to mark as
+ * an inner blocks wrapper, automatically rendering inner blocks as children. If
+ * you define a ref for the element, it is important to pass the ref to this
+ * hook, which the hook in turn will pass to the component through the props it
+ * returns. Optionally, you can also pass any other props through this hook, and
+ * they will be merged and returned.
+ *
+ * @param {Object} props   Optional. Props to pass to the element. Must contain
+ *                         the ref if one is defined.
+ * @param {Object} options Optional. Inner blocks options.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
+ */
+export function useInnerBlocksProps( props = {}, options = {} ) {
+	const fallbackRef = useRef();
+	const { clientId } = useBlockEditContext();
+	const isSmallScreen = useViewportMatch( 'medium', '<' );
+	const hasOverlay = useSelect(
+		( select ) => {
+			const {
+				getBlockName,
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				isNavigationMode,
+			} = select( 'core/block-editor' );
+			const enableClickThrough = isNavigationMode() || isSmallScreen;
+			return (
+				getBlockName( clientId ) !== 'core/template' &&
+				! isBlockSelected( clientId ) &&
+				! hasSelectedInnerBlock( clientId, true ) &&
+				enableClickThrough
+			);
+		},
+		[ clientId, isSmallScreen ]
+	);
+
+	const ref = props.ref || fallbackRef;
+	const InnerBlocks =
+		options.value && options.onChange
+			? ControlledInnerBlocks
+			: UncontrolledInnerBlocks;
+
+	return {
+		...props,
+		ref,
+		className: classnames(
+			props.className,
+			'block-editor-block-list__layout',
+			{
+				'has-overlay': hasOverlay,
+			}
+		),
+		children: (
+			<InnerBlocks
+				{ ...options }
+				clientId={ clientId }
+				wrapperRef={ ref }
+			/>
+		),
+	};
+}
 
 // Expose default appender placeholders as components.
 ForwardedInnerBlocks.DefaultBlockAppender = DefaultBlockAppender;

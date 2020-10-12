@@ -13,8 +13,6 @@ export const PREFERENCES_DEFAULTS = {
  * @typedef {Object} SETTINGS_DEFAULT
  * @property {boolean} alignWide Enable/Disable Wide/Full Alignments
  * @property {Array} availableLegacyWidgets Array of objects representing the legacy widgets available.
- * @property {Array} colors Palette colors
- * @property {Array} fontSizes Available font sizes
  * @property {boolean} imageEditing Image Editing settings set to false to disable.
  * @property {Array} imageSizes Available image sizes
  * @property {number} maxWidth Max width to constraint resizing
@@ -37,6 +35,8 @@ export const PREFERENCES_DEFAULTS = {
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
+	// colors setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
+	// The setting is only kept for backward compatibility purposes.
 	colors: [
 		{
 			name: __( 'Black' ),
@@ -95,7 +95,8 @@ export const SETTINGS_DEFAULTS = {
 			color: '#9b51e0',
 		},
 	],
-
+	// fontSizes setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
+	// The setting is only kept for backward compatibility purposes.
 	fontSizes: [
 		{
 			name: _x( 'Small', 'font size name' ),
@@ -156,7 +157,10 @@ export const SETTINGS_DEFAULTS = {
 	__mobileEnablePageTemplates: false,
 	__experimentalBlockPatterns: [],
 	__experimentalBlockPatternCategories: [],
+	__experimentalSpotlightEntityBlocks: [],
 
+	// gradients setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
+	// The setting is only kept for backward compatibility purposes.
 	gradients: [
 		{
 			name: __( 'Vivid cyan blue to vivid purple' ),

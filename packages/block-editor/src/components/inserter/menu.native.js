@@ -17,13 +17,16 @@ import { Component } from '@wordpress/element';
 import { createBlock, rawHandler } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
+import {
+	BottomSheet,
+	BottomSheetConsumer,
+	InserterButton,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import MenuItem from './menu-item.native';
 
 const MIN_COL_NUM = 3;
 
@@ -62,8 +65,8 @@ export class InserterMenu extends Component {
 		const {
 			paddingLeft: itemPaddingLeft,
 			paddingRight: itemPaddingRight,
-		} = styles.modalItem;
-		const { width: itemWidth } = styles.modalIconWrapper;
+		} = InserterButton.Styles.modalItem;
+		const { width: itemWidth } = InserterButton.Styles.modalIconWrapper;
 		return itemWidth + itemPaddingLeft + itemPaddingRight;
 	}
 
@@ -112,7 +115,7 @@ export class InserterMenu extends Component {
 		const { itemWidth, maxWidth } = this.state;
 		const { onSelect } = this.props;
 		return (
-			<MenuItem
+			<InserterButton
 				item={ item }
 				itemWidth={ itemWidth }
 				maxWidth={ maxWidth }

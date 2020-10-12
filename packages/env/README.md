@@ -169,6 +169,25 @@ $ wp-env destroy
 $ wp-env start
 ```
 
+### 7. Debug mode and inspecting the generated dockerfile.
+
+`wp-env` uses docker behind the scenes. Inspecting the generated docker-compose file can help to understand what's going on.
+
+Start `wp-env` in debug mode
+
+```sh
+wp-env start --debug
+```
+
+`wp-env` will output its config which includes `dockerComposeConfigPath`. 
+
+```sh
+ℹ Config:
+	...
+	"dockerComposeConfigPath": "/Users/$USERNAME/.wp-env/5a619d332a92377cd89feb339c67b833/docker-compose.yml",
+	...
+```
+
 ## Command reference
 
 `wp-env` creates generated files in the `wp-env` home directory. By default, this is `~/.wp-env`. The exception is Linux, where files are placed at `~/wp-env` [for compatibility with Snap Packages](https://github.com/WordPress/gutenberg/issues/20180#issuecomment-587046325). The `wp-env` home directory contains a subdirectory for each project named `/$md5_of_project_path`. To change the `wp-env` home directory, set the `WP_ENV_HOME` environment variable. For example, running `WP_ENV_HOME="something" wp-env start` will download the project files to the directory `./something/$md5_of_project_path` (relative to the current directory).

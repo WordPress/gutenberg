@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
-import '@wordpress/block-editor';
 import '@wordpress/viewport';
 import '@wordpress/notices';
 import '@wordpress/format-library';

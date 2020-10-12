@@ -12,6 +12,22 @@
 		color: inherit;
 	}
 
+	// Applied while media is being uploaded
+	&.is-transient::before {
+		background-color: #fff;
+		opacity: 0.3;
+	}
+
+	// Shown while media is being uploaded
+	.components-spinner {
+		position: absolute;
+		z-index: z-index(".wp-block-cover__inner-container");
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%); // Account for spinner dimensions
+		margin: 0;
+	}
+
 	.block-editor-block-list__layout {
 		width: 100%;
 	}

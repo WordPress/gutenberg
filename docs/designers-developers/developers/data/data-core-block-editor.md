@@ -243,15 +243,17 @@ _Returns_
 
 <a name="getBlockParentsByBlockName" href="#getBlockParentsByBlockName">#</a> **getBlockParentsByBlockName**
 
-Given a block client ID and a block name,
-returns the list of all its parents from top to bottom,
-filtered by the given name.
+Given a block client ID and a block name, returns the list of all its parents
+from top to bottom, filtered by the given name(s). For example, if passed
+'core/group' as the blockName, it will only return parents which are group
+blocks. If passed `[ 'core/group', 'core/cover']`, as the blockName, it will
+return parents which are group blocks and parents which are cover blocks.
 
 _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: Block from which to find root client ID.
--   _blockName_ `string`: Block name to filter.
+-   _blockName_ `(string|Array<string>)`: Block name(s) to filter.
 -   _ascending_ `boolean`: Order results from bottom to top (true) or top to bottom (false).
 
 _Returns_
@@ -1237,6 +1239,7 @@ _Parameters_
 -   _blocks_ `(Object|Array<Object>)`: Replacement block(s).
 -   _indexToSelect_ `number`: Index of replacement block to select.
 -   _initialPosition_ `number`: Index of caret after in the selected block after the operation.
+-   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 <a name="replaceInnerBlocks" href="#replaceInnerBlocks">#</a> **replaceInnerBlocks**
 

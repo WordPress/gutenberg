@@ -18,7 +18,10 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { useExperimentalFeatures } from '../../experimental-features';
+import {
+	useExperimentalFeatures,
+	navigationPanel,
+} from '../../experimental-features';
 
 const visitSiteEditor = async () => {
 	const query = addQueryArgs( '', {
@@ -31,20 +34,11 @@ const visitSiteEditor = async () => {
 	);
 };
 
-const openTemplateDropdown = async () => {
-	// Open the dropdown menu.
-	const templateDropdown =
-		'button.components-dropdown-menu__toggle[aria-label="Switch Template"]';
-	await page.click( templateDropdown );
-	await page.waitForSelector( '.edit-site-template-switcher__popover' );
-};
-
-const getTemplateDropdownElement = async ( itemName ) => {
-	await openTemplateDropdown();
-	const [ item ] = await page.$x(
-		`//div[contains(@class, "edit-site-template-switcher__popover")]//button[contains(., "${ itemName }")]`
-	);
-	return item;
+const clickTemplateItem = async ( menus, itemName ) => {
+	await navigationPanel.open();
+	await navigationPanel.backToRoot();
+	await navigationPanel.navigate( menus );
+	await navigationPanel.clickItemByText( itemName );
 };
 
 const createTemplatePart = async (
@@ -174,8 +168,7 @@ describe( 'Multi-entity editor states', () => {
 	} );
 
 	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
-		const templatePartButton = await getTemplateDropdownElement( 'header' );
-		await templatePartButton.click();
+		await clickTemplateItem( 'Template Parts', 'header' );
 
 		// Wait for blocks to load.
 		await page.waitForSelector( '.wp-block' );
@@ -183,8 +176,7 @@ describe( 'Multi-entity editor states', () => {
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
 
 		// Switch back and make sure it is still clean.
-		const templateButton = await getTemplateDropdownElement( 'front-page' );
-		await templateButton.click();
+		await clickTemplateItem( 'Templates', 'Front page' );
 		await page.waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
