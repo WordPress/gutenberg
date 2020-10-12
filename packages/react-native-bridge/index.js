@@ -271,4 +271,10 @@ export function requestMediaFilesUploadCancelDialog( mediaFiles ) {
 	);
 }
 
+export function requestMediaFilesSaveCancelDialog( mediaFiles ) {
+	return RNReactNativeGutenbergBridge.requestMediaFilesSaveCancelDialog(
+		mediaFiles
+	);
+}
+
 export default RNReactNativeGutenbergBridge;

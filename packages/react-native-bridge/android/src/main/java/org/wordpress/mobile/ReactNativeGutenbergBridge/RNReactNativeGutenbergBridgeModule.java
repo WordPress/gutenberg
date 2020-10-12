@@ -244,6 +244,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
+    public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
+        mGutenbergBridgeJS2Parent.requestMediaFilesSaveCancelDialog(mediaFiles);
+    }
+
+    @ReactMethod
     public void editorDidEmitLog(String message, int logLevel) {
         mGutenbergBridgeJS2Parent.editorDidEmitLog(message, GutenbergBridgeJS2Parent.LogLevel.valueOf(logLevel));
     }

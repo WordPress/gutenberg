@@ -202,6 +202,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
+                Toast.makeText(MainApplication.this, "requestMediaFilesSaveCancelDialog called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
             public void gutenbergDidSendButtonPressedAction(String buttonType) {
 
             }

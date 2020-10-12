@@ -154,6 +154,7 @@ public class WPAndroidGlueCode {
         void onRequestMediaFilesEditorLoad(ArrayList<Object> mediaFiles, String blockId);
         void onCancelUploadForMediaCollection(ArrayList<Object> mediaFiles);
         void onRetryUploadForMediaCollection(ArrayList<Object> mediaFiles);
+        void onCancelSaveForMediaCollection(ArrayList<Object> mediaFiles);
     }
 
     public interface OnImageFullscreenPreviewListener {
@@ -440,6 +441,13 @@ public class WPAndroidGlueCode {
             @Override
             public void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles) {
                 mOnMediaFilesCollectionBasedBlockEditorListener.onCancelUploadForMediaCollection(
+                        mediaFiles.toArrayList()
+                );
+            }
+
+            @Override
+            public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
+                mOnMediaFilesCollectionBasedBlockEditorListener.onCancelSaveForMediaCollection(
                         mediaFiles.toArrayList()
                 );
             }
