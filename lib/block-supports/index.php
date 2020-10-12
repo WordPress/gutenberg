@@ -5,16 +5,6 @@
  * @package gutenberg
  */
 
-/**
- * TODO.
- *
- * @param object $attributes Relevant block attributes.
- * @param string $block_name Block name.
- */
-function foo_default( $attributes, $block_name ) {
-	return false;
-}
-
 global $block_supports_config;
 $block_supports_config = array(
 	'align'            => array(
@@ -49,7 +39,7 @@ $block_supports_config = array(
 				'type' => 'string',
 			),
 		),
-		'callback'   => 'foo_default',
+		'callback'   => '__return_false',
 		'default'    => array( false, true ),
 	),
 	'color.gradients'  => array(
@@ -58,12 +48,12 @@ $block_supports_config = array(
 				'type' => 'string',
 			),
 		),
-		'callback'   => 'foo_default',
+		'callback'   => '__return_false',
 		'default'    => array( false, false ),
 	),
 	'color.link'       => array(
 		'attributes' => array(),
-		'callback'   => 'foo_default',
+		'callback'   => '__return_false',
 		'default'    => array( false, false ),
 	),
 	'color.text'       => array(
@@ -75,7 +65,7 @@ $block_supports_config = array(
 				'type' => 'string',
 			),
 		),
-		'callback'   => 'foo_default',
+		'callback'   => '__return_false',
 		'default'    => array( false, true ),
 	),
 	'customClassName'  => array(
@@ -88,7 +78,6 @@ $block_supports_config = array(
 			return array_key_exists( 'className', $attributes ) ?
 				$attributes['className'] :
 				false;
-
 		},
 		'default'    => true,
 	),
@@ -102,7 +91,7 @@ $block_supports_config = array(
 			),
 		),
 		'callback'   => function( $attributes, $block_name ) {
-			$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
+			$has_named_font_size = array_key_exists( 'fontSize', $attributes );
 			$has_custom_font_size = isset( $attributes['style']['typography']['fontSize'] );
 
 			$classes = '';
@@ -146,10 +135,8 @@ function gutenberg_register_block_supports() {
 	// Ideally we need a hook to extend the block registration
 	// instead of mutating the block type.
 	foreach ( $registered_block_types as $block_type ) {
-		/* gutenberg_register_alignment_support( $block_type ); */
 		gutenberg_register_colors_support( $block_type );
 		/* gutenberg_register_typography_support( $block_type ); */
-		/* gutenberg_register_custom_classname_support( $block_type ); */
 	}
 }
 add_action( 'init', 'gutenberg_register_block_supports', 21 );
@@ -274,11 +261,8 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	}
 
 	$attributes = array();
-	/* $attributes = gutenberg_apply_generated_classname_support( $attributes, $block['attrs'], $block_type ); */
 	$attributes = gutenberg_apply_colors_support( $attributes, $block['attrs'], $block_type );
 	/* $attributes = gutenberg_apply_typography_support( $attributes, $block['attrs'], $block_type ); */
-	/* $attributes = gutenberg_apply_alignment_support( $attributes, $block['attrs'], $block_type ); */
-	/* $attributes = gutenberg_apply_custom_classname_support( $attributes, $block['attrs'], $block_type ); */
 
 	if ( ! count( $attributes ) ) {
 		return $block_content;
