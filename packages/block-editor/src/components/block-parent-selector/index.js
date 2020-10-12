@@ -35,6 +35,10 @@ export default function BlockParentSelector() {
 		};
 	}, [] );
 
+	if ( parentBlockType.hideParentSelector ) {
+		return null;
+	}
+
 	if ( firstParentClientId !== undefined ) {
 		return (
 			<div

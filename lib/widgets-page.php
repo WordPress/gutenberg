@@ -70,10 +70,9 @@ function gutenberg_widgets_init( $hook ) {
 
 	$settings = array_merge(
 		array(
-			'imageSizes'         => $available_image_sizes,
-			'isRTL'              => is_rtl(),
-			'maxUploadFileSize'  => $max_upload_size,
-			'hideParentSelector' => true,
+			'imageSizes'        => $available_image_sizes,
+			'isRTL'             => is_rtl(),
+			'maxUploadFileSize' => $max_upload_size,
 		),
 		gutenberg_get_legacy_widget_settings()
 	);
@@ -142,3 +141,4 @@ function gutenberg_widgets_editor_load_block_editor_scripts_and_styles( $is_bloc
 }
 
 add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_widgets_editor_load_block_editor_scripts_and_styles' );
+
