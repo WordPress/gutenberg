@@ -94,7 +94,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 * @expectedIncorrectUsage rest_sanitize_value_from_schema
+	 *
 	 */
 	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
@@ -111,7 +111,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 * @expectedIncorrectUsage rest_sanitize_value_from_schema
+	 *
 	 */
 	public function test_get_item() {
 		$widget_name = 'calendar';
@@ -122,7 +122,6 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 		$widget_type = $endpoint->get_widget( $widget_name );
 		$this->check_widget_type_object( $widget_type, $response->get_data(), $response->get_links() );
 	}
-
 
 	/**
 	 *
@@ -196,7 +195,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 * @expectedIncorrectUsage rest_sanitize_value_from_schema
+	 *
 	 */
 	public function test_prepare_item() {
 		$endpoint    = new WP_REST_Widget_Types_Controller;

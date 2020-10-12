@@ -237,10 +237,12 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			'widget_class',
 
 		);
+
+		$widget_type_array = (array) $widget_type;
 		foreach ( $extra_fields as $extra_field ) {
 			if ( rest_is_field_included( $extra_field, $fields ) ) {
-				if ( isset( $widget_type->$extra_field ) ) {
-					$field = $widget_type->$extra_field;
+				if ( isset( $widget_type_array[ $extra_field ] ) ) {
+					$field = $widget_type_array[ $extra_field ];
 				} elseif ( array_key_exists( 'default', $schema['properties'][ $extra_field ] ) ) {
 					$field = $schema['properties'][ $extra_field ]['default'];
 				} else {
