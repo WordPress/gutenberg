@@ -58,8 +58,16 @@ body.is-navigation-sidebar-open {
 
 .edit-site-header__toolbar {
 	display: flex;
-	padding-left: $grid-unit-30;
 	align-items: center;
+	padding-left: $grid-unit-10;
+
+	@include break-small() {
+		padding-left: $grid-unit-30;
+	}
+
+	@include break-wide() {
+		padding-right: $grid-unit-10;
+	}
 
 	.edit-site-header-toolbar__inserter-toggle {
 		margin-right: $grid-unit-10;
