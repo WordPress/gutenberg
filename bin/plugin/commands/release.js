@@ -69,42 +69,31 @@ async function runReleaseBranchCreationStep(
 	gitWorkingDirectoryPath,
 	abortMessage
 ) {
-	let version, releaseBranch, versionLabel;
+	let parsedVersion, releaseBranch, versionLabel;
 	await runStep( 'Creating the release branch', abortMessage, async () => {
-		let parsedMajorVersion;
-
-		const getComponentsOfRC = ( ver ) => ver.match( /(.+-rc\.)([0-9]+)/ );
 		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
 		const packageJson = readJSONFile( packageJsonPath );
-		const rcComponents = getComponentsOfRC( packageJson.version );
-		const isRC = !! rcComponents;
+		const packageVersion = semver.parse( packageJson.version );
+		const isPackageVersionRC = packageVersion.prerelease.length > 0;
 
 		// if the last tag is an RC then we can assume that we should generate a new rc with the same version number
-		if ( isRC ) {
-			const [ , current, rc ] = rcComponents;
-			const nextRC = Number( rc ) + 1;
-
-			version = `${ current }${ nextRC }`;
-			versionLabel = `${ current.split( '-' )[ 0 ] } RC${ nextRC }`;
-			parsedMajorVersion = semver.parse( packageJson.version );
+		if ( isPackageVersionRC ) {
+			parsedVersion = semver.parse(
+				semver.inc( packageVersion.version, 'prerelease', 'rc' )
+			);
 		} else {
 			const nextMajor = getNextMajorVersion( packageJson.version );
-
-			parsedMajorVersion = semver.parse( nextMajor );
-			version = nextMajor + '-rc.1';
-			versionLabel = nextMajor + ' RC1';
+			parsedVersion = semver.parse( nextMajor + '-rc.1' );
 		}
 
+		versionLabel = parsedVersion.raw.replace( /\-rc\.([0-9]+)/, ' RC$1' );
 		releaseBranch =
-			'release/' +
-			parsedMajorVersion.major +
-			'.' +
-			parsedMajorVersion.minor;
+			'release/' + parsedVersion.major + '.' + parsedVersion.minor;
 
-		if ( ! isRC ) {
+		if ( ! isPackageVersionRC ) {
 			await askForConfirmation(
 				'The Plugin version to be used is ' +
-					formats.success( version ) +
+					formats.success( parsedVersion.raw ) +
 					'. Proceed with the creation of the release branch?',
 				true,
 				abortMessage
@@ -124,7 +113,7 @@ async function runReleaseBranchCreationStep(
 		} else {
 			log(
 				'The Plugin version to be used is ' +
-					formats.success( version ) +
+					formats.success( parsedVersion.raw ) +
 					', in the release branch ' +
 					formats.success( releaseBranch )
 			);
@@ -132,7 +121,7 @@ async function runReleaseBranchCreationStep(
 	} );
 
 	return {
-		version,
+		version: parsedVersion.raw,
 		versionLabel,
 		releaseBranch,
 	};
