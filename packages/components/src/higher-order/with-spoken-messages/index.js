@@ -1,11 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	createHigherOrderComponent,
-	useSpeak,
-	useDebouncedSpeak,
-} from '@wordpress/compose';
+import { createHigherOrderComponent, useDebounce } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 
 /**
  * A Higher Order Component used to be provide speak and debounced speak
@@ -21,8 +18,8 @@ export default createHigherOrderComponent(
 	( Component ) => ( props ) => (
 		<Component
 			{ ...props }
-			speak={ useSpeak() }
-			debouncedSpeak={ useDebouncedSpeak() }
+			speak={ speak }
+			debouncedSpeak={ useDebounce( speak, 500 ) }
 		/>
 	),
 	'withSpokenMessages'

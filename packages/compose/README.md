@@ -146,13 +146,16 @@ _Returns_
 
 -   `boolean`: Whether or not the text has been copied. Resets after the timeout.
 
-<a name="useDebouncedSpeak" href="#useDebouncedSpeak">#</a> **useDebouncedSpeak**
+<a name="useDebounce" href="#useDebounce">#</a> **useDebounce**
 
-Returns a debounced speak function.
+Debounces a function with Lodash's `debounce`. A new debounced function will
+be returned and any scheduled calls cancelled if any of the arguments change,
+including the function to debounce, so please wrap functions created on
+render in components in `useCallback`.
 
-_Related_
+_Parameters_
 
--   <https://developer.wordpress.org/block-editor/packages/packages-a11y/#speak>
+-   _args_ `...any`: Arguments passed to Lodash's `debounce`.
 
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
@@ -229,14 +232,6 @@ const App = () => {
 _Returns_
 
 -   `Array`: An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
-
-<a name="useSpeak" href="#useSpeak">#</a> **useSpeak**
-
-Returns a speak function.
-
-_Related_
-
--   <https://developer.wordpress.org/block-editor/packages/packages-a11y/#speak>
 
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 

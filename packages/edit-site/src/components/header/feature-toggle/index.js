@@ -10,7 +10,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
-import { useSpeak } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 
 export default function FeatureToggle( {
 	feature,
@@ -19,7 +19,6 @@ export default function FeatureToggle( {
 	messageActivated,
 	messageDeactivated,
 } ) {
-	const speak = useSpeak();
 	const speakMessage = () => {
 		if ( isActive ) {
 			speak( messageDeactivated || __( 'Feature deactivated' ) );

@@ -12,7 +12,8 @@ import { __, _n, sprintf } from '@wordpress/i18n';
 import { VisuallyHidden, Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
-import { useDebouncedSpeak } from '@wordpress/compose';
+import { useDebounce } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -111,7 +112,7 @@ export default function QuickInserter( {
 	isAppender,
 	selectBlockOnInsert,
 } ) {
-	const debouncedSpeak = useDebouncedSpeak();
+	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [
 		destinationRootClientId,

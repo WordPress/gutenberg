@@ -7,10 +7,11 @@ import { flow } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect, withDispatch } from '@wordpress/data';
-import { compose, useSpeak } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
+import { speak } from '@wordpress/a11y';
 
 function FeatureToggle( {
 	onToggle,
@@ -21,7 +22,6 @@ function FeatureToggle( {
 	messageDeactivated,
 	shortcut,
 } ) {
-	const speak = useSpeak();
 	const speakMessage = () => {
 		if ( isActive ) {
 			speak( messageDeactivated || __( 'Feature deactivated' ) );

@@ -9,10 +9,9 @@ import { noop } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { MenuItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useSpeak } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 
 export function BlockInspectorButton( { onClick = noop, small = false } ) {
-	const speak = useSpeak();
 	const { shortcut, areAdvancedSettingsOpened } = useSelect(
 		( select ) => ( {
 			shortcut: select(
