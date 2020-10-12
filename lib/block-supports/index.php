@@ -161,7 +161,6 @@ function foo_register_block_supports() {
 	global $block_supports_config;
 
 	wp_register_style( 'wp-block-supports', false );
-	wp_enqueue_style( 'wp-block-supports' );
 
 	$block_registry         = WP_Block_Type_Registry::get_instance();
 	$registered_block_types = $block_registry->get_all_registered();
@@ -200,7 +199,7 @@ add_action( 'init', 'foo_register_block_supports', 22 );
 function foo_enqueue_style() {
 	wp_enqueue_style( 'wp-block-supports' );
 }
-add_action( 'get_footer', 'foo_enqueue_style' );
+add_action( 'wp_footer', 'foo_enqueue_style' );
 
 /**
  * TODO.
