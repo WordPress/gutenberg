@@ -65,7 +65,32 @@ $block_supports_config = array(
 				'type' => 'string',
 			),
 		),
-		'callback'   => '__return_false',
+		'callback'   => function( $attributes ) {
+			$has_named_text_color = array_key_exists( 'textColor', $attributes );
+			$has_custom_text_color = isset( $attributes['style']['color']['text'] );
+			$classes = '';
+
+			// Apply required generic class.
+			if ( $has_custom_text_color || $has_named_text_color ) {
+				$classes .= ' has-text-color';
+			}
+			// Apply color class or inline style.
+			if ( $has_named_text_color ) {
+				$classes .= sprintf( ' has-%s-color', $attributes['textColor'] );
+			} elseif ( $has_custom_text_color ) {
+				$generated_class_name = uniqid( 'wp-block-color.text-' );
+				$classes .= " $generated_class_name";
+				wp_add_inline_style(
+					'wp-block-supports',
+					sprintf(
+						'.%s { color: %s; }',
+						$generated_class_name,
+						$attributes['style']['color']['text']
+					)
+				);
+			}
+			return $classes;
+		},
 		'default'    => array( false, true ),
 	),
 	'customClassName'  => array(
@@ -153,7 +178,7 @@ function gutenberg_register_block_supports() {
 	// Ideally we need a hook to extend the block registration
 	// instead of mutating the block type.
 	foreach ( $registered_block_types as $block_type ) {
-		gutenberg_register_colors_support( $block_type );
+		/* gutenberg_register_colors_support( $block_type ); */
 	}
 }
 add_action( 'init', 'gutenberg_register_block_supports', 21 );
