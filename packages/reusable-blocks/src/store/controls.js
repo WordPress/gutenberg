@@ -110,7 +110,7 @@ const controls = {
 					.getEditedEntityRecord( 'postType', 'wp_block', id );
 
 				// Don't allow a reusable block with a temporary ID to be deleted
-				if ( ! reusableBlock || reusableBlock.isTemporary ) {
+				if ( ! reusableBlock ) {
 					return;
 				}
 
