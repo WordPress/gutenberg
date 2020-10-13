@@ -827,7 +827,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'name'          => 'Text',
 				'description'   => 'Arbitrary text.',
 				'number'        => 1,
-				'rendered'      => '<div class="textwidget">Custom text test</div>',
+				'rendered'      => '',
 				'rendered_form' => '<input id="widget-text-1-title" name="widget-text[1][title]" class="title sync-input" type="hidden" value="">' . "\n" .
 								'			<textarea id="widget-text-1-text" name="widget-text[1][text]" class="text sync-input" hidden>Custom text test</textarea>' . "\n" .
 								'			<input id="widget-text-1-filter" name="widget-text[1][filter]" class="filter sync-input" type="hidden" value="on">' . "\n" .
