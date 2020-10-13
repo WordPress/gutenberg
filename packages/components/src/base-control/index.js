@@ -14,6 +14,20 @@ import {
 	StyledHelp,
 } from './styles/base-control-styles';
 
+/**
+ * @typedef Props
+ * @property {string} id ID
+ * @property {import('react').ReactNode} help Help text
+ * @property {import('react').ReactNode} label Help text
+ * @property {boolean} [hideLabelFromVision] True to visually hide the label
+ * @property {string} [className] Class name
+ * @property {import('react').ReactNode} [children] Children
+ */
+
+/**
+ * @param {Props} props
+ * @return {JSX.Element} Element
+ */
 function BaseControl( {
 	id,
 	label,
@@ -64,6 +78,16 @@ function BaseControl( {
 	);
 }
 
+/**
+ * @typedef VisualLabelProps
+ * @property {string} [className] Class name
+ * @property {import('react').ReactNode} [children] Children
+ */
+
+/**
+ * @param {VisualLabelProps} Props
+ * @return {JSX.Element} Element
+ */
 BaseControl.VisualLabel = ( { className, children } ) => {
 	className = classnames( 'components-base-control__label', className );
 	return <span className={ className }>{ children }</span>;

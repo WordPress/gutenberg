@@ -5,5 +5,10 @@
 		"declarationDir": "build-types"
 	},
 	"references": [ { "path": "../primitives" } ],
-	"include": [ "src/dashicon/*", "src/tip/*", "src/visually-hidden/*" ]
+	"include": [
+		"src/base-control/*",
+		"src/dashicon/*",
+		"src/tip/*",
+		"src/visually-hidden/*"
+	]
 }
