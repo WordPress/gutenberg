@@ -2,12 +2,14 @@
  * WordPress dependencies
  */
 import {
+	Button,
 	CircularOptionPicker,
 	Dropdown,
 	Icon,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { noFilter } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
@@ -15,6 +17,7 @@ import { DOWN } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
+import { ColorPalette } from '..';
 import {
 	getGradientFromCSSColors,
 	getGradientFromValues,
@@ -31,28 +34,45 @@ function Swatch( { fill } ) {
 	);
 }
 
-function CustomColorOption( { label, color } ) {
+function CustomColorOption( { label, color, onChange } ) {
+	const [ isOpen, setIsOpen ] = useState( false );
 	const icon = color ? <Swatch fill={ color } /> : <Icon icon={ noFilter } />;
 	return (
-		<div className="block-editor-duotone-toolbar__custom-color">
-			{ icon }
-			{ label }
+		<div className="block-editor-duotone-custom-color">
+			<Button
+				className="block-editor-duotone-custom-color__button"
+				icon={ icon }
+				onClick={ () => setIsOpen( ( prev ) => ! prev ) }
+			>
+				{ label }
+			</Button>
+			{ isOpen && <ColorPalette onChange={ onChange } /> }
 		</div>
 	);
 }
 
-function CustomColorPicker( { colors } ) {
+function CustomColorPicker( { colors, onChange } ) {
 	return (
-		<div>
+		<>
 			<CustomColorOption
 				label={ __( 'Dark Color' ) }
 				color={ colors?.[ 0 ] }
+				onChange={ ( newColor ) => {
+					const newColors = colors.slice();
+					newColors[ 0 ] = newColor;
+					onChange( newColors );
+				} }
 			/>
 			<CustomColorOption
 				label={ __( 'Light Color' ) }
 				color={ colors?.[ colors.length - 1 ] }
+				onChange={ ( newColor ) => {
+					const newColors = colors.slice();
+					newColors[ colors.length - 1 ] = newColor;
+					onChange( newColors );
+				} }
 			/>
-		</div>
+		</>
 	);
 }
 
@@ -151,6 +171,24 @@ function DuotoneToolbar( { value, onChange, options } ) {
 					>
 						<CustomColorPicker
 							colors={ getHexColorsFromValues( value?.values ) }
+							onChange={ ( newColors ) =>
+								onChange(
+									newColors.length >= 2
+										? {
+												values: getValuesFromHexColors(
+													newColors
+												),
+												slug: `custom-${ newColors
+													.map( ( hex ) =>
+														hex
+															.slice( 1 )
+															.toLowerCase()
+													)
+													.join( '-' ) }`,
+										  }
+										: undefined
+								)
+							}
 						/>
 					</CircularOptionPicker>
 				</div>
