@@ -167,8 +167,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
             @Override
             public void onPageCommitVisible(WebView view, String url) {
-                String injectCssScript = getFileContentFromAssets("gutenberg-web-single-block/inject-css.js");
-                evaluateJavaScript(injectCssScript);
+                injectCssScript();
 
                 long userId = getUserId();
                 if (userId != 0) {
@@ -189,6 +188,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                injectCssScript();
                 injectOnPageLoadExternalSources();
                 super.onPageStarted(view, url, favicon);
             }
@@ -237,6 +237,11 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
             // like NUX (new user experience) modal is.
             mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 1500);
         }, 2000);
+    }
+
+    private void injectCssScript() {
+        String injectCssScript = getFileContentFromAssets("gutenberg-web-single-block/inject-css.js");
+        evaluateJavaScript(injectCssScript);
     }
 
     private void injectOnGutenbergReadyExternalSources() {
