@@ -8,13 +8,14 @@ import { includes } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, Platform } from '@wordpress/element';
+import { Platform, useEffect } from '@wordpress/element';
 import {
 	RichText,
 	ContrastChecker,
 	InspectorControls,
 	withColors,
 	PanelColorSettings,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
@@ -29,28 +30,19 @@ import { BlockQuote } from './blockquote';
  */
 import { SOLID_COLOR_CLASS } from './shared';
 
-class PullQuoteEdit extends Component {
-	constructor( props ) {
-		super( props );
-
-		this.wasTextColorAutomaticallyComputed = false;
-		this.pullQuoteMainColorSetter = this.pullQuoteMainColorSetter.bind(
-			this
-		);
-		this.pullQuoteTextColorSetter = this.pullQuoteTextColorSetter.bind(
-			this
-		);
-	}
-
-	pullQuoteMainColorSetter( colorValue ) {
-		const {
-			colorUtils,
-			textColor,
-			setAttributes,
-			setTextColor,
-			setMainColor,
-			className,
-		} = this.props;
+function PullQuoteEdit( {
+	colorUtils,
+	textColor,
+	attributes,
+	setAttributes,
+	setTextColor,
+	setMainColor,
+	className,
+	mainColor,
+	isSelected,
+	insertBlocksAfter,
+} ) {
+	function pullQuoteMainColorSetter( colorValue ) {
 		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
 		const needTextColor =
 			! textColor.color || this.wasTextColorAutomaticallyComputed;
@@ -77,21 +69,39 @@ class PullQuoteEdit extends Component {
 		}
 	}
 
-	pullQuoteTextColorSetter( colorValue ) {
-		const { setTextColor } = this.props;
+	function pullQuoteTextColorSetter( colorValue ) {
 		setTextColor( colorValue );
 		this.wasTextColorAutomaticallyComputed = false;
 	}
 
-	componentDidUpdate( prevProps ) {
-		const { attributes, className, mainColor, setAttributes } = this.props;
+	const { value, citation } = attributes;
+
+	const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+	const figureStyles = isSolidColorStyle
+		? { backgroundColor: mainColor.color }
+		: { borderColor: mainColor.color };
+
+	const figureClasses = classnames( className, {
+		'has-background': isSolidColorStyle && mainColor.color,
+		[ mainColor.class ]: isSolidColorStyle && mainColor.class,
+	} );
+
+	const blockquoteStyles = {
+		color: textColor.color,
+	};
+
+	const blockquoteClasses =
+		textColor.color &&
+		classnames( 'has-text-color', {
+			[ textColor.class ]: textColor.class,
+		} );
+
+	const includesSolidColorClass = includes( className, SOLID_COLOR_CLASS );
+
+	useEffect( () => {
 		// If the block includes a named color and we switched from the
 		// solid color style to the default style.
-		if (
-			attributes.mainColor &&
-			! includes( className, SOLID_COLOR_CLASS ) &&
-			includes( prevProps.className, SOLID_COLOR_CLASS )
-		) {
+		if ( mainColor ) {
 			// Remove the named color, and set the color as a custom color.
 			// This is done because named colors use classes, in the default style we use a border color,
 			// and themes don't set classes for border colors.
@@ -100,120 +110,91 @@ class PullQuoteEdit extends Component {
 				customMainColor: mainColor.color,
 			} );
 		}
-	}
+	}, [ includesSolidColorClass, mainColor ] );
 
-	render() {
-		const {
-			attributes,
-			mainColor,
-			textColor,
-			setAttributes,
-			isSelected,
-			className,
-			insertBlocksAfter,
-		} = this.props;
-
-		const { value, citation } = attributes;
-
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
-		const figureStyles = isSolidColorStyle
-			? { backgroundColor: mainColor.color }
-			: { borderColor: mainColor.color };
-
-		const figureClasses = classnames( className, {
-			'has-background': isSolidColorStyle && mainColor.color,
-			[ mainColor.class ]: isSolidColorStyle && mainColor.class,
-		} );
-
-		const blockquoteStyles = {
-			color: textColor.color,
-		};
-
-		const blockquoteClasses =
-			textColor.color &&
-			classnames( 'has-text-color', {
-				[ textColor.class ]: textColor.class,
-			} );
-
-		return (
-			<>
-				<Figure style={ figureStyles } className={ figureClasses }>
-					<BlockQuote
-						style={ blockquoteStyles }
-						className={ blockquoteClasses }
-					>
+	return (
+		<>
+			<Figure
+				{ ...useBlockProps( {
+					style: figureStyles,
+					className: figureClasses,
+				} ) }
+			>
+				<BlockQuote
+					style={ blockquoteStyles }
+					className={ blockquoteClasses }
+				>
+					<RichText
+						identifier="value"
+						multiline
+						value={ value }
+						onChange={ ( nextValue ) =>
+							setAttributes( {
+								value: nextValue,
+							} )
+						}
+						placeholder={
+							// translators: placeholder text used for the quote
+							__( 'Write quote…' )
+						}
+						textAlign="center"
+					/>
+					{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 						<RichText
-							identifier="value"
-							multiline
-							value={ value }
-							onChange={ ( nextValue ) =>
+							identifier="citation"
+							value={ citation }
+							placeholder={
+								// translators: placeholder text used for the citation
+								__( 'Write citation…' )
+							}
+							onChange={ ( nextCitation ) =>
 								setAttributes( {
-									value: nextValue,
+									citation: nextCitation,
 								} )
 							}
-							placeholder={
-								// translators: placeholder text used for the quote
-								__( 'Write quote…' )
-							}
+							className="wp-block-pullquote__citation"
+							__unstableMobileNoFocusOnMount
 							textAlign="center"
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( 'core/paragraph' )
+								)
+							}
 						/>
-						{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
-							<RichText
-								identifier="citation"
-								value={ citation }
-								placeholder={
-									// translators: placeholder text used for the citation
-									__( 'Write citation…' )
-								}
-								onChange={ ( nextCitation ) =>
-									setAttributes( {
-										citation: nextCitation,
-									} )
-								}
-								className="wp-block-pullquote__citation"
-								__unstableMobileNoFocusOnMount
-								textAlign="center"
-								__unstableOnSplitAtEnd={ () =>
-									insertBlocksAfter(
-										createBlock( 'core/paragraph' )
-									)
-								}
+					) }
+				</BlockQuote>
+			</Figure>
+			{ Platform.OS === 'web' && (
+				<InspectorControls>
+					<PanelColorSettings
+						title={ __( 'Color settings' ) }
+						colorSettings={ [
+							{
+								value: mainColor.color,
+								onChange: pullQuoteMainColorSetter,
+								label: __( 'Main color' ),
+							},
+							{
+								value: textColor.color,
+								onChange: pullQuoteTextColorSetter,
+								label: __( 'Text color' ),
+							},
+						] }
+					>
+						{ isSolidColorStyle && (
+							<ContrastChecker
+								{ ...{
+									textColor: textColor.color,
+									backgroundColor: mainColor.color,
+								} }
+								isLargeText={ false }
 							/>
 						) }
-					</BlockQuote>
-				</Figure>
-				{ Platform.OS === 'web' && (
-					<InspectorControls>
-						<PanelColorSettings
-							title={ __( 'Color settings' ) }
-							colorSettings={ [
-								{
-									value: mainColor.color,
-									onChange: this.pullQuoteMainColorSetter,
-									label: __( 'Main color' ),
-								},
-								{
-									value: textColor.color,
-									onChange: this.pullQuoteTextColorSetter,
-									label: __( 'Text color' ),
-								},
-							] }
-						>
-							{ isSolidColorStyle && (
-								<ContrastChecker
-									{ ...{
-										textColor: textColor.color,
-										backgroundColor: mainColor.color,
-									} }
-									isLargeText={ false }
-								/>
-							) }
-						</PanelColorSettings>
-					</InspectorControls>
-				) }
-			</>
-		);
-	}
+					</PanelColorSettings>
+				</InspectorControls>
+			) }
+		</>
+	);
 }
 
 export default withColors( {
