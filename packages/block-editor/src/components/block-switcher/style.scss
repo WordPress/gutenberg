@@ -105,6 +105,13 @@
 	}
 }
 
+// Override standard MenuItem icon spacing, since the block transform icons are
+// shown on the left, rather than the right.
+.block-editor-block-switcher__transforms__menugroup .block-editor-block-icon {
+	margin-left: -2px; // This optically balances the icon.
+	margin-right: $grid-unit-10;
+}
+
 .block-editor-block-switcher__popover__preview__parent {
 	.block-editor-block-switcher__popover__preview__container {
 		position: absolute;

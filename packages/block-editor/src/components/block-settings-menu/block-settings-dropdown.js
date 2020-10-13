@@ -23,6 +23,7 @@ import { getBlockType, serialize } from '@wordpress/blocks';
  * Internal dependencies
  */
 import BlockActions from '../block-actions';
+import BlockIcon from '../block-icon';
 import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
 import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
@@ -125,6 +126,11 @@ export function BlockSettingsDropdown( {
 								/>
 								{ firstParentClientId !== undefined && (
 									<MenuItem
+										icon={
+											<BlockIcon
+												icon={ parentBlockType.icon }
+											/>
+										}
 										onClick={ () =>
 											selectBlock( firstParentClientId )
 										}
