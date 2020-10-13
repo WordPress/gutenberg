@@ -6,7 +6,7 @@ import {
 	useNavigation,
 	useFocusEffect,
 } from '@react-navigation/native';
-import { View, ScrollView, TouchableHighlight, Platform } from 'react-native';
+import { View, ScrollView, TouchableHighlight } from 'react-native';
 import { debounce } from 'lodash';
 
 /**
@@ -20,6 +20,7 @@ import { useRef, useCallback, useContext, useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { BottomSheetNavigationContext } from './bottom-sheet-navigation-context';
+import styles from './styles.scss';
 
 const BottomSheetNavigationScreen = ( {
 	children,
@@ -87,10 +88,9 @@ const BottomSheetNavigationScreen = ( {
 						{ ! isNested && (
 							<View
 								style={ {
-									height: safeAreaBottomInset,
-									backgroundColor: 'red',
-									marginBottom:
-										Platform.OS === 'android' ? 20 : 0,
+									height:
+										safeAreaBottomInset ||
+										styles.scrollableContent.paddingBottom,
 								} }
 							/>
 						) }
