@@ -53,3 +53,7 @@ $blocks-button__height: 3.1em;
 	background-color: transparent;
 	border: 2px solid;
 }
+
+.custom-width .wp-block-button__link {
+	width: 100%;
+}

@@ -21,19 +21,22 @@ export const WIDTH_SUPPORT_KEY = '__experimentalWidth';
  *
  * @param  {Object} props      Additional props applied to save element.
  * @param  {Object} blockType  Block type.
+ * @param  {Object} attributes Block attributes.
  * @return {Object}            Filtered props applied to save element.
  */
-function addSaveProps( props, blockType ) {
+function addSaveProps( props, blockType, attributes ) {
 	if ( ! hasWidthSupport( blockType ) ) {
 		return props;
 	}
 
 	// Add CSS class indicating that a custom width was applied
 	// Use TokenList to de-dupe classes.
-	const classes = new TokenList( props.className );
-	classes.add( `custom-width` );
-	const newClassName = classes.value;
-	props.className = newClassName ? newClassName : undefined;
+	if ( attributes.style?.width?.width ) {
+		const classes = new TokenList( props.className );
+		classes.add( `custom-width` );
+		const newClassName = classes.value;
+		props.className = newClassName ? newClassName : undefined;
+	}
 
 	return props;
 }
@@ -56,7 +59,7 @@ function addEditProps( settings ) {
 		if ( existingGetEditWrapperProps ) {
 			props = existingGetEditWrapperProps( attributes );
 		}
-		return addSaveProps( props, settings );
+		return addSaveProps( props, settings, attributes );
 	};
 
 	return settings;
