@@ -3,37 +3,33 @@
  */
 import classnames from 'classnames';
 
-function Animate( { type, options = {}, children } ) {
-	if ( type === 'appear' ) {
-		const { origin = 'top' } = options;
-		const [ yAxis, xAxis = 'center' ] = origin.split( ' ' );
+function getDefaultOrigin( type ) {
+	return type === 'appear' ? 'top' : 'left';
+}
 
-		return children( {
-			className: classnames( 'components-animate__appear', {
-				[ 'is-from-' + xAxis ]: xAxis !== 'center',
-				[ 'is-from-' + yAxis ]: yAxis !== 'middle',
-			} ),
+export function useAnimate( { type, origin = getDefaultOrigin( type ) } ) {
+	if ( type === 'appear' ) {
+		const [ yAxis, xAxis = 'center' ] = origin.split( ' ' );
+		return classnames( 'components-animate__appear', {
+			[ 'is-from-' + xAxis ]: xAxis !== 'center',
+			[ 'is-from-' + yAxis ]: yAxis !== 'middle',
 		} );
 	}
 
 	if ( type === 'slide-in' ) {
-		const { origin = 'left' } = options;
-
-		return children( {
-			className: classnames(
-				'components-animate__slide-in',
-				'is-from-' + origin
-			),
-		} );
+		return classnames(
+			'components-animate__slide-in',
+			'is-from-' + origin
+		);
 	}
 
 	if ( type === 'loading' ) {
-		return children( {
-			className: classnames( 'components-animate__loading' ),
-		} );
+		return classnames( 'components-animate__loading' );
 	}
-
-	return children( {} );
 }
 
-export default Animate;
+export default function Animate( { type, options = {}, children } ) {
+	return children( {
+		className: useAnimate( { type, ...options } ),
+	} );
+}
