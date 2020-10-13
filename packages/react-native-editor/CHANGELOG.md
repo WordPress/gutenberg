@@ -12,8 +12,9 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 
 ## 1.38.1
-------
-* [***] Unsupported Block Editor: Fixed issue when cannot view or interact with the classic block on Jetpack sites
+
+* [***] Fix unsupported block bottom sheet is triggered when device is rotated
+* [***] Unsupported Block Editor: Fixed issue when cannot view or interact with the classic block on Jetpack site
 
 ## 1.38.0
 
