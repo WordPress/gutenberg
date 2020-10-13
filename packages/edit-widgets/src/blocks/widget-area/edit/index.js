@@ -68,6 +68,7 @@ export default function WidgetAreaEdit( {
 				onToggle={ () => {
 					setIsWidgetAreaOpen( clientId, ! isOpen );
 				} }
+				scrollAfterOpen={ ! isDragging }
 			>
 				{ ( { opened } ) => (
 					// This is required to ensure LegacyWidget blocks are not unmounted when the panel is collapsed.

@@ -20,7 +20,16 @@ import Icon from '../icon';
 import { useControlledState, useUpdateEffect } from '../utils';
 
 export function PanelBody(
-	{ children, className, icon, initialOpen, onToggle = noop, opened, title },
+	{
+		children,
+		className,
+		icon,
+		initialOpen,
+		onToggle = noop,
+		opened,
+		title,
+		scrollAfterOpen = true,
+	},
 	ref
 ) {
 	const [ isOpened, setIsOpened ] = useControlledState( opened, {
@@ -39,9 +48,12 @@ export function PanelBody(
 		onToggle( next );
 	};
 
+	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value
+	const scrollAfterOpenRef = useRef();
+	scrollAfterOpenRef.current = scrollAfterOpen;
 	// Runs after initial render
 	useUpdateEffect( () => {
-		if ( isOpened ) {
+		if ( isOpened && scrollAfterOpenRef.current ) {
 			/*
 			 * Scrolls the content into view when visible.
 			 * This improves the UX when there are multiple stacking <PanelBody />
@@ -55,7 +67,7 @@ export function PanelBody(
 				} );
 			}
 		}
-	}, [ isOpened, scrollBehavior ] );
+	}, [ isOpened ] );
 
 	const classes = classnames( 'components-panel__body', className, {
 		'is-opened': isOpened,
