@@ -30,9 +30,7 @@ const { runPerformanceTests } = require( './commands/performance' );
 program
 	.command( 'release-plugin-rc' )
 	.alias( 'rc' )
-	.description(
-		'Release an RC version of the plugin'
-	)
+	.description( 'Release an RC version of the plugin' )
 	.action( catchException( releaseRC ) );
 
 program
