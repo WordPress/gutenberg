@@ -27,6 +27,7 @@ function Dashicon( { icon, size = 20, className, ...extraProps } ) {
 			// Ignore reason: span attributes are the global attributes which do not include width/height
 			// See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/span
 			// See https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes
+			// PR to remove: https://github.com/WordPress/gutenberg/pull/26067
 			// @ts-ignore
 			width={ size }
 			height={ size }
