@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { Button, Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
@@ -31,9 +31,18 @@ function NavigationToggle( { icon, isOpen, onClick } ) {
 		};
 	}, [] );
 
+	const { setNavigationPanelActiveMenu } = useDispatch( 'core/edit-site' );
+
 	if ( ! isActive ) {
 		return null;
 	}
+
+	const handleClick = ( event ) => {
+		if ( isOpen ) {
+			setNavigationPanelActiveMenu( 'root' );
+		}
+		onClick( event );
+	};
 
 	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
 
@@ -60,7 +69,7 @@ function NavigationToggle( { icon, isOpen, onClick } ) {
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
 				label={ __( 'Toggle navigation' ) }
-				onClick={ onClick }
+				onClick={ handleClick }
 				showTooltip
 			>
 				{ buttonIcon }

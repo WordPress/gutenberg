@@ -18,6 +18,9 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 	const mock = jest.fn();
 	return mock;
 } );
+jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
+	useDispatch: () => ( { setNavigationPanelActiveMenu: jest.fn() } ),
+} ) );
 
 jest.mock( '@wordpress/core-data' );
 
