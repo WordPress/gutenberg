@@ -925,8 +925,8 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onMediaCollectionSaveResult(blockFirstMediaId, success);
     }
 
-    public void mediaModelCreatedForFile(final String oldId, final String newId, final String oldUrl) {
-        mDeferredEventEmitter.onMediaModelCreatedForFile(oldId, newId, oldUrl);
+    public void mediaIdChanged(final String oldId, final String newId, final String oldUrl) {
+        mDeferredEventEmitter.onMediaIdChanged(oldId, newId, oldUrl);
     }
 
     public void replaceUnsupportedBlock(String content, String blockId) {
