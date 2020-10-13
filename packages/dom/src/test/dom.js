@@ -89,7 +89,7 @@ describe( 'DOM', () => {
 	describe( 'placeCaretAtHorizontalEdge', () => {
 		it( 'should place caret at the start of the input', () => {
 			const input = document.createElement( 'input' );
-			input.value = 'value'
+			input.value = 'value';
 			input.selectionStart = 5;
 			placeCaretAtHorizontalEdge( input, true );
 			expect( isHorizontalEdge( input, false ) ).toBe( true );
