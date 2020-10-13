@@ -31,7 +31,7 @@ function addSaveProps( props, blockType, attributes ) {
 
 	// Add CSS class indicating that a custom width was applied
 	// Use TokenList to de-dupe classes.
-	if ( attributes.style?.width?.width ) {
+	if ( attributes.style?.width ) {
 		const classes = new TokenList( props.className );
 		classes.add( `custom-width` );
 		const newClassName = classes.value;
@@ -84,11 +84,8 @@ export function WidthEdit( props ) {
 	const onChange = ( newWidthValue ) => {
 		const newStyle = {
 			...style,
-			width: {
-				width: newWidthValue,
-			},
+			width: newWidthValue,
 		};
-
 		setAttributes( { style: cleanEmptyObject( newStyle ) } );
 	};
 
@@ -99,7 +96,7 @@ export function WidthEdit( props ) {
 					<Button
 						key={ widthValue }
 						isSmall
-						isPrimary={ widthValue === style?.width?.width }
+						isPrimary={ widthValue === style?.width }
 						onClick={ () => onChange( widthValue ) }
 					>
 						{ widthValue }

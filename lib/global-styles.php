@@ -409,7 +409,7 @@ function gutenberg_experimental_global_styles_get_style_property() {
 		'color'                    => array( 'color', 'text' ),
 		'fontSize'                 => array( 'typography', 'fontSize' ),
 		'lineHeight'               => array( 'typography', 'lineHeight' ),
-		'width'                    => array( 'width', 'width'),
+		'width'                    => array( 'width'),
 	);
 }
 

@@ -44,7 +44,7 @@ function gutenberg_apply_width_support( $attributes, $block_attributes, $block_t
 		$has_width = isset( $block_attributes['style']['width'] );
 		if ( $has_width ) {
 			$width = intval( $block_attributes['style']['width'] );
-            $attributes['inline_styles'][] = sprintf( 'width: %d%%;', $width );
+            $attributes['inline_styles'][] = sprintf( 'width: %d;', $width );
 		}
 	}
 
