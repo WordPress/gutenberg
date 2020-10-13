@@ -5,5 +5,7 @@
 		"declarationDir": "build-types",
 	},
 	"references": [],
-    "include": [ "src/**/*" ],
+    "include": [
+		"src/dashicon/*"
+	],
 }
