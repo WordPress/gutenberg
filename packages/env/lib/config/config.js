@@ -23,7 +23,7 @@ const md5 = require( '../md5' );
  * @property {string}                           configDirectoryPath       Path to the .wp-env.json file.
  * @property {string}                           workDirectoryPath         Path to the work directory located in ~/.wp-env.
  * @property {string}                           dockerComposeConfigPath   Path to the docker-compose.yml file.
- * @property {string}                           dockerComposeOverridePath Path to the docker-compose.yml file.
+ * @property {string}                           dockerComposeOverridePath Path to the docker-compose.override.yml file.
  * @property {boolean}                          detectedLocalConfig       If true, wp-env detected local config and used it.
  * @property {Object.<string, WPServiceConfig>} env                       Specific config for different environments.
  * @property {boolean}                          debug                     True if debug mode is enabled.
@@ -72,6 +72,7 @@ module.exports = async function readConfig( configPath ) {
 	const defaultConfiguration = {
 		core: null,
 		phpVersion: null,
+		dockerComposeOverridePath: null,
 		plugins: [],
 		themes: [],
 		port: 8888,
@@ -171,8 +172,8 @@ module.exports = async function readConfig( configPath ) {
 			workDirectoryPath,
 			'docker-compose.yml'
 		),
-		dockerComposeOverridePath: path.resolve(
-			configDirectoryPath,
+		dockerComposeOverrideConfigPath: path.resolve(
+			workDirectoryPath,
 			'docker-compose.override.yml'
 		),
 		configDirectoryPath,

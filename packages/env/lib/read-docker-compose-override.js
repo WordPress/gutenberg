@@ -2,8 +2,13 @@
 /**
  * External dependencies
  */
-const fs = require( 'fs' );
-const yaml = require( 'js-yaml' );
+const path = require( 'path' );
+const yaml = require( 'node-yaml' );
+
+/**
+ * Internal dependencies
+ */
+const { ValidationError } = require( './config/validate-config' );
 
 /**
  * @typedef {import('./config').WPConfig} WPConfig
@@ -13,41 +18,41 @@ const yaml = require( 'js-yaml' );
  * Creates a docker-compose override config object, from a file on disk, which
  * overrides the docker-compose run-time the environment.
  *
- * @param {WPConfig} config A wp-env config object.
- * @param {Object}  options
- * @param {Object}   options.spinner    A CLI spinner which indicates progress.
- * @param {boolean}  options.debug      True if debug mode is enabled.
+ * @param {WPConfig} config             A wp-env config object.
  *
  * @return {Object} The docker-compose.override.yml file read as a YAML object.
  */
-module.exports = function readDockerComposeOverride(
-	config,
-	{ spinner, debug }
-) {
-	const log = debug
-		? ( message ) => {
-				spinner.info( `Read Docker Compose Override: ${ message }` );
-				spinner.start();
-		  }
-		: () => {};
-
-	// Get document, or throw exception on error
-	try {
-		const dockerComposeOverride = yaml.safeLoad(
-			fs.readFileSync( config.dockerComposeOverridePath, 'utf8' )
+module.exports = async function readDockerComposeOverride( config ) {
+	if ( config.env.development.dockerComposeOverridePath ) {
+		const dockerComposeOverridePath = path.resolve(
+			config.configDirectoryPath,
+			config.env.development.dockerComposeOverridePath
 		);
 
-		return dockerComposeOverride;
-	} catch ( e ) {
-		log( e );
-		const dockerComposeOverride = function () {
-			return { version: '3.7' };
-		};
-		fs.writeFile(
-			config.dockerComposeOverridePath,
-			yaml.dump( dockerComposeOverride )
-		);
-
-		return dockerComposeOverride;
+		// Get document, or throw exception on error
+		try {
+			return await yaml.read( dockerComposeOverridePath, {
+				encoding: 'utf8',
+			} );
+		} catch ( error ) {
+			if ( error instanceof SyntaxError ) {
+				throw new ValidationError(
+					`Invalid ${ dockerComposeOverridePath }: ${ error.message }`
+				);
+			} else {
+				throw new ValidationError(
+					`Could not read ${ dockerComposeOverridePath }: ${ error.message }`
+				);
+			}
+		}
 	}
+
+	/**
+	 * Default "empty" Docker Compose override file contents.
+	 */
+	return {
+		version: '3.7',
+		services: {},
+		volumes: {},
+	};
 };

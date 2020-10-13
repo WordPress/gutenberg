@@ -69,7 +69,7 @@ module.exports = async function start( { spinner, debug, update } ) {
 	const dockerComposeConfig = {
 		config: [
 			config.dockerComposeConfigPath,
-			config.dockerComposeOverridePath,
+			config.dockerComposeOverrideConfigPath,
 		],
 		log: config.debug,
 	};

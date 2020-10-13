@@ -17,7 +17,8 @@ const readDockerComposeOverride = require( './read-docker-compose-override' );
 
 /**
  * Initializes the local environment so that Docker commands can be run. Reads
- * ./.wp-env.json, creates ~/.wp-env, and creates ~/.wp-env/docker-compose.yml.
+ * ./.wp-env.json, creates ~/.wp-env, creates ~/.wp-env/docker-compose.yml,
+ * creates ~/.wp-env/docker-compose.override.yml.
  *
  * @param {Object}  options
  * @param {Object}  options.spinner A CLI spinner which indicates progress.
@@ -38,10 +39,11 @@ module.exports = async function initConfig( { spinner, debug } ) {
 		yaml.dump( dockerComposeConfig )
 	);
 
-	const dockerComposeOverride = readDockerComposeOverride( config, {
-		spinner,
-		debug,
-	} );
+	const dockerComposeOverride = await readDockerComposeOverride( config );
+	await fs.writeFile(
+		config.dockerComposeOverrideConfigPath,
+		yaml.dump( dockerComposeOverride )
+	);
 
 	if ( config.debug ) {
 		spinner.info(
