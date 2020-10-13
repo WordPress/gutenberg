@@ -141,9 +141,7 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 			</Section>
 			<MetaBoxesSection
 				title={ __( 'Additional panels' ) }
-				description={ __(
-					'Add extra areas to the editor.'
-				) }
+				description={ __( 'Add extra areas to the editor.' ) }
 			/>
 		</Modal>
 	);
