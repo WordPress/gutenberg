@@ -344,74 +344,11 @@ function TableEdit( {
 		);
 	}
 
-	/**
-	 * Creates an onFocus handler for a specified cell.
-	 *
-	 * @param {Object} cellLocation Object with `section`, `rowIndex`, and
-	 *                              `columnIndex` properties.
-	 *
-	 * @return {Function} Function to call on focus.
-	 */
-	function createOnFocus( cellLocation ) {
-		return () => {
-			setSelectedCell( {
-				...cellLocation,
-				type: 'cell',
-			} );
-		};
-	}
-
-	/**
-	 * Gets the table controls to display in the block toolbar.
-	 *
-	 * @return {Array} Table controls.
-	 */
-	function getTableControls() {
-		return [
-			{
-				icon: tableRowBefore,
-				title: __( 'Insert row before' ),
-				isDisabled: ! selectedCell,
-				onClick: onInsertRowBefore,
-			},
-			{
-				icon: tableRowAfter,
-				title: __( 'Insert row after' ),
-				isDisabled: ! selectedCell,
-				onClick: onInsertRowAfter,
-			},
-			{
-				icon: tableRowDelete,
-				title: __( 'Delete row' ),
-				isDisabled: ! selectedCell,
-				onClick: onDeleteRow,
-			},
-			{
-				icon: tableColumnBefore,
-				title: __( 'Insert column before' ),
-				isDisabled: ! selectedCell,
-				onClick: onInsertColumnBefore,
-			},
-			{
-				icon: tableColumnAfter,
-				title: __( 'Insert column after' ),
-				isDisabled: ! selectedCell,
-				onClick: onInsertColumnAfter,
-			},
-			{
-				icon: tableColumnDelete,
-				title: __( 'Delete column' ),
-				isDisabled: ! selectedCell,
-				onClick: onDeleteColumn,
-			},
-		];
-	}
-
 	useEffect( () => {
-		if ( ! isSelected && selectedCell ) {
+		if ( ! isSelected ) {
 			setSelectedCell();
 		}
-	}, [ isSelected, selectedCell ] );
+	}, [ isSelected ] );
 
 	const blockProps = useBlockProps();
 
@@ -460,6 +397,45 @@ function TableEdit( {
 			</div>
 		);
 	}
+
+	const tableControls = [
+		{
+			icon: tableRowBefore,
+			title: __( 'Insert row before' ),
+			isDisabled: ! selectedCell,
+			onClick: onInsertRowBefore,
+		},
+		{
+			icon: tableRowAfter,
+			title: __( 'Insert row after' ),
+			isDisabled: ! selectedCell,
+			onClick: onInsertRowAfter,
+		},
+		{
+			icon: tableRowDelete,
+			title: __( 'Delete row' ),
+			isDisabled: ! selectedCell,
+			onClick: onDeleteRow,
+		},
+		{
+			icon: tableColumnBefore,
+			title: __( 'Insert column before' ),
+			isDisabled: ! selectedCell,
+			onClick: onInsertColumnBefore,
+		},
+		{
+			icon: tableColumnAfter,
+			title: __( 'Insert column after' ),
+			isDisabled: ! selectedCell,
+			onClick: onInsertColumnAfter,
+		},
+		{
+			icon: tableColumnDelete,
+			title: __( 'Delete column' ),
+			isDisabled: ! selectedCell,
+			onClick: onDeleteColumn,
+		},
+	];
 
 	const tableClasses = classnames( backgroundColor.class, {
 		'has-fixed-layout': hasFixedLayout,
@@ -514,9 +490,12 @@ function TableEdit( {
 										}
 										value={ content }
 										onChange={ onChange }
-										unstableOnFocus={ createOnFocus(
-											cellLocation
-										) }
+										unstableOnFocus={ () => {
+											setSelectedCell( {
+												...cellLocation,
+												type: 'cell',
+											} );
+										} }
 										placeholder={ placeholder }
 									/>
 								);
@@ -539,7 +518,7 @@ function TableEdit( {
 								icon={ table }
 								toggleProps={ toggleProps }
 								label={ __( 'Edit table' ) }
-								controls={ getTableControls() }
+								controls={ tableControls }
 							/>
 						) }
 					</ToolbarItem>
