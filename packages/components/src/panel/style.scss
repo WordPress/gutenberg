@@ -156,3 +156,24 @@
 .components-panel .circle-picker {
 	padding-bottom: 20px;
 }
+
+
+.panel-collapse-enter {
+	opacity: 0.01;
+	transition: opacity 500ms ease-in;
+}
+
+.panel-collapse-enter.panel-collapse-enter-active {
+	opacity: 1;
+	transition: opacity 500ms ease-in;
+}
+
+.panel-collapse-leave {
+	opacity: 1;
+	transition: opacity 500ms ease-in;
+}
+
+.panel-collapse-leave.panel-collapse-leave-active {
+	opacity: 0.01;
+	transition: opacity 300ms ease-in;
+}

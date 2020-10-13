@@ -57,6 +57,7 @@
 		"react-resize-aware": "^3.0.1",
 		"react-spring": "^8.0.20",
 		"react-use-gesture": "^7.0.15",
+		"react-transition-group": "^4.4.1",
 		"reakit": "^1.1.0",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",

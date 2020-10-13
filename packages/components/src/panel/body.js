@@ -4,6 +4,7 @@
 import classnames from 'classnames';
 import { noop } from 'lodash';
 import mergeRefs from 'react-merge-refs';
+import { CSSTransition } from 'react-transition-group';
 
 /**
  * WordPress dependencies
@@ -69,9 +70,18 @@ export function PanelBody(
 				onClick={ handleOnToggle }
 				title={ title }
 			/>
-			{ typeof children === 'function'
-				? children( { opened: isOpened } )
-				: isOpened && children }
+			{ typeof children === 'function' ? (
+				children( { opened: isOpened } )
+			) : (
+				<CSSTransition
+					in={ isOpened }
+					classNames="panel-collapse"
+					timeout={ 500 }
+					unmountOnExit
+				>
+					<div>{ children }</div>
+				</CSSTransition>
+			) }
 		</div>
 	);
 }
