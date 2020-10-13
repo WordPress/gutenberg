@@ -53,6 +53,9 @@
 	"supports": {
 		"anchor": true,
 		"align": true,
+		"color": {
+			"text": true
+		},
 		"html": false,
 		"spacing": {
 			"padding": true

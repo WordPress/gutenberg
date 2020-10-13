@@ -18,7 +18,7 @@ function render_block_core_cover( $attributes, $content ) {
 		return str_replace( 'autoplay muted', 'autoplay muted playsinline', $content );
 	}
 
-	return $content;
+	return $content . '<p class="' . gutenberg_block_supports_classes() . '">...</p>';
 }
 
 /**

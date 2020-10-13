@@ -168,9 +168,6 @@ function foo_register_block_supports() {
 
 	$block_registry         = WP_Block_Type_Registry::get_instance();
 	$registered_block_types = $block_registry->get_all_registered();
-	$registered_features    = array(
-		'align' => $block_supports_config['align'],
-	);
 	foreach ( $registered_block_types as $block_type ) {
 		if ( ! property_exists( $block_type, 'supports' ) ) {
 			continue;
@@ -178,13 +175,11 @@ function foo_register_block_supports() {
 		if ( ! $block_type->attributes ) {
 			$block_type->attributes = array();
 		}
-		foreach ( $registered_features as $feature_name => $feature_config ) {
-			// TODO: split feature names like color.text.
-			// TODO: look at default value.
+		foreach ( $block_supports_config as $feature_name => $feature_config ) {
 			if (
-				! gutenberg_experimental_get(
+				! gutenberg_get_block_support(
 					$block_type->supports,
-					array( $feature_name ),
+					$feature_name,
 					$feature_config['default']
 				)
 			) {
@@ -204,6 +199,27 @@ function foo_enqueue_style() {
 	wp_enqueue_style( 'wp-block-supports' );
 }
 add_action( 'wp_footer', 'foo_enqueue_style' );
+
+function gutenberg_get_block_support( $block_supports, $feature_name, $default = false ) {
+	$path    = explode( '.', $feature_name );
+	$default = (array) $default;
+	if ( count( $path ) !== count( $default ) ) {
+		return false;
+	}
+	$partial_path = array();
+	foreach ( $path as $i => $subkey ) {
+		$partial_path[] = $subkey;
+		$result         = gutenberg_experimental_get(
+			$block_supports,
+			$partial_path,
+			$default[ $i ]
+		);
+		if ( ! $result ) {
+			break;
+		}
+	}
+	return $result;
+}
 
 /**
  * TODO.
@@ -232,15 +248,15 @@ function gutenberg_block_supports_classes() {
 
 	$output = '';
 	foreach ( $block_supports_config as $feature_name => $feature_config ) {
-		// TODO: split feature names like color.text.
-		// TODO: look at default value.
+		echo "feature name: $feature_name\n";
 		if (
-			! gutenberg_experimental_get(
+			! gutenberg_get_block_support(
 				$block_type->supports,
-				array( $feature_name ),
+				$feature_name,
 				$feature_config['default']
 			)
 		) {
+			echo "skip ({$current_parsed_block['blockName']})\n";
 			continue;
 		}
 		$classes = call_user_func(
