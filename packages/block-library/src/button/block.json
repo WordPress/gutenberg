@@ -59,6 +59,7 @@
 		"align": true,
 		"alignWide": false,
 		"reusable": false,
-		"__experimentalSelector": ".wp-block-button > a"
+		"__experimentalSelector": ".wp-block-button > a",
+		"__experimentalWidth": true
 	}
 }

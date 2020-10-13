@@ -20,11 +20,13 @@ import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
 import { SPACING_SUPPORT_KEY, PaddingEdit } from './padding';
 import SpacingPanelControl from '../components/spacing-panel-control';
+import { WIDTH_SUPPORT_KEY, WidthPanel } from './width';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
 	COLOR_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
+	WIDTH_SUPPORT_KEY,
 ];
 
 const hasStyleSupport = ( blockType ) =>
@@ -156,6 +158,7 @@ export const withBlockControls = createHigherOrderComponent(
 		return [
 			<TypographyPanel key="typography" { ...props } />,
 			<ColorEdit key="colors" { ...props } />,
+			<WidthPanel key="width" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
 			hasSpacingSupport && (
 				<SpacingPanelControl key="spacing">

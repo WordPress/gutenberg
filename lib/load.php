@@ -129,3 +129,4 @@ require dirname( __FILE__ ) . '/block-supports/colors.php';
 require dirname( __FILE__ ) . '/block-supports/align.php';
 require dirname( __FILE__ ) . '/block-supports/typography.php';
 require dirname( __FILE__ ) . '/block-supports/custom-classname.php';
+require dirname( __FILE__ ) . '/block-supports/dimensions.php';
