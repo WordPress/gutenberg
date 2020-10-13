@@ -53,7 +53,7 @@ function spawnCommandDirectly( { container, command, config, spinner } ) {
 		'-f',
 		config.dockerComposeConfigPath,
 		'-f',
-		config.dockerComposeOverridePath,
+		config.dockerComposeOverrideConfigPath,
 		'run',
 		'--rm',
 		container,

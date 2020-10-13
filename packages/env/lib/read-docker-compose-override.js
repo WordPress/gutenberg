@@ -23,36 +23,30 @@ const { ValidationError } = require( './config/validate-config' );
  * @return {Object} The docker-compose.override.yml file read as a YAML object.
  */
 module.exports = async function readDockerComposeOverride( config ) {
-	if ( config.env.development.dockerComposeOverridePath ) {
-		const dockerComposeOverridePath = path.resolve(
-			config.configDirectoryPath,
-			config.env.development.dockerComposeOverridePath
-		);
+	const dockerComposeOverridePath = path.resolve(
+		config.configDirectoryPath,
+		'docker-compose.override.yml'
+	);
 
-		// Get document, or throw exception on error
-		try {
-			return await yaml.read( dockerComposeOverridePath, {
-				encoding: 'utf8',
-			} );
-		} catch ( error ) {
-			if ( error instanceof SyntaxError ) {
-				throw new ValidationError(
-					`Invalid ${ dockerComposeOverridePath }: ${ error.message }`
-				);
-			} else {
-				throw new ValidationError(
-					`Could not read ${ dockerComposeOverridePath }: ${ error.message }`
-				);
-			}
+	// Get document, or throw exception on error
+	try {
+		return await yaml.read( dockerComposeOverridePath, {
+			encoding: 'utf8',
+		} );
+	} catch ( error ) {
+		if ( error instanceof SyntaxError ) {
+			throw new ValidationError(
+				`Invalid ${ dockerComposeOverridePath }: ${ error.message }`
+			);
+		} else {
+			/**
+			 * Default "empty" Docker Compose override file contents.
+			 */
+			return {
+				version: '3.7',
+				services: {},
+				volumes: {},
+			};
 		}
 	}
-
-	/**
-	 * Default "empty" Docker Compose override file contents.
-	 */
-	return {
-		version: '3.7',
-		services: {},
-		volumes: {},
-	};
 };

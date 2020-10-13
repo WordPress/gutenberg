@@ -29,7 +29,7 @@ module.exports = async function destroy( { spinner, debug } ) {
 	const configPath = path.resolve( '.wp-env.json' );
 	const {
 		dockerComposeConfigPath,
-		dockerComposeOverridePath,
+		dockerComposeOverrideConfigPath,
 		workDirectoryPath,
 	} = await readConfig( configPath );
 
@@ -63,7 +63,7 @@ module.exports = async function destroy( { spinner, debug } ) {
 	spinner.text = 'Removing WordPress docker containers.';
 
 	await dockerCompose.rm( {
-		config: [ dockerComposeConfigPath, dockerComposeOverridePath ],
+		config: [ dockerComposeConfigPath, dockerComposeOverrideConfigPath ],
 		commandOptions: [ '--stop', '-v' ],
 		log: debug,
 	} );
