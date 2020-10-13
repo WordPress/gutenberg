@@ -93,7 +93,7 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
     </WithSelect(PageAttributesCheck)>
   </Section>
   <WithSelect(MetaBoxesSection)
-    description="Add extra areas to the editor, such as one for custom fields."
+    description="Add extra areas to the editor."
     title="Additional panels"
   />
 </WithInstanceId(Modal)>
