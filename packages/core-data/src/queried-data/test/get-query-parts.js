@@ -28,18 +28,6 @@ describe( 'getQueryParts', () => {
 		} );
 	} );
 
-	it( 'parses out `_fields` property filtering', () => {
-		const parts = getQueryParts( { _fields: 'content', a: 1 } );
-
-		expect( parts ).toEqual( {
-			page: 1,
-			perPage: 10,
-			stableKey: 'a=1',
-			fields: [ 'content' ],
-			include: null,
-		} );
-	} );
-
 	it( 'encodes stable string key', () => {
 		const first = getQueryParts( { '?': '&', b: 2 } );
 		const second = getQueryParts( { b: 2, '?': '&' } );

@@ -64,11 +64,11 @@ describe( 'Test Custom Post Types', () => {
 		// Wait for the list of suggestions to fetch
 		// There should be a better way to do that.
 		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 1000 );
-		const selectedValue = await page.$eval(
-			PARENT_PAGE_INPUT,
-			( el ) => el.value
+		await page.waitFor(
+			( [ value, inputSelector ] ) =>
+				document.querySelector( inputSelector ).value === value,
+			{},
+			[ valueToSelect, PARENT_PAGE_INPUT ]
 		);
-		expect( selectedValue ).toEqual( valueToSelect );
 	} );
 } );
