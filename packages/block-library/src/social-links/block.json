@@ -6,6 +6,9 @@
 		"openInNewTab": {
 			"type": "boolean",
 			"default": false
+		},
+		"iconSize": {
+			"type": "string"
 		}
 	},
 	"providesContext": {

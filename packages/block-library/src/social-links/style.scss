@@ -1,6 +1,23 @@
-.wp-social-link {
-	--social-link-size: 36px;
-	--social-link-logo-size: 24px;
+
+// Normal / default size
+:root {
+	--wp-social-link-size: 36px;
+	--wp-social-link-logo-size: 24px;
+}
+
+.has-huge-icon-size > .wp-social-link {
+	--wp-social-link-size: 60px;
+	--wp-social-link-logo-size: 48px;
+}
+
+.has-large-icon-size > .wp-social-link {
+	--wp-social-link-size: 48px;
+	--wp-social-link-logo-size: 36px;
+}
+
+.has-small-icon-size > .wp-social-link {
+	--wp-social-link-size: 30px;
+	--wp-social-link-logo-size: 18px;
 }
 
 .wp-block-social-links {
@@ -46,8 +63,8 @@
 	svg {
 		color: currentColor;
 		fill: currentColor;
-		width: var(--social-link-logo-size);
-		height: var(--social-link-logo-size);
+		width: var(--wp-social-link-logo-size);
+		height: var(--wp-social-link-logo-size);
 	}
 
 	&:hover {
