@@ -13,6 +13,8 @@
 		flex-direction: row;
 		justify-content: center;
 		align-items: center;
+		transition: transform 0.2s;
+		@include reduce-motion(transition);
 
 		// See comment above about min-width
 		min-width: 0;
@@ -33,8 +35,6 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		transition: transform 0.2s;
-		@include reduce-motion(transition);
 	}
 
 	.edit-site-document-actions__get-info {
@@ -57,10 +57,13 @@
 	&.has-secondary-label {
 		transform: translateY(10px);
 
+		.edit-site-document-actions__title-wrapper {
+			transform: translateY(-14px);
+		}
+
 		.edit-site-document-actions__title {
 			color: $gray-900;
 			font-weight: bold;
-			transform: translateY(-14px);
 
 			&.is-secondary-title-active {
 				color: $gray-700;
