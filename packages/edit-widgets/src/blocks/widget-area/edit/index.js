@@ -73,7 +73,7 @@ export default function WidgetAreaEdit( {
 				{ ( { opened } ) => (
 					// This is required to ensure LegacyWidget blocks are not unmounted when the panel is collapsed.
 					// Unmounting legacy widgets may have unintended consequences (e.g. TinyMCE not being properly reinitialized)
-					<DisclosureContent visible={ opened } className="test">
+					<DisclosureContent visible={ opened }>
 						<EntityProvider
 							kind="root"
 							type="postType"
