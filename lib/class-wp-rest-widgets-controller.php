@@ -490,7 +490,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		);
 
 		// Get the widget output.
-		if ( is_callable( $widget['callback'] ) && rest_is_field_included( 'rendered', $fields ) ) {
+		if ( is_callable( $widget['callback'] ) && rest_is_field_included( 'rendered', $fields ) && 'wp_inactive_widgets' !== $sidebar_id ) {
 			// @note: everything up to ob_start is taken from the dynamic_sidebar function.
 			$widget_parameters = array_merge(
 				array(
