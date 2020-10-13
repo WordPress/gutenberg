@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import {
-	BaseControl,
 	CircularOptionPicker,
 	Dropdown,
 	Icon,
@@ -95,10 +94,10 @@ function DuotoneToolbar( { value, onChange, options } ) {
 				);
 			} }
 			renderContent={ () => (
-				<BaseControl>
-					<BaseControl.VisualLabel>
+				<div className="block-editor-duotone-toolbar__popover">
+					<span className="block-editor-duotone-toolbar__label">
 						{ __( 'Duotone Presets' ) }
-					</BaseControl.VisualLabel>
+					</span>
 					<CircularOptionPicker
 						options={ options.map( ( option ) => {
 							const isSelected = option.slug === value?.slug;
@@ -154,7 +153,7 @@ function DuotoneToolbar( { value, onChange, options } ) {
 							colors={ getHexColorsFromValues( value?.values ) }
 						/>
 					</CircularOptionPicker>
-				</BaseControl>
+				</div>
 			) }
 		/>
 	);

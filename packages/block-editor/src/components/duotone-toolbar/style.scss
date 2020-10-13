@@ -1,19 +1,19 @@
 .block-editor-duotone-toolbar__custom-color {
 	width: 100%;
-	height: 36px;
-	padding: 6px 0;
+	height: $button-size;
+	padding: $grid-unit 0;
 	display: inline-flex;
 	align-items: center;
 
 	& > svg,
 	& > .block-editor-duotone-toolbar__swatch {
-		margin-right: 8px;
+		margin-right: $grid-unit;
 	}
 }
 
 .block-editor-duotone-toolbar__swatch {
-	width: 24px;
-	height: 24px;
+	width: $icon-size;
+	height: $icon-size;
 	border-radius: 50%;
 	color: transparent;
 	background: transparent;
@@ -26,4 +26,9 @@
 		border: 1px solid rgba( 0, 0, 0, 0.2 );
 		border-radius: 50%;
 	}
+}
+
+.block-editor-duotone-toolbar__label {
+	display: inline-block;
+	margin-bottom: $grid-unit-10;
 }
