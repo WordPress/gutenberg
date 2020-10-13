@@ -81,7 +81,9 @@ export function WidthEdit( props ) {
 	const onChange = ( newWidthValue ) => {
 		const newStyle = {
 			...style,
-			width: newWidthValue,
+			width: {
+				width: newWidthValue,
+			},
 		};
 
 		setAttributes( { style: cleanEmptyObject( newStyle ) } );
@@ -89,15 +91,15 @@ export function WidthEdit( props ) {
 
 	return (
 		<ButtonGroup aria-label={ __( 'Width' ) }>
-			{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
+			{ [ '25%', '50%', '75%', '100%' ].map( ( widthValue ) => {
 				return (
 					<Button
 						key={ widthValue }
 						isSmall
-						isPrimary={ widthValue === style?.width }
+						isPrimary={ widthValue === style?.width?.width }
 						onClick={ () => onChange( widthValue ) }
 					>
-						{ widthValue }%
+						{ widthValue }
 					</Button>
 				);
 			} ) }
@@ -135,8 +137,12 @@ export function isWidthDisabled( { name: blockName } = {} ) {
 
 addFilter(
 	'blocks.getSaveContent.extraProps',
-	'core/font/addSaveProps',
+	'core/width/addSaveProps',
 	addSaveProps
 );
 
-addFilter( 'blocks.registerBlockType', 'core/font/addEditProps', addEditProps );
+addFilter(
+	'blocks.registerBlockType',
+	'core/width/addEditProps',
+	addEditProps
+);

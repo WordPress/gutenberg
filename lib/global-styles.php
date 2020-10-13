@@ -409,7 +409,7 @@ function gutenberg_experimental_global_styles_get_style_property() {
 		'color'                    => array( 'color', 'text' ),
 		'fontSize'                 => array( 'typography', 'fontSize' ),
 		'lineHeight'               => array( 'typography', 'lineHeight' ),
-		'width'                    => array( 'width'),
+		'width'                    => array( 'width', 'width'),
 	);
 }
 
@@ -817,6 +817,7 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 		'styles'   => array(
 			'typography' => array(),
 			'color'      => array(),
+			'width'      => array(),
 		),
 		'settings' => array(
 			'color'      => array(),
