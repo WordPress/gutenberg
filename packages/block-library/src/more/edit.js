@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, ToggleControl } from '@wordpress/components';
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { ENTER } from '@wordpress/keycodes';
 import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 
@@ -52,7 +52,7 @@ export default function MoreEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div className="wp-block-more">
+			<div { ...useBlockProps() }>
 				<input
 					aria-label={ __( 'Read more link text' ) }
 					type="text"
