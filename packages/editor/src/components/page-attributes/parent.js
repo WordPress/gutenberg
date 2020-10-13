@@ -23,36 +23,32 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { buildTermsTree } from '../../utils/terms';
 
 function getTitle( post ) {
-	return post.title && post.title.rendered
+	return post?.title?.rendered
 		? post.title.rendered
 		: `#${ post.id } (${ __( 'no title' ) })`;
 }
 
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( 'core/editor' );
-	const { parentPost, parentPostId } = useSelect( ( select ) => {
-		const { getEntityRecord } = select( 'core' );
-		const { getEditedPostAttribute } = select( 'core/editor' );
-		const postTypeSlug = getEditedPostAttribute( 'type' );
-		const pageId = getEditedPostAttribute( 'parent' );
-
-		return {
-			parentPostId: pageId,
-			parentPost: pageId
-				? getEntityRecord( 'postType', postTypeSlug, pageId )
-				: null,
-		};
-	}, [] );
 	const [ fieldValue, setFieldValue ] = useState( false );
-
-	const { isLoading, parent, items, postType } = useSelect(
+	const {
+		parentPost,
+		parentPostId,
+		isLoading,
+		parent,
+		items,
+		postType,
+	} = useSelect(
 		( select ) => {
-			const { getPostType, getEntityRecords } = select( 'core' );
+			const { getPostType, getEntityRecords, getEntityRecord } = select(
+				'core'
+			);
 			const { isResolving } = select( 'core/data' );
 			const { getCurrentPostId, getEditedPostAttribute } = select(
 				'core/editor'
 			);
 			const postTypeSlug = getEditedPostAttribute( 'type' );
+			const pageId = getEditedPostAttribute( 'parent' );
 			const pType = getPostType( postTypeSlug );
 			const postId = getCurrentPostId();
 			const isHierarchical = get( pType, [ 'hierarchical' ], false );
@@ -70,6 +66,10 @@ export function PageAttributesParent() {
 			const theParentID = getEditedPostAttribute( 'parent' );
 
 			return {
+				parentPostId: pageId,
+				parentPost: pageId
+					? getEntityRecord( 'postType', postTypeSlug, pageId )
+					: null,
 				parent: theParentID,
 				items: isHierarchical
 					? getEntityRecords( 'postType', postTypeSlug, query )
