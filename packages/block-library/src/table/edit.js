@@ -101,6 +101,16 @@ const ALIGNMENT_CONTROLS = [
 
 const withCustomBackgroundColors = createCustomColorsHOC( BACKGROUND_COLORS );
 
+const placeholder = {
+	head: __( 'Header label' ),
+	foot: __( 'Footer label' ),
+};
+
+function TSection( { name, ...props } ) {
+	const TagName = `t${ name }`;
+	return <TagName { ...props } />;
+}
+
 function TableEdit( {
 	attributes,
 	backgroundColor,
@@ -109,7 +119,7 @@ function TableEdit( {
 	insertBlocksAfter,
 	isSelected,
 } ) {
-	const { hasFixedLayout, caption, head, body, foot } = attributes;
+	const { hasFixedLayout, caption, head, foot } = attributes;
 	const [ initialRowCount, setInitialRowCount ] = useState( 2 );
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 	const [ selectedCell, setSelectedCell ] = useState();
@@ -350,53 +360,9 @@ function TableEdit( {
 		}
 	}, [ isSelected ] );
 
-	const blockProps = useBlockProps();
-
-	const isEmpty =
-		isEmptyTableSection( head ) &&
-		isEmptyTableSection( body ) &&
-		isEmptyTableSection( foot );
-
-	if ( isEmpty ) {
-		return (
-			<div { ...blockProps }>
-				<Placeholder
-					label={ __( 'Table' ) }
-					icon={ <BlockIcon icon={ icon } showColors /> }
-					instructions={ __( 'Insert a table for sharing data.' ) }
-				>
-					<form
-						className="blocks-table__placeholder-form"
-						onSubmit={ onCreateTable }
-					>
-						<TextControl
-							type="number"
-							label={ __( 'Column count' ) }
-							value={ initialColumnCount }
-							onChange={ onChangeInitialColumnCount }
-							min="1"
-							className="blocks-table__placeholder-input"
-						/>
-						<TextControl
-							type="number"
-							label={ __( 'Row count' ) }
-							value={ initialRowCount }
-							onChange={ onChangeInitialRowCount }
-							min="1"
-							className="blocks-table__placeholder-input"
-						/>
-						<Button
-							className="blocks-table__placeholder-button"
-							isPrimary
-							type="submit"
-						>
-							{ __( 'Create Table' ) }
-						</Button>
-					</form>
-				</Placeholder>
-			</div>
-		);
-	}
+	const sections = [ 'head', 'body', 'foot' ].filter(
+		( name ) => ! isEmptyTableSection( attributes[ name ] )
+	);
 
 	const tableControls = [
 		{
@@ -437,138 +403,121 @@ function TableEdit( {
 		},
 	];
 
-	const tableClasses = classnames( backgroundColor.class, {
-		'has-fixed-layout': hasFixedLayout,
-		'has-background': !! backgroundColor.color,
-	} );
-
-	const sections = [ 'head', 'body', 'foot' ].map( ( name ) => {
-		const rows = attributes[ name ];
-
-		if ( isEmptyTableSection( rows ) ) {
-			return null;
-		}
-
-		const Tag = `t${ name }`;
-
-		return (
-			<Tag key={ name }>
-				{ rows.map( ( { cells }, rowIndex ) => (
-					<tr key={ rowIndex }>
-						{ cells.map(
-							(
-								{ content, tag: CellTag, scope, align },
-								columnIndex
-							) => {
-								const cellLocation = {
-									sectionName: name,
-									rowIndex,
-									columnIndex,
-								};
-
-								const cellClasses = classnames(
+	const renderedSections = [ 'head', 'body', 'foot' ].map( ( name ) => (
+		<TSection name={ name } key={ name }>
+			{ attributes[ name ].map( ( { cells }, rowIndex ) => (
+				<tr key={ rowIndex }>
+					{ cells.map(
+						(
+							{ content, tag: CellTag, scope, align },
+							columnIndex
+						) => (
+							<RichText
+								tagName={ CellTag }
+								key={ columnIndex }
+								className={ classnames(
 									{
 										[ `has-text-align-${ align }` ]: align,
 									},
 									'wp-block-table__cell-content'
-								);
+								) }
+								scope={ CellTag === 'th' ? scope : undefined }
+								value={ content }
+								onChange={ onChange }
+								unstableOnFocus={ () => {
+									setSelectedCell( {
+										sectionName: name,
+										rowIndex,
+										columnIndex,
+										type: 'cell',
+									} );
+								} }
+								placeholder={ placeholder[ name ] }
+							/>
+						)
+					) }
+				</tr>
+			) ) }
+		</TSection>
+	) );
 
-								let placeholder = '';
-								if ( name === 'head' ) {
-									placeholder = __( 'Header label' );
-								} else if ( name === 'foot' ) {
-									placeholder = __( 'Footer label' );
-								}
-
-								return (
-									<RichText
-										tagName={ CellTag }
-										key={ columnIndex }
-										className={ cellClasses }
-										scope={
-											CellTag === 'th' ? scope : undefined
-										}
-										value={ content }
-										onChange={ onChange }
-										unstableOnFocus={ () => {
-											setSelectedCell( {
-												...cellLocation,
-												type: 'cell',
-											} );
-										} }
-										placeholder={ placeholder }
-									/>
-								);
-							}
-						) }
-					</tr>
-				) ) }
-			</Tag>
-		);
-	} );
+	const isEmpty = ! sections.length;
 
 	return (
-		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<DropdownMenu
-								hasArrowIndicator
-								icon={ table }
-								toggleProps={ toggleProps }
-								label={ __( 'Edit table' ) }
-								controls={ tableControls }
-							/>
-						) }
-					</ToolbarItem>
-				</ToolbarGroup>
-				<AlignmentToolbar
-					label={ __( 'Change column alignment' ) }
-					alignmentControls={ ALIGNMENT_CONTROLS }
-					value={ getCellAlignment() }
-					onChange={ ( nextAlign ) =>
-						onChangeColumnAlignment( nextAlign )
-					}
-				/>
-			</BlockControls>
-			<InspectorControls>
-				<PanelBody
-					title={ __( 'Table settings' ) }
-					className="blocks-table-settings"
+		<figure { ...useBlockProps() }>
+			{ ! isEmpty && (
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarItem>
+							{ ( toggleProps ) => (
+								<DropdownMenu
+									hasArrowIndicator
+									icon={ table }
+									toggleProps={ toggleProps }
+									label={ __( 'Edit table' ) }
+									controls={ tableControls }
+								/>
+							) }
+						</ToolbarItem>
+					</ToolbarGroup>
+					<AlignmentToolbar
+						label={ __( 'Change column alignment' ) }
+						alignmentControls={ ALIGNMENT_CONTROLS }
+						value={ getCellAlignment() }
+						onChange={ ( nextAlign ) =>
+							onChangeColumnAlignment( nextAlign )
+						}
+					/>
+				</BlockControls>
+			) }
+			{ ! isEmpty && (
+				<InspectorControls>
+					<PanelBody
+						title={ __( 'Table settings' ) }
+						className="blocks-table-settings"
+					>
+						<ToggleControl
+							label={ __( 'Fixed width table cells' ) }
+							checked={ !! hasFixedLayout }
+							onChange={ onChangeFixedLayout }
+						/>
+						<ToggleControl
+							label={ __( 'Header section' ) }
+							checked={ !! ( head && head.length ) }
+							onChange={ onToggleHeaderSection }
+						/>
+						<ToggleControl
+							label={ __( 'Footer section' ) }
+							checked={ !! ( foot && foot.length ) }
+							onChange={ onToggleFooterSection }
+						/>
+					</PanelBody>
+					<PanelColorSettings
+						title={ __( 'Color settings' ) }
+						initialOpen={ false }
+						colorSettings={ [
+							{
+								value: backgroundColor.color,
+								onChange: setBackgroundColor,
+								label: __( 'Background color' ),
+								disableCustomColors: true,
+								colors: BACKGROUND_COLORS,
+							},
+						] }
+					/>
+				</InspectorControls>
+			) }
+			{ ! isEmpty && (
+				<table
+					className={ classnames( backgroundColor.class, {
+						'has-fixed-layout': hasFixedLayout,
+						'has-background': !! backgroundColor.color,
+					} ) }
 				>
-					<ToggleControl
-						label={ __( 'Fixed width table cells' ) }
-						checked={ !! hasFixedLayout }
-						onChange={ onChangeFixedLayout }
-					/>
-					<ToggleControl
-						label={ __( 'Header section' ) }
-						checked={ !! ( head && head.length ) }
-						onChange={ onToggleHeaderSection }
-					/>
-					<ToggleControl
-						label={ __( 'Footer section' ) }
-						checked={ !! ( foot && foot.length ) }
-						onChange={ onToggleFooterSection }
-					/>
-				</PanelBody>
-				<PanelColorSettings
-					title={ __( 'Color settings' ) }
-					initialOpen={ false }
-					colorSettings={ [
-						{
-							value: backgroundColor.color,
-							onChange: setBackgroundColor,
-							label: __( 'Background color' ),
-							disableCustomColors: true,
-							colors: BACKGROUND_COLORS,
-						},
-					] }
-				/>
-			</InspectorControls>
-			<figure { ...blockProps }>
-				<table className={ tableClasses }>{ sections }</table>
+					{ renderedSections }
+				</table>
+			) }
+			{ ! isEmpty && (
 				<RichText
 					tagName="figcaption"
 					placeholder={ __( 'Write caption…' ) }
@@ -582,8 +531,44 @@ function TableEdit( {
 						insertBlocksAfter( createBlock( 'core/paragraph' ) )
 					}
 				/>
-			</figure>
-		</>
+			) }
+			{ isEmpty && (
+				<Placeholder
+					label={ __( 'Table' ) }
+					icon={ <BlockIcon icon={ icon } showColors /> }
+					instructions={ __( 'Insert a table for sharing data.' ) }
+				>
+					<form
+						className="blocks-table__placeholder-form"
+						onSubmit={ onCreateTable }
+					>
+						<TextControl
+							type="number"
+							label={ __( 'Column count' ) }
+							value={ initialColumnCount }
+							onChange={ onChangeInitialColumnCount }
+							min="1"
+							className="blocks-table__placeholder-input"
+						/>
+						<TextControl
+							type="number"
+							label={ __( 'Row count' ) }
+							value={ initialRowCount }
+							onChange={ onChangeInitialRowCount }
+							min="1"
+							className="blocks-table__placeholder-input"
+						/>
+						<Button
+							className="blocks-table__placeholder-button"
+							isPrimary
+							type="submit"
+						>
+							{ __( 'Create Table' ) }
+						</Button>
+					</form>
+				</Placeholder>
+			) }
+		</figure>
 	);
 }
 
