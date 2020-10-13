@@ -20,6 +20,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	fontSize: [ 'typography', 'fontSize' ],
 	textTransform: [ 'typography', 'textTransform' ],
 	lineHeight: [ 'typography', 'lineHeight' ],
+	textDecoration: [ 'typography', 'textDecoration' ],
 	paddingBottom: [ 'spacing', 'padding', 'bottom' ],
 	paddingLeft: [ 'spacing', 'padding', 'left' ],
 	paddingRight: [ 'spacing', 'padding', 'right' ],
