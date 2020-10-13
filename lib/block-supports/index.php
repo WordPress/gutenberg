@@ -78,12 +78,15 @@ $block_supports_config = array(
 			if ( $has_named_text_color ) {
 				$classes .= sprintf( ' has-%s-color', $attributes['textColor'] );
 			} elseif ( $has_custom_text_color ) {
-				$generated_class_name = uniqid( 'wp-block-color.text-' );
+				$generated_class_name = uniqid( 'wp-block-colortext-' );
 				$classes .= " $generated_class_name";
 				wp_add_inline_style(
 					'wp-block-supports',
 					sprintf(
-						'.%s { color: %s; }',
+						// TODO: how do systematically and confidently address specificity?
+						// should we just go back to proper inline styles?
+						// of course, there's also the blunt tool that is !important.
+						':root:root:root .%s { color: %s; }',
 						$generated_class_name,
 						$attributes['style']['color']['text']
 					)

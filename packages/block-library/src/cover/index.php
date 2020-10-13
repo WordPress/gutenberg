@@ -18,7 +18,14 @@ function render_block_core_cover( $attributes, $content ) {
 		return str_replace( 'autoplay muted', 'autoplay muted playsinline', $content );
 	}
 
-	return $content . '<p class="' . gutenberg_block_supports_classes() . '">...</p>';
+	// TODO: this is just a proof of concept, not a proper solution.
+	$class = gutenberg_block_supports_classes();
+	return preg_replace(
+		'/class="/',
+		"class=\"$class ",
+		$content,
+		1
+	);
 }
 
 /**
