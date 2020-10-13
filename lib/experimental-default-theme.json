@@ -160,6 +160,20 @@
 						"slug": "huge",
 						"size": 42
 					}
+				],
+				"textTransforms": [
+					{
+						"name": "Capitalize",
+						"slug": "capitalize"
+					},
+					{
+						"name": "Lowercase",
+						"slug": "lowercase"
+					},
+					{
+						"name": "Uppercase",
+						"slug": "uppercase"
+					}
 				]
 			},
 			"spacing": {

@@ -21,11 +21,16 @@ function gutenberg_register_typography_support( $block_type ) {
 		$has_line_height_support = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
 	}
 
+	$has_text_transform_support = false;
+	if ( property_exists( $block_type, 'supports' ) ) {
+		$has_text_transform_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
+	}
+
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
 	}
 
-	if ( ( $has_font_size_support || $has_line_height_support ) && ! array_key_exists( 'style', $block_type->attributes ) ) {
+	if ( ( $has_font_size_support || $has_line_height_support || $has_text_transform_support ) && ! array_key_exists( 'style', $block_type->attributes ) ) {
 		$block_type->attributes['style'] = array(
 			'type' => 'object',
 		);

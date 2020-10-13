@@ -21,10 +21,16 @@ import {
 	FontSizeEdit,
 	useIsFontSizeDisabled,
 } from './font-size';
+import {
+	TEXT_TRANSFORM_SUPPORT_KEY,
+	TextTransformEdit,
+	useIsTextTransformDisabled,
+} from './text-transform';
 
 export const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
+	TEXT_TRANSFORM_SUPPORT_KEY,
 ];
 
 export function TypographyPanel( props ) {
@@ -37,6 +43,7 @@ export function TypographyPanel( props ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Typography' ) }>
 				<FontSizeEdit { ...props } />
+				<TextTransformEdit { ...props } />
 				<LineHeightEdit { ...props } />
 			</PanelBody>
 		</InspectorControls>
@@ -56,6 +63,7 @@ function useIsTypographyDisabled( props = {} ) {
 	const configs = [
 		useIsFontSizeDisabled( props ),
 		useIsLineHeightDisabled( props ),
+		useIsTextTransformDisabled( props ),
 	];
 
 	return configs.filter( Boolean ).length === configs.length;
