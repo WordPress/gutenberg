@@ -296,7 +296,6 @@ export function toggleSection( state, sectionName ) {
 
 	// Get the length of the first row of the body to use when creating the header.
 	const columnCount = get( state, [ 'body', 0, 'cells', 'length' ], 1 );
-
 	// Section doesn't exist, insert an empty row to create the section.
 	return insertRow( state, { sectionName, rowIndex: 0, columnCount } );
 }
