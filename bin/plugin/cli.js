@@ -31,7 +31,7 @@ program
 	.command( 'release-plugin-rc' )
 	.alias( 'rc' )
 	.description(
-		'Release an RC version of the plugin (will increment the RC number if one already exists for the last version)'
+		'Release an RC version of the plugin'
 	)
 	.action( catchException( releaseRC ) );
 
