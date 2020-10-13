@@ -5,6 +5,7 @@ import {
 	BaseControl,
 	CircularOptionPicker,
 	Dropdown,
+	Icon,
 	ToolbarButton,
 	ToolbarGroup,
 } from '@wordpress/components';
@@ -18,8 +19,43 @@ import { DOWN } from '@wordpress/keycodes';
 import {
 	getGradientFromCSSColors,
 	getGradientFromValues,
+	getHexColorsFromValues,
 	getValuesFromHexColors,
 } from './utils';
+
+function Swatch( { fill } ) {
+	return (
+		<span
+			className="block-editor-duotone-toolbar__swatch"
+			style={ { background: fill } }
+		/>
+	);
+}
+
+function CustomColorOption( { label, color } ) {
+	const icon = color ? <Swatch fill={ color } /> : <Icon icon={ noFilter } />;
+	return (
+		<div className="block-editor-duotone-toolbar__custom-color">
+			{ icon }
+			{ label }
+		</div>
+	);
+}
+
+function CustomColorPicker( { colors } ) {
+	return (
+		<div>
+			<CustomColorOption
+				label={ __( 'Dark Color' ) }
+				color={ colors?.[ 0 ] }
+			/>
+			<CustomColorOption
+				label={ __( 'Light Color' ) }
+				color={ colors?.[ colors.length - 1 ] }
+			/>
+		</div>
+	);
+}
 
 function DuotoneToolbar( { value, onChange, options } ) {
 	return (
@@ -45,13 +81,10 @@ function DuotoneToolbar( { value, onChange, options } ) {
 							label={ __( 'Change image duotone filter' ) }
 							icon={
 								value ? (
-									<span
-										className="block-editor-duotone-toolbar-icon"
-										style={ {
-											background: getGradientFromValues(
-												value.values
-											),
-										} }
+									<Swatch
+										fill={ getGradientFromValues(
+											value.values
+										) }
 									/>
 								) : (
 									noFilter
@@ -117,7 +150,9 @@ function DuotoneToolbar( { value, onChange, options } ) {
 							</CircularOptionPicker.ButtonAction>
 						}
 					>
-						<div />
+						<CustomColorPicker
+							colors={ getHexColorsFromValues( value?.values ) }
+						/>
 					</CircularOptionPicker>
 				</BaseControl>
 			) }

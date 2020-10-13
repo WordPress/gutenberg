@@ -1,6 +1,29 @@
-.block-editor-duotone-toolbar-icon {
-	color: transparent;
-	border-radius: 50%;
+.block-editor-duotone-toolbar__custom-color {
+	width: 100%;
+	height: 36px;
+	padding: 6px 0;
+	display: inline-flex;
+	align-items: center;
+
+	& > svg,
+	& > .block-editor-duotone-toolbar__swatch {
+		margin-right: 8px;
+	}
+}
+
+.block-editor-duotone-toolbar__swatch {
 	width: 24px;
 	height: 24px;
+	border-radius: 50%;
+	color: transparent;
+	background: transparent;
+
+	&:after {
+		content: '';
+		display: block;
+		width: 100%;
+		height: 100%;
+		border: 1px solid rgba( 0, 0, 0, 0.2 );
+		border-radius: 50%;
+	}
 }

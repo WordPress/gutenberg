@@ -94,16 +94,7 @@ export function getGradientFromCSSColors( colors = [] ) {
  * @return {string} CSS gradient string for the duotone swatch.
  */
 export function getGradientFromValues( values = { r: [], g: [], b: [] } ) {
-	// R, G, and B should all be the same length, so we only need to map over one.
-	const colors = values.r.map( ( x, i ) => {
-		return rgb2hex( {
-			r: values.r[ i ],
-			g: values.g[ i ],
-			b: values.b[ i ],
-		} );
-	} );
-
-	return getGradientFromCSSColors( colors );
+	return getGradientFromCSSColors( getHexColorsFromValues( values ) );
 }
 
 /**
@@ -134,4 +125,33 @@ export function getValuesFromColors( colors = [] ) {
  */
 export function getValuesFromHexColors( colors = [] ) {
 	return getValuesFromColors( colors.map( hex2rgb ) );
+}
+
+/**
+ * Convert a color values object to an array of colors.
+ *
+ * @param {RGBValues} values R, G, and B values.
+ *
+ * @return {RGBColor[]} RGB color array.
+ */
+export function getColorsFromValues( values = { r: [], g: [], b: [] } ) {
+	// R, G, and B should all be the same length, so we only need to map over one.
+	return values.r.map( ( x, i ) => {
+		return {
+			r: values.r[ i ],
+			g: values.g[ i ],
+			b: values.b[ i ],
+		};
+	} );
+}
+
+/**
+ * Convert a color values object to an array of colors.
+ *
+ * @param {RGBValues} values R, G, and B values.
+ *
+ * @return {string[]} Hex color array.
+ */
+export function getHexColorsFromValues( values = { r: [], g: [], b: [] } ) {
+	return getColorsFromValues( values ).map( rgb2hex );
 }
