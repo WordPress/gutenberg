@@ -87,7 +87,8 @@ export function* saveWidgetAreas( widgetAreas ) {
 				'getEditedEntityRecord',
 				KIND,
 				POST_TYPE,
-				buildWidgetAreaPostId( widgetArea.id )
+				buildWidgetAreaPostId( widgetArea.id ),
+				{ deprecated: true }
 			);
 			const widgetsBlocks = post.blocks;
 			const newWidgets = widgetsBlocks.map( ( block ) => {
@@ -102,7 +103,10 @@ export function* saveWidgetAreas( widgetAreas ) {
 				KIND,
 				WIDGET_AREA_ENTITY_TYPE,
 				widgetArea.id,
-				{ widgets: newWidgets }
+				{
+					widgets: newWidgets,
+					deprecated: true
+				}
 			);
 
 			yield* trySaveWidgetArea( widgetArea.id );
