@@ -175,6 +175,12 @@ const deprecated = [
 				</table>
 			);
 		},
+		migrate( attributes ) {
+			return {
+				figure: true,
+				...attributes,
+			};
+		},
 	},
 ];
 

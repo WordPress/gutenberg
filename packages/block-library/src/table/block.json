@@ -12,7 +12,7 @@
 		"caption": {
 			"type": "string",
 			"source": "html",
-			"selector": "figcaption",
+			"selector": "caption, figcaption",
 			"default": ""
 		},
 		"head": {
@@ -119,6 +119,10 @@
 					}
 				}
 			}
+		},
+		"figure": {
+			"type": "boolean",
+			"default": true
 		}
 	},
 	"supports": {
