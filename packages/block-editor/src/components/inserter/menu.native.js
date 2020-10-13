@@ -7,6 +7,7 @@ import {
 	TouchableHighlight,
 	TouchableWithoutFeedback,
 	Dimensions,
+	Platform,
 } from 'react-native';
 import { pick } from 'lodash';
 
@@ -133,11 +134,11 @@ export class InserterMenu extends Component {
 				isVisible={ true }
 				onClose={ this.onClose }
 				hideHeader
-				isChildrenScrollable
+				withNavigation
 			>
 				<TouchableHighlight accessible={ false }>
 					<BottomSheetConsumer>
-						{ ( { listProps } ) => (
+						{ ( { listProps, safeAreaBottomInset } ) => (
 							<FlatList
 								onLayout={ this.onLayout }
 								key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
@@ -156,7 +157,10 @@ export class InserterMenu extends Component {
 								{ ...listProps }
 								contentContainerStyle={ [
 									...listProps.contentContainerStyle,
-									{ paddingLeft: 0, paddingRight: 0 },
+									{
+										paddingBottom:
+											safeAreaBottomInset || 32, //TODO check iOS
+									},
 								] }
 							/>
 						) }

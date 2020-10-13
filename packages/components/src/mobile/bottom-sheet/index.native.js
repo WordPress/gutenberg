@@ -9,6 +9,8 @@ import {
 	Dimensions,
 	Keyboard,
 	StatusBar,
+	ScrollView,
+	TouchableHighlight,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
@@ -284,6 +286,7 @@ class BottomSheet extends Component {
 			onDismiss,
 			children,
 			withHeaderSeparator = false,
+			withNavigation,
 			...rest
 		} = this.props;
 		const {
@@ -347,6 +350,9 @@ class BottomSheet extends Component {
 			scrollEnabled,
 			automaticallyAdjustContentInsets: false,
 		};
+
+		const WrapperView = withNavigation ? View : ScrollView;
+
 		const getHeader = () => (
 			<>
 				<View style={ styles.bottomSheetHeader }>
@@ -411,7 +417,11 @@ class BottomSheet extends Component {
 						<View style={ styles.dragIndicator } />
 					) }
 					{ ! hideHeader && getHeader() }
-					<View style={ listStyle }>
+					<WrapperView
+						{ ...( withNavigation
+							? { style: listProps.style }
+							: listProps ) }
+					>
 						<BottomSheetProvider
 							value={ {
 								shouldEnableBottomSheetScroll: this
@@ -425,11 +435,27 @@ class BottomSheet extends Component {
 									.onHandleHardwareButtonPress,
 								listProps,
 								setIsFullScreen: this.setIsFullScreen,
+								safeAreaBottomInset,
 							} }
 						>
-							{ children }
+							{ withNavigation ? (
+								<>{ children }</>
+							) : (
+								<TouchableHighlight accessible={ false }>
+									<>{ children }</>
+								</TouchableHighlight>
+							) }
 						</BottomSheetProvider>
-					</View>
+						{ ! withNavigation && (
+							<View
+								style={ {
+									height:
+										safeAreaBottomInset ||
+										styles.scrollableContent.paddingBottom,
+								} }
+							/>
+						) }
+					</WrapperView>
 				</KeyboardAvoidingView>
 			</Modal>
 		);

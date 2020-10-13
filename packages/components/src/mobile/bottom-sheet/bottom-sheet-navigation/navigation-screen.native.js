@@ -6,7 +6,7 @@ import {
 	useNavigation,
 	useFocusEffect,
 } from '@react-navigation/native';
-import { View, ScrollView, TouchableHighlight } from 'react-native';
+import { View, ScrollView, TouchableHighlight, Platform } from 'react-native';
 import { debounce } from 'lodash';
 
 /**
@@ -25,6 +25,7 @@ const BottomSheetNavigationScreen = ( {
 	children,
 	fullScreen,
 	isScrollable,
+	isNested,
 } ) => {
 	const navigation = useNavigation();
 	const heightRef = useRef( { maxHeight: 0 } );
@@ -75,7 +76,6 @@ const BottomSheetNavigationScreen = ( {
 			setHeightDebounce( height );
 		}
 	};
-
 	return useMemo( () => {
 		return isScrollable ? (
 			<View onLayout={ onLayout }>{ children }</View>
@@ -84,12 +84,21 @@ const BottomSheetNavigationScreen = ( {
 				<TouchableHighlight accessible={ false }>
 					<View onLayout={ onLayout }>
 						{ children }
-						<View style={ { height: safeAreaBottomInset } } />
+						{ ! isNested && (
+							<View
+								style={ {
+									height: safeAreaBottomInset,
+									backgroundColor: 'red',
+									marginBottom:
+										Platform.OS === 'android' ? 20 : 0,
+								} }
+							/>
+						) }
 					</View>
 				</TouchableHighlight>
 			</ScrollView>
 		);
-	}, [ children, isFocused ] );
+	}, [ children, isFocused, safeAreaBottomInset ] );
 };
 
 export default BottomSheetNavigationScreen;
