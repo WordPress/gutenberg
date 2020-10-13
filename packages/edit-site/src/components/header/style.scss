@@ -7,12 +7,21 @@
 	width: 100%;
 	padding-left: $header-height;
 
-	.edit-site-header_start,
+	.edit-site-header_start {
+		// The 335px flex basis and 0 flex-shrink prevents the left and
+		// right toolbar from collapsing when shrinking the viewport
+		flex: 1 0;
+		display: flex;
+		flex-basis: calc(335px - #{$header-height});
+	}
+
 	.edit-site-header_end {
 		// The 335px flex basis and 0 flex-shrink prevents the left and
 		// right toolbar from collapsing when shrinking the viewport
-		flex: 1 0 335px;
+		flex: 1 0;
 		display: flex;
+		flex-basis: 335px;
+		justify-content: flex-end;
 	}
 
 	.edit-site-header_center {
@@ -26,17 +35,16 @@
 		// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 		min-width: 0;
 	}
-
-	.edit-site-header_end {
-		justify-content: flex-end;
-		flex-basis: $header-height;
-	}
 }
 
 // Keeps the document title centered when the sidebar is open
 body.is-navigation-sidebar-open {
-	.edit-site-header_start {
-		flex-basis: calc(#{$nav-sidebar-width} + 335px);
+	.edit-site-header {
+		padding-left: 0;
+
+		.edit-site-header_start {
+			flex-basis: 335px;
+		}
 	}
 }
 
