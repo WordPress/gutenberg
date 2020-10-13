@@ -31,19 +31,11 @@ function getTitle( post ) {
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( 'core/editor' );
 	const [ fieldValue, setFieldValue ] = useState( false );
-	const {
-		parentPost,
-		parentPostId,
-		isLoading,
-		parent,
-		items,
-		postType,
-	} = useSelect(
+	const { parentPost, parentPostId, items, postType } = useSelect(
 		( select ) => {
 			const { getPostType, getEntityRecords, getEntityRecord } = select(
 				'core'
 			);
-			const { isResolving } = select( 'core/data' );
 			const { getCurrentPostId, getEditedPostAttribute } = select(
 				'core/editor'
 			);
@@ -63,23 +55,16 @@ export function PageAttributesParent() {
 			if ( parentPost && fieldValue && '' !== fieldValue ) {
 				query.search = fieldValue;
 			}
-			const theParentID = getEditedPostAttribute( 'parent' );
 
 			return {
 				parentPostId: pageId,
 				parentPost: pageId
 					? getEntityRecord( 'postType', postTypeSlug, pageId )
 					: null,
-				parent: theParentID,
 				items: isHierarchical
 					? getEntityRecords( 'postType', postTypeSlug, query )
 					: [],
 				postType: pType,
-				isLoading: isResolving( 'core', 'getEntityRecords', [
-					'postType',
-					postTypeSlug,
-					query,
-				] ),
 			};
 		},
 		[ fieldValue ]
@@ -109,7 +94,7 @@ export function PageAttributesParent() {
 		const opts = getOptionsFromTree( tree );
 
 		return opts;
-	}, [ parent, parentPost, pageItems ] );
+	}, [ pageItems ] );
 
 	if ( ! isHierarchical || ! parentPageLabel ) {
 		return null;
@@ -140,7 +125,6 @@ export function PageAttributesParent() {
 			options={ parentOptions }
 			onFilterValueChange={ debounce( handleKeydown, 300 ) }
 			onChange={ handleChange }
-			isLoading={ isLoading }
 		/>
 	);
 }
