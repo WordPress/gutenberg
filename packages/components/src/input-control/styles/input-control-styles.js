@@ -205,16 +205,6 @@ const labelTruncation = () => {
 	`;
 };
 
-const labelPadding = ( { labelPosition } ) => {
-	let paddingBottom = 4;
-
-	if ( labelPosition === 'edge' || labelPosition === 'side' ) {
-		paddingBottom = 0;
-	}
-
-	return css( { paddingTop: 0, paddingBottom } );
-};
-
 const BaseLabel = styled( Text )`
 	&&& {
 		box-sizing: border-box;
@@ -222,9 +212,10 @@ const BaseLabel = styled( Text )`
 		display: block;
 		margin: 0;
 		max-width: 100%;
+		padding-bottom: 4px;
+		padding-top: 0;
 		z-index: 1;
 
-		${ labelPadding }
 		${ labelTruncation }
 	}
 `;

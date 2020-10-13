@@ -56,7 +56,6 @@ export function InputBase(
 				<Label
 					className="components-input-control__label"
 					hideLabelFromVision={ hideLabelFromVision }
-					labelPosition={ labelPosition }
 					htmlFor={ id }
 					size={ size }
 				>

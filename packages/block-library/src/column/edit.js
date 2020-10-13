@@ -14,10 +14,7 @@ import {
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 } from '@wordpress/block-editor';
-import {
-	PanelBody,
-	__experimentalUnitControl as UnitControl,
-} from '@wordpress/components';
+import { PanelBody, RangeControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -55,9 +52,10 @@ function ColumnEdit( {
 		} );
 	};
 
+	const hasWidth = Number.isFinite( width );
 	const blockProps = useBlockProps( {
 		className: classes,
-		style: width ? { flexBasis: width } : undefined,
+		style: hasWidth ? { flexBasis: width + '%' } : undefined,
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock: false,
@@ -76,23 +74,20 @@ function ColumnEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Column settings' ) }>
-					<UnitControl
-						label={ __( 'Width' ) }
-						labelPosition="edge"
-						__unstableInputWidth="80px"
+					<RangeControl
+						label={ __( 'Percentage width' ) }
 						value={ width || '' }
 						onChange={ ( nextWidth ) => {
-							nextWidth =
-								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
 							setAttributes( { width: nextWidth } );
 						} }
-						units={ [
-							{ value: '%', label: '%', default: '' },
-							{ value: 'px', label: 'px', default: '' },
-							{ value: 'em', label: 'em', default: '' },
-							{ value: 'rem', label: 'rem', default: '' },
-							{ value: 'vw', label: 'vw', default: '' },
-						] }
+						min={ 0 }
+						max={ 100 }
+						step={ 0.1 }
+						required
+						allowReset
+						placeholder={
+							width === undefined ? __( 'Auto' ) : undefined
+						}
 					/>
 				</PanelBody>
 			</InspectorControls>
