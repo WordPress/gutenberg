@@ -69,7 +69,7 @@ async function runReleaseBranchCreationStep(
 	gitWorkingDirectoryPath,
 	abortMessage
 ) {
-	let parsedVersion, releaseBranch, versionLabel;
+	let version, releaseBranch, versionLabel;
 	await runStep( 'Creating the release branch', abortMessage, async () => {
 		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
 		const packageJson = readJSONFile( packageJsonPath );
@@ -78,22 +78,22 @@ async function runReleaseBranchCreationStep(
 
 		// if the last tag is an RC then we can assume that we should generate a new rc with the same version number
 		if ( isPackageVersionRC ) {
-			parsedVersion = semver.parse(
-				semver.inc( packageVersion.version, 'prerelease', 'rc' )
-			);
+			version = semver.inc( packageVersion.version, 'prerelease', 'rc' );
 		} else {
 			const nextMajor = getNextMajorVersion( packageJson.version );
-			parsedVersion = semver.parse( nextMajor + '-rc.1' );
+			version = nextMajor + '-rc.1';
 		}
 
-		versionLabel = parsedVersion.raw.replace( /\-rc\.([0-9]+)/, ' RC$1' );
+		const parsedVersion = semver.parse( version );
+
+		versionLabel = version.replace( /\-rc\.([0-9]+)/, ' RC$1' );
 		releaseBranch =
 			'release/' + parsedVersion.major + '.' + parsedVersion.minor;
 
 		if ( ! isPackageVersionRC ) {
 			await askForConfirmation(
 				'The Plugin version to be used is ' +
-					formats.success( parsedVersion.raw ) +
+					formats.success( version ) +
 					'. Proceed with the creation of the release branch?',
 				true,
 				abortMessage
@@ -113,7 +113,7 @@ async function runReleaseBranchCreationStep(
 		} else {
 			log(
 				'The Plugin version to be used is ' +
-					formats.success( parsedVersion.raw ) +
+					formats.success( version ) +
 					', in the release branch ' +
 					formats.success( releaseBranch )
 			);
@@ -121,7 +121,7 @@ async function runReleaseBranchCreationStep(
 	} );
 
 	return {
-		version: parsedVersion.raw,
+		version,
 		versionLabel,
 		releaseBranch,
 	};
