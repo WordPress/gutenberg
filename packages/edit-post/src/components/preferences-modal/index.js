@@ -46,43 +46,57 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 			<Section title={ __( 'General' ) }>
 				<EnablePublishSidebarOption
 					help={ __(
-						'Allows review of document settings before publishing.'
+						'Review settings such as categories and tags.'
 					) }
-					label={ __( 'Pre-publish checklist' ) }
+					label={ __( 'Include pre-publish checklist' ) }
 				/>
 				<EnableFeature
 					featureName="mostUsedBlocks"
-					label={ __( 'Most used blocks in library' ) }
+					help={ __(
+						'Places the most frequent blocks in the block library.'
+					) }
+					label={ __( 'Show most used blocks' ) }
 				/>
 				<EnableFeature
 					featureName="showIconLabels"
-					label={ __( 'Button text labels' ) }
+					help={ __( 'Shows text instead of icons in toolbar.' ) }
+					label={ __( 'Display button labels' ) }
 				/>
 			</Section>
 			<Section title={ __( 'Keyboard' ) }>
 				<EnableFeature
 					featureName="keepCaretInsideBlock"
-					help={ __( 'Keeps keyboard cursor inside active block.' ) }
-					label={ __( 'Contain the text cursor' ) }
+					help={ __(
+						'Aids screen readers by preventing text caret leaving blocks.'
+					) }
+					label={ __( 'Contain text cursor inside block.' ) }
 				/>
 			</Section>
 			<Section title={ __( 'Appearance' ) }>
 				<EnableFeature
 					featureName="themeStyles"
+					help={ __( 'Make the editor look like your theme.' ) }
 					label={ __( 'Use theme styles' ) }
 				/>
 				<EnableFeature
 					featureName="reducedUI"
-					help={ __( 'Reduces options in toolbar and outlines.' ) }
-					label={ __( 'Compact interface' ) }
+					help={ __(
+						'Compacts options and outlines in the toolbar.'
+					) }
+					label={ __( 'Reduce the interface' ) }
 				/>
 				<EnableFeature
 					featureName="focusMode"
-					help={ __( 'Highlights the current block.' ) }
+					help={ __(
+						'Highlights the current block and fades other content.'
+					) }
 					label={ __( 'Spotlight mode' ) }
 				/>
 			</Section>
-			<Section title={ __( 'Document panels' ) }>
+			<Section
+				title={ __( 'Document settings' ) }
+				description={ __( 'Choose what displays in the post panel.' ) }
+			>
 				<EnablePluginDocumentSettingPanelOption.Slot />
 				{ isViewable && (
 					<EnablePanelOption
@@ -125,7 +139,12 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 					/>
 				</PageAttributesCheck>
 			</Section>
-			<MetaBoxesSection title={ __( 'Advanced panels' ) } />
+			<MetaBoxesSection
+				title={ __( 'Additional panels' ) }
+				description={ __(
+					'Add extra areas to the editor, such as one for custom fields.'
+				) }
+			/>
 		</Modal>
 	);
 }

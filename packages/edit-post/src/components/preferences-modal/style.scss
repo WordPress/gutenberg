@@ -40,4 +40,10 @@
 		font-style: normal;
 		color: $gray-700;
 	}
+	.edit-post-preferences-modal__section-description {
+		margin: -$grid-unit-10 0 $grid-unit-10 0;
+		font-size: $helptext-font-size;
+		font-style: normal;
+		color: $gray-700;
+	}
 }
