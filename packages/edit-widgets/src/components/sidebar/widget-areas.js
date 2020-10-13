@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import { blockDefault } from '@wordpress/icons';
 import { BlockIcon } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -12,11 +13,14 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 		[]
 	);
 
-	const selectedWidgetArea =
-		selectedWidgetAreaId &&
-		widgetAreas?.find(
-			( widgetArea ) => widgetArea.id === selectedWidgetAreaId
-		);
+	const selectedWidgetArea = useMemo(
+		() =>
+			selectedWidgetAreaId &&
+			widgetAreas?.find(
+				( widgetArea ) => widgetArea.id === selectedWidgetAreaId
+			),
+		[ selectedWidgetAreaId, widgetAreas ]
+	);
 
 	let description;
 	if ( ! selectedWidgetArea ) {
