@@ -9,12 +9,19 @@ import classnames from 'classnames';
 import { renderAsRenderProps } from './utils';
 
 /**
+ * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+ * @typedef Props
+ * @property {T} [as='div'] Component to render
+ */
+
+/**
  * VisuallyHidden component to render text out non-visually
  * for use in devices such as a screen reader.
  *
- * @param {Object}             props             Component props.
- * @param {string|WPComponent} [props.as="div"]  A tag or component to render.
- * @param {string}             [props.className] Class to set on the container.
+ * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+ *
+ * @param {Props<T> & import('react').ComponentProps<T>} props  A tag or component to render.
+ * @return {JSX.Element} Element
  */
 function VisuallyHidden( { as = 'div', className, ...props } ) {
 	return renderAsRenderProps( {
@@ -24,3 +31,5 @@ function VisuallyHidden( { as = 'div', className, ...props } ) {
 	} );
 }
 export default VisuallyHidden;
+
+export const vh = <VisuallyHidden as="div" href="foo" />;
