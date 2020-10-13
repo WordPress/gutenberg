@@ -239,7 +239,9 @@ class BottomSheetRangeCell extends Component {
 						ref={ ( slider ) => {
 							this.sliderRef = slider;
 						} }
-						style={ styles.slider }
+						style={
+							isIOS ? styles.sliderIOS : styles.sliderAndroid
+						}
 						accessibilityRole={ 'adjustable' }
 					/>
 					{ shouldDisplayTextInput && (

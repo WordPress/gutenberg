@@ -12,7 +12,7 @@ import { useState } from '@wordpress/element';
  */
 import TemplatePreview from './template-preview';
 import { NavigationPanelPreviewFill } from '.';
-import { TEMPLATES_DEFAULT_DETAILS } from './constants';
+import { getTemplateInfo } from '../../../utils';
 
 export default function TemplateNavigationItems( {
 	entityType = 'wp_template',
@@ -35,20 +35,8 @@ export default function TemplateNavigationItems( {
 	return (
 		<>
 			{ templates.map( ( template ) => {
-				const { title: defaultTitle, description: defaultDescription } =
-					TEMPLATES_DEFAULT_DETAILS[ template.slug ] ?? {};
 				const key = `${ entityType }-${ template.id }`;
-
-				let title = template?.title?.rendered ?? template.slug;
-				if ( title !== template.slug ) {
-					title = template.title.rendered;
-				} else if ( defaultTitle ) {
-					title = defaultTitle;
-				}
-
-				const description =
-					template?.excerpt?.rendered || defaultDescription;
-
+				const { title, description } = getTemplateInfo( template );
 				return (
 					<NavigationItem
 						className="edit-site-navigation-panel__template-item"

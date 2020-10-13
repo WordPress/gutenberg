@@ -46,9 +46,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_PREFERRED_COLOR_SCHEME = "preferredColorScheme";
     private static final String EVENT_NAME_MEDIA_REPLACE_BLOCK = "replaceBlock";
     private static final String EVENT_NAME_UPDATE_THEME = "updateTheme";
+    private static final String EVENT_NAME_SHOW_NOTICE = "showNotice";
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
     private static final String MAP_KEY_UPDATE_TITLE = "title";
+    private static final String MAP_KEY_SHOW_NOTICE_MESSAGE = "message";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID = "mediaId";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL = "mediaUrl";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE = "mediaType";
@@ -110,6 +112,12 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public void setFocusOnTitleInJS() {
         WritableMap writableMap = new WritableNativeMap();
         emitToJS(EVENT_NAME_FOCUS_TITLE, writableMap);
+    }
+
+    public void showNoticeInJS(String message) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putString(MAP_KEY_SHOW_NOTICE_MESSAGE, message);
+        emitToJS(EVENT_NAME_SHOW_NOTICE, writableMap);
     }
 
     public void appendNewMediaBlock(int mediaId, String mediaUri, String mediaType) {
