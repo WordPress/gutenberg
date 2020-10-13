@@ -43,7 +43,7 @@ export const buildWidgetAreasPostId = () => `widget-areas`;
 export function buildWidgetAreasQuery() {
 	return {
 		per_page: -1,
-		deprecated: true
+		deprecated: true,
 	};
 }
 

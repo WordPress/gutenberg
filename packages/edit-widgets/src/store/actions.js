@@ -105,7 +105,7 @@ export function* saveWidgetAreas( widgetAreas ) {
 				widgetArea.id,
 				{
 					widgets: newWidgets,
-					deprecated: true
+					deprecated: true,
 				}
 			);
 
