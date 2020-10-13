@@ -101,6 +101,14 @@ describe( 'DOM', () => {
 			placeCaretAtHorizontalEdge( input, false );
 			expect( isHorizontalEdge( input, true ) ).toBe( true );
 		} );
+
+		it( 'should not move the caret if there is no selectionStart', () => {
+			const input = document.createElement( 'input' );
+			input.type = 'email'
+			input.value = 'user@example.com';
+			placeCaretAtHorizontalEdge( input, true );
+			expect( isHorizontalEdge( input, false ) ).toBe( false );
+		} );
 	} );
 
 	describe( 'isTextField', () => {
