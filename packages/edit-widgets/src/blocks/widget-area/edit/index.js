@@ -6,7 +6,7 @@ import { DisclosureContent } from 'reakit/Disclosure';
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef } from '@wordpress/element';
+import { useEffect, useState, useCallback, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { EntityProvider } from '@wordpress/core-data';
 import { Panel, PanelBody } from '@wordpress/components';
@@ -28,41 +28,140 @@ export default function WidgetAreaEdit( {
 	);
 	const { setIsWidgetAreaOpen } = useDispatch( 'core/edit-widgets' );
 
-	const scheduledForOpen = useRef( false );
-	const openOnDragOver = useCallback( () => {
-		if ( ! isOpen && ! scheduledForOpen.current ) {
-			scheduledForOpen.current = setTimeout( () => {
-				setIsWidgetAreaOpen( clientId, true );
-				scheduledForOpen.current = null;
-			}, 600 );
+	const wrapper = useRef();
+	const setOpen = useCallback(
+		( openState ) => setIsWidgetAreaOpen( clientId, openState ),
+		[ clientId ]
+	);
+	const isDragging = useIsDragging();
+	const isDraggingWithin = useIsDraggingWithin( wrapper );
+
+	const [ openedWhileDragging, setOpenedWhileDragging ] = useState( false );
+	useEffect( () => {
+		if ( ! isDragging ) {
+			setOpenedWhileDragging( false );
+			return;
 		}
-	}, [ clientId, isOpen, setIsWidgetAreaOpen ] );
+
+		let timeout;
+		if ( isDraggingWithin && ! isOpen ) {
+			timeout = setTimeout( () => {
+				setOpen( true );
+				setOpenedWhileDragging( true );
+			}, 600 );
+		} else if ( ! isDraggingWithin && isOpen && openedWhileDragging ) {
+			timeout = setTimeout( () => {
+				setOpen( false );
+			}, 100 );
+		}
+
+		return () => {
+			clearTimeout( timeout );
+		};
+	}, [ isOpen, isDragging, isDraggingWithin, openedWhileDragging ] );
 
 	return (
-		<div onDragOver={ openOnDragOver }>
-			<Panel className={ className }>
-				<PanelBody
-					title={ name }
-					opened={ isOpen }
-					onToggle={ () => {
-						setIsWidgetAreaOpen( clientId, ! isOpen );
-					} }
-				>
-					{ ( { opened } ) => (
-						// This is required to ensure LegacyWidget blocks are not unmounted when the panel is collapsed.
-						// Unmounting legacy widgets may have unintended consequences (e.g. TinyMCE not being properly reinitialized)
-						<DisclosureContent visible={ opened }>
-							<EntityProvider
-								kind="root"
-								type="postType"
-								id={ `widget-area-${ id }` }
-							>
-								<WidgetAreaInnerBlocks />
-							</EntityProvider>
-						</DisclosureContent>
-					) }
-				</PanelBody>
-			</Panel>
-		</div>
+		<Panel className={ className } ref={ wrapper }>
+			<PanelBody
+				title={ name }
+				opened={ isOpen }
+				onToggle={ () => {
+					setIsWidgetAreaOpen( clientId, ! isOpen );
+				} }
+			>
+				{ ( { opened } ) => (
+					// This is required to ensure LegacyWidget blocks are not unmounted when the panel is collapsed.
+					// Unmounting legacy widgets may have unintended consequences (e.g. TinyMCE not being properly reinitialized)
+					<DisclosureContent visible={ opened } className="test">
+						<EntityProvider
+							kind="root"
+							type="postType"
+							id={ `widget-area-${ id }` }
+						>
+							<WidgetAreaInnerBlocks />
+						</EntityProvider>
+					</DisclosureContent>
+				) }
+			</PanelBody>
+		</Panel>
 	);
 }
+
+/**
+ * A React hook to determine if dragging is active.
+ *
+ * @typedef {import('@wordpress/element').RefObject} RefObject
+ *
+ * @return {boolean} Is dragging within the entire document.
+ */
+const useIsDragging = () => {
+	const [ isDragging, setIsDragging ] = useState( false );
+
+	useEffect( () => {
+		function handleDragStart() {
+			setIsDragging( true );
+		}
+
+		function handleDragEnd() {
+			setIsDragging( false );
+		}
+
+		document.addEventListener( 'dragstart', handleDragStart );
+		document.addEventListener( 'dragend', handleDragEnd );
+
+		return () => {
+			document.removeEventListener( 'dragstart', handleDragStart );
+			document.removeEventListener( 'dragend', handleDragEnd );
+		};
+	}, [] );
+
+	return isDragging;
+};
+
+/**
+ * A React hook to determine if it's dragging within the target element.
+ *
+ * @typedef {import('@wordpress/element').RefObject} RefObject
+ *
+ * @param {RefObject<HTMLElement>} elementRef The target elementRef object.
+ *
+ * @return {boolean} Is dragging within the target element.
+ */
+const useIsDraggingWithin = ( elementRef ) => {
+	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
+
+	useEffect( () => {
+		function handleDragStart( event ) {
+			// Check the first time when the dragging starts.
+			handleDragEnter( event );
+		}
+
+		// Set to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
+		function handleDragEnd() {
+			setIsDraggingWithin( false );
+		}
+
+		function handleDragEnter( event ) {
+			// Check if the current target is inside the item element.
+			if ( elementRef.current.contains( event.target ) ) {
+				setIsDraggingWithin( true );
+			} else {
+				setIsDraggingWithin( false );
+			}
+		}
+
+		// Bind these events to the document to catch all drag events.
+		// Ideally, we can also use `event.relatedTarget`, but sadly that doesn't work in Safari.
+		document.addEventListener( 'dragstart', handleDragStart );
+		document.addEventListener( 'dragend', handleDragEnd );
+		document.addEventListener( 'dragenter', handleDragEnter );
+
+		return () => {
+			document.removeEventListener( 'dragstart', handleDragStart );
+			document.removeEventListener( 'dragend', handleDragEnd );
+			document.removeEventListener( 'dragenter', handleDragEnter );
+		};
+	}, [] );
+
+	return isDraggingWithin;
+};
