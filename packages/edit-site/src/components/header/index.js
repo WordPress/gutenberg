@@ -120,7 +120,7 @@ export default function Header( {
 			</div>
 
 			<div className="edit-site-header_center">
-				<DocumentActions documentTitle={ template?.slug } />
+				<DocumentActions template={ template } />
 			</div>
 
 			<div className="edit-site-header_end">
