@@ -13,7 +13,7 @@ import { BlockSettingsMenuControls } from '@wordpress/block-editor';
  */
 import { STORE_KEY } from '../../store/constants';
 
-export function ReusableBlockDeleteButton( { clientId } ) {
+function ReusableBlockDeleteButton( { clientId } ) {
 	const { isVisible, isDisabled, block } = useSelect(
 		( select ) => {
 			const { getBlock } = select( 'core/block-editor' );
