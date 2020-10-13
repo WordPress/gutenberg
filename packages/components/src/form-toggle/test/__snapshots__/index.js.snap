@@ -61,7 +61,7 @@ exports[`FormToggle basic rendering should render a span element with an uncheck
   opacity: 0;
   margin: 0;
   padding: 0;
-  z-index: z-index( '.components-form-toggle__input' );
+  z-index: 1;
   border: none;
 }
 
