@@ -6,7 +6,7 @@ import { DisclosureContent } from 'reakit/Disclosure';
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { EntityProvider } from '@wordpress/core-data';
 import { Panel, PanelBody } from '@wordpress/components';
@@ -21,21 +21,22 @@ export default function WidgetAreaEdit( {
 	className,
 	attributes: { id, name },
 } ) {
-	const { isOpen, isDraggingBlocks } = useSelect(
-		( select ) => ( {
-			isOpen: select( 'core/edit-widgets' ).getIsWidgetAreaOpen(
-				clientId
-			),
-			isDraggingBlocks: select( 'core/block-editor' ).isDraggingBlocks(),
-		} ),
+	const isOpen = useSelect(
+		( select ) =>
+			select( 'core/edit-widgets' ).getIsWidgetAreaOpen( clientId ),
 		[ clientId ]
 	);
 	const { setIsWidgetAreaOpen } = useDispatch( 'core/edit-widgets' );
+
+	const scheduledForOpen = useRef( false );
 	const openOnDragOver = useCallback( () => {
-		if ( ! isOpen && isDraggingBlocks ) {
-			setIsWidgetAreaOpen( clientId, true );
+		if ( ! isOpen && ! scheduledForOpen.current ) {
+			scheduledForOpen.current = setTimeout( () => {
+				setIsWidgetAreaOpen( clientId, true );
+				scheduledForOpen.current = null;
+			}, 600 );
 		}
-	}, [ clientId, isOpen, setIsWidgetAreaOpen, isDraggingBlocks ] );
+	}, [ clientId, isOpen, setIsWidgetAreaOpen ] );
 
 	return (
 		<div onDragOver={ openOnDragOver }>
