@@ -55,7 +55,7 @@ export const StyledToggleInput = styled.input`
 	opacity: 0;
 	margin: 0;
 	padding: 0;
-	z-index: ${ zIndex( '.components-form-toggle__input' ) };
+	${ zIndex( 'StyledToggleInput' ) };
 
 	// This overrides a border style that is inherited from parent checkbox styles.
 	border: none;
