@@ -19,6 +19,12 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	native: false,
 } );
 
+const BLOCK_INSPECTOR_IDENTIFIER = 'edit-widgets/block-inspector';
+
+// Widget areas were one called block areas, so use 'edit-widgets/block-areas'
+// for backwards compatibility.
+const WIDGET_AREAS_IDENTIFIER = 'edit-widgets/block-areas';
+
 /**
  * Internal dependencies
  */
@@ -67,9 +73,9 @@ export default function Sidebar() {
 		let activeArea = getActiveComplementaryArea( 'core/edit-widgets' );
 		if ( ! activeArea ) {
 			if ( selectedBlock ) {
-				activeArea = 'edit-widgets/block-inspector';
+				activeArea = BLOCK_INSPECTOR_IDENTIFIER;
 			} else {
-				activeArea = 'edit-widgets/widget-areas';
+				activeArea = WIDGET_AREAS_IDENTIFIER;
 			}
 		}
 
@@ -104,22 +110,22 @@ export default function Sidebar() {
 	useEffect( () => {
 		if (
 			hasSelectedNonAreaBlock &&
-			currentArea === 'edit-widgets/widget-areas' &&
+			currentArea === WIDGET_AREAS_IDENTIFIER &&
 			isGeneralSidebarOpen
 		) {
 			enableComplementaryArea(
 				'core/edit-widgets',
-				'edit-widgets/block-inspector'
+				BLOCK_INSPECTOR_IDENTIFIER
 			);
 		}
 		if (
 			! hasSelectedNonAreaBlock &&
-			currentArea === 'edit-widgets/block-inspector' &&
+			currentArea === BLOCK_INSPECTOR_IDENTIFIER &&
 			isGeneralSidebarOpen
 		) {
 			enableComplementaryArea(
 				'core/edit-widgets',
-				'edit-widgets/widget-areas'
+				WIDGET_AREAS_IDENTIFIER
 			);
 		}
 	}, [ hasSelectedNonAreaBlock, enableComplementaryArea ] );
@@ -131,23 +137,21 @@ export default function Sidebar() {
 				<ul>
 					<li>
 						<ComplementaryAreaTab
-							identifier="edit-widgets/widget-areas"
+							identifier={ WIDGET_AREAS_IDENTIFIER }
 							label={
 								selectedWidgetAreaBlock
 									? selectedWidgetAreaBlock.attributes.name
 									: __( 'Widget Areas' )
 							}
-							isActive={
-								currentArea === 'edit-widgets/widget-areas'
-							}
+							isActive={ currentArea === WIDGET_AREAS_IDENTIFIER }
 						/>
 					</li>
 					<li>
 						<ComplementaryAreaTab
-							identifier="edit-widgets/block-inspector"
+							identifier={ BLOCK_INSPECTOR_IDENTIFIER }
 							label={ __( 'Block' ) }
 							isActive={
-								currentArea === 'edit-widgets/block-inspector'
+								currentArea === BLOCK_INSPECTOR_IDENTIFIER
 							}
 						/>
 					</li>
@@ -162,14 +166,14 @@ export default function Sidebar() {
 			icon={ cog }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
-			{ currentArea === 'edit-widgets/widget-areas' && (
+			{ currentArea === WIDGET_AREAS_IDENTIFIER && (
 				<WidgetAreas
 					selectedWidgetAreaId={
 						selectedWidgetAreaBlock?.attributes.id
 					}
 				/>
 			) }
-			{ currentArea === 'edit-widgets/block-inspector' &&
+			{ currentArea === BLOCK_INSPECTOR_IDENTIFIER &&
 				( hasSelectedNonAreaBlock ? (
 					<BlockInspector />
 				) : (
