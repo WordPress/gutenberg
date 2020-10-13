@@ -167,8 +167,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
             @Override
             public void onPageCommitVisible(WebView view, String url) {
-                injectCssScript();
-
                 long userId = getUserId();
                 if (userId != 0) {
                     String injectLocalStorageScript = getFileContentFromAssets("gutenberg-web-single-block/local-storage-overrides.json");
@@ -188,7 +186,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                injectCssScript();
                 injectOnPageLoadExternalSources();
                 super.onPageStarted(view, url, favicon);
             }
@@ -205,14 +202,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                 String contentFunctions = getFileContentFromAssets("gutenberg-web-single-block/content-functions.js");
                 evaluateJavaScript(contentFunctions);
 
-                String editorStyle = getFileContentFromAssets("gutenberg-web-single-block/editor-style-overrides.css");
-                editorStyle = removeWhiteSpace(removeNewLines(editorStyle));
-                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, editorStyle));
-
-                String injectWPBarsCssScript = getFileContentFromAssets("gutenberg-web-single-block/wp-bar-override.css");
-                injectWPBarsCssScript = removeWhiteSpace(removeNewLines(injectWPBarsCssScript));
-                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, injectWPBarsCssScript));
-
                 String injectGutenbergObserver = getFileContentFromAssets("gutenberg-web-single-block/gutenberg-observer.js");
                 evaluateJavaScript(injectGutenbergObserver);
             }
@@ -226,6 +215,8 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
     private void onGutenbergReady() {
         preventAutoSavesScript();
+        // Inject css when Gutenberg is ready
+        injectCssScript();
         final Handler handler = new Handler();
         handler.postDelayed(() -> {
             // We want to make sure that page is loaded
@@ -241,7 +232,17 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
     private void injectCssScript() {
         String injectCssScript = getFileContentFromAssets("gutenberg-web-single-block/inject-css.js");
-        evaluateJavaScript(injectCssScript);
+        mWebView.evaluateJavascript(injectCssScript, message -> {
+            if (message != null) {
+                String editorStyle = getFileContentFromAssets("gutenberg-web-single-block/editor-style-overrides.css");
+                editorStyle = removeWhiteSpace(removeNewLines(editorStyle));
+                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, editorStyle));
+
+                String injectWPBarsCssScript = getFileContentFromAssets("gutenberg-web-single-block/wp-bar-override.css");
+                injectWPBarsCssScript = removeWhiteSpace(removeNewLines(injectWPBarsCssScript));
+                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, injectWPBarsCssScript));
+            }
+        });
     }
 
     private void injectOnGutenbergReadyExternalSources() {
