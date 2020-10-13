@@ -24,7 +24,7 @@ function Dashicon( { icon, size = 20, className, ...extraProps } ) {
 	return (
 		<span
 			className={ iconClass }
-			// Ignore reason: span attributes are the global attribtues which do not include width/height
+			// Ignore reason: span attributes are the global attributes which do not include width/height
 			// See https://developer.mozilla.org/en-US/docs/Web/HTML/Element/span
 			// See https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes
 			// @ts-ignore
