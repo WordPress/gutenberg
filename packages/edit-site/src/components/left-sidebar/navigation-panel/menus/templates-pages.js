@@ -11,6 +11,7 @@ import { __, _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import TemplateNavigationItems from '../template-navigation-items';
+import { MENU_TEMPLATES, MENU_TEMPLATES_PAGES } from '../constants';
 
 export default function TemplatesPagesMenu( { templates, onActivateItem } ) {
 	const defaultTemplate = templates?.find( ( { slug } ) => slug === 'page' );
@@ -20,9 +21,9 @@ export default function TemplatesPagesMenu( { templates, onActivateItem } ) {
 
 	return (
 		<NavigationMenu
-			menu="templates-pages"
+			menu={ MENU_TEMPLATES_PAGES }
 			title={ __( 'Pages' ) }
-			parentMenu="templates"
+			parentMenu={ MENU_TEMPLATES }
 		>
 			<NavigationGroup title={ _x( 'Specific', 'specific templates' ) }>
 				<TemplateNavigationItems

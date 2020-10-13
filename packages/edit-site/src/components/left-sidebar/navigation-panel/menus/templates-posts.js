@@ -11,7 +11,11 @@ import { __, _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import TemplateNavigationItems from '../template-navigation-items';
-import { TEMPLATES_POSTS } from '../constants';
+import {
+	MENU_TEMPLATES,
+	MENU_TEMPLATES_POSTS,
+	TEMPLATES_POSTS,
+} from '../constants';
 
 export default function TemplatePostsMenu( { templates, onActivateItem } ) {
 	const generalTemplates = templates?.find( ( { slug } ) =>
@@ -23,9 +27,9 @@ export default function TemplatePostsMenu( { templates, onActivateItem } ) {
 
 	return (
 		<NavigationMenu
-			menu="templates-posts"
+			menu={ MENU_TEMPLATES_POSTS }
 			title={ __( 'Posts' ) }
-			parentMenu="templates"
+			parentMenu={ MENU_TEMPLATES }
 		>
 			<NavigationGroup title={ _x( 'Specific', 'specific templates' ) }>
 				<TemplateNavigationItems
