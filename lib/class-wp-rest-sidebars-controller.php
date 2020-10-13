@@ -165,6 +165,31 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		if ( isset( $request['widgets'] ) ) {
 			$sidebars = wp_get_sidebars_widgets();
 
+			if ( $request['deprecated'] ) {
+				$widget_ids = array();
+
+				foreach ( $request['widgets'] as $widget ) {
+					if ( isset( $widget['id'] ) ) {
+						$widget_request = new WP_REST_Request( 'PUT', '/__experimental/widgets/' . $widget['id'] );
+					} else {
+						$widget_request = new WP_REST_Request( 'POST', '/__experimental/widgets' );
+					}
+
+					$widget['sidebar'] = $request['id'];
+					$widget_request->set_body_params( $widget );
+
+					$response = rest_do_request( $widget_request );
+
+					if ( is_wp_error( $response->as_error() ) ) {
+						return $response->as_error();
+					}
+
+					$widget_ids[] = $response->get_data()['id'];
+				}
+
+				$request['widgets'] = $widget_ids;
+			}
+
 			foreach ( $sidebars as $sidebar_id => $widgets ) {
 				foreach ( $widgets as $i => $widget_id ) {
 					if ( $sidebar_id !== $request['id'] && in_array( $widget_id, $request['widgets'], true ) ) {
@@ -182,6 +207,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 		$request['context'] = 'edit';
 
 		list( , $sidebar ) = $this->get_sidebar( $request['id'] );
+
 		return $this->prepare_item_for_response( $sidebar, $request );
 	}
 
@@ -272,6 +298,12 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 				$data[ $property_id ] = $sidebar[ $property_id ];
 			} elseif ( isset( $property['default'] ) ) {
 				$data[ $property_id ] = $property['default'];
+			}
+		}
+
+		if ( $request['deprecated'] ) {
+			foreach ( $data['widgets'] as $i => $widget ) {
+				$data['widgets'][ $i ] = rest_do_request( '/__experimental/widgets/' . $widget )->get_data();
 			}
 		}
 
@@ -401,7 +433,7 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 					'description' => __( 'Nested widgets.', 'gutenberg' ),
 					'type'        => 'array',
 					'items'       => array(
-						'type' => 'string',
+						'type' => array( 'object', 'string' ),
 					),
 					'default'     => array(),
 					'context'     => array( 'embed', 'view', 'edit' ),
