@@ -25,7 +25,11 @@ import styles from './editor.scss';
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
-function ButtonsEdit( { attributes: { align }, clientId, isSelected } ) {
+export default function ButtonsEdit( {
+	attributes: { align },
+	clientId,
+	isSelected,
+} ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
@@ -70,7 +74,7 @@ function ButtonsEdit( { attributes: { align }, clientId, isSelected } ) {
 		}
 	}, [ sizes ] );
 
-	function onAddNextButton( selectedId ) {
+	const onAddNextButton = debounce( ( selectedId ) => {
 		const order = getBlockOrder( clientId );
 		const selectedButtonIndex = order.findIndex(
 			( i ) => i === selectedId
@@ -83,19 +87,13 @@ function ButtonsEdit( { attributes: { align }, clientId, isSelected } ) {
 
 		insertBlock( insertedBlock, index, clientId );
 		selectBlock( insertedBlock.clientId );
-	}
-
-	const debounceAddNextButton = debounce( onAddNextButton, 200 );
-
-	function onDelete() {
-		removeBlock( clientId );
-	}
+	}, 200 );
 
 	const renderFooterAppender = useRef( () => (
 		<View style={ styles.appenderContainer }>
 			<InnerBlocks.ButtonBlockAppender
 				isFloating={ true }
-				onAddBlock={ debounceAddNextButton }
+				onAddBlock={ onAddNextButton }
 			/>
 		</View>
 	) );
@@ -116,8 +114,10 @@ function ButtonsEdit( { attributes: { align }, clientId, isSelected } ) {
 				}
 				orientation="horizontal"
 				horizontalAlignment={ align }
-				onDeleteBlock={ shouldDelete ? onDelete : undefined }
-				onAddBlock={ debounceAddNextButton }
+				onDeleteBlock={
+					shouldDelete ? () => removeBlock( clientId ) : undefined
+				}
+				onAddBlock={ onAddNextButton }
 				parentWidth={ maxWidth }
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
@@ -125,5 +125,3 @@ function ButtonsEdit( { attributes: { align }, clientId, isSelected } ) {
 		</AlignmentHookSettingsProvider>
 	);
 }
-
-export default ButtonsEdit;
