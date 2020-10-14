@@ -28,6 +28,7 @@ const BlockInspector = ( {
 	count,
 	hasBlockStyles,
 	selectedBlockClientId,
+	createdFromVariation,
 	selectedBlockName,
 	showNoBlockSelectedMessage = true,
 	bubblesVirtually = true,
@@ -65,7 +66,10 @@ const BlockInspector = ( {
 
 	return (
 		<div className="block-editor-block-inspector">
-			<BlockCard blockType={ blockType } />
+			<BlockCard
+				blockType={ blockType }
+				createdFromVariation={ createdFromVariation }
+			/>
 			{ hasBlockStyles && (
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
@@ -114,24 +118,28 @@ const AdvancedControls = ( { slotName, bubblesVirtually } ) => {
 };
 
 export default withSelect( ( select ) => {
-	const {
-		getSelectedBlockClientId,
-		getSelectedBlockCount,
-		getBlockName,
-	} = select( 'core/block-editor' );
+	const { getSelectedBlock, getSelectedBlockCount } = select(
+		'core/block-editor'
+	);
 	const { getBlockStyles } = select( 'core/blocks' );
-	const selectedBlockClientId = getSelectedBlockClientId();
-	const selectedBlockName =
-		selectedBlockClientId && getBlockName( selectedBlockClientId );
+	const selectedBlock = getSelectedBlock();
+	const selectedBlockClientId = selectedBlock?.clientId;
+	const selectedBlockName = selectedBlock?.name;
 	const blockType =
 		selectedBlockClientId && getBlockType( selectedBlockName );
 	const blockStyles =
 		selectedBlockClientId && getBlockStyles( selectedBlockName );
+	const createdFromVariation =
+		selectedBlock?.attributes?.fromVariation &&
+		blockType.variations?.find(
+			( { name } ) => name === selectedBlock.attributes.fromVariation
+		);
 	return {
 		count: getSelectedBlockCount(),
 		hasBlockStyles: blockStyles && blockStyles.length > 0,
 		selectedBlockName,
 		selectedBlockClientId,
 		blockType,
+		createdFromVariation,
 	};
 } )( BlockInspector );
