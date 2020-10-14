@@ -5,10 +5,8 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __experimentalNavigationItem as NavigationItem } from '@wordpress/components';
 import { getPathAndQueryString } from '@wordpress/url';
 
-const EXTRACTORS_TITLE = {
-	'taxonomy-category': ( entity ) => entity.name,
-	default: ( entity ) => entity?.title?.rendered,
-};
+const getEntityTitle = ( kind, entity ) =>
+	'taxonomy' === kind ? entity.name : entity?.title?.rendered;
 
 export default function NavigationEntityItems( { kind, name, query = {} } ) {
 	const entities = useSelect(
@@ -36,15 +34,12 @@ export default function NavigationEntityItems( { kind, name, query = {} } ) {
 
 	return entities.map( ( entity ) => {
 		const key = `content-${ getPathAndQueryString( entity.link ) }`;
-		const titleExtractor =
-			EXTRACTORS_TITLE[ `${ kind }-${ name }` ] ||
-			EXTRACTORS_TITLE.default;
 
 		return (
 			<NavigationItem
 				key={ key }
 				item={ key }
-				title={ titleExtractor( entity ) }
+				title={ getEntityTitle( kind, entity ) }
 				onClick={ () => onActivateItem( entity ) }
 			/>
 		);
