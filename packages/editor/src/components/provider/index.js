@@ -20,13 +20,13 @@ import {
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
+import { ReusableBlocksButtons } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
  */
 import withRegistryProvider from './with-registry-provider';
 import { mediaUpload } from '../../utils';
-import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
 
 /**
@@ -159,7 +159,6 @@ class EditorProvider extends Component {
 	getBlockEditorSettings(
 		settings,
 		reusableBlocks,
-		__experimentalFetchReusableBlocks,
 		hasUploadPermissions,
 		canUserUseUnfilteredHTML,
 		undo,
@@ -209,7 +208,6 @@ class EditorProvider extends Component {
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalFetchReusableBlocks,
 			__experimentalFetchLinkSuggestions: partialRight(
 				fetchLinkSuggestions,
 				settings
@@ -253,7 +251,6 @@ class EditorProvider extends Component {
 			resetEditorBlocksWithoutUndoLevel,
 			hasUploadPermissions,
 			isPostTitleSelected,
-			__experimentalFetchReusableBlocks,
 			undo,
 		} = this.props;
 
@@ -264,7 +261,6 @@ class EditorProvider extends Component {
 		const editorSettings = this.getBlockEditorSettings(
 			settings,
 			reusableBlocks,
-			__experimentalFetchReusableBlocks,
 			hasUploadPermissions,
 			canUserUseUnfilteredHTML,
 			undo,
@@ -316,7 +312,6 @@ export default compose( [
 			getEditorBlocks,
 			getEditorSelectionStart,
 			getEditorSelectionEnd,
-			__experimentalGetReusableBlocks,
 			isPostTitleSelected,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
@@ -327,7 +322,10 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			selectionStart: getEditorSelectionStart(),
 			selectionEnd: getEditorSelectionEnd(),
-			reusableBlocks: __experimentalGetReusableBlocks(),
+			reusableBlocks: select( 'core' ).getEntityRecords(
+				'postType',
+				'wp_block'
+			),
 			hasUploadPermissions: defaultTo(
 				canUser( 'create', 'media' ),
 				true
@@ -342,7 +340,6 @@ export default compose( [
 			updatePostLock,
 			resetEditorBlocks,
 			updateEditorSettings,
-			__experimentalFetchReusableBlocks,
 			__experimentalTearDownEditor,
 			undo,
 		} = dispatch( 'core/editor' );
@@ -361,7 +358,6 @@ export default compose( [
 				} );
 			},
 			tearDownEditor: __experimentalTearDownEditor,
-			__experimentalFetchReusableBlocks,
 			undo,
 		};
 	} ),

@@ -3,10 +3,16 @@
  */
 import { hasBlockSupport, isReusableBlock } from '@wordpress/blocks';
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
+import { useCallback } from '@wordpress/element';
 import { MenuItem } from '@wordpress/components';
 import { reusableBlock } from '@wordpress/icons';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import { STORE_KEY } from '../../store/constants';
 
 /**
  * Menu control to convert block(s) to reusable block.
@@ -23,9 +29,6 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 			const { getBlocksByClientId, canInsertBlockType } = select(
 				'core/block-editor'
 			);
-			const { __experimentalGetReusableBlock: getReusableBlock } = select(
-				'core/editor'
-			);
 
 			const blocks = getBlocksByClientId( clientIds ) ?? [];
 
@@ -33,7 +36,11 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 				blocks.length === 1 &&
 				blocks[ 0 ] &&
 				isReusableBlock( blocks[ 0 ] ) &&
-				!! getReusableBlock( blocks[ 0 ].attributes.ref );
+				!! select( 'core' ).getEntityRecord(
+					'postType',
+					'wp_block',
+					blocks[ 0 ].attributes.ref
+				);
 
 			const _canConvert =
 				// Hide when this is already a reusable block.
@@ -58,8 +65,27 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 	);
 
 	const {
-		__experimentalConvertBlockToReusable: convertBlockToReusable,
-	} = useDispatch( 'core/editor' );
+		__experimentalConvertBlocksToReusable: convertBlocksToReusable,
+	} = useDispatch( STORE_KEY );
+
+	const { createSuccessNotice, createErrorNotice } = useDispatch(
+		'core/notices'
+	);
+	const onConvert = useCallback(
+		async function () {
+			try {
+				await convertBlocksToReusable( clientIds );
+				createSuccessNotice( __( 'Block created.' ), {
+					type: 'snackbar',
+				} );
+			} catch ( error ) {
+				createErrorNotice( error.message, {
+					type: 'snackbar',
+				} );
+			}
+		},
+		[ clientIds ]
+	);
 
 	if ( ! canConvert ) {
 		return null;
@@ -71,7 +97,7 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 				<MenuItem
 					icon={ reusableBlock }
 					onClick={ () => {
-						convertBlockToReusable( clientIds );
+						onConvert();
 						onClose();
 					} }
 				>

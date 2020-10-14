@@ -1,28 +1,23 @@
 /**
- * External dependencies
- */
-import { partial } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEntityBlockEditor } from '@wordpress/core-data';
+import { useCallback } from '@wordpress/element';
 import {
-	BlockControls,
-	BlockEditorProvider,
-	BlockList,
-	WritingFlow,
-} from '@wordpress/block-editor';
-import { parse, serialize } from '@wordpress/blocks';
-import {
-	Disabled,
 	Placeholder,
 	Spinner,
-	ToolbarButton,
+	Disabled,
 	ToolbarGroup,
+	ToolbarButton,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
-import { useLayoutEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import {
+	BlockEditorProvider,
+	WritingFlow,
+	BlockList,
+	BlockControls,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -34,125 +29,80 @@ export default function ReusableBlockEdit( {
 	clientId,
 	isSelected,
 } ) {
+	const recordArgs = [ 'postType', 'wp_block', ref ];
+
 	const {
 		reusableBlock,
-		isFetching,
+		hasResolved,
+		isEditing,
 		isSaving,
-		blocks,
-		title,
-		canUpdateBlock,
+		canUserUpdate,
 		settings,
 	} = useSelect(
-		( select ) => {
-			const { canUser } = select( 'core' );
-			const {
-				__experimentalGetParsedReusableBlock: getParsedReusableBlock,
-				getSettings,
-			} = select( 'core/block-editor' );
-			const {
-				__experimentalGetReusableBlock: getReusableBlock,
-				__experimentalIsFetchingReusableBlock: isFetchingReusableBlock,
-				__experimentalIsSavingReusableBlock: isSavingReusableBlock,
-			} = select( 'core/editor' );
-			const _reusableBlock = getReusableBlock( ref );
+		( select ) => ( {
+			reusableBlock: select( 'core' ).getEditedEntityRecord(
+				...recordArgs
+			),
+			hasResolved: select( 'core' ).hasFinishedResolution(
+				'getEditedEntityRecord',
+				recordArgs
+			),
+			isSaving: select( 'core' ).isSavingEntityRecord( ...recordArgs ),
+			canUserUpdate: select( 'core' ).canUser( 'update', 'blocks', ref ),
+			isEditing: select(
+				'core/reusable-blocks'
+			).__experimentalIsEditingReusableBlock( clientId ),
+			settings: select( 'core/block-editor' ).getSettings(),
+		} ),
+		[ ref, clientId ]
+	);
 
-			let _blocks;
-			if ( _reusableBlock ) {
-				if ( _reusableBlock.isTemporary ) {
-					// The getParsedReusableBlock selector won't work for temporary
-					// reusable blocks.
-					_blocks = parse( _reusableBlock.content );
-				} else {
-					_blocks = getParsedReusableBlock( ref );
-				}
-			} else {
-				_blocks = null;
-			}
-
-			return {
-				reusableBlock: _reusableBlock,
-				isFetching: isFetchingReusableBlock( ref ),
-				isSaving: isSavingReusableBlock( ref ),
-				blocks: _blocks,
-				title: _reusableBlock?.title ?? null,
-				canUpdateBlock:
-					!! _reusableBlock &&
-					! _reusableBlock.isTemporary &&
-					!! canUser( 'update', 'blocks', ref ),
-				settings: getSettings(),
-			};
+	const { editEntityRecord, saveEditedEntityRecord } = useDispatch( 'core' );
+	const { __experimentalSetEditingReusableBlock } = useDispatch(
+		'core/reusable-blocks'
+	);
+	const setIsEditing = useCallback(
+		( value ) => {
+			__experimentalSetEditingReusableBlock( clientId, value );
 		},
-		[ ref ]
+		[ clientId ]
 	);
 
 	const {
 		__experimentalConvertBlockToStatic: convertBlockToStatic,
-		__experimentalFetchReusableBlocks: fetchReusableBlocks,
-		__experimentalUpdateReusableBlock: updateReusableBlock,
-		__experimentalSaveReusableBlock: saveReusableBlock,
-	} = useDispatch( 'core/editor' );
+	} = useDispatch( 'core/reusable-blocks' );
 
-	const fetchReusableBlock = partial( fetchReusableBlocks, ref );
-	const onChange = partial( updateReusableBlock, ref );
-	const onSave = partial( saveReusableBlock, ref );
-
-	// Start in edit mode when working with a newly created reusable block.
-	// Start in preview mode when we're working with an existing reusable block.
-	const [ isEditing, setIsEditing ] = useState(
-		reusableBlock?.isTemporary ?? false
+	const { createSuccessNotice, createErrorNotice } = useDispatch(
+		'core/notices'
 	);
-
-	// Local state used for temporary (newly-created, unsaved) reusable blocks
-	// and reusable blocks being edited. This state is used to make changes to
-	// the block without having to save them.
-	const [ localTitle, setLocalTitle ] = useState(
-		reusableBlock && isEditing ? title : null
-	);
-	const [ localBlocks, setLocalBlocks ] = useState(
-		reusableBlock && isEditing ? blocks : null
-	);
-
-	useLayoutEffect( () => {
-		if ( ! reusableBlock ) {
-			fetchReusableBlock();
+	const save = useCallback( async function () {
+		try {
+			await saveEditedEntityRecord( ...recordArgs );
+			createSuccessNotice( __( 'Block updated.' ), {
+				type: 'snackbar',
+			} );
+		} catch ( error ) {
+			createErrorNotice( error.message, {
+				type: 'snackbar',
+			} );
 		}
-	}, [] );
+	}, recordArgs );
 
-	function startEditing() {
-		// Copy saved reusable block data into local state.
-		setLocalBlocks( blocks );
-		setLocalTitle( title );
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		'wp_block',
+		{ id: ref }
+	);
 
-		setIsEditing( true );
-	}
-
-	function cancelEditing() {
-		// Clear local state.
-		setLocalBlocks( null );
-		setLocalTitle( null );
-
-		setIsEditing( false );
-	}
-
-	function saveAndStopEditing() {
-		onChange( { title: localTitle, content: serialize( localBlocks ) } );
-		onSave();
-
-		// Clear local state.
-		setLocalBlocks( null );
-		setLocalTitle( null );
-
-		setIsEditing( false );
+	if ( ! hasResolved ) {
+		return (
+			<Placeholder>
+				<Spinner />
+			</Placeholder>
+		);
 	}
 
 	if ( ! reusableBlock ) {
-		if ( isFetching ) {
-			return (
-				<Placeholder>
-					<Spinner />
-				</Placeholder>
-			);
-		}
 		return (
 			<Placeholder>
 				{ __( 'Block has been deleted or is unavailable.' ) }
@@ -160,22 +110,12 @@ export default function ReusableBlockEdit( {
 		);
 	}
 
-	function handleModifyBlocks( modifedBlocks ) {
-		// We shouldn't change local state when the blocks are loading
-		// from the saved reusable block.
-		if ( isEditing ) {
-			setLocalBlocks( modifedBlocks );
-		}
-	}
-
-	let content = (
+	let element = (
 		<BlockEditorProvider
+			value={ blocks }
+			onInput={ onInput }
+			onChange={ onChange }
 			settings={ settings }
-			// If editing, use local state; otherwise, load the blocks from the
-			// saved reusable block.
-			value={ isEditing ? localBlocks : blocks }
-			onChange={ handleModifyBlocks }
-			onInput={ handleModifyBlocks }
 		>
 			<WritingFlow>
 				<BlockList />
@@ -184,7 +124,7 @@ export default function ReusableBlockEdit( {
 	);
 
 	if ( ! isEditing ) {
-		content = <Disabled>{ content }</Disabled>;
+		element = <Disabled>{ element }</Disabled>;
 	}
 
 	return (
@@ -192,35 +132,31 @@ export default function ReusableBlockEdit( {
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
-						onClick={ () => {
-							convertBlockToStatic( clientId );
-						} }
+						onClick={ () => convertBlockToStatic( clientId ) }
 					>
 						{ __( 'Convert to regular blocks' ) }
 					</ToolbarButton>
 				</ToolbarGroup>
 			</BlockControls>
+
 			<div className="block-library-block__reusable-block-container">
 				{ ( isSelected || isEditing ) && (
 					<ReusableBlockEditPanel
 						isEditing={ isEditing }
-						title={ isEditing ? localTitle : title }
-						isSaving={
-							isSaving &&
-							! ( reusableBlock?.isTemporary ?? false )
+						title={ reusableBlock.title }
+						isSaving={ isSaving }
+						isEditDisabled={ ! canUserUpdate }
+						onEdit={ () => setIsEditing( true ) }
+						onChangeTitle={ ( title ) =>
+							editEntityRecord( ...recordArgs, { title } )
 						}
-						isEditDisabled={ ! canUpdateBlock }
-						onEdit={ startEditing }
-						onChangeTitle={ ( updatedTitle ) => {
-							if ( isEditing ) {
-								setLocalTitle( updatedTitle );
-							}
+						onSave={ () => {
+							save();
+							setIsEditing( false );
 						} }
-						onSave={ saveAndStopEditing }
-						onCancel={ cancelEditing }
 					/>
 				) }
-				{ content }
+				{ element }
 			</div>
 		</>
 	);
