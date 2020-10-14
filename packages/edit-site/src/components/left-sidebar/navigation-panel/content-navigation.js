@@ -37,7 +37,7 @@ export default function ContentNavigation( { onActivateMenu } ) {
 
 	return (
 		<Navigation
-			activeItem={ `content-${ page.path }` }
+			activeItem={ page && `content-${ page.path }` }
 			activeMenu={ activeMenu }
 			onActivateMenu={ handleActivateMenu }
 		>
