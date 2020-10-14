@@ -257,7 +257,7 @@ const variations = [
 	{
 		name: 'tiktok',
 		attributes: { service: 'tiktok' },
-		title: 'Tiktok',
+		title: 'TikTok',
 		icon: TiktokIcon,
 	},
 	{
