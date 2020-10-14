@@ -10,22 +10,24 @@ import android.view.MenuItem;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import org.wordpress.android.util.AppLog;
-import org.wordpress.android.util.helpers.WPWebChromeClient;
+import org.wordpress.android.util.AppLog;;
 import org.wordpress.mobile.FileUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GutenbergWebViewActivity extends AppCompatActivity {
 
@@ -42,6 +44,9 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     protected View mForegroundView;
     protected boolean mIsRedirected;
 
+    private ProgressBar mProgressBar;
+    private AtomicBoolean isBlockContentInserted = new AtomicBoolean(false);
+
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +56,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
         mWebView = findViewById(R.id.gutenberg_web_view);
         mForegroundView = findViewById(R.id.foreground_view);
+        mProgressBar = findViewById(R.id.progress_bar);
 
         // Set settings
         WebSettings settings = mWebView.getSettings();
@@ -64,7 +70,25 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
         // Setup WebView client
         setupWebViewClient();
-        mWebView.setWebChromeClient(new WPWebChromeClient(null, findViewById(R.id.progress_bar)));
+
+        // Setup Web Chrome client
+        mWebView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onProgressChanged(WebView view, int progress) {
+                if (progress == 100 && !isBlockContentInserted.getAndSet(true)) {
+                    mProgressBar.setVisibility(View.GONE);
+                    final Handler handler = new Handler();
+                    handler.postDelayed(() -> {
+                        // Inject block content
+                        insertBlockScript();
+                    }, 200);
+                }
+                else {
+                    mProgressBar.setVisibility(View.VISIBLE);
+                    mProgressBar.setProgress(progress);
+                }
+            }
+        });
 
         loadUrl();
     }
@@ -222,8 +246,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
             // We want to make sure that page is loaded
             // with all elements before executing external JS
             injectOnGutenbergReadyExternalSources();
-            // Inject block content
-            insertBlockScript();
             // We need some extra time to hide all unwanted html elements
             // like NUX (new user experience) modal is.
             mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 1500);
