@@ -82,7 +82,7 @@ async function createLocalTag( gitWorkingDirectoryPath, tagName ) {
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
  * @param {string} branchName Branch Name
- * @param {Array.<string>} options accepted by git-push
+ * @param {string[]} options accepted by git-push
  */
 async function pushBranchToOrigin(
 	gitWorkingDirectoryPath,
