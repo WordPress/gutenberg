@@ -6,9 +6,9 @@
 	},
 	"references": [ { "path": "../primitives" } ],
 	"include": [
-		"src/base-control/*",
-		"src/dashicon/*",
-		"src/tip/*",
-		"src/visually-hidden/*"
+		"src/base-control/**/*",
+		"src/dashicon/**/*",
+		"src/tip/**/*",
+		"src/visually-hidden/**/*"
 	]
 }
