@@ -226,12 +226,13 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
     private void onGutenbergReady() {
         preventAutoSavesScript();
-        insertBlockScript();
         final Handler handler = new Handler();
         handler.postDelayed(() -> {
             // We want to make sure that page is loaded
             // with all elements before executing external JS
             injectOnGutenbergReadyExternalSources();
+            // Inject block content
+            insertBlockScript();
             // We need some extra time to hide all unwanted html elements
             // like NUX (new user experience) modal is.
             mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 1500);

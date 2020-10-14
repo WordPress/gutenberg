@@ -13,7 +13,14 @@ import { __, _x } from '@wordpress/i18n';
 import TemplatesPagesMenu from './templates-pages';
 import TemplateNavigationItems from '../template-navigation-items';
 import TemplatePostsMenu from './templates-posts';
-import { TEMPLATES_GENERAL } from '../constants';
+import {
+	MENU_ROOT,
+	MENU_TEMPLATES,
+	MENU_TEMPLATES_ALL,
+	MENU_TEMPLATES_PAGES,
+	MENU_TEMPLATES_POSTS,
+	TEMPLATES_GENERAL,
+} from '../constants';
 import { useSelect } from '@wordpress/data';
 import TemplatesAllMenu from './templates-all';
 
@@ -33,20 +40,20 @@ export default function TemplatesMenu( { onActivateItem } ) {
 
 	return (
 		<NavigationMenu
-			menu="templates"
+			menu={ MENU_TEMPLATES }
 			title={ __( 'Templates' ) }
-			parentMenu="root"
+			parentMenu={ MENU_ROOT }
 		>
 			<NavigationItem
-				navigateToMenu="templates-all"
+				navigateToMenu={ MENU_TEMPLATES_ALL }
 				title={ _x( 'All', 'all templates' ) }
 			/>
 			<NavigationItem
-				navigateToMenu="templates-pages"
+				navigateToMenu={ MENU_TEMPLATES_PAGES }
 				title={ __( 'Pages' ) }
 			/>
 			<NavigationItem
-				navigateToMenu="templates-posts"
+				navigateToMenu={ MENU_TEMPLATES_POSTS }
 				title={ __( 'Posts' ) }
 			/>
 

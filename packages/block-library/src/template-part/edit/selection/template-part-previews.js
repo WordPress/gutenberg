@@ -209,7 +209,8 @@ export default function TemplateParts( {
 				per_page: -1,
 			}
 		);
-		const currentTheme = select( 'core' ).getCurrentTheme()?.textdomain;
+		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
+
 		const themeTemplateParts = select( 'core' ).getEntityRecords(
 			'postType',
 			'wp_template_part',
