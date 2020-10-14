@@ -38,10 +38,19 @@ export const getMergedGlobalStyles = (
 	};
 
 	if (
-		wrapperPropsStyle?.backgroundColor ||
-		blockStyleAttributes?.backgroundColor
+		! mergedStyle.padding &&
+		( wrapperPropsStyle?.backgroundColor ||
+			blockStyleAttributes?.backgroundColor )
 	) {
 		mergedStyle.padding = styles.withBackGroundColor.paddingLeft;
+	}
+
+	if (
+		mergedStyle?.padding &&
+		! wrapperPropsStyle?.backgroundColor &&
+		! blockStyleAttributes?.backgroundColor
+	) {
+		mergedStyle.padding = undefined;
 	}
 
 	Object.entries( blockStyleAttributes ).forEach( ( [ key, value ] ) => {

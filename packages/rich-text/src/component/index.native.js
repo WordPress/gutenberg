@@ -827,7 +827,15 @@ export class RichText extends Component {
 				: this.state.width;
 
 		return (
-			<View>
+			<View
+				style={ [
+					style?.padding &&
+						style?.backgroundColor && {
+							padding: style.padding,
+							backgroundColor: style.backgroundColor,
+						},
+				] }
+			>
 				{ children &&
 					children( {
 						isSelected,
