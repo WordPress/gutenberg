@@ -36,6 +36,16 @@ export const DEFAULT_VISUALIZER_VALUES = {
 	left: false,
 };
 
+export const DEFAULT_VISUALIZER_SPACING_VALUES = {
+	padding: DEFAULT_VISUALIZER_VALUES,
+	margin: DEFAULT_VISUALIZER_VALUES,
+};
+
+export const DEFAULT_SPACING_VALUES = {
+	padding: DEFAULT_VALUES,
+	margin: DEFAULT_VALUES,
+};
+
 /**
  * Gets an items with the most occurance within an array
  * https://stackoverflow.com/a/20762713

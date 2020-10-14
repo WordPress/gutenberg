@@ -45,6 +45,12 @@ export const Side = styled.div`
 		`
 		opacity: 0.3;
 	` }
+
+	${ ( { transform } ) =>
+		transform &&
+		`
+		transform: ${ transform };
+	` }
 `;
 
 export const TopView = styled( Side )`

@@ -27,7 +27,7 @@ import { __ } from '@wordpress/i18n';
 import { CSS_UNITS } from '../columns/utils';
 
 function ColumnEdit( {
-	attributes: { verticalAlignment, width, templateLock = false },
+	attributes: { verticalAlignment, width, style, templateLock = false },
 	setAttributes,
 	clientId,
 } ) {
@@ -63,7 +63,7 @@ function ColumnEdit( {
 	const widthWithUnit = Number.isFinite( width ) ? width + '%' : width;
 	const blockProps = useBlockProps( {
 		className: classes,
-		style: widthWithUnit ? { flexBasis: widthWithUnit } : undefined,
+		style: widthWithUnit ? { flexBasis: widthWithUnit, ...style } : { ...style },
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		templateLock,
