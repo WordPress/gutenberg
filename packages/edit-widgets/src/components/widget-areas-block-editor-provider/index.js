@@ -27,6 +27,7 @@ import { ReusableBlocksButtons } from '@wordpress/reusable-blocks';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
+import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
@@ -66,6 +67,8 @@ export default function WidgetAreasBlockEditorProvider( {
 		};
 	}, [ blockEditorSettings, hasUploadPermissions, reusableBlocks ] );
 
+	const widgetAreaId = useLastSelectedWidgetArea();
+
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		KIND,
 		POST_TYPE,
@@ -89,7 +92,9 @@ export default function WidgetAreasBlockEditorProvider( {
 							{ ...props }
 						>
 							{ children }
-							<ReusableBlocksButtons />
+							<ReusableBlocksButtons
+								rootClientId={ widgetAreaId }
+							/>
 						</BlockEditorProvider>
 					</FocusReturnProvider>
 				</DropZoneProvider>
