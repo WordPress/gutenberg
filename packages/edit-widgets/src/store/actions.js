@@ -6,7 +6,7 @@ import { invert } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -66,7 +66,8 @@ export function* saveEditedWidgetAreas() {
 		yield dispatch(
 			'core/notices',
 			'createErrorNotice',
-			__( 'There was an error.' ),
+			/* translators: %s: The error message. */
+			sprintf( __( 'There was an error. %s' ), e.message ),
 			{
 				type: 'snackbar',
 			}
@@ -90,6 +91,7 @@ export function* saveWidgetAreas( widgetAreas ) {
 				POST_TYPE,
 				buildWidgetAreaPostId( widgetArea.id )
 			);
+
 			// Remove all duplicate reference widget instances
 			const widgetsBlocks = post.blocks.filter(
 				( { attributes: { referenceWidgetName } } ) => {
@@ -105,10 +107,50 @@ export function* saveWidgetAreas( widgetAreas ) {
 				}
 			);
 			const newWidgets = widgetsBlocks.map( ( block ) => {
+			const widgetIds = [];
+
+			for ( const block of widgetsBlocks ) {
 				const widgetId = clientIdToWidgetId[ block.clientId ];
 				const oldWidget = widgets[ widgetId ];
-				return transformBlockToWidget( block, oldWidget );
-			} );
+				const widget = transformBlockToWidget( block, oldWidget );
+
+				if ( widgetId ) {
+					widgetIds.push( widgetId );
+					yield dispatch(
+						'core',
+						'editEntityRecord',
+						'root',
+						'widget',
+						widgetId,
+						{
+							...widget,
+							sidebar: widgetArea.id,
+						}
+					);
+					yield dispatch(
+						'core',
+						'saveEditedEntityRecord',
+						'root',
+						'widget',
+						widgetId,
+						widget
+					);
+				} else {
+					// This is a new widget instance.
+					const created = yield dispatch(
+						'core',
+						'saveEntityRecord',
+						'root',
+						'widget',
+						{
+							...widget,
+							sidebar: widgetArea.id,
+						}
+					);
+					widgetIds.push( created.id );
+					yield setWidgetIdForClientId( block.clientId, created.id );
+				}
+			}
 
 			yield dispatch(
 				'core',
@@ -117,7 +159,7 @@ export function* saveWidgetAreas( widgetAreas ) {
 				WIDGET_AREA_ENTITY_TYPE,
 				widgetArea.id,
 				{
-					widgets: newWidgets,
+					widgets: widgetIds,
 				}
 			);
 

@@ -41,6 +41,7 @@ export default function WidgetAreasBlockEditorProvider( {
 				true
 			),
 			widgetAreas: select( 'core/edit-widgets' ).getWidgetAreas(),
+			widgets: select( 'core/edit-widgets' ).getWidgets(),
 			reusableBlocks: select( 'core' ).getEntityRecords(
 				'postType',
 				'wp_block'

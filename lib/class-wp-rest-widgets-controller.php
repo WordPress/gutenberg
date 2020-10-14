@@ -181,6 +181,11 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$request['context'] = 'edit';
 
 		$response = $this->prepare_item_for_response( compact( 'sidebar_id', 'widget_id' ), $request );
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
 		$response->set_status( 201 );
 
 		return $response;
@@ -387,20 +392,14 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			// Just because we saved new widget doesn't mean it was added to $wp_registered_widgets.
 			// Let's make sure it's there so that it's included in the response.
 			if ( ! isset( $wp_registered_widgets[ $input_widget['id'] ] ) || 1 === $number ) {
-				$first_widget_id = substr( $input_widget['id'], 0, strrpos( $input_widget['id'], '-' ) ) . '-1';
-
-				if ( isset( $wp_registered_widgets[ $first_widget_id ] ) ) {
-					$wp_registered_widgets[ $input_widget['id'] ] = $wp_registered_widgets[ $first_widget_id ];
-
-					$widget_class = get_class( $update_control['callback'][0] );
-					$new_object   = new $widget_class(
-						$input_widget['id_base'],
-						$input_widget['name'],
-						$input_widget['settings']
-					);
-					$new_object->_register();
-					$wp_registered_widgets[ $input_widget['id'] ]['callback'][0] = $new_object;
-				}
+				$widget_class = get_class( $update_control['callback'][0] );
+				$new_object   = new $widget_class(
+					$input_widget['id_base'],
+					$input_widget['name'],
+					$input_widget['settings']
+				);
+				$new_object->_set( $number );
+				$new_object->_register();
 			}
 		} else {
 			$registered_widget_id = null;
@@ -550,8 +549,8 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		) {
 			$control   = $wp_registered_widget_controls[ $widget_id ];
 			$arguments = array();
-			if ( ! empty( $widget['number'] ) ) {
-				$arguments[0] = array( 'number' => $widget['number'] );
+			if ( ! empty( $prepared['number'] ) ) {
+				$arguments[0] = array( 'number' => $prepared['number'] );
 			}
 			ob_start();
 			call_user_func_array( $control['callback'], $arguments );
