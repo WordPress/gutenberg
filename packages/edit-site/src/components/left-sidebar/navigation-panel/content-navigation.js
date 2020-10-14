@@ -22,7 +22,7 @@ import {
 	MENU_CONTENT_POSTS,
 } from './constants';
 
-export default function ContentNavigation() {
+export default function ContentNavigation( { onActivateMenu } ) {
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 
 	const page = useSelect(
@@ -30,11 +30,16 @@ export default function ContentNavigation() {
 		[]
 	);
 
+	const handleActivateMenu = ( menu ) => {
+		setActiveMenu( menu );
+		onActivateMenu( menu );
+	};
+
 	return (
 		<Navigation
 			activeItem={ `content-${ page.path }` }
 			activeMenu={ activeMenu }
-			onActivateMenu={ setActiveMenu }
+			onActivateMenu={ handleActivateMenu }
 		>
 			<NavigationMenu title={ __( 'Content' ) }>
 				<NavigationItem
