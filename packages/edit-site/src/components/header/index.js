@@ -21,7 +21,6 @@ import { Button } from '@wordpress/components';
  * Internal dependencies
  */
 import MoreMenu from './more-menu';
-import PageSwitcher from '../page-switcher';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
@@ -35,27 +34,15 @@ export default function Header( {
 	isNavigationOpen,
 	onToggleNavigation,
 } ) {
-	const {
-		deviceType,
-		hasFixedToolbar,
-		template,
-		page,
-		showOnFront,
-	} = useSelect( ( select ) => {
+	const { deviceType, hasFixedToolbar, template } = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
 			isFeatureActive,
 			getTemplateId,
 			getTemplatePartId,
 			getTemplateType,
-			getPage,
 		} = select( 'core/edit-site' );
-
-		const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
-		const { show_on_front: _showOnFront } = getEditedEntityRecord(
-			'root',
-			'site'
-		);
+		const { getEntityRecord } = select( 'core' );
 
 		const _templateId = getTemplateId();
 		return {
@@ -65,14 +52,11 @@ export default function Header( {
 			template: getEntityRecord( 'postType', 'wp_template', _templateId ),
 			templatePartId: getTemplatePartId(),
 			templateType: getTemplateType(),
-			page: getPage(),
-			showOnFront: _showOnFront,
 		};
 	}, [] );
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-		setPage,
 	} = useDispatch( 'core/edit-site' );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -109,13 +93,6 @@ export default function Header( {
 							<BlockToolbar hideDragHandle />
 						</div>
 					) }
-					<div className="edit-site-header__toolbar-switchers">
-						<PageSwitcher
-							showOnFront={ showOnFront }
-							activePage={ page }
-							onActivePageChange={ setPage }
-						/>
-					</div>
 				</div>
 			</div>
 
