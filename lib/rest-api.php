@@ -195,6 +195,8 @@ function gutenberg_register_sidebars_and_widgets_endpoint() {
 	$sidebars = new WP_REST_Sidebars_Controller();
 	$sidebars->register_routes();
 
+	$widget_types = new WP_REST_Widget_Types_Controller();
+	$widget_types->register_routes();
 	$widgets = new WP_REST_Widgets_Controller();
 	$widgets->register_routes();
 }
