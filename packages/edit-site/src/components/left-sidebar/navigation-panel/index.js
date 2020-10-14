@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
  */
 import TemplatesMenu from './menus/templates';
 import TemplatePartsMenu from './menus/template-parts';
+import { MENU_ROOT, MENU_TEMPLATE_PARTS, MENU_TEMPLATES } from './constants';
 
 export const {
 	Fill: NavigationPanelPreviewFill,
@@ -68,7 +69,7 @@ const NavigationPanel = () => {
 				activeMenu={ activeMenu }
 				onActivateMenu={ setNavigationPanelActiveMenu }
 			>
-				{ activeMenu === 'root' && (
+				{ activeMenu === MENU_ROOT && (
 					<NavigationBackButton
 						backButtonLabel={ __( 'Dashboard' ) }
 						className="edit-site-navigation-panel__back-to-dashboard"
@@ -80,12 +81,12 @@ const NavigationPanel = () => {
 				<NavigationMenu title={ __( 'Theme' ) }>
 					<NavigationItem
 						title={ __( 'Templates' ) }
-						navigateToMenu="templates"
+						navigateToMenu={ MENU_TEMPLATES }
 					/>
 
 					<NavigationItem
 						title={ __( 'Template Parts' ) }
-						navigateToMenu="template-parts"
+						navigateToMenu={ MENU_TEMPLATE_PARTS }
 					/>
 
 					<TemplatesMenu onActivateItem={ setTemplate } />

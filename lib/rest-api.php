@@ -189,13 +189,18 @@ function gutenberg_register_plugins_endpoint() {
 add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
 
 /**
- * Registers the Sidebars REST API routes.
+ * Registers the Sidebars & Widgets REST API routes.
  */
-function gutenberg_register_sidebars_endpoint() {
+function gutenberg_register_sidebars_and_widgets_endpoint() {
 	$sidebars = new WP_REST_Sidebars_Controller();
 	$sidebars->register_routes();
+
+	$widget_types = new WP_REST_Widget_Types_Controller();
+	$widget_types->register_routes();
+	$widgets = new WP_REST_Widgets_Controller();
+	$widgets->register_routes();
 }
-add_action( 'rest_api_init', 'gutenberg_register_sidebars_endpoint' );
+add_action( 'rest_api_init', 'gutenberg_register_sidebars_and_widgets_endpoint' );
 
 /**
  * Registers the Batch REST API routes.
