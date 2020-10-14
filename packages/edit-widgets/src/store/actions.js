@@ -102,7 +102,9 @@ export function* saveWidgetAreas( widgetAreas ) {
 				KIND,
 				WIDGET_AREA_ENTITY_TYPE,
 				widgetArea.id,
-				{ widgets: newWidgets }
+				{
+					widgets: newWidgets,
+				}
 			);
 
 			yield* trySaveWidgetArea( widgetArea.id );
