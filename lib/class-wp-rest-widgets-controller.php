@@ -583,6 +583,8 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 * @return array Links for the given widget.
 	 */
 	protected function prepare_links( $prepared ) {
+		$id_base = ( ! empty( $prepared['id_base'] ) ) ? $prepared['id_base'] : $prepared['id'];
+
 		return array(
 			'collection'                => array(
 				'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ),
@@ -591,7 +593,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $prepared['id'] ) ),
 			),
 			'about'                     => array(
-				'href'       => rest_url( sprintf( 'wp/v2/widget-types/%s', $prepared['id_base'] ) ),
+				'href'       => rest_url( sprintf( 'wp/v2/widget-types/%s', $id_base ) ),
 				'embeddable' => true,
 			),
 			'https://api.w.org/sidebar' => array(
