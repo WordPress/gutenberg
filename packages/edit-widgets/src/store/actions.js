@@ -87,7 +87,7 @@ export function* saveWidgetAreas( widgetAreas ) {
 				'getEditedEntityRecord',
 				KIND,
 				POST_TYPE,
-				buildWidgetAreaPostId( widgetArea.id ),
+				buildWidgetAreaPostId( widgetArea.id )
 			);
 			const widgetsBlocks = post.blocks;
 			const newWidgets = widgetsBlocks.map( ( block ) => {
