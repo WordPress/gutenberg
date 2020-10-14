@@ -51,11 +51,12 @@ jobs:
           php bin/generate-gutenberg-php.php > gutenberg.tmp.php
           mv gutenberg.tmp.php gutenberg.php
       - name: Set build_files env var
-        run: echo ::set-env name=build_files::$(
+        run: |
+            echo 'build_files<<EOF' >> $GITHUB_ENV
             ls build/*/*.{js,css,asset.php} \
-            build/block-library/blocks/*.php build/block-library/blocks/*/block.json \
-            build/edit-widgets/blocks/*.php build/edit-widgets/blocks/*/block.json \
-          )
+              build/block-library/blocks/*.php build/block-library/blocks/*/block.json \
+              build/edit-widgets/blocks/*.php build/edit-widgets/blocks/*/block.json >> $GITHUB_ENV
+            echo 'EOF' >> $GITHUB_ENV
       - name: Create .zip archive
         run: |
           zip -r gutenberg.zip \
