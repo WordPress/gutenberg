@@ -53,7 +53,7 @@ class WP_Block_Supports {
 		$instance = self::get_instance();
 		$instance->register_attributes();
 		add_action( 'wp_footer', array( $instance, 'enqueue_styles' ) );
-		add_filter( 'render_block', array( $instance, 'inject_attributes' ), 10, 2 );
+		add_filter( 'render_block', array( $instance, 'apply_block_supports' ), 10, 2 );
 	}
 
 	/**
@@ -111,12 +111,12 @@ class WP_Block_Supports {
 				$block_type->name
 			);
 			if ( ! empty( $new_attributes ) ) {
-				$classes = $new_attributes['class'];
-				if ( empty( $output['class'] ) ) {
-					$output['class'] = '';
+				foreach ( $new_attributes as $attribute_name => $attribute_value ) {
+					if ( empty( $output[ $attribute_name ] ) ) {
+						$output[ $attribute_name ] = '';
+					}
+					$output[ $attribute_name ] .= " $attribute_value";
 				}
-
-				$output['class'] .= " $classes";
 			}
 		}
 		return $output;
@@ -129,7 +129,7 @@ class WP_Block_Supports {
 	 * @param  array  $block         Block object.
 	 * @return string                Transformed block content.
 	 */
-	public function inject_attributes( $block_content, $block ) {
+	public function apply_block_supports( $block_content, $block ) {
 		if ( ! isset( $block['attrs'] ) ) {
 			return $block_content;
 		}
@@ -142,8 +142,7 @@ class WP_Block_Supports {
 
 		$new_attributes = $this->get_new_block_attributes( $block );
 		if ( ! empty( $new_attributes ) ) {
-			// FIXME.
-			return $this->inject_classes( $block_content, $new_attributes['class'] );
+			return $this->inject_attributes( $block_content, $new_attributes );
 		}
 
 		return $block_content;
@@ -367,75 +366,48 @@ class WP_Block_Supports {
 	/**
 	 * TODO.
 	 *
-	 * @param  string $input HTML input.
-	 * @param  string $value Class(es) to insert at the root element.
-	 * @return string HTML with class(es) inserted.
+	 * @param  string $input      HTML input.
+	 * @param  array  $attributes Array of HTML attributes to insert at the
+	 *                            root element.
+	 * @return string             HTML with class(es) inserted.
 	 */
-	private function inject_classes( $input, $value ) {
-		$close_token    = '>';
-		$class_token    = 'class="';
-		$close_position = strpos( $input, $close_token );
-		$class_position = strpos( $input, $class_token );
-		// Unexpected. Bail.
-		if ( false === $close_position ) {
-			return $input;
-		}
-		// If the first HTML element in the string does not contain a `class`
-		// attribute...
-		if ( ! $class_position || $close_position < $class_position ) {
-			// then inject a new one at the end of the tag.
-			return substr_replace(
-				$input,
-				" class=\"$value\">",
-				$close_position,
-				strlen( $close_token )
-			);
-		}
-		// Otherwise, overwrite the opening of the `class` attribute in order to
-		// inject our value.
-		return substr_replace(
-			$input,
-			"class=\"$value ",
-			$class_position,
-			strlen( $class_token )
-		);
-	}
+	private function inject_attributes( $input, $attributes ) {
+		$output = $input;
 
-	/**
-	 * TODO.
-	 *
-	 * @param  string $input HTML input.
-	 * @param  string $value Inline styles to insert at the root element.
-	 * @return string HTML with styles inserted.
-	 */
-	private function inject_style( $input, $value ) {
-		$close_token    = '>';
-		$style_token    = 'style="';
-		$close_position = strpos( $input, $close_token );
-		$style_position = strpos( $input, $style_token );
-		// Unexpected. Bail.
-		if ( false === $close_position ) {
-			return $input;
-		}
-		// If the first HTML element in the string does not contain a `style`
-		// attribute...
-		if ( ! $style_position || $close_position < $style_position ) {
-			// then inject a new one at the end of the tag.
-			return substr_replace(
-				$input,
-				" style=\"$value\">",
-				$close_position,
-				strlen( $close_token )
+		foreach ( $attributes as $attribute_name => $attribute_value ) {
+			$close_token        = '>';
+			$attribute_token    = "$attribute_name=\"";
+			$close_position     = strpos( $output, $close_token );
+			$attribute_position = strpos( $output, $attribute_token );
+
+			// Unexpected. Bail.
+			if ( false === $close_position ) {
+				return $input;
+			}
+
+			// If the first HTML element in the string does not contain our
+			// attribute...
+			if ( ! $attribute_position || $close_position < $attribute_position ) {
+				// then inject a new one at the end of the tag.
+				$output = substr_replace(
+					$output,
+					" $attribute_name=\"$attribute_value\">",
+					$close_position,
+					strlen( $close_token )
+				);
+				continue;
+			}
+			// Otherwise, overwrite the opening of the attribute in order to
+			// inject our value.
+			$output = substr_replace(
+				$output,
+				"$attribute_name=\"$attribute_value ",
+				$attribute_position,
+				strlen( $attribute_token )
 			);
 		}
-		// Otherwise, overwrite the opening of the `style` attribute in order to
-		// inject our value.
-		return substr_replace(
-			$input,
-			"style=\"$value ",
-			$style_position,
-			strlen( $style_token )
-		);
+
+		return $output;
 	}
 
 	/**
