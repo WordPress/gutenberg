@@ -134,7 +134,7 @@ class WP_Block_Supports {
 			return $block_content;
 		}
 
-		$classes = gutenberg_block_supports_classes();
+		$classes = $this->get_block_classes( $block );
 		if ( ! empty( $classes ) ) {
 			return $this->inject_classes( $block_content, $classes );
 		}
