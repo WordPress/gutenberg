@@ -24,6 +24,7 @@ function register_block_core_shortcode() {
 	register_block_type_from_metadata(
 		__DIR__ . '/shortcode',
 		array(
+			'api_version'     => 2,
 			'render_callback' => 'render_block_core_shortcode',
 		)
 	);

@@ -149,6 +149,7 @@ function register_block_core_latest_comments() {
 	register_block_type_from_metadata(
 		__DIR__ . '/latest-comments',
 		array(
+			'api_version'     => 2,
 			'render_callback' => 'render_block_core_latest_comments',
 		)
 	);

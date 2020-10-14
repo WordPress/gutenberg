@@ -37,6 +37,7 @@ function register_block_core_post_comments_form() {
 	register_block_type_from_metadata(
 		__DIR__ . '/post-comments-form',
 		array(
+			'api_version'     => 2,
 			'render_callback' => 'render_block_core_post_comments_form',
 		)
 	);

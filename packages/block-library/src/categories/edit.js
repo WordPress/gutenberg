@@ -15,15 +15,15 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { InspectorControls } from '@wordpress/block-editor';
+import { useBlockProps, InspectorControls } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 
 export default function CategoriesEdit( {
 	attributes: { displayAsDropdown, showHierarchy, showPostCounts },
-	className,
 	setAttributes,
 } ) {
+	const blockProps = useBlockProps();
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
 	const { categories, isRequesting } = useSelect( ( select ) => {
 		const { getEntityRecords } = select( 'core' );
@@ -150,16 +150,19 @@ export default function CategoriesEdit( {
 		return (
 			<>
 				{ inspectorControls }
-				<Placeholder icon={ pin } label={ __( 'Categories' ) }>
-					<Spinner />
-				</Placeholder>
+				<div { ...blockProps }>
+					<Placeholder icon={ pin } label={ __( 'Categories' ) }>
+						<Spinner />
+					</Placeholder>
+				</div>
 			</>
 		);
 	}
+
 	return (
 		<>
 			{ inspectorControls }
-			<div className={ className }>
+			<div { ...blockProps }>
 				{ displayAsDropdown
 					? renderCategoryDropdown()
 					: renderCategoryList() }

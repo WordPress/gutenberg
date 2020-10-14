@@ -28,6 +28,7 @@ import {
 	BlockAlignmentToolbar,
 	BlockControls,
 	__experimentalImageSizeControl as ImageSizeControl,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
@@ -522,6 +523,16 @@ class LatestPostsEdit extends Component {
 	}
 }
 
+function LatestPostBlockWrapper( props ) {
+	const blockProps = useBlockProps();
+
+	return (
+		<div { ...blockProps }>
+			<LatestPostsEdit { ...props } />
+		</div>
+	);
+}
+
 export default withSelect( ( select, props ) => {
 	const {
 		featuredImageSizeSlug,
@@ -593,4 +604,4 @@ export default withSelect( ( select, props ) => {
 					return { ...post, featuredImageInfo };
 			  } ),
 	};
-} )( LatestPostsEdit );
+} )( LatestPostBlockWrapper );

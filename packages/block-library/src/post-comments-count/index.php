@@ -37,6 +37,7 @@ function register_block_core_post_comments_count() {
 	register_block_type_from_metadata(
 		__DIR__ . '/post-comments-count',
 		array(
+			'api_version'     => 2,
 			'attributes'      => array(
 				'className' => array(
 					'type' => 'string',

@@ -49,6 +49,7 @@ function register_block_core_post_hierarchical_terms() {
 	register_block_type_from_metadata(
 		__DIR__ . '/post-hierarchical-terms',
 		array(
+			'api_version'     => 2,
 			'render_callback' => 'render_block_core_post_hierarchical_terms',
 		)
 	);

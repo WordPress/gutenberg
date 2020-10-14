@@ -11,7 +11,10 @@
  */
 function register_block_core_post_comment() {
 	register_block_type_from_metadata(
-		__DIR__ . '/post-comment'
+		__DIR__ . '/post-comment',
+		array(
+			'api_version' => 2,
+		)
 	);
 }
 add_action( 'init', 'register_block_core_post_comment' );

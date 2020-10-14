@@ -90,6 +90,7 @@ function register_block_core_categories() {
 	register_block_type_from_metadata(
 		__DIR__ . '/categories',
 		array(
+			'api_version'     => 2,
 			'render_callback' => 'render_block_core_categories',
 		)
 	);

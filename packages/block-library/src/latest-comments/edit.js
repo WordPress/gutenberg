@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	Disabled,
 	PanelBody,
@@ -31,6 +31,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 		displayDate,
 		displayExcerpt,
 	} = attributes;
+	const blockProps = useBlockProps();
 
 	return (
 		<>
@@ -71,12 +72,14 @@ export default function LatestComments( { attributes, setAttributes } ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<Disabled>
-				<ServerSideRender
-					block="core/latest-comments"
-					attributes={ attributes }
-				/>
-			</Disabled>
+			<div { ...blockProps }>
+				<Disabled>
+					<ServerSideRender
+						block="core/latest-comments"
+						attributes={ attributes }
+					/>
+				</Disabled>
+			</div>
 		</>
 	);
 }

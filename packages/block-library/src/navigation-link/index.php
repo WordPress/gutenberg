@@ -217,6 +217,7 @@ function register_block_core_navigation_link() {
 	register_block_type_from_metadata(
 		__DIR__ . '/navigation-link',
 		array(
+			'api_version'     => 2,
 			'render_callback' => 'render_block_core_navigation_link',
 		)
 	);

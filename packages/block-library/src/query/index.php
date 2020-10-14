@@ -10,7 +10,10 @@
  */
 function register_block_core_query() {
 	register_block_type_from_metadata(
-		__DIR__ . '/query'
+		__DIR__ . '/query',
+		array(
+			'api_version' => 2,
+		)
 	);
 }
 add_action( 'init', 'register_block_core_query' );

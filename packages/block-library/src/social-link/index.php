@@ -43,6 +43,7 @@ function register_block_core_social_link() {
 	register_block_type_from_metadata(
 		__DIR__ . '/social-link',
 		array(
+			'api_version'     => 2,
 			'render_callback' => 'render_block_core_social_link',
 		)
 	);

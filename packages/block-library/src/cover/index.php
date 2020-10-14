@@ -8,6 +8,8 @@
 /**
  * Supports `playsinline` attribute server side for `core/cover`.
  *
+ * @todo Remove this file once we bump the minimum supported version to WordPress 5.5.
+ *
  * @param array  $attributes The block attributes.
  * @param string $content HTML content of the block.
  *
@@ -28,6 +30,7 @@ function register_block_core_cover() {
 	register_block_type_from_metadata(
 		__DIR__ . '/cover',
 		array(
+			'api_version'     => 2,
 			'render_callback' => 'render_block_core_cover',
 		)
 	);
