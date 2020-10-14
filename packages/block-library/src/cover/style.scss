@@ -34,13 +34,9 @@
 		background-size: auto;
 	}
 
-	&.has-background-dim {
-		background-color: $black;
-
-		&::before {
-			content: "";
-			background-color: inherit;
-		}
+	&.has-background-dim::before {
+		content: "";
+		background-color: inherit;
 	}
 
 	&.has-background-dim:not(.has-background-gradient)::before,
