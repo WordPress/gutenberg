@@ -147,6 +147,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_named_color_support() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(
 				'color' => true,
@@ -179,6 +180,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_custom_color_support() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(
 				'color' => true,
@@ -216,6 +218,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_named_link_color_support() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(
 				'color' => array(
@@ -247,6 +250,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_custom_link_color_support() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(
 				'color' => array(
@@ -278,6 +282,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_named_gradient_support() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(
 				'color' => array(
@@ -309,6 +314,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_custom_gradient_support() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(
 				'color' => array(
@@ -340,6 +346,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_color_unsupported() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(),
 			'render_callback' => true,
@@ -376,6 +383,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_named_font_size() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(
 				'fontSize' => true,
@@ -405,6 +413,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_custom_font_size() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(
 				'fontSize' => true,
@@ -434,6 +443,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_font_size_unsupported() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(),
 			'render_callback' => true,
@@ -462,6 +472,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_line_height() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(
 				'lineHeight' => true,
@@ -491,6 +502,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_line_height_unsupported() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(),
 			'render_callback' => true,
@@ -518,6 +530,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_block_alignment() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(
 				'align' => true,
@@ -547,6 +560,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_block_alignment_unsupported() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(),
 			'render_callback' => true,
@@ -574,6 +588,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_all_supported() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(
 				'color'      => array(
@@ -622,6 +637,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_one_supported() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(
 				'fontSize' => true,
@@ -663,6 +679,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_render_callback_required() {
 		$block_type_settings = array(
+			'apiVersion' => 2,
 			'attributes' => array(),
 			'supports'   => array(
 				'align'      => true,
@@ -709,6 +726,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_custom_classnames_support() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(),
 			'render_callback' => true,
@@ -736,6 +754,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_custom_classnames_support_opt_out() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(
 				'customClassName' => false,
@@ -765,6 +784,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_generatted_classnames_support_opt_out() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(
 				'className' => false,
@@ -792,6 +812,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	public function test_render_block_suppresses_warnings_without_at_suppression() {
 		$block_type_settings = array(
+			'apiVersion'      => 2,
 			'attributes'      => array(),
 			'supports'        => array(),
 			'render_callback' => true,
@@ -831,7 +852,13 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 * block attributes are escaped correctly and safely.
 	 */
 	public function test_render_block_attribute() {
-		$this->register_block_type( 'core/example', array( 'render_callback' => true ) );
+		$this->register_block_type(
+			'core/example',
+			array(
+				'apiVersion'      => 2,
+				'render_callback' => true,
+			)
+		);
 
 		$block = array(
 			'blockName' => 'core/example',
@@ -875,6 +902,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$this->register_block_type(
 			'core/example',
 			array(
+				'apiVersion'      => 2,
 				'render_callback' => function( $attributes, $content ) {
 					return $content . '<div>Appended</div>';
 				},
@@ -907,6 +935,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$this->register_block_type(
 			'core/example',
 			array(
+				'apiVersion'      => 2,
 				'render_callback' => function() {
 					return 'This is rendered as just text.';
 				},

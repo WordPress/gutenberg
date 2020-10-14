@@ -37,7 +37,7 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
 	// If no render_callback, assume styles have been previously handled.
-	if ( ! $block_type || ! $block_type->render_callback ) {
+	if ( ! $block_type || ! $block_type->apiVersion || ! $block_type->apiVersion < 2 || ! $block_type->render_callback ) {
 		return $block_content;
 	}
 
