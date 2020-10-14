@@ -78,7 +78,7 @@ const BottomSheetNavigationScreen = ( {
 		}
 	};
 	return useMemo( () => {
-		return isScrollable ? (
+		return isScrollable || isNested ? (
 			<View onLayout={ onLayout }>{ children }</View>
 		) : (
 			<ScrollView { ...listProps }>
@@ -98,7 +98,7 @@ const BottomSheetNavigationScreen = ( {
 				</TouchableHighlight>
 			</ScrollView>
 		);
-	}, [ children, isFocused, safeAreaBottomInset ] );
+	}, [ children, isFocused, safeAreaBottomInset, listProps ] );
 };
 
 export default BottomSheetNavigationScreen;
