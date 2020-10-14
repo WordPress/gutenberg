@@ -7,7 +7,9 @@ import { useSelect } from '@wordpress/data';
 
 /**
  * Warns the user if there are unsaved changes before leaving the editor.
- * Compatible with Post Editor and Site Editor.
+ *
+ * This is a duplicate of the component implemented in the editor package.
+ * Duplicated here as edit-widgets doesn't depend on editor.
  *
  * @return {WPComponent} The component.
  */
