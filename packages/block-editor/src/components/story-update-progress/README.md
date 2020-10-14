@@ -40,7 +40,7 @@ function StoryProgress( { url, id } ) {
 
 ### mediaFiles
 
-A collection of media ID that identifies the current story upload.
+A collection of media IDs that identify the current story upload.
 
 - Type: `Array`
 - Required: Yes
@@ -102,4 +102,3 @@ Callback called when the media upload is reset
 - Type: `Function`
 - Required: No
 - Platform: Mobile
-
