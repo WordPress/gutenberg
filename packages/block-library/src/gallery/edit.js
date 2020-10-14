@@ -25,7 +25,11 @@ import {
 	withNotices,
 	RangeControl,
 } from '@wordpress/components';
-import { MediaPlaceholder, InspectorControls } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	MediaPlaceholder,
+	InspectorControls,
+} from '@wordpress/block-editor';
 import { Component, Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
@@ -38,6 +42,7 @@ import { withViewportMatch } from '@wordpress/viewport';
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import Gallery from './gallery';
+import MediaAddButton from './media-add';
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
@@ -356,6 +361,7 @@ class GalleryEdit extends Component {
 		} = this.props;
 		const {
 			columns = defaultColumnsNumber( attributes ),
+			ids,
 			imageCrop,
 			images,
 			linkTo,
@@ -367,7 +373,6 @@ class GalleryEdit extends Component {
 		const mediaPlaceholder = (
 			<MediaPlaceholder
 				addToGallery={ hasImages }
-				isAppender={ hasImages }
 				className={ className }
 				disableMediaButtons={ hasImages && ! isSelected }
 				icon={ ! hasImages && sharedIcon }
@@ -396,6 +401,17 @@ class GalleryEdit extends Component {
 
 		return (
 			<>
+				<BlockControls>
+					{ hasImages && (
+						<MediaAddButton
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							images={ images }
+							onError={ this.onUploadError }
+							onSelect={ this.onSelectImages }
+							value={ ids }
+						/>
+					) }
+				</BlockControls>
 				<InspectorControls>
 					<PanelBody title={ __( 'Gallery settings' ) }>
 						{ images.length > 1 && (
@@ -436,7 +452,6 @@ class GalleryEdit extends Component {
 				<Gallery
 					{ ...this.props }
 					selectedImage={ this.state.selectedImage }
-					mediaPlaceholder={ mediaPlaceholder }
 					onMoveBackward={ this.onMoveBackward }
 					onMoveForward={ this.onMoveForward }
 					onRemoveImage={ this.onRemoveImage }
