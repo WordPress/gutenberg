@@ -31,12 +31,19 @@ export class UnsupportedBlockEdit extends Component {
 		super( props );
 		this.state = { showHelp: false };
 		this.toggleSheet = this.toggleSheet.bind( this );
+		this.closeSheet = this.closeSheet.bind( this );
 		this.requestFallback = this.requestFallback.bind( this );
 	}
 
 	toggleSheet() {
 		this.setState( {
 			showHelp: ! this.state.showHelp,
+		} );
+	}
+
+	closeSheet() {
+		this.setState( {
+			showHelp: false,
 		} );
 	}
 
@@ -123,7 +130,7 @@ export class UnsupportedBlockEdit extends Component {
 			<BottomSheet
 				isVisible={ this.state.showHelp }
 				hideHeader
-				onClose={ this.toggleSheet }
+				onClose={ this.closeSheet }
 				onModalHide={ () => {
 					if ( this.state.sendFallbackMessage ) {
 						// On iOS, onModalHide is called when the controller is still part of the hierarchy.

@@ -12,6 +12,7 @@ import {
  * Internal dependencies
  */
 import TemplateNavigationItems from '../template-navigation-items';
+import { MENU_ROOT, MENU_TEMPLATE_PARTS } from '../constants';
 
 export default function TemplatePartsMenu( { onActivateItem } ) {
 	const templateParts = useSelect( ( select ) => {
@@ -27,9 +28,9 @@ export default function TemplatePartsMenu( { onActivateItem } ) {
 
 	return (
 		<NavigationMenu
-			menu="template-parts"
+			menu={ MENU_TEMPLATE_PARTS }
 			title={ __( 'Template Parts' ) }
-			parentMenu="root"
+			parentMenu={ MENU_ROOT }
 		>
 			<TemplateNavigationItems
 				entityType="wp_template_part"
