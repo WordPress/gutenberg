@@ -29,7 +29,7 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
   >
     <WithSelect(WithDispatch(BaseOption))
       featureName="keepCaretInsideBlock"
-      help="Prevents text caret from leaving blocks to aid screen readers."
+      help="Aids screen readers by stopping text caret from leaving blocks."
       label="Contain text cursor inside block."
     />
   </Section>

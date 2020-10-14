@@ -67,7 +67,7 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 				<EnableFeature
 					featureName="keepCaretInsideBlock"
 					help={ __(
-						'Prevents text caret from leaving blocks to aid screen readers.'
+						'Aids screen readers by stopping text caret from leaving blocks.'
 					) }
 					label={ __( 'Contain text cursor inside block.' ) }
 				/>
