@@ -8,6 +8,7 @@
 	"include": [
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
+		"src/icon/**/*",
 		"src/tip/**/*",
 		"src/utils/**/*",
 		"src/visually-hidden/**/*"
