@@ -140,6 +140,8 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			foreach ( $data['widgets'] as $j => $widget ) {
 				$response->data[ $i ]['widgets'][ $j ] = rest_do_request( '/wp/v2/widgets/' . $widget )->get_data();
 			}
+
+			$response->data[ $i ]['widgets'] = array_values( $response->data[ $i ]['widgets'] );
 		}
 
 		return $response;
@@ -220,6 +222,8 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 			foreach ( $response->data['widgets'] as $i => $widget ) {
 				$response->data['widgets'][ $i ] = $widgets[ $i ];
 			}
+
+			$response->data['widgets'] = array_values( $response->data['widgets'] );
 		}
 
 		return $response;
