@@ -7,21 +7,16 @@
 	width: 100%;
 	padding-left: $header-height;
 
-	.edit-site-header_start {
-		// The 335px flex basis and 0 flex-shrink prevents the left and
-		// right toolbar from collapsing when shrinking the viewport
+	.edit-site-header_start,
+	.edit-site-header_end {
 		flex: 1 0;
 		display: flex;
-		flex-basis: calc(335px - #{$header-height});
 	}
 
-	.edit-site-header_end {
-		// The 335px flex basis and 0 flex-shrink prevents the left and
-		// right toolbar from collapsing when shrinking the viewport
-		flex: 1 0;
-		display: flex;
-		flex-basis: 335px;
-		justify-content: flex-end;
+	.edit-site-header_start {
+		// Flex basis prevents the header_start toolbar
+		// from collapsing when shrinking the viewport.
+		flex-basis: calc(#{$header-toolbar-min-width} - #{$header-height});
 	}
 
 	.edit-site-header_center {
@@ -35,6 +30,13 @@
 		// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
 		min-width: 0;
 	}
+
+	.edit-site-header_end {
+		// Flex basis prevents the header_end toolbar
+		// from collapsing when shrinking the viewport
+		flex-basis: $header-toolbar-min-width;
+		justify-content: flex-end;
+	}
 }
 
 // Keeps the document title centered when the sidebar is open
@@ -43,7 +45,7 @@ body.is-navigation-sidebar-open {
 		padding-left: 0;
 
 		.edit-site-header_start {
-			flex-basis: 335px;
+			flex-basis: $header-toolbar-min-width;
 		}
 	}
 }
