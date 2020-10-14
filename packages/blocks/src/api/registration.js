@@ -192,7 +192,7 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 	if ( select( 'core/blocks' ).getBlockType( name ) ) {
-		console.error( 'Block "' + name + '" is already registered.' );
+		console.error( `Block "${ name }" is already registered.` );
 		return;
 	}
 
@@ -247,22 +247,22 @@ export function registerBlockType( name, settings ) {
 		} )
 	) {
 		console.warn(
-			'The block "' +
-				name +
-				'" is registered with an invalid category "' +
-				settings.category +
-				'".'
+			`The block "${ name }" is registered with an invalid category "${ settings.category }".`
 		);
 		delete settings.category;
 	}
 
 	if ( ! ( 'title' in settings ) || settings.title === '' ) {
-		console.error( 'The block "' + name + '" must have a title.' );
+		console.error( `The block "${ name }" must have a title.` );
 		return;
 	}
 	if ( typeof settings.title !== 'string' ) {
 		console.error( 'Block titles must be strings.' );
 		return;
+	}
+
+	if ( settings.variations?.length ) {
+		settings.attributes.fromVariation = { type: 'string' };
 	}
 
 	settings.icon = normalizeIconObject( settings.icon );
