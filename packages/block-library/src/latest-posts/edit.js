@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Component, RawHTML } from '@wordpress/element';
+import { useState, RawHTML, useEffect, useRef } from '@wordpress/element';
 import {
 	BaseControl,
 	PanelBody,
@@ -28,6 +28,7 @@ import {
 	BlockAlignmentToolbar,
 	BlockControls,
 	__experimentalImageSizeControl as ImageSizeControl,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { withSelect } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
@@ -51,475 +52,463 @@ const USERS_LIST_QUERY = {
 	per_page: -1,
 };
 
-class LatestPostsEdit extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			categoriesList: [],
-			authorList: [],
-		};
-	}
+function LatestPostsEdit( {
+	attributes,
+	setAttributes,
+	imageSizeOptions,
+	latestPosts,
+	defaultImageWidth,
+	defaultImageHeight,
+} ) {
+	const [ categoriesList, setCategoriesList ] = useState( [] );
+	const [ authorList, setAuthorList ] = useState( [] );
+	const {
+		displayFeaturedImage,
+		displayPostContentRadio,
+		displayPostContent,
+		displayPostDate,
+		displayAuthor,
+		postLayout,
+		columns,
+		order,
+		orderBy,
+		categories,
+		selectedAuthor,
+		postsToShow,
+		excerptLength,
+		featuredImageAlign,
+		featuredImageSizeSlug,
+		featuredImageSizeWidth,
+		featuredImageSizeHeight,
+		addLinkToFeaturedImage,
+	} = attributes;
+	const categorySuggestions = categoriesList.reduce(
+		( accumulator, category ) => ( {
+			...accumulator,
+			[ category.name ]: category,
+		} ),
+		{}
+	);
+	const selectCategories = ( tokens ) => {
+		const hasNoSuggestion = tokens.some(
+			( token ) =>
+				typeof token === 'string' && ! categorySuggestions[ token ]
+		);
+		if ( hasNoSuggestion ) {
+			return;
+		}
+		// Categories that are already will be objects, while new additions will be strings (the name).
+		// allCategories nomalizes the array so that they are all objects.
+		const allCategories = tokens.map( ( token ) => {
+			return typeof token === 'string'
+				? categorySuggestions[ token ]
+				: token;
+		} );
+		// We do nothing if the category is not selected
+		// from suggestions.
+		if ( includes( allCategories, null ) ) {
+			return false;
+		}
+		setAttributes( { categories: allCategories } );
+	};
 
-	componentDidMount() {
-		this.isStillMounted = true;
-		this.fetchRequest = apiFetch( {
+	const isStillMounted = useRef();
+
+	useEffect( () => {
+		isStillMounted.current = true;
+
+		apiFetch( {
 			path: addQueryArgs( `/wp/v2/categories`, CATEGORIES_LIST_QUERY ),
 		} )
-			.then( ( categoriesList ) => {
-				if ( this.isStillMounted ) {
-					this.setState( { categoriesList } );
+			.then( ( data ) => {
+				if ( isStillMounted.current ) {
+					setCategoriesList( data );
 				}
 			} )
 			.catch( () => {
-				if ( this.isStillMounted ) {
-					this.setState( { categoriesList: [] } );
+				if ( isStillMounted.current ) {
+					setCategoriesList( [] );
 				}
 			} );
-		this.fetchRequest = apiFetch( {
+		apiFetch( {
 			path: addQueryArgs( `/wp/v2/users`, USERS_LIST_QUERY ),
 		} )
-			.then( ( authorList ) => {
-				if ( this.isStillMounted ) {
-					this.setState( { authorList } );
+			.then( ( data ) => {
+				if ( isStillMounted.current ) {
+					setAuthorList( data );
 				}
 			} )
 			.catch( () => {
-				if ( this.isStillMounted ) {
-					this.setState( { authorList: [] } );
+				if ( isStillMounted.current ) {
+					setAuthorList( [] );
 				}
 			} );
-	}
 
-	componentWillUnmount() {
-		this.isStillMounted = false;
-	}
-
-	render() {
-		const {
-			attributes,
-			setAttributes,
-			imageSizeOptions,
-			latestPosts,
-			defaultImageWidth,
-			defaultImageHeight,
-		} = this.props;
-		const { categoriesList, authorList } = this.state;
-		const {
-			displayFeaturedImage,
-			displayPostContentRadio,
-			displayPostContent,
-			displayPostDate,
-			displayAuthor,
-			postLayout,
-			columns,
-			order,
-			orderBy,
-			categories,
-			selectedAuthor,
-			postsToShow,
-			excerptLength,
-			featuredImageAlign,
-			featuredImageSizeSlug,
-			featuredImageSizeWidth,
-			featuredImageSizeHeight,
-			addLinkToFeaturedImage,
-		} = attributes;
-		const categorySuggestions = categoriesList.reduce(
-			( accumulator, category ) => ( {
-				...accumulator,
-				[ category.name ]: category,
-			} ),
-			{}
-		);
-		const selectCategories = ( tokens ) => {
-			const hasNoSuggestion = tokens.some(
-				( token ) =>
-					typeof token === 'string' && ! categorySuggestions[ token ]
-			);
-			if ( hasNoSuggestion ) {
-				return;
-			}
-			// Categories that are already will be objects, while new additions will be strings (the name).
-			// allCategories nomalizes the array so that they are all objects.
-			const allCategories = tokens.map( ( token ) => {
-				return typeof token === 'string'
-					? categorySuggestions[ token ]
-					: token;
-			} );
-			// We do nothing if the category is not selected
-			// from suggestions.
-			if ( includes( allCategories, null ) ) {
-				return false;
-			}
-			setAttributes( { categories: allCategories } );
+		return () => {
+			isStillMounted.current = false;
 		};
+	}, [] );
 
-		const inspectorControls = (
-			<InspectorControls>
-				<PanelBody title={ __( 'Post content settings' ) }>
-					<ToggleControl
-						label={ __( 'Post content' ) }
-						checked={ displayPostContent }
+	const inspectorControls = (
+		<InspectorControls>
+			<PanelBody title={ __( 'Post content settings' ) }>
+				<ToggleControl
+					label={ __( 'Post content' ) }
+					checked={ displayPostContent }
+					onChange={ ( value ) =>
+						setAttributes( { displayPostContent: value } )
+					}
+				/>
+				{ displayPostContent && (
+					<RadioControl
+						label={ __( 'Show:' ) }
+						selected={ displayPostContentRadio }
+						options={ [
+							{ label: __( 'Excerpt' ), value: 'excerpt' },
+							{
+								label: __( 'Full post' ),
+								value: 'full_post',
+							},
+						] }
 						onChange={ ( value ) =>
-							setAttributes( { displayPostContent: value } )
+							setAttributes( {
+								displayPostContentRadio: value,
+							} )
 						}
 					/>
-					{ displayPostContent && (
-						<RadioControl
-							label={ __( 'Show:' ) }
-							selected={ displayPostContentRadio }
-							options={ [
-								{ label: __( 'Excerpt' ), value: 'excerpt' },
-								{
-									label: __( 'Full post' ),
-									value: 'full_post',
-								},
-							] }
+				) }
+				{ displayPostContent &&
+					displayPostContentRadio === 'excerpt' && (
+						<RangeControl
+							label={ __( 'Max number of words in excerpt' ) }
+							value={ excerptLength }
 							onChange={ ( value ) =>
+								setAttributes( { excerptLength: value } )
+							}
+							min={ MIN_EXCERPT_LENGTH }
+							max={ MAX_EXCERPT_LENGTH }
+						/>
+					) }
+			</PanelBody>
+
+			<PanelBody title={ __( 'Post meta settings' ) }>
+				<ToggleControl
+					label={ __( 'Display author name' ) }
+					checked={ displayAuthor }
+					onChange={ ( value ) =>
+						setAttributes( { displayAuthor: value } )
+					}
+				/>
+				<ToggleControl
+					label={ __( 'Display post date' ) }
+					checked={ displayPostDate }
+					onChange={ ( value ) =>
+						setAttributes( { displayPostDate: value } )
+					}
+				/>
+			</PanelBody>
+
+			<PanelBody title={ __( 'Featured image settings' ) }>
+				<ToggleControl
+					label={ __( 'Display featured image' ) }
+					checked={ displayFeaturedImage }
+					onChange={ ( value ) =>
+						setAttributes( { displayFeaturedImage: value } )
+					}
+				/>
+				{ displayFeaturedImage && (
+					<>
+						<ImageSizeControl
+							onChange={ ( value ) => {
+								const newAttrs = {};
+								if ( value.hasOwnProperty( 'width' ) ) {
+									newAttrs.featuredImageSizeWidth =
+										value.width;
+								}
+								if ( value.hasOwnProperty( 'height' ) ) {
+									newAttrs.featuredImageSizeHeight =
+										value.height;
+								}
+								setAttributes( newAttrs );
+							} }
+							slug={ featuredImageSizeSlug }
+							width={ featuredImageSizeWidth }
+							height={ featuredImageSizeHeight }
+							imageWidth={ defaultImageWidth }
+							imageHeight={ defaultImageHeight }
+							imageSizeOptions={ imageSizeOptions }
+							onChangeImage={ ( value ) =>
 								setAttributes( {
-									displayPostContentRadio: value,
+									featuredImageSizeSlug: value,
+									featuredImageSizeWidth: undefined,
+									featuredImageSizeHeight: undefined,
 								} )
 							}
 						/>
-					) }
-					{ displayPostContent &&
-						displayPostContentRadio === 'excerpt' && (
-							<RangeControl
-								label={ __( 'Max number of words in excerpt' ) }
-								value={ excerptLength }
-								onChange={ ( value ) =>
-									setAttributes( { excerptLength: value } )
-								}
-								min={ MIN_EXCERPT_LENGTH }
-								max={ MAX_EXCERPT_LENGTH }
-							/>
-						) }
-				</PanelBody>
-
-				<PanelBody title={ __( 'Post meta settings' ) }>
-					<ToggleControl
-						label={ __( 'Display author name' ) }
-						checked={ displayAuthor }
-						onChange={ ( value ) =>
-							setAttributes( { displayAuthor: value } )
-						}
-					/>
-					<ToggleControl
-						label={ __( 'Display post date' ) }
-						checked={ displayPostDate }
-						onChange={ ( value ) =>
-							setAttributes( { displayPostDate: value } )
-						}
-					/>
-				</PanelBody>
-
-				<PanelBody title={ __( 'Featured image settings' ) }>
-					<ToggleControl
-						label={ __( 'Display featured image' ) }
-						checked={ displayFeaturedImage }
-						onChange={ ( value ) =>
-							setAttributes( { displayFeaturedImage: value } )
-						}
-					/>
-					{ displayFeaturedImage && (
-						<>
-							<ImageSizeControl
-								onChange={ ( value ) => {
-									const newAttrs = {};
-									if ( value.hasOwnProperty( 'width' ) ) {
-										newAttrs.featuredImageSizeWidth =
-											value.width;
-									}
-									if ( value.hasOwnProperty( 'height' ) ) {
-										newAttrs.featuredImageSizeHeight =
-											value.height;
-									}
-									setAttributes( newAttrs );
-								} }
-								slug={ featuredImageSizeSlug }
-								width={ featuredImageSizeWidth }
-								height={ featuredImageSizeHeight }
-								imageWidth={ defaultImageWidth }
-								imageHeight={ defaultImageHeight }
-								imageSizeOptions={ imageSizeOptions }
-								onChangeImage={ ( value ) =>
-									setAttributes( {
-										featuredImageSizeSlug: value,
-										featuredImageSizeWidth: undefined,
-										featuredImageSizeHeight: undefined,
-									} )
-								}
-							/>
-							<BaseControl className="block-editor-image-alignment-control__row">
-								<BaseControl.VisualLabel>
-									{ __( 'Image alignment' ) }
-								</BaseControl.VisualLabel>
-								<BlockAlignmentToolbar
-									value={ featuredImageAlign }
-									onChange={ ( value ) =>
-										setAttributes( {
-											featuredImageAlign: value,
-										} )
-									}
-									controls={ [ 'left', 'center', 'right' ] }
-									isCollapsed={ false }
-								/>
-							</BaseControl>
-							<ToggleControl
-								label={ __( 'Add link to featured image' ) }
-								checked={ addLinkToFeaturedImage }
+						<BaseControl className="block-editor-image-alignment-control__row">
+							<BaseControl.VisualLabel>
+								{ __( 'Image alignment' ) }
+							</BaseControl.VisualLabel>
+							<BlockAlignmentToolbar
+								value={ featuredImageAlign }
 								onChange={ ( value ) =>
 									setAttributes( {
-										addLinkToFeaturedImage: value,
+										featuredImageAlign: value,
 									} )
 								}
+								controls={ [ 'left', 'center', 'right' ] }
+								isCollapsed={ false }
 							/>
-						</>
-					) }
-				</PanelBody>
-
-				<PanelBody title={ __( 'Sorting and filtering' ) }>
-					<QueryControls
-						{ ...{ order, orderBy } }
-						numberOfItems={ postsToShow }
-						onOrderChange={ ( value ) =>
-							setAttributes( { order: value } )
-						}
-						onOrderByChange={ ( value ) =>
-							setAttributes( { orderBy: value } )
-						}
-						onNumberOfItemsChange={ ( value ) =>
-							setAttributes( { postsToShow: value } )
-						}
-						categorySuggestions={ categorySuggestions }
-						onCategoryChange={ selectCategories }
-						selectedCategories={ categories }
-						onAuthorChange={ ( value ) =>
-							setAttributes( {
-								selectedAuthor:
-									'' !== value ? Number( value ) : undefined,
-							} )
-						}
-						authorList={ authorList }
-						selectedAuthorId={ selectedAuthor }
-					/>
-
-					{ postLayout === 'grid' && (
-						<RangeControl
-							label={ __( 'Columns' ) }
-							value={ columns }
+						</BaseControl>
+						<ToggleControl
+							label={ __( 'Add link to featured image' ) }
+							checked={ addLinkToFeaturedImage }
 							onChange={ ( value ) =>
-								setAttributes( { columns: value } )
+								setAttributes( {
+									addLinkToFeaturedImage: value,
+								} )
 							}
-							min={ 2 }
-							max={
-								! hasPosts
-									? MAX_POSTS_COLUMNS
-									: Math.min(
-											MAX_POSTS_COLUMNS,
-											latestPosts.length
-									  )
-							}
-							required
 						/>
-					) }
-				</PanelBody>
-			</InspectorControls>
-		);
+					</>
+				) }
+			</PanelBody>
 
-		const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
-		if ( ! hasPosts ) {
-			return (
-				<>
-					{ inspectorControls }
-					<Placeholder icon={ pin } label={ __( 'Latest Posts' ) }>
-						{ ! Array.isArray( latestPosts ) ? (
-							<Spinner />
-						) : (
-							__( 'No posts found.' )
-						) }
-					</Placeholder>
-				</>
-			);
-		}
+			<PanelBody title={ __( 'Sorting and filtering' ) }>
+				<QueryControls
+					{ ...{ order, orderBy } }
+					numberOfItems={ postsToShow }
+					onOrderChange={ ( value ) =>
+						setAttributes( { order: value } )
+					}
+					onOrderByChange={ ( value ) =>
+						setAttributes( { orderBy: value } )
+					}
+					onNumberOfItemsChange={ ( value ) =>
+						setAttributes( { postsToShow: value } )
+					}
+					categorySuggestions={ categorySuggestions }
+					onCategoryChange={ selectCategories }
+					selectedCategories={ categories }
+					onAuthorChange={ ( value ) =>
+						setAttributes( {
+							selectedAuthor:
+								'' !== value ? Number( value ) : undefined,
+						} )
+					}
+					authorList={ authorList }
+					selectedAuthorId={ selectedAuthor }
+				/>
 
-		// Removing posts from display should be instant.
-		const displayPosts =
-			latestPosts.length > postsToShow
-				? latestPosts.slice( 0, postsToShow )
-				: latestPosts;
+				{ postLayout === 'grid' && (
+					<RangeControl
+						label={ __( 'Columns' ) }
+						value={ columns }
+						onChange={ ( value ) =>
+							setAttributes( { columns: value } )
+						}
+						min={ 2 }
+						max={
+							! hasPosts
+								? MAX_POSTS_COLUMNS
+								: Math.min(
+										MAX_POSTS_COLUMNS,
+										latestPosts.length
+								  )
+						}
+						required
+					/>
+				) }
+			</PanelBody>
+		</InspectorControls>
+	);
 
-		const layoutControls = [
-			{
-				icon: list,
-				title: __( 'List view' ),
-				onClick: () => setAttributes( { postLayout: 'list' } ),
-				isActive: postLayout === 'list',
-			},
-			{
-				icon: grid,
-				title: __( 'Grid view' ),
-				onClick: () => setAttributes( { postLayout: 'grid' } ),
-				isActive: postLayout === 'grid',
-			},
-		];
+	const blockProps = useBlockProps();
 
-		const dateFormat = __experimentalGetSettings().formats.date;
-
+	const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
+	if ( ! hasPosts ) {
 		return (
-			<>
+			<div { ...blockProps }>
 				{ inspectorControls }
-				<BlockControls>
-					<ToolbarGroup controls={ layoutControls } />
-				</BlockControls>
-				<ul
-					className={ classnames( this.props.className, {
-						'wp-block-latest-posts__list': true,
-						'is-grid': postLayout === 'grid',
-						'has-dates': displayPostDate,
-						'has-author': displayAuthor,
-						[ `columns-${ columns }` ]: postLayout === 'grid',
-					} ) }
-				>
-					{ displayPosts.map( ( post, i ) => {
-						const titleTrimmed = invoke( post, [
-							'title',
-							'rendered',
-							'trim',
-						] );
-						let excerpt = post.excerpt.rendered;
-						const currentAuthor = authorList.find(
-							( author ) => author.id === post.author
-						);
-
-						const excerptElement = document.createElement( 'div' );
-						excerptElement.innerHTML = excerpt;
-
-						excerpt =
-							excerptElement.textContent ||
-							excerptElement.innerText ||
-							'';
-
-						const {
-							featuredImageInfo: {
-								url: imageSourceUrl,
-								alt: featuredImageAlt,
-							} = {},
-						} = post;
-						const imageClasses = classnames( {
-							'wp-block-latest-posts__featured-image': true,
-							[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
-						} );
-						const renderFeaturedImage =
-							displayFeaturedImage && imageSourceUrl;
-						const featuredImage = renderFeaturedImage && (
-							<img
-								src={ imageSourceUrl }
-								alt={ featuredImageAlt }
-								style={ {
-									maxWidth: featuredImageSizeWidth,
-									maxHeight: featuredImageSizeHeight,
-								} }
-							/>
-						);
-
-						const needsReadMore =
-							excerptLength <
-								excerpt.trim().split( ' ' ).length &&
-							post.excerpt.raw === '';
-
-						const postExcerpt = needsReadMore ? (
-							<>
-								{ excerpt
-									.trim()
-									.split( ' ', excerptLength )
-									.join( ' ' ) }
-								{ /* translators: excerpt truncation character, default …  */ }
-								{ __( ' … ' ) }
-								<a
-									href={ post.link }
-									target="_blank"
-									rel="noopener noreferrer"
-								>
-									{ __( 'Read more' ) }
-								</a>
-							</>
-						) : (
-							excerpt
-						);
-
-						return (
-							<li key={ i }>
-								{ renderFeaturedImage && (
-									<div className={ imageClasses }>
-										{ addLinkToFeaturedImage ? (
-											<a
-												href={ post.link }
-												target="_blank"
-												rel="noreferrer noopener"
-											>
-												{ featuredImage }
-											</a>
-										) : (
-											featuredImage
-										) }
-									</div>
-								) }
-								<a
-									href={ post.link }
-									target="_blank"
-									rel="noreferrer noopener"
-								>
-									{ titleTrimmed ? (
-										<RawHTML>{ titleTrimmed }</RawHTML>
-									) : (
-										__( '(no title)' )
-									) }
-								</a>
-								{ displayAuthor && currentAuthor && (
-									<div className="wp-block-latest-posts__post-author">
-										{ sprintf(
-											/* translators: byline. %s: current author. */
-											__( 'by %s' ),
-											currentAuthor.name
-										) }
-									</div>
-								) }
-								{ displayPostDate && post.date_gmt && (
-									<time
-										dateTime={ format(
-											'c',
-											post.date_gmt
-										) }
-										className="wp-block-latest-posts__post-date"
-									>
-										{ dateI18n(
-											dateFormat,
-											post.date_gmt
-										) }
-									</time>
-								) }
-								{ displayPostContent &&
-									displayPostContentRadio === 'excerpt' && (
-										<div className="wp-block-latest-posts__post-excerpt">
-											{ postExcerpt }
-										</div>
-									) }
-								{ displayPostContent &&
-									displayPostContentRadio === 'full_post' && (
-										<div className="wp-block-latest-posts__post-full-content">
-											<RawHTML key="html">
-												{ post.content.raw.trim() }
-											</RawHTML>
-										</div>
-									) }
-							</li>
-						);
-					} ) }
-				</ul>
-			</>
+				<Placeholder icon={ pin } label={ __( 'Latest Posts' ) }>
+					{ ! Array.isArray( latestPosts ) ? (
+						<Spinner />
+					) : (
+						__( 'No posts found.' )
+					) }
+				</Placeholder>
+			</div>
 		);
 	}
+
+	// Removing posts from display should be instant.
+	const displayPosts =
+		latestPosts.length > postsToShow
+			? latestPosts.slice( 0, postsToShow )
+			: latestPosts;
+
+	const layoutControls = [
+		{
+			icon: list,
+			title: __( 'List view' ),
+			onClick: () => setAttributes( { postLayout: 'list' } ),
+			isActive: postLayout === 'list',
+		},
+		{
+			icon: grid,
+			title: __( 'Grid view' ),
+			onClick: () => setAttributes( { postLayout: 'grid' } ),
+			isActive: postLayout === 'grid',
+		},
+	];
+
+	const dateFormat = __experimentalGetSettings().formats.date;
+
+	return (
+		<div { ...blockProps }>
+			{ inspectorControls }
+			<BlockControls>
+				<ToolbarGroup controls={ layoutControls } />
+			</BlockControls>
+			<ul
+				className={ classnames( {
+					'wp-block-latest-posts__list': true,
+					'is-grid': postLayout === 'grid',
+					'has-dates': displayPostDate,
+					'has-author': displayAuthor,
+					[ `columns-${ columns }` ]: postLayout === 'grid',
+				} ) }
+			>
+				{ displayPosts.map( ( post, i ) => {
+					const titleTrimmed = invoke( post, [
+						'title',
+						'rendered',
+						'trim',
+					] );
+					let excerpt = post.excerpt.rendered;
+					const currentAuthor = authorList.find(
+						( author ) => author.id === post.author
+					);
+
+					const excerptElement = document.createElement( 'div' );
+					excerptElement.innerHTML = excerpt;
+
+					excerpt =
+						excerptElement.textContent ||
+						excerptElement.innerText ||
+						'';
+
+					const {
+						featuredImageInfo: {
+							url: imageSourceUrl,
+							alt: featuredImageAlt,
+						} = {},
+					} = post;
+					const imageClasses = classnames( {
+						'wp-block-latest-posts__featured-image': true,
+						[ `align${ featuredImageAlign }` ]: !! featuredImageAlign,
+					} );
+					const renderFeaturedImage =
+						displayFeaturedImage && imageSourceUrl;
+					const featuredImage = renderFeaturedImage && (
+						<img
+							src={ imageSourceUrl }
+							alt={ featuredImageAlt }
+							style={ {
+								maxWidth: featuredImageSizeWidth,
+								maxHeight: featuredImageSizeHeight,
+							} }
+						/>
+					);
+
+					const needsReadMore =
+						excerptLength < excerpt.trim().split( ' ' ).length &&
+						post.excerpt.raw === '';
+
+					const postExcerpt = needsReadMore ? (
+						<>
+							{ excerpt
+								.trim()
+								.split( ' ', excerptLength )
+								.join( ' ' ) }
+							{ /* translators: excerpt truncation character, default …  */ }
+							{ __( ' … ' ) }
+							<a
+								href={ post.link }
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{ __( 'Read more' ) }
+							</a>
+						</>
+					) : (
+						excerpt
+					);
+
+					return (
+						<li key={ i }>
+							{ renderFeaturedImage && (
+								<div className={ imageClasses }>
+									{ addLinkToFeaturedImage ? (
+										<a
+											href={ post.link }
+											target="_blank"
+											rel="noreferrer noopener"
+										>
+											{ featuredImage }
+										</a>
+									) : (
+										featuredImage
+									) }
+								</div>
+							) }
+							<a
+								href={ post.link }
+								target="_blank"
+								rel="noreferrer noopener"
+							>
+								{ titleTrimmed ? (
+									<RawHTML>{ titleTrimmed }</RawHTML>
+								) : (
+									__( '(no title)' )
+								) }
+							</a>
+							{ displayAuthor && currentAuthor && (
+								<div className="wp-block-latest-posts__post-author">
+									{ sprintf(
+										/* translators: byline. %s: current author. */
+										__( 'by %s' ),
+										currentAuthor.name
+									) }
+								</div>
+							) }
+							{ displayPostDate && post.date_gmt && (
+								<time
+									dateTime={ format( 'c', post.date_gmt ) }
+									className="wp-block-latest-posts__post-date"
+								>
+									{ dateI18n( dateFormat, post.date_gmt ) }
+								</time>
+							) }
+							{ displayPostContent &&
+								displayPostContentRadio === 'excerpt' && (
+									<div className="wp-block-latest-posts__post-excerpt">
+										{ postExcerpt }
+									</div>
+								) }
+							{ displayPostContent &&
+								displayPostContentRadio === 'full_post' && (
+									<div className="wp-block-latest-posts__post-full-content">
+										<RawHTML key="html">
+											{ post.content.raw.trim() }
+										</RawHTML>
+									</div>
+								) }
+						</li>
+					);
+				} ) }
+			</ul>
+		</div>
+	);
 }
 
 export default withSelect( ( select, props ) => {
