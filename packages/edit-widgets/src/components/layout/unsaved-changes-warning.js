@@ -14,7 +14,7 @@ import { useSelect } from '@wordpress/data';
  * @return {WPComponent} The component.
  */
 export default function UnsavedChangesWarning() {
-	const isDirty = useSelect( ( select ) => {
+	const getIsDirty = useSelect( ( select ) => {
 		return () => {
 			const { __experimentalGetDirtyEntityRecords } = select( 'core' );
 			const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
@@ -35,7 +35,7 @@ export default function UnsavedChangesWarning() {
 			// conditions with `BrowserURL` where `componentDidUpdate` gets the
 			// new value of `isEditedPostDirty` before this component does,
 			// causing this component to incorrectly think a trashed post is still dirty.
-			if ( isDirty() ) {
+			if ( getIsDirty() ) {
 				event.returnValue = __(
 					'You have unsaved changes. If you proceed, they will be lost.'
 				);
@@ -48,7 +48,7 @@ export default function UnsavedChangesWarning() {
 		return () => {
 			window.removeEventListener( 'beforeunload', warnIfUnsavedChanges );
 		};
-	}, [ isDirty ] );
+	}, [ getIsDirty ] );
 
 	return null;
 }
