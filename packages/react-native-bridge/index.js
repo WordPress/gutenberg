@@ -71,6 +71,10 @@ export function subscribeMediaUpload( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaUpload', callback );
 }
 
+export function subscribeMediaSave( callback ) {
+	return gutenbergBridgeEvents.addListener( 'mediaSave', callback );
+}
+
 export function subscribeMediaAppend( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaAppend', callback );
 }
@@ -175,6 +179,10 @@ export function mediaUploadSync() {
 	return RNReactNativeGutenbergBridge.mediaUploadSync();
 }
 
+export function mediaSaveSync() {
+	return RNReactNativeGutenbergBridge.mediaSaveSync();
+}
+
 export function requestImageFailedRetryDialog( mediaId ) {
 	return RNReactNativeGutenbergBridge.requestImageFailedRetryDialog(
 		mediaId
@@ -244,8 +252,8 @@ export function setStarterPageTemplatesTooltipShown( tooltipShown ) {
 	);
 }
 
-export function requestStoryCreatorLoad( mediaFiles, blockClientId ) {
-	return RNReactNativeGutenbergBridge.requestStoryCreatorLoad(
+export function requestMediaFilesEditorLoad( mediaFiles, blockClientId ) {
+	return RNReactNativeGutenbergBridge.requestMediaFilesEditorLoad(
 		mediaFiles,
 		blockClientId
 	);

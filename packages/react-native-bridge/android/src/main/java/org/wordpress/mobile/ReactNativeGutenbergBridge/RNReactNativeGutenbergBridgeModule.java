@@ -49,11 +49,13 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
     private static final String MAP_KEY_UPDATE_TITLE = "title";
+    public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_NEW_ID = "newId";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID = "mediaId";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL = "mediaUrl";
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE = "mediaType";
     private static final String MAP_KEY_THEME_UPDATE_COLORS = "colors";
     private static final String MAP_KEY_THEME_UPDATE_GRADIENTS = "gradients";
+    public static final String MAP_KEY_MEDIA_FINAL_SAVE_RESULT = "mediaFinalSaveResult";
 
     private static final String MAP_KEY_IS_PREFERRED_COLOR_SCHEME_DARK = "isPreferredColorSchemeDark";
 
@@ -196,6 +198,11 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
+    public void mediaSaveSync() {
+        mGutenbergBridgeJS2Parent.mediaSaveSync(getNewMediaSelectedCallback(true,null));
+    }
+
+    @ReactMethod
     public void requestImageFailedRetryDialog(final int mediaId) {
         mGutenbergBridgeJS2Parent.requestImageFailedRetryDialog(mediaId);
     }
@@ -221,8 +228,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void requestStoryCreatorLoad(ReadableArray mediaFiles, String blockId) {
-        mGutenbergBridgeJS2Parent.requestStoryCreatorLoad((savedMediaFiles, savedBlockId) ->
+    public void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId) {
+        mGutenbergBridgeJS2Parent.requestMediaFilesEditorLoad((savedMediaFiles, savedBlockId) ->
                 replaceBlock(savedMediaFiles, savedBlockId), mediaFiles, blockId);
     }
 
