@@ -8,13 +8,14 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import NavigationEntityItems from '../navigation-entity-items';
+import { MENU_CONTENT_CATEGORIES, MENU_ROOT } from '../constants';
 
 export default function ContentCategoriesMenu() {
 	return (
 		<NavigationMenu
-			menu="content-categories"
+			menu={ MENU_CONTENT_CATEGORIES }
 			title={ __( 'Categories' ) }
-			parentMenu="root"
+			parentMenu={ MENU_ROOT }
 		>
 			<NavigationEntityItems kind="taxonomy" name="category" />
 		</NavigationMenu>

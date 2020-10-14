@@ -16,6 +16,11 @@ import { __ } from '@wordpress/i18n';
 import ContentPagesMenu from './menus/content-pages';
 import ContentCategoriesMenu from './menus/content-categories';
 import ContentPostsMenu from './menus/content-posts';
+import {
+	MENU_CONTENT_CATEGORIES,
+	MENU_CONTENT_PAGES,
+	MENU_CONTENT_POSTS,
+} from './constants';
 
 export default function ContentNavigation() {
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
@@ -34,17 +39,17 @@ export default function ContentNavigation() {
 			<NavigationMenu title={ __( 'Content' ) }>
 				<NavigationItem
 					title={ __( 'Pages' ) }
-					navigateToMenu="content-pages"
+					navigateToMenu={ MENU_CONTENT_PAGES }
 				/>
 
 				<NavigationItem
 					title={ __( 'Categories' ) }
-					navigateToMenu="content-categories"
+					navigateToMenu={ MENU_CONTENT_CATEGORIES }
 				/>
 
 				<NavigationItem
 					title={ __( 'Posts' ) }
-					navigateToMenu="content-posts"
+					navigateToMenu={ MENU_CONTENT_POSTS }
 				/>
 			</NavigationMenu>
 

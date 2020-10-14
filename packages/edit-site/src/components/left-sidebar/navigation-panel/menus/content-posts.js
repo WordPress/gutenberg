@@ -12,6 +12,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import NavigationEntityItems from '../navigation-entity-items';
+import { MENU_CONTENT_POSTS, MENU_ROOT } from '../constants';
 
 export default function ContentPostsMenu() {
 	const showOnFront = useSelect(
@@ -36,9 +37,9 @@ export default function ContentPostsMenu() {
 
 	return (
 		<NavigationMenu
-			menu="content-posts"
+			menu={ MENU_CONTENT_POSTS }
 			title={ __( 'Posts' ) }
-			parentMenu="root"
+			parentMenu={ MENU_ROOT }
 		>
 			{ showOnFront === 'posts' && (
 				<NavigationItem

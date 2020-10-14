@@ -8,13 +8,14 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import NavigationEntityItems from '../navigation-entity-items';
+import { MENU_CONTENT_PAGES, MENU_ROOT } from '../constants';
 
 export default function ContentPagesMenu() {
 	return (
 		<NavigationMenu
-			menu="content-pages"
+			menu={ MENU_CONTENT_PAGES }
 			title={ __( 'Pages' ) }
-			parentMenu="root"
+			parentMenu={ MENU_ROOT }
 		>
 			<NavigationEntityItems kind="postType" name="page" />
 		</NavigationMenu>
