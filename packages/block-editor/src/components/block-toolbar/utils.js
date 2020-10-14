@@ -13,26 +13,28 @@ const { clearTimeout, setTimeout } = window;
 const DEBOUNCE_TIMEOUT = 200;
 
 /**
- * Hook that creates a showMover state, as well as debounced show/hide callbacks.
+ * Hook that creates debounced activate/deactivate callbacks.
  *
  * @param {Object}   props                       Component props.
  * @param {Object}   props.ref                   Element reference.
- * @param {boolean}  props.isFocused             Whether the component has current focus.
- * @param {number}   [props.debounceTimeout=250] Debounce timeout in milliseconds.
+ * @param {boolean}  props.isFocused             Whether the component has
+ *                                               current focus.
+ * @param {number}   [props.debounceTimeout=250] Debounce timeout in
+ *                                               milliseconds.
  * @param {Function} [props.onChange=noop]       Callback function.
  */
-export function useDebouncedShowMovers( {
+export function useDebouncedActivateCallbacks( {
 	ref,
 	isFocused,
 	debounceTimeout = DEBOUNCE_TIMEOUT,
 	onChange = noop,
 } ) {
-	const [ showMovers, setShowMovers ] = useState( false );
+	const [ active, setActive ] = useState( false );
 	const timeoutRef = useRef();
 
 	const handleOnChange = ( nextIsFocused ) => {
 		if ( ref?.current ) {
-			setShowMovers( nextIsFocused );
+			setActive( nextIsFocused );
 		}
 
 		onChange( nextIsFocused );
@@ -56,19 +58,19 @@ export function useDebouncedShowMovers( {
 		}
 	};
 
-	const debouncedShowMovers = ( event ) => {
+	const debouncedActivate = ( event ) => {
 		if ( event ) {
 			event.stopPropagation();
 		}
 
 		clearTimeoutRef();
 
-		if ( ! showMovers ) {
+		if ( ! active ) {
 			handleOnChange( true );
 		}
 	};
 
-	const debouncedHideMovers = ( event ) => {
+	const debouncedDeactivate = ( event ) => {
 		if ( event ) {
 			event.stopPropagation();
 		}
@@ -85,32 +87,34 @@ export function useDebouncedShowMovers( {
 	useEffect( () => () => clearTimeoutRef(), [] );
 
 	return {
-		showMovers,
-		debouncedShowMovers,
-		debouncedHideMovers,
+		debouncedActivate,
+		debouncedDeactivate,
 	};
 }
 
 /**
- * Hook that provides a showMovers state and gesture events for DOM elements
- * that interact with the showMovers state.
+ * Hook that provides hover/focus gesture events for a given DOM element.
  *
  * @param {Object}   props                       Component props.
  * @param {Object}   props.ref                   Element reference.
  * @param {number}   [props.debounceTimeout=250] Debounce timeout in milliseconds.
  * @param {Function} [props.onChange=noop]       Callback function.
  */
-export function useShowMoversGestures( {
+export function useElementHoverFocusGestures( {
 	ref,
 	debounceTimeout = DEBOUNCE_TIMEOUT,
 	onChange = noop,
 } ) {
 	const [ isFocused, setIsFocused ] = useState( false );
 	const {
-		showMovers,
-		debouncedShowMovers,
-		debouncedHideMovers,
-	} = useDebouncedShowMovers( { ref, debounceTimeout, isFocused, onChange } );
+		debouncedActivate,
+		debouncedDeactivate,
+	} = useDebouncedActivateCallbacks( {
+		ref,
+		debounceTimeout,
+		isFocused,
+		onChange,
+	} );
 
 	const registerRef = useRef( false );
 
@@ -127,14 +131,14 @@ export function useShowMoversGestures( {
 		const handleOnFocus = () => {
 			if ( isFocusedWithin() ) {
 				setIsFocused( true );
-				debouncedShowMovers();
+				debouncedActivate();
 			}
 		};
 
 		const handleOnBlur = () => {
 			if ( ! isFocusedWithin() ) {
 				setIsFocused( false );
-				debouncedHideMovers();
+				debouncedDeactivate();
 			}
 		};
 
@@ -158,15 +162,12 @@ export function useShowMoversGestures( {
 		ref,
 		registerRef,
 		setIsFocused,
-		debouncedShowMovers,
-		debouncedHideMovers,
+		debouncedActivate,
+		debouncedDeactivate,
 	] );
 
 	return {
-		showMovers,
-		gestures: {
-			onMouseMove: debouncedShowMovers,
-			onMouseLeave: debouncedHideMovers,
-		},
+		onMouseMove: debouncedActivate,
+		onMouseLeave: debouncedDeactivate,
 	};
 }
