@@ -892,3 +892,8 @@ async function releaseStable() {
 		"Thanks for performing the release! and don't forget to publish the release post.\n"
 	);
 }
+
+module.exports = {
+	releaseRC,
+	releaseStable,
+};
