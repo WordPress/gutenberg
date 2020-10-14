@@ -40,7 +40,7 @@ function BlockUpdatingProgress( { url, id } ) {
 
 ### mediaFiles
 
-A collection of media IDs that identify the current story upload.
+A collection of media IDs that identify the current upload.
 
 - Type: `Array`
 - Required: Yes
