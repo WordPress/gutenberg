@@ -1,8 +1,13 @@
 /**
  * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
- * @typedef Props
- * @property {T} [as='div'] Element to render
+ * @typedef OwnProps
+ * @property {T} [as='div'] Component to render
  * @property {import('react').ReactNode | ((props: import('react').ComponentProps<T>) => JSX.Element) } [children] Children or render props function
+ */
+
+/**
+ * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+ * @typedef {OwnProps<T> & import('react').ComponentProps<T>} Props
  */
 
 /**
@@ -13,8 +18,8 @@
  * See VisuallyHidden hidden for example.
  *
  * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
- * @param {Props<T> & import('react').ComponentProps<T>} props A tag or component to render.
- * @return {JSX.Element} The rendered component.
+ * @param {Props<T>} props
+ * @return {JSX.Element} The rendered element.
  */
 function renderAsRenderProps( { as: Component = 'div', ...props } ) {
 	if ( typeof props.children === 'function' ) {

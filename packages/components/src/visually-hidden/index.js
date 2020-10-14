@@ -10,8 +10,13 @@ import { renderAsRenderProps } from './utils';
 
 /**
  * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
- * @typedef Props
- * @property {T} [as='div'] Component to render
+ * @typedef OwnProps
+ * @property {T} [as='div'] Component to render, e.g. `"div"` or `MyComponent`.
+ */
+
+/**
+ * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
+ * @typedef {OwnProps<T> & import('react').ComponentProps<T>} Props
  */
 
 /**
@@ -20,7 +25,7 @@ import { renderAsRenderProps } from './utils';
  *
  * @template {keyof JSX.IntrinsicElements | import('react').JSXElementConstructor<any>} T
  *
- * @param {Props<T> & import('react').ComponentProps<T>} props  A tag or component to render.
+ * @param {Props<T>} props
  * @return {JSX.Element} Element
  */
 function VisuallyHidden( { as = 'div', className, ...props } ) {
@@ -30,5 +35,4 @@ function VisuallyHidden( { as = 'div', className, ...props } ) {
 		...props,
 	} );
 }
-
 export default VisuallyHidden;
