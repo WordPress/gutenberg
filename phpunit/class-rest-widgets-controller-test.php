@@ -148,8 +148,8 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
-		$this->assertArrayHasKey( '/__experimental/widgets', $routes );
-		$this->assertArrayHasKey( '/__experimental/widgets/(?P<id>[\w\-]+)', $routes );
+		$this->assertArrayHasKey( '/wp/v2/widgets', $routes );
+		$this->assertArrayHasKey( '/wp/v2/widgets/(?P<id>[\w\-]+)', $routes );
 	}
 
 	/**
@@ -162,7 +162,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 *
 	 */
 	public function test_get_items_no_widgets() {
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widgets' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/widgets' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
@@ -174,7 +174,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_get_items_no_permission() {
 		wp_set_current_user( 0 );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widgets' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/widgets' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 401 );
 	}
@@ -184,7 +184,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_get_items_wrong_permission_author() {
 		wp_set_current_user( self::$author_id );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widgets' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/widgets' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 403 );
 	}
@@ -215,7 +215,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array( 'text-1', 'rss-1' )
 		);
 
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widgets' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/widgets' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$data     = $this->remove_links( $data );
@@ -271,7 +271,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array( 'text-1' )
 		);
 
-		$request            = new WP_REST_Request( 'GET', '/__experimental/widgets' );
+		$request            = new WP_REST_Request( 'GET', '/wp/v2/widgets' );
 		$request['context'] = 'edit';
 		$response           = rest_get_server()->dispatch( $request );
 		$data               = $response->get_data();
@@ -319,7 +319,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array( 'text-1' )
 		);
 
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widgets/text-1' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/widgets/text-1' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertEqualSets(
@@ -361,7 +361,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array( 'text-1' )
 		);
 
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widgets/text-1' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/widgets/text-1' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 401 );
 	}
@@ -385,7 +385,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widgets/text-1' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/widgets/text-1' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 403 );
 	}
@@ -401,7 +401,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 
-		$request = new WP_REST_Request( 'POST', '/__experimental/widgets' );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/widgets' );
 		$request->set_body_params(
 			array(
 				'sidebar'  => 'sidebar-1',
@@ -444,7 +444,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 
-		$request = new WP_REST_Request( 'POST', '/__experimental/widgets' );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/widgets' );
 		$request->set_body_params(
 			array(
 				'sidebar'  => 'sidebar-1',
@@ -488,7 +488,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array( 'text-1', 'rss-1' )
 		);
 
-		$request = new WP_REST_Request( 'PUT', '/__experimental/widgets/text-1' );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/widgets/text-1' );
 		$request->set_body_params(
 			array(
 				'id'           => 'text-1',
@@ -545,7 +545,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array()
 		);
 
-		$request = new WP_REST_Request( 'PUT', '/__experimental/widgets/text-1' );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/widgets/text-1' );
 		$request->set_body_params(
 			array(
 				'sidebar' => 'sidebar-2',
@@ -556,10 +556,10 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertNotWPError( $error, $error ? $error->get_error_message() : '' );
 		$this->assertEquals( 'sidebar-2', $response->get_data()['sidebar'] );
 
-		$sidebar1 = rest_do_request( '/__experimental/sidebars/sidebar-1' );
+		$sidebar1 = rest_do_request( '/wp/v2/sidebars/sidebar-1' );
 		$this->assertNotContains( 'text-1', $sidebar1->get_data()['widgets'] );
 
-		$sidebar2 = rest_do_request( '/__experimental/sidebars/sidebar-2' );
+		$sidebar2 = rest_do_request( '/wp/v2/sidebars/sidebar-2' );
 		$this->assertContains( 'text-1', $sidebar2->get_data()['widgets'] );
 	}
 
@@ -614,7 +614,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array( 'text-1' )
 		);
 
-		$request = new WP_REST_Request( 'PUT', '/__experimental/widgets/text-1' );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/widgets/text-1' );
 		$request->set_body_params(
 			array(
 				'id'           => 'text-1',
@@ -689,7 +689,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array( $widget_id )
 		);
 
-		$request = new WP_REST_Request( 'PUT', '/__experimental/widgets/' . $widget_id );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/widgets/' . $widget_id );
 		$request->set_body_params(
 			array(
 				'id'       => $widget_id,
@@ -727,7 +727,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	public function test_update_item_no_permission() {
 		wp_set_current_user( 0 );
 
-		$request = new WP_REST_Request( 'PUT', '/__experimental/sidebars/sidebar-1' );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/sidebars/sidebar-1' );
 		$request->set_body_params(
 			array(
 				'widgets' => array(),
@@ -743,7 +743,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	public function test_update_item_wrong_permission_author() {
 		wp_set_current_user( self::$author_id );
 
-		$request = new WP_REST_Request( 'PUT', '/__experimental/sidebars/sidebar-1' );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/sidebars/sidebar-1' );
 		$request->set_body_params(
 			array(
 				'widgets' => array(),
@@ -760,7 +760,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->setup_widget( 'widget_text', 1, array( 'text' => 'Custom text test' ) );
 		$this->setup_sidebar( 'sidebar-1', array( 'name' => 'Test sidebar' ), array( 'text-1', 'rss-1' ) );
 
-		$request = new WP_REST_Request( 'PUT', '/__experimental/widgets/text-1' );
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/widgets/text-1' );
 		$request->set_body_params(
 			array(
 				'id'           => 'text-1',
@@ -812,7 +812,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array( 'text-1', 'rss-1' )
 		);
 
-		$request  = new WP_REST_Request( 'DELETE', '/__experimental/widgets/text-1' );
+		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/widgets/text-1' );
 		$response = rest_do_request( $request );
 
 		$this->assertEqualSets(
@@ -856,7 +856,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array( 'text-1', 'rss-1' )
 		);
 
-		$request = new WP_REST_Request( 'DELETE', '/__experimental/widgets/text-1' );
+		$request = new WP_REST_Request( 'DELETE', '/wp/v2/widgets/text-1' );
 		$request->set_query_params( array( 'force' => true ) );
 		$response = rest_do_request( $request );
 
@@ -886,7 +886,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			$response->get_data()
 		);
 
-		$response = rest_do_request( '/__experimental/widgets/text-1' );
+		$response = rest_do_request( '/wp/v2/widgets/text-1' );
 		$this->assertEquals( 404, $response->get_status() );
 	}
 
@@ -911,7 +911,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array( 'text-1', 'rss-1' )
 		);
 
-		$request  = new WP_REST_Request( 'DELETE', '/__experimental/widgets/text-1' );
+		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/widgets/text-1' );
 		$response = rest_do_request( $request );
 
 		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 401 );
@@ -938,7 +938,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array( 'text-1', 'rss-1' )
 		);
 
-		$request  = new WP_REST_Request( 'DELETE', '/__experimental/widgets/text-1' );
+		$request  = new WP_REST_Request( 'DELETE', '/wp/v2/widgets/text-1' );
 		$response = rest_do_request( $request );
 
 		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 403 );
@@ -955,7 +955,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_get_item_schema() {
 		wp_set_current_user( self::$admin_id );
-		$request    = new WP_REST_Request( 'OPTIONS', '/__experimental/widgets' );
+		$request    = new WP_REST_Request( 'OPTIONS', '/wp/v2/widgets' );
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];

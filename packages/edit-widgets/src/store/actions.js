@@ -88,7 +88,6 @@ export function* saveWidgetAreas( widgetAreas ) {
 				KIND,
 				POST_TYPE,
 				buildWidgetAreaPostId( widgetArea.id ),
-				{ deprecated: true }
 			);
 			const widgetsBlocks = post.blocks;
 			const newWidgets = widgetsBlocks.map( ( block ) => {
@@ -105,7 +104,6 @@ export function* saveWidgetAreas( widgetAreas ) {
 				widgetArea.id,
 				{
 					widgets: newWidgets,
-					deprecated: true,
 				}
 			);
 

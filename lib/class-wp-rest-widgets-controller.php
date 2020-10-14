@@ -14,7 +14,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 * Widgets controller constructor.
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'widgets';
 	}
 
@@ -573,7 +573,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	/**
 	 * Prepares links for the request.
 	 *
-	 * @param Array $prepared Widget.
+	 * @param array $prepared Widget.
 	 * @return array Links for the given widget.
 	 */
 	protected function prepare_links( $prepared ) {
@@ -585,7 +585,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $prepared['id'] ) ),
 			),
 			'https://api.w.org/sidebar' => array(
-				'href' => rest_url( sprintf( '__experimental/sidebars/%s/', $prepared['sidebar'] ) ),
+				'href' => rest_url( sprintf( 'wp/v2/sidebars/%s/', $prepared['sidebar'] ) ),
 			),
 		);
 	}
@@ -610,7 +610,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$instance  = $instances[ $number ];
 
 		$args = array_merge(
-			$sidebar,
+			is_array( $sidebar ) ? $sidebar : array(),
 			array(
 				'widget_id'   => $id,
 				'widget_name' => $name,
