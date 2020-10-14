@@ -258,7 +258,11 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 	public function get_items( $request ) {
 		$data = array();
 		foreach ( (array) wp_get_sidebars_widgets() as $id => $widgets ) {
-			list( , $sidebar ) = $this->get_sidebar( $id );
+			list( $exists, $sidebar ) = $this->get_sidebar( $id );
+
+			if ( ! $exists && 'wp_inactive_widgets' !== $id ) {
+				continue;
+			}
 
 			$data[] = $this->prepare_response_for_collection(
 				$this->prepare_item_for_response( $sidebar, $request )
