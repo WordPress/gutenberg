@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { useState } from 'react';
-import { SafeAreaView, TouchableOpacity } from 'react-native';
+import { SafeAreaView, TouchableOpacity, View } from 'react-native';
 import { lowerCase, startsWith } from 'lodash';
 
 /**
@@ -52,7 +52,6 @@ export const LinkPicker = ( {
 	value: initialValue,
 	onLinkPicked,
 	onCancel: cancel,
-	withPadding = true,
 } ) => {
 	const [ value, setValue ] = useState( initialValue );
 	const directEntry = createDirectEntry( value );
@@ -82,54 +81,50 @@ export const LinkPicker = ( {
 	);
 
 	return (
-		<SafeAreaView
-			style={ {
-				height: '100%',
-				marginLeft: withPadding ? 16 : 0,
-				marginRight: withPadding ? 16 : 0,
-			} }
-		>
+		<SafeAreaView style={ styles.safeArea }>
 			<NavigationHeader
 				screen={ __( 'Link to' ) }
 				leftButtonOnPress={ cancel }
 				applyButtonOnPress={ onSubmit }
 				isFullscreen
 			/>
-			<BottomSheet.Cell
-				icon={ link }
-				style={ omniCellStyle }
-				valueStyle={ styles.omniInput }
-				value={ value }
-				placeholder={ __( 'Search or type URL' ) }
-				autoCapitalize="none"
-				autoCorrect={ false }
-				keyboardType="url"
-				onChangeValue={ setValue }
-				onSubmit={ onSubmit }
-				/* eslint-disable-next-line jsx-a11y/no-autofocus */
-				autoFocus={ true }
-				separatorType="none"
-			>
-				{ value !== '' && (
-					<TouchableOpacity
-						onPress={ clear }
-						style={ styles.clearIcon }
-					>
-						<Icon
-							icon={ cancelCircleFilled }
-							fill={ iconStyle.color }
-							size={ 24 }
-						/>
-					</TouchableOpacity>
+			<View style={ styles.contentContainer }>
+				<BottomSheet.Cell
+					icon={ link }
+					style={ omniCellStyle }
+					valueStyle={ styles.omniInput }
+					value={ value }
+					placeholder={ __( 'Search or type URL' ) }
+					autoCapitalize="none"
+					autoCorrect={ false }
+					keyboardType="url"
+					onChangeValue={ setValue }
+					onSubmit={ onSubmit }
+					/* eslint-disable-next-line jsx-a11y/no-autofocus */
+					autoFocus={ true }
+					separatorType="none"
+				>
+					{ value !== '' && (
+						<TouchableOpacity
+							onPress={ clear }
+							style={ styles.clearIcon }
+						>
+							<Icon
+								icon={ cancelCircleFilled }
+								fill={ iconStyle.color }
+								size={ 24 }
+							/>
+						</TouchableOpacity>
+					) }
+				</BottomSheet.Cell>
+				{ !! value && (
+					<LinkPickerResults
+						query={ value }
+						onLinkPicked={ pickLink }
+						directEntry={ directEntry }
+					/>
 				) }
-			</BottomSheet.Cell>
-			{ !! value && (
-				<LinkPickerResults
-					query={ value }
-					onLinkPicked={ pickLink }
-					directEntry={ directEntry }
-				/>
-			) }
+			</View>
 		</SafeAreaView>
 	);
 };

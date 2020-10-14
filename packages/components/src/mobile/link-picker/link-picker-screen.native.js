@@ -13,7 +13,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { LinkPicker } from './';
 
-const LinkPickerScreen = ( { returnScreenName, withPadding } ) => {
+const LinkPickerScreen = ( { returnScreenName } ) => {
 	const navigation = useNavigation();
 	const route = useRoute();
 
@@ -35,7 +35,6 @@ const LinkPickerScreen = ( { returnScreenName, withPadding } ) => {
 				value={ inputValue }
 				onLinkPicked={ onLinkPicked }
 				onCancel={ onCancel }
-				withPadding={ withPadding }
 			/>
 		);
 	}, [ inputValue ] );

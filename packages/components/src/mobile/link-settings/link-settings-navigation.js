@@ -34,7 +34,6 @@ function LinkSettingsNavigation( props ) {
 				>
 					<LinkPickerScreen
 						returnScreenName={ linkSettingsScreens.settings }
-						withPadding={ false }
 					/>
 				</BottomSheet.NavigationScreen>
 			</BottomSheet.NavigationContainer>
