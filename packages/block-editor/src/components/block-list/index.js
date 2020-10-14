@@ -64,13 +64,20 @@ function Items( {
 		const {
 			getBlockOrder,
 			getBlockListSettings,
+			getSettings,
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
 			getGlobalBlockCount,
 			isTyping,
 			isDraggingBlocks,
+			__experimentalGetActiveBlockIdByBlockNames,
 		} = select( 'core/block-editor' );
+
+		// Determine if there is an active entity area to spotlight.
+		const activeEntityBlockId = __experimentalGetActiveBlockIdByBlockNames(
+			getSettings().__experimentalSpotlightEntityBlocks
+		);
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
@@ -82,6 +89,7 @@ function Items( {
 				! isTyping() &&
 				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 			isDraggingBlocks: isDraggingBlocks(),
+			activeEntityBlockId,
 		};
 	}
 
@@ -93,6 +101,7 @@ function Items( {
 		hasMultiSelection,
 		enableAnimation,
 		isDraggingBlocks,
+		activeEntityBlockId,
 	} = useSelect( selector, [ rootClientId ] );
 
 	const dropTargetIndex = useBlockDropZone( {
@@ -131,7 +140,9 @@ function Items( {
 								'is-dropping-horizontally':
 									isDropTarget &&
 									orientation === 'horizontal',
+								'has-active-entity': activeEntityBlockId,
 							} ) }
+							activeEntityBlockId={ activeEntityBlockId }
 						/>
 					</AsyncModeProvider>
 				);

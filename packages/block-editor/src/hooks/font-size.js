@@ -142,7 +142,7 @@ export function FontSizeEdit( props ) {
  */
 export function useIsFontSizeDisabled( { name: blockName } = {} ) {
 	const fontSizes = useEditorFeature( 'typography.fontSizes' );
-	const hasFontSizes = fontSizes.length;
+	const hasFontSizes = !! fontSizes?.length;
 
 	return (
 		! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) || ! hasFontSizes

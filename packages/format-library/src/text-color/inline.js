@@ -8,7 +8,6 @@ import { get } from 'lodash';
  */
 import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { withSpokenMessages } from '@wordpress/components';
 import { getRectangleFromRange } from '@wordpress/dom';
 import {
 	applyFormat,
@@ -119,7 +118,13 @@ const ColorPicker = ( { name, value, onChange } ) => {
 	return <ColorPalette value={ activeColor } onChange={ onColorChange } />;
 };
 
-const InlineColorUI = ( { name, value, onChange, onClose, addingColor } ) => {
+export default function InlineColorUI( {
+	name,
+	value,
+	onChange,
+	onClose,
+	addingColor,
+} ) {
 	return (
 		<ColorPopoverAtLink
 			value={ value }
@@ -130,6 +135,4 @@ const InlineColorUI = ( { name, value, onChange, onClose, addingColor } ) => {
 			<ColorPicker name={ name } value={ value } onChange={ onChange } />
 		</ColorPopoverAtLink>
 	);
-};
-
-export default withSpokenMessages( InlineColorUI );
+}
