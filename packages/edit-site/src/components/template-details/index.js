@@ -25,32 +25,41 @@ export default function TemplateDetails( { template, onClose } ) {
 	};
 
 	return (
-		<div className="edit-site-template-details">
-			<p className="edit-site-template-details__heading">
-				{ __( 'Template details' ) }
-			</p>
+		<>
+			<div className="edit-site-template-details">
+				<p className="edit-site-template-details__heading">
+					{ __( 'Template details' ) }
+				</p>
 
-			{ title && (
-				<p>
-					{ sprintf(
-						/* translators: %s: Name of the template. */
-						__( 'Name: %s' ),
-						title
-					) }
-				</p>
-			) }
-			{ description && (
-				<p>
-					{ sprintf(
-						/* translators: %s: Description of the template. */
-						__( 'Description: %s' ),
-						description
-					) }
-				</p>
-			) }
-			<Button onClick={ showTemplateInSidebar } isLink>
-				{ __( 'View in navigation sidebar.' ) }
+				{ title && (
+					<p>
+						{ sprintf(
+							/* translators: %s: Name of the template. */
+							__( 'Name: %s' ),
+							title
+						) }
+					</p>
+				) }
+				{ description && (
+					<p>
+						{ sprintf(
+							/* translators: %s: Description of the template. */
+							__( 'Description: %s' ),
+							description
+						) }
+					</p>
+				) }
+			</div>
+
+			<Button
+				className="edit-site-template-details__show-all-button"
+				onClick={ showTemplateInSidebar }
+				aria-label={ __(
+					'Browse all templates. This will open the template menu in the navigation side panel.'
+				) }
+			>
+				{ __( 'Browse all templates' ) }
 			</Button>
-		</div>
+		</>
 	);
 }

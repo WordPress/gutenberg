@@ -1,5 +1,5 @@
 .edit-site-template-details {
-	margin: 0 $grid-unit-10;
+	padding: $grid-unit-15;
 }
 
 .edit-site-template-details__heading {
@@ -9,4 +9,21 @@
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: 500;
+}
+
+.edit-site-template-details__show-all-button.components-button {
+	display: block;
+	background: $gray-900;
+	color: $white;
+	width: 100%;
+	height: ($button-size + $grid-unit-10);
+	border-radius: 0;
+
+	&:hover {
+		color: $white;
+	}
+
+	&:focus:not(:disabled) {
+		box-shadow: inset 0 0 0 $border-width-focus $gray-900, inset 0 0 0 2px $white;
+	}
 }
