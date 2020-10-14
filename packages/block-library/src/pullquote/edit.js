@@ -33,19 +33,30 @@ import { SOLID_COLOR_CLASS } from './shared';
 function PullQuoteEdit( {
 	colorUtils,
 	textColor,
-	attributes,
+	attributes: { value, citation },
 	setAttributes,
 	setTextColor,
 	setMainColor,
-	className,
 	mainColor,
 	isSelected,
 	insertBlocksAfter,
 } ) {
 	const wasTextColorAutomaticallyComputed = useRef( false );
+	const blockProps = useBlockProps();
+	const { style = {}, className } = blockProps;
+	const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+	const newBlockProps = {
+		...blockProps,
+		className: classnames( className, {
+			'has-background': isSolidColorStyle && mainColor.color,
+			[ mainColor.class ]: isSolidColorStyle && mainColor.class,
+		} ),
+		style: isSolidColorStyle
+			? { ...style, backgroundColor: mainColor.color }
+			: { ...style, borderColor: mainColor.color },
+	};
 
 	function pullQuoteMainColorSetter( colorValue ) {
-		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
 		const needTextColor =
 			! textColor.color || wasTextColorAutomaticallyComputed.current;
 		const shouldSetTextColor = isSolidColorStyle && needTextColor;
@@ -76,34 +87,10 @@ function PullQuoteEdit( {
 		wasTextColorAutomaticallyComputed.current = false;
 	}
 
-	const { value, citation } = attributes;
-
-	const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
-	const figureStyles = isSolidColorStyle
-		? { backgroundColor: mainColor.color }
-		: { borderColor: mainColor.color };
-
-	const figureClasses = classnames( className, {
-		'has-background': isSolidColorStyle && mainColor.color,
-		[ mainColor.class ]: isSolidColorStyle && mainColor.class,
-	} );
-
-	const blockquoteStyles = {
-		color: textColor.color,
-	};
-
-	const blockquoteClasses =
-		textColor.color &&
-		classnames( 'has-text-color', {
-			[ textColor.class ]: textColor.class,
-		} );
-
-	const includesSolidColorClass = includes( className, SOLID_COLOR_CLASS );
-
 	useEffect( () => {
 		// If the block includes a named color and we switched from the
 		// solid color style to the default style.
-		if ( mainColor ) {
+		if ( mainColor && ! isSolidColorStyle ) {
 			// Remove the named color, and set the color as a custom color.
 			// This is done because named colors use classes, in the default style we use a border color,
 			// and themes don't set classes for border colors.
@@ -112,19 +99,21 @@ function PullQuoteEdit( {
 				customMainColor: mainColor.color,
 			} );
 		}
-	}, [ includesSolidColorClass, mainColor ] );
+	}, [ isSolidColorStyle, mainColor ] );
 
 	return (
 		<>
-			<Figure
-				{ ...useBlockProps( {
-					style: figureStyles,
-					className: figureClasses,
-				} ) }
-			>
+			<Figure { ...newBlockProps }>
 				<BlockQuote
-					style={ blockquoteStyles }
-					className={ blockquoteClasses }
+					style={ {
+						color: textColor.color,
+					} }
+					className={
+						textColor.color &&
+						classnames( 'has-text-color', {
+							[ textColor.class ]: textColor.class,
+						} )
+					}
 				>
 					<RichText
 						identifier="value"
