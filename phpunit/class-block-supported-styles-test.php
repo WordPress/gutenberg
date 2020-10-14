@@ -112,8 +112,14 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$style_list = $this->get_attribute_from_block( 'style', $styled_block );
 
 		$this->assertEquals( self::BLOCK_CONTENT, $content );
-		$this->assertEquals( $expected_classes, $class_list );
-		$this->assertEquals( $expected_styles, $style_list );
+		$this->assertEqualSets(
+			explode( ' ', $expected_classes ),
+			explode( ' ', $class_list )
+		);
+		$this->assertEquals(
+			array_map( 'trim', explode( ';', $expected_styles ) ),
+			array_map( 'trim', explode( ';', $style_list ) )
+		);
 	}
 
 	/**
