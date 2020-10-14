@@ -226,12 +226,12 @@ export function navigationPanel(
  * @param {Object} state Current state.
  * @param {Object} action Dispatched action.
  */
-function blockInserterPanel( state = false, action ) {
+export function blockInserterPanel( state = false, action ) {
 	switch ( action.type ) {
 		case 'OPEN_NAVIGATION_PANEL_TO_MENU':
 			return false;
 		case 'SET_IS_NAVIGATION_PANEL_OPENED':
-			return action.isOpen ? false : state.isOpen;
+			return action.isOpen ? false : state;
 		case 'SET_IS_INSERTER_OPENED':
 			return action.isOpen;
 	}
