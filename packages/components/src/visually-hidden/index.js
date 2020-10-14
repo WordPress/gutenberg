@@ -30,6 +30,5 @@ function VisuallyHidden( { as = 'div', className, ...props } ) {
 		...props,
 	} );
 }
-export default VisuallyHidden;
 
-export const vh = <VisuallyHidden as="div" href="foo" />;
+export default VisuallyHidden;
