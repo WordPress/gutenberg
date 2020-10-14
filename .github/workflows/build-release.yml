@@ -44,8 +44,6 @@ jobs:
           echo ::set-env name=vendor_scripts::$(ls vendor/*.js)
       - name: Install dependencies
         run: npm install
-        env:
-          PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
       - name: Build Gutenberg
         run: npm run build
       - name: Set production constants in gutenberg.php
