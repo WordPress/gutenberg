@@ -67,12 +67,12 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
-		$this->assertArrayHasKey( '/__experimental/widget-types', $routes );
-		$this->assertCount( 1, $routes['/__experimental/widget-types'] );
-		$this->assertArrayHasKey( '/__experimental/widget-types/(?P<name>[a-zA-Z0-9_-]+)', $routes );
-		$this->assertCount( 1, $routes['/__experimental/widget-types/(?P<name>[a-zA-Z0-9_-]+)'] );
-		$this->assertArrayHasKey( '/__experimental/widget-types/(?P<name>[a-zA-Z0-9_-]+)/form-renderer', $routes );
-		$this->assertCount( 1, $routes['/__experimental/widget-types/(?P<name>[a-zA-Z0-9_-]+)/form-renderer'] );
+		$this->assertArrayHasKey( '/wp/v2/widget-types', $routes );
+		$this->assertCount( 1, $routes['/wp/v2/widget-types'] );
+		$this->assertArrayHasKey( '/wp/v2/widget-types/(?P<name>[a-zA-Z0-9_-]+)', $routes );
+		$this->assertCount( 1, $routes['/wp/v2/widget-types/(?P<name>[a-zA-Z0-9_-]+)'] );
+		$this->assertArrayHasKey( '/wp/v2/widget-types/(?P<name>[a-zA-Z0-9_-]+)/form-renderer', $routes );
+		$this->assertCount( 1, $routes['/wp/v2/widget-types/(?P<name>[a-zA-Z0-9_-]+)/form-renderer'] );
 	}
 
 	/**
@@ -80,13 +80,13 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	 */
 	public function test_context_param() {
 		// Collection.
-		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/widget-types' );
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/widget-types' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertSame( 'view', $data['endpoints'][0]['args']['context']['default'] );
 		$this->assertSame( array( 'view', 'embed', 'edit' ), $data['endpoints'][0]['args']['context']['enum'] );
 		// Single.
-		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/widget-types/calendar' );
+		$request  = new WP_REST_Request( 'OPTIONS', '/wp/v2/widget-types/calendar' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertSame( 'view', $data['endpoints'][0]['args']['context']['default'] );
@@ -98,7 +98,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	 */
 	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widget-types' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertCount( 20, $data );
@@ -116,7 +116,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	public function test_get_item() {
 		$widget_name = 'calendar';
 		wp_set_current_user( self::$admin_id );
-		$request     = new WP_REST_Request( 'GET', '/__experimental/widget-types/' . $widget_name );
+		$request     = new WP_REST_Request( 'GET', '/wp/v2/widget-types/' . $widget_name );
 		$response    = rest_get_server()->dispatch( $request );
 		$endpoint    = new WP_REST_Widget_Types_Controller;
 		$widget_type = $endpoint->get_widget( $widget_name );
@@ -134,7 +134,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 			function() {}
 		);
 		wp_set_current_user( self::$admin_id );
-		$request     = new WP_REST_Request( 'GET', '/__experimental/widget-types/' . $widget_id );
+		$request     = new WP_REST_Request( 'GET', '/wp/v2/widget-types/' . $widget_id );
 		$response    = rest_get_server()->dispatch( $request );
 		$endpoint    = new WP_REST_Widget_Types_Controller;
 		$widget_type = $endpoint->get_widget( $widget_id );
@@ -147,7 +147,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	public function test_get_widget_invalid_name() {
 		$widget_type = 'fake';
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widget-types/' . $widget_type );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types/' . $widget_type );
 		$response = rest_get_server()->dispatch( $request );
 
 		$this->assertErrorResponse( 'rest_widget_type_invalid', $response, 404 );
@@ -158,7 +158,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	 */
 	public function test_get_item_schema() {
 		wp_set_current_user( self::$admin_id );
-		$request    = new WP_REST_Request( 'OPTIONS', '/__experimental/widget-types' );
+		$request    = new WP_REST_Request( 'OPTIONS', '/wp/v2/widget-types' );
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
@@ -178,7 +178,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	 */
 	public function test_get_items_wrong_permission() {
 		wp_set_current_user( self::$subscriber_id );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widget-types' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
 	}
@@ -188,7 +188,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	 */
 	public function test_get_item_wrong_permission() {
 		wp_set_current_user( self::$subscriber_id );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widget-types/calendar' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types/calendar' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
 	}
@@ -198,7 +198,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	 */
 	public function test_get_items_no_permission() {
 		wp_set_current_user( 0 );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widget-types' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
 	}
@@ -208,7 +208,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	 */
 	public function test_get_item_no_permission() {
 		wp_set_current_user( 0 );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widget-types/calendar' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types/calendar' );
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
 	}
@@ -253,14 +253,14 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 		}
 
 		// Test links.
-		$this->assertSame( rest_url( '__experimental/widget-types' ), $links['collection'][0]['href'] );
-		// $this->assertSame( rest_url( '__experimental/widget-types/' . $widget_type->id_base ), $links['self'][0]['href'] );
+		$this->assertSame( rest_url( 'wp/v2/widget-types' ), $links['collection'][0]['href'] );
+		// $this->assertSame( rest_url( 'wp/v2/widget-types/' . $widget_type->id_base ), $links['self'][0]['href'] );
 	}
 
 	public function test_get_widget_form() {
 		$widget_name = 'calendar';
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widget-types/' . $widget_name . '/form-renderer' );
+		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types/' . $widget_name . '/form-renderer' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertArrayHasKey( 'instance', $data );

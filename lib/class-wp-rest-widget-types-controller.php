@@ -22,7 +22,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	 * @since x.x.0
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'widget-types';
 	}
 
