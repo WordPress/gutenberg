@@ -418,7 +418,7 @@ Whether the suggestions are being fetched at the moment. When this component is 
 - Type: `boolean`
 - Required: No
 
-Whether this component was rendered to show initial suggestions (the ones displayed right after mounting, before the user even started interacting with LinkControl). 
+Whether this component was rendered to show initial suggestions (the ones displayed right after mounting, before the user begins interacting with LinkControl). 
 
 ### selectedSuggestion
 
