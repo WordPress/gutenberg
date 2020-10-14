@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, filter, mapKeys, orderBy, uniq, map } from 'lodash';
+import { castArray, filter, mapKeys, orderBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -114,17 +114,30 @@ export class BlockSwitcher extends Component {
 
 		// When selection consists of blocks of multiple types, display an
 		// appropriate icon to communicate the non-uniformity.
-		const isSelectionOfSameType =
-			uniq( map( blocks, 'name' ) ).length === 1;
-
-		let icon;
-		if ( isSelectionOfSameType ) {
+		// If blocks are of same type and variation show variation's icon.
+		const getIcon = () => {
 			const sourceBlockName = hoveredBlock.name;
+			const isSelectionOfSameType = blocks.every(
+				( { name } ) => name === sourceBlockName
+			);
+			if ( ! isSelectionOfSameType ) return stack;
 			const blockType = getBlockType( sourceBlockName );
-			icon = blockType.icon;
-		} else {
-			icon = stack;
-		}
+			const isSelectionOfSameVariation = blocks.every(
+				( { attributes: { fromVariation } } ) =>
+					fromVariation &&
+					fromVariation === hoveredBlock.attributes.fromVariation
+			);
+			return (
+				( isSelectionOfSameVariation &&
+					blockType.variations?.find(
+						( { name } ) =>
+							hoveredBlock.attributes.fromVariation === name
+					)?.icon ) ||
+				blockType.icon
+			);
+		};
+
+		const icon = getIcon();
 
 		const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;
 
