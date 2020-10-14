@@ -10,27 +10,26 @@ import { useNavigationContext } from '../context';
 import { useNavigationMenuContext } from '../menu/context';
 import { normalizedSearch } from '../utils';
 
-export const useNavigationTreeItem = ( props ) => {
+export const useNavigationTreeItem = ( itemId, props ) => {
 	const {
 		activeMenu,
 		navigationTree: { addItem, removeItem },
 	} = useNavigationContext();
 	const { menu, search } = useNavigationMenuContext();
 
-	const key = props.item;
 	useEffect( () => {
 		const isMenuActive = activeMenu === menu;
 		const isItemVisible =
 			! search || normalizedSearch( props.title, search );
 
-		addItem( key, {
+		addItem( itemId, {
 			...props,
 			menu,
 			_isVisible: isMenuActive && isItemVisible,
 		} );
 
 		return () => {
-			removeItem( key );
+			removeItem( itemId );
 		};
 	}, [ activeMenu, search ] );
 };

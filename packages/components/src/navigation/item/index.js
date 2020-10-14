@@ -2,11 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
+import { noop, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import { Icon, chevronRight } from '@wordpress/icons';
 
 /**
@@ -29,14 +30,17 @@ export default function NavigationItem( props ) {
 		title,
 		...restProps
 	} = props;
-	useNavigationTreeItem( props );
+
+	const [ itemId ] = useState( uniqueId( 'item-' ) );
+
+	useNavigationTreeItem( itemId, props );
 	const {
 		activeItem,
 		navigationTree,
 		setActiveMenu,
 	} = useNavigationContext();
 
-	if ( ! navigationTree.getItem( item )?._isVisible ) {
+	if ( ! navigationTree.getItem( itemId )?._isVisible ) {
 		return null;
 	}
 

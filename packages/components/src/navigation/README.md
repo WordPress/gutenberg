@@ -190,7 +190,7 @@ If provided, renders `a` instead of `button`.
 ### `item`
 
 -   Type: `string`
--   Required: Yes
+-   Required: No
 
 The unique identifier of the item.
 
