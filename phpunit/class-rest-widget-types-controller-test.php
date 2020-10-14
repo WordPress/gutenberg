@@ -101,7 +101,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertCount( 20, $data );
+		$this->assertGreaterThan( 1, count( $data ) );
 		$endpoint = new WP_REST_Widget_Types_Controller;
 		foreach ( $data as $item ) {
 			$widget_type = $endpoint->get_widget( $item['name'] );
