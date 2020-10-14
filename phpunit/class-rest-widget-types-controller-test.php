@@ -101,7 +101,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 		$request  = new WP_REST_Request( 'GET', '/__experimental/widget-types' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertCount( 17, $data );
+		$this->assertCount( 20, $data );
 		$endpoint = new WP_REST_Widget_Types_Controller;
 		foreach ( $data as $item ) {
 			$widget_type = $endpoint->get_widget( $item['name'] );
@@ -144,13 +144,14 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 6, $properties );
+		$this->assertCount( 7, $properties );
 
 		$this->assertArrayHasKey( 'name', $properties );
-		$this->assertArrayHasKey( 'id_base', $properties );
+		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'option_name', $properties );
-		$this->assertArrayHasKey( 'control_options', $properties );
-		$this->assertArrayHasKey( 'widget_options', $properties );
+		$this->assertArrayHasKey( 'description', $properties );
+		$this->assertArrayHasKey( 'classname', $properties );
+		$this->assertArrayHasKey( 'customize_selective_refresh', $properties );
 		$this->assertArrayHasKey( 'widget_class', $properties );
 	}
 

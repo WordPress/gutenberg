@@ -118,13 +118,10 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		global $wp_widget_factory;
-
 		$data = array();
-		foreach ( $wp_widget_factory->widgets as $slug => $widget ) {
-			$widget->widget_class = $slug;
-			$widget_type          = $this->prepare_item_for_response( $widget, $request );
-			$data[]               = $this->prepare_response_for_collection( $widget_type );
+		foreach ( $this->get_widgets() as $widget ) {
+			$widget_type = $this->prepare_item_for_response( $widget, $request );
+			$data[]      = $this->prepare_response_for_collection( $widget_type );
 		}
 
 		return rest_ensure_response( $data );
@@ -182,16 +179,41 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	 * @return WP_Widget|WP_Error Widget type object if name is valid, WP_Error otherwise.
 	 */
 	public function get_widget( $name ) {
-		global $wp_widget_factory;
-		foreach ( $wp_widget_factory->widgets as $slug => $widget ) {
-			if ( $name === $widget->id_base ) {
-				$widget->widget_class = $slug;
-
+		foreach ( $this->get_widgets() as $widget ) {
+			if ( $name === $widget['id'] ) {
 				return $widget;
 			}
 		}
 
 		return new WP_Error( 'rest_widget_type_invalid', __( 'Invalid widget type.', 'gutenberg' ), array( 'status' => 404 ) );
+	}
+
+	/**
+	 * Normalize array of widgets.
+	 *
+	 * @return array Array of widgets.
+	 */
+	protected function get_widgets() {
+		global $wp_registered_widgets;
+
+		$widgets = array();
+		foreach ( $wp_registered_widgets as $slug => $widget ) {
+			$widget_callback = $widget['callback'];
+			unset( $widget['callback'] );
+
+			if ( is_array( $widget_callback ) && $widget_callback[0] instanceof WP_Widget ) {
+				$widget_class           = $widget_callback[0];
+				$widget_array           = (array) $widget_class;
+				$widget                 = array_merge( $widget, $widget_array );
+				$widget['id']           = $widget['id_base'];
+				$widget['widget_class'] = get_class( $widget_class );
+			} else {
+				unset( $widget['classname'] );
+			}
+			$widgets[] = $widget;
+		}
+
+		return $widgets;
 	}
 
 	/**
@@ -218,7 +240,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 	 *
 	 * @since x.x.0
 	 *
-	 * @param WP_Widget       $widget_type Widget type data.
+	 * @param array           $widget_type Widget type data.
 	 * @param WP_REST_Request $request    Full details about the request.
 	 * @return WP_REST_Response Widget type data.
 	 */
@@ -230,19 +252,18 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		$schema       = $this->get_item_schema();
 		$extra_fields = array(
 			'name',
-			'id_base',
-			'option_name',
-			'control_options',
-			'widget_options',
+			'id',
+			'description',
+			'classname',
 			'widget_class',
-
+			'option_name',
+			'customize_selective_refresh',
 		);
 
-		$widget_type_array = (array) $widget_type;
 		foreach ( $extra_fields as $extra_field ) {
 			if ( rest_is_field_included( $extra_field, $fields ) ) {
-				if ( isset( $widget_type_array[ $extra_field ] ) ) {
-					$field = $widget_type_array[ $extra_field ];
+				if ( isset( $widget_type[ $extra_field ] ) ) {
+					$field = $widget_type[ $extra_field ];
 				} elseif ( array_key_exists( 'default', $schema['properties'][ $extra_field ] ) ) {
 					$field = $schema['properties'][ $extra_field ]['default'];
 				} else {
@@ -289,7 +310,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 				'href' => rest_url( sprintf( '%s/%s', $this->namespace, $this->rest_base ) ),
 			),
 			'self'       => array(
-				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $widget_type->id_base ) ),
+				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $widget_type['id'] ) ),
 			),
 		);
 
@@ -313,72 +334,53 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			'title'      => 'widget-type',
 			'type'       => 'object',
 			'properties' => array(
-				'name'            => array(
+				'name'                        => array(
 					'description' => __( 'Unique name identifying the widget type.', 'gutenberg' ),
 					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'id_base'         => array(
+				'id'                          => array(
 					'description' => __( 'Unique name identifying the widget type.', 'gutenberg' ),
 					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'option_name'     => array(
+				'description'                 => array(
+					'description' => __( 'Description of the widget.', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'view', 'edit', 'embed' ),
+				),
+				'classname'                   => array(
+					'description' => __( 'Class name', 'gutenberg' ),
+					'type'        => 'string',
+					'default'     => '',
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
+				),
+				'option_name'                 => array(
 					'description' => __( 'Option name.', 'gutenberg' ),
 					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'widget_class'    => array(
+				'widget_class'                => array(
 					'description' => __( 'Widget class name.', 'gutenberg' ),
 					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'control_options' => array(
-					'description'          => __( 'Control options', 'gutenberg' ),
-					'type'                 => 'object',
-					'default'              => array(),
-					'properties'           => array(),
-					'context'              => array( 'embed', 'view', 'edit' ),
-					'readonly'             => true,
-					'additionalProperties' => true,
-				),
-				'widget_options'  => array(
-					'description'          => __( 'Widget options', 'gutenberg' ),
-					'type'                 => 'object',
-					'default'              => array(),
-					'properties'           => array(
-						'classname'                   => array(
-							'description' => __( 'Class name', 'gutenberg' ),
-							'type'        => 'string',
-							'default'     => '',
-							'context'     => array( 'embed', 'view', 'edit' ),
-							'readonly'    => true,
-						),
-						'customize_selective_refresh' => array(
-							'description' => __( 'Customize selective refresh.', 'gutenberg' ),
-							'type'        => 'boolean',
-							'default'     => false,
-							'context'     => array( 'embed', 'view', 'edit' ),
-							'readonly'    => true,
-						),
-						'description'                 => array(
-							'description' => __( 'Description of the widget.', 'gutenberg' ),
-							'type'        => 'string',
-							'default'     => '',
-							'context'     => array( 'view', 'edit', 'embed' ),
-						),
-					),
-					'additionalProperties' => true,
-					'context'              => array( 'embed', 'view', 'edit' ),
-					'readonly'             => true,
+				'customize_selective_refresh' => array(
+					'description' => __( 'Customize selective refresh.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'default'     => false,
+					'context'     => array( 'embed', 'view', 'edit' ),
+					'readonly'    => true,
 				),
 			),
 		);
