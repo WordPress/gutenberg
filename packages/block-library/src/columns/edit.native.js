@@ -30,7 +30,6 @@ import { columns } from '@wordpress/icons';
  */
 import variations from './variations';
 import styles from './editor.scss';
-import { getColumnWidths } from './utils';
 import ColumnsPreview from '../column/column-preview';
 
 /**
@@ -150,8 +149,9 @@ function ColumnsEditContainer( {
 	};
 
 	const getColumnsSliders = () => {
-		const columnWidths = Object.values(
-			getColumnWidths( innerColumns, columnCount )
+		const columnWidths = innerColumns.map(
+			( innerColumn ) =>
+				parseFloat( innerColumn.attributes.width ) || 100 / columnCount
 		);
 
 		return innerColumns.map( ( column, index ) => {
@@ -263,7 +263,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
 
 			updateBlockAttributes( columnId, {
-				width: value,
+				width: `${ value }%`,
 			} );
 		},
 		updateBlockSettings( settings ) {
