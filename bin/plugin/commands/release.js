@@ -391,7 +391,7 @@ async function runPushGitChangesStep(
 			await git.pushBranchToOrigin(
 				gitWorkingDirectoryPath,
 				releaseBranch,
-				[ '--force' ]
+				{ '--force': null }
 			);
 			await git.pushTagsToOrigin( gitWorkingDirectoryPath );
 		}
