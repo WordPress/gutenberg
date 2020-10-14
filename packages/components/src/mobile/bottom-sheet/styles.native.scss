@@ -49,12 +49,6 @@
 	padding-top: 8;
 }
 
-.backgroundFullScreen {
-	border-top-right-radius: 0;
-	border-top-left-radius: 0;
-	padding-top: 8;
-}
-
 .content {
 	padding: 0 16px 0 16px;
 }
@@ -184,7 +178,7 @@
 	flex-direction: row;
 	align-items: center;
 	min-height: 44px;
-	padding-right: $grid-unit-20;	
+	padding-right: $grid-unit-20;
 	padding-left: $grid-unit-20;
 }
 
