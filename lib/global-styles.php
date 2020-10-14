@@ -620,6 +620,11 @@ function gutenberg_experimental_global_styles_get_preset_classes( $selector, $se
 			'key'      => 'size',
 			'property' => 'font-size',
 		),
+		'font-style'          => array(
+			'path'     => array( 'typography', 'fontStyles' ),
+			'key'      => 'slug',
+			'property' => 'font-style',
+		),
 	);
 
 	foreach ( $classes_structure as $class_suffix => $preset_structure ) {
