@@ -77,7 +77,7 @@ jobs:
           tag_name: ${{ github.ref }}
           release_name: Release ${{ github.ref }}
           draft: true
-          prerelease: ${{ contains(github.ref, "rc") }}
+          prerelease: ${{ contains(github.ref, 'rc') }}
       - name: Upload Release Asset
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1.0.1
