@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { View, Text, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -41,6 +41,7 @@ const PaletteScreen = () => {
 	const [ currentValue, setCurrentValue ] = useState( colorValue );
 	const isGradientColor = isGradient( currentValue );
 	const selectedSegmentIndex = isGradientColor ? 1 : 0;
+	const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
 
 	const [ currentSegment, setCurrentSegment ] = useState(
 		segments[ selectedSegmentIndex ]
@@ -49,6 +50,10 @@ const PaletteScreen = () => {
 	const horizontalSeparatorStyle = usePreferredColorSchemeStyle(
 		styles.horizontalSeparator,
 		styles.horizontalSeparatorDark
+	);
+	const clearButtonStyle = usePreferredColorSchemeStyle(
+		styles.clearButton,
+		styles.clearButtonDark
 	);
 
 	const isSolidSegment = currentSegment === segments[ 0 ];
@@ -67,6 +72,15 @@ const PaletteScreen = () => {
 		}
 	};
 
+	function onClear() {
+		if ( isSolidSegment ) {
+			onColorChange( '' );
+		} else {
+			onGradientChange( '' );
+		}
+		navigation.goBack();
+	}
+
 	function onCustomPress() {
 		if ( isSolidSegment ) {
 			navigation.navigate( colorsUtils.screens.picker, {
@@ -80,6 +94,16 @@ const PaletteScreen = () => {
 				currentValue,
 			} );
 		}
+	}
+
+	function getClearButton() {
+		return (
+			<TouchableWithoutFeedback onPress={ onClear } hitSlop={ hitSlop }>
+				<View style={ styles.clearButtonContainer }>
+					<Text style={ clearButtonStyle }>{ __( 'Clear' ) }</Text>
+				</View>
+			</TouchableWithoutFeedback>
+		);
 	}
 
 	function getFooter() {
@@ -97,6 +121,7 @@ const PaletteScreen = () => {
 							/>
 						)
 					}
+					addonRight={ currentValue && getClearButton() }
 				/>
 			);
 		}
@@ -116,7 +141,9 @@ const PaletteScreen = () => {
 				>
 					{ __( 'Select a color' ) }
 				</Text>
-				<View style={ styles.flex } />
+				<View style={ styles.flex }>
+					{ currentValue && getClearButton() }
+				</View>
 			</View>
 		);
 	}

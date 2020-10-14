@@ -33,3 +33,15 @@
 	flex: 1;
 }
 
+.clearButtonContainer {
+	align-items: flex-end;
+}
+
+.clearButton {
+	color: $blue-50;
+	font-size: 17px;
+}
+
+.clearButtonDark {
+	color: $blue-30;
+}
