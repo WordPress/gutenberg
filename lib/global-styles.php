@@ -653,6 +653,11 @@ function gutenberg_experimental_global_styles_get_preset_classes( $selector, $se
 			'key'      => 'size',
 			'property' => 'font-size',
 		),
+		'text-decoration'     => array(
+			'path'     => array( 'typography', 'textDecorations' ),
+			'key'      => 'value',
+			'property' => 'text-decoration',
+		),
 		'text-transform'      => array(
 			'path'     => array( 'typography', 'textTransforms' ),
 			'key'      => 'slug',
