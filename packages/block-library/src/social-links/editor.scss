@@ -22,12 +22,29 @@
 .editor-styles-wrapper .wp-block-social-links {
 	padding: 0;
 }
-.wp-block-social-links__social-placeholder {
-	background-color: #aaa;
-	border-radius: 8px;
-	margin: 8px;
+.wp-block-social-links__social-placeholder div {
+	display: inline-block;
+	margin: 0 8px;
 	padding: 4px;
-	font-size: 13px;
+	width: 24px;
+	height: 24px;
+	border-radius: 12px;
+}
+
+.wp-block-social-links__social-placeholder__blue {
+	background-color: #3499cd;
+	box-shadow: 0 0 8px 8px #3499cd;
+}
+
+
+.wp-block-social-links__social-placeholder__pink {
+	background-color: #f00075;
+	box-shadow: 0 0 8px 8px #f00075;
+}
+
+.wp-block-social-links__social-placeholder__orange {
+	background-color: #f90;
+	box-shadow: 0 0 8px 8px #f90;
 }
 
 // Polish the Appender.
