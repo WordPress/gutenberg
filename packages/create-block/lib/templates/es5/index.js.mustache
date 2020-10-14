@@ -21,6 +21,13 @@
 	var __ = wp.i18n.__;
 
 	/**
+	 * This hook is used to mark the block wrapper element.
+	 *
+	 * @see https://developer.wordpress.org/block-editor/packages/packages-block-editor/
+	 */
+	var useBlockProps = wp.blockEditor.useBlockProps;
+
+	/**
 	 * Every block starts by registering a new block type definition.
 	 *
 	 * @see https://developer.wordpress.org/block-editor/developers/block-api/#registering-a-block
@@ -81,7 +88,7 @@
 		edit: function( props ) {
 			return el(
 				'p',
-				{ className: props.className },
+				useBlockProps(),
 				__( '{{title}} – hello from the editor!', '{{textdomain}}' )
 			);
 		},

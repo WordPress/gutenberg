@@ -31,6 +31,7 @@ module.exports = async ( {
 		JSON.stringify(
 			omitBy(
 				{
+					apiVersion: 2,
 					name: namespace + '/' + slug,
 					title,
 					category,
