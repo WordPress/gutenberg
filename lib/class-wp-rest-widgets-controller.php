@@ -590,12 +590,12 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			'self'                      => array(
 				'href' => rest_url( sprintf( '%s/%s/%s', $this->namespace, $this->rest_base, $prepared['id'] ) ),
 			),
+			'about'                     => array(
+				'href'       => rest_url( sprintf( 'wp/v2/widget-types/%s', $prepared['id_base'] ) ),
+				'embeddable' => true,
+			),
 			'https://api.w.org/sidebar' => array(
 				'href' => rest_url( sprintf( 'wp/v2/sidebars/%s/', $prepared['sidebar'] ) ),
-			),
-			'https://api.w.org/widget-type' => array(
-				'href' => rest_url( sprintf( 'wp/v2/widget-types/%s', $prepared['id_base'] ) ),
-				'embeddable' => true,
 			),
 		);
 	}
