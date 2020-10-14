@@ -7,7 +7,6 @@ import {
 	TouchableHighlight,
 	TouchableWithoutFeedback,
 	Dimensions,
-	Platform,
 } from 'react-native';
 import { pick } from 'lodash';
 
@@ -159,7 +158,8 @@ export class InserterMenu extends Component {
 									...listProps.contentContainerStyle,
 									{
 										paddingBottom:
-											safeAreaBottomInset || 32, //TODO check iOS
+											safeAreaBottomInset ||
+											styles.list.paddingBottom,
 									},
 								] }
 							/>
