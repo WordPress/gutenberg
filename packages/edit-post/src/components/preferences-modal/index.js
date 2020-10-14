@@ -67,7 +67,7 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 				<EnableFeature
 					featureName="keepCaretInsideBlock"
 					help={ __(
-						'Aids screen readers by preventing text caret leaving blocks.'
+						'Prevents text caret from leaving blocks to aid screen readers.'
 					) }
 					label={ __( 'Contain text cursor inside block.' ) }
 				/>
@@ -95,7 +95,7 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 			</Section>
 			<Section
 				title={ __( 'Document settings' ) }
-				description={ __( 'Choose what displays in the post panel.' ) }
+				description={ __( 'Choose what displays in the panel.' ) }
 			>
 				<EnablePluginDocumentSettingPanelOption.Slot />
 				{ isViewable && (

@@ -29,7 +29,7 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
   >
     <WithSelect(WithDispatch(BaseOption))
       featureName="keepCaretInsideBlock"
-      help="Aids screen readers by preventing text caret leaving blocks."
+      help="Prevents text caret from leaving blocks to aid screen readers."
       label="Contain text cursor inside block."
     />
   </Section>
@@ -53,7 +53,7 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
     />
   </Section>
   <Section
-    description="Choose what displays in the post panel."
+    description="Choose what displays in the panel."
     title="Document settings"
   >
     <EnablePluginDocumentSettingPanelOptionSlot />
