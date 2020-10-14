@@ -17,6 +17,7 @@ import {
 	WritingFlow,
 	BlockList,
 	BlockControls,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -94,19 +95,25 @@ export default function ReusableBlockEdit( {
 		{ id: ref }
 	);
 
+	const blockProps = useBlockProps();
+
 	if ( ! hasResolved ) {
 		return (
-			<Placeholder>
-				<Spinner />
-			</Placeholder>
+			<div { ...blockProps }>
+				<Placeholder>
+					<Spinner />
+				</Placeholder>
+			</div>
 		);
 	}
 
 	if ( ! reusableBlock ) {
 		return (
-			<Placeholder>
-				{ __( 'Block has been deleted or is unavailable.' ) }
-			</Placeholder>
+			<div { ...blockProps }>
+				<Placeholder>
+					{ __( 'Block has been deleted or is unavailable.' ) }
+				</Placeholder>
+			</div>
 		);
 	}
 
@@ -128,7 +135,7 @@ export default function ReusableBlockEdit( {
 	}
 
 	return (
-		<>
+		<div { ...blockProps }>
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
@@ -158,6 +165,6 @@ export default function ReusableBlockEdit( {
 				) }
 				{ element }
 			</div>
-		</>
+		</div>
 	);
 }
