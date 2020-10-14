@@ -45,7 +45,9 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     protected boolean mIsRedirected;
 
     private ProgressBar mProgressBar;
-    private AtomicBoolean isBlockContentInserted = new AtomicBoolean(false);
+    private boolean mIsGutenbergReady;
+    private AtomicBoolean mIsWebPageLoaded = new AtomicBoolean(false);
+    private AtomicBoolean mIsBlockContentInserted = new AtomicBoolean(false);
 
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,16 +77,20 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int progress) {
-                if (progress == 100 && !isBlockContentInserted.getAndSet(true)) {
-                    mProgressBar.setVisibility(View.GONE);
-                    final Handler handler = new Handler();
-                    handler.postDelayed(() -> {
-                        // Inject block content
-                        insertBlockScript();
-                    }, 200);
+                if (progress == 100 && !mIsWebPageLoaded.getAndSet(true)) {
+                    // We want to insert block content
+                    // only if gutenberg is ready
+                    if (mIsGutenbergReady) {
+                        mProgressBar.setVisibility(View.GONE);
+                        final Handler handler = new Handler();
+                        handler.postDelayed(() -> {
+                            // Insert block content
+                            insertBlockScript();
+                        }, 200);
+                    }
                 }
                 else {
-                    mProgressBar.setVisibility(View.VISIBLE);
+                    mIsWebPageLoaded.compareAndSet(true, false);
                     mProgressBar.setProgress(progress);
                 }
             }
@@ -238,6 +244,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     }
 
     private void onGutenbergReady() {
+        mIsGutenbergReady = true;
         preventAutoSavesScript();
         // Inject css when Gutenberg is ready
         injectCssScript();
@@ -246,6 +253,11 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
             // We want to make sure that page is loaded
             // with all elements before executing external JS
             injectOnGutenbergReadyExternalSources();
+            // If page is loaded try to insert block content
+            if (mIsWebPageLoaded.get()) {
+                // Insert block content
+                insertBlockScript();
+            }
             // We need some extra time to hide all unwanted html elements
             // like NUX (new user experience) modal is.
             mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 1500);
@@ -295,10 +307,12 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     }
 
     private void insertBlockScript() {
-        String insertBlock = getFileContentFromAssets("gutenberg-web-single-block/insert-block.js").replace("%@","%s");
-        String blockContent = getIntent().getExtras().getString(ARG_BLOCK_CONTENT);
-        insertBlock = String.format(insertBlock, blockContent);
-        evaluateJavaScript(removeNewLines(insertBlock.replace("\\n", "\\\\n")));
+        if (!mIsBlockContentInserted.getAndSet(true)) {
+            String insertBlock = getFileContentFromAssets("gutenberg-web-single-block/insert-block.js").replace("%@","%s");
+            String blockContent = getIntent().getExtras().getString(ARG_BLOCK_CONTENT);
+            insertBlock = String.format(insertBlock, blockContent);
+            evaluateJavaScript(removeNewLines(insertBlock.replace("\\n", "\\\\n")));
+        }
     }
 
     @Override
