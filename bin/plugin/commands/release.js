@@ -99,12 +99,6 @@ async function runReleaseBranchCreationStep(
 				abortMessage
 			);
 
-			// Creating the release branch
-			await git.createLocalBranch(
-				gitWorkingDirectoryPath,
-				releaseBranch
-			);
-
 			log(
 				'>> The local release branch ' +
 					formats.success( releaseBranch ) +
@@ -118,6 +112,9 @@ async function runReleaseBranchCreationStep(
 					formats.success( releaseBranch )
 			);
 		}
+
+		// Creates/checks-out the release branch
+		await git.createLocalBranch( gitWorkingDirectoryPath, releaseBranch );
 	} );
 
 	return {
@@ -390,9 +387,11 @@ async function runPushGitChangesStep(
 				true,
 				abortMessage
 			);
+			// We need to force-push because we are effectivelly rebasing from master
 			await git.pushBranchToOrigin(
 				gitWorkingDirectoryPath,
-				releaseBranch
+				releaseBranch,
+				[ '--force' ]
 			);
 			await git.pushTagsToOrigin( gitWorkingDirectoryPath );
 		}

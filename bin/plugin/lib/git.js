@@ -82,10 +82,20 @@ async function createLocalTag( gitWorkingDirectoryPath, tagName ) {
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
  * @param {string} branchName Branch Name
+ * @param {Array.<string>} options accepted by git-push
  */
-async function pushBranchToOrigin( gitWorkingDirectoryPath, branchName ) {
+async function pushBranchToOrigin(
+	gitWorkingDirectoryPath,
+	branchName,
+	options = []
+) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.push( 'origin', branchName );
+
+	// TODO The type definitions for simple-git are wrong and will complain here.
+	// The version of simple-git we are using doesn't seem to match the d.ts
+	// as options is supposed to be passed as the 1st argument and not the last.
+	// This is pending a fix by either updating the d.ts or simple-git.
+	await simpleGit.push( [ 'origin', branchName ].concat( options ) );
 }
 
 /**
