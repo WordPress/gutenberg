@@ -40,7 +40,7 @@ function BlockUpdatingProgress( { url, id } ) {
 
 ### mediaFiles
 
-A collection of media ID that identifies the current colleciton of files represented in this media container block.
+A collection of media IDs that identify the current story upload.
 
 - Type: `Array`
 - Required: Yes
@@ -97,9 +97,8 @@ The argument of the callback is an object containing the following properties:
 
 ### onMediaUploadStateReset
 
-Callback called when the media upload is reset
+Callback called when the media upload is reset.
 
 - Type: `Function`
 - Required: No
 - Platform: Mobile
-
