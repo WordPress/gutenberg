@@ -2,14 +2,15 @@
  * External dependencies
  */
 import {
-	map,
 	findIndex,
 	flow,
 	sortBy,
 	groupBy,
 	isEmpty,
 	orderBy,
+	chunk,
 } from 'lodash';
+import { List, AutoSizer } from 'react-virtualized';
 
 /**
  * WordPress dependencies
@@ -121,94 +122,197 @@ export function BlockTypesTab( {
 
 	const hasItems = ! isEmpty( filteredItems );
 
-	return (
-		<div>
-			{ hasChildItems && (
-				<ChildBlocks rootClientId={ rootClientId }>
-					<BlockTypesList
-						// Pass along every block, as useBlockTypesState() and
-						// getInserterItems() will have already filtered out
-						// non-child blocks.
-						items={ filteredItems }
-						onSelect={ onSelectItem }
-						onHover={ onHover }
-						label={ __( 'Child Blocks' ) }
-					/>
-				</ChildBlocks>
-			) }
+	const finalRows = useMemo( () => {
+		const rows = [];
 
-			{ showMostUsedBlocks &&
-				! hasChildItems &&
-				!! suggestedItems.length &&
-				! filterValue && (
-					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
+		if ( hasChildItems ) {
+			rows.push( {
+				height: 34,
+				component: <ChildBlocks rootClientId={ rootClientId } />,
+			} );
+
+			const chunks = chunk( filteredItems, 3 );
+			for ( const chunkItems of chunks ) {
+				rows.push( {
+					height: 108,
+					component: (
 						<BlockTypesList
-							items={ suggestedItems }
+							// Pass along every block, as useBlockTypesState() and
+							// getInserterItems() will have already filtered out
+							// non-child blocks.
+							items={ chunkItems }
+							onSelect={ onSelectItem }
+							onHover={ onHover }
+							label={ __( 'Child Blocks' ) }
+						/>
+					),
+				} );
+			}
+		}
+
+		if (
+			showMostUsedBlocks &&
+			! hasChildItems &&
+			!! suggestedItems.length &&
+			! filterValue
+		) {
+			rows.push( {
+				height: 34,
+				component: (
+					<InserterPanel title={ _x( 'Most used', 'blocks' ) } />
+				),
+			} );
+
+			const chunks = chunk( suggestedItems, 3 );
+			for ( const chunkItems of chunks ) {
+				rows.push( {
+					height: 108,
+					component: (
+						<BlockTypesList
+							items={ chunkItems }
 							onSelect={ onSelectItem }
 							onHover={ onHover }
 							label={ _x( 'Most used', 'blocks' ) }
 						/>
-					</InserterPanel>
-				) }
+					),
+				} );
+			}
+		}
 
-			{ ! hasChildItems &&
-				map( categories, ( category ) => {
-					const categoryItems = itemsPerCategory[ category.slug ];
-					if ( ! categoryItems || ! categoryItems.length ) {
-						return null;
-					}
-					return (
+		if ( ! hasChildItems ) {
+			for ( const category of categories ) {
+				const categoryItems = itemsPerCategory[ category.slug ];
+				if ( ! categoryItems || ! categoryItems.length ) {
+					continue;
+				}
+
+				rows.push( {
+					height: 34,
+					component: (
 						<InserterPanel
 							key={ category.slug }
 							title={ category.title }
 							icon={ category.icon }
-						>
+						/>
+					),
+				} );
+
+				const chunks = chunk( categoryItems, 3 );
+				for ( const chunkItems of chunks ) {
+					rows.push( {
+						height: 108,
+						component: (
 							<BlockTypesList
-								items={ categoryItems }
+								items={ chunkItems }
 								onSelect={ onSelectItem }
 								onHover={ onHover }
 								label={ category.title }
 							/>
-						</InserterPanel>
-					);
-				} ) }
+						),
+					} );
+				}
+			}
+		}
 
-			{ ! hasChildItems && !! uncategorizedItems.length && (
-				<InserterPanel
-					className="block-editor-inserter__uncategorized-blocks-panel"
-					title={ __( 'Uncategorized' ) }
-				>
-					<BlockTypesList
-						items={ uncategorizedItems }
-						onSelect={ onSelectItem }
-						onHover={ onHover }
-						label={ __( 'Uncategorized' ) }
+		if ( ! hasChildItems && !! uncategorizedItems.length ) {
+			rows.push( {
+				height: 34,
+				component: (
+					<InserterPanel
+						className="block-editor-inserter__uncategorized-blocks-panel"
+						title={ __( 'Uncategorized' ) }
 					/>
-				</InserterPanel>
-			) }
+				),
+			} );
 
-			{ ! hasChildItems &&
-				map( collections, ( collection, namespace ) => {
-					const collectionItems = itemsPerCollection[ namespace ];
-					if ( ! collectionItems || ! collectionItems.length ) {
-						return null;
-					}
+			const chunks = chunk( uncategorizedItems, 3 );
+			for ( const chunkItems of chunks ) {
+				rows.push( {
+					height: 108,
+					component: (
+						<BlockTypesList
+							items={ chunkItems }
+							onSelect={ onSelectItem }
+							onHover={ onHover }
+							label={ __( 'Uncategorized' ) }
+						/>
+					),
+				} );
+			}
+		}
 
-					return (
+		if ( ! hasChildItems ) {
+			for ( const namespace of Object.keys( collections ) ) {
+				const collection = collections[ namespace ];
+				const collectionItems = itemsPerCollection[ namespace ];
+				if ( ! collectionItems || ! collectionItems.length ) {
+					continue;
+				}
+
+				rows.push( {
+					height: 34,
+					component: (
 						<InserterPanel
 							key={ namespace }
 							title={ collection.title }
 							icon={ collection.icon }
-						>
+						/>
+					),
+				} );
+
+				const chunks = chunk( collectionItems, 3 );
+				for ( const chunkItems of chunks ) {
+					rows.push( {
+						height: 108,
+						component: (
 							<BlockTypesList
-								items={ collectionItems }
+								items={ chunkItems }
 								onSelect={ onSelectItem }
 								onHover={ onHover }
 								label={ collection.title }
 							/>
-						</InserterPanel>
-					);
-				} ) }
+						),
+					} );
+				}
+			}
+		}
+
+		return rows;
+	}, [
+		rootClientId,
+		hasChildItems,
+		filteredItems,
+		showMostUsedBlocks,
+		filterValue,
+		categories,
+		itemsPerCategory,
+		collections,
+		itemsPerCollection,
+		suggestedItems,
+	] );
+
+	return (
+		<div>
+			<AutoSizer>
+				{ ( { height, width } ) => (
+					<List
+						width={ width }
+						height={ height }
+						rowCount={ finalRows.length }
+						overscanRowCount={ 2 }
+						rowHeight={ ( { index } ) => {
+							return finalRows[ index ].height;
+						} }
+						rowRenderer={ ( { index, style } ) => {
+							return (
+								<div style={ style }>
+									{ finalRows[ index ].component }
+								</div>
+							);
+						} }
+					/>
+				) }
+			</AutoSizer>
 
 			<__experimentalInserterMenuExtension.Slot
 				fillProps={ {

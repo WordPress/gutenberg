@@ -128,6 +128,8 @@ $block-inserter-tabs-height: 44px;
 	display: flex;
 	flex-direction: column;
 	margin-top: -$grid-unit-10;
+	height: 100%;
+	flex: 1;
 
 	.components-tab-panel__tabs {
 		position: sticky;
@@ -338,4 +340,18 @@ $block-inserter-tabs-height: 44px;
 	&:focus:not(:disabled) {
 		box-shadow: inset 0 0 0 $border-width-focus $gray-900, inset 0 0 0 2px $white;
 	}
+}
+
+.block-editor-inserter__content {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+}
+
+.block-editor-inserter__block-list > div {
+	height: 100%;
+}
+
+.block-editor-block-types-list__list-item {
+	min-height: 108px;
 }
