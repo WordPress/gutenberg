@@ -3,9 +3,7 @@
         "clientId": "_clientId_0",
         "name": "core/post-comment",
         "isValid": true,
-        "attributes": {
-            "className": "wp-block-post-comment"
-        },
+        "attributes": {},
         "innerBlocks": [],
         "originalContent": "<div class=\"wp-block-post-comment\"></div>"
     }
