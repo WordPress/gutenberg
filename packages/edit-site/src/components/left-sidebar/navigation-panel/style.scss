@@ -3,6 +3,7 @@
 	height: 100%;
 	position: relative;
 	width: $nav-sidebar-width;
+	background: $gray-900;
 	@include reduce-motion("animation");
 
 	@keyframes edit-site-navigation-panel__slide-in {
@@ -12,10 +13,6 @@
 		to {
 			transform: translateX(0%);
 		}
-	}
-
-	.components-navigation {
-		height: 100%;
 	}
 }
 
