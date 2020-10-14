@@ -64,20 +64,20 @@ class WP_Block_Supports {
 	}
 
 	/**
-	 * Generates a string of classes by applying to the given block all of the
-	 * features that the block supports.
+	 * Generates an array of HTML attributes, such as classes, by applying to
+	 * the given block all of the features that the block supports.
 	 *
 	 * @param  array $parsed_block Block as parsed from content.
-	 * @return string              String of HTML classes.
+	 * @return array               Array of HTML attributes.
 	 */
-	public function get_block_classes( $parsed_block ) {
+	public function get_new_block_attributes( $parsed_block ) {
 		if (
 			empty( $parsed_block ) ||
 			! isset( $parsed_block['attrs'] ) ||
 			! isset( $parsed_block['blockName'] )
 		) {
 			// TODO: handle as error?
-			return '';
+			return array();
 		}
 
 		$block_attributes = $parsed_block['attrs'];
@@ -87,10 +87,10 @@ class WP_Block_Supports {
 
 		if ( empty( $block_type ) ) {
 			// TODO: handle as error?
-			return '';
+			return array();
 		}
 
-		$output = '';
+		$output = array();
 		foreach ( $this->config as $feature_name => $feature_config ) {
 			if (
 				! $this->get_block_support(
@@ -101,7 +101,7 @@ class WP_Block_Supports {
 			) {
 				continue;
 			}
-			$classes = call_user_func(
+			$new_attributes = call_user_func(
 				$feature_config['callback'],
 				// Pick from $block_attributes according to feature attributes.
 				array_intersect_key(
@@ -110,8 +110,13 @@ class WP_Block_Supports {
 				),
 				$block_type->name
 			);
-			if ( ! empty( $classes ) ) {
-				$output .= " $classes";
+			if ( ! empty( $new_attributes ) ) {
+				$classes = $new_attributes['class'];
+				if ( empty( $output['class'] ) ) {
+					$output['class'] = '';
+				}
+
+				$output['class'] .= " $classes";
 			}
 		}
 		return $output;
@@ -120,8 +125,9 @@ class WP_Block_Supports {
 	/**
 	 * TODO.
 	 *
-	 * @param  string $block_content rendered block content.
-	 * @param  array  $block block object.
+	 * @param  string $block_content Rendered block content.
+	 * @param  array  $block         Block object.
+	 * @return string                Transformed block content.
 	 */
 	public function inject_attributes( $block_content, $block ) {
 		if ( ! isset( $block['attrs'] ) ) {
@@ -134,9 +140,10 @@ class WP_Block_Supports {
 			return $block_content;
 		}
 
-		$classes = $this->get_block_classes( $block );
-		if ( ! empty( $classes ) ) {
-			return $this->inject_classes( $block_content, $classes );
+		$new_attributes = $this->get_new_block_attributes( $block );
+		if ( ! empty( $new_attributes ) ) {
+			// FIXME.
+			return $this->inject_classes( $block_content, $new_attributes['class'] );
 		}
 
 		return $block_content;
@@ -159,9 +166,11 @@ class WP_Block_Supports {
 						return false;
 					}
 
-					return sprintf(
-						'align%s',
-						$attributes['align']
+					return array(
+						'class' => sprintf(
+							'align%s',
+							$attributes['align']
+						),
 					);
 				},
 				'default'    => false,
@@ -169,7 +178,7 @@ class WP_Block_Supports {
 			'className'        => array(
 				'attributes' => array(),
 				'callback'   => function( $attributes, $block_name ) {
-					$classname = 'HELLO-FROM-className wp-block-' . preg_replace(
+					$classes = 'HELLO-FROM-className wp-block-' . preg_replace(
 						'/^core-/',
 						'',
 						str_replace( '/', '-', $block_name )
@@ -181,9 +190,9 @@ class WP_Block_Supports {
 					 * @param string     $class_name The current applied classname.
 					 * @param string     $block_name The block name.
 					 */
-					$classname = apply_filters( 'block_default_classname', $classname, $block_name );
+					$classes = apply_filters( 'block_default_classname', $classes, $block_name );
 
-					return $classname;
+					return array( 'class' => $classes );
 				},
 				'default'    => true,
 			),
@@ -246,7 +255,7 @@ class WP_Block_Supports {
 							)
 						);
 					}
-					return $classes;
+					return array( 'class' => $classes );
 				},
 				'default'    => array( false, true ),
 			),
@@ -258,7 +267,7 @@ class WP_Block_Supports {
 				),
 				'callback'   => function( $attributes ) {
 					return array_key_exists( 'className', $attributes ) ?
-						$attributes['className'] :
+						array( 'class' => $attributes['className'] ) :
 						false;
 				},
 				'default'    => true,
@@ -292,7 +301,7 @@ class WP_Block_Supports {
 						);
 					}
 
-					return $classes;
+					return array( 'class' => $classes );
 				},
 				'default'    => false,
 			),
@@ -319,7 +328,7 @@ class WP_Block_Supports {
 						);
 					}
 
-					return $classes;
+					return array( 'class' => $classes );
 				},
 				'default'    => false,
 			),
@@ -472,7 +481,8 @@ class WP_Block_Supports {
  */
 function gutenberg_block_supports_classes() {
 	global $current_parsed_block;
-	return WP_Block_Supports::get_instance()->get_block_classes( $current_parsed_block );
+	$new_attributes = WP_Block_Supports::get_instance()->get_new_block_attributes( $current_parsed_block );
+	return empty( $new_attributes ) ? '' : $new_attributes['class'];
 }
 
 add_action( 'init', array( 'WP_Block_Supports', 'init' ), 22 );
