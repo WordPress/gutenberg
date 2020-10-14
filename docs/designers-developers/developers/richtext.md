@@ -29,7 +29,7 @@ There are a number of core blocks using the RichText component. The JavaScript e
 {% ESNext %}
 ```js
 import { registerBlockType } from '@wordpress/blocks';
-import { RichText } from '@wordpress/block-editor';
+import { useBlockProps, RichText } from '@wordpress/block-editor';
 
 registerBlockType( /* ... */, {
 	// ...
@@ -42,11 +42,13 @@ registerBlockType( /* ... */, {
 		},
 	},
 
-	edit( { className, attributes, setAttributes } ) {
+	edit( { attributes, setAttributes } ) {
+		const blockProps = useBlockProps();
+
 		return (
 			<RichText
+				{ ...blockProps }
 				tagName="h2" // The tag here is the element output and editable in the admin
-				className={ className }
 				value={ attributes.content } // Any existing content, either from the database or an attribute default
 				formattingControls={ [ 'bold', 'italic' ] } // Allow the content to be made bold or italic, but do not allow other formatting options
 				onChange={ ( content ) => setAttributes( { content } ) } // Store updated content as a block attribute
@@ -56,7 +58,9 @@ registerBlockType( /* ... */, {
 	},
 
 	save( { attributes } ) {
-		return <RichText.Content tagName="h2" value={ attributes.content } />; // Saves <h2>Content added in the editor...</h2> to the database for frontend display
+		const blockProps = useBlockProps.save();
+
+		return <RichText.Content { ...blockProps } tagName="h2" value={ attributes.content } />; // Saves <h2>Content added in the editor...</h2> to the database for frontend display
 	}
 } );
 ```
@@ -74,22 +78,25 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	edit: function( props ) {
-		return wp.element.createElement( wp.editor.RichText, {
+		var blockProps = wp.blockEditor.useBlockProps();
+
+		return wp.element.createElement( wp.blockEditor.RichText, Object.assign( blockProps, {
 			tagName: 'h2',  // The tag here is the element output and editable in the admin
-			className: props.className,
 			value: props.attributes.content, // Any existing content, either from the database or an attribute default
 			formattingControls: [ 'bold', 'italic' ], // Allow the content to be made bold or italic, but do not allow other formatting options
 			onChange: function( content ) {
 				props.setAttributes( { content: content } ); // Store updated content as a block attribute
 			},
 			placeholder: __( 'Heading...' ), // Display this text before any content has been added by the user
-		} );
+		} ) );
 	},
 
 	save: function( props ) {
-		return wp.element.createElement( wp.editor.RichText.Content, {
+		var blockProps = wp.blockEditor.useBlockProps();
+
+		return wp.element.createElement( wp.blockEditor.RichText.Content, Object.assign( blockProps, {
 			tagName: 'h2', value: props.attributes.content // Saves <h2>Content added in the editor...</h2> to the database for frontend display
-		} );
+		} ) );
 	}
 } );
 ```

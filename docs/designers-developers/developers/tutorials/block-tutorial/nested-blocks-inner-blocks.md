@@ -10,22 +10,26 @@ Here is the basic InnerBlocks usage.
 {% ESNext %}
 ```js
 import { registerBlockType } from '@wordpress/blocks';
-import { InnerBlocks } from '@wordpress/block-editor';
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-06', {
 	// ...
 
-	edit: ( { className } ) => {
+	edit: () => {
+		const blockProps = useBlockProps();
+
 		return (
-			<div className={ className }>
+			<div { ...blockProps }>
 				<InnerBlocks />
 			</div>
 		);
 	},
 
-	save: ( { className } ) => {
+	save: () => {
+		const blockProps = useBlockProps.save();
+
 		return (
-			<div className={ className }>
+			<div { ...blockProps }>
 				<InnerBlocks.Content />
 			</div>
 		);
@@ -37,23 +41,28 @@ registerBlockType( 'gutenberg-examples/example-06', {
 ( function( blocks, element, blockEditor ) {
 	var el = element.createElement;
 	var InnerBlocks = blockEditor.InnerBlocks;
+	var useBlockProps = blockEditor.useBlockProps;
 
 	blocks.registerBlockType( 'gutenberg-examples/example-06', {
 		title: 'Example: Inner Blocks',
 		category: 'design',
 
-		edit: function( props ) {
+		edit: function() {
+			var blockProps = useBlockProps();
+
 			return el(
 				'div',
-				{ className: props.className },
+				blockProps,
 				el( InnerBlocks )
 			);
 		},
 
-		save: function( props ) {
+		save: function() {
+			var blockProps = useBlockProps.save();
+
 			return el(
 				'div',
-				{ className: props.className },
+				blockProps,
 				el( InnerBlocks.Content )
 			);
 		},

@@ -73,7 +73,7 @@ function random_image_enqueue_block_editor_assets() {
 	wp_enqueue_script(
 		'random-image-block',
 		plugins_url( 'block.js', __FILE__ ),
-		array( 'wp-blocks', 'wp-element' )
+		array( 'wp-blocks', 'wp-element', 'wp-block-editor', )
 	);
 }
 add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_assets' );
@@ -81,9 +81,10 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 
 ```js
 // block.js
-( function( blocks, element ) {
+( function( blocks, element, blockEditor ) {
 	var el = element.createElement,
-		source = blocks.source;
+		source = blocks.source,
+		useBlockProps = blockEditor.useBlockProps;
 
 	function RandomImage( props ) {
 		var src = 'http://lorempixel.com/400/200/' + props.category;
@@ -95,6 +96,8 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 	}
 
 	blocks.registerBlockType( 'myplugin/random-image', {
+		apiVersion: 2,
+
 		title: 'Random Image',
 
 		icon: 'format-image',
@@ -111,6 +114,7 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 		},
 
 		edit: function( props ) {
+			var blockProps = useBlockProps();
 			var category = props.attributes.category,
 				children;
 
@@ -134,7 +138,7 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 				)
 			);
 
-			return el( 'form', { onSubmit: setCategory }, children );
+			return el( 'form', Object.assing( blockProps, {  onSubmit: setCategory } ), children );
 		},
 
 		save: function( props ) {
@@ -143,7 +147,8 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 	} );
 } )(
 	window.wp.blocks,
-	window.wp.element
+	window.wp.element,
+	window.wp.blockEditor
 );
 ```
 

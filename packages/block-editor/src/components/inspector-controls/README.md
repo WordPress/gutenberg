@@ -13,7 +13,8 @@ var el = wp.element.createElement,
 	Fragment = wp.element.Fragment,
 	registerBlockType = wp.blocks.registerBlockType,
 	RichText = wp.editor.RichText,
-	InspectorControls = wp.editor.InspectorControls,
+	InspectorControls = wp.blockEditor.InspectorControls,
+	useBlockProps = wp.blockEditor.useBlockProps,
 	CheckboxControl = wp.components.CheckboxControl,
 	RadioControl = wp.components.RadioControl,
 	TextControl = wp.components.TextControl,
@@ -21,6 +22,8 @@ var el = wp.element.createElement,
 	SelectControl = wp.components.SelectControl;
 
 registerBlockType( 'my-plugin/inspector-controls-example', {
+	apiVersion: 2,
+
 	title: 'Inspector controls example',
 
 	icon: 'universal-access-alt',
@@ -53,6 +56,8 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 	},
 
 	edit: function( props ) {
+		var blockProps = useBlockProps();
+		
 		var content = props.attributes.content,
 			checkboxField = props.attributes.checkboxField,
 			radioField = props.attributes.radioField,
@@ -161,18 +166,19 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 				),
 				el(
 					RichText,
-					{
+					Object.assing( blockProps, {
 						key: 'editable',
 						tagName: 'p',
 						onChange: onChangeContent,
 						value: content
-					}
+					} )
 				)
 			)
 		);
 	},
 
 	save: function( props ) {
+		var blockProps  = useBlockProps.save();
 		var content = props.attributes.content,
 			checkboxField = props.attributes.checkboxField,
 			radioField = props.attributes.radioField,
@@ -182,7 +188,7 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 
 		return el(
 			'div',
-			null,
+			blockProps,
 			el(
 				RichText.Content,
 				{
@@ -236,19 +242,22 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 {% ESNext %}
 ```js
 import { registerBlockType } from '@wordpress/blocks';
-const {
+import {
 	CheckboxControl,
 	RadioControl,
 	TextControl,
 	ToggleControl,
-	SelectControl,
-} = wp.components;
-const {
+	SelectControl
+} from '@wordpress/components';
+import {
 	RichText,
 	InspectorControls,
-} = wp.editor;
+	useBlockProps
+} from '@wordpress/block-editor';
 
 registerBlockType( 'my-plugin/inspector-controls-example', {
+	apiVersion: 2,
+
 	title: 'Inspector controls example',
 
 	icon: 'universal-access-alt',
@@ -281,6 +290,7 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 	},
 
 	edit( { attributes, setAttributes } ) {
+		const blockProps = useBlockProps();
 		const { content, checkboxField, radioField, textField, toggleField, selectField } = attributes;
 
 		function onChangeContent( newContent ) {
@@ -360,6 +370,7 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 				</InspectorControls>
 
 				<RichText
+					{ ...blockProps }
 					key="editable"
 					tagName="p"
 					onChange={ onChangeContent }
@@ -371,9 +382,10 @@ registerBlockType( 'my-plugin/inspector-controls-example', {
 
 	save( { attributes } ) {
 		const { content, checkboxField, radioField, textField, toggleField, selectField } = attributes;
+		const blockProps = useBlockProps.save();
 
 		return (
-			<div>
+			<div { ...blockProps }>
 				<RichText.Content
 					value={ content }
 					tagName="p"

@@ -16,12 +16,14 @@ You can also customize the toolbar to include controls specific to your block ty
 import { registerBlockType } from '@wordpress/blocks';
 
 import {
+	useBlockProps,
 	RichText,
 	AlignmentToolbar,
 	BlockControls,
 } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
+	apiVersion: 2,
 	title: 'Example: Controls (esnext)',
 	icon: 'universal-access-alt',
 	category: 'design',
@@ -48,8 +50,9 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 				content,
 				alignment,
 			},
-			className,
 		} = props;
+
+		const blockProps = useBlockProps();
 
 		const onChangeContent = ( newContent ) => {
 			props.setAttributes( { content: newContent } );
@@ -60,7 +63,7 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 		};
 
 		return (
-			<div>
+			<div {...blockProps}>
 				{
 					<BlockControls>
 						<AlignmentToolbar
@@ -80,23 +83,28 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 		);
 	},
 	save: ( props ) => {
+		const blockProps = useBlockProps.save();
+
 		return (
-			<RichText.Content
-				className={ `gutenberg-examples-align-${ props.attributes.alignment }` }
-				tagName="p"
-				value={ props.attributes.content }
-			/>
+			<div {...blockProps}>
+				<RichText.Content
+					className={ `gutenberg-examples-align-${ props.attributes.alignment }` }
+					tagName="p"
+					value={ props.attributes.content }
+				/>
+			</div>
 		);
 	},
 } );
 ```
 {% ES5 %}
 ```js
-( function( blocks, editor, element ) {
+( function( blocks, blockEditor, element ) {
 	var el = element.createElement;
-	var RichText = editor.RichText;
-	var AlignmentToolbar = editor.AlignmentToolbar;
-	var BlockControls = editor.BlockControls;
+	var RichText = blockEditor.RichText;
+	var AlignmentToolbar = blockEditor.AlignmentToolbar;
+	var BlockControls = blockEditor.BlockControls;
+	var useBlockProps = blockEditor.useBlockProps;
 
 	blocks.registerBlockType( 'gutenberg-examples/example-04-controls', {
 		title: 'Example: Controls',
@@ -123,6 +131,7 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 		edit: function( props ) {
 			var content = props.attributes.content;
 			var alignment = props.attributes.alignment;
+			var blockProps = useBlockProps();
 
 			function onChangeContent( newContent ) {
 				props.setAttributes( { content: newContent } );
@@ -132,7 +141,9 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 				props.setAttributes( { alignment: newAlignment === undefined ? 'none' : newAlignment } );
 			}
 
-			return [
+			return el( 
+				'div', 
+				blockProps, 
 				el(
 					BlockControls,
 					{ key: 'controls' },
@@ -150,25 +161,30 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 						key: 'richtext',
 						tagName: 'p',
 						style: { textAlign: alignment },
-						className: props.className,
 						onChange: onChangeContent,
 						value: content,
 					}
 				),
-			];
+			);
 		},
 
 		save: function( props ) {
-			return el( RichText.Content, {
-				tagName: 'p',
-				className: 'gutenberg-examples-align-' + props.attributes.alignment,
-				value: props.attributes.content,
-			} );
+			var blockProps = useBlockProps.save();
+
+			return el( 
+				'div', 
+				blockProps, 
+				el( RichText.Content, {
+					tagName: 'p',
+					className: 'gutenberg-examples-align-' + props.attributes.alignment,
+					value: props.attributes.content,
+				} ) 
+			);
 		},
 	} );
 }(
 	window.wp.blocks,
-	window.wp.editor,
+	window.wp.blockEditor,
 	window.wp.element
 ) );
 ```
