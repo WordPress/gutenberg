@@ -42,6 +42,9 @@ jobs:
             mv -f "vendor/_download.tmp.js" "vendor/$filename"
           done
           echo ::set-env name=vendor_scripts::$(ls vendor/*.js)
+          echo 'vendor_scripts<<EOF' >> $GITHUB_ENV
+            ls vendor/*.js >> $GITHUB_ENV
+          echo 'EOF' >> $GITHUB_ENV
       - name: Install dependencies
         run: npm install
       - name: Build Gutenberg
