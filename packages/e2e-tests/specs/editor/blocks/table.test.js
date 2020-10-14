@@ -32,7 +32,7 @@ describe( 'Table', () => {
 
 		// Check for existence of the column count field.
 		const columnCountLabel = await page.$x(
-			"//div[@data-type='core/table']//label[text()='Column count']"
+			"//figure[@data-type='core/table']//label[text()='Column count']"
 		);
 		expect( columnCountLabel ).toHaveLength( 1 );
 
@@ -47,7 +47,7 @@ describe( 'Table', () => {
 
 		// Check for existence of the row count field.
 		const rowCountLabel = await page.$x(
-			"//div[@data-type='core/table']//label[text()='Row count']"
+			"//figure[@data-type='core/table']//label[text()='Row count']"
 		);
 		expect( rowCountLabel ).toHaveLength( 1 );
 
@@ -179,7 +179,7 @@ describe( 'Table', () => {
 		await insertBlock( 'Table' );
 
 		const [ columnCountLabel ] = await page.$x(
-			"//div[@data-type='core/table']//label[text()='Column count']"
+			"//figure[@data-type='core/table']//label[text()='Column count']"
 		);
 		await columnCountLabel.click();
 		await page.keyboard.press( 'Backspace' );
