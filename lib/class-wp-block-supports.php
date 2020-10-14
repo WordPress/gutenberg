@@ -231,6 +231,7 @@ class WP_Block_Supports {
 					$has_named_text_color = array_key_exists( 'textColor', $attributes );
 					$has_custom_text_color = isset( $attributes['style']['color']['text'] );
 					$classes = '';
+					$styles  = '';
 
 					// Apply required generic class.
 					if ( $has_custom_text_color || $has_named_text_color ) {
@@ -240,21 +241,15 @@ class WP_Block_Supports {
 					if ( $has_named_text_color ) {
 						$classes .= sprintf( ' has-%s-color', $attributes['textColor'] );
 					} elseif ( $has_custom_text_color ) {
-						$generated_class_name = uniqid( 'wp-block-colortext-' );
-						$classes .= " $generated_class_name";
-						wp_add_inline_style(
-							'wp-block-supports',
-							sprintf(
-								// TODO: how do systematically and confidently address specificity?
-								// should we just go back to proper inline styles?
-								// of course, there's also the blunt tool that is !important.
-								':root:root:root .%s { color: %s; }',
-								$generated_class_name,
-								$attributes['style']['color']['text']
-							)
+						$styles = sprintf(
+							'color:%s;',
+							$attributes['style']['color']['text']
 						);
 					}
-					return array( 'class' => $classes );
+					return array(
+						'class' => $classes,
+						'style' => $styles,
+					);
 				},
 				'default'    => array( false, true ),
 			),
