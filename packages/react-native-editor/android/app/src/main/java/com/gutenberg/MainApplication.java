@@ -85,7 +85,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void storySaveSync(MediaSelectedCallback mediaSelectedCallback) {
+            public void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback) {
             }
 
             @Override
@@ -177,14 +177,14 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void requestStoryCreatorLoad(
-                    ReplaceStoryEditedBlockCallback replaceStoryEditedBlockCallback,
+            public void requestMediaFilesEditorLoad(
+                    ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
                     ReadableArray mediaFiles,
                     String blockId
             ) {
                 // mReplaceStoryEditedBlockCallback = replaceStoryEditedBlockCallback;
-                // mOnStoryCreatorLoadRequestListener.onRequestStoryCreatorLoad(content, blockId);
-                Toast.makeText(MainApplication.this, "requestStoryCreatorLoad called", Toast.LENGTH_SHORT).show();
+                // mOnMediaFilesEditorLoadRequestListener.onRequestMediaFilesEditorLoad(content, blockId);
+                Toast.makeText(MainApplication.this, "requestMediaFilesEditorLoad called", Toast.LENGTH_SHORT).show();
             }
 
             @Override

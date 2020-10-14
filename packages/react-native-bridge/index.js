@@ -179,8 +179,8 @@ export function mediaUploadSync() {
 	return RNReactNativeGutenbergBridge.mediaUploadSync();
 }
 
-export function storySaveSync() {
-	return RNReactNativeGutenbergBridge.storySaveSync();
+export function mediaSaveSync() {
+	return RNReactNativeGutenbergBridge.mediaSaveSync();
 }
 
 export function requestImageFailedRetryDialog( mediaId ) {
@@ -252,8 +252,8 @@ export function setStarterPageTemplatesTooltipShown( tooltipShown ) {
 	);
 }
 
-export function requestStoryCreatorLoad( mediaFiles, blockClientId ) {
-	return RNReactNativeGutenbergBridge.requestStoryCreatorLoad(
+export function requestMediaFilesEditorLoad( mediaFiles, blockClientId ) {
+	return RNReactNativeGutenbergBridge.requestMediaFilesEditorLoad(
 		mediaFiles,
 		blockClientId
 	);

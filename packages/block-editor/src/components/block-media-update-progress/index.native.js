@@ -19,19 +19,19 @@ import {
  */
 import styles from './styles.scss';
 
-export const STORY_UPLOAD_STATE_UPLOADING = 1;
-export const STORY_UPLOAD_STATE_SUCCEEDED = 2;
-export const STORY_UPLOAD_STATE_FAILED = 3;
-export const STORY_UPLOAD_STATE_RESET = 4;
+export const MEDIA_UPLOAD_STATE_UPLOADING = 1;
+export const MEDIA_UPLOAD_STATE_SUCCEEDED = 2;
+export const MEDIA_UPLOAD_STATE_FAILED = 3;
+export const MEDIA_UPLOAD_STATE_RESET = 4;
 
 export const MEDIA_SAVE_STATE_SAVING = 5;
 export const MEDIA_SAVE_STATE_SUCCEEDED = 6;
 export const MEDIA_SAVE_STATE_FAILED = 7;
 export const MEDIA_SAVE_STATE_RESET = 8;
-export const STORY_SAVE_STATE_RESULT = 9;
+export const MEDIA_SAVE_FINAL_STATE_RESULT = 9;
 export const MEDIA_SAVE_MEDIAMODEL_CREATED = 10;
 
-export class StoryUpdateProgress extends React.Component {
+export class BlockMediaUpdateProgress extends React.Component {
 	constructor( props ) {
 		super( props );
 
@@ -79,16 +79,16 @@ export class StoryUpdateProgress extends React.Component {
 		}
 
 		switch ( payload.state ) {
-			case STORY_UPLOAD_STATE_UPLOADING:
+			case MEDIA_UPLOAD_STATE_UPLOADING:
 				this.updateMediaUploadProgress( payload );
 				break;
-			case STORY_UPLOAD_STATE_SUCCEEDED:
+			case MEDIA_UPLOAD_STATE_SUCCEEDED:
 				this.finishMediaUploadWithSuccess( payload );
 				break;
-			case STORY_UPLOAD_STATE_FAILED:
+			case MEDIA_UPLOAD_STATE_FAILED:
 				this.finishMediaUploadWithFailure( payload );
 				break;
-			case STORY_UPLOAD_STATE_RESET:
+			case MEDIA_UPLOAD_STATE_RESET:
 				this.mediaUploadStateReset( payload );
 				break;
 		}
@@ -117,8 +117,8 @@ export class StoryUpdateProgress extends React.Component {
 			case MEDIA_SAVE_STATE_RESET:
 				this.mediaSaveStateReset( payload );
 				break;
-			case STORY_SAVE_STATE_RESULT:
-				this.storySaveResult( payload );
+			case MEDIA_SAVE_FINAL_STATE_RESULT:
+				this.finalSaveResult( payload );
 				break;
 			case MEDIA_SAVE_MEDIAMODEL_CREATED:
 				this.mediaModelCreated( payload );
@@ -126,7 +126,7 @@ export class StoryUpdateProgress extends React.Component {
 		}
 	}
 
-	// ---- Story (media) save actions
+	// ---- Block media save actions
 	updateMediaSaveProgress( payload ) {
 		this.setState( {
 			progress: payload.progress,
@@ -149,8 +149,8 @@ export class StoryUpdateProgress extends React.Component {
 
 	finishMediaSaveWithFailure( payload ) {
 		this.setState( { isSaveInProgress: false, isSaveFailed: true } );
-		if ( this.props.onFinishMediaUploadWithFailure ) {
-			this.props.onFinishMediaUploadWithFailure( payload );
+		if ( this.props.onFinishMediaSaveWithFailure ) {
+			this.props.onFinishMediaSaveWithFailure( payload );
 		}
 	}
 
@@ -161,7 +161,7 @@ export class StoryUpdateProgress extends React.Component {
 		}
 	}
 
-	storySaveResult( payload ) {
+	finalSaveResult( payload ) {
 		this.setState( {
 			progress: payload.progress,
 			isUploadInProgress: false,
@@ -169,8 +169,8 @@ export class StoryUpdateProgress extends React.Component {
 			isSaveInProgress: false,
 			isSaveFailed: ! payload.success,
 		} );
-		if ( this.props.onStorySaveResult ) {
-			this.props.onStorySaveResult( payload );
+		if ( this.props.onFinalSaveResult ) {
+			this.props.onFinalSaveResult( payload );
 		}
 	}
 
@@ -186,7 +186,7 @@ export class StoryUpdateProgress extends React.Component {
 		}
 	}
 
-	// ---- Story upload actions
+	// ---- Block media upload actions
 	updateMediaUploadProgress( payload ) {
 		this.setState( {
 			progress: payload.progress,
@@ -268,7 +268,7 @@ export class StoryUpdateProgress extends React.Component {
 		const progress = this.state.progress * 100;
 		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
 		const retryMessage = __(
-			'Failed to save Story.\nPlease tap for options.'
+			'Failed to save files.\nPlease tap for options.'
 		);
 
 		return (
@@ -290,4 +290,4 @@ export class StoryUpdateProgress extends React.Component {
 	}
 }
 
-export default StoryUpdateProgress;
+export default BlockMediaUpdateProgress;
