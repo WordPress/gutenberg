@@ -134,8 +134,8 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 			function() {}
 		);
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/widget-types/' . $widget_id );
-		$response = rest_get_server()->dispatch( $request );
+		$request     = new WP_REST_Request( 'GET', '/__experimental/widget-types/' . $widget_id );
+		$response    = rest_get_server()->dispatch( $request );
 		$endpoint    = new WP_REST_Widget_Types_Controller;
 		$widget_type = $endpoint->get_widget( $widget_id );
 		$this->check_widget_type_object( $widget_type, $response->get_data(), $response->get_links() );
@@ -255,6 +255,16 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 		// Test links.
 		$this->assertSame( rest_url( '__experimental/widget-types' ), $links['collection'][0]['href'] );
 		// $this->assertSame( rest_url( '__experimental/widget-types/' . $widget_type->id_base ), $links['self'][0]['href'] );
+	}
+
+	public function test_get_widget_form() {
+		$widget_name = 'calendar';
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/widget-types/' . $widget_name . '/form-renderer' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertArrayHasKey( 'instance', $data );
+		$this->assertArrayHasKey( 'form', $data );
 	}
 
 	/**

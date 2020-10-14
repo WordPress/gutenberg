@@ -403,8 +403,8 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		$instance = $request->get_param( 'instance' );
 
 		$widget_name = $request['name'];
-		$widget_obj  = $this->get_widget( $widget_name );
-
+		$widget      = $this->get_widget( $widget_name );
+		$widget_obj  = new $widget['widget_class'];
 		$widget_obj->_set( -1 );
 		ob_start();
 
