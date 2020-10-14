@@ -6,6 +6,7 @@
 	},
 	"references": [],
     "include": [
-		"src/dashicon/*"
+		"src/dashicon/*",
+		"src/custom-select-control/*"
 	],
 }

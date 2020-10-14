@@ -13,6 +13,24 @@ import { Icon, check, chevronDown } from '@wordpress/icons';
  */
 import { Button, VisuallyHidden } from '../';
 
+/**
+ * @typedef CustomSelectControlOption
+ * @property {string} key Unique key for the option.
+ * @property {string} name The name of the option.
+ * @property {import('react').CSSProperties?} style Optional styles for the option.
+ * @property {string?} className Optional className to render on the option.
+ */
+
+/**
+ * @typedef Props
+ * @property {string} [className] Optional className
+ * @property {boolean} [hideLabelFromVision] Used to visually hide the label. It will always be visible to screen readers. Defaults to `false`
+ * @property {string} label The label for the control.
+ * @property {CustomSelectControlOption[]} options The options that can be chosen from.
+ * @property {import('downshift').UseSelectProps<CustomSelectControlOption>} [onChange] Function called with the control's internal state changes. The `selectedItem` property contains the next selected item.
+ * @property {CustomSelectControlOption} [value] Can be used to externally control the value of the control.
+ */
+
 const itemToString = ( item ) => item && item.name;
 // This is needed so that in Windows, where
 // the menu does not necessarily open on
@@ -52,6 +70,11 @@ const stateReducer = (
 			return changes;
 	}
 };
+
+/**
+ * @param {Props} props
+ * @return {JSX.Element} Element
+ */
 export default function CustomSelectControl( {
 	className,
 	hideLabelFromVision,
