@@ -8,7 +8,7 @@ import { includes } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Platform, useEffect } from '@wordpress/element';
+import { Platform, useEffect, useRef } from '@wordpress/element';
 import {
 	RichText,
 	ContrastChecker,
@@ -42,10 +42,12 @@ function PullQuoteEdit( {
 	isSelected,
 	insertBlocksAfter,
 } ) {
+	const wasTextColorAutomaticallyComputed = useRef( false );
+
 	function pullQuoteMainColorSetter( colorValue ) {
 		const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
 		const needTextColor =
-			! textColor.color || this.wasTextColorAutomaticallyComputed;
+			! textColor.color || wasTextColorAutomaticallyComputed.current;
 		const shouldSetTextColor = isSolidColorStyle && needTextColor;
 
 		if ( isSolidColorStyle ) {
@@ -59,11 +61,11 @@ function PullQuoteEdit( {
 
 		if ( shouldSetTextColor ) {
 			if ( colorValue ) {
-				this.wasTextColorAutomaticallyComputed = true;
+				wasTextColorAutomaticallyComputed.current = true;
 				setTextColor( colorUtils.getMostReadableColor( colorValue ) );
-			} else if ( this.wasTextColorAutomaticallyComputed ) {
+			} else if ( wasTextColorAutomaticallyComputed.current ) {
 				// We have to unset our previously computed text color on unsetting the main color.
-				this.wasTextColorAutomaticallyComputed = false;
+				wasTextColorAutomaticallyComputed.current = false;
 				setTextColor();
 			}
 		}
@@ -71,7 +73,7 @@ function PullQuoteEdit( {
 
 	function pullQuoteTextColorSetter( colorValue ) {
 		setTextColor( colorValue );
-		this.wasTextColorAutomaticallyComputed = false;
+		wasTextColorAutomaticallyComputed.current = false;
 	}
 
 	const { value, citation } = attributes;
