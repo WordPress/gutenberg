@@ -1388,6 +1388,7 @@ const getItemFromVariation = ( item ) => ( variation ) => ( {
 	initialAttributes: {
 		...item.initialAttributes,
 		...variation.attributes,
+		fromVariation: variation.name,
 	},
 	innerBlocks: variation.innerBlocks,
 	keywords: variation.keywords || item.keywords,
