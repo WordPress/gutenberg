@@ -5,6 +5,7 @@
 		{ "path": "packages/autop" },
 		{ "path": "packages/blob" },
 		{ "path": "packages/block-editor" },
+		{ "path": "packages/components" },
 		{ "path": "packages/element" },
 		{ "path": "packages/dependency-extraction-webpack-plugin" },
 		{ "path": "packages/dom-ready" },
