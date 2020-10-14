@@ -68,6 +68,7 @@ export class ImageEdit extends React.Component {
 		super( props );
 		this.state = {
 			isCaptionSelected: false,
+			alreadyAutoOpenedMediaUpload: false,
 		};
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
@@ -304,6 +305,10 @@ export class ImageEdit extends React.Component {
 			...mediaAttributes,
 			...additionalAttributes,
 		} );
+
+		this.setState( {
+			alreadyAutoOpenedMediaUpload: true,
+		} );
 	}
 
 	onFocusCaption() {
@@ -319,6 +324,9 @@ export class ImageEdit extends React.Component {
 
 	onClearMedia() {
 		this.props.setAttributes( { id: null, url: null } );
+		this.setState( {
+			alreadyAutoOpenedMediaUpload: true,
+		} );
 	}
 
 	getPlaceholderIcon() {
@@ -343,7 +351,7 @@ export class ImageEdit extends React.Component {
 	}
 
 	render() {
-		const { isCaptionSelected } = this.state;
+		const { isCaptionSelected, alreadyAutoOpenedMediaUpload } = this.state;
 		const {
 			attributes,
 			isSelected,
@@ -442,7 +450,11 @@ export class ImageEdit extends React.Component {
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getPlaceholderIcon() }
 						onFocus={ this.props.onFocus }
-						autoOpenMediaUpload={ isSelected && ! url }
+						autoOpenMediaUpload={
+							isSelected &&
+							! url &&
+							! alreadyAutoOpenedMediaUpload
+						}
 					/>
 				</View>
 			);
