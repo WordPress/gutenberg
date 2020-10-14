@@ -40,9 +40,8 @@ jobs:
               exit 1
             fi
             mv -f "vendor/_download.tmp.js" "vendor/$filename"
-            vendor_scripts="$vendor_scripts vendor/$filename"
           done
-          echo ::set-env name=vendor_scripts::$vendor_scripts
+          echo ::set-env name=vendor_scripts::$(ls vendor/*.js)
       - name: Install dependencies
         run: npm install
         env:
