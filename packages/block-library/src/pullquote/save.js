@@ -69,8 +69,8 @@ export default function save( { attributes } ) {
 	return (
 		<figure
 			{ ...useBlockProps.save( {
-				style: figureStyles,
 				className: figureClasses,
+				style: figureStyles,
 			} ) }
 		>
 			<blockquote
