@@ -211,7 +211,13 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$sidebar_id = $this->find_widgets_sidebar( $widget_id );
 
 		if ( is_wp_error( $sidebar_id ) ) {
-			return $sidebar_id;
+			// Allow for an update request to a reference widget if the widget hasn't been assigned to a sidebar yet.
+			if ( $request['sidebar'] && $this->is_reference_widget( $widget_id ) ) {
+				$sidebar_id = $request['sidebar'];
+				$this->assign_to_sidebar( $widget_id, $sidebar_id );
+			} else {
+				return $sidebar_id;
+			}
 		}
 
 		$backup_post = $_POST;
@@ -563,9 +569,9 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		/**
 		 * Filter widget REST API response.
 		 *
-		 * @param WP_REST_Response $response   The response object.
-		 * @param array            $prepared   Widget data.
-		 * @param WP_REST_Request  $request    Request used to generate the response.
+		 * @param WP_REST_Response $response The response object.
+		 * @param array            $prepared Widget data.
+		 * @param WP_REST_Request  $request  Request used to generate the response.
 		 */
 		return apply_filters( 'rest_prepare_widget', $response, $prepared, $request );
 	}
@@ -638,6 +644,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		global $wp_registered_widgets;
 
 		if (
+			! is_array( $wp_registered_widgets[ $widget_id ]['callback'] ) ||
 			! isset( $wp_registered_widgets[ $widget_id ]['callback'][0] ) ||
 			! isset( $wp_registered_widgets[ $widget_id ]['params'][0]['number'] ) ||
 			! isset( $wp_registered_widgets[ $widget_id ]['name'] ) ||
@@ -651,6 +658,20 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$name   = $wp_registered_widgets[ $widget_id ]['name'];
 
 		return array( $object, $number, $name );
+	}
+
+	/**
+	 * Checks if the given widget id is a reference widget, ie one that does not use WP_Widget.
+	 *
+	 * @since 5.6.0
+	 *
+	 * @param string $widget_id The widget id to check.
+	 * @return bool Whether this is a reference widget or not.
+	 */
+	protected function is_reference_widget( $widget_id ) {
+		list ( $object ) = $this->get_widget_info( $widget_id );
+
+		return ! $object instanceof WP_Widget;
 	}
 
 	/**

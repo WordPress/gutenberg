@@ -724,6 +724,94 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 *
 	 */
+	public function test_create_item_legacy_widget_1() {
+		$this->do_test_create_item_legacy_widget( 'testwidget-1' );
+	}
+
+	/**
+	 *
+	 */
+	public function test_create_item_legacy_widget_2() {
+		$this->do_test_create_item_legacy_widget( 'testwidget' );
+	}
+
+	/**
+	 *
+	 */
+	public function do_test_create_item_legacy_widget( $widget_id ) {
+		// @TODO: Use @dataProvider instead (it doesn't work with custom constructors like the one we have in this class)
+		wp_register_widget_control(
+			$widget_id,
+			'WP test widget',
+			function () {
+				$settings = get_option( 'widget_testwidget' );
+
+				// check if anything's been sent.
+				if ( isset( $_POST['update_testwidget'] ) ) {
+					$settings['id']    = $_POST['test_id'];
+					$settings['title'] = $_POST['test_title'];
+
+					update_option( 'widget_testwidget', $settings );
+				}
+			},
+			100,
+			200
+		);
+		wp_register_sidebar_widget(
+			$widget_id,
+			'WP test widget',
+			function () {
+				$settings = get_option( 'widget_testwidget' ) ? get_option( 'widget_testwidget' ) : array(
+					'id'    => '',
+					'title' => '',
+				);
+				echo '<h1>' . $settings['id'] . '</h1><span>' . $settings['title'] . '</span>';
+			}
+		);
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			),
+			array()
+		);
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/widgets/' . $widget_id );
+		$request->set_body_params(
+			array(
+				'id'       => $widget_id,
+				'sidebar'  => 'sidebar-1',
+				'name'     => 'WP test widget',
+				'settings' => array(
+					'test_id'           => 'My test id',
+					'test_title'        => 'My test title',
+					'update_testwidget' => true,
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$data     = $this->remove_links( $data );
+		$this->assertEquals(
+			array(
+				'id'            => $widget_id,
+				'sidebar'       => 'sidebar-1',
+				'settings'      => array(),
+				'rendered'      => '<h1>My test id</h1><span>My test title</span>',
+				'name'          => 'WP test widget',
+				'number'        => 0,
+				'rendered_form' => '',
+				'widget_class'  => '',
+				'id_base'       => '',
+				'description'   => '',
+			),
+			$data
+		);
+	}
+
+	/**
+	 *
+	 */
 	public function test_update_item_no_permission() {
 		wp_set_current_user( 0 );
 
