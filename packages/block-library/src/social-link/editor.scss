@@ -1,6 +1,7 @@
 .wp-block-social-links .wp-social-link button {
 	color: currentColor;
 	padding: 6px;
+	height: var(--wp-social-link-size);
 }
 
 .wp-block-social-links.is-style-pill-shape .wp-social-link button {
