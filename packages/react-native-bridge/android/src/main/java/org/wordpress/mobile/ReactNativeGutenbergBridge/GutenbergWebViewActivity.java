@@ -90,7 +90,9 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                     }
                 }
                 else {
-                    mIsWebPageLoaded.compareAndSet(true, false);
+                    if (progress < 100) {
+                        mIsWebPageLoaded.compareAndSet(true, false);
+                    }
                     mProgressBar.setProgress(progress);
                 }
             }
@@ -244,12 +246,12 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     }
 
     private void onGutenbergReady() {
-        mIsGutenbergReady = true;
         preventAutoSavesScript();
         // Inject css when Gutenberg is ready
         injectCssScript();
         final Handler handler = new Handler();
         handler.postDelayed(() -> {
+            mIsGutenbergReady = true;
             // We want to make sure that page is loaded
             // with all elements before executing external JS
             injectOnGutenbergReadyExternalSources();
