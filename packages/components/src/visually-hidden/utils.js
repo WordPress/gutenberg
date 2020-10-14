@@ -16,9 +16,11 @@
  * @param {Props<T> & import('react').ComponentProps<T>} props A tag or component to render.
  * @return {JSX.Element} The rendered component.
  */
-export function renderAsRenderProps( { as: Component = 'div', ...props } ) {
+function renderAsRenderProps( { as: Component = 'div', ...props } ) {
 	if ( typeof props.children === 'function' ) {
 		return props.children( props );
 	}
 	return <Component { ...props } />;
 }
+
+export { renderAsRenderProps };
