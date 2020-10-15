@@ -10,9 +10,8 @@ import NavigationPanel from './navigation-panel';
 import NavigationToggle from './navigation-toggle';
 
 const NavigationSidebar = () => {
-	const { isNavigationOpen } = useSelect( ( select ) => {
-		const { isNavigationOpened } = select( 'core/edit-site' );
-		return { isNavigationOpen: isNavigationOpened() };
+	const isNavigationOpen = useSelect( ( select ) => {
+		return select( 'core/edit-site' ).isNavigationOpened();
 	} );
 
 	return (
