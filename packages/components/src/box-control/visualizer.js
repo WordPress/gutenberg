@@ -22,10 +22,11 @@ import {
 export default function BoxControlVisualizer( {
 	children,
 	showValues = DEFAULT_VISUALIZER_SPACING_VALUES,
-	values: valuesProp = DEFAULT_SPACING_VALUES,
+	values,
 	...props
 } ) {
 	const isPositionAbsolute = ! children;
+	const valuesProp = { ...DEFAULT_SPACING_VALUES, ...values };
 
 	return Object.entries( showValues ).map( ( [ key, value ] ) => {
 		return (
@@ -46,11 +47,7 @@ export default function BoxControlVisualizer( {
 	} );
 }
 
-function Sides( {
-	showValues = DEFAULT_VISUALIZER_VALUES,
-	values,
-	type,
-} ) {
+function Sides( { showValues = DEFAULT_VISUALIZER_VALUES, values, type } ) {
 	const { top, right, bottom, left } = values;
 	const setTransformStyle = type === 'margin';
 
