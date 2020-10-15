@@ -9,6 +9,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -100,6 +101,19 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                     }
                     mProgressBar.setProgress(progress);
                 }
+            }
+
+            @Override
+            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+                if (consoleMessage != null && consoleMessage.message() != null) {
+                    // Listen if block content insert was with success
+                    if (consoleMessage.message().contains("'getContent' of null")) {
+                        // It wasn't successful so we wan't to reset that page was loaded
+                        // and wait for another event
+                        mIsWebPageLoaded.compareAndSet(true, false);
+                    }
+                }
+                return true;
             }
         });
 
@@ -270,7 +284,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
             // We need some extra time to hide all unwanted html elements
             // like NUX (new user experience) modal is.
             mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 1500);
-        }, 3100);
+        }, 2000);
     }
 
     private void injectCssScript() {
