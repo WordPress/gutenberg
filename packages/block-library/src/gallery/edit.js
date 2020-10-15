@@ -25,7 +25,11 @@ import {
 	withNotices,
 	RangeControl,
 } from '@wordpress/components';
-import { MediaPlaceholder, InspectorControls } from '@wordpress/block-editor';
+import {
+	MediaPlaceholder,
+	InspectorControls,
+	useBlockProps,
+} from '@wordpress/block-editor';
 import { Platform, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
@@ -337,8 +341,10 @@ function GalleryEdit( props ) {
 		/>
 	);
 
+	const blockProps = useBlockProps();
+
 	if ( ! hasImages ) {
-		return mediaPlaceholder;
+		return <div { ...blockProps }>{ mediaPlaceholder }</div>;
 	}
 
 	const imageSizeOptions = getImagesSizeOptions();
@@ -382,18 +388,20 @@ function GalleryEdit( props ) {
 				</PanelBody>
 			</InspectorControls>
 			{ noticeUI }
-			<Gallery
-				{ ...props }
-				selectedImage={ selectedImage }
-				mediaPlaceholder={ mediaPlaceholder }
-				onMoveBackward={ onMoveBackward }
-				onMoveForward={ onMoveForward }
-				onRemoveImage={ onRemoveImage }
-				onSelectImage={ onSelectImage }
-				onDeselectImage={ onDeselectImage }
-				onSetImageAttributes={ setImageAttributes }
-				onFocusGalleryCaption={ onFocusGalleryCaption }
-			/>
+			<div { ...blockProps }>
+				<Gallery
+					{ ...props }
+					selectedImage={ selectedImage }
+					mediaPlaceholder={ mediaPlaceholder }
+					onMoveBackward={ onMoveBackward }
+					onMoveForward={ onMoveForward }
+					onRemoveImage={ onRemoveImage }
+					onSelectImage={ onSelectImage }
+					onDeselectImage={ onDeselectImage }
+					onSetImageAttributes={ setImageAttributes }
+					onFocusGalleryCaption={ onFocusGalleryCaption }
+				/>
+			</div>
 		</>
 	);
 }
