@@ -47,6 +47,7 @@ import {
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 } from './constants';
+import View from './view';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -344,7 +345,7 @@ function GalleryEdit( props ) {
 	const blockProps = useBlockProps();
 
 	if ( ! hasImages ) {
-		return <div { ...blockProps }>{ mediaPlaceholder }</div>;
+		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
 	}
 
 	const imageSizeOptions = getImagesSizeOptions();
@@ -388,7 +389,7 @@ function GalleryEdit( props ) {
 				</PanelBody>
 			</InspectorControls>
 			{ noticeUI }
-			<div { ...blockProps }>
+			<View { ...blockProps }>
 				<Gallery
 					{ ...props }
 					selectedImage={ selectedImage }
@@ -401,7 +402,7 @@ function GalleryEdit( props ) {
 					onSetImageAttributes={ setImageAttributes }
 					onFocusGalleryCaption={ onFocusGalleryCaption }
 				/>
-			</div>
+			</View>
 		</>
 	);
 }
