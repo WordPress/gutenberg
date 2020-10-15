@@ -149,9 +149,9 @@ function GalleryEdit( props ) {
 			setSelectedImage();
 			setAttributes( {
 				images: newImages,
-				columns: columns
-					? Math.min( newImages.length, columns )
-					: columns,
+				columns: attributes.columns
+					? Math.min( newImages.length, attributes.columns )
+					: attributes.columns,
 			} );
 		};
 	}
@@ -200,7 +200,9 @@ function GalleryEdit( props ) {
 				// to a string here ensures it's type is consistent.
 				id: toString( newImage.id ),
 			} ) ),
-			columns: columns ? Math.min( newImages.length, columns ) : columns,
+			columns: attributes.columns
+				? Math.min( newImages.length, attributes.columns )
+				: attributes.columns,
 		} );
 	}
 
