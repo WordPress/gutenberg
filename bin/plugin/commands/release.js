@@ -63,20 +63,15 @@ async function runSvnRepositoryCheckoutStep( abortMessage ) {
  * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
  * @param {string} abortMessage            Abort Message.
  * @param {string} version the new version.
- * @return {Promise<Object>} chosen version and versionLabels.
+ * @param {string} releaseBranch The release branch to push to.
  */
 async function runReleaseBranchCreationStep(
 	gitWorkingDirectoryPath,
 	abortMessage,
-	version
+	version,
+	releaseBranch
 ) {
-	let releaseBranch;
 	await runStep( 'Creating the release branch', abortMessage, async () => {
-		const parsedVersion = semver.parse( version );
-
-		releaseBranch =
-			'release/' + parsedVersion.major + '.' + parsedVersion.minor;
-
 		await askForConfirmation(
 			'The Plugin version to be used is ' +
 				formats.success( version ) +
@@ -94,11 +89,6 @@ async function runReleaseBranchCreationStep(
 				' has been successfully created.'
 		);
 	} );
-
-	return {
-		version,
-		releaseBranch,
-	};
 }
 
 /**
@@ -107,22 +97,18 @@ async function runReleaseBranchCreationStep(
  * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
  * @param {string} abortMessage Abort Message.
  * @param {string} version The new version.
- * @return {Promise<Object>} chosen version and versionLabels.
+ * @param {string} releaseBranch The release branch to checkout.
  */
 async function runReleaseBranchCheckoutStep(
 	gitWorkingDirectoryPath,
 	abortMessage,
-	version
+	version,
+	releaseBranch
 ) {
-	let releaseBranch;
 	await runStep(
 		'Getting into the release branch',
 		abortMessage,
 		async () => {
-			const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
-
-			releaseBranch = findReleaseBranchName( packageJsonPath );
-
 			await git.checkoutRemoteBranch(
 				gitWorkingDirectoryPath,
 				releaseBranch
@@ -143,11 +129,6 @@ async function runReleaseBranchCheckoutStep(
 			);
 		}
 	);
-
-	return {
-		version,
-		releaseBranch,
-	};
 }
 
 /**
@@ -658,7 +639,7 @@ async function isMilestoneClear( version ) {
 async function releasePlugin( isRC = true ) {
 	// This is a variable that contains the abort message shown when the script is aborted.
 	let abortMessage = 'Aborting!';
-	let versionInfo;
+	let version, releaseBranch;
 
 	const temporaryFolders = [];
 
@@ -687,29 +668,45 @@ async function releasePlugin( isRC = true ) {
 		// We are releasing an RC.
 		// If packageVersion is stable, then generate new branch and RC1.
 		// If packageVersion is RC, then checkout branch and inc RC.
-		versionInfo = ! isPackageVersionRC
-			? await runReleaseBranchCreationStep(
-					gitWorkingDirectory,
-					abortMessage,
-					getNextMajorVersion( packageVersion ) + '-rc.1'
-			  )
-			: await runReleaseBranchCheckoutStep(
-					gitWorkingDirectory,
-					abortMessage,
-					semver.inc( packageVersion, 'prerelease', 'rc' )
-			  );
+		if ( ! isPackageVersionRC ) {
+			version = getNextMajorVersion( packageVersion ) + '-rc.1';
+			const parsedVersion = semver.parse( version );
+
+			releaseBranch =
+				'release/' + parsedVersion.major + '.' + parsedVersion.minor;
+
+			await runReleaseBranchCreationStep(
+				gitWorkingDirectory,
+				abortMessage,
+				version,
+				releaseBranch
+			);
+		} else {
+			version = semver.inc( packageVersion, 'prerelease', 'rc' );
+			releaseBranch = findReleaseBranchName( packageJsonPath );
+
+			await runReleaseBranchCheckoutStep(
+				gitWorkingDirectory,
+				abortMessage,
+				version,
+				releaseBranch
+			);
+		}
 	} else {
 		// We are releasing a stable version.
 		// If packageVersion is stable, then checkout the branch and inc patch.
 		// If packageVersion is RC, then checkout the branch and inc patch, effectively removing the RC.
-		versionInfo = await runReleaseBranchCheckoutStep(
+		version = semver.inc( packageVersion, 'patch' );
+		releaseBranch = findReleaseBranchName( packageJsonPath );
+
+		await runReleaseBranchCheckoutStep(
 			gitWorkingDirectory,
 			abortMessage,
-			semver.inc( packageVersion, 'patch' )
+			version,
+			findReleaseBranchName( packageJsonPath )
 		);
 	}
 
-	const { version, releaseBranch } = versionInfo;
 	const versionLabel = version.replace( /\-rc\.([0-9]+)/, ' RC$1' );
 
 	if ( ! ( await isMilestoneClear( version ) ) ) {
