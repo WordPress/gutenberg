@@ -11,7 +11,7 @@ import { renderToString } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { convertDerivativeBlocks } from './parser';
+import { convertLegacyBlocks } from './parser';
 import { createBlock } from './factory';
 import { getBlockType } from './registration';
 
@@ -111,7 +111,7 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 			const {
 				name: blockName,
 				attributes: blockAttributes,
-			} = convertDerivativeBlocks( name, normalizedAttributes );
+			} = convertLegacyBlocks( name, normalizedAttributes );
 
 			return createBlock(
 				blockName,

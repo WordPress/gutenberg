@@ -395,14 +395,15 @@ export function getMigratedBlock( block, parsedAttributes ) {
 }
 
 /**
- * Convert derivative blocks to their canonical form. This function is used
+ * Convert legacy blocks to their canonical form. This function is used
  * both in the parser level for previous content and to convert such blocks
  * used in Custom Post Types templates.
  *
- * @param {string} name
- * @param {Object} attributes
+ * @param {string} name The block's name
+ * @param {Object} attributes The block's attributes
  */
-export function convertDerivativeBlocks( name, attributes ) {
+export function convertLegacyBlocks( name, attributes ) {
+	const newAttributes = { ...attributes };
 	// Convert 'core/cover-image' block in existing content to 'core/cover'.
 	if ( 'core/cover-image' === name ) {
 		name = 'core/cover';
@@ -417,7 +418,7 @@ export function convertDerivativeBlocks( name, attributes ) {
 	// canonical form 'core/social-link'.
 	if ( name && name.indexOf( 'core/social-link-' ) === 0 ) {
 		// Capture `social-link-wordpress` into `{"service":"wordpress"}`
-		attributes.service = name.substring( 17 );
+		newAttributes.service = name.substring( 17 );
 		name = 'core/social-link';
 	}
 
@@ -430,18 +431,18 @@ export function convertDerivativeBlocks( name, attributes ) {
 			speaker: 'speaker-deck',
 			polldaddy: 'crowdsignal',
 		};
-		attributes.providerNameSlug =
+		newAttributes.providerNameSlug =
 			providerSlug in deprecated
 				? deprecated[ providerSlug ]
 				: providerSlug;
 		// this is needed as the `responsive` attribute was passed
 		// in a different way before the refactoring to block variations
 		if ( ! [ 'amazon-kindle', 'wordpress' ].includes( providerSlug ) ) {
-			attributes.responsive = true;
+			newAttributes.responsive = true;
 		}
 		name = 'core/embed';
 	}
-	return { name, attributes };
+	return { name, attributes: newAttributes };
 }
 
 /**
@@ -468,7 +469,7 @@ export function createBlockWithFallback( blockNode ) {
 	// freeform content fallback.
 	let name = originalName || freeformContentFallbackBlock;
 
-	name = convertDerivativeBlocks( name, attributes ).name;
+	( { name, attributes } = convertLegacyBlocks( name, attributes ) );
 
 	// Fallback content may be upgraded from classic editor expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
