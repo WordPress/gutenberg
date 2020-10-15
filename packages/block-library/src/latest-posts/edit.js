@@ -30,7 +30,7 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
 
 /**
@@ -52,17 +52,13 @@ const USERS_LIST_QUERY = {
 	per_page: -1,
 };
 
-function LatestPostsEdit( {
-	attributes,
-	setAttributes,
-	imageSizeOptions,
-	latestPosts,
-	defaultImageWidth,
-	defaultImageHeight,
-} ) {
-	const [ categoriesList, setCategoriesList ] = useState( [] );
-	const [ authorList, setAuthorList ] = useState( [] );
+export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	const {
+		postsToShow,
+		order,
+		orderBy,
+		categories,
+		selectedAuthor,
 		displayFeaturedImage,
 		displayPostContentRadio,
 		displayPostContent,
@@ -70,11 +66,6 @@ function LatestPostsEdit( {
 		displayAuthor,
 		postLayout,
 		columns,
-		order,
-		orderBy,
-		categories,
-		selectedAuthor,
-		postsToShow,
 		excerptLength,
 		featuredImageAlign,
 		featuredImageSizeSlug,
@@ -82,6 +73,93 @@ function LatestPostsEdit( {
 		featuredImageSizeHeight,
 		addLinkToFeaturedImage,
 	} = attributes;
+	const {
+		imageSizeOptions,
+		latestPosts,
+		defaultImageWidth,
+		defaultImageHeight,
+	} = useSelect(
+		( select ) => {
+			const { getEntityRecords, getMedia } = select( 'core' );
+			const { getSettings } = select( 'core/block-editor' );
+			const { imageSizes, imageDimensions } = getSettings();
+			const catIds =
+				categories && categories.length > 0
+					? categories.map( ( cat ) => cat.id )
+					: [];
+			const latestPostsQuery = pickBy(
+				{
+					categories: catIds,
+					author: selectedAuthor,
+					order,
+					orderby: orderBy,
+					per_page: postsToShow,
+				},
+				( value ) => ! isUndefined( value )
+			);
+
+			const posts = getEntityRecords(
+				'postType',
+				'post',
+				latestPostsQuery
+			);
+
+			return {
+				defaultImageWidth: get(
+					imageDimensions,
+					[ featuredImageSizeSlug, 'width' ],
+					0
+				),
+				defaultImageHeight: get(
+					imageDimensions,
+					[ featuredImageSizeSlug, 'height' ],
+					0
+				),
+				imageSizeOptions: imageSizes
+					.filter( ( { slug } ) => slug !== 'full' )
+					.map( ( { name, slug } ) => ( {
+						value: slug,
+						label: name,
+					} ) ),
+				latestPosts: ! Array.isArray( posts )
+					? posts
+					: posts.map( ( post ) => {
+							if ( ! post.featured_media ) return post;
+
+							const image = getMedia( post.featured_media );
+							let url = get(
+								image,
+								[
+									'media_details',
+									'sizes',
+									featuredImageSizeSlug,
+									'source_url',
+								],
+								null
+							);
+							if ( ! url ) {
+								url = get( image, 'source_url', null );
+							}
+							const featuredImageInfo = {
+								url,
+								// eslint-disable-next-line camelcase
+								alt: image?.alt_text,
+							};
+							return { ...post, featuredImageInfo };
+					  } ),
+			};
+		},
+		[
+			featuredImageSizeSlug,
+			postsToShow,
+			order,
+			orderBy,
+			categories,
+			selectedAuthor,
+		]
+	);
+	const [ categoriesList, setCategoriesList ] = useState( [] );
+	const [ authorList, setAuthorList ] = useState( [] );
 	const categorySuggestions = categoriesList.reduce(
 		( accumulator, category ) => ( {
 			...accumulator,
@@ -510,76 +588,3 @@ function LatestPostsEdit( {
 		</div>
 	);
 }
-
-export default withSelect( ( select, props ) => {
-	const {
-		featuredImageSizeSlug,
-		postsToShow,
-		order,
-		orderBy,
-		categories,
-		selectedAuthor,
-	} = props.attributes;
-	const { getEntityRecords, getMedia } = select( 'core' );
-	const { getSettings } = select( 'core/block-editor' );
-	const { imageSizes, imageDimensions } = getSettings();
-	const catIds =
-		categories && categories.length > 0
-			? categories.map( ( cat ) => cat.id )
-			: [];
-	const latestPostsQuery = pickBy(
-		{
-			categories: catIds,
-			author: selectedAuthor,
-			order,
-			orderby: orderBy,
-			per_page: postsToShow,
-		},
-		( value ) => ! isUndefined( value )
-	);
-
-	const posts = getEntityRecords( 'postType', 'post', latestPostsQuery );
-	const imageSizeOptions = imageSizes
-		.filter( ( { slug } ) => slug !== 'full' )
-		.map( ( { name, slug } ) => ( { value: slug, label: name } ) );
-
-	return {
-		defaultImageWidth: get(
-			imageDimensions,
-			[ featuredImageSizeSlug, 'width' ],
-			0
-		),
-		defaultImageHeight: get(
-			imageDimensions,
-			[ featuredImageSizeSlug, 'height' ],
-			0
-		),
-		imageSizeOptions,
-		latestPosts: ! Array.isArray( posts )
-			? posts
-			: posts.map( ( post ) => {
-					if ( ! post.featured_media ) return post;
-
-					const image = getMedia( post.featured_media );
-					let url = get(
-						image,
-						[
-							'media_details',
-							'sizes',
-							featuredImageSizeSlug,
-							'source_url',
-						],
-						null
-					);
-					if ( ! url ) {
-						url = get( image, 'source_url', null );
-					}
-					const featuredImageInfo = {
-						url,
-						// eslint-disable-next-line camelcase
-						alt: image?.alt_text,
-					};
-					return { ...post, featuredImageInfo };
-			  } ),
-	};
-} )( LatestPostsEdit );
