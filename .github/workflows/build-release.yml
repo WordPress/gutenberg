@@ -13,6 +13,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@master
+
       - name: Download vendor scripts
         run: |
           vendor_scripts=""
@@ -45,14 +46,18 @@ jobs:
           echo 'vendor_scripts<<EOF' >> $GITHUB_ENV
             ls vendor/*.js >> $GITHUB_ENV
           echo 'EOF' >> $GITHUB_ENV
+
       - name: Install dependencies
         run: npm install
+
       - name: Build Gutenberg
         run: npm run build
+
       - name: Set production constants in gutenberg.php
         run: |
           php bin/generate-gutenberg-php.php > gutenberg.tmp.php
           mv gutenberg.tmp.php gutenberg.php
+
       - name: Set build_files env var
         run: |
             echo 'build_files<<EOF' >> $GITHUB_ENV
@@ -60,6 +65,7 @@ jobs:
               build/block-library/blocks/*.php build/block-library/blocks/*/block.json \
               build/edit-widgets/blocks/*.php build/edit-widgets/blocks/*/block.json >> $GITHUB_ENV
             echo 'EOF' >> $GITHUB_ENV
+
       - name: Create .zip archive
         run: |
           zip -r gutenberg.zip \
@@ -72,6 +78,7 @@ jobs:
             readme.txt \
             changelog.txt \
             README.md
+
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1.0.0
@@ -82,6 +89,7 @@ jobs:
           release_name: Release ${{ github.ref }}
           draft: true
           prerelease: ${{ contains(github.ref, 'rc') }}
+
       - name: Upload Release Asset
         id: upload-release-asset 
         uses: actions/upload-release-asset@v1.0.1
