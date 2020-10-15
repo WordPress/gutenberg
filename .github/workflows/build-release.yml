@@ -19,8 +19,9 @@ jobs:
         env:
           NO_CHECKS: 'true'
 
-      - name: Set Release Name
-        run: echo "release_name=$(echo ${{ github.ref }} | sed s/^v// | sed 's/-rc./ RC/')" >> $GITHUB_ENV
+      - name: Set Release Version
+        id: get_release_version
+        run: echo ::set-output name=version::$(echo $GITHUB_REF | cut -d / -f 3 | sed s/^v// | sed 's/-rc./ RC/' )
 
       - name: Create Release
         id: create_release
@@ -29,7 +30,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tag_name: ${{ github.ref }}
-          release_name: ${{ env.release_name }}
+          release_name: ${{ steps.get_release_version.outputs.version }}
           draft: true
           prerelease: ${{ contains(github.ref, 'rc') }}
 
