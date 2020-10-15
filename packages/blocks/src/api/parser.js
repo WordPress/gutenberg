@@ -395,29 +395,14 @@ export function getMigratedBlock( block, parsedAttributes ) {
 }
 
 /**
- * Creates a block with fallback to the unknown type handler.
+ * Convert derivative blocks to their canonical form. This function is used
+ * both in the parser level for previous content and to convert such blocks
+ * used in Custom Post Types templates.
  *
- * @param {Object} blockNode Parsed block node.
- *
- * @return {?Object} An initialized block object (if possible).
+ * @param {string} name
+ * @param {Object} attributes
  */
-export function createBlockWithFallback( blockNode ) {
-	const { blockName: originalName } = blockNode;
-	let { attrs: attributes, innerBlocks = [], innerHTML } = blockNode;
-	const { innerContent } = blockNode;
-	const freeformContentFallbackBlock = getFreeformContentHandlerName();
-	const unregisteredFallbackBlock =
-		getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
-
-	attributes = attributes || {};
-
-	// Trim content to avoid creation of intermediary freeform segments.
-	innerHTML = innerHTML.trim();
-
-	// Use type from block content if available. Otherwise, default to the
-	// freeform content fallback.
-	let name = originalName || freeformContentFallbackBlock;
-
+export function convertDerivativeBlocks( name, attributes ) {
 	// Convert 'core/cover-image' block in existing content to 'core/cover'.
 	if ( 'core/cover-image' === name ) {
 		name = 'core/cover';
@@ -456,6 +441,34 @@ export function createBlockWithFallback( blockNode ) {
 		}
 		name = 'core/embed';
 	}
+	return { name, attributes };
+}
+
+/**
+ * Creates a block with fallback to the unknown type handler.
+ *
+ * @param {Object} blockNode Parsed block node.
+ *
+ * @return {?Object} An initialized block object (if possible).
+ */
+export function createBlockWithFallback( blockNode ) {
+	const { blockName: originalName } = blockNode;
+	let { attrs: attributes, innerBlocks = [], innerHTML } = blockNode;
+	const { innerContent } = blockNode;
+	const freeformContentFallbackBlock = getFreeformContentHandlerName();
+	const unregisteredFallbackBlock =
+		getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
+
+	attributes = attributes || {};
+
+	// Trim content to avoid creation of intermediary freeform segments.
+	innerHTML = innerHTML.trim();
+
+	// Use type from block content if available. Otherwise, default to the
+	// freeform content fallback.
+	let name = originalName || freeformContentFallbackBlock;
+
+	name = convertDerivativeBlocks( name, attributes ).name;
 
 	// Fallback content may be upgraded from classic editor expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,
