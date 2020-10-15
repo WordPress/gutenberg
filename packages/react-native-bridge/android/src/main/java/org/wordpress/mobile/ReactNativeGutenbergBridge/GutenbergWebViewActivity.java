@@ -270,7 +270,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
             // We need some extra time to hide all unwanted html elements
             // like NUX (new user experience) modal is.
             mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 1500);
-        }, 2000);
+        }, 3100);
     }
 
     private void injectCssScript() {
