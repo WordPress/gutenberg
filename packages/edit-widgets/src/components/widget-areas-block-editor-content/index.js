@@ -5,10 +5,10 @@ import { Popover } from '@wordpress/components';
 import {
 	BlockList,
 	BlockEditorKeyboardShortcuts,
+	BlockSelectionClearer,
 	WritingFlow,
 	ObserveTyping,
 } from '@wordpress/block-editor';
-import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -17,15 +17,10 @@ import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 
 export default function WidgetAreasBlockEditorContent() {
-	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
-
 	return (
 		<>
-			<KeyboardShortcuts />
-			<BlockEditorKeyboardShortcuts />
 			<Notices />
-			<Popover.Slot name="block-toolbar" />
-			<div tabIndex="-1" onFocus={ clearSelectedBlock }>
+			<BlockSelectionClearer>
 				<div
 					className="editor-styles-wrapper"
 					onFocus={ ( event ) => {
@@ -35,13 +30,16 @@ export default function WidgetAreasBlockEditorContent() {
 						event.preventDefault();
 					} }
 				>
+					<KeyboardShortcuts />
+					<BlockEditorKeyboardShortcuts />
+					<Popover.Slot name="block-toolbar" />
 					<WritingFlow>
 						<ObserveTyping>
 							<BlockList className="edit-widgets-main-block-list" />
 						</ObserveTyping>
 					</WritingFlow>
 				</div>
-			</div>
+			</BlockSelectionClearer>
 		</>
 	);
 }
