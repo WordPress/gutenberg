@@ -69,77 +69,79 @@ export default function DocumentActions( {
 	// part of it.
 	const titleRef = useRef();
 
+	// Return a simple loading indicator until we have information to show.
+	if ( ! entityTitle ) {
+		return (
+			<div className="edit-site-document-actions">
+				{ __( 'Loading…' ) }
+			</div>
+		);
+	}
+
 	return (
 		<div
 			className={ classnames( 'edit-site-document-actions', {
 				'has-secondary-label': !! label,
 			} ) }
 		>
-			{ entityTitle ? (
-				<>
-					<div
-						ref={ titleRef }
-						className="edit-site-document-actions__title-wrapper"
-					>
-						<h1>
-							<VisuallyHidden>
-								{ sprintf(
-									/* translators: %s: the entity being edited, like "template"*/
-									__( 'Edit %s:' ),
-									entityLabel
-								) }
-							</VisuallyHidden>
-							<div
-								className={ classnames(
-									'edit-site-document-actions__title',
-									{
-										'is-active': isTitleActive,
-										'is-secondary-title-active': isActive,
-									}
-								) }
-							>
-								{ entityTitle }
-							</div>
-						</h1>
-						{ dropdownContent && ! isActive && (
-							<Dropdown
-								popoverProps={ {
-									anchorRef: titleRef.current,
-								} }
-								position="bottom center"
-								renderToggle={ ( { isOpen, onToggle } ) => (
-									<Button
-										className="edit-site-document-actions__get-info"
-										icon={ chevronDown }
-										aria-expanded={ isOpen }
-										aria-haspopup="true"
-										onClick={ onToggle }
-										label={ sprintf(
-											/* translators: %s: the entity to see details about, like "template"*/
-											__( 'Show %s details' ),
-											entityLabel
-										) }
-									/>
-								) }
-								renderContent={ () => dropdownContent }
-							/>
+			<div
+				ref={ titleRef }
+				className="edit-site-document-actions__title-wrapper"
+			>
+				<h1>
+					<VisuallyHidden>
+						{ sprintf(
+							/* translators: %s: the entity being edited, like "template"*/
+							__( 'Edit %s:' ),
+							entityLabel
 						) }
-					</div>
-
+					</VisuallyHidden>
 					<div
 						className={ classnames(
-							'edit-site-document-actions__secondary-item',
+							'edit-site-document-actions__title',
 							{
+								'is-active': isTitleActive,
 								'is-secondary-title-active': isActive,
 							}
 						) }
 					>
-						{ label ?? '' }
+						{ entityTitle }
 					</div>
-				</>
-			) : (
-				__( 'Loading…' )
-			) }
+				</h1>
+				{ dropdownContent && ! isActive && (
+					<Dropdown
+						popoverProps={ {
+							anchorRef: titleRef.current,
+						} }
+						position="bottom center"
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<Button
+								className="edit-site-document-actions__get-info"
+								icon={ chevronDown }
+								aria-expanded={ isOpen }
+								aria-haspopup="true"
+								onClick={ onToggle }
+								label={ sprintf(
+									/* translators: %s: the entity to see details about, like "template"*/
+									__( 'Show %s details' ),
+									entityLabel
+								) }
+							/>
+						) }
+						renderContent={ () => dropdownContent }
+					/>
+				) }
+			</div>
+			<div
+				className={ classnames(
+					'edit-site-document-actions__secondary-item',
+					{
+						'is-secondary-title-active': isActive,
+					}
+				) }
+			>
+				{ label ?? '' }
+			</div>
 		</div>
 	);
 }
