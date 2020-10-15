@@ -124,8 +124,8 @@ function legacy_block_in_template_cpt() {
 				array(
 					'core-embed/wordpress-tv',
 					array( 'className' => 'wordpress_video' ),
-				)
-			)
+				),
+			),
 		)
 	);
 }
