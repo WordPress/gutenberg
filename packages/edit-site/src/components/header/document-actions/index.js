@@ -12,7 +12,12 @@ import {
 	getBlockType,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { Dropdown, Button, VisuallyHidden } from '@wordpress/components';
+import {
+	Dropdown,
+	Button,
+	VisuallyHidden,
+	__experimentalText as Text,
+} from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
@@ -59,11 +64,7 @@ export default function DocumentActions( {
 	entityLabel,
 	children: dropdownContent,
 } ) {
-	const { label, isActive } = useSecondaryText();
-
-	// Title is active when there is no secondary item, or when the secondary
-	// item is inactive.
-	const isTitleActive = ! label?.length || ! isActive;
+	const { label } = useSecondaryText();
 
 	// The title ref is passed to the popover as the anchorRef so that the
 	// dropdown is centered over the whole title area rather than just one
@@ -97,19 +98,14 @@ export default function DocumentActions( {
 							entityLabel
 						) }
 					</VisuallyHidden>
-					<div
-						className={ classnames(
-							'edit-site-document-actions__title',
-							{
-								'is-active': isTitleActive,
-								'is-secondary-title-active': isActive,
-							}
-						) }
+					<Text
+						variant="subtitle.small"
+						className="edit-site-document-actions__title"
 					>
 						{ entityTitle }
-					</div>
+					</Text>
 				</h1>
-				{ dropdownContent && ! isActive && (
+				{ dropdownContent && (
 					<Dropdown
 						popoverProps={ {
 							anchorRef: titleRef.current,
@@ -134,16 +130,12 @@ export default function DocumentActions( {
 					/>
 				) }
 			</div>
-			<div
-				className={ classnames(
-					'edit-site-document-actions__secondary-item',
-					{
-						'is-secondary-title-active': isActive,
-					}
-				) }
+			<Text
+				variant="body"
+				className="edit-site-document-actions__secondary-item"
 			>
 				{ label ?? '' }
-			</div>
+			</Text>
 		</div>
 	);
 }
