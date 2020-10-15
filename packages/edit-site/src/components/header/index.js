@@ -113,9 +113,13 @@ export default function Header( { openEntitiesSavedStates } ) {
 							: 'template part'
 					}
 				>
-					{ templateType === 'wp_template' && (
-						<TemplateDetails template={ template } />
-					) }
+					{ templateType === 'wp_template' &&
+						( ( { onClose } ) => (
+							<TemplateDetails
+								template={ template }
+								onClose={ onClose }
+							/>
+						) ) }
 				</DocumentActions>
 			</div>
 

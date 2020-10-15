@@ -50,8 +50,9 @@ function useSecondaryText() {
  * @param {string}   props.entityLabel A label to use for entity-related options.
  *                                     E.g. "template" would be used for "edit
  *                                     template" and "show template details".
- * @param {Object[]} props.children    React component to use for the
- *                                     information dropdown area.
+ * @param {Function} props.children    React component to use for the
+ *                                     information dropdown area. Should be a
+ *                                     function which accepts dropdown props.
  */
 export default function DocumentActions( {
 	entityTitle,
@@ -128,7 +129,8 @@ export default function DocumentActions( {
 								) }
 							/>
 						) }
-						renderContent={ () => dropdownContent }
+						contentClassName="edit-site-document-actions__info-dropdown"
+						renderContent={ dropdownContent }
 					/>
 				) }
 			</div>
