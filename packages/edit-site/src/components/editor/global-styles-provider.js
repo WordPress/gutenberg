@@ -70,7 +70,6 @@ export default function GlobalStylesProvider( {
 	const nextValue = useMemo(
 		() => ( {
 			contexts,
-			mergedStyles,
 			getSetting: ( context, path ) =>
 				get( userStyles?.[ context ]?.settings, path ),
 			setSetting: ( context, path, newValue ) => {

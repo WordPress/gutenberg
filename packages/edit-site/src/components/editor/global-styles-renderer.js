@@ -21,9 +21,9 @@ export const mergeTrees = ( baseData, userData ) => {
 	// see https://github.com/lodash/lodash/issues/1984
 	const mergedTree = JSON.parse( JSON.stringify( baseData ) );
 
-	const styleKeys = [ 'typography', 'color', 'custom', 'spacing' ];
+	const validMergeKeys = [ 'typography', 'color', 'custom', 'spacing' ];
 	Object.keys( userData ).forEach( ( context ) => {
-		styleKeys.forEach( ( key ) => {
+		validMergeKeys.forEach( ( key ) => {
 			// Normalize object shape: make sure the key exists under styles and settings.
 			if ( ! mergedTree[ context ].styles?.[ key ] ) {
 				mergedTree[ context ].styles[ key ] = {};
