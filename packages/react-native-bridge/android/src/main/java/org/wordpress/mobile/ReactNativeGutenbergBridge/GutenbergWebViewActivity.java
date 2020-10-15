@@ -106,8 +106,10 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
             @Override
             public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
                 if (consoleMessage != null && consoleMessage.message() != null) {
+                    Log.e("marecar", "console message " + consoleMessage.message());
                     // Listen if block content insert was with success
                     if (consoleMessage.message().contains("'getContent' of null")) {
+                        Log.e("marecar", "console message block insert content was failed");
                         // It wasn't successful so we wan't to reset that page was loaded
                         // and wait for another event
                         mIsWebPageLoaded.compareAndSet(true, false);
