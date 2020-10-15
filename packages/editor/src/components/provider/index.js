@@ -194,7 +194,6 @@ class EditorProvider extends Component {
 				'gradients',
 				'hasFixedToolbar',
 				'hasReducedUI',
-				'hasPermissionsToManageWidgets',
 				'imageEditing',
 				'imageSizes',
 				'imageDimensions',

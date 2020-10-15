@@ -158,8 +158,7 @@ function gutenberg_get_legacy_widget_settings() {
 		)
 	);
 
-	$has_permissions_to_manage_widgets = current_user_can( 'edit_theme_options' );
-	$available_legacy_widgets          = array();
+	$available_legacy_widgets = array();
 	global $wp_widget_factory;
 	if ( ! empty( $wp_widget_factory ) ) {
 		foreach ( $wp_widget_factory->widgets as $class => $widget_obj ) {
@@ -199,8 +198,7 @@ function gutenberg_get_legacy_widget_settings() {
 		}
 	}
 
-	$settings['hasPermissionsToManageWidgets'] = $has_permissions_to_manage_widgets;
-	$settings['availableLegacyWidgets']        = $available_legacy_widgets;
+	$settings['availableLegacyWidgets'] = $available_legacy_widgets;
 
 	return gutenberg_experiments_editor_settings( $settings );
 }
