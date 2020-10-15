@@ -37,9 +37,11 @@ import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
 import LeftSidebar from '../left-sidebar';
+import NavigationSidebar from '../navigation-sidebar';
 
 const interfaceLabels = {
 	leftSidebar: __( 'Block Library' ),
+	drawer: __( 'Navigation Sidebar' ),
 };
 
 function Editor() {
@@ -209,6 +211,9 @@ function Editor() {
 												<SidebarComplementaryAreaFills />
 												<InterfaceSkeleton
 													labels={ interfaceLabels }
+													drawer={
+														<NavigationSidebar />
+													}
 													leftSidebar={
 														<LeftSidebar />
 													}
