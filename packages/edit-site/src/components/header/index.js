@@ -24,36 +24,36 @@ import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 
 export default function Header( { openEntitiesSavedStates } ) {
-	const {
-		deviceType,
-		hasFixedToolbar,
-		template,
-		isNavigationOpen,
-		isInserterOpen,
-	} = useSelect( ( select ) => {
-		const {
-			__experimentalGetPreviewDeviceType,
-			isFeatureActive,
-			getTemplateId,
-			isNavigationOpened,
-			isInserterOpened,
-		} = select( 'core/edit-site' );
-		const { getEntityRecord } = select( 'core' );
+	const { deviceType, hasFixedToolbar, template, isInserterOpen } = useSelect(
+		( select ) => {
+			const {
+				__experimentalGetPreviewDeviceType,
+				isFeatureActive,
+				getTemplateId,
+				isNavigationOpened,
+				isInserterOpened,
+			} = select( 'core/edit-site' );
+			const { getEntityRecord } = select( 'core' );
 
-		const _templateId = getTemplateId();
-		return {
-			deviceType: __experimentalGetPreviewDeviceType(),
-			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
-			template: getEntityRecord( 'postType', 'wp_template', _templateId ),
-			isNavigationOpen: isNavigationOpened(),
-			isInserterOpen: isInserterOpened(),
-		};
-	}, [] );
+			const _templateId = getTemplateId();
+			return {
+				deviceType: __experimentalGetPreviewDeviceType(),
+				hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
+				template: getEntityRecord(
+					'postType',
+					'wp_template',
+					_templateId
+				),
+				isNavigationOpen: isNavigationOpened(),
+				isInserterOpen: isInserterOpened(),
+			};
+		},
+		[]
+	);
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setIsInserterOpened,
-		setIsNavigationPanelOpened,
 	} = useDispatch( 'core/edit-site' );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -63,14 +63,6 @@ export default function Header( { openEntitiesSavedStates } ) {
 	return (
 		<div className="edit-site-header">
 			<div className="edit-site-header_start">
-				{ /* <MainDashboardButton.Slot>
-					<NavigationToggle
-						isOpen={ isNavigationOpen }
-						onClick={ () =>
-							setIsNavigationPanelOpened( ! isNavigationOpen )
-						}
-					/>
-				</MainDashboardButton.Slot> */ }
 				<div className="edit-site-header__toolbar">
 					<Button
 						isPrimary

@@ -212,19 +212,7 @@ function Editor() {
 												<InterfaceSkeleton
 													labels={ interfaceLabels }
 													drawer={
-														<NavigationSidebar
-															content={
-																leftSidebarContent
-															}
-															isOpen={
-																isNavigationOpen
-															}
-															onNavigationToggle={ () =>
-																toggleLeftSidebarContent(
-																	'navigation'
-																)
-															}
-														/>
+														<NavigationSidebar />
 													}
 													leftSidebar={
 														<LeftSidebar />
