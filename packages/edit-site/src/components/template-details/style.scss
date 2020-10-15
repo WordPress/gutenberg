@@ -1,11 +1,8 @@
 .edit-site-template-details {
-	padding: $grid-unit-15;
-	.edit-site-template-details__detail {
-		margin: $grid-unit-10 0;
-	}
-	.edit-site-template-details__heading {
-		margin-top: $grid-unit-05;
-		margin-bottom: $grid-unit-15;
+	margin: $grid-unit-10 $grid-unit-20;
+
+	p {
+		padding: $grid-unit-10 0;
 	}
 }
 

@@ -27,18 +27,12 @@ export default function TemplateDetails( { template, onClose } ) {
 	return (
 		<>
 			<div className="edit-site-template-details">
-				<Text
-					variant="sectionheading"
-					className="edit-site-template-details__heading"
-				>
+				<Text variant="sectionheading">
 					{ __( 'Template details' ) }
 				</Text>
 
 				{ title && (
-					<Text
-						variant="body"
-						className="edit-site-template-details__detail"
-					>
+					<Text variant="body">
 						{ sprintf(
 							/* translators: %s: Name of the template. */
 							__( 'Name: %s' ),
@@ -48,10 +42,7 @@ export default function TemplateDetails( { template, onClose } ) {
 				) }
 
 				{ description && (
-					<Text
-						variant="body"
-						className="edit-site-template-details__detail"
-					>
+					<Text variant="body">
 						{ sprintf(
 							/* translators: %s: Description of the template. */
 							__( 'Description: %s' ),
