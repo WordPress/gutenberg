@@ -60,6 +60,8 @@
 		"alignWide": false,
 		"reusable": false,
 		"__experimentalSelector": ".wp-block-button > a",
-		"__experimentalWidth": true
+		"__experimentalDimensions": {
+			"width": true
+		}
 	}
 }

@@ -17,31 +17,34 @@ import WidthControl from '../components/width-control';
  * Key within block settings' supports array indicating support for
  * width, e.g. settings found in 'block.json'.
  */
-export const WIDTH_SUPPORT_KEY = '__experimentalWidth';
+export const DIMENSIONS_SUPPORT_KEY = '__experimentalDimensions';
 
-export function WidthPanel( props ) {
+export function DimensionsPanel( props ) {
 	const {
 		attributes: { style },
 		setAttributes,
 	} = props;
 
-	const widthOptions = useEditorFeature( 'width' );
-	const isDisabled = useIsWidthDisabled( props );
+	const widthOptions = useEditorFeature( 'dimensions.width' );
+	const isEnabled = useIsWidthEnabled( props );
 
-	if ( isDisabled ) {
+	if ( ! isEnabled ) {
 		return null;
 	}
 
 	const selectedWidth = getWidthFromAttributeValue(
 		widthOptions,
-		style?.width
+		style?.dimensions?.width
 	);
 
 	function onChange( newWidth ) {
 		setAttributes( {
 			style: cleanEmptyObject( {
 				...style,
-				width: newWidth,
+				dimensions: {
+					...style?.dimensions,
+					width: newWidth,
+				},
 			} ),
 		} );
 	}
@@ -60,18 +63,31 @@ export function WidthPanel( props ) {
 }
 
 /**
- * Checks if width support has been disabled
+ * Checks if there is block support for width.
  *
  * @param  {string|Object} blockType Block name or Block Type object.
  * @return {boolean}                 Whether there is support.
  */
-export function useIsWidthDisabled( { name: blockName } = {} ) {
-	const notSupported = ! hasBlockSupport( blockName, WIDTH_SUPPORT_KEY );
+export function hasWidthSupport( blockName ) {
+	const support = hasBlockSupport( blockName, DIMENSIONS_SUPPORT_KEY );
 
-	const widthOptions = useEditorFeature( 'width' );
+	// Further dimension properties to be added in future iterations.
+	// e.g. support && ( support.width || support.height )
+	return true === support || ( support && support.width );
+}
+
+/**
+ * Checks if width is supported and has not been disabled.
+ *
+ * @param  {string|Object} blockType Block name or Block Type object.
+ * @return {boolean}                 Whether there is support.
+ */
+export function useIsWidthEnabled( { name: blockName } = {} ) {
+	const supported = hasWidthSupport( blockName );
+	const widthOptions = useEditorFeature( 'dimensions.width' );
 	const hasWidthOptions = !! widthOptions?.length;
 
-	return notSupported || ! hasWidthOptions;
+	return supported && hasWidthOptions;
 }
 
 /**

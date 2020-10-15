@@ -49,7 +49,7 @@ export default function WidthControl( {
 						isPrimary={ selectedWidth === widthOption.slug }
 						onClick={ () => handleChange( widthOption.slug ) }
 					>
-						{ widthOption.slug }
+						{ widthOption.value }
 					</Button>
 				);
 			} ) }

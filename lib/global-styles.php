@@ -389,8 +389,6 @@ function gutenberg_experimental_global_styles_get_css_property( $style_property 
 			return 'font-size';
 		case 'lineHeight':
 			return 'line-height';
-		case 'width':
-			return 'width';
 		default:
 			return $style_property;
 	}
@@ -409,7 +407,7 @@ function gutenberg_experimental_global_styles_get_style_property() {
 		'color'                    => array( 'color', 'text' ),
 		'fontSize'                 => array( 'typography', 'fontSize' ),
 		'lineHeight'               => array( 'typography', 'lineHeight' ),
-		'width'                    => array( 'width' ),
+		'width'                    => array( 'dimensions', 'width' ),
 	);
 }
 
@@ -426,7 +424,7 @@ function gutenberg_experimental_global_styles_get_support_keys() {
 		'color'                    => array( 'color' ),
 		'fontSize'                 => array( 'fontSize' ),
 		'lineHeight'               => array( 'lineHeight' ),
-		'width'                    => array( '__experimentalWidth' ),
+		'width'                    => array( '__experimentalDimensions', 'width' ),
 	);
 }
 
@@ -450,7 +448,7 @@ function gutenberg_experimental_global_styles_get_presets_structure() {
 			'key'  => 'size',
 		),
 		'width'    => array(
-			'path' => array( 'width' ),
+			'path' => array( 'dimensions', 'width' ),
 			'key'  => 'value',
 		),
 	);
@@ -821,14 +819,13 @@ function gutenberg_experimental_global_styles_normalize_schema( $tree ) {
 		'styles'   => array(
 			'typography' => array(),
 			'color'      => array(),
-			'width'      => array(),
 		),
 		'settings' => array(
 			'color'      => array(),
 			'custom'     => array(),
 			'typography' => array(),
 			'spacing'    => array(),
-			'width'      => array(),
+			'dimensions' => array(),
 		),
 	);
 

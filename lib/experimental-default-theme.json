@@ -166,28 +166,30 @@
 				"customPadding": false,
 				"units": [ "px", "em", "rem", "vh", "vw" ]
 			},
-			"width": [
-				{
-					"name": "25%",
-					"slug": "25",
-					"value": "25%"
-				},
-				{
-					"name": "50%",
-					"slug": "50",
-					"value": "50%"
-				},
-				{
-					"name": "75%",
-					"slug": "75",
-					"value": "75%"
-				},
-				{
-					"name": "100%",
-					"slug": "100",
-					"value": "100%"
-				}
-			]
+			"dimensions": {
+				"width": [
+					{
+						"name": "25%",
+						"slug": "25",
+						"value": "25%"
+					},
+					{
+						"name": "50%",
+						"slug": "50",
+						"value": "50%"
+					},
+					{
+						"name": "75%",
+						"slug": "75",
+						"value": "75%"
+					},
+					{
+						"name": "100%",
+						"slug": "100",
+						"value": "100%"
+					}
+				]
+			}
 		}
 	}
 }
