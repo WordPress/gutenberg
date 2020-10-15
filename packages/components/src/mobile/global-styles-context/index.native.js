@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, pick, startsWith } from 'lodash';
+import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,16 +11,13 @@ import { createContext, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
+import {
+	BLOCK_STYLE_ATTRIBUTES,
+	getBlockPaddings,
+	getBlockColors,
+} from './utils';
 
 const GlobalStylesContext = createContext( { style: {} } );
-
-const BLOCK_STYLE_ATTRIBUTES = [ 'textColor', 'backgroundColor' ];
-
-// Mapping style properties name to native
-const BLOCK_STYLE_ATTRIBUTES_MAPPING = {
-	textColor: 'color',
-};
 
 export const getMergedGlobalStyles = (
 	globalStyle,
@@ -36,45 +33,14 @@ export const getMergedGlobalStyles = (
 		...globalStyle,
 		...wrapperPropsStyle,
 	};
+	const blockPaddings = getBlockPaddings(
+		mergedStyle,
+		wrapperPropsStyle,
+		blockStyleAttributes
+	);
+	const blockColors = getBlockColors( blockStyleAttributes, defaultColors );
 
-	if (
-		! mergedStyle.padding &&
-		( wrapperPropsStyle?.backgroundColor ||
-			blockStyleAttributes?.backgroundColor )
-	) {
-		mergedStyle.padding = styles.withBackGroundColor.paddingLeft;
-	}
-
-	if (
-		mergedStyle?.padding &&
-		! wrapperPropsStyle?.backgroundColor &&
-		! blockStyleAttributes?.backgroundColor
-	) {
-		mergedStyle.padding = undefined;
-	}
-
-	Object.entries( blockStyleAttributes ).forEach( ( [ key, value ] ) => {
-		const isCustomColor = startsWith( value, '#' );
-		let styleKey = key;
-
-		if ( BLOCK_STYLE_ATTRIBUTES_MAPPING[ styleKey ] ) {
-			styleKey = BLOCK_STYLE_ATTRIBUTES_MAPPING[ styleKey ];
-		}
-
-		if ( ! isCustomColor ) {
-			const mappedColor = find( defaultColors, {
-				slug: value,
-			} );
-
-			if ( mappedColor ) {
-				mergedStyle[ styleKey ] = mappedColor.color;
-			}
-		} else {
-			mergedStyle[ styleKey ] = value;
-		}
-	} );
-
-	return mergedStyle;
+	return { ...mergedStyle, ...blockPaddings, ...blockColors };
 };
 
 export const useGlobalStyles = () => {
