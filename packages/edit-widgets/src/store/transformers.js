@@ -13,6 +13,7 @@ export function transformWidgetToBlock( widget ) {
 	}
 
 	const attributes = {
+		name: widget.name,
 		form: widget.form,
 		instance: widget.settings,
 		idBase: widget.id_base,

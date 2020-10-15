@@ -43,7 +43,7 @@ return (
 With the above configuration management features (such as creating new reusable blocks) are still missing from the editor. Enter `@wordpress/reusable-blocks`:
 
 ```js
-import { ReusableBlocksButtons } from '@wordpress/reusable-blocks';
+import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 
 const { __experimentalReusableBlocks } = useSelect(
     ( select ) => select( 'core' ).getEntityRecords(
@@ -63,7 +63,7 @@ return (
         } }
         { ...props }
     >
-        <ReusableBlocksButtons />
+        <ReusableBlocksMenuItems />
         { children }
     </BlockEditorProvider>
 );

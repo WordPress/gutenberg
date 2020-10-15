@@ -9,7 +9,7 @@ import { withSelect } from '@wordpress/data';
 import ReusableBlockConvertButton from './reusable-block-convert-button';
 import ReusableBlockDeleteButton from './reusable-block-delete-button';
 
-function ReusableBlocksButtons( { clientIds } ) {
+function ReusableBlocksMenuItems( { clientIds } ) {
 	return (
 		<>
 			<ReusableBlockConvertButton clientIds={ clientIds } />
@@ -25,4 +25,4 @@ export default withSelect( ( select ) => {
 	return {
 		clientIds: getSelectedBlockClientIds(),
 	};
-} )( ReusableBlocksButtons );
+} )( ReusableBlocksMenuItems );

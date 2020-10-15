@@ -1,1 +1,1 @@
-export { default as ReusableBlocksButtons } from './reusable-blocks-buttons';
+export { default as ReusableBlocksMenuItems } from './reusable-blocks-menu-items';

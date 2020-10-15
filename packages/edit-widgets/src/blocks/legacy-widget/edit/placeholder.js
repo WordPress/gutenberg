@@ -15,7 +15,6 @@ import { brush } from '@wordpress/icons';
 export default function LegacyWidgetPlaceholder( {
 	availableLegacyWidgets,
 	currentWidget,
-	hasPermissionsToManageWidgets,
 	onChangeWidget,
 } ) {
 	const visibleLegacyWidgets = useMemo(
@@ -23,11 +22,7 @@ export default function LegacyWidgetPlaceholder( {
 		[ availableLegacyWidgets ]
 	);
 	let placeholderContent;
-	if ( ! hasPermissionsToManageWidgets ) {
-		placeholderContent = __(
-			"You don't have permissions to use widgets on this site."
-		);
-	} else if ( isEmpty( visibleLegacyWidgets ) ) {
+	if ( isEmpty( visibleLegacyWidgets ) ) {
 		placeholderContent = __( 'There are no widgets available.' );
 	} else {
 		placeholderContent = (

@@ -20,7 +20,7 @@ import {
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
-import { ReusableBlocksButtons } from '@wordpress/reusable-blocks';
+import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
@@ -193,7 +193,6 @@ class EditorProvider extends Component {
 				'gradients',
 				'hasFixedToolbar',
 				'hasReducedUI',
-				'hasPermissionsToManageWidgets',
 				'imageEditing',
 				'imageSizes',
 				'imageDimensions',
@@ -292,7 +291,7 @@ class EditorProvider extends Component {
 								useSubRegistry={ false }
 							>
 								{ children }
-								<ReusableBlocksButtons />
+								<ReusableBlocksMenuItems />
 								<ConvertToGroupButtons />
 							</BlockEditorProvider>
 						</BlockContextProvider>
