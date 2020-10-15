@@ -182,8 +182,6 @@ public class MainApplication extends Application implements ReactApplication, Gu
                     ReadableArray mediaFiles,
                     String blockId
             ) {
-                // mReplaceStoryEditedBlockCallback = replaceStoryEditedBlockCallback;
-                // mOnMediaFilesEditorLoadRequestListener.onRequestMediaFilesEditorLoad(content, blockId);
                 Toast.makeText(MainApplication.this, "requestMediaFilesEditorLoad called", Toast.LENGTH_SHORT).show();
             }
 
@@ -191,7 +189,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
             public void gutenbergDidSendButtonPressedAction(String buttonType) {
 
             }
-            
+
         }, isDarkMode());
 
         return new ReactNativeHost(this) {
