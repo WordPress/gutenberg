@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -77,14 +78,18 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int progress) {
+                Log.e("marecar", "progress " + progress);
                 if (progress == 100 && !mIsWebPageLoaded.getAndSet(true)) {
                     // We want to insert block content
                     // only if gutenberg is ready
+                    Log.e("marecar", "progress is 100%");
                     if (mIsGutenbergReady) {
+                        Log.e("marecar", "gutenberg is ready, let's insert content");
                         mProgressBar.setVisibility(View.GONE);
                         final Handler handler = new Handler();
                         handler.postDelayed(() -> {
                             // Insert block content
+                            Log.e("marecar", "let's insert content");
                             insertBlockScript();
                         }, 200);
                     }
@@ -251,12 +256,14 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         injectCssScript();
         final Handler handler = new Handler();
         handler.postDelayed(() -> {
+            Log.e("marecar", "gutenberg is ready");
             mIsGutenbergReady = true;
             // We want to make sure that page is loaded
             // with all elements before executing external JS
             injectOnGutenbergReadyExternalSources();
             // If page is loaded try to insert block content
             if (mIsWebPageLoaded.get()) {
+                Log.e("marecar", "gutenberg is ready and page is loaded let's try ti insert content");
                 // Insert block content
                 insertBlockScript();
             }
@@ -309,7 +316,9 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     }
 
     private void insertBlockScript() {
+        Log.e("marecar", "insertBlockScript is called");
         if (!mIsBlockContentInserted.getAndSet(true)) {
+            Log.e("marecar", "insertBlockScript insert content");
             String insertBlock = getFileContentFromAssets("gutenberg-web-single-block/insert-block.js").replace("%@","%s");
             String blockContent = getIntent().getExtras().getString(ARG_BLOCK_CONTENT);
             insertBlock = String.format(insertBlock, blockContent);
