@@ -59,7 +59,9 @@ export class BlockMediaUpdateProgress extends React.Component {
 
 	mediaIdContainedInMediaFiles( mediaId, mediaFiles ) {
 		if ( mediaId !== undefined && mediaFiles !== undefined ) {
-			return mediaFiles.some((element) => element.id === mediaId.toString());
+			return mediaFiles.some(
+				( element ) => element.id === mediaId.toString()
+			);
 		}
 		return false;
 	}
