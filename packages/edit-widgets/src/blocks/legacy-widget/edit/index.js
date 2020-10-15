@@ -7,7 +7,7 @@ import { get, omit } from 'lodash';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { Button, PanelBody, ToolbarGroup } from '@wordpress/components';
+import { Button, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
@@ -19,6 +19,7 @@ import { update } from '@wordpress/icons';
 import LegacyWidgetEditHandler from './handler';
 import LegacyWidgetPlaceholder from './placeholder';
 import WidgetPreview from './widget-preview';
+import LegacyWidgetInspectorCard from './inspector-card';
 
 function LegacyWidgetEdit( {
 	attributes,
@@ -86,9 +87,12 @@ function LegacyWidgetEdit( {
 
 	const inspectorControls = WPWidget ? (
 		<InspectorControls>
-			<PanelBody title={ WPWidget.name }>
-				{ WPWidget.description }
-			</PanelBody>
+			<LegacyWidgetInspectorCard
+				name={ WPWidget.name }
+				description={ WPWidget.description }
+			/>
+			{ /* <PanelBody title={ WPWidget.name }>
+			</PanelBody> */ }
 		</InspectorControls>
 	) : null;
 	if ( ! hasPermissionsToManageWidgets ) {

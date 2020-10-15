@@ -40,3 +40,7 @@
 	border: $border-width solid $gray-900;
 	border-radius: $radius-block-ui;
 }
+
+.wp-block-legacy-widget-inspector-card {
+	padding: 0 $grid-unit-20 $grid-unit-20;
+}
