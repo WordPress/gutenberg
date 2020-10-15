@@ -10,44 +10,30 @@ import classNames from 'classnames';
 import { Fragment } from '@wordpress/element';
 
 import {
+	BlockControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
 } from '@wordpress/block-editor';
 import {
-	CustomSelectControl,
+	Dropdown,
+	MenuGroup,
+	MenuItem,
 	PanelBody,
 	ToggleControl,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { DOWN } from '@wordpress/keycodes';
 
 const ALLOWED_BLOCKS = [ 'core/social-link' ];
 
-// The default_option is used for the CustomSelectControl if no value is found.
-// This prevents deprecation issues for social links without a default size set.
-const defaultOption = {
-	name: __( 'Normal' ),
-	key: 'has-normal-icon-size',
-	style: { fontSize: '100%' },
-};
-
-const iconOptions = [
-	{
-		key: 'has-small-icon-size',
-		name: __( 'Small' ),
-		style: { fontSize: '75%' },
-	},
-	defaultOption,
-	{
-		name: __( 'Large' ),
-		key: 'has-large-icon-size',
-		style: { fontSize: '150%' },
-	},
-	{
-		name: __( 'Huge' ),
-		key: 'has-huge-icon-size',
-		style: { fontSize: '200%' },
-	},
+const sizeOptions = [
+	{ name: __( 'Small' ), value: 'has-small-icon-size' },
+	{ name: __( 'Normal' ), value: 'has-normal-icon-size' },
+	{ name: __( 'Large' ), value: 'has-large-icon-size' },
+	{ name: __( 'Huge' ), value: 'has-huge-icon-size' },
 ];
 
 export function SocialLinksEdit( props ) {
@@ -74,24 +60,55 @@ export function SocialLinksEdit( props ) {
 		__experimentalAppenderTagName: 'li',
 	} );
 
+	const openOnArrowDown = ( event ) => {
+		if ( event.keyCode === DOWN ) {
+			event.preventDefault();
+			event.stopPropagation();
+			event.target.click();
+		}
+	};
 	return (
 		<Fragment>
+			<BlockControls>
+				<Dropdown
+					className={ 'icon-size-picker__dropdown' }
+					contentClassName={ 'icon-size-picker__dropdowncontent' }
+					popoverProps={ { position: 'bottom right' } }
+					renderToggle={ ( { isOpen, onToggle } ) => (
+						<ToolbarGroup>
+							<ToolbarButton
+								onClick={ onToggle }
+								onKeyDown={ openOnArrowDown }
+								aria-expanded={ isOpen }
+								aria-haspopup="true"
+							>
+								{ __( 'Size' ) }
+							</ToolbarButton>
+						</ToolbarGroup>
+					) }
+					renderContent={ () => (
+						<MenuGroup label={ __( 'Icon size' ) }>
+							{ sizeOptions.map( ( entry ) => {
+								return (
+									<MenuItem
+										key={ entry.value }
+										role="menuitemradio"
+										isSelected={ iconSize === entry.value }
+										onClick={ () =>
+											setAttributes( {
+												iconSize: entry.value,
+											} )
+										}
+									>
+										{ entry.name }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
+				/>
+			</BlockControls>
 			<InspectorControls>
-				<PanelBody title={ __( 'Icon size' ) }>
-					<CustomSelectControl
-						className={ 'components-icon-size-picker__select' }
-						label={ __( 'Icon size' ) }
-						options={ iconOptions }
-						value={
-							iconOptions.find(
-								( option ) => option.key === iconSize
-							) || defaultOption
-						}
-						onChange={ ( { selectedItem } ) => {
-							setAttributes( { iconSize: selectedItem.key } );
-						} }
-					/>
-				</PanelBody>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
 						label={ __( 'Open links in new tab' ) }
