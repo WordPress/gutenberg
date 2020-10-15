@@ -22,41 +22,37 @@ import {
 export default function BoxControlVisualizer( {
 	children,
 	showValues = DEFAULT_VISUALIZER_SPACING_VALUES,
-	values,
+	values: valuesProp = DEFAULT_SPACING_VALUES,
 	...props
 } ) {
 	const isPositionAbsolute = ! children;
-	const valuesProp = { ...DEFAULT_SPACING_VALUES, ...values };
-	const marginProps = showValues && showValues.margin;
-	const isMarginVisualizer =
-		marginProps && Object.values( marginProps ).filter( Boolean ).length;
 
-	return (
-		<Container
-			{ ...props }
-			isPositionAbsolute={ isPositionAbsolute }
-			aria-hidden="true"
-		>
-			<Sides
-				showValues={
-					isMarginVisualizer ? showValues.margin : showValues.padding
-				}
-				values={
-					isMarginVisualizer ? valuesProp.margin : valuesProp.padding
-				}
-				setTransformStyle={ isMarginVisualizer }
-			/>
-			{ children }
-		</Container>
-	);
+	return Object.entries( showValues ).map( ( [ key, value ] ) => {
+		return (
+			<Container
+				{ ...props }
+				key={ key }
+				isPositionAbsolute={ isPositionAbsolute }
+				aria-hidden="true"
+			>
+				<Sides
+					showValues={ value }
+					type={ key }
+					values={ valuesProp[ key ] }
+				/>
+				{ children }
+			</Container>
+		);
+	} );
 }
 
 function Sides( {
 	showValues = DEFAULT_VISUALIZER_VALUES,
 	values,
-	setTransformStyle,
+	type,
 } ) {
 	const { top, right, bottom, left } = values;
+	const setTransformStyle = type === 'margin';
 
 	return (
 		<>
