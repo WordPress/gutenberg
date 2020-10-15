@@ -66,13 +66,12 @@ export function initializeEmbeddedBlockWidgetEditors( _, settings ) {
 		const innerBlocks = parsedBlocks?.length
 			? parsedBlocks
 			: [ createBlock( 'core/paragraph', { content: '' } ) ];
-		const initialBlocks = [ createBlock( 'core/group', {}, innerBlocks ) ];
 		const synchronizeWithTextarea = ( newBlocks ) => {
 			onChange( serialize( newBlocks ) );
 		};
 		render(
 			<EmbeddedBlockWidgetEditor
-				initialBlocks={ initialBlocks }
+				initialBlocks={ innerBlocks }
 				settings={ settings }
 				onUpdateBlocks={ synchronizeWithTextarea }
 			/>,

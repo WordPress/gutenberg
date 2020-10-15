@@ -97,7 +97,7 @@ class WP_Widget_Block extends WP_Widget {
 			<br/>
 			<textarea name="<?php echo $this->get_field_name( 'content' ); ?>"
 					  id="<?php echo $textarea_id ?>"
-					  class="content sync-input wp-widget-block-content"
+					  class="content sync-input wp-widget-block-textarea"
 					  hidden
 			><?php echo esc_textarea( $content ); ?></textarea>
 			<div class="wp-widget-block-editor"></div>
@@ -107,7 +107,7 @@ class WP_Widget_Block extends WP_Widget {
 				setTimeout(() => {
 					jQuery( '#<?php echo $wrapper_id ?> .wp-widget-block-preview' ).remove();
 
-					const $textarea = jQuery( '#<?php echo $wrapper_id ?> .wp-widget-block-content' );
+					const $textarea = jQuery( '#<?php echo $wrapper_id ?> .wp-widget-block-textarea' );
 					window.wp.editWidgets.embedMiniEditor(
 						jQuery( '#<?php echo $wrapper_id ?> .wp-widget-block-editor' )[0],
 						$textarea.val(),
