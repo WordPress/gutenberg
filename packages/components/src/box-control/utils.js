@@ -122,3 +122,40 @@ export function isValuesDefined( values ) {
 		! isEmpty( Object.values( values ).filter( Boolean ) )
 	);
 }
+
+const sideStyles = {
+	margin: {
+		top: { transform: 'translateY(-100%)' },
+		right: { transform: 'translateX(100%)' },
+		bottom: { transform: 'translateY(100%)' },
+		left: { transform: 'translateX(-100%)' },
+	},
+	padding: {
+		top: null,
+		right: null,
+		bottom: null,
+		left: null,
+	},
+};
+
+/**
+ * Modifies the style properties of each side.
+ *
+ * @param {string} type of field
+ * @return {function(*, [*, *]): *} reducer function adding additional styles
+ */
+
+export function extendStyles( type ) {
+	return ( acc, [ side, value ] ) => {
+		const styles = sideStyles[ type ][ side ];
+		return {
+			...acc,
+			[ side ]: {
+				style: {
+					...styles,
+					[ side ]: value,
+				},
+			},
+		};
+	};
+}

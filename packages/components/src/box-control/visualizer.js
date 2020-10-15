@@ -17,6 +17,7 @@ import {
 	DEFAULT_VISUALIZER_VALUES,
 	DEFAULT_VISUALIZER_SPACING_VALUES,
 	DEFAULT_SPACING_VALUES,
+	extendStyles,
 } from './utils';
 
 export default function BoxControlVisualizer( {
@@ -47,88 +48,50 @@ export default function BoxControlVisualizer( {
 	} );
 }
 
-function Sides( { showValues = DEFAULT_VISUALIZER_VALUES, values, type } ) {
-	const { top, right, bottom, left } = values;
-	const setTransformStyle = type === 'margin';
+function Sides( { showValues = DEFAULT_VISUALIZER_VALUES, ...props } ) {
+	const { top, right, bottom, left } = Object.entries( props.values ).reduce(
+		extendStyles( props.type ),
+		{}
+	);
 
 	return (
 		<>
-			<Top
-				isVisible={ showValues.top }
-				value={ top }
-				setTransformStyle={ setTransformStyle }
-			/>
-			<Right
-				isVisible={ showValues.right }
-				value={ right }
-				setTransformStyle={ setTransformStyle }
-			/>
-			<Bottom
-				isVisible={ showValues.bottom }
-				value={ bottom }
-				setTransformStyle={ setTransformStyle }
-			/>
-			<Left
-				isVisible={ showValues.left }
-				value={ left }
-				setTransformStyle={ setTransformStyle }
-			/>
+			<Top isVisible={ showValues.top } value={ top.style } />
+			<Right isVisible={ showValues.right } value={ right.style } />
+			<Bottom isVisible={ showValues.bottom } value={ bottom.style } />
+			<Left isVisible={ showValues.left } value={ left.style } />
 		</>
 	);
 }
 
-function Top( { isVisible = false, value, setTransformStyle } ) {
-	const height = value;
+function Top( { isVisible = false, value } ) {
+	const { top: height, ...styles } = value;
 	const animationProps = useSideAnimation( height );
 	const isActive = animationProps.isActive || isVisible;
-	return (
-		<TopView
-			isActive={ isActive }
-			style={ { height } }
-			transform={ setTransformStyle ? 'translateY(-100%)' : null }
-		/>
-	);
+	return <TopView isActive={ isActive } style={ { height, ...styles } } />;
 }
 
-function Right( { isVisible = false, value, setTransformStyle } ) {
-	const width = value;
+function Right( { isVisible = false, value } ) {
+	const { right: width, ...styles } = value;
 	const animationProps = useSideAnimation( width );
 	const isActive = animationProps.isActive || isVisible;
 
-	return (
-		<RightView
-			isActive={ isActive }
-			style={ { width } }
-			transform={ setTransformStyle ? 'translateX(100%)' : null }
-		/>
-	);
+	return <RightView isActive={ isActive } style={ { width, ...styles } } />;
 }
 
-function Bottom( { isVisible = false, value, setTransformStyle } ) {
-	const height = value;
+function Bottom( { isVisible = false, value } ) {
+	const { bottom: height, ...styles } = value;
 	const animationProps = useSideAnimation( height );
 	const isActive = animationProps.isActive || isVisible;
-	return (
-		<BottomView
-			isActive={ isActive }
-			style={ { height } }
-			transform={ setTransformStyle ? 'translateY(100%)' : null }
-		/>
-	);
+	return <BottomView isActive={ isActive } style={ { height, ...styles } } />;
 }
 
-function Left( { isVisible = false, value, setTransformStyle } ) {
-	const width = value;
+function Left( { isVisible = false, value } ) {
+	const { left: width, ...styles } = value;
 	const animationProps = useSideAnimation( width );
 	const isActive = animationProps.isActive || isVisible;
 
-	return (
-		<LeftView
-			isActive={ isActive }
-			style={ { width } }
-			transform={ setTransformStyle ? 'translateX(-100%)' : null }
-		/>
-	);
+	return <LeftView isActive={ isActive } style={ { width, ...styles } } />;
 }
 
 /**
