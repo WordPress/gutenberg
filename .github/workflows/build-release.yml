@@ -14,70 +14,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@master
 
-      - name: Download vendor scripts
-        run: |
-          vendor_scripts=""
-          # Using `command | while read...` is more typical, but the inside of the `while`
-          # loop will run under a separate process this way, meaning that it cannot
-          # modify $vendor_scripts. See: https://stackoverflow.com/a/16855194
-          exec 3< <(
-            # Get minified versions of vendor scripts.
-            php bin/get-vendor-scripts.php
-            # Get non-minified versions of vendor scripts (for SCRIPT_DEBUG).
-            php bin/get-vendor-scripts.php debug
-          )
-          while IFS='|' read -u 3 url filename; do
-            echo "$url"
-            echo -n " > vendor/$filename ... "
-            http_status=$( curl \
-              --location \
-              --silent \
-              "$url" \
-              --output "vendor/_download.tmp.js" \
-              --write-out "%{http_code}"
-            )
-            if [ "$http_status" != 200 ]; then
-              error "HTTP $http_status"
-              exit 1
-            fi
-            mv -f "vendor/_download.tmp.js" "vendor/$filename"
-          done
-          echo ::set-env name=vendor_scripts::$(ls vendor/*.js)
-          echo 'vendor_scripts<<EOF' >> $GITHUB_ENV
-            ls vendor/*.js >> $GITHUB_ENV
-          echo 'EOF' >> $GITHUB_ENV
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Gutenberg
-        run: npm run build
-
-      - name: Set production constants in gutenberg.php
-        run: |
-          php bin/generate-gutenberg-php.php > gutenberg.tmp.php
-          mv gutenberg.tmp.php gutenberg.php
-
-      - name: Set build_files env var
-        run: |
-            echo 'build_files<<EOF' >> $GITHUB_ENV
-            ls build/*/*.{js,css,asset.php} \
-              build/block-library/blocks/*.php build/block-library/blocks/*/block.json \
-              build/edit-widgets/blocks/*.php build/edit-widgets/blocks/*/block.json >> $GITHUB_ENV
-            echo 'EOF' >> $GITHUB_ENV
-
-      - name: Create .zip archive
-        run: |
-          zip -r gutenberg.zip \
-            gutenberg.php \
-            lib \
-            packages/block-serialization-default-parser/*.php \
-            post-content.php \
-            $vendor_scripts \
-            $build_files \
-            readme.txt \
-            changelog.txt \
-            README.md
+      - name: Build Gutenberg plugin ZIP file
+        run: ./bin/build-plugin-zip.sh
+        env:
+          NO_CHECKS: 'true'
 
       - name: Create Release
         id: create_release
