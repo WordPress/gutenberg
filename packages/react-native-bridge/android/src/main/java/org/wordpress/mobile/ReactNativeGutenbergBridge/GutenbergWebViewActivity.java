@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -52,10 +53,10 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     private final Runnable mWebPageLoadedRunnable = new Runnable() {
         @Override public void run() {
             if (!mIsWebPageLoaded.getAndSet(true)) {
+                mProgressBar.setVisibility(View.GONE);
                 // We want to insert block content
                 // only if gutenberg is ready
                 if (mIsGutenbergReady) {
-                    mProgressBar.setVisibility(View.GONE);
                     final Handler handler = new Handler();
                     handler.postDelayed(() -> {
                         // Insert block content
@@ -355,6 +356,12 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         });
 
         super.finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mWebPageLoadedHandler.removeCallbacks(mWebPageLoadedRunnable);
+        super.onDestroy();
     }
 
     public class WPWebKit {
