@@ -2,8 +2,12 @@
 import UIKit
 import Gutenberg
 import Aztec
+import MobileCoreServices
 
 class GutenbergViewController: UIViewController {
+    private lazy var filesAppMediaPicker: GutenbergFilesAppMediaSource = {
+        return GutenbergFilesAppMediaSource(gutenberg: gutenberg)
+    }()
 
     fileprivate lazy var gutenberg = Gutenberg(dataSource: self, extraModules: [CustomImageLoader()])
     fileprivate var htmlMode = false
@@ -107,6 +111,9 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         case .deviceCamera:
             print("Gutenberg did request a device media picker, opening the camera picker")
             pickAndUpload(from: .camera, filter: currentFilter, callback: callback)
+
+        case .filesApp:
+            pickAndUploadFromFilesApp(filter: currentFilter, callback: callback)
         default: break
         }
     }
@@ -126,6 +133,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             self.mediaPickCoordinator = nil
         } )
         mediaPickCoordinator?.pick(from: source)
+    }
+
+    private func pickAndUploadFromFilesApp(filter: Gutenberg.MediaType, callback: @escaping MediaPickerDidPickMediaCallback) {
+        filesAppMediaPicker.presentPicker(origin: self, filters: [filter], multipleSelection: false, callback: callback)
     }
 
     func gutenbergDidRequestMediaUploadSync() {
@@ -300,6 +311,14 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergEditorTheme() -> GutenbergEditorTheme? {
         return nil
     }
+
+    func gutenbergMediaSources() -> [Gutenberg.MediaSource] {
+        return [.filesApp]
+    }
+}
+
+extension Gutenberg.MediaSource {
+    static let filesApp = Gutenberg.MediaSource(id: "files-app", label: "Pick a file", types: [.image, .video, .audio, .other])
 }
 
 //MARK: - Navigation bar
@@ -396,5 +415,70 @@ extension GutenbergViewController {
     func toggleHTMLMode(_ action: UIAlertAction) {
         htmlMode = !htmlMode
         gutenberg.toggleHTMLMode()
+    }
+}
+
+class GutenbergFilesAppMediaSource: NSObject {
+    private var mediaPickerCallback: MediaPickerDidPickMediaCallback?
+    private unowned var gutenberg: Gutenberg
+
+    init(gutenberg: Gutenberg) {
+        self.gutenberg = gutenberg
+    }
+
+    func presentPicker(origin: UIViewController, filters: [Gutenberg.MediaType], multipleSelection: Bool, callback: @escaping MediaPickerDidPickMediaCallback) {
+        let uttypeFilters = filters.compactMap { $0.typeIdentifier }
+        mediaPickerCallback = callback
+        let docPicker = UIDocumentPickerViewController(documentTypes: uttypeFilters, in: .import)
+        docPicker.delegate = self
+        docPicker.allowsMultipleSelection = multipleSelection
+        origin.present(docPicker, animated: true)
+    }
+}
+
+extension GutenbergFilesAppMediaSource: UIDocumentPickerDelegate {
+    func documentPicker(_ controller: UIDocumentPickerViewController, didPickDocumentsAt urls: [URL]) {
+        defer {
+            mediaPickerCallback = nil
+        }
+        if urls.count == 0 {
+            mediaPickerCallback?(nil)
+        } else {
+            insertOnBlock(with: urls)
+        }
+    }
+
+    func documentPickerWasCancelled(_ controller: UIDocumentPickerViewController) {
+        mediaPickerCallback?(nil)
+        mediaPickerCallback = nil
+    }
+
+    func insertOnBlock(with urls: [URL]) {
+        guard let callback = mediaPickerCallback else {
+            return assertionFailure("Image picked without callback")
+        }
+
+        let mediaInfo = urls.compactMap({ (url) -> MediaInfo? in
+            let mediaUploadID: Int32 = 1
+            let title = url.lastPathComponent
+            return MediaInfo(id: mediaUploadID, url: url.absoluteString, type: "file", title: title)
+        })
+
+        callback(mediaInfo)
+    }
+}
+
+extension Gutenberg.MediaType {
+    var typeIdentifier: String? {
+        switch self {
+        case .image:
+            return String(kUTTypeImage)
+        case .video:
+            return String(kUTTypeMovie)
+        case .audio:
+            return String(kUTTypeAudio)
+        case .other:
+            return String(kUTTypeItem)
+        }
     }
 }

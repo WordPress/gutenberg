@@ -1,0 +1,9 @@
+.defaultButton {
+	border-radius: $border-width * 4;
+	padding: $block-spacing * 2;
+	border-width: $border-width;
+	margin-top: $grid-unit-20;
+	background-color: $button-fallback-bg;
+	color: $white;
+	align-self: flex-start;
+}
