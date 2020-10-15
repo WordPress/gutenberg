@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -48,6 +49,23 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     private boolean mIsGutenbergReady;
     private AtomicBoolean mIsWebPageLoaded = new AtomicBoolean(false);
     private AtomicBoolean mIsBlockContentInserted = new AtomicBoolean(false);
+    private final Handler mWebPageLoadedHandler = new Handler();
+    private final Runnable mWebPageLoadedRunnable = new Runnable() {
+        @Override public void run() {
+            if (!mIsWebPageLoaded.getAndSet(true)) {
+                mProgressBar.setVisibility(View.GONE);
+                // We want to insert block content
+                // only if gutenberg is ready
+                if (mIsGutenbergReady) {
+                    final Handler handler = new Handler();
+                    handler.postDelayed(() -> {
+                        // Insert block content
+                        insertBlockScript();
+                    }, 200);
+                }
+            }
+        }
+    };
 
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,21 +95,13 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int progress) {
-                if (progress == 100 && !mIsWebPageLoaded.getAndSet(true)) {
-                    // We want to insert block content
-                    // only if gutenberg is ready
-                    if (mIsGutenbergReady) {
-                        mProgressBar.setVisibility(View.GONE);
-                        final Handler handler = new Handler();
-                        handler.postDelayed(() -> {
-                            // Insert block content
-                            insertBlockScript();
-                        }, 200);
-                    }
-                }
-                else {
-                    if (progress < 100) {
-                        mIsWebPageLoaded.compareAndSet(true, false);
+                if (progress == 100) {
+                    mWebPageLoadedHandler.removeCallbacks(mWebPageLoadedRunnable);
+                    mWebPageLoadedHandler.postDelayed(mWebPageLoadedRunnable, 1500);
+                } else {
+                    mIsWebPageLoaded.compareAndSet(true, false);
+                    if (mProgressBar.getVisibility() == View.GONE) {
+                        mProgressBar.setVisibility(View.VISIBLE);
                     }
                     mProgressBar.setProgress(progress);
                 }
@@ -349,6 +359,12 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         });
 
         super.finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mWebPageLoadedHandler.removeCallbacks(mWebPageLoadedRunnable);
+        super.onDestroy();
     }
 
     public class WPWebKit {
