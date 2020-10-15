@@ -9,7 +9,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
@@ -50,6 +49,27 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     private boolean mIsGutenbergReady;
     private AtomicBoolean mIsWebPageLoaded = new AtomicBoolean(false);
     private AtomicBoolean mIsBlockContentInserted = new AtomicBoolean(false);
+    private final Handler mWebPageLoadedHandler = new Handler();
+    private final Runnable mWebPageLoadedRunnable = new Runnable() {
+        @Override public void run() {
+            if (!mIsWebPageLoaded.getAndSet(true)) {
+                Log.e("marecar", "schedule succeeded");
+                // We want to insert block content
+                // only if gutenberg is ready
+                Log.e("marecar", "progress is 100%");
+                if (mIsGutenbergReady) {
+                    Log.e("marecar", "gutenberg is ready, let's insert content");
+                    mProgressBar.setVisibility(View.GONE);
+                    final Handler handler = new Handler();
+                    handler.postDelayed(() -> {
+                        // Insert block content
+                        Log.e("marecar", "let's insert content");
+                        insertBlockScript();
+                    }, 200);
+                }
+            }
+        }
+    };
 
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -80,42 +100,14 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
             @Override
             public void onProgressChanged(WebView view, int progress) {
                 Log.e("marecar", "progress " + progress);
-                if (progress == 100 && !mIsWebPageLoaded.getAndSet(true)) {
-                    // We want to insert block content
-                    // only if gutenberg is ready
-                    Log.e("marecar", "progress is 100%");
-                    if (mIsGutenbergReady) {
-                        Log.e("marecar", "gutenberg is ready, let's insert content");
-                        mProgressBar.setVisibility(View.GONE);
-                        final Handler handler = new Handler();
-                        handler.postDelayed(() -> {
-                            // Insert block content
-                            Log.e("marecar", "let's insert content");
-                            insertBlockScript();
-                        }, 200);
-                    }
-                }
-                else {
-                    if (progress < 100) {
-                        mIsWebPageLoaded.compareAndSet(true, false);
-                    }
+                if (progress == 100) {
+                    Log.e("marecar", "progress is 100 lets schedule" + progress);
+                    mWebPageLoadedHandler.removeCallbacks(mWebPageLoadedRunnable);
+                    mWebPageLoadedHandler.postDelayed(mWebPageLoadedRunnable, 1500);
+                } else {
+                    mIsWebPageLoaded.compareAndSet(true, false);
                     mProgressBar.setProgress(progress);
                 }
-            }
-
-            @Override
-            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-                if (consoleMessage != null && consoleMessage.message() != null) {
-                    Log.e("marecar", "console message " + consoleMessage.message());
-                    // Listen if block content insert was with success
-                    if (consoleMessage.message().contains("'getContent' of null")) {
-                        Log.e("marecar", "console message block insert content was failed");
-                        // It wasn't successful so we wan't to reset that page was loaded
-                        // and wait for another event
-                        mIsWebPageLoaded.compareAndSet(true, false);
-                    }
-                }
-                return true;
             }
         });
 
