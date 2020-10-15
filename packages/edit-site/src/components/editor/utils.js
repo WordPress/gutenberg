@@ -4,6 +4,7 @@ export const PRESET_CATEGORIES = {
 	color: { path: [ 'color', 'palette' ], key: 'color' },
 	gradient: { path: [ 'color', 'gradients' ], key: 'gradient' },
 	fontSize: { path: [ 'typography', 'fontSizes' ], key: 'size' },
+	width: { path: [ 'width' ], key: 'value' },
 };
 export const LINK_COLOR = '--wp--style--color--link';
 export const LINK_COLOR_DECLARATION = `a { color: var(${ LINK_COLOR }, #00e); }`;

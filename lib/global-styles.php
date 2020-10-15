@@ -409,7 +409,7 @@ function gutenberg_experimental_global_styles_get_style_property() {
 		'color'                    => array( 'color', 'text' ),
 		'fontSize'                 => array( 'typography', 'fontSize' ),
 		'lineHeight'               => array( 'typography', 'lineHeight' ),
-		'width'                    => array( 'width'),
+		'width'                    => array( 'width' ),
 	);
 }
 
@@ -448,6 +448,10 @@ function gutenberg_experimental_global_styles_get_presets_structure() {
 		'fontSize' => array(
 			'path' => array( 'typography', 'fontSizes' ),
 			'key'  => 'size',
+		),
+		'width'    => array(
+			'path' => array( 'width' ),
+			'key'  => 'value',
 		),
 	);
 }

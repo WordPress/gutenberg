@@ -48,7 +48,6 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 	$attributes = gutenberg_apply_typography_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_alignment_support( $attributes, $block['attrs'], $block_type );
 	$attributes = gutenberg_apply_custom_classname_support( $attributes, $block['attrs'], $block_type );
-	$attributes = gutenberg_apply_width_support( $attributes, $block['attrs'], $block_type );
 
 	if ( ! count( $attributes ) ) {
 		return $block_content;

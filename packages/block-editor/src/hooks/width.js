@@ -1,148 +1,95 @@
 /**
  * WordPress dependencies
  */
-import { getBlockSupport } from '@wordpress/blocks';
-import { Button, ButtonGroup, PanelBody } from '@wordpress/components';
-import { addFilter } from '@wordpress/hooks';
+import { hasBlockSupport } from '@wordpress/blocks';
+import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import TokenList from '@wordpress/token-list';
 
 /**
  * Internal dependencies
  */
 import { cleanEmptyObject } from './utils';
 import InspectorControls from '../components/inspector-controls';
+import useEditorFeature from '../components/use-editor-feature';
+import WidthControl from '../components/width-control';
 
+/**
+ * Key within block settings' supports array indicating support for
+ * width, e.g. settings found in 'block.json'.
+ */
 export const WIDTH_SUPPORT_KEY = '__experimentalWidth';
 
-/**
- * Override props assigned to save component to inject width CSS class
- * if applicable.
- *
- * @param  {Object} props      Additional props applied to save element.
- * @param  {Object} blockType  Block type.
- * @param  {Object} attributes Block attributes.
- * @return {Object}            Filtered props applied to save element.
- */
-function addSaveProps( props, blockType, attributes ) {
-	if ( ! hasWidthSupport( blockType ) ) {
-		return props;
-	}
-
-	// Add CSS class indicating that a custom width was applied
-	// Use TokenList to de-dupe classes.
-	if ( attributes.style?.width ) {
-		const classes = new TokenList( props.className );
-		classes.add( `custom-width` );
-		const newClassName = classes.value;
-		props.className = newClassName ? newClassName : undefined;
-	}
-
-	return props;
-}
-
-/**
- * Filters registered block settings to expand the block edit wrapper by
- * applying the desired class name.
- *
- * @param  {Object} settings Original block settings.
- * @return {Object}          Filtered block settings.
- */
-function addEditProps( settings ) {
-	if ( ! hasWidthSupport( settings ) ) {
-		return settings;
-	}
-
-	const existingGetEditWrapperProps = settings.getEditWrapperProps;
-	settings.getEditWrapperProps = ( attributes ) => {
-		let props = {};
-		if ( existingGetEditWrapperProps ) {
-			props = existingGetEditWrapperProps( attributes );
-		}
-		return addSaveProps( props, settings, attributes );
-	};
-
-	return settings;
-}
-
-/**
- * Inspector control panel containing the width related configuration.
- *
- * @param  {Object} props Block properties.
- * @return {WPElement}    Width edit element.
- */
-export function WidthEdit( props ) {
+export function WidthPanel( props ) {
 	const {
 		attributes: { style },
 		setAttributes,
 	} = props;
 
-	if ( isWidthDisabled( props ) ) {
+	const widthOptions = useEditorFeature( 'width' );
+	const isDisabled = useIsWidthDisabled( props );
+
+	if ( isDisabled ) {
 		return null;
 	}
 
-	const onChange = ( newWidthValue ) => {
-		const newStyle = {
-			...style,
-			width: newWidthValue,
-		};
-		setAttributes( { style: cleanEmptyObject( newStyle ) } );
-	};
-
-	return (
-		<ButtonGroup aria-label={ __( 'Width' ) }>
-			{ [ '25%', '50%', '75%', '100%' ].map( ( widthValue ) => {
-				return (
-					<Button
-						key={ widthValue }
-						isSmall
-						isPrimary={ widthValue === style?.width }
-						onClick={ () => onChange( widthValue ) }
-					>
-						{ widthValue }
-					</Button>
-				);
-			} ) }
-		</ButtonGroup>
+	const selectedWidth = getWidthFromAttributeValue(
+		widthOptions,
+		style?.width
 	);
-}
 
-export function WidthPanel( props ) {
-	if ( isWidthDisabled( props ) ) {
-		return null;
+	function onChange( newWidth ) {
+		setAttributes( {
+			style: cleanEmptyObject( {
+				...style,
+				width: newWidth,
+			} ),
+		} );
 	}
 
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Width Settings' ) }>
-				<WidthEdit { ...props } />
+				<WidthControl
+					value={ selectedWidth }
+					widthOptions={ widthOptions }
+					onChange={ onChange }
+				/>
 			</PanelBody>
 		</InspectorControls>
 	);
 }
 
 /**
- * Determines if there is width support.
+ * Checks if width support has been disabled
  *
  * @param  {string|Object} blockType Block name or Block Type object.
  * @return {boolean}                 Whether there is support.
  */
-export function hasWidthSupport( blockType ) {
-	return getBlockSupport( blockType, WIDTH_SUPPORT_KEY );
+export function useIsWidthDisabled( { name: blockName } = {} ) {
+	const notSupported = ! hasBlockSupport( blockName, WIDTH_SUPPORT_KEY );
+
+	const widthOptions = useEditorFeature( 'width' );
+	const hasWidthOptions = !! widthOptions?.length;
+
+	return notSupported || ! hasWidthOptions;
 }
 
-export function isWidthDisabled( { name: blockName } = {} ) {
-	return ! hasWidthSupport( blockName );
-}
+/**
+ * Extracts the current width selection, if available, from the CSS variable
+ * set as the 'styles.width' attribute.
+ *
+ * @param {Array} widthOptions Available width options as defined in theme.json
+ * @param {string} value       Attribute value in `styles.width`
+ * @return {string}            Actual width value
+ */
+const getWidthFromAttributeValue = ( widthOptions, value ) => {
+	const attributeParsed = /var:preset\|width\|(.+)/.exec( value );
 
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/width/addSaveProps',
-	addSaveProps
-);
+	if ( attributeParsed && attributeParsed[ 1 ] ) {
+		return widthOptions.find(
+			( { slug } ) => slug === attributeParsed[ 1 ]
+		)?.slug;
+	}
 
-addFilter(
-	'blocks.registerBlockType',
-	'core/width/addEditProps',
-	addEditProps
-);
+	return value;
+};

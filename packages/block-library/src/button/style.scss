@@ -54,6 +54,10 @@ $blocks-button__height: 3.1em;
 	border: 2px solid;
 }
 
-.custom-width .wp-block-button__link {
-	width: 100%;
+// Set the inner button to 100% width when a custom width
+// has been set on the parent
+div[style*="--wp--preset--width"] {
+	.wp-block-button__link {
+		width: 100%;
+	}
 }
