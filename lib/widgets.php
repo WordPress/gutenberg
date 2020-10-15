@@ -271,7 +271,7 @@ add_action( 'widgets_init', 'gutenberg_register_widgets' );
 
 /**
  * Overwrites the template WordPress would use to render the currrent request,
- * to a widget preview template if widgetPreview parameter was passed in the url.
+ * to a widget preview template if widget-preview parameter was passed in the url.
  *
  * @param string $template Original template.
  *
@@ -279,7 +279,7 @@ add_action( 'widgets_init', 'gutenberg_register_widgets' );
  */
 function change_post_template_to_widget_preview( $template ) {
 	if (
-		isset( $_GET['widgetPreview'] ) &&
+		isset( $_GET['widget-preview'] ) &&
 		current_user_can( 'edit_theme_options' )
 	) {
 		add_filter( 'show_admin_bar', '__return_false' );
