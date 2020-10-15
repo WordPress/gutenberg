@@ -22,6 +22,10 @@ export const LABELS = {
 	mixed: __( 'Mixed' ),
 };
 
+export const CUSTOM_VALUES = {
+	AUTO: 'auto',
+};
+
 export const DEFAULT_VALUES = {
 	top: null,
 	right: null,
@@ -104,7 +108,8 @@ export function getAllValue( values = {} ) {
  */
 export function isValuesMixed( values = {} ) {
 	const allValue = getAllValue( values );
-	const isMixed = isNaN( parseFloat( allValue ) );
+	const autoValues = Object.values( values ).every( ( i ) => i === 'auto' );
+	const isMixed = isNaN( parseFloat( allValue ) ) && ! autoValues;
 
 	return isMixed;
 }
@@ -158,4 +163,16 @@ export function extendStyles( type ) {
 			},
 		};
 	};
+}
+
+/**
+ * Checks to determine if passed param includes auto as value
+ * and if so returns only the auto string
+ *
+ * @param {string} value
+ *
+ * @return {string} Returns the provided value (value * unit) or only an 'auto' string
+ */
+export function setAutoValue( value ) {
+	return value.includes( CUSTOM_VALUES.AUTO ) ? CUSTOM_VALUES.AUTO : value;
 }

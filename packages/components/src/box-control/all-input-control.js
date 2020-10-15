@@ -6,7 +6,14 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import UnitControl from './unit-control';
-import { LABELS, getAllValue, isValuesMixed, isValuesDefined } from './utils';
+import {
+	LABELS,
+	CUSTOM_VALUES,
+	getAllValue,
+	isValuesMixed,
+	isValuesDefined,
+	setAutoValue,
+} from './utils';
 
 export default function AllInputControl( {
 	onChange = noop,
@@ -19,6 +26,9 @@ export default function AllInputControl( {
 	const allValue = getAllValue( values );
 	const hasValues = isValuesDefined( values );
 	const isMixed = hasValues && isValuesMixed( values );
+	const isAuto =
+		! allValue &&
+		Object.values( values ).every( ( i ) => i === CUSTOM_VALUES.AUTO );
 
 	const allPlaceholder = isMixed ? LABELS.mixed : null;
 
@@ -28,11 +38,12 @@ export default function AllInputControl( {
 
 	const handleOnChange = ( next ) => {
 		const nextValues = { ...values };
+		const val = setAutoValue( next );
 
-		nextValues.top = next;
-		nextValues.bottom = next;
-		nextValues.left = next;
-		nextValues.right = next;
+		nextValues.top = val;
+		nextValues.bottom = val;
+		nextValues.left = val;
+		nextValues.right = val;
 
 		onChange( nextValues );
 	};
@@ -59,6 +70,7 @@ export default function AllInputControl( {
 		<UnitControl
 			{ ...props }
 			disableUnits={ isMixed }
+			disableValue={ isAuto }
 			isOnly
 			value={ allValue }
 			onChange={ handleOnChange }

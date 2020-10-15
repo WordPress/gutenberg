@@ -13,6 +13,13 @@ import { cleanEmptyObject } from './utils';
 import useEditorFeature from '../components/use-editor-feature';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
+const UNITS = [
+	{ value: '%', label: '%', default: '' },
+	{ value: 'px', label: 'px', default: '' },
+	{ value: 'em', label: 'em', default: '' },
+	{ value: 'rem', label: 'rem', default: '' },
+	{ value: 'vw', label: 'vw', default: '' },
+];
 
 const hasPaddingSupport = ( blockName ) => {
 	const spacingSupport = getBlockSupport( blockName, SPACING_SUPPORT_KEY );

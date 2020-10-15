@@ -13,6 +13,15 @@ import { cleanEmptyObject } from './utils';
 import { useCustomUnits } from '../components/unit-control';
 import { SPACING_SUPPORT_KEY } from './padding';
 
+const UNITS = [
+	{ value: '%', label: '%', default: '' },
+	{ value: 'px', label: 'px', default: '' },
+	{ value: 'em', label: 'em', default: '' },
+	{ value: 'rem', label: 'rem', default: '' },
+	{ value: 'vw', label: 'vw', default: '' },
+	{ value: 'auto', label: 'auto', default: '' },
+];
+
 const hasMarginSupport = ( blockName ) => {
 	const spacingSupport = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
 	return spacingSupport && spacingSupport.margin;
@@ -32,7 +41,7 @@ export function MarginEdit( props ) {
 		setAttributes,
 	} = props;
 
-	const units = useCustomUnits();
+	const units = useCustomUnits( UNITS );
 
 	if ( ! hasMarginSupport( blockName ) ) {
 		return null;

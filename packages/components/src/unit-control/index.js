@@ -29,6 +29,7 @@ function UnitControl(
 		className,
 		disabled = false,
 		disableUnits = false,
+		disableValue = false,
 		isPressEnterToChange = false,
 		isResetValueOnUnitChange = false,
 		isUnitSelectTabbable = true,
@@ -164,7 +165,7 @@ function UnitControl(
 				{ ...omit( props, [ 'children' ] ) }
 				autoComplete={ autoComplete }
 				className={ classes }
-				disabled={ disabled }
+				disabled={ disabled || disableValue }
 				disableUnits={ disableUnits }
 				isPressEnterToChange={ isPressEnterToChange }
 				label={ label }
