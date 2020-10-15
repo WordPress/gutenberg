@@ -20,7 +20,7 @@ jobs:
           NO_CHECKS: 'true'
 
       - name: Set Release Name
-        run: echo "release_name=$(echo github.ref | sed s/^v// | sed 's/-rc./ RC/')" >> $GITHUB_ENV
+        run: echo "release_name=$(echo ${{ github.ref }} | sed s/^v// | sed 's/-rc./ RC/')" >> $GITHUB_ENV
 
       - name: Create Release
         id: create_release
