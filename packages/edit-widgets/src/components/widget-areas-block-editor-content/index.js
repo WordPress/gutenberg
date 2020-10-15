@@ -20,7 +20,7 @@ export default function WidgetAreasBlockEditorContent() {
 	return (
 		<BlockSelectionClearer>
 			<div
-				className="editor-styles-wrapper"
+				className="edit-widgets-block-editor editor-styles-wrapper"
 				onFocus={ ( event ) => {
 					// Stop propagation of the focus event to avoid the parent
 					// widget layout component catching the event and removing the selected area.
