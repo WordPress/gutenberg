@@ -48,7 +48,9 @@
 }
 
 .components-form-token-field__help {
-	font-style: italic;
+	font-size: $helptext-font-size;
+	font-style: normal;
+	color: $gray-700;
 }
 
 // Tokens

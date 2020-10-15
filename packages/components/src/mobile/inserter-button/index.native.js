@@ -62,7 +62,8 @@ class MenuItem extends Component {
 				style={ styles.touchableArea }
 				underlayColor="transparent"
 				activeOpacity={ 0.5 }
-				accessibilityLabel={ blockTitle }
+				accessibilityRole="button"
+				accessibilityLabel={ `${ item.title } block` }
 				onPress={ this.onPress }
 			>
 				<View style={ [ styles.modalItem, { width: maxWidth } ] }>

@@ -8,7 +8,7 @@ import tinycolor from 'tinycolor2';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
@@ -26,13 +26,13 @@ import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
-	InnerBlocks,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	withColors,
 	ColorPalette,
 	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
@@ -250,6 +250,7 @@ function CoverEdit( {
 		dimRatio,
 		focalPoint,
 		hasParallax,
+		isRepeated,
 		minHeight,
 		minHeightUnit,
 		style: styleAttribute,
@@ -267,6 +268,12 @@ function CoverEdit( {
 		setAttributes( {
 			hasParallax: ! hasParallax,
 			...( ! hasParallax ? { focalPoint: undefined } : {} ),
+		} );
+	};
+
+	const toggleIsRepeated = () => {
+		setAttributes( {
+			isRepeated: ! isRepeated,
 		} );
 	};
 
@@ -309,7 +316,8 @@ function CoverEdit( {
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 	const showFocalPointPicker =
-		isVideoBackground || ( isImageBackground && ! hasParallax );
+		isVideoBackground ||
+		( isImageBackground && ( ! hasParallax || isRepeated ) );
 
 	const controls = (
 		<>
@@ -340,11 +348,19 @@ function CoverEdit( {
 				{ !! url && (
 					<PanelBody title={ __( 'Media settings' ) }>
 						{ isImageBackground && (
-							<ToggleControl
-								label={ __( 'Fixed background' ) }
-								checked={ hasParallax }
-								onChange={ toggleParallax }
-							/>
+							<Fragment>
+								<ToggleControl
+									label={ __( 'Fixed background' ) }
+									checked={ hasParallax }
+									onChange={ toggleParallax }
+								/>
+
+								<ToggleControl
+									label={ __( 'Repeated background' ) }
+									checked={ isRepeated }
+									onChange={ toggleIsRepeated }
+								/>
+							</Fragment>
 						) }
 						{ showFocalPointPicker && (
 							<FocalPointPicker
@@ -371,6 +387,7 @@ function CoverEdit( {
 										dimRatio: undefined,
 										focalPoint: undefined,
 										hasParallax: undefined,
+										isRepeated: undefined,
 									} )
 								}
 							>
@@ -430,6 +447,12 @@ function CoverEdit( {
 	);
 
 	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-cover__inner-container',
+		},
+		{ template: INNER_BLOCKS_TEMPLATE }
+	);
 
 	if ( ! hasBackground ) {
 		const placeholderIcon = <BlockIcon icon={ icon } />;
@@ -483,6 +506,7 @@ function CoverEdit( {
 			'has-background-dim': dimRatio !== 0,
 			'is-transient': isBlogUrl,
 			'has-parallax': hasParallax,
+			'is-repeated': isRepeated,
 			[ overlayColor.class ]: overlayColor.class,
 			'has-background-gradient': gradientValue,
 			[ gradientClass ]: ! url && gradientClass,
@@ -554,13 +578,7 @@ function CoverEdit( {
 					/>
 				) }
 				{ isBlogUrl && <Spinner /> }
-				<InnerBlocks
-					__experimentalTagName="div"
-					__experimentalPassedProps={ {
-						className: 'wp-block-cover__inner-container',
-					} }
-					template={ INNER_BLOCKS_TEMPLATE }
-				/>
+				<div { ...innerBlocksProps } />
 			</div>
 		</>
 	);

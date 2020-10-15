@@ -6,6 +6,7 @@
 @import "./components/sidebar/style.scss";
 @import "./components/notices/style.scss";
 @import "./components/layout/style.scss";
+@import "./components/widget-areas-block-editor-content/style.scss";
 
 // In order to use mix-blend-mode, this element needs to have an explicitly set background-color
 // We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations
@@ -13,7 +14,8 @@ html.wp-toolbar {
 	background: $white;
 }
 
-body.appearance_page_gutenberg-widgets {
+body.appearance_page_gutenberg-widgets,
+body.widgets-php {
 	@include wp-admin-reset( ".blocks-widgets-container" );
 }
 

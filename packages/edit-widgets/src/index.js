@@ -19,7 +19,7 @@ import './store';
 import './hooks';
 import { create as createLegacyWidget } from './blocks/legacy-widget';
 import * as widgetArea from './blocks/widget-area';
-import EditWidgetsInitializer from './components/edit-widgets-initializer';
+import Layout from './components/layout';
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -31,11 +31,11 @@ export function initialize( id, settings ) {
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
-		registerBlock( createLegacyWidget( settings ) );
-		registerBlock( widgetArea );
 	}
+	registerBlock( createLegacyWidget( settings ) );
+	registerBlock( widgetArea );
 	render(
-		<EditWidgetsInitializer settings={ settings } />,
+		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )
 	);
 }

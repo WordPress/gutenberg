@@ -18,6 +18,7 @@ $mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile 
 $border-width: 1px;
 $border-width-focus: 1.5px;
 $border-width-tab: 4px;
+$helptext-font-size: 12px;
 
 /**
  * Grid System.
@@ -55,6 +56,7 @@ $mobile-header-toolbar-height: 44px;
 $mobile-floating-toolbar-height: 44px;
 $mobile-floating-toolbar-margin: 8px;
 $mobile-color-swatch: 48px;
+$header-toolbar-min-width: 335px;
 
 /**
  * Shadows.
