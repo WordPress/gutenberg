@@ -92,7 +92,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	},
 
 	save: function( props ) {
-		var blockProps = wp.blockEditor.useBlockProps();
+		var blockProps = wp.blockEditor.useBlockProps.save();
 
 		return wp.element.createElement( wp.blockEditor.RichText.Content, Object.assign( blockProps, {
 			tagName: 'h2', value: props.attributes.content // Saves <h2>Content added in the editor...</h2> to the database for frontend display
