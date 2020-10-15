@@ -29,8 +29,8 @@
 }
 
 .contentContainer {
-	padding-left: 16;
-	padding-right: 16;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
 	flex: 1;
 }
 
@@ -41,5 +41,5 @@
 .list {
 	padding-left: 0;
 	padding-right: 0;
-	padding-bottom: 16;
+	padding-bottom: $grid-unit-20;
 }

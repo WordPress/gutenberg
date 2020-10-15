@@ -54,7 +54,7 @@
 }
 
 .scrollableContent {
-	padding-bottom: 16px;
+	padding-bottom: 20px;
 }
 
 // Button
@@ -177,9 +177,9 @@
 .bottomSheetHeader {
 	flex-direction: row;
 	align-items: center;
-	min-height: 44px;
 	padding-right: $grid-unit-20;
 	padding-left: $grid-unit-20;
+	min-height: 44px;
 }
 
 .bottomSheetBackButton {
