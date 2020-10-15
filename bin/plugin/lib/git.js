@@ -82,16 +82,10 @@ async function createLocalTag( gitWorkingDirectoryPath, tagName ) {
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
  * @param {string} branchName Branch Name
- * @param {Object} options accepted by git-push
  */
-async function pushBranchToOrigin(
-	gitWorkingDirectoryPath,
-	branchName,
-	options = {}
-) {
+async function pushBranchToOrigin( gitWorkingDirectoryPath, branchName ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-
-	await simpleGit.push( 'origin', branchName, options );
+	await simpleGit.push( 'origin', branchName );
 }
 
 /**

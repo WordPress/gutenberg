@@ -60,71 +60,43 @@ async function runSvnRepositoryCheckoutStep( abortMessage ) {
  * Creates a new release branch based on the last package.json version
  * and chooses the next version number.
  *
- * @param {string}  gitWorkingDirectoryPath Git Working Directory Path.
- * @param {string}  abortMessage            Abort Message.
- * @param {boolean} isRC Whether to release an RC (or stable version).
+ * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
+ * @param {string} abortMessage            Abort Message.
+ * @param {string} version the new version.
  * @return {Promise<Object>} chosen version and versionLabels.
  */
 async function runReleaseBranchCreationStep(
 	gitWorkingDirectoryPath,
 	abortMessage,
-	isRC
+	version
 ) {
-	let version, releaseBranch, versionLabel;
+	let releaseBranch;
 	await runStep( 'Creating the release branch', abortMessage, async () => {
-		const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
-		const packageJson = readJSONFile( packageJsonPath );
-		const packageVersion = packageJson.version;
-
-		// We know that the version in package.json is a stable version.
-		if ( isRC ) {
-			// 9.2.1 -> 9.3.0-rc.1
-			// 7.9.0 -> 8.0.0-rc.1
-			version = getNextMajorVersion( packageVersion ) + '-rc.1';
-		} else {
-			// 9.2.1 -> 9.2.2
-			version = semver.inc( version, 'patch' );
-		}
-
 		const parsedVersion = semver.parse( version );
 
-		versionLabel = version.replace( /\-rc\.([0-9]+)/, ' RC$1' );
 		releaseBranch =
 			'release/' + parsedVersion.major + '.' + parsedVersion.minor;
 
-		if ( isRC ) {
-			await askForConfirmation(
-				'The Plugin version to be used is ' +
-					formats.success( version ) +
-					'. Proceed with the creation of the release branch?',
-				true,
-				abortMessage
-			);
+		await askForConfirmation(
+			'The Plugin version to be used is ' +
+				formats.success( version ) +
+				'. Proceed with the creation of the release branch?',
+			true,
+			abortMessage
+		);
 
-			// Creates the release branch
-			await git.createLocalBranch(
-				gitWorkingDirectoryPath,
-				releaseBranch
-			);
+		// Creates the release branch
+		await git.createLocalBranch( gitWorkingDirectoryPath, releaseBranch );
 
-			log(
-				'>> The local release branch ' +
-					formats.success( releaseBranch ) +
-					' has been successfully created.'
-			);
-		} else {
-			log(
-				'The Plugin version to be used is ' +
-					formats.success( version ) +
-					', in the release branch ' +
-					formats.success( releaseBranch )
-			);
-		}
+		log(
+			'>> The local release branch ' +
+				formats.success( releaseBranch ) +
+				' has been successfully created.'
+		);
 	} );
 
 	return {
 		version,
-		versionLabel,
 		releaseBranch,
 	};
 }
@@ -132,50 +104,35 @@ async function runReleaseBranchCreationStep(
 /**
  * Checkouts out the release branch.
  *
- * @param {string}  gitWorkingDirectoryPath Git Working Directory Path.
- * @param {string}  abortMessage Abort Message.
- * @param {boolean} isRC Whether to release an RC (or stable version).
+ * @param {string} gitWorkingDirectoryPath Git Working Directory Path.
+ * @param {string} abortMessage Abort Message.
+ * @param {string} version The new version.
  * @return {Promise<Object>} chosen version and versionLabels.
  */
 async function runReleaseBranchCheckoutStep(
 	gitWorkingDirectoryPath,
 	abortMessage,
-	isRC
+	version
 ) {
-	let releaseBranch, version, versionLabel;
+	let releaseBranch;
 	await runStep(
 		'Getting into the release branch',
 		abortMessage,
 		async () => {
 			const packageJsonPath = gitWorkingDirectoryPath + '/package.json';
+
 			releaseBranch = findReleaseBranchName( packageJsonPath );
+
 			await git.checkoutRemoteBranch(
 				gitWorkingDirectoryPath,
 				releaseBranch
 			);
+
 			log(
 				'>> The local release branch ' +
 					formats.success( releaseBranch ) +
 					' has been successfully checked out.'
 			);
-
-			const releaseBranchPackageJson = readJSONFile( packageJsonPath );
-			const releaseBranchParsedVersion = releaseBranchPackageJson.version;
-
-			// We know that the version in package.json is an RC, i.e. ends in -rc.x
-			if ( isRC ) {
-				// 9.2.0-rc.1 -> 9.2.0-rc.2
-				version = semver.inc(
-					releaseBranchParsedVersion,
-					'prerelease',
-					'rc'
-				);
-			} else {
-				// 9.2.0-rc.1 -> 9.2.0
-				version = semver.inc( releaseBranchParsedVersion, 'patch' );
-			}
-
-			versionLabel = version.replace( /\-rc\.([0-9]+)/, ' RC$1' );
 
 			await askForConfirmation(
 				'The Version to release is ' +
@@ -189,7 +146,6 @@ async function runReleaseBranchCheckoutStep(
 
 	return {
 		version,
-		versionLabel,
 		releaseBranch,
 	};
 }
@@ -387,12 +343,12 @@ async function runPushGitChangesStep(
 				true,
 				abortMessage
 			);
-			// We need to force-push because we are effectivelly rebasing from master
+
 			await git.pushBranchToOrigin(
 				gitWorkingDirectoryPath,
-				releaseBranch,
-				{ '--force': null }
+				releaseBranch
 			);
+
 			await git.pushTagsToOrigin( gitWorkingDirectoryPath );
 		}
 	);
@@ -702,6 +658,8 @@ async function isMilestoneClear( version ) {
 async function releasePlugin( isRC = true ) {
 	// This is a variable that contains the abort message shown when the script is aborted.
 	let abortMessage = 'Aborting!';
+	let versionInfo;
+
 	const temporaryFolders = [];
 
 	await askForConfirmation( 'Ready to go? ' );
@@ -720,21 +678,39 @@ async function releasePlugin( isRC = true ) {
 
 	const packageJsonPath = gitWorkingDirectory + '/package.json';
 	const packageJson = readJSONFile( packageJsonPath );
-	const packageVersion = semver.parse( packageJson.version );
-	const isPackageVersionRC = packageVersion.prerelease.length > 0;
+	const packageVersion = packageJson.version;
+	const parsedPackagedVersion = semver.parse( packageJson.version );
+	const isPackageVersionRC = parsedPackagedVersion.prerelease.length > 0;
 
-	// Creating the release branch
-	const { version, versionLabel, releaseBranch } = ! isPackageVersionRC
-		? await runReleaseBranchCreationStep(
-				gitWorkingDirectory,
-				abortMessage,
-				isRC
-		  )
-		: await runReleaseBranchCheckoutStep(
-				gitWorkingDirectory,
-				abortMessage,
-				isRC
-		  );
+	// Are we going to release an RC?
+	if ( isRC ) {
+		// We are releasing an RC.
+		// If packageVersion is stable, then generate new branch and RC1.
+		// If packageVersion is RC, then checkout branch and inc RC.
+		versionInfo = ! isPackageVersionRC
+			? await runReleaseBranchCreationStep(
+					gitWorkingDirectory,
+					abortMessage,
+					getNextMajorVersion( packageVersion ) + '-rc.1'
+			  )
+			: await runReleaseBranchCheckoutStep(
+					gitWorkingDirectory,
+					abortMessage,
+					semver.inc( packageVersion, 'prerelease', 'rc' )
+			  );
+	} else {
+		// We are releasing a stable version.
+		// If packageVersion is stable, then checkout the branch and inc patch.
+		// If packageVersion is RC, then checkout the branch and inc patch, effectively removing the RC.
+		versionInfo = await runReleaseBranchCheckoutStep(
+			gitWorkingDirectory,
+			abortMessage,
+			semver.inc( packageVersion, 'patch' )
+		);
+	}
+
+	const { version, releaseBranch } = versionInfo;
+	const versionLabel = version.replace( /\-rc\.([0-9]+)/, ' RC$1' );
 
 	if ( ! ( await isMilestoneClear( version ) ) ) {
 		await askForConfirmation(
