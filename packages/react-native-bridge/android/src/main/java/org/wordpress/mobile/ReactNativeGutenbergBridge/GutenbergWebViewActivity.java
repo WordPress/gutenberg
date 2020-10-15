@@ -48,6 +48,23 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     private boolean mIsGutenbergReady;
     private AtomicBoolean mIsWebPageLoaded = new AtomicBoolean(false);
     private AtomicBoolean mIsBlockContentInserted = new AtomicBoolean(false);
+    private final Handler mWebPageLoadedHandler = new Handler();
+    private final Runnable mWebPageLoadedRunnable = new Runnable() {
+        @Override public void run() {
+            if (!mIsWebPageLoaded.getAndSet(true)) {
+                // We want to insert block content
+                // only if gutenberg is ready
+                if (mIsGutenbergReady) {
+                    mProgressBar.setVisibility(View.GONE);
+                    final Handler handler = new Handler();
+                    handler.postDelayed(() -> {
+                        // Insert block content
+                        insertBlockScript();
+                    }, 200);
+                }
+            }
+        }
+    };
 
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -77,22 +94,11 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         mWebView.setWebChromeClient(new WebChromeClient() {
             @Override
             public void onProgressChanged(WebView view, int progress) {
-                if (progress == 100 && !mIsWebPageLoaded.getAndSet(true)) {
-                    // We want to insert block content
-                    // only if gutenberg is ready
-                    if (mIsGutenbergReady) {
-                        mProgressBar.setVisibility(View.GONE);
-                        final Handler handler = new Handler();
-                        handler.postDelayed(() -> {
-                            // Insert block content
-                            insertBlockScript();
-                        }, 200);
-                    }
-                }
-                else {
-                    if (progress < 100) {
-                        mIsWebPageLoaded.compareAndSet(true, false);
-                    }
+                if (progress == 100) {
+                    mWebPageLoadedHandler.removeCallbacks(mWebPageLoadedRunnable);
+                    mWebPageLoadedHandler.postDelayed(mWebPageLoadedRunnable, 1500);
+                } else {
+                    mIsWebPageLoaded.compareAndSet(true, false);
                     mProgressBar.setProgress(progress);
                 }
             }
