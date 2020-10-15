@@ -91,8 +91,6 @@ function LegacyWidgetEdit( {
 				name={ WPWidget.name }
 				description={ WPWidget.description }
 			/>
-			{ /* <PanelBody title={ WPWidget.name }>
-			</PanelBody> */ }
 		</InspectorControls>
 	) : null;
 	if ( ! hasPermissionsToManageWidgets ) {
