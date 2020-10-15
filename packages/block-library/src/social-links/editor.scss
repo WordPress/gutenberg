@@ -22,34 +22,19 @@
 .editor-styles-wrapper .wp-block-social-links {
 	padding: 0;
 }
-.wp-block-social-links__social-placeholder div {
+.wp-block-social-links__social-placeholder .wp-block-social-link {
 	display: inline-block;
-	margin: 0 8px;
-	padding: 4px;
-	width: 24px;
-	height: 24px;
-	border-radius: 12px;
-}
-
-.wp-block-social-links__social-placeholder__blue {
-	background-color: rgba(52, 153, 205, 0.5);
-	box-shadow: 0 0 8px 8px rgba(52, 153, 205, 0.5);
-}
-
-
-.wp-block-social-links__social-placeholder__pink {
-	background-color: rgba(240, 0, 117, 0.5);
-	box-shadow: 0 0 8px 8px rgba(240, 0, 117, 0.5);
-}
-
-.wp-block-social-links__social-placeholder__orange {
-	background-color: rgba(255, 153, 0, 0.5);
-	box-shadow: 0 0 8px 8px rgba(255, 153, 0, 0.5);
+	margin: 0 $grid-unit-10 0 0;
+	padding: $grid-unit-05;
+	width: 36px;
+	height: 36px;
+	border-radius: $radius-round;
+	opacity: 0.8;
 }
 
 // Polish the Appender.
 .wp-block-social-links .block-list-appender {
-	margin: 0;
+	margin: 0 0 $grid-unit-10 0;
 	display: flex;
 	align-items: center;
 }

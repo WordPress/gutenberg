@@ -22,9 +22,9 @@ export function SocialLinksEdit( props ) {
 
 	const SocialPlaceholder = (
 		<div className="wp-block-social-links__social-placeholder">
-			<div className="wp-block-social-links__social-placeholder__blue"></div>
-			<div className="wp-block-social-links__social-placeholder__pink"></div>
-			<div className="wp-block-social-links__social-placeholder__orange"></div>
+			<div className="wp-block-social-link wp-social-link-facebook"></div>
+			<div className="wp-block-social-link wp-social-link-twitter"></div>
+			<div className="wp-block-social-link wp-social-link-instagram"></div>
 		</div>
 	);
 
