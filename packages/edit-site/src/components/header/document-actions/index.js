@@ -129,6 +129,7 @@ export default function DocumentActions( {
 								) }
 							/>
 						) }
+						contentClassName="edit-site-document-actions__info-dropdown"
 						renderContent={ dropdownContent }
 					/>
 				) }
