@@ -64,4 +64,10 @@ describe( 'Test Custom Post Types', () => {
 		);
 		expect( selectedValue ).toEqual( valueToSelect );
 	} );
+	it( 'should create a cpt with a legacy block in its template without WSOD', async () => {
+		await createNewPost( { postType: 'leg_block_in_tpl' } );
+		await page.click( '.block-editor-writing-flow' );
+		await page.keyboard.type( 'Hello there' );
+		await publishPost();
+	} );
 } );
