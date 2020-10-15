@@ -28,6 +28,7 @@ import {
 	ColorPalette,
 	ColorPicker,
 	BottomSheetConsumer,
+	useUnitConverterToMobile,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -95,8 +96,15 @@ const Cover = ( {
 		id,
 		style,
 		customOverlayColor,
+		minHeightUnit,
 	} = attributes;
-	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
+
+	const convertedMinHeight = useUnitConverterToMobile(
+		minHeight,
+		minHeightUnit
+	);
+
+	const CONTAINER_HEIGHT = convertedMinHeight || COVER_DEFAULT_HEIGHT;
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
@@ -159,7 +167,7 @@ const Cover = ( {
 	};
 
 	const onHeightChange = ( value ) => {
-		if ( minHeight || value !== COVER_DEFAULT_HEIGHT ) {
+		if ( convertedMinHeight || value !== COVER_DEFAULT_HEIGHT ) {
 			setAttributes( { minHeight: value } );
 		}
 	};
