@@ -15,18 +15,7 @@
 
 .edit-site-navigation-toggle.is-open {
 	flex-shrink: 0;
-	height: $header-height + $border-width; // Cover header border
-	width: 300px;
 	position: static;
-
-	// Delay to sync with `NavigationPanel` animation
-	transition: width 80ms linear;
-	transition-delay: 20ms;
-	@include reduce-motion("transition");
-
-	.edit-site-navigation-toggle__button {
-		background: $gray-900;
-	}
 }
 
 .edit-site-navigation-toggle__button {
@@ -35,6 +24,7 @@
 	color: $white;
 	height: $header-height + $border-width; // Cover header border
 	width: $header-height;
+	z-index: 1;
 
 	&.has-icon {
 		min-width: $header-height;
@@ -57,6 +47,12 @@
 }
 
 .edit-site-navigation-toggle__site-title {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 300px;
+	left: $header-height;
+
 	font-style: normal;
 	font-weight: 600;
 	font-size: $default-font-size;
@@ -68,4 +64,21 @@
 	-webkit-line-clamp: 2;
 	-webkit-box-orient: vertical;
 	overflow: hidden;
+}
+
+.edit-site-navigation-toggle__site-title-container {
+	background: $gray-900;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 0;
+	height: $header-height + $border-width;
+	overflow: hidden;
+	pointer-events: none;
+	transition: width 100ms linear;
+	@include reduce-motion("transition");
+}
+
+.edit-site-navigation-toggle.is-open .edit-site-navigation-toggle__site-title-container {
+	width: 300px;
 }

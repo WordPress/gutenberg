@@ -1,18 +1,26 @@
 .edit-site-navigation-panel {
-	animation: edit-site-navigation-panel__slide-in 0.1s linear;
 	height: 100%;
-	width: $nav-sidebar-width;
+	position: relative;
+	width: 0;
+	overflow: hidden;
 	background: $gray-900;
-	@include reduce-motion("animation");
+	transition: width 100ms linear;
+	@include reduce-motion("transition");
+}
 
-	@keyframes edit-site-navigation-panel__slide-in {
-		from {
-			transform: translateX(-100%);
-		}
-		to {
-			transform: translateX(0%);
-		}
-	}
+.edit-site-navigation-panel.is-open {
+	width: $nav-sidebar-width;
+}
+
+.edit-site-navigation-panel__inner {
+	position: relative;
+	width: $nav-sidebar-width;
+	height: 100%;
+	padding-top: 61px;
+}
+
+.edit-site-navigation-panel.is-open .edit-site-navigation-panel__inner {
+	padding-top: 0;
 }
 
 .edit-site-navigation-panel__back-to-dashboard.components-button.is-tertiary {

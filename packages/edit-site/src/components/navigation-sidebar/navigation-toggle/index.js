@@ -68,11 +68,11 @@ function NavigationToggle( { icon, isOpen } ) {
 				{ buttonIcon }
 			</Button>
 
-			{ isOpen && (
+			<div className="edit-site-navigation-toggle__site-title-container">
 				<div className="edit-site-navigation-toggle__site-title">
 					{ siteTitle }
 				</div>
-			) }
+			</div>
 		</div>
 	);
 }
