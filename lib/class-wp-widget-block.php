@@ -54,7 +54,9 @@ class WP_Widget_Block extends WP_Widget {
 	 */
 	public function widget( $args, $instance ) {
 		echo $args['before_widget'];
-		echo do_blocks( $instance['content'] );
+		if ( ! empty( $instance['content'] ) ) {
+			echo do_blocks( $instance['content'] );
+		}
 		echo $args['after_widget'];
 	}
 
@@ -84,18 +86,36 @@ class WP_Widget_Block extends WP_Widget {
 	 */
 	public function form( $instance ) {
 		$instance = wp_parse_args( (array) $instance, $this->default_instance );
-		echo do_blocks( $instance['content'] );
+		$content = ! empty( $instance['content'] )  ? $instance['content'] : "";
 		$textarea_id = $this->get_field_id( 'content' );
+		$wrapper_id = uniqid( "wp-widget-block" );
 		?>
-		<br/>
-		<textarea id="<?php echo $textarea_id; ?>" name="<?php echo $this->get_field_name( 'content' ); ?>"
-				class="content sync-input" hidden><?php echo esc_textarea( $instance['content'] ); ?></textarea>
+		<div id="<?php echo $wrapper_id ?>">
+			<div class="wp-widget-block-preview">
+				<?php echo $content ?>
+			</div>
+			<br/>
+			<textarea name="<?php echo $this->get_field_name( 'content' ); ?>"
+					  id="<?php echo $textarea_id ?>"
+					  class="content sync-input wp-widget-block-content"
+					  hidden
+			><?php echo esc_textarea( $content ); ?></textarea>
+			<div class="wp-widget-block-editor"></div>
+		</div>
 		<script>
 			(function() {
-				var link = "<?php echo esc_js( admin_url( 'themes.php?page=gutenberg-widgets' ) ); ?>";
-				var container = jQuery('#<?php echo $textarea_id; ?>').closest(".form").find('.widget-control-actions .alignleft');
-				container.prepend(jQuery('<span> |</span>'));
-				container.prepend(jQuery('<a href="'+link+'" class="button-link">Edit</a>'));
+				setTimeout(() => {
+					jQuery( '#<?php echo $wrapper_id ?> .wp-widget-block-preview' ).remove();
+
+					const $textarea = jQuery( '#<?php echo $wrapper_id ?> .wp-widget-block-content' );
+					window.wp.editWidgets.embedMiniEditor(
+						jQuery( '#<?php echo $wrapper_id ?> .wp-widget-block-editor' )[0],
+						$textarea.val(),
+						function( newContent ) {
+							$textarea.val( newContent ).trigger( 'change' )
+						}
+					);
+				});
 			})();
 		</script>
 		<?php

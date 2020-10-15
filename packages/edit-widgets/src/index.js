@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import {
+	parse,
+	serialize,
+	createBlock,
 	registerBlockType,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
@@ -20,6 +23,7 @@ import './hooks';
 import { create as createLegacyWidget } from './blocks/legacy-widget';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
+import EmbeddedBlockWidgetEditor from './components/embedded-block-widget-editor';
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -38,6 +42,43 @@ export function initialize( id, settings ) {
 		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )
 	);
+}
+
+/**
+ * Initializes the block editor on widgets.php page and in the widgets Customizer section.
+ *
+ * @param {string} _        Placeholder for compliance with initialize() signature.
+ * @param {Object} settings Block editor settings.
+ */
+export function initializeEmbeddedBlockWidgetEditors( _, settings ) {
+	registerCoreBlocks();
+	if ( process.env.GUTENBERG_PHASE === 2 ) {
+		__experimentalRegisterExperimentalCoreBlocks( settings );
+		registerBlock( createLegacyWidget( settings ) );
+		registerBlock( widgetArea );
+	}
+	window.wp.editWidgets.embedMiniEditor = (
+		element,
+		serializedBlock,
+		onChange
+	) => {
+		const parsedBlocks = serializedBlock && parse( serializedBlock );
+		const innerBlocks = parsedBlocks?.length
+			? parsedBlocks
+			: [ createBlock( 'core/paragraph', { content: '' } ) ];
+		const initialBlocks = [ createBlock( 'core/group', {}, innerBlocks ) ];
+		const synchronizeWithTextarea = ( newBlocks ) => {
+			onChange( serialize( newBlocks ) );
+		};
+		render(
+			<EmbeddedBlockWidgetEditor
+				initialBlocks={ initialBlocks }
+				settings={ settings }
+				onUpdateBlocks={ synchronizeWithTextarea }
+			/>,
+			element
+		);
+	};
 }
 
 /**

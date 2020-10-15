@@ -28,20 +28,21 @@ function the_gutenberg_widgets() {
  * @param string $hook Page.
  */
 function gutenberg_widgets_init( $hook ) {
-	if ( 'widgets.php' === $hook ) {
-		wp_enqueue_style( 'wp-block-library' );
-		wp_enqueue_style( 'wp-block-library-theme' );
-		wp_add_inline_style(
-			'wp-block-library-theme',
-			'.block-widget-form .widget-control-save { display: none; }'
-		);
-		return;
-	}
-	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets' ), true ) ) {
+	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets', 'widgets.php' ), true ) ) {
 		return;
 	}
 
 	$initializer_name = 'initialize';
+	if ( 'widgets.php' === $hook ) {
+		wp_enqueue_style( 'wp-block-library' );
+		wp_enqueue_style( 'wp-block-library-theme' );
+		wp_add_inline_style(
+				'wp-block-library-theme',
+				'.block-widget-form .widget-control-save { display: none; }'
+		);
+		$initializer_name = 'initializeEmbeddedBlockWidgetEditors';
+	}
+
 
 	// Media settings.
 	$max_upload_size = wp_max_upload_size();
