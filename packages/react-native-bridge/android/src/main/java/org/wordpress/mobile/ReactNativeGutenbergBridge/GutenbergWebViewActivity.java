@@ -100,6 +100,9 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                     mWebPageLoadedHandler.postDelayed(mWebPageLoadedRunnable, 1500);
                 } else {
                     mIsWebPageLoaded.compareAndSet(true, false);
+                    if (mProgressBar.getVisibility() == View.GONE) {
+                        mProgressBar.setVisibility(View.VISIBLE);
+                    }
                     mProgressBar.setProgress(progress);
                 }
             }
