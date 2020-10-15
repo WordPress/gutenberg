@@ -24,7 +24,6 @@ import LegacyWidgetInspectorCard from './inspector-card';
 function LegacyWidgetEdit( {
 	attributes,
 	availableLegacyWidgets,
-	hasPermissionsToManageWidgets,
 	prerenderedEditForm,
 	setAttributes,
 	widgetId,
@@ -58,7 +57,6 @@ function LegacyWidgetEdit( {
 		return (
 			<LegacyWidgetPlaceholder
 				availableLegacyWidgets={ availableLegacyWidgets }
-				hasPermissionsToManageWidgets={ hasPermissionsToManageWidgets }
 				onChangeWidget={ ( newWidget ) => {
 					const {
 						isReferenceWidget,
@@ -93,18 +91,6 @@ function LegacyWidgetEdit( {
 			/>
 		</InspectorControls>
 	) : null;
-	if ( ! hasPermissionsToManageWidgets ) {
-		return (
-			<>
-				{ inspectorControls }
-				<WidgetPreview
-					className="wp-block-legacy-widget__preview"
-					widgetAreaId={ widgetAreaId }
-					attributes={ omit( attributes, 'widgetId' ) }
-				/>
-			</>
-		);
-	}
 
 	return (
 		<>
@@ -196,10 +182,7 @@ export default withSelect( ( select, { clientId, attributes } ) => {
 		clientId
 	);
 	const editorSettings = select( 'core/block-editor' ).getSettings();
-	const {
-		availableLegacyWidgets,
-		hasPermissionsToManageWidgets,
-	} = editorSettings;
+	const { availableLegacyWidgets } = editorSettings;
 
 	let WPWidget;
 	if ( widgetId && availableLegacyWidgets[ widgetId ] ) {
@@ -212,7 +195,6 @@ export default withSelect( ( select, { clientId, attributes } ) => {
 	}
 
 	return {
-		hasPermissionsToManageWidgets,
 		availableLegacyWidgets,
 		widgetId,
 		widgetAreaId: widgetArea?.id,

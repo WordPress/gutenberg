@@ -16,9 +16,8 @@ function WidgetPreview( { widgetAreaId, attributes, hidden, ...props } ) {
 	const [ height, setHeight ] = useState( DEFAULT_HEIGHT );
 	const iframeRef = useRef();
 	const currentUrl = document.location.href;
-	const siteUrl = currentUrl.substr( 0, currentUrl.indexOf( 'wp-admin/' ) );
-	const iframeUrl = addQueryArgs( siteUrl, {
-		widgetPreview: {
+	const iframeUrl = addQueryArgs( currentUrl, {
+		'widget-preview': {
 			...attributes,
 			sidebarId: widgetAreaId,
 		},
