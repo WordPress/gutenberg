@@ -19,6 +19,10 @@
 
 		// See comment above about min-width
 		min-width: 0;
+
+		// Since part of the dropdown button width is blank space, visually,
+		// it looks off-center. This offsets that blank space.
+		margin-left: 12px;
 	}
 
 	.edit-site-document-actions__title-wrapper > h1 {
@@ -34,11 +38,6 @@
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-	}
-
-	.edit-site-document-actions__get-info {
-		// Add a bit of margin for better spacing with title when focused.
-		margin-left: $grid-unit-05;
 	}
 
 	.edit-site-document-actions__secondary-item {
