@@ -29,7 +29,6 @@ const EMPTY_CONTENT = '{}';
 
 const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
-	mergedStyles: {},
 	getSetting: ( context, path ) => {},
 	setSetting: ( context, path, newValue ) => {},
 	getStyleProperty: ( context, propertyName ) => {},
