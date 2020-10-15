@@ -64,11 +64,7 @@ export default function DocumentActions( {
 	entityLabel,
 	children: dropdownContent,
 } ) {
-	const { label, isActive } = useSecondaryText();
-
-	// Title is active when there is no secondary item, or when the secondary
-	// item is inactive.
-	const isTitleActive = ! label?.length || ! isActive;
+	const { label } = useSecondaryText();
 
 	// The title ref is passed to the popover as the anchorRef so that the
 	// dropdown is centered over the whole title area rather than just one
@@ -103,13 +99,13 @@ export default function DocumentActions( {
 						) }
 					</VisuallyHidden>
 					<Text
-						variant={ isTitleActive ? 'subtitle.small' : 'body' }
+						variant="subtitle.small"
 						className="edit-site-document-actions__title"
 					>
 						{ entityTitle }
 					</Text>
 				</h1>
-				{ dropdownContent && ! isActive && (
+				{ dropdownContent && (
 					<Dropdown
 						popoverProps={ {
 							anchorRef: titleRef.current,
@@ -135,7 +131,7 @@ export default function DocumentActions( {
 				) }
 			</div>
 			<Text
-				variant={ isActive ? 'subtitle.small' : 'body' }
+				variant="body"
 				className="edit-site-document-actions__secondary-item"
 			>
 				{ label ?? '' }
