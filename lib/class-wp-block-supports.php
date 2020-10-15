@@ -276,26 +276,25 @@ class WP_Block_Supports {
 					),
 				),
 				'callback'   => function( $attributes, $block_name ) {
+					die( 42 );
 					$has_named_font_size = array_key_exists( 'fontSize', $attributes );
 					$has_custom_font_size = isset( $attributes['style']['typography']['fontSize'] );
 
 					$classes = '';
+					$styles  = '';
 					if ( $has_named_font_size ) {
 						$classes = sprintf( 'has-%s-font-size', $attributes['fontSize'] );
 					} elseif ( $has_custom_font_size ) {
-						$generated_class_name = uniqid( 'wp-block-fontsize-' );
-						$classes = $generated_class_name;
-						wp_add_inline_style(
-							'wp-block-supports',
-							sprintf(
-								'.%s { font-size: %spx; }',
-								$generated_class_name,
-								$attributes['style']['typography']['fontSize']
-							)
+						$styles = sprintf(
+							'font-size:%spx;',
+							$attributes['style']['typography']['fontSize']
 						);
 					}
 
-					return array( 'class' => $classes );
+					return array(
+						'class' => $classes,
+						'style' => 'color:pink;', //$styles,
+					);
 				},
 				'default'    => false,
 			),
