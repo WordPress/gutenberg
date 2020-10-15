@@ -85,6 +85,54 @@ describe( 'block factory', () => {
 			expect( typeof block.clientId ).toBe( 'string' );
 		} );
 
+		it( 'should create a block respecting the defaults in an property with `object` type', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					align: {
+						type: 'string',
+					},
+					includesDefault: {
+						type: 'boolean',
+						default: true,
+					},
+					includesFalseyDefault: {
+						type: 'number',
+						default: 0,
+					},
+					objectProp: {
+						type: 'object',
+						default: {
+							content: 'ping',
+							offset: 0,
+							level: 2,
+						},
+					},
+				},
+				category: 'text',
+				title: 'test block',
+			} );
+			const block = createBlock( 'core/test-block', {
+				align: 'left',
+				objectProp: { content: 'pong', level: 9 },
+			} );
+			expect( block ).toEqual(
+				expect.objectContaining( {
+					name: 'core/test-block',
+					innerBlocks: [],
+					attributes: {
+						includesDefault: true,
+						includesFalseyDefault: 0,
+						align: 'left',
+						objectProp: {
+							content: 'pong',
+							level: 9,
+							offset: 0,
+						},
+					},
+				} )
+			);
+		} );
+
 		it( 'should cast children and node source attributes with default undefined', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
