@@ -12,6 +12,7 @@ import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { View } from '@wordpress/primitives';
 
 const MIN_SPACER_HEIGHT = 1;
 const MAX_SPACER_HEIGHT = 500;
@@ -48,7 +49,7 @@ const SpacerEdit = ( {
 
 	return (
 		<>
-			<div { ...useBlockProps() }>
+			<View { ...useBlockProps() }>
 				<ResizableBox
 					className={ classnames(
 						'block-library-spacer__resize-container',
@@ -80,7 +81,7 @@ const SpacerEdit = ( {
 						isVisible: isResizing,
 					} }
 				/>
-			</div>
+			</View>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer settings' ) }>
 					<RangeControl
