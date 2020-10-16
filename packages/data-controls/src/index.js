@@ -2,11 +2,7 @@
  * WordPress dependencies
  */
 import triggerFetch from '@wordpress/api-fetch';
-import {
-	controls as dataControls,
-	createRegistryControl,
-} from '@wordpress/data';
-import { TRANSACTION_ERROR } from '@wordpress/batch-processing';
+import { controls as dataControls } from '@wordpress/data';
 // TODO: mark the deprecated controls after all Gutenberg usages are removed
 // import deprecated from '@wordpress/deprecated';
 
@@ -106,66 +102,8 @@ export function dispatch( ...args ) {
  * @return {Object} An object for registering the default controls with the
  *                  store.
  */
-
 export const controls = {
-	API_FETCH: createRegistryControl( ( registry ) => ( { request } ) => {
-		if (
-			! [ 'POST', 'PUT', 'PATCH', 'DELETE' ].includes( request.method ) ||
-			! request.batchAs ||
-			! endpointSupportsBatch( request.path )
-		) {
-			return triggerFetch( request );
-		}
-
-		registerBatchProcessor( registry );
-		return registry
-			.dispatch( 'core/batch-processing' )
-			.enqueueItemAndAutocommit( 'API_FETCH', 'abc', request );
-	} ),
+	API_FETCH( { request } ) {
+		return triggerFetch( request );
+	},
 };
-
-function endpointSupportsBatch( path ) {
-	// This should be more sophisticated in reality:
-	return path.indexOf( '/v2/template-parts' ) !== -1;
-}
-
-const registered = false;
-function registerBatchProcessor( registry ) {
-	if ( registered ) {
-		return;
-	}
-
-	return registry
-		.dispatch( 'core/batch-processing' )
-		.registerProcessor( 'API_FETCH', batchProcessor );
-}
-
-async function batchProcessor( requests, transaction ) {
-	if ( transaction.state === TRANSACTION_ERROR ) {
-		throw {
-			code: 'transaction_failed',
-			data: { status: 500 },
-			message: 'Transaction failed.',
-		};
-	}
-
-	const response = await triggerFetch( {
-		path: '/__experimental/batch',
-		method: 'POST',
-		data: {
-			validation: 'require-all-validate',
-			requests: requests.map( ( options ) => ( {
-				path: options.path,
-				body: options.data,
-				method: options.method,
-				headers: options.headers,
-			} ) ),
-		},
-	} );
-
-	if ( response.failed ) {
-		throw response.responses.map( ( { body } ) => body );
-	}
-
-	return response.responses.map( ( { body } ) => body );
-}
