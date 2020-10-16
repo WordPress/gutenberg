@@ -57,11 +57,6 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 					) }
 					label={ __( 'Show most used blocks' ) }
 				/>
-				<EnableFeature
-					featureName="showIconLabels"
-					help={ __( 'Shows text instead of icons in toolbar.' ) }
-					label={ __( 'Display button labels' ) }
-				/>
 			</Section>
 			<Section title={ __( 'Keyboard' ) }>
 				<EnableFeature
@@ -73,11 +68,6 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 				/>
 			</Section>
 			<Section title={ __( 'Appearance' ) }>
-				<EnableFeature
-					featureName="themeStyles"
-					help={ __( 'Make the editor look like your theme.' ) }
-					label={ __( 'Use theme styles' ) }
-				/>
 				<EnableFeature
 					featureName="reducedUI"
 					help={ __(
@@ -91,6 +81,16 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 						'Highlights the current block and fades other content.'
 					) }
 					label={ __( 'Spotlight mode' ) }
+				/>
+				<EnableFeature
+					featureName="showIconLabels"
+					help={ __( 'Shows text instead of icons in toolbar.' ) }
+					label={ __( 'Display button labels' ) }
+				/>
+				<EnableFeature
+					featureName="themeStyles"
+					help={ __( 'Make the editor look like your theme.' ) }
+					label={ __( 'Use theme styles' ) }
 				/>
 			</Section>
 			<Section
