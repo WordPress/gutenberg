@@ -100,11 +100,10 @@ const Cover = ( {
 	} = attributes;
 
 	const convertedMinHeight = useUnitConverterToMobile(
-		minHeight,
+		minHeight || COVER_DEFAULT_HEIGHT,
 		minHeightUnit
 	);
 
-	const CONTAINER_HEIGHT = convertedMinHeight || COVER_DEFAULT_HEIGHT;
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
@@ -299,7 +298,7 @@ const Cover = ( {
 					label={ __( 'Minimum height in pixels' ) }
 					minimumValue={ COVER_MIN_HEIGHT }
 					maximumValue={ COVER_MAX_HEIGHT }
-					value={ CONTAINER_HEIGHT }
+					value={ convertedMinHeight }
 					onChange={ onHeightChange }
 					style={ styles.rangeCellContainer }
 				/>
@@ -520,7 +519,7 @@ const Cover = ( {
 
 			<View
 				pointerEvents="box-none"
-				style={ [ styles.content, { minHeight: CONTAINER_HEIGHT } ] }
+				style={ [ styles.content, { minHeight: convertedMinHeight } ] }
 			>
 				<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
 			</View>

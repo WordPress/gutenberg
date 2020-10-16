@@ -17,7 +17,7 @@ import {
 /**
  * Internal dependencies
  */
-import { GlobalStylesContext } from '../global-styles-context';
+import GlobalStylesContext from '../global-styles-context';
 
 const useConvertUnitToMobile = ( value, unit ) => {
 	const [ windowSizes, setWindowSizes ] = useState(
@@ -65,7 +65,7 @@ const useConvertUnitToMobile = ( value, unit ) => {
 			default:
 				return Number( valueToConvert );
 		}
-	}, [ windowSizes, styles, value, unit ] );
+	}, [ windowSizes, value, unit ] );
 };
 
 export default useConvertUnitToMobile;
