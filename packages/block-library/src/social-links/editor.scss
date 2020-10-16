@@ -24,15 +24,19 @@
 }
 
 // Placeholder/setup state.
-.wp-block-social-links__social-placeholder .wp-block-social-link {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	margin: 0 $grid-unit-10 0 0;
-	width: 36px;
-	height: 36px;
-	border-radius: $radius-round;
-	opacity: 0.8;
+.wp-block-social-links__social-placeholder {
+	display: flex;
+
+	.wp-block-social-link {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		margin: 0 $grid-unit-10 $grid-unit-10 0;
+		width: 36px;
+		height: 36px;
+		border-radius: $radius-round;
+		opacity: 0.8;
+	}
 }
 
 .is-style-logos-only .wp-block-social-links__social-placeholder .wp-block-social-link::before {
@@ -42,7 +46,7 @@
 	height: 18px;
 	border-radius: $radius-round;
 	opacity: 0.8;
-	background: #ccc;
+	background: currentColor;
 }
 
 .is-style-pill-shape .wp-block-social-links__social-placeholder .wp-block-social-link {
