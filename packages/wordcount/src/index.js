@@ -109,7 +109,7 @@ function countCharacters( text, regex, settings ) {
  * Count some words.
  *
  * @param {string}                  text         The text being processed
- * @param {WPWordCountStrategy}     type	     The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
+ * @param {WPWordCountStrategy}     type         The type of count. Accepts 'words', 'characters_excluding_spaces', or 'characters_including_spaces'.
  * @param {WPWordCountUserSettings} userSettings Custom settings object.
  *
  * @example
