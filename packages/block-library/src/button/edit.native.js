@@ -19,7 +19,7 @@ import {
 	RangeControl,
 	ToolbarGroup,
 	ToolbarButton,
-	LinkSettings,
+	LinkSettingsNavigation,
 } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -242,7 +242,7 @@ class ButtonEdit extends Component {
 		};
 
 		return (
-			<LinkSettings
+			<LinkSettingsNavigation
 				isVisible={ isLinkSheetVisible }
 				attributes={ attributes }
 				onClose={ this.dismissSheet }

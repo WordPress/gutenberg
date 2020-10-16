@@ -11,7 +11,7 @@ import { useEffect, useState, useRef } from '@wordpress/element';
 import {
 	ToolbarGroup,
 	ToolbarButton,
-	LinkSettings,
+	LinkSettingsNavigation,
 } from '@wordpress/components';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
@@ -162,7 +162,7 @@ const SocialLinkEdit = ( {
 					</ToolbarGroup>
 				</BlockControls>
 			) }
-			<LinkSettings
+			<LinkSettingsNavigation
 				isVisible={ isLinkSheetVisible }
 				attributes={ attributes }
 				onEmptyURL={ onEmptyURL }

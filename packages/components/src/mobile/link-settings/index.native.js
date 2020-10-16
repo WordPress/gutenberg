@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Platform, Clipboard } from 'react-native';
+import { Clipboard } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -9,7 +9,7 @@ import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useEffect, useState, useRef } from '@wordpress/element';
-import { link, external } from '@wordpress/icons';
+import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -80,6 +80,8 @@ function LinkSettings( {
 	editorSidebarOpened,
 	// Specifies whether icon should be displayed next to the label
 	showIcon,
+	onLinkCellPressed,
+	urlValue,
 } ) {
 	const { url, label, linkTarget, rel } = attributes;
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
@@ -115,12 +117,14 @@ function LinkSettings( {
 		}
 	}, [ editorSidebarOpened, isVisible ] );
 
-	function onChangeURL( value ) {
-		if ( ! value && onEmptyURL ) {
+	useEffect( () => {
+		if ( ! urlValue && onEmptyURL ) {
 			onEmptyURL();
 		}
-		setUrlInputValue( value );
-	}
+		setAttributes( {
+			url: prependHTTP( urlValue ),
+		} );
+	}, [ urlValue ] );
 
 	function onChangeLabel( value ) {
 		setLabelInputValue( value );
@@ -177,20 +181,10 @@ function LinkSettings( {
 		return (
 			<>
 				{ options.url && (
-					<TextControl
-						icon={ showIcon && link }
-						label={ options.url.label }
-						value={ urlInputValue }
-						valuePlaceholder={ options.url.placeholder }
-						onChange={ onChangeURL }
-						onSubmit={ onCloseSettingsSheet }
-						autoCapitalize="none"
-						autoCorrect={ false }
-						// eslint-disable-next-line jsx-a11y/no-autofocus
-						autoFocus={
-							Platform.OS === 'ios' && options.url.autoFocus
-						}
-						keyboardType="url"
+					<BottomSheet.LinkCell
+						showIcon={ showIcon }
+						value={ url }
+						onPress={ onLinkCellPressed }
 					/>
 				) }
 				{ options.linkLabel && (
@@ -231,11 +225,7 @@ function LinkSettings( {
 	}
 
 	return (
-		<BottomSheet
-			isVisible={ isVisible }
-			onClose={ onCloseSettingsSheet }
-			hideHeader
-		>
+		<>
 			<PanelBody style={ styles.linkSettingsPanel }>
 				{ getSettings() }
 			</PanelBody>
@@ -248,7 +238,7 @@ function LinkSettings( {
 				</PanelBody>
 			) }
 			{ actions && <PanelActions actions={ actions } /> }
-		</BottomSheet>
+		</>
 	);
 }
 
