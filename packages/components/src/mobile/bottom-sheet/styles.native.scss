@@ -64,12 +64,12 @@
 	padding: 5px;
 }
 
-.resetButton {
+.customActionButton {
 	font-size: 17px;
 	color: $blue-wordpress;
 }
 
-.resetButtonDark {
+.customActionButtonDark {
 	color: $blue-30;
 }
 
@@ -99,7 +99,9 @@
 .cellRowContainer {
 	flex-direction: row;
 	align-items: center;
+	width: 100%;
 	flex-shrink: 0;
+	justify-content: space-between;
 }
 
 .cellLabel {

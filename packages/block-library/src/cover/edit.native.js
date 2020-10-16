@@ -21,6 +21,7 @@ import {
 	IMAGE_DEFAULT_FOCAL_POINT,
 	PanelBody,
 	RangeControl,
+	UnitControl,
 	BottomSheet,
 	ToolbarButton,
 	ToolbarGroup,
@@ -58,6 +59,7 @@ import {
 	COVER_MIN_HEIGHT,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	CSS_UNITS,
 } from './shared';
 import OverlayColorSettings from './overlay-color-settings';
 
@@ -98,6 +100,8 @@ const Cover = ( {
 		customOverlayColor,
 		minHeightUnit,
 	} = attributes;
+
+	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 
 	const convertedMinHeight = useUnitConverterToMobile(
 		minHeight || COVER_DEFAULT_HEIGHT,
@@ -166,7 +170,7 @@ const Cover = ( {
 	};
 
 	const onHeightChange = ( value ) => {
-		if ( convertedMinHeight || value !== COVER_DEFAULT_HEIGHT ) {
+		if ( minHeight || value !== COVER_DEFAULT_HEIGHT ) {
 			setAttributes( { minHeight: value } );
 		}
 	};
@@ -294,12 +298,19 @@ const Cover = ( {
 				</PanelBody>
 			) : null }
 			<PanelBody title={ __( 'Dimensions' ) }>
-				<RangeControl
+				<UnitControl
 					label={ __( 'Minimum height in pixels' ) }
 					minimumValue={ COVER_MIN_HEIGHT }
 					maximumValue={ COVER_MAX_HEIGHT }
-					value={ convertedMinHeight }
+					unit={ minHeightUnit || 'px' }
+					value={ CONTAINER_HEIGHT }
 					onChange={ onHeightChange }
+					onUnitChange={ ( nextUnit ) => {
+						setAttributes( {
+							minHeightUnit: nextUnit,
+						} );
+					} }
+					units={ CSS_UNITS }
 					style={ styles.rangeCellContainer }
 				/>
 			</PanelBody>

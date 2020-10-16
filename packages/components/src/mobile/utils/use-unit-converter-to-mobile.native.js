@@ -55,7 +55,7 @@ const useConvertUnitToMobile = ( value, unit ) => {
 			case '%':
 				return unit ? valueToConvert : `${ valueToConvert }%`;
 			case 'px':
-				return valueToConvert;
+				return Number( valueToConvert );
 			case 'vw':
 				const vw = width / 100;
 				return Math.round( valueToConvert * vw );

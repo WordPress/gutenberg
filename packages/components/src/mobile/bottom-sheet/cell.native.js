@@ -270,9 +270,9 @@ class BottomSheetCell extends Component {
 			styles.icon,
 			styles.iconDark
 		);
-		const resetButtonStyle = getStylesFromColorScheme(
-			styles.resetButton,
-			styles.resetButtonDark
+		const customActionButtonStyle = getStylesFromColorScheme(
+			styles.customActionButton,
+			styles.customActionButtonDark
 		);
 		const containerPointerEvents =
 			this.state.isScreenReaderEnabled && accessible ? 'none' : 'auto';
@@ -333,17 +333,19 @@ class BottomSheetCell extends Component {
 									{ label }
 								</Text>
 							) }
+							{ customActionButton && (
+								<View>
+									<TouchableOpacity
+										onPress={ handler }
+										accessibilityRole={ 'button' }
+									>
+										<Text style={ customActionButtonStyle }>
+											{ title }
+										</Text>
+									</TouchableOpacity>
+								</View>
+							) }
 						</View>
-						{ customActionButton && (
-							<TouchableOpacity
-								onPress={ handler }
-								accessibilityRole={ 'button' }
-							>
-								<Text style={ resetButtonStyle }>
-									{ title }
-								</Text>
-							</TouchableOpacity>
-						) }
 					</View>
 					{ isSelected && (
 						<Icon
