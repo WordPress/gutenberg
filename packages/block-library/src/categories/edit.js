@@ -15,13 +15,12 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect } from '@wordpress/data';
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 
 export default function CategoriesEdit( {
 	attributes: { displayAsDropdown, showHierarchy, showPostCounts },
-	className,
 	setAttributes,
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
@@ -125,45 +124,36 @@ export default function CategoriesEdit( {
 		];
 	};
 
-	const inspectorControls = (
-		<InspectorControls>
-			<PanelBody title={ __( 'Categories settings' ) }>
-				<ToggleControl
-					label={ __( 'Display as dropdown' ) }
-					checked={ displayAsDropdown }
-					onChange={ toggleAttribute( 'displayAsDropdown' ) }
-				/>
-				<ToggleControl
-					label={ __( 'Show hierarchy' ) }
-					checked={ showHierarchy }
-					onChange={ toggleAttribute( 'showHierarchy' ) }
-				/>
-				<ToggleControl
-					label={ __( 'Show post counts' ) }
-					checked={ showPostCounts }
-					onChange={ toggleAttribute( 'showPostCounts' ) }
-				/>
-			</PanelBody>
-		</InspectorControls>
-	);
-	if ( isRequesting ) {
-		return (
-			<>
-				{ inspectorControls }
+	return (
+		<div { ...useBlockProps() }>
+			<InspectorControls>
+				<PanelBody title={ __( 'Categories settings' ) }>
+					<ToggleControl
+						label={ __( 'Display as dropdown' ) }
+						checked={ displayAsDropdown }
+						onChange={ toggleAttribute( 'displayAsDropdown' ) }
+					/>
+					<ToggleControl
+						label={ __( 'Show hierarchy' ) }
+						checked={ showHierarchy }
+						onChange={ toggleAttribute( 'showHierarchy' ) }
+					/>
+					<ToggleControl
+						label={ __( 'Show post counts' ) }
+						checked={ showPostCounts }
+						onChange={ toggleAttribute( 'showPostCounts' ) }
+					/>
+				</PanelBody>
+			</InspectorControls>
+			{ isRequesting && (
 				<Placeholder icon={ pin } label={ __( 'Categories' ) }>
 					<Spinner />
 				</Placeholder>
-			</>
-		);
-	}
-	return (
-		<>
-			{ inspectorControls }
-			<div className={ className }>
-				{ displayAsDropdown
+			) }
+			{ ! isRequesting &&
+				( displayAsDropdown
 					? renderCategoryDropdown()
-					: renderCategoryList() }
-			</div>
-		</>
+					: renderCategoryList() ) }
+		</div>
 	);
 }

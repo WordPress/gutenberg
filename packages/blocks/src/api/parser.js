@@ -395,6 +395,59 @@ export function getMigratedBlock( block, parsedAttributes ) {
 }
 
 /**
+ * Convert legacy blocks to their canonical form. This function is used
+ * both in the parser level for previous content and to convert such blocks
+ * used in Custom Post Types templates.
+ *
+ * @param {string} name The block's name
+ * @param {Object} attributes The block's attributes
+ *
+ * @return {Object} The block's name and attributes, changed accordingly if a match was found
+ */
+export function convertLegacyBlocks( name, attributes ) {
+	const newAttributes = { ...attributes };
+	// Convert 'core/cover-image' block in existing content to 'core/cover'.
+	if ( 'core/cover-image' === name ) {
+		name = 'core/cover';
+	}
+
+	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
+	if ( 'core/text' === name || 'core/cover-text' === name ) {
+		name = 'core/paragraph';
+	}
+
+	// Convert derivative blocks such as 'core/social-link-wordpress' to the
+	// canonical form 'core/social-link'.
+	if ( name && name.indexOf( 'core/social-link-' ) === 0 ) {
+		// Capture `social-link-wordpress` into `{"service":"wordpress"}`
+		newAttributes.service = name.substring( 17 );
+		name = 'core/social-link';
+	}
+
+	// Convert derivative blocks such as 'core-embed/instagram' to the
+	// canonical form 'core/embed'.
+	if ( name && name.indexOf( 'core-embed/' ) === 0 ) {
+		// Capture `core-embed/instagram` into `{"providerNameSlug":"instagram"}`
+		const providerSlug = name.substring( 11 );
+		const deprecated = {
+			speaker: 'speaker-deck',
+			polldaddy: 'crowdsignal',
+		};
+		newAttributes.providerNameSlug =
+			providerSlug in deprecated
+				? deprecated[ providerSlug ]
+				: providerSlug;
+		// this is needed as the `responsive` attribute was passed
+		// in a different way before the refactoring to block variations
+		if ( ! [ 'amazon-kindle', 'wordpress' ].includes( providerSlug ) ) {
+			newAttributes.responsive = true;
+		}
+		name = 'core/embed';
+	}
+	return { name, attributes: newAttributes };
+}
+
+/**
  * Creates a block with fallback to the unknown type handler.
  *
  * @param {Object} blockNode Parsed block node.
@@ -418,44 +471,7 @@ export function createBlockWithFallback( blockNode ) {
 	// freeform content fallback.
 	let name = originalName || freeformContentFallbackBlock;
 
-	// Convert 'core/cover-image' block in existing content to 'core/cover'.
-	if ( 'core/cover-image' === name ) {
-		name = 'core/cover';
-	}
-
-	// Convert 'core/text' blocks in existing content to 'core/paragraph'.
-	if ( 'core/text' === name || 'core/cover-text' === name ) {
-		name = 'core/paragraph';
-	}
-
-	// Convert derivative blocks such as 'core/social-link-wordpress' to the
-	// canonical form 'core/social-link'.
-	if ( name && name.indexOf( 'core/social-link-' ) === 0 ) {
-		// Capture `social-link-wordpress` into `{"service":"wordpress"}`
-		attributes.service = name.substring( 17 );
-		name = 'core/social-link';
-	}
-
-	// Convert derivative blocks such as 'core-embed/instagram' to the
-	// canonical form 'core/embed'.
-	if ( name && name.indexOf( 'core-embed/' ) === 0 ) {
-		// Capture `core-embed/instagram` into `{"providerNameSlug":"instagram"}`
-		const providerSlug = name.substring( 11 );
-		const deprecated = {
-			speaker: 'speaker-deck',
-			polldaddy: 'crowdsignal',
-		};
-		attributes.providerNameSlug =
-			providerSlug in deprecated
-				? deprecated[ providerSlug ]
-				: providerSlug;
-		// this is needed as the `responsive` attribute was passed
-		// in a different way before the refactoring to block variations
-		if ( ! [ 'amazon-kindle', 'wordpress' ].includes( providerSlug ) ) {
-			attributes.responsive = true;
-		}
-		name = 'core/embed';
-	}
+	( { name, attributes } = convertLegacyBlocks( name, attributes ) );
 
 	// Fallback content may be upgraded from classic editor expecting implicit
 	// automatic paragraphs, so preserve them. Assumes wpautop is idempotent,

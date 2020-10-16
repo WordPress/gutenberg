@@ -20,12 +20,13 @@ function GroupEdit( { attributes, clientId } ) {
 		[ clientId ]
 	);
 	const blockProps = useBlockProps();
-	const { tagName: TagName = 'div' } = attributes;
+	const { tagName: TagName = 'div', templateLock } = attributes;
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-group__inner-container',
 		},
 		{
+			templateLock,
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import {
 	Disabled,
 	PanelBody,
@@ -33,7 +33,7 @@ export default function LatestComments( { attributes, setAttributes } ) {
 	} = attributes;
 
 	return (
-		<>
+		<div { ...useBlockProps() }>
 			<InspectorControls>
 				<PanelBody title={ __( 'Latest comments settings' ) }>
 					<ToggleControl
@@ -77,6 +77,6 @@ export default function LatestComments( { attributes, setAttributes } ) {
 					attributes={ attributes }
 				/>
 			</Disabled>
-		</>
+		</div>
 	);
 }

@@ -3,8 +3,7 @@
  */
 import { cloneElement } from '@wordpress/element';
 
-// Disable reason: JSDoc linter doesn't seem to parse the union (`&`) correctly.
-/** @typedef {{icon: JSX.Element, size?: number} & import('react').ComponentPropsWithoutRef<'SVG'>} IconProps */
+/** @typedef {{icon: JSX.Element, size?: number} & import('@wordpress/primitives').SVGProps} IconProps */
 
 /**
  * Return an SVG icon.

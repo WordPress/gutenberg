@@ -8,6 +8,9 @@
 		"referenceWidgetName": {
 			"type": "string"
 		},
+		"name": {
+			"type": "string"
+		},
 		"idBase": {
 			"type": "string"
 		},
