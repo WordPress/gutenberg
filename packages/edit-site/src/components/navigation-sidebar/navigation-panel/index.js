@@ -24,10 +24,18 @@ export const {
 
 const NavigationPanel = ( { isOpen } ) => {
 	const [ contentActiveMenu, setContentActiveMenu ] = useState( MENU_ROOT );
-	const templatesActiveMenu = useSelect(
-		( select ) => select( 'core/edit-site' ).getNavigationPanelActiveMenu(),
-		[]
-	);
+	const { templatesActiveMenu, siteTitle } = useSelect( ( select ) => {
+		const { getNavigationPanelActiveMenu } = select( 'core/edit-site' );
+		const { getEntityRecord } = select( 'core' );
+
+		const siteData =
+			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+
+		return {
+			templatesActiveMenu: getNavigationPanelActiveMenu(),
+			siteTitle: siteData.name,
+		};
+	}, [] );
 
 	return (
 		<div
@@ -36,6 +44,12 @@ const NavigationPanel = ( { isOpen } ) => {
 			} ) }
 		>
 			<div className="edit-site-navigation-panel__inner">
+				<div className="edit-site-navigation-panel__site-title-container">
+					<div className="edit-site-navigation-panel__site-title">
+						{ siteTitle }
+					</div>
+				</div>
+
 				{ ( contentActiveMenu === MENU_ROOT ||
 					templatesActiveMenu !== MENU_ROOT ) && (
 					<TemplatesNavigation />
