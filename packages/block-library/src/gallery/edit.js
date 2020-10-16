@@ -88,6 +88,7 @@ class GalleryEdit extends Component {
 		this.state = {
 			selectedImage: null,
 			attachmentCaptions: null,
+			alreadyAutoOpenedMediaUpload: false,
 		};
 	}
 
@@ -108,6 +109,9 @@ class GalleryEdit extends Component {
 		}
 
 		this.props.setAttributes( attributes );
+		this.setState( {
+			alreadyAutoOpenedMediaUpload: true,
+		} );
 	}
 
 	onSelectImage( index ) {
@@ -362,6 +366,8 @@ class GalleryEdit extends Component {
 			sizeSlug,
 		} = attributes;
 
+		const { alreadyAutoOpenedMediaUpload } = this.state;
+
 		const hasImages = !! images.length;
 
 		const mediaPlaceholder = (
@@ -383,7 +389,9 @@ class GalleryEdit extends Component {
 				onError={ this.onUploadError }
 				notices={ hasImages ? undefined : noticeUI }
 				onFocus={ this.props.onFocus }
-				autoOpenMediaUpload={ ! hasImages && isSelected }
+				autoOpenMediaUpload={
+					! hasImages && isSelected && ! alreadyAutoOpenedMediaUpload
+				}
 			/>
 		);
 
