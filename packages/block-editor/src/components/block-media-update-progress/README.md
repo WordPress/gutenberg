@@ -40,7 +40,7 @@ function BlockUpdatingProgress( { url, id } ) {
 
 ### mediaFiles
 
-A collection of media ID that identifies the current colleciton of files represented in this media container block.
+A collection of media ID that identifies the current collection of files represented in this media container block.
 
 - Type: `Array`
 - Required: Yes
@@ -102,4 +102,3 @@ Callback called when the media upload is reset
 - Type: `Function`
 - Required: No
 - Platform: Mobile
-

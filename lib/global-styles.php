@@ -141,7 +141,7 @@ function gutenberg_experimental_global_styles_get_user() {
 function gutenberg_experimental_global_styles_get_user_cpt( $should_create_cpt = false, $post_status_filter = array( 'publish' ) ) {
 	$user_cpt         = array();
 	$post_type_filter = 'wp_global_styles';
-	$post_name_filter = 'wp-global-styles-' . strtolower( wp_get_theme()->get( 'TextDomain' ) );
+	$post_name_filter = 'wp-global-styles-' . urlencode( wp_get_theme()->get_stylesheet() );
 	$recent_posts     = wp_get_recent_posts(
 		array(
 			'numberposts' => 1,
@@ -500,9 +500,6 @@ function gutenberg_experimental_global_styles_get_block_data() {
 		}
 
 		$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
-		if ( empty( $supports ) ) {
-			continue;
-		}
 
 		/*
 		 * Assign the selector for the block.
@@ -578,6 +575,77 @@ function gutenberg_experimental_global_styles_flatten_styles_tree( $styles ) {
 }
 
 /**
+ * Given a selector for a block, and the settings of the block, returns a string
+ * with the stylesheet of the preset classes required for that block.
+ *
+ * @param string $selector  String with the CSS selector for the block.
+ * @param array  $settings  Array containing the settings of the block.
+ *
+ * @return string Stylesheet with the preset classes.
+ */
+function gutenberg_experimental_global_styles_get_preset_classes( $selector, $settings ) {
+	if ( empty( $settings ) || empty( $selector ) ) {
+		return '';
+	}
+
+	$stylesheet        = '';
+	$class_prefix      = 'has';
+	$classes_structure = array(
+		'color'               => array(
+			'path'     => array( 'color', 'palette' ),
+			'key'      => 'color',
+			'property' => 'color',
+		),
+		'background-color'    => array(
+			'path'     => array( 'color', 'palette' ),
+			'key'      => 'color',
+			'property' => 'background-color',
+		),
+		'gradient-background' => array(
+			'path'     => array( 'color', 'gradients' ),
+			'key'      => 'gradient',
+			'property' => 'background',
+		),
+		'font-size'           => array(
+			'path'     => array( 'typography', 'fontSizes' ),
+			'key'      => 'size',
+			'property' => 'font-size',
+		),
+	);
+
+	foreach ( $classes_structure as $class_suffix => $preset_structure ) {
+		$path    = $preset_structure['path'];
+		$presets = gutenberg_experimental_get( $settings, $path );
+
+		if ( empty( $presets ) ) {
+			continue;
+		}
+
+		$key      = $preset_structure['key'];
+		$property = $preset_structure['property'];
+
+		foreach ( $presets as $preset ) {
+			$slug  = $preset['slug'];
+			$value = $preset[ $key ];
+
+			$class_to_use    = ".$class_prefix-$slug-$class_suffix";
+			$selector_to_use = '';
+			if ( ':root' === $selector ) {
+				$selector_to_use = $class_to_use;
+			} else {
+				$selector_to_use = "$selector$class_to_use";
+			}
+			if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+				$stylesheet .= "$selector_to_use {\n\t$property: $value;\n}\n";
+			} else {
+				$stylesheet .= $selector_to_use . '{' . "$property:$value;}\n";
+			}
+		}
+	}
+	return $stylesheet;
+}
+
+/**
  * Takes a tree adhering to the theme.json schema and generates
  * the corresponding stylesheet.
  *
@@ -633,6 +701,8 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 				$theme_variables
 			)
 		);
+
+		$stylesheet .= gutenberg_experimental_global_styles_get_preset_classes( $block_data[ $block_name ]['selector'], $tree[ $block_name ]['settings'] );
 	}
 
 	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {

@@ -79,8 +79,8 @@ async function waitForPreviewNavigation( previewPage ) {
  */
 async function toggleCustomFieldsOption( shouldBeChecked ) {
 	const checkboxXPath =
-		'//*[contains(@class, "edit-post-options-modal")]//label[contains(text(), "Custom fields")]';
-	await clickOnMoreMenuItem( 'Options' );
+		'//*[contains(@class, "edit-post-preferences-modal")]//label[contains(text(), "Custom fields")]';
+	await clickOnMoreMenuItem( 'Preferences' );
 	await page.waitForXPath( checkboxXPath );
 	const [ checkboxHandle ] = await page.$x( checkboxXPath );
 
@@ -102,7 +102,7 @@ async function toggleCustomFieldsOption( shouldBeChecked ) {
 		return;
 	}
 
-	await clickOnCloseModalButton( '.edit-post-options-modal' );
+	await clickOnCloseModalButton( '.edit-post-preferences-modal' );
 }
 
 describe( 'Preview', () => {

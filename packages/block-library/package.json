@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "2.25.0",
+	"version": "2.25.3",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -49,6 +49,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/primitives": "file:../primitives",
+		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",

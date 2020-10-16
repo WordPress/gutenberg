@@ -91,7 +91,7 @@ describe( 'Gutenberg Editor paste tests', () => {
 
 	it( 'copies styled text from one paragraph block and pastes in another', async () => {
 		// create paragraph block with styled text by editing html
-		await editorPage.setHtmlContentAndroid( testData.pasteHtmlText );
+		await editorPage.setHtmlContent( testData.pasteHtmlText );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
 			paragraphBlockName
 		);

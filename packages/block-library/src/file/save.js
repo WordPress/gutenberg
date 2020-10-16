@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -15,7 +15,7 @@ export default function save( { attributes } ) {
 
 	return (
 		href && (
-			<div>
+			<div { ...useBlockProps.save() }>
 				{ ! RichText.isEmpty( fileName ) && (
 					<a
 						href={ textLinkHref }

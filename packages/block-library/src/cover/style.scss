@@ -29,6 +29,11 @@
 		}
 	}
 
+	&.is-repeated {
+		background-repeat: repeat;
+		background-size: auto;
+	}
+
 	&.has-background-dim {
 		background-color: $black;
 
@@ -46,10 +51,6 @@
 		bottom: 0;
 		right: 0;
 		z-index: z-index(".wp-block-cover.has-background-dim::before");
-	}
-
-	&.has-background-dim:not(.has-background-gradient)::before,
-	& .wp-block-cover__gradient-background {
 		opacity: 0.5;
 	}
 
@@ -94,6 +95,7 @@
 	}
 
 	.wp-block-cover__inner-container {
+		width: 100%;
 		z-index: z-index(".wp-block-cover__inner-container");
 		color: $white;
 	}

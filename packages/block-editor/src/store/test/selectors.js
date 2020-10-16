@@ -68,6 +68,7 @@ const {
 	__experimentalGetBlockListSettingsForBlocks,
 	__experimentalGetLastBlockAttributeChanges,
 	getLowestCommonAncestorWithSelectedBlock,
+	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -458,49 +459,48 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getBlockParentsByBlockName', () => {
-		it( 'should return parent blocks', () => {
-			const state = {
-				blocks: {
-					parents: {
-						'client-id-01': '',
-						'client-id-02': 'client-id-01',
-						'client-id-03': 'client-id-02',
-						'client-id-04': 'client-id-03',
-						'client-id-05': 'client-id-04',
-					},
-					byClientId: {
-						'client-id-01': {
-							clientId: 'client-id-01',
-							name: 'core/navigation',
-						},
-						'client-id-02': {
-							clientId: 'client-id-02',
-							name: 'core/columns',
-						},
-						'client-id-03': {
-							clientId: 'client-id-03',
-							name: 'core/navigation',
-						},
-						'client-id-04': {
-							clientId: 'client-id-04',
-							name: 'core/navigation-link',
-						},
-						'client-id-05': {
-							clientId: 'client-id-05',
-							name: 'core/navigation-link',
-						},
-					},
-					cache: {
-						'client-id-01': {},
-						'client-id-02': {},
-						'client-id-03': {},
-						'client-id-04': {},
-						'client-id-05': {},
-					},
-					controlledInnerBlocks: {},
+		const state = {
+			blocks: {
+				parents: {
+					'client-id-01': '',
+					'client-id-02': 'client-id-01',
+					'client-id-03': 'client-id-02',
+					'client-id-04': 'client-id-03',
+					'client-id-05': 'client-id-04',
 				},
-			};
-
+				byClientId: {
+					'client-id-01': {
+						clientId: 'client-id-01',
+						name: 'core/navigation',
+					},
+					'client-id-02': {
+						clientId: 'client-id-02',
+						name: 'core/columns',
+					},
+					'client-id-03': {
+						clientId: 'client-id-03',
+						name: 'core/navigation',
+					},
+					'client-id-04': {
+						clientId: 'client-id-04',
+						name: 'core/navigation-link',
+					},
+					'client-id-05': {
+						clientId: 'client-id-05',
+						name: 'core/navigation-link',
+					},
+				},
+				cache: {
+					'client-id-01': {},
+					'client-id-02': {},
+					'client-id-03': {},
+					'client-id-04': {},
+					'client-id-05': {},
+				},
+				controlledInnerBlocks: {},
+			},
+		};
+		it( 'should return parent blocks', () => {
 			expect(
 				getBlockParentsByBlockName(
 					state,
@@ -524,6 +524,20 @@ describe( 'selectors', () => {
 					'core/unknown-block'
 				)
 			).toEqual( [] );
+		} );
+		it( 'Should optionally accept an array of parent types and return parents of multiple types', () => {
+			expect(
+				getBlockParentsByBlockName( state, 'client-id-05', [
+					'core/navigation',
+				] )
+			).toEqual( [ 'client-id-01', 'client-id-03' ] );
+
+			expect(
+				getBlockParentsByBlockName( state, 'client-id-05', [
+					'core/columns',
+					'core/navigation',
+				] )
+			).toEqual( [ 'client-id-01', 'client-id-02', 'client-id-03' ] );
 		} );
 	} );
 
@@ -2462,8 +2476,8 @@ describe( 'selectors', () => {
 							id: 1,
 							isTemporary: false,
 							clientId: 'block1',
-							title: 'Reusable Block 1',
-							content: '<!-- /wp:test-block-a -->',
+							title: { raw: 'Reusable Block 1' },
+							content: { raw: '<!-- /wp:test-block-a -->' },
 						},
 					],
 				},
@@ -2542,15 +2556,15 @@ describe( 'selectors', () => {
 							id: 1,
 							isTemporary: false,
 							clientId: 'block1',
-							title: 'Reusable Block 1',
-							content: '<!-- /wp:test-block-a -->',
+							title: { raw: 'Reusable Block 1' },
+							content: { raw: '<!-- /wp:test-block-a -->' },
 						},
 						{
 							id: 2,
 							isTemporary: false,
 							clientId: 'block2',
-							title: 'Reusable Block 2',
-							content: '<!-- /wp:test-block-b -->',
+							title: { raw: 'Reusable Block 2' },
+							content: { raw: '<!-- /wp:test-block-b -->' },
 						},
 					],
 				},
@@ -2944,6 +2958,82 @@ describe( 'selectors', () => {
 			expect(
 				getLowestCommonAncestorWithSelectedBlock( state, 'c' )
 			).toBe( 'a' );
+		} );
+	} );
+
+	describe( 'getActiveBlockIdByBlockName', () => {
+		const state = {
+			selectionStart: {
+				clientId: 'client-id-04',
+			},
+			selectionEnd: {
+				clientId: 'client-id-04',
+			},
+			blocks: {
+				parents: {
+					'client-id-01': '',
+					'client-id-02': 'client-id-01',
+					'client-id-03': 'client-id-02',
+					'client-id-04': 'client-id-03',
+					'client-id-05': 'client-id-03',
+				},
+				byClientId: {
+					'client-id-01': {
+						clientId: 'client-id-01',
+						name: 'core/columns',
+					},
+					'client-id-02': {
+						clientId: 'client-id-02',
+						name: 'core/navigation',
+					},
+					'client-id-03': {
+						clientId: 'client-id-03',
+						name: 'core/navigation-link',
+					},
+					'client-id-04': {
+						clientId: 'client-id-04',
+						name: 'core/navigation-link',
+					},
+					'client-id-05': {
+						clientId: 'client-id-05',
+						name: 'core/navigation-link',
+					},
+				},
+				cache: {
+					'client-id-01': {},
+					'client-id-02': {},
+					'client-id-03': {},
+					'client-id-04': {},
+					'client-id-05': {},
+				},
+				order: {
+					'client-id-03': [ 'client-id-04', 'client-id-05' ],
+				},
+				controlledInnerBlocks: {},
+			},
+		};
+		it( 'Should return first active matching block (including self) when single block selected', () => {
+			expect(
+				getActiveBlockIdByBlockNames( state, [
+					'core/navigation-link',
+				] )
+			).toEqual( 'client-id-04' );
+
+			expect(
+				getActiveBlockIdByBlockNames( state, [
+					'core/columns',
+					'core/navigation',
+				] )
+			).toEqual( 'client-id-02' );
+		} );
+		it( 'Should return first active matching block with (excluding self) when multi selected', () => {
+			state.selectionEnd.clientId = 'client-id-05';
+
+			expect(
+				getActiveBlockIdByBlockNames( state, [
+					'core/navigation-link',
+				] )
+			).toEqual( 'client-id-03' );
 		} );
 	} );
 } );
