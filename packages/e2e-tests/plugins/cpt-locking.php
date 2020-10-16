@@ -69,7 +69,7 @@ function gutenberg_test_cpt_locking() {
 						array(
 							'core/paragraph',
 							array(
-								'placeholder' => 'Add a description343',
+								'placeholder' => 'Add a description',
 							),
 						),
 					),
