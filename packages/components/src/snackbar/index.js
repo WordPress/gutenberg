@@ -29,7 +29,7 @@ const NOTICE_TIMEOUT = 10000;
  * Custom hook which announces the message with the given politeness, if a
  * valid message is provided.
  *
- * @param {string | WPElement}     [message]  Message to announce.
+ * @param {string | WPElement}     message  Message to announce.
  * @param {'polite' | 'assertive'} politeness Politeness to announce.
  */
 function useSpokenMessage( message, politeness ) {
@@ -43,15 +43,15 @@ function useSpokenMessage( message, politeness ) {
 	}, [ spokenMessage, politeness ] );
 }
 
-/** @typedef {{label: string, onClick: () => void, url: string}} Action */
+/** @typedef {{label: string, onClick: ((event: import('react').MouseEvent<HTMLButtonElement>) => void), url: string}} Action */
 
 /**
  * @typedef Props
  * @property {string} [className] Optional classname passed to the component.
- * @property {import('react').ReactNode} children The message to render.
+ * @property {string | WPElement} children The message to render.
  * @property {string | WPElement} [spokenMessage] Message to speak if different from children.
  * @property {'polite' | 'assertive'} [politeness='polite'] Politeness with which to speak the message.
- * @property {[Action]|[]} [actions=[]] Optional actions for the snackbar.
+ * @property {Action[]} [actions=[]] Optional actions for the snackbar.
  * @property {() => void} [onRemove] Function to run when the snackbar is clicked or keypressed.
  */
 
@@ -94,7 +94,7 @@ function Snackbar(
 			ref={ ref }
 			className={ classes }
 			onClick={ onRemove }
-			tabIndex="0"
+			tabIndex={ 0 }
 			role="button"
 			onKeyPress={ onRemove }
 			aria-label={ __( 'Dismiss this notice' ) }
@@ -107,7 +107,10 @@ function Snackbar(
 							key={ index }
 							href={ url }
 							isTertiary
-							onClick={ ( event ) => {
+							onClick={ (
+								/** @type {import('react').MouseEvent<HTMLButtonElement>} */
+								event
+							) => {
 								event.stopPropagation();
 								if ( onClick ) {
 									onClick( event );

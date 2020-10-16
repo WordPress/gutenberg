@@ -6,7 +6,6 @@
 	},
 	"references": [],
     "include": [
-		"src/dashicon/*",
-		"src/snackbar/*"
+		"src/dashicon/*"
 	],
 }
