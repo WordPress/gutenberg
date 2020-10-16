@@ -27,11 +27,11 @@ const ALLOWED_TYPES = [ 'text/vtt' ];
 const DEFAULT_KIND = 'subtitles';
 
 const KIND_OPTIONS = [
-	{ label: 'Subtitles', value: 'subtitles' },
-	{ label: 'Captions', value: 'captions' },
-	{ label: 'Descriptions', value: 'descriptions' },
-	{ label: 'Chapters', value: 'chapters' },
-	{ label: 'Metadata', value: 'metadata' },
+	{ label: __( 'Subtitles' ), value: 'subtitles' },
+	{ label: __( 'Captions' ), value: 'captions' },
+	{ label: __( 'Descriptions' ), value: 'descriptions' },
+	{ label: __( 'Chapters' ), value: 'chapters' },
+	{ label: __( 'Metadata' ), value: 'metadata' },
 ];
 
 const captionIcon = (
