@@ -25,6 +25,7 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { check } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
 
 const ALLOWED_BLOCKS = [ 'core/social-link' ];
@@ -91,14 +92,17 @@ export function SocialLinksEdit( props ) {
 							{ sizeOptions.map( ( entry ) => {
 								return (
 									<MenuItem
-										key={ entry.value }
-										role="menuitemradio"
+										icon={
+											iconSize === entry.value && check
+										}
 										isSelected={ iconSize === entry.value }
+										key={ entry.value }
 										onClick={ () =>
 											setAttributes( {
 												iconSize: entry.value,
 											} )
 										}
+										role="menuitemradio"
 									>
 										{ entry.name }
 									</MenuItem>
