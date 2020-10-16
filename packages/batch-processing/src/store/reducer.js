@@ -1,25 +1,22 @@
 /**
- * WordPress dependencies
- */
-import { combineReducers } from '@wordpress/data';
-
-/**
  * Internal dependencies
  */
 import {
 	BATCH_MAX_SIZE,
-	TRANSACTION_NEW,
-	TRANSACTION_IN_PROGRESS,
-	TRANSACTION_SUCCESS,
-	TRANSACTION_ERROR,
+	STATE_NEW,
+	STATE_IN_PROGRESS,
+	STATE_SUCCESS,
+	STATE_ERROR,
 } from './constants';
 
-const defaultBatches = {
+const defaultState = {
 	lastBatchId: 0,
 	enqueuedItems: {},
-	transactions: {},
+	batches: {},
+	processors: {},
 };
-export function batches( state = defaultBatches, action ) {
+
+export default function reducer( state = defaultState, action ) {
 	switch ( action.type ) {
 		case 'ENQUEUE_ITEM': {
 			const { queue, context, item, itemId } = action;
@@ -39,35 +36,33 @@ export function batches( state = defaultBatches, action ) {
 			};
 		}
 
-		case 'PREPARE_BATCH_TRANSACTION': {
-			const { queue, context, transactionId, meta } = action;
+		case 'PREPARE_BATCH_FOR_PROCESSING': {
+			const { queue, context, batchId, meta } = action;
 
-			if ( transactionId in state.transactions ) {
-				throw new Error(
-					`Transaction ${ transactionId } already exists`
-				);
+			if ( batchId in state.batches ) {
+				throw new Error( `Batch ${ batchId } already exists` );
 			}
 
 			const stateQueue = state.enqueuedItems[ queue ] || {};
 			const enqueuedItems = [ ...stateQueue[ context ] ];
-			const chunks = {};
-			let chunkNb = 0;
+			const transactions = {};
+			let transactionNb = 0;
 			while ( enqueuedItems.length ) {
-				const chunkId = `${ transactionId }-${ chunkNb }`;
-				chunks[ chunkId ] = {
-					number: chunkNb,
-					id: chunkId,
+				const transactionId = `${ batchId }-${ transactionNb }`;
+				transactions[ transactionId ] = {
+					number: transactionNb,
+					id: transactionId,
 					items: enqueuedItems.splice( 0, BATCH_MAX_SIZE ),
 				};
-				++chunkNb;
+				++transactionNb;
 			}
 
-			const transaction = {
-				id: transactionId,
-				state: TRANSACTION_NEW,
+			const batch = {
+				id: batchId,
+				state: STATE_NEW,
 				queue,
 				context,
-				chunks,
+				transactions,
 				results: {},
 				meta,
 			};
@@ -81,59 +76,59 @@ export function batches( state = defaultBatches, action ) {
 						[ context ]: [],
 					},
 				},
-				transactions: {
-					...state.transactions,
-					[ transactionId ]: transaction,
+				batches: {
+					...state.batches,
+					[ batchId ]: batch,
 				},
 			};
 		}
 
-		case 'COMMIT_START': {
-			const { transactionId } = action;
+		case 'BATCH_START': {
+			const { batchId } = action;
 			return {
 				...state,
-				transactions: {
-					...state.transactions,
-					[ transactionId ]: {
-						...state.transactions[ transactionId ],
-						state: TRANSACTION_IN_PROGRESS,
+				batches: {
+					...state.batches,
+					[ batchId ]: {
+						...state.batches[ batchId ],
+						state: STATE_IN_PROGRESS,
 					},
 				},
 			};
 		}
 
-		case 'COMMIT_FINISH': {
-			const { transactionId, state: commitState } = action;
+		case 'BATCH_FINISH': {
+			const { batchId, state: commitState } = action;
 			return {
 				...state,
-				transactions: {
-					...state.transactions,
-					[ transactionId ]: {
-						...state.transactions[ transactionId ],
+				batches: {
+					...state.batches,
+					[ batchId ]: {
+						...state.batches[ batchId ],
 						state:
-							commitState === TRANSACTION_SUCCESS
-								? TRANSACTION_SUCCESS
-								: TRANSACTION_ERROR,
+							commitState === STATE_SUCCESS
+								? STATE_SUCCESS
+								: STATE_ERROR,
 					},
 				},
 			};
 		}
 
-		case 'COMMIT_CHUNK_START': {
-			const { transactionId, chunkId } = action;
+		case 'COMMIT_TRANSACTION_START': {
+			const { batchId, transactionId } = action;
 			return {
 				...state,
-				transactions: {
-					...state.transactions,
-					[ transactionId ]: {
-						...state.transactions[ transactionId ],
-						chunks: {
-							...state.transactions[ transactionId ].chunks,
-							[ chunkId ]: {
-								...state.transactions[ transactionId ].chunks[
-									chunkId
+				batches: {
+					...state.batches,
+					[ batchId ]: {
+						...state.batches[ batchId ],
+						transactions: {
+							...state.batches[ batchId ].transactions,
+							[ transactionId ]: {
+								...state.batches[ batchId ].transactions[
+									transactionId
 								],
-								state: TRANSACTION_IN_PROGRESS,
+								state: STATE_IN_PROGRESS,
 							},
 						},
 					},
@@ -141,64 +136,56 @@ export function batches( state = defaultBatches, action ) {
 			};
 		}
 
-		case 'COMMIT_CHUNK_FINISH': {
+		case 'COMMIT_TRANSACTION_FINISH': {
 			const {
+				batchId,
+				state: transactionState,
 				transactionId,
-				state: chunkState,
-				chunkId,
 				results = {},
 				errors = {},
 				exception,
 			} = action;
 
-			const stateTransaction = state.transactions[ transactionId ] || {};
+			const stateBatch = state.batches[ batchId ] || {};
 			return {
 				...state,
-				transactions: {
-					...state.transactions,
-					[ transactionId ]: {
-						...stateTransaction,
-						chunks: {
-							...stateTransaction.chunks,
-							[ chunkId ]: {
-								...stateTransaction.chunks[ chunkId ],
-								state: TRANSACTION_SUCCESS,
+				batches: {
+					...state.batches,
+					[ batchId ]: {
+						...stateBatch,
+						transactions: {
+							...stateBatch.transactions,
+							[ transactionId ]: {
+								...stateBatch.transactions[ transactionId ],
+								state: STATE_SUCCESS,
 							},
 						},
 						results: {
-							...stateTransaction.results,
+							...stateBatch.results,
 							...results,
 						},
 						state:
-							chunkState === TRANSACTION_SUCCESS
-								? TRANSACTION_SUCCESS
-								: TRANSACTION_ERROR,
+							transactionState === STATE_SUCCESS
+								? STATE_SUCCESS
+								: STATE_ERROR,
 						errors,
 						exception,
 					},
 				},
 			};
 		}
-	}
 
-	return state;
-}
-
-export function processors( state = {}, action ) {
-	switch ( action.type ) {
 		case 'REGISTER_PROCESSOR':
 			const { queue, callback } = action;
 
 			return {
 				...state,
-				[ queue ]: callback,
+				processors: {
+					...state.processors,
+					[ queue ]: callback,
+				},
 			};
 	}
 
 	return state;
 }
-
-export default combineReducers( {
-	batches,
-	processors,
-} );
