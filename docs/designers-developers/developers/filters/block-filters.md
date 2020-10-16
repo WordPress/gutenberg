@@ -156,6 +156,67 @@ A filter that applies to the result of a block's `save` function. This filter is
 
 The filter's callback receives an element, a block type and the block attributes as arguments. It should return an element.
 
+_Example:_
+
+Adding a `<code>` element.
+
+{% codetabs %}
+{% ESNext %}
+```js
+const { cloneElement } = wp.element;
+
+function addCodeElement( element, blockType, attributes ) {
+	if ( blockType.name !== "core/paragraph" ) {
+		return element;
+	}
+
+	return cloneElement(
+		// The saved element
+		element,
+		// Overwrite props here
+		{},
+		// Original content (children)
+		element.props.children,
+		// Any additional content
+		<code>My code</code>
+	);
+};
+
+wp.hooks.addFilter(
+	'blocks.getSaveContent.extraProps',
+	'my-plugin/add-code-element',
+	addCodeElement
+);
+```
+{% ES5 %}
+```js
+var el = wp.element.createElement;
+
+function addCodeElement( element, blockType, attributes ) {
+	if ( blockType.name !== "core/paragraph" ) {
+		return element;
+	}
+
+	return wp.element.cloneElement(
+		// The saved element
+		element,
+		// Overwrite props here
+		{},
+		// Original content (children)
+		element.props.children,
+		// Any additional content
+		el( 'code', {}, 'My code' )
+	);
+};
+
+wp.hooks.addFilter(
+	'blocks.getSaveContent.extraProps',
+	'my-plugin/add-code-element',
+	addCodeElement
+);
+```
+{% end %}
+
 #### `blocks.getSaveContent.extraProps`
 
 A filter that applies to all blocks returning a WP Element in the `save` function. This filter is used to add extra props to the root element of the `save` function. For example: to add a className, an id, or any valid prop for this element.
