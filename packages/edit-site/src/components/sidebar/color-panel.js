@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { LINK_COLOR } from '../editor/utils';
+import { LINK_COLOR, useEditorFeature } from '../editor/utils';
 import ColorPalettePanel from './color-palette-panel';
 
 export default ( {
@@ -17,6 +17,13 @@ export default ( {
 	getSetting,
 	setSetting,
 } ) => {
+	const colors = useEditorFeature( 'color.palette', name );
+	const disableCustomColors = ! useEditorFeature( 'color.custom', name );
+	const gradients = useEditorFeature( 'color.gradients', name );
+	const disableCustomGradients = ! useEditorFeature(
+		'color.customGradient',
+		name
+	);
 	if (
 		! supports.includes( 'color' ) &&
 		! supports.includes( 'backgrounColor' ) &&
@@ -74,11 +81,14 @@ export default ( {
 			label: __( 'Link color' ),
 		} );
 	}
-
 	return (
 		<PanelColorGradientSettings
 			title={ __( 'Color' ) }
 			settings={ settings }
+			colors={ colors }
+			gradients={ gradients }
+			disableCustomColors={ disableCustomColors }
+			disableCustomGradients={ disableCustomGradients }
 		>
 			<ColorPalettePanel
 				key={ 'color-palette-panel-' + name }
