@@ -42,7 +42,7 @@ export const processBatch = function* ( queue, context, meta = {} ) {
 
 	let failed = false;
 	for ( const transactionId of Object.keys( transactions ) ) {
-		const result = yield commitTransaction( batchId, transactionId );
+		const result = yield* commitTransaction( batchId, transactionId );
 		if ( result.state === STATE_ERROR ) {
 			failed = true;
 		}
@@ -70,7 +70,7 @@ export function* commitTransaction( batchId, transactionId ) {
 		exception,
 		results;
 	try {
-		results = yield processTransaction( batch, transactionId );
+		results = yield* processTransaction( batch, transactionId );
 	} catch ( _exception ) {
 		failed = true;
 
