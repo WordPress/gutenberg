@@ -131,7 +131,7 @@ class WP_REST_Batch_Controller {
 					$allow_batch = ! empty( rest_get_server()->get_route_options( $route )['allow_batch'] );
 				}
 
-				if ( ! $allow_batch ) {
+				if ( 0 && ! $allow_batch ) {
 					$error = new WP_Error(
 						'rest_batch_not_allowed',
 						__( 'The requested route does not support batch requests.', 'gutenberg' ),

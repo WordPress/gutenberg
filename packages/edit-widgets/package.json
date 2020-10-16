@@ -29,6 +29,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
 		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/batch-processing": "file:../batch-processing",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
 		"@wordpress/blocks": "file:../blocks",
