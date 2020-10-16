@@ -89,7 +89,7 @@ function ColumnsEditContainer( {
 						label={ __( 'Columns' ) }
 						value={ count }
 						onChange={ ( value ) => updateColumns( count, value ) }
-						min={ 2 }
+						min={ 1 }
 						max={ Math.max( 6, count ) }
 					/>
 					{ count > 6 && (

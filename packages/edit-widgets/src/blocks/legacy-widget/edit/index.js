@@ -7,7 +7,7 @@ import { get, omit } from 'lodash';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { Button, PanelBody, ToolbarGroup } from '@wordpress/components';
+import { Button, ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import { BlockControls, InspectorControls } from '@wordpress/block-editor';
@@ -19,11 +19,11 @@ import { update } from '@wordpress/icons';
 import LegacyWidgetEditHandler from './handler';
 import LegacyWidgetPlaceholder from './placeholder';
 import WidgetPreview from './widget-preview';
+import LegacyWidgetInspectorCard from './inspector-card';
 
 function LegacyWidgetEdit( {
 	attributes,
 	availableLegacyWidgets,
-	hasPermissionsToManageWidgets,
 	prerenderedEditForm,
 	setAttributes,
 	widgetId,
@@ -57,7 +57,6 @@ function LegacyWidgetEdit( {
 		return (
 			<LegacyWidgetPlaceholder
 				availableLegacyWidgets={ availableLegacyWidgets }
-				hasPermissionsToManageWidgets={ hasPermissionsToManageWidgets }
 				onChangeWidget={ ( newWidget ) => {
 					const {
 						isReferenceWidget,
@@ -86,23 +85,12 @@ function LegacyWidgetEdit( {
 
 	const inspectorControls = WPWidget ? (
 		<InspectorControls>
-			<PanelBody title={ WPWidget.name }>
-				{ WPWidget.description }
-			</PanelBody>
+			<LegacyWidgetInspectorCard
+				name={ WPWidget.name }
+				description={ WPWidget.description }
+			/>
 		</InspectorControls>
 	) : null;
-	if ( ! hasPermissionsToManageWidgets ) {
-		return (
-			<>
-				{ inspectorControls }
-				<WidgetPreview
-					className="wp-block-legacy-widget__preview"
-					widgetAreaId={ widgetAreaId }
-					attributes={ omit( attributes, 'widgetId' ) }
-				/>
-			</>
-		);
-	}
 
 	return (
 		<>
@@ -194,10 +182,7 @@ export default withSelect( ( select, { clientId, attributes } ) => {
 		clientId
 	);
 	const editorSettings = select( 'core/block-editor' ).getSettings();
-	const {
-		availableLegacyWidgets,
-		hasPermissionsToManageWidgets,
-	} = editorSettings;
+	const { availableLegacyWidgets } = editorSettings;
 
 	let WPWidget;
 	if ( widgetId && availableLegacyWidgets[ widgetId ] ) {
@@ -210,7 +195,6 @@ export default withSelect( ( select, { clientId, attributes } ) => {
 	}
 
 	return {
-		hasPermissionsToManageWidgets,
 		availableLegacyWidgets,
 		widgetId,
 		widgetAreaId: widgetArea?.id,

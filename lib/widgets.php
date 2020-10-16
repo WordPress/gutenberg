@@ -158,8 +158,7 @@ function gutenberg_get_legacy_widget_settings() {
 		)
 	);
 
-	$has_permissions_to_manage_widgets = current_user_can( 'edit_theme_options' );
-	$available_legacy_widgets          = array();
+	$available_legacy_widgets = array();
 	global $wp_widget_factory;
 	if ( ! empty( $wp_widget_factory ) ) {
 		foreach ( $wp_widget_factory->widgets as $class => $widget_obj ) {
@@ -199,8 +198,7 @@ function gutenberg_get_legacy_widget_settings() {
 		}
 	}
 
-	$settings['hasPermissionsToManageWidgets'] = $has_permissions_to_manage_widgets;
-	$settings['availableLegacyWidgets']        = $available_legacy_widgets;
+	$settings['availableLegacyWidgets'] = $available_legacy_widgets;
 
 	return gutenberg_experiments_editor_settings( $settings );
 }
@@ -270,22 +268,19 @@ function gutenberg_register_widgets() {
 add_action( 'widgets_init', 'gutenberg_register_widgets' );
 
 /**
- * Overwrites the template WordPress would use to render the currrent request,
- * to a widget preview template if widgetPreview parameter was passed in the url.
- *
- * @param string $template Original template.
- *
- * @return string The original or the path of widget-preview-template.php file.
+ * Hook into before the widgets editor screen is loaded and, if widget-preview
+ * is set, render the requested preview of a legacy widget instead. This powers
+ * the Preview option in the Legacy Widget block.
  */
-function change_post_template_to_widget_preview( $template ) {
+function gutenberg_load_widget_preview_if_requested() {
 	if (
-		isset( $_GET['widgetPreview'] ) &&
+		isset( $_GET['widget-preview'] ) &&
 		current_user_can( 'edit_theme_options' )
 	) {
-		add_filter( 'show_admin_bar', '__return_false' );
-		return dirname( __FILE__ ) . '/widget-preview-template.php';
+		define( 'IFRAME_REQUEST', true );
+		require_once dirname( __FILE__ ) . '/widget-preview-template.php';
+		exit;
 	}
-	return $template;
 }
-add_filter( 'template_include', 'change_post_template_to_widget_preview' );
+add_filter( 'load-appearance_page_gutenberg-widgets', 'gutenberg_load_widget_preview_if_requested' );
 
