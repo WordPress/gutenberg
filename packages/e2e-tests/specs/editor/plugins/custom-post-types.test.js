@@ -68,6 +68,7 @@ describe( 'Test Custom Post Types', () => {
 		await createNewPost( { postType: 'leg_block_in_tpl' } );
 		await page.click( '.block-editor-writing-flow' );
 		await page.keyboard.type( 'Hello there' );
+		await page.waitForSelector( '[data-type="core/embed"]' );
 		await publishPost();
 	} );
 } );
