@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Button, ButtonGroup } from '@wordpress/components';
+import { Button, ButtonGroup, Icon } from '@wordpress/components';
+import { formatStrikethrough } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -43,14 +44,21 @@ export default function TextDecorationControl( {
 		onChange( newTextDecoration );
 	};
 
+	// Text Decoration icons to use.
+	const icons = {
+		strikethrough: formatStrikethrough,
+		underline: <Icon icon="editor-underline" />,
+	};
+
 	return (
-		<>
-			<p>{ __( 'Text Decoration' ) }</p>
+		<fieldset className="block-editor-text-decoration-control">
+			<legend>{ __( 'Text Decoration' ) }</legend>
 			<ButtonGroup>
 				{ textDecorations.map( ( presetDecoration ) => {
 					return (
 						<Button
 							key={ presetDecoration.slug }
+							icon={ icons[ presetDecoration.slug ] }
 							isSmall
 							isPressed={
 								textDecoration === presetDecoration.slug
@@ -59,11 +67,12 @@ export default function TextDecorationControl( {
 								handleOnChange( presetDecoration.slug )
 							}
 						>
-							{ presetDecoration.name }
+							{ ! icons[ presetDecoration.slug ] &&
+								presetDecoration.name }
 						</Button>
 					);
 				} ) }
 			</ButtonGroup>
-		</>
+		</fieldset>
 	);
 }
