@@ -443,15 +443,15 @@ function gutenberg_experimental_global_styles_get_support_keys() {
  */
 function gutenberg_experimental_global_styles_get_presets_structure() {
 	return array(
-		'color'    => array(
+		'color'         => array(
 			'path' => array( 'color', 'palette' ),
 			'key'  => 'color',
 		),
-		'gradient' => array(
+		'gradient'      => array(
 			'path' => array( 'color', 'gradients' ),
 			'key'  => 'gradient',
 		),
-		'fontSize' => array(
+		'fontSize'      => array(
 			'path' => array( 'typography', 'fontSizes' ),
 			'key'  => 'size',
 		),
