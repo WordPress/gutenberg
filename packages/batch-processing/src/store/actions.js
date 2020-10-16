@@ -45,6 +45,9 @@ export const processBatch = function* ( queue, context, meta = {} ) {
 		const result = yield* commitTransaction( batchId, transactionId );
 		if ( result.state === STATE_ERROR ) {
 			failed = true;
+			// Don't break the loop as we still need results for any remaining transactions.
+			// Queue processor receives the batch object and may choose whether to
+			// process other transactions or short-circuit with an error.
 		}
 	}
 
@@ -80,9 +83,6 @@ export function* commitTransaction( batchId, transactionId ) {
 		}
 		exception = _exception;
 		errors = exception.errorsById;
-		// Don't break the loop as we still need results for any remaining transactions.
-		// Queue processor receives the batch object and may choose whether to
-		// process other transactions or short-circuit with an error.
 	}
 
 	const finishedAction = {
