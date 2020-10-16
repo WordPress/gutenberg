@@ -22,9 +22,9 @@ const defaultBatches = {
 export function batches( state = defaultBatches, action ) {
 	switch ( action.type ) {
 		case 'ENQUEUE_ITEM': {
-			const { queue, context, item } = action;
+			const { queue, context, item, itemId } = action;
 
-			const stateQueue = state.batches.enqueuedItems[ queue ] || {};
+			const stateQueue = state.enqueuedItems[ queue ] || {};
 			const stateItems = stateQueue[ context ] || [];
 
 			return {
@@ -33,7 +33,7 @@ export function batches( state = defaultBatches, action ) {
 					...state.enqueuedItems,
 					[ queue ]: {
 						...stateQueue,
-						[ context ]: [ ...stateItems, item ],
+						[ context ]: [ ...stateItems, { id: itemId, item } ],
 					},
 				},
 			};
@@ -48,12 +48,12 @@ export function batches( state = defaultBatches, action ) {
 				);
 			}
 
-			const stateQueue = state.batches.enqueuedItems[ queue ] || {};
+			const stateQueue = state.enqueuedItems[ queue ] || {};
 			const enqueuedItems = [ ...stateQueue[ context ] ];
 			const chunks = {};
 			while ( enqueuedItems.length ) {
 				const number = chunks.length;
-				const chunkId = `${ transactionId }-number`;
+				const chunkId = `${ transactionId }-${ number }`;
 				chunks[ chunkId ] = {
 					number,
 					id: chunkId,
@@ -67,6 +67,7 @@ export function batches( state = defaultBatches, action ) {
 				queue,
 				context,
 				chunks,
+				results: {},
 			};
 
 			return {
@@ -151,22 +152,25 @@ export function batches( state = defaultBatches, action ) {
 		}
 
 		case 'COMMIT_CHUNK_SUCCESS': {
-			const { transactionId, result, chunkId } = action;
+			const { transactionId, chunkId, results } = action;
+
+			const stateTransaction = state.transactions[ transactionId ] || {};
 			return {
 				...state,
 				transactions: {
 					...state.transactions,
 					[ transactionId ]: {
-						...state.transactions[ transactionId ],
+						...stateTransaction,
 						chunks: {
-							...state.transactions[ transactionId ].chunks,
+							...stateTransaction.chunks,
 							[ chunkId ]: {
-								...state.transactions[ transactionId ].chunks[
-									chunkId
-								],
-								result,
-								state: TRANSACTION_IN_PROGRESS,
+								...stateTransaction.chunks[ chunkId ],
+								state: TRANSACTION_SUCCESS,
 							},
+						},
+						results: {
+							...stateTransaction.results,
+							...results,
 						},
 					},
 				},
