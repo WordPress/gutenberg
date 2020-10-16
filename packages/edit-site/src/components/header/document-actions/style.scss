@@ -19,6 +19,10 @@
 
 		// See comment above about min-width
 		min-width: 0;
+
+		// Since part of the dropdown button width is blank space, visually,
+		// it looks off-center. This offsets that blank space.
+		margin-left: 12px;
 	}
 
 	.edit-site-document-actions__title-wrapper > h1 {
@@ -31,20 +35,12 @@
 	}
 
 	.edit-site-document-actions__title {
-		font-size: $default-font-size;
-		font-weight: bold;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
 
-	.edit-site-document-actions__get-info {
-		// Add a bit of margin for better spacing with title when focused.
-		margin-left: $grid-unit-05;
-	}
-
 	.edit-site-document-actions__secondary-item {
-		font-size: $default-font-size;
 		opacity: 0;
 		transform: translateY(0);
 		transition: transform 0.2s;
@@ -59,30 +55,16 @@
 		transform: translateY(10px);
 
 		.edit-site-document-actions__title-wrapper {
-			transform: translateY(-14px);
-		}
-
-		.edit-site-document-actions__title {
-			color: $gray-900;
-			font-weight: bold;
-
-			&.is-secondary-title-active {
-				color: $gray-700;
-				font-weight: normal;
-			}
+			transform: translateY(-12px);
 		}
 
 		.edit-site-document-actions__secondary-item {
-			color: $gray-700;
-			font-weight: normal;
 			opacity: 1;
-			white-space: nowrap;
-			transform: translateY(-8px);
-
-			&.is-secondary-title-active {
-				color: $gray-900;
-				font-weight: bold;
-			}
+			transform: translateY(-16px);
 		}
 	}
+}
+
+.edit-site-document-actions__info-dropdown > .components-popover__content > div {
+	padding: 0;
 }

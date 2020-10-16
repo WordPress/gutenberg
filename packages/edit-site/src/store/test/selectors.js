@@ -10,6 +10,9 @@ import {
 	getTemplatePartId,
 	getTemplateType,
 	getPage,
+	getNavigationPanelActiveMenu,
+	isNavigationOpened,
+	isInserterOpened,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -139,6 +142,37 @@ describe( 'selectors', () => {
 		it( 'returns the page object', () => {
 			const state = { page: {} };
 			expect( getPage( state ) ).toBe( state.page );
+		} );
+	} );
+
+	describe( 'getNavigationPanelActiveMenu', () => {
+		it( 'returns the current navigation menu', () => {
+			const state = {
+				navigationPanel: { menu: 'test-menu', isOpen: false },
+			};
+			expect( getNavigationPanelActiveMenu( state ) ).toBe( 'test-menu' );
+		} );
+	} );
+
+	describe( 'isNavigationOpened', () => {
+		it( 'returns the navigation panel isOpened state', () => {
+			const state = {
+				navigationPanel: { menu: 'test-menu', isOpen: false },
+			};
+			expect( isNavigationOpened( state ) ).toBe( false );
+			state.navigationPanel.isOpen = true;
+			expect( isNavigationOpened( state ) ).toBe( true );
+		} );
+	} );
+
+	describe( 'isInserterOpened', () => {
+		it( 'returns the block inserter panel isOpened state', () => {
+			const state = {
+				blockInserterPanel: true,
+			};
+			expect( isInserterOpened( state ) ).toBe( true );
+			state.blockInserterPanel = false;
+			expect( isInserterOpened( state ) ).toBe( false );
 		} );
 	} );
 } );

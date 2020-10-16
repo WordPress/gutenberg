@@ -7,6 +7,7 @@ import {
 	RichText,
 	BlockControls,
 	AlignmentToolbar,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
 export default function SubheadEdit( {
@@ -31,18 +32,20 @@ export default function SubheadEdit( {
 					} }
 				/>
 			</BlockControls>
-			<RichText
-				tagName="p"
-				value={ content }
-				onChange={ ( nextContent ) => {
-					setAttributes( {
-						content: nextContent,
-					} );
-				} }
-				style={ { textAlign: align } }
-				className={ className }
-				placeholder={ placeholder || __( 'Write subheading…' ) }
-			/>
+			<div { ...useBlockProps() }>
+				<RichText
+					tagName="p"
+					value={ content }
+					onChange={ ( nextContent ) => {
+						setAttributes( {
+							content: nextContent,
+						} );
+					} }
+					style={ { textAlign: align } }
+					className={ className }
+					placeholder={ placeholder || __( 'Write subheading…' ) }
+				/>
+			</div>
 		</>
 	);
 }
