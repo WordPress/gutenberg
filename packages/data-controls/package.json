@@ -24,7 +24,6 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/batch-processing": "file:../batch-processing",
 		"@wordpress/data": "file:../data"
 	},
 	"publishConfig": {
