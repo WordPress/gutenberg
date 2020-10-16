@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { Button, ButtonGroup } from '@wordpress/components';
+import { formatItalic } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -40,23 +41,30 @@ export default function FontStyleControl( {
 		onChange( newFontStyle );
 	};
 
+	// Font style icons to use.
+	const icons = {
+		italic: formatItalic,
+		underline: undefined, // Need an underline icon designed.
+	};
+
 	return (
-		<>
-			<p>{ __( 'Font Style' ) }</p>
+		<fieldset className="block-editor-font-style-control">
+			<legend>{ __( 'Font Style' ) }</legend>
 			<ButtonGroup>
 				{ fontStyles.map( ( presetStyle ) => {
 					return (
 						<Button
 							key={ presetStyle.slug }
+							icon={ icons[ presetStyle.slug ] }
 							isSmall
 							isPressed={ fontStyle === presetStyle.slug }
 							onClick={ () => handleOnChange( presetStyle.slug ) }
 						>
-							{ presetStyle.name }
+							{ ! icons[ presetStyle.slug ] && presetStyle.name }
 						</Button>
 					);
 				} ) }
 			</ButtonGroup>
-		</>
+		</fieldset>
 	);
 }

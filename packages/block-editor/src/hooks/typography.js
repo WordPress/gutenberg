@@ -43,8 +43,8 @@ export function TypographyPanel( props ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Typography' ) }>
 				<FontSizeEdit { ...props } />
-				<LineHeightEdit { ...props } />
 				<FontStyleEdit { ...props } />
+				<LineHeightEdit { ...props } />
 			</PanelBody>
 		</InspectorControls>
 	);
