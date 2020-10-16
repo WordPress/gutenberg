@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { TRANSACTION_ERROR } from '@wordpress/batch-processing';
+import { STATE_ERROR } from '@wordpress/batch-processing';
 import { dispatch } from '@wordpress/data';
 
 const addToBatch = ( request ) => {
@@ -21,7 +21,7 @@ function isWidgetsEndpoint( path ) {
 }
 
 async function batchProcessor( requests, transaction ) {
-	if ( transaction.state === TRANSACTION_ERROR ) {
+	if ( transaction.state === STATE_ERROR ) {
 		throw {
 			code: 'transaction_failed',
 			data: { status: 500 },
