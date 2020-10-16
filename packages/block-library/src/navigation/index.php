@@ -155,6 +155,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 /**
  * Generates inline style for any selected font style within the block's
  * style typography attributes.
+ *
+ * @param  array $attributes Navigation block attributes.
+ * @return string            Font style related inline styles for block.
  */
 function block_core_navigation_inline_font_style( $attributes ) {
 	$has_font_style = isset( $attributes['style']['typography']['fontStyle'] );
