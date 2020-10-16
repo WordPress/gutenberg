@@ -16,18 +16,18 @@ import SeparatorSettings from './separator-settings';
 function SeparatorEdit( { color, setColor, className } ) {
 	return (
 		<>
-			<div { ...useBlockProps() }>
-				<HorizontalRule
-					className={ classnames( className, {
+			<HorizontalRule
+				{ ...useBlockProps( {
+					className: classnames( className, {
 						'has-background': color.color,
 						[ color.class ]: color.class,
-					} ) }
-					style={ {
+					} ),
+					style: {
 						backgroundColor: color.color,
 						color: color.color,
-					} }
-				/>
-			</div>
+					},
+				} ) }
+			/>
 			<SeparatorSettings color={ color } setColor={ setColor } />
 		</>
 	);
