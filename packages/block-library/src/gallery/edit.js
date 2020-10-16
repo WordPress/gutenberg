@@ -85,6 +85,10 @@ function GalleryEdit( props ) {
 	} = attributes;
 	const [ selectedImage, setSelectedImage ] = useState();
 	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
+	const [
+		alreadyAutoOpenedMediaUpload,
+		setAlreadyAutoOpenedMediaUpload,
+	] = useState();
 
 	function setAttributes( newAttrs ) {
 		if ( newAttrs.ids ) {
@@ -103,6 +107,8 @@ function GalleryEdit( props ) {
 		}
 
 		props.setAttributes( newAttrs );
+
+		setAlreadyAutoOpenedMediaUpload( true );
 	}
 
 	function onSelectImage( index ) {
@@ -334,6 +340,9 @@ function GalleryEdit( props ) {
 			onError={ onUploadError }
 			notices={ hasImages ? undefined : noticeUI }
 			onFocus={ onFocus }
+			autoOpenMediaUpload={
+				! hasImages && isSelected && ! alreadyAutoOpenedMediaUpload
+			}
 		/>
 	);
 
