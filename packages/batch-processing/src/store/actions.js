@@ -6,24 +6,28 @@ import { v4 as uuid } from 'uuid';
 /**
  * Internal dependencies
  */
-import { select } from './controls';
+import {
+	select,
+	enqueueItemAndAutocommit as enqueueAutocommitControl,
+	processChunk,
+} from './controls';
 
-export const enqueueForBatchProcessing = function (
-	queue,
-	context,
-	item,
-	autoCommit = true
-) {
+export const enqueueItemAndAutocommit = function* ( queue, context, item ) {
+	yield enqueueAutocommitControl( queue, context, item, true );
+};
+
+export const enqueueItem = function ( queue, context, item ) {
+	const itemId = uuid();
 	return {
 		type: 'ENQUEUE_ITEM',
 		queue,
 		context,
 		item,
-		autoCommit,
+		itemId,
 	};
 };
 
-export const commit = async function* ( queue, context ) {
+export const commit = function* ( queue, context ) {
 	const transactionId = uuid();
 	yield prepareBatchTransaction( queue, context, transactionId );
 	const transaction = yield select( 'getTransaction', transactionId );
@@ -35,32 +39,31 @@ export const commit = async function* ( queue, context ) {
 		transactionId,
 	};
 
-	const processor = yield select( 'getProcessor', queue );
-	for ( const chunk of transaction.chunks ) {
+	for ( const chunkId of Object.keys( transaction.chunks ) ) {
 		yield {
 			type: 'COMMIT_CHUNK_START',
 			transactionId,
-			chunkId: chunk.id,
+			chunkId,
 		};
 		try {
-			const result = await processor( chunk );
+			const results = yield processChunk( transaction, chunkId );
 			yield {
 				transactionId,
 				type: 'COMMIT_CHUNK_SUCCESS',
-				chunkId: chunk.id,
-				result,
+				chunkId,
+				results,
 			};
 		} catch ( e ) {
 			yield {
 				type: 'COMMIT_CHUNK_ERROR',
 				transactionId,
-				chunkId: chunk.id,
+				chunkId,
 				error: e,
 			};
 			yield {
 				type: 'COMMIT_ERROR',
 				transactionId,
-				chunkId: chunk.id,
+				chunkId,
 				error: e,
 			};
 			return;
@@ -71,6 +74,9 @@ export const commit = async function* ( queue, context ) {
 		type: 'COMMIT_SUCCESS',
 		transactionId,
 	};
+
+	const finishedTransaction = yield select( 'getTransaction', transactionId );
+	return finishedTransaction.results;
 };
 
 export function prepareBatchTransaction( queue, context, transactionId ) {
@@ -82,10 +88,10 @@ export function prepareBatchTransaction( queue, context, transactionId ) {
 	};
 }
 
-export const registerProcessor = function ( queue, processor ) {
+export const registerProcessor = function ( queue, callback ) {
 	return {
 		type: 'REGISTER_PROCESSOR',
 		queue,
-		processor,
+		callback,
 	};
 };

@@ -38,6 +38,23 @@ export function dispatch( actionName, ...args ) {
 	};
 }
 
+export function processChunk( transaction, chunkId ) {
+	return {
+		type: 'PROCESS_CHUNK',
+		transaction,
+		chunkId,
+	};
+}
+
+export function enqueueItemAndAutocommit( queue, context, item ) {
+	return {
+		type: 'ENQUEUE_ITEM_AND_AUTOCOMMIT',
+		queue,
+		context,
+		item,
+	};
+}
+
 const controls = {
 	SELECT: createRegistryControl(
 		( registry ) => ( { selectorName, args } ) => {
@@ -48,6 +65,45 @@ const controls = {
 	DISPATCH: createRegistryControl(
 		( registry ) => ( { actionName, args } ) => {
 			return registry.dispatch( MODULE_KEY )[ actionName ]( ...args );
+		}
+	),
+
+	ENQUEUE_ITEM_AND_AUTOCOMMIT: createRegistryControl(
+		( registry ) => async ( { queue, context, item } ) => {
+			const { itemId } = await registry
+				.dispatch( MODULE_KEY )
+				.enqueueItem( queue, context, item );
+
+			const results = await registry
+				.dispatch( MODULE_KEY )
+				.commit( queue, context );
+
+			return results[ itemId ];
+		}
+	),
+
+	PROCESS_CHUNK: createRegistryControl(
+		( registry ) => async ( { transaction, chunkId } ) => {
+			const { chunks, queue } = transaction;
+			const chunk = chunks[ chunkId ];
+			const processor = registry
+				.select( MODULE_KEY )
+				.getProcessor( queue );
+			if ( ! processor ) {
+				throw new Error(
+					`There is no batch processor registered for "${ queue }" queue. ` +
+						`Register one by dispatching registerProcessor() action on ${ MODULE_KEY } store.`
+				);
+			}
+			const itemIds = chunk.items.map( ( { id } ) => id );
+			const items = chunk.items.map( ( { item } ) => item );
+			const results = await processor( items );
+			// @TODO Assert results.length == items.length
+			const resultsById = {};
+			for ( let i = 0, max = itemIds.length; i < max; i++ ) {
+				resultsById[ itemIds[ i ] ] = results[ i ];
+			}
+			return resultsById;
 		}
 	),
 };
