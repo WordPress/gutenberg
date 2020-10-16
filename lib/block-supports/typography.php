@@ -48,9 +48,9 @@ function gutenberg_register_typography_support( $block_type ) {
  * @return array Font size CSS classes and inline styles.
  */
 function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
-    $has_font_size_support = false;
-    $classes = array();
-    $styles = array();
+	$has_font_size_support = false;
+	$classes               = array();
+	$styles                = array();
 	if ( property_exists( $block_type, 'supports' ) ) {
 		$has_font_size_support = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
 	}
@@ -94,10 +94,10 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 }
 
 // Register the block support.
-_WP_Block_Supports::get_instance()->register(
-    'typography',
-    array( 
-        'register_attribute' => 'gutenberg_register_typography_support',
-        'apply'              => 'gutenberg_apply_typography_support',
-    )
+WP_Block_Supports::get_instance()->register(
+	'typography',
+	array(
+		'register_attribute' => 'gutenberg_register_typography_support',
+		'apply'              => 'gutenberg_apply_typography_support',
+	)
 );

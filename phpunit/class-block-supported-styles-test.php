@@ -90,17 +90,22 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		<p>系の家庭に</p>
 		<p>Example &lt;p&gt;Test!&lt;/p&gt;</p>
 	';
-	
+
 	/**
 	 * Returns the rendered output for the current block.
 	 *
-	 * @param array  $block Block to render.
+	 * @param array $block Block to render.
 	 */
 	private function render_example_block( $block ) {
 		global $current_parsed_block;
 		$current_parsed_block = $block;
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'foo-bar-class', 'style' => 'test: style;' ) );
-		return '<div '. $wrapper_attributes . '>' . self::BLOCK_CONTENT . '</div>';
+		$wrapper_attributes   = get_block_wrapper_attributes(
+			array(
+				'class' => 'foo-bar-class',
+				'style' => 'test: style;',
+			)
+		);
+		return '<div ' . $wrapper_attributes . '>' . self::BLOCK_CONTENT . '</div>';
 	}
 
 	/**
@@ -375,8 +380,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_named_font_size() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
+			'attributes' => array(),
+			'supports'   => array(
 				'fontSize' => true,
 			),
 		);
@@ -403,8 +408,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_custom_font_size() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
+			'attributes' => array(),
+			'supports'   => array(
 				'fontSize' => true,
 			),
 		);
@@ -431,8 +436,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_font_size_unsupported() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(),
+			'attributes' => array(),
+			'supports'   => array(),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -458,8 +463,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_line_height() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
+			'attributes' => array(),
+			'supports'   => array(
 				'lineHeight' => true,
 			),
 		);
@@ -486,8 +491,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_line_height_unsupported() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(),
+			'attributes' => array(),
+			'supports'   => array(),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -512,8 +517,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_block_alignment() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
+			'attributes' => array(),
+			'supports'   => array(
 				'align' => true,
 			),
 		);
@@ -540,8 +545,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_block_alignment_unsupported() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(),
+			'attributes' => array(),
+			'supports'   => array(),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -566,8 +571,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_all_supported() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
+			'attributes' => array(),
+			'supports'   => array(
 				'color'      => array(
 					'gradients' => true,
 					'link'      => true,
@@ -612,8 +617,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_one_supported() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
+			'attributes' => array(),
+			'supports'   => array(
 				'fontSize' => true,
 			),
 		);
@@ -652,8 +657,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_custom_classnames_support() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(),
+			'attributes' => array(),
+			'supports'   => array(),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -678,8 +683,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_custom_classnames_support_opt_out() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
+			'attributes' => array(),
+			'supports'   => array(
 				'customClassName' => false,
 			),
 		);
@@ -706,8 +711,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_generatted_classnames_support_opt_out() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
+			'attributes' => array(),
+			'supports'   => array(
 				'className' => false,
 			),
 		);
@@ -732,8 +737,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	public function test_render_block_suppresses_warnings_without_at_suppression() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(),
+			'attributes' => array(),
+			'supports'   => array(),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 

@@ -25,7 +25,7 @@ function render_block_core_post_comments_form( $attributes, $content, $block ) {
 
 	ob_start();
 	comment_form( array(), $block->context['postId'] );
-	$form = ob_get_clean();
+	$form               = ob_get_clean();
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
 	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $form );

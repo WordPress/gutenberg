@@ -40,8 +40,8 @@ function gutenberg_get_block_default_classname( $block_name ) {
  * @return array Block CSS classes and inline styles.
  */
 function gutenberg_apply_generated_classname_support( $block_type, $block_attributes ) {
-    $has_generated_classname_support = true;
-    $attributes = array();
+	$has_generated_classname_support = true;
+	$attributes                      = array();
 	if ( property_exists( $block_type, 'supports' ) ) {
 		$has_generated_classname_support = gutenberg_experimental_get( $block_type->supports, array( 'className' ), true );
 	}
@@ -57,9 +57,9 @@ function gutenberg_apply_generated_classname_support( $block_type, $block_attrib
 }
 
 // Register the block support.
-_WP_Block_Supports::get_instance()->register(
-    'generated-classname',
-    array( 
-        'apply'              => 'gutenberg_apply_generated_classname_support',
-    )
+WP_Block_Supports::get_instance()->register(
+	'generated-classname',
+	array(
+		'apply' => 'gutenberg_apply_generated_classname_support',
+	)
 );

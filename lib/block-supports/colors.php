@@ -65,7 +65,7 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	$has_link_colors_support       = gutenberg_experimental_get( $color_support, array( 'link' ), false );
 	$has_gradients_support         = gutenberg_experimental_get( $color_support, array( 'gradients' ), false );
 	$classes                       = array();
-	$styles                        = array(); 
+	$styles                        = array();
 
 	// Text Colors.
 	// Check support for text colors.
@@ -94,9 +94,9 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 			// If link is a named color.
 			if ( strpos( $block_attributes['style']['color']['link'], 'var:preset|color|' ) !== false ) {
 				// Get the name from the string and add proper styles.
-				$index_to_splice               = strrpos( $block_attributes['style']['color']['link'], '|' ) + 1;
-				$link_color_name               = substr( $block_attributes['style']['color']['link'], $index_to_splice );
-				$styles[] = sprintf( '--wp--style--color--link: var(--wp--preset--color--%s);', $link_color_name );
+				$index_to_splice = strrpos( $block_attributes['style']['color']['link'], '|' ) + 1;
+				$link_color_name = substr( $block_attributes['style']['color']['link'], $index_to_splice );
+				$styles[]        = sprintf( '--wp--style--color--link: var(--wp--preset--color--%s);', $link_color_name );
 			} else {
 				$styles[] = sprintf( '--wp--style--color--link: %s;', $block_attributes['style']['color']['link'] );
 			}
@@ -148,10 +148,10 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 }
 
 // Register the block support.
-_WP_Block_Supports::get_instance()->register(
-    'colors',
-    array( 
-        'register_attribute' => 'gutenberg_register_colors_support',
-        'apply'              => 'gutenberg_apply_colors_support',
-    )
+WP_Block_Supports::get_instance()->register(
+	'colors',
+	array(
+		'register_attribute' => 'gutenberg_register_colors_support',
+		'apply'              => 'gutenberg_apply_colors_support',
+	)
 );

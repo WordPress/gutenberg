@@ -89,7 +89,7 @@ function render_block_core_search( $attributes ) {
 		}
 	}
 
-	$field_markup = sprintf(
+	$field_markup       = sprintf(
 		'<div class="wp-block-search__inside-wrapper"%s>%s</div>',
 		$width_styles,
 		$input_markup . $button_markup

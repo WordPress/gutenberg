@@ -33,7 +33,7 @@ function render_block_core_post_hierarchical_terms( $attributes, $content, $bloc
 			esc_html( $term->name )
 		);
 	}
-	$terms_links = trim( $terms_links, ' | ' );
+	$terms_links        = trim( $terms_links, ' | ' );
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
 	return sprintf(

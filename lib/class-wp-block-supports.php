@@ -7,10 +7,10 @@
 
 /**
  * Class encapsulating and implementing Block Supports.
- * 
+ *
  * @private
  */
-class _WP_Block_Supports {
+class WP_Block_Supports {
 
 	/**
 	 * Config.
@@ -22,7 +22,7 @@ class _WP_Block_Supports {
 	/**
 	 * Container for the main instance of the class.
 	 *
-	 * @var _WP_Block_Supports|null
+	 * @var WP_Block_Supports|null
 	 */
 	private static $instance = null;
 
@@ -31,7 +31,7 @@ class _WP_Block_Supports {
 	 *
 	 * The instance will be created if it does not exist yet.
 	 *
-	 * @return _WP_Block_Supports The main instance.
+	 * @return WP_Block_Supports The main instance.
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
@@ -136,7 +136,7 @@ class _WP_Block_Supports {
 				if ( ! isset( $block_support_config['register_attribute'] ) ) {
 					continue;
 				}
-	
+
 				call_user_func(
 					$block_support_config['register_attribute'],
 					$block_type
@@ -151,13 +151,13 @@ class _WP_Block_Supports {
  * rendered all of the features that the block supports.
  *
  * @param array $extra_attributes Extra attributes to render on the block wrapper.
- * 
+ *
  * @return string String of HTML classes.
  */
 function get_block_wrapper_attributes( $extra_attributes ) {
 	global $current_parsed_block;
-	$new_attributes = _WP_Block_Supports::get_instance()->apply_block_supports( $current_parsed_block );
-	
+	$new_attributes = WP_Block_Supports::get_instance()->apply_block_supports( $current_parsed_block );
+
 	if ( empty( $new_attributes ) && empty( $extra_attributes ) ) {
 		return '';
 	}
@@ -165,7 +165,7 @@ function get_block_wrapper_attributes( $extra_attributes ) {
 	// This is hardcoded on purpose.
 	// We only support a fixed list of attributes.
 	$attributes_to_merge = array( 'style', 'class' );
-	$attributes = array();
+	$attributes          = array();
 	foreach ( $attributes_to_merge as $attribute_name ) {
 		if ( empty( $new_attributes[ $attribute_name ] ) && empty( $extra_attributes[ $attribute_name ] ) ) {
 			continue;
@@ -196,4 +196,4 @@ function get_block_wrapper_attributes( $extra_attributes ) {
 	return implode( ' ', $normalized_attributes );
 }
 
-add_action( 'init', array( '_WP_Block_Supports', 'init' ), 22 );
+add_action( 'init', array( 'WP_Block_Supports', 'init' ), 22 );

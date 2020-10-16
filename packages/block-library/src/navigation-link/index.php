@@ -127,12 +127,14 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		$css_classes .= ' ' . $class_name;
 	};
 
-	$wrapper_attributes = get_block_wrapper_attributes( array(
-		'class' => $css_classes . ( $has_submenu ? ' has-child' : '' ) .
-			( $is_active ? ' current-menu-item' : '' ),
-		'style' => $style_attribute,
-	) );
-	$html = '<li ' . $wrapper_attributes . '>' .
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => $css_classes . ( $has_submenu ? ' has-child' : '' ) .
+				( $is_active ? ' current-menu-item' : '' ),
+			'style' => $style_attribute,
+		)
+	);
+	$html               = '<li ' . $wrapper_attributes . '>' .
 		'<a class="wp-block-navigation-link__content" ';
 
 	// Start appending HTML attributes to anchor tag.

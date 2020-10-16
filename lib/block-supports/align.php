@@ -39,7 +39,7 @@ function gutenberg_register_alignment_support( $block_type ) {
  * @return array Block alignment CSS classes and inline styles.
  */
 function gutenberg_apply_alignment_support( $block_type, $block_attributes ) {
-    $attributes = array();
+	$attributes        = array();
 	$has_align_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
 		$has_align_support = gutenberg_experimental_get( $block_type->supports, array( 'align' ), false );
@@ -56,10 +56,10 @@ function gutenberg_apply_alignment_support( $block_type, $block_attributes ) {
 }
 
 // Register the block support.
-_WP_Block_Supports::get_instance()->register(
-    'align',
-    array( 
-        'register_attribute' => 'gutenberg_register_alignment_support',
-        'apply'              => 'gutenberg_apply_alignment_support',
-    )
+WP_Block_Supports::get_instance()->register(
+	'align',
+	array(
+		'register_attribute' => 'gutenberg_register_alignment_support',
+		'apply'              => 'gutenberg_apply_alignment_support',
+	)
 );

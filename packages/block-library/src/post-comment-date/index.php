@@ -21,7 +21,7 @@ function render_block_core_post_comment_date( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes();
 	return sprintf(
 		'<div%1$s><time datetime="%2$s">%3$s</time></div>',
-		$wrapper_attributes !== '' ? ' ' . $wrapper_attributes : '',
+		'' !== $wrapper_attributes ? ' ' . $wrapper_attributes : '',
 		get_comment_date( 'c', $block->context['commentId'] ),
 		get_comment_date(
 			isset( $attributes['format'] ) ? $attributes['format'] : '',

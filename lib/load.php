@@ -118,7 +118,7 @@ require dirname( __FILE__ ) . '/navigation-page.php';
 require dirname( __FILE__ ) . '/experiments-page.php';
 require dirname( __FILE__ ) . '/global-styles.php';
 
-if ( ! class_exists( '_WP_Block_Supports' ) ) {
+if ( ! class_exists( 'WP_Block_Supports' ) ) {
 	require_once dirname( __FILE__ ) . '/class-wp-block-supports.php';
 }
 require dirname( __FILE__ ) . '/block-supports/generated-classname.php';

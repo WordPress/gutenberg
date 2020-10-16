@@ -125,9 +125,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$colors          = block_core_navigation_build_css_colors( $attributes );
-	$font_sizes      = block_core_navigation_build_css_font_sizes( $attributes );
-	$classes         = array_merge(
+	$colors     = block_core_navigation_build_css_colors( $attributes );
+	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
+	$classes    = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
 		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
@@ -139,11 +139,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks_html .= $inner_block->render();
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( 
-		array( 
-			'class' => implode( ' ', $classes ) ,
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => implode( ' ', $classes ),
 			'style' => $colors['inline_styles'] . $font_sizes['inline_styles'],
-		) 
+		)
 	);
 
 	return sprintf(
