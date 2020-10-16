@@ -6,7 +6,7 @@ import { createRegistryControl } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { MODULE_KEY, TRANSACTION_ERROR } from './constants';
+import { MODULE_KEY, STATE_ERROR } from './constants';
 
 /**
  * Calls a selector using chosen registry.
@@ -38,11 +38,11 @@ export function dispatch( actionName, ...args ) {
 	};
 }
 
-export function processChunk( transaction, chunkId ) {
+export function processTransaction( batch, transactionId ) {
 	return {
-		type: 'PROCESS_CHUNK',
-		transaction,
-		chunkId,
+		type: 'PROCESS_TRANSACTION',
+		batch,
+		transactionId,
 	};
 }
 
@@ -75,22 +75,22 @@ const controls = {
 				.enqueueItem( queue, context, item );
 
 			// @TODO autocommit when batch size exceeds the maximum or n milliseconds passes
-			const transaction = await registry
+			const batch = await registry
 				.dispatch( MODULE_KEY )
-				.commit( queue, context );
+				.processBatch( queue, context );
 
-			if ( transaction.state === TRANSACTION_ERROR ) {
-				throw transaction.errors[ itemId ];
+			if ( batch.state === STATE_ERROR ) {
+				throw batch.errors[ itemId ];
 			}
 
-			return transaction.results[ itemId ];
+			return batch.results[ itemId ];
 		}
 	),
 
-	PROCESS_CHUNK: createRegistryControl(
-		( registry ) => async ( { transaction, chunkId } ) => {
-			const { chunks, queue } = transaction;
-			const chunk = chunks[ chunkId ];
+	PROCESS_TRANSACTION: createRegistryControl(
+		( registry ) => async ( { batch, transactionId } ) => {
+			const { transactions, queue } = batch;
+			const transaction = transactions[ transactionId ];
 			const processor = registry
 				.select( MODULE_KEY )
 				.getProcessor( queue );
@@ -100,11 +100,11 @@ const controls = {
 						`Register one by dispatching registerProcessor() action on ${ MODULE_KEY } store.`
 				);
 			}
-			const itemIds = chunk.items.map( ( { id } ) => id );
-			const items = chunk.items.map( ( { item } ) => item );
+			const itemIds = transaction.items.map( ( { id } ) => id );
+			const items = transaction.items.map( ( { item } ) => item );
 			let results;
 			try {
-				results = await processor( items, transaction );
+				results = await processor( items, batch );
 			} catch ( exception ) {
 				const errorsById = {};
 				for ( let i = 0, max = itemIds.length; i < max; i++ ) {
@@ -113,7 +113,7 @@ const controls = {
 						: exception;
 				}
 				throw {
-					isChunkError: true,
+					isTransactionError: true,
 					exception,
 					errorsById,
 				};
