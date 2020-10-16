@@ -5,7 +5,7 @@ export const MODULE_KEY = 'core/batch-processing';
 
 export const BATCH_MAX_SIZE = 20;
 
-export const TRANSACTION_NEW = 'NEW';
-export const TRANSACTION_IN_PROGRESS = 'IN_PROGRESS';
-export const TRANSACTION_SUCCESS = 'SUCCESS';
-export const TRANSACTION_ERROR = 'ERROR';
+export const STATE_NEW = 'NEW';
+export const STATE_IN_PROGRESS = 'IN_PROGRESS';
+export const STATE_SUCCESS = 'SUCCESS';
+export const STATE_ERROR = 'ERROR';

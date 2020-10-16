@@ -1,5 +1,5 @@
-export const getTransaction = ( state, transactionId ) => {
-	return state.batches.transactions[ transactionId ];
+export const getBatch = ( state, batchId ) => {
+	return state.batches[ batchId ];
 };
 
 export const getProcessor = ( state, queue ) => {
