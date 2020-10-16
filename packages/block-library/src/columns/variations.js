@@ -15,7 +15,7 @@ const variations = [
 	{
 		name: 'one-column-full',
 		title: __( '100' ),
-		description: __( 'One column; full width' ),
+		description: __( 'One column' ),
 		icon: (
 			<SVG
 				width="48"
@@ -30,7 +30,6 @@ const variations = [
 				/>
 			</SVG>
 		),
-		isDefault: true,
 		innerBlocks: [ [ 'core/column' ] ],
 		scope: [ 'block' ],
 	},
