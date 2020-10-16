@@ -74,7 +74,10 @@ export function SocialLinksEdit( props ) {
 				<Dropdown
 					className={ 'icon-size-picker__dropdown' }
 					contentClassName={ 'icon-size-picker__dropdowncontent' }
-					popoverProps={ { position: 'bottom right' } }
+					popoverProps={ {
+						isAlternate: true,
+						position: 'bottom right',
+					} }
 					renderToggle={ ( { isOpen, onToggle } ) => (
 						<ToolbarGroup>
 							<ToolbarButton
