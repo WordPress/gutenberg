@@ -35,6 +35,7 @@ import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
+import { View } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -47,7 +48,6 @@ import {
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 } from './constants';
-import View from './view';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
