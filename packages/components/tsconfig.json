@@ -9,6 +9,7 @@
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
 		"src/tip/**/*",
+		"src/utils/**/*",
 		"src/visually-hidden/**/*"
 	]
 }
