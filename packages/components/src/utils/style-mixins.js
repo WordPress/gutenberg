@@ -3,3 +3,5 @@ export { reduceMotion } from './reduce-motion';
 export { rtl, getRTL, useRTL } from './rtl';
 export { space } from './space';
 export { font } from './font';
+export { breakpoint } from './breakpoint';
+export { variable } from './misc-variable';
