@@ -69,6 +69,9 @@ export class UnsupportedBlockEdit extends Component {
 			<TouchableHighlight
 				onPress={ this.onHelpButtonPressed }
 				style={ styles.helpIconContainer }
+				accessibilityLabel={ __( 'Help button' ) }
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Tap here to show help' ) }
 			>
 				<Icon
 					className="unsupported-icon-help"

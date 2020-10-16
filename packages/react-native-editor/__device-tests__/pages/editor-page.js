@@ -489,9 +489,9 @@ export default class EditorPage {
 	// =============================
 
 	async getUnsupportedBlockHelpButton() {
-		const accessibilityId = 'Help icon';
+		const accessibilityId = 'Help button';
 		let blockLocator =
-			'//android.widget.Button[@content-desc="Help icon, Tap here to show help"]';
+			'//android.widget.Button[@content-desc="Help button, Tap here to show help"]';
 
 		if ( ! isAndroid() ) {
 			blockLocator = `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
@@ -500,9 +500,9 @@ export default class EditorPage {
 	}
 
 	async getUnsupportedBlockBottomSheetEditButton() {
-		const accessibilityId = 'Edit block in web browser';
+		const accessibilityId = 'Edit using web editor';
 		let blockLocator =
-			'//android.widget.Button[@content-desc="Edit block in web browser"]';
+			'//android.widget.Button[@content-desc="Edit using web editor"]';
 
 		if ( ! isAndroid() ) {
 			blockLocator = `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
