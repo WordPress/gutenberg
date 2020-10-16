@@ -85,13 +85,30 @@ function gutenberg_render_duotone_support( $block_content, $block_attributes, $b
 
 	$duotone_id = 'duotone-filter-' . $duotone_slug;
 
-	// TODO: Handle multiple selectors
-	$duotone_selector = '.' . $duotone_id;
-	if ( is_string( $duotone_support ) ) {
-		$duotone_selector .= ' ' . $duotone_support;
-	} elseif ( is_string( $duotone_support['save'] ) ) {
-		$duotone_selector .= ' ' . $duotone_support['save'];
-	}
+	// Object | boolean | string | string[] -> boolean | string | string[].
+	$edit_selector =
+		! array_key_exists( 'edit', $duotone_support )
+			? $duotone_support
+			: $duotone_support['edit'];
+
+	// boolean | string | string[] -> boolean[] | string[].
+	$edit_selectors = is_array( $edit_selector )
+		? $edit_selector
+		: array( $edit_selector );
+
+	// boolean[] | string[] -> string[].
+	$duotone_class     = '.' . $duotone_id;
+	$duotone_selectors = array_map(
+		function ( $selector ) use ( $duotone_class ) {
+			return is_string( $selector )
+				? $duotone_class . ' ' . $selector
+				: $duotone_class;
+		},
+		$edit_selectors
+	);
+
+	// string[] -> string.
+	$duotone_selector = implode( ', ', $duotone_selectors );
 
 	ob_start();
 

@@ -110,7 +110,7 @@ supports: {
 
 ## duotone
 
-- Type: `boolean`, `string`, or `object`
+- Type: `boolean`, `string`, `string[]`, or `object`
 - Default value: `false`
 
 This property adds block controls which allow to apply a duotone filter to a block or part of a block. _Important: It doesn't work with dynamic blocks yet._
@@ -126,7 +126,14 @@ supports: {
 ```js
 supports: {
     // Apply the filter to the same selector in both edit and save.
-    duotone: `img`
+    duotone: 'img'
+}
+```
+
+```js
+supports: {
+    // Apply the filter to both images and videos
+    duotone: ['img', 'video']
 }
 ```
 
@@ -134,7 +141,7 @@ supports: {
 supports: {
     // Apply the filter to a specific inner element in edit and the whole block in save.
     duotone: {
-        edit: `.duotone-image img`
+        edit: '.duotone-image img'
         save: true
     }
 }

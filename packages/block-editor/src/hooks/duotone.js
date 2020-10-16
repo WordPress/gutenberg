@@ -143,19 +143,37 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName, attributes, setAttributes, clientId } = props;
 
-		const duotoneBlockSupport = getBlockSupport( blockName, 'duotone' );
+		const duotoneSupport = getBlockSupport( blockName, 'duotone' );
 
-		if ( ! duotoneBlockSupport ) {
+		if ( ! duotoneSupport ) {
 			return <BlockEdit { ...props } />;
 		}
 
-		// TODO: Handle multiple selectors. Cover will need to select img or video.
-		let duotoneSelector = `#block-${ clientId }`;
-		if ( typeof duotoneBlockSupport === 'string' ) {
-			duotoneSelector += ` ${ duotoneBlockSupport }`;
-		} else if ( typeof duotoneBlockSupport.edit === 'string' ) {
-			duotoneSelector += ` ${ duotoneBlockSupport.edit }`;
-		}
+		const duotoneId =
+			attributes?.duotone?.slug &&
+			`duotone-filter-${ attributes.duotone.slug }`;
+
+		// Object | boolean | string | string[] -> boolean | string | string[]
+		const editSelector =
+			duotoneSupport.edit === undefined
+				? duotoneSupport
+				: duotoneSupport.edit;
+
+		// boolean | string | string[] -> boolean[] | string[]
+		const editSelectors = Array.isArray( editSelector )
+			? editSelector
+			: [ editSelector ];
+
+		// boolean[] | string[] -> string[]
+		const duotoneBlockId = `#block-${ clientId }`;
+		const duotoneSelectors = editSelectors.map( ( selector ) =>
+			typeof selector === 'string'
+				? `${ duotoneBlockId } ${ selector }`
+				: duotoneBlockId
+		);
+
+		// string[] -> string
+		const duotoneSelector = duotoneSelectors.join( ', ' );
 
 		const duotoneOptions =
 			useEditorFeature( 'color.duotone' ) ?? DEFAULT_DUOTONE_OPTIONS;
@@ -166,7 +184,7 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 				{ attributes.duotone ? (
 					<Duotone
 						selector={ duotoneSelector }
-						id={ `duotone-filter-${ attributes.duotone.slug }` }
+						id={ duotoneId }
 						values={ attributes.duotone.values }
 					/>
 				) : null }
