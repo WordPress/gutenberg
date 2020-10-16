@@ -167,14 +167,17 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void onAddMention(Consumer<String> onSuccess) {
-                onSuccess.accept("matt");
+            public void onShowUserSuggestions(Consumer<String> onResult) {
+                onResult.accept("matt");
             }
 
             @Override
-            public void gutenbergDidSendButtonPressedAction(String buttonType) {
-
+            public void onShowXpostSuggestions(Consumer<String> onResult) {
+                onResult.accept("ma.tt");
             }
+
+            @Override
+            public void gutenbergDidSendButtonPressedAction(String buttonType) {}
             
         }, isDarkMode());
 

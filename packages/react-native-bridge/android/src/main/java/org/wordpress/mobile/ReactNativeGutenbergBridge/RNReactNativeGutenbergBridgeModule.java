@@ -296,8 +296,13 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     @ReactMethod
-    public void addMention(Promise promise) {
-        mGutenbergBridgeJS2Parent.onAddMention(promise::resolve);
+    public void showUserSuggestions(Promise promise) {
+        mGutenbergBridgeJS2Parent.onShowUserSuggestions(promise::resolve);
+    }
+
+    @ReactMethod
+    public void showXpostSuggestions(Promise promise) {
+        mGutenbergBridgeJS2Parent.onShowXpostSuggestions(promise::resolve);
     }
 
     @ReactMethod
