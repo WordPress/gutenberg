@@ -15,7 +15,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -37,6 +37,7 @@ export default function BlockNavigationBlock( {
 	position,
 	level,
 	rowCount,
+	siblingBlockCount,
 	showBlockMovers,
 	terminatedLevels,
 	path,
@@ -44,14 +45,26 @@ export default function BlockNavigationBlock( {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isFocused, setIsFocused ] = useState( false );
+	const { clientId } = block;
+	const isDragging = useSelect(
+		( select ) => {
+			const { isBlockBeingDragged, isAncestorBeingDragged } = select(
+				'core/block-editor'
+			);
+
+			return (
+				isBlockBeingDragged( clientId ) ||
+				isAncestorBeingDragged( clientId )
+			);
+		},
+		[ clientId ]
+	);
+
 	const { selectBlock: selectEditorBlock } = useDispatch(
 		'core/block-editor'
 	);
-	const { clientId } = block;
 
-	// Subtract 1 from rowCount, as it includes the block appender.
-	const siblingCount = rowCount - 1;
-	const hasSiblings = siblingCount > 0;
+	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
 	const hasVisibleMovers = isHovered || isFocused;
 	const moverCellClassName = classnames(
@@ -75,6 +88,7 @@ export default function BlockNavigationBlock( {
 		<BlockNavigationLeaf
 			className={ classnames( {
 				'is-selected': isSelected,
+				'is-dragging': isDragging,
 			} ) }
 			onMouseEnter={ () => setIsHovered( true ) }
 			onMouseLeave={ () => setIsHovered( false ) }
@@ -84,6 +98,8 @@ export default function BlockNavigationBlock( {
 			position={ position }
 			rowCount={ rowCount }
 			path={ path }
+			id={ `block-navigation-block-${ clientId }` }
+			data-block={ clientId }
 		>
 			<TreeGridCell
 				className="block-editor-block-navigation-block__contents-cell"
@@ -102,7 +118,7 @@ export default function BlockNavigationBlock( {
 							onClick={ () => onClick( block.clientId ) }
 							isSelected={ isSelected }
 							position={ position }
-							siblingCount={ siblingCount }
+							siblingBlockCount={ siblingBlockCount }
 							level={ level }
 							ref={ ref }
 							tabIndex={ tabIndex }

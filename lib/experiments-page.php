@@ -41,17 +41,6 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments'
 	);
 	add_settings_field(
-		'gutenberg-widget-experiments',
-		__( 'Widgets', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable Widgets screen and Legacy Widgets block', 'gutenberg' ),
-			'id'    => 'gutenberg-widget-experiments',
-		)
-	);
-	add_settings_field(
 		'gutenberg-navigation',
 		__( 'Navigation', 'gutenberg' ),
 		'gutenberg_display_experiment_field',
@@ -131,7 +120,6 @@ function gutenberg_display_experiment_section() {
  */
 function gutenberg_experiments_editor_settings( $settings ) {
 	$experiments_settings = array(
-		'__experimentalEnableLegacyWidgetBlock'   => gutenberg_is_experiment_enabled( 'gutenberg-widget-experiments' ),
 		'__experimentalEnableFullSiteEditing'     => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ),
 		'__experimentalEnableFullSiteEditingDemo' => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ),
 	);
@@ -140,8 +128,6 @@ function gutenberg_experiments_editor_settings( $settings ) {
 	if ( false !== $gradient_presets ) {
 		$experiments_settings['gradients'] = $gradient_presets;
 	}
-
-	$experiments_settings['disableCustomGradients'] = get_theme_support( 'disable-custom-gradients' );
 
 	return array_merge( $settings, $experiments_settings );
 }

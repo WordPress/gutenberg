@@ -4,6 +4,7 @@
 import {
 	createNewPost,
 	searchForBlock,
+	insertBlockDirectoryBlock,
 	setUpResponseMocking,
 	getEditedPostContent,
 	createJSONResponse,
@@ -123,6 +124,14 @@ const MOCK_BLOCKS_RESPONSES = [
 			'application/javascript; charset=utf-8'
 		),
 	},
+	{
+		// Mock the post-new page as requested via apiFetch for determining new CSS/JS assets.
+		match: ( request ) => request.url().includes( '/post-new.php' ),
+		onRequestMatch: createResponse(
+			`<html><head><script id="mock-block-js" src="${ MOCK_BLOCK1.assets[ 0 ] }"></script></head><body/></html>`,
+			'text/html; charset=UTF-8'
+		),
+	},
 ];
 
 function getResponseObject( obj, contentType ) {
@@ -170,18 +179,9 @@ describe( 'adding blocks from block directory', () => {
 		await setUpResponseMocking( MOCK_BLOCKS_RESPONSES );
 
 		// Search for the block via the inserter
-		await searchForBlock( MOCK_BLOCK1.title );
+		await insertBlockDirectoryBlock( MOCK_BLOCK1.title );
 
-		// Grab the first block in the list -> Needs to be the first one, the mock response expects it.
-		const addBtn = await page.waitForSelector(
-			'.block-directory-downloadable-blocks-list li:first-child button'
-		);
-
-		// Add the block
-		await addBtn.click();
-
-		// Delay to let block script load
-		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
+		await page.waitForSelector( `div[data-type="${ MOCK_BLOCK1.name }"]` );
 
 		// The block will auto select and get added, make sure we see it in the content
 		expect( await getEditedPostContent() ).toMatchSnapshot();

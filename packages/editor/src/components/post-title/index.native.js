@@ -76,6 +76,28 @@ class PostTitle extends Component {
 		this.richTextRef = richText;
 	}
 
+	getTitle( title, postType ) {
+		if ( 'page' === postType ) {
+			return isEmpty( title )
+				? /* translators: accessibility text. empty page title. */
+				  __( 'Page title. Empty' )
+				: sprintf(
+						/* translators: accessibility text. %s: text content of the page title. */
+						__( 'Page title. %s' ),
+						title
+				  );
+		}
+
+		return isEmpty( title )
+			? /* translators: accessibility text. empty post title. */
+			  __( 'Post title. Empty' )
+			: sprintf(
+					/* translators: accessibility text. %s: text content of the post title. */
+					__( 'Post title. %s' ),
+					title
+			  );
+	}
+
 	render() {
 		const {
 			placeholder,
@@ -84,6 +106,7 @@ class PostTitle extends Component {
 			focusedBorderColor,
 			borderStyle,
 			isDimmed,
+			postType,
 		} = this.props;
 
 		const decodedPlaceholder = decodeEntities( placeholder );
@@ -100,19 +123,12 @@ class PostTitle extends Component {
 					isDimmed && styles.dimmed,
 				] }
 				accessible={ ! this.props.isSelected }
-				accessibilityLabel={
-					isEmpty( title )
-						? /* translators: accessibility text. empty post title. */
-						  __( 'Post title. Empty' )
-						: sprintf(
-								/* translators: accessibility text. %s: text content of the post title. */
-								__( 'Post title. %s' ),
-								title
-						  )
-				}
+				accessibilityLabel={ this.getTitle( title, postType ) }
+				accessibilityHint={ __( 'Updates the title.' ) }
 			>
 				<RichText
 					setRef={ this.setRef }
+					accessibilityLabel={ this.getTitle( title, postType ) }
 					tagName={ 'p' }
 					tagsToEliminate={ [ 'strong' ] }
 					unstableOnFocus={ this.props.onSelect }
@@ -142,7 +158,9 @@ class PostTitle extends Component {
 
 export default compose(
 	withSelect( ( select ) => {
-		const { isPostTitleSelected } = select( 'core/editor' );
+		const { isPostTitleSelected, getEditedPostAttribute } = select(
+			'core/editor'
+		);
 
 		const { getSelectedBlockClientId, getBlockRootClientId } = select(
 			'core/block-editor'
@@ -152,6 +170,7 @@ export default compose(
 		const selectionIsNested = !! getBlockRootClientId( selectedId );
 
 		return {
+			postType: getEditedPostAttribute( 'type' ),
 			isAnyBlockSelected: !! selectedId,
 			isSelected: isPostTitleSelected(),
 			isDimmed: selectionIsNested,

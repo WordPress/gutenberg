@@ -81,7 +81,7 @@ describe( 'actions', () => {
 				args: [],
 				selectorName: 'getBlockTypes',
 				storeKey: 'core/blocks',
-				type: 'SELECT',
+				type: '@@data/RESOLVE_SELECT',
 			} );
 
 			expect( generator.next( [ block ] ).value ).toEqual( {
@@ -143,7 +143,7 @@ describe( 'actions', () => {
 				args: [],
 				selectorName: 'getBlockTypes',
 				storeKey: 'core/blocks',
-				type: 'SELECT',
+				type: '@@data/RESOLVE_SELECT',
 			} );
 
 			expect( generator.next( [ inactiveBlock ] ).value ).toEqual( {
@@ -154,31 +154,6 @@ describe( 'actions', () => {
 
 			expect( generator.next() ).toEqual( {
 				value: true,
-				done: true,
-			} );
-		} );
-
-		it( 'should set an error if the plugin has no assets', () => {
-			const generator = installBlockType( { ...block, assets: [] } );
-
-			expect( generator.next().value ).toEqual( {
-				type: 'CLEAR_ERROR_NOTICE',
-				blockId: block.id,
-			} );
-
-			expect( generator.next().value ).toMatchObject( {
-				type: 'SET_ERROR_NOTICE',
-				blockId: block.id,
-			} );
-
-			expect( generator.next().value ).toEqual( {
-				type: 'SET_INSTALLING_BLOCK',
-				blockId: block.id,
-				isInstalling: false,
-			} );
-
-			expect( generator.next() ).toEqual( {
-				value: false,
 				done: true,
 			} );
 		} );
@@ -299,7 +274,7 @@ describe( 'actions', () => {
 				data: null,
 			};
 			expect( generator.throw( apiError ).value ).toMatchObject( {
-				type: 'DISPATCH',
+				type: '@@data/DISPATCH',
 				actionName: 'createErrorNotice',
 				storeKey: 'core/notices',
 			} );

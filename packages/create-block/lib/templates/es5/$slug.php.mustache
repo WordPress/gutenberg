@@ -39,6 +39,7 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 		),
 		filemtime( "$dir/$index_js" )
 	);
+	wp_set_script_translations( '{{namespace}}-{{slug}}-block-editor', '{{textdomain}}' );
 
 	$editor_css = 'editor.css';
 	wp_register_style(

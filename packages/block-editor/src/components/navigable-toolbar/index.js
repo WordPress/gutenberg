@@ -9,21 +9,12 @@ import {
 	useEffect,
 	useCallback,
 } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 import { focus } from '@wordpress/dom';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
-function useUpdateLayoutEffect( effect, deps ) {
-	const mounted = useRef( false );
-	useLayoutEffect( () => {
-		if ( mounted.current ) {
-			return effect();
-		}
-		mounted.current = true;
-	}, deps );
-}
-
 function hasOnlyToolbarItem( elements ) {
-	const dataProp = 'experimentalToolbarItem';
+	const dataProp = 'toolbarItem';
 	return ! elements.some( ( element ) => ! ( dataProp in element.dataset ) );
 }
 
@@ -59,12 +50,18 @@ function useIsAccessibleToolbar( ref ) {
 
 	const determineIsAccessibleToolbar = useCallback( () => {
 		const tabbables = focus.tabbable.find( ref.current );
-		setIsAccessibleToolbar( hasOnlyToolbarItem( tabbables ) );
+		const onlyToolbarItem = hasOnlyToolbarItem( tabbables );
+		if ( ! onlyToolbarItem ) {
+			deprecated( 'Using custom components as toolbar controls', {
+				alternative: 'ToolbarItem or ToolbarButton components',
+				link:
+					'https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols',
+			} );
+		}
+		setIsAccessibleToolbar( onlyToolbarItem );
 	}, [] );
 
-	useLayoutEffect( determineIsAccessibleToolbar, [] );
-
-	useUpdateLayoutEffect( () => {
+	useLayoutEffect( () => {
 		// Toolbar buttons may be rendered asynchronously, so we use
 		// MutationObserver to check if the toolbar subtree has been modified
 		const observer = new window.MutationObserver(
@@ -106,7 +103,7 @@ function NavigableToolbar( { children, focusOnMount, ...props } ) {
 	if ( isAccessibleToolbar ) {
 		return (
 			<Toolbar
-				__experimentalAccessibilityLabel={ props[ 'aria-label' ] }
+				label={ props[ 'aria-label' ] }
 				ref={ wrapper }
 				{ ...props }
 			>

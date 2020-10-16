@@ -4,6 +4,7 @@
 import { Button, ButtonGroup } from '@wordpress/components';
 import { chevronLeft, chevronRight } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
+import { useBlockProps } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -42,12 +43,16 @@ export default function QueryPaginationEdit( {
 			</Button>
 		);
 	}
-	return previous || next ? (
-		<ButtonGroup>
-			{ previous }
-			{ next }
-		</ButtonGroup>
-	) : (
-		__( 'No pages to paginate.' )
+	return (
+		<div { ...useBlockProps() }>
+			{ previous || next ? (
+				<ButtonGroup>
+					{ previous }
+					{ next }
+				</ButtonGroup>
+			) : (
+				__( 'No pages to paginate.' )
+			) }
+		</div>
 	);
 }

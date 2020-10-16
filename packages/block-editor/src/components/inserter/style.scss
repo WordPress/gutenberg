@@ -9,7 +9,7 @@ $block-inserter-tabs-height: 44px;
 	padding: 0;
 	font-family: $default-font;
 	font-size: $default-font-size;
-	line-height: $default-line-height;
+	line-height: 0;
 
 	@include break-medium {
 		position: relative;
@@ -99,7 +99,7 @@ $block-inserter-tabs-height: 44px;
 		}
 
 		&::placeholder {
-			color: $dark-gray-400;
+			color: $gray-700;
 		}
 
 		&::-webkit-search-decoration,
@@ -135,7 +135,7 @@ $block-inserter-tabs-height: 44px;
 		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60;
 		background: $white;
 		z-index: 1;
-		border-bottom: $border-width solid $gray-200;
+		border-bottom: $border-width solid $gray-300;
 
 		.components-tab-panel__tabs-item {
 			flex-grow: 1;
@@ -157,16 +157,30 @@ $block-inserter-tabs-height: 44px;
 	padding: $grid-unit-20 $grid-unit-20 0;
 }
 
-.block-editor-inserter__panel-content {
-	padding: 0 $grid-unit-20;
+.block-editor-inserter__panel-header-patterns {
+	padding: $grid-unit-20 $grid-unit-20 0 $grid-unit-10;
 }
 
-.block-editor-inserter__panel-title {
+.block-editor-inserter__panel-content {
+	padding: $grid-unit-20;
+}
+
+.block-editor-inserter__panel-title,
+.block-editor-inserter__panel-title button,
+.components-custom-select-control__menu li {
 	margin: 0 $grid-unit-15 0 0;
 	color: $gray-700;
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: 500;
+}
+
+.block-editor-inserter__panel-dropdown select.components-select-control__input.components-select-control__input.components-select-control__input {
+	line-height: 1.2;
+}
+
+.block-editor-inserter__panel-dropdown select {
+	border: none;
 }
 
 .block-editor-inserter__block-list {
@@ -175,7 +189,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__popover .block-editor-block-types-list {
-	margin: 0 -8px;
+	margin: -8px;
 }
 
 .block-editor-inserter__reusable-blocks-panel {
@@ -195,7 +209,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__no-results-icon {
-	fill: $light-gray-800;
+	fill: $gray-600;
 }
 
 .block-editor-inserter__child-blocks {
@@ -220,10 +234,12 @@ $block-inserter-tabs-height: 44px;
 	width: 300px;
 	background: $white;
 	border-radius: $radius-block-ui;
-	border: $border-width solid $gray-200;
+	border: $border-width solid $gray-300;
 	position: absolute;
 	top: $grid-unit-20;
 	left: calc(100% + #{$grid-unit-20});
+	max-height: calc(100% - #{$grid-unit-40});
+	overflow-y: hidden;
 
 	@include break-medium {
 		display: block;
@@ -252,12 +268,12 @@ $block-inserter-tabs-height: 44px;
 	justify-content: center;
 	align-items: center;
 	min-height: $grid-unit-60 * 3;
-	color: $dark-gray-400;
+	color: $gray-700;
 	background: $gray-100;
 }
 
 .block-editor-inserter__tips {
-	border-top: $border-width solid $gray-200;
+	border-top: $border-width solid $gray-300;
 	padding: $grid-unit-20;
 	flex-shrink: 0;
 }
@@ -268,6 +284,10 @@ $block-inserter-tabs-height: 44px;
 
 .block-editor-inserter__quick-inserter {
 	width: 100%;
+
+	// Constrain to container. Avoids overflow bug on FF 79
+	// see https://github.com/WordPress/gutenberg/issues/24529.
+	max-width: 100%;
 
 	@include break-medium {
 		width: $block-inserter-width;
@@ -281,12 +301,12 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__quick-inserter .block-editor-inserter__panel-content {
-	padding: 0 $grid-unit-10;
+	padding: $grid-unit-10;
 }
 
 .block-editor-inserter__quick-inserter.has-search .block-editor-inserter__panel-content,
 .block-editor-inserter__quick-inserter.has-expand .block-editor-inserter__panel-content {
-	padding: 0 $grid-unit-20;
+	padding: $grid-unit-20;
 }
 
 .block-editor-inserter__quick-inserter-patterns {
@@ -296,7 +316,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__quick-inserter-separator {
-	border-top: $border-width solid $gray-200;
+	border-top: $border-width solid $gray-300;
 }
 
 .block-editor-inserter__popover.is-quick > .components-popover__content > div {
@@ -310,13 +330,16 @@ $block-inserter-tabs-height: 44px;
 	width: 100%;
 	height: ($button-size + $grid-unit-10);
 	border-radius: 0;
-	margin-top: $grid-unit-20;
 
 	&:hover {
 		color: $white;
 	}
 
+	&:active {
+		color: $gray-400;
+	}
+
 	&:focus:not(:disabled) {
-		box-shadow: inset 0 0 0 $border-width-focus $gray-900, inset 0 0 0 2px $white;
+		box-shadow: inset 0 0 0 1.5px var(--wp-admin-theme-color), inset 0 0 0 3px #fff;
 	}
 }

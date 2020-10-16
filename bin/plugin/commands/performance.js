@@ -28,7 +28,6 @@ const config = require( '../config' );
  * @typedef WPRawPerformanceResults
  *
  * @property {number[]} load             Load Time.
- * @property {number[]} domcontentloaded DOM Contentloaded time.
  * @property {number[]} type             Average type time.
  * @property {number[]} focus            Average block selection time.
  */
@@ -37,7 +36,6 @@ const config = require( '../config' );
  * @typedef WPPerformanceResults
  *
  * @property {number} load             Load Time.
- * @property {number} domcontentloaded DOM Contentloaded time.
  * @property {number} type             Average type time.
  * @property {number} minType          Minium type time.
  * @property {number} maxType          Maximum type time.
@@ -49,7 +47,6 @@ const config = require( '../config' );
  * @typedef WPFormattedPerformanceResults
  *
  * @property {string=} load             Load Time.
- * @property {string=} domcontentloaded DOM Contentloaded time.
  * @property {string=} type             Average type time.
  * @property {string=} minType          Minium type time.
  * @property {string=} maxType          Maximum type time.
@@ -106,7 +103,6 @@ function formatTime( number ) {
 function curateResults( results ) {
 	return {
 		load: average( results.load ),
-		domcontentloaded: average( results.domcontentloaded ),
 		type: average( results.type ),
 		minType: Math.min( ...results.type ),
 		maxType: Math.max( ...results.type ),
@@ -117,21 +113,12 @@ function curateResults( results ) {
 }
 
 /**
- * Runs the performance tests on a given branch.
+ * Set up the given branch for testing.
  *
- * @param {string} performanceTestDirectory Path to the performance tests' clone.
- * @param {string} environmentDirectory     Path to the plugin environment's clone.
- * @param {string} testSuite                Name of the tests set.
  * @param {string} branch                   Branch name.
- *
- * @return {Promise<WPFormattedPerformanceResults>} Performance results for the branch.
+ * @param {string} environmentDirectory     Path to the plugin environment's clone.
  */
-async function getPerformanceResultsForBranch(
-	performanceTestDirectory,
-	environmentDirectory,
-	testSuite,
-	branch
-) {
+async function setUpGitBranch( branch, environmentDirectory ) {
 	// Restore clean working directory (e.g. if `package-lock.json` has local
 	// changes after install).
 	await git.discardLocalChanges( environmentDirectory );
@@ -144,10 +131,17 @@ async function getPerformanceResultsForBranch(
 		'rm -rf node_modules && npm install && npm run build',
 		environmentDirectory
 	);
+}
 
-	log(
-		'>> Running the test on the ' + formats.success( branch ) + ' branch'
-	);
+/**
+ * Runs the performance tests on the current branch.
+ *
+ * @param {string} testSuite                Name of the tests set.
+ * @param {string} performanceTestDirectory Path to the performance tests' clone.
+ *
+ * @return {Promise<WPFormattedPerformanceResults>} Performance results for the branch.
+ */
+async function runTestSuite( testSuite, performanceTestDirectory ) {
 	const results = [];
 	for ( let i = 0; i < 3; i++ ) {
 		await runShellScript(
@@ -166,7 +160,6 @@ async function getPerformanceResultsForBranch(
 	const medians = mapValues(
 		{
 			load: results.map( ( r ) => r.load ),
-			domcontentloaded: results.map( ( r ) => r.domcontentloaded ),
 			type: results.map( ( r ) => r.type ),
 			minType: results.map( ( r ) => r.minType ),
 			maxType: results.map( ( r ) => r.maxType ),
@@ -246,18 +239,26 @@ async function runPerformanceTests( branches, options ) {
 	const testSuites = [ 'post-editor', 'site-editor' ];
 
 	/** @type {Record<string,Record<string, WPFormattedPerformanceResults>>} */
-	const results = {};
-	for ( const testSuite of testSuites ) {
-		results[ testSuite ] = {};
-		for ( const branch of branches ) {
-			results[ testSuite ][
-				branch
-			] = await getPerformanceResultsForBranch(
-				performanceTestDirectory,
-				environmentDirectory,
-				testSuite,
-				branch
-			);
+	let results = {};
+	for ( const branch of branches ) {
+		await setUpGitBranch( branch, environmentDirectory );
+		log(
+			'>> Running the test on the ' +
+				formats.success( branch ) +
+				' branch'
+		);
+
+		for ( const testSuite of testSuites ) {
+			results = {
+				...results,
+				[ testSuite ]: {
+					...results[ testSuite ],
+					[ branch ]: await runTestSuite(
+						testSuite,
+						performanceTestDirectory
+					),
+				},
+			};
 		}
 	}
 

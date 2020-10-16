@@ -29,7 +29,11 @@ $arrow-size: 8px;
 		margin-left: 2px;
 
 		&::before {
-			border: $arrow-size solid $gray-900;
+			border: $arrow-size solid $gray-400;
+		}
+
+		&.is-alternate::before {
+			border-color: $gray-900;
 		}
 
 		&::after {

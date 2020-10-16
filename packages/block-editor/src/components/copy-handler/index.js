@@ -8,7 +8,7 @@ import {
 	documentHasUncollapsedSelection,
 } from '@wordpress/dom';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -34,12 +34,12 @@ export function useNotifyCopy() {
 			notice =
 				eventType === 'copy'
 					? sprintf(
-							// Translators: Name of the block being copied, e.g. "Paragraph"
+							// Translators: Name of the block being copied, e.g. "Paragraph".
 							__( 'Copied "%s" to clipboard.' ),
 							title
 					  )
 					: sprintf(
-							// Translators: Name of the block being cut, e.g. "Paragraph"
+							// Translators: Name of the block being cut, e.g. "Paragraph".
 							__( 'Moved "%s" to clipboard.' ),
 							title
 					  );
@@ -47,13 +47,21 @@ export function useNotifyCopy() {
 			notice =
 				eventType === 'copy'
 					? sprintf(
-							// Translators: Number of blocks being copied
-							__( 'Copied %d blocks to clipboard.' ),
+							// Translators: %d: Number of blocks being copied.
+							_n(
+								'Copied %d block to clipboard.',
+								'Copied %d blocks to clipboard.',
+								selectedBlockClientIds.length
+							),
 							selectedBlockClientIds.length
 					  )
 					: sprintf(
-							// Translators: Number of blocks being cut
-							__( 'Moved %d blocks to clipboard.' ),
+							// Translators: %d: Number of blocks being cut.
+							_n(
+								'Moved %d block to clipboard.',
+								'Moved %d blocks to clipboard.',
+								selectedBlockClientIds.length
+							),
 							selectedBlockClientIds.length
 					  );
 		}
@@ -92,12 +100,14 @@ function CopyHandler( { children } ) {
 
 		// Always handle multiple selected blocks.
 		if ( ! hasMultiSelection() ) {
+			const { target } = event;
+			const { ownerDocument } = target;
 			// If copying, only consider actual text selection as selection.
 			// Otherwise, any focus on an input field is considered.
 			const hasSelection =
 				event.type === 'copy' || event.type === 'cut'
-					? documentHasUncollapsedSelection()
-					: documentHasSelection();
+					? documentHasUncollapsedSelection( ownerDocument )
+					: documentHasSelection( ownerDocument );
 
 			// Let native copy behaviour take over in input fields.
 			if ( hasSelection ) {

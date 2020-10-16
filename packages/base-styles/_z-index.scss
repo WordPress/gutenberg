@@ -84,6 +84,12 @@ $z-layers: (
 	".edit-site-sidebar {greater than small}": 90,
 	".edit-widgets-sidebar {greater than small}": 90,
 
+	// Show interface skeleton footer above interface skeleton drawer
+	".interface-interface-skeleton__footer": 90,
+
+	// Show the navigation toggle above the skeleton header
+	".edit-site-navigation-toggle": 31,
+
 	// Show notices below expanded editor bar
 	// .edit-post-header { z-index: 30 }
 	".components-notice-list": 29,
@@ -105,12 +111,13 @@ $z-layers: (
 	".components-popover": 1000000,
 
 	// ...Except for popovers immediately beneath wp-admin menu on large breakpoints
-	".components-popover.block-editor-inserter__popover": 99998,
+	".components-popover.block-editor-inserter__popover": 99999,
 	".components-popover.table-of-contents__popover": 99998,
 	".components-popover.block-editor-block-navigation__popover": 99998,
 	".components-popover.edit-post-more-menu__content": 99998,
 	".components-popover.edit-site-more-menu__content": 99998,
 	".components-popover.block-editor-rich-text__inline-format-toolbar": 99998,
+	".components-popover.block-editor-warning__dropdown": 99998,
 
 	".components-autocomplete__results": 1000000,
 

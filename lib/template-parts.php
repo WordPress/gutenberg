@@ -9,10 +9,6 @@
  * Registers block editor 'wp_template_part' post type.
  */
 function gutenberg_register_template_part_post_type() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
-		return;
-	}
-
 	$labels = array(
 		'name'                  => __( 'Template Parts', 'gutenberg' ),
 		'singular_name'         => __( 'Template Part', 'gutenberg' ),
@@ -163,7 +159,7 @@ function filter_rest_wp_template_part_collection_params( $query_params ) {
 	);
 	return $query_params;
 }
-apply_filters( 'rest_wp_template_part_collection_params', 'filter_rest_wp_template_part_collection_params', 99, 1 );
+add_filter( 'rest_wp_template_part_collection_params', 'filter_rest_wp_template_part_collection_params', 99, 1 );
 
 /**
  * Filter for supporting the `resolved`, `template`, and `theme` parameters in `wp_template_part` queries.
@@ -214,14 +210,29 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 		);
 
 		// Ensure auto-drafts of all theme supplied template parts are created.
-		if ( wp_get_theme()->get( 'TextDomain' ) === $request['theme'] ) {
+		if ( wp_get_theme()->stylesheet === $request['theme'] ) {
+			/**
+			 * Finds all nested template part file paths in a theme's directory.
+			 *
+			 * @param string $base_directory The theme's file path.
+			 * @return array $path_list A list of paths to all template part files.
+			 */
+			function get_template_part_paths( $base_directory ) {
+				$path_list = array();
+				if ( file_exists( $base_directory . '/block-template-parts' ) ) {
+					$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base_directory . '/block-template-parts' ) );
+					$nested_html_files = new RegexIterator( $nested_files, '/^.+\.html$/i', RecursiveRegexIterator::GET_MATCH );
+					foreach ( $nested_html_files as $path => $file ) {
+						$path_list[] = $path;
+					}
+				}
+				return $path_list;
+			}
+
 			// Get file paths for all theme supplied template parts.
-			$template_part_files = glob( get_stylesheet_directory() . '/block-template-parts/*.html' );
-			$template_part_files = is_array( $template_part_files ) ? $template_part_files : array();
+			$template_part_files = get_template_part_paths( get_stylesheet_directory() );
 			if ( is_child_theme() ) {
-				$child_template_part_files = glob( get_template_directory() . '/block-template-parts/*.html' );
-				$child_template_part_files = is_array( $child_template_part_files ) ? $child_template_part_files : array();
-				$template_part_files       = array_merge( $template_part_files, $child_template_part_files );
+				$template_part_files = array_merge( $template_part_files, get_template_part_paths( get_template_directory() ) );
 			}
 			// Build and save each template part.
 			foreach ( $template_part_files as $template_part_file ) {

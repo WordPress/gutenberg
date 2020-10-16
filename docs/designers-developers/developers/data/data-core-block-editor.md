@@ -243,15 +243,17 @@ _Returns_
 
 <a name="getBlockParentsByBlockName" href="#getBlockParentsByBlockName">#</a> **getBlockParentsByBlockName**
 
-Given a block client ID and a block name,
-returns the list of all its parents from top to bottom,
-filtered by the given name.
+Given a block client ID and a block name, returns the list of all its parents
+from top to bottom, filtered by the given name(s). For example, if passed
+'core/group' as the blockName, it will only return parents which are group
+blocks. If passed `[ 'core/group', 'core/cover']`, as the blockName, it will
+return parents which are group blocks and parents which are cover blocks.
 
 _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: Block from which to find root client ID.
--   _blockName_ `string`: Block name to filter.
+-   _blockName_ `(string|Array<string>)`: Block name(s) to filter.
 -   _ascending_ `boolean`: Order results from bottom to top (true) or top to bottom (false).
 
 _Returns_
@@ -363,6 +365,20 @@ _Returns_
 
 -   `Array`: ids of top-level and descendant blocks.
 
+<a name="getDraggedBlockClientIds" href="#getDraggedBlockClientIds">#</a> **getDraggedBlockClientIds**
+
+Returns the client ids of any blocks being directly dragged.
+
+This does not include children of a parent being dragged.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Array<string>`: Array of dragged block client ids.
+
 <a name="getFirstMultiSelectedBlockClientId" href="#getFirstMultiSelectedBlockClientId">#</a> **getFirstMultiSelectedBlockClientId**
 
 Returns the client ID of the first block in the multi-selection set, or null
@@ -426,7 +442,7 @@ _Properties_
 -   _category_ `string`: Block category that the item is associated with.
 -   _keywords_ `Array<string>`: Keywords that can be searched to find this item.
 -   _isDisabled_ `boolean`: Whether or not the user should be prevented from inserting this item.
--   _frecency_ `number`: Hueristic that combines frequency and recency.
+-   _frecency_ `number`: Heuristic that combines frequency and recency.
 
 <a name="getLastMultiSelectedBlockClientId" href="#getLastMultiSelectedBlockClientId">#</a> **getLastMultiSelectedBlockClientId**
 
@@ -737,6 +753,19 @@ _Returns_
 
 -   `boolean`: Whether the block as an inner block selected
 
+<a name="isAncestorBeingDragged" href="#isAncestorBeingDragged">#</a> **isAncestorBeingDragged**
+
+Returns whether a parent/ancestor of the block is being dragged.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: Client id for block to check.
+
+_Returns_
+
+-   `boolean`: Whether the block's ancestor is being dragged.
+
 <a name="isAncestorMultiSelected" href="#isAncestorMultiSelected">#</a> **isAncestorMultiSelected**
 
 Returns true if an ancestor of the block is multi-selected, or false
@@ -750,6 +779,23 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether an ancestor of the block is in multi-selection set.
+
+<a name="isBlockBeingDragged" href="#isBlockBeingDragged">#</a> **isBlockBeingDragged**
+
+Returns whether the block is being dragged.
+
+Only returns true if the block is being directly dragged,
+not if the block is a child of a parent being dragged.
+See `isAncestorBeingDragged` for child blocks.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _clientId_ `string`: Client id for block to check.
+
+_Returns_
+
+-   `boolean`: Whether the block is being dragged.
 
 <a name="isBlockHighlighted" href="#isBlockHighlighted">#</a> **isBlockHighlighted**
 
@@ -1051,6 +1097,7 @@ _Parameters_
 -   _index_ `?number`: Index at which block should be inserted.
 -   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
 -   _updateSelection_ `?boolean`: If true block selection will be updated.  If false, block selection will not change. Defaults to true.
+-   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 _Returns_
 
@@ -1192,6 +1239,7 @@ _Parameters_
 -   _blocks_ `(Object|Array<Object>)`: Replacement block(s).
 -   _indexToSelect_ `number`: Index of replacement block to select.
 -   _initialPosition_ `number`: Index of caret after in the selected block after the operation.
+-   _meta_ `?Object`: Optional Meta values to be passed to the action object.
 
 <a name="replaceInnerBlocks" href="#replaceInnerBlocks">#</a> **replaceInnerBlocks**
 
@@ -1340,6 +1388,10 @@ _Returns_
 <a name="startDraggingBlocks" href="#startDraggingBlocks">#</a> **startDraggingBlocks**
 
 Returns an action object used in signalling that the user has begun to drag blocks.
+
+_Parameters_
+
+-   _clientIds_ `Array<string>`: An array of client ids being dragged
 
 _Returns_
 

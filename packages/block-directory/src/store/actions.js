@@ -12,7 +12,7 @@ import getPluginUrl from './utils/get-plugin-url';
 
 /**
  * Returns an action object used in signalling that the downloadable blocks
- * have been requested and is loading.
+ * have been requested and are loading.
  *
  * @param {string} filterValue Search string.
  *
@@ -51,9 +51,6 @@ export function* installBlockType( block ) {
 	let success = false;
 	yield clearErrorNotice( id );
 	try {
-		if ( ! Array.isArray( assets ) || ! assets.length ) {
-			throw new Error( __( 'Block has no assets.' ) );
-		}
 		yield setIsInstalling( block.id, true );
 
 		// If we have a wp:plugin link, the plugin is installed but inactive.
@@ -153,7 +150,8 @@ export function* uninstallBlockType( block ) {
 }
 
 /**
- * Returns an action object used to add a newly installed block type.
+ * Returns an action object used to add a block type to the "newly installed"
+ * tracking list.
  *
  * @param {Object} item The block item with the block id and name.
  *
@@ -167,7 +165,8 @@ export function addInstalledBlockType( item ) {
 }
 
 /**
- * Returns an action object used to remove a newly installed block type.
+ * Returns an action object used to remove a block type from the "newly installed"
+ * tracking list.
  *
  * @param {string} item The block item with the block id and name.
  *
@@ -181,7 +180,7 @@ export function removeInstalledBlockType( item ) {
 }
 
 /**
- * Returns an action object used to indicate install in progress
+ * Returns an action object used to indicate install in progress.
  *
  * @param {string} blockId
  * @param {boolean} isInstalling
@@ -197,11 +196,11 @@ export function setIsInstalling( blockId, isInstalling ) {
 }
 
 /**
- * Sets an error notice string to be displayed to the user
+ * Sets an error notice to be displayed to the user for a given block.
  *
- * @param {string} blockId The ID of the block plugin. eg: my-block
+ * @param {string} blockId  The ID of the block plugin. eg: my-block
  * @param {string} message  The message shown in the notice.
- * @param {boolean} isFatal Whether the user can recover from the error
+ * @param {boolean} isFatal Whether the user can recover from the error.
  *
  * @return {Object} Action object.
  */
@@ -215,7 +214,7 @@ export function setErrorNotice( blockId, message, isFatal = false ) {
 }
 
 /**
- * Sets the error notice to empty for specific block
+ * Sets the error notice to empty for specific block.
  *
  * @param {string} blockId The ID of the block plugin. eg: my-block
  *

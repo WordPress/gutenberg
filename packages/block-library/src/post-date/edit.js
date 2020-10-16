@@ -13,7 +13,7 @@ import {
 	AlignmentToolbar,
 	BlockControls,
 	InspectorControls,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import {
 	ToolbarGroup,
@@ -24,9 +24,10 @@ import {
 	CustomSelectControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { edit } from '@wordpress/icons';
 
 export default function PostDateEdit( { attributes, context, setAttributes } ) {
-	const { align, format } = attributes;
+	const { textAlign, format } = attributes;
 	const { postId, postType } = context;
 
 	const [ siteFormat ] = useEntityProp( 'root', 'site', 'date_format' );
@@ -55,21 +56,26 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 		} )
 	);
 	const resolvedFormat = format || siteFormat || settings.formats.date;
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 
 	return (
 		<>
 			<BlockControls>
 				<AlignmentToolbar
-					value={ align }
+					value={ textAlign }
 					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
+						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
 
 				{ date && (
 					<ToolbarGroup>
 						<ToolbarButton
-							icon="edit"
+							icon={ edit }
 							title={ __( 'Change Date' ) }
 							onClick={ () =>
 								setIsPickerOpen(
@@ -99,11 +105,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 				</PanelBody>
 			</InspectorControls>
 
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ align }` ]: align,
-				} ) }
-			>
+			<div { ...blockProps }>
 				{ date && (
 					<time dateTime={ dateI18n( 'c', date ) }>
 						{ dateI18n( resolvedFormat, date ) }
@@ -122,7 +124,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 					</time>
 				) }
 				{ ! date && __( 'No Date' ) }
-			</Block.div>
+			</div>
 		</>
 	);
 }

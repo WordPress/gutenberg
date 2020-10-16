@@ -1,62 +1,129 @@
 # Getting Started
 
-Gutenberg is built using the [latest active LTS release](https://github.com/nodejs/Release#release-schedule) of [Node.js](https://nodejs.org/en/), along with the latest version of [NPM](http://npmjs.com/).
+The following guide is for setting up your local environment to contribute to the Gutenberg project. There is significant overlap between an environment to contribute and an environment used to extend the WordPress block editor. You can review the [Development Enviornment tutorial](/docs/designers-developers/developers/tutorials/devenv/readme.md) for additional setup information.
 
-The easiest way to install and manage node and NPM (on macOS, Linux, or Windows 10 with the Linux Subsystem) is by using [nvm](https://github.com/creationix/nvm). Once nvm is installed, you can install the correct version of Node by running nvm install --latest-npm in the Gutenberg directory.
+## Development Tools (Node)
 
-> **Note:** If you find yourself needing to build older versions of Gutenberg, nvm makes that process easier too. Because Gutenberg's `.nvmrc` file is regularly updated to the current available LTS release, running `nvm install` on an older branch will install whichever LTS version was active at that time.
+Gutenberg is a JavaScript project and requires [Node.js](https://nodejs.org/). The project is built using the latest active LTS release of node, and the latest verion of NPM. See the [LTS release schedule](https://github.com/nodejs/Release#release-schedule) for details.
 
-Once you have Node installed, run these scripts from within your local Gutenberg repository:
+We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) since it is the easiest way to install and manage node for macOS, Linux, and Windows 10 using WSL2. See [our Development Tools guide](/docs/designers-developers/developers/tutorials/devenv/readme.md#development-tools) or the Nodejs site for additional installation instructions.
 
-Note: The install scripts require [Python](https://www.python.org/) to be installed and in the path of the local system.
+After installing Node, you can build Gutenberg by running the following from within the cloned repository:
+
 
 ```bash
 npm install
 npm run build
 ```
 
-This will build Gutenberg, ready to be used as a WordPress plugin!
+> Note: The install scripts require [Python](https://www.python.org/) to be installed and in the path of the local system. This might be installed by default for your operating system, or require downloading and installing.
 
-`npm run build` is intended for one-off compilations of the project. If you're planning to do continued development in the source files, using `npm run dev` will most often be the better option. This will configure the build to avoid minifying the generated output, rebuild files automatically as they are changed in your working directory, and configure dependencies as running in a development environment so that useful warnings and errors are logged to your browser's developer console.
+Once built, Gutenberg is ready to be used as a WordPress plugin!
 
-If you don't have a local WordPress environment to load Gutenberg in, we can help get that up and running, too.
+`npm run build` creates a single build of the project once. While developing, you probably will want to use `npm run dev` to run continuous builds automatically as source files change. The dev build also includes additional warnings and errors to help troubleshoot while developing.
 
 ## Local Environment
 
-### Step 1: Installing a Local Environment
+If you are familiar with WordPress and already have an environment setup, use the above build as a standard WordPress plugin by putting the gutenberg directory in your wp-content/plugins/ directory.
 
-The quickest way to get up and running is to use the [`wp-env` command](https://github.com/WordPress/gutenberg/tree/master/packages/env), which is developed within the Gutenberg source repository, and published as `@wordpress/env` to npm. In its default mode, it'll install and run a local WordPress environment for you; however, it's also possible to [configure](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md#wp-envjson) it to use a pre-existing local WordPress installation.
+If you do not have a local WordPress environment setup, follow the steps in the rest of this section to create one.
 
-If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`.
+### Using wp-env to Install a Local Environment
 
-To install Docker, follow their instructions here for [Windows 10 Pro](https://docs.docker.com/docker-for-windows/install/), [all other version of Windows](https://docs.docker.com/toolbox/toolbox_install_windows/), [macOS](https://docs.docker.com/docker-for-mac/install/), or [Linux](https://docs.docker.com/v17.12/install/linux/docker-ce/ubuntu/#install-using-the-convenience-script). If running Ubuntu, see these [extended instructions for help and troubleshooting](/docs/contributors/env-ubuntu.md).
+The [wp-env package](/packages/env/README.md) was developed with the Gutneberg project as a quick way to create a standard WordPress environment using Docker. It is also published as the `@wordpress/env` npm package.
 
-To install Docker Compose, [follow their instructions here](https://docs.docker.com/compose/install/), be sure to select your operating system for proper instructions.
+By default, `wp-env` can run in a plugin direcotry to create and run a WordPress enviornment, mounting and activating the plugin automatically. You can also configure `wp-env` to use existing installs, multiple plugins, or themes. See the [wp-env package](/packages/env/README.md#wp-envjson) for complete documentation.
 
-Once Docker is installed and running, run this script to install WordPress, and build your local environment:
+If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`. See the [Developement Environment tutorial for additional details](/docs/designers-developers/developers/tutorials/devenv/readme.md).
+
+Once Docker is installed and running: To install WordPress, run the following from within the cloned gutenberg directory:
 
 ```bash
-npx wp-env start
+npm run wp-env start
 ```
 
-### Step 2: Accessing and Configuring the Local WordPress Install
+> Note: `npm run` will use the version specified within the Gutenberg project, making sure you are running the latest wp-env version.
+
+To stop the running environment:
+
+```bash
+npm run wp-env stop
+```
+
+To destroy the install completely:
+
+```bash
+npm run wp-env destroy
+```
+
+Explore the [package documentation](/packages/env/README.md) for additional commands.
+
 
 #### Accessing the Local WordPress Install
 
-The WordPress installation should now be available at `http://localhost:8888` (**Username**: `admin`, **Password**: `password`).
-If this port is in use, you can override it using the `WP_ENV_PORT` environment variable. For more information, consult the `wp-env` [README](https://github.com/WordPress/gutenberg/blob/master/packages/env/README.md).
+The WordPress installation should now be available at `http://localhost:8888`
 
-To shut down this local WordPress instance run `npx wp-env stop`. To start it back up again, run `npx wp-env start` again.
-
-#### Toggling Debug Systems
-
-WordPress comes with specific [debug systems](https://wordpress.org/support/article/debugging-in-wordpress/) designed to simplify the process as well as standardize code across core, plugins and themes. In order to use with `wp-env,` you'll have to edit your local WordPress install's `wp-config.php`.
+You can access the Dashboard at: `http://localhost:8888/wp-admin/` using **Username**: `admin`, **Password**: `password`.  You'll notice the Gutenberg plugin installed and activated, this is your local build.
 
 #### Troubleshooting
 
-See the [relevant section in `wp-env` docs](https://github.com/WordPress/gutenberg/tree/master/packages/env#troubleshooting-common-problems).
+If you run into an issue, check the [troubleshooting section in `wp-env` documentation](/packages/env/README.md#troubleshooting-common-problems).
+
+### Using Local or MAMP
+
+You can also use [Local by Flywheel](https://localbyflywheel.com/), [WampServer](http://www.wampserver.com/en/), or [MAMP](https://www.mamp.info/) as alternative environments to run a local WordPress environment. To do so clone and install Gutenberg as a regular plugin in your installation by creating a symlink or copying the directory to the proper `wp-content/plugins` directory.
+
+You will also need some extra configuration to be able to run the e2e tests.
+
+Change the current directory to the plugins folder and symlink all e2e test plugins:
+
+```bash
+ln -s gutenberg/packages/e2e-tests/plugins/* .
+```
+
+You'll need to run this again if new plugins are added. To run e2e tests:
+
+```bash
+WP_BASE_URL=http://localhost:8888/gutenberg npm run test-e2e
+```
+
+#### Caching of PHP files
+
+You'll need to disable OPCache in order to correctly work on PHP files. To fix:
+
+- Go to **MAMP > Preferences > PHP**
+- Under **Cache**, select **off**
+- Confirm with **OK**
+
+#### Incoming connections
+
+By default, the web server (Apache) launched by MAMP will listen to all incoming connections, not just local ones. This means that anyone on the same local network (and, in certain cases, anyone on the Internet) can access your web server. This may be intentional and useful for testing sites on other devices, but most often this can be a privacy or security issue. Keep this in mind and don't store sensitive information in this server.
+
+While it is possible to fix this, you should fix it at your own risk, since it breaks MAMP's ability to parse web server configurations and, as a result, makes MAMP think that Apache is listening to the wrong port. Consider switching away from MAMP. Otherwise, you can use the following:
+
+- Edit `/Applications/MAMP/conf/apache/httpd.conf`
+- Change `Listen 8888` to `Listen 127.0.0.1:8888`
+
+#### Linking to other directories
+
+You may like to create links in your `plugins` and `themes` directories to other folders, e.g.
+
+- wp-content/plugins/gutenberg -> ~/projects/gutenberg
+- wp-content/themes/twentytwenty -> ~/projects/twentytwenty
+
+If so, you need to instruct Apache to allow following such links:
+
+- Open or start a new file at `/Applications/MAMP/htdocs/.htaccess`
+- Add the following line: `Options +SymLinksIfOwnerMatch`
+
+#### Using WP-CLI
+
+Tools like MAMP tend to configure MySQL to use ports other than the default 3306, often preferring 8889. This may throw off WP-CLI, which will fail after trying to connect to the database. To remedy this, edit `wp-config.php` and change the `DB_HOST` constant from `define( 'DB_HOST', 'localhost' )` to `define( 'DB_HOST', '127.0.0.1:8889' )`.
 
 ## On A Remote Server
+=======
+### On A Remote Server
+>>>>>>> Docs: Refresh Getting Started guide
 
 You can use a remote server in development by building locally and then uploading the built files as a plugin to the remote server.
 
@@ -100,14 +167,14 @@ With the extension installed, ESLint will use the [.eslintrc.js](https://github.
 
 [Prettier](https://prettier.io/) is a tool that allows you to define an opinionated format, and automate fixing the code to match that format. Prettier and ESlint are similar, Prettier is more about formatting and style, while ESlint is for detecting coding errors.
 
-To use Prettier with Visual Studio Code, you should install the [Prettier - Code formatter extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode). You can then configure it to be the default formatter and to automatically fix issues on save, by adding the following to your settings.
+To use Prettier with Visual Studio Code, you should install the [Prettier - Code formatter extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode). You can then configure it to be the default formatter and to automatically fix issues on save, by adding the following to your settings. __**Note**: depending on where you are viewing htis document, the brackets may show as double, the proper format is just a single bracket.__
 
 ```json
-"\[javascript\]": {
+"[[javascript]]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
 },
-"\[markdown\]": {
+"[[markdown]]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
 },

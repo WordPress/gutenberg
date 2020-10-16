@@ -3,8 +3,8 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 import TokenList from '@wordpress/token-list';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -16,9 +16,9 @@ import {
 	FontSizePicker,
 } from '../components/font-sizes';
 import { cleanEmptyObject } from './utils';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import useEditorFeature from '../components/use-editor-feature';
 
-export const FONT_SIZE_SUPPORT_KEY = '__experimentalFontSize';
+export const FONT_SIZE_SUPPORT_KEY = 'fontSize';
 
 /**
  * Filters registered block settings, extending attributes to include
@@ -90,12 +90,6 @@ function addEditProps( settings ) {
 	return settings;
 }
 
-function useFontSizes() {
-	return useSelect(
-		( select ) => select( 'core/block-editor' ).getSettings().fontSizes
-	);
-}
-
 /**
  * Inspector control panel containing the font size related configuration
  *
@@ -109,7 +103,7 @@ export function FontSizeEdit( props ) {
 		setAttributes,
 	} = props;
 	const isDisabled = useIsFontSizeDisabled( props );
-	const fontSizes = useFontSizes();
+	const fontSizes = useEditorFeature( 'typography.fontSizes' );
 
 	if ( isDisabled ) {
 		return null;
@@ -147,8 +141,8 @@ export function FontSizeEdit( props ) {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsFontSizeDisabled( { name: blockName } = {} ) {
-	const fontSizes = useFontSizes();
-	const hasFontSizes = fontSizes.length;
+	const fontSizes = useEditorFeature( 'typography.fontSizes' );
+	const hasFontSizes = !! fontSizes?.length;
 
 	return (
 		! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) || ! hasFontSizes
@@ -165,7 +159,7 @@ export function useIsFontSizeDisabled( { name: blockName } = {} ) {
  */
 const withFontSizeInlineStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const fontSizes = useFontSizes();
+		const fontSizes = useEditorFeature( 'typography.fontSizes' );
 		const {
 			name: blockName,
 			attributes: { fontSize, style },

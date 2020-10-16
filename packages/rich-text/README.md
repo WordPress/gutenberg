@@ -24,14 +24,14 @@ provided.
 
 _Parameters_
 
--   _value_ `Object`: Value to modify.
--   _format_ `Object`: Format to apply.
+-   _value_ `RichTextValue`: Value to modify.
+-   _format_ `RichTextFormat`: Format to apply.
 -   _startIndex_ `[number]`: Start index.
 -   _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `Object`: A new value with the format applied.
+-   `RichTextValue`: A new value with the format applied.
 
 <a name="concat" href="#concat">#</a> **concat**
 
@@ -40,11 +40,11 @@ Combine all Rich Text values into one. This is similar to
 
 _Parameters_
 
--   _values_ `...Object`: Objects to combine.
+-   _values_ `...RichTextValue`: Objects to combine.
 
 _Returns_
 
--   `Object`: A new value combining all given records.
+-   `RichTextValue`: A new value combining all given records.
 
 <a name="create" href="#create">#</a> **create**
 
@@ -84,11 +84,12 @@ _Parameters_
 -   _$1.range_ `[Range]`: Range to create value from.
 -   _$1.multilineTag_ `[string]`: Multiline tag if the structure is multiline.
 -   _$1.multilineWrapperTags_ `[Array]`: Tags where lines can be found if nesting is possible.
--   _$1.preserveWhiteSpace_ `[?boolean]`: Whether or not to collapse white space characters.
+-   _$1.preserveWhiteSpace_ `[boolean]`: Whether or not to collapse white space characters.
+-   _$1.\_\_unstableIsEditableTree_ `[boolean]`: 
 
 _Returns_
 
--   `Object`: A rich text value.
+-   `RichTextValue`: A rich text value.
 
 <a name="getActiveFormat" href="#getActiveFormat">#</a> **getActiveFormat**
 
@@ -99,12 +100,12 @@ is no format at the selection.
 
 _Parameters_
 
--   _value_ `Object`: Value to inspect.
+-   _value_ `RichTextValue`: Value to inspect.
 -   _formatType_ `string`: Format type to look for.
 
 _Returns_
 
--   `(Object|undefined)`: Active format object of the specified type, or undefined.
+-   `(RichTextFormat|undefined)`: Active format object of the specified type, or undefined.
 
 <a name="getActiveObject" href="#getActiveObject">#</a> **getActiveObject**
 
@@ -112,11 +113,11 @@ Gets the active object, if there is any.
 
 _Parameters_
 
--   _value_ `Object`: Value to inspect.
+-   _value_ `RichTextValue`: Value to inspect.
 
 _Returns_
 
--   `?Object`: Active object, or undefined.
+-   `(RichTextFormat|void)`: Active object, or undefined.
 
 <a name="getTextContent" href="#getTextContent">#</a> **getTextContent**
 
@@ -125,7 +126,7 @@ Get the textual content of a Rich Text value. This is similar to
 
 _Parameters_
 
--   _value_ `Object`: Value to use.
+-   _value_ `RichTextValue`: Value to use.
 
 _Returns_
 
@@ -140,14 +141,14 @@ none are provided.
 
 _Parameters_
 
--   _value_ `Object`: Value to modify.
--   _valueToInsert_ `(Object|string)`: Value to insert.
+-   _value_ `RichTextValue`: Value to modify.
+-   _valueToInsert_ `(RichTextValue|string)`: Value to insert.
 -   _startIndex_ `[number]`: Start index.
 -   _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `Object`: A new value with the value inserted.
+-   `RichTextValue`: A new value with the value inserted.
 
 <a name="insertObject" href="#insertObject">#</a> **insertObject**
 
@@ -157,14 +158,14 @@ removed. Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
--   _value_ `Object`: Value to modify.
--   _formatToInsert_ `Object`: Format to insert as object.
+-   _value_ `RichTextValue`: Value to modify.
+-   _formatToInsert_ `RichTextFormat`: Format to insert as object.
 -   _startIndex_ `[number]`: Start index.
 -   _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `Object`: A new value with the object inserted.
+-   `RichTextValue`: A new value with the object inserted.
 
 <a name="isCollapsed" href="#isCollapsed">#</a> **isCollapsed**
 
@@ -175,7 +176,7 @@ is no selection, `undefined` will be returned. This is similar to
 
 _Parameters_
 
--   _value_ `Object`: The rich text value to check.
+-   _value_ `RichTextValue`: The rich text value to check.
 
 _Returns_
 
@@ -188,7 +189,7 @@ objects (such as images).
 
 _Parameters_
 
--   _value_ `Object`: Value to use.
+-   _value_ `RichTextValue`: Value to use.
 
 _Returns_
 
@@ -202,12 +203,12 @@ string. This is similar to `Array.prototype.join`.
 
 _Parameters_
 
--   _values_ `Array<Object>`: An array of values to join.
--   _separator_ `[(string|Object)]`: Separator string or value.
+-   _values_ `Array<RichTextValue>`: An array of values to join.
+-   _separator_ `[(string|RichTextValue)]`: Separator string or value.
 
 _Returns_
 
--   `Object`: A new combined value.
+-   `RichTextValue`: A new combined value.
 
 <a name="registerFormatType" href="#registerFormatType">#</a> **registerFormatType**
 
@@ -230,13 +231,13 @@ Remove content from a Rich Text value between the given `startIndex` and
 
 _Parameters_
 
--   _value_ `Object`: Value to modify.
+-   _value_ `RichTextValue`: Value to modify.
 -   _startIndex_ `[number]`: Start index.
 -   _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `Object`: A new value with the content removed.
+-   `RichTextValue`: A new value with the content removed.
 
 <a name="removeFormat" href="#removeFormat">#</a> **removeFormat**
 
@@ -246,14 +247,14 @@ selection if none are provided.
 
 _Parameters_
 
--   _value_ `Object`: Value to modify.
+-   _value_ `RichTextValue`: Value to modify.
 -   _formatType_ `string`: Format type to remove.
 -   _startIndex_ `[number]`: Start index.
 -   _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `Object`: A new value with the format applied.
+-   `RichTextValue`: A new value with the format applied.
 
 <a name="replace" href="#replace">#</a> **replace**
 
@@ -262,13 +263,13 @@ is similar to `String.prototype.replace`.
 
 _Parameters_
 
--   _value_ `Object`: The value to modify.
+-   _value_ `RichTextValue`: The value to modify.
 -   _pattern_ `(RegExp|string)`: A RegExp object or literal. Can also be a string. It is treated as a verbatim string and is not interpreted as a regular expression. Only the first occurrence will be replaced.
 -   _replacement_ `(Function|string)`: The match or matches are replaced with the specified or the value returned by the specified function.
 
 _Returns_
 
--   `Object`: A new value with replacements applied.
+-   `RichTextValue`: A new value with replacements applied.
 
 <a name="slice" href="#slice">#</a> **slice**
 
@@ -278,13 +279,13 @@ retrieved from the selection if none are provided. This is similar to
 
 _Parameters_
 
--   _value_ `Object`: Value to modify.
+-   _value_ `RichTextValue`: Value to modify.
 -   _startIndex_ `[number]`: Start index.
 -   _endIndex_ `[number]`: End index.
 
 _Returns_
 
--   `Object`: A new extracted value.
+-   `RichTextValue`: A new extracted value.
 
 <a name="split" href="#split">#</a> **split**
 
@@ -294,17 +295,12 @@ Indices are retrieved from the selection if none are provided.
 
 _Parameters_
 
--   _value_ `Object`: 
--   _value.formats_ `Array<Object>`: 
--   _value.replacements_ `Array<Object>`: 
--   _value.text_ `string`: 
--   _value.start_ `number`: 
--   _value.end_ `number`: 
+-   _value_ `RichTextValue`: 
 -   _string_ `[(number|string)]`: Start index, or string at which to split.
 
 _Returns_
 
--   `Array`: An array of new values.
+-   `Array<RichTextValue>`: An array of new values.
 
 <a name="toggleFormat" href="#toggleFormat">#</a> **toggleFormat**
 
@@ -312,12 +308,12 @@ Toggles a format object to a Rich Text value at the current selection.
 
 _Parameters_
 
--   _value_ `Object`: Value to modify.
--   _format_ `Object`: Format to apply or remove.
+-   _value_ `RichTextValue`: Value to modify.
+-   _format_ `RichTextFormat`: Format to apply or remove.
 
 _Returns_
 
--   `Object`: A new value with the format applied or removed.
+-   `RichTextValue`: A new value with the format applied or removed.
 
 <a name="toHTMLString" href="#toHTMLString">#</a> **toHTMLString**
 
@@ -327,9 +323,9 @@ provided, text separated by a line separator will be wrapped in it.
 _Parameters_
 
 -   _$1_ `Object`: Named argements.
--   _$1.value_ `Object`: Rich text value.
+-   _$1.value_ `RichTextValue`: Rich text value.
 -   _$1.multilineTag_ `[string]`: Multiline tag.
--   _$1.preserveWhiteSpace_ `[?boolean]`: Whether or not to use newline characters for line breaks.
+-   _$1.preserveWhiteSpace_ `[boolean]`: Whether or not to use newline characters for line breaks.
 
 _Returns_
 
@@ -345,7 +341,7 @@ _Parameters_
 
 _Returns_
 
--   `(WPFormat|undefined)`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
+-   `(RichTextFormatType|undefined)`: The previous format value, if it has been successfully unregistered; otherwise `undefined`.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

@@ -31,11 +31,14 @@ const usePatternsState = ( onInsert ) => {
 	}, [] );
 	const { createSuccessNotice } = useDispatch( 'core/notices' );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
-		onInsert( map( blocks, ( block ) => cloneBlock( block ) ) );
+		onInsert(
+			map( blocks, ( block ) => cloneBlock( block ) ),
+			pattern.name
+		);
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: block pattern title. */
-				__( 'Pattern "%s" inserted.' ),
+				__( 'Block pattern "%s" inserted.' ),
 				pattern.title
 			),
 			{

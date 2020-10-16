@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Image, Text, TouchableWithoutFeedback, View } from 'react-native';
+import { Image, Text, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -15,11 +15,10 @@ import { useEffect, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { MediaEdit } from '../media-edit';
-import { getImageWithFocalPointStyles } from '../image-with-focalpoint';
+import { getImageWithFocalPointStyles } from './utils';
 import styles from './style.scss';
 import SvgIconRetry from './icon-retry';
-import SvgIconCustomize from './icon-customize';
+import ImageEditingButton from './image-editing-button';
 
 const ICON_TYPE = {
 	PLACEHOLDER: 'placeholder',
@@ -27,35 +26,26 @@ const ICON_TYPE = {
 	UPLOAD: 'upload',
 };
 
-function editImageComponent( { open, mediaOptions } ) {
-	return (
-		<TouchableWithoutFeedback onPress={ open }>
-			<View style={ styles.editContainer }>
-				<View style={ styles.edit }>
-					{ mediaOptions() }
-					<Icon
-						size={ 16 }
-						icon={ SvgIconCustomize }
-						{ ...styles.iconCustomise }
-					/>
-				</View>
-			</View>
-		</TouchableWithoutFeedback>
-	);
-}
+export const IMAGE_DEFAULT_FOCAL_POINT = { x: 0.5, y: 0.5 };
 
 const ImageComponent = ( {
 	align,
 	alt,
+	editButton = true,
+	focalPoint,
+	height: imageHeight,
 	isSelected,
 	isUploadFailed,
 	isUploadInProgress,
+	mediaPickerOptions,
 	onSelectMediaUploadOption,
 	openMediaOptions,
+	resizeMode,
 	retryMessage,
+	retryIcon,
 	url,
+	shapeStyle,
 	width: imageWidth,
-	focalPoint,
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
@@ -89,7 +79,12 @@ const ImageComponent = ( {
 		let iconStyle;
 		switch ( iconType ) {
 			case ICON_TYPE.RETRY:
-				return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
+				return (
+					<Icon
+						icon={ retryIcon || SvgIconRetry }
+						{ ...styles.iconRetry }
+					/>
+				);
 			case ICON_TYPE.PLACEHOLDER:
 				iconStyle = iconPlaceholderStyles;
 				break;
@@ -110,22 +105,32 @@ const ImageComponent = ( {
 		styles.iconUploadDark
 	);
 
-	const placeholderStyles = usePreferredColorSchemeStyle(
-		styles.imageContainerUpload,
-		styles.imageContainerUploadDark
-	);
+	const placeholderStyles = [
+		usePreferredColorSchemeStyle(
+			styles.imageContainerUpload,
+			styles.imageContainerUploadDark
+		),
+		focalPoint && styles.imageContainerUploadWithFocalpoint,
+		imageHeight && { height: imageHeight },
+	];
 
 	const customWidth =
-		imageData?.width < containerSize?.width ? imageData?.width : '100%';
+		imageData?.width < containerSize?.width
+			? imageData?.width
+			: styles.wide.width;
 
 	const imageContainerStyles = [
 		styles.imageContent,
 		{
 			width:
-				imageData && imageWidth > 0 && imageWidth < containerSize?.width
+				imageWidth === styles.wide.width ||
+				( imageData &&
+					imageWidth > 0 &&
+					imageWidth < containerSize?.width )
 					? imageWidth
 					: customWidth,
 		},
+		resizeMode && { width: styles.wide.width },
 		focalPoint && styles.focalPointContainer,
 	];
 
@@ -149,6 +154,8 @@ const ImageComponent = ( {
 						? containerSize?.width / imageData?.aspectRatio
 						: undefined,
 			},
+		imageHeight && { height: imageHeight },
+		shapeStyle,
 	];
 
 	return (
@@ -189,22 +196,32 @@ const ImageComponent = ( {
 				) : (
 					<View style={ focalPoint && styles.focalPointContent }>
 						<Image
-							aspectRatio={ imageData?.aspectRatio }
+							{ ...( ! resizeMode && {
+								aspectRatio: imageData?.aspectRatio,
+							} ) }
 							style={ imageStyles }
 							source={ { uri: url } }
-							{ ...( ! focalPoint && { resizeMethod: 'scale' } ) }
+							{ ...( ! focalPoint && {
+								resizeMethod: 'scale',
+							} ) }
+							resizeMode={ resizeMode }
 						/>
 					</View>
 				) }
 
-				{ isUploadFailed && (
+				{ isUploadFailed && retryMessage && (
 					<View
 						style={ [
 							styles.imageContainer,
 							styles.retryContainer,
 						] }
 					>
-						<View style={ styles.modalIcon }>
+						<View
+							style={ [
+								styles.retryIcon,
+								retryIcon && styles.customRetryIcon,
+							] }
+						>
 							{ getIcon( ICON_TYPE.RETRY ) }
 						</View>
 						<Text style={ styles.uploadFailedText }>
@@ -212,17 +229,15 @@ const ImageComponent = ( {
 						</Text>
 					</View>
 				) }
-				{ isSelected &&
-					! isUploadInProgress &&
-					! isUploadFailed &&
-					( imageData || focalPoint ) && (
-						<MediaEdit
-							onSelect={ onSelectMediaUploadOption }
-							source={ { uri: url } }
-							openReplaceMediaOptions={ openMediaOptions }
-							render={ editImageComponent }
-						/>
-					) }
+
+				{ editButton && isSelected && ! isUploadInProgress && (
+					<ImageEditingButton
+						onSelectMediaUploadOption={ onSelectMediaUploadOption }
+						openMediaOptions={ openMediaOptions }
+						url={ ! isUploadFailed && imageData && url }
+						pickerOptions={ mediaPickerOptions }
+					/>
+				) }
 			</View>
 		</View>
 	);

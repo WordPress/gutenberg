@@ -22,8 +22,9 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalBlock as Block,
+	useBlockProps,
 	__experimentalLinkControl as LinkControl,
+	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
@@ -39,6 +40,8 @@ const NEW_TAB_REL = 'noreferrer noopener';
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_BORDER_RADIUS_POSITION = 5;
+
+const EMPTY_ARRAY = [];
 
 function BorderPanel( { borderRadius = '', setAttributes } ) {
 	const initialBorderRadius = borderRadius;
@@ -172,6 +175,7 @@ function ButtonEdit( props ) {
 		},
 		[ setAttributes ]
 	);
+	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -192,12 +196,13 @@ function ButtonEdit( props ) {
 		[ rel, setAttributes ]
 	);
 
-	const colorProps = getColorAndStyleProps( attributes );
+	const colorProps = getColorAndStyleProps( attributes, colors, true );
+	const blockProps = useBlockProps();
 
 	return (
 		<>
 			<ColorEdit { ...props } />
-			<Block.div>
+			<div { ...blockProps }>
 				<RichText
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
@@ -227,7 +232,7 @@ function ButtonEdit( props ) {
 					onMerge={ mergeBlocks }
 					identifier="text"
 				/>
-			</Block.div>
+			</div>
 			<URLPicker
 				url={ url }
 				setAttributes={ setAttributes }

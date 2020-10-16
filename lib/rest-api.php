@@ -136,21 +136,10 @@ add_filter( 'rest_prepare_theme', 'gutenberg_filter_rest_prepare_theme', 10, 3 )
  * @since 5.0.0
  */
 function gutenberg_register_rest_widget_updater_routes() {
-	$widget_forms = new WP_REST_Widget_Forms();
+	$widget_forms = new WP_REST_Widget_Utils_Controller();
 	$widget_forms->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_rest_widget_updater_routes' );
-
-/**
- * Registers the widget area REST API routes.
- *
- * @since 5.7.0
- */
-function gutenberg_register_rest_widget_areas() {
-	$widget_areas_controller = new WP_REST_Widget_Areas_Controller();
-	$widget_areas_controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_widget_areas' );
 
 /**
  * Registers the block directory.
@@ -198,6 +187,29 @@ function gutenberg_register_plugins_endpoint() {
 	$plugins->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
+
+/**
+ * Registers the Sidebars & Widgets REST API routes.
+ */
+function gutenberg_register_sidebars_and_widgets_endpoint() {
+	$sidebars = new WP_REST_Sidebars_Controller();
+	$sidebars->register_routes();
+
+	$widget_types = new WP_REST_Widget_Types_Controller();
+	$widget_types->register_routes();
+	$widgets = new WP_REST_Widgets_Controller();
+	$widgets->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_sidebars_and_widgets_endpoint' );
+
+/**
+ * Registers the Batch REST API routes.
+ */
+function gutenberg_register_batch_endpoint() {
+	$batch = new WP_REST_Batch_Controller();
+	$batch->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_batch_endpoint' );
 
 /**
  * Hook in to the nav menu item post type and enable a post type rest endpoint.
@@ -328,3 +340,32 @@ function gutenberg_register_image_editor() {
 	}
 }
 add_filter( 'rest_api_init', 'gutenberg_register_image_editor' );
+
+/**
+ * Registers the post format search handler.
+ *
+ * @param string $search_handlers     Title list of current handlers.
+ *
+ * @return array Title updated list of handlers.
+ */
+function gutenberg_post_format_search_handler( $search_handlers ) {
+	if ( current_theme_supports( 'post-formats' ) ) {
+		$search_handlers[] = new WP_REST_Post_Format_Search_Handler();
+	}
+
+	return $search_handlers;
+}
+add_filter( 'wp_rest_search_handlers', 'gutenberg_post_format_search_handler', 10, 5 );
+
+/**
+ * Registers the terms search handler.
+ *
+ * @param string $search_handlers Title list of current handlers.
+ *
+ * @return array Title updated list of handlers.
+ */
+function gutenberg_term_search_handler( $search_handlers ) {
+	$search_handlers[] = new WP_REST_Term_Search_Handler();
+	return $search_handlers;
+}
+add_filter( 'wp_rest_search_handlers', 'gutenberg_term_search_handler', 10, 5 );

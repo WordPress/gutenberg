@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, has, without } from 'lodash';
+import { has, without } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -94,6 +94,9 @@ export function addAttribute( settings ) {
 			...settings.attributes,
 			align: {
 				type: 'string',
+				// Allow for '' since it is used by updateAlignment function
+				// in withToolbarControls for special cases with defined default values.
+				enum: [ ...ALL_ALIGNMENTS, '' ],
 			},
 		};
 	}
@@ -132,11 +135,7 @@ export const withToolbarControls = createHigherOrderComponent(
 		const updateAlignment = ( nextAlign ) => {
 			if ( ! nextAlign ) {
 				const blockType = getBlockType( props.name );
-				const blockDefaultAlign = get( blockType, [
-					'attributes',
-					'align',
-					'default',
-				] );
+				const blockDefaultAlign = blockType.attributes?.align?.default;
 				if ( blockDefaultAlign ) {
 					nextAlign = '';
 				}

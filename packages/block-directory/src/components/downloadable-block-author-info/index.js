@@ -23,8 +23,8 @@ function DownloadableBlockAuthorInfo( {
 					? sprintf(
 							/* translators: 1: number of blocks. 2: average rating. */
 							_n(
-								'This author has %1$d block, with an average rating of %2$d.',
-								'This author has %1$d blocks, with an average rating of %2$d.',
+								'This author has %1$d block, with an average rating of %2$.1f.',
+								'This author has %1$d blocks, with an average rating of %2$.1f.',
 								authorBlockCount
 							),
 							authorBlockCount,

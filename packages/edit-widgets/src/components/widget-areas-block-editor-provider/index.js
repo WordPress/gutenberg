@@ -13,48 +13,31 @@ import {
 } from '@wordpress/components';
 import { uploadMedia } from '@wordpress/media-utils';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useMemo, useState } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import { useMemo } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import KeyboardShortcuts from '../keyboard-shortcuts';
-
-const EMPTY_ARRAY = [];
+import { useEntityBlockEditor } from '@wordpress/core-data';
+import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
 
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
 	...props
 } ) {
-	const { areas, hasUploadPermissions } = useSelect( ( select ) => {
-		const { canUser, getEntityRecords } = select( 'core' );
-		return {
-			areas: getEntityRecords( 'root', 'widgetArea' ) || EMPTY_ARRAY,
-			hasUploadPermissions: defaultTo(
-				canUser( 'create', 'media' ),
-				true
-			),
-		};
-	} );
-	const [ blocks, setBlocks ] = useState( [] );
-	useEffect( () => {
-		if ( ! areas || ! areas.length || blocks.length > 0 ) {
-			return;
-		}
-		setBlocks(
-			areas.map( ( { id, name } ) => {
-				return createBlock( 'core/widget-area', {
-					id,
-					name,
-				} );
-			} )
-		);
-	}, [ areas, blocks ] );
+	const { hasUploadPermissions } = useSelect( ( select ) => ( {
+		hasUploadPermissions: defaultTo(
+			select( 'core' ).canUser( 'create', 'media' ),
+			true
+		),
+		widgetAreas: select( 'core/edit-widgets' ).getWidgetAreas(),
+	} ) );
 
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
@@ -74,8 +57,15 @@ export default function WidgetAreasBlockEditorProvider( {
 		};
 	}, [ blockEditorSettings, hasUploadPermissions ] );
 
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		KIND,
+		POST_TYPE,
+		{ id: buildWidgetAreasPostId() }
+	);
+
 	return (
 		<>
+			<EditorStyles styles={ settings.styles } />
 			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 			<SlotFillProvider>
@@ -83,9 +73,10 @@ export default function WidgetAreasBlockEditorProvider( {
 					<FocusReturnProvider>
 						<BlockEditorProvider
 							value={ blocks }
-							onInput={ ( newBlocks ) => setBlocks( newBlocks ) }
-							onChange={ ( newBlocks ) => setBlocks( newBlocks ) }
+							onInput={ onInput }
+							onChange={ onChange }
 							settings={ settings }
+							useSubRegistry={ false }
 							{ ...props }
 						/>
 					</FocusReturnProvider>

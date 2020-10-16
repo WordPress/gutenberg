@@ -9,13 +9,11 @@ import classnames from 'classnames';
  */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import {
-	VisuallyHidden,
-	Button,
-	withSpokenMessages,
-} from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { VisuallyHidden, Button } from '@wordpress/components';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { useDebounce } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -107,14 +105,14 @@ function QuickInserterList( {
 	);
 }
 
-function QuickInserter( {
+export default function QuickInserter( {
 	onSelect,
 	rootClientId,
 	clientId,
 	isAppender,
 	selectBlockOnInsert,
-	debouncedSpeak,
 } ) {
+	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [
 		destinationRootClientId,
@@ -163,11 +161,19 @@ function QuickInserter( {
 		[]
 	);
 
+	const previousBlockClientId = useSelect(
+		( select ) =>
+			select( 'core/block-editor' ).getPreviousBlockClientId( clientId ),
+		[ clientId ]
+	);
+
 	useEffect( () => {
 		if ( setInserterIsOpened ) {
 			setInserterIsOpened( false );
 		}
 	}, [ setInserterIsOpened ] );
+
+	const { selectBlock } = useDispatch( 'core/block-editor' );
 
 	// Announce search results on change
 	useEffect( () => {
@@ -182,6 +188,19 @@ function QuickInserter( {
 		);
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak ] );
+
+	// When clicking Browse All select the appropriate block so as
+	// the insertion point can work as expected
+	const onBrowseAll = () => {
+		// We have to select the previous block because the menu inserter
+		// inserts the new block after the selected one.
+		// Ideally, this selection shouldn't focus the block to avoid the setTimeout.
+		selectBlock( previousBlockClientId );
+		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
+		setTimeout( () => {
+			setInserterIsOpened( true );
+		} );
+	};
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 	// is always visible, and one which already incurs this behavior of autoFocus via
@@ -204,6 +223,7 @@ function QuickInserter( {
 					onChange={ ( value ) => {
 						setFilterValue( value );
 					} }
+					placeholder={ __( 'Search for a block' ) }
 				/>
 			) }
 
@@ -218,7 +238,7 @@ function QuickInserter( {
 			{ setInserterIsOpened && (
 				<Button
 					className="block-editor-inserter__quick-inserter-expand"
-					onClick={ () => setInserterIsOpened( true ) }
+					onClick={ onBrowseAll }
 					aria-label={ __(
 						'Browse all. This will open the main inserter panel in the editor toolbar.'
 					) }
@@ -230,5 +250,3 @@ function QuickInserter( {
 	);
 	/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 }
-
-export default withSpokenMessages( QuickInserter );

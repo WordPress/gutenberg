@@ -7,6 +7,7 @@ import {
 	swipeDown,
 	typeString,
 	toggleHtmlMode,
+	swipeFromTo,
 } from '../helpers/utils';
 
 export default class EditorPage {
@@ -196,19 +197,31 @@ export default class EditorPage {
 
 	// Attempts to find the given block button in the block inserter control.
 	async findBlockButton( blockName ) {
+		const blockAccessibilityLabel = `${ blockName } block`;
+
 		if ( isAndroid() ) {
+			const size = await this.driver.getWindowSize();
+			const x = size.width / 2;
 			// Checks if the Block Button is available, and if not will scroll to the second half of the available buttons.
 			while (
-				! ( await this.driver.hasElementByAccessibilityId( blockName ) )
+				! ( await this.driver.hasElementByAccessibilityId(
+					blockAccessibilityLabel
+				) )
 			) {
-				await this.driver.pressKeycode( 20 ); // Press the Down arrow to force a scroll.
+				swipeFromTo(
+					this.driver,
+					{ x, y: size.height - 100 },
+					{ x, y: size.height - 450 }
+				);
 			}
 
-			return await this.driver.elementByAccessibilityId( blockName );
+			return await this.driver.elementByAccessibilityId(
+				blockAccessibilityLabel
+			);
 		}
 
 		const blockButton = await this.driver.elementByAccessibilityId(
-			blockName
+			blockAccessibilityLabel
 		);
 		const size = await this.driver.getWindowSize();
 		const height = size.height - 5;

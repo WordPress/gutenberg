@@ -38,10 +38,6 @@ function get_template_types() {
  * Adds necessary filters to use 'wp_template' posts instead of theme template files.
  */
 function gutenberg_add_template_loader_filters() {
-	if ( ! post_type_exists( 'wp_template' ) ) {
-		return;
-	}
-
 	foreach ( get_template_types() as $template_type ) {
 		if ( 'embed' === $template_type ) { // Skip 'embed' for now because it is not a regular template type.
 			continue;
@@ -152,7 +148,7 @@ function create_auto_draft_for_template_part_block( $block ) {
 				array(
 					'post_type'      => 'wp_template_part',
 					'post_status'    => array( 'publish', 'auto-draft' ),
-					'name'           => $block['attrs']['slug'],
+					'title'          => $block['attrs']['slug'],
 					'meta_key'       => 'theme',
 					'meta_value'     => $block['attrs']['theme'],
 					'posts_per_page' => 1,
@@ -259,18 +255,7 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 	// See if there is a theme block template with higher priority than the resolved template post.
 	$higher_priority_block_template_path     = null;
 	$higher_priority_block_template_priority = PHP_INT_MAX;
-	$block_template_files                    = glob( get_stylesheet_directory() . '/block-templates/*.html' );
-	$block_template_files                    = is_array( $block_template_files ) ? $block_template_files : array();
-	if ( is_child_theme() ) {
-		$child_block_template_files = glob( get_template_directory() . '/block-templates/*.html' );
-		$child_block_template_files = is_array( $child_block_template_files ) ? $child_block_template_files : array();
-		$block_template_files       = array_merge( $block_template_files, $child_block_template_files );
-	}
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
-		$demo_block_template_files = glob( dirname( __FILE__ ) . '/demo-block-templates/*.html' );
-		$demo_block_template_files = is_array( $demo_block_template_files ) ? $demo_block_template_files : array();
-		$block_template_files      = array_merge( $block_template_files, $demo_block_template_files );
-	}
+	$block_template_files                    = gutenberg_get_template_paths();
 	foreach ( $block_template_files as $path ) {
 		if ( ! isset( $slug_priorities[ basename( $path, '.html' ) ] ) ) {
 			continue;
@@ -426,7 +411,7 @@ function gutenberg_strip_php_suffix( $template_file ) {
 function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
 	global $post;
 
-	if ( ! $post || ! post_type_exists( 'wp_template' ) || ! post_type_exists( 'wp_template_part' ) ) {
+	if ( ! $post ) {
 		return $settings;
 	}
 

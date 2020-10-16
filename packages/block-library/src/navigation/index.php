@@ -130,11 +130,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$classes         = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
-		array( 'wp-block-navigation' ),
-		isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
 		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
-		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
-		isset( $attributes['align'] ) ? array( 'align' . $attributes['align'] ) : array()
+		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array()
 	);
 	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
 	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] )

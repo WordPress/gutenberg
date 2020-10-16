@@ -33,6 +33,8 @@ nvm install --latest-npm
 npm install
 ```
 
+Note: Commands described here should be run in the main `/gutenberg` directory.
+
 ## Run
 
 ```

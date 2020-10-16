@@ -9,7 +9,9 @@
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	padding: $grid-unit-20;
+	padding: 1em;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 
 	&.has-parallax {
 		background-attachment: fixed;
@@ -25,6 +27,11 @@
 		@media (prefers-reduced-motion: reduce) {
 			background-attachment: scroll;
 		}
+	}
+
+	&.is-repeated {
+		background-repeat: repeat;
+		background-size: auto;
 	}
 
 	&.has-background-dim {
@@ -44,10 +51,6 @@
 		bottom: 0;
 		right: 0;
 		z-index: z-index(".wp-block-cover.has-background-dim::before");
-	}
-
-	&.has-background-dim:not(.has-background-gradient)::before,
-	& .wp-block-cover__gradient-background {
 		opacity: 0.5;
 	}
 
@@ -92,7 +95,7 @@
 	}
 
 	.wp-block-cover__inner-container {
-		width: calc(100% - 70px);
+		width: 100%;
 		z-index: z-index(".wp-block-cover__inner-container");
 		color: $white;
 	}
@@ -218,6 +221,6 @@ section.wp-block-cover-image > h2,
 	z-index: 1;
 	margin-bottom: 0;
 	max-width: $content-width;
-	padding: $block-padding;
+	padding: 0.44em;
 	text-align: center;
 }

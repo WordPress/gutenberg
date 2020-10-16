@@ -45,6 +45,8 @@ function MediaPlaceholder( props ) {
 		value = [],
 		children,
 		height,
+		backgroundColor,
+		hideContent,
 	} = props;
 
 	// use ref to keep media array current for callbacks during rerenders
@@ -170,12 +172,13 @@ function MediaPlaceholder( props ) {
 									[
 										emptyStateContainerStyle,
 										height && { height },
+										backgroundColor && { backgroundColor },
 									],
 									isAppender && appenderStyle,
 								] }
 							>
 								{ getMediaOptions() }
-								{ renderContent() }
+								{ ! hideContent && renderContent() }
 							</View>
 						</TouchableWithoutFeedback>
 					);

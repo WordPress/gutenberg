@@ -227,6 +227,7 @@
 	padding-top: 16px;
 	display: flex;
 	align-items: flex-end;
+	min-width: 255px;
 
 	fieldset {
 		flex: 1;
@@ -236,7 +237,8 @@
 	}
 
 	.components-color-picker__inputs-fields .components-text-control__input[type="number"] {
-		padding: 6px 8px;
+		padding: 6px 3px;
+		margin: 0;
 	}
 }
 
@@ -256,7 +258,7 @@
 	}
 
 	.components-base-control__field {
-		margin: 0 4px;
+		margin: 0 2px;
 	}
 }
 
