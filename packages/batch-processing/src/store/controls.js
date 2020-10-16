@@ -74,6 +74,7 @@ const controls = {
 				.dispatch( MODULE_KEY )
 				.enqueueItem( queue, context, item );
 
+			// @TODO autocommit when batch size exceeds the maximum or n milliseconds passes
 			const transaction = await registry
 				.dispatch( MODULE_KEY )
 				.commit( queue, context );
