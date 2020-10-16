@@ -163,7 +163,6 @@ const controls = {
 				.getEntityRecords( KIND, WIDGET_AREA_ENTITY_TYPE, query );
 		}
 	),
-
 };
 
 const getState = ( registry ) =>
