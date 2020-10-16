@@ -6,7 +6,7 @@ import {
 	controls as dataControls,
 	createRegistryControl,
 } from '@wordpress/data';
-import '@wordpress/batch-processing';
+import { TRANSACTION_ERROR } from '@wordpress/batch-processing';
 // TODO: mark the deprecated controls after all Gutenberg usages are removed
 // import deprecated from '@wordpress/deprecated';
 
@@ -140,7 +140,15 @@ function registerBatchProcessor( registry ) {
 		.registerProcessor( 'API_FETCH', batchProcessor );
 }
 
-async function batchProcessor( requests ) {
+async function batchProcessor( requests, transaction ) {
+	if ( transaction.state === TRANSACTION_ERROR ) {
+		throw {
+			code: 'transaction_failed',
+			data: { status: 500 },
+			message: 'Transaction failed.',
+		};
+	}
+
 	const response = await triggerFetch( {
 		path: '/__experimental/batch',
 		method: 'POST',
@@ -148,11 +156,16 @@ async function batchProcessor( requests ) {
 			validation: 'require-all-validate',
 			requests: requests.map( ( options ) => ( {
 				path: options.path,
-				body: options.body,
+				body: options.data,
+				method: options.method,
 				headers: options.headers,
 			} ) ),
 		},
 	} );
 
-	return response.responses;
+	if ( response.failed ) {
+		throw response.responses.map( ( { body } ) => body );
+	}
+
+	return response.responses.map( ( { body } ) => body );
 }

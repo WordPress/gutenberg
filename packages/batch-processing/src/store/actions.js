@@ -11,9 +11,10 @@ import {
 	enqueueItemAndAutocommit as enqueueAutocommitControl,
 	processChunk,
 } from './controls';
+import { TRANSACTION_ERROR, TRANSACTION_SUCCESS } from './constants';
 
 export const enqueueItemAndAutocommit = function* ( queue, context, item ) {
-	yield enqueueAutocommitControl( queue, context, item, true );
+	return yield enqueueAutocommitControl( queue, context, item, true );
 };
 
 export const enqueueItem = function ( queue, context, item ) {
@@ -27,64 +28,79 @@ export const enqueueItem = function ( queue, context, item ) {
 	};
 };
 
-export const commit = function* ( queue, context ) {
+export const commit = function* ( queue, context, meta = {} ) {
 	const transactionId = uuid();
-	yield prepareBatchTransaction( queue, context, transactionId );
-	const transaction = yield select( 'getTransaction', transactionId );
+	yield prepareBatchTransaction( queue, context, transactionId, meta );
+	const { chunks } = yield select( 'getTransaction', transactionId );
 
 	yield {
-		type: 'COMMIT_START',
 		queue,
 		context,
 		transactionId,
+		type: 'COMMIT_START',
 	};
 
-	for ( const chunkId of Object.keys( transaction.chunks ) ) {
+	let failed = false;
+	for ( const chunkId of Object.keys( chunks ) ) {
 		yield {
-			type: 'COMMIT_CHUNK_START',
 			transactionId,
 			chunkId,
+			type: 'COMMIT_CHUNK_START',
 		};
+		const transaction = yield select( 'getTransaction', transactionId );
+
+		let chunkFailed = false,
+			errors,
+			exception,
+			results;
 		try {
-			const results = yield processChunk( transaction, chunkId );
-			yield {
-				transactionId,
-				type: 'COMMIT_CHUNK_SUCCESS',
-				chunkId,
-				results,
-			};
-		} catch ( e ) {
-			yield {
-				type: 'COMMIT_CHUNK_ERROR',
-				transactionId,
-				chunkId,
-				error: e,
-			};
-			yield {
-				type: 'COMMIT_ERROR',
-				transactionId,
-				chunkId,
-				error: e,
-			};
-			return;
+			results = yield processChunk( transaction, chunkId );
+		} catch ( _exception ) {
+			chunkFailed = failed = true;
+
+			// If the error isn't in the expected format, something is wrong - let's rethrow
+			if ( ! _exception.isChunkError ) {
+				throw _exception;
+			}
+			exception = _exception;
+			errors = exception.errorsById;
+			// Don't break the loop as we still need results for any remaining chunks.
+			// Queue processor receives the transaction object and may choose whether to
+			// process other chunks or short-circuit with an error.
 		}
+
+		yield {
+			transactionId,
+			chunkId,
+			results,
+			errors,
+			exception,
+			type: 'COMMIT_CHUNK_FINISH',
+			state: chunkFailed ? TRANSACTION_ERROR : TRANSACTION_SUCCESS,
+		};
 	}
 
 	yield {
-		type: 'COMMIT_SUCCESS',
 		transactionId,
+		type: 'COMMIT_FINISH',
+		state: failed ? TRANSACTION_ERROR : TRANSACTION_SUCCESS,
 	};
 
-	const finishedTransaction = yield select( 'getTransaction', transactionId );
-	return finishedTransaction.results;
+	return yield select( 'getTransaction', transactionId );
 };
 
-export function prepareBatchTransaction( queue, context, transactionId ) {
+export function prepareBatchTransaction(
+	queue,
+	context,
+	transactionId,
+	meta = {}
+) {
 	return {
 		type: 'PREPARE_BATCH_TRANSACTION',
 		queue,
 		context,
 		transactionId,
+		meta,
 	};
 }
 
