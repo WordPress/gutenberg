@@ -5,7 +5,7 @@ import { SVG, Path } from '@wordpress/primitives';
 
 /**
  * @typedef Props
- * @property {import('@wordpress/element').WPNode} children Children to render in the tip.
+ * @property {import('react').ReactNode} children Children to render in the tip.
  */
 
 /**

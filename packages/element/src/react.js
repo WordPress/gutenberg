@@ -41,12 +41,6 @@ import { isString } from 'lodash';
  */
 
 /**
- * Object containing a React node.
- *
- * @typedef {import('react').ReactNode} WPNode
- */
-
-/**
  * Object containing a React synthetic event.
  *
  * @typedef {import('react').SyntheticEvent} WPSyntheticEvent
