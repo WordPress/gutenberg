@@ -44,7 +44,7 @@ export default function FontStyleControl( {
 	// Font style icons to use.
 	const icons = {
 		italic: formatItalic,
-		underline: undefined, // Need an underline icon designed.
+		oblique: undefined, // Need an underline icon designed.
 	};
 
 	return (
