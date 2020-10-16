@@ -73,12 +73,12 @@ const PaletteScreen = () => {
 	};
 
 	function onClear() {
+		setCurrentValue( undefined );
 		if ( isSolidSegment ) {
 			onColorChange( '' );
 		} else {
 			onGradientChange( '' );
 		}
-		navigation.goBack();
 	}
 
 	function onCustomPress() {
@@ -100,7 +100,7 @@ const PaletteScreen = () => {
 		return (
 			<TouchableWithoutFeedback onPress={ onClear } hitSlop={ hitSlop }>
 				<View style={ styles.clearButtonContainer }>
-					<Text style={ clearButtonStyle }>{ __( 'Clear' ) }</Text>
+					<Text style={ clearButtonStyle }>{ __( 'Reset' ) }</Text>
 				</View>
 			</TouchableWithoutFeedback>
 		);
