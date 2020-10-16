@@ -72,7 +72,6 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
 function GalleryEdit( props ) {
 	const {
 		attributes,
-		className,
 		isSelected,
 		noticeUI,
 		noticeOperations,
@@ -324,7 +323,6 @@ function GalleryEdit( props ) {
 		<MediaPlaceholder
 			addToGallery={ hasImages }
 			isAppender={ hasImages }
-			className={ className }
 			disableMediaButtons={ hasImages && ! isSelected }
 			icon={ ! hasImages && sharedIcon }
 			labels={ {
@@ -389,20 +387,19 @@ function GalleryEdit( props ) {
 				</PanelBody>
 			</InspectorControls>
 			{ noticeUI }
-			<View { ...blockProps }>
-				<Gallery
-					{ ...props }
-					selectedImage={ selectedImage }
-					mediaPlaceholder={ mediaPlaceholder }
-					onMoveBackward={ onMoveBackward }
-					onMoveForward={ onMoveForward }
-					onRemoveImage={ onRemoveImage }
-					onSelectImage={ onSelectImage }
-					onDeselectImage={ onDeselectImage }
-					onSetImageAttributes={ setImageAttributes }
-					onFocusGalleryCaption={ onFocusGalleryCaption }
-				/>
-			</View>
+			<Gallery
+				{ ...props }
+				selectedImage={ selectedImage }
+				mediaPlaceholder={ mediaPlaceholder }
+				onMoveBackward={ onMoveBackward }
+				onMoveForward={ onMoveForward }
+				onRemoveImage={ onRemoveImage }
+				onSelectImage={ onSelectImage }
+				onDeselectImage={ onDeselectImage }
+				onSetImageAttributes={ setImageAttributes }
+				onFocusGalleryCaption={ onFocusGalleryCaption }
+				blockProps={ blockProps }
+			/>
 		</>
 	);
 }
