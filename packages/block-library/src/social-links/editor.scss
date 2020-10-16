@@ -22,14 +22,33 @@
 .editor-styles-wrapper .wp-block-social-links {
 	padding: 0;
 }
+
+// Placeholder/setup state.
 .wp-block-social-links__social-placeholder .wp-block-social-link {
-	display: inline-block;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	margin: 0 $grid-unit-10 0 0;
-	padding: $grid-unit-05;
 	width: 36px;
 	height: 36px;
 	border-radius: $radius-round;
 	opacity: 0.8;
+}
+
+.is-style-logos-only .wp-block-social-links__social-placeholder .wp-block-social-link::before {
+	content: "";
+	display: block;
+	width: 18px;
+	height: 18px;
+	border-radius: $radius-round;
+	opacity: 0.8;
+	background: #ccc;
+}
+
+.is-style-pill-shape .wp-block-social-links__social-placeholder .wp-block-social-link {
+	border-radius: 9999px;
+	padding-left: 16px + 12px;
+	padding-right: 16px + 12px;
 }
 
 // Polish the Appender.
