@@ -184,7 +184,7 @@ describe( 'cpt locking', () => {
 	describe( 'template_lock all unlocked group', () => {
 		beforeEach( async () => {
 			await createNewPost( {
-				postType: 'ul-post-ul-group',
+				postType: 'l-post-ul-group',
 			} );
 		} );
 

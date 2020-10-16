@@ -53,7 +53,7 @@ function gutenberg_test_cpt_locking() {
 		)
 	);
 	register_post_type(
-		'ul-post-ul-group',
+		'l-post-ul-group',
 		array(
 			'public'        => true,
 			'label'         => 'Locked Post Unlocked group',
