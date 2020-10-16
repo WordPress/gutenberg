@@ -8,7 +8,14 @@ import { useEffect, useState } from '@wordpress/element';
  */
 import { isValueDefined, getDefinedValue } from '../values';
 
-/** @type {Readonly<{initial:undefined,fallback:''}>} */
+/**
+ * @template T
+ * @typedef Options
+ * @property {T | undefined} initial  Initial value
+ * @property {T | ""}        fallback Fallback value
+ */
+
+/** @type {Readonly<{ initial: undefined, fallback: '' }>} */
 const defaultOptions = {
 	initial: undefined,
 	/**
@@ -36,10 +43,8 @@ const defaultOptions = {
  *
  * @template T
  *
- * @param {T|undefined} currentState The current value.
- * @param {Object} [options=defaultOptions] Additional options for the hook.
- * @param {T|undefined} options.initial The initial state.
- * @param {T|""} options.fallback The state to use when no state is defined.
+ * @param {T | undefined} currentState The current value.
+ * @param {Options<T>} [options=defaultOptions] Additional options for the hook.
  *
  * @return {[T | "", (nextState: T) => void]} The controlled value and the value setter.
  */
