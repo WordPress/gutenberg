@@ -150,11 +150,11 @@ class WP_Block_Supports {
  * Generates a string of attributes by applying to the current block being
  * rendered all of the features that the block supports.
  *
- * @param array $extra_attributes Extra attributes to render on the block wrapper.
+ * @param array? $extra_attributes Extra attributes to render on the block wrapper.
  *
  * @return string String of HTML classes.
  */
-function get_block_wrapper_attributes( $extra_attributes ) {
+function get_block_wrapper_attributes( $extra_attributes = array() ) {
 	global $current_parsed_block;
 	$new_attributes = WP_Block_Supports::get_instance()->apply_block_supports( $current_parsed_block );
 
