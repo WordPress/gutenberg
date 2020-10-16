@@ -3,7 +3,7 @@
  */
 import { useState, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockContextProvider,
 	InnerBlocks,
@@ -42,8 +42,11 @@ export default function QueryLoopEdit( {
 	const [ { page } ] = useQueryContext() || queryContext || [ {} ];
 	const [ activeBlockContext, setActiveBlockContext ] = useState();
 
-	const { posts, blocks } = useSelect(
+	const { posts, blocks, postTypeName } = useSelect(
 		( select ) => {
+			const { getEntityRecords, getPostType } = select( 'core' );
+			const { getBlocks } = select( 'core/block-editor' );
+			const postTypeObject = getPostType( postType );
 			const query = {
 				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
 				categories: categoryIds,
@@ -64,12 +67,9 @@ export default function QueryLoopEdit( {
 				query.exclude = exclude;
 			}
 			return {
-				posts: select( 'core' ).getEntityRecords(
-					'postType',
-					postType,
-					query
-				),
-				blocks: select( 'core/block-editor' ).getBlocks( clientId ),
+				posts: getEntityRecords( 'postType', postType, query ),
+				blocks: getBlocks( clientId ),
+				postTypeName: postTypeObject?.labels?.name || 'Posts',
 			};
 		},
 		[
@@ -98,7 +98,18 @@ export default function QueryLoopEdit( {
 	);
 	const blockProps = useBlockProps();
 
-	if ( ! posts?.length ) {
+	if ( ! posts ) {
+		return (
+			<p { ...blockProps }>
+				{
+					// translators: %s: Name of Post Type (plural) that is loading e.g: "Posts".
+					sprintf( __( 'Loading %s…' ), postTypeName )
+				}
+			</p>
+		);
+	}
+
+	if ( ! posts.length ) {
 		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
 	}
 
