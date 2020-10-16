@@ -6,6 +6,11 @@
 	background: $gray-900;
 	transition: width 100ms linear;
 	@include reduce-motion("transition");
+
+	// Footer is visible from medium so we subtract footer's height
+	@include break-medium() {
+		height: calc(100% - #{$button-size-small + $border-width});
+	}
 }
 
 .edit-site-navigation-panel.is-open {
