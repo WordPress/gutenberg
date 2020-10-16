@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isString } from 'lodash';
+import { isString, isObject } from 'lodash';
 
 /** @typedef {string | { display: string, ariaLabel: string }} Shortcut */
 /**
@@ -24,7 +24,9 @@ function Shortcut( { shortcut, className } ) {
 
 	if ( isString( shortcut ) ) {
 		displayText = shortcut;
-	} else {
+	}
+
+	if ( isObject( shortcut ) ) {
 		displayText = shortcut.display;
 		ariaLabel = shortcut.ariaLabel;
 	}
