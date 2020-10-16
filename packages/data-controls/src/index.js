@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import triggerFetch from '@wordpress/api-fetch';
-import { controls as dataControls } from '@wordpress/data';
+import {
+	controls as dataControls,
+	createRegistryControl,
+} from '@wordpress/data';
+import '@wordpress/batch-processing';
 // TODO: mark the deprecated controls after all Gutenberg usages are removed
 // import deprecated from '@wordpress/deprecated';
 
@@ -102,8 +106,53 @@ export function dispatch( ...args ) {
  * @return {Object} An object for registering the default controls with the
  *                  store.
  */
+
 export const controls = {
-	API_FETCH( { request } ) {
-		return triggerFetch( request );
-	},
+	API_FETCH: createRegistryControl( ( registry ) => ( { request } ) => {
+		if (
+			! [ 'POST', 'PUT', 'PATCH', 'DELETE' ].includes( request.method ) ||
+			! request.batchAs ||
+			! endpointSupportsBatch( request.path )
+		) {
+			return triggerFetch( request );
+		}
+
+		registerBatchProcessor( registry );
+		return registry
+			.dispatch( 'core/batch-processing' )
+			.enqueueItemAndAutocommit( 'API_FETCH', 'abc', request );
+	} ),
 };
+
+function endpointSupportsBatch( path ) {
+	// This should be more sophisticated in reality:
+	return path.indexOf( '/v2/template-parts' ) !== -1;
+}
+
+const registered = false;
+function registerBatchProcessor( registry ) {
+	if ( registered ) {
+		return;
+	}
+
+	return registry
+		.dispatch( 'core/batch-processing' )
+		.registerProcessor( 'API_FETCH', batchProcessor );
+}
+
+async function batchProcessor( requests ) {
+	const response = await triggerFetch( {
+		path: '/__experimental/batch',
+		method: 'POST',
+		data: {
+			validation: 'require-all-validate',
+			requests: requests.map( ( options ) => ( {
+				path: options.path,
+				body: options.body,
+				headers: options.headers,
+			} ) ),
+		},
+	} );
+
+	return response.responses;
+}
