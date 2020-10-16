@@ -203,6 +203,7 @@ async function runAxeTestsForBlockEditor() {
 			'region',
 			'aria-required-children',
 			'aria-required-parent',
+			'frame-title',
 		],
 		exclude: [
 			// Ignores elements created by metaboxes.

@@ -2,9 +2,9 @@
 
 ## Unreleased
 
-## New Features
+### New Features
 
-- Migrated to [@axe-core/puppeteer](https://github.com/dequelabs/axe-core-npm/tree/develop/packages/puppeteer).
+- Migrated `axe-puppeteer` to its new package name  [@axe-core/puppeteer](https://github.com/dequelabs/axe-core-npm/tree/develop/packages/puppeteer).
 
 ## 1.1.0 (2019-05-21)
 
