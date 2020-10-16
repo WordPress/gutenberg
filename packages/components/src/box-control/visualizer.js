@@ -16,7 +16,7 @@ import {
 import {
 	DEFAULT_VISUALIZER_VALUES,
 	DEFAULT_VISUALIZER_SPACING_VALUES,
-	DEFAULT_SPACING_VALUES,
+	DEFAULT_VALUES,
 	extendStyles,
 } from './utils';
 
@@ -27,7 +27,10 @@ export default function BoxControlVisualizer( {
 	...props
 } ) {
 	const isPositionAbsolute = ! children;
-	const valuesProp = { ...DEFAULT_SPACING_VALUES, ...values };
+	const valuesProp = {
+		margin: { ...DEFAULT_VALUES, ...values?.margin },
+		padding: { ...DEFAULT_VALUES, ...values?.padding },
+	};
 
 	return Object.entries( showValues ).map( ( [ key, value ] ) => {
 		return (
@@ -56,10 +59,10 @@ function Sides( { showValues = DEFAULT_VISUALIZER_VALUES, ...props } ) {
 
 	return (
 		<>
-			<Top isVisible={ showValues.top } value={ top.style } />
-			<Right isVisible={ showValues.right } value={ right.style } />
-			<Bottom isVisible={ showValues.bottom } value={ bottom.style } />
-			<Left isVisible={ showValues.left } value={ left.style } />
+			<Top isVisible={ showValues.top } value={ top?.style } />
+			<Right isVisible={ showValues.right } value={ right?.style } />
+			<Bottom isVisible={ showValues.bottom } value={ bottom?.style } />
+			<Left isVisible={ showValues.left } value={ left?.style } />
 		</>
 	);
 }
