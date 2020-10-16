@@ -12,7 +12,7 @@ import { isString } from 'lodash';
 
 /**
  * @param {Props} props Props
- * @return {JSX.Element | null} Element
+ * @return {import('react').ReactNode} Element
  */
 function Shortcut( { shortcut, className } ) {
 	if ( ! shortcut ) {
