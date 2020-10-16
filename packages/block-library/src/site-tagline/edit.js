@@ -37,14 +37,14 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 
 			<RichText
 				allowedFormats={ [] }
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
 				onChange={ setSiteTagline }
 				placeholder={ __( 'Site Tagline' ) }
 				tagName="p"
 				value={ siteTagline }
 				{ ...blockProps }
+				className={ classnames( blockProps.className, {
+					[ `has-text-align-${ textAlign }` ]: textAlign,
+				} ) }
 			/>
 		</>
 	);
