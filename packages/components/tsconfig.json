@@ -2,11 +2,8 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"declarationDir": "build-types",
+		"declarationDir": "build-types"
 	},
-	"references": [],
-    "include": [
-		"src/dashicon/*",
-		"src/tip/*"
-	],
+	"references": [ { "path": "../primitives" } ],
+	"include": [ "src/dashicon/*", "src/tip/*" ]
 }
