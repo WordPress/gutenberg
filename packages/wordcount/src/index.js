@@ -67,7 +67,7 @@ function loadSettings( type, userSettings ) {
  * @param {RegExp}              regex    The regular expression pattern being matched
  * @param {WPWordCountSettings} settings Settings object containing regular expressions for each strip function
  *
- * @return {number} The matched string.
+ * @return {number} Count of words.
  */
 function countWords( text, regex, settings ) {
 	text = flow(
