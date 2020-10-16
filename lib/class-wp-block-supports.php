@@ -86,7 +86,7 @@ class _WP_Block_Supports {
 		);
 
 		// If no render_callback, assume styles have been previously handled.
-		if ( ! $block_type || empty( $block_type ) || ! $block_type->render_callback ) {
+		if ( ! $block_type || empty( $block_type ) ) {
 			return array();
 		}
 
