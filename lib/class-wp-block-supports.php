@@ -150,7 +150,7 @@ class WP_Block_Supports {
  * Generates a string of attributes by applying to the current block being
  * rendered all of the features that the block supports.
  *
- * @param array? $extra_attributes Extra attributes to render on the block wrapper.
+ * @param array $extra_attributes Optional. Extra attributes to render on the block wrapper.
  *
  * @return string String of HTML classes.
  */
