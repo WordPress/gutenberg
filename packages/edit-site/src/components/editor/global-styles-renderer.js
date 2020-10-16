@@ -21,24 +21,26 @@ export const mergeTrees = ( baseData, userData ) => {
 	// see https://github.com/lodash/lodash/issues/1984
 	const mergedTree = JSON.parse( JSON.stringify( baseData ) );
 
-	const validMergeKeys = [ 'typography', 'color', 'custom', 'spacing' ];
+	const styleKeys = [ 'typography', 'color' ];
+	const settingKeys = [ 'typography', 'color', 'custom', 'spacing' ];
 	Object.keys( userData ).forEach( ( context ) => {
-		validMergeKeys.forEach( ( key ) => {
-			// Normalize object shape: make sure the key exists under styles and settings.
+		styleKeys.forEach( ( key ) => {
+			// Normalize object shape.
 			if ( ! mergedTree[ context ].styles?.[ key ] ) {
 				mergedTree[ context ].styles[ key ] = {};
 			}
-
-			if ( ! mergedTree[ context ].settings?.[ key ] ) {
-				mergedTree[ context ].settings[ key ] = {};
-			}
-
-			// Merge data: base + user.
+			// Merge base + user data.
 			mergedTree[ context ].styles[ key ] = {
 				...mergedTree[ context ].styles[ key ],
 				...userData[ context ]?.styles?.[ key ],
 			};
-
+		} );
+		settingKeys.forEach( ( key ) => {
+			// Normalize object shape.
+			if ( ! mergedTree[ context ].settings?.[ key ] ) {
+				mergedTree[ context ].settings[ key ] = {};
+			}
+			// Merge base + user data.
 			mergedTree[ context ].settings[ key ] = {
 				...mergedTree[ context ].settings[ key ],
 				...userData[ context ]?.settings?.[ key ],
@@ -48,6 +50,7 @@ export const mergeTrees = ( baseData, userData ) => {
 
 	return mergedTree;
 };
+
 export default ( blockData, tree ) => {
 	const styles = [];
 	// Can this be converted to a context, as the global context?
