@@ -6,7 +6,7 @@ import { createRegistryControl } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { MODULE_KEY } from './constants';
+import { MODULE_KEY, TRANSACTION_ERROR } from './constants';
 
 /**
  * Calls a selector using chosen registry.
@@ -74,11 +74,15 @@ const controls = {
 				.dispatch( MODULE_KEY )
 				.enqueueItem( queue, context, item );
 
-			const results = await registry
+			const transaction = await registry
 				.dispatch( MODULE_KEY )
 				.commit( queue, context );
 
-			return results[ itemId ];
+			if ( transaction.state === TRANSACTION_ERROR ) {
+				throw transaction.errors[ itemId ];
+			}
+
+			return transaction.results[ itemId ];
 		}
 	),
 
@@ -97,7 +101,23 @@ const controls = {
 			}
 			const itemIds = chunk.items.map( ( { id } ) => id );
 			const items = chunk.items.map( ( { item } ) => item );
-			const results = await processor( items );
+			let results;
+			try {
+				results = await processor( items, transaction );
+			} catch ( exception ) {
+				const errorsById = {};
+				for ( let i = 0, max = itemIds.length; i < max; i++ ) {
+					errorsById[ itemIds[ i ] ] = Array.isArray( exception )
+						? exception[ i ]
+						: exception;
+				}
+				throw {
+					isChunkError: true,
+					exception,
+					errorsById,
+				};
+			}
+
 			// @TODO Assert results.length == items.length
 			const resultsById = {};
 			for ( let i = 0, max = itemIds.length; i < max; i++ ) {

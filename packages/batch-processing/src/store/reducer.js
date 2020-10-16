@@ -40,7 +40,7 @@ export function batches( state = defaultBatches, action ) {
 		}
 
 		case 'PREPARE_BATCH_TRANSACTION': {
-			const { queue, context, transactionId } = action;
+			const { queue, context, transactionId, meta } = action;
 
 			if ( transactionId in state.transactions ) {
 				throw new Error(
@@ -51,14 +51,15 @@ export function batches( state = defaultBatches, action ) {
 			const stateQueue = state.enqueuedItems[ queue ] || {};
 			const enqueuedItems = [ ...stateQueue[ context ] ];
 			const chunks = {};
+			let chunkNb = 0;
 			while ( enqueuedItems.length ) {
-				const number = chunks.length;
-				const chunkId = `${ transactionId }-${ number }`;
+				const chunkId = `${ transactionId }-${ chunkNb }`;
 				chunks[ chunkId ] = {
-					number,
+					number: chunkNb,
 					id: chunkId,
 					items: enqueuedItems.splice( 0, BATCH_MAX_SIZE ),
 				};
+				++chunkNb;
 			}
 
 			const transaction = {
@@ -68,6 +69,7 @@ export function batches( state = defaultBatches, action ) {
 				context,
 				chunks,
 				results: {},
+				meta,
 			};
 
 			return {
@@ -100,30 +102,18 @@ export function batches( state = defaultBatches, action ) {
 			};
 		}
 
-		case 'COMMIT_SUCCESS': {
-			const { transactionId } = action;
+		case 'COMMIT_FINISH': {
+			const { transactionId, state: commitState } = action;
 			return {
 				...state,
 				transactions: {
 					...state.transactions,
 					[ transactionId ]: {
 						...state.transactions[ transactionId ],
-						state: TRANSACTION_SUCCESS,
-					},
-				},
-			};
-		}
-
-		case 'COMMIT_ERROR': {
-			const { transactionId, error } = action;
-			return {
-				...state,
-				transactions: {
-					...state.transactions,
-					[ transactionId ]: {
-						...state.transactions[ transactionId ],
-						state: TRANSACTION_ERROR,
-						error,
+						state:
+							commitState === TRANSACTION_SUCCESS
+								? TRANSACTION_SUCCESS
+								: TRANSACTION_ERROR,
 					},
 				},
 			};
@@ -143,7 +133,7 @@ export function batches( state = defaultBatches, action ) {
 								...state.transactions[ transactionId ].chunks[
 									chunkId
 								],
-								state: TRANSACTION_SUCCESS,
+								state: TRANSACTION_IN_PROGRESS,
 							},
 						},
 					},
@@ -151,8 +141,15 @@ export function batches( state = defaultBatches, action ) {
 			};
 		}
 
-		case 'COMMIT_CHUNK_SUCCESS': {
-			const { transactionId, chunkId, results } = action;
+		case 'COMMIT_CHUNK_FINISH': {
+			const {
+				transactionId,
+				state: chunkState,
+				chunkId,
+				results = {},
+				errors = {},
+				exception,
+			} = action;
 
 			const stateTransaction = state.transactions[ transactionId ] || {};
 			return {
@@ -172,29 +169,12 @@ export function batches( state = defaultBatches, action ) {
 							...stateTransaction.results,
 							...results,
 						},
-					},
-				},
-			};
-		}
-
-		case 'COMMIT_CHUNK_ERROR': {
-			const { transactionId, error, chunkId } = action;
-			return {
-				...state,
-				transactions: {
-					...state.transactions,
-					[ transactionId ]: {
-						...state.transactions[ transactionId ],
-						chunks: {
-							...state.transactions[ transactionId ].chunks,
-							[ chunkId ]: {
-								...state.transactions[ transactionId ].chunks[
-									chunkId
-								],
-								error,
-								state: TRANSACTION_ERROR,
-							},
-						},
+						state:
+							chunkState === TRANSACTION_SUCCESS
+								? TRANSACTION_SUCCESS
+								: TRANSACTION_ERROR,
+						errors,
+						exception,
 					},
 				},
 			};
