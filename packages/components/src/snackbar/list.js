@@ -16,15 +16,21 @@ import { useState } from '@wordpress/element';
  */
 import Snackbar from './';
 
+/** @typedef {{ content: string } & Omit<import('./index').Props, 'onRemove' | 'children'>} Notice */
+
+/**
+ * @typedef Props
+ * @property {Notice[]} notices Notices to render.
+ * @property {(notice: Notice) => void} onRemove Functionc called when a notice should be removed / dismissed.
+ * @property {string} [className] Name of the class used by the component.
+ * @property {import('react').ReactNode} children Rendered inside the notice list.
+ * @return {JSX.Element} Element
+ */
+
 /**
  * Renders a list of notices.
  *
- * @param  {Object}   $0           Props passed to the component.
- * @param  {Array}    $0.notices   Array of notices to render.
- * @param  {Function} $0.onRemove  Function called when a notice should be removed / dismissed.
- * @param  {Object}   $0.className Name of the class used by the component.
- * @param  {Object}   $0.children  Array of children to be rendered inside the notice list.
- * @return {Object}                The rendered notices list.
+ * @param {Props} props Props
  */
 function SnackbarList( { notices, className, children, onRemove = noop } ) {
 	const isReducedMotion = useReducedMotion();
