@@ -132,8 +132,6 @@ ${ selector } {
 	);
 }
 
-export default Duotone;
-
 /**
  * Override the default edit UI to include toolbar controls for duotone if the
  * block supports duotone.
