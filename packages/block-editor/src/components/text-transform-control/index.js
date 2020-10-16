@@ -43,25 +43,35 @@ export default function TextTransformControl( {
 		onChange( newTextTransform );
 	};
 
+	// Text transform icons to use.
+	// Icons still to be created/designed.
+	const icons = {
+		capitalize: undefined,
+		lowercase: undefined,
+		uppercase: undefined,
+	};
+
 	return (
-		<>
-			<p>{ __( 'Text Transform' ) }</p>
+		<fieldset className="block-editor-text-transform-control">
+			<legend>{ __( 'Text Transform' ) }</legend>
 			<ButtonGroup>
 				{ textTransforms.map( ( presetTransform ) => {
 					return (
 						<Button
 							key={ presetTransform.slug }
+							icon={ icons[ presetTransform.slug ] }
 							isSmall
 							isPressed={ textTransform === presetTransform.slug }
 							onClick={ () =>
 								handleOnChange( presetTransform.slug )
 							}
 						>
-							{ presetTransform.name }
+							{ ! icons[ presetTransform.slug ] &&
+								presetTransform.name }
 						</Button>
 					);
 				} ) }
 			</ButtonGroup>
-		</>
+		</fieldset>
 	);
 }
