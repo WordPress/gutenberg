@@ -413,7 +413,6 @@ export function* saveEntityRecord(
 				path: `${ path }/autosaves`,
 				method: 'POST',
 				data,
-				batchAs: `${ kind }-${ name }`,
 			} );
 			// An autosave may be processed by the server as a regular save
 			// when its update is requested by the author and the post had
@@ -506,7 +505,6 @@ export function* saveEntityRecord(
 				path,
 				method: recordId ? 'PUT' : 'POST',
 				data,
-				batchAs: `${ kind }-${ name }`,
 			} );
 			yield receiveEntityRecords(
 				kind,
