@@ -147,7 +147,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	);
 
 	return sprintf(
-		'<nav %1$s><ul class="wp-block-navigation__container">%3$s</ul></nav>',
+		'<nav %1$s><ul class="wp-block-navigation__container">%2$s</ul></nav>',
 		$wrapper_attributes,
 		$inner_blocks_html
 	);
