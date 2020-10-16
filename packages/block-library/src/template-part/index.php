@@ -61,10 +61,11 @@ function render_block_core_template_part( $attributes ) {
 	} else {
 		$content = wp_make_content_images_responsive( $content );
 	}
-	$content = do_shortcode( $content );
+	$content            = do_shortcode( $content );
+	$html_tag           = esc_attr( $attributes['tagName'] );
+	$wrapper_attributes = get_block_wrapper_attributes();
 
-	$html_tag = esc_attr( $attributes['tagName'] );
-	return "<$html_tag>" . str_replace( ']]>', ']]&gt;', $content ) . "</$html_tag>";
+	return "<$html_tag $wrapper_attributes>" . str_replace( ']]>', ']]&gt;', $content ) . "</$html_tag>";
 }
 
 /**

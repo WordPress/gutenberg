@@ -33,7 +33,9 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	}
 
 	$icon = block_core_social_link_get_icon( $service );
-	return '<li class="wp-social-link wp-social-link-' . esc_attr( $service ) . esc_attr( $class_name ) . '"><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" ' . $attribute . '> ' . $icon . '</a></li>';
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'wp-social-link wp-social-link-' . $service . $class_name ) );
+
+	return '<li .' . $wrapper_attributes . '><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" ' . $attribute . '> ' . $icon . '</a></li>';
 }
 
 /**
