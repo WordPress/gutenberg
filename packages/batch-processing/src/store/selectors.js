@@ -5,4 +5,3 @@ export const getTransaction = ( state, transactionId ) => {
 export const getProcessor = ( state, queue ) => {
 	return state.processors[ queue ];
 };
-
