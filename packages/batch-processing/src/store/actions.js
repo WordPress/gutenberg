@@ -70,7 +70,7 @@ export function* commitTransaction( batchId, transactionId ) {
 		exception,
 		results;
 	try {
-		results = yield *processTransaction( batch, transactionId );
+		results = yield processTransaction( batch, transactionId );
 	} catch ( _exception ) {
 		failed = true;
 
