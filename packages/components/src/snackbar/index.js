@@ -15,7 +15,11 @@ import warning from '@wordpress/warning';
 /**
  * Internal dependencies
  */
-import { Button } from '../';
+import {
+	SnackbarActionButton,
+	SnackbarContent,
+	SnackbarWrapper,
+} from './styles/snackbar-styles';
 
 const NOTICE_TIMEOUT = 10000;
 
@@ -25,8 +29,8 @@ const NOTICE_TIMEOUT = 10000;
  * Custom hook which announces the message with the given politeness, if a
  * valid message is provided.
  *
- * @param {string|WPElement}     [message]  Message to announce.
- * @param {'polite'|'assertive'} politeness Politeness to announce.
+ * @param {string | WPElement}     [message]  Message to announce.
+ * @param {'polite' | 'assertive'} politeness Politeness to announce.
  */
 function useSpokenMessage( message, politeness ) {
 	const spokenMessage =
@@ -39,6 +43,22 @@ function useSpokenMessage( message, politeness ) {
 	}, [ spokenMessage, politeness ] );
 }
 
+/** @typedef {{label: string, onClick: () => void, url: string}} Action */
+
+/**
+ * @typedef Props
+ * @property {string} [className] Optional classname passed to the component.
+ * @property {import('react').ReactNode} children The message to render.
+ * @property {string | WPElement} [spokenMessage] Message to speak if different from children.
+ * @property {'polite' | 'assertive'} [politeness='polite'] Politeness with which to speak the message.
+ * @property {[Action]|[]} [actions=[]] Optional actions for the snackbar.
+ * @property {() => void} [onRemove] Function to run when the snackbar is clicked or keypressed.
+ */
+
+/**
+ * @param {Props} props
+ * @param {import('react').Ref<HTMLDivElement>} ref
+ */
 function Snackbar(
 	{
 		className,
@@ -70,7 +90,7 @@ function Snackbar(
 	}
 
 	return (
-		<div
+		<SnackbarWrapper
 			ref={ ref }
 			className={ classes }
 			onClick={ onRemove }
@@ -79,11 +99,11 @@ function Snackbar(
 			onKeyPress={ onRemove }
 			aria-label={ __( 'Dismiss this notice' ) }
 		>
-			<div className="components-snackbar__content">
+			<SnackbarContent className="components-snackbar__content">
 				{ children }
 				{ actions.map( ( { label, onClick, url }, index ) => {
 					return (
-						<Button
+						<SnackbarActionButton
 							key={ index }
 							href={ url }
 							isTertiary
@@ -96,11 +116,11 @@ function Snackbar(
 							className="components-snackbar__action"
 						>
 							{ label }
-						</Button>
+						</SnackbarActionButton>
 					);
 				} ) }
-			</div>
-		</div>
+			</SnackbarContent>
+		</SnackbarWrapper>
 	);
 }
 
