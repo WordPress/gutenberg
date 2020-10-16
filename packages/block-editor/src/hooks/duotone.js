@@ -158,7 +158,7 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 		}
 
 		const duotoneOptions =
-			useEditorFeature( 'color.duotone' ) || DEFAULT_DUOTONE_OPTIONS;
+			useEditorFeature( 'color.duotone' ) ?? DEFAULT_DUOTONE_OPTIONS;
 
 		return (
 			<>

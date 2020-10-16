@@ -143,7 +143,7 @@ function DuotoneToolbar( { value, onChange, options } ) {
 									key={ option.slug }
 									value={ option.slug }
 									isSelected={ isSelected }
-									tooltipText={ option.name || code }
+									tooltipText={ option.name ?? code }
 									style={ style }
 									onClick={ () => {
 										const newValue = {
