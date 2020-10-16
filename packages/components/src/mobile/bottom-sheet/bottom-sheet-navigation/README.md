@@ -86,3 +86,17 @@ The component that should be rendered as content.
 
 - Type: React Element
 - Required: Yes
+
+### isScrollable
+
+This prop determines whether the screen should be wrapped into the ScrollView - this is needed if the screen contains FlatList or any other list inside. Thanks to that we do not nest List into the ScrollView with the same orientation.
+
+- Type: `Boolean`
+- Required: No
+
+### fullScreen
+
+This prop determines if the screen should have full height of device.
+
+- Type: `Boolean`
+- Required: No
