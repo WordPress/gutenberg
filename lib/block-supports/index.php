@@ -63,7 +63,13 @@ function gutenberg_apply_block_supports( $block_content, $block ) {
 		. $block_content
 		. '</body></html>';
 
-	$success = $dom->loadHTML( $wrapped_block_html, LIBXML_HTML_NODEFDTD | LIBXML_COMPACT );
+	$options = LIBXML_COMPACT;
+
+	// LIBXML_HTML_NODEFDTD is only available in libxml 2.7.8+.
+	if ( defined( 'LIBXML_HTML_NODEFDTD' ) ) {
+		$options |= constant( 'LIBXML_HTML_NODEFDTD' );
+	}
+	$success = $dom->loadHTML( $wrapped_block_html, $options );
 
 	// Clear errors and reset the use_errors setting.
 	libxml_clear_errors();
