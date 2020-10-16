@@ -29,6 +29,11 @@
 		}
 	}
 
+	&.is-repeated {
+		background-repeat: repeat;
+		background-size: auto;
+	}
+
 	&.has-background-dim {
 		background-color: $black;
 
@@ -90,6 +95,7 @@
 	}
 
 	.wp-block-cover__inner-container {
+		width: 100%;
 		z-index: z-index(".wp-block-cover__inner-container");
 		color: $white;
 	}

@@ -13,26 +13,37 @@ import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/bloc
  */
 import { PRESET_CATEGORIES, LINK_COLOR_DECLARATION } from './utils';
 
-const mergeTrees = ( baseData, userData ) => {
+export const mergeTrees = ( baseData, userData ) => {
 	// Deep clone from base data.
 	//
 	// We don't use cloneDeep from lodash here
 	// because we know the data is JSON compatible,
 	// see https://github.com/lodash/lodash/issues/1984
-	const mergedTree = JSON.parse( JSON.stringify( baseData ) );
+	const mergedTree = baseData ? JSON.parse( JSON.stringify( baseData ) ) : {};
 
 	const styleKeys = [ 'typography', 'color' ];
+	const settingKeys = [ 'typography', 'color', 'custom', 'spacing' ];
 	Object.keys( userData ).forEach( ( context ) => {
 		styleKeys.forEach( ( key ) => {
-			// Normalize object shape: make sure the key exists under styles.
+			// Normalize object shape.
 			if ( ! mergedTree[ context ].styles?.[ key ] ) {
 				mergedTree[ context ].styles[ key ] = {};
 			}
-
-			// Merge data: base + user.
+			// Merge base + user data.
 			mergedTree[ context ].styles[ key ] = {
 				...mergedTree[ context ].styles[ key ],
 				...userData[ context ]?.styles?.[ key ],
+			};
+		} );
+		settingKeys.forEach( ( key ) => {
+			// Normalize object shape.
+			if ( ! mergedTree[ context ].settings?.[ key ] ) {
+				mergedTree[ context ].settings[ key ] = {};
+			}
+			// Merge base + user data.
+			mergedTree[ context ].settings[ key ] = {
+				...mergedTree[ context ].settings[ key ],
+				...userData[ context ]?.settings?.[ key ],
 			};
 		} );
 	} );
@@ -40,12 +51,11 @@ const mergeTrees = ( baseData, userData ) => {
 	return mergedTree;
 };
 
-export default ( blockData, baseTree, userTree ) => {
+export default ( blockData, tree ) => {
 	const styles = [];
 	// Can this be converted to a context, as the global context?
 	// See comment in the server.
 	styles.push( LINK_COLOR_DECLARATION );
-	const tree = mergeTrees( baseTree, userTree );
 
 	/**
 	 * Transform given style tree into a set of style declarations.

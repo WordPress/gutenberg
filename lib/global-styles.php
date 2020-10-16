@@ -141,7 +141,7 @@ function gutenberg_experimental_global_styles_get_user() {
 function gutenberg_experimental_global_styles_get_user_cpt( $should_create_cpt = false, $post_status_filter = array( 'publish' ) ) {
 	$user_cpt         = array();
 	$post_type_filter = 'wp_global_styles';
-	$post_name_filter = 'wp-global-styles-' . strtolower( wp_get_theme()->get( 'TextDomain' ) );
+	$post_name_filter = 'wp-global-styles-' . urlencode( wp_get_theme()->get_stylesheet() );
 	$recent_posts     = wp_get_recent_posts(
 		array(
 			'numberposts' => 1,
