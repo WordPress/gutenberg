@@ -201,6 +201,8 @@ async function runAxeTestsForBlockEditor() {
 			'link-name',
 			'listitem',
 			'region',
+			'aria-required-children',
+			'aria-required-parent',
 		],
 		exclude: [
 			// Ignores elements created by metaboxes.
