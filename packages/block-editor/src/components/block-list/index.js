@@ -24,12 +24,6 @@ import useBlockDropZone from '../use-block-drop-zone';
  */
 const appenderNodesMap = new Map();
 
-/**
- * If the block count exceeds the threshold, we disable the reordering animation
- * to avoid laginess.
- */
-const BLOCK_ANIMATION_THRESHOLD = 200;
-
 function BlockList(
 	{ className, placeholder, rootClientId, renderAppender },
 	ref
@@ -73,8 +67,6 @@ function Items( {
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
-			getGlobalBlockCount,
-			isTyping,
 			isDraggingBlocks,
 			__experimentalGetActiveBlockIdByBlockNames,
 		} = select( 'core/block-editor' );
@@ -90,9 +82,6 @@ function Items( {
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 			orientation: getBlockListSettings( rootClientId )?.orientation,
 			hasMultiSelection: hasMultiSelection(),
-			enableAnimation:
-				! isTyping() &&
-				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 			isDraggingBlocks: isDraggingBlocks(),
 			activeEntityBlockId,
 		};
@@ -104,7 +93,6 @@ function Items( {
 		multiSelectedBlockClientIds,
 		orientation,
 		hasMultiSelection,
-		enableAnimation,
 		isDraggingBlocks,
 		activeEntityBlockId,
 	} = useSelect( selector, [ rootClientId ] );
@@ -137,9 +125,9 @@ function Items( {
 							clientId={ clientId }
 							// This prop is explicitely computed and passed down
 							// to avoid being impacted by the async mode
-							// otherwise there might be a small delay to trigger the animation.
+							// otherwise there might be a small delay to trigger
+							// the animation.
 							index={ index }
-							enableAnimation={ enableAnimation }
 							className={ classnames( {
 								'is-drop-target': isDropTarget,
 								'is-dropping-horizontally':

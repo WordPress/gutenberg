@@ -81,12 +81,8 @@ function BlockListBlock( {
 	isFocusMode,
 	isLocked,
 	clientId,
-	rootClientId,
 	isSelected,
 	isMultiSelected,
-	isPartOfMultiSelection,
-	isFirstMultiSelected,
-	isLastMultiSelected,
 	isTypingWithinBlock,
 	isAncestorOfSelectedBlock,
 	isSelectionEnabled,
@@ -100,8 +96,6 @@ function BlockListBlock( {
 	onInsertBlocksAfter,
 	onMerge,
 	toggleSelection,
-	index,
-	enableAnimation,
 	activeEntityBlockId,
 } ) {
 	// In addition to withSelect, we should favor using useSelect in this
@@ -207,18 +201,7 @@ function BlockListBlock( {
 
 	const value = {
 		clientId,
-		rootClientId,
-		isSelected,
-		isFirstMultiSelected,
-		isLastMultiSelected,
-		isPartOfMultiSelection,
-		enableAnimation,
-		index,
 		className: wrapperClassName,
-		isLocked,
-		name,
-		mode,
-		blockTitle: blockType.title,
 		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
@@ -267,10 +250,8 @@ const applyWithSelect = withSelect(
 	( select, { clientId, rootClientId, isLargeViewport } ) => {
 		const {
 			isBlockSelected,
-			isAncestorMultiSelected,
 			isBlockMultiSelected,
 			isFirstMultiSelectedBlock,
-			getLastMultiSelectedBlockClientId,
 			isTyping,
 			getBlockMode,
 			isSelectionEnabled,
@@ -297,19 +278,12 @@ const applyWithSelect = withSelect(
 		// the state. It happens now because the order in withSelect rendering
 		// is not correct.
 		const { name, attributes, isValid } = block || {};
-		const isFirstMultiSelected = isFirstMultiSelectedBlock( clientId );
 
 		// Do not add new properties here, use `useSelect` instead to avoid
 		// leaking new props to the public API (editor.BlockListBlock filter).
 		return {
 			isMultiSelected: isBlockMultiSelected( clientId ),
-			isPartOfMultiSelection:
-				isBlockMultiSelected( clientId ) ||
-				isAncestorMultiSelected( clientId ),
-			isFirstMultiSelected,
-			isLastMultiSelected:
-				getLastMultiSelectedBlockClientId() === clientId,
-			multiSelectedClientIds: isFirstMultiSelected
+			multiSelectedClientIds: isFirstMultiSelectedBlock( clientId )
 				? getMultiSelectedBlockClientIds()
 				: undefined,
 

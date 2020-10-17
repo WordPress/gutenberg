@@ -31,6 +31,12 @@ import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-wrapper-elements';
 
 /**
+ * If the block count exceeds the threshold, we disable the reordering animation
+ * to avoid laginess.
+ */
+const BLOCK_ANIMATION_THRESHOLD = 200;
+
+/**
  * This hook is used to lightly mark an element as a block element. The element
  * should be the outermost element of a block. Call this hook and pass the
  * returned props to the element to mark as a block. If you define a ref for the
@@ -51,21 +57,59 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const ref = props.ref || fallbackRef;
 	const onSelectionStart = useContext( Context );
 	const setBlockNodes = useContext( SetBlockNodes );
+	const { clientId, className, wrapperProps = {} } = useContext(
+		BlockListBlockContext
+	);
 	const {
-		clientId,
 		rootClientId,
+		mode,
+		name,
+		blockTitle,
+		index,
 		isSelected,
 		isFirstMultiSelected,
 		isLastMultiSelected,
 		isPartOfMultiSelection,
 		enableAnimation,
-		index,
-		className,
-		name,
-		mode,
-		blockTitle,
-		wrapperProps = {},
-	} = useContext( BlockListBlockContext );
+	} = useSelect(
+		( select ) => {
+			const {
+				getBlockMode,
+				getBlockName,
+				getBlockType,
+				getBlockRootClientId,
+				getBlockIndex,
+				isBlockSelected,
+				isFirstMultiSelectedBlock,
+				getLastMultiSelectedBlockClientId,
+				isBlockMultiSelected,
+				isAncestorMultiSelected,
+				isTyping,
+				getGlobalBlockCount,
+			} = select( 'core/block-editor' );
+			const blockRootClientId = getBlockRootClientId( clientId );
+			const blockName = getBlockName( clientId );
+
+			return {
+				rootClientId: blockRootClientId,
+				mode: getBlockMode( clientId ),
+				name: blockName,
+				blockTitle: getBlockType( blockName ).title,
+				index: getBlockIndex( clientId, rootClientId ),
+				isSelected: isBlockSelected( clientId ),
+				isFirstMultiSelected: isFirstMultiSelectedBlock( clientId ),
+				isLastMultiSelected:
+					getLastMultiSelectedBlockClientId() === clientId,
+				isPartOfMultiSelection:
+					isBlockMultiSelected( clientId ) ||
+					isAncestorMultiSelected( clientId ),
+				enableAnimation:
+					! isTyping() &&
+					getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
+			};
+		},
+		[ clientId ]
+	);
 	const {
 		initialPosition,
 		shouldFocusFirstElement,
