@@ -137,7 +137,6 @@ function InlineLinkUI( {
 		} else {
 			const newValue = applyFormat( value, format );
 			newValue.start = newValue.end;
-			newValue.activeFormats = [];
 			onChange( newValue );
 		}
 
