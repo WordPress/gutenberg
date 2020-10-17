@@ -147,6 +147,19 @@ export function* saveWidgetAreas( widgetAreas ) {
 							sidebar: widgetArea.id,
 						}
 					);
+
+					if ( ! created ) {
+						throw new Error(
+							sprintf(
+								/* translators: %s: The widget name. */
+								__(
+									'Could not save the widget "%s". An unexpected error occurred.'
+								),
+								block?.attributes?.name || block.name
+							)
+						);
+					}
+
 					widgetIds.push( created.id );
 					yield setWidgetIdForClientId( block.clientId, created.id );
 				}
