@@ -13,7 +13,7 @@ const Context = createContext( {
 	isSelected: false,
 	focusedElement: null,
 	setFocusedElement: noop,
-	clientId: null,
+	clientId: undefined,
 } );
 const { Provider } = Context;
 

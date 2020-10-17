@@ -577,7 +577,6 @@ _Parameters_
 
 -   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
 -   _options_ `Object`: Options for internal use only.
--   _options.\_\_unstableIsHtml_ `boolean`: 
 
 _Returns_
 

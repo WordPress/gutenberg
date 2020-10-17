@@ -30,8 +30,9 @@ import {
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from '../use-moving-animation';
 import { Context, SetBlockNodes } from './root-container';
-import { BlockListBlockContext } from './block';
+import { BlockWrapperPropsContext } from './block';
 import ELEMENTS from './block-wrapper-elements';
+import { useBlockEditContext } from '../block-edit';
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -48,21 +49,19 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * also pass any other props through this hook, and they will be merged and
  * returned.
  *
- * @param {Object}  props   Optional. Props to pass to the element. Must contain
- *                          the ref if one is defined.
- * @param {Object}  options Options for internal use only.
- * @param {boolean} options.__unstableIsHtml
+ * @param {Object} props   Optional. Props to pass to the element. Must contain
+ * the ref if one is defined.
+ * @param {Object} options Options for internal use only.
  *
  * @return {Object} Props to pass to the element to mark as a block.
  */
-export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
+export function useBlockProps( props = {}, options = {} ) {
+	const { clientId = options.clientId } = useBlockEditContext();
 	const fallbackRef = useRef();
 	const ref = props.ref || fallbackRef;
 	const onSelectionStart = useContext( Context );
 	const setBlockNodes = useContext( SetBlockNodes );
-	const { clientId, className, wrapperProps = {} } = useContext(
-		BlockListBlockContext
-	);
+	const wrapperProps = useContext( BlockWrapperPropsContext );
 	const {
 		rootClientId,
 		mode,
@@ -325,7 +324,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		};
 	}, [ isNavigationMode, isHovered, setHovered ] );
 
-	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
+	const htmlSuffix =
+		mode === 'html' && ! options.__unstableIsHtml ? '-visual' : '';
 
 	return {
 		...wrapperProps,
@@ -338,12 +338,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-block': clientId,
 		'data-type': name,
 		'data-title': blockTitle,
-		className: classnames(
-			className,
-			props.className,
-			wrapperProps.className,
-			{ 'is-hovered': isHovered }
-		),
+		className: classnames( props.className, wrapperProps.className, {
+			'is-hovered': isHovered,
+		} ),
 		style: { ...wrapperProps.style, ...props.style },
 	};
 }

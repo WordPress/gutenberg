@@ -42,7 +42,7 @@ import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
 import { useBlockProps } from './block-wrapper';
 
-export const BlockListBlockContext = createContext();
+export const BlockWrapperPropsContext = createContext( {} );
 
 /**
  * Merges wrapper props with special handling for classNames and styles.
@@ -68,9 +68,14 @@ function mergeWrapperProps( propsA, propsB ) {
 	return newProps;
 }
 
-function Block( { children, isHtml, ...props } ) {
+function Block( { children, isHtml, clientId, ...props } ) {
 	return (
-		<div { ...useBlockProps( props, { __unstableIsHtml: isHtml } ) }>
+		<div
+			{ ...useBlockProps( props, {
+				clientId,
+				__unstableIsHtml: isHtml,
+			} ) }
+		>
 			{ children }
 		</div>
 	);
@@ -90,7 +95,7 @@ function BlockListBlock( {
 	name,
 	isValid,
 	attributes,
-	wrapperProps,
+	wrapperProps = {},
 	setAttributes,
 	onReplace,
 	onInsertBlocksAfter,
@@ -199,18 +204,19 @@ function BlockListBlock( {
 		);
 	}
 
-	const value = {
-		clientId,
-		className: wrapperClassName,
-		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
-	};
-	const memoizedValue = useMemo( () => value, Object.values( value ) );
+	const memoizedValue = useMemo(
+		() => ( {
+			...omit( wrapperProps, [ 'data-align' ] ),
+			className: wrapperClassName,
+		} ),
+		[ wrapperClassName, ...Object.values( wrapperProps ) ]
+	);
 
 	let block;
 
 	if ( ! isValid ) {
 		block = (
-			<Block>
+			<Block clientId={ clientId } { ...wrapperProps }>
 				<BlockInvalidWarning clientId={ clientId } />
 				<div>{ getSaveElement( blockType, attributes ) }</div>
 			</Block>
@@ -221,28 +227,36 @@ function BlockListBlock( {
 		block = (
 			<>
 				<div style={ { display: 'none' } }>{ blockEdit }</div>
-				<Block isHtml>
+				<Block isHtml clientId={ clientId } { ...wrapperProps }>
 					<BlockHtml clientId={ clientId } />
 				</Block>
 			</>
 		);
 	} else if ( lightBlockWrapper ) {
-		block = blockEdit;
+		block = (
+			<BlockWrapperPropsContext.Provider value={ memoizedValue }>
+				{ blockEdit }
+			</BlockWrapperPropsContext.Provider>
+		);
 	} else {
-		block = <Block { ...wrapperProps }>{ blockEdit }</Block>;
+		block = (
+			<Block clientId={ clientId } { ...wrapperProps }>
+				{ blockEdit }
+			</Block>
+		);
 	}
 
 	return (
-		<BlockListBlockContext.Provider value={ memoizedValue }>
+		<>
 			<BlockCrashBoundary onError={ onBlockError }>
 				{ block }
 			</BlockCrashBoundary>
 			{ !! hasError && (
-				<Block>
+				<Block clientId={ clientId } { ...wrapperProps }>
 					<BlockCrashWarning />
 				</Block>
 			) }
-		</BlockListBlockContext.Provider>
+		</>
 	);
 }
 
