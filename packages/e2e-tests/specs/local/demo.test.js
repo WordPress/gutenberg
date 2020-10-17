@@ -9,7 +9,7 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 const MOCK_VIMEO_RESPONSE = {
-	url: 'https://vimeo.com/22439234',
+	url: 'https://vimeo.com/76979871',
 	html: '<iframe width="16" height="9"></iframe>',
 	type: 'video',
 	provider_name: 'Vimeo',
@@ -21,7 +21,7 @@ describe( 'new editor state', () => {
 	beforeAll( async () => {
 		await setUpResponseMocking( [
 			{
-				match: createEmbeddingMatcher( 'https://vimeo.com/22439234' ),
+				match: createEmbeddingMatcher( 'https://vimeo.com/76979871' ),
 				onRequestMatch: createJSONResponse( MOCK_VIMEO_RESPONSE ),
 			},
 		] );

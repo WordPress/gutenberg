@@ -79,7 +79,7 @@ describe( 'Blocks raw handling', () => {
 						transform: () => {
 							return createBlock( 'core/embed', {
 								url:
-									'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+									'https://www.youtube.com/watch?v=72xdCU__XCk',
 							} );
 						},
 					},

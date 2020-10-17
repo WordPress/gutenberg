@@ -80,7 +80,7 @@ describe( 'getEntityRecords', () => {
 describe( 'getEmbedPreview', () => {
 	const SUCCESSFUL_EMBED_RESPONSE = { data: '<p>some html</p>' };
 	const UNEMBEDDABLE_RESPONSE = false;
-	const EMBEDDABLE_URL = 'http://twitter.com/notnownikki';
+	const EMBEDDABLE_URL = 'http://twitter.com/WordPress';
 	const UNEMBEDDABLE_URL = 'http://example.com/';
 
 	it( 'yields with fetched embed preview', async () => {

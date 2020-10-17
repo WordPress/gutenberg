@@ -13,9 +13,9 @@ import {
 
 const MOCK_RESPONSES = [
 	{
-		match: createEmbeddingMatcher( 'https://twitter.com/wordpress' ),
+		match: createEmbeddingMatcher( 'https://twitter.com/WordPress' ),
 		onRequestMatch: createJSONResponse( {
-			url: 'https://twitter.com/wordpress',
+			url: 'https://twitter.com/WordPress',
 			html: '<p>Mock success response.</p>',
 			type: 'rich',
 			provider_name: 'Twitter',
@@ -48,7 +48,7 @@ describe( 'Embed block inside a locked all parent', () => {
 		await page.waitForSelector( embedInputSelector );
 		await page.click( embedInputSelector );
 		// This URL should not have a trailing slash.
-		await page.keyboard.type( 'https://twitter.com/wordpress' );
+		await page.keyboard.type( 'https://twitter.com/WordPress' );
 		await page.keyboard.press( 'Enter' );
 		// The twitter block should appear correctly.
 		await page.waitForSelector( 'figure.wp-block-embed' );
