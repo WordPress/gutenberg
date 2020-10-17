@@ -204,19 +204,21 @@ function BlockListBlock( {
 		);
 	}
 
-	const memoizedValue = useMemo(
-		() => ( {
-			...omit( wrapperProps, [ 'data-align' ] ),
-			className: wrapperClassName,
-		} ),
-		[ wrapperClassName, ...Object.values( wrapperProps ) ]
+	const blockProps = {
+		...omit( wrapperProps, [ 'data-align' ] ),
+		className: wrapperClassName,
+	};
+
+	const memoizedBlockProps = useMemo(
+		() => blockProps,
+		Object.values( blockProps )
 	);
 
 	let block;
 
 	if ( ! isValid ) {
 		block = (
-			<Block clientId={ clientId } { ...wrapperProps }>
+			<Block clientId={ clientId } { ...blockProps }>
 				<BlockInvalidWarning clientId={ clientId } />
 				<div>{ getSaveElement( blockType, attributes ) }</div>
 			</Block>
@@ -227,20 +229,20 @@ function BlockListBlock( {
 		block = (
 			<>
 				<div style={ { display: 'none' } }>{ blockEdit }</div>
-				<Block isHtml clientId={ clientId } { ...wrapperProps }>
+				<Block isHtml clientId={ clientId } { ...blockProps }>
 					<BlockHtml clientId={ clientId } />
 				</Block>
 			</>
 		);
 	} else if ( lightBlockWrapper ) {
 		block = (
-			<BlockWrapperPropsContext.Provider value={ memoizedValue }>
+			<BlockWrapperPropsContext.Provider value={ memoizedBlockProps }>
 				{ blockEdit }
 			</BlockWrapperPropsContext.Provider>
 		);
 	} else {
 		block = (
-			<Block clientId={ clientId } { ...wrapperProps }>
+			<Block clientId={ clientId } { ...blockProps }>
 				{ blockEdit }
 			</Block>
 		);
@@ -252,7 +254,7 @@ function BlockListBlock( {
 				{ block }
 			</BlockCrashBoundary>
 			{ !! hasError && (
-				<Block clientId={ clientId } { ...wrapperProps }>
+				<Block clientId={ clientId } { ...blockProps }>
 					<BlockCrashWarning />
 				</Block>
 			) }
@@ -265,7 +267,6 @@ const applyWithSelect = withSelect(
 		const {
 			isBlockSelected,
 			isBlockMultiSelected,
-			isFirstMultiSelectedBlock,
 			isTyping,
 			getBlockMode,
 			isSelectionEnabled,
@@ -273,7 +274,6 @@ const applyWithSelect = withSelect(
 			hasSelectedInnerBlock,
 			getTemplateLock,
 			__unstableGetBlockWithoutInnerBlocks,
-			getMultiSelectedBlockClientIds,
 		} = select( 'core/block-editor' );
 		const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 		const isSelected = isBlockSelected( clientId );
@@ -297,9 +297,6 @@ const applyWithSelect = withSelect(
 		// leaking new props to the public API (editor.BlockListBlock filter).
 		return {
 			isMultiSelected: isBlockMultiSelected( clientId ),
-			multiSelectedClientIds: isFirstMultiSelectedBlock( clientId )
-				? getMultiSelectedBlockClientIds()
-				: undefined,
 
 			// We only care about this prop when the block is selected
 			// Thus to avoid unnecessary rerenders we avoid updating the prop if
@@ -342,13 +339,13 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
 		setAttributes( newAttributes ) {
+			const { clientId } = ownProps;
 			const {
-				clientId,
-				isFirstMultiSelected,
-				multiSelectedClientIds,
-			} = ownProps;
-			const clientIds = isFirstMultiSelected
-				? multiSelectedClientIds
+				isFirstMultiSelectedBlock,
+				getMultiSelectedBlockClientIds,
+			} = select( 'core/block-editor' );
+			const clientIds = isFirstMultiSelectedBlock( clientId )
+				? getMultiSelectedBlockClientIds()
 				: [ clientId ];
 
 			updateBlockAttributes( clientIds, newAttributes );
