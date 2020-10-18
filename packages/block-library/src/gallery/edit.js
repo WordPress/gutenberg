@@ -62,7 +62,7 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
 	native: { type: 'stepper' },
 } );
 
-export const GalleryEdit = ( props ) => {
+function GalleryEdit( props ) {
 	const {
 		setAttributes,
 		attributes,
@@ -318,7 +318,7 @@ export const GalleryEdit = ( props ) => {
 			/>
 		</>
 	);
-};
+}
 export default compose( [
 	withNotices,
 	withViewportMatch( { isNarrow: '< small' } ),
