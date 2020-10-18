@@ -43,8 +43,9 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	};
 	return (
 		<AnglePickerControl
-			value={ hasGradient ? angle : '' }
+			hideLabelFromVision
 			onChange={ onAngleChange }
+			value={ hasGradient ? angle : '' }
 		/>
 	);
 };
