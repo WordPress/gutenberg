@@ -13,6 +13,7 @@ import {
 import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
+import { useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,7 +27,6 @@ export const Gallery = ( props ) => {
 		isSelected,
 		setAttributes,
 		mediaPlaceholder,
-		onFocusGalleryCaption,
 		insertBlocksAfter,
 		images,
 	} = props;
@@ -37,6 +37,7 @@ export const Gallery = ( props ) => {
 		caption,
 		imageCrop,
 	} = attributes;
+	const galleryRef = useRef();
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'blocks-gallery-grid',
@@ -47,8 +48,16 @@ export const Gallery = ( props ) => {
 			renderAppender: false,
 		}
 	);
+
+	useEffect( () => {
+		if ( galleryRef.current && isSelected ) {
+			galleryRef.current.parentElement.focus();
+		}
+	}, [ isSelected ] );
+
 	return (
 		<figure
+			ref={ galleryRef }
 			className={ classnames( className, {
 				[ `align${ align }` ]: align,
 				[ `columns-${ columns }` ]: columns,
@@ -64,7 +73,6 @@ export const Gallery = ( props ) => {
 				className="blocks-gallery-caption"
 				placeholder={ __( 'Write gallery caption…' ) }
 				value={ caption }
-				unstableOnFocus={ onFocusGalleryCaption }
 				onChange={ ( value ) => setAttributes( { caption: value } ) }
 				inlineToolbar
 				__unstableOnSplitAtEnd={ () =>
