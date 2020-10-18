@@ -56,12 +56,7 @@
 				color: $white;
 				text-align: center;
 				font-size: $default-font-size;
-				background: linear-gradient(
-					0deg,
-					rgba( $color: $black, $alpha: 0.7 ) 0,
-					rgba( $color: $black, $alpha: 0.3 ) 70%,
-					transparent
-				);
+				background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
 
 				img {
 					display: inline;
@@ -93,9 +88,9 @@
 
 	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
 	& .wp-block-image {
-		width: calc( 50% - #{$grid-unit-20} );
+		width: calc(50% - #{$grid-unit-20});
 
-		&:nth-of-type( even ) {
+		&:nth-of-type(even) {
 			margin-right: 0;
 		}
 	}
@@ -109,9 +104,7 @@
 	@include break-small {
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } .wp-block-image {
-				width: calc(
-					#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i}
-				);
+				width: calc(#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i});
 				margin-right: $grid-unit-20;
 			}
 		}
@@ -119,9 +112,9 @@
 		// Unset the right margin on every rightmost gallery item to ensure center balance.
 		@for $column-count from 1 through 8 {
 			&.columns-#{
-				$column-count
-				}
-				.wp-block-image:nth-of-type( #{ $column-count }n ) {
+			$column-count
+			}
+			.wp-block-image:nth-of-type(#{ $column-count }n) {
 				margin-right: 0;
 			}
 		}

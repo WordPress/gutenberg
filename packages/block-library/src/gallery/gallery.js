@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { RichText, InnerBlocks } from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
@@ -45,6 +45,7 @@ export const Gallery = ( props ) => {
 			<InnerBlocks
 				allowedBlocks={ [ 'core/image' ] }
 				__experimentalTagName="ul"
+				orientation="horizontal"
 			/>
 
 			{ mediaPlaceholder }
