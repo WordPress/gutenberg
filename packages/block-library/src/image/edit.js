@@ -259,6 +259,7 @@ export function ImageEdit( {
 			setTempUrl( url );
 			return;
 		}
+		console.log( 'here?' );
 		revokeBlobURL( tempUrl );
 	}, [ isTemp, url ] );
 
