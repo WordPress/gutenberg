@@ -27,8 +27,9 @@
 		"!((src|build|build-module)/(components|utils)/**)"
 	],
 	"dependencies": {
-	  "@wordpress/data": "file:../data",
-	  "uuid": "^8.3.1"
+		"@wordpress/data": "file:../data",
+		"lodash": "^4.17.20",
+		"uuid": "^8.3.1"
 	},
 	"publishConfig": {
 		"access": "public"

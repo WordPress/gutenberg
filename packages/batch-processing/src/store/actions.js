@@ -8,13 +8,29 @@ import { v4 as uuid } from 'uuid';
  */
 import {
 	select,
+	dispatch,
 	enqueueItemAndAutocommit as enqueueAutocommitControl,
 	processTransaction,
 } from './controls';
 import { STATE_ERROR, STATE_SUCCESS } from './constants';
 
 export const enqueueItemAndAutocommit = function* ( queue, context, item ) {
-	return yield enqueueAutocommitControl( queue, context, item, true );
+	return yield enqueueAutocommitControl( queue, context, item );
+};
+
+export const enqueueItemAndWaitForResults = function* ( queue, context, item ) {
+	const { itemId } = yield dispatch( 'enqueueItem', queue, context, item );
+	const { promise } = yield* getOrSetupPromise( queue, context );
+
+	return {
+		wait: promise.then( ( batch ) => {
+			if ( batch.state === STATE_ERROR ) {
+				throw batch.errors[ itemId ];
+			}
+
+			return batch.results[ itemId ];
+		} ),
+	};
 };
 
 export const enqueueItem = function ( queue, context, item ) {
@@ -26,6 +42,33 @@ export const enqueueItem = function ( queue, context, item ) {
 		item,
 		itemId,
 	};
+};
+
+const setupPromise = function ( queue, context ) {
+	const action = {
+		type: 'SETUP_PROMISE',
+		queue,
+		context,
+	};
+
+	action.promise = new Promise( ( resolve, reject ) => {
+		action.resolve = resolve;
+		action.reject = reject;
+	} );
+
+	return action;
+};
+
+const getOrSetupPromise = function* ( queue, context ) {
+	const promise = yield select( 'getPromise', queue, context );
+
+	if ( promise ) {
+		return promise;
+	}
+
+	yield setupPromise( queue, context );
+
+	return yield select( 'getPromise', queue, context );
 };
 
 export const processBatch = function* ( queue, context, meta = {} ) {
@@ -51,13 +94,21 @@ export const processBatch = function* ( queue, context, meta = {} ) {
 		}
 	}
 
+	const promise = yield select( 'getPromise', queue, context );
 	yield {
+		queue,
+		context,
 		batchId,
 		type: 'BATCH_FINISH',
 		state: failed ? STATE_ERROR : STATE_SUCCESS,
 	};
+	const batch = yield select( 'getBatch', batchId );
 
-	return yield select( 'getBatch', batchId );
+	if ( promise ) {
+		promise.resolve( batch );
+	}
+
+	return batch;
 };
 
 export function* commitTransaction( batchId, transactionId ) {

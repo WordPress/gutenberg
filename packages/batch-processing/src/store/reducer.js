@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { omit } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import {
@@ -14,6 +19,7 @@ const defaultState = {
 	enqueuedItems: {},
 	batches: {},
 	processors: {},
+	promises: {},
 };
 
 export default function reducer( state = defaultState, action ) {
@@ -44,7 +50,7 @@ export default function reducer( state = defaultState, action ) {
 			}
 
 			const stateQueue = state.enqueuedItems[ queue ] || {};
-			const enqueuedItems = [ ...stateQueue[ context ] ];
+			const enqueuedItems = [ ...( stateQueue[ context ] || [] ) ];
 			const transactions = {};
 			let transactionNb = 0;
 			while ( enqueuedItems.length ) {
@@ -83,6 +89,23 @@ export default function reducer( state = defaultState, action ) {
 			};
 		}
 
+		case 'SETUP_PROMISE': {
+			return {
+				...state,
+				promises: {
+					...state.promises,
+					[ action.queue ]: {
+						...( state.promises[ action.queue ] || {} ),
+						[ action.context ]: {
+							promise: action.promise,
+							resolve: action.resolve,
+							reject: action.reject,
+						},
+					},
+				},
+			};
+		}
+
 		case 'BATCH_START': {
 			const { batchId } = action;
 			return {
@@ -110,6 +133,13 @@ export default function reducer( state = defaultState, action ) {
 								? STATE_SUCCESS
 								: STATE_ERROR,
 					},
+				},
+				promises: {
+					...state.promises,
+					[ action.queue ]: omit(
+						state.promises[ action.queue ] || {},
+						[ action.context ]
+					),
 				},
 			};
 		}
