@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,10 +23,11 @@ import {
 
 export default function AnglePickerControl( {
 	className,
+	hideLabelFromVision,
 	id: idProp,
-	value,
+	label = __( 'Angle' ),
 	onChange,
-	label,
+	value,
 	...props
 } ) {
 	const instanceId = useInstanceId(
@@ -45,6 +47,7 @@ export default function AnglePickerControl( {
 	return (
 		<BaseControl
 			className={ classes }
+			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
 			label={ label }
 			{ ...props }
