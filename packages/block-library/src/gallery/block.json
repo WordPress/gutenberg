@@ -2,7 +2,7 @@
 	"name": "core/gallery",
 	"category": "media",
 	"attributes": {
-		"images": {
+		"imageUploads": {
 			"type": "array",
 			"default": [],
 			"items": {

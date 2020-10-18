@@ -28,11 +28,12 @@ export const Gallery = ( props ) => {
 		mediaPlaceholder,
 		onFocusGalleryCaption,
 		insertBlocksAfter,
+		images,
 	} = props;
 
 	const {
 		align,
-		columns = defaultColumnsNumber( attributes ),
+		columns = defaultColumnsNumber( images ),
 		caption,
 		imageCrop,
 	} = attributes;
