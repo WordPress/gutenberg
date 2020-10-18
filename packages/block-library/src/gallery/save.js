@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { RichText, InnerBlocks } from '@wordpress/block-editor';
@@ -6,7 +11,7 @@ import { RichText, InnerBlocks } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { defaultColumnsNumber } from './shared';
+// import { defaultColumnsNumber } from './shared';
 
 // Need to add work out best way to pass this to child images.
 // import {
@@ -16,7 +21,7 @@ import { defaultColumnsNumber } from './shared';
 
 export default function save( { attributes } ) {
 	const {
-		columns = 3, // defaultColumnsNumber( attributes ),
+		columns = 3, // defaultColumnsNumber( attributes ) - TODO: get this somehow from Edit state?
 		imageCrop,
 		caption,
 		// linkTo, // Needs to be passed down to children.
@@ -24,9 +29,9 @@ export default function save( { attributes } ) {
 
 	return (
 		<figure
-			className={ `columns-${ columns } ${
-				imageCrop ? 'is-cropped' : ''
-			}` }
+			className={ classnames( `columns-${ columns }`, {
+				'is-cropped': imageCrop,
+			} ) }
 		>
 			<ul>
 				<InnerBlocks.Content />

@@ -39,7 +39,7 @@ export const Gallery = ( props ) => {
 	} = attributes;
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			className: classnames( 'wp-block-gallery__container' ),
+			className: 'blocks-gallery-grid',
 		},
 		{
 			allowedBlocks: [ 'core/image' ],
