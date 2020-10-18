@@ -33,7 +33,7 @@ export default function save( { attributes } ) {
 				'is-cropped': imageCrop,
 			} ) }
 		>
-			<ul>
+			<ul className="blocks-gallery-grid">
 				<InnerBlocks.Content />
 			</ul>
 			{ ! RichText.isEmpty( caption ) && (
