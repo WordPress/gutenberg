@@ -54,29 +54,31 @@ function PostPublishPanelPrepublish( {
 				<>
 					<PanelBody
 						initialOpen={ false }
-						title={ [
-							__( 'Visibility:' ),
-							<span
-								className="editor-post-publish-panel__link"
-								key="label"
-							>
+						title={ __( 'Visibility' ) }
+						summary={
+							<>
+								{
+									/* translators: Describing the following as the current visibility. */
+									__( 'Set to:' )
+								}{ ' ' }
 								<PostVisibilityLabel />
-							</span>,
-						] }
+							</>
+						}
 					>
 						<PostVisibility />
 					</PanelBody>
 					<PanelBody
 						initialOpen={ false }
-						title={ [
-							__( 'Publish:' ),
-							<span
-								className="editor-post-publish-panel__link"
-								key="label"
-							>
+						title={ __( 'Publish date' ) }
+						summary={
+							<>
+								{
+									/* translators: Describing the following as the current publish date. */
+									__( 'Set to:' )
+								}{ ' ' }
 								<PostScheduleLabel />
-							</span>,
-						] }
+							</>
+						}
 					>
 						<PostSchedule />
 					</PanelBody>

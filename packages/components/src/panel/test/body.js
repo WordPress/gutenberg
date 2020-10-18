@@ -11,7 +11,9 @@ import { PanelBody } from '../body';
 const getPanelBody = ( container ) =>
 	container.querySelector( '.components-panel__body' );
 const getPanelBodyContent = ( container ) =>
-	container.querySelector( '.components-panel__body > div' );
+	container.querySelector(
+		'.components-panel__body > div:not(.components-panel__body-header)'
+	);
 const getPanelToggle = ( container ) =>
 	container.querySelector( '.components-panel__body-toggle' );
 

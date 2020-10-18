@@ -53,25 +53,31 @@
 	margin-top: -1px;
 }
 
-.components-panel__body > .components-panel__body-title {
-	display: block;
-	padding: 0;
-	font-size: inherit;
-	margin-top: 0;
-	margin-bottom: 0;
-	transition: 0.1s background ease-in-out;
-	@include reduce-motion("transition");
-}
-.components-panel__body.is-opened > .components-panel__body-title {
+.components-panel__body.is-opened > .components-panel__body-header {
 	margin: -1 * $grid-unit-20;
 	margin-bottom: 5px;
 }
 
+.components-panel__body-header > .components-panel__body-title {
+	display: block;
+	padding: 0;
+	transition: 0.1s background ease-in-out;
+	@include reduce-motion("transition");
+	font-size: inherit;
+	margin-top: 0;
+	margin-bottom: 0;
+}
+
 // Hover States
-.components-panel__body > .components-panel__body-title:hover {
+.components-panel__body-header > .components-panel__body-title:hover {
 	// Override the default button hover style
 	background: $gray-100;
 	border: none;
+}
+
+.components-panel__body-summary {
+	padding: $grid-unit-20;
+	padding-top: 0;
 }
 
 .components-panel__body-toggle.components-button {
