@@ -25,6 +25,6 @@ export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
 		imageProps.fullUrl = fullUrl;
 	}
 	imageProps.alt =
-		imageProps.alt !== '' ? imageProps.alt : __( 'Image Gallery Image' );
+		imageProps.alt !== '' ? imageProps.alt : __( 'Image gallery image' );
 	return imageProps;
 };
