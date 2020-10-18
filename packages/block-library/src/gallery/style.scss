@@ -1,5 +1,5 @@
 .wp-block-gallery {
-	ul {
+	ul.blocks-gallery-grid {
 		display: flex;
 		flex-wrap: wrap;
 		list-style-type: none;
@@ -33,12 +33,8 @@
 				display: block;
 				max-width: 100%;
 				height: auto;
-			}
-
-			// IE doesn't handle cropping, so we need an explicit width here.
-			img {
 				width: 100%;
-
+				// IE doesn't handle cropping, so we need an explicit width here.
 				// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
 				@supports ( position: sticky ) {
 					width: auto;
@@ -56,7 +52,12 @@
 				color: $white;
 				text-align: center;
 				font-size: $default-font-size;
-				background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
+				background: linear-gradient(
+					0deg,
+					rgba( $color: $black, $alpha: 0.7 ) 0,
+					rgba( $color: $black, $alpha: 0.3 ) 70%,
+					transparent
+				);
 
 				img {
 					display: inline;
@@ -70,7 +71,7 @@
 	}
 
 	// Cropped
-	&.is-cropped ul li.wp-block-image {
+	&.is-cropped ul.blocks-gallery-grid li.wp-block-image {
 		a,
 		img {
 			// IE11 doesn't support object-fit, so just make sure images aren't skewed.
@@ -88,9 +89,9 @@
 
 	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
 	& .wp-block-image {
-		width: calc(50% - #{$grid-unit-20});
+		width: calc( 50% - #{$grid-unit-20} );
 
-		&:nth-of-type(even) {
+		&:nth-of-type( even ) {
 			margin-right: 0;
 		}
 	}
@@ -104,7 +105,9 @@
 	@include break-small {
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } .wp-block-image {
-				width: calc(#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i});
+				width: calc(
+					#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i}
+				);
 				margin-right: $grid-unit-20;
 			}
 		}
@@ -112,9 +115,9 @@
 		// Unset the right margin on every rightmost gallery item to ensure center balance.
 		@for $column-count from 1 through 8 {
 			&.columns-#{
-			$column-count
-			}
-			.wp-block-image:nth-of-type(#{ $column-count }n) {
+				$column-count
+				}
+				.wp-block-image:nth-of-type( #{ $column-count }n ) {
 				margin-right: 0;
 			}
 		}
