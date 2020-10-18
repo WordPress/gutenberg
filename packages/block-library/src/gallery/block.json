@@ -2,12 +2,12 @@
 	"name": "core/gallery",
 	"category": "media",
 	"attributes": {
-		"ids": {
+		"images": {
 			"type": "array",
+			"default": [],
 			"items": {
-				"type": "number"
-			},
-			"default": []
+				"type": "object"
+			}
 		},
 		"columns": {
 			"type": "number",

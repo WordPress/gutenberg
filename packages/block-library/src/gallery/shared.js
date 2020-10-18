@@ -4,7 +4,9 @@
 import { get, pick } from 'lodash';
 
 export function defaultColumnsNumber( attributes ) {
-	return attributes?.ids?.length ? Math.min( 3, attributes.ids.length ) : 3;
+	return attributes?.images?.length
+		? Math.min( 3, attributes.images.length )
+		: 3;
 }
 
 export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
