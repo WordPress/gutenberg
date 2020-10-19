@@ -80,7 +80,7 @@ export function* saveEditedWidgetAreas() {
 export function* saveWidgetAreas( widgetAreas ) {
 	try {
 		for ( const widgetArea of widgetAreas ) {
-			yield saveWidgetArea( widgetArea.id );
+			yield* saveWidgetArea( widgetArea.id );
 		}
 	} finally {
 		// saveEditedEntityRecord resets the resolution status, let's fix it manually
