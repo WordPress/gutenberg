@@ -1,25 +1,3 @@
-
-// Normal / default size
-:root {
-	--wp-social-link-size: 36px;
-	--wp-social-link-logo-size: 24px;
-}
-
-.has-huge-icon-size > .wp-social-link {
-	--wp-social-link-size: 60px;
-	--wp-social-link-logo-size: 48px;
-}
-
-.has-large-icon-size > .wp-social-link {
-	--wp-social-link-size: 48px;
-	--wp-social-link-logo-size: 36px;
-}
-
-.has-small-icon-size > .wp-social-link {
-	--wp-social-link-size: 30px;
-	--wp-social-link-logo-size: 18px;
-}
-
 .wp-block-social-links {
 	display: flex;
 	flex-wrap: wrap;
@@ -38,19 +16,58 @@
 		border-bottom: 0;
 		box-shadow: none;
 	}
+
+	// Vertically balance the margin of each icon.
+	.wp-social-link {
+		margin: 4px 8px 4px 0;
+	}
+
+	// Icon sizes.
+	// Small.
+	&.has-small-icon-size {
+		svg {
+			width: 18px;
+			height: 18px;
+		}
+	}
+
+	// Normal/default.
+	&,
+	&.has-normal-icon-size {
+		// 24 & 36 button
+		svg {
+			width: 24px;
+			height: 24px;
+		}
+	}
+
+	// Large.
+	&.has-large-icon-size {
+		svg {
+			width: 36px;
+			height: 36px;
+		}
+	}
+
+	// Huge.
+	&.has-huge-icon-size {
+		svg {
+			width: 48px;
+			height: 48px;
+		}
+	}
 }
 
 .wp-social-link {
 	display: block;
-	width: var(--social-link-size);
-	height: var(--social-link-size);
 	border-radius: 9999px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
-	margin: 0 8px 8px 0;
 	transition: transform 0.1s ease;
 	@include reduce-motion("transition");
 
+	// Dimensions.
+	height: auto;
+
 	a {
-		padding: 6px;
 		display: block;
 		line-height: 0;
 		transition: transform 0.1s ease;
@@ -63,8 +80,6 @@
 	svg {
 		color: currentColor;
 		fill: currentColor;
-		width: var(--wp-social-link-logo-size);
-		height: var(--wp-social-link-logo-size);
 	}
 
 	&:hover {

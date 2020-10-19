@@ -6,13 +6,8 @@
 	}
 }
 
-// Reduce the paddings, margins, and UI of inner-blocks.
-// @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
-// When that happens, leverage that instead of the following overrides.
+// Prevent toolbar from jumping when selecting / hovering a link.
 .editor-styles-wrapper .wp-block-social-link {
-	margin: 0 8px 8px 0;
-
-	// Prevent toolbar from jumping when selecting / hovering a link.
 	&.is-selected,
 	&.is-hovered {
 		transform: none;
@@ -26,12 +21,13 @@
 // Placeholder/setup state.
 .wp-block-social-links__social-placeholder {
 	display: flex;
+	min-height: 24px;
 
-	.wp-block-social-link {
+	.wp-social-link {
 		display: inline-flex;
 		align-items: center;
 		justify-content: center;
-		margin: 0 $grid-unit-10 $grid-unit-10 0;
+		margin: $grid-unit-05 $grid-unit-10 $grid-unit-05 0;
 		width: 36px;
 		height: 36px;
 		border-radius: $radius-round;
@@ -57,9 +53,14 @@
 
 // Polish the Appender.
 .wp-block-social-links .block-list-appender {
-	margin: 0 0 $grid-unit-10 0;
+	margin: -$grid-unit-10 0;
 	display: flex;
 	align-items: center;
+
+	svg {
+		width: $icon-size;
+		height: $icon-size;
+	}
 }
 
 // Center flex items. This has an equivalent in style.scss.
@@ -71,12 +72,6 @@
 // @todo: Look at improving the preview component to make this unnecessary.
 .block-editor-block-preview__content .wp-social-link:disabled {
 	opacity: 1;
-}
-
-// Selected/unselected states.
-// Unselected block is preview, selected has additional options.
-[data-type="core/social-links"]:not(.is-selected):not(.has-child-selected) .wp-block-social-links {
-	min-height: 36px; // This height matches the height of the buttons and ensures an empty block doesn't collapse.
 }
 
 // Unconfigured placeholder links are semitransparent.

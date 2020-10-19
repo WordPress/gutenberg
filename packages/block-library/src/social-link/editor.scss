@@ -1,10 +1,18 @@
-.wp-block-social-links .wp-social-link button {
-	color: currentColor;
-	padding: 6px;
-	height: var(--wp-social-link-size);
-}
+// The editor uses the button component, the frontend uses a link.
+// Therefore we unstyle the button component to make it more like the frontend.
+.wp-block-social-links .wp-social-link {
+	line-height: 0;
 
+	button {
+		color: currentColor;
+		padding: 0;
+		height: auto;
+		line-height: 0;
+	}
+}
+/*
 .wp-block-social-links.is-style-pill-shape .wp-social-link button {
 	padding-left: 16px;
 	padding-right: 16px;
 }
+*/
