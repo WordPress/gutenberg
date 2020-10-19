@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pickBy, isEmpty, map, filter } from 'lodash';
+import { pickBy, isEmpty, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -24,18 +24,14 @@ export default function WidgetSelectControl( {
 			.map( ( { attributes } ) => attributes?.referenceWidgetName )
 	);
 	const choosableLegacyWidgets = useMemo( () => {
-		const visible = pickBy(
+		return pickBy(
 			availableLegacyWidgets,
-			( { isHidden } ) => ! isHidden
+			// Filter out hidden widgets and already used reference widgets.
+			( { isHidden }, referenceWidgetName ) =>
+				! isHidden &&
+				( ! referenceWidgetName ||
+					! usedReferenceWidgetNames.includes( referenceWidgetName ) )
 		);
-
-		// Filter out used reference widgets
-		return filter( visible, ( widget, referenceWidgetName ) => {
-			return (
-				! referenceWidgetName ||
-				! usedReferenceWidgetNames.includes( referenceWidgetName )
-			);
-		} );
 	}, [ availableLegacyWidgets, usedReferenceWidgetNames ] );
 
 	if ( isEmpty( choosableLegacyWidgets ) ) {
