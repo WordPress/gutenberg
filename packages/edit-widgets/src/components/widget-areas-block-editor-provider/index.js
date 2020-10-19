@@ -12,7 +12,7 @@ import {
 	FocusReturnProvider,
 } from '@wordpress/components';
 import { uploadMedia } from '@wordpress/media-utils';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import {
 	BlockEditorProvider,
@@ -47,6 +47,7 @@ export default function WidgetAreasBlockEditorProvider( {
 			),
 		} )
 	);
+	const { setIsInserterOpened } = useDispatch( 'core/edit-widgets' );
 
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
@@ -64,8 +65,14 @@ export default function WidgetAreasBlockEditorProvider( {
 			__experimentalReusableBlocks: reusableBlocks,
 			mediaUpload: mediaUploadBlockEditor,
 			templateLock: 'all',
+			__experimentalSetIsInserterOpened: setIsInserterOpened,
 		};
-	}, [ blockEditorSettings, hasUploadPermissions, reusableBlocks ] );
+	}, [
+		blockEditorSettings,
+		hasUploadPermissions,
+		reusableBlocks,
+		setIsInserterOpened,
+	] );
 
 	const widgetAreaId = useLastSelectedWidgetArea();
 
