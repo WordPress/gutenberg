@@ -8,7 +8,7 @@
 /**
  * Class encapsulating and implementing Block Supports.
  *
- * @private
+ * @access private
  */
 class WP_Block_Supports {
 
