@@ -6,7 +6,7 @@ import MobileCoreServices
 
 class GutenbergViewController: UIViewController {
     private lazy var filesAppMediaPicker: GutenbergFilesAppMediaSource = {
-        return GutenbergFilesAppMediaSource(gutenberg: gutenberg)
+        return GutenbergFilesAppMediaSource(gutenberg: gutenberg, coordinator: mediaUploadCoordinator)
     }()
 
     fileprivate lazy var gutenberg = Gutenberg(dataSource: self, extraModules: [CustomImageLoader()])
@@ -421,9 +421,11 @@ extension GutenbergViewController {
 class GutenbergFilesAppMediaSource: NSObject {
     private var mediaPickerCallback: MediaPickerDidPickMediaCallback?
     private unowned var gutenberg: Gutenberg
+    private unowned var uploadCoordinator: MediaUploadCoordinator
 
-    init(gutenberg: Gutenberg) {
+    init(gutenberg: Gutenberg, coordinator: MediaUploadCoordinator) {
         self.gutenberg = gutenberg
+        self.uploadCoordinator = coordinator
     }
 
     func presentPicker(origin: UIViewController, filters: [Gutenberg.MediaType], multipleSelection: Bool, callback: @escaping MediaPickerDidPickMediaCallback) {
@@ -459,9 +461,9 @@ extension GutenbergFilesAppMediaSource: UIDocumentPickerDelegate {
         }
 
         let mediaInfo = urls.compactMap({ (url) -> MediaInfo? in
-            let mediaUploadID: Int32 = 1
             let title = url.lastPathComponent
-            return MediaInfo(id: mediaUploadID, url: url.absoluteString, type: "file", title: title)
+            let id = self.uploadCoordinator.upload(url: url)
+            return MediaInfo(id: id, url: url.absoluteString, type: "file", title: title)
         })
 
         callback(mediaInfo)

@@ -7,3 +7,14 @@
 	color: $white;
 	align-self: flex-start;
 }
+
+.uploadFailedText {
+	color: #fff;
+	font-size: 14;
+	margin-top: 5;
+}
+
+.retryContainer {
+	flex: 1;
+	background-color: "rgba(0, 0, 0, 0.5)";
+}
