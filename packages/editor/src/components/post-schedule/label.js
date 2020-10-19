@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-
-import { dateI18n, __experimentalGetSettings } from '@wordpress/date';
-
+import {
+	dateI18nAddTimezone,
+	__experimentalGetSettings,
+} from '@wordpress/date';
 import { withSelect } from '@wordpress/data';
 
 export function PostScheduleLabel( { date, isFloating } ) {
@@ -14,7 +15,7 @@ export function PostScheduleLabel( { date, isFloating } ) {
 
 	const settings = __experimentalGetSettings();
 
-	return dateI18n(
+	return dateI18nAddTimezone(
 		`${ settings.formats.date } ${ settings.formats.time }`,
 		date
 	);

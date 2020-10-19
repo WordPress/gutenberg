@@ -544,6 +544,15 @@ export function gmdate( dateFormat, dateValue = new Date() ) {
 /**
  * Formats a date (like `wp_date()` in PHP), translating it into site's locale.
  *
+ * If the date string specifies a timezone e.g.: 2020-10-16T12:36:00.00-04:00
+ * the date is assumed to be in that timezone. If the date does not contain a
+ * timezone, the date is considered to be in the user's local timezone.
+ * Dates are converted to the site timezone before being formatted. If a date
+ * comes from WordPress API's it is already on the website timezone, but if we
+ * this function the function assume the date is in user timezone and when
+ * changing to WordPress timzone the time will change. If the date comes from
+ * the WordPress API's the date is string that not refers a timezone but is on the
+ * WordPress timezone, for these cases `dateI18nAddTimezone`should be should be used instead.
  * Backward Compatibility Notice: if `timezone` is set to `true`, the function
  * behaves like `gmdateI18n`.
  *
@@ -587,6 +596,42 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
 			},
 		}
 	);
+}
+
+/**
+ * Formats a date (like `wp_date()` in PHP), translating it into site's locale.
+ *
+ * If the date string specifies a timezone e.g.: 2020-10-16T12:36:00.00+01:00
+ * the date is assumed to be in that timezone. And then the date is changed to
+ * the website timezone. If the date does not contain a timezone like the dates
+ * from the WordPress API, the date is considered to be in the website timezone.
+ * For most cases where a date comes from the WordPress API, and we just want to
+ * format that date in a given way without chaning timezone this is the recommended
+ * function to use.
+ *
+ * @param {string}                     dateFormat PHP-style formatting string.
+ *                                                See php.net/date.
+ * @param {Date|string|Moment|null}    dateValue  Date object or string, parsable by
+ *                                                moment.js.
+ * @param {string|number|boolean|null} timezone   Timezone to output result in or a
+ *                                                UTC offset. Defaults to timezone from
+ *                                                site. Notice: `boolean` is effectively
+ *                                                deprecated, but still supported for
+ *                                                backward compatibility reasons.
+ *
+ * @see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+ * @see https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
+ *
+ * @return {string} Formatted date.
+ */
+export function dateI18nAddTimezone(
+	dateFormat,
+	dateValue = new Date(),
+	timezone = WP_ZONE
+) {
+	const dateMoment = momentLib.tz( dateValue, timezone );
+	dateMoment.locale( settings.l10n.locale );
+	return format( dateFormat, dateMoment );
 }
 
 /**

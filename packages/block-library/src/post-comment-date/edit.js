@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
+import {
+	__experimentalGetSettings,
+	dateI18nAddTimezone,
+} from '@wordpress/date';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { PanelBody, CustomSelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -18,7 +21,7 @@ export default function Edit( { attributes, context, setAttributes } ) {
 	const formatOptions = Object.values( settings.formats ).map(
 		( formatOption ) => ( {
 			key: formatOption,
-			name: dateI18n( formatOption, date ),
+			name: dateI18nAddTimezone( formatOption, date ),
 		} )
 	);
 	const resolvedFormat = format || siteDateFormat || settings.formats.date;
@@ -45,8 +48,13 @@ export default function Edit( { attributes, context, setAttributes } ) {
 			</InspectorControls>
 
 			<div { ...blockProps }>
-				<time dateTime={ dateI18n( 'c', date ) }>
-					{ dateI18n( resolvedFormat, date ) }
+				<time
+					dateTime={ dateI18nAddTimezone(
+						'c',
+						dateI18nAddTimezone( date )
+					) }
+				>
+					{ dateI18nAddTimezone( resolvedFormat, date ) }
 				</time>
 			</div>
 		</>

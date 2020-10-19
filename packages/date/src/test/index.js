@@ -5,6 +5,7 @@ import {
 	__experimentalGetSettings,
 	date as dateNoI18n,
 	dateI18n,
+	dateI18nAddTimezone,
 	getDate,
 	gmdate,
 	gmdateI18n,
@@ -830,5 +831,48 @@ describe( 'Moment.js Localization', () => {
 
 		// Restore default settings
 		setSettings( settings );
+	} );
+	describe( 'Function dateI18nAddTimezone', () => {
+		it( 'should add the website timezone to a date string without timezone and not change the time', () => {
+			const settings = __experimentalGetSettings();
+
+			// Simulate different timezone
+			setSettings( {
+				...settings,
+				timezone: { offset: -4, string: 'America/New_York' },
+			} );
+
+			expect( dateI18nAddTimezone( 'c', '2019-01-18T12:00:00' ) ).toBe(
+				'2019-01-18T12:00:00-04:00'
+			);
+		} );
+
+		it( 'should add the timezone parameter to a date string without timezone and not change the time', () => {
+			const settings = __experimentalGetSettings();
+
+			// Simulate different timezone
+			setSettings( {
+				...settings,
+				timezone: { offset: -4, string: 'America/New_York' },
+			} );
+
+			expect(
+				dateI18nAddTimezone( 'c', '2019-01-18T12:00:00', 'Japan' )
+			).toBe( '2019-01-18T12:00:00+09:00' );
+		} );
+
+		it( 'should convert a date that has a timezone to the website timezone before formatting', () => {
+			const settings = __experimentalGetSettings();
+
+			// Simulate different timezone
+			setSettings( {
+				...settings,
+				timezone: { offset: -4, string: 'America/New_York' },
+			} );
+
+			expect(
+				dateI18nAddTimezone( 'c', '2019-01-18T12:00:00+01:00' )
+			).toBe( '2019-01-18T07:00:00-04:00' );
+		} );
 	} );
 } );
