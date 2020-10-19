@@ -83,15 +83,13 @@ function LegacyWidgetEdit( {
 			<Placeholder
 				icon={ <BlockIcon icon={ brush } /> }
 				label={ __( 'Duplicate Widget' ) }
+				instructions={ sprintf(
+					// translators: %s: widget name e.g: "Calendar".
+					__( 'Only one instance of the "%s" widget may exist.' ),
+					availableLegacyWidgets[ attributes.referenceWidgetName ]
+						.name
+				) }
 			>
-				<p className="components-placeholder__error">
-					{ sprintf(
-						// translators: %s: widget name e.g: "Calendar".
-						__( 'Only one instance of the "%s" widget may exist.' ),
-						availableLegacyWidgets[ attributes.referenceWidgetName ]
-							.name
-					) }
-				</p>
 				<WidgetSelectControl
 					availableLegacyWidgets={ availableLegacyWidgets }
 					onChange={ setAttributes }
