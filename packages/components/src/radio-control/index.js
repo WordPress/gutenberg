@@ -12,7 +12,11 @@ import { useInstanceId } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import BaseControl from '../base-control';
+import {
+	RadioControlWrapper,
+	RadioControlInput,
+	RadioControlOption,
+} from './styles/radio-control-styles';
 
 export default function RadioControl( {
 	label,
@@ -28,7 +32,7 @@ export default function RadioControl( {
 
 	return (
 		! isEmpty( options ) && (
-			<BaseControl
+			<RadioControlWrapper
 				label={ label }
 				id={ id }
 				help={ help }
@@ -38,11 +42,11 @@ export default function RadioControl( {
 				) }
 			>
 				{ options.map( ( option, index ) => (
-					<div
+					<RadioControlOption
 						key={ `${ id }-${ index }` }
 						className="components-radio-control__option"
 					>
-						<input
+						<RadioControlInput
 							id={ `${ id }-${ index }` }
 							className="components-radio-control__input"
 							type="radio"
@@ -57,9 +61,9 @@ export default function RadioControl( {
 						<label htmlFor={ `${ id }-${ index }` }>
 							{ option.label }
 						</label>
-					</div>
+					</RadioControlOption>
 				) ) }
-			</BaseControl>
+			</RadioControlWrapper>
 		)
 	);
 }
