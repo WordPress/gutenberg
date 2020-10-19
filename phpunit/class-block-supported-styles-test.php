@@ -577,8 +577,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_all_supported() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
+			'attributes' => array(),
+			'supports'   => array(
 				'color'      => array(
 					'gradients' => true,
 					'link'      => true,
@@ -612,7 +612,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		);
 
 		$expected_classes = 'foo-bar-class wp-block-example has-text-color has-background alignwide';
-		$expected_styles  = 'test: style; color: #000; background-color: #fff; background: some-gradient; font-size: 10px; line-height: 20;';
+		$expected_styles  = 'test: style; color: #000; background-color: #fff; font-size: 10px; line-height: 20;';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
