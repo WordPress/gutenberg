@@ -114,7 +114,10 @@ export default function QueryLoopEdit( {
 					>
 						{ blockContext ===
 						( activeBlockContext || blockContexts[ 0 ] ) ? (
-							<InnerBlocks template={ TEMPLATE } />
+							<InnerBlocks
+								template={ TEMPLATE }
+								templateInsertUpdatesSelection={ false }
+							/>
 						) : (
 							<BlockPreview
 								blocks={ blocks }
