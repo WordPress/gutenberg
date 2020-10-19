@@ -15,7 +15,7 @@
 
 .edit-site-navigation-toggle__button {
 	align-items: center;
-	background: #23282e; // WP-admin gray.
+	background: $gray-900;
 	color: $white;
 	height: $header-height + $border-width; // Cover header border
 	width: $header-height;
