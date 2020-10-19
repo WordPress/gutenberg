@@ -27,8 +27,8 @@
 		padding: 0.25em;
 
 		.is-style-pill-shape & {
-			padding-left: 0.6666em;
-			padding-right: 0.6666em;
+			padding-left: calc((2/3) * 1em);
+			padding-right: calc((2/3) * 1em);
 		}
 	}
 
