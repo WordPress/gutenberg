@@ -41,6 +41,16 @@ function gutenberg_widgets_init( $hook ) {
 		return;
 	}
 
+	$current_screen = get_current_screen();
+	/**
+	 * Make the WP Screen object aware that this is a block editor page.
+	 * Since custom blocks check whether the screen is_block_editor,
+	 * this is required for custom blocks to be loaded and for responsive embeds
+	 * to work.
+	 * See wp_enqueue_registered_block_scripts_and_styles in wp-includes/script-loader.php
+	 */
+	$current_screen->is_block_editor( true );
+
 	$initializer_name = 'initialize';
 
 	// Media settings.
