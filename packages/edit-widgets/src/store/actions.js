@@ -181,7 +181,7 @@ export function* saveWidgetArea( widgetAreaId ) {
 	}
 
 	const batch = yield dispatch(
-		'core/batch-processing',
+		'core/__experimental-batch-processing',
 		'processBatch',
 		'WIDGETS_API_FETCH',
 		'default'

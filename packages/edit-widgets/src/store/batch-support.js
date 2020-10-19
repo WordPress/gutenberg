@@ -57,7 +57,7 @@ function shoehornBatchSupport() {
 		) {
 			// Wait for any batch requests already in progress
 			await Promise.all(
-				select( 'core/batch-processing' ).getPromises(
+				select( 'core/__experimental-batch-processing' ).getPromises(
 					'WIDGETS_API_FETCH'
 				)
 			);
@@ -65,7 +65,7 @@ function shoehornBatchSupport() {
 		return next( options );
 	} );
 
-	dispatch( 'core/batch-processing' ).registerProcessor(
+	dispatch( 'core/__experimental-batch-processing' ).registerProcessor(
 		'WIDGETS_API_FETCH',
 		batchProcessor
 	);
@@ -77,11 +77,9 @@ function isWidgetsEndpoint( path ) {
 }
 
 function addToBatch( request ) {
-	return dispatch( 'core/batch-processing' ).enqueueItemAndWaitForResults(
-		'WIDGETS_API_FETCH',
-		'default',
-		request
-	);
+	return dispatch(
+		'core/__experimental-batch-processing'
+	).enqueueItemAndWaitForResults( 'WIDGETS_API_FETCH', 'default', request );
 }
 
 async function batchProcessor( requests, transaction ) {
