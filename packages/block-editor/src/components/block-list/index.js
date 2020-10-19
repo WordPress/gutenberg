@@ -30,7 +30,10 @@ const appenderNodesMap = new Map();
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
-function BlockList( { className, rootClientId, renderAppender }, ref ) {
+function BlockList(
+	{ className, placeholder, rootClientId, renderAppender },
+	ref
+) {
 	const Container = rootClientId ? 'div' : RootContainer;
 	const fallbackRef = useRef();
 	const wrapperRef = ref || fallbackRef;
@@ -45,6 +48,7 @@ function BlockList( { className, rootClientId, renderAppender }, ref ) {
 				) }
 			>
 				<BlockListItems
+					placeholder={ placeholder }
 					rootClientId={ rootClientId }
 					renderAppender={ renderAppender }
 					wrapperRef={ wrapperRef }
@@ -55,6 +59,7 @@ function BlockList( { className, rootClientId, renderAppender }, ref ) {
 }
 
 function Items( {
+	placeholder,
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
@@ -147,6 +152,7 @@ function Items( {
 					</AsyncModeProvider>
 				);
 			} ) }
+			{ blockClientIds.length < 1 && placeholder }
 			<BlockListAppender
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }

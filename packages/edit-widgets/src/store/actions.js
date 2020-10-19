@@ -79,6 +79,7 @@ export function* saveWidgetAreas( widgetAreas ) {
 		const widgets = yield select( 'core/edit-widgets', 'getWidgets' );
 		const widgetIdToClientId = yield getWidgetToClientIdMapping();
 		const clientIdToWidgetId = invert( widgetIdToClientId );
+		const usedReferenceWidgets = [];
 
 		// @TODO: Batch save / concurrency
 		for ( const widgetArea of widgetAreas ) {
@@ -89,7 +90,20 @@ export function* saveWidgetAreas( widgetAreas ) {
 				POST_TYPE,
 				buildWidgetAreaPostId( widgetArea.id )
 			);
-			const widgetsBlocks = post.blocks;
+			// Remove all duplicate reference widget instances
+			const widgetsBlocks = post.blocks.filter(
+				( { attributes: { referenceWidgetName } } ) => {
+					if ( referenceWidgetName ) {
+						if (
+							usedReferenceWidgets.includes( referenceWidgetName )
+						) {
+							return false;
+						}
+						usedReferenceWidgets.push( referenceWidgetName );
+					}
+					return true;
+				}
+			);
 			const newWidgets = widgetsBlocks.map( ( block ) => {
 				const widgetId = clientIdToWidgetId[ block.clientId ];
 				const oldWidget = widgets[ widgetId ];
@@ -102,7 +116,9 @@ export function* saveWidgetAreas( widgetAreas ) {
 				KIND,
 				WIDGET_AREA_ENTITY_TYPE,
 				widgetArea.id,
-				{ widgets: newWidgets }
+				{
+					widgets: newWidgets,
+				}
 			);
 
 			yield* trySaveWidgetArea( widgetArea.id );

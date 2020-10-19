@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useBlockProps } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -15,6 +16,7 @@ export default function PostContentEdit( {
 	const { id: currentPostId, type: currentPostType } = useSelect(
 		( select ) => select( 'core/editor' ).getCurrentPost() ?? {}
 	);
+	const blockProps = useBlockProps();
 
 	// Only render InnerBlocks if the context is different from the active post
 	// to avoid infinite recursion of post content.
@@ -25,15 +27,20 @@ export default function PostContentEdit( {
 		contextPostType !== currentPostType
 	) {
 		return (
-			<PostContentInnerBlocks
-				postType={ contextPostType }
-				postId={ contextPostId }
-			/>
+			<div { ...blockProps }>
+				<PostContentInnerBlocks
+					postType={ contextPostType }
+					postId={ contextPostId }
+				/>
+			</div>
 		);
 	}
+
 	return (
-		<div className="wp-block-post-content__placeholder">
-			<span>{ __( 'This is a placeholder for post content.' ) }</span>
+		<div { ...blockProps }>
+			<div className="wp-block-post-content__placeholder">
+				<span>{ __( 'This is a placeholder for post content.' ) }</span>
+			</div>
 		</div>
 	);
 }

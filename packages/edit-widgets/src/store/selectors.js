@@ -108,6 +108,37 @@ export const getEditedWidgetAreas = createRegistrySelector(
 	}
 );
 
+/**
+ * Returns all blocks representing reference widgets.
+ *
+ * @param  {string} referenceWidgetName  Optional. If given, only reference widgets with this name will be returned.
+ * @return {Array}  List of all blocks representing reference widgets
+ */
+export const getReferenceWidgetBlocks = createRegistrySelector(
+	( select ) => ( state, referenceWidgetName = null ) => {
+		const results = [];
+		const widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
+		for ( const _widgetArea of widgetAreas ) {
+			const post = select( 'core' ).getEditedEntityRecord(
+				KIND,
+				POST_TYPE,
+				buildWidgetAreaPostId( _widgetArea.id )
+			);
+			for ( const block of post.blocks ) {
+				if (
+					block.name === 'core/legacy-widget' &&
+					( ! referenceWidgetName ||
+						block.attributes?.referenceWidgetName ===
+							referenceWidgetName )
+				) {
+					results.push( block );
+				}
+			}
+		}
+		return results;
+	}
+);
+
 export const isSavingWidgetAreas = createRegistrySelector(
 	( select ) => ( state, ids ) => {
 		if ( ! ids ) {

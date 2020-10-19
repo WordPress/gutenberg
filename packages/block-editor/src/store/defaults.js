@@ -18,7 +18,6 @@ export const PREFERENCES_DEFAULTS = {
  * @property {number} maxWidth Max width to constraint resizing
  * @property {boolean|Array} allowedBlockTypes Allowed block types
  * @property {boolean} hasFixedToolbar Whether or not the editor toolbar is fixed
- * @property {boolean} hasPermissionsToManageWidgets Whether or not the user is able to manage widgets.
  * @property {boolean} focusMode Whether the focus mode is enabled or not
  * @property {Array} styles Editor Styles
  * @property {boolean} isRTL Whether the editor is in RTL mode
@@ -149,7 +148,6 @@ export const SETTINGS_DEFAULTS = {
 	allowedMimeTypes: null,
 
 	availableLegacyWidgets: {},
-	hasPermissionsToManageWidgets: false,
 	__experimentalCanUserUseUnfilteredHTML: false,
 	__experimentalBlockDirectory: false,
 	__experimentalEnableFullSiteEditing: false,

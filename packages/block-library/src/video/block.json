@@ -60,6 +60,13 @@
 			"source": "attribute",
 			"selector": "video",
 			"attribute": "playsinline"
+		},
+		"tracks": {
+			"type": "array",
+			"items": {
+				"type": "object"
+			},
+			"default": []
 		}
 	},
 	"supports": {

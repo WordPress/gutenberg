@@ -9,6 +9,7 @@ import {
 	setBrowserViewport,
 	closeGlobalBlockInserter,
 	searchForBlock,
+	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
@@ -137,6 +138,7 @@ describe( 'adding blocks', () => {
 	it( 'should not allow transfer of focus outside of the block-insertion menu once open', async () => {
 		// Enter the default block and click the inserter toggle button to the left of it.
 		await page.keyboard.press( 'ArrowDown' );
+		await showBlockToolbar();
 		await page.click(
 			'.block-editor-block-list__empty-block-inserter .block-editor-inserter__toggle'
 		);

@@ -10,6 +10,7 @@ import { PluginArea } from '@wordpress/plugins';
 import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
 import Sidebar from '../sidebar';
 import Interface from './interface';
+import UnsavedChangesWarning from './unsaved-changes-warning';
 
 function Layout( { blockEditorSettings } ) {
 	return (
@@ -20,6 +21,7 @@ function Layout( { blockEditorSettings } ) {
 			<Sidebar />
 			<Popover.Slot />
 			<PluginArea />
+			<UnsavedChangesWarning />
 		</WidgetAreasBlockEditorProvider>
 	);
 }

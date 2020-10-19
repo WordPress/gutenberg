@@ -11,6 +11,7 @@ import {
 	registerCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
+import '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
@@ -31,9 +32,9 @@ export function initialize( id, settings ) {
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
-		registerBlock( createLegacyWidget( settings ) );
-		registerBlock( widgetArea );
 	}
+	registerBlock( createLegacyWidget( settings ) );
+	registerBlock( widgetArea );
 	render(
 		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )
