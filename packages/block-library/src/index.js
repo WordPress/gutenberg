@@ -107,6 +107,8 @@ const registerBlock = ( block ) => {
 /**
  * Function to register core blocks provided by the block editor.
  *
+ * @param {Function} filter An optional filter function to run through each block.
+ *
  * @example
  * ```js
  * import { registerCoreBlocks } from '@wordpress/block-library';
@@ -114,7 +116,7 @@ const registerBlock = ( block ) => {
  * registerCoreBlocks();
  * ```
  */
-export const registerCoreBlocks = () => {
+export const registerCoreBlocks = ( filter = () => true ) => {
 	[
 		// Common blocks are grouped at the top to prioritize their display
 		// in various contexts — like the inserter and auto-complete components.
@@ -163,7 +165,9 @@ export const registerCoreBlocks = () => {
 		textColumns,
 		verse,
 		video,
-	].forEach( registerBlock );
+	]
+		.filter( filter )
+		.forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
 	if ( window.wp && window.wp.oldEditor ) {

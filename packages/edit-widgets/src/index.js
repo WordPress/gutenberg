@@ -29,7 +29,7 @@ import Layout from './components/layout';
  * @param {Object} settings Block editor settings.
  */
 export function initialize( id, settings ) {
-	registerCoreBlocks();
+	registerCoreBlocks( ( block ) => ! [ 'core/more' ].includes( block.name ) );
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
 	}
