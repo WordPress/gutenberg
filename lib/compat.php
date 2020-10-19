@@ -376,8 +376,8 @@ $current_parsed_block = array(
  * Shim that hooks into `pre_render_block` so as to override `render_block` with
  * a function that assigns block context.
  *
- * FIXME: THIS IS NO LONGER ACCURATE: This can be removed when plugin support
- * requires WordPress 5.5.0+.
+ * The context handling can be removed when plugin support requires WordPress 5.5.0+.
+ * The global current_parsed_block assignment can be removed when plugin support requires WordPress 5.6.0+.
  *
  * @see https://core.trac.wordpress.org/ticket/49927
  * @see https://core.trac.wordpress.org/changeset/48243
