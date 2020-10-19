@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { dispatch } from '@wordpress/data';
+import { select, dispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -39,6 +39,30 @@ function shoehornBatchSupport() {
 
 			throw error;
 		} );
+	} );
+
+	// This is a hack to prevent the following timing problem:
+	// * batch request starts, cache is invalidated ->
+	// * resolvers sends GET request to /wp/v2/widgets?per_page=-1 before the batch is finished ->
+	// * batch request is processed and new widgets are saved ->
+	// * core/data stores the new version of the data ->
+	// * GET request is processed and returns the old widgets ->
+	// * core/data overwrites good data with stale data
+	//
+	// The ultimate solution is to fix the problem in core/data but this has to do for now
+	apiFetch.use( async ( options, next ) => {
+		if (
+			[ 'GET', undefined ].includes( options.method ) &&
+			isWidgetsEndpoint( options.path )
+		) {
+			// Wait for any batch requests already in progress
+			await Promise.all(
+				select( 'core/batch-processing' ).getPromises(
+					'WIDGETS_API_FETCH'
+				)
+			);
+		}
+		return next( options );
 	} );
 
 	dispatch( 'core/batch-processing' ).registerProcessor(

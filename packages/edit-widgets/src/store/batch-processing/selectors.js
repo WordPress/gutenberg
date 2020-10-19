@@ -9,3 +9,9 @@ export const getProcessor = ( state, queue ) => {
 export const getPromise = ( state, queue, context ) => {
 	return state.promises[ queue ]?.[ context ];
 };
+
+export const getPromises = ( state, queue ) => {
+	return Object.values( state.promises[ queue ] || {} ).map(
+		( { promise } ) => promise
+	);
+};
