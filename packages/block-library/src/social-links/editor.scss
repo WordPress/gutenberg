@@ -70,7 +70,7 @@
 
 // Improve the preview, ensure buttons are fully opaque despite being disabled.
 // @todo: Look at improving the preview component to make this unnecessary.
-.block-editor-block-preview__content .wp-social-link:disabled {
+.block-editor-block-preview__content .components-button:disabled {
 	opacity: 1;
 }
 
@@ -95,11 +95,4 @@
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
-}
-
-// To ensure a better selection footprint when editing, attach the margin to the block container.
-// @todo: This can very probably be removed entirely when this block receives a lighter DOM.
-.is-navigate-mode .block-editor-block-list__layout .block-editor-block-list__block[data-type="core/social-link"].is-selected::after,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/social-link"]:not([contenteditable]):focus::after {
-	right: 8px;
 }
