@@ -25,6 +25,14 @@ export function mapping( state, action ) {
 		return newMapping;
 	}
 
+	if ( type === 'REMOVE_WIDGET_ID_FOR_CLIENT_ID' ) {
+		const newMapping = {
+			...state,
+		};
+		delete newMapping[ action.widgetId ];
+		return newMapping;
+	}
+
 	return state || {};
 }
 

@@ -56,6 +56,7 @@ export function* saveEditedWidgetAreas() {
 	}
 	try {
 		yield* saveWidgetAreas( editedWidgetAreas );
+		yield* deleteRemovedWidgets();
 		yield dispatch(
 			'core/notices',
 			'createSuccessNotice',
@@ -270,6 +271,58 @@ function* trySaveWidgetArea( widgetAreaId ) {
 	}
 }
 
+function* deleteRemovedWidgets() {
+	const widgetIdToClientId = yield getWidgetToClientIdMapping();
+	const clientIdToWidgetId = invert( widgetIdToClientId );
+
+	const widgetAreas = yield select( 'core/edit-widgets', 'getWidgetAreas' );
+	const widgetBlocks = [];
+
+	for ( const widgetArea of widgetAreas ) {
+		const post = yield select(
+			'core',
+			'getEntityRecord',
+			KIND,
+			POST_TYPE,
+			buildWidgetAreaPostId( widgetArea.id )
+		);
+
+		widgetBlocks.push( ...post.blocks );
+	}
+
+	for ( const widgetBlock of widgetBlocks ) {
+		delete clientIdToWidgetId[ widgetBlock.clientId ];
+	}
+
+	for ( const clientId in clientIdToWidgetId ) {
+		if ( clientIdToWidgetId.hasOwnProperty( clientId ) ) {
+			dataDispatch( 'core' ).deleteEntityRecord(
+				'root',
+				'widget',
+				clientIdToWidgetId[ clientId ],
+				{ force: true }
+			);
+		}
+	}
+
+	const batch = yield dispatch(
+		'core/__experimental-batch-processing',
+		'processBatch',
+		'WIDGETS_API_FETCH',
+		'default'
+	);
+
+	if ( batch.state !== STATE_SUCCESS ) {
+		return;
+	}
+
+	for ( const clientId in clientIdToWidgetId ) {
+		if ( clientIdToWidgetId.hasOwnProperty( clientId ) ) {
+			yield removeWidgetIdForClientId( clientIdToWidgetId[ clientId ] );
+		}
+	}
+}
+
 /**
  * Sets the clientId stored for a particular widgetId.
  *
@@ -281,6 +334,19 @@ export function setWidgetIdForClientId( clientId, widgetId ) {
 	return {
 		type: 'SET_WIDGET_ID_FOR_CLIENT_ID',
 		clientId,
+		widgetId,
+	};
+}
+
+/**
+ * Removes the widget id -> client id mapping.
+ *
+ * @param {string} widgetId Widget id.
+ * @return {Object} Action.
+ */
+export function removeWidgetIdForClientId( widgetId ) {
+	return {
+		type: 'REMOVE_WIDGET_ID_FOR_CLIENT_ID',
 		widgetId,
 	};
 }
