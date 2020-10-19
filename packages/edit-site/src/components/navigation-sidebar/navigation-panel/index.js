@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { createSlotFill } from '@wordpress/components';
 
 /**
@@ -37,11 +37,18 @@ const NavigationPanel = ( { isOpen } ) => {
 		};
 	}, [] );
 
+	const menuRef = useRef();
+	useEffect( () => {
+		menuRef.current.focus();
+	}, [ templatesActiveMenu ] );
+
 	return (
 		<div
 			className={ classnames( `edit-site-navigation-panel`, {
 				'is-open': isOpen,
 			} ) }
+			ref={ menuRef }
+			tabIndex="-1"
 		>
 			<div className="edit-site-navigation-panel__inner">
 				<div className="edit-site-navigation-panel__site-title-container">
