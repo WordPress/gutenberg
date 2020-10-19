@@ -78,15 +78,6 @@ function LegacyWidgetEdit( {
 		);
 	}
 
-	const inspectorControls = (
-		<InspectorControls>
-			<LegacyWidgetInspectorCard
-				name={ WPWidget.name }
-				description={ WPWidget.description }
-			/>
-		</InspectorControls>
-	);
-
 	if ( isDuplicateReferenceWidget ) {
 		return (
 			<Placeholder
@@ -142,7 +133,12 @@ function LegacyWidgetEdit( {
 					) }
 				</ToolbarGroup>
 			</BlockControls>
-			{ inspectorControls }
+			<InspectorControls>
+				<LegacyWidgetInspectorCard
+					name={ WPWidget.name }
+					description={ WPWidget.description }
+				/>
+			</InspectorControls>
 			{ hasEditForm && (
 				<LegacyWidgetEditHandler
 					isVisible={ ! isPreview }
