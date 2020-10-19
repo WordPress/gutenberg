@@ -153,7 +153,7 @@ const formatMap = {
 	/**
 	 * Gets the ordinal suffix.
 	 *
-	 * @param {Date|string} dateValue Date ISO string or object.
+	 * @param {Date} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */
@@ -162,12 +162,18 @@ const formatMap = {
 		const withOrdinal = dateFnsFormat( dateValue, 'do' );
 		return withOrdinal.replace( num, '' );
 	},
-
-	w: 'd', // @todo: figure out how to make it start from 0
+	/**
+	 * Returns the day of the week (zero-indexed).
+	 *
+	 * @param {string} dateValue
+	 */
+	w( dateValue ) {
+		return `${ parseInt( dateFnsFormat( dateValue, 'i' ), 10 ) - 1 }`;
+	},
 	/**
 	 * Gets the day of the year (zero-indexed).
 	 *
-	 * @param {Date|string} dateValue Date ISO string or object.
+	 * @param {Date} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */
@@ -187,7 +193,7 @@ const formatMap = {
 	/**
 	 * Gets the days in the month.
 	 *
-	 * @param {Date|string} dateValue Date ISO string or object.
+	 * @param {Date} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */
@@ -199,7 +205,7 @@ const formatMap = {
 	/**
 	 * Gets whether the current year is a leap year.
 	 *
-	 * @param {Date|string} dateValue Date ISO string or object.
+	 * @param {Date} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */
@@ -216,7 +222,7 @@ const formatMap = {
 	/**
 	 * Gets the given time in Swatch Internet Time (.beats).
 	 *
-	 * @param {Date|string} dateValue Date ISO string or object.
+	 * @param {Date} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */
@@ -249,7 +255,7 @@ const formatMap = {
 	/**
 	 * Return the timezone identifier for the given date.
 	 *
-	 * @param {Date|string} dateValue Date ISO string or object.
+	 * @param {Date} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */
@@ -263,7 +269,7 @@ const formatMap = {
 	/**
 	 * Gets whether the timezone is in DST currently.
 	 *
-	 * @param {Date|string} dateValue Date ISO string or object.
+	 * @param {Date} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */

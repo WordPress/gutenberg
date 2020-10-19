@@ -255,6 +255,12 @@ describe( 'PHP Format Tokens', () => {
 		expect( formattedDate ).toBe( 'Eastern Daylight Time' );
 	} );
 
+	it( 'should support "w" to obtain day of the week starting from 0', () => {
+		const formattedDate = dateNoI18n( 'w', '2020-01-01T12:00:00.000Z' ); // Wednesday Jan 1st, 2020
+
+		expect( formattedDate ).toBe( '2' );
+	} );
+
 	it.skip( 'should support "I" to obtain whether or not the timezone is observing DST', () => {
 		const formattedFall = dateNoI18n( 'I', '2020-10-09T11:00:00.000Z' );
 
