@@ -53,21 +53,23 @@ export function PanelBody(
 	scrollAfterOpenRef.current = scrollAfterOpen;
 	// Runs after initial render
 	useUpdateEffect( () => {
-		if ( isOpened && scrollAfterOpenRef.current ) {
+		if (
+			isOpened &&
+			scrollAfterOpenRef.current &&
+			nodeRef.current?.scrollIntoView
+		) {
 			/*
 			 * Scrolls the content into view when visible.
 			 * This improves the UX when there are multiple stacking <PanelBody />
 			 * components in a scrollable container.
 			 */
-			if ( nodeRef.current.scrollIntoView ) {
-				nodeRef.current.scrollIntoView( {
-					inline: 'nearest',
-					block: 'nearest',
-					behavior: scrollBehavior,
-				} );
-			}
+			nodeRef.current.scrollIntoView( {
+				inline: 'nearest',
+				block: 'nearest',
+				behavior: scrollBehavior,
+			} );
 		}
-	}, [ isOpened ] );
+	}, [ isOpened, scrollBehavior ] );
 
 	const classes = classnames( 'components-panel__body', className, {
 		'is-opened': isOpened,
