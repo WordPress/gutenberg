@@ -7,7 +7,11 @@ import { get, isEmpty, omit, pickBy } from 'lodash';
  * WordPress dependencies
  */
 import { useCallback, useMemo, useState } from '@wordpress/element';
-import { Button, Placeholder, ToolbarGroup } from '@wordpress/components';
+import {
+	ToolbarButton,
+	Placeholder,
+	ToolbarGroup,
+} from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
 import {
@@ -105,7 +109,7 @@ function LegacyWidgetEdit( {
 			<BlockControls>
 				<ToolbarGroup>
 					{ WPWidget && ! WPWidget.isHidden && (
-						<Button
+						<ToolbarButton
 							onClick={ onResetWidget }
 							label={ __( 'Change widget' ) }
 							icon={ update }
@@ -113,20 +117,20 @@ function LegacyWidgetEdit( {
 					) }
 					{ hasEditForm && (
 						<>
-							<Button
+							<ToolbarButton
 								className="components-tab-button"
 								isPressed={ ! isPreview }
 								onClick={ () => setIsPreview( false ) }
 							>
 								<span>{ __( 'Edit' ) }</span>
-							</Button>
-							<Button
+							</ToolbarButton>
+							<ToolbarButton
 								className="components-tab-button"
 								isPressed={ isPreview }
 								onClick={ () => setIsPreview( true ) }
 							>
 								<span>{ __( 'Preview' ) }</span>
-							</Button>
+							</ToolbarButton>
 						</>
 					) }
 				</ToolbarGroup>
