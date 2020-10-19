@@ -78,7 +78,6 @@ export default function Header( { openEntitiesSavedStates } ) {
 	return (
 		<div className="edit-site-header">
 			<div className="edit-site-header_start">
-				<div className="edit-site-header__navigation-panel-spacer"></div>
 				<div className="edit-site-header__toolbar">
 					<Button
 						isPrimary

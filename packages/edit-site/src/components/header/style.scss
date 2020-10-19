@@ -6,6 +6,11 @@
 	box-sizing: border-box;
 	width: 100%;
 
+	padding-left: 60px;
+	transition: padding-left 20ms linear;
+	transition-delay: 80ms;
+	@include reduce-motion("transition");
+
 	.edit-site-header_start,
 	.edit-site-header_end {
 		flex: 1 0;
@@ -38,42 +43,16 @@
 	}
 }
 
-// This element is used to do the same transition as
-// the navigation sidebar. This element is at least
-// `$header-height` wide, when the navigation panel is
-// opened then it widens to the same width as the
-// navigation panel. While doing that, it also
-// moves itself to the left (negative `margin-left`)
-// to avoid content jumping
-.edit-site-header__navigation-panel-spacer {
-	min-width: $header-height;
-	transition: margin-left 100ms linear;
-	margin-left: 0;
-	@include reduce-motion("transition");
-}
-
-.edit-site-header__navigation-panel-spacer::before {
-	content: "";
-	display: block;
-	width: 0;
-	transition: width 100ms linear;
-	@include reduce-motion("transition");
-}
-
 // Keeps the document title centered when the sidebar is open
 body.is-navigation-sidebar-open {
 	.edit-site-header {
+		padding-left: 0;
+		transition: padding-left 20ms linear;
+		transition-delay: 0ms;
+
 		.edit-site-header_start {
 			flex-basis: $header-toolbar-min-width;
 		}
-	}
-
-	.edit-site-header__navigation-panel-spacer {
-		margin-left: -$nav-sidebar-width;
-	}
-
-	.edit-site-header__navigation-panel-spacer::before {
-		width: $nav-sidebar-width;
 	}
 }
 
