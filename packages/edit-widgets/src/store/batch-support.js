@@ -2,9 +2,14 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { STATE_ERROR } from '@wordpress/batch-processing';
 import { dispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import './batch-processing';
+import { STATE_ERROR } from './batch-processing/constants';
 
 function shoehornBatchSupport() {
 	apiFetch.use( async ( options, next ) => {

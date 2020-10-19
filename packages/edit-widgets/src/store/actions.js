@@ -8,11 +8,11 @@ import { invert } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { dispatch as dataDispatch } from '@wordpress/data';
-import { STATE_SUCCESS } from '@wordpress/batch-processing';
 
 /**
  * Internal dependencies
  */
+import { STATE_SUCCESS } from './batch-processing/constants';
 import { dispatch, select, getWidgetToClientIdMapping } from './controls';
 import { transformBlockToWidget } from './transformers';
 import {
