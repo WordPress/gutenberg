@@ -310,42 +310,53 @@ class BottomSheetCell extends Component {
 					pointerEvents={ containerPointerEvents }
 				>
 					<View style={ rowContainerStyles }>
-						<View style={ styles.cellRowContainer }>
-							{ icon && (
-								<View style={ styles.cellRowContainer }>
-									<Icon
-										icon={ icon }
-										size={ 24 }
-										fill={ iconStyle.color }
-										isPressed={ false }
-									/>
-									<View
-										style={
-											platformStyles.labelIconSeparator
-										}
-									/>
-								</View>
-							) }
-							{ label && (
-								<Text
-									style={ [ defaultLabelStyle, labelStyle ] }
-								>
-									{ label }
-								</Text>
-							) }
-							{ customActionButton && (
-								<View>
-									<TouchableOpacity
-										onPress={ handler }
-										accessibilityRole={ 'button' }
+						<View style={ rowContainerStyles }>
+							<View style={ styles.cellRowContainer }>
+								{ icon && (
+									<View style={ styles.cellRowContainer }>
+										<Icon
+											icon={ icon }
+											size={ 24 }
+											fill={ iconStyle.color }
+											isPressed={ false }
+										/>
+										<View
+											style={
+												platformStyles.labelIconSeparator
+											}
+										/>
+									</View>
+								) }
+								{ label && (
+									<Text
+										style={ [
+											defaultLabelStyle,
+											labelStyle,
+										] }
 									>
-										<Text style={ customActionButtonStyle }>
-											{ title }
-										</Text>
-									</TouchableOpacity>
-								</View>
-							) }
+										{ label }
+									</Text>
+								) }
+							</View>
 						</View>
+						{ customActionButton && (
+							<View
+								style={ {
+									flex: 1,
+									alignItems: 'flex-end',
+									justifyContent: 'center',
+								} }
+							>
+								<TouchableOpacity
+									onPress={ handler }
+									accessibilityRole={ 'button' }
+								>
+									<Text style={ customActionButtonStyle }>
+										{ title }
+									</Text>
+								</TouchableOpacity>
+							</View>
+						) }
 					</View>
 					{ isSelected && (
 						<Icon
@@ -353,6 +364,7 @@ class BottomSheetCell extends Component {
 							fill={ platformStyles.isSelected.color }
 						/>
 					) }
+
 					{ showValue && getValueComponent() }
 					{ children }
 				</View>

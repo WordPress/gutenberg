@@ -73,6 +73,12 @@
 	color: $blue-30;
 }
 
+.customActionButtonWrapper {
+	flex: 1;
+	align-items: flex-end;
+	justify-content: center;
+}
+
 // Cell
 
 .cellContainer {
@@ -99,9 +105,7 @@
 .cellRowContainer {
 	flex-direction: row;
 	align-items: center;
-	width: 100%;
 	flex-shrink: 0;
-	justify-content: space-between;
 }
 
 .cellLabel {
