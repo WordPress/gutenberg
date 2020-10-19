@@ -29,6 +29,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
 		"@wordpress/api-fetch": "file:../api-fetch",
+		"@wordpress/batch-processing": "file:../batch-processing",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
 		"@wordpress/blocks": "file:../blocks",
@@ -53,7 +54,8 @@
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",
 		"reakit": "^1.1.0",
-		"rememo": "^3.0.0"
+		"rememo": "^3.0.0",
+		"uuid": "^8.3.1"
 	},
 	"publishConfig": {
 		"access": "public"

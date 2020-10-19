@@ -25,7 +25,7 @@ class WP_REST_Batch_Controller {
 			array(
 				'callback'            => array( $this, 'serve_batch_request' ),
 				'permission_callback' => '__return_true',
-				'methods'             => array( 'POST', 'PUT', 'PATCH', 'DELETE' ),
+				'methods'             => 'POST',
 				'args'                => array(
 					'validation' => array(
 						'type'    => 'string',
@@ -39,6 +39,12 @@ class WP_REST_Batch_Controller {
 						'items'    => array(
 							'type'       => 'object',
 							'properties' => array(
+								'method'  => array(
+									'type'     => 'string',
+									'enum'     => array( 'POST', 'PUT', 'PATCH', 'DELETE' ),
+									'default'  => 'POST',
+									'required' => true,
+								),
 								'path'    => array(
 									'type'     => 'string',
 									'required' => true,
@@ -86,7 +92,7 @@ class WP_REST_Batch_Controller {
 				continue;
 			}
 
-			$single_request = new WP_REST_Request( $batch_request->get_method(), $parsed_url['path'] );
+			$single_request = new WP_REST_Request( $args['method'], $parsed_url['path'] );
 
 			if ( ! empty( $parsed_url['query'] ) ) {
 				$query_args = null; // Satisfy linter.

@@ -12,6 +12,7 @@ import { createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import {
+	buildWidgetsQuery,
 	buildWidgetAreasQuery,
 	buildWidgetAreaPostId,
 	KIND,
@@ -20,12 +21,13 @@ import {
 } from './utils';
 
 export const getWidgets = createRegistrySelector( ( select ) => () => {
-	const initialWidgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
-
-	return keyBy(
-		initialWidgetAreas.flatMap( ( area ) => area.widgets ),
-		( widget ) => widget.id
+	const widgets = select( 'core' ).getEntityRecords(
+		'root',
+		'widget',
+		buildWidgetsQuery()
 	);
+
+	return keyBy( widgets, 'id' );
 } );
 
 /**

@@ -429,6 +429,66 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	/**
 	 *
 	 */
+	public function test_create_item_multiple_in_a_row() {
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			)
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/widgets' );
+		$request->set_body_params(
+			array(
+				'sidebar'  => 'sidebar-1',
+				'settings' => array( 'text' => 'Text 1' ),
+				'id_base'  => 'text',
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals( 'text-1', $data['id'] );
+		$this->assertEquals( 'sidebar-1', $data['sidebar'] );
+		$this->assertEquals( 1, $data['number'] );
+		$this->assertEqualSets(
+			array(
+				'text'   => 'Text 1',
+				'title'  => '',
+				'filter' => false,
+			),
+			$data['settings']
+		);
+
+		$request = new WP_REST_Request( 'POST', '/wp/v2/widgets' );
+		$request->set_body_params(
+			array(
+				'sidebar'  => 'sidebar-1',
+				'settings' => array( 'text' => 'Text 2' ),
+				'id_base'  => 'text',
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals( 'text-2', $data['id'] );
+		$this->assertEquals( 'sidebar-1', $data['sidebar'] );
+		$this->assertEquals( 2, $data['number'] );
+		$this->assertEqualSets(
+			array(
+				'text'   => 'Text 2',
+				'title'  => '',
+				'filter' => false,
+			),
+			$data['settings']
+		);
+
+		$sidebar = rest_do_request( '/wp/v2/sidebars/sidebar-1' );
+		$this->assertContains( 'text-1', $sidebar->get_data()['widgets'] );
+		$this->assertContains( 'text-2', $sidebar->get_data()['widgets'] );
+	}
+
+	/**
+	 *
+	 */
 	public function test_create_item_second_instance() {
 		$this->setup_widget(
 			'widget_text',
