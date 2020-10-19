@@ -21,34 +21,28 @@
 // Placeholder/setup state.
 .wp-block-social-links__social-placeholder {
 	display: flex;
-	min-height: 24px;
+	opacity: 0.8;
 
 	.wp-social-link {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		margin: $grid-unit-05 $grid-unit-10 $grid-unit-05 0;
-		width: 36px;
-		height: 36px;
-		border-radius: $radius-round;
-		opacity: 0.8;
-	}
-}
-// @todo fix these so they work for placeholders
-.is-style-logos-only .wp-block-social-links__social-placeholder .wp-block-social-link::before {
-	content: "";
-	display: block;
-	width: 18px;
-	height: 18px;
-	border-radius: $radius-round;
-	opacity: 0.8;
-	background: currentColor;
-}
+		padding: 0.25em;
 
-.is-style-pill-shape .wp-block-social-links__social-placeholder .wp-block-social-link {
-	border-radius: 9999px;
-	padding-left: 16px + 12px;
-	padding-right: 16px + 12px;
+		.is-style-pill-shape & {
+			padding-left: 0.6666em;
+			padding-right: 0.6666em;
+		}
+	}
+
+	.wp-social-link::before {
+		content: "";
+		display: block;
+		width: 1em;
+		height: 1em;
+		border-radius: $radius-round;
+
+		.is-style-logos-only & {
+			background: currentColor;
+		}
+	}
 }
 
 // Polish the Appender.
