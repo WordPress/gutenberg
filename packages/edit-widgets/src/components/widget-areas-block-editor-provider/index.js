@@ -19,7 +19,7 @@ import {
 	BlockEditorKeyboardShortcuts,
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
-import { ReusableBlocksButtons } from '@wordpress/reusable-blocks';
+import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
@@ -92,7 +92,7 @@ export default function WidgetAreasBlockEditorProvider( {
 							{ ...props }
 						>
 							{ children }
-							<ReusableBlocksButtons
+							<ReusableBlocksMenuItems
 								rootClientId={ widgetAreaId }
 							/>
 						</BlockEditorProvider>
