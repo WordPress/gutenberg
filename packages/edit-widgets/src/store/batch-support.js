@@ -1,0 +1,97 @@
+/**
+ * WordPress dependencies
+ */
+import apiFetch from '@wordpress/api-fetch';
+import { dispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import './batch-processing';
+import { STATE_ERROR } from './batch-processing/constants';
+
+function shoehornBatchSupport() {
+	apiFetch.use( async ( options, next ) => {
+		if (
+			! [ 'POST', 'PUT', 'PATCH', 'DELETE' ].includes( options.method ) ||
+			! isWidgetsEndpoint( options.path )
+		) {
+			return next( options );
+		}
+
+		const { wait } = await addToBatch( options );
+
+		return wait.catch( ( error ) => {
+			// If this item didn't encounter an error specifically, the REST API
+			// will return `null`. We need to provide an error object of some kind
+			// to the apiFetch caller as they expect either a valid response, or
+			// an error. Null wouldn't be acceptable.
+			if ( error === null ) {
+				error = {
+					code: 'transaction_failed',
+					data: { status: 400 },
+					message: __(
+						'This item could not be saved because another item encountered an error when trying to save.'
+					),
+				};
+			}
+
+			throw error;
+		} );
+	} );
+
+	dispatch( 'core/batch-processing' ).registerProcessor(
+		'WIDGETS_API_FETCH',
+		batchProcessor
+	);
+}
+
+function isWidgetsEndpoint( path ) {
+	// This should be more sophisticated in reality:
+	return path.startsWith( '/wp/v2/widgets' );
+}
+
+function addToBatch( request ) {
+	return dispatch( 'core/batch-processing' ).enqueueItemAndWaitForResults(
+		'WIDGETS_API_FETCH',
+		'default',
+		request
+	);
+}
+
+async function batchProcessor( requests, transaction ) {
+	if ( transaction.state === STATE_ERROR ) {
+		throw {
+			code: 'transaction_failed',
+			data: { status: 500 },
+			message: 'Transaction failed.',
+		};
+	}
+
+	const response = await apiFetch( {
+		path: '/__experimental/batch',
+		method: 'POST',
+		data: {
+			validation: 'require-all-validate',
+			requests: requests.map( ( options ) => ( {
+				path: options.path,
+				body: options.data,
+				method: options.method,
+				headers: options.headers,
+			} ) ),
+		},
+	} );
+
+	if ( response.failed ) {
+		throw response.responses.map( ( itemResponse ) => {
+			// The REST API returns null if the request did not have an error.
+			return itemResponse === null ? null : itemResponse.body;
+		} );
+	}
+
+	return response.responses.map( ( { body } ) => body );
+}
+
+// setTimeout is a hack to ensure batch-processing store is available for dispatching
+setTimeout( shoehornBatchSupport );
