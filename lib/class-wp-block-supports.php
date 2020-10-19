@@ -42,7 +42,7 @@ class WP_Block_Supports {
 	}
 
 	/**
-	 * TODO.
+	 * Initializes the block supports. It registes the block supports block attributes.
 	 */
 	public static function init() {
 		$instance = self::get_instance();
@@ -71,15 +71,6 @@ class WP_Block_Supports {
 	 * @return array               Array of HTML attributes.
 	 */
 	public function apply_block_supports( $parsed_block ) {
-		if (
-			empty( $parsed_block ) ||
-			! isset( $parsed_block['attrs'] ) ||
-			! isset( $parsed_block['blockName'] )
-		) {
-			// TODO: handle as error?
-			return array();
-		}
-
 		$block_attributes = $parsed_block['attrs'];
 		$block_type       = WP_Block_Type_Registry::get_instance()->get_registered(
 			$parsed_block['blockName']
@@ -117,7 +108,7 @@ class WP_Block_Supports {
 	}
 
 	/**
-	 * TODO.
+	 * Registers the block attributes required by the different block supports.
 	 */
 	private function register_attributes() {
 		wp_register_style( 'wp-block-supports', false );
