@@ -105,9 +105,69 @@ const registerBlock = ( block ) => {
 };
 
 /**
+ * Function to get all the core blocks in an array.
+ *
+ * @example
+ * ```js
+ * import { __experimentalGetCoreBlocks } from '@wordpress/block-library';
+ *
+ * const coreBlocks = __experimentalGetCoreBlocks();
+ * ```
+ */
+export const __experimentalGetCoreBlocks = () => [
+	// Common blocks are grouped at the top to prioritize their display
+	// in various contexts — like the inserter and auto-complete components.
+	paragraph,
+	image,
+	heading,
+	gallery,
+	list,
+	quote,
+
+	// Register all remaining core blocks.
+	shortcode,
+	archives,
+	audio,
+	button,
+	buttons,
+	calendar,
+	categories,
+	code,
+	columns,
+	column,
+	cover,
+	embed,
+	file,
+	group,
+	window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
+	html,
+	mediaText,
+	latestComments,
+	latestPosts,
+	missing,
+	more,
+	nextpage,
+	preformatted,
+	pullquote,
+	rss,
+	search,
+	separator,
+	reusableBlock,
+	socialLinks,
+	socialLink,
+	spacer,
+	subhead,
+	table,
+	tagCloud,
+	textColumns,
+	verse,
+	video,
+];
+
+/**
  * Function to register core blocks provided by the block editor.
  *
- * @param {Function} filter An optional filter function to run through each block.
+ * @param {Array} blocks An optional array of the core blocks being registered.
  *
  * @example
  * ```js
@@ -116,58 +176,10 @@ const registerBlock = ( block ) => {
  * registerCoreBlocks();
  * ```
  */
-export const registerCoreBlocks = ( filter = () => true ) => {
-	[
-		// Common blocks are grouped at the top to prioritize their display
-		// in various contexts — like the inserter and auto-complete components.
-		paragraph,
-		image,
-		heading,
-		gallery,
-		list,
-		quote,
-
-		// Register all remaining core blocks.
-		shortcode,
-		archives,
-		audio,
-		button,
-		buttons,
-		calendar,
-		categories,
-		code,
-		columns,
-		column,
-		cover,
-		embed,
-		file,
-		group,
-		window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
-		html,
-		mediaText,
-		latestComments,
-		latestPosts,
-		missing,
-		more,
-		nextpage,
-		preformatted,
-		pullquote,
-		rss,
-		search,
-		separator,
-		reusableBlock,
-		socialLinks,
-		socialLink,
-		spacer,
-		subhead,
-		table,
-		tagCloud,
-		textColumns,
-		verse,
-		video,
-	]
-		.filter( filter )
-		.forEach( registerBlock );
+export const registerCoreBlocks = (
+	blocks = __experimentalGetCoreBlocks()
+) => {
+	blocks.forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
 	if ( window.wp && window.wp.oldEditor ) {
