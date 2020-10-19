@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import store from '../store';
+import store from '../index';
 import {
 	registerProcessor,
 	enqueueItemAndWaitForResults,
 	processBatch,
-} from '../store/actions';
+} from '../actions';
 import { STATE_ERROR, STATE_SUCCESS } from '../';
 
 const TEST_QUEUE = 'TEST_QUEUE';
