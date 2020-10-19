@@ -43,21 +43,12 @@ export default function WidgetAreaEdit( {
 			return;
 		}
 
-		let timeout;
 		if ( isDraggingWithin && ! isOpen ) {
-			timeout = setTimeout( () => {
-				setOpen( true );
-				setOpenedWhileDragging( true );
-			}, 600 );
+			setOpen( true );
+			setOpenedWhileDragging( true );
 		} else if ( ! isDraggingWithin && isOpen && openedWhileDragging ) {
-			timeout = setTimeout( () => {
-				setOpen( false );
-			}, 100 );
+			setOpen( false );
 		}
-
-		return () => {
-			clearTimeout( timeout );
-		};
 	}, [ isOpen, isDragging, isDraggingWithin, openedWhileDragging ] );
 
 	return (
