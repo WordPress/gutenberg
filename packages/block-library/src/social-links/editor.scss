@@ -32,6 +32,10 @@
 		}
 	}
 
+	.wp-social-link:hover {
+		transform: none;
+	}
+
 	.wp-social-link::before {
 		content: "";
 		display: block;
