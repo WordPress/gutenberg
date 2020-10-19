@@ -7,7 +7,7 @@ import {
 	enqueueItemAndWaitForResults,
 	processBatch,
 } from '../actions';
-import { STATE_ERROR, STATE_SUCCESS } from '../';
+import { STATE_ERROR, STATE_SUCCESS } from '../constants';
 
 const TEST_QUEUE = 'TEST_QUEUE';
 const TEST_CONTEXT = 'default';
