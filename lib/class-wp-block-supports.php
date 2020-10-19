@@ -8,7 +8,7 @@
 /**
  * Class encapsulating and implementing Block Supports.
  *
- * @private
+ * @access private
  */
 class WP_Block_Supports {
 
@@ -171,6 +171,12 @@ function get_block_wrapper_attributes( $extra_attributes = array() ) {
 		}
 
 		$attributes[ $attribute_name ] = $extra_attributes[ $attribute_name ] . ' ' . $new_attributes[ $attribute_name ];
+	}
+
+	foreach ( $extra_attributes as $attribute_name => $value ) {
+		if ( ! in_array( $attribute_name, $attributes_to_merge, true ) ) {
+			$attributes[ $attribute_name ] = $value;
+		}
 	}
 
 	if ( empty( $attributes ) ) {
