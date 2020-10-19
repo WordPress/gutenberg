@@ -8,11 +8,14 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { LINK_COLOR } from '../editor/utils';
+import ColorPalettePanel from './color-palette-panel';
 
 export default ( {
 	context: { supports, name },
 	getStyleProperty,
 	setStyleProperty,
+	getSetting,
+	setSetting,
 } ) => {
 	if (
 		! supports.includes( 'color' ) &&
@@ -76,6 +79,13 @@ export default ( {
 		<PanelColorGradientSettings
 			title={ __( 'Color' ) }
 			settings={ settings }
-		/>
+		>
+			<ColorPalettePanel
+				key={ 'color-palette-panel-' + name }
+				contextName={ name }
+				getSetting={ getSetting }
+				setSetting={ setSetting }
+			/>
+		</PanelColorGradientSettings>
 	);
 };

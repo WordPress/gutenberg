@@ -18,7 +18,7 @@ import {
 	MediaUploadCheck,
 	MediaReplaceFlow,
 	RichText,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { useRef, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -32,6 +32,8 @@ import { createBlock } from '@wordpress/blocks';
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import VideoCommonSettings from './edit-common-settings';
+import TracksEditor from './tracks-editor';
+import Tracks from './tracks';
 
 const ALLOWED_MEDIA_TYPES = [ 'video' ];
 const VIDEO_POSTER_ALLOWED_MEDIA_TYPES = [ 'image' ];
@@ -48,7 +50,7 @@ function VideoEdit( {
 	const instanceId = useInstanceId( VideoEdit );
 	const videoPlayer = useRef();
 	const posterImageButton = useRef();
-	const { id, caption, controls, poster, src } = attributes;
+	const { id, caption, controls, poster, src, tracks } = attributes;
 	const mediaUpload = useSelect(
 		( select ) => select( 'core/block-editor' ).getSettings().mediaUpload
 	);
@@ -110,11 +112,11 @@ function VideoEdit( {
 		noticeOperations.createErrorNotice( message );
 	}
 
-	const blockWrapperProps = useBlockWrapperProps();
+	const blockProps = useBlockProps();
 
 	if ( ! src ) {
 		return (
-			<div { ...blockWrapperProps }>
+			<div { ...blockProps }>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
 					onSelect={ onSelectVideo }
@@ -145,6 +147,12 @@ function VideoEdit( {
 	return (
 		<>
 			<BlockControls>
+				<TracksEditor
+					tracks={ tracks }
+					onChange={ ( newTracks ) => {
+						setAttributes( { tracks: newTracks } );
+					} }
+				/>
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ src }
@@ -209,7 +217,7 @@ function VideoEdit( {
 					</MediaUploadCheck>
 				</PanelBody>
 			</InspectorControls>
-			<figure { ...blockWrapperProps }>
+			<figure { ...blockProps }>
 				{ /*
 					Disable the video tag so the user clicking on it won't play the
 					video when the controls are enabled.
@@ -220,7 +228,9 @@ function VideoEdit( {
 						poster={ poster }
 						src={ src }
 						ref={ videoPlayer }
-					/>
+					>
+						<Tracks tracks={ tracks } />
+					</video>
 				</Disabled>
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText

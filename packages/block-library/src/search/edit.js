@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 	BlockControls,
 	InspectorControls,
 	RichText,
@@ -90,10 +90,10 @@ export default function SearchEdit( {
 			'button-only' === buttonPosition
 				? 'wp-block-search__button-only'
 				: undefined,
-			buttonUseIcon && 'no-button' !== buttonPosition
+			! buttonUseIcon && 'no-button' !== buttonPosition
 				? 'wp-block-search__text-button'
 				: undefined,
-			! buttonUseIcon && 'no-button' !== buttonPosition
+			buttonUseIcon && 'no-button' !== buttonPosition
 				? 'wp-block-search__icon-button'
 				: undefined
 		);
@@ -319,12 +319,12 @@ export default function SearchEdit( {
 		</>
 	);
 
-	const blockWrapperProps = useBlockWrapperProps( {
+	const blockProps = useBlockProps( {
 		className: getBlockClassNames(),
 	} );
 
 	return (
-		<div { ...blockWrapperProps }>
+		<div { ...blockProps }>
 			{ controls }
 
 			{ showLabel && (

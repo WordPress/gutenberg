@@ -12,6 +12,7 @@ import { createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import {
+	buildWidgetsQuery,
 	buildWidgetAreasQuery,
 	buildWidgetAreaPostId,
 	KIND,
@@ -20,12 +21,13 @@ import {
 } from './utils';
 
 export const getWidgets = createRegistrySelector( ( select ) => () => {
-	const initialWidgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
-
-	return keyBy(
-		initialWidgetAreas.flatMap( ( area ) => area.widgets ),
-		( widget ) => widget.id
+	const widgets = select( 'core' ).getEntityRecords(
+		'root',
+		'widget',
+		buildWidgetsQuery()
 	);
+
+	return keyBy( widgets, 'id' );
 } );
 
 /**
@@ -42,10 +44,6 @@ export const getWidget = createRegistrySelector(
 );
 
 export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
-	if ( ! hasResolvedWidgetAreas( query ) ) {
-		return null;
-	}
-
 	const query = buildWidgetAreasQuery();
 	return select( 'core' ).getEntityRecords(
 		KIND,
@@ -112,54 +110,73 @@ export const getEditedWidgetAreas = createRegistrySelector(
 	}
 );
 
-export const isSavingWidgetAreas = createRegistrySelector(
-	( select ) => ( state, ids ) => {
-		if ( ! ids ) {
-			ids = select( 'core/edit-widgets' )
-				.getWidgetAreas()
-				?.map( ( { id } ) => id );
-		}
-		if ( ! ids ) {
-			return false;
-		}
-		for ( const id of ids ) {
-			const isSaving = select( 'core' ).isSavingEntityRecord(
+/**
+ * Returns all blocks representing reference widgets.
+ *
+ * @param  {string} referenceWidgetName  Optional. If given, only reference widgets with this name will be returned.
+ * @return {Array}  List of all blocks representing reference widgets
+ */
+export const getReferenceWidgetBlocks = createRegistrySelector(
+	( select ) => ( state, referenceWidgetName = null ) => {
+		const results = [];
+		const widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
+		for ( const _widgetArea of widgetAreas ) {
+			const post = select( 'core' ).getEditedEntityRecord(
 				KIND,
-				WIDGET_AREA_ENTITY_TYPE,
-				id
+				POST_TYPE,
+				buildWidgetAreaPostId( _widgetArea.id )
 			);
-			if ( isSaving ) {
-				return true;
+			for ( const block of post.blocks ) {
+				if (
+					block.name === 'core/legacy-widget' &&
+					( ! referenceWidgetName ||
+						block.attributes?.referenceWidgetName ===
+							referenceWidgetName )
+				) {
+					results.push( block );
+				}
 			}
 		}
+		return results;
+	}
+);
+
+export const isSavingWidgetAreas = createRegistrySelector( ( select ) => () => {
+	const widgetAreasIds = select( 'core/edit-widgets' )
+		.getWidgetAreas()
+		?.map( ( { id } ) => id );
+	if ( ! widgetAreasIds ) {
 		return false;
 	}
-);
 
-/**
- * Returns true if the navigation post related to menuId was already resolved.
- *
- * @param {number} menuId The id of menu.
- * @return {boolean} True if the navigation post related to menuId was already resolved, false otherwise.
- */
-export const hasResolvedWidgetAreas = createRegistrySelector(
-	( select, query = buildWidgetAreasQuery() ) => () => {
-		const areas = select( 'core' ).getEntityRecords(
+	for ( const id of widgetAreasIds ) {
+		const isSaving = select( 'core' ).isSavingEntityRecord(
 			KIND,
 			WIDGET_AREA_ENTITY_TYPE,
-			query
+			id
 		);
-		if ( ! areas?.length ) {
-			return select( 'core' ).hasFinishedResolution( 'getEntityRecords', [
-				KIND,
-				WIDGET_AREA_ENTITY_TYPE,
-				query,
-			] );
+		if ( isSaving ) {
+			return true;
 		}
-
-		return true;
 	}
-);
+
+	const widgetIds = [
+		...Object.keys( select( 'core/edit-widgets' ).getWidgets() ),
+		undefined, // account for new widgets without an ID
+	];
+	for ( const id of widgetIds ) {
+		const isSaving = select( 'core' ).isSavingEntityRecord(
+			'root',
+			'widget',
+			id
+		);
+		if ( isSaving ) {
+			return true;
+		}
+	}
+
+	return false;
+} );
 
 /**
  * Gets whether the widget area is opened.

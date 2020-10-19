@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { useEntityProp } from '@wordpress/core-data';
 import {
 	AlignmentToolbar,
-	__experimentalUseBlockWrapperProps as useBlockWrapperProps,
+	useBlockProps,
 	BlockControls,
 	RichText,
 } from '@wordpress/block-editor';
@@ -22,8 +22,11 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 		'site',
 		'description'
 	);
-	const blockWrapperProps = useBlockWrapperProps();
-
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 	return (
 		<>
 			<BlockControls>
@@ -37,14 +40,11 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 
 			<RichText
 				allowedFormats={ [] }
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
 				onChange={ setSiteTagline }
 				placeholder={ __( 'Site Tagline' ) }
 				tagName="p"
 				value={ siteTagline }
-				{ ...blockWrapperProps }
+				{ ...blockProps }
 			/>
 		</>
 	);

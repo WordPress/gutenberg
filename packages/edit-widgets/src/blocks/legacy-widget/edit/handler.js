@@ -96,9 +96,9 @@ class LegacyWidgetEditHandler extends Component {
 				{ ...componentProps }
 			>
 				{ title && (
-					<div className="wp-block-legacy-widget__edit-widget-title">
+					<h3 className="wp-block-legacy-widget__edit-widget-title">
 						{ title }
-					</div>
+					</h3>
 				) }
 				<div
 					className="wp-block-legacy-widget__edit-container"
@@ -172,9 +172,9 @@ class LegacyWidgetEditHandler extends Component {
 
 		if ( widgetClass ) {
 			apiFetch( {
-				path: `/__experimental/widget-utils/form/${ encodeURIComponent(
-					widgetClass
-				) }/`,
+				path: `/wp/v2/widget-types/${ encodeURIComponent(
+					idBase
+				) }/form-renderer/`,
 				data: {
 					instance: {
 						...instance,

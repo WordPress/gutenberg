@@ -11,6 +11,13 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.39.0
+
+* [***] Full-width and wide alignment support for Video, Latest-posts, Gallery, Media & text, and Pullquote block
+* [***] Fix unsupported block bottom sheet is triggered when device is rotated
+* [***] Unsupported Block Editor: Fixed issue when cannot view or interact with the classic block on Jetpack site
+
+
 ## 1.38.0
 
 [***] Add support for selecting user's post when configuring the link

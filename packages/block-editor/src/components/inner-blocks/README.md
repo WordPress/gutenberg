@@ -162,5 +162,7 @@ Determines whether the toolbars of _all_ child Blocks (applied deeply, recursive
 
 For example, a button block, deeply nested in several levels of block `X` that utilises this property will see the button block's toolbar displayed on block `X`'s toolbar area.
 
+### `placeholder`
 
-
+* **Type:** `Function`
+* **Default:** - `undefined`. The placeholder is an optional function that can be passed in to be a rendered component placed in front of the appender. This can be used to represent an example state prior to any blocks being placed. See the Social Links for an implementation example.

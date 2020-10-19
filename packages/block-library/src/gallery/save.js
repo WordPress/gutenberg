@@ -43,7 +43,7 @@ export default function save( { attributes } ) {
 					const img = (
 						<img
 							src={ image.url }
-							alt={ image.alt }
+							alt={ image.alt !== '' ? image.alt : image.caption }
 							data-id={ image.id }
 							data-full-url={ image.fullUrl }
 							data-link={ image.link }

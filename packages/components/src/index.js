@@ -12,7 +12,10 @@ export {
 
 // Components
 export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
-export { default as Animate } from './animate';
+export {
+	default as Animate,
+	useAnimate as __unstableUseAnimate,
+} from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
@@ -27,6 +30,7 @@ export { default as CardHeader } from './card/header';
 export { default as CardMedia } from './card/media';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
+export { default as __experimentalColorEdit } from './color-edit';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPicker } from './color-picker';

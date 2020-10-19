@@ -4,6 +4,8 @@
 	justify-content: flex-start;
 	padding-left: 0;
 	padding-right: 0;
+	// Some themes set text-indent on all <ul>
+	text-indent: 0;
 	// Some themes give all <ul> default margin instead of padding.
 	margin-left: 0;
 
@@ -20,7 +22,7 @@
 	display: block;
 	width: 36px;
 	height: 36px;
-	border-radius: 36px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
+	border-radius: 9999px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
 	margin: 0 8px 8px 0;
 	transition: transform 0.1s ease;
 	@include reduce-motion("transition");

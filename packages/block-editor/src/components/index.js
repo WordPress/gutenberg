@@ -32,11 +32,17 @@ export { default as __experimentalGradientPickerPanel } from './gradient-picker/
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export { default as __experimentalImageSizeControl } from './image-size-control';
-export { default as InnerBlocks } from './inner-blocks';
+export {
+	default as InnerBlocks,
+	useInnerBlocksProps as __experimentalUseInnerBlocksProps,
+} from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
 export { default as __experimentalLinkControl } from './link-control';
-export { default as __experimentalLineHeightControl } from './line-height-control';
+export { default as __experimentalLinkControlSearchInput } from './link-control/search-input';
+export { default as __experimentalLinkControlSearchResults } from './link-control/search-results';
+export { default as __experimentalLinkControlSearchItem } from './link-control/search-item';
+export { default as LineHeightControl } from './line-height-control';
 export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
 export { default as MediaUpload } from './media-upload';
@@ -70,7 +76,7 @@ export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export {
 	Block as __experimentalBlock,
-	useBlockWrapperProps as __experimentalUseBlockWrapperProps,
+	useBlockProps,
 } from './block-list/block-wrapper';
 export { default as BlockMover } from './block-mover';
 export { default as BlockPreview } from './block-preview';

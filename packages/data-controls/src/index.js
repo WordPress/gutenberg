@@ -2,7 +2,9 @@
  * WordPress dependencies
  */
 import triggerFetch from '@wordpress/api-fetch';
-import { createRegistryControl } from '@wordpress/data';
+import { controls as dataControls } from '@wordpress/data';
+// TODO: mark the deprecated controls after all Gutenberg usages are removed
+// import deprecated from '@wordpress/deprecated';
 
 /**
  * Dispatches a control action for triggering an api fetch call.
@@ -23,105 +25,53 @@ import { createRegistryControl } from '@wordpress/data';
  *
  * @return {Object} The control descriptor.
  */
-export const apiFetch = ( request ) => {
+export function apiFetch( request ) {
 	return {
 		type: 'API_FETCH',
 		request,
 	};
-};
-
-/**
- * Dispatches a control action for triggering and resolving a registry select.
- *
- * Note: when this control action is handled, it automatically considers
- * selectors that may have a resolver. In such case, it will return a `Promise` that resolves
- * after the selector finishes resolving, with the final result value.
- *
- * @param {string} storeKey      The key for the store the selector belongs to
- * @param {string} selectorName  The name of the selector
- * @param {Array}  args          Arguments for the selector.
- *
- * @example
- * ```js
- * import { select } from '@wordpress/data-controls';
- *
- * // Action generator using select
- * export function* myAction() {
- * 	const isSidebarOpened = yield select( 'core/edit-post', 'isEditorSideBarOpened' );
- * 	// do stuff with the result from the select.
- * }
- * ```
- *
- * @return {Object} The control descriptor.
- */
-export function select( storeKey, selectorName, ...args ) {
-	return {
-		type: 'SELECT',
-		storeKey,
-		selectorName,
-		args,
-	};
 }
 
 /**
- * Dispatches a control action for triggering a synchronous registry select.
+ * Control for resolving a selector in a registered data store.
+ * Alias for the `resolveSelect` built-in control in the `@wordpress/data` package.
  *
- * Note: This control synchronously returns the current selector value, triggering the
- * resolution, but not waiting for it.
- *
- * @param {string} storeKey     The key for the store the selector belongs to.
- * @param {string} selectorName The name of the selector.
- * @param {Array}  args         Arguments for the selector.
- *
- * @example
- * ```js
- * import { syncSelect } from '@wordpress/data-controls';
- *
- * // Action generator using `syncSelect`.
- * export function* myAction() {
- * 	const isEditorSideBarOpened = yield syncSelect( 'core/edit-post', 'isEditorSideBarOpened' );
- * 	// Do stuff with the result from the `syncSelect`.
- * }
- * ```
- *
- * @return {Object} The control descriptor.
+ * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
  */
-export function syncSelect( storeKey, selectorName, ...args ) {
-	return {
-		type: 'SYNC_SELECT',
-		storeKey,
-		selectorName,
-		args,
-	};
+export function select( ...args ) {
+	// deprecated( '`select` control in `@wordpress/data-controls`', {
+	// 	alternative: 'built-in `resolveSelect` control in `@wordpress/data`',
+	// } );
+
+	return dataControls.resolveSelect( ...args );
 }
 
 /**
- * Dispatches a control action for triggering a registry dispatch.
+ * Control for calling a selector in a registered data store.
+ * Alias for the `select` built-in control in the `@wordpress/data` package.
  *
- * @param {string} storeKey    The key for the store the action belongs to
- * @param {string} actionName  The name of the action to dispatch
- * @param {Array}  args        Arguments for the dispatch action.
- *
- * @example
- * ```js
- * import { dispatch } from '@wordpress/data-controls';
- *
- * // Action generator using dispatch
- * export function* myAction() {
- * 	yield dispatch( 'core/edit-post', 'togglePublishSidebar' );
- * 	// do some other things.
- * }
- * ```
- *
- * @return {Object}  The control descriptor.
+ * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
  */
-export function dispatch( storeKey, actionName, ...args ) {
-	return {
-		type: 'DISPATCH',
-		storeKey,
-		actionName,
-		args,
-	};
+export function syncSelect( ...args ) {
+	// deprecated( '`syncSelect` control in `@wordpress/data-controls`', {
+	// 	alternative: 'built-in `select` control in `@wordpress/data`',
+	// } );
+
+	return dataControls.select( ...args );
+}
+
+/**
+ * Control for dispatching an action in a registered data store.
+ * Alias for the `dispatch` control in the `@wordpress/data` package.
+ *
+ * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
+ */
+export function dispatch( ...args ) {
+	// deprecated( '`dispatch` control in `@wordpress/data-controls`', {
+	// 	alternative: 'built-in `dispatch` control in `@wordpress/data`',
+	// } );
+
+	return dataControls.dispatch( ...args );
 }
 
 /**
@@ -156,23 +106,4 @@ export const controls = {
 	API_FETCH( { request } ) {
 		return triggerFetch( request );
 	},
-	SELECT: createRegistryControl(
-		( registry ) => ( { storeKey, selectorName, args } ) => {
-			return registry[
-				registry.select( storeKey )[ selectorName ].hasResolver
-					? '__experimentalResolveSelect'
-					: 'select'
-			]( storeKey )[ selectorName ]( ...args );
-		}
-	),
-	SYNC_SELECT: createRegistryControl(
-		( registry ) => ( { storeKey, selectorName, args } ) => {
-			return registry.select( storeKey )[ selectorName ]( ...args );
-		}
-	),
-	DISPATCH: createRegistryControl(
-		( registry ) => ( { storeKey, actionName, args } ) => {
-			return registry.dispatch( storeKey )[ actionName ]( ...args );
-		}
-	),
 };

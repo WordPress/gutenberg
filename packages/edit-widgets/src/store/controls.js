@@ -6,7 +6,12 @@ import { createRegistryControl } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { buildWidgetAreasQuery, KIND, WIDGET_AREA_ENTITY_TYPE } from './utils';
+import {
+	buildWidgetAreasQuery,
+	buildWidgetsQuery,
+	KIND,
+	WIDGET_AREA_ENTITY_TYPE,
+} from './utils';
 
 /**
  * Trigger an API Fetch request.
@@ -76,7 +81,7 @@ export function getNavigationPostForMenu( menuId ) {
 }
 
 /**
- * Resolves menu items for given menu id.
+ * Resolves widget areas.
  *
  * @param {Object} query Query.
  * @return {Object} Action.
@@ -84,6 +89,19 @@ export function getNavigationPostForMenu( menuId ) {
 export function resolveWidgetAreas( query = buildWidgetAreasQuery() ) {
 	return {
 		type: 'RESOLVE_WIDGET_AREAS',
+		query,
+	};
+}
+
+/**
+ * Resolves widgets.
+ *
+ * @param {Object} query Query.
+ * @return {Object} Action.
+ */
+export function resolveWidgets( query = buildWidgetsQuery() ) {
+	return {
+		type: 'RESOLVE_WIDGETS',
 		query,
 	};
 }
@@ -163,6 +181,12 @@ const controls = {
 				.getEntityRecords( KIND, WIDGET_AREA_ENTITY_TYPE, query );
 		}
 	),
+
+	RESOLVE_WIDGETS: createRegistryControl( ( registry ) => ( { query } ) => {
+		return registry
+			.__experimentalResolveSelect( 'core' )
+			.getEntityRecords( 'root', 'widget', query );
+	} ),
 };
 
 const getState = ( registry ) =>

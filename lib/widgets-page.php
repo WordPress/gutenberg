@@ -77,7 +77,30 @@ function gutenberg_widgets_init( $hook ) {
 		gutenberg_get_legacy_widget_settings()
 	);
 
+	// This purposefully does not rely on apply_filters( 'block_editor_settings', $settings, null );
+	// Applying that filter would bring over multitude of features from the post editor, some of which
+	// may be undesirable. Instead of using that filter, we simply pick just the settings that are needed.
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
+	$settings = gutenberg_extend_block_editor_styles( $settings );
+
+	$preload_paths = array(
+		array( '/wp/v2/media', 'OPTIONS' ),
+		'/wp/v2/sidebars?context=edit&per_page=-1',
+		'/wp/v2/widgets?context=edit&per_page=-1',
+	);
+	$preload_data  = array_reduce(
+		$preload_paths,
+		'rest_preload_api_request',
+		array()
+	);
+	wp_add_inline_script(
+		'wp-api-fetch',
+		sprintf(
+			'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );',
+			wp_json_encode( $preload_data )
+		),
+		'after'
+	);
 
 	wp_add_inline_script(
 		'wp-edit-widgets',
@@ -103,3 +126,20 @@ function gutenberg_widgets_init( $hook ) {
 	wp_enqueue_style( 'wp-format-library' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_widgets_init' );
+
+/**
+ * Tells the script loader to load the scripts and styles of custom block on widgets editor screen.
+ *
+ * @param bool $is_block_editor_screen Current decision about loading block assets.
+ * @return bool Filtered decision about loading block assets.
+ */
+function gutenberg_widgets_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
+	if ( is_callable( 'get_current_screen' ) && 'appearance_page_gutenberg-widgets' === get_current_screen()->base ) {
+		return true;
+	}
+
+	return $is_block_editor_screen;
+}
+
+add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_widgets_editor_load_block_editor_scripts_and_styles' );
+
