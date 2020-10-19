@@ -949,7 +949,7 @@ export class RichText extends Component {
 										<ToolbarButton
 											title={ __( 'Insert mention' ) }
 											icon={ <Icon icon={ atSymbol } /> }
-											onClick={ this.showMention }
+											onClick={ this.handleUserSuggestion }
 										/>
 									</Toolbar>
 								)
