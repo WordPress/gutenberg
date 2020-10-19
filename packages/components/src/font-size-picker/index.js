@@ -90,7 +90,7 @@ export default function FontSizePicker( {
 				onChange: ( event ) => onChange( event.target.value ),
 				ariaLabel: __( 'Custom' ),
 				value: value || '',
-				placeholder: 'e.g. calc(2rem - 13.5px)',
+				placeholder: __( 'e.g. calc(2rem - 13.5px)' ),
 		  }
 		: {
 				id: fontSizePickerNumberId,
@@ -150,11 +150,13 @@ export default function FontSizePicker( {
 			</div>
 			<div>
 				<ToggleControl
-					label="Advanced font sizing"
+					label={ __( 'Advanced font sizing' ) }
 					onChange={ () =>
 						setAdvancedFontSizing( ! advancedFontSizing )
 					}
-					help="Toggle to activate custom font-sizing settings"
+					help={ __(
+						'Toggle to activate custom font-sizing settings'
+					) }
 					checked={ advancedFontSizing }
 				/>
 			</div>
