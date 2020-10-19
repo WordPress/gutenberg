@@ -171,7 +171,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 	// Restricting these test to Android because I was not able to update the html on iOS
 	if ( isAndroid() ) {
 		it( 'should be able to merge blocks with unknown html elements', async () => {
-			await editorPage.setHtmlContentAndroid( `
+			await editorPage.setHtmlContent( `
 <!-- wp:paragraph -->
 <p><unknownhtmlelement>abc</unknownhtmlelement>D</p>
 <!-- /wp:paragraph -->
@@ -205,7 +205,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 		// Based on https://github.com/wordpress-mobile/gutenberg-mobile/pull/1507
 		it( 'should handle multiline paragraphs from web', async () => {
-			await editorPage.setHtmlContentAndroid( `
+			await editorPage.setHtmlContent( `
 	<!-- wp:paragraph -->
 	<p>multiple lines<br><br></p>
 	<!-- /wp:paragraph -->

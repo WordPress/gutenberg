@@ -9,10 +9,13 @@ import { withSelect } from '@wordpress/data';
 import ReusableBlockConvertButton from './reusable-block-convert-button';
 import ReusableBlockDeleteButton from './reusable-block-delete-button';
 
-function ReusableBlocksMenuItems( { clientIds } ) {
+function ReusableBlocksMenuItems( { clientIds, rootClientId } ) {
 	return (
 		<>
-			<ReusableBlockConvertButton clientIds={ clientIds } />
+			<ReusableBlockConvertButton
+				clientIds={ clientIds }
+				rootClientId={ rootClientId }
+			/>
 			{ clientIds.length === 1 && (
 				<ReusableBlockDeleteButton clientId={ clientIds[ 0 ] } />
 			) }
