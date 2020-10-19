@@ -566,7 +566,7 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
  */
 export function gmdateI18n( dateFormat, dateValue = new Date() ) {
 	return formatTZ(
-		utcToZonedTime( dateValue ),
+		utcToZonedTime( dateValue, 'UTC' ),
 		translateFormat( dateFormat, dateValue ),
 		{
 			timeZone: 'UTC',
