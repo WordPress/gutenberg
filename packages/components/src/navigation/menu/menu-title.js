@@ -20,6 +20,7 @@ export default function NavigationMenuTitle( {
 	onSearch,
 	search,
 	title,
+	titleAction,
 } ) {
 	const [ isSearching, setIsSearching ] = useState( false );
 	const { menu } = useNavigationMenuContext();
@@ -52,6 +53,8 @@ export default function NavigationMenuTitle( {
 					variant="title.small"
 				>
 					<span id={ menuTitleId }>{ title }</span>
+
+					{ titleAction }
 
 					{ hasSearch && (
 						<Button

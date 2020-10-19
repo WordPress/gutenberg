@@ -27,11 +27,12 @@ export default function NavigationMenu( props ) {
 		className,
 		hasSearch,
 		menu = ROOT_MENU,
+		onBackButtonClick,
 		onSearch: setControlledSearch,
 		parentMenu,
 		search: controlledSearch,
 		title,
-		onBackButtonClick,
+		titleAction,
 	} = props;
 	const [ uncontrolledSearch, setUncontrolledSearch ] = useState( '' );
 	useNavigationTreeMenu( props );
@@ -76,6 +77,7 @@ export default function NavigationMenu( props ) {
 					onSearch={ onSearch }
 					search={ search }
 					title={ title }
+					titleAction={ titleAction }
 				/>
 
 				<NavigableMenu>
