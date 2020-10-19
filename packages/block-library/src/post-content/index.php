@@ -18,8 +18,10 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
+
 	return (
-		'<div class="entry-content">' .
+		'<div ' . $wrapper_attributes . '>' .
 			apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', get_the_content( null, false, $block->context['postId'] ) ) ) .
 		'</div>'
 	);

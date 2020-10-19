@@ -32,8 +32,8 @@ function render_block_core_site_logo( $attributes ) {
 		$classnames[] = "align{$attributes['align']}";
 	}
 
-	$class_name = implode( ' ', $classnames );
-	$html       = sprintf( '<div class="%s"><a href="' . get_bloginfo( 'url' ) . '" rel="home" title="' . get_bloginfo( 'name' ) . '">%s</a></div>', $class_name, $custom_logo );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
+	$html               = sprintf( '<div %s><a href="' . get_bloginfo( 'url' ) . '" rel="home" title="' . get_bloginfo( 'name' ) . '">%s</a></div>', $wrapper_attributes, $custom_logo );
 	remove_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );
 	return $html;
 }
