@@ -111,8 +111,6 @@ class WP_Block_Supports {
 	 * Registers the block attributes required by the different block supports.
 	 */
 	private function register_attributes() {
-		wp_register_style( 'wp-block-supports', false );
-
 		$block_registry         = WP_Block_Type_Registry::get_instance();
 		$registered_block_types = $block_registry->get_all_registered();
 		foreach ( $registered_block_types as $block_type ) {
