@@ -128,20 +128,6 @@ function gutenberg_filter_rest_prepare_theme( $response, $theme, $request ) {
 add_filter( 'rest_prepare_theme', 'gutenberg_filter_rest_prepare_theme', 10, 3 );
 
 /**
- * Start: Include for phase 2
- */
-/**
- * Registers the REST API routes needed by the legacy widget block.
- *
- * @since 5.0.0
- */
-function gutenberg_register_rest_widget_updater_routes() {
-	$widget_forms = new WP_REST_Widget_Utils_Controller();
-	$widget_forms->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_widget_updater_routes' );
-
-/**
  * Registers the block directory.
  *
  * @since 6.5.0
