@@ -624,6 +624,50 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 *
+	 */
+	public function test_update_item_shouldnt_require_id_base() {
+		$this->setup_widget(
+			'widget_text',
+			1,
+			array(
+				'text' => 'Custom text test',
+			)
+		);
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			),
+			array( 'text-1', 'rss-1' )
+		);
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/widgets/text-1' );
+		$request->set_body_params(
+			array(
+				'id'       => 'text-1',
+				'settings' => array(
+					'text' => 'Updated text test',
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$this->assertEquals( 'text-1', $data['id'] );
+		$this->assertEquals( 'sidebar-1', $data['sidebar'] );
+		$this->assertEquals( 1, $data['number'] );
+		$this->assertEqualSets(
+			array(
+				'text'   => 'Updated text test',
+				'title'  => '',
+				'filter' => false,
+			),
+			$data['settings']
+		);
+	}
+
+	/**
 	 * @group multisite
 	 */
 	public function test_store_html_as_admin() {

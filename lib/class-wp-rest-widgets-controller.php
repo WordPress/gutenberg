@@ -371,6 +371,13 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 
 		$input_widget = $request->get_params();
 
+		if ( isset( $input_widget['id'] ) && ! $this->is_reference_widget( $input_widget['id'] ) ) {
+			$widget = $wp_registered_widgets[ $input_widget['id'] ];
+
+			$input_widget['number']  = (int) $widget['params'][0]['number'];
+			$input_widget['id_base'] = _get_widget_id_base( $input_widget['id'] );
+		}
+
 		ob_start();
 		if ( isset( $input_widget['id_base'] ) && isset( $wp_registered_widget_updates[ $input_widget['id_base'] ] ) ) {
 			// Class-based widget.
