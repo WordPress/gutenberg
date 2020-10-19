@@ -46,6 +46,12 @@ export function* getWidgetAreas() {
 				name: widgetArea.name,
 			} )
 		);
+
+		if ( ! widgetArea.widgets.length ) {
+			// If this widget area has no widgets, it won't get a post setup by
+			// the getWidgets resolver.
+			yield persistStubPost( buildWidgetAreaPostId( widgetArea.id ), [] );
+		}
 	}
 
 	const widgetAreasOpenState = {};
@@ -82,7 +88,7 @@ export function* getWidgets() {
 
 	for ( const sidebarId in groupedBySidebar ) {
 		if ( groupedBySidebar.hasOwnProperty( sidebarId ) ) {
-			// Persist the actual post containing the navigation block
+			// Persist the actual post containing the widget block
 			yield persistStubPost(
 				buildWidgetAreaPostId( sidebarId ),
 				groupedBySidebar[ sidebarId ]

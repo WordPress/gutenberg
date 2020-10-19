@@ -8,6 +8,7 @@ import { invert } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { dispatch as dataDispatch } from '@wordpress/data';
+import { STATE_SUCCESS } from '@wordpress/batch-processing';
 
 /**
  * Internal dependencies
@@ -120,12 +121,18 @@ export function* saveWidgetArea( widgetAreaId ) {
 			return true;
 		}
 	);
+	const widgetIds = [];
 	const newWidgetClientIds = [];
+	const savedBlocks = [];
 
-	for ( const block of widgetsBlocks ) {
+	for ( let i = 0; i < widgetsBlocks.length; i++ ) {
+		const block = widgetsBlocks[ i ];
 		const widgetId = clientIdToWidgetId[ block.clientId ];
 		const oldWidget = widgets[ widgetId ];
 		const widget = transformBlockToWidget( block, oldWidget );
+		// We'll replace the null widgetId after save, but we track it here
+		// since order is important.
+		widgetIds.push( widgetId );
 
 		if ( widgetId ) {
 			yield dispatch(
@@ -139,6 +146,20 @@ export function* saveWidgetArea( widgetAreaId ) {
 					sidebar: widgetAreaId,
 				}
 			);
+
+			const hasEdits = yield select(
+				'core',
+				'hasEditsForEntityRecord',
+				'root',
+				'widget',
+				widgetId
+			);
+
+			if ( ! hasEdits ) {
+				continue;
+			}
+
+			savedBlocks.push( block );
 			dataDispatch( 'core' ).saveEditedEntityRecord(
 				'root',
 				'widget',
@@ -146,7 +167,11 @@ export function* saveWidgetArea( widgetAreaId ) {
 				widget
 			);
 		} else {
-			newWidgetClientIds.push( block.clientId );
+			savedBlocks.push( block );
+			newWidgetClientIds.push( {
+				position: i,
+				clientId: block.clientId,
+			} );
 			// This is a new widget instance.
 			dataDispatch( 'core' ).saveEntityRecord( 'root', 'widget', {
 				...widget,
@@ -162,14 +187,39 @@ export function* saveWidgetArea( widgetAreaId ) {
 		'default'
 	);
 
-	const widgetIds = [];
+	if ( batch.state !== STATE_SUCCESS ) {
+		// This is unsafe. We can't rely on object key order.
+		const errors = Object.values( batch.errors );
+		const failedWidgetNames = [];
+
+		for ( let i = 0; i < errors.length; i++ ) {
+			if ( ! errors[ i ] ) {
+				continue;
+			}
+
+			failedWidgetNames.push(
+				savedBlocks[ i ].attributes?.name || savedBlocks[ i ]?.name
+			);
+		}
+
+		throw new Error(
+			sprintf(
+				/* translators: %s: List of widget names */
+				__( 'Could not save the following widgets: %s.' ),
+				failedWidgetNames.join( ', ' )
+			)
+		);
+	}
 
 	for ( const widget of Object.values( batch.results ) ) {
 		if ( widgetIdToClientId[ widget.id ] ) {
 			continue;
 		}
 
-		yield setWidgetIdForClientId( newWidgetClientIds.shift(), widget.id );
+		const { clientId, position } = newWidgetClientIds.shift();
+
+		widgetIds[ position ] = widget.id;
+		yield setWidgetIdForClientId( clientId, widget.id );
 	}
 
 	yield dispatch(
