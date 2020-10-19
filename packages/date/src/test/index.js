@@ -261,6 +261,19 @@ describe( 'PHP Format Tokens', () => {
 		expect( formattedDate ).toBe( '2' );
 	} );
 
+	it( 'should support "U" to get epoc for given date', () => {
+		const settings = __experimentalGetSettings();
+
+		setSettings( {
+			...settings,
+			timezone: { string: 'America/New_York' },
+		} );
+
+		const formattedDate = dateNoI18n( 'U', '2020-10-09T02:00:00.000Z' );
+
+		expect( formattedDate ).toBe( '1602201600' );
+	} );
+
 	it.skip( 'should support "I" to obtain whether or not the timezone is observing DST', () => {
 		const formattedFall = dateNoI18n( 'I', '2020-10-09T11:00:00.000Z' );
 

@@ -5,6 +5,7 @@ import {
 	addHours,
 	format as dateFnsFormat,
 	getDaysInMonth,
+	getUnixTime,
 	isFuture,
 	isLeapYear,
 	parseISO,
@@ -309,7 +310,9 @@ const formatMap = {
 	// Full date/time
 	c: 'yyyy-MM-DDTHH:mm:ssZ', // .toISOString
 	r: 'ddd, D MMM yyyy HH:mm:ss ZZ',
-	U: 'X', // @todo: find out how to get epoc
+	U( dateValue ) {
+		return getUnixTime( utcToZonedTime( dateValue, getActualTimezone() ) );
+	},
 };
 
 function translateFormat( formatString, dateValue ) {
