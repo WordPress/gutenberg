@@ -138,14 +138,11 @@ export default class FileEdit extends Component {
 				}
 				onFinishMediaUploadWithFailure={ () => {} }
 				onMediaUploadStateReset={ this.mediaUploadStateReset }
-				renderContent={ ( {
-					isUploadFailed,
-					retryMessage,
-				} ) => {
+				renderContent={ ( { isUploadFailed, retryMessage } ) => {
 					if ( isUploadFailed ) {
 						return this.getErrorComponent( retryMessage );
 					}
- 
+
 					return (
 						<View>
 							<RichText
@@ -162,9 +159,7 @@ export default class FileEdit extends Component {
 							<View style={ styles.defaultButton }>
 								<PlainText
 									value={ downloadButtonText }
-									onChange={
-										this.onChangeDownloadButtonText
-									}
+									onChange={ this.onChangeDownloadButtonText }
 								/>
 							</View>
 						</View>
