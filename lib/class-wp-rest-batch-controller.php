@@ -133,10 +133,11 @@ class WP_REST_Batch_Controller {
 				if ( isset( $handler['allow_batch'] ) ) {
 					$allow_batch = $handler['allow_batch'];
 				} else {
-					$allow_batch = ! empty( rest_get_server()->get_route_options( $route )['allow_batch'] );
+					$route_options = rest_get_server()->get_route_options( $route );
+					$allow_batch   = isset( $route_options['allow_batch'] ) ? $route_options['allow_batch'] : false;
 				}
 
-				if ( ! $allow_batch ) {
+				if ( ! is_array( $allow_batch ) || empty( $allow_batch['__experimental'] ) ) {
 					$error = new WP_Error(
 						'rest_batch_not_allowed',
 						__( 'The requested route does not support batch requests.', 'gutenberg' ),
