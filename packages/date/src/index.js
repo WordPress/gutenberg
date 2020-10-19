@@ -315,6 +315,12 @@ const formatMap = {
 	},
 };
 
+/**
+ * Applies map of PHP formatting tokens into date-fns formatting tokens to the given format and date.
+ *
+ * @param {string} formatString
+ * @param {Date|string} dateValue
+ */
 function translateFormat( formatString, dateValue ) {
 	let i, char;
 	let newFormat = [];
@@ -351,6 +357,9 @@ function translateFormat( formatString, dateValue ) {
 	return newFormat;
 }
 
+/**
+ * Build date-fns locale settings from WordPress localization settings.
+ */
 function getLocalizationSettings() {
 	const monthValues = {
 		abbreviated: settings.l10n.monthsShort,
