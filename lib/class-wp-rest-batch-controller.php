@@ -243,7 +243,7 @@ class WP_REST_Batch_Controller {
 		$responses = array();
 
 		foreach ( $requests as $request ) {
-			if ( 0 !== strpos( $request->get_route(), '/__experimental' ) ) {
+			if ( 0 !== strpos( $request->get_route(), '/__experimental' ) && 0 !== strpos( $request->get_route(), '/wp/v2/widgets' ) ) {
 				$error       = new WP_Error(
 					'rest_batch_not_allowed',
 					__( 'The requested route does not support batch requests.', 'gutenberg' ),
