@@ -121,10 +121,9 @@ export function* saveWidgetArea( widgetAreaId ) {
 			return true;
 		}
 	);
-	const widgetIds = [];
-	const newWidgetClientIds = [];
-	const savedBlocks = [];
 
+	const batchMeta = [];
+	const sidebarWidgetsIds = [];
 	for ( let i = 0; i < widgetsBlocks.length; i++ ) {
 		const block = widgetsBlocks[ i ];
 		const widgetId = clientIdToWidgetId[ block.clientId ];
@@ -132,7 +131,7 @@ export function* saveWidgetArea( widgetAreaId ) {
 		const widget = transformBlockToWidget( block, oldWidget );
 		// We'll replace the null widgetId after save, but we track it here
 		// since order is important.
-		widgetIds.push( widgetId );
+		sidebarWidgetsIds.push( widgetId );
 
 		if ( widgetId ) {
 			yield dispatch(
@@ -159,7 +158,6 @@ export function* saveWidgetArea( widgetAreaId ) {
 				continue;
 			}
 
-			savedBlocks.push( block );
 			dataDispatch( 'core' ).saveEditedEntityRecord(
 				'root',
 				'widget',
@@ -167,17 +165,18 @@ export function* saveWidgetArea( widgetAreaId ) {
 				widget
 			);
 		} else {
-			savedBlocks.push( block );
-			newWidgetClientIds.push( {
-				position: i,
-				clientId: block.clientId,
-			} );
 			// This is a new widget instance.
 			dataDispatch( 'core' ).saveEntityRecord( 'root', 'widget', {
 				...widget,
 				sidebar: widgetAreaId,
 			} );
 		}
+
+		batchMeta.push( {
+			block,
+			position: i,
+			clientId: block.clientId,
+		} );
 	}
 
 	const batch = yield dispatch(
@@ -196,9 +195,8 @@ export function* saveWidgetArea( widgetAreaId ) {
 				continue;
 			}
 
-			failedWidgetNames.push(
-				savedBlocks[ i ].attributes?.name || savedBlocks[ i ]?.name
-			);
+			const { block } = batchMeta[ i ];
+			failedWidgetNames.push( block.attributes?.name || block?.name );
 		}
 
 		throw new Error(
@@ -213,14 +211,13 @@ export function* saveWidgetArea( widgetAreaId ) {
 	for ( let i = 0; i < batch.sortedItemIds.length; i++ ) {
 		const itemId = batch.sortedItemIds[ i ];
 		const widget = batch.results[ itemId ];
-		if ( widgetIdToClientId[ widget.id ] ) {
-			continue;
+		const { clientId, position } = batchMeta[ i ];
+		if ( ! sidebarWidgetsIds[ position ] ) {
+			sidebarWidgetsIds[ position ] = widget.id;
 		}
-
-		const { clientId, position } = newWidgetClientIds[ i ];
-
-		widgetIds[ position ] = widget.id;
-		yield setWidgetIdForClientId( clientId, widget.id );
+		if ( clientId !== widgetIdToClientId[ widget.id ] ) {
+			yield setWidgetIdForClientId( clientId, widget.id );
+		}
 	}
 
 	yield dispatch(
@@ -230,7 +227,7 @@ export function* saveWidgetArea( widgetAreaId ) {
 		WIDGET_AREA_ENTITY_TYPE,
 		widgetAreaId,
 		{
-			widgets: widgetIds,
+			widgets: sidebarWidgetsIds,
 		}
 	);
 
