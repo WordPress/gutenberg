@@ -220,9 +220,9 @@ class WP_Block {
 				if ( is_string( $chunk ) ) {
 					$block_content .= $chunk;
 				} else {
-					$parent_parsed_block = $current_parsed_block;
+					$parent_parsed_block  = $current_parsed_block;
 					$current_parsed_block = $this->inner_blocks[ $index ]->parsed_block;
-					$block_content .= $this->inner_blocks[ $index++ ]->render();
+					$block_content       .= $this->inner_blocks[ $index++ ]->render();
 					$current_parsed_block = $parent_parsed_block;
 				}
 			}
