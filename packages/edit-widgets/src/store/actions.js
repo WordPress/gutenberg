@@ -188,8 +188,7 @@ export function* saveWidgetArea( widgetAreaId ) {
 	);
 
 	if ( batch.state !== STATE_SUCCESS ) {
-		// This is unsafe. We can't rely on object key order.
-		const errors = Object.values( batch.errors );
+		const errors = batch.sortedItemIds.map( ( id ) => batch.errors[ id ] );
 		const failedWidgetNames = [];
 
 		for ( let i = 0; i < errors.length; i++ ) {

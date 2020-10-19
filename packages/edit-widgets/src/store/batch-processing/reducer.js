@@ -51,6 +51,7 @@ export default function reducer( state = defaultState, action ) {
 
 			const stateQueue = state.enqueuedItems[ queue ] || {};
 			const enqueuedItems = [ ...( stateQueue[ context ] || [] ) ];
+			const sortedItemIds = enqueuedItems.map( ( { id } ) => id );
 			const transactions = {};
 			let transactionNb = 0;
 			while ( enqueuedItems.length ) {
@@ -68,6 +69,7 @@ export default function reducer( state = defaultState, action ) {
 				state: STATE_NEW,
 				queue,
 				context,
+				sortedItemIds,
 				transactions,
 				results: {},
 				meta,
