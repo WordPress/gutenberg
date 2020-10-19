@@ -19,7 +19,10 @@
 
 	// Vertically balance the margin of each icon.
 	.wp-social-link {
-		margin: 4px 8px 4px 0;
+		// This needs specificity to override some themes.
+		&.wp-social-link.wp-social-link {
+			margin: 4px 8px 4px 0;
+		}
 
 		// By setting the font size, we can scale icons and paddings consistently based on that.
 		// This also allows themes to override this, if need be.
