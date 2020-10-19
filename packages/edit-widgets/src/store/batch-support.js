@@ -92,7 +92,7 @@ async function batchProcessor( requests, transaction ) {
 	}
 
 	const response = await apiFetch( {
-		path: '/__experimental/batch',
+		path: '/v1/batch',
 		method: 'POST',
 		data: {
 			validation: 'require-all-validate',

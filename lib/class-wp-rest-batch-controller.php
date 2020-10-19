@@ -20,7 +20,7 @@ class WP_REST_Batch_Controller {
 	 */
 	public function register_routes() {
 		register_rest_route(
-			'__experimental',
+			'v1',
 			'batch',
 			array(
 				'callback'            => array( $this, 'serve_batch_request' ),
@@ -137,7 +137,7 @@ class WP_REST_Batch_Controller {
 					$allow_batch   = isset( $route_options['allow_batch'] ) ? $route_options['allow_batch'] : false;
 				}
 
-				if ( ! is_array( $allow_batch ) || empty( $allow_batch['__experimental'] ) ) {
+				if ( ! is_array( $allow_batch ) || empty( $allow_batch['v1'] ) ) {
 					$error = new WP_Error(
 						'rest_batch_not_allowed',
 						__( 'The requested route does not support batch requests.', 'gutenberg' ),
