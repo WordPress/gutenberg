@@ -20,41 +20,37 @@
 	// Vertically balance the margin of each icon.
 	.wp-social-link {
 		margin: 4px 8px 4px 0;
+
+		// By setting the font size, we can scale icons and paddings consistently based on that.
+		// This also allows themes to override this, if need be.
+		padding: 0.25em;
+
+		svg {
+			width: 1em;
+			height: 1em;
+		}
 	}
 
 	// Icon sizes.
 	// Small.
 	&.has-small-icon-size {
-		svg {
-			width: 18px;
-			height: 18px;
-		}
+		font-size: 16px; // 16 makes for a quarter-padding that keeps the icon centered.
 	}
 
 	// Normal/default.
 	&,
 	&.has-normal-icon-size {
-		// 24 & 36 button
-		svg {
-			width: 24px;
-			height: 24px;
-		}
+		font-size: 24px;
 	}
 
 	// Large.
 	&.has-large-icon-size {
-		svg {
-			width: 36px;
-			height: 36px;
-		}
+		font-size: 36px;
 	}
 
 	// Huge.
 	&.has-huge-icon-size {
-		svg {
-			width: 48px;
-			height: 48px;
-		}
+		font-size: 48px;
 	}
 }
 
