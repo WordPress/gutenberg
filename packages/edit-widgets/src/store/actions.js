@@ -210,12 +210,14 @@ export function* saveWidgetArea( widgetAreaId ) {
 		);
 	}
 
-	for ( const widget of Object.values( batch.results ) ) {
+	for ( let i = 0; i < batch.sortedItemIds.length; i++ ) {
+		const itemId = batch.sortedItemIds[ i ];
+		const widget = batch.results[ itemId ];
 		if ( widgetIdToClientId[ widget.id ] ) {
 			continue;
 		}
 
-		const { clientId, position } = newWidgetClientIds.shift();
+		const { clientId, position } = newWidgetClientIds[ i ];
 
 		widgetIds[ position ] = widget.id;
 		yield setWidgetIdForClientId( clientId, widget.id );
