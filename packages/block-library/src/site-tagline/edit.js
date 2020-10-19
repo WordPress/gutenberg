@@ -22,8 +22,11 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 		'site',
 		'description'
 	);
-	const blockProps = useBlockProps();
-
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 	return (
 		<>
 			<BlockControls>
@@ -42,9 +45,6 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 				tagName="p"
 				value={ siteTagline }
 				{ ...blockProps }
-				className={ classnames( blockProps.className, {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
 			/>
 		</>
 	);
