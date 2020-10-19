@@ -1,29 +1,34 @@
 /**
  * External dependencies
  */
-import { get, omit } from 'lodash';
+import { get, isEmpty, omit, pickBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
-import { Button, ToolbarGroup } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { useCallback, useMemo, useState } from '@wordpress/element';
+import { Button, Placeholder, ToolbarGroup } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
 import { withSelect } from '@wordpress/data';
-import { BlockControls, InspectorControls } from '@wordpress/block-editor';
-import { update } from '@wordpress/icons';
+import {
+	BlockIcon,
+	BlockControls,
+	InspectorControls,
+} from '@wordpress/block-editor';
+import { brush, update } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import LegacyWidgetEditHandler from './handler';
-import LegacyWidgetPlaceholder from './placeholder';
+import WidgetSelectControl from './widget-select-control';
 import WidgetPreview from './widget-preview';
 import LegacyWidgetInspectorCard from './inspector-card';
 
 function LegacyWidgetEdit( {
 	attributes,
 	availableLegacyWidgets,
+	isDuplicateReferenceWidget,
 	prerenderedEditForm,
 	setAttributes,
 	widgetId,
@@ -34,63 +39,66 @@ function LegacyWidgetEdit( {
 	const [ isPreview, setIsPreview ] = useState( false );
 	const shouldHidePreview = ! isPreview && hasEditForm;
 
-	function changeWidget() {
-		switchToEdit();
+	const onResetWidget = useCallback( () => {
+		setIsPreview( false );
 
 		setAttributes( {
 			instance: {},
 			id: undefined,
+			referenceWidgetName: undefined,
 			widgetClass: undefined,
 		} );
 		setHasEditForm( true );
-	}
+	} );
 
-	function switchToEdit() {
-		setIsPreview( false );
-	}
-
-	function switchToPreview() {
-		setIsPreview( true );
-	}
+	const visibleLegacyWidgets = useMemo(
+		() => pickBy( availableLegacyWidgets, ( { isHidden } ) => ! isHidden ),
+		[ availableLegacyWidgets ]
+	);
 
 	if ( ! WPWidget ) {
-		return (
-			<LegacyWidgetPlaceholder
-				availableLegacyWidgets={ availableLegacyWidgets }
-				onChangeWidget={ ( newWidget ) => {
-					const {
-						isReferenceWidget,
-						id_base: idBase,
-					} = availableLegacyWidgets[ newWidget ];
+		if ( isEmpty( visibleLegacyWidgets ) ) {
+			return (
+				<Placeholder label={ __( 'Legacy Widget' ) }>
+					{ __( 'There are no widgets available.' ) }
+				</Placeholder>
+			);
+		}
 
-					if ( isReferenceWidget ) {
-						setAttributes( {
-							instance: {},
-							idBase,
-							referenceWidgetName: newWidget,
-							widgetClass: undefined,
-						} );
-					} else {
-						setAttributes( {
-							instance: {},
-							idBase,
-							referenceWidgetName: undefined,
-							widgetClass: newWidget,
-						} );
-					}
-				} }
-			/>
+		return (
+			<Placeholder
+				icon={ <BlockIcon icon={ brush } /> }
+				label={ __( 'Legacy Widget' ) }
+			>
+				<WidgetSelectControl
+					availableLegacyWidgets={ availableLegacyWidgets }
+					onChange={ setAttributes }
+				/>
+			</Placeholder>
 		);
 	}
 
-	const inspectorControls = WPWidget ? (
-		<InspectorControls>
-			<LegacyWidgetInspectorCard
-				name={ WPWidget.name }
-				description={ WPWidget.description }
-			/>
-		</InspectorControls>
-	) : null;
+	if ( isDuplicateReferenceWidget ) {
+		return (
+			<Placeholder
+				icon={ <BlockIcon icon={ brush } /> }
+				label={ __( 'Duplicate Widget' ) }
+				instructions={ sprintf(
+					// translators: %s: widget name e.g: "Calendar".
+					__( 'Only one instance of the "%s" widget may exist.' ),
+					availableLegacyWidgets[ attributes.referenceWidgetName ]
+						.name
+				) }
+			>
+				<WidgetSelectControl
+					availableLegacyWidgets={ availableLegacyWidgets }
+					onChange={ setAttributes }
+					emptyLabel=""
+					label={ __( 'Select a different widget to display:' ) }
+				/>
+			</Placeholder>
+		);
+	}
 
 	return (
 		<>
@@ -98,7 +106,7 @@ function LegacyWidgetEdit( {
 				<ToolbarGroup>
 					{ WPWidget && ! WPWidget.isHidden && (
 						<Button
-							onClick={ changeWidget }
+							onClick={ onResetWidget }
 							label={ __( 'Change widget' ) }
 							icon={ update }
 						/>
@@ -108,14 +116,14 @@ function LegacyWidgetEdit( {
 							<Button
 								className="components-tab-button"
 								isPressed={ ! isPreview }
-								onClick={ switchToEdit }
+								onClick={ () => setIsPreview( false ) }
 							>
 								<span>{ __( 'Edit' ) }</span>
 							</Button>
 							<Button
 								className="components-tab-button"
 								isPressed={ isPreview }
-								onClick={ switchToPreview }
+								onClick={ () => setIsPreview( true ) }
 							>
 								<span>{ __( 'Preview' ) }</span>
 							</Button>
@@ -123,7 +131,12 @@ function LegacyWidgetEdit( {
 					) }
 				</ToolbarGroup>
 			</BlockControls>
-			{ inspectorControls }
+			<InspectorControls>
+				<LegacyWidgetInspectorCard
+					name={ WPWidget.name }
+					description={ WPWidget.description }
+				/>
+			</InspectorControls>
 			{ hasEditForm && (
 				<LegacyWidgetEditHandler
 					isVisible={ ! isPreview }
@@ -194,7 +207,18 @@ export default withSelect( ( select, { clientId, attributes } ) => {
 		widgetId = referenceWidgetName;
 	}
 
+	let isDuplicateReferenceWidget = false;
+	if ( referenceWidgetName ) {
+		const referenceWidgetBlocks = select(
+			'core/edit-widgets'
+		).getReferenceWidgetBlocks( referenceWidgetName );
+		if ( clientId !== referenceWidgetBlocks[ 0 ].clientId ) {
+			isDuplicateReferenceWidget = true;
+		}
+	}
+
 	return {
+		isDuplicateReferenceWidget,
 		availableLegacyWidgets,
 		widgetId,
 		widgetAreaId: widgetArea?.id,
