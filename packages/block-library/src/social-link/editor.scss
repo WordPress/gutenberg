@@ -6,14 +6,15 @@
 	button {
 		font-size: inherit;
 		color: currentColor;
-		padding: 0;
 		height: auto;
 		line-height: 0;
+
+		// This rule is duplicated from the style.scss and needs to be the same as there.
+		padding: 0.25em;
 	}
 }
-/*
+
 .wp-block-social-links.is-style-pill-shape .wp-social-link button {
-	padding-left: 16px;
-	padding-right: 16px;
+	padding-left: 0.6666em;
+	padding-right: 0.6666em;
 }
-*/

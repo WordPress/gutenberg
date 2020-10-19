@@ -23,7 +23,9 @@
 
 		// By setting the font size, we can scale icons and paddings consistently based on that.
 		// This also allows themes to override this, if need be.
-		padding: 0.25em;
+		a {
+			padding: 0.25em;
+		}
 
 		svg {
 			width: 1em;
@@ -116,7 +118,7 @@
 	}
 
 	.wp-social-link a {
-		padding-left: 16px;
-		padding-right: 16px;
+		padding-left: 0.6666em;
+		padding-right: 0.6666em;
 	}
 }
