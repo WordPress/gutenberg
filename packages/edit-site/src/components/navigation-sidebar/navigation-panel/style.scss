@@ -21,15 +21,10 @@
 	position: relative;
 	width: $nav-sidebar-width;
 	height: 100%;
-	padding-top: $header-height;
 	overflow: hidden;
 }
 
 .edit-site-navigation-panel__site-title-container {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
 	height: $header-height;
 	padding-left: $header-height;
 	margin: 0 $grid-unit-20 0 $grid-unit-10;
