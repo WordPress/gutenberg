@@ -16,17 +16,14 @@
 			justify-content: center;
 			position: relative;
 
+			&:last-child {
+				margin-right: 0;
+			}
+
 			figure,
 			figure > div {
 				margin: 0;
 				height: 100%;
-
-				// IE doesn't support flex so omit that.
-				@supports ( position: sticky ) {
-					display: flex;
-					align-items: flex-end;
-					justify-content: flex-start;
-				}
 			}
 
 			img {
@@ -121,11 +118,6 @@
 				margin-right: 0;
 			}
 		}
-	}
-
-	// Last item always needs margins reset.
-	.wp-block-image:last-child {
-		margin-right: 0;
 	}
 
 	// Apply max-width to floated items that have no intrinsic width.
