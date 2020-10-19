@@ -13,6 +13,7 @@ import {
 	TextControl,
 	FormTokenField,
 	SelectControl,
+	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -26,9 +27,16 @@ import { getTermsInfo } from '../utils';
 import { MAX_FETCHED_TERMS } from '../constants';
 
 export default function QueryInspectorControls( { query, setQuery } ) {
-	const { order, orderBy, author: selectedAuthorId, postType } = query;
+	const {
+		order,
+		orderBy,
+		author: selectedAuthorId,
+		postType,
+		sticky,
+	} = query;
 	const [ showCategories, setShowCategories ] = useState( true );
 	const [ showTags, setShowTags ] = useState( true );
+	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
 	const { authorList, categories, tags, postTypes } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getPostTypes } = select( 'core' );
@@ -72,6 +80,9 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		setShowCategories( postTypeTaxonomies.includes( 'category' ) );
 		setShowTags( postTypeTaxonomies.includes( 'post_tag' ) );
 	}, [ postType, postTypesTaxonomiesMap ] );
+	useEffect( () => {
+		setShowSticky( postType === 'post' );
+	}, [ postType ] );
 	const postTypesSelectOptions = useMemo(
 		() =>
 			( postTypes || [] ).map( ( { labels, slug } ) => ( {
@@ -87,6 +98,9 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		}
 		if ( ! postTypesTaxonomiesMap[ newValue ].includes( 'post_tag' ) ) {
 			updateQuery.tagIds = [];
+		}
+		if ( newValue !== 'post' ) {
+			updateQuery.sticky = false;
 		}
 		setQuery( updateQuery );
 	};
@@ -161,6 +175,14 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 					value={ querySearch }
 					onChange={ setQuerySearch }
 				/>
+				{ showSticky && (
+					<ToggleControl
+						label={ __( 'Sticky' ) }
+						checked={ sticky }
+						onChange={ ( value ) => setQuery( { sticky: value } ) }
+						help={ __( 'Limit results to items that are sticky.' ) }
+					/>
+				) }
 			</PanelBody>
 		</InspectorControls>
 	);

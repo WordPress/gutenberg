@@ -35,6 +35,7 @@ export default function QueryLoopEdit( {
 			author,
 			search,
 			exclude,
+			sticky,
 		} = {},
 		queryContext,
 	},
@@ -65,6 +66,9 @@ export default function QueryLoopEdit( {
 			if ( exclude?.length ) {
 				query.exclude = exclude;
 			}
+			if ( sticky ) {
+				query.sticky = sticky;
+			}
 			return {
 				posts: getEntityRecords( 'postType', postType, query ),
 				blocks: getBlocks( clientId ),
@@ -83,6 +87,7 @@ export default function QueryLoopEdit( {
 			search,
 			postType,
 			exclude,
+			sticky,
 		]
 	);
 

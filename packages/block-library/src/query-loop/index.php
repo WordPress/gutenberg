@@ -56,6 +56,9 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		if ( isset( $block->context['query']['search'] ) ) {
 			$query['s'] = $block->context['query']['search'];
 		}
+		if ( isset( $block->context['query']['sticky'] ) && $block->context['query']['sticky'] ) {
+			$query['post__in'] = get_option( 'sticky_posts' );
+		}
 	}
 
 	$posts = get_posts( $query );
