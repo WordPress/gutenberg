@@ -9,13 +9,11 @@ import classnames from 'classnames';
  */
 import { useState, useMemo, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import {
-	VisuallyHidden,
-	Button,
-	withSpokenMessages,
-} from '@wordpress/components';
+import { VisuallyHidden, Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { LEFT, RIGHT, UP, DOWN, BACKSPACE, ENTER } from '@wordpress/keycodes';
+import { useDebounce } from '@wordpress/compose';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -80,7 +78,6 @@ function QuickInserterList( {
 						onSelect={ onSelectBlockType }
 						onHover={ onHover }
 						label={ __( 'Blocks' ) }
-						limit={ SHOWN_BLOCK_TYPES }
 					/>
 				</InserterPanel>
 			) }
@@ -108,14 +105,14 @@ function QuickInserterList( {
 	);
 }
 
-function QuickInserter( {
+export default function QuickInserter( {
 	onSelect,
 	rootClientId,
 	clientId,
 	isAppender,
 	selectBlockOnInsert,
-	debouncedSpeak,
 } ) {
+	const debouncedSpeak = useDebounce( speak, 500 );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [
 		destinationRootClientId,
@@ -226,6 +223,7 @@ function QuickInserter( {
 					onChange={ ( value ) => {
 						setFilterValue( value );
 					} }
+					placeholder={ __( 'Search for a block' ) }
 				/>
 			) }
 
@@ -252,5 +250,3 @@ function QuickInserter( {
 	);
 	/* eslint-enable jsx-a11y/no-autofocus, jsx-a11y/no-static-element-interactions */
 }
-
-export default withSpokenMessages( QuickInserter );

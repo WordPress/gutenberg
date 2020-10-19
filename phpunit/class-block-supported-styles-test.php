@@ -72,10 +72,40 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 * @param string $block String of rendered block to check.
 	 */
 	private function get_content_from_block( $block ) {
-		$start_index = strpos( $block, '>' ) + 1;
+		$start_index = strpos( $block, '>' ) + 1; // First occurrence of '>'.
 		$split_arr   = substr( $block, $start_index );
-		$end_index   = strpos( $split_arr, '<' );
-		return substr( $split_arr, 0, $end_index );
+		$end_index   = strrpos( $split_arr, '<' ); // Last occurrence of '<'.
+		return substr( $split_arr, 0, $end_index ); // String between first '>' and last '<'.
+	}
+
+	/**
+	 * Block content to test with (i.e. what's wrapped by the block wrapper `<div />`).
+	 *
+	 * @var string
+	 */
+	const BLOCK_CONTENT = '
+		<p data-image-description="&lt;p&gt;Test!&lt;/p&gt;">Test</p>
+		<p>äöü</p>
+		<p>ß</p>
+		<p>系の家庭に</p>
+		<p>Example &lt;p&gt;Test!&lt;/p&gt;</p>
+	';
+
+	/**
+	 * Returns the rendered output for the current block.
+	 *
+	 * @param array $block Block to render.
+	 */
+	private function render_example_block( $block ) {
+		global $current_parsed_block;
+		$current_parsed_block = $block;
+		$wrapper_attributes   = get_block_wrapper_attributes(
+			array(
+				'class' => 'foo-bar-class',
+				'style' => 'test: style;',
+			)
+		);
+		return '<div ' . $wrapper_attributes . '>' . self::BLOCK_CONTENT . '</div>';
 	}
 
 	/**
@@ -86,7 +116,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 * @param string $expected_styles Expected output styles attr string.
 	 */
 	private function assert_styles_and_classes_match( $block, $expected_classes, $expected_styles ) {
-		$styled_block = apply_filters( 'render_block', self::BLOCK_MARKUP, $block );
+		$styled_block = $this->render_example_block( $block );
 		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
 		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
 
@@ -102,29 +132,25 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 * @param string $expected_styles Expected output styles attr string.
 	 */
 	private function assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles ) {
-		$styled_block = apply_filters( 'render_block', self::BLOCK_MARKUP, $block );
-		$content      = $this->get_content_from_block( $styled_block );
-		$class_list   = $this->get_attribute_from_block( 'class', $styled_block );
-		$style_list   = $this->get_attribute_from_block( 'style', $styled_block );
+		$styled_block = $this->render_example_block( $block );
+
+		// Ensure blocks to not add extra whitespace.
+		$this->assertEquals( $styled_block, trim( $styled_block ) );
+
+		$content    = $this->get_content_from_block( $styled_block );
+		$class_list = $this->get_attribute_from_block( 'class', $styled_block );
+		$style_list = $this->get_attribute_from_block( 'style', $styled_block );
 
 		$this->assertEquals( self::BLOCK_CONTENT, $content );
-		$this->assertEquals( $expected_classes, $class_list );
-		$this->assertEquals( $expected_styles, $style_list );
+		$this->assertEqualSets(
+			explode( ' ', $expected_classes ),
+			explode( ' ', $class_list )
+		);
+		$this->assertEquals(
+			array_map( 'trim', explode( ';', $expected_styles ) ),
+			array_map( 'trim', explode( ';', $style_list ) )
+		);
 	}
-
-	/**
-	 * Block content to test with (i.e. what's wrapped by the block wrapper `<div />`).
-	 *
-	 * @var string
-	 */
-	const BLOCK_CONTENT = 'Some non-Latin chärs to make sure DOM öperations don\'t mess them up: こんにちは';
-
-	/**
-	 * Example block markup string to test with.
-	 *
-	 * @var string
-	 */
-	const BLOCK_MARKUP = '<div class="foo-bar-class" style="test:style;">' . self::BLOCK_CONTENT . '</div>';
 
 	/**
 	 * Tests color support for named color support for named colors.
@@ -133,7 +159,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalColor' => true,
+				'color' => true,
 			),
 			'render_callback' => true,
 		);
@@ -165,7 +191,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalColor' => true,
+				'color' => true,
 			),
 			'render_callback' => true,
 		);
@@ -202,8 +228,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalColor' => array(
-					'linkColor' => true,
+				'color' => array(
+					'link' => true,
 				),
 			),
 			'render_callback' => true,
@@ -233,8 +259,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalColor' => array(
-					'linkColor' => true,
+				'color' => array(
+					'link' => true,
 				),
 			),
 			'render_callback' => true,
@@ -264,7 +290,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalColor' => array(
+				'color' => array(
 					'gradients' => true,
 				),
 			),
@@ -295,7 +321,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		$block_type_settings = array(
 			'attributes'      => array(),
 			'supports'        => array(
-				'__experimentalColor' => array(
+				'color' => array(
 					'gradients' => true,
 				),
 			),
@@ -360,11 +386,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_named_font_size() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
-				'__experimentalFontSize' => true,
+			'attributes' => array(),
+			'supports'   => array(
+				'fontSize' => true,
 			),
-			'render_callback' => true,
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -389,11 +414,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_custom_font_size() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
-				'__experimentalFontSize' => true,
+			'attributes' => array(),
+			'supports'   => array(
+				'fontSize' => true,
 			),
-			'render_callback' => true,
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -418,9 +442,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_font_size_unsupported() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(),
-			'render_callback' => true,
+			'attributes' => array(),
+			'supports'   => array(),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -446,11 +469,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_line_height() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
-				'__experimentalLineHeight' => true,
+			'attributes' => array(),
+			'supports'   => array(
+				'lineHeight' => true,
 			),
-			'render_callback' => true,
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -475,9 +497,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_line_height_unsupported() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(),
-			'render_callback' => true,
+			'attributes' => array(),
+			'supports'   => array(),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -502,11 +523,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_block_alignment() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
+			'attributes' => array(),
+			'supports'   => array(
 				'align' => true,
 			),
-			'render_callback' => true,
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -531,9 +551,8 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_block_alignment_unsupported() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(),
-			'render_callback' => true,
+			'attributes' => array(),
+			'supports'   => array(),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -558,17 +577,16 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_all_supported() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
-				'__experimentalColor'      => array(
+			'attributes' => array(),
+			'supports'   => array(
+				'color'      => array(
 					'gradients' => true,
-					'linkColor' => true,
+					'link'      => true,
 				),
-				'__experimentalFontSize'   => true,
-				'__experimentalLineHeight' => true,
-				'align'                    => true,
+				'fontSize'   => true,
+				'lineHeight' => true,
+				'align'      => true,
 			),
-			'render_callback' => true,
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -580,7 +598,6 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 					'color'      => array(
 						'text'       => '#000',
 						'background' => '#fff',
-						'gradient'   => 'some-gradient',
 						'style'      => array( 'color' => array( 'link' => '#fff' ) ),
 					),
 					'typography' => array(
@@ -595,7 +612,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		);
 
 		$expected_classes = 'foo-bar-class wp-block-example has-text-color has-background alignwide';
-		$expected_styles  = 'test: style; color: #000; background-color: #fff; background: some-gradient; font-size: 10px; line-height: 20;';
+		$expected_styles  = 'test: style; color: #000; background-color: #fff; font-size: 10px; line-height: 20;';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
@@ -606,11 +623,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_one_supported() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
-				'__experimentalFontSize' => true,
+			'attributes' => array(),
+			'supports'   => array(
+				'fontSize' => true,
 			),
-			'render_callback' => true,
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -643,59 +659,12 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	}
 
 	/**
-	 * Tests there is no change without 'render_callback' in block_type.
-	 */
-	function test_render_callback_required() {
-		$block_type_settings = array(
-			'attributes' => array(),
-			'supports'   => array(
-				'align'                    => true,
-				'__experimentalColor'      => array(
-					'gradients' => true,
-					'linkColor' => true,
-				),
-				'__experimentalFontSize'   => true,
-				'__experimentalLineHeight' => true,
-			),
-		);
-		$this->register_block_type( 'core/example', $block_type_settings );
-
-		$block = array(
-			'blockName'    => 'core/example',
-			'attrs'        => array(
-				'style' => array(
-					'align'      => 'wide',
-					'color'      => array(
-						'text'       => '#000',
-						'background' => '#fff',
-						'gradient'   => 'some-gradient',
-						'style'      => array( 'color' => array( 'link' => '#fff' ) ),
-					),
-					'typography' => array(
-						'lineHeight' => '20',
-						'fontSize'   => '10',
-					),
-				),
-			),
-			'innerBlock'   => array(),
-			'innerContent' => array(),
-			'innerHTML'    => array(),
-		);
-
-		$expected_classes = 'foo-bar-class';
-		$expected_styles  = 'test:style;';
-
-		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
-	}
-
-	/**
 	 * Tests custom classname server-side block support.
 	 */
 	function test_custom_classnames_support() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(),
-			'render_callback' => true,
+			'attributes' => array(),
+			'supports'   => array(),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -720,11 +689,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_custom_classnames_support_opt_out() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
+			'attributes' => array(),
+			'supports'   => array(
 				'customClassName' => false,
 			),
-			'render_callback' => true,
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -749,11 +717,10 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 */
 	function test_generatted_classnames_support_opt_out() {
 		$block_type_settings = array(
-			'attributes'      => array(),
-			'supports'        => array(
+			'attributes' => array(),
+			'supports'   => array(
 				'className' => false,
 			),
-			'render_callback' => true,
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
 
@@ -765,9 +732,45 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 			'innerHTML'    => array(),
 		);
 
-		$expected_styles  = 'test:style;';
+		$expected_styles  = 'test: style;';
 		$expected_classes = 'foo-bar-class';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	/**
+	 * Ensures libxml_internal_errors is being used instead of @ warning suppression
+	 */
+	public function test_render_block_suppresses_warnings_without_at_suppression() {
+		$block_type_settings = array(
+			'attributes' => array(),
+			'supports'   => array(),
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		// Custom error handler's see Warnings even if they are suppressed by the @ symbol.
+		$errors = array();
+		set_error_handler(
+			function ( $errno = 0, $errstr = '' ) use ( &$errors ) {
+				$errors[] = $errstr;
+				return false;
+			}
+		);
+
+		// HTML5 elements like <time> are not supported by the DOMDocument parser used by the block supports feature.
+		// This specific example is emitted by the "Display post date" setting in the latest-posts block.
+		apply_filters( 'render_block', '<div><time datetime="2020-06-18T04:01:43+10:00" class="wp-block-latest-posts__post-date">June 18, 2020</time></div>', $block );
+
+		restore_error_handler();
+
+		$this->assertEmpty( $errors, 'Libxml errors should be dropped.' );
 	}
 }

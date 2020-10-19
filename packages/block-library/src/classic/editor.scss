@@ -13,7 +13,7 @@
 
 	blockquote {
 		margin: 0;
-		box-shadow: inset 0 0 0 0 $gray-200;
+		box-shadow: inset 0 0 0 0 $gray-300;
 		border-left: 4px solid $black;
 		padding-left: 1em;
 	}
@@ -59,7 +59,7 @@
 	}
 
 	&:focus code[data-mce-selected] {
-		background: $gray-200;
+		background: $gray-300;
 	}
 
 	.alignright {
@@ -152,12 +152,12 @@
 		}
 
 		.loading-placeholder {
-			border: 1px dashed $gray-200;
+			border: 1px dashed $gray-300;
 			padding: 10px;
 		}
 
 		.wpview-error {
-			border: 1px solid $gray-200;
+			border: 1px solid $gray-300;
 			padding: 1em 0;
 			margin: 0;
 			word-wrap: break-word;
@@ -244,7 +244,7 @@ div[data-type="core/freeform"] {
 	&::before {
 		transition: border-color 0.1s linear, box-shadow 0.1s linear;
 		@include reduce-motion("transition");
-		border: $border-width solid $gray-200;
+		border: $border-width solid $gray-300;
 
 		// Windows High Contrast mode will show this outline.
 		outline: $border-width solid transparent;
@@ -299,7 +299,7 @@ div[data-type="core/freeform"] {
 	position: sticky;
 	z-index: z-index(".block-library-classic__toolbar");
 	top: 0;
-	border: $border-width solid $gray-200;
+	border: $border-width solid $gray-300;
 	border-bottom: none;
 	border-radius: $radius-block-ui;
 	margin-bottom: $grid-unit-10;

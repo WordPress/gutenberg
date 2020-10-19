@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { map, find, get, filter, compact, defaultTo } from 'lodash';
+import { set, map, find, get, filter, compact, defaultTo } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,7 @@ import deprecated from '@wordpress/deprecated';
 import { REDUCER_KEY } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
+import { getNormalizedCommaSeparable } from './utils';
 
 /**
  * Returns true if a request is in progress for embed preview data, or false
@@ -44,6 +45,9 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  * @return {Array} Authors list.
  */
 export function getAuthors( state ) {
+	deprecated( "select( 'core' ).getAuthors()", {
+		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
+	} );
 	return getUserQueryResults( state, 'authors' );
 }
 
@@ -101,23 +105,50 @@ export function getEntity( state, kind, name ) {
 }
 
 /**
- * Returns the Entity's record object by key.
+ * Returns the Entity's record object by key. Returns `null` if the value is not
+ * yet received, undefined if the value entity is known to not exist, or the
+ * entity object if it exists and is received.
  *
- * @param {Object} state  State tree
- * @param {string} kind   Entity kind.
- * @param {string} name   Entity name.
- * @param {number} key    Record's key
+ * @param {Object}  state State tree
+ * @param {string}  kind  Entity kind.
+ * @param {string}  name  Entity name.
+ * @param {number}  key   Record's key
+ * @param {?Object} query Optional query.
  *
  * @return {Object?} Record.
  */
-export function getEntityRecord( state, kind, name, key ) {
-	return get( state.entities.data, [
+export function getEntityRecord( state, kind, name, key, query ) {
+	const queriedState = get( state.entities.data, [
 		kind,
 		name,
 		'queriedData',
-		'items',
-		key,
 	] );
+	if ( ! queriedState ) {
+		return undefined;
+	}
+
+	if ( query === undefined ) {
+		// If expecting a complete item, validate that completeness.
+		if ( ! queriedState.itemIsComplete[ key ] ) {
+			return undefined;
+		}
+
+		return queriedState.items[ key ];
+	}
+
+	const item = queriedState.items[ key ];
+	if ( item && query._fields ) {
+		const filteredItem = {};
+		const fields = getNormalizedCommaSeparable( query._fields );
+		for ( let f = 0; f < fields.length; f++ ) {
+			const field = fields[ f ].split( '.' );
+			const value = get( item, field );
+			set( filteredItem, field, value );
+		}
+		return filteredItem;
+	}
+
+	return item;
 }
 
 /**
@@ -128,7 +159,7 @@ export function getEntityRecord( state, kind, name, key ) {
  * @param {string} name   Entity name.
  * @param {number} key    Record's key
  *
- * @return {Object?} Record.
+ * @return {Object|null} Record.
  */
 export function __experimentalGetEntityRecordNoResolver(
 	state,
@@ -172,16 +203,35 @@ export const getRawEntityRecord = createSelector(
 );
 
 /**
+ * Returns true if records have been received for the given set of parameters,
+ * or false otherwise.
+ *
+ * @param {Object}  state State tree
+ * @param {string}  kind  Entity kind.
+ * @param {string}  name  Entity name.
+ * @param {?Object} query Optional terms query.
+ *
+ * @return {boolean} Whether entity records have been received.
+ */
+export function hasEntityRecords( state, kind, name, query ) {
+	return Array.isArray( getEntityRecords( state, kind, name, query ) );
+}
+
+/**
  * Returns the Entity's records.
  *
- * @param {Object}  state  State tree
- * @param {string}  kind   Entity kind.
- * @param {string}  name   Entity name.
- * @param {?Object} query  Optional terms query.
+ * @param {Object}  state State tree
+ * @param {string}  kind  Entity kind.
+ * @param {string}  name  Entity name.
+ * @param {?Object} query Optional terms query.
  *
  * @return {?Array} Records.
  */
 export function getEntityRecords( state, kind, name, query ) {
+	// Queried data state is prepopulated for all known entities. If this is not
+	// assigned for the given parameters, then it is known to not exist. Thus, a
+	// return value of an empty array is used instead of `null` (where `null` is
+	// otherwise used to represent an unknown state).
 	const queriedState = get( state.entities.data, [
 		kind,
 		name,

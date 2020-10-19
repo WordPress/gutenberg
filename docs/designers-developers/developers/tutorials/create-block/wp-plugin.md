@@ -8,7 +8,7 @@ A WordPress plugin is a set of files within the site's `wp-content/plugins` dire
 
 ### Switch to Working Directory
 
-(1A) If you do not plan to use `wp-env` change to your local WordPress plugin directory. For example in Local it is: `~\Local Sites\mywp\wp-content\plugins`
+(1A) If you do not plan to use `wp-env`, change to your local WordPress plugin directory. For example in Local it is: `~\Local Sites\mywp\wp-content\plugins`
 
 -or-
 
@@ -55,7 +55,7 @@ Let's confirm the plugin is loaded and working.
 wp-env start
 ```
 
-This will start your local WordPress site and use the current directory as your plugin directory. In your browser, go to https://localhost:8888/wp-admin/ and login, the default username is "admin" and password is "password", no quotes.
+This will start your local WordPress site and use the current directory as your plugin directory. In your browser, go to http://localhost:8888/wp-admin/ and login, the default username is "admin" and password is "password", no quotes.
 
 ### Confirm Plugin Installed
 

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "6.20.3",
+	"version": "6.23.0",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,12 +25,13 @@
 		"!((src|build|build-module)/api/**)"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
+		"@babel/runtime": "^7.11.2",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
+		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",

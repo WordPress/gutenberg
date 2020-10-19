@@ -34,13 +34,38 @@
 		border: 0;
 
 		// Add a border after item groups to show as separator in the block toolbar.
-		border-right: $border-width solid $gray-200;
+		border-right: $border-width solid $gray-300;
 	}
 
 	> :last-child,
 	> :last-child .components-toolbar-group,
 	> :last-child .components-toolbar {
 		border-right: none;
+	}
+}
+
+// Block controls.
+.block-editor-block-toolbar__block-controls {
+	// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
+	height: auto !important;
+	padding: 0 !important;
+
+	// Switcher.
+	.block-editor-block-switcher .components-dropdown-menu__toggle,
+	.block-editor-block-switcher__no-switcher-icon {
+		.block-editor-block-icon {
+			width: $button-size-small !important;
+			margin: 0 !important;
+		}
+
+		&:focus::before {
+			right: $grid-unit-05 !important;
+		}
+	}
+
+	// Compensate for width of block switcher.
+	.block-editor-block-mover {
+		margin-left: -$grid-unit-15 / 2;
 	}
 }
 
@@ -79,11 +104,6 @@
 	.is-showing-movers & {
 		opacity: 1;
 		transform: translateY(-($block-toolbar-height + $grid-unit-15));
-	}
-
-	// Hide the Parent button in Top Toolbar mode.
-	.edit-post-header-toolbar__block-toolbar & {
-		display: none;
 	}
 }
 

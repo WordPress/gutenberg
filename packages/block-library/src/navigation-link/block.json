@@ -1,9 +1,8 @@
 {
+	"apiVersion": 2,
 	"name": "core/navigation-link",
 	"category": "design",
-	"parent": [
-		"core/navigation"
-	],
+	"parent": [ "core/navigation" ],
 	"attributes": {
 		"label": {
 			"type": "string"
@@ -26,6 +25,9 @@
 		},
 		"url": {
 			"type": "string"
+		},
+		"title": {
+			"type": "string"
 		}
 	},
 	"usesContext": [
@@ -39,7 +41,6 @@
 	],
 	"supports": {
 		"reusable": false,
-		"html": false,
-		"lightBlockWrapper": true
+		"html": false
 	}
 }

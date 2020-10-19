@@ -224,34 +224,6 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 
 	/*
 	 * This script registration and the corresponding function should be removed
-	 * once the plugin is updated to support WordPress 5.4.0 and newer.
-	 *
-	 * See: `gutenberg_add_url_polyfill`
-	 */
-	gutenberg_register_vendor_script(
-		$scripts,
-		'wp-polyfill-url',
-		'https://unpkg.com/core-js-url-browser@3.6.4/url' . $suffix . '.js',
-		array(),
-		'3.6.4'
-	);
-
-	/*
-	 * This script registration and the corresponding function should be removed
-	 * removed once the plugin is updated to support WordPress 5.4.0 and newer.
-	 *
-	 * See: `gutenberg_add_dom_rect_polyfill`
-	 */
-	gutenberg_register_vendor_script(
-		$scripts,
-		'wp-polyfill-dom-rect',
-		'https://unpkg.com/polyfill-library@3.42.0/polyfills/DOMRect/polyfill.js',
-		array(),
-		'3.42.0'
-	);
-
-	/*
-	 * This script registration and the corresponding function should be removed
 	 * removed once the plugin is updated to support WordPress 5.6.0 and newer.
 	 */
 	gutenberg_register_vendor_script(
@@ -358,7 +330,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-components',
 		gutenberg_url( 'build/components/style.css' ),
-		array(),
+		array( 'dashicons' ),
 		filemtime( gutenberg_dir_path() . 'build/components/style.css' )
 	);
 	$styles->add_data( 'wp-components', 'rtl', 'replace' );
@@ -649,57 +621,21 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
 
 /**
- * Extends block editor settings to determine whether to use custom line height controls.
+ * Load the default editor styles.
+ * These styles are used if the "no theme styles" options is triggered.
  *
  * @param array $settings Default editor settings.
  *
  * @return array Filtered editor settings.
  */
-function gutenberg_extend_settings_custom_line_height( $settings ) {
-	$settings['enableCustomLineHeight'] = get_theme_support( 'custom-line-height' );
+function gutenberg_extend_block_editor_settings_with_default_editor_styles( $settings ) {
+	$editor_styles_file              = gutenberg_dir_path() . 'build/editor/editor-styles.css';
+	$settings['defaultEditorStyles'] = array(
+		array(
+			'css' => file_get_contents( $editor_styles_file ),
+		),
+	);
+
 	return $settings;
 }
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_line_height' );
-
-/**
- * Extends block editor settings to determine whether to use custom unit controls.
- * Currently experimental.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_custom_units( $settings ) {
-	$settings['enableCustomUnits'] = get_theme_support( 'custom-units' );
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_units' );
-
-/**
- * Extends block editor settings to determine whether to use custom spacing controls.
- * Currently experimental.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_custom_spacing( $settings ) {
-	$settings['__experimentalEnableCustomSpacing'] = get_theme_support( 'experimental-custom-spacing' );
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_custom_spacing' );
-
-
-/**
- * Extends block editor settings to determine whether to use custom spacing controls.
- * Currently experimental.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_link_color( $settings ) {
-	$settings['__experimentalEnableLinkColor'] = get_theme_support( 'experimental-link-color' );
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_link_color' );
+add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_default_editor_styles' );

@@ -19,3 +19,14 @@
 .iconPlaceholderDark {
 	fill: $white;
 }
+
+.is-style-rounded {
+	border-radius: 9999px;
+	overflow: hidden;
+}
+
+.panelBody {
+	padding-left: 0;
+	padding-right: 0;
+	padding-bottom: $grid-unit;
+}

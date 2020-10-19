@@ -59,7 +59,6 @@ const blockAttributes = {
 	},
 	linkDestination: {
 		type: 'string',
-		default: 'none',
 	},
 	linkTarget: {
 		type: 'string',

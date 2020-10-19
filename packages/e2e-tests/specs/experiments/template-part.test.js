@@ -13,7 +13,10 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import { useExperimentalFeatures } from '../../experimental-features';
+import {
+	useExperimentalFeatures,
+	navigationPanel,
+} from '../../experimental-features';
 
 describe( 'Template Part', () => {
 	useExperimentalFeatures( [
@@ -43,13 +46,10 @@ describe( 'Template Part', () => {
 
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
 			// Switch to editing the header template part.
-			await page.click(
-				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
-			);
-			const switchToHeaderTemplatePartButton = await page.waitForXPath(
-				'//button[contains(text(), "header")]'
-			);
-			await switchToHeaderTemplatePartButton.click();
+			await navigationPanel.open();
+			await navigationPanel.backToRoot();
+			await navigationPanel.navigate( 'Template Parts' );
+			await navigationPanel.clickItemByText( 'header' );
 
 			// Edit it.
 			await insertBlock( 'Paragraph' );
@@ -63,13 +63,10 @@ describe( 'Template Part', () => {
 			);
 
 			// Switch back to the front page template.
-			await page.click(
-				'.components-dropdown-menu__toggle[aria-label="Switch Template"]'
-			);
-			const [ switchToFrontPageTemplateButton ] = await page.$x(
-				'//button[contains(text(), "front-page")]'
-			);
-			await switchToFrontPageTemplateButton.click();
+			await navigationPanel.open();
+			await navigationPanel.backToRoot();
+			await navigationPanel.navigate( 'Templates' );
+			await navigationPanel.clickItemByText( 'Front page' );
 
 			// Verify that the header template part is updated.
 			const [ headerTemplatePart ] = await page.$x(
@@ -88,7 +85,7 @@ describe( 'Template Part', () => {
 			'.editor-entities-saved-states__save-button';
 		const savePostSelector = '.editor-post-publish-button__button';
 		const templatePartSelector = '*[data-type="core/template-part"]';
-		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-inner-blocks`;
+		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-block-list__layout`;
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
 		const createNewButtonSelector =
 			'//button[contains(text(), "New template part")]';
@@ -116,6 +113,11 @@ describe( 'Template Part', () => {
 			await page.keyboard.type( testContent );
 			await page.click( savePostSelector );
 			await page.click( entitiesSaveSelector );
+
+			// TODO: Remove when toolbar supports text fields
+			expect( console ).toHaveWarnedWith(
+				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
+			);
 		} );
 
 		it( 'Should preview newly added template part', async () => {
@@ -138,6 +140,11 @@ describe( 'Template Part', () => {
 				testContentSelector
 			);
 			expect( templatePartContent ).toBeTruthy();
+
+			// TODO: Remove when toolbar supports text fields
+			expect( console ).toHaveWarnedWith(
+				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
+			);
 		} );
 	} );
 } );

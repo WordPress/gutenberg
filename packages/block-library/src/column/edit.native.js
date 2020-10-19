@@ -8,6 +8,7 @@ import { View } from 'react-native';
  */
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { useEffect } from '@wordpress/element';
 import {
 	InnerBlocks,
 	BlockControls,
@@ -25,7 +26,6 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './editor.scss';
 import ColumnsPreview from './column-preview';
-import { getColumnWidths } from '../columns/utils';
 
 function ColumnEdit( {
 	attributes,
@@ -38,6 +38,7 @@ function ColumnEdit( {
 	columns,
 	columnCount,
 	selectedColumnIndex,
+	parentAlignment,
 } ) {
 	const { verticalAlignment } = attributes;
 
@@ -45,14 +46,18 @@ function ColumnEdit( {
 		setAttributes( { verticalAlignment: alignment } );
 	};
 
+	useEffect( () => {
+		if ( ! verticalAlignment && parentAlignment ) {
+			updateAlignment( parentAlignment );
+		}
+	}, [] );
+
 	const onWidthChange = ( width ) => {
-		setAttributes( {
-			width,
-		} );
+		setAttributes( { width: `${ width }%` } );
 	};
 
-	const columnWidths = Object.values(
-		getColumnWidths( columns, columnCount )
+	const columnWidths = columns.map(
+		( column ) => parseFloat( column.attributes.width ) || 100 / columnCount
 	);
 
 	if ( ! isSelected && ! hasChildren ) {
@@ -87,7 +92,7 @@ function ColumnEdit( {
 						max={ 100 }
 						value={ columnWidths[ selectedColumnIndex ] }
 						onChange={ onWidthChange }
-						toFixed={ 1 }
+						decimalNum={ 1 }
 						rangePreview={
 							<ColumnsPreview
 								columnWidths={ columnWidths }
@@ -146,6 +151,7 @@ export default compose( [
 			getSelectedBlockClientId,
 			getBlocks,
 			getBlockOrder,
+			getBlockAttributes,
 		} = select( 'core/block-editor' );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
@@ -162,6 +168,9 @@ export default compose( [
 		const columnCount = getBlockCount( parentId );
 		const columns = getBlocks( parentId );
 
+		const parentAlignment = getBlockAttributes( parentId )
+			?.verticalAlignment;
+
 		return {
 			hasChildren,
 			isParentSelected,
@@ -169,6 +178,7 @@ export default compose( [
 			selectedColumnIndex,
 			columns,
 			columnCount,
+			parentAlignment,
 		};
 	} ),
 	withPreferredColorScheme,

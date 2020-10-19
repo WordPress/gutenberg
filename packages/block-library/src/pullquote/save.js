@@ -7,7 +7,11 @@ import { includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getColorClassName, RichText } from '@wordpress/block-editor';
+import {
+	getColorClassName,
+	RichText,
+	useBlockProps,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -63,7 +67,12 @@ export default function save( { attributes } ) {
 		: { color: customTextColor };
 
 	return (
-		<figure className={ figureClasses } style={ figureStyles }>
+		<figure
+			{ ...useBlockProps.save( {
+				className: figureClasses,
+				style: figureStyles,
+			} ) }
+		>
 			<blockquote
 				className={ blockquoteClasses }
 				style={ blockquoteStyles }
