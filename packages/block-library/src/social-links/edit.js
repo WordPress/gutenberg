@@ -96,7 +96,11 @@ export function SocialLinksEdit( props ) {
 								return (
 									<MenuItem
 										icon={
-											iconSize === entry.value && check
+											( iconSize === entry.value ||
+												( ! iconSize &&
+													entry.value ===
+														'has-normal-icon-size' ) ) &&
+											check
 										}
 										isSelected={ iconSize === entry.value }
 										key={ entry.value }
