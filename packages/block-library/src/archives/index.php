@@ -14,7 +14,7 @@
  *
  * @return string Returns the post content with archives added.
  */
-function render_block_core_archives( $attributes ) {
+function render_block_core_archives( $attributes, $content, $block ) {
 	$show_post_count = ! empty( $attributes['showPostCounts'] );
 
 	$class = '';
@@ -97,7 +97,11 @@ function render_block_core_archives( $attributes ) {
 		);
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes,
+		array( 'class' => $classnames )
+	);
 
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',
