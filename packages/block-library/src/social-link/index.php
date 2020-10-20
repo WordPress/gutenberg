@@ -33,7 +33,7 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	}
 
 	$icon               = block_core_social_link_get_icon( $service );
-	$wrapper_attributes = get_block_wrapper_attributes_without_global(
+	$wrapper_attributes = get_block_wrapper_attributes(
 		$block->name,
 		$attributes,
 		array( 'class' => 'wp-social-link wp-social-link-' . $service . $class_name )
