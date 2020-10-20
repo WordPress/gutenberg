@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, map } from 'lodash';
+import { filter, find, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -46,6 +46,11 @@ export default function NewTemplate() {
 		} );
 	};
 
+	const missingTemplates = filter(
+		TEMPLATES_DEFAULT_DETAILS,
+		( defaultTemplate, slug ) => ! find( templates, { slug } )
+	);
+
 	return (
 		<DropdownMenu
 			icon={ plus }
@@ -60,10 +65,9 @@ export default function NewTemplate() {
 				<NavigableMenu>
 					<MenuGroup label={ __( 'Add Template' ) }>
 						{ map(
-							TEMPLATES_DEFAULT_DETAILS,
+							missingTemplates,
 							( { title, description }, slug ) => (
 								<MenuItem
-									disabled={ !! find( templates, { slug } ) }
 									info={ description }
 									key={ slug }
 									onClick={ () => {
