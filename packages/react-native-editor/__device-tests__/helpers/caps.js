@@ -1,8 +1,7 @@
 const ios = {
 	browserName: '',
 	platformName: 'iOS',
-	platformVersion: '13.4',
-	deviceName: 'iPhone 11',
+	platformVersion: '14.0',
 	os: 'iOS',
 	deviceOrientation: 'portrait',
 	automationName: 'XCUITest',
@@ -15,13 +14,11 @@ const ios = {
 
 exports.iosLocal = {
 	...ios,
-	platformVersion: '13.4',
 	deviceName: 'iPhone 11',
 };
 
 exports.iosServer = {
 	...ios,
-	platformVersion: '13.0',
 	deviceName: 'iPhone 11 Simulator',
 };
 
