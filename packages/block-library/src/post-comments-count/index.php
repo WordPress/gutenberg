@@ -23,7 +23,11 @@ function render_block_core_post_comments_count( $attributes, $content, $block ) 
 		$classes .= 'has-text-align-' . $attributes['textAlign'];
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes,
+		array( 'class' => $classes )
+	);
 	return sprintf(
 		'<div class="%1$s">%2$s</div>',
 		$wrapper_attributes,
