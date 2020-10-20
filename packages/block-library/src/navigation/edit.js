@@ -213,7 +213,8 @@ export default compose( [
 				}
 				dispatch( 'core/block-editor' ).replaceInnerBlocks(
 					clientId,
-					blocks
+					blocks,
+					true
 				);
 			},
 		};
