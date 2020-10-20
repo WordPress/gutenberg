@@ -39,15 +39,17 @@ export default function TemplatePartPlaceholder( {
 		} );
 	}, [ setAttributes ] );
 
+	// If there are inner blocks already present, this is a convert to template part flow.
+	// Therefore immediately create the template part with the given inner blocks.
 	useEffect( () => {
 		if ( innerBlocks.length ) {
 			onCreate();
 		}
 	}, [] );
-
 	if ( innerBlocks.length ) {
 		return <Spinner />;
 	}
+
 	return (
 		<Placeholder
 			icon={ blockDefault }
