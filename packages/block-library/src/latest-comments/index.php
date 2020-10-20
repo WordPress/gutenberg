@@ -36,11 +36,13 @@ function wp_latest_comments_draft_or_post_title( $post = 0 ) {
 /**
  * Renders the `core/latest-comments` block on server.
  *
- * @param array $attributes The block attributes.
+ * @param Array   $attributes The block attributes.
+ * @param String  $content InnerBlocks content of the Block.
+ * @param WPBlock $block Block object.
  *
  * @return string Returns the post content with latest comments added.
  */
-function render_block_core_latest_comments( $attributes = array() ) {
+function render_block_core_latest_comments( $attributes = array(), $content, $block ) {
 	// This filter is documented in wp-includes/widgets/class-wp-widget-recent-comments.php.
 	$comments = get_comments(
 		apply_filters(
@@ -129,7 +131,11 @@ function render_block_core_latest_comments( $attributes = array() ) {
 	if ( empty( $comments ) ) {
 		$classnames[] = 'no-comments';
 	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes,
+		array( 'class' => implode( ' ', $classnames ) )
+	);
 
 	return ! empty( $comments ) ? sprintf(
 		'<ol %1$s>%2$s</ol>',
