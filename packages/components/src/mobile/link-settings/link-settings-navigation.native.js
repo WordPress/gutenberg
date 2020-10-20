@@ -19,7 +19,7 @@ function LinkSettingsNavigation( props ) {
 			isVisible={ props.isVisible }
 			onClose={ props.onClose }
 			hideHeader
-			withNavigation
+			hasNavigation
 		>
 			<BottomSheet.NavigationContainer animate main>
 				<BottomSheet.NavigationScreen
