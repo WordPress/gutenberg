@@ -413,8 +413,8 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
 /**
  * Switch one or more blocks into one or more blocks of the new block type.
  *
- * @param {Array|Object} blocks          Blocks array or block object.
- * @param {string}       name            Block name.
+ * @param {Array|Object} blocks Blocks array or block object.
+ * @param {string}       name   Block name.
  *
  * @return {?Array} Array of blocks or null.
  */
