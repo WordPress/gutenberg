@@ -38,9 +38,7 @@ describe( 'new editor state', () => {
 			return select( 'core/editor' ).isEditedPostDirty();
 		} );
 		expect( isDirty ).toBeTruthy();
-	} );
 
-	it( 'should be immediately saveable', async () => {
 		expect( await page.$( 'button.editor-post-save-draft' ) ).toBeTruthy();
 	} );
 } );
