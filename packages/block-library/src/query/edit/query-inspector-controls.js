@@ -13,7 +13,6 @@ import {
 	TextControl,
 	FormTokenField,
 	SelectControl,
-	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -100,7 +99,7 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 			updateQuery.tagIds = [];
 		}
 		if ( newValue !== 'post' ) {
-			updateQuery.sticky = false;
+			updateQuery.sticky = '';
 		}
 		setQuery( updateQuery );
 	};
@@ -125,6 +124,14 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
+	const stickyOptions = useMemo( () => [
+		{
+			label: __( 'All posts' ),
+			value: '',
+		},
+		{ label: __( 'Only sticky posts' ), value: 'show' },
+		{ label: __( 'Exclude sticky posts' ), value: 'exclude' },
+	] );
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Filtering and Sorting' ) }>
@@ -176,11 +183,11 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 					onChange={ setQuerySearch }
 				/>
 				{ showSticky && (
-					<ToggleControl
+					<SelectControl
+						options={ stickyOptions }
+						value={ sticky }
 						label={ __( 'Sticky' ) }
-						checked={ sticky }
 						onChange={ ( value ) => setQuery( { sticky: value } ) }
-						help={ __( 'Limit results to items that are sticky.' ) }
 					/>
 				) }
 			</PanelBody>

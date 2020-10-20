@@ -67,7 +67,7 @@ export default function QueryLoopEdit( {
 				query.exclude = exclude;
 			}
 			if ( sticky ) {
-				query.sticky = sticky;
+				query.sticky = sticky === 'show';
 			}
 			return {
 				posts: getEntityRecords( 'postType', postType, query ),
