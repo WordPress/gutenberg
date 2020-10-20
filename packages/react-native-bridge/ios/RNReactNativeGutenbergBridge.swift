@@ -325,6 +325,11 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
+    func mediaSaveSync() {
+        // TODO: To be implemented
+    }
+
+    @objc
     func actionButtonPressed(_ buttonType: String) {
         guard let button = Gutenberg.ActionButtonType(rawValue: buttonType) else {
             return
@@ -357,6 +362,7 @@ extension RNReactNativeGutenbergBridge {
         case replaceBlock
         case updateCapabilities
         case showNotice
+        case mediaSave
     }
 
     public override func supportedEvents() -> [String]! {
