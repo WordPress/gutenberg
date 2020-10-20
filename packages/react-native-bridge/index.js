@@ -262,7 +262,7 @@ export function setStarterPageTemplatesTooltipShown( tooltipShown ) {
  * @param {string} blockClientId the clientId of the block.
  */
 export function requestMediaFilesEditorLoad( mediaFiles, blockClientId ) {
-	return RNReactNativeGutenbergBridge.requestMediaFilesEditorLoad(
+	RNReactNativeGutenbergBridge.requestMediaFilesEditorLoad(
 		mediaFiles,
 		blockClientId
 	);
@@ -278,7 +278,7 @@ export function requestMediaFilesEditorLoad( mediaFiles, blockClientId ) {
  * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
  */
 export function requestMediaFilesFailedRetryDialog( mediaFiles ) {
-	return RNReactNativeGutenbergBridge.requestMediaFilesFailedRetryDialog(
+	RNReactNativeGutenbergBridge.requestMediaFilesFailedRetryDialog(
 		mediaFiles
 	);
 }
@@ -292,7 +292,7 @@ export function requestMediaFilesFailedRetryDialog( mediaFiles ) {
  * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
  */
 export function requestMediaFilesUploadCancelDialog( mediaFiles ) {
-	return RNReactNativeGutenbergBridge.requestMediaFilesUploadCancelDialog(
+	RNReactNativeGutenbergBridge.requestMediaFilesUploadCancelDialog(
 		mediaFiles
 	);
 }
@@ -306,7 +306,7 @@ export function requestMediaFilesUploadCancelDialog( mediaFiles ) {
  * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
  */
 export function requestMediaFilesSaveCancelDialog( mediaFiles ) {
-	return RNReactNativeGutenbergBridge.requestMediaFilesSaveCancelDialog(
+	RNReactNativeGutenbergBridge.requestMediaFilesSaveCancelDialog(
 		mediaFiles
 	);
 }
