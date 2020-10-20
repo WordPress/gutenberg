@@ -37,9 +37,11 @@ const NavigationPanel = ( { isOpen } ) => {
 		};
 	}, [] );
 
-	const menuRef = useRef();
+	// Ensures focus is moved to the panel area when it is activated
+	// from a separate component (such as document actions in the header).
+	const panelRef = useRef();
 	useEffect( () => {
-		menuRef.current.focus();
+		panelRef.current.focus();
 	}, [ templatesActiveMenu ] );
 
 	return (
@@ -47,7 +49,7 @@ const NavigationPanel = ( { isOpen } ) => {
 			className={ classnames( `edit-site-navigation-panel`, {
 				'is-open': isOpen,
 			} ) }
-			ref={ menuRef }
+			ref={ panelRef }
 			tabIndex="-1"
 		>
 			<div className="edit-site-navigation-panel__inner">
