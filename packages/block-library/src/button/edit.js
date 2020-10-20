@@ -199,6 +199,12 @@ function ButtonEdit( props ) {
 	const colorProps = getColorAndStyleProps( attributes, colors, true );
 	const blockProps = useBlockProps();
 
+	// Remove colorProps from style so that they are not applied to the button's
+	// wrapper
+	for ( const key of Object.keys( colorProps.style ) ) {
+		delete blockProps.style[ key ];
+	}
+
 	return (
 		<>
 			<ColorEdit { ...props } />

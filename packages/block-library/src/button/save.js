@@ -28,12 +28,19 @@ export default function save( { attributes } ) {
 		...colorProps.style,
 	};
 
+	const blockProps = useBlockProps.save();
+	// Remove colorProps from style so that they are not applied to the button's
+	// wrapper
+	for ( const key of Object.keys( colorProps.style ) ) {
+		delete blockProps.style[ key ];
+	}
+
 	// The use of a `title` attribute here is soft-deprecated, but still applied
 	// if it had already been assigned, for the sake of backward-compatibility.
 	// A title will no longer be assigned for new or updated button block links.
 
 	return (
-		<div { ...useBlockProps.save() }>
+		<div { ...blockProps }>
 			<RichText.Content
 				tagName="a"
 				className={ buttonClasses }
