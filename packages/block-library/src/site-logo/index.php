@@ -8,11 +8,13 @@
 /**
  * Renders the `core/site-logo` block on the server.
  *
- * @param array $attributes The block attributes.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  *
  * @return string The render.
  */
-function render_block_core_site_logo( $attributes ) {
+function render_block_core_site_logo( $attributes, $content, $block ) {
 	$adjust_width_height_filter = function ( $image ) use ( $attributes ) {
 		if ( empty( $attributes['width'] ) ) {
 			return $image;
@@ -32,7 +34,11 @@ function render_block_core_site_logo( $attributes ) {
 		$classnames[] = "align{$attributes['align']}";
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes,
+		array( 'class' => implode( ' ', $classnames ) )
+	);
 	$html               = sprintf( '<div %s><a href="' . get_bloginfo( 'url' ) . '" rel="home" title="' . get_bloginfo( 'name' ) . '">%s</a></div>', $wrapper_attributes, $custom_logo );
 	remove_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );
 	return $html;
