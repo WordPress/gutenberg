@@ -12,7 +12,7 @@
  *
  * @return string Returns the categories list/dropdown markup.
  */
-function render_block_core_categories( $attributes ) {
+function render_block_core_categories( $attributes, $content, $block ) {
 	static $block_id = 0;
 	$block_id++;
 
@@ -47,7 +47,11 @@ function render_block_core_categories( $attributes ) {
 		$type           = 'list';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => "wp-block-categories-{$type}" ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes,
+		array( 'class' => "wp-block-categories-{$type}" )
+	);
 
 	return sprintf(
 		$wrapper_markup,
