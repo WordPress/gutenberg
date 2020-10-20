@@ -25,7 +25,11 @@ function render_block_core_post_tags( $attributes, $content, $block ) {
 			$classes .= 'has-text-align-' . $attributes['textAlign'];
 		}
 
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+		$wrapper_attributes = get_block_wrapper_attributes(
+			$block->name,
+			$attributes,
+			array( 'class' => $classes )
+		);
 		$output             = sprintf( '<div %1$s>', $wrapper_attributes );
 
 		foreach ( $post_tags as $tag ) {
