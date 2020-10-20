@@ -8,7 +8,9 @@
 /**
  * Renders the `core/categories` block on server.
  *
- * @param array $attributes The block attributes.
+ * @param Array   $attributes The block attributes.
+ * @param String  $content InnerBlocks content of the Block.
+ * @param WPBlock $block Block object.
  *
  * @return string Returns the categories list/dropdown markup.
  */
