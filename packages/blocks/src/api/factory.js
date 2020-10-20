@@ -419,23 +419,11 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
  *
  * @return {?Array} Array of blocks or null.
  */
-export function switchToBlockType( blocks, name, isGroupingBlock ) {
+export function switchToBlockType( blocks, name ) {
 	const blocksArray = castArray( blocks );
 	const isMultiBlock = blocksArray.length > 1;
 	const firstBlock = blocksArray[ 0 ];
 	const sourceName = firstBlock.name;
-
-	// Unless it's a Grouping Block then for multi block selections
-	// check that all Blocks are of the same type otherwise
-	// we can't run a conversion
-	if (
-		! isContainerGroupBlock( name ) &&
-		isMultiBlock &&
-		// ! isBlockSelectionOfSameType( blocksArray ) &&
-		! isGroupingBlock
-	) {
-		return null;
-	}
 
 	// Find the right transformation by giving priority to the "to"
 	// transformation.
