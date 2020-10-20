@@ -80,7 +80,7 @@ async function toPassAxeTests(
 	page,
 	{ include, exclude, disabledRules, options, config } = {}
 ) {
-	const axe = await new AxePuppeteer( page );
+	const axe = new AxePuppeteer( page );
 
 	if ( include ) {
 		axe.include( include );
