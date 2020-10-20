@@ -99,7 +99,7 @@ function block_core_navigation_render_submenu_icon() {
  *
  * @param array $attributes The block attributes.
  * @param array $content The saved content.
- * @param array $block The parsed block.
+ * @param WPBlock $block The parsed block.
  *
  * @return string Returns the post content with the legacy widget added.
  */
@@ -140,6 +140,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes,
 		array(
 			'class' => implode( ' ', $classes ),
 			'style' => $colors['inline_styles'] . $font_sizes['inline_styles'],
