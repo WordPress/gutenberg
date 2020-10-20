@@ -46,7 +46,7 @@ class BottomSheetStepperCell extends Component {
 		const { step, max, onChange, value } = this.props;
 		const newValue = value + step;
 
-		if ( newValue <= max ) {
+		if ( newValue <= max || max === undefined ) {
 			onChange( newValue );
 			this.announceValue( newValue );
 		}
@@ -109,7 +109,15 @@ class BottomSheetStepperCell extends Component {
 	}
 
 	render() {
-		const { label, icon, min, max, value, separatorType } = this.props;
+		const {
+			label,
+			icon,
+			min,
+			max,
+			value,
+			separatorType,
+			children,
+		} = this.props;
 		const isMinValue = value === min;
 		const isMaxValue = value === max;
 		const labelStyle = [
@@ -164,6 +172,7 @@ class BottomSheetStepperCell extends Component {
 						onPressOut={ this.onPressOut }
 						value={ value }
 					/>
+					{ children }
 				</Cell>
 			</View>
 		);

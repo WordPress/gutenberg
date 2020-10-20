@@ -8,7 +8,7 @@ import { View } from 'react-native';
  */
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	InnerBlocks,
 	BlockControls,
@@ -17,15 +17,14 @@ import {
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
-	RangeControl,
 	FooterMessageControl,
+	UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
 import styles from './editor.scss';
-import ColumnsPreview from './column-preview';
 
 function ColumnEdit( {
 	attributes,
@@ -40,7 +39,12 @@ function ColumnEdit( {
 	selectedColumnIndex,
 	parentAlignment,
 } ) {
-	const { verticalAlignment } = attributes;
+	const { verticalAlignment, width } = attributes;
+	const regex = /(\d+\.?\d*)(.*)/;
+
+	const valueUnit = width && `${ width }`?.match( regex )[ 2 ];
+
+	const [ widthUnit, setWidthUnit ] = useState( valueUnit || '%' );
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -51,10 +55,6 @@ function ColumnEdit( {
 			updateAlignment( parentAlignment );
 		}
 	}, [] );
-
-	const onWidthChange = ( width ) => {
-		setAttributes( { width: `${ width }%` } );
-	};
 
 	const columnWidths = columns.map(
 		( column ) => parseFloat( column.attributes.width ) || 100 / columnCount
@@ -86,19 +86,36 @@ function ColumnEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Column settings' ) }>
-					<RangeControl
+					<UnitControl
 						label={ __( 'Width' ) }
 						min={ 1 }
-						max={ 100 }
-						value={ columnWidths[ selectedColumnIndex ] }
-						onChange={ onWidthChange }
+						max={ widthUnit === '%' ? 100 : undefined }
 						decimalNum={ 1 }
-						rangePreview={
-							<ColumnsPreview
-								columnWidths={ columnWidths }
-								selectedColumnIndex={ selectedColumnIndex }
-							/>
-						}
+						value={ columnWidths[ selectedColumnIndex ] }
+						onChange={ ( nextWidth ) => {
+							nextWidth =
+								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
+
+							setAttributes( {
+								width: `${ nextWidth }${ widthUnit }`,
+							} );
+						} }
+						onUnitChange={ ( nextUnit ) => {
+							setWidthUnit( nextUnit );
+							setAttributes( {
+								width: `${ parseFloat(
+									width || columnWidths[ selectedColumnIndex ]
+								) }${ nextUnit }`,
+							} );
+						} }
+						unit={ widthUnit }
+						units={ [
+							{ value: '%', label: '%', default: '' },
+							{ value: 'px', label: 'px', default: '' },
+							{ value: 'em', label: 'em', default: '' },
+							{ value: 'rem', label: 'rem', default: '' },
+							{ value: 'vw', label: 'vw', default: '' },
+						] }
 					/>
 				</PanelBody>
 				<PanelBody>

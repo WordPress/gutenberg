@@ -172,6 +172,7 @@ class BottomSheetRangeCell extends Component {
 			rangePreview,
 			cellContainerStyle,
 			shouldDisplayTextInput = true,
+			children,
 			...cellProps
 		} = this.props;
 
@@ -262,6 +263,7 @@ class BottomSheetRangeCell extends Component {
 							value={ inputValue }
 						/>
 					) }
+					{ children }
 				</View>
 			</Cell>
 		);

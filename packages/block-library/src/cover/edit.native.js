@@ -300,8 +300,8 @@ const Cover = ( {
 			<PanelBody title={ __( 'Dimensions' ) }>
 				<UnitControl
 					label={ __( 'Minimum height in pixels' ) }
-					minimumValue={ COVER_MIN_HEIGHT }
-					maximumValue={ COVER_MAX_HEIGHT }
+					min={ COVER_MIN_HEIGHT }
+					max={ COVER_MAX_HEIGHT }
 					unit={ minHeightUnit || 'px' }
 					value={ CONTAINER_HEIGHT }
 					onChange={ onHeightChange }

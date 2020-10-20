@@ -1,17 +1,21 @@
 /**
  * External dependencies
  */
-import { Platform } from 'react-native';
+import { Platform, TouchableOpacity, Text, View } from 'react-native';
 /**
  * Internal dependencies
  */
 import RangeCell from '../mobile/bottom-sheet/range-cell';
+import StepperCell from '../mobile/bottom-sheet/stepper-cell';
 import Picker from '../mobile/picker';
 
 /**
  * WordPress dependencies
  */
 import { useRef } from '@wordpress/element';
+import { withPreferredColorScheme } from '@wordpress/compose';
+
+import styles from './style.scss';
 
 function UnitControl( {
 	className,
@@ -31,6 +35,7 @@ function UnitControl( {
 	separatorType,
 	units,
 	unit,
+	getStylesFromColorScheme,
 	...props
 } ) {
 	const pickerRef = useRef();
@@ -51,26 +56,60 @@ function UnitControl( {
 		? currentInputValue
 		: initialPosition;
 
+	const unitButtonTextStyle = getStylesFromColorScheme(
+		styles.unitButtonText,
+		styles.unitButtonTextDark
+	);
+
+	const renderUnitButton = () => {
+		return (
+			<TouchableOpacity
+				onPress={ onPickerPresent }
+				accessibilityRole="button"
+				accessibilityHint="Open picker to choose unit"
+			>
+				<View style={ styles.unitButton }>
+					<Text style={ unitButtonTextStyle }>{ unit }</Text>
+				</View>
+			</TouchableOpacity>
+		);
+	};
+
 	return (
 		<>
-			<RangeCell
-				label={ label }
-				id={ id }
-				help={ help }
-				className={ className }
-				onChange={ onChange }
-				aria-describedby={ !! help ? `${ id }__help` : undefined }
-				minimumValue={ min }
-				maximumValue={ max }
-				value={ value }
-				beforeIcon={ beforeIcon }
-				afterIcon={ afterIcon }
-				allowReset={ allowReset }
-				defaultValue={ initialSliderValue }
-				separatorType={ separatorType }
-				customActionButton={ { title: unit, handler: onPickerPresent } }
-				{ ...props }
-			/>
+			{ unit !== '%' ? (
+				<StepperCell
+					label={ label }
+					max={ max }
+					min={ min }
+					onChange={ onChange }
+					separatorType={ separatorType }
+					value={ value }
+				>
+					{ renderUnitButton() }
+				</StepperCell>
+			) : (
+				<RangeCell
+					label={ label }
+					id={ id }
+					help={ help }
+					className={ className }
+					onChange={ onChange }
+					aria-describedby={ !! help ? `${ id }__help` : undefined }
+					minimumValue={ min }
+					maximumValue={ max }
+					value={ value }
+					beforeIcon={ beforeIcon }
+					afterIcon={ afterIcon }
+					allowReset={ allowReset }
+					defaultValue={ initialSliderValue }
+					separatorType={ separatorType }
+					{ ...props }
+				>
+					{ renderUnitButton() }
+				</RangeCell>
+			) }
+
 			<Picker
 				ref={ pickerRef }
 				options={ units }
@@ -82,4 +121,4 @@ function UnitControl( {
 	);
 }
 
-export default UnitControl;
+export default withPreferredColorScheme( UnitControl );
