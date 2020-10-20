@@ -8,11 +8,13 @@
 /**
  * Renders the `core/tag-cloud` block on server.
  *
- * @param array $attributes The block attributes.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  *
  * @return string Returns the tag cloud for selected taxonomy.
  */
-function render_block_core_tag_cloud( $attributes ) {
+function render_block_core_tag_cloud( $attributes, $content, $block ) {
 	$args      = array(
 		'echo'       => false,
 		'taxonomy'   => $attributes['taxonomy'],
@@ -31,7 +33,10 @@ function render_block_core_tag_cloud( $attributes ) {
 		);
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes();
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes
+	);
 
 	return sprintf(
 		'<p %1$s>%2$s</p>',
