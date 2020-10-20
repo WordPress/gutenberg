@@ -668,7 +668,7 @@ export function removeBlock( clientId, selectPrevious ) {
 export function replaceInnerBlocks(
 	rootClientId,
 	blocks,
-	updateSelection = true
+	updateSelection = false
 ) {
 	return {
 		type: 'REPLACE_INNER_BLOCKS',

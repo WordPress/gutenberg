@@ -69,7 +69,6 @@ function Navigation( {
 				isSelected
 					? InnerBlocks.DefaultAppender
 					: false,
-			templateInsertUpdatesSelection: false,
 			__experimentalAppenderTagName: 'li',
 			__experimentalCaptureToolbars: true,
 			// Template lock set to false here so that the Nav
