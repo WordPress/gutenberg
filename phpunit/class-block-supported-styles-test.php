@@ -97,7 +97,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	 * @param WPBlock $block Block to render.
 	 */
 	private function render_example_block( $block ) {
-		$wrapper_attributes   = get_block_wrapper_attributes(
+		$wrapper_attributes = get_block_wrapper_attributes(
 			$block->name,
 			$block->attributes,
 			array(

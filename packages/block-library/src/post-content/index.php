@@ -21,7 +21,8 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes(
 		$block->name,
 		$attributes,
-		array( 'class' => 'entry-content' ) );
+		array( 'class' => 'entry-content' )
+	);
 
 	return (
 		'<div ' . $wrapper_attributes . '>' .
