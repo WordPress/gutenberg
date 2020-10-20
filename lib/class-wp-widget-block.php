@@ -55,8 +55,15 @@ class WP_Widget_Block extends WP_Widget {
 	public function widget( $args, $instance ) {
 		echo $args['before_widget'];
 		$content = do_blocks( $instance['content'] );
+
+		// Handle embeds for block widgets.
+		//
+		// When this feature is added to core it may need to be implemented
+		// differently. WP_Widget_Text is a good reference, that applies a
+		// filter for its content, which WP_Embed uses in its constructor.
 		global $wp_embed;
 		echo $wp_embed->autoembed( $content );
+
 		echo $args['after_widget'];
 	}
 
