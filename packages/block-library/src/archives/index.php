@@ -10,7 +10,9 @@
  *
  * @see WP_Widget_Archives
  *
- * @param array $attributes The block attributes.
+ * @param Array   $attributes The block attributes.
+ * @param String  $content InnerBlocks content of the Block.
+ * @param WPBlock $block Block object.
  *
  * @return string Returns the post content with archives added.
  */
