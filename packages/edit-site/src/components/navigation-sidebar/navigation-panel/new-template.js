@@ -19,6 +19,7 @@ import { plus } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import getClosestAvailableTemplate from '../../../utils/get-closest-available-template';
 import { TEMPLATES_DEFAULT_DETAILS } from '../../../utils/get-template-info/constants';
 
 export default function NewTemplate() {
@@ -32,12 +33,18 @@ export default function NewTemplate() {
 	);
 	const { addTemplate } = useDispatch( 'core/edit-site' );
 
-	const createTemplate = ( slug ) =>
+	const createTemplate = ( slug ) => {
+		const closestAvailableTemplate = getClosestAvailableTemplate(
+			slug,
+			templates
+		);
 		addTemplate( {
+			content: closestAvailableTemplate.content.raw,
 			slug,
 			title: slug,
-			status: 'publish',
+			status: 'draft',
 		} );
+	};
 
 	return (
 		<DropdownMenu
@@ -68,6 +75,20 @@ export default function NewTemplate() {
 								</MenuItem>
 							)
 						) }
+					</MenuGroup>
+					<MenuGroup>
+						<MenuItem
+							info={ __( 'Custom template ' ) }
+							onClick={ () => {
+								addTemplate( {
+									title: __( 'New Template' ),
+									status: 'draft',
+								} );
+								onClose();
+							} }
+						>
+							{ __( 'General' ) }
+						</MenuItem>
 					</MenuGroup>
 				</NavigableMenu>
 			) }
