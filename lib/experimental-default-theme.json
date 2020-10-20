@@ -169,10 +169,6 @@
 					{
 						"name": "Italic",
 						"slug": "italic"
-					},
-					{
-						"name": "Oblique",
-						"slug": "oblique"
 					}
 				]
 			},
