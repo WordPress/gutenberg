@@ -61,6 +61,7 @@ class WP_Widget_Block extends WP_Widget {
 		// When this feature is added to core it may need to be implemented
 		// differently. WP_Widget_Text is a good reference, that applies a
 		// filter for its content, which WP_Embed uses in its constructor.
+		// See https://core.trac.wordpress.org/ticket/51566
 		global $wp_embed;
 		echo $wp_embed->autoembed( $content );
 
