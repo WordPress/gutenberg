@@ -34,7 +34,11 @@ function render_block_core_post_hierarchical_terms( $attributes, $content, $bloc
 		);
 	}
 	$terms_links        = trim( $terms_links, ' | ' );
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes,
+		array( 'class' => $align_class_name )
+	);
 
 	return sprintf(
 		'<div %1$s>%2$s</div>',
