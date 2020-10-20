@@ -4,6 +4,7 @@
 import {
 	createEmbeddingMatcher,
 	createJSONResponse,
+	createNewPost,
 	setUpResponseMocking,
 	visitAdminPage,
 } from '@wordpress/e2e-test-utils';
@@ -19,6 +20,9 @@ const MOCK_VIMEO_RESPONSE = {
 
 describe( 'new editor state', () => {
 	beforeAll( async () => {
+		// First, make sure that the block editor is properly configured.
+		await createNewPost();
+
 		await setUpResponseMocking( [
 			{
 				match: createEmbeddingMatcher( 'https://vimeo.com/22439234' ),
