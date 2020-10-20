@@ -8,11 +8,13 @@
 /**
  * Dynamically renders the `core/search` block.
  *
- * @param array $attributes The block attributes.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  *
  * @return string The search block markup.
  */
-function render_block_core_search( $attributes ) {
+function render_block_core_search( $attributes, $content, $block ) {
 	static $instance_id = 0;
 
 	// Older versions of the Search block defaulted the label and buttonText
@@ -96,7 +98,11 @@ function render_block_core_search( $attributes ) {
 		$width_styles,
 		$input_markup . $button_markup
 	);
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes,
+		array( 'class' => $classnames )
+	);
 
 	return sprintf(
 		'<form role="search" method="get" action="%s" %s>%s</form>',
