@@ -246,7 +246,7 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 					-5
 				);
 				// Wrap content with the template part block, parse, and create auto-draft.
-				$template_part_string = '<!-- wp:template-part {"slug":"' . $slug . '","theme":"' . wp_get_theme()->get( 'TextDomain' ) . '"} -->' . $content . '<!-- /wp:template-part -->';
+				$template_part_string = '<!-- wp:template-part {"slug":"' . $slug . '","theme":"' . wp_get_theme()->get_stylesheet() . '"} -->' . $content . '<!-- /wp:template-part -->';
 				$template_part_block  = parse_blocks( $template_part_string )[0];
 				create_auto_draft_for_template_part_block( $template_part_block );
 			}
