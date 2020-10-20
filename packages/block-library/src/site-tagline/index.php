@@ -8,13 +8,19 @@
 /**
  * Renders the `core/site-tagline` block on the server.
  *
- * @param array $attributes The block attributes.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  *
  * @return string The render.
  */
-function render_block_core_site_tagline( $attributes ) {
+function render_block_core_site_tagline( $attributes, $content, $block ) {
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes,
+		array( 'class' => $align_class_name )
+	);
 
 	return sprintf(
 		'<p %1$s>%2$s</p>',
