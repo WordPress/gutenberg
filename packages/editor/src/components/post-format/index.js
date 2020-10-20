@@ -1,22 +1,22 @@
 /**
  * External dependencies
  */
-import { find, get, includes, union } from 'lodash';
+import { union } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { Button, SelectControl } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { store as coreStore } from '@wordpress/core-data';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import PostFormatCheck from './check';
 import { store as editorStore } from '../../store';
+import PostFormatCheck from './check';
 
 // All WP post formats, sorted alphabetically by translated name.
 export const POST_FORMATS = [
@@ -47,38 +47,51 @@ export default function PostFormat() {
 	const instanceId = useInstanceId( PostFormat );
 	const postFormatSelectorId = `post-format-selector-${ instanceId }`;
 
-	const { postFormat, suggestedFormat, supportedFormats } = useSelect(
+	const { currentFormatId, listedFormats, suggestedFormat } = useSelect(
 		( select ) => {
+			const supportedFormatIds =
+				select( coreStore ).getThemeSupports().formats ?? [];
 			const { getEditedPostAttribute, getSuggestedPostFormat } = select(
 				editorStore
 			);
-			const _postFormat = getEditedPostAttribute( 'format' );
-			const themeSupports = select( coreStore ).getThemeSupports();
+			const _currentFormatId =
+				getEditedPostAttribute( 'format' ) ?? 'standard';
+
+			const potentialSuggestedFormatId = getSuggestedPostFormat();
+
+			// If the suggested format isn't null, isn't already applied, and is
+			// supported by the theme, return it. Otherwise, return null.
+			const suggestionIsValid =
+				potentialSuggestedFormatId &&
+				potentialSuggestedFormatId !== _currentFormatId &&
+				supportedFormatIds.includes( potentialSuggestedFormatId );
+
+			// The current format may not be supported by the theme.
+			// Ensure it is always shown in the select control.
+			const currentOrSupportedFormatIds = union(
+				[ _currentFormatId ],
+				supportedFormatIds
+			);
+
 			return {
-				postFormat: _postFormat ?? 'standard',
-				suggestedFormat: getSuggestedPostFormat(),
-				// Ensure current format is always in the set.
-				// The current format may not be a format supported by the theme.
-				supportedFormats: union(
-					[ _postFormat ],
-					get( themeSupports, [ 'formats' ], [] )
+				currentFormatId: _currentFormatId,
+				// Filter out invalid formats not included in POST_FORMATS.
+				listedFormats: POST_FORMATS.filter( ( { id } ) =>
+					currentOrSupportedFormatIds.includes( id )
 				),
+				suggestedFormat: suggestionIsValid
+					? POST_FORMATS.find(
+							( { id } ) => id === potentialSuggestedFormatId
+					  )
+					: null,
 			};
 		},
 		[]
 	);
 
-	const formats = POST_FORMATS.filter( ( format ) =>
-		includes( supportedFormats, format.id )
-	);
-	const suggestion = find(
-		formats,
-		( format ) => format.id === suggestedFormat
-	);
-
 	const { editPost } = useDispatch( editorStore );
 
-	const onUpdatePostFormat = ( format ) => editPost( { format } );
+	const updatePostFormat = ( formatId ) => editPost( { format: formatId } );
 
 	return (
 		<PostFormatCheck>
@@ -88,26 +101,26 @@ export default function PostFormat() {
 						{ __( 'Post Format' ) }
 					</label>
 					<SelectControl
-						value={ postFormat }
-						onChange={ ( format ) => onUpdatePostFormat( format ) }
+						value={ currentFormatId }
+						onChange={ updatePostFormat }
 						id={ postFormatSelectorId }
-						options={ formats.map( ( format ) => ( {
+						options={ listedFormats.map( ( format ) => ( {
 							label: format.caption,
 							value: format.id,
 						} ) ) }
 					/>
 				</div>
 
-				{ suggestion && suggestion.id !== postFormat && (
+				{ suggestedFormat && (
 					<div className="editor-post-format__suggestion">
 						{ __( 'Suggestion:' ) }{ ' ' }
 						<Button
 							variant="link"
 							onClick={ () =>
-								onUpdatePostFormat( suggestion.id )
+								updatePostFormat( suggestedFormat.id )
 							}
 						>
-							{ suggestion.caption }
+							{ suggestedFormat.caption }
 						</Button>
 					</div>
 				) }
