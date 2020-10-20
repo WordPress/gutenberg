@@ -975,5 +975,6 @@ function gutenberg_experimental_global_styles_register_cpt() {
 }
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
-add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
+// This is to hook into the edit-post (block-editor store)
+add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings' );
