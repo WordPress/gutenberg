@@ -90,58 +90,62 @@ function GalleryEdit( props ) {
 
 	const getBlock = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getBlock;
-	} );
+	}, [] );
 
-	const imageSizing = useSelect( ( select ) => {
-		const { getMedia } = select( 'core' );
-		const { getSettings } = select( 'core/block-editor' );
-		const { imageSizes } = getSettings();
+	const imageSizing = useSelect(
+		( select ) => {
+			const { getMedia } = select( 'core' );
+			const { getSettings } = select( 'core/block-editor' );
+			const { imageSizes } = getSettings();
 
-		let resizedImages = {};
+			let resizedImages = {};
 
-		if ( isSelected ) {
-			resizedImages = reduce(
-				images,
-				( currentResizedImages, img ) => {
-					if ( ! img.id ) {
-						return currentResizedImages;
-					}
-					const image = getMedia( img.id );
-					const sizes = reduce(
-						imageSizes,
-						( currentSizes, size ) => {
-							const defaultUrl = get( image, [
-								'sizes',
-								size.slug,
-								'url',
-							] );
-							const mediaDetailsUrl = get( image, [
-								'media_details',
-								'sizes',
-								size.slug,
-								'source_url',
-							] );
-							return {
-								...currentSizes,
-								[ size.slug ]: defaultUrl || mediaDetailsUrl,
-							};
-						},
-						{}
-					);
-					return {
-						...currentResizedImages,
-						[ parseInt( img.id, 10 ) ]: sizes,
-					};
-				},
-				{}
-			);
-		}
+			if ( isSelected ) {
+				resizedImages = reduce(
+					images,
+					( currentResizedImages, img ) => {
+						if ( ! img.id ) {
+							return currentResizedImages;
+						}
+						const image = getMedia( img.id );
+						const sizes = reduce(
+							imageSizes,
+							( currentSizes, size ) => {
+								const defaultUrl = get( image, [
+									'sizes',
+									size.slug,
+									'url',
+								] );
+								const mediaDetailsUrl = get( image, [
+									'media_details',
+									'sizes',
+									size.slug,
+									'source_url',
+								] );
+								return {
+									...currentSizes,
+									[ size.slug ]:
+										defaultUrl || mediaDetailsUrl,
+								};
+							},
+							{}
+						);
+						return {
+							...currentResizedImages,
+							[ parseInt( img.id, 10 ) ]: sizes,
+						};
+					},
+					{}
+				);
+			}
 
-		return {
-			imageSizes,
-			resizedImages,
-		};
-	} );
+			return {
+				imageSizes,
+				resizedImages,
+			};
+		},
+		[ isSelected, images ]
+	);
 
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
 
