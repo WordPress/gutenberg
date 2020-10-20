@@ -12,7 +12,7 @@
  *
  * @return string Returns the block content.
  */
-function render_block_core_calendar( $attributes ) {
+function render_block_core_calendar( $attributes, $content, $block ) {
 	global $monthnum, $year;
 
 	$previous_monthnum = $monthnum;
@@ -31,7 +31,10 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes();
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes
+	);
 	$output             = sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
