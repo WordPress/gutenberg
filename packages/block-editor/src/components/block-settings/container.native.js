@@ -27,7 +27,7 @@ function BottomSheetSettings( {
 			onClose={ closeGeneralSidebar }
 			hideHeader
 			contentStyle={ styles.content }
-			withNavigation
+			hasNavigation
 			{ ...props }
 		>
 			<BottomSheet.NavigationContainer animate main>
