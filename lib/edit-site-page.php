@@ -137,11 +137,6 @@ function gutenberg_edit_site_init( $hook ) {
 	$settings['styles'] = gutenberg_get_editor_styles();
 	$settings           = gutenberg_experimental_global_styles_settings( $settings );
 
-	// This is so other parts of the code can hook their own settings.
-	// Example: Global Styles.
-	global $post;
-	$settings = apply_filters( 'block_editor_settings', $settings, $post );
-
 	// Preload block editor paths.
 	// most of these are copied from edit-forms-blocks.php.
 	$preload_paths = array(
