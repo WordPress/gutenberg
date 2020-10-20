@@ -67,6 +67,7 @@ export default function NavigationItem( props ) {
 						<ItemTitleUI
 							className="components-navigation__item-title"
 							variant="body.small"
+							isRTL={ isRTL }
 							as="span"
 						>
 							{ title }

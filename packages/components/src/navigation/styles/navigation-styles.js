@@ -186,7 +186,6 @@ export const ItemBadgeUI = styled.span`
 	${ reduceMotion( 'animation' ) };
 `;
 
-export const ItemTitleUI = styled( Text )`
-	margin-right: auto;
-	text-align: left;
-`;
+export const ItemTitleUI = styled( Text )( ( props ) =>
+	props.isRTL ? { marginLeft: 'auto' } : { marginRight: 'auto' }
+);
