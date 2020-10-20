@@ -114,6 +114,14 @@ export default class FileEdit extends Component {
 		const { attributes } = this.props;
 		const { href, fileName, downloadButtonText, id } = attributes;
 
+		const dimmedStyle =
+			this.state.isUploadInProgress && styles.disabledButton;
+		const finalButtonStyle = Object.assign(
+			{},
+			styles.defaultButton,
+			dimmedStyle
+		);
+
 		if ( ! href ) {
 			return (
 				<MediaPlaceholder
@@ -156,7 +164,7 @@ export default class FileEdit extends Component {
 								value={ fileName }
 								deleteEnter={ true }
 							/>
-							<View style={ styles.defaultButton }>
+							<View style={ finalButtonStyle }>
 								<PlainText
 									value={ downloadButtonText }
 									onChange={ this.onChangeDownloadButtonText }

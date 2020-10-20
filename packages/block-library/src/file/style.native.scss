@@ -8,6 +8,10 @@
 	align-self: flex-start;
 }
 
+.disabledButton {
+	opacity: 0.4;
+}
+
 .uploadFailedText {
 	color: #fff;
 	font-size: 14;
