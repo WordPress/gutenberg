@@ -22,7 +22,7 @@ import { BottomSheet } from '@wordpress/components';
 
 
 const BottomSheetWithNavigation = () => (
-  <BottomSheet>
+  <BottomSheet hasNavigation>
     <BottomSheet.NavigationContainer>
       <BottomSheet.NavigationScreen
         name={ 'Settings' }

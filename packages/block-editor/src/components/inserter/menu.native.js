@@ -133,7 +133,7 @@ export class InserterMenu extends Component {
 				isVisible={ true }
 				onClose={ this.onClose }
 				hideHeader
-				withNavigation
+				hasNavigation
 			>
 				<TouchableHighlight accessible={ false }>
 					<BottomSheetConsumer>

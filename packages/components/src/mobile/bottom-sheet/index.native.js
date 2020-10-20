@@ -286,7 +286,7 @@ class BottomSheet extends Component {
 			onDismiss,
 			children,
 			withHeaderSeparator = false,
-			withNavigation,
+			hasNavigation,
 			...rest
 		} = this.props;
 		const {
@@ -351,7 +351,7 @@ class BottomSheet extends Component {
 			automaticallyAdjustContentInsets: false,
 		};
 
-		const WrapperView = withNavigation ? View : ScrollView;
+		const WrapperView = hasNavigation ? View : ScrollView;
 
 		const getHeader = () => (
 			<>
@@ -418,7 +418,7 @@ class BottomSheet extends Component {
 					) }
 					{ ! hideHeader && getHeader() }
 					<WrapperView
-						{ ...( withNavigation
+						{ ...( hasNavigation
 							? { style: listProps.style }
 							: listProps ) }
 					>
@@ -438,7 +438,7 @@ class BottomSheet extends Component {
 								safeAreaBottomInset,
 							} }
 						>
-							{ withNavigation ? (
+							{ hasNavigation ? (
 								<>{ children }</>
 							) : (
 								<TouchableHighlight accessible={ false }>
@@ -446,7 +446,7 @@ class BottomSheet extends Component {
 								</TouchableHighlight>
 							) }
 						</BottomSheetProvider>
-						{ ! withNavigation && (
+						{ ! hasNavigation && (
 							<View
 								style={ {
 									height:
