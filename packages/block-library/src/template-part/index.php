@@ -8,11 +8,13 @@
 /**
  * Renders the `core/template-part` block on the server.
  *
- * @param array $attributes The block attributes.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  *
  * @return string The render.
  */
-function render_block_core_template_part( $attributes ) {
+function render_block_core_template_part( $attributes, $content, $block ) {
 	$content = null;
 
 	if ( ! empty( $attributes['postId'] ) && get_post_status( $attributes['postId'] ) ) {
@@ -63,7 +65,10 @@ function render_block_core_template_part( $attributes ) {
 	}
 	$content            = do_shortcode( $content );
 	$html_tag           = esc_attr( $attributes['tagName'] );
-	$wrapper_attributes = get_block_wrapper_attributes();
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes
+	);
 
 	return "<$html_tag $wrapper_attributes>" . str_replace( ']]>', ']]&gt;', $content ) . "</$html_tag>";
 }
