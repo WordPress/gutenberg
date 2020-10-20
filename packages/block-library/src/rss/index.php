@@ -8,11 +8,13 @@
 /**
  * Renders the `core/rss` block on server.
  *
- * @param array $attributes The block attributes.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  *
  * @return string Returns the block content with received rss items.
  */
-function render_block_core_rss( $attributes ) {
+function render_block_core_rss( $attributes, $content, $block ) {
 	$rss = fetch_feed( $attributes['feedURL'] );
 
 	if ( is_wp_error( $rss ) ) {
@@ -87,7 +89,11 @@ function render_block_core_rss( $attributes ) {
 	if ( isset( $attributes['columns'] ) && 'grid' === $attributes['blockLayout'] ) {
 		$classnames[] = 'columns-' . $attributes['columns'];
 	}
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes,
+		array( 'class' => implode( ' ', $classnames ) )
+	);
 
 	return sprintf( '<ul %s>%s</ul>', $wrapper_attributes, $list_items );
 }
