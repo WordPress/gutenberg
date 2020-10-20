@@ -2,13 +2,10 @@
  * WordPress dependencies
  */
 import {
-	Button,
 	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -26,13 +23,9 @@ import {
 } from '../constants';
 import { useSelect } from '@wordpress/data';
 import TemplatesAllMenu from './templates-all';
-import NewTemplateModal from '../new-template-modal';
+import NewTemplate from '../new-template';
 
 export default function TemplatesMenu( { onActivateItem } ) {
-	const [ isNewTemplateModalOpen, setNewTemplateModalOpen ] = useState(
-		false
-	);
-
 	const templates = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
@@ -50,18 +43,7 @@ export default function TemplatesMenu( { onActivateItem } ) {
 		<NavigationMenu
 			menu={ MENU_TEMPLATES }
 			title={ __( 'Templates' ) }
-			titleAction={
-				<Button
-					icon={ plus }
-					isSmall
-					isTertiary
-					label={ __( 'New Template' ) }
-					onClick={ () => {
-						setNewTemplateModalOpen( true );
-					} }
-					showTooltip
-				/>
-			}
+			titleAction={ <NewTemplate /> }
 			parentMenu={ MENU_ROOT }
 		>
 			<NavigationItem
@@ -95,13 +77,6 @@ export default function TemplatesMenu( { onActivateItem } ) {
 			<TemplatesAllMenu
 				templates={ templates }
 				onActivateItem={ onActivateItem }
-			/>
-
-			<NewTemplateModal
-				isOpen={ isNewTemplateModalOpen }
-				onClose={ () => {
-					setNewTemplateModalOpen( false );
-				} }
 			/>
 		</NavigationMenu>
 	);
