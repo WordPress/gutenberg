@@ -28,11 +28,13 @@ function block_core_latest_posts_get_excerpt_length() {
 /**
  * Renders the `core/latest-posts` block on server.
  *
- * @param array $attributes The block attributes.
+ * @param Array   $attributes The block attributes.
+ * @param String  $content InnerBlocks content of the Block.
+ * @param WPBlock $block Block object.
  *
  * @return string Returns the post content with latest posts added.
  */
-function render_block_core_latest_posts( $attributes ) {
+function render_block_core_latest_posts( $attributes, $content, $block ) {
 	global $post, $block_core_latest_posts_excerpt_length;
 
 	$args = array(
@@ -171,7 +173,11 @@ function render_block_core_latest_posts( $attributes ) {
 		$class .= ' has-author';
 	}
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $class ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes,
+		array( 'class' => $class )
+	);
 
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',
