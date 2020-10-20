@@ -66,7 +66,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 					),
 				),
 				array(
-					'methods'             => WP_REST_Server::READABLE,
+					'methods'             => WP_REST_Server::CREATABLE,
 					'permission_callback' => array( $this, 'get_item_permissions_check' ),
 					'callback'            => array( $this, 'get_widget_form' ),
 					'args'                => array(

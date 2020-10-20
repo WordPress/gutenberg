@@ -45,6 +45,7 @@ function gutenberg_reregister_core_block_types() {
 				'text-columns',
 				'verse',
 				'video',
+				'embed',
 			),
 			'block_names'   => array_merge(
 				array(

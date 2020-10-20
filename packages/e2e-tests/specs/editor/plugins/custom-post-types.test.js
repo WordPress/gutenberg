@@ -71,4 +71,11 @@ describe( 'Test Custom Post Types', () => {
 			[ valueToSelect, PARENT_PAGE_INPUT ]
 		);
 	} );
+	it( 'should create a cpt with a legacy block in its template without WSOD', async () => {
+		await createNewPost( { postType: 'leg_block_in_tpl' } );
+		await page.click( '.block-editor-writing-flow' );
+		await page.keyboard.type( 'Hello there' );
+		await page.waitForSelector( '[data-type="core/embed"]' );
+		await publishPost();
+	} );
 } );

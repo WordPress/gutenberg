@@ -92,141 +92,6 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
-
-		// Lists all sidebars.
-		register_rest_route(
-			'__experimental',
-			'/' . $this->rest_base,
-			array(
-				'methods'             => WP_REST_Server::READABLE,
-				'callback'            => array( $this, 'do_items_shim' ),
-				'permission_callback' => '__return_true',
-			)
-		);
-
-		// Lists/updates a single sidebar based on the given id.
-		register_rest_route(
-			'__experimental',
-			'/' . $this->rest_base . '/(?P<id>[\w-]+)',
-			array(
-				'methods'             => WP_REST_Server::ALLMETHODS,
-				'callback'            => array( $this, 'do_item_shim' ),
-				'permission_callback' => '__return_true',
-			)
-		);
-	}
-
-	/**
-	 * Shims the items route to use the new endpoint.
-	 *
-	 * @param WP_REST_Request $request The full details about the request.
-	 *
-	 * @return WP_REST_Response The computed response.
-	 */
-	public function do_items_shim( $request ) {
-		$inner = new WP_REST_Request(
-			$request->get_method(),
-			str_replace( '/__experimental/', '/wp/v2/', $request->get_route() )
-		);
-		$inner->set_query_params( $request->get_query_params() );
-
-		$response = rest_do_request( $inner );
-
-		if ( $response->is_error() ) {
-			return $response;
-		}
-
-		foreach ( $response->get_data() as $i => $data ) {
-			foreach ( $data['widgets'] as $j => $widget ) {
-				$response->data[ $i ]['widgets'][ $j ] = rest_do_request( '/wp/v2/widgets/' . $widget )->get_data();
-			}
-
-			$response->data[ $i ]['widgets'] = array_values( $response->data[ $i ]['widgets'] );
-		}
-
-		return $response;
-	}
-
-	/**
-	 * Shims the item route to use the new endpoint.
-	 *
-	 * @param WP_REST_Request $request The full details about the request.
-	 *
-	 * @return WP_REST_Response The computed response.
-	 */
-	public function do_item_shim( $request ) {
-		if ( $request->get_method() === 'GET' ) {
-			$inner = new WP_REST_Request(
-				$request->get_method(),
-				str_replace( '/__experimental/', '/wp/v2/', $request->get_route() )
-			);
-			$inner->set_query_params( $request->get_query_params() );
-
-			$response = rest_do_request( $inner );
-
-			if ( $response->is_error() ) {
-				return $response;
-			}
-
-			foreach ( $response->data['widgets'] as $i => $widget ) {
-				$response->data['widgets'][ $i ] = rest_do_request( '/wp/v2/widgets/' . $widget )->get_data();
-			}
-
-			return $response;
-		}
-
-		$widgets = null;
-
-		if ( isset( $request['widgets'] ) ) {
-			$widgets = array();
-
-			foreach ( $request['widgets'] as $widget ) {
-				if ( isset( $widget['id'] ) ) {
-					$widget_request = new WP_REST_Request( 'PUT', '/wp/v2/widgets/' . $widget['id'] );
-				} else {
-					$widget_request = new WP_REST_Request( 'POST', '/wp/v2/widgets' );
-				}
-
-				$widget['sidebar'] = $request['id'];
-				$widget_request->set_body_params( $widget );
-
-				$response = rest_do_request( $widget_request );
-
-				if ( is_wp_error( $response->as_error() ) ) {
-					return $response->as_error();
-				}
-
-				$widgets[] = $response->get_data();
-			}
-		}
-
-		$inner = new WP_REST_Request(
-			$request->get_method(),
-			str_replace( '/__experimental/', '/wp/v2/', $request->get_route() )
-		);
-		$inner->set_query_params( $request->get_query_params() );
-		$inner->set_body_params( $request->get_body_params() );
-		$inner->set_body( $request->get_body() );
-
-		if ( null !== $widgets ) {
-			$inner['widgets'] = wp_list_pluck( $widgets, 'id' );
-		}
-
-		$response = rest_do_request( $inner );
-
-		if ( $response->is_error() ) {
-			return $response;
-		}
-
-		if ( isset( $response->data['widgets'] ) ) {
-			foreach ( $response->data['widgets'] as $i => $widget ) {
-				$response->data['widgets'][ $i ] = $widgets[ $i ];
-			}
-
-			$response->data['widgets'] = array_values( $response->data['widgets'] );
-		}
-
-		return $response;
 	}
 
 	/**
@@ -306,8 +171,13 @@ class WP_REST_Sidebars_Controller extends WP_REST_Controller {
 
 			foreach ( $sidebars as $sidebar_id => $widgets ) {
 				foreach ( $widgets as $i => $widget_id ) {
+					// This automatically removes the passed widget ids from any other sidebars in use.
 					if ( $sidebar_id !== $request['id'] && in_array( $widget_id, $request['widgets'], true ) ) {
 						unset( $sidebars[ $sidebar_id ][ $i ] );
+					}
+
+					// This automatically removes omitted widget ids to the inactive sidebar.
+					if ( $sidebar_id === $request['id'] && ! in_array( $widget_id, $request['widgets'], true ) ) {
 						$sidebars['wp_inactive_widgets'][] = $widget_id;
 					}
 				}

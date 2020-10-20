@@ -50,6 +50,9 @@ $z-layers: (
 	// The floated blocks should be above the other blocks to allow selection.
 	"{core/image aligned left or right} .wp-block": 21,
 
+	// Needs to be bellow media library that has a z-index of 160000.
+	"{core/video track editor popover}": 160000 - 10,
+
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
 	".block-editor-block-list__layout.has-overlay::after": 60,

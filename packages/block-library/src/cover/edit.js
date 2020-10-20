@@ -314,6 +314,7 @@ function CoverEdit( {
 		}
 	}
 
+	const canDim = !! url && ( overlayColor.color || gradientValue );
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 	const showFocalPointPicker =
 		isVideoBackground ||
@@ -425,7 +426,7 @@ function CoverEdit( {
 								},
 							] }
 						>
-							{ !! url && (
+							{ canDim && (
 								<RangeControl
 									label={ __( 'Opacity' ) }
 									value={ dimRatio }
@@ -436,6 +437,7 @@ function CoverEdit( {
 									}
 									min={ 0 }
 									max={ 100 }
+									step={ 10 }
 									required
 								/>
 							) }
