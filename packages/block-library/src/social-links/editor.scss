@@ -23,9 +23,41 @@
 	padding: 0;
 }
 
+// Placeholder/setup state.
+.wp-block-social-links__social-placeholder {
+	display: flex;
+
+	.wp-block-social-link {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		margin: 0 $grid-unit-10 $grid-unit-10 0;
+		width: 36px;
+		height: 36px;
+		border-radius: $radius-round;
+		opacity: 0.8;
+	}
+}
+
+.is-style-logos-only .wp-block-social-links__social-placeholder .wp-block-social-link::before {
+	content: "";
+	display: block;
+	width: 18px;
+	height: 18px;
+	border-radius: $radius-round;
+	opacity: 0.8;
+	background: currentColor;
+}
+
+.is-style-pill-shape .wp-block-social-links__social-placeholder .wp-block-social-link {
+	border-radius: 9999px;
+	padding-left: 16px + 12px;
+	padding-right: 16px + 12px;
+}
+
 // Polish the Appender.
 .wp-block-social-links .block-list-appender {
-	margin: 0;
+	margin: 0 0 $grid-unit-10 0;
 	display: flex;
 	align-items: center;
 }
@@ -45,22 +77,6 @@
 // Unselected block is preview, selected has additional options.
 [data-type="core/social-links"]:not(.is-selected):not(.has-child-selected) .wp-block-social-links {
 	min-height: 36px; // This height matches the height of the buttons and ensures an empty block doesn't collapse.
-}
-
-// Disappear but show on hover or nav mode focus.
-[data-type="core/social-links"] .wp-social-link__is-incomplete {
-	transition: transform 0.1s ease;
-	transform-origin: center center;
-}
-
-[data-type="core/social-links"]:not(.is-selected):not(.has-child-selected) {
-	.wp-social-link__is-incomplete {
-		opacity: 0;
-		transform: scale(0);
-		width: 0;
-		padding: 0;
-		margin-right: 0;
-	}
 }
 
 // Unconfigured placeholder links are semitransparent.

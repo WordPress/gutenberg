@@ -168,6 +168,10 @@ export async function insertReusableBlock( searchTerm ) {
 	await insertButton.click();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
+	// We should wait until the block is loaded
+	await page.waitForXPath(
+		'//*[@class="block-library-block__reusable-block-container"]'
+	);
 }
 
 /**

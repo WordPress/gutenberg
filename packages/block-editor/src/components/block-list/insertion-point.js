@@ -189,14 +189,22 @@ export default function InsertionPoint( { children, containerRef } ) {
 
 		const rect = event.target.getBoundingClientRect();
 		const offset = event.clientY - rect.top;
-		const element = Array.from( event.target.children ).find(
-			( blockEl ) => {
-				return blockEl.offsetTop > offset;
-			}
-		);
+		let element = Array.from( event.target.children ).find( ( blockEl ) => {
+			return blockEl.offsetTop > offset;
+		} );
 
 		if ( ! element ) {
 			return;
+		}
+
+		// The block may be in an alignment wrapper, so check the first direct
+		// child if the element has no ID.
+		if ( ! element.id ) {
+			element = element.firstElementChild;
+
+			if ( ! element ) {
+				return;
+			}
 		}
 
 		const clientId = element.id.slice( 'block-'.length );

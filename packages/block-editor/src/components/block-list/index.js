@@ -30,7 +30,10 @@ const appenderNodesMap = new Map();
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
-function BlockList( { className, rootClientId, renderAppender }, ref ) {
+function BlockList(
+	{ className, placeholder, rootClientId, renderAppender },
+	ref
+) {
 	const Container = rootClientId ? 'div' : RootContainer;
 	const fallbackRef = useRef();
 	const wrapperRef = ref || fallbackRef;
@@ -45,6 +48,7 @@ function BlockList( { className, rootClientId, renderAppender }, ref ) {
 				) }
 			>
 				<BlockListItems
+					placeholder={ placeholder }
 					rootClientId={ rootClientId }
 					renderAppender={ renderAppender }
 					wrapperRef={ wrapperRef }
@@ -55,6 +59,7 @@ function BlockList( { className, rootClientId, renderAppender }, ref ) {
 }
 
 function Items( {
+	placeholder,
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
@@ -64,13 +69,20 @@ function Items( {
 		const {
 			getBlockOrder,
 			getBlockListSettings,
+			getSettings,
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
 			getGlobalBlockCount,
 			isTyping,
 			isDraggingBlocks,
+			__experimentalGetActiveBlockIdByBlockNames,
 		} = select( 'core/block-editor' );
+
+		// Determine if there is an active entity area to spotlight.
+		const activeEntityBlockId = __experimentalGetActiveBlockIdByBlockNames(
+			getSettings().__experimentalSpotlightEntityBlocks
+		);
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
@@ -82,6 +94,7 @@ function Items( {
 				! isTyping() &&
 				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
 			isDraggingBlocks: isDraggingBlocks(),
+			activeEntityBlockId,
 		};
 	}
 
@@ -93,6 +106,7 @@ function Items( {
 		hasMultiSelection,
 		enableAnimation,
 		isDraggingBlocks,
+		activeEntityBlockId,
 	} = useSelect( selector, [ rootClientId ] );
 
 	const dropTargetIndex = useBlockDropZone( {
@@ -131,11 +145,14 @@ function Items( {
 								'is-dropping-horizontally':
 									isDropTarget &&
 									orientation === 'horizontal',
+								'has-active-entity': activeEntityBlockId,
 							} ) }
+							activeEntityBlockId={ activeEntityBlockId }
 						/>
 					</AsyncModeProvider>
 				);
 			} ) }
+			{ blockClientIds.length < 1 && placeholder }
 			<BlockListAppender
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }

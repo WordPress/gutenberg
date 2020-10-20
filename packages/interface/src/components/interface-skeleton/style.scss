@@ -12,7 +12,7 @@ html.interface-interface-skeleton__html-container {
 
 .interface-interface-skeleton {
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	height: auto;
 	max-height: 100%;
 
@@ -31,6 +31,12 @@ html.interface-interface-skeleton__html-container {
 			top: 0;
 		}
 	}
+}
+
+.interface-interface-skeleton__editor {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
 }
 
 @include editor-left(".interface-interface-skeleton");
@@ -130,6 +136,11 @@ html.interface-interface-skeleton__html-container {
 	flex-shrink: 0;
 	border-top: $border-width solid $gray-200;
 	color: $gray-900;
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	background-color: $white;
+	z-index: z-index(".interface-interface-skeleton__footer");
 
 	// On Mobile the footer is hidden
 	display: none;

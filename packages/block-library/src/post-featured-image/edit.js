@@ -6,7 +6,7 @@ import { useSelect } from '@wordpress/data';
 import { Icon, ToggleControl, PanelBody } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { postFeaturedImage as icon } from '@wordpress/icons';
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 
 const placeholderChip = (
 	<div className="post-featured-image_placeholder">
@@ -55,7 +55,7 @@ function PostFeaturedImageDisplay( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			{ image }
+			<div { ...useBlockProps() }>{ image }</div>
 		</>
 	);
 }

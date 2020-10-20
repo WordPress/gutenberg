@@ -29,11 +29,14 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	/**
 	* Start: Include for phase 2
 	*/
-	if ( ! class_exists( 'WP_REST_Widget_Utils_Controller' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-widget-utils-controller.php';
-	}
 	if ( ! class_exists( 'WP_REST_Sidebars_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-sidebars-controller.php';
+	}
+	if ( ! class_exists( 'WP_REST_Widget_Types_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-widget-types-controller.php';
+	}
+	if ( ! class_exists( 'WP_REST_Widgets_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-widgets-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Block_Directory_Controller' ) ) {
 		require dirname( __FILE__ ) . '/class-wp-rest-block-directory-controller.php';
@@ -117,9 +120,12 @@ require dirname( __FILE__ ) . '/navigation.php';
 require dirname( __FILE__ ) . '/navigation-page.php';
 require dirname( __FILE__ ) . '/experiments-page.php';
 require dirname( __FILE__ ) . '/global-styles.php';
-require dirname( __FILE__ ) . '/block-supports/index.php';
-require dirname( __FILE__ ) . '/block-supports/align.php';
+
+if ( ! class_exists( 'WP_Block_Supports' ) ) {
+	require_once dirname( __FILE__ ) . '/class-wp-block-supports.php';
+}
+require dirname( __FILE__ ) . '/block-supports/generated-classname.php';
 require dirname( __FILE__ ) . '/block-supports/colors.php';
+require dirname( __FILE__ ) . '/block-supports/align.php';
 require dirname( __FILE__ ) . '/block-supports/typography.php';
 require dirname( __FILE__ ) . '/block-supports/custom-classname.php';
-require dirname( __FILE__ ) . '/block-supports/generated-classname.php';

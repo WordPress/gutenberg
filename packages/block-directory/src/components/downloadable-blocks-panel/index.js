@@ -2,10 +2,11 @@
  * WordPress dependencies
  */
 import { Fragment } from '@wordpress/element';
-import { compose } from '@wordpress/compose';
+import { compose, useDebounce } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { Spinner, withSpokenMessages } from '@wordpress/components';
+import { Spinner } from '@wordpress/components';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
@@ -19,8 +20,9 @@ function DownloadableBlocksPanel( {
 	hasPermission,
 	isLoading,
 	isWaiting,
-	debouncedSpeak,
 } ) {
+	const debouncedSpeak = useDebounce( speak, 500 );
+
 	if ( false === hasPermission ) {
 		debouncedSpeak( __( 'No blocks found in your library.' ) );
 		return (
@@ -74,7 +76,6 @@ function DownloadableBlocksPanel( {
 }
 
 export default compose( [
-	withSpokenMessages,
 	withSelect( ( select, { filterValue } ) => {
 		const {
 			getDownloadableBlocks,

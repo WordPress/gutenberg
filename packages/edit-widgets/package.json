@@ -1,7 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "0.23.0",
-	"private": true,
+	"version": "1.1.0",
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -48,12 +47,14 @@
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
+		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",
 		"reakit": "^1.1.0",
-		"rememo": "^3.0.0"
+		"rememo": "^3.0.0",
+		"uuid": "^8.3.1"
 	},
 	"publishConfig": {
 		"access": "public"
