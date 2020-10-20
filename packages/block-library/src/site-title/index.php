@@ -8,11 +8,13 @@
 /**
  * Renders the `core/site-title` block on the server.
  *
- * @param array $attributes The block attributes.
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
  *
  * @return string The render.
  */
-function render_block_core_site_title( $attributes ) {
+function render_block_core_site_title( $attributes, $content, $block ) {
 	$tag_name         = 'h1';
 	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 
@@ -21,7 +23,11 @@ function render_block_core_site_title( $attributes ) {
 	}
 
 	$link               = sprintf( '<a href="%1$s" rel="home">%2$s</a>', get_bloginfo( 'url' ), get_bloginfo( 'name' ) );
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes,
+		array( 'class' => $align_class_name )
+	);
 
 	return sprintf(
 		'<%1$s %2$s>%3$s</%1$s>',
