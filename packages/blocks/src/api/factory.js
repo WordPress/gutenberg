@@ -415,7 +415,6 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
  *
  * @param {Array|Object} blocks          Blocks array or block object.
  * @param {string}       name            Block name.
- * @param {boolean}      isGroupingBlock Set to true to bypass default grouping block selection.
  *
  * @return {?Array} Array of blocks or null.
  */
