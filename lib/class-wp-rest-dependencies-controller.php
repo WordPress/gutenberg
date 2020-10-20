@@ -12,7 +12,7 @@
  *
  * @see WP_REST_Controller
  */
-class WP_REST_Dependencies_Controller extends WP_REST_Controller {
+abstract class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 
 	/**
 	 * Dependencies core object.
@@ -179,9 +179,8 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 		$check = $this->check_read_permission( $request['dependency'] );
 		if ( is_wp_error( $check ) ) {
 			return $check;
-		} else if ( true === $check ) {
-			return $check;
-		} else if (  current_user_can( 'manage_options' ) ) {
+		}
+		if ( true === $check || current_user_can( 'manage_options' ) ) {
 			return true;
 		}
 
@@ -199,9 +198,8 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 		$check = $this->check_read_permission( $request['handle'] );
 		if ( is_wp_error( $check ) ) {
 			return $check;
-		} else if ( true === $check ) {
-			return $check;
-		} else if (  current_user_can( 'manage_options' ) ) {
+		}
+		if ( true === $check || current_user_can( 'manage_options' ) ) {
 			return true;
 		}
 
@@ -295,12 +293,7 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	 *
 	 * @return array
 	 */
-	public function get_core_assets() {
-		/* translators: %s: Method name. */
-		_doing_it_wrong( sprintf( __( "Method '%s' not implemented. Must be overridden in subclass.", 'gutenberg' ), __METHOD__ ), 'x.x' );
-
-		return array();
-	}
+	abstract public function get_core_assets();
 
 	/**
 	 * Block asset.
