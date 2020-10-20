@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -45,6 +45,15 @@ function useControlledState( currentState, options = defaultOptions ) {
 
 	const [ internalState, setInternalState ] = useState( currentState );
 	const hasCurrentState = isValueDefined( currentState );
+
+	/*
+	 * Resets internal state if value every changes from uncontrolled <-> controlled.
+	 */
+	useEffect( () => {
+		if ( hasCurrentState && internalState ) {
+			setInternalState( undefined );
+		}
+	}, [ hasCurrentState, internalState ] );
 
 	const state = getDefinedValue(
 		[ currentState, internalState, initial ],

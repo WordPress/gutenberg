@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { FlatList, View, TouchableHighlight, Dimensions } from 'react-native';
+import {
+	FlatList,
+	View,
+	TouchableHighlight,
+	TouchableWithoutFeedback,
+	Dimensions,
+} from 'react-native';
 import { pick } from 'lodash';
 
 /**
@@ -11,13 +17,16 @@ import { Component } from '@wordpress/element';
 import { createBlock, rawHandler } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
-import { BottomSheet } from '@wordpress/components';
+import {
+	BottomSheet,
+	BottomSheetConsumer,
+	InserterButton,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import MenuItem from './menu-item.native';
 
 const MIN_COL_NUM = 3;
 
@@ -56,8 +65,8 @@ export class InserterMenu extends Component {
 		const {
 			paddingLeft: itemPaddingLeft,
 			paddingRight: itemPaddingRight,
-		} = styles.modalItem;
-		const { width: itemWidth } = styles.modalIconWrapper;
+		} = InserterButton.Styles.modalItem;
+		const { width: itemWidth } = InserterButton.Styles.modalIconWrapper;
 		return itemWidth + itemPaddingLeft + itemPaddingRight;
 	}
 
@@ -106,7 +115,7 @@ export class InserterMenu extends Component {
 		const { itemWidth, maxWidth } = this.state;
 		const { onSelect } = this.props;
 		return (
-			<MenuItem
+			<InserterButton
 				item={ item }
 				itemWidth={ itemWidth }
 				maxWidth={ maxWidth }
@@ -119,29 +128,35 @@ export class InserterMenu extends Component {
 		const { items } = this.props;
 		const { numberOfColumns } = this.state;
 
-		const bottomPadding = styles.contentBottomPadding;
-
 		return (
 			<BottomSheet
 				isVisible={ true }
 				onClose={ this.onClose }
-				contentStyle={ [ styles.content, bottomPadding ] }
 				hideHeader
+				isChildrenScrollable
 			>
 				<TouchableHighlight accessible={ false }>
-					<FlatList
-						onLayout={ this.onLayout }
-						scrollEnabled={ false }
-						key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-						keyboardShouldPersistTaps="always"
-						numColumns={ numberOfColumns }
-						data={ items }
-						ItemSeparatorComponent={ () => (
-							<View style={ styles.rowSeparator } />
+					<BottomSheetConsumer>
+						{ ( { listProps } ) => (
+							<FlatList
+								onLayout={ this.onLayout }
+								key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+								keyboardShouldPersistTaps="always"
+								numColumns={ numberOfColumns }
+								data={ items }
+								ItemSeparatorComponent={ () => (
+									<TouchableWithoutFeedback
+										accessible={ false }
+									>
+										<View style={ styles.rowSeparator } />
+									</TouchableWithoutFeedback>
+								) }
+								keyExtractor={ ( item ) => item.name }
+								renderItem={ this.renderItem }
+								{ ...listProps }
+							/>
 						) }
-						keyExtractor={ ( item ) => item.name }
-						renderItem={ this.renderItem }
-					/>
+					</BottomSheetConsumer>
 				</TouchableHighlight>
 			</BottomSheet>
 		);

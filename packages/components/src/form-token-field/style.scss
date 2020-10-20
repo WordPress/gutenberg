@@ -10,8 +10,12 @@
 
 
 	&.is-disabled {
-		background: $gray-200;
-		border-color: $light-gray-700;
+		background: $gray-300;
+		border-color: $gray-300;
+	}
+
+	&.is-active {
+		@include input-style__focus();
 	}
 
 	// Token input
@@ -44,7 +48,9 @@
 }
 
 .components-form-token-field__help {
-	font-style: italic;
+	font-size: $helptext-font-size;
+	font-style: normal;
+	color: $gray-700;
 }
 
 // Tokens
@@ -52,8 +58,8 @@
 	font-size: $default-font-size;
 	display: flex;
 	margin: 2px 4px 2px 0;
-	color: $dark-gray-700;
-	overflow: hidden;
+	color: $gray-900;
+	max-width: 100%;
 
 	&.is-success {
 		.components-form-token-field__token-text,
@@ -72,7 +78,7 @@
 	&.is-validating {
 		.components-form-token-field__token-text,
 		.components-form-token-field__remove-token {
-			color: $dark-gray-500;
+			color: $gray-700;
 		}
 	}
 
@@ -87,7 +93,7 @@
 
 		.components-form-token-field__remove-token {
 			background: transparent;
-			color: $dark-gray-500;
+			color: $gray-700;
 			position: absolute;
 			top: 1px;
 			right: 0;
@@ -126,7 +132,7 @@
 	display: inline-block;
 	line-height: 24px;
 	height: auto;
-	background: $gray-200;
+	background: $gray-300;
 	transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
 	@include reduce-motion;
 }
@@ -143,12 +149,12 @@
 	cursor: pointer;
 	border-radius: 0 12px 12px 0;
 	padding: 0 2px;
-	color: $dark-gray-500;
+	color: $gray-700;
 	line-height: 10px;
 	overflow: initial;
 
 	&:hover {
-		color: $dark-gray-700;
+		color: $gray-900;
 	}
 }
 
@@ -157,20 +163,21 @@
 	flex: 1 0 100%;
 	min-width: 100%;
 	max-height: 9em;
-	overflow-y: scroll;
+	overflow-y: auto;
 	transition: all 0.15s ease-in-out;
 	@include reduce-motion("transition");
 	list-style: none;
-	border-top: $border-width solid $dark-gray-300;
+	border-top: $border-width solid $gray-700;
 	margin: $grid-unit-05 (-$grid-unit-05) (-$grid-unit-05);
-	padding-top: 3px;
+	padding: 0;
 }
 
 .components-form-token-field__suggestion {
-	color: $dark-gray-500;
+	color: $gray-700;
 	display: block;
 	font-size: $default-font-size;
 	padding: 4px 8px;
+	margin: 0;
 	cursor: pointer;
 
 	&.is-selected {

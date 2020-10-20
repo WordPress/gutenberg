@@ -1,15 +1,20 @@
 /**
+ * WordPress dependencies
+ */
+import { syncSelect } from '@wordpress/data-controls';
+
+/**
  * Internal dependencies
  */
 import {
 	editEntityRecord,
 	saveEntityRecord,
+	deleteEntityRecord,
 	receiveEntityRecords,
 	receiveUserPermission,
 	receiveAutosaves,
 	receiveCurrentUser,
 } from '../actions';
-import { select } from '../controls';
 
 describe( 'editEntityRecord', () => {
 	it( 'throws when the edited entity does not have a loaded config.', () => {
@@ -21,12 +26,48 @@ describe( 'editEntityRecord', () => {
 			{}
 		);
 		expect( fulfillment.next().value ).toEqual(
-			select( 'getEntity', entity.kind, entity.name )
+			syncSelect( 'core', 'getEntity', entity.kind, entity.name )
 		);
 		// Don't pass back an entity config.
 		expect( fulfillment.next.bind( fulfillment ) ).toThrow(
 			`The entity being edited (${ entity.kind }, ${ entity.name }) does not have a loaded config.`
 		);
+	} );
+} );
+
+describe( 'deleteEntityRecord', () => {
+	it( 'triggers a DELETE request for an existing record', async () => {
+		const post = 10;
+		const entities = [
+			{ name: 'post', kind: 'postType', baseURL: '/wp/v2/posts' },
+		];
+		const fulfillment = deleteEntityRecord( 'postType', 'post', post );
+
+		// Trigger generator
+		fulfillment.next();
+
+		// Start
+		expect( fulfillment.next( entities ).value.type ).toBe(
+			'DELETE_ENTITY_RECORD_START'
+		);
+
+		// delete api call
+		const { value: apiFetchAction } = fulfillment.next();
+		expect( apiFetchAction.request ).toEqual( {
+			path: '/wp/v2/posts/10',
+			method: 'DELETE',
+		} );
+
+		expect( fulfillment.next().value.type ).toBe( 'REMOVE_ITEMS' );
+
+		expect( fulfillment.next().value.type ).toBe(
+			'DELETE_ENTITY_RECORD_FINISH'
+		);
+
+		expect( fulfillment.next() ).toMatchObject( {
+			done: true,
+			value: undefined,
+		} );
 	} );
 } );
 
@@ -46,11 +87,11 @@ describe( 'saveEntityRecord', () => {
 
 		// Should select __experimentalGetEntityRecordNoResolver selector (as opposed to getEntityRecord)
 		// see https://github.com/WordPress/gutenberg/pull/19752#discussion_r368498318.
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
 		expect( fulfillment.next().value.selectorName ).toBe(
 			'__experimentalGetEntityRecordNoResolver'
 		);
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
@@ -88,9 +129,9 @@ describe( 'saveEntityRecord', () => {
 		expect( fulfillment.next( entities ).value.type ).toBe(
 			'SAVE_ENTITY_RECORD_START'
 		);
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
+		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
+		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
@@ -125,9 +166,9 @@ describe( 'saveEntityRecord', () => {
 		expect( fulfillment.next( entities ).value.type ).toBe(
 			'SAVE_ENTITY_RECORD_START'
 		);
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'SELECT' );
+		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
+		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
+		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
 		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {

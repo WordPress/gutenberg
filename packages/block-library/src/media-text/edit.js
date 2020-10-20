@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { map, filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,10 +13,11 @@ import { useState } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
-	InnerBlocks,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
-	__experimentalBlock as Block,
+	useBlockProps,
 	__experimentalImageURLInputUI as ImageURLInputUI,
+	__experimentalImageSizeControl as ImageSizeControl,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -31,6 +33,7 @@ import { pullLeft, pullRight } from '@wordpress/icons';
  * Internal dependencies
  */
 import MediaContainer from './media-container';
+import { DEFAULT_MEDIA_SIZE_SLUG } from './constants';
 
 /**
  * Constants
@@ -54,6 +57,11 @@ const applyWidthConstraints = ( width ) =>
 
 const LINK_DESTINATION_MEDIA = 'media';
 const LINK_DESTINATION_ATTACHMENT = 'attachment';
+
+function getImageSourceUrlBySizeSlug( image, slug ) {
+	// eslint-disable-next-line camelcase
+	return image?.media_details?.sizes?.[ slug ]?.source_url;
+}
 
 function attributesFromMedia( {
 	attributes: { linkDestination, href },
@@ -126,6 +134,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		rel,
 		verticalAlignment,
 	} = attributes;
+	const mediaSizeSlug = attributes.mediaSizeSlug || DEFAULT_MEDIA_SIZE_SLUG;
 
 	const image = useSelect(
 		( select ) =>
@@ -187,6 +196,30 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	const onVerticalAlignmentChange = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
 	};
+
+	const imageSizes = useSelect( ( select ) => {
+		const settings = select( 'core/block-editor' ).getSettings();
+		return settings?.imageSizes;
+	} );
+	const imageSizeOptions = map(
+		filter( imageSizes, ( { slug } ) =>
+			getImageSourceUrlBySizeSlug( image, slug )
+		),
+		( { name, slug } ) => ( { value: slug, label: name } )
+	);
+	const updateImage = ( newMediaSizeSlug ) => {
+		const newUrl = getImageSourceUrlBySizeSlug( image, newMediaSizeSlug );
+
+		if ( ! newUrl ) {
+			return null;
+		}
+
+		setAttributes( {
+			mediaUrl: newUrl,
+			mediaSizeSlug: newMediaSizeSlug,
+		} );
+	};
+
 	const mediaTextGeneralSettings = (
 		<PanelBody title={ __( 'Media & Text settings' ) }>
 			<ToggleControl
@@ -236,7 +269,30 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					}
 				/>
 			) }
+			{ mediaType === 'image' && (
+				<ImageSizeControl
+					onChangeImage={ updateImage }
+					slug={ mediaSizeSlug }
+					imageSizeOptions={ imageSizeOptions }
+					isResizable={ false }
+				/>
+			) }
 		</PanelBody>
+	);
+
+	const blockProps = useBlockProps( {
+		className: classNames,
+		style,
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-media-text__content',
+		},
+		{
+			template: TEMPLATE,
+			templateInsertUpdatesSelection: false,
+		}
 	);
 
 	return (
@@ -264,7 +320,7 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					</ToolbarGroup>
 				) }
 			</BlockControls>
-			<Block.div className={ classNames } style={ style }>
+			<div { ...blockProps }>
 				<MediaContainer
 					className="wp-block-media-text__media"
 					onSelectMedia={ onSelectMedia }
@@ -283,15 +339,8 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 						mediaWidth,
 					} }
 				/>
-				<InnerBlocks
-					__experimentalTagName="div"
-					__experimentalPassedProps={ {
-						className: 'wp-block-media-text__content',
-					} }
-					template={ TEMPLATE }
-					templateInsertUpdatesSelection={ false }
-				/>
-			</Block.div>
+				<div { ...innerBlocksProps } />
+			</div>
 		</>
 	);
 }

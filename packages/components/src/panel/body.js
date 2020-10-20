@@ -20,7 +20,16 @@ import Icon from '../icon';
 import { useControlledState, useUpdateEffect } from '../utils';
 
 export function PanelBody(
-	{ children, className, icon, initialOpen, onToggle = noop, opened, title },
+	{
+		children,
+		className,
+		icon,
+		initialOpen,
+		onToggle = noop,
+		opened,
+		title,
+		scrollAfterOpen = true,
+	},
 	ref
 ) {
 	const [ isOpened, setIsOpened ] = useControlledState( opened, {
@@ -39,21 +48,26 @@ export function PanelBody(
 		onToggle( next );
 	};
 
+	// Ref is used so that the effect does not re-run upon scrollAfterOpen changing value
+	const scrollAfterOpenRef = useRef();
+	scrollAfterOpenRef.current = scrollAfterOpen;
 	// Runs after initial render
 	useUpdateEffect( () => {
-		if ( isOpened ) {
+		if (
+			isOpened &&
+			scrollAfterOpenRef.current &&
+			nodeRef.current?.scrollIntoView
+		) {
 			/*
 			 * Scrolls the content into view when visible.
 			 * This improves the UX when there are multiple stacking <PanelBody />
 			 * components in a scrollable container.
 			 */
-			if ( nodeRef.current.scrollIntoView ) {
-				nodeRef.current.scrollIntoView( {
-					inline: 'nearest',
-					block: 'nearest',
-					behavior: scrollBehavior,
-				} );
-			}
+			nodeRef.current.scrollIntoView( {
+				inline: 'nearest',
+				block: 'nearest',
+				behavior: scrollBehavior,
+			} );
 		}
 	}, [ isOpened, scrollBehavior ] );
 
@@ -69,7 +83,9 @@ export function PanelBody(
 				onClick={ handleOnToggle }
 				title={ title }
 			/>
-			{ isOpened && children }
+			{ typeof children === 'function'
+				? children( { opened: isOpened } )
+				: isOpened && children }
 		</div>
 	);
 }
@@ -82,6 +98,7 @@ const PanelBodyTitle = forwardRef(
 			<h2 className="components-panel__body-title">
 				<Button
 					className="components-panel__body-toggle"
+					aria-expanded={ isOpened }
 					ref={ ref }
 					{ ...props }
 				>

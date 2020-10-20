@@ -4,9 +4,7 @@
 import { createElement } from './react';
 
 // Disable reason: JSDoc linter doesn't seem to parse the union (`&`) correctly.
-/* eslint-disable jsdoc/valid-types */
 /** @typedef {{children: string} & import('react').ComponentPropsWithoutRef<'div'>} RawHTMLProps */
-/* eslint-enable jsdoc/valid-types */
 
 /**
  * Component used as equivalent of Fragment with unescaped HTML, in cases where

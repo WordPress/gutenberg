@@ -4,20 +4,17 @@
 
 import { replace } from './replace';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
  * Split a Rich Text value in two at the given `startIndex` and `endIndex`, or
  * split at the given separator. This is similar to `String.prototype.split`.
  * Indices are retrieved from the selection if none are provided.
  *
- * @param {Object}        value
- * @param {Object[]}      value.formats
- * @param {Object[]}      value.replacements
- * @param {string}        value.text
- * @param {number}        value.start
- * @param {number}        value.end
+ * @param {RichTextValue} value
  * @param {number|string} [string] Start index, or string at which to split.
  *
- * @return {Array} An array of new values.
+ * @return {Array<RichTextValue>} An array of new values.
  */
 export function split( { formats, replacements, text, start, end }, string ) {
 	if ( typeof string !== 'string' ) {

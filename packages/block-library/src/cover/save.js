@@ -10,6 +10,7 @@ import {
 	InnerBlocks,
 	getColorClassName,
 	__experimentalGetGradientClass,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -34,6 +35,7 @@ export default function save( { attributes } ) {
 		dimRatio,
 		focalPoint,
 		hasParallax,
+		isRepeated,
 		overlayColor,
 		url,
 		minHeight: minHeightProp,
@@ -85,6 +87,7 @@ export default function save( { attributes } ) {
 		{
 			'has-background-dim': dimRatio !== 0,
 			'has-parallax': hasParallax,
+			'is-repeated': isRepeated,
 			'has-background-gradient': gradient || customGradient,
 			[ gradientClass ]: ! url && gradientClass,
 			'has-custom-content-position': ! isContentPositionCenter(
@@ -95,7 +98,7 @@ export default function save( { attributes } ) {
 	);
 
 	return (
-		<div className={ classes } style={ style }>
+		<div { ...useBlockProps.save( { className: classes, style } ) }>
 			{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
 				<span
 					aria-hidden="true"

@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+## 7.2.1 (2020-09-17)
+
+### Bug Fixes
+
+-   Fix TypeError for projects without a local Prettier configuration.
+
+## 7.2.0 (2020-09-03)
+
+### Enhancements
+
+-   The bundled `eslint-plugin-jsdoc` dependency has been updated from requiring `^26.0.0` to requiring `^30.2.2`.
+
+### Bug Fixes
+
+-   The recommended configuration will now respect local Prettier configuration. These are merged to the default WordPress configuration.
+
 ## 7.1.0-rc.0 (2020-06-24)
 
 ### Enhancements
@@ -34,7 +50,7 @@
 
 ### Improvements
 
--   `'AsyncIterableIterator'` is now whitelisted as a valid TypeScript utility type.
+-   `'AsyncIterableIterator'` is now allowed as a valid TypeScript utility type.
 
 ## 5.1.0 (2020-04-30)
 

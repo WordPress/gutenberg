@@ -13,7 +13,6 @@ import {
 	hasBlockSupport,
 	getBlockType,
 } from '@wordpress/blocks';
-import deprecated from '@wordpress/deprecated';
 import { useContext, useMemo } from '@wordpress/element';
 
 /**
@@ -38,17 +37,6 @@ export const Edit = ( props ) => {
 
 	// Assign context values using the block type's declared context needs.
 	const context = useMemo( () => {
-		if ( blockType && blockType.context ) {
-			deprecated( 'Block type "context" option', {
-				alternative: '"usesContext"',
-				version: '8.6.0',
-				hint: `Block "${ name }".`,
-				link:
-					'https://developer.wordpress.org/block-editor/developers/block-api/block-context/',
-			} );
-			return pick( blockContext, blockType.context );
-		}
-
 		return blockType && blockType.usesContext
 			? pick( blockContext, blockType.usesContext )
 			: DEFAULT_BLOCK_CONTEXT;
@@ -62,13 +50,11 @@ export const Edit = ( props ) => {
 	// with which a block is displayed. If `blockType` is valid, assign
 	// them preferentially as the render value for the block.
 	const Component = blockType.edit || blockType.save;
-	const lightBlockWrapper = hasBlockSupport(
-		blockType,
-		'lightBlockWrapper',
-		false
-	);
 
-	if ( lightBlockWrapper ) {
+	if (
+		blockType.apiVersion > 1 ||
+		hasBlockSupport( blockType, 'lightBlockWrapper', false )
+	) {
 		return <Component { ...props } context={ context } />;
 	}
 

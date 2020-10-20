@@ -88,7 +88,7 @@ export const getSettings = createSelector(
  *
  * @param {Object} state Global application state.
  *
- * @return {number} Home template ID.
+ * @return {number?} Home template ID.
  */
 export function getHomeTemplateId( state ) {
 	return state.homeTemplateId;
@@ -99,7 +99,7 @@ export function getHomeTemplateId( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {number} Template ID.
+ * @return {number?} Template ID.
  */
 export function getTemplateId( state ) {
 	return state.templateId;
@@ -110,7 +110,7 @@ export function getTemplateId( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {number} Template part ID.
+ * @return {number?} Template part ID.
  */
 export function getTemplatePartId( state ) {
 	return state.templatePartId;
@@ -121,7 +121,7 @@ export function getTemplatePartId( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {string} Template type.
+ * @return {string?} Template type.
  */
 export function getTemplateType( state ) {
 	return state.templateType;
@@ -139,12 +139,34 @@ export function getPage( state ) {
 }
 
 /**
- * Returns the site's current `show_on_front` setting.
+ * Returns the active menu in the navigation panel.
  *
  * @param {Object} state Global application state.
  *
- * @return {Object} The setting.
+ * @return {string} Active menu.
  */
-export function getShowOnFront( state ) {
-	return state.showOnFront;
+export function getNavigationPanelActiveMenu( state ) {
+	return state.navigationPanel.menu;
+}
+
+/**
+ * Returns the current opened/closed state of the navigation panel.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} True if the navigation panel should be open; false if closed.
+ */
+export function isNavigationOpened( state ) {
+	return state.navigationPanel.isOpen;
+}
+
+/**
+ * Returns the current opened/closed state of the inserter panel.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} True if the inserter panel should be open; false if closed.
+ */
+export function isInserterOpened( state ) {
+	return state.blockInserterPanel;
 }

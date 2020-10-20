@@ -9,8 +9,10 @@ There are a few new concepts to consider when building themes:
 - **Responsive Embeds** - Themes must opt-in to responsive embeds.
 - **Frontend & Editor Styles** - To get the most out of blocks, theme authors will want to make sure Core styles look good and opt-in, or write their own styles to best fit their theme.
 - **Dark Mode** - If a Theme is a Dark Theme with a dark background containing light text, the theme author can opt-in to the Dark Mode.
+- **Block Tools** - Themes can opt-in to several block tools like line height, custom units.
+- **Core Block Patterns** - Themes can opt-out of the default block patterns.
 
-By default, blocks provide their styles to enable basic support for blocks in themes without any change. They also [provide opt-in opinonated styles](#default-block-styles). Themes can add/override these styles, or they can provide no styles at all, and rely fully on what the blocks provide.
+By default, blocks provide their styles to enable basic support for blocks in themes without any change. They also [provide opt-in opinionated styles](#default-block-styles). Themes can add/override these styles, or they can provide no styles at all, and rely fully on what the blocks provide.
 
 Some advanced block features require opt-in support in the theme itself as it's difficult for the block to provide these styles, they may require some architecting of the theme itself, in order to work well.
 
@@ -268,6 +270,36 @@ add_theme_support( 'disable-custom-gradients' );
 
 When set, users will be restricted to the default gradients provided in the block editor or the gradients provided via the `editor-gradient-presets` theme support setting.
 
+### Supporting custom line heights
+
+Some blocks like paragraph and headings support customizing the line height. Themes can enable support for this feature with the following code:
+
+```php
+add_theme_support( 'custom-line-height' );
+```
+
+### Support custom units
+
+In addition to pixels, users can use other units to define sizes, paddings... The available units are: px, em, rem, vh, vw. Themes can disable support for this feature with the following code:
+
+```php
+add_theme_support( 'custom-units', array() );
+```
+
+Themes can also filter the available custom units.
+
+```php
+add_theme_support( 'custom-units', 'rem', 'em' );
+```
+
+### Disabling the default block patterns.
+
+WordPress comes with a number of block patterns built-in, themes can opt-out of the bundled patterns and provide their own set using the following code:
+
+```php
+remove_theme_support( 'core-block-patterns' );
+```
+
 ## Editor styles
 
 The block editor supports the theme's [editor styles](https://codex.wordpress.org/Editor_Style), however it works a little differently than in the classic editor.
@@ -356,12 +388,12 @@ To make the content resize and keep its aspect ratio, the `<body>` element needs
 add_theme_support( 'responsive-embeds' );
 ```
 
-## Experimental — Cover block padding
+## Cover block padding
 
-Using the Gutenberg plugin (version 8.3 or later), Cover blocks can provide padding controls in the editor for users. This is off by default, and requires the theme to opt in by declaring support:
+Some blocks can provide padding controls in the editor for users. This is off by default, and requires the theme to opt in by declaring support:
 
 ```php
-add_theme_support('experimental-custom-spacing');
+add_theme_support('custom-spacing');
 ```
 
 ## Experimental — Link color control
@@ -370,4 +402,26 @@ Using the Gutenberg plugin (version 8.3 or later), link color control is availab
 
 ```php
 add_theme_support('experimental-link-color');
+```
+
+If a theme opts in, it should [define default link colors](https://developer.wordpress.org/block-editor/developers/themes/theme-json/#color-properties) in `experimental-theme.json` (or in its theme styles if no `experimental-theme.json` is present). For example:
+
+```css
+{
+    "global": {
+        "styles": {
+            "color": {
+                "link": "hotpink"
+            }
+        }
+    }
+}
+```
+
+If the theme styles the link color in its stylesheets (editor and front-end), it should ensure it maps to the `--wp--style--color--link` CSS variable:
+
+```css
+a {
+    color: var(--wp--style--color--link);
+}
 ```

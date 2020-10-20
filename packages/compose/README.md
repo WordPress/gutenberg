@@ -146,6 +146,17 @@ _Returns_
 
 -   `boolean`: Whether or not the text has been copied. Resets after the timeout.
 
+<a name="useDebounce" href="#useDebounce">#</a> **useDebounce**
+
+Debounces a function with Lodash's `debounce`. A new debounced function will
+be returned and any scheduled calls cancelled if any of the arguments change,
+including the function to debounce, so please wrap functions created on
+render in components in `useCallback`.
+
+_Parameters_
+
+-   _args_ `...any`: Arguments passed to Lodash's `debounce`.
+
 <a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
 
 Provides a unique instance ID.

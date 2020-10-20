@@ -234,106 +234,6 @@ if ( ! function_exists( 'register_block_type_from_metadata' ) ) {
 }
 
 /**
- * Extends block editor settings to include a list of image dimensions per size.
- *
- * This can be removed when plugin support requires WordPress 5.4.0+.
- *
- * @see https://core.trac.wordpress.org/ticket/49389
- * @see https://core.trac.wordpress.org/changeset/47240
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_settings_image_dimensions( $settings ) {
-	/*
-	 * Only filter settings if:
-	 * 1. `imageDimensions` is not already assigned, in which case it can be
-	 *    assumed to have been set from WordPress 5.4.0+ default settings.
-	 * 2. `imageSizes` is an array. Plugins may run `block_editor_settings`
-	 *    directly and not provide all properties of the settings array.
-	 */
-	if ( ! isset( $settings['imageDimensions'] ) && ! empty( $settings['imageSizes'] ) ) {
-		$image_dimensions = array();
-		$all_sizes        = wp_get_registered_image_subsizes();
-		foreach ( $settings['imageSizes'] as $size ) {
-			$key = $size['slug'];
-			if ( isset( $all_sizes[ $key ] ) ) {
-				$image_dimensions[ $key ] = $all_sizes[ $key ];
-			}
-		}
-		$settings['imageDimensions'] = $image_dimensions;
-	}
-
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_settings_image_dimensions' );
-
-/**
- * Adds a polyfill for the WHATWG URL in environments which do not support it.
- * The intention in how this action is handled is under the assumption that this
- * code would eventually be placed at `wp_default_packages_vendor`, which is
- * called as a result of `wp_default_packages` via the `wp_default_scripts`.
- *
- * This can be removed when plugin support requires WordPress 5.4.0+.
- *
- * The script registration occurs in `gutenberg_register_vendor_scripts`, which
- * should be removed in coordination with this function.
- *
- * @see gutenberg_register_vendor_scripts
- * @see https://core.trac.wordpress.org/ticket/49360
- * @see https://developer.mozilla.org/en-US/docs/Web/API/URL/URL
- * @see https://developer.wordpress.org/reference/functions/wp_default_packages_vendor/
- *
- * @since 7.3.0
- *
- * @param WP_Scripts $scripts WP_Scripts object.
- */
-function gutenberg_add_url_polyfill( $scripts ) {
-	did_action( 'init' ) && $scripts->add_inline_script(
-		'wp-polyfill',
-		wp_get_script_polyfill(
-			$scripts,
-			array(
-				'window.URL && window.URL.prototype && window.URLSearchParams' => 'wp-polyfill-url',
-			)
-		)
-	);
-}
-add_action( 'wp_default_scripts', 'gutenberg_add_url_polyfill', 20 );
-
-/**
- * Adds a polyfill for DOMRect in environments which do not support it.
- *
- * This can be removed when plugin support requires WordPress 5.4.0+.
- *
- * The script registration occurs in `gutenberg_register_vendor_scripts`, which
- * should be removed in coordination with this function.
- *
- * @see gutenberg_register_vendor_scripts
- * @see gutenberg_add_url_polyfill
- * @see https://core.trac.wordpress.org/ticket/49360
- * @see https://developer.mozilla.org/en-US/docs/Web/API/DOMRect
- * @see https://developer.wordpress.org/reference/functions/wp_default_packages_vendor/
- *
- * @since 7.5.0
- *
- * @param WP_Scripts $scripts WP_Scripts object.
- */
-function gutenberg_add_dom_rect_polyfill( $scripts ) {
-	did_action( 'init' ) && $scripts->add_inline_script(
-		'wp-polyfill',
-		wp_get_script_polyfill(
-			$scripts,
-			array(
-				'window.DOMRect' => 'wp-polyfill-dom-rect',
-			)
-		)
-	);
-}
-add_action( 'wp_default_scripts', 'gutenberg_add_dom_rect_polyfill', 20 );
-
-/**
  * Adds a wp.date.setSettings with timezone abbr parameter
  *
  * This can be removed when plugin support requires WordPress 5.6.0+.
@@ -466,11 +366,18 @@ function gutenberg_replace_default_block_categories( $default_categories ) {
 }
 add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
 
+global $current_parsed_block;
+$current_parsed_block = array(
+	'blockName'  => null,
+	'attributes' => null,
+);
+
 /**
  * Shim that hooks into `pre_render_block` so as to override `render_block` with
  * a function that assigns block context.
  *
- * This can be removed when plugin support requires WordPress 5.5.0+.
+ * The context handling can be removed when plugin support requires WordPress 5.5.0+.
+ * The global current_parsed_block assignment can be removed when plugin support requires WordPress 5.6.0+.
  *
  * @see https://core.trac.wordpress.org/ticket/49927
  * @see https://core.trac.wordpress.org/changeset/48243
@@ -482,6 +389,7 @@ add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
  */
 function gutenberg_render_block_with_assigned_block_context( $pre_render, $parsed_block ) {
 	global $post, $wp_query;
+	global $current_parsed_block;
 
 	/*
 	 * If a non-null value is provided, a filter has run at an earlier priority
@@ -490,6 +398,8 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 	if ( null !== $pre_render ) {
 		return $pre_render;
 	}
+
+	$current_parsed_block = $parsed_block;
 
 	$source_block = $parsed_block;
 
@@ -518,6 +428,27 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 		}
 	}
 
+	if ( isset( $wp_query->tax_query->queried_terms['post_tag'] ) ) {
+		if ( isset( $context['query'] ) ) {
+			$context['query']['tagIds'] = array();
+		} else {
+			$context['query'] = array( 'tagIds' => array() );
+		}
+
+		foreach ( $wp_query->tax_query->queried_terms['post_tag']['terms'] as $tag_slug_or_id ) {
+			$tag_ID = $tag_slug_or_id;
+
+			if ( 'slug' === $wp_query->tax_query->queried_terms['post_tag']['field'] ) {
+				$tag = get_term_by( 'slug', $tag_slug_or_id, 'post_tag' );
+
+				if ( $tag ) {
+					$tag_ID = $tag->term_id;
+				}
+			}
+			$context['query']['tagIds'][] = $tag_ID;
+		}
+	}
+
 	/**
 	 * Filters the default context provided to a rendered block.
 	 *
@@ -531,114 +462,6 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 	return $block->render();
 }
 add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
-
-/**
- * Shim that hooks into `wp_update_nav_menu_item` and makes it so that nav menu
- * items support a 'content' field. This field contains HTML and is used by nav
- * menu items with `type` set to `'html'`.
- *
- * Specifically, this shim makes it so that:
- *
- * 1) The `wp_update_nav_menu_item()` function supports setting
- * `'menu-item-content'` on a menu item. When merged to Core, this functionality
- * should exist in `wp_update_nav_menu_item()`.
- *
- * 2) The `customize_save` ajax action supports setting `'content'` on a nav
- * menu item. When merged to Core, this functionality should exist in
- * `WP_Customize_Manager::save()`.
- *
- * This shim can be removed when the Gutenberg plugin requires a WordPress
- * version that has the ticket below.
- *
- * @see https://core.trac.wordpress.org/ticket/50544
- *
- * @param int   $menu_id         ID of the updated menu.
- * @param int   $menu_item_db_id ID of the new menu item.
- * @param array $args            An array of arguments used to update/add the menu item.
- */
-function gutenberg_update_nav_menu_item_content( $menu_id, $menu_item_db_id, $args ) {
-	global $wp_customize;
-
-	// Support setting content in customize_save admin-ajax.php requests by
-	// grabbing the unsanitized $_POST values.
-	if ( isset( $wp_customize ) ) {
-		$values = $wp_customize->unsanitized_post_values();
-		if ( isset( $values[ "nav_menu_item[$menu_item_db_id]" ]['content'] ) ) {
-			if ( is_string( $values[ "nav_menu_item[$menu_item_db_id]" ]['content'] ) ) {
-				$args['menu-item-content'] = $values[ "nav_menu_item[$menu_item_db_id]" ]['content'];
-			} elseif ( isset( $values[ "nav_menu_item[$menu_item_db_id]" ]['content']['raw'] ) ) {
-				$args['menu-item-content'] = $values[ "nav_menu_item[$menu_item_db_id]" ]['content']['raw'];
-			}
-		}
-	}
-
-	$defaults = array(
-		'menu-item-content' => '',
-	);
-
-	$args = wp_parse_args( $args, $defaults );
-
-	update_post_meta( $menu_item_db_id, '_menu_item_content', wp_slash( $args['menu-item-content'] ) );
-}
-add_action( 'wp_update_nav_menu_item', 'gutenberg_update_nav_menu_item_content', 10, 3 );
-
-/**
- * Shim that hooks into `wp_setup_nav_menu_items` and makes it so that nav menu
- * items have a 'content' field. This field contains HTML and is used by nav
- * menu items with `type` set to `'html'`.
- *
- * Specifically, this shim makes it so that the `wp_setup_nav_menu_item()`
- * function sets `content` on the returned menu item. When merged to Core, this
- * functionality should exist in `wp_setup_nav_menu_item()`.
- *
- * This shim can be removed when the Gutenberg plugin requires a WordPress
- * version that has the ticket below.
- *
- * @see https://core.trac.wordpress.org/ticket/50544
- *
- * @param object $menu_item The menu item object.
- */
-function gutenberg_setup_html_nav_menu_item( $menu_item ) {
-	if ( 'html' === $menu_item->type ) {
-		$menu_item->type_label = __( 'HTML', 'gutenberg' );
-		$menu_item->content    = ! isset( $menu_item->content ) ? get_post_meta( $menu_item->db_id, '_menu_item_content', true ) : $menu_item->content;
-	}
-
-	return $menu_item;
-}
-add_filter( 'wp_setup_nav_menu_item', 'gutenberg_setup_html_nav_menu_item' );
-
-/**
- * Shim that hooks into `walker_nav_menu_start_el` and makes it so that the
- * default walker which renders a menu will correctly render the HTML associated
- * with any navigation menu item that has `type` set to `'html`'.
- *
- * Specifically, this shim makes it so that `Walker_Nav_Menu::start_el()`
- * renders the `content` of a nav menu item when its `type` is `'html'`. When
- * merged to Core, this functionality should exist in
- * `Walker_Nav_Menu::start_el()`.
- *
- * This shim can be removed when the Gutenberg plugin requires a WordPress
- * version that has the ticket below.
- *
- * @see https://core.trac.wordpress.org/ticket/50544
- *
- * @param string   $item_output The menu item's starting HTML output.
- * @param WP_Post  $item        Menu item data object.
- * @param int      $depth       Depth of menu item. Used for padding.
- * @param stdClass $args        An object of wp_nav_menu() arguments.
- */
-function gutenberg_output_html_nav_menu_item( $item_output, $item, $depth, $args ) {
-	if ( 'html' === $item->type ) {
-		$item_output = $args->before;
-		/** This filter is documented in wp-includes/post-template.php */
-		$item_output .= apply_filters( 'the_content', $item->content );
-		$item_output .= $args->after;
-	}
-
-	return $item_output;
-}
-add_filter( 'walker_nav_menu_start_el', 'gutenberg_output_html_nav_menu_item', 10, 4 );
 
 /**
  * Amends the paths to preload when initializing edit post.
@@ -656,3 +479,42 @@ function gutenberg_preload_edit_post( $preload_paths ) {
 }
 
 add_filter( 'block_editor_preload_paths', 'gutenberg_preload_edit_post' );
+
+/**
+ * Override post type labels for Reusable Block custom post type.
+ *
+ * This shim can be removed when the Gutenberg plugin requires a WordPress
+ * version that has the ticket below.
+ *
+ * @see https://core.trac.wordpress.org/ticket/50755
+ *
+ * @since 8.6.0
+ *
+ * @return array Array of new labels for Reusable Block post type.
+ */
+function gutenberg_override_reusable_block_post_type_labels() {
+	return array(
+		'name'                     => _x( 'Reusable Blocks', 'post type general name', 'gutenberg' ),
+		'singular_name'            => _x( 'Reusable Block', 'post type singular name', 'gutenberg' ),
+		'menu_name'                => _x( 'Reusable Blocks', 'admin menu', 'gutenberg' ),
+		'name_admin_bar'           => _x( 'Reusable Block', 'add new on admin bar', 'gutenberg' ),
+		'add_new'                  => _x( 'Add New', 'Reusable Block', 'gutenberg' ),
+		'add_new_item'             => __( 'Add New Reusable Block', 'gutenberg' ),
+		'new_item'                 => __( 'New Reusable Block', 'gutenberg' ),
+		'edit_item'                => __( 'Edit Reusable Block', 'gutenberg' ),
+		'view_item'                => __( 'View Reusable Block', 'gutenberg' ),
+		'all_items'                => __( 'All Reusable Blocks', 'gutenberg' ),
+		'search_items'             => __( 'Search Reusable Blocks', 'gutenberg' ),
+		'not_found'                => __( 'No reusable blocks found.', 'gutenberg' ),
+		'not_found_in_trash'       => __( 'No reusable blocks found in Trash.', 'gutenberg' ),
+		'filter_items_list'        => __( 'Filter reusable blocks list', 'gutenberg' ),
+		'items_list_navigation'    => __( 'Reusable Blocks list navigation', 'gutenberg' ),
+		'items_list'               => __( 'Reusable Blocks list', 'gutenberg' ),
+		'item_published'           => __( 'Reusable Block published.', 'gutenberg' ),
+		'item_published_privately' => __( 'Reusable Block published privately.', 'gutenberg' ),
+		'item_reverted_to_draft'   => __( 'Reusable Block reverted to draft.', 'gutenberg' ),
+		'item_scheduled'           => __( 'Reusable Block scheduled.', 'gutenberg' ),
+		'item_updated'             => __( 'Reusable Block updated.', 'gutenberg' ),
+	);
+}
+add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post_type_labels', 10, 0 );

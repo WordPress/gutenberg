@@ -116,7 +116,7 @@ The following snippet explains how the Gutenberg repository is structured omitti
     │   Unit tests for the PHP code of the Gutenberg plugin.
     │
     ├── storybook
-    │   Config of the [Gutenberg Storybook](http://wordpress.github.io).
+    │   Config of the [Gutenberg Storybook](https://wordpress.github.io/gutenberg/).
     │
     ├── test/integration
     │   Set of WordPress packages integration tests.

@@ -7,6 +7,10 @@ import { RichText } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { defaultColumnsNumber } from './shared';
+import {
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA,
+} from './constants';
 
 export default function save( { attributes } ) {
 	const {
@@ -28,10 +32,10 @@ export default function save( { attributes } ) {
 					let href;
 
 					switch ( linkTo ) {
-						case 'media':
+						case LINK_DESTINATION_MEDIA:
 							href = image.fullUrl || image.url;
 							break;
-						case 'attachment':
+						case LINK_DESTINATION_ATTACHMENT:
 							href = image.link;
 							break;
 					}
@@ -39,7 +43,7 @@ export default function save( { attributes } ) {
 					const img = (
 						<img
 							src={ image.url }
-							alt={ image.alt }
+							alt={ image.alt !== '' ? image.alt : image.caption }
 							data-id={ image.id }
 							data-full-url={ image.fullUrl }
 							data-link={ image.link }

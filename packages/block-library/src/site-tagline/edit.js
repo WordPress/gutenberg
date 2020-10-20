@@ -9,40 +9,42 @@ import classnames from 'classnames';
 import { useEntityProp } from '@wordpress/core-data';
 import {
 	AlignmentToolbar,
-	__experimentalBlock as Block,
+	useBlockProps,
 	BlockControls,
 	RichText,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 export default function SiteTaglineEdit( { attributes, setAttributes } ) {
-	const { align } = attributes;
+	const { textAlign } = attributes;
 	const [ siteTagline, setSiteTagline ] = useEntityProp(
 		'root',
 		'site',
 		'description'
 	);
-
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 	return (
 		<>
 			<BlockControls>
 				<AlignmentToolbar
 					onChange={ ( newAlign ) =>
-						setAttributes( { align: newAlign } )
+						setAttributes( { textAlign: newAlign } )
 					}
-					value={ align }
+					value={ textAlign }
 				/>
 			</BlockControls>
 
 			<RichText
 				allowedFormats={ [] }
-				className={ classnames( {
-					[ `has-text-align-${ align }` ]: align,
-				} ) }
 				onChange={ setSiteTagline }
 				placeholder={ __( 'Site Tagline' ) }
-				tagName={ Block.p }
+				tagName="p"
 				value={ siteTagline }
+				{ ...blockProps }
 			/>
 		</>
 	);

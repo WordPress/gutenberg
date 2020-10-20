@@ -1,0 +1,100 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
+<WithInstanceId(Modal)
+  className="edit-post-preferences-modal"
+  closeLabel="Close"
+  title="Preferences"
+>
+  <Section
+    title="General"
+  >
+    <WithSelect(WithDispatch(IfViewportMatches(BaseOption)))
+      help="Review settings such as categories and tags."
+      label="Include pre-publish checklist"
+    />
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="mostUsedBlocks"
+      help="Places the most frequent blocks in the block library."
+      label="Show most used blocks"
+    />
+  </Section>
+  <Section
+    title="Keyboard"
+  >
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="keepCaretInsideBlock"
+      help="Aids screen readers by stopping text caret from leaving blocks."
+      label="Contain text cursor inside block."
+    />
+  </Section>
+  <Section
+    title="Appearance"
+  >
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="reducedUI"
+      help="Compacts options and outlines in the toolbar."
+      label="Reduce the interface"
+    />
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="focusMode"
+      help="Highlights the current block and fades other content."
+      label="Spotlight mode"
+    />
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="showIconLabels"
+      help="Shows text instead of icons in toolbar."
+      label="Display button labels"
+    />
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="themeStyles"
+      help="Make the editor look like your theme."
+      label="Use theme styles"
+    />
+  </Section>
+  <Section
+    description="Choose what displays in the panel."
+    title="Document settings"
+  >
+    <EnablePluginDocumentSettingPanelOptionSlot />
+    <WithSelect(PostTaxonomies)
+      taxonomyWrapper={[Function]}
+    />
+    <PostFeaturedImageCheck>
+      <WithSelect(IfCondition(WithDispatch(BaseOption)))
+        label="Featured image"
+        panelName="featured-image"
+      />
+    </PostFeaturedImageCheck>
+    <PostExcerptCheck>
+      <WithSelect(IfCondition(WithDispatch(BaseOption)))
+        label="Excerpt"
+        panelName="post-excerpt"
+      />
+    </PostExcerptCheck>
+    <WithSelect(PostTypeSupportCheck)
+      supportKeys={
+        Array [
+          "comments",
+          "trackbacks",
+        ]
+      }
+    >
+      <WithSelect(IfCondition(WithDispatch(BaseOption)))
+        label="Discussion"
+        panelName="discussion-panel"
+      />
+    </WithSelect(PostTypeSupportCheck)>
+    <WithSelect(PageAttributesCheck)>
+      <WithSelect(IfCondition(WithDispatch(BaseOption)))
+        label="Page attributes"
+        panelName="page-attributes"
+      />
+    </WithSelect(PageAttributesCheck)>
+  </Section>
+  <WithSelect(MetaBoxesSection)
+    description="Add extra areas to the editor."
+    title="Additional panels"
+  />
+</WithInstanceId(Modal)>
+`;

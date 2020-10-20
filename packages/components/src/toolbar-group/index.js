@@ -56,7 +56,7 @@ function ToolbarGroup( {
 	...props
 } ) {
 	// It'll contain state if `ToolbarGroup` is being used within
-	// `<Toolbar accessibilityLabel="label" />`
+	// `<Toolbar label="label" />`
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	if ( ( ! controls || ! controls.length ) && ! children ) {

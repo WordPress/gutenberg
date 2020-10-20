@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.11.0 (2020-10-19)
+
+### New feature
+
+- Added a new `getBlobTypeByURL` function. Returns the file type of the blob or undefined if not a blob.
+
 ## 2.8.0 (2020-04-15)
 
 ### New feature

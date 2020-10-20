@@ -19,3 +19,5 @@ wp.data.select( 'core/editor' ).getCurrentPost().meta;
 ```
 
 Before adding the `register_post_meta` function to the plugin, this code returns a void array, because WordPress hasn't been told to load any meta field yet. After registering the field, the same code will return an object containing the registered meta field you registered.
+
+If the code returns `undefined` make sure your post type supports `custom-fields`. Either when [registering the post](https://developer.wordpress.org/reference/functions/register_post_type/#supports) or with [add_post_type_support function](https://developer.wordpress.org/reference/functions/add_post_type_support/).

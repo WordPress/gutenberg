@@ -150,11 +150,11 @@ export function NumberControl(
 		}
 
 		/**
-		 * Handles ENTER key press and submit
+		 * Handles commit (ENTER key press or on blur if isPressEnterToChange)
 		 */
 		if (
 			type === inputControlActionTypes.PRESS_ENTER ||
-			type === inputControlActionTypes.SUBMIT
+			type === inputControlActionTypes.COMMIT
 		) {
 			state.value = roundClamp( currentValue, min, max );
 		}

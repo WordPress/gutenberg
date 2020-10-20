@@ -8,6 +8,8 @@ import {
 	removeTemplate,
 	setTemplatePart,
 	setPage,
+	showHomepage,
+	setHomeTemplateId,
 } from '../actions';
 
 describe( 'actions', () => {
@@ -38,7 +40,7 @@ describe( 'actions', () => {
 
 			const it = addTemplate( template );
 			expect( it.next().value ).toEqual( {
-				type: 'DISPATCH',
+				type: '@@data/DISPATCH',
 				storeKey: 'core',
 				actionName: 'saveEntityRecord',
 				args: [ 'postType', 'wp_template', template ],
@@ -67,18 +69,18 @@ describe( 'actions', () => {
 				},
 			} );
 			expect( it.next().value ).toEqual( {
-				type: 'SELECT',
+				type: '@@data/RESOLVE_SELECT',
 				storeKey: 'core/edit-site',
 				selectorName: 'getPage',
 				args: [],
 			} );
-			// @FIXME: Test for done: true.
 			expect( it.next( page ).value ).toEqual( {
-				type: 'DISPATCH',
+				type: '@@data/DISPATCH',
 				storeKey: 'core/edit-site',
 				actionName: 'setPage',
 				args: [ page ],
 			} );
+			expect( it.next().done ).toBe( true );
 		} );
 	} );
 
@@ -93,7 +95,7 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'setPage', () => {
-		it( 'should yield the FIND_TEMPLATE control and return the SET_TEMPLATE_PART action', () => {
+		it( 'should yield the FIND_TEMPLATE control and return the SET_PAGE action', () => {
 			const page = { path: '/' };
 			const templateId = 1;
 
@@ -102,13 +104,94 @@ describe( 'actions', () => {
 				type: 'FIND_TEMPLATE',
 				path: page.path,
 			} );
-			expect( it.next( templateId ) ).toEqual( {
-				value: {
-					type: 'SET_PAGE',
-					page,
-					templateId,
+			expect( it.next( templateId ).value ).toEqual( {
+				type: 'SET_PAGE',
+				page,
+				templateId,
+			} );
+			expect( it.next().done ).toBe( true );
+		} );
+	} );
+
+	describe( 'showHomepage', () => {
+		it( 'should calculate and set the homepage if it is set to show posts', () => {
+			const templateId = 1;
+
+			const it = showHomepage();
+
+			expect( it.next().value ).toEqual( {
+				args: [ 'root', 'site' ],
+				selectorName: 'getEntityRecord',
+				storeKey: 'core',
+				type: '@@data/RESOLVE_SELECT',
+			} );
+
+			const page = {
+				path: '/',
+				context: {},
+			};
+			expect( it.next( { show_on_front: 'posts' } ).value ).toEqual( {
+				type: 'FIND_TEMPLATE',
+				path: page.path,
+			} );
+			expect( it.next( templateId ).value ).toEqual( {
+				type: 'SET_PAGE',
+				page,
+				templateId,
+			} );
+			expect( it.next( templateId ).value ).toEqual( {
+				type: 'SET_HOME_TEMPLATE',
+				homeTemplateId: templateId,
+			} );
+			expect( it.next().done ).toBe( true );
+		} );
+
+		it( 'should calculate and set the homepage if it is set to show a page', () => {
+			const templateId = 2;
+			const pageId = 2;
+
+			const it = showHomepage();
+
+			expect( it.next().value ).toEqual( {
+				args: [ 'root', 'site' ],
+				selectorName: 'getEntityRecord',
+				storeKey: 'core',
+				type: '@@data/RESOLVE_SELECT',
+			} );
+
+			const page = {
+				path: '/',
+				context: {
+					postType: 'page',
+					postId: pageId,
 				},
-				done: true,
+			};
+			expect(
+				it.next( { show_on_front: 'page', page_on_front: pageId } )
+					.value
+			).toEqual( {
+				type: 'FIND_TEMPLATE',
+				path: page.path,
+			} );
+			expect( it.next( templateId ).value ).toEqual( {
+				type: 'SET_PAGE',
+				page,
+				templateId,
+			} );
+			expect( it.next( templateId ).value ).toEqual( {
+				type: 'SET_HOME_TEMPLATE',
+				homeTemplateId: templateId,
+			} );
+			expect( it.next().done ).toBe( true );
+		} );
+	} );
+
+	describe( 'setHomeTemplateId', () => {
+		it( 'should return the SET_HOME_TEMPLATE action', () => {
+			const homeTemplateId = 90;
+			expect( setHomeTemplateId( homeTemplateId ) ).toEqual( {
+				type: 'SET_HOME_TEMPLATE',
+				homeTemplateId,
 			} );
 		} );
 	} );

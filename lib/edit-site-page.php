@@ -40,7 +40,6 @@ function gutenberg_is_edit_site_page( $page ) {
 function gutenberg_get_editor_styles() {
 	global $editor_styles;
 
-	//
 	// Ideally the code is extracted into a reusable function.
 	$styles = array(
 		array(
@@ -127,35 +126,16 @@ function gutenberg_edit_site_init( $hook ) {
 	}
 
 	$settings = array(
-		'alignWide'              => get_theme_support( 'align-wide' ),
-		'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
-		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
-		'imageSizes'             => $available_image_sizes,
-		'isRTL'                  => is_rtl(),
-		'maxUploadFileSize'      => $max_upload_size,
+		'alignWide'         => get_theme_support( 'align-wide' ),
+		'imageSizes'        => $available_image_sizes,
+		'isRTL'             => is_rtl(),
+		'maxUploadFileSize' => $max_upload_size,
+		'siteUrl'           => site_url(),
+		'postsPerPage'      => get_option( 'posts_per_page' ),
 	);
 
-	list( $color_palette, ) = (array) get_theme_support( 'editor-color-palette' );
-	list( $font_sizes, )    = (array) get_theme_support( 'editor-font-sizes' );
-	if ( false !== $color_palette ) {
-		$settings['colors'] = $color_palette;
-	}
-	if ( false !== $font_sizes ) {
-		$settings['fontSizes'] = $font_sizes;
-	}
 	$settings['styles'] = gutenberg_get_editor_styles();
-
-	$settings['editSiteInitialState'] = array();
-
-	$settings['editSiteInitialState']['templateType'] = 'wp_template';
-	$settings['editSiteInitialState']['showOnFront']  = get_option( 'show_on_front' );
-	$settings['editSiteInitialState']['page']         = array(
-		'path'    => '/',
-		'context' => 'page' === $settings['editSiteInitialState']['showOnFront'] ? array(
-			'postType' => 'page',
-			'postId'   => get_option( 'page_on_front' ),
-		) : array(),
-	);
+	$settings           = gutenberg_experimental_global_styles_settings( $settings );
 
 	// This is so other parts of the code can hook their own settings.
 	// Example: Global Styles.
@@ -225,3 +205,29 @@ function gutenberg_edit_site_init( $hook ) {
 	wp_enqueue_style( 'wp-format-library' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
+
+/**
+ * Register a core site setting for front page information.
+ */
+function register_site_editor_homepage_settings() {
+	register_setting(
+		'general',
+		'show_on_front',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'string',
+			'description'  => __( 'What to show on the front page', 'gutenberg' ),
+		)
+	);
+
+	register_setting(
+		'general',
+		'page_on_front',
+		array(
+			'show_in_rest' => true,
+			'type'         => 'number',
+			'description'  => __( 'The ID of the page that should be displayed on the front page', 'gutenberg' ),
+		)
+	);
+}
+add_action( 'init', 'register_site_editor_homepage_settings', 10 );

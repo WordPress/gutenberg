@@ -93,6 +93,9 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
  * @property {WPBlockVariationScope[]} [scope] The list of scopes where the variation
  *                                             is applicable. When not provided, it
  *                                             assumes all available scopes.
+ * @property {string[]} [keywords]             An array of terms (which can be translated)
+ *                                             that help users discover the variation
+ *                                             while searching.
  */
 
 /**
@@ -516,6 +519,18 @@ export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
 		blockName,
 		styleVariationName
 	);
+};
+
+/**
+ * Returns an array with the variations of a given block type.
+ *
+ * @param {string}                blockName Name of block (example: “core/columns”).
+ * @param {WPBlockVariationScope} [scope]   Block variation scope name.
+ *
+ * @return {(WPBlockVariation[]|void)} Block variations.
+ */
+export const getBlockVariations = ( blockName, scope ) => {
+	return select( 'core/blocks' ).getBlockVariations( blockName, scope );
 };
 
 /**

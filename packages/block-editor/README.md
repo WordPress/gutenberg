@@ -30,8 +30,8 @@ function MyEditorComponent () {
 	return (
 		<BlockEditorProvider
 			value={ blocks }
-			onInput={ updateBlocks }
-			onChange={ updateBlocks }
+			onInput={ ( blocks ) => updateBlocks( blocks ) }
+			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
 			<SlotFillProvider>
 				<Popover.Slot name="block-toolbar" />
@@ -392,13 +392,19 @@ Undocumented declaration.
 
 <a name="InspectorAdvancedControls" href="#InspectorAdvancedControls">#</a> **InspectorAdvancedControls**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls-advanced/README.md>
 
 <a name="InspectorControls" href="#InspectorControls">#</a> **InspectorControls**
 
 _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls/README.md>
+
+<a name="LineHeightControl" href="#LineHeightControl">#</a> **LineHeightControl**
+
+Undocumented declaration.
 
 <a name="MediaPlaceholder" href="#MediaPlaceholder">#</a> **MediaPlaceholder**
 
@@ -477,15 +483,11 @@ _Properties_
 
 -   _alignWide_ `boolean`: Enable/Disable Wide/Full Alignments
 -   _availableLegacyWidgets_ `Array`: Array of objects representing the legacy widgets available.
--   _colors_ `Array`: Palette colors
--   _disableCustomColors_ `boolean`: Whether or not the custom colors are disabled
--   _fontSizes_ `Array`: Available font sizes
--   _disableCustomFontSizes_ `boolean`: Whether or not the custom font sizes are disabled
+-   _imageEditing_ `boolean`: Image Editing settings set to false to disable.
 -   _imageSizes_ `Array`: Available image sizes
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
--   _hasPermissionsToManageWidgets_ `boolean`: Whether or not the user is able to manage widgets.
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
 -   _isRTL_ `boolean`: Whether the editor is in RTL mode
@@ -494,10 +496,11 @@ _Properties_
 -   _titlePlaceholder_ `string`: Empty title placeholder
 -   _codeEditingEnabled_ `boolean`: Whether or not the user can switch to the code editor
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
--   _\_\_experimentalEnableLegacyWidgetBlock_ `boolean`: Whether the user has enabled the Legacy Widget Block
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
 -   _\_\_experimentalEnableFullSiteEditingDemo_ `boolean`: Whether the user has enabled Full Site Editing Demo Templates
+-   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
+-   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
 
 <a name="SkipToSelectedBlock" href="#SkipToSelectedBlock">#</a> **SkipToSelectedBlock**
 
@@ -560,19 +563,55 @@ _Related_
 
 Undocumented declaration.
 
-<a name="useSimulatedMediaQuery" href="#useSimulatedMediaQuery">#</a> **useSimulatedMediaQuery**
+<a name="useBlockProps" href="#useBlockProps">#</a> **useBlockProps**
 
-Function that manipulates media queries from stylesheets to simulate a given
-viewport width.
+This hook is used to lightly mark an element as a block element. The element
+should be the outermost element of a block. Call this hook and pass the
+returned props to the element to mark as a block. If you define a ref for the
+element, it is important to pass the ref to this hook, which the hook in turn
+will pass to the component through the props it returns. Optionally, you can
+also pass any other props through this hook, and they will be merged and
+returned.
 
 _Parameters_
 
--   _marker_ `string`: CSS selector string defining start and end of manipulable styles.
--   _width_ `?number`: Viewport width to simulate. If provided null, the stylesheets will not be modified.
+-   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
+-   _options_ `Object`: Options for internal use only.
+-   _options.\_\_unstableIsHtml_ `boolean`: 
+
+_Returns_
+
+-   `Object`: Props to pass to the element to mark as a block.
+
+<a name="validateThemeColors" href="#validateThemeColors">#</a> **validateThemeColors**
+
+Given an array of theme colors checks colors for validity
+
+_Parameters_
+
+-   _colors_ `Array`: The array of theme colors
+
+_Returns_
+
+-   `Array`: The array of valid theme colors or the default colors
+
+<a name="validateThemeGradients" href="#validateThemeGradients">#</a> **validateThemeGradients**
+
+Given an array of theme gradients checks gradients for validity
+
+_Parameters_
+
+-   _gradients_ `Array`: The array of theme gradients
+
+_Returns_
+
+-   `Array`: The array of valid theme gradients or the default gradients
 
 <a name="Warning" href="#Warning">#</a> **Warning**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/warning/README.md>
 
 <a name="withColorContext" href="#withColorContext">#</a> **withColorContext**
 

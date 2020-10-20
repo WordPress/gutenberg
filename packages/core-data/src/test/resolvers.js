@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { apiFetch } from '@wordpress/data-controls';
+
+/**
  * Internal dependencies
  */
 import {
@@ -16,7 +21,6 @@ import {
 	receiveAutosaves,
 	receiveCurrentUser,
 } from '../actions';
-import { apiFetch } from '../controls';
 
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };

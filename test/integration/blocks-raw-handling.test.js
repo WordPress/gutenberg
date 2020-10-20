@@ -77,7 +77,7 @@ describe( 'Blocks raw handling', () => {
 							);
 						},
 						transform: () => {
-							return createBlock( 'core-embed/youtube', {
+							return createBlock( 'core/embed', {
 								url:
 									'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
 							} );
@@ -200,7 +200,7 @@ describe( 'Blocks raw handling', () => {
 		} );
 
 		expect( filtered ).toHaveLength( 1 );
-		expect( filtered[ 0 ].name ).toBe( 'core-embed/youtube' );
+		expect( filtered[ 0 ].name ).toBe( 'core/embed' );
 		expect( console ).toHaveLogged();
 	} );
 

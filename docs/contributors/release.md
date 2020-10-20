@@ -61,12 +61,12 @@ npm run changelog
 
 By default, this will search for and organize all pull requests associated with the milestone for the next version of the project. 
 
-To override the default behavior, you can pass one or both of the following options:
+To override the default behavior, you can pass one or both of the following options. Remember to use `--` to let NPM pass the options to the script.
 
 - `--milestone <milestone>`: Provide the title of the milestone for which the changelog should be generated. This should exactly match the title as shown on [the milestones page](https://github.com/WordPress/gutenberg/milestones).
-  - Example: `npm run changelog --milestone="Gutenberg 8.1"`
+  - Example: `npm run changelog -- --milestone="Gutenberg 8.1"`
 - `--token <token>`: Provide a [GitHub personal access token](https://github.com/settings/tokens) for authenticating requests. This should only be necessary if you run the script frequently enough to been blocked by [rate limiting](https://developer.github.com/v3/#rate-limiting).
-  - Example: `npm run changelog --token="..."`
+  - Example: `npm run changelog -- --token="..."`
 
 The script will output a generated changelog, grouped by pull request label. _Note that this is intended to be a starting point for release notes_. You will still want to manually review and curate the changelog entries.
 

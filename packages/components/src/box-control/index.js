@@ -52,7 +52,9 @@ export default function BoxControl( {
 	values: valuesProp,
 	units,
 } ) {
-	const [ values, setValues ] = useControlledState( valuesProp );
+	const [ values, setValues ] = useControlledState( valuesProp, {
+		fallback: DEFAULT_VALUES,
+	} );
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( valuesProp );
 

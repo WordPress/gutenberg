@@ -95,8 +95,10 @@ figure.wp-block-gallery {
 	}
 
 	.components-button.has-icon {
-		border: none;
-		box-shadow: none;
+		&:not(:focus) {
+			border: none;
+			box-shadow: none;
+		}
 
 		@include break-small() {
 			// Use smaller buttons to fit when there are many columns.
