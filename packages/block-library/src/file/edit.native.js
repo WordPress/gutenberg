@@ -15,9 +15,15 @@ import {
 	PlainText,
 	BlockControls,
 	MediaUpload,
+	InspectorControls,
 } from '@wordpress/block-editor';
-import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
-import { file as icon, replace } from '@wordpress/icons';
+import {
+	ToolbarButton,
+	ToolbarGroup,
+	PanelBody,
+	ToggleControl,
+} from '@wordpress/components';
+import { file as icon, replace, button } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 
@@ -44,6 +50,9 @@ export default class FileEdit extends Component {
 			this
 		);
 		this.getFileComponent = this.getFileComponent.bind( this );
+		this.onChangeDownloadButtonVisibility = this.onChangeDownloadButtonVisibility.bind(
+			this
+		);
 	}
 
 	componentDidMount() {
@@ -72,6 +81,10 @@ export default class FileEdit extends Component {
 
 	onChangeDownloadButtonText( downloadButtonText ) {
 		this.props.setAttributes( { downloadButtonText } );
+	}
+
+	onChangeDownloadButtonVisibility( showDownloadButton ) {
+		this.props.setAttributes( { showDownloadButton } );
 	}
 
 	updateMediaProgress( payload ) {
@@ -128,9 +141,30 @@ export default class FileEdit extends Component {
 		);
 	}
 
+	getInspectorControls( { showDownloadButton } ) {
+		return (
+			<InspectorControls>
+				<PanelBody title={ __( 'File block settings' ) } />
+				<PanelBody>
+					<ToggleControl
+						icon={ button }
+						label={ __( 'Show download button' ) }
+						checked={ showDownloadButton }
+						onChange={ this.onChangeDownloadButtonVisibility }
+					/>
+				</PanelBody>
+			</InspectorControls>
+		);
+	}
+
 	getFileComponent( openMediaOptions, getMediaOptions ) {
 		const { attributes } = this.props;
-		const { fileName, downloadButtonText, id } = attributes;
+		const {
+			fileName,
+			downloadButtonText,
+			id,
+			showDownloadButton,
+		} = attributes;
 
 		const dimmedStyle =
 			this.state.isUploadInProgress && styles.disabledButton;
@@ -158,6 +192,7 @@ export default class FileEdit extends Component {
 						<View>
 							{ this.getToolbarEditButton( openMediaOptions ) }
 							{ getMediaOptions() }
+							{ this.getInspectorControls( attributes ) }
 							<RichText
 								__unstableMobileNoFocusOnMount
 								fontSize={ 14 }
@@ -169,12 +204,16 @@ export default class FileEdit extends Component {
 								value={ fileName }
 								deleteEnter={ true }
 							/>
-							<View style={ finalButtonStyle }>
-								<PlainText
-									value={ downloadButtonText }
-									onChange={ this.onChangeDownloadButtonText }
-								/>
-							</View>
+							{ showDownloadButton && (
+								<View style={ finalButtonStyle }>
+									<PlainText
+										value={ downloadButtonText }
+										onChange={
+											this.onChangeDownloadButtonText
+										}
+									/>
+								</View>
+							) }
 						</View>
 					);
 				} }
