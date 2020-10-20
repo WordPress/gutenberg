@@ -7,6 +7,7 @@ import { useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { useNavigationContext } from '../context';
+import { useNavigationGroupContext } from '../group/context';
 import { useNavigationMenuContext } from '../menu/context';
 import { normalizedSearch } from '../utils';
 
@@ -15,6 +16,7 @@ export const useNavigationTreeItem = ( itemId, props ) => {
 		activeMenu,
 		navigationTree: { addItem, removeItem },
 	} = useNavigationContext();
+	const { group } = useNavigationGroupContext();
 	const { menu, search } = useNavigationMenuContext();
 
 	useEffect( () => {
@@ -24,6 +26,7 @@ export const useNavigationTreeItem = ( itemId, props ) => {
 
 		addItem( itemId, {
 			...props,
+			group,
 			menu,
 			_isVisible: isMenuActive && isItemVisible,
 		} );
