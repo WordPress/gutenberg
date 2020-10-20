@@ -4,6 +4,12 @@
 		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
-	"references": [ { "path": "../primitives" } ],
-	"include": [ "src/dashicon/*", "src/tip/*" ]
+	"references": [
+		{ "path": "../element" },
+		{ "path": "../primitives" }
+	],
+	"include": [
+		"src/dashicon/*",
+		"src/tip/*"
+	]
 }
