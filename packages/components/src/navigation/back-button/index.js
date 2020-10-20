@@ -14,7 +14,7 @@ import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
  */
 import { useNavigationContext } from '../context';
 import { MenuBackButtonUI } from '../styles/navigation-styles';
-import { useRTL } from '../../utils/rtl';
+import { getRTL } from '../../utils/rtl';
 
 function NavigationBackButton(
 	{ backButtonLabel, className, href, onClick, parentMenu },
@@ -34,11 +34,12 @@ function NavigationBackButton(
 			onClick( event );
 		}
 
+		const animationDirection = getRTL() ? 'left' : 'right';
 		if ( parentMenu && ! event.defaultPrevented ) {
-			setActiveMenu( parentMenu, 'right' );
+			setActiveMenu( parentMenu, animationDirection );
 		}
 	};
-	const icon = useRTL() ? chevronRight : chevronLeft;
+	const icon = getRTL() ? chevronRight : chevronLeft;
 	return (
 		<MenuBackButtonUI
 			className={ classes }
