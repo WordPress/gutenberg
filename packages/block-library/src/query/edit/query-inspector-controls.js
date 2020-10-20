@@ -126,11 +126,11 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 	}, [ querySearch, onChangeDebounced ] );
 	const stickyOptions = useMemo( () => [
 		{
-			label: __( 'All posts' ),
+			label: __( 'Include' ),
 			value: '',
 		},
-		{ label: __( 'Only sticky posts' ), value: 'show' },
-		{ label: __( 'Exclude sticky posts' ), value: 'exclude' },
+		{ label: __( 'Exclude' ), value: 'exclude' },
+		{ label: __( 'Only' ), value: 'only' },
 	] );
 	return (
 		<InspectorControls>
@@ -184,9 +184,9 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 				/>
 				{ showSticky && (
 					<SelectControl
+						label={ __( 'Sticky posts' ) }
 						options={ stickyOptions }
 						value={ sticky }
-						label={ __( 'Sticky' ) }
 						onChange={ ( value ) => setQuery( { sticky: value } ) }
 					/>
 				) }

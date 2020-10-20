@@ -32,7 +32,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		}
 		if ( isset( $block->context['query']['sticky'] ) && ! empty( $block->context['query']['sticky'] ) ) {
 			$sticky = get_option( 'sticky_posts' );
-			if ( 'show' === $block->context['query']['sticky'] ) {
+			if ( 'only' === $block->context['query']['sticky'] ) {
 				$query['post__in'] = $sticky;
 			} else {
 				$query['post__not_in'] = array_merge( $query['post__not_in'], $sticky );
