@@ -19,7 +19,11 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 	}
 
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		$block->name,
+		$attributes,
+		array( 'class' => $align_class_name )
+	);
 
 	return sprintf(
 		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
