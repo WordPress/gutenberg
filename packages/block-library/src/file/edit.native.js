@@ -13,8 +13,11 @@ import {
 	MediaUploadProgress,
 	RichText,
 	PlainText,
+	BlockControls,
+	MediaUpload,
 } from '@wordpress/block-editor';
-import { file as icon } from '@wordpress/icons';
+import { ToolbarButton, ToolbarGroup } from '@wordpress/components';
+import { file as icon, replace } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 
@@ -40,6 +43,7 @@ export default class FileEdit extends Component {
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
 			this
 		);
+		this.getFileComponent = this.getFileComponent.bind( this );
 	}
 
 	componentDidMount() {
@@ -110,9 +114,23 @@ export default class FileEdit extends Component {
 		);
 	}
 
-	render() {
+	getToolbarEditButton( open ) {
+		return (
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarButton
+						title={ __( 'Edit image' ) }
+						icon={ replace }
+						onClick={ open }
+					/>
+				</ToolbarGroup>
+			</BlockControls>
+		);
+	}
+
+	getFileComponent( openMediaOptions, getMediaOptions ) {
 		const { attributes } = this.props;
-		const { href, fileName, downloadButtonText, id } = attributes;
+		const { fileName, downloadButtonText, id } = attributes;
 
 		const dimmedStyle =
 			this.state.isUploadInProgress && styles.disabledButton;
@@ -121,21 +139,6 @@ export default class FileEdit extends Component {
 			styles.defaultButton,
 			dimmedStyle
 		);
-
-		if ( ! href ) {
-			return (
-				<MediaPlaceholder
-					icon={ <BlockIcon icon={ icon } /> }
-					labels={ {
-						title: __( 'File' ),
-						instructions: __( 'CHOOSE A FILE' ),
-					} }
-					onSelect={ this.onSelectFile }
-					onFocus={ this.props.onFocus }
-					allowedTypes={ [ 'other' ] }
-				/>
-			);
-		}
 
 		return (
 			<MediaUploadProgress
@@ -153,6 +156,8 @@ export default class FileEdit extends Component {
 
 					return (
 						<View>
+							{ this.getToolbarEditButton( openMediaOptions ) }
+							{ getMediaOptions() }
 							<RichText
 								__unstableMobileNoFocusOnMount
 								fontSize={ 14 }
@@ -172,6 +177,37 @@ export default class FileEdit extends Component {
 							</View>
 						</View>
 					);
+				} }
+			/>
+		);
+	}
+
+	render() {
+		const { attributes } = this.props;
+		const { href } = attributes;
+
+		if ( ! href ) {
+			return (
+				<MediaPlaceholder
+					icon={ <BlockIcon icon={ icon } /> }
+					labels={ {
+						title: __( 'File' ),
+						instructions: __( 'CHOOSE A FILE' ),
+					} }
+					onSelect={ this.onSelectFile }
+					onFocus={ this.props.onFocus }
+					allowedTypes={ [ 'other' ] }
+				/>
+			);
+		}
+
+		return (
+			<MediaUpload
+				allowedTypes={ [ 'other' ] }
+				isReplacingMedia={ true }
+				onSelect={ this.onSelectFile }
+				render={ ( { open, getMediaOptions } ) => {
+					return this.getFileComponent( open, getMediaOptions );
 				} }
 			/>
 		);
