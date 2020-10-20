@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Button, ButtonGroup } from '@wordpress/components';
-import { formatItalic } from '@wordpress/icons';
+import { SelectControl } from '@wordpress/components';
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -24,12 +24,9 @@ export default function FontStyleControl( {
 	 * interaction with the control then passes this on to the supplied onChange
 	 * handler.
 	 *
-	 * @param {string} newStyle Slug for selected style.
+	 * @param {string} style Slug for selected style.
 	 */
-	const handleOnChange = ( newStyle ) => {
-		// Check if we are toggling a style off.
-		const style = fontStyle === newStyle ? undefined : newStyle;
-
+	const handleOnChange = ( style ) => {
 		// Ensure only defined font styles are allowed.
 		const presetStyle = fontStyles.find( ( { slug } ) => slug === style );
 
@@ -41,30 +38,30 @@ export default function FontStyleControl( {
 		onChange( newFontStyle );
 	};
 
-	// Font style icons to use.
-	const icons = {
-		italic: formatItalic,
-		oblique: undefined, // Need an underline icon designed.
-	};
+	// Map styles to select options and inject a default for inheriting font style.
+	const options = useMemo(
+		() => [
+			{ label: __( 'Default' ), value: '' },
+			...fontStyles.map( ( { name, slug } ) => ( {
+				label: name,
+				value: slug,
+			} ) ),
+		],
+		[ fontStyles ]
+	);
 
 	return (
-		<fieldset className="block-editor-font-style-control">
-			<legend>{ __( 'Font Style' ) }</legend>
-			<ButtonGroup>
-				{ fontStyles.map( ( presetStyle ) => {
-					return (
-						<Button
-							key={ presetStyle.slug }
-							icon={ icons[ presetStyle.slug ] }
-							isSmall
-							isPressed={ fontStyle === presetStyle.slug }
-							onClick={ () => handleOnChange( presetStyle.slug ) }
-						>
-							{ ! icons[ presetStyle.slug ] && presetStyle.name }
-						</Button>
-					);
-				} ) }
-			</ButtonGroup>
+		<fieldset className="components-font-style-control">
+			<div className="components-font-style-control__select">
+				{ fontStyles.length > 0 && (
+					<SelectControl
+						options={ options }
+						value={ fontStyle }
+						label={ __( 'Font style' ) }
+						onChange={ handleOnChange }
+					/>
+				) }
+			</div>
 		</fieldset>
 	);
 }

@@ -1,10 +1,12 @@
-.block-editor-font-style-control {
-	legend {
-		margin-bottom: 8px;
-	}
+.components-font-style-control {
+	.components-font-style-control__select {
+		label {
+			padding-bottom: 0;
+			margin-bottom: 8px;
+		}
 
-	.components-button-group {
-		display: inline-flex;
-		margin-bottom: 24px;
+		.components-base-control {
+			margin-bottom: 24px;
+		}
 	}
 }

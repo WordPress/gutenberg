@@ -163,6 +163,10 @@
 				],
 				"fontStyles": [
 					{
+						"name": "Normal",
+						"slug": "normal"
+					},
+					{
 						"name": "Italic",
 						"slug": "italic"
 					},
