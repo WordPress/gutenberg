@@ -14,6 +14,7 @@ import { reduceMotion } from '../../utils';
 export const NavigationUI = styled.div`
 	width: 100%;
 	background-color: ${ G2.darkGray.primary };
+	box-sizing: border-box;
 	color: #f0f0f0;
 	padding: 0 8px;
 	overflow: hidden;
@@ -31,6 +32,10 @@ export const MenuUI = styled.div`
 	}
 	.components-navigation__back-button {
 		margin-bottom: 24px;
+	}
+
+	.components-navigation__group + .components-navigation__group {
+		margin-top: 24px;
 	}
 `;
 
@@ -66,9 +71,11 @@ export const GroupTitleUI = styled( Text )`
 export const ItemUI = styled.li`
 	border-radius: 2px;
 	color: ${ G2.lightGray.ui };
+	margin-bottom: 0;
 
 	button,
 	a {
+		height: 32px;
 		margin: 0;
 		font-weight: 400;
 		font-size: 14px;
