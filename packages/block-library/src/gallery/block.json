@@ -38,7 +38,7 @@
 			"type": "boolean",
 			"default": false
 		},
-		"isList": {
+		"isListItem": {
 			"type": "boolean",
 			"default": true
 		}
@@ -46,7 +46,7 @@
 	"providesContext": {
 		"allowAlign": "allowAlign",
 		"allowResize": "allowResize",
-		"isList": "isList"
+		"isListItem": "isListItem"
 	},
 	"supports": {
 		"anchor": true,

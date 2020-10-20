@@ -80,7 +80,7 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
-	context: { allowAlign = true, allowResize = true, isList = false },
+	context: { allowAlign = true, allowResize = true, isListItem = false },
 } ) {
 	const {
 		url = '',
@@ -263,10 +263,10 @@ export function ImageEdit( {
 	}, [ isTemp, url ] );
 
 	useEffect( () => {
-		if ( isList ) {
-			setAttributes( { isListItem: isList } );
+		if ( isListItem ) {
+			setAttributes( { isListItem } );
 		}
-	}, [ isList ] );
+	}, [ isListItem ] );
 
 	const isExternal = isExternalImage( id, url );
 	const controls = (
@@ -331,7 +331,7 @@ export function ImageEdit( {
 		/>
 	);
 
-	if ( isList ) {
+	if ( isListItem ) {
 		return (
 			<>
 				{ controls }
