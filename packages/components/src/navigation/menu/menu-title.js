@@ -59,7 +59,6 @@ export default function NavigationMenuTitle( {
 							label={ searchButtonLabel }
 							onClick={ () => setIsSearching( true ) }
 							ref={ searchButtonRef }
-							showTooltip
 						>
 							<Icon icon={ searchIcon } />
 						</Button>

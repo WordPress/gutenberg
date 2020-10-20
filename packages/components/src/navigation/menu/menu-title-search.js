@@ -102,7 +102,6 @@ function MenuTitleSearch( {
 				isTertiary
 				label={ __( 'Close search' ) }
 				onClick={ onClose }
-				showTooltip
 			>
 				<Icon icon={ closeSmall } />
 			</Button>
