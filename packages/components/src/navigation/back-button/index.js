@@ -2,19 +2,19 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
 /**
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Icon, chevronLeft } from '@wordpress/icons';
+import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { useNavigationContext } from '../context';
 import { MenuBackButtonUI } from '../styles/navigation-styles';
+import { useRTL } from '../../utils/rtl';
 
 function NavigationBackButton(
 	{ backButtonLabel, className, href, onClick, parentMenu },
@@ -38,7 +38,7 @@ function NavigationBackButton(
 			setActiveMenu( parentMenu, 'right' );
 		}
 	};
-
+	const icon = useRTL() ? chevronRight : chevronLeft;
 	return (
 		<MenuBackButtonUI
 			className={ classes }
@@ -47,10 +47,9 @@ function NavigationBackButton(
 			ref={ ref }
 			onClick={ handleOnClick }
 		>
-			<Icon icon={ chevronLeft } />
+			<Icon icon={ icon } />
 			{ backButtonLabel || parentMenuTitle || __( 'Back' ) }
 		</MenuBackButtonUI>
 	);
 }
-
 export default forwardRef( NavigationBackButton );
