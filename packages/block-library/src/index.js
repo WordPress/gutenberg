@@ -206,6 +206,8 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 				[
 					navigation,
 					navigationLink,
+					postTitle,
+					postContent,
 
 					// Register Full Site Editing Blocks.
 					...( enableFSEBlocks
@@ -217,8 +219,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								query,
 								queryLoop,
 								queryPagination,
-								postTitle,
-								postContent,
 								postAuthor,
 								postComment,
 								postCommentAuthor,

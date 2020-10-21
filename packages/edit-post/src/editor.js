@@ -1,26 +1,24 @@
 /**
  * External dependencies
  */
-import memize from 'memize';
 import { size, map, without, omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { store as blocksStore } from '@wordpress/blocks';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	EditorProvider,
 	ErrorBoundary,
 	PostLockedModal,
 } from '@wordpress/editor';
-import { StrictMode, Component } from '@wordpress/element';
+import { StrictMode, useMemo } from '@wordpress/element';
 import {
 	KeyboardShortcuts,
 	SlotFillProvider,
 	DropZoneProvider,
 } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -30,140 +28,26 @@ import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import EditPostSettings from './components/edit-post-settings';
 
-class Editor extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.getEditorSettings = memize( this.getEditorSettings, {
-			maxSize: 1,
-		} );
-	}
-
-	getEditorSettings(
-		settings,
+function Editor( {
+	postId,
+	postType,
+	settings,
+	initialEdits,
+	onError,
+	...props
+} ) {
+	const {
 		hasFixedToolbar,
 		focusMode,
 		hasReducedUI,
 		hasThemeStyles,
+		post,
+		preferredStyleVariations,
 		hiddenBlockTypes,
 		blockTypes,
-		preferredStyleVariations,
 		__experimentalLocalAutosaveInterval,
-		__experimentalSetIsInserterOpened,
-		updatePreferredStyleVariations,
-		keepCaretInsideBlock
-	) {
-		settings = {
-			...( hasThemeStyles
-				? settings
-				: omit( settings, [ 'defaultEditorStyles' ] ) ),
-			__experimentalPreferredStyleVariations: {
-				value: preferredStyleVariations,
-				onChange: updatePreferredStyleVariations,
-			},
-			hasFixedToolbar,
-			focusMode,
-			hasReducedUI,
-			__experimentalLocalAutosaveInterval,
-
-			// This is marked as experimental to give time for the quick inserter to mature.
-			__experimentalSetIsInserterOpened,
-			keepCaretInsideBlock,
-			styles: hasThemeStyles
-				? settings.styles
-				: settings.defaultEditorStyles,
-		};
-
-		// Omit hidden block types if exists and non-empty.
-		if ( size( hiddenBlockTypes ) > 0 ) {
-			// Defer to passed setting for `allowedBlockTypes` if provided as
-			// anything other than `true` (where `true` is equivalent to allow
-			// all block types).
-			const defaultAllowedBlockTypes =
-				true === settings.allowedBlockTypes
-					? map( blockTypes, 'name' )
-					: settings.allowedBlockTypes || [];
-
-			settings.allowedBlockTypes = without(
-				defaultAllowedBlockTypes,
-				...hiddenBlockTypes
-			);
-		}
-
-		return settings;
-	}
-
-	render() {
-		const {
-			settings,
-			hasFixedToolbar,
-			focusMode,
-			hasReducedUI,
-			hasThemeStyles,
-			post,
-			postId,
-			initialEdits,
-			onError,
-			hiddenBlockTypes,
-			blockTypes,
-			preferredStyleVariations,
-			__experimentalLocalAutosaveInterval,
-			setIsInserterOpened,
-			updatePreferredStyleVariations,
-			keepCaretInsideBlock,
-			...props
-		} = this.props;
-
-		if ( ! post ) {
-			return null;
-		}
-
-		const editorSettings = this.getEditorSettings(
-			settings,
-			hasFixedToolbar,
-			focusMode,
-			hasReducedUI,
-			hasThemeStyles,
-			hiddenBlockTypes,
-			blockTypes,
-			preferredStyleVariations,
-			__experimentalLocalAutosaveInterval,
-			setIsInserterOpened,
-			updatePreferredStyleVariations,
-			keepCaretInsideBlock
-		);
-
-		return (
-			<StrictMode>
-				<EditPostSettings.Provider value={ settings }>
-					<SlotFillProvider>
-						<DropZoneProvider>
-							<EditorProvider
-								settings={ editorSettings }
-								post={ post }
-								initialEdits={ initialEdits }
-								useSubRegistry={ false }
-								{ ...props }
-							>
-								<ErrorBoundary onError={ onError }>
-									<EditorInitialization postId={ postId } />
-									<Layout settings={ settings } />
-									<KeyboardShortcuts
-										shortcuts={ preventEventDiscovery }
-									/>
-								</ErrorBoundary>
-								<PostLockedModal />
-							</EditorProvider>
-						</DropZoneProvider>
-					</SlotFillProvider>
-				</EditPostSettings.Provider>
-			</StrictMode>
-		);
-	}
-}
-
-export default compose( [
-	withSelect( ( select, { postId, postType } ) => {
+		keepCaretInsideBlock,
+	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
 			getPreference,
@@ -190,15 +74,101 @@ export default compose( [
 			),
 			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const {
-			updatePreferredStyleVariations,
-			setIsInserterOpened,
-		} = dispatch( 'core/edit-post' );
-		return {
-			updatePreferredStyleVariations,
-			setIsInserterOpened,
+	} );
+
+	const { updatePreferredStyleVariations, setIsInserterOpened } = useDispatch(
+		'core/edit-post'
+	);
+
+	const editorSettings = useMemo( () => {
+		const result = {
+			...( hasThemeStyles
+				? settings
+				: omit( settings, [ 'defaultEditorStyles' ] ) ),
+			__experimentalPreferredStyleVariations: {
+				value: preferredStyleVariations,
+				onChange: updatePreferredStyleVariations,
+			},
+			hasFixedToolbar,
+			focusMode,
+			hasReducedUI,
+			__experimentalLocalAutosaveInterval,
+
+			// This is marked as experimental to give time for the quick inserter to mature.
+			__experimentalSetIsInserterOpened: setIsInserterOpened,
+			keepCaretInsideBlock,
+			styles: hasThemeStyles
+				? settings.styles
+				: settings.defaultEditorStyles,
 		};
-	} ),
-] )( Editor );
+
+		// Omit hidden block types if exists and non-empty.
+		if ( size( hiddenBlockTypes ) > 0 ) {
+			// Defer to passed setting for `allowedBlockTypes` if provided as
+			// anything other than `true` (where `true` is equivalent to allow
+			// all block types).
+			const defaultAllowedBlockTypes =
+				true === settings.allowedBlockTypes
+					? map( blockTypes, 'name' )
+					: settings.allowedBlockTypes || [];
+
+			result.allowedBlockTypes = without(
+				defaultAllowedBlockTypes,
+				...hiddenBlockTypes
+			);
+		}
+
+		return result;
+	}, [
+		settings,
+		hasFixedToolbar,
+		focusMode,
+		hasReducedUI,
+		hasThemeStyles,
+		hiddenBlockTypes,
+		blockTypes,
+		preferredStyleVariations,
+		__experimentalLocalAutosaveInterval,
+		setIsInserterOpened,
+		updatePreferredStyleVariations,
+		keepCaretInsideBlock,
+	] );
+
+	const template = useMemo(
+		() => [
+			createBlock( 'core/post-title' ),
+			createBlock( 'core/post-content' ),
+		],
+		[]
+	);
+
+	return (
+		<StrictMode>
+			<EditPostSettings.Provider value={ settings }>
+				<SlotFillProvider>
+					<DropZoneProvider>
+						<EditorProvider
+							settings={ editorSettings }
+							post={ post }
+							initialEdits={ initialEdits }
+							useSubRegistry={ false }
+							__unstableTemplate={ template }
+							{ ...props }
+						>
+							<ErrorBoundary onError={ onError }>
+								<EditorInitialization postId={ postId } />
+								<Layout settings={ settings } />
+								<KeyboardShortcuts
+									shortcuts={ preventEventDiscovery }
+								/>
+							</ErrorBoundary>
+							<PostLockedModal />
+						</EditorProvider>
+					</DropZoneProvider>
+				</SlotFillProvider>
+			</EditPostSettings.Provider>
+		</StrictMode>
+	);
+}
+
+export default Editor;

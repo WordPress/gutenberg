@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import {
-	PostTitle,
 	VisualEditorGlobalKeyboardShortcuts,
+	PostTitle,
 } from '@wordpress/editor';
 import {
 	WritingFlow,
