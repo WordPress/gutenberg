@@ -252,7 +252,6 @@ export class FileEdit extends Component {
 							{ this.getInspectorControls( attributes ) }
 							<RichText
 								__unstableMobileNoFocusOnMount
-								fontSize={ 14 }
 								onChange={ this.onChangeFileName }
 								placeholder={ __( 'File name' ) }
 								rootTagsToEliminate={ [ 'p' ] }
@@ -272,6 +271,7 @@ export class FileEdit extends Component {
 									] }
 								>
 									<PlainText
+										style={ styles.buttonText }
 										value={ downloadButtonText }
 										onChange={
 											this.onChangeDownloadButtonText

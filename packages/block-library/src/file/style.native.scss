@@ -4,7 +4,12 @@
 	border-width: $border-width;
 	margin-top: $grid-unit-20;
 	background-color: $button-fallback-bg;
+}
+
+.buttonText {
+	background-color: transparent;
 	color: $white;
+	font-size: 16;
 }
 
 .disabledButton {
