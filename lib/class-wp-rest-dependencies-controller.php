@@ -1,6 +1,6 @@
 <?php
 /**
- * Dependencies controller.
+ * Dependencies controller. An abstract class intended to be extended by scripts/styles endpoints.
  *
  * @package gutenberg
  */
@@ -39,6 +39,8 @@ abstract class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 
 	/**
 	 * Register routes.
+	 *
+	 * @return void
 	 */
 	public function register_routes() {
 		register_rest_route(
@@ -289,7 +291,7 @@ abstract class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Get core assets.
+	 * Get core assets. Abstract method that needs to be covered by all child classes.
 	 *
 	 * @return array
 	 */
