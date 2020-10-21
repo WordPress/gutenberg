@@ -201,16 +201,24 @@ class DependencyExtractionWebpackPlugin {
 					entrypointExternalizedWpDeps.add( 'wp-polyfill' );
 				}
 
+				const processModule = ( { userRequest } ) => {
+					if ( this.externalizedDeps.has( userRequest ) ) {
+						const scriptDependency = this.mapRequestToDependency(
+							userRequest
+						);
+						entrypointExternalizedWpDeps.add( scriptDependency );
+					}
+				};
+
 				// Search for externalized modules in all chunks.
 				for ( const chunk of entrypoint.chunks ) {
-					for ( const { userRequest } of chunk.modulesIterable ) {
-						if ( this.externalizedDeps.has( userRequest ) ) {
-							const scriptDependency = this.mapRequestToDependency(
-								userRequest
-							);
-							entrypointExternalizedWpDeps.add(
-								scriptDependency
-							);
+					for ( const chunkModule of chunk.modulesIterable ) {
+						processModule( chunkModule );
+						// loop through submodules of ConcatenatedModule
+						if ( chunkModule.modules ) {
+							for ( const concatModule of chunkModule.modules ) {
+								processModule( concatModule );
+							}
 						}
 					}
 				}
