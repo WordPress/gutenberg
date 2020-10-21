@@ -12,6 +12,10 @@ export const CSS_UNITS = [
 	{ value: 'vh', label: 'vh', default: 10 },
 ];
 
+export const CUSTOM_VALUES = {
+	AUTO: 'auto',
+};
+
 export const DEFAULT_UNIT = CSS_UNITS[ 0 ];
 
 /**
@@ -54,6 +58,11 @@ export function parseUnit( initialValue, units = CSS_UNITS ) {
 
 	let num = parseFloat( value, 10 );
 	num = isNaN( num ) ? '' : num;
+
+	if ( value === CUSTOM_VALUES.AUTO ) {
+		num = value;
+		return [ num, '' ];
+	}
 
 	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
 

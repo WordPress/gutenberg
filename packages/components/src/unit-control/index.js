@@ -19,7 +19,12 @@ import {
 } from '../input-control/state';
 import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
-import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
+import {
+	CSS_UNITS,
+	CUSTOM_VALUES,
+	getParsedValue,
+	getValidParsedUnit,
+} from './utils';
 import { useControlledState } from '../utils/hooks';
 
 function UnitControl(
@@ -29,7 +34,6 @@ function UnitControl(
 		className,
 		disabled = false,
 		disableUnits = false,
-		disableValue = false,
 		isPressEnterToChange = false,
 		isResetValueOnUnitChange = false,
 		isUnitSelectTabbable = true,
@@ -61,6 +65,11 @@ function UnitControl(
 			return;
 		}
 
+		if ( next && next.toString().includes( CUSTOM_VALUES.AUTO ) ) {
+			onChange( CUSTOM_VALUES.AUTO, changeProps );
+			return;
+		}
+
 		/*
 		 * Customizing the onChange callback.
 		 * This allows as to broadcast a combined value+unit to onChange.
@@ -86,6 +95,18 @@ function UnitControl(
 	};
 
 	const mayUpdateUnit = ( event ) => {
+		if ( event.target.value === CUSTOM_VALUES.AUTO ) {
+			refParsedValue.current = CUSTOM_VALUES.AUTO;
+
+			if ( isPressEnterToChange ) {
+				const defaultUnit = { value: '', label: '', default: '' };
+				const changeProps = { event, defaultUnit };
+
+				onChange( CUSTOM_VALUES.AUTO, changeProps );
+			}
+			return;
+		}
+
 		if ( ! isNaN( event.target.value ) ) {
 			refParsedValue.current = null;
 			return;
@@ -165,7 +186,7 @@ function UnitControl(
 				{ ...omit( props, [ 'children' ] ) }
 				autoComplete={ autoComplete }
 				className={ classes }
-				disabled={ disabled || disableValue }
+				disabled={ disabled }
 				disableUnits={ disableUnits }
 				isPressEnterToChange={ isPressEnterToChange }
 				label={ label }

@@ -7,7 +7,7 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import UnitControl from './unit-control';
-import { LABELS, CUSTOM_VALUES, setAutoValue } from './utils';
+import { LABELS, CUSTOM_VALUES } from './utils';
 import { LayoutContainer, Layout } from './styles/box-control-styles';
 
 export default function BoxInputControls( {
@@ -39,8 +39,7 @@ export default function BoxInputControls( {
 	const createHandleOnChange = ( side ) => ( next, { event } ) => {
 		const { altKey } = event;
 		const nextValues = { ...values };
-		const val = setAutoValue( next );
-		nextValues[ side ] = val;
+		nextValues[ side ] = next;
 
 		/**
 		 * Supports changing pair sides. For example, holding the ALT key
@@ -49,22 +48,24 @@ export default function BoxInputControls( {
 		if ( altKey ) {
 			switch ( side ) {
 				case 'top':
-					nextValues.bottom = val;
+					nextValues.bottom = next;
 					break;
 				case 'bottom':
-					nextValues.top = val;
+					nextValues.top = next;
 					break;
 				case 'left':
-					nextValues.right = val;
+					nextValues.right = next;
 					break;
 				case 'right':
-					nextValues.left = val;
+					nextValues.left = next;
 					break;
 			}
 		}
 
 		handleOnChange( nextValues );
 	};
+
+	const isMixed = ( side ) => side === CUSTOM_VALUES.AUTO;
 
 	return (
 		<LayoutContainer className="component-box-control__input-controls-wrapper">
@@ -82,7 +83,7 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'top' ) }
 					onHoverOff={ createHandleOnHoverOff( 'top' ) }
 					label={ LABELS.top }
-					disableValue={ top === CUSTOM_VALUES.AUTO }
+					disableUnits={ isMixed( top ) }
 				/>
 				<UnitControl
 					{ ...props }
@@ -92,7 +93,7 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'right' ) }
 					onHoverOff={ createHandleOnHoverOff( 'right' ) }
 					label={ LABELS.right }
-					disableValue={ right === CUSTOM_VALUES.AUTO }
+					disableUnits={ isMixed( right ) }
 				/>
 				<UnitControl
 					{ ...props }
@@ -102,7 +103,7 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'bottom' ) }
 					onHoverOff={ createHandleOnHoverOff( 'bottom' ) }
 					label={ LABELS.bottom }
-					disableValue={ bottom === CUSTOM_VALUES.AUTO }
+					disableUnits={ isMixed( bottom ) }
 				/>
 				<UnitControl
 					{ ...props }
@@ -113,7 +114,7 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'left' ) }
 					onHoverOff={ createHandleOnHoverOff( 'left' ) }
 					label={ LABELS.left }
-					disableValue={ left === CUSTOM_VALUES.AUTO }
+					disableUnits={ isMixed( left ) }
 				/>
 			</Layout>
 		</LayoutContainer>

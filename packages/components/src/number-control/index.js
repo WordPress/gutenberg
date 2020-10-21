@@ -155,7 +155,10 @@ export function NumberControl(
 			type === inputControlActionTypes.PRESS_ENTER ||
 			type === inputControlActionTypes.COMMIT
 		) {
-			state.value = roundClamp( currentValue, min, max );
+			state.value =
+				currentValue === 'auto'
+					? currentValue
+					: roundClamp( currentValue, min, max );
 		}
 
 		return state;

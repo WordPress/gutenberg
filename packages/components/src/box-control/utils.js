@@ -90,8 +90,9 @@ export function getAllValue( values = {} ) {
 	 * isNumber() is more specific for these cases, rather than relying on a
 	 * simple truthy check.
 	 */
-	const allValue = isNumber( value ) ? `${ value }${ unit }` : null;
-
+	const isAutoValue =
+		value === CUSTOM_VALUES.AUTO ? CUSTOM_VALUES.AUTO : null;
+	const allValue = isNumber( value ) ? `${ value }${ unit }` : isAutoValue;
 	return allValue;
 }
 
@@ -103,8 +104,7 @@ export function getAllValue( values = {} ) {
  */
 export function isValuesMixed( values = {} ) {
 	const allValue = getAllValue( values );
-	const autoValues = Object.values( values ).every( ( i ) => i === 'auto' );
-	const isMixed = isNaN( parseFloat( allValue ) ) && ! autoValues;
+	const isMixed = isNaN( parseFloat( allValue ) );
 
 	return isMixed;
 }
@@ -158,16 +158,4 @@ export function extendStyles( type ) {
 			},
 		};
 	};
-}
-
-/**
- * Checks to determine if passed param includes auto as value
- * and if so returns only the auto string
- *
- * @param {string} value
- *
- * @return {string} Returns the provided value (value * unit) or only an 'auto' string
- */
-export function setAutoValue( value ) {
-	return value.includes( CUSTOM_VALUES.AUTO ) ? CUSTOM_VALUES.AUTO : value;
 }

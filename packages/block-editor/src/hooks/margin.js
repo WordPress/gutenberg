@@ -19,7 +19,6 @@ const UNITS = [
 	{ value: 'em', label: 'em', default: '' },
 	{ value: 'rem', label: 'rem', default: '' },
 	{ value: 'vw', label: 'vw', default: '' },
-	{ value: 'auto', label: 'auto', default: '' },
 ];
 
 const hasMarginSupport = ( blockName ) => {

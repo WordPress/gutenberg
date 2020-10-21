@@ -12,7 +12,6 @@ import {
 	getAllValue,
 	isValuesMixed,
 	isValuesDefined,
-	setAutoValue,
 } from './utils';
 
 export default function AllInputControl( {
@@ -38,12 +37,11 @@ export default function AllInputControl( {
 
 	const handleOnChange = ( next ) => {
 		const nextValues = { ...values };
-		const val = setAutoValue( next );
 
-		nextValues.top = val;
-		nextValues.bottom = val;
-		nextValues.left = val;
-		nextValues.right = val;
+		nextValues.top = next;
+		nextValues.bottom = next;
+		nextValues.left = next;
+		nextValues.right = next;
 
 		onChange( nextValues );
 	};
