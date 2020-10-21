@@ -7,17 +7,16 @@
 	margin-left: -6px;
 }
 
-.sliderTextInput {
+.textInput {
 	min-height: 25px;
-	align-self: center;
 	margin-left: 10px;
 	border-color: $light-gray-400;
-	padding-top: 0;
-	padding-bottom: 0;
-	text-align: center;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	flex-direction: row;
 }
 
-.sliderDarkTextInput {
+.textInputDark {
 	border-color: $gray-70;
 }
 
@@ -45,4 +44,14 @@
 .containerAndroid {
 	padding-top: 8px;
 	padding-bottom: 8px;
+}
+
+.verticalBorder {
+	border-right-width: 1px;
+	text-align: center;
+	border-color: $light-gray-400;
+}
+
+.verticalBorderDark {
+	border-color: $gray-70;
 }

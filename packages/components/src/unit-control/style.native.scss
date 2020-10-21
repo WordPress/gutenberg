@@ -1,5 +1,4 @@
 .unitButtonText {
-	font-size: 17px;
 	color: $blue-wordpress;
 }
 
@@ -8,7 +7,8 @@
 }
 
 .unitButton {
-	width: 40px;
+	padding-right: 8px;
+	padding-left: 8px;
 	align-items: center;
 	justify-content: center;
 	flex: 1;

@@ -85,6 +85,8 @@ function UnitControl( {
 					onChange={ onChange }
 					separatorType={ separatorType }
 					value={ value }
+					defaultValue={ initialSliderValue }
+					shouldDisplayTextInput={ true }
 				>
 					{ renderUnitButton() }
 				</StepperCell>

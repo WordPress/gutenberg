@@ -194,9 +194,14 @@ class BottomSheetRangeCell extends Component {
 			value
 		);
 
-		const defaultSliderStyle = getStylesFromColorScheme(
-			styles.sliderTextInput,
-			styles.sliderDarkTextInput
+		const textInputStyle = getStylesFromColorScheme(
+			styles.textInput,
+			styles.textInputDark
+		);
+
+		const verticalBorderStyle = getStylesFromColorScheme(
+			styles.verticalBorder,
+			styles.verticalBorderDark
 		);
 
 		const containerStyle = [
@@ -245,25 +250,33 @@ class BottomSheetRangeCell extends Component {
 						}
 						accessibilityRole={ 'adjustable' }
 					/>
-					{ shouldDisplayTextInput && (
-						<TextInput
-							style={ [
-								defaultSliderStyle,
-								borderStyles.borderStyle,
-								hasFocus && borderStyles.isSelected,
-								{ width: 40 * fontScale },
-							] }
-							onChangeText={ this.onChangeText }
-							onSubmitEditing={ this.onSubmitEditing }
-							onFocus={ this.onInputFocus }
-							onBlur={ this.onInputBlur }
-							keyboardType="numeric"
-							returnKeyType="done"
-							defaultValue={ `${ inputValue }` }
-							value={ inputValue }
-						/>
-					) }
-					{ children }
+					<View
+						style={ [
+							textInputStyle,
+							borderStyles.borderStyle,
+							hasFocus && borderStyles.isSelected,
+						] }
+					>
+						{ shouldDisplayTextInput && (
+							<TextInput
+								style={ [
+									verticalBorderStyle,
+									{
+										width: 40 * fontScale,
+									},
+								] }
+								onChangeText={ this.onChangeText }
+								onSubmitEditing={ this.onSubmitEditing }
+								onFocus={ this.onInputFocus }
+								onBlur={ this.onInputBlur }
+								keyboardType="numeric"
+								returnKeyType="done"
+								defaultValue={ `${ inputValue }` }
+								value={ inputValue }
+							/>
+						) }
+						{ children }
+					</View>
 				</View>
 			</Cell>
 		);
