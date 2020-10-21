@@ -4,6 +4,7 @@
 import {
 	activatePlugin,
 	clickBlockToolbarButton,
+	clickMenuItem,
 	createNewPost,
 	deactivatePlugin,
 	getEditedPostContent,
@@ -40,7 +41,7 @@ describe( 'cpt locking', () => {
 		);
 		await clickBlockToolbarButton( 'More options' );
 		expect(
-			await page.$x( '//button[contains(text(), "Remove block")]' )
+			await page.$x( '//button/span[contains(text(), "Remove block")]' )
 		).toHaveLength( 0 );
 	};
 
@@ -171,10 +172,7 @@ describe( 'cpt locking', () => {
 				'p1'
 			);
 			await clickBlockToolbarButton( 'More options' );
-			const [ removeBlock ] = await page.$x(
-				'//button[contains(text(), "Remove block")]'
-			);
-			await removeBlock.click();
+			await clickMenuItem( 'Remove block' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 
@@ -194,10 +192,8 @@ describe( 'cpt locking', () => {
 				'p1'
 			);
 			await clickBlockToolbarButton( 'More options' );
-			const [ removeBlock ] = await page.$x(
-				'//button[contains(text(), "Remove block")]'
-			);
-			await removeBlock.click();
+			await clickMenuItem( 'Remove block' );
+
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
 

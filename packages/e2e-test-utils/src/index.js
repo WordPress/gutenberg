@@ -4,6 +4,7 @@ export { clearLocalStorage } from './clear-local-storage';
 export { clickBlockAppender } from './click-block-appender';
 export { clickBlockToolbarButton } from './click-block-toolbar-button';
 export { clickButton } from './click-button';
+export { clickMenuItem } from './click-menu-item';
 export { clickOnCloseModalButton } from './click-on-close-modal-button';
 export { clickOnMoreMenuItem } from './click-on-more-menu-item';
 export { createNewPost } from './create-new-post';

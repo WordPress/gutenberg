@@ -65,6 +65,14 @@ _Parameters_
 
 -   _buttonText_ `string`: The text that appears on the button to click.
 
+<a name="clickMenuItem" href="#clickMenuItem">#</a> **clickMenuItem**
+
+Searches for an item in the menu with the text provided and clicks it.
+
+_Parameters_
+
+-   _label_ `string`: The label to search the menu item for.
+
 <a name="clickOnCloseModalButton" href="#clickOnCloseModalButton">#</a> **clickOnCloseModalButton**
 
 Click on the close button of an open modal.

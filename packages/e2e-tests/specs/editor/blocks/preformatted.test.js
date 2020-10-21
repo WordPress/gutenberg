@@ -3,10 +3,10 @@
  */
 import {
 	clickBlockToolbarButton,
+	clickMenuItem,
 	getEditedPostContent,
 	createNewPost,
 	insertBlock,
-	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Preformatted', () => {
@@ -23,12 +23,12 @@ describe( 'Preformatted', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await clickBlockToolbarButton( 'More options' );
-		await clickButton( 'Convert to Blocks' );
+		await clickMenuItem( 'Convert to Blocks' );
 		// Once it's edited, it should be saved as BR tags.
 		await page.keyboard.type( '0' );
 		await page.keyboard.press( 'Enter' );
 		await clickBlockToolbarButton( 'More options' );
-		await clickButton( 'Edit as HTML' );
+		await clickMenuItem( 'Edit as HTML' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
