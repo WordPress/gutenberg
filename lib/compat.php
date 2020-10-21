@@ -508,9 +508,3 @@ function gutenberg_override_reusable_block_post_type_labels() {
 	);
 }
 add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post_type_labels', 10, 0 );
-
-global $current_parsed_block;
-$current_parsed_block = array(
-	'blockName'  => null,
-	'attributes' => null,
-);
