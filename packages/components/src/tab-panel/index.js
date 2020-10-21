@@ -7,7 +7,7 @@ import { partial, noop, find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -61,6 +61,11 @@ export default function TabPanel( {
 		}
 	}, [ tabs ] );
 
+	const childrenResult = useMemo(
+		() => selectedTab && children( selectedTab ),
+		[ selectedTab, children ]
+	);
+
 	return (
 		<div className={ className }>
 			<NavigableMenu
@@ -95,7 +100,7 @@ export default function TabPanel( {
 					id={ `${ selectedId }-view` }
 					className="components-tab-panel__tab-content"
 				>
-					{ children( selectedTab ) }
+					{ childrenResult }
 				</div>
 			) }
 		</div>
