@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, find, map } from 'lodash';
+import { map, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -46,9 +46,9 @@ export default function NewTemplate() {
 		} );
 	};
 
-	const missingTemplates = filter(
+	const missingTemplates = omit(
 		TEMPLATES_DEFAULT_DETAILS,
-		( defaultTemplate, slug ) => ! find( templates, { slug } )
+		map( templates, 'slug' )
 	);
 
 	return (
