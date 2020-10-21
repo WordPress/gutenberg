@@ -2,7 +2,7 @@
 	display: flex;
 }
 
-.story-buttons-container > * {
+.story-buttons-container > .components-button {
 	margin-right: 10px;
 	margin-bottom: 10px;
 }

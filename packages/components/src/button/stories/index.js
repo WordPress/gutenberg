@@ -29,20 +29,35 @@ export const _default = () => {
 
 export const primary = () => {
 	const label = text( 'Label', 'Primary Button' );
+	const disabled = boolean( 'Disabled', false );
 
-	return <Button isPrimary>{ label }</Button>;
+	return (
+		<Button isPrimary disabled={ disabled }>
+			{ label }
+		</Button>
+	);
 };
 
 export const secondary = () => {
 	const label = text( 'Label', 'Secondary Button' );
+	const disabled = boolean( 'Disabled', false );
 
-	return <Button isSecondary>{ label }</Button>;
+	return (
+		<Button isSecondary disabled={ disabled }>
+			{ label }
+		</Button>
+	);
 };
 
 export const tertiary = () => {
 	const label = text( 'Label', 'Tertiary Button' );
+	const disabled = boolean( 'Disabled', false );
 
-	return <Button isTertiary>{ label }</Button>;
+	return (
+		<Button isTertiary disabled={ disabled }>
+			{ label }
+		</Button>
+	);
 };
 
 export const isDestructive = () => {
