@@ -58,8 +58,6 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
 		inline: true,
 	} );
 
-	console.log( preserveWhiteSpace );
-
 	if ( ! preserveWhiteSpace ) {
 		HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
 	}
@@ -149,7 +147,6 @@ export function pasteHandler( {
 	tagName,
 	preserveWhiteSpace,
 } ) {
-	console.log( { preserveWhiteSpace } );
 	// First of all, strip any meta tags.
 	HTML = HTML.replace( /<meta[^>]+>/g, '' );
 	// Strip Windows markers.
