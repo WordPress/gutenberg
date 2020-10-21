@@ -242,7 +242,6 @@ describe( 'Multi-entity save flow', () => {
 
 			// Click the first block so that the template part inserts in the right place.
 			const firstBlock = await page.$( '.wp-block' );
-
 			await firstBlock.click();
 
 			// Insert a new template part placeholder.
