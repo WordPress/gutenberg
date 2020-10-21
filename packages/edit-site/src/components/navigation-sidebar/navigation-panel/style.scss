@@ -48,7 +48,7 @@
 .edit-site-navigation-panel__scroll-container {
 	overflow-x: hidden;
 	overflow-y: auto;
-	height: 100%;
+	height: calc(100% - #{$header-height});
 }
 
 .edit-site-navigation-panel__back-to-dashboard.components-button.is-tertiary {
