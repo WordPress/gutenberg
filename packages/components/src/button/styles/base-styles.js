@@ -123,6 +123,8 @@ export const icon = css`
 `;
 
 export const iconWithText = css`
+	${ icon }
+
 	justify-content: left;
 
 	svg {
