@@ -258,7 +258,7 @@ export function setStarterPageTemplatesTooltipShown( tooltipShown ) {
  * For example, a mediaFiles collection editor can make special handling of visualization
  * in this regard.
  *
- * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
+ * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item.
  * @param {string} blockClientId the clientId of the block.
  */
 export function requestMediaFilesEditorLoad( mediaFiles, blockClientId ) {
