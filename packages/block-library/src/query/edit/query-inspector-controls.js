@@ -16,8 +16,9 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useState, useCallback, useMemo } from '@wordpress/element';
+import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -26,10 +27,11 @@ import { getTermsInfo } from '../utils';
 import { MAX_FETCHED_TERMS } from '../constants';
 
 export default function QueryInspectorControls( {
+	clientId,
 	query,
 	setQuery,
-	setAttributes,
 } ) {
+	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
 	const { order, orderBy, author: selectedAuthorId, postType } = query;
 	const [ showCategories, setShowCategories ] = useState( true );
 	const [ showTags, setShowTags ] = useState( true );
@@ -149,19 +151,14 @@ export default function QueryInspectorControls( {
 									res.push( [ x ] );
 									return res;
 								}, [] );
-							const newLoopTemplate = [
-								[
-									'core/query-loop',
-									{
-										innerBlocksTemplate: newTpl,
-									},
-									// newTpl,
-								],
-							];
 
-							setAttributes( {
-								innerBlocksTemplate: newLoopTemplate,
-							} );
+							replaceInnerBlocks(
+								clientId,
+								createBlocksFromInnerBlocksTemplate( [
+									[ 'core/query-loop', {}, newTpl ],
+								] ),
+								false
+							);
 						}
 					} }
 				/>
