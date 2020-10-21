@@ -2,12 +2,13 @@
  * WordPress dependencies
  */
 import { Button, ButtonGroup } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Control to facilitate width selections.
  *
  * @param  {Object}   props                 Component props.
- * @param  {string}   props.value           Currently selected text decoration.
+ * @param  {string}   props.value           Currently selected width.
  * @param  {Array}    props.widthOptions    Width options available for selection.
  * @param  {Function} props.onChange        Handles change in width selection.
  * @return {WPElement}                      Width control.
@@ -40,19 +41,22 @@ export default function WidthControl( {
 	};
 
 	return (
-		<ButtonGroup>
-			{ widthOptions.map( ( widthOption ) => {
-				return (
-					<Button
-						key={ widthOption.slug }
-						isSmall
-						isPrimary={ selectedWidth === widthOption.slug }
-						onClick={ () => handleChange( widthOption.slug ) }
-					>
-						{ widthOption.value }
-					</Button>
-				);
-			} ) }
-		</ButtonGroup>
+		<>
+			<p>{ __( 'Width' ) }</p>
+			<ButtonGroup>
+				{ widthOptions.map( ( widthOption ) => {
+					return (
+						<Button
+							key={ widthOption.slug }
+							isSmall
+							isPrimary={ selectedWidth === widthOption.slug }
+							onClick={ () => handleChange( widthOption.slug ) }
+						>
+							{ widthOption.value }
+						</Button>
+					);
+				} ) }
+			</ButtonGroup>
+		</>
 	);
 }

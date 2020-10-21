@@ -1,13 +1,13 @@
 <?php
 /**
- * Width block support flag.
+ * Dimensions block support flag.
  *
  * @package gutenberg
  */
 
 /**
- * Registers the style and width block attributes for block types that
- * support it.
+ * Ensures the style attribute required by the dimensions feature is registered,
+ * for block types that support the feature.
  *
  * @param WP_Block_Type $block_type Block Type.
  */

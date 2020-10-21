@@ -15,7 +15,7 @@ import WidthControl from '../components/width-control';
 
 /**
  * Key within block settings' supports array indicating support for
- * width, e.g. settings found in 'block.json'.
+ * dimensions including width, e.g. settings found in 'block.json'.
  */
 export const DIMENSIONS_SUPPORT_KEY = '__experimentalDimensions';
 
@@ -51,7 +51,7 @@ export function DimensionsPanel( props ) {
 
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Width Settings' ) }>
+			<PanelBody title={ __( 'Dimensions' ) }>
 				<WidthControl
 					value={ selectedWidth }
 					widthOptions={ widthOptions }

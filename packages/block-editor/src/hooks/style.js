@@ -158,7 +158,7 @@ export const withBlockControls = createHigherOrderComponent(
 		return [
 			<TypographyPanel key="typography" { ...props } />,
 			<ColorEdit key="colors" { ...props } />,
-			<DimensionsPanel key="width" { ...props } />,
+			<DimensionsPanel key="dimensions" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
 			hasSpacingSupport && (
 				<SpacingPanelControl key="spacing">
