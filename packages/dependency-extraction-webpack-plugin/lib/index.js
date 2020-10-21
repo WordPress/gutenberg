@@ -172,13 +172,6 @@ class DependencyExtractionWebpackPlugin {
 	apply( compiler ) {
 		this.externalsPlugin.apply( compiler );
 
-		// Assert the `string` type for output filename.
-		// The type indicates the option may be `undefined`.
-		// However, at this point in compilation, webpack has filled the options in if
-		// they were not provided.
-		const outputFilename = /** @type {{filename:string}} */ ( compiler
-			.options.output ).filename;
-
 		compiler.hooks.emit.tap( this.constructor.name, ( compilation ) => {
 			const {
 				combineAssets,
@@ -238,15 +231,18 @@ class DependencyExtractionWebpackPlugin {
 
 				// Determine a filename for the asset file.
 				const [ filename, query ] = entrypointName.split( '?', 2 );
-				const buildFilename = compilation.getPath( outputFilename, {
-					chunk: runtimeChunk,
-					filename,
-					query,
-					basename: basename( filename ),
-					contentHash: createHash( 'md4' )
-						.update( assetString )
-						.digest( 'hex' ),
-				} );
+				const buildFilename = compilation.getPath(
+					compiler.options.output.filename,
+					{
+						chunk: runtimeChunk,
+						filename,
+						query,
+						basename: basename( filename ),
+						contentHash: createHash( 'md4' )
+							.update( assetString )
+							.digest( 'hex' ),
+					}
+				);
 
 				if ( combineAssets ) {
 					combinedAssetsData[ buildFilename ] = assetData;
