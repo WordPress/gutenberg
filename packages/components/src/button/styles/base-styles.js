@@ -6,7 +6,7 @@ import { css } from '@emotion/core';
 /**
  * Internal dependencies
  */
-import { font, config, color, reduceMotion, lighten } from '../../utils';
+import { font, config, color, reduceMotion, lighten, rtl } from '../../utils';
 
 export const buttonBase = css`
 	display: inline-flex;
@@ -125,7 +125,7 @@ export const icon = css`
 export const iconWithText = css`
 	${ icon }
 
-	justify-content: left;
+	${ rtl( { justifyContent: 'left' }, { justifyContent: 'right' } )() }
 
 	svg {
 		margin-right: 8px;
@@ -138,7 +138,8 @@ export const pressed = css`
 
 	&:focus:not( :disabled ) {
 		box-shadow: inset 0 0 0 1px ${ color( 'white' ) },
-			0 0 0 $border-width-focus var( --wp-admin-theme-color );
+			0 0 0 ${ config( 'borderWidthFocus' ) }
+				var( --wp-admin-theme-color );
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;

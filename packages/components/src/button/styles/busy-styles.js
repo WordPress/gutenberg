@@ -11,8 +11,6 @@ import { color, darken } from '../../utils';
 export const primary = css`
 	color: ${ color( 'white' ) };
 	background-size: 100px 100%;
-	// Disable reason: This function call looks nicer when each argument is on its own line.
-	/* stylelint-disable */
 	background-image: linear-gradient(
 		-45deg,
 		var( --wp-admin-theme-color ) 28%,
@@ -20,7 +18,6 @@ export const primary = css`
 		var( --wp-admin-theme-color-darker-20 ) 72%,
 		var( --wp-admin-theme-color ) 72%
 	);
-	/* stylelint-enable */
 	border-color: var( --wp-admin-theme-color );
 `;
 
@@ -34,8 +31,6 @@ export const generic = css`
 	animation: ${ busyAnimation } 2500ms infinite linear;
 	opacity: 1;
 	background-size: 100px 100%;
-	// Disable reason: This function call looks nicer when each argument is on its own line.
-	/* stylelint-disable */
 	background-image: linear-gradient(
 		-45deg,
 		${ darken( color( 'white' ), 2 ) } 28%,

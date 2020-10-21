@@ -7,7 +7,7 @@ import { css } from '@emotion/core';
  * Internal dependencies
  */
 import { buttonBase } from './base-styles';
-import { reduceMotion, config, color, darken } from '../../utils';
+import { reduceMotion, config, color, darken, rtl } from '../../utils';
 
 export const styles = css`
 	${ buttonBase }
@@ -18,7 +18,7 @@ export const styles = css`
 	border-radius: 0;
 	background: none;
 	outline: none;
-	text-align: left;
+	${ rtl( { textAlign: 'left' }, { textAlign: 'right' } )() }
 	/* Mimics the default link style in common.css */
 	color: #0073aa;
 	text-decoration: underline;
