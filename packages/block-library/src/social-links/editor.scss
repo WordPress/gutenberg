@@ -7,11 +7,8 @@
 }
 
 // Prevent toolbar from jumping when selecting / hovering a link.
-.editor-styles-wrapper .wp-block-social-link {
-	&.is-selected,
-	&.is-hovered {
-		transform: none;
-	}
+.wp-social-link:hover {
+	transform: none;
 }
 
 .editor-styles-wrapper .wp-block-social-links {
@@ -30,10 +27,6 @@
 			padding-left: calc((2/3) * 1em);
 			padding-right: calc((2/3) * 1em);
 		}
-	}
-
-	.wp-social-link:hover {
-		transform: none;
 	}
 
 	.wp-social-link::before {
