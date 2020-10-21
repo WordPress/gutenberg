@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
 import {
@@ -9,6 +9,7 @@ import {
 	InnerBlocks,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -19,11 +20,14 @@ import QueryInspectorControls from './query-inspector-controls';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
 const TEMPLATE = [ [ 'core/query-loop' ] ];
+
 export default function QueryEdit( {
-	attributes: { queryId, query },
+	attributes: { queryId, query, innerBlocksTemplate },
 	context: { postId },
 	setAttributes,
+	clientId,
 } ) {
+	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
 	const instanceId = useInstanceId( QueryEdit );
 	const blockProps = useBlockProps();
 	const { postsPerPage } = useSelect( ( select ) => {
@@ -48,6 +52,38 @@ export default function QueryEdit( {
 			updateQuery( newQuery );
 		}
 	}, [ query.perPage, query.exclude, postId ] );
+
+	useEffect( () => {
+		// TODO check about other blocks as well like Pagination later
+		// TODO find query-loop programmatically
+		replaceInnerBlocks(
+			clientId,
+			createBlocksFromInnerBlocksTemplate( innerBlocksTemplate ),
+			false
+		);
+	}, [ innerBlocksTemplate, clientId ] );
+
+	// const updateInnerBlocksTemplate = ( value ) => {
+	// 	const newTpl = value.split( ',' ).reduce( ( res, x ) => {
+	// 		res.push( [ x ] );
+	// 		return res;
+	// 	}, [] );
+	// 	const newLoopTemplate = [
+	// 		[
+	// 			'core/query-loop',
+	// 			{
+	// 				// innerBlocksTemplate: newTpl,
+	// 			},
+	// 			newTpl,
+	// 		],
+	// 	];
+	// 	replaceInnerBlocks(
+	// 		clientId,
+	// 		createBlocksFromInnerBlocksTemplate( newLoopTemplate ),
+	// 		false
+	// 	);
+	// };
+
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
@@ -59,7 +95,12 @@ export default function QueryEdit( {
 		setAttributes( { query: { ...query, ...newQuery } } );
 	return (
 		<>
-			<QueryInspectorControls query={ query } setQuery={ updateQuery } />
+			<QueryInspectorControls
+				query={ query }
+				setQuery={ updateQuery }
+				// updateInnerBlocksTemplate={ updateInnerBlocksTemplate }
+				setAttributes={ setAttributes }
+			/>
 			<BlockControls>
 				<QueryToolbar query={ query } setQuery={ updateQuery } />
 			</BlockControls>

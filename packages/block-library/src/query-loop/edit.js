@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useState, useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useState, useMemo, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockContextProvider,
@@ -10,6 +10,7 @@ import {
 	BlockPreview,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -19,10 +20,11 @@ import { useQueryContext } from '../query';
 const TEMPLATE = [
 	[ 'core/post-title' ],
 	[ 'core/post-date' ],
-	[ 'core/post-excerpt' ],
+	// [ 'core/post-excerpt' ],
 ];
 export default function QueryLoopEdit( {
 	clientId,
+	attributes: { innerBlocksTemplate },
 	context: {
 		query: {
 			perPage,
@@ -41,6 +43,16 @@ export default function QueryLoopEdit( {
 } ) {
 	const [ { page } ] = useQueryContext() || queryContext || [ {} ];
 	const [ activeBlockContext, setActiveBlockContext ] = useState();
+
+	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
+	const template = innerBlocksTemplate || TEMPLATE;
+	useEffect( () => {
+		replaceInnerBlocks(
+			clientId,
+			createBlocksFromInnerBlocksTemplate( innerBlocksTemplate ),
+			false
+		);
+	}, [ innerBlocksTemplate, clientId ] );
 
 	const { posts, blocks } = useSelect(
 		( select ) => {
@@ -115,7 +127,7 @@ export default function QueryLoopEdit( {
 						{ blockContext ===
 						( activeBlockContext || blockContexts[ 0 ] ) ? (
 							<InnerBlocks
-								template={ TEMPLATE }
+								template={ template }
 								templateInsertUpdatesSelection={ false }
 							/>
 						) : (

@@ -21,6 +21,10 @@
 				"search": "",
 				"exclude": []
 			}
+		},
+		"innerBlocksTemplate": {
+			"type": "array",
+			"default": [ [ "core/query-loop" ] ]
 		}
 	},
 	"providesContext": {

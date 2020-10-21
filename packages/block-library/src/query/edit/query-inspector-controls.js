@@ -25,7 +25,11 @@ import { useEffect, useState, useCallback, useMemo } from '@wordpress/element';
 import { getTermsInfo } from '../utils';
 import { MAX_FETCHED_TERMS } from '../constants';
 
-export default function QueryInspectorControls( { query, setQuery } ) {
+export default function QueryInspectorControls( {
+	query,
+	setQuery,
+	setAttributes,
+} ) {
 	const { order, orderBy, author: selectedAuthorId, postType } = query;
 	const [ showCategories, setShowCategories ] = useState( true );
 	const [ showTags, setShowTags ] = useState( true );
@@ -111,8 +115,57 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
+
+	const [ tsek, setTsek ] = useState( '' );
+	const changeInnerBlocksOptions = [
+		{
+			label: 'Select something',
+			value: '',
+			disabled: true,
+		},
+		{
+			label: 'Title + Date',
+			value: 'core/post-title,core/post-date',
+		},
+		{
+			label: 'Title + Image',
+			value: 'core/post-title,core/post-featured-image',
+		},
+	];
 	return (
 		<InspectorControls>
+			<PanelBody title={ __( 'Tsek test' ) }>
+				<SelectControl
+					options={ changeInnerBlocksOptions }
+					value={ tsek }
+					label={ __( 'Hey.. test here :)' ) }
+					onChange={ ( value ) => {
+						setTsek( value );
+						// updateInnerBlocksTemplate( value );
+						if ( value ) {
+							const newTpl = value
+								.split( ',' )
+								.reduce( ( res, x ) => {
+									res.push( [ x ] );
+									return res;
+								}, [] );
+							const newLoopTemplate = [
+								[
+									'core/query-loop',
+									{
+										innerBlocksTemplate: newTpl,
+									},
+									// newTpl,
+								],
+							];
+
+							setAttributes( {
+								innerBlocksTemplate: newLoopTemplate,
+							} );
+						}
+					} }
+				/>
+			</PanelBody>
 			<PanelBody title={ __( 'Filtering and Sorting' ) }>
 				<SelectControl
 					options={ postTypesSelectOptions }
