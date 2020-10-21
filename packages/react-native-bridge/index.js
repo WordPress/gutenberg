@@ -300,10 +300,10 @@ export function requestMediaFilesUploadCancelDialog( mediaFiles ) {
 /**
  * Request the host app to show a cancel dialog for mediaFiles arrays currently undergoing a save operation
  *
- * Save operatoins on mediaFiles collection could  be lengthy so for example, tapping on a mediaFiles-type block
+ * Save operations on mediaFiles collection could  be lengthy so for example, tapping on a mediaFiles-type block
  * currently being saved would trigger this request and a "Cancel save?" dialog would be presented to the user
  *
- * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
+ * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item.
  */
 export function requestMediaFilesSaveCancelDialog( mediaFiles ) {
 	RNReactNativeGutenbergBridge.requestMediaFilesSaveCancelDialog(
