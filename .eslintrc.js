@@ -125,6 +125,7 @@ module.exports = {
 		// See https://github.com/WordPress/gutenberg/pull/22771 for the eslint-plugin-jsdoc update.
 		'jsdoc/check-param-names': 'warn',
 		'jsdoc/require-param': 'warn',
+		'jsdoc/check-tag-names': [ 'error', { definedTags: [ 'jsx' ] } ],
 	},
 	overrides: [
 		{
