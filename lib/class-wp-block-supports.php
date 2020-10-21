@@ -20,6 +20,13 @@ class WP_Block_Supports {
 	private $block_supports = array();
 
 	/**
+	 * Tracks the current block to be rendered.
+	 *
+	 * @var array
+	 */
+	private $block_to_render = null;
+
+	/**
 	 * Container for the main instance of the class.
 	 *
 	 * @var WP_Block_Supports|null
@@ -50,6 +57,30 @@ class WP_Block_Supports {
 	}
 
 	/**
+	 * Callback hooked to the register_block_type_args filter.
+	 *
+	 * This hooks into block registration to wrap the render_callback
+	 * of dynamic blocks with a closure that keeps track of the
+	 * current block to be rendered.
+	 *
+	 * @param array $args Block attributes.
+	 * @return void
+	 */
+	public static function track_current_block_to_render( $args ) {
+		if ( null !== $args['render_callback'] ) {
+			$block_render_callback   = $args['render_callback'];
+			$args['render_callback'] = function( $attributes, $content, $block ) use ( $block_render_callback ) {
+				$parent_block          = $this->block_to_render;
+				$this->block_to_render = $block->parsed_block;
+				$result                = $block_render_callback( $attributes, $content, $block );
+				$this->block_to_render = $parent_block;
+				return $result;
+			};
+		}
+		return $args;
+	}
+
+	/**
 	 * Registers a block support.
 	 *
 	 * @param string $block_support_name Block support name.
@@ -67,13 +98,12 @@ class WP_Block_Supports {
 	 * Generates an array of HTML attributes, such as classes, by applying to
 	 * the given block all of the features that the block supports.
 	 *
-	 * @param  array $parsed_block Block as parsed from content.
 	 * @return array               Array of HTML attributes.
 	 */
-	public function apply_block_supports( $parsed_block ) {
-		$block_attributes = $parsed_block['attrs'];
+	public function apply_block_supports() {
+		$block_attributes = $this->block_to_render['attrs'];
 		$block_type       = WP_Block_Type_Registry::get_instance()->get_registered(
-			$parsed_block['blockName']
+			$this->block_to_render['blockName']
 		);
 
 		// If no render_callback, assume styles have been previously handled.
@@ -144,8 +174,7 @@ class WP_Block_Supports {
  * @return string String of HTML classes.
  */
 function get_block_wrapper_attributes( $extra_attributes = array() ) {
-	global $current_parsed_block;
-	$new_attributes = WP_Block_Supports::get_instance()->apply_block_supports( $current_parsed_block );
+	$new_attributes = WP_Block_Supports::get_instance()->apply_block_supports();
 
 	if ( empty( $new_attributes ) && empty( $extra_attributes ) ) {
 		return '';
@@ -192,3 +221,4 @@ function get_block_wrapper_attributes( $extra_attributes = array() ) {
 }
 
 add_action( 'init', array( 'WP_Block_Supports', 'init' ), 22 );
+add_filter( 'register_block_type_args', array( 'WP_Block_Supports', 'track_current_block_to_render' ) );
