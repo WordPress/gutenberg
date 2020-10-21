@@ -7,7 +7,7 @@ import { css } from '@emotion/core';
 /**
  * Internal dependencies
  */
-import { color, reduceMotion, rtl, zIndex } from '../../utils';
+import { color, reduceMotion, rtl, zIndex, config } from '../../utils';
 import {
 	toggleBorderWidth,
 	toggleWidth,
@@ -91,9 +91,7 @@ export const StyledFormToggle = styled.span`
 
     ${ StyledToggleInput }:focus + ${ StyledToggleTrack } {
 		box-shadow: 0 0 0 2px ${ color( 'white' ) },
-			0 0 0 ${
-				2 + 1.5 /* @todo(saramarcondes) remove inlined variable */
-			}px var( --wp-admin-theme-color );
+			0 0 0 calc( 2px + ${ config('borderWidthFocus') } )) var( --wp-admin-theme-color );
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
