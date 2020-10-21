@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { View, Text, Clipboard } from 'react-native';
 import React from 'react';
 
 /**
@@ -22,17 +22,21 @@ import {
 	ToolbarGroup,
 	PanelBody,
 	ToggleControl,
+	BottomSheet,
+	withNotices,
 } from '@wordpress/components';
 import { file as icon, replace, button } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
+import { compose } from '@wordpress/compose';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 
-export default class FileEdit extends Component {
+export class FileEdit extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -53,6 +57,7 @@ export default class FileEdit extends Component {
 		this.onChangeDownloadButtonVisibility = this.onChangeDownloadButtonVisibility.bind(
 			this
 		);
+		this.onCopyURL = this.onCopyURL.bind( this );
 	}
 
 	componentDidMount() {
@@ -85,6 +90,13 @@ export default class FileEdit extends Component {
 
 	onChangeDownloadButtonVisibility( showDownloadButton ) {
 		this.props.setAttributes( { showDownloadButton } );
+	}
+
+	onCopyURL() {
+		const { href } = this.props.attributes;
+		Clipboard.setString( href );
+		this.props.closeSettings();
+		this.props.createInfoNotice( __( 'Copied!' ) );
 	}
 
 	updateMediaProgress( payload ) {
@@ -132,7 +144,7 @@ export default class FileEdit extends Component {
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarButton
-						title={ __( 'Edit image' ) }
+						title={ __( 'Edit file' ) }
 						icon={ replace }
 						onClick={ open }
 					/>
@@ -151,6 +163,10 @@ export default class FileEdit extends Component {
 						label={ __( 'Show download button' ) }
 						checked={ showDownloadButton }
 						onChange={ this.onChangeDownloadButtonVisibility }
+					/>
+					<BottomSheet.Cell
+						label={ __( 'Copy file URL' ) }
+						onPress={ this.onCopyURL }
 					/>
 				</PanelBody>
 			</InspectorControls>
@@ -252,3 +268,16 @@ export default class FileEdit extends Component {
 		);
 	}
 }
+
+export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { createInfoNotice } = dispatch( 'core/editor' );
+		return {
+			closeSettings() {
+				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+			},
+			createInfoNotice,
+		};
+	} ),
+	withNotices,
+] )( FileEdit );
