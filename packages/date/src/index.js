@@ -613,3 +613,5 @@ export function getDate( dateString ) {
 	const actualDate = dateString ? new Date( dateString ) : new Date();
 	return toDate( actualDate, { timeZone: getActualTimezone() } );
 }
+
+export { zonedTimeToUtc };
