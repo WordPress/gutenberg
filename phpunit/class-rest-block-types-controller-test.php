@@ -61,21 +61,21 @@ class REST_Block_Types_Controller_Test extends WP_Test_REST_TestCase {
 	 *
 	 * @dataProvider dataProviderTestCases
 	 */
-	public function test_links_in_block( $blockName, $blockParameters ) {
+	public function test_links_in_block( $block_name, $block_parameters ) {
 		wp_set_current_user( self::$admin_id );
-		register_block_type( $blockName, $blockParameters );
-		$endpoint = sprintf( '/wp/v2/block-types/%s', $blockName );
+		register_block_type( $block_name, $block_parameters );
+		$endpoint = sprintf( '/wp/v2/block-types/%s', $block_name );
 		$request  = new WP_REST_Request( 'GET', $endpoint );
 		$response = rest_get_server()->dispatch( $request );
 		$links    = $response->get_links();
 		$this->assertEquals( 200, $response->get_status() );
-		foreach ( $blockParameters as $blockParameter => $parameterValue ) {
-			$linksKey = sprintf( 'https://api.w.org/%s', $blockParameter );
-			if ( empty( $parameterValue ) ) {
-				$this->assertArrayNotHasKey( $linksKey, $links );
+		foreach ( $block_parameters as $block_parameter => $parameter_value ) {
+			$links_key = sprintf( 'https://api.w.org/%s', $block_parameter );
+			if ( empty( $parameter_value ) ) {
+				$this->assertArrayNotHasKey( $links_key, $links );
 			} else {
-				$this->assertArrayHasKey( $linksKey, $links );
-				$this->assertNotEmpty( $links[ $linksKey ] );
+				$this->assertArrayHasKey( $links_key, $links );
+				$this->assertNotEmpty( $links[ $links_key ] );
 			}
 		}
 	}
