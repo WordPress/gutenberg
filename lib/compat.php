@@ -530,9 +530,9 @@ $current_parsed_block = array(
  * @param array $args Block attributes.
  * @return array Block attributes.
  */
-function gutenberg_current_parsed_block_tracking( $args ){
-	if ( NULL !== $args['render_callback'] ) {
-		$block_render_callback = $args['render_callback'];
+function gutenberg_current_parsed_block_tracking( $args ) {
+	if ( null !== $args['render_callback'] ) {
+		$block_render_callback   = $args['render_callback'];
 		$args['render_callback'] = function( $attributes, $content, $block ) use ( $block_render_callback ) {
 			global $current_parsed_block;
 			$parent_parsed_block  = $current_parsed_block;
