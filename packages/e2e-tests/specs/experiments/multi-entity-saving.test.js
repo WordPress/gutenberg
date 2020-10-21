@@ -244,8 +244,8 @@ describe( 'Multi-entity save flow', () => {
 			const firstBlock = await page.$( '.wp-block' );
 			await firstBlock.click();
 
-			// Insert a new template part placeholder.
-			await insertBlock( 'Template Part' );
+			// Insert something to dirty the editor.
+			await insertBlock( 'Paragraph' );
 
 			const enabledButton = await page.waitForSelector(
 				activeSaveSiteSelector
