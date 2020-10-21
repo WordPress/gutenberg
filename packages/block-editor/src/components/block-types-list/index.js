@@ -7,7 +7,7 @@ import { Composite, useCompositeState } from 'reakit';
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
-import { useEffect } from '@wordpress/element';
+import { useEffect, memo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -67,4 +67,4 @@ function BlockTypesList( {
 	);
 }
 
-export default BlockTypesList;
+export default memo( BlockTypesList );
