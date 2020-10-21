@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button, ButtonGroup, Icon } from '@wordpress/components';
+import { Button, Icon } from '@wordpress/components';
 import { formatStrikethrough } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -52,8 +52,8 @@ export default function TextDecorationControl( {
 
 	return (
 		<fieldset className="block-editor-text-decoration-control">
-			<legend>{ __( 'Text Decoration' ) }</legend>
-			<ButtonGroup>
+			<legend>{ __( 'Decoration' ) }</legend>
+			<div className="block-editor-text-decoration-control__buttons">
 				{ textDecorations.map( ( presetDecoration ) => {
 					return (
 						<Button
@@ -72,7 +72,7 @@ export default function TextDecorationControl( {
 						</Button>
 					);
 				} ) }
-			</ButtonGroup>
+			</div>
 		</fieldset>
 	);
 }

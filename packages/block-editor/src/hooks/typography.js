@@ -29,7 +29,6 @@ import {
 } from './font-size';
 import {
 	TEXT_DECORATION_SUPPORT_KEY,
-	TextDecorationEdit,
 	useIsTextDecorationDisabled,
 } from './text-decoration';
 import {
@@ -56,7 +55,6 @@ export function TypographyPanel( props ) {
 			<PanelBody title={ __( 'Typography' ) }>
 				<FontFamilyEdit { ...props } />
 				<FontSizeEdit { ...props } />
-				<TextDecorationEdit { ...props } />
 				<LineHeightEdit { ...props } />
 				<TextDecorationAndTransformEdit { ...props } />
 			</PanelBody>
