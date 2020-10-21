@@ -518,3 +518,14 @@ function gutenberg_override_reusable_block_post_type_labels() {
 	);
 }
 add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post_type_labels', 10, 0 );
+
+function gutenberg_check_render_callback( $args, $block_name ){
+	if ( NULL !== $args['render_callback'] ) {
+		$block_render_callback = $args['render_callback'];
+		$args['render_callback'] = function( $attributes, $content, $block ) use ( $block_render_callback ) {
+			return $block_render_callback( $attributes, $content, $block );
+		};
+	}
+	return $args;
+}
+add_filter( 'register_block_type_args', 'gutenberg_check_render_callback', 10, 2 );
