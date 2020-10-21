@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
+import TextDecorationAndTransformEdit from '../components/text-decoration-and-transform';
 
 import {
 	LINE_HEIGHT_SUPPORT_KEY,
@@ -23,7 +24,6 @@ import {
 } from './font-size';
 import {
 	TEXT_TRANSFORM_SUPPORT_KEY,
-	TextTransformEdit,
 	useIsTextTransformDisabled,
 } from './text-transform';
 
@@ -43,8 +43,8 @@ export function TypographyPanel( props ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Typography' ) }>
 				<FontSizeEdit { ...props } />
-				<TextTransformEdit { ...props } />
 				<LineHeightEdit { ...props } />
+				<TextDecorationAndTransformEdit { ...props } />
 			</PanelBody>
 		</InspectorControls>
 	);

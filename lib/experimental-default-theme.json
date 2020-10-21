@@ -163,16 +163,16 @@
 				],
 				"textTransforms": [
 					{
-						"name": "Capitalize",
-						"slug": "capitalize"
+						"name": "AB",
+						"slug": "uppercase"
 					},
 					{
-						"name": "Lowercase",
+						"name": "ab",
 						"slug": "lowercase"
 					},
 					{
-						"name": "Uppercase",
-						"slug": "uppercase"
+						"name": "Ab",
+						"slug": "capitalize"
 					}
 				]
 			},

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button, ButtonGroup } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -53,13 +53,14 @@ export default function TextTransformControl( {
 
 	return (
 		<fieldset className="block-editor-text-transform-control">
-			<legend>{ __( 'Text Transform' ) }</legend>
-			<ButtonGroup>
+			<legend>{ __( 'Letter case' ) }</legend>
+			<div className="block-editor-text-transform-control__buttons">
 				{ textTransforms.map( ( presetTransform ) => {
 					return (
 						<Button
 							key={ presetTransform.slug }
 							icon={ icons[ presetTransform.slug ] }
+							iconSize={ 24 }
 							isSmall
 							isPressed={ textTransform === presetTransform.slug }
 							onClick={ () =>
@@ -71,7 +72,7 @@ export default function TextTransformControl( {
 						</Button>
 					);
 				} ) }
-			</ButtonGroup>
+			</div>
 		</fieldset>
 	);
 }
