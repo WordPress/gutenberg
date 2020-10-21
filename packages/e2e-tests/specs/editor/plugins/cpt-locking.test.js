@@ -180,4 +180,67 @@ describe( 'cpt locking', () => {
 
 		it( 'should allow blocks to be moved', shouldAllowBlocksToBeMoved );
 	} );
+
+	describe( 'template_lock all unlocked group', () => {
+		beforeEach( async () => {
+			await createNewPost( {
+				postType: 'l-post-ul-group',
+			} );
+		} );
+
+		it( 'should allow blocks to be removed', async () => {
+			await page.type(
+				'.block-editor-rich-text__editable[data-type="core/paragraph"]',
+				'p1'
+			);
+			await clickBlockToolbarButton( 'More options' );
+			const [ removeBlock ] = await page.$x(
+				'//button[contains(text(), "Remove block")]'
+			);
+			await removeBlock.click();
+			expect( await getEditedPostContent() ).toMatchSnapshot();
+		} );
+
+		it( 'should allow blocks to be moved', shouldAllowBlocksToBeMoved );
+	} );
+
+	describe( 'template_lock all locked group', () => {
+		beforeEach( async () => {
+			await createNewPost( {
+				postType: 'l-post-l-group',
+			} );
+		} );
+
+		it(
+			'should not allow blocks to be removed',
+			shouldNotAllowBlocksToBeRemoved
+		);
+
+		it( 'should not allow blocks to be moved', async () => {
+			await page.click(
+				'.block-editor-rich-text__editable[data-type="core/paragraph"]'
+			);
+			expect( await page.$( 'button[aria-label="Move up"]' ) ).toBeNull();
+		} );
+	} );
+
+	describe( 'template_lock all inherited group', () => {
+		beforeEach( async () => {
+			await createNewPost( {
+				postType: 'l-post-i-group',
+			} );
+		} );
+
+		it(
+			'should not allow blocks to be removed',
+			shouldNotAllowBlocksToBeRemoved
+		);
+
+		it( 'should not allow blocks to be moved', async () => {
+			await page.click(
+				'.block-editor-rich-text__editable[data-type="core/paragraph"]'
+			);
+			expect( await page.$( 'button[aria-label="Move up"]' ) ).toBeNull();
+		} );
+	} );
 } );

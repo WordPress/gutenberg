@@ -17,12 +17,15 @@ import { STORE_KEY } from '../../store/constants';
 /**
  * Menu control to convert block(s) to reusable block.
  *
- * @param {Object}   props           Component props.
- * @param {string[]} props.clientIds Client ids of selected blocks.
- *
+ * @param {Object}   props              Component props.
+ * @param {string[]} props.clientIds    Client ids of selected blocks.
+ * @param {string}   props.rootClientId ID of the currently selected top-level block.
  * @return {import('@wordpress/element').WPComponent} The menu control or null.
  */
-export default function ReusableBlockConvertButton( { clientIds } ) {
+export default function ReusableBlockConvertButton( {
+	clientIds,
+	rootClientId,
+} ) {
 	const canConvert = useSelect(
 		( select ) => {
 			const { canUser } = select( 'core' );
@@ -46,7 +49,7 @@ export default function ReusableBlockConvertButton( { clientIds } ) {
 				// Hide when this is already a reusable block.
 				! isReusable &&
 				// Hide when reusable blocks are disabled.
-				canInsertBlockType( 'core/block' ) &&
+				canInsertBlockType( 'core/block', rootClientId ) &&
 				blocks.every(
 					( block ) =>
 						// Guard against the case where a regular block has *just* been converted.

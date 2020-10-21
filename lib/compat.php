@@ -370,7 +370,7 @@ add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
  * Shim that hooks into `pre_render_block` so as to override `render_block` with
  * a function that assigns block context.
  *
- * This can be removed when plugin support requires WordPress 5.5.0+.
+ * The context handling can be removed when plugin support requires WordPress 5.5.0+.
  *
  * @see https://core.trac.wordpress.org/ticket/49927
  * @see https://core.trac.wordpress.org/changeset/48243
@@ -508,3 +508,40 @@ function gutenberg_override_reusable_block_post_type_labels() {
 	);
 }
 add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post_type_labels', 10, 0 );
+
+global $current_parsed_block;
+$current_parsed_block = array(
+	'blockName'  => null,
+	'attributes' => null,
+);
+
+/**
+ * Wraps the render_callback of dynamic blocks to keep track
+ * of the current block being rendered via a global variable
+ * called $current_parsed_block.
+ *
+ * This is for get_block_wrapper_attributes to get access
+ * to the runtime data of the block being rendered.
+ *
+ * This shim can be removed when the plugin requires WordPress 5.6.
+ *
+ * @since 9.2.1
+ *
+ * @param array $args Block attributes.
+ * @return array Block attributes.
+ */
+function gutenberg_current_parsed_block_tracking( $args ) {
+	if ( null !== $args['render_callback'] ) {
+		$block_render_callback   = $args['render_callback'];
+		$args['render_callback'] = function( $attributes, $content, $block ) use ( $block_render_callback ) {
+			global $current_parsed_block;
+			$parent_parsed_block  = $current_parsed_block;
+			$current_parsed_block = $block->parsed_block;
+			$result               = $block_render_callback( $attributes, $content, $block );
+			$current_parsed_block = $parent_parsed_block;
+			return $result;
+		};
+	}
+	return $args;
+}
+add_filter( 'register_block_type_args', 'gutenberg_current_parsed_block_tracking' );

@@ -22,7 +22,8 @@
 		{ "path": "packages/project-management-automation" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/url" },
-		{ "path": "packages/warning" }
+		{ "path": "packages/warning" },
+		{ "path": "packages/wordcount" }
 	],
 	"files": []
 }

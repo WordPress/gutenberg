@@ -6,21 +6,20 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 import {
 	__experimentalGetBlockLabel as getBlockLabel,
 	getBlockType,
 } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { Dropdown, Button, VisuallyHidden } from '@wordpress/components';
+import {
+	Dropdown,
+	Button,
+	VisuallyHidden,
+	__experimentalText as Text,
+} from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import TemplateDetails from '../../template-details';
-import { getTemplateInfo } from '../../../utils';
 
 function getBlockDisplayText( block ) {
 	return block
@@ -50,18 +49,36 @@ function useSecondaryText() {
 	return {};
 }
 
-export default function DocumentActions( { template } ) {
-	const { title: documentTitle } = getTemplateInfo( template );
-	const { label, isActive } = useSecondaryText();
-
-	// Title is active when there is no secondary item, or when the secondary
-	// item is inactive.
-	const isTitleActive = ! label?.length || ! isActive;
+/**
+ * @param {Object}   props             Props for the DocumentActions component.
+ * @param {string}   props.entityTitle The title to display.
+ * @param {string}   props.entityLabel A label to use for entity-related options.
+ *                                     E.g. "template" would be used for "edit
+ *                                     template" and "show template details".
+ * @param {Function} props.children    React component to use for the
+ *                                     information dropdown area. Should be a
+ *                                     function which accepts dropdown props.
+ */
+export default function DocumentActions( {
+	entityTitle,
+	entityLabel,
+	children: dropdownContent,
+} ) {
+	const { label } = useSecondaryText();
 
 	// The title ref is passed to the popover as the anchorRef so that the
 	// dropdown is centered over the whole title area rather than just one
 	// part of it.
 	const titleRef = useRef();
+
+	// Return a simple loading indicator until we have information to show.
+	if ( ! entityTitle ) {
+		return (
+			<div className="edit-site-document-actions">
+				{ __( 'Loading…' ) }
+			</div>
+		);
+	}
 
 	return (
 		<div
@@ -69,65 +86,56 @@ export default function DocumentActions( { template } ) {
 				'has-secondary-label': !! label,
 			} ) }
 		>
-			{ documentTitle ? (
-				<>
-					<div
-						ref={ titleRef }
-						className="edit-site-document-actions__title-wrapper"
+			<div
+				ref={ titleRef }
+				className="edit-site-document-actions__title-wrapper"
+			>
+				<h1>
+					<VisuallyHidden>
+						{ sprintf(
+							/* translators: %s: the entity being edited, like "template"*/
+							__( 'Edit %s:' ),
+							entityLabel
+						) }
+					</VisuallyHidden>
+					<Text
+						variant="subtitle.small"
+						className="edit-site-document-actions__title"
 					>
-						<h1>
-							<VisuallyHidden>
-								{ __( 'Edit template:' ) }
-							</VisuallyHidden>
-							<div
-								className={ classnames(
-									'edit-site-document-actions__title',
-									{
-										'is-active': isTitleActive,
-										'is-secondary-title-active': isActive,
-									}
-								) }
-							>
-								{ documentTitle }
-							</div>
-						</h1>
-						{ ! isActive && (
-							<Dropdown
-								popoverProps={ {
-									anchorRef: titleRef.current,
-								} }
-								position="bottom center"
-								renderToggle={ ( { isOpen, onToggle } ) => (
-									<Button
-										className="edit-site-document-actions__get-info"
-										icon={ chevronDown }
-										aria-expanded={ isOpen }
-										aria-haspopup="true"
-										onClick={ onToggle }
-										label={ __( 'Show template details' ) }
-									/>
-								) }
-								renderContent={ () => (
-									<TemplateDetails template={ template } />
+						{ entityTitle }
+					</Text>
+				</h1>
+				{ dropdownContent && (
+					<Dropdown
+						popoverProps={ {
+							anchorRef: titleRef.current,
+						} }
+						position="bottom center"
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<Button
+								className="edit-site-document-actions__get-info"
+								icon={ chevronDown }
+								aria-expanded={ isOpen }
+								aria-haspopup="true"
+								onClick={ onToggle }
+								label={ sprintf(
+									/* translators: %s: the entity to see details about, like "template"*/
+									__( 'Show %s details' ),
+									entityLabel
 								) }
 							/>
 						) }
-					</div>
-
-					<div
-						className={ classnames(
-							'edit-site-document-actions__secondary-item',
-							{
-								'is-secondary-title-active': isActive,
-							}
-						) }
-					>
-						{ label ?? '' }
-					</div>
-				</>
-			) : (
-				__( 'Loading…' )
-			) }
+						contentClassName="edit-site-document-actions__info-dropdown"
+						renderContent={ dropdownContent }
+					/>
+				) }
+			</div>
+			<Text
+				variant="body"
+				className="edit-site-document-actions__secondary-item"
+			>
+				{ label ?? '' }
+			</Text>
 		</div>
 	);
 }

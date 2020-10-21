@@ -32,7 +32,6 @@ export default function ButtonsEdit( {
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
-	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
 	const { marginLeft: spacing } = styles.spacing;
 
 	const { getBlockOrder, isInnerButtonSelected, shouldDelete } = useSelect(
@@ -102,6 +101,8 @@ export default function ButtonsEdit( {
 	const alignmentHooksSetting = {
 		isEmbedButton: true,
 	};
+
+	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
 
 	return (
 		<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>

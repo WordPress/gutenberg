@@ -18,6 +18,7 @@ class LegacyWidgetEditDomManager extends Component {
 		this.idBaseInputRef = createRef();
 		this.widgetNumberInputRef = createRef();
 		this.triggerWidgetEvent = this.triggerWidgetEvent.bind( this );
+		this.handleChange = this.handleChange.bind( this );
 	}
 
 	componentDidMount() {
@@ -25,6 +26,23 @@ class LegacyWidgetEditDomManager extends Component {
 		if ( this.props.onMount ) {
 			this.props.onMount( this.getFormData() );
 		}
+
+		const form = this.formRef.current;
+		if ( form ) {
+			// We have to bind the events to the form element via `addEventListener`,
+			// because some inputs are not rendered by React, hence can't be captured by React's event system.
+			form.addEventListener( 'change', this.handleChange );
+			form.addEventListener( 'input', this.handleChange );
+		}
+	}
+
+	componentWillUnmount() {
+		const form = this.formRef.current;
+		if ( form ) {
+			form.removeEventListener( 'change', this.handleChange );
+			form.removeEventListener( 'input', this.handleChange );
+		}
+		window.cancelAnimationFrame( this.rafId );
 	}
 
 	shouldComponentUpdate( nextProps ) {
@@ -58,19 +76,21 @@ class LegacyWidgetEditDomManager extends Component {
 		return false;
 	}
 
+	handleChange() {
+		if ( ! this.rafId ) {
+			this.rafId = window.requestAnimationFrame( () => {
+				this.props.onInstanceChange( this.getFormData() );
+				this.rafId = null;
+			} );
+		}
+	}
+
 	render() {
 		const { id, idBase, number, form } = this.props;
 		return (
 			<div className="widget open" ref={ this.containerRef }>
 				<div className="widget-inside">
-					<form
-						className="form"
-						ref={ this.formRef }
-						method="post"
-						onBlur={ () =>
-							this.props.onInstanceChange( this.getFormData() )
-						}
-					>
+					<form className="form" ref={ this.formRef } method="post">
 						<div
 							ref={ this.widgetContentRef }
 							className="widget-content"

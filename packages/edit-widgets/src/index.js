@@ -9,8 +9,10 @@ import '@wordpress/notices';
 import { render } from '@wordpress/element';
 import {
 	registerCoreBlocks,
+	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
+import '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
@@ -28,12 +30,16 @@ import Layout from './components/layout';
  * @param {Object} settings Block editor settings.
  */
 export function initialize( id, settings ) {
-	registerCoreBlocks();
+	const coreBlocks = __experimentalGetCoreBlocks().filter(
+		( block ) => ! [ 'core/more' ].includes( block.name )
+	);
+	registerCoreBlocks( coreBlocks );
+
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
 		__experimentalRegisterExperimentalCoreBlocks( settings );
-		registerBlock( createLegacyWidget( settings ) );
-		registerBlock( widgetArea );
 	}
+	registerBlock( createLegacyWidget( settings ) );
+	registerBlock( widgetArea );
 	render(
 		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )

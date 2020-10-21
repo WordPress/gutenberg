@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "9.1.1",
+	"version": "9.2.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -235,7 +235,7 @@
 		"lint:md-docs": "wp-scripts lint-md-docs",
 		"native": "npm run --prefix packages/react-native-editor",
 		"pot-to-php": "./bin/pot-to-php.js",
-		"postinstall": "patch-package",
+		"postinstall": "patch-package && node ./patches/patch-xcode.js",
 		"publish:check": "lerna updated",
 		"publish:dev": "npm run clean:package-types && npm run build:packages && lerna publish prerelease --preid rc --dist-tag next",
 		"publish:patch": "npm run clean:package-types && npm run build:packages && lerna publish --dist-tag patch",
