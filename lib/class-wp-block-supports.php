@@ -24,7 +24,7 @@ class WP_Block_Supports {
 	 *
 	 * @var array
 	 */
-	private $block_to_render = null;
+	private static $block_to_render = null;
 
 	/**
 	 * Container for the main instance of the class.
@@ -64,16 +64,16 @@ class WP_Block_Supports {
 	 * current block to be rendered.
 	 *
 	 * @param array $args Block attributes.
-	 * @return void
+	 * @return array Block attributes.
 	 */
-	public static function track_current_block_to_render( $args ) {
+	public static function track_block_to_render( $args ) {
 		if ( null !== $args['render_callback'] ) {
 			$block_render_callback   = $args['render_callback'];
 			$args['render_callback'] = function( $attributes, $content, $block ) use ( $block_render_callback ) {
-				$parent_block          = $this->block_to_render;
-				$this->block_to_render = $block->parsed_block;
+				$parent_block          = self::$block_to_render;
+				self::$block_to_render = $block->parsed_block;
 				$result                = $block_render_callback( $attributes, $content, $block );
-				$this->block_to_render = $parent_block;
+				self::$block_to_render = $parent_block;
 				return $result;
 			};
 		}
@@ -101,9 +101,9 @@ class WP_Block_Supports {
 	 * @return array               Array of HTML attributes.
 	 */
 	public function apply_block_supports() {
-		$block_attributes = $this->block_to_render['attrs'];
+		$block_attributes = self::$block_to_render['attrs'];
 		$block_type       = WP_Block_Type_Registry::get_instance()->get_registered(
-			$this->block_to_render['blockName']
+			self::$block_to_render['blockName']
 		);
 
 		// If no render_callback, assume styles have been previously handled.
@@ -221,4 +221,4 @@ function get_block_wrapper_attributes( $extra_attributes = array() ) {
 }
 
 add_action( 'init', array( 'WP_Block_Supports', 'init' ), 22 );
-add_filter( 'register_block_type_args', array( 'WP_Block_Supports', 'track_current_block_to_render' ) );
+add_filter( 'register_block_type_args', array( 'WP_Block_Supports', 'track_block_to_render' ) );
