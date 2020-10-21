@@ -25,7 +25,7 @@ import {
 	BottomSheet,
 	withNotices,
 } from '@wordpress/components';
-import { file as icon, replace, button } from '@wordpress/icons';
+import { file as icon, replace, button, external } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
@@ -58,6 +58,9 @@ export class FileEdit extends Component {
 			this
 		);
 		this.onCopyURL = this.onCopyURL.bind( this );
+		this.onChangeOpenInNewWindow = this.onChangeOpenInNewWindow.bind(
+			this
+		);
 	}
 
 	componentDidMount() {
@@ -97,6 +100,12 @@ export class FileEdit extends Component {
 		Clipboard.setString( href );
 		this.props.closeSettings();
 		this.props.createInfoNotice( __( 'Copied!' ) );
+	}
+
+	onChangeOpenInNewWindow( newValue ) {
+		this.props.setAttributes( {
+			textLinkTarget: newValue ? '_blank' : false,
+		} );
 	}
 
 	updateMediaProgress( payload ) {
@@ -153,11 +162,17 @@ export class FileEdit extends Component {
 		);
 	}
 
-	getInspectorControls( { showDownloadButton } ) {
+	getInspectorControls( { showDownloadButton, textLinkTarget } ) {
 		return (
 			<InspectorControls>
 				<PanelBody title={ __( 'File block settings' ) } />
 				<PanelBody>
+					<ToggleControl
+						icon={ external }
+						label={ __( 'Open in new tab' ) }
+						checked={ textLinkTarget === '_blank' }
+						onChange={ this.onChangeOpenInNewWindow }
+					/>
 					<ToggleControl
 						icon={ button }
 						label={ __( 'Show download button' ) }
