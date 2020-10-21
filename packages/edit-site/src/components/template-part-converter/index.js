@@ -4,7 +4,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 import { MenuItem } from '@wordpress/components';
-import { switchToBlockType } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 export default function TemplatePartConverter() {
@@ -19,6 +19,12 @@ export default function TemplatePartConverter() {
 		};
 	} );
 	const { replaceBlocks } = useDispatch( 'core/block-editor' );
+
+	// Avoid transforming a single `core/template-part` block.
+	if ( blocks.length === 1 && blocks[ 0 ].name === 'core/template-part' ) {
+		return null;
+	}
+
 	return (
 		<BlockSettingsMenuControls>
 			{ ( { onClose } ) => (
@@ -26,10 +32,16 @@ export default function TemplatePartConverter() {
 					onClick={ () => {
 						replaceBlocks(
 							clientIds,
-							switchToBlockType(
-								blocks,
+							createBlock(
 								'core/template-part',
-								true
+								{},
+								blocks.map( ( block ) =>
+									createBlock(
+										block.name,
+										block.attributes,
+										block.innerBlocks
+									)
+								)
 							)
 						);
 						onClose();
