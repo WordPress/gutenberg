@@ -39,7 +39,7 @@ const sizeOptions = [
 
 export function SocialLinksEdit( props ) {
 	const {
-		attributes: { iconSize, openInNewTab },
+		attributes: { size, openInNewTab },
 		setAttributes,
 	} = props;
 
@@ -51,7 +51,7 @@ export function SocialLinksEdit( props ) {
 		</div>
 	);
 
-	const className = classNames( iconSize );
+	const className = classNames( size );
 	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
@@ -96,17 +96,17 @@ export function SocialLinksEdit( props ) {
 								return (
 									<MenuItem
 										icon={
-											( iconSize === entry.value ||
-												( ! iconSize &&
+											( size === entry.value ||
+												( ! size &&
 													entry.value ===
 														'has-normal-icon-size' ) ) &&
 											check
 										}
-										isSelected={ iconSize === entry.value }
+										isSelected={ size === entry.value }
 										key={ entry.value }
 										onClick={ () =>
 											setAttributes( {
-												iconSize: entry.value,
+												size: entry.value,
 											} )
 										}
 										role="menuitemradio"

@@ -10,10 +10,10 @@ import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( props ) {
 	const {
-		attributes: { iconSize },
+		attributes: { size },
 	} = props;
 
-	const className = classNames( iconSize );
+	const className = classNames( size );
 
 	return (
 		<ul { ...useBlockProps.save( { className } ) }>

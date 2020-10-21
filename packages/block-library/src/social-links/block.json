@@ -7,7 +7,7 @@
 			"type": "boolean",
 			"default": false
 		},
-		"iconSize": {
+		"size": {
 			"type": "string"
 		}
 	},
