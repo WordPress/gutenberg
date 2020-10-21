@@ -188,6 +188,31 @@ export class FileEdit extends Component {
 		);
 	}
 
+	getStyleForAlignment( align ) {
+		const getFlexAlign = ( alignment ) => {
+			switch ( alignment ) {
+				case 'right':
+					return 'flex-end';
+				case 'center':
+					return 'center';
+				default:
+					return 'flex-start';
+			}
+		};
+		return { alignSelf: getFlexAlign( align ) };
+	}
+
+	getTextAlignmentForAlignment( align ) {
+		switch ( align ) {
+			case 'right':
+				return 'right';
+			case 'center':
+				return 'center';
+			default:
+				return 'left';
+		}
+	}
+
 	getFileComponent( openMediaOptions, getMediaOptions ) {
 		const { attributes } = this.props;
 		const {
@@ -195,6 +220,7 @@ export class FileEdit extends Component {
 			downloadButtonText,
 			id,
 			showDownloadButton,
+			align,
 		} = attributes;
 
 		const dimmedStyle =
@@ -234,9 +260,17 @@ export class FileEdit extends Component {
 								underlineColorAndroid="transparent"
 								value={ fileName }
 								deleteEnter={ true }
+								textAlign={ this.getTextAlignmentForAlignment(
+									align
+								) }
 							/>
 							{ showDownloadButton && (
-								<View style={ finalButtonStyle }>
+								<View
+									style={ [
+										finalButtonStyle,
+										this.getStyleForAlignment( align ),
+									] }
+								>
 									<PlainText
 										value={ downloadButtonText }
 										onChange={
