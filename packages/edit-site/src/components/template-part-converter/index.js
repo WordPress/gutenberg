@@ -21,7 +21,7 @@ export default function TemplatePartConverter() {
 	const { replaceBlocks } = useDispatch( 'core/block-editor' );
 
 	// Avoid transforming a single `core/template-part` block.
-	if ( blocks.length === 1 && blocks[ 0 ].name === 'core/template-part' ) {
+	if ( blocks.length === 1 && blocks[ 0 ]?.name === 'core/template-part' ) {
 		return null;
 	}
 
