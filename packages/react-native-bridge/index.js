@@ -258,7 +258,7 @@ export function setStarterPageTemplatesTooltipShown( tooltipShown ) {
  * For example, a mediaFiles collection editor can make special handling of visualization
  * in this regard.
  *
- * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
+ * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item.
  * @param {string} blockClientId the clientId of the block.
  */
 export function requestMediaFilesEditorLoad( mediaFiles, blockClientId ) {
@@ -287,7 +287,7 @@ export function requestMediaFilesFailedRetryDialog( mediaFiles ) {
  * Request the host app to show a cancel dialog for mediaFiles arrays currently being uploaded
  *
  * For example, tapping on a block containing mediaFiles that are currently being uplaoded would trigger this request
- * and a "Cancel upload?" dialog would be presented to the user
+ * and a "Cancel upload?" dialog would be presented to the user.
  *
  * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
  */
