@@ -169,7 +169,8 @@ export const ItemUI = styled.li`
 `;
 
 export const ItemBadgeUI = styled.span`
-	margin-left: 8px;
+	margin-left: ${ ( props ) => ( props.isRTL ? '0' : '8px' ) };
+	margin-right: ${ ( props ) => ( props.isRTL ? '8px' : '0' ) };
 	display: inline-flex;
 	padding: 4px 12px;
 	border-radius: 2px;

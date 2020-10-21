@@ -75,7 +75,10 @@ export default function NavigationItem( props ) {
 					) }
 
 					{ badge && (
-						<ItemBadgeUI className="components-navigation__item-badge">
+						<ItemBadgeUI
+							className="components-navigation__item-badge"
+							isRTL={ isRTL }
+						>
 							{ badge }
 						</ItemBadgeUI>
 					) }
