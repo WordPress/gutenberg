@@ -26,11 +26,11 @@ A block instance (object) or a blocks array you would like to render a preview.
 * **Type:** `Int`
 * **Default:** `700`
 
-**** Modify here the documentation to have a customize value ****
-
 Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview.
 
 `viewportWidth` can be used to simulate how blocks look on different device sizes or to make sure make sure multiple previews will be rendered with the same scale, regardless of their content.
+
+`viewportWidth` can be override in example object with the property `viewportWidth`.
 
 ### __experimentalScalingDelay
 * **Type** `Int`

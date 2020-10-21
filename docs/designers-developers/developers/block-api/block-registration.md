@@ -204,8 +204,19 @@ example: {
                 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.'
             ),
         },
-    },
+	},
     ],
+},
+```
+
+It's also possible to define the width of the preview container in pixels via `viewportWidth`. For example:
+
+```js
+example: {
+    attributes: {
+        cover: 'https://example.com/image.jpg',
+	},
+	viewportWidth: 800
 },
 ```
 
