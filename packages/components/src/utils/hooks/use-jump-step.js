@@ -29,7 +29,10 @@ function useJumpStep( {
 	const [ isShiftKey, setIsShiftKey ] = useState( false );
 
 	useEffect( () => {
-		const handleShiftKeyToggle = ( event ) => {
+		const handleShiftKeyToggle = (
+			/** @type {KeyboardEvent} */
+			event
+		) => {
 			setIsShiftKey( event.shiftKey );
 		};
 

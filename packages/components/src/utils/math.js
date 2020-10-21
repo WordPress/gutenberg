@@ -19,24 +19,23 @@ export function getNumber( value ) {
 /**
  * Safely adds 2 values.
  *
- * @param {number|string} args Values to add together.
+ * @param {(number|string)[]} args Values to add together.
  *
  * @return {number} The sum of values.
  */
 export function add( ...args ) {
-	return args.reduce( ( sum, arg ) => sum + getNumber( arg ), 0 );
+	return args.map( getNumber ).reduce( ( sum, arg ) => sum + arg, 0 );
 }
 
 /**
  * Safely subtracts 2 values.
  *
- * @param {number|string} args Values to subtract together.
+ * @param {(number|string)[]} args Values to subtract together.
  *
  * @return {number} The difference of the 2 values.
  */
 export function subtract( ...args ) {
-	return args.reduce( ( diff, arg, index ) => {
-		const value = getNumber( arg );
+	return args.map( getNumber ).reduce( ( diff, value, index ) => {
 		return index === 0 ? value : diff - value;
 	} );
 }
@@ -56,10 +55,10 @@ function getPrecision( value ) {
 /**
  * Clamps a value based on a min/max range with rounding
  *
- * @param {number} value The value.
- * @param {number} min The minimum range.
- * @param {number} max The maximum range.
- * @param {number} step A multiplier for the value.
+ * @param {number} [value=0] The value.
+ * @param {number} [min=Infinity] The minimum range.
+ * @param {number} [max=Infinity] The maximum range.
+ * @param {number} [step=1] A multiplier for the value.
  *
  * @return {number} The rounded and clamped value.
  */
@@ -84,11 +83,7 @@ export function roundClamp(
  * Clamps a value based on a min/max range with rounding.
  * Returns a string.
  *
- * @param {any} args Arguments for roundClamp().
- * @property {number} value The value.
- * @property {number} min The minimum range.
- * @property {number} max The maximum range.
- * @property {number} step A multiplier for the value.
+ * @param {Parameters<roundClamp>} args Arguments for roundClamp().
  *
  * @return {string} The rounded and clamped value.
  */

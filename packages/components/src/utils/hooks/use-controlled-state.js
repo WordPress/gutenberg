@@ -8,6 +8,14 @@ import { useEffect, useState } from '@wordpress/element';
  */
 import { isValueDefined, getDefinedValue } from '../values';
 
+/**
+ * @template T
+ * @typedef Options
+ * @property {T} [initial] The initial state.
+ * @property {T} [fallback] The state to use when no state is defined.
+ */
+
+/** @type {Options<any>} */
 const defaultOptions = {
 	initial: undefined,
 	/**
@@ -33,10 +41,9 @@ const defaultOptions = {
  * Unlike the basic useState hook, useControlledState's state can
  * be updated if a new incoming prop value is changed.
  *
- * @param {any} currentState The current value.
- * @param {Object} options Additional options for the hook.
- * @param {any} options.initial The initial state.
- * @param {any} options.fallback The state to use when no state is defined.
+ * @template T
+ * @param {T | undefined} currentState The current value.
+ * @param {Options<T>} [options] Additional options for the hook.
  *
  * @return {[*, Function]} The controlled value and the value setter.
  */
@@ -60,7 +67,10 @@ function useControlledState( currentState, options = defaultOptions ) {
 		fallback
 	);
 
-	const setState = ( nextState ) => {
+	const setState = (
+		/** @type {any} */
+		nextState
+	) => {
 		if ( ! hasCurrentState ) {
 			setInternalState( nextState );
 		}

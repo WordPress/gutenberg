@@ -65,9 +65,9 @@ function getConvertedKey( key ) {
 /**
  * An incredibly basic ltr -> rtl converter for style properties
  *
- * @param {Object} ltrStyles
+ * @param {Record<string, string>} ltrStyles
  *
- * @return {Object} Converted ltr -> rtl styles
+ * @return {Record<string, string>} Converted ltr -> rtl styles
  */
 export const convertLTRToRTL = ( ltrStyles = {} ) => {
 	return mapKeys( ltrStyles, ( _value, key ) => getConvertedKey( key ) );
@@ -76,10 +76,10 @@ export const convertLTRToRTL = ( ltrStyles = {} ) => {
 /**
  * A higher-order function that create an incredibly basic ltr -> rtl style converter for CSS objects.
  *
- * @param {Object} ltrStyles Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
- * @param {null|Object} rtlStyles Rtl styles. Renders if provided.
+ * @param {Record<string, string>} [ltrStyles={}] Ltr styles. Converts and renders from ltr -> rtl styles, if applicable.
+ * @param {Record<string, string>} [rtlStyles] Rtl styles. Renders if provided.
  *
- * @return {Function} A function to output CSS styles for Emotion's renderer
+ * @return {() => ReturnType<css>} A function to output CSS styles for Emotion's renderer
  */
 export function rtl( ltrStyles = {}, rtlStyles ) {
 	return () => {

@@ -106,6 +106,7 @@
 		"@types/requestidlecallback": "0.3.1",
 		"@types/semver": "7.2.0",
 		"@types/sprintf-js": "1.1.2",
+		"@types/tinycolor2": "1.4.2",
 		"@types/uuid": "7.0.2",
 		"@types/webpack": "4.41.16",
 		"@types/webpack-sources": "0.1.7",
