@@ -13,6 +13,7 @@ import Button from '../../button';
 import MenuTitleSearch from './menu-title-search';
 import { MenuTitleHeadingUI, MenuTitleUI } from '../styles/navigation-styles';
 import { useNavigationMenuContext } from './context';
+import { SEARCH_FOCUS_DELAY } from '../constants';
 
 export default function NavigationMenuTitle( {
 	hasSearch,
@@ -35,7 +36,7 @@ export default function NavigationMenuTitle( {
 		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
 		setTimeout( () => {
 			searchButtonRef.current.focus();
-		}, 100 );
+		}, SEARCH_FOCUS_DELAY );
 	};
 
 	const menuTitleId = `components-navigation__menu-title-${ menu }`;

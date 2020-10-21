@@ -20,6 +20,7 @@ import withSpokenMessages from '../../higher-order/with-spoken-messages';
 import { useNavigationMenuContext } from './context';
 import { useNavigationContext } from '../context';
 import { MenuTitleSearchUI } from '../styles/navigation-styles';
+import { SEARCH_FOCUS_DELAY } from '../constants';
 
 function MenuTitleSearch( {
 	debouncedSpeak,
@@ -39,7 +40,7 @@ function MenuTitleSearch( {
 	useEffect( () => {
 		const delayedFocus = setTimeout( () => {
 			inputRef.current.focus();
-		}, 100 );
+		}, SEARCH_FOCUS_DELAY );
 
 		return () => {
 			clearTimeout( delayedFocus );
