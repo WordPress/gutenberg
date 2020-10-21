@@ -39,7 +39,7 @@ export const StyledToggleThumb = styled.span`
 	height: ${ toggleHeight - toggleBorderWidth * 6 }px;
 	border-radius: 50%;
 	transition: 0.1s transform ease;
-    ${ reduceMotion( 'transition' ) }
+	${ reduceMotion( 'transition' ) }
 	background-color: ${ color( 'darkGray.primary' ) };
 	border: 5px solid ${ color(
 		'darkGray.primary'
@@ -89,9 +89,11 @@ export const StyledFormToggle = styled.span`
 
 	${ ( props ) => ( props.isChecked ? checkedStyles : '' ) }
 
-    ${ StyledToggleInput }:focus + ${ StyledToggleTrack } {
+	${ StyledToggleInput }:focus + ${ StyledToggleTrack } {
 		box-shadow: 0 0 0 2px ${ color( 'white' ) },
-			0 0 0 calc( 2px + ${ config('borderWidthFocus') } )) var( --wp-admin-theme-color );
+			0 0 0 calc( 2px + ${ config(
+				'borderWidthFocus'
+			) } )) var( --wp-admin-theme-color );
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
