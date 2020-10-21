@@ -87,8 +87,7 @@ function gutenberg_get_editor_styles() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
-	global $current_screen;
-	global $post;
+	global $current_screen, $post;
 
 	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
