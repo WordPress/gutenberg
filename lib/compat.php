@@ -523,7 +523,12 @@ function gutenberg_check_render_callback( $args, $block_name ){
 	if ( NULL !== $args['render_callback'] ) {
 		$block_render_callback = $args['render_callback'];
 		$args['render_callback'] = function( $attributes, $content, $block ) use ( $block_render_callback ) {
-			return $block_render_callback( $attributes, $content, $block );
+			global $current_parsed_block;
+			$parent_parsed_block  = $current_parsed_block;
+			$current_parsed_block = $block->parsed_block;
+			$result               = $block_render_callback( $attributes, $content, $block );
+			$current_parsed_block = $parent_parsed_block;
+			return $result;
 		};
 	}
 	return $args;
