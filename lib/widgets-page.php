@@ -85,7 +85,8 @@ function gutenberg_widgets_init( $hook ) {
 
 	$preload_paths = array(
 		array( '/wp/v2/media', 'OPTIONS' ),
-		'/__experimental/sidebars?context=edit&per_page=-1',
+		'/wp/v2/sidebars?context=edit&per_page=-1',
+		'/wp/v2/widgets?context=edit&per_page=-1',
 	);
 	$preload_data  = array_reduce(
 		$preload_paths,

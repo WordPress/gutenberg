@@ -57,10 +57,18 @@ export const defaultEntities = [
 	{
 		name: 'sidebar',
 		kind: 'root',
-		baseURL: '/__experimental/sidebars',
+		baseURL: '/wp/v2/sidebars',
 		plural: 'sidebars',
 		transientEdits: { blocks: true },
 		label: __( 'Widget areas' ),
+	},
+	{
+		name: 'widget',
+		kind: 'root',
+		baseURL: '/wp/v2/widgets',
+		plural: 'widgets',
+		transientEdits: { blocks: true },
+		label: __( 'Widgets' ),
 	},
 	{
 		label: __( 'User' ),

@@ -1,7 +1,12 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { createSlotFill } from '@wordpress/components';
 
 /**
@@ -17,22 +22,55 @@ export const {
 	Slot: NavigationPanelPreviewSlot,
 } = createSlotFill( 'EditSiteNavigationPanelPreview' );
 
-const NavigationPanel = () => {
+const NavigationPanel = ( { isOpen } ) => {
 	const [ contentActiveMenu, setContentActiveMenu ] = useState( MENU_ROOT );
-	const templatesActiveMenu = useSelect(
-		( select ) => select( 'core/edit-site' ).getNavigationPanelActiveMenu(),
-		[]
-	);
+	const { templatesActiveMenu, siteTitle } = useSelect( ( select ) => {
+		const { getNavigationPanelActiveMenu } = select( 'core/edit-site' );
+		const { getEntityRecord } = select( 'core' );
+
+		const siteData =
+			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+
+		return {
+			templatesActiveMenu: getNavigationPanelActiveMenu(),
+			siteTitle: siteData.name,
+		};
+	}, [] );
+
+	// Ensures focus is moved to the panel area when it is activated
+	// from a separate component (such as document actions in the header).
+	const panelRef = useRef();
+	useEffect( () => {
+		panelRef.current.focus();
+	}, [ templatesActiveMenu ] );
 
 	return (
-		<div className="edit-site-navigation-panel">
-			{ ( contentActiveMenu === MENU_ROOT ||
-				templatesActiveMenu !== MENU_ROOT ) && <TemplatesNavigation /> }
+		<div
+			className={ classnames( `edit-site-navigation-panel`, {
+				'is-open': isOpen,
+			} ) }
+			ref={ panelRef }
+			tabIndex="-1"
+		>
+			<div className="edit-site-navigation-panel__inner">
+				<div className="edit-site-navigation-panel__site-title-container">
+					<div className="edit-site-navigation-panel__site-title">
+						{ siteTitle }
+					</div>
+				</div>
 
-			{ ( templatesActiveMenu === MENU_ROOT ||
-				contentActiveMenu !== MENU_ROOT ) && (
-				<ContentNavigation onActivateMenu={ setContentActiveMenu } />
-			) }
+				{ ( contentActiveMenu === MENU_ROOT ||
+					templatesActiveMenu !== MENU_ROOT ) && (
+					<TemplatesNavigation />
+				) }
+
+				{ ( templatesActiveMenu === MENU_ROOT ||
+					contentActiveMenu !== MENU_ROOT ) && (
+					<ContentNavigation
+						onActivateMenu={ setContentActiveMenu }
+					/>
+				) }
+			</div>
 
 			<NavigationPanelPreviewSlot />
 		</div>

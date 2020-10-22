@@ -23,6 +23,7 @@ const SpacerEdit = ( {
 	setAttributes,
 	onResizeStart,
 	onResizeStop,
+	className,
 } ) => {
 	const [ isResizing, setIsResizing ] = useState( false );
 	const { height } = attributes;
@@ -52,6 +53,7 @@ const SpacerEdit = ( {
 			<View { ...useBlockProps() }>
 				<ResizableBox
 					className={ classnames(
+						className,
 						'block-library-spacer__resize-container',
 						{
 							'is-selected': isSelected,
