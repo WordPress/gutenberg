@@ -7,6 +7,7 @@ import {
 	TextInput,
 	PixelRatio,
 	AppState,
+	Platform,
 } from 'react-native';
 
 /**
@@ -20,8 +21,10 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { toFixed, removeNonDigit } from '../utils';
-import styles from './range-cell.scss';
+import styles from './styles.scss';
 import borderStyles from './borderStyles.scss';
+
+const isIOS = Platform.OS === 'ios';
 
 class RangeTextInput extends Component {
 	constructor( props ) {
@@ -172,14 +175,22 @@ class RangeTextInput extends Component {
 		return (
 			<View
 				style={ [
-					textInputStyle,
-					borderStyles.borderStyle,
-					hasFocus && borderStyles.isSelected,
+					styles.rowContainer,
+					isIOS && [
+						textInputStyle,
+						borderStyles.borderStyle,
+						hasFocus && borderStyles.isSelected,
+					],
 				] }
 			>
 				<TextInput
 					style={ [
-						verticalBorderStyle,
+						! isIOS && [
+							textInputStyle,
+							borderStyles.borderStyle,
+							hasFocus && borderStyles.isSelected,
+						],
+						isIOS && verticalBorderStyle,
 						{
 							width: 40 * fontScale,
 						},

@@ -172,6 +172,35 @@
 	color: $blue-30;
 }
 
+// Range Text Input
+
+.verticalBorder {
+	border-right-width: 1px;
+	text-align: center;
+	border-color: $light-gray-400;
+}
+
+.verticalBorderDark {
+	border-color: $gray-70;
+}
+
+.rowContainer {
+	flex-direction: row;
+}
+
+.textInput {
+	min-height: 25px;
+	margin-left: 10px;
+	border-color: $light-gray-400;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	text-align: center;
+}
+
+.textInputDark {
+	border-color: $gray-70;
+}
+
 // Navigation Header
 
 .bottomSheetHeader {

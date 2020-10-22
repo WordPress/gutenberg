@@ -7,19 +7,6 @@
 	margin-left: -6px;
 }
 
-.textInput {
-	min-height: 25px;
-	margin-left: 10px;
-	border-color: $light-gray-400;
-	padding-top: 4px;
-	padding-bottom: 4px;
-	flex-direction: row;
-}
-
-.textInputDark {
-	border-color: $gray-70;
-}
-
 .isSelected {
 	border-width: 2px;
 	border-color: $blue-wordpress;
@@ -44,14 +31,4 @@
 .containerAndroid {
 	padding-top: 8px;
 	padding-bottom: 8px;
-}
-
-.verticalBorder {
-	border-right-width: 1px;
-	text-align: center;
-	border-color: $light-gray-400;
-}
-
-.verticalBorderDark {
-	border-color: $gray-70;
 }
