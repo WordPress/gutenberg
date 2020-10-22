@@ -94,7 +94,7 @@ public class WPAndroidGlueCode {
     private OnGutenbergDidSendButtonPressedActionListener mOnGutenbergDidSendButtonPressedActionListener;
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnStarterPageTemplatesTooltipShownEventListener mOnStarterPageTemplatesTooltipShownListener;
-    private OnMediaFilesEditorLoadRequestListener mOnMediaFilesEditorLoadRequestListener;
+    private OnMediaFilesCollectionBasedBlockEditorListener mOnMediaFilesCollectionBasedBlockEditorListener;
     private ReplaceMediaFilesEditedBlockCallback mReplaceMediaFilesEditedBlockCallback;
     private boolean mIsEditorMounted;
 
@@ -150,8 +150,11 @@ public class WPAndroidGlueCode {
         void onOtherMediaButtonClicked(String mediaSource, boolean allowMultipleSelection);
     }
 
-    public interface OnMediaFilesEditorLoadRequestListener {
+    public interface OnMediaFilesCollectionBasedBlockEditorListener {
         void onRequestMediaFilesEditorLoad(ArrayList<Object> mediaFiles, String blockId);
+        void onCancelUploadForMediaCollection(ArrayList<Object> mediaFiles);
+        void onRetryUploadForMediaCollection(ArrayList<Object> mediaFiles);
+        void onCancelSaveForMediaCollection(ArrayList<Object> mediaFiles);
     }
 
     public interface OnImageFullscreenPreviewListener {
@@ -424,7 +427,29 @@ public class WPAndroidGlueCode {
                     String blockId
             ) {
                 mReplaceMediaFilesEditedBlockCallback = replaceMediaFilesEditedBlockCallback;
-                mOnMediaFilesEditorLoadRequestListener.onRequestMediaFilesEditorLoad(mediaFiles.toArrayList(), blockId);
+                mOnMediaFilesCollectionBasedBlockEditorListener
+                        .onRequestMediaFilesEditorLoad(mediaFiles.toArrayList(), blockId);
+            }
+
+            @Override
+            public void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles) {
+                mOnMediaFilesCollectionBasedBlockEditorListener.onRetryUploadForMediaCollection(
+                        mediaFiles.toArrayList()
+                );
+            }
+
+            @Override
+            public void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles) {
+                mOnMediaFilesCollectionBasedBlockEditorListener.onCancelUploadForMediaCollection(
+                        mediaFiles.toArrayList()
+                );
+            }
+
+            @Override
+            public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
+                mOnMediaFilesCollectionBasedBlockEditorListener.onCancelSaveForMediaCollection(
+                        mediaFiles.toArrayList()
+                );
             }
         }, mIsDarkMode);
 
@@ -502,7 +527,7 @@ public class WPAndroidGlueCode {
                                   OnGutenbergDidSendButtonPressedActionListener onGutenbergDidSendButtonPressedActionListener,
                                   AddMentionUtil addMentionUtil,
                                   OnStarterPageTemplatesTooltipShownEventListener onStarterPageTemplatesTooltipListener,
-                                  OnMediaFilesEditorLoadRequestListener onMediaFilesEditorLoadRequestListener,
+                                  OnMediaFilesCollectionBasedBlockEditorListener onMediaFilesCollectionBasedBlockEditorListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
@@ -520,7 +545,7 @@ public class WPAndroidGlueCode {
         mOnGutenbergDidSendButtonPressedActionListener = onGutenbergDidSendButtonPressedActionListener;
         mAddMentionUtil = addMentionUtil;
         mOnStarterPageTemplatesTooltipShownListener = onStarterPageTemplatesTooltipListener;
-        mOnMediaFilesEditorLoadRequestListener = onMediaFilesEditorLoadRequestListener;
+        mOnMediaFilesCollectionBasedBlockEditorListener = onMediaFilesCollectionBasedBlockEditorListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
@@ -908,8 +933,8 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onMediaCollectionSaveResult(blockFirstMediaId, success);
     }
 
-    public void mediaModelCreatedForFile(final String oldId, final String newId, final String oldUrl) {
-        mDeferredEventEmitter.onMediaModelCreatedForFile(oldId, newId, oldUrl);
+    public void mediaIdChanged(final String oldId, final String newId, final String oldUrl) {
+        mDeferredEventEmitter.onMediaIdChanged(oldId, newId, oldUrl);
     }
 
     public void replaceUnsupportedBlock(String content, String blockId) {

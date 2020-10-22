@@ -29,7 +29,7 @@ export const MEDIA_SAVE_STATE_SUCCEEDED = 6;
 export const MEDIA_SAVE_STATE_FAILED = 7;
 export const MEDIA_SAVE_STATE_RESET = 8;
 export const MEDIA_SAVE_FINAL_STATE_RESULT = 9;
-export const MEDIA_SAVE_MEDIAMODEL_CREATED = 10;
+export const MEDIA_SAVE_MEDIAID_CHANGED = 10;
 
 export class BlockMediaUpdateProgress extends React.Component {
 	constructor( props ) {
@@ -118,8 +118,8 @@ export class BlockMediaUpdateProgress extends React.Component {
 			case MEDIA_SAVE_FINAL_STATE_RESULT:
 				this.finalSaveResult( payload );
 				break;
-			case MEDIA_SAVE_MEDIAMODEL_CREATED:
-				this.mediaModelCreated( payload );
+			case MEDIA_SAVE_MEDIAID_CHANGED:
+				this.mediaIdChanged( payload );
 				break;
 		}
 	}
@@ -172,15 +172,15 @@ export class BlockMediaUpdateProgress extends React.Component {
 		}
 	}
 
-	mediaModelCreated( payload ) {
+	mediaIdChanged( payload ) {
 		this.setState( {
 			isUploadInProgress: false,
 			isUploadFailed: false,
 			isSaveInProgress: false,
 			isSaveFailed: false,
 		} );
-		if ( this.props.onMediaModelCreated ) {
-			this.props.onMediaModelCreated( payload );
+		if ( this.props.onMediaIdChanged ) {
+			this.props.onMediaIdChanged( payload );
 		}
 	}
 
@@ -265,9 +265,17 @@ export class BlockMediaUpdateProgress extends React.Component {
 			this.state.isUploadInProgress || this.state.isSaveInProgress;
 		const progress = this.state.progress * 100;
 		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
-		const retryMessage = __(
+		const retryMessageSave = __(
 			'Failed to save files.\nPlease tap for options.'
 		);
+		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
+		const retryMessageUpload = __(
+			'Failed to upload files.\nPlease tap for options.'
+		);
+		let retryMessage = retryMessageSave;
+		if ( isUploadFailed ) {
+			retryMessage = retryMessageUpload;
+		}
 
 		return (
 			<View style={ styles.mediaUploadProgress } pointerEvents="box-none">

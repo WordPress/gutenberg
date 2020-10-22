@@ -298,6 +298,38 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
+    func requestMediaFilesFailedRetryDialog(_ mediaFilesArray: [AnyObject]) {
+        // TODO actually implement the delegate call on iOS
+        let mediaFiles = mediaFilesArray.compactMap { $0 as? String }
+        // DispatchQueue.main.async {
+        //     self.delegate?.gutenbergDidRequestMediaFilesFailedRetryDialog(mediaFiles: mediaFiles, blockId: blockId)
+        // }
+    }
+
+    @objc
+    func requestMediaFilesUploadCancelDialog(_ mediaFilesArray: [AnyObject]) {
+        // TODO actually implement the delegate call on iOS
+        let mediaFiles = mediaFilesArray.compactMap { $0 as? String }
+        // DispatchQueue.main.async {
+        //     self.delegate?.gutenbergDidRequestMediaFilesUploadCancelDialog(mediaFiles: mediaFiles, blockId: blockId)
+        // }
+    }
+
+    @objc
+    func requestMediaFilesSaveCancelDialog(_ mediaFilesArray: [AnyObject]) {
+        // TODO actually implement the delegate call on iOS
+        let mediaFiles = mediaFilesArray.compactMap { $0 as? String }
+        // DispatchQueue.main.async {
+        //     self.delegate?.gutenbergDidRequestMediaFilesSaveCancelDialog(mediaFiles: mediaFiles, blockId: blockId)
+        // }
+    }
+
+    @objc
+    func mediaSaveSync() {
+        // TODO: To be implemented
+    }
+
+    @objc
     func actionButtonPressed(_ buttonType: String) {
         guard let button = Gutenberg.ActionButtonType(rawValue: buttonType) else {
             return
@@ -330,6 +362,7 @@ extension RNReactNativeGutenbergBridge {
         case replaceBlock
         case updateCapabilities
         case showNotice
+        case mediaSave
     }
 
     public override func supportedEvents() -> [String]! {

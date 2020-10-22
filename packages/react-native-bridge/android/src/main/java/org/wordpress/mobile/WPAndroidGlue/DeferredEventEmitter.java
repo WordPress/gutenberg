@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID;
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_NEW_ID;
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL;
-import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FINAL_SAVE_RESULT;
+import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FINAL_SAVE_RESULT_SUCCESS_VALUE;
 
 public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveEventEmitter {
     public interface JSEventEmitter {
@@ -34,7 +34,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     private static final int MEDIA_SAVE_STATE_FAILED = 7;
     private static final int MEDIA_SAVE_STATE_RESET = 8;
     private static final int MEDIA_SAVE_FINAL_STATE_RESULT = 9;
-    private static final int MEDIA_SAVE_MEDIAMODEL_CREATED = 10;
+    private static final int MEDIA_SAVE_MEDIAID_CHANGED = 10;
 
     private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
     private static final String EVENT_NAME_MEDIA_SAVE = "mediaSave";
@@ -128,7 +128,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putInt(MAP_KEY_MEDIA_FILE_STATE, state);
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, mediaId);
-        writableMap.putBoolean(MAP_KEY_MEDIA_FINAL_SAVE_RESULT, success);
+        writableMap.putBoolean(MAP_KEY_MEDIA_FINAL_SAVE_RESULT_SUCCESS_VALUE, success);
         writableMap.putDouble(MAP_KEY_MEDIA_FILE_MEDIA_ACTION_PROGRESS, progress);
         if (isCriticalMessage(state)) {
             queueActionToJS(EVENT_NAME_MEDIA_SAVE, writableMap);
@@ -140,7 +140,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     private boolean isCriticalMessage(int state) {
         return state == MEDIA_UPLOAD_STATE_SUCCEEDED || state == MEDIA_UPLOAD_STATE_FAILED
                || state == MEDIA_SAVE_STATE_SUCCEEDED || state == MEDIA_SAVE_STATE_FAILED
-               || state == MEDIA_SAVE_MEDIAMODEL_CREATED;
+               || state == MEDIA_SAVE_MEDIAID_CHANGED;
     }
 
     @Override
@@ -189,13 +189,13 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
         setMediaSaveResultDataInJS(MEDIA_SAVE_FINAL_STATE_RESULT, firstMediaIdInCollection, success, success ? 1 : 0);
     }
 
-    @Override public void onMediaModelCreatedForFile(String oldId, String newId, String oldUrl) {
+    @Override public void onMediaIdChanged(String oldId, String newId, String oldUrl) {
         WritableMap writableMap = new WritableNativeMap();
-        writableMap.putInt(MAP_KEY_MEDIA_FILE_STATE, MEDIA_SAVE_MEDIAMODEL_CREATED);
+        writableMap.putInt(MAP_KEY_MEDIA_FILE_STATE, MEDIA_SAVE_MEDIAID_CHANGED);
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_ID, oldId);
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_NEW_ID, newId);
         writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL, oldUrl);
-        if (isCriticalMessage(MEDIA_SAVE_MEDIAMODEL_CREATED)) {
+        if (isCriticalMessage(MEDIA_SAVE_MEDIAID_CHANGED)) {
             queueActionToJS(EVENT_NAME_MEDIA_SAVE, writableMap);
         } else {
             emitOrDrop(EVENT_NAME_MEDIA_SAVE, writableMap);

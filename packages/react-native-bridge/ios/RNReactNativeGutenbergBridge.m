@@ -24,6 +24,9 @@ RCT_EXTERN_METHOD(addMention:(RCTPromiseResolveBlock)resolve rejecter:(RCTPromis
 RCT_EXTERN_METHOD(requestStarterPageTemplatesTooltipShown:(RCTResponseSenderBlock)callback)
 RCT_EXTERN_METHOD(setStarterPageTemplatesTooltipShown:(BOOL)tooltipShown)
 RCT_EXTERN_METHOD(requestMediaFilesEditorLoad:(NSArray *)mediaFiles blockId:(NSString *)blockId)
+RCT_EXTERN_METHOD(requestMediaFilesFailedRetryDialog:(NSArray *)mediaFiles)
+RCT_EXTERN_METHOD(onCancelUploadForMediaCollection:(NSArray *)mediaFiles)
 RCT_EXTERN_METHOD(actionButtonPressed:(NSString *)buttonType)
+RCT_EXTERN_METHOD(mediaSaveSync)
 
 @end

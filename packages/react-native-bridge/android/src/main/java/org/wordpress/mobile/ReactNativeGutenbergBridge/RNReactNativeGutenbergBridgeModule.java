@@ -58,7 +58,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public static final String MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE = "mediaType";
     private static final String MAP_KEY_THEME_UPDATE_COLORS = "colors";
     private static final String MAP_KEY_THEME_UPDATE_GRADIENTS = "gradients";
-    public static final String MAP_KEY_MEDIA_FINAL_SAVE_RESULT = "mediaFinalSaveResult";
+    public static final String MAP_KEY_MEDIA_FINAL_SAVE_RESULT_SUCCESS_VALUE = "success";
 
     private static final String MAP_KEY_IS_PREFERRED_COLOR_SCHEME_DARK = "isPreferredColorSchemeDark";
 
@@ -240,6 +240,21 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     public void requestMediaFilesEditorLoad(ReadableArray mediaFiles, String blockId) {
         mGutenbergBridgeJS2Parent.requestMediaFilesEditorLoad((savedMediaFiles, savedBlockId) ->
                 replaceBlock(savedMediaFiles, savedBlockId), mediaFiles, blockId);
+    }
+
+    @ReactMethod
+    public void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles) {
+        mGutenbergBridgeJS2Parent.requestMediaFilesFailedRetryDialog(mediaFiles);
+    }
+
+    @ReactMethod
+    public void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles) {
+        mGutenbergBridgeJS2Parent.requestMediaFilesUploadCancelDialog(mediaFiles);
+    }
+
+    @ReactMethod
+    public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
+        mGutenbergBridgeJS2Parent.requestMediaFilesSaveCancelDialog(mediaFiles);
     }
 
     @ReactMethod
