@@ -54,9 +54,6 @@ jobs:
     - name: Switch Xcode Version
       run: sudo xcode-select --switch /Applications/Xcode_12.app
 
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
-
     - name: Build (if needed)
       run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/gutenberg || npm run native test:e2e:build-app:ios
 
