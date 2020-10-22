@@ -51,17 +51,18 @@ jobs:
     - name: Bundle iOS
       run: npm run native test:e2e:bundle:ios
 
-    - name: Switch Xcode Version
-      run: sudo xcode-select --switch /Applications/Xcode_12.app
-
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
+    # - name: Switch Xcode Version
+      # run: sudo xcode-select --switch /Applications/Xcode_12.app
 
     - name: Build (if needed)
       run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/gutenberg || npm run native test:e2e:build-app:ios
 
     - name: Run iOS Device Tests
       run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
+
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
+      if: always()
 
     - name: Prepare build cache
       run: rm packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle
