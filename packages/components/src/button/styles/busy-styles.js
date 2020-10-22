@@ -8,26 +8,13 @@ import { css, keyframes } from '@emotion/core';
  */
 import { color, darken } from '../../utils';
 
-export const primary = css`
-	color: ${ color( 'white' ) };
-	background-size: 100px 100%;
-	background-image: linear-gradient(
-		-45deg,
-		var( --wp-admin-theme-color ) 28%,
-		var( --wp-admin-theme-color-darker-20 ) 28%,
-		var( --wp-admin-theme-color-darker-20 ) 72%,
-		var( --wp-admin-theme-color ) 72%
-	);
-	border-color: var( --wp-admin-theme-color );
-`;
-
 const busyAnimation = keyframes`
 	0% {
 		background-position: 200px 0;
 	}
 `;
 
-export const generic = css`
+const busy = css`
 	animation: ${ busyAnimation } 2500ms infinite linear;
 	opacity: 1;
 	background-size: 100px 100%;
@@ -39,3 +26,5 @@ export const generic = css`
 		${ darken( color( 'white' ), 2 ) } 72%
 	);
 `;
+
+export const appearBusy = ( props ) => ( props.isBusy ? busy : '' );

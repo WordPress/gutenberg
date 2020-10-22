@@ -1,10 +1,6 @@
-/* eslint-disable jsdoc/check-tag-names */
-/** @jsx jsx */
-/* eslint-enable jsdoc/check-tag-names */
 /**
  * External dependencies
  */
-import { jsx, css } from '@emotion/core';
 import classnames from 'classnames';
 import { isArray } from 'lodash';
 
@@ -19,83 +15,33 @@ import { forwardRef } from '@wordpress/element';
  */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
-import * as buttonStyles from './styles';
+import * as styledButtons from './styles';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
 
-const getBaseStyles = ( props ) => {
+const getStyledButton = ( props ) => {
 	if ( props.isPrimary ) {
-		return buttonStyles.primary.styles;
+		return styledButtons.PrimaryButton;
 	}
 
 	if ( props.isSecondary ) {
-		return buttonStyles.secondary.styles;
+		return styledButtons.SecondaryButton;
 	}
 
 	if ( props.isTertiary ) {
-		return buttonStyles.tertiary.styles;
+		return styledButtons.TertiaryButton;
 	}
 
 	if ( props.isLink ) {
-		if ( props.isDestructive ) {
-			return css`
-				${ buttonStyles.link.styles }
-				${ buttonStyles.link.destructive }
-			`;
-		}
-		return buttonStyles.link.styles;
+		return styledButtons.LinkButton;
 	}
 
 	// check pure destructive last to allow for destructive links
 	if ( props.isDestructive ) {
-		return buttonStyles.destructive.styles;
+		return styledButtons.DestructiveButton;
 	}
 
-	return buttonStyles.shared.buttonBase;
-};
-
-const getBusyStyles = ( props ) => {
-	if ( ! props.isBusy ) {
-		return '';
-	}
-
-	if ( props.isPrimary ) {
-		return buttonStyles.busy.primary;
-	}
-
-	return buttonStyles.busy.generic;
-};
-
-const getPressedStyles = ( props ) => {
-	if ( props.isPressed ) {
-		return buttonStyles.shared.pressed;
-	}
-
-	return '';
-};
-
-const getSmallStyles = ( props, hasIcon, hasText ) => {
-	if ( props.isSmall ) {
-		if ( hasIcon && ! hasText ) {
-			return buttonStyles.shared.smallOnlyIcon;
-		}
-
-		return buttonStyles.shared.small;
-	}
-
-	return '';
-};
-
-const getIconStyles = ( hasIcon, hasText ) => {
-	if ( hasIcon ) {
-		if ( hasText ) {
-			return buttonStyles.shared.iconWithText;
-		}
-
-		return buttonStyles.shared.icon;
-	}
-
-	return '';
+	return styledButtons.BaseButton;
 };
 
 export function Button( props, ref ) {
@@ -143,11 +89,9 @@ export function Button( props, ref ) {
 		'has-icon': !! icon,
 	} );
 
-	const hasText = !! icon && !! children;
-	const hasIcon = !! icon;
-
 	const trulyDisabled = disabled && ! isFocusable;
-	const Tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
+	const Tag = getStyledButton( props );
+	const as = href !== undefined && ! trulyDisabled ? 'a' : 'button';
 	const tagProps =
 		Tag === 'a'
 			? { href, target }
@@ -187,18 +131,16 @@ export function Button( props, ref ) {
 
 	const element = (
 		<Tag
-			css={ css`
-				${ getBaseStyles( props ) }
-				${ getBusyStyles( props ) }
-				${ getSmallStyles( props, hasIcon, hasText ) }
-				${ getPressedStyles( props ) }
-				${ getIconStyles( hasIcon, hasText ) }
-			` }
+			as={ as }
 			{ ...tagProps }
 			{ ...additionalProps }
 			className={ classes }
 			aria-label={ additionalProps[ 'aria-label' ] || label }
 			ref={ ref }
+			isDestructive={ isDestructive }
+			isSmall={ isSmall }
+			isBusy={ isBusy }
+			isPressed={ isPressed }
 		>
 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
 			{ children }

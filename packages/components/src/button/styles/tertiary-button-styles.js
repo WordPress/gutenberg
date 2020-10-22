@@ -1,16 +1,15 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/core';
+import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
  */
-import { secondaryAndTertiaryBase } from './base-styles';
+import { SecondaryAndTertiaryBase } from './base-styles';
+import { appearBusy } from './busy-styles';
 
-export const styles = css`
-	${ secondaryAndTertiaryBase }
-
+export const TertiaryButton = styled( SecondaryAndTertiaryBase )`
 	white-space: nowrap;
 	color: var( --wp-admin-theme-color );
 	background: transparent;
@@ -20,4 +19,6 @@ export const styles = css`
 		display: inline-block;
 		flex: 0 0 auto;
 	}
+
+	${ appearBusy }
 `;

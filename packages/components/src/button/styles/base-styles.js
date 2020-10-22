@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 
 /**
@@ -8,7 +9,74 @@ import { css } from '@emotion/core';
  */
 import { font, config, color, reduceMotion, lighten, rtl } from '../../utils';
 
-export const buttonBase = css`
+const small = css`
+	height: 24px;
+	line-height: 22px;
+	padding: 0 8px;
+	font-size: 11px;
+`;
+
+const smallOnlyIcon = css`
+	${ small }
+
+	padding: 0 8px;
+	width: 24px;
+`;
+
+const appearSmall = ( props ) => {
+	const hasIcon = !! props.icon;
+	const hasText = !! props.icon && !! props.children;
+
+	if ( props.isSmall ) {
+		if ( hasIcon && ! hasText ) {
+			return smallOnlyIcon;
+		}
+
+		return small;
+	}
+
+	return '';
+};
+
+export const icon = css`
+	padding: 6px; // Works for 24px icons. Smaller icons are vertically centered by flex alignments.
+
+	// Icon buttons are square.
+	min-width: ${ config( 'buttonSize' ) };
+	justify-content: center;
+
+	.dashicon {
+		display: inline-block;
+		flex: 0 0 auto;
+	}
+`;
+
+export const iconWithText = css`
+	${ icon }
+
+	${ rtl( { justifyContent: 'left' }, { justifyContent: 'right' } )() }
+
+	svg {
+		margin-right: 8px;
+	}
+`;
+
+const appearIcon = ( props ) => {
+	const hasIcon = !! props.icon;
+	const hasText = !! props.icon && !! props.children;
+
+	if ( hasIcon ) {
+		if ( hasText ) {
+			return iconWithText;
+		}
+
+		return icon;
+	}
+
+	return '';
+};
+
+export const BaseButton = styled.button`
 	display: inline-flex;
 	text-decoration: none;
 	font-size: ${ font( 'default.fontSize' ) };
@@ -67,12 +135,14 @@ export const buttonBase = css`
 	.components-visually-hidden {
 		height: auto;
 	}
+
+	${ appearSmall }
+	${ appearIcon }
+	${ ( props ) => ( props.isPressed ? pressed : '' ) }
 `;
 
-export const secondaryAndTertiaryBase = css`
-	${ buttonBase }
-
-	&:active:not(:disabled) {
+export const SecondaryAndTertiaryBase = styled( BaseButton )`
+	&:active:not( :disabled ) {
 		background: ${ color( 'gray.200' ) };
 		color: var( --wp-admin-theme-color-darker-10 );
 		box-shadow: none;
@@ -95,44 +165,7 @@ export const secondaryAndTertiaryBase = css`
 	}
 `;
 
-export const small = css`
-	height: 24px;
-	line-height: 22px;
-	padding: 0 8px;
-	font-size: 11px;
-`;
-
-export const smallOnlyIcon = css`
-	${ small }
-
-	padding: 0 8px;
-	width: 24px;
-`;
-
-export const icon = css`
-	padding: 6px; // Works for 24px icons. Smaller icons are vertically centered by flex alignments.
-
-	// Icon buttons are square.
-	min-width: ${ config( 'buttonSize' ) };
-	justify-content: center;
-
-	.dashicon {
-		display: inline-block;
-		flex: 0 0 auto;
-	}
-`;
-
-export const iconWithText = css`
-	${ icon }
-
-	${ rtl( { justifyContent: 'left' }, { justifyContent: 'right' } )() }
-
-	svg {
-		margin-right: 8px;
-	}
-`;
-
-export const pressed = css`
+const pressed = css`
 	color: ${ color( 'white' ) };
 	background: ${ color( 'gray.900' ) };
 

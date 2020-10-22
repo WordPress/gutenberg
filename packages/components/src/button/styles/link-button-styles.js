@@ -1,16 +1,17 @@
 /**
  * External dependencies
  */
+import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 
 /**
  * Internal dependencies
  */
-import { buttonBase } from './base-styles';
+import { BaseButton } from './base-styles';
+import { appearBusy } from './busy-styles';
 import { reduceMotion, config, color, darken, rtl } from '../../utils';
 
-export const styles = css`
-	${ buttonBase }
+export const LinkButton = styled( BaseButton )`
 	margin: 0;
 	padding: 0;
 	box-shadow: none;
@@ -18,7 +19,7 @@ export const styles = css`
 	border-radius: 0;
 	background: none;
 	outline: none;
-	${ rtl( { textAlign: 'left' }, { textAlign: 'right' } )() }
+	${ rtl( { textAlign: 'left' }, { textAlign: 'right' } ) }
 	/* Mimics the default link style in common.css */
 	color: #0073aa;
 	text-decoration: underline;
@@ -40,9 +41,12 @@ export const styles = css`
 			0 0 ${ config( 'borderWidthFocus' ) } ${ config( 'borderWidth' ) }
 				rgba( 30, 140, 190, 0.8 );
 	}
+
+	${ ( props ) => ( props.isDestructive ? destructive : '' ) }
+	${ appearBusy }
 `;
 
-export const destructive = css`
+const destructive = css`
 	color: ${ color( 'alert.red' ) };
 
 	&:active:not( :disabled ),

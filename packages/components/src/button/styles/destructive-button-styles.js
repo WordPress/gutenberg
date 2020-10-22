@@ -1,16 +1,16 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/core';
+import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
  */
-import { buttonBase } from './base-styles';
+import { BaseButton } from './base-styles';
+import { appearBusy } from './busy-styles';
 import { color, config, darken } from '../../utils';
 
-export const styles = css`
-    ${ buttonBase }
+export const DestructiveButton = styled( BaseButton )`
 	color: ${ color( 'alert.red' ) };
 	box-shadow: inset 0 0 0 ${ config( 'borderWidth' ) }
 		${ color( 'alert.red' ) };
@@ -28,4 +28,6 @@ export const styles = css`
 	&:active:not( :disabled ) {
 		background: ${ color( 'gray.400' ) };
 	}
+
+	${ appearBusy }
 `;

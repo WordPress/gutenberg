@@ -1,16 +1,16 @@
 /**
  * External dependencies
  */
+import styled from '@emotion/styled';
 import { css } from '@emotion/core';
 
 /**
  * Internal dependencies
  */
-import { buttonBase } from './base-styles';
+import { BaseButton } from './base-styles';
 import { color, config, rgba } from '../../utils';
 
-export const styles = css`
-	${ buttonBase }
+export const PrimaryButton = styled( BaseButton )`
 	white-space: nowrap;
 	background: var( --wp-admin-theme-color );
 	color: ${ color( 'white' ) };
@@ -52,4 +52,19 @@ export const styles = css`
 				0 0 0 3px var( --wp-admin-theme-color );
 		}
 	}
+
+	${ ( props ) => ( props.isBusy ? busy : '' ) }
+`;
+
+const busy = css`
+	color: ${ color( 'white' ) };
+	background-size: 100px 100%;
+	background-image: linear-gradient(
+		-45deg,
+		var( --wp-admin-theme-color ) 28%,
+		var( --wp-admin-theme-color-darker-20 ) 28%,
+		var( --wp-admin-theme-color-darker-20 ) 72%,
+		var( --wp-admin-theme-color ) 72%
+	);
+	border-color: var( --wp-admin-theme-color );
 `;
