@@ -137,7 +137,7 @@ export default function ButtonsEdit( {
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
 				__experimentalLayout={ { type: 'default', alignments: [] } }
-				templateInsertUpdatesSelection={ true }
+				templateInsertUpdatesSelection
 			/>
 		</>
 	);

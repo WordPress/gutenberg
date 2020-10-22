@@ -516,7 +516,7 @@ const Cover = ( {
 			>
 				<InnerBlocks
 					template={ INNER_BLOCKS_TEMPLATE }
-					templateInsertUpdatesSelection={ true }
+					templateInsertUpdatesSelection
 				/>
 			</View>
 
