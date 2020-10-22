@@ -302,16 +302,14 @@ function GalleryEdit( props ) {
 	}, [ isSelected ] );
 
 	useEffect( () => {
-		if ( Platform.OS === 'web' ) {
-			// linkTo attribute must be saved so blocks don't break when changing
-			// image_default_link_type in options.php
-			if ( ! linkTo ) {
-				setAttributes( {
-					linkTo:
-						window?.wp?.media?.view?.settings?.defaultProps?.link ||
-						LINK_DESTINATION_NONE,
-				} );
-			}
+		// linkTo attribute must be saved so blocks don't break when changing
+		// image_default_link_type in options.php
+		if ( Platform.OS === 'web' && ! linkTo ) {
+			setAttributes( {
+				linkTo:
+					window?.wp?.media?.view?.settings?.defaultProps?.link ||
+					LINK_DESTINATION_NONE,
+			} );
 		}
 	}, [ linkTo ] );
 
