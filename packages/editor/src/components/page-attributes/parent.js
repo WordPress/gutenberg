@@ -7,6 +7,7 @@ import {
 	debounce,
 	flatMap,
 	repeat,
+	find,
 } from 'lodash';
 
 /**
@@ -92,7 +93,14 @@ export function PageAttributesParent() {
 			} ) )
 		);
 		const opts = getOptionsFromTree( tree );
+		const itemsHaveParent = find( opts, item => item.value === parentPostId );
+		if ( parentPost && ! itemsHaveParent ) {
+			opts.unshift( {
+				value: parentPostId,
+				label: getTitle( parentPost ),
+			 } );
 
+		}
 		return opts;
 	}, [ pageItems ] );
 
