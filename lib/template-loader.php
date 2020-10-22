@@ -13,25 +13,7 @@
  * @return string[] List of all overrideable default template types.
  */
 function get_template_types() {
-	return array(
-		'index',
-		'404',
-		'archive',
-		'author',
-		'category',
-		'tag',
-		'taxonomy',
-		'date',
-		'embed',
-		'home',
-		'front-page',
-		'privacy-policy',
-		'page',
-		'search',
-		'single',
-		'singular',
-		'attachment',
-	);
+	return array_keys( gutenberg_get_template_types_definitions() );
 }
 
 /**
