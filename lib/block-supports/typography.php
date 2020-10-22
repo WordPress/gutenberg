@@ -65,9 +65,10 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$classes = array();
 	$styles  = array();
 
-	$has_font_size_support      = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
-	$has_line_height_support    = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
-	$has_text_transform_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
+	$has_font_size_support       = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
+	$has_line_height_support     = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
+	$has_text_decoration_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
+	$has_text_transform_support  = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
 
 	$has_font_family_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
@@ -110,6 +111,14 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		// Add the style (no classes for line-height).
 		if ( $has_line_height ) {
 			$styles[] = sprintf( 'line-height: %s;', $block_attributes['style']['typography']['lineHeight'] );
+		}
+	}
+
+	// Text Decoration.
+	if ( $has_text_decoration_support ) {
+		$text_decoration_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textDecoration', 'text-decoration' );
+		if ( $text_decoration_style ) {
+			$styles[] = $text_decoration_style;
 		}
 	}
 
