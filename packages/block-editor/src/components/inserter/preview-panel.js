@@ -25,9 +25,7 @@ function InserterPreviewPanel( { item } ) {
 						<BlockPreview
 							__experimentalPadding={ 16 }
 							viewportWidth={
-								( hoveredItemBlockType.example &&
-									hoveredItemBlockType.example
-										.viewportWidth ) ||
+								hoveredItemBlockType.example?.viewportWidth ??
 								500
 							}
 							blocks={
