@@ -60,7 +60,7 @@ function TemplatePartItem( {
 	return (
 		<CompositeItem
 			className="wp-block-template-part__selection-preview-item"
-			role="listitem"
+			role="option"
 			onClick={ onClick }
 			onKeyDown={ ( event ) => {
 				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
@@ -238,7 +238,7 @@ export default function TemplateParts( {
 		return (
 			<Composite
 				{ ...composite }
-				role="list"
+				role="listbox"
 				aria-label={ __( 'List of template parts' ) }
 			>
 				<TemplatePartSearchResults
@@ -255,7 +255,7 @@ export default function TemplateParts( {
 	return (
 		<Composite
 			{ ...composite }
-			role="list"
+			role="listbox"
 			aria-label={ __( 'List of template parts' ) }
 		>
 			<TemplatePartsByTheme
