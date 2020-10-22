@@ -17,7 +17,7 @@ const NavigationSidebar = () => {
 	return (
 		<>
 			<NavigationToggle isOpen={ isNavigationOpen } />
-			{ isNavigationOpen && <NavigationPanel /> }
+			<NavigationPanel isOpen={ isNavigationOpen } />
 		</>
 	);
 };

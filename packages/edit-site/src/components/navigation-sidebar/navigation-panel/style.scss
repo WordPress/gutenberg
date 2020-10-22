@@ -1,18 +1,42 @@
 .edit-site-navigation-panel {
-	animation: edit-site-navigation-panel__slide-in 0.1s linear;
 	height: 100%;
-	width: $nav-sidebar-width;
+	position: relative;
+	width: 0;
+	overflow: hidden;
 	background: $gray-900;
-	@include reduce-motion("animation");
+	transition: width 100ms linear;
+	@include reduce-motion("transition");
+}
 
-	@keyframes edit-site-navigation-panel__slide-in {
-		from {
-			transform: translateX(-100%);
-		}
-		to {
-			transform: translateX(0%);
-		}
-	}
+.edit-site-navigation-panel.is-open {
+	width: $nav-sidebar-width;
+}
+
+.edit-site-navigation-panel__inner {
+	position: relative;
+	width: $nav-sidebar-width;
+	height: 100%;
+}
+
+.edit-site-navigation-panel__site-title-container {
+	height: $header-height;
+	padding-left: $header-height;
+	margin: 0 $grid-unit-20 0 $grid-unit-10;
+	display: flex;
+	align-items: center;
+}
+
+.edit-site-navigation-panel__site-title {
+	font-style: normal;
+	font-weight: 600;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+	color: $gray-300;
+
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
 }
 
 .edit-site-navigation-panel__back-to-dashboard.components-button.is-tertiary {

@@ -30,11 +30,11 @@ If you do not have a local WordPress environment setup, follow the steps in the 
 
 ### Using wp-env to Install a Local Environment
 
-The [wp-env package](/packages/env/README.md) was developed with the Gutneberg project as a quick way to create a standard WordPress environment using Docker. It is also published as the `@wordpress/env` npm package.
+The [wp-env package](/packages/env/README.md) was developed with the Gutenberg project as a quick way to create a standard WordPress environment using Docker. It is also published as the `@wordpress/env` npm package.
 
-By default, `wp-env` can run in a plugin direcotry to create and run a WordPress enviornment, mounting and activating the plugin automatically. You can also configure `wp-env` to use existing installs, multiple plugins, or themes. See the [wp-env package](/packages/env/README.md#wp-envjson) for complete documentation.
+By default, `wp-env` can run in a plugin directory to create and run a WordPress enviornment, mounting and activating the plugin automatically. You can also configure `wp-env` to use existing installs, multiple plugins, or themes. See the [wp-env package](/packages/env/README.md#wp-envjson) for complete documentation.
 
-If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`. See the [Developement Environment tutorial for additional details](/docs/designers-developers/developers/tutorials/devenv/readme.md).
+If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`. See the [Development Environment tutorial for additional details](/docs/designers-developers/developers/tutorials/devenv/readme.md).
 
 Once Docker is installed and running: To install WordPress, run the following from within the cloned gutenberg directory:
 

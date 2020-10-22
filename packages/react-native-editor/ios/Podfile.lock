@@ -1,7 +1,7 @@
 PODS:
   - boost-for-react-native (1.63.0)
   - BVLinearGradient (2.5.6):
-    - React
+    - React-Core
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.61.5)
   - FBReactNativeSpec (0.61.5):
@@ -190,22 +190,22 @@ PODS:
     - React-jsi (= 0.61.5)
   - React-jsinspector (0.61.5)
   - react-native-blur (0.8.0):
-    - React
+    - React-Core
   - react-native-get-random-values (1.4.0):
-    - React
+    - React-Core
   - react-native-keyboard-aware-scroll-view (0.8.8):
-    - React
+    - React-Core
   - react-native-safe-area (0.5.1):
-    - React
+    - React-Core
   - react-native-safe-area-context (3.1.1):
-    - React
+    - React-Core
   - react-native-slider (3.0.2):
-    - React
+    - React-Core
   - react-native-video (5.0.2):
-    - React
+    - React-Core
     - react-native-video/Video (= 5.0.2)
   - react-native-video/Video (5.0.2):
-    - React
+    - React-Core
   - React-RCTActionSheet (0.61.5):
     - React-Core/RCTActionSheetHeaders (= 0.61.5)
   - React-RCTAnimation (0.61.5):
@@ -242,15 +242,15 @@ PODS:
     - React-jsi (= 0.61.5)
     - ReactCommon/jscallinvoker (= 0.61.5)
   - ReactNativeDarkMode (0.0.10):
-    - React
+    - React-Core
   - RNCMaskedView (0.1.10-wp):
-    - React
+    - React-Core
   - RNGestureHandler (1.6.0):
-    - React
+    - React-Core
   - RNReanimated (1.9.0):
-    - React
+    - React-Core
   - RNScreens (2.9.0):
-    - React
+    - React-Core
   - RNSVG (9.13.6-gb):
     - React
   - RNTAztecView (1.39.0):
@@ -396,7 +396,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BVLinearGradient: 60a475b2edfe7707deda00278cb8ce9bfe70e669
+  BVLinearGradient: 48f1964a78bddfae412d1aac5f386c2949fe0306
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
   FBLazyVector: aaeaf388755e4f29cd74acbc9e3b8da6d807c37f
   FBReactNativeSpec: 118d0d177724c2d67f08a59136eb29ef5943ec75

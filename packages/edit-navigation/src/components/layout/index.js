@@ -53,6 +53,7 @@ export default function Layout( { blockEditorSettings } ) {
 
 						<div className="edit-navigation-layout">
 							<Header
+								isPending={ ! navigationPost }
 								menus={ menus }
 								selectedMenuId={ selectedMenuId }
 								onSelectMenu={ selectMenu }

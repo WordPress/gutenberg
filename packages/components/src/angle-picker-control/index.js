@@ -7,25 +7,24 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
-import { FlexBlock } from '../flex';
+import { FlexBlock, FlexItem } from '../flex';
 import NumberControl from '../number-control';
 import AngleCircle from './angle-circle';
-import {
-	Root,
-	NumberControlWrapper,
-} from './styles/angle-picker-control-styles';
+import { Root } from './styles/angle-picker-control-styles';
 
 export default function AnglePickerControl( {
 	className,
+	hideLabelFromVision,
 	id: idProp,
-	value,
+	label = __( 'Angle' ),
 	onChange,
-	label,
+	value,
 	...props
 } ) {
 	const instanceId = useInstanceId(
@@ -45,12 +44,13 @@ export default function AnglePickerControl( {
 	return (
 		<BaseControl
 			className={ classes }
+			hideLabelFromVision={ hideLabelFromVision }
 			id={ id }
 			label={ label }
 			{ ...props }
 		>
-			<Root gap={ 3 }>
-				<NumberControlWrapper>
+			<Root>
+				<FlexBlock>
 					<NumberControl
 						className="components-angle-picker-control__input-field"
 						id={ id }
@@ -60,14 +60,14 @@ export default function AnglePickerControl( {
 						step="1"
 						value={ value }
 					/>
-				</NumberControlWrapper>
-				<FlexBlock>
+				</FlexBlock>
+				<FlexItem>
 					<AngleCircle
 						aria-hidden="true"
 						value={ value }
 						onChange={ onChange }
 					/>
-				</FlexBlock>
+				</FlexItem>
 			</Root>
 		</BaseControl>
 	);

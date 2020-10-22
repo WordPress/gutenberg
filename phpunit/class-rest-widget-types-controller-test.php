@@ -260,7 +260,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	public function test_get_widget_form() {
 		$widget_name = 'calendar';
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types/' . $widget_name . '/form-renderer' );
+		$request  = new WP_REST_Request( 'POST', '/wp/v2/widget-types/' . $widget_name . '/form-renderer' );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertArrayHasKey( 'instance', $data );
