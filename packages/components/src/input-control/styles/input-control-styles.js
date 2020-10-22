@@ -226,6 +226,7 @@ const BaseLabel = styled( Text )`
 
 		${ labelPadding }
 		${ labelTruncation }
+		${ rootLabelPositionStyles }
 	}
 `;
 
