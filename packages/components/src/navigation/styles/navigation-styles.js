@@ -78,7 +78,6 @@ export const ItemUI = styled.li`
 		height: 32px;
 		margin: 0;
 		font-weight: 400;
-		font-size: 14px;
 		line-height: 20px;
 		padding-left: 16px;
 		padding-right: 16px;
@@ -129,4 +128,5 @@ export const ItemBadgeUI = styled.span`
 export const ItemTitleUI = styled( Text )`
 	margin-right: auto;
 	text-align: left;
+	font-size: 13px;
 `;
