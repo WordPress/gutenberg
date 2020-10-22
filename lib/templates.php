@@ -76,7 +76,6 @@ function gutenberg_register_template_post_type() {
 	register_post_status( 'theme-provided', array(
 		'label'                     => __( 'Theme-provided' ),
 		'post_type'                 => array( 'wp_template' ),
-		'publicly_queryable'        => true,
 		'show_in_admin_all_list'    => true,
 		'show_in_admin_status_list' => true,
 	) );
@@ -183,17 +182,23 @@ function gutenberg_render_template_list_table_column( $column_name, $post_id ) {
 			echo get_the_excerpt( $post_id );
 			break;
 		case 'status':
-			echo get_post_status( $post_id );
+			$post_status = get_post_status( $post_id );
+			$post_status_object = get_post_status_object( $post_status );
+			echo $post_status_object->label;
 			break;
 	}
 }
 add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_template_list_table_column', 10, 2 );
 
 function gutenberg_filter_templates_admin_query( $query ) {
-	if ( ! is_admin() || 'wp_template' !== $query->query['post_type'] ) {
+	if (
+		! is_admin() ||
+		'wp_template' !== $query->query['post_type'] ||
+		'' !== $query->query['post_status']
+	) {
 		return;
 	}
-	$query->set( 'post_status', array( 'publish', 'theme-provided', 'auto-draft' ) );
+	$query->set( 'post_status', array( 'publish', 'auto-draft', 'theme-provided' ) );
 }
 add_filter( 'pre_get_posts', 'gutenberg_filter_templates_admin_query' );
 
