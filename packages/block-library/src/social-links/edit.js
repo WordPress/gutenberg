@@ -16,17 +16,16 @@ import {
 	InspectorControls,
 } from '@wordpress/block-editor';
 import {
-	Dropdown,
+	DropdownMenu,
 	MenuGroup,
 	MenuItem,
 	PanelBody,
 	ToggleControl,
-	ToolbarButton,
+	ToolbarItem,
 	ToolbarGroup,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
-import { DOWN } from '@wordpress/keycodes';
 
 const ALLOWED_BLOCKS = [ 'core/social-link' ];
 
@@ -61,63 +60,48 @@ export function SocialLinksEdit( props ) {
 		__experimentalAppenderTagName: 'li',
 	} );
 
-	const openOnArrowDown = ( event ) => {
-		if ( event.keyCode === DOWN ) {
-			event.preventDefault();
-			event.stopPropagation();
-			event.target.click();
-		}
-	};
 	return (
 		<Fragment>
 			<BlockControls>
-				<Dropdown
-					className={ 'icon-size-picker__dropdown' }
-					contentClassName={ 'icon-size-picker__dropdowncontent' }
-					popoverProps={ {
-						isAlternate: true,
-						position: 'bottom right',
-					} }
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<ToolbarGroup>
-							<ToolbarButton
-								onClick={ onToggle }
-								onKeyDown={ openOnArrowDown }
-								aria-expanded={ isOpen }
-								aria-haspopup="true"
-							>
-								{ __( 'Size' ) }
-							</ToolbarButton>
-						</ToolbarGroup>
-					) }
-					renderContent={ () => (
-						<MenuGroup label={ __( 'Icon size' ) }>
-							{ sizeOptions.map( ( entry ) => {
-								return (
-									<MenuItem
-										icon={
-											( size === entry.value ||
-												( ! size &&
-													entry.value ===
-														'has-normal-icon-size' ) ) &&
-											check
-										}
-										isSelected={ size === entry.value }
-										key={ entry.value }
-										onClick={ () =>
-											setAttributes( {
-												size: entry.value,
-											} )
-										}
-										role="menuitemradio"
-									>
-										{ entry.name }
-									</MenuItem>
-								);
-							} ) }
-						</MenuGroup>
-					) }
-				/>
+				<ToolbarGroup>
+					<ToolbarItem>
+						{ () => (
+							<DropdownMenu label={ __( 'Size' ) }>
+								{ ( onClose ) => (
+									<MenuGroup>
+										{ sizeOptions.map( ( entry ) => {
+											return (
+												<MenuItem
+													icon={
+														( size ===
+															entry.value ||
+															( ! size &&
+																entry.value ===
+																	'has-normal-icon-size' ) ) &&
+														check
+													}
+													isSelected={
+														size === entry.value
+													}
+													key={ entry.value }
+													onClick={ () => {
+														setAttributes( {
+															size: entry.value,
+														} );
+													} }
+													onClose={ onClose }
+													role="menuitemradio"
+												>
+													{ entry.name }
+												</MenuItem>
+											);
+										} ) }
+									</MenuGroup>
+								) }
+							</DropdownMenu>
+						) }
+					</ToolbarItem>
+				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
