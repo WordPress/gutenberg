@@ -661,7 +661,7 @@ export function removeBlock( clientId, selectPrevious ) {
  *
  * @param {string}   rootClientId    Client ID of the block whose InnerBlocks will re replaced.
  * @param {Object[]} blocks          Block objects to insert as new InnerBlocks
- * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
+ * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to false.
  *
  * @return {Object} Action object.
  */
