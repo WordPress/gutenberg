@@ -2,6 +2,15 @@ figure.wp-block-image:not(.wp-block) {
 	margin: 0;
 }
 
+figure.wp-block {
+	// Because blocks have margin left/right of `auto`, the figure should
+	// stay full-size so it doesn't unexpectedly center when the image inside
+	// it is resized to smaller proportions.
+	// This is needed specifically for the image block because the figure has
+	// `display: table` so the default behavior is for its width to collapse.
+	width: 100%;
+}
+
 .wp-block-image {
 	position: relative;
 
