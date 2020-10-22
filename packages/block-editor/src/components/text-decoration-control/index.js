@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { Button, Icon } from '@wordpress/components';
-import { formatStrikethrough } from '@wordpress/icons';
+import { Button } from '@wordpress/components';
+import { formatStrikethrough, formatUnderline } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -47,7 +47,7 @@ export default function TextDecorationControl( {
 	// Text Decoration icons to use.
 	const icons = {
 		strikethrough: formatStrikethrough,
-		underline: <Icon icon="editor-underline" />,
+		underline: formatUnderline,
 	};
 
 	return (
