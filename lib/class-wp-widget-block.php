@@ -29,7 +29,7 @@ class WP_Widget_Block extends WP_Widget {
 	 */
 	public function __construct() {
 		$widget_ops  = array(
-			'classname'                   => 'widget_block',
+			'classname'                   => '%s', // Set dynamically in widget().
 			'description'                 => __( 'Gutenberg block.', 'gutenberg' ),
 			'customize_selective_refresh' => true,
 		);
@@ -53,8 +53,8 @@ class WP_Widget_Block extends WP_Widget {
 	 * @global WP_Post $post Global post object.
 	 */
 	public function widget( $args, $instance ) {
-		echo $args['before_widget'];
-		$content = do_blocks( $instance['content'] );
+		echo sprintf( $args['before_widget'], $this->get_dynamic_classname( $instance ) );
+		echo do_blocks( $instance['content'] );
 
 		// Handle embeds for block widgets.
 		//
@@ -66,6 +66,87 @@ class WP_Widget_Block extends WP_Widget {
 		echo $wp_embed->autoembed( $content );
 
 		echo $args['after_widget'];
+	}
+
+	/**
+	 * Calculates the classname to use in the block widget's container HTML.
+	 *
+	 * Usually this is set to $this->widget_options['classname'] by
+	 * dynamic_sidebar(). In this case, however, we want to set the classname
+	 * dynamically depending on the block conatined by this block widget.
+	 *
+	 * If a block widget contains a block that has an equivelant legacy widget,
+	 * we display that legacy widget's class name. This helps with theme
+	 * backwards compatibility.
+	 *
+	 * @since 9.3.0
+	 *
+	 * @param array $instance Settings for the current block widget instance.
+	 *
+	 * @return string The classname to use in the block widget's container HTML.
+	 */
+	private function get_dynamic_classname( $instance ) {
+		$blocks = parse_blocks( $instance['content'] );
+
+		$block_name = isset( $blocks[0] ) ? $blocks[0]['blockName'] : null;
+
+		switch ( $block_name ) {
+			case 'core/paragraph':
+				$classname = 'widget_block widget_text';
+				break;
+			case 'core/calendar':
+				$classname = 'widget_block widget_calendar';
+				break;
+			case 'core/search':
+				$classname = 'widget_block widget_search';
+				break;
+			case 'core/html':
+				$classname = 'widget_block widget_custom_html';
+				break;
+			case 'core/archives':
+				$classname = 'widget_block widget_archive';
+				break;
+			case 'core/latest-posts':
+				$classname = 'widget_block widget_recent_entries';
+				break;
+			case 'core/latest-comments':
+				$classname = 'widget_block widget_recent_comments';
+				break;
+			case 'core/tag-cloud':
+				$classname = 'widget_block widget_tag_cloud';
+				break;
+			case 'core/categories':
+				$classname = 'widget_block widget_categories';
+				break;
+			case 'core/audio':
+				$classname = 'widget_block widget_media_audio';
+				break;
+			case 'core/video':
+				$classname = 'widget_block widget_media_video';
+				break;
+			case 'core/image':
+				$classname = 'widget_block widget_media_image';
+				break;
+			case 'core/gallery':
+				$classname = 'widget_block widget_media_gallery';
+				break;
+			case 'core/rss':
+				$classname = 'widget_block widget_rss';
+				break;
+			default:
+				$classname = 'widget_block';
+		}
+
+		/**
+		 * The classname used in the block widget's container HTML.
+		 *
+		 * This can be set according to the name of the block contained by the
+		 * block widget.
+		 *
+		 * @param string $classname The classname to be used in the block widget's container HTML, e.g. 'widget_block widget_text'.
+		 * @param string $block_name The name of the block contained by the block widget, e.g. 'core/paragraph'.
+		 */
+		return apply_filters( 'widget_block_dynamic_classname', $classname, $block_name );
 	}
 
 	/**
