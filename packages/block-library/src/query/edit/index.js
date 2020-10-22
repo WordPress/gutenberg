@@ -1,14 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	InnerBlocks,
 	useBlockProps,
+	__experimentalBlockVariationPicker,
 } from '@wordpress/block-editor';
+import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -19,12 +21,12 @@ import QueryInspectorControls from './query-inspector-controls';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
 const TEMPLATE = [ [ 'core/query-loop' ] ];
-export default function QueryEdit( {
+export function QueryEditContainer( {
 	attributes: { queryId, query },
 	context: { postId },
 	setAttributes,
 } ) {
-	const instanceId = useInstanceId( QueryEdit );
+	const instanceId = useInstanceId( QueryEditContainer );
 	const blockProps = useBlockProps();
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
@@ -75,4 +77,61 @@ export default function QueryEdit( {
 	);
 }
 
+const Placeholder = ( { clientId, name, setAttributes } ) => {
+	const { blockType, defaultVariation, variations } = useSelect(
+		( select ) => {
+			const {
+				getBlockVariations,
+				getBlockType,
+				getDefaultBlockVariation,
+			} = select( 'core/blocks' );
+
+			return {
+				blockType: getBlockType( name ),
+				defaultVariation: getDefaultBlockVariation( name, 'block' ),
+				variations: getBlockVariations( name, 'block' ),
+			};
+		},
+		[ name ]
+	);
+	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
+	const blockProps = useBlockProps();
+	return (
+		<div { ...blockProps }>
+			<__experimentalBlockVariationPicker
+				icon={ blockType?.icon?.src }
+				label={ blockType?.title }
+				variations={ variations }
+				onSelect={ ( nextVariation = defaultVariation ) => {
+					if ( nextVariation.attributes ) {
+						setAttributes( nextVariation.attributes );
+					}
+					if ( nextVariation.innerBlocks ) {
+						replaceInnerBlocks(
+							clientId,
+							createBlocksFromInnerBlocksTemplate(
+								nextVariation.innerBlocks
+							),
+							false
+						);
+					}
+				} }
+			/>
+		</div>
+	);
+};
+
+const QueryEdit = ( props ) => {
+	const { clientId } = props;
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
+		[ clientId ]
+	);
+	const Component = hasInnerBlocks ? QueryEditContainer : Placeholder;
+
+	return <Component { ...props } />;
+};
+
+export default QueryEdit;
 export * from './query-provider';
