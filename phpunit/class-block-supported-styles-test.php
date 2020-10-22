@@ -573,19 +573,80 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * Tests width support
+	 */
+	function test_width() {
+		$block_type_settings = array(
+			'attributes'      => array(),
+			'supports'        => array(
+				'__experimentalDimensions' => array( 'width' => true ),
+			),
+			'render_callback' => true,
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'style' => array(
+					'dimensions' => array( 'width' => 'var:preset|width|75' ),
+				),
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+			$expected_classes = 'foo-bar-class wp-block-example';
+			$expected_styles  = 'test: style; width: var(--wp--preset--width--75);';
+
+			$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	/**
+	 * Tests width not applied without support flag.
+	 */
+	function test_width_unsupported() {
+		$block_type_settings = array(
+			'attributes'      => array(),
+			'supports'        => array(),
+			'render_callback' => true,
+		);
+		$this->register_block_type( 'core/example', $block_type_settings );
+
+		$block = array(
+			'blockName'    => 'core/example',
+			'attrs'        => array(
+				'style' => array( 'dimensions' => array( 'width' => 'var:preset|width|75' ) ),
+			),
+			'innerBlock'   => array(),
+			'innerContent' => array(),
+			'innerHTML'    => array(),
+		);
+
+		$expected_classes = 'foo-bar-class wp-block-example';
+		$expected_styles  = 'test: style;';
+
+		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
+	}
+
+	/**
 	 * Tests all support flags together to ensure they work together as expected.
 	 */
 	function test_all_supported() {
 		$block_type_settings = array(
 			'attributes' => array(),
 			'supports'   => array(
-				'color'      => array(
+				'color'                    => array(
 					'gradients' => true,
 					'link'      => true,
 				),
-				'fontSize'   => true,
-				'lineHeight' => true,
-				'align'      => true,
+				'fontSize'                 => true,
+				'lineHeight'               => true,
+				'align'                    => true,
+				'__experimentalDimensions' => array(
+					'width' => true,
+				),
 			),
 		);
 		$this->register_block_type( 'core/example', $block_type_settings );
@@ -604,6 +665,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 						'lineHeight' => '20',
 						'fontSize'   => '10',
 					),
+					'dimensions' => array( 'width' => 'var:preset|width|75' ),
 				),
 			),
 			'innerBlock'   => array(),
@@ -612,7 +674,7 @@ class Block_Supported_Styles_Test extends WP_UnitTestCase {
 		);
 
 		$expected_classes = 'foo-bar-class wp-block-example has-text-color has-background alignwide';
-		$expected_styles  = 'test: style; color: #000; background-color: #fff; font-size: 10px; line-height: 20;';
+		$expected_styles  = 'test: style; color: #000; background-color: #fff; font-size: 10px; line-height: 20; width: var(--wp--preset--width--75);';
 
 		$this->assert_content_and_styles_and_classes_match( $block, $expected_classes, $expected_styles );
 	}
