@@ -10,7 +10,7 @@ jobs:
     strategy:
       matrix:
         native-test-name: [
-          gutenberg-editor-gallery
+          gutenberg-editor-blocks
         ]
 
     steps:
