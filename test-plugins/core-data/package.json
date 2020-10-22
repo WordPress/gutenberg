@@ -1,0 +1,48 @@
+{
+	"name": "pistachio",
+	"private": true,
+	"version": "0.0.1",
+	"description": "The Green Nut",
+	"main": "index.js",
+	"scripts": {
+		"build": "cross-env SOURCEMAP=source-map NODE_ENV=development calypso-build index=./js/index.js --env.WP ",
+		"start": "npm run build -- --watch"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "GPL-2.0+",
+	"devDependencies": {
+		"@automattic/calypso-build": "^5.1.0",
+		"@testing-library/react": "^10.0.2",
+		"babel-eslint": "^8.2.6",
+		"cross-env": "^5.2.1",
+		"enzyme-to-json": "^3.4.0",
+		"eslint": "^5.4.0",
+		"eslint-config-prettier": "^3.0.1",
+		"eslint-config-wpcalypso": "^4.0.1",
+		"eslint-plugin-import": "^2.14.0",
+		"eslint-plugin-jest": "^21.21.0",
+		"eslint-plugin-prettier": "^3.0.0",
+		"eslint-plugin-react": "^7.11.1",
+		"eslint-plugin-wpcalypso": "^4.0.2",
+		"jest": "^25.3",
+		"prettier": "npm:wp-prettier@1.19.1",
+		"random-fixture-data": "^2.0.19",
+		"react": "^16.4.0",
+		"react-dom": "^16.4.0",
+		"react-redux": "^5.0.7",
+		"redux": "^4.0.0",
+		"unescape-html": "^1.1.0"
+	},
+	"dependencies": {
+		"@wordpress/api-fetch": "^3.4.0",
+		"@wordpress/compose": "^1.0.4",
+		"@wordpress/core-data": "^1.1.1",
+		"@wordpress/data": "^4.15.0",
+		"addressparser": "^1.0.1",
+		"file-size": "^1.0.0",
+		"lodash": "^4.17.10",
+		"moment": "^2.22.2",
+		"title-case": "^2.1.1"
+	}
+}

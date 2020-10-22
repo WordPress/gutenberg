@@ -1,6 +1,6 @@
 {
 	"core": "WordPress/WordPress",
-	"plugins": [ "." ],
+	"plugins": [ ".", "./test-plugins/core-data" ],
 	"env": {
 		"tests": {
 			"mappings": {
