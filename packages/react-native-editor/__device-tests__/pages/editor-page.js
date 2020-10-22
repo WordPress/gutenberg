@@ -120,6 +120,17 @@ export default class EditorPage {
 		return elements[ elements.length - 1 ];
 	}
 
+	async scrollAndReturnElement( accessibilityLabel ) {
+		const elements = await this.driver.elementsByXPath(
+			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
+		);
+		if ( elements.length === 0 ) {
+			await swipeUp( this.driver );
+			return this.scrollAndReturnElement( accessibilityLabel );
+		}
+		return elements[ elements.length - 1 ];
+	}
+
 	async getTextViewForHtmlViewContent() {
 		const accessibilityId = 'html-view-content';
 		let blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
