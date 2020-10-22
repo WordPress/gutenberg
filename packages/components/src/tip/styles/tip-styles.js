@@ -1,25 +1,30 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/core';
+import styled from '@emotion/styled';
+
+/**
+ * WordPress dependencies
+ */
+import { SVG } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
  */
 import { color, space, rtl } from '../../utils';
 
-export const tipStyles = css`
+export const TipWrapper = styled.div`
 	display: flex;
 	color: ${ color( 'mediumGray.text' ) };
 `;
 
-export const iconStyles = css`
+export const TipIcon = styled( SVG )`
 	align-self: center;
 	fill: ${ color( 'alert.yellow' ) };
 	flex-shrink: 0;
 	${ rtl( { marginRight: space( 2 ) } )() }
 `;
 
-export const contentStyles = css`
+export const TipContent = styled.p`
 	margin: 0;
 `;
