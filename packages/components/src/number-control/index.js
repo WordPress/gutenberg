@@ -29,6 +29,7 @@ export function NumberControl(
 		hideHTMLArrows = false,
 		isDragEnabled = true,
 		isShiftStepEnabled = true,
+		canAcceptAutoValue = false,
 		label,
 		max = Infinity,
 		min = -Infinity,
@@ -156,7 +157,7 @@ export function NumberControl(
 			type === inputControlActionTypes.COMMIT
 		) {
 			state.value =
-				currentValue === 'auto'
+				currentValue === 'auto' && canAcceptAutoValue
 					? currentValue
 					: roundClamp( currentValue, min, max );
 		}
