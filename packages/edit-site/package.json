@@ -22,10 +22,6 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
-	"sideEffects": [
-		"build-style/**",
-		"!((src|build|build-module)/components/**)"
-	],
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
 		"@wordpress/a11y": "file:../a11y",
