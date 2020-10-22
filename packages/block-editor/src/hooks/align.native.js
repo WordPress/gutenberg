@@ -12,8 +12,6 @@ import { WIDE_ALIGNMENTS } from '@wordpress/components';
 
 const ALIGNMENTS = [ 'left', 'center', 'right' ];
 
-export { AlignmentHookSettingsProvider } from './align.js';
-
 // Used to filter out blocks that don't support wide/full alignment on mobile
 addFilter(
 	'blocks.registerBlockType',

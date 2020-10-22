@@ -7,10 +7,7 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalAlignmentHookSettingsProvider as AlignmentHookSettingsProvider,
-	InnerBlocks,
-} from '@wordpress/block-editor';
+import { InnerBlocks } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -97,15 +94,10 @@ export default function ButtonsEdit( {
 		</View>
 	) );
 
-	// Inside buttons block alignment options are not supported.
-	const alignmentHooksSetting = {
-		isEmbedButton: true,
-	};
-
 	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
 
 	return (
-		<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
+		<>
 			{ resizeObserver }
 			<InnerBlocks
 				allowedBlocks={ ALLOWED_BLOCKS }
@@ -122,7 +114,8 @@ export default function ButtonsEdit( {
 				parentWidth={ maxWidth }
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
+				__experimentalLayout={ { type: 'default', alignments: [] } }
 			/>
-		</AlignmentHookSettingsProvider>
+		</>
 	);
 }
