@@ -72,6 +72,14 @@ function gutenberg_register_template_post_type() {
 	);
 
 	register_post_type( 'wp_template', $args );
+
+	register_post_status( 'theme-provided', array(
+		'label'                     => __( 'Theme-provided' ),
+		'post_type'                 => array( 'wp_template' ),
+		'publicly_queryable'        => true,
+		'show_in_admin_all_list'    => true,
+		'show_in_admin_status_list' => true,
+	) );
 }
 add_action( 'init', 'gutenberg_register_template_post_type' );
 
@@ -185,7 +193,7 @@ function gutenberg_filter_templates_admin_query( $query ) {
 	if ( ! is_admin() || 'wp_template' !== $query->query['post_type'] ) {
 		return;
 	}
-	$query->set( 'post_status', array( 'publish', 'draft', 'auto-draft' ) );
+	$query->set( 'post_status', array( 'publish', 'theme-provided', 'auto-draft' ) );
 }
 add_filter( 'pre_get_posts', 'gutenberg_filter_templates_admin_query' );
 
@@ -237,7 +245,7 @@ function filter_rest_wp_template_query( $args, $request ) {
 			}
 		}
 		$args['post__in']    = $template_ids;
-		$args['post_status'] = array( 'publish', 'auto-draft' );
+		$args['post_status'] = array( 'publish', 'auto-draft', 'theme-provided' );
 	}
 
 	return $args;

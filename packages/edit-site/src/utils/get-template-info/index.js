@@ -14,16 +14,15 @@ export default function getTemplateInfo( template ) {
 	if ( ! template ) {
 		return {};
 	}
+
+	if ( 'wp_template_part' === template.type ) {
+		return { title: template.slug, description: '' };
+	}
+
 	const { title: defaultTitle, description: defaultDescription } =
 		TEMPLATES_DEFAULT_DETAILS[ template.slug ] ?? {};
 
-	let title = template?.title?.rendered ?? template.slug;
-	if ( title !== template.slug ) {
-		title = template.title.rendered;
-	} else if ( defaultTitle ) {
-		title = defaultTitle;
-	}
-
+	const title = template?.title?.rendered ?? defaultTitle ?? template.slug;
 	const description = template?.excerpt?.raw || defaultDescription;
 	return { title, description };
 }

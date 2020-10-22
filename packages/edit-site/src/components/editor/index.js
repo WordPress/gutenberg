@@ -119,9 +119,10 @@ function Editor() {
 				entitiesToSave.forEach( ( { kind, name, key } ) => {
 					const record = getEditedEntityRecord( kind, name, key );
 
-					const edits = record.slug
-						? { status: 'publish', title: record.slug }
-						: { status: 'publish' };
+					const edits =
+						! record.title && record.slug
+							? { status: 'publish', title: record.slug }
+							: { status: 'publish' };
 
 					editEntityRecord( kind, name, key, edits );
 				} );

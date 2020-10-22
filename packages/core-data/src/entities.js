@@ -135,7 +135,7 @@ function* loadPostTypeEntities() {
 			mergedEdits: { meta: true },
 			getTitle( record ) {
 				if ( name === 'wp_template_part' || name === 'wp_template' ) {
-					return startCase( record.slug );
+					return record.title || startCase( record.slug );
 				}
 				return get( record, [ 'title', 'rendered' ], record.id );
 			},

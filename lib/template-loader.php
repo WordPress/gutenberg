@@ -250,15 +250,22 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 		$current_template_post = array(
 			'post_content' => $file_contents,
 			'post_title'   => $post_name,
-			'post_status'  => 'auto-draft',
+			'post_status'  => 'theme-provided',
 			'post_type'    => 'wp_template',
 			'post_name'    => $post_name,
 		);
+
+		$template_types_definitions = gutenberg_get_template_types_definitions();
+		if ( isset( $template_types_definitions[ $post_name ] ) ) {
+			$current_template_post['post_title']   = $template_types_definitions[ $post_name ]['title'];
+			$current_template_post['post_excerpt'] = $template_types_definitions[ $post_name ]['description'];
+		}
+
 		if ( is_admin() || defined( 'REST_REQUEST' ) ) {
 			$template_query        = new WP_Query(
 				array(
 					'post_type'      => 'wp_template',
-					'post_status'    => 'auto-draft',
+					'post_status'    => 'theme-provided',
 					'name'           => $post_name,
 					'posts_per_page' => 1,
 					'no_found_rows'  => true,
@@ -266,7 +273,7 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 			);
 			$current_template_post = $template_query->have_posts() ? $template_query->next_post() : $current_template_post;
 
-			// Only create auto-draft of block template for editing
+			// Only create auto-draft (theme-provided) of block template for editing
 			// in admin screens, when necessary, because the underlying
 			// file has changed.
 			if ( is_array( $current_template_post ) || $current_template_post->post_content !== $file_contents ) {
@@ -290,7 +297,7 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 	if ( ! $current_template_post && ( is_admin() || defined( 'REST_REQUEST' ) ) ) {
 		$current_template_post = array(
 			'post_title'  => 'index',
-			'post_status' => 'auto-draft',
+			'post_status' => 'theme-provided',
 			'post_type'   => 'wp_template',
 			'post_name'   => 'index',
 		);
