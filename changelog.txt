@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 9.2.1 =
+
+### Bug Fixes
+
+ - Code block: preserve indentation on paste
+ - Fix block supports for inner blocks
+ - Fix archives block render function
+
+
 = 9.2.0 =
 
 ### Features

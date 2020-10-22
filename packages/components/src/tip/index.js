@@ -1,8 +1,17 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { SVG, Path } from '../';
+import { SVG, Path } from '@wordpress/primitives';
 
+/**
+ * @typedef Props
+ * @property {import('react').ReactNode} children Children to render in the tip.
+ */
+
+/**
+ * @param {Props} props
+ * @return {JSX.Element} Element
+ */
 function Tip( props ) {
 	return (
 		<div className="components-tip">
