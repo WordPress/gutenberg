@@ -80,9 +80,7 @@ function gutenberg_render_duotone_support( $block_type, $block_attributes, $bloc
 	}
 
 	$duotone_slug   = $block_attributes['duotone']['slug'];
-	$duotone_colors = $block_attributes['duotone']['values'];
-
-	$duotone_id = 'duotone-filter-' . $duotone_slug;
+	$duotone_values = $block_attributes['duotone']['values'];
 
 	// Object | boolean | string | string[] -> boolean | string | string[].
 	$edit_selector =
@@ -90,67 +88,7 @@ function gutenberg_render_duotone_support( $block_type, $block_attributes, $bloc
 			? $duotone_support
 			: $duotone_support['edit'];
 
-	// boolean | string | string[] -> boolean[] | string[].
-	$edit_selectors = is_array( $edit_selector )
-		? $edit_selector
-		: array( $edit_selector );
-
-	// boolean[] | string[] -> string[].
-	$duotone_class     = '.' . $duotone_id;
-	$duotone_selectors = array_map(
-		function ( $selector ) use ( $duotone_class ) {
-			return is_string( $selector )
-				? $duotone_class . ' ' . $selector
-				: $duotone_class;
-		},
-		$edit_selectors
-	);
-
-	// string[] -> string.
-	$duotone_selector = implode( ', ', $duotone_selectors );
-
-	ob_start();
-
-	?>
-
-	<style>
-		<?php echo $duotone_selector; ?> {
-			filter: url( <?php echo '#' . $duotone_id; ?> );
-		}
-	</style>
-
-	<svg
-		xmlns:xlink="http://www.w3.org/1999/xlink"
-		viewBox="0 0 0 0"
-		width="0"
-		height="0"
-		focusable="false"
-		role="none"
-		style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"
-	>
-		<defs>
-			<filter id="<?php echo $duotone_id; ?>">
-				<feColorMatrix
-					type="matrix"
-					<?php // phpcs:disable Generic.WhiteSpace.DisallowSpaceIndent ?>
-					values=".299 .587 .114 0 0
-					        .299 .587 .114 0 0
-					        .299 .587 .114 0 0
-					        0 0 0 1 0"
-					<?php // phpcs:enable Generic.WhiteSpace.DisallowSpaceIndent ?>
-				/>
-				<feComponentTransfer color-interpolation-filters="sRGB">
-					<feFuncR type="table" tableValues="<?php echo join( ' ', $duotone_colors['r'] ); ?>" />
-					<feFuncG type="table" tableValues="<?php echo join( ' ', $duotone_colors['g'] ); ?>" />
-					<feFuncB type="table" tableValues="<?php echo join( ' ', $duotone_colors['b'] ); ?>" />
-				</feComponentTransfer>
-			</filter>
-		</defs>
-	</svg>
-
-	<?php
-
-	$duotone = ob_get_clean();
+	$duotone = gutenberg_render_duotone_filter( $duotone_slug, $edit_selector, $duotone_values );
 
 	return $block_content . $duotone;
 }
