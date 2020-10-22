@@ -24,24 +24,15 @@ import {
 	RichText,
 	useBlockProps,
 	__experimentalLinkControl as LinkControl,
-	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
 import { link, linkOff } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
 
-/**
- * Internal dependencies
- */
-import ColorEdit from './color-edit';
-import getColorAndStyleProps from './color-props';
-
 const NEW_TAB_REL = 'noreferrer noopener';
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_BORDER_RADIUS_POSITION = 5;
-
-const EMPTY_ARRAY = [];
 
 function BorderPanel( { borderRadius = '', setAttributes } ) {
 	const initialBorderRadius = borderRadius;
@@ -175,7 +166,6 @@ function ButtonEdit( props ) {
 		},
 		[ setAttributes ]
 	);
-	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 
 	const onToggleOpenInNewTab = useCallback(
 		( value ) => {
@@ -196,18 +186,18 @@ function ButtonEdit( props ) {
 		[ rel, setAttributes ]
 	);
 
-	const colorProps = getColorAndStyleProps( attributes, colors, true );
 	const blockProps = useBlockProps();
 
-	// Remove colorProps from style so that they are not applied to the button's
-	// wrapper
-	for ( const key of Object.keys( colorProps.style ) ) {
-		delete blockProps.style[ key ];
-	}
+	// Temporarily, we need to add the border radius to the blockProps so
+	// that it is applied at the block level. This can be replaced by using
+	// the border radius block support.
+	blockProps.style = {
+		...blockProps.style,
+		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+	};
 
 	return (
 		<>
-			<ColorEdit { ...props } />
 			<div { ...blockProps }>
 				<RichText
 					placeholder={ placeholder || __( 'Add text…' ) }
@@ -217,17 +207,10 @@ function ButtonEdit( props ) {
 					className={ classnames(
 						className,
 						'wp-block-button__link',
-						colorProps.className,
 						{
 							'no-border-radius': borderRadius === 0,
 						}
 					) }
-					style={ {
-						borderRadius: borderRadius
-							? borderRadius + 'px'
-							: undefined,
-						...colorProps.style,
-					} }
 					onSplit={ ( value ) =>
 						createBlock( 'core/button', {
 							...attributes,

@@ -10,8 +10,14 @@ import classnames from 'classnames';
 import {
 	RichText,
 	getColorClassName,
+	useBlockProps,
 	__experimentalGetGradientClass,
 } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import getColorAndStyleProps from './color-props';
 
 const migrateCustomColorsAndGradients = ( attributes ) => {
 	if (
@@ -81,6 +87,85 @@ const blockAttributes = {
 };
 
 const deprecated = [
+	{
+		supports: {
+			anchor: true,
+			align: true,
+			alignWide: false,
+			reusable: false,
+			__experimentalSelector: '.wp-block-button > a',
+		},
+		attributes: {
+			...blockAttributes,
+			linkTarget: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'target',
+			},
+			rel: {
+				type: 'string',
+				source: 'attribute',
+				selector: 'a',
+				attribute: 'rel',
+			},
+			placeholder: {
+				type: 'string',
+			},
+			borderRadius: {
+				type: 'number',
+			},
+			backgroundColor: {
+				type: 'string',
+			},
+			textColor: {
+				type: 'string',
+			},
+			gradient: {
+				type: 'string',
+			},
+			style: {
+				type: 'object',
+			},
+		},
+		save( { attributes } ) {
+			const {
+				borderRadius,
+				linkTarget,
+				rel,
+				text,
+				title,
+				url,
+			} = attributes;
+			const colorProps = getColorAndStyleProps( attributes );
+			const buttonClasses = classnames(
+				'wp-block-button__link',
+				colorProps.className,
+				{
+					'no-border-radius': borderRadius === 0,
+				}
+			);
+			const buttonStyle = {
+				borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+				...colorProps.style,
+			};
+
+			return (
+				<div { ...useBlockProps.save() }>
+					<RichText.Content
+						tagName="a"
+						className={ buttonClasses }
+						href={ url }
+						title={ title }
+						style={ buttonStyle }
+						value={ text }
+						target={ linkTarget }
+						rel={ rel }
+					/>
+				</div>
+			);
+		},
+	},
 	{
 		supports: {
 			align: true,

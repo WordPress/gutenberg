@@ -1,5 +1,24 @@
 $blocks-button__height: 3.1em;
 
+// If a custom style has been applied to the wrapper via block
+// support, inherit it in the button
+.wp-block-buttons > .wp-block-button {
+	&.has-text-color .wp-block-button__link {
+		color: inherit;
+	}
+
+	&.has-background {
+		display: inline-block;
+		.wp-block-button__link {
+			background-color: inherit;
+		}
+	}
+
+	&[style*="border-radius:"] .wp-block-button__link {
+		border-radius: inherit;
+	}
+}
+
 // Prefer the link selector instead of the regular button classname
 // to support the previous markup in addition to the new one.
 .wp-block-button__link {

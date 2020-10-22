@@ -62,6 +62,9 @@
 		"__experimentalSelector": ".wp-block-button > a",
 		"__experimentalDimensions": {
 			"width": true
+		},
+		"color": {
+			"gradients": true
 		}
 	}
 }
