@@ -77,3 +77,9 @@ function gutenberg_get_template_types_definitions() {
 		),
 	);
 }
+
+function gutenberg_get_default_template_types( $settings ) {
+	$settings['defaultTemplateTypes'] = gutenberg_get_template_types_definitions();
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_get_default_template_types' );

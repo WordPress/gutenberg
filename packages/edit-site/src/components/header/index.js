@@ -33,6 +33,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 		templatePart,
 		templateType,
 		isInserterOpen,
+		defaultTemplateDetails,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -41,6 +42,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 			getTemplatePartId,
 			getTemplateType,
 			isInserterOpened,
+			getSettings,
 		} = select( 'core/edit-site' );
 		const { getEntityRecord } = select( 'core' );
 
@@ -58,6 +60,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 			),
 			templateType: getTemplateType(),
 			isInserterOpen: isInserterOpened(),
+			defaultTemplateTypes: getSettings()?.defaultTemplateTypes,
 		};
 	}, [] );
 
@@ -70,10 +73,10 @@ export default function Header( { openEntitiesSavedStates } ) {
 	const displayBlockToolbar =
 		! isLargeViewport || deviceType !== 'Desktop' || hasFixedToolbar;
 
-	let { title } = getTemplateInfo( template );
-	if ( 'wp_template_part' === templateType ) {
-		title = templatePart?.slug;
-	}
+	const { title } = getTemplateInfo(
+		templateType === 'wp_template' ? template : templatePart,
+		defaultTemplateDetails
+	);
 
 	return (
 		<div className="edit-site-header">

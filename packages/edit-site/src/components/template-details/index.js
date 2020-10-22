@@ -3,7 +3,7 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button, __experimentalText as Text } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -12,12 +12,19 @@ import { getTemplateInfo } from '../../utils';
 import { MENU_TEMPLATES } from '../navigation-sidebar/navigation-panel/constants';
 
 export default function TemplateDetails( { template, onClose } ) {
+	const defaultTemplateTypes = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/edit-site' );
+		return getSettings()?.defaultTemplateTypes;
+	}, [] );
 	const { openNavigationPanelToMenu } = useDispatch( 'core/edit-site' );
 	if ( ! template ) {
 		return null;
 	}
 
-	const { title, description } = getTemplateInfo( template );
+	const { title, description } = getTemplateInfo(
+		template,
+		defaultTemplateTypes
+	);
 
 	const showTemplateInSidebar = () => {
 		onClose();

@@ -1,20 +1,21 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-import { TEMPLATES_DEFAULT_DETAILS } from './constants';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Given a template entity, return information about it which is ready to be
  * rendered, such as the title and description.
  *
  * @param {Object} template The template for which we need information.
- * @param {Object} defaultTemplateDetails An optional list of default template details.
  * @return {Object} Information about the template, including title and description.
  */
-export default function getTemplateInfo(
-	template,
-	defaultTemplateDetails = {}
-) {
+export default function useTemplateInfo( template ) {
+	const defaultTemplateTypes = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/edit-site' );
+		return getSettings()?.defaultTemplateTypes;
+	}, [] );
+
 	if ( ! template ) {
 		return {};
 	}
@@ -24,11 +25,9 @@ export default function getTemplateInfo(
 	}
 
 	const { title: defaultTitle, description: defaultDescription } =
-		defaultTemplateDetails[ template.slug ] ||
-		TEMPLATES_DEFAULT_DETAILS[ template.slug ] ||
-		{};
+		defaultTemplateTypes[ template.slug ] ?? {};
 
-	const title = template?.title?.rendered || defaultTitle || template.slug;
+	const title = template?.title?.rendered ?? defaultTitle ?? template.slug;
 	const description = template?.excerpt?.raw || defaultDescription;
 	return { title, description };
 }

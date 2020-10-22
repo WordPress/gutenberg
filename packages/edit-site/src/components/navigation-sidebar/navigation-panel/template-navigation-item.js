@@ -5,7 +5,7 @@ import {
 	Button,
 	__experimentalNavigationItem as NavigationItem,
 } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
 /**
@@ -16,10 +16,17 @@ import { NavigationPanelPreviewFill } from '../index';
 import { getTemplateInfo } from '../../../utils';
 
 export default function TemplateNavigationItem( { item } ) {
+	const defaultTemplateTypes = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/edit-site' );
+		return getSettings()?.defaultTemplateTypes;
+	}, [] );
 	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
 	const [ isPreviewVisible, setIsPreviewVisible ] = useState( false );
 
-	const { title, description } = getTemplateInfo( item );
+	const { title, description } = getTemplateInfo(
+		item,
+		defaultTemplateTypes
+	);
 
 	const onActivateItem = () =>
 		'wp_template' === item.type
