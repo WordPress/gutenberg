@@ -1531,6 +1531,21 @@ export function isNavigationMode( state = false, action ) {
 }
 
 /**
+ * Reducer returning whether the browse mode is enabled or not.
+ *
+ * @param {string} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {string} Updated state.
+ */
+export function isBrowseMode( state = false, action ) {
+	if ( action.type === 'SET_BROWSE_MODE' ) {
+		return action.isBrowseMode;
+	}
+	return state;
+}
+
+/**
  * Reducer returning whether the block moving mode is enabled or not.
  *
  * @param {string|null} state  Current state.
@@ -1663,6 +1678,7 @@ export default combineReducers( {
 	preferences,
 	lastBlockAttributesChange,
 	isNavigationMode,
+	isBrowseMode,
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,

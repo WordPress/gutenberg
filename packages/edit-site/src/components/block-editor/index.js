@@ -17,6 +17,7 @@ import {
 /**
  * Internal dependencies
  */
+import BrowseModeNavigation from '../browse-mode-navigation';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 
@@ -48,6 +49,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			onChange={ onChange }
 			useSubRegistry={ false }
 		>
+			<BrowseModeNavigation />
 			<BlockEditorKeyboardShortcuts />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
