@@ -3,6 +3,11 @@
  */
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import {
+	formatCapitalize,
+	formatLowercase,
+	formatUppercase,
+} from '@wordpress/icons';
 
 /**
  * Control to facilitate text transform selections.
@@ -46,9 +51,9 @@ export default function TextTransformControl( {
 	// Text transform icons to use.
 	// Icons still to be created/designed.
 	const icons = {
-		capitalize: undefined,
-		lowercase: undefined,
-		uppercase: undefined,
+		capitalize: formatCapitalize,
+		lowercase: formatLowercase,
+		uppercase: formatUppercase,
 	};
 
 	return (
@@ -60,7 +65,6 @@ export default function TextTransformControl( {
 						<Button
 							key={ presetTransform.slug }
 							icon={ icons[ presetTransform.slug ] }
-							iconSize={ 24 }
 							isSmall
 							isPressed={ textTransform === presetTransform.slug }
 							onClick={ () =>
