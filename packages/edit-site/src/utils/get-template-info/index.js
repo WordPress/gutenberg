@@ -24,6 +24,6 @@ export default function getTemplateInfo( template ) {
 		title = defaultTitle;
 	}
 
-	const description = template?.excerpt?.rendered || defaultDescription;
+	const description = template?.excerpt?.raw || defaultDescription;
 	return { title, description };
 }

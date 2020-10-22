@@ -65,6 +65,7 @@ function gutenberg_register_template_post_type() {
 		'supports'          => array(
 			'title',
 			'slug',
+			'excerpt',
 			'editor',
 			'revisions',
 		),
@@ -149,6 +150,8 @@ add_action( 'admin_menu', 'gutenberg_fix_template_admin_menu_entry' );
  */
 function gutenberg_filter_template_list_table_columns( array $columns ) {
 	$columns['slug'] = __( 'Slug', 'gutenberg' );
+	$columns['description'] = __( 'Description', 'gutenberg' );
+	$columns['status'] = __( 'Status', 'gutenberg' );
 	if ( isset( $columns['date'] ) ) {
 		unset( $columns['date'] );
 	}
@@ -163,13 +166,28 @@ add_filter( 'manage_wp_template_posts_columns', 'gutenberg_filter_template_list_
  * @param int    $post_id     Post ID.
  */
 function gutenberg_render_template_list_table_column( $column_name, $post_id ) {
-	if ( 'slug' !== $column_name ) {
-		return;
+	switch( $column_name ) {
+		case 'slug':
+			$post = get_post( $post_id );
+			echo esc_html( $post->post_name );
+			break;
+		case 'description':
+			echo get_the_excerpt( $post_id );
+			break;
+		case 'status':
+			echo get_post_status( $post_id );
+			break;
 	}
-	$post = get_post( $post_id );
-	echo esc_html( $post->post_name );
 }
 add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_template_list_table_column', 10, 2 );
+
+function gutenberg_filter_templates_admin_query( $query ) {
+	if ( ! is_admin() || 'wp_template' !== $query->query['post_type'] ) {
+		return;
+	}
+	$query->set( 'post_status', array( 'publish', 'draft', 'auto-draft' ) );
+}
+add_filter( 'pre_get_posts', 'gutenberg_filter_templates_admin_query' );
 
 /**
  * Filter for adding a `resolved` parameter to `wp_template` queries.
