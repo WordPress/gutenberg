@@ -19,6 +19,7 @@ import {
 	PanelBody,
 	FooterMessageControl,
 	UnitControl,
+	getValueAndUnit,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -40,9 +41,7 @@ function ColumnEdit( {
 	parentAlignment,
 } ) {
 	const { verticalAlignment, width } = attributes;
-	const regex = /(\d+\.?\d*)(.*)/;
-
-	const valueUnit = width && `${ width }`?.match( regex )[ 2 ];
+	const { valueUnit } = getValueAndUnit( width ) || {};
 
 	const [ widthUnit, setWidthUnit ] = useState( valueUnit || '%' );
 

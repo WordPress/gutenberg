@@ -87,7 +87,10 @@ export {
 } from './mobile/utils/alignments';
 
 // Hooks
-export { default as useUnitConverterToMobile } from './mobile/utils/use-unit-converter-to-mobile';
+export {
+	useConvertUnitToMobile,
+	getValueAndUnit,
+} from './mobile/utils/use-unit-converter-to-mobile';
 
 export {
 	default as GlobalStylesContext,

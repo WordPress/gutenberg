@@ -19,6 +19,20 @@ import {
  */
 import GlobalStylesContext from '../global-styles-context';
 
+const getValueAndUnit = ( value, unit ) => {
+	const regex = /(\d+\.?\d*)(.*)/;
+
+	const splitValue = `${ value }`?.match( regex );
+
+	if ( splitValue ) {
+		return {
+			valueToConvert: splitValue[ 1 ],
+			valueUnit: unit || splitValue[ 2 ],
+		};
+	}
+	return null;
+};
+
 const useConvertUnitToMobile = ( value, unit ) => {
 	const [ windowSizes, setWindowSizes ] = useState(
 		Dimensions.get( 'window' )
@@ -41,12 +55,7 @@ const useConvertUnitToMobile = ( value, unit ) => {
 		const { width, height } = windowSizes;
 		const { fontSize = 16 } = styles || {};
 
-		const regex = /(\d+\.?\d*)(.*)/;
-
-		const splitValue = `${ value }`?.match( regex );
-
-		const valueToConvert = splitValue[ 1 ];
-		const valueUnit = unit || splitValue[ 2 ];
+		const { valueToConvert, valueUnit } = getValueAndUnit( value, unit );
 
 		switch ( valueUnit ) {
 			case 'rem':
@@ -68,4 +77,4 @@ const useConvertUnitToMobile = ( value, unit ) => {
 	}, [ windowSizes, value, unit ] );
 };
 
-export default useConvertUnitToMobile;
+export { useConvertUnitToMobile, getValueAndUnit };

@@ -5,7 +5,6 @@ import {
 	AccessibilityInfo,
 	View,
 	Platform,
-	TextInput,
 	PixelRatio,
 	AppState,
 } from 'react-native';
@@ -23,8 +22,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import Cell from '../cell';
 import Stepper from './stepper';
 import styles from './style.scss';
-import borderStyles from '../borderStyles.scss';
-
+import RangeTextInput from '../range-text-input';
 import { toFixed, removeNonDigit } from '../../utils';
 
 const STEP_DELAY = 200;
@@ -44,23 +42,14 @@ class BottomSheetStepperCell extends Component {
 			this
 		);
 		this.onPressOut = this.onPressOut.bind( this );
-		this.startPressInterval = this.startPressInterval.bind( this );
-		this.onInputFocus = this.onInputFocus.bind( this );
-		this.onInputBlur = this.onInputBlur.bind( this );
-		this.handleChangePixelRatio = this.handleChangePixelRatio.bind( this );
-		this.onSubmitEditing = this.onSubmitEditing.bind( this );
-		this.onChangeText = this.onChangeText.bind( this );
+
 		const initialValue = this.validateInput(
 			props.value || props.defaultValue || props.min
 		);
 
-		const fontScale = this.getFontScale();
-
 		this.state = {
-			fontScale,
 			inputValue: initialValue,
 			stepperValue: initialValue,
-			hasFocus: false,
 		};
 	}
 
@@ -83,19 +72,6 @@ class BottomSheetStepperCell extends Component {
 		if ( nextAppState === 'active' ) {
 			this.setState( { fontScale: this.getFontScale() } );
 		}
-	}
-
-	onInputFocus() {
-		this.setState( {
-			hasFocus: true,
-		} );
-	}
-
-	onInputBlur() {
-		this.onChangeText( '' + this.state.stepperValue );
-		this.setState( {
-			hasFocus: false,
-		} );
 	}
 
 	validateInput( text ) {
@@ -131,33 +107,6 @@ class BottomSheetStepperCell extends Component {
 		initialValue = toFixed( initialValue, decimalNum );
 		this.setState( { inputValue: initialValue } );
 		this.updateValue( initialValue );
-	}
-
-	onChangeText( textValue ) {
-		const { decimalNum } = this.props;
-		const inputValue = removeNonDigit( textValue, decimalNum );
-		textValue = inputValue.replace( ',', '.' );
-		textValue = toFixed( textValue, decimalNum );
-		const value = this.validateInput( textValue );
-		this.setState( {
-			inputValue,
-			stepperValue: value,
-		} );
-		this.updateValue( value );
-	}
-
-	onSubmitEditing( { nativeEvent: { text } } ) {
-		const { decimalNum } = this.props;
-		if ( ! isNaN( Number( text ) ) ) {
-			text = toFixed( text.replace( ',', '.' ), decimalNum );
-			const validValue = this.validateInput( text );
-
-			if ( this.state.inputValue !== validValue ) {
-				this.setState( { inputValue: validValue } );
-				this.announceValue( `${ validValue }` );
-				this.props.onChange( validValue );
-			}
-		}
 	}
 
 	onIncrementValue() {
@@ -242,9 +191,8 @@ class BottomSheetStepperCell extends Component {
 			separatorType,
 			children,
 			shouldDisplayTextInput = false,
-			getStylesFromColorScheme,
 		} = this.props;
-		const { fontScale, inputValue, hasFocus } = this.state;
+		const { inputValue } = this.state;
 		const isMinValue = value === min;
 		const isMaxValue = value === max;
 		const labelStyle = [
@@ -256,16 +204,6 @@ class BottomSheetStepperCell extends Component {
 			__( '%1$s. Current value is %2$s' ),
 			label,
 			value
-		);
-
-		const textInputStyle = getStylesFromColorScheme(
-			styles.textInput,
-			styles.textInputDark
-		);
-
-		const verticalBorderStyle = getStylesFromColorScheme(
-			styles.verticalBorder,
-			styles.verticalBorderDark
 		);
 
 		return (
@@ -310,33 +248,19 @@ class BottomSheetStepperCell extends Component {
 						value={ value }
 						shouldDisplayTextInput={ shouldDisplayTextInput }
 					>
-						<View
-							style={ [
-								textInputStyle,
-								borderStyles.borderStyle,
-								hasFocus && borderStyles.isSelected,
-							] }
-						>
-							{ shouldDisplayTextInput && (
-								<TextInput
-									style={ [
-										verticalBorderStyle,
-										{
-											width: 40 * fontScale,
-										},
-									] }
-									onChangeText={ this.onChangeText }
-									onSubmitEditing={ this.onSubmitEditing }
-									onFocus={ this.onInputFocus }
-									onBlur={ this.onInputBlur }
-									keyboardType="numeric"
-									returnKeyType="done"
-									defaultValue={ `${ inputValue }` }
-									value={ inputValue }
-								/>
-							) }
-							{ children }
-						</View>
+						{ shouldDisplayTextInput && (
+							<RangeTextInput
+								label={ label }
+								onChange={ this.props.onChange }
+								defaultValue={ `${ inputValue }` }
+								value={ inputValue }
+								min={ min }
+								step={ 1 }
+								decimalNum={ 1 }
+							>
+								{ children }
+							</RangeTextInput>
+						) }
 					</Stepper>
 				</Cell>
 			</View>

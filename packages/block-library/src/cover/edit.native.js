@@ -29,7 +29,7 @@ import {
 	ColorPalette,
 	ColorPicker,
 	BottomSheetConsumer,
-	useUnitConverterToMobile,
+	useConvertUnitToMobile,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -103,7 +103,7 @@ const Cover = ( {
 
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 
-	const convertedMinHeight = useUnitConverterToMobile(
+	const convertedMinHeight = useConvertUnitToMobile(
 		minHeight || COVER_DEFAULT_HEIGHT,
 		minHeightUnit
 	);
