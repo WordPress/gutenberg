@@ -211,8 +211,8 @@ function wp_block_supports_track_block_to_render( $args ) {
 		$block_render_callback   = $args['render_callback'];
 		$args['render_callback'] = function( $attributes, $content, $block ) use ( $block_render_callback ) {
 			$parent_block                       = WP_Block_Supports::$block_to_render;
-			WP_Block_Supports::$block_to_render =  $block->parsed_block;
-			$result                = $block_render_callback( $attributes, $content, $block );
+			WP_Block_Supports::$block_to_render = $block->parsed_block;
+			$result                             = $block_render_callback( $attributes, $content, $block );
 			WP_Block_Supports::$block_to_render = $parent_block;
 			return $result;
 		};
