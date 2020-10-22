@@ -11,7 +11,7 @@ describe( 'Gutenberg Editor Blocks test', () => {
 	let driver;
 	let editorPage;
 	let allPassed = true;
-	const lastBlockName = 'Heading';
+	const lastBlockAccessibilityLabel = 'Heading with line-height set';
 
 	// Use reporter for setting status for saucelabs Job
 	if ( ! isLocalEnvironment() ) {
@@ -33,13 +33,11 @@ describe( 'Gutenberg Editor Blocks test', () => {
 		await expect( editorPage.getBlockList() ).resolves.toBe( true );
 	} );
 
-	it( 'should be able to create a post with all blocks', async () => {
+	it( 'should be able to create a post with all blocks and scroll to the last one', async () => {
 		await editorPage.setHtmlContent( testData.initialHtml );
 
-		const lastBlockElement = await editorPage.getBlockAtPosition(
-			lastBlockName,
-			1,
-			{ autoscroll: true }
+		const lastBlockElement = await editorPage.scrollAndReturnElement(
+			lastBlockAccessibilityLabel
 		);
 
 		expect( lastBlockElement ).toBeTruthy();
