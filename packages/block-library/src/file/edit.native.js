@@ -240,14 +240,19 @@ export class FileEdit extends Component {
 				}
 				onFinishMediaUploadWithFailure={ () => {} }
 				onMediaUploadStateReset={ this.mediaUploadStateReset }
-				renderContent={ ( { isUploadFailed, retryMessage } ) => {
+				renderContent={ ( {
+					isUploadInProgress,
+					isUploadFailed,
+					retryMessage,
+				} ) => {
 					if ( isUploadFailed ) {
 						return this.getErrorComponent( retryMessage );
 					}
 
 					return (
 						<View>
-							{ this.getToolbarEditButton( openMediaOptions ) }
+							{ isUploadInProgress ||
+								this.getToolbarEditButton( openMediaOptions ) }
 							{ getMediaOptions() }
 							{ this.getInspectorControls( attributes ) }
 							<RichText
