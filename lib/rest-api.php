@@ -388,7 +388,7 @@ function gutenberg_add_assets_links_to_block_type( $response, $block_type ) {
 		$expected_handle = $block_type->$script;
 		if ( wp_script_is( $expected_handle, 'registered' ) ) {
 			$links[ 'https://api.w.org/' . $script ] = array(
-				'href'       => rest_url( sprintf( '%s/%s/%s', 'wp/v2', 'scripts', $expected_handle ) ),
+				'href'       => rest_url( sprintf( '%s/%s/%s', '__experimental', 'scripts', $expected_handle ) ),
 				'embeddable' => true,
 			);
 		}
