@@ -103,7 +103,7 @@ require dirname( __FILE__ ) . '/utils.php';
 
 // Include FSE related files only if the experiment is enabled.
 if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
-	require dirname( __FILE__ ) . '/full-site-editing/templates-definitions.php';
+	require dirname( __FILE__ ) . '/full-site-editing/template-types-definitions.php';
 	require dirname( __FILE__ ) . '/templates.php';
 	require dirname( __FILE__ ) . '/template-parts.php';
 	require dirname( __FILE__ ) . '/template-loader.php';

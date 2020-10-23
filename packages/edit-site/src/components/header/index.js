@@ -33,7 +33,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 		templatePart,
 		templateType,
 		isInserterOpen,
-		defaultTemplateDetails,
+		defaultTemplateTypesDefinitions,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -60,7 +60,8 @@ export default function Header( { openEntitiesSavedStates } ) {
 			),
 			templateType: getTemplateType(),
 			isInserterOpen: isInserterOpened(),
-			defaultTemplateDetails: getSettings()?.defaultTemplateTypes,
+			defaultTemplateTypesDefinitions: getSettings()
+				?.defaultTemplateTypesDefinitions,
 		};
 	}, [] );
 
@@ -75,7 +76,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 
 	const { title } = getTemplateInfo(
 		templateType === 'wp_template' ? template : templatePart,
-		defaultTemplateDetails
+		defaultTemplateTypesDefinitions
 	);
 
 	return (

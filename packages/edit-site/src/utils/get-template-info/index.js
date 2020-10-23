@@ -8,12 +8,12 @@ import { TEMPLATES_DEFAULT_DETAILS } from './constants';
  * rendered, such as the title and description.
  *
  * @param {Object} template The template for which we need information.
- * @param {Object} defaultTemplateDetails An optional list of default template details.
+ * @param {Object} defaultTemplateTypesDefinitions An optional list of default template details.
  * @return {Object} Information about the template, including title and description.
  */
 export default function getTemplateInfo(
 	template,
-	defaultTemplateDetails = {}
+	defaultTemplateTypesDefinitions = {}
 ) {
 	if ( ! template ) {
 		return {};
@@ -24,7 +24,7 @@ export default function getTemplateInfo(
 	}
 
 	const { title: defaultTitle, description: defaultDescription } =
-		defaultTemplateDetails[ template.slug ] ||
+		defaultTemplateTypesDefinitions[ template.slug ] ||
 		TEMPLATES_DEFAULT_DETAILS[ template.slug ] ||
 		{};
 
