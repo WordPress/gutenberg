@@ -14,7 +14,7 @@ export default function LevelToolbar( { level, onChange } ) {
 		<ToolbarGroup
 			isCollapsed
 			icon={ <LevelIcon level={ level } /> }
-			controls={ [ 0, 1, 2, 3, 4, 5, 6 ].map( ( currentLevel ) => {
+			controls={ [ 1, 2, 3, 4, 5, 6, 0 ].map( ( currentLevel ) => {
 				const isActive = currentLevel === level;
 				return {
 					icon: (

@@ -7,6 +7,7 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import { StyledTextarea } from './styles/textarea-control-styles';
 
 export default function TextareaControl( {
 	label,
@@ -30,7 +31,7 @@ export default function TextareaControl( {
 			help={ help }
 			className={ className }
 		>
-			<textarea
+			<StyledTextarea
 				className="components-textarea-control__input"
 				id={ id }
 				rows={ rows }

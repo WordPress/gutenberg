@@ -12,19 +12,25 @@
 
 // Lining up all the actions in a nice row.
 .edit-navigation-header__actions {
-	align-items: center;
 	display: flex;
+	align-items: baseline;
+	margin-top: $grid-unit-10;
+
+	.edit-navigation-header__action_header {
+		font-weight: normal;
+		font-size: inherit;
+		margin: 0;
+	}
 
 	// Spacing out the actions a little.
-	.edit-navigation-header__current-menu,
+	.edit-navigation-header__action_header,
 	.components-dropdown {
 		margin-right: $grid-unit-20;
 	}
-}
 
-// The select menu for choosing which menu to edit.
-.edit-navigation-header__current-menu .components-base-control__field {
-	margin: 0;
+	.components-dropdown:last-child {
+		margin-right: 0;
+	}
 }
 
 .edit-navigation-header__create-menu-button {

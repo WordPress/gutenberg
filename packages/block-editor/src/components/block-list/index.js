@@ -30,7 +30,10 @@ const appenderNodesMap = new Map();
  */
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
-function BlockList( { className, rootClientId, renderAppender }, ref ) {
+function BlockList(
+	{ className, placeholder, rootClientId, renderAppender },
+	ref
+) {
 	const Container = rootClientId ? 'div' : RootContainer;
 	const fallbackRef = useRef();
 	const wrapperRef = ref || fallbackRef;
@@ -45,6 +48,7 @@ function BlockList( { className, rootClientId, renderAppender }, ref ) {
 				) }
 			>
 				<BlockListItems
+					placeholder={ placeholder }
 					rootClientId={ rootClientId }
 					renderAppender={ renderAppender }
 					wrapperRef={ wrapperRef }
@@ -55,6 +59,7 @@ function BlockList( { className, rootClientId, renderAppender }, ref ) {
 }
 
 function Items( {
+	placeholder,
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
@@ -70,7 +75,6 @@ function Items( {
 			hasMultiSelection,
 			getGlobalBlockCount,
 			isTyping,
-			isDraggingBlocks,
 			__experimentalGetActiveBlockIdByBlockNames,
 		} = select( 'core/block-editor' );
 
@@ -88,7 +92,6 @@ function Items( {
 			enableAnimation:
 				! isTyping() &&
 				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
-			isDraggingBlocks: isDraggingBlocks(),
 			activeEntityBlockId,
 		};
 	}
@@ -100,7 +103,6 @@ function Items( {
 		orientation,
 		hasMultiSelection,
 		enableAnimation,
-		isDraggingBlocks,
 		activeEntityBlockId,
 	} = useSelect( selector, [ rootClientId ] );
 
@@ -109,8 +111,7 @@ function Items( {
 		rootClientId,
 	} );
 
-	const isAppenderDropTarget =
-		dropTargetIndex === blockClientIds.length && isDraggingBlocks;
+	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
 
 	return (
 		<>
@@ -119,8 +120,7 @@ function Items( {
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
 
-				const isDropTarget =
-					dropTargetIndex === index && isDraggingBlocks;
+				const isDropTarget = dropTargetIndex === index;
 
 				return (
 					<AsyncModeProvider
@@ -147,6 +147,7 @@ function Items( {
 					</AsyncModeProvider>
 				);
 			} ) }
+			{ blockClientIds.length < 1 && placeholder }
 			<BlockListAppender
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }

@@ -206,7 +206,7 @@ Add the following global presets to the `experimental-theme.json` file:
 ```
 {
 	"global": {
-		"setttings": {
+		"settings": {
 			"color": {
 				"palette": [
 					{

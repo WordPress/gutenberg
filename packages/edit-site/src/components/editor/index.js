@@ -37,14 +37,14 @@ import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
 import LeftSidebar from '../left-sidebar';
+import NavigationSidebar from '../navigation-sidebar';
 
 const interfaceLabels = {
 	leftSidebar: __( 'Block Library' ),
+	drawer: __( 'Navigation Sidebar' ),
 };
 
 function Editor() {
-	const [ leftSidebarContent, setLeftSidebarContent ] = useState( null );
-
 	const {
 		isFullscreenActive,
 		deviceType,
@@ -55,6 +55,7 @@ function Editor() {
 		page,
 		template,
 		select,
+		isNavigationOpen,
 	} = useSelect( ( _select ) => {
 		const {
 			isFeatureActive,
@@ -64,6 +65,7 @@ function Editor() {
 			getTemplatePartId,
 			getTemplateType,
 			getPage,
+			isNavigationOpened,
 		} = _select( 'core/edit-site' );
 		const _templateId = getTemplateId();
 		const _templatePartId = getTemplatePartId();
@@ -94,10 +96,11 @@ function Editor() {
 				: null,
 			select: _select,
 			entityId: _entityId,
+			isNavigationOpen: isNavigationOpened(),
 		};
 	}, [] );
 	const { editEntityRecord } = useDispatch( 'core' );
-	const { setPage } = useDispatch( 'core/edit-site' );
+	const { setPage, setIsInserterOpened } = useDispatch( 'core/edit-site' );
 
 	const inlineStyles = useResizeCanvas( deviceType );
 
@@ -153,8 +156,6 @@ function Editor() {
 		[ page?.context ]
 	);
 
-	const isNavigationOpen = leftSidebarContent === 'navigation';
-
 	useEffect( () => {
 		if ( isNavigationOpen ) {
 			document.body.classList.add( 'is-navigation-sidebar-open' );
@@ -162,9 +163,6 @@ function Editor() {
 			document.body.classList.remove( 'is-navigation-sidebar-open' );
 		}
 	}, [ isNavigationOpen ] );
-
-	const toggleLeftSidebarContent = ( value ) =>
-		setLeftSidebarContent( leftSidebarContent === value ? null : value );
 
 	return (
 		<>
@@ -213,15 +211,11 @@ function Editor() {
 												<SidebarComplementaryAreaFills />
 												<InterfaceSkeleton
 													labels={ interfaceLabels }
+													drawer={
+														<NavigationSidebar />
+													}
 													leftSidebar={
-														<LeftSidebar
-															content={
-																leftSidebarContent
-															}
-															setContent={
-																setLeftSidebarContent
-															}
-														/>
+														<LeftSidebar />
 													}
 													sidebar={
 														sidebarIsOpened && (
@@ -232,23 +226,6 @@ function Editor() {
 														<Header
 															openEntitiesSavedStates={
 																openEntitiesSavedStates
-															}
-															isInserterOpen={
-																leftSidebarContent ===
-																'inserter'
-															}
-															onToggleInserter={ () =>
-																toggleLeftSidebarContent(
-																	'inserter'
-																)
-															}
-															isNavigationOpen={
-																isNavigationOpen
-															}
-															onToggleNavigation={ () =>
-																toggleLeftSidebarContent(
-																	'navigation'
-																)
 															}
 														/>
 													}
@@ -263,14 +240,8 @@ function Editor() {
 															<Popover.Slot name="block-toolbar" />
 															{ template && (
 																<BlockEditor
-																	setIsInserterOpen={ (
-																		isInserterOpen
-																	) =>
-																		setLeftSidebarContent(
-																			isInserterOpen
-																				? 'inserter'
-																				: null
-																		)
+																	setIsInserterOpen={
+																		setIsInserterOpened
 																	}
 																/>
 															) }

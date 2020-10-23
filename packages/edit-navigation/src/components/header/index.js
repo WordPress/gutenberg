@@ -1,9 +1,19 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { useViewportMatch } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
-import { Button, SelectControl, Dropdown } from '@wordpress/components';
+import { __, sprintf } from '@wordpress/i18n';
+import {
+	Button,
+	Dropdown,
+	DropdownMenu,
+	MenuGroup,
+	MenuItemsChoice,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -11,8 +21,28 @@ import { Button, SelectControl, Dropdown } from '@wordpress/components';
 import ManageLocations from './manage-locations';
 import AddMenuForm from './add-menu-form';
 
-export default function Header( { menus, selectedMenuId, onSelectMenu } ) {
-	const isMobileViewport = useViewportMatch( 'small', '<' );
+export default function Header( {
+	menus,
+	selectedMenuId,
+	onSelectMenu,
+	isPending,
+} ) {
+	const selectedMenu = find( menus, { id: selectedMenuId } );
+	const menuName = selectedMenu ? selectedMenu.name : undefined;
+	let actionHeaderText;
+
+	if ( menuName ) {
+		actionHeaderText = sprintf(
+			// translators: Name of the menu being edited, e.g. 'Main Menu'.
+			__( 'Editing: %s' ),
+			menuName
+		);
+	} else if ( isPending ) {
+		// Loading text won't be displayed if menus are preloaded.
+		actionHeaderText = __( 'Loading …' );
+	} else {
+		actionHeaderText = __( 'No menus available' );
+	}
 
 	return (
 		<div className="edit-navigation-header">
@@ -21,28 +51,36 @@ export default function Header( { menus, selectedMenuId, onSelectMenu } ) {
 			</h1>
 
 			<div className="edit-navigation-header__actions">
-				<div className="edit-navigation-header__current-menu">
-					<SelectControl
-						label={ __( 'Currently editing' ) }
-						hideLabelFromVision={ isMobileViewport }
-						disabled={ ! menus?.length }
-						value={ selectedMenuId ?? 0 }
-						options={
-							menus?.length
-								? menus.map( ( menu ) => ( {
-										value: menu.id,
-										label: menu.name,
-								  } ) )
-								: [
-										{
-											value: 0,
-											label: '-',
-										},
-								  ]
-						}
-						onChange={ onSelectMenu }
-					/>
-				</div>
+				<h2 className="edit-navigation-header__action_header">
+					{ actionHeaderText }
+				</h2>
+
+				<DropdownMenu
+					icon={ null }
+					toggleProps={ {
+						showTooltip: false,
+						children: __( 'Select menu' ),
+						isTertiary: true,
+						disabled: ! menus,
+						__experimentalIsFocusable: true,
+					} }
+					popoverProps={ {
+						position: 'bottom center',
+					} }
+				>
+					{ () => (
+						<MenuGroup>
+							<MenuItemsChoice
+								value={ selectedMenuId }
+								onSelect={ onSelectMenu }
+								choices={ menus.map( ( menu ) => ( {
+									value: menu.id,
+									label: menu.name,
+								} ) ) }
+							/>
+						</MenuGroup>
+					) }
+				</DropdownMenu>
 
 				<Dropdown
 					position="bottom center"

@@ -1504,7 +1504,7 @@ export const getInserterItems = createSelector(
 				id,
 				name: 'core/block',
 				initialAttributes: { ref: reusableBlock.id },
-				title: reusableBlock.title,
+				title: reusableBlock.title.raw,
 				icon: referencedBlockType
 					? referencedBlockType.icon
 					: templateIcon,
@@ -1695,7 +1695,9 @@ export const __experimentalGetParsedReusableBlock = createSelector(
 			return null;
 		}
 
-		return parse( reusableBlock.content );
+		// Only reusableBlock.content.raw should be used here, `reusableBlock.content` is a
+		// workaround until #22127 is fixed.
+		return parse( reusableBlock.content.raw || reusableBlock.content );
 	},
 	( state ) => [ getReusableBlocks( state ) ]
 );

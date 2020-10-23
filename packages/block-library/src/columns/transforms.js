@@ -30,7 +30,7 @@ const transforms = {
 				);
 			},
 			isMatch: ( { length: selectedBlocksLength } ) =>
-				selectedBlocksLength > 1 &&
+				selectedBlocksLength &&
 				selectedBlocksLength <= MAXIMUM_SELECTED_BLOCKS,
 		},
 	],

@@ -42,14 +42,15 @@ function gutenberg_register_typography_support( $block_type ) {
  * Add CSS classes and inline styles for font sizes to the incoming attributes array.
  * This will be applied to the block markup in the front-end.
  *
- * @param  array         $attributes       Comprehensive list of attributes to be applied.
- * @param  array         $block_attributes Block attributes.
  * @param  WP_Block_Type $block_type       Block type.
+ * @param  array         $block_attributes Block attributes.
  *
  * @return array Font size CSS classes and inline styles.
  */
-function gutenberg_apply_typography_support( $attributes, $block_attributes, $block_type ) {
+function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_font_size_support = false;
+	$classes               = array();
+	$styles                = array();
 	if ( property_exists( $block_type, 'supports' ) ) {
 		$has_font_size_support = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
 	}
@@ -66,9 +67,9 @@ function gutenberg_apply_typography_support( $attributes, $block_attributes, $bl
 
 		// Apply required class or style.
 		if ( $has_named_font_size ) {
-			$attributes['css_classes'][] = sprintf( 'has-%s-font-size', $block_attributes['fontSize'] );
+			$classes[] = sprintf( 'has-%s-font-size', $block_attributes['fontSize'] );
 		} elseif ( $has_custom_font_size ) {
-			$attributes['inline_styles'][] = sprintf( 'font-size: %spx;', $block_attributes['style']['typography']['fontSize'] );
+			$styles[] = sprintf( 'font-size: %spx;', $block_attributes['style']['typography']['fontSize'] );
 		}
 	}
 
@@ -77,9 +78,26 @@ function gutenberg_apply_typography_support( $attributes, $block_attributes, $bl
 		$has_line_height = isset( $block_attributes['style']['typography']['lineHeight'] );
 		// Add the style (no classes for line-height).
 		if ( $has_line_height ) {
-			$attributes['inline_styles'][] = sprintf( 'line-height: %s;', $block_attributes['style']['typography']['lineHeight'] );
+			$styles[] = sprintf( 'line-height: %s;', $block_attributes['style']['typography']['lineHeight'] );
 		}
+	}
+
+	$attributes = array();
+	if ( ! empty( $classes ) ) {
+		$attributes['class'] = implode( ' ', $classes );
+	}
+	if ( ! empty( $styles ) ) {
+		$attributes['style'] = implode( ' ', $styles );
 	}
 
 	return $attributes;
 }
+
+// Register the block support.
+WP_Block_Supports::get_instance()->register(
+	'typography',
+	array(
+		'register_attribute' => 'gutenberg_register_typography_support',
+		'apply'              => 'gutenberg_apply_typography_support',
+	)
+);

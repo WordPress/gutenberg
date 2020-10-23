@@ -68,4 +68,4 @@ export function initialize( id, settings ) {
 }
 
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
-export { default as __experimentalNavigationToggle } from './components/header/navigation-toggle';
+export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';

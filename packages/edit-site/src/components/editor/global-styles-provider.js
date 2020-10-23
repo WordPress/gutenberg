@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { set, get } from 'lodash';
+import { set, get, mapValues } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,11 +15,15 @@ import {
 } from '@wordpress/element';
 import { useEntityProp } from '@wordpress/core-data';
 import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import getGlobalStyles from './global-styles-renderer';
+import {
+	default as getGlobalStyles,
+	mergeTrees,
+} from './global-styles-renderer';
 
 const EMPTY_CONTENT = '{}';
 
@@ -48,13 +52,20 @@ export const useGlobalStylesReset = () => {
 	];
 };
 
-export default ( { children, baseStyles, contexts } ) => {
+export default function GlobalStylesProvider( {
+	children,
+	baseStyles,
+	contexts,
+} ) {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
 
-	const userStyles = useMemo(
-		() => ( content ? JSON.parse( content ) : {} ),
-		[ content ]
-	);
+	const { userStyles, mergedStyles } = useMemo( () => {
+		const parsedContent = content ? JSON.parse( content ) : {};
+		return {
+			userStyles: parsedContent,
+			mergedStyles: mergeTrees( baseStyles, parsedContent ),
+		};
+	}, [ content ] );
 
 	const nextValue = useMemo(
 		() => ( {
@@ -110,16 +121,27 @@ export default ( { children, baseStyles, contexts } ) => {
 				.appendChild( styleNode );
 		}
 
-		styleNode.innerText = getGlobalStyles(
-			contexts,
-			baseStyles,
-			userStyles
-		);
+		styleNode.innerText = getGlobalStyles( contexts, mergedStyles );
 	}, [ contexts, baseStyles, content ] );
+
+	const settings = useSelect( ( select ) =>
+		select( 'core/edit-site' ).getSettings()
+	);
+	const { updateSettings } = useDispatch( 'core/edit-site' );
+
+	useEffect( () => {
+		updateSettings( {
+			...settings,
+			__experimentalFeatures: mapValues(
+				mergedStyles,
+				( value ) => value.settings || {}
+			),
+		} );
+	}, [ mergedStyles ] );
 
 	return (
 		<GlobalStylesContext.Provider value={ nextValue }>
 			{ children }
 		</GlobalStylesContext.Provider>
 	);
-};
+}

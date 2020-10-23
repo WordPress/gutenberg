@@ -125,7 +125,7 @@ export default class EditorPage {
 		let blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
 
 		if ( ! isAndroid() ) {
-			blockLocator += '//XCUIElementTypeTextView';
+			blockLocator = `//XCUIElementTypeTextView[starts-with(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityId }")]`;
 		}
 		return await this.driver.elementByXPath( blockLocator );
 	}
@@ -143,11 +143,11 @@ export default class EditorPage {
 	}
 
 	// set html editor content explicitly
-	async setHtmlContentAndroid( html ) {
+	async setHtmlContent( html ) {
 		await toggleHtmlMode( this.driver, true );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
-		await htmlContentView.setText( html );
+		await htmlContentView.type( html );
 
 		await toggleHtmlMode( this.driver, false );
 	}
@@ -197,12 +197,16 @@ export default class EditorPage {
 
 	// Attempts to find the given block button in the block inserter control.
 	async findBlockButton( blockName ) {
+		const blockAccessibilityLabel = `${ blockName } block`;
+
 		if ( isAndroid() ) {
 			const size = await this.driver.getWindowSize();
 			const x = size.width / 2;
 			// Checks if the Block Button is available, and if not will scroll to the second half of the available buttons.
 			while (
-				! ( await this.driver.hasElementByAccessibilityId( blockName ) )
+				! ( await this.driver.hasElementByAccessibilityId(
+					blockAccessibilityLabel
+				) )
 			) {
 				swipeFromTo(
 					this.driver,
@@ -211,11 +215,13 @@ export default class EditorPage {
 				);
 			}
 
-			return await this.driver.elementByAccessibilityId( blockName );
+			return await this.driver.elementByAccessibilityId(
+				blockAccessibilityLabel
+			);
 		}
 
 		const blockButton = await this.driver.elementByAccessibilityId(
-			blockName
+			blockAccessibilityLabel
 		);
 		const size = await this.driver.getWindowSize();
 		const height = size.height - 5;
@@ -476,5 +482,44 @@ export default class EditorPage {
 			true
 		);
 		return await typeString( this.driver, textViewElement, text, clear );
+	}
+
+	// =============================
+	// Unsupported Block functions
+	// =============================
+
+	async getUnsupportedBlockHelpButton() {
+		const accessibilityId = 'Help button';
+		let blockLocator =
+			'//android.widget.Button[@content-desc="Help button, Tap here to show help"]';
+
+		if ( ! isAndroid() ) {
+			blockLocator = `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
+		}
+		return await this.driver.elementByXPath( blockLocator );
+	}
+
+	async getUnsupportedBlockBottomSheetEditButton() {
+		const accessibilityId = 'Edit using web editor';
+		let blockLocator =
+			'//android.widget.Button[@content-desc="Edit using web editor"]';
+
+		if ( ! isAndroid() ) {
+			blockLocator = `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
+		}
+		return await this.driver.elementByXPath( blockLocator );
+	}
+
+	async getUnsupportedBlockWebView() {
+		let blockLocator = '//android.webkit.WebView';
+
+		if ( ! isAndroid() ) {
+			blockLocator = '//XCUIElementTypeWebView';
+		}
+
+		this.driver.setImplicitWaitTimeout( 20000 );
+		const element = await this.driver.elementByXPath( blockLocator );
+		this.driver.setImplicitWaitTimeout( 5000 );
+		return element;
 	}
 }
