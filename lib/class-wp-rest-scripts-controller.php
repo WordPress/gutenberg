@@ -11,6 +11,8 @@
 class WP_REST_Scripts_Controller extends WP_REST_Dependencies_Controller {
 
 	/**
+	 * Core assets collection.
+	 *
 	 * @var null|array
 	 */
 	protected $core_assets;

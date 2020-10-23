@@ -123,7 +123,7 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
-		$request = new WP_REST_Request( 'GET', add_query_arg( [], '/__experimental/scripts' ) );
+		$request = new WP_REST_Request( 'GET', '/__experimental/scripts' );
 		$request->set_query_params( [ 'dependency' => 'script1' ] );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
@@ -143,7 +143,7 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 */
 	public function test_get_items_nested_deps1() {
 		wp_set_current_user( self::$admin_id );
-		$request = new WP_REST_Request( 'GET', add_query_arg( [], '/__experimental/scripts' ) );
+		$request = new WP_REST_Request( 'GET', '/__experimental/scripts' );
 		$request->set_query_params( array( 'dependency' => 'script-with-deps' ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
@@ -254,10 +254,10 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Test schema.
 	 */
 	public function test_get_item_schema() {
-		$request    = new WP_REST_Request( 'OPTIONS', '/__experimental/scripts' );
-		$response   = rest_get_server()->dispatch( $request );
-		$data       = $response->get_data();
-		$this->assertArrayHasKey( 'schema', $data);
+		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/scripts' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertArrayHasKey( 'schema', $data );
 		$this->assertArrayHasKey( 'properties', $data['schema'] );
 		$properties = $data['schema']['properties'];
 		$this->assertEquals( 9, count( $properties ) );

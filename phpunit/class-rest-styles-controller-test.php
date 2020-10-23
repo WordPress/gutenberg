@@ -254,10 +254,10 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Test schema.
 	 */
 	public function test_get_item_schema() {
-		$request    = new WP_REST_Request( 'OPTIONS', '/__experimental/styles' );
-		$response   = rest_get_server()->dispatch( $request );
-		$data       = $response->get_data();
-		$this->assertArrayHasKey( 'schema', $data);
+		$request  = new WP_REST_Request( 'OPTIONS', '/__experimental/styles' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertArrayHasKey( 'schema', $data );
 		$this->assertArrayHasKey( 'properties', $data['schema'] );
 		$properties = $data['schema']['properties'];
 		$this->assertEquals( 9, count( $properties ) );
