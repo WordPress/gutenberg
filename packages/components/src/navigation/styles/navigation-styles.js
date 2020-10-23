@@ -62,6 +62,10 @@ export const MenuTitleHeadingUI = styled( Text )`
 	justify-content: space-between;
 	margin-bottom: ${ space( 1 ) };
 	padding: ${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) };
+`;
+
+export const MenuTitleActionsUI = styled.span`
+	height: ${ space( 3 ) }; // 24px, same height as the buttons inside
 
 	.components-button.is-small {
 		color: ${ G2.lightGray.ui };
@@ -84,7 +88,7 @@ export const MenuTitleSearchUI = styled.div`
 	position: relative;
 
 	input {
-		height: 36px; // Same height as MenuTitle
+		height: ${ space( 4.5 ) }; // 36px, same height as MenuTitle
 		margin-bottom: ${ space( 1 ) };
 		padding-left: 30px; // Leave room for the search icon
 		padding-right: 30px; // Leave room for the close search button

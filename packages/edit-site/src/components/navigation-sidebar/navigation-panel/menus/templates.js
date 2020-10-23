@@ -23,7 +23,7 @@ import {
 } from '../constants';
 import { useSelect } from '@wordpress/data';
 import TemplatesAllMenu from './templates-all';
-import NewTemplate from '../new-template';
+import NewTemplateDropdown from '../new-template-dropdown';
 
 export default function TemplatesMenu( { onActivateItem } ) {
 	const templates = useSelect(
@@ -43,7 +43,7 @@ export default function TemplatesMenu( { onActivateItem } ) {
 		<NavigationMenu
 			menu={ MENU_TEMPLATES }
 			title={ __( 'Templates' ) }
-			titleAction={ <NewTemplate /> }
+			titleAction={ <NewTemplateDropdown /> }
 			parentMenu={ MENU_ROOT }
 		>
 			<NavigationItem

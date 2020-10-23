@@ -14,7 +14,7 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { plus } from '@wordpress/icons';
+import { Icon, plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -22,7 +22,7 @@ import { plus } from '@wordpress/icons';
 import getClosestAvailableTemplate from '../../../utils/get-closest-available-template';
 import { TEMPLATES_DEFAULT_DETAILS } from '../../../utils/get-template-info/constants';
 
-export default function NewTemplate() {
+export default function NewTemplateDropdown() {
 	const templates = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
@@ -53,13 +53,17 @@ export default function NewTemplate() {
 
 	return (
 		<DropdownMenu
-			icon={ plus }
+			className="edit-site-navigation-panel__new-template-dropdown"
+			icon={ null }
 			label={ __( 'Add Template' ) }
 			popoverProps={ {
-				className: 'edit-site-navigation-panel__new-template',
 				noArrow: false,
 			} }
-			toggleProps={ { isSmall: true, isTertiary: true } }
+			toggleProps={ {
+				children: <Icon icon={ plus } />,
+				isSmall: true,
+				isTertiary: true,
+			} }
 		>
 			{ ( { onClose } ) => (
 				<NavigableMenu>
