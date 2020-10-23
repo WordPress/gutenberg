@@ -303,7 +303,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
 				onFinishMediaSaveWithSuccess={ onFinishMediaSaveWithSuccess }
-				mediaFiles={ localMediaFiles }
+				mediaFiles={ tempMediaFiles }
 				renderContent={ () => {} }
 			/>
 		);
@@ -338,7 +338,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
 				onFinishMediaSaveWithFailure={ onFinishMediaSaveWithFailure }
-				mediaFiles={ localMediaFiles }
+				mediaFiles={ tempMediaFiles }
 				renderContent={ () => {} }
 			/>
 		);
@@ -374,7 +374,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
 				onMediaSaveStateReset={ onMediaSaveStateReset }
-				mediaFiles={ localMediaFiles }
+				mediaFiles={ tempMediaFiles }
 				renderContent={ () => {} }
 			/>
 		);
@@ -409,7 +409,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
 				onFinalSaveResult={ onFinalSaveResult }
-				mediaFiles={ localMediaFiles }
+				mediaFiles={ tempMediaFiles }
 				renderContent={ () => {} }
 			/>
 		);
@@ -444,7 +444,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
 				onFinalSaveResult={ onFinalSaveResult }
-				mediaFiles={ localMediaFiles }
+				mediaFiles={ tempMediaFiles }
 				renderContent={ () => {} }
 			/>
 		);
@@ -480,7 +480,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
 				onMediaIdChanged={ onMediaIdChanged }
-				mediaFiles={ localMediaFiles }
+				mediaFiles={ tempMediaFiles }
 				renderContent={ () => {} }
 			/>
 		);
