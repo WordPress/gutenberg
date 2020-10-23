@@ -81,7 +81,7 @@ const localMediaFiles = [
 	{
 		alt: '',
 		caption: '',
-		id: 2,
+		id: '2',
 		link: '',
 		mime: 'image/jpeg',
 		type: 'image',
@@ -90,7 +90,7 @@ const localMediaFiles = [
 	{
 		alt: '',
 		caption: '',
-		id: 3,
+		id: '3',
 		link: '',
 		mime: 'image/jpeg',
 		type: 'image',
