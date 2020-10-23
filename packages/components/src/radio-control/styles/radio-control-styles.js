@@ -2,6 +2,7 @@
  * External dependencies
  */
 import styled from '@emotion/styled';
+import { css } from '@emotion/core';
 
 /**
  * Internal dependencies
@@ -33,6 +34,18 @@ export const RadioControlOption = styled.div`
 	}
 `;
 
+const appearBoxShadow = () => {
+	const boxShadow = [
+		`0 0 0 calc( ${ config( 'borderWidth' ) } * 2 ) ${ color( 'white' ) }`,
+		`0 0 0 calc( ${ config( 'borderWidth' ) } * 2 + ${ config(
+			'borderWidthFocus'
+		) } )
+					var( --wp-admin-theme-color )`,
+	].join( ',' );
+
+	return css( { boxShadow } );
+};
+
 export const RadioControlInput = styled.input`
 	${ inputControl }
 
@@ -59,13 +72,7 @@ export const RadioControlInput = styled.input`
 	}
 
 	&:focus {
-		box-shadow: 0 0 0 calc( ${ config( 'borderWidth' ) } * 2 ) ${ color(
-	'white'
-) },
-			0 0 0 calc( ${ config( 'borderWidth' ) } * 2 + ${ config(
-	'borderWidthFocus'
-) } )
-				var( --wp-admin-theme-color );
+		${ appearBoxShadow() }
 
 		// Only visible in Windows High Contrast mode.
 		outline: 2px solid transparent;
