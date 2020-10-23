@@ -23,11 +23,8 @@ const smallOnlyIcon = css`
 	width: 24px;
 `;
 
-const appearSmall = ( props ) => {
-	const hasIcon = !! props.icon;
-	const hasText = !! props.icon && !! props.children;
-
-	if ( props.isSmall ) {
+const appearSmall = ( { hasIcon, isSmall, hasText } ) => {
+	if ( isSmall ) {
 		if ( hasIcon && ! hasText ) {
 			return smallOnlyIcon;
 		}
@@ -61,10 +58,7 @@ export const iconWithText = css`
 	}
 `;
 
-const appearIcon = ( props ) => {
-	const hasIcon = !! props.icon;
-	const hasText = !! props.icon && !! props.children;
-
+const appearIcon = ( { hasIcon, hasText } ) => {
 	if ( hasIcon ) {
 		if ( hasText ) {
 			return iconWithText;

@@ -76,6 +76,9 @@ export function Button( props, ref ) {
 		} );
 	}
 
+	const hasIcon = !! icon;
+	const hasText = !! icon && !! children;
+
 	const classes = classnames( 'components-button', className, {
 		'is-secondary': isDefault || isSecondary,
 		'is-primary': isPrimary,
@@ -85,8 +88,8 @@ export function Button( props, ref ) {
 		'is-busy': isBusy,
 		'is-link': isLink,
 		'is-destructive': isDestructive,
-		'has-text': !! icon && !! children,
-		'has-icon': !! icon,
+		'has-text': hasText,
+		'has-icon': hasIcon,
 	} );
 
 	const trulyDisabled = disabled && ! isFocusable;
@@ -141,6 +144,8 @@ export function Button( props, ref ) {
 			isSmall={ isSmall }
 			isBusy={ isBusy }
 			isPressed={ isPressed }
+			hasText={ hasText }
+			hasIcon={ hasIcon }
 		>
 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
 			{ children }
