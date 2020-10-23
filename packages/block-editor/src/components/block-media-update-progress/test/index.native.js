@@ -114,11 +114,11 @@ describe( 'BlockMediaUpdateProgress component', () => {
 			progress,
 		};
 
-		const onUpdateMediaProgress = jest.fn();
+		const onUpdateMediaUploadProgress = jest.fn();
 
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
-				onUpdateMediaProgress={ onUpdateMediaProgress }
+				onUpdateMediaUploadProgress={ onUpdateMediaUploadProgress }
 				mediaFiles={ localMediaFiles }
 				renderContent={ () => {} }
 			/>
@@ -129,8 +129,8 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		expect( wrapper.instance().state.progress ).toEqual( progress );
 		expect( wrapper.instance().state.isUploadInProgress ).toEqual( true );
 		expect( wrapper.instance().state.isUploadFailed ).toEqual( false );
-		expect( onUpdateMediaProgress ).toHaveBeenCalledTimes( 1 );
-		expect( onUpdateMediaProgress ).toHaveBeenCalledWith( payload );
+		expect( onUpdateMediaUploadProgress ).toHaveBeenCalledTimes( 1 );
+		expect( onUpdateMediaUploadProgress ).toHaveBeenCalledWith( payload );
 	} );
 
 	// UPLOAD tests
@@ -140,10 +140,10 @@ describe( 'BlockMediaUpdateProgress component', () => {
 			mediaId: 432, // id not belonging to assigned mediaFiles collection in test
 			progress: 20,
 		};
-		const onUpdateMediaProgress = jest.fn();
+		const onUpdateMediaUploadProgress = jest.fn();
 		const wrapper = shallow(
 			<BlockMediaUpdateProgress
-				onUpdateMediaProgress={ onUpdateMediaProgress }
+				onUpdateMediaUploadProgress={ onUpdateMediaUploadProgress }
 				mediaFiles={ localMediaFiles }
 				renderContent={ () => {} }
 			/>
@@ -152,7 +152,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		sendMediaUpload( payload );
 
 		expect( wrapper.instance().state.progress ).toEqual( 0 );
-		expect( onUpdateMediaProgress ).toHaveBeenCalledTimes( 0 );
+		expect( onUpdateMediaUploadProgress ).toHaveBeenCalledTimes( 0 );
 	} );
 
 	it( 'upload: listens media upload success', () => {
