@@ -376,7 +376,7 @@ add_filter( 'wp_rest_search_handlers', 'gutenberg_term_search_handler', 10, 5 );
  * @param \WP_REST_Response $response   API response.
  * @param \WP_Block_Type    $block_type Block type.
  *
- * @return \WP_REST_Response Modified APi response.
+ * @return \WP_REST_Response Modified API response.
  */
 function gutenberg_add_assets_links_to_block_type( $response, $block_type ) {
 	$links   = array();
