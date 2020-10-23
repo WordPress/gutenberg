@@ -66,7 +66,11 @@ export function SocialLinksEdit( props ) {
 				<ToolbarGroup>
 					<ToolbarItem>
 						{ () => (
-							<DropdownMenu label={ __( 'Size' ) }>
+							<DropdownMenu
+								label={ __( 'Size' ) }
+								text={ __( 'Size' ) }
+								icon={ null }
+							>
 								{ ( onClose ) => (
 									<MenuGroup>
 										{ sizeOptions.map( ( entry ) => {
