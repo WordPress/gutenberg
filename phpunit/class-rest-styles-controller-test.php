@@ -163,8 +163,8 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 'dependency4', $data[1]['handle'] );
 		$this->assertEquals( 'dependency5', $data[2]['handle'] );
 
+		$keys = array( 'src', 'url', 'args', 'ver', 'extra', 'textdomain', 'translations_path', 'deps', '_links' );
 		for ( $i = 0; $i < 3; $i ++ ) {
-			$keys = array( 'src', 'url', 'args', 'ver', 'extra', 'textdomain', 'translations_path', 'deps', '_links' );
 			foreach ( $keys as $key ) {
 				$this->assertArrayHasKey( $key, $data[ $i ] );
 			}
