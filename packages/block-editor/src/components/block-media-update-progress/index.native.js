@@ -153,7 +153,7 @@ export class BlockMediaUpdateProgress extends React.Component {
 	}
 
 	mediaSaveStateReset( payload ) {
-		this.setState( { isUploadInProgress: false, isUploadFailed: false } );
+		this.setState( { isSaveInProgress: false, isSaveFailed: false } );
 		if ( this.props.onMediaSaveStateReset ) {
 			this.props.onMediaSaveStateReset( payload );
 		}
