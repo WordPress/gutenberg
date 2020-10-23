@@ -1,16 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	InnerBlocks,
 	useBlockProps,
-	__experimentalBlockVariationPicker,
 } from '@wordpress/block-editor';
-import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -18,15 +16,16 @@ import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 import QueryToolbar from './query-toolbar';
 import QueryProvider from './query-provider';
 import QueryInspectorControls from './query-inspector-controls';
+import QueryPlaceholder from './query-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
 const TEMPLATE = [ [ 'core/query-loop' ] ];
-export function QueryEditContainer( {
+export function QueryContent( {
 	attributes: { queryId, query },
 	context: { postId },
 	setAttributes,
 } ) {
-	const instanceId = useInstanceId( QueryEditContainer );
+	const instanceId = useInstanceId( QueryContent );
 	const blockProps = useBlockProps();
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
@@ -46,7 +45,7 @@ export function QueryEditContainer( {
 		if ( ! query.perPage && postsPerPage ) {
 			newQuery.perPage = postsPerPage;
 		}
-		if ( Object.keys( newQuery ).length ) {
+		if ( !! Object.keys( newQuery ).length ) {
 			updateQuery( newQuery );
 		}
 	}, [ query.perPage, query.exclude, postId ] );
@@ -77,58 +76,14 @@ export function QueryEditContainer( {
 	);
 }
 
-const Placeholder = ( { clientId, name, setAttributes } ) => {
-	const { blockType, defaultVariation, variations } = useSelect(
-		( select ) => {
-			const {
-				getBlockVariations,
-				getBlockType,
-				getDefaultBlockVariation,
-			} = select( 'core/blocks' );
-
-			return {
-				blockType: getBlockType( name ),
-				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				variations: getBlockVariations( name, 'block' ),
-			};
-		},
-		[ name ]
-	);
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
-	const blockProps = useBlockProps();
-	return (
-		<div { ...blockProps }>
-			<__experimentalBlockVariationPicker
-				icon={ blockType?.icon?.src }
-				label={ blockType?.title }
-				variations={ variations }
-				onSelect={ ( nextVariation = defaultVariation ) => {
-					if ( nextVariation.attributes ) {
-						setAttributes( nextVariation.attributes );
-					}
-					if ( nextVariation.innerBlocks ) {
-						replaceInnerBlocks(
-							clientId,
-							createBlocksFromInnerBlocksTemplate(
-								nextVariation.innerBlocks
-							),
-							false
-						);
-					}
-				} }
-			/>
-		</div>
-	);
-};
-
 const QueryEdit = ( props ) => {
 	const { clientId } = props;
 	const hasInnerBlocks = useSelect(
 		( select ) =>
-			select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
+			!! select( 'core/block-editor' ).getBlocks( clientId ).length,
 		[ clientId ]
 	);
-	const Component = hasInnerBlocks ? QueryEditContainer : Placeholder;
+	const Component = hasInnerBlocks ? QueryContent : QueryPlaceholder;
 
 	return <Component { ...props } />;
 };

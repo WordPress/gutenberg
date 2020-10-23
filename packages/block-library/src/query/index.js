@@ -16,6 +16,7 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Query' ),
+	description: __( 'Displays a list of entities as a result of a query.' ),
 	edit,
 	save,
 	variations,
