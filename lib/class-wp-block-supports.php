@@ -207,14 +207,24 @@ function get_block_wrapper_attributes( $extra_attributes = array() ) {
  * @return array Block attributes.
  */
 function wp_block_supports_track_block_to_render( $args ) {
-	if ( null !== $args['render_callback'] ) {
+	if ( is_callable( $args['render_callback'] ) ) {
 		$block_render_callback   = $args['render_callback'];
 		$args['render_callback'] = function( $attributes, $content, $block ) use ( $block_render_callback ) {
-			$parent_block                       = WP_Block_Supports::$block_to_render;
-			WP_Block_Supports::$block_to_render = $block->parsed_block;
-			$result                             = $block_render_callback( $attributes, $content, $block );
-			WP_Block_Supports::$block_to_render = $parent_block;
-			return $result;
+			// Check for null for back compatibility with WP_Block_Type->render
+			// which is unused since the introduction of WP_Block class.
+			//
+			// See:
+			// - https://core.trac.wordpress.org/ticket/49927
+			// - commit 910de8f6890c87f93359c6f2edc6c27b9a3f3292 at wordpress-develop
+			if ( null !== $block ) {
+				$parent_block                       = WP_Block_Supports::$block_to_render;
+				WP_Block_Supports::$block_to_render = $block->parsed_block;
+				$result                             = $block_render_callback( $attributes, $content, $block );
+				WP_Block_Supports::$block_to_render = $parent_block;
+				return $result;
+			} else {
+				return $block_render_callback( $attributes, $content );
+			}
 		};
 	}
 	return $args;
