@@ -1,7 +1,31 @@
 /**
+ * External dependencies
+ */
+import { isNumber } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
+
+function getAspectRatio( width, height ) {
+	return isNumber( width ) && isNumber( height ) ? width / height : undefined;
+}
+
+function useLazyAspectRatio( width, height ) {
+	const initialAspect = getAspectRatio( width, height );
+	const [ aspect, setAspect ] = useState( initialAspect );
+
+	// Wait for a valid width/height before setting the aspect ratio.
+	useEffect( () => {
+		if ( aspect === undefined ) {
+			const newInitialAspect = getAspectRatio( width, height );
+			setAspect( newInitialAspect );
+		}
+	}, [ aspect, width, height ] );
+
+	return [ aspect, setAspect ];
+}
 
 export default function useTransformImage( {
 	url,
@@ -16,7 +40,7 @@ export default function useTransformImage( {
 	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
 	const [ zoom, setZoom ] = useState( 100 );
 	const [ rotation, setRotation ] = useState( 0 );
-	const [ aspect, setAspect ] = useState( naturalWidth / naturalHeight );
+	const [ aspect, setAspect ] = useLazyAspectRatio( width, height );
 
 	// TODO - remove inlined logic.
 	const editedWidth = width;
