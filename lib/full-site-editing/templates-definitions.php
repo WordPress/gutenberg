@@ -6,7 +6,7 @@
  */
 
 function gutenberg_get_template_types_definitions() {
-	return array(
+	$template_type_definitions = array(
 		'index'          => array(
 			'title'         => _x( 'Default (Index)', 'Template name', 'gutenberg' ),
 			'description'   => __( 'Main template, applied when no other template is found', 'gutenberg' ),
@@ -76,6 +76,15 @@ function gutenberg_get_template_types_definitions() {
 			'description'   => '',
 		),
 	);
+
+	/**
+	 * Filters the list of template types definitions.
+	 *
+	 * @param array $template_type_definitions An array of template types definitions, formatted as [ slug => [ title, description ] ].
+	 *
+	 * @since 5.x.x
+	 */
+	return apply_filters( 'template_types_definitions', $template_type_definitions );
 }
 
 function gutenberg_get_default_template_types( $settings ) {

@@ -60,7 +60,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 			),
 			templateType: getTemplateType(),
 			isInserterOpen: isInserterOpened(),
-			defaultTemplateTypes: getSettings()?.defaultTemplateTypes,
+			defaultTemplateDetails: getSettings()?.defaultTemplateTypes,
 		};
 	}, [] );
 
