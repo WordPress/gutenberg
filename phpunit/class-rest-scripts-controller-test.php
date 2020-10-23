@@ -178,6 +178,23 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * Test whether script handle is excluded from its dependencies list.
+	 */
+	public function test_get_items_check_asset_deps() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'GET', '/__experimental/scripts' );
+		$request->set_query_params( array( 'dependency' => 'script-with-nested-deps' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+
+		$handles = wp_list_pluck( $data, 'handle' );
+
+		$this->assertNotContains( 'script-with-nested-deps', $handles );
+		$this->assertContains( 'dependency3', $handles );
+		$this->assertContains( 'dependency4', $handles );
+	}
+
+	/**
 	 * Test single script.
 	 */
 	public function test_get_item() {
