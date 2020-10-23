@@ -11,7 +11,11 @@ import { Icon, search as searchIcon } from '@wordpress/icons';
 import Animate from '../../animate';
 import Button from '../../button';
 import MenuTitleSearch from './menu-title-search';
-import { MenuTitleHeadingUI, MenuTitleUI } from '../styles/navigation-styles';
+import {
+	MenuTitleActionsUI,
+	MenuTitleHeadingUI,
+	MenuTitleUI,
+} from '../styles/navigation-styles';
 import { useNavigationMenuContext } from './context';
 import { SEARCH_FOCUS_DELAY } from '../constants';
 
@@ -20,6 +24,7 @@ export default function NavigationMenuTitle( {
 	onSearch,
 	search,
 	title,
+	titleAction,
 } ) {
 	const [ isSearching, setIsSearching ] = useState( false );
 	const { menu } = useNavigationMenuContext();
@@ -53,16 +58,22 @@ export default function NavigationMenuTitle( {
 				>
 					<span id={ menuTitleId }>{ title }</span>
 
-					{ hasSearch && (
-						<Button
-							isSmall
-							isTertiary
-							label={ searchButtonLabel }
-							onClick={ () => setIsSearching( true ) }
-							ref={ searchButtonRef }
-						>
-							<Icon icon={ searchIcon } />
-						</Button>
+					{ ( hasSearch || titleAction ) && (
+						<MenuTitleActionsUI>
+							{ titleAction }
+
+							{ hasSearch && (
+								<Button
+									isSmall
+									isTertiary
+									label={ searchButtonLabel }
+									onClick={ () => setIsSearching( true ) }
+									ref={ searchButtonRef }
+								>
+									<Icon icon={ searchIcon } />
+								</Button>
+							) }
+						</MenuTitleActionsUI>
 					) }
 				</MenuTitleHeadingUI>
 			) }
