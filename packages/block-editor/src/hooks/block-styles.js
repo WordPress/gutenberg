@@ -73,5 +73,6 @@ export const withInspectorControls = createHigherOrderComponent(
 addFilter(
 	'editor.BlockEdit',
 	'core/editor/block-styles/with-inspector-controls',
-	withInspectorControls
+	withInspectorControls,
+	20
 );
