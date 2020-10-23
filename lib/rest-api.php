@@ -402,7 +402,7 @@ function gutenberg_add_assets_links_to_block_type( $response, $block_type ) {
 		$expected_handle = $block_type->$style;
 		if ( wp_style_is( $expected_handle, 'registered' ) ) {
 			$links[ 'https://api.w.org/' . $style ] = array(
-				'href'       => rest_url( sprintf( '%s/%s/%s', 'wp/v2', 'styles', $expected_handle ) ),
+				'href'       => rest_url( sprintf( '%s/%s/%s', '__experimental', 'styles', $expected_handle ) ),
 				'embeddable' => true,
 			);
 		}
