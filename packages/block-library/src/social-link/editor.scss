@@ -15,6 +15,6 @@
 }
 
 .wp-block-social-links.is-style-pill-shape .wp-social-link button {
-	padding-left: 0.6666em;
-	padding-right: 0.6666em;
+	padding-left: calc((2/3) * 1em);
+	padding-right: calc((2/3) * 1em);
 }
