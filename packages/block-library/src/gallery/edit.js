@@ -40,7 +40,7 @@ import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
-} from './constants';
+} from '../image/constants'; // Switched from gallery constants that don't match.
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -75,6 +75,8 @@ function GalleryEdit( props ) {
 	} = props;
 
 	const {
+		applyToAllImages,
+		linkTarget,
 		linkTo,
 		columns = defaultColumnsNumber( images ),
 		sizeSlug,
@@ -196,6 +198,22 @@ function GalleryEdit( props ) {
 			: __( 'Thumbnails are not cropped.' );
 	}
 
+	function toggleApplyToAll() {
+		setAttributes( { applyToAllImages: ! applyToAllImages } );
+	}
+
+	function getApplyToAllHelp( checked ) {
+		return checked
+			? __( 'Changes apply to all images.' )
+			: __( 'Changes apply to images missing the setting.' );
+	}
+
+	function toggleOpenInNewTab() {
+		setAttributes( {
+			linkTarget: linkTarget ? undefined : '_blank',
+		} );
+	}
+
 	function getImagesSizeOptions() {
 		return map(
 			filter( imageSizing.imageSizes, ( { slug } ) =>
@@ -205,9 +223,9 @@ function GalleryEdit( props ) {
 		);
 	}
 
-	// function updateImagesSize( newSizeSlug ) {
-	// 	// Needs applying to child images somehow
-	// }
+	function updateImageSizes( newSizeSlug ) {
+		setAttributes( { sizeSlug: newSizeSlug } );
+	}
 
 	useEffect( () => {
 		if (
@@ -290,7 +308,6 @@ function GalleryEdit( props ) {
 							required
 						/>
 					) }
-
 					<ToggleControl
 						label={ __( 'Crop images' ) }
 						checked={ !! imageCrop }
@@ -303,14 +320,25 @@ function GalleryEdit( props ) {
 						onChange={ setLinkTo }
 						options={ linkOptions }
 					/>
+					<ToggleControl
+						label={ __( 'Open in new tab' ) }
+						onChange={ toggleOpenInNewTab }
+						checked={ linkTarget === '_blank' }
+					/>
 					{ shouldShowSizeOptions && (
 						<SelectControl
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }
-							// onChange={ updateImagesSize }
+							onChange={ updateImageSizes }
 						/>
 					) }
+					<ToggleControl
+						label={ __( 'Apply changes to all images' ) }
+						checked={ !! applyToAllImages }
+						onChange={ toggleApplyToAll }
+						help={ getApplyToAllHelp }
+					/>
 				</PanelBody>
 			</InspectorControls>
 			{ noticeUI }

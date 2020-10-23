@@ -27,6 +27,7 @@ import { image as icon } from '@wordpress/icons';
  * Internal dependencies
  */
 import Image from './image';
+import { getUpdatedLinkTargetSettings } from './utils';
 
 /**
  * Module constants
@@ -80,7 +81,15 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
-	context: { allowAlign = true, allowResize = true, isListItem = false },
+	context: {
+		allowAlign = true,
+		allowResize = true,
+		applyToAllImages = false,
+		galleryLinkDestination,
+		galleryLinkTarget,
+		gallerySizeSlug,
+		isListItem = false,
+	},
 } ) {
 	const {
 		url = '',
@@ -90,6 +99,8 @@ export function ImageEdit( {
 		id,
 		width,
 		height,
+		linkDestination,
+		linkTarget,
 		sizeSlug,
 	} = attributes;
 
@@ -109,6 +120,72 @@ export function ImageEdit( {
 		const { getSettings } = select( 'core/block-editor' );
 		return getSettings().mediaUpload;
 	} );
+
+	// We need the image if updating due to Gallery setting changes.
+	const imageMedia = useSelect(
+		( select ) => {
+			return id ? select( 'core' ).getMedia( id ) : null;
+		},
+		[ id ]
+	);
+
+	// Update link target and rel based on Gallery context, if appropriate.
+	// Currently, we don't know if attributes were previously set via gallery context.
+	// So effectively this fallback is "one-time only" unless `applyToAllImages` is on.
+	useEffect( () => {
+		if ( applyToAllImages || ( ! linkTarget && galleryLinkTarget ) ) {
+			setAttributes(
+				getUpdatedLinkTargetSettings( galleryLinkTarget, attributes )
+			);
+		}
+	}, [ applyToAllImages, linkTarget, galleryLinkTarget ] );
+
+	// Update link destination and href based on Gallery context, if appropriate.
+	// Currently, we don't know if attributes were previously set via gallery context.
+	// So effectively this fallback is "one-time only" unless `applyToAllImages` is on.
+	useEffect( () => {
+		if (
+			applyToAllImages ||
+			( linkDestination === 'none' && galleryLinkDestination )
+		) {
+			let href;
+			switch ( galleryLinkDestination ) {
+				case LINK_DESTINATION_MEDIA:
+					href = imageMedia.source_url;
+					break;
+				case LINK_DESTINATION_ATTACHMENT:
+					href = imageMedia.link;
+					break;
+			}
+			setAttributes( {
+				linkDestination: galleryLinkDestination,
+				href,
+			} );
+		}
+	}, [ applyToAllImages, galleryLinkDestination ] );
+
+	// Update image size slug based on Gallery context, if appropriate.
+	// Currently, we don't know if the attribtues were previously set via gallery context.
+	// So effectively this fallback is "one-time only" unless `applyToAllImages` is on.
+	useEffect( () => {
+		if ( applyToAllImages || ( ! sizeSlug && gallerySizeSlug ) ) {
+			const newUrl = get( imageMedia, [
+				'media_details',
+				'sizes',
+				gallerySizeSlug,
+				'source_url',
+			] );
+
+			if ( newUrl ) {
+				setAttributes( {
+					url: newUrl,
+					width: undefined,
+					height: undefined,
+					sizeSlug: gallerySizeSlug,
+				} );
+			}
+		}
+	}, [ applyToAllImages, gallerySizeSlug ] );
 
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
@@ -158,8 +235,8 @@ export function ImageEdit( {
 		}
 
 		// Check if default link setting should be used.
-		let linkDestination = attributes.linkDestination;
-		if ( ! linkDestination ) {
+		let destination = linkDestination;
+		if ( ! destination ) {
 			// Use the WordPress option to determine the proper default.
 			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
 			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
@@ -169,24 +246,24 @@ export function ImageEdit( {
 			) {
 				case 'file':
 				case LINK_DESTINATION_MEDIA:
-					linkDestination = LINK_DESTINATION_MEDIA;
+					destination = LINK_DESTINATION_MEDIA;
 					break;
 				case 'post':
 				case LINK_DESTINATION_ATTACHMENT:
-					linkDestination = LINK_DESTINATION_ATTACHMENT;
+					destination = LINK_DESTINATION_ATTACHMENT;
 					break;
 				case LINK_DESTINATION_CUSTOM:
-					linkDestination = LINK_DESTINATION_CUSTOM;
+					destination = LINK_DESTINATION_CUSTOM;
 					break;
 				case LINK_DESTINATION_NONE:
-					linkDestination = LINK_DESTINATION_NONE;
+					destination = LINK_DESTINATION_NONE;
 					break;
 			}
 		}
 
 		// Check if the image is linked to it's media.
 		let href;
-		switch ( linkDestination ) {
+		switch ( destination ) {
 			case LINK_DESTINATION_MEDIA:
 				href = media.url;
 				break;

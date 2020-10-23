@@ -26,6 +26,9 @@
 		"linkTo": {
 			"type": "string"
 		},
+		"linkTarget": {
+			"type": "string"
+		},
 		"sizeSlug": {
 			"type": "string",
 			"default": "large"
@@ -41,12 +44,20 @@
 		"isListItem": {
 			"type": "boolean",
 			"default": true
+		},
+		"applyToAllImages": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"providesContext": {
 		"allowAlign": "allowAlign",
 		"allowResize": "allowResize",
-		"isListItem": "isListItem"
+		"isListItem": "isListItem",
+		"applyToAllImages": "applyToAllImages",
+		"galleryLinkDestination": "linkTo",
+		"galleryLinkTarget": "linkTarget",
+		"gallerySizeSlug": "sizeSlug"
 	},
 	"supports": {
 		"anchor": true,
