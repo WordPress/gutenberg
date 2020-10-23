@@ -84,20 +84,6 @@ export default function NewTemplateDropdown() {
 							)
 						) }
 					</MenuGroup>
-					<MenuGroup>
-						<MenuItem
-							info={ __( 'Custom template ' ) }
-							onClick={ () => {
-								addTemplate( {
-									title: __( 'New Template' ),
-									status: 'draft',
-								} );
-								onClose();
-							} }
-						>
-							{ __( 'General' ) }
-						</MenuItem>
-					</MenuGroup>
 				</NavigableMenu>
 			) }
 		</DropdownMenu>
