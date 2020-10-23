@@ -43,7 +43,7 @@ exports[`FormToggle basic rendering should render a span element with an uncheck
 }
 
 .emotion-6 .emotion-1:focus + .emotion-3 {
-  box-shadow: 0 0 0 2px #fff,0 0 0 3.5px var( --wp-admin-theme-color );
+  box-shadow: 0 0 0 2px #fff,0 0 0 calc( 2px + 1.5px )) var( --wp-admin-theme-color );
   outline: 2px solid transparent;
   outline-offset: 2px;
 }
