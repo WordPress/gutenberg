@@ -40,8 +40,8 @@ export default function TemplatePartPlaceholder( {
 		} );
 	}, [ setAttributes ] );
 
-	// If there are inner blocks already present, this is a convert to template part flow.
-	// Therefore immediately create the template part with the given inner blocks.
+	// If there are inner blocks present, the content for creation is clear.
+	// Therefore immediately create the template part with the given inner blocks as its content.
 	useEffect( () => {
 		if ( innerBlocks.length ) {
 			onCreate();
