@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { Platform, TouchableOpacity, Text, View } from 'react-native';
+import { Platform, Text, View } from 'react-native';
+import Menu, { MenuItem } from 'react-native-material-menu';
 /**
  * Internal dependencies
  */
@@ -16,6 +17,8 @@ import { useRef } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
 
 import styles from './style.scss';
+
+const isIOS = Platform.OS === 'ios';
 
 function UnitControl( {
 	className,
@@ -39,14 +42,20 @@ function UnitControl( {
 	...props
 } ) {
 	const pickerRef = useRef();
+	const menuRef = useRef();
 
 	function onPickerSelect( selectedOption ) {
 		onUnitChange( selectedOption );
+		if ( menuRef?.current && ! isIOS ) {
+			menuRef.current.hide();
+		}
 	}
 
 	function onPickerPresent() {
-		if ( pickerRef.current ) {
+		if ( pickerRef?.current && isIOS ) {
 			pickerRef.current.presentPicker();
+		} else if ( menuRef?.current && ! isIOS ) {
+			menuRef.current.show();
 		}
 	}
 
@@ -63,15 +72,53 @@ function UnitControl( {
 
 	const renderUnitButton = () => {
 		return (
-			<TouchableOpacity
-				onPress={ onPickerPresent }
-				accessibilityRole="button"
-				accessibilityHint="Open picker to choose unit"
+			<View style={ styles.unitButton }>
+				<Text style={ unitButtonTextStyle } onPress={ onPickerPresent }>
+					{ unit }
+				</Text>
+			</View>
+		);
+	};
+
+	const renderUnitPicker = () => {
+		if ( isIOS ) {
+			return (
+				<>
+					{ renderUnitButton() }
+					<Picker
+						ref={ pickerRef }
+						options={ units }
+						onChange={ onPickerSelect }
+						hideCancelButton={ false }
+						leftAlign={ true }
+					/>
+				</>
+			);
+		}
+		return (
+			<View
+				style={ {
+					alignItems: 'center',
+					justifyContent: 'center',
+				} }
 			>
-				<View style={ styles.unitButton }>
-					<Text style={ unitButtonTextStyle }>{ unit }</Text>
-				</View>
-			</TouchableOpacity>
+				<Menu ref={ menuRef } button={ renderUnitButton() }>
+					<View>
+						{ units.map( ( unitItem ) => {
+							return (
+								<MenuItem
+									key={ unit.label }
+									onPress={ () =>
+										onPickerSelect( unitItem.value )
+									}
+								>
+									<Text>{ unitItem.label }</Text>
+								</MenuItem>
+							);
+						} ) }
+					</View>
+				</Menu>
+			</View>
 		);
 	};
 
@@ -88,7 +135,7 @@ function UnitControl( {
 					defaultValue={ initialSliderValue }
 					shouldDisplayTextInput={ true }
 				>
-					{ renderUnitButton() }
+					{ renderUnitPicker() }
 				</StepperCell>
 			) : (
 				<RangeCell
@@ -108,17 +155,9 @@ function UnitControl( {
 					separatorType={ separatorType }
 					{ ...props }
 				>
-					{ renderUnitButton() }
+					{ renderUnitPicker() }
 				</RangeCell>
 			) }
-
-			<Picker
-				ref={ pickerRef }
-				options={ units }
-				onChange={ onPickerSelect }
-				hideCancelButton={ Platform.OS !== 'ios' }
-				leftAlign={ true }
-			/>
 		</>
 	);
 }

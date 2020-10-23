@@ -299,7 +299,7 @@ const Cover = ( {
 			) : null }
 			<PanelBody title={ __( 'Dimensions' ) }>
 				<UnitControl
-					label={ __( 'Minimum height in pixels' ) }
+					label={ __( 'Minimum height' ) }
 					min={ COVER_MIN_HEIGHT }
 					max={ COVER_MAX_HEIGHT }
 					unit={ minHeightUnit || 'px' }
