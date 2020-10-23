@@ -178,11 +178,11 @@ The data provided in the example object should match the attributes defined. For
 
 ```js
 example: {
-    attributes: {
-        cover: 'https://example.com/image.jpg',
-        author: 'William Shakespeare',
-        pages: 500
-    },
+	attributes: {
+		cover: 'https://example.com/image.jpg',
+		author: 'William Shakespeare',
+		pages: 500
+	},
 },
 ```
 
@@ -192,20 +192,31 @@ It's also possible to extend the block preview with inner blocks via `innerBlock
 
 ```js
 example: {
-    attributes: {
-        cover: 'https://example.com/image.jpg',
-    },
-    innerBlocks: [
-    {
-        name: 'core/paragraph',
-        attributes: {
-            /* translators: example text. */
-            content: __(
-                'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.'
-            ),
-        },
-    },
-    ],
+	attributes: {
+		cover: 'https://example.com/image.jpg',
+	},
+	innerBlocks: [
+		{
+			name: 'core/paragraph',
+			attributes: {
+				/* translators: example text. */
+				content: __(
+					'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Praesent et eros eu felis.'
+				),
+			},
+		},
+	],
+},
+```
+
+It's also possible to define the width of the preview container in pixels via `viewportWidth`. For example:
+
+```js
+example: {
+	attributes: {
+		cover: 'https://example.com/image.jpg',
+	},
+	viewportWidth: 800
 },
 ```
 
