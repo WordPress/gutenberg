@@ -71,7 +71,7 @@ export function BlockAlignmentToolbar( {
 	const { alignments: availableAlignments = DEFAULT_CONTROLS } = layout;
 	const enabledControls = controls.filter(
 		( control ) =>
-			( wideControlsEnabled || WIDE_CONTROLS.includes( control ) ) &&
+			( wideControlsEnabled || ! WIDE_CONTROLS.includes( control ) ) &&
 			availableAlignments.includes( control )
 	);
 
