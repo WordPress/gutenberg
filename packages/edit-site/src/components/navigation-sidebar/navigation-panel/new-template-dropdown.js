@@ -20,15 +20,25 @@ import { Icon, plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import getClosestAvailableTemplate from '../../../utils/get-closest-available-template';
-import { TEMPLATES_DEFAULT_DETAILS } from '../../../utils/get-template-info/constants';
 
 export default function NewTemplateDropdown() {
-	const templates = useSelect(
-		( select ) =>
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
-				status: [ 'publish', 'auto-draft', 'theme-provided' ],
-				per_page: -1,
-			} ),
+	const { defaultTemplateTypesDefinitions, templates } = useSelect(
+		( select ) => {
+			const { getSettings } = select( 'core/edit-site' );
+			const templateEntities = select( 'core' ).getEntityRecords(
+				'postType',
+				'wp_template',
+				{
+					status: [ 'publish', 'auto-draft', 'theme-provided' ],
+					per_page: -1,
+				}
+			);
+			return {
+				defaultTemplateTypesDefinitions: getSettings()
+					?.defaultTemplateTypesDefinitions,
+				templates: templateEntities,
+			};
+		},
 		[]
 	);
 	const { addTemplate } = useDispatch( 'core/edit-site' );
@@ -47,7 +57,7 @@ export default function NewTemplateDropdown() {
 	};
 
 	const missingTemplates = omit(
-		TEMPLATES_DEFAULT_DETAILS,
+		defaultTemplateTypesDefinitions,
 		map( templates, 'slug' )
 	);
 

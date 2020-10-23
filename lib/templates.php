@@ -256,3 +256,16 @@ function filter_rest_wp_template_query( $args, $request ) {
 	return $args;
 }
 add_filter( 'rest_wp_template_query', 'filter_rest_wp_template_query', 99, 2 );
+
+/**
+ * Filter the default template types definitions to temporarily remove 'embed',
+ * because it is not a regular template type.
+ *
+ * @param array $template_type_definitions The array of template types definitions.
+ * @return array Filtered $template_type_definitions.
+ */
+function gutenberg_filter_default_template_types_definitions( $template_type_definitions ) {
+	unset( $template_type_definitions['embed'] );
+	return $template_type_definitions;
+}
+add_filter( 'template_types_definitions', 'gutenberg_filter_default_template_types_definitions' );
