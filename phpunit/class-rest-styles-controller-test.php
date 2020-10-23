@@ -78,6 +78,13 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'role' => 'subscriber',
 			)
 		);
+		register_block_type(
+			'fake/styles-test',
+			array(
+				'style'        => 'block-style',
+				'editor_style' => 'block-editor-style',
+			)
+		);
 	}
 
 	/**
@@ -89,6 +96,7 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		self::delete_user( self::$editor_id );
 		self::delete_user( self::$author_id );
 		self::delete_user( self::$subscriber_id );
+		unregister_block_type( 'fake/styles-tests' );
 	}
 
 	/**
@@ -107,6 +115,8 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		wp_register_style( 'dependency5', home_url( '/dependency5.css' ), array( 'dependency4' ) );
 		wp_register_style( 'style-with-deps', home_url( '/style-with-deps.css' ), array( 'dependency1', 'dependency2' ) );
 		wp_register_style( 'style-with-nested-deps', home_url( '/style-with-nested-deps.css' ), array( 'dependency5' ) );
+		wp_register_style( 'block-style', home_url( '/block-style.css' ) );
+		wp_register_style( 'block-editor-style', home_url( '/block-editor-style.css' ) );
 	}
 
 	/**
@@ -140,12 +150,14 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Test multiple styles.
 	 */
 	public function test_get_items() {
-		wp_set_current_user( self::$admin_id );
-		$request = new WP_REST_Request( 'GET', '/__experimental/styles' );
-		$request->set_query_params( array( 'dependency' => 'style1' ) );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-		$this->assertCount( 0, $data );
+		foreach ( array( self::$admin_id, self::$superadmin_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+			$request = new WP_REST_Request( 'GET', '/__experimental/styles' );
+			$request->set_query_params( array( 'dependency' => 'style1' ) );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+			$this->assertCount( 0, $data );
+		}
 	}
 
 	/**
@@ -196,17 +208,36 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 * Test single style.
+	 * Test whether style handle is excluded from its dependencies list.
 	 */
-	public function test_get_item() {
+	public function test_get_items_check_asset_deps() {
 		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/styles/' . self::$style_handle );
+		$request = new WP_REST_Request( 'GET', '/__experimental/styles' );
+		$request->set_query_params( array( 'dependency' => 'style-with-nested-deps' ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		$this->assertEquals( self::$style_handle, $data['handle'] );
-		$this->assertEquals( home_url( '/test.css' ), $data['src'] );
-		$this->assertEquals( home_url( '/test.css' ), $data['url'] );
+		$handles = wp_list_pluck( $data, 'handle' );
+
+		$this->assertNotContains( 'style-with-nested-deps', $handles );
+		$this->assertContains( 'dependency3', $handles );
+		$this->assertContains( 'dependency4', $handles );
+	}
+
+	/**
+	 * Test single style.
+	 */
+	public function test_get_item() {
+		foreach ( array( self::$admin_id, self::$superadmin_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+			$request  = new WP_REST_Request( 'GET', '/__experimental/styles/' . self::$style_handle );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+
+			$this->assertEquals( self::$style_handle, $data['handle'] );
+			$this->assertEquals( home_url( '/test.css' ), $data['src'] );
+			$this->assertEquals( home_url( '/test.css' ), $data['url'] );
+		}
 	}
 
 	/**
@@ -275,4 +306,79 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'translations_path', $properties );
 		$this->assertArrayHasKey( 'deps', $properties );
 	}
+
+	/**
+	 * Test single block style.
+	 */
+	public function test_get_item_block_style() {
+		foreach ( array( 0, self::$subscriber_id, self::$editor_id, self::$author_id, self::$admin_id, self::$superadmin_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+			$request  = new WP_REST_Request( 'GET', '/__experimental/styles/block-style' );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+
+			$this->assertEquals( 'block-style', $data['handle'] );
+			$this->assertEquals( home_url( '/block-style.css' ), $data['src'] );
+			$this->assertEquals( home_url( '/block-style.css' ), $data['url'] );
+		}
+	}
+
+	/**
+	 * Test single block editor style.
+	 */
+	public function test_get_item_block_editor_style() {
+		foreach ( array( self::$editor_id, self::$author_id, self::$admin_id, self::$superadmin_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+			$request  = new WP_REST_Request( 'GET', '/__experimental/styles/block-editor-style' );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+
+			$this->assertEquals( 'block-editor-style', $data['handle'] );
+			$this->assertEquals( home_url( '/block-editor-style.css' ), $data['src'] );
+			$this->assertEquals( home_url( '/block-editor-style.css' ), $data['url'] );
+		}
+	}
+
+	/**
+	 * Test get items with no permission.
+	 */
+	public function test_get_items_no_permission() {
+		foreach ( array( 0, self::$subscriber_id, self::$author_id, self::$editor_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+			$request = new WP_REST_Request( 'GET', '/__experimental/styles' );
+			$request->set_query_params( array( 'dependency' => 'style1' ) );
+			$response = rest_get_server()->dispatch( $request );
+			$this->assertWPError( $response->as_error() );
+			$this->assertEquals( 'rest_handle_cannot_view', $response->as_error()->get_error_code() );
+		}
+	}
+
+	/**
+	 * Test single style with no permission.
+	 */
+	public function test_get_item_no_permission() {
+		foreach ( array( 0, self::$subscriber_id, self::$author_id, self::$editor_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+			$request  = new WP_REST_Request( 'GET', '/__experimental/styles/' . self::$style_handle );
+			$response = rest_get_server()->dispatch( $request );
+
+			$this->assertWPError( $response->as_error() );
+			$this->assertEquals( 'rest_handle_cannot_view', $response->as_error()->get_error_code() );
+		}
+	}
+
+	/**
+	 * Test single block editor style with no permission.
+	 */
+	public function test_get_item_block_editor_style_no_permission() {
+		foreach ( array( 0, self::$subscriber_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+			$request  = new WP_REST_Request( 'GET', '/__experimental/styles/block-editor-style' );
+			$response = rest_get_server()->dispatch( $request );
+
+			$this->assertWPError( $response->as_error() );
+			$this->assertEquals( 'rest_handle_cannot_view', $response->as_error()->get_error_code() );
+		}
+	}
+
 }

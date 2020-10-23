@@ -78,6 +78,13 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'role' => 'subscriber',
 			)
 		);
+		register_block_type(
+			'fake/scripts-test',
+			array(
+				'script'        => 'block-script',
+				'editor_script' => 'block-editor-script',
+			)
+		);
 	}
 
 	/**
@@ -89,6 +96,7 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		self::delete_user( self::$editor_id );
 		self::delete_user( self::$author_id );
 		self::delete_user( self::$subscriber_id );
+		unregister_block_type( 'fake/scripts-tests' );
 	}
 
 	/**
@@ -107,6 +115,8 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		wp_register_script( 'dependency5', home_url( '/dependency5.js' ), array( 'dependency4' ) );
 		wp_register_script( 'script-with-deps', home_url( '/script-with-deps.js' ), array( 'dependency1', 'dependency2' ) );
 		wp_register_script( 'script-with-nested-deps', home_url( '/script-with-nested-deps.js' ), array( 'dependency5' ) );
+		wp_register_script( 'block-script', home_url( '/block-script.js' ) );
+		wp_register_script( 'block-editor-script', home_url( '/block-editor-script.js' ) );
 	}
 
 	/**
@@ -298,6 +308,38 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * Test single block script.
+	 */
+	public function test_get_item_block_script() {
+		foreach ( array( 0, self::$subscriber_id, self::$editor_id, self::$author_id, self::$admin_id, self::$superadmin_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+			$request  = new WP_REST_Request( 'GET', '/__experimental/scripts/block-script' );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+
+			$this->assertEquals( 'block-script', $data['handle'] );
+			$this->assertEquals( home_url( '/block-script.js' ), $data['src'] );
+			$this->assertEquals( home_url( '/block-script.js' ), $data['url'] );
+		}
+	}
+
+	/**
+	 * Test single block editor script.
+	 */
+	public function test_get_item_block_editor_script() {
+		foreach ( array( self::$editor_id, self::$author_id, self::$admin_id, self::$superadmin_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+			$request  = new WP_REST_Request( 'GET', '/__experimental/scripts/block-editor-script' );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+
+			$this->assertEquals( 'block-editor-script', $data['handle'] );
+			$this->assertEquals( home_url( '/block-editor-script.js' ), $data['src'] );
+			$this->assertEquals( home_url( '/block-editor-script.js' ), $data['url'] );
+		}
+	}
+
+	/**
 	 * Test get items with no permission.
 	 */
 	public function test_get_items_no_permission() {
@@ -318,6 +360,20 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		foreach ( array( 0, self::$subscriber_id, self::$author_id, self::$editor_id ) as $user_id ) {
 			wp_set_current_user( $user_id );
 			$request  = new WP_REST_Request( 'GET', '/__experimental/scripts/' . self::$script_handle );
+			$response = rest_get_server()->dispatch( $request );
+
+			$this->assertWPError( $response->as_error() );
+			$this->assertEquals( 'rest_handle_cannot_view', $response->as_error()->get_error_code() );
+		}
+	}
+
+	/**
+	 * Test single block editor script with no permission.
+	 */
+	public function test_get_item_block_editor_script_no_permission() {
+		foreach ( array( 0, self::$subscriber_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+			$request  = new WP_REST_Request( 'GET', '/__experimental/scripts/block-editor-script' );
 			$response = rest_get_server()->dispatch( $request );
 
 			$this->assertWPError( $response->as_error() );
