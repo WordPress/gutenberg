@@ -11,13 +11,6 @@
 class WP_REST_Styles_Controller extends WP_REST_Dependencies_Controller {
 
 	/**
-	 * Core assets collection.
-	 *
-	 * @var null|array
-	 */
-	protected $core_assets;
-
-	/**
 	 * WP_REST_Styles_Controller constructor.
 	 */
 	public function __construct() {

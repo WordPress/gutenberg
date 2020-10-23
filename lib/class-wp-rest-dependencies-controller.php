@@ -38,6 +38,13 @@ abstract class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	protected $block_dependency = '';
 
 	/**
+	 * Core assets collection.
+	 *
+	 * @var null|array
+	 */
+	protected $core_assets;
+
+	/**
 	 * Register routes.
 	 *
 	 * @return void
