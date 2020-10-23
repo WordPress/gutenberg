@@ -8,7 +8,7 @@ import { useRef, useEffect } from '@wordpress/element';
  * Source:
  * https://github.com/reakit/reakit/blob/master/packages/reakit-utils/src/useUpdateEffect.ts
  *
- * @param {()=>void}                       effect
+ * @param {import('react').EffectCallback} effect
  * @param {import('react').DependencyList} deps
  */
 function useUpdateEffect( effect, deps ) {
