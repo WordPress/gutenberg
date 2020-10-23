@@ -5,6 +5,7 @@
 		"declarationDir": "build-types"
 	},
 	"references": [
+		{ "path": "../deprecated" },
 		{ "path": "../element" },
 		{ "path": "../hooks" },
 		{ "path": "../primitives" }
