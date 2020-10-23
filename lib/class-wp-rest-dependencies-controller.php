@@ -100,6 +100,9 @@ abstract class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 
 		if ( $handle ) {
 			foreach ( $filter as $dependency_handle ) {
+				if ( $handle === $dependency_handle ) {
+					continue;
+				}
 				foreach ( $this->object->registered as $dependency ) {
 					if ( $dependency_handle === $dependency->handle ) {
 						$item   = $this->prepare_item_for_response( $dependency, $request );

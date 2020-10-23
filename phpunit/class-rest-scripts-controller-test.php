@@ -127,15 +127,7 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request->set_query_params( array( 'dependency' => 'script1' ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertCount( 1, $data );
-		$this->assertEquals( 'script1', $data[0]['handle'] );
-
-		$keys = array( 'src', 'url', 'args', 'ver', 'extra', 'textdomain', 'translations_path', 'deps', '_links' );
-		foreach ( $keys as $key ) {
-			$this->assertArrayHasKey( $key, $data[0] );
-		}
-
-		$this->assertCount( 0, $data[0]['deps'] );
+		$this->assertCount( 0, $data );
 	}
 
 	/**
@@ -147,16 +139,13 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request->set_query_params( array( 'dependency' => 'script-with-deps' ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertCount( 3, $data );
+		$this->assertCount( 2, $data );
 
 		$this->assertEquals( 'dependency1', $data[0]['handle'] );
 		$this->assertEquals( 'dependency2', $data[1]['handle'] );
-		$this->assertEquals( 'script-with-deps', $data[2]['handle'] );
 
 		$this->assertCount( 0, $data[0]['deps'] );
 		$this->assertCount( 0, $data[1]['deps'] );
-		$this->assertCount( 2, $data[2]['deps'] );
-		$this->assertEquals( array( 'dependency1', 'dependency2' ), $data[2]['deps'] );
 	}
 
 	/**
@@ -168,14 +157,13 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$request->set_query_params( array( 'dependency' => 'script-with-nested-deps' ) );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
-		$this->assertCount( 4, $data );
+		$this->assertCount( 3, $data );
 
 		$this->assertEquals( 'dependency3', $data[0]['handle'] );
 		$this->assertEquals( 'dependency4', $data[1]['handle'] );
 		$this->assertEquals( 'dependency5', $data[2]['handle'] );
-		$this->assertEquals( 'script-with-nested-deps', $data[3]['handle'] );
 
-		for ( $i = 0; $i < 4; $i ++ ) {
+		for ( $i = 0; $i < 3; $i ++ ) {
 			$keys = array( 'src', 'url', 'args', 'ver', 'extra', 'textdomain', 'translations_path', 'deps', '_links' );
 			foreach ( $keys as $key ) {
 				$this->assertArrayHasKey( $key, $data[ $i ] );
@@ -187,8 +175,6 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( array( 'dependency3' ), $data[1]['deps'] );
 		$this->assertCount( 1, $data[2]['deps'] );
 		$this->assertEquals( array( 'dependency4' ), $data[2]['deps'] );
-		$this->assertCount( 1, $data[3]['deps'] );
-		$this->assertEquals( array( 'dependency5' ), $data[3]['deps'] );
 	}
 
 	/**
