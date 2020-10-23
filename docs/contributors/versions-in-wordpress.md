@@ -6,6 +6,7 @@ If anything looks incorrect here, please bring it up in #core-editor in [WordPre
 
 | Gutenberg Versions | WordPress Version |
 | ------------------ | ----------------- |
+| 8.5.1-9.2            | 5.6             |
 | 7.6-8.5            | 5.5.1             |
 | 7.6-8.5            | 5.5               |
 | 6.6-7.5            | 5.4.2             |

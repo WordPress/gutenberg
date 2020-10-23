@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { dropRight, get, map, times } from 'lodash';
+import { dropRight, get, times } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -12,14 +12,17 @@ import { PanelBody, RangeControl, Notice } from '@wordpress/components';
 
 import {
 	InspectorControls,
-	InnerBlocks,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -66,6 +69,12 @@ function ColumnsEditContainer( {
 	const blockProps = useBlockProps( {
 		className: classes,
 	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+    allowedChildBlocks: allowedChildBlocks,
+		orientation: 'horizontal',
+		renderAppender: false,
+	} );
 
 	return (
 		<>
@@ -81,7 +90,7 @@ function ColumnsEditContainer( {
 						label={ __( 'Columns' ) }
 						value={ count }
 						onChange={ ( value ) => updateColumns( count, value ) }
-						min={ 2 }
+						min={ 1 }
 						max={ Math.max( 6, count ) }
 					/>
 					{ count > 6 && (
@@ -93,15 +102,7 @@ function ColumnsEditContainer( {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<InnerBlocks
-				allowedBlocks={ ALLOWED_BLOCKS }
-				//Specify the blocks allowed to be placed within the possible created child columns within this block
-				allowedChildBlocks={ allowedChildBlocks }
-				orientation="horizontal"
-				__experimentalTagName="div"
-				__experimentalPassedProps={ blockProps }
-				renderAppender={ false }
-			/>
+			<div { ...innerBlocksProps } />
 		</>
 	);
 }
@@ -203,18 +204,6 @@ const ColumnsEditContainerWrapper = withDispatch(
 		},
 	} )
 )( ColumnsEditContainer );
-
-const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock(
-				name,
-				attributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
-			)
-	);
-};
 
 function Placeholder( { clientId, name, setAttributes } ) {
 	const { blockType, defaultVariation, variations } = useSelect(

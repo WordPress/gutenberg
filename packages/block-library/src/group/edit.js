@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+} from '@wordpress/block-editor';
 import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
@@ -16,7 +20,18 @@ function GroupEdit( { attributes, clientId } ) {
 		[ clientId ]
 	);
 	const blockProps = useBlockProps();
-	const { tagName: TagName = 'div' } = attributes;
+	const { tagName: TagName = 'div', templateLock } = attributes;
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-group__inner-container',
+		},
+		{
+			templateLock,
+			renderAppender: hasInnerBlocks
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
+		}
+	);
 
 	return (
 		<TagName { ...blockProps }>
@@ -24,15 +39,7 @@ function GroupEdit( { attributes, clientId } ) {
 				values={ attributes.style?.spacing?.padding }
 				showValues={ attributes.style?.visualizers?.padding }
 			/>
-			<InnerBlocks
-				renderAppender={
-					hasInnerBlocks ? undefined : InnerBlocks.ButtonBlockAppender
-				}
-				__experimentalTagName="div"
-				__experimentalPassedProps={ {
-					className: 'wp-block-group__inner-container',
-				} }
-			/>
+			<div { ...innerBlocksProps } />
 		</TagName>
 	);
 }

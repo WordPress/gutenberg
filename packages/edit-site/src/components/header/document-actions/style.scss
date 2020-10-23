@@ -1,34 +1,70 @@
 .edit-site-document-actions {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	justify-content: space-evenly;
+	justify-content: center;
+	height: 100%;
+	// Flex items will, by default, refuse to shrink below a minimum
+	// intrinsic width. In order to shrink this flexbox item, and
+	// subsequently truncate child text, we set an explicit min-width.
+	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
+	min-width: 0;
 
-	.edit-site-document-actions__label {
-		color: $gray-700;
+	.edit-site-document-actions__title-wrapper {
 		display: flex;
+		flex-direction: row;
 		justify-content: center;
 		align-items: center;
-		transition: height 0.25s;
+		transition: transform 0.2s;
+		@include reduce-motion(transition);
 
-		&.is-active {
-			color: inherit;
-		}
+		// See comment above about min-width
+		min-width: 0;
 
-		&.edit-site-document-actions__title {
-			height: 100%;
-			// Otherwise, the secondary item still takes up space with height 0:
-			flex-grow: 1;
-		}
+		// Since part of the dropdown button width is blank space, visually,
+		// it looks off-center. This offsets that blank space.
+		margin-left: 12px;
+	}
 
-		&.edit-site-document-actions__secondary-item {
-			height: 0;
-		}
+	.edit-site-document-actions__title-wrapper > h1 {
+		display: flex;
+		justify-content: center;
+		margin: 0;
+
+		// See comment above about min-width
+		min-width: 0;
+	}
+
+	.edit-site-document-actions__title {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	.edit-site-document-actions__secondary-item {
+		opacity: 0;
+		transform: translateY(0);
+		transition: transform 0.2s;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		text-align: center;
+		@include reduce-motion(transition);
 	}
 
 	&.has-secondary-label {
-		.edit-site-document-actions__label {
-			height: 50%;
+		transform: translateY(10px);
+
+		.edit-site-document-actions__title-wrapper {
+			transform: translateY(-12px);
+		}
+
+		.edit-site-document-actions__secondary-item {
+			opacity: 1;
+			transform: translateY(-16px);
 		}
 	}
+}
+
+.edit-site-document-actions__info-dropdown > .components-popover__content > div {
+	padding: 0;
 }

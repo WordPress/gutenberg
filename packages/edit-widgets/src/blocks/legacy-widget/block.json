@@ -8,6 +8,9 @@
 		"referenceWidgetName": {
 			"type": "string"
 		},
+		"name": {
+			"type": "string"
+		},
 		"idBase": {
 			"type": "string"
 		},
@@ -20,6 +23,10 @@
 	},
 	"supports": {
 		"html": false,
-		"customClassName": false
-	}
+		"customClassName": false,
+		"reusable": false
+	},
+	"parent": [
+		"core/widget-area"
+	]
 }

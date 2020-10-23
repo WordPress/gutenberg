@@ -1,9 +1,3 @@
-.block-editor-block-list__layout .block-editor-block-list__block { // Needs specificity to override inherited styles.
-	.reusable-block-edit-panel * {
-		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
-	}
-}
-
 // This remove the margins set here: https://github.com/WordPress/gutenberg/blob/17e5c2d870d84fb6de48dcd5bc3c38cd0c0fb0d0/packages/block-library/src/editor.scss#L56
 // It removes the margins around blocks when a BlockPreview is rendered in the block style selector
 .block-editor-block-styles .block-editor-block-list__block {
@@ -13,79 +7,6 @@
 /**
  * Notices & Block Selected/Hover Styles.
  */
-
-.block-editor-block-list__layout .block-editor-block-list__block {
-	position: relative;
-
-	// Break long strings of text without spaces so they don't overflow the block.
-	overflow-wrap: break-word;
-
-	/**
-	 * Notices
-	 */
-
-	.components-placeholder .components-with-notices-ui {
-		margin: -10px 0 12px 0;
-	}
-
-	.components-with-notices-ui {
-		margin: 0 0 12px 0;
-		width: 100%;
-
-		.components-notice {
-			margin-left: 0;
-			margin-right: 0;
-
-			.components-notice__content {
-				font-size: $default-font-size;
-			}
-		}
-	}
-
-
-	/**
-	 * Block Layout
-	 */
-
-	// Navigate mode & Focused wrapper.
-	// We're using a pseudo element to overflow placeholder borders
-	// and any border inside the block itself.
-	&:not([contenteditable]):focus {
-		outline: none;
-
-		&::after {
-			position: absolute;
-			z-index: 1;
-			pointer-events: none;
-			content: "";
-			top: $border-width;
-			bottom: $border-width;
-			left: $border-width;
-			right: $border-width;
-
-			// 2px outside.
-			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
-			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
-
-			// Show a light color for dark themes.
-			.is-dark-theme & {
-				box-shadow: 0 0 0 $border-width-focus $dark-theme-focus;
-			}
-		}
-	}
-
-	// Spotlight mode.
-	&.is-focus-mode:not(.is-multi-selected) {
-		opacity: 0.5;
-		transition: opacity 0.1s linear;
-		@include reduce-motion("transition");
-
-		&:not(.is-focused) .block-editor-block-list__block,
-		&.is-focused {
-			opacity: 1;
-		}
-	}
-}
 
 .block-editor-block-list__layout .block-editor-block-list__block,
 .block-editor-block-list__layout .block-list-appender {
@@ -128,8 +49,8 @@
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-multi-selected {
 
-		// Show selection borders around every non-nested block's actual footprint.
 		&::after {
+			// Show selection borders around every non-nested block's actual footprint.
 			position: absolute;
 			z-index: 1;
 			pointer-events: none;
@@ -138,14 +59,11 @@
 			bottom: $border-width;
 			left: $border-width;
 			right: $border-width;
-		}
 
-		&::after { // Everything else.
+			// Everything else.
 			// 2px outside.
 			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
-			transition: box-shadow 0.2s ease-out;
-			@include reduce-motion("transition");
 
 			// Windows High Contrast mode will show this outline.
 			outline: 2px solid transparent;
@@ -212,15 +130,100 @@
 	padding: 0;
 }
 
-/**
- * Block styles and alignments
- */
-
 .block-editor-block-list__layout .block-editor-block-list__block {
-	&.has-warning {
-		min-height: ( $block-padding + $block-spacing ) * 2;
+	position: relative;
+
+	// Break long strings of text without spaces so they don't overflow the block.
+	overflow-wrap: break-word;
+
+	.reusable-block-edit-panel * {
+		z-index: z-index(".block-editor-block-list__block .reusable-block-edit-panel *");
 	}
 
+	/**
+	 * Notices
+	 */
+
+	.components-placeholder .components-with-notices-ui {
+		margin: -10px 0 12px 0;
+	}
+
+	.components-with-notices-ui {
+		margin: 0 0 12px 0;
+		width: 100%;
+
+		.components-notice {
+			margin-left: 0;
+			margin-right: 0;
+
+			.components-notice__content {
+				font-size: $default-font-size;
+			}
+		}
+	}
+
+
+	/**
+	 * Block Layout
+	 */
+
+	// Navigate mode & Focused wrapper.
+	// We're using a pseudo element to overflow placeholder borders
+	// and any border inside the block itself.
+	&:not([contenteditable]):focus {
+		outline: none;
+
+		&::after {
+			position: absolute;
+			z-index: 1;
+			pointer-events: none;
+			content: "";
+			top: $border-width;
+			bottom: $border-width;
+			left: $border-width;
+			right: $border-width;
+
+			// 2px outside.
+			box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
+
+			// Show a light color for dark themes.
+			.is-dark-theme & {
+				box-shadow: 0 0 0 $border-width-focus $dark-theme-focus;
+			}
+		}
+	}
+
+	// Spotlight mode.
+	&.is-focus-mode:not(.is-multi-selected) {
+		opacity: 0.5;
+		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
+
+		&:not(.is-focused) .block-editor-block-list__block,
+		&.is-focused {
+			opacity: 1;
+		}
+	}
+
+	// Active entity spotlight.
+	&.has-active-entity:not(.is-focus-mode) {
+		opacity: 0.5;
+		transition: opacity 0.1s linear;
+		@include reduce-motion("transition");
+
+		&.is-active-entity,
+		&.has-child-selected,
+		&:not(.has-child-selected) .block-editor-block-list__block,
+		&.is-active-entity .block-editor-block-list__block,
+		.is-active-entity .block-editor-block-list__block {
+			opacity: 1;
+		}
+	}
+
+	/**
+	* Block styles and alignments
+	*/
 	&::after {
 		content: "";
 		pointer-events: none;
@@ -231,12 +234,12 @@
 		left: 0;
 		border-radius: $radius-block-ui;
 		box-shadow: 0 0 0 $border-width-focus transparent;
-		transition: box-shadow 0.1s ease-in;
-		@include reduce-motion("transition");
 	}
 
 	// Warnings
 	&.has-warning {
+		min-height: ( $block-padding + $block-spacing ) * 2;
+
 		// When a block has a warning, you shouldn't be able to manipulate the contents.
 		> * {
 			pointer-events: none;
@@ -364,7 +367,11 @@
 .block-editor-block-list__insertion-point {
 	position: relative;
 	z-index: z-index(".block-editor-block-list__insertion-point");
-	margin-top: -$block-padding * 2;
+	margin-top: -$block-padding;
+
+	&.is-insert-after {
+		margin-top: $block-padding;
+	}
 }
 
 .block-editor-block-list__insertion-point-indicator {

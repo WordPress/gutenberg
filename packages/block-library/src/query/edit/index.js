@@ -18,9 +18,10 @@ import QueryProvider from './query-provider';
 import QueryInspectorControls from './query-inspector-controls';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
-const TEMPLATE = [ [ 'core/query-loop' ], [ 'core/query-pagination' ] ];
+const TEMPLATE = [ [ 'core/query-loop' ] ];
 export default function QueryEdit( {
 	attributes: { queryId, query },
+	context: { postId },
 	setAttributes,
 } ) {
 	const instanceId = useInstanceId( QueryEdit );
@@ -32,11 +33,21 @@ export default function QueryEdit( {
 				+getSettings().postsPerPage || DEFAULTS_POSTS_PER_PAGE,
 		};
 	}, [] );
+	// Changes in query property (which is an object) need to be in the same callback,
+	// because updates are batched after the render and changes in different query properties
+	// would cause to overide previous wanted changes.
 	useEffect( () => {
-		if ( ! query.perPage && postsPerPage ) {
-			updateQuery( { perPage: postsPerPage } );
+		const newQuery = {};
+		if ( postId && ! query.exclude?.length ) {
+			newQuery.exclude = [ postId ];
 		}
-	}, [ query.perPage ] );
+		if ( ! query.perPage && postsPerPage ) {
+			newQuery.perPage = postsPerPage;
+		}
+		if ( Object.keys( newQuery ).length ) {
+			updateQuery( newQuery );
+		}
+	}, [ query.perPage, query.exclude, postId ] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
@@ -54,7 +65,10 @@ export default function QueryEdit( {
 			</BlockControls>
 			<div { ...blockProps }>
 				<QueryProvider>
-					<InnerBlocks template={ TEMPLATE } />
+					<InnerBlocks
+						template={ TEMPLATE }
+						templateInsertUpdatesSelection={ false }
+					/>
 				</QueryProvider>
 			</div>
 		</>

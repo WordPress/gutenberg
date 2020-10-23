@@ -13,9 +13,16 @@ import { useRef, forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import BlockListBlock from './block';
-import BlockListAppender from '../block-list-appender';
+import BlockListAppender, {
+	AppenderNodesContext,
+} from '../block-list-appender';
 import RootContainer from './root-container';
 import useBlockDropZone from '../use-block-drop-zone';
+
+/**
+ * A map to store the reference of each "Appenders" rendered with `rootClientId` as key.
+ */
+const appenderNodesMap = new Map();
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -24,27 +31,57 @@ import useBlockDropZone from '../use-block-drop-zone';
 const BLOCK_ANIMATION_THRESHOLD = 200;
 
 function BlockList(
-	{
-		className,
-		rootClientId,
-		renderAppender,
-		__experimentalTagName = 'div',
-		__experimentalAppenderTagName,
-		__experimentalPassedProps = {},
-	},
+	{ className, placeholder, rootClientId, renderAppender },
 	ref
 ) {
+	const Container = rootClientId ? 'div' : RootContainer;
+	const fallbackRef = useRef();
+	const wrapperRef = ref || fallbackRef;
+
+	return (
+		<AppenderNodesContext.Provider value={ appenderNodesMap }>
+			<Container
+				ref={ wrapperRef }
+				className={ classnames(
+					'block-editor-block-list__layout',
+					className
+				) }
+			>
+				<BlockListItems
+					placeholder={ placeholder }
+					rootClientId={ rootClientId }
+					renderAppender={ renderAppender }
+					wrapperRef={ wrapperRef }
+				/>
+			</Container>
+		</AppenderNodesContext.Provider>
+	);
+}
+
+function Items( {
+	placeholder,
+	rootClientId,
+	renderAppender,
+	__experimentalAppenderTagName,
+	wrapperRef,
+} ) {
 	function selector( select ) {
 		const {
 			getBlockOrder,
 			getBlockListSettings,
+			getSettings,
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
 			getGlobalBlockCount,
 			isTyping,
-			isDraggingBlocks,
+			__experimentalGetActiveBlockIdByBlockNames,
 		} = select( 'core/block-editor' );
+
+		// Determine if there is an active entity area to spotlight.
+		const activeEntityBlockId = __experimentalGetActiveBlockIdByBlockNames(
+			getSettings().__experimentalSpotlightEntityBlocks
+		);
 
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
@@ -55,7 +92,7 @@ function BlockList(
 			enableAnimation:
 				! isTyping() &&
 				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
-			isDraggingBlocks: isDraggingBlocks(),
+			activeEntityBlockId,
 		};
 	}
 
@@ -66,38 +103,24 @@ function BlockList(
 		orientation,
 		hasMultiSelection,
 		enableAnimation,
-		isDraggingBlocks,
+		activeEntityBlockId,
 	} = useSelect( selector, [ rootClientId ] );
 
-	const fallbackRef = useRef();
-	const element = __experimentalPassedProps.ref || ref || fallbackRef;
-
-	const Container = rootClientId ? __experimentalTagName : RootContainer;
 	const dropTargetIndex = useBlockDropZone( {
-		element,
+		element: wrapperRef,
 		rootClientId,
 	} );
 
-	const isAppenderDropTarget =
-		dropTargetIndex === blockClientIds.length && isDraggingBlocks;
+	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
 
 	return (
-		<Container
-			{ ...__experimentalPassedProps }
-			ref={ element }
-			className={ classnames(
-				'block-editor-block-list__layout',
-				className,
-				__experimentalPassedProps.className
-			) }
-		>
+		<>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
 
-				const isDropTarget =
-					dropTargetIndex === index && isDraggingBlocks;
+				const isDropTarget = dropTargetIndex === index;
 
 				return (
 					<AsyncModeProvider
@@ -117,11 +140,14 @@ function BlockList(
 								'is-dropping-horizontally':
 									isDropTarget &&
 									orientation === 'horizontal',
+								'has-active-entity': activeEntityBlockId,
 							} ) }
+							activeEntityBlockId={ activeEntityBlockId }
 						/>
 					</AsyncModeProvider>
 				);
 			} ) }
+			{ blockClientIds.length < 1 && placeholder }
 			<BlockListAppender
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
@@ -132,19 +158,18 @@ function BlockList(
 						isAppenderDropTarget && orientation === 'horizontal',
 				} ) }
 			/>
-		</Container>
+		</>
 	);
 }
 
-const ForwardedBlockList = forwardRef( BlockList );
-
-// This component needs to always be synchronous
-// as it's the one changing the async mode
-// depending on the block selection.
-export default forwardRef( ( props, ref ) => {
+export function BlockListItems( props ) {
+	// This component needs to always be synchronous as it's the one changing
+	// the async mode depending on the block selection.
 	return (
 		<AsyncModeProvider value={ false }>
-			<ForwardedBlockList ref={ ref } { ...props } />
+			<Items { ...props } />
 		</AsyncModeProvider>
 	);
-} );
+}
+
+export default forwardRef( BlockList );

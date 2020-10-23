@@ -8,7 +8,7 @@ import tinycolor from 'tinycolor2';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
@@ -17,6 +17,7 @@ import {
 	PanelRow,
 	RangeControl,
 	ResizableBox,
+	Spinner,
 	ToggleControl,
 	withNotices,
 	__experimentalBoxControl as BoxControl,
@@ -25,13 +26,13 @@ import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
-	InnerBlocks,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	withColors,
 	ColorPalette,
 	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
@@ -40,6 +41,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
+import { isBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -248,6 +250,7 @@ function CoverEdit( {
 		dimRatio,
 		focalPoint,
 		hasParallax,
+		isRepeated,
 		minHeight,
 		minHeightUnit,
 		style: styleAttribute,
@@ -259,11 +262,18 @@ function CoverEdit( {
 		setGradient,
 	} = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes );
+	const isBlogUrl = isBlobURL( url );
 
 	const toggleParallax = () => {
 		setAttributes( {
 			hasParallax: ! hasParallax,
 			...( ! hasParallax ? { focalPoint: undefined } : {} ),
+		} );
+	};
+
+	const toggleIsRepeated = () => {
+		setAttributes( {
+			isRepeated: ! isRepeated,
 		} );
 	};
 
@@ -304,9 +314,11 @@ function CoverEdit( {
 		}
 	}
 
+	const canDim = !! url && ( overlayColor.color || gradientValue );
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 	const showFocalPointPicker =
-		isVideoBackground || ( isImageBackground && ! hasParallax );
+		isVideoBackground ||
+		( isImageBackground && ( ! hasParallax || isRepeated ) );
 
 	const controls = (
 		<>
@@ -337,11 +349,19 @@ function CoverEdit( {
 				{ !! url && (
 					<PanelBody title={ __( 'Media settings' ) }>
 						{ isImageBackground && (
-							<ToggleControl
-								label={ __( 'Fixed background' ) }
-								checked={ hasParallax }
-								onChange={ toggleParallax }
-							/>
+							<Fragment>
+								<ToggleControl
+									label={ __( 'Fixed background' ) }
+									checked={ hasParallax }
+									onChange={ toggleParallax }
+								/>
+
+								<ToggleControl
+									label={ __( 'Repeated background' ) }
+									checked={ isRepeated }
+									onChange={ toggleIsRepeated }
+								/>
+							</Fragment>
 						) }
 						{ showFocalPointPicker && (
 							<FocalPointPicker
@@ -368,6 +388,7 @@ function CoverEdit( {
 										dimRatio: undefined,
 										focalPoint: undefined,
 										hasParallax: undefined,
+										isRepeated: undefined,
 									} )
 								}
 							>
@@ -405,7 +426,7 @@ function CoverEdit( {
 								},
 							] }
 						>
-							{ !! url && (
+							{ canDim && (
 								<RangeControl
 									label={ __( 'Opacity' ) }
 									value={ dimRatio }
@@ -416,6 +437,7 @@ function CoverEdit( {
 									}
 									min={ 0 }
 									max={ 100 }
+									step={ 10 }
 									required
 								/>
 							) }
@@ -427,6 +449,12 @@ function CoverEdit( {
 	);
 
 	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-cover__inner-container',
+		},
+		{ template: INNER_BLOCKS_TEMPLATE }
+	);
 
 	if ( ! hasBackground ) {
 		const placeholderIcon = <BlockIcon icon={ icon } />;
@@ -478,7 +506,9 @@ function CoverEdit( {
 		{
 			'is-dark-theme': isDark,
 			'has-background-dim': dimRatio !== 0,
+			'is-transient': isBlogUrl,
 			'has-parallax': hasParallax,
+			'is-repeated': isRepeated,
 			[ overlayColor.class ]: overlayColor.class,
 			'has-background-gradient': gradientValue,
 			[ gradientClass ]: ! url && gradientClass,
@@ -549,13 +579,8 @@ function CoverEdit( {
 						style={ { objectPosition: positionValue } }
 					/>
 				) }
-				<InnerBlocks
-					__experimentalTagName="div"
-					__experimentalPassedProps={ {
-						className: 'wp-block-cover__inner-container',
-					} }
-					template={ INNER_BLOCKS_TEMPLATE }
-				/>
+				{ isBlogUrl && <Spinner /> }
+				<div { ...innerBlocksProps } />
 			</div>
 		</>
 	);

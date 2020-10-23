@@ -6,6 +6,9 @@
 		"tagName": {
 			"type": "string",
 			"default": "div"
+		},
+		"templateLock": {
+			"type": "string"
 		}
 	},
 	"supports": {
@@ -19,6 +22,8 @@
 			"gradients": true,
 			"link": true
 		},
-		"__experimentalPadding": true
+		"spacing": {
+			"padding": true
+		}
 	}
 }

@@ -30,8 +30,8 @@ function MyEditorComponent () {
 	return (
 		<BlockEditorProvider
 			value={ blocks }
-			onInput={ updateBlocks }
-			onChange={ updateBlocks }
+			onInput={ ( blocks ) => updateBlocks( blocks ) }
+			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
 			<SlotFillProvider>
 				<Popover.Slot name="block-toolbar" />
@@ -392,7 +392,9 @@ Undocumented declaration.
 
 <a name="InspectorAdvancedControls" href="#InspectorAdvancedControls">#</a> **InspectorAdvancedControls**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls-advanced/README.md>
 
 <a name="InspectorControls" href="#InspectorControls">#</a> **InspectorControls**
 
@@ -486,7 +488,6 @@ _Properties_
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
--   _hasPermissionsToManageWidgets_ `boolean`: Whether or not the user is able to manage widgets.
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
 -   _isRTL_ `boolean`: Whether the editor is in RTL mode

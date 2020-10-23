@@ -25,7 +25,9 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$featured_image = sprintf( '<a href="%1s">%2s</a>', get_the_permalink( $post_ID ), $featured_image );
 	}
 
-	return '<p>' . $featured_image . '</p>';
+	$wrapper_attributes = get_block_wrapper_attributes();
+
+	return '<p ' . $wrapper_attributes . '>' . $featured_image . '</p>';
 }
 
 /**

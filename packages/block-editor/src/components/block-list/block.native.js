@@ -167,6 +167,7 @@ class BlockListBlock extends Component {
 					>
 						{ isSelected && (
 							<View
+								pointerEvents="box-none"
 								style={ [
 									styles.solidBorder,
 									isFullWidth &&
