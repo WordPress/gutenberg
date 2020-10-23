@@ -63,7 +63,7 @@
 	border-radius: $radius-block-ui;
 	position: absolute;
 	top: $header-height + $grid-unit-15 + 1px; // +1px for the header border
-	left: calc(100% + #{$grid-unit-15});
+	left: $nav-sidebar-width + $grid-unit-15;
 	color: $gray-900;
 	z-index: z-index(".edit-site-navigation-panel__preview");
 
