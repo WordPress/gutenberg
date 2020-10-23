@@ -37,7 +37,7 @@ export const RadioControlInput = styled.input`
 	${ inputControl }
 
 	border: ${ config( 'borderWidth' ) } solid ${ color( 'gray.900' ) };
-    margin-top: 0;
+	margin-top: 0;
 	margin-right: 6px;
 	transition: none;
 	border-radius: ${ config( 'radiusRound' ) };
