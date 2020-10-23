@@ -39,7 +39,7 @@ import { crop, upload } from '@wordpress/icons';
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
-import ImageEditor from './image-editing';
+import ImageEditor, { ImageEditingProvider } from './image-editing';
 import { isExternalImage } from './edit';
 
 /**
@@ -413,21 +413,7 @@ export default function Image( {
 	}
 
 	if ( canEditImage && isEditingImage ) {
-		img = (
-			<ImageEditor
-				id={ id }
-				url={ url }
-				naturalWidth={ naturalWidth }
-				naturalHeight={ naturalHeight }
-				width={ width }
-				height={ height }
-				clientWidth={ clientWidth }
-				onSaveImage={ ( imageAttributes ) =>
-					setAttributes( imageAttributes )
-				}
-				onFinishEditing={ () => setIsEditingImage( false ) }
-			/>
-		);
+		img = <ImageEditor url={ url } />;
 	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
 		img = <div style={ { width, height } }>{ img }</div>;
 	} else {
@@ -510,7 +496,19 @@ export default function Image( {
 	}
 
 	return (
-		<>
+		<ImageEditingProvider
+			id={ id }
+			url={ url }
+			naturalWidth={ naturalWidth }
+			naturalHeight={ naturalHeight }
+			width={ width }
+			height={ height }
+			clientWidth={ clientWidth }
+			onSaveImage={ ( imageAttributes ) =>
+				setAttributes( imageAttributes )
+			}
+			onFinishEditing={ () => setIsEditingImage( false ) }
+		>
 			{ controls }
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
@@ -530,6 +528,6 @@ export default function Image( {
 					}
 				/>
 			) }
-		</>
+		</ImageEditingProvider>
 	);
 }
