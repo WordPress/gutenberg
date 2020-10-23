@@ -16,7 +16,7 @@ export default function TemplatePreview( { rawContent } ) {
 
 	return (
 		<div className="edit-site-navigation-panel__preview">
-			{ <BlockPreview blocks={ blocks } viewportWidth={ 1200 } /> }
+			<BlockPreview blocks={ blocks } viewportWidth={ 1200 } />
 		</div>
 	);
 }
