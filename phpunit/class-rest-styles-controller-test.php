@@ -92,6 +92,24 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * Tests set up.
+	 */
+	public function setUp() {
+		global $wp_styles;
+		parent::setUp();
+		$wp_styles = new WP_Styles();
+		wp_register_style( self::$style_handle, home_url( '/test.css' ) );
+		wp_register_style( 'style1', home_url( '/style1.css' ) );
+		wp_register_style( 'dependency1', home_url( '/dependency1.css' ) );
+		wp_register_style( 'dependency2', home_url( '/dependency2.css' ) );
+		wp_register_style( 'dependency3', home_url( '/dependency3.css' ) );
+		wp_register_style( 'dependency4', home_url( '/dependency4.css' ), array( 'dependency3' ) );
+		wp_register_style( 'dependency5', home_url( '/dependency5.css' ), array( 'dependency4' ) );
+		wp_register_style( 'style-with-deps', home_url( '/style-with-deps.css' ), array( 'dependency1', 'dependency2' ) );
+		wp_register_style( 'style-with-nested-deps', home_url( '/style-with-nested-deps.css' ), array( 'dependency5' ) );
+	}
+
+	/**
 	 * Test whether proper routes are registered.
 	 */
 	public function test_register_routes() {
@@ -257,31 +275,4 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'translations_path', $properties );
 		$this->assertArrayHasKey( 'deps', $properties );
 	}
-
-	/**
-	 * Tests set up.
-	 */
-	public function setUp() {
-		global $wp_styles;
-		parent::setUp();
-		$wp_styles = new WP_Styles();
-		wp_register_style( self::$style_handle, home_url( '/test.css' ) );
-		wp_register_style( 'style1', home_url( '/style1.css' ) );
-		wp_register_style( 'dependency1', home_url( '/dependency1.css' ) );
-		wp_register_style( 'dependency2', home_url( '/dependency2.css' ) );
-		wp_register_style( 'dependency3', home_url( '/dependency3.css' ) );
-		wp_register_style( 'dependency4', home_url( '/dependency4.css' ), array( 'dependency3' ) );
-		wp_register_style( 'dependency5', home_url( '/dependency5.css' ), array( 'dependency4' ) );
-		wp_register_style( 'style-with-deps', home_url( '/style-with-deps.css' ), array( 'dependency1', 'dependency2' ) );
-		wp_register_style( 'style-with-nested-deps', home_url( '/style-with-nested-deps.css' ), array( 'dependency5' ) );
-	}
-
-	/**
-	 * Tests tear down.
-	 */
-	public function tearDown() {
-		parent::tearDown();
-	}
-
-
 }

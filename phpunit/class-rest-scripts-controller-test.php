@@ -92,6 +92,24 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
+	 * Tests set up.
+	 */
+	public function setUp() {
+		global $wp_scripts;
+		parent::setUp();
+		$wp_scripts = new WP_Scripts();
+		wp_register_script( self::$script_handle, home_url( '/test.js' ) );
+		wp_register_script( 'script1', home_url( '/script1.js' ) );
+		wp_register_script( 'dependency1', home_url( '/dependency1.js' ) );
+		wp_register_script( 'dependency2', home_url( '/dependency2.js' ) );
+		wp_register_script( 'dependency3', home_url( '/dependency3.js' ) );
+		wp_register_script( 'dependency4', home_url( '/dependency4.js' ), array( 'dependency3' ) );
+		wp_register_script( 'dependency5', home_url( '/dependency5.js' ), array( 'dependency4' ) );
+		wp_register_script( 'script-with-deps', home_url( '/script-with-deps.js' ), array( 'dependency1', 'dependency2' ) );
+		wp_register_script( 'script-with-nested-deps', home_url( '/script-with-nested-deps.js' ), array( 'dependency5' ) );
+	}
+
+	/**
 	 * Test whether proper routes are registered.
 	 */
 	public function test_register_routes() {
@@ -273,24 +291,6 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'textdomain', $properties );
 		$this->assertArrayHasKey( 'translations_path', $properties );
 		$this->assertArrayHasKey( 'deps', $properties );
-	}
-
-	/**
-	 * Tests set up.
-	 */
-	public function setUp() {
-		global $wp_scripts;
-		parent::setUp();
-		$wp_scripts = new WP_Scripts();
-		wp_register_script( self::$script_handle, home_url( '/test.js' ) );
-		wp_register_script( 'script1', home_url( '/script1.js' ) );
-		wp_register_script( 'dependency1', home_url( '/dependency1.js' ) );
-		wp_register_script( 'dependency2', home_url( '/dependency2.js' ) );
-		wp_register_script( 'dependency3', home_url( '/dependency3.js' ) );
-		wp_register_script( 'dependency4', home_url( '/dependency4.js' ), array( 'dependency3' ) );
-		wp_register_script( 'dependency5', home_url( '/dependency5.js' ), array( 'dependency4' ) );
-		wp_register_script( 'script-with-deps', home_url( '/script-with-deps.js' ), array( 'dependency1', 'dependency2' ) );
-		wp_register_script( 'script-with-nested-deps', home_url( '/script-with-nested-deps.js' ), array( 'dependency5' ) );
 	}
 
 }
