@@ -2,13 +2,22 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { heading, paragraph, list } from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import {
+	titleDate,
+	titleExcerpt,
+	titleDateExcerpt,
+	titleContent,
+} from './icons';
 
 const variations = [
 	{
 		name: 'title-date',
 		title: __( 'Title and Date' ),
-		icon: list,
+		icon: titleDate,
 		innerBlocks: [
 			[
 				'core/query-loop',
@@ -19,14 +28,14 @@ const variations = [
 		scope: [ 'block' ],
 	},
 	{
-		name: 'title-image',
-		title: __( 'Title and Featured Image' ),
-		icon: heading,
+		name: 'title-excerpt',
+		title: __( 'Title and Excerpt' ),
+		icon: titleExcerpt,
 		innerBlocks: [
 			[
 				'core/query-loop',
 				{},
-				[ [ 'core/post-title' ], [ 'core/post-featured-image' ] ],
+				[ [ 'core/post-title' ], [ 'core/post-excerpt' ] ],
 			],
 		],
 		scope: [ 'block' ],
@@ -34,7 +43,7 @@ const variations = [
 	{
 		name: 'title-date-excerpt',
 		title: __( 'Title, Date and Excerpt' ),
-		icon: paragraph,
+		icon: titleDateExcerpt,
 		innerBlocks: [
 			[
 				'core/query-loop',
@@ -44,6 +53,19 @@ const variations = [
 					[ 'core/post-date' ],
 					[ 'core/post-excerpt' ],
 				],
+			],
+		],
+		scope: [ 'block' ],
+	},
+	{
+		name: 'title-content',
+		title: __( 'Title and Content' ),
+		icon: titleContent,
+		innerBlocks: [
+			[
+				'core/query-loop',
+				{},
+				[ [ 'core/post-title' ], [ 'core/post-content' ] ],
 			],
 		],
 		scope: [ 'block' ],
