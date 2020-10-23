@@ -314,7 +314,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 
 		sendMediaSave( payloadSuccess );
 
-		expect( wrapper.instance().state.c ).toEqual( false );
+		expect( wrapper.instance().state.isUploadInProgress ).toEqual( false );
 		expect( onFinishMediaSaveWithSuccess ).toHaveBeenCalledTimes( 1 );
 		expect( onFinishMediaSaveWithSuccess ).toHaveBeenCalledWith(
 			payloadSuccess
