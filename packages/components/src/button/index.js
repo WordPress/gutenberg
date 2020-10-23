@@ -93,10 +93,10 @@ export function Button( props, ref ) {
 	} );
 
 	const trulyDisabled = disabled && ! isFocusable;
-	const Tag = getStyledButton( props );
-	const as = href !== undefined && ! trulyDisabled ? 'a' : 'button';
+	const StyledButton = getStyledButton( props );
+	const tag = href !== undefined && ! trulyDisabled ? 'a' : 'button';
 	const tagProps =
-		Tag === 'a'
+		tag === 'a'
 			? { href, target }
 			: {
 					type: 'button',
@@ -133,8 +133,8 @@ export function Button( props, ref ) {
 				false !== showTooltip ) );
 
 	const element = (
-		<Tag
-			as={ as }
+		<StyledButton
+			as={ tag }
 			{ ...tagProps }
 			{ ...additionalProps }
 			className={ classes }
@@ -149,7 +149,7 @@ export function Button( props, ref ) {
 		>
 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
 			{ children }
-		</Tag>
+		</StyledButton>
 	);
 
 	if ( ! shouldShowTooltip ) {
