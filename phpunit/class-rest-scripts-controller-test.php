@@ -140,12 +140,14 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Test multiple scripts.
 	 */
 	public function test_get_items() {
-		wp_set_current_user( self::$admin_id );
-		$request = new WP_REST_Request( 'GET', '/__experimental/scripts' );
-		$request->set_query_params( array( 'dependency' => 'script1' ) );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-		$this->assertCount( 0, $data );
+		foreach ( array( self::$admin_id, self::$superadmin_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+			$request = new WP_REST_Request( 'GET', '/__experimental/scripts' );
+			$request->set_query_params( array( 'dependency' => 'script1' ) );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
+			$this->assertCount( 0, $data );
+		}
 	}
 
 	/**
@@ -216,14 +218,16 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Test single script.
 	 */
 	public function test_get_item() {
-		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'GET', '/__experimental/scripts/' . self::$script_handle );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
+		foreach ( array( self::$admin_id, self::$superadmin_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+			$request  = new WP_REST_Request( 'GET', '/__experimental/scripts/' . self::$script_handle );
+			$response = rest_get_server()->dispatch( $request );
+			$data     = $response->get_data();
 
-		$this->assertEquals( self::$script_handle, $data['handle'] );
-		$this->assertEquals( home_url( '/test.js' ), $data['src'] );
-		$this->assertEquals( home_url( '/test.js' ), $data['url'] );
+			$this->assertEquals( self::$script_handle, $data['handle'] );
+			$this->assertEquals( home_url( '/test.js' ), $data['src'] );
+			$this->assertEquals( home_url( '/test.js' ), $data['url'] );
+		}
 	}
 
 	/**
@@ -291,6 +295,34 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertArrayHasKey( 'textdomain', $properties );
 		$this->assertArrayHasKey( 'translations_path', $properties );
 		$this->assertArrayHasKey( 'deps', $properties );
+	}
+
+	/**
+	 * Test get items with no permission.
+	 */
+	public function test_get_items_no_permission() {
+		foreach ( array( 0, self::$subscriber_id, self::$author_id, self::$editor_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+			$request = new WP_REST_Request( 'GET', '/__experimental/scripts' );
+			$request->set_query_params( array( 'dependency' => 'script1' ) );
+			$response = rest_get_server()->dispatch( $request );
+			$this->assertWPError( $response->as_error() );
+			$this->assertEquals( 'rest_handle_cannot_view', $response->as_error()->get_error_code() );
+		}
+	}
+
+	/**
+	 * Test single script with no permission.
+	 */
+	public function test_get_item_no_permission() {
+		foreach ( array( 0, self::$subscriber_id, self::$author_id, self::$editor_id ) as $user_id ) {
+			wp_set_current_user( $user_id );
+			$request  = new WP_REST_Request( 'GET', '/__experimental/scripts/' . self::$script_handle );
+			$response = rest_get_server()->dispatch( $request );
+
+			$this->assertWPError( $response->as_error() );
+			$this->assertEquals( 'rest_handle_cannot_view', $response->as_error()->get_error_code() );
+		}
 	}
 
 }
