@@ -48,7 +48,11 @@ export default function TemplatePartPlaceholder( {
 		}
 	}, [] );
 	if ( innerBlocks.length ) {
-		return <Spinner />;
+		return (
+			<Placeholder>
+				<Spinner />
+			</Placeholder>
+		);
 	}
 
 	return (
