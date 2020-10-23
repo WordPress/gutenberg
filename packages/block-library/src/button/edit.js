@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+
 /**
  * WordPress dependencies
  */
@@ -71,7 +72,15 @@ function BorderPanel( { borderRadius = '', setAttributes } ) {
 	);
 }
 
-function WidthPanel( { width, setAttributes } ) {
+function WidthPanel( { selectedWidth, setAttributes } ) {
+	function handleChange( newWidth ) {
+		// Check if we are toggling the width off
+		const width = selectedWidth === newWidth ? undefined : newWidth;
+
+		// Update attributes
+		setAttributes( { width } );
+	}
+
 	return (
 		<PanelBody title={ __( 'Width Settings' ) }>
 			<ButtonGroup aria-label={ __( 'Button Width' ) }>
@@ -80,10 +89,8 @@ function WidthPanel( { width, setAttributes } ) {
 						<Button
 							key={ widthValue }
 							isSmall
-							isPrimary={ widthValue === width }
-							onClick={ () =>
-								setAttributes( { width: widthValue } )
-							}
+							isPrimary={ widthValue === selectedWidth }
+							onClick={ () => handleChange( widthValue ) }
 						>
 							{ widthValue }%
 						</Button>
@@ -275,7 +282,10 @@ function ButtonEdit( props ) {
 					borderRadius={ borderRadius }
 					setAttributes={ setAttributes }
 				/>
-				<WidthPanel width={ width } setAttributes={ setAttributes } />
+				<WidthPanel
+					selectedWidth={ width }
+					setAttributes={ setAttributes }
+				/>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
 						label={ __( 'Open in new tab' ) }
