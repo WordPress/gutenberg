@@ -14,7 +14,7 @@ import { Spinner } from '@wordpress/components';
  */
 import { MIN_ZOOM, MAX_ZOOM } from './constants';
 
-import useImageEditingContext from './context';
+import { useImageEditingContext } from './context';
 
 export default function ImageCropper( { url } ) {
 	const {

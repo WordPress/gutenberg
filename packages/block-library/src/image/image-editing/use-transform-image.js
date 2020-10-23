@@ -87,6 +87,8 @@ export default function useTransformImage( {
 	}
 
 	return {
+		position,
+		setPosition,
 		crop,
 		setCrop,
 		zoom,

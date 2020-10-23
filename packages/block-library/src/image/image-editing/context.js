@@ -13,18 +13,25 @@ const ImageEditingContext = createContext( {} );
 
 export const useImageEditingContext = () => useContext( ImageEditingContext );
 
-export default function ImageEditingContextProvider( {
+export default function ImageEditingProvider( {
 	id,
 	url,
 	naturalWidth,
 	naturalHeight,
+	width,
+	height,
+	clientWidth,
 	onFinishEditing,
 	onSaveImage,
+	children,
 } ) {
 	const transformImage = useTransformImage( {
 		url,
 		naturalWidth,
 		naturalHeight,
+		width,
+		height,
+		clientWidth,
 	} );
 
 	const saveImage = useSaveImage( {
@@ -43,5 +50,9 @@ export default function ImageEditingContextProvider( {
 		[ transformImage, saveImage ]
 	);
 
-	return <ImageEditingContext.Provider value={ providerValue } />;
+	return (
+		<ImageEditingContext.Provider value={ providerValue }>
+			{ children }
+		</ImageEditingContext.Provider>
+	);
 }

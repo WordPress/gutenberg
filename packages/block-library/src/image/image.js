@@ -39,7 +39,7 @@ import { crop, upload } from '@wordpress/icons';
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
-import ImageEditor from './image-editor';
+import ImageEditor from './image-editing';
 import { isExternalImage } from './edit';
 
 /**
@@ -417,13 +417,15 @@ export default function Image( {
 			<ImageEditor
 				id={ id }
 				url={ url }
-				setAttributes={ setAttributes }
 				naturalWidth={ naturalWidth }
 				naturalHeight={ naturalHeight }
 				width={ width }
 				height={ height }
 				clientWidth={ clientWidth }
-				setIsEditingImage={ setIsEditingImage }
+				onSaveImage={ ( imageAttributes ) =>
+					setAttributes( imageAttributes )
+				}
+				onFinishEditing={ () => setIsEditingImage( false ) }
 			/>
 		);
 	} else if ( ! isResizable || ! imageWidthWithinContainer ) {

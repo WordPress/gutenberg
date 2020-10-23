@@ -12,11 +12,12 @@ import ZoomDropdown from './zoom-dropdown';
 import AspectRatioDropdown from './aspect-ratio-dropdown';
 import RotationButton from './rotation-button';
 import FormControls from './form-controls';
+import ImageEditingProvider from './context';
 
-export default function ImageEditor( { url } ) {
+export default function ImageEditor( props ) {
 	return (
-		<>
-			<Cropper url={ url } />
+		<ImageEditingProvider { ...props }>
+			<Cropper url={ props.url } />
 			<BlockControls>
 				<ToolbarGroup>
 					<ZoomDropdown />
@@ -33,6 +34,6 @@ export default function ImageEditor( { url } ) {
 					<FormControls />
 				</ToolbarGroup>
 			</BlockControls>
-		</>
+		</ImageEditingProvider>
 	);
 }
