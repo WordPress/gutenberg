@@ -60,6 +60,11 @@ export function SocialLinksEdit( props ) {
 		__experimentalAppenderTagName: 'li',
 	} );
 
+	const POPOVER_PROPS = {
+		position: 'bottom right',
+		isAlternate: true,
+	};
+
 	return (
 		<Fragment>
 			<BlockControls>
@@ -70,6 +75,7 @@ export function SocialLinksEdit( props ) {
 								label={ __( 'Size' ) }
 								text={ __( 'Size' ) }
 								icon={ null }
+								popoverProps={ POPOVER_PROPS }
 							>
 								{ ( onClose ) => (
 									<MenuGroup>
