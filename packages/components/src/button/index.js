@@ -112,7 +112,7 @@ export function Button( props, ref ) {
 			ref={ ref }
 		>
 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
-			{ ! icon && text && <span>{ text }</span> }
+			{ text && <>{ text }</> }
 			{ children }
 		</Tag>
 	);
