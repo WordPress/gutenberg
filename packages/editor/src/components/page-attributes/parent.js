@@ -32,7 +32,7 @@ function getTitle( post ) {
 export function PageAttributesParent() {
 	const { editPost } = useDispatch( 'core/editor' );
 	const [ fieldValue, setFieldValue ] = useState( false );
-	const isSearching = fieldValue && '' !== fieldValue;
+	const isSearching = fieldValue;
 	const { parentPost, parentPostId, items, postType } = useSelect(
 		( select ) => {
 			const { getPostType, getEntityRecords, getEntityRecord } = select(
