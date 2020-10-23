@@ -276,12 +276,4 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		wp_register_script( 'script-with-nested-deps', home_url( '/script-with-nested-deps.js' ), array( 'dependency5' ) );
 	}
 
-	/**
-	 * Tests tear down.
-	 */
-	public function tearDown() {
-		parent::tearDown();
-	}
-
-
 }

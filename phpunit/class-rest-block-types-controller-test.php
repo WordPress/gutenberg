@@ -43,20 +43,6 @@ class REST_Block_Types_Controller_Test extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Set up each test method.
-	 */
-	public function setUp() {
-		parent::setUp();
-	}
-
-	/**
-	 * Tear down each test method.
-	 */
-	public function tearDown() {
-		parent::tearDown();
-	}
-
-	/**
 	 * Test whether test block type contains scripts/styles links.
 	 *
 	 * @dataProvider dataProviderTestCases
