@@ -57,10 +57,7 @@ describe( 'Multi-entity save flow', () => {
 		}
 	};
 
-	useExperimentalFeatures( [
-		'#gutenberg-full-site-editing',
-		'#gutenberg-full-site-editing-demo',
-	] );
+	useExperimentalFeatures( [ '#gutenberg-full-site-editing' ] );
 
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );

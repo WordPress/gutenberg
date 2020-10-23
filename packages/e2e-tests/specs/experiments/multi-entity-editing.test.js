@@ -152,10 +152,7 @@ describe( 'Multi-entity editor states', () => {
 	const templatePartName = 'Test Template Part Name Edit';
 	const nestedTPName = 'Test Nested Template Part Name Edit';
 
-	useExperimentalFeatures( [
-		'#gutenberg-full-site-editing',
-		'#gutenberg-full-site-editing-demo',
-	] );
+	useExperimentalFeatures( [ '#gutenberg-full-site-editing' ] );
 
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );

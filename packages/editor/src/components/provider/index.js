@@ -170,7 +170,6 @@ class EditorProvider extends Component {
 				'__experimentalBlockPatterns',
 				'__experimentalBlockPatternCategories',
 				'__experimentalEnableFullSiteEditing',
-				'__experimentalEnableFullSiteEditingDemo',
 				'__experimentalFeatures',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBaseStyles',

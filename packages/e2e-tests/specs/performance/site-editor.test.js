@@ -18,10 +18,7 @@ import { addQueryArgs } from '@wordpress/url';
 jest.setTimeout( 1000000 );
 
 describe( 'Site Editor Performance', () => {
-	useExperimentalFeatures( [
-		'#gutenberg-full-site-editing',
-		'#gutenberg-full-site-editing-demo',
-	] );
+	useExperimentalFeatures( [ '#gutenberg-full-site-editing' ] );
 
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );
