@@ -58,7 +58,7 @@ function gutenberg_initialize_experiments_settings() {
 		'gutenberg-experiments',
 		'gutenberg_experiments_section',
 		array(
-			'label' => __( 'Enable Full Site Editing (Warning: this will replace your theme and cause potentially irreversible changes to your site. We recommend using this only in a development environment.)', 'gutenberg' ),
+			'label' => __( 'Enable Full Site Editing (Warning: A block-based theme is required for this experiment to work properly. We recommend using this only in a development environment.)', 'gutenberg' ),
 			'id'    => 'gutenberg-full-site-editing',
 		)
 	);
