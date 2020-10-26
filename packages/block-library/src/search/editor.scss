@@ -7,29 +7,14 @@
 		padding: $grid-unit-05;
 	}
 
-	.wp-block-search__input,
-	&.wp-block-search__button-inside .wp-block-search__inside-wrapper {
-		border-radius: $radius-block-ui;
-		border: 1px solid $gray-600;
-		color: $dark-gray-placeholder;
-		font-family: $default-font;
-		font-size: $default-font-size;
-		background-color: $white;
-
-		&:focus {
-			outline: none;
-		}
-	}
-
 	.wp-block-search__button {
-		background: #f7f7f7;
-		border-radius: $radius-block-ui;
-		border: 1px solid #ccc;
-		box-shadow: inset 0 -1px 0 #ccc;
-		font-family: $default-font;
-		font-size: $default-font-size;
-		padding: 6px 10px;
-		color: #32373c;
+		height: auto;
+		border-radius: initial;
+
+		// This needs high specificity because it otherwise inherits styles from `components-button`.
+		&.wp-block-search__button.wp-block-search__button {
+			padding: 6px 10px;
+		}
 	}
 
 	&__components-button-group {

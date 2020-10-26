@@ -1,4 +1,17 @@
 .wp-block-search {
+
+	.wp-block-search__button {
+		background: #f7f7f7;
+		border: 1px solid #ccc;
+		padding: 6px 10px;
+		color: #32373c;
+
+
+		&.has-icon {
+			line-height: 0;
+		}
+	}
+
 	.wp-block-search__inside-wrapper {
 		display: flex;
 		flex: auto;
