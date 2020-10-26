@@ -7,6 +7,7 @@ import { useInstanceId } from '@wordpress/compose';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import { StyledInput } from './styles/text-control-styles';
 
 export default function TextControl( {
 	label,
@@ -30,7 +31,7 @@ export default function TextControl( {
 			help={ help }
 			className={ className }
 		>
-			<input
+			<StyledInput
 				className="components-text-control__input"
 				type={ type }
 				id={ id }
