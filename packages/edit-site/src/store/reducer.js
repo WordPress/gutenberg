@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { flow } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -15,37 +10,24 @@ import { PREFERENCES_DEFAULTS } from './defaults';
 import { MENU_ROOT } from '../components/navigation-sidebar/navigation-panel/constants';
 
 /**
- * Higher-order reducer creator which provides the given initial state for the
- * original reducer.
- *
- * @param {*} initialState Initial state to provide to reducer.
- *
- * @return {Function} Higher-order reducer.
- */
-const createWithInitialState = ( initialState ) => ( reducer ) => {
-	return ( state = initialState, action ) => reducer( state, action );
-};
-
-/**
  * Reducer returning the user preferences.
  *
  * @param {Object}  state Current state.
- *
+ * @param {Object}  action Dispatched action.
  * @return {Object} Updated state.
  */
-export const preferences = flow( [
-	combineReducers,
-	createWithInitialState( PREFERENCES_DEFAULTS ),
-] )( {
-	features( state, action ) {
-		if ( action.type === 'TOGGLE_FEATURE' ) {
-			return {
-				...state,
-				[ action.feature ]: ! state[ action.feature ],
-			};
+export const preferences = combineReducers( {
+	features( state = PREFERENCES_DEFAULTS.features, action ) {
+		switch ( action.type ) {
+			case 'TOGGLE_FEATURE': {
+				return {
+					...state,
+					[ action.feature ]: ! state[ action.feature ],
+				};
+			}
+			default:
+				return state;
 		}
-
-		return state;
 	},
 } );
 

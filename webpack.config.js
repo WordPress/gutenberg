@@ -71,7 +71,7 @@ module.exports = {
 		filename: './build/[basename]/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
-		libraryTarget: 'this',
+		libraryTarget: 'window',
 	},
 	module: {
 		rules: compact( [

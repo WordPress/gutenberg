@@ -57,6 +57,7 @@ class TokenInput extends Component {
 					className,
 					'components-form-token-field__input'
 				) }
+				autoComplete="off"
 				role="combobox"
 				aria-expanded={ isExpanded }
 				aria-autocomplete="list"
