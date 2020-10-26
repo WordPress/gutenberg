@@ -3,7 +3,7 @@
  */
 import EditorPage from './pages/editor-page';
 import { setupDriver, isLocalEnvironment, stopDriver } from './helpers/utils';
-import testData from './helpers/test-data';
+import initialHtml from '../src/initial-html';
 
 jest.setTimeout( 1000000 );
 
@@ -34,7 +34,7 @@ describe( 'Gutenberg Editor Blocks test', () => {
 	} );
 
 	it( 'should be able to create a post with all blocks and scroll to the last one', async () => {
-		await editorPage.setHtmlContent( testData.initialHtml );
+		await editorPage.setHtmlContent( initialHtml );
 
 		const lastBlockElement = await editorPage.scrollAndReturnElement(
 			lastBlockAccessibilityLabel
