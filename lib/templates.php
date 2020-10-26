@@ -78,6 +78,10 @@ function gutenberg_register_template_post_type() {
 		'post_type'                 => array( 'wp_template' ),
 		'show_in_admin_all_list'    => true,
 		'show_in_admin_status_list' => true,
+		'label_count'               => _n_noop(
+			'Theme-provided <span class="count">(%s)</span>',
+			'Theme-provided <span class="count">(%s)</span>'
+		),
 	) );
 }
 add_action( 'init', 'gutenberg_register_template_post_type' );
@@ -198,7 +202,7 @@ function gutenberg_filter_templates_admin_query( $query ) {
 	) {
 		return;
 	}
-	$query->set( 'post_status', array( 'publish', 'auto-draft', 'theme-provided' ) );
+	$query->set( 'post_status', array( 'publish', 'draft', 'auto-draft', 'theme-provided' ) );
 }
 add_filter( 'pre_get_posts', 'gutenberg_filter_templates_admin_query' );
 
