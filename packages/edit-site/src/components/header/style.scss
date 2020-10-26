@@ -6,10 +6,12 @@
 	box-sizing: border-box;
 	width: 100%;
 
-	padding-left: 60px;
-	transition: padding-left 20ms linear;
-	transition-delay: 80ms;
-	@include reduce-motion("transition");
+	@include break-small() {
+		padding-left: 60px;
+		transition: padding-left 20ms linear;
+		transition-delay: 80ms;
+		@include reduce-motion("transition");
+	}
 
 	.edit-site-header_start,
 	.edit-site-header_end {
@@ -17,10 +19,12 @@
 		display: flex;
 	}
 
-	.edit-site-header_start {
-		// Flex basis prevents the header_start toolbar
-		// from collapsing when shrinking the viewport.
-		flex-basis: calc(#{$header-toolbar-min-width} - #{$header-height});
+	@include break-small() {
+		.edit-site-header_start {
+			// Flex basis prevents the header_start toolbar
+			// from collapsing when shrinking the viewport.
+			flex-basis: calc(#{$header-toolbar-min-width} - #{$header-height});
+		}
 	}
 
 	.edit-site-header_center {
