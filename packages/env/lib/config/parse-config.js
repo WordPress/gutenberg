@@ -125,6 +125,7 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 				gitHubFields[ 2 ],
 				gitHubFields[ 4 ] || '.'
 			),
+			clonePath: path.resolve( workDirectoryPath, gitHubFields[ 2 ] ),
 			basename: gitHubFields[ 2 ],
 		};
 	}
