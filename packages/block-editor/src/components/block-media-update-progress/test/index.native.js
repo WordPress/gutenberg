@@ -106,7 +106,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		expect( wrapper ).toBeTruthy();
 	} );
 
-	it( 'upload: listens media upload progress for local file', () => {
+	it( 'upload: onUpdateMediaUploadProgress is called when a progress update payload is received', () => {
 		const progress = 10;
 		const payload = {
 			state: MEDIA_UPLOAD_STATE_UPLOADING,
@@ -155,7 +155,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		expect( onUpdateMediaUploadProgress ).toHaveBeenCalledTimes( 0 );
 	} );
 
-	it( 'upload: listens media upload success', () => {
+	it( 'upload: onFinishMediaUploadWithSuccess is called when a success payload is received', () => {
 		const progress = 10;
 		const payloadSuccess = {
 			state: MEDIA_UPLOAD_STATE_SUCCEEDED,
@@ -192,7 +192,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		);
 	} );
 
-	it( 'upload: listens media upload fail', () => {
+	it( 'upload: onFinishMediaUploadWithFailure is called when a failed payload is received', () => {
 		const progress = 10;
 		const payloadFail = {
 			state: MEDIA_UPLOAD_STATE_FAILED,
@@ -230,7 +230,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		);
 	} );
 
-	it( 'upload: listens media upload reset', () => {
+	it( 'upload: onMediaUploadStateReset is called when a reset payload is received', () => {
 		const progress = 10;
 		const payloadReset = {
 			state: MEDIA_UPLOAD_STATE_RESET,
@@ -265,7 +265,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 	} );
 
 	// SAVE tests
-	it( 'save does not get affected by unrelated media uploads', () => {
+	it( 'save does not get affected by unrelated media save events', () => {
 		const payload = {
 			state: MEDIA_SAVE_STATE_SAVING,
 			mediaId: 'tempid-432', // id not belonging to assigned mediaFiles collection in test
@@ -286,7 +286,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		expect( onUpdateMediaSaveProgress ).toHaveBeenCalledTimes( 0 );
 	} );
 
-	it( 'save: listens media save success', () => {
+	it( 'save: onFinishMediaSaveWithSuccess is called when a success payload is received', () => {
 		const progress = 10;
 		const payloadSuccess = {
 			state: MEDIA_SAVE_STATE_SUCCEEDED,
@@ -321,7 +321,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		);
 	} );
 
-	it( 'save: listens media save fail', () => {
+	it( 'save: onFinishMediaSaveWithFailure is called when a failed payload is received', () => {
 		const progress = 10;
 		const payloadFail = {
 			state: MEDIA_SAVE_STATE_FAILED,
@@ -357,7 +357,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		);
 	} );
 
-	it( 'save: listens media save reset', () => {
+	it( 'save: onMediaSaveStateReset is called when a reset payload is received', () => {
 		const progress = 10;
 		const payloadReset = {
 			state: MEDIA_SAVE_STATE_RESET,
@@ -391,7 +391,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		expect( onMediaSaveStateReset ).toHaveBeenCalledWith( payloadReset );
 	} );
 
-	it( 'save: listens total media save result, with result: fail', () => {
+	it( 'save: onFinalSaveResult is called with fail result when fail result is received', () => {
 		const progress = 10;
 		const payloadFail = {
 			state: MEDIA_SAVE_FINAL_STATE_RESULT,
@@ -426,7 +426,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		expect( onFinalSaveResult ).toHaveBeenCalledWith( payloadFail );
 	} );
 
-	it( 'save: listens total media save result, with result: success', () => {
+	it( 'save: onFinalSaveResult is called with success result when success result is received', () => {
 		const progress = 10;
 		const payloadSuccess = {
 			state: MEDIA_SAVE_FINAL_STATE_RESULT,
