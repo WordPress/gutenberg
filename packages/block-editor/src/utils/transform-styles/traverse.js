@@ -1,26 +1,13 @@
 /**
  * External dependencies
  */
-import traverse from 'traverse';
-
-/**
- * Internal dependencies
- */
-import { parse, stringify } from './ast';
+import csstree from 'css-tree';
 
 function traverseCSS( css, callback ) {
 	try {
-		const parsed = parse( css );
-
-		const updated = traverse.map( parsed, function ( node ) {
-			if ( ! node ) {
-				return node;
-			}
-			const updatedNode = callback( node );
-			return this.update( updatedNode );
-		} );
-
-		return stringify( updated );
+		const ast = csstree.parse( css );
+		csstree.walk( ast, callback );
+		return csstree.generate( ast );
 	} catch ( err ) {
 		// eslint-disable-next-line no-console
 		console.warn( 'Error while traversing the CSS: ' + err );

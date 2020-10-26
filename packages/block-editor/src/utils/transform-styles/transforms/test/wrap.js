@@ -22,7 +22,12 @@ describe( 'CSS selector wrap', () => {
 	} );
 
 	it( 'should ignore selectors', () => {
-		const callback = wrap( '.my-namespace', 'body' );
+		const callback = wrap( '.my-namespace', [
+			{
+				type: 'TypeSelector',
+				name: 'body',
+			},
+		] );
 		const input = `h1, body { color: red; }`;
 		const output = traverse( input, callback );
 
@@ -68,6 +73,17 @@ describe( 'CSS selector wrap', () => {
 		:root {
 			--my-color: #ff0000;
 		}`;
+		const output = traverse( input, callback );
+
+		expect( output ).toMatchSnapshot();
+	} );
+
+	it( 'should not throw an exception for valid data URLs that contain `url()` inside (e.g. inline SVGs with mask)', () => {
+		const callback = wrap( '.test' );
+		const input = `
+		.wp-block-group {
+          background: url("url(t);");
+        }`;
 		const output = traverse( input, callback );
 
 		expect( output ).toMatchSnapshot();
