@@ -1,4 +1,9 @@
-.component-color-indicator {
+/**
+ * External dependencies
+ */
+import styled from '@emotion/styled';
+
+export const StyledColorIndicator = styled.span`
 	width: 25px;
 	height: 16px;
 	margin-left: 0.8rem;
@@ -8,4 +13,4 @@
 	& + & {
 		margin-left: 0.5rem;
 	}
-}
+`;
