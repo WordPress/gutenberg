@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { useEntityBlockEditor } from '@wordpress/core-data';
-import {
-	InnerBlocks,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-} from '@wordpress/block-editor';
+import { InnerBlocks, useInnerBlocksProps } from '@wordpress/block-editor';
 
 export default function TemplatePartInnerBlocks( {
 	postId: id,

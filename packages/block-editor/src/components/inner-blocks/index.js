@@ -9,7 +9,10 @@ import classnames from 'classnames';
 import { useViewportMatch } from '@wordpress/compose';
 import { forwardRef, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { getBlockType, withBlockContentContext } from '@wordpress/blocks';
+import {
+	getBlockType,
+	__unstableGetInnerBlocksProps as getInnerBlocksProps,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -182,13 +185,13 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	};
 }
 
+useInnerBlocksProps.save = getInnerBlocksProps;
+
 // Expose default appender placeholders as components.
 ForwardedInnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
 ForwardedInnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
-ForwardedInnerBlocks.Content = withBlockContentContext(
-	( { BlockContent } ) => <BlockContent />
-);
+ForwardedInnerBlocks.Content = () => useInnerBlocksProps.save().children;
 
 /**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md

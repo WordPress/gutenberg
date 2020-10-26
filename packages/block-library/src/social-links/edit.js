@@ -5,7 +5,7 @@
 import { Fragment } from '@wordpress/element';
 
 import {
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
 } from '@wordpress/block-editor';

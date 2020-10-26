@@ -583,6 +583,25 @@ _Returns_
 
 -   `Object`: Props to pass to the element to mark as a block.
 
+<a name="useInnerBlocksProps" href="#useInnerBlocksProps">#</a> **useInnerBlocksProps**
+
+This hook is used to lightly mark an element as an inner blocks wrapper
+element. Call this hook and pass the returned props to the element to mark as
+an inner blocks wrapper, automatically rendering inner blocks as children. If
+you define a ref for the element, it is important to pass the ref to this
+hook, which the hook in turn will pass to the component through the props it
+returns. Optionally, you can also pass any other props through this hook, and
+they will be merged and returned.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md>
+
+_Parameters_
+
+-   _props_ `Object`: Optional. Props to pass to the element. Must contain the ref if one is defined.
+-   _options_ `Object`: Optional. Inner blocks options.
+
 <a name="validateThemeColors" href="#validateThemeColors">#</a> **validateThemeColors**
 
 Given an array of theme colors checks colors for validity

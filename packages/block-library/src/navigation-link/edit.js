@@ -29,7 +29,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,

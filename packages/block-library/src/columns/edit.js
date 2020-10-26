@@ -12,7 +12,7 @@ import { PanelBody, RangeControl, Notice } from '@wordpress/components';
 
 import {
 	InspectorControls,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	__experimentalBlockVariationPicker,

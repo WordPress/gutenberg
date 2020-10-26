@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	InnerBlocks,
+	useInnerBlocksProps,
 	getColorClassName,
 	__experimentalGetGradientClass,
 	useBlockProps,
@@ -124,9 +124,11 @@ export default function save( { attributes } ) {
 					style={ videoStyle }
 				/>
 			) }
-			<div className="wp-block-cover__inner-container">
-				<InnerBlocks.Content />
-			</div>
+			<div
+				{ ...useInnerBlocksProps.save( {
+					className: 'wp-block-cover__inner-container',
+				} ) }
+			/>
 		</div>
 	);
 }

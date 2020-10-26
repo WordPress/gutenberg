@@ -12,7 +12,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 	useBlockProps,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useInnerBlocksProps,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,

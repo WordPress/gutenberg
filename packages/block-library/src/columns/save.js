@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
+import { useInnerBlocksProps, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { verticalAlignment } = attributes;
@@ -15,9 +15,8 @@ export default function save( { attributes } ) {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
-	return (
-		<div { ...useBlockProps.save( { className } ) }>
-			<InnerBlocks.Content />
-		</div>
-	);
+	const blockProps = useBlockProps.save( { className } );
+	const innerBlocksProps = useInnerBlocksProps.save( blockProps );
+
+	return <div { ...innerBlocksProps } />;
 }
