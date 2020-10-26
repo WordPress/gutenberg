@@ -8,7 +8,7 @@ import NavigationMenu from '../menu';
 export function HideIFEmptyStory() {
 	return (
 		<>
-			<Navigation>
+			<Navigation className="navigation-story">
 				<NavigationMenu title="Home" menu="root" isEmpty={ false }>
 					<NavigationItem
 						navigateToMenu="root-sub-1"
@@ -38,7 +38,9 @@ export function HideIFEmptyStory() {
 					menu="root-sub-2"
 					parentMenu="root"
 					isEmpty={ false }
-				/>
+				>
+					<NavigationItem title="This menu is visible" />
+				</NavigationMenu>
 				<NavigationMenu
 					menu="root-sub-1-sub-1"
 					parentMenu="root-sub-1"
