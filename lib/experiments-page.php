@@ -109,7 +109,7 @@ function gutenberg_display_experiment_section() {
  */
 function gutenberg_experiments_editor_settings( $settings ) {
 	$experiments_settings = array(
-		'__experimentalEnableFullSiteEditing'     => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ),
+		'__experimentalEnableFullSiteEditing' => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ),
 	);
 
 	$gradient_presets = current( (array) get_theme_support( 'editor-gradient-presets' ) );
