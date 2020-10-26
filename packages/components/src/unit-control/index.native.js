@@ -21,17 +21,11 @@ import styles from './style.scss';
 const isIOS = Platform.OS === 'ios';
 
 function UnitControl( {
-	className,
 	currentInput,
 	label,
 	value,
-	instanceId,
 	onChange,
 	onUnitChange,
-	beforeIcon,
-	afterIcon,
-	help,
-	allowReset,
 	initialPosition,
 	min,
 	max,
@@ -59,7 +53,6 @@ function UnitControl( {
 		}
 	}
 
-	const id = `inspector-range-control-${ instanceId }`;
 	const currentInputValue = currentInput === null ? value : currentInput;
 	const initialSliderValue = isFinite( currentInputValue )
 		? currentInputValue
@@ -134,23 +127,17 @@ function UnitControl( {
 					value={ value }
 					defaultValue={ initialSliderValue }
 					shouldDisplayTextInput={ true }
+					{ ...props }
 				>
 					{ renderUnitPicker() }
 				</StepperCell>
 			) : (
 				<RangeCell
 					label={ label }
-					id={ id }
-					help={ help }
-					className={ className }
 					onChange={ onChange }
-					aria-describedby={ !! help ? `${ id }__help` : undefined }
 					minimumValue={ min }
 					maximumValue={ max }
 					value={ value }
-					beforeIcon={ beforeIcon }
-					afterIcon={ afterIcon }
-					allowReset={ allowReset }
 					defaultValue={ initialSliderValue }
 					separatorType={ separatorType }
 					{ ...props }

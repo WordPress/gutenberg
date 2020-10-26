@@ -40,7 +40,8 @@
 	min-width: 24px;
 	border-color: $toolbar-button;
 	flex-direction: row;
-	margin-right: 10px;
+	align-self: center;
+	margin-left: 10px;
 	border-width: $border-width;
 	border-radius: $radius-block-ui;
 }

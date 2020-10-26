@@ -26,6 +26,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import styles from './editor.scss';
+import ColumnsPreview from './column-preview';
 
 function ColumnEdit( {
 	attributes,
@@ -55,9 +56,16 @@ function ColumnEdit( {
 		}
 	}, [] );
 
-	const columnWidths = columns.map(
-		( column ) => parseFloat( column.attributes.width ) || 100 / columnCount
-	);
+	const getColumnWidths = ( withParsing ) => {
+		return columns.map( ( innerColumn ) => {
+			const innerColumnWidth =
+				innerColumn.attributes.width || 100 / columnCount;
+
+			return withParsing
+				? parseFloat( innerColumnWidth )
+				: innerColumnWidth;
+		} );
+	};
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
@@ -90,7 +98,7 @@ function ColumnEdit( {
 						min={ 1 }
 						max={ widthUnit === '%' ? 100 : undefined }
 						decimalNum={ 1 }
-						value={ columnWidths[ selectedColumnIndex ] }
+						value={ getColumnWidths( true )[ selectedColumnIndex ] }
 						onChange={ ( nextWidth ) => {
 							nextWidth =
 								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
@@ -103,7 +111,10 @@ function ColumnEdit( {
 							setWidthUnit( nextUnit );
 							setAttributes( {
 								width: `${ parseFloat(
-									width || columnWidths[ selectedColumnIndex ]
+									width ||
+										getColumnWidths( true )[
+											selectedColumnIndex
+										]
 								) }${ nextUnit }`,
 							} );
 						} }
@@ -115,6 +126,12 @@ function ColumnEdit( {
 							{ value: 'rem', label: 'rem', default: '' },
 							{ value: 'vw', label: 'vw', default: '' },
 						] }
+						rangePreview={
+							<ColumnsPreview
+								columnWidths={ getColumnWidths( false ) }
+								selectedColumnIndex={ selectedColumnIndex }
+							/>
+						}
 					/>
 				</PanelBody>
 				<PanelBody>

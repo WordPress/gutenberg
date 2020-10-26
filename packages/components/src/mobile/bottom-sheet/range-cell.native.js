@@ -145,7 +145,6 @@ class BottomSheetRangeCell extends Component {
 				}
 			>
 				<View style={ containerStyle }>
-					{ rangePreview }
 					<Slider
 						value={ this.validateInput( sliderValue ) }
 						defaultValue={ defaultValue }
@@ -184,6 +183,7 @@ class BottomSheetRangeCell extends Component {
 							{ children }
 						</RangeTextInput>
 					) }
+					{ rangePreview }
 				</View>
 			</Cell>
 		);

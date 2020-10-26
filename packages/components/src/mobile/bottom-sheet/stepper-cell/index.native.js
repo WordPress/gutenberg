@@ -191,6 +191,7 @@ class BottomSheetStepperCell extends Component {
 			separatorType,
 			children,
 			shouldDisplayTextInput = false,
+			rangePreview,
 		} = this.props;
 		const { inputValue } = this.state;
 		const isMinValue = value === min;
@@ -262,6 +263,7 @@ class BottomSheetStepperCell extends Component {
 							</RangeTextInput>
 						) }
 					</Stepper>
+					{ rangePreview }
 				</Cell>
 			</View>
 		);

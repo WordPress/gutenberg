@@ -62,7 +62,7 @@ const useConvertUnitToMobile = ( value, unit ) => {
 			case 'em':
 				return valueToConvert * fontSize;
 			case '%':
-				return unit ? valueToConvert : `${ valueToConvert }%`;
+				return Number( valueToConvert / 100 ) * width;
 			case 'px':
 				return Number( valueToConvert );
 			case 'vw':
@@ -72,7 +72,7 @@ const useConvertUnitToMobile = ( value, unit ) => {
 				const vh = height / 100;
 				return Math.round( valueToConvert * vh );
 			default:
-				return Number( valueToConvert );
+				return Number( valueToConvert / 100 ) * width;
 		}
 	}, [ windowSizes, value, unit ] );
 };
