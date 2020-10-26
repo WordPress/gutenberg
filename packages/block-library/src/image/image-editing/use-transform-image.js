@@ -42,7 +42,7 @@ export default function useTransformImage( {
 	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
 	const [ zoom, setZoom ] = useState( 100 );
 	const [ rotation, setRotation ] = useState( 0 );
-	const [ aspect, defaultAspect, setAspect ] = useLazyAspectRatio(
+	const [ defaultAspect, aspect, setAspect ] = useLazyAspectRatio(
 		width,
 		height
 	);
