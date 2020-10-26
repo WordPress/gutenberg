@@ -368,11 +368,20 @@ function gutenberg_render_the_template() {
 	// Wrap block template in .wp-site-blocks to allow for specific descendant styles
 	// (e.g. `.wp-site-blocks > *`).
 	echo '<div class="wp-site-blocks">';
+
 	$blocks = parse_blocks( $content );
 	foreach ( $blocks as $block ) {
 		gutenberg_render_the_block_partial( $block );
 	}
+
 	echo '</div>';
+
+	// If there are blocks in this content, we shouldn't run wpautop() on it later.
+	$priority = has_filter( 'the_content', 'wpautop' );
+	if ( false !== $priority && doing_filter( 'the_content' ) && has_blocks( $content ) ) {
+		remove_filter( 'the_content', 'wpautop', $priority );
+		add_filter( 'the_content', '_restore_wpautop_hook', $priority + 1 );
+	}
 }
 
 /**
