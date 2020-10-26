@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "1.0.2",
+	"version": "1.1.0",
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -53,7 +53,8 @@
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",
 		"reakit": "^1.1.0",
-		"rememo": "^3.0.0"
+		"rememo": "^3.0.0",
+		"uuid": "^8.3.1"
 	},
 	"publishConfig": {
 		"access": "public"

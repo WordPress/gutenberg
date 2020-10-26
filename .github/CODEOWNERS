@@ -4,10 +4,10 @@
 /docs/designers-developers/designers            @chrisvanpatten @mkaz @ajitbohra
 
 # Data
-/packages/api-fetch                             @youknowriad @nerrad @mmtr
-/packages/core-data                             @youknowriad @nerrad
-/packages/data                                  @youknowriad @nerrad @coderkevin
-/packages/redux-routine                         @youknowriad @nerrad
+/packages/api-fetch                             @nerrad @mmtr
+/packages/core-data                             @nerrad
+/packages/data                                  @nerrad @coderkevin
+/packages/redux-routine                         @nerrad
 /packages/data-controls                         @nerrad
 
 # Blocks
@@ -20,13 +20,13 @@
 # Editor
 /packages/annotations                           @atimmer @ellatrix
 /packages/autop
-/packages/block-editor                          @youknowriad @ellatrix
+/packages/block-editor                          @ellatrix
 /packages/block-serialization-spec-parser       @dmsnell
 /packages/block-serialization-default-parser    @dmsnell
-/packages/blocks                                @youknowriad @ellatrix
+/packages/blocks                                @ellatrix
 /packages/edit-post
 /packages/editor
-/packages/list-reusable-blocks                  @youknowriad
+/packages/list-reusable-blocks
 /packages/shortcode
 /packages/block-directory
 /packages/interface
@@ -34,18 +34,18 @@
 /packages/server-side-render
 
 # Widgets
-/packages/edit-widgets                          @youknowriad @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
+/packages/edit-widgets                          @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
 
 # Navigation
 /packages/edit-navigation                       @draganescu @talldan @noisysocks @tellthemachines @adamziel @kevin940726
 
 # Full Site Editing
-/packages/edit-site                             @youknowriad
+/packages/edit-site
 
 # Tooling
 /bin                                            @ntwb @nerrad @ajitbohra
 /bin/api-docs                                   @ntwb @nerrad @ajitbohra @nosolosw
-/docs/tool                                      @youknowriad @chrisvanpatten @ajitbohra @nosolosw
+/docs/tool                                      @chrisvanpatten @ajitbohra @nosolosw
 /packages/babel-plugin-import-jsx-pragma        @gziolo @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
@@ -61,15 +61,15 @@
 /packages/jest-puppeteer-axe                    @gziolo @ntwb @nerrad @ajitbohra
 /packages/library-export-default-webpack-plugin @gziolo @ntwb @nerrad @ajitbohra
 /packages/npm-package-json-lint-config          @gziolo @ntwb @nerrad @ajitbohra
-/packages/postcss-themes                        @youknowriad @ntwb @nerrad @ajitbohra
+/packages/postcss-themes                        @ntwb @nerrad @ajitbohra
 /packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra
 /packages/dependency-extraction-webpack-plugin  @gziolo
 /packages/prettier-config                       @ntwb @gziolo
 
 # UI Components
-/packages/components                            @youknowriad @ajitbohra @jaymanpandya @chrisvanpatten
-/packages/compose                               @youknowriad @ajitbohra @jaymanpandya
-/packages/element                               @youknowriad @ajitbohra @jaymanpandya
+/packages/components                            @ajitbohra @jaymanpandya @chrisvanpatten
+/packages/compose                               @ajitbohra @jaymanpandya
+/packages/element                               @ajitbohra @jaymanpandya
 /packages/notices                               @ajitbohra @jaymanpandya
 /packages/nux                                   @ajitbohra @jaymanpandya
 /packages/viewport                              @ajitbohra @jaymanpandya
@@ -78,10 +78,10 @@
 /packages/primitives
 
 # Utilities
-/packages/a11y                                  @youknowriad
+/packages/a11y
 /packages/blob
 /packages/date
-/packages/deprecated                            @youknowriad
+/packages/deprecated
 /packages/dom                                   @ellatrix
 /packages/dom-ready
 /packages/escape-html
@@ -89,7 +89,7 @@
 /packages/i18n                                  @swissspidy
 /packages/is-shallow-equal
 /packages/keycodes                              @talldan @ellatrix
-/packages/priority-queue                        @youknowriad
+/packages/priority-queue
 /packages/token-list
 /packages/url                                   @talldan
 /packages/wordcount
@@ -106,7 +106,7 @@
 /packages/block-editor/src/components/rich-text @ellatrix @etoledom @cameronvoell @guarani
 
 # Project Management
-/.github                                        @youknowriad @mapk @karmatosed
+/.github                                        @mapk @karmatosed
 /packages/project-management-automation
 
 # wp-env

@@ -50,6 +50,16 @@ export const navigationPanel = {
 		}
 	},
 
+	async close() {
+		const isOpen = !! ( await page.$(
+			'.edit-site-navigation-toggle.is-open'
+		) );
+
+		if ( isOpen ) {
+			await page.click( '.edit-site-navigation-toggle__button' );
+		}
+	},
+
 	async isRoot() {
 		const isBackToDashboardButtonVisible = !! ( await page.$(
 			'.edit-site-navigation-panel .edit-site-navigation-panel__back-to-dashboard'

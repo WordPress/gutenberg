@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.5.1 (2020-10-19)
+
 ### Security
 
 -   Updated `postcss-custom-properties` dependency to `v10.0.0` that no longer contains vulnerable dependency `url-regex`.

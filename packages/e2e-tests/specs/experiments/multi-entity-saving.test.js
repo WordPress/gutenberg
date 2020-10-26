@@ -73,7 +73,6 @@ describe( 'Multi-entity save flow', () => {
 		const multiSaveSelector =
 			'.editor-post-publish-button__button.has-changes-dot';
 		const savePostSelector = '.editor-post-publish-button__button';
-		const disabledSavePostSelector = `${ savePostSelector }[aria-disabled=true]`;
 		const enabledSavePostSelector = `${ savePostSelector }[aria-disabled=false]`;
 		const publishA11ySelector =
 			'.edit-post-layout__toggle-publish-panel-button';
@@ -93,129 +92,98 @@ describe( 'Multi-entity save flow', () => {
 			expect( multiSaveButton ).toBeNull();
 		};
 
-		describe( 'Pre-Publish state', () => {
-			it( 'Should not trigger multi-entity save button with only post edited', async () => {
-				await createNewPost();
-				// Edit the page some.
-				await page.click( '.editor-post-title' );
-				await page.keyboard.type( 'Test Post...' );
-				await page.keyboard.press( 'Enter' );
+		it( 'Save flow should work as expected.', async () => {
+			expect.assertions( 27 );
+			await createNewPost();
+			// Edit the page some.
+			await page.click( '.editor-post-title' );
+			await page.keyboard.type( 'Test Post...' );
+			await page.keyboard.press( 'Enter' );
 
-				await assertMultiSaveDisabled();
-			} );
+			// Should not trigger multi-entity save button with only post edited
+			await assertMultiSaveDisabled();
 
-			it( 'Should only have publish panel a11y button active with only post edited', async () => {
-				await assertExistance( publishA11ySelector, true );
-				await assertExistance( saveA11ySelector, false );
-				await assertExistance( publishPanelSelector, false );
-				await assertExistance( savePanelSelector, false );
-			} );
+			// Should only have publish panel a11y button active with only post edited.
+			await assertExistance( publishA11ySelector, true );
+			await assertExistance( saveA11ySelector, false );
+			await assertExistance( publishPanelSelector, false );
+			await assertExistance( savePanelSelector, false );
 
-			it( 'Should trigger multi-entity save button once template part edited', async () => {
-				// Create new template part.
-				await insertBlock( 'Template Part' );
-				const [ createNewButton ] = await page.$x(
-					createNewButtonSelector
-				);
-				await createNewButton.click();
-				await page.waitForSelector( activatedTemplatePartSelector );
-				await page.keyboard.press( 'Tab' );
-				await page.keyboard.type( 'test-template-part' );
+			// Add a template part and edit it.
+			await insertBlock( 'Template Part' );
+			const [ createNewButton ] = await page.$x(
+				createNewButtonSelector
+			);
+			await createNewButton.click();
+			await page.waitForSelector( activatedTemplatePartSelector );
+			await page.keyboard.press( 'Tab' );
+			await page.keyboard.type( 'test-template-part' );
+			await page.click( '.block-editor-button-block-appender' );
+			await page.click( '.editor-block-list-item-paragraph' );
+			await page.keyboard.type( 'some words...' );
 
-				// Make some changes in new Template Part.
-				await page.click( '.block-editor-button-block-appender' );
-				await page.click( '.editor-block-list-item-paragraph' );
-				await page.keyboard.type( 'some words...' );
+			// Should trigger multi-entity save button once template part edited.
+			await assertMultiSaveEnabled();
+			// TODO: Remove when toolbar supports text fields
+			expect( console ).toHaveWarnedWith(
+				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
+			);
 
-				await assertMultiSaveEnabled();
+			// Should only have save panel a11y button active after child entities edited.
+			await assertExistance( publishA11ySelector, false );
+			await assertExistance( saveA11ySelector, true );
+			await assertExistance( publishPanelSelector, false );
+			await assertExistance( savePanelSelector, false );
 
-				// TODO: Remove when toolbar supports text fields
-				expect( console ).toHaveWarnedWith(
-					'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
-				);
-			} );
+			// Opening panel has boxes checked by default.
+			await page.click( savePostSelector );
+			await page.waitForSelector( savePanelSelector );
+			await assertAllBoxesChecked();
 
-			it( 'Should only have save panel a11y button active after child entities edited', async () => {
-				await assertExistance( publishA11ySelector, false );
-				await assertExistance( saveA11ySelector, true );
-				await assertExistance( publishPanelSelector, false );
-				await assertExistance( savePanelSelector, false );
-			} );
+			// Should not show other panels (or their a11y buttons) while save panel opened.
+			await assertExistance( publishA11ySelector, false );
+			await assertExistance( saveA11ySelector, false );
+			await assertExistance( publishPanelSelector, false );
 
-			it( 'Clicking should open panel with boxes checked by default', async () => {
-				await page.click( savePostSelector );
-				await page.waitForSelector( savePanelSelector );
-				await assertAllBoxesChecked();
-			} );
+			// Publish panel should open after saving.
+			await page.click( entitiesSaveSelector );
+			await page.waitForSelector( publishPanelSelector );
 
-			it( 'Should not show other panels (or their a11y buttons) while save panel opened', async () => {
-				await assertExistance( publishA11ySelector, false );
-				await assertExistance( saveA11ySelector, false );
-				await assertExistance( publishPanelSelector, false );
-			} );
+			// No other panels (or their a11y buttons) should be present with publish panel open.
+			await assertExistance( publishA11ySelector, false );
+			await assertExistance( saveA11ySelector, false );
+			await assertExistance( savePanelSelector, false );
 
-			it( 'Publish panel should open after saving, no other panels (or their a11y buttons) should be present', async () => {
-				// Save entities and wait for publish panel.
-				await page.click( entitiesSaveSelector );
-				await page.waitForSelector( publishPanelSelector );
+			// Close publish panel.
+			await page.click( closePanelButtonSelector );
 
-				await assertExistance( publishA11ySelector, false );
-				await assertExistance( saveA11ySelector, false );
-				await assertExistance( savePanelSelector, false );
+			// Verify saving is disabled.
+			const draftSaved = await page.waitForSelector( draftSavedSelector );
+			expect( draftSaved ).not.toBeNull();
+			await assertMultiSaveDisabled();
+			await assertExistance( saveA11ySelector, false );
 
-				// Close publish panel.
-				await page.click( closePanelButtonSelector );
-			} );
+			await publishPost();
 
-			it( 'Saving should result in items being saved', async () => {
-				// Verify post is saved.
-				const draftSaved = await page.waitForSelector(
-					draftSavedSelector
-				);
-				expect( draftSaved ).not.toBeNull();
+			// Update the post.
+			await page.click( '.editor-post-title' );
+			await page.keyboard.type( '...more title!' );
 
-				// Verify template part is saved.
-				await assertMultiSaveDisabled();
-			} );
-		} );
+			// Verify update button is enabled.
+			const enabledSaveButton = await page.$( enabledSavePostSelector );
+			expect( enabledSaveButton ).not.toBeNull();
+			// Verify multi-entity saving not enabled.
+			await assertMultiSaveDisabled();
+			await assertExistance( saveA11ySelector, false );
 
-		describe( 'Published state', () => {
-			it( 'Update button disabled after publish', async () => {
-				await publishPost();
-				const disabledSaveButton = await page.$(
-					disabledSavePostSelector
-				);
-				expect( disabledSaveButton ).not.toBeNull();
-			} );
+			// Update template part.
+			await page.click( templatePartSelector );
+			await page.keyboard.type( '...some more words...' );
+			await page.keyboard.press( 'Enter' );
 
-			it( 'should not have save a11y button when no changes', async () => {
-				await assertExistance( saveA11ySelector, false );
-			} );
-
-			it( 'Update button enabled after editing post', async () => {
-				await page.click( '.editor-post-title' );
-				await page.keyboard.type( '...more title!' );
-
-				// Verify update button is enabled.
-				const enabledSaveButton = await page.$(
-					enabledSavePostSelector
-				);
-				expect( enabledSaveButton ).not.toBeNull();
-
-				// Verify is not for multi-entity saving.
-				await assertMultiSaveDisabled();
-			} );
-
-			it( 'Multi-save button triggered after editing template part.', async () => {
-				await page.click( templatePartSelector );
-				await page.keyboard.type( '...some more words...' );
-				await page.keyboard.press( 'Enter' );
-				await assertMultiSaveEnabled();
-			} );
-
-			it( 'save a11y button enables after editing template part', async () => {
-				await assertExistance( saveA11ySelector, true );
-			} );
+			// Multi-entity saving should be enabled.
+			await assertMultiSaveEnabled();
+			await assertExistance( saveA11ySelector, true );
 		} );
 	} );
 
@@ -226,7 +194,8 @@ describe( 'Multi-entity save flow', () => {
 		const disabledSaveSiteSelector = `${ saveSiteSelector }[aria-disabled=true]`;
 		const saveA11ySelector = '.edit-site-editor__toggle-save-panel-button';
 
-		it( 'Should be enabled after edits', async () => {
+		it( 'Save flow should work as expected', async () => {
+			expect.assertions( 5 );
 			// Navigate to site editor.
 			const query = addQueryArgs( '', {
 				page: 'gutenberg-edit-site',
@@ -238,32 +207,34 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( 'Front page' );
+			await navigationPanel.close();
 
-			// Insert a new template part placeholder.
-			await insertBlock( 'Template Part' );
+			// Click the first block so that the template part inserts in the right place.
+			const firstBlock = await page.$( '.wp-block' );
+			await firstBlock.click();
+
+			// Insert something to dirty the editor.
+			await insertBlock( 'Paragraph' );
 
 			const enabledButton = await page.waitForSelector(
 				activeSaveSiteSelector
 			);
 
+			// Should be enabled after edits.
 			expect( enabledButton ).not.toBeNull();
-		} );
 
-		it( 'save a11y button should be present', async () => {
+			// Save a11y button should be present.
 			await assertExistance( saveA11ySelector, true );
-		} );
 
-		it( 'Clicking button should open panel with boxes checked', async () => {
+			// Clicking button should open panel with boxes checked.
 			await page.click( activeSaveSiteSelector );
 			await page.waitForSelector( savePanelSelector );
 			await assertAllBoxesChecked();
-		} );
 
-		it( 'save a11y button should not be present with save panel open', async () => {
+			// Save a11y button should not be present with save panel open.
 			await assertExistance( saveA11ySelector, false );
-		} );
 
-		it( 'Saving should result in items being saved', async () => {
+			// Saving should result in items being saved.
 			await page.click( entitiesSaveSelector );
 			const disabledButton = await page.waitForSelector(
 				disabledSaveSiteSelector

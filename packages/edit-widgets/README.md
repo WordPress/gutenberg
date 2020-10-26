@@ -4,6 +4,10 @@ Widgets Page Module for WordPress.
 
 > This package is meant to be used only with WordPress core. Feel free to use it in your own project but please keep in mind that it might never get fully documented.
 
+## Batch processing
+
+This package contains the first version of what may eventually become `@wordpress/batch-processing` package. Once imported, `core/__experimental-batch-processing` store gets registered. As the name says - it is highly experimental and considered a private API for now.
+
 ## Installation
 
 Install the module
