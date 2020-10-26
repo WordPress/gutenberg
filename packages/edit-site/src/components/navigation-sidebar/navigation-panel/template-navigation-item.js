@@ -5,7 +5,7 @@ import {
 	Button,
 	__experimentalNavigationItem as NavigationItem,
 } from '@wordpress/components';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
 /**
@@ -15,24 +15,21 @@ import TemplatePreview from './template-preview';
 import { NavigationPanelPreviewFill } from '../index';
 import { getTemplateInfo } from '../../../utils';
 
-export default function TemplateNavigationItem( { itemId, itemType } ) {
-	const item = useSelect( ( select ) =>
-		select( 'core' ).getEntityRecord( 'postType', itemType, itemId )
-	);
+export default function TemplateNavigationItem( { item } ) {
 	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
 	const [ isPreviewVisible, setIsPreviewVisible ] = useState( false );
 
 	const { title, description } = getTemplateInfo( item );
 
 	const onActivateItem = () =>
-		'wp_template' === itemType
-			? setTemplate( itemId )
-			: setTemplatePart( itemId );
+		'wp_template' === item.type
+			? setTemplate( item.id )
+			: setTemplatePart( item.id );
 
 	return (
 		<NavigationItem
 			className="edit-site-navigation-panel__template-item"
-			item={ `${ itemType }-${ itemId }` }
+			item={ `${ item.type }-${ item.id }` }
 			title={ title }
 		>
 			<Button

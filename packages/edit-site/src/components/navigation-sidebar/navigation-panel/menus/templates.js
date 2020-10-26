@@ -31,15 +31,17 @@ import NewTemplateDropdown from '../new-template-dropdown';
 import TemplateNavigationItem from '../template-navigation-item';
 
 export default function TemplatesMenu() {
-	const generalTemplates = useSelect(
+	const templates = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
 				status: [ 'publish', 'auto-draft' ],
 				per_page: -1,
-				_fields: 'id,slug',
-				slug: TEMPLATES_GENERAL,
 			} ),
 		[]
+	);
+
+	const generalTemplates = templates?.filter( ( { slug } ) =>
+		TEMPLATES_GENERAL.includes( slug )
 	);
 
 	return (
@@ -64,17 +66,16 @@ export default function TemplatesMenu() {
 
 			{ map( generalTemplates, ( template ) => (
 				<TemplateNavigationItem
-					itemId={ template.id }
-					itemType="wp_template"
+					item={ template }
 					key={ `wp_template-${ template.id }` }
 				/>
 			) ) }
 
-			<TemplatePostsMenu />
+			<TemplatePostsMenu templates={ templates } />
 
-			<TemplatesPagesMenu />
+			<TemplatesPagesMenu templates={ templates } />
 
-			<TemplatesAllMenu />
+			<TemplatesAllMenu templates={ templates } />
 		</NavigationMenu>
 	);
 }

@@ -10,7 +10,6 @@ import {
 	__experimentalNavigationGroup as NavigationGroup,
 	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 
 /**
@@ -19,24 +18,11 @@ import { __, _x } from '@wordpress/i18n';
 import TemplateNavigationItem from '../template-navigation-item';
 import { MENU_TEMPLATES, MENU_TEMPLATES_PAGES } from '../constants';
 
-export default function TemplatesPagesMenu() {
-	const { defaultTemplate, specificTemplates } = useSelect( ( select ) => {
-		const templates = select( 'core' ).getEntityRecords(
-			'postType',
-			'wp_template',
-			{
-				status: [ 'publish', 'auto-draft' ],
-				per_page: -1,
-				_fields: 'id,slug',
-			}
-		);
-		return {
-			defaultTemplate: templates?.find( ( { slug } ) => slug === 'page' ),
-			specificTemplates: templates?.filter( ( { slug } ) =>
-				slug.startsWith( 'page-' )
-			),
-		};
-	}, [] );
+export default function TemplatesPagesMenu( { templates } ) {
+	const defaultTemplate = templates?.find( ( { slug } ) => slug === 'page' );
+	const specificTemplates = templates?.filter( ( { slug } ) =>
+		slug.startsWith( 'page-' )
+	);
 
 	return (
 		<NavigationMenu
@@ -47,8 +33,7 @@ export default function TemplatesPagesMenu() {
 			<NavigationGroup title={ _x( 'Specific', 'specific templates' ) }>
 				{ map( specificTemplates, ( template ) => (
 					<TemplateNavigationItem
-						itemId={ template.id }
-						itemType="wp_template"
+						item={ template }
 						key={ `wp_template-${ template.id }` }
 					/>
 				) ) }
@@ -56,11 +41,7 @@ export default function TemplatesPagesMenu() {
 
 			{ defaultTemplate && (
 				<NavigationGroup title={ _x( 'General', 'general templates' ) }>
-					<TemplateNavigationItem
-						itemId={ defaultTemplate.id }
-						itemType="wp_template"
-						key={ `wp_template-${ defaultTemplate.id }` }
-					/>
+					<TemplateNavigationItem item={ defaultTemplate } />
 				</NavigationGroup>
 			) }
 		</NavigationMenu>

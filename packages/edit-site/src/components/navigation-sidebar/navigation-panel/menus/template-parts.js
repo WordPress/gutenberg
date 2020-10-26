@@ -27,7 +27,6 @@ export default function TemplatePartsMenu() {
 			{
 				status: [ 'publish', 'auto-draft' ],
 				per_page: -1,
-				_fields: 'id,slug',
 			}
 		);
 	}, [] );
@@ -40,8 +39,7 @@ export default function TemplatePartsMenu() {
 		>
 			{ map( templateParts, ( templatePart ) => (
 				<TemplateNavigationItem
-					itemId={ templatePart.id }
-					itemType="wp_template_part"
+					item={ templatePart }
 					key={ `wp_template_part-${ templatePart.id }` }
 				/>
 			) ) }
