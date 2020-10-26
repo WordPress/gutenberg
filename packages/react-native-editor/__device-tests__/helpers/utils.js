@@ -432,7 +432,7 @@ const tapPasteAboveElement = async ( driver, element ) => {
 
 // Starts from the middle of the screen or the element(if specified)
 // and swipes upwards
-const swipeUp = async ( driver, element = undefined ) => {
+const swipeUp = async ( driver, element = undefined, delay = 3000 ) => {
 	let size = await driver.getWindowSize();
 	let y = 0;
 	if ( element !== undefined ) {
@@ -446,25 +446,31 @@ const swipeUp = async ( driver, element = undefined ) => {
 	const endX = startX;
 	const endY = startY + startY * -1 * 0.5;
 
-	await swipeFromTo( driver, { x: startX, y: startY }, { x: endX, y: endY } );
+	await swipeFromTo(
+		driver,
+		{ x: startX, y: startY },
+		{ x: endX, y: endY },
+		delay
+	);
 };
 
 const defaultCoordinates = { x: 0, y: 0 };
 const swipeFromTo = async (
 	driver,
 	from = defaultCoordinates,
-	to = defaultCoordinates
+	to = defaultCoordinates,
+	delay
 ) => {
 	const action = await new wd.TouchAction( driver );
 	action.press( from );
-	action.wait( 3000 );
+	action.wait( delay );
 	action.moveTo( to );
 	action.release();
 	await action.perform();
 };
 
 // Starts from the middle of the screen and swipes downwards
-const swipeDown = async ( driver ) => {
+const swipeDown = async ( driver, delay = 3000 ) => {
 	const size = await driver.getWindowSize();
 	const y = 0;
 
@@ -473,7 +479,12 @@ const swipeDown = async ( driver ) => {
 	const endX = startX;
 	const endY = startY - startY * -1 * 0.5;
 
-	await swipeFromTo( driver, { x: startX, y: startY }, { x: endX, y: endY } );
+	await swipeFromTo(
+		driver,
+		{ x: startX, y: startY },
+		{ x: endX, y: endY },
+		delay
+	);
 };
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {

@@ -125,7 +125,7 @@ export default class EditorPage {
 			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
 		);
 		if ( elements.length === 0 ) {
-			await swipeUp( this.driver );
+			await swipeUp( this.driver, undefined, 200 );
 			return this.scrollAndReturnElement( accessibilityLabel );
 		}
 		return elements[ elements.length - 1 ];
