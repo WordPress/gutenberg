@@ -1379,11 +1379,25 @@ export function blocksMode( state = {}, action ) {
  */
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
-		case 'SHOW_INSERTION_POINT':
+		case 'SET_INSERTION_POINT': {
 			const { rootClientId, index } = action;
-			return { rootClientId, index };
+			return { rootClientId, index, isVisible: false };
+		}
+
+		case 'SHOW_INSERTION_POINT': {
+			const { rootClientId, index } = action;
+			return { rootClientId, index, isVisible: true };
+		}
 
 		case 'HIDE_INSERTION_POINT':
+			return state ? { ...state, isVisible: false } : state;
+
+		case 'CLEAR_SELECTED_BLOCK':
+		case 'SELECT_BLOCK':
+		case 'REPLACE_INNER_BLOCKS':
+		case 'INSERT_BLOCKS':
+		case 'REMOVE_BLOCKS':
+		case 'REPLACE_BLOCKS':
 			return null;
 	}
 

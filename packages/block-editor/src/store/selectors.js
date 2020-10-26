@@ -1138,12 +1138,19 @@ export function isCaretWithinFormattedText( state ) {
 }
 
 /**
- * Returns the insertion point, the index at which the new inserted block would
- * be placed. Defaults to the last index.
+ * Returns the insertion point. This will be:
  *
- * @param {Object} state Editor state.
+ * 1) The insertion point manually set using setInsertionPoint() or
+ *    showInsertionPoint(); or
+ * 2) The point after the current block selection, if there is a selection; or
+ * 3) The point at the end of the block list.
  *
- * @return {Object} Insertion point object with `rootClientId`, `index`.
+ * Components like <Inserter> will default to inserting blocks at this point.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} Insertion point object with `rootClientId`, `index`,
+ *                  `isVisible`.
  */
 export function getBlockInsertionPoint( state ) {
 	let rootClientId, index;
@@ -1162,18 +1169,19 @@ export function getBlockInsertionPoint( state ) {
 		index = getBlockOrder( state ).length;
 	}
 
-	return { rootClientId, index };
+	return { rootClientId, index, isVisible: false };
 }
 
 /**
- * Returns true if we should show the block insertion point.
+ * Whether or not the insertion point should be shown to users. This is set
+ * using showInsertionPoint() or hideInsertionPoint().
  *
  * @param {Object} state Global application state.
  *
- * @return {?boolean} Whether the insertion point is visible or not.
+ * @return {?boolean} Whether the insertion point should be shown.
  */
 export function isBlockInsertionPointVisible( state ) {
-	return state.insertionPoint !== null;
+	return !! state.insertionPoint?.isVisible;
 }
 
 /**

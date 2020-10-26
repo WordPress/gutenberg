@@ -523,8 +523,28 @@ export function* insertBlocks(
 }
 
 /**
- * Returns an action object used in signalling that the insertion point should
- * be shown.
+ * Sets the insertion point without showing it to users.
+ *
+ * Components like <Inserter> will default to inserting blocks at this point.
+ *
+ * @param {?string} rootClientId Optional root client ID of block list on
+ *                               which to insert.
+ * @param {?number} index        Index at which block should be inserted.
+ *
+ * @return {Object} Action object.
+ */
+export function setInsertionPoint( rootClientId, index ) {
+	return {
+		type: 'SET_INSERTION_POINT',
+		rootClientId,
+		index,
+	};
+}
+
+/**
+ * Sets the insertion point and shows it to users.
+ *
+ * Components like <Inserter> will default to inserting blocks at this point.
  *
  * @param {?string} rootClientId Optional root client ID of block list on
  *                               which to insert.
@@ -541,7 +561,7 @@ export function showInsertionPoint( rootClientId, index ) {
 }
 
 /**
- * Returns an action object hiding the insertion point.
+ * Hides the insertion point for users.
  *
  * @return {Object} Action object.
  */

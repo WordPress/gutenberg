@@ -2020,12 +2020,14 @@ describe( 'selectors', () => {
 				insertionPoint: {
 					rootClientId: undefined,
 					index: 0,
+					isVisible: true,
 				},
 			};
 
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
 				index: 0,
+				isVisible: true,
 			} );
 		} );
 
@@ -2054,6 +2056,7 @@ describe( 'selectors', () => {
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
 				index: 1,
+				isVisible: false,
 			} );
 		} );
 
@@ -2086,6 +2089,7 @@ describe( 'selectors', () => {
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: 'clientId1',
 				index: 1,
+				isVisible: false,
 			} );
 		} );
 
@@ -2118,6 +2122,7 @@ describe( 'selectors', () => {
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
 				index: 2,
+				isVisible: false,
 			} );
 		} );
 
@@ -2150,6 +2155,7 @@ describe( 'selectors', () => {
 			expect( getBlockInsertionPoint( state ) ).toEqual( {
 				rootClientId: undefined,
 				index: 2,
+				isVisible: false,
 			} );
 		} );
 	} );
@@ -2163,11 +2169,24 @@ describe( 'selectors', () => {
 			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
 		} );
 
-		it( 'should return true if assigned insertion point', () => {
+		it( 'should return false if insertion point is set to not show', () => {
 			const state = {
 				insertionPoint: {
 					rootClientId: undefined,
 					index: 5,
+					isVisible: false,
+				},
+			};
+
+			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
+		} );
+
+		it( 'should return true if insertion point is set to show', () => {
+			const state = {
+				insertionPoint: {
+					rootClientId: undefined,
+					index: 5,
+					isVisible: true,
 				},
 			};
 

@@ -2023,6 +2023,20 @@ describe( 'state', () => {
 
 		it( 'should set insertion point', () => {
 			const state = insertionPoint( null, {
+				type: 'SET_INSERTION_POINT',
+				rootClientId: 'clientId1',
+				index: 0,
+			} );
+
+			expect( state ).toEqual( {
+				rootClientId: 'clientId1',
+				index: 0,
+				isVisible: false,
+			} );
+		} );
+
+		it( 'should show insertion point', () => {
+			const state = insertionPoint( null, {
 				type: 'SHOW_INSERTION_POINT',
 				rootClientId: 'clientId1',
 				index: 0,
@@ -2031,16 +2045,42 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				rootClientId: 'clientId1',
 				index: 0,
+				isVisible: true,
 			} );
 		} );
 
-		it( 'should clear the insertion point', () => {
+		it( 'should hide the insertion point', () => {
 			const original = deepFreeze( {
 				rootClientId: 'clientId1',
 				index: 0,
+				isVisible: true,
 			} );
 			const state = insertionPoint( original, {
 				type: 'HIDE_INSERTION_POINT',
+			} );
+
+			expect( state ).toEqual( {
+				rootClientId: 'clientId1',
+				index: 0,
+				isVisible: false,
+			} );
+		} );
+
+		it.each( [
+			'CLEAR_SELECTED_BLOCK',
+			'SELECT_BLOCK',
+			'REPLACE_INNER_BLOCKS',
+			'INSERT_BLOCKS',
+			'REMOVE_BLOCKS',
+			'REPLACE_BLOCKS',
+		] )( 'should clear the insertion point on %s', ( type ) => {
+			const original = deepFreeze( {
+				rootClientId: 'clientId1',
+				index: 0,
+				isVisible: true,
+			} );
+			const state = insertionPoint( original, {
+				type,
 			} );
 
 			expect( state ).toBe( null );
