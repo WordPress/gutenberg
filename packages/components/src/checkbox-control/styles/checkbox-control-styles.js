@@ -15,6 +15,17 @@ import { Icon } from '@wordpress/icons';
 import { config, space, color, breakpoint, reduceMotion } from '../../utils';
 import { inputControl } from '../../utils/input';
 
+const appearBoxShadow = () => {
+	const boxShadow = [
+		`0 0 0 calc(${ config( 'borderWidth' ) } * 2) ${ color( 'white' ) }`,
+		`0 0 0 calc(${ config( 'borderWidth' ) } * 2 + ${ config(
+			'borderWidthFocus'
+		) }) var(--wp-admin-theme-color)`,
+	].join( ',' );
+
+	return css( { boxShadow } );
+};
+
 const checkboxControl = css`
 	${ inputControl }
 
@@ -24,9 +35,7 @@ const checkboxControl = css`
 	border-radius: ${ config( 'radiusBlockUi' ) };
 
 	&:focus {
-		box-shadow: 0 0 0 ( ${ config( 'borderWidth' ) } * 2 ) ${ color( 'white' ) },
-			0 0 0 ( ${ config( 'borderWidth' ) } * 2 + ${ config( 'borderWidthFocus' ) } )
-				var( --wp-admin-theme-color );
+		${ appearBoxShadow() }
 
 		// Only visible in Windows High Contrast mode.
 		outline: 2px solid transparent;
@@ -82,17 +91,6 @@ const checkboxControl = css`
 const inputSize = '20px';
 const inputSizeSm = '24px';
 
-const appearBoxShadow = () => {
-	const boxShadow = [
-		`0 0 0 calc(${ config( 'borderWidth' ) } * 2) ${ color( 'white' ) }`,
-		`0 0 0 calc(${ config( 'borderWidth' ) } * 2 + ${ config(
-			'borderWidthFocus'
-		) }) var(--wp-admin-theme-color)`,
-	].join( ',' );
-
-	return css( { boxShadow } );
-};
-
 export const StyledCheckbox = styled.input`
 	${ checkboxControl }
 	background: ${ color( 'white' ) };
@@ -117,12 +115,6 @@ export const StyledCheckbox = styled.input`
 	appearance: none;
 	transition: 0.1s border-color ease-in-out;
 	${ reduceMotion( 'transition' ) }
-
-	&:focus {
-		${ appearBoxShadow() }
-		// Only visible in Windows High Contrast mode.
-		outline: 2px solid transparent;
-	}
 
 	&:checked::before {
 		content: none;

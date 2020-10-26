@@ -1,34 +1,222 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation message when toggled on 1`] = `
-.emotion-2 {
+.emotion-8 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-0 {
+.emotion-6 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-0 {
+.components-panel__row .emotion-6 {
   margin-bottom: inherit;
+}
+
+.emotion-4 {
+  position: relative;
+  display: inline-block;
+  margin-right: 12px;
+  vertical-align: middle;
+  width: 24px;
+  height: 24px;
+}
+
+@media (min-width:600px) {
+  .emotion-4 {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  padding: 6px 8px;
+  box-shadow: 0 0 0 transparent;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  border-radius: 2px;
+  border: 1px solid #757575;
+  font-size: 16px;
+  line-height: normal;
+  border: 1px solid #1e1e1e;
+  margin-right: 12px;
+  -webkit-transition: none;
+  transition: none;
+  border-radius: 2px;
+  background: #fff;
+  color: #1e1e1e;
+  clear: none;
+  cursor: pointer;
+  display: inline-block;
+  line-height: 0;
+  margin: 0 4px 0 0;
+  outline: 0;
+  padding: 0;
+  text-align: center;
+  vertical-align: top;
+  width: 24px;
+  height: 24px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-transition: 0.1s border-color ease-in-out;
+  transition: 0.1s border-color ease-in-out;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+@media (min-width:600px) {
+  .emotion-0 {
+    font-size: 13px;
+    line-height: normal;
+  }
+}
+
+.emotion-0:focus {
+  border-color: var( --wp-admin-theme-color );
+  box-shadow: 0 0 0 calc( 1.5px - 1px ) var( --wp-admin-theme-color );
+  outline: 2px solid transparent;
+}
+
+.emotion-0::-webkit-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-0::-moz-placeholder {
+  opacity: 1;
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-0:-ms-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.is-dark-theme .emotion-0::-webkit-input-placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-0::-moz-placeholder {
+  opacity: 1;
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-0:-ms-input-placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.emotion-0:focus {
+  box-shadow: 0 0 0 calc(1px * 2) #fff,0 0 0 calc(1px * 2 + 1.5px) var(--wp-admin-theme-color);
+  outline: 2px solid transparent;
+}
+
+.emotion-0:checked {
+  background: var( --wp-admin-theme-color );
+  border-color: var( --wp-admin-theme-color );
+}
+
+.emotion-0:checked::-ms-check {
+  opacity: 0;
+}
+
+.emotion-0:checked::before,
+.emotion-0[aria-checked='mixed']::before {
+  margin: -3px -5px;
+  color: #fff;
+}
+
+@media (min-width:782px) {
+  .emotion-0:checked::before,
+  .emotion-0[aria-checked='mixed']::before {
+    margin: -4px 0 0 -5px;
+  }
+}
+
+.emotion-0[aria-checked='mixed'] {
+  background: var( --wp-admin-theme-color );
+  border-color: var( --wp-admin-theme-color );
+}
+
+.emotion-0[aria-checked='mixed']::before {
+  content: '\\f460';
+  float: left;
+  display: inline-block;
+  vertical-align: middle;
+  width: 16px;
+  font: normal 30px/1 dashicons;
+  speak: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (min-width:782px) {
+  .emotion-0[aria-checked='mixed']::before {
+    float: none;
+    font-size: 21px;
+  }
+}
+
+@media (min-width:600px) {
+  .emotion-0 {
+    height: 20px;
+    width: 20px;
+  }
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-0:checked::before {
+  content: none;
+}
+
+.emotion-2 {
+  fill: #fff;
+  cursor: pointer;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+@media (min-width:600px) {
+  .emotion-2 {
+    left: -2px;
+    top: -2px;
+  }
 }
 
 <div
   className="edit-post-preferences-modal__option"
 >
   <div
-    className="components-base-control emotion-2 emotion-3"
+    className="components-base-control emotion-8 emotion-9"
   >
     <div
-      className="components-base-control__field emotion-0 emotion-1"
+      className="components-base-control__field emotion-6 emotion-7"
     >
-      <span
-        className="components-checkbox-control__input-container"
+      <div
+        className="components-checkbox-control__input-container emotion-4 emotion-5"
       >
         <input
           checked={true}
-          className="components-checkbox-control__input"
+          className="components-checkbox-control__input emotion-0 emotion-1"
           id="inspector-checkbox-control-3"
           onChange={[Function]}
           type="checkbox"
@@ -36,7 +224,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
         />
         <svg
           aria-hidden={true}
-          className="components-checkbox-control__checked"
+          className="components-checkbox-control__checked emotion-2 emotion-3"
           focusable={false}
           height={24}
           role="img"
@@ -48,7 +236,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
             d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
           />
         </svg>
-      </span>
+      </div>
       <label
         className="components-checkbox-control__label"
         htmlFor="inspector-checkbox-control-3"
@@ -72,34 +260,222 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
 `;
 
 exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields are enabled 1`] = `
-.emotion-2 {
+.emotion-8 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-0 {
+.emotion-6 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-0 {
+.components-panel__row .emotion-6 {
   margin-bottom: inherit;
+}
+
+.emotion-4 {
+  position: relative;
+  display: inline-block;
+  margin-right: 12px;
+  vertical-align: middle;
+  width: 24px;
+  height: 24px;
+}
+
+@media (min-width:600px) {
+  .emotion-4 {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  padding: 6px 8px;
+  box-shadow: 0 0 0 transparent;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  border-radius: 2px;
+  border: 1px solid #757575;
+  font-size: 16px;
+  line-height: normal;
+  border: 1px solid #1e1e1e;
+  margin-right: 12px;
+  -webkit-transition: none;
+  transition: none;
+  border-radius: 2px;
+  background: #fff;
+  color: #1e1e1e;
+  clear: none;
+  cursor: pointer;
+  display: inline-block;
+  line-height: 0;
+  margin: 0 4px 0 0;
+  outline: 0;
+  padding: 0;
+  text-align: center;
+  vertical-align: top;
+  width: 24px;
+  height: 24px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-transition: 0.1s border-color ease-in-out;
+  transition: 0.1s border-color ease-in-out;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+@media (min-width:600px) {
+  .emotion-0 {
+    font-size: 13px;
+    line-height: normal;
+  }
+}
+
+.emotion-0:focus {
+  border-color: var( --wp-admin-theme-color );
+  box-shadow: 0 0 0 calc( 1.5px - 1px ) var( --wp-admin-theme-color );
+  outline: 2px solid transparent;
+}
+
+.emotion-0::-webkit-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-0::-moz-placeholder {
+  opacity: 1;
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-0:-ms-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.is-dark-theme .emotion-0::-webkit-input-placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-0::-moz-placeholder {
+  opacity: 1;
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-0:-ms-input-placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.emotion-0:focus {
+  box-shadow: 0 0 0 calc(1px * 2) #fff,0 0 0 calc(1px * 2 + 1.5px) var(--wp-admin-theme-color);
+  outline: 2px solid transparent;
+}
+
+.emotion-0:checked {
+  background: var( --wp-admin-theme-color );
+  border-color: var( --wp-admin-theme-color );
+}
+
+.emotion-0:checked::-ms-check {
+  opacity: 0;
+}
+
+.emotion-0:checked::before,
+.emotion-0[aria-checked='mixed']::before {
+  margin: -3px -5px;
+  color: #fff;
+}
+
+@media (min-width:782px) {
+  .emotion-0:checked::before,
+  .emotion-0[aria-checked='mixed']::before {
+    margin: -4px 0 0 -5px;
+  }
+}
+
+.emotion-0[aria-checked='mixed'] {
+  background: var( --wp-admin-theme-color );
+  border-color: var( --wp-admin-theme-color );
+}
+
+.emotion-0[aria-checked='mixed']::before {
+  content: '\\f460';
+  float: left;
+  display: inline-block;
+  vertical-align: middle;
+  width: 16px;
+  font: normal 30px/1 dashicons;
+  speak: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (min-width:782px) {
+  .emotion-0[aria-checked='mixed']::before {
+    float: none;
+    font-size: 21px;
+  }
+}
+
+@media (min-width:600px) {
+  .emotion-0 {
+    height: 20px;
+    width: 20px;
+  }
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-0:checked::before {
+  content: none;
+}
+
+.emotion-2 {
+  fill: #fff;
+  cursor: pointer;
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 24px;
+  height: 24px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
+}
+
+@media (min-width:600px) {
+  .emotion-2 {
+    left: -2px;
+    top: -2px;
+  }
 }
 
 <div
   className="edit-post-preferences-modal__option"
 >
   <div
-    className="components-base-control emotion-2 emotion-3"
+    className="components-base-control emotion-8 emotion-9"
   >
     <div
-      className="components-base-control__field emotion-0 emotion-1"
+      className="components-base-control__field emotion-6 emotion-7"
     >
-      <span
-        className="components-checkbox-control__input-container"
+      <div
+        className="components-checkbox-control__input-container emotion-4 emotion-5"
       >
         <input
           checked={true}
-          className="components-checkbox-control__input"
+          className="components-checkbox-control__input emotion-0 emotion-1"
           id="inspector-checkbox-control-0"
           onChange={[Function]}
           type="checkbox"
@@ -107,7 +483,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
         />
         <svg
           aria-hidden={true}
-          className="components-checkbox-control__checked"
+          className="components-checkbox-control__checked emotion-2 emotion-3"
           focusable={false}
           height={24}
           role="img"
@@ -119,7 +495,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
             d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
           />
         </svg>
-      </span>
+      </div>
       <label
         className="components-checkbox-control__label"
         htmlFor="inspector-checkbox-control-0"
@@ -130,40 +506,206 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
 `;
 
 exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmation message when toggled off 1`] = `
-.emotion-2 {
+.emotion-6 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-0 {
+.emotion-4 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-0 {
+.components-panel__row .emotion-4 {
   margin-bottom: inherit;
+}
+
+.emotion-2 {
+  position: relative;
+  display: inline-block;
+  margin-right: 12px;
+  vertical-align: middle;
+  width: 24px;
+  height: 24px;
+}
+
+@media (min-width:600px) {
+  .emotion-2 {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  padding: 6px 8px;
+  box-shadow: 0 0 0 transparent;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  border-radius: 2px;
+  border: 1px solid #757575;
+  font-size: 16px;
+  line-height: normal;
+  border: 1px solid #1e1e1e;
+  margin-right: 12px;
+  -webkit-transition: none;
+  transition: none;
+  border-radius: 2px;
+  background: #fff;
+  color: #1e1e1e;
+  clear: none;
+  cursor: pointer;
+  display: inline-block;
+  line-height: 0;
+  margin: 0 4px 0 0;
+  outline: 0;
+  padding: 0;
+  text-align: center;
+  vertical-align: top;
+  width: 24px;
+  height: 24px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-transition: 0.1s border-color ease-in-out;
+  transition: 0.1s border-color ease-in-out;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+@media (min-width:600px) {
+  .emotion-0 {
+    font-size: 13px;
+    line-height: normal;
+  }
+}
+
+.emotion-0:focus {
+  border-color: var( --wp-admin-theme-color );
+  box-shadow: 0 0 0 calc( 1.5px - 1px ) var( --wp-admin-theme-color );
+  outline: 2px solid transparent;
+}
+
+.emotion-0::-webkit-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-0::-moz-placeholder {
+  opacity: 1;
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-0:-ms-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.is-dark-theme .emotion-0::-webkit-input-placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-0::-moz-placeholder {
+  opacity: 1;
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-0:-ms-input-placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.emotion-0:focus {
+  box-shadow: 0 0 0 calc(1px * 2) #fff,0 0 0 calc(1px * 2 + 1.5px) var(--wp-admin-theme-color);
+  outline: 2px solid transparent;
+}
+
+.emotion-0:checked {
+  background: var( --wp-admin-theme-color );
+  border-color: var( --wp-admin-theme-color );
+}
+
+.emotion-0:checked::-ms-check {
+  opacity: 0;
+}
+
+.emotion-0:checked::before,
+.emotion-0[aria-checked='mixed']::before {
+  margin: -3px -5px;
+  color: #fff;
+}
+
+@media (min-width:782px) {
+  .emotion-0:checked::before,
+  .emotion-0[aria-checked='mixed']::before {
+    margin: -4px 0 0 -5px;
+  }
+}
+
+.emotion-0[aria-checked='mixed'] {
+  background: var( --wp-admin-theme-color );
+  border-color: var( --wp-admin-theme-color );
+}
+
+.emotion-0[aria-checked='mixed']::before {
+  content: '\\f460';
+  float: left;
+  display: inline-block;
+  vertical-align: middle;
+  width: 16px;
+  font: normal 30px/1 dashicons;
+  speak: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (min-width:782px) {
+  .emotion-0[aria-checked='mixed']::before {
+    float: none;
+    font-size: 21px;
+  }
+}
+
+@media (min-width:600px) {
+  .emotion-0 {
+    height: 20px;
+    width: 20px;
+  }
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-0:checked::before {
+  content: none;
 }
 
 <div
   className="edit-post-preferences-modal__option"
 >
   <div
-    className="components-base-control emotion-2 emotion-3"
+    className="components-base-control emotion-6 emotion-7"
   >
     <div
-      className="components-base-control__field emotion-0 emotion-1"
+      className="components-base-control__field emotion-4 emotion-5"
     >
-      <span
-        className="components-checkbox-control__input-container"
+      <div
+        className="components-checkbox-control__input-container emotion-2 emotion-3"
       >
         <input
           checked={false}
-          className="components-checkbox-control__input"
+          className="components-checkbox-control__input emotion-0 emotion-1"
           id="inspector-checkbox-control-2"
           onChange={[Function]}
           type="checkbox"
           value="1"
         />
-      </span>
+      </div>
       <label
         className="components-checkbox-control__label"
         htmlFor="inspector-checkbox-control-2"
@@ -187,40 +729,206 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
 `;
 
 exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fields are disabled 1`] = `
-.emotion-2 {
+.emotion-6 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-0 {
+.emotion-4 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-0 {
+.components-panel__row .emotion-4 {
   margin-bottom: inherit;
+}
+
+.emotion-2 {
+  position: relative;
+  display: inline-block;
+  margin-right: 12px;
+  vertical-align: middle;
+  width: 24px;
+  height: 24px;
+}
+
+@media (min-width:600px) {
+  .emotion-2 {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.emotion-0 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  padding: 6px 8px;
+  box-shadow: 0 0 0 transparent;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  border-radius: 2px;
+  border: 1px solid #757575;
+  font-size: 16px;
+  line-height: normal;
+  border: 1px solid #1e1e1e;
+  margin-right: 12px;
+  -webkit-transition: none;
+  transition: none;
+  border-radius: 2px;
+  background: #fff;
+  color: #1e1e1e;
+  clear: none;
+  cursor: pointer;
+  display: inline-block;
+  line-height: 0;
+  margin: 0 4px 0 0;
+  outline: 0;
+  padding: 0;
+  text-align: center;
+  vertical-align: top;
+  width: 24px;
+  height: 24px;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  -webkit-transition: 0.1s border-color ease-in-out;
+  transition: 0.1s border-color ease-in-out;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+@media (min-width:600px) {
+  .emotion-0 {
+    font-size: 13px;
+    line-height: normal;
+  }
+}
+
+.emotion-0:focus {
+  border-color: var( --wp-admin-theme-color );
+  box-shadow: 0 0 0 calc( 1.5px - 1px ) var( --wp-admin-theme-color );
+  outline: 2px solid transparent;
+}
+
+.emotion-0::-webkit-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-0::-moz-placeholder {
+  opacity: 1;
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-0:-ms-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.is-dark-theme .emotion-0::-webkit-input-placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-0::-moz-placeholder {
+  opacity: 1;
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-0:-ms-input-placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.emotion-0:focus {
+  box-shadow: 0 0 0 calc(1px * 2) #fff,0 0 0 calc(1px * 2 + 1.5px) var(--wp-admin-theme-color);
+  outline: 2px solid transparent;
+}
+
+.emotion-0:checked {
+  background: var( --wp-admin-theme-color );
+  border-color: var( --wp-admin-theme-color );
+}
+
+.emotion-0:checked::-ms-check {
+  opacity: 0;
+}
+
+.emotion-0:checked::before,
+.emotion-0[aria-checked='mixed']::before {
+  margin: -3px -5px;
+  color: #fff;
+}
+
+@media (min-width:782px) {
+  .emotion-0:checked::before,
+  .emotion-0[aria-checked='mixed']::before {
+    margin: -4px 0 0 -5px;
+  }
+}
+
+.emotion-0[aria-checked='mixed'] {
+  background: var( --wp-admin-theme-color );
+  border-color: var( --wp-admin-theme-color );
+}
+
+.emotion-0[aria-checked='mixed']::before {
+  content: '\\f460';
+  float: left;
+  display: inline-block;
+  vertical-align: middle;
+  width: 16px;
+  font: normal 30px/1 dashicons;
+  speak: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+@media (min-width:782px) {
+  .emotion-0[aria-checked='mixed']::before {
+    float: none;
+    font-size: 21px;
+  }
+}
+
+@media (min-width:600px) {
+  .emotion-0 {
+    height: 20px;
+    width: 20px;
+  }
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-0:checked::before {
+  content: none;
 }
 
 <div
   className="edit-post-preferences-modal__option"
 >
   <div
-    className="components-base-control emotion-2 emotion-3"
+    className="components-base-control emotion-6 emotion-7"
   >
     <div
-      className="components-base-control__field emotion-0 emotion-1"
+      className="components-base-control__field emotion-4 emotion-5"
     >
-      <span
-        className="components-checkbox-control__input-container"
+      <div
+        className="components-checkbox-control__input-container emotion-2 emotion-3"
       >
         <input
           checked={false}
-          className="components-checkbox-control__input"
+          className="components-checkbox-control__input emotion-0 emotion-1"
           id="inspector-checkbox-control-1"
           onChange={[Function]}
           type="checkbox"
           value="1"
         />
-      </span>
+      </div>
       <label
         className="components-checkbox-control__label"
         htmlFor="inspector-checkbox-control-1"
