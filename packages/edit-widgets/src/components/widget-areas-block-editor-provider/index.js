@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { defaultTo } from 'lodash';
+import useMemoValue from 'use-memo-value';
 
 /**
  * WordPress dependencies
@@ -46,9 +47,13 @@ export default function WidgetAreasBlockEditorProvider( {
 				'postType',
 				'wp_block'
 			),
-		} )
+		} ),
+		[]
 	);
 	const { setIsInserterOpened } = useDispatch( 'core/edit-widgets' );
+	// Memoize it to prevent it from creating a new instance every time this component renders.
+	// By default, it uses "shallow equal" to compare the array between renders.
+	const memoizedReusableBlocks = useMemoValue( reusableBlocks );
 
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
@@ -63,7 +68,7 @@ export default function WidgetAreasBlockEditorProvider( {
 		}
 		return {
 			...blockEditorSettings,
-			__experimentalReusableBlocks: reusableBlocks,
+			__experimentalReusableBlocks: memoizedReusableBlocks,
 			mediaUpload: mediaUploadBlockEditor,
 			templateLock: 'all',
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
@@ -71,7 +76,7 @@ export default function WidgetAreasBlockEditorProvider( {
 	}, [
 		blockEditorSettings,
 		hasUploadPermissions,
-		reusableBlocks,
+		memoizedReusableBlocks,
 		setIsInserterOpened,
 	] );
 
