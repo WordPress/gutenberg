@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -11,10 +16,10 @@ import {
 /**
  * Internal dependencies
  */
-import TemplateNavigationItems from '../template-navigation-items';
+import TemplateNavigationItem from '../template-navigation-item';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS } from '../constants';
 
-export default function TemplatePartsMenu( { onActivateItem } ) {
+export default function TemplatePartsMenu() {
 	const templateParts = useSelect( ( select ) => {
 		return select( 'core' ).getEntityRecords(
 			'postType',
@@ -32,11 +37,13 @@ export default function TemplatePartsMenu( { onActivateItem } ) {
 			title={ __( 'Template Parts' ) }
 			parentMenu={ MENU_ROOT }
 		>
-			<TemplateNavigationItems
-				entityType="wp_template_part"
-				templates={ templateParts }
-				onActivateItem={ onActivateItem }
-			/>
+			{ map( templateParts, ( templatePart ) => (
+				<TemplateNavigationItem
+					itemId={ templatePart.id }
+					itemType="wp_template_part"
+					key={ `wp_template_part-${ templatePart.id }` }
+				/>
+			) ) }
 
 			{ ! templateParts && <NavigationItem title={ __( 'Loading…' ) } /> }
 		</NavigationMenu>

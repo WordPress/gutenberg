@@ -16,13 +16,13 @@ import { NavigationPanelPreviewFill } from '../index';
 import { getTemplateInfo } from '../../../utils';
 
 export default function TemplateNavigationItem( { itemId, itemType } ) {
-	const template = useSelect( ( select ) =>
+	const item = useSelect( ( select ) =>
 		select( 'core' ).getEntityRecord( 'postType', itemType, itemId )
 	);
 	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
 	const [ isPreviewVisible, setIsPreviewVisible ] = useState( false );
 
-	const { title, description } = getTemplateInfo( template );
+	const { title, description } = getTemplateInfo( item );
 
 	const onActivateItem = () =>
 		'wp_template' === itemType
@@ -33,7 +33,7 @@ export default function TemplateNavigationItem( { itemId, itemType } ) {
 		<>
 			<NavigationItem
 				className="edit-site-navigation-panel__template-item"
-				item={ `${ template.type }-${ itemId }` }
+				item={ `${ itemType }-${ itemId }` }
 				title={ title }
 			>
 				<Button
@@ -52,7 +52,7 @@ export default function TemplateNavigationItem( { itemId, itemType } ) {
 
 			{ isPreviewVisible && (
 				<NavigationPanelPreviewFill>
-					<TemplatePreview rawContent={ template.content.raw } />
+					<TemplatePreview rawContent={ item.content.raw } />
 				</NavigationPanelPreviewFill>
 			) }
 		</>
