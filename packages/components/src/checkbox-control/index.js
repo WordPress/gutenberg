@@ -2,12 +2,17 @@
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { Icon, check } from '@wordpress/icons';
+import { check } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import {
+	StyledCheck,
+	StyledCheckbox,
+	StyledContainer,
+} from './styles/checkbox-control-styles';
 
 export default function CheckboxControl( {
 	label,
@@ -29,8 +34,8 @@ export default function CheckboxControl( {
 			help={ help }
 			className={ className }
 		>
-			<span className="components-checkbox-control__input-container">
-				<input
+			<StyledContainer className="components-checkbox-control__input-container">
+				<StyledCheckbox
 					id={ id }
 					className="components-checkbox-control__input"
 					type="checkbox"
@@ -41,13 +46,13 @@ export default function CheckboxControl( {
 					{ ...props }
 				/>
 				{ checked ? (
-					<Icon
+					<StyledCheck
 						icon={ check }
 						className="components-checkbox-control__checked"
 						role="presentation"
 					/>
 				) : null }
-			</span>
+			</StyledContainer>
 			<label
 				className="components-checkbox-control__label"
 				htmlFor={ id }
