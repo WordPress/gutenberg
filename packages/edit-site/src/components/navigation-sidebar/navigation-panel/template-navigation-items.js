@@ -11,7 +11,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import TemplatePreview from './template-preview';
-import { NavigationPanelPreviewFill } from '.';
+import { NavigationPanelPreviewFill } from '../index';
 import { getTemplateInfo } from '../../../utils';
 
 export default function TemplateNavigationItems( {

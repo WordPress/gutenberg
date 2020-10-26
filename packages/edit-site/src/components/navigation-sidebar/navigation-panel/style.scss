@@ -62,9 +62,10 @@
 	box-shadow: $shadow-popover;
 	border-radius: $radius-block-ui;
 	position: absolute;
-	top: $grid-unit-15;
-	left: calc(100% + #{$grid-unit-15});
+	top: $header-height + $grid-unit-15 + 1px; // +1px for the header border
+	left: $nav-sidebar-width + $grid-unit-15;
 	color: $gray-900;
+	z-index: z-index(".edit-site-navigation-panel__preview");
 
 	@include break-medium {
 		display: block;

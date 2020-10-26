@@ -79,7 +79,10 @@ export default function TemplatePartEdit( {
 	return (
 		<TagName { ...blockProps }>
 			{ isPlaceholder && (
-				<TemplatePartPlaceholder setAttributes={ setAttributes } />
+				<TemplatePartPlaceholder
+					setAttributes={ setAttributes }
+					innerBlocks={ innerBlocks }
+				/>
 			) }
 			{ isTemplateFile && (
 				<BlockControls>
