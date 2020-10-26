@@ -99,9 +99,7 @@ function RangeControl(
 
 	const inputSliderValue = isValueReset ? '' : currentValue;
 
-	const rangeFillValue = isValueReset
-		? floatClamp( max / 2, min, max )
-		: value;
+	const rangeFillValue = isValueReset ? ( max - min ) / 2 + min : value;
 
 	const calculatedFillValue = ( ( value - min ) / ( max - min ) ) * 100;
 	const fillValue = isValueReset ? 50 : calculatedFillValue;
