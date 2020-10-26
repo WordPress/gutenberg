@@ -27,6 +27,7 @@ export default function TemplatePartsMenu() {
 			{
 				status: [ 'publish', 'auto-draft' ],
 				per_page: -1,
+				_fields: 'id,slug',
 			}
 		);
 	}, [] );

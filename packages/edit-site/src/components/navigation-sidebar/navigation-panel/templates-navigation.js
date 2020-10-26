@@ -46,9 +46,7 @@ export default function TemplatesNavigation() {
 		[]
 	);
 
-	const { setTemplate, setNavigationPanelActiveMenu } = useDispatch(
-		'core/edit-site'
-	);
+	const { setNavigationPanelActiveMenu } = useDispatch( 'core/edit-site' );
 
 	return (
 		<Navigation
@@ -80,8 +78,7 @@ export default function TemplatesNavigation() {
 					navigateToMenu={ MENU_TEMPLATE_PARTS }
 				/>
 
-				<TemplatesMenu onActivateItem={ setTemplate } />
-
+				<TemplatesMenu />
 				<TemplatePartsMenu />
 			</NavigationMenu>
 		</Navigation>

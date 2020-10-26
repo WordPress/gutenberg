@@ -30,31 +30,29 @@ export default function TemplateNavigationItem( { itemId, itemType } ) {
 			: setTemplatePart( itemId );
 
 	return (
-		<>
-			<NavigationItem
-				className="edit-site-navigation-panel__template-item"
-				item={ `${ itemType }-${ itemId }` }
-				title={ title }
+		<NavigationItem
+			className="edit-site-navigation-panel__template-item"
+			item={ `${ itemType }-${ itemId }` }
+			title={ title }
+		>
+			<Button
+				onClick={ onActivateItem }
+				onMouseEnter={ () => setIsPreviewVisible( true ) }
+				onMouseLeave={ () => setIsPreviewVisible( false ) }
 			>
-				<Button
-					onClick={ onActivateItem }
-					onMouseEnter={ () => setIsPreviewVisible( true ) }
-					onMouseLeave={ () => setIsPreviewVisible( false ) }
-				>
-					{ title }
-					{ description && (
-						<div className="edit-site-navigation-panel__template-item-description">
-							{ description }
-						</div>
-					) }
-				</Button>
-			</NavigationItem>
+				{ title }
+				{ description && (
+					<div className="edit-site-navigation-panel__template-item-description">
+						{ description }
+					</div>
+				) }
+			</Button>
 
 			{ isPreviewVisible && (
 				<NavigationPanelPreviewFill>
 					<TemplatePreview rawContent={ item.content.raw } />
 				</NavigationPanelPreviewFill>
 			) }
-		</>
+		</NavigationItem>
 	);
 }

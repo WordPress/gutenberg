@@ -10,6 +10,7 @@ import {
 	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 
 /**
@@ -25,23 +26,20 @@ import {
 	MENU_TEMPLATES_POSTS,
 	TEMPLATES_GENERAL,
 } from '../constants';
-import { useSelect } from '@wordpress/data';
 import TemplatesAllMenu from './templates-all';
 import NewTemplateDropdown from '../new-template-dropdown';
 import TemplateNavigationItem from '../template-navigation-item';
 
-export default function TemplatesMenu( { onActivateItem } ) {
-	const templates = useSelect(
+export default function TemplatesMenu() {
+	const generalTemplates = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
 				status: [ 'publish', 'auto-draft' ],
 				per_page: -1,
+				_fields: 'id,slug',
+				slug: TEMPLATES_GENERAL,
 			} ),
 		[]
-	);
-
-	const generalTemplates = templates?.filter( ( { slug } ) =>
-		TEMPLATES_GENERAL.includes( slug )
 	);
 
 	return (
@@ -72,20 +70,11 @@ export default function TemplatesMenu( { onActivateItem } ) {
 				/>
 			) ) }
 
-			<TemplatePostsMenu
-				templates={ templates }
-				onActivateItem={ onActivateItem }
-			/>
+			<TemplatePostsMenu />
 
-			<TemplatesPagesMenu
-				templates={ templates }
-				onActivateItem={ onActivateItem }
-			/>
+			<TemplatesPagesMenu />
 
-			<TemplatesAllMenu
-				templates={ templates }
-				onActivateItem={ onActivateItem }
-			/>
+			<TemplatesAllMenu />
 		</NavigationMenu>
 	);
 }
