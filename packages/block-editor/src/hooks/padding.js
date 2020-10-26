@@ -88,6 +88,7 @@ export function PaddingEdit( props ) {
 					onChange={ onChange }
 					onChangeShowVisualizer={ onChangeShowVisualizer }
 					label={ __( 'Padding' ) }
+					type="padding"
 					units={ units }
 				/>
 			</>

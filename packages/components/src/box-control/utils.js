@@ -90,9 +90,7 @@ export function getAllValue( values = {} ) {
 	 * isNumber() is more specific for these cases, rather than relying on a
 	 * simple truthy check.
 	 */
-	const isAutoValue =
-		value === CUSTOM_VALUES.AUTO ? CUSTOM_VALUES.AUTO : null;
-	const allValue = isNumber( value ) ? `${ value }${ unit }` : isAutoValue;
+	const allValue = isNumber( value ) ? `${ value }${ unit }` : null;
 	return allValue;
 }
 
@@ -103,10 +101,8 @@ export function getAllValue( values = {} ) {
  * @return {boolean} Whether values are mixed.
  */
 export function isValuesMixed( values = {} ) {
-	const allValue = getAllValue( values );
-	const isMixed = isNaN( parseFloat( allValue ) );
-
-	return isMixed;
+	const vals = Object.values( values );
+	return vals.some( ( val ) => val !== vals[ 0 ] );
 }
 
 /**

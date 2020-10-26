@@ -51,7 +51,7 @@ export default function BoxControl( {
 	label = __( 'Box Control' ),
 	values: valuesProp,
 	units,
-	canAcceptAutoValue,
+	type,
 } ) {
 	const [ values, setValues ] = useControlledState( valuesProp, {
 		fallback: DEFAULT_VALUES,
@@ -109,7 +109,7 @@ export default function BoxControl( {
 		isLinked,
 		units,
 		values: inputValues,
-		canAcceptAutoValue,
+		type,
 	};
 
 	return (

@@ -7,7 +7,7 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import UnitControl from './unit-control';
-import { LABELS, CUSTOM_VALUES } from './utils';
+import { LABELS } from './utils';
 import { LayoutContainer, Layout } from './styles/box-control-styles';
 
 export default function BoxInputControls( {
@@ -16,6 +16,7 @@ export default function BoxInputControls( {
 	onHoverOn = noop,
 	onHoverOff = noop,
 	values,
+	type,
 	...props
 } ) {
 	const createHandleOnFocus = ( side ) => ( event ) => {
@@ -65,8 +66,6 @@ export default function BoxInputControls( {
 		handleOnChange( nextValues );
 	};
 
-	const isMixed = ( side ) => side === CUSTOM_VALUES.AUTO;
-
 	return (
 		<LayoutContainer className="component-box-control__input-controls-wrapper">
 			<Layout
@@ -83,7 +82,8 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'top' ) }
 					onHoverOff={ createHandleOnHoverOff( 'top' ) }
 					label={ LABELS.top }
-					disableUnits={ isMixed( top ) }
+					disableUnits={ top.match( /^(auto|calc)/ ) }
+					type={ `${ type }Top` }
 				/>
 				<UnitControl
 					{ ...props }
@@ -93,7 +93,8 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'right' ) }
 					onHoverOff={ createHandleOnHoverOff( 'right' ) }
 					label={ LABELS.right }
-					disableUnits={ isMixed( right ) }
+					disableUnits={ right.match( /^(auto|calc)/ ) }
+					type={ `${ type }Right` }
 				/>
 				<UnitControl
 					{ ...props }
@@ -103,7 +104,8 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'bottom' ) }
 					onHoverOff={ createHandleOnHoverOff( 'bottom' ) }
 					label={ LABELS.bottom }
-					disableUnits={ isMixed( bottom ) }
+					disableUnits={ bottom.match( /^(auto|calc)/ ) }
+					type={ `${ type }Bottom` }
 				/>
 				<UnitControl
 					{ ...props }
@@ -114,7 +116,8 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'left' ) }
 					onHoverOff={ createHandleOnHoverOff( 'left' ) }
 					label={ LABELS.left }
-					disableUnits={ isMixed( left ) }
+					disableUnits={ left.match( /^(auto|calc)/ ) }
+					type={ `${ type }Left` }
 				/>
 			</Layout>
 		</LayoutContainer>

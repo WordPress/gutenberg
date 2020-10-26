@@ -84,8 +84,8 @@ export function MarginEdit( props ) {
 					onChange={ onChange }
 					onChangeShowVisualizer={ onChangeShowVisualizer }
 					label={ __( 'Margin' ) }
+					type="margin"
 					units={ units }
-					canAcceptAutoValue
 				/>
 			</>
 		),

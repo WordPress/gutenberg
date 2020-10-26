@@ -92,7 +92,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should decrement value on DOWN press', () => {
-			let state = 50;
+			let state = '50px';
 			const setState = ( nextState ) => ( state = nextState );
 
 			render( <UnitControl value={ state } onChange={ setState } /> );
@@ -104,7 +104,7 @@ describe( 'UnitControl', () => {
 		} );
 
 		it( 'should decrement value on DOWN + SHIFT press, with step', () => {
-			let state = 50;
+			let state = '50px';
 			const setState = ( nextState ) => ( state = nextState );
 
 			render( <UnitControl value={ state } onChange={ setState } /> );
