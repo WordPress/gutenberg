@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "9.2.1",
+	"version": "9.2.2",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -175,7 +175,7 @@
 		"mkdirp": "0.5.1",
 		"nock": "12.0.3",
 		"node-sass": "4.13.1",
-		"node-watch": "0.6.0",
+		"node-watch": "0.7.0",
 		"patch-package": "6.2.2",
 		"postcss": "7.0.32",
 		"postcss-loader": "3.0.0",
