@@ -66,7 +66,7 @@ describe( 'Template Part', () => {
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Front page' );
+			await navigationPanel.clickItemByText( 'Front Page' );
 
 			// Verify that the header template part is updated.
 			const [ headerTemplatePart ] = await page.$x(

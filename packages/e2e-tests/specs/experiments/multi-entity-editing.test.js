@@ -176,7 +176,7 @@ describe( 'Multi-entity editor states', () => {
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
 
 		// Switch back and make sure it is still clean.
-		await clickTemplateItem( 'Templates', 'Front page' );
+		await clickTemplateItem( 'Templates', templateName );
 		await page.waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
