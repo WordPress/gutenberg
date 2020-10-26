@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ColorIndicator matches the snapshot 1`] = `
-<span
+<StyledColorIndicator
   aria-label="sample label"
   className="component-color-indicator"
   style={
