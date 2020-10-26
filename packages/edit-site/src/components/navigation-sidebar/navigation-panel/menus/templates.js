@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -11,7 +16,6 @@ import { __, _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import TemplatesPagesMenu from './templates-pages';
-import TemplateNavigationItems from '../template-navigation-items';
 import TemplatePostsMenu from './templates-posts';
 import {
 	MENU_ROOT,
@@ -24,6 +28,7 @@ import {
 import { useSelect } from '@wordpress/data';
 import TemplatesAllMenu from './templates-all';
 import NewTemplateDropdown from '../new-template-dropdown';
+import TemplateNavigationItem from '../template-navigation-item';
 
 export default function TemplatesMenu( { onActivateItem } ) {
 	const templates = useSelect(
@@ -59,10 +64,13 @@ export default function TemplatesMenu( { onActivateItem } ) {
 				title={ __( 'Posts' ) }
 			/>
 
-			<TemplateNavigationItems
-				templates={ generalTemplates }
-				onActivateItem={ onActivateItem }
-			/>
+			{ map( generalTemplates, ( template ) => (
+				<TemplateNavigationItem
+					key={ `template-${ template.id }` }
+					onActivateItem={ onActivateItem }
+					templateId={ template.id }
+				/>
+			) ) }
 
 			<TemplatePostsMenu
 				templates={ templates }
