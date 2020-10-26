@@ -15,16 +15,18 @@ function getAspectRatio( width, height ) {
 function useLazyAspectRatio( width, height ) {
 	const initialAspect = getAspectRatio( width, height );
 	const [ aspect, setAspect ] = useState( initialAspect );
+	const [ defaultAspect, setDefaultAspect ] = useState( initialAspect );
 
 	// Wait for a valid width/height before setting the aspect ratio.
 	useEffect( () => {
 		if ( aspect === undefined ) {
 			const newInitialAspect = getAspectRatio( width, height );
 			setAspect( newInitialAspect );
+			setDefaultAspect( newInitialAspect );
 		}
 	}, [ aspect, width, height ] );
 
-	return [ aspect, setAspect ];
+	return [ defaultAspect, aspect, setAspect ];
 }
 
 export default function useTransformImage( {
@@ -40,7 +42,10 @@ export default function useTransformImage( {
 	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
 	const [ zoom, setZoom ] = useState( 100 );
 	const [ rotation, setRotation ] = useState( 0 );
-	const [ aspect, setAspect ] = useLazyAspectRatio( width, height );
+	const [ aspect, defaultAspect, setAspect ] = useLazyAspectRatio(
+		width,
+		height
+	);
 
 	// TODO - remove inlined logic.
 	const editedWidth = width;
@@ -119,6 +124,7 @@ export default function useTransformImage( {
 		setZoom,
 		rotation,
 		rotateClockwise,
+		defaultAspect,
 		aspect,
 		setAspect,
 		editedUrl,
