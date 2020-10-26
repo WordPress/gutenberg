@@ -75,7 +75,8 @@ export const ItemUI = styled.li`
 
 	button,
 	a {
-		height: 32px;
+		height: auto;
+		min-height: 32px;
 		margin: 0;
 		font-weight: 400;
 		line-height: 20px;
