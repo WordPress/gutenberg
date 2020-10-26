@@ -250,6 +250,40 @@ function gutenberg_experimental_global_styles_get_core() {
 			$font_size['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
 		}
 	}
+
+	$default_font_styles_i18n = array(
+		'normal'  => __( 'Regular', 'gutenberg' ),
+		'italic'  => __( 'Italic', 'gutenberg' ),
+		'initial' => __( 'Initial', 'gutenberg' ),
+		'inherit' => __( 'Inherit', 'gutenberg' ),
+	);
+
+	if ( ! empty( $config['global']['settings']['typography']['fontStyles'] ) ) {
+		foreach ( $config['global']['settings']['typography']['fontStyles'] as &$font_style ) {
+			$font_style['name'] = $default_font_styles_i18n[ $font_style['slug'] ];
+		}
+	}
+
+	$default_font_weights_i18n = array(
+		'100'     => __( 'Ultralight', 'gutenberg' ),
+		'200'     => __( 'Thin', 'gutenberg' ),
+		'300'     => __( 'Light', 'gutenberg' ),
+		'400'     => __( 'Regular', 'gutenberg' ),
+		'500'     => __( 'Medium', 'gutenberg' ),
+		'600'     => __( 'Semibold', 'gutenberg' ),
+		'700'     => __( 'Bold', 'gutenberg' ),
+		'800'     => __( 'Heavy', 'gutenberg' ),
+		'900'     => __( 'Black', 'gutenberg' ),
+		'initial' => __( 'Initial', 'gutenberg' ),
+		'inherit' => __( 'Inherit', 'gutenberg' ),
+	);
+
+	if ( ! empty( $config['global']['settings']['typography']['fontWeights'] ) ) {
+		foreach ( $config['global']['settings']['typography']['fontWeights'] as &$font_weight ) {
+			$font_weight['name'] = $default_font_weights_i18n[ $font_weight['slug'] ];
+		}
+	}
+
 	// End i18n logic to remove when JSON i18 strings are extracted.
 	return $config;
 }
@@ -393,6 +427,10 @@ function gutenberg_experimental_global_styles_get_css_property( $style_property 
 			return 'background-color';
 		case 'fontSize':
 			return 'font-size';
+		case 'fontStyle':
+			return 'font-style';
+		case 'fontWeight':
+			return 'font-weight';
 		case 'lineHeight':
 			return 'line-height';
 		case 'fontFamily':
@@ -419,6 +457,8 @@ function gutenberg_experimental_global_styles_get_style_property() {
 		'color'                    => array( 'color', 'text' ),
 		'fontSize'                 => array( 'typography', 'fontSize' ),
 		'fontFamily'               => array( 'typography', 'fontFamily' ),
+		'fontStyle'                => array( 'typography', 'fontStyle' ),
+		'fontWeight'               => array( 'typography', 'fontWeight' ),
 		'lineHeight'               => array( 'typography', 'lineHeight' ),
 		'textDecoration'           => array( 'typography', 'textDecoration' ),
 		'textTransform'            => array( 'typography', 'textTransform' ),
@@ -437,6 +477,8 @@ function gutenberg_experimental_global_styles_get_support_keys() {
 		'backgroundColor'          => array( 'color' ),
 		'color'                    => array( 'color' ),
 		'fontSize'                 => array( 'fontSize' ),
+		'fontStyle'                => array( '__experimentalFontAppearance' ),
+		'fontWeight'               => array( '__experimentalFontAppearance' ),
 		'lineHeight'               => array( 'lineHeight' ),
 		'fontFamily'               => array( '__experimentalFontFamily' ),
 		'textDecoration'           => array( '__experimentalTextDecoration' ),
@@ -466,6 +508,14 @@ function gutenberg_experimental_global_styles_get_presets_structure() {
 		'fontFamily'     => array(
 			'path' => array( 'typography', 'fontFamilies' ),
 			'key'  => 'fontFamily',
+		),
+		'fontStyle'      => array(
+			'path' => array( 'typography', 'fontStyles' ),
+			'key'  => 'slug',
+		),
+		'fontWeight'     => array(
+			'path' => array( 'typography', 'fontWeights' ),
+			'key'  => 'slug',
 		),
 		'textDecoration' => array(
 			'path' => array( 'typography', 'textDecorations' ),
@@ -514,6 +564,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
 				array(
 					'supports' => array(
 						'__experimentalSelector'       => ':root',
+						'__experimentalFontAppearance' => false,
 						'__experimentalFontFamily'     => true,
 						'fontSize'                     => true,
 						'__experimentalTextDecoration' => true,
@@ -652,6 +703,16 @@ function gutenberg_experimental_global_styles_get_preset_classes( $selector, $se
 			'path'     => array( 'typography', 'fontSizes' ),
 			'key'      => 'size',
 			'property' => 'font-size',
+		),
+		'font-style'          => array(
+			'path'     => array( 'typography', 'fontStyles' ),
+			'key'      => 'slug',
+			'property' => 'font-style',
+		),
+		'font-weight'         => array(
+			'path'     => array( 'typography', 'fontWeights' ),
+			'key'      => 'slug',
+			'property' => 'font-weight',
 		),
 		'text-decoration'     => array(
 			'path'     => array( 'typography', 'textDecorations' ),

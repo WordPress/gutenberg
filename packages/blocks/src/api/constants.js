@@ -18,6 +18,8 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	backgroundColor: [ 'color', 'background' ],
 	color: [ 'color', 'text' ],
 	fontSize: [ 'typography', 'fontSize' ],
+	fontStyle: [ 'typography', 'fontStyle' ],
+	fontWeight: [ 'typography', 'fontWeight' ],
 	lineHeight: [ 'typography', 'lineHeight' ],
 	textDecoration: [ 'typography', 'textDecoration' ],
 	textTransform: [ 'typography', 'textTransform' ],
