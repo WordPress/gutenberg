@@ -21,10 +21,8 @@ export const titleDateExcerpt = (
 	</SVG>
 );
 
-export const titleContent = (
+export const imageDateTitle = (
 	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 34 30">
-		<Path d="M0 5h30v1H0zM0 17h30v1H0zM0 11h30v1H0zM0 23h30v1H0zM0 8h34v1H0zM0 20h34v1H0zM0 14h34v1H0zM0 26h34v1H0zM0 29h34v1H0zM0 0h34v3H0z" />
+		<Path d="M0 0h34v6H0V0zm12 8H0v1h12V8zm18 3H0v1h30v-1zm0 18H0v1h30v-1zM0 26h12v1H0v-1zm34-8H0v6h34v-6z" />
 	</SVG>
 );
-
-export default { titleDate, titleExcerpt, titleDateExcerpt, titleContent };

@@ -10,7 +10,7 @@ import {
 	titleDate,
 	titleExcerpt,
 	titleDateExcerpt,
-	titleContent,
+	imageDateTitle,
 } from './icons';
 
 const variations = [
@@ -58,14 +58,18 @@ const variations = [
 		scope: [ 'block' ],
 	},
 	{
-		name: 'title-content',
-		title: __( 'Title and Content' ),
-		icon: titleContent,
+		name: 'image-date-title',
+		title: __( 'Image, Date and Title ' ),
+		icon: imageDateTitle,
 		innerBlocks: [
 			[
 				'core/query-loop',
 				{},
-				[ [ 'core/post-title' ], [ 'core/post-content' ] ],
+				[
+					[ 'core/post-featured-image' ],
+					[ 'core/post-date' ],
+					[ 'core/post-title' ],
+				],
 			],
 		],
 		scope: [ 'block' ],
