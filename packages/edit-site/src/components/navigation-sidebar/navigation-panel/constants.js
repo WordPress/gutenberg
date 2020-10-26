@@ -9,6 +9,13 @@ export const TEMPLATES_GENERAL = [
 
 export const TEMPLATES_POSTS = [ 'home', 'single' ];
 
+export const TEMPLATES_STATUSES = [
+	'publish',
+	'draft',
+	'auto-draft',
+	'theme-provided',
+];
+
 export const MENU_ROOT = 'root';
 export const MENU_CONTENT_CATEGORIES = 'content-categories';
 export const MENU_CONTENT_PAGES = 'content-pages';

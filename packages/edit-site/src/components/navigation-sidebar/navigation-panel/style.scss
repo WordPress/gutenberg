@@ -90,6 +90,11 @@
 	}
 }
 
+.edit-site-navigation-panel__template-item-title {
+	em {
+		margin-right: 1ch;
+	}
+}
 .edit-site-navigation-panel__template-item-description {
 	padding-top: $grid-unit-05;
 	color: $gray-700;

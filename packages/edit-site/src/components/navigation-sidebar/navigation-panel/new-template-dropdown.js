@@ -20,6 +20,7 @@ import { Icon, plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import getClosestAvailableTemplate from '../../../utils/get-closest-available-template';
+import { TEMPLATES_STATUSES } from './constants';
 
 export default function NewTemplateDropdown() {
 	const { defaultTemplateTypesDefinitions, templates } = useSelect(
@@ -29,7 +30,7 @@ export default function NewTemplateDropdown() {
 				'postType',
 				'wp_template',
 				{
-					status: [ 'publish', 'auto-draft', 'theme-provided' ],
+					status: TEMPLATES_STATUSES,
 					per_page: -1,
 				}
 			);
@@ -50,9 +51,10 @@ export default function NewTemplateDropdown() {
 		);
 		addTemplate( {
 			content: closestAvailableTemplate.content.raw,
+			excerpt: defaultTemplateTypesDefinitions[ slug ].description,
 			slug,
-			title: slug,
 			status: 'draft',
+			title: defaultTemplateTypesDefinitions[ slug ].title,
 		} );
 	};
 

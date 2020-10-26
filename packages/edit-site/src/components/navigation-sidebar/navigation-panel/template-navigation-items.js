@@ -7,6 +7,7 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -60,7 +61,12 @@ export default function TemplateNavigationItems( {
 							}
 							onMouseLeave={ onMouseLeaveTemplate }
 						>
-							{ title }
+							<div className="edit-site-navigation-panel__template-item-title">
+								{ 'draft' === template.status && (
+									<em>{ __( '[Draft]' ) }</em>
+								) }
+								{ title }
+							</div>
 							{ description && (
 								<div className="edit-site-navigation-panel__template-item-description">
 									{ description }
