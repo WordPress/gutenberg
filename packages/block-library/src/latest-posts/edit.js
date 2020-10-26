@@ -52,7 +52,11 @@ const USERS_LIST_QUERY = {
 	per_page: -1,
 };
 
-export default function LatestPostsEdit( { attributes, setAttributes } ) {
+export default function LatestPostsEdit( {
+	attributes,
+	setAttributes,
+	className,
+} ) {
 	const {
 		postsToShow,
 		order,
@@ -448,7 +452,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 				<ToolbarGroup controls={ layoutControls } />
 			</BlockControls>
 			<ul
-				className={ classnames( {
+				className={ classnames( className, {
 					'wp-block-latest-posts__list': true,
 					'is-grid': postLayout === 'grid',
 					'has-dates': displayPostDate,
