@@ -12,6 +12,7 @@ import {
 	createNewPost,
 	publishPost,
 	trashAllPosts,
+	activateTheme,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -157,6 +158,11 @@ describe( 'Multi-entity editor states', () => {
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'twentytwentyone-blocks' );
+	} );
+
+	afterAll( async () => {
+		await activateTheme( 'twentytwentyone' );
 	} );
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {

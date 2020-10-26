@@ -7,6 +7,7 @@ import {
 	disablePrePublishChecks,
 	visitAdminPage,
 	trashAllPosts,
+	activateTheme,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -24,10 +25,12 @@ describe( 'Template Part', () => {
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'twentytwentyone-blocks' );
 	} );
 	afterAll( async () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'twentytwentyone' );
 	} );
 
 	describe( 'Template part block', () => {
