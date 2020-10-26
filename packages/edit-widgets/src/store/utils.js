@@ -47,6 +47,17 @@ export function buildWidgetAreasQuery() {
 }
 
 /**
+ * Builds a query to resolve widgets.
+ *
+ * @return {Object} Query.
+ */
+export function buildWidgetsQuery() {
+	return {
+		per_page: -1,
+	};
+}
+
+/**
  * Creates a stub post with given id and set of blocks. Used as a governing entity records
  * for all widget areas.
  *

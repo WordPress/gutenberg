@@ -20,12 +20,12 @@ class WP_REST_Batch_Controller {
 	 */
 	public function register_routes() {
 		register_rest_route(
-			'__experimental',
+			'v1',
 			'batch',
 			array(
 				'callback'            => array( $this, 'serve_batch_request' ),
 				'permission_callback' => '__return_true',
-				'methods'             => array( 'POST', 'PUT', 'PATCH', 'DELETE' ),
+				'methods'             => 'POST',
 				'args'                => array(
 					'validation' => array(
 						'type'    => 'string',
@@ -39,6 +39,11 @@ class WP_REST_Batch_Controller {
 						'items'    => array(
 							'type'       => 'object',
 							'properties' => array(
+								'method'  => array(
+									'type'    => 'string',
+									'enum'    => array( 'POST', 'PUT', 'PATCH', 'DELETE' ),
+									'default' => 'POST',
+								),
 								'path'    => array(
 									'type'     => 'string',
 									'required' => true,
@@ -86,7 +91,7 @@ class WP_REST_Batch_Controller {
 				continue;
 			}
 
-			$single_request = new WP_REST_Request( $batch_request->get_method(), $parsed_url['path'] );
+			$single_request = new WP_REST_Request( isset( $args['method'] ) ? $args['method'] : 'POST', $parsed_url['path'] );
 
 			if ( ! empty( $parsed_url['query'] ) ) {
 				$query_args = null; // Satisfy linter.
@@ -105,7 +110,7 @@ class WP_REST_Batch_Controller {
 			$requests[] = $single_request;
 		}
 
-		if ( ! method_exists( rest_get_server(), 'match_request_to_handler' ) ) {
+		if ( ! is_callable( array( rest_get_server(), 'match_request_to_handler' ) ) ) {
 			return $this->polyfill_batching( $requests );
 		}
 
@@ -128,10 +133,11 @@ class WP_REST_Batch_Controller {
 				if ( isset( $handler['allow_batch'] ) ) {
 					$allow_batch = $handler['allow_batch'];
 				} else {
-					$allow_batch = ! empty( rest_get_server()->get_route_options( $route )['allow_batch'] );
+					$route_options = rest_get_server()->get_route_options( $route );
+					$allow_batch   = isset( $route_options['allow_batch'] ) ? $route_options['allow_batch'] : false;
 				}
 
-				if ( ! $allow_batch ) {
+				if ( ! is_array( $allow_batch ) || empty( $allow_batch['v1'] ) ) {
 					$error = new WP_Error(
 						'rest_batch_not_allowed',
 						__( 'The requested route does not support batch requests.', 'gutenberg' ),
@@ -237,7 +243,7 @@ class WP_REST_Batch_Controller {
 		$responses = array();
 
 		foreach ( $requests as $request ) {
-			if ( 0 !== strpos( $request->get_route(), '/__experimental' ) ) {
+			if ( 0 !== strpos( $request->get_route(), '/__experimental' ) && 0 !== strpos( $request->get_route(), '/wp/v2/widgets' ) ) {
 				$error       = new WP_Error(
 					'rest_batch_not_allowed',
 					__( 'The requested route does not support batch requests.', 'gutenberg' ),
