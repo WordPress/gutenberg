@@ -60,7 +60,7 @@ describe( 'Meta boxes', () => {
 		await page.waitForNavigation();
 
 		// Check the the dynamic block appears.
-		await page.waitForSelector( '.wp-block-latest-posts' );
+		await page.waitForSelector( '.wp-block-latest-posts__list' );
 	} );
 
 	it( 'Should render the excerpt in meta based on post content if no explicit excerpt exists', async () => {
