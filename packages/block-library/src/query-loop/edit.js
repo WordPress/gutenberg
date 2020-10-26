@@ -66,6 +66,9 @@ export default function QueryLoopEdit( {
 			if ( exclude?.length ) {
 				query.exclude = exclude;
 			}
+			// If sticky is not set, it will return all posts in the results.
+			// If sticky is set to `only`, it will limit the results to sticky posts only.
+			// If it is anything else, it will exclude sticky posts from results. For the record the value stored is `exclude`.
 			if ( sticky ) {
 				query.sticky = sticky === 'only';
 			}
