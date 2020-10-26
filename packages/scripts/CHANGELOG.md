@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Ignore `/vendor` folder when searching for files to lint or format.
+
 ## 12.1.0 (2020-07-07)
 
 ### Enhancements
