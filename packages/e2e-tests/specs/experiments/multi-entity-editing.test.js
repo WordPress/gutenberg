@@ -29,10 +29,6 @@ const visitSiteEditor = async () => {
 		page: 'gutenberg-edit-site',
 	} ).slice( 1 );
 	await visitAdminPage( 'admin.php', query );
-	// Waits for the template part to load...
-	await page.waitForSelector(
-		'.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
-	);
 };
 
 const clickTemplateItem = async ( menus, itemName ) => {
@@ -171,6 +167,7 @@ describe( 'Multi-entity editor states', () => {
 	} );
 
 	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
+		await visitSiteEditor();
 		await clickTemplateItem( 'Template Parts', 'header' );
 
 		// Wait for blocks to load.
@@ -208,6 +205,10 @@ describe( 'Multi-entity editor states', () => {
 			);
 			await saveAllEntities();
 			await visitSiteEditor();
+			// Waits for the template part to load...
+			await page.waitForSelector(
+				'.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
+			);
 			removeErrorMocks();
 		} );
 
