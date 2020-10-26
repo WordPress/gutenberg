@@ -66,9 +66,9 @@ export default function TemplatesMenu( { onActivateItem } ) {
 
 			{ map( generalTemplates, ( template ) => (
 				<TemplateNavigationItem
-					key={ `template-${ template.id }` }
-					onActivateItem={ onActivateItem }
-					templateId={ template.id }
+					itemId={ template.id }
+					itemType="wp_template"
+					key={ `wp_template-${ template.id }` }
 				/>
 			) ) }
 
