@@ -1,22 +1,81 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ColorPicker should commit changes to all views on blur 1`] = `
-.emotion-4 {
+.emotion-6 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-2 {
+.emotion-4 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-2 {
+.components-panel__row .emotion-4 {
   margin-bottom: inherit;
 }
 
 .emotion-0 {
   display: inline-block;
   margin-bottom: 8px;
+}
+
+.emotion-2 {
+  width: 100%;
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  padding: 6px 8px;
+  box-shadow: 0 0 0 transparent;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  border-radius: 2px;
+  border: 1px solid #757575;
+  font-size: 16px;
+  line-height: normal;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-2 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+@media (min-width:600px) {
+  .emotion-2 {
+    font-size: 13px;
+    line-height: normal;
+  }
+}
+
+.emotion-2:focus {
+  border-color: var( --wp-admin-theme-color );
+  box-shadow: 0 0 0 calc( 1.5px - 1px ) var( --wp-admin-theme-color );
+  outline: 2px solid transparent;
+}
+
+.emotion-2::-webkit-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-2::-moz-placeholder {
+  opacity: 1;
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-2:-ms-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.is-dark-theme .emotion-2::-webkit-input-placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-2::-moz-placeholder {
+  opacity: 1;
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-2:-ms-input-placeholder {
+  color: rgba(255,255,255,0.65);
 }
 
 <div
@@ -135,10 +194,10 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
+          className="components-base-control components-color-picker__inputs-field emotion-6 emotion-7"
         >
           <div
-            className="components-base-control__field emotion-2 emotion-3"
+            className="components-base-control__field emotion-4 emotion-5"
           >
             <label
               className="components-base-control__label emotion-0 emotion-1"
@@ -147,7 +206,7 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
               Color value in hexadecimal
             </label>
             <input
-              className="components-text-control__input"
+              className="components-text-control__input emotion-2 emotion-3"
               id="inspector-text-control-2"
               onBlur={[Function]}
               onChange={[Function]}
@@ -193,22 +252,81 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
 `;
 
 exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = `
-.emotion-4 {
+.emotion-6 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-2 {
+.emotion-4 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-2 {
+.components-panel__row .emotion-4 {
   margin-bottom: inherit;
 }
 
 .emotion-0 {
   display: inline-block;
   margin-bottom: 8px;
+}
+
+.emotion-2 {
+  width: 100%;
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  padding: 6px 8px;
+  box-shadow: 0 0 0 transparent;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  border-radius: 2px;
+  border: 1px solid #757575;
+  font-size: 16px;
+  line-height: normal;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-2 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+@media (min-width:600px) {
+  .emotion-2 {
+    font-size: 13px;
+    line-height: normal;
+  }
+}
+
+.emotion-2:focus {
+  border-color: var( --wp-admin-theme-color );
+  box-shadow: 0 0 0 calc( 1.5px - 1px ) var( --wp-admin-theme-color );
+  outline: 2px solid transparent;
+}
+
+.emotion-2::-webkit-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-2::-moz-placeholder {
+  opacity: 1;
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-2:-ms-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.is-dark-theme .emotion-2::-webkit-input-placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-2::-moz-placeholder {
+  opacity: 1;
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-2:-ms-input-placeholder {
+  color: rgba(255,255,255,0.65);
 }
 
 <div
@@ -327,10 +445,10 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
+          className="components-base-control components-color-picker__inputs-field emotion-6 emotion-7"
         >
           <div
-            className="components-base-control__field emotion-2 emotion-3"
+            className="components-base-control__field emotion-4 emotion-5"
           >
             <label
               className="components-base-control__label emotion-0 emotion-1"
@@ -339,7 +457,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
               Color value in hexadecimal
             </label>
             <input
-              className="components-text-control__input"
+              className="components-text-control__input emotion-2 emotion-3"
               id="inspector-text-control-4"
               onBlur={[Function]}
               onChange={[Function]}
@@ -385,22 +503,81 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
 `;
 
 exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] = `
-.emotion-4 {
+.emotion-6 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-2 {
+.emotion-4 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-2 {
+.components-panel__row .emotion-4 {
   margin-bottom: inherit;
 }
 
 .emotion-0 {
   display: inline-block;
   margin-bottom: 8px;
+}
+
+.emotion-2 {
+  width: 100%;
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  padding: 6px 8px;
+  box-shadow: 0 0 0 transparent;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  border-radius: 2px;
+  border: 1px solid #757575;
+  font-size: 16px;
+  line-height: normal;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-2 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+@media (min-width:600px) {
+  .emotion-2 {
+    font-size: 13px;
+    line-height: normal;
+  }
+}
+
+.emotion-2:focus {
+  border-color: var( --wp-admin-theme-color );
+  box-shadow: 0 0 0 calc( 1.5px - 1px ) var( --wp-admin-theme-color );
+  outline: 2px solid transparent;
+}
+
+.emotion-2::-webkit-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-2::-moz-placeholder {
+  opacity: 1;
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-2:-ms-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.is-dark-theme .emotion-2::-webkit-input-placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-2::-moz-placeholder {
+  opacity: 1;
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-2:-ms-input-placeholder {
+  color: rgba(255,255,255,0.65);
 }
 
 <div
@@ -519,10 +696,10 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
+          className="components-base-control components-color-picker__inputs-field emotion-6 emotion-7"
         >
           <div
-            className="components-base-control__field emotion-2 emotion-3"
+            className="components-base-control__field emotion-4 emotion-5"
           >
             <label
               className="components-base-control__label emotion-0 emotion-1"
@@ -531,7 +708,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
               Color value in hexadecimal
             </label>
             <input
-              className="components-text-control__input"
+              className="components-text-control__input emotion-2 emotion-3"
               id="inspector-text-control-5"
               onBlur={[Function]}
               onChange={[Function]}
@@ -577,22 +754,81 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
 `;
 
 exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
-.emotion-4 {
+.emotion-6 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-2 {
+.emotion-4 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-2 {
+.components-panel__row .emotion-4 {
   margin-bottom: inherit;
 }
 
 .emotion-0 {
   display: inline-block;
   margin-bottom: 8px;
+}
+
+.emotion-2 {
+  width: 100%;
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  padding: 6px 8px;
+  box-shadow: 0 0 0 transparent;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  border-radius: 2px;
+  border: 1px solid #757575;
+  font-size: 16px;
+  line-height: normal;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-2 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+@media (min-width:600px) {
+  .emotion-2 {
+    font-size: 13px;
+    line-height: normal;
+  }
+}
+
+.emotion-2:focus {
+  border-color: var( --wp-admin-theme-color );
+  box-shadow: 0 0 0 calc( 1.5px - 1px ) var( --wp-admin-theme-color );
+  outline: 2px solid transparent;
+}
+
+.emotion-2::-webkit-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-2::-moz-placeholder {
+  opacity: 1;
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-2:-ms-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.is-dark-theme .emotion-2::-webkit-input-placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-2::-moz-placeholder {
+  opacity: 1;
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-2:-ms-input-placeholder {
+  color: rgba(255,255,255,0.65);
 }
 
 <div
@@ -711,10 +947,10 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
+          className="components-base-control components-color-picker__inputs-field emotion-6 emotion-7"
         >
           <div
-            className="components-base-control__field emotion-2 emotion-3"
+            className="components-base-control__field emotion-4 emotion-5"
           >
             <label
               className="components-base-control__label emotion-0 emotion-1"
@@ -723,7 +959,7 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
               Color value in hexadecimal
             </label>
             <input
-              className="components-text-control__input"
+              className="components-text-control__input emotion-2 emotion-3"
               id="inspector-text-control-3"
               onBlur={[Function]}
               onChange={[Function]}
@@ -769,22 +1005,81 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
 `;
 
 exports[`ColorPicker should only update input view for draft changes 1`] = `
-.emotion-4 {
+.emotion-6 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-2 {
+.emotion-4 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-2 {
+.components-panel__row .emotion-4 {
   margin-bottom: inherit;
 }
 
 .emotion-0 {
   display: inline-block;
   margin-bottom: 8px;
+}
+
+.emotion-2 {
+  width: 100%;
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  padding: 6px 8px;
+  box-shadow: 0 0 0 transparent;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  border-radius: 2px;
+  border: 1px solid #757575;
+  font-size: 16px;
+  line-height: normal;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-2 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+@media (min-width:600px) {
+  .emotion-2 {
+    font-size: 13px;
+    line-height: normal;
+  }
+}
+
+.emotion-2:focus {
+  border-color: var( --wp-admin-theme-color );
+  box-shadow: 0 0 0 calc( 1.5px - 1px ) var( --wp-admin-theme-color );
+  outline: 2px solid transparent;
+}
+
+.emotion-2::-webkit-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-2::-moz-placeholder {
+  opacity: 1;
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-2:-ms-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.is-dark-theme .emotion-2::-webkit-input-placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-2::-moz-placeholder {
+  opacity: 1;
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-2:-ms-input-placeholder {
+  color: rgba(255,255,255,0.65);
 }
 
 <div
@@ -903,10 +1198,10 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
+          className="components-base-control components-color-picker__inputs-field emotion-6 emotion-7"
         >
           <div
-            className="components-base-control__field emotion-2 emotion-3"
+            className="components-base-control__field emotion-4 emotion-5"
           >
             <label
               className="components-base-control__label emotion-0 emotion-1"
@@ -915,7 +1210,7 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
               Color value in hexadecimal
             </label>
             <input
-              className="components-text-control__input"
+              className="components-text-control__input emotion-2 emotion-3"
               id="inspector-text-control-1"
               onBlur={[Function]}
               onChange={[Function]}
@@ -961,22 +1256,81 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
 `;
 
 exports[`ColorPicker should render color picker 1`] = `
-.emotion-4 {
+.emotion-6 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-2 {
+.emotion-4 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-2 {
+.components-panel__row .emotion-4 {
   margin-bottom: inherit;
 }
 
 .emotion-0 {
   display: inline-block;
   margin-bottom: 8px;
+}
+
+.emotion-2 {
+  width: 100%;
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  padding: 6px 8px;
+  box-shadow: 0 0 0 transparent;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  border-radius: 2px;
+  border: 1px solid #757575;
+  font-size: 16px;
+  line-height: normal;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-2 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+@media (min-width:600px) {
+  .emotion-2 {
+    font-size: 13px;
+    line-height: normal;
+  }
+}
+
+.emotion-2:focus {
+  border-color: var( --wp-admin-theme-color );
+  box-shadow: 0 0 0 calc( 1.5px - 1px ) var( --wp-admin-theme-color );
+  outline: 2px solid transparent;
+}
+
+.emotion-2::-webkit-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-2::-moz-placeholder {
+  opacity: 1;
+  color: rgba(30,30,30,0.62);
+}
+
+.emotion-2:-ms-input-placeholder {
+  color: rgba(30,30,30,0.62);
+}
+
+.is-dark-theme .emotion-2::-webkit-input-placeholder {
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-2::-moz-placeholder {
+  opacity: 1;
+  color: rgba(255,255,255,0.65);
+}
+
+.is-dark-theme .emotion-2:-ms-input-placeholder {
+  color: rgba(255,255,255,0.65);
 }
 
 <div
@@ -1095,10 +1449,10 @@ exports[`ColorPicker should render color picker 1`] = `
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
+          className="components-base-control components-color-picker__inputs-field emotion-6 emotion-7"
         >
           <div
-            className="components-base-control__field emotion-2 emotion-3"
+            className="components-base-control__field emotion-4 emotion-5"
           >
             <label
               className="components-base-control__label emotion-0 emotion-1"
@@ -1107,7 +1461,7 @@ exports[`ColorPicker should render color picker 1`] = `
               Color value in hexadecimal
             </label>
             <input
-              className="components-text-control__input"
+              className="components-text-control__input emotion-2 emotion-3"
               id="inspector-text-control-0"
               onBlur={[Function]}
               onChange={[Function]}
