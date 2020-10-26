@@ -370,7 +370,7 @@ add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
  * Shim that hooks into `pre_render_block` so as to override `render_block` with
  * a function that assigns block context.
  *
- * This can be removed when plugin support requires WordPress 5.5.0+.
+ * The context handling can be removed when plugin support requires WordPress 5.5.0+.
  *
  * @see https://core.trac.wordpress.org/ticket/49927
  * @see https://core.trac.wordpress.org/changeset/48243

@@ -7,11 +7,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { View } from '@wordpress/primitives';
 
 const MIN_SPACER_HEIGHT = 1;
 const MAX_SPACER_HEIGHT = 500;
@@ -22,6 +23,7 @@ const SpacerEdit = ( {
 	setAttributes,
 	onResizeStart,
 	onResizeStop,
+	className,
 } ) => {
 	const [ isResizing, setIsResizing ] = useState( false );
 	const { height } = attributes;
@@ -48,37 +50,40 @@ const SpacerEdit = ( {
 
 	return (
 		<>
-			<ResizableBox
-				className={ classnames(
-					'block-library-spacer__resize-container',
-					{
-						'is-selected': isSelected,
-					}
-				) }
-				size={ {
-					height,
-				} }
-				minHeight={ MIN_SPACER_HEIGHT }
-				enable={ {
-					top: false,
-					right: false,
-					bottom: true,
-					left: false,
-					topRight: false,
-					bottomRight: false,
-					bottomLeft: false,
-					topLeft: false,
-				} }
-				onResizeStart={ handleOnResizeStart }
-				onResizeStop={ handleOnResizeStop }
-				showHandle={ isSelected }
-				__experimentalShowTooltip={ true }
-				__experimentalTooltipProps={ {
-					axis: 'y',
-					position: 'bottom',
-					isVisible: isResizing,
-				} }
-			/>
+			<View { ...useBlockProps() }>
+				<ResizableBox
+					className={ classnames(
+						className,
+						'block-library-spacer__resize-container',
+						{
+							'is-selected': isSelected,
+						}
+					) }
+					size={ {
+						height,
+					} }
+					minHeight={ MIN_SPACER_HEIGHT }
+					enable={ {
+						top: false,
+						right: false,
+						bottom: true,
+						left: false,
+						topRight: false,
+						bottomRight: false,
+						bottomLeft: false,
+						topLeft: false,
+					} }
+					onResizeStart={ handleOnResizeStart }
+					onResizeStop={ handleOnResizeStop }
+					showHandle={ isSelected }
+					__experimentalShowTooltip={ true }
+					__experimentalTooltipProps={ {
+						axis: 'y',
+						position: 'bottom',
+						isVisible: isResizing,
+					} }
+				/>
+			</View>
 			<InspectorControls>
 				<PanelBody title={ __( 'Spacer settings' ) }>
 					<RangeControl

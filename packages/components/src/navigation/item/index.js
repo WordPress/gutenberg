@@ -2,11 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { noop } from 'lodash';
+import { noop, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { useState } from '@wordpress/element';
 import { Icon, chevronRight } from '@wordpress/icons';
 
 /**
@@ -14,9 +15,8 @@ import { Icon, chevronRight } from '@wordpress/icons';
  */
 import Button from '../../button';
 import { useNavigationContext } from '../context';
-import { ItemBadgeUI, ItemTitleUI, ItemUI } from '../styles/navigation-styles';
 import { useNavigationTreeItem } from './use-navigation-tree-item';
-import { useNavigationMenuContext } from '../menu/context';
+import { ItemBadgeUI, ItemTitleUI, ItemUI } from '../styles/navigation-styles';
 
 export default function NavigationItem( props ) {
 	const {
@@ -30,14 +30,17 @@ export default function NavigationItem( props ) {
 		title,
 		...restProps
 	} = props;
-	useNavigationTreeItem( props );
-	const { activeItem, setActiveMenu } = useNavigationContext();
-	const { isActive } = useNavigationMenuContext();
 
-	// If this item is in an inactive menu, then we skip rendering
-	// We need to make sure this component gets mounted though
-	// To make sure inactive items are included in the navigation tree
-	if ( ! isActive ) {
+	const [ itemId ] = useState( uniqueId( 'item-' ) );
+
+	useNavigationTreeItem( itemId, props );
+	const {
+		activeItem,
+		navigationTree,
+		setActiveMenu,
+	} = useNavigationContext();
+
+	if ( ! navigationTree.getItem( itemId )?._isVisible ) {
 		return null;
 	}
 

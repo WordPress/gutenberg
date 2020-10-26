@@ -10,15 +10,13 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
     title="General"
   >
     <WithSelect(WithDispatch(IfViewportMatches(BaseOption)))
-      label="Pre-publish checks"
+      help="Review settings such as categories and tags."
+      label="Include pre-publish checklist"
     />
     <WithSelect(WithDispatch(BaseOption))
       featureName="mostUsedBlocks"
-      label="Enable the Most Used Blocks category in the block library"
-    />
-    <WithSelect(WithDispatch(BaseOption))
-      featureName="showIconLabels"
-      label="Show button text labels"
+      help="Places the most frequent blocks in the block library."
+      label="Show most used blocks"
     />
   </Section>
   <Section
@@ -26,27 +24,37 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
   >
     <WithSelect(WithDispatch(BaseOption))
       featureName="keepCaretInsideBlock"
-      label="Contain text cursor inside active block"
+      help="Aids screen readers by stopping text caret from leaving blocks."
+      label="Contain text cursor inside block."
     />
   </Section>
   <Section
-    title="Writing Mode"
+    title="Appearance"
   >
     <WithSelect(WithDispatch(BaseOption))
-      featureName="themeStyles"
-      label="Theme Styles"
-    />
-    <WithSelect(WithDispatch(BaseOption))
       featureName="reducedUI"
-      label="Compact UI"
+      help="Compacts options and outlines in the toolbar."
+      label="Reduce the interface"
     />
     <WithSelect(WithDispatch(BaseOption))
       featureName="focusMode"
-      label="Spotlight"
+      help="Highlights the current block and fades other content."
+      label="Spotlight mode"
+    />
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="showIconLabels"
+      help="Shows text instead of icons in toolbar."
+      label="Display button labels"
+    />
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="themeStyles"
+      help="Make the editor look like your theme."
+      label="Use theme styles"
     />
   </Section>
   <Section
-    title="Document panels"
+    description="Choose what displays in the panel."
+    title="Document settings"
   >
     <EnablePluginDocumentSettingPanelOptionSlot />
     <WithSelect(PostTaxonomies)
@@ -85,7 +93,8 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
     </WithSelect(PageAttributesCheck)>
   </Section>
   <WithSelect(MetaBoxesSection)
-    title="Advanced panels"
+    description="Add extra areas to the editor."
+    title="Additional panels"
   />
 </WithInstanceId(Modal)>
 `;

@@ -1,55 +1,70 @@
 .edit-site-document-actions {
 	display: flex;
 	flex-direction: column;
-	align-items: center;
 	justify-content: center;
 	height: 100%;
-	position: relative;
+	// Flex items will, by default, refuse to shrink below a minimum
+	// intrinsic width. In order to shrink this flexbox item, and
+	// subsequently truncate child text, we set an explicit min-width.
+	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
+	min-width: 0;
 
 	.edit-site-document-actions__title-wrapper {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+		transition: transform 0.2s;
+		@include reduce-motion(transition);
+
+		// See comment above about min-width
+		min-width: 0;
+
+		// Since part of the dropdown button width is blank space, visually,
+		// it looks off-center. This offsets that blank space.
+		margin-left: 12px;
+	}
+
+	.edit-site-document-actions__title-wrapper > h1 {
+		display: flex;
+		justify-content: center;
 		margin: 0;
+
+		// See comment above about min-width
+		min-width: 0;
 	}
 
 	.edit-site-document-actions__title {
-		font-size: $default-font-size;
-		font-weight: bold;
-		transition: transform 0.2s;
-		@include reduce-motion(transition);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
 	.edit-site-document-actions__secondary-item {
-		font-size: $default-font-size;
 		opacity: 0;
-		transform: translateY(20px);
+		transform: translateY(0);
 		transition: transform 0.2s;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		text-align: center;
 		@include reduce-motion(transition);
 	}
 
 	&.has-secondary-label {
-		.edit-site-document-actions__title {
-			position: absolute;
-			left: 0;
-			color: $gray-900;
-			font-weight: bold;
-			transform: translateY(-12px);
+		transform: translateY(10px);
 
-			&.is-secondary-title-active {
-				color: $gray-700;
-				font-weight: normal;
-			}
+		.edit-site-document-actions__title-wrapper {
+			transform: translateY(-12px);
 		}
 
 		.edit-site-document-actions__secondary-item {
-			color: $gray-700;
-			font-weight: normal;
 			opacity: 1;
-			white-space: nowrap;
-			transform: translateY(12px);
-
-			&.is-secondary-title-active {
-				color: $gray-900;
-				font-weight: bold;
-			}
+			transform: translateY(-16px);
 		}
 	}
+}
+
+.edit-site-document-actions__info-dropdown > .components-popover__content > div {
+	padding: 0;
 }

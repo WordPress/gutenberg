@@ -4,28 +4,55 @@
 	display: flex;
 	height: $header-height;
 	box-sizing: border-box;
+	width: 100%;
+
+	padding-left: 60px;
+	transition: padding-left 20ms linear;
+	transition-delay: 80ms;
+	@include reduce-motion("transition");
 
 	.edit-site-header_start,
 	.edit-site-header_end {
-		flex: 1;
+		flex: 1 0;
 		display: flex;
+	}
+
+	.edit-site-header_start {
+		// Flex basis prevents the header_start toolbar
+		// from collapsing when shrinking the viewport.
+		flex-basis: calc(#{$header-toolbar-min-width} - #{$header-height});
 	}
 
 	.edit-site-header_center {
 		display: flex;
 		align-items: center;
 		height: 100%;
+		flex-shrink: 1;
+		// Flex items will, by default, refuse to shrink below a minimum
+		// intrinsic width. In order to shrink this flexbox item, and
+		// subsequently truncate child text, we set an explicit min-width.
+		// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
+		min-width: 0;
 	}
 
 	.edit-site-header_end {
+		// Flex basis prevents the header_end toolbar
+		// from collapsing when shrinking the viewport
+		flex-basis: $header-toolbar-min-width;
 		justify-content: flex-end;
 	}
 }
 
 // Keeps the document title centered when the sidebar is open
 body.is-navigation-sidebar-open {
-	.edit-site-header_start {
-		flex-basis: $nav-sidebar-width;
+	.edit-site-header {
+		padding-left: 0;
+		transition: padding-left 20ms linear;
+		transition-delay: 0ms;
+
+		.edit-site-header_start {
+			flex-basis: $header-toolbar-min-width;
+		}
 	}
 }
 
@@ -57,6 +84,11 @@ body.is-navigation-sidebar-open {
  */
 
 .edit-site-header__actions {
+	display: inline-flex;
+	align-items: center;
+	flex-wrap: wrap;
+	padding-right: $grid-unit-05;
+
 	// Adjust button paddings to scale better to mobile.
 	.editor-post-saved-state,
 	.components-button.components-button {
@@ -76,13 +108,6 @@ body.is-navigation-sidebar-open {
 	.interface-pinned-items .components-button {
 		margin-right: 0;
 	}
-}
-
-.edit-site-header__actions {
-	display: inline-flex;
-	align-items: center;
-	flex-wrap: wrap;
-	padding-right: $grid-unit-05;
 
 	@include break-small () {
 		padding-right: $grid-unit-20;

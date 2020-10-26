@@ -128,20 +128,6 @@ function gutenberg_filter_rest_prepare_theme( $response, $theme, $request ) {
 add_filter( 'rest_prepare_theme', 'gutenberg_filter_rest_prepare_theme', 10, 3 );
 
 /**
- * Start: Include for phase 2
- */
-/**
- * Registers the REST API routes needed by the legacy widget block.
- *
- * @since 5.0.0
- */
-function gutenberg_register_rest_widget_updater_routes() {
-	$widget_forms = new WP_REST_Widget_Utils_Controller();
-	$widget_forms->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_widget_updater_routes' );
-
-/**
  * Registers the block directory.
  *
  * @since 6.5.0
@@ -189,13 +175,18 @@ function gutenberg_register_plugins_endpoint() {
 add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
 
 /**
- * Registers the Sidebars REST API routes.
+ * Registers the Sidebars & Widgets REST API routes.
  */
-function gutenberg_register_sidebars_endpoint() {
+function gutenberg_register_sidebars_and_widgets_endpoint() {
 	$sidebars = new WP_REST_Sidebars_Controller();
 	$sidebars->register_routes();
+
+	$widget_types = new WP_REST_Widget_Types_Controller();
+	$widget_types->register_routes();
+	$widgets = new WP_REST_Widgets_Controller();
+	$widgets->register_routes();
 }
-add_action( 'rest_api_init', 'gutenberg_register_sidebars_endpoint' );
+add_action( 'rest_api_init', 'gutenberg_register_sidebars_and_widgets_endpoint' );
 
 /**
  * Registers the Batch REST API routes.

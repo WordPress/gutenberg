@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
 import { G2, UI } from '../../utils/colors-values';
 import Button from '../../button';
 import Text from '../../text';
-import { reduceMotion } from '../../utils';
+import { reduceMotion, space } from '../../utils';
 
 export const NavigationUI = styled.div`
 	width: 100%;
@@ -50,10 +50,77 @@ export const MenuBackButtonUI = styled( Button )`
 	}
 `;
 
-export const MenuTitleUI = styled( Text )`
-	padding: 4px 0 4px 16px;
-	margin-bottom: 8px;
+export const MenuTitleUI = styled.div`
+	overflow: hidden;
+	width: 100%;
+`;
+
+export const MenuTitleHeadingUI = styled( Text )`
+	align-items: center;
 	color: ${ G2.gray[ 100 ] };
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: ${ space( 1 ) };
+	padding: ${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) };
+`;
+
+export const MenuTitleActionsUI = styled.span`
+	height: ${ space( 3 ) }; // 24px, same height as the buttons inside
+
+	.components-button.is-small {
+		color: ${ G2.lightGray.ui };
+		margin-right: 2px; // Avoid hiding the focus outline
+		padding: 0;
+
+		&:active:not( :disabled ) {
+			background: none;
+			color: ${ G2.gray[ 200 ] };
+		}
+		&:hover:not( :disabled ) {
+			box-shadow: none;
+			color: ${ G2.gray[ 200 ] };
+		}
+	}
+`;
+
+export const MenuTitleSearchUI = styled.div`
+	padding: 0;
+	position: relative;
+
+	input {
+		height: ${ space( 4.5 ) }; // 36px, same height as MenuTitle
+		margin-bottom: ${ space( 1 ) };
+		padding-left: 30px; // Leave room for the search icon
+		padding-right: 30px; // Leave room for the close search button
+
+		&::-webkit-search-decoration,
+		&::-webkit-search-cancel-button,
+		&::-webkit-search-results-button,
+		&::-webkit-search-results-decoration {
+			-webkit-appearance: none;
+		}
+	}
+
+	> svg {
+		left: ${ space( 0.5 ) };
+		position: absolute;
+		top: 6px;
+	}
+
+	.components-button.is-small {
+		height: 30px;
+		padding: 0;
+		position: absolute;
+		right: ${ space( 1 ) };
+		top: 3px;
+
+		&:active:not( :disabled ) {
+			background: none;
+		}
+		&:hover:not( :disabled ) {
+			box-shadow: none;
+		}
+	}
 `;
 
 export const GroupTitleUI = styled( Text )`

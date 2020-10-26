@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`adding blocks should insert a block pattern 1`] = `
+exports[`adding patterns should insert a block pattern 1`] = `
 "<!-- wp:buttons {\\"align\\":\\"center\\"} -->
 <div class=\\"wp-block-buttons aligncenter\\"><!-- wp:button {\\"borderRadius\\":2,\\"style\\":{\\"color\\":{\\"background\\":\\"#ba0c49\\",\\"text\\":\\"#fffffa\\"}}} -->
 <div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link has-text-color has-background\\" style=\\"border-radius:2px;background-color:#ba0c49;color:#fffffa\\">Download now</a></div>

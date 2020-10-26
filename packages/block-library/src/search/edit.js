@@ -90,10 +90,10 @@ export default function SearchEdit( {
 			'button-only' === buttonPosition
 				? 'wp-block-search__button-only'
 				: undefined,
-			buttonUseIcon && 'no-button' !== buttonPosition
+			! buttonUseIcon && 'no-button' !== buttonPosition
 				? 'wp-block-search__text-button'
 				: undefined,
-			! buttonUseIcon && 'no-button' !== buttonPosition
+			buttonUseIcon && 'no-button' !== buttonPosition
 				? 'wp-block-search__icon-button'
 				: undefined
 		);
