@@ -17,12 +17,14 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 	Popover,
+	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import {
 	BlockControls,
 	InspectorControls,
 	RichText,
 	useBlockProps,
+	getFontSizeClass,
 	__experimentalLinkControl as LinkControl,
 	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
@@ -42,6 +44,7 @@ const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_BORDER_RADIUS_POSITION = 5;
 
 const EMPTY_ARRAY = [];
+const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 function BorderPanel( { borderRadius = '', setAttributes } ) {
 	const initialBorderRadius = borderRadius;
@@ -199,10 +202,21 @@ function ButtonEdit( props ) {
 	const colorProps = getColorAndStyleProps( attributes, colors, true );
 	const blockProps = useBlockProps();
 
+	// The passed className for fontSize shouldn't be applied on the div, only on the text field
+	const wrapperClassNames = blockProps.className.replace(
+		getFontSizeClass( attributes.fontSize ),
+		''
+	);
+	const { style, ...otherBlockProps } = blockProps;
+
 	return (
 		<>
 			<ColorEdit { ...props } />
-			<div { ...blockProps }>
+			<div { ...otherBlockProps } className={ wrapperClassNames }>
+				<BoxControlVisualizer
+					values={ attributes.style?.spacing?.padding }
+					showValues={ attributes.style?.visualizers?.padding }
+				/>
 				<RichText
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
@@ -221,6 +235,7 @@ function ButtonEdit( props ) {
 							? borderRadius + 'px'
 							: undefined,
 						...colorProps.style,
+						...style,
 					} }
 					onSplit={ ( value ) =>
 						createBlock( 'core/button', {

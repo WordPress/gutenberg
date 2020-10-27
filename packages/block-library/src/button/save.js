@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	getFontSizeClass,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -14,18 +18,32 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 import getColorAndStyleProps from './color-props';
 
 export default function save( { attributes } ) {
-	const { borderRadius, linkTarget, rel, text, title, url } = attributes;
+	const {
+		borderRadius,
+		linkTarget,
+		rel,
+		text,
+		title,
+		url,
+		fontSize,
+	} = attributes;
 	const colorProps = getColorAndStyleProps( attributes );
 	const buttonClasses = classnames(
 		'wp-block-button__link',
 		colorProps.className,
+		getFontSizeClass( fontSize ),
 		{
 			'no-border-radius': borderRadius === 0,
 		}
 	);
+
+	const blockProps = useBlockProps.save();
+	const { style, ...otherBlockProps } = blockProps;
+
 	const buttonStyle = {
 		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 		...colorProps.style,
+		...style,
 	};
 
 	// The use of a `title` attribute here is soft-deprecated, but still applied
@@ -33,7 +51,7 @@ export default function save( { attributes } ) {
 	// A title will no longer be assigned for new or updated button block links.
 
 	return (
-		<div { ...useBlockProps.save() }>
+		<div { ...otherBlockProps }>
 			<RichText.Content
 				tagName="a"
 				className={ buttonClasses }
