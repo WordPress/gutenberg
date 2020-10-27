@@ -49,8 +49,20 @@ function reorderEmotionStyleTag( node ) {
 	if ( __resolvedCache__.has( node ) ) return;
 
 	const headNode = document.getElementsByTagName( 'head' )[ 0 ];
-	// Moving it to the first position within the document.head.
-	headNode.prepend( node );
+
+	const latestResolvedTag = Array.from( __resolvedCache__ ).pop();
+
+	if ( ! latestResolvedTag ) {
+		// Moving it to the first position within the document.head.
+		headNode.prepend( node );
+	} else {
+		// Otherwise, insert it after the latest resolved tag.
+		latestResolvedTag.parentNode.insertBefore(
+			node,
+			latestResolvedTag.nextSibling
+		);
+	}
+
 	// Marking it as "resolved", so it does not get moved again.
 	__resolvedCache__.add( node );
 }
