@@ -9,14 +9,13 @@ import Menu, { MenuItem } from 'react-native-material-menu';
 import RangeCell from '../mobile/bottom-sheet/range-cell';
 import StepperCell from '../mobile/bottom-sheet/stepper-cell';
 import Picker from '../mobile/picker';
-
+import styles from './style.scss';
+import { CSS_UNITS } from './utils';
 /**
  * WordPress dependencies
  */
 import { useRef } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
-
-import styles from './style.scss';
 
 const isIOS = Platform.OS === 'ios';
 
@@ -30,7 +29,7 @@ function UnitControl( {
 	min,
 	max,
 	separatorType,
-	units,
+	units = CSS_UNITS,
 	unit,
 	getStylesFromColorScheme,
 	...props
@@ -89,12 +88,7 @@ function UnitControl( {
 			);
 		}
 		return (
-			<View
-				style={ {
-					alignItems: 'center',
-					justifyContent: 'center',
-				} }
-			>
+			<View style={ styles.unitMenu }>
 				<Menu ref={ menuRef } button={ renderUnitButton() }>
 					<View>
 						{ units.map( ( unitItem ) => {

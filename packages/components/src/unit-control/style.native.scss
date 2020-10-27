@@ -7,8 +7,13 @@
 }
 
 .unitButton {
-	padding-right: 8px;
-	padding-left: 8px;
+	padding-right: $grid-unit;
+	padding-left: $grid-unit;
 	align-items: flex-end;
 	justify-content: flex-end;
+}
+
+.unitMenu {
+	justify-content: center;
+	align-items: center;
 }

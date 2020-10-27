@@ -27,6 +27,7 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './editor.scss';
 import ColumnsPreview from './column-preview';
+import { CSS_UNITS } from '../columns/utils';
 
 function ColumnEdit( {
 	attributes,
@@ -119,13 +120,7 @@ function ColumnEdit( {
 							} );
 						} }
 						unit={ widthUnit }
-						units={ [
-							{ value: '%', label: '%', default: '' },
-							{ value: 'px', label: 'px', default: '' },
-							{ value: 'em', label: 'em', default: '' },
-							{ value: 'rem', label: 'rem', default: '' },
-							{ value: 'vw', label: 'vw', default: '' },
-						] }
+						units={ CSS_UNITS }
 						preview={
 							<ColumnsPreview
 								columnWidths={ getColumnWidths( false ) }

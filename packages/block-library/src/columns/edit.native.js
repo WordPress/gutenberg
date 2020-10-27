@@ -37,6 +37,7 @@ import {
 	getMappedColumnWidths,
 	getRedistributedColumnWidths,
 	toWidthPrecision,
+	CSS_UNITS,
 } from './utils';
 import ColumnsPreview from '../column/column-preview';
 
@@ -197,13 +198,7 @@ function ColumnsEditContainer( {
 						);
 					} }
 					unit={ valueUnit || '%' }
-					units={ [
-						{ value: '%', label: '%', default: '' },
-						{ value: 'px', label: 'px', default: '' },
-						{ value: 'em', label: 'em', default: '' },
-						{ value: 'rem', label: 'rem', default: '' },
-						{ value: 'vw', label: 'vw', default: '' },
-					] }
+					units={ CSS_UNITS }
 					preview={
 						<ColumnsPreview
 							columnWidths={ getColumnWidths( false ) }

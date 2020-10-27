@@ -172,25 +172,17 @@ class RangeTextInput extends Component {
 			styles.verticalBorderDark
 		);
 
+		const inputBorderStyles = [
+			textInputStyle,
+			borderStyles.borderStyle,
+			hasFocus && borderStyles.isSelected,
+		];
+
 		return (
-			<View
-				style={ [
-					styles.rowContainer,
-					isIOS && [
-						textInputStyle,
-						borderStyles.borderStyle,
-						hasFocus && borderStyles.isSelected,
-					],
-				] }
-			>
+			<View style={ [ styles.rowContainer, isIOS && inputBorderStyles ] }>
 				<TextInput
 					style={ [
-						! isIOS && [
-							textInputStyle,
-							borderStyles.borderStyle,
-							hasFocus && borderStyles.isSelected,
-						],
-						isIOS && verticalBorderStyle,
+						! isIOS ? inputBorderStyles : verticalBorderStyle,
 						{
 							width: 40 * fontScale,
 						},

@@ -120,3 +120,28 @@ export function getMappedColumnWidths( blocks, widths ) {
 		} )
 	);
 }
+
+/**
+ * Returns an array with columns widths values, parsed or no depends on `withParsing` flag.
+ *
+ * @param {WPBlock[]} blocks          Block objects.
+ * @param {?boolean} withParsing Whether value has to be parsed.
+ * Defaults to number of blocks passed.
+ * @return {Array<number,string>} Column widths.
+ */
+export function getWidths( blocks, withParsing = true ) {
+	return blocks.map( ( innerColumn ) => {
+		const innerColumnWidth =
+			innerColumn.attributes.width || 100 / blocks.length;
+
+		return withParsing ? parseFloat( innerColumnWidth ) : innerColumnWidth;
+	} );
+}
+
+export const CSS_UNITS = [
+	{ value: '%', label: '%', default: '' },
+	{ value: 'px', label: 'px', default: '' },
+	{ value: 'em', label: 'em', default: '' },
+	{ value: 'rem', label: 'rem', default: '' },
+	{ value: 'vw', label: 'vw', default: '' },
+];
