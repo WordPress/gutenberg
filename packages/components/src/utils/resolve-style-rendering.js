@@ -7,8 +7,6 @@ let __didInvokeResolver__ = false;
  */
 const __resolvedCache__ = new Set();
 
-const { MutationObserver } = window;
-
 /**
  * Checks if an HTML element is an Emotion style tag.
  *
@@ -75,6 +73,11 @@ function reorderEmotionStyleTag( node ) {
  * @return {MutationObserver} The MutationObserver instance.
  */
 function createEmotionStyleTagObserver() {
+	if ( ! window ) {
+		/* Escape in case of SSR or other non-browser env */ return;
+	}
+	const { MutationObserver } = window;
+
 	const headNode = document.getElementsByTagName( 'head' )[ 0 ];
 	const config = { attributes: true, childList: true, subtree: true };
 
@@ -114,6 +117,9 @@ function createEmotionStyleTagObserver() {
  * This can be removed once the styles are stable.
  */
 function resolveEmotionStyleTagRendering() {
+	if ( ! window ) {
+		/* Escape in case of SSR or other non-browser env */ return;
+	}
 	if ( __didInvokeResolver__ ) return;
 
 	try {
