@@ -18,15 +18,15 @@ const DEFAULT_ALLOWED_VALUES = [ 'left', 'center', 'right' ];
 const CONTROLS = {
 	left: {
 		icon: contentJustificationLeftIcon,
-		title: __( 'Justify items left' ),
+		title: __( 'Justify content left' ),
 	},
 	center: {
 		icon: contentJustificationCenterIcon,
-		title: __( 'Justify items center' ),
+		title: __( 'Justify content center' ),
 	},
 	right: {
 		icon: contentJustificationRightIcon,
-		title: __( 'Justify items right' ),
+		title: __( 'Justify content right' ),
 	},
 };
 
