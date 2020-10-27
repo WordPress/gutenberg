@@ -87,19 +87,124 @@ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`]
 `;
 
 exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] = `
-<button
+<LinkButton
   aria-expanded={true}
   aria-haspopup="true"
   aria-label="Custom color picker"
+  as="button"
   className="components-button is-link"
+  hasIcon={false}
+  hasText={false}
   onClick={[MockFunction]}
   type="button"
 >
   Custom color
-</button>
+</LinkButton>
 `;
 
 exports[`ColorPalette Dropdown should render it correctly 1`] = `
+.emotion-0 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  font-size: 13px;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background: none;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  height: 36px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border-radius: 2px;
+  color: #1e1e1e;
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  outline: none;
+  text-align: left;
+  color: #0073aa;
+  -webkit-text-decoration: underline;
+  text-decoration: underline;
+  -webkit-transition-property: border,background,color;
+  transition-property: border,background,color;
+  -webkit-transition-duration: 0.05s;
+  transition-duration: 0.05s;
+  -webkit-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
+  height: auto;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-0[aria-expanded='true'],
+.emotion-0:hover {
+  color: var( --wp-admin-theme-color );
+}
+
+.emotion-0[aria-disabled='true']:hover {
+  color: initial;
+}
+
+.emotion-0:focus:not(:disabled ) {
+  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+}
+
+.emotion-0:not([aria-disabled="true"]):active {
+  color: inherit;
+}
+
+.emotion-0:disabled,
+.emotion-0[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.emotion-0 svg {
+  fill: currentColor;
+  outline: none;
+}
+
+.emotion-0 .components-visually-hidden {
+  height: auto;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-0:hover:not(:disabled ),
+.emotion-0:active:not(:disabled ) {
+  color: #00a0d2;
+  box-shadow: none;
+}
+
+.emotion-0:focus {
+  color: #124964;
+  box-shadow: 0 0 0 1px #5b9dd9,0 0 1.5px 1px rgba( 30,140,190,0.8 );
+}
+
 <Dropdown
   className="components-circular-option-picker__dropdown-link-action"
   contentClassName="components-color-palette__picker"
@@ -116,16 +221,28 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
       isLink={true}
       onClick={[Function]}
     >
-      <button
+      <LinkButton
         aria-expanded={false}
         aria-haspopup="true"
         aria-label="Custom color picker"
+        as="button"
         className="components-button is-link"
+        hasIcon={false}
+        hasText={false}
         onClick={[Function]}
         type="button"
       >
-        Custom color
-      </button>
+        <button
+          aria-expanded={false}
+          aria-haspopup="true"
+          aria-label="Custom color picker"
+          className="components-button is-link emotion-0 emotion-1"
+          onClick={[Function]}
+          type="button"
+        >
+          Custom color
+        </button>
+      </LinkButton>
     </ForwardRef(Button)>
   </div>
 </Dropdown>
@@ -193,6 +310,350 @@ exports[`ColorPalette should allow disabling custom color picker 1`] = `
 `;
 
 exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
+.emotion-0 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  font-size: 13px;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background: none;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  height: 36px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border-radius: 2px;
+  color: #1e1e1e;
+  color: #fff;
+  background: #1e1e1e;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-0[aria-expanded='true'],
+.emotion-0:hover {
+  color: var( --wp-admin-theme-color );
+}
+
+.emotion-0[aria-disabled='true']:hover {
+  color: initial;
+}
+
+.emotion-0:focus:not(:disabled ) {
+  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+}
+
+.emotion-0:not([aria-disabled="true"]):active {
+  color: inherit;
+}
+
+.emotion-0:disabled,
+.emotion-0[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.emotion-0 svg {
+  fill: currentColor;
+  outline: none;
+}
+
+.emotion-0 .components-visually-hidden {
+  height: auto;
+}
+
+.emotion-0:focus:not(:disabled ) {
+  box-shadow: inset 0 0 0 1px #fff,0 0 0 1.5px var( --wp-admin-theme-color );
+  outline: 2px solid transparent;
+}
+
+.emotion-0:hover:not(:disabled ) {
+  color: #fff;
+  background: #1e1e1e;
+}
+
+.emotion-2 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  font-size: 13px;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background: none;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  height: 36px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border-radius: 2px;
+  color: #1e1e1e;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-2 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-2[aria-expanded='true'],
+.emotion-2:hover {
+  color: var( --wp-admin-theme-color );
+}
+
+.emotion-2[aria-disabled='true']:hover {
+  color: initial;
+}
+
+.emotion-2:focus:not(:disabled ) {
+  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+}
+
+.emotion-2:not([aria-disabled="true"]):active {
+  color: inherit;
+}
+
+.emotion-2:disabled,
+.emotion-2[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.emotion-2 svg {
+  fill: currentColor;
+  outline: none;
+}
+
+.emotion-2 .components-visually-hidden {
+  height: auto;
+}
+
+.emotion-6 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  font-size: 13px;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background: none;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  height: 36px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border-radius: 2px;
+  color: #1e1e1e;
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  outline: none;
+  text-align: left;
+  color: #0073aa;
+  -webkit-text-decoration: underline;
+  text-decoration: underline;
+  -webkit-transition-property: border,background,color;
+  transition-property: border,background,color;
+  -webkit-transition-duration: 0.05s;
+  transition-duration: 0.05s;
+  -webkit-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
+  height: auto;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-6 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-6[aria-expanded='true'],
+.emotion-6:hover {
+  color: var( --wp-admin-theme-color );
+}
+
+.emotion-6[aria-disabled='true']:hover {
+  color: initial;
+}
+
+.emotion-6:focus:not(:disabled ) {
+  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+}
+
+.emotion-6:not([aria-disabled="true"]):active {
+  color: inherit;
+}
+
+.emotion-6:disabled,
+.emotion-6[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.emotion-6 svg {
+  fill: currentColor;
+  outline: none;
+}
+
+.emotion-6 .components-visually-hidden {
+  height: auto;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-6 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-6:hover:not(:disabled ),
+.emotion-6:active:not(:disabled ) {
+  color: #00a0d2;
+  box-shadow: none;
+}
+
+.emotion-6:focus {
+  color: #124964;
+  box-shadow: 0 0 0 1px #5b9dd9,0 0 1.5px 1px rgba( 30,140,190,0.8 );
+}
+
+.emotion-8 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  font-size: 13px;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background: none;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  height: 36px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border-radius: 2px;
+  color: #1e1e1e;
+  height: 24px;
+  line-height: 22px;
+  padding: 0 8px;
+  font-size: 11px;
+  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+  white-space: nowrap;
+  color: var( --wp-admin-theme-color );
+  background: transparent;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-8 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-8[aria-expanded='true'],
+.emotion-8:hover {
+  color: var( --wp-admin-theme-color );
+}
+
+.emotion-8[aria-disabled='true']:hover {
+  color: initial;
+}
+
+.emotion-8:focus:not(:disabled ) {
+  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+}
+
+.emotion-8:not([aria-disabled="true"]):active {
+  color: inherit;
+}
+
+.emotion-8:disabled,
+.emotion-8[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.emotion-8 svg {
+  fill: currentColor;
+  outline: none;
+}
+
+.emotion-8 .components-visually-hidden {
+  height: auto;
+}
+
+.emotion-8:active:not(:disabled ) {
+  background: #e0e0e0;
+  color: var( --wp-admin-theme-color-darker-10 );
+  box-shadow: none;
+}
+
+.emotion-8:hover:not(:disabled ) {
+  color: var( --wp-admin-theme-color-darker-10 );
+  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color-darker-10 );
+}
+
+.emotion-8:disabled,
+.emotion-8[aria-disabled='true'],
+.emotion-8[aria-disabled='true']:hover {
+  color: #828282;
+  background: #eaeaea;
+  -webkit-transform: none;
+  -ms-transform: none;
+  transform: none;
+  opacity: 1;
+  box-shadow: none;
+}
+
 <ColorPalette
   colors={
     Array [
@@ -332,10 +793,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   }
                 }
               >
-                <button
+                <BaseButton
                   aria-label="Color: red"
                   aria-pressed={true}
+                  as="button"
                   className="components-button components-circular-option-picker__option is-pressed"
+                  hasIcon={false}
+                  hasText={false}
+                  isPressed={true}
                   onBlur={[Function]}
                   onClick={[Function]}
                   onFocus={[Function]}
@@ -349,7 +814,26 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                     }
                   }
                   type="button"
-                />
+                >
+                  <button
+                    aria-label="Color: red"
+                    aria-pressed={true}
+                    className="components-button components-circular-option-picker__option is-pressed emotion-0 emotion-1"
+                    onBlur={[Function]}
+                    onClick={[Function]}
+                    onFocus={[Function]}
+                    onMouseDown={[Function]}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    style={
+                      Object {
+                        "backgroundColor": "#f00",
+                        "color": "#f00",
+                      }
+                    }
+                    type="button"
+                  />
+                </BaseButton>
               </ForwardRef(Button)>
             </Tooltip>
             <Icon
@@ -431,10 +915,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   }
                 }
               >
-                <button
+                <BaseButton
                   aria-label="Color: white"
                   aria-pressed={false}
+                  as="button"
                   className="components-button components-circular-option-picker__option"
+                  hasIcon={false}
+                  hasText={false}
+                  isPressed={false}
                   onBlur={[Function]}
                   onClick={[Function]}
                   onFocus={[Function]}
@@ -448,7 +936,26 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                     }
                   }
                   type="button"
-                />
+                >
+                  <button
+                    aria-label="Color: white"
+                    aria-pressed={false}
+                    className="components-button components-circular-option-picker__option emotion-2 emotion-1"
+                    onBlur={[Function]}
+                    onClick={[Function]}
+                    onFocus={[Function]}
+                    onMouseDown={[Function]}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    style={
+                      Object {
+                        "backgroundColor": "#fff",
+                        "color": "#fff",
+                      }
+                    }
+                    type="button"
+                  />
+                </BaseButton>
               </ForwardRef(Button)>
             </Tooltip>
           </div>
@@ -490,10 +997,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   }
                 }
               >
-                <button
+                <BaseButton
                   aria-label="Color: blue"
                   aria-pressed={false}
+                  as="button"
                   className="components-button components-circular-option-picker__option"
+                  hasIcon={false}
+                  hasText={false}
+                  isPressed={false}
                   onBlur={[Function]}
                   onClick={[Function]}
                   onFocus={[Function]}
@@ -507,7 +1018,26 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                     }
                   }
                   type="button"
-                />
+                >
+                  <button
+                    aria-label="Color: blue"
+                    aria-pressed={false}
+                    className="components-button components-circular-option-picker__option emotion-2 emotion-1"
+                    onBlur={[Function]}
+                    onClick={[Function]}
+                    onFocus={[Function]}
+                    onMouseDown={[Function]}
+                    onMouseEnter={[Function]}
+                    onMouseLeave={[Function]}
+                    style={
+                      Object {
+                        "backgroundColor": "#00f",
+                        "color": "#00f",
+                      }
+                    }
+                    type="button"
+                  />
+                </BaseButton>
               </ForwardRef(Button)>
             </Tooltip>
           </div>
@@ -546,16 +1076,28 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 isLink={true}
                 onClick={[Function]}
               >
-                <button
+                <LinkButton
                   aria-expanded={false}
                   aria-haspopup="true"
                   aria-label="Custom color picker"
+                  as="button"
                   className="components-button is-link"
+                  hasIcon={false}
+                  hasText={false}
                   onClick={[Function]}
                   type="button"
                 >
-                  Custom color
-                </button>
+                  <button
+                    aria-expanded={false}
+                    aria-haspopup="true"
+                    aria-label="Custom color picker"
+                    className="components-button is-link emotion-6 emotion-7"
+                    onClick={[Function]}
+                    type="button"
+                  >
+                    Custom color
+                  </button>
+                </LinkButton>
               </ForwardRef(Button)>
             </div>
           </Dropdown>
@@ -569,13 +1111,23 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             isSmall={true}
             onClick={[Function]}
           >
-            <button
+            <SecondaryButton
+              as="button"
               className="components-button components-circular-option-picker__clear is-secondary is-small"
+              hasIcon={false}
+              hasText={false}
+              isSmall={true}
               onClick={[Function]}
               type="button"
             >
-              Clear
-            </button>
+              <button
+                className="components-button components-circular-option-picker__clear is-secondary is-small emotion-8 emotion-9"
+                onClick={[Function]}
+                type="button"
+              >
+                Clear
+              </button>
+            </SecondaryButton>
           </ForwardRef(Button)>
         </ButtonAction>
       </div>

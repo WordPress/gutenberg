@@ -14,6 +14,100 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
   margin-bottom: inherit;
 }
 
+.emotion-4 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  font-size: 13px;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background: none;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  height: 36px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border-radius: 2px;
+  color: #1e1e1e;
+  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+  white-space: nowrap;
+  color: var( --wp-admin-theme-color );
+  background: transparent;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-4 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-4[aria-expanded='true'],
+.emotion-4:hover {
+  color: var( --wp-admin-theme-color );
+}
+
+.emotion-4[aria-disabled='true']:hover {
+  color: initial;
+}
+
+.emotion-4:focus:not(:disabled ) {
+  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+}
+
+.emotion-4:not([aria-disabled="true"]):active {
+  color: inherit;
+}
+
+.emotion-4:disabled,
+.emotion-4[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.emotion-4 svg {
+  fill: currentColor;
+  outline: none;
+}
+
+.emotion-4 .components-visually-hidden {
+  height: auto;
+}
+
+.emotion-4:active:not(:disabled ) {
+  background: #e0e0e0;
+  color: var( --wp-admin-theme-color-darker-10 );
+  box-shadow: none;
+}
+
+.emotion-4:hover:not(:disabled ) {
+  color: var( --wp-admin-theme-color-darker-10 );
+  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color-darker-10 );
+}
+
+.emotion-4:disabled,
+.emotion-4[aria-disabled='true'],
+.emotion-4[aria-disabled='true']:hover {
+  color: #828282;
+  background: #eaeaea;
+  -webkit-transform: none;
+  -ms-transform: none;
+  transform: none;
+  opacity: 1;
+  box-shadow: none;
+}
+
 <div
   className="edit-post-preferences-modal__option"
 >
@@ -61,7 +155,7 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
     A page reload is required for this change. Make sure your content is saved before reloading.
   </p>
   <button
-    className="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
+    className="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary emotion-4 emotion-5"
     disabled={false}
     onClick={[Function]}
     type="button"
@@ -143,6 +237,100 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
   margin-bottom: inherit;
 }
 
+.emotion-4 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  font-size: 13px;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background: none;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  height: 36px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border-radius: 2px;
+  color: #1e1e1e;
+  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+  white-space: nowrap;
+  color: var( --wp-admin-theme-color );
+  background: transparent;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-4 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-4[aria-expanded='true'],
+.emotion-4:hover {
+  color: var( --wp-admin-theme-color );
+}
+
+.emotion-4[aria-disabled='true']:hover {
+  color: initial;
+}
+
+.emotion-4:focus:not(:disabled ) {
+  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+}
+
+.emotion-4:not([aria-disabled="true"]):active {
+  color: inherit;
+}
+
+.emotion-4:disabled,
+.emotion-4[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.emotion-4 svg {
+  fill: currentColor;
+  outline: none;
+}
+
+.emotion-4 .components-visually-hidden {
+  height: auto;
+}
+
+.emotion-4:active:not(:disabled ) {
+  background: #e0e0e0;
+  color: var( --wp-admin-theme-color-darker-10 );
+  box-shadow: none;
+}
+
+.emotion-4:hover:not(:disabled ) {
+  color: var( --wp-admin-theme-color-darker-10 );
+  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color-darker-10 );
+}
+
+.emotion-4:disabled,
+.emotion-4[aria-disabled='true'],
+.emotion-4[aria-disabled='true']:hover {
+  color: #828282;
+  background: #eaeaea;
+  -webkit-transform: none;
+  -ms-transform: none;
+  transform: none;
+  opacity: 1;
+  box-shadow: none;
+}
+
 <div
   className="edit-post-preferences-modal__option"
 >
@@ -176,7 +364,7 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
     A page reload is required for this change. Make sure your content is saved before reloading.
   </p>
   <button
-    className="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary"
+    className="components-button edit-post-preferences-modal__custom-fields-confirmation-button is-secondary emotion-4 emotion-5"
     disabled={false}
     onClick={[Function]}
     type="button"

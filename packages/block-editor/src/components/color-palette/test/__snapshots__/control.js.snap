@@ -1,24 +1,302 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ColorPaletteControl matches the snapshot 1`] = `
-.emotion-2 {
+.emotion-8 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-0 {
+.emotion-6 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-0 {
+.components-panel__row .emotion-6 {
   margin-bottom: inherit;
 }
 
+.emotion-0 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  font-size: 13px;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background: none;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  height: 36px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border-radius: 2px;
+  color: #1e1e1e;
+  color: #fff;
+  background: #1e1e1e;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-0[aria-expanded='true'],
+.emotion-0:hover {
+  color: var( --wp-admin-theme-color );
+}
+
+.emotion-0[aria-disabled='true']:hover {
+  color: initial;
+}
+
+.emotion-0:focus:not(:disabled ) {
+  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+}
+
+.emotion-0:not([aria-disabled="true"]):active {
+  color: inherit;
+}
+
+.emotion-0:disabled,
+.emotion-0[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.emotion-0 svg {
+  fill: currentColor;
+  outline: none;
+}
+
+.emotion-0 .components-visually-hidden {
+  height: auto;
+}
+
+.emotion-0:focus:not(:disabled ) {
+  box-shadow: inset 0 0 0 1px #fff,0 0 0 1.5px var( --wp-admin-theme-color );
+  outline: 2px solid transparent;
+}
+
+.emotion-0:hover:not(:disabled ) {
+  color: #fff;
+  background: #1e1e1e;
+}
+
+.emotion-2 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  font-size: 13px;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background: none;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  height: 36px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border-radius: 2px;
+  color: #1e1e1e;
+  margin: 0;
+  padding: 0;
+  box-shadow: none;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  outline: none;
+  text-align: left;
+  color: #0073aa;
+  -webkit-text-decoration: underline;
+  text-decoration: underline;
+  -webkit-transition-property: border,background,color;
+  transition-property: border,background,color;
+  -webkit-transition-duration: 0.05s;
+  transition-duration: 0.05s;
+  -webkit-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
+  height: auto;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-2 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-2[aria-expanded='true'],
+.emotion-2:hover {
+  color: var( --wp-admin-theme-color );
+}
+
+.emotion-2[aria-disabled='true']:hover {
+  color: initial;
+}
+
+.emotion-2:focus:not(:disabled ) {
+  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+}
+
+.emotion-2:not([aria-disabled="true"]):active {
+  color: inherit;
+}
+
+.emotion-2:disabled,
+.emotion-2[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.emotion-2 svg {
+  fill: currentColor;
+  outline: none;
+}
+
+.emotion-2 .components-visually-hidden {
+  height: auto;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-2 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-2:hover:not(:disabled ),
+.emotion-2:active:not(:disabled ) {
+  color: #00a0d2;
+  box-shadow: none;
+}
+
+.emotion-2:focus {
+  color: #124964;
+  box-shadow: 0 0 0 1px #5b9dd9,0 0 1.5px 1px rgba( 30,140,190,0.8 );
+}
+
+.emotion-4 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  font-size: 13px;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background: none;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  height: 36px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border-radius: 2px;
+  color: #1e1e1e;
+  height: 24px;
+  line-height: 22px;
+  padding: 0 8px;
+  font-size: 11px;
+  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+  white-space: nowrap;
+  color: var( --wp-admin-theme-color );
+  background: transparent;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-4 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-4[aria-expanded='true'],
+.emotion-4:hover {
+  color: var( --wp-admin-theme-color );
+}
+
+.emotion-4[aria-disabled='true']:hover {
+  color: initial;
+}
+
+.emotion-4:focus:not(:disabled ) {
+  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+}
+
+.emotion-4:not([aria-disabled="true"]):active {
+  color: inherit;
+}
+
+.emotion-4:disabled,
+.emotion-4[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.emotion-4 svg {
+  fill: currentColor;
+  outline: none;
+}
+
+.emotion-4 .components-visually-hidden {
+  height: auto;
+}
+
+.emotion-4:active:not(:disabled ) {
+  background: #e0e0e0;
+  color: var( --wp-admin-theme-color-darker-10 );
+  box-shadow: none;
+}
+
+.emotion-4:hover:not(:disabled ) {
+  color: var( --wp-admin-theme-color-darker-10 );
+  box-shadow: inset 0 0 0 1px var( --wp-admin-theme-color-darker-10 );
+}
+
+.emotion-4:disabled,
+.emotion-4[aria-disabled='true'],
+.emotion-4[aria-disabled='true']:hover {
+  color: #828282;
+  background: #eaeaea;
+  -webkit-transform: none;
+  -ms-transform: none;
+  transform: none;
+  opacity: 1;
+  box-shadow: none;
+}
+
 <div
-  className="components-base-control block-editor-color-gradient-control emotion-2 emotion-3"
+  className="components-base-control block-editor-color-gradient-control emotion-8 emotion-9"
 >
   <div
-    className="components-base-control__field emotion-0 emotion-1"
+    className="components-base-control__field emotion-6 emotion-7"
   >
     <fieldset>
       <legend>
@@ -53,7 +331,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             <button
               aria-label="Color: red"
               aria-pressed={true}
-              className="components-button components-circular-option-picker__option is-pressed"
+              className="components-button components-circular-option-picker__option is-pressed emotion-0 emotion-1"
               onBlur={[Function]}
               onClick={[Function]}
               onFocus={[Function]}
@@ -94,7 +372,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
               aria-expanded={false}
               aria-haspopup="true"
               aria-label="Custom color picker"
-              className="components-button is-link"
+              className="components-button is-link emotion-2 emotion-3"
               onClick={[Function]}
               type="button"
             >
@@ -102,7 +380,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             </button>
           </div>
           <button
-            className="components-button components-circular-option-picker__clear is-secondary is-small"
+            className="components-button components-circular-option-picker__clear is-secondary is-small emotion-4 emotion-5"
             onClick={[Function]}
             type="button"
           >

@@ -26,7 +26,7 @@ describe( 'Button', () => {
 			expect( button.prop( 'disabled' ) ).toBeUndefined();
 			expect( button.prop( 'aria-disabled' ) ).toBeUndefined();
 			expect( button.prop( 'type' ) ).toBe( 'button' );
-			expect( button.type() ).toBe( 'button' );
+			expect( button.prop( 'as' ) ).toBe( 'button' );
 		} );
 
 		it( 'should render a button element with is-primary class', () => {
@@ -108,7 +108,7 @@ describe( 'Button', () => {
 			);
 			expect( iconButton.name() ).toBe( 'Tooltip' );
 			expect( iconButton.prop( 'text' ) ).toBe( 'WordPress' );
-			expect( iconButton.find( 'button' ).prop( 'aria-label' ) ).toBe(
+			expect( iconButton.find( 'BaseButton' ).prop( 'aria-label' ) ).toBe(
 				'WordPress'
 			);
 		} );
@@ -126,7 +126,7 @@ describe( 'Button', () => {
 					showTooltip={ false }
 				/>
 			);
-			expect( iconButton.name() ).toBe( 'button' );
+			expect( iconButton.name() ).toBe( 'BaseButton' );
 			expect( iconButton.prop( 'aria-label' ) ).toBe( 'WordPress' );
 		} );
 
@@ -144,7 +144,7 @@ describe( 'Button', () => {
 					Children
 				</Button>
 			);
-			expect( iconButton.name() ).toBe( 'button' );
+			expect( iconButton.name() ).toBe( 'BaseButton' );
 		} );
 
 		it( 'should force showing the tooltip even if icon and children defined', () => {
@@ -161,7 +161,7 @@ describe( 'Button', () => {
 		it( 'should render a link instead of a button with href prop', () => {
 			const button = shallow( <Button href="https://wordpress.org/" /> );
 
-			expect( button.type() ).toBe( 'a' );
+			expect( button.prop( 'as' ) ).toBe( 'a' );
 			expect( button.prop( 'href' ) ).toBe( 'https://wordpress.org/' );
 		} );
 
@@ -178,7 +178,7 @@ describe( 'Button', () => {
 				<Button href="https://wordpress.org/" disabled />
 			);
 
-			expect( button.type() ).toBe( 'button' );
+			expect( button.prop( 'as' ) ).toBe( 'button' );
 		} );
 	} );
 

@@ -1,6 +1,85 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`MoreMenu should match snapshot 1`] = `
+.emotion-0 {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  font-size: 13px;
+  margin: 0;
+  border: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  background: none;
+  -webkit-transition: box-shadow 0.1s linear;
+  transition: box-shadow 0.1s linear;
+  height: 36px;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 6px 12px;
+  border-radius: 2px;
+  color: #1e1e1e;
+  padding: 6px;
+  min-width: 36px;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+}
+
+@media ( prefers-reduced-motion:reduce ) {
+  .emotion-0 {
+    -webkit-transition-duration: 0ms;
+    transition-duration: 0ms;
+  }
+}
+
+.emotion-0[aria-expanded='true'],
+.emotion-0:hover {
+  color: var( --wp-admin-theme-color );
+}
+
+.emotion-0[aria-disabled='true']:hover {
+  color: initial;
+}
+
+.emotion-0:focus:not(:disabled ) {
+  box-shadow: 0 0 0 1.5px var( --wp-admin-theme-color );
+  outline: 1px solid transparent;
+}
+
+.emotion-0:not([aria-disabled="true"]):active {
+  color: inherit;
+}
+
+.emotion-0:disabled,
+.emotion-0[aria-disabled="true"] {
+  cursor: default;
+  opacity: 0.3;
+}
+
+.emotion-0 svg {
+  fill: currentColor;
+  outline: none;
+}
+
+.emotion-0 .components-visually-hidden {
+  height: auto;
+}
+
+.emotion-0 .dashicon {
+  display: inline-block;
+  -webkit-flex: 0 0 auto;
+  -ms-flex: 0 0 auto;
+  flex: 0 0 auto;
+}
+
 <MoreMenu>
   <DropdownMenu
     className="edit-post-more-menu"
@@ -67,11 +146,14 @@ exports[`MoreMenu should match snapshot 1`] = `
             position="bottom"
             text="Options"
           >
-            <button
+            <BaseButton
               aria-expanded={false}
               aria-haspopup="true"
               aria-label="Options"
+              as="button"
               className="components-button components-dropdown-menu__toggle has-icon"
+              hasIcon={true}
+              hasText={false}
               onBlur={[Function]}
               onClick={[Function]}
               onFocus={[Function]}
@@ -81,45 +163,60 @@ exports[`MoreMenu should match snapshot 1`] = `
               onMouseLeave={[Function]}
               type="button"
             >
-              <Icon
-                icon={
-                  <SVG
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <Path
-                      d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
-                    />
-                  </SVG>
-                }
-                key="0,0"
+              <button
+                aria-expanded={false}
+                aria-haspopup="true"
+                aria-label="Options"
+                className="components-button components-dropdown-menu__toggle has-icon emotion-0 emotion-1"
+                onBlur={[Function]}
+                onClick={[Function]}
+                onFocus={[Function]}
+                onKeyDown={[Function]}
+                onMouseDown={[Function]}
+                onMouseEnter={[Function]}
+                onMouseLeave={[Function]}
+                type="button"
               >
-                <SVG
-                  height={24}
-                  viewBox="0 0 24 24"
-                  width={24}
-                  xmlns="http://www.w3.org/2000/svg"
+                <Icon
+                  icon={
+                    <SVG
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <Path
+                        d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
+                      />
+                    </SVG>
+                  }
+                  key="0,0"
                 >
-                  <svg
-                    aria-hidden={true}
-                    focusable={false}
+                  <SVG
                     height={24}
-                    role="img"
                     viewBox="0 0 24 24"
                     width={24}
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <Path
-                      d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
+                    <svg
+                      aria-hidden={true}
+                      focusable={false}
+                      height={24}
+                      role="img"
+                      viewBox="0 0 24 24"
+                      width={24}
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      <path
+                      <Path
                         d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
-                      />
-                    </Path>
-                  </svg>
-                </SVG>
-              </Icon>
-            </button>
+                      >
+                        <path
+                          d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
+                        />
+                      </Path>
+                    </svg>
+                  </SVG>
+                </Icon>
+              </button>
+            </BaseButton>
           </Tooltip>
         </ForwardRef(Button)>
       </div>
