@@ -38,6 +38,26 @@ export class BlockListItem extends Component {
 		this.state = {
 			blockWidth: 0,
 		};
+		this.onFocus = this.onFocus.bind( this );
+		this.blockListItemRef = this.blockListItemRef.bind( this );
+	}
+
+	blockListItemRef( ref ) {
+		this.blockListItem = ref;
+	}
+
+	onFocus() {
+		const { isSelected } = this.props;
+		if ( isSelected ) {
+			this.blockListItem.measureInWindow( ( x, y, width, height ) => {
+				this.scrollToBlockListItemIfNotInViewPort(
+					x,
+					y,
+					width,
+					height
+				);
+			} );
+		}
 	}
 
 	onLayout( { nativeEvent } ) {
@@ -47,12 +67,9 @@ export class BlockListItem extends Component {
 		if ( blockWidth !== layout.width ) {
 			this.setState( { blockWidth: layout.width } );
 		}
-
-		this.scrollToBlockListItemIfNotInViewPort( layout );
 	}
 
-	scrollToBlockListItemIfNotInViewPort( layout ) {
-		const { x, y, width, height } = layout;
+	scrollToBlockListItemIfNotInViewPort( x, y, width, height ) {
 		const window = Dimensions.get( 'window' );
 
 		const visible =
@@ -63,7 +80,7 @@ export class BlockListItem extends Component {
 
 		const { scrollTo, clientId } = this.props;
 
-		if ( visible ) {
+		if ( ! visible ) {
 			scrollTo( clientId );
 		}
 	}
@@ -128,9 +145,13 @@ export class BlockListItem extends Component {
 		return (
 			<ReadableContentView
 				align={ blockAlignment }
+				onFocus={ this.onFocus }
 				style={ readableContentViewStyle }
 			>
 				<View
+					ref={ ( view ) => {
+						this.blockListItemRef( view );
+					} }
 					style={ this.getContentStyles( readableContentViewStyle ) }
 					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
 					onLayout={ this.onLayout }
@@ -165,6 +186,7 @@ export default compose( [
 				getSettings,
 				getBlockParents,
 				__unstableGetBlockWithoutInnerBlocks,
+				isBlockSelected,
 			} = select( 'core/block-editor' );
 
 			const blockClientIds = getBlockOrder( rootClientId );
@@ -193,6 +215,7 @@ export default compose( [
 			const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 			const { attributes } = block || {};
 			const { align } = attributes || {};
+			const isSelected = isBlockSelected( clientId );
 			const parents = getBlockParents( clientId, true );
 			const hasParents = !! parents.length;
 			const parentBlock = hasParents
@@ -202,6 +225,7 @@ export default compose( [
 				parentBlock?.attributes || {};
 
 			return {
+				isSelected,
 				shouldShowInsertionPointBefore,
 				shouldShowInsertionPointAfter,
 				isReadOnly,

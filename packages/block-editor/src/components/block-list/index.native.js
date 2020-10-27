@@ -73,10 +73,20 @@ export class BlockList extends Component {
 		);
 		this.renderEmptyList = this.renderEmptyList.bind( this );
 		this.getExtraData = this.getExtraData.bind( this );
+		this.setListRef = this.setListRef.bind( this );
+		this.scrollToBlockListItem = this.scrollToBlockListItem.bind( this );
+		this.blockListItemRefs = new Array();
 	}
 
 	addBlockToEndOfPost( newBlock ) {
 		this.props.insertBlock( newBlock, this.props.blockCount );
+	}
+
+	scrollToBlockListItem( clientId ) {
+		const ref = this.blockListItemRefs.filter(
+			( item ) => item.clientId === clientId
+		).blockListItemRef;
+		this.listRef.scrollToItem( ref );
 	}
 
 	onCaretVerticalPositionChange( targetId, caretY, previousCaretY ) {
@@ -90,6 +100,10 @@ export class BlockList extends Component {
 
 	scrollViewInnerRef( ref ) {
 		this.scrollViewRef = ref;
+	}
+
+	setListRef( ref ) {
+		this.listRef = ref;
 	}
 
 	shouldFlatListPreventAutomaticScroll() {
@@ -198,6 +212,7 @@ export class BlockList extends Component {
 					autoScroll={ this.props.autoScroll }
 					innerRef={ ( ref ) => {
 						this.scrollViewInnerRef( parentScrollRef || ref );
+						this.setListRef( ref );
 					} }
 					extraScrollHeight={
 						blockToolbar.height + blockBorder.width
@@ -271,6 +286,12 @@ export class BlockList extends Component {
 				isStackedHorizontally={ isStackedHorizontally }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
+				ref={ ( blockListItemRef ) =>
+					this.blockListItemRefs.push( {
+						clientId,
+						blockListItemRef,
+					} )
+				}
 				parentWidth={ parentWidth }
 				contentResizeMode={ contentResizeMode }
 				contentStyle={ contentStyle }
@@ -278,6 +299,7 @@ export class BlockList extends Component {
 				marginVertical={ marginVertical }
 				marginHorizontal={ marginHorizontal }
 				onDeleteBlock={ onDeleteBlock }
+				scrollTo={ this.scrollToBlockListItem }
 				shouldShowInnerBlockAppender={
 					this.shouldShowInnerBlockAppender
 				}
