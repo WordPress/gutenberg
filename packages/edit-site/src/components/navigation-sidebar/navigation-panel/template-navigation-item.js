@@ -7,6 +7,7 @@ import {
 } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -16,16 +17,16 @@ import { NavigationPanelPreviewFill } from '../index';
 import { getTemplateInfo } from '../../../utils';
 
 export default function TemplateNavigationItem( { item } ) {
-	const defaultTemplateTypes = useSelect( ( select ) => {
+	const defaultTemplateTypesDefinitions = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/edit-site' );
-		return getSettings()?.defaultTemplateTypes;
+		return getSettings()?.defaultTemplateTypesDefinitions;
 	}, [] );
 	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
 	const [ isPreviewVisible, setIsPreviewVisible ] = useState( false );
 
 	const { title, description } = getTemplateInfo(
 		item,
-		defaultTemplateTypes
+		defaultTemplateTypesDefinitions
 	);
 
 	const onActivateItem = () =>
@@ -44,7 +45,10 @@ export default function TemplateNavigationItem( { item } ) {
 				onMouseEnter={ () => setIsPreviewVisible( true ) }
 				onMouseLeave={ () => setIsPreviewVisible( false ) }
 			>
-				{ title }
+				<div className="edit-site-navigation-panel__template-item-title">
+					{ 'draft' === item.status && <em>{ __( '[Draft]' ) }</em> }
+					{ title }
+				</div>
 				{ description && (
 					<div className="edit-site-navigation-panel__template-item-description">
 						{ description }
