@@ -201,6 +201,7 @@ export const ItemBadgeUI = styled.span`
 `;
 
 export const ItemTitleUI = styled( Text )`
-	${ ( props ) => ( props.isRTL ? 'margin-left: auto;' : 'margin-right: auto;' ) }
+	${ ( props ) =>
+		props.isRTL ? 'margin-left: auto;' : 'margin-right: auto;' }
 	font-size: 13px;
 `;
