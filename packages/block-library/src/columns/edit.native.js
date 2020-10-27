@@ -37,6 +37,7 @@ import {
 	getMappedColumnWidths,
 	getRedistributedColumnWidths,
 	toWidthPrecision,
+	getWidths,
 	CSS_UNITS,
 } from './utils';
 import ColumnsPreview from '../column/column-preview';
@@ -157,15 +158,22 @@ function ColumnsEditContainer( {
 		return null;
 	};
 
-	const getColumnWidths = ( withParsing ) => {
-		return innerColumns.map( ( innerColumn ) => {
-			const innerColumnWidth =
-				innerColumn.attributes.width || 100 / columnCount;
+	const onChangeWidth = ( nextWidth, valueUnit, columnId ) => {
+		nextWidth = 0 > parseFloat( nextWidth ) ? '0' : nextWidth;
 
-			return withParsing
-				? parseFloat( innerColumnWidth )
-				: innerColumnWidth;
-		} );
+		updateInnerColumnWidth(
+			`${ nextWidth }${ valueUnit || '%' }`,
+			columnId
+		);
+	};
+
+	const onChangeUnit = ( nextUnit, index, columnId ) => {
+		updateInnerColumnWidth(
+			`${ parseFloat(
+				getWidths( innerColumns )[ index ]
+			) }${ nextUnit }`,
+			columnId
+		);
 	};
 
 	const getColumnsSliders = () => {
@@ -175,33 +183,24 @@ function ColumnsEditContainer( {
 			return (
 				<UnitControl
 					label={ `Column ${ index + 1 }` }
-					key={ `${ column.clientId }-${ getColumnWidths().length }` }
+					key={ `${ column.clientId }-${
+						getWidths( innerColumns ).length
+					}` }
 					min={ 1 }
 					max={ valueUnit === '%' || ! valueUnit ? 100 : undefined }
 					decimalNum={ 1 }
-					value={ getColumnWidths( true )[ index ] }
+					value={ getWidths( innerColumns )[ index ] }
 					onChange={ ( nextWidth ) => {
-						nextWidth =
-							0 > parseFloat( nextWidth ) ? '0' : nextWidth;
-
-						updateInnerColumnWidth(
-							`${ nextWidth }${ valueUnit || '%' }`,
-							column.clientId
-						);
+						onChangeWidth( nextWidth, valueUnit, column.clientId );
 					} }
-					onUnitChange={ ( nextUnit ) => {
-						updateInnerColumnWidth(
-							`${ parseFloat(
-								getColumnWidths( true )[ index ]
-							) }${ nextUnit }`,
-							column.clientId
-						);
-					} }
+					onUnitChange={ ( nextUnit ) =>
+						onChangeUnit( nextUnit, index, column.clientId )
+					}
 					unit={ valueUnit || '%' }
 					units={ CSS_UNITS }
 					preview={
 						<ColumnsPreview
-							columnWidths={ getColumnWidths( false ) }
+							columnWidths={ getWidths( innerColumns, false ) }
 							selectedColumnIndex={ index }
 						/>
 					}

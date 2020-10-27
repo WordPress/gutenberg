@@ -27,7 +27,7 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './editor.scss';
 import ColumnsPreview from './column-preview';
-import { CSS_UNITS } from '../columns/utils';
+import { getWidths, CSS_UNITS } from '../columns/utils';
 
 function ColumnEdit( {
 	attributes,
@@ -38,7 +38,6 @@ function ColumnEdit( {
 	isParentSelected,
 	contentStyle,
 	columns,
-	columnCount,
 	selectedColumnIndex,
 	parentAlignment,
 } ) {
@@ -52,19 +51,29 @@ function ColumnEdit( {
 	};
 
 	useEffect( () => {
+		setWidthUnit( valueUnit );
+	}, [ valueUnit ] );
+
+	useEffect( () => {
 		if ( ! verticalAlignment && parentAlignment ) {
 			updateAlignment( parentAlignment );
 		}
 	}, [] );
 
-	const getColumnWidths = ( withParsing ) => {
-		return columns.map( ( innerColumn ) => {
-			const innerColumnWidth =
-				innerColumn.attributes.width || 100 / columnCount;
+	const onChangeWidth = ( nextWidth ) => {
+		nextWidth = 0 > parseFloat( nextWidth ) ? '0' : nextWidth;
 
-			return withParsing
-				? parseFloat( innerColumnWidth )
-				: innerColumnWidth;
+		setAttributes( {
+			width: `${ nextWidth }${ widthUnit }`,
+		} );
+	};
+
+	const onChangeUnit = ( nextUnit ) => {
+		setWidthUnit( nextUnit );
+		setAttributes( {
+			width: `${ parseFloat(
+				width || getWidths( columns )[ selectedColumnIndex ]
+			) }${ nextUnit }`,
 		} );
 	};
 
@@ -99,31 +108,14 @@ function ColumnEdit( {
 						min={ 1 }
 						max={ widthUnit === '%' ? 100 : undefined }
 						decimalNum={ 1 }
-						value={ getColumnWidths( true )[ selectedColumnIndex ] }
-						onChange={ ( nextWidth ) => {
-							nextWidth =
-								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
-
-							setAttributes( {
-								width: `${ nextWidth }${ widthUnit }`,
-							} );
-						} }
-						onUnitChange={ ( nextUnit ) => {
-							setWidthUnit( nextUnit );
-							setAttributes( {
-								width: `${ parseFloat(
-									width ||
-										getColumnWidths( true )[
-											selectedColumnIndex
-										]
-								) }${ nextUnit }`,
-							} );
-						} }
+						value={ getWidths( columns )[ selectedColumnIndex ] }
+						onChange={ onChangeWidth }
+						onUnitChange={ onChangeUnit }
 						unit={ widthUnit }
 						units={ CSS_UNITS }
 						preview={
 							<ColumnsPreview
-								columnWidths={ getColumnWidths( false ) }
+								columnWidths={ getWidths( columns, false ) }
 								selectedColumnIndex={ selectedColumnIndex }
 							/>
 						}
@@ -193,7 +185,6 @@ export default compose( [
 		const blockOrder = getBlockOrder( parentId );
 
 		const selectedColumnIndex = blockOrder.indexOf( clientId );
-		const columnCount = getBlockCount( parentId );
 		const columns = getBlocks( parentId );
 
 		const parentAlignment = getBlockAttributes( parentId )
@@ -205,7 +196,6 @@ export default compose( [
 			isSelected,
 			selectedColumnIndex,
 			columns,
-			columnCount,
 			parentAlignment,
 		};
 	} ),
