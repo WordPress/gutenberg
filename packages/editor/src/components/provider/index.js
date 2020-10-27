@@ -324,7 +324,7 @@ export default compose( [
 			reusableBlocks: select( 'core' ).getEntityRecords(
 				'postType',
 				'wp_block',
-				{ 'per_page': -1 }
+				{ per_page: -1 }
 			),
 			hasUploadPermissions: defaultTo(
 				canUser( 'create', 'media' ),
