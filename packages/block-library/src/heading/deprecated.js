@@ -7,7 +7,11 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getColorClassName, RichText } from '@wordpress/block-editor';
+import {
+	getColorClassName,
+	RichText,
+	useBlockProps,
+} from '@wordpress/block-editor';
 
 const blockSupports = {
 	className: false,
@@ -48,7 +52,31 @@ const migrateCustomColors = ( attributes ) => {
 	};
 };
 
+const TEXT_ALIGN_OPTIONS = [ 'left', 'right', 'center' ];
+
 const deprecated = [
+	{
+		supports: blockSupports,
+		attributes: { ...blockAttributes },
+		isEligible: ( { align } ) => TEXT_ALIGN_OPTIONS.includes( align ),
+		migrate: ( { align, ...rest } ) => {
+			return { ...rest, textAlign: align };
+		},
+		save( { attributes } ) {
+			const { textAlign, content, level } = attributes;
+			const TagName = 'h' + level;
+
+			const className = classnames( {
+				[ `has-text-align-${ textAlign }` ]: textAlign,
+			} );
+
+			return (
+				<TagName { ...useBlockProps.save( { className } ) }>
+					<RichText.Content value={ content } />
+				</TagName>
+			);
+		},
+	},
 	{
 		supports: blockSupports,
 		attributes: {
