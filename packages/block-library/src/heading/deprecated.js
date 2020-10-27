@@ -56,7 +56,23 @@ const TEXT_ALIGN_OPTIONS = [ 'left', 'right', 'center' ];
 
 const deprecated = [
 	{
-		supports: blockSupports,
+		supports: {
+			className: false,
+			anchor: true,
+			align: [ 'wide', 'full' ],
+			color: { link: true },
+			fontSize: true,
+			lineHeight: true,
+			__experimentalSelector: {
+				'core/heading/h1': 'h1',
+				'core/heading/h2': 'h2',
+				'core/heading/h3': 'h3',
+				'core/heading/h4': 'h4',
+				'core/heading/h5': 'h5',
+				'core/heading/h6': 'h6',
+			},
+			__unstablePasteTextInline: true,
+		},
 		attributes: { ...blockAttributes },
 		isEligible: ( { align } ) => TEXT_ALIGN_OPTIONS.includes( align ),
 		migrate: ( { align, ...rest } ) => {
