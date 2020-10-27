@@ -38,6 +38,10 @@ export function useEditorFeature( featurePath, blockName = GLOBAL_CONTEXT ) {
 		get(
 			settings,
 			`__experimentalFeatures.${ blockName }.${ featurePath }`
-		) ?? get( settings, `__experimentalFeatures.global.${ featurePath }` )
+		) ??
+		get(
+			settings,
+			`__experimentalFeatures.${ GLOBAL_CONTEXT }.${ featurePath }`
+		)
 	);
 }
