@@ -14,6 +14,7 @@ public struct MediaInfo {
 
 /// Definition of capabilities to enable in the Block Editor
 public enum Capabilities: String {
+    case stories
     case mentions
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
