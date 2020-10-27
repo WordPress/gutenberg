@@ -61,6 +61,11 @@ html.interface-interface-skeleton__html-container {
 	// it is added, it should take care of the issue.
 	// See also: https://drafts.csswg.org/css-overscroll/
 	overscroll-behavior-y: none;
+
+	// Footer overlap prevention
+	@include break-medium() {
+		padding-bottom: $button-size-small + $border-width;
+	}
 }
 
 .interface-interface-skeleton__content {
@@ -111,7 +116,6 @@ html.interface-interface-skeleton__html-container {
 	@include break-medium() {
 		border-right: $border-width solid $gray-200;
 		overflow: hidden; // prevent overscroll
-		padding-bottom: 24px; // compensate for breadcrumb footer
 	}
 }
 
