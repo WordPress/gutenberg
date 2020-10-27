@@ -70,6 +70,32 @@ const appearIcon = ( { hasIcon, hasText } ) => {
 	return '';
 };
 
+const pressed = css`
+	color: ${ color( 'white' ) };
+	background: ${ color( 'gray.900' ) };
+
+	&:focus:not( :disabled ) {
+		box-shadow: inset 0 0 0 1px ${ color( 'white' ) },
+			0 0 0 ${ config( 'borderWidthFocus' ) }
+				var( --wp-admin-theme-color );
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
+	}
+
+	&:hover:not( :disabled ) {
+		color: ${ color( 'white' ) };
+		background: ${ color( 'gray.900' ) };
+	}
+
+	&[aria-expanded='true'],
+	&:hover {
+		color: ${ color( 'white' ) };
+	}
+`;
+
+const appearPressed = ( props ) => ( props.isPressed ? pressed : '' );
+
 export const BaseButton = styled.button`
 	display: inline-flex;
 	text-decoration: none;
@@ -132,7 +158,7 @@ export const BaseButton = styled.button`
 
 	${ appearSmall }
 	${ appearIcon }
-	${ ( props ) => ( props.isPressed ? pressed : '' ) }
+	${ appearPressed }
 `;
 
 export const SecondaryAndTertiaryBase = styled( BaseButton )`
@@ -156,24 +182,5 @@ export const SecondaryAndTertiaryBase = styled( BaseButton )`
 		transform: none;
 		opacity: 1;
 		box-shadow: none;
-	}
-`;
-
-const pressed = css`
-	color: ${ color( 'white' ) };
-	background: ${ color( 'gray.900' ) };
-
-	&:focus:not( :disabled ) {
-		box-shadow: inset 0 0 0 1px ${ color( 'white' ) },
-			0 0 0 ${ config( 'borderWidthFocus' ) }
-				var( --wp-admin-theme-color );
-
-		// Windows High Contrast mode will show this outline, but not the box-shadow.
-		outline: 2px solid transparent;
-	}
-
-	&:hover:not( :disabled ) {
-		color: ${ color( 'white' ) };
-		background: ${ color( 'gray.900' ) };
 	}
 `;
