@@ -21,6 +21,10 @@ export default function TemplateNavigationItem( { item } ) {
 	const [ isPreviewVisible, setIsPreviewVisible ] = useState( false );
 	const { title, description } = useTemplateInfo( item );
 
+	if ( ! item ) {
+		return;
+	}
+
 	const onActivateItem = () =>
 		'wp_template' === item.type
 			? setTemplate( item.id )
