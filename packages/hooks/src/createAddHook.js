@@ -3,7 +3,6 @@
  */
 import validateNamespace from './validateNamespace.js';
 import validateHookName from './validateHookName.js';
-import { doAction } from './';
 
 /**
  * @callback AddHook
@@ -91,7 +90,13 @@ function createAddHook( hooks ) {
 		}
 
 		if ( hookName !== 'hookAdded' ) {
-			doAction( 'hookAdded', hookName, namespace, callback, priority );
+			this.doAction(
+				'hookAdded',
+				hookName,
+				namespace,
+				callback,
+				priority
+			);
 		}
 	};
 }

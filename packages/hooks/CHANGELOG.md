@@ -6,6 +6,10 @@
 
 - Include TypeScript type declarations ([#26430](https://github.com/WordPress/gutenberg/pull/26430))
 
+### Bug Fix
+
+- Fix: Use own instance's `doAction` method for built-in `hookAdded` and `hookRemoved` hooks ([#26498](https://github.com/WordPress/gutenberg/pull/26498))
+
 ## 2.6.0 (2019-08-29)
 
 ### New Feature

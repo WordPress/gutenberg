@@ -20,15 +20,17 @@ function createHooks() {
 	actions.__current = [];
 	filters.__current = [];
 
-	return {
-		addAction: createAddHook( actions ),
-		addFilter: createAddHook( filters ),
-		removeAction: createRemoveHook( actions ),
-		removeFilter: createRemoveHook( filters ),
+	const hooks = Object.create( null );
+
+	Object.assign( hooks, {
+		addAction: createAddHook( actions ).bind( hooks ),
+		addFilter: createAddHook( filters ).bind( hooks ),
+		removeAction: createRemoveHook( actions ).bind( hooks ),
+		removeFilter: createRemoveHook( filters ).bind( hooks ),
 		hasAction: createHasHook( actions ),
 		hasFilter: createHasHook( filters ),
-		removeAllActions: createRemoveHook( actions, true ),
-		removeAllFilters: createRemoveHook( filters, true ),
+		removeAllActions: createRemoveHook( actions, true ).bind( hooks ),
+		removeAllFilters: createRemoveHook( filters, true ).bind( hooks ),
 		doAction: createRunHook( actions ),
 		applyFilters: createRunHook( filters, true ),
 		currentAction: createCurrentHook( actions ),
@@ -39,7 +41,9 @@ function createHooks() {
 		didFilter: createDidHook( filters ),
 		actions,
 		filters,
-	};
+	} );
+
+	return hooks;
 }
 
 export default createHooks;

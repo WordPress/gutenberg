@@ -3,7 +3,6 @@
  */
 import validateNamespace from './validateNamespace.js';
 import validateHookName from './validateHookName.js';
-import { doAction } from './';
 
 /**
  * @callback RemoveHook
@@ -74,8 +73,9 @@ function createRemoveHook( hooks, removeAll = false ) {
 				}
 			}
 		}
+
 		if ( hookName !== 'hookRemoved' ) {
-			doAction( 'hookRemoved', hookName, namespace );
+			this.doAction( 'hookRemoved', hookName, namespace );
 		}
 
 		return handlersRemoved;
