@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Platform, Text, View } from 'react-native';
+import { Platform, Text, View, TouchableWithoutFeedback } from 'react-native';
 import Menu, { MenuItem } from 'react-native-material-menu';
 /**
  * Internal dependencies
@@ -64,11 +64,11 @@ function UnitControl( {
 
 	const renderUnitButton = () => {
 		return (
-			<View style={ styles.unitButton }>
-				<Text style={ unitButtonTextStyle } onPress={ onPickerPresent }>
-					{ unit }
-				</Text>
-			</View>
+			<TouchableWithoutFeedback onPress={ onPickerPresent }>
+				<View style={ styles.unitButton }>
+					<Text style={ unitButtonTextStyle }>{ unit }</Text>
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	};
 

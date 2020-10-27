@@ -51,7 +51,7 @@ function ColumnEdit( {
 	};
 
 	useEffect( () => {
-		setWidthUnit( valueUnit );
+		setWidthUnit( valueUnit || '%' );
 	}, [ valueUnit ] );
 
 	useEffect( () => {
@@ -70,10 +70,13 @@ function ColumnEdit( {
 
 	const onChangeUnit = ( nextUnit ) => {
 		setWidthUnit( nextUnit );
+		const tempWidth = parseFloat(
+			width || getWidths( columns )[ selectedColumnIndex ]
+		);
 		setAttributes( {
-			width: `${ parseFloat(
-				width || getWidths( columns )[ selectedColumnIndex ]
-			) }${ nextUnit }`,
+			width: `${
+				nextUnit === '%' ? Math.min( tempWidth, 100 ) : tempWidth
+			}${ nextUnit }`,
 		} );
 	};
 

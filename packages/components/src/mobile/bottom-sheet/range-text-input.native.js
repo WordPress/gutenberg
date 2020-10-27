@@ -59,9 +59,14 @@ class RangeTextInput extends Component {
 		clearTimeout( this.timeoutAnnounceValue );
 	}
 
-	componentDidUpdate( prevProps ) {
+	componentDidUpdate( prevProps, prevState ) {
 		if ( prevProps.value !== this.props.value ) {
 			this.setState( { inputValue: this.props.value } );
+		}
+
+		if ( prevState.hasFocus !== this.state.hasFocus ) {
+			const validValue = this.validateInput( this.state.inputValue );
+			this.setState( { inputValue: validValue } );
 		}
 	}
 

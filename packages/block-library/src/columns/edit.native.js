@@ -168,10 +168,11 @@ function ColumnsEditContainer( {
 	};
 
 	const onChangeUnit = ( nextUnit, index, columnId ) => {
+		const tempWidth = parseFloat( getWidths( innerColumns )[ index ] );
 		updateInnerColumnWidth(
-			`${ parseFloat(
-				getWidths( innerColumns )[ index ]
-			) }${ nextUnit }`,
+			`${
+				nextUnit === '%' ? Math.min( tempWidth, 100 ) : tempWidth
+			}${ nextUnit }`,
 			columnId
 		);
 	};

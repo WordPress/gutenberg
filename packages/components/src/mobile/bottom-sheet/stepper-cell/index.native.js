@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	AccessibilityInfo,
-	View,
-	Platform,
-	PixelRatio,
-	AppState,
-} from 'react-native';
+import { AccessibilityInfo, View, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -23,7 +17,6 @@ import Cell from '../cell';
 import Stepper from './stepper';
 import styles from './style.scss';
 import RangeTextInput from '../range-text-input';
-import { toFixed, removeNonDigit } from '../../utils';
 
 const STEP_DELAY = 200;
 const DEFAULT_STEP = 1;
@@ -43,9 +36,7 @@ class BottomSheetStepperCell extends Component {
 		);
 		this.onPressOut = this.onPressOut.bind( this );
 
-		const initialValue = this.validateInput(
-			props.value || props.defaultValue || props.min
-		);
+		const initialValue = props.value || props.defaultValue || props.min;
 
 		this.state = {
 			inputValue: initialValue,
@@ -53,60 +44,10 @@ class BottomSheetStepperCell extends Component {
 		};
 	}
 
-	componentDidMount() {
-		AppState.addEventListener( 'change', this.handleChangePixelRatio );
-	}
-
 	componentWillUnmount() {
-		AppState.removeEventListener( 'change', this.handleChangePixelRatio );
 		clearTimeout( this.timeout );
 		clearInterval( this.interval );
 		clearTimeout( this.timeoutAnnounceValue );
-	}
-
-	getFontScale() {
-		return PixelRatio.getFontScale() < 1 ? 1 : PixelRatio.getFontScale();
-	}
-
-	handleChangePixelRatio( nextAppState ) {
-		if ( nextAppState === 'active' ) {
-			this.setState( { fontScale: this.getFontScale() } );
-		}
-	}
-
-	validateInput( text ) {
-		const { min, max, decimalNum } = this.props;
-		if ( ! text ) {
-			return min;
-		}
-		if ( typeof text === 'number' ) {
-			if ( max ) {
-				return Math.min( Math.max( text, min ), max );
-			}
-			return Math.max( text, min );
-		}
-		if ( max ) {
-			return Math.min(
-				Math.max( removeNonDigit( text, decimalNum ), min ),
-				max
-			);
-		}
-		return Math.max( removeNonDigit( text, decimalNum ), min );
-	}
-
-	updateValue( value ) {
-		const { onChange } = this.props;
-		const validValue = this.validateInput( value );
-
-		this.announceValue( `${ validValue }` );
-		onChange( validValue );
-	}
-
-	onChangeValue( initialValue ) {
-		const { decimalNum } = this.props;
-		initialValue = toFixed( initialValue, decimalNum );
-		this.setState( { inputValue: initialValue } );
-		this.updateValue( initialValue );
 	}
 
 	onIncrementValue() {
@@ -192,6 +133,7 @@ class BottomSheetStepperCell extends Component {
 			children,
 			shouldDisplayTextInput = false,
 			preview,
+			onChange,
 		} = this.props;
 		const { inputValue } = this.state;
 		const isMinValue = value === min;
@@ -253,7 +195,7 @@ class BottomSheetStepperCell extends Component {
 						{ shouldDisplayTextInput && (
 							<RangeTextInput
 								label={ label }
-								onChange={ this.props.onChange }
+								onChange={ onChange }
 								defaultValue={ `${ inputValue }` }
 								value={ inputValue }
 								min={ min }

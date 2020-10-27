@@ -22,7 +22,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import Cell from './cell';
 import styles from './range-cell.scss';
 import RangeTextInput from './range-text-input';
-import { toFixed, removeNonDigit } from '../utils';
+import { toFixed } from '../utils';
 
 const isIOS = Platform.OS === 'ios';
 
@@ -31,9 +31,8 @@ class BottomSheetRangeCell extends Component {
 		super( props );
 		this.onChangeValue = this.onChangeValue.bind( this );
 		this.onCellPress = this.onCellPress.bind( this );
-		const initialValue = this.validateInput(
-			props.value || props.defaultValue || props.minimumValue
-		);
+		const initialValue =
+			props.value || props.defaultValue || props.minimumValue;
 
 		this.state = {
 			accessible: true,
@@ -42,33 +41,12 @@ class BottomSheetRangeCell extends Component {
 		};
 	}
 
-	validateInput( text ) {
-		const { minimumValue, maximumValue, decimalNum } = this.props;
-		if ( ! text ) {
-			return minimumValue;
-		}
-		if ( typeof text === 'number' ) {
-			return Math.min( Math.max( text, minimumValue ), maximumValue );
-		}
-		return Math.min(
-			Math.max( removeNonDigit( text, decimalNum ), minimumValue ),
-			maximumValue
-		);
-	}
-
-	updateValue( value ) {
-		const { onChange } = this.props;
-		const validValue = this.validateInput( value );
-
-		this.announceCurrentValue( `${ validValue }` );
-		onChange( validValue );
-	}
-
 	onChangeValue( initialValue ) {
-		const { decimalNum } = this.props;
+		const { decimalNum, onChange } = this.props;
 		initialValue = toFixed( initialValue, decimalNum );
 		this.setState( { inputValue: initialValue } );
-		this.updateValue( initialValue );
+		this.announceCurrentValue( `${ initialValue }` );
+		onChange( initialValue );
 	}
 
 	onCellPress() {
@@ -147,7 +125,7 @@ class BottomSheetRangeCell extends Component {
 				<View style={ containerStyle }>
 					{ preview }
 					<Slider
-						value={ this.validateInput( sliderValue ) }
+						value={ sliderValue }
 						defaultValue={ defaultValue }
 						disabled={ disabled }
 						step={ step }
