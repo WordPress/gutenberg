@@ -12,7 +12,7 @@ module.exports = {
 		'/node_modules/',
 		'<rootDir>/wordpress/',
 		'e2e-tests/specs/editor/', // covered in default config
-		'e2e-tests/specs/local/',  // covered in default config
+		'e2e-tests/specs/local/', // covered in default config
 		'e2e-tests/specs/performance/',
 	],
 };
