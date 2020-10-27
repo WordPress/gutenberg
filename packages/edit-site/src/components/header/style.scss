@@ -6,7 +6,7 @@
 	box-sizing: border-box;
 	width: 100%;
 
-	@include break-small() {
+	@include break-medium() {
 		padding-left: 60px;
 		transition: padding-left 20ms linear;
 		transition-delay: 80ms;
@@ -19,11 +19,17 @@
 		display: flex;
 	}
 
-	@include break-small() {
+	@include break-medium() {
 		.edit-site-header_start {
 			// Flex basis prevents the header_start toolbar
 			// from collapsing when shrinking the viewport.
 			flex-basis: calc(#{$header-toolbar-min-width} - #{$header-height});
+		}
+
+		.edit-site-header_end {
+			// Flex basis prevents the header_end toolbar
+			// from collapsing when shrinking the viewport
+			flex-basis: $header-toolbar-min-width;
 		}
 	}
 
@@ -40,9 +46,6 @@
 	}
 
 	.edit-site-header_end {
-		// Flex basis prevents the header_end toolbar
-		// from collapsing when shrinking the viewport
-		flex-basis: $header-toolbar-min-width;
 		justify-content: flex-end;
 	}
 }
@@ -121,7 +124,7 @@ body.is-navigation-sidebar-open {
 
 	.editor-post-saved-state,
 	.components-button.is-tertiary {
-		padding: 0 #{ $grid-unit-15 / 2 };
+		padding: 0 #{$grid-unit-15 / 2};
 	}
 
 	.edit-site-more-menu .components-button,
@@ -129,7 +132,7 @@ body.is-navigation-sidebar-open {
 		margin-right: 0;
 	}
 
-	@include break-small () {
+	@include break-small() {
 		padding-right: $grid-unit-20;
 	}
 }
