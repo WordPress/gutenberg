@@ -31,3 +31,12 @@ function gutenberg_experimental_get( $array, $path, $default = array() ) {
 	}
 	return $array;
 }
+
+/**
+ * Returns whether the current theme is an FSE theme or not.
+ *
+ * @return boolean Whether the current theme is an FSE theme or not.
+ */
+function gutenberg_is_fse_theme() {
+	return is_readable( locate_template( 'block-templates/index.html' ) );
+}

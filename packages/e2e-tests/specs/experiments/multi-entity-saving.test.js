@@ -14,10 +14,7 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import {
-	useExperimentalFeatures,
-	navigationPanel,
-} from '../../experimental-features';
+import { navigationPanel } from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -57,8 +54,6 @@ describe( 'Multi-entity save flow', () => {
 			expect( element ).toBeNull();
 		}
 	};
-
-	useExperimentalFeatures( [ '#gutenberg-full-site-editing' ] );
 
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );

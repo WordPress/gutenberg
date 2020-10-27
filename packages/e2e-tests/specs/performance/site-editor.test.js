@@ -7,7 +7,7 @@ import { writeFileSync } from 'fs';
 /**
  * Internal dependencies
  */
-import { useExperimentalFeatures } from '../../experimental-features';
+import {} from '../../experimental-features';
 
 /**
  * WordPress dependencies
@@ -22,8 +22,6 @@ import { addQueryArgs } from '@wordpress/url';
 jest.setTimeout( 1000000 );
 
 describe( 'Site Editor Performance', () => {
-	useExperimentalFeatures( [ '#gutenberg-full-site-editing' ] );
-
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );

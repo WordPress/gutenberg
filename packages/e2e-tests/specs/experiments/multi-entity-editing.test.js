@@ -19,10 +19,7 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import {
-	useExperimentalFeatures,
-	navigationPanel,
-} from '../../experimental-features';
+import { navigationPanel } from '../../experimental-features';
 
 const visitSiteEditor = async () => {
 	const query = addQueryArgs( '', {
@@ -148,8 +145,6 @@ describe( 'Multi-entity editor states', () => {
 	const templateName = 'Front Page';
 	const templatePartName = 'Test Template Part Name Edit';
 	const nestedTPName = 'Test Nested Template Part Name Edit';
-
-	useExperimentalFeatures( [ '#gutenberg-full-site-editing' ] );
 
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );

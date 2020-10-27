@@ -14,14 +14,9 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import {
-	useExperimentalFeatures,
-	navigationPanel,
-} from '../../experimental-features';
+import { navigationPanel } from '../../experimental-features';
 
 describe( 'Template Part', () => {
-	useExperimentalFeatures( [ '#gutenberg-full-site-editing' ] );
-
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );

@@ -97,7 +97,7 @@ export function initializeEditor(
 	);
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks();
 	}
 
 	// Show a console log warning if the browser is not in Standards rendering mode.

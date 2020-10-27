@@ -192,8 +192,7 @@ export const registerCoreBlocks = (
 /**
  * Function to register experimental core blocks depending on editor settings.
  *
- * @param {Object} settings Editor settings.
- *
+ * @param {boolean} isSiteEditor Whether to enable site editor blocks.
  * @example
  * ```js
  * import { __experimentalRegisterExperimentalCoreBlocks } from '@wordpress/block-library';
@@ -203,15 +202,13 @@ export const registerCoreBlocks = (
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
-		? ( settings ) => {
-				const { __experimentalEnableFullSiteEditing } = settings;
-
+		? ( isSiteEditor ) => {
 				[
 					navigation,
 					navigationLink,
 
 					// Register Full Site Editing Blocks.
-					...( __experimentalEnableFullSiteEditing
+					...( isSiteEditor
 						? [
 								siteLogo,
 								siteTagline,
