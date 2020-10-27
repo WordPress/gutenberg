@@ -52,6 +52,13 @@ const migrateCustomColors = ( attributes ) => {
 	};
 };
 
+const migrateTextAlign = ( attributes ) => {
+	const { align, ...rest } = attributes;
+	return TEXT_ALIGN_OPTIONS.includes( align )
+		? { ...rest, textAlign: align }
+		: attributes;
+};
+
 const TEXT_ALIGN_OPTIONS = [ 'left', 'right', 'center' ];
 
 const deprecated = [
@@ -75,9 +82,7 @@ const deprecated = [
 		},
 		attributes: { ...blockAttributes },
 		isEligible: ( { align } ) => TEXT_ALIGN_OPTIONS.includes( align ),
-		migrate: ( { align, ...rest } ) => {
-			return { ...rest, textAlign: align };
-		},
+		migrate: migrateTextAlign,
 		save( { attributes } ) {
 			const { textAlign, content, level } = attributes;
 			const TagName = 'h' + level;
@@ -104,9 +109,8 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: ( { align, ...rest } ) => {
-			return migrateCustomColors( { ...rest, textAlign: align } );
-		},
+		migrate: ( attributes ) =>
+			migrateCustomColors( migrateTextAlign( attributes ) ),
 		save( { attributes } ) {
 			const {
 				textAlign,
@@ -147,9 +151,8 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: ( { align, ...rest } ) => {
-			return migrateCustomColors( { ...rest, textAlign: align } );
-		},
+		migrate: ( attributes ) =>
+			migrateCustomColors( migrateTextAlign( attributes ) ),
 		save( { attributes } ) {
 			const {
 				textAlign,
@@ -191,9 +194,8 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: ( { align, ...rest } ) => {
-			return migrateCustomColors( { ...rest, textAlign: align } );
-		},
+		migrate: ( attributes ) =>
+			migrateCustomColors( migrateTextAlign( attributes ) ),
 		save( { attributes } ) {
 			const {
 				textAlign,
