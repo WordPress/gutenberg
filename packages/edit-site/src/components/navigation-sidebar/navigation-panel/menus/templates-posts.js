@@ -22,7 +22,7 @@ import {
 	TEMPLATES_POSTS,
 } from '../constants';
 
-export default function TemplatePostsMenu( { templates } ) {
+export default function TemplatesPostsMenu( { templates } ) {
 	const generalTemplates = templates?.find( ( { slug } ) =>
 		TEMPLATES_POSTS.includes( slug )
 	);

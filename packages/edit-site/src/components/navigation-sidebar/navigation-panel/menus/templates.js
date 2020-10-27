@@ -17,7 +17,7 @@ import { __, _x } from '@wordpress/i18n';
  * Internal dependencies
  */
 import TemplatesPagesMenu from './templates-pages';
-import TemplatePostsMenu from './templates-posts';
+import TemplatesPostsMenu from './templates-posts';
 import {
 	MENU_ROOT,
 	MENU_TEMPLATES,
@@ -71,7 +71,7 @@ export default function TemplatesMenu() {
 				/>
 			) ) }
 
-			<TemplatePostsMenu templates={ templates } />
+			<TemplatesPostsMenu templates={ templates } />
 
 			<TemplatesPagesMenu templates={ templates } />
 
