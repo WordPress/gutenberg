@@ -302,7 +302,7 @@ export default function Image( {
 							<>
 								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 									{ __(
-										'Describe the purpose of the image'
+										'Alt text explains the purpose of an image, giving context to visitors with vision impairments.'
 									) }
 								</ExternalLink>
 								{ __(
