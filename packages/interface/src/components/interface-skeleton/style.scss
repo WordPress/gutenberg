@@ -12,7 +12,7 @@ html.interface-interface-skeleton__html-container {
 
 .interface-interface-skeleton {
 	display: flex;
-	flex-direction: row;
+	flex-direction: column;
 	height: auto;
 	max-height: 100%;
 
@@ -37,6 +37,7 @@ html.interface-interface-skeleton__html-container {
 	display: flex;
 	flex-direction: column;
 	flex: 0 1 100%;
+	overflow: hidden;
 }
 
 @include editor-left(".interface-interface-skeleton");
@@ -61,11 +62,6 @@ html.interface-interface-skeleton__html-container {
 	// it is added, it should take care of the issue.
 	// See also: https://drafts.csswg.org/css-overscroll/
 	overscroll-behavior-y: none;
-
-	// Footer overlap prevention
-	@include break-medium() {
-		padding-bottom: $button-size-small + $border-width;
-	}
 }
 
 .interface-interface-skeleton__content {
@@ -141,9 +137,6 @@ html.interface-interface-skeleton__html-container {
 	flex-shrink: 0;
 	border-top: $border-width solid $gray-200;
 	color: $gray-900;
-	position: absolute;
-	bottom: 0;
-	left: 0;
 	width: 100%;
 	background-color: $white;
 	z-index: z-index(".interface-interface-skeleton__footer");
