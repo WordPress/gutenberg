@@ -46,7 +46,7 @@
 		"showdown": "^1.9.1",
 		"simple-html-tokenizer": "^0.5.7",
 		"tinycolor2": "^1.4.1",
-		"uuid": "^7.0.2"
+		"uuid": "^8.3.0"
 	},
 	"publishConfig": {
 		"access": "public"
