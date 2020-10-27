@@ -47,25 +47,28 @@ export const StyledToggleThumb = styled.span`
 `;
 
 export const StyledToggleInput = styled.input`
-	position: absolute;
-	top: 0;
-	${ rtl( { left: 0 } ) };
-	width: 100%;
-	height: 100%;
-	opacity: 0;
-	margin: 0;
-	padding: 0;
-	${ zIndex( 'StyledToggleInput' ) };
+	&,
+	&[type='checkbox'] {
+		position: absolute;
+		top: 0;
+		${ rtl( { left: 0 } ) };
+		width: 100%;
+		height: 100%;
+		opacity: 0;
+		margin: 0;
+		padding: 0;
+		${ zIndex( 'StyledToggleInput' ) };
 
-	// This overrides a border style that is inherited from parent checkbox styles.
-	border: none;
-	&:checked {
-		background: none;
-	}
+		// This overrides a border style that is inherited from parent checkbox styles.
+		border: none;
+		&:checked {
+			background: none;
+		}
 
-	// Don't show custom checkbox checkmark.
-	&::before {
-		content: '';
+		// Don't show custom checkbox checkmark.
+		&::before {
+			content: '';
+		}
 	}
 `;
 
