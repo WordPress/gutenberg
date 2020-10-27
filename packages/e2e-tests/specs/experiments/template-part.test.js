@@ -146,9 +146,7 @@ describe( 'Template Part', () => {
 				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
 			);
 
-			// expect( console ).toHaveErroredWith(
-			// 	'Failed to inject axe-core into frame (about:blank)'
-			// );
+			expect( console ).toHaveErrored();
 		} );
 	} );
 } );
