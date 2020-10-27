@@ -1,5 +1,13 @@
 == Changelog ==
 
+= 9.2.2 =
+
+
+### Bug Fixes
+
+- Fix widget previews in the widget screen https://github.com/WordPress/gutenberg/pull/26356 https://github.com/WordPress/gutenberg/pull/26417
+
+
 = 9.2.1 =
 
 ### Bug Fixes

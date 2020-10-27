@@ -8,7 +8,8 @@ import { find, includes, get, hasIn, compact, uniq } from 'lodash';
  */
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
-import { apiFetch, select, syncSelect } from '@wordpress/data-controls';
+import { controls } from '@wordpress/data';
+import { apiFetch } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -91,7 +92,7 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 		// The resolution cache won't consider query as reusable based on the
 		// fields, so it's tested here, prior to initiating the REST request,
 		// and without causing `getEntityRecords` resolution to occur.
-		const hasRecords = yield syncSelect(
+		const hasRecords = yield controls.select(
 			'core',
 			'hasEntityRecords',
 			kind,
@@ -297,7 +298,7 @@ export function* canUser( action, resource, id ) {
  * @param {number} postId   The id of the parent post.
  */
 export function* getAutosaves( postType, postId ) {
-	const { rest_base: restBase } = yield select(
+	const { rest_base: restBase } = yield controls.resolveSelect(
 		'core',
 		'getPostType',
 		postType
@@ -321,5 +322,5 @@ export function* getAutosaves( postType, postId ) {
  * @param {number} postId   The id of the parent post.
  */
 export function* getAutosave( postType, postId ) {
-	yield select( 'core', 'getAutosaves', postType, postId );
+	yield controls.resolveSelect( 'core', 'getAutosaves', postType, postId );
 }

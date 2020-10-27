@@ -134,11 +134,11 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 	log( 'Cloning or getting the repo.' );
 	const repository = await NodeGit.Clone(
 		source.url,
-		source.path,
+		source.clonePath,
 		gitFetchOptions
 	).catch( () => {
 		log( 'Repo already exists, get it.' );
-		return NodeGit.Repository.open( source.path );
+		return NodeGit.Repository.open( source.clonePath );
 	} );
 
 	log( 'Fetching the specified ref.' );
