@@ -4,6 +4,12 @@
 	margin-bottom: 1.75em;
 	color: #555;
 
+	.is-dark-theme & {
+		border-top: 4px solid $light-gray-placeholder;
+		border-bottom: 4px solid $light-gray-placeholder;
+		color: $light-gray-placeholder;
+	}
+
 	cite,
 	footer,
 	&__citation {
@@ -11,5 +17,9 @@
 		text-transform: uppercase;
 		font-size: 0.8125em;
 		font-style: normal;
+
+		.is-dark-theme & {
+			color: $light-gray-placeholder;
+		}
 	}
 }
