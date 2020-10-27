@@ -66,7 +66,10 @@ export const MenuTitleHeadingUI = styled( Text )`
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: ${ space( 1 ) };
-	padding: ${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) };
+	padding: ${ ( props ) =>
+		props.isRTL
+			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } 0`
+			: `${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) }` };
 `;
 
 export const MenuTitleActionsUI = styled.span`
@@ -130,7 +133,10 @@ export const MenuTitleSearchUI = styled.div`
 
 export const GroupTitleUI = styled( Text )`
 	margin-top: 8px;
-	padding: 4px 0 4px 16px;
+	padding: ${ ( props ) =>
+		props.isRTL
+			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } 0`
+			: `${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) }` };
 	text-transform: uppercase;
 	color: ${ G2.gray[ 100 ] };
 `;
@@ -175,7 +181,8 @@ export const ItemUI = styled.li`
 `;
 
 export const ItemBadgeUI = styled.span`
-	margin-left: 8px;
+	margin-left: ${ ( props ) => ( props.isRTL ? '0' : space( 1 ) ) };
+	margin-right: ${ ( props ) => ( props.isRTL ? space( 1 ) : '0' ) };
 	display: inline-flex;
 	padding: 4px 12px;
 	border-radius: 2px;
@@ -194,7 +201,6 @@ export const ItemBadgeUI = styled.span`
 `;
 
 export const ItemTitleUI = styled( Text )`
-	margin-right: auto;
-	text-align: left;
+	${ ( props ) => ( props.isRTL ? 'margin-left: auto;' : 'margin-right: auto;' ) }
 	font-size: 13px;
 `;
