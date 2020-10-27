@@ -1,5 +1,6 @@
 export {
 	createBlock,
+	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
@@ -24,6 +25,7 @@ export {
 	getBlockMenuDefaultClassName,
 	getSaveElement,
 	getSaveContent,
+	getBlockProps as __unstableGetBlockProps,
 } from './serializer';
 export { isValidBlockContent } from './validation';
 export { getCategories, setCategories, updateCategory } from './categories';
@@ -67,3 +69,4 @@ export {
 } from './templates';
 export { default as children } from './children';
 export { default as node } from './node';
+export { __EXPERIMENTAL_STYLE_PROPERTY } from './constants';

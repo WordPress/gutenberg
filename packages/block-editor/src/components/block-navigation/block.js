@@ -15,7 +15,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { moreVertical } from '@wordpress/icons';
 import { useState, useRef, useEffect } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -45,10 +45,24 @@ export default function BlockNavigationBlock( {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
 	const [ isFocused, setIsFocused ] = useState( false );
+	const { clientId } = block;
+	const isDragging = useSelect(
+		( select ) => {
+			const { isBlockBeingDragged, isAncestorBeingDragged } = select(
+				'core/block-editor'
+			);
+
+			return (
+				isBlockBeingDragged( clientId ) ||
+				isAncestorBeingDragged( clientId )
+			);
+		},
+		[ clientId ]
+	);
+
 	const { selectBlock: selectEditorBlock } = useDispatch(
 		'core/block-editor'
 	);
-	const { clientId } = block;
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
@@ -74,6 +88,7 @@ export default function BlockNavigationBlock( {
 		<BlockNavigationLeaf
 			className={ classnames( {
 				'is-selected': isSelected,
+				'is-dragging': isDragging,
 			} ) }
 			onMouseEnter={ () => setIsHovered( true ) }
 			onMouseLeave={ () => setIsHovered( false ) }
@@ -83,6 +98,8 @@ export default function BlockNavigationBlock( {
 			position={ position }
 			rowCount={ rowCount }
 			path={ path }
+			id={ `block-navigation-block-${ clientId }` }
+			data-block={ clientId }
 		>
 			<TreeGridCell
 				className="block-editor-block-navigation-block__contents-cell"

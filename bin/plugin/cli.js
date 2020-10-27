@@ -5,6 +5,17 @@
  */
 const program = require( 'commander' );
 
+const catchException = ( command ) => {
+	return async ( ...args ) => {
+		try {
+			await command( ...args );
+		} catch ( error ) {
+			console.error( error );
+			process.exitCode = 1;
+		}
+	};
+};
+
 /**
  * Internal dependencies
  */
@@ -19,16 +30,14 @@ const { runPerformanceTests } = require( './commands/performance' );
 program
 	.command( 'release-plugin-rc' )
 	.alias( 'rc' )
-	.description(
-		'Release an RC version of the plugin (supports only rc.1 for now)'
-	)
-	.action( releaseRC );
+	.description( 'Release an RC version of the plugin' )
+	.action( catchException( releaseRC ) );
 
 program
 	.command( 'release-plugin-stable' )
 	.alias( 'stable' )
 	.description( 'Release a stable version of the plugin' )
-	.action( releaseStable );
+	.action( catchException( releaseStable ) );
 
 program
 	.command( 'prepare-packages-stable' )
@@ -36,7 +45,7 @@ program
 	.description(
 		'Prepares the packages to be published to npm as stable (latest dist-tag, production version)'
 	)
-	.action( prepareLatestDistTag );
+	.action( catchException( prepareLatestDistTag ) );
 
 program
 	.command( 'prepare-packages-rc' )
@@ -44,7 +53,7 @@ program
 	.description(
 		'Prepares the packages to be published to npm as RC (next dist-tag, RC version)'
 	)
-	.action( prepareNextDistTag );
+	.action( catchException( prepareNextDistTag ) );
 
 program
 	.command( 'release-plugin-changelog' )
@@ -52,7 +61,7 @@ program
 	.option( '-m, --milestone <milestone>', 'Milestone' )
 	.option( '-t, --token <token>', 'Github token' )
 	.description( 'Generates a changelog from merged Pull Requests' )
-	.action( getReleaseChangelog );
+	.action( catchException( getReleaseChangelog ) );
 
 program
 	.command( 'performance-tests [branches...]' )
@@ -65,6 +74,6 @@ program
 	.description(
 		'Runs performance tests on two separate branches and outputs the result'
 	)
-	.action( runPerformanceTests );
+	.action( catchException( runPerformanceTests ) );
 
 program.parse( process.argv );

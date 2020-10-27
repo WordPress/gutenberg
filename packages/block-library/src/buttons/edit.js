@@ -2,9 +2,8 @@
  * WordPress dependencies
  */
 import {
-	__experimentalAlignmentHookSettingsProvider as AlignmentHookSettingsProvider,
-	InnerBlocks,
-	__experimentalBlock as Block,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -15,23 +14,18 @@ import { name as buttonBlockName } from '../button/';
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
-// Inside buttons block alignment options are not supported.
-const alignmentHooksSetting = {
-	isEmbedButton: true,
-};
-
 function ButtonsEdit() {
-	return (
-		<Block.div>
-			<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
-				<InnerBlocks
-					allowedBlocks={ ALLOWED_BLOCKS }
-					template={ BUTTONS_TEMPLATE }
-					orientation="horizontal"
-				/>
-			</AlignmentHookSettingsProvider>
-		</Block.div>
-	);
+	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+		template: BUTTONS_TEMPLATE,
+		orientation: 'horizontal',
+		__experimentalLayout: {
+			type: 'default',
+			alignments: [],
+		},
+	} );
+	return <div { ...innerBlocksProps } />;
 }
 
 export default ButtonsEdit;

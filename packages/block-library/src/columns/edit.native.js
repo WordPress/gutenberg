@@ -24,12 +24,12 @@ import { withDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState, useMemo } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
+import { columns } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
 import variations from './variations';
 import styles from './editor.scss';
-import { getColumnWidths } from './utils';
 import ColumnsPreview from '../column/column-preview';
 
 /**
@@ -87,11 +87,13 @@ function ColumnsEditContainer( {
 	const { verticalAlignment } = attributes;
 	const { width } = sizes || {};
 
+	const newColumnCount = columnCount || DEFAULT_COLUMNS_NUM;
+
 	useEffect( () => {
-		const newColumnCount = ! columnCount
-			? DEFAULT_COLUMNS_NUM
-			: columnCount;
 		updateColumns( columnCount, newColumnCount );
+	}, [] );
+
+	useEffect( () => {
 		if ( width ) {
 			setColumnsInRow( getColumnsInRow( width, newColumnCount ) );
 		}
@@ -136,17 +138,20 @@ function ColumnsEditContainer( {
 	const renderAppender = () => {
 		if ( isSelected ) {
 			return (
-				<InnerBlocks.ButtonBlockAppender
-					onAddBlock={ onAddNextColumn }
-				/>
+				<View style={ columnCount === 0 && { width } }>
+					<InnerBlocks.ButtonBlockAppender
+						onAddBlock={ onAddNextColumn }
+					/>
+				</View>
 			);
 		}
 		return null;
 	};
 
 	const getColumnsSliders = () => {
-		const columnWidths = Object.values(
-			getColumnWidths( innerColumns, columnCount )
+		const columnWidths = innerColumns.map(
+			( innerColumn ) =>
+				parseFloat( innerColumn.attributes.width ) || 100 / columnCount
 		);
 
 		return innerColumns.map( ( column, index ) => {
@@ -160,7 +165,7 @@ function ColumnsEditContainer( {
 						updateInnerColumnWidth( value, column.clientId )
 					}
 					cellContainerStyle={ styles.cellContainerStyle }
-					toFixed={ 1 }
+					decimalNum={ 1 }
 					rangePreview={
 						<ColumnsPreview
 							columnWidths={ columnWidths }
@@ -180,7 +185,7 @@ function ColumnsEditContainer( {
 				<PanelBody title={ __( 'Columns Settings' ) }>
 					<RangeControl
 						label={ __( 'Number of columns' ) }
-						icon="columns"
+						icon={ columns }
 						value={ columnCount }
 						onChange={ ( value ) =>
 							updateColumns( columnCount, value )
@@ -258,7 +263,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
 
 			updateBlockAttributes( columnId, {
-				width: value,
+				width: `${ value }%`,
 			} );
 		},
 		updateBlockSettings( settings ) {
@@ -326,9 +331,11 @@ const ColumnsEditContainerWrapper = withDispatch(
 				verticalAlignment,
 			} );
 
-			innerBlocks.push( insertedBlock );
-
-			replaceInnerBlocks( clientId, innerBlocks, true );
+			replaceInnerBlocks(
+				clientId,
+				[ ...innerBlocks, insertedBlock ],
+				true
+			);
 			selectBlock( insertedBlock.clientId );
 		},
 		onDeleteBlock: () => {

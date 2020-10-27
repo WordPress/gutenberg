@@ -6,13 +6,14 @@ import { upperFirst, camelCase, map, find, get, startCase } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { controls } from '@wordpress/data';
+import { apiFetch } from '@wordpress/data-controls';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { addEntities } from './actions';
-import { apiFetch, select } from './controls';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
@@ -57,10 +58,18 @@ export const defaultEntities = [
 	{
 		name: 'sidebar',
 		kind: 'root',
-		baseURL: '/__experimental/sidebars',
+		baseURL: '/wp/v2/sidebars',
 		plural: 'sidebars',
 		transientEdits: { blocks: true },
 		label: __( 'Widget areas' ),
+	},
+	{
+		name: 'widget',
+		kind: 'root',
+		baseURL: '/wp/v2/widgets',
+		plural: 'widgets',
+		transientEdits: { blocks: true },
+		label: __( 'Widgets' ),
 	},
 	{
 		label: __( 'User' ),
@@ -188,7 +197,7 @@ export const getMethodName = (
  * @return {Array} Entities
  */
 export function* getKindEntities( kind ) {
-	let entities = yield select( 'getEntitiesByKind', kind );
+	let entities = yield controls.select( 'core', 'getEntitiesByKind', kind );
 	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}

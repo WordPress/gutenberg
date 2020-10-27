@@ -10,14 +10,12 @@ import { I18nManager } from 'react-native';
  */
 import { Component } from '@wordpress/element';
 import { EditorProvider } from '@wordpress/editor';
-import { parse, serialize } from '@wordpress/blocks';
+import { parse, serialize, rawHandler } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
-import {
-	SlotFillProvider,
-	SiteCapabilitiesContext,
-} from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/components';
+import { Preview } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -103,6 +101,13 @@ class Editor extends Component {
 		this.postTitleRef = titleRef;
 	}
 
+	editorMode( initialHtml, editorMode ) {
+		if ( editorMode === 'preview' ) {
+			return <Preview blocks={ rawHandler( { HTML: initialHtml } ) } />;
+		}
+		return <Layout setTitleRef={ this.setTitleRef } />;
+	}
+
 	render() {
 		const {
 			settings,
@@ -116,6 +121,8 @@ class Editor extends Component {
 			postType,
 			colors,
 			gradients,
+			initialHtml,
+			editorMode,
 			...props
 		} = this.props;
 
@@ -138,7 +145,7 @@ class Editor extends Component {
 				// make sure the post content is in sync with gutenberg store
 				// to avoid marking the post as modified when simply loaded
 				// For now, let's assume: serialize( parse( html ) ) !== html
-				raw: serialize( parse( props.initialHtml || '' ) ),
+				raw: serialize( parse( initialHtml || '' ) ),
 			},
 			type: postType,
 			status: 'draft',
@@ -147,19 +154,15 @@ class Editor extends Component {
 
 		return (
 			<SlotFillProvider>
-				<SiteCapabilitiesContext.Provider
-					value={ this.props.capabilities }
+				<EditorProvider
+					settings={ editorSettings }
+					post={ normalizedPost }
+					initialEdits={ initialEdits }
+					useSubRegistry={ false }
+					{ ...props }
 				>
-					<EditorProvider
-						settings={ editorSettings }
-						post={ normalizedPost }
-						initialEdits={ initialEdits }
-						useSubRegistry={ false }
-						{ ...props }
-					>
-						<Layout setTitleRef={ this.setTitleRef } />
-					</EditorProvider>
-				</SiteCapabilitiesContext.Provider>
+					{ this.editorMode( initialHtml, editorMode ) }
+				</EditorProvider>
 			</SlotFillProvider>
 		);
 	}

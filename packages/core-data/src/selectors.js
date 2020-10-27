@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { first, map, find, get, filter, compact, defaultTo } from 'lodash';
+import { set, map, find, get, filter, compact, defaultTo } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,7 @@ import deprecated from '@wordpress/deprecated';
 import { REDUCER_KEY } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
+import { getNormalizedCommaSeparable } from './utils';
 
 /**
  * Returns true if a request is in progress for embed preview data, or false
@@ -44,6 +45,9 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  * @return {Array} Authors list.
  */
 export function getAuthors( state ) {
+	deprecated( "select( 'core' ).getAuthors()", {
+		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
+	} );
 	return getUserQueryResults( state, 'authors' );
 }
 
@@ -111,7 +115,7 @@ export function getEntity( state, kind, name ) {
  * @param {number}  key   Record's key
  * @param {?Object} query Optional query.
  *
- * @return {Object?|null} Record.
+ * @return {Object?} Record.
  */
 export function getEntityRecord( state, kind, name, key, query ) {
 	const queriedState = get( state.entities.data, [
@@ -120,20 +124,31 @@ export function getEntityRecord( state, kind, name, key, query ) {
 		'queriedData',
 	] );
 	if ( ! queriedState ) {
-		return null;
+		return undefined;
 	}
 
 	if ( query === undefined ) {
 		// If expecting a complete item, validate that completeness.
 		if ( ! queriedState.itemIsComplete[ key ] ) {
-			return null;
+			return undefined;
 		}
 
-		return queriedState.items[ key ] || null;
+		return queriedState.items[ key ];
 	}
 
-	query = { ...query, include: [ key ] };
-	return first( getQueriedItems( queriedState, query ) ) || null;
+	const item = queriedState.items[ key ];
+	if ( item && query._fields ) {
+		const filteredItem = {};
+		const fields = getNormalizedCommaSeparable( query._fields );
+		for ( let f = 0; f < fields.length; f++ ) {
+			const field = fields[ f ].split( '.' );
+			const value = get( item, field );
+			set( filteredItem, field, value );
+		}
+		return filteredItem;
+	}
+
+	return item;
 }
 
 /**

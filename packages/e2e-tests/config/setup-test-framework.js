@@ -8,6 +8,7 @@ import { get } from 'lodash';
  */
 import {
 	activatePlugin,
+	activateTheme,
 	clearLocalStorage,
 	enablePageDialogAccept,
 	isOfflineMode,
@@ -201,6 +202,9 @@ async function runAxeTestsForBlockEditor() {
 			'link-name',
 			'listitem',
 			'region',
+			'aria-required-children',
+			'aria-required-parent',
+			'frame-title',
 		],
 		exclude: [
 			// Ignores elements created by metaboxes.
@@ -257,7 +261,7 @@ beforeAll( async () => {
 	enablePageDialogAccept();
 	observeConsoleLogging();
 	await simulateAdverseConditions();
-
+	await activateTheme( 'twentytwentyone' );
 	await trashAllPosts();
 	await trashAllPosts( 'wp_block' );
 	await setupBrowser();

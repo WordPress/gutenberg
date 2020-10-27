@@ -103,9 +103,7 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data
-				.dispatch( 'core/editor' )
-				.__experimentalLocalAutosave()
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
 		// Reload without saving on the server
 		await page.reload();
@@ -124,42 +122,6 @@ describe( 'autosave', () => {
 		expect( await getEditedPostContent() ).toEqual(
 			wrapParagraph( 'before save after save' )
 		);
-	} );
-
-	it( 'should clear sessionStorage upon user logout', async () => {
-		await clickBlockAppender();
-		await page.keyboard.type( 'before save' );
-		await saveDraft();
-
-		// Fake local autosave
-		await page.evaluate(
-			( postId ) =>
-				window.sessionStorage.setItem(
-					`wp-autosave-block-editor-post-${ postId }`,
-					JSON.stringify( {
-						post_title: 'A',
-						content: 'B',
-						excerpt: 'C',
-					} )
-				),
-			await getCurrentPostId()
-		);
-		expect(
-			await page.evaluate( () => window.sessionStorage.length )
-		).toBe( 1 );
-
-		await Promise.all( [
-			page.waitForSelector( '#wp-admin-bar-logout', { visible: true } ),
-			page.hover( '#wp-admin-bar-my-account' ),
-		] );
-		await Promise.all( [
-			page.waitForNavigation(),
-			page.click( '#wp-admin-bar-logout' ),
-		] );
-
-		expect(
-			await page.evaluate( () => window.sessionStorage.length )
-		).toBe( 0 );
 	} );
 
 	it( "shouldn't contaminate other posts", async () => {
@@ -207,9 +169,7 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data
-				.dispatch( 'core/editor' )
-				.__experimentalLocalAutosave()
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
@@ -233,9 +193,7 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data
-				.dispatch( 'core/editor' )
-				.__experimentalLocalAutosave()
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
@@ -260,9 +218,7 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data
-				.dispatch( 'core/editor' )
-				.__experimentalLocalAutosave()
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
@@ -283,9 +239,7 @@ describe( 'autosave', () => {
 
 		// Trigger local autosave
 		await page.evaluate( () =>
-			window.wp.data
-				.dispatch( 'core/editor' )
-				.__experimentalLocalAutosave()
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
@@ -314,9 +268,7 @@ describe( 'autosave', () => {
 
 		// Force conflicting local autosave
 		await page.evaluate( () =>
-			window.wp.data
-				.dispatch( 'core/editor' )
-				.__experimentalLocalAutosave()
+			window.wp.data.dispatch( 'core/editor' ).autosave( { local: true } )
 		);
 		expect(
 			await page.evaluate( () => window.sessionStorage.length )
@@ -348,6 +300,42 @@ describe( 'autosave', () => {
 			( element ) => element.innerText
 		);
 		expect( notice ).toContain( AUTOSAVE_NOTICE_REMOTE );
+	} );
+
+	it( 'should clear sessionStorage upon user logout', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( 'before save' );
+		await saveDraft();
+
+		// Fake local autosave
+		await page.evaluate(
+			( postId ) =>
+				window.sessionStorage.setItem(
+					`wp-autosave-block-editor-post-${ postId }`,
+					JSON.stringify( {
+						post_title: 'A',
+						content: 'B',
+						excerpt: 'C',
+					} )
+				),
+			await getCurrentPostId()
+		);
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 1 );
+
+		await Promise.all( [
+			page.waitForSelector( '#wp-admin-bar-logout', { visible: true } ),
+			page.hover( '#wp-admin-bar-my-account' ),
+		] );
+		await Promise.all( [
+			page.waitForNavigation(),
+			page.click( '#wp-admin-bar-logout' ),
+		] );
+
+		expect(
+			await page.evaluate( () => window.sessionStorage.length )
+		).toBe( 0 );
 	} );
 
 	afterEach( async () => {

@@ -1,0 +1,96 @@
+.edit-site-navigation-panel {
+	height: 100%;
+	position: relative;
+	width: 0;
+	overflow: hidden;
+	background: $gray-900;
+	transition: width 100ms linear;
+	@include reduce-motion("transition");
+}
+
+.edit-site-navigation-panel.is-open {
+	width: $nav-sidebar-width;
+}
+
+.edit-site-navigation-panel__inner {
+	position: relative;
+	width: $nav-sidebar-width;
+	height: 100%;
+}
+
+.edit-site-navigation-panel__site-title-container {
+	height: $header-height;
+	padding-left: $header-height;
+	margin: 0 $grid-unit-20 0 $grid-unit-10;
+	display: flex;
+	align-items: center;
+}
+
+.edit-site-navigation-panel__site-title {
+	font-style: normal;
+	font-weight: 600;
+	font-size: $default-font-size;
+	line-height: $default-line-height;
+	color: $gray-300;
+
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
+}
+
+.edit-site-navigation-panel__back-to-dashboard.components-button.is-tertiary {
+	border-radius: 0;
+	border-bottom: $border-width solid $gray-700;
+	height: auto;
+	margin-left: -6px; // +2px to display the focus box-shadow
+	margin-top: 2px; // +2px to display the focus box-shadow
+	padding: $grid-unit $grid-unit-20;
+	width: calc(100% + #{$grid-unit-15});
+
+	&:focus:not(:disabled) {
+		border-bottom-color: transparent;
+	}
+}
+
+.edit-site-navigation-panel__preview {
+	display: none;
+	border: $border-width solid $gray-400;
+	width: $nav-sidebar-width;
+	padding: $grid-unit-20;
+	background: $white;
+	box-shadow: $shadow-popover;
+	border-radius: $radius-block-ui;
+	position: absolute;
+	top: $header-height + $grid-unit-15 + 1px; // +1px for the header border
+	left: $nav-sidebar-width + $grid-unit-15;
+	color: $gray-900;
+	z-index: z-index(".edit-site-navigation-panel__preview");
+
+	@include break-medium {
+		display: block;
+	}
+}
+
+.edit-site-navigation-panel__template-item {
+	display: block;
+
+	&.is-active .edit-site-navigation-panel__template-item-description {
+		color: $gray-100;
+	}
+
+	button {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		justify-content: center;
+		height: auto;
+		min-height: $button-size;
+		text-align: left;
+	}
+}
+
+.edit-site-navigation-panel__template-item-description {
+	padding-top: $grid-unit-05;
+	color: $gray-700;
+}

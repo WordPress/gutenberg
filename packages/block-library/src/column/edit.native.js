@@ -26,7 +26,6 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './editor.scss';
 import ColumnsPreview from './column-preview';
-import { getColumnWidths } from '../columns/utils';
 
 function ColumnEdit( {
 	attributes,
@@ -54,13 +53,11 @@ function ColumnEdit( {
 	}, [] );
 
 	const onWidthChange = ( width ) => {
-		setAttributes( {
-			width,
-		} );
+		setAttributes( { width: `${ width }%` } );
 	};
 
-	const columnWidths = Object.values(
-		getColumnWidths( columns, columnCount )
+	const columnWidths = columns.map(
+		( column ) => parseFloat( column.attributes.width ) || 100 / columnCount
 	);
 
 	if ( ! isSelected && ! hasChildren ) {
@@ -95,7 +92,7 @@ function ColumnEdit( {
 						max={ 100 }
 						value={ columnWidths[ selectedColumnIndex ] }
 						onChange={ onWidthChange }
-						toFixed={ 1 }
+						decimalNum={ 1 }
 						rangePreview={
 							<ColumnsPreview
 								columnWidths={ columnWidths }

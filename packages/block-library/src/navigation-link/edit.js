@@ -25,17 +25,24 @@ import {
 	ToolbarGroup,
 } from '@wordpress/components';
 import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { Fragment, useState, useEffect, useRef } from '@wordpress/element';
+import {
+	Fragment,
+	useState,
+	useEffect,
+	useRef,
+	createInterpolateElement,
+} from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { link as linkIcon } from '@wordpress/icons';
 
@@ -92,6 +99,27 @@ const useIsDraggingWithin = ( elementRef ) => {
 	return isDraggingWithin;
 };
 
+/**
+ * Given the Link block's type attribute, return the query params to give to
+ * /wp/v2/search.
+ *
+ * @param {string} type Link block's type attribute.
+ * @return {{ type?: string, subtype?: string }} Search query params.
+ */
+function getSuggestionsQuery( type ) {
+	switch ( type ) {
+		case 'post':
+		case 'page':
+			return { type: 'post', subtype: type };
+		case 'category':
+			return { type: 'term', subtype: 'category' };
+		case 'tag':
+			return { type: 'term', subtype: 'post_tag' };
+		default:
+			return {};
+	}
+}
+
 function NavigationLinkEdit( {
 	attributes,
 	hasDescendants,
@@ -107,11 +135,20 @@ function NavigationLinkEdit( {
 	rgbBackgroundColor,
 	selectedBlockHasDescendants,
 	userCanCreatePages = false,
+	userCanCreatePosts = false,
 	insertBlocksAfter,
 	mergeBlocks,
 	onReplace,
 } ) {
-	const { label, opensInNewTab, url, description, rel } = attributes;
+	const {
+		label,
+		type,
+		opensInNewTab,
+		url,
+		description,
+		rel,
+		title,
+	} = attributes;
 	const link = {
 		url,
 		opensInNewTab,
@@ -170,28 +207,84 @@ function NavigationLinkEdit( {
 	 */
 	function selectLabelText() {
 		ref.current.focus();
-		const selection = window.getSelection();
-		const range = document.createRange();
+		const { ownerDocument } = ref.current;
+		const { defaultView } = ownerDocument;
+		const selection = defaultView.getSelection();
+		const range = ownerDocument.createRange();
 		// Get the range of the current ref contents so we can add this range to the selection.
 		range.selectNodeContents( ref.current );
 		selection.removeAllRanges();
 		selection.addRange( range );
 	}
 
-	async function handleCreatePage( pageTitle ) {
-		const type = 'page';
-		const page = await saveEntityRecord( 'postType', type, {
+	let userCanCreate = false;
+	if ( ! type || type === 'page' ) {
+		userCanCreate = userCanCreatePages;
+	} else if ( type === 'post' ) {
+		userCanCreate = userCanCreatePosts;
+	}
+
+	async function handleCreate( pageTitle ) {
+		const postType = type || 'page';
+
+		const page = await saveEntityRecord( 'postType', postType, {
 			title: pageTitle,
 			status: 'publish',
 		} );
 
 		return {
 			id: page.id,
-			type,
+			postType,
 			title: page.title.rendered,
 			url: page.link,
 		};
 	}
+
+	const blockProps = useBlockProps( {
+		ref: listItemRef,
+		className: classnames( {
+			'is-editing':
+				( isSelected || isParentOfSelectedBlock ) &&
+				// Don't show the element as editing while dragging.
+				! isDraggingBlocks,
+			// Don't select the element while dragging.
+			'is-selected': isSelected && ! isDraggingBlocks,
+			'is-dragging-within': isDraggingWithin,
+			'has-link': !! url,
+			'has-child': hasDescendants,
+			'has-text-color': rgbTextColor,
+			[ `has-${ textColor }-color` ]: !! textColor,
+			'has-background': rgbBackgroundColor,
+			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+		} ),
+		style: {
+			color: rgbTextColor,
+			backgroundColor: rgbBackgroundColor,
+		},
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: classnames( 'wp-block-navigation__container', {
+				'is-parent-of-selected-block':
+					isParentOfSelectedBlock &&
+					// Don't select as parent of selected block while dragging.
+					! isDraggingBlocks,
+			} ),
+		},
+		{
+			allowedBlocks: [ 'core/navigation-link' ],
+			renderAppender:
+				( isSelected && hasDescendants ) ||
+				( isImmediateParentOfSelectedBlock &&
+					! selectedBlockHasDescendants ) ||
+				// Show the appender while dragging to allow inserting element between item and the appender.
+				( isDraggingBlocks && hasDescendants )
+					? InnerBlocks.DefaultAppender
+					: false,
+			__experimentalAppenderTagName: 'li',
+		}
+	);
 
 	return (
 		<Fragment>
@@ -232,6 +325,14 @@ function NavigationLinkEdit( {
 						) }
 					/>
 					<TextControl
+						value={ title || '' }
+						onChange={ ( titleValue ) => {
+							setAttributes( { title: titleValue } );
+						} }
+						label={ __( 'Link title' ) }
+						autoComplete="off"
+					/>
+					<TextControl
 						value={ rel || '' }
 						onChange={ ( relValue ) => {
 							setAttributes( { rel: relValue } );
@@ -241,28 +342,7 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<Block.li
-				className={ classnames( {
-					'is-editing':
-						( isSelected || isParentOfSelectedBlock ) &&
-						// Don't show the element as editing while dragging.
-						! isDraggingBlocks,
-					// Don't select the element while dragging.
-					'is-selected': isSelected && ! isDraggingBlocks,
-					'is-dragging-within': isDraggingWithin,
-					'has-link': !! url,
-					'has-child': hasDescendants,
-					'has-text-color': rgbTextColor,
-					[ `has-${ textColor }-color` ]: !! textColor,
-					'has-background': rgbBackgroundColor,
-					[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
-				} ) }
-				style={ {
-					color: rgbTextColor,
-					backgroundColor: rgbBackgroundColor,
-				} }
-				ref={ listItemRef }
-			>
+			<li { ...blockProps }>
 				<div className="wp-block-navigation-link__content">
 					<RichText
 						ref={ ref }
@@ -298,8 +378,29 @@ function NavigationLinkEdit( {
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
 								showInitialSuggestions={ true }
-								withCreateSuggestion={ userCanCreatePages }
-								createSuggestion={ handleCreatePage }
+								withCreateSuggestion={ userCanCreate }
+								createSuggestion={ handleCreate }
+								createSuggestionButtonText={ ( searchTerm ) => {
+									let format;
+									if ( type === 'post' ) {
+										/* translators: %s: search term. */
+										format = __(
+											'Create post: <mark>%s</mark>'
+										);
+									} else {
+										/* translators: %s: search term. */
+										format = __(
+											'Create page: <mark>%s</mark>'
+										);
+									}
+									return createInterpolateElement(
+										sprintf( format, searchTerm ),
+										{ mark: <mark /> }
+									);
+								} }
+								noDirectEntry={ !! type }
+								noURLSuggestion={ !! type }
+								suggestionsQuery={ getSuggestionsQuery( type ) }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
@@ -343,32 +444,8 @@ function NavigationLinkEdit( {
 						<ItemSubmenuIcon />
 					</span>
 				) }
-				<InnerBlocks
-					allowedBlocks={ [ 'core/navigation-link' ] }
-					renderAppender={
-						( isSelected && hasDescendants ) ||
-						( isImmediateParentOfSelectedBlock &&
-							! selectedBlockHasDescendants ) ||
-						// Show the appender while dragging to allow inserting element between item and the appender.
-						( isDraggingBlocks && hasDescendants )
-							? InnerBlocks.DefaultAppender
-							: false
-					}
-					__experimentalTagName="ul"
-					__experimentalAppenderTagName="li"
-					__experimentalPassedProps={ {
-						className: classnames(
-							'wp-block-navigation__container',
-							{
-								'is-parent-of-selected-block':
-									isParentOfSelectedBlock &&
-									// Don't select as parent of selected block while dragging.
-									! isDraggingBlocks,
-							}
-						),
-					} }
-				/>
-			</Block.li>
+				<ul { ...innerBlocksProps } />
+			</li>
 		</Fragment>
 	);
 }
@@ -424,11 +501,6 @@ export default compose( [
 			selectedBlockId,
 		] )?.length;
 
-		const userCanCreatePages = select( 'core' ).canUser(
-			'create',
-			'pages'
-		);
-
 		return {
 			isParentOfSelectedBlock,
 			isImmediateParentOfSelectedBlock,
@@ -437,7 +509,8 @@ export default compose( [
 			showSubmenuIcon,
 			textColor: navigationBlockAttributes.textColor,
 			backgroundColor: navigationBlockAttributes.backgroundColor,
-			userCanCreatePages,
+			userCanCreatePages: select( 'core' ).canUser( 'create', 'pages' ),
+			userCanCreatePosts: select( 'core' ).canUser( 'create', 'posts' ),
 			rgbTextColor: getColorObjectByColorSlug(
 				colors,
 				navigationBlockAttributes.textColor,

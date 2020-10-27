@@ -22,13 +22,14 @@
 @import "./image/editor.scss";
 @import "./latest-comments/editor.scss";
 @import "./latest-posts/editor.scss";
-@import "./legacy-widget/editor.scss";
+@import "./list/editor.scss";
 @import "./media-text/editor.scss";
 @import "./more/editor.scss";
 @import "./navigation/editor.scss";
 @import "./navigation-link/editor.scss";
 @import "./nextpage/editor.scss";
 @import "./paragraph/editor.scss";
+@import "./post-content/editor.scss";
 @import "./post-excerpt/editor.scss";
 @import "./post-author/editor.scss";
 @import "./pullquote/editor.scss";
@@ -48,9 +49,9 @@
 @import "./text-columns/editor.scss";
 @import "./verse/editor.scss";
 @import "./video/editor.scss";
-@import "./widget-area/editor.scss";
 @import "./query-loop/editor.scss";
 @import "./query/editor.scss";
+@import "./post-featured-image/editor.scss";
 
 /**
  * Import styles from internal editor components used by the blocks.

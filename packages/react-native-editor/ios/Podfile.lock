@@ -1,7 +1,7 @@
 PODS:
   - boost-for-react-native (1.63.0)
   - BVLinearGradient (2.5.6):
-    - React
+    - React-Core
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.63.2)
   - FBReactNativeSpec (0.63.2):
@@ -21,8 +21,8 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - Gutenberg (1.34.0):
-    - React (= 0.63.2)
+  - Gutenberg (1.39.1):
+    - React-Core (= 0.63.2)
     - React-CoreModules (= 0.63.2)
     - React-RCTImage (= 0.63.2)
     - RNTAztecView
@@ -193,22 +193,22 @@ PODS:
     - React-jsi (= 0.63.2)
   - React-jsinspector (0.63.2)
   - react-native-blur (0.8.0):
-    - React
+    - React-Core
   - react-native-get-random-values (1.4.0):
-    - React
+    - React-Core
   - react-native-keyboard-aware-scroll-view (0.8.8):
-    - React
+    - React-Core
   - react-native-safe-area (0.5.1):
-    - React
+    - React-Core
   - react-native-safe-area-context (3.1.1):
-    - React
+    - React-Core
   - react-native-slider (3.0.2):
-    - React
+    - React-Core
   - react-native-video (5.0.2):
-    - React
+    - React-Core
     - react-native-video/Video (= 5.0.2)
   - react-native-video/Video (5.0.2):
-    - React
+    - React-Core
   - React-RCTActionSheet (0.63.2):
     - React-Core/RCTActionSheetHeaders (= 0.63.2)
   - React-RCTAnimation (0.63.2):
@@ -269,17 +269,17 @@ PODS:
     - React-Core (= 0.63.2)
     - React-cxxreact (= 0.63.2)
     - React-jsi (= 0.63.2)
-  - RNCMaskedView (0.1.10):
-    - React
+  - RNCMaskedView (0.1.10-wp):
+    - React-Core
   - RNGestureHandler (1.6.0):
-    - React
+    - React-Core
   - RNReanimated (1.9.0):
-    - React
+    - React-Core
   - RNScreens (2.9.0):
-    - React
+    - React-Core
   - RNSVG (9.13.6-gb):
-    - React
-  - RNTAztecView (1.34.0):
+    - React-Core
+  - RNTAztecView (1.39.1):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.3)
   - WordPress-Aztec-iOS (1.19.3)
@@ -421,13 +421,13 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BVLinearGradient: 60a475b2edfe7707deda00278cb8ce9bfe70e669
+  BVLinearGradient: 48f1964a78bddfae412d1aac5f386c2949fe0306
   DoubleConversion: cde416483dac037923206447da6e1454df403714
   FBLazyVector: 3ef4a7f62e7db01092f9d517d2ebc0d0677c4a37
   FBReactNativeSpec: dc7fa9088f0f2a998503a352b0554d69a4391c5a
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
-  Gutenberg: 4f4018d40e466e0b802ac27a633ac2d2ea9a8105
+  Gutenberg: 6b47731293f63fda57f4320e29bd7b840eec54f8
   RCTRequired: f13f25e7b12f925f1f6a6a8c69d929a03c0129fe
   RCTTypeSafety: 44982c5c8e43ff4141eb519a8ddc88059acd1f3a
   React: e1c65dd41cb9db13b99f24608e47dd595f28ca9a
@@ -438,13 +438,13 @@ SPEC CHECKSUMS:
   React-jsi: 54245e1d5f4b690dec614a73a3795964eeef13a8
   React-jsiexecutor: 8ca588cc921e70590820ce72b8789b02c67cce38
   React-jsinspector: b14e62ebe7a66e9231e9581279909f2fc3db6606
-  react-native-blur: cad4d93b364f91e7b7931b3fa935455487e5c33c
-  react-native-get-random-values: 8940331a943a46c165d3ed05802c09c392f8dd46
-  react-native-keyboard-aware-scroll-view: ffa9152671fec9a571197ed2d02e0fcb90206e60
-  react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
-  react-native-safe-area-context: 344b969c45af3d8464d36e8dea264942992ef033
-  react-native-slider: ecb7f25c14f2348d1c1f629a6f2be7611d22a066
-  react-native-video: d01ed7ff1e38fa7dcc6c15c94cf505e661b7bfd0
+  react-native-blur: ef741a08d020010ba65e411be0ab82d1d325e7ad
+  react-native-get-random-values: 03edb8dcc2d3f43e55aa67ea13b61b6723bbf047
+  react-native-keyboard-aware-scroll-view: 6cb84879bf07e4cc1caed18b11fb928e142adac6
+  react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
+  react-native-safe-area-context: 133d77d86b13cf694e014ab03dc2944ee3125d97
+  react-native-slider: 2e42dc91e7ab8b35a9c7f2eb3532729a41d0dbe2
+  react-native-video: e5dd0649534076cd6d09a0db51c617fa668d534a
   React-RCTActionSheet: 910163b6b09685a35c4ebbc52b66d1bfbbe39fc5
   React-RCTAnimation: 9a883bbe1e9d2e158d4fb53765ed64c8dc2200c6
   React-RCTBlob: 39cf0ece1927996c4466510e25d2105f67010e13
@@ -455,15 +455,15 @@ SPEC CHECKSUMS:
   React-RCTText: 1b6773e776e4b33f90468c20fe3b16ca3e224bb8
   React-RCTVibration: 4d2e726957f4087449739b595f107c0d4b6c2d2d
   ReactCommon: a0a1edbebcac5e91338371b72ffc66aa822792ce
-  RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
-  RNGestureHandler: dde546180bf24af0b5f737c8ad04b6f3fa51609a
-  RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
-  RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
-  RNSVG: 68a534a5db06dcbdaebfd5079349191598caef7b
-  RNTAztecView: b2a8bbc94328376f6cd7a238e826f5d49b20ae1a
+  RNCMaskedView: dfeba59697c44d36abec79c062aeb1ea343d610d
+  RNGestureHandler: 7a377d0580c9f07df99e590bbcefd616ee0e2626
+  RNReanimated: f05baf4cd76b6eab2e4d7e2b244424960b968918
+  RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
+  RNSVG: 46c4b680fe18237fa01eb7d7b311d77618fde31f
+  RNTAztecView: ad6d95c0536a06ed2e862979847400a37e32d335
   WordPress-Aztec-iOS: b7ac8b30f746992e85d9668453ac87c2cdcecf4f
   Yoga: 7740b94929bbacbddda59bf115b5317e9a161598
 
-PODFILE CHECKSUM: 8e5d9625f974104e3c151b599ff09c8800f81ec4
+PODFILE CHECKSUM: b79cd81095eb9f18b7c35a0e47ceee097fd589dc
 
 COCOAPODS: 1.8.4

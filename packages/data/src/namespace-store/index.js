@@ -14,6 +14,7 @@ import createReduxRoutineMiddleware from '@wordpress/redux-routine';
 /**
  * Internal dependencies
  */
+import { builtinControls } from '../controls';
 import promise from '../promise-middleware';
 import createResolversCacheMiddleware from '../resolvers-cache-middleware';
 import metadataReducer from './metadata/reducer';
@@ -156,17 +157,20 @@ export default function createNamespace( key, options, registry ) {
  * @return {Object} Newly created redux store.
  */
 function createReduxStore( key, options, registry ) {
+	const controls = {
+		...options.controls,
+		...builtinControls,
+	};
+
+	const normalizedControls = mapValues( controls, ( control ) =>
+		control.isRegistryControl ? control( registry ) : control
+	);
+
 	const middlewares = [
 		createResolversCacheMiddleware( registry, key ),
 		promise,
+		createReduxRoutineMiddleware( normalizedControls ),
 	];
-
-	if ( options.controls ) {
-		const normalizedControls = mapValues( options.controls, ( control ) => {
-			return control.isRegistryControl ? control( registry ) : control;
-		} );
-		middlewares.push( createReduxRoutineMiddleware( normalizedControls ) );
-	}
 
 	const enhancers = [ applyMiddleware( ...middlewares ) ];
 	if (
@@ -252,13 +256,21 @@ function mapActions( actions, store ) {
  * @param {Object} resolvers      Resolvers to register.
  * @param {Object} selectors      The current selectors to be modified.
  * @param {Object} store          The redux store to which the resolvers should be mapped.
- * @param {Object} queue          Resolvers async queue.
  * @param {Object} resolversCache Resolvers Cache.
  */
 function mapResolvers( resolvers, selectors, store, resolversCache ) {
+	// The `resolver` can be either a function that does the resolution, or, in more advanced
+	// cases, an object with a `fullfill` method and other optional methods like `isFulfilled`.
+	// Here we normalize the `resolver` function to an object with `fulfill` method.
 	const mappedResolvers = mapValues( resolvers, ( resolver ) => {
-		const { fulfill: resolverFulfill = resolver } = resolver;
-		return { ...resolver, fulfill: resolverFulfill };
+		if ( resolver.fulfill ) {
+			return resolver;
+		}
+
+		return {
+			...resolver, // copy the enumerable properties of the resolver function
+			fulfill: resolver, // add the fulfill method
+		};
 	} );
 
 	const mapSelector = ( selector, selectorName ) => {

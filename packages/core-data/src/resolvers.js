@@ -8,6 +8,8 @@ import { find, includes, get, hasIn, compact, uniq } from 'lodash';
  */
 import { addQueryArgs } from '@wordpress/url';
 import deprecated from '@wordpress/deprecated';
+import { controls } from '@wordpress/data';
+import { apiFetch } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -23,7 +25,6 @@ import {
 	receiveAutosaves,
 } from './actions';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
-import { apiFetch, select, resolveSelect } from './controls';
 import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
 
 /**
@@ -91,7 +92,8 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 		// The resolution cache won't consider query as reusable based on the
 		// fields, so it's tested here, prior to initiating the REST request,
 		// and without causing `getEntityRecords` resolution to occur.
-		const hasRecords = yield select(
+		const hasRecords = yield controls.select(
+			'core',
 			'hasEntityRecords',
 			kind,
 			name,
@@ -153,8 +155,24 @@ export function* getEntityRecords( kind, name, query = {} ) {
 		...query,
 		context: 'edit',
 	} );
-	const records = yield apiFetch( { path } );
-	yield receiveEntityRecords( kind, name, Object.values( records ), query );
+
+	let records = Object.values( yield apiFetch( { path } ) );
+	// If we request fields but the result doesn't contain the fields,
+	// explicitely set these fields as "undefined"
+	// that way we consider the query "fullfilled".
+	if ( query._fields ) {
+		records = records.map( ( record ) => {
+			query._fields.split( ',' ).forEach( ( field ) => {
+				if ( ! record.hasOwnProperty( field ) ) {
+					record[ field ] = undefined;
+				}
+			} );
+
+			return record;
+		} );
+	}
+
+	yield receiveEntityRecords( kind, name, records, query );
 }
 
 getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
@@ -280,7 +298,8 @@ export function* canUser( action, resource, id ) {
  * @param {number} postId   The id of the parent post.
  */
 export function* getAutosaves( postType, postId ) {
-	const { rest_base: restBase } = yield resolveSelect(
+	const { rest_base: restBase } = yield controls.resolveSelect(
+		'core',
 		'getPostType',
 		postType
 	);
@@ -303,5 +322,5 @@ export function* getAutosaves( postType, postId ) {
  * @param {number} postId   The id of the parent post.
  */
 export function* getAutosave( postType, postId ) {
-	yield resolveSelect( 'getAutosaves', postType, postId );
+	yield controls.resolveSelect( 'core', 'getAutosaves', postType, postId );
 }

@@ -58,7 +58,7 @@ function render_block_core_archives( $attributes ) {
 				break;
 		}
 
-		$label = esc_attr( $label );
+		$label = esc_html( $label );
 
 		$block_content = '<label class="screen-reader-text" for="' . $dropdown_id . '">' . $title . '</label>
 	<select id="' . $dropdown_id . '" name="archive-dropdown" onchange="document.location.href=this.options[this.selectedIndex].value;">
@@ -88,18 +88,19 @@ function render_block_core_archives( $attributes ) {
 
 	$classnames = esc_attr( $class );
 
-	if ( empty( $archives ) ) {
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
 
+	if ( empty( $archives ) ) {
 		return sprintf(
-			'<div class="%1$s">%2$s</div>',
-			$classnames,
+			'<div %1$s>%2$s</div>',
+			$wrapper_attributes,
 			__( 'No archives to show.' )
 		);
 	}
 
 	return sprintf(
-		'<ul class="%1$s">%2$s</ul>',
-		$classnames,
+		'<ul %1$s>%2$s</ul>',
+		$wrapper_attributes,
 		$archives
 	);
 }
