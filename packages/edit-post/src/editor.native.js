@@ -26,6 +26,10 @@ class Editor extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
+		if ( !__DEV__ ) {
+			this.props.hideBlockTypes( [ 'jetpack/story' ] );
+		}
+
 		if ( props.initialHtmlModeEnabled && props.mode === 'visual' ) {
 			// enable html mode if the initial mode the parent wants it but we're not already in it
 			this.props.switchEditorMode( 'text' );
@@ -56,6 +60,11 @@ class Editor extends Component {
 
 		// Omit hidden block types if exists and non-empty.
 		if ( size( hiddenBlockTypes ) > 0 ) {
+			if ( settings.allowedBlockTypes === undefined ) {
+				// if no specific flags for allowedBlockTypes are set, assume `true`
+				// meaning allow all block types
+				settings.allowedBlockTypes = true;
+			}
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
@@ -189,10 +198,13 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { switchEditorMode } = dispatch( 'core/edit-post' );
+		const { switchEditorMode, hideBlockTypes } = dispatch(
+			'core/edit-post'
+		);
 
 		return {
 			switchEditorMode,
+			hideBlockTypes,
 		};
 	} ),
 ] )( Editor );
