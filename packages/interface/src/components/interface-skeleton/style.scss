@@ -114,10 +114,7 @@ html.interface-interface-skeleton__html-container {
 }
 
 .interface-interface-skeleton__left-sidebar {
-	width: 0;
-
 	@include break-medium() {
-		width: auto;
 		border-right: $border-width solid $gray-200;
 	}
 }
