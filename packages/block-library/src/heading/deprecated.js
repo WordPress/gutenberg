@@ -52,6 +52,8 @@ const migrateCustomColors = ( attributes ) => {
 	};
 };
 
+const TEXT_ALIGN_OPTIONS = [ 'left', 'right', 'center' ];
+
 const migrateTextAlign = ( attributes ) => {
 	const { align, ...rest } = attributes;
 	return TEXT_ALIGN_OPTIONS.includes( align )
@@ -59,14 +61,12 @@ const migrateTextAlign = ( attributes ) => {
 		: attributes;
 };
 
-const TEXT_ALIGN_OPTIONS = [ 'left', 'right', 'center' ];
-
 const deprecated = [
 	{
 		supports: {
-			className: false,
-			anchor: true,
 			align: [ 'wide', 'full' ],
+			anchor: true,
+			className: false,
 			color: { link: true },
 			fontSize: true,
 			lineHeight: true,
@@ -80,7 +80,7 @@ const deprecated = [
 			},
 			__unstablePasteTextInline: true,
 		},
-		attributes: { ...blockAttributes },
+		attributes: blockAttributes,
 		isEligible: ( { align } ) => TEXT_ALIGN_OPTIONS.includes( align ),
 		migrate: migrateTextAlign,
 		save( { attributes } ) {
