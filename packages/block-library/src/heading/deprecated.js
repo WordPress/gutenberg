@@ -104,10 +104,12 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: migrateCustomColors,
+		migrate: ( { align, ...rest } ) => {
+			return migrateCustomColors( { ...rest, textAlign: align } );
+		},
 		save( { attributes } ) {
 			const {
-				align,
+				textAlign,
 				content,
 				customTextColor,
 				level,
@@ -120,7 +122,7 @@ const deprecated = [
 			const className = classnames( {
 				[ textClass ]: textClass,
 				'has-text-color': textColor || customTextColor,
-				[ `has-text-align-${ align }` ]: align,
+				[ `has-text-align-${ textAlign }` ]: textAlign,
 			} );
 
 			return (
@@ -145,10 +147,12 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: migrateCustomColors,
+		migrate: ( { align, ...rest } ) => {
+			return migrateCustomColors( { ...rest, textAlign: align } );
+		},
 		save( { attributes } ) {
 			const {
-				align,
+				textAlign,
 				content,
 				customTextColor,
 				level,
@@ -160,7 +164,7 @@ const deprecated = [
 
 			const className = classnames( {
 				[ textClass ]: textClass,
-				[ `has-text-align-${ align }` ]: align,
+				[ `has-text-align-${ textAlign }` ]: textAlign,
 			} );
 
 			return (
@@ -187,10 +191,12 @@ const deprecated = [
 				type: 'string',
 			},
 		},
-		migrate: migrateCustomColors,
+		migrate: ( { align, ...rest } ) => {
+			return migrateCustomColors( { ...rest, textAlign: align } );
+		},
 		save( { attributes } ) {
 			const {
-				align,
+				textAlign,
 				level,
 				content,
 				textColor,
@@ -209,7 +215,7 @@ const deprecated = [
 					className={ className ? className : undefined }
 					tagName={ tagName }
 					style={ {
-						textAlign: align,
+						textAlign,
 						color: textClass ? undefined : customTextColor,
 					} }
 					value={ content }
