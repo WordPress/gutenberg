@@ -1,4 +1,5 @@
 const EMOTION_TAG_SELECTOR = 'style[data-emotion="css"]';
+const INSERTION_ANCHOR_ID = 'resolve-style-rendering-node';
 
 let __didInvokeResolver__ = false;
 /*
@@ -6,6 +7,34 @@ let __didInvokeResolver__ = false;
  * the MutationObserver from adjusting the tag HTML Element again.
  */
 const __resolvedCache__ = new Set();
+
+function getHeadNode() {
+	return document.getElementsByTagName( 'head' )[ 0 ];
+}
+
+/**
+ * Retrieves the "insertion" anchor point for Emotion style tags to
+ * re-order to when resolving styles.
+ *
+ * @return {HTMLStyleElement} The insertion style HTML node.
+ */
+function getInsertionAnchorNode() {
+	let node = document.getElementById( INSERTION_ANCHOR_ID );
+	if ( node ) return node;
+
+	const headNode = getHeadNode();
+
+	/*
+	 * Injecting the insertion HTML element to act as the "anchor" point
+	 * for Emotion tags to insert to.
+	 */
+	node = document.createElement( 'style' );
+	node.id = INSERTION_ANCHOR_ID;
+
+	headNode.prepend( node );
+
+	return node;
+}
 
 /**
  * Checks if an HTML element is an Emotion style tag.
@@ -46,20 +75,10 @@ function reorderEmotionStyleTag( node ) {
 	// Ensure that reordering only happens for unresolved tags.
 	if ( __resolvedCache__.has( node ) ) return;
 
-	const headNode = document.getElementsByTagName( 'head' )[ 0 ];
+	const headNode = getHeadNode();
+	const insertionNode = getInsertionAnchorNode();
 
-	const latestResolvedTag = Array.from( __resolvedCache__ ).pop();
-
-	if ( ! latestResolvedTag ) {
-		// Moving it to the first position within the document.head.
-		headNode.prepend( node );
-	} else {
-		// Otherwise, insert it after the latest resolved tag.
-		latestResolvedTag.parentNode.insertBefore(
-			node,
-			latestResolvedTag.nextSibling
-		);
-	}
+	headNode.insertBefore( node, insertionNode );
 
 	// Marking it as "resolved", so it does not get moved again.
 	__resolvedCache__.add( node );
@@ -74,11 +93,12 @@ function reorderEmotionStyleTag( node ) {
  */
 function createEmotionStyleTagObserver() {
 	if ( ! window ) {
-		/* Escape in case of SSR or other non-browser env */ return;
+		/* Escape in case of SSR or other non-browser env */
+		return;
 	}
 	const { MutationObserver } = window;
 
-	const headNode = document.getElementsByTagName( 'head' )[ 0 ];
+	const headNode = getHeadNode();
 	const config = { attributes: true, childList: true, subtree: true };
 
 	const handleOnMutation = ( mutationsList ) => {
@@ -118,7 +138,8 @@ function createEmotionStyleTagObserver() {
  */
 function resolveEmotionStyleTagRendering() {
 	if ( ! window ) {
-		/* Escape in case of SSR or other non-browser env */ return;
+		/* Escape in case of SSR or other non-browser env */
+		return;
 	}
 	if ( __didInvokeResolver__ ) return;
 
