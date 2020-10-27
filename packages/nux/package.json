@@ -23,6 +23,7 @@
 	"react-native": "src/index",
 	"sideEffects": [
 		"build-style/**",
+		"src/**/*.scss",
 		"{src,build,build-module}/{index.js,store/index.js}"
 	],
 	"dependencies": {
