@@ -22,8 +22,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"sideEffects": [
-		"build-style/**",
-		"!((src|build|build-module)/(components|utils)/**)"
+		"{src,build,build-module}/{index.js,store/index.js}"
 	],
 	"dependencies": {
 		"@wordpress/block-editor": "file:../block-editor",

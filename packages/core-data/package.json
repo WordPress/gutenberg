@@ -23,7 +23,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"sideEffects": [
-		"(src|build|build-module)/index.js"
+		"{src,build,build-module}/index.js"
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
