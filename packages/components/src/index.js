@@ -1,3 +1,9 @@
+/**
+ * Internal dependencies
+ */
+// Resolves Emotion (CSS-in-JS) style rendering.
+import './utils/resolve-style-rendering';
+
 // Primitives
 export {
 	SVG,
