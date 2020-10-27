@@ -9,6 +9,21 @@ import styled from '@emotion/styled';
 import { inputControl } from '../../utils/input';
 
 export const StyledInput = styled.input`
-	width: 100%;
-	${ inputControl }
+	&,
+	&[type='text'],
+	&[type='tel'],
+	&[type='time'],
+	&[type='url'],
+	&[type='week'],
+	&[type='password'],
+	&[type='color'],
+	&[type='date'],
+	&[type='datetime'],
+	&[type='datetime-local'],
+	&[type='email'],
+	&[type='month'],
+	&[type='number'] {
+		width: 100%;
+		${ inputControl }
+	}
 `;
