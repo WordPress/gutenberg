@@ -25,7 +25,7 @@ export default function ConvertToRegularBlocks( { clientId } ) {
 						onClose();
 					} }
 				>
-					{ __( 'Convert to regular blocks' ) }
+					{ __( 'Detach blocks from template part.' ) }
 				</MenuItem>
 			) }
 		</BlockSettingsMenuControls>
