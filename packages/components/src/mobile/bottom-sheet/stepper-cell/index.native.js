@@ -191,7 +191,7 @@ class BottomSheetStepperCell extends Component {
 			separatorType,
 			children,
 			shouldDisplayTextInput = false,
-			rangePreview,
+			preview,
 		} = this.props;
 		const { inputValue } = this.state;
 		const isMinValue = value === min;
@@ -239,6 +239,7 @@ class BottomSheetStepperCell extends Component {
 					labelStyle={ labelStyle }
 					leftAlign={ true }
 					separatorType={ separatorType }
+					preview={ preview }
 				>
 					<Stepper
 						isMaxValue={ isMaxValue }
@@ -263,7 +264,6 @@ class BottomSheetStepperCell extends Component {
 							</RangeTextInput>
 						) }
 					</Stepper>
-					{ rangePreview }
 				</Cell>
 			</View>
 		);

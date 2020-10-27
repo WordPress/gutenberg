@@ -126,7 +126,7 @@ function ColumnEdit( {
 							{ value: 'rem', label: 'rem', default: '' },
 							{ value: 'vw', label: 'vw', default: '' },
 						] }
-						rangePreview={
+						preview={
 							<ColumnsPreview
 								columnWidths={ getColumnWidths( false ) }
 								selectedColumnIndex={ selectedColumnIndex }

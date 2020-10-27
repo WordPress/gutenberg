@@ -204,7 +204,7 @@ function ColumnsEditContainer( {
 						{ value: 'rem', label: 'rem', default: '' },
 						{ value: 'vw', label: 'vw', default: '' },
 					] }
-					rangePreview={
+					preview={
 						<ColumnsPreview
 							columnWidths={ getColumnWidths( false ) }
 							selectedColumnIndex={ index }

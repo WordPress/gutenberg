@@ -99,7 +99,7 @@ class BottomSheetRangeCell extends Component {
 				: '#5198d9',
 			maximumTrackTintColor = isIOS ? '#e9eff3' : '#909090',
 			thumbTintColor = ! isIOS && '#00669b',
-			rangePreview,
+			preview,
 			cellContainerStyle,
 			shouldDisplayTextInput = true,
 			children,
@@ -145,6 +145,7 @@ class BottomSheetRangeCell extends Component {
 				}
 			>
 				<View style={ containerStyle }>
+					{ preview }
 					<Slider
 						value={ this.validateInput( sliderValue ) }
 						defaultValue={ defaultValue }
@@ -183,7 +184,6 @@ class BottomSheetRangeCell extends Component {
 							{ children }
 						</RangeTextInput>
 					) }
-					{ rangePreview }
 				</View>
 			</Cell>
 		);
