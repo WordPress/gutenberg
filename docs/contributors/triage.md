@@ -62,9 +62,9 @@ If you have enough knowledge about the report at hand and feel confident in doin
 
 | Label | Reason |
 | ------------- | ------------- |
-|`Priority OMGWTFBBQ` | Major issues that are causing failures and are reported frequently. Typically, these are issues that are critical because they break important behaviour or functionality. An example might be, “Unable to remove a block after it is added to the editor”.  |
+|`Priority OMGWTFBBQ` | Major issues that are causing failures and are reported frequently. Typically, these are issues that are critical because they break important behavior or functionality. An example might be, “Unable to remove a block after it is added to the editor”.  |
 |`Priority: High` | Fits one of the current focuses and is causing  a major broken experience (including flow, visual bugs and blocks). |
-| `Priority: Low`  | Enhancements that aren’t part of focuses, iche bugs, problems with old browsers.   |
+| `Priority: Low`  | Enhancements that aren’t part of focuses, niche bugs, problems with old browsers.   |
 
 ### Closing issues
 
@@ -88,7 +88,7 @@ Here are some guidelines to follow when doing triage specifically around the tim
 Along with the general triage flows listed previously, there are some specific additions to the flows for more design-centric triage for design minded folks participating in triage. 
 
 * PR testing and reviews: this should be your first stop for daily self triage. 
-* Needs design feedback: check if the issue does need design feedback and, if possible, give it. You can organise this by priority, project boards or by least commented. Once there are enough opinions, please remove this label and decide on next steps (ie adding the Needs Design label). 
+* Needs design feedback: check if the issue does need design feedback and, if possible, give it. You can organize this by priority, project boards or by least commented. Once there are enough opinions, please remove this label and decide on next steps (ie adding the Needs Design label). 
 *  Needs design: Does it really need a design? Does this fit a focus? If it has a design mark as ‘needs design feedback’ to better categorize the issue. 
  
 Reminders: 
