@@ -23,6 +23,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
+		"@babel/runtime": "^7.11.2",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/data": "file:../data"
 	},
