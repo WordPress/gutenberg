@@ -209,7 +209,7 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Front page' );
+			await navigationPanel.clickItemByText( 'Front Page' );
 			await navigationPanel.close();
 
 			// Click the first block so that the template part inserts in the right place.
