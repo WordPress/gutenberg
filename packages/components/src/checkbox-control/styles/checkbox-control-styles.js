@@ -92,32 +92,34 @@ const inputSize = '20px';
 const inputSizeSm = '24px';
 
 export const StyledCheckbox = styled.input`
-	${ checkboxControl }
-	background: ${ color( 'white' ) };
-	color: ${ color( 'gray.900' ) };
-	clear: none;
-	cursor: pointer;
-	display: inline-block;
-	line-height: 0;
-	margin: 0 ${ space( 0.5 ) } 0 0;
-	outline: 0;
-	padding: 0;
-	text-align: center;
-	vertical-align: top;
-	width: ${ inputSizeSm };
-	height: ${ inputSizeSm };
+	&[type='checkbox'] {
+		${ checkboxControl }
+		background: ${ color( 'white' ) };
+		color: ${ color( 'gray.900' ) };
+		clear: none;
+		cursor: pointer;
+		display: inline-block;
+		line-height: 0;
+		margin: 0 ${ space( 0.5 ) } 0 0;
+		outline: 0;
+		padding: 0;
+		text-align: center;
+		vertical-align: top;
+		width: ${ inputSizeSm };
+		height: ${ inputSizeSm };
 
-	${ breakpoint( 'small' ) } {
-		height: ${ inputSize };
-		width: ${ inputSize };
-	}
+		${ breakpoint( 'small' ) } {
+			height: ${ inputSize };
+			width: ${ inputSize };
+		}
 
-	appearance: none;
-	transition: 0.1s border-color ease-in-out;
-	${ reduceMotion( 'transition' ) }
+		appearance: none;
+		transition: 0.1s border-color ease-in-out;
+		${ reduceMotion( 'transition' ) }
 
-	&:checked::before {
-		content: none;
+		&:checked::before {
+			content: none;
+		}
 	}
 `;
 
