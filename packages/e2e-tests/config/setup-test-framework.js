@@ -8,6 +8,7 @@ import { get } from 'lodash';
  */
 import {
 	activatePlugin,
+	activateTheme,
 	clearLocalStorage,
 	enablePageDialogAccept,
 	isOfflineMode,
@@ -260,7 +261,7 @@ beforeAll( async () => {
 	enablePageDialogAccept();
 	observeConsoleLogging();
 	await simulateAdverseConditions();
-
+	await activateTheme( 'twentytwentyone' );
 	await trashAllPosts();
 	await trashAllPosts( 'wp_block' );
 	await setupBrowser();
