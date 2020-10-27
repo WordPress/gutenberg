@@ -1,5 +1,6 @@
 const EMOTION_TAG_SELECTOR = 'style[data-emotion="css"]';
 
+let __didInvokeResolver__ = false;
 /*
  * A cache that tracks tags that have been resolved. This prevents
  * the MutationObserver from adjusting the tag HTML Element again.
@@ -101,6 +102,8 @@ function createEmotionStyleTagObserver() {
  * This can be removed once the styles are stable.
  */
 function resolveEmotionStyleTagRendering() {
+	if ( __didInvokeResolver__ ) return;
+
 	try {
 		/*
 		 * Shifting the order of Emotion rendered style tags to the top of
@@ -118,6 +121,9 @@ function resolveEmotionStyleTagRendering() {
 		 */
 		createEmotionStyleTagObserver();
 	} catch ( err ) {}
+
+	// Ensure this resolver is only invoked once.
+	__didInvokeResolver__ = true;
 }
 
 /*
