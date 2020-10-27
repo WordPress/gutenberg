@@ -88,6 +88,10 @@ class DropZoneProvider extends Component {
 		const { defaultView } = ownerDocument;
 		defaultView.addEventListener( 'dragover', this.onDragOver );
 		defaultView.addEventListener( 'mouseup', this.resetDragState );
+		// Note that `dragend` doesn't fire consistently for file and HTML drag
+		// events where the drag origin is outside the browser window.
+		// In Firefox it may also not fire if the originating node is removed.
+		defaultView.addEventListener( 'dragend', this.resetDragState );
 	}
 
 	componentWillUnmount() {
@@ -95,6 +99,7 @@ class DropZoneProvider extends Component {
 		const { defaultView } = ownerDocument;
 		defaultView.removeEventListener( 'dragover', this.onDragOver );
 		defaultView.removeEventListener( 'mouseup', this.resetDragState );
+		defaultView.removeEventListener( 'dragend', this.resetDragState );
 	}
 
 	addDropZone( dropZone ) {

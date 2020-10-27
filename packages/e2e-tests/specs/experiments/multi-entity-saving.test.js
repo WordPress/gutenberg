@@ -238,9 +238,14 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( 'Front page' );
+			await navigationPanel.close();
 
-			// Insert a new template part placeholder.
-			await insertBlock( 'Template Part' );
+			// Click the first block so that the template part inserts in the right place.
+			const firstBlock = await page.$( '.wp-block' );
+			await firstBlock.click();
+
+			// Insert something to dirty the editor.
+			await insertBlock( 'Paragraph' );
 
 			const enabledButton = await page.waitForSelector(
 				activeSaveSiteSelector
