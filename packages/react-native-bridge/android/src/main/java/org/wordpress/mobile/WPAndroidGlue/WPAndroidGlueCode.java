@@ -147,7 +147,7 @@ public class WPAndroidGlueCode {
         void onCancelUploadForMediaClicked(int mediaId);
         void onCancelUploadForMediaDueToDeletedBlock(int mediaId);
         ArrayList<MediaOption> onGetOtherMediaImageOptions();
-        ArrayList<MediaOption> onGetOtherMediaDocumentOptions();
+        ArrayList<MediaOption> onGetOtherMediaFileOptions();
         void onOtherMediaButtonClicked(String mediaSource, boolean allowMultipleSelection);
     }
 
@@ -354,8 +354,8 @@ public class WPAndroidGlueCode {
                     ArrayList<MediaOption> otherMediaImageOptions = mOnMediaLibraryButtonListener.onGetOtherMediaImageOptions();
                     otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaImageOptions);
                 } else {
-                    ArrayList<MediaOption> otherMediaDocumentOptions = mOnMediaLibraryButtonListener.onGetOtherMediaDocumentOptions();
-                    otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaDocumentOptions);
+                    ArrayList<MediaOption> otherMediaFileOptions = mOnMediaLibraryButtonListener.onGetOtherMediaFileOptions();
+                    otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaFileOptions);
                 }
             }
 
