@@ -5,6 +5,7 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	pressKeyWithModifier,
+	visitAdminPage,
 } from '@wordpress/e2e-test-utils';
 
 // Avoid using three, as it looks too much like two with some fonts.
@@ -12,13 +13,28 @@ const ARABIC_ZERO = '٠';
 const ARABIC_ONE = '١';
 const ARABIC_TWO = '٢';
 
+async function switchLanguage( code ) {
+	await visitAdminPage( 'options-general.php' );
+	await page.waitForSelector( `select#WPLANG option[value="${ code }"]` );
+	await page.select( 'select#WPLANG', code );
+	await page.click( '#submit' );
+	await page.waitForNavigation();
+}
+
 describe( 'RTL', () => {
+	beforeAll( async () => {
+		await switchLanguage( 'ar' );
+	} );
+
 	beforeEach( async () => {
 		await createNewPost();
 	} );
 
+	afterAll( async () => {
+		await switchLanguage( '' );
+	} );
+
 	it( 'should arrow navigate', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		// We need at least three characters as arrow navigation *from* the
@@ -36,7 +52,6 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should split', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -48,7 +63,6 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should merge backward', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -61,7 +75,6 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should merge forward', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -75,7 +88,6 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should arrow navigate between blocks', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		await page.keyboard.type( ARABIC_ZERO );
@@ -101,7 +113,6 @@ describe( 'RTL', () => {
 	} );
 
 	it( 'should navigate inline boundaries', async () => {
-		await page.evaluate( () => ( document.dir = 'rtl' ) );
 		await page.keyboard.press( 'Enter' );
 
 		// Wait for rich text editor to load.
