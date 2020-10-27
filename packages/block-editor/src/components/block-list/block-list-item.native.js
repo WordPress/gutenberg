@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -31,6 +31,9 @@ export class BlockListItem extends Component {
 		super( ...arguments );
 
 		this.onLayout = this.onLayout.bind( this );
+		this.scrollToBlockListItemIfNotInViewPort = this.scrollToBlockListItemIfNotInViewPort.bind(
+			this
+		);
 
 		this.state = {
 			blockWidth: 0,
@@ -43,6 +46,25 @@ export class BlockListItem extends Component {
 
 		if ( blockWidth !== layout.width ) {
 			this.setState( { blockWidth: layout.width } );
+		}
+
+		this.scrollToBlockListItemIfNotInViewPort( layout );
+	}
+
+	scrollToBlockListItemIfNotInViewPort( layout ) {
+		const { x, y, width, height } = layout;
+		const window = Dimensions.get( 'window' );
+
+		const visible =
+			y < window.height &&
+			x < window.width &&
+			y + height < window.height &&
+			x + width < window.width;
+
+		const { scrollTo, clientId } = this.props;
+
+		if ( visible ) {
+			scrollTo( clientId );
 		}
 	}
 
