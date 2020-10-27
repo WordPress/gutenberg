@@ -82,16 +82,13 @@ const deprecated = [
 		},
 		attributes: { ...blockAttributes },
 		isEligible: ( { align } ) => TEXT_ALIGN_OPTIONS.includes( align ),
-		migrate: ( { align, ...rest } ) => {
-			delete rest.className;
-			return { ...rest, textAlign: align };
-		},
+		migrate: migrateTextAlign,
 		save( { attributes } ) {
-			const { textAlign, content, level } = attributes;
+			const { align, content, level } = attributes;
 			const TagName = 'h' + level;
 
 			const className = classnames( {
-				[ `has-text-align-${ textAlign }` ]: textAlign,
+				[ `has-text-align-${ align }` ]: align,
 			} );
 
 			return (
