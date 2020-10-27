@@ -12,7 +12,7 @@ import { speak } from '@wordpress/a11y';
  * @property {string=}   rootClientId        If set, insertion will be into the
  *                                           block with this ID.
  * @property {number=}   insertionIndex      If set, insertion will be into this
- *                                           explciit position.
+ *                                           explicit position.
  * @property {string=}   clientId            If set, insertion will be after the
  *                                           block with this ID.
  * @property {boolean=}  isAppender          Whether the inserter is an appender
