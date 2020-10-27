@@ -300,14 +300,14 @@ export default function Image( {
 						onChange={ updateAlt }
 						help={
 							<>
+							{ __(
+								'Alt Text explains an image\'s purpose, giving context to visitors with vision impairments.'
+							) }
 								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
 									{ __(
-										'Alt Text explains an image\'s purpose, giving context to visitors with vision impairments.'
+										"Learn more."
 									) }
 								</ExternalLink>
-								{ __(
-									'Leave empty if the image is purely decorative.'
-								) }
 							</>
 						}
 					/>
