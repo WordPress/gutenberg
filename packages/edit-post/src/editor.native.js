@@ -26,7 +26,7 @@ class Editor extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
-		if ( !__DEV__ ) {
+		if ( ! __DEV__ ) {
 			this.props.hideBlockTypes( [ 'jetpack/story' ] );
 		}
 
