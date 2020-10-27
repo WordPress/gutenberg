@@ -8,14 +8,13 @@ import ReactNative, {
 	TouchableWithoutFeedback,
 	Platform,
 } from 'react-native';
+import TextInputState from 'react-native/Libraries/Components/TextInput/TextInputState';
 /**
  * WordPress dependencies
  */
 import { ENTER, BACKSPACE } from '@wordpress/keycodes';
 
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
-
-let currentlyFocusedID = null;
 
 class AztecView extends React.Component {
 	constructor() {
@@ -126,7 +125,7 @@ class AztecView extends React.Component {
 
 	_onBlur( event ) {
 		this.selectionEndCaretY = null;
-		this.blur();
+		TextInputState.blurTextInput( ReactNative.findNodeHandle( this ) );
 
 		if ( ! this.props.onBlur ) {
 			return;
@@ -178,43 +177,17 @@ class AztecView extends React.Component {
 	}
 
 	blur() {
-		const textFieldID = ReactNative.findNodeHandle( this );
-		if ( currentlyFocusedID === textFieldID && textFieldID !== null ) {
-			currentlyFocusedID = null;
-			if ( Platform.OS === 'ios' ) {
-				UIManager.blur( textFieldID );
-			} else if ( Platform.OS === 'android' ) {
-				UIManager.dispatchViewManagerCommand(
-					textFieldID,
-					UIManager.getViewManagerConfig( 'AndroidTextInput' )
-						.Commands.blurTextInput,
-					null
-				);
-			}
-		}
+		TextInputState.blurTextInput( ReactNative.findNodeHandle( this ) );
 	}
 
 	focus() {
-		const textFieldID = ReactNative.findNodeHandle( this );
-		if ( currentlyFocusedID !== textFieldID && textFieldID !== null ) {
-			currentlyFocusedID = textFieldID;
-			if ( Platform.OS === 'ios' ) {
-				UIManager.focus( textFieldID );
-			} else if ( Platform.OS === 'android' ) {
-				UIManager.dispatchViewManagerCommand(
-					textFieldID,
-					UIManager.getViewManagerConfig( 'AndroidTextInput' )
-						.Commands.focusTextInput,
-					null
-				);
-			}
-		}
+		TextInputState.focusTextInput( ReactNative.findNodeHandle( this ) );
 	}
 
 	isFocused() {
+		const focusedField = TextInputState.currentlyFocusedField();
 		return (
-			currentlyFocusedID &&
-			currentlyFocusedID === ReactNative.findNodeHandle( this )
+			focusedField && focusedField === ReactNative.findNodeHandle( this )
 		);
 	}
 
