@@ -5,7 +5,6 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	pressKeyWithModifier,
-	visitAdminPage,
 } from '@wordpress/e2e-test-utils';
 
 // Avoid using three, as it looks too much like two with some fonts.
@@ -13,25 +12,12 @@ const ARABIC_ZERO = '٠';
 const ARABIC_ONE = '١';
 const ARABIC_TWO = '٢';
 
-async function switchLanguage( code ) {
-	await visitAdminPage( 'options-general.php' );
-	await page.waitForSelector( `select#WPLANG option[value="${ code }"]` );
-	await page.select( 'select#WPLANG', code );
-	await page.click( '#submit' );
-	await page.waitForNavigation();
-}
-
 describe( 'RTL', () => {
-	beforeAll( async () => {
-		await switchLanguage( 'ar' );
-	} );
-
 	beforeEach( async () => {
 		await createNewPost();
-	} );
-
-	afterAll( async () => {
-		await switchLanguage( '' );
+		await page.evaluate( () => {
+			document.querySelector( '.is-root-container' ).dir = 'rtl';
+		} );
 	} );
 
 	it( 'should arrow navigate', async () => {
