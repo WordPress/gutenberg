@@ -38,7 +38,7 @@ export default function FontAppearanceControl( { value, options, onChange } ) {
 					name:
 						styleSlug === 'normal'
 							? weightName
-							: `${ weightName } - ${ styleName }`,
+							: `${ weightName } ${ styleName }`,
 					// style applies font appearance to the individual select option.
 					style: { fontStyle: styleSlug, fontWeight: weightSlug },
 					// presetStyle are the actual typography styles that should be given to onChange.
