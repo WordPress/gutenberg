@@ -82,8 +82,8 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 	}
 
 	return (
-		<PanelBody title={ __( 'Width Settings' ) }>
-			<ButtonGroup aria-label={ __( 'Button Width' ) }>
+		<PanelBody title={ __( 'Width settings' ) }>
+			<ButtonGroup aria-label={ __( 'Button width' ) }>
 				{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
 					return (
 						<Button
