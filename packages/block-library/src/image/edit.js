@@ -85,9 +85,9 @@ export function ImageEdit( {
 		allowAlign = true,
 		allowResize = true,
 		applyToAllImages = false,
-		galleryLinkDestination,
-		galleryLinkTarget,
-		gallerySizeSlug,
+		parentLinkDestination,
+		parentLinkTarget,
+		parentSizeSlug,
 		isListItem = false,
 	},
 } ) {
@@ -133,12 +133,12 @@ export function ImageEdit( {
 	// Currently, we don't know if attributes were previously set via gallery context.
 	// So effectively this fallback is "one-time only" unless `applyToAllImages` is on.
 	useEffect( () => {
-		if ( applyToAllImages || ( ! linkTarget && galleryLinkTarget ) ) {
+		if ( applyToAllImages || ( ! linkTarget && parentLinkTarget ) ) {
 			setAttributes(
-				getUpdatedLinkTargetSettings( galleryLinkTarget, attributes )
+				getUpdatedLinkTargetSettings( parentLinkTarget, attributes )
 			);
 		}
-	}, [ applyToAllImages, linkTarget, galleryLinkTarget ] );
+	}, [ applyToAllImages, linkTarget, parentLinkTarget ] );
 
 	// Update link destination and href based on Gallery context, if appropriate.
 	// Currently, we don't know if attributes were previously set via gallery context.
@@ -146,10 +146,10 @@ export function ImageEdit( {
 	useEffect( () => {
 		if (
 			applyToAllImages ||
-			( linkDestination === 'none' && galleryLinkDestination )
+			( linkDestination === 'none' && parentLinkDestination )
 		) {
 			let href;
-			switch ( galleryLinkDestination ) {
+			switch ( parentLinkDestination ) {
 				case LINK_DESTINATION_MEDIA:
 					href = imageMedia.source_url;
 					break;
@@ -158,21 +158,21 @@ export function ImageEdit( {
 					break;
 			}
 			setAttributes( {
-				linkDestination: galleryLinkDestination,
+				linkDestination: parentLinkDestination,
 				href,
 			} );
 		}
-	}, [ applyToAllImages, galleryLinkDestination ] );
+	}, [ applyToAllImages, parentLinkDestination ] );
 
 	// Update image size slug based on Gallery context, if appropriate.
 	// Currently, we don't know if the attribtues were previously set via gallery context.
 	// So effectively this fallback is "one-time only" unless `applyToAllImages` is on.
 	useEffect( () => {
-		if ( applyToAllImages || ( ! sizeSlug && gallerySizeSlug ) ) {
+		if ( applyToAllImages || ( ! sizeSlug && parentSizeSlug ) ) {
 			const newUrl = get( imageMedia, [
 				'media_details',
 				'sizes',
-				gallerySizeSlug,
+				parentSizeSlug,
 				'source_url',
 			] );
 
@@ -181,11 +181,11 @@ export function ImageEdit( {
 					url: newUrl,
 					width: undefined,
 					height: undefined,
-					sizeSlug: gallerySizeSlug,
+					sizeSlug: parentSizeSlug,
 				} );
 			}
 		}
-	}, [ applyToAllImages, gallerySizeSlug ] );
+	}, [ applyToAllImages, parentSizeSlug ] );
 
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();

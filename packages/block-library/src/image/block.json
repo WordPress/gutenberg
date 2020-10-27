@@ -6,10 +6,10 @@
 		"allowAlign",
 		"allowResize",
 		"applyToAllImages",
-		"galleryLinkDestination",
-		"galleryLinkTarget",
-		"gallerySizeSlug",
-		"isListItem"
+		"isListItem",
+		"parentLinkDestination",
+		"parentLinkTarget",
+		"parentSizeSlug"
 	],
 	"attributes": {
 		"align": {

@@ -53,11 +53,11 @@
 	"providesContext": {
 		"allowAlign": "allowAlign",
 		"allowResize": "allowResize",
-		"isListItem": "isListItem",
 		"applyToAllImages": "applyToAllImages",
-		"galleryLinkDestination": "linkTo",
-		"galleryLinkTarget": "linkTarget",
-		"gallerySizeSlug": "sizeSlug"
+		"isListItem": "isListItem",
+		"parentLinkDestination": "linkTo",
+		"parentLinkTarget": "linkTarget",
+		"parentSizeSlug": "sizeSlug"
 	},
 	"supports": {
 		"anchor": true,
