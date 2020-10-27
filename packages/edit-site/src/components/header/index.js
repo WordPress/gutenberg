@@ -23,7 +23,7 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
-import { getTemplateInfo } from '../../utils';
+import useTemplateInfo from '../../hooks/use-template-info';
 
 export default function Header( { openEntitiesSavedStates } ) {
 	const {
@@ -33,7 +33,6 @@ export default function Header( { openEntitiesSavedStates } ) {
 		templatePart,
 		templateType,
 		isInserterOpen,
-		defaultTemplateTypesDefinitions,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -42,7 +41,6 @@ export default function Header( { openEntitiesSavedStates } ) {
 			getTemplatePartId,
 			getTemplateType,
 			isInserterOpened,
-			getSettings,
 		} = select( 'core/edit-site' );
 		const { getEntityRecord } = select( 'core' );
 
@@ -60,8 +58,6 @@ export default function Header( { openEntitiesSavedStates } ) {
 			),
 			templateType: getTemplateType(),
 			isInserterOpen: isInserterOpened(),
-			defaultTemplateTypesDefinitions: getSettings()
-				?.defaultTemplateTypesDefinitions,
 		};
 	}, [] );
 
@@ -74,9 +70,8 @@ export default function Header( { openEntitiesSavedStates } ) {
 	const displayBlockToolbar =
 		! isLargeViewport || deviceType !== 'Desktop' || hasFixedToolbar;
 
-	const { title } = getTemplateInfo(
-		templateType === 'wp_template' ? template : templatePart,
-		defaultTemplateTypesDefinitions
+	const { title } = useTemplateInfo(
+		templateType === 'wp_template' ? template : templatePart
 	);
 
 	return (
