@@ -61,7 +61,7 @@
 		"react-use-gesture": "^7.0.15",
 		"reakit": "^1.1.0",
 		"rememo": "^3.0.0",
-		"stylis-plugin-css-variables": "^1.0.2",
+		"stylis-plugin-css-variables": "^1.0.6",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^8.3.0"
 	},
