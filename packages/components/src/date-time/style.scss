@@ -1,8 +1,4 @@
-// We can't reference this package with ~ because of how Lerna handles packages.
-// Also, don't convert styles to RTL because react-dates uses an isRTL flag instead.
-/*rtl:begin:ignore*/
-@import "node_modules/react-dates/lib/css/_datepicker";
-/*rtl:end:ignore*/
+@import "./datepicker";
 
 .components-datetime {
 	padding: 0;
