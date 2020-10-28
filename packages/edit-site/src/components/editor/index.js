@@ -223,8 +223,8 @@ function Editor() {
 													}
 													leftSidebar={
 														isInserterOpen ? (
-															<div className="edit-site-inserter-panel">
-																<div className="edit-site-inserter-panel__header">
+															<div className="edit-site-editor__inserter-panel">
+																<div className="edit-site-editor__inserter-panel-header">
 																	<Button
 																		icon={
 																			close
@@ -236,7 +236,7 @@ function Editor() {
 																		}
 																	/>
 																</div>
-																<div className="edit-site-inserter-panel__content">
+																<div className="edit-site-editor__inserter-panel-content">
 																	<Library
 																		showInserterHelpPanel
 																		onSelect={ () => {
