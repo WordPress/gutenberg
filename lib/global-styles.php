@@ -567,7 +567,16 @@ function gutenberg_experimental_global_styles_flatten_styles_tree( $styles ) {
 	foreach ( $mappings as $key => $path ) {
 		$value = gutenberg_experimental_get( $styles, $path, null );
 		if ( null !== $value ) {
-			$result[ $key ] = $value;
+			$variable_reference_prefix               = 'var:';
+			$variable_path_separator_token_attribute = '|';
+			$variable_path_separator_token_style     = '--';
+			$variable_reference_prefix_length        = strlen( $variable_reference_prefix );
+			if ( strncmp( $value, $variable_reference_prefix, $variable_reference_prefix_length ) === 0 ) {
+				$variable       = str_replace( $variable_path_separator_token_attribute, $variable_path_separator_token_style, substr( $value, $variable_reference_prefix_length ) );
+				$result[ $key ] = "var(--wp--$variable)";
+			} else {
+				$result[ $key ] = $value;
+			}
 		}
 	}
 	return $result;
