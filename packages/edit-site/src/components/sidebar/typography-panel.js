@@ -1,20 +1,26 @@
 /**
  * WordPress dependencies
  */
-import { FontSizePicker, LineHeightControl } from '@wordpress/block-editor';
-import { PanelBody } from '@wordpress/components';
+import { LineHeightControl } from '@wordpress/block-editor';
+import { PanelBody, FontSizePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { fromPx, toPx } from '../editor/utils';
+import { fromPx, toPx, useEditorFeature } from '../editor/utils';
 
 export default ( {
 	context: { supports, name },
 	getStyleProperty,
 	setStyleProperty,
 } ) => {
+	const fontSizes = useEditorFeature( 'typography.fontSizes', name );
+	const disableCustomFontSizes = ! useEditorFeature(
+		'typography.customFontSize',
+		name
+	);
+
 	if (
 		! supports.includes( 'fontSize' ) &&
 		! supports.includes( 'lineHeight' )
@@ -30,6 +36,8 @@ export default ( {
 					onChange={ ( value ) =>
 						setStyleProperty( name, 'fontSize', toPx( value ) )
 					}
+					fontSizes={ fontSizes }
+					disableCustomFontSizes={ disableCustomFontSizes }
 				/>
 			) }
 			{ supports.includes( 'lineHeight' ) && (

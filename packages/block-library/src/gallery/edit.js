@@ -29,7 +29,7 @@ import { MediaPlaceholder, InspectorControls } from '@wordpress/block-editor';
 import { Platform, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withSelect } from '@wordpress/data';
+import { useDispatch, withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 
 /**
@@ -85,6 +85,9 @@ function GalleryEdit( props ) {
 	} = attributes;
 	const [ selectedImage, setSelectedImage ] = useState();
 	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		'core/block-editor'
+	);
 
 	function setAttributes( newAttrs ) {
 		if ( newAttrs.ids ) {
@@ -305,6 +308,7 @@ function GalleryEdit( props ) {
 		// linkTo attribute must be saved so blocks don't break when changing
 		// image_default_link_type in options.php
 		if ( ! linkTo ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( {
 				linkTo:
 					window?.wp?.media?.view?.settings?.defaultProps?.link ||

@@ -8,7 +8,7 @@ import { noop, uniqueId } from 'lodash';
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-import { Icon, chevronRight } from '@wordpress/icons';
+import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -17,6 +17,7 @@ import Button from '../../button';
 import { useNavigationContext } from '../context';
 import { useNavigationTreeItem } from './use-navigation-tree-item';
 import { ItemBadgeUI, ItemTitleUI, ItemUI } from '../styles/navigation-styles';
+import { useRTL } from '../../utils/rtl';
 
 export default function NavigationItem( props ) {
 	const {
@@ -39,6 +40,7 @@ export default function NavigationItem( props ) {
 		navigationTree,
 		setActiveMenu,
 	} = useNavigationContext();
+	const isRTL = useRTL();
 
 	if ( ! navigationTree.getItem( itemId )?._isVisible ) {
 		return null;
@@ -55,6 +57,7 @@ export default function NavigationItem( props ) {
 
 		onClick( event );
 	};
+	const icon = isRTL ? chevronLeft : chevronRight;
 
 	return (
 		<ItemUI className={ classes }>
@@ -64,6 +67,7 @@ export default function NavigationItem( props ) {
 						<ItemTitleUI
 							className="components-navigation__item-title"
 							variant="body.small"
+							isRTL={ isRTL }
 							as="span"
 						>
 							{ title }
@@ -71,12 +75,15 @@ export default function NavigationItem( props ) {
 					) }
 
 					{ badge && (
-						<ItemBadgeUI className="components-navigation__item-badge">
+						<ItemBadgeUI
+							className="components-navigation__item-badge"
+							isRTL={ isRTL }
+						>
 							{ badge }
 						</ItemBadgeUI>
 					) }
 
-					{ navigateToMenu && <Icon icon={ chevronRight } /> }
+					{ navigateToMenu && <Icon icon={ icon } /> }
 				</Button>
 			) }
 		</ItemUI>
