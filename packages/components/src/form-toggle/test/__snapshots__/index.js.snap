@@ -52,7 +52,8 @@ exports[`FormToggle basic rendering should render a span element with an uncheck
   opacity: 0.3;
 }
 
-.emotion-0 {
+.emotion-0,
+.emotion-0[type='checkbox'] {
   position: absolute;
   top: 0;
   left: 0;
@@ -65,11 +66,13 @@ exports[`FormToggle basic rendering should render a span element with an uncheck
   border: none;
 }
 
-.emotion-0:checked {
+.emotion-0:checked,
+.emotion-0[type='checkbox']:checked {
   background: none;
 }
 
-.emotion-0::before {
+.emotion-0::before,
+.emotion-0[type='checkbox']::before {
   content: '';
 }
 
