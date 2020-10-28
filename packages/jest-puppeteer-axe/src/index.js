@@ -62,23 +62,24 @@ function formatViolations( violations ) {
  *
  * @see https://github.com/dequelabs/axe-core-npm/tree/develop/packages/puppeteer
  *
- * @param {Page}          page                 Puppeteer's page instance.
- * @param {?Object}       params               Optional params that allow better control over Axe API.
- * @param {?string|Array} params.include       CSS selector(s) to add to the list of elements
- *                                             to include in analysis.
- * @param {?string|Array} params.exclude       CSS selector(s) to add to the list of elements
- *                                             to exclude from analysis.
- * @param {?Array}        params.disabledRules The list of Axe rules to skip from verification.
- * @param {?RunOptions}   params.options       A flexible way to configure how Axe run operates,
- *                                             see https://github.com/dequelabs/axe-core/blob/master/doc/API.md#options-parameter.
- * @param {?Spec}         params.config        Axe configuration object,
- *                                             see https://github.com/dequelabs/axe-core/blob/master/doc/API.md#api-name-axeconfigure.
+ * @param {Page}          page                  Puppeteer's page instance.
+ * @param {?Object}       params                Optional params that allow better control over Axe API.
+ * @param {?string|Array} params.include        CSS selector(s) to add to the list of elements
+ *                                              to include in analysis.
+ * @param {?string|Array} params.exclude        CSS selector(s) to add to the list of elements
+ *                                              to exclude from analysis.
+ * @param {?Array}        params.disabledRules  The list of Axe rules to skip from verification.
+ * @param {?Array}        params.disabledFrames An array of selectors for iframes that are disabled in axe tests
+ * @param {?RunOptions}   params.options        A flexible way to configure how Axe run operates,
+ *                                              see https://github.com/dequelabs/axe-core/blob/master/doc/API.md#options-parameter.
+ * @param {?Spec}         params.config         Axe configuration object,
+ *                                              see https://github.com/dequelabs/axe-core/blob/master/doc/API.md#api-name-axeconfigure.
  *
  * @return {Object} A matcher object with two keys `pass` and `message`.
  */
 async function toPassAxeTests(
 	page,
-	{ include, exclude, disabledRules, options, config } = {}
+	{ include, exclude, disabledRules, disabledFrames, options, config } = {}
 ) {
 	const axe = new AxePuppeteer( page );
 
@@ -96,6 +97,10 @@ async function toPassAxeTests(
 
 	if ( disabledRules ) {
 		axe.disableRules( disabledRules );
+	}
+
+	if ( disabledFrames ) {
+		disabledFrames.forEach( axe.disableFrame );
 	}
 
 	if ( config ) {

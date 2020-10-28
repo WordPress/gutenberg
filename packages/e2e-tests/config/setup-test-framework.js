@@ -206,6 +206,10 @@ async function runAxeTestsForBlockEditor() {
 			'aria-required-parent',
 			'frame-title',
 		],
+		disabledFrames: [
+			// Ignore block previews.
+			'.block-editor-block-preview__container iframe',
+		],
 		exclude: [
 			// Ignores elements created by metaboxes.
 			'.edit-post-layout__metaboxes',
