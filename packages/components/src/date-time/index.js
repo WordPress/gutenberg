@@ -1,11 +1,4 @@
 /**
- * External dependencies
- */
-// Needed to initialise the default datepicker styles.
-// See: https://github.com/airbnb/react-dates#initialize
-import 'react-dates/initialize';
-
-/**
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
@@ -42,9 +35,10 @@ export class DateTimePicker extends Component {
 			currentDate,
 			is12Hour,
 			isInvalidDate,
-			onMonthPreviewed,
+			onMonthChange,
 			onChange,
 			events,
+			locale,
 		} = this.props;
 
 		return (
@@ -60,8 +54,9 @@ export class DateTimePicker extends Component {
 							currentDate={ currentDate }
 							onChange={ onChange }
 							isInvalidDate={ isInvalidDate }
-							onMonthPreviewed={ onMonthPreviewed }
+							onMonthChange={ onMonthChange }
 							events={ events }
+							locale={ locale }
 						/>
 					</>
 				) }
