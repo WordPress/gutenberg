@@ -216,6 +216,8 @@ async function runAxeTestsForBlockEditor() {
 			// https://github.com/w3c/aria/issues/558
 			'[role="treegrid"] [aria-posinset]',
 			'[role="treegrid"] [aria-setsize]',
+			// Ignore block previews.
+			'.block-editor-block-preview__container',
 		],
 	} );
 }
