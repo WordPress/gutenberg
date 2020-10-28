@@ -97,7 +97,9 @@ function gutenberg_display_experiment_section() {
  * @return array Filtered editor settings.
  */
 function gutenberg_experiments_editor_settings( $settings ) {
-	$experiments_settings = array();
+	$experiments_settings = array(
+		'__unstableEnableFullSiteEditingBlocks' => gutenberg_is_fse_theme(),
+	);
 	$gradient_presets     = current( (array) get_theme_support( 'editor-gradient-presets' ) );
 	if ( false !== $gradient_presets ) {
 		$experiments_settings['gradients'] = $gradient_presets;
