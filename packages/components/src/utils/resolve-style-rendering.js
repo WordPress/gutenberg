@@ -6,7 +6,7 @@ let __didInvokeResolver__ = false;
  * A cache that tracks tags that have been resolved. This prevents
  * the MutationObserver from adjusting the tag HTML Element again.
  */
-const __resolvedCache__ = new Set();
+const __resolvedCache__ = new WeakSet();
 
 function getHeadNode() {
 	return document.getElementsByTagName( 'head' )[ 0 ];
