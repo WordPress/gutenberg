@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { throttle, isFunction } from 'lodash';
+import { debounce, isFunction } from 'lodash';
 import classnames from 'classnames';
 import scrollIntoView from 'dom-scroll-into-view';
 
@@ -40,7 +40,7 @@ class URLInput extends Component {
 		this.bindSuggestionNode = this.bindSuggestionNode.bind( this );
 		this.autocompleteRef = props.autocompleteRef || createRef();
 		this.inputRef = createRef();
-		this.updateSuggestions = throttle(
+		this.updateSuggestions = debounce(
 			this.updateSuggestions.bind( this ),
 			200
 		);
