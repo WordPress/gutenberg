@@ -5,11 +5,6 @@ import { basename, join } from 'path';
 import { writeFileSync } from 'fs';
 
 /**
- * Internal dependencies
- */
-import {} from '../../experimental-features';
-
-/**
  * WordPress dependencies
  */
 import {
