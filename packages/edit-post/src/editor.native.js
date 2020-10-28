@@ -26,10 +26,6 @@ class Editor extends Component {
 	constructor( props ) {
 		super( ...arguments );
 
-		if ( ! __DEV__ && this.props.capabilities.stories !== true ) {
-			this.props.hideBlockTypes( [ 'jetpack/story' ] );
-		}
-
 		if ( props.initialHtmlModeEnabled && props.mode === 'visual' ) {
 			// enable html mode if the initial mode the parent wants it but we're not already in it
 			this.props.switchEditorMode( 'text' );
@@ -198,13 +194,9 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { switchEditorMode, hideBlockTypes } = dispatch(
-			'core/edit-post'
-		);
-
+		const { switchEditorMode } = dispatch( 'core/edit-post' );
 		return {
 			switchEditorMode,
-			hideBlockTypes,
 		};
 	} ),
 ] )( Editor );
