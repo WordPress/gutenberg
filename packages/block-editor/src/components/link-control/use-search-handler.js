@@ -45,16 +45,18 @@ export const handleDirectEntry = ( val ) => {
 	] );
 };
 
-export const handleEntitySearch = async (
+const handleEntitySearch = async (
 	val,
-	args,
+	suggestionsQuery,
 	fetchSearchSuggestions,
-	directEntryHandler
+	directEntryHandler,
+	withCreateSuggestion,
+	withURLSuggestion
 ) => {
+	const { isInitialSuggestions } = suggestionsQuery;
+
 	let results = await Promise.all( [
-		fetchSearchSuggestions( val, {
-			...( args.isInitialSuggestions ? { perPage: 3 } : {} ),
-		} ),
+		fetchSearchSuggestions( val, suggestionsQuery ),
 		directEntryHandler( val ),
 	] );
 
@@ -63,13 +65,14 @@ export const handleEntitySearch = async (
 	// If it's potentially a URL search then concat on a URL search suggestion
 	// just for good measure. That way once the actual results run out we always
 	// have a URL option to fallback on.
-	results =
-		couldBeURL && ! args.isInitialSuggestions
-			? results[ 0 ].concat( results[ 1 ] )
-			: results[ 0 ];
+	if ( couldBeURL && withURLSuggestion && ! isInitialSuggestions ) {
+		results = results[ 0 ].concat( results[ 1 ] );
+	} else {
+		results = results[ 0 ];
+	}
 
 	// If displaying initial suggestions just return plain results.
-	if ( args.isInitialSuggestions ) {
+	if ( isInitialSuggestions ) {
 		return results;
 	}
 
@@ -87,7 +90,7 @@ export const handleEntitySearch = async (
 	// to the text value of the `<input>`. This is because `title` is used
 	// when creating the suggestion. Similarly `url` is used when using keyboard to select
 	// the suggestion (the <form> `onSubmit` handler falls-back to `url`).
-	return isURLLike( val )
+	return isURLLike( val ) || ! withCreateSuggestion
 		? results
 		: results.concat( {
 				// the `id` prop is intentionally ommitted here because it
@@ -99,7 +102,12 @@ export const handleEntitySearch = async (
 		  } );
 };
 
-export default function useSearchHandler( allowDirectEntry ) {
+export default function useSearchHandler(
+	suggestionsQuery,
+	allowDirectEntry,
+	withCreateSuggestion,
+	withURLSuggestion
+) {
 	const { fetchSearchSuggestions } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return {
@@ -113,16 +121,18 @@ export default function useSearchHandler( allowDirectEntry ) {
 		: handleNoop;
 
 	return useCallback(
-		( val, args ) => {
+		( val, { isInitialSuggestions } ) => {
 			return isURLLike( val )
-				? directEntryHandler( val, args )
+				? directEntryHandler( val, { isInitialSuggestions } )
 				: handleEntitySearch(
 						val,
-						args,
+						{ ...suggestionsQuery, isInitialSuggestions },
 						fetchSearchSuggestions,
-						directEntryHandler
+						directEntryHandler,
+						withCreateSuggestion,
+						withURLSuggestion
 				  );
 		},
-		[ directEntryHandler, fetchSearchSuggestions ]
+		[ directEntryHandler, fetchSearchSuggestions, withCreateSuggestion ]
 	);
 }

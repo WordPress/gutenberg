@@ -6,7 +6,8 @@
 	flex-shrink: 0;
 	flex-wrap: wrap;
 
-	& & {
+	// Unset for nested toolbar groups. Increase specificity.
+	& .components-toolbar-group.components-toolbar-group {
 		border-width: 0;
 		margin: 0;
 	}
@@ -20,11 +21,16 @@
 	min-height: $block-toolbar-height;
 	margin: 0;
 	border: $border-width solid $gray-900;
-	border-radius: $radius-block-ui;
 	background-color: $white;
 	display: inline-flex;
 	flex-shrink: 0;
 	flex-wrap: wrap;
+
+	// Unset for nested toolbars. Increase specificity.
+	& .components-toolbar.components-toolbar {
+		border-width: 0;
+		margin: 0;
+	}
 }
 
 div.components-toolbar {
@@ -49,7 +55,7 @@ div.components-toolbar {
 			display: inline-block;
 			content: "";
 			box-sizing: content-box;
-			background-color: $gray-200;
+			background-color: $gray-300;
 			position: absolute;
 			top: 8px;
 			left: -3px;
@@ -92,7 +98,7 @@ div.components-toolbar {
 }
 
 // Last button in a group.
-.components-accessible-toolbar .components-toolbar-group > .components-button:last-child.has-icon,
+.components-accessible-toolbar .components-toolbar-group > .components-button:last-of-type.has-icon,
 .components-accessible-toolbar .components-toolbar-group > div:last-child > .components-button.has-icon,
 .components-toolbar div:last-child .components-button.has-icon {
 	min-width: $block-toolbar-height - $grid-unit-15 / 2;

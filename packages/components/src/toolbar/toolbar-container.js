@@ -14,7 +14,7 @@ import { forwardRef } from '@wordpress/element';
 import ToolbarContext from '../toolbar-context';
 import { getRTL } from '../utils/rtl';
 
-function ToolbarContainer( { accessibilityLabel, ...props }, ref ) {
+function ToolbarContainer( { label, ...props }, ref ) {
 	// https://reakit.io/docs/basic-concepts/#state-hooks
 	// Passing baseId for server side rendering (which includes snapshots)
 	// If an id prop is passed to Toolbar, toolbar items will use it as a base for their ids
@@ -29,7 +29,7 @@ function ToolbarContainer( { accessibilityLabel, ...props }, ref ) {
 		<ToolbarContext.Provider value={ toolbarState }>
 			<Toolbar
 				ref={ ref }
-				aria-label={ accessibilityLabel }
+				aria-label={ label }
 				{ ...toolbarState }
 				{ ...props }
 			/>

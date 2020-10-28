@@ -70,8 +70,15 @@ function fail_if_died( $message ) {
 }
 tests_add_filter( 'wp_die_handler', 'fail_if_died' );
 
+$GLOBALS['wp_tests_options'] = array(
+	'gutenberg-experiments' => array(
+		'gutenberg-widget-experiments' => '1',
+	),
+);
+
 // Start up the WP testing environment.
 require $_tests_dir . '/includes/bootstrap.php';
 
 // Use existing behavior for wp_die during actual test execution.
 remove_filter( 'wp_die_handler', 'fail_if_died' );
+

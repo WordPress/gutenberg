@@ -75,7 +75,7 @@ export default function FontSizePicker( {
 				{ fontSizes.length > 0 && (
 					<CustomSelectControl
 						className={ 'components-font-size-picker__select' }
-						label={ __( 'Preset size' ) }
+						label={ __( 'Font size' ) }
 						options={ options }
 						value={ options.find(
 							( option ) => option.key === selectedFontSizeSlug

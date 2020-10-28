@@ -51,13 +51,14 @@ Then modify your package.json and add an extra command to npm `scripts` (https:/
 When installing `wp-env` in this way, all `wp-env` commands detailed in these docs must be prefixed with `npm run`, for example:
 
 ```sh
-$ npm run wp-env start
+# You must add another dash to pass the "update" flag to wp-env
+$ npm run wp-env start -- --update
 ```
 
 instead of:
 
 ```sh
-$ wp-env start
+$ wp-env start --update
 ```
 
 ## Usage
@@ -166,6 +167,25 @@ To nuke everything:
 ```sh
 $ wp-env destroy
 $ wp-env start
+```
+
+### 7. Debug mode and inspecting the generated dockerfile.
+
+`wp-env` uses docker behind the scenes. Inspecting the generated docker-compose file can help to understand what's going on.
+
+Start `wp-env` in debug mode
+
+```sh
+wp-env start --debug
+```
+
+`wp-env` will output its config which includes `dockerComposeConfigPath`. 
+
+```sh
+ℹ Config:
+	...
+	"dockerComposeConfigPath": "/Users/$USERNAME/.wp-env/5a619d332a92377cd89feb339c67b833/docker-compose.yml",
+	...
 ```
 
 ## Command reference

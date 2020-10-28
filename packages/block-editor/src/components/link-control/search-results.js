@@ -28,6 +28,8 @@ export default function LinkControlSearchResults( {
 	selectedSuggestion,
 	isLoading,
 	isInitialSuggestions,
+	createSuggestionButtonText,
+	suggestionsQuery,
 } ) {
 	const resultsListClasses = classnames(
 		'block-editor-link-control__search-results',
@@ -44,6 +46,8 @@ export default function LinkControlSearchResults( {
 		withCreateSuggestion &&
 		! isSingleDirectEntryResult &&
 		! isInitialSuggestions;
+	// If the query has a specified type, then we can skip showing them in the result. See #24839.
+	const shouldShowSuggestionsTypes = ! suggestionsQuery?.type;
 
 	// According to guidelines aria-label should be added if the label
 	// itself is not visible.
@@ -87,6 +91,7 @@ export default function LinkControlSearchResults( {
 						return (
 							<LinkControlSearchCreate
 								searchTerm={ currentInputValue }
+								buttonText={ createSuggestionButtonText }
 								onClick={ () =>
 									handleSuggestionClick( suggestion )
 								}
@@ -126,6 +131,7 @@ export default function LinkControlSearchResults( {
 								suggestion.type.toLowerCase()
 							) }
 							searchTerm={ currentInputValue }
+							shouldShowType={ shouldShowSuggestionsTypes }
 						/>
 					);
 				} ) }

@@ -23,16 +23,17 @@ function render_block_core_site_logo( $attributes ) {
 
 	add_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );
 	$custom_logo = get_custom_logo();
-	$class_name  = 'wp-block-site-logo';
+	$classnames  = array();
 	if ( ! empty( $attributes['className'] ) ) {
-		$class_name .= " {$attributes['className']}";
+		$classnames[] = $attributes['className'];
 	}
 
 	if ( ! empty( $attributes['align'] ) && in_array( $attributes['align'], array( 'center', 'left', 'right' ), true ) ) {
-		$class_name .= " align{$attributes['align']}";
+		$classnames[] = "align{$attributes['align']}";
 	}
 
-	$html = sprintf( '<div class="%s"><a href="' . get_bloginfo( 'url' ) . '" rel="home" title="' . get_bloginfo( 'name' ) . '">%s</a></div>', $class_name, $custom_logo );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
+	$html               = sprintf( '<div %s><a href="' . get_bloginfo( 'url' ) . '" rel="home" title="' . get_bloginfo( 'name' ) . '">%s</a></div>', $wrapper_attributes, $custom_logo );
 	remove_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );
 	return $html;
 }
@@ -43,8 +44,8 @@ function render_block_core_site_logo( $attributes ) {
  */
 function register_block_core_site_logo() {
 	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
-		register_block_type(
-			'core/site-logo',
+		register_block_type_from_metadata(
+			__DIR__ . '/site-logo',
 			array(
 				'render_callback' => 'render_block_core_site_logo',
 			)

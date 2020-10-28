@@ -5,6 +5,7 @@
 		{ "path": "packages/autop" },
 		{ "path": "packages/blob" },
 		{ "path": "packages/block-editor" },
+		{ "path": "packages/components" },
 		{ "path": "packages/element" },
 		{ "path": "packages/dependency-extraction-webpack-plugin" },
 		{ "path": "packages/dom-ready" },
@@ -21,7 +22,8 @@
 		{ "path": "packages/project-management-automation" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/url" },
-		{ "path": "packages/warning" }
+		{ "path": "packages/warning" },
+		{ "path": "packages/wordcount" }
 	],
 	"files": []
 }

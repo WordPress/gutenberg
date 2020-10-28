@@ -3,6 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
+import { decodeEntities } from '@wordpress/html-entities';
 
 /**
  * Internal dependencies
@@ -25,7 +26,7 @@ function DownloadableBlockHeader( {
 
 			<div className="block-directory-downloadable-block-header__column">
 				<h2 className="block-directory-downloadable-block-header__title">
-					{ title }
+					{ decodeEntities( title ) }
 				</h2>
 				<BlockRatings rating={ rating } ratingCount={ ratingCount } />
 			</div>

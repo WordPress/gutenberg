@@ -1,7 +1,7 @@
 # FontSizePicker
 
 FontSizePicker is a React component that renders a UI that allows users to select a font size.
-The component renders a series of buttons that allow the user to select predefined (common) font sizes and contains a range slider that enables the user to select custom font sizes (by choosing the value.
+The component renders a user interface that allows the user to select predefined (common) font sizes and contains an option that allows users to select custom font sizes (by choosing the value) if that functionality is enabled.
 
 ## Usage
 

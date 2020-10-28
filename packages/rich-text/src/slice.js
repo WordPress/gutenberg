@@ -1,13 +1,15 @@
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
  * Slice a Rich Text value from `startIndex` to `endIndex`. Indices are
  * retrieved from the selection if none are provided. This is similar to
  * `String.prototype.slice`.
  *
- * @param {Object} value        Value to modify.
- * @param {number} [startIndex] Start index.
- * @param {number} [endIndex]   End index.
+ * @param {RichTextValue} value        Value to modify.
+ * @param {number}        [startIndex] Start index.
+ * @param {number}        [endIndex]   End index.
  *
- * @return {Object} A new extracted value.
+ * @return {RichTextValue} A new extracted value.
  */
 export function slice( value, startIndex = value.start, endIndex = value.end ) {
 	const { formats, replacements, text } = value;

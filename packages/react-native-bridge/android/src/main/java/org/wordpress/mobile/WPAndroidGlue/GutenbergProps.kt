@@ -5,12 +5,14 @@ import android.os.Bundle
 data class GutenbergProps @JvmOverloads constructor(
     val enableMentions: Boolean,
     val enableUnsupportedBlockEditor: Boolean,
+    val canEnableUnsupportedBlockEditor: Boolean,
     val localeSlug: String,
     val postType: String,
     val editorTheme: Bundle?,
     val translations: Bundle,
     val isDarkMode: Boolean,
     val htmlModeEnabled: Boolean,
+    val isPreview: Boolean = false,
     val isModalLayoutPickerEnabled: Boolean = false
 ) {
 
@@ -22,16 +24,22 @@ data class GutenbergProps @JvmOverloads constructor(
         putBundle(PROP_TRANSLATIONS, translations)
         putBoolean(PROP_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled)
 
-        putBundle(PROP_CAPABILITIES, Bundle().apply {
-            putBoolean(PROP_CAPABILITIES_MENTIONS, enableMentions)
-            putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
-            putBoolean(PROP_CAPABILITIES_MODAL_LAYOUT_PICKER, isModalLayoutPickerEnabled)
-        })
+        val editorMode = if (isPreview) PROP_EDITOR_MODE_PREVIEW else PROP_EDITOR_MODE_EDITOR
+        putString(PROP_EDITOR_MODE, editorMode)
 
-        editorTheme?.also {
-            getSerializable(PROP_COLORS)?.let { putSerializable(PROP_COLORS, it) }
-            getSerializable(PROP_GRADIENTS)?.let { putSerializable(PROP_GRADIENTS, it) }
+        putBundle(PROP_CAPABILITIES, getUpdatedCapabilitiesProps())
+
+        editorTheme?.also { theme ->
+            theme.getSerializable(PROP_COLORS)?.let { putSerializable(PROP_COLORS, it) }
+            theme.getSerializable(PROP_GRADIENTS)?.let { putSerializable(PROP_GRADIENTS, it) }
         }
+    }
+
+    fun getUpdatedCapabilitiesProps() = Bundle().apply {
+        putBoolean(PROP_CAPABILITIES_MENTIONS, enableMentions)
+        putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
+        putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
+        putBoolean(PROP_CAPABILITIES_MODAL_LAYOUT_PICKER, isModalLayoutPickerEnabled)
     }
 
     companion object {
@@ -51,9 +59,14 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_COLORS = "colors"
         private const val PROP_GRADIENTS = "gradients"
 
+        private const val PROP_EDITOR_MODE = "editorMode"
+        private const val PROP_EDITOR_MODE_PREVIEW = "preview"
+        private const val PROP_EDITOR_MODE_EDITOR = "editor"
+
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_MENTIONS = "mentions"
         const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"
+        const val PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR = "canEnableUnsupportedBlockEditor"
         const val PROP_CAPABILITIES_MODAL_LAYOUT_PICKER = "modalLayoutPicker"
     }
 }

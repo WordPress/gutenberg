@@ -43,13 +43,14 @@ import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
-import OptionsModal from '../options-modal';
+import PreferencesModal from '../preferences-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
 import ActionsPanel from './actions-panel';
+import PopoverWrapper from './popover-wrapper';
 
 const interfaceLabels = {
 	leftSidebar: __( 'Block library' ),
@@ -85,6 +86,8 @@ function Layout() {
 		hasBlockSelected,
 		showMostUsedBlocks,
 		isInserterOpened,
+		showIconLabels,
+		hasReducedUI,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -114,12 +117,19 @@ function Layout() {
 			nextShortcut: select(
 				'core/keyboard-shortcuts'
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
+			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+				'showIconLabels'
+			),
+			hasReducedUI: select( 'core/edit-post' ).isFeatureActive(
+				'reducedUI'
+			),
 		};
 	}, [] );
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
+		'show-icon-labels': showIconLabels,
 	} );
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
@@ -178,29 +188,36 @@ function Layout() {
 					leftSidebar={
 						mode === 'visual' &&
 						isInserterOpened && (
-							<div className="edit-post-layout__inserter-panel">
-								<div className="edit-post-layout__inserter-panel-header">
-									<Button
-										icon={ close }
-										onClick={ () =>
-											setIsInserterOpened( false )
-										}
-									/>
-								</div>
-								<div className="edit-post-layout__inserter-panel-content">
-									<Library
-										showMostUsedBlocks={
-											showMostUsedBlocks
-										}
-										showInserterHelpPanel
-										onSelect={ () => {
-											if ( isMobileViewport ) {
-												setIsInserterOpened( false );
+							<PopoverWrapper
+								className="edit-post-layout__inserter-panel-popover-wrapper"
+								onClose={ () => setIsInserterOpened( false ) }
+							>
+								<div className="edit-post-layout__inserter-panel">
+									<div className="edit-post-layout__inserter-panel-header">
+										<Button
+											icon={ close }
+											onClick={ () =>
+												setIsInserterOpened( false )
 											}
-										} }
-									/>
+										/>
+									</div>
+									<div className="edit-post-layout__inserter-panel-content">
+										<Library
+											showMostUsedBlocks={
+												showMostUsedBlocks
+											}
+											showInserterHelpPanel
+											onSelect={ () => {
+												if ( isMobileViewport ) {
+													setIsInserterOpened(
+														false
+													);
+												}
+											} }
+										/>
+									</div>
 								</div>
-							</div>
+							</PopoverWrapper>
 						)
 					}
 					sidebar={
@@ -245,6 +262,7 @@ function Layout() {
 						</>
 					}
 					footer={
+						! hasReducedUI &&
 						! isMobileViewport &&
 						isRichEditingEnabled &&
 						mode === 'visual' && (
@@ -272,7 +290,7 @@ function Layout() {
 					} }
 				/>
 				<ManageBlocksModal />
-				<OptionsModal />
+				<PreferencesModal />
 				<KeyboardShortcutHelpModal />
 				<WelcomeGuide />
 				<Popover.Slot />

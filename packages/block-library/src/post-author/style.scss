@@ -10,11 +10,11 @@
 	}
 
 	&__avatar {
-		margin-right: $grid-unit-20;
+		margin-right: 1em;
 	}
 
 	&__bio {
-		margin-bottom: $grid-unit-10;
+		margin-bottom: 0.7em;
 		font-size: 0.7em;
 	}
 
@@ -27,9 +27,4 @@
 		font-weight: bold;
 		margin: 0;
 	}
-}
-
-.wp-block-post-author.has-link-color a,
-.wp-block-post-author.has-background.has-link-color a {
-	color: var(--wp--style--color--link);
 }

@@ -24,6 +24,10 @@ export const userEvents = {
 	editorSessionTemplatePreview: 'editor_session_template_preview',
 };
 
+export const actionButtons = {
+	missingBlockAlertActionButton: 'missing_block_alert_action_button',
+};
+
 // Console polyfill from react-native
 
 export function nativeLoggingHook( message, logLevel ) {
@@ -88,6 +92,14 @@ export function subscribePreferredColorScheme( callback ) {
 	);
 }
 
+export function subscribeUpdateCapabilities( callback ) {
+	return gutenbergBridgeEvents.addListener( 'updateCapabilities', callback );
+}
+
+export function subscribeShowNotice( callback ) {
+	return gutenbergBridgeEvents.addListener( 'showNotice', callback );
+}
+
 /**
  * @callback FnReplaceBlockCompletion
  * @param {string} html the HTML to replace the block.
@@ -144,6 +156,15 @@ export function requestUnsupportedBlockFallback(
 		blockName,
 		blockTitle
 	);
+}
+
+/**
+ * Messages the client that an action button was pressed.
+ *
+ * @param {string} htmlContent One of the values deffined on `actionButtons` constant object.
+ */
+export function sendActionButtonPressedAction( buttonType ) {
+	RNReactNativeGutenbergBridge.actionButtonPressed( buttonType );
 }
 
 export function requestMediaImport( url, callback ) {

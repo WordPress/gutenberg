@@ -40,11 +40,12 @@ import {
 	MediaUploadProgress,
 	withColors,
 	__experimentalUseGradient,
+	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState, useRef } from '@wordpress/element';
-import { cover as icon, replace } from '@wordpress/icons';
+import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 
 /**
@@ -83,7 +84,6 @@ const Cover = ( {
 	overlayColor,
 	setAttributes,
 	openGeneralSidebar,
-	settings,
 	closeSettingsBottomSheet,
 } ) => {
 	const {
@@ -100,8 +100,9 @@ const Cover = ( {
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
+	const colorsDefault = useEditorFeature( 'color.palette' ) || [];
 	const coverDefaultPalette = {
-		colors: settings.colors.slice( 0, THEME_COLORS_COUNT ),
+		colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
 	};
 
 	const { gradientValue } = __experimentalUseGradient();
@@ -113,6 +114,8 @@ const Cover = ( {
 		overlayColor.color ||
 		gradientValue
 	);
+
+	const hasOnlyColorBackground = ! url && hasBackground;
 
 	const [
 		isCustomColorPickerShowing,
@@ -202,8 +205,8 @@ const Cover = ( {
 
 	function openColorPicker() {
 		if ( isParentSelected ) {
-			openGeneralSidebar();
 			setCustomColorPickerShowing( true );
+			openGeneralSidebar();
 		}
 	}
 
@@ -248,6 +251,20 @@ const Cover = ( {
 				/>
 			</ToolbarGroup>
 		</BlockControls>
+	);
+
+	const addMediaButton = () => (
+		<TouchableWithoutFeedback onPress={ openMediaOptionsRef.current }>
+			<View style={ styles.selectImageContainer }>
+				<View style={ styles.selectImage }>
+					<Icon
+						size={ 16 }
+						icon={ image }
+						{ ...styles.selectImageIcon }
+					/>
+				</View>
+			</View>
+		</TouchableWithoutFeedback>
 	);
 
 	const controls = (
@@ -298,25 +315,29 @@ const Cover = ( {
 			<BottomSheetConsumer>
 				{ ( {
 					shouldEnableBottomSheetScroll,
-					shouldDisableBottomSheetMaxHeight,
-					onCloseBottomSheet,
-					onHardwareButtonPress,
+					shouldEnableBottomSheetMaxHeight,
+					onHandleClosingBottomSheet,
+					onHandleHardwareButtonPress,
 					isBottomSheetContentScrolling,
 				} ) => (
 					<ColorPicker
 						shouldEnableBottomSheetScroll={
 							shouldEnableBottomSheetScroll
 						}
-						shouldDisableBottomSheetMaxHeight={
-							shouldDisableBottomSheetMaxHeight
+						shouldEnableBottomSheetMaxHeight={
+							shouldEnableBottomSheetMaxHeight
 						}
 						setColor={ ( color ) => {
 							setCustomColor( color );
 							setColor( color );
 						} }
 						onNavigationBack={ closeSettingsBottomSheet }
-						onCloseBottomSheet={ onCloseBottomSheet }
-						onHardwareButtonPress={ onHardwareButtonPress }
+						onHandleClosingBottomSheet={
+							onHandleClosingBottomSheet
+						}
+						onHandleHardwareButtonPress={
+							onHandleHardwareButtonPress
+						}
 						onBottomSheetClosed={ () => {
 							setCustomColorPickerShowing( false );
 						} }
@@ -328,6 +349,13 @@ const Cover = ( {
 				) }
 			</BottomSheetConsumer>
 		</InspectorControls>
+	);
+
+	const renderContent = ( getMediaOptions ) => (
+		<>
+			{ renderBackground( getMediaOptions ) }
+			{ isParentSelected && hasOnlyColorBackground && addMediaButton() }
+		</>
 	);
 
 	const renderBackground = ( getMediaOptions ) => (
@@ -383,6 +411,7 @@ const Cover = ( {
 							onSelectMediaUploadOption={ onSelectMedia }
 							openMediaOptions={ openMediaOptionsRef.current }
 							url={ url }
+							width={ styles.image.width }
 						/>
 					</View>
 				) }
@@ -426,19 +455,26 @@ const Cover = ( {
 					onFocus={ onFocus }
 				>
 					<View style={ styles.colorPaletteWrapper }>
-						<ColorPalette
-							customColorIndicatorStyles={
-								styles.paletteColorIndicator
-							}
-							customIndicatorWrapperStyles={
-								styles.paletteCustomIndicatorWrapper
-							}
-							setColor={ setColor }
-							onCustomPress={ openColorPicker }
-							defaultSettings={ coverDefaultPalette }
-							shouldShowCustomLabel={ false }
-							shouldShowCustomVerticalSeparator={ false }
-						/>
+						<BottomSheetConsumer>
+							{ ( { shouldEnableBottomSheetScroll } ) => (
+								<ColorPalette
+									customColorIndicatorStyles={
+										styles.paletteColorIndicator
+									}
+									customIndicatorWrapperStyles={
+										styles.paletteCustomIndicatorWrapper
+									}
+									setColor={ setColor }
+									onCustomPress={ openColorPicker }
+									defaultSettings={ coverDefaultPalette }
+									shouldShowCustomLabel={ false }
+									shouldShowCustomVerticalSeparator={ false }
+									shouldEnableBottomSheetScroll={
+										shouldEnableBottomSheetScroll
+									}
+								/>
+							) }
+						</BottomSheetConsumer>
 					</View>
 				</MediaPlaceholder>
 			</View>
@@ -494,11 +530,11 @@ const Cover = ( {
 
 			<MediaUpload
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
-				isReplacingMedia={ true }
+				isReplacingMedia={ ! hasOnlyColorBackground }
 				onSelect={ onSelectMedia }
 				render={ ( { open, getMediaOptions } ) => {
 					openMediaOptionsRef.current = open;
-					return renderBackground( getMediaOptions );
+					return renderContent( getMediaOptions );
 				} }
 			/>
 
@@ -508,10 +544,7 @@ const Cover = ( {
 					style={ styles.uploadFailedContainer }
 				>
 					<View style={ styles.uploadFailed }>
-						<Icon
-							icon={ 'warning' }
-							{ ...styles.uploadFailedIcon }
-						/>
+						<Icon icon={ warning } { ...styles.uploadFailedIcon } />
 					</View>
 				</View>
 			) }

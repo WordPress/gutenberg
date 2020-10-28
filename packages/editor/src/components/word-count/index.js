@@ -1,11 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { _x } from '@wordpress/i18n';
 import { count as wordCount } from '@wordpress/wordcount';
 
-function WordCount( { content } ) {
+export default function WordCount() {
+	const content = useSelect( ( select ) =>
+		select( 'core/editor' ).getEditedPostAttribute( 'content' )
+	);
+
 	/*
 	 * translators: If your word count is based on single characters (e.g. East Asian characters),
 	 * enter 'characters_excluding_spaces' or 'characters_including_spaces'. Otherwise, enter 'words'.
@@ -19,9 +23,3 @@ function WordCount( { content } ) {
 		</span>
 	);
 }
-
-export default withSelect( ( select ) => {
-	return {
-		content: select( 'core/editor' ).getEditedPostAttribute( 'content' ),
-	};
-} )( WordCount );

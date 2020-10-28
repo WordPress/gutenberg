@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
+
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
 	'top center': 'is-position-top-center',
@@ -38,6 +43,11 @@ export function attributesFromMedia( setAttributes ) {
 			setAttributes( { url: undefined, id: undefined } );
 			return;
 		}
+
+		if ( isBlobURL( media.url ) ) {
+			media.type = getBlobTypeByURL( media.url );
+		}
+
 		let mediaType;
 		// for media selections originated from a file upload.
 		if ( media.media_type ) {
@@ -70,16 +80,32 @@ export function attributesFromMedia( setAttributes ) {
 	};
 }
 
-export function getPositionClassName( contentPosition ) {
-	if ( contentPosition === undefined ) return '';
-
-	return POSITION_CLASSNAMES[ contentPosition ];
-}
-
+/**
+ * Checks of the contentPosition is the center (default) position.
+ *
+ * @param {string} contentPosition The current content position.
+ * @return {boolean} Whether the contentPosition is center.
+ */
 export function isContentPositionCenter( contentPosition ) {
 	return (
 		! contentPosition ||
 		contentPosition === 'center center' ||
 		contentPosition === 'center'
 	);
+}
+
+/**
+ * Retrieves the className for the current contentPosition.
+ * The default position (center) will not have a className.
+ *
+ * @param {string} contentPosition The current content position.
+ * @return {string} The className assigned to the contentPosition.
+ */
+export function getPositionClassName( contentPosition ) {
+	/*
+	 * Only render a className if the contentPosition is not center (the default).
+	 */
+	if ( isContentPositionCenter( contentPosition ) ) return '';
+
+	return POSITION_CLASSNAMES[ contentPosition ];
 }

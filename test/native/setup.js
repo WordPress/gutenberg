@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { NativeModules } from 'react-native';
+import 'react-native-gesture-handler/jestSetup';
 
 jest.mock( '@wordpress/element', () => {
 	return {
@@ -24,6 +25,8 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeAndroidModalClosed: jest.fn(),
 		subscribeUpdateTheme: jest.fn(),
 		subscribePreferredColorScheme: () => 'light',
+		subscribeUpdateCapabilities: jest.fn(),
+		subscribeShowNotice: jest.fn(),
 		editorDidMount: jest.fn(),
 		editorDidAutosave: jest.fn(),
 		subscribeMediaUpload: jest.fn(),
@@ -122,3 +125,16 @@ Object.keys( mockNativeModules ).forEach( ( module ) => {
 		} );
 	}
 } );
+
+jest.mock( 'react-native-reanimated', () => {
+	const Reanimated = require( 'react-native-reanimated/mock' );
+
+	// The mock for `call` immediately calls the callback which is incorrect
+	// So we override it with a no-op
+	Reanimated.default.call = () => {};
+
+	return Reanimated;
+} );
+
+// Silence the warning: Animated: `useNativeDriver` is not supported because the native animated module is missing
+jest.mock( 'react-native/Libraries/Animated/src/NativeAnimatedHelper' );

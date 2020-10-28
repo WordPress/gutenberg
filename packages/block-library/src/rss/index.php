@@ -79,24 +79,17 @@ function render_block_core_rss( $attributes ) {
 		$list_items .= "<li class='wp-block-rss__item'>{$title}{$date}{$author}{$excerpt}</li>";
 	}
 
-	$class = 'wp-block-rss';
-	if ( isset( $attributes['align'] ) ) {
-		$class .= ' align' . $attributes['align'];
-	}
-
+	$classnames = array();
 	if ( isset( $attributes['blockLayout'] ) && 'grid' === $attributes['blockLayout'] ) {
-		$class .= ' is-grid';
+		$classnames[] = 'is-grid';
 	}
 
 	if ( isset( $attributes['columns'] ) && 'grid' === $attributes['blockLayout'] ) {
-		$class .= ' columns-' . $attributes['columns'];
+		$classnames[] = 'columns-' . $attributes['columns'];
 	}
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
 
-	if ( isset( $attributes['className'] ) ) {
-		$class .= ' ' . $attributes['className'];
-	}
-
-	return sprintf( '<ul class="%s">%s</ul>', esc_attr( $class ), $list_items );
+	return sprintf( '<ul %s>%s</ul>', $wrapper_attributes, $list_items );
 }
 
 /**

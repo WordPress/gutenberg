@@ -88,6 +88,35 @@
 	height: 100%;
 }
 
+.selectImageContainer {
+	position: absolute;
+	padding: 8px;
+	justify-self: flex-start;
+	align-self: flex-end;
+	justify-content: flex-start;
+	align-items: flex-end;
+	z-index: 3;
+	width: $grid-unit-40;
+	height: $grid-unit-40;
+}
+
+.selectImage {
+	width: 30px;
+	height: 30px;
+	background-color: $gray-dark;
+	border-radius: 22px;
+	position: absolute;
+	top: 5px;
+	right: 5px;
+}
+
+.selectImageIcon {
+	fill: $white;
+	position: absolute;
+	top: 7px;
+	left: 7px;
+}
+
 .clearMediaButton {
 	color: $alert-red;
 }
@@ -105,6 +134,10 @@
 	top: 0;
 	width: 60px;
 	z-index: 4;
+}
+
+.image {
+	width: 100%;
 }
 
 .colorPaletteWrapper {

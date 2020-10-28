@@ -38,10 +38,18 @@ const LinkControlSearchInput = forwardRef(
 			fetchSuggestions = null,
 			allowDirectEntry = true,
 			showInitialSuggestions = false,
+			suggestionsQuery = {},
+			withURLSuggestion = true,
+			createSuggestionButtonText,
 		},
 		ref
 	) => {
-		const genericSearchHandler = useSearchHandler( allowDirectEntry );
+		const genericSearchHandler = useSearchHandler(
+			suggestionsQuery,
+			allowDirectEntry,
+			withCreateSuggestion,
+			withURLSuggestion
+		);
 		const searchHandler = showSuggestions
 			? fetchSuggestions || genericSearchHandler
 			: noopSearchHandler;
@@ -72,6 +80,8 @@ const LinkControlSearchInput = forwardRef(
 				instanceId,
 				withCreateSuggestion,
 				currentInputValue: value,
+				createSuggestionButtonText,
+				suggestionsQuery,
 				handleSuggestionClick: ( suggestion ) => {
 					if ( props.handleSuggestionClick ) {
 						props.handleSuggestionClick( suggestion );

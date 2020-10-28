@@ -4,11 +4,17 @@
 import { castArray, get, isEqual, find } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { controls } from '@wordpress/data';
+import { apiFetch } from '@wordpress/data-controls';
+import { addQueryArgs } from '@wordpress/url';
+
+/**
  * Internal dependencies
  */
-import { receiveItems, receiveQueriedItems } from './queried-data';
+import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
-import { select, apiFetch } from './controls';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -140,6 +146,58 @@ export function receiveEmbedPreview( url, preview ) {
 }
 
 /**
+ * Action triggered to delete an entity record.
+ *
+ * @param {string}  kind              Kind of the deleted entity.
+ * @param {string}  name              Name of the deleted entity.
+ * @param {string}  recordId          Record ID of the deleted entity.
+ * @param {?Object} query             Special query parameters for the DELETE API call.
+ */
+export function* deleteEntityRecord( kind, name, recordId, query ) {
+	const entities = yield getKindEntities( kind );
+	const entity = find( entities, { kind, name } );
+	let error;
+	let deletedRecord = false;
+	if ( ! entity ) {
+		return;
+	}
+
+	yield {
+		type: 'DELETE_ENTITY_RECORD_START',
+		kind,
+		name,
+		recordId,
+	};
+
+	try {
+		let path = `${ entity.baseURL }/${ recordId }`;
+
+		if ( query ) {
+			path = addQueryArgs( path, query );
+		}
+
+		deletedRecord = yield apiFetch( {
+			path,
+			method: 'DELETE',
+		} );
+
+		yield removeItems( kind, name, recordId, true );
+	} catch ( _error ) {
+		error = _error;
+	}
+
+	yield {
+		type: 'DELETE_ENTITY_RECORD_FINISH',
+		kind,
+		name,
+		recordId,
+		error,
+	};
+
+	return deletedRecord;
+}
+
+/**
  * Returns an action object that triggers an
  * edit to an entity record.
  *
@@ -153,15 +211,22 @@ export function receiveEmbedPreview( url, preview ) {
  * @return {Object} Action object.
  */
 export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
-	const entity = yield select( 'getEntity', kind, name );
+	const entity = yield controls.select( 'core', 'getEntity', kind, name );
 	if ( ! entity ) {
 		throw new Error(
 			`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
 		);
 	}
 	const { transientEdits = {}, mergedEdits = {} } = entity;
-	const record = yield select( 'getRawEntityRecord', kind, name, recordId );
-	const editedRecord = yield select(
+	const record = yield controls.select(
+		'core',
+		'getRawEntityRecord',
+		kind,
+		name,
+		recordId
+	);
+	const editedRecord = yield controls.select(
+		'core',
 		'getEditedEntityRecord',
 		kind,
 		name,
@@ -206,7 +271,7 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
  * an entity record, if any.
  */
 export function* undo() {
-	const undoEdit = yield select( 'getUndoEdit' );
+	const undoEdit = yield controls.select( 'core', 'getUndoEdit' );
 	if ( ! undoEdit ) {
 		return;
 	}
@@ -224,7 +289,7 @@ export function* undo() {
  * edit to an entity record, if any.
  */
 export function* redo() {
-	const redoEdit = yield select( 'getRedoEdit' );
+	const redoEdit = yield controls.select( 'core', 'getRedoEdit' );
 	if ( ! redoEdit ) {
 		return;
 	}
@@ -274,7 +339,13 @@ export function* saveEntityRecord(
 	for ( const [ key, value ] of Object.entries( record ) ) {
 		if ( typeof value === 'function' ) {
 			const evaluatedValue = value(
-				yield select( 'getEditedEntityRecord', kind, name, recordId )
+				yield controls.select(
+					'core',
+					'getEditedEntityRecord',
+					kind,
+					name,
+					recordId
+				)
 			);
 			yield editEntityRecord(
 				kind,
@@ -302,7 +373,8 @@ export function* saveEntityRecord(
 	let currentEdits;
 	try {
 		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
-		const persistedRecord = yield select(
+		const persistedRecord = yield controls.select(
+			'core',
 			'getRawEntityRecord',
 			kind,
 			name,
@@ -314,9 +386,13 @@ export function* saveEntityRecord(
 			// This is fine for now as it is the only supported autosave,
 			// but ideally this should all be handled in the back end,
 			// so the client just sends and receives objects.
-			const currentUser = yield select( 'getCurrentUser' );
+			const currentUser = yield controls.select(
+				'core',
+				'getCurrentUser'
+			);
 			const currentUserId = currentUser ? currentUser.id : undefined;
-			const autosavePost = yield select(
+			const autosavePost = yield controls.select(
+				'core',
 				'getAutosave',
 				persistedRecord.type,
 				persistedRecord.id,
@@ -407,13 +483,15 @@ export function* saveEntityRecord(
 
 			// Get the full local version of the record before the update,
 			// to merge it with the edits and then propagate it to subscribers
-			persistedEntity = yield select(
+			persistedEntity = yield controls.select(
+				'core',
 				'__experimentalGetEntityRecordNoResolver',
 				kind,
 				name,
 				recordId
 			);
-			currentEdits = yield select(
+			currentEdits = yield controls.select(
+				'core',
 				'getEntityRecordEdits',
 				kind,
 				name,
@@ -459,7 +537,8 @@ export function* saveEntityRecord(
 				recordId,
 				{
 					...currentEdits,
-					...( yield select(
+					...( yield controls.select(
+						'core',
 						'getEntityRecordEdits',
 						kind,
 						name,
@@ -492,11 +571,18 @@ export function* saveEntityRecord(
  */
 export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 	if (
-		! ( yield select( 'hasEditsForEntityRecord', kind, name, recordId ) )
+		! ( yield controls.select(
+			'core',
+			'hasEditsForEntityRecord',
+			kind,
+			name,
+			recordId
+		) )
 	) {
 		return;
 	}
-	const edits = yield select(
+	const edits = yield controls.select(
+		'core',
 		'getEntityRecordNonTransientEdits',
 		kind,
 		name,
