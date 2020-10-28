@@ -22,6 +22,19 @@ import {
 	receiveCurrentUser,
 } from '../actions';
 
+jest.mock( '../locks/actions', () => ( {
+	acquireStoreLock: jest.fn( () => [
+		{
+			type: 'MOCKED_ACQUIRE_LOCK',
+		},
+	] ),
+	releaseStoreLock: jest.fn( () => [
+		{
+			type: 'MOCKED_RELEASE_LOCK',
+		},
+	] ),
+} ) );
+
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
 
@@ -32,8 +45,12 @@ describe( 'getEntityRecord', () => {
 		const fulfillment = getEntityRecord( 'root', 'postType', 'post' );
 		// Trigger generator
 		fulfillment.next();
-		// Provide entities and trigger apiFetch
-		const { value: apiFetchAction } = fulfillment.next( entities );
+		// Provide entities and acquire lock
+		expect( fulfillment.next( entities ).value.type ).toEqual(
+			'MOCKED_ACQUIRE_LOCK'
+		);
+		// trigger apiFetch
+		const { value: apiFetchAction } = fulfillment.next();
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/types/post?context=edit',
 		} );
@@ -41,6 +58,10 @@ describe( 'getEntityRecord', () => {
 		const { value: received } = fulfillment.next( POST_TYPE );
 		expect( received ).toEqual(
 			receiveEntityRecords( 'root', 'postType', POST_TYPE )
+		);
+		// Release lock
+		expect( fulfillment.next().value.type ).toEqual(
+			'MOCKED_RELEASE_LOCK'
 		);
 	} );
 } );
@@ -60,8 +81,15 @@ describe( 'getEntityRecords', () => {
 
 		// Trigger generator
 		fulfillment.next();
-		// Provide entities and trigger apiFetch
-		const { value: apiFetchAction } = fulfillment.next( ENTITIES );
+
+		// Provide entities and acquire lock
+		expect( fulfillment.next( ENTITIES ).value.type ).toEqual(
+			'MOCKED_ACQUIRE_LOCK'
+		);
+
+		// trigger apiFetch
+		const { value: apiFetchAction } = fulfillment.next();
+
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/types?context=edit',
 		} );
@@ -74,6 +102,11 @@ describe( 'getEntityRecords', () => {
 				Object.values( POST_TYPES ),
 				{}
 			)
+		);
+
+		// Release lock
+		expect( fulfillment.next().value.type ).toEqual(
+			'MOCKED_RELEASE_LOCK'
 		);
 	} );
 

@@ -38,7 +38,8 @@
 		"@wordpress/url": "file:../url",
 		"equivalent-key-map": "^0.2.2",
 		"lodash": "^4.17.19",
-		"rememo": "^3.0.0"
+		"rememo": "^3.0.0",
+	  	"uuid": "^8.3.1"
 	},
 	"publishConfig": {
 		"access": "public"
