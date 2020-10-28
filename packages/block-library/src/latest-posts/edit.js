@@ -400,7 +400,15 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		</InspectorControls>
 	);
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			'wp-block-latest-posts__list': true,
+			'is-grid': postLayout === 'grid',
+			'has-dates': displayPostDate,
+			'has-author': displayAuthor,
+			[ `columns-${ columns }` ]: postLayout === 'grid',
+		} ),
+	} );
 
 	const hasPosts = Array.isArray( latestPosts ) && latestPosts.length;
 	if ( ! hasPosts ) {
@@ -442,20 +450,12 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	const dateFormat = __experimentalGetSettings().formats.date;
 
 	return (
-		<div { ...blockProps }>
+		<>
 			{ inspectorControls }
 			<BlockControls>
 				<ToolbarGroup controls={ layoutControls } />
 			</BlockControls>
-			<ul
-				className={ classnames( {
-					'wp-block-latest-posts__list': true,
-					'is-grid': postLayout === 'grid',
-					'has-dates': displayPostDate,
-					'has-author': displayAuthor,
-					[ `columns-${ columns }` ]: postLayout === 'grid',
-				} ) }
-			>
+			<ul { ...blockProps }>
 				{ displayPosts.map( ( post, i ) => {
 					const titleTrimmed = invoke( post, [
 						'title',
@@ -585,6 +585,6 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 					);
 				} ) }
 			</ul>
-		</div>
+		</>
 	);
 }
