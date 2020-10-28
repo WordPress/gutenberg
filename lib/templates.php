@@ -193,26 +193,30 @@ function gutenberg_render_template_list_table_column( $column_name, $post_id ) {
 	}
 
 	if ( 'description' === $column_name ) {
-		echo get_the_excerpt( $post_id );
+		the_excerpt( $post_id );
 		return;
 	}
 
 	if ( 'status' === $column_name ) {
 		$post_status = get_post_status( $post_id );
 		$post_status_object = get_post_status_object( $post_status );
-		echo $post_status_object->label;
+		echo esc_html( $post_status_object->label );
 		return;
 	}
 
 	if ( 'source' === $column_name ) {
-		$post_status = get_post_status( $post_id );
 		$theme = get_post_meta( $post_id, 'theme', true );
-		if ( $theme && 'theme-provided' === $post_status ) {
+		if ( $theme ) {
 			$theme_data = wp_get_theme( $theme );
-			echo sprintf( __( 'Theme: %s' ), $theme_data->display( 'Name' ) );
+			$post_status = get_post_status( $post_id );
+			if ( 'theme-provided' === $post_status ) {
+				echo sprintf( __( 'Theme: %s' ), $theme_data->display( 'Name' ) );
+				return;
+			}
+			echo sprintf( __( 'Theme: %s (Customized)' ), $theme_data->display( 'Name' ) );
 			return;
 		}
-		echo __( 'Site' );
+		echo __( 'Custom' );
 		return;
 	}
 }
