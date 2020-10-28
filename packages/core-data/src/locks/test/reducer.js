@@ -40,7 +40,7 @@ describe( 'locks', () => {
 		const request = { path: [ 'bird', 'green' ] };
 		const state = deepFreeze( {
 			requests: [ request ],
-			tree: tree,
+			tree,
 		} );
 
 		const lock = {};
