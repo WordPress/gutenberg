@@ -52,7 +52,6 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 	};
 } );
 
-// const MEDIA_ID_REMOTE = 123;
 const MEDIA_ID_LOCAL = 2;
 const MEDIA_ID_TEMP = 'tempid-0-1';
 
