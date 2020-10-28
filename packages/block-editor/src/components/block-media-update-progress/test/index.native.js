@@ -52,8 +52,8 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 	};
 } );
 
-const MEDIA_ID_LOCAL = 2;
-const MEDIA_ID_TEMP = 'tempid-0-1';
+const MEDIAID_LOCAL = 2;
+const MEDIAID_TEMP = 'tempid-0-1';
 
 const tempMediaFiles = [
 	{
@@ -109,7 +109,7 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const progress = 10;
 		const payload = {
 			state: MEDIA_UPLOAD_STATE_UPLOADING,
-			mediaId: MEDIA_ID_LOCAL,
+			mediaId: MEDIAID_LOCAL,
 			progress,
 		};
 
@@ -158,11 +158,11 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const progress = 10;
 		const payloadSuccess = {
 			state: MEDIA_UPLOAD_STATE_SUCCEEDED,
-			mediaId: MEDIA_ID_LOCAL,
+			mediaId: MEDIAID_LOCAL,
 		};
 		const payloadUploading = {
 			state: MEDIA_UPLOAD_STATE_UPLOADING,
-			mediaId: MEDIA_ID_LOCAL,
+			mediaId: MEDIAID_LOCAL,
 			progress,
 		};
 
@@ -195,11 +195,11 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const progress = 10;
 		const payloadFail = {
 			state: MEDIA_UPLOAD_STATE_FAILED,
-			mediaId: MEDIA_ID_LOCAL,
+			mediaId: MEDIAID_LOCAL,
 		};
 		const payloadUploading = {
 			state: MEDIA_UPLOAD_STATE_UPLOADING,
-			mediaId: MEDIA_ID_LOCAL,
+			mediaId: MEDIAID_LOCAL,
 			progress,
 		};
 
@@ -233,11 +233,11 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const progress = 10;
 		const payloadReset = {
 			state: MEDIA_UPLOAD_STATE_RESET,
-			mediaId: MEDIA_ID_LOCAL,
+			mediaId: MEDIAID_LOCAL,
 		};
 		const payloadUploading = {
 			state: MEDIA_UPLOAD_STATE_UPLOADING,
-			mediaId: MEDIA_ID_LOCAL,
+			mediaId: MEDIAID_LOCAL,
 			progress,
 		};
 
@@ -289,11 +289,11 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const progress = 10;
 		const payloadSuccess = {
 			state: MEDIA_SAVE_STATE_SUCCEEDED,
-			mediaId: MEDIA_ID_TEMP, // while saving, we have a tempid key
+			mediaId: MEDIAID_TEMP, // while saving, we have a tempid key
 		};
 		const payloadSaving = {
 			state: MEDIA_SAVE_STATE_SAVING,
-			mediaId: MEDIA_ID_TEMP, // while saving, we have a tempid key
+			mediaId: MEDIAID_TEMP, // while saving, we have a tempid key
 			progress,
 		};
 
@@ -324,11 +324,11 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const progress = 10;
 		const payloadFail = {
 			state: MEDIA_SAVE_STATE_FAILED,
-			mediaId: MEDIA_ID_TEMP, // while saving, we have a tempid key
+			mediaId: MEDIAID_TEMP, // while saving, we have a tempid key
 		};
 		const payloadSaving = {
 			state: MEDIA_SAVE_STATE_SAVING,
-			mediaId: MEDIA_ID_TEMP, // while saving, we have a tempid key
+			mediaId: MEDIAID_TEMP, // while saving, we have a tempid key
 			progress,
 		};
 
@@ -360,11 +360,11 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const progress = 10;
 		const payloadReset = {
 			state: MEDIA_SAVE_STATE_RESET,
-			mediaId: MEDIA_ID_TEMP, // while saving, we have a tempid key
+			mediaId: MEDIAID_TEMP, // while saving, we have a tempid key
 		};
 		const payloadSaving = {
 			state: MEDIA_SAVE_STATE_SAVING,
-			mediaId: MEDIA_ID_TEMP, // while saving, we have a tempid key
+			mediaId: MEDIAID_TEMP, // while saving, we have a tempid key
 			progress,
 		};
 
@@ -394,12 +394,12 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const progress = 10;
 		const payloadFail = {
 			state: MEDIA_SAVE_FINAL_STATE_RESULT,
-			mediaId: MEDIA_ID_TEMP, // while saving, we have a tempid key
+			mediaId: MEDIAID_TEMP, // while saving, we have a tempid key
 			success: false,
 		};
 		const payloadSaving = {
 			state: MEDIA_SAVE_STATE_SAVING,
-			mediaId: MEDIA_ID_TEMP, // while saving, we have a tempid key
+			mediaId: MEDIAID_TEMP, // while saving, we have a tempid key
 			progress,
 		};
 
@@ -429,12 +429,12 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const progress = 10;
 		const payloadSuccess = {
 			state: MEDIA_SAVE_FINAL_STATE_RESULT,
-			mediaId: MEDIA_ID_TEMP, // while saving, we have a tempid key
+			mediaId: MEDIAID_TEMP, // while saving, we have a tempid key
 			success: true,
 		};
 		const payloadSaving = {
 			state: MEDIA_SAVE_STATE_SAVING,
-			mediaId: MEDIA_ID_TEMP, // while saving, we have a tempid key
+			mediaId: MEDIAID_TEMP, // while saving, we have a tempid key
 			progress,
 		};
 
@@ -464,13 +464,13 @@ describe( 'BlockMediaUpdateProgress component', () => {
 		const progress = 10;
 		const payloadMediaIdChange = {
 			state: MEDIA_SAVE_MEDIAID_CHANGED,
-			mediaId: MEDIA_ID_TEMP, // while saving, we have a tempid key
-			newId: MEDIA_ID_LOCAL,
+			mediaId: MEDIAID_TEMP, // while saving, we have a tempid key
+			newId: MEDIAID_LOCAL,
 			mediaUrl: 'file:///folder/someimage.jpg',
 		};
 		const payloadSaving = {
 			state: MEDIA_SAVE_STATE_SAVING,
-			mediaId: MEDIA_ID_TEMP, // while saving, we have a tempid key
+			mediaId: MEDIAID_TEMP, // while saving, we have a tempid key
 			progress,
 		};
 
