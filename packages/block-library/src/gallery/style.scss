@@ -7,9 +7,10 @@
 		// Some themes give all <ul> default margin instead of padding.
 		margin: 0;
 
-		// Need all the extra selectors to override specificity on default image block on front end.
+		// Need to add the bogus :not(#individual-image) to override long not:() specificity chain 
+		// on default image block on front end.
 		// Add space between thumbnails, and unset right most thumbnails later.
-		li.wp-block-image:not(.alignwide):not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter) {
+		li.wp-block-image:not(#individual-image) {
 			margin: 0 $grid-unit-20 $grid-unit-20 0;
 			&:last-child {
 				margin-right: 0;
@@ -71,7 +72,7 @@
 	}
 
 	// Cropped
-	&.is-cropped ul.blocks-gallery-grid li.wp-block-image:not(.alignwide):not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter) {
+	&.is-cropped ul.blocks-gallery-grid li.wp-block-image:not(#individual-image) {
 		a,
 		img {
 			// IE11 doesn't support object-fit, so just make sure images aren't skewed.
@@ -88,7 +89,7 @@
 	}
 
 	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
-	& .wp-block-image:not(.alignwide):not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter) {
+	& .wp-block-image:not(#individual-image) {
 		width: calc( 50% - #{$grid-unit-20} );
 
 		&:nth-of-type( even ) {
@@ -96,7 +97,7 @@
 		}
 	}
 
-	&.columns-1 .wp-block-image:not(.alignwide):not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter) {
+	&.columns-1 .wp-block-image:not(#individual-image) {
 		width: 100%;
 		margin-right: 0;
 	}
@@ -104,7 +105,7 @@
 	// Beyond mobile viewports, we allow up to 8 columns.
 	@include break-small {
 		@for $i from 3 through 8 {
-			&.columns-#{ $i } .wp-block-image:not(.alignwide):not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter) {
+			&.columns-#{ $i } .wp-block-image:not(#individual-image) {
 				width: calc(
 					#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i}
 				);
@@ -117,7 +118,7 @@
 			&.columns-#{
 				$column-count
 				}
-				.wp-block-image:not(.alignwide):not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter):nth-of-type( #{ $column-count }n ) {
+				.wp-block-image:not(#individual-image):nth-of-type( #{ $column-count }n ) {
 				margin-right: 0;
 			}
 		}
