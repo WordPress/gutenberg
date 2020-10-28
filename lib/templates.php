@@ -205,8 +205,9 @@ function gutenberg_render_template_list_table_column( $column_name, $post_id ) {
 	}
 
 	if ( 'source' === $column_name ) {
+		$post_status = get_post_status( $post_id );
 		$theme = get_post_meta( $post_id, 'theme', true );
-		if ( $theme ) {
+		if ( $theme && 'theme-provided' === $post_status ) {
 			$theme_data = wp_get_theme( $theme );
 			echo sprintf( __( 'Theme: %s' ), $theme_data->display( 'Name' ) );
 			return;
