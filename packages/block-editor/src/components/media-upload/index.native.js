@@ -20,6 +20,8 @@ import {
 	video,
 	wordpress,
 } from '@wordpress/icons';
+import { withSelect } from '@wordpress/data';
+import { compose } from '@wordpress/compose';
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
@@ -98,7 +100,10 @@ export class MediaUpload extends React.Component {
 			siteLibrarySource,
 		];
 
-		return internalSources.concat( this.state.otherMediaOptions );
+		if ( this.props.hasMediaUpload ) {
+			return internalSources.concat( this.state.otherMediaOptions );
+		}
+		return [ siteLibrarySource ]; // You can only use the media that ia already there
 	}
 
 	getMediaOptionsItems() {
@@ -209,4 +214,10 @@ export class MediaUpload extends React.Component {
 	}
 }
 
-export default MediaUpload;
+export default compose(
+	withSelect( ( select ) => {
+		return {
+			hasMediaUpload: !! select( 'core' ).canUser( 'create', 'media' ),
+		};
+	} )
+)( MediaUpload );
