@@ -46,6 +46,7 @@ export const Gallery = ( props ) => {
 			allowedBlocks: [ 'core/image' ],
 			orientation: 'horizontal',
 			renderAppender: false,
+			__experimentalLayout: { type: 'default', alignments: [] },
 		}
 	);
 

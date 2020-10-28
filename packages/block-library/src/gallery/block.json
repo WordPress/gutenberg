@@ -30,10 +30,6 @@
 			"type": "string",
 			"default": "large"
 		},
-		"allowAlign": {
-			"type": "boolean",
-			"default": false
-		},
 		"allowResize": {
 			"type": "boolean",
 			"default": false
@@ -44,7 +40,6 @@
 		}
 	},
 	"providesContext": {
-		"allowAlign": "allowAlign",
 		"allowResize": "allowResize",
 		"isListItem": "isListItem"
 	},

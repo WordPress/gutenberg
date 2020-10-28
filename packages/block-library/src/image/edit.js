@@ -80,7 +80,7 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
-	context: { allowAlign = true, allowResize = true, isListItem = false },
+	context: { allowResize = true, isListItem = false },
 } ) {
 	const {
 		url = '',
@@ -271,12 +271,10 @@ export function ImageEdit( {
 	const isExternal = isExternalImage( id, url );
 	const controls = (
 		<BlockControls>
-			{ allowAlign && (
-				<BlockAlignmentToolbar
-					value={ align }
-					onChange={ updateAlignment }
-				/>
-			) }
+			<BlockAlignmentToolbar
+				value={ align }
+				onChange={ updateAlignment }
+			/>
 		</BlockControls>
 	);
 	const src = isExternal ? url : undefined;
