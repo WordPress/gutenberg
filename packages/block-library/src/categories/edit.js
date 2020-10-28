@@ -23,7 +23,7 @@ import { pin } from '@wordpress/icons';
 function CategoriesEdit( {
 	attributes: { taxonomy, displayAsDropdown, showHierarchy, showPostCounts },
 	setAttributes,
-	taxonomies
+	taxonomies,
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
 	const { categories, isRequesting } = useSelect( ( select ) => {
