@@ -17,7 +17,7 @@ export function withNextComponent(
 			return <NextComponent { ...nextProps } ref={ ref } />;
 		}
 
-		return <CurrentComponent { ...otherProps } ref={ ref } />;
+		return <CurrentComponent { ...props } ref={ ref } />;
 	};
 
 	return contextConnect( WrappedComponent, namespace );
