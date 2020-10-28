@@ -32,9 +32,21 @@ import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
  */
 export function* getAuthors() {
 	const users = yield apiFetch( {
-		path: '/wp/v2/users/?who=authors&per_page=-1',
+		path: '/wp/v2/users/?who=authors&per_page=100',
 	} );
 	yield receiveUserQuery( 'authors', users );
+}
+
+/**
+ * Temporary approach to resolving editor access to author queries.
+ *
+ * @param {number} id The author id.
+ */
+export function* __unstableGetAuthor( id ) {
+	const users = yield apiFetch( {
+		path: `/wp/v2/users/${ id }`,
+	} );
+	yield receiveUserQuery( 'author', users );
 }
 
 /**

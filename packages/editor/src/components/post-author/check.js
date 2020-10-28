@@ -40,7 +40,7 @@ export default compose( [
 				false
 			),
 			postType: select( 'core/editor' ).getCurrentPostType(),
-			authors: select( 'core' ).getUsers( { who: 'authors' } ),
+			authors: select( 'core' ).getAuthors(),
 		};
 	} ),
 	withInstanceId,

@@ -21,7 +21,7 @@ function PostAuthor() {
 
 	const { authorId, isLoading, authors, postAuthor } = useSelect(
 		( select ) => {
-			const { getUser, getUsers, isResolving } = select( 'core' );
+			const { getUser, getAuthors, isResolving } = select( 'core' );
 			const { getEditedPostAttribute } = select( 'core/editor' );
 			const author = getUser( getEditedPostAttribute( 'author' ) );
 			const query =
@@ -29,9 +29,9 @@ function PostAuthor() {
 			return {
 				authorId: getEditedPostAttribute( 'author' ),
 				postAuthor: author,
-				authors: getUsers( { who: 'authors', ...query } ),
+				authors: getAuthors( { ...query } ),
 				isLoading: isResolving( 'core', 'getUsers', [
-					{ search: fieldValue, who: 'authors' },
+					{ search: fieldValue },
 				] ),
 			};
 		},

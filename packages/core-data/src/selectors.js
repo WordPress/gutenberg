@@ -52,6 +52,20 @@ export function getAuthors( state ) {
 }
 
 /**
+ * Returns all available authors.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Authors list.
+ */
+export function __unstableGetAuthor( state ) {
+	deprecated( "select( 'core' ).getAuthor()", {
+		alternative: "select( 'core' ).getUser({ who: 'authors' })",
+	} );
+	return getUserQueryResults( state, 'author' );
+}
+
+/**
  * Returns the current user.
  *
  * @param {Object} state Data state.
