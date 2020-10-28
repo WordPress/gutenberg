@@ -7,10 +7,13 @@
 		// Some themes give all <ul> default margin instead of padding.
 		margin: 0;
 
+		// Need all the extra selectors to override specificity on default image block on front end.
 		// Add space between thumbnails, and unset right most thumbnails later.
-		// Need all the extra selectors to override specificity on default image block.
 		li.wp-block-image:not(.alignwide):not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter) {
 			margin: 0 $grid-unit-20 $grid-unit-20 0;
+			&:last-child {
+				margin-right: 0;
+			}
 		}
 
 		li.wp-block-image {
@@ -19,10 +22,6 @@
 			flex-direction: column;
 			justify-content: center;
 			position: relative;
-
-			&:last-child {
-				margin-right: 0;
-			}
 
 			figure,
 			figure > div {
@@ -72,7 +71,7 @@
 	}
 
 	// Cropped
-	&.is-cropped ul.blocks-gallery-grid li.wp-block-image {
+	&.is-cropped ul.blocks-gallery-grid li.wp-block-image:not(.alignwide):not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter) {
 		a,
 		img {
 			// IE11 doesn't support object-fit, so just make sure images aren't skewed.
@@ -89,7 +88,7 @@
 	}
 
 	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
-	& .wp-block-image {
+	& .wp-block-image:not(.alignwide):not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter) {
 		width: calc( 50% - #{$grid-unit-20} );
 
 		&:nth-of-type( even ) {
@@ -97,7 +96,7 @@
 		}
 	}
 
-	&.columns-1 .wp-block-image {
+	&.columns-1 .wp-block-image:not(.alignwide):not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter) {
 		width: 100%;
 		margin-right: 0;
 	}
@@ -105,7 +104,7 @@
 	// Beyond mobile viewports, we allow up to 8 columns.
 	@include break-small {
 		@for $i from 3 through 8 {
-			&.columns-#{ $i } .wp-block-image {
+			&.columns-#{ $i } .wp-block-image:not(.alignwide):not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter) {
 				width: calc(
 					#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i}
 				);
@@ -118,7 +117,7 @@
 			&.columns-#{
 				$column-count
 				}
-				.wp-block-image:nth-of-type( #{ $column-count }n ) {
+				.wp-block-image:not(.alignwide):not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter):nth-of-type( #{ $column-count }n ) {
 				margin-right: 0;
 			}
 		}
