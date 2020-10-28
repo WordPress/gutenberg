@@ -100,7 +100,7 @@ async function toPassAxeTests(
 	}
 
 	if ( disabledFrames ) {
-		disabledFrames.forEach( axe.disableFrame );
+		disabledFrames.forEach( ( frame ) => axe.disableFrame( frame ) );
 	}
 
 	if ( config ) {
