@@ -1,0 +1,30 @@
+{
+	"name": "@wordpress/ui.styles",
+	"version": "11.1.1",
+	"description": "Styles System for WordPress UI.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"styles"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/ui.styles/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/ui.styles"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"sideEffects": false,
+	"dependencies": {
+		"@wp-g2/styles": "^0.0.95"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

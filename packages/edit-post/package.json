@@ -46,6 +46,7 @@
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
+		"@wordpress/ui.context": "file:../ui.context",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/warning": "file:../warning",

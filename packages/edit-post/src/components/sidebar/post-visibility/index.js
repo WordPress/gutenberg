@@ -8,6 +8,7 @@ import {
 	PostVisibilityLabel,
 	PostVisibilityCheck,
 } from '@wordpress/editor';
+import { ContextSystemProvider } from '@wordpress/ui.context';
 
 export function PostVisibility() {
 	return (
@@ -20,23 +21,27 @@ export function PostVisibility() {
 							<PostVisibilityLabel />
 						</span>
 					) }
-					{ canEdit && (
-						<Dropdown
-							position="bottom left"
-							contentClassName="edit-post-post-visibility__dialog"
-							renderToggle={ ( { isOpen, onToggle } ) => (
-								<Button
-									aria-expanded={ isOpen }
-									className="edit-post-post-visibility__toggle"
-									onClick={ onToggle }
-									isTertiary
-								>
-									<PostVisibilityLabel />
-								</Button>
-							) }
-							renderContent={ () => <PostVisibilityForm /> }
-						/>
-					) }
+					<ContextSystemProvider
+						value={ { Button: { version: 'next' } } }
+					>
+						{ canEdit && (
+							<Dropdown
+								position="bottom left"
+								contentClassName="edit-post-post-visibility__dialog"
+								renderToggle={ ( { isOpen, onToggle } ) => (
+									<Button
+										aria-expanded={ isOpen }
+										className="edit-post-post-visibility__toggle"
+										onClick={ onToggle }
+										isTertiary
+									>
+										<PostVisibilityLabel />
+									</Button>
+								) }
+								renderContent={ () => <PostVisibilityForm /> }
+							/>
+						) }
+					</ContextSystemProvider>
 				</PanelRow>
 			) }
 		/>

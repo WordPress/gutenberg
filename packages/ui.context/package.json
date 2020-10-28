@@ -1,0 +1,30 @@
+{
+	"name": "@wordpress/ui.context",
+	"version": "11.1.1",
+	"description": "Context System for WordPress UI.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"context"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/ui.context/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/ui.context"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"sideEffects": false,
+	"dependencies": {
+		"@wp-g2/context": "^0.0.95"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}
