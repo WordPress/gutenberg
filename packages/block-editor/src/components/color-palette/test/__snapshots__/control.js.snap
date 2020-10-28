@@ -92,6 +92,11 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   background: #1e1e1e;
 }
 
+.emotion-0[aria-expanded='true'],
+.emotion-0:hover {
+  color: #fff;
+}
+
 .emotion-2 {
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
