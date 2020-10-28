@@ -452,17 +452,6 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'hasNonPostEntityChanges', () => {
-		it( 'should return false if the full site editing experiment is disabled.', () => {
-			const state = {
-				currentPost: { id: 1, type: 'post' },
-				__experimentalGetDirtyEntityRecords() {
-					return [
-						{ kind: 'someKind', name: 'someName', key: 'someKey' },
-					];
-				},
-			};
-			expect( hasNonPostEntityChanges( state ) ).toBe( false );
-		} );
 		it( 'should return true if there are changes to an arbitrary entity', () => {
 			const state = {
 				currentPost: { id: 1, type: 'post' },
