@@ -112,7 +112,6 @@ class BottomSheetCell extends Component {
 			type,
 			step,
 			borderless,
-			preview,
 			...valueProps
 		} = this.props;
 
@@ -312,7 +311,6 @@ class BottomSheetCell extends Component {
 				>
 					<View style={ rowContainerStyles }>
 						<View style={ styles.cellRowContainer }>
-							{ preview }
 							{ icon && (
 								<View style={ styles.cellRowContainer }>
 									<Icon

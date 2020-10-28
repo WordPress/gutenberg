@@ -32,6 +32,7 @@ function UnitControl( {
 	units = CSS_UNITS,
 	unit,
 	getStylesFromColorScheme,
+	decimalNum,
 	...props
 } ) {
 	const pickerRef = useRef();
@@ -53,7 +54,7 @@ function UnitControl( {
 	}
 
 	const currentInputValue = currentInput === null ? value : currentInput;
-	const initialSliderValue = isFinite( currentInputValue )
+	const initialControlValue = isFinite( currentInputValue )
 		? currentInputValue
 		: initialPosition;
 
@@ -119,8 +120,9 @@ function UnitControl( {
 					onChange={ onChange }
 					separatorType={ separatorType }
 					value={ value }
-					defaultValue={ initialSliderValue }
+					defaultValue={ initialControlValue }
 					shouldDisplayTextInput={ true }
+					decimalNum={ unit === 'px' ? 0 : decimalNum }
 					{ ...props }
 				>
 					{ renderUnitPicker() }
@@ -132,8 +134,9 @@ function UnitControl( {
 					minimumValue={ min }
 					maximumValue={ max }
 					value={ value }
-					defaultValue={ initialSliderValue }
+					defaultValue={ initialControlValue }
 					separatorType={ separatorType }
+					decimalNum={ decimalNum }
 					{ ...props }
 				>
 					{ renderUnitPicker() }

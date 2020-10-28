@@ -6,6 +6,26 @@
 	justify-content: flex-end;
 }
 
+.rowContainer {
+	flex-direction: row;
+	align-items: center;
+}
+
+.columnContainer {
+	margin-top: 13px;
+	flex-direction: column;
+}
+
+.containerIOS {
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+
+.containerAndroid {
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
+
 .cellContainerStyles {
 	flex-direction: row;
 	align-items: flex-start;

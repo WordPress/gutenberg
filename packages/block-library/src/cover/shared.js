@@ -2,6 +2,8 @@
  * WordPress dependencies
  */
 import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
+import { __ } from '@wordpress/i18n';
+import { Platform } from '@wordpress/element';
 
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
@@ -24,11 +26,37 @@ export function backgroundImageStyles( url ) {
 }
 
 export const CSS_UNITS = [
-	{ value: 'px', label: 'px', default: 430 },
-	{ value: 'em', label: 'em', default: 20 },
-	{ value: 'rem', label: 'rem', default: 20 },
-	{ value: 'vw', label: 'vw', default: 20 },
-	{ value: 'vh', label: 'vh', default: 50 },
+	{
+		value: 'px',
+		label: Platform.OS === 'web' ? 'px' : __( 'Pixels (px)' ),
+		default: '',
+	},
+	{
+		value: 'em',
+		label:
+			Platform.OS === 'web'
+				? 'em'
+				: __( 'Relative to parent font size (em)' ),
+		default: '',
+	},
+	{
+		value: 'rem',
+		label:
+			Platform.OS === 'web'
+				? 'rem'
+				: __( 'Relative to root font size (rem)' ),
+		default: '',
+	},
+	{
+		value: 'vw',
+		label: Platform.OS === 'web' ? 'vw' : __( 'Viewport width (vw)' ),
+		default: '',
+	},
+	{
+		value: 'vh',
+		label: Platform.OS === 'web' ? 'vh' : __( 'Viewport height (vh)' ),
+		default: '',
+	},
 ];
 
 export function dimRatioToClass( ratio ) {

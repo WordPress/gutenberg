@@ -4,6 +4,12 @@
 import { sumBy, merge, mapValues } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+import { Platform } from '@wordpress/element';
+
+/**
  * Returns a column width attribute value rounded to standard precision.
  * Returns `undefined` if the value is not a valid finite number.
  *
@@ -139,9 +145,35 @@ export function getWidths( blocks, withParsing = true ) {
 }
 
 export const CSS_UNITS = [
-	{ value: '%', label: '%', default: '' },
-	{ value: 'px', label: 'px', default: '' },
-	{ value: 'em', label: 'em', default: '' },
-	{ value: 'rem', label: 'rem', default: '' },
-	{ value: 'vw', label: 'vw', default: '' },
+	{
+		value: '%',
+		label: Platform.OS === 'web' ? '%' : __( 'Percentage (%)' ),
+		default: '',
+	},
+	{
+		value: 'px',
+		label: Platform.OS === 'web' ? 'px' : __( 'Pixels (px)' ),
+		default: '',
+	},
+	{
+		value: 'em',
+		label:
+			Platform.OS === 'web'
+				? 'em'
+				: __( 'Relative to parent font size (em)' ),
+		default: '',
+	},
+	{
+		value: 'rem',
+		label:
+			Platform.OS === 'web'
+				? 'rem'
+				: __( 'Relative to root font size (rem)' ),
+		default: '',
+	},
+	{
+		value: 'vw',
+		label: Platform.OS === 'web' ? 'vw' : __( 'Viewport width (vw)' ),
+		default: '',
+	},
 ];
