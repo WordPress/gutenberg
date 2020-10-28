@@ -217,7 +217,7 @@ async function runAxeTestsForBlockEditor() {
 			'[role="treegrid"] [aria-posinset]',
 			'[role="treegrid"] [aria-setsize]',
 			// Ignore block previews.
-			'.block-editor-block-preview__container',
+			'.block-editor-block-preview__content',
 		],
 	} );
 }
