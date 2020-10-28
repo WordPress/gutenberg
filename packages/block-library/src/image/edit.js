@@ -80,6 +80,7 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
+	context,
 } ) {
 	const {
 		url = '',
@@ -90,6 +91,7 @@ export function ImageEdit( {
 		width,
 		height,
 		sizeSlug,
+		isListItem,
 	} = attributes;
 
 	const altRef = useRef();
@@ -107,6 +109,12 @@ export function ImageEdit( {
 		const { getSettings } = select( 'core/block-editor' );
 		return getSettings().mediaUpload;
 	} );
+
+	const allowResize =
+		context.allowResize !== undefined ? context.allowResize : true;
+
+	const allowAlign =
+		context.allowBlockAlign !== undefined ? context.allowBlockAlign : true;
 
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
@@ -262,13 +270,21 @@ export function ImageEdit( {
 		};
 	}, [ isTemp ] );
 
+	useEffect( () => {
+		if ( context?.isList ) {
+			setAttributes( { isListItem: context.isList } );
+		}
+	}, [ context ] );
+
 	const isExternal = isExternalImage( id, url );
 	const controls = (
 		<BlockControls>
-			<BlockAlignmentToolbar
-				value={ align }
-				onChange={ updateAlignment }
-			/>
+			{ allowAlign && (
+				<BlockAlignmentToolbar
+					value={ align }
+					onChange={ updateAlignment }
+				/>
+			) }
 		</BlockControls>
 	);
 	const src = isExternal ? url : undefined;
@@ -308,27 +324,44 @@ export function ImageEdit( {
 		className: classes,
 	} );
 
-	return (
-		<>
-			{ controls }
-			<figure { ...blockProps }>
-				{ url && (
-					<Image
-						attributes={ attributes }
-						setAttributes={ setAttributes }
-						isSelected={ isSelected }
-						insertBlocksAfter={ insertBlocksAfter }
-						onReplace={ onReplace }
-						onSelectImage={ onSelectImage }
-						onSelectURL={ onSelectURL }
-						onUploadError={ onUploadError }
-						containerRef={ ref }
-					/>
-				) }
-				{ mediaPlaceholder }
-			</figure>
-		</>
+	const image = url && (
+		<Image
+			attributes={ attributes }
+			setAttributes={ setAttributes }
+			isSelected={ isSelected }
+			insertBlocksAfter={ insertBlocksAfter }
+			onReplace={ onReplace }
+			onSelectImage={ onSelectImage }
+			onSelectURL={ onSelectURL }
+			onUploadError={ onUploadError }
+			containerRef={ ref }
+			allowResize={ allowResize }
+		/>
 	);
+
+	if ( isListItem ) {
+		return (
+			<>
+				{ controls }
+				<li { ...blockProps }>
+					<figure>
+						{ image }
+						{ mediaPlaceholder }
+					</figure>
+				</li>
+			</>
+		);
+	} else {
+		return (
+			<>
+				{ controls }
+				<figure { ...blockProps }>
+					{ image }
+					{ mediaPlaceholder }
+				</figure>
+			</>
+		);
+	}
 }
 
 export default withNotices( ImageEdit );
