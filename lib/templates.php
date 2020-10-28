@@ -68,6 +68,7 @@ function gutenberg_register_template_post_type() {
 			'excerpt',
 			'editor',
 			'revisions',
+			'custom-fields',
 		),
 	);
 
@@ -82,6 +83,13 @@ function gutenberg_register_template_post_type() {
 			'Theme-provided <span class="count">(%s)</span>',
 			'Theme-provided <span class="count">(%s)</span>'
 		),
+	) );
+
+	register_post_meta( 'wp_template', 'theme', array(
+		'type'           => 'string',
+		'description'    => 'The theme that provided the template, if any.',
+		'single'         => true,
+		'show_in_rest'   => true,
 	) );
 }
 add_action( 'init', 'gutenberg_register_template_post_type' );
@@ -163,6 +171,7 @@ function gutenberg_filter_template_list_table_columns( array $columns ) {
 	$columns['slug'] = __( 'Slug', 'gutenberg' );
 	$columns['description'] = __( 'Description', 'gutenberg' );
 	$columns['status'] = __( 'Status', 'gutenberg' );
+	$columns['source'] = __( 'Source', 'gutenberg' );
 	if ( isset( $columns['date'] ) ) {
 		unset( $columns['date'] );
 	}
@@ -177,19 +186,33 @@ add_filter( 'manage_wp_template_posts_columns', 'gutenberg_filter_template_list_
  * @param int    $post_id     Post ID.
  */
 function gutenberg_render_template_list_table_column( $column_name, $post_id ) {
-	switch( $column_name ) {
-		case 'slug':
-			$post = get_post( $post_id );
-			echo esc_html( $post->post_name );
-			break;
-		case 'description':
-			echo get_the_excerpt( $post_id );
-			break;
-		case 'status':
-			$post_status = get_post_status( $post_id );
-			$post_status_object = get_post_status_object( $post_status );
-			echo $post_status_object->label;
-			break;
+	if ( 'slug' === $column_name ) {
+		$post = get_post( $post_id );
+		echo esc_html( $post->post_name );
+		return;
+	}
+
+	if ( 'description' === $column_name ) {
+		echo get_the_excerpt( $post_id );
+		return;
+	}
+
+	if ( 'status' === $column_name ) {
+		$post_status = get_post_status( $post_id );
+		$post_status_object = get_post_status_object( $post_status );
+		echo $post_status_object->label;
+		return;
+	}
+
+	if ( 'source' === $column_name ) {
+		$theme = get_post_meta( $post_id, 'theme', true );
+		if ( $theme ) {
+			$theme_data = wp_get_theme( $theme );
+			echo sprintf( __( 'Theme: %s' ), $theme_data->display( 'Name' ) );
+			return;
+		}
+		echo __( 'Site' );
+		return;
 	}
 }
 add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_template_list_table_column', 10, 2 );

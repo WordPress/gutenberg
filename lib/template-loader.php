@@ -280,6 +280,7 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 				if ( ! is_array( $current_template_post ) ) {
 					$current_template_post->post_content = $file_contents;
 				}
+				$current_template_post['meta_input'] = array( 'theme' => wp_get_theme()->get_stylesheet() );
 				$current_template_post = get_post(
 					wp_insert_post( $current_template_post )
 				);
@@ -297,7 +298,7 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 	if ( ! $current_template_post && ( is_admin() || defined( 'REST_REQUEST' ) ) ) {
 		$current_template_post = array(
 			'post_title'  => 'index',
-			'post_status' => 'theme-provided',
+			'post_status' => 'publish',
 			'post_type'   => 'wp_template',
 			'post_name'   => 'index',
 		);
