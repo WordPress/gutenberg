@@ -208,7 +208,7 @@ async function runAxeTestsForBlockEditor() {
 		],
 		disabledFrames: [
 			// Ignore block previews.
-			'.block-editor-block-preview__container iframe',
+			'[aria-hidden="true"]',
 		],
 		exclude: [
 			// Ignores elements created by metaboxes.
