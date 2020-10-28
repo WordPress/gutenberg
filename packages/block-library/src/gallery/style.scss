@@ -7,9 +7,13 @@
 		// Some themes give all <ul> default margin instead of padding.
 		margin: 0;
 
-		li.wp-block-image {
-			// Add space between thumbnails, and unset right most thumbnails later.
+		// Add space between thumbnails, and unset right most thumbnails later.
+		// Need all the extra selectors to override specificity on default image block.
+		li.wp-block-image:not(.alignwide):not(.alignfull):not(.alignleft):not(.alignright):not(.aligncenter) {
 			margin: 0 $grid-unit-20 $grid-unit-20 0;
+		}
+
+		li.wp-block-image {
 			display: flex;
 			flex-grow: 1;
 			flex-direction: column;
