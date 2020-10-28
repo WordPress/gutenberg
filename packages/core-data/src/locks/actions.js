@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { syncSelect, awaitPromise } from '@wordpress/data-controls';
+import { awaitPromise } from '@wordpress/data-controls';
+import { controls } from '@wordpress/data';
 
 export function* acquireStoreLock( store, path, { exclusive } ) {
 	const promise = yield* enqueueLockRequest( store, path, { exclusive } );
@@ -33,10 +34,13 @@ export function* processPendingLockRequests() {
 	yield {
 		type: 'PROCESS_PENDING_LOCK_REQUESTS',
 	};
-	const lockRequests = yield syncSelect( 'core', 'getPendingLockRequests' );
+	const lockRequests = yield controls.select(
+		'core',
+		'getPendingLockRequests'
+	);
 	for ( const request of lockRequests ) {
 		const { store, path, exclusive, notifyAcquired } = request;
-		const isAvailable = yield syncSelect(
+		const isAvailable = yield controls.select(
 			'core',
 			'isLockAvailable',
 			store,
