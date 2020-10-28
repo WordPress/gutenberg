@@ -2,50 +2,6 @@
 	"name": "core/gallery",
 	"category": "media",
 	"attributes": {
-		"images": {
-			"type": "array",
-			"default": [],
-			"source": "query",
-			"selector": ".blocks-gallery-item",
-			"query": {
-				"url": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "src"
-				},
-				"fullUrl": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "data-full-url"
-				},
-				"link": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "data-link"
-				},
-				"alt": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "alt",
-					"default": ""
-				},
-				"id": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "data-id"
-				},
-				"caption": {
-					"type": "string",
-					"source": "html",
-					"selector": ".blocks-gallery-item__caption"
-				}
-			}
-		},
 		"ids": {
 			"type": "array",
 			"items": {
@@ -73,6 +29,23 @@
 		"sizeSlug": {
 			"type": "string",
 			"default": "large"
+		},
+		"allowBlockAlign": {
+			"type": "boolean",
+			"default": false
+		},
+		"allowResize": {
+			"type": "boolean",
+			"default": false
+		},
+		"isList": {
+			"type": "boolean",
+			"default": true
+		},
+		"providesContext": {
+			"allowBlockAlign": "allowBlockAlign",
+			"allowResize": "allowResize",
+			"isList": "isList"
 		}
 	},
 	"supports": {
