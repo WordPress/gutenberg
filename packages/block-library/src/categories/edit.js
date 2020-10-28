@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { times, unescape } from 'lodash';
+import { filter, map, times, unescape } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,19 +9,21 @@ import { times, unescape } from 'lodash';
 import {
 	PanelBody,
 	Placeholder,
+	SelectControl,
 	Spinner,
 	ToggleControl,
 	VisuallyHidden,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { withSelect, useSelect } from '@wordpress/data';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { pin } from '@wordpress/icons';
 
-export default function CategoriesEdit( {
-	attributes: { displayAsDropdown, showHierarchy, showPostCounts },
+function CategoriesEdit( {
+	attributes: { taxonomy, displayAsDropdown, showHierarchy, showPostCounts },
 	setAttributes,
+	taxonomies
 } ) {
 	const selectId = useInstanceId( CategoriesEdit, 'blocks-category-select' );
 	const { categories, isRequesting } = useSelect( ( select ) => {
@@ -29,10 +31,10 @@ export default function CategoriesEdit( {
 		const { isResolving } = select( 'core/data' );
 		const query = { per_page: -1, hide_empty: true };
 		return {
-			categories: getEntityRecords( 'taxonomy', 'category', query ),
+			categories: getEntityRecords( 'taxonomy', taxonomy, query ),
 			isRequesting: isResolving( 'core', 'getEntityRecords', [
 				'taxonomy',
-				'category',
+				taxonomy,
 				query,
 			] ),
 		};
@@ -123,11 +125,37 @@ export default function CategoriesEdit( {
 				),
 		];
 	};
+	const getTaxonomyOptions = () => {
+		const selectOption = {
+			label: __( '- Select -' ),
+			value: '',
+			disabled: true,
+		};
+		const taxonomyOptions = map(
+			filter( taxonomies, 'show_cloud' ),
+			( item ) => {
+				return {
+					value: item.slug,
+					label: item.name,
+				};
+			}
+		);
+
+		return [ selectOption, ...taxonomyOptions ];
+	};
 
 	return (
 		<div { ...useBlockProps() }>
 			<InspectorControls>
 				<PanelBody title={ __( 'Categories settings' ) }>
+					<SelectControl
+						label={ __( 'Taxonomy' ) }
+						options={ getTaxonomyOptions() }
+						value={ taxonomy }
+						onChange={ ( selectedTaxonomy ) =>
+							setAttributes( { taxonomy: selectedTaxonomy } )
+						}
+					/>
 					<ToggleControl
 						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
@@ -157,3 +185,9 @@ export default function CategoriesEdit( {
 		</div>
 	);
 }
+
+export default withSelect( ( select ) => {
+	return {
+		taxonomies: select( 'core' ).getTaxonomies(),
+	};
+} )( CategoriesEdit );

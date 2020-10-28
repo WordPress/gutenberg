@@ -3,6 +3,10 @@
 	"name": "core/categories",
 	"category": "widgets",
 	"attributes": {
+		"taxonomy": {
+			"type": "string",
+			"default": "category"
+		},
 		"displayAsDropdown": {
 			"type": "boolean",
 			"default": false
