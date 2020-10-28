@@ -17,7 +17,7 @@ function render_block_core_categories( $attributes ) {
 	$block_id++;
 
 	$args = array(
-		'taxonomy'     => empty($attributes['taxonomy']) ? 'category' : $attributes['taxonomy'],
+		'taxonomy'     => empty( $attributes['taxonomy'] ) ? 'category' : $attributes['taxonomy'],
 		'echo'         => false,
 		'hierarchical' => ! empty( $attributes['showHierarchy'] ),
 		'orderby'      => 'name',
