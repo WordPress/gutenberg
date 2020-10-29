@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-navigation",
-	"version": "1.6.0",
+	"version": "1.7.1",
 	"private": true,
 	"description": "Module for the Navigation page in WordPress.",
 	"author": "The WordPress Contributors",
@@ -23,10 +23,6 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
-	"sideEffects": [
-		"build-style/**",
-		"!((src|build|build-module)/components/**)"
-	],
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
 		"@wordpress/api-fetch": "file:../api-fetch",
@@ -51,7 +47,7 @@
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",
 		"rememo": "^3.0.0",
-		"uuid": "^7.0.2"
+		"uuid": "^8.3.0"
 	},
 	"publishConfig": {
 		"access": "public"

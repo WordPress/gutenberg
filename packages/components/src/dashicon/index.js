@@ -1,4 +1,16 @@
-function Dashicon( { icon, size = 20, className, ...extraProps } ) {
+/**
+ * @typedef OwnProps
+ *
+ * @property {string} icon        Icon name
+ * @property {string} [className] Class name
+ */
+/** @typedef {import('react').ComponentPropsWithoutRef<'span'> & OwnProps} Props */
+
+/**
+ * @param {Props} props
+ * @return {JSX.Element} Element
+ */
+function Dashicon( { icon, className, ...extraProps } ) {
 	const iconClass = [
 		'dashicon',
 		'dashicons',
@@ -8,14 +20,7 @@ function Dashicon( { icon, size = 20, className, ...extraProps } ) {
 		.filter( Boolean )
 		.join( ' ' );
 
-	return (
-		<span
-			className={ iconClass }
-			width={ size }
-			height={ size }
-			{ ...extraProps }
-		/>
-	);
+	return <span className={ iconClass } { ...extraProps } />;
 }
 
 export default Dashicon;

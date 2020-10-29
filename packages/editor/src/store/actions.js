@@ -1,18 +1,14 @@
 /**
  * External dependencies
  */
-import { has, castArray } from 'lodash';
+import { has } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-import {
-	dispatch,
-	select,
-	syncSelect,
-	apiFetch,
-} from '@wordpress/data-controls';
+import { controls } from '@wordpress/data';
+import { apiFetch } from '@wordpress/data-controls';
 import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
 
 /**
@@ -122,8 +118,8 @@ export function* resetAutosave( newAutosave ) {
 		plugin: 'Gutenberg',
 	} );
 
-	const postId = yield select( STORE_KEY, 'getCurrentPostId' );
-	yield dispatch( 'core', 'receiveAutosaves', postId, newAutosave );
+	const postId = yield controls.select( STORE_KEY, 'getCurrentPostId' );
+	yield controls.dispatch( 'core', 'receiveAutosaves', postId, newAutosave );
 
 	return { type: '__INERT__' };
 }
@@ -196,8 +192,8 @@ export function setupEditorState( post ) {
  * @yield {Object} Action object or control.
  */
 export function* editPost( edits, options ) {
-	const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
-	yield dispatch(
+	const { id, type } = yield controls.select( STORE_KEY, 'getCurrentPost' );
+	yield controls.dispatch(
 		'core',
 		'editEntityRecord',
 		'postType',
@@ -229,21 +225,23 @@ export function __experimentalOptimisticUpdatePost( edits ) {
  * @param {Object} options
  */
 export function* savePost( options = {} ) {
-	if ( ! ( yield select( STORE_KEY, 'isEditedPostSaveable' ) ) ) {
+	if ( ! ( yield controls.select( STORE_KEY, 'isEditedPostSaveable' ) ) ) {
 		return;
 	}
 	let edits = {
-		content: yield select( STORE_KEY, 'getEditedPostContent' ),
+		content: yield controls.select( STORE_KEY, 'getEditedPostContent' ),
 	};
 	if ( ! options.isAutosave ) {
-		yield dispatch( STORE_KEY, 'editPost', edits, { undoIgnore: true } );
+		yield controls.dispatch( STORE_KEY, 'editPost', edits, {
+			undoIgnore: true,
+		} );
 	}
 
 	yield __experimentalRequestPostUpdateStart( options );
-	const previousRecord = yield select( STORE_KEY, 'getCurrentPost' );
+	const previousRecord = yield controls.select( STORE_KEY, 'getCurrentPost' );
 	edits = {
 		id: previousRecord.id,
-		...( yield select(
+		...( yield controls.select(
 			'core',
 			'getEntityRecordNonTransientEdits',
 			'postType',
@@ -252,7 +250,7 @@ export function* savePost( options = {} ) {
 		) ),
 		...edits,
 	};
-	yield dispatch(
+	yield controls.dispatch(
 		'core',
 		'saveEntityRecord',
 		'postType',
@@ -262,7 +260,7 @@ export function* savePost( options = {} ) {
 	);
 	yield __experimentalRequestPostUpdateFinish( options );
 
-	const error = yield select(
+	const error = yield controls.select(
 		'core',
 		'getLastEntitySaveError',
 		'postType',
@@ -276,23 +274,38 @@ export function* savePost( options = {} ) {
 			error,
 		} );
 		if ( args.length ) {
-			yield dispatch( 'core/notices', 'createErrorNotice', ...args );
+			yield controls.dispatch(
+				'core/notices',
+				'createErrorNotice',
+				...args
+			);
 		}
 	} else {
-		const updatedRecord = yield select( STORE_KEY, 'getCurrentPost' );
+		const updatedRecord = yield controls.select(
+			STORE_KEY,
+			'getCurrentPost'
+		);
 		const args = getNotificationArgumentsForSaveSuccess( {
 			previousPost: previousRecord,
 			post: updatedRecord,
-			postType: yield select( 'core', 'getPostType', updatedRecord.type ),
+			postType: yield controls.resolveSelect(
+				'core',
+				'getPostType',
+				updatedRecord.type
+			),
 			options,
 		} );
 		if ( args.length ) {
-			yield dispatch( 'core/notices', 'createSuccessNotice', ...args );
+			yield controls.dispatch(
+				'core/notices',
+				'createSuccessNotice',
+				...args
+			);
 		}
 		// Make sure that any edits after saving create an undo level and are
 		// considered for change detection.
 		if ( ! options.isAutosave ) {
-			yield dispatch(
+			yield controls.dispatch(
 				'core/block-editor',
 				'__unstableMarkLastChangeAsPersistent'
 			);
@@ -304,9 +317,16 @@ export function* savePost( options = {} ) {
  * Action generator for handling refreshing the current post.
  */
 export function* refreshPost() {
-	const post = yield select( STORE_KEY, 'getCurrentPost' );
-	const postTypeSlug = yield select( STORE_KEY, 'getCurrentPostType' );
-	const postType = yield select( 'core', 'getPostType', postTypeSlug );
+	const post = yield controls.select( STORE_KEY, 'getCurrentPost' );
+	const postTypeSlug = yield controls.select(
+		STORE_KEY,
+		'getCurrentPostType'
+	);
+	const postType = yield controls.resolveSelect(
+		'core',
+		'getPostType',
+		postTypeSlug
+	);
 	const newPost = yield apiFetch( {
 		// Timestamp arg allows caller to bypass browser caching, which is
 		// expected for this specific function.
@@ -314,26 +334,37 @@ export function* refreshPost() {
 			`/wp/v2/${ postType.rest_base }/${ post.id }` +
 			`?context=edit&_timestamp=${ Date.now() }`,
 	} );
-	yield dispatch( STORE_KEY, 'resetPost', newPost );
+	yield controls.dispatch( STORE_KEY, 'resetPost', newPost );
 }
 
 /**
  * Action generator for trashing the current post in the editor.
  */
 export function* trashPost() {
-	const postTypeSlug = yield select( STORE_KEY, 'getCurrentPostType' );
-	const postType = yield select( 'core', 'getPostType', postTypeSlug );
-	yield dispatch( 'core/notices', 'removeNotice', TRASH_POST_NOTICE_ID );
+	const postTypeSlug = yield controls.select(
+		STORE_KEY,
+		'getCurrentPostType'
+	);
+	const postType = yield controls.resolveSelect(
+		'core',
+		'getPostType',
+		postTypeSlug
+	);
+	yield controls.dispatch(
+		'core/notices',
+		'removeNotice',
+		TRASH_POST_NOTICE_ID
+	);
 	try {
-		const post = yield select( STORE_KEY, 'getCurrentPost' );
+		const post = yield controls.select( STORE_KEY, 'getCurrentPost' );
 		yield apiFetch( {
 			path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
 			method: 'DELETE',
 		} );
 
-		yield dispatch( STORE_KEY, 'savePost' );
+		yield controls.dispatch( STORE_KEY, 'savePost' );
 	} catch ( error ) {
-		yield dispatch(
+		yield controls.dispatch(
 			'core/notices',
 			'createErrorNotice',
 			...getNotificationArgumentsForTrashFail( { error } )
@@ -342,36 +373,46 @@ export function* trashPost() {
 }
 
 /**
- * Action generator used in signalling that the post should autosave.
+ * Action generator used in signalling that the post should autosave.  This
+ * includes server-side autosaving (default) and client-side (a.k.a. local)
+ * autosaving (e.g. on the Web, the post might be committed to Session
+ * Storage).
  *
  * @param {Object?} options Extra flags to identify the autosave.
  */
-export function* autosave( options ) {
-	yield dispatch( STORE_KEY, 'savePost', { isAutosave: true, ...options } );
-}
-
-export function* __experimentalLocalAutosave() {
-	const post = yield select( STORE_KEY, 'getCurrentPost' );
-	const isPostNew = yield select( STORE_KEY, 'isEditedPostNew' );
-	const title = yield select( STORE_KEY, 'getEditedPostAttribute', 'title' );
-	const content = yield select(
-		STORE_KEY,
-		'getEditedPostAttribute',
-		'content'
-	);
-	const excerpt = yield select(
-		STORE_KEY,
-		'getEditedPostAttribute',
-		'excerpt'
-	);
-	yield {
-		type: 'LOCAL_AUTOSAVE_SET',
-		postId: post.id,
-		isPostNew,
-		title,
-		content,
-		excerpt,
-	};
+export function* autosave( { local = false, ...options } = {} ) {
+	if ( local ) {
+		const post = yield controls.select( STORE_KEY, 'getCurrentPost' );
+		const isPostNew = yield controls.select( STORE_KEY, 'isEditedPostNew' );
+		const title = yield controls.select(
+			STORE_KEY,
+			'getEditedPostAttribute',
+			'title'
+		);
+		const content = yield controls.select(
+			STORE_KEY,
+			'getEditedPostAttribute',
+			'content'
+		);
+		const excerpt = yield controls.select(
+			STORE_KEY,
+			'getEditedPostAttribute',
+			'excerpt'
+		);
+		yield {
+			type: 'LOCAL_AUTOSAVE_SET',
+			postId: post.id,
+			isPostNew,
+			title,
+			content,
+			excerpt,
+		};
+	} else {
+		yield controls.dispatch( STORE_KEY, 'savePost', {
+			isAutosave: true,
+			...options,
+		} );
+	}
 }
 
 /**
@@ -381,7 +422,7 @@ export function* __experimentalLocalAutosave() {
  * @yield {Object} Action object.
  */
 export function* redo() {
-	yield dispatch( 'core', 'redo' );
+	yield controls.dispatch( 'core', 'redo' );
 }
 
 /**
@@ -390,7 +431,7 @@ export function* redo() {
  * @yield {Object} Action object.
  */
 export function* undo() {
-	yield dispatch( 'core', 'undo' );
+	yield controls.dispatch( 'core', 'undo' );
 }
 
 /**
@@ -414,115 +455,6 @@ export function updatePostLock( lock ) {
 	return {
 		type: 'UPDATE_POST_LOCK',
 		lock,
-	};
-}
-
-/**
- * Returns an action object used to fetch a single reusable block or all
- * reusable blocks from the REST API into the store.
- *
- * @param {?string} id If given, only a single reusable block with this ID will
- *                     be fetched.
- *
- * @return {Object} Action object.
- */
-export function __experimentalFetchReusableBlocks( id ) {
-	return {
-		type: 'FETCH_REUSABLE_BLOCKS',
-		id,
-	};
-}
-
-/**
- * Returns an action object used in signalling that reusable blocks have been
- * received. `results` is an array of objects containing:
- *  - `reusableBlock` - Details about how the reusable block is persisted.
- *  - `parsedBlock` - The original block.
- *
- * @param {Object[]} results Reusable blocks received.
- *
- * @return {Object} Action object.
- */
-export function __experimentalReceiveReusableBlocks( results ) {
-	return {
-		type: 'RECEIVE_REUSABLE_BLOCKS',
-		results,
-	};
-}
-
-/**
- * Returns an action object used to save a reusable block that's in the store to
- * the REST API.
- *
- * @param {Object} id The ID of the reusable block to save.
- *
- * @return {Object} Action object.
- */
-export function __experimentalSaveReusableBlock( id ) {
-	return {
-		type: 'SAVE_REUSABLE_BLOCK',
-		id,
-	};
-}
-
-/**
- * Returns an action object used to delete a reusable block via the REST API.
- *
- * @param {number} id The ID of the reusable block to delete.
- *
- * @return {Object} Action object.
- */
-export function __experimentalDeleteReusableBlock( id ) {
-	return {
-		type: 'DELETE_REUSABLE_BLOCK',
-		id,
-	};
-}
-
-/**
- * Returns an action object used in signalling that a reusable block is
- * to be updated.
- *
- * @param {number} id      The ID of the reusable block to update.
- * @param {Object} changes The changes to apply.
- *
- * @return {Object} Action object.
- */
-export function __experimentalUpdateReusableBlock( id, changes ) {
-	return {
-		type: 'UPDATE_REUSABLE_BLOCK',
-		id,
-		changes,
-	};
-}
-
-/**
- * Returns an action object used to convert a reusable block into a static
- * block.
- *
- * @param {string} clientId The client ID of the block to attach.
- *
- * @return {Object} Action object.
- */
-export function __experimentalConvertBlockToStatic( clientId ) {
-	return {
-		type: 'CONVERT_BLOCK_TO_STATIC',
-		clientId,
-	};
-}
-
-/**
- * Returns an action object used to convert a static block into a reusable
- * block.
- *
- * @param {string} clientIds The client IDs of the block to detach.
- *
- * @return {Object} Action object.
- */
-export function __experimentalConvertBlockToReusable( clientIds ) {
-	return {
-		type: 'CONVERT_BLOCK_TO_REUSABLE',
-		clientIds: castArray( clientIds ),
 	};
 }
 
@@ -677,9 +609,12 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 	const edits = { blocks, selectionStart, selectionEnd };
 
 	if ( __unstableShouldCreateUndoLevel !== false ) {
-		const { id, type } = yield select( STORE_KEY, 'getCurrentPost' );
+		const { id, type } = yield controls.select(
+			STORE_KEY,
+			'getCurrentPost'
+		);
 		const noChange =
-			( yield syncSelect(
+			( yield controls.select(
 				'core',
 				'getEditedEntityRecord',
 				'postType',
@@ -687,7 +622,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 				id
 			) ).blocks === edits.blocks;
 		if ( noChange ) {
-			return yield dispatch(
+			return yield controls.dispatch(
 				'core',
 				'__unstableCreateUndoLevel',
 				'postType',
@@ -729,7 +664,7 @@ const getBlockEditorAction = ( name ) =>
 			alternative:
 				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',
 		} );
-		yield dispatch( 'core/block-editor', name, ...args );
+		yield controls.dispatch( 'core/block-editor', name, ...args );
 	};
 
 /**

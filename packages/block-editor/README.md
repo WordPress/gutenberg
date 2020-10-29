@@ -392,7 +392,9 @@ Undocumented declaration.
 
 <a name="InspectorAdvancedControls" href="#InspectorAdvancedControls">#</a> **InspectorAdvancedControls**
 
-Undocumented declaration.
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inspector-controls-advanced/README.md>
 
 <a name="InspectorControls" href="#InspectorControls">#</a> **InspectorControls**
 
@@ -486,7 +488,6 @@ _Properties_
 -   _maxWidth_ `number`: Max width to constraint resizing
 -   _allowedBlockTypes_ `(boolean|Array)`: Allowed block types
 -   _hasFixedToolbar_ `boolean`: Whether or not the editor toolbar is fixed
--   _hasPermissionsToManageWidgets_ `boolean`: Whether or not the user is able to manage widgets.
 -   _focusMode_ `boolean`: Whether the focus mode is enabled or not
 -   _styles_ `Array`: Editor Styles
 -   _isRTL_ `boolean`: Whether the editor is in RTL mode
@@ -497,7 +498,6 @@ _Properties_
 -   _\_\_experimentalCanUserUseUnfilteredHTML_ `boolean`: Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
 -   _\_\_experimentalBlockDirectory_ `boolean`: Whether the user has enabled the Block Directory
 -   _\_\_experimentalEnableFullSiteEditing_ `boolean`: Whether the user has enabled Full Site Editing
--   _\_\_experimentalEnableFullSiteEditingDemo_ `boolean`: Whether the user has enabled Full Site Editing Demo Templates
 -   _\_\_experimentalBlockPatterns_ `Array`: Array of objects representing the block patterns
 -   _\_\_experimentalBlockPatternCategories_ `Array`: Array of objects representing the block pattern categories
 

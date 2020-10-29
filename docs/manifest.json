@@ -1758,6 +1758,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/reusable-blocks",
+		"slug": "packages-reusable-blocks",
+		"markdown_source": "../packages/reusable-blocks/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/rich-text",
 		"slug": "packages-rich-text",
 		"markdown_source": "../packages/rich-text/README.md",

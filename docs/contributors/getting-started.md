@@ -30,11 +30,11 @@ If you do not have a local WordPress environment setup, follow the steps in the 
 
 ### Using wp-env to Install a Local Environment
 
-The [wp-env package](/packages/env/README.md) was developed with the Gutneberg project as a quick way to create a standard WordPress environment using Docker. It is also published as the `@wordpress/env` npm package.
+The [wp-env package](/packages/env/README.md) was developed with the Gutenberg project as a quick way to create a standard WordPress environment using Docker. It is also published as the `@wordpress/env` npm package.
 
-By default, `wp-env` can run in a plugin direcotry to create and run a WordPress enviornment, mounting and activating the plugin automatically. You can also configure `wp-env` to use existing installs, multiple plugins, or themes. See the [wp-env package](/packages/env/README.md#wp-envjson) for complete documentation.
+By default, `wp-env` can run in a plugin directory to create and run a WordPress enviornment, mounting and activating the plugin automatically. You can also configure `wp-env` to use existing installs, multiple plugins, or themes. See the [wp-env package](/packages/env/README.md#wp-envjson) for complete documentation.
 
-If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`. See the [Developement Environment tutorial for additional details](/docs/designers-developers/developers/tutorials/devenv/readme.md).
+If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`. See the [Development Environment tutorial for additional details](/docs/designers-developers/developers/tutorials/devenv/readme.md).
 
 Once Docker is installed and running: To install WordPress, run the following from within the cloned gutenberg directory:
 
@@ -87,7 +87,7 @@ You'll need to run this again if new plugins are added. To run e2e tests:
 WP_BASE_URL=http://localhost:8888/gutenberg npm run test-e2e
 ```
 
-### Caching of PHP files
+#### Caching of PHP files
 
 You'll need to disable OPCache in order to correctly work on PHP files. To fix:
 
@@ -95,7 +95,7 @@ You'll need to disable OPCache in order to correctly work on PHP files. To fix:
 - Under **Cache**, select **off**
 - Confirm with **OK**
 
-### Incoming connections
+#### Incoming connections
 
 By default, the web server (Apache) launched by MAMP will listen to all incoming connections, not just local ones. This means that anyone on the same local network (and, in certain cases, anyone on the Internet) can access your web server. This may be intentional and useful for testing sites on other devices, but most often this can be a privacy or security issue. Keep this in mind and don't store sensitive information in this server.
 
@@ -104,7 +104,7 @@ While it is possible to fix this, you should fix it at your own risk, since it b
 - Edit `/Applications/MAMP/conf/apache/httpd.conf`
 - Change `Listen 8888` to `Listen 127.0.0.1:8888`
 
-### Linking to other directories
+#### Linking to other directories
 
 You may like to create links in your `plugins` and `themes` directories to other folders, e.g.
 
@@ -116,10 +116,11 @@ If so, you need to instruct Apache to allow following such links:
 - Open or start a new file at `/Applications/MAMP/htdocs/.htaccess`
 - Add the following line: `Options +SymLinksIfOwnerMatch`
 
-## On A Remote Server
-=======
+#### Using WP-CLI
+
+Tools like MAMP tend to configure MySQL to use ports other than the default 3306, often preferring 8889. This may throw off WP-CLI, which will fail after trying to connect to the database. To remedy this, edit `wp-config.php` and change the `DB_HOST` constant from `define( 'DB_HOST', 'localhost' )` to `define( 'DB_HOST', '127.0.0.1:8889' )`.
+
 ### On A Remote Server
->>>>>>> Docs: Refresh Getting Started guide
 
 You can use a remote server in development by building locally and then uploading the built files as a plugin to the remote server.
 

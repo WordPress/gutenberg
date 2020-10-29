@@ -16,15 +16,16 @@ import {
 import QueryToolbar from './query-toolbar';
 import QueryProvider from './query-provider';
 import QueryInspectorControls from './query-inspector-controls';
+import QueryPlaceholder from './query-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
 const TEMPLATE = [ [ 'core/query-loop' ] ];
-export default function QueryEdit( {
+export function QueryContent( {
 	attributes: { queryId, query },
 	context: { postId },
 	setAttributes,
 } ) {
-	const instanceId = useInstanceId( QueryEdit );
+	const instanceId = useInstanceId( QueryContent );
 	const blockProps = useBlockProps();
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
@@ -44,7 +45,7 @@ export default function QueryEdit( {
 		if ( ! query.perPage && postsPerPage ) {
 			newQuery.perPage = postsPerPage;
 		}
-		if ( Object.keys( newQuery ).length ) {
+		if ( !! Object.keys( newQuery ).length ) {
 			updateQuery( newQuery );
 		}
 	}, [ query.perPage, query.exclude, postId ] );
@@ -65,11 +66,27 @@ export default function QueryEdit( {
 			</BlockControls>
 			<div { ...blockProps }>
 				<QueryProvider>
-					<InnerBlocks template={ TEMPLATE } />
+					<InnerBlocks
+						template={ TEMPLATE }
+						templateInsertUpdatesSelection={ false }
+					/>
 				</QueryProvider>
 			</div>
 		</>
 	);
 }
 
+const QueryEdit = ( props ) => {
+	const { clientId } = props;
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			!! select( 'core/block-editor' ).getBlocks( clientId ).length,
+		[ clientId ]
+	);
+	const Component = hasInnerBlocks ? QueryContent : QueryPlaceholder;
+
+	return <Component { ...props } />;
+};
+
+export default QueryEdit;
 export * from './query-provider';

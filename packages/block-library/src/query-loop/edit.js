@@ -35,6 +35,7 @@ export default function QueryLoopEdit( {
 			author,
 			search,
 			exclude,
+			sticky,
 		} = {},
 		queryContext,
 	},
@@ -44,6 +45,8 @@ export default function QueryLoopEdit( {
 
 	const { posts, blocks } = useSelect(
 		( select ) => {
+			const { getEntityRecords } = select( 'core' );
+			const { getBlocks } = select( 'core/block-editor' );
 			const query = {
 				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
 				categories: categoryIds,
@@ -63,13 +66,15 @@ export default function QueryLoopEdit( {
 			if ( exclude?.length ) {
 				query.exclude = exclude;
 			}
+			// If sticky is not set, it will return all posts in the results.
+			// If sticky is set to `only`, it will limit the results to sticky posts only.
+			// If it is anything else, it will exclude sticky posts from results. For the record the value stored is `exclude`.
+			if ( sticky ) {
+				query.sticky = sticky === 'only';
+			}
 			return {
-				posts: select( 'core' ).getEntityRecords(
-					'postType',
-					postType,
-					query
-				),
-				blocks: select( 'core/block-editor' ).getBlocks( clientId ),
+				posts: getEntityRecords( 'postType', postType, query ),
+				blocks: getBlocks( clientId ),
 			};
 		},
 		[
@@ -85,6 +90,7 @@ export default function QueryLoopEdit( {
 			search,
 			postType,
 			exclude,
+			sticky,
 		]
 	);
 
@@ -98,7 +104,11 @@ export default function QueryLoopEdit( {
 	);
 	const blockProps = useBlockProps();
 
-	if ( ! posts?.length ) {
+	if ( ! posts ) {
+		return <p { ...blockProps }>{ __( 'Loading…' ) }</p>;
+	}
+
+	if ( ! posts.length ) {
 		return <p { ...blockProps }> { __( 'No results found.' ) }</p>;
 	}
 
@@ -112,7 +122,10 @@ export default function QueryLoopEdit( {
 					>
 						{ blockContext ===
 						( activeBlockContext || blockContexts[ 0 ] ) ? (
-							<InnerBlocks template={ TEMPLATE } />
+							<InnerBlocks
+								template={ TEMPLATE }
+								templateInsertUpdatesSelection={ false }
+							/>
 						) : (
 							<BlockPreview
 								blocks={ blocks }

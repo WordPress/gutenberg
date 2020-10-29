@@ -1,7 +1,6 @@
 {
 	"name": "@wordpress/edit-widgets",
-	"version": "0.23.0",
-	"private": true,
+	"version": "1.1.1",
 	"description": "Widgets Page module for WordPress..",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,10 +22,6 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
-	"sideEffects": [
-		"build-style/**",
-		"!((src|build|build-module)/components/**)"
-	],
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
 		"@wordpress/api-fetch": "file:../api-fetch",
@@ -48,12 +43,14 @@
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
+		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",
 		"reakit": "^1.1.0",
-		"rememo": "^3.0.0"
+		"rememo": "^3.0.0",
+		"uuid": "^8.3.0"
 	},
 	"publishConfig": {
 		"access": "public"

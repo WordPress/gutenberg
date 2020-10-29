@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/editor",
-	"version": "9.23.0",
+	"version": "9.24.1",
 	"description": "Building blocks for WordPress editors.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,7 +23,8 @@
 	"react-native": "src/index",
 	"sideEffects": [
 		"build-style/**",
-		"!((src|build|build-module)/(components|utils)/**)"
+		"src/**/*.scss",
+		"{src,build,build-module}/{index.js,store/index.js,hooks/**}"
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
@@ -49,6 +50,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
+		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",

@@ -39,6 +39,9 @@ export {
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
 export { default as __experimentalLinkControl } from './link-control';
+export { default as __experimentalLinkControlSearchInput } from './link-control/search-input';
+export { default as __experimentalLinkControlSearchResults } from './link-control/search-results';
+export { default as __experimentalLinkControlSearchItem } from './link-control/search-item';
 export { default as LineHeightControl } from './line-height-control';
 export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';

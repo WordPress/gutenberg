@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { render } from 'enzyme';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -16,7 +11,6 @@ import {
 /**
  * Internal dependencies
  */
-import EmbedEdit from '../edit';
 import {
 	findMoreSuitableBlock,
 	getClassNames,
@@ -32,12 +26,6 @@ const { name: DEFAULT_EMBED_BLOCK, attributes } = metadata;
 
 jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {} ) );
 
-describe( 'core/embed', () => {
-	test( 'block edit matches snapshot', () => {
-		const wrapper = render( <EmbedEdit attributes={ {} } /> );
-		expect( wrapper ).toMatchSnapshot();
-	} );
-} );
 describe( 'utils', () => {
 	beforeAll( () => {
 		registerBlockType( DEFAULT_EMBED_BLOCK, {

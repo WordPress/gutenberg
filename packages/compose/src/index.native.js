@@ -28,3 +28,4 @@ export { default as withPreferredColorScheme } from './higher-order/with-preferr
 export { default as usePreferredColorScheme } from './hooks/use-preferred-color-scheme';
 export { default as usePreferredColorSchemeStyle } from './hooks/use-preferred-color-scheme-style';
 export { default as useResizeObserver } from './hooks/use-resize-observer';
+export { default as useDebounce } from './hooks/use-debounce';
