@@ -1,7 +1,7 @@
 PODS:
   - boost-for-react-native (1.63.0)
   - BVLinearGradient (2.5.6):
-    - React-Core
+    - React
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.63.2)
   - FBReactNativeSpec (0.63.2):
@@ -193,22 +193,22 @@ PODS:
     - React-jsi (= 0.63.2)
   - React-jsinspector (0.63.2)
   - react-native-blur (0.8.0):
-    - React-Core
+    - React
   - react-native-get-random-values (1.4.0):
-    - React-Core
+    - React
   - react-native-keyboard-aware-scroll-view (0.8.8):
-    - React-Core
+    - React
   - react-native-safe-area (0.5.1):
-    - React-Core
+    - React
   - react-native-safe-area-context (3.1.1):
-    - React-Core
+    - React
   - react-native-slider (3.0.2):
-    - React-Core
+    - React
   - react-native-video (5.0.2):
-    - React-Core
+    - React
     - react-native-video/Video (= 5.0.2)
   - react-native-video/Video (5.0.2):
-    - React-Core
+    - React
   - React-RCTActionSheet (0.63.2):
     - React-Core/RCTActionSheetHeaders (= 0.63.2)
   - React-RCTAnimation (0.63.2):
@@ -270,15 +270,15 @@ PODS:
     - React-cxxreact (= 0.63.2)
     - React-jsi (= 0.63.2)
   - RNCMaskedView (0.1.10-wp):
-    - React-Core
+    - React
   - RNGestureHandler (1.6.0):
-    - React-Core
+    - React
   - RNReanimated (1.9.0):
-    - React-Core
+    - React
   - RNScreens (2.9.0):
-    - React-Core
+    - React
   - RNSVG (9.13.6-gb):
-    - React-Core
+    - React
   - RNTAztecView (1.39.1):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.3)
@@ -421,7 +421,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BVLinearGradient: 48f1964a78bddfae412d1aac5f386c2949fe0306
+  BVLinearGradient: 60a475b2edfe7707deda00278cb8ce9bfe70e669
   DoubleConversion: cde416483dac037923206447da6e1454df403714
   FBLazyVector: 3ef4a7f62e7db01092f9d517d2ebc0d0677c4a37
   FBReactNativeSpec: dc7fa9088f0f2a998503a352b0554d69a4391c5a
@@ -438,13 +438,13 @@ SPEC CHECKSUMS:
   React-jsi: 54245e1d5f4b690dec614a73a3795964eeef13a8
   React-jsiexecutor: 8ca588cc921e70590820ce72b8789b02c67cce38
   React-jsinspector: b14e62ebe7a66e9231e9581279909f2fc3db6606
-  react-native-blur: ef741a08d020010ba65e411be0ab82d1d325e7ad
-  react-native-get-random-values: 03edb8dcc2d3f43e55aa67ea13b61b6723bbf047
-  react-native-keyboard-aware-scroll-view: 6cb84879bf07e4cc1caed18b11fb928e142adac6
-  react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
-  react-native-safe-area-context: 133d77d86b13cf694e014ab03dc2944ee3125d97
-  react-native-slider: 2e42dc91e7ab8b35a9c7f2eb3532729a41d0dbe2
-  react-native-video: e5dd0649534076cd6d09a0db51c617fa668d534a
+  react-native-blur: cad4d93b364f91e7b7931b3fa935455487e5c33c
+  react-native-get-random-values: 8940331a943a46c165d3ed05802c09c392f8dd46
+  react-native-keyboard-aware-scroll-view: ffa9152671fec9a571197ed2d02e0fcb90206e60
+  react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
+  react-native-safe-area-context: 4c3249e4840225c61fcd215b136af0a737bccb79
+  react-native-slider: ecb7f25c14f2348d1c1f629a6f2be7611d22a066
+  react-native-video: 961749da457e73bf0b5565edfbaffc25abfb8974
   React-RCTActionSheet: 910163b6b09685a35c4ebbc52b66d1bfbbe39fc5
   React-RCTAnimation: 9a883bbe1e9d2e158d4fb53765ed64c8dc2200c6
   React-RCTBlob: 39cf0ece1927996c4466510e25d2105f67010e13
@@ -455,15 +455,15 @@ SPEC CHECKSUMS:
   React-RCTText: 1b6773e776e4b33f90468c20fe3b16ca3e224bb8
   React-RCTVibration: 4d2e726957f4087449739b595f107c0d4b6c2d2d
   ReactCommon: a0a1edbebcac5e91338371b72ffc66aa822792ce
-  RNCMaskedView: dfeba59697c44d36abec79c062aeb1ea343d610d
-  RNGestureHandler: 7a377d0580c9f07df99e590bbcefd616ee0e2626
-  RNReanimated: f05baf4cd76b6eab2e4d7e2b244424960b968918
-  RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
-  RNSVG: 46c4b680fe18237fa01eb7d7b311d77618fde31f
+  RNCMaskedView: 744eb642f5d96bd670ea93f59e7a1346ea50976a
+  RNGestureHandler: dde546180bf24af0b5f737c8ad04b6f3fa51609a
+  RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
+  RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
+  RNSVG: 68a534a5db06dcbdaebfd5079349191598caef7b
   RNTAztecView: ad6d95c0536a06ed2e862979847400a37e32d335
   WordPress-Aztec-iOS: b7ac8b30f746992e85d9668453ac87c2cdcecf4f
   Yoga: 7740b94929bbacbddda59bf115b5317e9a161598
 
-PODFILE CHECKSUM: b79cd81095eb9f18b7c35a0e47ceee097fd589dc
+PODFILE CHECKSUM: 8db3fdd35c1b1c7a2374ab80cddb1ba101680fc3
 
 COCOAPODS: 1.8.4
