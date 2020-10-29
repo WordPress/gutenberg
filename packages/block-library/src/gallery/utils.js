@@ -83,7 +83,7 @@ export function getNewImageAttributes(
 		return {
 			...getHrefAndDestination( image, parentOptions.linkTo ),
 			...getLinkTargetSettings( parentOptions.linkTarget, attributes ),
-			sizeSlug,
+			sizeSlug: parentOptions.sizeSlug,
 		};
 	}
 

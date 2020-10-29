@@ -234,9 +234,9 @@ function GalleryEdit( props ) {
 		} );
 	}
 
-	// function updateImagesSize( newSizeSlug ) {
-	// 	// Needs applying to child images somehow
-	// }
+	function updateImagesSize( newSizeSlug ) {
+		setAttributes( { sizeSlug: newSizeSlug } );
+	}
 
 	useEffect( () => {
 		if (
@@ -348,7 +348,7 @@ function GalleryEdit( props ) {
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }
-							// onChange={ updateImagesSize }
+							onChange={ updateImagesSize }
 						/>
 					) }
 					{ dirtyImageOptions && (
