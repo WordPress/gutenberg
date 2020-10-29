@@ -67,7 +67,7 @@ export default function TemplatePartEdit( {
 
 		const innerContent = serialize( innerBlocks );
 
-		// If we havent set initialContent, the block hasn't loaded.
+		// If we havent set initialContent, check if innerBlocks are loaded.
 		if ( ! initialContent.current ) {
 			// If the content of innerBlocks and the content from entity match,
 			// then we can consider innerBlocks as loaded and set initialContent.
