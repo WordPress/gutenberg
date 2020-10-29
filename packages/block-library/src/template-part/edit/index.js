@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { BlockControls, useBlockProps } from '@wordpress/block-editor';
 import {
@@ -53,20 +53,24 @@ export default function TemplatePartEdit( {
 		[ clientId, postId ]
 	);
 	const { editEntityRecord } = useDispatch( 'core' );
-	const [ areInnerBlocksLoaded, setAreInnerBlocksLoaded ] = useState( false );
+	const initialContent = useRef();
 	useEffect( () => {
 		if ( postId === null || postId === undefined ) {
 			return;
 		}
 
-		if ( ! areInnerBlocksLoaded ) {
-			if ( serialize( innerBlocks ) === expectedContent ) {
-				setAreInnerBlocksLoaded( true );
+		if ( ! initialContent.current ) {
+			const innerContent = serialize( innerBlocks );
+			if ( innerContent === expectedContent ) {
+				initialContent.current = innerContent;
 			}
 			return;
 		}
 
-		if ( _postId === null || _postId === undefined ) {
+		if (
+			( _postId === null || _postId === undefined ) &&
+			initialContent.current !== serialize( innerBlocks )
+		) {
 			setAttributes( { postId } );
 			editEntityRecord( 'postType', 'wp_template_part', postId, {
 				status: 'publish',
