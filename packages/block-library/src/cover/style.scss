@@ -155,6 +155,12 @@
 	}
 }
 
+// This is unscoped to the Cover block to reduce specificity.
+// This allows theme colors override the specific color.
+.has-background-dim {
+	background-color: $black;
+}
+
 .wp-block-cover__video-background {
 	position: absolute;
 	top: 50%;
