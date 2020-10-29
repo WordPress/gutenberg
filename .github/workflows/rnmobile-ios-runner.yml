@@ -60,7 +60,7 @@ jobs:
       run: sudo xcode-select --switch /Applications/Xcode_12.app
 
     - name: Build (if needed)
-      run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/gutenberg || npm run native test:e2e:build-app:ios
+      run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || npm run native test:e2e:build-app:ios
 
     - name: Run iOS Device Tests
       run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
