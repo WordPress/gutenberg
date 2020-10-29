@@ -86,7 +86,10 @@ describe( 'Multi-entity save flow', () => {
 			expect( multiSaveButton ).not.toBeNull();
 		};
 		const assertMultiSaveDisabled = async () => {
-			const multiSaveButton = await page.$( multiSaveSelector );
+			const multiSaveButton = await page.waitForSelector(
+				multiSaveSelector,
+				{ hidden: true }
+			);
 			expect( multiSaveButton ).toBeNull();
 		};
 
@@ -193,7 +196,7 @@ describe( 'Multi-entity save flow', () => {
 		const saveA11ySelector = '.edit-site-editor__toggle-save-panel-button';
 
 		it( 'Save flow should work as expected', async () => {
-			expect.assertions( 5 );
+			expect.assertions( 6 );
 			// Navigate to site editor.
 			const query = addQueryArgs( '', {
 				page: 'gutenberg-edit-site',
