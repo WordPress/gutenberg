@@ -15,7 +15,7 @@ import {
 /**
  * WordPress dependencies
  */
-import { compose, usePrevious } from '@wordpress/compose';
+import { compose } from '@wordpress/compose';
 import {
 	Button,
 	ButtonGroup,
@@ -90,8 +90,15 @@ function GalleryEdit( props ) {
 		'core/block-editor'
 	);
 
-	const previousOptions = usePrevious( { linkTarget, linkTo, sizeSlug } );
+	const currentImageOptions = { linkTarget, linkTo, sizeSlug };
+
 	const [ images, setImages ] = useState( [] );
+	const [ imageSettings, setImageSettings ] = useState( currentImageOptions );
+	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
+
+	useEffect( () => {
+		setDirtyImageOptions( ! isEqual( currentImageOptions, imageSettings ) );
+	}, [ currentImageOptions, imageSettings ] );
 
 	const getBlock = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getBlock;
@@ -232,6 +239,8 @@ function GalleryEdit( props ) {
 			);
 			updateBlockAttributes( block.clientId, newAttributes );
 		} );
+		setDirtyImageOptions( false );
+		setImageSettings( currentImageOptions );
 	}
 
 	function updateImagesSize( newSizeSlug ) {
@@ -304,10 +313,6 @@ function GalleryEdit( props ) {
 	const imageSizeOptions = getImagesSizeOptions();
 	const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
 	const hasLinkTo = linkTo && linkTo !== 'none';
-	const currentOptions = { linkTarget, linkTo, sizeSlug };
-	// Not working...multiple re-renders ruins usePrevious determination of dirty.
-	const dirtyImageOptions =
-		true || ! isEqual( previousOptions, currentOptions );
 
 	return (
 		<>
