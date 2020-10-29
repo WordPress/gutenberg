@@ -109,7 +109,8 @@ function TemplatePartsByTheme( {
 	return templatePartsByTheme.map( ( templatePartList ) => (
 		<PanelGroup
 			key={ templatePartList[ 0 ].meta.theme }
-			title={ templatePartList[ 0 ].meta.theme }
+			// Falsy theme implies custom template part.
+			title={ templatePartList[ 0 ].meta.theme || __( 'Custom' ) }
 		>
 			{ templatePartList.map( ( templatePart ) => {
 				return currentShownTPs.includes( templatePart ) ? (
