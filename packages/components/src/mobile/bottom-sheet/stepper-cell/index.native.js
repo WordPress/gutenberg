@@ -68,7 +68,7 @@ class BottomSheetStepperCell extends Component {
 
 	onDecrementValue() {
 		const { step, min, onChange, value, decimalNum } = this.props;
-		const newValue = toFixed( value + step, decimalNum );
+		const newValue = toFixed( value - step, decimalNum );
 
 		if ( newValue >= min ) {
 			onChange( newValue );
