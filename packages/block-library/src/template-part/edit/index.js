@@ -33,7 +33,7 @@ export default function TemplatePartEdit( {
 	// Resolve the post ID if not set, and load its post.
 	const postId = useTemplatePartPost( _postId, slug, theme );
 
-	// Set the post ID, once found, so that edits persist,
+	// Set the postId attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
 	const { innerBlocks, entityRecordEdits } = useSelect(
@@ -54,22 +54,22 @@ export default function TemplatePartEdit( {
 	const { editEntityRecord } = useDispatch( 'core' );
 	const [ areInnerBlocksLoaded, setAreInnerBlocksLoaded ] = useState( false );
 	useEffect( () => {
-		if ( postId !== null && postId !== undefined ) {
-			if ( ! areInnerBlocksLoaded ) {
-				// Another option than using entityRecordEdits is to get the entityRecord
-				// parse its content into blocks, then compare.
-				if ( innerBlocks === entityRecordEdits?.blocks ) {
-					setAreInnerBlocksLoaded( true );
-				}
-				return;
-			}
+		if ( postId === null || postId === undefined ) {
+			return;
+		}
 
-			if ( _postId === null || _postId === undefined ) {
-				setAttributes( { postId } );
-				editEntityRecord( 'postType', 'wp_template_part', postId, {
-					status: 'publish',
-				} );
+		if ( ! areInnerBlocksLoaded ) {
+			if ( innerBlocks === entityRecordEdits?.blocks ) {
+				setAreInnerBlocksLoaded( true );
 			}
+			return;
+		}
+
+		if ( _postId === null || _postId === undefined ) {
+			setAttributes( { postId } );
+			editEntityRecord( 'postType', 'wp_template_part', postId, {
+				status: 'publish',
+			} );
 		}
 	}, [ innerBlocks, entityRecordEdits?.blocks ] );
 
