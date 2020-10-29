@@ -57,11 +57,7 @@ export default function TemplatePartEdit( {
 	useEffect( () => {
 		// If postId (entity) has not resolved or _postId (block attr) is set,
 		// then we have no need for this effect.
-		if (
-			postId === null ||
-			postId === undefined ||
-			( _postId !== null && _postId !== undefined )
-		) {
+		if ( ! postId || _postId ) {
 			return;
 		}
 
