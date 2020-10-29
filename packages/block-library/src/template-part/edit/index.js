@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { BlockControls, useBlockProps } from '@wordpress/block-editor';
 import {
@@ -38,22 +38,39 @@ export default function TemplatePartEdit( {
 	// but wait until the third inner blocks change,
 	// because the first 2 are just the template part
 	// content loading.
-	const { innerBlocks } = useSelect(
+	const { innerBlocks, entityRecordEdits } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( 'core/block-editor' );
+			const { getEntityRecordEdits } = select( 'core' );
 			return {
 				innerBlocks: getBlocks( clientId ),
+				entityRecordEdits: getEntityRecordEdits(
+					'postType',
+					'wp_template_part',
+					postId
+				),
 			};
 		},
-		[ clientId ]
+		[ clientId, postId ]
 	);
 	const { editEntityRecord } = useDispatch( 'core' );
-	const blockChanges = useRef( 0 );
+	const [ areInnerBlocksLoaded, setAreInnerBlocksLoaded ] = useState( false );
 	useEffect( () => {
-		if ( blockChanges.current < 4 ) blockChanges.current++;
+		if (
+			! areInnerBlocksLoaded &&
+			postId !== null &&
+			postId !== undefined &&
+			innerBlocks === entityRecordEdits?.blocks
+		) {
+			// Another option than using entityRecordEdits is to get the entityRecord
+			// parse its content into blocks, then compare.
+			setAreInnerBlocksLoaded( true );
+			return;
+		}
 
 		if (
-			blockChanges.current === 3 &&
+			areInnerBlocksLoaded &&
+			( _postId === null || _postId === undefined ) &&
 			( initialPostId.current === undefined ||
 				initialPostId.current === null ) &&
 			postId !== undefined &&
@@ -64,7 +81,7 @@ export default function TemplatePartEdit( {
 				status: 'publish',
 			} );
 		}
-	}, [ innerBlocks ] );
+	}, [ innerBlocks, entityRecordEdits?.blocks ] );
 
 	const blockProps = useBlockProps();
 
