@@ -136,20 +136,3 @@ function gutenberg_widgets_init( $hook ) {
 	wp_enqueue_style( 'wp-format-library' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_widgets_init' );
-
-/**
- * Tells the script loader to load the scripts and styles of custom block on widgets editor screen.
- *
- * @param bool $is_block_editor_screen Current decision about loading block assets.
- * @return bool Filtered decision about loading block assets.
- */
-function gutenberg_widgets_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
-	if ( is_callable( 'get_current_screen' ) && 'appearance_page_gutenberg-widgets' === get_current_screen()->base ) {
-		return true;
-	}
-
-	return $is_block_editor_screen;
-}
-
-add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_widgets_editor_load_block_editor_scripts_and_styles' );
-
