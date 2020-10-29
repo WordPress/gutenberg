@@ -12,8 +12,7 @@ import { combineReducers } from '@wordpress/data';
  * Internal dependencies
  */
 import { PREFERENCES_DEFAULTS } from './defaults';
-import { MENU_ROOT } from '../components/left-sidebar/navigation-panel/constants';
-
+import { MENU_ROOT } from '../components/navigation-sidebar/navigation-panel/constants';
 /**
  * Higher-order reducer creator which provides the given initial state for the
  * original reducer.

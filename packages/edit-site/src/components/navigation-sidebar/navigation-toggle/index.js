@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { Button, Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 
-function NavigationToggle( { icon, isOpen, onClick } ) {
+function NavigationToggle( { icon, isOpen } ) {
 	const {
 		isActive,
 		isRequestingSiteIcon,
@@ -30,6 +30,8 @@ function NavigationToggle( { icon, isOpen, onClick } ) {
 			siteTitle: siteData.name,
 		};
 	}, [] );
+
+	const { setIsNavigationPanelOpened } = useDispatch( 'core/edit-site' );
 
 	if ( ! isActive ) {
 		return null;
@@ -60,7 +62,7 @@ function NavigationToggle( { icon, isOpen, onClick } ) {
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
 				label={ __( 'Toggle navigation' ) }
-				onClick={ onClick }
+				onClick={ () => setIsNavigationPanelOpened( ! isOpen ) }
 				showTooltip
 			>
 				{ buttonIcon }

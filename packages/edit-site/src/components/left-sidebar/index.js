@@ -7,24 +7,16 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import InserterPanel from './inserter-panel';
-import NavigationPanel from './navigation-panel';
 
 const LeftSidebar = () => {
-	const { isNavigationOpen, isInserterOpen } = useSelect( ( select ) => {
-		const { isNavigationOpened, isInserterOpened } = select(
-			'core/edit-site'
-		);
+	const { isInserterOpen } = useSelect( ( select ) => {
+		const { isInserterOpened } = select( 'core/edit-site' );
 		return {
-			isNavigationOpen: isNavigationOpened(),
 			isInserterOpen: isInserterOpened(),
 		};
 	} );
 
 	const { setIsInserterOpened } = useDispatch( 'core/edit-site' );
-
-	if ( isNavigationOpen ) {
-		return <NavigationPanel />;
-	}
 
 	if ( isInserterOpen ) {
 		return (
