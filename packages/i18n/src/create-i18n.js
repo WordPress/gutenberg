@@ -24,7 +24,7 @@ const DEFAULT_LOCALE_DATA = {
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * @typedef {(data?: LocaleData, domain?: string)=>void} SetLocaleData
+ * @typedef {(data?: LocaleData, domain?: string) => void} SetLocaleData
  * Merges locale data into the Tannin instance by domain. Accepts data in a
  * Jed-formatted JSON object shape.
  *
