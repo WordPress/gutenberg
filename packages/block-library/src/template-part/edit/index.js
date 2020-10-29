@@ -27,7 +27,6 @@ export default function TemplatePartEdit( {
 	setAttributes,
 	clientId,
 } ) {
-	const initialPostId = useRef( _postId );
 	const initialSlug = useRef( slug );
 	const initialTheme = useRef( theme );
 
@@ -56,30 +55,22 @@ export default function TemplatePartEdit( {
 	const { editEntityRecord } = useDispatch( 'core' );
 	const [ areInnerBlocksLoaded, setAreInnerBlocksLoaded ] = useState( false );
 	useEffect( () => {
-		if (
-			! areInnerBlocksLoaded &&
-			postId !== null &&
-			postId !== undefined &&
-			innerBlocks === entityRecordEdits?.blocks
-		) {
-			// Another option than using entityRecordEdits is to get the entityRecord
-			// parse its content into blocks, then compare.
-			setAreInnerBlocksLoaded( true );
-			return;
-		}
+		if ( postId !== null && postId !== undefined ) {
+			if ( ! areInnerBlocksLoaded ) {
+				// Another option than using entityRecordEdits is to get the entityRecord
+				// parse its content into blocks, then compare.
+				if ( innerBlocks === entityRecordEdits?.blocks ) {
+					setAreInnerBlocksLoaded( true );
+				}
+				return;
+			}
 
-		if (
-			areInnerBlocksLoaded &&
-			( _postId === null || _postId === undefined ) &&
-			( initialPostId.current === undefined ||
-				initialPostId.current === null ) &&
-			postId !== undefined &&
-			postId !== null
-		) {
-			setAttributes( { postId } );
-			editEntityRecord( 'postType', 'wp_template_part', postId, {
-				status: 'publish',
-			} );
+			if ( _postId === null || _postId === undefined ) {
+				setAttributes( { postId } );
+				editEntityRecord( 'postType', 'wp_template_part', postId, {
+					status: 'publish',
+				} );
+			}
 		}
 	}, [ innerBlocks, entityRecordEdits?.blocks ] );
 
