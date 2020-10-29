@@ -21,16 +21,18 @@ function PostAuthor() {
 
 	const { authorId, isLoading, authors, postAuthor } = useSelect(
 		( select ) => {
-			const { getUser, getAuthors, isResolving } = select( 'core' );
+			const { __unstableGetAuthor, getAuthors, isResolving } = select( 'core' );
 			const { getEditedPostAttribute } = select( 'core/editor' );
-			const author = getUser( getEditedPostAttribute( 'author' ) );
+			const author = __unstableGetAuthor( getEditedPostAttribute( 'author' ) )[ 0 ];
 			const query =
-				! fieldValue || '' === fieldValue ? {} : { search: fieldValue };
+				! fieldValue || '' === fieldValue || fieldValue === author.name
+					? {}
+					: { search: fieldValue };
 			return {
 				authorId: getEditedPostAttribute( 'author' ),
 				postAuthor: author,
-				authors: getAuthors( { ...query } ),
-				isLoading: isResolving( 'core', 'getUsers', [
+				authors: getAuthors( query ),
+				isLoading: isResolving( 'core', 'getAuthors', [
 					{ search: fieldValue },
 				] ),
 			};
