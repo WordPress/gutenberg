@@ -1,0 +1,31 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/gallery",
+        "isValid": true,
+        "attributes": {
+            "images": [
+                {
+                    "url": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==",
+                    "alt": "",
+                    "caption": "Caption with a <a href=\"#\">link</a>"
+                },
+                {
+                    "url": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
+                    "alt": "",
+                    "caption": "Caption without a link"
+                }
+            ],
+            "ids": [
+                null,
+                null
+            ],
+            "caption": "",
+            "imageCrop": true,
+            "linkTo": "none",
+            "sizeSlug": "large"
+        },
+        "innerBlocks": [],
+        "originalContent": "<figure class=\"wp-block-gallery columns-2 is-cropped\">\n\t<ul class=\"blocks-gallery-grid\">\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt />\n\t\t\t\t<figcaption class=\"blocks-gallery-item__caption\">Caption with a <a href=\"#\">link</a></figcaption>\n\t\t\t</figure>\n\t\t</li>\n\t\t<li class=\"blocks-gallery-item\">\n\t\t\t<figure>\n\t\t\t\t<img src=\"data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=\" alt />\n\t\t\t\t<figcaption class=\"blocks-gallery-item__caption\">Caption without a link</figcaption>\n\t\t\t</figure>\n\t\t</li>\n\t</ul>\n</figure>"
+    }
+]
