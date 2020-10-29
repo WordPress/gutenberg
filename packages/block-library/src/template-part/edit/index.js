@@ -29,6 +29,7 @@ export default function TemplatePartEdit( {
 } ) {
 	const initialSlug = useRef( slug );
 	const initialTheme = useRef( theme );
+	const initialContent = useRef();
 
 	// Resolve the post ID if not set, and load its post.
 	const postId = useTemplatePartPost( _postId, slug, theme );
@@ -53,24 +54,26 @@ export default function TemplatePartEdit( {
 		[ clientId, postId ]
 	);
 	const { editEntityRecord } = useDispatch( 'core' );
-	const initialContent = useRef();
+
 	useEffect( () => {
-		if ( postId === null || postId === undefined ) {
+		if (
+			postId === null ||
+			postId === undefined ||
+			( _postId !== null && _postId !== undefined )
+		) {
 			return;
 		}
 
+		const innerContent = serialize( innerBlocks );
+
 		if ( ! initialContent.current ) {
-			const innerContent = serialize( innerBlocks );
 			if ( innerContent === expectedContent ) {
 				initialContent.current = innerContent;
 			}
 			return;
 		}
 
-		if (
-			( _postId === null || _postId === undefined ) &&
-			initialContent.current !== serialize( innerBlocks )
-		) {
+		if ( initialContent.current !== innerContent ) {
 			setAttributes( { postId } );
 			editEntityRecord( 'postType', 'wp_template_part', postId, {
 				status: 'publish',
