@@ -23,4 +23,5 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	paddingLeft: [ 'spacing', 'padding', 'left' ],
 	paddingRight: [ 'spacing', 'padding', 'right' ],
 	paddingTop: [ 'spacing', 'padding', 'top' ],
+	fontFamily: [ 'typography', 'fontFamily' ],
 };
