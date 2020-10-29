@@ -196,7 +196,7 @@ describe( 'Multi-entity save flow', () => {
 		const saveA11ySelector = '.edit-site-editor__toggle-save-panel-button';
 
 		it( 'Save flow should work as expected', async () => {
-			expect.assertions( 6 );
+			expect.assertions( 5 );
 			// Navigate to site editor.
 			const query = addQueryArgs( '', {
 				page: 'gutenberg-edit-site',
