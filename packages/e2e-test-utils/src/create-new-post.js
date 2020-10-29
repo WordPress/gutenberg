@@ -58,5 +58,7 @@ export async function createNewPost( {
 				.dispatch( 'core/edit-post' )
 				.toggleFeature( 'fullscreenMode' )
 		);
+
+		await page.waitForSelector( 'body:not(.is-fullscreen-mode)' );
 	}
 }

@@ -19,7 +19,8 @@
 				"orderBy": "date",
 				"author": "",
 				"search": "",
-				"exclude": []
+				"exclude": [],
+				"sticky": ""
 			}
 		}
 	},

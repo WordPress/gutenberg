@@ -208,6 +208,10 @@
 	color: #555;
 	font-size: $default-font-size;
 	text-align: center;
+
+	.is-dark-theme & {
+		color: $light-gray-placeholder;
+	}
 }
 
 

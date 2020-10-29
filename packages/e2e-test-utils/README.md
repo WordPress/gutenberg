@@ -24,6 +24,14 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
+<a name="activateTheme" href="#activateTheme">#</a> **activateTheme**
+
+Ativate a theme.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+
 <a name="arePrePublishChecksEnabled" href="#arePrePublishChecksEnabled">#</a> **arePrePublishChecksEnabled**
 
 Verifies if publish checks are enabled.

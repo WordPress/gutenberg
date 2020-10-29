@@ -8,6 +8,7 @@ import { get } from 'lodash';
  */
 import {
 	activatePlugin,
+	activateTheme,
 	clearLocalStorage,
 	enablePageDialogAccept,
 	isOfflineMode,
@@ -215,6 +216,8 @@ async function runAxeTestsForBlockEditor() {
 			// https://github.com/w3c/aria/issues/558
 			'[role="treegrid"] [aria-posinset]',
 			'[role="treegrid"] [aria-setsize]',
+			// Ignore block previews.
+			'.block-editor-block-preview__content',
 		],
 	} );
 }
@@ -260,7 +263,7 @@ beforeAll( async () => {
 	enablePageDialogAccept();
 	observeConsoleLogging();
 	await simulateAdverseConditions();
-
+	await activateTheme( 'twentytwentyone' );
 	await trashAllPosts();
 	await trashAllPosts( 'wp_block' );
 	await setupBrowser();

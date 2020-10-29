@@ -15,12 +15,14 @@ import { useState } from '@wordpress/element';
 import { NavigationGroupContext } from './context';
 import { GroupTitleUI } from '../styles/navigation-styles';
 import { useNavigationContext } from '../context';
+import { useRTL } from '../../utils/rtl';
 
 export default function NavigationGroup( { children, className, title } ) {
 	const [ groupId ] = useState( uniqueId( 'group-' ) );
 	const {
 		navigationTree: { items },
 	} = useNavigationContext();
+	const isRTL = useRTL();
 
 	const context = { group: groupId };
 
@@ -45,6 +47,7 @@ export default function NavigationGroup( { children, className, title } ) {
 						className="components-navigation__group-title"
 						id={ groupTitleId }
 						variant="caption"
+						isRTL={ isRTL }
 					>
 						{ title }
 					</GroupTitleUI>

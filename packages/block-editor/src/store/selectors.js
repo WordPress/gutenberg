@@ -1697,7 +1697,11 @@ export const __experimentalGetParsedReusableBlock = createSelector(
 
 		// Only reusableBlock.content.raw should be used here, `reusableBlock.content` is a
 		// workaround until #22127 is fixed.
-		return parse( reusableBlock.content.raw || reusableBlock.content );
+		return parse(
+			typeof reusableBlock.content.raw === 'string'
+				? reusableBlock.content.raw
+				: reusableBlock.content
+		);
 	},
 	( state ) => [ getReusableBlocks( state ) ]
 );
