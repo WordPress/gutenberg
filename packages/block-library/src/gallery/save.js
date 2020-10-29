@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
+import { __unstableStripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -43,7 +44,11 @@ export default function save( { attributes } ) {
 					const img = (
 						<img
 							src={ image.url }
-							alt={ image.alt !== '' ? image.alt : image.caption }
+							alt={
+								image.alt !== ''
+									? image.alt
+									: __unstableStripHTML( image.caption )
+							}
 							data-id={ image.id }
 							data-full-url={ image.fullUrl }
 							data-link={ image.link }
