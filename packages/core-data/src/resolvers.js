@@ -47,7 +47,7 @@ export function* getAuthors( query ) {
  */
 export function* __unstableGetAuthor( id ) {
 	const users = yield apiFetch( {
-		path: `/wp/v2/users/${ id }`,
+		path: `/wp/v2/users?who=authors&include=${ id }`,
 	} );
 	yield receiveUserQuery( 'author', users );
 }
