@@ -34,7 +34,7 @@ export default function TemplatePartEdit( {
 	// Resolve the post ID if not set, and load its post.
 	const postId = useTemplatePartPost( _postId, slug, theme );
 
-	// Set the postId attribute if it did not exist,
+	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
 	const { innerBlocks, expectedContent } = useSelect(
@@ -54,8 +54,9 @@ export default function TemplatePartEdit( {
 		[ clientId, postId ]
 	);
 	const { editEntityRecord } = useDispatch( 'core' );
-
 	useEffect( () => {
+		// If postId (entity) has not resolved or _postId (block attr) is set,
+		// then we have no need for this effect.
 		if (
 			postId === null ||
 			postId === undefined ||
@@ -66,13 +67,21 @@ export default function TemplatePartEdit( {
 
 		const innerContent = serialize( innerBlocks );
 
+		// If we havent set initialContent, the block hasn't loaded.
 		if ( ! initialContent.current ) {
+			// If the content of innerBlocks and the content from entity match,
+			// then we can consider innerBlocks as loaded and set initialContent.
 			if ( innerContent === expectedContent ) {
 				initialContent.current = innerContent;
 			}
+			// Continue to return early until this effect is triggered
+			// with innerBlocks already loaded (as denoted by initialContent being set).
 			return;
 		}
 
+		// After initialContent is set and the content is updated, we can set the
+		// postId block attribute and set the post status to 'publish'.
+		// After this is done the hook will no longer run due to the first return above.
 		if ( initialContent.current !== innerContent ) {
 			setAttributes( { postId } );
 			editEntityRecord( 'postType', 'wp_template_part', postId, {
