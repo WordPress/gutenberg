@@ -1,5 +1,5 @@
 {
-	"core": "WordPress/WordPress",
+	"core": "WordPress/WordPress#5.5-branch",
 	"plugins": [ "." ],
 	"mappings": {
 		"wp-content/mu-plugins": "./packages/e2e-tests/mu-plugins",
