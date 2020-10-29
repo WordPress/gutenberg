@@ -12,7 +12,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { chevronUp, chevronDown } from '@wordpress/icons';
-
+import { serialize } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -36,17 +36,18 @@ export default function TemplatePartEdit( {
 	// Set the postId attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { innerBlocks, entityRecordEdits } = useSelect(
+	const { innerBlocks, expectedContent } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( 'core/block-editor' );
-			const { getEntityRecordEdits } = select( 'core' );
+			const entityRecord = select( 'core' ).getEntityRecord(
+				'postType',
+				'wp_template_part',
+				postId
+			);
+
 			return {
 				innerBlocks: getBlocks( clientId ),
-				entityRecordEdits: getEntityRecordEdits(
-					'postType',
-					'wp_template_part',
-					postId
-				),
+				expectedContent: entityRecord?.content.raw,
 			};
 		},
 		[ clientId, postId ]
@@ -59,7 +60,7 @@ export default function TemplatePartEdit( {
 		}
 
 		if ( ! areInnerBlocksLoaded ) {
-			if ( innerBlocks === entityRecordEdits?.blocks ) {
+			if ( serialize( innerBlocks ) === expectedContent ) {
 				setAreInnerBlocksLoaded( true );
 			}
 			return;
@@ -71,7 +72,7 @@ export default function TemplatePartEdit( {
 				status: 'publish',
 			} );
 		}
-	}, [ innerBlocks, entityRecordEdits?.blocks ] );
+	}, [ innerBlocks, expectedContent ] );
 
 	const blockProps = useBlockProps();
 
