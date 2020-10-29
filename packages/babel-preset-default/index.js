@@ -24,6 +24,8 @@ module.exports = ( api ) => {
 			};
 		} else {
 			opts.modules = false;
+			opts.useBuiltIns = 'usage';
+			opts.corejs = 3;
 			opts.targets = {
 				browsers: require( '@wordpress/browserslist-config' ),
 			};
