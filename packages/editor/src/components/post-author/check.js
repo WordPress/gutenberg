@@ -19,7 +19,7 @@ export function PostAuthorCheck( {
 	authors,
 	children,
 } ) {
-	if ( ! hasAssignAuthorAction || ! authors || authors.length < 2 ) {
+	if ( ! hasAssignAuthorAction || ! authors ) {
 		return null;
 	}
 

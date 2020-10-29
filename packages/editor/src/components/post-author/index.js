@@ -21,9 +21,13 @@ function PostAuthor() {
 
 	const { authorId, isLoading, authors, postAuthor } = useSelect(
 		( select ) => {
-			const { __unstableGetAuthor, getAuthors, isResolving } = select( 'core' );
+			const { __unstableGetAuthor, getAuthors, isResolving } = select(
+				'core'
+			);
 			const { getEditedPostAttribute } = select( 'core/editor' );
-			const author = __unstableGetAuthor( getEditedPostAttribute( 'author' ) )[ 0 ];
+			const author =
+				postAuthor ||
+				__unstableGetAuthor( getEditedPostAttribute( 'author' ) )[ 0 ];
 			const query =
 				! fieldValue || '' === fieldValue || fieldValue === author.name
 					? {}
