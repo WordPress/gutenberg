@@ -50,6 +50,7 @@ export default function SiteTitleEdit( { attributes, setAttributes } ) {
 
 			<RichText
 				tagName={ tagName }
+				aria-label={ __( 'Site title text' ) }
 				placeholder={ __( 'Site Title' ) }
 				value={ title }
 				onChange={ setTitle }

@@ -515,6 +515,7 @@ export default function Image( {
 				<RichText
 					ref={ captionRef }
 					tagName="figcaption"
+					aria-label={ __( 'Image caption text' ) }
 					placeholder={ __( 'Write caption…' ) }
 					value={ caption }
 					unstableOnFocus={ onFocusCaption }

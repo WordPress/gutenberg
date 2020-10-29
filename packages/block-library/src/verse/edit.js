@@ -46,6 +46,7 @@ export default function VerseEdit( {
 						content: nextContent,
 					} );
 				} }
+				aria-label={ __( 'Verse text' ) }
 				placeholder={ __( 'Write…' ) }
 				onMerge={ mergeBlocks }
 				textAlign={ textAlign }
