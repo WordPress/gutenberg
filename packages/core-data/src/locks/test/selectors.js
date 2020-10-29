@@ -37,7 +37,7 @@ describe( 'isLockAvailable', () => {
 				isLockAvailable( state, 'core', [], { exclusive: true } )
 			).toBe( true );
 		} );
-		it( 'returns true if lock is not available', () => {
+		it( 'returns false if lock is not available', () => {
 			const state = deepFreeze( {
 				locks: {
 					tree: {
@@ -73,7 +73,7 @@ describe( 'isLockAvailable', () => {
 			).toBe( true );
 		} );
 
-		it( `returns true if another branch holds a locks (1/2)`, () => {
+		it( `returns true if another branch holds a locks (1/3)`, () => {
 			appendLock( state, [ 'core', 'queries' ], {
 				exclusive: true,
 			} );
@@ -87,7 +87,7 @@ describe( 'isLockAvailable', () => {
 			).toBe( true );
 		} );
 
-		it( `returns true if another branch holds a locks (2/2)`, () => {
+		it( `returns true if another branch holds a locks (2/3)`, () => {
 			appendLock( state, [ 'vendor' ], {
 				exclusive: true,
 			} );
@@ -101,7 +101,87 @@ describe( 'isLockAvailable', () => {
 			).toBe( true );
 		} );
 
+		it( `returns true if another branch holds a locks (3/3)`, () => {
+			const subState = {
+				locks: {
+					tree: {
+						locks: [],
+						children: {
+							postType: {
+								locks: [],
+								children: {
+									post: {
+										locks: [],
+										children: {
+											'16': {
+												locks: [
+													{
+														path: [
+															'core',
+															'entities',
+															'data',
+															'postType',
+															'post',
+															16,
+														],
+														exclusive: true,
+													},
+												],
+												children: {},
+											},
+										},
+									},
+									wp_template_part: {
+										locks: [],
+										children: {
+											'17': {
+												locks: [],
+												children: {},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			};
+			expect(
+				isLockAvailable(
+					deepFreeze( subState ),
+					'core',
+					[ 'postType', 'wp_template_part', 17 ],
+					{ exclusive: true }
+				)
+			).toBe( true );
+		} );
+
 		[ true, false ].forEach( ( exclusive ) => {
+			it( `returns true if the path is not accessible and no parent holds a lock`, () => {
+				expect(
+					isLockAvailable(
+						deepFreeze( state ),
+						'core',
+						[ 'core', 'fake', 'path' ],
+						{ exclusive: true }
+					)
+				).toBe( true );
+			} );
+
+			it( `returns false if the path is not accessible and any parent holds a lock`, () => {
+				appendLock( state, [ 'core' ], {
+					exclusive,
+				} );
+				expect(
+					isLockAvailable(
+						deepFreeze( state ),
+						'core',
+						[ 'core', 'fake', 'path' ],
+						{ exclusive: true }
+					)
+				).toBe( false );
+			} );
+
 			it( `returns false if top-level parent already has a lock with exclusive=${ exclusive }`, () => {
 				appendLock( state, [], {
 					exclusive,
@@ -202,6 +282,20 @@ describe( 'isLockAvailable', () => {
 
 		[ true, false ].forEach( ( isOtherLockExclusive ) => {
 			const expectation = ! isOtherLockExclusive;
+			it( `returns ${ expectation } if the path is not accessible and any parent holds a lock exclusive=${ isOtherLockExclusive }`, () => {
+				appendLock( state, [ 'core' ], {
+					exclusive: isOtherLockExclusive,
+				} );
+				expect(
+					isLockAvailable(
+						deepFreeze( state ),
+						'core',
+						[ 'core', 'fake', 'path' ],
+						{ exclusive: false }
+					)
+				).toBe( expectation );
+			} );
+
 			it( `returns ${ expectation } if top-level parent already has a lock with exclusive=${ isOtherLockExclusive }`, () => {
 				appendLock( state, [], {
 					exclusive: isOtherLockExclusive,

@@ -69,6 +69,12 @@ describe( 'iteratePath', () => {
 	it( 'Yields just the root if the path is empty', () => {
 		expect( Array.from( iteratePath( tree, [] ) ) ).toEqual( [ tree ] );
 	} );
+
+	it( 'Yields only the accessible nodes in the path', () => {
+		expect(
+			Array.from( iteratePath( tree, [ 'target', 'bird', 'fake' ] ) )
+		).toEqual( [ tree, target, bird ] );
+	} );
 } );
 
 describe( 'iterateDescendants', () => {
