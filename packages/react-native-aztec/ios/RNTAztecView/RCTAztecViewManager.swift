@@ -34,9 +34,9 @@ public class RCTAztecViewManager: RCTViewManager {
         return view
     }
 
-    func executeBlock(_ block: @escaping (RCTAztecView) -> Void, onNode node: NSNumber) {
-        self.bridge.uiManager.addUIBlock { (manager, viewRegistry) in
-            let view = viewRegistry?[node]
+    func executeBlock(viewTag: NSNumber, block: @escaping (RCTAztecView) -> Void) {
+        self.bridge.uiManager.addUIBlock { (uiManager, viewRegistry) in
+            let view = viewRegistry?[viewTag]
             guard let aztecView = view as? RCTAztecView else {
                 return
             }
@@ -66,4 +66,19 @@ public class RCTAztecViewManager: RCTViewManager {
         defaultStyle.textListParagraphSpacingBefore = 5
         return defaultStyle
     }
+    
+    @objc
+    func focus(_ viewTag: NSNumber) -> Void {
+        self.executeBlock(viewTag: viewTag) { (aztecView) in
+            aztecView.reactFocus()
+        }
+    }
+    
+    @objc
+    func blur(_ viewTag: NSNumber) -> Void {
+        self.executeBlock(viewTag: viewTag) { (aztecView) in
+            aztecView.reactBlur()
+        }
+    }
 }
+
