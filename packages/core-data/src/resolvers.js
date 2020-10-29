@@ -173,6 +173,13 @@ export function* getEntityRecords( kind, name, query = {} ) {
 	}
 
 	yield receiveEntityRecords( kind, name, records, query );
+	for ( const record of records ) {
+		yield {
+			type: 'FINISH_RESOLUTION',
+			selectorName: 'getEntityRecord',
+			args: [ kind, name, record.id ],
+		};
+	}
 }
 
 getEntityRecords.shouldInvalidate = ( action, kind, name ) => {
