@@ -34,9 +34,8 @@ export default function TemplatePartEdit( {
 	const postId = useTemplatePartPost( _postId, slug, theme );
 
 	// Set the post ID, once found, so that edits persist,
-	// but wait until the third inner blocks change,
-	// because the first 2 are just the template part
-	// content loading.
+	// but wait until the inner blocks have loaded to allow
+	// new edits to trigger this.
 	const { innerBlocks, entityRecordEdits } = useSelect(
 		( select ) => {
 			const { getBlocks } = select( 'core/block-editor' );
