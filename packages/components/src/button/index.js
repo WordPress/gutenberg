@@ -132,4 +132,9 @@ export function Button( props, ref ) {
 	);
 }
 
-export default withNextComponent( Button, UIButton, buttonAdapter, 'Button' );
+export default withNextComponent(
+	Button,
+	UIButton,
+	'WPComponentsButton',
+	buttonAdapter
+);

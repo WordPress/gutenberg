@@ -20,9 +20,10 @@
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
+	"types": "types",
 	"sideEffects": false,
 	"dependencies": {
-		"@wp-g2/components": "^0.0.95"
+		"@wp-g2/components": "^0.0.100"
 	},
 	"publishConfig": {
 		"access": "public"

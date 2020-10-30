@@ -22,7 +22,7 @@ export function PostVisibility() {
 						</span>
 					) }
 					<ContextSystemProvider
-						value={ { Button: { version: 'next' } } }
+						value={ { WPComponentsButton: { version: 'next' } } }
 					>
 						{ canEdit && (
 							<Dropdown

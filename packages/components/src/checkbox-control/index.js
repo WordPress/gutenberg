@@ -3,13 +3,15 @@
  */
 import { useInstanceId } from '@wordpress/compose';
 import { Icon, check } from '@wordpress/icons';
+import { withNextComponent } from '@wordpress/ui.context';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import { CheckboxControlNext } from './next';
 
-export default function CheckboxControl( {
+function CheckboxControl( {
 	label,
 	className,
 	heading,
@@ -57,3 +59,9 @@ export default function CheckboxControl( {
 		</BaseControl>
 	);
 }
+
+export default withNextComponent(
+	CheckboxControl,
+	CheckboxControlNext,
+	'WPComponentsCheckboxControl'
+);

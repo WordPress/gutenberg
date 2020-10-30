@@ -6,8 +6,8 @@ import { contextConnect, useContextSystem } from '@wp-g2/context';
 export function withNextComponent(
 	CurrentComponent = () => null,
 	NextComponent = () => null,
-	adapter = ( p ) => p,
-	namespace = 'Component'
+	namespace = 'Component',
+	adapter = ( p ) => p
 ) {
 	const WrappedComponent = ( props, ref ) => {
 		const { version, ...otherProps } = useContextSystem( props, namespace );
