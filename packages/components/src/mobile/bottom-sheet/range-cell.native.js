@@ -65,13 +65,13 @@ class BottomSheetRangeCell extends Component {
 		AccessibilityInfo.announceForAccessibility( announcement );
 	}
 
-	onChange = ( nextValue ) => {
+	onChange( nextValue ) {
 		const { onChange } = this.props;
 		this.setState( {
 			sliderValue: nextValue,
 		} );
 		onChange( nextValue );
-	};
+	}
 
 	render() {
 		const {
