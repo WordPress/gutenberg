@@ -23,8 +23,12 @@ export default function NavigationSidebar() {
 	return (
 		<>
 			<NavigationToggle isOpen={ isNavigationOpen } />
-			<NavigationPanel isOpen={ isNavigationOpen } />
-			<NavigationPanelPreviewSlot />
+			{ isNavigationOpen && (
+				<>
+					<NavigationPanel isOpen={ isNavigationOpen } />
+					<NavigationPanelPreviewSlot />
+				</>
+			) }
 		</>
 	);
 }
