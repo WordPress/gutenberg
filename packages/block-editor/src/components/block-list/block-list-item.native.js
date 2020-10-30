@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Dimensions } from 'react-native';
+import { View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -31,33 +31,10 @@ export class BlockListItem extends Component {
 		super( ...arguments );
 
 		this.onLayout = this.onLayout.bind( this );
-		this.scrollToBlockListItemIfNotInViewPort = this.scrollToBlockListItemIfNotInViewPort.bind(
-			this
-		);
 
 		this.state = {
 			blockWidth: 0,
 		};
-		this.onFocus = this.onFocus.bind( this );
-		this.blockListItemRef = this.blockListItemRef.bind( this );
-	}
-
-	blockListItemRef( ref ) {
-		this.blockListItem = ref;
-	}
-
-	onFocus() {
-		const { isSelected } = this.props;
-		if ( isSelected ) {
-			this.blockListItem.measureInWindow( ( x, y, width, height ) => {
-				this.scrollToBlockListItemIfNotInViewPort(
-					x,
-					y,
-					width,
-					height
-				);
-			} );
-		}
 	}
 
 	onLayout( { nativeEvent } ) {
@@ -66,22 +43,6 @@ export class BlockListItem extends Component {
 
 		if ( blockWidth !== layout.width ) {
 			this.setState( { blockWidth: layout.width } );
-		}
-	}
-
-	scrollToBlockListItemIfNotInViewPort( x, y, width, height ) {
-		const window = Dimensions.get( 'window' );
-
-		const visible =
-			y < window.height &&
-			x < window.width &&
-			y + height < window.height &&
-			x + width < window.width;
-
-		const { scrollTo, clientId } = this.props;
-
-		if ( ! visible ) {
-			scrollTo( clientId );
 		}
 	}
 
@@ -145,13 +106,9 @@ export class BlockListItem extends Component {
 		return (
 			<ReadableContentView
 				align={ blockAlignment }
-				onFocus={ this.onFocus }
 				style={ readableContentViewStyle }
 			>
 				<View
-					ref={ ( view ) => {
-						this.blockListItemRef( view );
-					} }
 					style={ this.getContentStyles( readableContentViewStyle ) }
 					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
 					onLayout={ this.onLayout }
@@ -161,6 +118,7 @@ export class BlockListItem extends Component {
 					) }
 					<BlockListBlock
 						key={ clientId }
+						scrollTo={ this.props.scrollTo }
 						showTitle={ false }
 						clientId={ clientId }
 						{ ...restProps }

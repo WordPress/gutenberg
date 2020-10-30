@@ -30,18 +30,62 @@ class BlockListBlock extends Component {
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.getBlockWidth = this.getBlockWidth.bind( this );
+		this.scrollToBlockListItemIfNotInViewPort = this.scrollToBlockListItemIfNotInViewPort.bind(
+			this
+		);
 
 		this.state = {
 			blockWidth: 0,
 		};
 
 		this.anchorNodeRef = createRef();
+		this.blockRef = createRef();
+		this.onFocusScrollToBlock = this.onFocusScrollToBlock.bind( this );
 	}
 
 	onFocus() {
 		const { firstToSelectId, isSelected, onSelect } = this.props;
 		if ( ! isSelected ) {
 			onSelect( firstToSelectId );
+		}
+	}
+
+	componentDidUpdate() {
+		this.onFocusScrollToBlock();
+	}
+
+	onFocusScrollToBlock() {
+		const { isSelected } = this.props;
+		if ( isSelected ) {
+			if ( this.blockRef.current !== null ) {
+				this.blockRef.current.measure(
+					( x, y, width, height, px, py ) => {
+						this.scrollToBlockListItemIfNotInViewPort(
+							px,
+							py,
+							width,
+							height
+						);
+					}
+				);
+			}
+		}
+	}
+
+	scrollToBlockListItemIfNotInViewPort( x, y, width, height ) {
+		const window = Dimensions.get( 'window' );
+
+		const visible =
+			y <= window.height &&
+			x <= window.width &&
+			y + height <= window.height - 100 &&
+			x + width <= window.width;
+
+		const { scrollTo, clientId } = this.props;
+
+		if ( ! visible ) {
+			const offset = y + height;
+			scrollTo( clientId, offset );
 		}
 	}
 
@@ -154,6 +198,8 @@ class BlockListBlock extends Component {
 				accessibilityRole={ 'button' }
 			>
 				<View
+					ref={ this.blockRef }
+					collapsable={ false }
 					style={ { flex: 1 } }
 					accessibilityLabel={ accessibilityLabel }
 				>

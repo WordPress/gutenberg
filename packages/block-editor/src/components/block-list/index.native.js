@@ -7,7 +7,7 @@ import { View, Platform, TouchableWithoutFeedback } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Component, createContext } from '@wordpress/element';
+import { Component, createContext, createRef } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
@@ -76,17 +76,26 @@ export class BlockList extends Component {
 		this.setListRef = this.setListRef.bind( this );
 		this.scrollToBlockListItem = this.scrollToBlockListItem.bind( this );
 		this.blockListItemRefs = new Array();
+		this.listRef = createRef();
 	}
 
 	addBlockToEndOfPost( newBlock ) {
 		this.props.insertBlock( newBlock, this.props.blockCount );
 	}
 
-	scrollToBlockListItem( clientId ) {
-		const ref = this.blockListItemRefs.filter(
+	scrollToBlockListItem( clientId, offset ) {
+		const ref = this.blockListItemRefs.find(
 			( item ) => item.clientId === clientId
-		).blockListItemRef;
-		this.listRef.scrollToItem( ref );
+		);
+
+		if ( ref !== undefined ) {
+			this.timeout = setTimeout( () => {
+				this.listRef.current.scrollToOffset( {
+					offset,
+					animated: true,
+				} );
+			}, 500 );
+		}
 	}
 
 	onCaretVerticalPositionChange( targetId, caretY, previousCaretY ) {
@@ -212,8 +221,8 @@ export class BlockList extends Component {
 					autoScroll={ this.props.autoScroll }
 					innerRef={ ( ref ) => {
 						this.scrollViewInnerRef( parentScrollRef || ref );
-						this.setListRef( ref );
 					} }
+					listRef={ this.listRef }
 					extraScrollHeight={
 						blockToolbar.height + blockBorder.width
 					}
@@ -269,7 +278,7 @@ export class BlockList extends Component {
 		);
 	}
 
-	renderItem( { item: clientId } ) {
+	renderItem( { item: clientId, index } ) {
 		const {
 			contentResizeMode,
 			contentStyle,
@@ -281,17 +290,30 @@ export class BlockList extends Component {
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
+
+		const blockListItemIndex = this.blockListItemRefs.find(
+			( itemRef ) => itemRef.clientId === clientId
+		);
+
+		if ( blockListItemIndex ) {
+			if ( blockListItemIndex.index > 0 && blockListItemIndex >= index ) {
+				this.blockListItemRefs.push( {
+					clientId,
+					index,
+				} );
+			}
+		} else {
+			this.blockListItemRefs.push( {
+				clientId,
+				index,
+			} );
+		}
+
 		return (
 			<BlockListItem
 				isStackedHorizontally={ isStackedHorizontally }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
-				ref={ ( blockListItemRef ) =>
-					this.blockListItemRefs.push( {
-						clientId,
-						blockListItemRef,
-					} )
-				}
 				parentWidth={ parentWidth }
 				contentResizeMode={ contentResizeMode }
 				contentStyle={ contentStyle }

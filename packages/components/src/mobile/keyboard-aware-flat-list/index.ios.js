@@ -18,6 +18,7 @@ export const KeyboardAwareFlatList = ( {
 	autoScroll,
 	scrollViewStyle,
 	inputAccessoryViewHeight,
+	listRef,
 	...listProps
 } ) => (
 	<KeyboardAwareScrollView
@@ -62,7 +63,7 @@ export const KeyboardAwareFlatList = ( {
 			this.latestContentOffsetY = event.nativeEvent.contentOffset.y;
 		} }
 	>
-		<List { ...listProps } />
+		<List ref={ listRef } { ...listProps } />
 	</KeyboardAwareScrollView>
 );
 
