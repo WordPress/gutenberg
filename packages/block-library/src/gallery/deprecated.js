@@ -111,10 +111,16 @@ const deprecated = [
 			return {
 				...attributes,
 				images: attributes.images.map( ( image ) => {
-					if ( image.alt !== __unstableStripHTML( image.alt ) ) {
-						return __unstableStripHTML( image.alt );
+					let alt = image.alt;
+
+					if ( alt !== __unstableStripHTML( alt ) ) {
+						alt = __unstableStripHTML( image.alt );
 					}
-					return image.alt;
+
+					return {
+						...image,
+						alt,
+					};
 				} ),
 			};
 		},
