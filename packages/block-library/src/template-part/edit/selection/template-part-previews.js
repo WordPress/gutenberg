@@ -179,7 +179,10 @@ function TemplatePartSearchResults( {
 	const currentShownTPs = useAsyncList( filteredTPs );
 
 	return filteredTPs.map( ( templatePart ) => (
-		<PanelGroup key={ templatePart.id } title={ templatePart.meta.theme }>
+		<PanelGroup
+			key={ templatePart.id }
+			title={ templatePart.meta.theme || __( 'Custom' ) }
+		>
 			{ currentShownTPs.includes( templatePart ) ? (
 				<TemplatePartItem
 					key={ templatePart.id }
