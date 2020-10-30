@@ -61,7 +61,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	}
 	if ( ! class_exists( 'WP_REST_Styles_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-styles-controller.php';
-  }
+	}
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-customizer-nonces.php';
 	}

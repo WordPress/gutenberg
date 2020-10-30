@@ -9,6 +9,7 @@
  * Class WP_REST_Scripts_Controller
  */
 class WP_REST_Scripts_Controller extends WP_REST_Dependencies_Controller {
+
 	/**
 	 * WP_REST_Scripts_Controller constructor.
 	 */
@@ -49,13 +50,15 @@ class WP_REST_Scripts_Controller extends WP_REST_Dependencies_Controller {
 	 * @return array
 	 */
 	public function get_core_assets() {
-		$wp_scripts = new WP_Scripts();
-		wp_default_scripts( $wp_scripts );
-		wp_default_packages_vendor( $wp_scripts );
-		wp_default_packages_scripts( $wp_scripts );
-		$handles = wp_list_pluck( $wp_scripts->registered, 'handle' );
-		$handles = array_values( $handles );
+		if ( null === $this->core_assets ) {
+			$wp_scripts = new WP_Scripts();
+			wp_default_scripts( $wp_scripts );
+			wp_default_packages_vendor( $wp_scripts );
+			wp_default_packages_scripts( $wp_scripts );
+			$handles           = wp_list_pluck( $wp_scripts->registered, 'handle' );
+			$this->core_assets = array_values( $handles );
+		}
 
-		return $handles;
+		return $this->core_assets;
 	}
 }

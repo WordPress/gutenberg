@@ -1,6 +1,6 @@
 <?php
 /**
- * Dependencies controller.
+ * Dependencies controller. An abstract class intended to be extended by scripts/styles endpoints.
  *
  * @package gutenberg
  */
@@ -12,7 +12,7 @@
  *
  * @see WP_REST_Controller
  */
-class WP_REST_Dependencies_Controller extends WP_REST_Controller {
+abstract class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 
 	/**
 	 * Dependencies core object.
@@ -38,7 +38,16 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	protected $block_dependency = '';
 
 	/**
+	 * Core assets collection.
+	 *
+	 * @var null|array
+	 */
+	protected $core_assets;
+
+	/**
 	 * Register routes.
+	 *
+	 * @return void
 	 */
 	public function register_routes() {
 		register_rest_route(
@@ -98,6 +107,9 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 
 		if ( $handle ) {
 			foreach ( $filter as $dependency_handle ) {
+				if ( $handle === $dependency_handle ) {
+					continue;
+				}
 				foreach ( $this->object->registered as $dependency ) {
 					if ( $dependency_handle === $dependency->handle ) {
 						$item   = $this->prepare_item_for_response( $dependency, $request );
@@ -179,9 +191,8 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 		$check = $this->check_read_permission( $request['dependency'] );
 		if ( is_wp_error( $check ) ) {
 			return $check;
-		} else if ( true === $check ) {
-			return $check;
-		} else if (  current_user_can( 'manage_options' ) ) {
+		}
+		if ( true === $check || current_user_can( 'manage_options' ) ) {
 			return true;
 		}
 
@@ -199,9 +210,8 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 		$check = $this->check_read_permission( $request['handle'] );
 		if ( is_wp_error( $check ) ) {
 			return $check;
-		} else if ( true === $check ) {
-			return $check;
-		} else if (  current_user_can( 'manage_options' ) ) {
+		}
+		if ( true === $check || current_user_can( 'manage_options' ) ) {
 			return true;
 		}
 
@@ -291,16 +301,11 @@ class WP_REST_Dependencies_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Get core assets.
+	 * Get core assets. Abstract method that needs to be covered by all child classes.
 	 *
 	 * @return array
 	 */
-	public function get_core_assets() {
-		/* translators: %s: Method name. */
-		_doing_it_wrong( sprintf( __( "Method '%s' not implemented. Must be overridden in subclass.", 'gutenberg' ), __METHOD__ ), 'x.x' );
-
-		return array();
-	}
+	abstract public function get_core_assets();
 
 	/**
 	 * Block asset.
