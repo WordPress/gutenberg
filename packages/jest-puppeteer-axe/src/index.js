@@ -69,7 +69,6 @@ function formatViolations( violations ) {
  * @param {?string|Array} params.exclude        CSS selector(s) to add to the list of elements
  *                                              to exclude from analysis.
  * @param {?Array}        params.disabledRules  The list of Axe rules to skip from verification.
- * @param {?Array}        params.disabledFrames An array of selectors for iframes that are disabled in axe tests
  * @param {?RunOptions}   params.options        A flexible way to configure how Axe run operates,
  *                                              see https://github.com/dequelabs/axe-core/blob/master/doc/API.md#options-parameter.
  * @param {?Spec}         params.config         Axe configuration object,
@@ -79,7 +78,14 @@ function formatViolations( violations ) {
  */
 async function toPassAxeTests(
 	page,
-	{ include, exclude, disabledRules, disabledFrames, options, config } = {}
+	{
+		include,
+		exclude,
+		disabledRules,
+		__experimentalDisabledFrames: disabledFrames,
+		options,
+		config,
+	} = {}
 ) {
 	const axe = new AxePuppeteer( page );
 
