@@ -10,11 +10,11 @@ import { __ } from '@wordpress/i18n';
  */
 import { useEditorFeature } from '../editor/utils';
 
-export default ( {
+export default function TypographyPanel( {
 	context: { supports, name },
 	getStyleProperty,
 	setStyleProperty,
-} ) => {
+} ) {
 	const fontSizes = useEditorFeature( 'typography.fontSizes', name );
 	const disableCustomFontSizes = ! useEditorFeature(
 		'typography.customFontSize',
@@ -50,4 +50,4 @@ export default ( {
 			) }
 		</PanelBody>
 	);
-};
+}
