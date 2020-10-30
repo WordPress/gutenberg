@@ -104,9 +104,7 @@ function InserterSearchResults( {
 
 	return (
 		<>
-			{ ! filteredBlockTypes.length && ! filteredBlockPatterns.length && (
-				<InserterNoResults />
-			) }
+			{ ! showBlockDirectory && ! hasItems && <InserterNoResults /> }
 
 			{ !! filteredBlockTypes.length && (
 				<InserterPanel
