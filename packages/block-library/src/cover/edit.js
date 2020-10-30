@@ -86,10 +86,19 @@ function retrieveFastAverageColor() {
 function CoverHeightInput( {
 	onChange,
 	onUnitChange,
+	fullHeightAlignment,
 	unit = 'px',
 	value = '',
 } ) {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
+
+	useEffect( () => {
+		if ( fullHeightAlignment ) {
+			onChange( 100 );
+			onUnitChange( 'vh' );
+		}
+	}, [ fullHeightAlignment ] );
+
 	const instanceId = useInstanceId( UnitControl );
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
@@ -410,6 +419,7 @@ function CoverEdit( {
 							<CoverHeightInput
 								value={ temporaryMinHeight || minHeight }
 								unit={ minHeightUnit }
+								fullHeightAlignment={ fullHeightAlignment }
 								onChange={ ( newMinHeight ) =>
 									setAttributes( { minHeight: newMinHeight } )
 								}
