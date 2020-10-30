@@ -11,31 +11,7 @@
  *
  * @see WP_Test_REST_Controller_Testcase
  */
-class REST_Scripts_Controller_Test extends WP_Test_REST_TestCase {
-	/**
-	 * @var int
-	 */
-	protected static $superadmin_id;
-
-	/**
-	 * @var int
-	 */
-	protected static $admin_id;
-
-	/**
-	 * @var int
-	 */
-	protected static $editor_id;
-
-	/**
-	 * @var int
-	 */
-	protected static $subscriber_id;
-
-	/**
-	 * @var int
-	 */
-	protected static $author_id;
+class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	/**
 	 * @var array
@@ -54,40 +30,35 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_TestCase {
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$superadmin_id           = $factory->user->create(
+		self::$users_map['superadmin'] = $factory->user->create(
 			array(
 				'role'       => 'administrator',
 				'user_login' => 'superadmin',
 			)
 		);
-		self::$users_map['superadmin'] = self::$superadmin_id;
 		if ( is_multisite() ) {
 			update_site_option( 'site_admins', array( 'superadmin' ) );
 		}
-		self::$admin_id                = $factory->user->create(
+		self::$users_map['admin']      = $factory->user->create(
 			array(
 				'role' => 'administrator',
 			)
 		);
-		self::$users_map['admin']      = self::$admin_id;
-		self::$editor_id               = $factory->user->create(
+		self::$users_map['editor']     = $factory->user->create(
 			array(
 				'role' => 'editor',
 			)
 		);
-		self::$users_map['editor']     = self::$editor_id;
-		self::$author_id               = $factory->user->create(
+		self::$users_map['author']     = $factory->user->create(
 			array(
 				'role' => 'author',
 			)
 		);
-		self::$users_map['author']     = self::$author_id;
-		self::$subscriber_id           = $factory->user->create(
+		self::$users_map['subscriber'] = $factory->user->create(
 			array(
 				'role' => 'subscriber',
 			)
 		);
-		self::$users_map['subscriber'] = self::$subscriber_id;
 		self::$users_map['guest']      = 0;
 		register_block_type(
 			'fake/scripts-test',
@@ -102,9 +73,9 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_TestCase {
 	 * Tear down tests after entire test class is done.
 	 */
 	public static function wpTearDownAfterClass() {
-	foreach( self::$users_map as $key => $user_id ){
-            self::delete_user( $user_id );
-        }
+		foreach ( self::$users_map as $key => $user_id ) {
+			self::delete_user( $user_id );
+		}
 		unregister_block_type( 'fake/scripts-tests' );
 	}
 
@@ -114,6 +85,7 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_TestCase {
 	public function setUp() {
 		global $wp_scripts;
 		parent::setUp();
+
 		$wp_scripts = new WP_Scripts();
 		wp_register_script( self::$script_handle, home_url( '/test.css' ) );
 		wp_register_script( 'script1', home_url( '/script1.css' ) );
@@ -162,7 +134,7 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_TestCase {
 	 *
 	 * @param string $user_identifier User identifier.
 	 */
-	public function test_get_items( $user_identifier ) {
+	public function test_get_items_with_data_provider( $user_identifier ) {
 		wp_set_current_user( self::$users_map[ $user_identifier ] );
 		$request = new WP_REST_Request( 'GET', '/__experimental/scripts' );
 		$request->set_query_params( array( 'dependency' => 'script1' ) );
@@ -175,7 +147,7 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_TestCase {
 	 * Test multiple scripts with nested dependencies.
 	 */
 	public function test_get_items_nested_deps1() {
-		wp_set_current_user( self::$admin_id );
+		wp_set_current_user( self::$users_map['admin'] );
 		$request = new WP_REST_Request( 'GET', '/__experimental/scripts' );
 		$request->set_query_params( array( 'dependency' => 'script-with-deps' ) );
 		$response = rest_get_server()->dispatch( $request );
@@ -193,7 +165,7 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_TestCase {
 	 * Test multiple scripts with nested dependencies.
 	 */
 	public function test_get_items_nested_deps2() {
-		wp_set_current_user( self::$admin_id );
+		wp_set_current_user( self::$users_map['admin'] );
 		$request = new WP_REST_Request( 'GET', '/__experimental/scripts' );
 		$request->set_query_params( array( 'dependency' => 'script-with-nested-deps' ) );
 		$response = rest_get_server()->dispatch( $request );
@@ -222,7 +194,7 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_TestCase {
 	 * Test whether script handle is excluded from its dependencies list.
 	 */
 	public function test_get_items_check_asset_deps() {
-		wp_set_current_user( self::$admin_id );
+		wp_set_current_user( self::$users_map['admin'] );
 		$request = new WP_REST_Request( 'GET', '/__experimental/scripts' );
 		$request->set_query_params( array( 'dependency' => 'script-with-nested-deps' ) );
 		$response = rest_get_server()->dispatch( $request );
@@ -242,7 +214,7 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_TestCase {
 	 *
 	 * @param string $user_identifier User identifier.
 	 */
-	public function test_get_item( $user_identifier ) {
+	public function test_get_item_with_data_provider( $user_identifier ) {
 		wp_set_current_user( self::$users_map[ $user_identifier ] );
 		$request  = new WP_REST_Request( 'GET', '/__experimental/scripts/' . self::$script_handle );
 		$response = rest_get_server()->dispatch( $request );
@@ -254,31 +226,10 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_TestCase {
 	}
 
 	/**
-	 * Create item test.
-	 */
-	public function test_create_item() {
-		// Not testable.
-	}
-
-	/**
-	 * Update item test.
-	 */
-	public function test_update_item() {
-		// Not testable.
-	}
-
-	/**
-	 * Delete item test.
-	 */
-	public function test_delete_item() {
-		// Not testable.
-	}
-
-	/**
 	 * Test prepare item.
 	 */
 	public function test_prepare_item() {
-		wp_set_current_user( self::$admin_id );
+		wp_set_current_user( self::$users_map['admin'] );
 		$request  = new WP_REST_Request( 'GET', '/__experimental/scripts/' . self::$script_handle );
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
@@ -472,4 +423,43 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_TestCase {
 		);
 	}
 
+	/**
+	 * Get items test.
+	 */
+	public function test_get_items() {
+		// Covered by test_get_items_with_data_provider.
+		$this->markTestSkipped( 'Covered by test_get_items_with_data_provider.' );
+	}
+
+	/**
+	 * Get item test.
+	 */
+	public function test_get_item() {
+		// Covered by test_get_item_with_data_provider.
+		$this->markTestSkipped( 'Covered by test_get_item_with_data_provider.' );
+	}
+
+	/**
+	 * Create item test.
+	 */
+	public function test_create_item() {
+		// Not testable.
+		$this->markTestSkipped( 'Not testable.' );
+	}
+
+	/**
+	 * Update item test.
+	 */
+	public function test_update_item() {
+		// Not testable.
+		$this->markTestSkipped( 'Not testable.' );
+	}
+
+	/**
+	 * Delete item test.
+	 */
+	public function test_delete_item() {
+		// Not testable.
+		$this->markTestSkipped( 'Not testable.' );
+	}
 }
