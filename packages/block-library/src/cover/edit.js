@@ -37,6 +37,7 @@ import {
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
 	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
+	__experimentalBlockFullHeightAligmentToolbar as FullHeightAlignment,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
@@ -255,6 +256,7 @@ function CoverEdit( {
 		minHeightUnit,
 		style: styleAttribute,
 		url,
+		fullHeightAlignment,
 	} = attributes;
 	const {
 		gradientClass,
@@ -322,6 +324,12 @@ function CoverEdit( {
 	const controls = (
 		<>
 			<BlockControls>
+				<FullHeightAlignment
+					isActive={ fullHeightAlignment }
+					onToggle={ ( active ) =>
+						setAttributes( { fullHeightAlignment: active } )
+					}
+				/>
 				{ hasBackground && (
 					<>
 						<BlockAlignmentMatrixToolbar
