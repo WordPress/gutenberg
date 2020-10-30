@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 6.5.0 (2020-10-30)
+
 ### Enhancements
 
 -   Ignore `/vendor` folder when searching for tests.
