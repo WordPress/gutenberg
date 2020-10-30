@@ -86,6 +86,7 @@ function retrieveFastAverageColor() {
 function CoverHeightInput( {
 	onChange,
 	onUnitChange,
+	onFullHeightChange,
 	unit = 'px',
 	value = '',
 	fullHeightAlignment,
@@ -141,22 +142,33 @@ function CoverHeightInput( {
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
 	return (
-		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
-			<UnitControl
+		<Fragment>
+			<BaseControl
+				label={ __( 'Minimum height of cover' ) }
 				id={ inputId }
-				isResetValueOnUnitChange
-				min={ min }
-				onBlur={ handleOnBlur }
-				onChange={ handleOnChange }
-				onUnitChange={ onUnitChange }
-				step="1"
-				style={ { maxWidth: 80 } }
-				unit={ unit }
-				units={ CSS_UNITS }
-				value={ inputValue }
-				disabled={ fullHeightAlignment }
+			>
+				<UnitControl
+					id={ inputId }
+					isResetValueOnUnitChange
+					min={ min }
+					onBlur={ handleOnBlur }
+					onChange={ handleOnChange }
+					onUnitChange={ onUnitChange }
+					step="1"
+					style={ { maxWidth: 80 } }
+					unit={ unit }
+					units={ CSS_UNITS }
+					value={ inputValue }
+					disabled={ fullHeightAlignment }
+				/>
+			</BaseControl>
+
+			<ToggleControl
+				label={ __( 'Full Screen Height' ) }
+				checked={ fullHeightAlignment }
+				onChange={ onFullHeightChange }
 			/>
-		</BaseControl>
+		</Fragment>
 	);
 }
 
@@ -436,11 +448,16 @@ function CoverEdit( {
 								onChange={ ( newMinHeight ) =>
 									setAttributes( { minHeight: newMinHeight } )
 								}
-								onUnitChange={ ( nextUnit ) => {
+								onUnitChange={ ( nextUnit ) =>
 									setAttributes( {
 										minHeightUnit: nextUnit,
-									} );
-								} }
+									} )
+								}
+								onFullHeightChange={ ( nextFullHeightMode ) =>
+									setAttributes( {
+										fullHeightAlignment: nextFullHeightMode,
+									} )
+								}
 							/>
 						</PanelBody>
 						<PanelColorGradientSettings
