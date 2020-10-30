@@ -207,7 +207,10 @@ async function runAxeTestsForBlockEditor() {
 			'frame-title',
 		],
 		disabledFrames: [
-			// Ignore block previews.
+			// Ignore any aria-hidden iframes, in particular those added by
+			// react-resize-aware in the `useResizeObserver` hook. Axe often
+			// throws errors when trying to inject its scripts into these
+			// iframes.
 			'[aria-hidden="true"]',
 		],
 		exclude: [
