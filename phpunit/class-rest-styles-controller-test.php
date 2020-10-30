@@ -38,6 +38,11 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	protected static $author_id;
 
 	/**
+	 * @var array
+	 */
+	protected static $users_map = array();
+
+	/**
 	 * @var string
 	 */
 	protected static $style_handle = 'core-assets-test';
@@ -49,35 +54,41 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
 	public static function wpSetUpBeforeClass( $factory ) {
-		self::$superadmin_id = $factory->user->create(
+		self::$superadmin_id           = $factory->user->create(
 			array(
 				'role'       => 'administrator',
 				'user_login' => 'superadmin',
 			)
 		);
+		self::$users_map['superadmin'] = self::$superadmin_id;
 		if ( is_multisite() ) {
 			update_site_option( 'site_admins', array( 'superadmin' ) );
 		}
-		self::$admin_id      = $factory->user->create(
+		self::$admin_id                = $factory->user->create(
 			array(
 				'role' => 'administrator',
 			)
 		);
-		self::$editor_id     = $factory->user->create(
+		self::$users_map['admin']      = self::$admin_id;
+		self::$editor_id               = $factory->user->create(
 			array(
 				'role' => 'editor',
 			)
 		);
-		self::$author_id     = $factory->user->create(
+		self::$users_map['editor']     = self::$editor_id;
+		self::$author_id               = $factory->user->create(
 			array(
 				'role' => 'author',
 			)
 		);
-		self::$subscriber_id = $factory->user->create(
+		self::$users_map['author']     = self::$author_id;
+		self::$subscriber_id           = $factory->user->create(
 			array(
 				'role' => 'subscriber',
 			)
 		);
+		self::$users_map['subscriber'] = self::$subscriber_id;
+		self::$users_map['guest']      = 0;
 		register_block_type(
 			'fake/styles-test',
 			array(
@@ -309,76 +320,142 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	/**
 	 * Test single block style.
+	 *
+	 * @dataProvider data_provider_all_users
+	 *
+	 * @param string $user_identifier User identifier.
 	 */
-	public function test_get_item_block_style() {
-		foreach ( array( 0, self::$subscriber_id, self::$editor_id, self::$author_id, self::$admin_id, self::$superadmin_id ) as $user_id ) {
-			wp_set_current_user( $user_id );
-			$request  = new WP_REST_Request( 'GET', '/__experimental/styles/block-style' );
-			$response = rest_get_server()->dispatch( $request );
-			$data     = $response->get_data();
+	public function test_get_item_block_style( $user_identifier ) {
+		wp_set_current_user( self::$users_map[ $user_identifier ] );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/styles/block-style' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
 
-			$this->assertEquals( 'block-style', $data['handle'] );
-			$this->assertEquals( home_url( '/block-style.css' ), $data['src'] );
-			$this->assertEquals( home_url( '/block-style.css' ), $data['url'] );
-		}
+		$this->assertEquals( 'block-style', $data['handle'] );
+		$this->assertEquals( home_url( '/block-style.css' ), $data['src'] );
+		$this->assertEquals( home_url( '/block-style.css' ), $data['url'] );
 	}
 
 	/**
 	 * Test single block editor style.
+	 *
+	 * @dataProvider data_provider_item_block_editor
+	 *
+	 * @param string $user_identifier User identifier.
 	 */
-	public function test_get_item_block_editor_style() {
-		foreach ( array( self::$editor_id, self::$author_id, self::$admin_id, self::$superadmin_id ) as $user_id ) {
-			wp_set_current_user( $user_id );
-			$request  = new WP_REST_Request( 'GET', '/__experimental/styles/block-editor-style' );
-			$response = rest_get_server()->dispatch( $request );
-			$data     = $response->get_data();
+	public function test_get_item_block_editor_style( $user_identifier ) {
+		wp_set_current_user( self::$users_map[ $user_identifier ] );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/styles/block-editor-style' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
 
-			$this->assertEquals( 'block-editor-style', $data['handle'] );
-			$this->assertEquals( home_url( '/block-editor-style.css' ), $data['src'] );
-			$this->assertEquals( home_url( '/block-editor-style.css' ), $data['url'] );
-		}
+		$this->assertEquals( 'block-editor-style', $data['handle'] );
+		$this->assertEquals( home_url( '/block-editor-style.css' ), $data['src'] );
+		$this->assertEquals( home_url( '/block-editor-style.css' ), $data['url'] );
 	}
 
 	/**
 	 * Test get items with no permission.
+	 *
+	 * @dataProvider data_provider_item_no_permission
+	 *
+	 * @param string $user_identifier User identifier.
 	 */
-	public function test_get_items_no_permission() {
-		foreach ( array( 0, self::$subscriber_id, self::$author_id, self::$editor_id ) as $user_id ) {
-			wp_set_current_user( $user_id );
-			$request = new WP_REST_Request( 'GET', '/__experimental/styles' );
-			$request->set_query_params( array( 'dependency' => 'style1' ) );
-			$response = rest_get_server()->dispatch( $request );
-			$this->assertWPError( $response->as_error() );
-			$this->assertEquals( 'rest_handle_cannot_view', $response->as_error()->get_error_code() );
-		}
+	public function test_get_items_no_permission( $user_identifier ) {
+		wp_set_current_user( self::$users_map[ $user_identifier ] );
+		$request = new WP_REST_Request( 'GET', '/__experimental/styles' );
+		$request->set_query_params( array( 'dependency' => 'style1' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$this->assertWPError( $response->as_error() );
+		$this->assertEquals( 'rest_handle_cannot_view', $response->as_error()->get_error_code() );
 	}
 
 	/**
 	 * Test single style with no permission.
+	 *
+	 * @dataProvider data_provider_item_no_permission
+	 *
+	 * @param string $user_identifier User identifier.
 	 */
-	public function test_get_item_no_permission() {
-		foreach ( array( 0, self::$subscriber_id, self::$author_id, self::$editor_id ) as $user_id ) {
-			wp_set_current_user( $user_id );
-			$request  = new WP_REST_Request( 'GET', '/__experimental/styles/' . self::$style_handle );
-			$response = rest_get_server()->dispatch( $request );
+	public function test_get_item_no_permission( $user_identifier ) {
+		wp_set_current_user( self::$users_map[ $user_identifier ] );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/styles/' . self::$style_handle );
+		$response = rest_get_server()->dispatch( $request );
 
-			$this->assertWPError( $response->as_error() );
-			$this->assertEquals( 'rest_handle_cannot_view', $response->as_error()->get_error_code() );
-		}
+		$this->assertWPError( $response->as_error() );
+		$this->assertEquals( 'rest_handle_cannot_view', $response->as_error()->get_error_code() );
 	}
 
 	/**
 	 * Test single block editor style with no permission.
+	 *
+	 * @dataProvider data_provider_item_block_editor_style_no_permission
+	 *
+	 * @param string $user_identifier User identifier.
 	 */
-	public function test_get_item_block_editor_style_no_permission() {
-		foreach ( array( 0, self::$subscriber_id ) as $user_id ) {
-			wp_set_current_user( $user_id );
-			$request  = new WP_REST_Request( 'GET', '/__experimental/styles/block-editor-style' );
-			$response = rest_get_server()->dispatch( $request );
+	public function test_get_item_block_editor_style_no_permission( $user_identifier ) {
+		wp_set_current_user( self::$users_map[ $user_identifier ] );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/styles/block-editor-style' );
+		$response = rest_get_server()->dispatch( $request );
 
-			$this->assertWPError( $response->as_error() );
-			$this->assertEquals( 'rest_handle_cannot_view', $response->as_error()->get_error_code() );
-		}
+		$this->assertWPError( $response->as_error() );
+		$this->assertEquals( 'rest_handle_cannot_view', $response->as_error()->get_error_code() );
+	}
+
+	/**
+	 * Return no permission users ids.
+	 *
+	 * @return string[][]
+	 */
+	public function data_provider_item_block_editor_style_no_permission() {
+		return array(
+			array( 'guest' ),
+			array( 'subscriber' ),
+		);
+	}
+
+	/**
+	 * Return no permission users ids.
+	 *
+	 * @return string[][]
+	 */
+	public function data_provider_item_no_permission() {
+		return array(
+			array( 'guest' ),
+			array( 'subscriber' ),
+			array( 'author' ),
+			array( 'editor' ),
+		);
+	}
+
+	/**
+	 * Return users with permissions to read data.
+	 *
+	 * @return string[][]
+	 */
+	public function data_provider_item_block_editor() {
+		return array(
+			array( 'author' ),
+			array( 'editor' ),
+			array( 'admin' ),
+			array( 'superadmin' ),
+		);
+	}
+
+	/**
+	 * Return all users.
+	 *
+	 * @return string[][]
+	 */
+	public function data_provider_all_users() {
+		return array(
+			array( 'guest' ),
+			array( 'subscriber' ),
+			array( 'author' ),
+			array( 'editor' ),
+			array( 'admin' ),
+			array( 'superadmin' ),
+		);
 	}
 
 }
