@@ -28,11 +28,11 @@ function HeadingEdit( {
 	onReplace,
 	mergedStyle,
 } ) {
-	const { align, content, level, placeholder } = attributes;
+	const { textAlign, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
 	const blockProps = useBlockProps( {
 		className: classnames( {
-			[ `has-text-align-${ align }` ]: align,
+			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 		style: mergedStyle,
 	} );
@@ -49,9 +49,9 @@ function HeadingEdit( {
 					/>
 				</ToolbarGroup>
 				<AlignmentToolbar
-					value={ align }
+					value={ textAlign }
 					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
+						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
 			</BlockControls>
@@ -74,7 +74,7 @@ function HeadingEdit( {
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
 				placeholder={ placeholder || __( 'Write heading…' ) }
-				textAlign={ align }
+				textAlign={ textAlign }
 				{ ...blockProps }
 			/>
 		</>

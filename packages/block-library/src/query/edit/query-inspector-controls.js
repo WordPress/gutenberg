@@ -26,9 +26,16 @@ import { getTermsInfo } from '../utils';
 import { MAX_FETCHED_TERMS } from '../constants';
 
 export default function QueryInspectorControls( { query, setQuery } ) {
-	const { order, orderBy, author: selectedAuthorId, postType } = query;
+	const {
+		order,
+		orderBy,
+		author: selectedAuthorId,
+		postType,
+		sticky,
+	} = query;
 	const [ showCategories, setShowCategories ] = useState( true );
 	const [ showTags, setShowTags ] = useState( true );
+	const [ showSticky, setShowSticky ] = useState( postType === 'post' );
 	const { authorList, categories, tags, postTypes } = useSelect(
 		( select ) => {
 			const { getEntityRecords, getPostTypes } = select( 'core' );
@@ -72,6 +79,9 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		setShowCategories( postTypeTaxonomies.includes( 'category' ) );
 		setShowTags( postTypeTaxonomies.includes( 'post_tag' ) );
 	}, [ postType, postTypesTaxonomiesMap ] );
+	useEffect( () => {
+		setShowSticky( postType === 'post' );
+	}, [ postType ] );
 	const postTypesSelectOptions = useMemo(
 		() =>
 			( postTypes || [] ).map( ( { labels, slug } ) => ( {
@@ -87,6 +97,9 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		}
 		if ( ! postTypesTaxonomiesMap[ newValue ].includes( 'post_tag' ) ) {
 			updateQuery.tagIds = [];
+		}
+		if ( newValue !== 'post' ) {
+			updateQuery.sticky = '';
 		}
 		setQuery( updateQuery );
 	};
@@ -111,6 +124,14 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
+	const stickyOptions = useMemo( () => [
+		{
+			label: __( 'Include' ),
+			value: '',
+		},
+		{ label: __( 'Exclude' ), value: 'exclude' },
+		{ label: __( 'Only' ), value: 'only' },
+	] );
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Filtering and Sorting' ) }>
@@ -161,6 +182,14 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 					value={ querySearch }
 					onChange={ setQuerySearch }
 				/>
+				{ showSticky && (
+					<SelectControl
+						label={ __( 'Sticky posts' ) }
+						options={ stickyOptions }
+						value={ sticky }
+						onChange={ ( value ) => setQuery( { sticky: value } ) }
+					/>
+				) }
 			</PanelBody>
 		</InspectorControls>
 	);

@@ -17,6 +17,7 @@ import { ROOT_MENU } from './constants';
 import { NavigationContext } from './context';
 import { NavigationUI } from './styles/navigation-styles';
 import { useCreateNavigationTree } from './use-create-navigation-tree';
+import { useRTL } from '../utils/rtl';
 
 export default function Navigation( {
 	activeItem,
@@ -28,8 +29,9 @@ export default function Navigation( {
 	const [ menu, setMenu ] = useState( activeMenu );
 	const [ slideOrigin, setSlideOrigin ] = useState();
 	const navigationTree = useCreateNavigationTree();
+	const defaultSlideOrigin = useRTL() ? 'right' : 'left';
 
-	const setActiveMenu = ( menuId, slideInOrigin = 'left' ) => {
+	const setActiveMenu = ( menuId, slideInOrigin = defaultSlideOrigin ) => {
 		if ( ! navigationTree.getMenu( menuId ) ) {
 			return;
 		}

@@ -17,6 +17,21 @@ async function openBlockNavigator() {
 	);
 }
 
+async function tabToColumnsControl() {
+	let isColumnsControl = false;
+	do {
+		await page.keyboard.press( 'Tab' );
+		isColumnsControl = await page.evaluate( () => {
+			const activeElement = document.activeElement;
+			return (
+				activeElement.tagName === 'INPUT' &&
+				activeElement.attributes.getNamedItem( 'aria-label' ).value ===
+					'Columns'
+			);
+		} );
+	} while ( ! isColumnsControl );
+}
+
 describe( 'Navigating the block hierarchy', () => {
 	beforeEach( async () => {
 		await createNewPost();
@@ -94,7 +109,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
-		await pressKeyTimes( 'Tab', 5 );
+		await tabToColumnsControl();
 
 		// Tweak the columns count by increasing it by one.
 		await page.keyboard.press( 'ArrowRight' );
