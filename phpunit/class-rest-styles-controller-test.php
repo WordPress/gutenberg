@@ -64,12 +64,11 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		if ( is_multisite() ) {
 			update_site_option( 'site_admins', array( 'superadmin' ) );
 		}
-		self::$admin_id                = $factory->user->create(
+		self::$users_map['admin']      = $factory->user->create(
 			array(
 				'role' => 'administrator',
 			)
 		);
-		self::$users_map['admin']      = self::$admin_id;
 		self::$editor_id               = $factory->user->create(
 			array(
 				'role' => 'editor',
