@@ -115,7 +115,6 @@ html.interface-interface-skeleton__html-container {
 .interface-interface-skeleton__left-sidebar {
 	@include break-medium() {
 		border-right: $border-width solid $gray-200;
-		overflow: hidden; // prevent overscroll
 	}
 }
 
