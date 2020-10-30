@@ -145,6 +145,22 @@ function observeConsoleLogging() {
 			return;
 		}
 
+		// Ignore axe core errors about injections into blank iframes
+		// See the following tickets for details:
+		// - https://github.com/dequelabs/axe-puppeteer/issues/25
+		// - https://github.com/dequelabs/axe-core-npm/issues/98
+		//
+		// Previous attempts to solve:
+		// - https://github.com/WordPress/gutenberg/pull/26527
+		// - https://github.com/WordPress/gutenberg/pull/26535
+		if (
+			text.includes(
+				'Failed to inject axe-core into frame (about:blank)'
+			)
+		) {
+			return;
+		}
+
 		const logFunction = OBSERVED_CONSOLE_MESSAGE_TYPES[ type ];
 
 		// As of Puppeteer 1.6.1, `message.text()` wrongly returns an object of
