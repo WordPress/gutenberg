@@ -98,7 +98,7 @@ const Cover = ( {
 		id,
 		style,
 		customOverlayColor,
-		minHeightUnit,
+		minHeightUnit = 'px',
 	} = attributes;
 
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
@@ -278,6 +278,12 @@ const Cover = ( {
 		</TouchableWithoutFeedback>
 	);
 
+	const onChangeUnit = ( nextUnit ) => {
+		setAttributes( {
+			minHeightUnit: nextUnit,
+		} );
+	};
+
 	const controls = (
 		<InspectorControls>
 			<OverlayColorSettings
@@ -302,14 +308,10 @@ const Cover = ( {
 					label={ __( 'Minimum height' ) }
 					min={ COVER_MIN_HEIGHT }
 					max={ COVER_MAX_HEIGHT }
-					unit={ minHeightUnit || 'px' }
+					unit={ minHeightUnit }
 					value={ CONTAINER_HEIGHT }
 					onChange={ onHeightChange }
-					onUnitChange={ ( nextUnit ) => {
-						setAttributes( {
-							minHeightUnit: nextUnit,
-						} );
-					} }
+					onUnitChange={ onChangeUnit }
 					units={ CSS_UNITS }
 					style={ styles.rangeCellContainer }
 				/>

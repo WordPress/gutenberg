@@ -25,36 +25,32 @@ export function backgroundImageStyles( url ) {
 	return url ? { backgroundImage: `url(${ url })` } : {};
 }
 
+const isWeb = Platform.OS === 'web';
+
 export const CSS_UNITS = [
 	{
 		value: 'px',
-		label: Platform.OS === 'web' ? 'px' : __( 'Pixels (px)' ),
+		label: isWeb ? 'px' : __( 'Pixels (px)' ),
 		default: '',
 	},
 	{
 		value: 'em',
-		label:
-			Platform.OS === 'web'
-				? 'em'
-				: __( 'Relative to parent font size (em)' ),
+		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
 		default: '',
 	},
 	{
 		value: 'rem',
-		label:
-			Platform.OS === 'web'
-				? 'rem'
-				: __( 'Relative to root font size (rem)' ),
+		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
 		default: '',
 	},
 	{
 		value: 'vw',
-		label: Platform.OS === 'web' ? 'vw' : __( 'Viewport width (vw)' ),
+		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
 		default: '',
 	},
 	{
 		value: 'vh',
-		label: Platform.OS === 'web' ? 'vh' : __( 'Viewport height (vh)' ),
+		label: isWeb ? 'vh' : __( 'Viewport height (vh)' ),
 		default: '',
 	},
 ];

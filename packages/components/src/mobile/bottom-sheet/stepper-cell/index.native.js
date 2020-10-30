@@ -39,7 +39,9 @@ class BottomSheetStepperCell extends Component {
 		);
 		this.onPressOut = this.onPressOut.bind( this );
 
-		const initialValue = props.value || props.defaultValue || props.min;
+		const { value, defaultValue, min } = props;
+
+		const initialValue = value || defaultValue || min;
 
 		this.state = {
 			inputValue: initialValue,

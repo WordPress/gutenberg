@@ -1,11 +1,11 @@
 .sliderIOS {
 	flex-grow: 1;
-	min-height: 48px;
+	min-height: $grid-unit-60;
 }
 
 .sliderAndroid {
 	flex-grow: 1;
-	min-height: 48px;
+	min-height: $grid-unit-60;
 	margin-left: -6px;
 }
 

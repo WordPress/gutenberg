@@ -42,16 +42,16 @@ function ColumnEdit( {
 	parentAlignment,
 } ) {
 	const { verticalAlignment, width } = attributes;
-	const { valueUnit } = getValueAndUnit( width ) || {};
+	const { valueUnit = '%' } = getValueAndUnit( width ) || {};
 
-	const [ widthUnit, setWidthUnit ] = useState( valueUnit || '%' );
+	const [ widthUnit, setWidthUnit ] = useState( valueUnit );
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
 	};
 
 	useEffect( () => {
-		setWidthUnit( valueUnit || '%' );
+		setWidthUnit( valueUnit );
 	}, [ valueUnit ] );
 
 	useEffect( () => {

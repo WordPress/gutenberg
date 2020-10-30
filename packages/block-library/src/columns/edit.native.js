@@ -161,10 +161,7 @@ function ColumnsEditContainer( {
 	const onChangeWidth = ( nextWidth, valueUnit, columnId ) => {
 		nextWidth = 0 > parseFloat( nextWidth ) ? '0' : nextWidth;
 
-		updateInnerColumnWidth(
-			`${ nextWidth }${ valueUnit || '%' }`,
-			columnId
-		);
+		updateInnerColumnWidth( `${ nextWidth }${ valueUnit }`, columnId );
 	};
 
 	const onChangeUnit = ( nextUnit, index, columnId ) => {
@@ -179,7 +176,7 @@ function ColumnsEditContainer( {
 
 	const getColumnsSliders = () => {
 		return innerColumns.map( ( column, index ) => {
-			const { valueUnit } =
+			const { valueUnit = '%' } =
 				getValueAndUnit( column.attributes.width ) || {};
 			return (
 				<UnitControl
@@ -197,7 +194,7 @@ function ColumnsEditContainer( {
 					onUnitChange={ ( nextUnit ) =>
 						onChangeUnit( nextUnit, index, column.clientId )
 					}
-					unit={ valueUnit || '%' }
+					unit={ valueUnit }
 					units={ CSS_UNITS }
 					preview={
 						<ColumnsPreview

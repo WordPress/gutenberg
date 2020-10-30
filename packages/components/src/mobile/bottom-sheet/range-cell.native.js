@@ -30,9 +30,11 @@ class BottomSheetRangeCell extends Component {
 	constructor( props ) {
 		super( props );
 		this.onChangeValue = this.onChangeValue.bind( this );
+		this.onChange = this.onChange.bind( this );
 		this.onCellPress = this.onCellPress.bind( this );
-		const initialValue =
-			props.value || props.defaultValue || props.minimumValue;
+
+		const { value, defaultValue, minimumValue } = props;
+		const initialValue = value || defaultValue || minimumValue;
 
 		this.state = {
 			accessible: true,
@@ -62,6 +64,14 @@ class BottomSheetRangeCell extends Component {
 		const announcement = sprintf( __( 'Current value is %s' ), value );
 		AccessibilityInfo.announceForAccessibility( announcement );
 	}
+
+	onChange = ( nextValue ) => {
+		const { onChange } = this.props;
+		this.setState( {
+			sliderValue: nextValue,
+		} );
+		onChange( nextValue );
+	};
 
 	render() {
 		const {
@@ -146,12 +156,7 @@ class BottomSheetRangeCell extends Component {
 					{ shouldDisplayTextInput && (
 						<RangeTextInput
 							label={ cellProps.label }
-							onChange={ ( nextValue ) => {
-								this.setState( {
-									sliderValue: nextValue,
-								} );
-								this.props.onChange( nextValue );
-							} }
+							onChange={ this.onChange }
 							defaultValue={ `${ inputValue }` }
 							value={ inputValue }
 							min={ minimumValue }

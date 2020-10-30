@@ -144,36 +144,32 @@ export function getWidths( blocks, withParsing = true ) {
 	} );
 }
 
+const isWeb = Platform.OS === 'web';
+
 export const CSS_UNITS = [
 	{
 		value: '%',
-		label: Platform.OS === 'web' ? '%' : __( 'Percentage (%)' ),
+		label: isWeb ? '%' : __( 'Percentage (%)' ),
 		default: '',
 	},
 	{
 		value: 'px',
-		label: Platform.OS === 'web' ? 'px' : __( 'Pixels (px)' ),
+		label: isWeb ? 'px' : __( 'Pixels (px)' ),
 		default: '',
 	},
 	{
 		value: 'em',
-		label:
-			Platform.OS === 'web'
-				? 'em'
-				: __( 'Relative to parent font size (em)' ),
+		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
 		default: '',
 	},
 	{
 		value: 'rem',
-		label:
-			Platform.OS === 'web'
-				? 'rem'
-				: __( 'Relative to root font size (rem)' ),
+		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
 		default: '',
 	},
 	{
 		value: 'vw',
-		label: Platform.OS === 'web' ? 'vw' : __( 'Viewport width (vw)' ),
+		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
 		default: '',
 	},
 ];

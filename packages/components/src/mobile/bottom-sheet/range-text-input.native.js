@@ -36,9 +36,9 @@ class RangeTextInput extends Component {
 		this.handleChangePixelRatio = this.handleChangePixelRatio.bind( this );
 		this.onSubmitEditing = this.onSubmitEditing.bind( this );
 		this.onChangeText = this.onChangeText.bind( this );
-		const initialValue = this.validateInput(
-			props.value || props.defaultValue || props.min
-		);
+
+		const { value, defaultValue, min } = props;
+		const initialValue = value || defaultValue || min;
 
 		const fontScale = this.getFontScale();
 
@@ -60,12 +60,15 @@ class RangeTextInput extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		if ( prevProps.value !== this.props.value ) {
-			this.setState( { inputValue: this.props.value } );
+		const { value } = this.props;
+		const { hasFocus, inputValue } = this.state;
+
+		if ( prevProps.value !== value ) {
+			this.setState( { inputValue: value } );
 		}
 
-		if ( prevState.hasFocus !== this.state.hasFocus ) {
-			const validValue = this.validateInput( this.state.inputValue );
+		if ( prevState.hasFocus !== hasFocus ) {
+			const validValue = this.validateInput( inputValue );
 			this.setState( { inputValue: validValue } );
 		}
 	}
@@ -87,7 +90,8 @@ class RangeTextInput extends Component {
 	}
 
 	onInputBlur() {
-		this.onChangeText( '' + this.state.inputValue );
+		const { inputValue } = this.state;
+		this.onChangeText( `${ inputValue }` );
 		this.setState( {
 			hasFocus: false,
 		} );
@@ -95,22 +99,18 @@ class RangeTextInput extends Component {
 
 	validateInput( text ) {
 		const { min, max, decimalNum } = this.props;
+		let result = min;
 		if ( ! text ) {
 			return min;
 		}
+
 		if ( typeof text === 'number' ) {
-			if ( max ) {
-				return Math.min( Math.max( text, min ), max );
-			}
-			return Math.max( text, min );
+			result = Math.max( text, min );
+			return max ? Math.min( result, max ) : result;
 		}
-		if ( max ) {
-			return Math.min(
-				Math.max( removeNonDigit( text, decimalNum ), min ),
-				max
-			);
-		}
-		return Math.max( removeNonDigit( text, decimalNum ), min );
+
+		result = Math.max( removeNonDigit( text, decimalNum ), min );
+		return max ? Math.min( result, max ) : result;
 	}
 
 	updateValue( value ) {
@@ -145,11 +145,13 @@ class RangeTextInput extends Component {
 
 	onSubmitEditing( { nativeEvent: { text } } ) {
 		const { decimalNum } = this.props;
+		const { inputValue } = this.state;
+
 		if ( ! isNaN( Number( text ) ) ) {
 			text = toFixed( text.replace( ',', '.' ), decimalNum );
 			const validValue = this.validateInput( text );
 
-			if ( this.state.inputValue !== validValue ) {
+			if ( inputValue !== validValue ) {
 				this.setState( { inputValue: validValue } );
 				this.announceCurrentValue( `${ validValue }` );
 				this.props.onChange( validValue );
