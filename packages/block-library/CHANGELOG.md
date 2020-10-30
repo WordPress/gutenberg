@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+- Code and Preformatted Blocks: delete on backspace from an empty block.
+
 ## 2.23.0 (2020-09-03)
 
 ### Enhancement
