@@ -86,17 +86,28 @@ function retrieveFastAverageColor() {
 function CoverHeightInput( {
 	onChange,
 	onUnitChange,
-	fullHeightAlignment,
 	unit = 'px',
 	value = '',
+	fullHeightAlignment,
 } ) {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
+	const [ prevValue, setPrevValue ] = useState( value );
+	const [ prevUnit, setPrevUnit ] = useState( unit );
 
 	useEffect( () => {
 		if ( fullHeightAlignment ) {
+			// Store values to be able to return to them.
+			setPrevValue( value );
+			setPrevUnit( unit );
+
 			onChange( 100 );
 			onUnitChange( 'vh' );
+			return;
 		}
+
+		// Return previos values.
+		onChange( prevValue );
+		onUnitChange( prevUnit );
 	}, [ fullHeightAlignment ] );
 
 	const instanceId = useInstanceId( UnitControl );
