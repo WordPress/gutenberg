@@ -142,6 +142,13 @@ html.interface-interface-skeleton__html-container {
 	background-color: $white;
 	z-index: z-index(".interface-interface-skeleton__footer");
 
+	// When the navigate regions shortcut is used it applies position: relative
+	// to regions. The footer should always stay stuck to the bottom though, so
+	// override using a more specific selector with position: fixed.
+	.is-focusing-regions &[role="region"] {
+		position: fixed;
+	}
+
 	// On Mobile the footer is hidden
 	display: none;
 	@include break-medium() {
