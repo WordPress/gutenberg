@@ -7,7 +7,11 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default ( { contextName, getSetting, setSetting } ) => {
+export default function ColorPalettePanel( {
+	contextName,
+	getSetting,
+	setSetting,
+} ) {
 	const colors = getSetting( contextName, 'color.palette' );
 	let emptyUI;
 	if ( colors === undefined ) {
@@ -37,4 +41,4 @@ export default ( { contextName, getSetting, setSetting } ) => {
 			emptyUI={ emptyUI }
 		/>
 	);
-};
+}

@@ -22,7 +22,12 @@ import { GLOBAL_CONTEXT } from '../editor/utils';
 import TypographyPanel from './typography-panel';
 import ColorPanel from './color-panel';
 
-export default ( { identifier, title, icon, closeLabel } ) => {
+export default function GlobalStylesSidebar( {
+	identifier,
+	title,
+	icon,
+	closeLabel,
+} ) {
 	const {
 		contexts,
 		getStyleProperty,
@@ -178,4 +183,4 @@ export default ( { identifier, title, icon, closeLabel } ) => {
 			</TabPanel>
 		</DefaultSidebar>
 	);
-};
+}
