@@ -14,6 +14,7 @@ public struct MediaInfo {
 
 /// Definition of capabilities to enable in the Block Editor
 public enum Capabilities: String {
+    case mediaFilesCollectionBlock
     case mentions
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
@@ -117,10 +118,10 @@ extension RCTLogLevel {
 }
 
 public enum GutenbergUserEvent {
-    
+
     case editorSessionTemplateApply(_ template: String)
     case editorSessionTemplatePreview(_ template: String)
-    
+
     init?(event: String, properties:[AnyHashable: Any]?) {
         switch event {
         case "editor_session_template_apply":
@@ -210,7 +211,7 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate to display the media editor from a given URL
     ///
     func gutenbergDidRequestMediaEditor(with mediaUrl: URL, callback: @escaping MediaPickerDidPickMediaCallback)
-    
+
     /// Tells the delegate that the editor needs to log a custom event
     /// - Parameter event: The event key to be logged
     func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent)
@@ -224,9 +225,9 @@ public protocol GutenbergBridgeDelegate: class {
 
     /// Tells the delegate that the editor requested to show the tooltip
     func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool
-    
+
     /// Tells the delegate that the editor requested to set the tooltip's visibility
-    /// - Parameter tooltipShown: Tooltip's visibility value    
+    /// - Parameter tooltipShown: Tooltip's visibility value
     func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool)
 
     func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType)
