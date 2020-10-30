@@ -102,11 +102,9 @@ class REST_Scripts_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * Tear down tests after entire test class is done.
 	 */
 	public static function wpTearDownAfterClass() {
-		self::delete_user( self::$superadmin_id );
-		self::delete_user( self::$admin_id );
-		self::delete_user( self::$editor_id );
-		self::delete_user( self::$author_id );
-		self::delete_user( self::$subscriber_id );
+	foreach( self::$users_map as $key => $user_id ){
+            self::delete_user( $user_id );
+        }
 		unregister_block_type( 'fake/scripts-tests' );
 	}
 
