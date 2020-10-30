@@ -143,6 +143,7 @@ function CoverHeightInput( {
 				unit={ unit }
 				units={ CSS_UNITS }
 				value={ inputValue }
+				disabled={ fullHeightAlignment }
 			/>
 		</BaseControl>
 	);
