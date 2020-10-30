@@ -48,3 +48,18 @@ export const TEMPLATES_DEFAULT_DETAILS = {
 		description: __( 'Template for single posts' ),
 	},
 };
+
+/**
+ * This is the default order of perceived importance for creating templates
+ */
+export const TEMPLATES_DEFAULT_ORDER = [
+	'front-page',
+	'index',
+	'home',
+	'page',
+	'singular',
+	'single',
+	'archive',
+	'search',
+	'404',
+];

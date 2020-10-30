@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, omit } from 'lodash';
+import { map, omit, reduce } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,7 +20,10 @@ import { Icon, plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import getClosestAvailableTemplate from '../../../utils/get-closest-available-template';
-import { TEMPLATES_DEFAULT_DETAILS } from '../../../utils/get-template-info/constants';
+import {
+	TEMPLATES_DEFAULT_DETAILS,
+	TEMPLATES_DEFAULT_ORDER,
+} from '../../../utils/get-template-info/constants';
 
 export default function NewTemplateDropdown() {
 	const templates = useSelect(
@@ -51,6 +54,18 @@ export default function NewTemplateDropdown() {
 		map( templates, 'slug' )
 	);
 
+	const orderedMissingTemplates = reduce(
+		TEMPLATES_DEFAULT_ORDER,
+		( result = [], slug ) => {
+			if ( missingTemplates[ slug ] ) {
+				const template = missingTemplates[ slug ];
+				template.slug = slug;
+				result.push( template );
+			}
+			return result;
+		}
+	);
+
 	return (
 		<DropdownMenu
 			className="edit-site-navigation-panel__new-template-dropdown"
@@ -69,8 +84,8 @@ export default function NewTemplateDropdown() {
 				<NavigableMenu>
 					<MenuGroup label={ __( 'Add Template' ) }>
 						{ map(
-							missingTemplates,
-							( { title, description }, slug ) => (
+							orderedMissingTemplates,
+							( { title, description, slug } ) => (
 								<MenuItem
 									info={ description }
 									key={ slug }
