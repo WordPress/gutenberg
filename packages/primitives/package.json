@@ -22,7 +22,9 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
-	"sideEffects": false,
+	"sideEffects": [
+		"src/**/*.scss"
+	],
 	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",

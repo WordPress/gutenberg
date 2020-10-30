@@ -1,9 +1,14 @@
-.components-disabled {
+/**
+ * External dependencies
+ */
+import styled from '@emotion/styled';
+
+export const StyledWrapper = styled.div`
 	position: relative;
 	pointer-events: none;
 
 	&::after {
-		content: "";
+		content: '';
 		position: absolute;
 		top: 0;
 		right: 0;
@@ -15,4 +20,4 @@
 	* {
 		pointer-events: none;
 	}
-}
+`;

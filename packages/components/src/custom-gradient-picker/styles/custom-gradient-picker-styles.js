@@ -5,8 +5,12 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { FlexItem } from '../../flex';
+import { FlexBlock } from '../../flex';
 
-export const SelectWrapper = styled( FlexItem )`
-	width: 110px;
+export const SelectWrapper = styled( FlexBlock )`
+	flex-grow: 5;
+`;
+
+export const AccessoryWrapper = styled( FlexBlock )`
+	flex-grow: 4;
 `;
