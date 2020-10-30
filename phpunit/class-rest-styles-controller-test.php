@@ -11,7 +11,7 @@
  *
  * @see WP_Test_REST_Controller_Testcase
  */
-class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
+class REST_Styles_Controller_Test extends WP_Test_REST_TestCase {
 	/**
 	 * @var int
 	 */
@@ -159,16 +159,18 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	/**
 	 * Test multiple styles.
+	 *
+	 * @dataProvider data_provider_admins
+	 *
+	 * @param string $user_identifier User identifier.
 	 */
-	public function test_get_items() {
-		foreach ( array( self::$admin_id, self::$superadmin_id ) as $user_id ) {
-			wp_set_current_user( $user_id );
-			$request = new WP_REST_Request( 'GET', '/__experimental/styles' );
-			$request->set_query_params( array( 'dependency' => 'style1' ) );
-			$response = rest_get_server()->dispatch( $request );
-			$data     = $response->get_data();
-			$this->assertCount( 0, $data );
-		}
+	public function test_get_items( $user_identifier ) {
+		wp_set_current_user( self::$users_map[ $user_identifier ] );
+		$request = new WP_REST_Request( 'GET', '/__experimental/styles' );
+		$request->set_query_params( array( 'dependency' => 'style1' ) );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertCount( 0, $data );
 	}
 
 	/**
@@ -237,18 +239,20 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 	/**
 	 * Test single style.
+	 *
+	 * @dataProvider data_provider_admins
+	 *
+	 * @param string $user_identifier User identifier.
 	 */
-	public function test_get_item() {
-		foreach ( array( self::$admin_id, self::$superadmin_id ) as $user_id ) {
-			wp_set_current_user( $user_id );
-			$request  = new WP_REST_Request( 'GET', '/__experimental/styles/' . self::$style_handle );
-			$response = rest_get_server()->dispatch( $request );
-			$data     = $response->get_data();
+	public function test_get_item( $user_identifier ) {
+		wp_set_current_user( self::$users_map[ $user_identifier ] );
+		$request  = new WP_REST_Request( 'GET', '/__experimental/styles/' . self::$style_handle );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
 
-			$this->assertEquals( self::$style_handle, $data['handle'] );
-			$this->assertEquals( home_url( '/test.css' ), $data['src'] );
-			$this->assertEquals( home_url( '/test.css' ), $data['url'] );
-		}
+		$this->assertEquals( self::$style_handle, $data['handle'] );
+		$this->assertEquals( home_url( '/test.css' ), $data['src'] );
+		$this->assertEquals( home_url( '/test.css' ), $data['url'] );
 	}
 
 	/**
@@ -453,6 +457,18 @@ class REST_Styles_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array( 'subscriber' ),
 			array( 'author' ),
 			array( 'editor' ),
+			array( 'admin' ),
+			array( 'superadmin' ),
+		);
+	}
+
+	/**
+	 * Return all admins.
+	 *
+	 * @return string[][]
+	 */
+	public function data_provider_admins() {
+		return array(
 			array( 'admin' ),
 			array( 'superadmin' ),
 		);
