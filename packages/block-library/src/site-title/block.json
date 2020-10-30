@@ -12,6 +12,7 @@
 		}
 	},
 	"supports": {
+		"align": [ "full", "wide" ],
 		"html": false,
 		"color": {
 			"gradients": true
