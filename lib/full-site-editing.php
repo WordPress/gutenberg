@@ -78,7 +78,7 @@ function gutenberg_menu_order( $menu_order ) {
 		'gutenberg-edit-site' => array_search( 'themes.php', $menu_order, true ),
 	);
 
-	// traverse through the new positions and move.
+	// Traverse through the new positions and move
 	// the items if found in the original menu_positions.
 	foreach ( $new_positions as $value => $new_index ) {
 		$current_index = array_search( $value, $menu_order, true );
