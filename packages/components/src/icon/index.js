@@ -23,21 +23,21 @@ import Dashicon from '../dashicon';
 
 /**
  * @template P
- * @typedef {string | import('react').ComponentType<P>|ReactElement} IconType
+ * @typedef {string | import('react').ComponentType<P> | ReactElement} IconType
  */
 
 /**
  * @template P
  * @typedef BaseProps
  *
- * @property {IconType<P>|null} icon The icon to render. Supported values are: Dashicons (specified as strings), functions, WPComponent instances and `null`.
+ * @property {IconType<P> | null} icon The icon to render. Supported values are: Dashicons (specified as strings), functions, WPComponent instances and `null`.
  * @property {number} [size] The size (width and height) of the icon.
  */
 
 /**
  * @template {{size?: number}} P
  * @param {BaseProps<P> & AdditionalProps<IconType<P>>} props
- * @return {JSX.Element|null} Element
+ * @return {JSX.Element | null} Element
  */
 function Icon( { icon = null, size, ...additionalProps } ) {
 	if ( 'string' === typeof icon ) {
