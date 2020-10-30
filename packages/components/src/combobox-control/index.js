@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
+import { deburr } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -49,7 +49,9 @@ function ComboboxControl( {
 		const containsMatch = [];
 		const match = inputValue.toLocaleLowerCase();
 		options.forEach( ( option ) => {
-			const index = option.label.toLocaleLowerCase().indexOf( match );
+			const index = deburr( option.label )
+				.toLocaleLowerCase()
+				.indexOf( match );
 			if ( index === 0 ) {
 				startsWithMatch.push( option );
 			} else if ( index > 0 ) {
