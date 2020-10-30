@@ -70,7 +70,11 @@ function gutenberg_menu() {
 	if ( gutenberg_is_fse_theme() ) {
 		add_menu_page(
 			__( 'Site Editor (beta)', 'gutenberg' ),
-			__( 'Site Editor <span class="awaiting-mod">beta</span>', 'gutenberg' ),
+			sprintf(
+				/* translators: %s: "beta" label. */
+				__( 'Site Editor %s', 'gutenberg' ),
+				'<span class="awaiting-mod">' . __( 'beta', 'gutenberg' ) . '</span>'
+			),
 			'edit_theme_options',
 			'gutenberg-edit-site',
 			'gutenberg_edit_site_page',
