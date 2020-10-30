@@ -322,6 +322,7 @@ function CoverEdit( {
 		...( isImageBackground ? backgroundImageStyles( url ) : {} ),
 		backgroundColor: overlayColor.color,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
+		[ fullHeightAlignment ? 'height' : null ]: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
 	if ( gradientValue && ! url ) {
