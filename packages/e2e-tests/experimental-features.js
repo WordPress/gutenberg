@@ -90,9 +90,7 @@ export const navigationPanel = {
 
 	async getItemByText( text ) {
 		const selector = `//div[contains(@class, "edit-site-navigation-panel")]//button[contains(., "${ text }")]`;
-		await page.waitForXPath( selector );
-		const [ item ] = await page.$x( selector );
-		return item;
+		return await page.waitForXPath( selector );
 	},
 
 	async clickItemByText( text ) {

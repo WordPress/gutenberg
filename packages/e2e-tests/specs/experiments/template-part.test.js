@@ -69,7 +69,7 @@ describe( 'Template Part', () => {
 			await navigationPanel.clickItemByText( 'Front page' );
 
 			// Verify that the header template part is updated.
-			const [ headerTemplatePart ] = await page.$x(
+			const headerTemplatePart = await page.waitForXPath(
 				'//*[@data-type="core/template-part"][//p[text()="Header Template Part123"]]'
 			);
 			expect( headerTemplatePart ).not.toBeNull();
