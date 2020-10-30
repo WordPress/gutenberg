@@ -12,7 +12,7 @@
 		}
 	},
 	"supports": {
-		"align": [ "full", "wide" ],
+		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
 			"gradients": true
