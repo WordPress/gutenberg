@@ -3,7 +3,12 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { VisuallyHidden } from '@wordpress/components';
+import {
+	__experimentalRadio as Radio,
+	TextControl,
+} from '@wordpress/components';
+import { ContextSystemProvider } from '@wordpress/ui.context';
+import { ListGroup, Grid, View, Text } from '@wordpress/ui.components';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -60,13 +65,13 @@ export class PostVisibility extends Component {
 		this.setState( { hasPassword: true } );
 	}
 
-	updatePassword( event ) {
+	updatePassword( next ) {
 		const { status, onUpdateVisibility } = this.props;
-		onUpdateVisibility( status, event.target.value );
+		onUpdateVisibility( status, next );
 	}
 
 	render() {
-		const { visibility, password, instanceId } = this.props;
+		const { visibility, password } = this.props;
 
 		const visibilityHandlers = {
 			public: {
@@ -91,58 +96,46 @@ export class PostVisibility extends Component {
 				<legend className="editor-post-visibility__dialog-legend">
 					{ __( 'Post Visibility' ) }
 				</legend>
-				{ visibilityOptions.map( ( { value, label, info } ) => (
-					<div
-						key={ value }
-						className="editor-post-visibility__choice"
-					>
-						<input
-							type="radio"
-							name={ `editor-post-visibility__setting-${ instanceId }` }
-							value={ value }
-							onChange={ visibilityHandlers[ value ].onSelect }
-							checked={ visibilityHandlers[ value ].checked }
-							id={ `editor-post-${ value }-${ instanceId }` }
-							aria-describedby={ `editor-post-${ value }-${ instanceId }-description` }
-							className="editor-post-visibility__dialog-radio"
-						/>
-						<label
-							htmlFor={ `editor-post-${ value }-${ instanceId }` }
-							className="editor-post-visibility__dialog-label"
-						>
-							{ label }
-						</label>
-						{
-							<p
-								id={ `editor-post-${ value }-${ instanceId }-description` }
-								className="editor-post-visibility__dialog-info"
+				<ContextSystemProvider
+					value={ { ControlLabel: { weight: 'bold' } } }
+				>
+					<ListGroup>
+						{ visibilityOptions.map( ( { value, label, info } ) => (
+							<div
+								key={ value }
+								className="editor-post-visibility__choice"
 							>
-								{ info }
-							</p>
-						}
-					</div>
-				) ) }
+								<Radio
+									label={ label }
+									help={ <Text>{ info }</Text> }
+									value={ value }
+									onChange={
+										visibilityHandlers[ value ].onSelect
+									}
+									checked={
+										visibilityHandlers[ value ].checked
+									}
+									version="next"
+								/>
+							</div>
+						) ) }
+					</ListGroup>
+				</ContextSystemProvider>
 			</fieldset>,
 			this.state.hasPassword && (
-				<div
-					className="editor-post-visibility__dialog-password"
-					key="password-selector"
-				>
-					<VisuallyHidden
-						as="label"
-						htmlFor={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
-					>
-						{ __( 'Create password' ) }
-					</VisuallyHidden>
-					<input
-						className="editor-post-visibility__dialog-password-input"
-						id={ `editor-post-visibility__dialog-password-input-${ instanceId }` }
-						type="text"
+				<Grid templateColumns="20px 1fr" css={ { paddingTop: 4 } }>
+					<View />
+					<TextControl
+						className="editor-post-visibility__dialog-password"
+						key="password-selector"
+						label={ __( 'Create password' ) }
+						labelHidden
 						onChange={ this.updatePassword }
 						value={ password }
 						placeholder={ __( 'Use a secure password' ) }
+						version="next"
 					/>
-				</div>
+				</Grid>
 			),
 		];
 	}

@@ -2,13 +2,13 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelRow, Dropdown, Button } from '@wordpress/components';
+import { PanelRow, Button } from '@wordpress/components';
 import {
 	PostVisibility as PostVisibilityForm,
 	PostVisibilityLabel,
 	PostVisibilityCheck,
 } from '@wordpress/editor';
-import { ContextSystemProvider } from '@wordpress/ui.context';
+import { CardBody, Popover } from '@wordpress/ui.components';
 
 export function PostVisibility() {
 	return (
@@ -21,27 +21,26 @@ export function PostVisibility() {
 							<PostVisibilityLabel />
 						</span>
 					) }
-					<ContextSystemProvider
-						value={ { WPComponentsButton: { version: 'next' } } }
-					>
-						{ canEdit && (
-							<Dropdown
-								position="bottom left"
-								contentClassName="edit-post-post-visibility__dialog"
-								renderToggle={ ( { isOpen, onToggle } ) => (
-									<Button
-										aria-expanded={ isOpen }
-										className="edit-post-post-visibility__toggle"
-										onClick={ onToggle }
-										isTertiary
-									>
-										<PostVisibilityLabel />
-									</Button>
-								) }
-								renderContent={ () => <PostVisibilityForm /> }
-							/>
-						) }
-					</ContextSystemProvider>
+
+					{ canEdit && (
+						<Popover
+							placement="bottom-end"
+							maxWidth={ 260 }
+							trigger={
+								<Button
+									className="edit-post-post-visibility__toggle"
+									version="next"
+									isTertiary
+								>
+									<PostVisibilityLabel />
+								</Button>
+							}
+						>
+							<CardBody>
+								<PostVisibilityForm />
+							</CardBody>
+						</Popover>
+					) }
 				</PanelRow>
 			) }
 		/>

@@ -2,13 +2,15 @@
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import { withNextComponent } from '@wordpress/ui.context';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import { TextControlNext } from './next';
 
-export default function TextControl( {
+function TextControl( {
 	label,
 	hideLabelFromVision,
 	value,
@@ -42,3 +44,9 @@ export default function TextControl( {
 		</BaseControl>
 	);
 }
+
+export default withNextComponent(
+	TextControl,
+	TextControlNext,
+	'WPComponentsTextControl'
+);

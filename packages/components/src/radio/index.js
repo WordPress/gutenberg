@@ -7,6 +7,12 @@ import { Radio as ReakitRadio } from 'reakit/Radio';
  * WordPress dependencies
  */
 import { useContext, forwardRef } from '@wordpress/element';
+import { withNextComponent } from '@wordpress/ui.context';
+
+/**
+ * Internal dependencies
+ */
+import { RadioNext } from './next';
 
 /**
  * Internal dependencies
@@ -33,4 +39,10 @@ function Radio( { children, value, ...props }, ref ) {
 	);
 }
 
-export default forwardRef( Radio );
+const ForwardedComponent = forwardRef( Radio );
+
+export default withNextComponent(
+	ForwardedComponent,
+	RadioNext,
+	'WPComponentsRadio'
+);

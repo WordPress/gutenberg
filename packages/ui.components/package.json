@@ -23,7 +23,7 @@
 	"types": "types",
 	"sideEffects": false,
 	"dependencies": {
-		"@wp-g2/components": "^0.0.100"
+		"@wp-g2/components": "^0.0.101"
 	},
 	"publishConfig": {
 		"access": "public"
