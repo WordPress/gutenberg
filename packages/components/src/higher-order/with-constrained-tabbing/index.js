@@ -30,6 +30,12 @@ const withConstrainedTabbing = createHigherOrderComponent(
 				const firstTabbable = tabbables[ 0 ];
 				const lastTabbable = tabbables[ tabbables.length - 1 ];
 
+				if ( tabbables.includes( event.target ) ) {
+					// Stops nested withConstrainedTabbing components from always focusing
+					// the outermost component.
+					event.stopPropagation();
+				}
+
 				if ( event.shiftKey && event.target === firstTabbable ) {
 					event.preventDefault();
 					lastTabbable.focus();
