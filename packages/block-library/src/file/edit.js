@@ -11,6 +11,8 @@ import {
 	__unstableUseAnimate as useAnimate,
 	ClipboardButton,
 	withNotices,
+	ToolbarGroup,
+	ToolbarItem,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
@@ -171,13 +173,28 @@ function FileEdit( {
 				} }
 			/>
 			<BlockControls>
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ href }
-					accept="*"
-					onSelect={ onSelectFile }
-					onError={ onUploadError }
-				/>
+				<ToolbarGroup>
+					<ToolbarItem
+						as={ MediaReplaceFlow }
+						mediaId={ id }
+						mediaURL={ href }
+						accept="*"
+						onSelect={ onSelectFile }
+						onError={ onUploadError }
+					/>
+					<ToolbarItem
+						as={ ClipboardButton }
+						text={ href }
+						className={ 'wp-block-file__copy-url-button' }
+						onCopy={ confirmCopyURL }
+						onFinishCopy={ resetCopyConfirmation }
+						disabled={ isBlobURL( href ) }
+					>
+						{ showCopyConfirmation
+							? __( 'Copied!' )
+							: __( 'Copy URL' ) }
+					</ToolbarItem>
+				</ToolbarGroup>
 			</BlockControls>
 			<div { ...blockProps }>
 				<div className={ 'wp-block-file__content-wrapper' }>
@@ -214,20 +231,6 @@ function FileEdit( {
 						</div>
 					) }
 				</div>
-				{ isSelected && (
-					<ClipboardButton
-						isSecondary
-						text={ href }
-						className={ 'wp-block-file__copy-url-button' }
-						onCopy={ confirmCopyURL }
-						onFinishCopy={ resetCopyConfirmation }
-						disabled={ isBlobURL( href ) }
-					>
-						{ showCopyConfirmation
-							? __( 'Copied!' )
-							: __( 'Copy URL' ) }
-					</ClipboardButton>
-				) }
 			</div>
 		</>
 	);
