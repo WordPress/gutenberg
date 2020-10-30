@@ -54,7 +54,7 @@ function gutenberg_register_typography_support( $block_type ) {
  */
 function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	if ( ! property_exists( $block_type, 'supports' ) ) {
-		return $attributes;
+		return array();
 	}
 
 	$classes = array();
