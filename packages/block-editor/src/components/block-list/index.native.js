@@ -89,12 +89,10 @@ export class BlockList extends Component {
 		);
 
 		if ( ref !== undefined ) {
-			this.timeout = setTimeout( () => {
-				this.listRef.current.scrollToOffset( {
-					offset,
-					animated: true,
-				} );
-			}, 500 );
+			this.listRef.current.scrollToOffset( {
+				offset,
+				animated: true,
+			} );
 		}
 	}
 
@@ -314,6 +312,7 @@ export class BlockList extends Component {
 				isStackedHorizontally={ isStackedHorizontally }
 				rootClientId={ rootClientId }
 				clientId={ clientId }
+				listRef={ this.listRef }
 				parentWidth={ parentWidth }
 				contentResizeMode={ contentResizeMode }
 				contentStyle={ contentStyle }

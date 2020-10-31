@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
+import {
+	View,
+	Text,
+	TouchableWithoutFeedback,
+	Dimensions,
+	findNodeHandle,
+} from 'react-native';
 
 /**
  * WordPress dependencies
@@ -58,13 +64,20 @@ class BlockListBlock extends Component {
 		const { isSelected } = this.props;
 		if ( isSelected ) {
 			if ( this.blockRef.current !== null ) {
-				this.blockRef.current.measure(
-					( x, y, width, height, px, py ) => {
-						this.scrollToBlockListItemIfNotInViewPort(
-							px,
-							py,
-							width,
-							height
+				this.blockRef.current.measureLayout(
+					findNodeHandle( this.props.listRef.current ),
+					( x, y ) => {
+						this.blockRef.current.measure(
+							( _x, _y, width, height, px, py ) => {
+								this.scrollToBlockListItemIfNotInViewPort(
+									x,
+									y,
+									width,
+									height,
+									px,
+									py
+								);
+							}
 						);
 					}
 				);
@@ -72,20 +85,17 @@ class BlockListBlock extends Component {
 		}
 	}
 
-	scrollToBlockListItemIfNotInViewPort( x, y, width, height ) {
+	scrollToBlockListItemIfNotInViewPort( x, y, width, height, px, py ) {
 		const window = Dimensions.get( 'window' );
-
-		const visible =
-			y <= window.height &&
-			x <= window.width &&
-			y + height <= window.height - 100 &&
-			x + width <= window.width;
 
 		const { scrollTo, clientId } = this.props;
 
-		if ( ! visible ) {
-			const offset = y + height;
-			scrollTo( clientId, offset );
+		if ( py - 100 < 0 ) {
+			scrollTo( clientId, y - height );
+		}
+
+		if ( py + height + 100 > window.height ) {
+			scrollTo( clientId, y );
 		}
 	}
 
