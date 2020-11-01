@@ -23,6 +23,9 @@
 			"type": "boolean",
 			"default": true
 		},
+		"linkTarget": {
+			"type": "string"
+		},
 		"linkTo": {
 			"type": "string"
 		},

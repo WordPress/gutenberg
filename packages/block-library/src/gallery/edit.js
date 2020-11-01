@@ -17,6 +17,8 @@ import {
  */
 import { compose } from '@wordpress/compose';
 import {
+	Button,
+	ButtonGroup,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
@@ -35,6 +37,7 @@ import { createBlock } from '@wordpress/blocks';
  */
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
+import { getNewImageAttributes } from './utils';
 import Gallery from './gallery';
 import {
 	LINK_DESTINATION_ATTACHMENT,
@@ -75,6 +78,7 @@ function GalleryEdit( props ) {
 	} = props;
 
 	const {
+		linkTarget,
 		linkTo,
 		columns = defaultColumnsNumber( images ),
 		sizeSlug,
@@ -86,15 +90,26 @@ function GalleryEdit( props ) {
 		'core/block-editor'
 	);
 
+	const currentImageOptions = { linkTarget, linkTo, sizeSlug };
+
 	const [ images, setImages ] = useState( [] );
+	const [ imageSettings, setImageSettings ] = useState( currentImageOptions );
+	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
+
+	useEffect( () => {
+		setDirtyImageOptions( ! isEqual( currentImageOptions, imageSettings ) );
+	}, [ currentImageOptions, imageSettings ] );
 
 	const getBlock = useSelect( ( select ) => {
 		return select( 'core/block-editor' ).getBlock;
 	}, [] );
 
+	const getMedia = useSelect( ( select ) => {
+		return select( 'core' ).getMedia;
+	}, [] );
+
 	const imageSizing = useSelect(
 		( select ) => {
-			const { getMedia } = select( 'core' );
 			const { getSettings } = select( 'core/block-editor' );
 			const { imageSizes } = getSettings();
 
@@ -147,7 +162,9 @@ function GalleryEdit( props ) {
 		[ isSelected, images ]
 	);
 
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
+	const { replaceInnerBlocks, updateBlockAttributes } = useDispatch(
+		'core/block-editor'
+	);
 
 	// function onRemoveImage( index ) {
 	// 	// need to update columns attribute at this point maybe?
@@ -196,6 +213,10 @@ function GalleryEdit( props ) {
 			: __( 'Thumbnails are not cropped.' );
 	}
 
+	function toggleOpenInNewTab() {
+		setAttributes( { linkTarget: linkTarget ? undefined : '_blank' } );
+	}
+
 	function getImagesSizeOptions() {
 		return map(
 			filter( imageSizing.imageSizes, ( { slug } ) =>
@@ -205,9 +226,26 @@ function GalleryEdit( props ) {
 		);
 	}
 
-	// function updateImagesSize( newSizeSlug ) {
-	// 	// Needs applying to child images somehow
-	// }
+	function applyImageOptions( { forceUpdate } ) {
+		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
+			const image = block.attributes.id
+				? getMedia( block.attributes.id )
+				: null;
+			const newAttributes = getNewImageAttributes(
+				attributes,
+				block.attributes,
+				image,
+				forceUpdate
+			);
+			updateBlockAttributes( block.clientId, newAttributes );
+		} );
+		setDirtyImageOptions( false );
+		setImageSettings( currentImageOptions );
+	}
+
+	function updateImagesSize( newSizeSlug ) {
+		setAttributes( { sizeSlug: newSizeSlug } );
+	}
 
 	useEffect( () => {
 		if (
@@ -274,6 +312,7 @@ function GalleryEdit( props ) {
 
 	const imageSizeOptions = getImagesSizeOptions();
 	const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
+	const hasLinkTo = linkTo && linkTo !== 'none';
 
 	return (
 		<>
@@ -290,7 +329,6 @@ function GalleryEdit( props ) {
 							required
 						/>
 					) }
-
 					<ToggleControl
 						label={ __( 'Crop images' ) }
 						checked={ !! imageCrop }
@@ -303,13 +341,40 @@ function GalleryEdit( props ) {
 						onChange={ setLinkTo }
 						options={ linkOptions }
 					/>
+					{ hasLinkTo && (
+						<ToggleControl
+							label={ __( 'Open in new tab' ) }
+							checked={ linkTarget === '_blank' }
+							onChange={ toggleOpenInNewTab }
+						/>
+					) }
 					{ shouldShowSizeOptions && (
 						<SelectControl
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }
-							// onChange={ updateImagesSize }
+							onChange={ updateImagesSize }
 						/>
+					) }
+					{ dirtyImageOptions && (
+						<ButtonGroup>
+							<Button
+								isSmall
+								onClick={ () =>
+									applyImageOptions( { forceUpdate: true } )
+								}
+							>
+								{ __( 'Apply to all images' ) }
+							</Button>
+							<Button
+								isSmall
+								onClick={ () =>
+									applyImageOptions( { forceUpdate: false } )
+								}
+							>
+								{ __( 'Apply only as fallback' ) }
+							</Button>
+						</ButtonGroup>
 					) }
 				</PanelBody>
 			</InspectorControls>
