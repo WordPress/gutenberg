@@ -97,7 +97,10 @@ function GalleryEdit( props ) {
 	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
 
 	useEffect( () => {
-		setDirtyImageOptions( ! isEqual( currentImageOptions, imageSettings ) );
+		const currentOptionsState = ! isEqual( currentImageOptions, imageSettings );
+		if ( currentOptionsState !== dirtyImageOptions) {
+			setDirtyImageOptions( currentOptionsState );
+		}
 	}, [ currentImageOptions, imageSettings ] );
 
 	const getBlock = useSelect( ( select ) => {
