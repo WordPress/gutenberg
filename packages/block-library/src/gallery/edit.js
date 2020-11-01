@@ -1,16 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	filter,
-	get,
-	map,
-	reduce,
-	some,
-	toString,
-	isEqual,
-	isEmpty,
-} from 'lodash';
+import { toString, isEqual, isEmpty, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -44,6 +35,7 @@ import {
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 } from './constants';
+import useImageSizes from './use-image-sizes';
 
 const MAX_COLUMNS = 8;
 const linkOptions = [
@@ -106,75 +98,19 @@ function GalleryEdit( props ) {
 		}
 	}, [ currentImageOptions, imageSettings ] );
 
-	const getBlock = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getBlock;
+	const { getBlock, getMedia, getSettings } = useSelect( ( select ) => {
+		return {
+			getBlock: select( 'core/block-editor' ).getBlock,
+			getSettings: select( 'core/block-editor' ).getSettings,
+			getMedia: select( 'core' ).getMedia,
+		};
 	}, [] );
 
-	const getMedia = useSelect( ( select ) => {
-		return select( 'core' ).getMedia;
-	}, [] );
-
-	const imageSizing = useSelect(
-		( select ) => {
-			const { getSettings } = select( 'core/block-editor' );
-			const { imageSizes } = getSettings();
-
-			let resizedImages = {};
-
-			if ( isSelected ) {
-				resizedImages = reduce(
-					images,
-					( currentResizedImages, img ) => {
-						if ( ! img.id ) {
-							return currentResizedImages;
-						}
-						const image = getMedia( img.id );
-						const sizes = reduce(
-							imageSizes,
-							( currentSizes, size ) => {
-								const defaultUrl = get( image, [
-									'sizes',
-									size.slug,
-									'url',
-								] );
-								const mediaDetailsUrl = get( image, [
-									'media_details',
-									'sizes',
-									size.slug,
-									'source_url',
-								] );
-								return {
-									...currentSizes,
-									[ size.slug ]:
-										defaultUrl || mediaDetailsUrl,
-								};
-							},
-							{}
-						);
-						return {
-							...currentResizedImages,
-							[ parseInt( img.id, 10 ) ]: sizes,
-						};
-					},
-					{}
-				);
-			}
-
-			return {
-				imageSizes,
-				resizedImages,
-			};
-		},
-		[ isSelected, images ]
-	);
+	const imageSizeOptions = useImageSizes( images, isSelected, getSettings );
 
 	const { replaceInnerBlocks, updateBlockAttributes } = useDispatch(
 		'core/block-editor'
 	);
-
-	// function onRemoveImage( index ) {
-	// 	// need to update columns attribute at this point maybe?
-	// }
 
 	function onSelectImages( newImages ) {
 		const newBlocks = newImages.map( ( image ) => {
@@ -223,24 +159,15 @@ function GalleryEdit( props ) {
 		setAttributes( { linkTarget: linkTarget ? undefined : '_blank' } );
 	}
 
-	function getImagesSizeOptions() {
-		return map(
-			filter( imageSizing.imageSizes, ( { slug } ) =>
-				some( imageSizing.resizedImages, ( sizes ) => sizes[ slug ] )
-			),
-			( { name, slug } ) => ( { value: slug, label: name } )
-		);
-	}
-
 	function applyImageOptions( { forceUpdate } ) {
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
 			const image = block.attributes.id
-				? getMedia( block.attributes.id )
+				? find( images, { id: block.attributes.id } )
 				: null;
 			const newAttributes = getNewImageAttributes(
 				attributes,
 				block.attributes,
-				image,
+				image.imageData,
 				forceUpdate
 			);
 			updateBlockAttributes( block.clientId, newAttributes );
@@ -269,6 +196,7 @@ function GalleryEdit( props ) {
 			return {
 				id: block.attributes.id,
 				url: block.attributes.url,
+				imageData: getMedia( block.attributes.id ),
 			};
 		} );
 
@@ -316,7 +244,6 @@ function GalleryEdit( props ) {
 		return mediaPlaceholder;
 	}
 
-	const imageSizeOptions = getImagesSizeOptions();
 	const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
 	const hasLinkTo = linkTo && linkTo !== 'none';
 
