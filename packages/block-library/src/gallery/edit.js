@@ -97,8 +97,11 @@ function GalleryEdit( props ) {
 	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
 
 	useEffect( () => {
-		const currentOptionsState = ! isEqual( currentImageOptions, imageSettings );
-		if ( currentOptionsState !== dirtyImageOptions) {
+		const currentOptionsState = ! isEqual(
+			currentImageOptions,
+			imageSettings
+		);
+		if ( currentOptionsState !== dirtyImageOptions ) {
 			setDirtyImageOptions( currentOptionsState );
 		}
 	}, [ currentImageOptions, imageSettings ] );
