@@ -3,11 +3,13 @@
  */
 import {
 	insertBlock,
+	insertReusableBlock,
 	createNewPost,
 	clickBlockToolbarButton,
 	pressKeyWithModifier,
-	searchForBlock,
+	searchForReusableBlock,
 	getEditedPostContent,
+	trashAllPosts,
 } from '@wordpress/e2e-test-utils';
 
 function waitForAndAcceptDialog() {
@@ -19,6 +21,10 @@ function waitForAndAcceptDialog() {
 describe( 'Reusable blocks', () => {
 	beforeAll( async () => {
 		await createNewPost();
+	} );
+
+	afterAll( async () => {
+		await trashAllPosts( 'wp_block' );
 	} );
 
 	beforeEach( async () => {
@@ -45,6 +51,9 @@ describe( 'Reusable blocks', () => {
 		// Wait for creation to finish
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
+		);
+		await page.waitForXPath(
+			'//*[@class="block-library-block__reusable-block-container"]'
 		);
 
 		// Select all of the text in the title field.
@@ -90,6 +99,9 @@ describe( 'Reusable blocks', () => {
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
+		await page.waitForXPath(
+			'//*[@class="block-library-block__reusable-block-container"]'
+		);
 
 		// Save the reusable block
 		const [ saveButton ] = await page.$x( '//button[text()="Save"]' );
@@ -114,7 +126,7 @@ describe( 'Reusable blocks', () => {
 
 	it( 'can be inserted and edited', async () => {
 		// Insert the reusable block we created above
-		await insertBlock( 'Greeting block' );
+		await insertReusableBlock( 'Greeting block' );
 
 		// Put the reusable block in edit mode
 		const editButton = await page.waitForXPath(
@@ -181,6 +193,9 @@ describe( 'Reusable blocks', () => {
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
+		await page.waitForXPath(
+			'//*[@class="block-library-block__reusable-block-container"]'
+		);
 
 		// Select all of the text in the title field.
 		await pressKeyWithModifier( 'primary', 'a' );
@@ -198,7 +213,7 @@ describe( 'Reusable blocks', () => {
 
 		// Step 3. Insert the block created in Step 1.
 
-		await insertBlock( 'Awesome block' );
+		await insertReusableBlock( 'Awesome block' );
 
 		// Check that we have a reusable block on the page
 		const block = await page.$(
@@ -216,14 +231,10 @@ describe( 'Reusable blocks', () => {
 
 	it( 'can be converted to a regular block', async () => {
 		// Insert the reusable block we edited above
-		await insertBlock( 'Surprised greeting block' );
+		await insertReusableBlock( 'Surprised greeting block' );
 
 		// Convert block to a regular block
-		await clickBlockToolbarButton( 'More options' );
-		const convertButton = await page.waitForXPath(
-			'//button[text()="Convert to Regular Block"]'
-		);
-		await convertButton.click();
+		await clickBlockToolbarButton( 'Convert to regular blocks', 'content' );
 
 		// Check that we have a paragraph block on the page
 		const block = await page.$(
@@ -241,7 +252,7 @@ describe( 'Reusable blocks', () => {
 
 	it( 'can be deleted', async () => {
 		// Insert the reusable block we edited above
-		await insertBlock( 'Surprised greeting block' );
+		await insertReusableBlock( 'Surprised greeting block' );
 
 		// Delete the block and accept the confirmation dialog
 		await clickBlockToolbarButton( 'More options' );
@@ -259,7 +270,7 @@ describe( 'Reusable blocks', () => {
 		expect( await getEditedPostContent() ).toBe( '' );
 
 		// Search for the block in the inserter
-		await searchForBlock( 'Surprised greeting block' );
+		await searchForReusableBlock( 'Surprised greeting block' );
 
 		// Check that we couldn't find it
 		const items = await page.$$(
@@ -292,6 +303,9 @@ describe( 'Reusable blocks', () => {
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
 		);
+		await page.waitForXPath(
+			'//*[@class="block-library-block__reusable-block-container"]'
+		);
 
 		// Select all of the text in the title field.
 		await pressKeyWithModifier( 'primary', 'a' );
@@ -322,14 +336,10 @@ describe( 'Reusable blocks', () => {
 
 	it( 'multi-selection reusable block can be converted back to regular blocks', async () => {
 		// Insert the reusable block we edited above
-		await insertBlock( 'Multi-selection reusable block' );
+		await insertReusableBlock( 'Multi-selection reusable block' );
 
 		// Convert block to a regular block
-		await clickBlockToolbarButton( 'More options' );
-		const convertButton = await page.waitForXPath(
-			'//button[text()="Convert to Regular Block"]'
-		);
-		await convertButton.click();
+		await clickBlockToolbarButton( 'Convert to regular blocks', 'content' );
 
 		// Check that we have two paragraph blocks on the page
 		expect( await getEditedPostContent() ).toMatchSnapshot();

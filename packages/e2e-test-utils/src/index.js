@@ -21,13 +21,17 @@ export { getAllBlocks } from './get-all-blocks';
 export { getAvailableBlockTransforms } from './get-available-block-transforms';
 export { getBlockSetting } from './get-block-setting';
 export { getEditedPostContent } from './get-edited-post-content';
+export { getCurrentPostContent } from './get-current-post-content';
 export { hasBlockSwitcher } from './has-block-switcher';
 export { getPageError } from './get-page-error';
 export {
 	insertBlock,
 	insertPattern,
+	insertReusableBlock,
 	searchForBlock,
 	searchForPattern,
+	searchForReusableBlock,
+	insertBlockDirectoryBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
 } from './inserter';
@@ -41,6 +45,7 @@ export {
 } from './observe-focus-loss';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 export { openPublishPanel } from './open-publish-panel';
+export { trashAllPosts } from './posts';
 export { pressKeyTimes } from './press-key-times';
 export { pressKeyWithModifier } from './press-key-with-modifier';
 export { publishPost } from './publish-post';
@@ -52,6 +57,7 @@ export { setPostContent } from './set-post-content';
 export { switchEditorModeTo } from './switch-editor-mode-to';
 export { switchUserToAdmin } from './switch-user-to-admin';
 export { switchUserToTest } from './switch-user-to-test';
+export { activateTheme } from './themes';
 export { toggleMoreMenu } from './toggle-more-menu';
 export { toggleOfflineMode, isOfflineMode } from './offline-mode';
 export { toggleScreenOption } from './toggle-screen-option';

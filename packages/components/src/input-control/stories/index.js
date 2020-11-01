@@ -24,9 +24,17 @@ function Example() {
 	const props = {
 		disabled: boolean( 'disabled', false ),
 		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
-		isFloatingLabel: boolean( 'isFloatingLabel', false ),
 		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
 		label: text( 'label', 'Value' ),
+		labelPosition: select(
+			'labelPosition',
+			{
+				top: 'top',
+				side: 'side',
+				bottom: 'bottom',
+			},
+			'top'
+		),
 		placeholder: text( 'placeholder', 'Placeholder' ),
 		size: select(
 			'size',
@@ -37,14 +45,17 @@ function Example() {
 			'default'
 		),
 		suffix: text( 'suffix', '' ),
+		prefix: text( 'prefix', '' ),
 	};
 
 	const suffixMarkup = props.suffix ? <div>{ props.suffix }</div> : null;
+	const prefixMarkup = props.prefix ? <div>{ props.prefix }</div> : null;
 
 	return (
 		<InputControl
 			{ ...props }
 			onChange={ ( v ) => setValue( v ) }
+			prefix={ prefixMarkup }
 			suffix={ suffixMarkup }
 			value={ value }
 		/>

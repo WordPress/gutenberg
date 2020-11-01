@@ -22,13 +22,14 @@
 @import "./image/editor.scss";
 @import "./latest-comments/editor.scss";
 @import "./latest-posts/editor.scss";
-@import "./legacy-widget/editor.scss";
+@import "./list/editor.scss";
 @import "./media-text/editor.scss";
 @import "./more/editor.scss";
 @import "./navigation/editor.scss";
 @import "./navigation-link/editor.scss";
 @import "./nextpage/editor.scss";
 @import "./paragraph/editor.scss";
+@import "./post-content/editor.scss";
 @import "./post-excerpt/editor.scss";
 @import "./post-author/editor.scss";
 @import "./pullquote/editor.scss";
@@ -37,6 +38,7 @@
 @import "./search/editor.scss";
 @import "./separator/editor.scss";
 @import "./shortcode/editor.scss";
+@import "./site-logo/editor.scss";
 @import "./social-link/editor.scss";
 @import "./social-links/editor.scss";
 @import "./spacer/editor.scss";
@@ -47,12 +49,50 @@
 @import "./text-columns/editor.scss";
 @import "./verse/editor.scss";
 @import "./video/editor.scss";
-@import "./widget-area/editor.scss";
+@import "./query-loop/editor.scss";
+@import "./query/editor.scss";
+@import "./post-featured-image/editor.scss";
 
 /**
  * Import styles from internal editor components used by the blocks.
  */
 @import "./block/edit-panel/editor.scss";
+
+:root .editor-styles-wrapper {
+	// Background colors.
+	@include background-colors();
+
+	// Foreground colors.
+	@include foreground-colors();
+
+	// Gradients
+	@include gradient-colors();
+}
+
+// Font sizes.
+// The reason we add the editor class wrapper here is
+// to avoid enqueing the classes twice: here and in ./editor.scss
+.editor-styles-wrapper .has-small-font-size {
+	font-size: 13px;
+}
+
+.editor-styles-wrapper .has-regular-font-size, // Not used now, kept because of backward compatibility.
+.editor-styles-wrapper .has-normal-font-size {
+	font-size: 16px;
+}
+
+.editor-styles-wrapper .has-medium-font-size {
+	font-size: 20px;
+}
+
+.editor-styles-wrapper .has-large-font-size {
+	font-size: 36px;
+}
+
+.editor-styles-wrapper .has-larger-font-size, // Not used now, kept because of backward compatibility.
+.editor-styles-wrapper .has-huge-font-size {
+	font-size: 42px;
+}
 
 /**
  * Editor Normalization Styles

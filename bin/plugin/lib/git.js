@@ -62,6 +62,7 @@ async function createLocalBranch( gitWorkingDirectoryPath, branchName ) {
  */
 async function checkoutRemoteBranch( gitWorkingDirectoryPath, branchName ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+	await simpleGit.fetch( 'origin', branchName );
 	await simpleGit.checkout( branchName );
 }
 

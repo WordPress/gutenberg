@@ -1,12 +1,10 @@
 .components-menu-items-choice,
 .components-menu-items-choice.components-button {
-	padding-left: $button-size-small + $grid-unit-10 + $grid-unit-10;
-
 	svg {
-		margin-right: $grid-unit-10;
+		margin-right: $grid-unit-15;
 	}
 
 	&.has-icon {
-		padding-left: $grid-unit-10;
+		padding-left: $grid-unit-15;
 	}
 }

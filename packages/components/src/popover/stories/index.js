@@ -30,12 +30,14 @@ export const _default = () => {
 		'firstElement'
 	);
 	const noArrow = boolean( 'noArrow', false );
+	const isAlternate = boolean( 'isAlternate', false );
 
 	const props = {
 		animate,
 		children,
 		focusOnMount,
 		noArrow,
+		isAlternate,
 	};
 
 	if ( ! show ) {

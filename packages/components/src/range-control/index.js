@@ -26,13 +26,13 @@ import {
 	ActionRightWrapper,
 	AfterIconWrapper,
 	BeforeIconWrapper,
+	InputNumber,
 	Root,
 	Track,
 	ThumbWrapper,
 	Thumb,
 	Wrapper,
 } from './styles/range-control-styles';
-import InputField from './input-field';
 import { useRTL } from '../utils/rtl';
 
 function RangeControl(
@@ -42,7 +42,7 @@ function RangeControl(
 		beforeIcon,
 		className,
 		currentInput,
-		color: colorProp = color( 'ui.brand' ),
+		color: colorProp = color( 'ui.theme' ),
 		disabled = false,
 		help,
 		initialPosition,
@@ -77,6 +77,7 @@ function RangeControl(
 		value: valueProp,
 		initial: initialPosition,
 	} );
+	const isResetPendent = useRef( false );
 	const [ showTooltip, setShowTooltip ] = useState( showTooltipProp );
 	const [ isFocused, setIsFocused ] = useState( false );
 
@@ -119,17 +120,33 @@ function RangeControl(
 
 	const handleOnRangeChange = ( event ) => {
 		const nextValue = parseFloat( event.target.value );
-		handleOnChange( nextValue );
+		setValue( nextValue );
+		onChange( nextValue );
 	};
 
 	const handleOnChange = ( nextValue ) => {
-		if ( isNaN( nextValue ) ) {
-			handleOnReset();
-			return;
-		}
-
+		nextValue = parseFloat( nextValue );
 		setValue( nextValue );
-		onChange( nextValue );
+		/*
+		 * Calls onChange only when nextValue is numeric
+		 * otherwise may queue a reset for the blur event.
+		 */
+		if ( ! isNaN( nextValue ) ) {
+			if ( nextValue < min || nextValue > max ) {
+				nextValue = floatClamp( nextValue, min, max );
+			}
+			onChange( nextValue );
+			isResetPendent.current = false;
+		} else if ( allowReset ) {
+			isResetPendent.current = true;
+		}
+	};
+
+	const handleOnInputNumberBlur = () => {
+		if ( isResetPendent.current ) {
+			handleOnReset();
+			isResetPendent.current = false;
+		}
 	};
 
 	const handleOnReset = () => {
@@ -256,14 +273,16 @@ function RangeControl(
 					</AfterIconWrapper>
 				) }
 				{ withInputField && (
-					<InputField
+					<InputNumber
+						aria-label={ label }
+						className="components-range-control__number"
 						disabled={ disabled }
+						inputMode="decimal"
 						isShiftStepEnabled={ isShiftStepEnabled }
-						label={ label }
 						max={ max }
 						min={ min }
+						onBlur={ handleOnInputNumberBlur }
 						onChange={ handleOnChange }
-						onReset={ handleOnReset }
 						shiftStep={ shiftStep }
 						step={ step }
 						value={ inputSliderValue }

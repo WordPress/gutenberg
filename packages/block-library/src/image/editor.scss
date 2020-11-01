@@ -90,46 +90,30 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
-.wp-block-image__zoom-control {
-	border: $border-width solid $dark-gray-primary;
-	border-radius: $radius-block-ui;
-	background-color: $white;
-	padding: $grid-unit-10;
-	line-height: 1;
-	width: 100%;
-	max-width: 280px;
-	display: flex;
-	flex-direction: row;
-	align-items: center;
-
-	// Place as a stacked toolbar.
-	position: sticky;
-	top: $grid-unit-60 + $grid-unit-15;
-	z-index: z-index(".block-editor-block-list__block-popover");
-	float: left;
+.wp-block-image__zoom {
+	.components-popover__content {
+		overflow: visible;
+	}
 
 	.components-range-control {
 		flex: 1;
-		margin-right: $grid-unit-15;
-		margin-left: $grid-unit-15;
 	}
 
 	.components-base-control__field {
 		display: flex;
 		margin-bottom: 0;
 	}
+}
 
-	.wp-block-image__aspect-ratio {
-		height: $grid-unit-60 - $border-width - $border-width;
-		margin-top: -$grid-unit-10;
-		margin-bottom: -$grid-unit-10;
-		display: flex;
-		align-items: center;
+.wp-block-image__aspect-ratio {
+	height: $grid-unit-60 - $border-width - $border-width;
+	margin-bottom: -$grid-unit-10;
+	display: flex;
+	align-items: center;
 
-		.components-button {
-			width: $button-size;
-			padding-left: 0;
-			padding-right: 0;
-		}
+	.components-button {
+		width: $button-size;
+		padding-left: 0;
+		padding-right: 0;
 	}
 }

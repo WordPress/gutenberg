@@ -63,6 +63,20 @@ If true, pressing `UP` or `DOWN` along with the `SHIFT` key will increment the v
 -   Required: No
 -   Default: `true`
 
+### label
+
+If this property is added, a label will be generated using label property as the content.
+
+-   Type: `String`
+-   Required: No
+
+### labelPosition
+
+The position of the label (`top`, `side`, `bottom`, or `edge`).
+
+-   Type: `String`
+-   Required: No
+
 ### shiftStep
 
 Amount to increment by when the `SHIFT` key is held down. This shift value is a multiplier to the `step` value. For example, if the `step` value is `5`, and `shiftStep` is `10`, each jump would increment/decrement by `50`.

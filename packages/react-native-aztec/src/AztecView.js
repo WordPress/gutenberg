@@ -210,7 +210,10 @@ class AztecView extends React.Component {
 
 	render() {
 		// eslint-disable-next-line no-unused-vars
-		const { onActiveFormatsChange, style, ...otherProps } = this.props;
+		const { onActiveFormatsChange, ...otherProps } = this.props;
+		// `style` has to be destructured separately, without `otherProps`, because of:
+		// https://github.com/WordPress/gutenberg/issues/23611
+		const { style } = this.props;
 
 		if ( style.hasOwnProperty( 'lineHeight' ) ) {
 			delete style.lineHeight;

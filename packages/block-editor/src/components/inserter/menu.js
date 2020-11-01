@@ -15,6 +15,7 @@ import InserterSearchForm from './search-form';
 import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTabs from './block-patterns-tab';
+import ReusableBlocksTab from './reusable-blocks-tab';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 
@@ -25,12 +26,18 @@ function InserterMenu( {
 	clientId,
 	isAppender,
 	__experimentalSelectBlockOnInsert,
+	__experimentalInsertionIndex,
 	onSelect,
 	showInserterHelpPanel,
 	showMostUsedBlocks,
 } ) {
+	const [ activeTab, setActiveTab ] = useState( 'blocks' );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
+	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
+		null
+	);
+
 	const [
 		destinationRootClientId,
 		onInsertBlocks,
@@ -40,19 +47,22 @@ function InserterMenu( {
 		clientId,
 		isAppender,
 		selectBlockOnInsert: __experimentalSelectBlockOnInsert,
+		insertionIndex: __experimentalInsertionIndex,
 	} );
-	const { hasPatterns } = useSelect(
-		( select ) => {
-			const { getSettings } = select( 'core/block-editor' );
-			return {
-				hasPatterns: !! getSettings().__experimentalBlockPatterns
-					?.length,
-			};
-		},
-		[ isAppender, clientId, rootClientId ]
-	);
+	const { hasPatterns, hasReusableBlocks } = useSelect( ( select ) => {
+		const {
+			__experimentalBlockPatterns,
+			__experimentalReusableBlocks,
+		} = select( 'core/block-editor' ).getSettings();
+
+		return {
+			hasPatterns: !! __experimentalBlockPatterns?.length,
+			hasReusableBlocks: !! __experimentalReusableBlocks?.length,
+		};
+	}, [] );
 
 	const showPatterns = ! destinationRootClientId && hasPatterns;
+
 	const onKeyDown = ( event ) => {
 		if (
 			[ LEFT, DOWN, RIGHT, UP, BACKSPACE, ENTER ].includes(
@@ -69,9 +79,18 @@ function InserterMenu( {
 		onSelect();
 	};
 
+	const onInsertPattern = ( blocks, patternName ) => {
+		onInsertBlocks( blocks, { patternName } );
+		onSelect();
+	};
+
 	const onHover = ( item ) => {
 		onToggleInsertionPoint( !! item );
 		setHoveredItem( item );
+	};
+
+	const onClickPatternCategory = ( patternCategory ) => {
+		setSelectedPatternCategory( patternCategory );
 	};
 
 	const blocksTab = (
@@ -97,8 +116,34 @@ function InserterMenu( {
 	);
 
 	const patternsTab = (
-		<BlockPatternsTabs onInsert={ onInsert } filterValue={ filterValue } />
+		<BlockPatternsTabs
+			onInsert={ onInsertPattern }
+			filterValue={ filterValue }
+			onClickCategory={ onClickPatternCategory }
+			selectedCategory={ selectedPatternCategory }
+		/>
 	);
+
+	const reusableBlocksTab = (
+		<ReusableBlocksTab
+			rootClientId={ destinationRootClientId }
+			onInsert={ onInsert }
+			onHover={ onHover }
+			filterValue={ filterValue }
+		/>
+	);
+
+	const searchFormPlaceholder = () => {
+		if ( activeTab === 'reusable' ) {
+			return __( 'Search for a reusable block' );
+		}
+
+		if ( activeTab === 'patterns' ) {
+			return __( 'Search for a pattern' );
+		}
+
+		return __( 'Search for a block' );
+	};
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 	// is always visible, and one which already incurs this behavior of autoFocus via
@@ -116,26 +161,34 @@ function InserterMenu( {
 				{ /* the following div is necessary to fix the sticky position of the search form */ }
 				<div className="block-editor-inserter__content">
 					<InserterSearchForm
-						onChange={ setFilterValue }
+						onChange={ ( value ) => {
+							if ( hoveredItem ) setHoveredItem( null );
+							setFilterValue( value );
+						} }
 						value={ filterValue }
+						placeholder={ searchFormPlaceholder() }
 					/>
-					{ showPatterns && (
-						<InserterTabs>
+					{ ( showPatterns || hasReusableBlocks ) && (
+						<InserterTabs
+							showPatterns={ showPatterns }
+							showReusableBlocks={ hasReusableBlocks }
+							onSelect={ setActiveTab }
+						>
 							{ ( tab ) => {
 								if ( tab.name === 'blocks' ) {
 									return blocksTab;
+								} else if ( tab.name === 'patterns' ) {
+									return patternsTab;
 								}
-								return patternsTab;
+								return reusableBlocksTab;
 							} }
 						</InserterTabs>
 					) }
-					{ ! showPatterns && blocksTab }
+					{ ! showPatterns && ! hasReusableBlocks && blocksTab }
 				</div>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
-				<div className="block-editor-inserter__preview-container">
-					<InserterPreviewPanel item={ hoveredItem } />
-				</div>
+				<InserterPreviewPanel item={ hoveredItem } />
 			) }
 		</div>
 	);

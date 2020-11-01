@@ -19,18 +19,25 @@ function render_block_core_post_title( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$post_ID          = $block->context['postId'];
 	$tag_name         = 'h2';
-	$align_class_name = empty( $attributes['align'] ) ? '' : ' ' . "has-text-align-{$attributes['align']}";
+	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
 
 	if ( isset( $attributes['level'] ) ) {
 		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
 	}
 
+	$title = get_the_title( $post_ID );
+	if ( isset( $attributes['isLink'] ) && $attributes['isLink'] ) {
+		$title = sprintf( '<a href="%1s" target="%2s" rel="%3s">%4s</a>', get_the_permalink( $post_ID ), $attributes['linkTarget'], $attributes['rel'], $title );
+	}
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
+
 	return sprintf(
-		'<%1$s class="%2$s">%3$s</%1$s>',
+		'<%1$s %2$s>%3$s</%1$s>',
 		$tag_name,
-		'wp-block-post-title' . esc_attr( $align_class_name ),
-		get_the_title( $block->context['postId'] )
+		$wrapper_attributes,
+		$title
 	);
 }
 

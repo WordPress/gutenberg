@@ -23,8 +23,7 @@ export default function registerEditSiteStore( initialState ) {
 		initialState,
 	} );
 
-	// We set the initial page here to include the template fetch which will
-	// resolve the correct homepage template.
-	store.dispatch( actions.setPage( initialState.page ) );
+	store.dispatch( actions.showHomepage() );
+
 	return store;
 }

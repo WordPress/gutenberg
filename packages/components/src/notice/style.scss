@@ -45,7 +45,7 @@
 }
 
 .components-notice__dismiss {
-	color: $dark-gray-300;
+	color: $gray-700;
 
 	// Place the dismiss button at the top of the container, even when text wraps onto two lines.
 	align-self: flex-start;
@@ -54,7 +54,7 @@
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
 	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
 	&:not(:disabled):not([aria-disabled="true"]):focus {
-		color: $dark-gray-900;
+		color: $gray-900;
 		background-color: transparent;
 	}
 

@@ -10,6 +10,7 @@ import {
 	InnerBlocks,
 	getColorClassName,
 	__experimentalGetGradientClass,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -34,6 +35,7 @@ export default function save( { attributes } ) {
 		dimRatio,
 		focalPoint,
 		hasParallax,
+		isRepeated,
 		overlayColor,
 		url,
 		minHeight: minHeightProp,
@@ -48,22 +50,36 @@ export default function save( { attributes } ) {
 		? `${ minHeightProp }${ minHeightUnit }`
 		: minHeightProp;
 
-	const style =
-		backgroundType === IMAGE_BACKGROUND_TYPE
-			? backgroundImageStyles( url )
-			: {};
+	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+
+	const style = isImageBackground ? backgroundImageStyles( url ) : {};
+	const videoStyle = {};
+
 	if ( ! overlayColorClass ) {
 		style.backgroundColor = customOverlayColor;
 	}
-	if ( focalPoint && ! hasParallax ) {
-		style.backgroundPosition = `${ Math.round(
-			focalPoint.x * 100
-		) }% ${ Math.round( focalPoint.y * 100 ) }%`;
-	}
+
 	if ( customGradient && ! url ) {
 		style.background = customGradient;
 	}
 	style.minHeight = minHeight || undefined;
+
+	let positionValue;
+
+	if ( focalPoint ) {
+		positionValue = `${ Math.round( focalPoint.x * 100 ) }% ${ Math.round(
+			focalPoint.y * 100
+		) }%`;
+
+		if ( isImageBackground && ! hasParallax ) {
+			style.backgroundPosition = positionValue;
+		}
+
+		if ( isVideoBackground ) {
+			videoStyle.objectPosition = positionValue;
+		}
+	}
 
 	const classes = classnames(
 		dimRatioToClass( dimRatio ),
@@ -71,6 +87,7 @@ export default function save( { attributes } ) {
 		{
 			'has-background-dim': dimRatio !== 0,
 			'has-parallax': hasParallax,
+			'is-repeated': isRepeated,
 			'has-background-gradient': gradient || customGradient,
 			[ gradientClass ]: ! url && gradientClass,
 			'has-custom-content-position': ! isContentPositionCenter(
@@ -81,7 +98,7 @@ export default function save( { attributes } ) {
 	);
 
 	return (
-		<div className={ classes } style={ style }>
+		<div { ...useBlockProps.save( { className: classes, style } ) }>
 			{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
 				<span
 					aria-hidden="true"
@@ -96,7 +113,7 @@ export default function save( { attributes } ) {
 					}
 				/>
 			) }
-			{ VIDEO_BACKGROUND_TYPE === backgroundType && url && (
+			{ isVideoBackground && url && (
 				<video
 					className="wp-block-cover__video-background"
 					autoPlay
@@ -104,6 +121,7 @@ export default function save( { attributes } ) {
 					loop
 					playsInline
 					src={ url }
+					style={ videoStyle }
 				/>
 			) }
 			<div className="wp-block-cover__inner-container">

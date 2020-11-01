@@ -8,7 +8,7 @@ import tinycolor from 'tinycolor2';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
@@ -17,6 +17,7 @@ import {
 	PanelRow,
 	RangeControl,
 	ResizableBox,
+	Spinner,
 	ToggleControl,
 	withNotices,
 	__experimentalBoxControl as BoxControl,
@@ -25,13 +26,13 @@ import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
-	InnerBlocks,
 	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	withColors,
 	ColorPalette,
-	__experimentalBlock as Block,
+	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
@@ -40,6 +41,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
+import { isBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -103,6 +105,9 @@ function CoverHeightInput( {
 		}
 		setTemporaryInput( null );
 		onChange( inputValue );
+		if ( inputValue === undefined ) {
+			onUnitChange();
+		}
 	};
 
 	const handleOnBlur = () => {
@@ -245,6 +250,7 @@ function CoverEdit( {
 		dimRatio,
 		focalPoint,
 		hasParallax,
+		isRepeated,
 		minHeight,
 		minHeightUnit,
 		style: styleAttribute,
@@ -256,11 +262,18 @@ function CoverEdit( {
 		setGradient,
 	} = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes );
+	const isBlogUrl = isBlobURL( url );
 
 	const toggleParallax = () => {
 		setAttributes( {
 			hasParallax: ! hasParallax,
 			...( ! hasParallax ? { focalPoint: undefined } : {} ),
+		} );
+	};
+
+	const toggleIsRepeated = () => {
+		setAttributes( {
+			isRepeated: ! isRepeated,
 		} );
 	};
 
@@ -272,6 +285,9 @@ function CoverEdit( {
 		isDarkElement
 	);
 
+	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+
 	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
 	const { removeAllNotices, createErrorNotice } = noticeOperations;
 
@@ -280,9 +296,7 @@ function CoverEdit( {
 		: minHeight;
 
 	const style = {
-		...( backgroundType === IMAGE_BACKGROUND_TYPE
-			? backgroundImageStyles( url )
-			: {} ),
+		...( isImageBackground ? backgroundImageStyles( url ) : {} ),
 		backgroundColor: overlayColor.color,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
@@ -291,13 +305,20 @@ function CoverEdit( {
 		style.background = gradientValue;
 	}
 
+	let positionValue;
+
 	if ( focalPoint ) {
-		style.backgroundPosition = `${ focalPoint.x * 100 }% ${
-			focalPoint.y * 100
-		}%`;
+		positionValue = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
+		if ( isImageBackground ) {
+			style.backgroundPosition = positionValue;
+		}
 	}
 
+	const canDim = !! url && ( overlayColor.color || gradientValue );
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
+	const showFocalPointPicker =
+		isVideoBackground ||
+		( isImageBackground && ( ! hasParallax || isRepeated ) );
 
 	const controls = (
 		<>
@@ -327,28 +348,32 @@ function CoverEdit( {
 			<InspectorControls>
 				{ !! url && (
 					<PanelBody title={ __( 'Media settings' ) }>
-						{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-							<ToggleControl
-								label={ __( 'Fixed background' ) }
-								checked={ hasParallax }
-								onChange={ toggleParallax }
-							/>
-						) }
-						{ IMAGE_BACKGROUND_TYPE === backgroundType &&
-							! hasParallax && (
-								<FocalPointPicker
-									label={ __( 'Focal point picker' ) }
-									url={ url }
-									value={ focalPoint }
-									onChange={ ( newFocalPoint ) =>
-										setAttributes( {
-											focalPoint: newFocalPoint,
-										} )
-									}
+						{ isImageBackground && (
+							<Fragment>
+								<ToggleControl
+									label={ __( 'Fixed background' ) }
+									checked={ hasParallax }
+									onChange={ toggleParallax }
 								/>
-							) }
-						{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-							<video autoPlay muted loop src={ url } />
+
+								<ToggleControl
+									label={ __( 'Repeated background' ) }
+									checked={ isRepeated }
+									onChange={ toggleIsRepeated }
+								/>
+							</Fragment>
+						) }
+						{ showFocalPointPicker && (
+							<FocalPointPicker
+								label={ __( 'Focal point picker' ) }
+								url={ url }
+								value={ focalPoint }
+								onChange={ ( newFocalPoint ) =>
+									setAttributes( {
+										focalPoint: newFocalPoint,
+									} )
+								}
+							/>
 						) }
 						<PanelRow>
 							<Button
@@ -363,6 +388,7 @@ function CoverEdit( {
 										dimRatio: undefined,
 										focalPoint: undefined,
 										hasParallax: undefined,
+										isRepeated: undefined,
 									} )
 								}
 							>
@@ -400,7 +426,7 @@ function CoverEdit( {
 								},
 							] }
 						>
-							{ !! url && (
+							{ canDim && (
 								<RangeControl
 									label={ __( 'Opacity' ) }
 									value={ dimRatio }
@@ -411,6 +437,7 @@ function CoverEdit( {
 									}
 									min={ 0 }
 									max={ 100 }
+									step={ 10 }
 									required
 								/>
 							) }
@@ -421,6 +448,14 @@ function CoverEdit( {
 		</>
 	);
 
+	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-cover__inner-container',
+		},
+		{ template: INNER_BLOCKS_TEMPLATE }
+	);
+
 	if ( ! hasBackground ) {
 		const placeholderIcon = <BlockIcon icon={ icon } />;
 		const label = __( 'Cover' );
@@ -428,7 +463,13 @@ function CoverEdit( {
 		return (
 			<>
 				{ controls }
-				<Block.div className="is-placeholder">
+				<div
+					{ ...blockProps }
+					className={ classnames(
+						'is-placeholder',
+						blockProps.className
+					) }
+				>
 					<MediaPlaceholder
 						icon={ placeholderIcon }
 						labels={ {
@@ -455,7 +496,7 @@ function CoverEdit( {
 							/>
 						</div>
 					</MediaPlaceholder>
-				</Block.div>
+				</div>
 			</>
 		);
 	}
@@ -465,7 +506,9 @@ function CoverEdit( {
 		{
 			'is-dark-theme': isDark,
 			'has-background-dim': dimRatio !== 0,
+			'is-transient': isBlogUrl,
 			'has-parallax': hasParallax,
+			'is-repeated': isRepeated,
 			[ overlayColor.class ]: overlayColor.class,
 			'has-background-gradient': gradientValue,
 			[ gradientClass ]: ! url && gradientClass,
@@ -479,7 +522,12 @@ function CoverEdit( {
 	return (
 		<>
 			{ controls }
-			<Block.div className={ classes } data-url={ url } style={ style }>
+			<div
+				{ ...blockProps }
+				className={ classnames( classes, blockProps.className ) }
+				style={ { ...style, ...blockProps.style } }
+				data-url={ url }
+			>
 				<BoxControlVisualizer
 					values={ styleAttribute?.spacing?.padding }
 					showValues={ styleAttribute?.visualizers?.padding }
@@ -498,7 +546,7 @@ function CoverEdit( {
 					} }
 					showHandle={ isSelected }
 				/>
-				{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+				{ isImageBackground && (
 					// Used only to programmatically check if the image is dark or not
 					<img
 						ref={ isDarkElement }
@@ -520,7 +568,7 @@ function CoverEdit( {
 						style={ { background: gradientValue } }
 					/>
 				) }
-				{ VIDEO_BACKGROUND_TYPE === backgroundType && (
+				{ isVideoBackground && (
 					<video
 						ref={ isDarkElement }
 						className="wp-block-cover__video-background"
@@ -528,16 +576,12 @@ function CoverEdit( {
 						muted
 						loop
 						src={ url }
+						style={ { objectPosition: positionValue } }
 					/>
 				) }
-				<InnerBlocks
-					__experimentalTagName="div"
-					__experimentalPassedProps={ {
-						className: 'wp-block-cover__inner-container',
-					} }
-					template={ INNER_BLOCKS_TEMPLATE }
-				/>
-			</Block.div>
+				{ isBlogUrl && <Spinner /> }
+				<div { ...innerBlocksProps } />
+			</div>
 		</>
 	);
 }

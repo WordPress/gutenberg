@@ -17,7 +17,7 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
@@ -28,11 +28,11 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 } from '@wordpress/block-editor';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { createBlock } from '@wordpress/blocks';
-import { crop } from '@wordpress/icons';
+import { crop, upload } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -40,6 +40,7 @@ import { crop } from '@wordpress/icons';
 import { createUpgradedEmbedBlock } from '../embed/util';
 import useClientWidth from './use-client-width';
 import ImageEditor from './image-editor';
+import { isExternalImage } from './edit';
 
 /**
  * Module constants
@@ -79,6 +80,8 @@ export default function Image( {
 	onUploadError,
 	containerRef,
 } ) {
+	const captionRef = useRef();
+	const prevUrl = usePrevious( url );
 	const image = useSelect(
 		( select ) => {
 			const { getMedia } = select( 'core' );
@@ -86,16 +89,32 @@ export default function Image( {
 		},
 		[ id, isSelected ]
 	);
-	const { maxWidth, isRTL, imageSizes } = useSelect( ( select ) => {
+	const {
+		imageEditing,
+		imageSizes,
+		isRTL,
+		maxWidth,
+		mediaUpload,
+	} = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
-		return pick( getSettings(), [ 'imageSizes', 'isRTL', 'maxWidth' ] );
+		return pick( getSettings(), [
+			'imageEditing',
+			'imageSizes',
+			'isRTL',
+			'maxWidth',
+			'mediaUpload',
+		] );
 	} );
 	const { toggleSelection } = useDispatch( 'core/block-editor' );
+	const { createErrorNotice, createSuccessNotice } = useDispatch(
+		'core/notices'
+	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ captionFocused, setCaptionFocused ] = useState( false );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
+	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const imageSizeOptions = map(
@@ -110,6 +129,30 @@ export default function Image( {
 			setCaptionFocused( false );
 		}
 	}, [ isSelected ] );
+
+	// If an image is externally hosted, try to fetch the image data. This may
+	// fail if the image host doesn't allow CORS with the domain. If it works,
+	// we can enable a button in the toolbar to upload the image.
+	useEffect( () => {
+		if ( ! isExternalImage( id, url ) || ! isSelected || externalBlob ) {
+			return;
+		}
+
+		window
+			.fetch( url )
+			.then( ( response ) => response.blob() )
+			.then( ( blob ) => setExternalBlob( blob ) );
+	}, [ id, url, isSelected, externalBlob ] );
+
+	// Focus the caption after inserting an image from the placeholder. This is
+	// done to preserve the behaviour of focussing the first tabbable element
+	// when a block is mounted. Previously, the image block would remount when
+	// the placeholder is removed. Maybe this behaviour could be removed.
+	useEffect( () => {
+		if ( url && ! prevUrl && isSelected ) {
+			captionRef.current.focus();
+		}
+	}, [ url, prevUrl ] );
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -172,13 +215,35 @@ export default function Image( {
 		} );
 	}
 
+	function uploadExternal() {
+		mediaUpload( {
+			filesList: [ externalBlob ],
+			onFileChange( [ img ] ) {
+				onSelectImage( img );
+
+				if ( isBlobURL( img.url ) ) {
+					return;
+				}
+
+				setExternalBlob();
+				createSuccessNotice( __( 'Image uploaded.' ), {
+					type: 'snackbar',
+				} );
+			},
+			allowedTypes: ALLOWED_MEDIA_TYPES,
+			onError( message ) {
+				createErrorNotice( message, { type: 'snackbar' } );
+			},
+		} );
+	}
+
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
 		}
 	}, [ isSelected ] );
 
-	const canEditImage = id && naturalWidth && naturalHeight;
+	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 
 	const controls = (
 		<>
@@ -189,7 +254,7 @@ export default function Image( {
 							url={ href || '' }
 							onChangeUrl={ onSetHref }
 							linkDestination={ linkDestination }
-							mediaUrl={ image && image.source_url }
+							mediaUrl={ ( image && image.source_url ) || url }
 							mediaLink={ image && image.link }
 							linkTarget={ linkTarget }
 							linkClass={ linkClass }
@@ -203,6 +268,15 @@ export default function Image( {
 							onClick={ () => setIsEditingImage( true ) }
 							icon={ crop }
 							label={ __( 'Crop' ) }
+						/>
+					</ToolbarGroup>
+				) }
+				{ externalBlob && (
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ uploadExternal }
+							icon={ upload }
+							label={ __( 'Upload external image' ) }
 						/>
 					</ToolbarGroup>
 				) }
@@ -424,6 +498,7 @@ export default function Image( {
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
+					ref={ captionRef }
 					tagName="figcaption"
 					placeholder={ __( 'Write caption…' ) }
 					value={ caption }

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/notices",
-	"version": "2.7.0",
+	"version": "2.11.0",
 	"description": "State management for notices.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,10 +22,10 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
+		"@babel/runtime": "^7.11.2",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/data": "file:../data",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.19"
 	},
 	"publishConfig": {
 		"access": "public"

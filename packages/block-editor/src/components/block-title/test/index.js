@@ -22,6 +22,24 @@ jest.mock( '@wordpress/blocks', () => {
 
 				case 'name-exists':
 					return { title: 'Block Title' };
+
+				case 'name-with-label':
+					return { title: 'Block With Label' };
+
+				case 'name-with-long-label':
+					return { title: 'Block With Long Label' };
+			}
+		},
+		__experimentalGetBlockLabel( { title } ) {
+			switch ( title ) {
+				case 'Block With Label':
+					return 'Test Label';
+
+				case 'Block With Long Label':
+					return 'This is a longer label than typical for blocks to have.';
+
+				default:
+					return title;
 			}
 		},
 	};
@@ -34,14 +52,22 @@ jest.mock( '@wordpress/data/src/components/use-select', () => {
 } );
 
 describe( 'BlockTitle', () => {
-	it( 'renders nothing if name is falsey', () => {
+	it( 'renders nothing if name is falsey2', () => {
+		useSelect.mockImplementation( () => ( {
+			name: null,
+			attributes: null,
+		} ) );
+
 		const wrapper = shallow( <BlockTitle /> );
 
 		expect( wrapper.type() ).toBe( null );
 	} );
 
 	it( 'renders nothing if block type does not exist', () => {
-		useSelect.mockImplementation( () => 'name-not-exists' );
+		useSelect.mockImplementation( () => ( {
+			name: 'name-not-exists',
+			attributes: null,
+		} ) );
 		const wrapper = shallow(
 			<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
 		);
@@ -50,11 +76,43 @@ describe( 'BlockTitle', () => {
 	} );
 
 	it( 'renders title if block type exists', () => {
-		useSelect.mockImplementation( () => 'name-exists' );
+		useSelect.mockImplementation( () => ( {
+			name: 'name-exists',
+			attributes: null,
+		} ) );
+
 		const wrapper = shallow(
 			<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
 		);
 
 		expect( wrapper.text() ).toBe( 'Block Title' );
+	} );
+
+	it( 'renders label if it is set', () => {
+		useSelect.mockImplementation( () => ( {
+			name: 'name-with-label',
+			attributes: null,
+		} ) );
+
+		const wrapper = shallow(
+			<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+		);
+
+		expect( wrapper.text() ).toBe( 'Block With Label: Test Label' );
+	} );
+
+	it( 'truncates the label if it is too long', () => {
+		useSelect.mockImplementation( () => ( {
+			name: 'name-with-long-label',
+			attributes: null,
+		} ) );
+
+		const wrapper = shallow(
+			<BlockTitle clientId="afd1cb17-2c08-4e7a-91be-007ba7ddc3a1" />
+		);
+
+		expect( wrapper.text() ).toBe(
+			'Block With Long Label: This is a lo...'
+		);
 	} );
 } );

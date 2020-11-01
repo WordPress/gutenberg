@@ -2,8 +2,12 @@ name: End-to-End Tests
 
 on:
   pull_request:
+    paths-ignore:
+    - '**.md'
   push:
     branches: [master]
+    paths-ignore:
+    - '**.md'
 
 jobs:
   admin-1:
@@ -39,7 +43,6 @@ jobs:
 
     - name: Install WordPress
       run: |
-        echo '{ "config": { "SCRIPT_DEBUG": false, "WP_PHP_BINARY": "php", "WP_TESTS_EMAIL": "admin@example.org", "WP_TESTS_TITLE": "Test Blog" } }' > .wp-env.override.json
         chmod -R 767 ./ # TODO: Possibly integrate in wp-env
         npm run wp-env start
 
@@ -81,7 +84,6 @@ jobs:
 
     - name: Install WordPress
       run: |
-        echo '{ "config": { "SCRIPT_DEBUG": false, "WP_PHP_BINARY": "php", "WP_TESTS_EMAIL": "admin@example.org", "WP_TESTS_TITLE": "Test Blog" } }' > .wp-env.override.json
         chmod -R 767 ./ # TODO: Possibly integrate in wp-env
         npm run wp-env start
 
@@ -123,7 +125,6 @@ jobs:
 
     - name: Install WordPress
       run: |
-        echo '{ "config": { "SCRIPT_DEBUG": false, "WP_PHP_BINARY": "php", "WP_TESTS_EMAIL": "admin@example.org", "WP_TESTS_TITLE": "Test Blog" } }' > .wp-env.override.json
         chmod -R 767 ./ # TODO: Possibly integrate in wp-env
         npm run wp-env start
 
@@ -165,7 +166,6 @@ jobs:
 
     - name: Install WordPress
       run: |
-        echo '{ "config": { "SCRIPT_DEBUG": false, "WP_PHP_BINARY": "php", "WP_TESTS_EMAIL": "admin@example.org", "WP_TESTS_TITLE": "Test Blog" } }' > .wp-env.override.json
         chmod -R 767 ./ # TODO: Possibly integrate in wp-env
         npm run wp-env start
 

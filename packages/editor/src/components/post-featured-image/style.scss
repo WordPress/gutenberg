@@ -47,14 +47,15 @@
 }
 
 .editor-post-featured-image__toggle {
-	border: $border-width dashed $light-gray-900;
-	background-color: $light-gray-300;
+	border-radius: $radius-block-ui;
+	background-color: $gray-100;
 	min-height: 90px;
 	line-height: 20px;
 	padding: $grid-unit-10 0;
 	text-align: center;
 
 	&:hover {
-		background-color: $light-gray-100;
+		background: $gray-300;
+		color: $gray-900;
 	}
 }

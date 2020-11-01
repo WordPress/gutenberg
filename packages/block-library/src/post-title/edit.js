@@ -10,9 +10,16 @@ import { useSelect } from '@wordpress/data';
 import {
 	AlignmentToolbar,
 	BlockControls,
-	__experimentalBlock as Block,
+	InspectorControls,
+	useBlockProps,
 } from '@wordpress/block-editor';
-import { ToolbarGroup } from '@wordpress/components';
+import {
+	ToolbarGroup,
+	ToggleControl,
+	TextControl,
+	PanelBody,
+} from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -20,13 +27,11 @@ import { ToolbarGroup } from '@wordpress/components';
 import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
 export default function PostTitleEdit( {
-	attributes,
+	attributes: { level, textAlign, isLink, rel, linkTarget },
 	setAttributes,
-	context,
+	context: { postType, postId },
 } ) {
-	const { level, align } = attributes;
-	const { postType, postId } = context;
-	const tagName = 0 === level ? 'p' : 'h' + level;
+	const TagName = 0 === level ? 'p' : 'h' + level;
 
 	const post = useSelect(
 		( select ) =>
@@ -38,8 +43,23 @@ export default function PostTitleEdit( {
 		[ postType, postId ]
 	);
 
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
+
 	if ( ! post ) {
 		return null;
+	}
+
+	let title = post.title || __( 'Post Title' );
+	if ( isLink ) {
+		title = (
+			<a href={ post.link } target={ linkTarget } rel={ rel }>
+				{ title }
+			</a>
+		);
 	}
 
 	return (
@@ -54,20 +74,42 @@ export default function PostTitleEdit( {
 					/>
 				</ToolbarGroup>
 				<AlignmentToolbar
-					value={ align }
+					value={ textAlign }
 					onChange={ ( nextAlign ) => {
-						setAttributes( { align: nextAlign } );
+						setAttributes( { textAlign: nextAlign } );
 					} }
 				/>
 			</BlockControls>
-			<Block
-				tagName={ tagName }
-				className={ classnames( {
-					[ `has-text-align-${ align }` ]: align,
-				} ) }
-			>
-				{ post.title }
-			</Block>
+			<InspectorControls>
+				<PanelBody title={ __( 'Link settings' ) }>
+					<ToggleControl
+						label={ __( 'Make title a link' ) }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
+					/>
+					{ isLink && (
+						<>
+							<ToggleControl
+								label={ __( 'Open in new tab' ) }
+								onChange={ ( value ) =>
+									setAttributes( {
+										linkTarget: value ? '_blank' : '_self',
+									} )
+								}
+								checked={ linkTarget === '_blank' }
+							/>
+							<TextControl
+								label={ __( 'Link rel' ) }
+								value={ rel }
+								onChange={ ( newRel ) =>
+									setAttributes( { rel: newRel } )
+								}
+							/>
+						</>
+					) }
+				</PanelBody>
+			</InspectorControls>
+			<TagName { ...blockProps }>{ title }</TagName>
 		</>
 	);
 }

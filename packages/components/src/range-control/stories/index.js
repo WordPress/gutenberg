@@ -32,7 +32,7 @@ const DefaultExample = () => {
 		afterIcon: text( 'afterIcon', '' ),
 		allowReset: boolean( 'allowReset', false ),
 		beforeIcon: text( 'beforeIcon', '' ),
-		color: text( 'color', color( 'ui.brand' ) ),
+		color: text( 'color', color( 'ui.theme' ) ),
 		disabled: boolean( 'disabled', false ),
 		help: text( 'help', '' ),
 		label: text( 'label', 'Range Label' ),

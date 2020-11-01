@@ -9,13 +9,13 @@ import {
 
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
 
-describe( 'adding blocks', () => {
+describe( 'adding patterns', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );
 
 	it( 'should insert a block pattern', async () => {
-		await insertPattern( 'Two Buttons' );
+		await insertPattern( 'Two buttons' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

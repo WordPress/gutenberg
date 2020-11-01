@@ -1,13 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { isValueDefined, getDefinedValue } from '../values';
 
+/**
+ * @template T
+ * @typedef Options
+ * @property {T | undefined} initial  Initial value
+ * @property {T | ""}        fallback Fallback value
+ */
+
+/** @type {Readonly<{ initial: undefined, fallback: '' }>} */
 const defaultOptions = {
 	initial: undefined,
 	/**
@@ -33,12 +41,12 @@ const defaultOptions = {
  * Unlike the basic useState hook, useControlledState's state can
  * be updated if a new incoming prop value is changed.
  *
- * @param {any} currentState The current value.
- * @param {Object} options Additional options for the hook.
- * @param {any} options.initial The initial state.
- * @param {any} options.fallback The state to use when no state is defined.
+ * @template T
  *
- * @return {[*, Function]} The controlled value and the value setter.
+ * @param {T | undefined} currentState The current value.
+ * @param {Options<T>} [options=defaultOptions] Additional options for the hook.
+ *
+ * @return {[T | "", (nextState: T) => void]} The controlled value and the value setter.
  */
 function useControlledState( currentState, options = defaultOptions ) {
 	const { initial, fallback } = { ...defaultOptions, ...options };
@@ -46,16 +54,28 @@ function useControlledState( currentState, options = defaultOptions ) {
 	const [ internalState, setInternalState ] = useState( currentState );
 	const hasCurrentState = isValueDefined( currentState );
 
+	/*
+	 * Resets internal state if value every changes from uncontrolled <-> controlled.
+	 */
+	useEffect( () => {
+		if ( hasCurrentState && internalState ) {
+			setInternalState( undefined );
+		}
+	}, [ hasCurrentState, internalState ] );
+
 	const state = getDefinedValue(
 		[ currentState, internalState, initial ],
 		fallback
 	);
 
+	/* eslint-disable jsdoc/no-undefined-types */
+	/** @type {(nextState: T) => void} */
 	const setState = ( nextState ) => {
 		if ( ! hasCurrentState ) {
 			setInternalState( nextState );
 		}
 	};
+	/* eslint-enable jsdoc/no-undefined-types */
 
 	return [ state, setState ];
 }

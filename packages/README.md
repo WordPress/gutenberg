@@ -27,7 +27,7 @@ When creating a new package, you need to provide at least the following:
     	"module": "build-module/index.js",
     	"react-native": "src/index",
     	"dependencies": {
-    		"@babel/runtime": "^7.9.2"
+    		"@babel/runtime": "^7.11.2"
     	},
     	"publishConfig": {
     		"access": "public"
@@ -305,19 +305,6 @@ If your package includes a few files with side effects, you can list them instea
 {
 	"name": "package",
 	"sideEffects": [ "file-with-side-effects.js", "another-file-with-side-effects.js" ]
-}
-```
-
-Many `@wordpress` UI-focused packages rely on side effects for registering blocks, plugins, and data stores. To reduce maintenance costs, it may be preferable to opt for an inverse glob strategy, where you instead list the paths where side effects are *not* present, leaving the bundler to assume that everything else might have them. This results in a glob with multiple roots (to match `@wordpress` package structure) and one or more excluded directories.
-
-Here is an example where we declare that the `components` and `utils` directories are side effect-free:
-
-```json
-{
-	"name": "package",
-	"sideEffects": [
-		"!((src|build|build-module)/(components|utils)/**)"
-	],
 }
 ```
 

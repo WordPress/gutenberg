@@ -80,7 +80,7 @@ let settings = {
 		datetime: 'F j, Y g: i a',
 		datetimeAbbreviated: 'M j, Y g: i a',
 	},
-	timezone: { offset: '0', string: '' },
+	timezone: { offset: '0', string: '', abbr: '' },
 };
 
 /**

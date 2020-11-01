@@ -1,21 +1,33 @@
 /**
+ * External dependencies
+ */
+import { Composite, useCompositeState } from 'reakit';
+
+/**
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import InserterListItem from '../inserter-list-item';
-import { includeVariationsInInserterItems } from '../inserter/utils';
 
 function BlockTypesList( {
 	items = [],
 	onSelect,
 	onHover = () => {},
 	children,
+	label,
 } ) {
-	const normalizedItems = includeVariationsInInserterItems( items );
+	const composite = useCompositeState();
+	const orderId = items.reduce( ( acc, item ) => acc + '--' + item.id, '' );
+
+	// This ensures the composite state refreshes when the list order changes.
+	useEffect( () => {
+		composite.unstable_sort();
+	}, [ composite.unstable_sort, orderId ] );
 
 	return (
 		/*
@@ -23,8 +35,13 @@ function BlockTypesList( {
 		 * Safari+VoiceOver won't announce the list otherwise.
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
-		<ul role="list" className="block-editor-block-types-list">
-			{ normalizedItems.map( ( item ) => {
+		<Composite
+			{ ...composite }
+			role="listbox"
+			className="block-editor-block-types-list"
+			aria-label={ label }
+		>
+			{ items.map( ( item ) => {
 				return (
 					<InserterListItem
 						key={ item.id }
@@ -40,11 +57,12 @@ function BlockTypesList( {
 						onBlur={ () => onHover( null ) }
 						isDisabled={ item.isDisabled }
 						title={ item.title }
+						composite={ composite }
 					/>
 				);
 			} ) }
 			{ children }
-		</ul>
+		</Composite>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
 }

@@ -128,7 +128,7 @@ class Layout extends Component {
 				) }
 				onLayout={ this.onRootViewLayout }
 			>
-				<AutosaveMonitor />
+				<AutosaveMonitor disableIntervalChecks />
 				<View
 					style={ getStylesFromColorScheme(
 						styles.background,
@@ -152,6 +152,7 @@ class Layout extends Component {
 					<KeyboardAvoidingView
 						parentHeight={ this.state.rootViewHeight }
 						style={ toolbarKeyboardAvoidingViewStyle }
+						withAnimatedHeight
 					>
 						{ isTemplatePickerAvailable && (
 							<__experimentalPageTemplatePicker
@@ -174,10 +175,11 @@ export default compose( [
 			'core/editor'
 		);
 		const { getEditorMode } = select( 'core/edit-post' );
-
+		const { getSettings } = select( 'core/block-editor' );
 		return {
 			isReady: isEditorReady(),
 			mode: getEditorMode(),
+			modalLayoutPicker: getSettings( 'capabilities' ).modalLayoutPicker,
 		};
 	} ),
 	withPreferredColorScheme,

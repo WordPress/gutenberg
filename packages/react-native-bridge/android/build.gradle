@@ -23,7 +23,7 @@ buildscript {
         classpath 'com.github.dcendents:android-maven-gradle-plugin:2.1'
 
         if (buildGutenbergMobileJSBundle) {
-            classpath "com.moowork.gradle:gradle-node-plugin:1.3.1"
+            classpath 'com.github.node-gradle:gradle-node-plugin:3.0.0-rc2'
         }
     }
 }
@@ -44,7 +44,7 @@ def npmFolder = file("${tempFolder}/npm")
 if (buildGutenbergMobileJSBundle) {
     println 'Building the Gutenberg Mobile JS bundle'
 
-    apply plugin: 'com.moowork.node'
+    apply plugin: 'com.github.node-gradle.node'
 
     node {
         // Version of node to use.
@@ -70,7 +70,7 @@ if (buildGutenbergMobileJSBundle) {
         nodeModulesDir = file("${project.projectDir}/../../../../")
     }
 
-    npm_install {
+    npmInstall {
         args = ['--prefer-offline']
     }
 }
@@ -94,11 +94,11 @@ def hermesPath = hermesOriginalPath;
 def buildAssetsFolder = 'build/assets'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 29
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 28
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
     }
@@ -155,6 +155,11 @@ dependencies {
         implementation project(':react-native-video')
         implementation project(':@react-native-community_slider')
         implementation project(':react-native-get-random-values')
+        implementation project(':@react-native-community_masked-view')
+        implementation project(':react-native-gesture-handler')
+        implementation project(':react-native-screens')
+        implementation project(':react-native-safe-area-context')
+        implementation project(':react-native-reanimated')
 
         implementation 'com.facebook.react:react-native:+'
     } else {
@@ -165,6 +170,11 @@ dependencies {
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-linear-gradient', readHashedVersion('../../react-native-editor/package.json', 'react-native-linear-gradient', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-slider', readHashedVersion('../../react-native-editor/package.json', '@react-native-community/slider', 'dependencies')))
         implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-get-random-values', readHashedVersion('../../react-native-editor/package.json', 'react-native-get-random-values', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-masked-view', readHashedVersion('../../react-native-editor/package.json', '@react-native-community/masked-view', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-gesture-handler', readHashedVersion('../../react-native-editor/package.json', 'react-native-gesture-handler', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-screens', readHashedVersion('../../react-native-editor/package.json', 'react-native-screens', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-safe-area-context', readHashedVersion('../../react-native-editor/package.json', 'react-native-safe-area-context', 'dependencies')))
+        implementation (waitJitpack('com.github.wordpress-mobile', 'react-native-reanimated', readHashedVersion('../../react-native-editor/package.json', 'react-native-reanimated', 'dependencies')))
 
         // FIXME Temporary fix to get Jitpack builds to green while I work on a solution without hardcoded values.
         //def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
@@ -235,8 +245,8 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         }
     }
 
-    npm_install.dependsOn bundleUpToDateCheck
-    npm_install.onlyIf { !isBundleUpToDate() }
+    npmInstall.dependsOn bundleUpToDateCheck
+    npmInstall.onlyIf { !isBundleUpToDate() }
 
     task buildJSBundle(type: NpmTask) {
         dependsOn bundleUpToDateCheck
@@ -310,6 +320,8 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
         doFirst {
             println "Deleting temporary folders with extracted RN tools"
         }
+        dependsOn bundleUpToDateCheck
+        onlyIf { !isBundleUpToDate() }
         delete nodeFolder, npmFolder
     }
 
@@ -318,8 +330,9 @@ If they are changed, the isBundleUpToDate flag is switched to false. That flag i
     backupHermesDebugAAR.dependsOn(backupHermesReleaseAAR)
     backupHermesReleaseAAR.dependsOn(copyJSBundle)
     copyJSBundle.dependsOn(buildJSBundle)
-    buildJSBundle.dependsOn(npm_install)
+    buildJSBundle.dependsOn(npmInstall)
     nodeSetup.dependsOn(resetExtractedRNTools)
+    npmSetup.dependsOn(resetExtractedRNTools)
 
     clean {
         doFirst {

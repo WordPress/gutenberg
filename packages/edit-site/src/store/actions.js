@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { select, dispatch, apiFetch } from '@wordpress/data-controls';
+import { controls } from '@wordpress/data';
+import { apiFetch } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -51,14 +52,14 @@ export function setTemplate( templateId ) {
 }
 
 /**
- * Returns an action object used to add a template.
+ * Adds a new template, and sets it as the current template.
  *
  * @param {Object} template The template.
  *
- * @return {Object} Action object.
+ * @return {Object} Action object used to set the current template.
  */
 export function* addTemplate( template ) {
-	const newTemplate = yield dispatch(
+	const newTemplate = yield controls.dispatch(
 		'core',
 		'saveEntityRecord',
 		'postType',
@@ -66,32 +67,23 @@ export function* addTemplate( template ) {
 		template
 	);
 	return {
-		type: 'ADD_TEMPLATE',
+		type: 'SET_TEMPLATE',
 		templateId: newTemplate.id,
 	};
 }
 
 /**
- * Returns an action object used to remove a template.
+ * Removes a template, and updates the current page and template.
  *
  * @param {number} templateId The template ID.
- *
- * @return {Object} Action object.
  */
 export function* removeTemplate( templateId ) {
 	yield apiFetch( {
 		path: `/wp/v2/templates/${ templateId }`,
 		method: 'DELETE',
 	} );
-	yield dispatch(
-		'core/edit-site',
-		'setPage',
-		yield select( 'core/edit-site', 'getPage' )
-	);
-	return {
-		type: 'REMOVE_TEMPLATE',
-		templateId,
-	};
+	const page = yield controls.select( 'core/edit-site', 'getPage' );
+	yield controls.dispatch( 'core/edit-site', 'setPage', page );
 }
 
 /**
@@ -109,21 +101,130 @@ export function setTemplatePart( templatePartId ) {
 }
 
 /**
- * Resolves the template for a page and sets them.
+ * Updates the homeTemplateId state with the templateId of the page resolved
+ * from the given path.
  *
- * @param {Object} page         The page object.
- * @param {string} page.type    The page type.
- * @param {string} page.slug    The page slug.
- * @param {string} page.path    The page path.
- * @param {Object} page.context The page context.
+ * @param {number} homeTemplateId The template ID for the homepage.
+ */
+export function setHomeTemplateId( homeTemplateId ) {
+	return {
+		type: 'SET_HOME_TEMPLATE',
+		homeTemplateId,
+	};
+}
+
+/**
+ * Resolves the template for a page and displays both.
  *
- * @return {Object} Action object.
+ * @param {Object}  page         The page object.
+ * @param {string}  page.type    The page type.
+ * @param {string}  page.slug    The page slug.
+ * @param {string}  page.path    The page path.
+ * @param {Object}  page.context The page context.
+ *
+ * @return {number} The resolved template ID for the page route.
  */
 export function* setPage( page ) {
 	const templateId = yield findTemplate( page.path );
-	return {
+	yield {
 		type: 'SET_PAGE',
 		page,
 		templateId,
+	};
+	return templateId;
+}
+
+/**
+ * Displays the site homepage for editing in the editor.
+ */
+export function* showHomepage() {
+	const {
+		show_on_front: showOnFront,
+		page_on_front: frontpageId,
+	} = yield controls.resolveSelect(
+		'core',
+		'getEntityRecord',
+		'root',
+		'site'
+	);
+
+	const page = {
+		path: '/',
+		context:
+			showOnFront === 'page'
+				? {
+						postType: 'page',
+						postId: frontpageId,
+				  }
+				: {},
+	};
+
+	const homeTemplate = yield* setPage( page );
+	yield setHomeTemplateId( homeTemplate );
+}
+
+/**
+ * Returns an action object used to set the active navigation panel menu.
+ *
+ * @param {string} menu Menu prop of active menu.
+ *
+ * @return {Object} Action object.
+ */
+export function setNavigationPanelActiveMenu( menu ) {
+	return {
+		type: 'SET_NAVIGATION_PANEL_ACTIVE_MENU',
+		menu,
+	};
+}
+
+/**
+ * Opens the navigation panel and sets its active menu at the same time.
+ *
+ * @param {string} menu Identifies the menu to open.
+ */
+export function openNavigationPanelToMenu( menu ) {
+	return {
+		type: 'OPEN_NAVIGATION_PANEL_TO_MENU',
+		menu,
+	};
+}
+
+/**
+ * Sets whether the navigation panel should be open.
+ *
+ * @param {boolean} isOpen If true, opens the nav panel. If false, closes it. It
+ *                         does not toggle the state, but sets it directly.
+ */
+export function setIsNavigationPanelOpened( isOpen ) {
+	return {
+		type: 'SET_IS_NAVIGATION_PANEL_OPENED',
+		isOpen,
+	};
+}
+
+/**
+ * Sets whether the block inserter panel should be open.
+ *
+ * @param {boolean} isOpen If true, opens the inserter. If false, closes it. It
+ *                         does not toggle the state, but sets it directly.
+ */
+export function setIsInserterOpened( isOpen ) {
+	return {
+		type: 'SET_IS_INSERTER_OPENED',
+		isOpen,
+	};
+}
+
+/**
+ * Returns an action object used to update the settings.
+ *
+ * @param {Object} settings New settings.
+ *
+ * @return {Object} Action object.
+ */
+export function updateSettings( settings ) {
+	return {
+		type: 'UPDATE_SETTINGS',
+		settings,
 	};
 }
