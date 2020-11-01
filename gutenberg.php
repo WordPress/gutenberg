@@ -1,12 +1,12 @@
 <?php
 /**
- * Plugin Name: Gutenberg
- * Plugin URI: https://github.com/WordPress/gutenberg
+ * Plugin Name: Gutenberg - Nightly
+ * Plugin URI: https://github.com/bph/gutenberg
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
  * Requires at least: 5.3
  * Requires PHP: 5.6
- * Version: 9.2.2
- * Author: Gutenberg Team
+ * Version: 9.2.2.20201101
+ * Author: Gutenberg Team / Birgit Pauli-Haack (Gutenberg Times)
  * Text Domain: gutenberg
  *
  * @package gutenberg
