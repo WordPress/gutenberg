@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.18.0 (2020-10-30)
+
 ### Breaking Changes
 
 -   Update the list of available block categories to align with changes introduced in WordPress 5.5.0 (https://make.wordpress.org/core/2020/07/30/block-api-updates-in-5-5/).

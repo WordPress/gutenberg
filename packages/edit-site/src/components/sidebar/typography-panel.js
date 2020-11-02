@@ -8,13 +8,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { fromPx, toPx, useEditorFeature } from '../editor/utils';
+import { useEditorFeature } from '../editor/utils';
 
-export default ( {
+export default function TypographyPanel( {
 	context: { supports, name },
 	getStyleProperty,
 	setStyleProperty,
-} ) => {
+} ) {
 	const fontSizes = useEditorFeature( 'typography.fontSizes', name );
 	const disableCustomFontSizes = ! useEditorFeature(
 		'typography.customFontSize',
@@ -32,9 +32,9 @@ export default ( {
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
 			{ supports.includes( 'fontSize' ) && (
 				<FontSizePicker
-					value={ fromPx( getStyleProperty( name, 'fontSize' ) ) }
+					value={ getStyleProperty( name, 'fontSize' ) }
 					onChange={ ( value ) =>
-						setStyleProperty( name, 'fontSize', toPx( value ) )
+						setStyleProperty( name, 'fontSize', value )
 					}
 					fontSizes={ fontSizes }
 					disableCustomFontSizes={ disableCustomFontSizes }
@@ -50,4 +50,4 @@ export default ( {
 			) }
 		</PanelBody>
 	);
-};
+}

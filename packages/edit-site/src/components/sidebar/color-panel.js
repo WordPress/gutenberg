@@ -10,13 +10,13 @@ import { __ } from '@wordpress/i18n';
 import { LINK_COLOR, useEditorFeature } from '../editor/utils';
 import ColorPalettePanel from './color-palette-panel';
 
-export default ( {
+export default function ColorPanel( {
 	context: { supports, name },
 	getStyleProperty,
 	setStyleProperty,
 	getSetting,
 	setSetting,
-} ) => {
+} ) {
 	const colors = useEditorFeature( 'color.palette', name );
 	const disableCustomColors = ! useEditorFeature( 'color.custom', name );
 	const gradients = useEditorFeature( 'color.gradients', name );
@@ -98,4 +98,4 @@ export default ( {
 			/>
 		</PanelColorGradientSettings>
 	);
-};
+}

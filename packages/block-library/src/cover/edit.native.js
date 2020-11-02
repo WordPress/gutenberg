@@ -534,7 +534,10 @@ const Cover = ( {
 				pointerEvents="box-none"
 				style={ [ styles.content, { minHeight: convertedMinHeight } ] }
 			>
-				<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
+				<InnerBlocks
+					template={ INNER_BLOCKS_TEMPLATE }
+					templateInsertUpdatesSelection
+				/>
 			</View>
 
 			<View pointerEvents="none" style={ styles.overlayContainer }>
