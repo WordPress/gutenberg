@@ -70,14 +70,20 @@ export function SocialLinksEdit( props ) {
 			<BlockControls>
 				<ToolbarGroup>
 					<ToolbarItem>
-						{ () => (
+						{ ( toggleProps ) => (
 							<DropdownMenu
 								label={ __( 'Size' ) }
-								text={ __( 'Size' ) }
+								text={
+									// Display size value Small, Large, etc..
+									sizeOptions.find(
+										( opt ) => opt.value === size
+									).name || __( 'Size' )
+								}
 								icon={ null }
 								popoverProps={ POPOVER_PROPS }
+								toggleProps={ toggleProps }
 							>
-								{ ( onClose ) => (
+								{ ( { onClose } ) => (
 									<MenuGroup>
 										{ sizeOptions.map( ( entry ) => {
 											return (
