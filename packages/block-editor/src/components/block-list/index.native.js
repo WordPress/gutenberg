@@ -82,11 +82,16 @@ export class BlockList extends Component {
 		this.props.insertBlock( newBlock, this.props.blockCount );
 	}
 
-	scrollToBlockListItem( offset ) {
-		this.listRef.current.scrollToOffset( {
-			offset,
-			animated: true,
-		} );
+	scrollToBlockListItem( offsetY ) {
+		const isIOS = Platform.OS === 'ios';
+		if ( isIOS ) {
+			this.scrollViewRef.props.scrollToPosition( 0, offsetY, true );
+		} else {
+			this.listRef.current.scrollToOffset( {
+				offsetY,
+				animated: true,
+			} );
+		}
 	}
 
 	onCaretVerticalPositionChange( targetId, caretY, previousCaretY ) {
