@@ -23,7 +23,7 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
-import { getTemplateInfo } from '../../utils';
+import useTemplateInfo from '../../hooks/use-template-info';
 
 export default function Header( { openEntitiesSavedStates } ) {
 	const {
@@ -70,7 +70,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 	const displayBlockToolbar =
 		! isLargeViewport || deviceType !== 'Desktop' || hasFixedToolbar;
 
-	let { title } = getTemplateInfo( template );
+	let { title } = useTemplateInfo( template );
 	if ( 'wp_template_part' === templateType ) {
 		title = templatePart?.slug;
 	}

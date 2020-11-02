@@ -8,16 +8,16 @@ import { useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { getTemplateInfo } from '../../utils';
+import useTemplateInfo from '../../hooks/use-template-info';
 import { MENU_TEMPLATES } from '../navigation-sidebar/navigation-panel/constants';
 
 export default function TemplateDetails( { template, onClose } ) {
 	const { openNavigationPanelToMenu } = useDispatch( 'core/edit-site' );
+	const { title, description } = useTemplateInfo( template );
+
 	if ( ! template ) {
 		return null;
 	}
-
-	const { title, description } = getTemplateInfo( template );
 
 	const showTemplateInSidebar = () => {
 		onClose();

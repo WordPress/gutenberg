@@ -170,3 +170,14 @@ export function isNavigationOpened( state ) {
 export function isInserterOpened( state ) {
 	return state.blockInserterPanel;
 }
+
+/**
+ * Returns the default template types definitions.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The template types definitions.
+ */
+export function getDefaultTemplateTypesDefinitions( state ) {
+	return state.settings?.defaultTemplateTypesDefinitions;
+}

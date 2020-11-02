@@ -7,19 +7,23 @@ import {
 } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import TemplatePreview from './template-preview';
 import { NavigationPanelPreviewFill } from '../index';
-import { getTemplateInfo } from '../../../utils';
+import useTemplateInfo from '../../../hooks/use-template-info';
 
 export default function TemplateNavigationItem( { item } ) {
 	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
 	const [ isPreviewVisible, setIsPreviewVisible ] = useState( false );
+	const { title, description } = useTemplateInfo( item );
 
-	const { title, description } = getTemplateInfo( item );
+	if ( ! item ) {
+		return null;
+	}
 
 	const onActivateItem = () =>
 		'wp_template' === item.type
@@ -37,7 +41,10 @@ export default function TemplateNavigationItem( { item } ) {
 				onMouseEnter={ () => setIsPreviewVisible( true ) }
 				onMouseLeave={ () => setIsPreviewVisible( false ) }
 			>
-				{ title }
+				<div className="edit-site-navigation-panel__template-item-title">
+					{ 'draft' === item.status && <em>{ __( '[Draft]' ) }</em> }
+					{ title }
+				</div>
 				{ description && (
 					<div className="edit-site-navigation-panel__template-item-description">
 						{ description }
