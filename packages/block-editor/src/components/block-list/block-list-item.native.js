@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, findNodeHandle, Dimensions } from 'react-native';
+import { View, findNodeHandle, Dimensions, Platform } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -99,23 +99,28 @@ export class BlockListItem extends Component {
 
 	scrollToBlockIfItsNotVisible() {
 		const { isSelected } = this.props;
+		const isIOS = Platform.OS === 'ios';
+		const scrollFactor = isIOS ? 200 : 100;
+
 		if ( isSelected ) {
 			if ( this.blockRef.current ) {
 				this.blockRef.current.measureLayout(
 					findNodeHandle( this.props.listRef.current ),
 					( x, y ) => {
 						this.blockRef.current.measure(
-							( _x, _y, width, height, px, py ) => {
+							( _x, _y, blockWidth, blockHeight, px, py ) => {
 								const window = Dimensions.get( 'window' );
 
-								const { scrollTo } = this.props;
+								const { scrollToBlockListOffset } = this.props;
 
 								if ( py - 200 < 0 ) {
-									scrollTo( y - height - 100 );
-								}
-
-								if ( py + height + 200 > window.height ) {
-									scrollTo( y );
+									scrollToBlockListOffset( y - 300 );
+									scrollToBlockListOffset( y + blockHeight );
+								} else if (
+									py + blockHeight + scrollFactor >
+									window.height
+								) {
+									scrollToBlockListOffset( y );
 								}
 							}
 						);

@@ -74,7 +74,9 @@ export class BlockList extends Component {
 		this.renderEmptyList = this.renderEmptyList.bind( this );
 		this.getExtraData = this.getExtraData.bind( this );
 		this.setListRef = this.setListRef.bind( this );
-		this.scrollToBlockListItem = this.scrollToBlockListItem.bind( this );
+		this.scrollToBlockListOffset = this.scrollToBlockListOffset.bind(
+			this
+		);
 		this.listRef = createRef();
 	}
 
@@ -82,7 +84,7 @@ export class BlockList extends Component {
 		this.props.insertBlock( newBlock, this.props.blockCount );
 	}
 
-	scrollToBlockListItem( offsetY ) {
+	scrollToBlockListOffset( offsetY ) {
 		const isIOS = Platform.OS === 'ios';
 		if ( isIOS ) {
 			this.scrollViewRef.props.scrollToPosition( 0, offsetY, true );
@@ -300,7 +302,7 @@ export class BlockList extends Component {
 				marginVertical={ marginVertical }
 				marginHorizontal={ marginHorizontal }
 				onDeleteBlock={ onDeleteBlock }
-				scrollTo={ this.scrollToBlockListItem }
+				scrollToBlockListOffset={ this.scrollToBlockListOffset }
 				shouldShowInnerBlockAppender={
 					this.shouldShowInnerBlockAppender
 				}
