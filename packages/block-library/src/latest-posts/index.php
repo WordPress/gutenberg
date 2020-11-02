@@ -53,6 +53,8 @@ function render_block_core_latest_posts( $attributes ) {
 		$args['author'] = $attributes['selectedAuthor'];
 	}
 
+	$args = apply_filters( 'block_core_latest_posts_query_args', $args );
+
 	$recent_posts = get_posts( $args );
 
 	$list_items_markup = '';
