@@ -41,9 +41,9 @@ export default function save( { attributes } ) {
 							break;
 					}
 
-					let alt = image.alt || image.caption || '';
+					let alt = image.alt || image.caption;
 
-					if ( alt !== __unstableStripHTML( alt ) ) {
+					if ( alt && alt !== __unstableStripHTML( alt ) ) {
 						alt = __unstableStripHTML( alt );
 					}
 
