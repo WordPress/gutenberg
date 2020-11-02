@@ -104,6 +104,7 @@ require __DIR__ . '/compat.php';
 require __DIR__ . '/utils.php';
 
 require __DIR__ . '/full-site-editing.php';
+require __DIR__ . '/full-site-editing/template-types-definitions.php';
 require __DIR__ . '/templates-sync.php';
 require __DIR__ . '/templates.php';
 require __DIR__ . '/template-parts.php';

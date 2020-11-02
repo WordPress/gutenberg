@@ -69,6 +69,7 @@ function gutenberg_register_template_post_type() {
 		'supports'          => array(
 			'title',
 			'slug',
+			'excerpt',
 			'editor',
 			'revisions',
 		),
@@ -187,7 +188,9 @@ add_action( 'admin_menu', 'gutenberg_fix_template_admin_menu_entry' );
  * @return array Filtered $columns.
  */
 function gutenberg_filter_template_list_table_columns( array $columns ) {
-	$columns['slug'] = __( 'Slug', 'gutenberg' );
+	$columns['slug']        = __( 'Slug', 'gutenberg' );
+	$columns['description'] = __( 'Description', 'gutenberg' );
+	$columns['status']      = __( 'Status', 'gutenberg' );
 	if ( isset( $columns['date'] ) ) {
 		unset( $columns['date'] );
 	}
@@ -202,13 +205,42 @@ add_filter( 'manage_wp_template_posts_columns', 'gutenberg_filter_template_list_
  * @param int    $post_id     Post ID.
  */
 function gutenberg_render_template_list_table_column( $column_name, $post_id ) {
-	if ( 'slug' !== $column_name ) {
+	if ( 'slug' === $column_name ) {
+		$post = get_post( $post_id );
+		echo esc_html( $post->post_name );
 		return;
 	}
-	$post = get_post( $post_id );
-	echo esc_html( $post->post_name );
+
+	if ( 'description' === $column_name ) {
+		the_excerpt( $post_id );
+		return;
+	}
+
+	if ( 'status' === $column_name ) {
+		$post_status        = get_post_status( $post_id );
+		$post_status_object = get_post_status_object( $post_status );
+		echo esc_html( $post_status_object->label );
+		return;
+	}
 }
 add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_template_list_table_column', 10, 2 );
+
+/**
+ * Filters the query for the 'wp_template' post type list table to include auto-draft.
+ *
+ * @param WP_Query $query The query to filter.
+ */
+function gutenberg_filter_templates_admin_query( $query ) {
+	if (
+		! is_admin() ||
+		'wp_template' !== $query->query['post_type'] ||
+		'' !== $query->query['post_status']
+	) {
+		return;
+	}
+	$query->set( 'post_status', array( 'publish', 'draft', 'auto-draft' ) );
+}
+add_filter( 'pre_get_posts', 'gutenberg_filter_templates_admin_query' );
 
 /**
  * Filter for adding a `resolved` parameter to `wp_template` queries.
@@ -277,5 +309,17 @@ function gutenberg_filter_rest_wp_template_dispatch( $dispatch_result, $request,
 
 	return null;
 }
-
 add_filter( 'rest_dispatch_request', 'gutenberg_filter_rest_wp_template_dispatch', 10, 3 );
+
+/**
+ * Filter the default template types definitions to temporarily remove 'embed',
+ * because it is not a regular template type.
+ *
+ * @param array $template_type_definitions The array of template types definitions.
+ * @return array Filtered $template_type_definitions.
+ */
+function gutenberg_filter_default_template_types_definitions( $template_type_definitions ) {
+	unset( $template_type_definitions['embed'] );
+	return $template_type_definitions;
+}
+add_filter( 'template_types_definitions', 'gutenberg_filter_default_template_types_definitions' );

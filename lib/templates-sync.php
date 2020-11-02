@@ -26,7 +26,7 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 		array(
 			'post_type'      => $post_type,
 			'post_status'    => array( 'publish', 'auto-draft' ),
-			'title'          => $slug,
+			'name'           => $slug,
 			'meta_key'       => 'theme',
 			'meta_value'     => $theme,
 			'posts_per_page' => 1,
@@ -35,15 +35,23 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 	);
 	$post           = $template_query->have_posts() ? $template_query->next_post() : null;
 	if ( ! $post ) {
-		wp_insert_post(
-			array(
-				'post_content' => $content,
-				'post_title'   => $slug,
-				'post_status'  => 'auto-draft',
-				'post_type'    => $post_type,
-				'post_name'    => $slug,
-			)
+		$template_post = array(
+			'post_content' => $content,
+			'post_title'   => $slug,
+			'post_status'  => 'auto-draft',
+			'post_type'    => $post_type,
+			'post_name'    => $slug,
 		);
+
+		if ( 'wp_template' === $post_type ) {
+			$template_types_definitions = gutenberg_get_default_template_types_definitions();
+			if ( isset( $template_types_definitions[ $slug ] ) ) {
+				$template_post['post_title']   = $template_types_definitions[ $slug ]['title'];
+				$template_post['post_excerpt'] = $template_types_definitions[ $slug ]['description'];
+			}
+		}
+
+		wp_insert_post( $template_post );
 	} else {
 		// Potentially we could decide to update the content if different.
 	}
