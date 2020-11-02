@@ -24,12 +24,14 @@ export default function QuoteEdit( {
 	onReplace,
 	className,
 	insertBlocksAfter,
+	mergedStyle,
 } ) {
 	const { align, value, citation } = attributes;
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
 			[ `has-text-align-${ align }` ]: align,
 		} ),
+		style: mergedStyle,
 	} );
 
 	return (
