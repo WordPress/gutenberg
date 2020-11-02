@@ -9,6 +9,10 @@
  * Registers block editor 'wp_template_part' post type.
  */
 function gutenberg_register_template_part_post_type() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
 	$labels = array(
 		'name'                  => __( 'Template Parts', 'gutenberg' ),
 		'singular_name'         => __( 'Template Part', 'gutenberg' ),
@@ -88,6 +92,10 @@ add_filter( 'wp_unique_post_slug', 'gutenberg_filter_wp_template_part_wp_unique_
  * Fixes the label of the 'wp_template_part' admin menu entry.
  */
 function gutenberg_fix_template_part_admin_menu_entry() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
 	global $submenu;
 	if ( ! isset( $submenu['themes.php'] ) ) {
 		return;
