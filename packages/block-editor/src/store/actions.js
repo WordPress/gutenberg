@@ -661,14 +661,14 @@ export function removeBlock( clientId, selectPrevious ) {
  *
  * @param {string}   rootClientId    Client ID of the block whose InnerBlocks will re replaced.
  * @param {Object[]} blocks          Block objects to insert as new InnerBlocks
- * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
+ * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to false.
  *
  * @return {Object} Action object.
  */
 export function replaceInnerBlocks(
 	rootClientId,
 	blocks,
-	updateSelection = true
+	updateSelection = false
 ) {
 	return {
 		type: 'REPLACE_INNER_BLOCKS',
@@ -861,7 +861,7 @@ export function __unstableSaveReusableBlock( id, updatedId ) {
 }
 
 /**
- * Returns an action object used in signalling that the last block change should be marked explicitely as persistent.
+ * Returns an action object used in signalling that the last block change should be marked explicitly as persistent.
  *
  * @return {Object} Action object.
  */

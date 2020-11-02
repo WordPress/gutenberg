@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+## 12.5.0 (2020-10-30)
+
+### Enhancements
+
+-   Ignore `/vendor` folder when searching for files to lint or format.
+
+### Bug Fixes
+
+-   Temporary pin `ignore-emit-webpack-plugin` to the version `2.0.3` to fix a known issue with version `2.0.4` ([GitHub issue](https://github.com/mrbar42/ignore-emit-webpack-plugin/issues/17)).
+
 ## 12.1.0 (2020-07-07)
 
 ### Enhancements

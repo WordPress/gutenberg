@@ -7,6 +7,7 @@ import {
 	disablePrePublishChecks,
 	visitAdminPage,
 	trashAllPosts,
+	activateTheme,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -19,18 +20,17 @@ import {
 } from '../../experimental-features';
 
 describe( 'Template Part', () => {
-	useExperimentalFeatures( [
-		'#gutenberg-full-site-editing',
-		'#gutenberg-full-site-editing-demo',
-	] );
+	useExperimentalFeatures( [ '#gutenberg-full-site-editing' ] );
 
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'twentytwentyone-blocks' );
 	} );
 	afterAll( async () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'twentytwentyone' );
 	} );
 
 	describe( 'Template part block', () => {
@@ -66,7 +66,7 @@ describe( 'Template Part', () => {
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Front page' );
+			await navigationPanel.clickItemByText( 'Front Page' );
 
 			// Verify that the header template part is updated.
 			const [ headerTemplatePart ] = await page.$x(

@@ -276,6 +276,7 @@ $block-inserter-tabs-height: 44px;
 	border-top: $border-width solid $gray-300;
 	padding: $grid-unit-20;
 	flex-shrink: 0;
+	position: relative; // prevents overscroll when block library is open
 }
 
 .block-editor-inserter__manage-reusable-blocks-container {

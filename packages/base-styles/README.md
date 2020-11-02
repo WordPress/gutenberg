@@ -23,6 +23,7 @@ In your application's SCSS file, include styles like so:
 @import "node_modules/@wordpress/base-styles/breakpoints";
 @import "node_modules/@wordpress/base-styles/animations";
 @import "node_modules/@wordpress/base-styles/z-index";
+@import 'node_modules/@wordpress/base-styles/default-custom-properties';
 ```
 
 If you use [Webpack](https://webpack.js.org/) for your SCSS pipeline, you can use `~` to resolve to `node_modules`:

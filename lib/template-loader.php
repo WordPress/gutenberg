@@ -161,18 +161,9 @@ function create_auto_draft_for_template_part_block( $block ) {
 			} else {
 				// Template part is not customized, get it from a file and make an auto-draft for it, unless one already exists
 				// and the underlying file hasn't changed.
-				$template_part_file_path =
-				get_stylesheet_directory() . '/block-template-parts/' . $block['attrs']['slug'] . '.html';
+				$template_part_file_path = get_stylesheet_directory() . '/block-template-parts/' . $block['attrs']['slug'] . '.html';
 				if ( ! file_exists( $template_part_file_path ) ) {
-					if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ) ) {
-						$template_part_file_path =
-							dirname( __FILE__ ) . '/demo-block-template-parts/' . $block['attrs']['slug'] . '.html';
-						if ( ! file_exists( $template_part_file_path ) ) {
-							$template_part_file_path = false;
-						}
-					} else {
-						$template_part_file_path = false;
-					}
+					$template_part_file_path = false;
 				}
 
 				if ( $template_part_file_path ) {
