@@ -28,6 +28,10 @@ function gutenberg_get_template_paths() {
  * Registers block editor 'wp_template' post type.
  */
 function gutenberg_register_template_post_type() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
 	$labels = array(
 		'name'                  => __( 'Templates', 'gutenberg' ),
 		'singular_name'         => __( 'Template', 'gutenberg' ),
@@ -124,6 +128,9 @@ add_filter( 'wp_unique_post_slug', 'gutenberg_filter_wp_template_wp_unique_post_
  * Fixes the label of the 'wp_template' admin menu entry.
  */
 function gutenberg_fix_template_admin_menu_entry() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
 	global $submenu;
 	if ( ! isset( $submenu['themes.php'] ) ) {
 		return;

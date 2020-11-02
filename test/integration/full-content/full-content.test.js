@@ -65,14 +65,11 @@ describe( 'full post content fixture', () => {
 			} )
 		);
 		unstable__bootstrapServerSideBlockDefinitions( blockDefinitions );
-		const settings = {
-			__experimentalEnableFullSiteEditing: true,
-		};
 		// Load all hooks that modify blocks
 		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		if ( process.env.GUTENBERG_PHASE === 2 ) {
-			__experimentalRegisterExperimentalCoreBlocks( settings );
+			__experimentalRegisterExperimentalCoreBlocks( true );
 		}
 	} );
 

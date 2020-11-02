@@ -23,5 +23,10 @@ export async function activateTheme( slug ) {
 	}
 	const activateButton = await themeCard.$( '.button.activate' );
 	await activateButton.click();
+	await page.waitForFunction(
+		() =>
+			document.body &&
+			document.body.innerText.includes( 'New theme activated' )
+	);
 	await switchUserToTest();
 }
