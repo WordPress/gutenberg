@@ -10,17 +10,18 @@ import { doAction } from './';
  *
  * Adds the hook to the appropriate hooks container.
  *
- * @param {string}   hookName  Name of hook to add
- * @param {string}   namespace The unique namespace identifying the callback in the form `vendor/plugin/function`.
+ * @param {string}               hookName  Name of hook to add
+ * @param {string}               namespace The unique namespace identifying the callback in the form `vendor/plugin/function`.
  * @param {import('.').Callback} callback  Function to call when the hook is run
- * @param {?number}  priority  Priority of this hook (default=10)
+ * @param {?number}              priority  Priority of this hook (default=10)
  */
 
 /**
  * Returns a function which, when invoked, will add a hook.
  *
  * @param  {import('.').Hooks} hooks Stored hooks, keyed by hook name.
- * @return {AddHook}                 Function that adds a new hook.
+ *
+ * @return {AddHook} Function that adds a new hook.
  */
 function createAddHook( hooks ) {
 	return function addHook( hookName, namespace, callback, priority = 10 ) {

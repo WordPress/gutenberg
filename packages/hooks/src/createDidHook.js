@@ -10,16 +10,16 @@ import validateHookName from './validateHookName.js';
  *
  * @param  {string} hookName The hook name to check.
  *
- * @return {number|undefined}          The number of times the hook has run.
+ * @return {number|undefined} The number of times the hook has run.
  */
 
 /**
  * Returns a function which, when invoked, will return the number of times a
  * hook has been called.
  *
- * @param  {import('.').Hooks}   hooks Stored hooks, keyed by hook name.
+ * @param  {import('.').Hooks} hooks Stored hooks, keyed by hook name.
  *
- * @return {DidHook}       Function that returns a hook's call count.
+ * @return {DidHook} Function that returns a hook's call count.
  */
 function createDidHook( hooks ) {
 	return function didHook( hookName ) {

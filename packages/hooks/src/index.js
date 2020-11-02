@@ -15,14 +15,16 @@ import createHooks from './createHooks';
 /**
  * @typedef Hook
  * @property {Handler[]} handlers Array of handlers
- * @property {number} runs Run counter
+ * @property {number}    runs     Run counter
  *
  */
+
 /**
  * @typedef Current
- * @property {string} name Hook name
+ * @property {string} name         Hook name
  * @property {number} currentIndex The index
  */
+
 /**
  * @typedef {Record<string, Hook> & {__current: Current[]}} Hooks
  */

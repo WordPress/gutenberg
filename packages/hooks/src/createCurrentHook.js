@@ -3,9 +3,9 @@
  * currently running hook, or `null` if no hook of the given type is currently
  * running.
  *
- * @param  {import('.').Hooks}   hooks          Stored hooks, keyed by hook name.
+ * @param  {import('.').Hooks} hooks Stored hooks, keyed by hook name.
  *
- * @return {() => string | null}     Function that returns the current hook name or null.
+ * @return {() => string | null} Function that returns the current hook name or null.
  */
 function createCurrentHook( hooks ) {
 	return function currentHook() {

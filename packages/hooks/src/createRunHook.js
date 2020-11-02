@@ -3,11 +3,11 @@
  * registered to a hook of the specified type, optionally returning the final
  * value of the call chain.
  *
- * @param  {import('.').Hooks}   hooks          Stored hooks, keyed by hook name.
- * @param  {?boolean}    returnFirstArg Whether each hook callback is expected to
- *                                   return its first argument.
+ * @param  {import('.').Hooks} hooks                  Stored hooks, keyed by hook name.
+ * @param  {boolean}           [returnFirstArg=false] Whether each hook callback is expected to
+ *                                                    return its first argument.
  *
- * @return {(hookName:string, ...args: unknown[]) => unknown}                Function that runs hook callbacks.
+ * @return {(hookName:string, ...args: unknown[]) => unknown} Function that runs hook callbacks.
  */
 function createRunHook( hooks, returnFirstArg = false ) {
 	return function runHooks( hookName, ...args ) {
