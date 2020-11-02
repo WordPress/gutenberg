@@ -1,7 +1,7 @@
 {
 	"core": "WordPress/WordPress",
 	"plugins": [
-		"."
+		".", "./test-plugins/core-data"
 	],
 	"themes": [ "WordPress/theme-experiments/twentytwentyone-blocks" ],
 	"env": {
