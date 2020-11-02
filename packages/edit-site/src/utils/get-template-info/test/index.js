@@ -2,10 +2,6 @@
  * Internal dependencies
  */
 import getTemplateInfo from '../';
-import {
-	TEMPLATES_DEFAULT_DETAILS,
-	TEMPLATES_DEFAULT_ORDER,
-} from '../constants';
 
 describe( 'get template info', () => {
 	it( 'should return an empty object if no template is passed', () => {
@@ -71,11 +67,5 @@ describe( 'get template info', () => {
 		).toMatchSnapshot();
 
 		expect( getTemplateInfo( {} ) ).toMatchSnapshot();
-	} );
-
-	it( 'should have the same templates in TEMPLATES_DEFAULT_DETAILS and TEMPLATES_DEFAULT_ORDER', () => {
-		expect( Object.keys( TEMPLATES_DEFAULT_DETAILS ).sort() ).toEqual(
-			TEMPLATES_DEFAULT_ORDER.sort()
-		);
 	} );
 } );
