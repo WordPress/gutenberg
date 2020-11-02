@@ -101,14 +101,12 @@ require_once dirname( __FILE__ ) . '/widgets-page.php';
 require dirname( __FILE__ ) . '/compat.php';
 require dirname( __FILE__ ) . '/utils.php';
 
-// Include FSE related files only if the experiment is enabled.
-if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
-	require dirname( __FILE__ ) . '/templates.php';
-	require dirname( __FILE__ ) . '/template-parts.php';
-	require dirname( __FILE__ ) . '/template-loader.php';
-	require dirname( __FILE__ ) . '/edit-site-page.php';
-	require dirname( __FILE__ ) . '/edit-site-export.php';
-}
+require dirname( __FILE__ ) . '/full-site-editing.php';
+require dirname( __FILE__ ) . '/templates.php';
+require dirname( __FILE__ ) . '/template-parts.php';
+require dirname( __FILE__ ) . '/template-loader.php';
+require dirname( __FILE__ ) . '/edit-site-page.php';
+require dirname( __FILE__ ) . '/edit-site-export.php';
 
 require dirname( __FILE__ ) . '/block-patterns.php';
 require dirname( __FILE__ ) . '/blocks.php';
