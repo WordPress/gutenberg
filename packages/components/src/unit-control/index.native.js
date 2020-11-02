@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { Platform, Text, View, TouchableWithoutFeedback } from 'react-native';
-import Menu, { MenuItem } from 'react-native-material-menu';
+import { Text, View, TouchableWithoutFeedback } from 'react-native';
 /**
  * Internal dependencies
  */
@@ -16,8 +15,6 @@ import { CSS_UNITS } from './utils';
  */
 import { useRef } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
-
-const isIOS = Platform.OS === 'ios';
 
 function UnitControl( {
 	currentInput,
@@ -36,20 +33,14 @@ function UnitControl( {
 	...props
 } ) {
 	const pickerRef = useRef();
-	const menuRef = useRef();
 
 	function onPickerSelect( selectedOption ) {
 		onUnitChange( selectedOption );
-		if ( menuRef?.current && ! isIOS ) {
-			menuRef.current.hide();
-		}
 	}
 
 	function onPickerPresent() {
-		if ( pickerRef?.current && isIOS ) {
+		if ( pickerRef?.current ) {
 			pickerRef.current.presentPicker();
-		} else if ( menuRef?.current && ! isIOS ) {
-			menuRef.current.show();
 		}
 	}
 
@@ -74,38 +65,16 @@ function UnitControl( {
 	};
 
 	const renderUnitPicker = () => {
-		if ( isIOS ) {
-			return (
-				<>
-					{ renderUnitButton() }
-					<Picker
-						ref={ pickerRef }
-						options={ units }
-						onChange={ onPickerSelect }
-						hideCancelButton={ false }
-						leftAlign={ true }
-					/>
-				</>
-			);
-		}
 		return (
 			<View style={ styles.unitMenu }>
-				<Menu ref={ menuRef } button={ renderUnitButton() }>
-					<View>
-						{ units.map( ( unitItem ) => {
-							return (
-								<MenuItem
-									key={ unit.label }
-									onPress={ () =>
-										onPickerSelect( unitItem.value )
-									}
-								>
-									<Text>{ unitItem.label }</Text>
-								</MenuItem>
-							);
-						} ) }
-					</View>
-				</Menu>
+				{ renderUnitButton() }
+				<Picker
+					ref={ pickerRef }
+					options={ units }
+					onChange={ onPickerSelect }
+					hideCancelButton
+					leftAlign={ true }
+				/>
 			</View>
 		);
 	};

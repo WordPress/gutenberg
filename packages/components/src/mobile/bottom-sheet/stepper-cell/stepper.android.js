@@ -51,12 +51,12 @@ function Stepper( {
 			>
 				<Icon
 					icon={ chevronDown }
-					size={ 18 }
+					size={ 24 }
 					color={ buttonIconStyle.color }
 				/>
 			</TouchableOpacity>
 			{ ! shouldDisplayTextInput && (
-				<Text style={ valueStyle }>{ value }</Text>
+				<Text style={ [ valueStyle, styles.spacings ] }>{ value }</Text>
 			) }
 			{ children }
 			<TouchableOpacity
@@ -70,7 +70,7 @@ function Stepper( {
 			>
 				<Icon
 					icon={ chevronUp }
-					size={ 18 }
+					size={ 24 }
 					color={ buttonIconStyle.color }
 				/>
 			</TouchableOpacity>

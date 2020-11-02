@@ -61,7 +61,6 @@
 	width: 32px;
 	height: 32px;
 	color: #87a6bc;
-	margin-left: 12px;
 	align-items: center;
 	justify-content: center;
 }
@@ -78,7 +77,11 @@
 .value {
 	color: #2e4453;
 	font-size: 16px;
+}
+
+.spacings {
 	margin-left: 12px;
+	margin-right: 12px;
 }
 
 .valueTextDark {

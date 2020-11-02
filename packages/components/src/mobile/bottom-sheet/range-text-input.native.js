@@ -8,6 +8,8 @@ import {
 	PixelRatio,
 	AppState,
 	Platform,
+	Text,
+	TouchableWithoutFeedback,
 } from 'react-native';
 
 /**
@@ -70,6 +72,10 @@ class RangeTextInput extends Component {
 		if ( prevState.hasFocus !== hasFocus ) {
 			const validValue = this.validateInput( inputValue );
 			this.setState( { inputValue: validValue } );
+		}
+
+		if ( ! prevState.hasFocus && hasFocus ) {
+			this._valueTextInput.focus();
 		}
 	}
 
@@ -185,26 +191,48 @@ class RangeTextInput extends Component {
 			hasFocus && borderStyles.isSelected,
 		];
 
+		const valueFinalStyle = [
+			! isIOS ? inputBorderStyles : verticalBorderStyle,
+			{
+				width: 40 * fontScale,
+			},
+		];
+
 		return (
-			<View style={ [ styles.rowContainer, isIOS && inputBorderStyles ] }>
-				<TextInput
+			<TouchableWithoutFeedback onPress={ this.onInputFocus }>
+				<View
 					style={ [
-						! isIOS ? inputBorderStyles : verticalBorderStyle,
-						{
-							width: 40 * fontScale,
-						},
+						styles.textInputContainer,
+						isIOS && inputBorderStyles,
 					] }
-					onChangeText={ this.onChangeText }
-					onSubmitEditing={ this.onSubmitEditing }
-					onFocus={ this.onInputFocus }
-					onBlur={ this.onInputBlur }
-					keyboardType="numeric"
-					returnKeyType="done"
-					defaultValue={ `${ inputValue }` }
-					value={ inputValue }
-				/>
-				{ children }
-			</View>
+				>
+					{ isIOS || hasFocus ? (
+						<TextInput
+							ref={ ( c ) => ( this._valueTextInput = c ) }
+							style={ valueFinalStyle }
+							onChangeText={ this.onChangeText }
+							onSubmitEditing={ this.onSubmitEditing }
+							onFocus={ this.onInputFocus }
+							onBlur={ this.onInputBlur }
+							keyboardType="numeric"
+							returnKeyType="done"
+							numberOfLines={ 1 }
+							defaultValue={ `${ inputValue }` }
+							value={ inputValue }
+							pointerEvents={ hasFocus ? 'auto' : 'none' }
+						/>
+					) : (
+						<Text
+							style={ valueFinalStyle }
+							numberOfLines={ 1 }
+							ellipsizeMode="clip"
+						>
+							{ inputValue }
+						</Text>
+					) }
+					{ children }
+				</View>
+			</TouchableWithoutFeedback>
 		);
 	}
 }
