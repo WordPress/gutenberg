@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { syncSelect } from '@wordpress/data-controls';
+import { controls } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -26,7 +26,7 @@ describe( 'editEntityRecord', () => {
 			{}
 		);
 		expect( fulfillment.next().value ).toEqual(
-			syncSelect( 'core', 'getEntity', entity.kind, entity.name )
+			controls.select( 'core', 'getEntity', entity.kind, entity.name )
 		);
 		// Don't pass back an entity config.
 		expect( fulfillment.next.bind( fulfillment ) ).toThrow(

@@ -12,24 +12,27 @@ import { useExperimentalFeatures } from '../../experimental-features';
 /**
  * WordPress dependencies
  */
-import { trashAllPosts, visitAdminPage } from '@wordpress/e2e-test-utils';
+import {
+	trashAllPosts,
+	visitAdminPage,
+	activateTheme,
+} from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 jest.setTimeout( 1000000 );
 
 describe( 'Site Editor Performance', () => {
-	useExperimentalFeatures( [
-		'#gutenberg-full-site-editing',
-		'#gutenberg-full-site-editing-demo',
-	] );
+	useExperimentalFeatures( [ '#gutenberg-full-site-editing' ] );
 
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'twentytwentyone-blocks' );
 	} );
 	afterAll( async () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'twentytwentyone' );
 	} );
 
 	it( 'Loading', async () => {
@@ -52,7 +55,7 @@ describe( 'Site Editor Performance', () => {
 		while ( i-- ) {
 			const startTime = new Date();
 			await page.reload();
-			await page.waitForSelector( '.wp-block' );
+			await page.waitForSelector( '.wp-block', { timeout: 120000 } );
 			results.load.push( new Date() - startTime );
 		}
 

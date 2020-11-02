@@ -3,6 +3,10 @@
 	margin: 0 0 1.75em 0;
 	padding-left: 1em;
 
+	.is-dark-theme & {
+		border-left: 0.25em solid $light-gray-placeholder;
+	}
+
 	cite,
 	footer,
 	&__citation {
@@ -11,6 +15,10 @@
 		margin-top: 1em;
 		position: relative;
 		font-style: normal;
+
+		.is-dark-theme & {
+			color: $light-gray-placeholder;
+		}
 	}
 
 	&.has-text-align-right {

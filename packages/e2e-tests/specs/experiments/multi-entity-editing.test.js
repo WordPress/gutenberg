@@ -12,6 +12,7 @@ import {
 	createNewPost,
 	publishPost,
 	trashAllPosts,
+	activateTheme,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -28,10 +29,6 @@ const visitSiteEditor = async () => {
 		page: 'gutenberg-edit-site',
 	} ).slice( 1 );
 	await visitAdminPage( 'admin.php', query );
-	// Waits for the template part to load...
-	await page.waitForSelector(
-		'.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
-	);
 };
 
 const clickTemplateItem = async ( menus, itemName ) => {
@@ -152,14 +149,16 @@ describe( 'Multi-entity editor states', () => {
 	const templatePartName = 'Test Template Part Name Edit';
 	const nestedTPName = 'Test Nested Template Part Name Edit';
 
-	useExperimentalFeatures( [
-		'#gutenberg-full-site-editing',
-		'#gutenberg-full-site-editing-demo',
-	] );
+	useExperimentalFeatures( [ '#gutenberg-full-site-editing' ] );
 
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'twentytwentyone-blocks' );
+	} );
+
+	afterAll( async () => {
+		await activateTheme( 'twentytwentyone' );
 	} );
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
@@ -168,6 +167,7 @@ describe( 'Multi-entity editor states', () => {
 	} );
 
 	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
+		await visitSiteEditor();
 		await clickTemplateItem( 'Template Parts', 'header' );
 
 		// Wait for blocks to load.
@@ -176,7 +176,7 @@ describe( 'Multi-entity editor states', () => {
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
 
 		// Switch back and make sure it is still clean.
-		await clickTemplateItem( 'Templates', 'Front page' );
+		await clickTemplateItem( 'Templates', templateName );
 		await page.waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
@@ -205,6 +205,10 @@ describe( 'Multi-entity editor states', () => {
 			);
 			await saveAllEntities();
 			await visitSiteEditor();
+			// Waits for the template part to load...
+			await page.waitForSelector(
+				'.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
+			);
 			removeErrorMocks();
 		} );
 

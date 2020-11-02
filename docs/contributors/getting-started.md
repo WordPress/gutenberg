@@ -30,11 +30,11 @@ If you do not have a local WordPress environment setup, follow the steps in the 
 
 ### Using wp-env to Install a Local Environment
 
-The [wp-env package](/packages/env/README.md) was developed with the Gutneberg project as a quick way to create a standard WordPress environment using Docker. It is also published as the `@wordpress/env` npm package.
+The [wp-env package](/packages/env/README.md) was developed with the Gutenberg project as a quick way to create a standard WordPress environment using Docker. It is also published as the `@wordpress/env` npm package.
 
-By default, `wp-env` can run in a plugin direcotry to create and run a WordPress enviornment, mounting and activating the plugin automatically. You can also configure `wp-env` to use existing installs, multiple plugins, or themes. See the [wp-env package](/packages/env/README.md#wp-envjson) for complete documentation.
+By default, `wp-env` can run in a plugin directory to create and run a WordPress enviornment, mounting and activating the plugin automatically. You can also configure `wp-env` to use existing installs, multiple plugins, or themes. See the [wp-env package](/packages/env/README.md#wp-envjson) for complete documentation.
 
-If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`. See the [Developement Environment tutorial for additional details](/docs/designers-developers/developers/tutorials/devenv/readme.md).
+If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`. See the [Development Environment tutorial for additional details](/docs/designers-developers/developers/tutorials/devenv/readme.md).
 
 Once Docker is installed and running: To install WordPress, run the following from within the cloned gutenberg directory:
 
@@ -120,10 +120,7 @@ If so, you need to instruct Apache to allow following such links:
 
 Tools like MAMP tend to configure MySQL to use ports other than the default 3306, often preferring 8889. This may throw off WP-CLI, which will fail after trying to connect to the database. To remedy this, edit `wp-config.php` and change the `DB_HOST` constant from `define( 'DB_HOST', 'localhost' )` to `define( 'DB_HOST', '127.0.0.1:8889' )`.
 
-## On A Remote Server
-=======
 ### On A Remote Server
->>>>>>> Docs: Refresh Getting Started guide
 
 You can use a remote server in development by building locally and then uploading the built files as a plugin to the remote server.
 

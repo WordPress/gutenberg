@@ -3,7 +3,7 @@
 	"name": "core/heading",
 	"category": "text",
 	"attributes": {
-		"align": {
+		"textAlign": {
 			"type": "string"
 		},
 		"content": {
@@ -21,7 +21,7 @@
 		}
 	},
 	"supports": {
-		"align": [ "full", "wide" ],
+		"align": [ "wide", "full" ],
 		"anchor": true,
 		"className": false,
 		"color": {

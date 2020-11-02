@@ -415,6 +415,7 @@ function RichTextWrapper(
 					HTML: filePasteHandler( files ),
 					mode: 'BLOCKS',
 					tagName,
+					preserveWhiteSpace,
 				} );
 
 				// Allows us to ask for this information when we get a report.
@@ -457,6 +458,7 @@ function RichTextWrapper(
 				plainText,
 				mode,
 				tagName,
+				preserveWhiteSpace,
 			} );
 
 			if ( typeof content === 'string' ) {
@@ -500,6 +502,7 @@ function RichTextWrapper(
 			splitValue,
 			__unstableEmbedURLOnPaste,
 			multiline,
+			preserveWhiteSpace,
 		]
 	);
 

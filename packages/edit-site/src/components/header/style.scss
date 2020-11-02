@@ -5,7 +5,11 @@
 	height: $header-height;
 	box-sizing: border-box;
 	width: 100%;
-	padding-left: $header-height;
+
+	padding-left: 60px;
+	transition: padding-left 20ms linear;
+	transition-delay: 80ms;
+	@include reduce-motion("transition");
 
 	.edit-site-header_start,
 	.edit-site-header_end {
@@ -43,6 +47,8 @@
 body.is-navigation-sidebar-open {
 	.edit-site-header {
 		padding-left: 0;
+		transition: padding-left 20ms linear;
+		transition-delay: 0ms;
 
 		.edit-site-header_start {
 			flex-basis: $header-toolbar-min-width;

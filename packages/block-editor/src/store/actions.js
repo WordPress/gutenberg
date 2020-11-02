@@ -861,7 +861,7 @@ export function __unstableSaveReusableBlock( id, updatedId ) {
 }
 
 /**
- * Returns an action object used in signalling that the last block change should be marked explicitely as persistent.
+ * Returns an action object used in signalling that the last block change should be marked explicitly as persistent.
  *
  * @return {Object} Action object.
  */

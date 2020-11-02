@@ -1,20 +1,26 @@
 /**
  * WordPress dependencies
  */
-import { FontSizePicker, LineHeightControl } from '@wordpress/block-editor';
-import { PanelBody } from '@wordpress/components';
+import { LineHeightControl } from '@wordpress/block-editor';
+import { PanelBody, FontSizePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { fromPx, toPx } from '../editor/utils';
+import { useEditorFeature } from '../editor/utils';
 
-export default ( {
+export default function TypographyPanel( {
 	context: { supports, name },
 	getStyleProperty,
 	setStyleProperty,
-} ) => {
+} ) {
+	const fontSizes = useEditorFeature( 'typography.fontSizes', name );
+	const disableCustomFontSizes = ! useEditorFeature(
+		'typography.customFontSize',
+		name
+	);
+
 	if (
 		! supports.includes( 'fontSize' ) &&
 		! supports.includes( 'lineHeight' )
@@ -26,10 +32,12 @@ export default ( {
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
 			{ supports.includes( 'fontSize' ) && (
 				<FontSizePicker
-					value={ fromPx( getStyleProperty( name, 'fontSize' ) ) }
+					value={ getStyleProperty( name, 'fontSize' ) }
 					onChange={ ( value ) =>
-						setStyleProperty( name, 'fontSize', toPx( value ) )
+						setStyleProperty( name, 'fontSize', value )
 					}
+					fontSizes={ fontSizes }
+					disableCustomFontSizes={ disableCustomFontSizes }
 				/>
 			) }
 			{ supports.includes( 'lineHeight' ) && (
@@ -42,4 +50,4 @@ export default ( {
 			) }
 		</PanelBody>
 	);
-};
+}

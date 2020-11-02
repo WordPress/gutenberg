@@ -28,7 +28,6 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} __experimentalCanUserUseUnfilteredHTML Whether the user should be able to use unfiltered HTML or the HTML should be filtered e.g., to remove elements considered insecure like iframes.
  * @property {boolean} __experimentalBlockDirectory Whether the user has enabled the Block Directory
  * @property {boolean} __experimentalEnableFullSiteEditing Whether the user has enabled Full Site Editing
- * @property {boolean} __experimentalEnableFullSiteEditingDemo Whether the user has enabled Full Site Editing Demo Templates
  * @property {Array} __experimentalBlockPatterns Array of objects representing the block patterns
  * @property {Array} __experimentalBlockPatternCategories Array of objects representing the block pattern categories
  */
@@ -151,7 +150,6 @@ export const SETTINGS_DEFAULTS = {
 	__experimentalCanUserUseUnfilteredHTML: false,
 	__experimentalBlockDirectory: false,
 	__experimentalEnableFullSiteEditing: false,
-	__experimentalEnableFullSiteEditingDemo: false,
 	__mobileEnablePageTemplates: false,
 	__experimentalBlockPatterns: [],
 	__experimentalBlockPatternCategories: [],

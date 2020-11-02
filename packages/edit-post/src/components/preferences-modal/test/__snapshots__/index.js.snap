@@ -18,11 +18,6 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
       help="Places the most frequent blocks in the block library."
       label="Show most used blocks"
     />
-    <WithSelect(WithDispatch(BaseOption))
-      featureName="showIconLabels"
-      help="Shows text instead of icons in toolbar."
-      label="Display button labels"
-    />
   </Section>
   <Section
     title="Keyboard"
@@ -30,17 +25,12 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
     <WithSelect(WithDispatch(BaseOption))
       featureName="keepCaretInsideBlock"
       help="Aids screen readers by stopping text caret from leaving blocks."
-      label="Contain text cursor inside block."
+      label="Contain text cursor inside block"
     />
   </Section>
   <Section
     title="Appearance"
   >
-    <WithSelect(WithDispatch(BaseOption))
-      featureName="themeStyles"
-      help="Make the editor look like your theme."
-      label="Use theme styles"
-    />
     <WithSelect(WithDispatch(BaseOption))
       featureName="reducedUI"
       help="Compacts options and outlines in the toolbar."
@@ -50,6 +40,16 @@ exports[`PreferencesModal should match snapshot when the modal is active 1`] = `
       featureName="focusMode"
       help="Highlights the current block and fades other content."
       label="Spotlight mode"
+    />
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="showIconLabels"
+      help="Shows text instead of icons in toolbar."
+      label="Display button labels"
+    />
+    <WithSelect(WithDispatch(BaseOption))
+      featureName="themeStyles"
+      help="Make the editor look like your theme."
+      label="Use theme styles"
     />
   </Section>
   <Section

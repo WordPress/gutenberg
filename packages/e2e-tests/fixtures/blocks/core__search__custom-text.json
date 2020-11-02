@@ -4,12 +4,12 @@
         "name": "core/search",
         "isValid": true,
         "attributes": {
-            "buttonPosition": "button-outside",
             "label": "Custom label",
+            "showLabel": true,
             "placeholder": "Custom placeholder",
             "buttonText": "Custom button text",
-            "buttonUseIcon": false,
-            "showLabel": true
+            "buttonPosition": "button-outside",
+            "buttonUseIcon": false
         },
         "innerBlocks": [],
         "originalContent": ""
