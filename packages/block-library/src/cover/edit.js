@@ -86,30 +86,10 @@ function retrieveFastAverageColor() {
 function CoverHeightInput( {
 	onChange,
 	onUnitChange,
-	onFullHeightChange,
 	unit = 'px',
 	value = '',
-	fullHeightAlignment,
 } ) {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
-	const [ prevValue, setPrevValue ] = useState( value );
-	const [ prevUnit, setPrevUnit ] = useState( unit );
-
-	useEffect( () => {
-		if ( fullHeightAlignment ) {
-			// Store values to be able to return to them.
-			setPrevValue( value );
-			setPrevUnit( unit );
-
-			onChange( 100 );
-			onUnitChange( 'vh' );
-			return;
-		}
-
-		// Return previos values.
-		onChange( prevValue );
-		onUnitChange( prevUnit );
-	}, [ fullHeightAlignment ] );
 
 	const instanceId = useInstanceId( UnitControl );
 	const inputId = `block-cover-height-input-${ instanceId }`;
@@ -142,33 +122,21 @@ function CoverHeightInput( {
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
 	return (
-		<Fragment>
-			<BaseControl
-				label={ __( 'Minimum height of cover' ) }
+		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
+			<UnitControl
 				id={ inputId }
-			>
-				<UnitControl
-					id={ inputId }
-					isResetValueOnUnitChange
-					min={ min }
-					onBlur={ handleOnBlur }
-					onChange={ handleOnChange }
-					onUnitChange={ onUnitChange }
-					step="1"
-					style={ { maxWidth: 80 } }
-					unit={ unit }
-					units={ CSS_UNITS }
-					value={ inputValue }
-					disabled={ fullHeightAlignment }
-				/>
-			</BaseControl>
-
-			<ToggleControl
-				label={ __( 'Full Screen Height' ) }
-				checked={ fullHeightAlignment }
-				onChange={ onFullHeightChange }
+				isResetValueOnUnitChange
+				min={ min }
+				onBlur={ handleOnBlur }
+				onChange={ handleOnChange }
+				onUnitChange={ onUnitChange }
+				step="1"
+				style={ { maxWidth: 80 } }
+				unit={ unit }
+				units={ CSS_UNITS }
+				value={ inputValue }
 			/>
-		</Fragment>
+		</BaseControl>
 	);
 }
 
@@ -289,7 +257,6 @@ function CoverEdit( {
 		minHeightUnit,
 		style: styleAttribute,
 		url,
-		fullHeightAlignment,
 	} = attributes;
 	const {
 		gradientClass,
@@ -298,6 +265,37 @@ function CoverEdit( {
 	} = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes );
 	const isBlogUrl = isBlobURL( url );
+
+	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
+	const [ prevMinHeightUnit, setPrevMinHeightUnit ] = useState(
+		minHeightUnit
+	);
+	const isMinFullHeight = minHeightUnit === 'vh' && minHeight === 100;
+
+	// Remember previos values of height,
+	// to be able to implement Full Height toggle.
+	useEffect( () => {
+		if ( isMinFullHeight ) {
+			return;
+		}
+
+		setPrevMinHeightValue( minHeight );
+		setPrevMinHeightUnit( minHeightUnit );
+	}, [ isMinFullHeight, minHeight, minHeightUnit ] );
+
+	const toggleMinFullHeight = () => {
+		if ( isMinFullHeight ) {
+			return setAttributes( {
+				minHeight: prevMinHeightValue,
+				minHeightUnit: prevMinHeightUnit,
+			} );
+		}
+
+		return setAttributes( {
+			minHeight: 100,
+			minHeightUnit: 'vh',
+		} );
+	};
 
 	const toggleParallax = () => {
 		setAttributes( {
@@ -334,7 +332,6 @@ function CoverEdit( {
 		...( isImageBackground ? backgroundImageStyles( url ) : {} ),
 		backgroundColor: overlayColor.color,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
-		[ fullHeightAlignment ? 'height' : null ]: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
 	if ( gradientValue && ! url ) {
@@ -359,10 +356,8 @@ function CoverEdit( {
 		<>
 			<BlockControls>
 				<FullHeightAlignment
-					isActive={ fullHeightAlignment }
-					onToggle={ ( active ) =>
-						setAttributes( { fullHeightAlignment: active } )
-					}
+					isActive={ isMinFullHeight }
+					onToggle={ toggleMinFullHeight }
 				/>
 				{ hasBackground && (
 					<>
@@ -444,18 +439,12 @@ function CoverEdit( {
 							<CoverHeightInput
 								value={ temporaryMinHeight || minHeight }
 								unit={ minHeightUnit }
-								fullHeightAlignment={ fullHeightAlignment }
 								onChange={ ( newMinHeight ) =>
 									setAttributes( { minHeight: newMinHeight } )
 								}
 								onUnitChange={ ( nextUnit ) =>
 									setAttributes( {
 										minHeightUnit: nextUnit,
-									} )
-								}
-								onFullHeightChange={ ( nextFullHeightMode ) =>
-									setAttributes( {
-										fullHeightAlignment: nextFullHeightMode,
 									} )
 								}
 							/>

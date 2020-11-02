@@ -40,9 +40,6 @@
 		"minHeightUnit": {
 			"type": "string"
 		},
-		"fullHeightAlignment": {
-			"type": "boolean"
-		},
 		"gradient": {
 			"type": "string"
 		},
