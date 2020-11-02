@@ -27,7 +27,7 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './editor.scss';
 import ColumnsPreview from './column-preview';
-import { getWidths, CSS_UNITS } from '../columns/utils';
+import { getWidths, getWidthWithUnit, CSS_UNITS } from '../columns/utils';
 
 function ColumnEdit( {
 	attributes,
@@ -61,10 +61,10 @@ function ColumnEdit( {
 	}, [] );
 
 	const onChangeWidth = ( nextWidth ) => {
-		nextWidth = 0 > parseFloat( nextWidth ) ? '0' : nextWidth;
+		const widthWithUnit = getWidthWithUnit( nextWidth, widthUnit );
 
 		setAttributes( {
-			width: `${ nextWidth }${ widthUnit }`,
+			width: widthWithUnit,
 		} );
 	};
 
@@ -73,10 +73,9 @@ function ColumnEdit( {
 		const tempWidth = parseFloat(
 			width || getWidths( columns )[ selectedColumnIndex ]
 		);
+
 		setAttributes( {
-			width: `${
-				nextUnit === '%' ? Math.min( tempWidth, 100 ) : tempWidth
-			}${ nextUnit }`,
+			width: getWidthWithUnit( tempWidth, nextUnit ),
 		} );
 	};
 

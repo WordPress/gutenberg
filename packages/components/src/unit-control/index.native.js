@@ -34,10 +34,6 @@ function UnitControl( {
 } ) {
 	const pickerRef = useRef();
 
-	function onPickerSelect( selectedOption ) {
-		onUnitChange( selectedOption );
-	}
-
 	function onPickerPresent() {
 		if ( pickerRef?.current ) {
 			pickerRef.current.presentPicker();
@@ -71,9 +67,9 @@ function UnitControl( {
 				<Picker
 					ref={ pickerRef }
 					options={ units }
-					onChange={ onPickerSelect }
+					onChange={ onUnitChange }
 					hideCancelButton
-					leftAlign={ true }
+					leftAlign
 				/>
 			</View>
 		);
@@ -90,7 +86,7 @@ function UnitControl( {
 					separatorType={ separatorType }
 					value={ value }
 					defaultValue={ initialControlValue }
-					shouldDisplayTextInput={ true }
+					shouldDisplayTextInput
 					decimalNum={ unit === 'px' ? 0 : decimalNum }
 					{ ...props }
 				>

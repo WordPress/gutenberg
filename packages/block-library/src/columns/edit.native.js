@@ -38,6 +38,7 @@ import {
 	getRedistributedColumnWidths,
 	toWidthPrecision,
 	getWidths,
+	getWidthWithUnit,
 	CSS_UNITS,
 } from './utils';
 import ColumnsPreview from '../column/column-preview';
@@ -159,19 +160,16 @@ function ColumnsEditContainer( {
 	};
 
 	const onChangeWidth = ( nextWidth, valueUnit, columnId ) => {
-		nextWidth = 0 > parseFloat( nextWidth ) ? '0' : nextWidth;
+		const widthWithUnit = getWidthWithUnit( nextWidth, valueUnit );
 
-		updateInnerColumnWidth( `${ nextWidth }${ valueUnit }`, columnId );
+		updateInnerColumnWidth( widthWithUnit, columnId );
 	};
 
 	const onChangeUnit = ( nextUnit, index, columnId ) => {
 		const tempWidth = parseFloat( getWidths( innerColumns )[ index ] );
-		updateInnerColumnWidth(
-			`${
-				nextUnit === '%' ? Math.min( tempWidth, 100 ) : tempWidth
-			}${ nextUnit }`,
-			columnId
-		);
+		const widthWithUnit = getWidthWithUnit( tempWidth, nextUnit );
+
+		updateInnerColumnWidth( widthWithUnit, columnId );
 	};
 
 	const getColumnsSliders = () => {

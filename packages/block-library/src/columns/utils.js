@@ -130,9 +130,9 @@ export function getMappedColumnWidths( blocks, widths ) {
 /**
  * Returns an array with columns widths values, parsed or no depends on `withParsing` flag.
  *
- * @param {WPBlock[]} blocks          Block objects.
- * @param {?boolean} withParsing Whether value has to be parsed.
- * Defaults to number of blocks passed.
+ * @param {WPBlock[]} blocks			Block objects.
+ * @param {?boolean} withParsing 	Whether value has to be parsed.
+ *
  * @return {Array<number,string>} Column widths.
  */
 export function getWidths( blocks, withParsing = true ) {
@@ -142,6 +142,24 @@ export function getWidths( blocks, withParsing = true ) {
 
 		return withParsing ? parseFloat( innerColumnWidth ) : innerColumnWidth;
 	} );
+}
+
+/**
+ * Returns a column width with unit.
+ *
+ * @param {string} width	Column width.
+ * @param {string} unit 	Column width unit.
+ *
+ * @return {string} Column width with unit.
+ */
+export function getWidthWithUnit( width, unit ) {
+	width = 0 > parseFloat( width ) ? '0' : width;
+
+	if ( unit === '%' ) {
+		width = Math.min( width, 100 );
+	}
+
+	return `${ width }${ unit }`;
 }
 
 const isWeb = Platform.OS === 'web';
