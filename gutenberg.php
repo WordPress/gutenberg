@@ -14,6 +14,7 @@
  * @package gutenberg
  */
 
+// GitHub Updater filters.
 add_filter(
 	'github_updater_override_dot_org',
 	function ( $overrides ) {
@@ -23,13 +24,15 @@ add_filter(
 		);
 	}
 );
-
 add_filter(
 	'github_updater_number_rollbacks',
 	function () {
 		return 2;
 	}
 );
+add_filter( 'github_updater_no_release_asset_branches', '__return_true' );
+// End GitHub Updater filters.
+
 
 ### BEGIN AUTO-GENERATED DEFINES
 defined( 'GUTENBERG_DEVELOPMENT_MODE' ) or define( 'GUTENBERG_DEVELOPMENT_MODE', true );
