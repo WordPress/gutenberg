@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Clipboard, Platform } from 'react-native';
+import { Platform, Clipboard } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -131,6 +131,13 @@ function LinkSettings( {
 		} );
 	}, [ urlValue ] );
 
+	function onChangeURL( value ) {
+		if ( ! value && onEmptyURL ) {
+			onEmptyURL();
+		}
+		setUrlInputValue( value );
+	}
+
 	function onChangeLabel( value ) {
 		setLabelInputValue( value );
 	}
@@ -166,13 +173,6 @@ function LinkSettings( {
 
 	function onChangeLinkRel( value ) {
 		setLinkRelInputValue( value );
-	}
-
-	function onChangeURL( value ) {
-		if ( ! value && onEmptyURL ) {
-			onEmptyURL();
-		}
-		setUrlInputValue( value );
 	}
 
 	async function getURLFromClipboard() {
