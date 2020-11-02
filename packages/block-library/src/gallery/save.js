@@ -41,6 +41,10 @@ export default function save( { attributes } ) {
 							break;
 					}
 
+					// image.caption comes from a RichText component, so it can contain
+					// HTML that we need to strip. In GB 9.2, image.alt would fall back to
+					// image.caption without stripping the HTML, so we also run it through
+					// __unstableStripHTML here.
 					let alt = image.alt || image.caption;
 
 					if ( alt && alt !== __unstableStripHTML( alt ) ) {
