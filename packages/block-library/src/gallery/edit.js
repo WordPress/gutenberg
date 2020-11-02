@@ -28,7 +28,8 @@ import { createBlock } from '@wordpress/blocks';
  */
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
-import { getNewImageAttributes } from './utils';
+import { getHrefAndDestination, getNewImageAttributes } from './utils';
+import { getUpdatedLinkTargetSettings } from '../image/utils';
 import Gallery from './gallery';
 import {
 	LINK_DESTINATION_ATTACHMENT,
@@ -112,20 +113,41 @@ function GalleryEdit( props ) {
 		'core/block-editor'
 	);
 
+	/**
+	 * Determines the image attributes that should be applied to an image block
+	 * after the gallery updates.
+	 *
+	 * The gallery will receive the full collection of images when a new image
+	 * is added. As a result we need to reapply the image's original settings if
+	 * it already existed in the gallery. If the image is in fact new, we need
+	 * to apply the gallery's current settings to the image.
+	 *
+	 * @param  {Object} existingBlock Existing Image block that still exists after gallery update.
+	 * @param  {Object} image         Media object for the actual image.
+	 * @return {Object}               Attributes to set on the new image block.
+	 */
+	function buildImageAttributes( existingBlock, image ) {
+		if ( existingBlock ) {
+			return existingBlock.attributes;
+		}
+
+		return {
+			...pickRelevantMediaFiles( image, sizeSlug ),
+			...getHrefAndDestination( image, linkTo ),
+			...getUpdatedLinkTargetSettings( linkTarget, attributes ),
+			sizeSlug,
+		};
+	}
+
 	function onSelectImages( newImages ) {
 		const newBlocks = newImages.map( ( image ) => {
 			const existingBlock = find(
 				images,
 				( img ) => img.id === image.id
 			);
-			const newImageAttribs = existingBlock
-				? existingBlock.attributes
-				: {
-						...pickRelevantMediaFiles( image, sizeSlug ),
-						linkDestination: linkTo,
-				  };
+
 			return createBlock( 'core/image', {
-				...newImageAttribs,
+				...buildImageAttributes( existingBlock, image ),
 				id: image.id,
 			} );
 		} );

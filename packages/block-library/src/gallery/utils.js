@@ -11,6 +11,11 @@ import {
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 } from './constants';
+import {
+	LINK_DESTINATION_ATTACHMENT as IMAGE_LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA as IMAGE_LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_NONE as IMAGE_LINK_DESTINATION_NONE,
+} from '../image/constants';
 import { getUpdatedLinkTargetSettings as getLinkTargetSettings } from '../image/utils';
 
 /**
@@ -28,18 +33,18 @@ export function getHrefAndDestination( image, destination ) {
 	switch ( destination ) {
 		case LINK_DESTINATION_MEDIA:
 			return {
-				href: image?.source_url, // eslint-disable-line camelcase
-				linkDestination: 'media',
+				href: image?.source_url || image?.url, // eslint-disable-line camelcase
+				linkDestination: IMAGE_LINK_DESTINATION_MEDIA,
 			};
 		case LINK_DESTINATION_ATTACHMENT:
 			return {
 				href: image?.link,
-				linkDestination: 'attachment',
+				linkDestination: IMAGE_LINK_DESTINATION_ATTACHMENT,
 			};
 		case LINK_DESTINATION_NONE:
 			return {
 				href: undefined,
-				linkDestination: LINK_DESTINATION_NONE,
+				linkDestination: IMAGE_LINK_DESTINATION_NONE,
 			};
 	}
 
