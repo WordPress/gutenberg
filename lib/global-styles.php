@@ -334,6 +334,12 @@ function gutenberg_experimental_global_styles_get_theme_support_settings() {
 			$theme_settings['global']['settings']['typography'] = array();
 		}
 		$theme_settings['global']['settings']['typography']['fontSizes'] = array();
+		// Back-compatibility for presets without units.
+		foreach ( $theme_font_sizes[0] as &$font_size ) {
+			if ( is_numeric( $font_size['size'] ) ) {
+				$font_size['size'] = $font_size['size'] . 'px';
+			}
+		}
 		$theme_settings['global']['settings']['typography']['fontSizes'] = $theme_font_sizes[0];
 	}
 

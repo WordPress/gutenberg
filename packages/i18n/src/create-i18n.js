@@ -22,19 +22,69 @@ const DEFAULT_LOCALE_DATA = {
 	},
 };
 
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @typedef {(data?: LocaleData, domain?: string) => void} SetLocaleData
+ * Merges locale data into the Tannin instance by domain. Accepts data in a
+ * Jed-formatted JSON object shape.
+ *
+ * @see http://messageformat.github.io/Jed/
+ */
+/**
+ * @typedef {(text: string, domain?: string) => string} __
+ *
+ * Retrieve the translation of text.
+ *
+ * @see https://developer.wordpress.org/reference/functions/__/
+ */
+/**
+ * @typedef {(text: string, context: string, domain?: string) => string} _x
+ *
+ * Retrieve translated string with gettext context.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_x/
+ */
+/**
+ * @typedef {(single: string, plural: string, number: number, domain?: string) => string} _n
+ *
+ * Translates and retrieves the singular or plural form based on the supplied
+ * number.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_n/
+ */
+/**
+ * @typedef {(single: string, plural: string, number: number, context: string, domain?: string) => string} _nx
+ *
+ * Translates and retrieves the singular or plural form based on the supplied
+ * number, with gettext context.
+ *
+ * @see https://developer.wordpress.org/reference/functions/_nx/
+ */
+/**
+ * @typedef {() => boolean} IsRtl
+ *
+ * Check if current locale is RTL.
+ *
+ * **RTL (Right To Left)** is a locale property indicating that text is written from right to left.
+ * For example, the `he` locale (for Hebrew) specifies right-to-left. Arabic (ar) is another common
+ * language written RTL. The opposite of RTL, LTR (Left To Right) is used in other languages,
+ * including English (`en`, `en-US`, `en-GB`, etc.), Spanish (`es`), and French (`fr`).
+ */
+/* eslint-enable jsdoc/valid-types */
+
 /**
  * An i18n instance
  *
- * @typedef {Object} I18n
- * @property {Function} setLocaleData Merges locale data into the Tannin instance by domain. Accepts data in a
- *                                    Jed-formatted JSON object shape.
- * @property {Function} __            Retrieve the translation of text.
- * @property {Function} _x            Retrieve translated string with gettext context.
- * @property {Function} _n            Translates and retrieves the singular or plural form based on the supplied
- *                                    number.
- * @property {Function} _nx           Translates and retrieves the singular or plural form based on the supplied
- *                                    number, with gettext context.
- * @property {Function} isRTL         Check if current locale is RTL.
+ * @typedef I18n
+ * @property {SetLocaleData} setLocaleData Merges locale data into the Tannin instance by domain. Accepts data in a
+ *                                         Jed-formatted JSON object shape.
+ * @property {__} __                       Retrieve the translation of text.
+ * @property {_x} _x                       Retrieve translated string with gettext context.
+ * @property {_n} _n                       Translates and retrieves the singular or plural form based on the supplied
+ *                                         number.
+ * @property {_nx} _nx                     Translates and retrieves the singular or plural form based on the supplied
+ *                                         number, with gettext context.
+ * @property {IsRtl} isRTL                 Check if current locale is RTL.
  */
 
 /**
@@ -52,15 +102,7 @@ export const createI18n = ( initialData, initialDomain ) => {
 	 */
 	const tannin = new Tannin( {} );
 
-	/**
-	 * Merges locale data into the Tannin instance by domain. Accepts data in a
-	 * Jed-formatted JSON object shape.
-	 *
-	 * @see http://messageformat.github.io/Jed/
-	 *
-	 * @param {LocaleData} [data]   Locale data configuration.
-	 * @param {string}     [domain] Domain for which configuration applies.
-	 */
+	/** @type {SetLocaleData} */
 	const setLocaleData = ( data, domain = 'default' ) => {
 		tannin.data[ domain ] = {
 			...DEFAULT_LOCALE_DATA,
@@ -105,82 +147,27 @@ export const createI18n = ( initialData, initialDomain ) => {
 		return tannin.dcnpgettext( domain, context, single, plural, number );
 	};
 
-	/**
-	 * Retrieve the translation of text.
-	 *
-	 * @see https://developer.wordpress.org/reference/functions/__/
-	 *
-	 * @param {string} text     Text to translate.
-	 * @param {string} [domain] Domain to retrieve the translated text.
-	 *
-	 * @return {string} Translated text.
-	 */
+	/** @type {__} */
 	const __ = ( text, domain ) => {
 		return dcnpgettext( domain, undefined, text );
 	};
 
-	/**
-	 * Retrieve translated string with gettext context.
-	 *
-	 * @see https://developer.wordpress.org/reference/functions/_x/
-	 *
-	 * @param {string} text     Text to translate.
-	 * @param {string} context  Context information for the translators.
-	 * @param {string} [domain] Domain to retrieve the translated text.
-	 *
-	 * @return {string} Translated context string without pipe.
-	 */
+	/** @type {_x} */
 	const _x = ( text, context, domain ) => {
 		return dcnpgettext( domain, context, text );
 	};
 
-	/**
-	 * Translates and retrieves the singular or plural form based on the supplied
-	 * number.
-	 *
-	 * @see https://developer.wordpress.org/reference/functions/_n/
-	 *
-	 * @param {string} single   The text to be used if the number is singular.
-	 * @param {string} plural   The text to be used if the number is plural.
-	 * @param {number} number   The number to compare against to use either the
-	 *                          singular or plural form.
-	 * @param {string} [domain] Domain to retrieve the translated text.
-	 *
-	 * @return {string} The translated singular or plural form.
-	 */
+	/** @type {_n} */
 	const _n = ( single, plural, number, domain ) => {
 		return dcnpgettext( domain, undefined, single, plural, number );
 	};
 
-	/**
-	 * Translates and retrieves the singular or plural form based on the supplied
-	 * number, with gettext context.
-	 *
-	 * @see https://developer.wordpress.org/reference/functions/_nx/
-	 *
-	 * @param {string} single   The text to be used if the number is singular.
-	 * @param {string} plural   The text to be used if the number is plural.
-	 * @param {number} number   The number to compare against to use either the
-	 *                          singular or plural form.
-	 * @param {string} context  Context information for the translators.
-	 * @param {string} [domain] Domain to retrieve the translated text.
-	 *
-	 * @return {string} The translated singular or plural form.
-	 */
+	/** @type {_nx} */
 	const _nx = ( single, plural, number, context, domain ) => {
 		return dcnpgettext( domain, context, single, plural, number );
 	};
 
-	/**
-	 * Check if current locale is RTL.
-	 *
-	 * **RTL (Right To Left)** is a locale property indicating that text is written from right to left.
-	 * For example, the `he` locale (for Hebrew) specifies right-to-left. Arabic (ar) is another common
-	 * language written RTL. The opposite of RTL, LTR (Left To Right) is used in other languages,
-	 * including English (`en`, `en-US`, `en-GB`, etc.), Spanish (`es`), and French (`fr`).
-	 *
-	 * @return {boolean} Whether locale is RTL.
-	 */
+	/** @type {IsRtl} */
 	const isRTL = () => {
 		return 'rtl' === _x( 'ltr', 'text direction' );
 	};

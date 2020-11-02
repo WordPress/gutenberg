@@ -15,6 +15,11 @@ import {
 } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 
+/**
+ * Internal dependencies
+ */
+import { StyledWrapper } from './styles/disabled-styles';
+
 const { Consumer, Provider } = createContext( false );
 
 /**
@@ -87,13 +92,13 @@ function Disabled( { className, children, ...props } ) {
 
 	return (
 		<Provider value={ true }>
-			<div
+			<StyledWrapper
 				ref={ node }
 				className={ classnames( className, 'components-disabled' ) }
 				{ ...props }
 			>
 				{ children }
-			</div>
+			</StyledWrapper>
 		</Provider>
 	);
 }
