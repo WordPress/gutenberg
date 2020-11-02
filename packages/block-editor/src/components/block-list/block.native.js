@@ -1,13 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	View,
-	Text,
-	TouchableWithoutFeedback,
-	Dimensions,
-	findNodeHandle,
-} from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -42,48 +36,12 @@ class BlockListBlock extends Component {
 		};
 
 		this.anchorNodeRef = createRef();
-		this.blockRef = createRef();
-		this.scrollToBlockIfItsNotVisible = this.scrollToBlockIfItsNotVisible.bind(
-			this
-		);
 	}
 
 	onFocus() {
 		const { firstToSelectId, isSelected, onSelect } = this.props;
 		if ( ! isSelected ) {
 			onSelect( firstToSelectId );
-		}
-	}
-
-	componentDidUpdate() {
-		this.scrollToBlockIfItsNotVisible();
-	}
-
-	scrollToBlockIfItsNotVisible() {
-		const { isSelected } = this.props;
-		if ( isSelected ) {
-			if ( this.blockRef.current ) {
-				this.blockRef.current.measureLayout(
-					findNodeHandle( this.props.listRef.current ),
-					( x, y ) => {
-						this.blockRef.current.measure(
-							( _x, _y, width, height, px, py ) => {
-								const window = Dimensions.get( 'window' );
-
-								const { scrollTo } = this.props;
-
-								if ( py - 100 < 0 ) {
-									scrollTo( y - height );
-								}
-
-								if ( py + height + 100 > window.height ) {
-									scrollTo( y );
-								}
-							}
-						);
-					}
-				);
-			}
 		}
 	}
 
@@ -196,8 +154,6 @@ class BlockListBlock extends Component {
 				accessibilityRole={ 'button' }
 			>
 				<View
-					ref={ this.blockRef }
-					collapsable={ false }
 					style={ { flex: 1 } }
 					accessibilityLabel={ accessibilityLabel }
 				>
