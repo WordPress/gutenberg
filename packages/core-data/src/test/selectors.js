@@ -247,6 +247,19 @@ describe( 'getEntityRecords', () => {
 			{ slug: 'page' },
 		] );
 	} );
+
+	it( 'should return the same instance with the same arguments', () => {
+		const state = deepFreeze( {
+			entities: {
+				data: {},
+			},
+		} );
+
+		const firstRecords = getEntityRecords( state, 'root', 'postType' );
+		const secondRecords = getEntityRecords( state, 'root', 'postType' );
+
+		expect( firstRecords ).toBe( secondRecords );
+	} );
 } );
 
 describe( '__experimentalGetDirtyEntityRecords', () => {
