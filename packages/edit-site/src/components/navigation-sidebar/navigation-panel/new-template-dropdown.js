@@ -20,15 +20,27 @@ import { Icon, plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import getClosestAvailableTemplate from '../../../utils/get-closest-available-template';
-import { TEMPLATES_DEFAULT_DETAILS } from '../../../utils/get-template-info/constants';
+import { TEMPLATES_STATUSES } from './constants';
 
 export default function NewTemplateDropdown() {
-	const templates = useSelect(
-		( select ) =>
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
-				status: [ 'publish', 'auto-draft' ],
-				per_page: -1,
-			} ),
+	const { defaultTemplateTypesDefinitions, templates } = useSelect(
+		( select ) => {
+			const { getDefaultTemplateTypesDefinitions } = select(
+				'core/edit-site'
+			);
+			const templateEntities = select( 'core' ).getEntityRecords(
+				'postType',
+				'wp_template',
+				{
+					status: TEMPLATES_STATUSES,
+					per_page: -1,
+				}
+			);
+			return {
+				defaultTemplateTypesDefinitions: getDefaultTemplateTypesDefinitions(),
+				templates: templateEntities,
+			};
+		},
 		[]
 	);
 	const { addTemplate } = useDispatch( 'core/edit-site' );
@@ -40,16 +52,17 @@ export default function NewTemplateDropdown() {
 		);
 		addTemplate( {
 			content: closestAvailableTemplate.content.raw,
+			excerpt: defaultTemplateTypesDefinitions[ slug ].description,
 			slug,
-			title: slug,
 			status: 'draft',
+			title: defaultTemplateTypesDefinitions[ slug ].title,
 		} );
 	};
 
 	const existingTemplateSlugs = map( templates, 'slug' );
 
 	const missingTemplates = filter(
-		TEMPLATES_DEFAULT_DETAILS,
+		defaultTemplateTypesDefinitions,
 		( template ) => ! includes( existingTemplateSlugs, template.slug )
 	);
 

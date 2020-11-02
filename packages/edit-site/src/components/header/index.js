@@ -70,10 +70,9 @@ export default function Header( { openEntitiesSavedStates } ) {
 	const displayBlockToolbar =
 		! isLargeViewport || deviceType !== 'Desktop' || hasFixedToolbar;
 
-	let { title } = useTemplateInfo( template );
-	if ( 'wp_template_part' === templateType ) {
-		title = templatePart?.slug;
-	}
+	const { title } = useTemplateInfo(
+		templateType === 'wp_template' ? template : templatePart
+	);
 
 	return (
 		<div className="edit-site-header">
