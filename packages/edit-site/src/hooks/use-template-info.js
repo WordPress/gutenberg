@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -26,7 +31,7 @@ export default function useTemplateInfo( template ) {
 	}
 
 	const { title: defaultTitle, description: defaultDescription } =
-		defaultTemplateTypesDefinitions[ template.slug ] || {};
+		find( defaultTemplateTypesDefinitions, { slug: template?.slug } ) || {};
 
 	const title = template?.title?.rendered || defaultTitle || template.slug;
 	const description = template?.excerpt?.raw || defaultDescription;
