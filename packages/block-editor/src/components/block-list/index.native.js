@@ -75,7 +75,6 @@ export class BlockList extends Component {
 		this.getExtraData = this.getExtraData.bind( this );
 		this.setListRef = this.setListRef.bind( this );
 		this.scrollToBlockListItem = this.scrollToBlockListItem.bind( this );
-		this.blockListItemRefs = new Array();
 		this.listRef = createRef();
 	}
 
@@ -83,17 +82,11 @@ export class BlockList extends Component {
 		this.props.insertBlock( newBlock, this.props.blockCount );
 	}
 
-	scrollToBlockListItem( clientId, offset ) {
-		const ref = this.blockListItemRefs.find(
-			( item ) => item.clientId === clientId
-		);
-
-		if ( ref !== undefined ) {
-			this.listRef.current.scrollToOffset( {
-				offset,
-				animated: true,
-			} );
-		}
+	scrollToBlockListItem( offset ) {
+		this.listRef.current.scrollToOffset( {
+			offset,
+			animated: true,
+		} );
 	}
 
 	onCaretVerticalPositionChange( targetId, caretY, previousCaretY ) {
@@ -276,7 +269,7 @@ export class BlockList extends Component {
 		);
 	}
 
-	renderItem( { item: clientId, index } ) {
+	renderItem( { item: clientId } ) {
 		const {
 			contentResizeMode,
 			contentStyle,
@@ -288,24 +281,6 @@ export class BlockList extends Component {
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
-
-		const blockListItemIndex = this.blockListItemRefs.find(
-			( itemRef ) => itemRef.clientId === clientId
-		);
-
-		if ( blockListItemIndex ) {
-			if ( blockListItemIndex.index > 0 && blockListItemIndex >= index ) {
-				this.blockListItemRefs.push( {
-					clientId,
-					index,
-				} );
-			}
-		} else {
-			this.blockListItemRefs.push( {
-				clientId,
-				index,
-			} );
-		}
 
 		return (
 			<BlockListItem

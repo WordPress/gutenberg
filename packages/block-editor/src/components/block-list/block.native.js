@@ -36,9 +36,6 @@ class BlockListBlock extends Component {
 		this.insertBlocksAfter = this.insertBlocksAfter.bind( this );
 		this.onFocus = this.onFocus.bind( this );
 		this.getBlockWidth = this.getBlockWidth.bind( this );
-		this.scrollToBlockListItemIfNotInViewPort = this.scrollToBlockListItemIfNotInViewPort.bind(
-			this
-		);
 
 		this.state = {
 			blockWidth: 0,
@@ -46,7 +43,9 @@ class BlockListBlock extends Component {
 
 		this.anchorNodeRef = createRef();
 		this.blockRef = createRef();
-		this.onFocusScrollToBlock = this.onFocusScrollToBlock.bind( this );
+		this.scrollToBlockIfItsNotVisible = this.scrollToBlockIfItsNotVisible.bind(
+			this
+		);
 	}
 
 	onFocus() {
@@ -57,45 +56,34 @@ class BlockListBlock extends Component {
 	}
 
 	componentDidUpdate() {
-		this.onFocusScrollToBlock();
+		this.scrollToBlockIfItsNotVisible();
 	}
 
-	onFocusScrollToBlock() {
+	scrollToBlockIfItsNotVisible() {
 		const { isSelected } = this.props;
 		if ( isSelected ) {
-			if ( this.blockRef.current !== null ) {
+			if ( this.blockRef.current ) {
 				this.blockRef.current.measureLayout(
 					findNodeHandle( this.props.listRef.current ),
 					( x, y ) => {
 						this.blockRef.current.measure(
 							( _x, _y, width, height, px, py ) => {
-								this.scrollToBlockListItemIfNotInViewPort(
-									x,
-									y,
-									width,
-									height,
-									px,
-									py
-								);
+								const window = Dimensions.get( 'window' );
+
+								const { scrollTo } = this.props;
+
+								if ( py - 100 < 0 ) {
+									scrollTo( y - height );
+								}
+
+								if ( py + height + 100 > window.height ) {
+									scrollTo( y );
+								}
 							}
 						);
 					}
 				);
 			}
-		}
-	}
-
-	scrollToBlockListItemIfNotInViewPort( x, y, width, height, px, py ) {
-		const window = Dimensions.get( 'window' );
-
-		const { scrollTo, clientId } = this.props;
-
-		if ( py - 100 < 0 ) {
-			scrollTo( clientId, y - height );
-		}
-
-		if ( py + height + 100 > window.height ) {
-			scrollTo( clientId, y );
 		}
 	}
 
