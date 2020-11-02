@@ -40,7 +40,6 @@ export default function save( { attributes } ) {
 		url,
 		minHeight: minHeightProp,
 		minHeightUnit,
-		fullHeightAlignment,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -65,10 +64,6 @@ export default function save( { attributes } ) {
 		style.background = customGradient;
 	}
 	style.minHeight = minHeight || undefined;
-
-	if ( fullHeightAlignment ) {
-		style.height = style.minHeight;
-	}
 
 	let positionValue;
 
