@@ -154,8 +154,10 @@ function observeConsoleLogging() {
 		// - https://github.com/WordPress/gutenberg/pull/26527
 		// - https://github.com/WordPress/gutenberg/pull/26535
 		if (
-			text.includes(
-				'Failed to inject axe-core into frame (about:blank)'
+			message.args.some( ( argument ) =>
+				argument?.includes(
+					'Failed to inject axe-core into frame (about:blank)'
+				)
 			)
 		) {
 			return;
