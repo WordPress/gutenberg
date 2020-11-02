@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, findNodeHandle, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, createRef } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import {
@@ -31,6 +31,10 @@ export class BlockListItem extends Component {
 		super( ...arguments );
 
 		this.onLayout = this.onLayout.bind( this );
+		this.blockRef = createRef();
+		this.scrollToBlockIfItsNotVisible = this.scrollToBlockIfItsNotVisible.bind(
+			this
+		);
 
 		this.state = {
 			blockWidth: 0,
@@ -89,6 +93,38 @@ export class BlockListItem extends Component {
 		];
 	}
 
+	componentDidUpdate() {
+		this.scrollToBlockIfItsNotVisible();
+	}
+
+	scrollToBlockIfItsNotVisible() {
+		const { isSelected } = this.props;
+		if ( isSelected ) {
+			if ( this.blockRef.current ) {
+				this.blockRef.current.measureLayout(
+					findNodeHandle( this.props.listRef.current ),
+					( x, y ) => {
+						this.blockRef.current.measure(
+							( _x, _y, width, height, px, py ) => {
+								const window = Dimensions.get( 'window' );
+
+								const { scrollTo } = this.props;
+
+								if ( py - 200 < 0 ) {
+									scrollTo( y - height - 100 );
+								}
+
+								if ( py + height + 200 > window.height ) {
+									scrollTo( y );
+								}
+							}
+						);
+					}
+				);
+			}
+		}
+	}
+
 	render() {
 		const {
 			blockAlignment,
@@ -109,6 +145,7 @@ export class BlockListItem extends Component {
 				style={ readableContentViewStyle }
 			>
 				<View
+					ref={ this.blockRef }
 					style={ this.getContentStyles( readableContentViewStyle ) }
 					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
 					onLayout={ this.onLayout }
