@@ -114,12 +114,19 @@ function GalleryEdit( props ) {
 
 	function onSelectImages( newImages ) {
 		const newBlocks = newImages.map( ( image ) => {
-			const newImageAttribs = pickRelevantMediaFiles( image, sizeSlug );
-
+			const existingBlock = find(
+				images,
+				( img ) => img.id === image.id
+			);
+			const newImageAttribs = existingBlock
+				? existingBlock.attributes
+				: {
+						...pickRelevantMediaFiles( image, sizeSlug ),
+						linkDestination: linkTo,
+				  };
 			return createBlock( 'core/image', {
 				...newImageAttribs,
 				id: image.id,
-				linkDestination: linkTo,
 			} );
 		} );
 
@@ -196,6 +203,7 @@ function GalleryEdit( props ) {
 			return {
 				id: block.attributes.id,
 				url: block.attributes.url,
+				attributes: block.attributes,
 				imageData: getMedia( block.attributes.id ),
 			};
 		} );
