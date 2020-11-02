@@ -22,7 +22,7 @@
 	"module": "build-module/index.js",
 	"sideEffects": false,
 	"dependencies": {
-		"@wp-g2/context": "^0.0.100"
+		"@wordpress/ui.components": "file:../ui.components"
 	},
 	"publishConfig": {
 		"access": "public"

@@ -22,7 +22,7 @@
 	"module": "build-module/index.js",
 	"sideEffects": false,
 	"dependencies": {
-		"@wp-g2/styles": "^0.0.100"
+		"@wp-g2/styles": "^0.0.103"
 	},
 	"publishConfig": {
 		"access": "public"

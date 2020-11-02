@@ -1,2 +1,2 @@
-export * from '@wp-g2/context';
+export * from './ContextSystem';
 export * from './withNextComponent';

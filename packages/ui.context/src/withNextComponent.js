@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { contextConnect, useContextSystem } from '@wp-g2/context';
+import { contextConnect, useContextSystem } from './ContextSystem';
 
 export function withNextComponent(
 	CurrentComponent = () => null,
