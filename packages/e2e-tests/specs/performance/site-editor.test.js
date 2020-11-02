@@ -18,9 +18,9 @@ jest.setTimeout( 1000000 );
 
 describe( 'Site Editor Performance', () => {
 	beforeAll( async () => {
+		await activateTheme( 'twentytwentyone-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
-		await activateTheme( 'twentytwentyone-blocks' );
 	} );
 	afterAll( async () => {
 		await trashAllPosts( 'wp_template' );

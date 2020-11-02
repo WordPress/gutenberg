@@ -56,9 +56,9 @@ describe( 'Multi-entity save flow', () => {
 	};
 
 	beforeAll( async () => {
+		await activateTheme( 'twentytwentyone-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
-		await activateTheme( 'twentytwentyone-blocks' );
 	} );
 
 	afterAll( async () => {
