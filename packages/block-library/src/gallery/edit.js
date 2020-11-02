@@ -9,7 +9,6 @@ import { toString, isEqual, isEmpty, find } from 'lodash';
 import { compose } from '@wordpress/compose';
 import {
 	Button,
-	ButtonGroup,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
@@ -28,7 +27,7 @@ import { createBlock } from '@wordpress/blocks';
  */
 import { sharedIcon } from './shared-icon';
 import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
-import { getHrefAndDestination, getNewImageAttributes } from './utils';
+import { getHrefAndDestination, getImageSizeAttributes } from './utils';
 import { getUpdatedLinkTargetSettings } from '../image/utils';
 import Gallery from './gallery';
 import {
@@ -188,21 +187,24 @@ function GalleryEdit( props ) {
 		setAttributes( { linkTarget: linkTarget ? undefined : '_blank' } );
 	}
 
-	function applyImageOptions( { forceUpdate } ) {
+	function applyImageOptions() {
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
 			const image = block.attributes.id
 				? find( images, { id: block.attributes.id } )
 				: null;
-			const newAttributes = getNewImageAttributes(
-				attributes,
-				block.attributes,
-				image.imageData,
-				forceUpdate
-			);
-			updateBlockAttributes( block.clientId, newAttributes );
+
+			updateBlockAttributes( block.clientId, {
+				...getHrefAndDestination( image.imageData, linkTo ),
+				...getUpdatedLinkTargetSettings( linkTarget, block.attributes ),
+				...getImageSizeAttributes( image.imageData, sizeSlug ),
+			} );
 		} );
 		setDirtyImageOptions( false );
 		setImageSettings( currentImageOptions );
+	}
+
+	function cancelImageOptions() {
+		setAttributes( imageSettings );
 	}
 
 	function updateImagesSize( newSizeSlug ) {
@@ -320,24 +322,18 @@ function GalleryEdit( props ) {
 						/>
 					) }
 					{ dirtyImageOptions && (
-						<ButtonGroup>
-							<Button
-								isSmall
-								onClick={ () =>
-									applyImageOptions( { forceUpdate: true } )
-								}
-							>
+						<div className={ 'gallery-settings-buttons' }>
+							<Button isPrimary onClick={ applyImageOptions }>
 								{ __( 'Apply to all images' ) }
 							</Button>
 							<Button
-								isSmall
-								onClick={ () =>
-									applyImageOptions( { forceUpdate: false } )
-								}
+								className={ 'cancel-apply-to-images' }
+								isLink
+								onClick={ cancelImageOptions }
 							>
-								{ __( 'Apply only as fallback' ) }
+								{ __( 'Cancel' ) }
 							</Button>
-						</ButtonGroup>
+						</div>
 					) }
 				</PanelBody>
 			</InspectorControls>
