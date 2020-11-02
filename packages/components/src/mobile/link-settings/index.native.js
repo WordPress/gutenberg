@@ -1,23 +1,21 @@
 /**
  * External dependencies
  */
-import { Clipboard } from 'react-native';
+import { Clipboard, Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { useEffect, useState, useRef } from '@wordpress/element';
-import { external } from '@wordpress/icons';
+import { useEffect, useState, useRef, useContext } from '@wordpress/element';
+import { link, external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import BottomSheet from '../bottom-sheet';
+import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
 import PanelBody from '../../panel/body';
 import TextControl from '../../text-control';
 import ToggleControl from '../../toggle-control';
@@ -88,6 +86,13 @@ function LinkSettings( {
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );
 	const [ linkRelInputValue, setLinkRelInputValue ] = useState( '' );
 	const prevEditorSidebarOpenedRef = useRef();
+
+	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
+	useEffect( () => {
+		if ( ! onLinkCellPressed ) {
+			onHandleClosingBottomSheet( onCloseSettingsSheet );
+		}
+	}, [ urlInputValue, labelInputValue, linkRelInputValue ] );
 
 	useEffect( () => {
 		prevEditorSidebarOpenedRef.current = editorSidebarOpened;
@@ -163,6 +168,13 @@ function LinkSettings( {
 		setLinkRelInputValue( value );
 	}
 
+	function onChangeURL( value ) {
+		if ( ! value && onEmptyURL ) {
+			onEmptyURL();
+		}
+		setUrlInputValue( value );
+	}
+
 	async function getURLFromClipboard() {
 		const clipboardText = await Clipboard.getString();
 
@@ -180,13 +192,30 @@ function LinkSettings( {
 	function getSettings() {
 		return (
 			<>
-				{ options.url && (
-					<BottomSheet.LinkCell
-						showIcon={ showIcon }
-						value={ url }
-						onPress={ onLinkCellPressed }
-					/>
-				) }
+				{ options.url &&
+					( onLinkCellPressed ? (
+						<BottomSheet.LinkCell
+							showIcon={ showIcon }
+							value={ url }
+							onPress={ onLinkCellPressed }
+						/>
+					) : (
+						<TextControl
+							icon={ showIcon && link }
+							label={ options.url.label }
+							value={ urlInputValue }
+							valuePlaceholder={ options.url.placeholder }
+							onChange={ onChangeURL }
+							onSubmit={ onCloseSettingsSheet }
+							autoCapitalize="none"
+							autoCorrect={ false }
+							// eslint-disable-next-line jsx-a11y/no-autofocus
+							autoFocus={
+								Platform.OS === 'ios' && options.url.autoFocus
+							}
+							keyboardType="url"
+						/>
+					) ) }
 				{ options.linkLabel && (
 					<TextControl
 						label={ options.linkLabel.label }

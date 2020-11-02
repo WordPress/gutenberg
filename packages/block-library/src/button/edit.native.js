@@ -248,6 +248,7 @@ class ButtonEdit extends Component {
 				onClose={ this.dismissSheet }
 				setAttributes={ setAttributes }
 				withBottomSheet={ ! isCompatibleWithSettings }
+				hasPicker
 				actions={ actions }
 				options={ options }
 				showIcon={ ! isCompatibleWithSettings }

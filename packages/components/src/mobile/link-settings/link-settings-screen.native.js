@@ -25,7 +25,9 @@ const LinkSettingsScreen = ( props ) => {
 	return useMemo( () => {
 		return (
 			<LinkSettings
-				onLinkCellPressed={ onLinkCellPressed }
+				onLinkCellPressed={
+					props.hasPicker ? onLinkCellPressed : undefined
+				}
 				urlValue={ inputValue }
 				{ ...props }
 			/>
