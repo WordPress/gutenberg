@@ -41,14 +41,16 @@ export default function save( { attributes } ) {
 							break;
 					}
 
+					let alt = image.alt || image.caption || '';
+
+					if ( alt !== __unstableStripHTML( alt ) ) {
+						alt = __unstableStripHTML( alt );
+					}
+
 					const img = (
 						<img
 							src={ image.url }
-							alt={
-								image.alt !== ''
-									? image.alt
-									: __unstableStripHTML( image.caption )
-							}
+							alt={ alt }
 							data-id={ image.id }
 							data-full-url={ image.fullUrl }
 							data-link={ image.link }
