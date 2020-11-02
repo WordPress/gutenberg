@@ -28,7 +28,10 @@ function gutenberg_edit_site_export() {
 
 		$current_template = gutenberg_find_template_post_and_parts( $template_type );
 		if ( isset( $current_template ) ) {
-			$zip->addFromString( 'theme/block-templates/' . $current_template['template_post']->post_name . '.html', $current_template['template_post']->post_content );
+			$zip->addFromString(
+				'theme/block-templates/' . $current_template['template_post']->post_name . '.html',
+				gutenberg_strip_post_ids_from_template_part_blocks( $current_template['template_post']->post_content )
+			);
 
 			foreach ( $current_template['template_part_ids'] as $template_part_id ) {
 				$template_part = get_post( $template_part_id );
@@ -62,3 +65,29 @@ add_action(
 		);
 	}
 );
+
+/**
+ * Remove post id attributes from template part blocks.
+ *
+ * This is needed so that Gutenberg loads the HTML file of the template, instead of looking for a template part post.
+ *
+ * @param string $template_content Template content to modify.
+ *
+ * @return string Potentially modified template content.
+ */
+function gutenberg_strip_post_ids_from_template_part_blocks( $template_content ) {
+	$blocks = parse_blocks( $template_content );
+
+	array_walk(
+		$blocks,
+		function( &$block ) {
+			if ( 'core/template-part' !== $block['blockName'] ) {
+				return;
+			}
+
+			unset( $block['attrs']['postId'] );
+		}
+	);
+
+	return serialize_blocks( $blocks );
+}

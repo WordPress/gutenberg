@@ -6,7 +6,8 @@ import { castArray, get, isEqual, find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { apiFetch, syncSelect } from '@wordpress/data-controls';
+import { controls } from '@wordpress/data';
+import { apiFetch } from '@wordpress/data-controls';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -210,21 +211,21 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
  * @return {Object} Action object.
  */
 export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
-	const entity = yield syncSelect( 'core', 'getEntity', kind, name );
+	const entity = yield controls.select( 'core', 'getEntity', kind, name );
 	if ( ! entity ) {
 		throw new Error(
 			`The entity being edited (${ kind }, ${ name }) does not have a loaded config.`
 		);
 	}
 	const { transientEdits = {}, mergedEdits = {} } = entity;
-	const record = yield syncSelect(
+	const record = yield controls.select(
 		'core',
 		'getRawEntityRecord',
 		kind,
 		name,
 		recordId
 	);
-	const editedRecord = yield syncSelect(
+	const editedRecord = yield controls.select(
 		'core',
 		'getEditedEntityRecord',
 		kind,
@@ -270,7 +271,7 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
  * an entity record, if any.
  */
 export function* undo() {
-	const undoEdit = yield syncSelect( 'core', 'getUndoEdit' );
+	const undoEdit = yield controls.select( 'core', 'getUndoEdit' );
 	if ( ! undoEdit ) {
 		return;
 	}
@@ -288,7 +289,7 @@ export function* undo() {
  * edit to an entity record, if any.
  */
 export function* redo() {
-	const redoEdit = yield syncSelect( 'core', 'getRedoEdit' );
+	const redoEdit = yield controls.select( 'core', 'getRedoEdit' );
 	if ( ! redoEdit ) {
 		return;
 	}
@@ -338,7 +339,7 @@ export function* saveEntityRecord(
 	for ( const [ key, value ] of Object.entries( record ) ) {
 		if ( typeof value === 'function' ) {
 			const evaluatedValue = value(
-				yield syncSelect(
+				yield controls.select(
 					'core',
 					'getEditedEntityRecord',
 					kind,
@@ -372,7 +373,7 @@ export function* saveEntityRecord(
 	let currentEdits;
 	try {
 		const path = `${ entity.baseURL }${ recordId ? '/' + recordId : '' }`;
-		const persistedRecord = yield syncSelect(
+		const persistedRecord = yield controls.select(
 			'core',
 			'getRawEntityRecord',
 			kind,
@@ -385,9 +386,12 @@ export function* saveEntityRecord(
 			// This is fine for now as it is the only supported autosave,
 			// but ideally this should all be handled in the back end,
 			// so the client just sends and receives objects.
-			const currentUser = yield syncSelect( 'core', 'getCurrentUser' );
+			const currentUser = yield controls.select(
+				'core',
+				'getCurrentUser'
+			);
 			const currentUserId = currentUser ? currentUser.id : undefined;
-			const autosavePost = yield syncSelect(
+			const autosavePost = yield controls.select(
 				'core',
 				'getAutosave',
 				persistedRecord.type,
@@ -479,14 +483,14 @@ export function* saveEntityRecord(
 
 			// Get the full local version of the record before the update,
 			// to merge it with the edits and then propagate it to subscribers
-			persistedEntity = yield syncSelect(
+			persistedEntity = yield controls.select(
 				'core',
 				'__experimentalGetEntityRecordNoResolver',
 				kind,
 				name,
 				recordId
 			);
-			currentEdits = yield syncSelect(
+			currentEdits = yield controls.select(
 				'core',
 				'getEntityRecordEdits',
 				kind,
@@ -533,7 +537,7 @@ export function* saveEntityRecord(
 				recordId,
 				{
 					...currentEdits,
-					...( yield syncSelect(
+					...( yield controls.select(
 						'core',
 						'getEntityRecordEdits',
 						kind,
@@ -567,7 +571,7 @@ export function* saveEntityRecord(
  */
 export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 	if (
-		! ( yield syncSelect(
+		! ( yield controls.select(
 			'core',
 			'hasEditsForEntityRecord',
 			kind,
@@ -577,7 +581,7 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 	) {
 		return;
 	}
-	const edits = yield syncSelect(
+	const edits = yield controls.select(
 		'core',
 		'getEntityRecordNonTransientEdits',
 		kind,

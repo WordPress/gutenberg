@@ -4,7 +4,7 @@
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
 import { queryByText, queryByRole } from '@testing-library/react';
-import { first, last, nth, uniqueId } from 'lodash';
+import { default as lodash, first, last, nth, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -15,6 +15,12 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
  */
 import LinkControl from '../';
 import { fauxEntitySuggestions, fetchFauxEntitySuggestions } from './fixtures';
+
+// Mock debounce() so that it runs instantly.
+lodash.debounce = jest.fn( ( callback ) => {
+	callback.cancel = jest.fn();
+	return callback;
+} );
 
 const mockFetchSearchSuggestions = jest.fn();
 

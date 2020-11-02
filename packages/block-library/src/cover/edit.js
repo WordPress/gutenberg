@@ -436,6 +436,7 @@ function CoverEdit( {
 									}
 									min={ 0 }
 									max={ 100 }
+									step={ 10 }
 									required
 								/>
 							) }
@@ -451,7 +452,10 @@ function CoverEdit( {
 		{
 			className: 'wp-block-cover__inner-container',
 		},
-		{ template: INNER_BLOCKS_TEMPLATE }
+		{
+			template: INNER_BLOCKS_TEMPLATE,
+			templateInsertUpdatesSelection: true,
+		}
 	);
 
 	if ( ! hasBackground ) {

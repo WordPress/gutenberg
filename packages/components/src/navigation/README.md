@@ -101,6 +101,13 @@ A callback to handle clicking on the back button. If this prop is provided then 
 
 Optional className for the `NavigationMenu` component.
 
+### hasSearch
+
+-   Type: `boolean`
+-   Required: No
+
+Enable the search feature on the menu title.
+
 ### `menu`
 
 -   Type: `string`
@@ -109,6 +116,13 @@ Optional className for the `NavigationMenu` component.
 
 The unique identifier of the menu. The root menu can omit this, and it will default to "root"; all other menus need to specify it.
 
+### onSearch
+
+-   Type: `function`
+-   Required: No
+
+When `hasSearch` is active, this function handles the search input's `onChange` event, making it controlled from the outside. It requires setting the `search` prop as well.
+
 ### `parentMenu`
 
 -   Type: `string`
@@ -116,12 +130,19 @@ The unique identifier of the menu. The root menu can omit this, and it will defa
 
 The parent menu slug; used by nested menus to indicate their parent menu.
 
+### search
+
+-   Type: `string`
+-   Required: No
+
+When `hasSearch` is active and `onSearch` is provided, this controls the value of the search input. Required when the `onSearch` prop is provided.
+
 ### `title`
 
 -   Type: `string`
 -   Required: No
 
-The menu title.
+The menu title. It's also the field used by the menu search function. 
 
 ## Navigation Group Props
 
@@ -169,7 +190,7 @@ If provided, renders `a` instead of `button`.
 ### `item`
 
 -   Type: `string`
--   Required: Yes
+-   Required: No
 
 The unique identifier of the item.
 

@@ -84,7 +84,7 @@ export function MediaPlaceholder( {
 
 	useEffect( () => {
 		setSrc( value?.src ?? '' );
-	}, [ value ] );
+	}, [ value?.src ] );
 
 	const onlyAllowsImages = () => {
 		if ( ! allowedTypes || allowedTypes.length === 0 ) {
