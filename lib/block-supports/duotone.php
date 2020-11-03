@@ -84,7 +84,7 @@ function gutenberg_render_duotone_support( $block_type, $block_attributes, $bloc
 
 	// Object | boolean | string | string[] -> boolean | string | string[].
 	$edit_selector =
-		! array_key_exists( 'edit', $duotone_support )
+		! is_array( $duotone_support ) || ! array_key_exists( 'edit', $duotone_support )
 			? $duotone_support
 			: $duotone_support['edit'];
 
