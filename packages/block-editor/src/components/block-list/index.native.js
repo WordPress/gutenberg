@@ -88,7 +88,7 @@ export class BlockList extends Component {
 	scrollToBlockListOffset( offset ) {
 		const isIOS = Platform.OS === 'ios';
 		if ( isIOS ) {
-			// utilizes the ScrollView of the Keyboard Aware Flat List to scroll.
+			// utilizes the ScrollView of the Keyboard Aware Flat List to scroll on iOS.
 			this.scrollViewRef.props.scrollToPosition( 0, offset, true );
 		} else {
 			// utilizes the FlatList of the Keyboard Aware Flat List to scroll on Android.
