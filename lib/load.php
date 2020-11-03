@@ -93,8 +93,13 @@ if ( ! class_exists( 'WP_Block' ) ) {
 if ( ! class_exists( 'WP_Block_List' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-block-list.php';
 }
+
 if ( ! class_exists( 'WP_Widget_Block' ) ) {
 	require_once dirname( __FILE__ ) . '/class-wp-widget-block.php';
+}
+
+if ( ! class_exists( 'WP_REST_Template_Parts_Controller' ) ) {
+	require_once dirname( __FILE__ ) . '/class-wp-rest-template-parts-controller.php';
 }
 require_once dirname( __FILE__ ) . '/widgets-page.php';
 

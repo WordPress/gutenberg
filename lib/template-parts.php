@@ -36,17 +36,18 @@ function gutenberg_register_template_part_post_type() {
 	);
 
 	$args = array(
-		'labels'            => $labels,
-		'description'       => __( 'Template parts to include in your templates.', 'gutenberg' ),
-		'public'            => false,
-		'has_archive'       => false,
-		'show_ui'           => true,
-		'show_in_menu'      => 'themes.php',
-		'show_in_admin_bar' => false,
-		'show_in_rest'      => true,
-		'rest_base'         => 'template-parts',
-		'map_meta_cap'      => true,
-		'supports'          => array(
+		'labels'                => $labels,
+		'description'           => __( 'Template parts to include in your templates.', 'gutenberg' ),
+		'public'                => false,
+		'has_archive'           => false,
+		'show_ui'               => true,
+		'show_in_menu'          => 'themes.php',
+		'show_in_admin_bar'     => false,
+		'show_in_rest'          => true,
+		'rest_base'             => 'template-parts',
+		'rest_controller_class' => 'WP_REST_Template_Parts_Controller',
+		'map_meta_cap'          => true,
+		'supports'              => array(
 			'title',
 			'slug',
 			'editor',
@@ -216,49 +217,6 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 			'key'   => 'theme',
 			'value' => $request['theme'],
 		);
-
-		// Ensure auto-drafts of all theme supplied template parts are created.
-		if ( wp_get_theme()->stylesheet === $request['theme'] ) {
-			/**
-			 * Finds all nested template part file paths in a theme's directory.
-			 *
-			 * @param string $base_directory The theme's file path.
-			 * @return array $path_list A list of paths to all template part files.
-			 */
-			function get_template_part_paths( $base_directory ) {
-				$path_list = array();
-				if ( file_exists( $base_directory . '/block-template-parts' ) ) {
-					$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base_directory . '/block-template-parts' ) );
-					$nested_html_files = new RegexIterator( $nested_files, '/^.+\.html$/i', RecursiveRegexIterator::GET_MATCH );
-					foreach ( $nested_html_files as $path => $file ) {
-						$path_list[] = $path;
-					}
-				}
-				return $path_list;
-			}
-
-			// Get file paths for all theme supplied template parts.
-			$template_part_files = get_template_part_paths( get_stylesheet_directory() );
-			if ( is_child_theme() ) {
-				$template_part_files = array_merge( $template_part_files, get_template_part_paths( get_template_directory() ) );
-			}
-			// Build and save each template part.
-			foreach ( $template_part_files as $template_part_file ) {
-				$content = file_get_contents( $template_part_file );
-				// Infer slug from filepath.
-				$slug = substr(
-					$template_part_file,
-					// Starting position of slug.
-					strpos( $template_part_file, 'block-template-parts/' ) + 21,
-					// Subtract ending '.html'.
-					-5
-				);
-				// Wrap content with the template part block, parse, and create auto-draft.
-				$template_part_string = '<!-- wp:template-part {"slug":"' . $slug . '","theme":"' . wp_get_theme()->get( 'TextDomain' ) . '"} -->' . $content . '<!-- /wp:template-part -->';
-				$template_part_block  = parse_blocks( $template_part_string )[0];
-				create_auto_draft_for_template_part_block( $template_part_block );
-			}
-		};
 
 		$args['meta_query'] = $meta_query;
 	}

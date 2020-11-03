@@ -124,83 +124,6 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 }
 
 /**
- * Recursively traverses a block tree, creating auto drafts
- * for any encountered template parts without a fixed post.
- *
- * @access private
- *
- * @param array $block The root block to start traversing from.
- * @return int[] A list of template parts IDs for the given block.
- */
-function create_auto_draft_for_template_part_block( $block ) {
-	$template_part_ids = array();
-
-	if ( 'core/template-part' === $block['blockName'] && isset( $block['attrs']['slug'] ) ) {
-		if ( isset( $block['attrs']['postId'] ) ) {
-			// Template part is customized.
-			$template_part_id = $block['attrs']['postId'];
-		} else {
-			// A published post might already exist if this template part
-			// was customized elsewhere or if it's part of a customized
-			// template. We also check if an auto-draft was already created
-			// because preloading can make this run twice, so, different code
-			// paths can end up with different posts for the same template part.
-			// E.g. The server could send back post ID 1 to the client, preload,
-			// and create another auto-draft. So, if the client tries to resolve the
-			// post ID from the slug and theme, it won't match with what the server sent.
-			$template_part_query = new WP_Query(
-				array(
-					'post_type'      => 'wp_template_part',
-					'post_status'    => array( 'publish', 'auto-draft' ),
-					'title'          => $block['attrs']['slug'],
-					'meta_key'       => 'theme',
-					'meta_value'     => $block['attrs']['theme'],
-					'posts_per_page' => 1,
-					'no_found_rows'  => true,
-				)
-			);
-			$template_part_post  = $template_part_query->have_posts() ? $template_part_query->next_post() : null;
-			if ( $template_part_post && 'auto-draft' !== $template_part_post->post_status ) {
-				$template_part_id = $template_part_post->ID;
-			} else {
-				// Template part is not customized, get it from a file and make an auto-draft for it, unless one already exists
-				// and the underlying file hasn't changed.
-				$template_part_file_path = get_stylesheet_directory() . '/block-template-parts/' . $block['attrs']['slug'] . '.html';
-				if ( ! file_exists( $template_part_file_path ) ) {
-					$template_part_file_path = false;
-				}
-
-				if ( $template_part_file_path ) {
-					$file_contents = file_get_contents( $template_part_file_path );
-					if ( $template_part_post && $template_part_post->post_content === $file_contents ) {
-						$template_part_id = $template_part_post->ID;
-					} else {
-						$template_part_id = wp_insert_post(
-							array(
-								'post_content' => $file_contents,
-								'post_title'   => $block['attrs']['slug'],
-								'post_status'  => 'auto-draft',
-								'post_type'    => 'wp_template_part',
-								'post_name'    => $block['attrs']['slug'],
-								'meta_input'   => array(
-									'theme' => $block['attrs']['theme'],
-								),
-							)
-						);
-					}
-				}
-			}
-		}
-		$template_part_ids[ $block['attrs']['slug'] ] = $template_part_id;
-	}
-
-	foreach ( $block['innerBlocks'] as $inner_block ) {
-		$template_part_ids = array_merge( $template_part_ids, create_auto_draft_for_template_part_block( $inner_block ) );
-	}
-	return $template_part_ids;
-}
-
-/**
  * Return the correct 'wp_template' post and template part IDs for the current template.
  *
  * Accepts an optional $template_hierarchy argument as a hint.
@@ -323,11 +246,11 @@ function gutenberg_find_template_post_and_parts( $template_type, $template_hiera
 
 	if ( $current_template_post ) {
 		$template_part_ids = array();
-		if ( is_admin() || defined( 'REST_REQUEST' ) ) {
+		/* if ( is_admin() || defined( 'REST_REQUEST' ) ) {
 			foreach ( parse_blocks( $current_template_post->post_content ) as $block ) {
 				$template_part_ids = array_merge( $template_part_ids, create_auto_draft_for_template_part_block( $block ) );
 			}
-		}
+		} */
 		return array(
 			'template_post'     => $current_template_post,
 			'template_part_ids' => $template_part_ids,
@@ -395,37 +318,6 @@ function gutenberg_viewport_meta_tag() {
 function gutenberg_strip_php_suffix( $template_file ) {
 	return preg_replace( '/\.php$/', '', $template_file );
 }
-
-/**
- * Extends default editor settings to enable template and template part editing.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_template_loader_filter_block_editor_settings( $settings ) {
-	global $post;
-
-	if ( ! $post ) {
-		return $settings;
-	}
-
-	// If this is the Site Editor, auto-drafts for template parts have already been generated
-	// through `filter_rest_wp_template_part_query`, when called via the REST API.
-	if ( isset( $settings['editSiteInitialState'] ) ) {
-		return $settings;
-	}
-
-	// Otherwise, create template part auto-drafts for the edited post.
-	$post = get_post();
-	foreach ( parse_blocks( $post->post_content ) as $block ) {
-		create_auto_draft_for_template_part_block( $block );
-	}
-
-	// TODO: Set editing mode and current template ID for editing modes support.
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_template_loader_filter_block_editor_settings' );
 
 /**
  * Removes post details from block context when rendering a block template.
