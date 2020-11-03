@@ -27,6 +27,7 @@ import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
 import { BlockNodes } from './root-container';
+import { getBlockDOMNode } from '../../utils/dom';
 
 function selector( select ) {
 	const {
@@ -119,12 +120,12 @@ function BlockPopover( {
 
 	let node = blockNodes[ clientId ];
 
-	if ( capturingClientId ) {
-		node = document.getElementById( 'block-' + capturingClientId );
-	}
-
 	if ( ! node ) {
 		return null;
+	}
+
+	if ( capturingClientId ) {
+		node = getBlockDOMNode( capturingClientId, node.ownerDocument );
 	}
 
 	let anchorRef = node;
