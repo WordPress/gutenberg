@@ -26,6 +26,7 @@ const visitSiteEditor = async () => {
 		page: 'gutenberg-edit-site',
 	} ).slice( 1 );
 	await visitAdminPage( 'admin.php', query );
+	await page.waitForSelector( '.edit-site-visual-editor' );
 };
 
 const clickTemplateItem = async ( menus, itemName ) => {
