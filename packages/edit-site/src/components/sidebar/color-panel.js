@@ -10,6 +10,15 @@ import { __ } from '@wordpress/i18n';
 import { LINK_COLOR, useEditorFeature } from '../editor/utils';
 import ColorPalettePanel from './color-palette-panel';
 
+export function useHasColorPanel( { supports } ) {
+	return (
+		supports.includes( 'color' ) ||
+		supports.includes( 'backgroundColor' ) ||
+		supports.includes( 'background' ) ||
+		supports.includes( LINK_COLOR )
+	);
+}
+
 export default function ColorPanel( {
 	context: { supports, name },
 	getStyleProperty,
@@ -24,14 +33,6 @@ export default function ColorPanel( {
 		'color.customGradient',
 		name
 	);
-	if (
-		! supports.includes( 'color' ) &&
-		! supports.includes( 'backgrounColor' ) &&
-		! supports.includes( 'background' ) &&
-		! supports.includes( LINK_COLOR )
-	) {
-		return null;
-	}
 
 	const settings = [];
 
