@@ -32,7 +32,7 @@ export class BlockListItem extends Component {
 
 		this.onLayout = this.onLayout.bind( this );
 		this.blockRef = createRef();
-		this.scrollToBlockIfItsNotVisible = this.scrollToBlockIfItsNotVisible.bind(
+		this.scrollToSelectedBlockIfItsNotVisible = this.scrollToSelectedBlockIfItsNotVisible.bind(
 			this
 		);
 
@@ -94,30 +94,38 @@ export class BlockListItem extends Component {
 	}
 
 	componentDidUpdate() {
-		this.scrollToBlockIfItsNotVisible();
+		this.scrollToSelectedBlockIfItsNotVisible();
 	}
 
-	scrollToBlockIfItsNotVisible() {
+	scrollToSelectedBlockIfItsNotVisible() {
 		const { isSelected } = this.props;
-		const isIOS = Platform.OS === 'ios';
-		const scrollAdjustmentY = isIOS ? 200 : 100;
 
 		if ( isSelected ) {
+			const isIOS = Platform.OS === 'ios';
+
+			// this adjustment factor is utilized to create an invisible bounds at the top and bottom of the screen where once the View enters within
+			//any of these bounds then the scrolling action is triggered.
+			const scrollAdjustmentY = isIOS ? 200 : 100;
+
 			if ( this.blockRef.current ) {
+				// first we are measuring the layout to determine where {x,y} within the List Component being rendered the current Block based View is located.
 				this.blockRef.current.measureLayout(
 					findNodeHandle( this.props.listRef.current ),
 					( x, y ) => {
+						// once we have the {x,y} of that View we can then determine if it is currently visible.
 						this.blockRef.current.measure(
 							( _x, _y, blockWidth, blockHeight, px, py ) => {
 								const window = Dimensions.get( 'window' );
 
 								const { scrollToBlockListOffset } = this.props;
 
+								// if the view has gone beyond the top of the screen we scroll to that location.
 								if ( py - scrollAdjustmentY < 0 ) {
 									scrollToBlockListOffset(
 										y - blockHeight - scrollAdjustmentY
 									);
-								} else if (
+								} // if the view has gone below the bottom of the screen we scroll to that location.
+								else if (
 									py + blockHeight + scrollAdjustmentY >
 									window.height
 								) {
