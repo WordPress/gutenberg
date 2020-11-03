@@ -249,16 +249,39 @@ describe( 'getEntityRecords', () => {
 	} );
 
 	it( 'should return the same instance with the same arguments', () => {
-		const state = deepFreeze( {
+		let state = deepFreeze( {
 			entities: {
 				data: {},
 			},
 		} );
 
-		const firstRecords = getEntityRecords( state, 'root', 'postType' );
-		const secondRecords = getEntityRecords( state, 'root', 'postType' );
+		const postTypeFirstRecords = getEntityRecords(
+			state,
+			'root',
+			'postType'
+		);
+		const wpBlockFirstRecords = getEntityRecords(
+			state,
+			'postType',
+			'wp_block'
+		);
 
-		expect( firstRecords ).toBe( secondRecords );
+		// Simulate update states
+		state = { ...state };
+
+		const postTypeSecondRecords = getEntityRecords(
+			state,
+			'root',
+			'postType'
+		);
+		const wpBlockSecondRecords = getEntityRecords(
+			state,
+			'postType',
+			'wp_block'
+		);
+
+		expect( postTypeFirstRecords ).toBe( postTypeSecondRecords );
+		expect( wpBlockFirstRecords ).toBe( wpBlockSecondRecords );
 	} );
 } );
 
