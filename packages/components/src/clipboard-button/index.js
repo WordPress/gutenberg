@@ -15,6 +15,7 @@ import { useCopyOnClick } from '@wordpress/compose';
 import Button from '../button';
 
 export default function ClipboardButton( {
+	as: Component = Button,
 	className,
 	children,
 	onCopy,
@@ -52,13 +53,13 @@ export default function ClipboardButton( {
 	};
 
 	return (
-		<Button
+		<Component
 			{ ...buttonProps }
 			className={ classes }
 			ref={ ref }
 			onCopy={ focusOnCopyEventTarget }
 		>
 			{ children }
-		</Button>
+		</Component>
 	);
 }

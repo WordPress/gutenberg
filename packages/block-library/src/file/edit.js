@@ -12,7 +12,7 @@ import {
 	ClipboardButton,
 	withNotices,
 	ToolbarGroup,
-	ToolbarItem,
+	ToolbarButton,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
@@ -174,16 +174,15 @@ function FileEdit( {
 			/>
 			<BlockControls>
 				<ToolbarGroup>
-					<ToolbarItem
-						as={ MediaReplaceFlow }
+					<MediaReplaceFlow
 						mediaId={ id }
 						mediaURL={ href }
 						accept="*"
 						onSelect={ onSelectFile }
 						onError={ onUploadError }
 					/>
-					<ToolbarItem
-						as={ ClipboardButton }
+					<ClipboardButton
+						as={ ToolbarButton }
 						text={ href }
 						onCopy={ confirmCopyURL }
 						onFinishCopy={ resetCopyConfirmation }
@@ -192,7 +191,7 @@ function FileEdit( {
 						{ showCopyConfirmation
 							? __( 'Copied!' )
 							: __( 'Copy URL' ) }
-					</ToolbarItem>
+					</ClipboardButton>
 				</ToolbarGroup>
 			</BlockControls>
 			<div { ...blockProps }>
