@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	InnerBlocks,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -15,13 +16,39 @@ import {
 import QueryToolbar from './query-toolbar';
 import QueryProvider from './query-provider';
 import QueryInspectorControls from './query-inspector-controls';
+import QueryPlaceholder from './query-placeholder';
+import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
-const TEMPLATE = [ [ 'core/query-loop' ], [ 'core/query-pagination' ] ];
-export default function QueryEdit( {
+const TEMPLATE = [ [ 'core/query-loop' ] ];
+export function QueryContent( {
 	attributes: { queryId, query },
+	context: { postId },
 	setAttributes,
 } ) {
-	const instanceId = useInstanceId( QueryEdit );
+	const instanceId = useInstanceId( QueryContent );
+	const blockProps = useBlockProps();
+	const { postsPerPage } = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		return {
+			postsPerPage:
+				+getSettings().postsPerPage || DEFAULTS_POSTS_PER_PAGE,
+		};
+	}, [] );
+	// Changes in query property (which is an object) need to be in the same callback,
+	// because updates are batched after the render and changes in different query properties
+	// would cause to overide previous wanted changes.
+	useEffect( () => {
+		const newQuery = {};
+		if ( postId && ! query.exclude?.length ) {
+			newQuery.exclude = [ postId ];
+		}
+		if ( ! query.perPage && postsPerPage ) {
+			newQuery.perPage = postsPerPage;
+		}
+		if ( !! Object.keys( newQuery ).length ) {
+			updateQuery( newQuery );
+		}
+	}, [ query.perPage, query.exclude, postId ] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
@@ -37,13 +64,26 @@ export default function QueryEdit( {
 			<BlockControls>
 				<QueryToolbar query={ query } setQuery={ updateQuery } />
 			</BlockControls>
-			<Block.div>
+			<div { ...blockProps }>
 				<QueryProvider>
 					<InnerBlocks template={ TEMPLATE } />
 				</QueryProvider>
-			</Block.div>
+			</div>
 		</>
 	);
 }
 
+const QueryEdit = ( props ) => {
+	const { clientId } = props;
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			!! select( 'core/block-editor' ).getBlocks( clientId ).length,
+		[ clientId ]
+	);
+	const Component = hasInnerBlocks ? QueryContent : QueryPlaceholder;
+
+	return <Component { ...props } />;
+};
+
+export default QueryEdit;
 export * from './query-provider';

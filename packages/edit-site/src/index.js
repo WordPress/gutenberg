@@ -18,6 +18,7 @@ import './plugins';
 import './hooks';
 import registerEditSiteStore from './store';
 import Editor from './components/editor';
+import { findTemplate } from './utils';
 
 const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
 	apiFetch( {
@@ -52,16 +53,19 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
  * @param {Object} settings Editor settings.
  */
 export function initialize( id, settings ) {
+	findTemplate.siteUrl = settings.siteUrl;
 	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
+	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
 
 	registerEditSiteStore( { settings } );
 
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks( true );
 	}
 
 	render( <Editor />, document.getElementById( id ) );
 }
 
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
+export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';

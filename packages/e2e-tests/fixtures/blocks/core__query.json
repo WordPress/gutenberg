@@ -1,22 +1,25 @@
 [
-	{
-		"clientId": "_clientId_0",
-		"name": "core/query",
-		"isValid": true,
-		"attributes": {
-			"query": {
-				"perPage": 3,
-				"pages": 1,
-				"offset": 0,
-				"categoryIds": [],
-				"tagIds": [],
-				"order": "desc",
-				"orderBy": "date",
-				"author": "",
-				"search": ""
-			}
-		},
-		"innerBlocks": [],
-		"originalContent": ""
-	}
+    {
+        "clientId": "_clientId_0",
+        "name": "core/query",
+        "isValid": true,
+        "attributes": {
+            "query": {
+                "perPage": null,
+                "pages": 1,
+                "offset": 0,
+                "postType": "post",
+                "categoryIds": [],
+                "tagIds": [],
+                "order": "desc",
+                "orderBy": "date",
+                "author": "",
+                "search": "",
+                "exclude": [],
+                "sticky": ""
+            }
+        },
+        "innerBlocks": [],
+        "originalContent": ""
+    }
 ]

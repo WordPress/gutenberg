@@ -1,3 +1,15 @@
+.block-editor-block-list__block[data-type="core/spacer"] {
+	// This generates an invisible field above the spacer, which makes its minimum clickable-to-select height larger.
+	&::before {
+		content: "";
+		display: block;
+		position: absolute;
+		width: 100%;
+		height: $button-size-small;
+		transform: translateY(-#{$button-size-small / 2});
+	}
+}
+
 .block-library-spacer__resize-container.has-show-handle {
 	background: $gray-100;
 

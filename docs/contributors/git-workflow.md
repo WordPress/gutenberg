@@ -1,25 +1,93 @@
 # Git Workflow
 
-A good workflow for new contributors to follow is listed below:
+The Gutenberg project follows a standard pull request process for contributions. See GitHub's documentation for [additional details about pull requests](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests).
+
+This documentation is intended to help you get started using git with Gutenberg. Git is a powerful source code management tool; to learn git deeply, check out the [Pro Git book](https://git-scm.com/book/en/v2) available free online under CC BY-NC-SA 3.0 license.
+
+If you are unfamiliar with using git, it is worthwhile to explore and play with it. Try out the [git tutorial](https://git-scm.com/docs/gittutorial) as well as the [git user manual](https://git-scm.com/docs/user-manual) for help getting started.
+
+## Overview
+
+An overview of the process for contributors is:
+
 - Fork the Gutenberg repository.
 - Clone the forked repository.
 - Create a new branch.
 - Make code changes.
+- Confirm tests pass.
 - Commit the code changes within the newly created branch.
 - Push the branch to the forked repository.
-- Submit a Pull Request to the Gutenberg repository.
+- Submit a pull request to the Gutenberg repository.
 
-Ideally name your branches with prefixes and descriptions, like this: `[type]/[change]`. A good prefix would be:
+See the [repository management document](/docs/contributors/repository-management.md) for additional information on how the Gutenberg project uses GitHub.
+
+## Git Workflow Walkthrough
+
+The workflow for code and documentation is the same, since both are managed in GitHub. You can watch a [video walk-through of contributing documentation](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing to Gutenberg](https://mkaz.blog/wordpress/contribute-documentation-to-gutenberg/).
+
+
+Here is a visual overview of the Git workflow:
+
+![Visual Overview of Git Workflow](https://developer.wordpress.org/files/2020/09/git-workflow.png)
+
+
+**Step 1**: Go to the Gutenberg repository on GitHub and click Fork. This creates a copy of the main Gutenberg repository to your account.
+
+![Screenshot showing fork button on GitHub](https://developer.wordpress.org/files/2020/09/gutenberg-fork.png)
+
+**Step 2**: Clone your forked repository locally. It is located at: `https://github.com/YOUR-USER-NAME/gutenberg`. Cloning copies all the files to your computer. Open a terminal and run:
+
+```bash
+git clone https://github.com/YOUR-USER-NAME/gutenberg
+```
+
+This will create a directory called `gutenberg` with all the files for the project. It might take a couple of minutes because it is downloading the entire history of the Gutenberg project.
+
+**Step 3**: Create a branch for your change (see below for branch naming). For this example, the branch name is the complete string: `update/my-branch`
+
+```bash
+git switch -c update/my-branch
+```
+
+**Step 4**: Make the code changes. Build, confirm, and test your change thoroughly. See [coding guidelines](/docs/contributors/coding-guidelines.md) and [testing overview](/docs/contributors/testing-overview.md) for guidance.
+
+**Step 5**: Commit your change with a [good commit message](https://make.wordpress.org/core/handbook/best-practices/commit-messages/). This will commit your change to your local copy of the repository.
+
+```bash
+git commit -m "Your Good Commit Message" path/to/FILE
+```
+
+**Step 6**: Push your change up to GitHub. The change will be pushed to your fork of the repository on the GitHub
+
+```bash
+git push -u origin upgrade/my-branch
+```
+
+**Step 7**: Go to your forked repository on GitHub -- it will automatically detect the change and give you a link to create a pull request.
+
+![Screenshot showing pull request link](https://developer.wordpress.org/files/2020/09/pull-request-create.png)
+
+**Step 8**: Create the pull request. This will create the request on the WordPress Gutenberg repository to integrate the change from your forked repository.
+
+**Step 9**: Keep up with new activity on the pull request. If any additional changes or updates are requested, then make the changes locally and push them up, following Steps 4-6.
+
+Do not make a new pull request for updates; by pushing your change to your respotiroy it will update the same PR. In this sense, the PR is a pointer on the WordPress Gutenberg repository to your copy. So when you update your copy, the PR is also updated.
+
+That’s it! Once approved and merged, your change will be incorporated into the main repository. 🎉
+
+
+## Branch Naming
+
+You should name your branches using a prefixes and short description, like this: `[type]/[change]`.
+
+Suggested prefixes:
 
 - `add/` = add a new feature
 - `try/` = experimental feature, "tentatively add"
 - `update/` = update an existing feature
+- `remove/` = remove an existing feature
 
 For example, `add/gallery-block` means you're working on adding a new gallery block.
-
-You can pick among all the <a href="https://github.com/WordPress/gutenberg/issues">tickets</a>, or some of the ones labelled <a href="https://github.com/WordPress/gutenberg/labels/Good%20First%20Issue">Good First Issue</a>.
-
-The workflow is documented in greater detail in the [repository management](/docs/contributors/repository-management.md) document.
 
 ## Keeping Your Branch Up To Date
 
@@ -69,8 +137,3 @@ git push
 ```
 
 The above commands will update your `master` branch from _upstream_. To update any other branch replace `master` with the respective branch name.
-
-
-## References
-- https://git-scm.com/book/en/v2
-- https://help.github.com/categories/collaborating-with-issues-and-pull-requests/

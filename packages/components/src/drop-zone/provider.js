@@ -6,7 +6,7 @@ import { isEqual, find, some, filter, throttle, includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createContext } from '@wordpress/element';
+import { Component, createContext, createRef } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
 export const Context = createContext( {
@@ -80,16 +80,26 @@ class DropZoneProvider extends Component {
 			isDraggingOverDocument: false,
 			position: null,
 		};
+		this.ref = createRef();
 	}
 
 	componentDidMount() {
-		window.addEventListener( 'dragover', this.onDragOver );
-		window.addEventListener( 'mouseup', this.resetDragState );
+		const { ownerDocument } = this.ref.current;
+		const { defaultView } = ownerDocument;
+		defaultView.addEventListener( 'dragover', this.onDragOver );
+		defaultView.addEventListener( 'mouseup', this.resetDragState );
+		// Note that `dragend` doesn't fire consistently for file and HTML drag
+		// events where the drag origin is outside the browser window.
+		// In Firefox it may also not fire if the originating node is removed.
+		defaultView.addEventListener( 'dragend', this.resetDragState );
 	}
 
 	componentWillUnmount() {
-		window.removeEventListener( 'dragover', this.onDragOver );
-		window.removeEventListener( 'mouseup', this.resetDragState );
+		const { ownerDocument } = this.ref.current;
+		const { defaultView } = ownerDocument;
+		defaultView.removeEventListener( 'dragover', this.onDragOver );
+		defaultView.removeEventListener( 'mouseup', this.resetDragState );
+		defaultView.removeEventListener( 'dragend', this.resetDragState );
 	}
 
 	addDropZone( dropZone ) {
@@ -257,6 +267,7 @@ class DropZoneProvider extends Component {
 	render() {
 		return (
 			<div
+				ref={ this.ref }
 				onDrop={ this.onDrop }
 				className="components-drop-zone__provider"
 			>

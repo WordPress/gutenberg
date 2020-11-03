@@ -1,20 +1,22 @@
 /**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data-controls';
+import { controls } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import ifNotResolved from '../if-not-resolved';
 
-jest.mock( '@wordpress/data-controls', () => ( {
-	select: jest.fn(),
+jest.mock( '@wordpress/data', () => ( {
+	controls: {
+		select: jest.fn(),
+	},
 } ) );
 
 describe( 'ifNotResolved', () => {
 	beforeEach( () => {
-		select.mockReset();
+		controls.select.mockReset();
 	} );
 
 	it( 'returns a new function', () => {
@@ -26,7 +28,7 @@ describe( 'ifNotResolved', () => {
 	} );
 
 	it( 'triggers original resolver if not already resolved', () => {
-		select.mockImplementation( ( _storeKey, selectorName ) => ( {
+		controls.select.mockImplementation( ( _storeKey, selectorName ) => ( {
 			_nextValue:
 				selectorName === 'hasStartedResolution' ? false : undefined,
 		} ) );
@@ -49,7 +51,7 @@ describe( 'ifNotResolved', () => {
 	} );
 
 	it( 'does not trigger original resolver if already resolved', () => {
-		select.mockImplementation( ( _storeKey, selectorName ) => ( {
+		controls.select.mockImplementation( ( _storeKey, selectorName ) => ( {
 			_nextValue:
 				selectorName === 'hasStartedResolution' ? true : undefined,
 		} ) );

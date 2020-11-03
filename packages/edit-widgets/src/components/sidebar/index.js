@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -20,51 +19,37 @@ const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
 	native: false,
 } );
 
+const BLOCK_INSPECTOR_IDENTIFIER = 'edit-widgets/block-inspector';
+
+// Widget areas were one called block areas, so use 'edit-widgets/block-areas'
+// for backwards compatibility.
+const WIDGET_AREAS_IDENTIFIER = 'edit-widgets/block-areas';
+
 /**
  * Internal dependencies
  */
-import BlockAreas from './block-areas';
+import WidgetAreas from './widget-areas';
 
-const CORE_WIDGET_COMPLEMENTARY_AREAS = {
-	'edit-widgets/block-areas': __( 'Block areas' ),
-	'edit-widgets/block-inspector': __( 'Block' ),
-};
-
-function ComplementaryAreaHeader( { activeComplementaryArea } ) {
+function ComplementaryAreaTab( { identifier, label, isActive } ) {
 	const { enableComplementaryArea } = useDispatch( 'core/interface' );
 	return (
-		<ul>
-			{ map( CORE_WIDGET_COMPLEMENTARY_AREAS, ( label, identifier ) => {
-				const isActive = identifier === activeComplementaryArea;
-				return (
-					<li key={ identifier }>
-						<Button
-							onClick={ () =>
-								enableComplementaryArea(
-									'core/edit-widgets',
-									identifier
-								)
-							}
-							className={ classnames(
-								'edit-widgets-sidebar__panel-tab',
-								{
-									'is-active': isActive,
-								}
-							) }
-							aria-label={
-								isActive
-									? // translators: %s: sidebar label e.g: "Block areas".
-									  sprintf( __( '%s (selected)' ), label )
-									: label
-							}
-							data-label={ label }
-						>
-							{ label }
-						</Button>
-					</li>
-				);
+		<Button
+			onClick={ () =>
+				enableComplementaryArea( 'core/edit-widgets', identifier )
+			}
+			className={ classnames( 'edit-widgets-sidebar__panel-tab', {
+				'is-active': isActive,
 			} ) }
-		</ul>
+			aria-label={
+				isActive
+					? // translators: %s: sidebar label e.g: "Widget Areas".
+					  sprintf( __( '%s (selected)' ), label )
+					: label
+			}
+			data-label={ label }
+		>
+			{ label }
+		</Button>
 	);
 }
 
@@ -74,28 +59,49 @@ export default function Sidebar() {
 		currentArea,
 		hasSelectedNonAreaBlock,
 		isGeneralSidebarOpen,
+		selectedWidgetAreaBlock,
 	} = useSelect( ( select ) => {
-		let activeArea = select( 'core/interface' ).getActiveComplementaryArea(
-			'core/edit-widgets'
-		);
-		const isSidebarOpen = !! activeArea;
-		const { getBlockSelectionStart, getBlockRootClientId } = select(
-			'core/block-editor'
-		);
-		const selectionStart = getBlockSelectionStart();
-		if ( ! CORE_WIDGET_COMPLEMENTARY_AREAS[ activeArea ] ) {
-			if ( ! selectionStart ) {
-				activeArea = 'edit-widgets/block-areas';
+		const {
+			getSelectedBlock,
+			getBlock,
+			getBlockParentsByBlockName,
+		} = select( 'core/block-editor' );
+		const { getActiveComplementaryArea } = select( 'core/interface' );
+
+		const selectedBlock = getSelectedBlock();
+
+		let activeArea = getActiveComplementaryArea( 'core/edit-widgets' );
+		if ( ! activeArea ) {
+			if ( selectedBlock ) {
+				activeArea = BLOCK_INSPECTOR_IDENTIFIER;
 			} else {
-				activeArea = 'edit-widgets/block-inspector';
+				activeArea = WIDGET_AREAS_IDENTIFIER;
 			}
 		}
+
+		const isSidebarOpen = !! activeArea;
+
+		let widgetAreaBlock;
+		if ( selectedBlock ) {
+			if ( selectedBlock.name === 'core/widget-area' ) {
+				widgetAreaBlock = selectedBlock;
+			} else {
+				widgetAreaBlock = getBlock(
+					getBlockParentsByBlockName(
+						selectedBlock.clientId,
+						'core/widget-area'
+					)[ 0 ]
+				);
+			}
+		}
+
 		return {
 			currentArea: activeArea,
 			hasSelectedNonAreaBlock: !! (
-				selectionStart && getBlockRootClientId( selectionStart )
+				selectedBlock && selectedBlock.name !== 'core/widget-area'
 			),
 			isGeneralSidebarOpen: isSidebarOpen,
+			selectedWidgetAreaBlock: widgetAreaBlock,
 		};
 	}, [] );
 
@@ -104,22 +110,22 @@ export default function Sidebar() {
 	useEffect( () => {
 		if (
 			hasSelectedNonAreaBlock &&
-			currentArea === 'edit-widgets/block-areas' &&
+			currentArea === WIDGET_AREAS_IDENTIFIER &&
 			isGeneralSidebarOpen
 		) {
 			enableComplementaryArea(
 				'core/edit-widgets',
-				'edit-widgets/block-inspector'
+				BLOCK_INSPECTOR_IDENTIFIER
 			);
 		}
 		if (
 			! hasSelectedNonAreaBlock &&
-			currentArea === 'edit-widgets/block-inspector' &&
+			currentArea === BLOCK_INSPECTOR_IDENTIFIER &&
 			isGeneralSidebarOpen
 		) {
 			enableComplementaryArea(
 				'core/edit-widgets',
-				'edit-widgets/block-areas'
+				WIDGET_AREAS_IDENTIFIER
 			);
 		}
 	}, [ hasSelectedNonAreaBlock, enableComplementaryArea ] );
@@ -128,9 +134,28 @@ export default function Sidebar() {
 		<ComplementaryArea
 			className="edit-widgets-sidebar"
 			header={
-				<ComplementaryAreaHeader
-					activeComplementaryArea={ currentArea }
-				/>
+				<ul>
+					<li>
+						<ComplementaryAreaTab
+							identifier={ WIDGET_AREAS_IDENTIFIER }
+							label={
+								selectedWidgetAreaBlock
+									? selectedWidgetAreaBlock.attributes.name
+									: __( 'Widget Areas' )
+							}
+							isActive={ currentArea === WIDGET_AREAS_IDENTIFIER }
+						/>
+					</li>
+					<li>
+						<ComplementaryAreaTab
+							identifier={ BLOCK_INSPECTOR_IDENTIFIER }
+							label={ __( 'Block' ) }
+							isActive={
+								currentArea === BLOCK_INSPECTOR_IDENTIFIER
+							}
+						/>
+					</li>
+				</ul>
 			}
 			headerClassName="edit-widgets-sidebar__panel-tabs"
 			/* translators: button label text should, if possible, be under 16 characters. */
@@ -141,10 +166,23 @@ export default function Sidebar() {
 			icon={ cog }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
-			{ currentArea === 'edit-widgets/block-areas' && <BlockAreas /> }
-			{ currentArea === 'edit-widgets/block-inspector' && (
-				<BlockInspector />
+			{ currentArea === WIDGET_AREAS_IDENTIFIER && (
+				<WidgetAreas
+					selectedWidgetAreaId={
+						selectedWidgetAreaBlock?.attributes.id
+					}
+				/>
 			) }
+			{ currentArea === BLOCK_INSPECTOR_IDENTIFIER &&
+				( hasSelectedNonAreaBlock ? (
+					<BlockInspector />
+				) : (
+					// Pretend that Widget Areas are part of the UI by not
+					// showing the Block Inspector when one is selected.
+					<span className="block-editor-block-inspector__no-blocks">
+						{ __( 'No block selected.' ) }
+					</span>
+				) ) }
 		</ComplementaryArea>
 	);
 }

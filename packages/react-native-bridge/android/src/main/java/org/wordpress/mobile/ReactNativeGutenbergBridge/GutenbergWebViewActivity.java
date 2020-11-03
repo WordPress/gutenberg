@@ -4,28 +4,31 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.JavascriptInterface;
+import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
-import org.wordpress.android.util.AppLog;
-import org.wordpress.android.util.helpers.WPWebChromeClient;
+import org.wordpress.android.util.AppLog;;
 import org.wordpress.mobile.FileUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class GutenbergWebViewActivity extends AppCompatActivity {
 
@@ -42,6 +45,28 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     protected View mForegroundView;
     protected boolean mIsRedirected;
 
+    private ProgressBar mProgressBar;
+    private boolean mIsGutenbergReady;
+    private AtomicBoolean mIsWebPageLoaded = new AtomicBoolean(false);
+    private AtomicBoolean mIsBlockContentInserted = new AtomicBoolean(false);
+    private final Handler mWebPageLoadedHandler = new Handler();
+    private final Runnable mWebPageLoadedRunnable = new Runnable() {
+        @Override public void run() {
+            if (!mIsWebPageLoaded.getAndSet(true)) {
+                mProgressBar.setVisibility(View.GONE);
+                // We want to insert block content
+                // only if gutenberg is ready
+                if (mIsGutenbergReady) {
+                    final Handler handler = new Handler();
+                    handler.postDelayed(() -> {
+                        // Insert block content
+                        insertBlockScript();
+                    }, 200);
+                }
+            }
+        }
+    };
+
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +76,7 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
         mWebView = findViewById(R.id.gutenberg_web_view);
         mForegroundView = findViewById(R.id.foreground_view);
+        mProgressBar = findViewById(R.id.progress_bar);
 
         // Set settings
         WebSettings settings = mWebView.getSettings();
@@ -64,7 +90,23 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
         // Setup WebView client
         setupWebViewClient();
-        mWebView.setWebChromeClient(new WPWebChromeClient(null, findViewById(R.id.progress_bar)));
+
+        // Setup Web Chrome client
+        mWebView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public void onProgressChanged(WebView view, int progress) {
+                if (progress == 100) {
+                    mWebPageLoadedHandler.removeCallbacks(mWebPageLoadedRunnable);
+                    mWebPageLoadedHandler.postDelayed(mWebPageLoadedRunnable, 1500);
+                } else {
+                    mIsWebPageLoaded.compareAndSet(true, false);
+                    if (mProgressBar.getVisibility() == View.GONE) {
+                        mProgressBar.setVisibility(View.VISIBLE);
+                    }
+                    mProgressBar.setProgress(progress);
+                }
+            }
+        });
 
         loadUrl();
     }
@@ -167,9 +209,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
             @Override
             public void onPageCommitVisible(WebView view, String url) {
-                String injectCssScript = getFileContentFromAssets("gutenberg-web-single-block/inject-css.js");
-                evaluateJavaScript(injectCssScript);
-
                 long userId = getUserId();
                 if (userId != 0) {
                     String injectLocalStorageScript = getFileContentFromAssets("gutenberg-web-single-block/local-storage-overrides.json");
@@ -205,14 +244,6 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
                 String contentFunctions = getFileContentFromAssets("gutenberg-web-single-block/content-functions.js");
                 evaluateJavaScript(contentFunctions);
 
-                String editorStyle = getFileContentFromAssets("gutenberg-web-single-block/editor-style-overrides.css");
-                editorStyle = removeWhiteSpace(removeNewLines(editorStyle));
-                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, editorStyle));
-
-                String injectWPBarsCssScript = getFileContentFromAssets("gutenberg-web-single-block/wp-bar-override.css");
-                injectWPBarsCssScript = removeWhiteSpace(removeNewLines(injectWPBarsCssScript));
-                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, injectWPBarsCssScript));
-
                 String injectGutenbergObserver = getFileContentFromAssets("gutenberg-web-single-block/gutenberg-observer.js");
                 evaluateJavaScript(injectGutenbergObserver);
             }
@@ -226,16 +257,38 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
 
     private void onGutenbergReady() {
         preventAutoSavesScript();
-        insertBlockScript();
+        // Inject css when Gutenberg is ready
+        injectCssScript();
         final Handler handler = new Handler();
         handler.postDelayed(() -> {
+            mIsGutenbergReady = true;
             // We want to make sure that page is loaded
             // with all elements before executing external JS
             injectOnGutenbergReadyExternalSources();
+            // If page is loaded try to insert block content
+            if (mIsWebPageLoaded.get()) {
+                // Insert block content
+                insertBlockScript();
+            }
             // We need some extra time to hide all unwanted html elements
             // like NUX (new user experience) modal is.
             mForegroundView.postDelayed(() -> mForegroundView.setVisibility(View.INVISIBLE), 1500);
         }, 2000);
+    }
+
+    private void injectCssScript() {
+        String injectCssScript = getFileContentFromAssets("gutenberg-web-single-block/inject-css.js");
+        mWebView.evaluateJavascript(injectCssScript, message -> {
+            if (message != null) {
+                String editorStyle = getFileContentFromAssets("gutenberg-web-single-block/editor-style-overrides.css");
+                editorStyle = removeWhiteSpace(removeNewLines(editorStyle));
+                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, editorStyle));
+
+                String injectWPBarsCssScript = getFileContentFromAssets("gutenberg-web-single-block/wp-bar-override.css");
+                injectWPBarsCssScript = removeWhiteSpace(removeNewLines(injectWPBarsCssScript));
+                evaluateJavaScript(String.format(INJECT_CSS_SCRIPT_TEMPLATE, injectWPBarsCssScript));
+            }
+        });
     }
 
     private void injectOnGutenbergReadyExternalSources() {
@@ -266,10 +319,12 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
     }
 
     private void insertBlockScript() {
-        String insertBlock = getFileContentFromAssets("gutenberg-web-single-block/insert-block.js").replace("%@","%s");
-        String blockContent = getIntent().getExtras().getString(ARG_BLOCK_CONTENT);
-        insertBlock = String.format(insertBlock, blockContent);
-        evaluateJavaScript(removeNewLines(insertBlock.replace("\\n", "\\\\n")));
+        if (!mIsBlockContentInserted.getAndSet(true)) {
+            String insertBlock = getFileContentFromAssets("gutenberg-web-single-block/insert-block.js").replace("%@","%s");
+            String blockContent = getIntent().getExtras().getString(ARG_BLOCK_CONTENT);
+            insertBlock = String.format(insertBlock, blockContent);
+            evaluateJavaScript(removeNewLines(insertBlock.replace("\\n", "\\\\n")));
+        }
     }
 
     @Override
@@ -304,6 +359,12 @@ public class GutenbergWebViewActivity extends AppCompatActivity {
         });
 
         super.finish();
+    }
+
+    @Override
+    protected void onDestroy() {
+        mWebPageLoadedHandler.removeCallbacks(mWebPageLoadedRunnable);
+        super.onDestroy();
     }
 
     public class WPWebKit {

@@ -48,19 +48,20 @@ describe( 'getEntityRecord', () => {
 describe( 'getEntityRecords', () => {
 	const POST_TYPES = {
 		post: { slug: 'post' },
-		page: { slug: 'page' },
+		page: { slug: 'page', id: 2 },
 	};
+	const ENTITIES = [
+		{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
+		{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
+	];
 
 	it( 'yields with requested post type', async () => {
-		const entities = [
-			{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
-		];
 		const fulfillment = getEntityRecords( 'root', 'postType' );
 
 		// Trigger generator
 		fulfillment.next();
 		// Provide entities and trigger apiFetch
-		const { value: apiFetchAction } = fulfillment.next( entities );
+		const { value: apiFetchAction } = fulfillment.next( ENTITIES );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/types?context=edit',
 		} );
@@ -74,6 +75,29 @@ describe( 'getEntityRecords', () => {
 				{}
 			)
 		);
+	} );
+
+	it( 'marks specific entity records as resolved', async () => {
+		const fulfillment = getEntityRecords( 'root', 'postType' );
+
+		// Repeat the steps from `yields with requested post type` test
+		fulfillment.next();
+		fulfillment.next( ENTITIES );
+		fulfillment.next( POST_TYPES );
+
+		// It should mark the entity record that has an ID as resolved
+		expect( fulfillment.next().value ).toEqual( {
+			type: 'START_RESOLUTION',
+			selectorName: 'getEntityRecord',
+			args: [ ENTITIES[ 1 ].kind, ENTITIES[ 1 ].name, 2 ],
+		} );
+		expect( fulfillment.next().value ).toEqual( {
+			type: 'FINISH_RESOLUTION',
+			selectorName: 'getEntityRecord',
+			args: [ ENTITIES[ 1 ].kind, ENTITIES[ 1 ].name, 2 ],
+		} );
+
+		expect( fulfillment.next().done ).toEqual( true );
 	} );
 } );
 

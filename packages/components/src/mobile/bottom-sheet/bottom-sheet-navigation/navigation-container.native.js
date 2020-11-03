@@ -12,8 +12,10 @@ import {
 	useState,
 	useContext,
 	useMemo,
+	useCallback,
 	Children,
 	useRef,
+	cloneElement,
 } from '@wordpress/element';
 
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -77,27 +79,49 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 		},
 	};
 
-	const setHeight = ( height, layout ) => {
-		if ( currentHeight !== height && height > 1 ) {
-			if ( animate && layout && currentHeight === 1 ) {
-				setCurrentHeight( height );
-			} else if ( animate ) {
+	const setHeight = useCallback(
+		( height, layout ) => {
+			// The screen is fullHeight or changing from fullScreen to the default mode
+			if (
+				( typeof currentHeight === 'string' &&
+					typeof height !== 'string' ) ||
+				typeof height === 'string'
+			) {
 				performLayoutAnimation( ANIMATION_DURATION );
 				setCurrentHeight( height );
-			} else {
-				setCurrentHeight( height );
+
+				return;
 			}
-		}
-	};
+
+			if ( currentHeight !== height && height > 1 ) {
+				if ( animate && layout && currentHeight === 1 ) {
+					setCurrentHeight( height );
+				} else if ( animate ) {
+					performLayoutAnimation( ANIMATION_DURATION );
+					setCurrentHeight( height );
+				} else {
+					setCurrentHeight( height );
+				}
+			}
+		},
+		[ currentHeight ]
+	);
 
 	const screens = useMemo( () => {
 		return Children.map( children, ( child ) => {
+			let screen = child;
 			const { name, ...otherProps } = child.props;
+			if ( ! main ) {
+				screen = cloneElement( child, {
+					...child.props,
+					isNested: true,
+				} );
+			}
 			return (
 				<Stack.Screen
 					name={ name }
 					{ ...otherProps }
-					children={ () => child }
+					children={ () => screen }
 				/>
 			);
 		} );
@@ -105,9 +129,16 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 
 	return useMemo( () => {
 		return (
-			<View style={ { height: currentHeight } }>
+			<View
+				style={ {
+					height: currentHeight,
+				} }
+			>
 				<BottomSheetNavigationProvider
-					value={ { setHeight, currentHeight } }
+					value={ {
+						setHeight,
+						currentHeight,
+					} }
 				>
 					{ main ? (
 						<NavigationContainer theme={ _theme }>
@@ -123,7 +154,7 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 				</BottomSheetNavigationProvider>
 			</View>
 		);
-	}, [ currentHeight ] );
+	}, [ currentHeight, _theme ] );
 }
 
 export default BottomSheetNavigationContainer;

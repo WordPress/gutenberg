@@ -12,15 +12,13 @@ import { WIDE_ALIGNMENTS } from '@wordpress/components';
 
 const ALIGNMENTS = [ 'left', 'center', 'right' ];
 
-export { AlignmentHookSettingsProvider } from './align.js';
-
 // Used to filter out blocks that don't support wide/full alignment on mobile
 addFilter(
 	'blocks.registerBlockType',
 	'core/react-native-editor/align',
 	( settings, name ) => {
 		if (
-			! WIDE_ALIGNMENTS.supportedBlocks.includes( name ) &&
+			WIDE_ALIGNMENTS.excludeBlocks.includes( name ) &&
 			hasBlockSupport( settings, 'align' )
 		) {
 			const blockAlign = settings.supports.align;

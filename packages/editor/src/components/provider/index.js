@@ -20,13 +20,13 @@ import {
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
+import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
  */
 import withRegistryProvider from './with-registry-provider';
 import { mediaUpload } from '../../utils';
-import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
 
 /**
@@ -42,16 +42,18 @@ import ConvertToGroupButtons from '../convert-to-group-buttons';
  * @param {number} [searchArguments.isInitialSuggestions]
  * @param {number} [searchArguments.type]
  * @param {number} [searchArguments.subtype]
+ * @param {number} [searchArguments.page]
  * @param {Object} [editorSettings]
  * @param {boolean} [editorSettings.disablePostFormats=false]
  * @return {Promise<Object[]>} List of suggestions
  */
-const fetchLinkSuggestions = (
+
+const fetchLinkSuggestions = async (
 	search,
-	{ isInitialSuggestions, type, subtype } = {},
+	{ isInitialSuggestions, type, subtype, page, perPage: perPageArg } = {},
 	{ disablePostFormats = false } = {}
 ) => {
-	const perPage = isInitialSuggestions ? 3 : 20;
+	const perPage = perPageArg || isInitialSuggestions ? 3 : 20;
 
 	const queries = [];
 
@@ -60,11 +62,12 @@ const fetchLinkSuggestions = (
 			apiFetch( {
 				path: addQueryArgs( '/wp/v2/search', {
 					search,
+					page,
 					per_page: perPage,
 					type: 'post',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] ) // fail by returning no results
 		);
 	}
 
@@ -73,11 +76,12 @@ const fetchLinkSuggestions = (
 			apiFetch( {
 				path: addQueryArgs( '/wp/v2/search', {
 					search,
+					page,
 					per_page: perPage,
 					type: 'term',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] )
 		);
 	}
 
@@ -86,21 +90,27 @@ const fetchLinkSuggestions = (
 			apiFetch( {
 				path: addQueryArgs( '/wp/v2/search', {
 					search,
+					page,
 					per_page: perPage,
 					type: 'post-format',
 					subtype,
 				} ),
-			} )
+			} ).catch( () => [] )
 		);
 	}
 
 	return Promise.all( queries ).then( ( results ) => {
-		return map( flatten( results ).slice( 0, perPage ), ( result ) => ( {
-			id: result.id,
-			url: result.url,
-			title: decodeEntities( result.title ) || __( '(no title)' ),
-			type: result.subtype || result.type,
-		} ) );
+		return map(
+			flatten( results )
+				.filter( ( result ) => !! result.id )
+				.slice( 0, perPage ),
+			( result ) => ( {
+				id: result.id,
+				url: result.url,
+				title: decodeEntities( result.title ) || __( '(no title)' ),
+				type: result.subtype || result.type,
+			} )
+		);
 	} );
 };
 
@@ -149,7 +159,6 @@ class EditorProvider extends Component {
 	getBlockEditorSettings(
 		settings,
 		reusableBlocks,
-		__experimentalFetchReusableBlocks,
 		hasUploadPermissions,
 		canUserUseUnfilteredHTML,
 		undo,
@@ -160,8 +169,6 @@ class EditorProvider extends Component {
 				'__experimentalBlockDirectory',
 				'__experimentalBlockPatterns',
 				'__experimentalBlockPatternCategories',
-				'__experimentalEnableFullSiteEditing',
-				'__experimentalEnableFullSiteEditingDemo',
 				'__experimentalFeatures',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBaseStyles',
@@ -183,7 +190,7 @@ class EditorProvider extends Component {
 				'fontSizes',
 				'gradients',
 				'hasFixedToolbar',
-				'hasPermissionsToManageWidgets',
+				'hasReducedUI',
 				'imageEditing',
 				'imageSizes',
 				'imageDimensions',
@@ -198,7 +205,6 @@ class EditorProvider extends Component {
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalFetchReusableBlocks,
 			__experimentalFetchLinkSuggestions: partialRight(
 				fetchLinkSuggestions,
 				settings
@@ -242,7 +248,6 @@ class EditorProvider extends Component {
 			resetEditorBlocksWithoutUndoLevel,
 			hasUploadPermissions,
 			isPostTitleSelected,
-			__experimentalFetchReusableBlocks,
 			undo,
 		} = this.props;
 
@@ -253,7 +258,6 @@ class EditorProvider extends Component {
 		const editorSettings = this.getBlockEditorSettings(
 			settings,
 			reusableBlocks,
-			__experimentalFetchReusableBlocks,
 			hasUploadPermissions,
 			canUserUseUnfilteredHTML,
 			undo,
@@ -285,7 +289,7 @@ class EditorProvider extends Component {
 								useSubRegistry={ false }
 							>
 								{ children }
-								<ReusableBlocksButtons />
+								<ReusableBlocksMenuItems />
 								<ConvertToGroupButtons />
 							</BlockEditorProvider>
 						</BlockContextProvider>
@@ -305,7 +309,6 @@ export default compose( [
 			getEditorBlocks,
 			getEditorSelectionStart,
 			getEditorSelectionEnd,
-			__experimentalGetReusableBlocks,
 			isPostTitleSelected,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
@@ -316,7 +319,11 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			selectionStart: getEditorSelectionStart(),
 			selectionEnd: getEditorSelectionEnd(),
-			reusableBlocks: __experimentalGetReusableBlocks(),
+			reusableBlocks: select( 'core' ).getEntityRecords(
+				'postType',
+				'wp_block',
+				{ per_page: -1 }
+			),
 			hasUploadPermissions: defaultTo(
 				canUser( 'create', 'media' ),
 				true
@@ -331,7 +338,6 @@ export default compose( [
 			updatePostLock,
 			resetEditorBlocks,
 			updateEditorSettings,
-			__experimentalFetchReusableBlocks,
 			__experimentalTearDownEditor,
 			undo,
 		} = dispatch( 'core/editor' );
@@ -350,7 +356,6 @@ export default compose( [
 				} );
 			},
 			tearDownEditor: __experimentalTearDownEditor,
-			__experimentalFetchReusableBlocks,
 			undo,
 		};
 	} ),

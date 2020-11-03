@@ -2,7 +2,7 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { first, map, find, get, filter, compact, defaultTo } from 'lodash';
+import { set, map, find, get, filter, compact, defaultTo } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -16,6 +16,18 @@ import deprecated from '@wordpress/deprecated';
 import { REDUCER_KEY } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
+import { getNormalizedCommaSeparable } from './utils';
+
+/**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ *
+ * @type {Array}
+ */
+const EMPTY_ARRAY = [];
 
 /**
  * Returns true if a request is in progress for embed preview data, or false
@@ -44,6 +56,9 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  * @return {Array} Authors list.
  */
 export function getAuthors( state ) {
+	deprecated( "select( 'core' ).getAuthors()", {
+		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
+	} );
 	return getUserQueryResults( state, 'authors' );
 }
 
@@ -132,8 +147,19 @@ export function getEntityRecord( state, kind, name, key, query ) {
 		return queriedState.items[ key ];
 	}
 
-	query = { ...query, include: [ key ] };
-	return first( getQueriedItems( queriedState, query ) );
+	const item = queriedState.items[ key ];
+	if ( item && query._fields ) {
+		const filteredItem = {};
+		const fields = getNormalizedCommaSeparable( query._fields );
+		for ( let f = 0; f < fields.length; f++ ) {
+			const field = fields[ f ].split( '.' );
+			const value = get( item, field );
+			set( filteredItem, field, value );
+		}
+		return filteredItem;
+	}
+
+	return item;
 }
 
 /**
@@ -223,7 +249,7 @@ export function getEntityRecords( state, kind, name, query ) {
 		'queriedData',
 	] );
 	if ( ! queriedState ) {
-		return [];
+		return EMPTY_ARRAY;
 	}
 	return getQueriedItems( queriedState, query );
 }

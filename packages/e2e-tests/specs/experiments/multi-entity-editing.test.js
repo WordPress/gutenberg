@@ -12,39 +12,27 @@ import {
 	createNewPost,
 	publishPost,
 	trashAllPosts,
+	activateTheme,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { useExperimentalFeatures } from '../../experimental-features';
+import { navigationPanel } from '../../experimental-features';
 
 const visitSiteEditor = async () => {
 	const query = addQueryArgs( '', {
 		page: 'gutenberg-edit-site',
 	} ).slice( 1 );
 	await visitAdminPage( 'admin.php', query );
-	// Waits for the template part to load...
-	await page.waitForSelector(
-		'.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
-	);
 };
 
-const openTemplateDropdown = async () => {
-	// Open the dropdown menu.
-	const templateDropdown =
-		'button.components-dropdown-menu__toggle[aria-label="Switch Template"]';
-	await page.click( templateDropdown );
-	await page.waitForSelector( '.edit-site-template-switcher__popover' );
-};
-
-const getTemplateDropdownElement = async ( itemName ) => {
-	await openTemplateDropdown();
-	const [ item ] = await page.$x(
-		`//div[contains(@class, "edit-site-template-switcher__popover")]//button[contains(., "${ itemName }")]`
-	);
-	return item;
+const clickTemplateItem = async ( menus, itemName ) => {
+	await navigationPanel.open();
+	await navigationPanel.backToRoot();
+	await navigationPanel.navigate( menus );
+	await navigationPanel.clickItemByText( itemName );
 };
 
 const createTemplatePart = async (
@@ -158,14 +146,14 @@ describe( 'Multi-entity editor states', () => {
 	const templatePartName = 'Test Template Part Name Edit';
 	const nestedTPName = 'Test Nested Template Part Name Edit';
 
-	useExperimentalFeatures( [
-		'#gutenberg-full-site-editing',
-		'#gutenberg-full-site-editing-demo',
-	] );
-
 	beforeAll( async () => {
+		await activateTheme( 'twentytwentyone-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+	} );
+
+	afterAll( async () => {
+		await activateTheme( 'twentytwentyone' );
 	} );
 
 	it( 'should not display any dirty entities when loading the site editor', async () => {
@@ -174,8 +162,8 @@ describe( 'Multi-entity editor states', () => {
 	} );
 
 	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
-		const templatePartButton = await getTemplateDropdownElement( 'header' );
-		await templatePartButton.click();
+		await visitSiteEditor();
+		await clickTemplateItem( 'Template Parts', 'header' );
 
 		// Wait for blocks to load.
 		await page.waitForSelector( '.wp-block' );
@@ -183,8 +171,7 @@ describe( 'Multi-entity editor states', () => {
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
 
 		// Switch back and make sure it is still clean.
-		const templateButton = await getTemplateDropdownElement( 'front-page' );
-		await templateButton.click();
+		await clickTemplateItem( 'Templates', templateName );
 		await page.waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
@@ -213,6 +200,10 @@ describe( 'Multi-entity editor states', () => {
 			);
 			await saveAllEntities();
 			await visitSiteEditor();
+			// Waits for the template part to load...
+			await page.waitForSelector(
+				'.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
+			);
 			removeErrorMocks();
 		} );
 

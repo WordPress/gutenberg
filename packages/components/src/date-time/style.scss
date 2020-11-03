@@ -1,8 +1,4 @@
-// We can't reference this package with ~ because of how Lerna handles packages.
-// Also, don't convert styles to RTL because react-dates uses an isRTL flag instead.
-/*rtl:begin:ignore*/
-@import "node_modules/react-dates/lib/css/_datepicker";
-/*rtl:end:ignore*/
+@import "./datepicker";
 
 .components-datetime {
 	padding: 0;
@@ -48,7 +44,7 @@
 
 .components-datetime__date {
 	min-height: 236px;
-	border-top: 1px solid $gray-200;
+	border-top: 1px solid $gray-300;
 
 	// Override external DatePicker styles.
 	.DayPickerNavigation_leftButton__horizontalDefault {

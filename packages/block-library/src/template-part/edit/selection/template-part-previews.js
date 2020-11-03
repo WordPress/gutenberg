@@ -14,14 +14,23 @@ import { useAsyncList } from '@wordpress/compose';
  * External dependencies
  */
 import { groupBy, uniq, deburr } from 'lodash';
+import { Composite, useCompositeState, CompositeItem } from 'reakit';
 
 function PreviewPlaceholder() {
 	return (
-		<div className="wp-block-template-part__selection-preview-item is-placeholder" />
+		<div
+			className="wp-block-template-part__selection-preview-item is-placeholder"
+			tabIndex={ 0 }
+		/>
 	);
 }
 
-function TemplatePartItem( { templatePart, setAttributes, onClose } ) {
+function TemplatePartItem( {
+	templatePart,
+	setAttributes,
+	onClose,
+	composite,
+} ) {
 	const {
 		id,
 		slug,
@@ -49,9 +58,9 @@ function TemplatePartItem( { templatePart, setAttributes, onClose } ) {
 	}, [ id, slug, theme ] );
 
 	return (
-		<div
+		<CompositeItem
 			className="wp-block-template-part__selection-preview-item"
-			role="button"
+			role="option"
 			onClick={ onClick }
 			onKeyDown={ ( event ) => {
 				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
@@ -60,12 +69,13 @@ function TemplatePartItem( { templatePart, setAttributes, onClose } ) {
 			} }
 			tabIndex={ 0 }
 			aria-label={ templatePart.slug }
+			{ ...composite }
 		>
 			<BlockPreview blocks={ blocks } />
 			<div className="wp-block-template-part__selection-preview-item-title">
 				{ templatePart.slug }
 			</div>
-		</div>
+		</CompositeItem>
 	);
 }
 
@@ -85,7 +95,12 @@ function PanelGroup( { title, icon, children } ) {
 	);
 }
 
-function TemplatePartsByTheme( { templateParts, setAttributes, onClose } ) {
+function TemplatePartsByTheme( {
+	templateParts,
+	setAttributes,
+	onClose,
+	composite,
+} ) {
 	const templatePartsByTheme = useMemo( () => {
 		return Object.values( groupBy( templateParts, 'meta.theme' ) );
 	}, [ templateParts ] );
@@ -94,7 +109,8 @@ function TemplatePartsByTheme( { templateParts, setAttributes, onClose } ) {
 	return templatePartsByTheme.map( ( templatePartList ) => (
 		<PanelGroup
 			key={ templatePartList[ 0 ].meta.theme }
-			title={ templatePartList[ 0 ].meta.theme }
+			// Falsy theme implies custom template part.
+			title={ templatePartList[ 0 ].meta.theme || __( 'Custom' ) }
 		>
 			{ templatePartList.map( ( templatePart ) => {
 				return currentShownTPs.includes( templatePart ) ? (
@@ -103,6 +119,7 @@ function TemplatePartsByTheme( { templateParts, setAttributes, onClose } ) {
 						templatePart={ templatePart }
 						setAttributes={ setAttributes }
 						onClose={ onClose }
+						composite={ composite }
 					/>
 				) : (
 					<PreviewPlaceholder key={ templatePart.id } />
@@ -117,6 +134,7 @@ function TemplatePartSearchResults( {
 	setAttributes,
 	filterValue,
 	onClose,
+	composite,
 } ) {
 	const filteredTPs = useMemo( () => {
 		// Filter based on value.
@@ -161,13 +179,17 @@ function TemplatePartSearchResults( {
 	const currentShownTPs = useAsyncList( filteredTPs );
 
 	return filteredTPs.map( ( templatePart ) => (
-		<PanelGroup key={ templatePart.id } title={ templatePart.meta.theme }>
+		<PanelGroup
+			key={ templatePart.id }
+			title={ templatePart.meta.theme || __( 'Custom' ) }
+		>
 			{ currentShownTPs.includes( templatePart ) ? (
 				<TemplatePartItem
 					key={ templatePart.id }
 					templatePart={ templatePart }
 					setAttributes={ setAttributes }
 					onClose={ onClose }
+					composite={ composite }
 				/>
 			) : (
 				<PreviewPlaceholder key={ templatePart.id } />
@@ -181,6 +203,7 @@ export default function TemplateParts( {
 	filterValue,
 	onClose,
 } ) {
+	const composite = useCompositeState();
 	const templateParts = useSelect( ( select ) => {
 		const publishedTemplateParts = select( 'core' ).getEntityRecords(
 			'postType',
@@ -190,7 +213,8 @@ export default function TemplateParts( {
 				per_page: -1,
 			}
 		);
-		const currentTheme = select( 'core' ).getCurrentTheme()?.textdomain;
+		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
+
 		const themeTemplateParts = select( 'core' ).getEntityRecords(
 			'postType',
 			'wp_template_part',
@@ -216,20 +240,34 @@ export default function TemplateParts( {
 
 	if ( filterValue ) {
 		return (
-			<TemplatePartSearchResults
-				templateParts={ templateParts }
-				setAttributes={ setAttributes }
-				filterValue={ filterValue }
-				onClose={ onClose }
-			/>
+			<Composite
+				{ ...composite }
+				role="listbox"
+				aria-label={ __( 'List of template parts' ) }
+			>
+				<TemplatePartSearchResults
+					templateParts={ templateParts }
+					setAttributes={ setAttributes }
+					filterValue={ filterValue }
+					onClose={ onClose }
+					composite={ composite }
+				/>
+			</Composite>
 		);
 	}
 
 	return (
-		<TemplatePartsByTheme
-			templateParts={ templateParts }
-			setAttributes={ setAttributes }
-			onClose={ onClose }
-		/>
+		<Composite
+			{ ...composite }
+			role="listbox"
+			aria-label={ __( 'List of template parts' ) }
+		>
+			<TemplatePartsByTheme
+				templateParts={ templateParts }
+				setAttributes={ setAttributes }
+				onClose={ onClose }
+				composite={ composite }
+			/>
+		</Composite>
 	);
 }

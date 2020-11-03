@@ -1,7 +1,11 @@
 .background {
-	background-color: $white;
+	background-color: $modal-background;
 }
 
 .backgroundDark {
-	background-color: $background-dark-elevated;
+	background-color: $modal-background-dark;
+}
+
+.scrollableContent {
+	padding-bottom: $grid-unit-20;
 }

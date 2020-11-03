@@ -1,5 +1,10 @@
-.slider {
+.sliderIOS {
 	flex-grow: 1;
+}
+
+.sliderAndroid {
+	flex-grow: 1;
+	margin-left: -6px;
 }
 
 .sliderTextInput {
@@ -24,6 +29,7 @@
 .container {
 	flex-direction: row;
 	align-items: center;
+	flex: 1;
 }
 
 .cellContainerStyles {
@@ -40,4 +46,8 @@
 .containerAndroid {
 	padding-top: 8px;
 	padding-bottom: 8px;
+}
+
+.valueStyle {
+	height: 0;
 }

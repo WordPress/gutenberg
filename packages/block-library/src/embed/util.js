@@ -149,6 +149,24 @@ export const createUpgradedEmbedBlock = (
 };
 
 /**
+ * Removes all previously set aspect ratio related classes and return the rest
+ * existing class names.
+ *
+ * @param {string} existingClassNames Any existing class names.
+ * @return {string} The class names without any aspect ratio related class.
+ */
+export const removeAspectRatioClasses = ( existingClassNames ) => {
+	const aspectRatioClassNames = ASPECT_RATIOS.reduce(
+		( accumulator, { className } ) => {
+			accumulator[ className ] = false;
+			return accumulator;
+		},
+		{ 'wp-has-aspect-ratio': false }
+	);
+	return classnames( existingClassNames, aspectRatioClassNames );
+};
+
+/**
  * Returns class names with any relevant responsive aspect ratio names.
  *
  * @param {string}  html               The preview HTML that possibly contains an iframe with width and height set.
@@ -162,14 +180,7 @@ export function getClassNames(
 	allowResponsive = true
 ) {
 	if ( ! allowResponsive ) {
-		// Remove all of the aspect ratio related class names.
-		const aspectRatioClassNames = {
-			'wp-has-aspect-ratio': false,
-		};
-		ASPECT_RATIOS.forEach( ( { className } ) => {
-			aspectRatioClassNames[ className ] = false;
-		} );
-		return classnames( existingClassNames, aspectRatioClassNames );
+		return removeAspectRatioClasses( existingClassNames );
 	}
 
 	const previewDocument = document.implementation.createHTMLDocument( '' );
@@ -188,7 +199,7 @@ export function getClassNames(
 			const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
 			if ( aspectRatio >= potentialRatio.ratio ) {
 				return classnames(
-					existingClassNames,
+					removeAspectRatioClasses( existingClassNames ),
 					potentialRatio.className,
 					'wp-has-aspect-ratio'
 				);

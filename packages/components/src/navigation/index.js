@@ -16,25 +16,26 @@ import Animate from '../animate';
 import { ROOT_MENU } from './constants';
 import { NavigationContext } from './context';
 import { NavigationUI } from './styles/navigation-styles';
+import { useCreateNavigationTree } from './use-create-navigation-tree';
+import { useRTL } from '../utils/rtl';
 
 export default function Navigation( {
 	activeItem,
 	activeMenu = ROOT_MENU,
 	children,
 	className,
-	onActivateItem = noop,
 	onActivateMenu = noop,
 } ) {
-	const [ item, setItem ] = useState( activeItem );
 	const [ menu, setMenu ] = useState( activeMenu );
 	const [ slideOrigin, setSlideOrigin ] = useState();
+	const navigationTree = useCreateNavigationTree();
+	const defaultSlideOrigin = useRTL() ? 'right' : 'left';
 
-	const setActiveItem = ( itemId ) => {
-		setItem( itemId );
-		onActivateItem( itemId );
-	};
+	const setActiveMenu = ( menuId, slideInOrigin = defaultSlideOrigin ) => {
+		if ( ! navigationTree.getMenu( menuId ) ) {
+			return;
+		}
 
-	const setActiveMenu = ( menuId, slideInOrigin = 'left' ) => {
 		setSlideOrigin( slideInOrigin );
 		setMenu( menuId );
 		onActivateMenu( menuId );
@@ -49,19 +50,16 @@ export default function Navigation( {
 	}, [] );
 
 	useEffect( () => {
-		if ( activeItem !== item ) {
-			setActiveItem( activeItem );
-		}
 		if ( activeMenu !== menu ) {
 			setActiveMenu( activeMenu );
 		}
-	}, [ activeItem, activeMenu ] );
+	}, [ activeMenu ] );
 
 	const context = {
-		activeItem: item,
+		activeItem,
 		activeMenu: menu,
-		setActiveItem,
 		setActiveMenu,
+		navigationTree,
 	};
 
 	const classes = classnames( 'components-navigation', className );

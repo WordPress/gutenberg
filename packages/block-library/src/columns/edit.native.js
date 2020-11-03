@@ -24,12 +24,12 @@ import { withDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState, useMemo } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
+import { columns } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
 import variations from './variations';
 import styles from './editor.scss';
-import { getColumnWidths } from './utils';
 import ColumnsPreview from '../column/column-preview';
 
 /**
@@ -149,8 +149,9 @@ function ColumnsEditContainer( {
 	};
 
 	const getColumnsSliders = () => {
-		const columnWidths = Object.values(
-			getColumnWidths( innerColumns, columnCount )
+		const columnWidths = innerColumns.map(
+			( innerColumn ) =>
+				parseFloat( innerColumn.attributes.width ) || 100 / columnCount
 		);
 
 		return innerColumns.map( ( column, index ) => {
@@ -164,7 +165,7 @@ function ColumnsEditContainer( {
 						updateInnerColumnWidth( value, column.clientId )
 					}
 					cellContainerStyle={ styles.cellContainerStyle }
-					toFixed={ 1 }
+					decimalNum={ 1 }
 					rangePreview={
 						<ColumnsPreview
 							columnWidths={ columnWidths }
@@ -184,7 +185,7 @@ function ColumnsEditContainer( {
 				<PanelBody title={ __( 'Columns Settings' ) }>
 					<RangeControl
 						label={ __( 'Number of columns' ) }
-						icon="columns"
+						icon={ columns }
 						value={ columnCount }
 						onChange={ ( value ) =>
 							updateColumns( columnCount, value )
@@ -262,7 +263,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
 
 			updateBlockAttributes( columnId, {
-				width: value,
+				width: `${ value }%`,
 			} );
 		},
 		updateBlockSettings( settings ) {
@@ -310,7 +311,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 				);
 			}
 
-			replaceInnerBlocks( clientId, innerBlocks, false );
+			replaceInnerBlocks( clientId, innerBlocks );
 		},
 		onAddNextColumn: () => {
 			const { clientId } = ownProps;

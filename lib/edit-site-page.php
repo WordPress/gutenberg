@@ -87,7 +87,7 @@ function gutenberg_get_editor_styles() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
-	global $current_screen;
+	global $current_screen, $post;
 
 	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
@@ -130,23 +130,12 @@ function gutenberg_edit_site_init( $hook ) {
 		'imageSizes'        => $available_image_sizes,
 		'isRTL'             => is_rtl(),
 		'maxUploadFileSize' => $max_upload_size,
+		'siteUrl'           => site_url(),
+		'postsPerPage'      => get_option( 'posts_per_page' ),
 	);
 
-	list( $color_palette, ) = (array) get_theme_support( 'editor-color-palette' );
-	list( $font_sizes, )    = (array) get_theme_support( 'editor-font-sizes' );
-	if ( false !== $color_palette ) {
-		$settings['colors'] = $color_palette;
-	}
-	if ( false !== $font_sizes ) {
-		$settings['fontSizes'] = $font_sizes;
-	}
 	$settings['styles'] = gutenberg_get_editor_styles();
 	$settings           = gutenberg_experimental_global_styles_settings( $settings );
-
-	// This is so other parts of the code can hook their own settings.
-	// Example: Global Styles.
-	global $post;
-	$settings = apply_filters( 'block_editor_settings', $settings, $post );
 
 	// Preload block editor paths.
 	// most of these are copied from edit-forms-blocks.php.

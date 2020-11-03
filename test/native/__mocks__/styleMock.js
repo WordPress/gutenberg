@@ -93,4 +93,7 @@ module.exports = {
 	defaultBlock: {
 		marginTop: 16,
 	},
+	scrollableContent: {
+		paddingBottom: 20,
+	},
 };
