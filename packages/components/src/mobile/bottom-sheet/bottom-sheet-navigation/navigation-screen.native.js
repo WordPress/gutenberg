@@ -36,7 +36,7 @@ const BottomSheetNavigationScreen = ( {
 		shouldEnableBottomSheetMaxHeight,
 		setIsFullScreen,
 		listProps,
-		safeAreaBottomInset,
+		safeAreaBottomInset = styles.scrollableContent.paddingBottom,
 	} = useContext( BottomSheetContext );
 
 	const { setHeight } = useContext( BottomSheetNavigationContext );
@@ -88,9 +88,7 @@ const BottomSheetNavigationScreen = ( {
 						{ ! isNested && (
 							<View
 								style={ {
-									height:
-										safeAreaBottomInset ||
-										styles.scrollableContent.paddingBottom,
+									height: safeAreaBottomInset,
 								} }
 							/>
 						) }
