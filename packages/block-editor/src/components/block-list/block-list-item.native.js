@@ -101,7 +101,7 @@ export class BlockListItem extends Component {
 		const { isSelected } = this.props;
 
 		if ( this.blockRef.current ) {
-			// first we are measuring the layout to determine where {x,y} within the List Component being rendered the current Block based View is located.
+			// first we are measuring the layout to determine where {x,y} within the List Component the current Block based View is located.
 			this.blockRef.current.measureLayout(
 				findNodeHandle( this.props.listRef.current ),
 				( x, y ) => {
