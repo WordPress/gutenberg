@@ -29,16 +29,6 @@ function getPackageName( file ) {
 	return path.relative( PACKAGES_DIR, file ).split( path.sep )[ 0 ];
 }
 
-/**
- * Determine if a file is a sass stylesheet
- *
- * @param  {string} file File name
- * @return {boolean} Is a stylesheet
- */
-function isSassStylesheet( file ) {
-	return path.extname( file ) === '.scss';
-}
-
 function findEntriesThatImportFile( file ) {
 	const entriesWithImport = allEntries.reduce( ( acc, entry ) => {
 		const content = fs.readFileSync( entry, 'utf8' );
@@ -76,7 +66,7 @@ function createStyleEntryTransform() {
 		objectMode: true,
 		async transform( file, encoding, callback ) {
 			// Only stylesheets are subject to this transform.
-			if ( ! isSassStylesheet( file ) ) {
+			if ( path.extname( file ) !== '.scss' ) {
 				this.push( file );
 				callback();
 				return;
