@@ -1,0 +1,26 @@
+export default [
+	{
+		id: 'wp_inactive_widgets',
+		name: 'Inactive widgets',
+		description: '',
+		class: '',
+		before_widget: '',
+		after_widget: '',
+		before_title: '',
+		after_title: '',
+		status: 'inactive',
+		widgets: [],
+	},
+	{
+		id: 'sidebar-1',
+		name: 'Footer',
+		description: 'Add widgets here to appear in your footer.',
+		class: '',
+		before_widget: '<section id="%1$s" class="widget %2$s">',
+		after_widget: '</section>',
+		before_title: '<h2 class="widget-title">',
+		after_title: '</h2>',
+		status: 'active',
+		widgets: [ 'block-19', 'recent-posts-6', 'search-5', 'block-20' ],
+	},
+];

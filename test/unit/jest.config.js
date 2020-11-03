@@ -21,6 +21,7 @@ module.exports = {
 		'<rootDir>/test/unit/config/gutenberg-phase.js',
 		'<rootDir>/test/unit/config/register-context.js',
 	],
+	setupFilesAfterEnv: [ '<rootDir>/test/unit/config/setup-tests.js' ],
 	testURL: 'http://localhost',
 	testPathIgnorePatterns: [
 		'/.git/',
