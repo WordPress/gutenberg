@@ -10,7 +10,6 @@ import {
 
 const store = 'test';
 const path = [ 'blue', 'bird' ];
-const lockPath = [ store, ...path ];
 
 describe( 'enqueueLockRequest', () => {
 	it( 'Enqueues a lock request', async () => {
@@ -23,7 +22,7 @@ describe( 'enqueueLockRequest', () => {
 			type: 'ENQUEUE_LOCK_REQUEST',
 			request: {
 				store,
-				path: lockPath,
+				path,
 				exclusive: true,
 				notifyAcquired: expect.any( Function ),
 			},
@@ -64,14 +63,14 @@ describe( 'enqueueLockRequest', () => {
 
 describe( 'processPendingLockRequests', () => {
 	const exclusive = true;
-	const lock = { path: lockPath, exclusive };
+	const lock = { store, path, exclusive };
 
 	let notifyAcquired;
 	let request;
 
 	beforeEach( () => {
 		notifyAcquired = jest.fn();
-		request = { path: lockPath, exclusive, notifyAcquired };
+		request = { store, path, exclusive, notifyAcquired };
 	} );
 
 	it( 'Grants a lock request that may be granted', async () => {
@@ -184,14 +183,14 @@ describe( 'processPendingLockRequests', () => {
 
 describe( 'acquireStoreLock', () => {
 	const exclusive = true;
-	const lock = { path: lockPath, exclusive };
+	const lock = { store, path, exclusive };
 
 	let notifyAcquired;
 	let request;
 
 	beforeEach( () => {
 		notifyAcquired = jest.fn();
-		request = { path: lockPath, exclusive, notifyAcquired };
+		request = { store, path, exclusive, notifyAcquired };
 	} );
 
 	it( 'Enqueues a lock request and attempts to fulfill it', async () => {
@@ -276,7 +275,7 @@ describe( 'acquireStoreLock', () => {
 } );
 
 describe( 'releaseStoreLock', () => {
-	const lock = { path: lockPath, exclusive: true };
+	const lock = { store, path, exclusive: true };
 
 	it( 'Releases a lock request and attempts to fulfill pending lock requests', async () => {
 		const fulfillment = releaseStoreLock( lock );

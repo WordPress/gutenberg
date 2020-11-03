@@ -37,7 +37,7 @@ describe( 'locks', () => {
 		const bird = buildNode( { red, blue, green } );
 		const tree = buildNode( { bird } );
 
-		const request = { path: [ 'bird', 'green' ] };
+		const request = { store: 'bird', path: [ 'green' ] };
 		const state = deepFreeze( {
 			requests: [ request ],
 			tree,
@@ -77,7 +77,8 @@ describe( 'locks', () => {
 		const red = buildNode();
 		const blue = buildNode();
 		const lock = {
-			path: [ 'bird', 'green' ],
+			store: 'bird',
+			path: [ 'green' ],
 		};
 		const state = deepFreeze( {
 			// Should remove the request...

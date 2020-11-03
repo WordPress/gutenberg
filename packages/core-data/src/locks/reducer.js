@@ -30,10 +30,11 @@ export function locks( state = DEFAULT_STATE, action ) {
 		}
 		case 'GRANT_LOCK_REQUEST': {
 			const { lock, request } = action;
-			const { path } = request;
+			const { store, path } = request;
+			const storePath = [ store, ...path ];
 
-			const newTree = deepCopyLocksTreePath( state.tree, path );
-			const node = getNode( newTree, path );
+			const newTree = deepCopyLocksTreePath( state.tree, storePath );
+			const node = getNode( newTree, storePath );
 			node.locks = [ ...node.locks, lock ];
 
 			return {
@@ -44,9 +45,10 @@ export function locks( state = DEFAULT_STATE, action ) {
 		}
 		case 'RELEASE_LOCK': {
 			const { lock } = action;
+			const storePath = [ lock.store, ...lock.path ];
 
-			const newTree = deepCopyLocksTreePath( state.tree, lock.path );
-			const node = getNode( newTree, lock.path );
+			const newTree = deepCopyLocksTreePath( state.tree, storePath );
+			const node = getNode( newTree, storePath );
 			node.locks = node.locks.filter( ( l ) => l !== lock );
 
 			return {

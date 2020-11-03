@@ -17,7 +17,7 @@ export function* enqueueLockRequest( store, path, { exclusive } ) {
 	} );
 	yield {
 		type: 'ENQUEUE_LOCK_REQUEST',
-		request: { store, path: [ store, ...path ], exclusive, notifyAcquired },
+		request: { store, path, exclusive, notifyAcquired },
 	};
 	return promise;
 }
@@ -50,7 +50,7 @@ export function* processPendingLockRequests() {
 			}
 		);
 		if ( isAvailable ) {
-			const lock = { path, exclusive };
+			const lock = { store, path, exclusive };
 			yield {
 				type: 'GRANT_LOCK_REQUEST',
 				lock,
