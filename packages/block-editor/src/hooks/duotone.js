@@ -54,13 +54,16 @@ function addDuotoneAttributes( settings ) {
  */
 const withDuotoneToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { name: blockName, attributes, setAttributes, clientId } = props;
-
-		const duotoneSupport = getBlockSupport( blockName, 'duotone' );
+		const duotoneSupport = getBlockSupport( props.name, 'duotone' );
 
 		if ( ! duotoneSupport ) {
 			return <BlockEdit { ...props } />;
 		}
+
+		const {
+			attributes: { duotone },
+			setAttributes,
+		} = props;
 
 		// Object | boolean | string | string[] -> boolean | string | string[]
 		const editSelectors =
@@ -74,22 +77,25 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 
 		return (
 			<>
-				<BlockEdit { ...props } />
-				{ attributes.duotone ? (
+				<div
+					className={ duotone && `duotone-filter-${ duotone.slug }` }
+				>
+					<BlockEdit { ...props } />
+				</div>
+				{ duotone ? (
 					<DuotoneFilter
-						slug={ attributes.duotone.slug }
-						scope={ `#block-${ clientId }` }
+						slug={ duotone.slug }
 						selectors={ editSelectors }
-						values={ attributes.duotone.values }
+						values={ duotone.values }
 					/>
 				) : null }
 				<BlockControls>
 					<DuotoneToolbar
-						value={ attributes.duotone }
+						value={ duotone }
 						duotonePalette={ duotonePalette }
 						colorPalette={ colorPalette }
-						onChange={ ( duotone ) => {
-							setAttributes( { duotone } );
+						onChange={ ( newDuotone ) => {
+							setAttributes( { duotone: newDuotone } );
 						} }
 					/>
 				</BlockControls>

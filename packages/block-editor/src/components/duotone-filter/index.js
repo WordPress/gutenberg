@@ -26,14 +26,11 @@ import { SVG } from '@wordpress/components';
  *
  * @param  {Object}    props           Duotone props.
  * @param  {string}    props.slug      Unique id for this duotone filter.
- * @param  {string}    props.scope     Outer scope to limit the filter effects.
  * @param  {Selectors} props.selectors Selectors to apply the filter to.
  * @param  {Values}    props.values    R, G, and B values to filter with.
  * @return {WPElement}                 Duotone element.
  */
-export default function DuotoneFilter( { slug, scope, selectors, values } ) {
-	// TODO: Decide if scope is needed or if the classname can be added like in the PHP.
-
+export default function DuotoneFilter( { slug, selectors, values } ) {
 	const duotoneId = `duotone-filter-${ slug }`;
 
 	// boolean | string | string[] -> boolean[] | string[]
@@ -43,7 +40,9 @@ export default function DuotoneFilter( { slug, scope, selectors, values } ) {
 
 	// boolean[] | string[] -> string[]
 	const scopedSelectors = selectorsArray.map( ( selector ) =>
-		typeof selector === 'string' ? `${ scope } ${ selector }` : scope
+		typeof selector === 'string'
+			? `.${ duotoneId } ${ selector }`
+			: `.${ duotoneId }`
 	);
 
 	// string[] -> string

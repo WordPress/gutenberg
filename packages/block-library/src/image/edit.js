@@ -80,7 +80,6 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
-	clientId,
 } ) {
 	const {
 		url = '',
@@ -324,7 +323,6 @@ export function ImageEdit( {
 						onSelectURL={ onSelectURL }
 						onUploadError={ onUploadError }
 						containerRef={ ref }
-						clientId={ clientId }
 					/>
 				) }
 				{ mediaPlaceholder }

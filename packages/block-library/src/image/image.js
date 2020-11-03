@@ -83,7 +83,6 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
-	clientId,
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
@@ -388,6 +387,7 @@ export default function Image( {
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		<>
 			<img
+				className={ duotone && `duotone-filter-${ duotone.slug }` }
 				src={ url }
 				alt={ defaultedAlt }
 				onClick={ onImageClick }
@@ -513,20 +513,16 @@ export default function Image( {
 		);
 	}
 
-	const duotoneFilter = duotone ? (
-		<DuotoneFilter
-			slug={ duotone.slug }
-			scope={ `#block-${ clientId }` }
-			selectors={ 'img' }
-			values={ duotone.values }
-		/>
-	) : null;
-
 	return (
 		<>
 			{ controls }
 			{ img }
-			{ duotoneFilter }
+			{ duotone && (
+				<DuotoneFilter
+					slug={ duotone.slug }
+					values={ duotone.values }
+				/>
+			) }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
 					ref={ captionRef }
