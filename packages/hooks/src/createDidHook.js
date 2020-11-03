@@ -10,7 +10,7 @@ import validateHookName from './validateHookName.js';
  *
  * @param  {string} hookName The hook name to check.
  *
- * @return {number|undefined} The number of times the hook has run.
+ * @return {number | undefined} The number of times the hook has run.
  */
 
 /**

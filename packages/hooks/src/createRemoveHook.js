@@ -14,7 +14,7 @@ import { doAction } from './';
  * @param {string} namespace The unique namespace identifying the callback in the
  *                           form `vendor/plugin/function`.
  *
- * @return {number|undefined} The number of callbacks removed.
+ * @return {number | undefined} The number of callbacks removed.
  */
 
 /**

@@ -13,7 +13,7 @@ import { doAction } from './';
  * @param {string}               hookName  Name of hook to add
  * @param {string}               namespace The unique namespace identifying the callback in the form `vendor/plugin/function`.
  * @param {import('.').Callback} callback  Function to call when the hook is run
- * @param {?number}              priority  Priority of this hook (default=10)
+ * @param {number}              [priority=10]  Priority of this hook
  */
 
 /**
