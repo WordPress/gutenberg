@@ -135,7 +135,7 @@ function gutenberg_edit_site_init( $hook ) {
 	);
 
 	$settings['styles']                          = gutenberg_get_editor_styles();
-	$settings['defaultTemplateTypesDefinitions'] = gutenberg_get_default_template_types_definitions();
+	$settings['defaultTemplateTypesDefinitions'] = gutenberg_get_indexed_default_template_types_definitions();
 	$settings                                    = gutenberg_experimental_global_styles_settings( $settings );
 
 	// Preload block editor paths.
