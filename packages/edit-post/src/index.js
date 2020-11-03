@@ -6,7 +6,6 @@ import '@wordpress/block-editor';
 import '@wordpress/editor';
 import '@wordpress/keyboard-shortcuts';
 import '@wordpress/reusable-blocks';
-import '@wordpress/viewport';
 import '@wordpress/notices';
 import {
 	registerCoreBlocks,

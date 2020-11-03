@@ -36,6 +36,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/plugins": "file:../plugins",
+		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19"
 	},

@@ -8,7 +8,6 @@ import '@wordpress/keyboard-shortcuts';
 import '@wordpress/notices';
 import '@wordpress/reusable-blocks';
 import '@wordpress/rich-text';
-import '@wordpress/viewport';
 
 /**
  * Internal dependencies

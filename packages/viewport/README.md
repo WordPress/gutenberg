@@ -76,6 +76,10 @@ _Returns_
 
 -   `Function`: Higher-order component.
 
+<a name="viewportStore" href="#viewportStore">#</a> **viewportStore**
+
+Undocumented declaration.
+
 <a name="withViewportMatch" href="#withViewportMatch">#</a> **withViewportMatch**
 
 Higher-order component creator, creating a new component which renders with

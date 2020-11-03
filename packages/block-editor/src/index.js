@@ -3,7 +3,6 @@
  */
 import '@wordpress/blocks';
 import '@wordpress/rich-text';
-import '@wordpress/viewport';
 import '@wordpress/keyboard-shortcuts';
 import '@wordpress/notices';
 
