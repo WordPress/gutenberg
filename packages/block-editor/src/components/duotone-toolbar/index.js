@@ -28,15 +28,7 @@ import {
 
 function getDefaultColors( palette ) {
 	// A default dark and light color are required.
-	if ( ! palette || palette.length === 0 ) return [ '#000', '#fff' ];
-
-	// Optimize for contrast if only one color is present.
-	if ( palette.length === 1 ) {
-		const { color } = palette[ 0 ];
-		return toBrightness( color ) > 0.5
-			? [ '#000', color ]
-			: [ color, '#fff' ];
-	}
+	if ( ! palette || palette.length < 2 ) return [ '#000', '#fff' ];
 
 	return palette
 		.map( ( { color } ) => ( {
