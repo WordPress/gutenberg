@@ -17,6 +17,8 @@ const files = process.argv.slice( 2 );
  */
 const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
 
+const allEntries = glob.sync( path.resolve( PACKAGES_DIR, '*/src/*.scss' ) );
+
 /**
  * Get the package name for a specified file
  *
@@ -35,6 +37,28 @@ function getPackageName( file ) {
  */
 function isSassStylesheet( file ) {
 	return path.extname( file ) === '.scss';
+}
+
+function findEntriesThatImportFile( file ) {
+	const entriesWithImport = allEntries.reduce( ( acc, entry ) => {
+		const content = fs.readFileSync( entry, 'utf8' );
+		const importedFiles = content.toString().match( /@import "(.*?)"/g );
+
+		const packageName = getPackageName( file );
+		const re = new RegExp( packageName, 'g' );
+
+		const fileIsImported =
+			importedFiles &&
+			importedFiles.find( ( importedFile ) => importedFile.match( re ) );
+
+		if ( fileIsImported ) {
+			acc.push( entry );
+		}
+
+		return acc;
+	}, [] );
+
+	return entriesWithImport;
 }
 
 /**
@@ -65,12 +89,21 @@ function createStyleEntryTransform() {
 				return;
 			}
 
-			packages.add( packageName );
-			const entries = await glob(
-				path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
-			);
-			entries.forEach( ( entry ) => this.push( entry ) );
-			callback();
+			// Determines whether or not other packages import styles
+			// that include styles from the currently modified stylesheet
+			const entriesWithImport = findEntriesThatImportFile( file );
+
+			if ( entriesWithImport.length ) {
+				entriesWithImport.forEach( ( entry ) => stream.push( entry ) );
+				callback();
+			} else {
+				packages.add( packageName );
+				const entries = await glob(
+					path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
+				);
+				entries.forEach( ( entry ) => this.push( entry ) );
+				callback();
+			}
 		},
 	} );
 }
@@ -118,50 +151,10 @@ let onFileComplete = () => {};
 
 let stream;
 
-function findEntriesWithImports( file, allEntries ) {
-	const entriesWithImport = allEntries.reduce( ( acc, entry ) => {
-		const content = fs.readFileSync( entry, 'utf8' );
-		const importedFiles = content.toString().match( /@import "(.*?)"/g );
-
-		const packageName = getPackageName( file );
-		const re = new RegExp( packageName, 'g' );
-
-		const fileIsImported =
-			importedFiles &&
-			importedFiles.find( ( importedFile ) => importedFile.match( re ) );
-
-		if ( fileIsImported ) {
-			acc.push( entry );
-		}
-
-		return acc;
-	}, [] );
-
-	return entriesWithImport;
-}
-
 if ( files.length ) {
-	const allEntries = glob.sync(
-		path.resolve( PACKAGES_DIR, '*/src/*.scss' )
-	);
-
 	stream = new Readable( { encoding: 'utf8' } );
 	files.forEach( ( file ) => {
 		stream.push( file );
-		if ( isSassStylesheet( file ) ) {
-			// determine if what we are rebuilding is imported in another
-			// style.scss of other packages
-
-			// Determines other packages that import modified styles
-			const entriesWithImport = findEntriesWithImports(
-				file,
-				allEntries
-			);
-
-			if ( entriesWithImport.length ) {
-				entriesWithImport.forEach( ( entry ) => stream.push( entry ) );
-			}
-		}
 	} );
 
 	stream.push( null );
