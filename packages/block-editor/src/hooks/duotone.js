@@ -36,9 +36,34 @@ const DEFAULT_DUOTONE_OPTIONS = [
 		slug: 'grayscale',
 	},
 	{
-		name: __( 'Light grayscale' ),
-		colors: [ '#7f7f7f', '#ffffff' ],
-		slug: 'light-grayscale',
+		name: __( 'Green and Yellow' ),
+		colors: [ '#00e400', '#f9ff00' ],
+		slug: 'green-yellow',
+	},
+	{
+		name: __( 'Red and Blue' ),
+		colors: [ '#ff0000', '#0705ff' ],
+		slug: 'red-blue',
+	},
+	{
+		name: __( 'Midnight' ),
+		colors: [ '#03005d', '#0090ff' ],
+		slug: 'midnight',
+	},
+	{
+		name: __( 'Orange and Yellow' ),
+		colors: [ '#ff4b00', '#ffe400' ],
+		slug: 'orange-yellow',
+	},
+	{
+		name: __( 'Magenta and Lime' ),
+		colors: [ '#ff00ac', '#a8ff76' ],
+		slug: 'magenta-lime',
+	},
+	{
+		name: __( 'Blue and Green' ),
+		colors: [ '#0410ff', '#00ff00' ],
+		slug: 'blue-green',
 	},
 ];
 
