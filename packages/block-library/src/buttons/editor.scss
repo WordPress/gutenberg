@@ -3,15 +3,17 @@
 	margin-left: 0;
 }
 
-.wp-block[data-align="center"] > .wp-block-buttons {
+.wp-block > .wp-block-buttons {
 	display: flex;
-	align-items: center;
 	flex-wrap: wrap;
+}
+
+.wp-block[data-align="center"] > .wp-block-buttons {
+	align-items: center;
 	justify-content: center;
 }
 
 .wp-block[data-align="right"] > .wp-block-buttons {
-	display: flex;
 	justify-content: flex-end;
 }
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, kebabCase, reduce } from 'lodash';
+import { get, kebabCase, reduce, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -51,6 +51,20 @@ export const mergeTrees = ( baseData, userData ) => {
 	return mergedTree;
 };
 
+function compileStyleValue( uncompiledValue ) {
+	const VARIABLE_REFERENCE_PREFIX = 'var:';
+	const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
+	const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
+	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
+		const variable = uncompiledValue
+			.slice( VARIABLE_REFERENCE_PREFIX.length )
+			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
+			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
+		return `var(--wp--${ variable })`;
+	}
+	return uncompiledValue;
+}
+
 export default ( blockData, tree ) => {
 	const styles = [];
 	// Can this be converted to a context, as the global context?
@@ -74,9 +88,8 @@ export default ( blockData, tree ) => {
 				get( blockStyles, STYLE_PROPERTY[ key ], false )
 			) {
 				declarations.push(
-					`${ cssProperty }: ${ get(
-						blockStyles,
-						STYLE_PROPERTY[ key ]
+					`${ cssProperty }: ${ compileStyleValue(
+						get( blockStyles, STYLE_PROPERTY[ key ] )
 					) }`
 				);
 			}

@@ -43,16 +43,14 @@ function render_block_core_site_logo( $attributes ) {
  * Registers the `core/site-logo` block on the server.
  */
 function register_block_core_site_logo() {
-	if ( gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
-		register_block_type_from_metadata(
-			__DIR__ . '/site-logo',
-			array(
-				'render_callback' => 'render_block_core_site_logo',
-			)
-		);
-		add_filter( 'pre_set_theme_mod_custom_logo', 'sync_site_logo_to_theme_mod' );
-		add_filter( 'theme_mod_custom_logo', 'override_custom_logo_theme_mod' );
-	}
+	register_block_type_from_metadata(
+		__DIR__ . '/site-logo',
+		array(
+			'render_callback' => 'render_block_core_site_logo',
+		)
+	);
+	add_filter( 'pre_set_theme_mod_custom_logo', 'sync_site_logo_to_theme_mod' );
+	add_filter( 'theme_mod_custom_logo', 'override_custom_logo_theme_mod' );
 }
 add_action( 'init', 'register_block_core_site_logo' );
 

@@ -6,7 +6,7 @@ import { clamp } from 'lodash';
 /**
  * Parses and retrieves a number value.
  *
- * @param {any} value The incoming value.
+ * @param {unknown} value The incoming value.
  *
  * @return {number} The parsed number value.
  */
@@ -19,26 +19,34 @@ export function getNumber( value ) {
 /**
  * Safely adds 2 values.
  *
- * @param {number|string} args Values to add together.
+ * @param {Array<number|string>} args Values to add together.
  *
  * @return {number} The sum of values.
  */
 export function add( ...args ) {
-	return args.reduce( ( sum, arg ) => sum + getNumber( arg ), 0 );
+	return args.reduce(
+		/** @type {(sum:number, arg: number|string) => number} */
+		( sum, arg ) => sum + getNumber( arg ),
+		0
+	);
 }
 
 /**
  * Safely subtracts 2 values.
  *
- * @param {number|string} args Values to subtract together.
+ * @param {Array<number|string>} args Values to subtract together.
  *
- * @return {number} The difference of the 2 values.
+ * @return {number} The difference of the values.
  */
 export function subtract( ...args ) {
-	return args.reduce( ( diff, arg, index ) => {
-		const value = getNumber( arg );
-		return index === 0 ? value : diff - value;
-	} );
+	return args.reduce(
+		/** @type {(diff:number, arg: number|string, index:number) => number} */
+		( diff, arg, index ) => {
+			const value = getNumber( arg );
+			return index === 0 ? value : diff - value;
+		},
+		0
+	);
 }
 
 /**
@@ -84,12 +92,7 @@ export function roundClamp(
  * Clamps a value based on a min/max range with rounding.
  * Returns a string.
  *
- * @param {any} args Arguments for roundClamp().
- * @property {number} value The value.
- * @property {number} min The minimum range.
- * @property {number} max The maximum range.
- * @property {number} step A multiplier for the value.
- *
+ * @param {Parameters<typeof roundClamp>} args Arguments for roundClamp().
  * @return {string} The rounded and clamped value.
  */
 export function roundClampString( ...args ) {

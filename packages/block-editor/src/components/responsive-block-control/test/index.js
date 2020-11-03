@@ -118,7 +118,6 @@ describe( 'Basic rendering', () => {
 		expect( defaultControl ).not.toBeNull();
 		expect( toggleLabel ).not.toBeNull();
 		expect( toggleState ).toBe( true );
-		expect( container.innerHTML ).toMatchSnapshot();
 	} );
 
 	it( 'should not render without valid legend', () => {

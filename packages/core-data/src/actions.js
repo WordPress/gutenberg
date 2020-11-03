@@ -502,7 +502,8 @@ export function* saveEntityRecord(
 				name,
 				{ ...persistedEntity, ...data },
 				undefined,
-				true
+				// This must be false or it will trigger a GET request in parallel to the PUT/POST below
+				false
 			);
 
 			updatedRecord = yield apiFetch( {

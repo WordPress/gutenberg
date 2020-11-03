@@ -4,6 +4,20 @@
 		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
-	"references": [ { "path": "../primitives" } ],
-	"include": [ "src/dashicon/*", "src/tip/*" ]
+	"references": [ { "path": "../hooks" }, { "path": "../primitives" } ],
+	"include": [
+		"src/base-control/**/*",
+		"src/dashicon/**/*",
+		"src/tip/**/*",
+		"src/utils/**/*",
+		"src/visually-hidden/**/*"
+	],
+	"exclude": [
+		"src/**/*.android.js",
+		"src/**/*.ios.js",
+		"src/**/*.native.js",
+		"src/**/react-native-*",
+		"src/**/stories",
+		"src/**/test"
+	]
 }

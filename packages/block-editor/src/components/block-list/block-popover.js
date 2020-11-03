@@ -7,7 +7,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useContext } from '@wordpress/element';
+import {
+	useState,
+	useCallback,
+	useContext,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
@@ -91,6 +97,16 @@ function BlockPopover( {
 			isDisabled: ! canFocusHiddenToolbar,
 		}
 	);
+
+	// Stores the active toolbar item index so the block toolbar can return focus
+	// to it when re-mounting.
+	const initialToolbarItemIndexRef = useRef();
+
+	useEffect( () => {
+		// Resets the index whenever the active block changes so this is not
+		// persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+		initialToolbarItemIndexRef.current = undefined;
+	}, [ clientId ] );
 
 	if (
 		! shouldShowBreadcrumb &&
@@ -190,6 +206,12 @@ function BlockPopover( {
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
 					focusOnMount={ isToolbarForced }
+					__experimentalInitialIndex={
+						initialToolbarItemIndexRef.current
+					}
+					__experimentalOnIndexChange={ ( index ) => {
+						initialToolbarItemIndexRef.current = index;
+					} }
 				/>
 			) }
 			{ shouldShowBreadcrumb && (
