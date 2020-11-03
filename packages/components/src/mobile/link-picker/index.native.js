@@ -101,7 +101,7 @@ export const LinkPicker = ( {
 					onChangeValue={ setValue }
 					onSubmit={ onSubmit }
 					/* eslint-disable-next-line jsx-a11y/no-autofocus */
-					autoFocus={ true }
+					autoFocus
 					separatorType="none"
 				>
 					{ value !== '' && (
