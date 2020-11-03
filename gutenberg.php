@@ -24,12 +24,6 @@ add_filter(
 		);
 	}
 );
-add_filter(
-	'github_updater_number_rollbacks',
-	function () {
-		return 2;
-	}
-);
 add_filter( 'github_updater_no_release_asset_branches', '__return_true' );
 // End GitHub Updater filters.
 
