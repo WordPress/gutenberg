@@ -176,7 +176,7 @@ class WP_Block_Supports {
 				$block_support_config['render_block'],
 				$block_type,
 				$block_attributes,
-				$block_content,
+				$block_content
 			);
 		}
 
