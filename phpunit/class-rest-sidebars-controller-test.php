@@ -366,7 +366,7 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 * The test_update_item() method does not exist for sidebar.
+	 * The test_create_item() method does not exist for sidebar.
 	 */
 	public function test_create_item() {
 	}
@@ -434,6 +434,89 @@ class REST_Sidebars_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			),
 			$data
 		);
+	}
+
+	/**
+	 *
+	 */
+	public function test_update_item_removes_widget_from_existing_sidebar() {
+		$this->setup_widget(
+			'widget_text',
+			1,
+			array(
+				'text' => 'Custom text test',
+			)
+		);
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			),
+			array( 'text-1' )
+		);
+		$this->setup_sidebar(
+			'sidebar-2',
+			array(
+				'name' => 'Test sidebar 2',
+			),
+			array()
+		);
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/sidebars/sidebar-2' );
+		$request->set_body_params(
+			array(
+				'widgets' => array(
+					'text-1',
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertContains( 'text-1', $data['widgets'] );
+
+		$this->assertNotContains( 'text-1', rest_do_request( '/wp/v2/sidebars/sidebar-1' )->get_data()['widgets'] );
+	}
+
+	/**
+	 *
+	 */
+	public function test_update_item_moves_omitted_widget_to_inactive_sidebar() {
+		$this->setup_widget(
+			'widget_text',
+			1,
+			array(
+				'text' => 'Custom text test',
+			)
+		);
+		$this->setup_widget(
+			'widget_text',
+			2,
+			array(
+				'text' => 'Custom text test',
+			)
+		);
+		$this->setup_sidebar(
+			'sidebar-1',
+			array(
+				'name' => 'Test sidebar',
+			),
+			array( 'text-1' )
+		);
+
+		$request = new WP_REST_Request( 'PUT', '/wp/v2/sidebars/sidebar-1' );
+		$request->set_body_params(
+			array(
+				'widgets' => array(
+					'text-2',
+				),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertContains( 'text-2', $data['widgets'] );
+		$this->assertNotContains( 'text-1', $data['widgets'] );
+
+		$this->assertContains( 'text-1', rest_do_request( '/wp/v2/sidebars/wp_inactive_widgets' )->get_data()['widgets'] );
 	}
 
 	/**

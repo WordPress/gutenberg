@@ -91,16 +91,17 @@ function render_block_core_search( $attributes ) {
 		}
 	}
 
-	$field_markup = sprintf(
+	$field_markup       = sprintf(
 		'<div class="wp-block-search__inside-wrapper"%s>%s</div>',
 		$width_styles,
 		$input_markup . $button_markup
 	);
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
 
 	return sprintf(
-		'<form role="search" method="get" action="%s" class="%s">%s</form>',
+		'<form role="search" method="get" action="%s" %s>%s</form>',
 		esc_url( home_url( '/' ) ),
-		$classnames,
+		$wrapper_attributes,
 		$label_markup . $field_markup
 	);
 }

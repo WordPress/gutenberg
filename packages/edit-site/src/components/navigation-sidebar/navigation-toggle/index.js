@@ -7,29 +7,26 @@ import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 
 function NavigationToggle( { icon, isOpen } ) {
-	const {
-		isActive,
-		isRequestingSiteIcon,
-		siteIconUrl,
-		siteTitle,
-	} = useSelect( ( select ) => {
-		const { isFeatureActive } = select( 'core/edit-site' );
-		const { getEntityRecord } = select( 'core' );
-		const { isResolving } = select( 'core/data' );
-		const siteData =
-			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+	const { isActive, isRequestingSiteIcon, siteIconUrl } = useSelect(
+		( select ) => {
+			const { isFeatureActive } = select( 'core/edit-site' );
+			const { getEntityRecord } = select( 'core' );
+			const { isResolving } = select( 'core/data' );
+			const siteData =
+				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
-		return {
-			isActive: isFeatureActive( 'fullscreenMode' ),
-			isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
-				'root',
-				'__unstableBase',
-				undefined,
-			] ),
-			siteIconUrl: siteData.site_icon_url,
-			siteTitle: siteData.name,
-		};
-	}, [] );
+			return {
+				isActive: isFeatureActive( 'fullscreenMode' ),
+				isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
+					'root',
+					'__unstableBase',
+					undefined,
+				] ),
+				siteIconUrl: siteData.site_icon_url,
+			};
+		},
+		[]
+	);
 
 	const { setIsNavigationPanelOpened } = useDispatch( 'core/edit-site' );
 
@@ -67,12 +64,6 @@ function NavigationToggle( { icon, isOpen } ) {
 			>
 				{ buttonIcon }
 			</Button>
-
-			{ isOpen && (
-				<div className="edit-site-navigation-toggle__site-title">
-					{ siteTitle }
-				</div>
-			) }
 		</div>
 	);
 }

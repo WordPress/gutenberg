@@ -238,6 +238,16 @@ exports[`Writing Flow should not delete surrounding space when deleting a word w
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Writing Flow should not have a dead zone above an aligned block 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {\\"align\\":\\"wide\\"} -->
+<figure class=\\"wp-block-image alignwide\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->"
+`;
+
 exports[`Writing Flow should not have a dead zone between blocks (lower) 1`] = `
 "<!-- wp:paragraph -->
 <p>1</p>

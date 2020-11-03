@@ -64,7 +64,7 @@ export function PreferencesModal( { isModalActive, isViewable, closeModal } ) {
 					help={ __(
 						'Aids screen readers by stopping text caret from leaving blocks.'
 					) }
-					label={ __( 'Contain text cursor inside block.' ) }
+					label={ __( 'Contain text cursor inside block' ) }
 				/>
 			</Section>
 			<Section title={ __( 'Appearance' ) }>

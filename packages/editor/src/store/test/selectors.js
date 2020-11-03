@@ -452,26 +452,9 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'hasNonPostEntityChanges', () => {
-		it( 'should return false if the full site editing experiment is disabled.', () => {
-			const state = {
-				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: false,
-				},
-				__experimentalGetDirtyEntityRecords() {
-					return [
-						{ kind: 'someKind', name: 'someName', key: 'someKey' },
-					];
-				},
-			};
-			expect( hasNonPostEntityChanges( state ) ).toBe( false );
-		} );
 		it( 'should return true if there are changes to an arbitrary entity', () => {
 			const state = {
 				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: true,
-				},
 				__experimentalGetDirtyEntityRecords() {
 					return [
 						{ kind: 'someKind', name: 'someName', key: 'someKey' },
@@ -483,9 +466,6 @@ describe( 'selectors', () => {
 		it( 'should return false if there are only changes for the current post', () => {
 			const state = {
 				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: true,
-				},
 				__experimentalGetDirtyEntityRecords() {
 					return [ { kind: 'postType', name: 'post', key: 1 } ];
 				},
@@ -495,9 +475,6 @@ describe( 'selectors', () => {
 		it( 'should return true if there are changes to multiple posts', () => {
 			const state = {
 				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: true,
-				},
 				__experimentalGetDirtyEntityRecords() {
 					return [
 						{ kind: 'postType', name: 'post', key: 1 },
@@ -510,9 +487,6 @@ describe( 'selectors', () => {
 		it( 'should return true if there are changes to multiple posts of different post types', () => {
 			const state = {
 				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: true,
-				},
 				__experimentalGetDirtyEntityRecords() {
 					return [
 						{ kind: 'postType', name: 'post', key: 1 },

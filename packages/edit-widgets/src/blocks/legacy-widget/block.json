@@ -23,7 +23,8 @@
 	},
 	"supports": {
 		"html": false,
-		"customClassName": false
+		"customClassName": false,
+		"reusable": false
 	},
 	"parent": [
 		"core/widget-area"

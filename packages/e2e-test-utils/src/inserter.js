@@ -143,11 +143,9 @@ export async function insertBlock( searchTerm ) {
  */
 export async function insertPattern( searchTerm ) {
 	await searchForPattern( searchTerm );
-	const insertButton = (
-		await page.$x(
-			`//div[@role = 'button']//div[contains(text(), '${ searchTerm }')]`
-		)
-	 )[ 0 ];
+	const insertButton = await page.waitForXPath(
+		`//div[@role = 'button']//div[contains(text(), '${ searchTerm }')]`
+	);
 	await insertButton.click();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();

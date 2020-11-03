@@ -172,9 +172,9 @@ class LegacyWidgetEditHandler extends Component {
 
 		if ( widgetClass ) {
 			apiFetch( {
-				path: `/__experimental/widget-utils/form/${ encodeURIComponent(
-					widgetClass
-				) }/`,
+				path: `/wp/v2/widget-types/${ encodeURIComponent(
+					idBase
+				) }/form-renderer/`,
 				data: {
 					instance: {
 						...instance,

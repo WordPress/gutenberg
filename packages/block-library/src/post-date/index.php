@@ -18,11 +18,12 @@ function render_block_core_post_date( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$align_class_name = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
+	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
 	return sprintf(
-		'<div class="%1$s"><time datetime="%2$s">%3$s</time></div>',
-		esc_attr( $align_class_name ),
+		'<div %1$s><time datetime="%2$s">%3$s</time></div>',
+		$wrapper_attributes,
 		get_the_date( 'c', $block->context['postId'] ),
 		get_the_date( isset( $attributes['format'] ) ? $attributes['format'] : '', $block->context['postId'] )
 	);

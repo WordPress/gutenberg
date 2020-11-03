@@ -13,7 +13,7 @@ import { __ } from '@wordpress/i18n';
  */
 import AnglePickerControl from '../angle-picker-control';
 import CustomGradientBar from './custom-gradient-bar';
-import { Flex, FlexItem } from '../flex';
+import { Flex } from '../flex';
 import SelectControl from '../select-control';
 import { getGradientParsed } from './utils';
 import { serializeGradient } from './serializer';
@@ -22,7 +22,10 @@ import {
 	HORIZONTAL_GRADIENT_ORIENTATION,
 	GRADIENT_OPTIONS,
 } from './constants';
-import { SelectWrapper } from './styles/custom-gradient-picker-styles';
+import {
+	AccessoryWrapper,
+	SelectWrapper,
+} from './styles/custom-gradient-picker-styles';
 
 const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	const angle = get(
@@ -43,8 +46,9 @@ const GradientAnglePicker = ( { gradientAST, hasGradient, onChange } ) => {
 	};
 	return (
 		<AnglePickerControl
-			value={ hasGradient ? angle : '' }
+			hideLabelFromVision
 			onChange={ onAngleChange }
+			value={ hasGradient ? angle : '' }
 		/>
 	);
 };
@@ -85,6 +89,7 @@ const GradientTypePicker = ( { gradientAST, hasGradient, onChange } ) => {
 		<SelectControl
 			className="components-custom-gradient-picker__type-picker"
 			label={ __( 'Type' ) }
+			labelPosition={ 'side' }
 			onChange={ handleOnChange }
 			options={ GRADIENT_OPTIONS }
 			value={ hasGradient && type }
@@ -109,15 +114,15 @@ export default function CustomGradientPicker( { value, onChange } ) {
 						onChange={ onChange }
 					/>
 				</SelectWrapper>
-				{ type === 'linear-gradient' && (
-					<FlexItem>
+				<AccessoryWrapper>
+					{ type === 'linear-gradient' && (
 						<GradientAnglePicker
 							gradientAST={ gradientAST }
 							hasGradient={ hasGradient }
 							onChange={ onChange }
 						/>
-					</FlexItem>
-				) }
+					) }
+				</AccessoryWrapper>
 			</Flex>
 		</div>
 	);

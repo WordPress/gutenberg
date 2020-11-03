@@ -24,7 +24,10 @@ function InserterPreviewPanel( { item } ) {
 					<div className="block-editor-inserter__preview-content">
 						<BlockPreview
 							__experimentalPadding={ 16 }
-							viewportWidth={ 500 }
+							viewportWidth={
+								hoveredItemBlockType.example?.viewportWidth ??
+								500
+							}
 							blocks={
 								hoveredItemBlockType.example
 									? getBlockFromExample( item.name, {
