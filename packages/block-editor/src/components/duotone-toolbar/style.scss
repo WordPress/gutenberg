@@ -16,24 +16,33 @@
 	}
 }
 
-.block-editor-duotone-toolbar__label {
-	display: inline-block;
-	margin-bottom: $grid-unit-10;
+.components-button.has-icon.has-text .block-editor-duotone-toolbar__swatch {
+	margin-right: $grid-unit;
 }
 
 .block-editor-duotone-toolbar__popover {
-	$popover-padding: 6px;
+	.components-popover__content {
+		border: $border-width solid $gray-900;
+	}
 
-	.block-editor-duotone-toolbar__custom-color {
+	.components-circular-option-picker,
+	.block-editor-duotone-toolbar__label,
+	.block-editor-duotone-toolbar__description {
+		padding: 12px;
+	}
+
+	.block-editor-duotone-toolbar__label,
+	.block-editor-duotone-toolbar__custom-colors,
+	.block-editor-duotone-toolbar__color-button {
 		width: 100%;
-		padding: $popover-padding;
 	}
 
-	.components-circular-option-picker__swatches {
-		padding: $popover-padding;
+	.block-editor-duotone-toolbar__label {
+		display: inline-block;
+		font-weight: bold;
 	}
-}
 
-.components-button.has-icon.has-text .block-editor-duotone-toolbar__swatch {
-	margin-right: $grid-unit;
+	.block-editor-duotone-toolbar__description {
+		border-top: $border-width solid $gray-900;
+	}
 }

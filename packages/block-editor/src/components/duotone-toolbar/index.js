@@ -4,11 +4,11 @@
 import {
 	Button,
 	CircularOptionPicker,
-	Dropdown,
 	Icon,
 	ToolbarButton,
 	ToolbarGroup,
 	ColorPalette,
+	Popover,
 } from '@wordpress/components';
 import { useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -68,9 +68,9 @@ function CustomColorOption( { label, value, colors, onChange } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const icon = value ? <Swatch fill={ value } /> : <Icon icon={ noFilter } />;
 	return (
-		<div className="block-editor-duotone-custom-color">
+		<>
 			<Button
-				className="block-editor-duotone-custom-color__button"
+				className="block-editor-duotone-toolbar__color-button"
 				icon={ icon }
 				onClick={ () => setIsOpen( ( prev ) => ! prev ) }
 			>
@@ -84,7 +84,7 @@ function CustomColorOption( { label, value, colors, onChange } ) {
 					onChange={ onChange }
 				/>
 			) }
-		</div>
+		</>
 	);
 }
 
@@ -95,7 +95,7 @@ function CustomColorPicker( { colors, palette, onChange } ) {
 	);
 
 	return (
-		<>
+		<div className="block-editor-duotone-toolbar__custom-colors">
 			<CustomColorOption
 				label={ __( 'Dark Color' ) }
 				value={ colors[ 0 ] }
@@ -128,49 +128,48 @@ function CustomColorPicker( { colors, palette, onChange } ) {
 					onChange( newColors );
 				} }
 			/>
-		</>
+		</div>
 	);
 }
 
 function DuotoneToolbar( { value, onChange, duotonePalette, colorPalette } ) {
+	const [ isOpen, setIsOpen ] = useState( false );
+	const onToggle = () => {
+		setIsOpen( ( prev ) => ! prev );
+	};
+	const openOnArrowDown = ( event ) => {
+		if ( ! isOpen && event.keyCode === DOWN ) {
+			event.preventDefault();
+			event.stopPropagation();
+			onToggle();
+		}
+	};
 	return (
-		<Dropdown
-			position="bottom right"
-			renderToggle={ ( { onToggle, isOpen } ) => {
-				const openOnArrowDown = ( event ) => {
-					if ( ! isOpen && event.keyCode === DOWN ) {
-						event.preventDefault();
-						event.stopPropagation();
-						onToggle();
+		<>
+			<ToolbarGroup>
+				<ToolbarButton
+					showTooltip
+					onClick={ onToggle }
+					aria-haspopup="true"
+					aria-expanded={ isOpen }
+					onKeyDown={ openOnArrowDown }
+					label={ __( 'Change image duotone filter' ) }
+					icon={
+						value ? (
+							<Swatch
+								fill={ getGradientFromValues( value.values ) }
+							/>
+						) : (
+							noFilter
+						)
 					}
-				};
-
-				return (
-					<ToolbarGroup>
-						<ToolbarButton
-							showTooltip
-							onClick={ onToggle }
-							aria-haspopup="true"
-							aria-expanded={ isOpen }
-							onKeyDown={ openOnArrowDown }
-							label={ __( 'Change image duotone filter' ) }
-							icon={
-								value ? (
-									<Swatch
-										fill={ getGradientFromValues(
-											value.values
-										) }
-									/>
-								) : (
-									noFilter
-								)
-							}
-						/>
-					</ToolbarGroup>
-				);
-			} }
-			renderContent={ () => (
-				<div className="block-editor-duotone-toolbar__popover">
+				/>
+			</ToolbarGroup>
+			{ isOpen && (
+				<Popover
+					className="block-editor-duotone-toolbar__popover"
+					headerTitle={ __( 'Duotone Presets' ) }
+				>
 					<span className="block-editor-duotone-toolbar__label">
 						{ __( 'Duotone Presets' ) }
 					</span>
@@ -248,9 +247,14 @@ function DuotoneToolbar( { value, onChange, duotonePalette, colorPalette } ) {
 							}
 						/>
 					</CircularOptionPicker>
-				</div>
+					<div className="block-editor-duotone-toolbar__description">
+						{ __(
+							'The duotone filter creates a two-color version of your image, where you choose the colors.'
+						) }
+					</div>
+				</Popover>
 			) }
-		/>
+		</>
 	);
 }
 
