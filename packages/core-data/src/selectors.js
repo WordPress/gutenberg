@@ -19,6 +19,17 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable } from './utils';
 
 /**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ *
+ * @type {Array}
+ */
+const EMPTY_ARRAY = [];
+
+/**
  * Returns true if a request is in progress for embed preview data, or false
  * otherwise.
  *
@@ -217,9 +228,6 @@ export function hasEntityRecords( state, kind, name, query ) {
 	return Array.isArray( getEntityRecords( state, kind, name, query ) );
 }
 
-const getQueriedState = ( state, kind, name ) =>
-	get( state.entities.data, [ kind, name, 'queriedData' ] );
-
 /**
  * Returns the Entity's records.
  *
@@ -230,20 +238,21 @@ const getQueriedState = ( state, kind, name ) =>
  *
  * @return {?Array} Records.
  */
-export const getEntityRecords = createSelector(
-	( state, kind, name, query ) => {
-		// Queried data state is prepopulated for all known entities. If this is not
-		// assigned for the given parameters, then it is known to not exist. Thus, a
-		// return value of an empty array is used instead of `null` (where `null` is
-		// otherwise used to represent an unknown state).
-		const queriedState = getQueriedState( state, kind, name );
-		if ( ! queriedState ) {
-			return [];
-		}
-		return getQueriedItems( queriedState, query );
-	},
-	( state, kind, name ) => [ getQueriedState( state, kind, name ) ]
-);
+export function getEntityRecords( state, kind, name, query ) {
+	// Queried data state is prepopulated for all known entities. If this is not
+	// assigned for the given parameters, then it is known to not exist. Thus, a
+	// return value of an empty array is used instead of `null` (where `null` is
+	// otherwise used to represent an unknown state).
+	const queriedState = get( state.entities.data, [
+		kind,
+		name,
+		'queriedData',
+	] );
+	if ( ! queriedState ) {
+		return EMPTY_ARRAY;
+	}
+	return getQueriedItems( queriedState, query );
+}
 
 /**
  * Returns the  list of dirty entity records.
