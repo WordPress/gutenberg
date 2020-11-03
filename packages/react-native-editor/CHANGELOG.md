@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+* [**] Button block - Add link picker to the block settings
+
 ## 1.39.1
 
 * [*] Heading block - Disable full-width/wide alignment [#26308]
