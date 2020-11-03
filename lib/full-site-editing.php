@@ -70,7 +70,7 @@ add_filter( 'menu_order', 'gutenberg_menu_order' );
  */
 function gutenberg_menu_order( $menu_order ) {
 	if ( ! gutenberg_is_fse_theme() ) {
-		return;
+		return $menu_order;
 	}
 
 	$new_positions = array(
