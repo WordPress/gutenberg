@@ -6,13 +6,18 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useMemo } from '@wordpress/element';
+import { useState, useCallback, useMemo, useEffect } from '@wordpress/element';
 
 const DEBOUNCE_IN_MS = 500;
 
 export function useDebouncedSearch() {
 	const [ searchInput, setSearchInput ] = useState( '' );
 	const [ search, setSearch ] = useState( '' );
+	const [ debouncing, setDebouncing ] = useState( false );
+
+	useEffect( () => {
+		setDebouncing( false );
+	}, [ search ] );
 
 	const debouncedSetSearch = useCallback(
 		debounce( setSearch, DEBOUNCE_IN_MS ),
@@ -23,6 +28,7 @@ export function useDebouncedSearch() {
 		( value ) => {
 			setSearchInput( value );
 			debouncedSetSearch( value );
+			setDebouncing( true );
 		},
 		[ setSearchInput, debouncedSetSearch ]
 	);
@@ -36,5 +42,5 @@ export function useDebouncedSearch() {
 		[ handleOnSearch, searchInput ]
 	);
 
-	return { search, menuProps };
+	return { search, debouncing, menuProps };
 }

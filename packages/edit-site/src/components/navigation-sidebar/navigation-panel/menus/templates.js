@@ -33,7 +33,11 @@ import { SearchResults } from '../search-results';
 import { useDebouncedSearch } from '../use-debounced-search';
 
 export default function TemplatesMenu() {
-	const { search, menuProps: searchMenuProps } = useDebouncedSearch();
+	const {
+		search,
+		debouncing,
+		menuProps: searchMenuProps,
+	} = useDebouncedSearch();
 
 	const templates = useSelect(
 		( select ) =>
@@ -58,7 +62,7 @@ export default function TemplatesMenu() {
 			{ ...searchMenuProps }
 		>
 			{ search && (
-				<SearchResults items={ templates }>
+				<SearchResults items={ templates } debouncing={ debouncing }>
 					{ map( templates, ( template ) => (
 						<TemplateNavigationItem
 							item={ template }

@@ -7,16 +7,18 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export function SearchResults( { items, children } ) {
+export function SearchResults( { items, debouncing, children } ) {
+	const loading = items === null || debouncing;
+
 	return (
 		<NavigationGroup title={ __( 'Search results' ) }>
-			{ items === null && <NavigationItem title={ __( 'Loading…' ) } /> }
+			{ loading && <NavigationItem title={ __( 'Loading…' ) } /> }
 
-			{ items?.length === 0 && (
+			{ ! loading && items?.length === 0 && (
 				<NavigationItem title={ __( 'No results found.' ) } />
 			) }
 
-			{ children }
+			{ ! loading && children }
 		</NavigationGroup>
 	);
 }
