@@ -1,7 +1,11 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback } from 'react-native';
+import {
+	View,
+	TouchableWithoutFeedback,
+	AccessibilityInfo,
+} from 'react-native';
 import Video from 'react-native-video';
 
 /**
@@ -437,6 +441,7 @@ const Cover = ( {
 	);
 
 	if ( ! hasBackground || isCustomColorPickerShowing ) {
+		const isScreenReaderOn = AccessibilityInfo.isScreenReaderEnabled();
 		return (
 			<View>
 				{ isCustomColorPickerShowing && colorPickerControls }
@@ -454,7 +459,10 @@ const Cover = ( {
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					onFocus={ onFocus }
 				>
-					<View style={ styles.colorPaletteWrapper }>
+					<View
+						style={ styles.colorPaletteWrapper }
+						pointerEvents={ isScreenReaderOn ? 'none' : 'box-none' }
+					>
 						<BottomSheetConsumer>
 							{ ( { shouldEnableBottomSheetScroll } ) => (
 								<ColorPalette
