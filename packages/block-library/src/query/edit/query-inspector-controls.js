@@ -124,14 +124,14 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
-	const stickyOptions = useMemo( () => [
-		{
-			label: __( 'Include' ),
-			value: '',
-		},
-		{ label: __( 'Exclude' ), value: 'exclude' },
-		{ label: __( 'Only' ), value: 'only' },
-	] );
+	const stickyOptions = useMemo(
+		() => [
+			{ label: __( 'Include' ), value: '' },
+			{ label: __( 'Exclude' ), value: 'exclude' },
+			{ label: __( 'Only' ), value: 'only' },
+		],
+		[]
+	);
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Filtering and Sorting' ) }>
