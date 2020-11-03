@@ -100,24 +100,25 @@ export class BlockListItem extends Component {
 	scrollToSelectedBlockIfItsNotVisible() {
 		const { isSelected } = this.props;
 
-		if ( isSelected ) {
-			const isIOS = Platform.OS === 'ios';
+		if ( this.blockRef.current ) {
+			// first we are measuring the layout to determine where {x,y} within the List Component being rendered the current Block based View is located.
+			this.blockRef.current.measureLayout(
+				findNodeHandle( this.props.listRef.current ),
+				( x, y ) => {
+					// once we have the {x,y} of that View we can then determine if it is currently visible.
+					this.blockRef.current.measure(
+						( _x, _y, blockWidth, blockHeight, px, py ) => {
+							const window = Dimensions.get( 'window' );
 
-			// this adjustment factor is utilized to create an invisible bounds at the top and bottom of the screen where once the View enters within
-			//any of these bounds then the scrolling action is triggered.
-			const scrollAdjustmentY = isIOS ? 200 : 100;
-
-			if ( this.blockRef.current ) {
-				// first we are measuring the layout to determine where {x,y} within the List Component being rendered the current Block based View is located.
-				this.blockRef.current.measureLayout(
-					findNodeHandle( this.props.listRef.current ),
-					( x, y ) => {
-						// once we have the {x,y} of that View we can then determine if it is currently visible.
-						this.blockRef.current.measure(
-							( _x, _y, blockWidth, blockHeight, px, py ) => {
-								const window = Dimensions.get( 'window' );
-
+							if ( isSelected ) {
 								const { scrollToBlockListOffset } = this.props;
+								const isIOS = Platform.OS === 'ios';
+
+								// this adjustment factor is utilized to create an invisible bounds at the top and bottom of the screen where once the View enters within
+								//any of these bounds then the scrolling action is triggered.
+								const scrollAdjustmentY = isIOS
+									? 0.2 * window.height
+									: 0.1 * window.height;
 
 								// if the view has gone beyond the top of the screen we scroll to that location.
 								if ( py - scrollAdjustmentY < 0 ) {
@@ -132,10 +133,10 @@ export class BlockListItem extends Component {
 									scrollToBlockListOffset( y );
 								}
 							}
-						);
-					}
-				);
-			}
+						}
+					);
+				}
+			);
 		}
 	}
 
