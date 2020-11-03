@@ -185,7 +185,6 @@ function FileEdit( {
 					<ToolbarItem
 						as={ ClipboardButton }
 						text={ href }
-						className={ 'wp-block-file__copy-url-button' }
 						onCopy={ confirmCopyURL }
 						onFinishCopy={ resetCopyConfirmation }
 						disabled={ isBlobURL( href ) }
