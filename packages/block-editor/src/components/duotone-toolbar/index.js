@@ -161,6 +161,7 @@ function DuotoneToolbar( { value, onChange, duotonePalette, colorPalette } ) {
 				<Popover
 					className="block-editor-duotone-toolbar__popover"
 					headerTitle={ __( 'Duotone Presets' ) }
+					onFocusOutside={ onToggle }
 				>
 					<span className="block-editor-duotone-toolbar__label">
 						{ __( 'Duotone Presets' ) }
