@@ -161,8 +161,6 @@ export class BlockListItem extends Component {
 					) }
 					<BlockListBlock
 						key={ clientId }
-						listRef={ this.props.listRef }
-						scrollTo={ this.props.scrollTo }
 						showTitle={ false }
 						clientId={ clientId }
 						{ ...restProps }
