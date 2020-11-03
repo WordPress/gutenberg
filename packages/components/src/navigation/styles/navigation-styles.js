@@ -99,7 +99,9 @@ export const MenuTitleSearchUI = styled.div`
 		height: ${ space( 4.5 ) }; // 36px, same height as MenuTitle
 		margin-bottom: ${ space( 1 ) };
 		padding-left: ${ space( 4 ) }; // Leave room for the search icon
-		padding-right: ${ space( 4 ) }; // Leave room for the close search button
+		padding-right: ${ space(
+			4
+		) }; // Leave room for the close search button
 
 		&::-webkit-search-decoration,
 		&::-webkit-search-cancel-button,
