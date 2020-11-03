@@ -3,7 +3,6 @@
 ## Unreleased
 
 - Introduce `Navigation` component as `__experimentalNavigation` for displaying a hierarchy of items.
-- ClipBoardButton: add `as: Component` props so the Button Component can be overridden, this change is made so we can use is as ToolbarButton.
 
 ### Breaking Change
 
