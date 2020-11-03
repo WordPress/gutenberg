@@ -5,7 +5,6 @@ import {
 	ToolbarGroup,
 	Dropdown,
 	ToolbarButton,
-	RangeControl,
 	BaseControl,
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
@@ -29,7 +28,7 @@ export default function QueryToolbar( { query, setQuery } ) {
 						<BaseControl>
 							<NumberControl
 								__unstableInputWidth="60px"
-								label={ __( 'Items per Page' ) }
+								label={ __( 'Items per page' ) }
 								labelPosition="edge"
 								min={ 1 }
 								max={ 100 }
@@ -44,7 +43,7 @@ export default function QueryToolbar( { query, setQuery } ) {
 						<BaseControl>
 							<NumberControl
 								__unstableInputWidth="60px"
-								label={ __( 'Offset' ) }
+								label={ __( 'Offset the first item' ) }
 								labelPosition="edge"
 								min={ 0 }
 								max={ 100 }
@@ -54,17 +53,6 @@ export default function QueryToolbar( { query, setQuery } ) {
 								step="1"
 								value={ query.offset }
 								isDragEnabled={ false }
-							/>
-						</BaseControl>
-						<BaseControl>
-							<RangeControl
-								label={ __( 'Number of Pages' ) }
-								min={ 1 }
-								allowReset
-								value={ query.pages }
-								onChange={ ( value ) =>
-									setQuery( { pages: value ?? -1 } )
-								}
 							/>
 						</BaseControl>
 					</>
