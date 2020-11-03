@@ -10,7 +10,7 @@
 
 ### Enhancement
 
-- File Block: Copy url button is moved to Block toolbar
+- File Block: Copy url button is moved to Block toolbar.
 
 ## 2.23.0 (2020-09-03)
 
