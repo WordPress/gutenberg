@@ -8,8 +8,9 @@ import {
 	Icon,
 	ToolbarButton,
 	ToolbarGroup,
+	ColorPalette,
 } from '@wordpress/components';
-import { useState } from '@wordpress/element';
+import { useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { noFilter } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
@@ -17,13 +18,42 @@ import { DOWN } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import { ColorPalette } from '..';
 import {
 	getGradientFromCSSColors,
 	getGradientFromValues,
 	getHexColorsFromValues,
 	getValuesFromHexColors,
+	toBrightness,
 } from './utils';
+
+function getDefaultColors( palette ) {
+	// A default dark and light color are required.
+	if ( ! palette || palette.length === 0 ) return [ '#000', '#fff' ];
+
+	// Optimize for contrast if only one color is present.
+	if ( palette.length === 1 ) {
+		const { color } = palette[ 0 ];
+		return toBrightness( color ) > 0.5
+			? [ '#000', color ]
+			: [ color, '#fff' ];
+	}
+
+	return palette
+		.map( ( { color } ) => ( {
+			color,
+			brightness: toBrightness( color ),
+		} ) )
+		.reduce(
+			( [ min, max ], current ) => {
+				return [
+					current.brightness <= min.brightness ? current : min,
+					current.brightness >= max.brightness ? current : max,
+				];
+			},
+			[ { brightness: 1 }, { brightness: 0 } ]
+		)
+		.map( ( { color } ) => color );
+}
 
 function Swatch( { fill } ) {
 	return (
@@ -34,9 +64,9 @@ function Swatch( { fill } ) {
 	);
 }
 
-function CustomColorOption( { label, color, onChange } ) {
+function CustomColorOption( { label, value, colors, onChange } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
-	const icon = color ? <Swatch fill={ color } /> : <Icon icon={ noFilter } />;
+	const icon = value ? <Swatch fill={ value } /> : <Icon icon={ noFilter } />;
 	return (
 		<div className="block-editor-duotone-custom-color">
 			<Button
@@ -46,29 +76,55 @@ function CustomColorOption( { label, color, onChange } ) {
 			>
 				{ label }
 			</Button>
-			{ isOpen && <ColorPalette onChange={ onChange } /> }
+			{ isOpen && (
+				<ColorPalette
+					colors={ colors }
+					value={ value }
+					clearable={ false }
+					onChange={ onChange }
+				/>
+			) }
 		</div>
 	);
 }
 
-function CustomColorPicker( { colors, onChange } ) {
+function CustomColorPicker( { colors, palette, onChange } ) {
+	const [ defaultDark, defaultLight ] = useMemo(
+		() => getDefaultColors( palette ),
+		[ palette ]
+	);
+
 	return (
 		<>
 			<CustomColorOption
 				label={ __( 'Dark Color' ) }
-				color={ colors?.[ 0 ] }
+				value={ colors[ 0 ] }
+				colors={ palette }
 				onChange={ ( newColor ) => {
 					const newColors = colors.slice();
 					newColors[ 0 ] = newColor;
+					if ( ! newColors[ 0 ] ) {
+						newColors[ 0 ] = defaultDark;
+					}
+					if ( ! newColors[ 1 ] ) {
+						newColors[ 1 ] = defaultLight;
+					}
 					onChange( newColors );
 				} }
 			/>
 			<CustomColorOption
 				label={ __( 'Light Color' ) }
-				color={ colors?.[ colors.length - 1 ] }
+				value={ colors[ 1 ] }
+				colors={ palette }
 				onChange={ ( newColor ) => {
 					const newColors = colors.slice();
-					newColors[ colors.length - 1 ] = newColor;
+					newColors[ 1 ] = newColor;
+					if ( ! newColors[ 0 ] ) {
+						newColors[ 0 ] = defaultDark;
+					}
+					if ( ! newColors[ 1 ] ) {
+						newColors[ 1 ] = defaultLight;
+					}
 					onChange( newColors );
 				} }
 			/>
@@ -76,7 +132,7 @@ function CustomColorPicker( { colors, onChange } ) {
 	);
 }
 
-function DuotoneToolbar( { value, onChange, options } ) {
+function DuotoneToolbar( { value, onChange, duotonePalette, colorPalette } ) {
 	return (
 		<Dropdown
 			position="bottom right"
@@ -119,7 +175,7 @@ function DuotoneToolbar( { value, onChange, options } ) {
 						{ __( 'Duotone Presets' ) }
 					</span>
 					<CircularOptionPicker
-						options={ options.map( ( option ) => {
+						options={ duotonePalette.map( ( option ) => {
 							const isSelected = option.slug === value?.slug;
 							const style = {
 								background: getGradientFromCSSColors(
@@ -171,6 +227,7 @@ function DuotoneToolbar( { value, onChange, options } ) {
 					>
 						<CustomColorPicker
 							colors={ getHexColorsFromValues( value?.values ) }
+							palette={ colorPalette }
 							onChange={ ( newColors ) =>
 								onChange(
 									newColors.length >= 2

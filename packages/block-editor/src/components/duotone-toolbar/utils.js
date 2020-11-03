@@ -155,3 +155,14 @@ export function getColorsFromValues( values = { r: [], g: [], b: [] } ) {
 export function getHexColorsFromValues( values = { r: [], g: [], b: [] } ) {
 	return getColorsFromValues( values ).map( rgb2hex );
 }
+
+/**
+ * Convert a hex color to perceived brightness.
+ *
+ * @param {string} color Hex color
+ * @return {number} Perceived brightness of the color
+ */
+export function toBrightness( color ) {
+	const { r, g, b } = hex2rgb( color );
+	return r * 0.299 + g * 0.587 + b * 0.114;
+}

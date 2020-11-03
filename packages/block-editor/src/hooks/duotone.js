@@ -90,8 +90,11 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 				? duotoneSupport
 				: duotoneSupport.edit;
 
-		const duotoneOptions =
+		const duotonePalette =
 			useEditorFeature( 'color.duotone' ) ?? DEFAULT_DUOTONE_OPTIONS;
+
+		const colorPalette =
+			useEditorFeature( 'color.palette' ) ?? DEFAULT_DUOTONE_OPTIONS;
 
 		return (
 			<>
@@ -107,7 +110,8 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 				<BlockControls>
 					<DuotoneToolbar
 						value={ attributes.duotone }
-						options={ duotoneOptions }
+						duotonePalette={ duotonePalette }
+						colorPalette={ colorPalette }
 						onChange={ ( duotone ) => {
 							setAttributes( { duotone } );
 						} }

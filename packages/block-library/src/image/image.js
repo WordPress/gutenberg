@@ -71,6 +71,22 @@ const DEFAULT_DUOTONE_OPTIONS = [
 	},
 ];
 
+/**
+ * Color palette colors used when the theme doesn't include any.
+ */
+const DEFAULT_PALETTE_OPTIONS = [
+	{
+		name: __( 'Black' ),
+		color: '#000000',
+		slug: 'black',
+	},
+	{
+		name: __( 'White' ),
+		color: '#ffffff',
+		slug: 'white',
+	},
+];
+
 function getFilename( url ) {
 	const path = getPath( url );
 	if ( path ) {
@@ -275,8 +291,11 @@ export default function Image( {
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 
-	const duotoneOptions =
+	const duotonePalette =
 		useEditorFeature( 'color.duotone' ) ?? DEFAULT_DUOTONE_OPTIONS;
+
+	const colorPalette =
+		useEditorFeature( 'color.palette' ) ?? DEFAULT_PALETTE_OPTIONS;
 
 	const controls = (
 		<>
@@ -316,7 +335,8 @@ export default function Image( {
 				{ ! isEditingImage && (
 					<DuotoneToolbar
 						value={ duotone }
-						options={ duotoneOptions }
+						duotonePalette={ duotonePalette }
+						colorPalette={ colorPalette }
 						onChange={ onDuotoneChange }
 					/>
 				) }
