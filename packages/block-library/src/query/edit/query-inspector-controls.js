@@ -142,7 +142,7 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 					onChange={ onPostTypeChange }
 				/>
 				<QueryControls
-					{ ...{ order, orderBy, selectedAuthorId, authorList } }
+					{ ...{ order, orderBy } }
 					onOrderChange={ ( value ) => setQuery( { order: value } ) }
 					onOrderByChange={ ( value ) =>
 						setQuery( { orderBy: value } )
@@ -183,7 +183,7 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 					/>
 				) }
 				<QueryControls
-					{ ...{ order, orderBy, selectedAuthorId, authorList } }
+					{ ...{ selectedAuthorId, authorList } }
 					onAuthorChange={ ( value ) =>
 						setQuery( {
 							author: value !== '' ? +value : undefined,
