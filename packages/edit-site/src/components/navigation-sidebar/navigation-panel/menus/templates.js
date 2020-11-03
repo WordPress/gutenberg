@@ -29,15 +29,20 @@ import {
 import TemplatesAllMenu from './templates-all';
 import NewTemplateDropdown from '../new-template-dropdown';
 import TemplateNavigationItem from '../template-navigation-item';
+import { SearchResults } from '../search-results';
+import { useDebouncedSearch } from '../use-debounced-search';
 
 export default function TemplatesMenu() {
+	const { search, menuProps: searchMenuProps } = useDebouncedSearch();
+
 	const templates = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
 				status: [ 'publish', 'auto-draft' ],
 				per_page: -1,
+				search,
 			} ),
-		[]
+		[ search ]
 	);
 
 	const generalTemplates = templates?.filter( ( { slug } ) =>
@@ -50,25 +55,46 @@ export default function TemplatesMenu() {
 			title={ __( 'Templates' ) }
 			titleAction={ <NewTemplateDropdown /> }
 			parentMenu={ MENU_ROOT }
+			{ ...searchMenuProps }
 		>
-			{ map( generalTemplates, ( template ) => (
-				<TemplateNavigationItem
-					item={ template }
-					key={ `wp_template-${ template.id }` }
-				/>
-			) ) }
-			<NavigationItem
-				navigateToMenu={ MENU_TEMPLATES_ALL }
-				title={ _x( 'All', 'all templates' ) }
-			/>
-			<NavigationItem
-				navigateToMenu={ MENU_TEMPLATES_PAGES }
-				title={ __( 'Pages' ) }
-			/>
-			<NavigationItem
-				navigateToMenu={ MENU_TEMPLATES_POSTS }
-				title={ __( 'Posts' ) }
-			/>
+			{ search && (
+				<SearchResults items={ templates }>
+					{ map( templates, ( template ) => (
+						<TemplateNavigationItem
+							item={ template }
+							key={ `wp_template-${ template.id }` }
+						/>
+					) ) }
+				</SearchResults>
+			) }
+
+			{ ! search && (
+				<>
+					<NavigationItem
+						navigateToMenu={ MENU_TEMPLATES_ALL }
+						title={ _x( 'All', 'all templates' ) }
+					/>
+					<NavigationItem
+						navigateToMenu={ MENU_TEMPLATES_PAGES }
+						title={ __( 'Pages' ) }
+					/>
+					<NavigationItem
+						navigateToMenu={ MENU_TEMPLATES_POSTS }
+						title={ __( 'Posts' ) }
+					/>
+					{ map( generalTemplates, ( template ) => (
+						<TemplateNavigationItem
+							item={ template }
+							key={ `wp_template-${ template.id }` }
+						/>
+					) ) }
+				</>
+			) }
+
+			{ ! search && templates === null && (
+				<NavigationItem title={ __( 'Loading…' ) } />
+			) }
+
 			<TemplatesPostsMenu templates={ templates } />
 			<TemplatesPagesMenu templates={ templates } />
 			<TemplatesAllMenu templates={ templates } />
