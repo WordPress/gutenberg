@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+const fs = require( 'fs' );
 const path = require( 'path' );
 const glob = require( 'fast-glob' );
 const ProgressBar = require( 'progress' );
@@ -27,6 +28,16 @@ function getPackageName( file ) {
 }
 
 /**
+ * Determine if a file is a sass stylesheet
+ *
+ * @param  {string} file File name
+ * @return {boolean} Is a stylesheet
+ */
+function isSassStylesheet( file ) {
+	return path.extname( file ) === '.scss';
+}
+
+/**
  * Returns a stream transform which maps an individual stylesheet to its
  * package entrypoint. Unlike JavaScript which uses an external bundler to
  * efficiently manage rebuilds by entrypoints, stylesheets are rebuilt fresh
@@ -41,7 +52,7 @@ function createStyleEntryTransform() {
 		objectMode: true,
 		async transform( file, encoding, callback ) {
 			// Only stylesheets are subject to this transform.
-			if ( path.extname( file ) !== '.scss' ) {
+			if ( ! isSassStylesheet( file ) ) {
 				this.push( file );
 				callback();
 				return;
@@ -107,9 +118,52 @@ let onFileComplete = () => {};
 
 let stream;
 
+function findEntriesWithImports( file, allEntries ) {
+	const entriesWithImport = allEntries.reduce( ( acc, entry ) => {
+		const content = fs.readFileSync( entry, 'utf8' );
+		const importedFiles = content.toString().match( /@import "(.*?)"/g );
+
+		const packageName = getPackageName( file );
+		const re = new RegExp( packageName, 'g' );
+
+		const fileIsImported =
+			importedFiles &&
+			importedFiles.find( ( importedFile ) => importedFile.match( re ) );
+
+		if ( fileIsImported ) {
+			acc.push( entry );
+		}
+
+		return acc;
+	}, [] );
+
+	return entriesWithImport;
+}
+
 if ( files.length ) {
+	const allEntries = glob.sync(
+		path.resolve( PACKAGES_DIR, '*/src/*.scss' )
+	);
+
 	stream = new Readable( { encoding: 'utf8' } );
-	files.forEach( ( file ) => stream.push( file ) );
+	files.forEach( ( file ) => {
+		stream.push( file );
+		if ( isSassStylesheet( file ) ) {
+			// determine if what we are rebuilding is imported in another
+			// style.scss of other packages
+
+			// Determines other packages that import modified styles
+			const entriesWithImport = findEntriesWithImports(
+				file,
+				allEntries
+			);
+
+			if ( entriesWithImport.length ) {
+				entriesWithImport.forEach( ( entry ) => stream.push( entry ) );
+			}
+		}
+	} );
+
 	stream.push( null );
 	stream = stream
 		.pipe( createStyleEntryTransform() )
