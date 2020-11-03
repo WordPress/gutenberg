@@ -402,7 +402,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: 118d0d177724c2d67f08a59136eb29ef5943ec75
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
-  Gutenberg: e36158c6bb94e35144097807a736a697dce020d3
+  Gutenberg: 44a9a122188b218a8d9076b7e94ec4bdea2096dd
   RCTRequired: b153add4da6e7dbc44aebf93f3cf4fcae392ddf1
   RCTTypeSafety: 9aa1b91d7f9310fc6eadc3cf95126ffe818af320
   React: b6a59ef847b2b40bb6e0180a97d0ca716969ac78
@@ -429,12 +429,12 @@ SPEC CHECKSUMS:
   React-RCTText: 9ccc88273e9a3aacff5094d2175a605efa854dbe
   React-RCTVibration: a49a1f42bf8f5acf1c3e297097517c6b3af377ad
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
-  ReactNativeDarkMode: f61376360c5d983907e5c316e8e1c853a8c2f348
-  RNCMaskedView: 884452b2a5d593e4c55058b3fedf39c2a34d0743
-  RNGestureHandler: dde546180bf24af0b5f737c8ad04b6f3fa51609a
-  RNReanimated: b5ccb50650ba06f6e749c7c329a1bc3ae0c88b43
-  RNScreens: c526239bbe0e957b988dacc8d75ac94ec9cb19da
-  RNSVG: 68a534a5db06dcbdaebfd5079349191598caef7b
+  ReactNativeDarkMode: 6d807bc8373b872472c8541fc3341817d979a6fb
+  RNCMaskedView: dfeba59697c44d36abec79c062aeb1ea343d610d
+  RNGestureHandler: 7a377d0580c9f07df99e590bbcefd616ee0e2626
+  RNReanimated: f05baf4cd76b6eab2e4d7e2b244424960b968918
+  RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
+  RNSVG: 46c4b680fe18237fa01eb7d7b311d77618fde31f
   RNTAztecView: 7fb49235388967f36b922f6ed481b97302ec298e
   WordPress-Aztec-iOS: b7ac8b30f746992e85d9668453ac87c2cdcecf4f
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
