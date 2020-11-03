@@ -84,13 +84,13 @@ export class BlockList extends Component {
 		this.props.insertBlock( newBlock, this.props.blockCount );
 	}
 
-	scrollToBlockListOffset( offsetY ) {
+	scrollToBlockListOffset( offset ) {
 		const isIOS = Platform.OS === 'ios';
 		if ( isIOS ) {
-			this.scrollViewRef.props.scrollToPosition( 0, offsetY, true );
+			this.scrollViewRef.props.scrollToPosition( 0, offset, true );
 		} else {
 			this.listRef.current.scrollToOffset( {
-				offsetY,
+				offset,
 				animated: true,
 			} );
 		}
