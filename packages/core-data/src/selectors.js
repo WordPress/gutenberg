@@ -217,6 +217,9 @@ export function hasEntityRecords( state, kind, name, query ) {
 	return Array.isArray( getEntityRecords( state, kind, name, query ) );
 }
 
+const getQueriedState = ( state, kind, name ) =>
+	get( state.entities.data, [ kind, name, 'queriedData' ] );
+
 /**
  * Returns the Entity's records.
  *
@@ -233,16 +236,13 @@ export const getEntityRecords = createSelector(
 		// assigned for the given parameters, then it is known to not exist. Thus, a
 		// return value of an empty array is used instead of `null` (where `null` is
 		// otherwise used to represent an unknown state).
-		const queriedState = get( state.entities.data, [
-			kind,
-			name,
-			'queriedData',
-		] );
+		const queriedState = getQueriedState( state, kind, name );
 		if ( ! queriedState ) {
 			return [];
 		}
 		return getQueriedItems( queriedState, query );
-	}
+	},
+	( state, kind, name ) => [ getQueriedState( state, kind, name ) ]
 );
 
 /**
