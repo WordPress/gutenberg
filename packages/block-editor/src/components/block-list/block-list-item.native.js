@@ -100,7 +100,7 @@ export class BlockListItem extends Component {
 	scrollToBlockIfItsNotVisible() {
 		const { isSelected } = this.props;
 		const isIOS = Platform.OS === 'ios';
-		const scrollFactor = isIOS ? 200 : 100;
+		const scrollAdjustmentY = isIOS ? 200 : 100;
 
 		if ( isSelected ) {
 			if ( this.blockRef.current ) {
@@ -113,11 +113,12 @@ export class BlockListItem extends Component {
 
 								const { scrollToBlockListOffset } = this.props;
 
-								if ( py - 200 < 0 ) {
-									scrollToBlockListOffset( y - 300 );
-									scrollToBlockListOffset( y + blockHeight );
+								if ( py - scrollAdjustmentY < 0 ) {
+									scrollToBlockListOffset(
+										y - blockHeight - scrollAdjustmentY
+									);
 								} else if (
-									py + blockHeight + scrollFactor >
+									py + blockHeight + scrollAdjustmentY >
 									window.height
 								) {
 									scrollToBlockListOffset( y );
