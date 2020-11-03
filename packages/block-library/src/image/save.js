@@ -24,11 +24,13 @@ export default function save( { attributes } ) {
 		linkTarget,
 		sizeSlug,
 		title,
+		duotone,
 	} = attributes;
 
 	const newRel = isEmpty( rel ) ? undefined : rel;
 
 	const classes = classnames( {
+		[ `duotone-filter-${ duotone?.slug }` ]: duotone,
 		[ `align${ align }` ]: align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,

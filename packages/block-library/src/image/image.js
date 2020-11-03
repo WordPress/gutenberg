@@ -27,6 +27,9 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
+	__experimentalUseEditorFeature as useEditorFeature,
+	__experimentalDuotoneToolbar as DuotoneToolbar,
+	__experimentalDuotoneFilter as DuotoneFilter,
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -46,6 +49,27 @@ import { isExternalImage } from './edit';
  * Module constants
  */
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
+
+/**
+ * Duotone colors used when the theme doesn't include any.
+ */
+const DEFAULT_DUOTONE_OPTIONS = [
+	{
+		name: __( 'Dark grayscale' ),
+		colors: [ '#000000', '#7f7f7f' ],
+		slug: 'dark-grayscale',
+	},
+	{
+		name: __( 'Grayscale' ),
+		colors: [ '#000000', '#ffffff' ],
+		slug: 'grayscale',
+	},
+	{
+		name: __( 'Light grayscale' ),
+		colors: [ '#7f7f7f', '#ffffff' ],
+		slug: 'light-grayscale',
+	},
+];
 
 function getFilename( url ) {
 	const path = getPath( url );
@@ -70,6 +94,7 @@ export default function Image( {
 		height,
 		linkTarget,
 		sizeSlug,
+		duotone,
 	},
 	setAttributes,
 	isSelected,
@@ -79,6 +104,7 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
+	clientId,
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
@@ -237,6 +263,10 @@ export default function Image( {
 		} );
 	}
 
+	function onDuotoneChange( newDuotone ) {
+		setAttributes( { duotone: newDuotone } );
+	}
+
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
@@ -244,6 +274,9 @@ export default function Image( {
 	}, [ isSelected ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
+
+	const duotoneOptions =
+		useEditorFeature( 'color.duotone' ) ?? DEFAULT_DUOTONE_OPTIONS;
 
 	const controls = (
 		<>
@@ -279,6 +312,13 @@ export default function Image( {
 							label={ __( 'Upload external image' ) }
 						/>
 					</ToolbarGroup>
+				) }
+				{ ! isEditingImage && (
+					<DuotoneToolbar
+						value={ duotone }
+						options={ duotoneOptions }
+						onChange={ onDuotoneChange }
+					/>
 				) }
 				{ ! isEditingImage && (
 					<MediaReplaceFlow
@@ -492,10 +532,20 @@ export default function Image( {
 		);
 	}
 
+	const duotoneFilter = duotone ? (
+		<DuotoneFilter
+			slug={ duotone.slug }
+			scope={ `#block-${ clientId }` }
+			selectors={ 'img' }
+			values={ duotone.values }
+		/>
+	) : null;
+
 	return (
 		<>
 			{ controls }
 			{ img }
+			{ duotoneFilter }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
 					ref={ captionRef }

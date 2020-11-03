@@ -68,13 +68,12 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
+		},
+		"duotone": {
+			"type": "object"
 		}
 	},
 	"supports": {
-		"anchor": true,
-		"duotone": {
-			"edit": "img",
-			"save": true
-		}
+		"anchor": true
 	}
 }
