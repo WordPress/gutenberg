@@ -1,12 +1,12 @@
 <?php
 /**
- * Template types definitions.
+ * Template types.
  *
  * @package gutenberg
  */
 
-function gutenberg_get_default_template_types_definitions() {
-	$template_type_definitions = array(
+function gutenberg_get_default_template_types() {
+	$default_template_types = array(
 		'index'          => array(
 			'title'         => _x( 'Default (Index)', 'Template name', 'gutenberg' ),
 			'description'   => __( 'Main template, applied when no other template is found', 'gutenberg' ),
@@ -78,17 +78,17 @@ function gutenberg_get_default_template_types_definitions() {
 	);
 
 	/**
-	 * Filters the list of template types definitions.
+	 * Filters the list of template types.
 	 *
-	 * @param array $template_type_definitions An array of template types definitions, formatted as [ slug => [ title, description ] ].
+	 * @param array $default_template_types An array of template types, formatted as [ slug => [ title, description ] ].
 	 *
 	 * @since 5.x.x
 	 */
-	return apply_filters( 'template_types_definitions', $template_type_definitions );
+	return apply_filters( 'default_template_types', $default_template_types );
 }
 
 /**
- * Converts the default template types definitions array from associative to indexed,
+ * Converts the default template types array from associative to indexed,
  * to be used in JS, where numeric keys (e.g. '404') always appear before alphabetical
  * ones, regardless of the actual order of the array.
  *
@@ -98,14 +98,14 @@ function gutenberg_get_default_template_types_definitions() {
  * ...to indexed array with slug as property:
  * `[ [ 'slug' => 'index', 'title' => 'Index', 'description' => 'Index template' ] ]`
  *
- * @return array The default template types definitions as an indexed array.
+ * @return array The default template types as an indexed array.
  */
-function gutenberg_get_indexed_default_template_types_definitions() {
-	$definitions         = array();
-	$default_definitions = gutenberg_get_default_template_types_definitions();
-	foreach( $default_definitions as $slug => $definition ) {
-		$definition['slug'] = $slug;
-		$definitions[]      = $definition;
+function gutenberg_get_indexed_default_template_types() {
+	$indexed_template_types = array();
+	$default_template_types = gutenberg_get_default_template_types();
+	foreach( $default_template_types as $slug => $template_type ) {
+		$template_type['slug']    = $slug;
+		$indexed_template_types[] = $template_type;
 	}
-	return $definitions;
+	return $indexed_template_types;
 }

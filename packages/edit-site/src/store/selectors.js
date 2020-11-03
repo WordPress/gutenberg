@@ -172,12 +172,12 @@ export function isInserterOpened( state ) {
 }
 
 /**
- * Returns the default template types definitions.
+ * Returns the default template types.
  *
  * @param {Object} state Global application state.
  *
- * @return {Object} The template types definitions.
+ * @return {Object} The template types.
  */
-export function getDefaultTemplateTypesDefinitions( state ) {
-	return state.settings?.defaultTemplateTypesDefinitions;
+export function getDefaultTemplateTypes( state ) {
+	return state.settings?.defaultTemplateTypes;
 }

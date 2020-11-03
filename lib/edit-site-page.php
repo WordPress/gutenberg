@@ -134,9 +134,9 @@ function gutenberg_edit_site_init( $hook ) {
 		'postsPerPage'      => get_option( 'posts_per_page' ),
 	);
 
-	$settings['styles']                          = gutenberg_get_editor_styles();
-	$settings['defaultTemplateTypesDefinitions'] = gutenberg_get_indexed_default_template_types_definitions();
-	$settings                                    = gutenberg_experimental_global_styles_settings( $settings );
+	$settings['styles']               = gutenberg_get_editor_styles();
+	$settings['defaultTemplateTypes'] = gutenberg_get_indexed_default_template_types();
+	$settings                         = gutenberg_experimental_global_styles_settings( $settings );
 
 	// Preload block editor paths.
 	// most of these are copied from edit-forms-blocks.php.

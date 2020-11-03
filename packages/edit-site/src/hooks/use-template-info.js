@@ -16,9 +16,8 @@ import { useSelect } from '@wordpress/data';
  * @return {Object} Information about the template, including title and description.
  */
 export default function useTemplateInfo( template ) {
-	const defaultTemplateTypesDefinitions = useSelect(
-		( select ) =>
-			select( 'core/edit-site' ).getDefaultTemplateTypesDefinitions(),
+	const defaultTemplateTypes = useSelect(
+		( select ) => select( 'core/edit-site' ).getDefaultTemplateTypes(),
 		[]
 	);
 
@@ -31,7 +30,7 @@ export default function useTemplateInfo( template ) {
 	}
 
 	const { title: defaultTitle, description: defaultDescription } =
-		find( defaultTemplateTypesDefinitions, { slug: template?.slug } ) || {};
+		find( defaultTemplateTypes, { slug: template?.slug } ) || {};
 
 	const title = template?.title?.rendered || defaultTitle || template.slug;
 	const description = template?.excerpt?.raw || defaultDescription;

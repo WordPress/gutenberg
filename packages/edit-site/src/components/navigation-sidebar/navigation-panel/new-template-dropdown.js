@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, filter, includes } from 'lodash';
+import { filter, find, includes, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -23,26 +23,21 @@ import getClosestAvailableTemplate from '../../../utils/get-closest-available-te
 import { TEMPLATES_STATUSES } from './constants';
 
 export default function NewTemplateDropdown() {
-	const { defaultTemplateTypesDefinitions, templates } = useSelect(
-		( select ) => {
-			const { getDefaultTemplateTypesDefinitions } = select(
-				'core/edit-site'
-			);
-			const templateEntities = select( 'core' ).getEntityRecords(
-				'postType',
-				'wp_template',
-				{
-					status: TEMPLATES_STATUSES,
-					per_page: -1,
-				}
-			);
-			return {
-				defaultTemplateTypesDefinitions: getDefaultTemplateTypesDefinitions(),
-				templates: templateEntities,
-			};
-		},
-		[]
-	);
+	const { defaultTemplateTypes, templates } = useSelect( ( select ) => {
+		const { getDefaultTemplateTypes } = select( 'core/edit-site' );
+		const templateEntities = select( 'core' ).getEntityRecords(
+			'postType',
+			'wp_template',
+			{
+				status: TEMPLATES_STATUSES,
+				per_page: -1,
+			}
+		);
+		return {
+			defaultTemplateTypes: getDefaultTemplateTypes(),
+			templates: templateEntities,
+		};
+	}, [] );
 	const { addTemplate } = useDispatch( 'core/edit-site' );
 
 	const createTemplate = ( slug ) => {
@@ -50,19 +45,20 @@ export default function NewTemplateDropdown() {
 			slug,
 			templates
 		);
+		const { title, description } = find( defaultTemplateTypes, { slug } );
 		addTemplate( {
 			content: closestAvailableTemplate.content.raw,
-			excerpt: defaultTemplateTypesDefinitions[ slug ].description,
+			excerpt: description,
 			slug,
 			status: 'draft',
-			title: defaultTemplateTypesDefinitions[ slug ].title,
+			title,
 		} );
 	};
 
 	const existingTemplateSlugs = map( templates, 'slug' );
 
 	const missingTemplates = filter(
-		defaultTemplateTypesDefinitions,
+		defaultTemplateTypes,
 		( template ) => ! includes( existingTemplateSlugs, template.slug )
 	);
 

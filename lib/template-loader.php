@@ -13,7 +13,7 @@
  * @return string[] List of all overrideable default template types.
  */
 function get_template_types() {
-	return array_keys( gutenberg_get_default_template_types_definitions() );
+	return array_keys( gutenberg_get_default_template_types() );
 }
 
 /**

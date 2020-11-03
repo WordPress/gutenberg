@@ -312,14 +312,14 @@ function gutenberg_filter_rest_wp_template_dispatch( $dispatch_result, $request,
 add_filter( 'rest_dispatch_request', 'gutenberg_filter_rest_wp_template_dispatch', 10, 3 );
 
 /**
- * Filter the default template types definitions to temporarily remove 'embed',
+ * Filter the default template types to temporarily remove 'embed',
  * because it is not a regular template type.
  *
- * @param array $template_type_definitions The array of template types definitions.
- * @return array Filtered $template_type_definitions.
+ * @param array $default_template_types The array of template types definitions.
+ * @return array Filtered $default_template_types.
  */
-function gutenberg_filter_default_template_types_definitions( $template_type_definitions ) {
-	unset( $template_type_definitions['embed'] );
-	return $template_type_definitions;
+function gutenberg_filter_default_template_types( $default_template_types ) {
+	unset( $default_template_types['embed'] );
+	return $default_template_types;
 }
-add_filter( 'template_types_definitions', 'gutenberg_filter_default_template_types_definitions' );
+add_filter( 'default_template_types', 'gutenberg_filter_default_template_types' );

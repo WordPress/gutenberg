@@ -44,10 +44,10 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 		);
 
 		if ( 'wp_template' === $post_type ) {
-			$template_types_definitions = gutenberg_get_default_template_types_definitions();
-			if ( isset( $template_types_definitions[ $slug ] ) ) {
-				$template_post['post_title']   = $template_types_definitions[ $slug ]['title'];
-				$template_post['post_excerpt'] = $template_types_definitions[ $slug ]['description'];
+			$default_template_types = gutenberg_get_default_template_types();
+			if ( isset( $default_template_types[ $slug ] ) ) {
+				$template_post['post_title']   = $default_template_types[ $slug ]['title'];
+				$template_post['post_excerpt'] = $default_template_types[ $slug ]['description'];
 			}
 		}
 
