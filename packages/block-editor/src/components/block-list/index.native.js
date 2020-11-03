@@ -84,11 +84,14 @@ export class BlockList extends Component {
 		this.props.insertBlock( newBlock, this.props.blockCount );
 	}
 
+	// scrolls to the Block at the offset Y that's passed.
 	scrollToBlockListOffset( offset ) {
 		const isIOS = Platform.OS === 'ios';
 		if ( isIOS ) {
+			// utilizes the ScrollView of the Keyboard Aware Flat List to scroll.
 			this.scrollViewRef.props.scrollToPosition( 0, offset, true );
 		} else {
+			// utilizes the FlatList of the Keyboard Aware Flat List to scroll on Android.
 			this.listRef.current.scrollToOffset( {
 				offset,
 				animated: true,
