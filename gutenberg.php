@@ -24,6 +24,16 @@ add_filter(
 		);
 	}
 );
+add_filter(
+	'github_updater_release_asset_rollback',
+	function ( $rollback, $file ) {
+		if ( $file === plugin_basename( __FILE__ ) ) {
+			return [ 'gutenberg-nightly' ];
+		}
+	},
+	10,
+	2
+);
 add_filter( 'github_updater_no_release_asset_branches', '__return_true' );
 // End GitHub Updater filters.
 
