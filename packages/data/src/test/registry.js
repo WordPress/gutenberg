@@ -185,6 +185,16 @@ describe( 'createRegistry', () => {
 	} );
 
 	describe( 'registerStore', () => {
+		it( 'should return the reducer name for registered store', () => {
+			const store = registry.registerStore( 'butcher', {
+				reducer( state ) {
+					return state;
+				},
+			} );
+
+			expect( store.toString() ).toEqual( 'butcher' );
+		} );
+
 		it( 'should be shorthand for reducer, actions, selectors registration', () => {
 			const store = registry.registerStore( 'butcher', {
 				reducer( state = {}, action ) {
@@ -551,6 +561,18 @@ describe( 'createRegistry', () => {
 			);
 		} );
 
+		it( 'should work with the store object as param for select', () => {
+			const store = registry.registerStore( 'demo', {
+				reducer: ( state = 'OK' ) => state,
+				selectors: {
+					getValue: ( state ) => state,
+				},
+				resolvers: {},
+			} );
+
+			expect( registry.select( store ).getValue() ).toBe( 'OK' );
+		} );
+
 		it( 'should run the registry selector from a non-registry selector', () => {
 			const selector1 = () => 'result1';
 			const selector2 = createRegistrySelector( ( select ) => () =>
@@ -679,6 +701,26 @@ describe( 'createRegistry', () => {
 			} );
 			registry.dispatch( 'counter' ).increment( 4 ); // state = 5
 			expect( store.getState() ).toBe( 5 );
+		} );
+
+		it( 'should work with the store object as param for dispatch', async () => {
+			const store = registry.registerStore( 'demo', {
+				reducer( state = 'OK', action ) {
+					if ( action.type === 'UPDATE' ) {
+						return 'UPDATED';
+					}
+					return state;
+				},
+				actions: {
+					update() {
+						return { type: 'UPDATE' };
+					},
+				},
+			} );
+
+			expect( store.getState() ).toBe( 'OK' );
+			await registry.dispatch( store ).update();
+			expect( store.getState() ).toBe( 'UPDATED' );
 		} );
 	} );
 

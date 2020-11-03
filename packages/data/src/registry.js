@@ -80,6 +80,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @return {*} The selector's returned value.
 	 */
 	function select( reducerKey ) {
+		reducerKey = String( reducerKey );
 		const store = stores[ reducerKey ];
 		if ( store ) {
 			return store.getSelectors();
@@ -153,6 +154,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @return {*} The action's returned value.
 	 */
 	function dispatch( reducerKey ) {
+		reducerKey = String( reducerKey );
 		const store = stores[ reducerKey ];
 		if ( store ) {
 			return store.getActions();
@@ -222,6 +224,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 
 		const namespace = createNamespace( reducerKey, options, registry );
 		registerGenericStore( reducerKey, namespace );
+		namespace.store.toString = () => reducerKey;
 		return namespace.store;
 	};
 
