@@ -32,30 +32,32 @@ function getPackageName( file ) {
 }
 
 /**
- * Finds all stylesheet entry points that have import statements
- * that include styles from a given file
+ * Finds all stylesheet entry points that contain import statements
+ * that include the given file name
  *
  * @param  {string} file File name
  * @return {Array}       List of entry points that import the styles from the file
  */
-function findEntryPointsThatImportFile( file ) {
+function findStyleEntriesThatImportFile( file ) {
 	const entriesWithImport = stylesheetEntryPoints.reduce(
 		( acc, entryPoint ) => {
 			const content = fs.readFileSync( entryPoint, 'utf8' );
+
+			// Returns all import statements from a stylesheet
 			const importStatements = content
 				.toString()
 				.match( /@import "(.*?)"/g );
 
 			const packageName = getPackageName( file );
-			const re = new RegExp( packageName, 'g' );
+			const regex = new RegExp( packageName, 'g' );
 
-			const fileIsImported =
+			const fileIsImportedInStyleEntry =
 				importStatements &&
-				importStatements.find( ( importedFile ) =>
-					importedFile.match( re )
+				importStatements.find( ( importStatement ) =>
+					importStatement.match( regex )
 				);
 
-			if ( fileIsImported ) {
+			if ( fileIsImportedInStyleEntry ) {
 				acc.push( entryPoint );
 			}
 
@@ -97,11 +99,11 @@ function createStyleEntryTransform() {
 
 			// Find other stylesheets that need to be rebuilt because
 			// they import the styles that are being transformed
-			const entryPoints = await findEntryPointsThatImportFile( file );
+			const styleEntries = findStyleEntriesThatImportFile( file );
 
-			// Rebuild stylesheets that import the styles being updated
-			if ( entryPoints.length ) {
-				entryPoints.forEach( ( entry ) => stream.push( entry ) );
+			// Rebuild stylesheets that import the styles being transformed
+			if ( styleEntries.length ) {
+				styleEntries.forEach( ( entry ) => stream.push( entry ) );
 				callback();
 			} else {
 				packages.add( packageName );
