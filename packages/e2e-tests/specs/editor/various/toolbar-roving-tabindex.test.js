@@ -4,6 +4,7 @@
 import {
 	createNewPost,
 	pressKeyWithModifier,
+	clickBlockToolbarButton,
 	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
@@ -102,5 +103,15 @@ describe( 'Toolbar roving tabindex', () => {
 		await testBlockToolbarKeyboardNavigation( 'Block: Custom HTML' );
 		await wrapCurrentBlockWithGroup();
 		await testGroupKeyboardNavigation( 'Block: Custom HTML' );
+	} );
+
+	it( 'ensures block toolbar remembers the last focused item', async () => {
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Paragraph' );
+		await focusBlockToolbar();
+		await clickBlockToolbarButton( 'Bold' );
+		await page.keyboard.type( 'a' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await expectLabelToHaveFocus( 'Bold' );
 	} );
 } );

@@ -7,28 +7,28 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalAlignmentHookSettingsProvider as AlignmentHookSettingsProvider,
-	InnerBlocks,
-} from '@wordpress/block-editor';
+import { BlockControls, InnerBlocks } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef } from '@wordpress/element';
+import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { name as buttonBlockName } from '../button/';
 import styles from './editor.scss';
+import ContentJustificationDropdown from './content-justification-dropdown';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
 export default function ButtonsEdit( {
-	attributes: { align },
+	attributes: { contentJustification },
 	clientId,
 	isSelected,
+	setAttributes,
 } ) {
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
@@ -88,6 +88,12 @@ export default function ButtonsEdit( {
 		selectBlock( insertedBlock.clientId );
 	}, 200 );
 
+	function onChangeContentJustification( updatedValue ) {
+		setAttributes( {
+			contentJustification: updatedValue,
+		} );
+	}
+
 	const renderFooterAppender = useRef( () => (
 		<View style={ styles.appenderContainer }>
 			<InnerBlocks.ButtonBlockAppender
@@ -97,15 +103,23 @@ export default function ButtonsEdit( {
 		</View>
 	) );
 
-	// Inside buttons block alignment options are not supported.
-	const alignmentHooksSetting = {
-		isEmbedButton: true,
-	};
-
 	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
 
 	return (
-		<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
+		<>
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarItem>
+						{ ( toggleProps ) => (
+							<ContentJustificationDropdown
+								toggleProps={ toggleProps }
+								value={ contentJustification }
+								onChange={ onChangeContentJustification }
+							/>
+						) }
+					</ToolbarItem>
+				</ToolbarGroup>
+			</BlockControls>
 			{ resizeObserver }
 			<InnerBlocks
 				allowedBlocks={ ALLOWED_BLOCKS }
@@ -114,7 +128,7 @@ export default function ButtonsEdit( {
 					shouldRenderFooterAppender && renderFooterAppender.current
 				}
 				orientation="horizontal"
-				horizontalAlignment={ align }
+				horizontalAlignment={ contentJustification }
 				onDeleteBlock={
 					shouldDelete ? () => removeBlock( clientId ) : undefined
 				}
@@ -122,7 +136,9 @@ export default function ButtonsEdit( {
 				parentWidth={ maxWidth }
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
+				__experimentalLayout={ { type: 'default', alignments: [] } }
+				templateInsertUpdatesSelection
 			/>
-		</AlignmentHookSettingsProvider>
+		</>
 	);
 }

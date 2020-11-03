@@ -29,6 +29,7 @@
 .container {
 	flex-direction: row;
 	align-items: center;
+	flex: 1;
 }
 
 .cellContainerStyles {
@@ -45,4 +46,8 @@
 .containerAndroid {
 	padding-top: 8px;
 	padding-bottom: 8px;
+}
+
+.valueStyle {
+	height: 0;
 }
