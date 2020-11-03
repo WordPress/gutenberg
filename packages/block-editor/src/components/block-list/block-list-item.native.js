@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, findNodeHandle, Dimensions, Platform } from 'react-native';
+import { View, findNodeHandle, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -112,13 +112,10 @@ export class BlockListItem extends Component {
 
 							if ( isSelected ) {
 								const { scrollToBlockListOffset } = this.props;
-								const isIOS = Platform.OS === 'ios';
 
 								// this adjustment factor is utilized to create an invisible bounds at the top and bottom of the screen where once the View enters within
 								//any of these bounds then the scrolling action is triggered.
-								const scrollAdjustmentY = isIOS
-									? 0.2 * window.height
-									: 0.1 * window.height;
+								const scrollAdjustmentY = 0.2 * window.height;
 
 								// if the view has gone beyond the top of the screen we scroll to that location.
 								if ( py - scrollAdjustmentY < 0 ) {
