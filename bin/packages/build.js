@@ -17,7 +17,9 @@ const files = process.argv.slice( 2 );
  */
 const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
 
-const allEntries = glob.sync( path.resolve( PACKAGES_DIR, '*/src/*.scss' ) );
+const stylesheetEntryPoints = glob.sync(
+	path.resolve( PACKAGES_DIR, '*/src/*.scss' )
+);
 
 /**
  * Get the package name for a specified file
@@ -29,24 +31,38 @@ function getPackageName( file ) {
 	return path.relative( PACKAGES_DIR, file ).split( path.sep )[ 0 ];
 }
 
-function findEntriesThatImportFile( file ) {
-	const entriesWithImport = allEntries.reduce( ( acc, entry ) => {
-		const content = fs.readFileSync( entry, 'utf8' );
-		const importedFiles = content.toString().match( /@import "(.*?)"/g );
+/**
+ * Finds all stylesheet entry points that have import statements
+ * that include styles from a given file
+ *
+ * @param  {string} file File name
+ * @return {Array}       List of entry points that import the styles from the file
+ */
+function findEntryPointsThatImportFile( file ) {
+	const entriesWithImport = stylesheetEntryPoints.reduce(
+		( acc, entryPoint ) => {
+			const content = fs.readFileSync( entryPoint, 'utf8' );
+			const importStatements = content
+				.toString()
+				.match( /@import "(.*?)"/g );
 
-		const packageName = getPackageName( file );
-		const re = new RegExp( packageName, 'g' );
+			const packageName = getPackageName( file );
+			const re = new RegExp( packageName, 'g' );
 
-		const fileIsImported =
-			importedFiles &&
-			importedFiles.find( ( importedFile ) => importedFile.match( re ) );
+			const fileIsImported =
+				importStatements &&
+				importStatements.find( ( importedFile ) =>
+					importedFile.match( re )
+				);
 
-		if ( fileIsImported ) {
-			acc.push( entry );
-		}
+			if ( fileIsImported ) {
+				acc.push( entryPoint );
+			}
 
-		return acc;
-	}, [] );
+			return acc;
+		},
+		[]
+	);
 
 	return entriesWithImport;
 }
@@ -79,12 +95,13 @@ function createStyleEntryTransform() {
 				return;
 			}
 
-			// Determines whether or not other packages import styles
-			// that include styles from the currently modified stylesheet
-			const entriesWithImport = findEntriesThatImportFile( file );
+			// Find other stylesheets that need to be rebuilt because
+			// they import the styles that are being transformed
+			const entryPoints = await findEntryPointsThatImportFile( file );
 
-			if ( entriesWithImport.length ) {
-				entriesWithImport.forEach( ( entry ) => stream.push( entry ) );
+			// Rebuild stylesheets that import the styles being updated
+			if ( entryPoints.length ) {
+				entryPoints.forEach( ( entry ) => stream.push( entry ) );
 				callback();
 			} else {
 				packages.add( packageName );
