@@ -126,6 +126,48 @@
 						"slug": "midnight"
 					}
 				],
+				"duotone": [
+					{
+						"name":  "Dark grayscale" ,
+						"colors": [ "#000000", "#7f7f7f" ],
+						"slug": "dark-grayscale"
+					},
+					{
+						"name":  "Grayscale" ,
+						"colors": [ "#000000", "#ffffff" ],
+						"slug": "grayscale"
+					},
+					{
+						"name":  "Green and Yellow" ,
+						"colors": [ "#00e400", "#f9ff00" ],
+						"slug": "green-yellow"
+					},
+					{
+						"name":  "Red and Blue" ,
+						"colors": [ "#ff0000", "#0705ff" ],
+						"slug": "red-blue"
+					},
+					{
+						"name":  "Midnight" ,
+						"colors": [ "#03005d", "#0090ff" ],
+						"slug": "midnight"
+					},
+					{
+						"name":  "Orange and Yellow" ,
+						"colors": [ "#ff4b00", "#ffe400" ],
+						"slug": "orange-yellow"
+					},
+					{
+						"name":  "Magenta and Lime" ,
+						"colors": [ "#ff00ac", "#a8ff76" ],
+						"slug": "magenta-lime"
+					},
+					{
+						"name":  "Blue and Green" ,
+						"colors": [ "#0410ff", "#00ff00" ],
+						"slug": "blue-green"
+					}
+				],
 				"custom": true,
 				"link": false,
 				"customGradient": true

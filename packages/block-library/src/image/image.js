@@ -50,68 +50,6 @@ import { isExternalImage } from './edit';
  */
 import { MIN_SIZE, ALLOWED_MEDIA_TYPES } from './constants';
 
-/**
- * Duotone colors used when the theme doesn't include any.
- */
-const DEFAULT_DUOTONE_OPTIONS = [
-	{
-		name: __( 'Dark grayscale' ),
-		colors: [ '#000000', '#7f7f7f' ],
-		slug: 'dark-grayscale',
-	},
-	{
-		name: __( 'Grayscale' ),
-		colors: [ '#000000', '#ffffff' ],
-		slug: 'grayscale',
-	},
-	{
-		name: __( 'Green and Yellow' ),
-		colors: [ '#00e400', '#f9ff00' ],
-		slug: 'green-yellow',
-	},
-	{
-		name: __( 'Red and Blue' ),
-		colors: [ '#ff0000', '#0705ff' ],
-		slug: 'red-blue',
-	},
-	{
-		name: __( 'Midnight' ),
-		colors: [ '#03005d', '#0090ff' ],
-		slug: 'midnight',
-	},
-	{
-		name: __( 'Orange and Yellow' ),
-		colors: [ '#ff4b00', '#ffe400' ],
-		slug: 'orange-yellow',
-	},
-	{
-		name: __( 'Magenta and Lime' ),
-		colors: [ '#ff00ac', '#a8ff76' ],
-		slug: 'magenta-lime',
-	},
-	{
-		name: __( 'Blue and Green' ),
-		colors: [ '#0410ff', '#00ff00' ],
-		slug: 'blue-green',
-	},
-];
-
-/**
- * Color palette colors used when the theme doesn't include any.
- */
-const DEFAULT_PALETTE_OPTIONS = [
-	{
-		name: __( 'Black' ),
-		color: '#000000',
-		slug: 'black',
-	},
-	{
-		name: __( 'White' ),
-		color: '#ffffff',
-		slug: 'white',
-	},
-];
-
 function getFilename( url ) {
 	const path = getPath( url );
 	if ( path ) {
@@ -316,11 +254,9 @@ export default function Image( {
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
 
-	const duotonePalette =
-		useEditorFeature( 'color.duotone' ) ?? DEFAULT_DUOTONE_OPTIONS;
+	const duotonePalette = useEditorFeature( 'color.duotone' );
 
-	const colorPalette =
-		useEditorFeature( 'color.palette' ) ?? DEFAULT_PALETTE_OPTIONS;
+	const colorPalette = useEditorFeature( 'color.palette' );
 
 	const controls = (
 		<>
