@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { toString, isEqual, isEmpty, find } from 'lodash';
+import { isEqual, isEmpty, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -88,8 +88,6 @@ function GalleryEdit( props ) {
 	);
 
 	const currentImageOptions = { linkTarget, linkTo, sizeSlug };
-
-	const [ images, setImages ] = useState( [] );
 	const [ imageSettings, setImageSettings ] = useState( currentImageOptions );
 	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
 
@@ -110,6 +108,20 @@ function GalleryEdit( props ) {
 			getMedia: select( 'core' ).getMedia,
 		};
 	}, [] );
+
+	const images = useSelect( ( select ) => {
+		const newImages = select( 'core/block-editor' )
+			.getBlock( clientId )
+			.innerBlocks.map( ( block ) => {
+				return {
+					id: block.attributes.id,
+					url: block.attributes.url,
+					attributes: block.attributes,
+					imageData: getMedia( block.attributes.id ),
+				};
+			} );
+		return newImages;
+	} );
 
 	const imageSizeOptions = useImageSizes( images, isSelected, getSettings );
 
@@ -156,12 +168,6 @@ function GalleryEdit( props ) {
 			} );
 		} );
 
-		setImages(
-			newImages.map( ( newImage ) => ( {
-				id: toString( newImage.id ),
-				url: newImage.url,
-			} ) )
-		);
 		replaceInnerBlocks( clientId, newBlocks );
 	}
 
@@ -226,21 +232,6 @@ function GalleryEdit( props ) {
 			setAttributes( { imageUploads: undefined } );
 		}
 	}, [ imageUploads ] );
-
-	useEffect( () => {
-		const newImages = getBlock( clientId ).innerBlocks.map( ( block ) => {
-			return {
-				id: block.attributes.id,
-				url: block.attributes.url,
-				attributes: block.attributes,
-				imageData: getMedia( block.attributes.id ),
-			};
-		} );
-
-		if ( ! isEqual( newImages, images ) ) {
-			setImages( newImages );
-		}
-	} );
 
 	useEffect( () => {
 		// linkTo attribute must be saved so blocks don't break when changing image_default_link_type in options.php
