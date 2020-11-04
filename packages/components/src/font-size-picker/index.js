@@ -16,6 +16,7 @@ import VisuallyHidden from '../visually-hidden';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';
+const MAX_FONT_SIZE_DISPLAY = '25px';
 
 function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
@@ -41,7 +42,10 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 	return optionsArray.map( ( option ) => ( {
 		key: option.slug,
 		name: option.name,
-		style: { fontSize: option.size },
+		size: option.size,
+		style: {
+			fontSize: `min( ${ option.size }, ${ MAX_FONT_SIZE_DISPLAY } )`,
+		},
 	} ) );
 }
 
