@@ -9,7 +9,6 @@ import {
 	clickMiddleOfElement,
 	clickBeginningOfElement,
 	stopDriver,
-	swipeUp,
 	isAndroid,
 } from './helpers/utils';
 import testData from './helpers/test-data';
