@@ -41,8 +41,10 @@ class EnterPressedWatcher(aztecText: AztecText, var enterDeleter: EnterDeleter) 
         if (aztecText != null && !aztecText.isTextChangedListenerDisabled() && aztecKeyListener != null) {
             val newTextCopy = SpannableStringBuilder(text)
 
+            // ensures that that if we have reached the last character of a selection then we don't
+            //do this check
             if (selStart != selEnd) {
-                // now check that the inserted character is actually a NEWLINE
+                // check if the inserted character is a NEWLINE and then handle it's occurrence.
                 if (text.subSequence(start, start + 1).toString().equals(Constants.NEWLINE.toString(), true)) {
                     done = false
                     aztecText.editableText.setSpan(EnterPressedUnderway(), 0, 0, Spanned.SPAN_USER)
