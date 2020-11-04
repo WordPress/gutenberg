@@ -108,7 +108,7 @@ const transforms = {
 			},
 			transform( files ) {
 				const block = createBlock( 'core/gallery', {
-					images: files.map( ( file ) =>
+					imageUploads: files.map( ( file ) =>
 						pickRelevantMediaFiles( {
 							url: createBlobURL( file ),
 						} )
