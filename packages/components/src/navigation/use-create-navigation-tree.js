@@ -48,20 +48,23 @@ export const useCreateNavigationTree = () => {
 			visited.push( current.menu );
 			queue = [ ...queue, ...getChildMenu( current.menu ) ];
 
-			callback( current );
+			if ( callback( current ) === false ) {
+				break;
+			}
 		}
 	};
 
 	const isMenuEmpty = ( menuToCheck ) => {
-		let count = 0;
+		let isEmpty = true;
 
 		traverseMenu( menuToCheck, ( current ) => {
 			if ( ! current.isEmpty ) {
-				count++;
+				isEmpty = false;
+				return false;
 			}
 		} );
 
-		return count === 0;
+		return isEmpty;
 	};
 
 	return {
