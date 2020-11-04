@@ -227,11 +227,11 @@ describe( 'useSelect', () => {
 
 		const selectSpyFoo = jest
 			.fn()
-			.mockImplementation( () =>
-				registry.select( 'store-1' ).getCounter()
-			);
+			.mockImplementation( ( { getCounter } ) => getCounter() );
+		const selectSpyBar = jest.fn().mockImplementation( () => 2 );
 		const TestComponent = jest.fn().mockImplementation( () => {
-			const data = useSelect( selectSpyFoo, [], [ 'store-1' ] );
+			const data = useSelect( 'store-1', selectSpyFoo, [] );
+			useSelect( selectSpyBar, [] );
 			return <div>{ 'Counter: ' + data }</div>;
 		} );
 		let renderer;
@@ -245,6 +245,7 @@ describe( 'useSelect', () => {
 		const testInstance = renderer.root;
 
 		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
+		expect( selectSpyBar ).toHaveBeenCalledTimes( 2 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
 		// ensure expected state was rendered
@@ -256,8 +257,9 @@ describe( 'useSelect', () => {
 		act( () => {
 			registry.dispatch( 'store-1' ).increment();
 		} );
-		// ensure the selector was recomputed
+		// ensure both selectors were recomputed
 		expect( selectSpyFoo ).toHaveBeenCalledTimes( 3 );
+		expect( selectSpyBar ).toHaveBeenCalledTimes( 3 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		expect( testInstance.findByType( 'div' ).props ).toEqual( {
 			children: 'Counter: 1',
@@ -269,6 +271,8 @@ describe( 'useSelect', () => {
 		} );
 		// ensure the selector was not recomputed
 		expect( selectSpyFoo ).toHaveBeenCalledTimes( 3 );
+		// ensure the general selector was recomputed
+		expect( selectSpyBar ).toHaveBeenCalledTimes( 4 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 		expect( testInstance.findByType( 'div' ).props ).toEqual( {
 			children: 'Counter: 1',
