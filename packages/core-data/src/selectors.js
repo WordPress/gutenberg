@@ -67,7 +67,8 @@ export function getAuthors( state ) {
  * @return {Array} Authors list.
  */
 export function __unstableGetAuthor( state ) {
-	return getUserQueryResults( state, 'author' );
+	const authors = getUserQueryResults( state, 'author' );
+	return authors ? authors[ 0 ] : [];
 }
 
 /**

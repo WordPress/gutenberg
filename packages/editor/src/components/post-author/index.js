@@ -27,7 +27,7 @@ function PostAuthor() {
 			const { getEditedPostAttribute } = select( 'core/editor' );
 			const author =
 				postAuthor ||
-				__unstableGetAuthor( getEditedPostAttribute( 'author' ) )[ 0 ];
+				__unstableGetAuthor( getEditedPostAttribute( 'author' ) );
 			const query =
 				! fieldValue || '' === fieldValue || fieldValue === author.name
 					? {}
