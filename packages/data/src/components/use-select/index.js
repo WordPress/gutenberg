@@ -81,12 +81,13 @@ const renderQueue = createQueue();
  * @return {Function}  A custom react hook.
  */
 export default function useSelect( storeKey, _mapSelect, deps ) {
-	if ( arguments.length === 3 ) {
-		[ storeKey, _mapSelect, deps ] = arguments;
-	} else {
+	if ( arguments.length < 3 ) {
 		// Backwards compatible signature
-		storeKey = null;
-		[ _mapSelect, deps ] = arguments;
+		[ storeKey, _mapSelect, deps ] = [
+			null,
+			arguments[ 0 ],
+			arguments[ 1 ],
+		];
 	}
 	const mapSelect = useCallback(
 		_mapSelect,
