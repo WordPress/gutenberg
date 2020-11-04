@@ -161,6 +161,10 @@ export default function useSelect( _mapSelect, deps ) {
 			}
 		};
 
+		// A single dispatch() call may cause multiple store changes in a very brief
+		// period of time. There is little value in recomputing selector in response
+		// to every atomic update. Throttling ensures this doesn't happen more often
+		// than once in THROTTLE_MS milliseconds.
 		const throttledOnStoreChange = () => {
 			if ( throttleRef.current ) {
 				return;
