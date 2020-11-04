@@ -100,6 +100,10 @@ const Cover = ( {
 		style,
 		customOverlayColor,
 	} = attributes;
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
+		false
+	);
+
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
@@ -142,8 +146,29 @@ const Cover = ( {
 		}
 	}, [ setAttributes ] );
 
-	// sync with local media store
-	useEffect( mediaUploadSync, [] );
+	useEffect( () => {
+		// sync with local media store
+		mediaUploadSync();
+		AccessibilityInfo.addEventListener(
+			'screenReaderChanged',
+			handleScreenReaderToggled
+		);
+
+		AccessibilityInfo.isScreenReaderEnabled().then( ( enabled ) => {
+			setIsScreenReaderEnabled( enabled );
+		} );
+
+		return () => {
+			AccessibilityInfo.removeEventListener(
+				'screenReaderChanged',
+				handleScreenReaderToggled
+			);
+		};
+	}, [] );
+
+	const handleScreenReaderToggled = ( enabled ) => {
+		setIsScreenReaderEnabled( enabled );
+	};
 
 	// initialize uploading flag to false, awaiting sync
 	const [ isUploadInProgress, setIsUploadInProgress ] = useState( false );
@@ -441,7 +466,6 @@ const Cover = ( {
 	);
 
 	if ( ! hasBackground || isCustomColorPickerShowing ) {
-		const isScreenReaderOn = AccessibilityInfo.isScreenReaderEnabled();
 		return (
 			<View>
 				{ isCustomColorPickerShowing && colorPickerControls }
@@ -461,7 +485,9 @@ const Cover = ( {
 				>
 					<View
 						style={ styles.colorPaletteWrapper }
-						pointerEvents={ isScreenReaderOn ? 'none' : 'box-none' }
+						pointerEvents={
+							isScreenReaderEnabled ? 'none' : 'auto'
+						}
 					>
 						<BottomSheetConsumer>
 							{ ( { shouldEnableBottomSheetScroll } ) => (
