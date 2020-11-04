@@ -39,11 +39,11 @@ class EnterPressedWatcher(aztecText: AztecText, var enterDeleter: EnterDeleter) 
         val aztecText = aztecTextRef.get()
         val aztecKeyListener = aztecText?.getAztecKeyListener()
         if (aztecText != null && !aztecText.isTextChangedListenerDisabled() && aztecKeyListener != null) {
-            val newTextCopy = SpannableStringBuilder(text)
-
             // ensures that that if we have reached the last character of a selection then we don't
-            //do this check
+            //do this check.
             if (selStart != selEnd) {
+                val newTextCopy = SpannableStringBuilder(text)
+
                 // check if the inserted character is a NEWLINE and then handle it's occurrence.
                 if (newTextCopy.subSequence(start, start + 1).toString().equals(Constants.NEWLINE.toString(), true)) {
                     done = false
