@@ -40,10 +40,10 @@ class EnterPressedWatcher(aztecText: AztecText, var enterDeleter: EnterDeleter) 
         val aztecKeyListener = aztecText?.getAztecKeyListener()
         if (aztecText != null && !aztecText.isTextChangedListenerDisabled() && aztecKeyListener != null) {
             val newTextCopy = SpannableStringBuilder(text)
-            // if new text length is longer than original text by 1
-            if (textBefore?.length == newTextCopy.length - 1) {
+
+            if (selStart != selEnd) {
                 // now check that the inserted character is actually a NEWLINE
-                if (newTextCopy[this.start] == Constants.NEWLINE) {
+                if (text.subSequence(start, start + 1).toString().equals(Constants.NEWLINE.toString(), true)) {
                     done = false
                     aztecText.editableText.setSpan(EnterPressedUnderway(), 0, 0, Spanned.SPAN_USER)
                     aztecKeyListener.onEnterKey(
@@ -63,7 +63,7 @@ class EnterPressedWatcher(aztecText: AztecText, var enterDeleter: EnterDeleter) 
                 done = true
                 if (enterDeleter.shouldDeleteEnter())
                     text.replace(start, start + 1, "")
-                }
+            }
             aztecTextRef.get()?.editableText?.removeSpan(it)
         }
     }
