@@ -35,6 +35,9 @@ const useIsomorphicLayoutEffect =
 
 const renderQueue = createQueue();
 
+// Arbitrarily picked low number
+const THROTTLE_MS = 10;
+
 /**
  * Custom react hook for retrieving props from registered selectors.
  *
@@ -136,6 +139,7 @@ export default function useSelect( _mapSelect, deps ) {
 		}
 	} );
 
+	const throttleRef = useRef( null );
 	useIsomorphicLayoutEffect( () => {
 		const onStoreChange = () => {
 			if ( isMountedAndNotUnsubscribing.current ) {
@@ -157,23 +161,34 @@ export default function useSelect( _mapSelect, deps ) {
 			}
 		};
 
+		const throttledOnStoreChange = () => {
+			if ( throttleRef.current ) {
+				return;
+			}
+			throttleRef.current = setTimeout( () => {
+				throttleRef.current = null;
+				onStoreChange();
+			}, THROTTLE_MS );
+		};
+
 		// catch any possible state changes during mount before the subscription
 		// could be set.
 		if ( latestIsAsync.current ) {
-			renderQueue.add( queueContext, onStoreChange );
+			renderQueue.add( queueContext, throttledOnStoreChange );
 		} else {
-			onStoreChange();
+			throttledOnStoreChange();
 		}
 
 		const unsubscribe = registry.subscribe( () => {
 			if ( latestIsAsync.current ) {
-				renderQueue.add( queueContext, onStoreChange );
+				renderQueue.add( queueContext, throttledOnStoreChange );
 			} else {
-				onStoreChange();
+				throttledOnStoreChange();
 			}
 		} );
 
 		return () => {
+			clearTimeout( throttleRef.current );
 			isMountedAndNotUnsubscribing.current = false;
 			unsubscribe();
 			renderQueue.flush( queueContext );
