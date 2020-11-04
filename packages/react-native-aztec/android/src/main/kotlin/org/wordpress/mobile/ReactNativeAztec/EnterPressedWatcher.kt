@@ -65,7 +65,7 @@ class EnterPressedWatcher(aztecText: AztecText, var enterDeleter: EnterDeleter) 
                 done = true
                 if (enterDeleter.shouldDeleteEnter())
                     text.replace(start, start + 1, "")
-            }
+                }
             aztecTextRef.get()?.editableText?.removeSpan(it)
         }
     }
