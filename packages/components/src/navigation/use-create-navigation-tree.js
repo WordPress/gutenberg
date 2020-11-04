@@ -30,8 +30,8 @@ export const useCreateNavigationTree = () => {
 	 * Key is the menu prop of the menu
 	 * Value is an array of menu keys
 	 */
-	const [ directSubMenus, setDirectSubMenus ] = useState( {} );
-	const getDirectSubMenus = ( menu ) => directSubMenus[ menu ] || [];
+	const [ childMenu, setChildMenu ] = useState( {} );
+	const getChildMenu = ( menu ) => childMenu[ menu ] || [];
 
 	const traverseMenu = ( startMenu, callback ) => {
 		const visited = [];
@@ -46,7 +46,7 @@ export const useCreateNavigationTree = () => {
 			}
 
 			visited.push( current.menu );
-			queue = [ ...queue, ...getDirectSubMenus( current.menu ) ];
+			queue = [ ...queue, ...getChildMenu( current.menu ) ];
 
 			callback( current );
 		}
@@ -73,7 +73,7 @@ export const useCreateNavigationTree = () => {
 		menus,
 		getMenu,
 		addMenu: ( key, value ) => {
-			setDirectSubMenus( ( state ) => {
+			setChildMenu( ( state ) => {
 				const newState = { ...state };
 
 				if ( ! newState[ value.parentMenu ] ) {
@@ -88,7 +88,7 @@ export const useCreateNavigationTree = () => {
 			addMenu( key, value );
 		},
 		removeMenu,
-		directSubMenus,
+		directSubMenus: childMenu,
 		traverseMenu,
 		isMenuEmpty,
 	};
