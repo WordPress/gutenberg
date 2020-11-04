@@ -77,18 +77,6 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 
 		return (
 			<>
-				<div
-					className={ duotone && `duotone-filter-${ duotone.slug }` }
-				>
-					<BlockEdit { ...props } />
-				</div>
-				{ duotone ? (
-					<DuotoneFilter
-						slug={ duotone.slug }
-						selectors={ editSelectors }
-						values={ duotone.values }
-					/>
-				) : null }
 				<BlockControls>
 					<DuotoneToolbar
 						value={ duotone }
@@ -99,6 +87,18 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 						} }
 					/>
 				</BlockControls>
+				<div
+					className={ duotone && `duotone-filter-${ duotone.slug }` }
+				>
+					<BlockEdit { ...props } />
+				</div>
+				{ duotone && (
+					<DuotoneFilter
+						slug={ duotone.slug }
+						selectors={ editSelectors }
+						values={ duotone.values }
+					/>
+				) }
 			</>
 		);
 	},
