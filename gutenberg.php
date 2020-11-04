@@ -5,7 +5,7 @@
  * Description: Zip from master of Gutenberg GitHub repo: Gutenberg This is the development plugin for the new block editor in core. Ping @bph on WPSlack for questions. 
  * Requires at least: 5.3
  * Requires PHP: 5.6
- * Version: 9.3.0.20201103
+ * Version: 9.3.0.20201104
  * Author: Gutenberg Team / Birgit Pauli-Haack (Gutenberg Times)
  * Text Domain: gutenberg
  * GitHub Plugin URI: bph/gutenberg
