@@ -289,44 +289,40 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func requestMediaFilesEditorLoad(_ mediaFilesArray: [AnyObject], blockId: String) {
-        // TODO actually implement the delegate call on iOS
-        let mediaFiles = mediaFilesArray.compactMap { $0 as? String }
-        // DispatchQueue.main.async {
-        //     self.delegate?.gutenbergDidRequestMediaFilesEditorLoad(mediaFiles: mediaFiles, blockId: blockId)
-        // }
+    func requestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFilesEditorLoad(mediaFiles, blockId: blockId)
+        }
     }
 
     @objc
-    func requestMediaFilesFailedRetryDialog(_ mediaFilesArray: [AnyObject]) {
-        // TODO actually implement the delegate call on iOS
-        let mediaFiles = mediaFilesArray.compactMap { $0 as? String }
-        // DispatchQueue.main.async {
-        //     self.delegate?.gutenbergDidRequestMediaFilesFailedRetryDialog(mediaFiles: mediaFiles, blockId: blockId)
-        // }
+    func requestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFilesFailedRetryDialog(mediaFiles)
+        }
     }
 
     @objc
-    func requestMediaFilesUploadCancelDialog(_ mediaFilesArray: [AnyObject]) {
-        // TODO actually implement the delegate call on iOS
-        let mediaFiles = mediaFilesArray.compactMap { $0 as? String }
-        // DispatchQueue.main.async {
-        //     self.delegate?.gutenbergDidRequestMediaFilesUploadCancelDialog(mediaFiles: mediaFiles, blockId: blockId)
-        // }
+    func requestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFilesUploadCancelDialog(mediaFiles)
+        }
     }
 
     @objc
-    func requestMediaFilesSaveCancelDialog(_ mediaFilesArray: [AnyObject]) {
-        // TODO actually implement the delegate call on iOS
-        let mediaFiles = mediaFilesArray.compactMap { $0 as? String }
-        // DispatchQueue.main.async {
-        //     self.delegate?.gutenbergDidRequestMediaFilesSaveCancelDialog(mediaFiles: mediaFiles, blockId: blockId)
-        // }
+    func rrequestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFilesSaveCancelDialog(mediaFiles)
+        }
     }
 
     @objc
     func mediaSaveSync() {
-        // TODO: To be implemented
+        DispatchQueue.main.async {
+            if self.hasObservers {
+                self.delegate?.gutenbergDidRequestMediaSaveSync()
+            }
+        }
     }
 
     @objc
