@@ -88,7 +88,7 @@ export const useCreateNavigationTree = () => {
 			addMenu( key, value );
 		},
 		removeMenu,
-		directSubMenus: childMenu,
+		childMenu,
 		traverseMenu,
 		isMenuEmpty,
 	};
