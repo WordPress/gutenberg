@@ -34,11 +34,11 @@ The following command generates PHP, JS and CSS code for registering a block.
 $ npx @wordpress/create-block [options] [slug]
 ```
 
-`[slug]` is optional. When provided it triggers the quick mode where it is used as the block slug used for its identification, the output location for scaffolded files, and the name of the WordPress plugin. The rest of the configuration is set to all default values unless overriden with some of the options listed below.
+`[slug]` is optional. When provided it triggers the quick mode where it is used as the block slug used for its identification, the output location for scaffolded files, and the name of the WordPress plugin. The rest of the configuration is set to all default values unless overridden with some of the options listed below.
 
 Options:
 
-```sh
+```bash
 -V, --version                output the version number
 -t, --template <name>        block template type name, allowed values: "es5", "esnext", or the name of an external npm package (default: "esnext")
 --namespace <value>          internal namespace for the block name
@@ -76,7 +76,7 @@ When you scaffold a block, you must provide at least a `slug` name, the `namespa
 
 ## Available Commands [ESNext template]
 
-When bootstraped with the `esnext` template, you can run several commands inside the directory:
+When bootstrapped with the `esnext` template (or any external template with `wpScripts` flag enabled), you can run several commands inside the directory:
 
 ```bash
 $ npm start
@@ -116,44 +116,52 @@ Updates WordPress packages to the latest version. [Learn more](/packages/scripts
 
 ## External Templates
 
-Since version `0.19.0` it is possible to use external templates hosted on npm. These packages need to contain `.mustache` files inside the `templates` folder that will be used in the scaffolding and one `create-block` section in `package.json` for the metadata.
+Since version `0.19.0` it is possible to use external templates hosted on npm. These packages need to contain `.mustache` files that will be used during the block scaffolding process.
 
-### Available Variables:
+### Template Configuration
 
-The following variables are passed to the template files:
+It is mandatory to provide the main file for the package that returns a configuration object. It must containing at least `templatesPath` field with the path pointing to the location where template files live (nested folders are also supported).
 
+_Example:_
+
+```js
+module.exports = {
+	templatesPath: __dirname,
+};
+```
+
+It is also possible to override the default template configuration using the `defaultValues` field.
+
+_Example:_
+
+```js
+module.exports = {
+	defaultValues: {
+		slug: 'my-fantastic-block',
+		title: 'My fantastic block',
+		dashicon: 'palmtree',
+		version: '1.2.3',
+	},
+	templatesPath: __dirname,
+};
+```
+
+The following configurable variables are used with the template files. Template authors can change default values to use when users don't provide their data:
+
+-   `slug` (no default)
 -   `namespace` (default: `create-block`)
--   `namespaceSnakeCase` (auto-generated from `namespace`)
--   `slug` (always provided from CLI)
--   `slugSnakeCase` (auto-generated from `slug`)
 -   `title` (no default)
 -   `description` (no default)
 -   `dashicon` (no default)
 -   `category` (default: `widgets`)
--   `version` (default: `0.1.0`)
 -   `author` (default: `The WordPress Contributors`)
 -   `license` (default: `GPL-2.0-or-later`)
 -   `licenseURI` (default: `https://www.gnu.org/licenses/gpl-2.0.html`)
--   `textdomain` (auto-generated from `namespace`)
+-   `version` (default: `0.1.0`)
+-   `wpScripts` (default: `true`)
 -   `editorScript` (default: `file:./build/index.js`)
 -   `editorStyle` (default: `file:./build/index.css`)
 -   `style` (default: `file:./build/style-index.css`)
--   `wpScripts` (default: `true`)
-
-### `package.json`
-
-_Example:_
-
-```json
-{
-	"create-block": {
-		"namespace": "my-plugin",
-		"title": "My plugin",
-		"dashicon": "palmtree",
-		"version": "1.2.3"
-	}
-}
-```
 
 ## WP-CLI
 
