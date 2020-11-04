@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import { TEMPLATES_DEFAULT_DETAILS } from './constants';
@@ -15,7 +20,7 @@ export default function getTemplateInfo( template ) {
 		return {};
 	}
 	const { title: defaultTitle, description: defaultDescription } =
-		TEMPLATES_DEFAULT_DETAILS[ template.slug ] ?? {};
+		find( TEMPLATES_DEFAULT_DETAILS, { slug: template?.slug } ) ?? {};
 
 	let title = template?.title?.rendered ?? template.slug;
 	if ( title !== template.slug ) {

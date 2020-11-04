@@ -134,10 +134,10 @@ function* loadPostTypeEntities() {
 			},
 			mergedEdits: { meta: true },
 			getTitle( record ) {
-				if ( name === 'wp_template_part' || name === 'wp_template' ) {
+				if ( [ 'wp_template_part', 'wp_template' ].includes( name ) ) {
 					return startCase( record.slug );
 				}
-				return get( record, [ 'title', 'rendered' ], record.id );
+				return record?.title?.renderd || record?.title || record.id;
 			},
 		};
 	} );
