@@ -11,7 +11,8 @@
 		border-top: $border-width solid $gray-200;
 	}
 
-	.block-editor-block-card {
+	.block-editor-block-card,
+	.block-editor-block-variation-transforms {
 		padding: $grid-unit-20;
 	}
 }

@@ -23,6 +23,7 @@ import InspectorAdvancedControls from '../inspector-advanced-controls';
 import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
 import DefaultStylePicker from '../default-style-picker';
+import BlockVariationTransforms from '../block-variation-transforms';
 const BlockInspector = ( {
 	blockType,
 	count,
@@ -66,6 +67,10 @@ const BlockInspector = ( {
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard blockType={ blockType } />
+			<BlockVariationTransforms
+				blockName={ blockType.name }
+				selectedBlockClientId={ selectedBlockClientId }
+			/>
 			{ hasBlockStyles && (
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
