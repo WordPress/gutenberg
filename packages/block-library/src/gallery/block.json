@@ -41,6 +41,10 @@
 		"isListItem": {
 			"type": "boolean",
 			"default": true
+		},
+		"imageCount": {
+			"type": "number",
+			"default": 0
 		}
 	},
 	"providesContext": {
