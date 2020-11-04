@@ -75,9 +75,10 @@ function GalleryEdit( props ) {
 	} = props;
 
 	const {
+		imageCount,
 		linkTarget,
 		linkTo,
-		columns = defaultColumnsNumber( images ),
+		columns = defaultColumnsNumber( imageCount ),
 		sizeSlug,
 		imageUploads,
 		imageCrop,
@@ -122,6 +123,12 @@ function GalleryEdit( props ) {
 			} );
 		return newImages;
 	} );
+
+	useEffect( () => {
+		if ( images.length !== imageCount ) {
+			setAttributes( { imageCount: images.length } );
+		}
+	}, [ images ] );
 
 	const imageSizeOptions = useImageSizes( images, isSelected, getSettings );
 

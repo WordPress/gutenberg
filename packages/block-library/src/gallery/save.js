@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { RichText, useBlockProps, InnerBlocks } from '@wordpress/block-editor';
@@ -13,9 +8,10 @@ import { RichText, useBlockProps, InnerBlocks } from '@wordpress/block-editor';
  */
 import { defaultColumnsNumber } from './shared';
 
-export default function save( { attributes, innerBlocks } ) {
+export default function save( { attributes } ) {
 	const {
-		columns = defaultColumnsNumber( innerBlocks ),
+		imageCount,
+		columns = defaultColumnsNumber( imageCount ),
 		imageCrop,
 		caption,
 	} = attributes;
