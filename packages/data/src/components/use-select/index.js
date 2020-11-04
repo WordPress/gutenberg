@@ -50,7 +50,8 @@ const renderQueue = createQueue();
  * @param {Array}    deps        If provided, this memoizes the mapSelect so the
  *                               same `mapSelect` is invoked on every state
  *                               change unless the dependencies change.
- *
+ * @param {Array}    stores      If provided, this invokes mapSelect only when
+ *                               specific stores change, not the entire registry.
  * @example
  * ```js
  * const { useSelect } = wp.data;
@@ -78,9 +79,19 @@ const renderQueue = createQueue();
  *
  * @return {Function}  A custom react hook.
  */
-export default function useSelect( _mapSelect, deps ) {
-	const mapSelect = useCallback( _mapSelect, deps );
+export default function useSelect( _mapSelect, deps, stores ) {
+	const mapSelect = useCallback(
+		_mapSelect,
+		stores ? stores.concat( deps || [] ) : deps
+	);
 	const registry = useRegistry();
+	if ( stores ) {
+		for ( const store of stores ) {
+			if ( ! registry.stores[ store ] ) {
+				throw new Error( `Store ${ store } is not registered` );
+			}
+		}
+	}
 	const isAsync = useAsyncMode();
 	// React can sometimes clear the `useMemo` cache.
 	// We use the cache-stable `useMemoOne` to avoid
@@ -165,20 +176,30 @@ export default function useSelect( _mapSelect, deps ) {
 			onStoreChange();
 		}
 
-		const unsubscribe = registry.subscribe( () => {
+		const onChange = () => {
 			if ( latestIsAsync.current ) {
 				renderQueue.add( queueContext, onStoreChange );
 			} else {
 				onStoreChange();
 			}
-		} );
+		};
+		let unsubscribe;
+		if ( stores ) {
+			const unsubscribes = stores.map( ( store ) =>
+				registry.stores[ store ].subscribe( onChange )
+			);
+			unsubscribe = () =>
+				unsubscribes.forEach( ( callback ) => callback() );
+		} else {
+			unsubscribe = registry.subscribe( onChange );
+		}
 
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;
 			unsubscribe();
 			renderQueue.flush( queueContext );
 		};
-	}, [ registry ] );
+	}, [ registry ].concat( stores || [] ) );
 
 	return mapOutput;
 }

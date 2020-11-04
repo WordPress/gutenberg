@@ -707,6 +707,7 @@ _Parameters_
 
 -   _\_mapSelect_ `Function`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument.
 -   _deps_ `Array`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
+-   _stores_ `Array`: If provided, this invokes mapSelect only when specific stores change, not the entire registry.
 
 _Returns_
 

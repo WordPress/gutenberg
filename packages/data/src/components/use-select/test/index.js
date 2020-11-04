@@ -203,4 +203,75 @@ describe( 'useSelect', () => {
 			}
 		);
 	} );
+
+	it( 'uses memoized selector if dependent stores do not change', async () => {
+		const storeConfig = {
+			actions: {
+				increment: () => ( { type: 'INCREMENT' } ),
+			},
+			reducer: ( state, action ) => {
+				if ( ! state ) {
+					return { counter: 0 };
+				}
+				if ( action?.type === 'INCREMENT' ) {
+					return { counter: state.counter + 1 };
+				}
+				return state;
+			},
+			selectors: {
+				getCounter: ( state ) => state.counter,
+			},
+		};
+		registry.registerStore( 'store-1', storeConfig );
+		registry.registerStore( 'store-2', storeConfig );
+
+		const selectSpyFoo = jest
+			.fn()
+			.mockImplementation( () =>
+				registry.select( 'store-1' ).getCounter()
+			);
+		const TestComponent = jest.fn().mockImplementation( () => {
+			const data = useSelect( selectSpyFoo, [], [ 'store-1' ] );
+			return <div>{ 'Counter: ' + data }</div>;
+		} );
+		let renderer;
+		act( () => {
+			renderer = TestRenderer.create(
+				<RegistryProvider value={ registry }>
+					<TestComponent keyName="foo" change={ true } />
+				</RegistryProvider>
+			);
+		} );
+		const testInstance = renderer.root;
+
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
+
+		// ensure expected state was rendered
+		expect( testInstance.findByType( 'div' ).props ).toEqual( {
+			children: 'Counter: 0',
+		} );
+
+		// update related store
+		act( () => {
+			registry.dispatch( 'store-1' ).increment();
+		} );
+		// ensure the selector was recomputed
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 3 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+		expect( testInstance.findByType( 'div' ).props ).toEqual( {
+			children: 'Counter: 1',
+		} );
+
+		// update unrelated store
+		act( () => {
+			registry.dispatch( 'store-2' ).increment();
+		} );
+		// ensure the selector was not recomputed
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 3 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+		expect( testInstance.findByType( 'div' ).props ).toEqual( {
+			children: 'Counter: 1',
+		} );
+	} );
 } );
