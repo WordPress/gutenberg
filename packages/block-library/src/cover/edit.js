@@ -314,7 +314,6 @@ function CoverEdit( {
 		}
 	}
 
-	const canDim = !! url && ( overlayColor.color || gradientValue );
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 	const showFocalPointPicker =
 		isVideoBackground ||
@@ -426,7 +425,7 @@ function CoverEdit( {
 								},
 							] }
 						>
-							{ canDim && (
+							{ !! url && (
 								<RangeControl
 									label={ __( 'Opacity' ) }
 									value={ dimRatio }
@@ -453,7 +452,10 @@ function CoverEdit( {
 		{
 			className: 'wp-block-cover__inner-container',
 		},
-		{ template: INNER_BLOCKS_TEMPLATE }
+		{
+			template: INNER_BLOCKS_TEMPLATE,
+			templateInsertUpdatesSelection: true,
+		}
 	);
 
 	if ( ! hasBackground ) {

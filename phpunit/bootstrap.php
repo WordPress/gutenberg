@@ -73,6 +73,7 @@ tests_add_filter( 'wp_die_handler', 'fail_if_died' );
 $GLOBALS['wp_tests_options'] = array(
 	'gutenberg-experiments' => array(
 		'gutenberg-widget-experiments' => '1',
+		'gutenberg-full-site-editing'  => 1,
 	),
 );
 

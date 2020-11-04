@@ -102,7 +102,7 @@ The previous example creates an InnerBlocks area containing two columns one with
 
 ### `templateInsertUpdatesSelection`
 * **Type:** `Boolean`
-* **Default:** `true`
+* **Default:** `false`
 
 If true when child blocks in the template are inserted the selection is updated.
 If false the selection should not be updated when child blocks specified in the template are inserted.
