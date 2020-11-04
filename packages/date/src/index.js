@@ -450,7 +450,7 @@ function shouldParseAsUTCOffset( offset ) {
  *
  * @param {string} timezone
  */
-function getActualTimezone( timezone = '' ) {
+export function getActualTimezone( timezone = '' ) {
 	if ( ! timezone ) {
 		const { string, offset } = settings.timezone;
 
