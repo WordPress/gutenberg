@@ -4,7 +4,7 @@
 		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
-	"references": [ { "path": "../primitives" } ],
+	"references": [ { "path": "../hooks" }, { "path": "../primitives" } ],
 	"include": [
 		"src/base-control/**/*",
 		"src/dashicon/**/*",

@@ -10,6 +10,10 @@ import { __ } from '@wordpress/i18n';
  */
 import { useEditorFeature } from '../editor/utils';
 
+export function useHasTypographyPanel( { supports } ) {
+	return supports.includes( 'fontSize' ) || supports.includes( 'lineHeight' );
+}
+
 export default function TypographyPanel( {
 	context: { supports, name },
 	getStyleProperty,
@@ -20,13 +24,6 @@ export default function TypographyPanel( {
 		'typography.customFontSize',
 		name
 	);
-
-	if (
-		! supports.includes( 'fontSize' ) &&
-		! supports.includes( 'lineHeight' )
-	) {
-		return null;
-	}
 
 	return (
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
