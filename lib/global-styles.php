@@ -397,10 +397,10 @@ function gutenberg_experimental_global_styles_get_css_property( $style_property 
 			return 'line-height';
 		case 'fontFamily':
 			return 'font-family';
-		case 'textTransform':
-			return 'text-transform';
 		case 'textDecoration':
 			return 'text-decoration';
+		case 'textTransform':
+			return 'text-transform';
 		default:
 			return $style_property;
 	}
@@ -420,8 +420,8 @@ function gutenberg_experimental_global_styles_get_style_property() {
 		'fontSize'                 => array( 'typography', 'fontSize' ),
 		'fontFamily'               => array( 'typography', 'fontFamily' ),
 		'lineHeight'               => array( 'typography', 'lineHeight' ),
-		'textTransform'            => array( 'typography', 'textTransform' ),
 		'textDecoration'           => array( 'typography', 'textDecoration' ),
+		'textTransform'            => array( 'typography', 'textTransform' ),
 	);
 }
 
@@ -439,8 +439,8 @@ function gutenberg_experimental_global_styles_get_support_keys() {
 		'fontSize'                 => array( 'fontSize' ),
 		'lineHeight'               => array( 'lineHeight' ),
 		'fontFamily'               => array( '__experimentalFontFamily' ),
-		'textTransform'            => array( '__experimentalTextTransform' ),
 		'textDecoration'           => array( '__experimentalTextDecoration' ),
+		'textTransform'            => array( '__experimentalTextTransform' ),
 	);
 }
 
@@ -467,13 +467,13 @@ function gutenberg_experimental_global_styles_get_presets_structure() {
 			'path' => array( 'typography', 'fontFamilies' ),
 			'key'  => 'fontFamily',
 		),
-		'textTransform'  => array(
-			'path' => array( 'typography', 'textTransforms' ),
-			'key'  => 'slug',
-		),
 		'textDecoration' => array(
 			'path' => array( 'typography', 'textDecorations' ),
 			'key'  => 'value',
+		),
+		'textTransform'  => array(
+			'path' => array( 'typography', 'textTransforms' ),
+			'key'  => 'slug',
 		),
 	);
 }
@@ -516,8 +516,8 @@ function gutenberg_experimental_global_styles_get_block_data() {
 						'__experimentalSelector'       => ':root',
 						'__experimentalFontFamily'     => true,
 						'fontSize'                     => true,
-						'__experimentalTextTransform'  => true,
 						'__experimentalTextDecoration' => true,
+						'__experimentalTextTransform'  => true,
 						'color'                        => array(
 							'linkColor' => true,
 							'gradients' => true,

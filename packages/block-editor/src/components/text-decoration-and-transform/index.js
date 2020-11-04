@@ -28,8 +28,8 @@ export default function TextDecorationAndTransformEdit( props ) {
 
 	return (
 		<div className="block-editor-text-decoration-and-transform">
-			{ transformAvailable && <TextTransformEdit { ...props } /> }
 			{ decorationAvailable && <TextDecorationEdit { ...props } /> }
+			{ transformAvailable && <TextTransformEdit { ...props } /> }
 		</div>
 	);
 }
