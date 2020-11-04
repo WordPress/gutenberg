@@ -29,8 +29,8 @@ import {
 import TemplatesAllMenu from './templates-all';
 import NewTemplateDropdown from '../new-template-dropdown';
 import TemplateNavigationItem from '../template-navigation-item';
-import { SearchResults } from '../search-results';
-import { useDebouncedSearch } from '../use-debounced-search';
+import SearchResults from '../search-results';
+import useDebouncedSearch from '../use-debounced-search';
 
 export default function TemplatesMenu() {
 	const {

@@ -7,7 +7,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export function SearchResults( { items, debouncing, children } ) {
+export default function SearchResults( { items, debouncing, children } ) {
 	const loading = items === null || debouncing;
 
 	return (

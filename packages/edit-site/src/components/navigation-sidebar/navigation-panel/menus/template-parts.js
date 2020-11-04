@@ -18,8 +18,8 @@ import {
  */
 import TemplateNavigationItem from '../template-navigation-item';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS } from '../constants';
-import { SearchResults } from '../search-results';
-import { useDebouncedSearch } from '../use-debounced-search';
+import SearchResults from '../search-results';
+import useDebouncedSearch from '../use-debounced-search';
 
 export default function TemplatePartsMenu() {
 	const {

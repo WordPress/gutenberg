@@ -10,7 +10,7 @@ import { useState, useCallback, useMemo, useEffect } from '@wordpress/element';
 
 const DEBOUNCE_IN_MS = 500;
 
-export function useDebouncedSearch() {
+export default function useDebouncedSearch() {
 	const [ searchInput, setSearchInput ] = useState( '' );
 	const [ search, setSearch ] = useState( '' );
 	const [ debouncing, setDebouncing ] = useState( false );
