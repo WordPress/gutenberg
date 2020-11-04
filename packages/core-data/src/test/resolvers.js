@@ -83,9 +83,7 @@ describe( 'getEntityRecords', () => {
 		fulfillment.next();
 
 		// Provide entities and acquire lock
-		expect( fulfillment.next( ENTITIES ).value.type ).toEqual(
-			'MOCKED_ACQUIRE_LOCK'
-		);
+		fulfillment.next( ENTITIES );
 
 		// trigger apiFetch
 		const { value: apiFetchAction } = fulfillment.next();
@@ -103,6 +101,23 @@ describe( 'getEntityRecords', () => {
 				{}
 			)
 		);
+	} );
+
+	it( 'Uses state locks', async () => {
+		const fulfillment = getEntityRecords( 'root', 'postType' );
+
+		// Repeat the steps from `yields with requested post type` test
+		fulfillment.next();
+		// Provide entities and acquire lock
+		expect( fulfillment.next( ENTITIES ).value.type ).toEqual(
+			'MOCKED_ACQUIRE_LOCK'
+		);
+		fulfillment.next();
+		fulfillment.next( POST_TYPES );
+
+		// Resolve specific entity records
+		fulfillment.next();
+		fulfillment.next();
 
 		// Release lock
 		expect( fulfillment.next().value.type ).toEqual(
@@ -116,6 +131,7 @@ describe( 'getEntityRecords', () => {
 		// Repeat the steps from `yields with requested post type` test
 		fulfillment.next();
 		fulfillment.next( ENTITIES );
+		fulfillment.next();
 		fulfillment.next( POST_TYPES );
 
 		// It should mark the entity record that has an ID as resolved
@@ -129,8 +145,6 @@ describe( 'getEntityRecords', () => {
 			selectorName: 'getEntityRecord',
 			args: [ ENTITIES[ 1 ].kind, ENTITIES[ 1 ].name, 2 ],
 		} );
-
-		expect( fulfillment.next().done ).toEqual( true );
 	} );
 } );
 
