@@ -17,6 +17,7 @@
 			"gradients": true
 		},
 		"fontSize": true,
-		"lineHeight": true
+		"lineHeight": true,
+		"__experimentalFontFamily": true
 	}
 }

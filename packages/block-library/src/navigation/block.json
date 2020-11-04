@@ -54,6 +54,7 @@
 		"color": {
 			"textColor": true,
 			"backgroundColor": true
-		}
+		},
+		"__experimentalFontFamily": true
 	}
 }

@@ -64,6 +64,11 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_line_height_support    = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
 	$has_text_transform_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
 
+	$has_font_family_support = false;
+	if ( property_exists( $block_type, 'supports' ) ) {
+		$has_font_family_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontFamily' ), false );
+	}
+
 	// Font Size.
 	if ( $has_font_size_support ) {
 		$has_named_font_size  = array_key_exists( 'fontSize', $block_attributes );
@@ -74,6 +79,23 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 			$classes[] = sprintf( 'has-%s-font-size', $block_attributes['fontSize'] );
 		} elseif ( $has_custom_font_size ) {
 			$styles[] = sprintf( 'font-size: %spx;', $block_attributes['style']['typography']['fontSize'] );
+		}
+	}
+
+	// Font Family.
+	if ( $has_font_family_support ) {
+		$has_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
+		// Apply required class and style.
+		if ( $has_font_family ) {
+			$font_family = $block_attributes['style']['typography']['fontFamily'];
+			if ( strpos( $font_family, 'var:preset|font-family' ) !== false ) {
+				// Get the name from the string and add proper styles.
+				$index_to_splice  = strrpos( $font_family, '|' ) + 1;
+				$font_family_name = substr( $font_family, $index_to_splice );
+				$styles[]         = sprintf( 'font-family: var(--wp--preset--font-family--%s);', $font_family_name );
+			} else {
+				$styles[] = sprintf( 'font-family: %s;', $block_attributes['style']['color']['fontFamily'] );
+			}
 		}
 	}
 
