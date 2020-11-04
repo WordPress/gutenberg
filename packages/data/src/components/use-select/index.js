@@ -192,8 +192,11 @@ export default function useSelect( _mapSelect, deps ) {
 		} );
 
 		return () => {
-			clearTimeout( throttleRef.current );
-			throttleRef.current = null;
+			if ( throttleRef.current ) {
+				clearTimeout( throttleRef.current );
+				throttleRef.current = null;
+				onStoreChange();
+			}
 			isMountedAndNotUnsubscribing.current = false;
 			unsubscribe();
 			renderQueue.flush( queueContext );
