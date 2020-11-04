@@ -29,6 +29,7 @@ export { default as ContrastChecker } from './contrast-checker';
 export { default as __experimentalGradientPicker } from './gradient-picker';
 export { default as __experimentalGradientPickerControl } from './gradient-picker/control';
 export { default as __experimentalGradientPickerPanel } from './gradient-picker/panel';
+export { default as __experimentalFontFamilyControl } from './font-family';
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export { default as __experimentalImageSizeControl } from './image-size-control';

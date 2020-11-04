@@ -395,6 +395,8 @@ function gutenberg_experimental_global_styles_get_css_property( $style_property 
 			return 'font-size';
 		case 'lineHeight':
 			return 'line-height';
+		case 'fontFamily':
+			return 'font-family';
 		case 'textTransform':
 			return 'text-transform';
 		default:
@@ -414,6 +416,7 @@ function gutenberg_experimental_global_styles_get_style_property() {
 		'backgroundColor'          => array( 'color', 'background' ),
 		'color'                    => array( 'color', 'text' ),
 		'fontSize'                 => array( 'typography', 'fontSize' ),
+		'fontFamily'               => array( 'typography', 'fontFamily' ),
 		'lineHeight'               => array( 'typography', 'lineHeight' ),
 		'textTransform'            => array( 'typography', 'textTransform' ),
 	);
@@ -432,6 +435,7 @@ function gutenberg_experimental_global_styles_get_support_keys() {
 		'color'                    => array( 'color' ),
 		'fontSize'                 => array( 'fontSize' ),
 		'lineHeight'               => array( 'lineHeight' ),
+		'fontFamily'               => array( '__experimentalFontFamily' ),
 		'textTransform'            => array( '__experimentalTextTransform' ),
 	);
 }
@@ -454,6 +458,10 @@ function gutenberg_experimental_global_styles_get_presets_structure() {
 		'fontSize'      => array(
 			'path' => array( 'typography', 'fontSizes' ),
 			'key'  => 'size',
+		),
+		'fontFamily'    => array(
+			'path' => array( 'typography', 'fontFamilies' ),
+			'key'  => 'fontFamily',
 		),
 		'textTransform' => array(
 			'path' => array( 'typography', 'textTransforms' ),
@@ -498,6 +506,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
 				array(
 					'supports' => array(
 						'__experimentalSelector'      => ':root',
+						'__experimentalFontFamily'    => true,
 						'fontSize'                    => true,
 						'__experimentalTextTransform' => true,
 						'color'                       => array(
