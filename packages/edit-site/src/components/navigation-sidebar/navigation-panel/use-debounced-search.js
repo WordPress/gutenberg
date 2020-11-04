@@ -8,7 +8,10 @@ import { debounce } from 'lodash';
  */
 import { useState, useCallback, useMemo, useEffect } from '@wordpress/element';
 
-const DEBOUNCE_IN_MS = 500;
+/**
+ * Internal dependencies
+ */
+import { SEARCH_DEBOUNCE_IN_MS } from './constants';
 
 export default function useDebouncedSearch() {
 	const [ searchInput, setSearchInput ] = useState( '' );
@@ -20,7 +23,7 @@ export default function useDebouncedSearch() {
 	}, [ search ] );
 
 	const debouncedSetSearch = useCallback(
-		debounce( setSearch, DEBOUNCE_IN_MS ),
+		debounce( setSearch, SEARCH_DEBOUNCE_IN_MS ),
 		[ setSearch ]
 	);
 
