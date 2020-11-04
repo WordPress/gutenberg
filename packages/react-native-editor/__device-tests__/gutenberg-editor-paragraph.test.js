@@ -163,7 +163,6 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 
 		for ( let i = 3; i > 0; i-- ) {
-			await swipeUp( driver );
 			await editorPage.removeBlockAtPosition( paragraphBlockName, i );
 		}
 	} );
