@@ -1,3 +1,7 @@
 .wp-block-quote__citation {
 	font-size: $default-font-size;
 }
+
+.is-dark-theme .wp-block-quote__citation ::placeholder {
+	color: $light-gray-placeholder;
+}

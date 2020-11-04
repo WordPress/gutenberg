@@ -29,3 +29,8 @@
 .wp-block-pullquote .wp-block-pullquote__citation {
 	color: inherit;
 }
+
+// Colorize the placeholder state to be legible.
+.is-dark-theme [data-type="core/pullquote"] [data-rich-text-placeholder] {
+	color: $white;
+}
