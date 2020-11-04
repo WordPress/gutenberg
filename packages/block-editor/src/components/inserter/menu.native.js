@@ -133,11 +133,14 @@ export class InserterMenu extends Component {
 				isVisible={ true }
 				onClose={ this.onClose }
 				hideHeader
-				isChildrenScrollable
+				hasNavigation
 			>
 				<TouchableHighlight accessible={ false }>
 					<BottomSheetConsumer>
-						{ ( { listProps } ) => (
+						{ ( {
+							listProps,
+							safeAreaBottomInset = styles.list.paddingBottom,
+						} ) => (
 							<FlatList
 								onLayout={ this.onLayout }
 								key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
@@ -154,6 +157,12 @@ export class InserterMenu extends Component {
 								keyExtractor={ ( item ) => item.name }
 								renderItem={ this.renderItem }
 								{ ...listProps }
+								contentContainerStyle={ [
+									...listProps.contentContainerStyle,
+									{
+										paddingBottom: safeAreaBottomInset,
+									},
+								] }
 							/>
 						) }
 					</BottomSheetConsumer>

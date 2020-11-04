@@ -52,6 +52,9 @@
 		},
 		"gradient": {
 			"type": "string"
+		},
+		"width": {
+			"type": "number"
 		}
 	},
 	"supports": {

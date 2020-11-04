@@ -1250,7 +1250,7 @@ _Parameters_
 
 -   _rootClientId_ `string`: Client ID of the block whose InnerBlocks will re replaced.
 -   _blocks_ `Array<Object>`: Block objects to insert as new InnerBlocks
--   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to true.
+-   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to false.
 
 _Returns_
 

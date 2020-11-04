@@ -14,10 +14,7 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import {
-	useExperimentalFeatures,
-	navigationPanel,
-} from '../../experimental-features';
+import { navigationPanel } from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -58,12 +55,10 @@ describe( 'Multi-entity save flow', () => {
 		}
 	};
 
-	useExperimentalFeatures( [ '#gutenberg-full-site-editing' ] );
-
 	beforeAll( async () => {
+		await activateTheme( 'twentytwentyone-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
-		await activateTheme( 'twentytwentyone-blocks' );
 	} );
 
 	afterAll( async () => {

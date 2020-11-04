@@ -52,6 +52,19 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
+.wp-block[data-align="left"],
+.wp-block[data-align="center"],
+.wp-block[data-align="right"] {
+	> .wp-block-image {
+		display: table;
+
+		> figcaption {
+			display: table-caption;
+			caption-side: bottom;
+		}
+	}
+}
+
 .wp-block[data-align="left"] > .wp-block-image {
 	margin-right: 1em;
 	margin-left: 0;
