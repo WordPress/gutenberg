@@ -8,8 +8,8 @@ import { get, pick } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 
-export function defaultColumnsNumber( images ) {
-	return images?.length ? Math.min( 3, images.length ) : 3;
+export function defaultColumnsNumber( imageCount ) {
+	return imageCount ? Math.min( 3, imageCount ) : 3;
 }
 
 export const pickRelevantMediaFiles = ( image, sizeSlug = 'large' ) => {
