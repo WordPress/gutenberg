@@ -73,12 +73,7 @@ export function SocialLinksEdit( props ) {
 						{ ( toggleProps ) => (
 							<DropdownMenu
 								label={ __( 'Size' ) }
-								text={
-									// Display size value Small, Large, etc..
-									sizeOptions.find(
-										( opt ) => opt.value === size
-									).name || __( 'Size' )
-								}
+								text={ __( 'Size' ) }
 								icon={ null }
 								popoverProps={ POPOVER_PROPS }
 								toggleProps={ toggleProps }
