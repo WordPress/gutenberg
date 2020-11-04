@@ -15,11 +15,6 @@ import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { useRef, useEffect } from '@wordpress/element';
 
-/**
- * Internal dependencies
- */
-import { defaultColumnsNumber } from './shared';
-
 export const Gallery = ( props ) => {
 	const {
 		attributes,
@@ -28,15 +23,9 @@ export const Gallery = ( props ) => {
 		mediaPlaceholder,
 		insertBlocksAfter,
 		blockProps,
-		images,
 	} = props;
 
-	const {
-		align,
-		columns = defaultColumnsNumber( images ),
-		caption,
-		imageCrop,
-	} = attributes;
+	const { align, columns, caption, imageCrop } = attributes;
 	const galleryRef = useRef();
 	const innerBlocksProps = useInnerBlocksProps(
 		{
