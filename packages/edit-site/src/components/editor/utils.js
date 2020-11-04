@@ -14,6 +14,7 @@ export const PRESET_CATEGORIES = {
 	gradient: { path: [ 'color', 'gradients' ], key: 'gradient' },
 	fontSize: { path: [ 'typography', 'fontSizes' ], key: 'size' },
 	fontFamily: { path: [ 'typography', 'fontFamilies' ], key: 'fontFamily' },
+	textTransform: { path: [ 'typography', 'textTransforms' ], key: 'slug' },
 };
 export const LINK_COLOR = '--wp--style--color--link';
 export const LINK_COLOR_DECLARATION = `a { color: var(${ LINK_COLOR }, #00e); }`;

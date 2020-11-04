@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
+import TextDecorationAndTransformEdit from '../components/text-decoration-and-transform';
 
 import {
 	LINE_HEIGHT_SUPPORT_KEY,
@@ -26,11 +27,16 @@ import {
 	FontSizeEdit,
 	useIsFontSizeDisabled,
 } from './font-size';
+import {
+	TEXT_TRANSFORM_SUPPORT_KEY,
+	useIsTextTransformDisabled,
+} from './text-transform';
 
 export const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
 	FONT_FAMILY_SUPPORT_KEY,
+	TEXT_TRANSFORM_SUPPORT_KEY,
 ];
 
 export function TypographyPanel( props ) {
@@ -45,6 +51,7 @@ export function TypographyPanel( props ) {
 				<FontFamilyEdit { ...props } />
 				<FontSizeEdit { ...props } />
 				<LineHeightEdit { ...props } />
+				<TextDecorationAndTransformEdit { ...props } />
 			</PanelBody>
 		</InspectorControls>
 	);
@@ -64,6 +71,7 @@ function useIsTypographyDisabled( props = {} ) {
 		useIsFontSizeDisabled( props ),
 		useIsLineHeightDisabled( props ),
 		useIsFontFamilyDisabled( props ),
+		useIsTextTransformDisabled( props ),
 	];
 
 	return configs.filter( Boolean ).length === configs.length;
