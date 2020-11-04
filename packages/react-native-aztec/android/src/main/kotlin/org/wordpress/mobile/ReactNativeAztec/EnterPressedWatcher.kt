@@ -45,7 +45,7 @@ class EnterPressedWatcher(aztecText: AztecText, var enterDeleter: EnterDeleter) 
             //do this check
             if (selStart != selEnd) {
                 // check if the inserted character is a NEWLINE and then handle it's occurrence.
-                if (text.subSequence(start, start + 1).toString().equals(Constants.NEWLINE.toString(), true)) {
+                if (newTextCopy.subSequence(start, start + 1).toString().equals(Constants.NEWLINE.toString(), true)) {
                     done = false
                     aztecText.editableText.setSpan(EnterPressedUnderway(), 0, 0, Spanned.SPAN_USER)
                     aztecKeyListener.onEnterKey(
