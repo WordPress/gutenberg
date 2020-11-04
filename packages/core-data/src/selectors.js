@@ -291,9 +291,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 								entityRecord[
 									entity.key || DEFAULT_ENTITY_KEY
 								],
-							title: ! entity.getTitle
-								? ''
-								: entity.getTitle( entityRecord ),
+							title: entity?.getTitle?.( entityRecord ) || '',
 							name,
 							kind,
 						} );
