@@ -1,10 +1,24 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { RichText, useBlockProps, InnerBlocks } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
-	const { columns, imageCrop, caption } = attributes;
+/**
+ * Internal dependencies
+ */
+import { defaultColumnsNumber } from './shared';
+
+export default function save( { attributes, innerBlocks } ) {
+	const {
+		columns = defaultColumnsNumber( innerBlocks ),
+		imageCrop,
+		caption,
+	} = attributes;
 	const className = `columns-${ columns } ${ imageCrop ? 'is-cropped' : '' }`;
 
 	return (
