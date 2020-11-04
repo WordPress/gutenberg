@@ -387,7 +387,6 @@ export default function Image( {
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		<>
 			<img
-				className={ duotone && `duotone-filter-${ duotone.slug }` }
 				src={ url }
 				alt={ defaultedAlt }
 				onClick={ onImageClick }
@@ -520,6 +519,7 @@ export default function Image( {
 			{ duotone && (
 				<DuotoneFilter
 					slug={ duotone.slug }
+					selectors="img"
 					values={ duotone.values }
 				/>
 			) }
