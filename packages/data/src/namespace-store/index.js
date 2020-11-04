@@ -120,7 +120,7 @@ export default function createNamespace( key, options, registry ) {
 		store &&
 		( ( listener ) => {
 			let lastState = store.__unstableOriginalGetState();
-			store.subscribe( () => {
+			return store.subscribe( () => {
 				const state = store.__unstableOriginalGetState();
 				const hasChanged = state !== lastState;
 				lastState = state;
