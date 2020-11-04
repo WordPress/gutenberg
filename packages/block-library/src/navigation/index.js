@@ -34,12 +34,14 @@ export const settings = {
 			title: __( 'Navigation (horizontal)' ),
 			description: __( 'Links shown in a row.' ),
 			attributes: { orientation: 'horizontal' },
+			scope: [ 'inserter', 'transform' ],
 		},
 		{
 			name: 'vertical',
 			title: __( 'Navigation (vertical)' ),
 			description: __( 'Links shown in a column.' ),
 			attributes: { orientation: 'vertical' },
+			scope: [ 'inserter', 'transform' ],
 		},
 	],
 
