@@ -7,6 +7,7 @@ import { forEach } from 'lodash';
  * WordPress dependencies
  */
 import { Component, forwardRef } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -39,6 +40,10 @@ const listener = new Listener();
  * @return {Function} Higher-order component.
  */
 function withGlobalEvents( eventTypesToHandlers ) {
+	deprecated( 'wp.compose.withGlobalEvents', {
+		alternative: 'useEffect',
+	} );
+
 	return createHigherOrderComponent( ( WrappedComponent ) => {
 		class Wrapper extends Component {
 			constructor() {
