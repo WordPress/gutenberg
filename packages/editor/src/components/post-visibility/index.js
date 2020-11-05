@@ -115,7 +115,6 @@ export class PostVisibility extends Component {
 									checked={
 										visibilityHandlers[ value ].checked
 									}
-									version="next"
 								/>
 							</div>
 						) ) }
@@ -133,7 +132,6 @@ export class PostVisibility extends Component {
 						onChange={ this.updatePassword }
 						value={ password }
 						placeholder={ __( 'Use a secure password' ) }
-						version="next"
 					/>
 				</Grid>
 			),

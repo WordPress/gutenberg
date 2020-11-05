@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { FormGroup, TextInput } from '@wordpress/ui.components';
+import { FormGroup, Select } from '@wordpress/ui.components';
 import { withNextComponent as withNext } from '@wordpress/ui.context';
 
-function TextControl( {
+export function SelectControl( {
 	label,
 	hideLabelFromVision,
 	labelHidden: labelHiddenProp,
@@ -14,11 +14,11 @@ function TextControl( {
 
 	return (
 		<FormGroup label={ label } labelHidden={ labelHidden }>
-			<TextInput { ...props } />
+			<Select { ...props } />
 		</FormGroup>
 	);
 }
 
 export function withNextComponent( current ) {
-	return withNext( current, TextControl, 'WPComponentsTextControl' );
+	return withNext( current, SelectControl, 'WPComponentsSelectControl' );
 }

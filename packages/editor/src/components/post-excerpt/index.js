@@ -14,7 +14,6 @@ function PostExcerpt( { excerpt, onUpdateExcerpt } ) {
 				className="editor-post-excerpt__textarea"
 				onChange={ ( value ) => onUpdateExcerpt( value ) }
 				value={ excerpt }
-				version="next"
 			/>
 			<ExternalLink
 				href={ __( 'https://wordpress.org/support/article/excerpt/' ) }

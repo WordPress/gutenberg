@@ -4,7 +4,7 @@
 import { FormGroup, TextInput } from '@wordpress/ui.components';
 import { withNextComponent as withNext } from '@wordpress/ui.context';
 
-export function TextareaControl( { label, ...props } ) {
+function TextareaControl( { label, ...props } ) {
 	return (
 		<FormGroup label={ label }>
 			<TextInput minRows={ 3 } maxRows={ 6 } { ...props } multiline />

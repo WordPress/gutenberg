@@ -4,6 +4,7 @@
 import { BlockInspector } from '@wordpress/block-editor';
 import { cog } from '@wordpress/icons';
 import { Platform } from '@wordpress/element';
+import { ContextSystemProvider } from '@wordpress/ui.context';
 
 /**
  * Internal dependencies
@@ -66,20 +67,30 @@ const SettingsSidebar = () => {
 			icon={ cog }
 			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
 		>
-			{ sidebarName === 'edit-post/document' && (
-				<>
-					<PostStatus />
-					<PluginDocumentSettingPanel.Slot />
-					<LastRevision />
-					<PostLink />
-					<PostTaxonomies />
-					<FeaturedImage />
-					<PostExcerpt />
-					<DiscussionPanel />
-					<PageAttributes />
-					<MetaBoxes location="side" />
-				</>
-			) }
+			<ContextSystemProvider
+				value={ {
+					WPComponentsCheckboxControl: { version: 'next' },
+					WPComponentsRadio: { version: 'next' },
+					WPComponentsTextControl: { version: 'next' },
+					WPComponentsTextareaControl: { version: 'next' },
+					WPComponentsSelectControl: { version: 'next' },
+				} }
+			>
+				{ sidebarName === 'edit-post/document' && (
+					<>
+						<PostStatus />
+						<PluginDocumentSettingPanel.Slot />
+						<LastRevision />
+						<PostLink />
+						<PostTaxonomies />
+						<FeaturedImage />
+						<PostExcerpt />
+						<DiscussionPanel />
+						<PageAttributes />
+						<MetaBoxes location="side" />
+					</>
+				) }
+			</ContextSystemProvider>
 			{ sidebarName === 'edit-post/block' && <BlockInspector /> }
 		</PluginSidebarEditPost>
 	);

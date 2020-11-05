@@ -5,7 +5,6 @@ import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
-import { ContextSystemProvider } from '@wordpress/ui.context';
 
 /**
  * Internal dependencies
@@ -36,23 +35,15 @@ function PostStatus( { isOpened, onTogglePanel } ) {
 			<PluginPostStatusInfo.Slot>
 				{ ( fills ) => (
 					<>
-						<ContextSystemProvider
-							value={ {
-								WPComponentsCheckboxControl: {
-									version: 'next',
-								},
-							} }
-						>
-							<PostVisibility />
-							<PostSchedule />
-							<PostFormat />
-							<PostSticky />
-							<PostPendingStatus />
-							<PostSlug />
-							<PostAuthor />
-							{ fills }
-							<PostTrash />
-						</ContextSystemProvider>
+						<PostVisibility />
+						<PostSchedule />
+						<PostFormat />
+						<PostSticky />
+						<PostPendingStatus />
+						<PostSlug />
+						<PostAuthor />
+						{ fills }
+						<PostTrash />
 					</>
 				) }
 			</PluginPostStatusInfo.Slot>

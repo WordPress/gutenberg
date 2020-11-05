@@ -2,13 +2,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody, PanelRow } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
 import {
 	PostComments,
 	PostPingbacks,
 	PostTypeSupportCheck,
 } from '@wordpress/editor';
 import { compose } from '@wordpress/compose';
+import { ListGroup } from '@wordpress/ui.components';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
@@ -28,17 +29,14 @@ function DiscussionPanel( { isEnabled, isOpened, onTogglePanel } ) {
 				opened={ isOpened }
 				onToggle={ onTogglePanel }
 			>
-				<PostTypeSupportCheck supportKeys="comments">
-					<PanelRow>
+				<ListGroup>
+					<PostTypeSupportCheck supportKeys="comments">
 						<PostComments />
-					</PanelRow>
-				</PostTypeSupportCheck>
-
-				<PostTypeSupportCheck supportKeys="trackbacks">
-					<PanelRow>
+					</PostTypeSupportCheck>
+					<PostTypeSupportCheck supportKeys="trackbacks">
 						<PostPingbacks />
-					</PanelRow>
-				</PostTypeSupportCheck>
+					</PostTypeSupportCheck>
+				</ListGroup>
 			</PanelBody>
 		</PostTypeSupportCheck>
 	);

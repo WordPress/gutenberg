@@ -17,6 +17,7 @@ import { Icon, chevronDown } from '@wordpress/icons';
 import BaseControl from '../base-control';
 import InputBase from '../input-control/input-base';
 import { Select, DownArrowWrapper } from './styles/select-control-styles';
+import { withNextComponent } from './next';
 
 function useUniqueId( idProp ) {
 	const instanceId = useInstanceId( SelectControl );
@@ -133,4 +134,4 @@ function SelectControl(
 
 const ForwardedComponent = forwardRef( SelectControl );
 
-export default ForwardedComponent;
+export default withNextComponent( ForwardedComponent );
