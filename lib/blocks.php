@@ -251,31 +251,17 @@ function gutenberg_add_blocks_to_post_resource( $content ) {
 	$blocks   = $parser->parse( $content );
 	$data     = array();
 
+	$attributes = array( 'blockName', 'attrs', 'innerHTML', 'innerBlocks', 'innerContent' );
+
 	// Loop thru the blocks, adding rendered content when available.
 	foreach ( $blocks as $block ) {
-		$block_name  = isset( $block['blockName'] ) ? $block['blockName'] : null;
-		$attributes  = is_array( $block['attrs'] ) ? $block['attrs'] : null;
-		$raw_content = isset( $block['rawContent'] ) ? $block['rawContent'] : null;
-
-		// Skip block if we didn’t get a valid block name.
-		if ( null === $block_name ) {
-			continue;
+		foreach( $attributes as $attribute ) {
+			if ( isset( $block[ $attribute ] ) ) {
+				$item[ $attribute ] = $block[ $attribute ];
+			}
 		}
 
-		// Set up rendered content, if available.
-		$block['renderedContent'] = null;
-		$block_type               = $registry->get_registered( $block_name );
-		if ( null !== $block_type ) {
-			$block['renderedContent'] = $block_type->render( $attributes, $raw_content );
-		}
-
-		// Add the item data.
-		$data[] = array(
-			'type'       => $block_name,
-			'attributes' => $attributes,
-			'content'    => $raw_content,
-			'rendered'   => $block['renderedContent'],
-		);
+		$data[] = $item;
 	}
 
 	return $data;
