@@ -8,20 +8,20 @@ export default function FocusableIframe( { iframeRef, onFocus, ...props } ) {
 	const ref = iframeRef || fallbackRef;
 
 	useEffect( () => {
+		const iframe = ref.current;
+		const { ownerDocument } = iframe;
+		const { defaultView } = ownerDocument;
+		const { FocusEvent } = defaultView;
+
 		/**
 		 * Checks whether the iframe is the activeElement, inferring that it has
 		 * then received focus, and calls the `onFocus` prop callback.
 		 */
 		function checkFocus() {
-			const iframe = ref.current;
-			const { ownerDocument } = iframe;
-
 			if ( ownerDocument.activeElement !== iframe ) {
 				return;
 			}
 
-			const { defaultView } = ownerDocument;
-			const { FocusEvent } = defaultView;
 			const focusEvent = new FocusEvent( 'focus', { bubbles: true } );
 
 			iframe.dispatchEvent( focusEvent );
@@ -31,10 +31,10 @@ export default function FocusableIframe( { iframeRef, onFocus, ...props } ) {
 			}
 		}
 
-		window.addEventListener( 'blur', checkFocus );
+		defaultView.addEventListener( 'blur', checkFocus );
 
 		return () => {
-			window.removeEventListener( 'blur', checkFocus );
+			defaultView.removeEventListener( 'blur', checkFocus );
 		};
 	}, [ onFocus ] );
 
