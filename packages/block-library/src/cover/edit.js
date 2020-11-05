@@ -20,6 +20,7 @@ import {
 	Spinner,
 	ToggleControl,
 	withNotices,
+	ButtonGroup,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
@@ -80,6 +81,47 @@ function retrieveFastAverageColor() {
 		retrieveFastAverageColor.fastAverageColor = new FastAverageColor();
 	}
 	return retrieveFastAverageColor.fastAverageColor;
+}
+
+const backgroundSizesOptions = [
+	{
+		slug: 'cover',
+		label: __( 'Cover' ),
+	},
+	{
+		slug: 'contain',
+		label: __( 'Contain' ),
+	},
+	{
+		slug: 'initial',
+		label: __( 'Original' ),
+	},
+	{
+		slug: 'custom',
+		label: __( 'Custom' ),
+	},
+];
+
+function BackgroundSizeControl( { size = 'cover', onSelect } ) {
+	return (
+		<BaseControl
+			label={ __( ' Background size' ) }
+			id={ 'background-size' }
+		>
+			<ButtonGroup label={ __( 'Size' ) } defaultChecked="size-content">
+				{ backgroundSizesOptions.map( ( { slug, label } ) => (
+					<Button
+						key={ slug }
+						isSmall
+						isPressed={ slug === size }
+						onClick={ () => onSelect( slug ) }
+					>
+						{ label }
+					</Button>
+				) ) }
+			</ButtonGroup>
+		</BaseControl>
+	);
 }
 
 function CoverHeightInput( {
@@ -360,6 +402,8 @@ function CoverEdit( {
 									checked={ isRepeated }
 									onChange={ toggleIsRepeated }
 								/>
+
+								<BackgroundSizeControl />
 							</Fragment>
 						) }
 						{ showFocalPointPicker && (
