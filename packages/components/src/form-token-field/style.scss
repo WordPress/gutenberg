@@ -133,13 +133,14 @@
 	line-height: 24px;
 	height: auto;
 	background: $gray-300;
+	min-width: unset;
 	transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
 	@include reduce-motion;
 }
 
 .components-form-token-field__token-text {
 	border-radius: 12px 0 0 12px;
-	padding: 0 4px 0 8px;
+	padding: 0 0 0 8px;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
