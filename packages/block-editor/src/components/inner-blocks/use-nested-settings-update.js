@@ -28,7 +28,8 @@ export default function useNestedSettingsUpdate(
 	allowedBlocks,
 	templateLock,
 	captureToolbars,
-	orientation
+	orientation,
+	dropZonesDisabled,
 ) {
 	const { updateBlockListSettings } = useDispatch( 'core/block-editor' );
 
@@ -65,6 +66,9 @@ export default function useNestedSettingsUpdate(
 		if ( orientation !== undefined ) {
 			newSettings.orientation = orientation;
 		}
+		if ( dropZonesDisabled !== undefined ) {
+			newSettings.dropZonesDisabled = dropZonesDisabled;
+		}
 
 		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
 			updateBlockListSettings( clientId, newSettings );
@@ -77,6 +81,7 @@ export default function useNestedSettingsUpdate(
 		parentLock,
 		captureToolbars,
 		orientation,
+		dropZonesDisabled,
 		updateBlockListSettings,
 	] );
 }

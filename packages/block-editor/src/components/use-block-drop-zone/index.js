@@ -98,12 +98,14 @@ export default function useBlockDropZone( {
 } ) {
 	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
 
-	const { isLockedAll, orientation } = useSelect(
+	const { isLockedAll, orientation, isDropZonesDisabled } = useSelect(
 		( select ) => {
 			const { getBlockListSettings, getTemplateLock } = select(
 				'core/block-editor'
 			);
 			return {
+				isDropZonesDisabled: getBlockListSettings( targetRootClientId )
+				?.dropZonesDisabled,
 				isLockedAll: getTemplateLock( targetRootClientId ) === 'all',
 				orientation: getBlockListSettings( targetRootClientId )
 					?.orientation,
@@ -119,7 +121,7 @@ export default function useBlockDropZone( {
 
 	const { position } = useDropZone( {
 		element,
-		isDisabled: isLockedAll,
+		isDisabled: isLockedAll || isDropZonesDisabled,
 		withPosition: true,
 		...dropEventHandlers,
 	} );
