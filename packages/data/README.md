@@ -712,6 +712,10 @@ _Returns_
 
 -   `Function`: A custom react hook.
 
+<a name="useStoreSelectors" href="#useStoreSelectors">#</a> **useStoreSelectors**
+
+Undocumented declaration.
+
 <a name="withDispatch" href="#withDispatch">#</a> **withDispatch**
 
 Higher-order component used to add dispatch props using registered action
