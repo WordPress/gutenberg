@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import {
+	registerStore,
+	createUseStoreSelect,
+	createUseStoreDispatch,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,3 +19,6 @@ export default registerStore( 'core/keyboard-shortcuts', {
 	actions,
 	selectors,
 } );
+
+export const useDispatch = createUseStoreDispatch( 'core/keyboard-shortcuts' );
+export const useSelect = createUseStoreSelect( 'core/keyboard-shortcuts' );

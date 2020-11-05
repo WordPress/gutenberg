@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import {
+	registerStore,
+	createUseStoreSelect,
+	createUseStoreDispatch,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,3 +22,6 @@ const store = registerStore( 'core/nux', {
 } );
 
 export default store;
+
+export const useDispatch = createUseStoreDispatch( 'core/nux' );
+export const useSelect = createUseStoreSelect( 'core/nux' );

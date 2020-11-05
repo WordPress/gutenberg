@@ -7,6 +7,7 @@ import deprecated from '@wordpress/deprecated';
  * Internal dependencies
  */
 import './store';
+export { useSelect, useDispatch } from './store';
 
 export { default as DotTip } from './components/dot-tip';
 

@@ -2,32 +2,34 @@
  * WordPress dependencies
  */
 import { Icon, MenuGroup } from '@wordpress/components';
-import { PostPreviewButton } from '@wordpress/editor';
+import {
+	PostPreviewButton,
+	useSelect as useCoreEditorSelect,
+} from '@wordpress/editor';
 import { external } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { __experimentalPreviewOptions as PreviewOptions } from '@wordpress/block-editor';
-import { useDispatch, useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import {
+	useDispatch as useEditPostDispatch,
+	useSelect as useEditPostSelect,
+} from '../../store';
 
 export default function DevicePreview() {
-	const {
-		hasActiveMetaboxes,
-		isPostSaveable,
-		isSaving,
-		deviceType,
-	} = useSelect(
-		( select ) => ( {
-			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
-			deviceType: select(
-				'core/edit-post'
-			).__experimentalGetPreviewDeviceType(),
-		} ),
-		[]
-	);
+	const [ isPostSaveable ] = useCoreEditorSelect( [
+		'isEditedPostSaveable',
+	] );
+	const [ hasActiveMetaboxes, isSaving, deviceType ] = useEditPostSelect( [
+		'hasMetaBoxes',
+		'isSavingMetaBoxes',
+		'__experimentalGetPreviewDeviceType',
+	] );
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-	} = useDispatch( 'core/edit-post' );
+	} = useEditPostDispatch();
 
 	return (
 		<PreviewOptions

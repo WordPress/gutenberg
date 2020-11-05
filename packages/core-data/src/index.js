@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import {
+	registerStore,
+	createUseStoreDispatch,
+	createUseStoreSelect,
+} from '@wordpress/data';
 import { controls } from '@wordpress/data-controls';
 
 /**
@@ -64,3 +68,6 @@ registerStore( REDUCER_KEY, {
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';
+
+export const useDispatch = createUseStoreDispatch( REDUCER_KEY );
+export const useSelect = createUseStoreSelect( REDUCER_KEY );

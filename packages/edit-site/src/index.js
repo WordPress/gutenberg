@@ -19,6 +19,7 @@ import './hooks';
 import registerEditSiteStore from './store';
 import Editor from './components/editor';
 import { findTemplate } from './utils';
+export { useSelect, useDispatch } from './store';
 
 const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
 	apiFetch( {

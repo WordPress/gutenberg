@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import {
+	registerStore,
+	createUseStoreDispatch,
+	createUseStoreSelect,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,3 +19,6 @@ export default registerStore( 'core/viewport', {
 	actions,
 	selectors,
 } );
+
+export const useDispatch = createUseStoreDispatch( 'core/viewport' );
+export const useSelect = createUseStoreSelect( 'core/viewport' );

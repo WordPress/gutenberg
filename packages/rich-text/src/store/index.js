@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import {
+	registerStore,
+	createUseStoreDispatch,
+	createUseStoreSelect,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -11,3 +15,6 @@ import * as selectors from './selectors';
 import * as actions from './actions';
 
 registerStore( 'core/rich-text', { reducer, selectors, actions } );
+
+export const useDispatch = createUseStoreDispatch( 'core/rich-text' );
+export const useSelect = createUseStoreSelect( 'core/rich-text' );

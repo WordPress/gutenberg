@@ -18,6 +18,8 @@ export {
 	useRegistry,
 } from './components/registry-provider';
 export { default as useSelect } from './components/use-select';
+export { default as createUseStoreSelect } from './components/create-use-store-select';
+export { default as createUseStoreDispatch } from './components/create-use-store-dispatch';
 export { useDispatch } from './components/use-dispatch';
 export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';

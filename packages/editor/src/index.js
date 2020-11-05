@@ -18,7 +18,7 @@ import './hooks';
 
 export * from './components';
 export * from './utils';
-export { storeConfig } from './store';
+export { storeConfig, useSelect, useDispatch } from './store';
 
 /*
  * Backward compatibility

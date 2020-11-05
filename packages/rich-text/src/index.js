@@ -3,6 +3,7 @@
  */
 import './store';
 
+export { useSelect, useDispatch } from './store';
 export { applyFormat } from './apply-format';
 export { concat } from './concat';
 export { create } from './create';

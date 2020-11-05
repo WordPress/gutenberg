@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import {
+	createUseStoreDispatch,
+	createUseStoreSelect,
+	registerStore,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -35,3 +39,6 @@ export const storeConfig = {
 const store = registerStore( MODULE_KEY, storeConfig );
 
 export default store;
+
+export const useDispatch = createUseStoreDispatch( MODULE_KEY );
+export const useSelect = createUseStoreSelect( MODULE_KEY );

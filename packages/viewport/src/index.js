@@ -6,6 +6,7 @@ import addDimensionsEventListener from './listener';
 
 export { default as ifViewportMatches } from './if-viewport-matches';
 export { default as withViewportMatch } from './with-viewport-match';
+export { useSelect, useDispatch } from './store';
 
 /**
  * Hash of breakpoint names with pixel width at which it becomes effective.

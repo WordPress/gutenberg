@@ -18,6 +18,7 @@ import '@wordpress/reusable-blocks';
  * Internal dependencies
  */
 import './store';
+export { useSelect, useDispatch } from './store';
 import './hooks';
 import { create as createLegacyWidget } from './blocks/legacy-widget';
 import * as widgetArea from './blocks/widget-area';

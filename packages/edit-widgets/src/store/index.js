@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { registerStore } from '@wordpress/data';
+import {
+	registerStore,
+	createUseStoreSelect,
+	createUseStoreDispatch,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -48,3 +52,6 @@ apiFetch.use( function ( options, next ) {
 } );
 
 export default store;
+
+export const useDispatch = createUseStoreDispatch( MODULE_KEY );
+export const useSelect = createUseStoreSelect( MODULE_KEY );

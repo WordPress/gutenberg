@@ -25,6 +25,8 @@ import { addFilter } from '@wordpress/hooks';
 import Layout from './components/layout';
 import './store';
 
+export { useSelect, useDispatch } from './store';
+
 function disableInsertingNonNavigationBlocks( settings, name ) {
 	if ( ! [ 'core/navigation', 'core/navigation-link' ].includes( name ) ) {
 		set( settings, [ 'supports', 'inserter' ], false );

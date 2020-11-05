@@ -425,6 +425,14 @@ _Returns_
 
 -   `Function`: Registry selector that can be registered with a store.
 
+<a name="createUseStoreDispatch" href="#createUseStoreDispatch">#</a> **createUseStoreDispatch**
+
+Undocumented declaration.
+
+<a name="createUseStoreSelect" href="#createUseStoreSelect">#</a> **createUseStoreSelect**
+
+Undocumented declaration.
+
 <a name="dispatch" href="#dispatch">#</a> **dispatch**
 
 Given the name of a registered store, returns an object of the store's action creators.

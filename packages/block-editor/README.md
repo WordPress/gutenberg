@@ -581,6 +581,14 @@ _Returns_
 
 -   `Object`: Props to pass to the element to mark as a block.
 
+<a name="useDispatch" href="#useDispatch">#</a> **useDispatch**
+
+Undocumented declaration.
+
+<a name="useSelect" href="#useSelect">#</a> **useSelect**
+
+Undocumented declaration.
+
 <a name="validateThemeColors" href="#validateThemeColors">#</a> **validateThemeColors**
 
 Given an array of theme colors checks colors for validity

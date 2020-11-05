@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import {
+	createUseStoreDispatch,
+	createUseStoreSelect,
+	registerStore,
+} from '@wordpress/data';
 import { controls as dataControls } from '@wordpress/data-controls';
 
 /**
@@ -36,3 +40,6 @@ const store = registerStore( STORE_KEY, {
 } );
 
 export default store;
+
+export const useDispatch = createUseStoreDispatch( STORE_KEY );
+export const useSelect = createUseStoreSelect( STORE_KEY );

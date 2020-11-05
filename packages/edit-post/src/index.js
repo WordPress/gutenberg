@@ -21,6 +21,7 @@ import './hooks';
 import './plugins';
 import './store';
 import Editor from './editor';
+export { useSelect, useDispatch } from './store';
 
 /**
  * Reinitializes the editor after the user chooses to reboot the editor after

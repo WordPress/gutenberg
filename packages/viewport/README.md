@@ -76,6 +76,14 @@ _Returns_
 
 -   `Function`: Higher-order component.
 
+<a name="useDispatch" href="#useDispatch">#</a> **useDispatch**
+
+Undocumented declaration.
+
+<a name="useSelect" href="#useSelect">#</a> **useSelect**
+
+Undocumented declaration.
+
 <a name="withViewportMatch" href="#withViewportMatch">#</a> **withViewportMatch**
 
 Higher-order component creator, creating a new component which renders with

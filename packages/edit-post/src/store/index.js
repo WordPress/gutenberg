@@ -1,7 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import {
+	createUseStoreDispatch,
+	createUseStoreSelect,
+	registerStore,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -20,5 +24,8 @@ const store = registerStore( STORE_KEY, {
 } );
 
 applyMiddlewares( store );
+
+export const useDispatch = createUseStoreDispatch( STORE_KEY );
+export const useSelect = createUseStoreSelect( STORE_KEY );
 
 export default store;
