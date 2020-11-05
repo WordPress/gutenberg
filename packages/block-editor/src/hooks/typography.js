@@ -28,6 +28,10 @@ import {
 	useIsFontSizeDisabled,
 } from './font-size';
 import {
+	TEXT_DECORATION_SUPPORT_KEY,
+	useIsTextDecorationDisabled,
+} from './text-decoration';
+import {
 	TEXT_TRANSFORM_SUPPORT_KEY,
 	useIsTextTransformDisabled,
 } from './text-transform';
@@ -36,6 +40,7 @@ export const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
 	FONT_FAMILY_SUPPORT_KEY,
+	TEXT_DECORATION_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 ];
 
@@ -71,6 +76,7 @@ function useIsTypographyDisabled( props = {} ) {
 		useIsFontSizeDisabled( props ),
 		useIsLineHeightDisabled( props ),
 		useIsFontFamilyDisabled( props ),
+		useIsTextDecorationDisabled( props ),
 		useIsTextTransformDisabled( props ),
 	];
 
