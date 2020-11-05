@@ -199,12 +199,16 @@ class RangeTextInput extends Component {
 		];
 
 		return (
-			<TouchableWithoutFeedback onPress={ this.onInputFocus }>
+			<TouchableWithoutFeedback
+				onPress={ this.onInputFocus }
+				accessible={ false }
+			>
 				<View
 					style={ [
 						styles.textInputContainer,
 						isIOS && inputBorderStyles,
 					] }
+					accessible={ false }
 				>
 					{ isIOS || hasFocus ? (
 						<TextInput

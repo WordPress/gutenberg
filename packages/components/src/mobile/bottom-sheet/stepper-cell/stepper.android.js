@@ -35,11 +35,7 @@ function Stepper( {
 	);
 
 	return (
-		<View
-			style={ styles.container }
-			accesibility={ false }
-			importantForAccessibility="no-hide-descendants"
-		>
+		<View style={ styles.container }>
 			<TouchableOpacity
 				disabled={ isMinValue }
 				onPressIn={ onPressInDecrement }

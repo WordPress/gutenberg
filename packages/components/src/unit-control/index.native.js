@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { Text, View, TouchableWithoutFeedback } from 'react-native';
+import { Text, View, TouchableWithoutFeedback, Platform } from 'react-native';
+
 /**
  * Internal dependencies
  */
@@ -15,6 +16,7 @@ import { CSS_UNITS } from './utils';
  */
 import { useRef } from '@wordpress/element';
 import { withPreferredColorScheme } from '@wordpress/compose';
+import { __, sprintf } from '@wordpress/i18n';
 
 function UnitControl( {
 	currentInput,
@@ -51,8 +53,23 @@ function UnitControl( {
 	);
 
 	const renderUnitButton = () => {
+		const accessibilityHint =
+			Platform.OS === 'ios'
+				? __( 'Double tap to open Action Sheet with available options' )
+				: __(
+						'Double tap to open Bottom Sheet with available options'
+				  );
+
+		/* translators: accessibility text. Inform about current unit value. %s: Current unit value. */
+		const accessibilityLabel = sprintf( __( 'Current unit is %s' ), unit );
+
 		return (
-			<TouchableWithoutFeedback onPress={ onPickerPresent }>
+			<TouchableWithoutFeedback
+				onPress={ onPickerPresent }
+				accessibilityLabel={ accessibilityLabel }
+				accessibilityRole="button"
+				accessibilityHint={ accessibilityHint }
+			>
 				<View style={ styles.unitButton }>
 					<Text style={ unitButtonTextStyle }>{ unit }</Text>
 				</View>
