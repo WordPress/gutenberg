@@ -69,6 +69,11 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		$has_font_family_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontFamily' ), false );
 	}
 
+	$has_font_weight_support = false;
+	if ( property_exists( $block_type, 'supports' ) ) {
+		$has_font_weight_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontWeight' ), false );
+	}
+
 	// Font Size.
 	if ( $has_font_size_support ) {
 		$has_named_font_size  = array_key_exists( 'fontSize', $block_attributes );
@@ -96,6 +101,16 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 			} else {
 				$styles[] = sprintf( 'font-family: %s;', $block_attributes['style']['color']['fontFamily'] );
 			}
+		}
+	}
+
+	// Font weight.
+	if ( $has_font_weight_support ) {
+		$has_font_weight = isset( $block_attributes['style']['typography']['fontWeight'] );
+		// Apply required class and style.
+		if ( $has_font_weight ) {
+			// Add the style (no classes for line-height).
+			$styles[] = sprintf( 'font-weight: %s;', $block_attributes['style']['typography']['fontWeight'] );
 		}
 	}
 

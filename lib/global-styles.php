@@ -511,6 +511,7 @@ function gutenberg_experimental_global_styles_get_block_data() {
 					'supports' => array(
 						'__experimentalSelector'      => ':root',
 						'__experimentalFontFamily'    => true,
+						'__experimentalFontWeight'    => true,
 						'fontSize'                    => true,
 						'__experimentalTextTransform' => true,
 						'color'                       => array(

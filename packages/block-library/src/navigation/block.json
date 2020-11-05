@@ -55,6 +55,7 @@
 			"textColor": true,
 			"backgroundColor": true
 		},
-		"__experimentalFontFamily": true
+		"__experimentalFontFamily": true,
+		"__experimentalFontWeight": true
 	}
 }

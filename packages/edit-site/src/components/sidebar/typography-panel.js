@@ -4,6 +4,7 @@
 import {
 	LineHeightControl,
 	__experimentalFontFamilyControl as FontFamilyControl,
+	__experimentalFontWeightControl as FontWeightControl,
 } from '@wordpress/block-editor';
 import { PanelBody, FontSizePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -13,8 +14,19 @@ import { __ } from '@wordpress/i18n';
  */
 import { useEditorFeature } from '../editor/utils';
 
-export function useHasTypographyPanel( { supports } ) {
-	return supports.includes( 'fontSize' ) || supports.includes( 'lineHeight' );
+function useHasFontWeight( { supports, name } ) {
+	return (
+		useEditorFeature( 'typography.fontWeight', name ) &&
+		supports.includes( 'fontWeight' )
+	);
+}
+
+export function useHasTypographyPanel( { supports, name } ) {
+	return (
+		useHasFontWeight( { supports, name } ) ||
+		supports.includes( 'fontSize' ) ||
+		supports.includes( 'lineHeight' )
+	);
 }
 
 export default function TypographyPanel( {
@@ -28,6 +40,7 @@ export default function TypographyPanel( {
 		name
 	);
 	const fontFamilies = useEditorFeature( 'typography.fontFamilies', name );
+	const hasFontWeightEnabled = useHasFontWeight( { supports, name } );
 
 	return (
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
@@ -36,6 +49,14 @@ export default function TypographyPanel( {
 					value={ getStyleProperty( name, 'fontFamily' ) }
 					onChange={ ( value ) =>
 						setStyleProperty( name, 'fontFamily', value )
+					}
+				/>
+			) }
+			{ hasFontWeightEnabled && (
+				<FontWeightControl
+					value={ getStyleProperty( name, 'fontWeight' ) }
+					onChange={ ( value ) =>
+						setStyleProperty( name, 'fontWeight', value )
 					}
 				/>
 			) }
