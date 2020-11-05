@@ -2,13 +2,12 @@
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { withNextComponent } from '@wordpress/ui.context';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
-import { TextControlNext } from './next';
+import { withNextComponent } from './next';
 
 function TextControl( {
 	label,
@@ -45,8 +44,4 @@ function TextControl( {
 	);
 }
 
-export default withNextComponent(
-	TextControl,
-	TextControlNext,
-	'WPComponentsTextControl'
-);
+export default withNextComponent( TextControl );

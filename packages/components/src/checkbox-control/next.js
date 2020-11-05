@@ -2,7 +2,8 @@
  * WordPress dependencies
  */
 import { Checkbox } from '@wordpress/ui.components';
+import { withNextComponent as withNext } from '@wordpress/ui.context';
 
-export function CheckboxControlNext( props ) {
-	return <Checkbox { ...props } />;
+export function withNextComponent( current ) {
+	return withNext( current, Checkbox, 'WPComponentsCheckboxControl' );
 }

@@ -8,15 +8,13 @@ import { isArray } from 'lodash';
  * WordPress dependencies
  */
 import deprecated from '@wordpress/deprecated';
-import { Button as UIButton } from '@wordpress/ui.components';
-import { withNextComponent } from '@wordpress/ui.context';
 
 /**
  * Internal dependencies
  */
 import Tooltip from '../tooltip';
 import Icon from '../icon';
-import { buttonAdapter } from './next';
+import { withNextComponent } from './next';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
 
@@ -134,9 +132,4 @@ export function Button( props, ref ) {
 	);
 }
 
-export default withNextComponent(
-	Button,
-	UIButton,
-	'WPComponentsButton',
-	buttonAdapter
-);
+export default withNextComponent( Button );

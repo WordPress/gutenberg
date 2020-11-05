@@ -1,6 +1,8 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
+import { Button } from '@wordpress/ui.components';
+import { withNextComponent as withNext } from '@wordpress/ui.context';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
 
@@ -88,4 +90,8 @@ export function buttonAdapter( props ) {
 		iconSize,
 		size,
 	};
+}
+
+export function withNextComponent( current ) {
+	return withNext( current, Button, 'WPComponentsButton', buttonAdapter );
 }

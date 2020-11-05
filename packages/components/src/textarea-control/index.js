@@ -2,14 +2,13 @@
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { withNextComponent } from '@wordpress/ui.context';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
 import { StyledTextarea } from './styles/textarea-control-styles';
-import { TextareaControlNext } from './next';
+import { withNextComponent } from './next';
 
 function TextareaControl( {
 	label,
@@ -46,8 +45,4 @@ function TextareaControl( {
 	);
 }
 
-export default withNextComponent(
-	TextareaControl,
-	TextareaControlNext,
-	'WPComponentsTextareaControl'
-);
+export default withNextComponent( TextareaControl );
