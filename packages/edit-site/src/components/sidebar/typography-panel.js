@@ -33,6 +33,7 @@ export default function TypographyPanel( {
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
 			{ supports.includes( 'fontFamily' ) && (
 				<FontFamilyControl
+					fontFamilies={ fontFamilies }
 					value={ getStyleProperty( name, 'fontFamily' ) }
 					onChange={ ( value ) =>
 						setStyleProperty( name, 'fontFamily', value )
@@ -51,7 +52,6 @@ export default function TypographyPanel( {
 			) }
 			{ supports.includes( 'lineHeight' ) && (
 				<LineHeightControl
-					fontFamilies={ fontFamilies }
 					value={ getStyleProperty( name, 'lineHeight' ) }
 					onChange={ ( value ) =>
 						setStyleProperty( name, 'lineHeight', value )
