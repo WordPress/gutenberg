@@ -125,8 +125,10 @@ function BlockPopover( {
 		return null;
 	}
 
+	const { ownerDocument } = node;
+
 	if ( capturingClientId ) {
-		node = getBlockDOMNode( capturingClientId, node.ownerDocument );
+		node = getBlockDOMNode( capturingClientId, ownerDocument );
 	}
 
 	let anchorRef = node;
@@ -163,7 +165,7 @@ function BlockPopover( {
 		: 'top right left';
 	const stickyBoundaryElement = showEmptyBlockSideInserter
 		? undefined
-		: getScrollContainer( node ) || node.ownerDocument.body;
+		: getScrollContainer( node ) || ownerDocument.body;
 
 	return (
 		<Popover
