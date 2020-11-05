@@ -760,6 +760,34 @@ function gutenberg_experimental_global_styles_get_preset_classes( $selector, $se
 }
 
 /**
+ * Given a tree that adheres to the theme.json schema
+ * it adds the block data (selector, support) to each context.
+ *
+ * @param array $tree Tree to augment with block data.
+ *
+ * @return array Tree with block data.
+ */
+function gutenberg_experimental_global_styles_augment_with_block_data( $tree ) {
+	$block_data = gutenberg_experimental_global_styles_get_block_data();
+	foreach ( array_keys( $tree ) as $block_name ) {
+		if (
+			! array_key_exists( $block_name, $block_data ) ||
+			! array_key_exists( 'selector', $block_data[ $block_name ] ) ||
+			! array_key_exists( 'supports', $block_data[ $block_name ] )
+		) {
+			// Skip blocks that haven't declared support,
+			// because we don't know to process them.
+			continue;
+		}
+
+		$tree[ $block_name ]['selector'] = $block_data[ $block_name ]['selector'];
+		$tree[ $block_name ]['supports'] = $block_data[ $block_name ]['supports'];
+	}
+
+	return $tree;
+}
+
+/**
  * Takes a tree adhering to the theme.json schema and generates
  * the corresponding stylesheet.
  *
