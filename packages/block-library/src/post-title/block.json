@@ -35,6 +35,7 @@
 		},
 		"fontSize": true,
 		"lineHeight": true,
+		"__experimentalFontFamily": true,
 		"__experimentalSelector": {
 			"core/post-title/h1": "h1",
 			"core/post-title/h2": "h2",
