@@ -94,6 +94,8 @@ export default function useSelect( _mapSelect, deps ) {
 	const latestMapOutputError = useRef();
 	const isMountedAndNotUnsubscribing = useRef();
 
+	// Keep track of the stores being selected in the mapSelect function,
+	// and only subscribe to those stores later.
 	const registeredStores = useRef( [] );
 	const trapSelect = useCallback(
 		( storeKey ) => {
@@ -129,6 +131,7 @@ export default function useSelect( _mapSelect, deps ) {
 		}
 	}
 
+	// Reset the registered stores when mapSelect changes. In case it subscribes to different stores.
 	useIsomorphicLayoutEffect( () => {
 		registeredStores.current = [];
 	}, [ mapSelect ] );
@@ -186,9 +189,9 @@ export default function useSelect( _mapSelect, deps ) {
 			}
 		};
 
-		const unsubscribers = registeredStores.current.map( ( storeKey ) => {
-			return registry.stores[ storeKey ].subscribe( onChange );
-		} );
+		const unsubscribers = registeredStores.current.map( ( storeKey ) =>
+			registry.stores[ storeKey ].subscribe( onChange )
+		);
 		const unsubscribe = () => {
 			unsubscribers.map( ( unsubscriber ) => unsubscriber() );
 		};

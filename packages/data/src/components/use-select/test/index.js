@@ -4,6 +4,11 @@
 import TestRenderer, { act } from 'react-test-renderer';
 
 /**
+ * WordPress dependencies
+ */
+import { useState } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { createRegistry } from '../../../registry';
@@ -203,8 +208,8 @@ describe( 'useSelect', () => {
 		);
 	} );
 
-	it( 'uses memoized selector if dependent stores do not change', () => {
-		const storeConfig = {
+	describe( 're-calls the selector as minimal times as possible', () => {
+		const counterStore = {
 			actions: {
 				increment: () => ( { type: 'INCREMENT' } ),
 			},
@@ -222,56 +227,170 @@ describe( 'useSelect', () => {
 			},
 		};
 
-		registry.registerStore( 'store-1', storeConfig );
-		registry.registerStore( 'store-2', storeConfig );
+		it( 'only calls the selectors it has selected', () => {
+			registry.registerStore( 'store-1', counterStore );
+			registry.registerStore( 'store-2', counterStore );
 
-		let renderer;
+			let renderer;
 
-		const selectCount1 = jest.fn( ( select ) =>
-			select( 'store-1' ).getCounter()
-		);
-		const selectCount2 = jest.fn( ( select ) =>
-			select( 'store-2' ).getCounter()
-		);
+			const selectCount1 = jest.fn();
+			const selectCount2 = jest.fn();
 
-		const TestComponent = jest.fn( () => {
-			const count1 = useSelect( selectCount1, [] );
-			useSelect( selectCount2, [] );
+			const TestComponent = jest.fn( () => {
+				const count1 = useSelect(
+					( select ) =>
+						selectCount1() || select( 'store-1' ).getCounter(),
+					[]
+				);
+				useSelect(
+					( select ) =>
+						selectCount2() || select( 'store-2' ).getCounter(),
+					[]
+				);
 
-			return <div data={ count1 } />;
+				return <div data={ count1 } />;
+			} );
+
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				);
+			} );
+
+			const testInstance = renderer.root;
+
+			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
+			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
+			expect( TestComponent ).toHaveBeenCalledTimes( 1 );
+			expect( testInstance.findByType( 'div' ).props.data ).toBe( 0 );
+
+			act( () => {
+				registry.dispatch( 'store-2' ).increment();
+			} );
+
+			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
+			expect( selectCount2 ).toHaveBeenCalledTimes( 3 );
+			expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+			expect( testInstance.findByType( 'div' ).props.data ).toBe( 0 );
+
+			act( () => {
+				registry.dispatch( 'store-1' ).increment();
+			} );
+
+			expect( selectCount1 ).toHaveBeenCalledTimes( 3 );
+			expect( selectCount2 ).toHaveBeenCalledTimes( 3 );
+			expect( TestComponent ).toHaveBeenCalledTimes( 3 );
+			expect( testInstance.findByType( 'div' ).props.data ).toBe( 1 );
 		} );
 
-		act( () => {
-			renderer = TestRenderer.create(
-				<RegistryProvider value={ registry }>
-					<TestComponent />
-				</RegistryProvider>
-			);
+		it( 'can subscribe to multiple stores at once', () => {
+			registry.registerStore( 'store-1', counterStore );
+			registry.registerStore( 'store-2', counterStore );
+			registry.registerStore( 'store-3', counterStore );
+
+			let renderer;
+
+			const selectCount1And2 = jest.fn();
+
+			const TestComponent = jest.fn( () => {
+				const { count1, count2 } = useSelect(
+					( select ) =>
+						selectCount1And2() || {
+							count1: select( 'store-1' ).getCounter(),
+							count2: select( 'store-2' ).getCounter(),
+						},
+					[]
+				);
+
+				return <div data={ { count1, count2 } } />;
+			} );
+
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				);
+			} );
+
+			const testInstance = renderer.root;
+
+			expect( selectCount1And2 ).toHaveBeenCalledTimes( 2 );
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
+				count1: 0,
+				count2: 0,
+			} );
+
+			act( () => {
+				registry.dispatch( 'store-2' ).increment();
+			} );
+
+			expect( selectCount1And2 ).toHaveBeenCalledTimes( 3 );
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
+				count1: 0,
+				count2: 1,
+			} );
+
+			act( () => {
+				registry.dispatch( 'store-3' ).increment();
+			} );
+
+			expect( selectCount1And2 ).toHaveBeenCalledTimes( 3 );
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
+				count1: 0,
+				count2: 1,
+			} );
 		} );
 
-		const testInstance = renderer.root;
+		it( 're-calls the selector when deps changed', () => {
+			registry.registerStore( 'store-1', counterStore );
+			registry.registerStore( 'store-2', counterStore );
+			registry.registerStore( 'store-3', counterStore );
 
-		expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
-		expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
-		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
-		expect( testInstance.findByType( 'div' ).props.data ).toBe( 0 );
+			let renderer, dep, setDep;
+			const selectCount1AndDep = jest.fn();
 
-		act( () => {
-			registry.dispatch( 'store-2' ).increment();
+			const TestComponent = jest.fn( () => {
+				[ dep, setDep ] = useState( 0 );
+				const state = useSelect(
+					( select ) =>
+						selectCount1AndDep() || {
+							count1: select( 'store-1' ).getCounter(),
+							dep,
+						},
+					[ dep ]
+				);
+
+				return <div data={ state } />;
+			} );
+
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				);
+			} );
+
+			const testInstance = renderer.root;
+
+			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 2 );
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
+				count1: 0,
+				dep: 0,
+			} );
+
+			act( () => {
+				setDep( 1 );
+			} );
+
+			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 3 );
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
+				count1: 0,
+				dep: 1,
+			} );
 		} );
-
-		expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
-		expect( selectCount2 ).toHaveBeenCalledTimes( 3 );
-		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
-		expect( testInstance.findByType( 'div' ).props.data ).toBe( 0 );
-
-		act( () => {
-			registry.dispatch( 'store-1' ).increment();
-		} );
-
-		expect( selectCount1 ).toHaveBeenCalledTimes( 3 );
-		expect( selectCount2 ).toHaveBeenCalledTimes( 3 );
-		expect( TestComponent ).toHaveBeenCalledTimes( 3 );
-		expect( testInstance.findByType( 'div' ).props.data ).toBe( 1 );
 	} );
 } );
