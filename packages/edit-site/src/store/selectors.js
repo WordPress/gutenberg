@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { find, get } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -180,4 +180,16 @@ export function isInserterOpened( state ) {
  */
 export function getDefaultTemplateTypes( state ) {
 	return state.settings?.defaultTemplateTypes;
+}
+
+/**
+ * Returns a default template type searched by slug.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} slug The template type slug.
+ *
+ * @return {Object} The template type.
+ */
+export function getDefaultTemplateType( state, slug ) {
+	return find( getDefaultTemplateTypes( state ), { slug } ) || {};
 }

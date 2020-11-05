@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -16,17 +11,19 @@ import { useSelect } from '@wordpress/data';
  * @return {Object} Information about the template, including title and description.
  */
 export default function useTemplateInfo( template ) {
-	const defaultTemplateTypes = useSelect(
-		( select ) => select( 'core/edit-site' ).getDefaultTemplateTypes(),
-		[]
+	const { defaultTitle, defaultDescription } = useSelect(
+		( select ) => {
+			const { title, description } = select(
+				'core/edit-site'
+			).getDefaultTemplateType( template?.slug );
+			return { defaultTitle: title, defaultDescription: description };
+		},
+		[ template?.slug ]
 	);
 
 	if ( ! template ) {
 		return {};
 	}
-
-	const { title: defaultTitle, description: defaultDescription } =
-		find( defaultTemplateTypes, { slug: template?.slug } ) || {};
 
 	const title = template?.title?.rendered || defaultTitle || template.slug;
 	const description = template?.excerpt?.raw || defaultDescription;

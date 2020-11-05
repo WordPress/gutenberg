@@ -121,13 +121,21 @@ function Editor() {
 		( entitiesToSave ) => {
 			if ( entitiesToSave ) {
 				const { getEditedEntityRecord } = select( 'core' );
+				const { getDefaultTemplateType } = select( 'core/edit-site' );
 				entitiesToSave.forEach( ( { kind, name, key } ) => {
 					const record = getEditedEntityRecord( kind, name, key );
 
-					const edits =
-						! record.title && record.slug
-							? { status: 'publish', title: record.slug }
-							: { status: 'publish' };
+					if ( 'postType' === kind && name === 'wp_template' ) {
+						const { title } = getDefaultTemplateType( record.slug );
+						return editEntityRecord( kind, name, key, {
+							status: 'publish',
+							title: title || record.slug,
+						} );
+					}
+
+					const edits = record.slug
+						? { status: 'publish', title: record.slug }
+						: { status: 'publish' };
 
 					editEntityRecord( kind, name, key, edits );
 				} );
