@@ -18,7 +18,6 @@ import {
 	saving,
 	postLock,
 	postSavingLock,
-	reusableBlocks,
 	template,
 	isReady,
 	editorSettings,
@@ -26,7 +25,7 @@ import {
 
 import { EDITOR_SETTINGS_DEFAULTS } from './defaults.js';
 
-EDITOR_SETTINGS_DEFAULTS.autosaveInterval = 0; // This is a way to override default behavior on mobile, and make it ping the native save at each keystroke
+EDITOR_SETTINGS_DEFAULTS.autosaveInterval = 1; // This is a way to override default behavior on mobile, and make it ping the native save every second as long as something changed
 
 export * from './reducer.js';
 
@@ -95,7 +94,6 @@ export default optimist(
 		saving,
 		postLock,
 		postSavingLock,
-		reusableBlocks,
 		template,
 		isReady,
 		editorSettings,

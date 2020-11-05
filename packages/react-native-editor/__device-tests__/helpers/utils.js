@@ -29,7 +29,7 @@ const testEnvironment = process.env.TEST_ENV || defaultEnvironment;
 const defaultAndroidAppPath =
 	'./android/app/build/outputs/apk/debug/app-debug.apk';
 const defaultIOSAppPath =
-	'./ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app';
+	'./ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app';
 
 const localAndroidAppPath =
 	process.env.ANDROID_APP_PATH || defaultAndroidAppPath;
@@ -446,10 +446,19 @@ const swipeUp = async ( driver, element = undefined ) => {
 	const endX = startX;
 	const endY = startY + startY * -1 * 0.5;
 
+	await swipeFromTo( driver, { x: startX, y: startY }, { x: endX, y: endY } );
+};
+
+const defaultCoordinates = { x: 0, y: 0 };
+const swipeFromTo = async (
+	driver,
+	from = defaultCoordinates,
+	to = defaultCoordinates
+) => {
 	const action = await new wd.TouchAction( driver );
-	action.press( { x: startX, y: startY } );
+	action.press( from );
 	action.wait( 3000 );
-	action.moveTo( { x: endX, y: endY } );
+	action.moveTo( to );
 	action.release();
 	await action.perform();
 };
@@ -464,12 +473,7 @@ const swipeDown = async ( driver ) => {
 	const endX = startX;
 	const endY = startY - startY * -1 * 0.5;
 
-	const action = await new wd.TouchAction( driver );
-	action.press( { x: startX, y: startY } );
-	action.wait( 3000 );
-	action.moveTo( { x: endX, y: endY } );
-	action.release();
-	await action.perform();
+	await swipeFromTo( driver, { x: startX, y: startY }, { x: endX, y: endY } );
 };
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
@@ -526,6 +530,7 @@ module.exports = {
 	tapPasteAboveElement,
 	swipeDown,
 	swipeUp,
+	swipeFromTo,
 	stopDriver,
 	toggleHtmlMode,
 	toggleOrientation,

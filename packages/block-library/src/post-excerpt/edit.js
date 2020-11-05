@@ -14,7 +14,7 @@ import {
 	InspectorControls,
 	RichText,
 	Warning,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { PanelBody, RangeControl, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -57,6 +57,11 @@ function PostExcerptEditor( {
 		postId,
 		postType
 	);
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 
 	return (
 		<>
@@ -92,26 +97,18 @@ function PostExcerptEditor( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
+			<div { ...blockProps }>
 				<RichText
 					className={
 						! showMoreOnNewLine &&
 						'wp-block-post-excerpt__excerpt is-inline'
 					}
-					placeholder={ postContentExcerpt }
 					value={
 						excerpt ||
-						( isSelected
-							? ''
-							: postContentExcerpt ||
-							  __( 'No post excerpt found' ) )
+						postContentExcerpt ||
+						( isSelected ? '' : __( 'No post excerpt found' ) )
 					}
 					onChange={ setExcerpt }
-					keepPlaceholderOnFocus
 				/>
 				{ ! showMoreOnNewLine && ' ' }
 				{ showMoreOnNewLine ? (
@@ -135,7 +132,7 @@ function PostExcerptEditor( {
 						}
 					/>
 				) }
-			</Block.div>
+			</div>
 		</>
 	);
 }

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEmpty, map } from 'lodash';
+import { compact, isEmpty, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,7 +21,10 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 			);
 			const ids =
 				clientIds !== null ? clientIds : getSelectedBlockClientIds();
-			return map( getBlocksByClientId( ids ), ( block ) => block.name );
+			return map(
+				compact( getBlocksByClientId( ids ) ),
+				( block ) => block.name
+			);
 		},
 		[ clientIds ]
 	);

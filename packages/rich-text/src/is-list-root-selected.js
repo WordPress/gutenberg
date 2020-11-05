@@ -4,10 +4,12 @@
 
 import { getLineIndex } from './get-line-index';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
  * Whether or not the root list is selected.
  *
- * @param {Object} value The value to check.
+ * @param {RichTextValue} value The value to check.
  *
  * @return {boolean} True if the root list or nothing is selected, false if an
  *                   inner list is selected.

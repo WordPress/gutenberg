@@ -1,0 +1,45 @@
+.omniCell {
+	border-bottom-width: 1px;
+	border-bottom-color: $light-gray-400;
+}
+
+.omniCellDark {
+	border-bottom-color: $gray-70;
+}
+
+.omniInput {
+	text-align: left;
+}
+
+.spinner {
+	height: 150px;
+	justify-content: center;
+}
+
+.clearIcon {
+	margin-left: 16;
+}
+
+.icon {
+	color: $gray-lighten-10;
+}
+
+.iconDark {
+	color: $dark-tertiary;
+}
+
+.contentContainer {
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
+	flex: 1;
+}
+
+.safeArea {
+	height: 100%;
+}
+
+.list {
+	padding-left: 0;
+	padding-right: 0;
+	padding-bottom: $grid-unit-20;
+}

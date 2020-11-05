@@ -40,7 +40,6 @@ function gutenberg_is_edit_site_page( $page ) {
 function gutenberg_get_editor_styles() {
 	global $editor_styles;
 
-	//
 	// Ideally the code is extracted into a reusable function.
 	$styles = array(
 		array(
@@ -88,7 +87,7 @@ function gutenberg_get_editor_styles() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
-	global $current_screen;
+	global $current_screen, $post;
 
 	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
@@ -127,28 +126,16 @@ function gutenberg_edit_site_init( $hook ) {
 	}
 
 	$settings = array(
-		'alignWide'              => get_theme_support( 'align-wide' ),
-		'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
-		'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
-		'imageSizes'             => $available_image_sizes,
-		'isRTL'                  => is_rtl(),
-		'maxUploadFileSize'      => $max_upload_size,
+		'alignWide'         => get_theme_support( 'align-wide' ),
+		'imageSizes'        => $available_image_sizes,
+		'isRTL'             => is_rtl(),
+		'maxUploadFileSize' => $max_upload_size,
+		'siteUrl'           => site_url(),
+		'postsPerPage'      => get_option( 'posts_per_page' ),
 	);
 
-	list( $color_palette, ) = (array) get_theme_support( 'editor-color-palette' );
-	list( $font_sizes, )    = (array) get_theme_support( 'editor-font-sizes' );
-	if ( false !== $color_palette ) {
-		$settings['colors'] = $color_palette;
-	}
-	if ( false !== $font_sizes ) {
-		$settings['fontSizes'] = $font_sizes;
-	}
 	$settings['styles'] = gutenberg_get_editor_styles();
-
-	// This is so other parts of the code can hook their own settings.
-	// Example: Global Styles.
-	global $post;
-	$settings = apply_filters( 'block_editor_settings', $settings, $post );
+	$settings           = gutenberg_experimental_global_styles_settings( $settings );
 
 	// Preload block editor paths.
 	// most of these are copied from edit-forms-blocks.php.
@@ -222,9 +209,7 @@ function register_site_editor_homepage_settings() {
 		'general',
 		'show_on_front',
 		array(
-			'show_in_rest' => array(
-				'name' => 'show_on_front',
-			),
+			'show_in_rest' => true,
 			'type'         => 'string',
 			'description'  => __( 'What to show on the front page', 'gutenberg' ),
 		)
@@ -234,12 +219,10 @@ function register_site_editor_homepage_settings() {
 		'general',
 		'page_on_front',
 		array(
-			'show_in_rest' => array(
-				'name' => 'page_on_front',
-			),
+			'show_in_rest' => true,
 			'type'         => 'number',
 			'description'  => __( 'The ID of the page that should be displayed on the front page', 'gutenberg' ),
 		)
 	);
 }
-add_action( 'rest_api_init', 'register_site_editor_homepage_settings', 10 );
+add_action( 'init', 'register_site_editor_homepage_settings', 10 );

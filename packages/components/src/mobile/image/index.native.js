@@ -33,14 +33,18 @@ const ImageComponent = ( {
 	alt,
 	editButton = true,
 	focalPoint,
+	height: imageHeight,
 	isSelected,
 	isUploadFailed,
 	isUploadInProgress,
 	mediaPickerOptions,
 	onSelectMediaUploadOption,
 	openMediaOptions,
+	resizeMode,
 	retryMessage,
+	retryIcon,
 	url,
+	shapeStyle,
 	width: imageWidth,
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
@@ -75,7 +79,12 @@ const ImageComponent = ( {
 		let iconStyle;
 		switch ( iconType ) {
 			case ICON_TYPE.RETRY:
-				return <Icon icon={ SvgIconRetry } { ...styles.iconRetry } />;
+				return (
+					<Icon
+						icon={ retryIcon || SvgIconRetry }
+						{ ...styles.iconRetry }
+					/>
+				);
 			case ICON_TYPE.PLACEHOLDER:
 				iconStyle = iconPlaceholderStyles;
 				break;
@@ -102,19 +111,26 @@ const ImageComponent = ( {
 			styles.imageContainerUploadDark
 		),
 		focalPoint && styles.imageContainerUploadWithFocalpoint,
+		imageHeight && { height: imageHeight },
 	];
 
 	const customWidth =
-		imageData?.width < containerSize?.width ? imageData?.width : '100%';
+		imageData?.width < containerSize?.width
+			? imageData?.width
+			: styles.wide.width;
 
 	const imageContainerStyles = [
 		styles.imageContent,
 		{
 			width:
-				imageData && imageWidth > 0 && imageWidth < containerSize?.width
+				imageWidth === styles.wide.width ||
+				( imageData &&
+					imageWidth > 0 &&
+					imageWidth < containerSize?.width )
 					? imageWidth
 					: customWidth,
 		},
+		resizeMode && { width: styles.wide.width },
 		focalPoint && styles.focalPointContainer,
 	];
 
@@ -138,6 +154,8 @@ const ImageComponent = ( {
 						? containerSize?.width / imageData?.aspectRatio
 						: undefined,
 			},
+		imageHeight && { height: imageHeight },
+		shapeStyle,
 	];
 
 	return (
@@ -178,12 +196,15 @@ const ImageComponent = ( {
 				) : (
 					<View style={ focalPoint && styles.focalPointContent }>
 						<Image
-							aspectRatio={ imageData?.aspectRatio }
+							{ ...( ! resizeMode && {
+								aspectRatio: imageData?.aspectRatio,
+							} ) }
 							style={ imageStyles }
 							source={ { uri: url } }
 							{ ...( ! focalPoint && {
 								resizeMethod: 'scale',
 							} ) }
+							resizeMode={ resizeMode }
 						/>
 					</View>
 				) }
@@ -195,7 +216,12 @@ const ImageComponent = ( {
 							styles.retryContainer,
 						] }
 					>
-						<View style={ styles.modalIcon }>
+						<View
+							style={ [
+								styles.retryIcon,
+								retryIcon && styles.customRetryIcon,
+							] }
+						>
 							{ getIcon( ICON_TYPE.RETRY ) }
 						</View>
 						<Text style={ styles.uploadFailedText }>
@@ -204,20 +230,14 @@ const ImageComponent = ( {
 					</View>
 				) }
 
-				{ editButton &&
-					isSelected &&
-					imageData &&
-					! isUploadInProgress &&
-					! isUploadFailed && (
-						<ImageEditingButton
-							onSelectMediaUploadOption={
-								onSelectMediaUploadOption
-							}
-							openMediaOptions={ openMediaOptions }
-							url={ url }
-							pickerOptions={ mediaPickerOptions }
-						/>
-					) }
+				{ editButton && isSelected && ! isUploadInProgress && (
+					<ImageEditingButton
+						onSelectMediaUploadOption={ onSelectMediaUploadOption }
+						openMediaOptions={ openMediaOptions }
+						url={ ! isUploadFailed && imageData && url }
+						pickerOptions={ mediaPickerOptions }
+					/>
+				) }
 			</View>
 		</View>
 	);

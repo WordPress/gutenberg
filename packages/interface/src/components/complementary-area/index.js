@@ -6,10 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Animate, Button, Panel, Slot, Fill } from '@wordpress/components';
+import { Button, Panel, Slot, Fill } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { starEmpty, starFilled } from '@wordpress/icons';
+import { check, starEmpty, starFilled } from '@wordpress/icons';
 import { useEffect, useRef } from '@wordpress/element';
 
 /**
@@ -27,9 +27,7 @@ function ComplementaryAreaSlot( { scope, ...props } ) {
 function ComplementaryAreaFill( { scope, children, className } ) {
 	return (
 		<Fill name={ `ComplementaryArea/${ scope }` }>
-			<Animate type="slide-in" options={ { origin: 'left' } }>
-				{ () => <div className={ className }>{ children }</div> }
-			</Animate>
+			<div className={ className }>{ children }</div>
 		</Fill>
 	);
 }
@@ -94,8 +92,9 @@ function ComplementaryArea( {
 	title,
 	toggleShortcut,
 	isActiveByDefault,
+	showIconLabels = false,
 } ) {
-	const { isActive, isPinned, activeArea, isSmall } = useSelect(
+	const { isActive, isPinned, activeArea, isSmall, isLarge } = useSelect(
 		( select ) => {
 			const { getActiveComplementaryArea, isItemPinned } = select(
 				'core/interface'
@@ -108,6 +107,7 @@ function ComplementaryArea( {
 				isSmall: select( 'core/viewport' ).isViewportMatch(
 					'< medium'
 				),
+				isLarge: select( 'core/viewport' ).isViewportMatch( 'large' ),
 			};
 		},
 		[ identifier, scope ]
@@ -139,10 +139,14 @@ function ComplementaryArea( {
 					<ComplementaryAreaToggle
 						scope={ scope }
 						identifier={ identifier }
-						isPressed={ isActive }
+						isPressed={
+							isActive && ( ! showIconLabels || isLarge )
+						}
 						aria-expanded={ isActive }
 						label={ title }
-						icon={ icon }
+						icon={ showIconLabels ? check : icon }
+						showTooltip={ ! showIconLabels }
+						isTertiary={ showIconLabels }
 					/>
 				</PinnedItems>
 			) }

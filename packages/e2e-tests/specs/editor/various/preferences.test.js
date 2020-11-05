@@ -41,6 +41,7 @@ describe( 'preferences', () => {
 		// See: https://github.com/WordPress/gutenberg/issues/6377
 		// See: https://github.com/WordPress/gutenberg/pull/8995
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 		expect( await getActiveSidebarTabText() ).toBe( 'Post' );
 
 		// Dismiss
@@ -51,6 +52,7 @@ describe( 'preferences', () => {
 
 		// Remember after reload.
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 		expect( await getActiveSidebarTabText() ).toBe( null );
 	} );
 } );

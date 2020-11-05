@@ -7,9 +7,9 @@ import {
 	Platform,
 	PanResponder,
 	Dimensions,
-	ScrollView,
 	Keyboard,
 	StatusBar,
+	ScrollView,
 	TouchableHighlight,
 } from 'react-native';
 import Modal from 'react-native-modal';
@@ -33,10 +33,13 @@ import PickerCell from './picker-cell';
 import SwitchCell from './switch-cell';
 import RangeCell from './range-cell';
 import ColorCell from './color-cell';
+import LinkCell from './link-cell';
+import LinkSuggestionItemCell from './link-suggestion-item-cell';
 import RadioCell from './radio-cell';
+import NavigationScreen from './bottom-sheet-navigation/navigation-screen';
+import NavigationContainer from './bottom-sheet-navigation/navigation-container';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
 import { BottomSheetProvider } from './bottom-sheet-context';
-import { performLayoutAnimation } from '../layout-animation';
 
 class BottomSheet extends Component {
 	constructor() {
@@ -48,6 +51,9 @@ class BottomSheet extends Component {
 		this.onShouldSetBottomSheetMaxHeight = this.onShouldSetBottomSheetMaxHeight.bind(
 			this
 		);
+
+		this.setIsFullScreen = this.setIsFullScreen.bind( this );
+
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
 		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
 		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
@@ -57,22 +63,21 @@ class BottomSheet extends Component {
 		this.onHandleHardwareButtonPress = this.onHandleHardwareButtonPress.bind(
 			this
 		);
-		this.onReplaceSubsheet = this.onReplaceSubsheet.bind( this );
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 
 		this.state = {
 			safeAreaBottomInset: 0,
+			safeAreaTopInset: 0,
 			bounces: false,
 			maxHeight: 0,
 			keyboardHeight: 0,
 			scrollEnabled: true,
 			isScrolling: false,
-			onCloseBottomSheet: null,
-			onHardwareButtonPress: null,
+			handleClosingBottomSheet: null,
+			handleHardwareButtonPress: null,
 			isMaxHeightSet: true,
-			currentScreen: '',
-			extraProps: {},
+			isFullScreen: this.props.isFullScreen || false,
 		};
 
 		SafeArea.getSafeAreaInsetsForRootView().then(
@@ -120,6 +125,8 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
+		this.keyboardWillShowListener.remove();
+		this.keyboardDidHideListener.remove();
 		if ( this.androidModalClosedSubscription ) {
 			this.androidModalClosedSubscription.remove();
 		}
@@ -132,26 +139,22 @@ class BottomSheet extends Component {
 			'safeAreaInsetsForRootViewDidChange',
 			this.onSafeAreaInsetsUpdate
 		);
-		this.keyboardWillShowListener.remove();
-		this.keyboardDidHideListener.remove();
-	}
-
-	componentDidUpdate( prevProps ) {
-		const { isVisible } = this.props;
-
-		if ( ! prevProps.isVisible && isVisible ) {
-			this.setState( { currentScreen: '' } );
-		}
 	}
 
 	onSafeAreaInsetsUpdate( result ) {
-		const { safeAreaBottomInset } = this.state;
+		const { safeAreaBottomInset, safeAreaTopInset } = this.state;
 		if ( this.safeAreaEventSubscription === null ) {
 			return;
 		}
 		const { safeAreaInsets } = result;
-		if ( safeAreaBottomInset !== safeAreaInsets.bottom ) {
-			this.setState( { safeAreaBottomInset: safeAreaInsets.bottom } );
+		if (
+			safeAreaBottomInset !== safeAreaInsets.bottom ||
+			safeAreaTopInset !== safeAreaInsets.top
+		) {
+			this.setState( {
+				safeAreaBottomInset: safeAreaInsets.bottom,
+				safeAreaTopInset: safeAreaInsets.top,
+			} );
 		}
 	}
 
@@ -221,51 +224,53 @@ class BottomSheet extends Component {
 	}
 
 	onHandleClosingBottomSheet( action ) {
-		this.setState( { onCloseBottomSheet: action } );
+		this.setState( { handleClosingBottomSheet: action } );
 	}
 
 	onHandleHardwareButtonPress( action ) {
-		this.setState( { onHardwareButtonPress: action } );
+		this.setState( { handleHardwareButtonPress: action } );
 	}
 
 	onCloseBottomSheet() {
 		const { onClose } = this.props;
-		const { onCloseBottomSheet } = this.state;
-		if ( onCloseBottomSheet ) {
-			onCloseBottomSheet();
+		const { handleClosingBottomSheet } = this.state;
+		if ( handleClosingBottomSheet ) {
+			handleClosingBottomSheet();
 		}
-		onClose();
+		if ( onClose ) {
+			onClose();
+		}
+		this.onShouldSetBottomSheetMaxHeight( true );
+	}
+
+	setIsFullScreen( isFullScreen ) {
+		if ( isFullScreen !== this.state.isFullScreen ) {
+			if ( isFullScreen ) {
+				this.setState( { isFullScreen, isMaxHeightSet: false } );
+			} else {
+				this.setState( { isFullScreen, isMaxHeightSet: true } );
+			}
+		}
 	}
 
 	onHardwareButtonPress() {
 		const { onClose } = this.props;
-		const { onHardwareButtonPress } = this.state;
-		if ( onHardwareButtonPress ) {
-			return onHardwareButtonPress();
+		const { handleHardwareButtonPress } = this.state;
+		if ( handleHardwareButtonPress && handleHardwareButtonPress() ) {
+			return;
 		}
-		return onClose();
+		if ( onClose ) {
+			return onClose();
+		}
 	}
 
 	getContentStyle() {
 		const { safeAreaBottomInset } = this.state;
 		return {
-			flexGrow: 1,
 			paddingBottom:
 				( safeAreaBottomInset || 0 ) +
 				styles.scrollableContent.paddingBottom,
 		};
-	}
-
-	onReplaceSubsheet( destination, extraProps, callback ) {
-		performLayoutAnimation();
-
-		this.setState(
-			{
-				currentScreen: destination,
-				extraProps: extraProps || {},
-			},
-			callback
-		);
 	}
 
 	render() {
@@ -279,19 +284,20 @@ class BottomSheet extends Component {
 			contentStyle = {},
 			getStylesFromColorScheme,
 			onDismiss,
-			isChildrenScrollable,
 			children,
+			withHeaderSeparator = false,
+			hasNavigation,
 			...rest
 		} = this.props;
 		const {
 			maxHeight,
 			bounces,
 			safeAreaBottomInset,
+			safeAreaTopInset,
 			isScrolling,
 			scrollEnabled,
 			isMaxHeightSet,
-			extraProps,
-			currentScreen,
+			isFullScreen,
 		} = this.state;
 
 		const panResponder = PanResponder.create( {
@@ -310,24 +316,22 @@ class BottomSheet extends Component {
 			},
 		} );
 
-		const getHeader = () => (
-			<View>
-				<View style={ styles.head }>
-					<View style={ { flex: 1 } }>{ leftButton }</View>
-					<View style={ styles.titleContainer }>
-						<Text style={ styles.title }>{ title }</Text>
-					</View>
-					<View style={ { flex: 1 } }>{ rightButton }</View>
-				</View>
-				<View style={ styles.separator } />
-			</View>
-		);
-
 		const backgroundStyle = getStylesFromColorScheme(
 			styles.background,
 			styles.backgroundDark
 		);
 
+		const bottomSheetHeaderTitleStyle = getStylesFromColorScheme(
+			styles.bottomSheetHeaderTitle,
+			styles.bottomSheetHeaderTitleDark
+		);
+
+		let listStyle = {};
+		if ( isFullScreen ) {
+			listStyle = { flexGrow: 1 };
+		} else if ( isMaxHeightSet ) {
+			listStyle = { maxHeight };
+		}
 		const listProps = {
 			disableScrollViewPanResponder: true,
 			bounces,
@@ -339,21 +343,36 @@ class BottomSheet extends Component {
 				styles.content,
 				hideHeader && styles.emptyHeader,
 				contentStyle,
-				isChildrenScrollable && this.getContentStyle(),
-				contentStyle,
+				isFullScreen && { flexGrow: 1 },
 			],
-			style: isMaxHeightSet ? { maxHeight } : {},
+			style: listStyle,
+			safeAreaBottomInset,
 			scrollEnabled,
 			automaticallyAdjustContentInsets: false,
 		};
 
-		const WrapperView = isChildrenScrollable ? View : ScrollView;
+		const WrapperView = hasNavigation ? View : ScrollView;
 
+		const getHeader = () => (
+			<>
+				<View style={ styles.bottomSheetHeader }>
+					<View style={ styles.flex }>{ leftButton }</View>
+					<Text
+						style={ bottomSheetHeaderTitleStyle }
+						maxFontSizeMultiplier={ 3 }
+					>
+						{ title }
+					</Text>
+					<View style={ styles.flex }>{ rightButton }</View>
+				</View>
+				{ withHeaderSeparator && <View style={ styles.separator } /> }
+			</>
+		);
 		return (
 			<Modal
 				isVisible={ isVisible }
 				style={ styles.bottomModal }
-				animationInTiming={ 600 }
+				animationInTiming={ 400 }
 				animationOutTiming={ 300 }
 				backdropTransitionInTiming={ 50 }
 				backdropTransitionOutTiming={ 50 }
@@ -382,14 +401,24 @@ class BottomSheet extends Component {
 					style={ {
 						...backgroundStyle,
 						borderColor: 'rgba(0, 0, 0, 0.1)',
+						marginTop:
+							Platform.OS === 'ios' && isFullScreen
+								? safeAreaTopInset
+								: 0,
+						flex: isFullScreen ? 1 : undefined,
+						...( Platform.OS === 'android' && isFullScreen
+							? styles.backgroundFullScreen
+							: {} ),
 						...style,
 					} }
 					keyboardVerticalOffset={ -safeAreaBottomInset }
 				>
-					<View style={ styles.dragIndicator } />
+					{ ! ( Platform.OS === 'android' && isFullScreen ) && (
+						<View style={ styles.dragIndicator } />
+					) }
 					{ ! hideHeader && getHeader() }
 					<WrapperView
-						{ ...( isChildrenScrollable
+						{ ...( hasNavigation
 							? { style: listProps.style }
 							: listProps ) }
 					>
@@ -397,25 +426,34 @@ class BottomSheet extends Component {
 							value={ {
 								shouldEnableBottomSheetScroll: this
 									.onShouldEnableScroll,
-								shouldDisableBottomSheetMaxHeight: this
+								shouldEnableBottomSheetMaxHeight: this
 									.onShouldSetBottomSheetMaxHeight,
 								isBottomSheetContentScrolling: isScrolling,
-								onCloseBottomSheet: this
+								onHandleClosingBottomSheet: this
 									.onHandleClosingBottomSheet,
-								onHardwareButtonPress: this
+								onHandleHardwareButtonPress: this
 									.onHandleHardwareButtonPress,
-								onReplaceSubsheet: this.onReplaceSubsheet,
-								extraProps,
-								currentScreen,
 								listProps,
+								setIsFullScreen: this.setIsFullScreen,
+								safeAreaBottomInset,
 							} }
 						>
-							<TouchableHighlight accessible={ false }>
+							{ hasNavigation ? (
 								<>{ children }</>
-							</TouchableHighlight>
+							) : (
+								<TouchableHighlight accessible={ false }>
+									<>{ children }</>
+								</TouchableHighlight>
+							) }
 						</BottomSheetProvider>
-						{ ! isChildrenScrollable && (
-							<View style={ { height: safeAreaBottomInset } } />
+						{ ! hasNavigation && (
+							<View
+								style={ {
+									height:
+										safeAreaBottomInset ||
+										styles.scrollableContent.paddingBottom,
+								} }
+							/>
 						) }
 					</WrapperView>
 				</KeyboardAvoidingView>
@@ -441,6 +479,10 @@ ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;
 ThemedBottomSheet.RangeCell = RangeCell;
 ThemedBottomSheet.ColorCell = ColorCell;
+ThemedBottomSheet.LinkCell = LinkCell;
+ThemedBottomSheet.LinkSuggestionItemCell = LinkSuggestionItemCell;
 ThemedBottomSheet.RadioCell = RadioCell;
+ThemedBottomSheet.NavigationScreen = NavigationScreen;
+ThemedBottomSheet.NavigationContainer = NavigationContainer;
 
 export default ThemedBottomSheet;

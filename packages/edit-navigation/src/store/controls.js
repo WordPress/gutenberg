@@ -147,7 +147,8 @@ const controls = {
 
 	IS_PROCESSING_POST: createRegistryControl(
 		( registry ) => ( { postId } ) => {
-			return getState( registry ).processingQueue[ postId ]?.inProgress;
+			return !! getState( registry ).processingQueue[ postId ]
+				?.inProgress;
 		}
 	),
 

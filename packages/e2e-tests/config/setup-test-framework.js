@@ -8,6 +8,7 @@ import { get } from 'lodash';
  */
 import {
 	activatePlugin,
+	activateTheme,
 	clearLocalStorage,
 	enablePageDialogAccept,
 	isOfflineMode,
@@ -34,7 +35,14 @@ const THROTTLE_CPU = process.env.THROTTLE_CPU;
  *
  * @type {string|undefined}
  */
-const DOWNLOAD_THROUGHPUT = process.env.DOWNLOAD_THROUGHPUT;
+const SLOW_NETWORK = process.env.SLOW_NETWORK;
+
+/**
+ * Emulate no internet connection.
+ *
+ * @type {string|undefined}
+ */
+const OFFLINE = process.env.OFFLINE;
 
 /**
  * Set of console logging types observed to protect against unexpected yet
@@ -194,6 +202,9 @@ async function runAxeTestsForBlockEditor() {
 			'link-name',
 			'listitem',
 			'region',
+			'aria-required-children',
+			'aria-required-parent',
+			'frame-title',
 		],
 		exclude: [
 			// Ignores elements created by metaboxes.
@@ -205,6 +216,8 @@ async function runAxeTestsForBlockEditor() {
 			// https://github.com/w3c/aria/issues/558
 			'[role="treegrid"] [aria-posinset]',
 			'[role="treegrid"] [aria-setsize]',
+			// Ignore block previews.
+			'.block-editor-block-preview__content',
 		],
 	} );
 }
@@ -213,17 +226,24 @@ async function runAxeTestsForBlockEditor() {
  * Simulate slow network or throttled CPU if provided via environment variables.
  */
 async function simulateAdverseConditions() {
-	if ( ! DOWNLOAD_THROUGHPUT && ! THROTTLE_CPU ) {
+	if ( ! SLOW_NETWORK && ! OFFLINE && ! THROTTLE_CPU ) {
 		return;
 	}
 
 	const client = await page.target().createCDPSession();
 
-	if ( DOWNLOAD_THROUGHPUT ) {
+	if ( SLOW_NETWORK || OFFLINE ) {
 		// See: https://chromedevtools.github.io/devtools-protocol/tot/Network#method-emulateNetworkConditions
+		// The values below simulate fast 3G conditions as per https://github.com/ChromeDevTools/devtools-frontend/blob/80c102878fd97a7a696572054007d40560dcdd21/front_end/sdk/NetworkManager.js#L252-L274
 		await client.send( 'Network.emulateNetworkConditions', {
-			// Simulated download speed (bytes/s)
-			downloadThroughput: Number( DOWNLOAD_THROUGHPUT ),
+			// Network connectivity is absent
+			offline: Boolean( OFFLINE || false ),
+			// Download speed (bytes/s)
+			downloadThroughput: ( ( 1.6 * 1024 * 1024 ) / 8 ) * 0.9,
+			// Upload speed (bytes/s)
+			uploadThroughput: ( ( 750 * 1024 ) / 8 ) * 0.9,
+			// Latency (ms)
+			latency: 150 * 3.75,
 		} );
 	}
 
@@ -243,7 +263,7 @@ beforeAll( async () => {
 	enablePageDialogAccept();
 	observeConsoleLogging();
 	await simulateAdverseConditions();
-
+	await activateTheme( 'twentytwentyone' );
 	await trashAllPosts();
 	await trashAllPosts( 'wp_block' );
 	await setupBrowser();

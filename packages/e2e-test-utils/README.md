@@ -24,6 +24,14 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
+<a name="activateTheme" href="#activateTheme">#</a> **activateTheme**
+
+Ativate a theme.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+
 <a name="arePrePublishChecksEnabled" href="#arePrePublishChecksEnabled">#</a> **arePrePublishChecksEnabled**
 
 Verifies if publish checks are enabled.
@@ -297,6 +305,16 @@ _Returns_
 
 Opens the inserter, searches for the given term, then selects the first
 result that appears. It then waits briefly for the block list to update.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
+<a name="insertBlockDirectoryBlock" href="#insertBlockDirectoryBlock">#</a> **insertBlockDirectoryBlock**
+
+Opens the inserter, searches for the given block, then selects the
+first result that appears from the block directory. It then waits briefly for the block list to
+update.
 
 _Parameters_
 

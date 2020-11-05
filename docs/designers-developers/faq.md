@@ -25,19 +25,6 @@ There are four phases of Gutenberg which you can see on the [official WordPress 
 3. Collaboration — A more intuitive way to co-author content
 4. Multi-lingual — Core implementation for Multi-lingual sites
 
-## What are “blocks” and why are we using them?
-
-The current WordPress editor is an open text window—it’s always been a wonderful blank canvas for writing, but when it comes to building posts and pages with images, multimedia, embedded content from social media, polls, and other elements, it required a mix of different approaches that were not always intuitive:
-
-- Media library/HTML for images, multimedia and approved files.
-- Pasted links for embeds.
-- `Shortcodes` for specialized assets from plugins.
-- Featured images for the image at the top of a post or page.
-- Excerpts for subheadings.
-- Widgets for content on the side of a page.
-
-As we thought about these uses and how to make them obvious and consistent, we began to embrace the concept of “blocks.” All of the above items could be blocks: easy to search and understand, and easy to dynamically shift around the page. The block concept is very powerful, and if designed thoughtfully, can offer an outstanding editing and publishing experience.
-
 ## When was Gutenberg started? 
 
 The editor focus started in early 2017 with the first three months spent designing, planning, prototyping, and testing prototypes, to help us inform how to approach this project. The first plugin was launched during WordCamp Europe in June 2017.

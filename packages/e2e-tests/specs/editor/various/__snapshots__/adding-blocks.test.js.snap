@@ -53,6 +53,46 @@ lines preserved[/myshortcode]
 <!-- /wp:shortcode -->"
 `;
 
+exports[`adding blocks inserts a block in proper place after having clicked \`Browse All\` from inline inserter 1`] = `
+"<!-- wp:paragraph -->
+<p>First paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:heading -->
+<h2>Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Second paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Third paragraph</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`adding blocks inserts a block in proper place after having clicked \`Browse All\` from inline inserter 2`] = `
+"<!-- wp:paragraph -->
+<p>First paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:cover -->
+<div class=\\"wp-block-cover has-background-dim\\"><div class=\\"wp-block-cover__inner-container\\"></div></div>
+<!-- /wp:cover -->
+
+<!-- wp:heading -->
+<h2>Heading</h2>
+<!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>Second paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Third paragraph</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`adding blocks inserts blocks at root level when using the root appender while selection is in an inner block 1`] = `
 "<!-- wp:buttons -->
 <div class=\\"wp-block-buttons\\"><!-- wp:button -->

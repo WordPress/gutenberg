@@ -18,14 +18,15 @@ function render_block_core_post_comments_count( $attributes, $content, $block ) 
 		return '';
 	}
 
-	$classes = 'wp-block-post-comments-count';
+	$classes = '';
 	if ( isset( $attributes['textAlign'] ) ) {
-		$classes .= ' has-text-align-' . $attributes['textAlign'];
+		$classes .= 'has-text-align-' . $attributes['textAlign'];
 	}
 
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	return sprintf(
 		'<div class="%1$s">%2$s</div>',
-		esc_attr( $classes ),
+		$wrapper_attributes,
 		get_comments_number( $block->context['postId'] )
 	);
 }

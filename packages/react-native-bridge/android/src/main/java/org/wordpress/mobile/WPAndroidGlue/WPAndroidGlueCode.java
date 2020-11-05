@@ -37,6 +37,12 @@ import com.horcrux.svg.SvgPackage;
 import com.BV.LinearGradient.LinearGradientPackage;
 import com.reactnativecommunity.slider.ReactSliderPackage;
 import org.linusu.RNGetRandomValuesPackage;
+import com.swmansion.gesturehandler.react.RNGestureHandlerEnabledRootView;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.swmansion.reanimated.ReanimatedPackage;
+import com.swmansion.rnscreens.RNScreensPackage;
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
+import org.reactnative.maskedview.RNCMaskedViewPackage;
 
 import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
@@ -83,6 +89,7 @@ public class WPAndroidGlueCode {
     private OnMediaEditorListener mOnMediaEditorListener;
     private OnLogGutenbergUserEventListener mOnLogGutenbergUserEventListener;
     private OnGutenbergDidRequestUnsupportedBlockFallbackListener mOnGutenbergDidRequestUnsupportedBlockFallbackListener;
+    private OnGutenbergDidSendButtonPressedActionListener mOnGutenbergDidSendButtonPressedActionListener;
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnStarterPageTemplatesTooltipShownEventListener mOnStarterPageTemplatesTooltipShownListener;
     private boolean mIsEditorMounted;
@@ -169,6 +176,10 @@ public class WPAndroidGlueCode {
 
     public interface OnGutenbergDidRequestUnsupportedBlockFallbackListener {
         void gutenbergDidRequestUnsupportedBlockFallback(UnsupportedBlock unsupportedBlock);
+    }
+
+    public interface OnGutenbergDidSendButtonPressedActionListener {
+        void gutenbergDidSendButtonPressedAction(String buttonType);
     }
 
     public interface OnStarterPageTemplatesTooltipShownEventListener {
@@ -369,6 +380,11 @@ public class WPAndroidGlueCode {
             }
 
             @Override
+            public void gutenbergDidSendButtonPressedAction(String buttonType) {
+                mOnGutenbergDidSendButtonPressedActionListener.gutenbergDidSendButtonPressedAction(buttonType);
+            }
+
+            @Override
             public void onAddMention(Consumer<String> onSuccess) {
                 mAddMentionUtil.getMention(onSuccess);
             }
@@ -393,6 +409,11 @@ public class WPAndroidGlueCode {
                 new ReactVideoPackage(),
                 new ReactSliderPackage(),
                 new RNGetRandomValuesPackage(),
+                new RNGestureHandlerPackage(),
+                new RNScreensPackage(),
+                new SafeAreaContextPackage(),
+                new RNCMaskedViewPackage(),
+                new ReanimatedPackage(),
                 mRnReactNativeGutenbergBridgePackage);
     }
 
@@ -416,7 +437,7 @@ public class WPAndroidGlueCode {
         mIsDarkMode = gutenbergProps.isDarkMode();
         mExceptionLogger = exceptionLogger;
         mBreadcrumbLogger = breadcrumbLogger;
-        mReactRootView = new ReactRootView(new MutableContextWrapper(initContext));
+        mReactRootView = new RNGestureHandlerEnabledRootView(new MutableContextWrapper(initContext));
         mReactRootView.setBackgroundColor(colorBackground);
 
         ReactInstanceManagerBuilder builder =
@@ -450,6 +471,7 @@ public class WPAndroidGlueCode {
                                   OnMediaEditorListener onMediaEditorListener,
                                   OnLogGutenbergUserEventListener onLogGutenbergUserEventListener,
                                   OnGutenbergDidRequestUnsupportedBlockFallbackListener onGutenbergDidRequestUnsupportedBlockFallbackListener,
+                                  OnGutenbergDidSendButtonPressedActionListener onGutenbergDidSendButtonPressedActionListener,
                                   AddMentionUtil addMentionUtil,
                                   OnStarterPageTemplatesTooltipShownEventListener onStarterPageTemplatesTooltipListener,
                                   boolean isDarkMode) {
@@ -465,6 +487,7 @@ public class WPAndroidGlueCode {
         mOnMediaEditorListener = onMediaEditorListener;
         mOnLogGutenbergUserEventListener = onLogGutenbergUserEventListener;
         mOnGutenbergDidRequestUnsupportedBlockFallbackListener = onGutenbergDidRequestUnsupportedBlockFallbackListener;
+        mOnGutenbergDidSendButtonPressedActionListener = onGutenbergDidSendButtonPressedActionListener;
         mAddMentionUtil = addMentionUtil;
         mOnStarterPageTemplatesTooltipShownListener = onStarterPageTemplatesTooltipListener;
 
@@ -582,6 +605,14 @@ public class WPAndroidGlueCode {
             mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule()
                                                 .updateTheme(mEditorTheme);
             mEditorTheme = null;
+        }
+    }
+
+    public void showNotice(String message) {
+        if (message != null) {
+            mRnReactNativeGutenbergBridgePackage.getRNReactNativeGutenbergBridgeModule().showNoticeInJS(message);
+        } else {
+            AppLog.d(AppLog.T.EDITOR, "Notice not shown because message is null");
         }
     }
 
@@ -835,6 +866,10 @@ public class WPAndroidGlueCode {
 
     private boolean isMediaSelectedCallbackRegistered() {
         return mMediaSelectedCallback != null;
+    }
+
+    public void updateCapabilities(GutenbergProps gutenbergProps) {
+        mDeferredEventEmitter.updateCapabilities(gutenbergProps);
     }
 }
 

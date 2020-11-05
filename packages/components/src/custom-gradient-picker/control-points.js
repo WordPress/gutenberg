@@ -105,6 +105,7 @@ function ControlPointButton( {
 					color
 				) }
 				aria-describedby={ descriptionId }
+				aria-haspopup="true"
 				aria-expanded={ isOpen }
 				className={ classnames(
 					'components-custom-gradient-picker__control-point-button',

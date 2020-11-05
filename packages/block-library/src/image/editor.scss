@@ -52,6 +52,19 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
+.wp-block[data-align="left"],
+.wp-block[data-align="center"],
+.wp-block[data-align="right"] {
+	> .wp-block-image {
+		display: table;
+
+		> figcaption {
+			display: table-caption;
+			caption-side: bottom;
+		}
+	}
+}
+
 .wp-block[data-align="left"] > .wp-block-image {
 	margin-right: 1em;
 	margin-left: 0;
@@ -107,7 +120,6 @@ figure.wp-block-image:not(.wp-block) {
 
 .wp-block-image__aspect-ratio {
 	height: $grid-unit-60 - $border-width - $border-width;
-	margin-top: -$grid-unit-10;
 	margin-bottom: -$grid-unit-10;
 	display: flex;
 	align-items: center;

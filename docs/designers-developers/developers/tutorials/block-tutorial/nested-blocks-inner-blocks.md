@@ -135,7 +135,7 @@ const MY_TEMPLATE = [
 ```
 {% end %}
 
-Use the `templateLock` property to lock down the template. Using `all` locks the template complete, no changes can be made. Using `insert` prevents additional blocks to be inserted, but existing blocks can be reorderd. See [templateLock documentation](https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/src/components/inner-blocks/README.md#templatelock) for additional information.
+Use the `templateLock` property to lock down the template. Using `all` locks the template complete, no changes can be made. Using `insert` prevents additional blocks to be inserted, but existing blocks can be reordered. See [templateLock documentation](https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/src/components/inner-blocks/README.md#templatelock) for additional information.
 
 ### Post Template
 

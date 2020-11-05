@@ -12,7 +12,10 @@ export {
 
 // Components
 export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
-export { default as Animate } from './animate';
+export {
+	default as Animate,
+	useAnimate as __unstableUseAnimate,
+} from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
@@ -27,9 +30,11 @@ export { default as CardHeader } from './card/header';
 export { default as CardMedia } from './card/media';
 export { default as CheckboxControl } from './checkbox-control';
 export { default as ClipboardButton } from './clipboard-button';
+export { default as __experimentalColorEdit } from './color-edit';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPicker } from './color-picker';
+export { default as ComboboxControl } from './combobox-control';
 export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
 export { DateTimePicker, DatePicker, TimePicker } from './date-time';
@@ -67,6 +72,11 @@ export { default as MenuItemsChoice } from './menu-items-choice';
 export { default as Modal } from './modal';
 export { default as ScrollLock } from './scroll-lock';
 export { NavigableMenu, TabbableContainer } from './navigable-container';
+export { default as __experimentalNavigation } from './navigation';
+export { default as __experimentalNavigationBackButton } from './navigation/back-button';
+export { default as __experimentalNavigationGroup } from './navigation/group';
+export { default as __experimentalNavigationItem } from './navigation/item';
+export { default as __experimentalNavigationMenu } from './navigation/menu';
 export { default as Notice } from './notice';
 export { default as __experimentalNumberControl } from './number-control';
 export { default as NoticeList } from './notice/list';
@@ -99,7 +109,7 @@ export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
-export { default as __experimentalToolbarItem } from './toolbar-item';
+export { default as ToolbarItem } from './toolbar-item';
 export { default as Tooltip } from './tooltip';
 export {
 	default as __experimentalTreeGrid,

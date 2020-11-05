@@ -11,10 +11,49 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.39.1
+
+* [*] Heading block - Disable full-width/wide alignment [#26308]
+
+## 1.39.0
+
+* [***] Full-width and wide alignment support for Video, Latest-posts, Gallery, Media & text, and Pullquote block
+* [***] Fix unsupported block bottom sheet is triggered when device is rotated
+* [***] Unsupported Block Editor: Fixed issue when cannot view or interact with the classic block on Jetpack site
+
+
+## 1.38.0
+
+[***] Add support for selecting user's post when configuring the link
+
+## 1.37.0
+
+* [**] Add support for rounded style in Image block
+* [***] Full-width and wide alignment support for Group, Cover and Image block
+
+## 1.36.1
+
+* [**] [iOS] Fixed Dark Mode transition for editor menus.
+
+## 1.36.0
+
+* [**] [Android] Removed pullquote dev only restriction in Android
+* [**] Reflect changes of slider in block settings immediately.
+
+## 1.35.0
+
+* [***] Fixed empty text fields on RTL layout. Now they are selectable and placeholders are visible.
+* [**] Add settings to allow changing column widths
+* [**] Media editing support in Gallery block.
+
 ## 1.34.0
 
 * [***] Media editing support in Cover block.
 * [*] Fixed a bug on the Heading block, where a heading with a link and string formatting showed a white shadow in dark mode.
+
+## 1.33.1
+
+* Fixed a bug in the @-mentions feature where dismissing the @-mentions UI removed the @ character from the post.
 
 ## 1.33.0
 

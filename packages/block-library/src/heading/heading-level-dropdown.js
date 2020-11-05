@@ -69,9 +69,7 @@ export default function HeadingLevelDropdown( { selectedLevel, onChange } ) {
 			renderContent={ () => (
 				<Toolbar
 					className="block-library-heading-level-toolbar"
-					__experimentalAccessibilityLabel={ __(
-						'Change heading level'
-					) }
+					label={ __( 'Change heading level' ) }
 				>
 					<ToolbarGroup
 						isCollapsed={ false }

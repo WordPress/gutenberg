@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/create-block",
-	"version": "0.16.0",
+	"version": "0.18.0",
 	"description": "Generates PHP, JS and CSS code for registering a block for a WordPress plugin.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -37,7 +37,7 @@
 		"execa": "^4.0.2",
 		"fast-glob": "^2.2.7",
 		"inquirer": "^7.1.0",
-		"lodash": "^4.17.15",
+		"lodash": "^4.17.19",
 		"make-dir": "^3.0.0",
 		"mustache": "^4.0.0",
 		"write-pkg": "^4.0.0"

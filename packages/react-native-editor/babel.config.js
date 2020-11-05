@@ -1,9 +1,17 @@
+/**
+ * External dependencies
+ */
+const path = require( 'path' );
+
 module.exports = function ( api ) {
 	api.cache( true );
 	return {
 		presets: [ 'module:metro-react-native-babel-preset' ],
 		plugins: [
-			'@babel/plugin-proposal-async-generator-functions',
+			path.resolve(
+				__dirname,
+				'../../node_modules/@babel/plugin-proposal-async-generator-functions'
+			),
 			'@babel/plugin-transform-runtime',
 			[
 				'react-native-platform-specific-extensions',
@@ -24,7 +32,7 @@ module.exports = function ( api ) {
 						},
 					],
 				],
-				exclude: /node_modules\/(react-native|@react-native-community)/,
+				exclude: /node_modules\/(react-native|@react-native-community|@react-navigation)/,
 			},
 			{
 				// Auto-add `import { createElement } from '@wordpress/element';` when JSX is found
@@ -39,7 +47,7 @@ module.exports = function ( api ) {
 						},
 					],
 				],
-				exclude: /node_modules\/(react-native|@react-native-community)/,
+				exclude: /node_modules\/(react-native|@react-native-community|@react-navigation)/,
 			},
 		],
 		env: {

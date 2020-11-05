@@ -24,7 +24,6 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import styles from './style.scss';
 import ColorIndicator from '../color-indicator';
 import { colorsUtils } from '../mobile/color-settings/utils';
-import { performLayoutAnimation } from '../mobile/layout-animation';
 
 const ANIMATION_DURATION = 200;
 
@@ -138,7 +137,6 @@ function ColorPalette( {
 			contentWidth - scrollPosition - customIndicatorWidth < width;
 
 		if ( isCustomGradientColor ) {
-			performLayoutAnimation();
 			if ( ! isIOS ) {
 				// Scroll position on Android doesn't adjust automatically when removing the last item from the horizontal list.
 				// https://github.com/facebook/react-native/issues/27504

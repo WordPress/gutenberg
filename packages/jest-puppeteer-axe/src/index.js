@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import AxePuppeteer from 'axe-puppeteer';
+import AxePuppeteer from '@axe-core/puppeteer';
 
 /** @typedef {import('puppeteer').Page} Page */
 
@@ -60,7 +60,7 @@ function formatViolations( violations ) {
  * @see https://www.deque.com/axe/
  * It is possible to pass optional Axe API options to perform customized check.
  *
- * @see https://github.com/dequelabs/axe-puppeteer
+ * @see https://github.com/dequelabs/axe-core-npm/tree/develop/packages/puppeteer
  *
  * @param {Page}          page                 Puppeteer's page instance.
  * @param {?Object}       params               Optional params that allow better control over Axe API.

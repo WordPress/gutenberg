@@ -13,7 +13,6 @@ import { useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import InserterListItem from '../inserter-list-item';
-import { includeVariationsInInserterItems } from '../inserter/utils';
 
 function BlockTypesList( {
 	items = [],
@@ -23,11 +22,7 @@ function BlockTypesList( {
 	label,
 } ) {
 	const composite = useCompositeState();
-	const normalizedItems = includeVariationsInInserterItems( items );
-	const orderId = normalizedItems.reduce(
-		( acc, item ) => acc + '--' + item.id,
-		''
-	);
+	const orderId = items.reduce( ( acc, item ) => acc + '--' + item.id, '' );
 
 	// This ensures the composite state refreshes when the list order changes.
 	useEffect( () => {
@@ -46,7 +41,7 @@ function BlockTypesList( {
 			className="block-editor-block-types-list"
 			aria-label={ label }
 		>
-			{ normalizedItems.map( ( item ) => {
+			{ items.map( ( item ) => {
 				return (
 					<InserterListItem
 						key={ item.id }

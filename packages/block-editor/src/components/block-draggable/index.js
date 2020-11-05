@@ -17,6 +17,7 @@ const BlockDraggable = ( {
 	cloneClassname,
 	onDragStart,
 	onDragEnd,
+	elementId,
 } ) => {
 	const { srcRootClientId, isDraggable } = useSelect(
 		( select ) => {
@@ -68,10 +69,10 @@ const BlockDraggable = ( {
 	return (
 		<Draggable
 			cloneClassname={ cloneClassname }
-			elementId={ `block-${ clientIds[ 0 ] }` }
+			elementId={ elementId || `block-${ clientIds[ 0 ] }` }
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
-				startDraggingBlocks();
+				startDraggingBlocks( clientIds );
 				isDragging.current = true;
 
 				startScrolling( event );

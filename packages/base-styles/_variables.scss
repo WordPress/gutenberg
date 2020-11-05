@@ -18,6 +18,7 @@ $mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile 
 $border-width: 1px;
 $border-width-focus: 1.5px;
 $border-width-tab: 4px;
+$helptext-font-size: 12px;
 
 /**
  * Grid System.
@@ -43,6 +44,7 @@ $button-size: 36px;
 $button-size-small: 24px;
 $header-height: 60px;
 $panel-header-height: $grid-unit-60;
+$nav-sidebar-width: 300px;
 $admin-bar-height: 32px;
 $admin-bar-height-big: 46px;
 $admin-sidebar-width: 160px;
@@ -54,6 +56,7 @@ $mobile-header-toolbar-height: 44px;
 $mobile-floating-toolbar-height: 44px;
 $mobile-floating-toolbar-margin: 8px;
 $mobile-color-swatch: 48px;
+$header-toolbar-min-width: 335px;
 
 /**
  * Shadows.
@@ -81,9 +84,6 @@ $block-padding: 14px; // Space between block footprint and focus boundaries. The
 $block-spacing: 4px; // Vertical space between blocks.
 $block-side-ui-width: $button-size; // Width of the movers/drag handle UI.
 $block-side-ui-clearance: 2px; // Space between movers/drag handle UI, and block.
-$block-container-side-padding: $block-side-ui-width + $block-padding + 2 * $block-side-ui-clearance; // Total space left and right of the block footprint.
-$block-bg-padding--v: $block-padding + $block-spacing + $block-side-ui-clearance; // padding for Blocks with a background color (eg: paragraph or group)
-$block-bg-padding--h: $block-side-ui-width + $block-side-ui-clearance; // padding for Blocks with a background color (eg: paragraph or group)
 $dimmed-opacity: 1;
 
 $block-edge-to-content: 16px;
@@ -101,3 +101,10 @@ $block-selected-to-content: $block-edge-to-content - $block-selected-margin - $b
 
 $radius-round: 50%;
 $radius-block-ui: 2px;
+
+/**
+ * Block paddings.
+ */
+// Padding for blocks with a background color (e.g. paragraph or group).
+$block-bg-padding--v: 1.25em;
+$block-bg-padding--h: 2.375em;

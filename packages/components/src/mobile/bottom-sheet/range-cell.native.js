@@ -23,19 +23,22 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  * Internal dependencies
  */
 import Cell from './cell';
+import { toFixed, removeNonDigit } from '../utils';
 import styles from './range-cell.scss';
 import borderStyles from './borderStyles.scss';
+
+const isIOS = Platform.OS === 'ios';
 
 class BottomSheetRangeCell extends Component {
 	constructor( props ) {
 		super( props );
-		this.handleToggleFocus = this.handleToggleFocus.bind( this );
-		this.handleChange = this.handleChange.bind( this );
-		this.handleValueSave = this.handleValueSave.bind( this );
+		this.onInputFocus = this.onInputFocus.bind( this );
+		this.onInputBlur = this.onInputBlur.bind( this );
 		this.onChangeValue = this.onChangeValue.bind( this );
 		this.onCellPress = this.onCellPress.bind( this );
 		this.handleChangePixelRatio = this.handleChangePixelRatio.bind( this );
-
+		this.onSubmitEditing = this.onSubmitEditing.bind( this );
+		this.onChangeText = this.onChangeText.bind( this );
 		const initialValue = this.validateInput(
 			props.value || props.defaultValue || props.minimumValue
 		);
@@ -43,10 +46,10 @@ class BottomSheetRangeCell extends Component {
 
 		this.state = {
 			accessible: true,
-			sliderValue: initialValue,
-			initialValue,
 			hasFocus: false,
 			fontScale,
+			inputValue: initialValue,
+			sliderValue: initialValue,
 		};
 	}
 
@@ -55,7 +58,6 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	componentWillUnmount() {
-		this.handleToggleFocus();
 		AppState.removeEventListener( 'change', this.handleChangePixelRatio );
 	}
 
@@ -69,26 +71,21 @@ class BottomSheetRangeCell extends Component {
 		}
 	}
 
-	handleChange( text ) {
-		if ( ! isNaN( Number( text ) ) ) {
-			this.setState( { sliderValue: text } );
-			this.announceCurrentValue( text );
-		}
+	onInputFocus() {
+		this.setState( {
+			hasFocus: true,
+		} );
 	}
 
-	handleToggleFocus( validateInput = true ) {
-		const newState = { hasFocus: ! this.state.hasFocus };
-
-		if ( validateInput ) {
-			const sliderValue = this.validateInput( this.state.sliderValue );
-			this.handleValueSave( sliderValue );
-		}
-
-		this.setState( newState );
+	onInputBlur() {
+		this.onChangeText( '' + this.state.sliderValue );
+		this.setState( {
+			hasFocus: false,
+		} );
 	}
 
 	validateInput( text ) {
-		const { minimumValue, maximumValue } = this.props;
+		const { minimumValue, maximumValue, decimalNum } = this.props;
 		if ( ! text ) {
 			return minimumValue;
 		}
@@ -96,32 +93,37 @@ class BottomSheetRangeCell extends Component {
 			return Math.min( Math.max( text, minimumValue ), maximumValue );
 		}
 		return Math.min(
-			Math.max(
-				text.replace( /[^0-9]/g, '' ).replace( /^0+(?=\d)/, '' ),
-				minimumValue
-			),
+			Math.max( removeNonDigit( text, decimalNum ), minimumValue ),
 			maximumValue
 		);
 	}
 
-	handleValueSave( text ) {
-		if ( ! isNaN( Number( text ) ) ) {
-			this.onChangeValue( text );
-			this.setState( { sliderValue: text } );
-			this.announceCurrentValue( text );
-		}
+	updateValue( value ) {
+		const { onChange } = this.props;
+		const validValue = this.validateInput( value );
+
+		this.announceCurrentValue( `${ validValue }` );
+		onChange( validValue );
 	}
 
 	onChangeValue( initialValue ) {
-		const { minimumValue, maximumValue, onChange } = this.props;
+		const { decimalNum } = this.props;
+		initialValue = toFixed( initialValue, decimalNum );
+		this.setState( { inputValue: initialValue } );
+		this.updateValue( initialValue );
+	}
 
-		let sliderValue = initialValue;
-		if ( sliderValue < minimumValue ) {
-			sliderValue = minimumValue;
-		} else if ( sliderValue > maximumValue ) {
-			sliderValue = maximumValue;
-		}
-		onChange( sliderValue );
+	onChangeText( textValue ) {
+		const { decimalNum } = this.props;
+		const inputValue = removeNonDigit( textValue, decimalNum );
+		textValue = inputValue.replace( ',', '.' );
+		textValue = toFixed( textValue, decimalNum );
+		const value = this.validateInput( textValue );
+		this.setState( {
+			inputValue,
+			sliderValue: value,
+		} );
+		this.updateValue( value );
 	}
 
 	onCellPress() {
@@ -132,6 +134,20 @@ class BottomSheetRangeCell extends Component {
 		}
 	}
 
+	onSubmitEditing( { nativeEvent: { text } } ) {
+		const { decimalNum } = this.props;
+		if ( ! isNaN( Number( text ) ) ) {
+			text = toFixed( text.replace( ',', '.' ), decimalNum );
+			const validValue = this.validateInput( text );
+
+			if ( this.state.inputValue !== validValue ) {
+				this.setState( { inputValue: validValue } );
+				this.announceCurrentValue( `${ validValue }` );
+				this.props.onChange( validValue );
+			}
+		}
+	}
+
 	announceCurrentValue( value ) {
 		/* translators: %s: current cell value. */
 		const announcement = sprintf( __( 'Current value is %s' ), value );
@@ -139,7 +155,6 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	render() {
-		const isIOS = Platform.OS === 'ios';
 		const {
 			value,
 			defaultValue,
@@ -154,10 +169,19 @@ class BottomSheetRangeCell extends Component {
 			maximumTrackTintColor = isIOS ? '#e9eff3' : '#909090',
 			thumbTintColor = ! isIOS && '#00669b',
 			getStylesFromColorScheme,
+			rangePreview,
+			cellContainerStyle,
+			shouldDisplayTextInput = true,
 			...cellProps
 		} = this.props;
 
-		const { hasFocus, sliderValue, accessible, fontScale } = this.state;
+		const {
+			hasFocus,
+			accessible,
+			fontScale,
+			inputValue,
+			sliderValue,
+		} = this.state;
 
 		const accessibilityLabel = sprintf(
 			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
@@ -174,29 +198,34 @@ class BottomSheetRangeCell extends Component {
 			styles.sliderDarkTextInput
 		);
 
-		const cellRowContainerStyle = [
-			styles.cellRowStyles,
-			isIOS ? styles.cellRowStylesIOS : styles.cellRowStylesAndroid,
+		const containerStyle = [
+			styles.container,
+			isIOS ? styles.containerIOS : styles.containerAndroid,
 		];
 
 		return (
 			<Cell
 				{ ...cellProps }
-				cellContainerStyle={ styles.cellContainerStyles }
-				cellRowContainerStyle={ cellRowContainerStyle }
+				cellContainerStyle={ [
+					styles.cellContainerStyles,
+					cellContainerStyle,
+				] }
+				cellRowContainerStyle={ containerStyle }
 				accessibilityRole={ 'none' }
 				value={ '' }
 				editable={ false }
 				activeOpacity={ 1 }
 				accessible={ accessible }
 				onPress={ this.onCellPress }
+				valueStyle={ styles.valueStyle }
 				accessibilityLabel={ accessibilityLabel }
 				accessibilityHint={
 					/* translators: accessibility text (hint for focusing a slider) */
 					__( 'Double tap to change the value using slider' )
 				}
 			>
-				<View style={ styles.container }>
+				<View style={ containerStyle }>
+					{ rangePreview }
 					<Slider
 						value={ this.validateInput( sliderValue ) }
 						defaultValue={ defaultValue }
@@ -207,28 +236,33 @@ class BottomSheetRangeCell extends Component {
 						minimumTrackTintColor={ minimumTrackTintColor }
 						maximumTrackTintColor={ maximumTrackTintColor }
 						thumbTintColor={ thumbTintColor }
-						onValueChange={ this.handleChange }
-						onSlidingComplete={ this.handleValueSave }
+						onValueChange={ this.onChangeValue }
 						ref={ ( slider ) => {
 							this.sliderRef = slider;
 						} }
-						style={ styles.slider }
+						style={
+							isIOS ? styles.sliderIOS : styles.sliderAndroid
+						}
 						accessibilityRole={ 'adjustable' }
 					/>
-					<TextInput
-						style={ [
-							defaultSliderStyle,
-							borderStyles.borderStyle,
-							hasFocus && borderStyles.isSelected,
-							{ width: 40 * fontScale },
-						] }
-						onChangeText={ this.handleChange }
-						onFocus={ this.handleToggleFocus }
-						onBlur={ this.handleToggleFocus }
-						keyboardType="number-pad"
-						returnKeyType="done"
-						value={ `${ sliderValue }` }
-					/>
+					{ shouldDisplayTextInput && (
+						<TextInput
+							style={ [
+								defaultSliderStyle,
+								borderStyles.borderStyle,
+								hasFocus && borderStyles.isSelected,
+								{ width: 40 * fontScale },
+							] }
+							onChangeText={ this.onChangeText }
+							onSubmitEditing={ this.onSubmitEditing }
+							onFocus={ this.onInputFocus }
+							onBlur={ this.onInputBlur }
+							keyboardType="numeric"
+							returnKeyType="done"
+							defaultValue={ `${ inputValue }` }
+							value={ inputValue }
+						/>
+					) }
 				</View>
 			</Cell>
 		);

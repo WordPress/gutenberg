@@ -31,11 +31,10 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
-	$custom_class_name = empty( $attributes['className'] ) ? '' : ' ' . $attributes['className'];
-
-	$output = sprintf(
-		'<div class="%1$s">%2$s</div>',
-		esc_attr( 'wp-block-calendar' . $custom_class_name ),
+	$wrapper_attributes = get_block_wrapper_attributes();
+	$output             = sprintf(
+		'<div %1$s>%2$s</div>',
+		$wrapper_attributes,
 		get_calendar( true, false )
 	);
 

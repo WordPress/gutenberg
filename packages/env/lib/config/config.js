@@ -259,7 +259,12 @@ function withOverrides( config ) {
 				const baseUrl = new URL(
 					config.env[ envKey ].config[ configKey ]
 				);
-				baseUrl.port = config.env[ envKey ].port;
+
+				// Don't overwrite the port of WP_HOME when set.
+				if ( ! ( configKey === 'WP_HOME' && !! baseUrl.port ) ) {
+					baseUrl.port = config.env[ envKey ].port;
+				}
+
 				config.env[ envKey ].config[ configKey ] = baseUrl.toString();
 			} catch ( error ) {
 				throw new ValidationError(

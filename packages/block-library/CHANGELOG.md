@@ -2,6 +2,22 @@
 
 ## Unreleased
 
+### Bug Fixes
+
+- Fix a regression where the Cover would not show opacity controls for the default overlay color ([#26625](https://github.com/WordPress/gutenberg/pull/26625)).
+- Fix a regression ([#26545](https://github.com/WordPress/gutenberg/pull/26545)) where the Cover block lost its default background overlay color
+  ([#26569](https://github.com/WordPress/gutenberg/pull/26569)).
+
+## 2.23.0 (2020-09-03)
+
+### Enhancement
+
+- Site title is now a link.
+
+### New Features
+
+- Add heading level controls to Site Title block.
+
 ## 2.12.0 (2020-01-13)
 
 ### Bug Fixes

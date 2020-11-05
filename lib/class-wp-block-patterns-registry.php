@@ -37,19 +37,19 @@ final class WP_Block_Patterns_Registry {
 	 */
 	public function register( $pattern_name, $pattern_properties ) {
 		if ( ! isset( $pattern_name ) || ! is_string( $pattern_name ) ) {
-			$message = __( 'Pattern name must be a string.', 'gutenberg' );
+			$message = __( 'Block pattern name must be a string.', 'gutenberg' );
 			_doing_it_wrong( __METHOD__, $message, '7.8.0' );
 			return false;
 		}
 
 		if ( ! isset( $pattern_properties['title'] ) || ! is_string( $pattern_properties['title'] ) ) {
-			$message = __( 'Pattern title must be a string.', 'gutenberg' );
+			$message = __( 'Block pattern title must be a string.', 'gutenberg' );
 			_doing_it_wrong( __METHOD__, $message, '8.5.0' );
 			return false;
 		}
 
 		if ( ! isset( $pattern_properties['content'] ) || ! is_string( $pattern_properties['content'] ) ) {
-			$message = __( 'Pattern content must be a string.', 'gutenberg' );
+			$message = __( 'Block pattern content must be a string.', 'gutenberg' );
 			_doing_it_wrong( __METHOD__, $message, '8.5.0' );
 			return false;
 		}
@@ -71,7 +71,7 @@ final class WP_Block_Patterns_Registry {
 	public function unregister( $pattern_name ) {
 		if ( ! $this->is_registered( $pattern_name ) ) {
 			/* translators: 1: Pattern name. */
-			$message = sprintf( __( 'Pattern "%1$s" not found.', 'gutenberg' ), $pattern_name );
+			$message = sprintf( __( 'Block pattern "%1$s" not found.', 'gutenberg' ), $pattern_name );
 			_doing_it_wrong( __METHOD__, $message, '7.8.0' );
 			return false;
 		}

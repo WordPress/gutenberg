@@ -4,6 +4,8 @@
 import { createRegistry } from '../../registry';
 import { createRegistryControl } from '../../factory';
 
+jest.useFakeTimers();
+
 describe( 'controls', () => {
 	let registry;
 
@@ -80,16 +82,14 @@ describe( 'controls', () => {
 					.select( 'store' )
 					.hasFinishedResolution( 'getItems' );
 				if ( isFinished ) {
-					expect( registry.select( 'store' ).getItems() ).toEqual( [
-						1,
-						2,
-						3,
-					] );
+					const items = registry.select( 'store' ).getItems();
+					expect( items ).toEqual( [ 1, 2, 3 ] );
 				}
 				resolve();
 			} );
 
 			registry.select( 'store' ).getItems();
+			jest.runAllTimers();
 		} );
 	} );
 	describe( 'selectors have expected value for the `hasResolver` property', () => {
