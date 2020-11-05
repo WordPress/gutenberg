@@ -50,9 +50,11 @@
 		"html": false,
 		"inserter": true,
 		"fontSize": true,
+		"__experimentalTextTransform": true,
 		"color": {
 			"textColor": true,
 			"backgroundColor": true
-		}
+		},
+		"__experimentalFontFamily": true
 	}
 }
