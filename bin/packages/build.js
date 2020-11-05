@@ -49,7 +49,7 @@ function findStyleEntriesThatImportFile( file ) {
 				.match( /@import "(.*?)"/g );
 
 			const packageName = getPackageName( file );
-			const regex = new RegExp( packageName, 'g' );
+			const regex = new RegExp( `/${ packageName }/`, 'g' );
 
 			const fileIsImportedInStyleEntry =
 				importStatements &&
@@ -97,6 +97,12 @@ function createStyleEntryTransform() {
 				return;
 			}
 
+			packages.add( packageName );
+			const entries = await glob(
+				path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
+			);
+			entries.forEach( ( entry ) => this.push( entry ) );
+
 			// Find other stylesheets that need to be rebuilt because
 			// they import the styles that are being transformed
 			const styleEntries = findStyleEntriesThatImportFile( file );
@@ -104,15 +110,9 @@ function createStyleEntryTransform() {
 			// Rebuild stylesheets that import the styles being transformed
 			if ( styleEntries.length ) {
 				styleEntries.forEach( ( entry ) => stream.push( entry ) );
-				callback();
-			} else {
-				packages.add( packageName );
-				const entries = await glob(
-					path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
-				);
-				entries.forEach( ( entry ) => this.push( entry ) );
-				callback();
 			}
+
+			callback();
 		},
 	} );
 }
