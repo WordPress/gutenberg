@@ -94,6 +94,15 @@ export default function useSelect( _mapSelect, deps ) {
 	const latestMapOutputError = useRef();
 	const isMountedAndNotUnsubscribing = useRef();
 
+	const registeredStores = useRef( [] );
+	const trapSelect = useCallback(
+		( storeKey ) => {
+			registeredStores.current.push( storeKey );
+			return registry.select( storeKey );
+		},
+		[ registry ]
+	);
+
 	let mapOutput;
 
 	try {
@@ -101,7 +110,7 @@ export default function useSelect( _mapSelect, deps ) {
 			latestMapSelect.current !== mapSelect ||
 			latestMapOutputError.current
 		) {
-			mapOutput = mapSelect( registry.select, registry );
+			mapOutput = mapSelect( trapSelect, registry );
 		} else {
 			mapOutput = latestMapOutput.current;
 		}
@@ -119,6 +128,10 @@ export default function useSelect( _mapSelect, deps ) {
 			console.error( errorMessage );
 		}
 	}
+
+	useIsomorphicLayoutEffect( () => {
+		registeredStores.current = [];
+	}, [ mapSelect ] );
 
 	useIsomorphicLayoutEffect( () => {
 		latestMapSelect.current = mapSelect;
@@ -141,7 +154,7 @@ export default function useSelect( _mapSelect, deps ) {
 			if ( isMountedAndNotUnsubscribing.current ) {
 				try {
 					const newMapOutput = latestMapSelect.current(
-						registry.select,
+						trapSelect,
 						registry
 					);
 					if (
@@ -165,13 +178,20 @@ export default function useSelect( _mapSelect, deps ) {
 			onStoreChange();
 		}
 
-		const unsubscribe = registry.subscribe( () => {
+		const onChange = () => {
 			if ( latestIsAsync.current ) {
 				renderQueue.add( queueContext, onStoreChange );
 			} else {
 				onStoreChange();
 			}
+		};
+
+		const unsubscribers = registeredStores.current.map( ( storeKey ) => {
+			return registry.stores[ storeKey ].subscribe( onChange );
 		} );
+		const unsubscribe = () => {
+			unsubscribers.map( ( unsubscriber ) => unsubscriber() );
+		};
 
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;
