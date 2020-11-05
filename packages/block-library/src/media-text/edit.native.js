@@ -379,10 +379,7 @@ class MediaTextEdit extends Component {
 							...innerBlockContainerStyle,
 						} }
 					>
-						<InnerBlocks
-							template={ TEMPLATE }
-							templateInsertUpdatesSelection={ false }
-						/>
+						<InnerBlocks template={ TEMPLATE } />
 					</View>
 				</View>
 			</>

@@ -36,7 +36,7 @@ export function initialize( id, settings ) {
 	registerCoreBlocks( coreBlocks );
 
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks();
 	}
 	registerBlock( createLegacyWidget( settings ) );
 	registerBlock( widgetArea );

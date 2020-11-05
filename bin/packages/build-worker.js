@@ -6,7 +6,7 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 const babel = require( '@babel/core' );
 const makeDir = require( 'make-dir' );
-const sass = require( 'node-sass' );
+const sass = require( 'sass' );
 const postcss = require( 'postcss' );
 /**
  * Internal dependencies

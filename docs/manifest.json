@@ -1794,6 +1794,30 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/ui.components",
+		"slug": "packages-ui.components",
+		"markdown_source": "../packages/ui.components/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/ui.context",
+		"slug": "packages-ui.context",
+		"markdown_source": "../packages/ui.context/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/ui.styles",
+		"slug": "packages-ui.styles",
+		"markdown_source": "../packages/ui.styles/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/ui.utils",
+		"slug": "packages-ui.utils",
+		"markdown_source": "../packages/ui.utils/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/url",
 		"slug": "packages-url",
 		"markdown_source": "../packages/url/README.md",

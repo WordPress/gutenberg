@@ -160,6 +160,20 @@
 						"slug": "huge",
 						"size": 42
 					}
+				],
+				"textTransforms": [
+					{
+						"name": "AB",
+						"slug": "uppercase"
+					},
+					{
+						"name": "ab",
+						"slug": "lowercase"
+					},
+					{
+						"name": "Ab",
+						"slug": "capitalize"
+					}
 				]
 			},
 			"spacing": {

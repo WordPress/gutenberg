@@ -134,13 +134,30 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 	] );
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Filtering and Sorting' ) }>
+			<PanelBody title={ __( 'Settings' ) }>
 				<SelectControl
 					options={ postTypesSelectOptions }
 					value={ postType }
 					label={ __( 'Post Type' ) }
 					onChange={ onPostTypeChange }
 				/>
+				<QueryControls
+					{ ...{ order, orderBy } }
+					onOrderChange={ ( value ) => setQuery( { order: value } ) }
+					onOrderByChange={ ( value ) =>
+						setQuery( { orderBy: value } )
+					}
+				/>
+				{ showSticky && (
+					<SelectControl
+						label={ __( 'Sticky posts' ) }
+						options={ stickyOptions }
+						value={ sticky }
+						onChange={ ( value ) => setQuery( { sticky: value } ) }
+					/>
+				) }
+			</PanelBody>
+			<PanelBody title={ __( 'Filters' ) }>
 				{ showCategories && categories?.terms?.length > 0 && (
 					<FormTokenField
 						label={ __( 'Categories' ) }
@@ -166,11 +183,7 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 					/>
 				) }
 				<QueryControls
-					{ ...{ order, orderBy, selectedAuthorId, authorList } }
-					onOrderChange={ ( value ) => setQuery( { order: value } ) }
-					onOrderByChange={ ( value ) =>
-						setQuery( { orderBy: value } )
-					}
+					{ ...{ selectedAuthorId, authorList } }
 					onAuthorChange={ ( value ) =>
 						setQuery( {
 							author: value !== '' ? +value : undefined,
@@ -178,18 +191,10 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 					}
 				/>
 				<TextControl
-					label={ __( 'Search' ) }
+					label={ __( 'Keyword' ) }
 					value={ querySearch }
 					onChange={ setQuerySearch }
 				/>
-				{ showSticky && (
-					<SelectControl
-						label={ __( 'Sticky posts' ) }
-						options={ stickyOptions }
-						value={ sticky }
-						onChange={ ( value ) => setQuery( { sticky: value } ) }
-					/>
-				) }
 			</PanelBody>
 		</InspectorControls>
 	);

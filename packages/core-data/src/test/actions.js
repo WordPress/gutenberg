@@ -92,7 +92,9 @@ describe( 'saveEntityRecord', () => {
 			'__experimentalGetEntityRecordNoResolver'
 		);
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
+		const receiveItems = fulfillment.next().value;
+		expect( receiveItems.type ).toBe( 'RECEIVE_ITEMS' );
+		expect( receiveItems.invalidateCache ).toBe( false );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/posts',
@@ -132,7 +134,9 @@ describe( 'saveEntityRecord', () => {
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
 		expect( fulfillment.next().value.type ).toBe( '@@data/SELECT' );
-		expect( fulfillment.next().value.type ).toBe( 'RECEIVE_ITEMS' );
+		const receiveItems = fulfillment.next().value;
+		expect( receiveItems.type ).toBe( 'RECEIVE_ITEMS' );
+		expect( receiveItems.invalidateCache ).toBe( false );
 		const { value: apiFetchAction } = fulfillment.next( {} );
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/posts/10',

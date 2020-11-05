@@ -68,8 +68,7 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 	const onVariationSelect = ( variation ) => {
 		replaceInnerBlocks(
 			clientId,
-			createBlocksFromInnerBlocksTemplate( variation.innerBlocks ),
-			false
+			createBlocksFromInnerBlocksTemplate( variation.innerBlocks )
 		);
 		onClose();
 	};
