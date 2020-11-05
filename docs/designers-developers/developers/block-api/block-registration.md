@@ -264,7 +264,7 @@ An object describing a variation defined for the block type can contain the foll
 - `attributes` (optional, type `Object`) – Values that override block attributes.
 - `innerBlocks` (optional, type `Array[]`) – Initial configuration of nested blocks.
 - `example` (optional, type `Object`) – Example provides structured data for the block preview. You can set to `undefined` to disable the preview shown for the block type.
-- `scope` (optional, type `string[]`) - the list of scopes where the variation is applicable. When not provided, it assumes all available scopes. Available options: `block`, `inserter`, `transform`.
+- `scope` (optional, type `WPBlockVariationScope[]`) - the list of scopes where the variation is applicable. When not provided, it assumes all available scopes. Available options: `block`, `inserter`, `transform`.
 - `keywords` (optional, type `string[]`) - An array of terms (which can be translated) that help users discover the variation while searching.
 
 It's also possible to override the default block style variation using the `className` attribute when defining block variations.
