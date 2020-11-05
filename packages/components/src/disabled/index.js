@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import {
 	createContext,
+	Fragment,
 	useCallback,
 	useLayoutEffect,
 	useRef,
@@ -104,5 +105,10 @@ function Disabled( { className, children, ...props } ) {
 }
 
 Disabled.Consumer = Consumer;
+
+export function Disableable( { children, disabled } ) {
+	const WrapperComponent = disabled ? Disabled : Fragment;
+	return <WrapperComponent>{ children }</WrapperComponent>;
+}
 
 export default Disabled;
