@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+* [*] [Android] Enable multiple upload support for Image block
+
+## 1.40.0
+
 ## 1.39.1
 
 * [*] Heading block - Disable full-width/wide alignment [#26308]
