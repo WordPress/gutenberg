@@ -19,33 +19,12 @@ import { DOWN } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import {
+	getDefaultColors,
 	getGradientFromCSSColors,
 	getGradientFromValues,
 	getHexColorsFromValues,
 	getValuesFromHexColors,
-	toBrightness,
 } from './utils';
-
-function getDefaultColors( palette ) {
-	// A default dark and light color are required.
-	if ( ! palette || palette.length < 2 ) return [ '#000', '#fff' ];
-
-	return palette
-		.map( ( { color } ) => ( {
-			color,
-			brightness: toBrightness( color ),
-		} ) )
-		.reduce(
-			( [ min, max ], current ) => {
-				return [
-					current.brightness <= min.brightness ? current : min,
-					current.brightness >= max.brightness ? current : max,
-				];
-			},
-			[ { brightness: 1 }, { brightness: 0 } ]
-		)
-		.map( ( { color } ) => color );
-}
 
 function Swatch( { fill } ) {
 	return (
@@ -195,11 +174,10 @@ function DuotoneToolbar( { value, onChange, duotonePalette, colorPalette } ) {
 									style={ style }
 									onClick={ () => {
 										const newValue = {
-											// TODO: Should values be precomputed here or computed in the PHP instead?
 											values: getValuesFromHexColors(
 												option.colors
 											),
-											slug: option.slug,
+											id: `duotone-filter-${ option.slug }`,
 										};
 										onChange(
 											isSelected ? undefined : newValue
@@ -227,7 +205,7 @@ function DuotoneToolbar( { value, onChange, duotonePalette, colorPalette } ) {
 												values: getValuesFromHexColors(
 													newColors
 												),
-												slug: `custom-${ newColors
+												id: `duotone-filter-custom-${ newColors
 													.map( ( hex ) =>
 														hex
 															.slice( 1 )

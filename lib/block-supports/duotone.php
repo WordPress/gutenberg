@@ -40,6 +40,7 @@ function gutenberg_register_duotone_support( $block_type ) {
  * @return array Colors CSS classes and inline styles.
  */
 function gutenberg_apply_duotone_support( $block_type, $block_attributes ) {
+	$attributes          = array();
 	$has_duotone_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
 		$has_duotone_support = gutenberg_experimental_get( $block_type->supports, array( 'duotone' ), false );
@@ -48,7 +49,7 @@ function gutenberg_apply_duotone_support( $block_type, $block_attributes ) {
 		$has_duotone_attribute = array_key_exists( 'duotone', $block_attributes );
 
 		if ( $has_duotone_attribute ) {
-			$attributes['class'] = 'duotone-filter-' . $block_attributes['duotone']['slug'];
+			$attributes['class'] = $block_attributes['duotone']['id'];
 		}
 	}
 
@@ -79,16 +80,38 @@ function gutenberg_render_duotone_support( $block_type, $block_attributes, $bloc
 		return $block_content;
 	}
 
-	$duotone_slug   = $block_attributes['duotone']['slug'];
+	$duotone_id     = $block_attributes['duotone']['id'];
 	$duotone_values = $block_attributes['duotone']['values'];
 
+	// Adding the block class as to not affect other blocks.
+	$block_class = gutenberg_get_block_default_classname( $block_type->name );
+	$scope       = '.' . $block_class . '.' . $duotone_id;
+
 	// Object | boolean | string | string[] -> boolean | string | string[].
-	$edit_selector =
+	$selector =
 		! is_array( $duotone_support ) || ! array_key_exists( 'edit', $duotone_support )
 			? $duotone_support
 			: $duotone_support['edit'];
 
-	$duotone = gutenberg_render_duotone_filter( $duotone_slug, $edit_selector, $duotone_values );
+	// boolean | string | string[] -> boolean[] | string[].
+	$selector = is_array( $selector )
+		? $selector
+		: array( $selector );
+
+	// boolean[] | string[] -> string[].
+	$selector = array_map(
+		function ( $selector ) use ( $scope ) {
+			return is_string( $selector )
+				? $scope . ' ' . $selector
+				: $scope;
+		},
+		$selector
+	);
+
+	// string[] -> string.
+	$selector = implode( ', ', $selector );
+
+	$duotone = gutenberg_render_duotone_filter( $selector, $duotone_id, $duotone_values );
 
 	return $block_content . $duotone;
 }

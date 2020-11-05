@@ -4,15 +4,6 @@
 import { SVG } from '@wordpress/components';
 
 /**
- * CSS selectors to apply the filter to.
- * - `true` to select the whole scope/block.
- * - String for a single selector.
- * - Array of strings for a multiple selectors.
- *
- * @typedef Selectors {boolean|string|string[]}
- */
-
-/**
  * Values for the SVG `feComponentTransfer`.
  *
  * @typedef Values {Object}
@@ -24,33 +15,16 @@ import { SVG } from '@wordpress/components';
 /**
  * SVG and stylesheet needed for rendering the duotone filter.
  *
- * @param  {Object}    props           Duotone props.
- * @param  {string}    props.slug      Unique id for this duotone filter.
- * @param  {Selectors} props.selectors Selectors to apply the filter to.
- * @param  {Values}    props.values    R, G, and B values to filter with.
- * @return {WPElement}                 Duotone element.
+ * @param  {Object} props          Duotone props.
+ * @param  {string} props.selector Selector to apply the filter to.
+ * @param  {string} props.id       Unique id for this duotone filter.
+ * @param  {Values} props.values   R, G, and B values to filter with.
+ * @return {WPElement}             Duotone element.
  */
-export default function DuotoneFilter( { slug, selectors, values } ) {
-	const duotoneId = `duotone-filter-${ slug }`;
-
-	// boolean | string | string[] -> boolean[] | string[]
-	const selectorsArray = Array.isArray( selectors )
-		? selectors
-		: [ selectors ];
-
-	// boolean[] | string[] -> string[]
-	const scopedSelectors = selectorsArray.map( ( selector ) =>
-		typeof selector === 'string'
-			? `.${ duotoneId } ${ selector }`
-			: `.${ duotoneId }`
-	);
-
-	// string[] -> string
-	const selector = scopedSelectors.join( ', ' );
-
+export default function DuotoneFilter( { selector, id, values } ) {
 	const stylesheet = `
 ${ selector } {
-	filter: url( #${ duotoneId } );
+	filter: url( #${ id } );
 }
 `;
 
@@ -71,7 +45,7 @@ ${ selector } {
 				} }
 			>
 				<defs>
-					<filter id={ duotoneId }>
+					<filter id={ id }>
 						<feColorMatrix
 							type="matrix"
 							// Use perceptual brightness to convert to grayscale.

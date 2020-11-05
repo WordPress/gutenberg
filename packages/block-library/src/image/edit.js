@@ -298,7 +298,7 @@ export function ImageEdit( {
 	);
 
 	const classes = classnames( className, {
-		[ `duotone-filter-${ duotone?.slug }` ]: duotone,
+		[ duotone?.id ]: duotone,
 		'is-transient': isBlobURL( url ),
 		'is-resized': !! width || !! height,
 		'is-focused': isSelected,

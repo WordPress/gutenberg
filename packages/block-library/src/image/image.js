@@ -518,8 +518,8 @@ export default function Image( {
 			{ img }
 			{ duotone && (
 				<DuotoneFilter
-					slug={ duotone.slug }
-					selectors="img"
+					selector={ `.wp-block-image.${ duotone.id } img` }
+					id={ duotone.id }
 					values={ duotone.values }
 				/>
 			) }

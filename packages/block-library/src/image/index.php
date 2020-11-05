@@ -18,11 +18,15 @@ function render_block_core_image( $attributes, $content ) {
 		return $content;
 	}
 
-	$duotone_slug   = $attributes['duotone']['slug'];
-	$duotone_values = $attributes['duotone']['values'];
-	$edit_selector  = 'img';
+	$id        = $attributes['duotone']['id'];
+	$values    = $attributes['duotone']['values'];
+	$selectors = array(
+		'div.wp-block-image .' . $id . ' img',
+		'figure.wp-block-image.' . $id . ' img',
+	);
+	$selector  = implode( ', ', $selectors );
 
-	$duotone = gutenberg_render_duotone_filter( $duotone_slug, $edit_selector, $duotone_values );
+	$duotone = gutenberg_render_duotone_filter( $selector, $id, $values );
 
 	return $content . $duotone;
 }

@@ -8,42 +8,19 @@
 /**
  * SVG and stylesheet needed for rendering the duotone filter.
  *
- * @param  string $slug      Unique slug for this duotone filter.
- * @param  mixed  $selectors CSS selectors to apply the duotone to.
- *                           `true` to select the whole block.
- *                           String for a single selector.
- *                           Array of strings for a multiple selectors.
- * @param  array  $values    R, G, and B values to filter with.
- * @return string            Duotone stylesheet and SVG.
+ * @param  string $selector CSS selectors to apply the duotone to.
+ * @param  string $id       Unique slug for this duotone filter.
+ * @param  array  $values   R, G, and B values to filter with.
+ * @return string           Duotone stylesheet and SVG.
  */
-function gutenberg_render_duotone_filter( $slug, $selectors, $values ) {
-	$duotone_id = 'duotone-filter-' . $slug;
-
-	// boolean | string | string[] -> boolean[] | string[].
-	$selectors = is_array( $selectors )
-		? $selectors
-		: array( $selectors );
-
-	// boolean[] | string[] -> string[].
-	$selectors = array_map(
-		function ( $selector ) use ( $duotone_id ) {
-			return is_string( $selector )
-				? '.' . $duotone_id . ' ' . $selector
-				: '.' . $duotone_id;
-		},
-		$selectors
-	);
-
-	// string[] -> string.
-	$selectors = implode( ', ', $selectors );
-
+function gutenberg_render_duotone_filter( $selector, $id, $values ) {
 	ob_start();
 
 	?>
 
 	<style>
-		<?php echo $selectors; ?> {
-			filter: url( <?php echo '#' . $duotone_id; ?> );
+		<?php echo $selector; ?> {
+			filter: url( <?php echo '#' . $id; ?> );
 		}
 	</style>
 
@@ -57,7 +34,7 @@ function gutenberg_render_duotone_filter( $slug, $selectors, $values ) {
 		style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"
 	>
 		<defs>
-			<filter id="<?php echo $duotone_id; ?>">
+			<filter id="<?php echo $id; ?>">
 				<feColorMatrix
 					type="matrix"
 					<?php // phpcs:disable Generic.WhiteSpace.DisallowSpaceIndent ?>

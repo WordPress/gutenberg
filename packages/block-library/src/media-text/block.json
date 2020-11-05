@@ -89,6 +89,6 @@
 			"gradients": true,
 			"link": true
 		},
-		"duotone": ".wp-block-media-text img"
+		"duotone": "img"
 	}
 }

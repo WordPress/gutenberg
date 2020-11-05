@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockDefaultClassName,
+	getBlockSupport,
+	hasBlockSupport,
+} from '@wordpress/blocks';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
@@ -65,15 +69,35 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 			setAttributes,
 		} = props;
 
+		const duotonePalette = useEditorFeature( 'color.duotone' );
+		const colorPalette = useEditorFeature( 'color.palette' );
+
+		// Adding the block class as to not affect other blocks.
+		const blockClass = getBlockDefaultClassName( props.name );
+
+		// Wrapper div has the filter class, so it comes before blockClass.
+		const scope = duotone
+			? `.${ duotone.id } .${ blockClass }`
+			: `.${ blockClass }`;
+
 		// Object | boolean | string | string[] -> boolean | string | string[]
-		const editSelectors =
+		const selectors =
 			duotoneSupport.edit === undefined
 				? duotoneSupport
 				: duotoneSupport.edit;
 
-		const duotonePalette = useEditorFeature( 'color.duotone' );
+		// boolean | string | string[] -> boolean[] | string[]
+		const selectorsArray = Array.isArray( selectors )
+			? selectors
+			: [ selectors ];
 
-		const colorPalette = useEditorFeature( 'color.palette' );
+		// boolean[] | string[] -> string[]
+		const scopedSelectors = selectorsArray.map( ( selector ) =>
+			typeof selector === 'string' ? `${ scope } ${ selector }` : scope
+		);
+
+		// string[] -> string
+		const selector = scopedSelectors.join( ', ' );
 
 		return (
 			<>
@@ -87,15 +111,13 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 						} }
 					/>
 				</BlockControls>
-				<div
-					className={ duotone && `duotone-filter-${ duotone.slug }` }
-				>
+				<div className={ duotone?.id }>
 					<BlockEdit { ...props } />
 				</div>
 				{ duotone && (
 					<DuotoneFilter
-						slug={ duotone.slug }
-						selectors={ editSelectors }
+						selector={ selector }
+						id={ duotone.id }
 						values={ duotone.values }
 					/>
 				) }
@@ -123,10 +145,7 @@ function addDuotoneFilterStyle( props, blockType, attributes ) {
 
 	return {
 		...props,
-		className: classnames(
-			props.className,
-			`duotone-filter-${ attributes.duotone.slug }`
-		),
+		className: classnames( props.className, attributes.duotone.id ),
 	};
 }
 

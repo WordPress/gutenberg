@@ -30,7 +30,7 @@ export default function save( { attributes } ) {
 	const newRel = isEmpty( rel ) ? undefined : rel;
 
 	const classes = classnames( {
-		[ `duotone-filter-${ duotone?.slug }` ]: duotone,
+		[ duotone?.id ]: duotone,
 		[ `align${ align }` ]: align,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 		'is-resized': width || height,

@@ -160,9 +160,38 @@ export function getHexColorsFromValues( values = { r: [], g: [], b: [] } ) {
  * Convert a hex color to perceived brightness.
  *
  * @param {string} color Hex color
+ *
  * @return {number} Perceived brightness of the color
  */
 export function toBrightness( color ) {
 	const { r, g, b } = hex2rgb( color );
 	return r * 0.299 + g * 0.587 + b * 0.114;
+}
+
+/**
+ * Calculate the bightest and darkest values from a color palette.
+ *
+ * @param {Object[]} palette Color palette for the theme.
+ *
+ * @return {string[]} Tuple of the darkest color and brightest color.
+ */
+export function getDefaultColors( palette ) {
+	// A default dark and light color are required.
+	if ( ! palette || palette.length < 2 ) return [ '#000', '#fff' ];
+
+	return palette
+		.map( ( { color } ) => ( {
+			color,
+			brightness: toBrightness( color ),
+		} ) )
+		.reduce(
+			( [ min, max ], current ) => {
+				return [
+					current.brightness <= min.brightness ? current : min,
+					current.brightness >= max.brightness ? current : max,
+				];
+			},
+			[ { brightness: 1 }, { brightness: 0 } ]
+		)
+		.map( ( { color } ) => color );
 }
