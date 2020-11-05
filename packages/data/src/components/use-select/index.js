@@ -80,7 +80,7 @@ const renderQueue = createQueue();
  *
  * @return {Function}  A custom react hook.
  */
-export default function useStoreSelect( _mapSelect, deps = [] ) {
+export default function useSelect( _mapSelect, deps = [] ) {
 	const dependentStores = useRef( {} );
 
 	const registry = useRegistry();
