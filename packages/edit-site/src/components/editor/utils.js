@@ -13,6 +13,7 @@ export const PRESET_CATEGORIES = {
 	color: { path: [ 'color', 'palette' ], key: 'color' },
 	gradient: { path: [ 'color', 'gradients' ], key: 'gradient' },
 	fontSize: { path: [ 'typography', 'fontSizes' ], key: 'size' },
+	fontFamily: { path: [ 'typography', 'fontFamilies' ], key: 'fontFamily' },
 	textTransform: { path: [ 'typography', 'textTransforms' ], key: 'slug' },
 };
 export const LINK_COLOR = '--wp--style--color--link';

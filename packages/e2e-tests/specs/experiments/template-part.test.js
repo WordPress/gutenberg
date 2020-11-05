@@ -65,9 +65,9 @@ describe( 'Template Part', () => {
 
 			// Verify that the header template part is updated.
 			const [ headerTemplatePart ] = await page.$x(
-				'//*[@data-type="core/template-part"][//p[text()="Header Template Part123"]]'
+				'//*[@data-type="core/template-part"][//p[text()="Header Template Part 123"]]'
 			);
-			expect( headerTemplatePart ).not.toBeNull();
+			expect( headerTemplatePart ).not.toBeUndefined();
 		} );
 	} );
 

@@ -12,7 +12,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Animate from '../animate';
+import { useAnimate } from '../animate';
 import { ROOT_MENU } from './constants';
 import { NavigationContext } from './context';
 import { NavigationUI } from './styles/navigation-styles';
@@ -63,27 +63,23 @@ export default function Navigation( {
 	};
 
 	const classes = classnames( 'components-navigation', className );
+	const animateClassName = useAnimate( {
+		type: 'slide-in',
+		origin: slideOrigin,
+	} );
 
 	return (
 		<NavigationUI className={ classes }>
-			<Animate
+			<div
 				key={ menu }
-				type="slide-in"
-				options={ { origin: slideOrigin } }
+				className={ classnames( {
+					[ animateClassName ]: isMounted.current && slideOrigin,
+				} ) }
 			>
-				{ ( { className: animateClassName } ) => (
-					<div
-						className={ classnames( {
-							[ animateClassName ]:
-								isMounted.current && slideOrigin,
-						} ) }
-					>
-						<NavigationContext.Provider value={ context }>
-							{ children }
-						</NavigationContext.Provider>
-					</div>
-				) }
-			</Animate>
+				<NavigationContext.Provider value={ context }>
+					{ children }
+				</NavigationContext.Provider>
+			</div>
 		</NavigationUI>
 	);
 }
