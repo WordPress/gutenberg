@@ -6,7 +6,7 @@ import { Button, Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
 
-function NavigationToggle( { icon, isOpen } ) {
+function NavigationToggle( { icon, isOpen, setHasOpened } ) {
 	const { isActive, isRequestingSiteIcon, siteIconUrl } = useSelect(
 		( select ) => {
 			const { isFeatureActive } = select( 'core/edit-site' );
@@ -29,6 +29,10 @@ function NavigationToggle( { icon, isOpen } ) {
 	);
 
 	const { setIsNavigationPanelOpened } = useDispatch( 'core/edit-site' );
+	const onClick = () => {
+		setHasOpened( true );
+		setIsNavigationPanelOpened( ! isOpen );
+	};
 
 	if ( ! isActive ) {
 		return null;
@@ -59,7 +63,7 @@ function NavigationToggle( { icon, isOpen } ) {
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
 				label={ __( 'Toggle navigation' ) }
-				onClick={ () => setIsNavigationPanelOpened( ! isOpen ) }
+				onClick={ onClick }
 				showTooltip
 			>
 				{ buttonIcon }

@@ -137,10 +137,7 @@ export class InserterMenu extends Component {
 			>
 				<TouchableHighlight accessible={ false }>
 					<BottomSheetConsumer>
-						{ ( {
-							listProps,
-							safeAreaBottomInset = styles.list.paddingBottom,
-						} ) => (
+						{ ( { listProps, safeAreaBottomInset } ) => (
 							<FlatList
 								onLayout={ this.onLayout }
 								key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
@@ -160,7 +157,9 @@ export class InserterMenu extends Component {
 								contentContainerStyle={ [
 									...listProps.contentContainerStyle,
 									{
-										paddingBottom: safeAreaBottomInset,
+										paddingBottom:
+											safeAreaBottomInset ||
+											styles.list.paddingBottom,
 									},
 								] }
 							/>
