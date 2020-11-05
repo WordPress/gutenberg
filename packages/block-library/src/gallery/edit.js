@@ -324,7 +324,8 @@ function GalleryEdit( props ) {
 							onChange={ updateImagesSize }
 						/>
 					) }
-					{ dirtyImageOptions && (
+					{ /* TODO - fix for mobile */ }
+					{ /* { dirtyImageOptions && (
 						<div className={ 'gallery-settings-buttons' }>
 							<Button isPrimary onClick={ applyImageOptions }>
 								{ __( 'Apply to all images' ) }
@@ -337,7 +338,7 @@ function GalleryEdit( props ) {
 								{ __( 'Cancel' ) }
 							</Button>
 						</div>
-					) }
+					) } */ }
 				</PanelBody>
 			</InspectorControls>
 			{ noticeUI }

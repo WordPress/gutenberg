@@ -3,6 +3,7 @@
  */
 import { useSelect } from '@wordpress/data';
 import { getBlockType, withBlockContentContext } from '@wordpress/blocks';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,6 +21,44 @@ import BlockList from '../block-list';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
+
+/**
+ * This hook is used to lightly mark an element as an inner blocks wrapper
+ * element. Call this hook and pass the returned props to the element to mark as
+ * an inner blocks wrapper, automatically rendering inner blocks as children. If
+ * you define a ref for the element, it is important to pass the ref to this
+ * hook, which the hook in turn will pass to the component through the props it
+ * returns. Optionally, you can also pass any other props through this hook, and
+ * they will be merged and returned.
+ *
+ * @param {Object} props   Optional. Props to pass to the element. Must contain
+ *                         the ref if one is defined.
+ * @param {Object} options Optional. Inner blocks options.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
+ */
+export function useInnerBlocksProps( props = {}, options = {} ) {
+	const fallbackRef = useRef();
+	const { clientId } = useBlockEditContext();
+
+	const ref = props.ref || fallbackRef;
+	const InnerBlocks =
+		options.value && options.onChange
+			? ControlledInnerBlocks
+			: UncontrolledInnerBlocks;
+
+	return {
+		...props,
+		ref,
+		children: (
+			<InnerBlocks
+				{ ...options }
+				clientId={ clientId }
+				wrapperRef={ ref }
+			/>
+		),
+	};
+}
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -49,6 +88,7 @@ function UncontrolledInnerBlocks( props ) {
 		marginHorizontal,
 		horizontalAlignment,
 		filterInnerBlocks,
+		numColumns,
 	} = props;
 
 	const block = useSelect(
@@ -82,6 +122,7 @@ function UncontrolledInnerBlocks( props ) {
 			onAddBlock={ onAddBlock }
 			onDeleteBlock={ onDeleteBlock }
 			filterInnerBlocks={ filterInnerBlocks }
+			numColumns={ numColumns }
 		/>
 	);
 

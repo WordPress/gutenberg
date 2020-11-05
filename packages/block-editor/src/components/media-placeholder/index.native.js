@@ -163,7 +163,9 @@ function MediaPlaceholder( props ) {
 							accessibilityRole={ 'button' }
 							accessibilityHint={ accessibilityHint }
 							onPress={ ( event ) => {
-								props.onFocus( event );
+								if ( props.onFocus ) {
+									props.onFocus( event );
+								}
 								open();
 							} }
 						>

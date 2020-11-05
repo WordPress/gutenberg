@@ -459,7 +459,7 @@ export class ImageEdit extends React.Component {
 					onLongPress={ openMediaOptions }
 					disabled={ ! isSelected }
 				>
-					<View style={ styles.content }>
+					<View style={ [ styles.content ] }>
 						{ getInspectorControls() }
 						{ getMediaOptions() }
 						{ ! this.state.isCaptionSelected &&
@@ -483,25 +483,40 @@ export class ImageEdit extends React.Component {
 								retryMessage,
 							} ) => {
 								return (
-									<Image
-										align={ align && alignToFlex[ align ] }
-										alt={ alt }
-										isSelected={
-											isSelected && ! isCaptionSelected
-										}
-										isUploadFailed={ isUploadFailed }
-										isUploadInProgress={
-											isUploadInProgress
-										}
-										onSelectMediaUploadOption={
-											this.onSelectMediaUploadOption
-										}
-										openMediaOptions={ openMediaOptions }
-										retryMessage={ retryMessage }
-										url={ url }
-										shapeStyle={ styles[ className ] }
-										width={ this.getWidth() }
-									/>
+									/// TEMPORARY FOR GALLERY!! TODO
+									<View
+										style={ {
+											height: 150,
+											overflow: 'hidden',
+										} }
+									>
+										<Image
+											align={
+												align && alignToFlex[ align ]
+											}
+											alt={ alt }
+											isSelected={
+												isSelected &&
+												! isCaptionSelected
+											}
+											isUploadFailed={ isUploadFailed }
+											isUploadInProgress={
+												isUploadInProgress
+											}
+											onSelectMediaUploadOption={
+												this.onSelectMediaUploadOption
+											}
+											openMediaOptions={
+												openMediaOptions
+											}
+											retryMessage={ retryMessage }
+											url={ url }
+											shapeStyle={ styles[ className ] }
+											width={ this.getWidth() }
+											height={ '100%' }
+											resizeMode={ 'cover' }
+										/>
+									</View>
 								);
 							} }
 						/>
