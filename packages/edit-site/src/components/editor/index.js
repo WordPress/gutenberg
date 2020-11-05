@@ -17,6 +17,7 @@ import {
 	BlockBreadcrumb,
 	__unstableEditorStyles as EditorStyles,
 	__experimentalUseResizeCanvas as useResizeCanvas,
+	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
 import {
 	FullscreenMode,
@@ -26,6 +27,8 @@ import {
 import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
+import { close } from '@wordpress/icons';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -36,7 +39,6 @@ import { SidebarComplementaryAreaFills } from '../sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
-import LeftSidebar from '../left-sidebar';
 import NavigationSidebar from '../navigation-sidebar';
 
 const interfaceLabels = {
@@ -47,6 +49,7 @@ const interfaceLabels = {
 function Editor() {
 	const {
 		isFullscreenActive,
+		isInserterOpen,
 		deviceType,
 		sidebarIsOpened,
 		settings,
@@ -59,6 +62,7 @@ function Editor() {
 	} = useSelect( ( _select ) => {
 		const {
 			isFeatureActive,
+			isInserterOpened,
 			__experimentalGetPreviewDeviceType,
 			getSettings,
 			getTemplateId,
@@ -79,6 +83,7 @@ function Editor() {
 		}
 
 		return {
+			isInserterOpen: isInserterOpened(),
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 			deviceType: __experimentalGetPreviewDeviceType(),
 			sidebarIsOpened: !! _select(
@@ -164,6 +169,8 @@ function Editor() {
 		}
 	}, [ isNavigationOpen ] );
 
+	const isMobile = useViewportMatch( 'medium', '<' );
+
 	return (
 		<>
 			<EditorStyles styles={ settings.styles } />
@@ -215,7 +222,36 @@ function Editor() {
 														<NavigationSidebar />
 													}
 													leftSidebar={
-														<LeftSidebar />
+														isInserterOpen ? (
+															<div className="edit-site-editor__inserter-panel">
+																<div className="edit-site-editor__inserter-panel-header">
+																	<Button
+																		icon={
+																			close
+																		}
+																		onClick={ () =>
+																			setIsInserterOpened(
+																				false
+																			)
+																		}
+																	/>
+																</div>
+																<div className="edit-site-editor__inserter-panel-content">
+																	<Library
+																		showInserterHelpPanel
+																		onSelect={ () => {
+																			if (
+																				isMobile
+																			) {
+																				setIsInserterOpened(
+																					false
+																				);
+																			}
+																		} }
+																	/>
+																</div>
+															</div>
+														) : null
 													}
 													sidebar={
 														sidebarIsOpened && (

@@ -88,7 +88,6 @@ html.interface-interface-skeleton__html-container {
 .interface-interface-skeleton__left-sidebar,
 .interface-interface-skeleton__sidebar {
 	display: block;
-	width: auto; // Keep the sidebar width flexible.
 	flex-shrink: 0;
 	position: absolute;
 	z-index: z-index(".interface-interface-skeleton__sidebar");
@@ -103,6 +102,7 @@ html.interface-interface-skeleton__html-container {
 	@include break-medium() {
 		position: relative !important;
 		z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
+		width: auto; // Keep the sidebar width flexible.
 	}
 }
 

@@ -6,10 +6,12 @@
 	box-sizing: border-box;
 	width: 100%;
 
-	padding-left: 60px;
-	transition: padding-left 20ms linear;
-	transition-delay: 80ms;
-	@include reduce-motion("transition");
+	@include break-medium() {
+		padding-left: 60px;
+		transition: padding-left 20ms linear;
+		transition-delay: 80ms;
+		@include reduce-motion("transition");
+	}
 
 	.edit-site-header_start,
 	.edit-site-header_end {
@@ -17,10 +19,18 @@
 		display: flex;
 	}
 
-	.edit-site-header_start {
-		// Flex basis prevents the header_start toolbar
-		// from collapsing when shrinking the viewport.
-		flex-basis: calc(#{$header-toolbar-min-width} - #{$header-height});
+	@include break-medium() {
+		.edit-site-header_start {
+			// Flex basis prevents the header_start toolbar
+			// from collapsing when shrinking the viewport.
+			flex-basis: calc(#{$header-toolbar-min-width} - #{$header-height});
+		}
+
+		.edit-site-header_end {
+			// Flex basis prevents the header_end toolbar
+			// from collapsing when shrinking the viewport
+			flex-basis: $header-toolbar-min-width;
+		}
 	}
 
 	.edit-site-header_center {
@@ -36,9 +46,6 @@
 	}
 
 	.edit-site-header_end {
-		// Flex basis prevents the header_end toolbar
-		// from collapsing when shrinking the viewport
-		flex-basis: $header-toolbar-min-width;
 		justify-content: flex-end;
 	}
 }
@@ -58,8 +65,16 @@ body.is-navigation-sidebar-open {
 
 .edit-site-header__toolbar {
 	display: flex;
-	padding-left: $grid-unit-30;
 	align-items: center;
+	padding-left: $grid-unit-10;
+
+	@include break-small() {
+		padding-left: $grid-unit-30;
+	}
+
+	@include break-wide() {
+		padding-right: $grid-unit-10;
+	}
 
 	.edit-site-header-toolbar__inserter-toggle {
 		margin-right: $grid-unit-10;
@@ -89,6 +104,14 @@ body.is-navigation-sidebar-open {
 	flex-wrap: wrap;
 	padding-right: $grid-unit-05;
 
+	.interface-pinned-items {
+		display: none;
+
+		@include break-medium() {
+			display: block;
+		}
+	}
+
 	// Adjust button paddings to scale better to mobile.
 	.editor-post-saved-state,
 	.components-button.components-button {
@@ -101,7 +124,7 @@ body.is-navigation-sidebar-open {
 
 	.editor-post-saved-state,
 	.components-button.is-tertiary {
-		padding: 0 #{ $grid-unit-15 / 2 };
+		padding: 0 #{$grid-unit-15 / 2};
 	}
 
 	.edit-site-more-menu .components-button,
@@ -109,7 +132,7 @@ body.is-navigation-sidebar-open {
 		margin-right: 0;
 	}
 
-	@include break-small () {
+	@include break-small() {
 		padding-right: $grid-unit-20;
 	}
 }
