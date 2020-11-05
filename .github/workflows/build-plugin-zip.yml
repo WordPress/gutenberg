@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    name: Upload Release Asset
+    name: Build Release Artifact
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
