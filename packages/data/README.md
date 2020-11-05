@@ -705,8 +705,7 @@ not change because the dependency is just the currency.
 
 _Parameters_
 
--   _storeKey_ `Array`: If provided, this invokes mapSelect only when specific stores change, not the entire registry.
--   _\_mapSelect_ `Function`: Function called on every state change. The returned value is exposed to the component implementing this hook. If `storeKey` is provided, The function receives the `registry.select( storeKey )` object. Otherwise it receices the `registry.select` method on the first argument and the `registry` on the second argument.
+-   _\_mapSelect_ `Function`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument.
 -   _deps_ `Array`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_
