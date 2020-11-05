@@ -17,6 +17,10 @@
 			"type": "boolean",
 			"default": false
 		},
+		"backgroundSize": {
+			"type": "string",
+			"enum": [ "cover", "contain", "initial", "custom" ]
+		},
 		"dimRatio": {
 			"type": "number",
 			"default": 50

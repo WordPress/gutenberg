@@ -289,6 +289,7 @@ function CoverEdit( {
 		contentPosition,
 		id,
 		backgroundType,
+		backgroundSize,
 		dimRatio,
 		focalPoint,
 		hasParallax,
@@ -341,6 +342,7 @@ function CoverEdit( {
 		...( isImageBackground ? backgroundImageStyles( url ) : {} ),
 		backgroundColor: overlayColor.color,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
+		backgroundSize,
 	};
 
 	if ( gradientValue && ! url ) {
@@ -403,7 +405,14 @@ function CoverEdit( {
 									onChange={ toggleIsRepeated }
 								/>
 
-								<BackgroundSizeControl />
+								<BackgroundSizeControl
+									size={ backgroundSize }
+									onSelect={ ( newSize ) =>
+										setAttributes( {
+											backgroundSize: newSize,
+										} )
+									}
+								/>
 							</Fragment>
 						) }
 						{ showFocalPointPicker && (
