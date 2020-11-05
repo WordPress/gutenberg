@@ -19,7 +19,12 @@ import useTemplateInfo from '../../../hooks/use-template-info';
 export default function TemplateNavigationItem( { item } ) {
 	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
 	const [ isPreviewVisible, setIsPreviewVisible ] = useState( false );
-	const { title, description } = useTemplateInfo( item );
+
+	let { title, description } = useTemplateInfo( item );
+	if ( 'wp_template_part' === item.type ) {
+		title = item?.slug;
+		description = '';
+	}
 
 	if ( ! item ) {
 		return null;

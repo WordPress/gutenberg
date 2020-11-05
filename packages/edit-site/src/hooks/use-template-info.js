@@ -25,10 +25,6 @@ export default function useTemplateInfo( template ) {
 		return {};
 	}
 
-	if ( 'wp_template_part' === template.type ) {
-		return { title: template.slug, description: '' };
-	}
-
 	const { title: defaultTitle, description: defaultDescription } =
 		find( defaultTemplateTypes, { slug: template?.slug } ) || {};
 
