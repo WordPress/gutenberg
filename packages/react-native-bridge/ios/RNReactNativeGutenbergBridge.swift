@@ -310,7 +310,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func rrequestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) {
+    func requestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) {
         DispatchQueue.main.async {
             self.delegate?.gutenbergDidRequestMediaFilesSaveCancelDialog(mediaFiles)
         }
