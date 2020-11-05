@@ -41,18 +41,16 @@ const renderQueue = createQueue();
  * In general, this custom React hook follows the
  * [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
  *
- * @param {Array}    storeKey    If provided, this invokes mapSelect only when
- *                               specific stores change, not the entire registry.
  * @param {Function} _mapSelect  Function called on every state change. The
  *                               returned value is exposed to the component
- *                               implementing this hook. If `storeKey` is provided,
- *                               The function receives the `registry.select( storeKey )`
- *                               object. Otherwise it receices the `registry.select` method
- *                               on the first argument and the `registry` on the second
+ *                               implementing this hook. The function receives
+ *                               the `registry.select` method on the first
+ *                               argument and the `registry` on the second
  *                               argument.
  * @param {Array}    deps        If provided, this memoizes the mapSelect so the
  *                               same `mapSelect` is invoked on every state
  *                               change unless the dependencies change.
+ *
  * @example
  * ```js
  * const { useSelect } = wp.data;
@@ -80,23 +78,9 @@ const renderQueue = createQueue();
  *
  * @return {Function}  A custom react hook.
  */
-export default function useSelect( storeKey, _mapSelect, deps ) {
-	if ( arguments.length < 3 ) {
-		// Backwards compatible signature
-		[ storeKey, _mapSelect, deps ] = [
-			null,
-			arguments[ 0 ],
-			arguments[ 1 ],
-		];
-	}
-	const mapSelect = useCallback(
-		_mapSelect,
-		storeKey ? [ storeKey ].concat( deps || [] ) : deps
-	);
+export default function useSelect( _mapSelect, deps ) {
+	const mapSelect = useCallback( _mapSelect, deps );
 	const registry = useRegistry();
-	if ( storeKey && ! registry.stores[ storeKey ] ) {
-		throw new Error( `Store ${ storeKey } is not registered` );
-	}
 	const isAsync = useAsyncMode();
 	// React can sometimes clear the `useMemo` cache.
 	// We use the cache-stable `useMemoOne` to avoid
@@ -117,10 +101,7 @@ export default function useSelect( storeKey, _mapSelect, deps ) {
 			latestMapSelect.current !== mapSelect ||
 			latestMapOutputError.current
 		) {
-			mapOutput = mapSelect(
-				storeKey ? registry.select( storeKey ) : registry.select,
-				registry
-			);
+			mapOutput = mapSelect( registry.select, registry );
 		} else {
 			mapOutput = latestMapOutput.current;
 		}
@@ -160,9 +141,7 @@ export default function useSelect( storeKey, _mapSelect, deps ) {
 			if ( isMountedAndNotUnsubscribing.current ) {
 				try {
 					const newMapOutput = latestMapSelect.current(
-						storeKey
-							? registry.select( storeKey )
-							: registry.select,
+						registry.select,
 						registry
 					);
 					if (
@@ -186,26 +165,20 @@ export default function useSelect( storeKey, _mapSelect, deps ) {
 			onStoreChange();
 		}
 
-		const onChange = () => {
+		const unsubscribe = registry.subscribe( () => {
 			if ( latestIsAsync.current ) {
 				renderQueue.add( queueContext, onStoreChange );
 			} else {
 				onStoreChange();
 			}
-		};
-		let unsubscribe;
-		if ( storeKey ) {
-			unsubscribe = registry.stores[ storeKey ].subscribe( onChange );
-		} else {
-			unsubscribe = registry.subscribe( onChange );
-		}
+		} );
 
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;
 			unsubscribe();
 			renderQueue.flush( queueContext );
 		};
-	}, [ registry, storeKey ] );
+	}, [ registry ] );
 
 	return mapOutput;
 }
