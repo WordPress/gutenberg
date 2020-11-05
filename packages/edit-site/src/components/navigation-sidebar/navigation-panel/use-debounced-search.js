@@ -32,8 +32,13 @@ export default function useDebouncedSearch() {
 	const onSearch = useCallback(
 		( value ) => {
 			setSearch( value );
-			debouncedSetSearchQuery( value );
-			setIsDebouncing( true );
+
+			if ( value.length >= 2 ) {
+				debouncedSetSearchQuery( value );
+				setIsDebouncing( true );
+			} else if ( value.length <= 1 ) {
+				setSearchQuery( '' );
+			}
 		},
 		[ setSearch, setIsDebouncing, debouncedSetSearchQuery ]
 	);
