@@ -133,23 +133,22 @@ describe( 'useSelect', () => {
 			const data = useSelect( mapSelectSpy, [] );
 			return <div data={ data } />;
 		};
-		let subscribedSpy, TestComponent;
+		let TestComponent;
 		const mapSelectSpy = jest.fn( ( select ) =>
 			select( 'testStore' ).testSelector()
 		);
 		const selectorSpy = jest.fn();
-		const subscribeCallback = ( subscription ) => {
-			subscribedSpy = subscription;
-		};
 
 		beforeEach( () => {
 			registry.registerStore( 'testStore', {
-				reducer: () => null,
+				actions: {
+					forceUpdate: () => ( { type: 'FORCE_UPDATE' } ),
+				},
+				reducer: ( state = {} ) => ( { ...state } ),
 				selectors: {
 					testSelector: selectorSpy,
 				},
 			} );
-			registry.subscribe = subscribeCallback;
 			TestComponent = getComponent( mapSelectSpy );
 		} );
 		afterEach( () => {
@@ -194,7 +193,7 @@ describe( 'useSelect', () => {
 				// subscription which should in turn trigger a re-render.
 				act( () => {
 					selectorSpy.mockReturnValue( valueB );
-					subscribedSpy();
+					registry.dispatch( 'testStore' ).forceUpdate();
 				} );
 				expect( testInstance.findByType( 'div' ).props.data ).toEqual(
 					valueB
@@ -202,5 +201,77 @@ describe( 'useSelect', () => {
 				expect( mapSelectSpy ).toHaveBeenCalledTimes( 3 );
 			}
 		);
+	} );
+
+	it( 'uses memoized selector if dependent stores do not change', () => {
+		const storeConfig = {
+			actions: {
+				increment: () => ( { type: 'INCREMENT' } ),
+			},
+			reducer: ( state, action ) => {
+				if ( ! state ) {
+					return { counter: 0 };
+				}
+				if ( action?.type === 'INCREMENT' ) {
+					return { counter: state.counter + 1 };
+				}
+				return state;
+			},
+			selectors: {
+				getCounter: ( state ) => state.counter,
+			},
+		};
+
+		registry.registerStore( 'store-1', storeConfig );
+		registry.registerStore( 'store-2', storeConfig );
+
+		let renderer;
+
+		const selectCount1 = jest.fn( ( select ) =>
+			select( 'store-1' ).getCounter()
+		);
+		const selectCount2 = jest.fn( ( select ) =>
+			select( 'store-2' ).getCounter()
+		);
+
+		const TestComponent = jest.fn( () => {
+			const count1 = useSelect( selectCount1, [] );
+			useSelect( selectCount2, [] );
+
+			return <div data={ count1 } />;
+		} );
+
+		act( () => {
+			renderer = TestRenderer.create(
+				<RegistryProvider value={ registry }>
+					<TestComponent />
+				</RegistryProvider>
+			);
+		} );
+
+		const testInstance = renderer.root;
+
+		expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
+		expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
+		expect( testInstance.findByType( 'div' ).props.data ).toBe( 0 );
+
+		act( () => {
+			registry.dispatch( 'store-2' ).increment();
+		} );
+
+		expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
+		expect( selectCount2 ).toHaveBeenCalledTimes( 3 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+		expect( testInstance.findByType( 'div' ).props.data ).toBe( 0 );
+
+		act( () => {
+			registry.dispatch( 'store-1' ).increment();
+		} );
+
+		expect( selectCount1 ).toHaveBeenCalledTimes( 3 );
+		expect( selectCount2 ).toHaveBeenCalledTimes( 3 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 3 );
+		expect( testInstance.findByType( 'div' ).props.data ).toBe( 1 );
 	} );
 } );
