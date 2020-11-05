@@ -5,6 +5,7 @@ import {
 	insertBlock,
 	createNewPost,
 	clickBlockToolbarButton,
+	clickMenuItem,
 	pressKeyWithModifier,
 	getEditedPostContent,
 	transformBlockTo,
@@ -77,11 +78,7 @@ describe( 'Block Grouping', () => {
 			await pressKeyWithModifier( 'primary', 'a' );
 
 			await clickBlockToolbarButton( 'More options' );
-
-			const groupButton = await page.waitForXPath(
-				'//button[text()="Group"]'
-			);
-			await groupButton.click();
+			await clickMenuItem( 'Group' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -94,19 +91,13 @@ describe( 'Block Grouping', () => {
 
 			// Group
 			await clickBlockToolbarButton( 'More options' );
-			const groupButton = await page.waitForXPath(
-				'//button[text()="Group"]'
-			);
-			await groupButton.click();
+			await clickMenuItem( 'Group' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 
 			// UnGroup
 			await clickBlockToolbarButton( 'More options' );
-			const unGroupButton = await page.waitForXPath(
-				'//button[text()="Ungroup"]'
-			);
-			await unGroupButton.click();
+			await clickMenuItem( 'Ungroup' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -115,7 +106,7 @@ describe( 'Block Grouping', () => {
 			await insertBlock( 'Group' );
 			await clickBlockToolbarButton( 'More options' );
 			const ungroupButtons = await page.$x(
-				'//button[text()="Ungroup"]'
+				'//button/span[text()="Ungroup"]'
 			);
 			expect( ungroupButtons ).toHaveLength( 0 );
 		} );
@@ -236,10 +227,7 @@ describe( 'Block Grouping', () => {
 			// as opposed to "transformTo()" which uses whatever is passed to it. To
 			// ensure this test is meaningful we must rely on what is registered.
 			await clickBlockToolbarButton( 'More options' );
-			const groupButton = await page.waitForXPath(
-				'//button[text()="Group"]'
-			);
-			await groupButton.click();
+			await clickMenuItem( 'Group' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
