@@ -16,18 +16,14 @@
  * @param string $content Template part content.
  */
 function create_auto_draft_for_template_part_block( $slug, $theme, $content ) {
-	// A published post might already exist if this template part
-	// was customized elsewhere or if it's part of a customized
-	// template. We also check if an auto-draft was already created
-	// because preloading can make this run twice, so, different code
-	// paths can end up with different posts for the same template part.
-	// E.g. The server could send back post ID 1 to the client, preload,
-	// and create another auto-draft. So, if the client tries to resolve the
-	// post ID from the slug and theme, it won't match with what the server sent.
+	// We check if an auto-draft was already created,
+	// before running the REST API calls
+	// because the site editor needs an existing auto-draft
+	// for each theme template part to work properly.
 	$template_part_query = new WP_Query(
 		array(
 			'post_type'      => 'wp_template_part',
-			'post_status'    => array( 'publish', 'auto-draft' ),
+			'post_status'    => array( 'auto-draft' ),
 			'title'          => $slug,
 			'meta_key'       => 'theme',
 			'meta_value'     => $theme,
@@ -59,7 +55,7 @@ function create_auto_draft_for_template_part_block( $slug, $theme, $content ) {
  *
  * @access private
  */
-function create_theme_template_parts() {
+function synchronize_theme_template_parts() {
 	/**
 	 * Finds all nested template part file paths in a theme's directory.
 	 *
@@ -111,7 +107,7 @@ class WP_REST_Template_Parts_Controller extends WP_REST_Posts_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		create_theme_template_parts();
+		synchronize_theme_template_parts();
 
 		return parent::get_items( $request );
 	}
@@ -123,7 +119,7 @@ class WP_REST_Template_Parts_Controller extends WP_REST_Posts_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( $request ) {
-		create_theme_template_parts();
+		synchronize_theme_template_parts();
 
 		return parent::get_items( $request );
 	}
