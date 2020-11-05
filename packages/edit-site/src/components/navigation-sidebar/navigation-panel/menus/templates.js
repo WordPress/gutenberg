@@ -35,8 +35,9 @@ import useDebouncedSearch from '../use-debounced-search';
 export default function TemplatesMenu() {
 	const {
 		search,
-		debouncing,
-		menuProps: searchMenuProps,
+		searchQuery,
+		onSearch,
+		isDebouncing,
 	} = useDebouncedSearch();
 
 	const templates = useSelect(
@@ -44,9 +45,9 @@ export default function TemplatesMenu() {
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
 				status: [ 'publish', 'auto-draft' ],
 				per_page: -1,
-				search,
+				search: searchQuery,
 			} ),
-		[ search ]
+		[ searchQuery ]
 	);
 
 	const generalTemplates = templates?.filter( ( { slug } ) =>
@@ -59,10 +60,15 @@ export default function TemplatesMenu() {
 			title={ __( 'Templates' ) }
 			titleAction={ <NewTemplateDropdown /> }
 			parentMenu={ MENU_ROOT }
-			{ ...searchMenuProps }
+			hasSearch={ true }
+			onSearch={ onSearch }
+			search={ search }
 		>
 			{ search && (
-				<SearchResults items={ templates } debouncing={ debouncing }>
+				<SearchResults
+					items={ templates }
+					isDebouncing={ isDebouncing }
+				>
 					{ map( templates, ( template ) => (
 						<TemplateNavigationItem
 							item={ template }

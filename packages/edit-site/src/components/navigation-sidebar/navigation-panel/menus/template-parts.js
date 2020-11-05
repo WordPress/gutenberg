@@ -24,8 +24,9 @@ import useDebouncedSearch from '../use-debounced-search';
 export default function TemplatePartsMenu() {
 	const {
 		search,
-		debouncing,
-		menuProps: searchMenuProps,
+		searchQuery,
+		onSearch,
+		isDebouncing,
 	} = useDebouncedSearch();
 
 	const templateParts = useSelect(
@@ -37,7 +38,7 @@ export default function TemplatePartsMenu() {
 					{
 						status: [ 'publish', 'auto-draft' ],
 						per_page: -1,
-						search,
+						search: searchQuery,
 					}
 				) || [];
 			const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
@@ -47,7 +48,7 @@ export default function TemplatePartsMenu() {
 					item.wp_theme_slug === currentTheme
 			);
 		},
-		[ search ]
+		[ searchQuery ]
 	);
 
 	return (
@@ -55,12 +56,14 @@ export default function TemplatePartsMenu() {
 			menu={ MENU_TEMPLATE_PARTS }
 			title={ __( 'Template Parts' ) }
 			parentMenu={ MENU_ROOT }
-			{ ...searchMenuProps }
+			hasSearch={ true }
+			onSearch={ onSearch }
+			search={ search }
 		>
 			{ search && (
 				<SearchResults
 					items={ templateParts }
-					debouncing={ debouncing }
+					isDebouncing={ isDebouncing }
 				>
 					{ map( templateParts, ( templatePart ) => (
 						<TemplateNavigationItem

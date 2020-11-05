@@ -7,8 +7,8 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function SearchResults( { items, debouncing, children } ) {
-	const loading = items === null || debouncing;
+export default function SearchResults( { items, isDebouncing, children } ) {
+	const loading = items === null || isDebouncing;
 
 	return (
 		<NavigationGroup title={ __( 'Search results' ) }>

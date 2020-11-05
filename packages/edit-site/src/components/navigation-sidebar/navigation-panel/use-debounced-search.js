@@ -6,7 +6,7 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useMemo, useEffect } from '@wordpress/element';
+import { useState, useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -14,36 +14,34 @@ import { useState, useCallback, useMemo, useEffect } from '@wordpress/element';
 import { SEARCH_DEBOUNCE_IN_MS } from './constants';
 
 export default function useDebouncedSearch() {
-	const [ searchInput, setSearchInput ] = useState( '' );
+	// The value used by the NavigationMenu to control the input field.
 	const [ search, setSearch ] = useState( '' );
-	const [ debouncing, setDebouncing ] = useState( false );
+	// The value used to actually perform the search query.
+	const [ searchQuery, setSearchQuery ] = useState( '' );
+	const [ isDebouncing, setIsDebouncing ] = useState( false );
 
 	useEffect( () => {
-		setDebouncing( false );
-	}, [ search ] );
+		setIsDebouncing( false );
+	}, [ searchQuery ] );
 
-	const debouncedSetSearch = useCallback(
-		debounce( setSearch, SEARCH_DEBOUNCE_IN_MS ),
-		[ setSearch ]
+	const debouncedSetSearchQuery = useCallback(
+		debounce( setSearchQuery, SEARCH_DEBOUNCE_IN_MS ),
+		[ setSearchQuery ]
 	);
 
-	const handleOnSearch = useCallback(
+	const onSearch = useCallback(
 		( value ) => {
-			setSearchInput( value );
-			debouncedSetSearch( value );
-			setDebouncing( true );
+			setSearch( value );
+			debouncedSetSearchQuery( value );
+			setIsDebouncing( true );
 		},
-		[ setSearchInput, debouncedSetSearch ]
+		[ setSearch, setIsDebouncing, debouncedSetSearchQuery ]
 	);
 
-	const menuProps = useMemo(
-		() => ( {
-			hasSearch: true,
-			onSearch: handleOnSearch,
-			search: searchInput,
-		} ),
-		[ handleOnSearch, searchInput ]
-	);
-
-	return { search, debouncing, menuProps };
+	return {
+		search,
+		searchQuery,
+		isDebouncing,
+		onSearch,
+	};
 }
