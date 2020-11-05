@@ -11,7 +11,7 @@ import icon from './icon';
 
 function BlockFullHeightAlignmentToolbar( {
 	isActive,
-	label = __( 'Full Height' ),
+	label = __( 'Toggle full height' ),
 	onToggle,
 } ) {
 	return (
