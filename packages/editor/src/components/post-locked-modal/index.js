@@ -96,6 +96,7 @@ class PostLockedModal extends Component {
 				isTakeover: true,
 				user: {
 					avatar: received.lock_error.avatar_src,
+					text: received.lock_error.text,
 				},
 			} );
 		} else if ( received.new_lock ) {
@@ -143,7 +144,7 @@ class PostLockedModal extends Component {
 			return null;
 		}
 
-		const userDisplayName = user.name;
+		const userTakeoverText = user.text;
 		const userAvatar = user.avatar;
 
 		const unlockUrl = addQueryArgs( 'post.php', {
@@ -180,13 +181,12 @@ class PostLockedModal extends Component {
 				{ !! isTakeover && (
 					<div>
 						<div>
-							{ userDisplayName
+							{ userTakeoverText
 								? sprintf(
-										/* translators: %s: user's display name */
 										__(
-											'%s now has editing control of this post. Don’t worry, your changes up to this moment have been saved.'
+											'%s Don’t worry, your changes up to this moment have been saved.'
 										),
-										userDisplayName
+										userTakeoverText
 								  )
 								: __(
 										'Another user now has editing control of this post. Don’t worry, your changes up to this moment have been saved.'
