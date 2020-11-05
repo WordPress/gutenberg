@@ -179,7 +179,7 @@ export default function Sandbox( {
 		trySandbox();
 
 		function tryNoForceSandbox() {
-			this.trySandbox( false );
+			trySandbox( false );
 		}
 
 		function checkMessageForResize( event ) {
