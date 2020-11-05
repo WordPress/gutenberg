@@ -71,6 +71,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		};
 	};
 
+	let recordSelectStores = false;
+	const selectStores = new Set();
 	/**
 	 * Calls a selector given the current state and extra arguments.
 	 *
@@ -80,6 +82,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * @return {*} The selector's returned value.
 	 */
 	function select( reducerKey ) {
+		if ( recordSelectStores ) {
+			selectStores.add( reducerKey );
+		}
 		const store = stores[ reducerKey ];
 		if ( store ) {
 			return store.getSelectors();
@@ -128,6 +133,16 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		},
 		{ maxSize: 1 }
 	);
+
+	function __experimentalStartRecordingSelectStores() {
+		recordSelectStores = true;
+	}
+	function __experimentalStopRecordingSelectStores() {
+		recordSelectStores = false;
+		const retval = Array.from( selectStores );
+		selectStores.clear();
+		return retval;
+	}
 
 	/**
 	 * Given the name of a registered store, returns an object containing the store's
@@ -248,5 +263,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		parent.subscribe( globalListener );
 	}
 
-	return withPlugins( registry );
+	const final = withPlugins( registry );
+
+	final.__experimentalStartRecordingSelectStores = __experimentalStartRecordingSelectStores;
+	final.__experimentalStopRecordingSelectStores = __experimentalStopRecordingSelectStores;
+	return final;
 }

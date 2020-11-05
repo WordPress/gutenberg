@@ -80,23 +80,72 @@ const renderQueue = createQueue();
  *
  * @return {Function}  A custom react hook.
  */
-export default function useSelect( storeKey, _mapSelect, deps ) {
-	if ( arguments.length < 3 ) {
-		// Backwards compatible signature
-		[ storeKey, _mapSelect, deps ] = [
-			null,
-			arguments[ 0 ],
-			arguments[ 1 ],
-		];
-	}
-	const mapSelect = useCallback(
-		_mapSelect,
-		storeKey ? [ storeKey ].concat( deps || [] ) : deps
-	);
+export default function useStoreSelect( _mapSelect, deps = [] ) {
+	const dependentStores = useRef( {} );
+
 	const registry = useRegistry();
-	if ( storeKey && ! registry.stores[ storeKey ] ) {
-		throw new Error( `Store ${ storeKey } is not registered` );
-	}
+	const onStoreChange = useCallback( () => {
+		if ( isMountedAndNotUnsubscribing.current ) {
+			try {
+				const newMapOutput = latestMapSelect.current(
+					registry.select( registry.select, registry )
+				);
+				if ( isShallowEqual( latestMapOutput.current, newMapOutput ) ) {
+					return;
+				}
+				latestMapOutput.current = newMapOutput;
+			} catch ( error ) {
+				latestMapOutputError.current = error;
+			}
+			forceRender();
+		}
+	}, [ registry ] );
+
+	// @TODO memoize
+	const onChange = () => {
+		if ( latestIsAsync.current ) {
+			renderQueue.add( queueContext, onStoreChange );
+		} else {
+			onStoreChange();
+		}
+	};
+
+	const updateSubscriptions = useCallback( ( next ) => {
+		const current = [ ...Object.keys( dependentStores.current ) ];
+		const nextSet = new Set( next );
+		for ( const storeKey in dependentStores.current ) {
+			if ( ! nextSet.has( storeKey ) ) {
+				// Unsubscribe
+				dependentStores.current[ storeKey ]();
+				delete dependentStores.current[ storeKey ];
+			}
+		}
+		for ( const storeKey of nextSet ) {
+			if ( ! ( storeKey in dependentStores.current ) ) {
+				// Subscribe
+				dependentStores.current[ storeKey ] = registry.stores[
+					storeKey
+				].subscribe( onChange );
+			}
+		}
+	}, [] );
+
+	/**
+	 * Call the original mapSelect with a Proxy object,
+	 * each used selector will be
+	 */
+	const mapSelect = useCallback(
+		( select, registry ) => {
+			registry.__experimentalStartRecordingSelectStores();
+			const retval = _mapSelect( select, registry );
+			updateSubscriptions(
+				registry.__experimentalStopRecordingSelectStores()
+			);
+			return retval;
+		},
+		deps // @TODO: account for a different _mapSelect ?
+	);
+
 	const isAsync = useAsyncMode();
 	// React can sometimes clear the `useMemo` cache.
 	// We use the cache-stable `useMemoOne` to avoid
@@ -117,10 +166,7 @@ export default function useSelect( storeKey, _mapSelect, deps ) {
 			latestMapSelect.current !== mapSelect ||
 			latestMapOutputError.current
 		) {
-			mapOutput = mapSelect(
-				storeKey ? registry.select( storeKey ) : registry.select,
-				registry
-			);
+			mapOutput = mapSelect( registry.select, registry );
 		} else {
 			mapOutput = latestMapOutput.current;
 		}
@@ -156,56 +202,18 @@ export default function useSelect( storeKey, _mapSelect, deps ) {
 	} );
 
 	useIsomorphicLayoutEffect( () => {
-		const onStoreChange = () => {
-			if ( isMountedAndNotUnsubscribing.current ) {
-				try {
-					const newMapOutput = latestMapSelect.current(
-						storeKey
-							? registry.select( storeKey )
-							: registry.select,
-						registry
-					);
-					if (
-						isShallowEqual( latestMapOutput.current, newMapOutput )
-					) {
-						return;
-					}
-					latestMapOutput.current = newMapOutput;
-				} catch ( error ) {
-					latestMapOutputError.current = error;
-				}
-				forceRender();
-			}
-		};
-
 		// catch any possible state changes during mount before the subscription
 		// could be set.
-		if ( latestIsAsync.current ) {
-			renderQueue.add( queueContext, onStoreChange );
-		} else {
-			onStoreChange();
-		}
-
-		const onChange = () => {
-			if ( latestIsAsync.current ) {
-				renderQueue.add( queueContext, onStoreChange );
-			} else {
-				onStoreChange();
-			}
-		};
-		let unsubscribe;
-		if ( storeKey ) {
-			unsubscribe = registry.stores[ storeKey ].subscribe( onChange );
-		} else {
-			unsubscribe = registry.subscribe( onChange );
-		}
-
+		onChange();
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;
-			unsubscribe();
 			renderQueue.flush( queueContext );
+			for ( const storeKey in dependentStores.current ) {
+				dependentStores.current[ storeKey ]();
+				delete dependentStores.current[ storeKey ];
+			}
 		};
-	}, [ registry, storeKey ] );
+	}, [ registry ] );
 
 	return mapOutput;
 }

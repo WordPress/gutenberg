@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { EntitiesSavedStates, PostPublishPanel } from '@wordpress/editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect, useStoreSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback } from '@wordpress/element';
@@ -22,21 +22,20 @@ export default function ActionsPanel( {
 	);
 	const {
 		publishSidebarOpened,
-		hasActiveMetaboxes,
+		hasMetaBoxes: hasActiveMetaboxes,
 		isSavingMetaBoxes,
-		hasNonPostEntityChanges,
-	} = useSelect( ( select ) => {
-		return {
-			publishSidebarOpened: select(
-				'core/edit-post'
-			).isPublishSidebarOpened(),
-			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isSavingMetaBoxes: select( 'core/edit-post' ).isSavingMetaBoxes(),
-			hasNonPostEntityChanges: select(
-				'core/editor'
-			).hasNonPostEntityChanges(),
-		};
-	}, [] );
+	} = useStoreSelect( 'core/edit-post', [
+		'isPublishSidebarOpened',
+		'hasMetaBoxes',
+		'isSavingMetaBoxes',
+	] );
+
+	const { hasNonPostEntityChanges } = useStoreSelect(
+		'core/editor',
+		( x ) => ( {
+			hasNonPostEntityChanges: x.hasNonPostEntityChanges(),
+		} )
+	);
 
 	const openEntitiesSavedStates = useCallback(
 		() => setEntitiesSavedStatesCallback( true ),

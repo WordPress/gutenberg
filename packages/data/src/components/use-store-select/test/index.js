@@ -8,9 +8,9 @@ import TestRenderer, { act } from 'react-test-renderer';
  */
 import { createRegistry } from '../../../registry';
 import { RegistryProvider } from '../../registry-provider';
-import useSelect from '../index';
+import useStoreSelect from '../index';
 
-describe( 'useSelect', () => {
+describe( 'useStoreSelect', () => {
 	let registry;
 	beforeEach( () => {
 		registry = createRegistry();
@@ -21,7 +21,7 @@ describe( 'useSelect', () => {
 		mapSelectSpy.mockImplementation( ( select ) => ( {
 			results: select( 'testStore' ).testSelector( props.keyName ),
 		} ) );
-		const data = useSelect( mapSelectSpy, [ dependencies ] );
+		const data = useStoreSelect( mapSelectSpy, [ dependencies ] );
 		return <div>{ data.results }</div>;
 	};
 
@@ -69,7 +69,7 @@ describe( 'useSelect', () => {
 		const selectSpyBar = jest.fn().mockImplementation( () => 'bar' );
 		const TestComponent = jest.fn().mockImplementation( ( props ) => {
 			const mapSelect = props.change ? selectSpyFoo : selectSpyBar;
-			const data = useSelect( mapSelect, [ props.keyName ] );
+			const data = useStoreSelect( mapSelect, [ props.keyName ] );
 			return <div>{ data }</div>;
 		} );
 		let renderer;
@@ -130,7 +130,7 @@ describe( 'useSelect', () => {
 	} );
 	describe( 'rerenders as expected with various mapSelect return types', () => {
 		const getComponent = ( mapSelectSpy ) => () => {
-			const data = useSelect( mapSelectSpy, [] );
+			const data = useStoreSelect( mapSelectSpy, [] );
 			return <div data={ data } />;
 		};
 		let subscribedSpy, TestComponent;
@@ -202,5 +202,80 @@ describe( 'useSelect', () => {
 				expect( mapSelectSpy ).toHaveBeenCalledTimes( 3 );
 			}
 		);
+	} );
+
+	it( 'uses memoized selector if dependent stores do not change', async () => {
+		const storeConfig = {
+			actions: {
+				increment: () => ( { type: 'INCREMENT' } ),
+			},
+			reducer: ( state, action ) => {
+				if ( ! state ) {
+					return { counter: 0 };
+				}
+				if ( action?.type === 'INCREMENT' ) {
+					return { counter: state.counter + 1 };
+				}
+				return state;
+			},
+			selectors: {
+				getCounter: ( state ) => state.counter,
+			},
+		};
+		registry.registerStore( 'store-1', storeConfig );
+		registry.registerStore( 'store-2', storeConfig );
+
+		const selectSpyFoo = jest
+			.fn()
+			.mockImplementation( ( { getCounter } ) => getCounter() );
+		const selectSpyBar = jest.fn().mockImplementation( () => 2 );
+		const TestComponent = jest.fn().mockImplementation( () => {
+			const data = useStoreSelect( 'store-1', selectSpyFoo, [] );
+			useStoreSelect( selectSpyBar, [] );
+			return <div>{ 'Counter: ' + data }</div>;
+		} );
+		let renderer;
+		act( () => {
+			renderer = TestRenderer.create(
+				<RegistryProvider value={ registry }>
+					<TestComponent keyName="foo" change={ true } />
+				</RegistryProvider>
+			);
+		} );
+		const testInstance = renderer.root;
+
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
+		expect( selectSpyBar ).toHaveBeenCalledTimes( 2 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
+
+		// ensure expected state was rendered
+		expect( testInstance.findByType( 'div' ).props ).toEqual( {
+			children: 'Counter: 0',
+		} );
+
+		// update related store
+		act( () => {
+			registry.dispatch( 'store-1' ).increment();
+		} );
+		// ensure both selectors were recomputed
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 3 );
+		expect( selectSpyBar ).toHaveBeenCalledTimes( 3 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+		expect( testInstance.findByType( 'div' ).props ).toEqual( {
+			children: 'Counter: 1',
+		} );
+
+		// update unrelated store
+		act( () => {
+			registry.dispatch( 'store-2' ).increment();
+		} );
+		// ensure the selector was not recomputed
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 3 );
+		// ensure the general selector was recomputed
+		expect( selectSpyBar ).toHaveBeenCalledTimes( 4 );
+		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
+		expect( testInstance.findByType( 'div' ).props ).toEqual( {
+			children: 'Counter: 1',
+		} );
 	} );
 } );
