@@ -25,6 +25,12 @@ import { useEffect, useState, useCallback, useMemo } from '@wordpress/element';
 import { getTermsInfo } from '../utils';
 import { MAX_FETCHED_TERMS } from '../constants';
 
+const stickyOptions = [
+	{ label: __( 'Include' ), value: '' },
+	{ label: __( 'Exclude' ), value: 'exclude' },
+	{ label: __( 'Only' ), value: 'only' },
+];
+
 export default function QueryInspectorControls( { query, setQuery } ) {
 	const {
 		order,
@@ -124,14 +130,6 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
-	const stickyOptions = useMemo( () => [
-		{
-			label: __( 'Include' ),
-			value: '',
-		},
-		{ label: __( 'Exclude' ), value: 'exclude' },
-		{ label: __( 'Only' ), value: 'only' },
-	] );
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>

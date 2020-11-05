@@ -64,10 +64,16 @@
 
 	// Position the icons correctly.
 	@include break-small() {
+		.components-toolbar-group .block-editor-block-mover-button,
+		.components-toolbar .block-editor-block-mover-button {
+			margin: 0 auto 0 0;
+		}
+
+		// Up button.
 		.components-toolbar-group .block-editor-block-mover-button.is-up-button,
 		.components-toolbar .block-editor-block-mover-button.is-up-button {
 			svg {
-				margin-bottom: -$grid-unit-10;
+				top: 5px;
 			}
 
 			// Focus style.
@@ -77,10 +83,11 @@
 			}
 		}
 
+		// Down button.
 		.components-toolbar-group .block-editor-block-mover-button.is-down-button,
 		.components-toolbar .block-editor-block-mover-button.is-down-button {
 			svg {
-				margin-top: -$grid-unit-10;
+				bottom: 5px;
 			}
 
 			// Focus style.

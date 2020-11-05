@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { kebabCase } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -26,6 +21,7 @@ const visitSiteEditor = async () => {
 		page: 'gutenberg-edit-site',
 	} ).slice( 1 );
 	await visitAdminPage( 'admin.php', query );
+	await page.waitForSelector( '.edit-site-visual-editor' );
 };
 
 const clickTemplateItem = async ( menus, itemName ) => {
@@ -185,7 +181,7 @@ describe( 'Multi-entity editor states', () => {
 			await trashAllPosts( 'wp_template_part' );
 			await createNewPost( {
 				postType: 'wp_template',
-				title: kebabCase( templateName ),
+				title: templateName,
 			} );
 			await publishPost();
 			await createTemplatePart( templatePartName );
