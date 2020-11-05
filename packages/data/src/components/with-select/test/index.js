@@ -670,7 +670,7 @@ describe( 'withSelect', () => {
 		// - 1 on initial render
 		// - 1 on effect before subscription set.
 		// - 1 child subscription fires.
-		expect( childMapSelectToProps ).toHaveBeenCalledTimes( 3 );
+		expect( childMapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( parentMapSelectToProps ).toHaveBeenCalledTimes( 4 );
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 2 );
