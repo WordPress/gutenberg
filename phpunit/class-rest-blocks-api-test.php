@@ -45,17 +45,21 @@ class WP_REST_BlockAPI_Test extends WP_UnitTestCase {
 			dirname( __FILE__ ) . '/fixtures/long-content.html'
 		);
 
-		self::$test_block_post_id = wp_insert_post( array(
-			'post_type'    => 'post',
-			'post_status'  => 'publish',
-			'post_name'    => 'gutenberg-block-test',
-			'post_title'   => 'My cool block',
-			'post_content' => self::$demo_post_content,
-		) );
+		self::$test_block_post_id = wp_insert_post(
+			array(
+				'post_type'    => 'post',
+				'post_status'  => 'publish',
+				'post_name'    => 'gutenberg-block-test',
+				'post_title'   => 'My cool block',
+				'post_content' => self::$demo_post_content,
+			)
+		);
 
-		self::$editor_id = $factory->user->create( array(
-			'role' => 'editor',
-		) );
+		self::$editor_id = $factory->user->create(
+			array(
+				'role' => 'editor',
+			)
+		);
 	}
 
 	/**

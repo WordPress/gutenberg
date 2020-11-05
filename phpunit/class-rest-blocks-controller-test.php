@@ -84,7 +84,8 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					'title'   => 'My cool block',
 					'content' => '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->',
 				),
-			), $response->get_data()
+			),
+			$response->get_data()
 		);
 	}
 
@@ -103,7 +104,8 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'id'      => self::$post_id,
 				'title'   => 'My cool block',
 				'content' => '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->',
-			), $response->get_data()
+			),
+			$response->get_data()
 		);
 	}
 
@@ -129,7 +131,8 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'id'      => self::$post_id,
 				'title'   => 'New cool block',
 				'content' => '<!-- wp:core/paragraph --><p>Wow!</p><!-- /wp:core/paragraph -->',
-			), $response->get_data()
+			),
+			$response->get_data()
 		);
 	}
 
@@ -155,7 +158,8 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'id'      => self::$post_id,
 				'title'   => 'Updated cool block',
 				'content' => '<!-- wp:core/paragraph --><p>Nice!</p><!-- /wp:core/paragraph -->',
-			), $response->get_data()
+			),
+			$response->get_data()
 		);
 	}
 
@@ -178,7 +182,8 @@ class REST_Blocks_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					'title'   => 'My cool block',
 					'content' => '<!-- wp:core/paragraph --><p>Hello!</p><!-- /wp:core/paragraph -->',
 				),
-			), $response->get_data()
+			),
+			$response->get_data()
 		);
 	}
 
