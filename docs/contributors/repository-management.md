@@ -23,7 +23,7 @@ Any issues that are irrelevant or not actionable should be closed, because they 
 
 ### Labels
 
-All issues should have [one or more labels](https://github.com/WordPress/gutenberg/labels). 
+All issues should have [one or more labels](https://github.com/WordPress/gutenberg/labels).
 
 Workflow labels start with “Needs” and may be applied as needed. Ideally, each workflow label will have a group that follows it, such as the Accessibility Team for `Needs Accessibility Feedback`, the Testing Team for `Needs Testing`, etc.
 
@@ -60,24 +60,7 @@ To keep the issue list healthy, it needs to be triaged regularly. *Triage* is th
 
 Anyone can help triage, although you’ll need contributor permission on the Gutenberg repository to modify an issue’s labels or edit its title.
 
-Here are a couple places you can start:
-
-- [All Gutenberg issues without an assigned label](https://github.com/wordpress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc+no%3Alabel).
-- [The least recently updated Gutenberg issues](https://github.com/WordPress/gutenberg/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-asc).
-
-When reviewing issues, here are some steps you can perform:
-
-- First search for duplicates. If the issue is duplicate, close it by commenting with “Duplicate of #<original-id>” and add any relevant new details to the existing issue.
-- If the issue is missing labels, add some to better categorize it (requires proper permissions).
-- If the title doesn’t communicate the issue, edit it for clarity (requires proper permissions).
-- If it’s a bug report, test to confirm the report or add the `Needs Testing` label. If there is not enough information to confirm the report, add the `[Status] Needs More Info` label and ask for the details needed.
-- Remove the `[Status] Needs More Info` if the author of the issue has responded with enough details.
-- Close the issue with a note if it has a `[Status] Needs More Info` label but the author didn't respond in 2+ weeks.
-- If there was conversation on the issue but no actionable steps identified, follow up with the participants to see what’s actionable.
-- If you feel comfortable triaging the issue further, then you can also:
-  - Check that the bug report is valid by debugging it to see if you can track down the technical specifics.
-  - Check if the issue is missing some detail and see if you can fill in those details. For instance, if a bug report is missing visual detail, it’s helpful to reproduce the issue locally and upload a screenshot or GIF.
-
+See the [Triage Contributors guide](/docs/contributors/triage.md) for details.
 
 ## Pull Requests
 
@@ -87,6 +70,14 @@ Gutenberg follows a feature branch pull request workflow for all code and docume
 2. Make your changes, testing thoroughly.
 3. Commit your changes when you’re happy with them, and push the branch.
 4. Open your pull request.
+5. If you are a regular contributor with proper access, label and name your pull request appropriately (see below).
+
+For labeling and naming pull requests, here are guidelines to consider that make compiling the changelog more efficient and organized. These guidelines are particularly relevant for regular contributors. Don't let getting the following right be a blocker for sharing your work - mistakes are expected and easy to fix!
+
+- When working on experimental screens and features, apply the `[Type] Experimental` label instead of `Feature`, `Enhancement`, etc.
+- When working on new features to technical packages (scripts, create-block, adding  react hooks, etc), apply the `[Type] New API`  label instead of `Feature`, `Enhancement`, etc.
+- When fixing a bug or making an enhancement to an internal tool used in the project, apply the `[Type] Build Tooling` instead of `Bugs`, `Enhancement`, etc
+- In pull request titles, instead of describing the code change done to fix an issue, consider referring to the actual bug being fixed instead. For example: instead of saying "Check for nullable object in component", it would be preferable to say "Fix editor breakage when clicking the copy block button". 
 
 Along with this process, there are a few important points to mention:
 
@@ -108,11 +99,17 @@ Every pull request goes through a manual code review, in addition to automated t
 
 *As a contributor*, your responsibility is to learn from suggestions and iterate your pull request should it be needed based on feedback. Seek to collaborate and produce the best possible contribution to the greater whole.
 
+Code reviews are encouraged by everyone who is willing to attempt one. If you review a pull request and are confident in the changes, approve it. If you don't feel totally confident it is ready for merging, add your review with a comment that says it should have another set of eyes on it before final approval. This can help filter out obvious bugs and simplify reviews for core members. Following the later reviews will also help improve your reviewing confidence in the future.
+
+If you are not yet comfortable leaving a full review, try commenting on a PR. Questions about functionality or the reasoning behind a change are helpful too. You could also comment on changes to parts of the code you understand, without leaving a full review.
+
 ### Design Review
 
-If your pull request impacts the design, you can ask for a designer to review. Most pull requests that have an impact on design are reviewed. However, you can request a design review on something by adding the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label. As a guide, this could be:
+If your pull request impacts the design/UI, you need to label appropriately to alert design. To request a design review, add the [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) label to your PR. If there are any PRs that require an update to the design/UI, please use the [Figma Library Update](https://github.com/WordPress/gutenberg/labels/Figma%20Library%20Update) label.
 
-- Something based on a previous design, to check is as that design.
+As a guide, changes that should be reviewed:
+
+- A change based on a previous design, to confirm the design is still valid with the change.
 - Anything that changes something visually.
 - If you just want design feedback on an idea or exploration.
 
@@ -130,7 +127,10 @@ A pull request can generally be merged once it is:
 
 The final pull request merge decision is made by the **@wordpress/gutenberg-core** team.
 
-Please make sure to assign your merged pull request to its release milestone. Doing so creates the historical legacy of what code landed when, and makes it possible for all project contributors (even non-technical ones) to access this information.
+All members of the WordPress organization on GitHub have the ability to review and merge pull requests. If you have reviewed a PR and are confident in the code, approve the pull request and comment pinging **@wordpress/gutenberg-core** or a specific core member who has been involved in the PR. Once they confirm there are no objections, you are free to merge the PR into master.
+
+Most pull requests will be automatically assigned a release milestone, but please make sure your merged pull request was assigned one. Doing so creates the historical legacy of what code landed when, and makes it possible for all project contributors (even non-technical ones) to access this information.
+
 
 ### Closing Pull Requests
 
@@ -149,6 +149,16 @@ If you’d like a template to follow:
 > I’m closing this pull request because ____. To clarify further, ____.
 >
 > For more details, please see ____ and ____.
+
+## Teams
+
+Two GitHub teams are used in the project.
+
+* [Gutenberg Core](https://github.com/orgs/WordPress/teams/gutenberg-core): A team composed of people that are actively involved in the project: attending meetings regularly, participating in triage sessions, performing reviews regularly, working on features and bug fixes and performing plugin and npm releases.
+
+* [Gutenberg](https://github.com/orgs/WordPress/teams/gutenberg): A team composed of contributors with at least 2–3 meaningful contributions to the project.
+
+If you meet this criteria of several meaningful contributions having been accepted into the repository and would like to be added to the Gutenberg team, feel free to ask in the [#core-editor Slack channel](https://make.wordpress.org/chat/).
 
 ## Projects
 

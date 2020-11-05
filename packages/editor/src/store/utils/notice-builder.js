@@ -67,10 +67,12 @@ export function getNotificationArgumentsForSaveSuccess( data ) {
 			noticeMessage,
 			{
 				id: SAVE_POST_NOTICE_ID,
+				type: 'snackbar',
 				actions,
 			},
 		];
 	}
+
 	return [];
 }
 
@@ -95,15 +97,26 @@ export function getNotificationArgumentsForSaveFail( data ) {
 	// If the post was being published, we show the corresponding publish error message
 	// Unless we publish an "updating failed" message
 	const messages = {
-		publish: __( 'Publishing failed' ),
-		private: __( 'Publishing failed' ),
-		future: __( 'Scheduling failed' ),
+		publish: __( 'Publishing failed.' ),
+		private: __( 'Publishing failed.' ),
+		future: __( 'Scheduling failed.' ),
 	};
-	const noticeMessage = ! isPublished && publishStatus.indexOf( edits.status ) !== -1 ?
-		messages[ edits.status ] :
-		__( 'Updating failed' );
+	let noticeMessage =
+		! isPublished && publishStatus.indexOf( edits.status ) !== -1
+			? messages[ edits.status ]
+			: __( 'Updating failed.' );
 
-	return [ noticeMessage, { id: SAVE_POST_NOTICE_ID } ];
+	// Check if message string contains HTML. Notice text is currently only
+	// supported as plaintext, and stripping the tags may muddle the meaning.
+	if ( error.message && ! /<\/?[^>]*>/.test( error.message ) ) {
+		noticeMessage = [ noticeMessage, error.message ].join( ' ' );
+	}
+	return [
+		noticeMessage,
+		{
+			id: SAVE_POST_NOTICE_ID,
+		},
+	];
 }
 
 /**
@@ -115,9 +128,11 @@ export function getNotificationArgumentsForSaveFail( data ) {
  */
 export function getNotificationArgumentsForTrashFail( data ) {
 	return [
-		data.error.message && data.error.code !== 'unknown_error' ?
-			data.error.message :
-			__( 'Trashing failed' ),
-		{ id: TRASH_POST_NOTICE_ID },
+		data.error.message && data.error.code !== 'unknown_error'
+			? data.error.message
+			: __( 'Trashing failed' ),
+		{
+			id: TRASH_POST_NOTICE_ID,
+		},
 	];
 }

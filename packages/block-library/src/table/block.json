@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/table",
-	"category": "formatting",
+	"category": "text",
 	"attributes": {
 		"hasFixedLayout": {
 			"type": "boolean",
@@ -8,6 +9,12 @@
 		},
 		"backgroundColor": {
 			"type": "string"
+		},
+		"caption": {
+			"type": "string",
+			"source": "html",
+			"selector": "figcaption",
+			"default": ""
 		},
 		"head": {
 			"type": "array",
@@ -29,6 +36,16 @@
 							"type": "string",
 							"default": "td",
 							"source": "tag"
+						},
+						"scope": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "scope"
+						},
+						"align": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "data-align"
 						}
 					}
 				}
@@ -54,6 +71,16 @@
 							"type": "string",
 							"default": "td",
 							"source": "tag"
+						},
+						"scope": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "scope"
+						},
+						"align": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "data-align"
 						}
 					}
 				}
@@ -79,10 +106,25 @@
 							"type": "string",
 							"default": "td",
 							"source": "tag"
+						},
+						"scope": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "scope"
+						},
+						"align": {
+							"type": "string",
+							"source": "attribute",
+							"attribute": "data-align"
 						}
 					}
 				}
 			}
 		}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true,
+		"__experimentalSelector": ".wp-block-button > table"
 	}
 }

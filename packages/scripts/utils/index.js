@@ -2,39 +2,41 @@
  * Internal dependencies
  */
 const {
-	getCliArg,
-	getCliArgs,
-	hasCliArg,
+	getArgFromCLI,
+	getArgsFromCLI,
+	getFileArgsFromCLI,
+	getNodeArgsFromCLI,
+	hasArgInCLI,
+	hasFileArgInCLI,
 	spawnScript,
-	cleanUpArgs,
 } = require( './cli' );
 const {
 	getWebpackArgs,
 	hasBabelConfig,
+	getJestOverrideConfigFile,
 	hasJestConfig,
+	hasPrettierConfig,
+	hasPostCSSConfig,
 } = require( './config' );
-const {
-	fromConfigRoot,
-	hasProjectFile,
-} = require( './file' );
-const {
-	hasPackageProp,
-} = require( './package' );
-const {
-	camelCaseDash,
-} = require( './string' );
+const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
+const { hasPackageProp } = require( './package' );
 
 module.exports = {
-	camelCaseDash,
+	fromProjectRoot,
 	fromConfigRoot,
-	getCliArg,
-	getCliArgs,
+	getArgFromCLI,
+	getArgsFromCLI,
+	getFileArgsFromCLI,
+	getNodeArgsFromCLI,
 	getWebpackArgs,
 	hasBabelConfig,
-	hasCliArg,
+	hasArgInCLI,
+	hasFileArgInCLI,
+	getJestOverrideConfigFile,
 	hasJestConfig,
 	hasPackageProp,
+	hasPrettierConfig,
+	hasPostCSSConfig,
 	hasProjectFile,
 	spawnScript,
-	cleanUpArgs,
 };

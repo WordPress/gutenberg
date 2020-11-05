@@ -1,16 +1,24 @@
+/**
+ * External dependencies
+ */
+const { cosmiconfigSync } = require( 'cosmiconfig' );
+
+/**
+ * WordPress dependencies
+ */
+const defaultPrettierConfig = require( '@wordpress/prettier-config' );
+
+const { config: localPrettierConfig } =
+	cosmiconfigSync( 'prettier' ).search() || {};
+const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
+
 module.exports = {
-	parser: 'babel-eslint',
 	extends: [
-		require.resolve( './jsx-a11y.js' ),
-		require.resolve( './react.js' ),
-		require.resolve( './custom.js' ),
-		require.resolve( './esnext.js' ),
+		require.resolve( './recommended-with-formatting.js' ),
+		'plugin:prettier/recommended',
+		'prettier/react',
 	],
-	env: {
-		node: true,
-	},
-	globals: {
-		window: true,
-		document: true,
+	rules: {
+		'prettier/prettier': [ 'error', prettierConfig ],
 	},
 };

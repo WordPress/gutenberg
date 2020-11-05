@@ -8,49 +8,72 @@ import tinycolor from 'tinycolor2';
 /**
  * WordPress dependencies
  */
+import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import {
+	BaseControl,
+	Button,
 	FocalPointPicker,
-	IconButton,
 	PanelBody,
+	PanelRow,
 	RangeControl,
+	ResizableBox,
+	Spinner,
 	ToggleControl,
-	Toolbar,
 	withNotices,
+	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
+import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
-	InnerBlocks,
 	InspectorControls,
 	MediaPlaceholder,
-	MediaUpload,
-	MediaUploadCheck,
-	PanelColorSettings,
+	MediaReplaceFlow,
 	withColors,
-} from '@wordpress/editor';
-import { Component, createRef, Fragment } from '@wordpress/element';
+	ColorPalette,
+	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	__experimentalUseGradient,
+	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
+	__experimentalUnitControl as UnitControl,
+	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { withDispatch } from '@wordpress/data';
+import { cover as icon } from '@wordpress/icons';
+import { isBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
  */
-import icon from './icon';
+import {
+	attributesFromMedia,
+	IMAGE_BACKGROUND_TYPE,
+	VIDEO_BACKGROUND_TYPE,
+	COVER_MIN_HEIGHT,
+	CSS_UNITS,
+	backgroundImageStyles,
+	dimRatioToClass,
+	isContentPositionCenter,
+	getPositionClassName,
+} from './shared';
 
 /**
  * Module Constants
  */
-export const IMAGE_BACKGROUND_TYPE = 'image';
-export const VIDEO_BACKGROUND_TYPE = 'video';
 const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
 const INNER_BLOCKS_TEMPLATE = [
-	[ 'core/paragraph', {
-		align: 'center',
-		fontSize: 'large',
-		placeholder: __( 'Write title…' ),
-	} ],
+	[
+		'core/paragraph',
+		{
+			align: 'center',
+			fontSize: 'large',
+			placeholder: __( 'Write title…' ),
+		},
+	],
 ];
-const INNER_BLOCKS_ALLOWED_BLOCKS = [ 'core/button', 'core/heading', 'core/paragraph' ];
+
+const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 function retrieveFastAverageColor() {
 	if ( ! retrieveFastAverageColor.fastAverageColor ) {
@@ -59,320 +82,521 @@ function retrieveFastAverageColor() {
 	return retrieveFastAverageColor.fastAverageColor;
 }
 
-export function backgroundImageStyles( url ) {
-	return url ?
-		{ backgroundImage: `url(${ url })` } :
-		{};
+function CoverHeightInput( {
+	onChange,
+	onUnitChange,
+	unit = 'px',
+	value = '',
+} ) {
+	const [ temporaryInput, setTemporaryInput ] = useState( null );
+	const instanceId = useInstanceId( UnitControl );
+	const inputId = `block-cover-height-input-${ instanceId }`;
+	const isPx = unit === 'px';
+
+	const handleOnChange = ( unprocessedValue ) => {
+		const inputValue =
+			unprocessedValue !== ''
+				? parseInt( unprocessedValue, 10 )
+				: undefined;
+
+		if ( isNaN( inputValue ) && inputValue !== undefined ) {
+			setTemporaryInput( unprocessedValue );
+			return;
+		}
+		setTemporaryInput( null );
+		onChange( inputValue );
+		if ( inputValue === undefined ) {
+			onUnitChange();
+		}
+	};
+
+	const handleOnBlur = () => {
+		if ( temporaryInput !== null ) {
+			setTemporaryInput( null );
+		}
+	};
+
+	const inputValue = temporaryInput !== null ? temporaryInput : value;
+	const min = isPx ? COVER_MIN_HEIGHT : 0;
+
+	return (
+		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
+			<UnitControl
+				id={ inputId }
+				isResetValueOnUnitChange
+				min={ min }
+				onBlur={ handleOnBlur }
+				onChange={ handleOnChange }
+				onUnitChange={ onUnitChange }
+				step="1"
+				style={ { maxWidth: 80 } }
+				unit={ unit }
+				units={ CSS_UNITS }
+				value={ inputValue }
+			/>
+		</BaseControl>
+	);
 }
 
-export function dimRatioToClass( ratio ) {
-	return ( ratio === 0 || ratio === 50 ) ?
-		null :
-		'has-background-dim-' + ( 10 * Math.round( ratio / 10 ) );
+const RESIZABLE_BOX_ENABLE_OPTION = {
+	top: false,
+	right: false,
+	bottom: true,
+	left: false,
+	topRight: false,
+	bottomRight: false,
+	bottomLeft: false,
+	topLeft: false,
+};
+
+function ResizableCover( {
+	className,
+	onResizeStart,
+	onResize,
+	onResizeStop,
+	...props
+} ) {
+	const [ isResizing, setIsResizing ] = useState( false );
+
+	return (
+		<ResizableBox
+			className={ classnames( className, {
+				'is-resizing': isResizing,
+			} ) }
+			enable={ RESIZABLE_BOX_ENABLE_OPTION }
+			onResizeStart={ ( _event, _direction, elt ) => {
+				onResizeStart( elt.clientHeight );
+				onResize( elt.clientHeight );
+			} }
+			onResize={ ( _event, _direction, elt ) => {
+				onResize( elt.clientHeight );
+				if ( ! isResizing ) {
+					setIsResizing( true );
+				}
+			} }
+			onResizeStop={ ( _event, _direction, elt ) => {
+				onResizeStop( elt.clientHeight );
+				setIsResizing( false );
+			} }
+			minHeight={ COVER_MIN_HEIGHT }
+			{ ...props }
+		/>
+	);
 }
 
-class CoverEdit extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			isDark: false,
-		};
-		this.imageRef = createRef();
-		this.videoRef = createRef();
-		this.changeIsDarkIfRequired = this.changeIsDarkIfRequired.bind( this );
-	}
-
-	componentDidMount() {
-		this.handleBackgroundMode();
-	}
-
-	componentDidUpdate( prevProps ) {
-		this.handleBackgroundMode( prevProps );
-	}
-
-	render() {
-		const {
-			attributes,
-			setAttributes,
-			className,
-			noticeOperations,
-			noticeUI,
-			overlayColor,
-			setOverlayColor,
-		} = this.props;
-		const {
-			backgroundType,
-			dimRatio,
-			focalPoint,
-			hasParallax,
-			id,
-			url,
-		} = attributes;
-		const onSelectMedia = ( media ) => {
-			if ( ! media || ! media.url ) {
-				setAttributes( { url: undefined, id: undefined } );
+/**
+ * useCoverIsDark is a hook that returns a boolean variable specifying if the cover
+ * background is dark or not.
+ *
+ * @param {?string} url          Url of the media background.
+ * @param {?number} dimRatio     Transparency of the overlay color. If an image and
+ *                               color are set, dimRatio is used to decide what is used
+ *                               for background darkness checking purposes.
+ * @param {?string} overlayColor String containing the overlay color value if one exists.
+ * @param {?Object} elementRef   If a media background is set, elementRef should contain a reference to a
+ *                               dom element that renders that media.
+ *
+ * @return {boolean} True if the cover background is considered "dark" and false otherwise.
+ */
+function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
+	const [ isDark, setIsDark ] = useState( false );
+	useEffect( () => {
+		// If opacity is lower than 50 the dominant color is the image or video color,
+		// so use that color for the dark mode computation.
+		if ( url && dimRatio <= 50 && elementRef.current ) {
+			retrieveFastAverageColor().getColorAsync(
+				elementRef.current,
+				( color ) => {
+					setIsDark( color.isDark );
+				}
+			);
+		}
+	}, [ url, url && dimRatio <= 50 && elementRef.current, setIsDark ] );
+	useEffect( () => {
+		// If opacity is greater than 50 the dominant color is the overlay color,
+		// so use that color for the dark mode computation.
+		if ( dimRatio > 50 || ! url ) {
+			if ( ! overlayColor ) {
+				// If no overlay color exists the overlay color is black (isDark )
+				setIsDark( true );
 				return;
 			}
-			let mediaType;
-			// for media selections originated from a file upload.
-			if ( media.media_type ) {
-				if ( media.media_type === IMAGE_BACKGROUND_TYPE ) {
-					mediaType = IMAGE_BACKGROUND_TYPE;
-				} else {
-					// only images and videos are accepted so if the media_type is not an image we can assume it is a video.
-					// Videos contain the media type of 'file' in the object returned from the rest api.
-					mediaType = VIDEO_BACKGROUND_TYPE;
-				}
-			} else { // for media selections originated from existing files in the media library.
-				if (
-					media.type !== IMAGE_BACKGROUND_TYPE &&
-					media.type !== VIDEO_BACKGROUND_TYPE
-				) {
-					return;
-				}
-				mediaType = media.type;
-			}
-
-			setAttributes( {
-				url: media.url,
-				id: media.id,
-				backgroundType: mediaType,
-				...( mediaType === VIDEO_BACKGROUND_TYPE ?
-					{ focalPoint: undefined, hasParallax: undefined } :
-					{}
-				),
-			} );
-		};
-
-		const toggleParallax = () => {
-			setAttributes( {
-				hasParallax: ! hasParallax,
-				...( ! hasParallax ? { focalPoint: undefined } : {} ),
-			} );
-		};
-		const setDimRatio = ( ratio ) => setAttributes( { dimRatio: ratio } );
-
-		const style = {
-			...(
-				backgroundType === IMAGE_BACKGROUND_TYPE ?
-					backgroundImageStyles( url ) :
-					{}
-			),
-			backgroundColor: overlayColor.color,
-		};
-
-		if ( focalPoint ) {
-			style.backgroundPosition = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
+			setIsDark( tinycolor( overlayColor ).isDark() );
 		}
+	}, [ overlayColor, dimRatio > 50 || ! url, setIsDark ] );
+	useEffect( () => {
+		if ( ! url && ! overlayColor ) {
+			// Reset isDark
+			setIsDark( false );
+		}
+	}, [ ! url && ! overlayColor, setIsDark ] );
+	return isDark;
+}
 
-		const controls = (
-			<Fragment>
-				<BlockControls>
-					{ !! url && (
-						<Fragment>
-							<MediaUploadCheck>
-								<Toolbar>
-									<MediaUpload
-										onSelect={ onSelectMedia }
-										allowedTypes={ ALLOWED_MEDIA_TYPES }
-										value={ id }
-										render={ ( { open } ) => (
-											<IconButton
-												className="components-toolbar__control"
-												label={ __( 'Edit media' ) }
-												icon="edit"
-												onClick={ open }
-											/>
-										) }
-									/>
-								</Toolbar>
-							</MediaUploadCheck>
-						</Fragment>
-					) }
-				</BlockControls>
+function CoverEdit( {
+	attributes,
+	setAttributes,
+	isSelected,
+	noticeUI,
+	overlayColor,
+	setOverlayColor,
+	toggleSelection,
+	noticeOperations,
+} ) {
+	const {
+		contentPosition,
+		id,
+		backgroundType,
+		dimRatio,
+		focalPoint,
+		hasParallax,
+		isRepeated,
+		minHeight,
+		minHeightUnit,
+		style: styleAttribute,
+		url,
+	} = attributes;
+	const {
+		gradientClass,
+		gradientValue,
+		setGradient,
+	} = __experimentalUseGradient();
+	const onSelectMedia = attributesFromMedia( setAttributes );
+	const isBlogUrl = isBlobURL( url );
+
+	const toggleParallax = () => {
+		setAttributes( {
+			hasParallax: ! hasParallax,
+			...( ! hasParallax ? { focalPoint: undefined } : {} ),
+		} );
+	};
+
+	const toggleIsRepeated = () => {
+		setAttributes( {
+			isRepeated: ! isRepeated,
+		} );
+	};
+
+	const isDarkElement = useRef();
+	const isDark = useCoverIsDark(
+		url,
+		dimRatio,
+		overlayColor.color,
+		isDarkElement
+	);
+
+	const isImageBackground = IMAGE_BACKGROUND_TYPE === backgroundType;
+	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
+
+	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
+	const { removeAllNotices, createErrorNotice } = noticeOperations;
+
+	const minHeightWithUnit = minHeightUnit
+		? `${ minHeight }${ minHeightUnit }`
+		: minHeight;
+
+	const style = {
+		...( isImageBackground ? backgroundImageStyles( url ) : {} ),
+		backgroundColor: overlayColor.color,
+		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
+	};
+
+	if ( gradientValue && ! url ) {
+		style.background = gradientValue;
+	}
+
+	let positionValue;
+
+	if ( focalPoint ) {
+		positionValue = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
+		if ( isImageBackground ) {
+			style.backgroundPosition = positionValue;
+		}
+	}
+
+	const hasBackground = !! ( url || overlayColor.color || gradientValue );
+	const showFocalPointPicker =
+		isVideoBackground ||
+		( isImageBackground && ( ! hasParallax || isRepeated ) );
+
+	const controls = (
+		<>
+			<BlockControls>
+				{ hasBackground && (
+					<>
+						<BlockAlignmentMatrixToolbar
+							label={ __( 'Change content position' ) }
+							value={ contentPosition }
+							onChange={ ( nextPosition ) =>
+								setAttributes( {
+									contentPosition: nextPosition,
+								} )
+							}
+						/>
+
+						<MediaReplaceFlow
+							mediaId={ id }
+							mediaURL={ url }
+							allowedTypes={ ALLOWED_MEDIA_TYPES }
+							accept="image/*,video/*"
+							onSelect={ onSelectMedia }
+						/>
+					</>
+				) }
+			</BlockControls>
+			<InspectorControls>
 				{ !! url && (
-					<InspectorControls>
-						<PanelBody title={ __( 'Cover Settings' ) }>
-							{ IMAGE_BACKGROUND_TYPE === backgroundType && (
+					<PanelBody title={ __( 'Media settings' ) }>
+						{ isImageBackground && (
+							<Fragment>
 								<ToggleControl
-									label={ __( 'Fixed Background' ) }
+									label={ __( 'Fixed background' ) }
 									checked={ hasParallax }
 									onChange={ toggleParallax }
 								/>
-							) }
-							{ IMAGE_BACKGROUND_TYPE === backgroundType && ! hasParallax && (
-								<FocalPointPicker
-									label={ __( 'Focal Point Picker' ) }
-									url={ url }
-									value={ focalPoint }
-									onChange={ ( value ) => setAttributes( { focalPoint: value } ) }
+
+								<ToggleControl
+									label={ __( 'Repeated background' ) }
+									checked={ isRepeated }
+									onChange={ toggleIsRepeated }
 								/>
-							) }
-							<PanelColorSettings
-								title={ __( 'Overlay' ) }
-								initialOpen={ true }
-								colorSettings={ [ {
-									value: overlayColor.color,
-									onChange: setOverlayColor,
-									label: __( 'Overlay Color' ),
-								} ] }
+							</Fragment>
+						) }
+						{ showFocalPointPicker && (
+							<FocalPointPicker
+								label={ __( 'Focal point picker' ) }
+								url={ url }
+								value={ focalPoint }
+								onChange={ ( newFocalPoint ) =>
+									setAttributes( {
+										focalPoint: newFocalPoint,
+									} )
+								}
+							/>
+						) }
+						<PanelRow>
+							<Button
+								isSecondary
+								isSmall
+								className="block-library-cover__reset-button"
+								onClick={ () =>
+									setAttributes( {
+										url: undefined,
+										id: undefined,
+										backgroundType: undefined,
+										dimRatio: undefined,
+										focalPoint: undefined,
+										hasParallax: undefined,
+										isRepeated: undefined,
+									} )
+								}
 							>
+								{ __( 'Clear Media' ) }
+							</Button>
+						</PanelRow>
+					</PanelBody>
+				) }
+				{ hasBackground && (
+					<>
+						<PanelBody title={ __( 'Dimensions' ) }>
+							<CoverHeightInput
+								value={ temporaryMinHeight || minHeight }
+								unit={ minHeightUnit }
+								onChange={ ( newMinHeight ) =>
+									setAttributes( { minHeight: newMinHeight } )
+								}
+								onUnitChange={ ( nextUnit ) => {
+									setAttributes( {
+										minHeightUnit: nextUnit,
+									} );
+								} }
+							/>
+						</PanelBody>
+						<PanelColorGradientSettings
+							title={ __( 'Overlay' ) }
+							initialOpen={ true }
+							settings={ [
+								{
+									colorValue: overlayColor.color,
+									gradientValue,
+									onColorChange: setOverlayColor,
+									onGradientChange: setGradient,
+									label: __( 'Color' ),
+								},
+							] }
+						>
+							{ !! url && (
 								<RangeControl
-									label={ __( 'Background Opacity' ) }
+									label={ __( 'Opacity' ) }
 									value={ dimRatio }
-									onChange={ setDimRatio }
+									onChange={ ( newDimRation ) =>
+										setAttributes( {
+											dimRatio: newDimRation,
+										} )
+									}
 									min={ 0 }
 									max={ 100 }
 									step={ 10 }
 									required
 								/>
-							</PanelColorSettings>
-						</PanelBody>
-					</InspectorControls>
+							) }
+						</PanelColorGradientSettings>
+					</>
 				) }
-			</Fragment>
-		);
+			</InspectorControls>
+		</>
+	);
 
-		if ( ! url ) {
-			const placeholderIcon = <BlockIcon icon={ icon } />;
-			const label = __( 'Cover' );
+	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-cover__inner-container',
+		},
+		{
+			template: INNER_BLOCKS_TEMPLATE,
+			templateInsertUpdatesSelection: true,
+		}
+	);
 
-			return (
-				<Fragment>
-					{ controls }
+	if ( ! hasBackground ) {
+		const placeholderIcon = <BlockIcon icon={ icon } />;
+		const label = __( 'Cover' );
+
+		return (
+			<>
+				{ controls }
+				<div
+					{ ...blockProps }
+					className={ classnames(
+						'is-placeholder',
+						blockProps.className
+					) }
+				>
 					<MediaPlaceholder
 						icon={ placeholderIcon }
-						className={ className }
 						labels={ {
 							title: label,
-							instructions: __( 'Drag an image or a video, upload a new one or select a file from your library.' ),
+							instructions: __(
+								'Upload an image or video file, or pick one from your media library.'
+							),
 						} }
 						onSelect={ onSelectMedia }
 						accept="image/*,video/*"
 						allowedTypes={ ALLOWED_MEDIA_TYPES }
 						notices={ noticeUI }
-						onError={ noticeOperations.createErrorNotice }
-					/>
-				</Fragment>
-			);
-		}
-
-		const classes = classnames(
-			className,
-			dimRatioToClass( dimRatio ),
-			{
-				'is-dark-theme': this.state.isDark,
-				'has-background-dim': dimRatio !== 0,
-				'has-parallax': hasParallax,
-			}
-		);
-
-		return (
-			<Fragment>
-				{ controls }
-				<div
-					data-url={ url }
-					style={ style }
-					className={ classes }
-				>
-					{ IMAGE_BACKGROUND_TYPE === backgroundType && (
-						// Used only to programmatically check if the image is dark or not
-						<img
-							ref={ this.imageRef }
-							aria-hidden
-							alt=""
-							style={ {
-								display: 'none',
-							} }
-							src={ url }
-						/>
-					) }
-					{ VIDEO_BACKGROUND_TYPE === backgroundType && (
-						<video
-							ref={ this.videoRef }
-							className="wp-block-cover__video-background"
-							autoPlay
-							muted
-							loop
-							src={ url }
-						/>
-					) }
-					<div className="wp-block-cover__inner-container">
-						<InnerBlocks
-							template={ INNER_BLOCKS_TEMPLATE }
-							allowedBlocks={ INNER_BLOCKS_ALLOWED_BLOCKS }
-						/>
-					</div>
+						onError={ ( message ) => {
+							removeAllNotices();
+							createErrorNotice( message );
+						} }
+					>
+						<div className="wp-block-cover__placeholder-background-options">
+							<ColorPalette
+								disableCustomColors={ true }
+								value={ overlayColor.color }
+								onChange={ setOverlayColor }
+								clearable={ false }
+							/>
+						</div>
+					</MediaPlaceholder>
 				</div>
-			</Fragment>
+			</>
 		);
 	}
 
-	handleBackgroundMode( prevProps ) {
-		const { attributes, overlayColor } = this.props;
-		const { dimRatio, url } = attributes;
-		// If opacity is greater than 50 the dominant color is the overlay color,
-		// so use that color for the dark mode computation.
-		if ( dimRatio > 50 ) {
-			if (
-				prevProps &&
-				prevProps.attributes.dimRatio > 50 &&
-				prevProps.overlayColor.color === overlayColor.color
-			) {
-				// No relevant prop changes happened there is no need to apply any change.
-				return;
-			}
-			if ( ! overlayColor.color ) {
-				// If no overlay color exists the overlay color is black (isDark )
-				this.changeIsDarkIfRequired( true );
-				return;
-			}
-			this.changeIsDarkIfRequired(
-				tinycolor( overlayColor.color ).isDark()
-			);
-			return;
-		}
-		// If opacity is lower than 50 the dominant color is the image or video color,
-		// so use that color for the dark mode computation.
+	const classes = classnames(
+		dimRatioToClass( dimRatio ),
+		{
+			'is-dark-theme': isDark,
+			'has-background-dim': dimRatio !== 0,
+			'is-transient': isBlogUrl,
+			'has-parallax': hasParallax,
+			'is-repeated': isRepeated,
+			[ overlayColor.class ]: overlayColor.class,
+			'has-background-gradient': gradientValue,
+			[ gradientClass ]: ! url && gradientClass,
+			'has-custom-content-position': ! isContentPositionCenter(
+				contentPosition
+			),
+		},
+		getPositionClassName( contentPosition )
+	);
 
-		if (
-			prevProps &&
-			prevProps.attributes.dimRatio <= 50 &&
-			prevProps.attributes.url === url
-		) {
-			// No relevant prop changes happened there is no need to apply any change.
-			return;
-		}
-		const { backgroundType } = attributes;
-
-		let element;
-
-		switch ( backgroundType ) {
-			case IMAGE_BACKGROUND_TYPE:
-				element = this.imageRef.current;
-				break;
-			case VIDEO_BACKGROUND_TYPE:
-				element = this.videoRef.current;
-				break;
-		}
-		if ( ! element ) {
-			return;
-		}
-		retrieveFastAverageColor().getColorAsync( element, ( color ) => {
-			this.changeIsDarkIfRequired( color.isDark );
-		} );
-	}
-
-	changeIsDarkIfRequired( newIsDark ) {
-		if ( this.state.isDark !== newIsDark ) {
-			this.setState( {
-				isDark: newIsDark,
-			} );
-		}
-	}
+	return (
+		<>
+			{ controls }
+			<div
+				{ ...blockProps }
+				className={ classnames( classes, blockProps.className ) }
+				style={ { ...style, ...blockProps.style } }
+				data-url={ url }
+			>
+				<BoxControlVisualizer
+					values={ styleAttribute?.spacing?.padding }
+					showValues={ styleAttribute?.visualizers?.padding }
+				/>
+				<ResizableCover
+					className="block-library-cover__resize-container"
+					onResizeStart={ () => {
+						setAttributes( { minHeightUnit: 'px' } );
+						toggleSelection( false );
+					} }
+					onResize={ setTemporaryMinHeight }
+					onResizeStop={ ( newMinHeight ) => {
+						toggleSelection( true );
+						setAttributes( { minHeight: newMinHeight } );
+						setTemporaryMinHeight( null );
+					} }
+					showHandle={ isSelected }
+				/>
+				{ isImageBackground && (
+					// Used only to programmatically check if the image is dark or not
+					<img
+						ref={ isDarkElement }
+						aria-hidden
+						alt=""
+						style={ {
+							display: 'none',
+						} }
+						src={ url }
+					/>
+				) }
+				{ url && gradientValue && dimRatio !== 0 && (
+					<span
+						aria-hidden="true"
+						className={ classnames(
+							'wp-block-cover__gradient-background',
+							gradientClass
+						) }
+						style={ { background: gradientValue } }
+					/>
+				) }
+				{ isVideoBackground && (
+					<video
+						ref={ isDarkElement }
+						className="wp-block-cover__video-background"
+						autoPlay
+						muted
+						loop
+						src={ url }
+						style={ { objectPosition: positionValue } }
+					/>
+				) }
+				{ isBlogUrl && <Spinner /> }
+				<div { ...innerBlocksProps } />
+			</div>
+		</>
+	);
 }
 
 export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { toggleSelection } = dispatch( 'core/block-editor' );
+
+		return {
+			toggleSelection,
+		};
+	} ),
 	withColors( { overlayColor: 'background-color' } ),
 	withNotices,
+	withInstanceId,
 ] )( CoverEdit );

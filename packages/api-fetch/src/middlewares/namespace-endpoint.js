@@ -4,7 +4,7 @@ const namespaceAndEndpointMiddleware = ( options, next ) => {
 
 	if (
 		typeof options.namespace === 'string' &&
-			typeof options.endpoint === 'string'
+		typeof options.endpoint === 'string'
 	) {
 		namespaceTrimmed = options.namespace.replace( /^\/|\/$/g, '' );
 		endpointTrimmed = options.endpoint.replace( /^\//, '' );

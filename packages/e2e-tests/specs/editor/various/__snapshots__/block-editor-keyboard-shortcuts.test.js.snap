@@ -1,0 +1,113 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`block editor keyboard shortcuts move blocks multiple blocks selected should move the blocks down 1`] = `
+"<!-- wp:paragraph -->
+<p>First paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Third paragraph</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`block editor keyboard shortcuts move blocks multiple blocks selected should move the blocks down 2`] = `
+"<!-- wp:paragraph -->
+<p>Third paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>First paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second paragraph</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`block editor keyboard shortcuts move blocks multiple blocks selected should move the blocks up 1`] = `
+"<!-- wp:paragraph -->
+<p>First paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Third paragraph</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`block editor keyboard shortcuts move blocks multiple blocks selected should move the blocks up 2`] = `
+"<!-- wp:paragraph -->
+<p>Second paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Third paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>First paragraph</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`block editor keyboard shortcuts move blocks single block selected should move the block down 1`] = `
+"<!-- wp:paragraph -->
+<p>First paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Third paragraph</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`block editor keyboard shortcuts move blocks single block selected should move the block down 2`] = `
+"<!-- wp:paragraph -->
+<p>First paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Third paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second paragraph</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`block editor keyboard shortcuts move blocks single block selected should move the block up 1`] = `
+"<!-- wp:paragraph -->
+<p>First paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Third paragraph</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`block editor keyboard shortcuts move blocks single block selected should move the block up 2`] = `
+"<!-- wp:paragraph -->
+<p>Third paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>First paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>Second paragraph</p>
+<!-- /wp:paragraph -->"
+`;

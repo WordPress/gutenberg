@@ -4,28 +4,37 @@
 import { castArray } from 'lodash';
 
 /**
+ * WordPress dependencies
+ */
+import { controls } from '@wordpress/data';
+
+/**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
- * @param {string} name Sidebar name to be opened.
+ * @param {?string} name Sidebar name to be opened.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function openGeneralSidebar( name ) {
-	return {
-		type: 'OPEN_GENERAL_SIDEBAR',
-		name,
-	};
+export function* openGeneralSidebar( name ) {
+	yield controls.dispatch(
+		'core/interface',
+		'enableComplementaryArea',
+		'core/edit-post',
+		name
+	);
 }
 
 /**
  * Returns an action object signalling that the user closed the sidebar.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function closeGeneralSidebar() {
-	return {
-		type: 'CLOSE_GENERAL_SIDEBAR',
-	};
+export function* closeGeneralSidebar() {
+	yield controls.dispatch(
+		'core/interface',
+		'disableComplementaryArea',
+		'core/edit-post'
+	);
 }
 
 /**
@@ -108,7 +117,7 @@ export function toggleEditorPanelEnabled( panelName ) {
  * @param {string} panelName A string that identifies the panel to open or close.
  *
  * @return {Object} Action object.
-*/
+ */
 export function toggleEditorPanelOpened( panelName ) {
 	return {
 		type: 'TOGGLE_PANEL_OPENED',
@@ -181,6 +190,36 @@ export function hideBlockTypes( blockNames ) {
 }
 
 /**
+ * Returns an action object used in signaling that a style should be auto-applied when a block is created.
+ *
+ * @param {string}  blockName  Name of the block.
+ * @param {?string} blockStyle Name of the style that should be auto applied. If undefined, the "auto apply" setting of the block is removed.
+ *
+ * @return {Object} Action object.
+ */
+export function updatePreferredStyleVariations( blockName, blockStyle ) {
+	return {
+		type: 'UPDATE_PREFERRED_STYLE_VARIATIONS',
+		blockName,
+		blockStyle,
+	};
+}
+
+/**
+ * Returns an action object used in signalling that the editor should attempt
+ * to locally autosave the current post every `interval` seconds.
+ *
+ * @param {number} interval The new interval, in seconds.
+ * @return {Object} Action object.
+ */
+export function __experimentalUpdateLocalAutosaveInterval( interval ) {
+	return {
+		type: 'UPDATE_LOCAL_AUTOSAVE_INTERVAL',
+		interval,
+	};
+}
+
+/**
  * Returns an action object used in signalling that block types by the given
  * name(s) should be shown.
  *
@@ -232,3 +271,29 @@ export function metaBoxUpdatesSuccess() {
 	};
 }
 
+/**
+ * Returns an action object used to toggle the width of the editing canvas.
+ *
+ * @param {string} deviceType
+ *
+ * @return {Object} Action object.
+ */
+export function __experimentalSetPreviewDeviceType( deviceType ) {
+	return {
+		type: 'SET_PREVIEW_DEVICE_TYPE',
+		deviceType,
+	};
+}
+
+/**
+ * Returns an action object used to open/close the inserter.
+ *
+ * @param {boolean} value A boolean representing whether the inserter should be opened or closed.
+ * @return {Object} Action object.
+ */
+export function setIsInserterOpened( value ) {
+	return {
+		type: 'SET_IS_INSERTER_OPENED',
+		value,
+	};
+}

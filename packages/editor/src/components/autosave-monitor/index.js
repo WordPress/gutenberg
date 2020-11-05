@@ -5,51 +5,75 @@ import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
+/**
+ * AutosaveMonitor invokes `props.autosave()` within at most `interval` seconds after an unsaved change is detected.
+ *
+ * The logic is straightforward: a check is performed every `props.interval` seconds. If any changes are detected, `props.autosave()` is called.
+ * The time between the change and the autosave varies but is no larger than `props.interval` seconds. Refer to the code below for more details, such as
+ * the specific way of detecting changes.
+ *
+ * There are two caveats:
+ * * If `props.isAutosaveable` happens to be false at a time of checking for changes, the check is retried every second.
+ * * The timer may be disabled by setting `props.disableIntervalChecks` to `false`. In that mode, any change will immediately trigger `props.autosave()`.
+ */
 export class AutosaveMonitor extends Component {
+	constructor( props ) {
+		super( props );
+		this.needsAutosave = !! ( props.isDirty && props.isAutosaveable );
+	}
+
+	componentDidMount() {
+		if ( ! this.props.disableIntervalChecks ) {
+			this.setAutosaveTimer();
+		}
+	}
+
 	componentDidUpdate( prevProps ) {
-		const { isDirty, editsReference, isAutosaveable, isAutosaving } = this.props;
-
-		// The edits reference is held for comparison to avoid scheduling an
-		// autosave if an edit has not been made since the last autosave
-		// completion. This is assigned when the autosave completes, and reset
-		// when an edit occurs.
-		//
-		// See: https://github.com/WordPress/gutenberg/issues/12318
-
-		if ( editsReference !== prevProps.editsReference ) {
-			this.didAutosaveForEditsReference = false;
-		}
-
-		if ( ! isAutosaving && prevProps.isAutosaving ) {
-			this.didAutosaveForEditsReference = true;
-		}
-
 		if (
-			prevProps.isDirty !== isDirty ||
-			prevProps.isAutosaveable !== isAutosaveable ||
-			prevProps.editsReference !== editsReference
+			this.props.disableIntervalChecks &&
+			this.props.editsReference !== prevProps.editsReference
 		) {
-			this.toggleTimer(
-				isDirty &&
-				isAutosaveable &&
-				! this.didAutosaveForEditsReference
-			);
+			this.props.autosave();
+			return;
+		}
+
+		if ( ! this.props.isDirty && prevProps.isDirty ) {
+			this.needsAutosave = false;
+			return;
+		}
+
+		if ( this.props.isAutosaving && ! prevProps.isAutosaving ) {
+			this.needsAutosave = false;
+			return;
+		}
+
+		if ( this.props.editsReference !== prevProps.editsReference ) {
+			this.needsAutosave = true;
 		}
 	}
 
 	componentWillUnmount() {
-		this.toggleTimer( false );
+		clearTimeout( this.timerId );
 	}
 
-	toggleTimer( isPendingSave ) {
-		clearTimeout( this.pendingSave );
-		const { autosaveInterval } = this.props;
-		if ( isPendingSave ) {
-			this.pendingSave = setTimeout(
-				() => this.props.autosave(),
-				autosaveInterval * 1000
-			);
+	setAutosaveTimer( timeout = this.props.interval * 1000 ) {
+		this.timerId = setTimeout( () => {
+			this.autosaveTimerHandler();
+		}, timeout );
+	}
+
+	autosaveTimerHandler() {
+		if ( ! this.props.isAutosaveable ) {
+			this.setAutosaveTimer( 1000 );
+			return;
 		}
+
+		if ( this.needsAutosave ) {
+			this.needsAutosave = false;
+			this.props.autosave();
+		}
+
+		this.setAutosaveTimer();
 	}
 
 	render() {
@@ -58,25 +82,30 @@ export class AutosaveMonitor extends Component {
 }
 
 export default compose( [
-	withSelect( ( select ) => {
+	withSelect( ( select, ownProps ) => {
+		const { getReferenceByDistinctEdits } = select( 'core' );
+
 		const {
 			isEditedPostDirty,
 			isEditedPostAutosaveable,
-			getReferenceByDistinctEdits,
 			isAutosavingPost,
+			getEditorSettings,
 		} = select( 'core/editor' );
 
-		const { autosaveInterval } = select( 'core/editor' ).getEditorSettings();
+		const { interval = getEditorSettings().autosaveInterval } = ownProps;
 
 		return {
+			editsReference: getReferenceByDistinctEdits(),
 			isDirty: isEditedPostDirty(),
 			isAutosaveable: isEditedPostAutosaveable(),
-			editsReference: getReferenceByDistinctEdits(),
 			isAutosaving: isAutosavingPost(),
-			autosaveInterval,
+			interval,
 		};
 	} ),
-	withDispatch( ( dispatch ) => ( {
-		autosave: dispatch( 'core/editor' ).autosave,
+	withDispatch( ( dispatch, ownProps ) => ( {
+		autosave() {
+			const { autosave = dispatch( 'core/editor' ).autosave } = ownProps;
+			autosave();
+		},
 	} ) ),
 ] )( AutosaveMonitor );

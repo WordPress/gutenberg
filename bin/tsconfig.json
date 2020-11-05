@@ -1,0 +1,31 @@
+{
+	"extends": "../tsconfig.base.json",
+	"compilerOptions": {
+		"module": "commonjs",
+		"esModuleInterop": true,
+		"target": "ES6",
+		"lib": [ "ES6", "ES2020.string" ],
+		"rootDir": ".",
+
+		// These scripts aren't published and packages don't depend on them.
+		// Don't generate types, this is strictly for validation.
+		"incremental": true,
+		"declarationMap": false,
+		"emitDeclarationOnly": false,
+		"noEmit": true,
+		"outDir": ".cache"
+	},
+	"files": [
+		"./api-docs/update-api-docs.js",
+		"./check-latest-npm.js",
+		"./plugin/config.js",
+		"./plugin/commands/changelog.js",
+		"./plugin/commands/performance.js",
+		"./plugin/lib/milestone.js",
+		"./plugin/lib/version.js",
+		"./plugin/lib/logger.js",
+		"./plugin/lib/utils.js",
+		"./plugin/lib/git.js",
+		"./validate-package-lock.js"
+	]
+}

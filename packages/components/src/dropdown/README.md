@@ -100,3 +100,26 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
  - Type: `String` or `Boolean`
  - Required: No
  - Default: `"firstElement"`
+
+ ### popoverProps
+ 
+Properties of popoverProps object will be passed as props to the `Popover` component.
+Use this o object to access properties/feature if the `Popover` component that are not already exposed in the `Dropdown`component, e.g.: the hability to have the popover without an arrow. 
+ 
+ - Type: `Object`
+ - Required: No
+
+### onClose
+
+A callback invoked when the popover should be closed.
+
+- Type: `Function`
+- Required: No
+
+### onToggle
+
+A callback invoked when the state of the popover changes from open to closed and vice versa.
+Function receives a boolean as a parameter. If `true`, the popover will open. If `false`, the popover will close.
+
+- Type: `Function`
+- Required: No

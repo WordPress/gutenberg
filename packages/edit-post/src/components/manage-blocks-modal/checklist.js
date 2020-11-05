@@ -6,7 +6,6 @@ import { partial } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { BlockIcon } from '@wordpress/block-editor';
 import { CheckboxControl } from '@wordpress/components';
 
@@ -19,12 +18,12 @@ function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 					className="edit-post-manage-blocks-modal__checklist-item"
 				>
 					<CheckboxControl
-						label={ (
-							<Fragment>
+						label={
+							<>
 								{ blockType.title }
 								<BlockIcon icon={ blockType.icon } />
-							</Fragment>
-						) }
+							</>
+						}
 						checked={ value.includes( blockType.name ) }
 						onChange={ partial( onItemChange, blockType.name ) }
 					/>

@@ -2,87 +2,111 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
-import { withViewportMatch } from '@wordpress/viewport';
-import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
+import { ToolbarGroup } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import {
+	positionCenter,
+	positionLeft,
+	positionRight,
+	stretchFullWidth,
+	stretchWide,
+} from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { withBlockEditContext } from '../block-edit/context';
+import { useLayout } from '../inner-blocks/layout';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
 	left: {
-		icon: 'align-left',
+		icon: positionLeft,
 		title: __( 'Align left' ),
 	},
 	center: {
-		icon: 'align-center',
+		icon: positionCenter,
 		title: __( 'Align center' ),
 	},
 	right: {
-		icon: 'align-right',
+		icon: positionRight,
 		title: __( 'Align right' ),
 	},
 	wide: {
-		icon: 'align-wide',
+		icon: stretchWide,
 		title: __( 'Wide width' ),
 	},
 	full: {
-		icon: 'align-full-width',
+		icon: stretchFullWidth,
 		title: __( 'Full width' ),
 	},
 };
 
 const DEFAULT_CONTROLS = [ 'left', 'center', 'right', 'wide', 'full' ];
+const DEFAULT_CONTROL = 'center';
 const WIDE_CONTROLS = [ 'wide', 'full' ];
 
-export function BlockAlignmentToolbar( { isCollapsed, value, onChange, controls = DEFAULT_CONTROLS, wideControlsEnabled = false } ) {
+const POPOVER_PROPS = {
+	isAlternate: true,
+};
+
+export function BlockAlignmentToolbar( {
+	value,
+	onChange,
+	controls = DEFAULT_CONTROLS,
+	isCollapsed = true,
+} ) {
+	const { wideControlsEnabled = false } = useSelect( ( select ) => {
+		const { getSettings } = select( 'core/block-editor' );
+		const settings = getSettings();
+		return {
+			wideControlsEnabled: settings.alignWide,
+		};
+	} );
+	const layout = useLayout();
+	const supportsAlignments = layout.type === 'default';
+
+	if ( ! supportsAlignments ) {
+		return null;
+	}
+
+	const { alignments: availableAlignments = DEFAULT_CONTROLS } = layout;
+	const enabledControls = controls.filter(
+		( control ) =>
+			( wideControlsEnabled || ! WIDE_CONTROLS.includes( control ) ) &&
+			availableAlignments.includes( control )
+	);
+
+	if ( enabledControls.length === 0 ) {
+		return null;
+	}
+
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
 
-	const enabledControls = wideControlsEnabled ?
-		controls :
-		controls.filter( ( control ) => WIDE_CONTROLS.indexOf( control ) === -1 );
-
-	const activeAlignment = BLOCK_ALIGNMENTS_CONTROLS[ value ];
+	const activeAlignmentControl = BLOCK_ALIGNMENTS_CONTROLS[ value ];
+	const defaultAlignmentControl =
+		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
 	return (
-		<Toolbar
+		<ToolbarGroup
+			popoverProps={ POPOVER_PROPS }
 			isCollapsed={ isCollapsed }
-			icon={ activeAlignment ? activeAlignment.icon : 'align-left' }
-			label={ __( 'Change Alignment' ) }
-			controls={
-				enabledControls.map( ( control ) => {
-					return {
-						...BLOCK_ALIGNMENTS_CONTROLS[ control ],
-						isActive: value === control,
-						onClick: applyOrUnset( control ),
-					};
-				} )
+			icon={
+				activeAlignmentControl
+					? activeAlignmentControl.icon
+					: defaultAlignmentControl.icon
 			}
+			label={ __( 'Change alignment' ) }
+			controls={ enabledControls.map( ( control ) => {
+				return {
+					...BLOCK_ALIGNMENTS_CONTROLS[ control ],
+					isActive: value === control,
+					role: isCollapsed ? 'menuitemradio' : undefined,
+					onClick: applyOrUnset( control ),
+				};
+			} ) }
 		/>
 	);
 }
 
-export default compose(
-	withBlockEditContext( ( { clientId } ) => {
-		return {
-			clientId,
-		};
-	} ),
-	withViewportMatch( { isLargeViewport: 'medium' } ),
-	withSelect( ( select, { clientId, isLargeViewport, isCollapsed } ) => {
-		const { getBlockRootClientId, getSettings } = select( 'core/block-editor' );
-		const settings = getSettings();
-		return {
-			wideControlsEnabled: settings.alignWide,
-			isCollapsed: isCollapsed || ! isLargeViewport || (
-				! settings.hasFixedToolbar &&
-				getBlockRootClientId( clientId )
-			),
-		};
-	} ),
-)( BlockAlignmentToolbar );
+export default BlockAlignmentToolbar;

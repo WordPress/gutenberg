@@ -1,0 +1,39 @@
+{
+	"apiVersion": 2,
+	"name": "core/search",
+	"category": "widgets",
+	"attributes": {
+		"label": {
+			"type": "string"
+		},
+		"showLabel": {
+			"type": "boolean",
+			"default": true
+		},
+		"placeholder": {
+			"type": "string",
+			"default": ""
+		},
+		"width": {
+			"type": "number"
+		},
+		"widthUnit": {
+			"type": "string"
+		},
+		"buttonText": {
+			"type": "string"
+		},
+		"buttonPosition": {
+			"type": "string",
+			"default": "button-outside"
+		},
+		"buttonUseIcon": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"align": [ "left", "center", "right" ],
+		"html": false
+	}
+}

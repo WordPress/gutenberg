@@ -29,3 +29,9 @@ function example( number ) {
 	return number + foo;
 }
 ```
+
+## Options
+
+This rule accepts a single options argument:
+
+- Set the `excludePattern` option to a regular expression string to exempt specific function calls by name.

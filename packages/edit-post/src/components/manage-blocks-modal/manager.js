@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter } from 'lodash';
+import { filter, includes, isArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,7 +9,7 @@ import { filter } from 'lodash';
 import { withSelect } from '@wordpress/data';
 import { compose, withState } from '@wordpress/compose';
 import { TextControl } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -23,14 +23,18 @@ function BlockManager( {
 	categories,
 	hasBlockSupport,
 	isMatchingSearchTerm,
+	numberOfHiddenBlocks,
 } ) {
 	// Filtering occurs here (as opposed to `withSelect`) to avoid wasted
 	// wasted renders by consequence of `Array#filter` producing a new
 	// value reference on each call.
-	blockTypes = blockTypes.filter( ( blockType ) => (
-		hasBlockSupport( blockType, 'inserter', true ) &&
-		( ! search || isMatchingSearchTerm( blockType, search ) )
-	) );
+	blockTypes = blockTypes.filter(
+		( blockType ) =>
+			hasBlockSupport( blockType, 'inserter', true ) &&
+			( ! search || isMatchingSearchTerm( blockType, search ) ) &&
+			( ! blockType.parent ||
+				includes( blockType.parent, 'core/post-content' ) )
+	);
 
 	return (
 		<div className="edit-post-manage-blocks-modal__content">
@@ -38,11 +42,26 @@ function BlockManager( {
 				type="search"
 				label={ __( 'Search for a block' ) }
 				value={ search }
-				onChange={ ( nextSearch ) => setState( {
-					search: nextSearch,
-				} ) }
+				onChange={ ( nextSearch ) =>
+					setState( {
+						search: nextSearch,
+					} )
+				}
 				className="edit-post-manage-blocks-modal__search"
 			/>
+			{ !! numberOfHiddenBlocks && (
+				<div className="edit-post-manage-blocks-modal__disabled-blocks-count">
+					{ sprintf(
+						/* translators: %d: number of blocks. */
+						_n(
+							'%d block is disabled.',
+							'%d blocks are disabled.',
+							numberOfHiddenBlocks
+						),
+						numberOfHiddenBlocks
+					) }
+				</div>
+			) }
 			<div
 				tabIndex="0"
 				role="region"
@@ -57,12 +76,19 @@ function BlockManager( {
 				{ categories.map( ( category ) => (
 					<BlockManagerCategory
 						key={ category.slug }
-						category={ category }
+						title={ category.title }
 						blockTypes={ filter( blockTypes, {
 							category: category.slug,
 						} ) }
 					/>
 				) ) }
+				<BlockManagerCategory
+					title={ __( 'Uncategorized' ) }
+					blockTypes={ filter(
+						blockTypes,
+						( { category } ) => ! category
+					) }
+				/>
 			</div>
 		</div>
 	);
@@ -77,12 +103,17 @@ export default compose( [
 			hasBlockSupport,
 			isMatchingSearchTerm,
 		} = select( 'core/blocks' );
+		const { getPreference } = select( 'core/edit-post' );
+		const hiddenBlockTypes = getPreference( 'hiddenBlockTypes' );
+		const numberOfHiddenBlocks =
+			isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;
 
 		return {
 			blockTypes: getBlockTypes(),
 			categories: getCategories(),
 			hasBlockSupport,
 			isMatchingSearchTerm,
+			numberOfHiddenBlocks,
 		};
 	} ),
 ] )( BlockManager );

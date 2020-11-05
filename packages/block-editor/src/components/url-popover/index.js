@@ -2,73 +2,72 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
-import {
-	Popover,
-	IconButton,
-} from '@wordpress/components';
+import { useState } from '@wordpress/element';
+import { Button, Popover } from '@wordpress/components';
+import { chevronDown } from '@wordpress/icons';
 
-class URLPopover extends Component {
-	constructor() {
-		super( ...arguments );
+/**
+ * Internal dependencies
+ */
+import LinkViewer from './link-viewer';
+import LinkEditor from './link-editor';
 
-		this.toggleSettingsVisibility = this.toggleSettingsVisibility.bind( this );
+function URLPopover( {
+	additionalControls,
+	children,
+	renderSettings,
+	position = 'bottom center',
+	focusOnMount = 'firstElement',
+	...popoverProps
+} ) {
+	const [ isSettingsExpanded, setIsSettingsExpanded ] = useState( false );
 
-		this.state = {
-			isSettingsExpanded: false,
-		};
-	}
+	const showSettings = !! renderSettings && isSettingsExpanded;
 
-	toggleSettingsVisibility() {
-		this.setState( {
-			isSettingsExpanded: ! this.state.isSettingsExpanded,
-		} );
-	}
+	const toggleSettingsVisibility = () => {
+		setIsSettingsExpanded( ! isSettingsExpanded );
+	};
 
-	render() {
-		const {
-			children,
-			renderSettings,
-			onClose,
-			onClickOutside,
-			position = 'bottom center',
-			focusOnMount = 'firstElement',
-		} = this.props;
-
-		const {
-			isSettingsExpanded,
-		} = this.state;
-
-		const showSettings = !! renderSettings && isSettingsExpanded;
-
-		return (
-			<Popover
-				className="editor-url-popover block-editor-url-popover"
-				focusOnMount={ focusOnMount }
-				position={ position }
-				onClose={ onClose }
-				onClickOutside={ onClickOutside }
-			>
-				<div className="editor-url-popover__row block-editor-url-popover__row">
+	return (
+		<Popover
+			className="block-editor-url-popover"
+			focusOnMount={ focusOnMount }
+			position={ position }
+			{ ...popoverProps }
+		>
+			<div className="block-editor-url-popover__input-container">
+				<div className="block-editor-url-popover__row">
 					{ children }
 					{ !! renderSettings && (
-						<IconButton
-							className="editor-url-popover__settings-toggle block-editor-url-popover__settings-toggle"
-							icon="arrow-down-alt2"
-							label={ __( 'Link Settings' ) }
-							onClick={ this.toggleSettingsVisibility }
+						<Button
+							className="block-editor-url-popover__settings-toggle"
+							icon={ chevronDown }
+							label={ __( 'Link settings' ) }
+							onClick={ toggleSettingsVisibility }
 							aria-expanded={ isSettingsExpanded }
 						/>
 					) }
 				</div>
 				{ showSettings && (
-					<div className="editor-url-popover__row block-editor-url-popover__row editor-url-popover__settings block-editor-url-popover__settings">
+					<div className="block-editor-url-popover__row block-editor-url-popover__settings">
 						{ renderSettings() }
 					</div>
 				) }
-			</Popover>
-		);
-	}
+			</div>
+			{ additionalControls && ! showSettings && (
+				<div className="block-editor-url-popover__additional-controls">
+					{ additionalControls }
+				</div>
+			) }
+		</Popover>
+	);
 }
 
+URLPopover.LinkEditor = LinkEditor;
+
+URLPopover.LinkViewer = LinkViewer;
+
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-popover/README.md
+ */
 export default URLPopover;

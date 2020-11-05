@@ -2,6 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { CompositeItem } from 'reakit';
+
+/**
+ * WordPress dependencies
+ */
+import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -10,59 +16,48 @@ import BlockIcon from '../block-icon';
 
 function InserterListItem( {
 	icon,
-	hasChildBlocksWithInserterSupport,
 	onClick,
 	isDisabled,
 	title,
 	className,
+	composite,
 	...props
 } ) {
-	const itemIconStyle = icon ? {
-		backgroundColor: icon.background,
-		color: icon.foreground,
-	} : {};
-	const itemIconStackStyle = icon && icon.shadowColor ? {
-		backgroundColor: icon.shadowColor,
-	} : {};
+	const itemIconStyle = icon
+		? {
+				backgroundColor: icon.background,
+				color: icon.foreground,
+		  }
+		: {};
 
 	return (
-		<li className="editor-block-types-list__list-item block-editor-block-types-list__list-item">
-			<button
-				className={
-					classnames(
-						'editor-block-types-list__item block-editor-block-types-list__item',
-						className,
-						{
-							'editor-block-types-list__item-has-children block-editor-block-types-list__item-has-children':
-								hasChildBlocksWithInserterSupport,
-						}
-					)
-				}
+		<div className="block-editor-block-types-list__list-item">
+			<CompositeItem
+				role="option"
+				as={ Button }
+				{ ...composite }
+				className={ classnames(
+					'block-editor-block-types-list__item',
+					className
+				) }
 				onClick={ ( event ) => {
 					event.preventDefault();
 					onClick();
 				} }
 				disabled={ isDisabled }
-				aria-label={ title } // Fix for IE11 and JAWS 2018.
 				{ ...props }
 			>
 				<span
-					className="editor-block-types-list__item-icon block-editor-block-types-list__item-icon"
+					className="block-editor-block-types-list__item-icon"
 					style={ itemIconStyle }
 				>
 					<BlockIcon icon={ icon } showColors />
-					{ hasChildBlocksWithInserterSupport &&
-						<span
-							className="editor-block-types-list__item-icon-stack block-editor-block-types-list__item-icon-stack"
-							style={ itemIconStackStyle }
-						/>
-					}
 				</span>
-				<span className="editor-block-types-list__item-title block-editor-block-types-list__item-title">
+				<span className="block-editor-block-types-list__item-title">
 					{ title }
 				</span>
-			</button>
-		</li>
+			</CompositeItem>
+		</div>
 	);
 }
 

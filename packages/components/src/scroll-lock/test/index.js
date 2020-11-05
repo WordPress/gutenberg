@@ -17,13 +17,19 @@ describe( 'scroll-lock', () => {
 	let wrapper = null;
 
 	function expectLocked( locked ) {
-		expect( testDocument.documentElement.classList.contains( lockingClassName ) ).toBe( locked );
+		expect(
+			testDocument.documentElement.classList.contains( lockingClassName )
+		).toBe( locked );
 		// Assert against `body` because `scrollingElement` does not exist on our test DOM implementation.
-		expect( testDocument.body.classList.contains( lockingClassName ) ).toBe( locked );
+		expect( testDocument.body.classList.contains( lockingClassName ) ).toBe(
+			locked
+		);
 	}
 
 	beforeEach( () => {
-		testDocument = document.implementation.createHTMLDocument( 'Test scroll-lock' );
+		testDocument = document.implementation.createHTMLDocument(
+			'Test scroll-lock'
+		);
 		ScrollLock = createScrollLockComponent( {
 			htmlDocument: testDocument,
 			className: lockingClassName,

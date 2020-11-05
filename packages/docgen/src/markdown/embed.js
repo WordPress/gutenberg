@@ -5,7 +5,10 @@ const { findLast } = require( 'lodash' );
 
 const getHeadingIndex = ( ast, index ) => {
 	const astBeforeIndex = ast.children.slice( 0, index );
-	const lastHeading = findLast( astBeforeIndex, ( node ) => node.type === 'heading' );
+	const lastHeading = findLast(
+		astBeforeIndex,
+		( node ) => node.type === 'heading'
+	);
 	return lastHeading ? lastHeading.depth : 1;
 };
 
@@ -17,7 +20,7 @@ const getHeadingIndex = ( ast, index ) => {
  * @param {Object} newContentAst The new contents to be embedded in remark AST format.
  * @return {boolean} Whether the contents were embedded or not.
  */
-const embed = function( token, targetAst, newContentAst ) {
+const embed = ( token, targetAst, newContentAst ) => {
 	let headingIndex = -1;
 
 	const START_TOKEN = `<!-- START TOKEN(${ token }) -->`;
@@ -42,7 +45,11 @@ const embed = function( token, targetAst, newContentAst ) {
 				node.depth = headingIndex + 1;
 			}
 		} );
-		targetAst.children.splice( startIndex + 1, endIndex - startIndex - 1, newContentAst );
+		targetAst.children.splice(
+			startIndex + 1,
+			endIndex - startIndex - 1,
+			newContentAst
+		);
 		return true;
 	}
 	return false;

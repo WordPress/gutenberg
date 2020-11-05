@@ -1,7 +1,7 @@
 ( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
-	var InnerBlocks = wp.editor.InnerBlocks;
+	var InnerBlocks = wp.blockEditor.InnerBlocks;
 	var __ = wp.i18n.__;
 	var TEMPLATE = [
 		[ 'core/paragraph', { fontSize: 'large', content: __( 'Content…' ) } ],
@@ -9,7 +9,7 @@
 
 	var baseBlock = {
 		icon: 'cart',
-		category: 'common',
+		category: 'text',
 		edit: function( props ) {
 			return el(
 				'div',
@@ -43,7 +43,7 @@
 				title: 'Test Align True',
 				supports: {
 					align: true,
-				}
+				},
 			},
 			baseBlock
 		)
@@ -56,7 +56,7 @@
 				title: 'Test Align Array',
 				supports: {
 					align: [ 'left', 'center' ],
-				}
+				},
 			},
 			baseBlock
 		)
@@ -75,7 +75,7 @@
 				},
 				supports: {
 					align: true,
-				}
+				},
 			},
 			baseBlock
 		)

@@ -16,11 +16,26 @@ describe( 'removeFormat', () => {
 
 	it( 'should remove format', () => {
 		const record = {
-			formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
+			formats: [
+				,
+				,
+				,
+				[ strong ],
+				[ em, strong ],
+				[ em, strong ],
+				[ em ],
+				,
+				,
+				,
+				,
+				,
+				,
+			],
 			text: 'one two three',
 		};
 		const expected = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			activeFormats: [],
 			text: 'one two three',
 		};
 		const result = removeFormat( deepFreeze( record ), 'strong', 3, 6 );
@@ -32,11 +47,26 @@ describe( 'removeFormat', () => {
 
 	it( 'should remove format for collased selection', () => {
 		const record = {
-			formats: [ , , , [ strong ], [ em, strong ], [ em, strong ], [ em ], , , , , , , ],
+			formats: [
+				,
+				,
+				,
+				[ strong ],
+				[ em, strong ],
+				[ em, strong ],
+				[ em ],
+				,
+				,
+				,
+				,
+				,
+				,
+			],
 			text: 'one two three',
 		};
 		const expected = {
 			formats: [ , , , , [ em ], [ em ], [ em ], , , , , , , ],
+			activeFormats: [],
 			text: 'one two three',
 		};
 		const result = removeFormat( deepFreeze( record ), 'strong', 4, 4 );

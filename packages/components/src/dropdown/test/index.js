@@ -1,73 +1,97 @@
 /**
  * External dependencies
  */
-import TestUtils from 'react-dom/test-utils';
+import { fireEvent, render } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
 import Dropdown from '../';
-import Popover from '../../popover';
+
+function getButtonElement( container ) {
+	return container.querySelector( 'button' );
+}
+function getOpenCloseButton( container, selector ) {
+	return container.querySelector( selector );
+}
 
 describe( 'Dropdown', () => {
-	const expectPopoverVisible = ( wrapper, visible ) => {
-		expect(
-			TestUtils.scryRenderedComponentsWithType( wrapper, Popover ) )
-			.toHaveLength( visible ? 1 : 0 );
-	};
-	const buttonElement = ( wrapper ) => TestUtils.findRenderedDOMComponentWithTag(
-		wrapper,
-		'button'
-	);
-	const openCloseElement = ( wrapper, className ) => TestUtils
-		.findRenderedDOMComponentWithClass( wrapper, className );
+	function expectPopoverVisible( container, value ) {
+		const popover = container.querySelector( '.components-popover' );
+		if ( value ) {
+			expect( popover ).toBeTruthy();
+		} else {
+			expect( popover ).toBeFalsy();
+		}
+	}
 
 	it( 'should toggle the dropdown properly', () => {
-		const expectButtonExpanded = ( wrapper, expanded ) => {
+		const expectButtonExpanded = ( container, expanded ) => {
+			expect( container.querySelectorAll( 'button' ) ).toHaveLength( 1 );
 			expect(
-				TestUtils.scryRenderedDOMComponentsWithTag( wrapper, 'button' ) )
-				.toHaveLength( 1 );
-			expect(
-				buttonElement( wrapper ).getAttribute( 'aria-expanded' )
+				getButtonElement( container ).getAttribute( 'aria-expanded' )
 			).toBe( expanded.toString() );
 		};
-		const wrapper = TestUtils.renderIntoDocument( <Dropdown
-			className="container"
-			contentClassName="content"
-			renderToggle={ ( { isOpen, onToggle } ) => (
-				<button aria-expanded={ isOpen } onClick={ onToggle }>Toggleee</button>
-			) }
-			renderContent={ () => null }
-		/> );
 
-		expectButtonExpanded( wrapper, false );
-		expectPopoverVisible( wrapper, false );
+		const {
+			container: { firstChild: dropdownContainer },
+		} = render(
+			<Dropdown
+				className="container"
+				contentClassName="content"
+				renderToggle={ ( { isOpen, onToggle } ) => (
+					<button aria-expanded={ isOpen } onClick={ onToggle }>
+						Toggleee
+					</button>
+				) }
+				renderContent={ () => <span>test</span> }
+			/>
+		);
 
-		TestUtils.Simulate.click( buttonElement( wrapper ) );
+		expectButtonExpanded( dropdownContainer, false );
+		expectPopoverVisible( dropdownContainer, false );
 
-		expectButtonExpanded( wrapper, true );
-		expectPopoverVisible( wrapper, true );
+		const button = getButtonElement( dropdownContainer );
+		fireEvent.click( button );
+
+		expectButtonExpanded( dropdownContainer, true );
+		expectPopoverVisible( dropdownContainer, true );
 	} );
 
 	it( 'should close the dropdown when calling onClose', () => {
-		const wrapper = TestUtils.renderIntoDocument( <Dropdown
-			className="container"
-			contentClassName="content"
-			renderToggle={ ( { isOpen, onToggle, onClose } ) => [
-				<button key="open" className="open" aria-expanded={ isOpen } onClick={ onToggle }>Toggleee</button>,
-				<button key="close" className="close" onClick={ onClose } >closee</button>,
-			] }
-			renderContent={ () => null }
-		/> );
+		const {
+			container: { firstChild: dropdownContainer },
+		} = render(
+			<Dropdown
+				className="container"
+				contentClassName="content"
+				renderToggle={ ( { isOpen, onToggle, onClose } ) => [
+					<button
+						key="open"
+						className="open"
+						aria-expanded={ isOpen }
+						onClick={ onToggle }
+					>
+						Toggleee
+					</button>,
+					<button key="close" className="close" onClick={ onClose }>
+						closee
+					</button>,
+				] }
+				renderContent={ () => null }
+			/>
+		);
 
-		expectPopoverVisible( wrapper, false );
+		expectPopoverVisible( dropdownContainer, false );
 
-		TestUtils.Simulate.click( openCloseElement( wrapper, 'open' ) );
+		const openButton = getOpenCloseButton( dropdownContainer, '.open' );
+		fireEvent.click( openButton );
 
-		expectPopoverVisible( wrapper, true );
+		expectPopoverVisible( dropdownContainer, true );
 
-		TestUtils.Simulate.click( openCloseElement( wrapper, 'close' ) );
+		const closeButton = getOpenCloseButton( dropdownContainer, '.close' );
+		fireEvent.click( closeButton );
 
-		expectPopoverVisible( wrapper, false );
+		expectPopoverVisible( dropdownContainer, false );
 	} );
 } );

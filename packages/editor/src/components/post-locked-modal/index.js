@@ -121,13 +121,24 @@ class PostLockedModal extends Component {
 		data.append( 'post_ID', postId );
 		data.append( 'active_post_lock', activePostLock );
 
-		const xhr = new window.XMLHttpRequest();
-		xhr.open( 'POST', postLockUtils.ajaxUrl, false );
-		xhr.send( data );
+		if ( window.navigator.sendBeacon ) {
+			window.navigator.sendBeacon( postLockUtils.ajaxUrl, data );
+		} else {
+			const xhr = new window.XMLHttpRequest();
+			xhr.open( 'POST', postLockUtils.ajaxUrl, false );
+			xhr.send( data );
+		}
 	}
 
 	render() {
-		const { user, postId, isLocked, isTakeover, postLockUtils, postType } = this.props;
+		const {
+			user,
+			postId,
+			isLocked,
+			isTakeover,
+			postLockUtils,
+			postType,
+		} = this.props;
 		if ( ! isLocked ) {
 			return null;
 		}
@@ -148,11 +159,15 @@ class PostLockedModal extends Component {
 		const allPostsLabel = __( 'Exit the Editor' );
 		return (
 			<Modal
-				title={ isTakeover ? __( 'Someone else has taken over this post.' ) : __( 'This post is already being edited.' ) }
+				title={
+					isTakeover
+						? __( 'Someone else has taken over this post.' )
+						: __( 'This post is already being edited.' )
+				}
 				focusOnMount={ true }
 				shouldCloseOnClickOutside={ false }
 				shouldCloseOnEsc={ false }
-				isDismissable={ false }
+				isDismissible={ false }
 				className="editor-post-locked-modal"
 			>
 				{ !! userAvatar && (
@@ -165,18 +180,21 @@ class PostLockedModal extends Component {
 				{ !! isTakeover && (
 					<div>
 						<div>
-							{ userDisplayName ?
-								sprintf(
-									/* translators: %s: user's display name */
-									__( '%s now has editing control of this post. Don’t worry, your changes up to this moment have been saved.' ),
-									userDisplayName
-								) :
-								__( 'Another user now has editing control of this post. Don’t worry, your changes up to this moment have been saved.' )
-							}
+							{ userDisplayName
+								? sprintf(
+										/* translators: %s: user's display name */
+										__(
+											'%s now has editing control of this post. Don’t worry, your changes up to this moment have been saved.'
+										),
+										userDisplayName
+								  )
+								: __(
+										'Another user now has editing control of this post. Don’t worry, your changes up to this moment have been saved.'
+								  ) }
 						</div>
 
 						<div className="editor-post-locked-modal__buttons">
-							<Button isPrimary isLarge href={ allPostsUrl }>
+							<Button isPrimary href={ allPostsUrl }>
 								{ allPostsLabel }
 							</Button>
 						</div>
@@ -185,22 +203,25 @@ class PostLockedModal extends Component {
 				{ ! isTakeover && (
 					<div>
 						<div>
-							{ userDisplayName ?
-								sprintf(
-									/* translators: %s: user's display name */
-									__( '%s is currently working on this post, which means you cannot make changes, unless you take over.' ),
-									userDisplayName
-								) :
-								__( 'Another user is currently working on this post, which means you cannot make changes, unless you take over.' )
-							}
+							{ userDisplayName
+								? sprintf(
+										/* translators: %s: user's display name */
+										__(
+											'%s is currently working on this post, which means you cannot make changes, unless you take over.'
+										),
+										userDisplayName
+								  )
+								: __(
+										'Another user is currently working on this post, which means you cannot make changes, unless you take over.'
+								  ) }
 						</div>
 
 						<div className="editor-post-locked-modal__buttons">
-							<Button isDefault isLarge href={ allPostsUrl }>
+							<Button isSecondary href={ allPostsUrl }>
 								{ allPostsLabel }
 							</Button>
 							<PostPreviewButton />
-							<Button isPrimary isLarge href={ unlockUrl }>
+							<Button isPrimary href={ unlockUrl }>
 								{ __( 'Take Over' ) }
 							</Button>
 						</div>

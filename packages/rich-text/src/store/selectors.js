@@ -13,9 +13,7 @@ import { find } from 'lodash';
  */
 export const getFormatTypes = createSelector(
 	( state ) => Object.values( state.formatTypes ),
-	( state ) => [
-		state.formatTypes,
-	]
+	( state ) => [ state.formatTypes ]
 );
 
 /**
@@ -40,8 +38,8 @@ export function getFormatType( state, name ) {
  * @return {?Object} Format type.
  */
 export function getFormatTypeForBareElement( state, bareElementTagName ) {
-	return find( getFormatTypes( state ), ( { tagName } ) => {
-		return bareElementTagName === tagName;
+	return find( getFormatTypes( state ), ( { className, tagName } ) => {
+		return className === null && bareElementTagName === tagName;
 	} );
 }
 

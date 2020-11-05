@@ -2,13 +2,28 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { Button, Placeholder } from '@wordpress/components';
+import { Button, Placeholder, ExternalLink } from '@wordpress/components';
 import { BlockIcon } from '@wordpress/block-editor';
 
-const EmbedPlaceholder = ( props ) => {
-	const { icon, label, value, onSubmit, onChange, cannotEmbed, fallback, tryAgain } = props;
+const EmbedPlaceholder = ( {
+	icon,
+	label,
+	value,
+	onSubmit,
+	onChange,
+	cannotEmbed,
+	fallback,
+	tryAgain,
+} ) => {
 	return (
-		<Placeholder icon={ <BlockIcon icon={ icon } showColors /> } label={ label } className="wp-block-embed">
+		<Placeholder
+			icon={ <BlockIcon icon={ icon } showColors /> }
+			label={ label }
+			className="wp-block-embed"
+			instructions={ __(
+				'Paste a link to the content you want to display on your site.'
+			) }
+		>
 			<form onSubmit={ onSubmit }>
 				<input
 					type="url"
@@ -16,19 +31,34 @@ const EmbedPlaceholder = ( props ) => {
 					className="components-placeholder__input"
 					aria-label={ label }
 					placeholder={ __( 'Enter URL to embed here…' ) }
-					onChange={ onChange } />
-				<Button
-					isLarge
-					type="submit">
+					onChange={ onChange }
+				/>
+				<Button isPrimary type="submit">
 					{ _x( 'Embed', 'button label' ) }
 				</Button>
-				{ cannotEmbed &&
-					<p className="components-placeholder__error">
-						{ __( 'Sorry, this content could not be embedded.' ) }<br />
-						<Button isLarge onClick={ tryAgain }>{ _x( 'Try again', 'button label' ) }</Button> <Button isLarge onClick={ fallback }>{ _x( 'Convert to link', 'button label' ) }</Button>
-					</p>
-				}
 			</form>
+			<div className="components-placeholder__learn-more">
+				<ExternalLink
+					href={ __(
+						'https://wordpress.org/support/article/embeds/'
+					) }
+				>
+					{ __( 'Learn more about embeds' ) }
+				</ExternalLink>
+			</div>
+			{ cannotEmbed && (
+				<div className="components-placeholder__error">
+					<div className="components-placeholder__instructions">
+						{ __( 'Sorry, this content could not be embedded.' ) }
+					</div>
+					<Button isSecondary onClick={ tryAgain }>
+						{ _x( 'Try again', 'button label' ) }
+					</Button>{ ' ' }
+					<Button isSecondary onClick={ fallback }>
+						{ _x( 'Convert to link', 'button label' ) }
+					</Button>
+				</div>
+			) }
 		</Placeholder>
 	);
 };

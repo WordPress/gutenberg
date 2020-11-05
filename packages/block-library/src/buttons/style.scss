@@ -1,0 +1,69 @@
+.wp-block-buttons {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+
+	// Increased specificity to override blocks default margin.
+	> .wp-block-button {
+		display: inline-block;
+		/*rtl:ignore*/
+		margin-right: 0.5em;
+		margin-bottom: 0.5em;
+
+		&:last-child {
+			/*rtl:ignore*/
+			margin-right: 0;
+		}
+	}
+
+	&.is-content-justification-left {
+		justify-content: flex-start;
+	}
+
+	&.is-content-justification-center {
+		justify-content: center;
+	}
+
+	&.is-content-justification-right {
+		justify-content: flex-end;
+
+		> .wp-block-button {
+			/*rtl:ignore*/
+			margin-left: 0.5em;
+			/*rtl:ignore*/
+			margin-right: 0;
+
+			&:first-child {
+				/*rtl:ignore*/
+				margin-left: 0;
+			}
+		}
+	}
+
+	// Kept for backward compatibiity.
+	&.aligncenter {
+		text-align: center;
+	}
+	&.alignleft .wp-block-button {
+		/*rtl:ignore*/
+		margin-left: 0;
+		/*rtl:ignore*/
+		margin-right: 0.5em;
+
+		&:last-child {
+			/*rtl:ignore*/
+			margin-right: 0;
+		}
+	}
+	&.alignright .wp-block-button {
+		/*rtl:ignore*/
+		margin-right: 0;
+		/*rtl:ignore*/
+		margin-left: 0.5em;
+
+		&:first-child {
+			/*rtl:ignore*/
+			margin-left: 0;
+		}
+	}
+}

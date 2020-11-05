@@ -10,6 +10,7 @@ const { last } = require( 'lodash' );
  */
 const engine = require( './engine' );
 const defaultMarkdownFormatter = require( './markdown' );
+const isSymbolPrivate = require( './is-symbol-private' );
 
 /**
  * Helpers functions.
@@ -50,8 +51,12 @@ const processFile = ( rootDir, inputFile ) => {
 		const data = fs.readFileSync( inputFile, 'utf8' );
 		currentFileStack.push( inputFile );
 		const relativePath = path.relative( rootDir, inputFile );
-		const result = engine( relativePath, data, getIRFromRelativePath( rootDir, last( currentFileStack ) ) );
-		currentFileStack.pop( inputFile );
+		const result = engine(
+			relativePath,
+			data,
+			getIRFromRelativePath( rootDir, last( currentFileStack ) )
+		);
+		currentFileStack.pop();
 		return result;
 	} catch ( e ) {
 		process.stderr.write( `\n${ e }` );
@@ -60,7 +65,13 @@ const processFile = ( rootDir, inputFile ) => {
 	}
 };
 
-const runCustomFormatter = ( customFormatterFile, rootDir, doc, symbols, headingTitle ) => {
+const runCustomFormatter = (
+	customFormatterFile,
+	rootDir,
+	doc,
+	symbols,
+	headingTitle
+) => {
 	try {
 		const customFormatter = require( customFormatterFile );
 		const output = customFormatter( rootDir, doc, symbols, headingTitle );
@@ -76,7 +87,7 @@ const runCustomFormatter = ( customFormatterFile, rootDir, doc, symbols, heading
 // To keep track of file being processed.
 const currentFileStack = [];
 
-module.exports = function( sourceFile, options ) {
+module.exports = ( sourceFile, options ) => {
 	// Input: process CLI args, prepare files, etc
 	const processDir = process.cwd();
 	if ( sourceFile === undefined ) {
@@ -96,26 +107,44 @@ module.exports = function( sourceFile, options ) {
 	const ast = inputBase + '-ast.json';
 	const tokens = inputBase + '-exports.json';
 	const ir = inputBase + '-ir.json';
-	const doc = options.output ?
-		path.join( processDir, options.output ) :
-		inputBase + '-api.md';
+	const doc = options.output
+		? path.join( processDir, options.output )
+		: inputBase + '-api.md';
 
 	// Process
 	const result = processFile( processDir, sourceFile );
-	const filteredIr = result.ir.filter( ( { name } ) => options.ignore ? ! name.match( options.ignore ) : true );
+	const filteredIR = result.ir.filter( ( symbol ) => {
+		if ( isSymbolPrivate( symbol ) ) {
+			return false;
+		}
+
+		if ( options.ignore ) {
+			return ! symbol.name.match( options.ignore );
+		}
+
+		return true;
+	} );
 
 	// Ouput
 	if ( result === undefined ) {
-		process.stdout.write( '\nFile was processed, but contained no ES6 module exports:' );
+		process.stdout.write(
+			'\nFile was processed, but contained no ES6 module exports:'
+		);
 		process.stdout.write( `\n${ sourceFile }` );
 		process.stdout.write( '\n\n' );
 		process.exit( 0 );
 	}
 
 	if ( options.formatter ) {
-		runCustomFormatter( path.join( processDir, options.formatter ), processDir, doc, filteredIr, 'API' );
+		runCustomFormatter(
+			path.join( processDir, options.formatter ),
+			processDir,
+			doc,
+			filteredIR,
+			'API'
+		);
 	} else {
-		defaultMarkdownFormatter( options, processDir, doc, filteredIr, 'API' );
+		defaultMarkdownFormatter( options, processDir, doc, filteredIR, 'API' );
 	}
 
 	if ( debugMode ) {

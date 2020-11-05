@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flowRight, omit, has } from 'lodash';
+import { omit, has } from 'lodash';
 import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
@@ -18,27 +18,27 @@ import { onSubKey } from './utils';
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
- * @returns {Object} Next state.
+ * @return {Object} Next state.
  */
-const subKeysIsResolved = flowRight( [
-	onSubKey( 'selectorName' ),
-] )( ( state = new EquivalentKeyMap(), action ) => {
-	switch ( action.type ) {
-		case 'START_RESOLUTION':
-		case 'FINISH_RESOLUTION': {
-			const isStarting = action.type === 'START_RESOLUTION';
-			const nextState = new EquivalentKeyMap( state );
-			nextState.set( action.args, isStarting );
-			return nextState;
+const subKeysIsResolved = onSubKey( 'selectorName' )(
+	( state = new EquivalentKeyMap(), action ) => {
+		switch ( action.type ) {
+			case 'START_RESOLUTION':
+			case 'FINISH_RESOLUTION': {
+				const isStarting = action.type === 'START_RESOLUTION';
+				const nextState = new EquivalentKeyMap( state );
+				nextState.set( action.args, isStarting );
+				return nextState;
+			}
+			case 'INVALIDATE_RESOLUTION': {
+				const nextState = new EquivalentKeyMap( state );
+				nextState.delete( action.args );
+				return nextState;
+			}
 		}
-		case 'INVALIDATE_RESOLUTION': {
-			const nextState = new EquivalentKeyMap( state );
-			nextState.delete( action.args );
-			return nextState;
-		}
+		return state;
 	}
-	return state;
-} );
+);
 
 /**
  * Reducer function returning next state for selector resolution, object form:
@@ -55,9 +55,9 @@ const isResolved = ( state = {}, action ) => {
 		case 'INVALIDATE_RESOLUTION_FOR_STORE':
 			return {};
 		case 'INVALIDATE_RESOLUTION_FOR_STORE_SELECTOR':
-			return has( state, [ action.selectorName ] ) ?
-				omit( state, [ action.selectorName ] ) :
-				state;
+			return has( state, [ action.selectorName ] )
+				? omit( state, [ action.selectorName ] )
+				: state;
 		case 'START_RESOLUTION':
 		case 'FINISH_RESOLUTION':
 		case 'INVALIDATE_RESOLUTION':

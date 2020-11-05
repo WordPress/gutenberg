@@ -9,7 +9,7 @@
 			className: 'my-plugin-link',
 			edit: function( props ) {
 				return wp.element.createElement(
-					wp.editor.RichTextToolbarButton, {
+					wp.blockEditor.RichTextToolbarButton, {
 						icon: 'admin-links',
 						title: 'Custom Link',
 						onClick: function() {
@@ -18,7 +18,7 @@
 									props.value, {
 										type: 'my-plugin/link',
 										attributes: {
-											url: '#test',
+											url: 'https://example.com',
 										}
 									}
 								)

@@ -3,7 +3,8 @@
  */
 import { MenuGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
-import { ifViewportMatches } from '@wordpress/viewport';
+import { useViewportMatch } from '@wordpress/compose';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -11,33 +12,39 @@ import { ifViewportMatches } from '@wordpress/viewport';
 import FeatureToggle from '../feature-toggle';
 
 function WritingMenu() {
+	const isLargeViewport = useViewportMatch( 'medium' );
+	if ( ! isLargeViewport ) {
+		return null;
+	}
+
 	return (
-		<MenuGroup
-			label={ _x( 'View', 'noun' ) }
-		>
+		<MenuGroup label={ _x( 'View', 'noun' ) }>
 			<FeatureToggle
 				feature="fixedToolbar"
-				label={ __( 'Top Toolbar' ) }
-				info={ __( 'Access all block and document tools in a single place' ) }
+				label={ __( 'Top toolbar' ) }
+				info={ __(
+					'Access all block and document tools in a single place'
+				) }
 				messageActivated={ __( 'Top toolbar activated' ) }
 				messageDeactivated={ __( 'Top toolbar deactivated' ) }
 			/>
 			<FeatureToggle
 				feature="focusMode"
-				label={ __( 'Spotlight Mode' ) }
+				label={ __( 'Spotlight mode' ) }
 				info={ __( 'Focus on one block at a time' ) }
 				messageActivated={ __( 'Spotlight mode activated' ) }
 				messageDeactivated={ __( 'Spotlight mode deactivated' ) }
 			/>
 			<FeatureToggle
 				feature="fullscreenMode"
-				label={ __( 'Fullscreen Mode' ) }
+				label={ __( 'Fullscreen mode' ) }
 				info={ __( 'Work without distraction' ) }
 				messageActivated={ __( 'Fullscreen mode activated' ) }
 				messageDeactivated={ __( 'Fullscreen mode deactivated' ) }
+				shortcut={ displayShortcut.secondary( 'f' ) }
 			/>
 		</MenuGroup>
 	);
 }
 
-export default ifViewportMatches( 'medium' )( WritingMenu );
+export default WritingMenu;

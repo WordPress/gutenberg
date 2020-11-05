@@ -2,1202 +2,709 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import {
-	find,
-	isNil,
-	isEqual,
-	omit,
-	pickBy,
-} from 'lodash';
-import memize from 'memize';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, Fragment, RawHTML } from '@wordpress/element';
-import { isHorizontalEdge } from '@wordpress/dom';
-import { createBlobURL } from '@wordpress/blob';
-import { BACKSPACE, DELETE, ENTER, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
-import { withDispatch, withSelect } from '@wordpress/data';
-import { pasteHandler, children, getBlockTransforms, findTransform } from '@wordpress/blocks';
-import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
-import { isURL } from '@wordpress/url';
 import {
+	RawHTML,
+	Platform,
+	useRef,
+	useCallback,
+	forwardRef,
+} from '@wordpress/element';
+import { useDispatch, useSelect } from '@wordpress/data';
+import {
+	pasteHandler,
+	children as childrenSource,
+	getBlockTransforms,
+	findTransform,
+	isUnmodifiedDefaultBlock,
+} from '@wordpress/blocks';
+import { useInstanceId } from '@wordpress/compose';
+import {
+	__experimentalRichText as RichText,
+	__unstableCreateElement,
 	isEmpty,
-	create,
-	__unstableApply as apply,
-	applyFormat,
-	split,
-	toHTMLString,
-	getTextContent,
+	__unstableIsEmptyLine as isEmptyLine,
 	insert,
 	__unstableInsertLineSeparator as insertLineSeparator,
-	__unstableIsEmptyLine as isEmptyLine,
-	__unstableToDom as toDom,
-	remove,
-	removeFormat,
-	isCollapsed,
+	create,
+	replace,
+	split,
 	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
-	__unstableIndentListItems as indentListItems,
-	__unstableGetActiveFormats as getActiveFormats,
-	__unstableUpdateFormats as updateFormats,
+	toHTMLString,
+	slice,
 } from '@wordpress/rich-text';
-import { decodeEntities } from '@wordpress/html-entities';
-import { withFilters, IsolatedEventContainer } from '@wordpress/components';
 import deprecated from '@wordpress/deprecated';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import { isURL } from '@wordpress/url';
+import { regexp } from '@wordpress/shortcode';
 
 /**
  * Internal dependencies
  */
 import Autocomplete from '../autocomplete';
-import BlockFormatControls from '../block-format-controls';
-import FormatEdit from './format-edit';
-import FormatToolbar from './format-toolbar';
-import Editable from './editable';
-import { pickAriaProps } from './aria';
-import { getPatterns } from './patterns';
-import { withBlockEditContext } from '../block-edit/context';
-import { ListEdit } from './list-edit';
+import { useBlockEditContext } from '../block-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
+import { filePasteHandler } from './file-paste-handler';
+import FormatToolbarContainer from './format-toolbar-container';
+
+const wrapperClasses = 'block-editor-rich-text';
+const classes = 'block-editor-rich-text__editable';
 
 /**
- * Browser dependencies
- */
-
-const { getSelection, getComputedStyle } = window;
-
-/**
- * All inserting input types that would insert HTML into the DOM.
+ * Get the multiline tag based on the multiline prop.
  *
- * @see  https://www.w3.org/TR/input-events-2/#interface-InputEvent-Attributes
+ * @param {?(string|boolean)} multiline The multiline prop.
  *
- * @type {Set}
+ * @return {?string} The multiline tag.
  */
-const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
-	'insertParagraph',
-	'insertOrderedList',
-	'insertUnorderedList',
-	'insertHorizontalRule',
-	'insertLink',
-] );
+function getMultilineTag( multiline ) {
+	if ( multiline !== true && multiline !== 'p' && multiline !== 'li' ) {
+		return;
+	}
 
-/**
- * Global stylesheet.
- */
-const globalStyle = document.createElement( 'style' );
-
-document.head.appendChild( globalStyle );
-
-function createPrepareEditableTree( props ) {
-	const fns = Object.keys( props ).reduce( ( accumulator, key ) => {
-		if ( key.startsWith( 'format_prepare_functions' ) ) {
-			accumulator.push( props[ key ] );
-		}
-
-		return accumulator;
-	}, [] );
-
-	return ( value ) => fns.reduce( ( accumulator, fn ) => {
-		return fn( accumulator, value.text );
-	}, value.formats );
+	return multiline === true ? 'p' : multiline;
 }
 
-export class RichText extends Component {
-	constructor( { value, onReplace, multiline } ) {
-		super( ...arguments );
-
-		if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
-			this.multilineTag = multiline === true ? 'p' : multiline;
-		}
-
-		if ( this.multilineTag === 'li' ) {
-			this.multilineWrapperTags = [ 'ul', 'ol' ];
-		}
-
-		if ( this.props.onSplit ) {
-			this.onSplit = this.props.onSplit;
-
-			deprecated( 'wp.editor.RichText onSplit prop', {
-				plugin: 'Gutenberg',
-				alternative: 'wp.editor.RichText unstableOnSplit prop',
-			} );
-		} else if ( this.props.unstableOnSplit ) {
-			this.onSplit = this.props.unstableOnSplit;
-		}
-
-		this.onFocus = this.onFocus.bind( this );
-		this.onBlur = this.onBlur.bind( this );
-		this.onChange = this.onChange.bind( this );
-		this.onDeleteKeyDown = this.onDeleteKeyDown.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
-		this.onPaste = this.onPaste.bind( this );
-		this.onCreateUndoLevel = this.onCreateUndoLevel.bind( this );
-		this.setFocusedElement = this.setFocusedElement.bind( this );
-		this.onInput = this.onInput.bind( this );
-		this.onCompositionEnd = this.onCompositionEnd.bind( this );
-		this.onSelectionChange = this.onSelectionChange.bind( this );
-		this.getRecord = this.getRecord.bind( this );
-		this.createRecord = this.createRecord.bind( this );
-		this.applyRecord = this.applyRecord.bind( this );
-		this.isEmpty = this.isEmpty.bind( this );
-		this.valueToFormat = this.valueToFormat.bind( this );
-		this.setRef = this.setRef.bind( this );
-		this.valueToEditableHTML = this.valueToEditableHTML.bind( this );
-		this.handleHorizontalNavigation = this.handleHorizontalNavigation.bind( this );
-		this.onPointerDown = this.onPointerDown.bind( this );
-
-		this.formatToValue = memize(
-			this.formatToValue.bind( this ),
-			{ maxSize: 1 }
-		);
-
-		this.savedContent = value;
-		this.patterns = getPatterns( {
-			onReplace,
-			valueToFormat: this.valueToFormat,
-		} );
-		this.enterPatterns = getBlockTransforms( 'from' )
-			.filter( ( { type } ) => type === 'enter' );
-
-		this.state = {};
-
-		this.usedDeprecatedChildrenSource = Array.isArray( value );
-		this.lastHistoryValue = value;
+function getAllowedFormats( {
+	allowedFormats,
+	formattingControls,
+	disableFormats,
+} ) {
+	if ( disableFormats ) {
+		return getAllowedFormats.EMPTY_ARRAY;
 	}
 
-	componentWillUnmount() {
-		document.removeEventListener( 'selectionchange', this.onSelectionChange );
+	if ( ! allowedFormats && ! formattingControls ) {
+		return;
 	}
 
-	setRef( node ) {
-		if ( node ) {
-			if ( process.env.NODE_ENV === 'development' ) {
-				const computedStyle = getComputedStyle( node );
+	if ( allowedFormats ) {
+		return allowedFormats;
+	}
 
-				if ( computedStyle.display === 'inline' ) {
-					// eslint-disable-next-line no-console
-					console.warn( 'RichText cannot be used with an inline container. Please use a different tagName.' );
-				}
+	deprecated( 'wp.blockEditor.RichText formattingControls prop', {
+		alternative: 'allowedFormats',
+	} );
+
+	return formattingControls.map( ( name ) => `core/${ name }` );
+}
+
+getAllowedFormats.EMPTY_ARRAY = [];
+
+const isShortcode = ( text ) => regexp( '.*' ).test( text );
+
+function RichTextWrapper(
+	{
+		children,
+		tagName,
+		value: originalValue,
+		onChange: originalOnChange,
+		isSelected: originalIsSelected,
+		multiline,
+		inlineToolbar,
+		wrapperClassName,
+		autocompleters,
+		onReplace,
+		placeholder,
+		keepPlaceholderOnFocus,
+		allowedFormats,
+		formattingControls,
+		withoutInteractiveFormatting,
+		onRemove,
+		onMerge,
+		onSplit,
+		__unstableOnSplitAtEnd: onSplitAtEnd,
+		__unstableOnSplitMiddle: onSplitMiddle,
+		identifier,
+		preserveWhiteSpace,
+		__unstableEmbedURLOnPaste,
+		__unstableDisableFormats: disableFormats,
+		disableLineBreaks,
+		unstableOnFocus,
+		__unstableAllowPrefixTransformations,
+		__unstableMultilineRootTag,
+		// Native props.
+		__unstableMobileNoFocusOnMount,
+		deleteEnter,
+		placeholderTextColor,
+		textAlign,
+		selectionColor,
+		tagsToEliminate,
+		rootTagsToEliminate,
+		disableEditingMenu,
+		fontSize,
+		fontFamily,
+		fontWeight,
+		fontStyle,
+		minWidth,
+		maxWidth,
+		onBlur,
+		setRef,
+		...props
+	},
+	forwardedRef
+) {
+	const instanceId = useInstanceId( RichTextWrapper );
+
+	identifier = identifier || instanceId;
+
+	const fallbackRef = useRef();
+	const ref = forwardedRef || fallbackRef;
+	const {
+		clientId,
+		onCaretVerticalPositionChange,
+		isSelected: blockIsSelected,
+	} = useBlockEditContext();
+	const selector = ( select ) => {
+		const {
+			isCaretWithinFormattedText,
+			getSelectionStart,
+			getSelectionEnd,
+			getSettings,
+			didAutomaticChange,
+			__unstableGetBlockWithoutInnerBlocks,
+			isMultiSelecting,
+			hasMultiSelection,
+		} = select( 'core/block-editor' );
+
+		const selectionStart = getSelectionStart();
+		const selectionEnd = getSelectionEnd();
+		const { __experimentalUndo: undo } = getSettings();
+
+		let isSelected;
+
+		if ( originalIsSelected === undefined ) {
+			isSelected =
+				selectionStart.clientId === clientId &&
+				selectionStart.attributeKey === identifier;
+		} else if ( originalIsSelected ) {
+			isSelected = selectionStart.clientId === clientId;
+		}
+
+		let extraProps = {};
+		if ( Platform.OS === 'native' ) {
+			// If the block of this RichText is unmodified then it's a candidate for replacing when adding a new block.
+			// In order to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1126, let's blur on unmount in that case.
+			// This apparently assumes functionality the BlockHlder actually
+			const block =
+				clientId && __unstableGetBlockWithoutInnerBlocks( clientId );
+			const shouldBlurOnUnmount =
+				block && isSelected && isUnmodifiedDefaultBlock( block );
+			extraProps = {
+				shouldBlurOnUnmount,
+			};
+		}
+
+		return {
+			isCaretWithinFormattedText: isCaretWithinFormattedText(),
+			selectionStart: isSelected ? selectionStart.offset : undefined,
+			selectionEnd: isSelected ? selectionEnd.offset : undefined,
+			isSelected,
+			didAutomaticChange: didAutomaticChange(),
+			disabled: isMultiSelecting() || hasMultiSelection(),
+			undo,
+			...extraProps,
+		};
+	};
+	// This selector must run on every render so the right selection state is
+	// retreived from the store on merge.
+	// To do: fix this somehow.
+	const {
+		isCaretWithinFormattedText,
+		selectionStart,
+		selectionEnd,
+		isSelected,
+		didAutomaticChange,
+		disabled,
+		undo,
+		shouldBlurOnUnmount,
+	} = useSelect( selector );
+	const {
+		__unstableMarkLastChangeAsPersistent,
+		enterFormattedText,
+		exitFormattedText,
+		selectionChange,
+		__unstableMarkAutomaticChange,
+	} = useDispatch( 'core/block-editor' );
+	const multilineTag = getMultilineTag( multiline );
+	const adjustedAllowedFormats = getAllowedFormats( {
+		allowedFormats,
+		formattingControls,
+		disableFormats,
+	} );
+	const hasFormats =
+		! adjustedAllowedFormats || adjustedAllowedFormats.length > 0;
+	let adjustedValue = originalValue;
+	let adjustedOnChange = originalOnChange;
+
+	// Handle deprecated format.
+	if ( Array.isArray( originalValue ) ) {
+		adjustedValue = childrenSource.toHTML( originalValue );
+		adjustedOnChange = ( newValue ) =>
+			originalOnChange(
+				childrenSource.fromDOM(
+					__unstableCreateElement( document, newValue ).childNodes
+				)
+			);
+	}
+
+	const onSelectionChange = useCallback(
+		( start, end ) => {
+			selectionChange( clientId, identifier, start, end );
+		},
+		[ clientId, identifier ]
+	);
+
+	const onDelete = useCallback(
+		( { value, isReverse } ) => {
+			if ( onMerge ) {
+				onMerge( ! isReverse );
 			}
 
-			this.editableRef = node;
-		} else {
-			delete this.editableRef;
-		}
-	}
-
-	setFocusedElement() {
-		if ( this.props.setFocusedElement ) {
-			this.props.setFocusedElement( this.props.instanceId );
-		}
-	}
+			// Only handle remove on Backspace. This serves dual-purpose of being
+			// an intentional user interaction distinguishing between Backspace and
+			// Delete to remove the empty field, but also to avoid merge & remove
+			// causing destruction of two fields (merge, then removed merged).
+			if ( onRemove && isEmpty( value ) && isReverse ) {
+				onRemove( ! isReverse );
+			}
+		},
+		[ onMerge, onRemove ]
+	);
 
 	/**
-	 * Get the current record (value and selection) from props and state.
+	 * Signals to the RichText owner that the block can be replaced with two
+	 * blocks as a result of splitting the block by pressing enter, or with
+	 * blocks as a result of splitting the block by pasting block content in the
+	 * instance.
 	 *
-	 * @return {Object} The current record (value and selection).
+	 * @param  {Object} record       The rich text value to split.
+	 * @param  {Array}  pastedBlocks The pasted blocks to insert, if any.
 	 */
-	getRecord() {
-		const { formats, replacements, text } = this.formatToValue( this.props.value );
-		const { start, end, activeFormats } = this.state;
-
-		return { formats, replacements, text, start, end, activeFormats };
-	}
-
-	createRecord() {
-		const selection = getSelection();
-		const range = selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
-
-		return create( {
-			element: this.editableRef,
-			range,
-			multilineTag: this.multilineTag,
-			multilineWrapperTags: this.multilineWrapperTags,
-			prepareEditableTree: createPrepareEditableTree( this.props ),
-			__unstableIsEditableTree: true,
-		} );
-	}
-
-	applyRecord( record, { domOnly } = {} ) {
-		apply( {
-			value: record,
-			current: this.editableRef,
-			multilineTag: this.multilineTag,
-			multilineWrapperTags: this.multilineWrapperTags,
-			prepareEditableTree: createPrepareEditableTree( this.props ),
-			__unstableDomOnly: domOnly,
-		} );
-	}
-
-	isEmpty() {
-		return isEmpty( this.formatToValue( this.props.value ) );
-	}
-
-	/**
-	 * Handles a paste event.
-	 *
-	 * Saves the pasted data as plain text in `pastedPlainText`.
-	 *
-	 * @param {PasteEvent} event The paste event.
-	 */
-	onPaste( event ) {
-		const clipboardData = event.clipboardData;
-		let { items, files } = clipboardData;
-
-		// In Edge these properties can be null instead of undefined, so a more
-		// rigorous test is required over using default values.
-		items = isNil( items ) ? [] : items;
-		files = isNil( files ) ? [] : files;
-
-		let plainText = '';
-		let html = '';
-
-		// IE11 only supports `Text` as an argument for `getData` and will
-		// otherwise throw an invalid argument error, so we try the standard
-		// arguments first, then fallback to `Text` if they fail.
-		try {
-			plainText = clipboardData.getData( 'text/plain' );
-			html = clipboardData.getData( 'text/html' );
-		} catch ( error1 ) {
-			try {
-				html = clipboardData.getData( 'Text' );
-			} catch ( error2 ) {
-				// Some browsers like UC Browser paste plain text by default and
-				// don't support clipboardData at all, so allow default
-				// behaviour.
-				return;
-			}
-		}
-
-		event.preventDefault();
-
-		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', html );
-		window.console.log( 'Received plain text:\n\n', plainText );
-
-		// Only process file if no HTML is present.
-		// Note: a pasted file may have the URL as plain text.
-		const item = find( [ ...items, ...files ], ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
-		if ( item && ! html ) {
-			const file = item.getAsFile ? item.getAsFile() : item;
-			const content = pasteHandler( {
-				HTML: `<img src="${ createBlobURL( file ) }">`,
-				mode: 'BLOCKS',
-				tagName: this.props.tagName,
-			} );
-			const shouldReplace = this.props.onReplace && this.isEmpty();
-
-			// Allows us to ask for this information when we get a report.
-			window.console.log( 'Received item:\n\n', file );
-
-			if ( shouldReplace ) {
-				this.props.onReplace( content );
-			} else if ( this.onSplit ) {
-				this.splitContent( content );
-			}
-
-			return;
-		}
-
-		const record = this.getRecord();
-
-		// There is a selection, check if a URL is pasted.
-		if ( ! isCollapsed( record ) ) {
-			const pastedText = ( html || plainText ).replace( /<[^>]+>/g, '' ).trim();
-
-			// A URL was pasted, turn the selection into a link
-			if ( isURL( pastedText ) ) {
-				this.onChange( applyFormat( record, {
-					type: 'a',
-					attributes: {
-						href: decodeEntities( pastedText ),
-					},
-				} ) );
-
-				// Allows us to ask for this information when we get a report.
-				window.console.log( 'Created link:\n\n', pastedText );
-
-				return;
-			}
-		}
-
-		const shouldReplace = this.props.onReplace && this.isEmpty();
-
-		let mode = 'INLINE';
-
-		if ( shouldReplace ) {
-			mode = 'BLOCKS';
-		} else if ( this.onSplit ) {
-			mode = 'AUTO';
-		}
-
-		const content = pasteHandler( {
-			HTML: html,
-			plainText,
-			mode,
-			tagName: this.props.tagName,
-			canUserUseUnfilteredHTML: this.props.canUserUseUnfilteredHTML,
-		} );
-
-		if ( typeof content === 'string' ) {
-			const recordToInsert = create( { html: content } );
-			this.onChange( insert( record, recordToInsert ) );
-		} else if ( this.onSplit ) {
-			if ( ! content.length ) {
+	const splitValue = useCallback(
+		( record, pastedBlocks = [] ) => {
+			if ( ! onReplace || ! onSplit ) {
 				return;
 			}
 
-			if ( shouldReplace ) {
-				this.props.onReplace( content );
-			} else {
-				this.splitContent( content, { paste: true } );
+			const blocks = [];
+			const [ before, after ] = split( record );
+			const hasPastedBlocks = pastedBlocks.length > 0;
+			let lastPastedBlockIndex = -1;
+
+			// Create a block with the content before the caret if there's no pasted
+			// blocks, or if there are pasted blocks and the value is not empty.
+			// We do not want a leading empty block on paste, but we do if split
+			// with e.g. the enter key.
+			if ( ! hasPastedBlocks || ! isEmpty( before ) ) {
+				blocks.push(
+					onSplit(
+						toHTMLString( {
+							value: before,
+							multilineTag,
+						} )
+					)
+				);
+				lastPastedBlockIndex += 1;
 			}
-		}
-	}
 
-	/**
-	 * Handles a focus event on the contenteditable field, calling the
-	 * `unstableOnFocus` prop callback if one is defined. The callback does not
-	 * receive any arguments.
-	 *
-	 * This is marked as a private API and the `unstableOnFocus` prop is not
-	 * documented, as the current requirements where it is used are subject to
-	 * future refactoring following `isSelected` handling.
-	 *
-	 * In contrast with `setFocusedElement`, this is only triggered in response
-	 * to focus within the contenteditable field, whereas `setFocusedElement`
-	 * is triggered on focus within any `RichText` descendent element.
-	 *
-	 * @see setFocusedElement
-	 *
-	 * @private
-	 */
-	onFocus() {
-		const { unstableOnFocus } = this.props;
-		if ( unstableOnFocus ) {
-			unstableOnFocus();
-		}
+			if ( hasPastedBlocks ) {
+				blocks.push( ...pastedBlocks );
+				lastPastedBlockIndex += pastedBlocks.length;
+			} else if ( onSplitMiddle ) {
+				blocks.push( onSplitMiddle() );
+			}
 
-		this.recalculateBoundaryStyle();
-
-		document.addEventListener( 'selectionchange', this.onSelectionChange );
-	}
-
-	onBlur() {
-		document.removeEventListener( 'selectionchange', this.onSelectionChange );
-	}
-
-	/**
-	 * Handle input on the next selection change event.
-	 *
-	 * @param {SyntheticEvent} event Synthetic input event.
-	 */
-	onInput( event ) {
-		// For Input Method Editor (IME), used in Chinese, Japanese, and Korean
-		// (CJK), do not trigger a change if characters are being composed.
-		// Browsers setting `isComposing` to `true` will usually emit a final
-		// `input` event when the characters are composed.
-		if ( event && event.nativeEvent.isComposing ) {
-			// Also don't update any selection.
-			document.removeEventListener( 'selectionchange', this.onSelectionChange );
-			return;
-		}
-
-		if ( event && event.nativeEvent.inputType ) {
-			const { inputType } = event.nativeEvent;
-
-			// The browser formatted something or tried to insert HTML.
-			// Overwrite it. It will be handled later by the format library if
-			// needed.
+			// If there's pasted blocks, append a block with non empty content
+			/// after the caret. Otherwise, do append an empty block if there
+			// is no `onSplitMiddle` prop, but if there is and the content is
+			// empty, the middle block is enough to set focus in.
 			if (
-				inputType.indexOf( 'format' ) === 0 ||
-				INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType )
+				hasPastedBlocks
+					? ! isEmpty( after )
+					: ! onSplitMiddle || ! isEmpty( after )
 			) {
-				this.applyRecord( this.getRecord() );
-				return;
-			}
-		}
-
-		const value = this.createRecord();
-		const { activeFormats = [], start } = this.state;
-
-		// Update the formats between the last and new caret position.
-		const change = updateFormats( {
-			value,
-			start,
-			end: value.start,
-			formats: activeFormats,
-		} );
-
-		this.onChange( change, { withoutHistory: true } );
-
-		const transformed = this.patterns.reduce(
-			( accumlator, transform ) => transform( accumlator ),
-			change
-		);
-
-		if ( transformed !== change ) {
-			this.onCreateUndoLevel();
-			this.onChange( { ...transformed, activeFormats } );
-		}
-
-		// Create an undo level when input stops for over a second.
-		this.props.clearTimeout( this.onInput.timeout );
-		this.onInput.timeout = this.props.setTimeout( this.onCreateUndoLevel, 1000 );
-	}
-
-	onCompositionEnd() {
-		// Ensure the value is up-to-date for browsers that don't emit a final
-		// input event after composition.
-		this.onInput();
-		// Tracking selection changes can be resumed.
-		document.addEventListener( 'selectionchange', this.onSelectionChange );
-	}
-
-	/**
-	 * Handles the `selectionchange` event: sync the selection to local state.
-	 */
-	onSelectionChange() {
-		const value = this.createRecord();
-		const { start, end } = value;
-
-		if ( start !== this.state.start || end !== this.state.end ) {
-			const { isCaretWithinFormattedText } = this.props;
-			const activeFormats = getActiveFormats( value );
-
-			if ( ! isCaretWithinFormattedText && activeFormats.length ) {
-				this.props.onEnterFormattedText();
-			} else if ( isCaretWithinFormattedText && ! activeFormats.length ) {
-				this.props.onExitFormattedText();
+				blocks.push(
+					onSplit(
+						toHTMLString( {
+							value: after,
+							multilineTag,
+						} )
+					)
+				);
 			}
 
-			this.setState( { start, end, activeFormats } );
-			this.applyRecord( { ...value, activeFormats }, { domOnly: true } );
+			// If there are pasted blocks, set the selection to the last one.
+			// Otherwise, set the selection to the second block.
+			const indexToSelect = hasPastedBlocks ? lastPastedBlockIndex : 1;
 
-			if ( activeFormats.length > 0 ) {
-				this.recalculateBoundaryStyle();
-			}
-		}
-	}
+			// If there are pasted blocks, move the caret to the end of the selected block
+			// Otherwise, retain the default value.
+			const initialPosition = hasPastedBlocks ? -1 : null;
 
-	recalculateBoundaryStyle() {
-		const boundarySelector = '*[data-rich-text-format-boundary]';
-		const element = this.editableRef.querySelector( boundarySelector );
+			onReplace( blocks, indexToSelect, initialPosition );
+		},
+		[ onReplace, onSplit, multilineTag, onSplitMiddle ]
+	);
 
-		if ( element ) {
-			const computedStyle = getComputedStyle( element );
-			const newColor = computedStyle.color
-				.replace( ')', ', 0.2)' )
-				.replace( 'rgb', 'rgba' );
+	const onEnter = useCallback(
+		( { value, onChange, shiftKey } ) => {
+			const canSplit = onReplace && onSplit;
 
-			globalStyle.innerHTML =
-				`*:focus ${ boundarySelector }{background-color: ${ newColor }}`;
-		}
-	}
-
-	/**
-	 * Sync the value to global state. The node tree and selection will also be
-	 * updated if differences are found.
-	 *
-	 * @param {Object}  record            The record to sync and apply.
-	 * @param {Object}  $2                Named options.
-	 * @param {boolean} $2.withoutHistory If true, no undo level will be
-	 *                                    created.
-	 */
-	onChange( record, { withoutHistory } = {} ) {
-		this.applyRecord( record );
-
-		const { start, end, activeFormats = [] } = record;
-		const changeHandlers = pickBy( this.props, ( v, key ) =>
-			key.startsWith( 'format_on_change_functions_' )
-		);
-
-		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
-			changeHandler( record.formats, record.text );
-		} );
-
-		this.savedContent = this.valueToFormat( record );
-		this.props.onChange( this.savedContent );
-		this.setState( { start, end, activeFormats } );
-
-		if ( ! withoutHistory ) {
-			this.onCreateUndoLevel();
-		}
-	}
-
-	onCreateUndoLevel() {
-		// If the content is the same, no level needs to be created.
-		if ( this.lastHistoryValue === this.savedContent ) {
-			return;
-		}
-
-		this.props.onCreateUndoLevel();
-		this.lastHistoryValue = this.savedContent;
-	}
-
-	/**
-	 * Handles a delete keyDown event to handle merge or removal for collapsed
-	 * selection where caret is at directional edge: forward for a delete key,
-	 * reverse for a backspace key.
-	 *
-	 * @link https://en.wikipedia.org/wiki/Caret_navigation
-	 *
-	 * @param {KeyboardEvent} event Keydown event.
-	 */
-	onDeleteKeyDown( event ) {
-		const { onMerge, onRemove } = this.props;
-		if ( ! onMerge && ! onRemove ) {
-			return;
-		}
-
-		const { keyCode } = event;
-		const isReverse = keyCode === BACKSPACE;
-
-		// Only process delete if the key press occurs at uncollapsed edge.
-		if ( ! isCollapsed( this.createRecord() ) ) {
-			return;
-		}
-
-		const empty = this.isEmpty();
-
-		// It is important to consider emptiness because an empty container
-		// will include a padding BR node _after_ the caret, so in a forward
-		// deletion the isHorizontalEdge function will incorrectly interpret the
-		// presence of the BR node as not being at the edge.
-		const isEdge = ( empty || isHorizontalEdge( this.editableRef, isReverse ) );
-
-		if ( ! isEdge ) {
-			return;
-		}
-
-		if ( onMerge ) {
-			onMerge( ! isReverse );
-		}
-
-		// Only handle remove on Backspace. This serves dual-purpose of being
-		// an intentional user interaction distinguishing between Backspace and
-		// Delete to remove the empty field, but also to avoid merge & remove
-		// causing destruction of two fields (merge, then removed merged).
-		if ( onRemove && empty && isReverse ) {
-			onRemove( ! isReverse );
-		}
-
-		event.preventDefault();
-	}
-
-	/**
-	 * Handles a keydown event.
-	 *
-	 * @param {SyntheticEvent} event A synthetic keyboard event.
-	 */
-	onKeyDown( event ) {
-		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
-
-		if (
-			// Only override left and right keys without modifiers pressed.
-			! shiftKey && ! altKey && ! metaKey && ! ctrlKey &&
-			( keyCode === LEFT || keyCode === RIGHT )
-		) {
-			this.handleHorizontalNavigation( event );
-		}
-
-		// Use the space key in list items (at the start of an item) to indent
-		// the list item.
-		if ( keyCode === SPACE && this.multilineTag === 'li' ) {
-			const value = this.createRecord();
-
-			if ( isCollapsed( value ) ) {
-				const { text, start } = value;
-				const characterBefore = text[ start - 1 ];
-
-				// The caret must be at the start of a line.
-				if ( ! characterBefore || characterBefore === LINE_SEPARATOR ) {
-					this.onChange( indentListItems( value, { type: this.props.tagName } ) );
-					event.preventDefault();
-				}
-			}
-		}
-
-		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
-			const value = this.createRecord();
-			const { replacements, text, start, end } = value;
-
-			// Always handle full content deletion ourselves.
-			if ( start === 0 && end !== 0 && end === value.text.length ) {
-				this.onChange( remove( value ) );
-				event.preventDefault();
-				return;
-			}
-
-			if ( this.multilineTag ) {
-				let newValue;
-
-				if ( keyCode === BACKSPACE ) {
-					const index = start - 1;
-
-					if ( text[ index ] === LINE_SEPARATOR ) {
-						const collapsed = isCollapsed( value );
-
-						// If the line separator that is about te be removed
-						// contains wrappers, remove the wrappers first.
-						if ( collapsed && replacements[ index ] && replacements[ index ].length ) {
-							const newReplacements = replacements.slice();
-
-							newReplacements[ index ] = replacements[ index ].slice( 0, -1 );
-							newValue = {
-								...value,
-								replacements: newReplacements,
-							};
-						} else {
-							newValue = remove(
-								value,
-								// Only remove the line if the selection is
-								// collapsed, otherwise remove the selection.
-								collapsed ? start - 1 : start,
-								end
-							);
-						}
-					}
-				} else if ( text[ end ] === LINE_SEPARATOR ) {
-					const collapsed = isCollapsed( value );
-
-					// If the line separator that is about te be removed
-					// contains wrappers, remove the wrappers first.
-					if ( collapsed && replacements[ end ] && replacements[ end ].length ) {
-						const newReplacements = replacements.slice();
-
-						newReplacements[ end ] = replacements[ end ].slice( 0, -1 );
-						newValue = {
-							...value,
-							replacements: newReplacements,
-						};
-					} else {
-						newValue = remove(
-							value,
-							start,
-							// Only remove the line if the selection is
-							// collapsed, otherwise remove the selection.
-							collapsed ? end + 1 : end,
-						);
-					}
-				}
-
-				if ( newValue ) {
-					this.onChange( newValue );
-					event.preventDefault();
-				}
-			}
-
-			this.onDeleteKeyDown( event );
-		} else if ( keyCode === ENTER ) {
-			event.preventDefault();
-
-			const record = this.createRecord();
-
-			if ( this.props.onReplace ) {
-				const text = getTextContent( record );
-				const transformation = findTransform( this.enterPatterns, ( item ) => {
-					return item.regExp.test( text );
+			if ( onReplace ) {
+				const transforms = getBlockTransforms( 'from' ).filter(
+					( { type } ) => type === 'enter'
+				);
+				const transformation = findTransform( transforms, ( item ) => {
+					return item.regExp.test( value.text );
 				} );
 
 				if ( transformation ) {
-					this.props.onReplace( [
-						transformation.transform( { content: text } ),
+					onReplace( [
+						transformation.transform( { content: value.text } ),
 					] );
-					return;
+					__unstableMarkAutomaticChange();
 				}
 			}
 
-			if ( this.multilineTag ) {
-				if ( event.shiftKey ) {
-					this.onChange( insert( record, '\n' ) );
-				} else if ( this.onSplit && isEmptyLine( record ) ) {
-					this.onSplit( ...split( record ).map( this.valueToFormat ) );
+			if ( multiline ) {
+				if ( shiftKey ) {
+					if ( ! disableLineBreaks ) {
+						onChange( insert( value, '\n' ) );
+					}
+				} else if ( canSplit && isEmptyLine( value ) ) {
+					splitValue( value );
 				} else {
-					this.onChange( insertLineSeparator( record ) );
+					onChange( insertLineSeparator( value ) );
 				}
-			} else if ( event.shiftKey || ! this.onSplit ) {
-				this.onChange( insert( record, '\n' ) );
 			} else {
-				this.splitContent();
+				const { text, start, end } = value;
+				const canSplitAtEnd =
+					onSplitAtEnd && start === end && end === text.length;
+
+				if ( shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
+					if ( ! disableLineBreaks ) {
+						onChange( insert( value, '\n' ) );
+					}
+				} else if ( ! canSplit && canSplitAtEnd ) {
+					onSplitAtEnd();
+				} else if ( canSplit ) {
+					splitValue( value );
+				}
 			}
-		}
-	}
+		},
+		[
+			onReplace,
+			onSplit,
+			__unstableMarkAutomaticChange,
+			multiline,
+			splitValue,
+			onSplitAtEnd,
+		]
+	);
 
-	/**
-	 * Handles horizontal keyboard navigation when no modifiers are pressed. The
-	 * navigation is handled separately to move correctly around format
-	 * boundaries.
-	 *
-	 * @param  {SyntheticEvent} event A synthetic keyboard event.
-	 */
-	handleHorizontalNavigation( event ) {
-		const value = this.createRecord();
-		const { formats, text, start, end } = value;
-		const { activeFormats = [] } = this.state;
-		const collapsed = isCollapsed( value );
-		const isReverse = event.keyCode === LEFT;
+	const onPaste = useCallback(
+		( { value, onChange, html, plainText, files, activeFormats } ) => {
+			// Only process file if no HTML is present.
+			// Note: a pasted file may have the URL as plain text.
+			if ( files && files.length && ! html ) {
+				const content = pasteHandler( {
+					HTML: filePasteHandler( files ),
+					mode: 'BLOCKS',
+					tagName,
+					preserveWhiteSpace,
+				} );
 
-		// If the selection is collapsed and at the very start, do nothing if
-		// navigating backward.
-		// If the selection is collapsed and at the very end, do nothing if
-		// navigating forward.
-		if ( collapsed && activeFormats.length === 0 ) {
-			if ( start === 0 && isReverse ) {
+				// Allows us to ask for this information when we get a report.
+				// eslint-disable-next-line no-console
+				window.console.log( 'Received items:\n\n', files );
+
+				if ( onReplace && isEmpty( value ) ) {
+					onReplace( content );
+				} else {
+					splitValue( value, content );
+				}
+
 				return;
 			}
 
-			if ( end === text.length && ! isReverse ) {
-				return;
-			}
-		}
+			let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
 
-		// If the selection is not collapsed, let the browser handle collapsing
-		// the selection for now. Later we could expand this logic to set
-		// boundary positions if needed.
-		if ( ! collapsed ) {
-			return;
-		}
-
-		// In all other cases, prevent default behaviour.
-		event.preventDefault();
-
-		const formatsBefore = formats[ start - 1 ] || [];
-		const formatsAfter = formats[ start ] || [];
-
-		let newActiveFormatsLength = activeFormats.length;
-		let source = formatsAfter;
-
-		if ( formatsBefore.length > formatsAfter.length ) {
-			source = formatsBefore;
-		}
-
-		// If the amount of formats before the caret and after the caret is
-		// different, the caret is at a format boundary.
-		if ( formatsBefore.length < formatsAfter.length ) {
-			if ( ! isReverse && activeFormats.length < formatsAfter.length ) {
-				newActiveFormatsLength++;
+			// Force the blocks mode when the user is pasting
+			// on a new line & the content resembles a shortcode.
+			// Otherwise it's going to be detected as inline
+			// and the shortcode won't be replaced.
+			if (
+				mode === 'AUTO' &&
+				isEmpty( value ) &&
+				isShortcode( plainText )
+			) {
+				mode = 'BLOCKS';
 			}
 
-			if ( isReverse && activeFormats.length > formatsBefore.length ) {
-				newActiveFormatsLength--;
-			}
-		} else if ( formatsBefore.length > formatsAfter.length ) {
-			if ( ! isReverse && activeFormats.length > formatsAfter.length ) {
-				newActiveFormatsLength--;
-			}
-
-			if ( isReverse && activeFormats.length < formatsBefore.length ) {
-				newActiveFormatsLength++;
-			}
-		}
-
-		// Wait for boundary class to be added.
-		this.props.setTimeout( () => this.recalculateBoundaryStyle() );
-
-		if ( newActiveFormatsLength !== activeFormats.length ) {
-			const newActiveFormats = source.slice( 0, newActiveFormatsLength );
-			this.applyRecord( { ...value, activeFormats: newActiveFormats } );
-			this.setState( { activeFormats: newActiveFormats } );
-			return;
-		}
-
-		const newPos = value.start + ( isReverse ? -1 : 1 );
-
-		this.setState( { start: newPos, end: newPos } );
-		this.applyRecord( {
-			...value,
-			start: newPos,
-			end: newPos,
-			activeFormats: isReverse ? formatsBefore : formatsAfter,
-		} );
-	}
-
-	/**
-	 * Splits the content at the location of the selection.
-	 *
-	 * Replaces the content of the editor inside this element with the contents
-	 * before the selection. Sends the elements after the selection to the `onSplit`
-	 * handler.
-	 *
-	 * @param {Array}  blocks  The blocks to add after the split point.
-	 * @param {Object} context The context for splitting.
-	 */
-	splitContent( blocks = [], context = {} ) {
-		if ( ! this.onSplit ) {
-			return;
-		}
-
-		const record = this.createRecord();
-		let [ before, after ] = split( record );
-
-		// In case split occurs at the trailing or leading edge of the field,
-		// assume that the before/after values respectively reflect the current
-		// value. This also provides an opportunity for the parent component to
-		// determine whether the before/after value has changed using a trivial
-		//  strict equality operation.
-		if ( isEmpty( after ) ) {
-			before = record;
-		} else if ( isEmpty( before ) ) {
-			after = record;
-		}
-
-		// If pasting and the split would result in no content other than the
-		// pasted blocks, remove the before and after blocks.
-		if ( context.paste ) {
-			before = isEmpty( before ) ? null : before;
-			after = isEmpty( after ) ? null : after;
-		}
-
-		if ( before ) {
-			before = this.valueToFormat( before );
-		}
-
-		if ( after ) {
-			after = this.valueToFormat( after );
-		}
-
-		this.onSplit( before, after, ...blocks );
-	}
-
-	/**
-	 * Select object when they are clicked. The browser will not set any
-	 * selection when clicking e.g. an image.
-	 *
-	 * @param  {SyntheticEvent} event Synthetic mousedown or touchstart event.
-	 */
-	onPointerDown( event ) {
-		const { target } = event;
-
-		// If the child element has no text content, it must be an object.
-		if ( target === this.editableRef || target.textContent ) {
-			return;
-		}
-
-		const { parentNode } = target;
-		const index = Array.from( parentNode.childNodes ).indexOf( target );
-		const range = target.ownerDocument.createRange();
-		const selection = getSelection();
-
-		range.setStart( target.parentNode, index );
-		range.setEnd( target.parentNode, index + 1 );
-
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}
-
-	componentDidUpdate( prevProps ) {
-		const { tagName, value, isSelected } = this.props;
-
-		if (
-			tagName === prevProps.tagName &&
-			value !== prevProps.value &&
-			value !== this.savedContent
-		) {
-			// Handle deprecated `children` and `node` sources.
-			// The old way of passing a value with the `node` matcher required
-			// the value to be mapped first, creating a new array each time, so
-			// a shallow check wouldn't work. We need to check deep equality.
-			// This is only executed for a deprecated API and will eventually be
-			// removed.
-			if ( Array.isArray( value ) && isEqual( value, this.savedContent ) ) {
-				return;
+			if (
+				__unstableEmbedURLOnPaste &&
+				isEmpty( value ) &&
+				isURL( plainText.trim() )
+			) {
+				mode = 'BLOCKS';
 			}
 
-			const record = this.formatToValue( value );
-
-			if ( isSelected ) {
-				const prevRecord = this.formatToValue( prevProps.value );
-				const length = getTextContent( prevRecord ).length;
-				record.start = length;
-				record.end = length;
-			}
-
-			this.applyRecord( record );
-			this.savedContent = value;
-		}
-
-		const prefix = 'format_prepare_props_';
-		const predicate = ( v, key ) => key.startsWith( prefix );
-		const prepareProps = pickBy( this.props, predicate );
-		const prevPrepareProps = pickBy( prevProps, predicate );
-
-		// If any format prepare props update, reapply value.
-		if ( ! isShallowEqual( prepareProps, prevPrepareProps ) ) {
-			const record = this.formatToValue( value );
-
-			// Maintain the previous selection if the instance is currently
-			// selected.
-			if ( isSelected ) {
-				record.start = this.state.start;
-				record.end = this.state.end;
-			}
-
-			this.applyRecord( record );
-		}
-	}
-
-	/**
-	 * Converts the outside data structure to our internal representation.
-	 *
-	 * @param {*} value The outside value, data type depends on props.
-	 * @return {Object} An internal rich-text value.
-	 */
-	formatToValue( value ) {
-		// Handle deprecated `children` and `node` sources.
-		if ( Array.isArray( value ) ) {
-			return create( {
-				html: children.toHTML( value ),
-				multilineTag: this.multilineTag,
-				multilineWrapperTags: this.multilineWrapperTags,
+			const content = pasteHandler( {
+				HTML: html,
+				plainText,
+				mode,
+				tagName,
+				preserveWhiteSpace,
 			} );
-		}
 
-		if ( this.props.format === 'string' ) {
-			return create( {
-				html: value,
-				multilineTag: this.multilineTag,
-				multilineWrapperTags: this.multilineWrapperTags,
-			} );
-		}
+			if ( typeof content === 'string' ) {
+				let valueToInsert = create( { html: content } );
 
-		// Guard for blocks passing `null` in onSplit callbacks. May be removed
-		// if onSplit is revised to not pass a `null` value.
-		if ( value === null ) {
-			return create();
-		}
+				// If there are active formats, merge them with the pasted formats.
+				if ( activeFormats.length ) {
+					let index = valueToInsert.formats.length;
 
-		return value;
-	}
+					while ( index-- ) {
+						valueToInsert.formats[ index ] = [
+							...activeFormats,
+							...( valueToInsert.formats[ index ] || [] ),
+						];
+					}
+				}
 
-	valueToEditableHTML( value ) {
-		return toDom( {
-			value,
-			multilineTag: this.multilineTag,
-			prepareEditableTree: createPrepareEditableTree( this.props ),
-		} ).body.innerHTML;
-	}
+				// If the content should be multiline, we should process text
+				// separated by a line break as separate lines.
+				if ( multiline ) {
+					valueToInsert = replace(
+						valueToInsert,
+						/\n+/g,
+						LINE_SEPARATOR
+					);
+				}
 
-	/**
-	 * Removes editor only formats from the value.
-	 *
-	 * Editor only formats are applied using `prepareEditableTree`, so we need to
-	 * remove them before converting the internal state
-	 *
-	 * @param {Object} value The internal rich-text value.
-	 * @return {Object} A new rich-text value.
-	 */
-	removeEditorOnlyFormats( value ) {
-		this.props.formatTypes.forEach( ( formatType ) => {
-			// Remove formats created by prepareEditableTree, because they are editor only.
-			if ( formatType.__experimentalCreatePrepareEditableTree ) {
-				value = removeFormat( value, formatType.name, 0, value.text.length );
+				onChange( insert( value, valueToInsert ) );
+			} else if ( content.length > 0 ) {
+				if ( onReplace && isEmpty( value ) ) {
+					onReplace( content, content.length - 1, -1 );
+				} else {
+					splitValue( value, content );
+				}
 			}
-		} );
+		},
+		[
+			tagName,
+			onReplace,
+			onSplit,
+			splitValue,
+			__unstableEmbedURLOnPaste,
+			multiline,
+			preserveWhiteSpace,
+		]
+	);
 
-		return value;
-	}
+	const inputRule = useCallback(
+		( value, valueToFormat ) => {
+			if ( ! onReplace ) {
+				return;
+			}
 
-	/**
-	 * Converts the internal value to the external data format.
-	 *
-	 * @param {Object} value The internal rich-text value.
-	 * @return {*} The external data format, data type depends on props.
-	 */
-	valueToFormat( value ) {
-		value = this.removeEditorOnlyFormats( value );
+			const { start, text } = value;
+			const characterBefore = text.slice( start - 1, start );
 
-		// Handle deprecated `children` and `node` sources.
-		if ( this.usedDeprecatedChildrenSource ) {
-			return children.fromDOM( toDom( {
+			// The character right before the caret must be a plain space.
+			if ( characterBefore !== ' ' ) {
+				return;
+			}
+
+			const trimmedTextBefore = text.slice( 0, start ).trim();
+			const prefixTransforms = getBlockTransforms( 'from' ).filter(
+				( { type } ) => type === 'prefix'
+			);
+			const transformation = findTransform(
+				prefixTransforms,
+				( { prefix } ) => {
+					return trimmedTextBefore === prefix;
+				}
+			);
+
+			if ( ! transformation ) {
+				return;
+			}
+
+			const content = valueToFormat( slice( value, start, text.length ) );
+			const block = transformation.transform( content );
+
+			onReplace( [ block ] );
+			__unstableMarkAutomaticChange();
+		},
+		[ onReplace, __unstableMarkAutomaticChange ]
+	);
+
+	const content = (
+		<RichText
+			clientId={ clientId }
+			identifier={ identifier }
+			ref={ ref }
+			value={ adjustedValue }
+			onChange={ adjustedOnChange }
+			selectionStart={ selectionStart }
+			selectionEnd={ selectionEnd }
+			onSelectionChange={ onSelectionChange }
+			tagName={ tagName }
+			placeholder={ placeholder }
+			allowedFormats={ adjustedAllowedFormats }
+			withoutInteractiveFormatting={ withoutInteractiveFormatting }
+			onEnter={ onEnter }
+			onDelete={ onDelete }
+			onPaste={ onPaste }
+			__unstableIsSelected={ isSelected }
+			__unstableInputRule={ inputRule }
+			__unstableMultilineTag={ multilineTag }
+			__unstableIsCaretWithinFormattedText={ isCaretWithinFormattedText }
+			__unstableOnEnterFormattedText={ enterFormattedText }
+			__unstableOnExitFormattedText={ exitFormattedText }
+			__unstableOnCreateUndoLevel={ __unstableMarkLastChangeAsPersistent }
+			__unstableMarkAutomaticChange={ __unstableMarkAutomaticChange }
+			__unstableDidAutomaticChange={ didAutomaticChange }
+			__unstableUndo={ undo }
+			__unstableDisableFormats={ disableFormats }
+			preserveWhiteSpace={ preserveWhiteSpace }
+			disabled={ disabled }
+			unstableOnFocus={ unstableOnFocus }
+			__unstableAllowPrefixTransformations={
+				__unstableAllowPrefixTransformations
+			}
+			__unstableMultilineRootTag={ __unstableMultilineRootTag }
+			// Native props.
+			onCaretVerticalPositionChange={ onCaretVerticalPositionChange }
+			blockIsSelected={
+				originalIsSelected !== undefined
+					? originalIsSelected
+					: blockIsSelected
+			}
+			shouldBlurOnUnmount={ shouldBlurOnUnmount }
+			__unstableMobileNoFocusOnMount={ __unstableMobileNoFocusOnMount }
+			deleteEnter={ deleteEnter }
+			placeholderTextColor={ placeholderTextColor }
+			textAlign={ textAlign }
+			selectionColor={ selectionColor }
+			tagsToEliminate={ tagsToEliminate }
+			rootTagsToEliminate={ rootTagsToEliminate }
+			disableEditingMenu={ disableEditingMenu }
+			fontSize={ fontSize }
+			fontFamily={ fontFamily }
+			fontWeight={ fontWeight }
+			fontStyle={ fontStyle }
+			minWidth={ minWidth }
+			maxWidth={ maxWidth }
+			onBlur={ onBlur }
+			setRef={ setRef }
+			// Props to be set on the editable container are destructured on the
+			// element itself for web (see below), but passed through rich text
+			// for native.
+			id={ props.id }
+			style={ props.style }
+		>
+			{ ( {
+				isSelected: nestedIsSelected,
 				value,
-				multilineTag: this.multilineTag,
-				isEditableTree: false,
-			} ).body.childNodes );
-		}
-
-		if ( this.props.format === 'string' ) {
-			return toHTMLString( {
-				value,
-				multilineTag: this.multilineTag,
-			} );
-		}
-
-		return value;
-	}
-
-	render() {
-		const {
-			tagName: Tagname = 'div',
-			style,
-			wrapperClassName,
-			className,
-			inlineToolbar = false,
-			formattingControls,
-			placeholder,
-			keepPlaceholderOnFocus = false,
-			isSelected,
-			autocompleters,
-			onTagNameChange,
-		} = this.props;
-
-		// Generating a key that includes `tagName` ensures that if the tag
-		// changes, we replace the relevant element. This is needed because we
-		// prevent Editable component updates.
-		const key = Tagname;
-		const MultilineTag = this.multilineTag;
-		const ariaProps = pickAriaProps( this.props );
-		const isPlaceholderVisible = placeholder && ( ! isSelected || keepPlaceholderOnFocus ) && this.isEmpty();
-		const classes = classnames( wrapperClassName, 'editor-rich-text block-editor-rich-text' );
-		const record = this.getRecord();
-
-		return (
-			<div className={ classes } onFocus={ this.setFocusedElement }>
-				{ isSelected && this.multilineTag === 'li' && (
-					<ListEdit
-						onTagNameChange={ onTagNameChange }
-						tagName={ Tagname }
-						value={ record }
-						onChange={ this.onChange }
-					/>
-				) }
-				{ isSelected && ! inlineToolbar && (
-					<BlockFormatControls>
-						<FormatToolbar controls={ formattingControls } />
-					</BlockFormatControls>
-				) }
-				{ isSelected && inlineToolbar && (
-					<IsolatedEventContainer className="editor-rich-text__inline-toolbar block-editor-rich-text__inline-toolbar">
-						<FormatToolbar controls={ formattingControls } />
-					</IsolatedEventContainer>
-				) }
-				<Autocomplete
-					onReplace={ this.props.onReplace }
-					completers={ autocompleters }
-					record={ record }
-					onChange={ this.onChange }
-				>
-					{ ( { listBoxId, activeId } ) => (
-						<Fragment>
-							<Editable
-								tagName={ Tagname }
-								style={ style }
-								record={ record }
-								valueToEditableHTML={ this.valueToEditableHTML }
-								isPlaceholderVisible={ isPlaceholderVisible }
-								aria-label={ placeholder }
-								aria-autocomplete="list"
+				onChange,
+				onFocus,
+				editableProps,
+				editableTagName: TagName,
+			} ) => (
+				<>
+					{ children && children( { value, onChange, onFocus } ) }
+					{ nestedIsSelected && hasFormats && (
+						<FormatToolbarContainer
+							inline={ inlineToolbar }
+							anchorRef={ ref.current }
+						/>
+					) }
+					{ nestedIsSelected && <RemoveBrowserShortcuts /> }
+					<Autocomplete
+						onReplace={ onReplace }
+						completers={ autocompleters }
+						record={ value }
+						onChange={ onChange }
+						isSelected={ nestedIsSelected }
+					>
+						{ ( { listBoxId, activeId, onKeyDown } ) => (
+							<TagName
+								{ ...editableProps }
+								{ ...props }
+								style={
+									props.style
+										? {
+												...props.style,
+												...editableProps.style,
+										  }
+										: editableProps.style
+								}
+								className={ classnames(
+									classes,
+									props.className,
+									editableProps.className,
+									{
+										'keep-placeholder-on-focus': keepPlaceholderOnFocus,
+									}
+								) }
+								aria-autocomplete={
+									listBoxId ? 'list' : undefined
+								}
 								aria-owns={ listBoxId }
 								aria-activedescendant={ activeId }
-								{ ...ariaProps }
-								className={ className }
-								key={ key }
-								onPaste={ this.onPaste }
-								onInput={ this.onInput }
-								onCompositionEnd={ this.onCompositionEnd }
-								onKeyDown={ this.onKeyDown }
-								onFocus={ this.onFocus }
-								onBlur={ this.onBlur }
-								onMouseDown={ this.onPointerDown }
-								onTouchStart={ this.onPointerDown }
-								setRef={ this.setRef }
+								onKeyDown={ ( event ) => {
+									onKeyDown( event );
+									editableProps.onKeyDown( event );
+								} }
 							/>
-							{ isPlaceholderVisible &&
-								<Tagname
-									className={ classnames( 'editor-rich-text__editable block-editor-rich-text__editable', className ) }
-									style={ style }
-								>
-									{ MultilineTag ? <MultilineTag>{ placeholder }</MultilineTag> : placeholder }
-								</Tagname>
-							}
-							{ isSelected && <FormatEdit value={ record } onChange={ this.onChange } /> }
-						</Fragment>
-					) }
-				</Autocomplete>
-				{ isSelected && <RemoveBrowserShortcuts /> }
-			</div>
-		);
+						) }
+					</Autocomplete>
+				</>
+			) }
+		</RichText>
+	);
+
+	if ( ! wrapperClassName ) {
+		return content;
 	}
+
+	deprecated( 'wp.blockEditor.RichText wrapperClassName prop', {
+		alternative: 'className prop or create your own wrapper div',
+	} );
+
+	return (
+		<div className={ classnames( wrapperClasses, wrapperClassName ) }>
+			{ content }
+		</div>
+	);
 }
 
-RichText.defaultProps = {
-	formattingControls: [ 'bold', 'italic', 'link', 'strikethrough' ],
-	format: 'string',
-	value: '',
-};
+const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
 
-const RichTextContainer = compose( [
-	withInstanceId,
-	withBlockEditContext( ( context, ownProps ) => {
-		// When explicitly set as not selected, do nothing.
-		if ( ownProps.isSelected === false ) {
-			return {
-				clientId: context.clientId,
-			};
-		}
-		// When explicitly set as selected, use the value stored in the context instead.
-		if ( ownProps.isSelected === true ) {
-			return {
-				isSelected: context.isSelected,
-				clientId: context.clientId,
-			};
-		}
-
-		// Ensures that only one RichText component can be focused.
-		return {
-			isSelected: context.isSelected && context.focusedElement === ownProps.instanceId,
-			setFocusedElement: context.setFocusedElement,
-			clientId: context.clientId,
-		};
-	} ),
-	withSelect( ( select ) => {
-		// This should probably be moved to the block editor settings.
-		const { canUserUseUnfilteredHTML } = select( 'core/editor' );
-		const { isCaretWithinFormattedText } = select( 'core/block-editor' );
-		const { getFormatTypes } = select( 'core/rich-text' );
-
-		return {
-			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
-			isCaretWithinFormattedText: isCaretWithinFormattedText(),
-			formatTypes: getFormatTypes(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const {
-			__unstableMarkLastChangeAsPersistent,
-			enterFormattedText,
-			exitFormattedText,
-		} = dispatch( 'core/block-editor' );
-
-		return {
-			onCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
-			onEnterFormattedText: enterFormattedText,
-			onExitFormattedText: exitFormattedText,
-		};
-	} ),
-	withSafeTimeout,
-	withFilters( 'experimentalRichText' ),
-] )( RichText );
-
-RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => {
-	let html = value;
-	let MultilineTag;
-
-	if ( multiline === true || multiline === 'p' || multiline === 'li' ) {
-		MultilineTag = multiline === true ? 'p' : multiline;
-	}
-
+ForwardedRichTextContainer.Content = ( {
+	value,
+	tagName: Tag,
+	multiline,
+	...props
+} ) => {
 	// Handle deprecated `children` and `node` sources.
 	if ( Array.isArray( value ) ) {
-		html = children.toHTML( value );
+		value = childrenSource.toHTML( value );
 	}
 
-	if ( ! html && MultilineTag ) {
-		html = `<${ MultilineTag }></${ MultilineTag }>`;
+	const MultilineTag = getMultilineTag( multiline );
+
+	if ( ! value && MultilineTag ) {
+		value = `<${ MultilineTag }></${ MultilineTag }>`;
 	}
 
-	const content = <RawHTML>{ html }</RawHTML>;
+	const content = <RawHTML>{ value }</RawHTML>;
 
 	if ( Tag ) {
 		return <Tag { ...omit( props, [ 'format' ] ) }>{ content }</Tag>;
@@ -1206,21 +713,19 @@ RichTextContainer.Content = ( { value, tagName: Tag, multiline, ...props } ) => 
 	return content;
 };
 
-RichTextContainer.isEmpty = ( value = '' ) => {
-	// Handle deprecated `children` and `node` sources.
-	if ( Array.isArray( value ) ) {
-		return ! value || value.length === 0;
-	}
-
-	return value.length === 0;
+ForwardedRichTextContainer.isEmpty = ( value ) => {
+	return ! value || value.length === 0;
 };
 
-RichTextContainer.Content.defaultProps = {
+ForwardedRichTextContainer.Content.defaultProps = {
 	format: 'string',
 	value: '',
 };
 
-export default RichTextContainer;
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/rich-text/README.md
+ */
+export default ForwardedRichTextContainer;
 export { RichTextShortcut } from './shortcut';
 export { RichTextToolbarButton } from './toolbar-button';
-export { UnstableRichTextInputEvent } from './input-event';
+export { __unstableRichTextInputEvent } from './input-event';

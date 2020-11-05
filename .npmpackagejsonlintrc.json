@@ -1,0 +1,39 @@
+{
+	"extends": "@wordpress/npm-package-json-lint-config",
+	"rules": {
+		"description-format": [
+			"error",
+			{
+				"requireCapitalFirstLetter": true,
+				"requireEndingPeriod": true
+			}
+		],
+		"prefer-no-devDependencies": "error",
+		"require-publishConfig": "error",
+		"require-repository-directory": "error",
+		"valid-values-author": [
+			"error",
+			[
+				"The WordPress Contributors"
+			]
+		],
+		"valid-values-publishConfig": [
+			"error",
+			[
+				{
+					"access": "public"
+				}
+			]
+		]
+	},
+	"overrides": [
+		{
+			"patterns": [ "./package.json" ],
+			"rules": {
+				"require-publishConfig": "off",
+				"require-repository-directory": "off",
+				"prefer-no-devDependencies": "off"
+			}
+		}
+	]
+}

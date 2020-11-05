@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { PostTaxonomies as PostTaxonomiesForm, PostTaxonomiesCheck } from '@wordpress/editor';
+import {
+	PostTaxonomies as PostTaxonomiesForm,
+	PostTaxonomiesCheck,
+} from '@wordpress/editor';
 
 /**
  * Internal dependencies

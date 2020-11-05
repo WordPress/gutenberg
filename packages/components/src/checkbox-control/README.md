@@ -8,9 +8,9 @@ Selected and unselected checkboxes
 
 ## Table of contents
 
-1. [Design guidelines](http://#design-guidelines)
-2. [Development guidelines](http://#development-guidelines)
-3. [Related components](http://#related-components)
+1. [Design guidelines](#design-guidelines)
+2. [Development guidelines](#development-guidelines)
+3. [Related components](#related-components)
 
 ## Design guidelines
 
@@ -56,19 +56,20 @@ If only a few child checkboxes are checked, the parent checkbox becomes a mixed 
 Render an is author checkbox:
 ```jsx
 import { CheckboxControl } from '@wordpress/components';
-import { withState } from '@wordpress/compose';
+import { useState } from '@wordpress/element';
 
-const MyCheckboxControl = withState( {
-	isChecked: true,
-} )( ( { isChecked, setState } ) => (
-	<CheckboxControl
-		heading="User"
-		label="Is author"
-		help="Is the user a author or not?"
-		checked={ isChecked }
-		onChange={ ( isChecked ) => { setState( { isChecked } ) } }
-	/>
-) );
+const MyCheckboxControl = () => {
+	const [ isChecked, setChecked ] = useState( true );
+	return (
+		<CheckboxControl
+			heading="User"
+			label="Is author"
+			help="Is the user a author or not?"
+			checked={ isChecked }
+			onChange={ setChecked }
+		/>
+	)
+};
 ```
 
 ### Props

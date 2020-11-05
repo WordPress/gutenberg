@@ -1,113 +1,45 @@
 /**
- * WordPress dependencies
- */
-import triggerFetch from '@wordpress/api-fetch';
-import { createRegistryControl } from '@wordpress/data';
-
-/**
- * Dispatches a control action for triggering an api fetch call.
+ * Function returning a sessionStorage key to set or retrieve a given post's
+ * automatic session backup.
  *
- * @param {Object} request Arguments for the fetch request.
+ * Keys are crucially prefixed with 'wp-autosave-' so that wp-login.php's
+ * `loggedout` handler can clear sessionStorage of any user-private content.
  *
- * @return {Object} control descriptor.
+ * @see https://github.com/WordPress/wordpress-develop/blob/6dad32d2aed47e6c0cf2aee8410645f6d7aba6bd/src/wp-login.php#L103
+ *
+ * @param {string}  postId     Post ID.
+ * @param {boolean} isPostNew  Whether post new.
+ * @return {string}            sessionStorage key
  */
-export function apiFetch( request ) {
-	return {
-		type: 'API_FETCH',
-		request,
-	};
+function postKey( postId, isPostNew ) {
+	return `wp-autosave-block-editor-post-${
+		isPostNew ? 'auto-draft' : postId
+	}`;
 }
 
-/**
- * Dispatches a control action for triggering a registry select.
- *
- * @param {string} storeKey
- * @param {string} selectorName
- * @param {Array}  args Arguments for the select.
- *
- * @return {Object} control descriptor.
- */
-export function select( storeKey, selectorName, ...args ) {
-	return {
-		type: 'SELECT',
-		storeKey,
-		selectorName,
-		args,
-	};
+export function localAutosaveGet( postId, isPostNew ) {
+	return window.sessionStorage.getItem( postKey( postId, isPostNew ) );
 }
 
-/**
- * Dispatches a control action for triggering a registry select that has a
- * resolver.
- *
- * @param {string}  storeKey
- * @param {string}  selectorName
- * @param {Array}   args  Arguments for the select.
- *
- * @return {Object} control descriptor.
- */
-export function resolveSelect( storeKey, selectorName, ...args ) {
-	return {
-		type: 'RESOLVE_SELECT',
-		storeKey,
-		selectorName,
-		args,
-	};
+export function localAutosaveSet( postId, isPostNew, title, content, excerpt ) {
+	window.sessionStorage.setItem(
+		postKey( postId, isPostNew ),
+		JSON.stringify( {
+			post_title: title,
+			content,
+			excerpt,
+		} )
+	);
 }
 
-/**
- * Dispatches a control action for triggering a registry dispatch.
- *
- * @param {string} storeKey
- * @param {string} actionName
- * @param {Array} args  Arguments for the dispatch action.
- *
- * @return {Object}  control descriptor.
- */
-export function dispatch( storeKey, actionName, ...args ) {
-	return {
-		type: 'DISPATCH',
-		storeKey,
-		actionName,
-		args,
-	};
+export function localAutosaveClear( postId, isPostNew ) {
+	window.sessionStorage.removeItem( postKey( postId, isPostNew ) );
 }
 
-export default {
-	API_FETCH( { request } ) {
-		return triggerFetch( request );
+const controls = {
+	LOCAL_AUTOSAVE_SET( { postId, isPostNew, title, content, excerpt } ) {
+		localAutosaveSet( postId, isPostNew, title, content, excerpt );
 	},
-	SELECT: createRegistryControl(
-		( registry ) => ( { storeKey, selectorName, args } ) => {
-			return registry.select( storeKey )[ selectorName ]( ...args );
-		}
-	),
-	DISPATCH: createRegistryControl(
-		( registry ) => ( { storeKey, actionName, args } ) => {
-			return registry.dispatch( storeKey )[ actionName ]( ...args );
-		}
-	),
-	RESOLVE_SELECT: createRegistryControl(
-		( registry ) => ( { storeKey, selectorName, args } ) => {
-			return new Promise( ( resolve ) => {
-				const hasFinished = () => registry.select( 'core/data' )
-					.hasFinishedResolution( storeKey, selectorName, args );
-				const getResult = () => registry.select( storeKey )[ selectorName ]
-					.apply( null, args );
-
-				// trigger the selector (to trigger the resolver)
-				const result = getResult();
-				if ( hasFinished() ) {
-					return resolve( result );
-				}
-
-				const unsubscribe = registry.subscribe( () => {
-					if ( hasFinished() ) {
-						unsubscribe();
-						resolve( getResult() );
-					}
-				} );
-			} );
-		}
-	),
 };
+
+export default controls;

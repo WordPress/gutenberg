@@ -1,9 +1,34 @@
-## V.V.V (Unreleased)
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
 
-### New Features
+## Unreleased
+
+## 3.13.0 (2020-02-10)
+
+### Internal
+
+- Move the internal `EditorRegions` component to the `@wordpress/block-editor` package, an rename to `EditorSkeleton`. Its class names have thus been renamed from `edit-post-editor-regions` to `block-editor-editor-skeleton`.
+
+## 3.8.2
+
+### Bug Fixes
+
+- Fix regression introduced by EditorInitializer component which auto-closed sidebar plugins when opened on small screens. ([#17712](https://github.com/WordPress/gutenberg/pull/17712))
+
+## 3.6.0 (2019-08-05)
+
+### Refactor
+
+- Create EditorInitializer component and implement for various things to initialize as the editor is loaded. This replaces the `__unstableInitialize` refactor done in #14740. ([#15444](https://github.com/WordPress/gutenberg/pull/15444))
+
+## 3.4.0 (2019-05-21)
+
+### New Feature
 
 - Implement the `addToGallery` option in the `MediaUpload` hook. The option allows users to open the media modal in the `gallery-library`instead of `gallery-edit` state.
 
+### Refactor
+
+- convert `INIT` effect to controls & actions [#14740](https://github.com/WordPress/gutenberg/pull/14740)
 
 ## 3.2.0 (2019-03-06)
 

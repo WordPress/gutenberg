@@ -2,7 +2,21 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { filter, get, includes, map, some, flow, deburr } from 'lodash';
+import {
+	deburr,
+	filter,
+	findLast,
+	first,
+	flow,
+	get,
+	includes,
+	map,
+	some,
+} from 'lodash';
+
+/** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
+/** @typedef {import('../api/registration').WPBlockVariationScope} WPBlockVariationScope */
+/** @typedef {import('./reducer').WPBlockCategory} WPBlockCategory */
 
 /**
  * Given a block name or block type object, returns the corresponding
@@ -13,11 +27,10 @@ import { filter, get, includes, map, some, flow, deburr } from 'lodash';
  *
  * @return {Object} Block type object.
  */
-const getNormalizedBlockType = ( state, nameOrType ) => (
-	'string' === typeof nameOrType ?
-		getBlockType( state, nameOrType ) :
-		nameOrType
-);
+const getNormalizedBlockType = ( state, nameOrType ) =>
+	'string' === typeof nameOrType
+		? getBlockType( state, nameOrType )
+		: nameOrType;
 
 /**
  * Returns all the available block types.
@@ -27,10 +40,15 @@ const getNormalizedBlockType = ( state, nameOrType ) => (
  * @return {Array} Block Types.
  */
 export const getBlockTypes = createSelector(
-	( state ) => Object.values( state.blockTypes ),
-	( state ) => [
-		state.blockTypes,
-	]
+	( state ) => {
+		return Object.values( state.blockTypes ).map( ( blockType ) => {
+			return {
+				...blockType,
+				variations: getBlockVariations( state, blockType.name ),
+			};
+		} );
+	},
+	( state ) => [ state.blockTypes, state.blockVariations ]
 );
 
 /**
@@ -58,14 +76,62 @@ export function getBlockStyles( state, name ) {
 }
 
 /**
+ * Returns block variations by block name.
+ *
+ * @param {Object}                state     Data state.
+ * @param {string}                blockName Block type name.
+ * @param {WPBlockVariationScope} [scope]   Block variation scope name.
+ *
+ * @return {(WPBlockVariation[]|void)} Block variations.
+ */
+export function getBlockVariations( state, blockName, scope ) {
+	const variations = state.blockVariations[ blockName ];
+	if ( ! variations || ! scope ) {
+		return variations;
+	}
+	return variations.filter( ( variation ) => {
+		return ! variation.scope || variation.scope.includes( scope );
+	} );
+}
+
+/**
+ * Returns the default block variation for the given block type.
+ * When there are multiple variations annotated as the default one,
+ * the last added item is picked. This simplifies registering overrides.
+ * When there is no default variation set, it returns the first item.
+ *
+ * @param {Object}                state     Data state.
+ * @param {string}                blockName Block type name.
+ * @param {WPBlockVariationScope} [scope]   Block variation scope name.
+ *
+ * @return {?WPBlockVariation} The default block variation.
+ */
+export function getDefaultBlockVariation( state, blockName, scope ) {
+	const variations = getBlockVariations( state, blockName, scope );
+
+	return findLast( variations, 'isDefault' ) || first( variations );
+}
+
+/**
  * Returns all the available categories.
  *
  * @param {Object} state Data state.
  *
- * @return {Array} Categories list.
+ * @return {WPBlockCategory[]} Categories list.
  */
 export function getCategories( state ) {
 	return state.categories;
+}
+
+/**
+ * Returns all the available collections.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Object} Collections list.
+ */
+export function getCollections( state ) {
+	return state.collections;
 }
 
 /**
@@ -102,6 +168,17 @@ export function getUnregisteredFallbackBlockName( state ) {
 }
 
 /**
+ * Returns the name of the block for handling unregistered blocks.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {string?} Name of the block for handling unregistered blocks.
+ */
+export function getGroupingBlockName( state ) {
+	return state.groupingBlockName;
+}
+
+/**
  * Returns an array with the child blocks of a given block.
  *
  * @param {Object} state     Data state.
@@ -118,9 +195,7 @@ export const getChildBlockNames = createSelector(
 			( { name } ) => name
 		);
 	},
-	( state ) => [
-		state.blockTypes,
-	]
+	( state ) => [ state.blockTypes ]
 );
 
 /**
@@ -134,13 +209,19 @@ export const getChildBlockNames = createSelector(
  *
  * @return {?*} Block support value
  */
-export const getBlockSupport = ( state, nameOrType, feature, defaultSupports ) => {
+export const getBlockSupport = (
+	state,
+	nameOrType,
+	feature,
+	defaultSupports
+) => {
 	const blockType = getNormalizedBlockType( state, nameOrType );
 
-	return get( blockType, [
-		'supports',
-		feature,
-	], defaultSupports );
+	return get(
+		blockType,
+		[ 'supports', ...feature.split( '.' ) ],
+		defaultSupports
+	);
 };
 
 /**
@@ -166,7 +247,7 @@ export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
  * @param {(string|Object)} nameOrType Block name or type object.
  * @param {string}          searchTerm Search term by which to filter.
  *
- * @return {Object[]} Wheter block type matches search term.
+ * @return {Object[]} Whether block type matches search term.
  */
 export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 	const blockType = getNormalizedBlockType( state, nameOrType );
@@ -189,10 +270,8 @@ export function isMatchingSearchTerm( state, nameOrType, searchTerm ) {
 
 	const isSearchMatch = flow( [
 		getNormalizedSearchTerm,
-		( normalizedCandidate ) => includes(
-			normalizedCandidate,
-			normalizedSearchTerm
-		),
+		( normalizedCandidate ) =>
+			includes( normalizedCandidate, normalizedSearchTerm ),
 	] );
 
 	return (

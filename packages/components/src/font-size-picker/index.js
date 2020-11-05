@@ -1,24 +1,58 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { isNumber, isString } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __, _x, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
+import { textColor } from '@wordpress/icons';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import Dashicon from '../dashicon';
-import BaseControl from '../base-control';
 import Button from '../button';
-import Dropdown from '../dropdown';
 import RangeControl from '../range-control';
-import { NavigableMenu } from '../navigable-container';
+import CustomSelectControl from '../custom-select-control';
+import VisuallyHidden from '../visually-hidden';
 
-function FontSizePicker( {
+const DEFAULT_FONT_SIZE = 'default';
+const CUSTOM_FONT_SIZE = 'custom';
+const MAX_FONT_SIZE_DISPLAY = '25px';
+
+function getSelectValueFromFontSize( fontSizes, value ) {
+	if ( value ) {
+		const fontSizeValue = fontSizes.find( ( font ) => font.size === value );
+		return fontSizeValue ? fontSizeValue.slug : CUSTOM_FONT_SIZE;
+	}
+	return DEFAULT_FONT_SIZE;
+}
+
+function getSelectOptions( optionsArray, disableCustomFontSizes ) {
+	if ( disableCustomFontSizes && ! optionsArray.length ) {
+		return null;
+	}
+	optionsArray = [
+		{ slug: DEFAULT_FONT_SIZE, name: __( 'Default' ) },
+		...optionsArray,
+		...( disableCustomFontSizes
+			? []
+			: [ { slug: CUSTOM_FONT_SIZE, name: __( 'Custom' ) } ] ),
+	];
+	return optionsArray.map( ( option ) => ( {
+		key: option.slug,
+		name: option.name,
+		size: option.size,
+		style: {
+			fontSize: `min( ${ option.size }, ${ MAX_FONT_SIZE_DISPLAY } )`,
+		},
+	} ) );
+}
+
+export default function FontSizePicker( {
 	fallbackFontSize,
 	fontSizes = [],
 	disableCustomFontSizes = false,
@@ -26,102 +60,105 @@ function FontSizePicker( {
 	value,
 	withSlider = false,
 } ) {
-	if ( disableCustomFontSizes && ! fontSizes.length ) {
+	const hasUnits =
+		isString( value ) ||
+		( fontSizes[ 0 ] && isString( fontSizes[ 0 ].size ) );
+
+	let noUnitsValue;
+	if ( ! hasUnits ) {
+		noUnitsValue = value;
+	} else {
+		noUnitsValue = parseInt( value );
+	}
+
+	const isPixelValue =
+		isNumber( value ) || ( isString( value ) && value.endsWith( 'px' ) );
+
+	const instanceId = useInstanceId( FontSizePicker );
+
+	const options = useMemo(
+		() => getSelectOptions( fontSizes, disableCustomFontSizes ),
+		[ fontSizes, disableCustomFontSizes ]
+	);
+
+	if ( ! options ) {
 		return null;
 	}
-	const onChangeValue = ( event ) => {
-		const newValue = event.target.value;
-		if ( newValue === '' ) {
-			onChange( undefined );
-			return;
-		}
-		onChange( Number( newValue ) );
-	};
 
-	const currentFont = fontSizes.find( ( font ) => font.size === value );
-	const currentFontSizeName = ( currentFont && currentFont.name ) || ( ! value && _x( 'Normal', 'font size name' ) ) || _x( 'Custom', 'font size name' );
+	const selectedFontSizeSlug = getSelectValueFromFontSize( fontSizes, value );
+
+	const fontSizePickerNumberId = `components-font-size-picker__number#${ instanceId }`;
 
 	return (
-		<BaseControl label={ __( 'Font Size' ) }>
-			<div className="components-font-size-picker__buttons">
-				{ ( fontSizes.length > 0 ) &&
-					<Dropdown
-						className="components-font-size-picker__dropdown"
-						contentClassName="components-font-size-picker__dropdown-content"
-						position="bottom"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button
-								className="components-font-size-picker__selector"
-								isLarge
-								onClick={ onToggle }
-								aria-expanded={ isOpen }
-								aria-label={ sprintf(
-									/* translators: %s: font size name */
-									__( 'Font size: %s' ), currentFontSizeName
-								) }
-							>
-								{ currentFontSizeName }
-							</Button>
+		<fieldset className="components-font-size-picker">
+			<VisuallyHidden as="legend">{ __( 'Font size' ) }</VisuallyHidden>
+			<div className="components-font-size-picker__controls">
+				{ fontSizes.length > 0 && (
+					<CustomSelectControl
+						className={ 'components-font-size-picker__select' }
+						label={ __( 'Font size' ) }
+						options={ options }
+						value={ options.find(
+							( option ) => option.key === selectedFontSizeSlug
 						) }
-						renderContent={ () => (
-							<NavigableMenu>
-								{ map( fontSizes, ( { name, size, slug } ) => {
-									const isSelected = ( value === size || ( ! value && slug === 'normal' ) );
-
-									return (
-										<Button
-											key={ slug }
-											onClick={ () => onChange( slug === 'normal' ? undefined : size ) }
-											className={ `is-font-${ slug }` }
-											role="menuitemradio"
-											aria-checked={ isSelected }
-										>
-											{ isSelected && <Dashicon icon="saved" /> }
-											<span className="components-font-size-picker__dropdown-text-size" style={ { fontSize: size } }>
-												{ name }
-											</span>
-										</Button>
-									);
-								} ) }
-							</NavigableMenu>
-						) }
+						onChange={ ( { selectedItem } ) => {
+							if ( hasUnits ) {
+								onChange( selectedItem.size );
+							} else {
+								onChange( Number( selectedItem.size ) );
+							}
+						} }
 					/>
-				}
-				{ ( ! withSlider && ! disableCustomFontSizes ) &&
-					<input
-						className="components-range-control__number"
-						type="number"
-						onChange={ onChangeValue }
-						aria-label={ __( 'Custom font size' ) }
-						value={ value || '' }
-					/>
-				}
+				) }
+				{ ! withSlider && ! disableCustomFontSizes && (
+					<div className="components-font-size-picker__number-container">
+						<label htmlFor={ fontSizePickerNumberId }>
+							{ __( 'Custom' ) }
+						</label>
+						<input
+							id={ fontSizePickerNumberId }
+							className="components-font-size-picker__number"
+							type="number"
+							min={ 1 }
+							onChange={ ( event ) => {
+								if ( hasUnits ) {
+									onChange( event.target.value + 'px' );
+								} else {
+									onChange( Number( event.target.value ) );
+								}
+							} }
+							aria-label={ __( 'Custom' ) }
+							value={ ( isPixelValue && noUnitsValue ) || '' }
+						/>
+					</div>
+				) }
 				<Button
 					className="components-color-palette__clear"
-					type="button"
 					disabled={ value === undefined }
-					onClick={ () => onChange( undefined ) }
+					onClick={ () => {
+						onChange( undefined );
+					} }
 					isSmall
-					isDefault
+					isSecondary
 				>
 					{ __( 'Reset' ) }
 				</Button>
 			</div>
-			{ withSlider &&
+			{ withSlider && (
 				<RangeControl
 					className="components-font-size-picker__custom-input"
 					label={ __( 'Custom Size' ) }
-					value={ value || '' }
+					value={ ( isPixelValue && noUnitsValue ) || '' }
 					initialPosition={ fallbackFontSize }
-					onChange={ onChange }
+					onChange={ ( newValue ) => {
+						onChange( hasUnits ? newValue + 'px' : newValue );
+					} }
 					min={ 12 }
 					max={ 100 }
-					beforeIcon="editor-textcolor"
-					afterIcon="editor-textcolor"
+					beforeIcon={ textColor }
+					afterIcon={ textColor }
 				/>
-			}
-		</BaseControl>
+			) }
+		</fieldset>
 	);
 }
-
-export default FontSizePicker;

@@ -1,58 +1,19 @@
-.components-dropdown-menu {
-	padding: 3px;
-	display: flex;
-
-	.components-dropdown-menu__toggle {
-		width: auto;
-		margin: 0;
-		padding: 4px;
-		border: $border-width solid transparent;
-		display: flex;
-		flex-direction: row;
-
-		&.is-active,
-		&.is-active:hover {
-			box-shadow: none;
-			background-color: $dark-gray-500;
-			color: $white;
-		}
-
-		&:focus::before {
-			top: -3px;
-			right: -3px;
-			bottom: -3px;
-			left: -3px;
-		}
-
-		&:hover,
-		&:focus,
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default):hover {
-			@include formatting-button-style__hover();
-		}
-
-		// Add a dropdown arrow indicator.
-		.components-dropdown-menu__indicator::after {
-			@include dropdown-arrow();
-		}
-	}
-}
 .components-dropdown-menu__popover .components-popover__content {
-	width: 200px;
+	min-width: 200px;
 }
 
 .components-dropdown-menu__menu {
 	width: 100%;
-	padding: 9px;
 	font-family: $default-font;
 	font-size: $default-font-size;
 	line-height: $default-line-height;
 
-	.components-dropdown-menu__menu-item {
+	.components-dropdown-menu__menu-item,
+	.components-menu-item {
 		width: 100%;
 		padding: 6px;
 		outline: none;
 		cursor: pointer;
-		margin-bottom: $grid-size-small;
 
 		&.has-separator {
 			margin-top: 6px;
@@ -64,7 +25,7 @@
 			display: block;
 			content: "";
 			box-sizing: content-box;
-			background-color: $light-gray-500;
+			background-color: $gray-300;
 			position: absolute;
 			top: -3px;
 			left: 0;
@@ -72,24 +33,54 @@
 			height: 1px;
 		}
 
-		// Plain menu styles.
-		&:focus:not(:disabled):not([aria-disabled="true"]):not(.is-default) {
-			@include menu-style__focus();
+		&.is-active svg {
+			// Block UI appearance.
+			color: $white;
+			background: $gray-900;
+			box-shadow: 0 0 0 $border-width $gray-900;
+			border-radius: $border-width;
 		}
 
 		// Formatting buttons
 		> svg {
-			border-radius: $radius-round-rectangle;
+			border-radius: $radius-block-ui;
+			width: $button-size-small;
+			height: $button-size-small;
+		}
+	}
 
-			// This assumes 20x20px dashicons.
-			padding: 2px;
-			width: $icon-button-size-small;
-			height: $icon-button-size-small;
-			margin: -1px $grid-size -1px 0;
+	.components-menu-item__button,
+	.components-menu-item__button.components-button {
+		min-height: $button-size;
+		height: auto;
+		text-align: left;
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
+	}
+
+	.components-menu-group {
+		padding: $grid-unit-15;
+		margin-top: 0;
+		margin-bottom: 0;
+		margin-left: -$grid-unit-15;
+		margin-right: -$grid-unit-15;
+
+		&:first-child {
+			margin-top: -$grid-unit-15;
 		}
 
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-default).is-active > svg {
-			@include formatting-button-style__active();
+		&:last-child {
+			margin-bottom: -$grid-unit-15;
+		}
+	}
+
+	.components-menu-group + .components-menu-group {
+		margin-top: 0;
+		border-top: $border-width solid $gray-400;
+		padding: $grid-unit-15;
+
+		.is-alternate & {
+			border-color: $gray-900;
 		}
 	}
 }

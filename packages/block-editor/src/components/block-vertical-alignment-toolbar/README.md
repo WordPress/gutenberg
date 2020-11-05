@@ -12,7 +12,6 @@ In a block's `edit` implementation, render a `<BlockControls />` component. Then
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
-import { Fragment } from '@wordpress/element';
 import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
@@ -38,7 +37,7 @@ registerBlockType( 'my-plugin/my-block', {
 		const onChange = ( alignment ) => setAttributes( { verticalAlignment: alignment } );
 
 		return (
-			<Fragment>
+			<>
 				<BlockControls>
 					<BlockVerticalAlignmentToolbar
 						onChange={ onChange }
@@ -48,7 +47,7 @@ registerBlockType( 'my-plugin/my-block', {
 				<div>
 					// your Block here
 				</div>
-			</Fragment>
+			</>
 		);
 	}
 } );
@@ -67,6 +66,11 @@ _Note:_ the user can repeatedly click on the toolbar buttons to toggle the align
 
 The current value of the alignment setting. You may only choose from the `Options` listed above.
 
+### `isCollapsed`
+* **Type:** `Boolean`
+* **Default:** `true`
+
+Whether to display toolbar options in the dropdown menu. This toolbar is collapsed by default.
 
 ### `onChange`
 * **Type:** `Function`

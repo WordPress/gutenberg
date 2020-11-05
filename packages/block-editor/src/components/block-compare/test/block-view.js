@@ -11,7 +11,16 @@ import BlockView from '../block-view';
 
 describe( 'BlockView', () => {
 	test( 'should match snapshot', () => {
-		const wrapper = shallow( <BlockView title="title" rawContent="raw" renderedContent="render" action={ noop } actionText="action" className="class" /> );
+		const wrapper = shallow(
+			<BlockView
+				title="title"
+				rawContent="raw"
+				renderedContent="render"
+				action={ noop }
+				actionText="action"
+				className="class"
+			/>
+		);
 
 		expect( wrapper ).toMatchSnapshot();
 	} );

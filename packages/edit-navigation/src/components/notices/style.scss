@@ -1,0 +1,26 @@
+.edit-navigation-notices__snackbar-list {
+	position: fixed;
+	bottom: 20px;
+	margin-left: 20px;
+}
+
+.edit-navigation-notices__notice-list {
+	// The page has a 10px left margin at narrower widths, reverse that so that the notice sits flush.
+	margin-left: -10px;
+
+	@include break-medium {
+		// The page has a 20px left margin at wider widths, reverse that so that the notice sits flush.
+		margin-left: -20px;
+	}
+
+	// Notices have some unusual margin and padding by default, reset that.
+	.components-notice {
+		margin: 0;
+		padding-right: 12px;
+
+		// Make sure the close button is centered.
+		.components-button {
+			align-self: initial;
+		}
+	}
+}

@@ -1,0 +1,24 @@
+[
+    {
+        "blockName": "core/image",
+        "attrs": {
+            "align": "left",
+            "height": 100,
+            "width": 100
+        },
+        "innerBlocks": [],
+        "innerHTML": "\n<figure class=\"wp-block-image alignleft is-resized\">\n\t<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" width=\"100\" height=\"100\" />\n</figure>\n",
+        "innerContent": [
+            "\n<figure class=\"wp-block-image alignleft is-resized\">\n\t<img src=\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAACklEQVR4nGMAAQAABQABDQottAAAAABJRU5ErkJggg==\" alt=\"\" width=\"100\" height=\"100\" />\n</figure>\n"
+        ]
+    },
+    {
+        "blockName": null,
+        "attrs": {},
+        "innerBlocks": [],
+        "innerHTML": "\n",
+        "innerContent": [
+            "\n"
+        ]
+    }
+]

@@ -2,15 +2,15 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { createBlock, getPhrasingContentSchema } from '@wordpress/blocks';
-import { RichText } from '@wordpress/block-editor';
+import { preformatted as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
+import save from './save';
+import transforms from './transforms';
 
 const { name } = metadata;
 
@@ -18,55 +18,23 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Preformatted' ),
-
-	description: __( 'Add text that respects your spacing and tabs, and also allows styling.' ),
-
+	description: __(
+		'Add text that respects your spacing and tabs, and also allows styling.'
+	),
 	icon,
-
-	transforms: {
-		from: [
-			{
-				type: 'block',
-				blocks: [ 'core/code', 'core/paragraph' ],
-				transform: ( { content } ) =>
-					createBlock( 'core/preformatted', {
-						content,
-					} ),
-			},
-			{
-				type: 'raw',
-				isMatch: ( node ) => (
-					node.nodeName === 'PRE' &&
-					! (
-						node.children.length === 1 &&
-						node.firstChild.nodeName === 'CODE'
-					)
-				),
-				schema: {
-					pre: {
-						children: getPhrasingContentSchema(),
-					},
-				},
-			},
-		],
-		to: [
-			{
-				type: 'block',
-				blocks: [ 'core/paragraph' ],
-				transform: ( attributes ) =>
-					createBlock( 'core/paragraph', attributes ),
-			},
-		],
+	example: {
+		attributes: {
+			/* eslint-disable @wordpress/i18n-no-collapsible-whitespace */
+			// translators: Sample content for the Preformatted block. Can be replaced with a more locale-adequate work.
+			content: __(
+				'EXT. XANADU - FAINT DAWN - 1940 (MINIATURE)\nWindow, very small in the distance, illuminated.\nAll around this is an almost totally black screen. Now, as the camera moves slowly towards the window which is almost a postage stamp in the frame, other forms appear;'
+			),
+			/* eslint-enable @wordpress/i18n-no-collapsible-whitespace */
+		},
 	},
-
+	transforms,
 	edit,
-
-	save( { attributes } ) {
-		const { content } = attributes;
-
-		return <RichText.Content tagName="pre" value={ content } />;
-	},
-
+	save,
 	merge( attributes, attributesToMerge ) {
 		return {
 			content: attributes.content + attributesToMerge.content,

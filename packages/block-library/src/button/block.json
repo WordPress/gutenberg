@@ -1,6 +1,10 @@
 {
+	"apiVersion": 2,
 	"name": "core/button",
-	"category": "layout",
+	"category": "design",
+	"parent": [
+		"core/buttons"
+	],
 	"attributes": {
 		"url": {
 			"type": "string",
@@ -19,17 +23,45 @@
 			"source": "html",
 			"selector": "a"
 		},
+		"linkTarget": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "a",
+			"attribute": "target"
+		},
+		"rel": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "a",
+			"attribute": "rel"
+		},
+		"placeholder": {
+			"type": "string"
+		},
+		"borderRadius": {
+			"type": "number"
+		},
+		"style": {
+			"type": "object"
+		},
 		"backgroundColor": {
 			"type": "string"
 		},
 		"textColor": {
 			"type": "string"
 		},
-		"customBackgroundColor": {
+		"gradient": {
 			"type": "string"
 		},
-		"customTextColor": {
-			"type": "string"
+		"width": {
+			"type": "number"
 		}
+	},
+	"supports": {
+		"anchor": true,
+		"align": true,
+		"alignWide": false,
+		"reusable": false,
+		"__experimentalSelector": ".wp-block-button > a"
 	}
 }

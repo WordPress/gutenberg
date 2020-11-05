@@ -4,7 +4,7 @@
 There was a survey done: [https://make.wordpress.org/core/2017/04/07/editor-experience-survey-results/](https://make.wordpress.org/core/2017/04/07/editor-experience-survey-results/)
 
 ## Inspiration
-This includes a list of historical articles and influences on Gutenberg.
+This includes a list of historical articles and influences on the Gutenberg project.
 
 - LivingDocs: [https://beta.livingdocs.io/articles](https://beta.livingdocs.io/articles)
 - Parrot: [https://intenseminimalism.com/2017/parrot-an-integrated-site-builder-and-editor-concept-for-wordpress/](https://intenseminimalism.com/2017/parrot-an-integrated-site-builder-and-editor-concept-for-wordpress/)

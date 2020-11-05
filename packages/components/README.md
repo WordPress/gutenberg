@@ -1,4 +1,4 @@
-# Components
+# Component Reference
 
 This packages includes a library of generic WordPress components to be used for creating common UI elements shared between screens and features of the WordPress dashboard.
 
@@ -26,5 +26,9 @@ export default function MyButton() {
 	return <Button>Click Me!</Button>;
 }
 ```
+
+Many components include CSS to add style, you will need to add in order to appear correctly. Within WordPress, add the `wp-components` stylesheet as a dependency of your plugin's stylesheet. See [wp_enqueue_style documentation](https://developer.wordpress.org/reference/functions/wp_enqueue_style/#parameters) for how to specify dependencies.
+
+In non-WordPress projects, link to the `build-style/style.css` file directly, it is located at `node_modules/@wordpress/components/build-style/style.css`.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

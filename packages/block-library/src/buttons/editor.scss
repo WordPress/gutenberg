@@ -1,0 +1,23 @@
+.wp-block-buttons > .wp-block {
+	// Override editor auto block margins.
+	margin-left: 0;
+}
+
+.wp-block > .wp-block-buttons {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.wp-block[data-align="center"] > .wp-block-buttons {
+	align-items: center;
+	justify-content: center;
+}
+
+.wp-block[data-align="right"] > .wp-block-buttons {
+	justify-content: flex-end;
+}
+
+.wp-block-buttons > .block-list-appender {
+	display: inline-flex;
+	align-items: center;
+}

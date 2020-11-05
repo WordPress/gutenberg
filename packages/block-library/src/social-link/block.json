@@ -1,0 +1,26 @@
+{
+	"apiVersion": 2,
+	"name": "core/social-link",
+	"category": "widgets",
+	"parent": [
+		"core/social-links"
+	],
+	"attributes": {
+		"url": {
+			"type": "string"
+		},
+		"service": {
+			"type": "string"
+		},
+		"label": {
+			"type": "string"
+		}
+	},
+	"usesContext": [
+		"openInNewTab"
+	],
+	"supports": {
+		"reusable": false,
+		"html": false
+	}
+}

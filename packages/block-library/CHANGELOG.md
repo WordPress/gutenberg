@@ -1,4 +1,50 @@
-## 2.5.0 (Unreleased)
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+### Bug Fixes
+
+- Fix a regression where the Cover would not show opacity controls for the default overlay color ([#26625](https://github.com/WordPress/gutenberg/pull/26625)).
+- Fix a regression ([#26545](https://github.com/WordPress/gutenberg/pull/26545)) where the Cover block lost its default background overlay color
+  ([#26569](https://github.com/WordPress/gutenberg/pull/26569)).
+
+### Enhancement
+
+- File Block: Copy url button is moved to Block toolbar.
+
+## 2.23.0 (2020-09-03)
+
+### Enhancement
+
+- Site title is now a link.
+
+### New Features
+
+- Add heading level controls to Site Title block.
+
+## 2.12.0 (2020-01-13)
+
+### Bug Fixes
+
+- Fixes a regression published in version 2.9.2 that would prevent some build tools from including
+  styles provided in the packages build-styles directory.
+
+## 2.7.0 (2019-08-05)
+
+### Enhancements
+
+- Heading block uses `has-text-align-*` class names rather than inline style for text alignment.
+- Verse block uses `has-text-align-*` class names rather than inline style for text alignment.
+
+### Bug Fixes
+
+- Fixed insertion of columns in the table block, which now inserts columns for all table sections ([#16410](https://github.com/WordPress/gutenberg/pull/16410))
+
+## 2.6.0 (2019-06-12)
+
+- Fixed an issue with creating upgraded embed blocks that are not registered ([#15883](https://github.com/WordPress/gutenberg/issues/15883)).
+
+## 2.5.0 (2019-05-21)
 
 - Add vertical alignment controls to Columns Block ([#13899](https://github.com/WordPress/gutenberg/pull/13899/)).
 - Add vertical alignment controls to Media & Text Block ([#13989](https://github.com/WordPress/gutenberg/pull/13989)).

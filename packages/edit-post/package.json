@@ -1,12 +1,14 @@
 {
 	"name": "@wordpress/edit-post",
-	"version": "3.3.0",
+	"version": "3.25.2",
 	"description": "Edit Post module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"editor"
+		"gutenberg",
+		"editor",
+		"post"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-post/README.md",
 	"repository": {
@@ -21,7 +23,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.3.1",
+		"@babel/runtime": "^7.11.2",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
@@ -33,17 +35,25 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
-		"@wordpress/format-library": "file:../format-library",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/interface": "file:../interface",
+		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/keycodes": "file:../keycodes",
-		"@wordpress/nux": "file:../nux",
+		"@wordpress/media-utils": "file:../media-utils",
+		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
+		"@wordpress/primitives": "file:../primitives",
+		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/url": "file:../url",
 		"@wordpress/viewport": "file:../viewport",
+		"@wordpress/warning": "file:../warning",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.11",
-		"refx": "^3.0.0"
+		"lodash": "^4.17.19",
+		"memize": "^1.1.0",
+		"refx": "^3.0.0",
+		"rememo": "^3.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

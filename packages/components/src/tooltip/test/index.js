@@ -15,7 +15,10 @@ describe( 'Tooltip', () => {
 		it( 'should render children (abort) if multiple children passed', () => {
 			// Mount: Enzyme shallow does not support wrapping multiple nodes
 			const wrapper = mount(
-				<Tooltip><div /><div /></Tooltip>
+				<Tooltip>
+					<div />
+					<div />
+				</Tooltip>
 			);
 
 			expect( wrapper.children() ).toHaveLength( 2 );
@@ -77,6 +80,48 @@ describe( 'Tooltip', () => {
 			expect( popover ).toHaveLength( 1 );
 		} );
 
+		it( 'should show not popover on focus as result of mousedown', () => {
+			const originalOnMouseDown = jest.fn();
+			const originalOnMouseUp = jest.fn();
+			const wrapper = mount(
+				<Tooltip text="Help text">
+					<button
+						onMouseDown={ originalOnMouseDown }
+						onMouseUp={ originalOnMouseUp }
+					>
+						Hover Me!
+					</button>
+				</Tooltip>
+			);
+
+			const button = wrapper.find( 'button' );
+
+			let event;
+
+			event = { type: 'mousedown' };
+			button.simulate( event.type, event );
+			expect( originalOnMouseDown ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: event.type,
+				} )
+			);
+
+			event = { type: 'focus', currentTarget: {} };
+			button.simulate( event.type, event );
+
+			const popover = wrapper.find( 'Popover' );
+			expect( wrapper.state( 'isOver' ) ).toBe( false );
+			expect( popover ).toHaveLength( 0 );
+
+			event = new window.MouseEvent( 'mouseup' );
+			document.dispatchEvent( event );
+			expect( originalOnMouseUp ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					type: event.type,
+				} )
+			);
+		} );
+
 		it( 'should show popover on delayed mouseenter', () => {
 			const originalMouseEnter = jest.fn();
 			const wrapper = TestUtils.renderIntoDocument(
@@ -90,20 +135,32 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			/* eslint-disable react/no-find-dom-node */
-			const button = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'button' );
+			const button = TestUtils.findRenderedDOMComponentWithTag(
+				wrapper,
+				'button'
+			);
+			// eslint-disable-next-line react/no-find-dom-node
 			TestUtils.Simulate.mouseEnter( ReactDOM.findDOMNode( button ) );
-			/* eslint-enable react/no-find-dom-node */
 
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
 			expect( wrapper.state.isOver ).toBe( false );
-			expect( TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-popover' ) ).toHaveLength( 0 );
+			expect(
+				TestUtils.scryRenderedDOMComponentsWithClass(
+					wrapper,
+					'components-popover'
+				)
+			).toHaveLength( 0 );
 
 			// Force delayedSetIsOver to be called
 			wrapper.delayedSetIsOver.flush();
 
 			expect( wrapper.state.isOver ).toBe( true );
-			expect( TestUtils.scryRenderedDOMComponentsWithClass( wrapper, 'components-popover' ) ).toHaveLength( 1 );
+			expect(
+				TestUtils.scryRenderedDOMComponentsWithClass(
+					wrapper,
+					'components-popover'
+				)
+			).toHaveLength( 1 );
 		} );
 
 		it( 'should ignore mouseenter on disabled elements', () => {
@@ -129,7 +186,7 @@ describe( 'Tooltip', () => {
 				target: wrapper.find( 'button > span' ).getDOMNode(),
 			} );
 
-			expect( originalMouseEnter ).toHaveBeenCalled();
+			expect( originalMouseEnter ).not.toHaveBeenCalled();
 
 			const popover = wrapper.find( 'Popover' );
 			wrapper.instance().delayedSetIsOver.flush();

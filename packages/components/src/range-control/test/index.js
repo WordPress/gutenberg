@@ -1,310 +1,320 @@
 /**
  * External dependencies
  */
-import TestUtils from 'react-dom/test-utils';
+import { fireEvent, render } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
 import RangeControl from '../';
 
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
-import { Dashicon } from '@wordpress/components';
+const getRangeInput = ( container ) =>
+	container.querySelector( 'input[type="range"]' );
+const getNumberInput = ( container ) =>
+	container.querySelector( 'input[type="number"]' );
+const getResetButton = ( container ) =>
+	container.querySelector( '.components-range-control__reset' );
 
 describe( 'RangeControl', () => {
-	class TestWrapper extends Component {
-		render() {
-			return <RangeControl { ...this.props } />;
-		}
-	}
-
-	const getWrapper = ( props = {} ) => TestUtils.renderIntoDocument(
-		<TestWrapper { ...props } />
-	);
-
 	describe( '#render()', () => {
-		it( 'triggers change callback with numeric value', () => {
-			// Mount: With shallow, cannot find input child of BaseControl
+		it( 'should trigger change callback with numeric value', () => {
 			const onChange = jest.fn();
-			const wrapper = getWrapper( { onChange } );
 
-			const rangeInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
-				wrapper,
-				'components-range-control__slider'
+			const { container } = render(
+				<RangeControl onChange={ onChange } />
 			);
-			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
-				wrapper,
-				'components-range-control__number'
-			);
-			TestUtils.Simulate.change(
-				rangeInputElement(),
-				{
-					target: {
-						value: '5',
-						checkValidity() {
-							return true;
-						},
-					},
-				}
-			);
-			TestUtils.Simulate.change(
-				numberInputElement(),
-				{
-					target: {
-						value: '10',
-						checkValidity() {
-							return true;
-						},
-					},
-				}
-			);
+
+			const rangeInput = getRangeInput( container );
+			const numberInput = getNumberInput( container );
+
+			rangeInput.focus();
+			fireEvent.change( rangeInput, { target: { value: '5' } } );
+
+			numberInput.focus();
+			fireEvent.change( numberInput, { target: { value: '10' } } );
 
 			expect( onChange ).toHaveBeenCalledWith( 5 );
 			expect( onChange ).toHaveBeenCalledWith( 10 );
 		} );
 
-		it( 'renders with icons', () => {
-			let wrapper, icons;
-			const iconElements = ( component ) => TestUtils
-				.scryRenderedComponentsWithType( component, Dashicon );
-			wrapper = getWrapper();
-			icons = iconElements( wrapper );
-			expect( icons ).toHaveLength( 0 );
-
-			wrapper = getWrapper( { beforeIcon: 'format-image' } );
-			icons = iconElements( wrapper );
-			expect( icons ).toHaveLength( 1 );
-			expect( icons[ 0 ].props.icon ).toBe( 'format-image' );
-
-			wrapper = getWrapper(
-				{
-					beforeIcon: 'format-image',
-					afterIcon: 'format-video',
-				}
+		it( 'should render with icons', () => {
+			const { container } = render(
+				<RangeControl
+					beforeIcon="format-image"
+					afterIcon="format-video"
+				/>
 			);
-			icons = iconElements( wrapper );
-			expect( icons ).toHaveLength( 2 );
-			expect( icons[ 0 ].props.icon ).toBe( 'format-image' );
-			expect( icons[ 1 ].props.icon ).toBe( 'format-video' );
+
+			const beforeIcon = container.querySelector(
+				'.dashicons-format-image'
+			);
+			const afterIcon = container.querySelector(
+				'.dashicons-format-image'
+			);
+
+			expect( beforeIcon ).toBeTruthy();
+			expect( afterIcon ).toBeTruthy();
 		} );
 	} );
 
 	describe( 'validation', () => {
-		it( 'does not calls onChange if the new value is lower than minimum', () => {
-			// Mount: With shallow, cannot find input child of BaseControl
+		it( 'should not apply if new value is lower than minimum', () => {
+			const { container } = render( <RangeControl min={ 11 } /> );
+
+			const rangeInput = getRangeInput( container );
+			const numberInput = getNumberInput( container );
+
+			fireEvent.change( numberInput, { target: { value: '10' } } );
+			fireEvent.blur( numberInput );
+
+			expect( rangeInput.value ).not.toBe( '10' );
+		} );
+
+		it( 'should not apply if new value is greater than maximum', () => {
+			const { container } = render( <RangeControl max={ 20 } /> );
+
+			const rangeInput = getRangeInput( container );
+			const numberInput = getNumberInput( container );
+
+			fireEvent.change( numberInput, { target: { value: '21' } } );
+			fireEvent.blur( numberInput );
+
+			expect( rangeInput.value ).not.toBe( '21' );
+		} );
+
+		it( 'should not call onChange if new value is invalid', () => {
 			const onChange = jest.fn();
-			const wrapper = getWrapper( { onChange, min: 11, value: 12 } );
-
-			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
-				wrapper,
-				'components-range-control__number'
+			const { container } = render(
+				<RangeControl onChange={ onChange } min={ 10 } max={ 20 } />
 			);
 
-			TestUtils.Simulate.change(
-				numberInputElement(),
-				{
-					target: {
-						value: '10',
-						checkValidity() {
-							return false;
-						},
-					},
-				}
-			);
+			const numberInput = getNumberInput( container );
+
+			numberInput.focus();
+			fireEvent.change( numberInput, { target: { value: '25e' } } );
 
 			expect( onChange ).not.toHaveBeenCalled();
 		} );
 
-		it( 'does not calls onChange if the new value is greater than maximum', () => {
-			// Mount: With shallow, cannot find input child of BaseControl
+		it( 'should keep invalid values in number input until loss of focus', () => {
 			const onChange = jest.fn();
-			const wrapper = getWrapper( { onChange, max: 20, value: 12 } );
-
-			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
-				wrapper,
-				'components-range-control__number'
+			const { container } = render(
+				<RangeControl onChange={ onChange } min={ -1 } max={ 1 } />
 			);
 
-			TestUtils.Simulate.change(
-				numberInputElement(),
-				{
-					target: {
-						value: '21',
-						checkValidity() {
-							return false;
-						},
-					},
-				}
-			);
+			const rangeInput = getRangeInput( container );
+			const numberInput = getNumberInput( container );
 
-			expect( onChange ).not.toHaveBeenCalled();
+			numberInput.focus();
+			fireEvent.change( numberInput, { target: { value: '-1.1' } } );
+
+			expect( numberInput.value ).toBe( '-1.1' );
+			expect( rangeInput.value ).toBe( '-1' );
+
+			fireEvent.blur( numberInput );
+			expect( onChange ).toHaveBeenCalledWith( -1 );
+			expect( numberInput.value ).toBe( '-1' );
 		} );
 
-		it( 'calls onChange after invalid inputs if the new input is valid', () => {
-			// Mount: With shallow, cannot find input child of BaseControl
-			const onChange = jest.fn();
-			const wrapper = getWrapper( { onChange, min: 11, max: 20, value: 12 } );
-
-			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
-				wrapper,
-				'components-range-control__number'
+		it( 'should validate when provided a max or min of zero', () => {
+			const { container } = render(
+				<RangeControl min={ -100 } max={ 0 } />
 			);
 
-			TestUtils.Simulate.change(
-				numberInputElement(),
-				{
-					target: {
-						value: '10',
-						checkValidity() {
-							return false;
-						},
-					},
-				}
-			);
+			const rangeInput = getRangeInput( container );
+			const numberInput = getNumberInput( container );
 
-			TestUtils.Simulate.change(
-				numberInputElement(),
-				{
-					target: {
-						value: '21',
-						checkValidity() {
-							return false;
-						},
-					},
-				}
-			);
+			numberInput.focus();
+			fireEvent.change( numberInput, { target: { value: '1' } } );
+			fireEvent.blur( numberInput );
 
-			expect( onChange ).not.toHaveBeenCalled();
-
-			TestUtils.Simulate.change(
-				numberInputElement(),
-				{
-					target: {
-						value: '14',
-						checkValidity() {
-							return true;
-						},
-					},
-				}
-			);
-
-			expect( onChange ).toHaveBeenCalledWith( 14 );
+			expect( rangeInput.value ).toBe( '0' );
 		} );
 
-		it( 'validates when provided a max or min of zero', () => {
-			const onChange = jest.fn();
-			const wrapper = getWrapper( { onChange, min: -100, max: 0, value: 0 } );
-
-			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
-				wrapper,
-				'components-range-control__number'
+		it( 'should validate when min and max are negative', () => {
+			const { container } = render(
+				<RangeControl min={ -100 } max={ -50 } />
 			);
 
-			TestUtils.Simulate.change(
-				numberInputElement(),
-				{
-					target: {
-						value: '1',
-						checkValidity() {
-							return false;
-						},
-					},
-				}
-			);
+			const rangeInput = getRangeInput( container );
+			const numberInput = getNumberInput( container );
 
-			expect( onChange ).not.toHaveBeenCalled();
+			numberInput.focus();
+
+			fireEvent.change( numberInput, { target: { value: '-101' } } );
+			expect( rangeInput.value ).toBe( '-100' );
+
+			fireEvent.change( numberInput, { target: { value: '-49' } } );
+			expect( rangeInput.value ).toBe( '-50' );
+
+			fireEvent.change( numberInput, { target: { value: '-50' } } );
+			expect( rangeInput.value ).toBe( '-50' );
 		} );
 
-		it( 'validates when min and max are negative', () => {
+		it( 'should take into account the step starting from min', () => {
 			const onChange = jest.fn();
-			const wrapper = getWrapper( { onChange, min: -100, max: -50, value: -60 } );
-
-			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
-				wrapper,
-				'components-range-control__number'
+			const { container } = render(
+				<RangeControl
+					onChange={ onChange }
+					min={ 0.1 }
+					step={ 0.125 }
+				/>
 			);
 
-			TestUtils.Simulate.change(
-				numberInputElement(),
-				{
-					target: {
-						value: '-101',
-						checkValidity() {
-							return false;
-						},
-					},
-				}
-			);
+			const rangeInput = getRangeInput( container );
+			const numberInput = getNumberInput( container );
 
-			expect( onChange ).not.toHaveBeenCalled();
+			numberInput.focus();
+			fireEvent.change( numberInput, { target: { value: '0.125' } } );
 
-			TestUtils.Simulate.change(
-				numberInputElement(),
-				{
-					target: {
-						value: '-49',
-						checkValidity() {
-							return false;
-						},
-					},
-				}
-			);
+			expect( onChange ).toHaveBeenCalledWith( 0.125 );
+			expect( rangeInput.value ).toBe( '0.125' );
 
-			expect( onChange ).not.toHaveBeenCalled();
-
-			TestUtils.Simulate.change(
-				numberInputElement(),
-				{
-					target: {
-						value: '-50',
-						checkValidity() {
-							return true;
-						},
-					},
-				}
-			);
-
-			expect( onChange ).toHaveBeenCalledWith( -50 );
-		} );
-		it( 'takes into account the step starting from min', () => {
-			const onChange = jest.fn();
-			const wrapper = getWrapper( { onChange, min: 0.1, step: 0.125, value: 0.1 } );
-
-			const numberInputElement = () => TestUtils.findRenderedDOMComponentWithClass(
-				wrapper,
-				'components-range-control__number'
-			);
-
-			TestUtils.Simulate.change(
-				numberInputElement(),
-				{
-					target: {
-						value: '0.125',
-						checkValidity() {
-							return false;
-						},
-					},
-				}
-			);
-
-			expect( onChange ).not.toHaveBeenCalled();
-
-			TestUtils.Simulate.change(
-				numberInputElement(),
-				{
-					target: {
-						value: '0.225',
-						checkValidity() {
-							return true;
-						},
-					},
-				}
-			);
+			fireEvent.change( numberInput, { target: { value: '0.225' } } );
 
 			expect( onChange ).toHaveBeenCalledWith( 0.225 );
+			expect( rangeInput.value ).toBe( '0.225' );
+		} );
+	} );
+
+	describe( 'initialPosition / value', () => {
+		it( 'should render initial rendered value of 50% of min/max, if no initialPosition or value is defined', () => {
+			const { container } = render(
+				<RangeControl min={ 0 } max={ 10 } />
+			);
+
+			const rangeInput = getRangeInput( container );
+
+			expect( rangeInput.value ).toBe( '5' );
+		} );
+
+		it( 'should render initialPosition if no value is provided', () => {
+			const { container } = render(
+				<RangeControl initialPosition={ 50 } />
+			);
+
+			const rangeInput = getRangeInput( container );
+
+			expect( rangeInput.value ).toBe( '50' );
+		} );
+
+		it( 'should render value instead of initialPosition is provided', () => {
+			const { container } = render(
+				<RangeControl initialPosition={ 50 } value={ 10 } />
+			);
+
+			const rangeInput = getRangeInput( container );
+
+			expect( rangeInput.value ).toBe( '10' );
+		} );
+	} );
+
+	describe( 'input field', () => {
+		it( 'should render an input field by default', () => {
+			const { container } = render( <RangeControl /> );
+
+			const numberInput = getNumberInput( container );
+
+			expect( numberInput ).toBeTruthy();
+		} );
+
+		it( 'should not render an input field, if disabled', () => {
+			const { container } = render(
+				<RangeControl withInputField={ false } />
+			);
+
+			const numberInput = getNumberInput( container );
+
+			expect( numberInput ).toBeFalsy();
+		} );
+
+		it( 'should render a zero value into input range and field', () => {
+			const { container } = render( <RangeControl value={ 0 } /> );
+
+			const rangeInput = getRangeInput( container );
+			const numberInput = getNumberInput( container );
+
+			expect( rangeInput.value ).toBe( '0' );
+			expect( numberInput.value ).toBe( '0' );
+		} );
+
+		it( 'should update both field and range on change', () => {
+			const { container } = render( <RangeControl /> );
+
+			const rangeInput = getRangeInput( container );
+			const numberInput = getNumberInput( container );
+
+			rangeInput.focus();
+			fireEvent.change( rangeInput, { target: { value: 13 } } );
+
+			expect( rangeInput.value ).toBe( '13' );
+			expect( numberInput.value ).toBe( '13' );
+
+			numberInput.focus();
+			fireEvent.change( numberInput, { target: { value: 7 } } );
+
+			expect( rangeInput.value ).toBe( '7' );
+			expect( numberInput.value ).toBe( '7' );
+		} );
+
+		it( 'should reset input values if next value is removed', () => {
+			const { container } = render( <RangeControl /> );
+
+			const rangeInput = getRangeInput( container );
+			const numberInput = getNumberInput( container );
+
+			fireEvent.change( numberInput, { target: { value: '' } } );
+			fireEvent.blur( numberInput );
+
+			// Reset to 50. Median value of min: 0, max: 100
+			expect( rangeInput.value ).toBe( '50' );
+			// Input field should be blank
+			expect( numberInput.value ).toBe( '' );
+		} );
+	} );
+
+	describe( 'reset', () => {
+		it( 'should reset to a custom fallback value, defined by a parent component', () => {
+			const spy = jest.fn();
+			const { container } = render(
+				<RangeControl
+					initialPosition={ 10 }
+					allowReset={ true }
+					onChange={ spy }
+					resetFallbackValue={ 33 }
+				/>
+			);
+
+			const resetButton = getResetButton( container );
+			const rangeInput = getRangeInput( container );
+			const numberInput = getNumberInput( container );
+
+			fireEvent.click( resetButton );
+
+			expect( rangeInput.value ).toBe( '33' );
+			expect( numberInput.value ).toBe( '33' );
+			expect( spy ).toHaveBeenCalledWith( 33 );
+		} );
+
+		it( 'should reset to a 50% of min/max value, of no initialPosition or value is defined', () => {
+			const { container } = render(
+				<RangeControl
+					initialPosition={ undefined }
+					min={ 0 }
+					max={ 100 }
+					allowReset={ true }
+					resetFallbackValue={ undefined }
+				/>
+			);
+
+			const resetButton = getResetButton( container );
+			const rangeInput = getRangeInput( container );
+			const numberInput = getNumberInput( container );
+
+			fireEvent.click( resetButton );
+
+			expect( rangeInput.value ).toBe( '50' );
+			expect( numberInput.value ).toBe( '' );
 		} );
 	} );
 } );

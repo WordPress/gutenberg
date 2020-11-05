@@ -8,10 +8,20 @@ import { flow } from 'lodash';
  */
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { MenuItem, withSpokenMessages } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { check } from '@wordpress/icons';
+import { speak } from '@wordpress/a11y';
 
-function FeatureToggle( { onToggle, isActive, label, info, messageActivated, messageDeactivated, speak } ) {
+function FeatureToggle( {
+	onToggle,
+	isActive,
+	label,
+	info,
+	messageActivated,
+	messageDeactivated,
+	shortcut,
+} ) {
 	const speakMessage = () => {
 		if ( isActive ) {
 			speak( messageDeactivated || __( 'Feature deactivated' ) );
@@ -22,11 +32,12 @@ function FeatureToggle( { onToggle, isActive, label, info, messageActivated, mes
 
 	return (
 		<MenuItem
-			icon={ isActive && 'yes' }
+			icon={ isActive && check }
 			isSelected={ isActive }
 			onClick={ flow( onToggle, speakMessage ) }
 			role="menuitemcheckbox"
 			info={ info }
+			shortcut={ shortcut }
 		>
 			{ label }
 		</MenuItem>
@@ -42,5 +53,4 @@ export default compose( [
 			dispatch( 'core/edit-post' ).toggleFeature( ownProps.feature );
 		},
 	} ) ),
-	withSpokenMessages,
 ] )( FeatureToggle );

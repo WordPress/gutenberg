@@ -1,0 +1,46 @@
+{
+	"apiVersion": 2,
+	"name": "core/navigation-link",
+	"category": "design",
+	"parent": [ "core/navigation" ],
+	"attributes": {
+		"label": {
+			"type": "string"
+		},
+		"type": {
+			"type": "string"
+		},
+		"description": {
+			"type": "string"
+		},
+		"rel": {
+			"type": "string"
+		},
+		"id": {
+			"type": "number"
+		},
+		"opensInNewTab": {
+			"type": "boolean",
+			"default": false
+		},
+		"url": {
+			"type": "string"
+		},
+		"title": {
+			"type": "string"
+		}
+	},
+	"usesContext": [
+		"textColor",
+		"customTextColor",
+		"backgroundColor",
+		"customBackgroundColor",
+		"fontSize",
+		"customFontSize",
+		"showSubmenuIcon"
+	],
+	"supports": {
+		"reusable": false,
+		"html": false
+	}
+}

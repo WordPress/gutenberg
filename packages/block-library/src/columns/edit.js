@@ -2,29 +2,37 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { dropRight, get, times } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
-import {
-	PanelBody,
-	RangeControl,
-} from '@wordpress/components';
-import { Fragment } from '@wordpress/element';
+import { PanelBody, RangeControl, Notice } from '@wordpress/components';
+
 import {
 	InspectorControls,
-	InnerBlocks,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
+	__experimentalBlockVariationPicker,
+	useBlockProps,
 } from '@wordpress/block-editor';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withDispatch, useDispatch, useSelect } from '@wordpress/data';
+import {
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import { getColumnsTemplate } from './utils';
+import {
+	hasExplicitColumnWidths,
+	getMappedColumnWidths,
+	getRedistributedColumnWidths,
+	toWidthPrecision,
+} from './utils';
 
 /**
  * Allowed blocks constant is passed to InnerBlocks precisely as specified here.
@@ -34,91 +42,222 @@ import { getColumnsTemplate } from './utils';
  *
  * @constant
  * @type {string[]}
-*/
+ */
 const ALLOWED_BLOCKS = [ 'core/column' ];
 
-export const ColumnsEdit = function( { attributes, setAttributes, className, updateAlignment } ) {
-	const { columns, verticalAlignment } = attributes;
+function ColumnsEditContainer( {
+	attributes,
+	updateAlignment,
+	updateColumns,
+	clientId,
+} ) {
+	const { verticalAlignment } = attributes;
 
-	const classes = classnames( className, `has-${ columns }-columns`, {
+	const { count } = useSelect(
+		( select ) => {
+			return {
+				count: select( 'core/block-editor' ).getBlockCount( clientId ),
+			};
+		},
+		[ clientId ]
+	);
+
+	const classes = classnames( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
-	const onChange = ( alignment ) => {
-		// Update all the (immediate) child Column Blocks
-		updateAlignment( alignment );
-	};
+	const blockProps = useBlockProps( {
+		className: classes,
+	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+		orientation: 'horizontal',
+		renderAppender: false,
+	} );
 
 	return (
-		<Fragment>
+		<>
+			<BlockControls>
+				<BlockVerticalAlignmentToolbar
+					onChange={ updateAlignment }
+					value={ verticalAlignment }
+				/>
+			</BlockControls>
 			<InspectorControls>
 				<PanelBody>
 					<RangeControl
 						label={ __( 'Columns' ) }
-						value={ columns }
-						onChange={ ( nextColumns ) => {
-							setAttributes( {
-								columns: nextColumns,
-							} );
-						} }
-						min={ 2 }
-						max={ 6 }
+						value={ count }
+						onChange={ ( value ) => updateColumns( count, value ) }
+						min={ 1 }
+						max={ Math.max( 6, count ) }
 					/>
+					{ count > 6 && (
+						<Notice status="warning" isDismissible={ false }>
+							{ __(
+								'This column count exceeds the recommended amount and may cause visual breakage.'
+							) }
+						</Notice>
+					) }
 				</PanelBody>
 			</InspectorControls>
-			<BlockControls>
-				<BlockVerticalAlignmentToolbar
-					onChange={ onChange }
-					value={ verticalAlignment }
-				/>
-			</BlockControls>
-			<div className={ classes }>
-				<InnerBlocks
-					template={ getColumnsTemplate( columns ) }
-					templateLock="all"
-					allowedBlocks={ ALLOWED_BLOCKS } />
-			</div>
-		</Fragment>
+			<div { ...innerBlocksProps } />
+		</>
 	);
+}
+
+const ColumnsEditContainerWrapper = withDispatch(
+	( dispatch, ownProps, registry ) => ( {
+		/**
+		 * Update all child Column blocks with a new vertical alignment setting
+		 * based on whatever alignment is passed in. This allows change to parent
+		 * to overide anything set on a individual column basis.
+		 *
+		 * @param {string} verticalAlignment the vertical alignment setting
+		 */
+		updateAlignment( verticalAlignment ) {
+			const { clientId, setAttributes } = ownProps;
+			const { updateBlockAttributes } = dispatch( 'core/block-editor' );
+			const { getBlockOrder } = registry.select( 'core/block-editor' );
+
+			// Update own alignment.
+			setAttributes( { verticalAlignment } );
+
+			// Update all child Column Blocks to match
+			const innerBlockClientIds = getBlockOrder( clientId );
+			innerBlockClientIds.forEach( ( innerBlockClientId ) => {
+				updateBlockAttributes( innerBlockClientId, {
+					verticalAlignment,
+				} );
+			} );
+		},
+
+		/**
+		 * Updates the column count, including necessary revisions to child Column
+		 * blocks to grant required or redistribute available space.
+		 *
+		 * @param {number} previousColumns Previous column count.
+		 * @param {number} newColumns      New column count.
+		 */
+		updateColumns( previousColumns, newColumns ) {
+			const { clientId } = ownProps;
+			const { replaceInnerBlocks } = dispatch( 'core/block-editor' );
+			const { getBlocks } = registry.select( 'core/block-editor' );
+
+			let innerBlocks = getBlocks( clientId );
+			const hasExplicitWidths = hasExplicitColumnWidths( innerBlocks );
+
+			// Redistribute available width for existing inner blocks.
+			const isAddingColumn = newColumns > previousColumns;
+
+			if ( isAddingColumn && hasExplicitWidths ) {
+				// If adding a new column, assign width to the new column equal to
+				// as if it were `1 / columns` of the total available space.
+				const newColumnWidth = toWidthPrecision( 100 / newColumns );
+
+				// Redistribute in consideration of pending block insertion as
+				// constraining the available working width.
+				const widths = getRedistributedColumnWidths(
+					innerBlocks,
+					100 - newColumnWidth
+				);
+
+				innerBlocks = [
+					...getMappedColumnWidths( innerBlocks, widths ),
+					...times( newColumns - previousColumns, () => {
+						return createBlock( 'core/column', {
+							width: newColumnWidth,
+						} );
+					} ),
+				];
+			} else if ( isAddingColumn ) {
+				innerBlocks = [
+					...innerBlocks,
+					...times( newColumns - previousColumns, () => {
+						return createBlock( 'core/column' );
+					} ),
+				];
+			} else {
+				// The removed column will be the last of the inner blocks.
+				innerBlocks = dropRight(
+					innerBlocks,
+					previousColumns - newColumns
+				);
+
+				if ( hasExplicitWidths ) {
+					// Redistribute as if block is already removed.
+					const widths = getRedistributedColumnWidths(
+						innerBlocks,
+						100
+					);
+
+					innerBlocks = getMappedColumnWidths( innerBlocks, widths );
+				}
+			}
+
+			replaceInnerBlocks( clientId, innerBlocks );
+		},
+	} )
+)( ColumnsEditContainer );
+
+function Placeholder( { clientId, name, setAttributes } ) {
+	const { blockType, defaultVariation, variations } = useSelect(
+		( select ) => {
+			const {
+				getBlockVariations,
+				getBlockType,
+				getDefaultBlockVariation,
+			} = select( 'core/blocks' );
+
+			return {
+				blockType: getBlockType( name ),
+				defaultVariation: getDefaultBlockVariation( name, 'block' ),
+				variations: getBlockVariations( name, 'block' ),
+			};
+		},
+		[ name ]
+	);
+	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
+	const blockProps = useBlockProps();
+
+	return (
+		<div { ...blockProps }>
+			<__experimentalBlockVariationPicker
+				icon={ get( blockType, [ 'icon', 'src' ] ) }
+				label={ get( blockType, [ 'title' ] ) }
+				variations={ variations }
+				onSelect={ ( nextVariation = defaultVariation ) => {
+					if ( nextVariation.attributes ) {
+						setAttributes( nextVariation.attributes );
+					}
+					if ( nextVariation.innerBlocks ) {
+						replaceInnerBlocks(
+							clientId,
+							createBlocksFromInnerBlocksTemplate(
+								nextVariation.innerBlocks
+							),
+							true
+						);
+					}
+				} }
+				allowSkip
+			/>
+		</div>
+	);
+}
+
+const ColumnsEdit = ( props ) => {
+	const { clientId } = props;
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
+		[ clientId ]
+	);
+	const Component = hasInnerBlocks
+		? ColumnsEditContainerWrapper
+		: Placeholder;
+
+	return <Component { ...props } />;
 };
 
-const DEFAULT_EMPTY_ARRAY = [];
-
-export default compose(
-	/**
-	 * Selects the child column Blocks for this parent Column
-	 */
-	withSelect( ( select, { clientId } ) => {
-		const { getBlocksByClientId } = select( 'core/editor' );
-		const block = getBlocksByClientId( clientId )[ 0 ];
-
-		return {
-			childColumns: block ? block.innerBlocks : DEFAULT_EMPTY_ARRAY,
-		};
-	} ),
-	withDispatch( ( dispatch, { clientId, childColumns } ) => {
-		return {
-			/**
-			 * Update all child column Blocks with a new
-			 * vertical alignment setting based on whatever
-			 * alignment is passed in. This allows change to parent
-			 * to overide anything set on a individual column basis
-			 *
-			 * @param  {string} alignment the vertical alignment setting
-			 */
-			updateAlignment( alignment ) {
-				// Update self...
-				dispatch( 'core/editor' ).updateBlockAttributes( clientId, {
-					verticalAlignment: alignment,
-				} );
-
-				// Update all child Column Blocks to match
-				childColumns.forEach( ( childColumn ) => {
-					dispatch( 'core/editor' ).updateBlockAttributes( childColumn.clientId, {
-						verticalAlignment: alignment,
-					} );
-				} );
-			},
-		};
-	} ),
-)( ColumnsEdit );
+export default ColumnsEdit;

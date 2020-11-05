@@ -1,10 +1,148 @@
-## 7.3.0 (Unreleased)
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+- Introduce `Navigation` component as `__experimentalNavigation` for displaying a hierarchy of items.
+
+### Breaking Change
+
+- Introduce support for other units and advanced CSS properties on `FontSizePicker`. Provided the value passed to the `FontSizePicker` is a string or one of the size options passed is a string, onChange will start to be called with a string value instead of a number. On WordPress usage, font size options are now automatically converted to strings with the default "px" unit added.
+
+## 10.0.0 (2020-07-07)
+
+### Breaking Change
+
+- `NumberControl` no longer automatically transforms values when rendering `value` into a `<input />` HTML element.
+- `Dashicon` component no longer renders SVGs. If you rely on this component, make sure to load the dashicon font.
+
+## 9.6.0 (2020-05-14)
+
+### Bug Fix
+
+- Fix and issue that would cause the `Popover` component to throw an error under certain
+  circumstances ([#22264](https://github.com/WordPress/gutenberg/pull/22264)).
+
+### Deprecations
+
+- The `Guide` component no longer supports passing pages as children. Use the `pages` prop instead.
+- The `GuidePage` component is deprecated. Use the `pages` prop in `Guide` instead.
+
+## 9.2.0 (2020-02-10)
+
+### Enhancements
+
+- The `Notice` component will speak its message. With this new feature, a developer can control either the `spokenMessage` spoken message, or the `politeness` politeness level of the message.
+- The `Snackbar` component will speak its message. With this new feature, a developer can control either the `spokenMessage` spoken message, or the `politeness` politeness level of the message.
+- A `Notice` `actions` member can now assign `isPrimary` to render a primary button action associated with a notice message.
+
+### Bug Fixes
+
+- Notice will assume a default status of 'info' if none is provided. This resolves an issue where the notice would be assigned a class name `is-undefined`. This was previously the effective default by styled appearance and should not be considered a breaking change in that regard.
+
+## 9.0.0 (2020-01-13)
+
+### New Features
+
+- Added a new `Guide` component which allows developers to easily present a user guide.
+
+### Breaking Changes
+
+- `is-button` classname has been removed from the Button component.
+- The `is-default` classname is not applied automatically anymore.
+- By default Button components come with a fixed height and hover styles.
+
+### Bug Fixes
+
+- Fixes a regression published in version 8.5.0 that would prevent some build tools from including
+  styles provided in the packages build-styles directory.
+
+### Deprecations
+
+- `isDefault` prop in `Button` has been deprecated. Consider using `isSecondary` instead.
+- `IconButton` has been deprecated. Use the `Button` component instead.
+
+## 8.2.0 (2019-08-29)
+
+### New Features
+
+- The bundled `re-resizable` dependency has been updated from requiring `5.0.1` to requiring `^6.0.0` ([#17011](https://github.com/WordPress/gutenberg/pull/17011)).
+
+## 8.1.0 (2019-08-05)
+
+### New Features
+
+- Added a new `popoverProps` prop to the `Dropdown` component which allows users of the `Dropdown` component to pass props directly to the `Popover` component.
+- Added and documented `hideLabelFromVision` prop to `BaseControl` used by `SelectControl`, `TextControl`, and `TextareaControl`.
+- Added a new `popoverProps` prop to the `DropdownMenu` component which allows to pass props directly to the nested `Popover` component.
+- Added a new `toggleProps` prop to the `DropdownMenu` component which allows to pass props directly to the nested `IconButton` component.
+- Added a new `menuProps` prop to the `DropdownMenu` component which allows to pass props directly to the nested `NavigableMenu` component.
+
+### Deprecations
+
+- `menuLabel` prop in `DropdownComponent` has been deprecated. Consider using `menuProps` object and its `aria-label` property instead.
+- `position` prop in `DropdownComponent` has been deprecated. Consider using `popoverProps` object and its `position` property instead.
+
+### Bug Fixes
+
+- The `Button` component will no longer assign default styling (`is-default` class) when explicitly assigned as primary (the `isPrimary` prop). This should resolve potential conflicts affecting a combination of `isPrimary`, `isDefault`, and `isLarge` / `isSmall`, where the busy animation would appear with incorrect coloring.
+
+### Deprecations
+
+- The `Popover` component `onClickOutside` prop has been deprecated. Use `onFocusOutside` instead.
+
+### Internal
+
+- The `Dropdown` component has been refactored to focus changes using the `Popover` component's `onFocusOutside` prop.
+- The `MenuItem` component will now always use an `IconButton`. This prevents a focus loss when clicking a menu item.
+- Package no longer depends on external `react-click-outside` library.
+
+## 8.0.0 (2019-06-12)
+
+### New Feature
+
+- Add new `BlockQuotation` block to the primitives folder to support blockquote in a multiplatform way. [#15482](https://github.com/WordPress/gutenberg/pull/15482).
+- `DropdownMenu` now supports passing a [render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render) as children for more advanced customization.
+
+### Internal
+
+- `MenuGroup` no longer uses `NavigableMenu` internally. It needs to be explicitly wrapped with `NavigableMenu` to bring back the same behavior.
+
+### Documentation
+
+- Added missing documentation for `DropdownMenu` props `menuLabel`, `position`, `className`.
+
+### Breaking Change
+
+- `ServerSideRender` is no longer part of components. It was extracted to an independent package `@wordpress/server-side-render`.
+
+### Bug Fix
+
+- Although `DateTimePicker` does not allow picking the seconds, passed the current seconds as the selected value for seconds when calling `onChange`. Now it passes zero.
+
+## 7.4.0 (2019-05-21)
+
+### New Feature
+
+- Added a new `HorizontalRule` component.
+- Added a new `Snackbar` component.
+
+### Bug Fix
+
+- Fixed display of reset button when using RangeControl `allowReset` prop.
+- Fixed minutes field of `DateTimePicker` missed '0' before single digit values.
+
+## 7.3.0 (2019-04-16)
 
 ### New Features
 
 - Added a new `render` property to `FormFileUpload` component. Allowing users of the component to custom the UI for their needs.
 - Added a new `BaseControl.VisualLabel` component.
 - Added a new `preview` prop to the `Placeholder` component which allows to display a preview, for example a media preview when the Placeholder is used in media editing contexts.
+- Added a new `anchorRect` prop to `Popover` which enables a developer to provide a custom `DOMRect` object at which to position the popover.
+
+### Improvements
+
+- Limit `Base Control Label` to the width of its content.
 
 ### Bug fixes
 

@@ -1,14 +1,39 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
-import { AlignmentToolbar, BlockControls, RichText } from '@wordpress/block-editor';
+import {
+	AlignmentToolbar,
+	BlockControls,
+	RichText,
+	useBlockProps,
+} from '@wordpress/block-editor';
+import { BlockQuotation } from '@wordpress/components';
+import { createBlock } from '@wordpress/blocks';
 
-export default function QuoteEdit( { attributes, setAttributes, isSelected, mergeBlocks, onReplace, className } ) {
+export default function QuoteEdit( {
+	attributes,
+	setAttributes,
+	isSelected,
+	mergeBlocks,
+	onReplace,
+	className,
+	insertBlocksAfter,
+} ) {
 	const { align, value, citation } = attributes;
+	const blockProps = useBlockProps( {
+		className: classnames( className, {
+			[ `has-text-align-${ align }` ]: align,
+		} ),
+	} );
+
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<AlignmentToolbar
 					value={ align }
@@ -17,19 +42,20 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 					} }
 				/>
 			</BlockControls>
-			<blockquote className={ className } style={ { textAlign: align } }>
+			<BlockQuotation { ...blockProps }>
 				<RichText
 					identifier="value"
 					multiline
 					value={ value }
-					onChange={
-						( nextValue ) => setAttributes( {
+					onChange={ ( nextValue ) =>
+						setAttributes( {
 							value: nextValue,
 						} )
 					}
 					onMerge={ mergeBlocks }
 					onRemove={ ( forward ) => {
-						const hasEmptyCitation = ! citation || citation.length === 0;
+						const hasEmptyCitation =
+							! citation || citation.length === 0;
 						if ( ! forward && hasEmptyCitation ) {
 							onReplace( [] );
 						}
@@ -38,24 +64,40 @@ export default function QuoteEdit( { attributes, setAttributes, isSelected, merg
 						// translators: placeholder text used for the quote
 						__( 'Write quote…' )
 					}
+					onReplace={ onReplace }
+					onSplit={ ( piece ) =>
+						createBlock( 'core/quote', {
+							...attributes,
+							value: piece,
+						} )
+					}
+					__unstableOnSplitMiddle={ () =>
+						createBlock( 'core/paragraph' )
+					}
+					textAlign={ align }
 				/>
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
 						identifier="citation"
 						value={ citation }
-						onChange={
-							( nextCitation ) => setAttributes( {
+						onChange={ ( nextCitation ) =>
+							setAttributes( {
 								citation: nextCitation,
 							} )
 						}
+						__unstableMobileNoFocusOnMount
 						placeholder={
 							// translators: placeholder text used for the citation
 							__( 'Write citation…' )
 						}
 						className="wp-block-quote__citation"
+						textAlign={ align }
+						__unstableOnSplitAtEnd={ () =>
+							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						}
 					/>
 				) }
-			</blockquote>
-		</Fragment>
+			</BlockQuotation>
+		</>
 	);
 }

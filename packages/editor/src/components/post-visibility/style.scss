@@ -1,8 +1,7 @@
-.edit-post-post-visibility__dialog {
-	.editor-post-visibility__dialog-fieldset {
-		padding: $grid-size-small;
-		padding-top: 0;
-	}
+.edit-post-post-visibility__dialog,
+.editor-post-visibility__dialog-fieldset {
+	padding: $grid-unit-05;
+	padding-top: 0;
 
 	.editor-post-visibility__dialog-legend {
 		font-weight: 600;
@@ -11,7 +10,8 @@
 		padding: 0;
 	}
 
-	.editor-post-visibility__dialog-radio {
+	.editor-post-visibility__dialog-radio[type="radio"] {
+		@include radio-control;
 		margin-top: 2px;
 	}
 
@@ -29,11 +29,8 @@
 		margin-bottom: 0;
 	}
 
-	.editor-post-visibility__dialog-password-input {
+	.editor-post-visibility__dialog-password-input[type="text"] {
+		@include input-control;
 		margin-left: 28px;
 	}
-}
-
-.edit-post-post-visibility__dialog.components-popover.is-bottom {
-	z-index: z-index(".edit-post-post-visibility__dialog.components-popover.is-bottom");
 }

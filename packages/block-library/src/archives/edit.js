@@ -1,38 +1,46 @@
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
-import {
-	PanelBody,
-	ToggleControl,
-	Disabled,
-} from '@wordpress/components';
+import { PanelBody, ToggleControl, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
-import { ServerSideRender } from '@wordpress/editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import ServerSideRender from '@wordpress/server-side-render';
 
 export default function ArchivesEdit( { attributes, setAttributes } ) {
 	const { showPostCounts, displayAsDropdown } = attributes;
 
 	return (
-		<Fragment>
+		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Archives Settings' ) }>
+				<PanelBody title={ __( 'Archives settings' ) }>
 					<ToggleControl
-						label={ __( 'Display as Dropdown' ) }
+						label={ __( 'Display as dropdown' ) }
 						checked={ displayAsDropdown }
-						onChange={ () => setAttributes( { displayAsDropdown: ! displayAsDropdown } ) }
+						onChange={ () =>
+							setAttributes( {
+								displayAsDropdown: ! displayAsDropdown,
+							} )
+						}
 					/>
 					<ToggleControl
-						label={ __( 'Show Post Counts' ) }
+						label={ __( 'Show post counts' ) }
 						checked={ showPostCounts }
-						onChange={ () => setAttributes( { showPostCounts: ! showPostCounts } ) }
+						onChange={ () =>
+							setAttributes( {
+								showPostCounts: ! showPostCounts,
+							} )
+						}
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<Disabled>
-				<ServerSideRender block="core/archives" attributes={ attributes } />
-			</Disabled>
-		</Fragment>
+			<div { ...useBlockProps() }>
+				<Disabled>
+					<ServerSideRender
+						block="core/archives"
+						attributes={ attributes }
+					/>
+				</Disabled>
+			</div>
+		</>
 	);
 }

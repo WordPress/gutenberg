@@ -40,19 +40,46 @@ ruleTester.run( 'react-no-unsafe-timeout', rule, {
 		{
 			code: `class MyComponent extends Component { componentDidMount() { this.timeoutId = setTimeout(); } }`,
 		},
+		{
+			code: `
+function MyComponent() {
+	useEffect( () => {
+		const timeoutHandle = setTimeout( () => {} );
+
+		return () => clearTimeout( timeoutHandle );
+	}, [] );
+
+	return null;
+}`,
+		},
 	],
 	invalid: [
 		{
 			code: `function MyComponent() { setTimeout(); }`,
-			errors: [ { message: 'setTimeout in a component must be cancelled on unmount' } ],
+			errors: [
+				{
+					message:
+						'setTimeout in a component must be cancelled on unmount',
+				},
+			],
 		},
 		{
 			code: `class MyComponent extends Component { componentDidMount() { setTimeout(); } }`,
-			errors: [ { message: 'setTimeout in a component must be cancelled on unmount' } ],
+			errors: [
+				{
+					message:
+						'setTimeout in a component must be cancelled on unmount',
+				},
+			],
 		},
 		{
 			code: `class MyComponent extends wp.element.Component { componentDidMount() { setTimeout(); } }`,
-			errors: [ { message: 'setTimeout in a component must be cancelled on unmount' } ],
+			errors: [
+				{
+					message:
+						'setTimeout in a component must be cancelled on unmount',
+				},
+			],
 		},
 	],
 } );

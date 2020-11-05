@@ -3,7 +3,7 @@
  */
 const fs = require( 'fs' );
 const path = require( 'path' );
-const { overEvery } = require( 'lodash' );
+const { isEmpty, overEvery } = require( 'lodash' );
 
 /**
  * Absolute path to packages directory.
@@ -25,6 +25,28 @@ function isDirectory( file ) {
 }
 
 /**
+ * Returns true if the given packages has "module" field.
+ *
+ * @param {string} file Packages directory file.
+ *
+ * @return {boolean} Whether file is a directory.
+ */
+function hasModuleField( file ) {
+	let pkg;
+	try {
+		pkg = require( path.resolve( PACKAGES_DIR, file, 'package.json' ) );
+	} catch {
+		// If, for whatever reason, the package's `package.json` cannot be read,
+		// consider it as an invalid candidate. In most cases, this can happen
+		// when lingering directories are left in the working path when changing
+		// to an older branch where a package did not yet exist.
+		return false;
+	}
+
+	return ! isEmpty( pkg.module );
+}
+
+/**
  * Filter predicate, returning true if the given base file name is to be
  * included in the build.
  *
@@ -32,7 +54,7 @@ function isDirectory( file ) {
  *
  * @return {boolean} Whether to include file in build.
  */
-const filterPackages = overEvery( isDirectory );
+const filterPackages = overEvery( isDirectory, hasModuleField );
 
 /**
  * Returns the absolute path of all WordPress packages

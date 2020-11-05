@@ -1,0 +1,22 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`get template info should return both a title and a description 1`] = `
+Object {
+  "description": "test description",
+  "title": "Index",
+}
+`;
+
+exports[`get template info should return both a title and a description 2`] = `
+Object {
+  "description": "Default template",
+  "title": "Index",
+}
+`;
+
+exports[`get template info should return both a title and a description 3`] = `
+Object {
+  "description": undefined,
+  "title": undefined,
+}
+`;

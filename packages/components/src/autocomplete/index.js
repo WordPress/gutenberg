@@ -7,10 +7,15 @@ import { escapeRegExp, find, map, debounce, deburr } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, renderToString } from '@wordpress/element';
-import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT, SPACE } from '@wordpress/keycodes';
+import {
+	renderToString,
+	useEffect,
+	useLayoutEffect,
+	useState,
+} from '@wordpress/element';
+import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import {
 	create,
 	slice,
@@ -18,95 +23,86 @@ import {
 	isCollapsed,
 	getTextContent,
 } from '@wordpress/rich-text';
-import { getRectangleFromRange } from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
-import withFocusOutside from '../higher-order/with-focus-outside';
 import Button from '../button';
 import Popover from '../popover';
 import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 /**
  * A raw completer option.
+ *
  * @typedef {*} CompleterOption
  */
 
 /**
  * @callback FnGetOptions
  *
- * @returns {(CompleterOption[]|Promise.<CompleterOption[]>)} The completer options or a promise for them.
+ * @return {(CompleterOption[]|Promise.<CompleterOption[]>)} The completer options or a promise for them.
  */
 
 /**
  * @callback FnGetOptionKeywords
  * @param {CompleterOption} option a completer option.
  *
- * @returns {string[]} list of key words to search.
+ * @return {string[]} list of key words to search.
  */
 
 /**
  * @callback FnIsOptionDisabled
  * @param {CompleterOption} option a completer option.
  *
- * @returns {string[]} whether or not the given option is disabled.
+ * @return {string[]} whether or not the given option is disabled.
  */
 
 /**
  * @callback FnGetOptionLabel
  * @param {CompleterOption} option a completer option.
  *
- * @returns {(string|Array.<(string|Component)>)} list of react components to render.
- */
-
-/**
- * @callback FnAllowNode
- * @param {Node} textNode check if the completer can handle this text node.
- *
- * @returns {boolean} true if the completer can handle this text node.
+ * @return {(string|Array.<(string|WPElement)>)} list of react components to render.
  */
 
 /**
  * @callback FnAllowContext
- * @param {Range} before the range before the auto complete trigger and query.
- * @param {Range} after the range after the autocomplete trigger and query.
+ * @param {string} before the string before the auto complete trigger and query.
+ * @param {string} after  the string after the autocomplete trigger and query.
  *
- * @returns {boolean} true if the completer can handle these ranges.
+ * @return {boolean} true if the completer can handle.
  */
 
 /**
  * @typedef {Object} OptionCompletion
- * @property {('insert-at-caret', 'replace')} action the intended placement of the completion.
+ * @property {'insert-at-caret'|'replace'} action the intended placement of the completion.
  * @property {OptionCompletionValue} value the completion value.
  */
 
 /**
  * A completion value.
- * @typedef {(String|WPElement|Object)} OptionCompletionValue
+ *
+ * @typedef {(string|WPElement|Object)} OptionCompletionValue
  */
 
 /**
  * @callback FnGetOptionCompletion
  * @param {CompleterOption} value the value of the completer option.
- * @param {Range} range the nodes included in the autocomplete trigger and query.
- * @param {String} query the text value of the autocomplete query.
+ * @param {string} query the text value of the autocomplete query.
  *
- * @returns {(OptionCompletion|OptionCompletionValue)} the completion for the given option. If an
+ * @return {(OptionCompletion|OptionCompletionValue)} the completion for the given option. If an
  * 													   OptionCompletionValue is returned, the
  * 													   completion action defaults to `insert-at-caret`.
  */
 
 /**
- * @typedef {Object} Completer
- * @property {String} name a way to identify a completer, useful for selective overriding.
- * @property {?String} className A class to apply to the popup menu.
- * @property {String} triggerPrefix the prefix that will display the menu.
+ * @typedef {Object} WPCompleter
+ * @property {string} name a way to identify a completer, useful for selective overriding.
+ * @property {?string} className A class to apply to the popup menu.
+ * @property {string} triggerPrefix the prefix that will display the menu.
  * @property {(CompleterOption[]|FnGetOptions)} options the completer options or a function to get them.
  * @property {?FnGetOptionKeywords} getOptionKeywords get the keywords for a given option.
  * @property {?FnIsOptionDisabled} isOptionDisabled get whether or not the given option is disabled.
  * @property {FnGetOptionLabel} getOptionLabel get the label for a given option.
- * @property {?FnAllowNode} allowNode filter the allowed text nodes in the autocomplete.
  * @property {?FnAllowContext} allowContext filter the context under which the autocomplete activates.
  * @property {FnGetOptionCompletion} getOptionCompletion get the completion associated with a given option.
  */
@@ -122,7 +118,9 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 			keywords = [ ...keywords, option.label ];
 		}
 
-		const isMatch = keywords.some( ( keyword ) => search.test( deburr( keyword ) ) );
+		const isMatch = keywords.some( ( keyword ) =>
+			search.test( deburr( keyword ) )
+		);
 		if ( ! isMatch ) {
 			continue;
 		}
@@ -138,114 +136,225 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 	return filtered;
 }
 
-function getCaretRect() {
-	const range = window.getSelection().getRangeAt( 0 );
-
-	if ( range ) {
-		return getRectangleFromRange( range );
-	}
+function getRange() {
+	const selection = window.getSelection();
+	return selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 }
 
-export class Autocomplete extends Component {
-	static getInitialState() {
-		return {
-			search: /./,
-			selectedIndex: 0,
-			suppress: undefined,
-			open: undefined,
-			query: undefined,
-			filteredOptions: [],
-		};
+const getAutoCompleterUI = ( autocompleter ) => {
+	const useItems = autocompleter.useItems
+		? autocompleter.useItems
+		: ( filterValue ) => {
+				const [ items, setItems ] = useState( [] );
+				/*
+				 * We support both synchronous and asynchronous retrieval of completer options
+				 * but internally treat all as async so we maintain a single, consistent code path.
+				 *
+				 * Because networks can be slow, and the internet is wonderfully unpredictable,
+				 * we don't want two promises updating the state at once. This ensures that only
+				 * the most recent promise will act on `optionsData`. This doesn't use the state
+				 * because `setState` is batched, and so there's no guarantee that setting
+				 * `activePromise` in the state would result in it actually being in `this.state`
+				 * before the promise resolves and we check to see if this is the active promise or not.
+				 */
+				useLayoutEffect( () => {
+					const { options, isDebounced } = autocompleter;
+					const loadOptions = debounce(
+						() => {
+							const promise = Promise.resolve(
+								typeof options === 'function'
+									? options( filterValue )
+									: options
+							).then( ( optionsData ) => {
+								if ( promise.canceled ) {
+									return;
+								}
+								const keyedOptions = optionsData.map(
+									( optionData, optionIndex ) => ( {
+										key: `${ autocompleter.name }-${ optionIndex }`,
+										value: optionData,
+										label: autocompleter.getOptionLabel(
+											optionData
+										),
+										keywords: autocompleter.getOptionKeywords
+											? autocompleter.getOptionKeywords(
+													optionData
+											  )
+											: [],
+										isDisabled: autocompleter.isOptionDisabled
+											? autocompleter.isOptionDisabled(
+													optionData
+											  )
+											: false,
+									} )
+								);
+
+								// create a regular expression to filter the options
+								const search = new RegExp(
+									'(?:\\b|\\s|^)' +
+										escapeRegExp( filterValue ),
+									'i'
+								);
+								setItems(
+									filterOptions( search, keyedOptions )
+								);
+							} );
+
+							return promise;
+						},
+						isDebounced ? 250 : 0
+					);
+
+					const promise = loadOptions();
+
+					return () => {
+						loadOptions.cancel();
+						if ( promise ) {
+							promise.canceled = true;
+						}
+					};
+				}, [ filterValue ] );
+
+				return [ items ];
+		  };
+
+	function AutocompleterUI( {
+		filterValue,
+		instanceId,
+		listBoxId,
+		className,
+		selectedIndex,
+		onChangeOptions,
+		onSelect,
+		onReset,
+	} ) {
+		const [ items ] = useItems( filterValue );
+		useLayoutEffect( () => {
+			onChangeOptions( items );
+		}, [ items ] );
+
+		if ( ! items.length > 0 ) {
+			return null;
+		}
+
+		return (
+			<Popover
+				focusOnMount={ false }
+				onClose={ onReset }
+				position="top right"
+				className="components-autocomplete__popover"
+				anchorRef={ getRange() }
+			>
+				<div
+					id={ listBoxId }
+					role="listbox"
+					className="components-autocomplete__results"
+				>
+					{ map( items, ( option, index ) => (
+						<Button
+							key={ option.key }
+							id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
+							role="option"
+							aria-selected={ index === selectedIndex }
+							disabled={ option.isDisabled }
+							className={ classnames(
+								'components-autocomplete__result',
+								className,
+								{
+									'is-selected': index === selectedIndex,
+								}
+							) }
+							onClick={ () => onSelect( option ) }
+						>
+							{ option.label }
+						</Button>
+					) ) }
+				</div>
+			</Popover>
+		);
 	}
 
-	constructor() {
-		super( ...arguments );
+	return AutocompleterUI;
+};
 
-		this.bindNode = this.bindNode.bind( this );
-		this.select = this.select.bind( this );
-		this.reset = this.reset.bind( this );
-		this.resetWhenSuppressed = this.resetWhenSuppressed.bind( this );
-		this.handleKeyDown = this.handleKeyDown.bind( this );
-		this.debouncedLoadOptions = debounce( this.loadOptions, 250 );
+function Autocomplete( {
+	children,
+	isSelected,
+	record,
+	onChange,
+	onReplace,
+	completers,
+	debouncedSpeak,
+} ) {
+	const instanceId = useInstanceId( Autocomplete );
+	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
+	const [ filteredOptions, setFilteredOptions ] = useState( [] );
+	const [ filterValue, setFilterValue ] = useState( '' );
+	const [ autocompleter, setAutocompleter ] = useState( null );
+	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
 
-		this.state = this.constructor.getInitialState();
-	}
-
-	bindNode( node ) {
-		this.node = node;
-	}
-
-	insertCompletion( replacement ) {
-		const { open, query } = this.state;
-		const { record, onChange } = this.props;
+	function insertCompletion( replacement ) {
 		const end = record.start;
-		const start = end - open.triggerPrefix.length - query.length;
+		const start =
+			end - autocompleter.triggerPrefix.length - filterValue.length;
 		const toInsert = create( { html: renderToString( replacement ) } );
 
 		onChange( insert( record, toInsert, start, end ) );
 	}
 
-	select( option ) {
-		const { onReplace } = this.props;
-		const { open, query } = this.state;
-		const { getOptionCompletion } = open || {};
+	function select( option ) {
+		const { getOptionCompletion } = autocompleter || {};
 
 		if ( option.isDisabled ) {
 			return;
 		}
 
 		if ( getOptionCompletion ) {
-			const completion = getOptionCompletion( option.value, query );
+			const completion = getOptionCompletion( option.value, filterValue );
 
 			const { action, value } =
-				( undefined === completion.action || undefined === completion.value ) ?
-					{ action: 'insert-at-caret', value: completion } :
-					completion;
+				undefined === completion.action ||
+				undefined === completion.value
+					? { action: 'insert-at-caret', value: completion }
+					: completion;
 
 			if ( 'replace' === action ) {
 				onReplace( [ value ] );
 			} else if ( 'insert-at-caret' === action ) {
-				this.insertCompletion( value );
+				insertCompletion( value );
 			}
 		}
 
 		// Reset autocomplete state after insertion rather than before
 		// so insertion events don't cause the completion menu to redisplay.
-		this.reset();
+		reset();
 	}
 
-	reset() {
-		const isMounted = !! this.node;
-
-		// Autocompletions may replace the block containing this component,
-		// so we make sure it is mounted before resetting the state.
-		if ( isMounted ) {
-			this.setState( this.constructor.getInitialState() );
-		}
+	function reset() {
+		setSelectedIndex( 0 );
+		setFilteredOptions( [] );
+		setFilterValue( '' );
+		setAutocompleter( null );
+		setAutocompleterUI( null );
 	}
 
-	resetWhenSuppressed() {
-		const { open, suppress } = this.state;
-		if ( open && suppress === open.idx ) {
-			this.reset();
-		}
-	}
-
-	handleFocusOutside() {
-		this.reset();
-	}
-
-	announce( filteredOptions ) {
-		const { debouncedSpeak } = this.props;
+	function announce( options ) {
 		if ( ! debouncedSpeak ) {
 			return;
 		}
-		if ( !! filteredOptions.length ) {
-			debouncedSpeak( sprintf( _n(
-				'%d result found, use up and down arrow keys to navigate.',
-				'%d results found, use up and down arrow keys to navigate.',
-				filteredOptions.length
-			), filteredOptions.length ), 'assertive' );
+		if ( !! options.length ) {
+			debouncedSpeak(
+				sprintf(
+					/* translators: %d: number of results. */
+					_n(
+						'%d result found, use up and down arrow keys to navigate.',
+						'%d results found, use up and down arrow keys to navigate.',
+						options.length
+					),
+					options.length
+				),
+				'assertive'
+			);
 		} else {
 			debouncedSpeak( __( 'No results.' ), 'assertive' );
 		}
@@ -254,102 +363,50 @@ export class Autocomplete extends Component {
 	/**
 	 * Load options for an autocompleter.
 	 *
-	 * @param {Completer} completer The autocompleter.
-	 * @param {string}    query     The query, if any.
+	 * @param {Array} options
 	 */
-	loadOptions( completer, query ) {
-		const { options } = completer;
-
-		/*
-		 * We support both synchronous and asynchronous retrieval of completer options
-		 * but internally treat all as async so we maintain a single, consistent code path.
-		 *
-		 * Because networks can be slow, and the internet is wonderfully unpredictable,
-		 * we don't want two promises updating the state at once. This ensures that only
-		 * the most recent promise will act on `optionsData`. This doesn't use the state
-		 * because `setState` is batched, and so there's no guarantee that setting
-		 * `activePromise` in the state would result in it actually being in `this.state`
-		 * before the promise resolves and we check to see if this is the active promise or not.
-		 */
-		const promise = this.activePromise = Promise.resolve(
-			typeof options === 'function' ? options( query ) : options
-		).then( ( optionsData ) => {
-			if ( promise !== this.activePromise ) {
-				// Another promise has become active since this one was asked to resolve, so do nothing,
-				// or else we might end triggering a race condition updating the state.
-				return;
-			}
-			const keyedOptions = optionsData.map( ( optionData, optionIndex ) => ( {
-				key: `${ completer.idx }-${ optionIndex }`,
-				value: optionData,
-				label: completer.getOptionLabel( optionData ),
-				keywords: completer.getOptionKeywords ? completer.getOptionKeywords( optionData ) : [],
-				isDisabled: completer.isOptionDisabled ? completer.isOptionDisabled( optionData ) : false,
-			} ) );
-
-			const filteredOptions = filterOptions( this.state.search, keyedOptions );
-			const selectedIndex = filteredOptions.length === this.state.filteredOptions.length ? this.state.selectedIndex : 0;
-			this.setState( {
-				[ 'options_' + completer.idx ]: keyedOptions,
-				filteredOptions,
-				selectedIndex,
-			} );
-			this.announce( filteredOptions );
-		} );
+	function onChangeOptions( options ) {
+		setSelectedIndex(
+			options.length === filteredOptions.length ? selectedIndex : 0
+		);
+		setFilteredOptions( options );
+		announce( options );
 	}
 
-	handleKeyDown( event ) {
-		const { open, suppress, selectedIndex, filteredOptions } = this.state;
-		if ( ! open ) {
-			return;
-		}
-		if ( suppress === open.idx ) {
-			switch ( event.keyCode ) {
-				// cancel popup suppression on CTRL+SPACE
-				case SPACE:
-					const { ctrlKey, shiftKey, altKey, metaKey } = event;
-					if ( ctrlKey && ! ( shiftKey || altKey || metaKey ) ) {
-						this.setState( { suppress: undefined } );
-						event.preventDefault();
-						event.stopPropagation();
-					}
-					break;
-
-				// reset on cursor movement
-				case UP:
-				case DOWN:
-				case LEFT:
-				case RIGHT:
-					this.reset();
-			}
+	function handleKeyDown( event ) {
+		if ( ! autocompleter ) {
 			return;
 		}
 		if ( filteredOptions.length === 0 ) {
 			return;
 		}
-		let nextSelectedIndex;
 		switch ( event.keyCode ) {
 			case UP:
-				nextSelectedIndex = ( selectedIndex === 0 ? filteredOptions.length : selectedIndex ) - 1;
-				this.setState( { selectedIndex: nextSelectedIndex } );
+				setSelectedIndex(
+					( selectedIndex === 0
+						? filteredOptions.length
+						: selectedIndex ) - 1
+				);
 				break;
 
 			case DOWN:
-				nextSelectedIndex = ( selectedIndex + 1 ) % filteredOptions.length;
-				this.setState( { selectedIndex: nextSelectedIndex } );
+				setSelectedIndex(
+					( selectedIndex + 1 ) % filteredOptions.length
+				);
 				break;
 
 			case ESCAPE:
-				this.setState( { suppress: open.idx } );
+				setAutocompleter( null );
+				setAutocompleterUI( null );
 				break;
 
 			case ENTER:
-				this.select( filteredOptions[ selectedIndex ] );
+				select( filteredOptions[ selectedIndex ] );
 				break;
 
 			case LEFT:
 			case RIGHT:
-				this.reset();
+				reset();
 				return;
 
 			default:
@@ -362,143 +419,92 @@ export class Autocomplete extends Component {
 		event.stopPropagation();
 	}
 
-	toggleKeyEvents( isListening ) {
-		// This exists because we must capture ENTER key presses before RichText.
-		// It seems that react fires the simulated capturing events after the
-		// native browser event has already bubbled so we can't stopPropagation
-		// and avoid RichText getting the event from TinyMCE, hence we must
-		// register a native event handler.
-		const handler = isListening ? 'addEventListener' : 'removeEventListener';
-		this.node[ handler ]( 'keydown', this.handleKeyDown, true );
+	let textContent;
+
+	if ( isCollapsed( record ) ) {
+		textContent = getTextContent( slice( record, 0 ) );
 	}
 
-	componentDidUpdate( prevProps, prevState ) {
-		const { record, completers } = this.props;
-		const { record: prevRecord } = prevProps;
-		const { open: prevOpen } = prevState;
-
-		if ( ( ! this.state.open ) !== ( ! prevOpen ) ) {
-			this.toggleKeyEvents( ! ! this.state.open );
+	useEffect( () => {
+		if ( ! textContent ) {
+			return;
 		}
 
-		if ( isCollapsed( record ) ) {
-			const text = deburr( getTextContent( slice( record, 0 ) ) );
-			const prevText = deburr( getTextContent( slice( prevRecord, 0 ) ) );
-
-			if ( text !== prevText ) {
-				const textAfterSelection = getTextContent( slice( record, undefined, getTextContent( record ).length ) );
-				const allCompleters = map( completers, ( completer, idx ) => ( { ...completer, idx } ) );
-				const open = find( allCompleters, ( { triggerPrefix, allowContext } ) => {
-					const index = text.lastIndexOf( triggerPrefix );
-
-					if ( index === -1 ) {
-						return false;
-					}
-
-					if ( allowContext && ! allowContext( text.slice( 0, index ), textAfterSelection ) ) {
-						return false;
-					}
-
-					return /^\S*$/.test( text.slice( index + triggerPrefix.length ) );
-				} );
-
-				if ( ! open ) {
-					this.reset();
-					return;
-				}
-
-				const safeTrigger = escapeRegExp( open.triggerPrefix );
-				const match = text.match( new RegExp( `${ safeTrigger }(\\S*)$` ) );
-				const query = match && match[ 1 ];
-				const { open: wasOpen, suppress: wasSuppress, query: wasQuery } = this.state;
-
-				if ( open && ( ! wasOpen || open.idx !== wasOpen.idx || query !== wasQuery ) ) {
-					if ( open.isDebounced ) {
-						this.debouncedLoadOptions( open, query );
-					} else {
-						this.loadOptions( open, query );
-					}
-				}
-				// create a regular expression to filter the options
-				const search = open ? new RegExp( '(?:\\b|\\s|^)' + escapeRegExp( query ), 'i' ) : /./;
-				// filter the options we already have
-				const filteredOptions = open ? filterOptions( search, this.state[ 'options_' + open.idx ] ) : [];
-				// check if we should still suppress the popover
-				const suppress = ( open && wasSuppress === open.idx ) ? wasSuppress : undefined;
-				// update the state
-				if ( wasOpen || open ) {
-					this.setState( { selectedIndex: 0, filteredOptions, suppress, search, open, query } );
-				}
-				// announce the count of filtered options but only if they have loaded
-				if ( open && this.state[ 'options_' + open.idx ] ) {
-					this.announce( filteredOptions );
-				}
-			}
-		}
-	}
-
-	componentWillUnmount() {
-		this.toggleKeyEvents( false );
-		this.debouncedLoadOptions.cancel();
-	}
-
-	render() {
-		const { children, instanceId } = this.props;
-		const { open, suppress, selectedIndex, filteredOptions } = this.state;
-		const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
-		const { className, idx } = open || {};
-		const isExpanded = suppress !== idx && filteredOptions.length > 0;
-		const listBoxId = isExpanded ? `components-autocomplete-listbox-${ instanceId }` : null;
-		const activeId = isExpanded ? `components-autocomplete-item-${ instanceId }-${ selectedKey }` : null;
-
-		// Disable reason: Clicking the editor should reset the autocomplete when the menu is suppressed
-		/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-		return (
-			<div
-				ref={ this.bindNode }
-				onClick={ this.resetWhenSuppressed }
-				className="components-autocomplete"
-			>
-				{ children( { isExpanded, listBoxId, activeId } ) }
-				{ isExpanded && (
-					<Popover
-						focusOnMount={ false }
-						onClose={ this.reset }
-						position="top right"
-						className="components-autocomplete__popover"
-						getAnchorRect={ getCaretRect }
-					>
-						<div
-							id={ listBoxId }
-							role="listbox"
-							className="components-autocomplete__results"
-						>
-							{ isExpanded && map( filteredOptions, ( option, index ) => (
-								<Button
-									key={ option.key }
-									id={ `components-autocomplete-item-${ instanceId }-${ option.key }` }
-									role="option"
-									aria-selected={ index === selectedIndex }
-									disabled={ option.isDisabled }
-									className={ classnames( 'components-autocomplete__result', className, {
-										'is-selected': index === selectedIndex,
-									} ) }
-									onClick={ () => this.select( option ) }
-								>
-									{ option.label }
-								</Button>
-							) ) }
-						</div>
-					</Popover>
-				) }
-			</div>
+		const text = deburr( textContent );
+		const textAfterSelection = getTextContent(
+			slice( record, undefined, getTextContent( record ).length )
 		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/onclick-has-role, jsx-a11y/click-events-have-key-events */
-	}
+		const completer = find(
+			completers,
+			( { triggerPrefix, allowContext } ) => {
+				const index = text.lastIndexOf( triggerPrefix );
+
+				if ( index === -1 ) {
+					return false;
+				}
+
+				if (
+					allowContext &&
+					! allowContext( text.slice( 0, index ), textAfterSelection )
+				) {
+					return false;
+				}
+
+				return /^\S*$/.test(
+					text.slice( index + triggerPrefix.length )
+				);
+			}
+		);
+
+		if ( ! completer ) {
+			reset();
+			return;
+		}
+
+		const safeTrigger = escapeRegExp( completer.triggerPrefix );
+		const match = text.match( new RegExp( `${ safeTrigger }(\\S*)$` ) );
+		const query = match && match[ 1 ];
+
+		setAutocompleter( completer );
+		setAutocompleterUI( () =>
+			completer !== autocompleter
+				? getAutoCompleterUI( completer )
+				: AutocompleterUI
+		);
+		setFilterValue( query );
+	}, [ textContent ] );
+
+	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
+	const { className } = autocompleter || {};
+	const isExpanded = !! autocompleter && filteredOptions.length > 0;
+	const listBoxId = isExpanded
+		? `components-autocomplete-listbox-${ instanceId }`
+		: null;
+	const activeId = isExpanded
+		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
+		: null;
+
+	return (
+		<>
+			{ children( {
+				isExpanded,
+				listBoxId,
+				activeId,
+				onKeyDown: handleKeyDown,
+			} ) }
+			{ isSelected && AutocompleterUI && (
+				<AutocompleterUI
+					className={ className }
+					filterValue={ filterValue }
+					instanceId={ instanceId }
+					listBoxId={ listBoxId }
+					selectedIndex={ selectedIndex }
+					onChangeOptions={ onChangeOptions }
+					onSelect={ select }
+				/>
+			) }
+		</>
+	);
 }
 
-export default compose( [
-	withSpokenMessages,
-	withInstanceId,
-	withFocusOutside, // this MUST be the innermost HOC as it calls handleFocusOutside
-] )( Autocomplete );
+export default withSpokenMessages( Autocomplete );

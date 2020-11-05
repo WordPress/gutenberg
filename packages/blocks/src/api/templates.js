@@ -11,6 +11,7 @@ import { renderToString } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { convertLegacyBlocks } from './parser';
 import { createBlock } from './factory';
 import { getBlockType } from './registration';
 
@@ -54,53 +55,69 @@ export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 		return blocks;
 	}
 
-	return map( template, ( [ name, attributes, innerBlocksTemplate ], index ) => {
-		const block = blocks[ index ];
+	return map(
+		template,
+		( [ name, attributes, innerBlocksTemplate ], index ) => {
+			const block = blocks[ index ];
 
-		if ( block && block.name === name ) {
-			const innerBlocks = synchronizeBlocksWithTemplate( block.innerBlocks, innerBlocksTemplate );
-			return { ...block, innerBlocks };
-		}
-
-		// To support old templates that were using the "children" format
-		// for the attributes using "html" strings now, we normalize the template attributes
-		// before creating the blocks.
-
-		const blockType = getBlockType( name );
-		const isHTMLAttribute = ( attributeDefinition ) => get( attributeDefinition, [ 'source' ] ) === 'html';
-		const isQueryAttribute = ( attributeDefinition ) => get( attributeDefinition, [ 'source' ] ) === 'query';
-
-		const normalizeAttributes = ( schema, values ) => {
-			return mapValues( values, ( value, key ) => {
-				return normalizeAttribute( schema[ key ], value );
-			} );
-		};
-		const normalizeAttribute = ( definition, value ) => {
-			if ( isHTMLAttribute( definition ) && isArray( value ) ) {
-				// Introduce a deprecated call at this point
-				// When we're confident that "children" format should be removed from the templates.
-
-				return renderToString( value );
+			if ( block && block.name === name ) {
+				const innerBlocks = synchronizeBlocksWithTemplate(
+					block.innerBlocks,
+					innerBlocksTemplate
+				);
+				return { ...block, innerBlocks };
 			}
 
-			if ( isQueryAttribute( definition ) && value ) {
-				return value.map( ( subValues ) => {
-					return normalizeAttributes( definition.query, subValues );
+			// To support old templates that were using the "children" format
+			// for the attributes using "html" strings now, we normalize the template attributes
+			// before creating the blocks.
+
+			const blockType = getBlockType( name );
+			const isHTMLAttribute = ( attributeDefinition ) =>
+				get( attributeDefinition, [ 'source' ] ) === 'html';
+			const isQueryAttribute = ( attributeDefinition ) =>
+				get( attributeDefinition, [ 'source' ] ) === 'query';
+
+			const normalizeAttributes = ( schema, values ) => {
+				return mapValues( values, ( value, key ) => {
+					return normalizeAttribute( schema[ key ], value );
 				} );
-			}
+			};
+			const normalizeAttribute = ( definition, value ) => {
+				if ( isHTMLAttribute( definition ) && isArray( value ) ) {
+					// Introduce a deprecated call at this point
+					// When we're confident that "children" format should be removed from the templates.
 
-			return value;
-		};
+					return renderToString( value );
+				}
 
-		const normalizedAttributes = normalizeAttributes(
-			get( blockType, [ 'attributes' ], {} ),
-			attributes
-		);
+				if ( isQueryAttribute( definition ) && value ) {
+					return value.map( ( subValues ) => {
+						return normalizeAttributes(
+							definition.query,
+							subValues
+						);
+					} );
+				}
 
-		return createBlock(
-			name,
-			normalizedAttributes,
-			synchronizeBlocksWithTemplate( [], innerBlocksTemplate )
-		);
-	} );
+				return value;
+			};
+
+			const normalizedAttributes = normalizeAttributes(
+				get( blockType, [ 'attributes' ], {} ),
+				attributes
+			);
+
+			const {
+				name: blockName,
+				attributes: blockAttributes,
+			} = convertLegacyBlocks( name, normalizedAttributes );
+
+			return createBlock(
+				blockName,
+				blockAttributes,
+				synchronizeBlocksWithTemplate( [], innerBlocksTemplate )
+			);
+		}
+	);
 }

@@ -1,19 +1,33 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Fragment } from '@wordpress/element';
 import {
 	RichText,
 	BlockControls,
 	AlignmentToolbar,
+	useBlockProps,
 } from '@wordpress/block-editor';
 
-export default function VerseEdit( { attributes, setAttributes, className, mergeBlocks } ) {
+export default function VerseEdit( {
+	attributes,
+	setAttributes,
+	mergeBlocks,
+} ) {
 	const { textAlign, content } = attributes;
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 
 	return (
-		<Fragment>
+		<>
 			<BlockControls>
 				<AlignmentToolbar
 					value={ textAlign }
@@ -24,17 +38,19 @@ export default function VerseEdit( { attributes, setAttributes, className, merge
 			</BlockControls>
 			<RichText
 				tagName="pre"
+				identifier="content"
+				preserveWhiteSpace
 				value={ content }
 				onChange={ ( nextContent ) => {
 					setAttributes( {
 						content: nextContent,
 					} );
 				} }
-				style={ { textAlign } }
 				placeholder={ __( 'Write…' ) }
-				wrapperClassName={ className }
 				onMerge={ mergeBlocks }
+				textAlign={ textAlign }
+				{ ...blockProps }
 			/>
-		</Fragment>
+		</>
 	);
 }

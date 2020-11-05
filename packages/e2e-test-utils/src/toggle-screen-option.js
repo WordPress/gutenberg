@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { clickOnCloseModalButton } from './click-on-close-modal-button';
 import { clickOnMoreMenuItem } from './click-on-more-menu-item';
 
 /**
@@ -11,8 +12,10 @@ import { clickOnMoreMenuItem } from './click-on-more-menu-item';
  *                                   undefined, the option will be toggled.
  */
 export async function toggleScreenOption( label, shouldBeChecked = undefined ) {
-	await clickOnMoreMenuItem( 'Options' );
-	const [ handle ] = await page.$x( `//label[contains(text(), "${ label }")]` );
+	await clickOnMoreMenuItem( 'Preferences' );
+	const [ handle ] = await page.$x(
+		`//label[contains(text(), "${ label }")]`
+	);
 
 	const isChecked = await page.evaluate(
 		( element ) => element.control.checked,
@@ -22,5 +25,5 @@ export async function toggleScreenOption( label, shouldBeChecked = undefined ) {
 		await handle.click();
 	}
 
-	await page.click( 'button[aria-label="Close dialog"]' );
+	await clickOnCloseModalButton();
 }

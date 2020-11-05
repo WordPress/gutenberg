@@ -1,3 +1,19 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 2.0.0 (2020-02-10)
+
+### Breaking Change
+
+- A notices message is no longer spoken as a result of notice creation, but rather by its display in the interface by its corresponding [`Notice` component](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/notice).
+
+## 1.5.0 (2019-06-12)
+
+### New Features
+
+- Support a new `snackbar` notice type in the `createNotice` action.
+
 ## 1.1.2 (2019-01-03)
 
 ## 1.1.1 (2018-12-12)

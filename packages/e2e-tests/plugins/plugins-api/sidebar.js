@@ -7,7 +7,7 @@
 	var withSelect = wp.data.withSelect;
 	var select = wp.data.select;
 	var dispatch = wp.data.dispatch;
-	var PlainText = wp.editor.PlainText;
+	var PlainText = wp.blockEditor.PlainText;
 	var Fragment = wp.element.Fragment;
 	var el = wp.element.createElement;
 	var __ = wp.i18n.__;
@@ -18,7 +18,7 @@
 	function SidebarContents( props ) {
 		return el(
 			PanelBody,
-			{},
+			{ className: 'sidebar-title-plugin-panel' },
 			el(
 				PanelRow,
 				{},

@@ -6,67 +6,105 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
-import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
-import { withInstanceId } from '@wordpress/compose';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
+import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
+import { compose, withInstanceId } from '@wordpress/compose';
+import { withDispatch } from '@wordpress/data';
+import { useState } from '@wordpress/element';
+import { View } from '@wordpress/primitives';
 
-const SpacerEdit = ( { attributes, isSelected, setAttributes, toggleSelection, instanceId } ) => {
+const MIN_SPACER_HEIGHT = 1;
+const MAX_SPACER_HEIGHT = 500;
+
+const SpacerEdit = ( {
+	attributes,
+	isSelected,
+	setAttributes,
+	onResizeStart,
+	onResizeStop,
+} ) => {
+	const [ isResizing, setIsResizing ] = useState( false );
 	const { height } = attributes;
-	const id = `block-spacer-height-input-${ instanceId }`;
+	const updateHeight = ( value ) => {
+		setAttributes( {
+			height: value,
+		} );
+	};
+
+	const handleOnResizeStart = ( ...args ) => {
+		onResizeStart( ...args );
+		setIsResizing( true );
+	};
+
+	const handleOnResizeStop = ( event, direction, elt, delta ) => {
+		onResizeStop();
+		const spacerHeight = Math.min(
+			parseInt( height + delta.height, 10 ),
+			MAX_SPACER_HEIGHT
+		);
+		updateHeight( spacerHeight );
+		setIsResizing( false );
+	};
 
 	return (
-		<Fragment>
-			<ResizableBox
-				className={ classnames(
-					'block-library-spacer__resize-container',
-					{ 'is-selected': isSelected },
-				) }
-				size={ {
-					height,
-				} }
-				minHeight="20"
-				enable={ {
-					top: false,
-					right: false,
-					bottom: true,
-					left: false,
-					topRight: false,
-					bottomRight: false,
-					bottomLeft: false,
-					topLeft: false,
-				} }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					setAttributes( {
-						height: parseInt( height + delta.height, 10 ),
-					} );
-					toggleSelection( true );
-				} }
-				onResizeStart={ () => {
-					toggleSelection( false );
-				} }
-			/>
+		<>
+			<View { ...useBlockProps() }>
+				<ResizableBox
+					className={ classnames(
+						'block-library-spacer__resize-container',
+						{
+							'is-selected': isSelected,
+						}
+					) }
+					size={ {
+						height,
+					} }
+					minHeight={ MIN_SPACER_HEIGHT }
+					enable={ {
+						top: false,
+						right: false,
+						bottom: true,
+						left: false,
+						topRight: false,
+						bottomRight: false,
+						bottomLeft: false,
+						topLeft: false,
+					} }
+					onResizeStart={ handleOnResizeStart }
+					onResizeStop={ handleOnResizeStop }
+					showHandle={ isSelected }
+					__experimentalShowTooltip={ true }
+					__experimentalTooltipProps={ {
+						axis: 'y',
+						position: 'bottom',
+						isVisible: isResizing,
+					} }
+				/>
+			</View>
 			<InspectorControls>
-				<PanelBody title={ __( 'Spacer Settings' ) }>
-					<BaseControl label={ __( 'Height in pixels' ) } id={ id }>
-						<input
-							type="number"
-							id={ id }
-							onChange={ ( event ) => {
-								setAttributes( {
-									height: parseInt( event.target.value, 10 ),
-								} );
-							} }
-							value={ height }
-							min="20"
-							step="10"
-						/>
-					</BaseControl>
+				<PanelBody title={ __( 'Spacer settings' ) }>
+					<RangeControl
+						label={ __( 'Height in pixels' ) }
+						min={ MIN_SPACER_HEIGHT }
+						max={ Math.max( MAX_SPACER_HEIGHT, height ) }
+						value={ height }
+						onChange={ updateHeight }
+					/>
 				</PanelBody>
 			</InspectorControls>
-		</Fragment>
+		</>
 	);
 };
 
-export default withInstanceId( SpacerEdit );
+export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { toggleSelection } = dispatch( 'core/block-editor' );
+
+		return {
+			onResizeStart: () => toggleSelection( false ),
+			onResizeStop: () => toggleSelection( true ),
+		};
+	} ),
+	withInstanceId,
+] )( SpacerEdit );

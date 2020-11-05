@@ -4,10 +4,6 @@
 	align-items: center;
 	margin-bottom: 0;
 
-	&.is-transient {
-		@include edit-post__loading-fade-animation;
-	}
-
 	.wp-block-file__content-wrapper {
 		flex-grow: 1;
 	}
@@ -24,9 +20,5 @@
 	.wp-block-file__button-richtext-wrapper {
 		display: inline-block;
 		margin-left: 0.75em;
-	}
-
-	.wp-block-file__copy-url-button {
-		margin-left: 1em;
 	}
 }

@@ -97,12 +97,17 @@ const MyNotice = () => (
 
 #### Props
 
-The following props are used to control the display of the component.
+The following props are used to control the behavior of the component.
 
-* `status`: (string) can be `warning` (yellow), `success` (green), `error` (red).
+* `children`: (string) The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
+* `spokenMessage`: (string) Used to provide a custom spoken message in place of the `children` default.
+* `status`: (string) can be `warning` (yellow), `success` (green), `error` (red), or `info`. Defaults to `info`.
 * `onRemove`: function called when dismissing the notice
+* `politeness`: (string) A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live). If not provided, a sensible default is used based on the notice status. Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.
+  * A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
+  * A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
 * `isDismissible`: (boolean) defaults to true, whether the notice should be dismissible or not
-* `actions`: (array) an array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function. A `className` property can be used to add custom classes to the button styles. By default, some classes are used (e.g: is-link or is-default) the default classes can be removed by setting property `noDefaultClasses` to `false`.
+* `actions`: (array) an array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function. A `className` property can be used to add custom classes to the button styles. The default appearance of the button is inferred based on whether `url` or `onClick` are provided, rendering the button as a link if appropriate. A `noDefaultClasses` property value of `true` will remove all default styling. You can denote a primary button action for a notice by assigning a `isPrimary` value of `true`.
 
 ## Related components
 

@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/list",
-	"category": "common",
+	"category": "text",
 	"attributes": {
 		"ordered": {
 			"type": "boolean",
@@ -11,7 +12,26 @@
 			"source": "html",
 			"selector": "ol,ul",
 			"multiline": "li",
+			"__unstableMultilineWrapperTags": [ "ol", "ul" ],
 			"default": ""
+		},
+		"type": {
+			"type": "string"
+		},
+		"start": {
+			"type": "number"
+		},
+		"reversed": {
+			"type": "boolean"
 		}
+	},
+	"supports": {
+		"anchor": true,
+		"className": false,
+		"fontSize": true,
+		"color": {
+			"gradients": true
+		},
+		"__unstablePasteTextInline": true
 	}
 }

@@ -6,9 +6,9 @@ SelectControl allow users to select from a single-option menu. It functions as a
 
 ## Table of contents
 
-1. [Design guidelines](http://##design-guidelines)
-2. [Development guidelines](http://##development-guidelines)
-3. [Related components](http://##related-components)
+1. [Design guidelines](#design-guidelines)
+2. [Development guidelines](#development-guidelines)
+3. [Related components](#related-components)
 
 ## Design guidelines
 
@@ -81,40 +81,44 @@ Use sentences in your menu.
 
 Render a user interface to select the size of an image.
 
-    import { SelectControl } from '@wordpress/components';
-    import { withState } from '@wordpress/compose';
+```jsx
+import { SelectControl } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-    const MySelectControl = withState( {
-        size: '50%',
-    } )( ( { size, setState } ) => (
-        <SelectControl
-            label="Size"
-            value={ size }
-            options={ [
-                { label: 'Big', value: '100%' },
-                { label: 'Medium', value: '50%' },
-                { label: 'Small', value: '25%' },
-            ] }
-            onChange={ ( size ) => { setState( { size } ) } }
-        />
-    ) );
+const MySelectControl = withState( {
+    size: '50%',
+} )( ( { size, setState } ) => (
+    <SelectControl
+        label="Size"
+        value={ size }
+        options={ [
+            { label: 'Big', value: '100%' },
+            { label: 'Medium', value: '50%' },
+            { label: 'Small', value: '25%' },
+        ] }
+        onChange={ ( size ) => { setState( { size } ) } }
+    />
+) );
+```
 
 Render a user interface to select multiple users from a list.
 
-        <SelectControl
-            multiple
-            label={ __( 'Select some users:' ) }
-            value={ this.state.users } // e.g: value = [ 'a', 'c' ]
-            onChange={ ( users ) => { this.setState( { users } ) } }
-            options={ [
-                { value: 'a', label: 'User A' },
-                { value: 'b', label: 'User B' },
-                { value: 'c', label: 'User c' },
-            ] }
-        />
+```jsx
+<SelectControl
+    multiple
+    label={ __( 'Select some users:' ) }
+    value={ this.state.users } // e.g: value = [ 'a', 'c' ]
+    onChange={ ( users ) => { this.setState( { users } ) } }
+    options={ [
+        { value: null, label: 'Select a User', disabled: true },
+        { value: 'a', label: 'User A' },
+        { value: 'b', label: 'User B' },
+        { value: 'c', label: 'User c' },
+    ] }
+/>
+```
 
 ### Props
-
 
 - The set of props accepted by the component will be specified below.
 - Props not included in this set will be applied to the select element.
@@ -125,6 +129,18 @@ Render a user interface to select multiple users from a list.
 
 If this property is added, a label will be generated using label property as the content.
 - Type: `String`
+- Required: No
+
+#### labelPosition
+
+The position of the label (`top`, `side`, or `bottom`).
+- Type: `String`
+- Required: No
+
+#### hideLabelFromVision
+
+If true, the label will only be visible to screen readers.
+- Type: `Boolean`
 - Required: No
 
 #### help
@@ -144,6 +160,7 @@ If this property is added, multiple values can be selected. The value passed sho
 An array of objects containing the following properties:
 - `label`: (string) The label to be shown to the user.
 - `value`: (Object) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
+- `disabled`: (boolean) Whether or not the option should have the disabled attribute.
 - Type: `Array`
 - Required: No
 

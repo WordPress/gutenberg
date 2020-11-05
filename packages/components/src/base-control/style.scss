@@ -3,7 +3,7 @@
 	font-size: $default-font-size;
 
 	.components-base-control__field {
-		margin-bottom: $grid-size;
+		margin-bottom: $grid-unit-10;
 
 		.components-panel__row & {
 			margin-bottom: inherit;
@@ -11,16 +11,14 @@
 	}
 
 	.components-base-control__label {
-		display: block;
-		margin-bottom: $grid-size-small;
+		display: inline-block;
+		margin-bottom: $grid-unit-10;
 	}
 
 	.components-base-control__help {
-		margin-top: -$grid-size;
-		font-style: italic;
+		margin-top: -$grid-unit-10;
+		font-size: $helptext-font-size;
+		font-style: normal;
+		color: $gray-700;
 	}
-}
-
-.components-base-control + .components-base-control {
-	margin-bottom: $grid-size-large;
 }

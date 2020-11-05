@@ -31,12 +31,10 @@ function render_block_core_calendar( $attributes ) {
 		}
 	}
 
-	$custom_class_name = empty( $attributes['className'] ) ? '' : ' ' . $attributes['className'];
-	$align_class_name  = empty( $attributes['align'] ) ? '' : ' ' . "align{$attributes['align']}";
-
-	$output = sprintf(
-		'<div class="%1$s">%2$s</div>',
-		esc_attr( 'wp-block-calendar' . $custom_class_name . $align_class_name ),
+	$wrapper_attributes = get_block_wrapper_attributes();
+	$output             = sprintf(
+		'<div %1$s>%2$s</div>',
+		$wrapper_attributes,
 		get_calendar( true, false )
 	);
 
@@ -52,24 +50,9 @@ function render_block_core_calendar( $attributes ) {
  * Registers the `core/calendar` block on server.
  */
 function register_block_core_calendar() {
-	register_block_type(
-		'core/calendar',
+	register_block_type_from_metadata(
+		__DIR__ . '/calendar',
 		array(
-			'attributes'      => array(
-				'align'     => array(
-					'type' => 'string',
-					'enum' => array( 'left', 'center', 'right', 'wide', 'full' ),
-				),
-				'className' => array(
-					'type' => 'string',
-				),
-				'month'     => array(
-					'type' => 'integer',
-				),
-				'year'      => array(
-					'type' => 'integer',
-				),
-			),
 			'render_callback' => 'render_block_core_calendar',
 		)
 	);

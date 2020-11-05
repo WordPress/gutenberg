@@ -1,57 +1,56 @@
 /**
  * External dependencies
  */
-import Mousetrap from 'mousetrap';
-import 'mousetrap/plugins/global-bind/mousetrap-global-bind';
-import { forEach } from 'lodash';
+import { map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, Children } from '@wordpress/element';
+import { useRef, Children } from '@wordpress/element';
+import { useKeyboardShortcut } from '@wordpress/compose';
 
-class KeyboardShortcuts extends Component {
-	constructor() {
-		super( ...arguments );
+function KeyboardShortcut( {
+	target,
+	callback,
+	shortcut,
+	bindGlobal,
+	eventName,
+} ) {
+	useKeyboardShortcut( shortcut, callback, {
+		bindGlobal,
+		target,
+		eventName,
+	} );
 
-		this.bindKeyTarget = this.bindKeyTarget.bind( this );
+	return null;
+}
+
+function KeyboardShortcuts( { children, shortcuts, bindGlobal, eventName } ) {
+	const target = useRef();
+
+	const element = map( shortcuts, ( callback, shortcut ) => (
+		<KeyboardShortcut
+			key={ shortcut }
+			shortcut={ shortcut }
+			callback={ callback }
+			bindGlobal={ bindGlobal }
+			eventName={ eventName }
+			target={ target }
+		/>
+	) );
+
+	// Render as non-visual if there are no children pressed. Keyboard
+	// events will be bound to the document instead.
+	if ( ! Children.count( children ) ) {
+		return element;
 	}
 
-	componentDidMount() {
-		const { keyTarget = document } = this;
-
-		this.mousetrap = new Mousetrap( keyTarget );
-		forEach( this.props.shortcuts, ( callback, key ) => {
-			const { bindGlobal, eventName } = this.props;
-			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';
-			this.mousetrap[ bindFn ]( key, callback, eventName );
-		} );
-	}
-
-	componentWillUnmount() {
-		this.mousetrap.reset();
-	}
-
-	/**
-	 * When rendering with children, binds the wrapper node on which events
-	 * will be bound.
-	 *
-	 * @param {Element} node Key event target.
-	 */
-	bindKeyTarget( node ) {
-		this.keyTarget = node;
-	}
-
-	render() {
-		// Render as non-visual if there are no children pressed. Keyboard
-		// events will be bound to the document instead.
-		const { children } = this.props;
-		if ( ! Children.count( children ) ) {
-			return null;
-		}
-
-		return <div ref={ this.bindKeyTarget }>{ children }</div>;
-	}
+	return (
+		<div ref={ target }>
+			{ element }
+			{ children }
+		</div>
+	);
 }
 
 export default KeyboardShortcuts;

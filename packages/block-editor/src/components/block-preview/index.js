@@ -1,48 +1,59 @@
 /**
  * External dependencies
  */
-import { noop } from 'lodash';
+import { castArray } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { createBlock } from '@wordpress/blocks';
-import { Disabled } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { memo, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import BlockEdit from '../block-edit';
+import BlockEditorProvider from '../provider';
+import LiveBlockPreview from './live';
+import AutoHeightBlockPreview from './auto';
+
+export function BlockPreview( {
+	blocks,
+	__experimentalPadding = 0,
+	viewportWidth = 700,
+	__experimentalLive = false,
+	__experimentalOnClick,
+} ) {
+	const settings = useSelect(
+		( select ) => select( 'core/block-editor' ).getSettings(),
+		[]
+	);
+	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
+	if ( ! blocks || blocks.length === 0 ) {
+		return null;
+	}
+	return (
+		<BlockEditorProvider value={ renderedBlocks } settings={ settings }>
+			{ __experimentalLive ? (
+				<LiveBlockPreview onClick={ __experimentalOnClick } />
+			) : (
+				<AutoHeightBlockPreview
+					viewportWidth={ viewportWidth }
+					__experimentalPadding={ __experimentalPadding }
+				/>
+			) }
+		</BlockEditorProvider>
+	);
+}
 
 /**
- * Block Preview Component: It renders a preview given a block name and attributes.
+ * BlockPreview renders a preview of a block or array of blocks.
  *
- * @param {Object} props Component props.
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/block-preview/README.md
  *
- * @return {WPElement} Rendered element.
+ * @param {Object} preview options for how the preview should be shown
+ * @param {Array|Object} preview.blocks A block instance (object) or an array of blocks to be previewed.
+ * @param {number} preview.viewportWidth Width of the preview container in pixels. Controls at what size the blocks will be rendered inside the preview. Default: 700.
+ *
+ * @return {WPComponent} The component to be rendered.
  */
-function BlockPreview( props ) {
-	return (
-		<div className="editor-block-preview block-editor-block-preview">
-			<div className="editor-block-preview__title block-editor-block-preview__title">{ __( 'Preview' ) }</div>
-			<BlockPreviewContent { ...props } />
-		</div>
-	);
-}
-
-export function BlockPreviewContent( { name, attributes } ) {
-	const block = createBlock( name, attributes );
-	return (
-		<Disabled className="editor-block-preview__content block-editor-block-preview__content editor-styles-wrapper" aria-hidden>
-			<BlockEdit
-				name={ name }
-				focus={ false }
-				attributes={ block.attributes }
-				setAttributes={ noop }
-			/>
-		</Disabled>
-	);
-}
-
-export default BlockPreview;
+export default memo( BlockPreview );

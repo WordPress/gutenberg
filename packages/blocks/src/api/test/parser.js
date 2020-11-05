@@ -10,7 +10,6 @@ import deepFreeze from 'deep-freeze';
 import {
 	getBlockAttribute,
 	getBlockAttributes,
-	asType,
 	createBlockWithFallback,
 	getMigratedBlock,
 	default as parsePegjs,
@@ -20,6 +19,7 @@ import {
 	isOfTypes,
 	isValidByType,
 	isValidByEnum,
+	serializeBlockNode,
 } from '../parser';
 import {
 	registerBlockType,
@@ -39,12 +39,12 @@ describe( 'block parser', () => {
 			},
 		},
 		save: ( { attributes } ) => attributes.fruit || null,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 
 	const unknownBlockSettings = {
-		category: 'common',
+		category: 'text',
 		title: 'unknown block',
 		attributes: {
 			content: {
@@ -101,44 +101,6 @@ describe( 'block parser', () => {
 
 			expect( originalMatcher( node ) ).toBe( 'disabled' );
 			expect( enhancedMatcher( node ) ).toBe( true );
-		} );
-	} );
-
-	describe( 'asType()', () => {
-		it( 'gracefully handles undefined type', () => {
-			expect( asType( 5 ) ).toBe( 5 );
-		} );
-
-		it( 'gracefully handles unhandled type', () => {
-			expect( asType( 5, '__UNHANDLED__' ) ).toBe( 5 );
-		} );
-
-		it( 'returns expected coerced values', () => {
-			const arr = [];
-			const obj = {};
-
-			expect( asType( '5', 'string' ) ).toBe( '5' );
-			expect( asType( 5, 'string' ) ).toBe( '5' );
-
-			expect( asType( 5, 'integer' ) ).toBe( 5 );
-			expect( asType( '5', 'integer' ) ).toBe( 5 );
-
-			expect( asType( 5, 'number' ) ).toBe( 5 );
-			expect( asType( '5', 'number' ) ).toBe( 5 );
-
-			expect( asType( true, 'boolean' ) ).toBe( true );
-			expect( asType( false, 'boolean' ) ).toBe( false );
-			expect( asType( '5', 'boolean' ) ).toBe( true );
-			expect( asType( 0, 'boolean' ) ).toBe( false );
-
-			expect( asType( null, 'null' ) ).toBe( null );
-			expect( asType( 0, 'null' ) ).toBe( null );
-
-			expect( asType( arr, 'array' ) ).toBe( arr );
-			expect( asType( new Set( [ 1, 2, 3 ] ), 'array' ) ).toEqual( [ 1, 2, 3 ] );
-
-			expect( asType( obj, 'object' ) ).toBe( obj );
-			expect( asType( {}, 'object' ) ).toEqual( {} );
 		} );
 	} );
 
@@ -220,40 +182,31 @@ describe( 'block parser', () => {
 
 	describe( 'parseWithAttributeSchema', () => {
 		it( 'should return the matcher’s attribute value', () => {
-			const value = parseWithAttributeSchema(
-				'<div>chicken</div>',
-				{
-					type: 'string',
-					source: 'text',
-					selector: 'div',
-				},
-			);
+			const value = parseWithAttributeSchema( '<div>chicken</div>', {
+				type: 'string',
+				source: 'text',
+				selector: 'div',
+			} );
 			expect( value ).toBe( 'chicken' );
 		} );
 
 		it( 'should return the matcher’s string attribute value', () => {
-			const value = parseWithAttributeSchema(
-				'<audio src="#" loop>',
-				{
-					type: 'string',
-					source: 'attribute',
-					selector: 'audio',
-					attribute: 'src',
-				},
-			);
+			const value = parseWithAttributeSchema( '<audio src="#" loop>', {
+				type: 'string',
+				source: 'attribute',
+				selector: 'audio',
+				attribute: 'src',
+			} );
 			expect( value ).toBe( '#' );
 		} );
 
 		it( 'should return the matcher’s true boolean attribute value', () => {
-			const value = parseWithAttributeSchema(
-				'<audio src="#" loop>',
-				{
-					type: 'boolean',
-					source: 'attribute',
-					selector: 'audio',
-					attribute: 'loop',
-				},
-			);
+			const value = parseWithAttributeSchema( '<audio src="#" loop>', {
+				type: 'boolean',
+				source: 'attribute',
+				selector: 'audio',
+				attribute: 'loop',
+			} );
 			expect( value ).toBe( true );
 		} );
 
@@ -265,7 +218,7 @@ describe( 'block parser', () => {
 					source: 'attribute',
 					selector: 'audio',
 					attribute: 'loop',
-				},
+				}
 			);
 			expect( value ).toBe( true );
 		} );
@@ -278,9 +231,29 @@ describe( 'block parser', () => {
 					source: 'attribute',
 					selector: 'audio',
 					attribute: 'loop',
-				},
+				}
 			);
 			expect( value ).toBe( false );
+		} );
+
+		describe( 'source: tag', () => {
+			it( 'returns tag name of matching selector', () => {
+				const value = parseWithAttributeSchema( '<div></div>', {
+					source: 'tag',
+					selector: ':nth-child(1)',
+				} );
+
+				expect( value ).toBe( 'div' );
+			} );
+
+			it( 'returns undefined when no element matches selector', () => {
+				const value = parseWithAttributeSchema( '<div></div>', {
+					source: 'tag',
+					selector: ':nth-child(2)',
+				} );
+
+				expect( value ).toBe( undefined );
+			} );
 		} );
 	} );
 
@@ -430,12 +403,14 @@ describe( 'block parser', () => {
 			const innerHTML = '<div data-number="10">Ribs</div>';
 			const attrs = { align: null, invalid: true };
 
-			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual( {
-				content: 'Ribs',
-				align: null,
-				topic: 'none',
-				undefAmbiguousStringWithDefault: 'ok',
-			} );
+			expect( getBlockAttributes( blockType, innerHTML, attrs ) ).toEqual(
+				{
+					content: 'Ribs',
+					align: null,
+					topic: 'none',
+					undefAmbiguousStringWithDefault: 'ok',
+				}
+			);
 		} );
 
 		it( 'should work when block type is passed as string', () => {
@@ -465,7 +440,8 @@ describe( 'block parser', () => {
 			const block = deepFreeze( {
 				name: 'core/test-block',
 				attributes: parsedAttributes,
-				originalContent: '<span class="wp-block-test-block">Bananas</span>',
+				originalContent:
+					'<span class="wp-block-test-block">Bananas</span>',
 				isValid: false,
 			} );
 			registerBlockType( 'core/test-block', defaultBlockSettings );
@@ -480,7 +456,8 @@ describe( 'block parser', () => {
 			const block = deepFreeze( {
 				name: 'core/test-block',
 				attributes: parsedAttributes,
-				originalContent: '<span class="wp-block-test-block">Bananas</span>',
+				originalContent:
+					'<span class="wp-block-test-block">Bananas</span>',
 				isValid: false,
 			} );
 			registerBlockType( 'core/test-block', {
@@ -496,9 +473,7 @@ describe( 'block parser', () => {
 
 			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
-			expect( migratedBlock ).toBe( block );
-			expect( console ).toHaveErrored();
-			expect( console ).toHaveWarned();
+			expect( migratedBlock ).toEqual( expect.objectContaining( block ) );
 		} );
 
 		it( 'should return with attributes parsed by the deprecated version', () => {
@@ -522,7 +497,9 @@ describe( 'block parser', () => {
 								selector: 'span',
 							},
 						},
-						save: ( props ) => <span>{ props.attributes.fruit }</span>,
+						save: ( props ) => (
+							<span>{ props.attributes.fruit }</span>
+						),
 					},
 				],
 			} );
@@ -552,14 +529,18 @@ describe( 'block parser', () => {
 								selector: 'span',
 							},
 						},
-						save: ( props ) => <span>{ props.attributes.fruit }</span>,
+						save: ( props ) => (
+							<span>{ props.attributes.fruit }</span>
+						),
 						migrate: ( attributes ) => {
 							return [
 								{ newFruit: attributes.fruit },
-								[ {
-									name: 'core/test-block',
-									attributes: { aaa: 'bbb' },
-								} ],
+								[
+									{
+										name: 'core/test-block',
+										attributes: { aaa: 'bbb' },
+									},
+								],
 							];
 						},
 					},
@@ -568,10 +549,16 @@ describe( 'block parser', () => {
 
 			const migratedBlock = getMigratedBlock( block, parsedAttributes );
 
-			expect( migratedBlock.attributes ).toEqual( { newFruit: 'Bananas' } );
+			expect( migratedBlock.attributes ).toEqual( {
+				newFruit: 'Bananas',
+			} );
 			expect( migratedBlock.innerBlocks ).toHaveLength( 1 );
-			expect( migratedBlock.innerBlocks[ 0 ].name ).toEqual( 'core/test-block' );
-			expect( migratedBlock.innerBlocks[ 0 ].attributes ).toEqual( { aaa: 'bbb' } );
+			expect( migratedBlock.innerBlocks[ 0 ].name ).toEqual(
+				'core/test-block'
+			);
+			expect( migratedBlock.innerBlocks[ 0 ].attributes ).toEqual( {
+				aaa: 'bbb',
+			} );
 		} );
 
 		it( 'should ignore valid uneligible blocks', () => {
@@ -700,7 +687,10 @@ describe( 'block parser', () => {
 		} );
 
 		it( 'should fall back to the unregistered type handler for unregistered blocks if present', () => {
-			registerBlockType( 'core/unregistered-block', unknownBlockSettings );
+			registerBlockType(
+				'core/unregistered-block',
+				unknownBlockSettings
+			);
 			setUnregisteredTypeHandlerName( 'core/unregistered-block' );
 
 			const block = createBlockWithFallback( {
@@ -751,8 +741,12 @@ describe( 'block parser', () => {
 								selector: 'span',
 							},
 						},
-						save: ( { attributes } ) => <span>{ attributes.fruit }</span>,
-						migrate: ( attributes ) => ( { fruit: 'Big ' + attributes.fruit } ),
+						save: ( { attributes } ) => (
+							<span>{ attributes.fruit }</span>
+						),
+						migrate: ( attributes ) => ( {
+							fruit: 'Big ' + attributes.fruit,
+						} ),
 					},
 				],
 			} );
@@ -765,8 +759,117 @@ describe( 'block parser', () => {
 			expect( block.name ).toEqual( 'core/test-block' );
 			expect( block.attributes ).toEqual( { fruit: 'Big Bananas' } );
 			expect( block.isValid ).toBe( true );
-			expect( console ).toHaveErrored();
-			expect( console ).toHaveWarned();
+			expect( console ).toHaveInformed();
+		} );
+	} );
+
+	describe( 'serializeBlockNode', () => {
+		it( 'reserializes block nodes', () => {
+			const expected = `<!-- wp:columns -->
+				<div class="wp-block-columns has-2-columns">
+					<!-- wp:column -->
+					<div class="wp-block-column">
+						<!-- wp:paragraph -->
+						<p>A</p>
+						<!-- /wp:paragraph -->
+					</div>
+					<!-- /wp:column -->
+					<!-- wp:column -->
+					<div class="wp-block-column">
+						<!-- wp:group -->
+						<div class="wp-block-group"><div class="wp-block-group__inner-container">
+							<!-- wp:list -->
+							<ul><li>B</li><li>C</li></ul>
+							<!-- /wp:list -->
+							<!-- wp:paragraph -->
+							<p>D</p>
+							<!-- /wp:paragraph -->
+						</div></div>
+						<!-- /wp:group -->
+					</div>
+					<!-- /wp:column -->
+				</div>
+				<!-- /wp:columns -->`.replace( /\t/g, '' );
+			const input = {
+				blockName: 'core/columns',
+				attrs: {},
+				innerBlocks: [
+					{
+						blockName: 'core/column',
+						attrs: {},
+						innerBlocks: [
+							{
+								blockName: 'core/paragraph',
+								attrs: {},
+								innerBlocks: [],
+								innerHTML: '<p>A</p>',
+								innerContent: [ '<p>A</p>' ],
+							},
+						],
+						innerHTML: '<div class="wp-block-column"></div>',
+						innerContent: [
+							'<div class="wp-block-column">',
+							null,
+							'</div>',
+						],
+					},
+					{
+						blockName: 'core/column',
+						attrs: {},
+						innerBlocks: [
+							{
+								blockName: 'core/group',
+								attrs: {},
+								innerBlocks: [
+									{
+										blockName: 'core/list',
+										attrs: {},
+										innerBlocks: [],
+										innerHTML:
+											'<ul><li>B</li><li>C</li></ul>',
+										innerContent: [
+											'<ul><li>B</li><li>C</li></ul>',
+										],
+									},
+									{
+										blockName: 'core/paragraph',
+										attrs: {},
+										innerBlocks: [],
+										innerHTML: '<p>D</p>',
+										innerContent: [ '<p>D</p>' ],
+									},
+								],
+								innerHTML:
+									'<div class="wp-block-group"><div class="wp-block-group__inner-container"></div></div>',
+								innerContent: [
+									'<div class="wp-block-group"><div class="wp-block-group__inner-container">',
+									null,
+									'',
+									null,
+									'</div></div>',
+								],
+							},
+						],
+						innerHTML: '<div class="wp-block-column"></div>',
+						innerContent: [
+							'<div class="wp-block-column">',
+							null,
+							'</div>',
+						],
+					},
+				],
+				innerHTML: '<div class="wp-block-columns has-2-columns"></div>',
+				innerContent: [
+					'<div class="wp-block-columns has-2-columns">',
+					null,
+					'',
+					null,
+					'</div>',
+				],
+			};
+			const actual = serializeBlockNode( input );
+
+			expect( actual ).toEqual( expected );
 		} );
 	} );
 
@@ -789,14 +892,14 @@ describe( 'block parser', () => {
 					chicken: { type: 'string' },
 				},
 				save: ( { attributes } ) => attributes.content,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 
 			const parsed = parse(
 				`<!-- wp:core/test-block {"smoked":"yes","url":"http://google.com","chicken":"ribs & 'wings'"} -->` +
-				'Brisket' +
-				'<!-- /wp:core/test-block -->'
+					'Brisket' +
+					'<!-- /wp:core/test-block -->'
 			);
 
 			expect( parsed ).toHaveLength( 1 );
@@ -825,14 +928,14 @@ describe( 'block parser', () => {
 					},
 				},
 				save: ( { attributes } ) => attributes.content,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 
 			const parsed = parse(
 				'<!-- wp:core/test-block -->\nRibs\n<!-- /wp:core/test-block -->' +
-				'<p>Broccoli</p>' +
-				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
+					'<p>Broccoli</p>' +
+					'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
 			);
 
 			expect( parsed ).toHaveLength( 1 );
@@ -862,8 +965,8 @@ describe( 'block parser', () => {
 
 			const parsed = parse(
 				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
-				'<p>Broccoli</p>' +
-				'<!-- wp:core/unknown/block -->Ribs<!-- /wp:core/unknown/block -->'
+					'<p>Broccoli</p>' +
+					'<!-- wp:core/unknown/block -->Ribs<!-- /wp:core/unknown/block -->'
 			);
 			expect( parsed ).toHaveLength( 1 );
 			expect( parsed[ 0 ].name ).toBe( 'core/test-block' );
@@ -877,8 +980,8 @@ describe( 'block parser', () => {
 
 			const parsed = parse(
 				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
-				'<p>Broccoli</p>' +
-				'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
+					'<p>Broccoli</p>' +
+					'<!-- wp:core/unknown-block -->Ribs<!-- /wp:core/unknown-block -->'
 			);
 
 			expect( parsed ).toHaveLength( 3 );
@@ -897,10 +1000,10 @@ describe( 'block parser', () => {
 
 			const parsed = parse(
 				'<p>Cauliflower</p>' +
-				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
-				'\n<p>Broccoli</p>\n' +
-				'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
-				'<p>Romanesco</p>'
+					'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
+					'\n<p>Broccoli</p>\n' +
+					'<!-- wp:test-block {"fruit":"Bananas"} -->\nBananas\n<!-- /wp:test-block -->' +
+					'<p>Romanesco</p>'
 			);
 
 			expect( parsed ).toHaveLength( 5 );
@@ -911,9 +1014,15 @@ describe( 'block parser', () => {
 				'core/test-block',
 				'core/unknown-block',
 			] );
-			expect( parsed[ 0 ].attributes.content ).toEqual( '<p>Cauliflower</p>' );
-			expect( parsed[ 2 ].attributes.content ).toEqual( '<p>Broccoli</p>' );
-			expect( parsed[ 4 ].attributes.content ).toEqual( '<p>Romanesco</p>' );
+			expect( parsed[ 0 ].attributes.content ).toEqual(
+				'<p>Cauliflower</p>'
+			);
+			expect( parsed[ 2 ].attributes.content ).toEqual(
+				'<p>Broccoli</p>'
+			);
+			expect( parsed[ 4 ].attributes.content ).toEqual(
+				'<p>Romanesco</p>'
+			);
 		} );
 
 		it( 'should parse blocks with empty content', () => {
@@ -933,18 +1042,19 @@ describe( 'block parser', () => {
 			registerBlockType( 'core/void-block', defaultBlockSettings );
 			const parsed = parse(
 				'<!-- wp:core/test-block --><!-- /wp:core/test-block -->' +
-				'<!-- wp:core/void-block /-->'
+					'<!-- wp:core/void-block /-->'
 			);
 
 			expect( parsed ).toHaveLength( 2 );
 			expect( parsed.map( ( { name } ) => name ) ).toEqual( [
-				'core/test-block', 'core/void-block',
+				'core/test-block',
+				'core/void-block',
 			] );
 		} );
 
 		it( 'should parse with unicode escaped returned to original representation', () => {
 			registerBlockType( 'core/code', {
-				category: 'common',
+				category: 'text',
 				title: 'Code Block',
 				attributes: {
 					content: {
@@ -954,7 +1064,7 @@ describe( 'block parser', () => {
 				save: ( { attributes } ) => attributes.content,
 			} );
 
-			const content = '$foo = "My \"escaped\" text.";';
+			const content = '$foo = "My "escaped" text.";';
 			const block = createBlock( 'core/code', { content } );
 			const serialized = serialize( block );
 			const parsed = parse( serialized );

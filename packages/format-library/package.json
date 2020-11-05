@@ -1,11 +1,12 @@
 {
 	"name": "@wordpress/format-library",
-	"version": "1.4.0",
+	"version": "1.25.2",
 	"description": "Format library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"formats"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/format-library/README.md",
@@ -21,15 +22,20 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.3.1",
+		"@babel/runtime": "^7.11.2",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/components": "file:../components",
-		"@wordpress/editor": "file:../editor",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
+		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/rich-text": "file:../rich-text",
-		"@wordpress/url": "file:../url"
+		"@wordpress/url": "file:../url",
+		"lodash": "^4.17.19"
 	},
 	"publishConfig": {
 		"access": "public"

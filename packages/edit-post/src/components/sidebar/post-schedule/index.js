@@ -3,43 +3,31 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelRow, Dropdown, Button } from '@wordpress/components';
-import { withInstanceId } from '@wordpress/compose';
-import { PostSchedule as PostScheduleForm, PostScheduleLabel, PostScheduleCheck } from '@wordpress/editor';
-import { Fragment } from '@wordpress/element';
+import {
+	PostSchedule as PostScheduleForm,
+	PostScheduleLabel,
+	PostScheduleCheck,
+} from '@wordpress/editor';
 
-export function PostSchedule( { instanceId } ) {
+export function PostSchedule() {
 	return (
 		<PostScheduleCheck>
 			<PanelRow className="edit-post-post-schedule">
-				<label
-					htmlFor={ `edit-post-post-schedule__toggle-${ instanceId }` }
-					id={ `edit-post-post-schedule__heading-${ instanceId }` }
-				>
-					{ __( 'Publish' ) }
-				</label>
+				<span>{ __( 'Publish' ) }</span>
 				<Dropdown
 					position="bottom left"
 					contentClassName="edit-post-post-schedule__dialog"
 					renderToggle={ ( { onToggle, isOpen } ) => (
-						<Fragment>
-							<label
-								className="edit-post-post-schedule__label"
-								htmlFor={ `edit-post-post-schedule__toggle-${ instanceId }` }
-							>
-								<PostScheduleLabel /> { __( 'Click to change' ) }
-							</label>
+						<>
 							<Button
-								id={ `edit-post-post-schedule__toggle-${ instanceId }` }
-								type="button"
 								className="edit-post-post-schedule__toggle"
 								onClick={ onToggle }
 								aria-expanded={ isOpen }
-								aria-live="polite"
-								isLink
+								isTertiary
 							>
 								<PostScheduleLabel />
 							</Button>
-						</Fragment>
+						</>
 					) }
 					renderContent={ () => <PostScheduleForm /> }
 				/>
@@ -48,4 +36,4 @@ export function PostSchedule( { instanceId } ) {
 	);
 }
 
-export default withInstanceId( PostSchedule );
+export default PostSchedule;

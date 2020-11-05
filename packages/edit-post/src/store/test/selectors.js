@@ -9,13 +9,9 @@ import deepFreeze from 'deep-freeze';
 import {
 	getEditorMode,
 	getPreference,
-	isEditorSidebarOpened,
 	isEditorPanelOpened,
 	isModalActive,
 	isFeatureActive,
-	isPluginSidebarOpened,
-	getActiveGeneralSidebarName,
-	isPluginItemPinned,
 	hasMetaBoxes,
 	isSavingMetaBoxes,
 	getActiveMetaBoxLocations,
@@ -65,113 +61,9 @@ describe( 'selectors', () => {
 				preferences: {},
 			};
 
-			expect( getPreference( state, 'ribs', 'chicken' ) ).toEqual( 'chicken' );
-		} );
-	} );
-
-	describe( 'isEditorSidebarOpened', () => {
-		it( 'should return false when the editor sidebar is not opened', () => {
-			const state = {
-				preferences: {
-					isGeneralSidebarDismissed: true,
-				},
-				activeGeneralSidebar: null,
-			};
-
-			expect( isEditorSidebarOpened( state ) ).toBe( false );
-		} );
-
-		it( 'should return false when the editor sidebar is assigned but not opened', () => {
-			const state = {
-				preferences: {
-					isGeneralSidebarDismissed: true,
-				},
-				activeGeneralSidebar: 'edit-post/document',
-			};
-
-			expect( isEditorSidebarOpened( state ) ).toBe( false );
-		} );
-
-		it( 'should return false when the plugin sidebar is opened', () => {
-			const state = {
-				preferences: {
-					isGeneralSidebarDismissed: false,
-				},
-				activeGeneralSidebar: 'my-plugin/my-sidebar',
-			};
-
-			expect( isEditorSidebarOpened( state ) ).toBe( false );
-		} );
-
-		it( 'should return true when the editor sidebar is opened', () => {
-			const state = {
-				preferences: {
-					isGeneralSidebarDismissed: false,
-				},
-				activeGeneralSidebar: 'edit-post/document',
-			};
-
-			expect( isEditorSidebarOpened( state ) ).toBe( true );
-		} );
-	} );
-
-	describe( 'isPluginSidebarOpened', () => {
-		it( 'should return false when the plugin sidebar is not opened', () => {
-			const state = {
-				preferences: {
-					isGeneralSidebarDismissed: true,
-				},
-				activeGeneralSidebar: null,
-			};
-
-			expect( isPluginSidebarOpened( state ) ).toBe( false );
-		} );
-
-		it( 'should return false when the editor sidebar is opened', () => {
-			const state = {
-				preferences: {
-					isGeneralSidebarDismissed: false,
-				},
-				activeGeneralSidebar: 'edit-post/document',
-			};
-
-			expect( isPluginSidebarOpened( state ) ).toBe( false );
-		} );
-
-		it( 'should return true when the plugin sidebar is opened', () => {
-			const name = 'plugin-sidebar/my-plugin/my-sidebar';
-			const state = {
-				preferences: {
-					isGeneralSidebarDismissed: false,
-				},
-				activeGeneralSidebar: name,
-			};
-
-			expect( isPluginSidebarOpened( state ) ).toBe( true );
-		} );
-	} );
-
-	describe( 'getActiveGeneralSidebarName', () => {
-		it( 'returns null if dismissed', () => {
-			const state = {
-				preferences: {
-					isGeneralSidebarDismissed: true,
-				},
-				activeGeneralSidebar: 'edit-post/block',
-			};
-
-			expect( getActiveGeneralSidebarName( state ) ).toBe( null );
-		} );
-
-		it( 'returns active general sidebar', () => {
-			const state = {
-				preferences: {
-					isGeneralSidebarDismissed: false,
-				},
-				activeGeneralSidebar: 'edit-post/block',
-			};
-
-			expect( getActiveGeneralSidebarName( state ) ).toBe( 'edit-post/block' );
+			expect( getPreference( state, 'ribs', 'chicken' ) ).toEqual(
+				'chicken'
+			);
 		} );
 	} );
 
@@ -207,14 +99,14 @@ describe( 'selectors', () => {
 				removedPanels: [],
 			} );
 
-			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( false );
+			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return true when panel was removed', () => {
 			const state = deepFreeze( {
-				removedPanels: [
-					'post-status',
-				],
+				removedPanels: [ 'post-status' ],
 			} );
 
 			expect( isEditorPanelRemoved( state, 'post-status' ) ).toBe( true );
@@ -253,7 +145,9 @@ describe( 'selectors', () => {
 				},
 			};
 
-			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( false );
+			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return false when a panel is enabled but removed', () => {
@@ -268,7 +162,9 @@ describe( 'selectors', () => {
 				removedPanels: [ 'post-status' ],
 			} );
 
-			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe( false );
+			expect( isEditorPanelEnabled( state, 'post-status' ) ).toBe(
+				false
+			);
 		} );
 	} );
 
@@ -378,35 +274,11 @@ describe( 'selectors', () => {
 		it( 'should return false if feature is not referred', () => {
 			const state = {
 				preferences: {
-					features: {
-					},
+					features: {},
 				},
 			};
 
 			expect( isFeatureActive( state, 'chicken' ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'isPluginItemPinned', () => {
-		const state = {
-			preferences: {
-				pinnedPluginItems: {
-					'foo/pinned': true,
-					'foo/unpinned': false,
-				},
-			},
-		};
-
-		it( 'should return true if the flag is not set for the plugin item', () => {
-			expect( isPluginItemPinned( state, 'foo/unknown' ) ).toBe( true );
-		} );
-
-		it( 'should return true if plugin item is not pinned', () => {
-			expect( isPluginItemPinned( state, 'foo/pinned' ) ).toBe( true );
-		} );
-
-		it( 'should return false if plugin item item is unpinned', () => {
-			expect( isPluginItemPinned( state, 'foo/unpinned' ) ).toBe( false );
 		} );
 	} );
 

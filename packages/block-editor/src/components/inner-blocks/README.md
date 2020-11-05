@@ -41,9 +41,10 @@ _Note:_ Because the save step will automatically apply props to the element retu
 ## Props
 
 ### `allowedBlocks`
-* **Type:** `Array<String>`
+* **Type:** `Boolean|Array<String>`
+* **Default:** `true`
 
-Allowed blocks prop should contain an array of strings, each string should contain the identifier of a block. When allowedBlocks is set it is only possible to insert blocks part of the set specified in the array.
+`allowedBlocks` can contain an array of strings, each string should contain the identifier of a block. When `allowedBlocks` is set it is only possible to insert blocks part of the set specified in the array.
 
 ```jsx
 const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
@@ -67,11 +68,20 @@ const ALLOWED_BLOCKS = [];
 
 The previous code block restricts all blocks, so only child blocks explicitly registered as compatible with this block can be inserted. If no child blocks are available: it will be impossible to insert any inner blocks.
 
+If `allowedBlocks` is set to `true`, all blocks are allowed. `false` means no blocks are allowed.
+
+### `orientation`
+* **Type:** `"horizontal"|"vertical"|undefined`
+
+Indicates whether inner blocks are shown horizontally or vertically. Use the string 'horizontal' or 'vertical' as a value. When left unspecified, defaults to 'vertical'.
+
+While this prop doesn't change any styles for the inner blocks themselves, it does display the Block Movers in the correct orientation, and also ensures drag and drop works correctly.
+
 ### `template`
 * **Type:** `Array<Array<Object>>`
 
 The template is defined as a list of block items. Such blocks can have predefined attributes, placeholder, content, etc. Block templates allow specifying a default initial state for an InnerBlocks area.
-More information about templates can be found in [template docs](https://wordpress.org/gutenberg/handbook/templates/).
+More information about templates can be found in [template docs](/docs/designers-developers/developers/block-api/block-templates.md).
 
 ```jsx
 const TEMPLATE = [ [ 'core/columns', {}, [
@@ -92,7 +102,7 @@ The previous example creates an InnerBlocks area containing two columns one with
 
 ### `templateInsertUpdatesSelection`
 * **Type:** `Boolean`
-* **Default:** `true`
+* **Default:** `false`
 
 If true when child blocks in the template are inserted the selection is updated.
 If false the selection should not be updated when child blocks specified in the template are inserted.
@@ -100,15 +110,59 @@ If false the selection should not be updated when child blocks specified in the 
 ### `templateLock`
 * **Type:** `String|Boolean`
 
-Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](https://wordpress.org/gutenberg/handbook/templates/#locking).
+Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](/docs/designers-developers/developers/block-api/block-templates.md#locking).
 
 Template locking allows locking the `InnerBlocks` area for the current template.
 *Options:*
 
-- `all` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
-- `insert` — prevents inserting or removing blocks, but allows moving existing ones.
-- `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking.
+- `'all'` — prevents all operations. It is not possible to insert new blocks. Move existing blocks or delete them.
+- `'insert'` — prevents inserting or removing blocks, but allows moving existing ones.
+- `false` — prevents locking from being applied to an `InnerBlocks` area even if a parent block contains locking. ( Boolean )
 
 If locking is not set in an `InnerBlocks` area: the locking of the parent `InnerBlocks` area is used.
 
 If the block is a top level block: the locking of the Custom Post Type is used.
+
+### `renderAppender`
+* **Type:** `Function|false`
+* **Default:** - `undefined`. When `renderAppender` is not specific the `<DefaultBlockAppender>` component is as a default. It automatically inserts whichever block is configured as the default block via `wp.blocks.setDefaultBlockName` (typically `paragraph`). If a `false` value is provider, no appender is rendered.
+
+A 'render prop' function that can be used to customize the block's appender.
+
+#### Notes
+* For convenience two predefined appender components are exposed on `InnerBlocks` which can be consumed within the render function:
+	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon button that, when clicked, displays the block picker menu. No default Block is inserted.
+	- `<InnerBlocks.DefaultBlockAppender />` - display the default block appender as set by `wp.blocks.setDefaultBlockName`. Typically this is the `paragraph` block.
+* Consumers are also free to pass any valid render function. This provides the full flexibility to define a bespoke block appender.
+
+#### Example usage
+
+```jsx
+// Utilise a predefined component
+<InnerBlocks
+	renderAppender={ () => (
+		<InnerBlocks.ButtonBlockAppender />
+	) }
+/>
+
+// Fully custom
+<InnerBlocks
+	renderAppender={ () => (
+		<button className="bespoke-appender" type="button">Some Special Appender</button>
+	) }
+/>
+```
+
+### `__experimentalCaptureToolbars`
+
+* **Type:** `Boolean`
+* **Default:** `false`
+
+Determines whether the toolbars of _all_ child Blocks (applied deeply, recursive) should have their toolbars "captured" and shown on the Block which is consuming `InnerBlocks`.
+
+For example, a button block, deeply nested in several levels of block `X` that utilises this property will see the button block's toolbar displayed on block `X`'s toolbar area.
+
+### `placeholder`
+
+* **Type:** `Function`
+* **Default:** - `undefined`. The placeholder is an optional function that can be passed in to be a rendered component placed in front of the appender. This can be used to represent an example state prior to any blocks being placed. See the Social Links for an implementation example.

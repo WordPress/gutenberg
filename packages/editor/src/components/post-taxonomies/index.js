@@ -16,19 +16,28 @@ import { compose } from '@wordpress/compose';
 import HierarchicalTermSelector from './hierarchical-term-selector';
 import FlatTermSelector from './flat-term-selector';
 
-export function PostTaxonomies( { postType, taxonomies, taxonomyWrapper = identity } ) {
-	const availableTaxonomies = filter( taxonomies, ( taxonomy ) => includes( taxonomy.types, postType ) );
-	const visibleTaxonomies = filter( availableTaxonomies, ( taxonomy ) => taxonomy.visibility.show_ui );
+export function PostTaxonomies( {
+	postType,
+	taxonomies,
+	taxonomyWrapper = identity,
+} ) {
+	const availableTaxonomies = filter( taxonomies, ( taxonomy ) =>
+		includes( taxonomy.types, postType )
+	);
+	const visibleTaxonomies = filter(
+		availableTaxonomies,
+		( taxonomy ) => taxonomy.visibility.show_ui
+	);
 	return visibleTaxonomies.map( ( taxonomy ) => {
-		const TaxonomyComponent = taxonomy.hierarchical ? HierarchicalTermSelector : FlatTermSelector;
+		const TaxonomyComponent = taxonomy.hierarchical
+			? HierarchicalTermSelector
+			: FlatTermSelector;
 		return (
 			<Fragment key={ `taxonomy-${ taxonomy.slug }` }>
-				{
-					taxonomyWrapper(
-						<TaxonomyComponent slug={ taxonomy.slug } />,
-						taxonomy
-					)
-				}
+				{ taxonomyWrapper(
+					<TaxonomyComponent slug={ taxonomy.slug } />,
+					taxonomy
+				) }
 			</Fragment>
 		);
 	} );
@@ -42,4 +51,3 @@ export default compose( [
 		};
 	} ),
 ] )( PostTaxonomies );
-

@@ -1,4 +1,5 @@
 .wp-block-freeform.block-library-rich-text__tinymce {
+	height: auto; /* Allow height of embed iframes to be calculated properly */
 	p,
 	li {
 		line-height: $editor-line-height;
@@ -12,7 +13,7 @@
 
 	blockquote {
 		margin: 0;
-		box-shadow: inset 0 0 0 0 $light-gray-500;
+		box-shadow: inset 0 0 0 0 $gray-300;
 		border-left: 4px solid $black;
 		padding-left: 1em;
 	}
@@ -21,31 +22,7 @@
 		white-space: pre-wrap;
 		font-family: $editor-html-font;
 		font-size: $text-editor-font-size;
-		color: $dark-gray-800;
-	}
-
-	h1 {
-		font-size: 2em;
-	}
-
-	h2 {
-		font-size: 1.6em;
-	}
-
-	h3 {
-		font-size: 1.4em;
-	}
-
-	h4 {
-		font-size: 1.2em;
-	}
-
-	h5 {
-		font-size: 1.1em;
-	}
-
-	h6 {
-		font-size: 1em;
+		color: $gray-900;
 	}
 
 	> *:first-child {
@@ -61,28 +38,28 @@
 	}
 
 	a {
-		color: $blue-medium-700;
+		color: var(--wp-admin-theme-color);
 	}
 
 	&:focus a[data-mce-selected] {
 		padding: 0 2px;
 		margin: 0 -2px;
 		border-radius: 2px;
-		box-shadow: 0 0 0 $border-width $blue-medium-100;
-		background: $blue-medium-100;
+		box-shadow: 0 0 0 $border-width #e5f5fa;
+		background: #e5f5fa;
 	}
 
 	code {
 		padding: 2px;
 		border-radius: 2px;
-		color: $dark-gray-800;
-		background: $light-gray-200;
+		color: $gray-900;
+		background: $gray-100;
 		font-family: $editor-html-font;
 		font-size: 14px;
 	}
 
 	&:focus code[data-mce-selected] {
-		background: $light-gray-400;
+		background: $gray-300;
 	}
 
 	.alignright {
@@ -175,12 +152,12 @@
 		}
 
 		.loading-placeholder {
-			border: 1px dashed $light-gray-400;
+			border: 1px dashed $gray-300;
 			padding: 10px;
 		}
 
 		.wpview-error {
-			border: 1px solid $light-gray-400;
+			border: 1px solid $gray-300;
 			padding: 1em 0;
 			margin: 0;
 			word-wrap: break-word;
@@ -264,25 +241,20 @@
 }
 
 div[data-type="core/freeform"] {
-	.block-editor-block-list__block-edit::before {
+	&::before {
 		transition: border-color 0.1s linear, box-shadow 0.1s linear;
-		border: $border-width solid $light-gray-500;
+		@include reduce-motion("transition");
+		border: $border-width solid $gray-300;
 
 		// Windows High Contrast mode will show this outline.
 		outline: $border-width solid transparent;
 	}
 
-	&.is-selected .block-editor-block-list__block-edit::before {
-		border-color: $light-gray-800;
-		border-left-color: transparent;
+	&.is-selected::before {
+		border-color: $gray-900;
 	}
 
-	// Don't show block type label for classic block
-	&.is-hovered .block-editor-block-list__breadcrumb {
-		display: none;
-	}
-
-	.editor-block-contextual-toolbar + div {
+	.block-editor-block-contextual-toolbar + div {
 		margin-top: 0;
 		padding-top: 0;
 	}
@@ -303,7 +275,7 @@ div[data-type="core/freeform"] {
 	.mce-btn.mce-active:hover button,
 	.mce-btn.mce-active i,
 	.mce-btn.mce-active:hover i {
-		color: $dark-gray-800;
+		color: $gray-900;
 	}
 
 	// Prevent toolbar clipping on heading style in RTL languages
@@ -319,21 +291,34 @@ div[data-type="core/freeform"] {
 }
 
 .block-library-classic__toolbar {
+	// Only display the classic toolbar when the classic block is selected or when the
+	// block is empty or loading and the placeholder should be displayed.
+	display: none;
 	width: auto;
-	margin: 0 #{ -$block-padding };
+	margin: 0;
 	position: sticky;
 	z-index: z-index(".block-library-classic__toolbar");
-	top: $block-padding;
-	transform: translateY(-$block-padding);
-	border: $border-width solid $light-gray-500;
+	top: 0;
+	border: $border-width solid $gray-300;
 	border-bottom: none;
+	border-radius: $radius-block-ui;
+	margin-bottom: $grid-unit-10;
 
 	// On mobile, toolbars go edge to edge.
-	padding: 0 $block-padding;
+	padding: 0;
 
-	.is-selected & {
-		border-color: $light-gray-800;
-		border-left-color: transparent;
+	// By using the `data-type` attribute in this selector it ensures these styles only appear
+	// when the block itself is selected, without it they would also show when a parent block
+	// is selected.
+	div[data-type="core/freeform"].is-selected &,
+	div[data-type="core/freeform"].is-typing & {
+		display: block;
+		border-color: $gray-900;
+	}
+
+	// Remove the box shadow to mimic other Gutenberg UI.
+	.mce-tinymce {
+		box-shadow: none;
 	}
 
 	@include break-small() {
@@ -341,7 +326,7 @@ div[data-type="core/freeform"] {
 	}
 
 	&:empty {
-		height: $block-toolbar-height;
+		display: block;
 		background: #f5f5f5;
 		border-bottom: $border-width solid #e2e4e7;
 
@@ -353,6 +338,10 @@ div[data-type="core/freeform"] {
 			line-height: 37px;
 			padding: $block-padding;
 		}
+	}
+
+	div.mce-toolbar-grp {
+		border-bottom: 1px solid $gray-900;
 	}
 
 	// Overwrite inline styles.
@@ -386,53 +375,5 @@ div[data-type="core/freeform"] {
 
 	&.has-advanced-toolbar .mce-toolbar-grp .mce-toolbar {
 		display: block;
-	}
-}
-
-// We don't want the ellipsis to overlap the classic toolbar, which it will due to position sticky.
-// So we move it to the right, and make room for it.
-@include break-small() {
-	.block-editor-block-list__block[data-type="core/freeform"] {
-		.block-editor-block-switcher__no-switcher-icon {
-			display: none;
-		}
-		.block-editor-block-contextual-toolbar {
-			float: right;
-			margin-right: $icon-button-size - $block-padding + ($border-width * 3);
-			transform: translateY(-#{ $block-padding - $border-width });
-			top: $block-padding;
-
-			.block-editor-block-toolbar {
-				border: none;
-				box-shadow: none;
-
-				// Match the TinyMCE "mobile" breakpoint buttons alignment.
-				margin-top: 3px;
-				@include break-medium() {
-					margin-top: 0;
-				}
-
-				&::before {
-					content: "";
-					display: block;
-					border-left: 1px solid $light-gray-500;
-					margin-top: $grid-size-small;
-					margin-bottom: $grid-size-small;
-				}
-
-				.components-toolbar__control.components-button:hover {
-					background-color: transparent;
-				}
-			}
-
-			.components-toolbar {
-				background: transparent;
-				border: none;
-			}
-		}
-
-		.mce-container.mce-toolbar.mce-stack-layout-item {
-			padding-right: $icon-button-size;
-		}
 	}
 }

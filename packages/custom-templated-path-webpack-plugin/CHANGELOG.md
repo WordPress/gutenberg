@@ -1,3 +1,17 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 1.4.0 (2019-06-12)
+
+### Bug Fixes
+
+- Resolved an issue where only the value of the first matched tag would be produced.
+
+### Internal
+
+- The module is no longer transpiled as part of a build process, and instead exposes its source directly as the `main` file.
+
 ## 1.1.0 (2018-07-12)
 
 ### Internal

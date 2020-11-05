@@ -6,8 +6,8 @@ import renderer from 'react-test-renderer';
 /**
  * WordPress dependencies
  */
-import { dispatch } from '@wordpress/data';
 import { Component } from '@wordpress/element';
+import { useViewportMatch as useViewportMatchMock } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -16,6 +16,10 @@ import '../store';
 import withViewportMatch from '../with-viewport-match';
 
 describe( 'withViewportMatch()', () => {
+	afterEach( () => {
+		useViewportMatchMock.mockClear();
+	} );
+
 	const ChildComponent = () => <div>Hello</div>;
 
 	// this is needed because TestUtils does not accept a stateless component.
@@ -30,14 +34,34 @@ describe( 'withViewportMatch()', () => {
 	};
 
 	it( 'should render with result of query as custom prop name', () => {
-		dispatch( 'core/viewport' ).setIsMatching( { '> wide': true } );
-		const EnhancedComponent = withViewportMatch(
-			{ isWide: '> wide' }
-		)( ChildComponent );
-		const wrapper = renderer.create( getTestComponent( EnhancedComponent ) );
+		const EnhancedComponent = withViewportMatch( {
+			isWide: '>= wide',
+			isSmall: '>= small',
+			isLarge: 'large',
+			isLessThanSmall: '< small',
+		} )( ChildComponent );
 
-		expect( wrapper.root.findByType( ChildComponent ).props.isWide )
-			.toBe( true );
+		useViewportMatchMock.mockReturnValueOnce( false );
+		useViewportMatchMock.mockReturnValueOnce( true );
+		useViewportMatchMock.mockReturnValueOnce( true );
+		useViewportMatchMock.mockReturnValueOnce( false );
+
+		const wrapper = renderer.create(
+			getTestComponent( EnhancedComponent )
+		);
+
+		expect( useViewportMatchMock.mock.calls ).toEqual( [
+			[ 'wide', '>=' ],
+			[ 'small', '>=' ],
+			[ 'large', '>=' ],
+			[ 'small', '<' ],
+		] );
+
+		const { props } = wrapper.root.findByType( ChildComponent );
+		expect( props.isWide ).toBe( false );
+		expect( props.isSmall ).toBe( true );
+		expect( props.isLarge ).toBe( true );
+		expect( props.isLessThanSmall ).toBe( false );
 
 		wrapper.unmount();
 	} );

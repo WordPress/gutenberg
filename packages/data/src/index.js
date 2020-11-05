@@ -12,11 +12,26 @@ import * as plugins from './plugins';
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
 export { default as withRegistry } from './components/with-registry';
-export { default as RegistryProvider, RegistryConsumer } from './components/registry-provider';
-export { default as __experimentalAsyncModeProvider } from './components/async-mode-provider';
+export {
+	RegistryProvider,
+	RegistryConsumer,
+	useRegistry,
+} from './components/registry-provider';
+export { default as useSelect } from './components/use-select';
+export { useDispatch } from './components/use-dispatch';
+export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
-export { plugins };
 export { createRegistrySelector, createRegistryControl } from './factory';
+export { controls } from './controls';
+
+/**
+ * Object of available plugins to use with a registry.
+ *
+ * @see [use](#use)
+ *
+ * @type {Object}
+ */
+export { plugins };
 
 /**
  * The combineReducers helper function turns an object whose values are different
@@ -62,7 +77,7 @@ export { combineReducers };
  * The selector functions are been pre-bound to pass the current state automatically.
  * As a consumer, you need only pass arguments of the selector, if applicable.
  *
- * @param {string} name Store name
+ * @param {string} name Store name.
  *
  * @example
  * ```js
@@ -76,10 +91,33 @@ export { combineReducers };
 export const select = defaultRegistry.select;
 
 /**
+ * Given the name of a registered store, returns an object containing the store's
+ * selectors pre-bound to state so that you only need to supply additional arguments,
+ * and modified so that they return promises that resolve to their eventual values,
+ * after any resolvers have ran.
+ *
+ * @param {string} name Store name.
+ *
+ * @example
+ * ```js
+ * const { __experimentalResolveSelect } = wp.data;
+ *
+ * __experimentalResolveSelect( 'my-shop' ).getPrice( 'hammer' ).then(console.log)
+ * ```
+ *
+ * @return {Object} Object containing the store's promise-wrapped selectors.
+ */
+export const __experimentalResolveSelect =
+	defaultRegistry.__experimentalResolveSelect;
+
+/**
  * Given the name of a registered store, returns an object of the store's action creators.
  * Calling an action creator will cause it to be dispatched, updating the state value accordingly.
  *
- * @param {string} name Store name
+ * Note: Action creators returned by the dispatch will return a promise when
+ * they are called.
+ *
+ * @param {string} name Store name.
  *
  * @example
  * ```js
@@ -114,11 +152,11 @@ export const dispatch = defaultRegistry.dispatch;
 export const subscribe = defaultRegistry.subscribe;
 
 /**
-* Registers a generic store.
-*
-* @param {string} key    Store registry key.
-* @param {Object} config Configuration (getSelectors, getActions, subscribe).
-*/
+ * Registers a generic store.
+ *
+ * @param {string} key    Store registry key.
+ * @param {Object} config Configuration (getSelectors, getActions, subscribe).
+ */
 export const registerGenericStore = defaultRegistry.registerGenericStore;
 
 /**
@@ -130,4 +168,12 @@ export const registerGenericStore = defaultRegistry.registerGenericStore;
  * @return {Object} Registered store object.
  */
 export const registerStore = defaultRegistry.registerStore;
+
+/**
+ * Extends a registry to inherit functionality provided by a given plugin. A
+ * plugin is an object with properties aligning to that of a registry, merged
+ * to extend the default registry behavior.
+ *
+ * @param {Object} plugin Plugin object.
+ */
 export const use = defaultRegistry.use;

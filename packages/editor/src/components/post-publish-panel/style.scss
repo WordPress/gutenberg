@@ -1,6 +1,5 @@
 .editor-post-publish-panel {
 	background: $white;
-	color: $dark-gray-500;
 }
 
 .editor-post-publish-panel__content {
@@ -9,27 +8,46 @@
 
 	.components-spinner {
 		display: block;
-		float: none;
 		margin: 100px auto 0;
 	}
 }
 
 .editor-post-publish-panel__header {
 	background: $white;
-	padding-left: 16px;
-	height: $header-height;
-	border-bottom: $border-width solid $light-gray-500;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
+	height: $header-height + $border-width;
+	border-bottom: $border-width solid $gray-300;
 	display: flex;
 	align-items: center;
 	align-content: space-between;
+
+	.components-button {
+		width: 100%;
+		justify-content: center;
+	}
+
+	.has-icon {
+		margin-left: auto;
+		width: auto;
+	}
+}
+
+.editor-post-publish-panel__header-publish-button,
+.editor-post-publish-panel__header-cancel-button {
+	flex-grow: 1;
+
+	@include break-mobile() {
+		max-width: $admin-sidebar-width;
+	}
 }
 
 .editor-post-publish-panel__header-publish-button {
-	display: flex;
-	justify-content: flex-end;
-	flex-grow: 1;
-	text-align: right;
-	flex-wrap: nowrap;
+	padding-right: $grid-unit-05;
+}
+
+.editor-post-publish-panel__header-cancel-button {
+	padding-left: $grid-unit-05;
 }
 
 .editor-post-publish-panel__header-published {
@@ -54,17 +72,15 @@
 }
 
 .editor-post-publish-panel__link {
-	color: $blue-medium-700;
 	font-weight: 400;
 	padding-left: 4px;
-	text-decoration: underline;
 }
 
 .editor-post-publish-panel__prepublish {
 	padding: 16px;
 
 	strong {
-		color: $dark-gray-900;
+		color: $gray-900;
 	}
 
 	.components-panel__body {
@@ -79,7 +95,7 @@
 }
 
 .post-publish-panel__postpublish .components-panel__body {
-	border-bottom: $border-width solid $light-gray-500;
+	border-bottom: $border-width solid $gray-200;
 	border-top: none;
 }
 
@@ -109,11 +125,11 @@
 }
 
 .post-publish-panel__postpublish-post-address {
-	margin-bottom: $grid-size-large;
+	margin-bottom: $grid-unit-20;
 
 	input[readonly] {
 		padding: 10px;
-		background: $light-gray-400;
+		background: $gray-300;
 		overflow: hidden;
 		text-overflow: ellipsis;
 	}
@@ -124,7 +140,7 @@
 }
 
 .post-publish-panel__postpublish-subheader {
-	margin: 0 0 $grid-size;
+	margin: 0 0 $grid-unit-10;
 }
 
 .post-publish-panel__tip {

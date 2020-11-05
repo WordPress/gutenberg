@@ -1,9 +1,7 @@
 /**
  * Internal dependencies
  */
-import {
-	isBlobURL,
-} from '../';
+import { isBlobURL, getBlobTypeByURL } from '../';
 
 describe( 'isBlobURL', () => {
 	it( 'returns true if the url starts with "blob:"', () => {
@@ -16,5 +14,15 @@ describe( 'isBlobURL', () => {
 
 	it( 'returns false if the url is not defined', () => {
 		expect( isBlobURL() ).toBe( false );
+	} );
+} );
+
+describe( 'getBlobTypeByURL', () => {
+	it( 'returns undefined if the blob is not found', () => {
+		expect( getBlobTypeByURL( 'blob:notexisting' ) ).toBe( undefined );
+	} );
+
+	it( 'returns undefined if the url is not defined', () => {
+		expect( getBlobTypeByURL() ).toBe( undefined );
 	} );
 } );

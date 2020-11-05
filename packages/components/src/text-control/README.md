@@ -55,19 +55,20 @@ Don’t use unclear visual markers to indicate a text field.
 ### Usage
 
 Render a user interface to input the name of an additional css class.
+```js 
+import { TextControl } from '@wordpress/components';
+import { withState } from '@wordpress/compose';
 
-    import { TextControl } from '@wordpress/components';
-    import { withState } from '@wordpress/compose';
-    
-    const MyTextControl = withState( {
-        className: '',
-    } )( ( { className, setState } ) => ( 
-        <TextControl
-            label="Additional CSS Class"
-            value={ className }
-            onChange={ ( className ) => setState( { className } ) }
-        />
-    ) );
+const MyTextControl = withState( {
+    className: '',
+} )( ( { className, setState } ) => ( 
+    <TextControl
+        label="Additional CSS Class"
+        value={ className }
+        onChange={ ( className ) => setState( { className } ) }
+    />
+) );
+``` 
 
 ### Props
 
@@ -78,6 +79,12 @@ Props not included in this set will be applied to the input element.
 If this property is added, a label will be generated using label property as the content.
 
 - Type: `String`
+- Required: No
+
+#### hideLabelFromVision
+If true, the label will only be visible to screen readers.
+
+- Type: `Boolean`
 - Required: No
 
 #### help
@@ -96,7 +103,7 @@ Type of the input element to render. Defaults to "text".
 #### value
 The current value of the input.
 
-- Type: `Number`
+- Type: `String | Number`
 - Required: Yes
 
 #### className

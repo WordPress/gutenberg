@@ -2,12 +2,9 @@
  * External dependencies
  */
 import { createStore, applyMiddleware } from 'redux';
-import {
-	flowRight,
-	get,
-	mapValues,
-} from 'lodash';
+import { flowRight, get, mapValues } from 'lodash';
 import combineReducers from 'turbo-combine-reducers';
+import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
  * WordPress dependencies
@@ -17,6 +14,7 @@ import createReduxRoutineMiddleware from '@wordpress/redux-routine';
 /**
  * Internal dependencies
  */
+import { builtinControls } from '../controls';
 import promise from '../promise-middleware';
 import createResolversCacheMiddleware from '../resolvers-cache-middleware';
 import metadataReducer from './metadata/reducer';
@@ -24,39 +22,85 @@ import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
 /**
+ * Create a cache to track whether resolvers started running or not.
+ *
+ * @return {Object} Resolvers Cache.
+ */
+function createResolversCache() {
+	const cache = {};
+	return {
+		isRunning( selectorName, args ) {
+			return cache[ selectorName ] && cache[ selectorName ].get( args );
+		},
+
+		clear( selectorName, args ) {
+			if ( cache[ selectorName ] ) {
+				cache[ selectorName ].delete( args );
+			}
+		},
+
+		markAsRunning( selectorName, args ) {
+			if ( ! cache[ selectorName ] ) {
+				cache[ selectorName ] = new EquivalentKeyMap();
+			}
+
+			cache[ selectorName ].set( args, true );
+		},
+	};
+}
+
+/**
+ * @typedef {WPDataRegistry} WPDataRegistry
+ */
+
+/**
  * Creates a namespace object with a store derived from the reducer given.
  *
- * @param {string} key              Identifying string used for namespace and redex dev tools.
- * @param {Object} options          Contains reducer, actions, selectors, and resolvers.
- * @param {Object} registry         Registry reference.
+ * @param {string}         key      Unique namespace identifier.
+ * @param {Object}         options  Registered store options, with properties
+ *                                  describing reducer, actions, selectors, and
+ *                                  resolvers.
+ * @param {WPDataRegistry} registry Registry reference.
  *
  * @return {Object} Store Object.
  */
 export default function createNamespace( key, options, registry ) {
 	const reducer = options.reducer;
 	const store = createReduxStore( key, options, registry );
+	const resolversCache = createResolversCache();
 
 	let resolvers;
-	const actions = mapActions( {
-		...metadataActions,
-		...options.actions,
-	}, store );
-	let selectors = mapSelectors( {
-		...mapValues( metadataSelectors, ( selector ) => ( state, ...args ) => selector( state.metadata, ...args ) ),
-		...mapValues( options.selectors, ( selector ) => {
-			if ( selector.isRegistrySelector ) {
-				const mappedSelector = ( reg ) => ( state, ...args ) => {
-					return selector( reg )( state.root, ...args );
-				};
-				mappedSelector.isRegistrySelector = selector.isRegistrySelector;
-				return mappedSelector;
-			}
+	const actions = mapActions(
+		{
+			...metadataActions,
+			...options.actions,
+		},
+		store
+	);
+	let selectors = mapSelectors(
+		{
+			...mapValues(
+				metadataSelectors,
+				( selector ) => ( state, ...args ) =>
+					selector( state.metadata, ...args )
+			),
+			...mapValues( options.selectors, ( selector ) => {
+				if ( selector.isRegistrySelector ) {
+					selector.registry = registry;
+				}
 
-			return ( state, ...args ) => selector( state.root, ...args );
-		} ),
-	}, store, registry );
+				return ( state, ...args ) => selector( state.root, ...args );
+			} ),
+		},
+		store
+	);
 	if ( options.resolvers ) {
-		const result = mapResolvers( options.resolvers, selectors, store );
+		const result = mapResolvers(
+			options.resolvers,
+			selectors,
+			store,
+			resolversCache
+		);
 		resolvers = result.resolvers;
 		selectors = result.selectors;
 	}
@@ -72,18 +116,20 @@ export default function createNamespace( key, options, registry ) {
 
 	// Customize subscribe behavior to call listeners only on effective change,
 	// not on every dispatch.
-	const subscribe = store && function( listener ) {
-		let lastState = store.__unstableOriginalGetState();
-		store.subscribe( () => {
-			const state = store.__unstableOriginalGetState();
-			const hasChanged = state !== lastState;
-			lastState = state;
+	const subscribe =
+		store &&
+		( ( listener ) => {
+			let lastState = store.__unstableOriginalGetState();
+			store.subscribe( () => {
+				const state = store.__unstableOriginalGetState();
+				const hasChanged = state !== lastState;
+				lastState = state;
 
-			if ( hasChanged ) {
-				listener();
-			}
+				if ( hasChanged ) {
+					listener();
+				}
+			} );
 		} );
-	};
 
 	// This can be simplified to just { subscribe, getSelectors, getActions }
 	// Once we remove the use function.
@@ -102,31 +148,41 @@ export default function createNamespace( key, options, registry ) {
 /**
  * Creates a redux store for a namespace.
  *
- * @param {string} key      Part of the state shape to register the
- *                          selectors for.
- * @param {Object} options  Registered store options.
- * @param {Object} registry Registry reference, for resolver enhancer support.
+ * @param {string}         key      Unique namespace identifier.
+ * @param {Object}         options  Registered store options, with properties
+ *                                  describing reducer, actions, selectors, and
+ *                                  resolvers.
+ * @param {WPDataRegistry} registry Registry reference.
  *
  * @return {Object} Newly created redux store.
  */
 function createReduxStore( key, options, registry ) {
+	const controls = {
+		...options.controls,
+		...builtinControls,
+	};
+
+	const normalizedControls = mapValues( controls, ( control ) =>
+		control.isRegistryControl ? control( registry ) : control
+	);
+
 	const middlewares = [
 		createResolversCacheMiddleware( registry, key ),
 		promise,
+		createReduxRoutineMiddleware( normalizedControls ),
 	];
 
-	if ( options.controls ) {
-		const normalizedControls = mapValues( options.controls, ( control ) => {
-			return control.isRegistryControl ? control( registry ) : control;
-		} );
-		middlewares.push( createReduxRoutineMiddleware( normalizedControls ) );
-	}
-
-	const enhancers = [
-		applyMiddleware( ...middlewares ),
-	];
-	if ( typeof window !== 'undefined' && window.__REDUX_DEVTOOLS_EXTENSION__ ) {
-		enhancers.push( window.__REDUX_DEVTOOLS_EXTENSION__( { name: key, instanceId: key } ) );
+	const enhancers = [ applyMiddleware( ...middlewares ) ];
+	if (
+		typeof window !== 'undefined' &&
+		window.__REDUX_DEVTOOLS_EXTENSION__
+	) {
+		enhancers.push(
+			window.__REDUX_DEVTOOLS_EXTENSION__( {
+				name: key,
+				instanceId: key,
+			} )
+		);
 	}
 
 	const { reducer, initialState } = options;
@@ -143,21 +199,17 @@ function createReduxStore( key, options, registry ) {
 }
 
 /**
- * Maps selectors to a redux store.
+ * Maps selectors to a store.
  *
- * @param {Object} selectors  Selectors to register. Keys will be used as the
- *                            public facing API. Selectors will get passed the
- *                            state as first argument.
- * @param {Object} store      The redux store to which the selectors should be mapped.
- * @param {Object} registry   Registry reference.
- *
- * @return {Object}           Selectors mapped to the redux store provided.
+ * @param {Object} selectors Selectors to register. Keys will be used as the
+ *                           public facing API. Selectors will get passed the
+ *                           state as first argument.
+ * @param {Object} store     The store to which the selectors should be mapped.
+ * @return {Object} Selectors mapped to the provided store.
  */
-function mapSelectors( selectors, store, registry ) {
-	const createStateSelector = ( registeredSelector ) => {
-		const selector = registeredSelector.isRegistrySelector ? registeredSelector( registry.select ) : registeredSelector;
-
-		return function runSelector() {
+function mapSelectors( selectors, store ) {
+	const createStateSelector = ( registrySelector ) => {
+		const selector = function runSelector() {
 			// This function is an optimized implementation of:
 			//
 			//   selector( store.getState(), ...arguments )
@@ -172,8 +224,10 @@ function mapSelectors( selectors, store, registry ) {
 				args[ i + 1 ] = arguments[ i ];
 			}
 
-			return selector( ...args );
+			return registrySelector( ...args );
 		};
+		selector.hasResolver = false;
+		return selector;
 	};
 
 	return mapValues( selectors, createStateSelector );
@@ -188,7 +242,7 @@ function mapSelectors( selectors, store, registry ) {
  */
 function mapActions( actions, store ) {
 	const createBoundAction = ( action ) => ( ...args ) => {
-		store.dispatch( action( ...args ) );
+		return Promise.resolve( store.dispatch( action( ...args ) ) );
 	};
 
 	return mapValues( actions, createBoundAction );
@@ -199,43 +253,80 @@ function mapActions( actions, store ) {
  * Resolvers are side effects invoked once per argument set of a given selector call,
  * used in ensuring that the data needs for the selector are satisfied.
  *
- * @param {Object} resolvers   Resolvers to register.
- * @param {Object} selectors   The current selectors to be modified.
- * @param {Object} store       The redux store to which the resolvers should be mapped.
- * @return {Object}            An object containing updated selectors and resolvers.
+ * @param {Object} resolvers      Resolvers to register.
+ * @param {Object} selectors      The current selectors to be modified.
+ * @param {Object} store          The redux store to which the resolvers should be mapped.
+ * @param {Object} resolversCache Resolvers Cache.
  */
-function mapResolvers( resolvers, selectors, store ) {
+function mapResolvers( resolvers, selectors, store, resolversCache ) {
+	// The `resolver` can be either a function that does the resolution, or, in more advanced
+	// cases, an object with a `fullfill` method and other optional methods like `isFulfilled`.
+	// Here we normalize the `resolver` function to an object with `fulfill` method.
 	const mappedResolvers = mapValues( resolvers, ( resolver ) => {
-		const { fulfill: resolverFulfill = resolver } = resolver;
-		return { ...resolver, fulfill: resolverFulfill };
+		if ( resolver.fulfill ) {
+			return resolver;
+		}
+
+		return {
+			...resolver, // copy the enumerable properties of the resolver function
+			fulfill: resolver, // add the fulfill method
+		};
 	} );
 
 	const mapSelector = ( selector, selectorName ) => {
 		const resolver = resolvers[ selectorName ];
 		if ( ! resolver ) {
+			selector.hasResolver = false;
 			return selector;
 		}
 
-		return ( ...args ) => {
+		const selectorResolver = ( ...args ) => {
 			async function fulfillSelector() {
 				const state = store.getState();
-				if ( typeof resolver.isFulfilled === 'function' && resolver.isFulfilled( state, ...args ) ) {
+				if (
+					resolversCache.isRunning( selectorName, args ) ||
+					( typeof resolver.isFulfilled === 'function' &&
+						resolver.isFulfilled( state, ...args ) )
+				) {
 					return;
 				}
 
 				const { metadata } = store.__unstableOriginalGetState();
-				if ( metadataSelectors.hasStartedResolution( metadata, selectorName, args ) ) {
+
+				if (
+					metadataSelectors.hasStartedResolution(
+						metadata,
+						selectorName,
+						args
+					)
+				) {
 					return;
 				}
 
-				store.dispatch( metadataActions.startResolution( selectorName, args ) );
-				await fulfillResolver( store, mappedResolvers, selectorName, ...args );
-				store.dispatch( metadataActions.finishResolution( selectorName, args ) );
+				resolversCache.markAsRunning( selectorName, args );
+
+				setTimeout( async () => {
+					resolversCache.clear( selectorName, args );
+					store.dispatch(
+						metadataActions.startResolution( selectorName, args )
+					);
+					await fulfillResolver(
+						store,
+						mappedResolvers,
+						selectorName,
+						...args
+					);
+					store.dispatch(
+						metadataActions.finishResolution( selectorName, args )
+					);
+				} );
 			}
 
 			fulfillSelector( ...args );
 			return selector( ...args );
 		};
+		selectorResolver.hasResolver = true;
+		return selectorResolver;
 	};
 
 	return {

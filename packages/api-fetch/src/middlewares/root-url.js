@@ -20,7 +20,10 @@ const createRootURLMiddleware = ( rootURL ) => ( options, next ) => {
 
 			// API root may already include query parameter prefix if site is
 			// configured to use plain permalinks.
-			if ( 'string' === typeof apiRoot && -1 !== apiRoot.indexOf( '?' ) ) {
+			if (
+				'string' === typeof apiRoot &&
+				-1 !== apiRoot.indexOf( '?' )
+			) {
 				path = path.replace( '?', '&' );
 			}
 

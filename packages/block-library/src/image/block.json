@@ -1,6 +1,7 @@
 {
+	"apiVersion": 2,
 	"name": "core/image",
-	"category": "common",
+	"category": "media",
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -22,6 +23,12 @@
 			"type": "string",
 			"source": "html",
 			"selector": "figcaption"
+		},
+		"title": {
+			"type": "string",
+			"source": "attribute",
+			"selector": "img",
+			"attribute": "title"
 		},
 		"href": {
 			"type": "string",
@@ -50,9 +57,11 @@
 		"height": {
 			"type": "number"
 		},
+		"sizeSlug": {
+			"type": "string"
+		},
 		"linkDestination": {
-			"type": "string",
-			"default": "none"
+			"type": "string"
 		},
 		"linkTarget": {
 			"type": "string",
@@ -60,5 +69,8 @@
 			"selector": "figure > a",
 			"attribute": "target"
 		}
+	},
+	"supports": {
+		"anchor": true
 	}
 }

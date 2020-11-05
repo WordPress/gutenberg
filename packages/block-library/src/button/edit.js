@@ -7,143 +7,300 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useCallback, useState } from '@wordpress/element';
 import {
-	Component,
-	Fragment,
-} from '@wordpress/element';
-import { compose } from '@wordpress/compose';
-import {
-	Dashicon,
-	IconButton,
-	withFallbackStyles,
+	Button,
+	ButtonGroup,
+	KeyboardShortcuts,
+	PanelBody,
+	RangeControl,
+	TextControl,
+	ToggleControl,
+	ToolbarButton,
+	ToolbarGroup,
+	Popover,
 } from '@wordpress/components';
 import {
-	URLInput,
-	RichText,
-	ContrastChecker,
+	BlockControls,
 	InspectorControls,
-	withColors,
-	PanelColorSettings,
+	RichText,
+	useBlockProps,
+	__experimentalLinkControl as LinkControl,
+	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
+import { rawShortcut, displayShortcut } from '@wordpress/keycodes';
+import { link, linkOff } from '@wordpress/icons';
+import { createBlock } from '@wordpress/blocks';
 
-const { getComputedStyle } = window;
+/**
+ * Internal dependencies
+ */
+import ColorEdit from './color-edit';
+import getColorAndStyleProps from './color-props';
 
-const applyFallbackStyles = withFallbackStyles( ( node, ownProps ) => {
-	const { textColor, backgroundColor } = ownProps;
-	const backgroundColorValue = backgroundColor && backgroundColor.color;
-	const textColorValue = textColor && textColor.color;
-	//avoid the use of querySelector if textColor color is known and verify if node is available.
-	const textNode = ! textColorValue && node ? node.querySelector( '[contenteditable="true"]' ) : null;
-	return {
-		fallbackBackgroundColor: backgroundColorValue || ! node ? undefined : getComputedStyle( node ).backgroundColor,
-		fallbackTextColor: textColorValue || ! textNode ? undefined : getComputedStyle( textNode ).color,
-	};
-} );
+const NEW_TAB_REL = 'noreferrer noopener';
+const MIN_BORDER_RADIUS_VALUE = 0;
+const MAX_BORDER_RADIUS_VALUE = 50;
+const INITIAL_BORDER_RADIUS_POSITION = 5;
 
-class ButtonEdit extends Component {
-	constructor() {
-		super( ...arguments );
-		this.nodeRef = null;
-		this.bindRef = this.bindRef.bind( this );
-	}
+const EMPTY_ARRAY = [];
 
-	bindRef( node ) {
-		if ( ! node ) {
-			return;
-		}
-		this.nodeRef = node;
-	}
-
-	render() {
-		const {
-			attributes,
-			backgroundColor,
-			textColor,
-			setBackgroundColor,
-			setTextColor,
-			fallbackBackgroundColor,
-			fallbackTextColor,
-			setAttributes,
-			isSelected,
-			className,
-		} = this.props;
-
-		const {
-			text,
-			url,
-			title,
-		} = attributes;
-
-		return (
-			<Fragment>
-				<div className={ className } title={ title } ref={ this.bindRef }>
-					<RichText
-						placeholder={ __( 'Add text…' ) }
-						value={ text }
-						onChange={ ( value ) => setAttributes( { text: value } ) }
-						formattingControls={ [ 'bold', 'italic', 'strikethrough' ] }
-						className={ classnames(
-							'wp-block-button__link', {
-								'has-background': backgroundColor.color,
-								[ backgroundColor.class ]: backgroundColor.class,
-								'has-text-color': textColor.color,
-								[ textColor.class ]: textColor.class,
-							}
-						) }
-						style={ {
-							backgroundColor: backgroundColor.color,
-							color: textColor.color,
-						} }
-						keepPlaceholderOnFocus
-					/>
-					<InspectorControls>
-						<PanelColorSettings
-							title={ __( 'Color Settings' ) }
-							colorSettings={ [
-								{
-									value: backgroundColor.color,
-									onChange: setBackgroundColor,
-									label: __( 'Background Color' ),
-								},
-								{
-									value: textColor.color,
-									onChange: setTextColor,
-									label: __( 'Text Color' ),
-								},
-							] }
-						>
-							<ContrastChecker
-								{ ...{
-									// Text is considered large if font size is greater or equal to 18pt or 24px,
-									// currently that's not the case for button.
-									isLargeText: false,
-									textColor: textColor.color,
-									backgroundColor: backgroundColor.color,
-									fallbackBackgroundColor,
-									fallbackTextColor,
-								} }
-							/>
-						</PanelColorSettings>
-					</InspectorControls>
-				</div>
-				{ isSelected && (
-					<form
-						className="block-library-button__inline-link"
-						onSubmit={ ( event ) => event.preventDefault() }>
-						<Dashicon icon="admin-links" />
-						<URLInput
-							value={ url }
-							onChange={ ( value ) => setAttributes( { url: value } ) }
-						/>
-						<IconButton icon="editor-break" label={ __( 'Apply' ) } type="submit" />
-					</form>
-				) }
-			</Fragment>
-		);
-	}
+function BorderPanel( { borderRadius = '', setAttributes } ) {
+	const initialBorderRadius = borderRadius;
+	const setBorderRadius = useCallback(
+		( newBorderRadius ) => {
+			if ( newBorderRadius === undefined )
+				setAttributes( {
+					borderRadius: initialBorderRadius,
+				} );
+			else setAttributes( { borderRadius: newBorderRadius } );
+		},
+		[ setAttributes ]
+	);
+	return (
+		<PanelBody title={ __( 'Border settings' ) }>
+			<RangeControl
+				value={ borderRadius }
+				label={ __( 'Border radius' ) }
+				min={ MIN_BORDER_RADIUS_VALUE }
+				max={ MAX_BORDER_RADIUS_VALUE }
+				initialPosition={ INITIAL_BORDER_RADIUS_POSITION }
+				allowReset
+				onChange={ setBorderRadius }
+			/>
+		</PanelBody>
+	);
 }
 
-export default compose( [
-	withColors( 'backgroundColor', { textColor: 'color' } ),
-	applyFallbackStyles,
-] )( ButtonEdit );
+function WidthPanel( { selectedWidth, setAttributes } ) {
+	function handleChange( newWidth ) {
+		// Check if we are toggling the width off
+		const width = selectedWidth === newWidth ? undefined : newWidth;
+
+		// Update attributes
+		setAttributes( { width } );
+	}
+
+	return (
+		<PanelBody title={ __( 'Width settings' ) }>
+			<ButtonGroup aria-label={ __( 'Button width' ) }>
+				{ [ 25, 50, 75, 100 ].map( ( widthValue ) => {
+					return (
+						<Button
+							key={ widthValue }
+							isSmall
+							isPrimary={ widthValue === selectedWidth }
+							onClick={ () => handleChange( widthValue ) }
+						>
+							{ widthValue }%
+						</Button>
+					);
+				} ) }
+			</ButtonGroup>
+		</PanelBody>
+	);
+}
+
+function URLPicker( {
+	isSelected,
+	url,
+	setAttributes,
+	opensInNewTab,
+	onToggleOpenInNewTab,
+} ) {
+	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
+	const urlIsSet = !! url;
+	const urlIsSetandSelected = urlIsSet && isSelected;
+	const openLinkControl = () => {
+		setIsURLPickerOpen( true );
+		return false; // prevents default behaviour for event
+	};
+	const unlinkButton = () => {
+		setAttributes( {
+			url: undefined,
+			linkTarget: undefined,
+			rel: undefined,
+		} );
+		setIsURLPickerOpen( false );
+	};
+	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
+		<Popover
+			position="bottom center"
+			onClose={ () => setIsURLPickerOpen( false ) }
+		>
+			<LinkControl
+				className="wp-block-navigation-link__inline-link-input"
+				value={ { url, opensInNewTab } }
+				onChange={ ( {
+					url: newURL = '',
+					opensInNewTab: newOpensInNewTab,
+				} ) => {
+					setAttributes( { url: newURL } );
+
+					if ( opensInNewTab !== newOpensInNewTab ) {
+						onToggleOpenInNewTab( newOpensInNewTab );
+					}
+				} }
+			/>
+		</Popover>
+	);
+	return (
+		<>
+			<BlockControls>
+				<ToolbarGroup>
+					{ ! urlIsSet && (
+						<ToolbarButton
+							name="link"
+							icon={ link }
+							title={ __( 'Link' ) }
+							shortcut={ displayShortcut.primary( 'k' ) }
+							onClick={ openLinkControl }
+						/>
+					) }
+					{ urlIsSetandSelected && (
+						<ToolbarButton
+							name="link"
+							icon={ linkOff }
+							title={ __( 'Unlink' ) }
+							shortcut={ displayShortcut.primaryShift( 'k' ) }
+							onClick={ unlinkButton }
+							isActive={ true }
+						/>
+					) }
+				</ToolbarGroup>
+			</BlockControls>
+			{ isSelected && (
+				<KeyboardShortcuts
+					bindGlobal
+					shortcuts={ {
+						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
+					} }
+				/>
+			) }
+			{ linkControl }
+		</>
+	);
+}
+
+function ButtonEdit( props ) {
+	const {
+		attributes,
+		setAttributes,
+		className,
+		isSelected,
+		onReplace,
+		mergeBlocks,
+	} = props;
+	const {
+		borderRadius,
+		linkTarget,
+		placeholder,
+		rel,
+		text,
+		url,
+		width,
+	} = attributes;
+	const onSetLinkRel = useCallback(
+		( value ) => {
+			setAttributes( { rel: value } );
+		},
+		[ setAttributes ]
+	);
+	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
+
+	const onToggleOpenInNewTab = useCallback(
+		( value ) => {
+			const newLinkTarget = value ? '_blank' : undefined;
+
+			let updatedRel = rel;
+			if ( newLinkTarget && ! rel ) {
+				updatedRel = NEW_TAB_REL;
+			} else if ( ! newLinkTarget && rel === NEW_TAB_REL ) {
+				updatedRel = undefined;
+			}
+
+			setAttributes( {
+				linkTarget: newLinkTarget,
+				rel: updatedRel,
+			} );
+		},
+		[ rel, setAttributes ]
+	);
+
+	const colorProps = getColorAndStyleProps( attributes, colors, true );
+	const blockProps = useBlockProps();
+
+	return (
+		<>
+			<ColorEdit { ...props } />
+			<div
+				{ ...blockProps }
+				className={ classnames( blockProps.className, {
+					[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+				} ) }
+			>
+				<RichText
+					placeholder={ placeholder || __( 'Add text…' ) }
+					value={ text }
+					onChange={ ( value ) => setAttributes( { text: value } ) }
+					withoutInteractiveFormatting
+					className={ classnames(
+						className,
+						'wp-block-button__link',
+						colorProps.className,
+						{
+							'no-border-radius': borderRadius === 0,
+						}
+					) }
+					style={ {
+						borderRadius: borderRadius
+							? borderRadius + 'px'
+							: undefined,
+						...colorProps.style,
+					} }
+					onSplit={ ( value ) =>
+						createBlock( 'core/button', {
+							...attributes,
+							text: value,
+						} )
+					}
+					onReplace={ onReplace }
+					onMerge={ mergeBlocks }
+					identifier="text"
+				/>
+			</div>
+			<URLPicker
+				url={ url }
+				setAttributes={ setAttributes }
+				isSelected={ isSelected }
+				opensInNewTab={ linkTarget === '_blank' }
+				onToggleOpenInNewTab={ onToggleOpenInNewTab }
+			/>
+			<InspectorControls>
+				<BorderPanel
+					borderRadius={ borderRadius }
+					setAttributes={ setAttributes }
+				/>
+				<WidthPanel
+					selectedWidth={ width }
+					setAttributes={ setAttributes }
+				/>
+				<PanelBody title={ __( 'Link settings' ) }>
+					<ToggleControl
+						label={ __( 'Open in new tab' ) }
+						onChange={ onToggleOpenInNewTab }
+						checked={ linkTarget === '_blank' }
+					/>
+					<TextControl
+						label={ __( 'Link rel' ) }
+						value={ rel || '' }
+						onChange={ onSetLinkRel }
+					/>
+				</PanelBody>
+			</InspectorControls>
+		</>
+	);
+}
+
+export default ButtonEdit;

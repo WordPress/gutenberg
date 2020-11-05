@@ -1,3 +1,13 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 1.8.0 (2019-08-29)
+
+### Internal
+
+- The inline link component has been refactored to focus changes using the `Popover` component's `onFocusOutside` prop.
+
 ## 1.2.10 (2019-01-03)
 
 ## 1.2.9 (2018-12-18)

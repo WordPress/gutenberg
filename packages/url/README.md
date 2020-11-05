@@ -30,12 +30,33 @@ const newURL = addQueryArgs( 'https://google.com', { q: 'test' } ); // https://g
 
 _Parameters_
 
--   _url_ `?string`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
--   _args_ `Object`: Query arguments to apply to URL.
+-   _url_ `[string]`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
+-   _args_ `[Object]`: Query arguments to apply to URL.
 
 _Returns_
 
 -   `string`: URL with arguments applied.
+
+<a name="cleanForSlug" href="#cleanForSlug">#</a> **cleanForSlug**
+
+Performs some basic cleanup of a string for use as a post slug.
+
+This replicates some of what `sanitize_title()` does in WordPress core, but
+is only designed to approximate what the slug will be.
+
+Converts Latin-1 Supplement and Latin Extended-A letters to basic Latin
+letters. Removes combining diacritical marks. Converts whitespace, periods,
+and forward slashes to hyphens. Removes any remaining non-word characters
+except hyphens. Converts remaining string to lowercase. It does not account
+for octets, HTML entities, or other encoded characters.
+
+_Parameters_
+
+-   _string_ `string`: Title or slug to be processed.
+
+_Returns_
+
+-   `string`: Processed string.
 
 <a name="filterURLForDisplay" href="#filterURLForDisplay">#</a> **filterURLForDisplay**
 
@@ -72,7 +93,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: The authority part of the URL.
+-   `(string|void)`: The authority part of the URL.
 
 <a name="getFragment" href="#getFragment">#</a> **getFragment**
 
@@ -91,7 +112,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: The fragment part of the URL.
+-   `(string|void)`: The fragment part of the URL.
 
 <a name="getPath" href="#getPath">#</a> **getPath**
 
@@ -110,7 +131,26 @@ _Parameters_
 
 _Returns_
 
--   `?string`: The path part of the URL.
+-   `(string|void)`: The path part of the URL.
+
+<a name="getPathAndQueryString" href="#getPathAndQueryString">#</a> **getPathAndQueryString**
+
+Returns the path part and query string part of the URL.
+
+_Usage_
+
+```js
+const pathAndQueryString1 = getPathAndQueryString( 'http://localhost:8080/this/is/a/test?query=true' ); // '/this/is/a/test?query=true'
+const pathAndQueryString2 = getPathAndQueryString( 'https://wordpress.org/help/faq/' ); // '/help/faq'
+```
+
+_Parameters_
+
+-   _url_ `string`: The full URL.
+
+_Returns_
+
+-   `string`: The path part and query string part of the URL.
 
 <a name="getProtocol" href="#getProtocol">#</a> **getProtocol**
 
@@ -129,7 +169,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: The protocol part of the URL.
+-   `(string|void)`: The protocol part of the URL.
 
 <a name="getQueryArg" href="#getQueryArg">#</a> **getQueryArg**
 
@@ -143,12 +183,12 @@ const foo = getQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'foo' ); // ba
 
 _Parameters_
 
--   _url_ `string`: URL
--   _arg_ `string`: Query arg name
+-   _url_ `string`: URL.
+-   _arg_ `string`: Query arg name.
 
 _Returns_
 
--   `(Array|string)`: Query arg value.
+-   `(QueryArgParsed|undefined)`: Query arg value.
 
 <a name="getQueryString" href="#getQueryString">#</a> **getQueryString**
 
@@ -157,8 +197,7 @@ Returns the query string part of the URL.
 _Usage_
 
 ```js
-const queryString1 = getQueryString( 'http://localhost:8080/this/is/a/test?query=true#fragment' ); // 'query=true'
-const queryString2 = getQueryString( 'https://wordpress.org#fragment?query=false&search=hello' ); // 'query=false&search=hello'
+const queryString = getQueryString( 'http://localhost:8080/this/is/a/test?query=true#fragment' ); // 'query=true'
 ```
 
 _Parameters_
@@ -167,7 +206,7 @@ _Parameters_
 
 _Returns_
 
--   `?string`: The query string part of the URL.
+-   `(string|void)`: The query string part of the URL.
 
 <a name="hasQueryArg" href="#hasQueryArg">#</a> **hasQueryArg**
 
@@ -181,8 +220,8 @@ const hasBar = hasQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'bar' ); //
 
 _Parameters_
 
--   _url_ `string`: URL
--   _arg_ `string`: Query arg name
+-   _url_ `string`: URL.
+-   _arg_ `string`: Query arg name.
 
 _Returns_
 
@@ -209,6 +248,11 @@ _Returns_
 <a name="isURL" href="#isURL">#</a> **isURL**
 
 Determines whether the given string looks like a URL.
+
+_Related_
+
+-   <https://url.spec.whatwg.org/>
+-   <https://url.spec.whatwg.org/#valid-url-string>
 
 _Usage_
 
@@ -331,11 +375,11 @@ const actualURL = prependHTTP( 'wordpress.org' ); // http://wordpress.org
 
 _Parameters_
 
--   _url_ `string`: The URL to test
+-   _url_ `string`: The URL to test.
 
 _Returns_
 
--   `string`: The updated URL
+-   `string`: The updated URL.
 
 <a name="removeQueryArgs" href="#removeQueryArgs">#</a> **removeQueryArgs**
 
@@ -349,12 +393,12 @@ const newUrl = removeQueryArgs( 'https://wordpress.org?foo=bar&bar=baz&baz=fooba
 
 _Parameters_
 
--   _url_ `string`: URL
--   _args_ `...string`: Query Args
+-   _url_ `string`: URL.
+-   _args_ `...string`: Query Args.
 
 _Returns_
 
--   `string`: Updated URL
+-   `string`: Updated URL.
 
 <a name="safeDecodeURI" href="#safeDecodeURI">#</a> **safeDecodeURI**
 

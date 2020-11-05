@@ -36,6 +36,7 @@ import { noop } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { Component, createRef } from '@wordpress/element';
 import { TAB } from '@wordpress/keycodes';
+import { pure } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -74,7 +75,8 @@ export class Alpha extends Component {
 
 	decrease( amount = 0.01 ) {
 		const { hsl, onChange = noop } = this.props;
-		const intValue = parseInt( hsl.a * 100, 10 ) - parseInt( amount * 100, 10 );
+		const intValue =
+			parseInt( hsl.a * 100, 10 ) - parseInt( amount * 100, 10 );
 		const change = {
 			h: hsl.h,
 			s: hsl.s,
@@ -87,7 +89,11 @@ export class Alpha extends Component {
 
 	handleChange( e ) {
 		const { onChange = noop } = this.props;
-		const change = calculateAlphaChange( e, this.props, this.container.current );
+		const change = calculateAlphaChange(
+			e,
+			this.props,
+			this.container.current
+		);
 		if ( change ) {
 			onChange( change, e );
 		}
@@ -151,7 +157,8 @@ export class Alpha extends Component {
 						ref={ this.container }
 						onMouseDown={ this.handleMouseDown }
 						onTouchMove={ this.handleChange }
-						onTouchStart={ this.handleChange }>
+						onTouchStart={ this.handleChange }
+					>
 						<div
 							tabIndex="0"
 							role="slider"
@@ -174,4 +181,4 @@ export class Alpha extends Component {
 	}
 }
 
-export default Alpha;
+export default pure( Alpha );

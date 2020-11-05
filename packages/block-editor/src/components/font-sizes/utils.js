@@ -11,10 +11,14 @@ import { find, kebabCase } from 'lodash';
  * @param {?string} fontSizeAttribute       Content of the font size attribute (slug).
  * @param {?number} customFontSizeAttribute Contents of the custom font size attribute (value).
  *
- * @return {?string} If fontSizeAttribute is set and an equal slug is found in fontSizes it returns the font size object for that slug.
+ * @return {?Object} If fontSizeAttribute is set and an equal slug is found in fontSizes it returns the font size object for that slug.
  * 					 Otherwise, an object with just the size value based on customFontSize is returned.
  */
-export const getFontSize = ( fontSizes, fontSizeAttribute, customFontSizeAttribute ) => {
+export const getFontSize = (
+	fontSizes,
+	fontSizeAttribute,
+	customFontSizeAttribute
+) => {
 	if ( fontSizeAttribute ) {
 		const fontSizeObject = find( fontSizes, { slug: fontSizeAttribute } );
 		if ( fontSizeObject ) {
@@ -25,6 +29,25 @@ export const getFontSize = ( fontSizes, fontSizeAttribute, customFontSizeAttribu
 		size: customFontSizeAttribute,
 	};
 };
+
+/**
+ * Returns the corresponding font size object for a given value.
+ *
+ * @param {Array} fontSizes Array of font size objects.
+ * @param {number} value Font size value.
+ *
+ * @return {Object} Font size object.
+ */
+export function getFontSizeObjectByValue( fontSizes, value ) {
+	const fontSizeObject = find( fontSizes, { size: value } );
+	if ( fontSizeObject ) {
+		return fontSizeObject;
+	}
+
+	return {
+		size: value,
+	};
+}
 
 /**
  * Returns a class based on fontSizeName.

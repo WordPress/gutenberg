@@ -1,3 +1,13 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 2.6.0 (2019-08-29)
+
+### Bug Fix
+
+- When there is no `options.version` param provided `deprecated` method warns with more relaxed tone.
+
 ## 2.0.4 (2019-01-03)
 
 ## 2.0.0 (2018-09-05)

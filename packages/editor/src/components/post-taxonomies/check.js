@@ -10,7 +10,9 @@ import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
 export function PostTaxonomiesCheck( { postType, taxonomies, children } ) {
-	const hasTaxonomies = some( taxonomies, ( taxonomy ) => includes( taxonomy.types, postType ) );
+	const hasTaxonomies = some( taxonomies, ( taxonomy ) =>
+		includes( taxonomy.types, postType )
+	);
 	if ( ! hasTaxonomies ) {
 		return null;
 	}
@@ -26,4 +28,3 @@ export default compose( [
 		};
 	} ),
 ] )( PostTaxonomiesCheck );
-

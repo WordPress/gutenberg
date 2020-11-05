@@ -1,0 +1,37 @@
+{
+	"apiVersion": 2,
+	"name": "core/query",
+	"category": "design",
+	"attributes": {
+		"queryId": {
+			"type": "number"
+		},
+		"query": {
+			"type": "object",
+			"default": {
+				"perPage": null,
+				"pages": 1,
+				"offset": 0,
+				"postType": "post",
+				"categoryIds": [],
+				"tagIds": [],
+				"order": "desc",
+				"orderBy": "date",
+				"author": "",
+				"search": "",
+				"exclude": [],
+				"sticky": ""
+			}
+		}
+	},
+	"providesContext": {
+		"queryId": "queryId",
+		"query": "query"
+	},
+	"usesContext": [
+		"postId"
+	],
+	"supports": {
+		"html": false
+	}
+}

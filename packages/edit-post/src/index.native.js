@@ -2,27 +2,34 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
+import '@wordpress/viewport';
 import '@wordpress/notices';
-import { registerCoreBlocks } from '@wordpress/block-library';
-import { unregisterBlockType } from '@wordpress/blocks';
+import '@wordpress/format-library';
+import '@wordpress/reusable-blocks';
+import { render } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import './store';
+import Editor from './editor';
+
+let editorInitialized = false;
 
 /**
- * Initializes the Editor.
+ * Initializes the Editor and returns a componentProvider
+ * that can be registered with `AppRegistry.registerComponent`
+ *
+ * @param {string}  id           Unique identifier for editor instance.
+ * @param {Object}  postType     Post type of the post to edit.
+ * @param {Object}  postId       ID of the post to edit (unused right now)
  */
-export function initializeEditor() {
-	// register and setup blocks
-	registerCoreBlocks();
-
-	// disable Code and More blocks for the release
-	// eslint-disable-next-line no-undef
-	if ( typeof __DEV__ === 'undefined' || ! __DEV__ ) {
-		unregisterBlockType( 'core/code' );
-		unregisterBlockType( 'core/more' );
+export function initializeEditor( id, postType, postId ) {
+	if ( editorInitialized ) {
+		return;
 	}
-}
 
+	editorInitialized = true;
+
+	render( <Editor postId={ postId } postType={ postType } />, id );
+}

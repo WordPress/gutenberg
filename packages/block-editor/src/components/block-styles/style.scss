@@ -5,54 +5,59 @@
 }
 
 .block-editor-block-styles__item {
-	width: calc(50% - #{ $grid-size-small });
-	margin: $grid-size-small 0;
+	width: calc(50% - #{ $grid-unit-05 });
+	margin: $grid-unit-05 0;
 	flex-shrink: 0;
 	cursor: pointer;
 	overflow: hidden;
-	border-radius: $radius-round-rectangle;
-	padding: $grid-size-small;
-
-	&.is-active {
-		@include block-style__focus-active();
-		box-shadow: 0 0 0 2px $dark-gray-500;
-	}
+	border-radius: $radius-block-ui;
+	padding: $grid-unit-05 * 1.5;
+	display: flex;
+	flex-direction: column;
 
 	&:focus {
-		@include block-style__focus-active();
+		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+
+		// Windows High Contrast mode will show this outline, but not the box-shadow.
+		outline: 2px solid transparent;
 	}
 
-	&:hover {
-		@include block-style__hover;
+	&:hover .block-editor-block-styles__item-preview {
+		border-color: var(--wp-admin-theme-color);
+	}
+
+	&.is-active {
+		.block-editor-block-styles__item-label {
+			font-weight: bold;
+		}
+
+		.block-editor-block-styles__item-preview {
+			margin: 0;
+			border: 2px solid $gray-900;
+		}
 	}
 }
 
+// Show a little preview thumbnail for style variations.
 .block-editor-block-styles__item-preview {
 	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
-	border: 1px solid rgba($dark-gray-900, 0.2);
-	overflow: hidden;
 	padding: 0;
-	text-align: initial;
-	border-radius: $radius-round-rectangle;
+	margin: 2px;
+	border-radius: $radius-block-ui;
 	display: flex;
-	height: 60px;
+	overflow: hidden;
 	background: $white;
+	align-items: center;
+	flex-grow: 1;
+	min-height: 80px;
+	max-height: 160px;
+}
 
-	// Actual preview contents.
-	.block-editor-block-preview__content {
-		transform: scale(0.7);
-		transform-origin: center center;
-		width: 100%;
-
-		// Unset some of the styles that might be inherited from the editor style.
-		margin: 0;
-		padding: 0;
-		overflow: visible;
-		min-height: auto;
-	}
+.block-editor-block-switcher__styles__menugroup {
+	position: relative;
 }
 
 .block-editor-block-styles__item-label {
 	text-align: center;
-	padding: 4px 2px;
+	padding: 4px 0;
 }

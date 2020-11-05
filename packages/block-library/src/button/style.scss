@@ -1,8 +1,27 @@
-$blocks-button__height: 56px;
+$blocks-button__height: 3.1em;
 
-.wp-block-button {
+// Prefer the link selector instead of the regular button classname
+// to support the previous markup in addition to the new one.
+.wp-block-button__link {
 	color: $white;
-	margin-bottom: 1.5em;
+	background-color: #32373c;
+	border: none;
+	border-radius: $blocks-button__height / 2;
+	box-shadow: none;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 1.125em;
+	padding: 0.667em 1.333em;
+	text-align: center;
+	text-decoration: none;
+	overflow-wrap: break-word;
+
+	&:hover,
+	&:focus,
+	&:active,
+	&:visited {
+		color: $white;
+	}
 
 	&.aligncenter {
 		text-align: center;
@@ -14,39 +33,47 @@ $blocks-button__height: 56px;
 	}
 }
 
-.wp-block-button__link {
-	background-color: $dark-gray-700;
-	border: none;
-	border-radius: $blocks-button__height / 2;
-	box-shadow: none;
-	color: inherit;
-	cursor: pointer;
-	display: inline-block;
-	font-size: $big-font-size;
-	margin: 0;
-	padding: 12px 24px;
-	text-align: center;
-	text-decoration: none;
-	white-space: normal;
-	overflow-wrap: break-word;
+.wp-block-button {
+	&.has-custom-width {
+		max-width: none;
+		.wp-block-button__link {
+			width: 100%;
+		}
+	}
 
-	&:hover,
-	&:focus,
-	&:active,
-	&:visited {
-		color: inherit;
+	&.wp-block-button__width-25 {
+		width: 25%;
+	}
+
+	&.wp-block-button__width-50 {
+		width: 50%;
+	}
+
+	&.wp-block-button__width-75 {
+		width: 75%;
+	}
+
+	&.wp-block-button__width-100 {
+		width: 100%;
 	}
 }
 
-.is-style-squared .wp-block-button__link {
+// the first selector is required for old buttons markup
+.wp-block-button.is-style-squared,
+.wp-block-button__link.wp-block-button.is-style-squared {
 	border-radius: 0;
 }
 
-.is-style-outline {
-	color: $dark-gray-700;
 
-	.wp-block-button__link {
-		background-color: transparent;
-		border: 2px solid;
-	}
+// the first selector is required for old buttons markup
+.wp-block-button.no-border-radius,
+.wp-block-button__link.no-border-radius {
+	border-radius: 0 !important;
+}
+
+.is-style-outline > .wp-block-button__link,
+.wp-block-button__link.is-style-outline {
+	color: #32373c;
+	background-color: transparent;
+	border: 2px solid;
 }

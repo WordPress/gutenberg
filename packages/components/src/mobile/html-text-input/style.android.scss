@@ -1,0 +1,21 @@
+@import "./style-common.scss";
+
+.htmlView {
+	font-family: $htmlFont;
+	padding-left: $padding;
+	padding-right: $padding;
+	padding-top: $padding;
+	padding-bottom: $padding + 16;
+}
+
+.htmlViewTitle {
+	font-family: $htmlFont;
+	padding-left: $padding;
+	padding-right: $padding;
+	padding-top: $padding;
+	padding-bottom: $padding;
+}
+
+.scrollView {
+	flex: 1;
+}

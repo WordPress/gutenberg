@@ -36,5 +36,7 @@ class MetaBoxVisibility extends Component {
 }
 
 export default withSelect( ( select, { id } ) => ( {
-	isVisible: select( 'core/edit-post' ).isEditorPanelEnabled( `meta-box-${ id }` ),
+	isVisible: select( 'core/edit-post' ).isEditorPanelEnabled(
+		`meta-box-${ id }`
+	),
 } ) )( MetaBoxVisibility );

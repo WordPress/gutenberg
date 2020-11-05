@@ -2,6 +2,15 @@
 
 For features included in the Gutenberg plugin, the deprecation policy is intended to support backward compatibility for two minor plugin releases, when possible. Features and code included in a stable release of WordPress are not included in this deprecation timeline, and are instead subject to the [versioning policies of the WordPress project](https://make.wordpress.org/core/handbook/about/release-cycle/version-numbering/). The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 8.6.0
+
+- Block API integration with [Block Context](https://github.com/WordPress/gutenberg/blob/master/docs/designers-developers/developers/block-api/block-context.md) was updated. When registering a block use `usesContext` and `providesContext` pair in JavaScript files and `uses_context` and `provides_context` pair in PHP files instead of previous pair `context` and `providesContext`.
+
+## 8.3.0
+
+- The PHP function `gutenberg_get_post_from_context` has been removed. Use [Block Context](https://github.com/WordPress/gutenberg/blob/master/docs/designers-developers/developers/block-api/block-context.md) instead.
+- The old Block Pattern APIs `register_pattern`/`unregister_pattern` have been removed. Use the [new functions](https://github.com/WordPress/gutenberg/blob/master/docs/designers-developers/developers/block-api/block-patterns.md#register_block_pattern) instead.
+
 ## 5.5.0
 
 - The PHP function `gutenberg_init` has been removed.
@@ -59,7 +68,7 @@ For features included in the Gutenberg plugin, the deprecation policy is intende
 - The PHP function `gutenberg_get_block_categories` has been removed. Use [`get_block_categories`](https://developer.wordpress.org/reference/functions/get_block_categories/) instead.
 - The PHP function `register_tinymce_scripts` has been removed. Use [`wp_register_tinymce_scripts`](https://developer.wordpress.org/reference/functions/wp_register_tinymce_scripts/) instead.
 - The PHP function `gutenberg_register_post_types` has been removed.
-- The `gutenberg` theme support option has been removed. Use [`align-wide`](https://wordpress.org/gutenberg/handbook/designers-developers/developers/themes/theme-support/#wide-alignment) instead.
+- The `gutenberg` theme support option has been removed. Use [`align-wide`](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#wide-alignment) instead.
 - The PHP function `gutenberg_prepare_blocks_for_js` has been removed. Use [`get_block_editor_server_block_settings`](https://developer.wordpress.org/reference/functions/get_block_editor_server_block_settings/) instead.
 - The PHP function `gutenberg_load_list_reusable_blocks` has been removed.
 - The PHP function `_gutenberg_utf8_split` has been removed. Use `_mb_substr` instead.
@@ -124,7 +133,7 @@ For features included in the Gutenberg plugin, the deprecation policy is intende
 - `wp.components.CodeEditor` has been removed. Used `wp.codeEditor` directly instead.
 - `wp.blocks.setUnknownTypeHandlerName` has been removed. Please use `setFreeformContentHandlerName` and `setUnregisteredTypeHandlerName` instead.
 - `wp.blocks.getUnknownTypeHandlerName` has been removed. Please use `getFreeformContentHandlerName` and `getUnregisteredTypeHandlerName` instead.
-- The Reusable Blocks Data API was marked as experimental as it's subject to change in the future.
+- The Reusable blocks Data API was marked as experimental as it's subject to change in the future.
 
 ## 4.1.0
 
@@ -241,11 +250,11 @@ For features included in the Gutenberg plugin, the deprecation policy is intende
 ## 3.0.0
 
  - `wp.blocks.registerCoreBlocks` function removed. Please use `wp.coreBlocks.registerCoreBlocks` instead.
- - Raw TinyMCE event handlers for `RichText` have been deprecated. Please use [documented props](/packages/editor/src/components/rich-text/README.md), ancestor event handler, or onSetup access to the internal editor instance event hub instead.
+ - Raw TinyMCE event handlers for `RichText` have been deprecated. Please use [documented props](https://github.com/WordPress/gutenberg/blob/v3.0.0/editor/components/rich-text/README.md), ancestor event handler, or onSetup access to the internal editor instance event hub instead.
 
 ## 2.8.0
 
- - `Original autocompleter interface in wp.components.Autocomplete` updated. Please use `latest autocompleter interface` instead. See [autocomplete](/packages/components/src/autocomplete/README.md) for more info.
+ - `Original autocompleter interface in wp.components.Autocomplete` updated. Please use `latest autocompleter interface` instead. See [autocomplete](https://github.com/WordPress/gutenberg/blob/v2.8.0/components/autocomplete/README.md) for more info.
  - `getInserterItems`: the `allowedBlockTypes` argument is now mandatory.
  - `getFrecentInserterItems`: the `allowedBlockTypes` argument is now mandatory.
 

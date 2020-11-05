@@ -20,6 +20,9 @@ ruleTester.run( 'valid-sprintf', rule, {
 			code: `sprintf( '%s', 'substitute' )`,
 		},
 		{
+			code: `sprintf( '%1$d%%', 500 )`,
+		},
+		{
 			code: `sprintf( __( '%s' ), 'substitute' )`,
 		},
 		{
@@ -37,39 +40,92 @@ ruleTester.run( 'valid-sprintf', rule, {
 		{
 			code: `var value = ''; sprintf( value, 'substitute' )`,
 		},
+		{
+			code: `
+sprintf(
+	/* translators: 1: number of blocks. 2: average rating. */
+	_n(
+		'This author has %1$d block, with an average rating of %2$d.',
+		'This author has %1$d blocks, with an average rating of %2$d.',
+		authorBlockCount
+	),
+	authorBlockCount,
+	authorBlockRating
+);`,
+		},
+		{
+			code: `i18n.sprintf( '%s', 'substitute' )`,
+		},
+		{
+			code: `i18n.sprintf( i18n.__( '%s' ), 'substitute' )`,
+		},
+		{
+			code: `sprintf( ...args )`,
+		},
+		{
+			code: `sprintf( '%1$s %2$s', 'foo', 'bar' )`,
+		},
+		{
+			code: `sprintf( '%(greeting)s', 'Hello' )`,
+		},
+		{
+			code: `sprintf( '%(greeting)s %(toWhom)s', 'Hello', 'World' )`,
+		},
 	],
 	invalid: [
 		{
 			code: `sprintf()`,
-			errors: [ { message: 'sprintf must be called with a format string' } ],
+			errors: [ { messageId: 'noFormatString' } ],
 		},
 		{
 			code: `sprintf( '%s' )`,
-			errors: [ { message: 'sprintf must be called with placeholder value argument(s)' } ],
+			errors: [ { messageId: 'noPlaceholderArgs' } ],
 		},
 		{
 			code: `sprintf( 1, 'substitute' )`,
-			errors: [ { message: 'sprintf must be called with a valid format string' } ],
+			errors: [ { messageId: 'invalidFormatString' } ],
 		},
 		{
 			code: `sprintf( [], 'substitute' )`,
-			errors: [ { message: 'sprintf must be called with a valid format string' } ],
+			errors: [ { messageId: 'invalidFormatString' } ],
 		},
 		{
 			code: `sprintf( '%%', 'substitute' )`,
-			errors: [ { message: 'sprintf format string must contain at least one placeholder' } ],
+			errors: [ { messageId: 'noPlaceholders' } ],
 		},
 		{
 			code: `sprintf( __( '%%' ), 'substitute' )`,
-			errors: [ { message: 'sprintf format string must contain at least one placeholder' } ],
+			errors: [ { messageId: 'noPlaceholders' } ],
 		},
 		{
 			code: `sprintf( _n( '%s', '' ), 'substitute' )`,
-			errors: [ { message: 'sprintf format string options must have the same number of placeholders' } ],
+			errors: [ { messageId: 'placeholderMismatch' } ],
 		},
 		{
 			code: `sprintf( _n( '%s', '%s %s' ), 'substitute' )`,
-			errors: [ { message: 'sprintf format string options must have the same number of placeholders' } ],
+			errors: [ { messageId: 'placeholderMismatch' } ],
+		},
+		{
+			code: `
+sprintf(
+	/* translators: 1: number of blocks. 2: average rating. */
+	_n(
+		'This author has %d block, with an average rating of %d.',
+		'This author has %d blocks, with an average rating of %d.',
+		authorBlockCount
+	),
+	authorBlockCount,
+	authorBlockRating
+);`,
+			errors: [ { messageId: 'noOrderedPlaceholders' } ],
+		},
+		{
+			code: `i18n.sprintf()`,
+			errors: [ { messageId: 'noFormatString' } ],
+		},
+		{
+			code: `i18n.sprintf( i18n.__( '%%' ), 'substitute' )`,
+			errors: [ { messageId: 'noPlaceholders' } ],
 		},
 	],
 } );

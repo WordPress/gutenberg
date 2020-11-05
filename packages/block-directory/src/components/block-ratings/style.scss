@@ -1,0 +1,15 @@
+.block-directory-block-ratings {
+	display: flex;
+	> div {
+		line-height: 1;
+		display: flex;
+	}
+
+	.block-directory-block-ratings__rating-count {
+		font-size: ms(-2);
+	}
+
+	svg {
+		fill: #ffb900;
+	}
+}

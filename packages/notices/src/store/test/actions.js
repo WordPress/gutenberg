@@ -17,15 +17,10 @@ describe( 'actions', () => {
 		const status = 'status';
 		const content = 'my message';
 
-		it( 'yields actions when options is empty', () => {
+		it( 'returns an action when options is empty', () => {
 			const result = createNotice( status, content );
 
-			expect( result.next().value ).toMatchObject( {
-				type: 'SPEAK',
-				message: content,
-			} );
-
-			expect( result.next().value ).toMatchObject( {
+			expect( result ).toMatchObject( {
 				type: 'CREATE_NOTICE',
 				context: DEFAULT_CONTEXT,
 				notice: {
@@ -34,6 +29,7 @@ describe( 'actions', () => {
 					isDismissible: true,
 					id: expect.any( String ),
 					actions: [],
+					type: 'default',
 				},
 			} );
 		} );
@@ -41,12 +37,7 @@ describe( 'actions', () => {
 		it( 'normalizes content to string', () => {
 			const result = createNotice( status, <strong>Hello</strong> );
 
-			expect( result.next().value ).toMatchObject( {
-				type: 'SPEAK',
-				message: expect.any( String ),
-			} );
-
-			expect( result.next().value ).toMatchObject( {
+			expect( result ).toMatchObject( {
 				type: 'CREATE_NOTICE',
 				context: DEFAULT_CONTEXT,
 				notice: {
@@ -55,11 +46,12 @@ describe( 'actions', () => {
 					isDismissible: true,
 					id: expect.any( String ),
 					actions: [],
+					type: 'default',
 				},
 			} );
 		} );
 
-		it( 'yields actions when options passed', () => {
+		it( 'returns an action when options passed', () => {
 			const context = 'foo';
 			const options = {
 				id,
@@ -69,25 +61,22 @@ describe( 'actions', () => {
 
 			const result = createNotice( status, content, options );
 
-			expect( result.next().value ).toMatchObject( {
-				type: 'SPEAK',
-				message: content,
-			} );
-
-			expect( result.next().value ).toEqual( {
+			expect( result ).toEqual( {
 				type: 'CREATE_NOTICE',
 				context,
 				notice: {
 					id,
 					status,
 					content,
+					spokenMessage: content,
 					isDismissible: false,
 					actions: [],
+					type: 'default',
 				},
 			} );
 		} );
 
-		it( 'yields action when speak disabled', () => {
+		it( 'returns an action when speak disabled', () => {
 			const result = createNotice(
 				undefined,
 				'my <strong>message</strong>',
@@ -99,16 +88,18 @@ describe( 'actions', () => {
 				}
 			);
 
-			expect( result.next().value ).toEqual( {
+			expect( result ).toEqual( {
 				type: 'CREATE_NOTICE',
 				context: DEFAULT_CONTEXT,
 				notice: {
 					id,
 					status: DEFAULT_STATUS,
 					content: 'my <strong>message</strong>',
+					spokenMessage: null,
 					__unstableHTML: true,
 					isDismissible: false,
 					actions: [],
+					type: 'default',
 				},
 			} );
 		} );
@@ -120,12 +111,7 @@ describe( 'actions', () => {
 
 			const result = createSuccessNotice( content );
 
-			expect( result.next().value ).toMatchObject( {
-				type: 'SPEAK',
-				message: content,
-			} );
-
-			expect( result.next().value ).toMatchObject( {
+			expect( result ).toMatchObject( {
 				type: 'CREATE_NOTICE',
 				context: DEFAULT_CONTEXT,
 				notice: {
@@ -133,6 +119,7 @@ describe( 'actions', () => {
 					content,
 					isDismissible: true,
 					id: expect.any( String ),
+					type: 'default',
 				},
 			} );
 		} );
@@ -144,12 +131,7 @@ describe( 'actions', () => {
 
 			const result = createInfoNotice( content );
 
-			expect( result.next().value ).toMatchObject( {
-				type: 'SPEAK',
-				message: content,
-			} );
-
-			expect( result.next().value ).toMatchObject( {
+			expect( result ).toMatchObject( {
 				type: 'CREATE_NOTICE',
 				context: DEFAULT_CONTEXT,
 				notice: {
@@ -157,6 +139,7 @@ describe( 'actions', () => {
 					content,
 					isDismissible: true,
 					id: expect.any( String ),
+					type: 'default',
 				},
 			} );
 		} );
@@ -168,12 +151,7 @@ describe( 'actions', () => {
 
 			const result = createErrorNotice( content );
 
-			expect( result.next().value ).toMatchObject( {
-				type: 'SPEAK',
-				message: content,
-			} );
-
-			expect( result.next().value ).toMatchObject( {
+			expect( result ).toMatchObject( {
 				type: 'CREATE_NOTICE',
 				context: DEFAULT_CONTEXT,
 				notice: {
@@ -181,6 +159,7 @@ describe( 'actions', () => {
 					content,
 					isDismissible: true,
 					id: expect.any( String ),
+					type: 'default',
 				},
 			} );
 		} );
@@ -192,12 +171,7 @@ describe( 'actions', () => {
 
 			const result = createWarningNotice( content );
 
-			expect( result.next().value ).toMatchObject( {
-				type: 'SPEAK',
-				message: content,
-			} );
-
-			expect( result.next().value ).toMatchObject( {
+			expect( result ).toMatchObject( {
 				type: 'CREATE_NOTICE',
 				context: DEFAULT_CONTEXT,
 				notice: {
@@ -205,6 +179,7 @@ describe( 'actions', () => {
 					content,
 					isDismissible: true,
 					id: expect.any( String ),
+					type: 'default',
 				},
 			} );
 		} );

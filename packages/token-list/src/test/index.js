@@ -80,7 +80,9 @@ describe( 'token-list', () => {
 		it( 'returns a generator', () => {
 			const list = new TokenList();
 
-			expect( list[ Symbol.iterator ]().next ).toEqual( expect.any( Function ) );
+			expect( list[ Symbol.iterator ]().next ).toEqual(
+				expect.any( Function )
+			);
 		} );
 
 		it( 'yields entries', () => {

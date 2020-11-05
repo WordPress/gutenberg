@@ -2,10 +2,10 @@
  * A function that adds two parameters.
  *
  * @deprecated Use native addition instead.
- * @since v2
+ * @since 2.0.0
  *
  * @see addition
- * @link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Arithmetic_Operators
  *
  * @param {number} firstParam The first param to add.
  * @param {number} secondParam The second param to add.

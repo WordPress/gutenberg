@@ -1,3 +1,22 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 2.21.0 (2020-09-03)
+
+### New Feature
+
+- The `deleteEntityRecord` and `removeItems` actions have been added.
+- The `isDeletingEntityRecord` and `getLastEntityDeleteError` selectors have been added.
+- A `delete<entity.name>` helper is created for every registered entity.
+
+## 2.3.0 (2019-05-21)
+
+### New features
+
+- The `getAutosave`, `getAutosaves` and `getCurrentUser` selectors have been added.
+- The `receiveAutosaves` and `receiveCurrentUser` actions have been added.
+
 ## 2.0.16 (2019-01-03)
 
 ### Bug Fixes

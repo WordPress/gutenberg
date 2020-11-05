@@ -60,11 +60,13 @@ describe( 'getKindEntities', () => {
 	} );
 
 	it( 'should fetch and add the entities', async () => {
-		const fetchedEntities = [ {
-			baseURL: '/wp/v2/posts',
-			kind: 'postType',
-			name: 'post',
-		} ];
+		const fetchedEntities = [
+			{
+				baseURL: '/wp/v2/posts',
+				kind: 'postType',
+				name: 'post',
+			},
+		];
 		const fulfillment = getKindEntities( 'postType' );
 		// Start the generator
 		fulfillment.next();

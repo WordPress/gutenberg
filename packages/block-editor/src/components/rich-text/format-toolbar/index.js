@@ -9,26 +9,56 @@ import { orderBy } from 'lodash';
  */
 
 import { __ } from '@wordpress/i18n';
-import { Toolbar, Slot, DropdownMenu } from '@wordpress/components';
+import {
+	ToolbarItem,
+	ToolbarGroup,
+	DropdownMenu,
+	Slot,
+} from '@wordpress/components';
+import { chevronDown } from '@wordpress/icons';
 
-const FormatToolbar = ( { controls } ) => {
+const POPOVER_PROPS = {
+	position: 'bottom right',
+	isAlternate: true,
+};
+
+const FormatToolbar = () => {
 	return (
-		<div className="editor-format-toolbar block-editor-format-toolbar">
-			<Toolbar>
-				{ controls.map( ( format ) =>
-					<Slot name={ `RichText.ToolbarControls.${ format }` } key={ format } />
+		<div className="block-editor-format-toolbar">
+			<ToolbarGroup>
+				{ [ 'bold', 'italic', 'link', 'text-color' ].map(
+					( format ) => (
+						<Slot
+							name={ `RichText.ToolbarControls.${ format }` }
+							key={ format }
+						/>
+					)
 				) }
 				<Slot name="RichText.ToolbarControls">
-					{ ( fills ) => fills.length !== 0 &&
-						<DropdownMenu
-							icon={ false }
-							position="bottom left"
-							label={ __( 'More Rich Text Controls' ) }
-							controls={ orderBy( fills.map( ( [ { props } ] ) => props ), 'title' ) }
-						/>
+					{ ( fills ) =>
+						fills.length !== 0 && (
+							<ToolbarItem>
+								{ ( toggleProps ) => (
+									<DropdownMenu
+										icon={ chevronDown }
+										label={ __(
+											'More rich text controls'
+										) }
+										toggleProps={ toggleProps }
+										controls={ orderBy(
+											fills.map(
+												( [ { props } ] ) => props
+											),
+											'title'
+										) }
+										popoverProps={ POPOVER_PROPS }
+									/>
+								) }
+							</ToolbarItem>
+						)
 					}
 				</Slot>
-			</Toolbar>
+			</ToolbarGroup>
 		</div>
 	);
 };

@@ -1,42 +1,29 @@
 /**
  * WordPress dependencies
  */
-import { Fragment } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
-import { navigateRegions } from '@wordpress/components';
+import { Popover } from '@wordpress/components';
+import { PluginArea } from '@wordpress/plugins';
 
 /**
  * Internal dependencies
  */
-import Header from '../header';
+import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provider';
 import Sidebar from '../sidebar';
-import WidgetArea from '../widget-area';
+import Interface from './interface';
+import UnsavedChangesWarning from './unsaved-changes-warning';
 
-function Layout() {
-	const areas = [
-		__( 'Sidebar' ),
-		__( 'Footer' ),
-		__( 'Header' ),
-	];
-
+function Layout( { blockEditorSettings } ) {
 	return (
-		<Fragment>
-			<Header />
+		<WidgetAreasBlockEditorProvider
+			blockEditorSettings={ blockEditorSettings }
+		>
+			<Interface blockEditorSettings={ blockEditorSettings } />
 			<Sidebar />
-			<div
-				className="edit-widgets-layout__content"
-				role="region"
-				aria-label={ __( 'Widgets screen content' ) }
-				tabIndex="-1"
-			>
-				{ areas.map( ( area, index ) => (
-					<div key={ index } className="edit-widgets-layout__area">
-						<WidgetArea title={ area } initialOpen={ index === 0 } />
-					</div>
-				) ) }
-			</div>
-		</Fragment>
+			<Popover.Slot />
+			<PluginArea />
+			<UnsavedChangesWarning />
+		</WidgetAreasBlockEditorProvider>
 	);
 }
 
-export default navigateRegions( Layout );
+export default Layout;

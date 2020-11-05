@@ -1,9 +1,24 @@
 {
+	"apiVersion": 2,
 	"name": "core/column",
-	"category": "common",
+	"category": "text",
+	"parent": [
+		"core/columns"
+	],
 	"attributes": {
 		"verticalAlignment": {
 			"type": "string"
+		},
+		"width": {
+			"type": "string"
+		},
+		"templateLock": {
+			"type": "string"
 		}
+	},
+	"supports": {
+		"anchor": true,
+		"reusable": false,
+		"html": false
 	}
 }

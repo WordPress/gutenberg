@@ -7,53 +7,70 @@ import { find } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Toolbar } from '@wordpress/components';
-import { withViewportMatch } from '@wordpress/viewport';
-import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import { withBlockEditContext } from '../block-edit/context';
+import { ToolbarGroup } from '@wordpress/components';
+import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 
 const DEFAULT_ALIGNMENT_CONTROLS = [
 	{
-		icon: 'editor-alignleft',
+		icon: alignLeft,
 		title: __( 'Align text left' ),
 		align: 'left',
 	},
 	{
-		icon: 'editor-aligncenter',
+		icon: alignCenter,
 		title: __( 'Align text center' ),
 		align: 'center',
 	},
 	{
-		icon: 'editor-alignright',
+		icon: alignRight,
 		title: __( 'Align text right' ),
 		align: 'right',
 	},
 ];
 
-export function AlignmentToolbar( { isCollapsed, value, onChange, alignmentControls = DEFAULT_ALIGNMENT_CONTROLS } ) {
+const POPOVER_PROPS = {
+	position: 'bottom right',
+	isAlternate: true,
+};
+
+export function AlignmentToolbar( props ) {
+	const {
+		value,
+		onChange,
+		alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
+		label = __( 'Change text alignment' ),
+		isCollapsed = true,
+		isRTL,
+	} = props;
+
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
 
-	const activeAlignment = find( alignmentControls, ( control ) => control.align === value );
+	const activeAlignment = find(
+		alignmentControls,
+		( control ) => control.align === value
+	);
+
+	function setIcon() {
+		if ( activeAlignment ) return activeAlignment.icon;
+		return isRTL ? alignRight : alignLeft;
+	}
 
 	return (
-		<Toolbar
+		<ToolbarGroup
 			isCollapsed={ isCollapsed }
-			icon={ activeAlignment ? activeAlignment.icon : 'editor-alignleft' }
-			label={ __( 'Change Text Alignment' ) }
+			icon={ setIcon() }
+			label={ label }
+			popoverProps={ POPOVER_PROPS }
 			controls={ alignmentControls.map( ( control ) => {
 				const { align } = control;
-				const isActive = ( value === align );
+				const isActive = value === align;
 
 				return {
 					...control,
 					isActive,
+					role: isCollapsed ? 'menuitemradio' : undefined,
 					onClick: applyOrUnset( align ),
 				};
 			} ) }
@@ -61,20 +78,4 @@ export function AlignmentToolbar( { isCollapsed, value, onChange, alignmentContr
 	);
 }
 
-export default compose(
-	withBlockEditContext( ( { clientId } ) => {
-		return {
-			clientId,
-		};
-	} ),
-	withViewportMatch( { isLargeViewport: 'medium' } ),
-	withSelect( ( select, { clientId, isLargeViewport, isCollapsed } ) => {
-		const { getBlockRootClientId, getSettings } = select( 'core/block-editor' );
-		return {
-			isCollapsed: isCollapsed || ! isLargeViewport || (
-				! getSettings().hasFixedToolbar &&
-				getBlockRootClientId( clientId )
-			),
-		};
-	} ),
-)( AlignmentToolbar );
+export default AlignmentToolbar;

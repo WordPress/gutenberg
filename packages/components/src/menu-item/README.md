@@ -23,7 +23,7 @@ const MyMenuItem = withState( {
 
 ## Props
 
-MenuItem supports the following props. Any additional props are passed through to the underlying [Button](/packages/components/src/button/README.md) or [IconButton](/packages/components/src/icon-button/README.md) component.
+MenuItem supports the following props. Any additional props are passed through to the underlying [Button](/packages/components/src/button/README.md).
 
 ### `children`
 
@@ -31,8 +31,6 @@ MenuItem supports the following props. Any additional props are passed through t
 - Required: No
 
 Element to render as child of button.
-
-Element
 
 ### `info`
 
@@ -48,7 +46,14 @@ Refer to documentation for [`label`](#label).
 - Type: `string`
 - Required: No
 
-Refer to documentation for [IconButton's `icon` prop](/packages/components/src/icon-button/README.md#icon).
+Refer to documentation for [Button's `icon` prop](/packages/components/src/icon-button/README.md#icon).
+
+### `isSelected`
+
+- Type: `boolean`
+- Required: No
+
+Whether or not the menu item is currently selected.
 
 ### `shortcut`
 

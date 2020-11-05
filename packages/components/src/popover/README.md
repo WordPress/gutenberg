@@ -18,7 +18,7 @@ const MyPopover = withState( {
 		setState( ( state ) => ( { isVisible: ! state.isVisible } ) );
 	};
 	return (
-		<Button isDefault onClick={ toggleVisible }>
+		<Button isSecondary onClick={ toggleVisible }>
 			Toggle Popover!
 			{ isVisible && (
 				<Popover>
@@ -70,7 +70,7 @@ The direction in which the popover should open relative to its parent node. Spec
 
 - Type: `String`
 - Required: No
-- Default: `"top center"`
+- Default: `"bottom right"`
 
 ### children
 
@@ -93,9 +93,11 @@ A callback invoked when the popover should be closed.
 - Type: `Function`
 - Required: No
 
-### onClickOutside
+### onFocusOutside
 
-A callback invoked when the user clicks outside the opened popover, passing the click event. The popover should be closed in response to this interaction. Defaults to `onClose`.
+A callback invoked when the focus leaves the opened popover. This should only be provided in advanced use-cases when a Popover should close under specific circumstances; for example, if the new `document.activeElement` is content of or otherwise controlling Popover visibility.
+
+Defaults to `onClose` when not provided.
 
 - Type: `Function`
 - Required: No
@@ -121,7 +123,25 @@ Opt-in prop to show popovers fullscreen on mobile, pass `false` in this prop to 
 
  - Type: `Boolean`
  - Required: No
- - Default: `false`
+ - Default: `true`
+
+### anchorRect
+
+A custom `DOMRect` object at which to position the popover. `anchorRect` is used when the position (custom `DOMRect` object) of the popover needs to be fixed at one location all the time.
+
+- Type: `DOMRect`
+- Required: No
+
+### getAnchorRect
+
+A callback function which is used to override the anchor value computation algorithm. `anchorRect` will take precedence over this prop, if both are passed together.
+
+If you need the `DOMRect` object i.e., the position of popover to be calculated on every time, the popover re-renders, then use `getAnchorRect`.
+
+`getAnchorRect` callback function receives a reference to the popover anchor element as a function parameter and it should return a `DOMRect` objcet.
+
+- Type: `Function`
+- Required: No
 
 ## Methods
 

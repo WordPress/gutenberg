@@ -6,9 +6,7 @@ import { count } from '../';
 
 const mockData = {
 	l10n: {
-		shortcodes: [
-			'shortcode',
-		],
+		shortcodes: [ 'shortcode' ],
 	},
 };
 
@@ -100,7 +98,11 @@ describe( 'WordCounter', () => {
 		},
 	];
 
-	const types = [ 'words', 'characters_excluding_spaces', 'characters_including_spaces' ];
+	const types = [
+		'words',
+		'characters_excluding_spaces',
+		'characters_including_spaces',
+	];
 
 	dataProvider.forEach( ( item ) => {
 		types.forEach( ( type ) => {
@@ -111,4 +113,3 @@ describe( 'WordCounter', () => {
 		} );
 	} );
 } );
-

@@ -45,7 +45,7 @@ Producing an equivalent "Post published" notice would require code like this:
 
 ```js
 ( function( wp ) {
-	wp.data.dispatch('core/notices').createNotice(
+	wp.data.dispatch( 'core/notices' ).createNotice(
 		'success', // Can be one of: success, info, warning, error.
 		'Post published.', // Text string to display.
 		{
@@ -54,9 +54,9 @@ Producing an equivalent "Post published" notice would require code like this:
 			actions: [
 				{
 					url: '#',
-					label: 'View post'
-				}
-			]
+					label: 'View post',
+				},
+			],
 		}
 	);
 } )( window.wp );

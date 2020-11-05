@@ -1,22 +1,27 @@
-/**
- * External dependencies
- */
-import { flowRight } from 'lodash';
+// Utils
+export { default as createHigherOrderComponent } from './utils/create-higher-order-component';
 
-export { default as createHigherOrderComponent } from './create-higher-order-component';
-export { default as ifCondition } from './if-condition';
-export { default as pure } from './pure';
-export { default as withGlobalEvents } from './with-global-events';
-export { default as withInstanceId } from './with-instance-id';
-export { default as withSafeTimeout } from './with-safe-timeout';
-export { default as withState } from './with-state';
+// Compose helper (aliased flowRight from Lodash)
+export { default as compose } from './higher-order/compose';
 
-/**
- * Composes multiple higher-order components into a single higher-order component. Performs right-to-left function
- * composition, where each successive invocation is supplied the return value of the previous.
- *
- * @param {...Function} hocs The HOC functions to invoke.
- *
- * @return {Function} Returns the new composite function.
- */
-export { flowRight as compose };
+// Higher-order components
+export { default as ifCondition } from './higher-order/if-condition';
+export { default as pure } from './higher-order/pure';
+export { default as withGlobalEvents } from './higher-order/with-global-events';
+export { default as withInstanceId } from './higher-order/with-instance-id';
+export { default as withSafeTimeout } from './higher-order/with-safe-timeout';
+export { default as withState } from './higher-order/with-state';
+
+// Hooks
+export { default as useCopyOnClick } from './hooks/use-copy-on-click';
+export { default as __experimentalUseDragging } from './hooks/use-dragging';
+export { default as useInstanceId } from './hooks/use-instance-id';
+export { default as useKeyboardShortcut } from './hooks/use-keyboard-shortcut';
+export { default as useMediaQuery } from './hooks/use-media-query';
+export { default as usePrevious } from './hooks/use-previous';
+export { default as useReducedMotion } from './hooks/use-reduced-motion';
+export { default as useViewportMatch } from './hooks/use-viewport-match';
+export { default as useResizeObserver } from './hooks/use-resize-observer';
+export { default as useAsyncList } from './hooks/use-async-list';
+export { default as useWarnOnChange } from './hooks/use-warn-on-change';
+export { default as useDebounce } from './hooks/use-debounce';

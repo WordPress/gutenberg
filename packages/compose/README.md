@@ -1,6 +1,6 @@
 # Compose
 
-The `compose` package is a collection of handy [Higher Order Components](https://facebook.github.io/react/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
+The `compose` package is a collection of handy [Hooks](https://reactjs.org/docs/hooks-intro.html) and [Higher Order Components](https://facebook.github.io/react/docs/higher-order-components.html) (HOCs) you can use to wrap your WordPress components and provide some basic features like: state, instance id, pure...
 
 The `compose` function is an alias to [flowRight](https://lodash.com/docs/#flowRight) from Lodash. It comes from functional programming, and allows you to compose any number of functions. You might also think of this as layering functions; `compose` will execute the last function first, then sequentially move back through the previous functions passing the result of each function upward.
 
@@ -119,9 +119,177 @@ _Returns_
 
 -   `WPComponent`: Component class with generated display name assigned.
 
+<a name="useAsyncList" href="#useAsyncList">#</a> **useAsyncList**
+
+React hook returns an array which items get asynchronously appended from a source array.
+This behavior is useful if we want to render a list of items asynchronously for performance reasons.
+
+_Parameters_
+
+-   _list_ `Array`: Source array.
+
+_Returns_
+
+-   `Array`: Async array.
+
+<a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
+
+Copies the text to the clipboard when the element is clicked.
+
+_Parameters_
+
+-   _ref_ `Object`: Reference with the element.
+-   _text_ `(string|Function)`: The text to copy.
+-   _timeout_ `number`: Optional timeout to reset the returned state. 4 seconds by default.
+
+_Returns_
+
+-   `boolean`: Whether or not the text has been copied. Resets after the timeout.
+
+<a name="useDebounce" href="#useDebounce">#</a> **useDebounce**
+
+Debounces a function with Lodash's `debounce`. A new debounced function will
+be returned and any scheduled calls cancelled if any of the arguments change,
+including the function to debounce, so please wrap functions created on
+render in components in `useCallback`.
+
+_Parameters_
+
+-   _args_ `...any`: Arguments passed to Lodash's `debounce`.
+
+<a name="useInstanceId" href="#useInstanceId">#</a> **useInstanceId**
+
+Provides a unique instance ID.
+
+_Parameters_
+
+-   _object_ `Object`: Object reference to create an id for.
+-   _prefix_ `string`: Prefix for the unique id.
+
+<a name="useKeyboardShortcut" href="#useKeyboardShortcut">#</a> **useKeyboardShortcut**
+
+Attach a keyboard shortcut handler.
+
+_Parameters_
+
+-   _shortcuts_ `(Array<string>|string)`: Keyboard Shortcuts.
+-   _callback_ `Function`: Shortcut callback.
+-   _options_ `WPKeyboardShortcutConfig`: Shortcut options.
+
+<a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
+
+Runs a media query and returns its value when it changes.
+
+_Parameters_
+
+-   _query_ `[string]`: Media Query.
+
+_Returns_
+
+-   `boolean`: return value of the media query.
+
+<a name="usePrevious" href="#usePrevious">#</a> **usePrevious**
+
+Use something's value from the previous render.
+Based on <https://usehooks.com/usePrevious/>.
+
+_Parameters_
+
+-   _value_ `T`: The value to track.
+
+_Returns_
+
+-   `(T|undefined)`: The value from the previous render.
+
+<a name="useReducedMotion" href="#useReducedMotion">#</a> **useReducedMotion**
+
+Hook returning whether the user has a preference for reduced motion.
+
+_Returns_
+
+-   `boolean`: Reduced motion preference value.
+
+<a name="useResizeObserver" href="#useResizeObserver">#</a> **useResizeObserver**
+
+Hook which allows to listen the resize event of any target element when it changes sizes.
+_Note: `useResizeObserver` will report `null` until after first render_
+
+_Usage_
+
+```js
+const App = () => {
+	const [ resizeListener, sizes ] = useResizeObserver();
+
+	return (
+		<div>
+			{ resizeListener }
+			Your content here
+		</div>
+	);
+};
+```
+
+_Returns_
+
+-   `Array`: An array of {Element} `resizeListener` and {?Object} `sizes` with properties `width` and `height`
+
+<a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
+
+Returns true if the viewport matches the given query, or false otherwise.
+
+_Usage_
+
+```js
+useViewportMatch( 'huge', '<' );
+useViewportMatch( 'medium' );
+```
+
+_Parameters_
+
+-   _breakpoint_ `WPBreakpoint`: Breakpoint size name.
+-   _operator_ `[WPViewportOperator]`: Viewport operator.
+
+_Returns_
+
+-   `boolean`: Whether viewport matches query.
+
+<a name="useWarnOnChange" href="#useWarnOnChange">#</a> **useWarnOnChange**
+
+Hook that performs a shallow comparison between the preview value of an object
+and the new one, if there's a difference, it prints it to the console.
+this is useful in performance related work, to check why a component re-renders.
+
+_Usage_
+
+```jsx
+function MyComponent(props) {
+   useWarnOnChange(props);
+
+   return "Something";
+}
+```
+
+_Parameters_
+
+-   _object_ `Object`: Object which changes to compare.
+-   _prefix_ `string`: Just a prefix to show when console logging.
+
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
 
-Undocumented declaration.
+Higher-order component creator which, given an object of DOM event types and
+values corresponding to a callback function name on the component, will
+create or update a window event handler to invoke the callback when an event
+occurs. On behalf of the consuming developer, the higher-order component
+manages unbinding when the component unmounts, and binding at most a single
+event handler for the entire application.
+
+_Parameters_
+
+-   _eventTypesToHandlers_ `Object<string,string>`: Object with keys of DOM event type, the value a name of the function on the original component's instance which handles the event.
+
+_Returns_
+
+-   `Function`: Higher-order component.
 
 <a name="withInstanceId" href="#withInstanceId">#</a> **withInstanceId**
 
@@ -130,11 +298,11 @@ component.
 
 _Parameters_
 
--   _WrappedComponent_ `WPElement`: The wrapped component.
+-   _WrappedComponent_ `WPComponent`: The wrapped component.
 
 _Returns_
 
--   `Component`: Component with an instanceId prop.
+-   `WPComponent`: Component with an instanceId prop.
 
 <a name="withSafeTimeout" href="#withSafeTimeout">#</a> **withSafeTimeout**
 
@@ -143,11 +311,11 @@ that ought to be bound to a component's lifecycle.
 
 _Parameters_
 
--   _OriginalComponent_ `Component`: Component requiring setTimeout
+-   _OriginalComponent_ `WPComponent`: Component requiring setTimeout
 
 _Returns_
 
--   `Component`: Wrapped component.
+-   `WPComponent`: Wrapped component.
 
 <a name="withState" href="#withState">#</a> **withState**
 
@@ -160,7 +328,7 @@ _Parameters_
 
 _Returns_
 
--   `Component`: Wrapped component.
+-   `WPComponent`: Wrapped component.
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

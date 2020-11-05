@@ -19,17 +19,18 @@ export { Provider as PluginContextProvider };
  *                                     expected to return object of props to
  *                                     merge with the component's own props.
  *
- * @return {Component} Enhanced component with injected context as props.
+ * @return {WPComponent} Enhanced component with injected context as props.
  */
-export const withPluginContext = ( mapContextToProps ) => createHigherOrderComponent( ( OriginalComponent ) => {
-	return ( props ) => (
-		<Consumer>
-			{ ( context ) => (
-				<OriginalComponent
-					{ ...props }
-					{ ...mapContextToProps( context, props ) }
-				/>
-			) }
-		</Consumer>
-	);
-}, 'withPluginContext' );
+export const withPluginContext = ( mapContextToProps ) =>
+	createHigherOrderComponent( ( OriginalComponent ) => {
+		return ( props ) => (
+			<Consumer>
+				{ ( context ) => (
+					<OriginalComponent
+						{ ...props }
+						{ ...mapContextToProps( context, props ) }
+					/>
+				) }
+			</Consumer>
+		);
+	}, 'withPluginContext' );

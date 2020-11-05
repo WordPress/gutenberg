@@ -7,11 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { select } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import { mediaUpload } from './media-upload';
+import { uploadMedia } from '@wordpress/media-utils';
 
 /**
  * Upload a media file when the file upload button is activated.
@@ -25,7 +21,7 @@ import { mediaUpload } from './media-upload';
  * @param   {Function} $0.onError           Function called when an error happens.
  * @param   {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
  */
-export default function( {
+export default function mediaUpload( {
 	additionalData = {},
 	allowedTypes,
 	filesList,
@@ -35,9 +31,10 @@ export default function( {
 } ) {
 	const { getCurrentPostId, getEditorSettings } = select( 'core/editor' );
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
-	maxUploadFileSize = maxUploadFileSize || getEditorSettings().maxUploadFileSize;
+	maxUploadFileSize =
+		maxUploadFileSize || getEditorSettings().maxUploadFileSize;
 
-	mediaUpload( {
+	uploadMedia( {
 		allowedTypes,
 		filesList,
 		onFileChange,

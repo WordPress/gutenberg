@@ -1,13 +1,11 @@
 /**
  * External dependencies
  */
-
 const { basename } = require( 'path' );
 
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
-
 const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
 
 module.exports = {
@@ -15,7 +13,7 @@ module.exports = {
 	context: __dirname,
 	entry: './entry',
 	output: {
-		filename: 'build/[basename].js',
+		filename: 'build/[basename]-[theanswertolife].js',
 		path: __dirname,
 	},
 	plugins: [
@@ -31,6 +29,9 @@ module.exports = {
 				}
 
 				return path;
+			},
+			theanswertolife() {
+				return 42;
 			},
 		} ),
 	],

@@ -1,0 +1,16 @@
+.toolbar {
+	flex-direction: row;
+	height: $mobile-block-toolbar-height;
+	align-items: flex-start;
+	margin-left: 2px;
+	margin-right: 2px;
+}
+
+.toolbarFullWidth {
+	padding-left: $block-edge-to-content / 2;
+	padding-right: $block-edge-to-content / 2;
+}
+
+.spacer {
+	flex-grow: 1;
+}
