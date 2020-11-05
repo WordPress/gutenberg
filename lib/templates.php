@@ -203,13 +203,6 @@ apply_filters( 'rest_wp_template_collection_params', 'filter_rest_wp_template_co
  * @return array Filtered $args.
  */
 function filter_rest_wp_template_query( $args, $request ) {
-	// Create auto-drafts for each theme template files.
-	$block_template_files = gutenberg_get_template_paths();
-	foreach ( $block_template_files as $path ) {
-		$template_type = basename( $path, '.html' );
-		gutenberg_find_template_post_and_parts( $template_type, array( $template_type ) );
-	}
-
 	if ( $request['resolved'] ) {
 		$template_ids   = array( 0 ); // Return nothing by default (the 0 is needed for `post__in`).
 		$template_types = $request['slug'] ? $request['slug'] : get_template_types();
@@ -220,9 +213,9 @@ function filter_rest_wp_template_query( $args, $request ) {
 				continue;
 			}
 
-			$current_template = gutenberg_find_template_post_and_parts( $template_type );
-			if ( isset( $current_template ) ) {
-				$template_ids[] = $current_template['template_post']->ID;
+			$current_template = gutenberg_resolve_template( $template_type );
+			if ( $current_template ) {
+				$template_ids[] = $current_template->ID;
 			}
 		}
 		$args['post__in']    = $template_ids;
@@ -232,3 +225,95 @@ function filter_rest_wp_template_query( $args, $request ) {
 	return $args;
 }
 add_filter( 'rest_wp_template_query', 'filter_rest_wp_template_query', 99, 2 );
+
+/**
+ * Creates a template auto-draft if it doesn't exist yet.
+ *
+ * @access private
+ *
+ * @param string $slug    Template slug.
+ * @param string $theme   Template theme.
+ * @param string $content Template content.
+ */
+function create_auto_draft_for_template( $slug, $theme, $content ) {
+	// We check if an auto-draft was already created,
+	// before running the REST API calls
+	// because the site editor needs an existing auto-draft
+	// for each theme template to work properly.
+	$template_query = new WP_Query(
+		array(
+			'post_type'      => 'wp_template',
+			'post_status'    => array( 'publish', 'auto-draft' ),
+			'title'          => $slug,
+			'meta_key'       => 'theme',
+			'meta_value'     => $theme,
+			'posts_per_page' => 1,
+			'no_found_rows'  => true,
+		)
+	);
+	$template_post  = $template_query->have_posts() ? $template_query->next_post() : null;
+	if ( ! $template_post ) {
+		wp_insert_post(
+			array(
+				'post_content' => $content,
+				'post_title'   => $slug,
+				'post_status'  => 'auto-draft',
+				'post_type'    => 'wp_template',
+				'post_name'    => $slug,
+				'meta_input'   => array(
+					'theme' => $theme,
+				),
+			)
+		);
+	} else {
+		// Potentially we could decide to update the content if different.
+	}
+}
+
+/**
+ * Create the template auto-drafts for the current theme.
+ *
+ * @access private
+ */
+function synchronize_theme_templates() {
+	/**
+	 * Finds all nested template part file paths in a theme's directory.
+	 *
+	 * @param string $base_directory The theme's file path.
+	 * @return array $path_list A list of paths to all template part files.
+	 */
+	function get_template_paths( $base_directory ) {
+		$path_list = array();
+		if ( file_exists( $base_directory . '/block-templates' ) ) {
+			$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base_directory . '/block-templates' ) );
+			$nested_html_files = new RegexIterator( $nested_files, '/^.+\.html$/i', RecursiveRegexIterator::GET_MATCH );
+			foreach ( $nested_html_files as $path => $file ) {
+				$path_list[] = $path;
+			}
+		}
+		return $path_list;
+	}
+
+	// Get file paths for all theme supplied template parts.
+	$template_files = get_template_paths( get_stylesheet_directory() );
+	if ( is_child_theme() ) {
+		$template_files = array_merge( $template_files, get_template_paths( get_template_directory() ) );
+	}
+	// Build and save each template part.
+	foreach ( $template_files as $template_file ) {
+		$content = file_get_contents( $template_file );
+		$slug    = substr(
+			$template_file,
+			// Starting position of slug.
+			strpos( $template_file, 'block-templates/' ) + 16,
+			// Subtract ending '.html'.
+			-5
+		);
+		create_auto_draft_for_template( $slug, wp_get_theme()->get( 'TextDomain' ), $content );
+	}
+
+	// If we haven't found any block-template by default, create a fallback one.
+	if ( count( $template_files ) === 0 ) {
+		create_auto_draft_for_template( 'index', wp_get_theme()->get( 'TextDomain' ), '' );
+	}
+}
