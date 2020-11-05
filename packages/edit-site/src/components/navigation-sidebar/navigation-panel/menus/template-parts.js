@@ -64,6 +64,7 @@ export default function TemplatePartsMenu() {
 				<SearchResults
 					items={ templateParts }
 					isDebouncing={ isDebouncing }
+					search={ search }
 				>
 					{ map( templateParts, ( templatePart ) => (
 						<TemplateNavigationItem
