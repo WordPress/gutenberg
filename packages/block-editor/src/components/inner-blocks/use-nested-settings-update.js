@@ -29,7 +29,7 @@ export default function useNestedSettingsUpdate(
 	templateLock,
 	captureToolbars,
 	orientation,
-	dropZonesDisabled,
+	dropZonesDisabled
 ) {
 	const { updateBlockListSettings } = useDispatch( 'core/block-editor' );
 
