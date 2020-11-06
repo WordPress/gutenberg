@@ -327,3 +327,25 @@ supports: {
     padding: true, // Enable padding color UI control.
 }
 ```
+
+When the block declares support for a specific spacing property, the attributes definition is extended to include some attributes.
+
+- `style`: attribute of `object` type with no default assigned. This is added when `padding` support is declared. It stores the custom values set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            spacing: {
+                padding: {
+                    top: 'value',
+                    right: 'value',
+                    bottom: 'value',
+                    left: 'value'
+                }
+            }
+        }
+    }
+}
+```
