@@ -136,12 +136,29 @@ supports: {
 
 This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.
 
+The values shown in this control are the ones declared by the theme via the `editor-font-sizes` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), or the default ones if none is provided.
+
 ```js
 supports: {
     // Enable UI control for font-size.
     fontSize: true,
 }
 ```
+
+When the block declares support for `fontSize`, the attributes definition is extended to include two new attributes: `fontSize` and `style`:
+
+- `fontSize`: attribute of `string` type with no default assigned. It stores the preset values set by the user. The block can apply a default alignment by specifying its own `fontSize` attribute with a default e.g.:
+
+```js
+attributes: {
+    fontSize: {
+        type: 'string',
+        default: 'some-value',
+    }
+}
+```
+
+- `style`: attribute of `object` type with no default assigned. It stores the custom values set by the user.
 
 ## html
 
