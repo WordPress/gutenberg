@@ -550,7 +550,10 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
 	}
 
 	return formatTZ(
-		utcToZonedTime( dateValue, getActualTimezone( timezone ) ),
+		utcToZonedTime(
+			zonedTimeToUtc( dateValue, getActualTimezone() ),
+			getActualTimezone( timezone )
+		),
 		translateFormat( dateFormat, dateValue ),
 		{
 			timeZone: getActualTimezone( timezone ),

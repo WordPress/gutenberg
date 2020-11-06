@@ -3,12 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 
-import {
-	dateI18n,
-	getActualTimezone,
-	__experimentalGetSettings,
-	zonedTimeToUtc,
-} from '@wordpress/date';
+import { dateI18n, __experimentalGetSettings } from '@wordpress/date';
 
 import { withSelect } from '@wordpress/data';
 
@@ -18,7 +13,7 @@ export function PostScheduleLabel( { date, isFloating } ) {
 	return date && ! isFloating
 		? dateI18n(
 				`${ settings.formats.date } ${ settings.formats.time }`,
-				zonedTimeToUtc( date, getActualTimezone() )
+				date
 		  )
 		: __( 'Immediately' );
 }
