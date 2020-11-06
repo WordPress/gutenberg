@@ -72,10 +72,6 @@
 		// Up button.
 		.components-toolbar-group .block-editor-block-mover-button.is-up-button,
 		.components-toolbar .block-editor-block-mover-button.is-up-button {
-			svg {
-				top: 5px;
-			}
-
 			// Focus style.
 			&::before {
 				bottom: 0;
@@ -86,10 +82,6 @@
 		// Down button.
 		.components-toolbar-group .block-editor-block-mover-button.is-down-button,
 		.components-toolbar .block-editor-block-mover-button.is-down-button {
-			svg {
-				bottom: 5px;
-			}
-
 			// Focus style.
 			&::before {
 				top: 0;
