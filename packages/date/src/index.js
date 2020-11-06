@@ -266,7 +266,7 @@ const formatMap = {
 	u: 'SSSSSS',
 	v: 'SSS',
 	// Timezone
-	e: 'zz', // date-fns-timezone perhaps
+	e: 'zz', // @todo: date-fns-tz perhaps
 	/**
 	 * Gets whether the timezone is in DST currently.
 	 *
@@ -279,7 +279,7 @@ const formatMap = {
 	},
 	O: 'xx',
 	P: 'xxx',
-	T: 'z', // date-fns-timezone perhaps
+	T: 'z', // @todo: date-fns-tz perhaps
 	/**
 	 * Gets the timezone offset in seconds.
 	 *
@@ -301,7 +301,7 @@ const formatMap = {
 	// Full date/time
 	c: 'yyyy-MM-DDTHH:mm:ssZ', // .toISOString
 	r: 'ddd, D MMM yyyy HH:mm:ss ZZ',
-	U: 'X', // find out how to get epoc
+	U: 'X', // @todo: find out how to get epoc
 };
 
 function translateFormat( formatString ) {
@@ -318,6 +318,7 @@ function translateFormat( formatString ) {
 			continue;
 		}
 		if ( char in formatMap ) {
+			// @todo: the following is commented out until format functions are implemented
 			// if ( typeof formatMap[ char ] !== 'string' ) {
 			// 	// If the format is a function, call it.
 			// 	newFormat.push( '[' + formatMap[ char ]( momentDate ) + ']' );
