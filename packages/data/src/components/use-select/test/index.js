@@ -6,7 +6,7 @@ import TestRenderer, { act } from 'react-test-renderer';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useReducer } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -450,6 +450,64 @@ describe( 'useSelect', () => {
 				count1: 0,
 				count2: 1,
 			} );
+		} );
+
+		it( 'handles conditional statements in selectors', () => {
+			registry.registerStore( 'store-1', counterStore );
+			registry.registerStore( 'store-2', counterStore );
+
+			let renderer, shouldSelectCount1, toggle;
+			const selectCount1 = jest.fn();
+			const selectCount2 = jest.fn();
+
+			const TestComponent = jest.fn( () => {
+				[ shouldSelectCount1, toggle ] = useReducer(
+					( should ) => ! should,
+					false
+				);
+				const state = useSelect(
+					( select ) => {
+						if ( shouldSelectCount1 ) {
+							selectCount1();
+							select( 'store-1' ).getCounter();
+							return 'count1';
+						}
+
+						selectCount2();
+						select( 'store-2' ).getCounter();
+						return 'count2';
+					},
+					[ shouldSelectCount1 ]
+				);
+
+				return <div data={ state } />;
+			} );
+
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				);
+			} );
+
+			const testInstance = renderer.root;
+
+			expect( selectCount1 ).toHaveBeenCalledTimes( 0 );
+			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
+			expect( testInstance.findByType( 'div' ).props.data ).toBe(
+				'count2'
+			);
+
+			act( () => {
+				toggle();
+			} );
+
+			expect( selectCount1 ).toHaveBeenCalledTimes( 1 );
+			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
+			expect( testInstance.findByType( 'div' ).props.data ).toBe(
+				'count1'
+			);
 		} );
 	} );
 } );
