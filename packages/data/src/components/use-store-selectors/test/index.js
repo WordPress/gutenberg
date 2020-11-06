@@ -1,17 +1,18 @@
 /**
- * Internal dependencies
- */
-import { createRegistry } from '../../../registry';
-import useStoreSelectors from '../index';
-
-/**
  * External dependencies
  */
-import TestRenderer, { act } from 'react-test-renderer';
+import { renderHook } from '@testing-library/react-hooks';
+
 /**
  * WordPress dependencies
  */
 import { RegistryProvider } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { createRegistry } from '../../../registry';
+import useStoreSelectors from '../index';
 
 describe( 'useStoreSelectors', () => {
 	let registry;
@@ -27,26 +28,18 @@ describe( 'useStoreSelectors', () => {
 			},
 		} );
 
-		const TestComponent = () => {
-			const results = useStoreSelectors(
-				'testStore',
-				( { testSelector } ) => testSelector( 'foo' )
-			);
-			return <div>{ results }</div>;
-		};
+		const wrapper = ( { children } ) => (
+			<RegistryProvider value={ registry }>{ children }</RegistryProvider>
+		);
 
-		let renderer;
-		act( () => {
-			renderer = TestRenderer.create(
-				<RegistryProvider value={ registry }>
-					<TestComponent keyName="foo" />
-				</RegistryProvider>
+		const useHook = () =>
+			useStoreSelectors( 'testStore', ( { testSelector } ) =>
+				testSelector( 'foo' )
 			);
-		} );
-		const testInstance = renderer.root;
+
+		const { result } = renderHook( useHook, { wrapper } );
+
 		// ensure expected state was rendered
-		expect( testInstance.findByType( 'div' ).props ).toEqual( {
-			children: 'bar',
-		} );
+		expect( result.current ).toEqual( 'bar' );
 	} );
 } );
