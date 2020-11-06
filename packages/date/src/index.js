@@ -569,7 +569,7 @@ export function gmdateI18n( dateFormat, dateValue = new Date() ) {
 /**
  * Check whether a date is considered in the future according to the WordPress settings.
  *
- * @param {string} dateValue Date String or Date object in the Defined WP Timezone.
+ * @param {string|Date} dateValue Date String or Date object in the Defined WP Timezone.
  *
  * @return {boolean} Is in the future.
  */
@@ -587,9 +587,6 @@ export function isInTheFuture( dateValue ) {
  * @return {Date} Date
  */
 export function getDate( dateString ) {
-	if ( ! dateString ) {
-		return toDate( new Date(), { timeZone: WP_ZONE } );
-	}
-
-	return toDate( dateString, WP_ZONE );
+	const actualDate = dateString ? dateString : new Date();
+	return toDate( actualDate, { timeZone: WP_ZONE } );
 }
