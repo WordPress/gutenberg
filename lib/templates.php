@@ -236,3 +236,25 @@ function filter_rest_wp_template_query( $args, $request ) {
 	return $args;
 }
 add_filter( 'rest_wp_template_query', 'filter_rest_wp_template_query', 99, 2 );
+
+/**
+ * Run synchrnonization for template part API requests
+ *
+ * @param mixed           $dispatch_result Dispatch result, will be used if not empty.
+ * @param WP_REST_Request $request         Request used to generate the response.
+ * @param string          $route           Route matched for the request.
+ * @param array           $handler         Route handler used for the request.
+ */
+function gutenberg_filter_rest_wp_template_dispatch( $dispatch_result, $request, $route, $handler ) {
+	if ( null !== $dispatch_result ) {
+		return $dispatch_result;
+	}
+
+	if ( 0 === strpos( $route, '/wp/v2/templates' ) && 'GET' === $request->get_method() ) {
+		_gutenberg_synchronize_theme_templates( 'template' );
+	}
+
+	return null;
+}
+
+add_filter( 'rest_dispatch_request', 'gutenberg_filter_rest_wp_template_dispatch', 10, 4 );

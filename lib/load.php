@@ -71,9 +71,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Batch_Controller' ) ) {
 		require_once dirname( __FILE__ ) . '/class-wp-rest-batch-controller.php';
 	}
-	if ( ! class_exists( 'WP_REST_Template_Parts_Controller' ) ) {
-		require_once dirname( __FILE__ ) . '/class-wp-rest-template-parts-controller.php';
-	}
 	/**
 	* End: Include for phase 2
 	*/

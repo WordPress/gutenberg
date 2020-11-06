@@ -45,7 +45,6 @@ function gutenberg_register_template_part_post_type() {
 		'show_in_admin_bar'     => false,
 		'show_in_rest'          => true,
 		'rest_base'             => 'template-parts',
-		'rest_controller_class' => 'WP_REST_Template_Parts_Controller',
 		'map_meta_cap'          => true,
 		'supports'              => array(
 			'title',
@@ -183,3 +182,25 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 	return $args;
 }
 add_filter( 'rest_wp_template_part_query', 'filter_rest_wp_template_part_query', 99, 2 );
+
+/**
+ * Run synchrnonization for template part API requests
+ *
+ * @param mixed           $dispatch_result Dispatch result, will be used if not empty.
+ * @param WP_REST_Request $request         Request used to generate the response.
+ * @param string          $route           Route matched for the request.
+ * @param array           $handler         Route handler used for the request.
+ */
+function gutenberg_filter_rest_wp_template_part_dispatch( $dispatch_result, $request, $route, $handler ) {
+	if ( null !== $dispatch_result ) {
+		return $dispatch_result;
+	}
+
+	if ( 0 === strpos( $route, '/wp/v2/template-parts' ) && 'GET' === $request->get_method() ) {
+		_gutenberg_synchronize_theme_templates( 'template-part' );
+	}
+
+	return null;
+}
+
+add_filter( 'rest_dispatch_request', 'gutenberg_filter_rest_wp_template_part_dispatch', 10, 4 );

@@ -93,6 +93,9 @@ function get_template_hierarchy( $template_type ) {
 function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
 	global $_wp_current_template_content;
 
+	// Create auto-drafts for theme templates.
+	_gutenberg_synchronize_theme_templates( 'template' );
+
 	$current_template = gutenberg_resolve_template( $type, $templates );
 
 	if ( $current_template ) {
@@ -139,9 +142,6 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 	if ( ! $template_type ) {
 		return null;
 	}
-
-	// Create auto-drafts for each theme template files.
-	_gutenberg_synchronize_theme_templates( 'template' );
 
 	if ( empty( $template_hierarchy ) ) {
 		if ( 'index' === $template_type ) {
