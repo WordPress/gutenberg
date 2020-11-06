@@ -70,15 +70,6 @@ _Returns_
 
 -   `string`: Formatted date.
 
-<a name="getActualTimezone" href="#getActualTimezone">#</a> **getActualTimezone**
-
-Get a properly formatted timezone from a timezone string or offset.
-Return system timezone or offset if no timezone was given.
-
-_Parameters_
-
--   _timezone_ `string`: 
-
 <a name="getDate" href="#getDate">#</a> **getDate**
 
 Create and return a JavaScript Date Object from a date string in the WP timezone.

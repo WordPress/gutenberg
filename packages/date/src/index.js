@@ -5,7 +5,6 @@ import {
 	addHours,
 	format as dateFnsFormat,
 	getDaysInMonth,
-	getUnixTime,
 	isFuture,
 	isLeapYear,
 	parseISO,
@@ -270,7 +269,6 @@ const formatMap = {
 	/**
 	 * Gets whether the timezone is in DST currently.
 	 *
-	 * @param {Date} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */
@@ -311,7 +309,10 @@ const formatMap = {
 	c: 'yyyy-MM-DDTHH:mm:ssZ', // .toISOString
 	r: 'ddd, D MMM yyyy HH:mm:ss ZZ',
 	U( dateValue ) {
-		return getUnixTime( utcToZonedTime( dateValue, getActualTimezone() ) );
+		return formatTZ(
+			zonedTimeToUtc( dateValue, getActualTimezone() ),
+			't'
+		);
 	},
 };
 
@@ -450,7 +451,7 @@ function shouldParseAsUTCOffset( offset ) {
  *
  * @param {string} timezone
  */
-export function getActualTimezone( timezone = '' ) {
+function getActualTimezone( timezone = '' ) {
 	if ( ! timezone ) {
 		const { string, offset } = settings.timezone;
 

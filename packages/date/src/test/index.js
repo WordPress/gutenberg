@@ -266,12 +266,12 @@ describe( 'PHP Format Tokens', () => {
 
 		setSettings( {
 			...settings,
-			timezone: { string: 'America/New_York' },
+			timezone: { string: 'UTC' },
 		} );
 
-		const formattedDate = dateNoI18n( 'U', '2020-10-09T02:00:00.000Z' );
+		const formattedDate = dateNoI18n( 'U', '2020-10-09T11:00:00.000Z' );
 
-		expect( formattedDate ).toBe( '1602201600' );
+		expect( formattedDate ).toBe( '1602241200' );
 	} );
 
 	it.skip( 'should support "I" to obtain whether or not the timezone is observing DST', () => {
