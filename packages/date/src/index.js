@@ -5,13 +5,12 @@ import momentLib from 'moment';
 import 'moment-timezone/moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
+import { format as dateFnsFormat, isFuture, parseISO, toDate } from 'date-fns';
+import { format as formatIntl, utcToZonedTime } from 'date-fns-tz';
+
 /** @typedef {import('moment').Moment} Moment */
 
 const WP_ZONE = 'WP';
-
-// This regular expression tests positive for UTC offsets as described in ISO 8601.
-// See: https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
-const VALID_UTC_OFFSET = /^[+-][0-1][0-9](:?[0-9][0-9])?$/;
 
 // Changes made here will likely need to be made in `lib/client-assets.php` as
 // well because it uses the `setSettings()` function to change these settings.
@@ -123,8 +122,6 @@ export function setSettings( dateSettings ) {
 		relativeTime: dateSettings.l10n.relative,
 	} );
 	momentLib.locale( currentLocale );
-
-	setupWPTimezone();
 }
 
 /**
@@ -134,18 +131,6 @@ export function setSettings( dateSettings ) {
  */
 export function __experimentalGetSettings() {
 	return settings;
-}
-
-function setupWPTimezone() {
-	// Create WP timezone based off dateSettings.
-	momentLib.tz.add(
-		momentLib.tz.pack( {
-			name: WP_ZONE,
-			abbrs: [ WP_ZONE ],
-			untils: [ null ],
-			offsets: [ -settings.timezone.offset * 60 || 0 ],
-		} )
-	);
 }
 
 // Date constants.
@@ -182,11 +167,11 @@ const HOUR_IN_SECONDS = 60 * MINUTE_IN_SECONDS;
  */
 const formatMap = {
 	// Day
-	d: 'DD',
-	D: 'ddd',
-	j: 'D',
-	l: 'dddd',
-	N: 'E',
+	d: 'dd',
+	D: 'EEE',
+	j: 'd',
+	l: 'EEEE',
+	N: 'i',
 
 	/**
 	 * Gets the ordinal suffix.
@@ -202,7 +187,7 @@ const formatMap = {
 		return withOrdinal.replace( num, '' );
 	},
 
-	w: 'd',
+	w: 'd', // @todo: figure out how to make it start from 0
 	/**
 	 * Gets the day of the year (zero-indexed).
 	 *
@@ -246,7 +231,7 @@ const formatMap = {
 		return momentDate.isLeapYear() ? '1' : '0';
 	},
 	o: 'GGGG',
-	Y: 'YYYY',
+	Y: 'yyyy',
 	y: 'YY',
 
 	// Time
@@ -281,7 +266,7 @@ const formatMap = {
 	u: 'SSSSSS',
 	v: 'SSS',
 	// Timezone
-	e: 'zz',
+	e: 'zz', // date-fns-timezone perhaps
 	/**
 	 * Gets whether the timezone is in DST currently.
 	 *
@@ -292,9 +277,9 @@ const formatMap = {
 	I( momentDate ) {
 		return momentDate.isDST() ? '1' : '0';
 	},
-	O: 'ZZ',
-	P: 'Z',
-	T: 'z',
+	O: 'xx',
+	P: 'xxx',
+	T: 'z', // date-fns-timezone perhaps
 	/**
 	 * Gets the timezone offset in seconds.
 	 *
@@ -314,10 +299,53 @@ const formatMap = {
 		);
 	},
 	// Full date/time
-	c: 'YYYY-MM-DDTHH:mm:ssZ', // .toISOString
-	r: 'ddd, D MMM YYYY HH:mm:ss ZZ',
-	U: 'X',
+	c: 'yyyy-MM-DDTHH:mm:ssZ', // .toISOString
+	r: 'ddd, D MMM yyyy HH:mm:ss ZZ',
+	U: 'X', // find out how to get epoc
 };
+
+function translateFormat( formatString ) {
+	let i, char;
+	let newFormat = [];
+
+	for ( i = 0; i < formatString.length; i++ ) {
+		char = formatString[ i ];
+		// Is this an escape?
+		if ( '\\' === char ) {
+			// Add next character, then move on.
+			i++;
+			newFormat.push( "'" + formatString[ i ] + "'" );
+			continue;
+		}
+		if ( char in formatMap ) {
+			// if ( typeof formatMap[ char ] !== 'string' ) {
+			// 	// If the format is a function, call it.
+			// 	newFormat.push( '[' + formatMap[ char ]( momentDate ) + ']' );
+			// } else {
+			// Otherwise, add as a formatting string.
+			newFormat.push( formatMap[ char ] );
+			// }
+		} else {
+			newFormat.push( "'" + char + "'" );
+		}
+	}
+	// Join with [] between to separate characters, and replace
+	// unneeded separators with static text.
+
+	newFormat = newFormat.join( '' );
+
+	return newFormat;
+}
+
+function getActualTimezone( timezone = '' ) {
+	if ( ! timezone ) {
+		const { string, offset } = settings.timezone;
+
+		return string ? string : offset;
+	}
+
+	return timezone;
+}
 
 /**
  * Formats a date. Does not alter the date's timezone.
@@ -330,34 +358,8 @@ const formatMap = {
  * @return {string} Formatted date.
  */
 export function format( dateFormat, dateValue = new Date() ) {
-	let i, char;
-	let newFormat = [];
-	const momentDate = momentLib( dateValue );
-	for ( i = 0; i < dateFormat.length; i++ ) {
-		char = dateFormat[ i ];
-		// Is this an escape?
-		if ( '\\' === char ) {
-			// Add next character, then move on.
-			i++;
-			newFormat.push( '[' + dateFormat[ i ] + ']' );
-			continue;
-		}
-		if ( char in formatMap ) {
-			if ( typeof formatMap[ char ] !== 'string' ) {
-				// If the format is a function, call it.
-				newFormat.push( '[' + formatMap[ char ]( momentDate ) + ']' );
-			} else {
-				// Otherwise, add as a formatting string.
-				newFormat.push( formatMap[ char ] );
-			}
-		} else {
-			newFormat.push( '[' + char + ']' );
-		}
-	}
-	// Join with [] between to separate characters, and replace
-	// unneeded separators with static text.
-	newFormat = newFormat.join( '[]' );
-	return momentDate.format( newFormat );
+	const formatString = translateFormat( dateFormat );
+	return dateFnsFormat( new Date( dateValue ), formatString );
 }
 
 /**
@@ -377,8 +379,13 @@ export function format( dateFormat, dateValue = new Date() ) {
  * @return {string} Formatted date in English.
  */
 export function date( dateFormat, dateValue = new Date(), timezone ) {
-	const dateMoment = buildMoment( dateValue, timezone );
-	return format( dateFormat, dateMoment );
+	const formatString = translateFormat( dateFormat );
+
+	return formatIntl(
+		utcToZonedTime( parseISO( dateValue ), getActualTimezone( timezone ) ),
+		formatString,
+		{ timeZone: getActualTimezone( timezone ) }
+	);
 }
 
 /**
@@ -426,9 +433,10 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
 		timezone = undefined;
 	}
 
-	const dateMoment = buildMoment( dateValue, timezone );
-	dateMoment.locale( settings.l10n.locale );
-	return format( dateFormat, dateMoment );
+	return formatIntl( parseISO( dateValue ), dateFormat, {
+		timeZone: getActualTimezone( timezone ),
+		locale: settings.l10n.locale,
+	} );
 }
 
 /**
@@ -456,10 +464,9 @@ export function gmdateI18n( dateFormat, dateValue = new Date() ) {
  * @return {boolean} Is in the future.
  */
 export function isInTheFuture( dateValue ) {
-	const now = momentLib.tz( WP_ZONE );
-	const momentObject = momentLib.tz( dateValue, WP_ZONE );
+	const dateObject = toDate( dateValue, { timeZone: WP_ZONE } );
 
-	return momentObject.isAfter( now );
+	return isFuture( dateObject );
 }
 
 /**
@@ -471,57 +478,8 @@ export function isInTheFuture( dateValue ) {
  */
 export function getDate( dateString ) {
 	if ( ! dateString ) {
-		return momentLib.tz( WP_ZONE ).toDate();
+		return toDate( new Date(), { timeZone: WP_ZONE } );
 	}
 
-	return momentLib.tz( dateString, WP_ZONE ).toDate();
+	return toDate( dateString, WP_ZONE );
 }
-
-/**
- * Creates a moment instance using the given timezone or, if none is provided, using global settings.
- *
- * @param {Date|string|Moment|null} dateValue Date object or string, parsable
- *                                            by moment.js.
- * @param {string|number|null}      timezone  Timezone to output result in or a
- *                                            UTC offset. Defaults to timezone from
- *                                            site.
- *
- * @see https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
- * @see https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
- *
- * @return {Moment} a moment instance.
- */
-function buildMoment( dateValue, timezone = '' ) {
-	const dateMoment = momentLib( dateValue );
-
-	if ( timezone && ! isUTCOffset( timezone ) ) {
-		return dateMoment.tz( timezone );
-	}
-
-	if ( timezone && isUTCOffset( timezone ) ) {
-		return dateMoment.utcOffset( timezone );
-	}
-
-	if ( settings.timezone.string ) {
-		return dateMoment.tz( settings.timezone.string );
-	}
-
-	return dateMoment.utcOffset( settings.timezone.offset );
-}
-
-/**
- * Returns whether a certain UTC offset is valid or not.
- *
- * @param {number|string} offset a UTC offset.
- *
- * @return {boolean} whether a certain UTC offset is valid or not.
- */
-function isUTCOffset( offset ) {
-	if ( 'number' === typeof offset ) {
-		return true;
-	}
-
-	return VALID_UTC_OFFSET.test( offset );
-}
-
-setupWPTimezone();
