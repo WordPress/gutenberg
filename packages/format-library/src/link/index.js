@@ -49,7 +49,6 @@ function Edit( { isActive, activeAttributes, value, onChange, onFocus } ) {
 			);
 		} else {
 			setAddingLink( true );
-			this.setState( { addingLink: true } );
 		}
 	}
 
