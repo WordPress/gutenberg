@@ -14,7 +14,11 @@ import {
 	parseISO,
 	toDate,
 } from 'date-fns';
-import { format as formatIntl, utcToZonedTime } from 'date-fns-tz';
+import {
+	format as formatIntl,
+	utcToZonedTime,
+	zonedTimeToUtc,
+} from 'date-fns-tz';
 import originalLocale from 'date-fns/locale/en-US/index';
 import buildLocalizeFn from 'date-fns/locale/_lib/buildLocalizeFn';
 import buildFormatLongFn from 'date-fns/locale/_lib/buildFormatLongFn';
@@ -195,8 +199,8 @@ const formatMap = {
 	 * @return {string} Formatted date.
 	 */
 	S( dateValue ) {
-		const num = formatIntl( parseISO( dateValue ), 'd' );
-		const withOrdinal = formatIntl( parseISO( dateValue ), 'do' );
+		const num = dateFnsFormat( dateValue, 'd' );
+		const withOrdinal = dateFnsFormat( dateValue, 'do' );
 		return withOrdinal.replace( num, '' );
 	},
 
@@ -210,9 +214,7 @@ const formatMap = {
 	 */
 	z( dateValue ) {
 		// DDD - 1
-		return `${
-			parseInt( formatIntl( parseISO( dateValue ), 'DDD' ), 10 ) - 1
-		}`;
+		return `${ parseInt( dateFnsFormat( dateValue, 'DDD' ), 10 ) - 1 }`;
 	},
 
 	// Week
@@ -231,7 +233,7 @@ const formatMap = {
 	 * @return {string} Formatted date.
 	 */
 	t( dateValue ) {
-		return getDaysInMonth( parseISO( dateValue ) );
+		return getDaysInMonth( dateValue );
 	},
 
 	// Year
@@ -243,7 +245,7 @@ const formatMap = {
 	 * @return {string} Formatted date.
 	 */
 	L( dateValue ) {
-		return isLeapYear( parseISO( dateValue ) ) ? '1' : '0';
+		return isLeapYear( dateValue ) ? '1' : '0';
 	},
 	o: 'GGGG',
 	Y: 'yyyy',
@@ -260,10 +262,10 @@ const formatMap = {
 	 * @return {string} Formatted date.
 	 */
 	B( dateValue ) {
-		const parsedDate = addHours( utcToZonedTime( dateValue, 'UTC' ), 1 );
-		const seconds = parseInt( formatIntl( parsedDate, 's' ), 10 ),
-			minutes = parseInt( formatIntl( parsedDate, 'm' ), 10 ),
-			hours = parseInt( formatIntl( parsedDate, 'H' ), 10 );
+		const parsedDate = addHours( zonedTimeToUtc( dateValue ), 1 );
+		const seconds = parseInt( dateFnsFormat( parsedDate, 's' ), 10 ),
+			minutes = parseInt( dateFnsFormat( parsedDate, 'm' ), 10 ),
+			hours = parseInt( dateFnsFormat( parsedDate, 'H' ), 10 );
 
 		/*
 		 * Rounding up to match results on the same timestamp using
@@ -308,7 +310,10 @@ const formatMap = {
 	 */
 	Z( dateValue ) {
 		// Timezone offset in seconds.
-		const offset = formatIntl( utcToZonedTime( dateValue, 'UTC' ), 'XXX' );
+		const offset = dateFnsFormat(
+			utcToZonedTime( dateValue, 'UTC' ),
+			'XXX'
+		);
 		const sign = offset[ 0 ] === '-' ? -1 : 1;
 		const parts = offset.substring( 1 ).split( ':' );
 		return (
@@ -327,6 +332,9 @@ function translateFormat( formatString, dateValue ) {
 	let i, char;
 	let newFormat = [];
 
+	const parsedDate =
+		typeof dateValue === 'string' ? parseISO( dateValue ) : dateValue;
+
 	for ( i = 0; i < formatString.length; i++ ) {
 		char = formatString[ i ];
 		// Is this an escape?
@@ -339,7 +347,7 @@ function translateFormat( formatString, dateValue ) {
 		if ( char in formatMap ) {
 			if ( typeof formatMap[ char ] !== 'string' ) {
 				// If the format is a function, call it.
-				newFormat.push( "'" + formatMap[ char ]( dateValue ) + "'" );
+				newFormat.push( "'" + formatMap[ char ]( parsedDate ) + "'" );
 			} else {
 				// Otherwise, add as a formatting string.
 				newFormat.push( formatMap[ char ] );
@@ -478,12 +486,9 @@ export function format( dateFormat, dateValue = new Date() ) {
  * @return {string} Formatted date in English.
  */
 export function date( dateFormat, dateValue = new Date(), timezone ) {
-	const formatString = translateFormat( dateFormat, dateValue );
-
-	return formatIntl(
-		utcToZonedTime( dateValue, getActualTimezone( timezone ) ),
-		formatString,
-		{ timeZone: getActualTimezone( timezone ) }
+	return format(
+		dateFormat,
+		utcToZonedTime( dateValue, getActualTimezone( timezone ) )
 	);
 }
 
@@ -498,9 +503,7 @@ export function date( dateFormat, dateValue = new Date(), timezone ) {
  * @return {string} Formatted date in English.
  */
 export function gmdate( dateFormat, dateValue = new Date() ) {
-	const formatString = translateFormat( dateFormat, dateValue );
-
-	return formatIntl( utcToZonedTime( dateValue, 'UTC' ), formatString );
+	return format( dateFormat, utcToZonedTime( dateValue, 'UTC' ) );
 }
 
 /**
@@ -562,7 +565,7 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
 export function gmdateI18n( dateFormat, dateValue = new Date() ) {
 	return formatIntl(
 		utcToZonedTime( dateValue ),
-		translateFormat( dateFormat ),
+		translateFormat( dateFormat, dateValue ),
 		{
 			timeZone: 'UTC',
 			locale: {
