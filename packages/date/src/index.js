@@ -12,6 +12,10 @@ import { format as formatIntl, utcToZonedTime } from 'date-fns-tz';
 
 const WP_ZONE = 'WP';
 
+// This regular expression tests positive for UTC offsets as described in ISO 8601.
+// See: https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
+const VALID_UTC_OFFSET = /^[+-][0-1][0-9](:?[0-9][0-9])?$/;
+
 // Changes made here will likely need to be made in `lib/client-assets.php` as
 // well because it uses the `setSettings()` function to change these settings.
 let settings = {
@@ -338,14 +342,49 @@ function translateFormat( formatString ) {
 	return newFormat;
 }
 
+/**
+ * Returns whether a certain UTC offset is valid or not.
+ *
+ * @param {number|string} offset a UTC offset.
+ *
+ * @return {boolean} whether a certain UTC offset is valid or not.
+ */
+function isValidUTCOffset( offset ) {
+	return VALID_UTC_OFFSET.test( offset );
+}
+
+function integerToUTCOffset( offset ) {
+	const offsetInHours = offset > 23 ? offset / 60 : offset;
+	const sign = offset < 0 ? '-' : '+';
+	const absoluteOffset =
+		offsetInHours < 0 ? offsetInHours * -1 : offsetInHours;
+
+	return offsetInHours < 10
+		? `${ sign }0${ absoluteOffset }`
+		: `${ sign }${ absoluteOffset }`;
+}
+
+function shouldParseAsUTCOffset( offset ) {
+	const isNumber = ! Number.isNaN( Number.parseInt( offset, 10 ) );
+	return isNumber && ! isValidUTCOffset( offset );
+}
+
 function getActualTimezone( timezone = '' ) {
 	if ( ! timezone ) {
 		const { string, offset } = settings.timezone;
 
-		return string ? string : offset;
+		if ( string ) {
+			return string;
+		}
+
+		if ( shouldParseAsUTCOffset( offset ) ) {
+			return integerToUTCOffset( offset );
+		}
 	}
 
-	return timezone;
+	return shouldParseAsUTCOffset( timezone )
+		? integerToUTCOffset( timezone )
+		: timezone;
 }
 
 /**
@@ -400,8 +439,12 @@ export function date( dateFormat, dateValue = new Date(), timezone ) {
  * @return {string} Formatted date in English.
  */
 export function gmdate( dateFormat, dateValue = new Date() ) {
-	const dateMoment = momentLib( dateValue ).utc();
-	return format( dateFormat, dateMoment );
+	const formatString = translateFormat( dateFormat );
+
+	return formatIntl(
+		utcToZonedTime( parseISO( dateValue ), 'UTC' ),
+		formatString
+	);
 }
 
 /**
