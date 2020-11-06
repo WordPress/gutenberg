@@ -147,7 +147,7 @@ supports: {
 
 When the block declares support for `fontSize`, the attributes definition is extended to include two new attributes: `fontSize` and `style`:
 
-- `fontSize`: attribute of `string` type with no default assigned. It stores the preset values set by the user. The block can apply a default alignment by specifying its own `fontSize` attribute with a default e.g.:
+- `fontSize`: attribute of `string` type with no default assigned. It stores the preset values set by the user. The block can apply a default fontSize by specifying its own `fontSize` attribute with a default e.g.:
 
 ```js
 attributes: {
@@ -158,7 +158,20 @@ attributes: {
 }
 ```
 
-- `style`: attribute of `object` type with no default assigned. It stores the custom values set by the user.
+- `style`: attribute of `object` type with no default assigned. It stores the custom values set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            typography: {
+                fontSize: 'value'
+            }
+        }
+    }
+}
+```
 
 ## html
 
