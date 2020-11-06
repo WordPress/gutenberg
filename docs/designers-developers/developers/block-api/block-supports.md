@@ -212,3 +212,18 @@ supports: {
     reusable: false
 }
 ```
+
+## spacing
+
+- Type: `Object`
+- Default value: null
+- Subproperties:
+  - `padding`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values.
+
+```js
+supports: {
+    padding: true, // Enable padding color UI control.
+}
+```
