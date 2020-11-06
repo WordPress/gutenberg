@@ -563,16 +563,17 @@ function gutenberg_experimental_global_styles_get_block_data() {
 				'global',
 				array(
 					'supports' => array(
-						'__experimentalSelector'       => ':root',
 						'__experimentalFontAppearance' => false,
 						'__experimentalFontFamily'     => true,
-						'fontSize'                     => true,
+						'__experimentalSelector'       => ':root',
 						'__experimentalTextDecoration' => true,
 						'__experimentalTextTransform'  => true,
 						'color'                        => array(
-							'linkColor' => true,
 							'gradients' => true,
+							'linkColor' => true,
 						),
+						'fontSize'                     => true,
+						'lineHeight'                   => true,
 					),
 				)
 			),
