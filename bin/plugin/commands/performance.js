@@ -31,6 +31,7 @@ const config = require( '../config' );
  * @property {number[]} type             Average type time.
  * @property {number[]} focus            Average block selection time.
  * @property {number[]} inserterOpen     Average time to open global inserter.
+ * @property {number[]} inserterHover    Average time to move mouse between two block item in the inserter.
  */
 
 /**
@@ -46,6 +47,9 @@ const config = require( '../config' );
  * @property {number} inserterOpen     Average time to open global inserter.
  * @property {number} minInserterOpen  Min time to open global inserter.
  * @property {number} maxInserterOpen  Max time to open global inserter.
+ * @property {number} inserterHover     Average time to move mouse between two block item in the inserter.
+ * @property {number} minInserterHover  Min time to move mouse between two block item in the inserter.
+ * @property {number} maxInserterHover  Max time to move mouse between two block item in the inserter.
  */
 /**
  * @typedef WPFormattedPerformanceResults
@@ -60,6 +64,9 @@ const config = require( '../config' );
  * @property {string=} inserterOpen     Average time to open global inserter.
  * @property {string=} minInserterOpen  Min time to open global inserter.
  * @property {string=} maxInserterOpen  Max time to open global inserter.
+ * @property {string=} inserterHover     Average time to move mouse between two block item in the inserter.
+ * @property {string=} minInserterHover  Min time to move mouse between two block item in the inserter.
+ * @property {string=} maxInserterHover  Max time to move mouse between two block item in the inserter.
  */
 
 /**
@@ -119,6 +126,9 @@ function curateResults( results ) {
 		inserterOpen: average( results.inserterOpen ),
 		minInserterOpen: Math.min( ...results.inserterOpen ),
 		maxInserterOpen: Math.max( ...results.inserterOpen ),
+		inserterHover: average( results.inserterHover ),
+		minInserterHover: Math.min( ...results.inserterHover ),
+		maxInserterHover: Math.max( ...results.inserterHover ),
 	};
 }
 
@@ -179,6 +189,9 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 			inserterOpen: results.map( ( r ) => r.inserterOpen ),
 			minInserterOpen: results.map( ( r ) => r.minInserterOpen ),
 			maxInserterOpen: results.map( ( r ) => r.maxInserterOpen ),
+			inserterHover: results.map( ( r ) => r.inserterHover ),
+			minInserterHover: results.map( ( r ) => r.minInserterHover ),
+			maxInserterHover: results.map( ( r ) => r.maxInserterHover ),
 		},
 		median
 	);
