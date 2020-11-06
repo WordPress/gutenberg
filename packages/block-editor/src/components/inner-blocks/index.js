@@ -45,7 +45,6 @@ function UncontrolledInnerBlocks( props ) {
 		__experimentalAppenderTagName,
 		renderAppender,
 		orientation,
-		dropZonesDisabled,
 		placeholder,
 		__experimentalLayout,
 	} = props;
@@ -55,8 +54,7 @@ function UncontrolledInnerBlocks( props ) {
 		allowedBlocks,
 		templateLock,
 		captureToolbars,
-		orientation,
-		dropZonesDisabled,
+		orientation
 	);
 
 	useInnerBlockTemplateSync(
