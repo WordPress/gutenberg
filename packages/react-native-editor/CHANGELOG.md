@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+* [***] Faster editor start and overall operation on Android [#26732]
 
 ## 1.39.1
 
