@@ -77,7 +77,7 @@ function gutenberg_register_template_post_type() {
 	register_post_type( 'wp_template', $args );
 
 	$meta_args = array(
-		'object_subtype' => 'wp_part',
+		'object_subtype' => 'wp_template',
 		'type'           => 'string',
 		'description'    => 'The theme that provided the template, if any.',
 		'single'         => true,
@@ -238,7 +238,7 @@ function filter_rest_wp_template_query( $args, $request ) {
 add_filter( 'rest_wp_template_query', 'filter_rest_wp_template_query', 99, 2 );
 
 /**
- * Run synchrnonization for template part API requests
+ * Run synchrnonization for template API requests
  *
  * @param mixed           $dispatch_result Dispatch result, will be used if not empty.
  * @param WP_REST_Request $request         Request used to generate the response.
