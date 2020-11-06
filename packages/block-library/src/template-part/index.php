@@ -40,7 +40,7 @@ function render_block_core_template_part( $attributes ) {
 			// Else, if the template part was provided by the active theme,
 			// render the corresponding file content.
 			$template_part_file_path = get_stylesheet_directory() . '/block-template-parts/' . $attributes['slug'] . '.html';
-			if ( 0 === validate_file( $template_part_file_path ) && file_exists( $template_part_file_path ) ) {
+			if ( 0 === validate_file( $attributes['slug'] ) && file_exists( $template_part_file_path ) ) {
 				$content = file_get_contents( $template_part_file_path );
 			}
 		}
