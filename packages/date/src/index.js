@@ -183,7 +183,7 @@ const formatMap = {
 	},
 
 	// Week
-	W: 'W',
+	W: 'II',
 
 	// Month
 	F: 'MMMM',
@@ -212,13 +212,17 @@ const formatMap = {
 	L( dateValue ) {
 		return isLeapYear( dateValue ) ? '1' : '0';
 	},
-	o: 'GGGG',
+	o: 'R',
 	Y: 'yyyy',
-	y: 'YY',
+	y: 'yy',
 
 	// Time
-	a: 'a',
-	A: 'A',
+	a( dateValue ) {
+		return formatTZ( dateValue, 'aa', {
+			timeZone: getActualTimezone(),
+		} ).toLowerCase();
+	},
+	A: 'bb',
 	/**
 	 * Gets the given time in Swatch Internet Time (.beats).
 	 *
@@ -260,11 +264,7 @@ const formatMap = {
 	 * @return {string} Formatted date.
 	 */
 	e( dateValue ) {
-		return formatTZ(
-			utcToZonedTime( dateValue, getActualTimezone() ),
-			'zzzz',
-			{ timeZone: getActualTimezone() }
-		);
+		return formatTZ( dateValue, 'zzzz', { timeZone: getActualTimezone() } );
 	},
 	/**
 	 * Gets whether the timezone is in DST currently.
@@ -275,14 +275,14 @@ const formatMap = {
 	I() {
 		return ''; // @todo
 	},
-	O: 'xx',
-	P: 'xxx',
+	O( dateValue ) {
+		return formatTZ( dateValue, 'xx', { timeZone: getActualTimezone() } );
+	},
+	P( dateValue ) {
+		return formatTZ( dateValue, 'xxx', { timeZone: getActualTimezone() } );
+	},
 	T( dateValue ) {
-		return formatTZ(
-			utcToZonedTime( dateValue, getActualTimezone() ),
-			'z',
-			{ timeZone: getActualTimezone() }
-		);
+		return formatTZ( dateValue, 'z', { timeZone: getActualTimezone() } );
 	},
 	/**
 	 * Gets the timezone offset in seconds.
