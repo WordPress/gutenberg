@@ -10,7 +10,7 @@
  * and template parts from the site editor, and close the connection.
  */
 function gutenberg_edit_site_export() {
-	// Theme templates andd template parts need to be synchronized
+	// Theme templates and template parts need to be synchronized
 	// before the export.
 	synchronize_theme_template_parts();
 	synchronize_theme_templates();
@@ -44,7 +44,7 @@ function gutenberg_edit_site_export() {
 		);
 	}
 
-	// Load template partss into the zip file.
+	// Load template parts into the zip file.
 	$template_part_query = new WP_Query(
 		array(
 			'post_type'      => 'wp_template_part',
