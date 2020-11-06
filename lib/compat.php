@@ -482,7 +482,6 @@ add_filter( 'block_editor_preload_paths', 'gutenberg_preload_edit_post' );
  *
  * @return array Array of new labels for Reusable Block post type.
  */
-
 function gutenberg_override_reusable_block_post_type_labels() {
 	return array(
 		'name'                     => _x( 'Reusable Blocks', 'post type general name', 'gutenberg' ),
