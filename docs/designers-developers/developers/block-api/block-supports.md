@@ -215,6 +215,21 @@ supports: {
 }
 ```
 
+When the block declares support for `lineHeight`, the attributes definition is extended to include a new attribute `style` of `object` type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            typography: {
+                lineHeight: 'value'
+            }
+        }
+    }
+}
+```
+
 ## multiple
 
 - Type: `boolean`
