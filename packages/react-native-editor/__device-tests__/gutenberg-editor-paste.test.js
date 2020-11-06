@@ -69,6 +69,10 @@ describe( 'Gutenberg Editor paste tests', () => {
 
 		// create another paragraph block
 		await editorPage.addNewBlock( paragraphBlockName );
+		if ( isAndroid() ) {
+			// On Andrdoid 10 a new auto-suggestion popup is appearing to let the user paste text recently put in the clipboard. Let's dismiss it.
+			await editorPage.dismissAndroidClipboardSmartSuggestion();
+		}
 		const paragraphBlockElement2 = await editorPage.getBlockAtPosition(
 			paragraphBlockName,
 			2
@@ -110,6 +114,10 @@ describe( 'Gutenberg Editor paste tests', () => {
 
 		// create another paragraph block
 		await editorPage.addNewBlock( paragraphBlockName );
+		if ( isAndroid() ) {
+			// On Andrdoid 10 a new auto-suggestion popup is appearing to let the user paste text recently put in the clipboard. Let's dismiss it.
+			await editorPage.dismissAndroidClipboardSmartSuggestion();
+		}
 		const paragraphBlockElement2 = await editorPage.getBlockAtPosition(
 			paragraphBlockName,
 			2
