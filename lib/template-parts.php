@@ -83,7 +83,7 @@ function gutenberg_set_template_part_post_theme( $post_id, $post, $update ) {
 	$theme = get_post_meta( $post_id, 'theme', true );
 
 	if ( ! $theme ) {
-		update_post_meta( $post_id, 'theme', wp_get_theme()->get( 'TextDomain' ) );
+		update_post_meta( $post_id, 'theme', wp_get_theme()->get_stylesheet() );
 	}
 }
 

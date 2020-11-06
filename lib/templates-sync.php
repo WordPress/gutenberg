@@ -103,6 +103,6 @@ function _gutenberg_synchronize_theme_templates( $template_type ) {
 			// Subtract ending '.html'.
 			-5
 		);
-		_gutenberg_create_auto_draft_for_template( $template_post_types[ $template_type ], $slug, wp_get_theme()->get( 'TextDomain' ), $content );
+		_gutenberg_create_auto_draft_for_template( $template_post_types[ $template_type ], $slug, wp_get_theme()->get_stylesheet(), $content );
 	}
 }

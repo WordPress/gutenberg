@@ -23,7 +23,7 @@ function gutenberg_edit_site_export() {
 	$zip->addEmptyDir( 'theme/block-templates' );
 	$zip->addEmptyDir( 'theme/block-template-parts' );
 
-	$theme = wp_get_theme()->get( 'TextDomain' );
+	$theme = wp_get_theme()->get_stylesheet();
 
 	// Load templates into the zip file.
 	$template_query = new WP_Query(
