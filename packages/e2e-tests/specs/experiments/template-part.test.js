@@ -14,18 +14,13 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import {
-	useExperimentalFeatures,
-	navigationPanel,
-} from '../../experimental-features';
+import { navigationPanel } from '../../experimental-features';
 
 describe( 'Template Part', () => {
-	useExperimentalFeatures( [ '#gutenberg-full-site-editing' ] );
-
 	beforeAll( async () => {
+		await activateTheme( 'twentytwentyone-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
-		await activateTheme( 'twentytwentyone-blocks' );
 	} );
 	afterAll( async () => {
 		await trashAllPosts( 'wp_template' );
@@ -70,9 +65,9 @@ describe( 'Template Part', () => {
 
 			// Verify that the header template part is updated.
 			const [ headerTemplatePart ] = await page.$x(
-				'//*[@data-type="core/template-part"][//p[text()="Header Template Part123"]]'
+				'//*[@data-type="core/template-part"][//p[text()="Header Template Part 123"]]'
 			);
-			expect( headerTemplatePart ).not.toBeNull();
+			expect( headerTemplatePart ).not.toBeUndefined();
 		} );
 	} );
 

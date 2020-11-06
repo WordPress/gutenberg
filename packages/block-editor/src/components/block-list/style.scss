@@ -550,18 +550,6 @@
 	.block-editor-block-mover:not(.is-horizontal) {
 		// Position SVGs.
 		.block-editor-block-mover-button {
-			&.is-up-button {
-				svg {
-					margin-top: 2px;
-				}
-			}
-
-			&.is-down-button {
-				svg {
-					margin-bottom: 3px;
-				}
-			}
-
 			&:focus::before {
 				left: 0 !important;
 				min-width: 0;

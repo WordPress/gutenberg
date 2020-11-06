@@ -12,6 +12,7 @@
 		{ "path": "packages/escape-html" },
 		{ "path": "packages/eslint-plugin" },
 		{ "path": "packages/html-entities" },
+		{ "path": "packages/hooks" },
 		{ "path": "packages/i18n" },
 		{ "path": "packages/icons" },
 		{ "path": "packages/is-shallow-equal" },
