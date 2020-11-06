@@ -4,11 +4,14 @@
 import { createRegistry } from '../../../registry';
 import useStoreSelectors from '../index';
 
-jest.mock( '../../use-select', () => {
-	return jest.fn();
-} );
-
-import useSelect from '../../use-select';
+/**
+ * External dependencies
+ */
+import TestRenderer, { act } from 'react-test-renderer';
+/**
+ * WordPress dependencies
+ */
+import { RegistryProvider } from '@wordpress/data';
 
 describe( 'useStoreSelectors', () => {
 	let registry;
@@ -24,28 +27,26 @@ describe( 'useStoreSelectors', () => {
 			},
 		} );
 
-		// Setup mocks
-		const mapSelectSpy = jest.fn( () => 'map select retval' );
-		const selectSpy = jest.fn();
-		useSelect.mockImplementation( () => 'return value' );
+		const TestComponent = () => {
+			const results = useStoreSelectors(
+				'testStore',
+				( { testSelector } ) => testSelector( 'foo' )
+			);
+			return <div>{ results }</div>;
+		};
 
-		// Call with a mock mapSelect fn
-		const retval = useStoreSelectors( 'testStore', mapSelectSpy );
-
-		// Make sure useSelect was called and we got its return value
-		expect( retval ).toBe( 'return value' );
-		expect( useSelect ).toHaveBeenCalledTimes( 1 );
-
-		// Make sure mapSelect was _not_ called just yet
-		expect( mapSelectSpy ).not.toHaveBeenCalled();
-
-		// Grab the wrapped mapSelect created by useStoreSelectors
-		const wrappedMapSelect = useSelect.mock.calls[ 0 ][ 0 ];
-		expect( wrappedMapSelect ).toEqual( expect.any( Function ) );
-		expect( selectSpy ).not.toHaveBeenCalled();
-
-		// Call it and make sure it calls the callback passed to useStoreSelectors
-		expect( wrappedMapSelect( selectSpy ) ).toBe( 'map select retval' );
-		expect( selectSpy ).toHaveBeenCalledWith( 'testStore' );
+		let renderer;
+		act( () => {
+			renderer = TestRenderer.create(
+				<RegistryProvider value={ registry }>
+					<TestComponent keyName="foo" />
+				</RegistryProvider>
+			);
+		} );
+		const testInstance = renderer.root;
+		// ensure expected state was rendered
+		expect( testInstance.findByType( 'div' ).props ).toEqual( {
+			children: 'bar',
+		} );
 	} );
 } );
