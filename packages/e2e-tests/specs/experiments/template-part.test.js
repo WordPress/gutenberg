@@ -65,6 +65,7 @@ describe( 'Template Part', () => {
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( 'Front Page' );
+			await navigationPanel.close();
 		}
 
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
@@ -108,7 +109,7 @@ describe( 'Template Part', () => {
 			);
 			expect(
 				initialTemplateParts.length - finalTemplateParts.length
-			).toEqual( 1 );
+			).toBe( 1 );
 
 			// Verify content of the template part is still present.
 			const [ expectedContent ] = await page.$x(
@@ -118,6 +119,7 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert selected block(s) to template part', async () => {
+			await page.waitForSelector( '.wp-block-template-part' );
 			const initialTemplateParts = await page.$$(
 				'.wp-block-template-part'
 			);
@@ -146,13 +148,18 @@ describe( 'Template Part', () => {
 			);
 			expect( newTemplatePart ).not.toBeNull();
 
+			// TODO: Remove when toolbar supports text fields
+			expect( console ).toHaveWarnedWith(
+				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
+			);
+
 			// Verify there is 1 more template part on the page than previously.
 			const finalTemplateParts = await page.$$(
 				'.wp-block-template-part'
 			);
 			expect(
 				finalTemplateParts.length - initialTemplateParts.length
-			).toEqual( 1 );
+			).toBe( 1 );
 		} );
 	} );
 
