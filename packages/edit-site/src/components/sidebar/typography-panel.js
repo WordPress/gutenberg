@@ -13,8 +13,18 @@ import { __ } from '@wordpress/i18n';
  */
 import { useEditorFeature } from '../editor/utils';
 
-export function useHasTypographyPanel( { supports } ) {
-	return supports.includes( 'fontSize' ) || supports.includes( 'lineHeight' );
+export function useHasTypographyPanel( { supports, name } ) {
+	return (
+		useHasLineHeightControl( { supports, name } ) ||
+		supports.includes( 'fontSize' )
+	);
+}
+
+function useHasLineHeightControl( { supports, name } ) {
+	return (
+		useEditorFeature( 'typography.customLineHeight', name ) &&
+		supports.includes( 'lineHeight' )
+	);
 }
 
 export default function TypographyPanel( {
@@ -28,11 +38,13 @@ export default function TypographyPanel( {
 		name
 	);
 	const fontFamilies = useEditorFeature( 'typography.fontFamilies', name );
+	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
 
 	return (
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
 			{ supports.includes( 'fontFamily' ) && (
 				<FontFamilyControl
+					fontFamilies={ fontFamilies }
 					value={ getStyleProperty( name, 'fontFamily' ) }
 					onChange={ ( value ) =>
 						setStyleProperty( name, 'fontFamily', value )
@@ -49,9 +61,8 @@ export default function TypographyPanel( {
 					disableCustomFontSizes={ disableCustomFontSizes }
 				/>
 			) }
-			{ supports.includes( 'lineHeight' ) && (
+			{ hasLineHeightEnabled && (
 				<LineHeightControl
-					fontFamilies={ fontFamilies }
 					value={ getStyleProperty( name, 'lineHeight' ) }
 					onChange={ ( value ) =>
 						setStyleProperty( name, 'lineHeight', value )

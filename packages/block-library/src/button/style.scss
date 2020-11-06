@@ -73,7 +73,15 @@ $blocks-button__height: 3.1em;
 
 .is-style-outline > .wp-block-button__link,
 .wp-block-button__link.is-style-outline {
-	color: #32373c;
-	background-color: transparent;
 	border: 2px solid;
+}
+
+.is-style-outline > .wp-block-button__link:not(.has-text-color),
+.wp-block-button__link.is-style-outline:not(.has-text-color) {
+	color: #32373c;
+}
+
+.is-style-outline > .wp-block-button__link:not(.has-background),
+.wp-block-button__link.is-style-outline:not(.has-background) {
+	background-color: transparent;
 }
