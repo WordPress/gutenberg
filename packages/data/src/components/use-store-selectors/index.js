@@ -4,7 +4,7 @@
 import useSelect from '../use-select';
 
 /**
- * A shorthand notation for useSelect() that returns all the selectors from a given store.
+ * A shorthand for useSelect() that returns all the selectors from a given store.
  *
  * @param {string}   storeKey    Store to return selectors from.
  * @param {Function} _mapSelect  Function called on every state change. The

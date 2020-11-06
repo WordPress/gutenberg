@@ -714,7 +714,7 @@ _Returns_
 
 <a name="useStoreSelectors" href="#useStoreSelectors">#</a> **useStoreSelectors**
 
-A shorthand notation for useSelect() that returns all the selectors from a given store.
+A shorthand for useSelect() that returns all the selectors from a given store.
 
 _Related_
 
