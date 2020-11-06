@@ -10,9 +10,8 @@ import useSelect from '../use-select';
  * @param {Function} _mapSelect  Function called on every state change. The
  *                               returned value is exposed to the component
  *                               implementing this hook. The function receives
- *                               the `registry.select` method on the first
- *                               argument and the `registry` on the second
- *                               argument.
+ *                               the object with all the store selectors as
+ *                               its only argument.
  * @param {Array}    deps        If provided, this memoizes the mapSelect so the
  *                               same `mapSelect` is invoked on every state
  *                               change unless the dependencies change.
