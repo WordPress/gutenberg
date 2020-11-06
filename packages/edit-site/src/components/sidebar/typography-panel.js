@@ -29,7 +29,7 @@ function useHasLineHeightControl( { supports, name } ) {
 
 export default function TypographyPanel( {
 	context: { supports, name },
-	getStyleProperty,
+	getMergedStyleProperty,
 	setStyleProperty,
 } ) {
 	const fontSizes = useEditorFeature( 'typography.fontSizes', name );
@@ -45,7 +45,7 @@ export default function TypographyPanel( {
 			{ supports.includes( 'fontFamily' ) && (
 				<FontFamilyControl
 					fontFamilies={ fontFamilies }
-					value={ getStyleProperty( name, 'fontFamily' ) }
+					value={ getMergedStyleProperty( name, 'fontFamily' ) }
 					onChange={ ( value ) =>
 						setStyleProperty( name, 'fontFamily', value )
 					}
@@ -53,7 +53,7 @@ export default function TypographyPanel( {
 			) }
 			{ supports.includes( 'fontSize' ) && (
 				<FontSizePicker
-					value={ getStyleProperty( name, 'fontSize' ) }
+					value={ getMergedStyleProperty( name, 'fontSize' ) }
 					onChange={ ( value ) =>
 						setStyleProperty( name, 'fontSize', value )
 					}
@@ -63,7 +63,7 @@ export default function TypographyPanel( {
 			) }
 			{ hasLineHeightEnabled && (
 				<LineHeightControl
-					value={ getStyleProperty( name, 'lineHeight' ) }
+					value={ getMergedStyleProperty( name, 'lineHeight' ) }
 					onChange={ ( value ) =>
 						setStyleProperty( name, 'lineHeight', value )
 					}

@@ -32,6 +32,7 @@ const GlobalStylesContext = createContext( {
 	getSetting: ( context, path ) => {},
 	setSetting: ( context, path, newValue ) => {},
 	getStyleProperty: ( context, propertyName ) => {},
+	getMergedStyleProperty: ( context, propertyName ) => {},
 	setStyleProperty: ( context, propertyName, newValue ) => {},
 	globalContext: {},
 	/* eslint-enable no-unused-vars */
@@ -85,6 +86,11 @@ export default function GlobalStylesProvider( {
 			getStyleProperty: ( context, propertyName ) =>
 				get(
 					userStyles?.[ context ]?.styles,
+					STYLE_PROPERTY[ propertyName ]
+				),
+			getMergedStyleProperty: ( context, propertyName ) =>
+				get(
+					mergedStyles?.[ context ]?.styles,
 					STYLE_PROPERTY[ propertyName ]
 				),
 			setStyleProperty: ( context, propertyName, newValue ) => {

@@ -27,6 +27,7 @@ export function useHasColorPanel( { supports } ) {
 export default function ColorPanel( {
 	context: { supports, name },
 	getStyleProperty,
+	getMergedStyleProperty,
 	setStyleProperty,
 	getSetting,
 	setSetting,
@@ -42,7 +43,8 @@ export default function ColorPanel( {
 	const settings = [];
 
 	if ( supports.includes( 'color' ) ) {
-		const color = getStyleProperty( name, 'color' );
+		const color = getMergedStyleProperty( name, 'color' );
+		const userColor = getStyleProperty( name, 'color' );
 		settings.push( {
 			colorValue:
 				getPresetValueFromVariable( 'color', colors, color ) || color,
@@ -53,12 +55,17 @@ export default function ColorPanel( {
 					getPresetVariable( 'color', colors, value ) || value
 				),
 			label: __( 'Text color' ),
+			clearable: color === userColor,
 		} );
 	}
 
 	let backgroundSettings = {};
 	if ( supports.includes( 'backgroundColor' ) ) {
-		const backgroundColor = getStyleProperty( name, 'backgroundColor' );
+		const backgroundColor = getMergedStyleProperty(
+			name,
+			'backgroundColor'
+		);
+		const userBackgroundColor = getStyleProperty( name, 'backgroundColor' );
 		backgroundSettings = {
 			colorValue:
 				getPresetValueFromVariable(
@@ -73,11 +80,16 @@ export default function ColorPanel( {
 					getPresetVariable( 'color', colors, value ) || value
 				),
 		};
+		if ( backgroundColor ) {
+			backgroundSettings.clearable =
+				backgroundColor === userBackgroundColor;
+		}
 	}
 
 	let gradientSettings = {};
 	if ( supports.includes( 'background' ) ) {
-		const gradient = getStyleProperty( name, 'background' );
+		const gradient = getMergedStyleProperty( name, 'background' );
+		const userGradient = getStyleProperty( name, 'background' );
 		gradientSettings = {
 			gradientValue:
 				getPresetValueFromVariable( 'gradient', gradients, gradient ) ||
@@ -89,6 +101,9 @@ export default function ColorPanel( {
 					getPresetVariable( 'gradient', gradients, value ) || value
 				),
 		};
+		if ( gradient ) {
+			gradientSettings.clearable = gradient === userGradient;
+		}
 	}
 
 	if (
@@ -103,7 +118,8 @@ export default function ColorPanel( {
 	}
 
 	if ( supports.includes( LINK_COLOR ) ) {
-		const color = getStyleProperty( name, LINK_COLOR );
+		const color = getMergedStyleProperty( name, LINK_COLOR );
+		const userColor = getStyleProperty( name, LINK_COLOR );
 		settings.push( {
 			colorValue:
 				getPresetValueFromVariable( 'color', colors, color ) || color,
@@ -114,6 +130,7 @@ export default function ColorPanel( {
 					getPresetVariable( 'color', colors, value ) || value
 				),
 			label: __( 'Link color' ),
+			clearable: color === userColor,
 		} );
 	}
 	return (
