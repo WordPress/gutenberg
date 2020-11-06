@@ -42,9 +42,6 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 				'post_status'  => 'auto-draft',
 				'post_type'    => $post_type,
 				'post_name'    => $slug,
-				'meta_input'   => array(
-					'theme' => $theme,
-				),
 			)
 		);
 	} else {

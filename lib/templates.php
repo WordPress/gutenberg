@@ -90,6 +90,27 @@ function gutenberg_register_template_post_type() {
 add_action( 'init', 'gutenberg_register_template_post_type' );
 
 /**
+ * Automatically set the theme meta for templates.
+ *
+ * @param array $post_id Template ID.
+ * @param array $post    Template Post.
+ * @param bool  $update  Is update.
+ */
+function gutenberg_set_template_post_theme( $post_id, $post, $update ) {
+	if ( 'wp_template' !== $post->post_type || $update || 'trash' === $post->post_status ) {
+		return;
+	}
+
+	$theme = get_post_meta( $post_id, 'theme', true );
+
+	if ( ! $theme ) {
+		update_post_meta( $post_id, 'theme', wp_get_theme()->get( 'TextDomain' ) );
+	}
+}
+
+add_action( 'save_post', 'gutenberg_set_template_post_theme', 10, 3 );
+
+/**
  * Filters the capabilities of a user to conditionally grant them capabilities for managing 'wp_template' posts.
  *
  * Any user who can 'edit_theme_options' will have access.

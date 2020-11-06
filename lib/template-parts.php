@@ -69,6 +69,27 @@ function gutenberg_register_template_part_post_type() {
 add_action( 'init', 'gutenberg_register_template_part_post_type' );
 
 /**
+ * Automatically set the theme meta for template parts.
+ *
+ * @param array $post_id Template Part ID.
+ * @param array $post    Template Part Post.
+ * @param bool  $update  Is update.
+ */
+function gutenberg_set_template_part_post_theme( $post_id, $post, $update ) {
+	if ( 'wp_template_part' !== $post->post_type || $update || 'trash' === $post->post_status ) {
+		return;
+	}
+
+	$theme = get_post_meta( $post_id, 'theme', true );
+
+	if ( ! $theme ) {
+		update_post_meta( $post_id, 'theme', wp_get_theme()->get( 'TextDomain' ) );
+	}
+}
+
+add_action( 'save_post', 'gutenberg_set_template_part_post_theme', 10, 3 );
+
+/**
  * Filters `wp_template_part` posts slug resolution to bypass deduplication logic as
  * template part slugs should be unique.
  *
