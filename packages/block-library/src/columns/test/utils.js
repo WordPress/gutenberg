@@ -18,6 +18,14 @@ describe( 'toWidthPrecision', () => {
 		expect( value ).toBe( 50.11 );
 	} );
 
+	it( 'should convert a string value with unit to a number', () => {
+		expect( toWidthPrecision( '33.3%' ) ).toBe( 33.3 );
+	} );
+
+	it( 'should return undefined for an invalid string', () => {
+		expect( toWidthPrecision( 'blahblah' ) ).toBe( undefined );
+	} );
+
 	it( 'should return undefined for invalid number', () => {
 		expect( toWidthPrecision( null ) ).toBe( undefined );
 		expect( toWidthPrecision( undefined ) ).toBe( undefined );
@@ -173,6 +181,14 @@ describe( 'hasExplicitColumnWidths', () => {
 		expect( result ).toBe( true );
 	} );
 
+	it( 'returns true if a block has explicit width defined as a string', () => {
+		const blocks = [ { attributes: { width: '100%' } } ];
+
+		const result = hasExplicitColumnWidths( blocks );
+
+		expect( result ).toBe( true );
+	} );
+
 	it( 'returns false if some, not all blocks have explicit width', () => {
 		const blocks = [
 			{ attributes: { width: 10 } },
@@ -188,6 +204,17 @@ describe( 'hasExplicitColumnWidths', () => {
 		const blocks = [
 			{ attributes: { width: 10 } },
 			{ attributes: { width: 90 } },
+		];
+
+		const result = hasExplicitColumnWidths( blocks );
+
+		expect( result ).toBe( true );
+	} );
+
+	it( 'returns true if blocks have width defined as strings and numbers', () => {
+		const blocks = [
+			{ attributes: { width: 10 } },
+			{ attributes: { width: '90px' } },
 		];
 
 		const result = hasExplicitColumnWidths( blocks );
