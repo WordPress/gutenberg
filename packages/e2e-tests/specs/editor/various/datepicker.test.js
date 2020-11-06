@@ -34,7 +34,7 @@ describe( 'Datepicker', () => {
 		);
 
 		expect( publishingDate ).toMatch(
-			/[A-Za-z]{3} \d{1,2}, \d{4} \d{1,2}:\d{2} [ap]m/
+			/[A-Za-z]{3} \d{1,2}, \d{4} \d{1,2}:\d{2} [AP]M/
 		);
 	} );
 
@@ -55,9 +55,9 @@ describe( 'Datepicker', () => {
 		);
 
 		expect( publishingDate ).not.toEqual( 'Immediately' );
-		// The expected date format will be "Sep 26, 2018 11:52 pm".
+		// The expected date format will be "Sep 26, 2018 11:52 PM".
 		expect( publishingDate ).toMatch(
-			/[A-Za-z]{3} \d{1,2}, \d{4} \d{1,2}:\d{2} [ap]m/
+			/[A-Za-z]{3} \d{1,2}, \d{4} \d{1,2}:\d{2} [AP]M/
 		);
 	} );
 
