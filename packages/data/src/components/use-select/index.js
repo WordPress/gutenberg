@@ -187,9 +187,7 @@ export default function useSelect( _mapSelect, deps ) {
 			}
 		};
 
-		const unsubscribers = [
-			...listeningStores.current,
-		].map( ( storeKey ) =>
+		const unsubscribers = listeningStores.current.map( ( storeKey ) =>
 			registry.stores[ storeKey ].subscribe( onChange )
 		);
 		const unsubscribe = () => {
@@ -201,7 +199,7 @@ export default function useSelect( _mapSelect, deps ) {
 			unsubscribe();
 			renderQueue.flush( queueContext );
 			// Reset the registered stores when mapSelect changes. In case it subscribes to different stores.
-			listeningStores.current = new Set();
+			listeningStores.current = [];
 		};
 	}, [ registry, onStoreChange, mapSelect ] );
 
