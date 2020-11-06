@@ -78,7 +78,6 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 			{ isAddingColor && (
 				<InlineColorUI
 					name={ name }
-					addingColor={ isAddingColor }
 					onClose={ disableIsAddingColor }
 					activeAttributes={ activeAttributes }
 					value={ value }

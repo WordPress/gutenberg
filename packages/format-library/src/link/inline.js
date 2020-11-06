@@ -10,7 +10,13 @@ import { useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withSpokenMessages, Popover } from '@wordpress/components';
 import { prependHTTP } from '@wordpress/url';
-import { create, insert, isCollapsed, applyFormat } from '@wordpress/rich-text';
+import {
+	create,
+	insert,
+	isCollapsed,
+	applyFormat,
+	useAnchorRef,
+} from '@wordpress/rich-text';
 import { __experimentalLinkControl as LinkControl } from '@wordpress/block-editor';
 
 /**
@@ -52,31 +58,6 @@ function InlineLinkUI( {
 	 * @type {[Object|undefined,Function]}
 	 */
 	const [ nextLinkValue, setNextLinkValue ] = useState();
-
-	const anchorRef = useMemo( () => {
-		const selection = window.getSelection();
-
-		if ( ! selection.rangeCount ) {
-			return;
-		}
-
-		const range = selection.getRangeAt( 0 );
-
-		if ( addingLink && ! isActive ) {
-			return range;
-		}
-
-		let element = range.startContainer;
-
-		// If the caret is right before the element, select the next element.
-		element = element.nextElementSibling || element;
-
-		while ( element.nodeType !== element.ELEMENT_NODE ) {
-			element = element.parentNode;
-		}
-
-		return element.closest( 'a' );
-	}, [ addingLink, value.start, value.end ] );
 
 	const linkValue = {
 		url: activeAttributes.url,
@@ -160,6 +141,8 @@ function InlineLinkUI( {
 			speak( __( 'Link inserted.' ), 'assertive' );
 		}
 	}
+
+	const anchorRef = useAnchorRef();
 
 	return (
 		<Popover

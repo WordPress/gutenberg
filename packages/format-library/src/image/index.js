@@ -3,8 +3,8 @@
  */
 import { Path, SVG, TextControl, Popover, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
-import { insertObject } from '@wordpress/rich-text';
+import { useState } from '@wordpress/element';
+import { insertObject, useAnchorRef } from '@wordpress/rich-text';
 import {
 	MediaUpload,
 	RichTextToolbarButton,
@@ -33,18 +33,10 @@ function onKeyDown( event ) {
 	}
 }
 
-function InlineUI( {
-	value,
-	onChange,
-	isObjectActive,
-	activeObjectAttributes,
-} ) {
+function InlineUI( { value, onChange, activeObjectAttributes } ) {
 	const { style } = activeObjectAttributes;
 	const [ width, setWidth ] = useState( style.replace( /\D/g, '' ) );
-	const anchorRef = useMemo( () => {
-		const selection = window.getSelection();
-		return selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-	}, [ isObjectActive ] );
+	const anchorRef = useAnchorRef();
 
 	return (
 		<Popover
@@ -159,7 +151,6 @@ function Edit( {
 				<InlineUI
 					value={ value }
 					onChange={ onChange }
-					isObjectActive={ isObjectActive }
 					activeObjectAttributes={ activeObjectAttributes }
 				/>
 			) }

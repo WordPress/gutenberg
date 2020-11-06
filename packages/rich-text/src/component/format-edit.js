@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { useMemo, createContext } from '@wordpress/element';
+
+/**
  * Internal dependencies
  */
 import { getActiveFormat } from '../get-active-format';
@@ -23,6 +28,10 @@ const interactiveContentTags = new Set( [
 	'video',
 ] );
 
+export const Range = createContext();
+export const FormatSettings = createContext( {} );
+export const IsActive = createContext( false );
+
 export default function FormatEdit( {
 	formatTypes,
 	onChange,
@@ -30,8 +39,21 @@ export default function FormatEdit( {
 	value,
 	allowedFormats,
 	withoutInteractiveFormatting,
+	getWin,
 } ) {
-	return formatTypes.map( ( { name, edit: Edit, tagName } ) => {
+	const range = useMemo( () => {
+		const selection = getWin().getSelection();
+
+		if ( ! selection.rangeCount ) {
+			return;
+		}
+
+		return selection.getRangeAt( 0 );
+	}, [ value.start, value.end ] );
+
+	const edits = formatTypes.map( ( settings ) => {
+		const { name, edit: Edit, tagName } = settings;
+
 		if ( ! Edit ) {
 			return null;
 		}
@@ -53,9 +75,8 @@ export default function FormatEdit( {
 		const isObjectActive =
 			activeObject !== undefined && activeObject.type === name;
 
-		return (
+		const edit = (
 			<Edit
-				key={ name }
 				isActive={ isActive }
 				activeAttributes={
 					isActive ? activeFormat.attributes || {} : {}
@@ -69,5 +90,15 @@ export default function FormatEdit( {
 				onFocus={ onFocus }
 			/>
 		);
+
+		return (
+			<FormatSettings.Provider key={ name } value={ settings }>
+				<IsActive.Provider value={ isActive }>
+					{ edit }
+				</IsActive.Provider>
+			</FormatSettings.Provider>
+		);
 	} );
+
+	return <Range.Provider value={ range }>{ edits }</Range.Provider>;
 }
