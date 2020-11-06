@@ -15,7 +15,7 @@ import {
 	toDate,
 } from 'date-fns';
 import {
-	format as formatIntl,
+	format as formatTZ,
 	utcToZonedTime,
 	zonedTimeToUtc,
 } from 'date-fns-tz';
@@ -287,7 +287,20 @@ const formatMap = {
 	u: 'SSSSSS',
 	v: 'SSS',
 	// Timezone
-	e: 'zz', // @todo: date-fns-tz perhaps
+	/**
+	 * Return the timezone identifier for the given date.
+	 *
+	 * @param {Date|string} dateValue Date ISO string or object.
+	 *
+	 * @return {string} Formatted date.
+	 */
+	e( dateValue ) {
+		return formatTZ(
+			utcToZonedTime( dateValue, getActualTimezone() ),
+			'zzzz',
+			{ timeZone: getActualTimezone() }
+		);
+	},
 	/**
 	 * Gets whether the timezone is in DST currently.
 	 *
@@ -300,7 +313,13 @@ const formatMap = {
 	},
 	O: 'xx',
 	P: 'xxx',
-	T: 'z', // @todo: date-fns-tz perhaps
+	T( dateValue ) {
+		return formatTZ(
+			utcToZonedTime( dateValue, getActualTimezone() ),
+			'z',
+			{ timeZone: getActualTimezone() }
+		);
+	},
 	/**
 	 * Gets the timezone offset in seconds.
 	 *
@@ -536,7 +555,7 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
 		timezone = undefined;
 	}
 
-	return formatIntl(
+	return formatTZ(
 		utcToZonedTime( dateValue, getActualTimezone( timezone ) ),
 		translateFormat( dateFormat, dateValue ),
 		{
@@ -563,7 +582,7 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
  * @return {string} Formatted date.
  */
 export function gmdateI18n( dateFormat, dateValue = new Date() ) {
-	return formatIntl(
+	return formatTZ(
 		utcToZonedTime( dateValue ),
 		translateFormat( dateFormat, dateValue ),
 		{

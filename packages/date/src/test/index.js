@@ -224,6 +224,37 @@ describe( 'PHP Format Tokens', () => {
 		expect( formattedDate ).toBe( '500' );
 	} );
 
+	it( 'should support "T" to obtain the timezone abbreviation for the given date', () => {
+		const settings = __experimentalGetSettings();
+
+		setSettings( {
+			...settings,
+			timezone: { offset: -4, string: 'America/New_York' },
+		} );
+
+		const formattedDateStandard = dateNoI18n(
+			'T',
+			'2020-01-01T11:00:00.000Z'
+		);
+
+		expect( formattedDateStandard ).toBe( 'EST' );
+
+		setSettings( settings );
+	} );
+
+	it( 'should support "e" to obtain timezone identifier', () => {
+		const settings = __experimentalGetSettings();
+
+		setSettings( {
+			...settings,
+			timezone: { offset: -4, string: 'America/New_York' },
+		} );
+
+		const formattedDate = dateNoI18n( 'e', '2020-10-09T11:00:00.000Z' );
+
+		expect( formattedDate ).toBe( 'Eastern Daylight Time' );
+	} );
+
 	it.skip( 'should support "I" to obtain whether or not the timezone is observing DST', () => {
 		const formattedFall = dateNoI18n( 'I', '2020-10-09T11:00:00.000Z' );
 
