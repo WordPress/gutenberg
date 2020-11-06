@@ -116,6 +116,44 @@ describe( 'Template Part', () => {
 			);
 			expect( expectedContent ).not.toBeUndefined();
 		} );
+
+		it( 'Should convert selected block(s) to template part', async () => {
+			const initialTemplateParts = await page.$$(
+				'.wp-block-template-part'
+			);
+
+			// Add some block.
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( 'Some block...' );
+
+			// Select the block.
+			const allBlocks = await getAllBlocks();
+			const paragraphBlock = allBlocks.find(
+				( block ) => block.name === 'core/paragraph'
+			);
+			await selectBlockByClientId( paragraphBlock.clientId );
+
+			// Convert block to a template part.
+			await clickBlockToolbarButton( 'More options' );
+			const convertButton = await page.waitForXPath(
+				'//span[contains(text(), "Make template part")]'
+			);
+			await convertButton.click();
+
+			// Verify new template part is created with expected content.
+			const newTemplatePart = await page.waitForXPath(
+				'//*[@data-type="core/template-part"][//p[text()="Some block..."]]'
+			);
+			expect( newTemplatePart ).not.toBeNull();
+
+			// Verify there is 1 more template part on the page than previously.
+			const finalTemplateParts = await page.$$(
+				'.wp-block-template-part'
+			);
+			expect(
+				finalTemplateParts.length - initialTemplateParts.length
+			).toEqual( 1 );
+		} );
 	} );
 
 	describe( 'Template part placeholder', () => {
