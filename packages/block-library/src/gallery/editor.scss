@@ -2,13 +2,8 @@
 	// Override the default list style type _only in the editor_
 	// to avoid :not() selector specificity issues.
 	// See https://github.com/WordPress/gutenberg/pull/10358
-
 	li {
 		list-style-type: none;
-		.components-drop-zone {
-			display: none;
-			pointer-events: none;
-		}
 	}
 
 	// @todo: this deserves a refactor, by being moved to the toolbar.
