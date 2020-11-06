@@ -157,20 +157,6 @@ supports: {
 }
 ```
 
-## lineHeight
-
-- Type: `boolean`
-- Default value: `false`
-
-This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value.
-
-```js
-supports: {
-    // Enable UI control for line-height.
-    lineHeight: true,
-}
-```
-
 ## inserter
 
 - Type: `boolean`
@@ -182,6 +168,20 @@ By default, all blocks will appear in the inserter. To hide a block so that it c
 supports: {
     // Hide this block from the inserter.
     inserter: false
+}
+```
+
+## lineHeight
+
+- Type: `boolean`
+- Default value: `false`
+
+This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value.
+
+```js
+supports: {
+    // Enable UI control for line-height.
+    lineHeight: true,
 }
 ```
 
