@@ -1,10 +1,6 @@
 .wp-block-cover-image,
 .wp-block-cover {
 	position: relative;
-	background-size: cover;
-	background-position: center center;
-	min-height: 430px;
-	height: 100%;
 	width: 100%;
 	display: flex;
 	justify-content: center;
@@ -12,6 +8,13 @@
 	padding: 1em;
 	// This block has customizable padding, border-box makes that more predictable.
 	box-sizing: border-box;
+
+	// Default settings values.
+	min-height: 430px;
+	height: 100%;
+	background-size: cover;
+	background-position: center center;
+	background-repeat: no-repeat;
 
 	&.has-parallax {
 		background-attachment: fixed;
@@ -31,7 +34,6 @@
 
 	&.is-repeated {
 		background-repeat: repeat;
-		background-size: auto;
 	}
 
 	/**

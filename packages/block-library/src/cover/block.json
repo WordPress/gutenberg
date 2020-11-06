@@ -19,6 +19,7 @@
 		},
 		"backgroundSize": {
 			"type": "string",
+			"default": "cover",
 			"enum": [ "cover", "contain", "initial", "custom" ]
 		},
 		"dimRatio": {
