@@ -6,7 +6,7 @@ import {
 	getBlockTransforms,
 	pasteHandler,
 } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, select } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -158,6 +158,27 @@ export function onFilesDrop(
 ) {
 	return ( files ) => {
 		if ( ! hasUploadPermissions ) {
+			return;
+		}
+
+		const parentBlock = select( 'core/block-editor' ).getBlock(
+			targetRootClientId
+		);
+
+		if ( parentBlock?.name === 'core/gallery' && files?.length > 1 ) {
+			const transformation = findTransform(
+				getBlockTransforms( 'from' ),
+				( transform ) =>
+					transform.type === 'files' &&
+					transform.isMatch( [ files[ 0 ] ] )
+			);
+			if ( transformation ) {
+				const blocks = files.map( ( file ) =>
+					transformation.transform( [ file ], updateBlockAttributes )
+				);
+
+				insertBlocks( blocks, targetBlockIndex, targetRootClientId );
+			}
 			return;
 		}
 
