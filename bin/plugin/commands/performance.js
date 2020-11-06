@@ -37,16 +37,16 @@ const config = require( '../config' );
 /**
  * @typedef WPPerformanceResults
  *
- * @property {number} load             Load Time.
- * @property {number} type             Average type time.
- * @property {number} minType          Minium type time.
- * @property {number} maxType          Maximum type time.
- * @property {number} focus            Average block selection time.
- * @property {number} minFocus         Min block selection time.
- * @property {number} maxFocus         Max block selection time.
- * @property {number} inserterOpen     Average time to open global inserter.
- * @property {number} minInserterOpen  Min time to open global inserter.
- * @property {number} maxInserterOpen  Max time to open global inserter.
+ * @property {number} load              Load Time.
+ * @property {number} type              Average type time.
+ * @property {number} minType           Minium type time.
+ * @property {number} maxType           Maximum type time.
+ * @property {number} focus             Average block selection time.
+ * @property {number} minFocus          Min block selection time.
+ * @property {number} maxFocus          Max block selection time.
+ * @property {number} inserterOpen      Average time to open global inserter.
+ * @property {number} minInserterOpen   Min time to open global inserter.
+ * @property {number} maxInserterOpen   Max time to open global inserter.
  * @property {number} inserterHover     Average time to move mouse between two block item in the inserter.
  * @property {number} minInserterHover  Min time to move mouse between two block item in the inserter.
  * @property {number} maxInserterHover  Max time to move mouse between two block item in the inserter.
@@ -54,16 +54,16 @@ const config = require( '../config' );
 /**
  * @typedef WPFormattedPerformanceResults
  *
- * @property {string=} load             Load Time.
- * @property {string=} type             Average type time.
- * @property {string=} minType          Minium type time.
- * @property {string=} maxType          Maximum type time.
- * @property {string=} focus            Average block selection time.
- * @property {string=} minFocus         Min block selection time.
- * @property {string=} maxFocus         Max block selection time.
- * @property {string=} inserterOpen     Average time to open global inserter.
- * @property {string=} minInserterOpen  Min time to open global inserter.
- * @property {string=} maxInserterOpen  Max time to open global inserter.
+ * @property {string=} load              Load Time.
+ * @property {string=} type              Average type time.
+ * @property {string=} minType           Minium type time.
+ * @property {string=} maxType           Maximum type time.
+ * @property {string=} focus             Average block selection time.
+ * @property {string=} minFocus          Min block selection time.
+ * @property {string=} maxFocus          Max block selection time.
+ * @property {string=} inserterOpen      Average time to open global inserter.
+ * @property {string=} minInserterOpen   Min time to open global inserter.
+ * @property {string=} maxInserterOpen   Max time to open global inserter.
  * @property {string=} inserterHover     Average time to move mouse between two block item in the inserter.
  * @property {string=} minInserterHover  Min time to move mouse between two block item in the inserter.
  * @property {string=} maxInserterHover  Max time to move mouse between two block item in the inserter.
