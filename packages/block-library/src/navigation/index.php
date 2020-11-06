@@ -6,86 +6,6 @@
  */
 
 /**
- * Build an array with CSS classes and inline styles defining the colors
- * which will be applied to the navigation markup in the front-end.
- *
- * @param  array $attributes Navigation block attributes.
- * @return array Colors CSS classes and inline styles.
- */
-function block_core_navigation_build_css_colors( $attributes ) {
-	$colors = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-
-	// Text color.
-	$has_named_text_color  = array_key_exists( 'textColor', $attributes );
-	$has_custom_text_color = array_key_exists( 'customTextColor', $attributes );
-
-	// If has text color.
-	if ( $has_custom_text_color || $has_named_text_color ) {
-		// Add has-text-color class.
-		$colors['css_classes'][] = 'has-text-color';
-	}
-
-	if ( $has_named_text_color ) {
-		// Add the color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-color', $attributes['textColor'] );
-	} elseif ( $has_custom_text_color ) {
-		// Add the custom color inline style.
-		$colors['inline_styles'] .= sprintf( 'color: %s;', $attributes['customTextColor'] );
-	}
-
-	// Background color.
-	$has_named_background_color  = array_key_exists( 'backgroundColor', $attributes );
-	$has_custom_background_color = array_key_exists( 'customBackgroundColor', $attributes );
-
-	// If has background color.
-	if ( $has_custom_background_color || $has_named_background_color ) {
-		// Add has-background class.
-		$colors['css_classes'][] = 'has-background';
-	}
-
-	if ( $has_named_background_color ) {
-		// Add the background-color class.
-		$colors['css_classes'][] = sprintf( 'has-%s-background-color', $attributes['backgroundColor'] );
-	} elseif ( $has_custom_background_color ) {
-		// Add the custom background-color inline style.
-		$colors['inline_styles'] .= sprintf( 'background-color: %s;', $attributes['customBackgroundColor'] );
-	}
-
-	return $colors;
-}
-
-/**
- * Build an array with CSS classes and inline styles defining the font sizes
- * which will be applied to the navigation markup in the front-end.
- *
- * @param  array $attributes Navigation block attributes.
- * @return array Font size CSS classes and inline styles.
- */
-function block_core_navigation_build_css_font_sizes( $attributes ) {
-	// CSS classes.
-	$font_sizes = array(
-		'css_classes'   => array(),
-		'inline_styles' => '',
-	);
-
-	$has_named_font_size  = array_key_exists( 'fontSize', $attributes );
-	$has_custom_font_size = array_key_exists( 'customFontSize', $attributes );
-
-	if ( $has_named_font_size ) {
-		// Add the font size class.
-		$font_sizes['css_classes'][] = sprintf( 'has-%s-font-size', $attributes['fontSize'] );
-	} elseif ( $has_custom_font_size ) {
-		// Add the custom font size inline style.
-		$font_sizes['inline_styles'] = sprintf( 'font-size: %spx;', $attributes['customFontSize'] );
-	}
-
-	return $font_sizes;
-}
-
-/**
  * Returns the top-level submenu SVG chevron icon.
  *
  * @return string
@@ -125,11 +45,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$colors     = block_core_navigation_build_css_colors( $attributes );
-	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
-	$classes    = array_merge(
-		$colors['css_classes'],
-		$font_sizes['css_classes'],
+	$classes = array_merge(
 		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array()
 	);
@@ -144,7 +60,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => implode( ' ', $classes ),
-			'style' => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
+			'style' => $block_styles,
 		)
 	);
 
