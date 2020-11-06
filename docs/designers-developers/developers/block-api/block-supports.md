@@ -80,6 +80,29 @@ supports: {
 }
 ```
 
+## color
+
+- Type: `Object`
+- Default value: null
+- Subproperties:
+  - `background`: type `boolean`, default value `false`
+  - `gradient`: type `boolean`, default value `false`
+  - `link`: type `boolean`, default value `false`
+  - `text`: type `boolean`, default value `false`
+
+This value enables a block to declare support for some color style properties. When it does, the block editor will show UI controls for the user to set the values of these variables.
+
+For example, this will enable all controls:
+
+```js
+supports: {
+    background: true,
+    text: true,
+    link: true,
+    text: true,
+}
+```
+
 ## customClassName
 
 - Type: `boolean`
