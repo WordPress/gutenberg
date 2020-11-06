@@ -74,6 +74,7 @@ export { default as formatOutdent } from './library/format-outdent';
 export { default as formatOutdentRTL } from './library/format-outdent-rtl';
 export { default as formatRtl } from './library/format-rtl';
 export { default as formatStrikethrough } from './library/format-strikethrough';
+export { default as formatUnderline } from './library/format-underline';
 export { default as formatUppercase } from './library/format-uppercase';
 export { default as fullscreen } from './library/fullscreen';
 export { default as gallery } from './library/gallery';

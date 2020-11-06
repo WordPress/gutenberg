@@ -14,6 +14,9 @@ export const PRESET_CATEGORIES = {
 	gradient: { path: [ 'color', 'gradients' ], key: 'gradient' },
 	fontSize: { path: [ 'typography', 'fontSizes' ], key: 'size' },
 	fontFamily: { path: [ 'typography', 'fontFamilies' ], key: 'fontFamily' },
+	fontStyle: { path: [ 'typography', 'fontStyles' ], key: 'slug' },
+	fontWeight: { path: [ 'typography', 'fontWeights' ], key: 'slug' },
+	textDecoration: { path: [ 'typography', 'textDecorations' ], key: 'value' },
 	textTransform: { path: [ 'typography', 'textTransforms' ], key: 'slug' },
 };
 export const LINK_COLOR = '--wp--style--color--link';

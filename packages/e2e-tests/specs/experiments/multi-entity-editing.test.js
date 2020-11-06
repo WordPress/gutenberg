@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { kebabCase } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -186,7 +181,7 @@ describe( 'Multi-entity editor states', () => {
 			await trashAllPosts( 'wp_template_part' );
 			await createNewPost( {
 				postType: 'wp_template',
-				title: kebabCase( templateName ),
+				title: templateName,
 			} );
 			await publishPost();
 			await createTemplatePart( templatePartName );
