@@ -104,7 +104,7 @@ export default function useBlockDropZone( {
 			);
 			return {
 				isDropZonesDisabled: getBlockListSettings( targetRootClientId )
-					?.dropZonesDisabled,
+				?.dropZonesDisabled,
 				isLockedAll: getTemplateLock( targetRootClientId ) === 'all',
 				orientation: getBlockListSettings( targetRootClientId )
 					?.orientation,
