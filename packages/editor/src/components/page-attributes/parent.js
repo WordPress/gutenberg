@@ -148,7 +148,4 @@ export function PageAttributesParent() {
 	);
 }
 
-
-
-
 export default PageAttributesParent;
