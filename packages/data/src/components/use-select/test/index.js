@@ -12,6 +12,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { createRegistry } from '../../../registry';
+import { createRegistrySelector } from '../../../factory';
 import { RegistryProvider } from '../../registry-provider';
 import useSelect from '../index';
 
@@ -390,6 +391,64 @@ describe( 'useSelect', () => {
 			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
 				count1: 0,
 				dep: 1,
+			} );
+		} );
+
+		it( 'handles registry selectors', () => {
+			const getCount1And2 = createRegistrySelector(
+				( select ) => ( state ) => ( {
+					count1: state.counter,
+					count2: select( 'store-2' ).getCounter(),
+				} )
+			);
+
+			registry.registerStore( 'store-1', {
+				...counterStore,
+				selectors: {
+					...counterStore.selectors,
+					getCount1And2,
+				},
+			} );
+			registry.registerStore( 'store-2', counterStore );
+
+			let renderer;
+			const selectCount1And2 = jest.fn();
+
+			const TestComponent = jest.fn( () => {
+				const state = useSelect(
+					( select ) =>
+						selectCount1And2() ||
+						select( 'store-1' ).getCount1And2(),
+					[]
+				);
+
+				return <div data={ state } />;
+			} );
+
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				);
+			} );
+
+			const testInstance = renderer.root;
+
+			expect( selectCount1And2 ).toHaveBeenCalledTimes( 2 );
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
+				count1: 0,
+				count2: 0,
+			} );
+
+			act( () => {
+				registry.dispatch( 'store-2' ).increment();
+			} );
+
+			expect( selectCount1And2 ).toHaveBeenCalledTimes( 3 );
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
+				count1: 0,
+				count2: 1,
 			} );
 		} );
 	} );

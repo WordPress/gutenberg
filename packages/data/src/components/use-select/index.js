@@ -96,12 +96,13 @@ export default function useSelect( _mapSelect, deps ) {
 
 	// Keep track of the stores being selected in the mapSelect function,
 	// and only subscribe to those stores later.
-	const registeredStores = useRef( [] );
+	const listeningStores = useRef( [] );
 	const trapSelect = useCallback(
-		( storeKey ) => {
-			registeredStores.current.push( storeKey );
-			return registry.select( storeKey );
-		},
+		( callback ) =>
+			registry.__experimentalMarkListeningStores(
+				callback,
+				listeningStores
+			),
 		[ registry ]
 	);
 
@@ -112,7 +113,9 @@ export default function useSelect( _mapSelect, deps ) {
 			latestMapSelect.current !== mapSelect ||
 			latestMapOutputError.current
 		) {
-			mapOutput = mapSelect( trapSelect, registry );
+			mapOutput = trapSelect( () =>
+				mapSelect( registry.select, registry )
+			);
 		} else {
 			mapOutput = latestMapOutput.current;
 		}
@@ -131,11 +134,6 @@ export default function useSelect( _mapSelect, deps ) {
 		}
 	}
 
-	// Reset the registered stores when mapSelect changes. In case it subscribes to different stores.
-	useIsomorphicLayoutEffect( () => {
-		registeredStores.current = [];
-	}, [ mapSelect ] );
-
 	useIsomorphicLayoutEffect( () => {
 		latestMapSelect.current = mapSelect;
 		latestMapOutput.current = mapOutput;
@@ -152,27 +150,25 @@ export default function useSelect( _mapSelect, deps ) {
 		}
 	} );
 
-	useIsomorphicLayoutEffect( () => {
-		const onStoreChange = () => {
-			if ( isMountedAndNotUnsubscribing.current ) {
-				try {
-					const newMapOutput = latestMapSelect.current(
-						trapSelect,
-						registry
-					);
-					if (
-						isShallowEqual( latestMapOutput.current, newMapOutput )
-					) {
-						return;
-					}
-					latestMapOutput.current = newMapOutput;
-				} catch ( error ) {
-					latestMapOutputError.current = error;
-				}
-				forceRender();
-			}
-		};
+	const onStoreChange = useCallback( () => {
+		if ( isMountedAndNotUnsubscribing.current ) {
+			try {
+				const newMapOutput = trapSelect( () =>
+					latestMapSelect.current( registry.select, registry )
+				);
 
+				if ( isShallowEqual( latestMapOutput.current, newMapOutput ) ) {
+					return;
+				}
+				latestMapOutput.current = newMapOutput;
+			} catch ( error ) {
+				latestMapOutputError.current = error;
+			}
+			forceRender();
+		}
+	}, [ registry ] );
+
+	useIsomorphicLayoutEffect( () => {
 		// catch any possible state changes during mount before the subscription
 		// could be set.
 		if ( latestIsAsync.current ) {
@@ -180,7 +176,9 @@ export default function useSelect( _mapSelect, deps ) {
 		} else {
 			onStoreChange();
 		}
+	}, [ onStoreChange ] );
 
+	useIsomorphicLayoutEffect( () => {
 		const onChange = () => {
 			if ( latestIsAsync.current ) {
 				renderQueue.add( queueContext, onStoreChange );
@@ -189,7 +187,9 @@ export default function useSelect( _mapSelect, deps ) {
 			}
 		};
 
-		const unsubscribers = registeredStores.current.map( ( storeKey ) =>
+		const unsubscribers = [
+			...listeningStores.current,
+		].map( ( storeKey ) =>
 			registry.stores[ storeKey ].subscribe( onChange )
 		);
 		const unsubscribe = () => {
@@ -200,8 +200,10 @@ export default function useSelect( _mapSelect, deps ) {
 			isMountedAndNotUnsubscribing.current = false;
 			unsubscribe();
 			renderQueue.flush( queueContext );
+			// Reset the registered stores when mapSelect changes. In case it subscribes to different stores.
+			listeningStores.current = new Set();
 		};
-	}, [ registry ] );
+	}, [ registry, onStoreChange, mapSelect ] );
 
 	return mapOutput;
 }

@@ -50,6 +50,7 @@ import createCoreDataStore from './store';
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
 	let listeners = [];
+	const __experimentalListeningStores = new Set();
 
 	/**
 	 * Global listener called for each store's update.
@@ -85,12 +86,20 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		const storeName = isObject( storeNameOrDefinition )
 			? storeNameOrDefinition.name
 			: storeNameOrDefinition;
+		__experimentalListeningStores.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getSelectors();
 		}
 
 		return parent && parent.select( storeName );
+	}
+
+	function __experimentalMarkListeningStores( callback, ref ) {
+		__experimentalListeningStores.clear();
+		const result = callback.call( this );
+		ref.current = Array.from( __experimentalListeningStores );
+		return result;
 	}
 
 	const getResolveSelectors = memize(
@@ -223,6 +232,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		dispatch,
 		use,
 		register,
+		__experimentalMarkListeningStores,
 	};
 
 	/**
