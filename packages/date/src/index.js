@@ -7,6 +7,9 @@ import 'moment-timezone/moment-timezone-utils';
 
 import { format as dateFnsFormat, isFuture, parseISO, toDate } from 'date-fns';
 import { format as formatIntl, utcToZonedTime } from 'date-fns-tz';
+import originalLocale from 'date-fns/locale/en-US/index';
+import buildLocalizeFn from 'date-fns/locale/_lib/buildLocalizeFn';
+import buildFormatLongFn from 'date-fns/locale/_lib/buildFormatLongFn';
 
 /** @typedef {import('moment').Moment} Moment */
 
@@ -85,7 +88,6 @@ let settings = {
 	},
 	timezone: { offset: '0', string: '', abbr: '' },
 };
-
 /**
  * Adds a locale to moment, using the format supplied by `wp_localize_script()`.
  *
@@ -342,6 +344,51 @@ function translateFormat( formatString ) {
 	return newFormat;
 }
 
+function getLocalizationSettings() {
+	const monthValues = {
+		abbreviated: settings.l10n.monthsShort,
+		wide: settings.l10n.months,
+	};
+
+	const dayValues = {
+		abbreviated: settings.l10n.weekdaysShort,
+		wide: settings.l10n.weekdays,
+	};
+
+	return {
+		...originalLocale.localize,
+		month: buildLocalizeFn( {
+			values: monthValues,
+			defaultWidth: 'wide',
+		} ),
+		day: buildLocalizeFn( {
+			values: dayValues,
+			defaultWidth: 'wide',
+		} ),
+		formatLong: {
+			date: buildFormatLongFn( {
+				formats: {
+					full: settings.formats.date,
+					defaultWidth: 'full',
+				},
+			} ),
+			time: buildFormatLongFn( {
+				formats: {
+					full: settings.formats.time,
+					defaultWidth: 'full',
+				},
+			} ),
+			dateTime: buildFormatLongFn( {
+				formats: {
+					full: settings.formats.datetime,
+					short: settings.formats.datetimeAbbreviated,
+					defaultWidth: 'full',
+				},
+			} ),
+		},
+	};
+}
+
 /**
  * Returns whether a certain UTC offset is valid or not.
  *
@@ -477,10 +524,19 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
 		timezone = undefined;
 	}
 
-	return formatIntl( parseISO( dateValue ), dateFormat, {
-		timeZone: getActualTimezone( timezone ),
-		locale: settings.l10n.locale,
-	} );
+	return formatIntl(
+		utcToZonedTime( parseISO( dateValue ), getActualTimezone( timezone ) ),
+		translateFormat( dateFormat ),
+		{
+			timeZone: getActualTimezone( timezone ),
+			locale: {
+				...originalLocale,
+				locale: settings.l10n.locale,
+				code: settings.l10n.locale,
+				localize: getLocalizationSettings(),
+			},
+		}
+	);
 }
 
 /**
@@ -495,9 +551,19 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
  * @return {string} Formatted date.
  */
 export function gmdateI18n( dateFormat, dateValue = new Date() ) {
-	const dateMoment = momentLib( dateValue ).utc();
-	dateMoment.locale( settings.l10n.locale );
-	return format( dateFormat, dateMoment );
+	return formatIntl(
+		utcToZonedTime( parseISO( dateValue ) ),
+		translateFormat( dateFormat ),
+		{
+			timeZone: 'UTC',
+			locale: {
+				...originalLocale,
+				locale: settings.l10n.locale,
+				code: settings.l10n.locale,
+				localize: getLocalizationSettings(),
+			},
+		}
+	);
 }
 
 /**
