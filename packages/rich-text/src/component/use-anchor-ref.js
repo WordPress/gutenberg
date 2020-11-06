@@ -8,6 +8,14 @@ import { useMemo, useContext } from '@wordpress/element';
  */
 import { Range, FormatSettings, IsActive } from './format-edit';
 
+/**
+ * This hook, to be used in a format type's Edit component, returns the active
+ * element that is formatted, or the selection range if no format is active.
+ * The returned value is meant to be used for positioning UI, e.g. by passing it
+ * to the `Popover` component.
+ *
+ * @return {Element|Range} The active element or selection range.
+ */
 export function useAnchorRef() {
 	const range = useContext( Range );
 	const { tagName, className } = useContext( FormatSettings );
