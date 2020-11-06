@@ -30,6 +30,7 @@ const config = require( '../config' );
  * @property {number[]} load             Load Time.
  * @property {number[]} type             Average type time.
  * @property {number[]} focus            Average block selection time.
+ * @property {number[]} inserterOpen     Average time to open global inserter.
  */
 
 /**
@@ -42,6 +43,9 @@ const config = require( '../config' );
  * @property {number} focus            Average block selection time.
  * @property {number} minFocus         Min block selection time.
  * @property {number} maxFocus         Max block selection time.
+ * @property {number} inserterOpen     Average time to open global inserter.
+ * @property {number} minInserterOpen  Min time to open global inserter.
+ * @property {number} maxInserterOpen  Max time to open global inserter.
  */
 /**
  * @typedef WPFormattedPerformanceResults
@@ -53,6 +57,9 @@ const config = require( '../config' );
  * @property {string=} focus            Average block selection time.
  * @property {string=} minFocus         Min block selection time.
  * @property {string=} maxFocus         Max block selection time.
+ * @property {string=} inserterOpen     Average time to open global inserter.
+ * @property {string=} minInserterOpen  Min time to open global inserter.
+ * @property {string=} maxInserterOpen  Max time to open global inserter.
  */
 
 /**
@@ -109,6 +116,9 @@ function curateResults( results ) {
 		focus: average( results.focus ),
 		minFocus: Math.min( ...results.focus ),
 		maxFocus: Math.max( ...results.focus ),
+		inserterOpen: average( results.inserterOpen ),
+		minInserterOpen: Math.min( ...results.inserterOpen ),
+		maxInserterOpen: Math.max( ...results.inserterOpen ),
 	};
 }
 
@@ -166,6 +176,9 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 			focus: results.map( ( r ) => r.focus ),
 			minFocus: results.map( ( r ) => r.minFocus ),
 			maxFocus: results.map( ( r ) => r.maxFocus ),
+			inserterOpen: results.map( ( r ) => r.inserterOpen ),
+			minInserterOpen: results.map( ( r ) => r.minInserterOpen ),
+			maxInserterOpen: results.map( ( r ) => r.maxInserterOpen ),
 		},
 		median
 	);
