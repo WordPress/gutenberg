@@ -31,7 +31,7 @@ export function PostSchedule( { date, onUpdateDate } ) {
 	return (
 		<DateTimePicker
 			ref={ ref }
-			currentDate={ date }
+			currentDate={ date ? date : getDate() }
 			onChange={ onChange }
 			is12Hour={ is12HourTime }
 		/>
