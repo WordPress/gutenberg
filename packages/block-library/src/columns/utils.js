@@ -99,10 +99,18 @@ export function getRedistributedColumnWidths(
  *
  * @return {boolean} Whether columns have explicit widths.
  */
-export function hasExplicitColumnWidths( blocks ) {
-	return blocks.every( ( block ) =>
-		Number.isFinite( parseFloat( block.attributes.width ) )
-	);
+export function hasExplicitPercentColumnWidths( blocks ) {
+	return blocks.every( ( block ) => {
+		if (
+			typeof block.attributes.width === 'string' &&
+			block.attributes.width.charAt(
+				block.attributes.width.length - 1
+			) === '%'
+		) {
+			return Number.isFinite( parseFloat( block.attributes.width ) );
+		}
+		return Number.isFinite( block.attributes.width );
+	} );
 }
 
 /**

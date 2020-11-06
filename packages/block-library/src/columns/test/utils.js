@@ -7,7 +7,7 @@ import {
 	getTotalColumnsWidth,
 	getColumnWidths,
 	getRedistributedColumnWidths,
-	hasExplicitColumnWidths,
+	hasExplicitPercentColumnWidths,
 	getMappedColumnWidths,
 } from '../utils';
 
@@ -164,27 +164,27 @@ describe( 'getRedistributedColumnWidths', () => {
 	} );
 } );
 
-describe( 'hasExplicitColumnWidths', () => {
+describe( 'hasExplicitPercentColumnWidths', () => {
 	it( 'returns false if no blocks have explicit width', () => {
 		const blocks = [ { attributes: {} } ];
 
-		const result = hasExplicitColumnWidths( blocks );
+		const result = hasExplicitPercentColumnWidths( blocks );
 
 		expect( result ).toBe( false );
 	} );
 
-	it( 'returns true if a block has explicit width', () => {
+	it( 'returns true if a block has explicit width defined as a number', () => {
 		const blocks = [ { attributes: { width: 100 } } ];
 
-		const result = hasExplicitColumnWidths( blocks );
+		const result = hasExplicitPercentColumnWidths( blocks );
 
 		expect( result ).toBe( true );
 	} );
 
-	it( 'returns true if a block has explicit width defined as a string', () => {
+	it( 'returns true if a block has explicit percent width defined as a string', () => {
 		const blocks = [ { attributes: { width: '100%' } } ];
 
-		const result = hasExplicitColumnWidths( blocks );
+		const result = hasExplicitPercentColumnWidths( blocks );
 
 		expect( result ).toBe( true );
 	} );
@@ -195,7 +195,7 @@ describe( 'hasExplicitColumnWidths', () => {
 			{ attributes: { width: undefined } },
 		];
 
-		const result = hasExplicitColumnWidths( blocks );
+		const result = hasExplicitPercentColumnWidths( blocks );
 
 		expect( result ).toBe( false );
 	} );
@@ -206,20 +206,31 @@ describe( 'hasExplicitColumnWidths', () => {
 			{ attributes: { width: 90 } },
 		];
 
-		const result = hasExplicitColumnWidths( blocks );
+		const result = hasExplicitPercentColumnWidths( blocks );
 
 		expect( result ).toBe( true );
 	} );
 
-	it( 'returns true if blocks have width defined as strings and numbers', () => {
+	it( 'returns true if blocks have width defined as percent strings and numbers', () => {
 		const blocks = [
-			{ attributes: { width: 10 } },
+			{ attributes: { width: '10%' } },
+			{ attributes: { width: 90 } },
+		];
+
+		const result = hasExplicitPercentColumnWidths( blocks );
+
+		expect( result ).toBe( true );
+	} );
+
+	it( 'returns false if blocks have width defined as mixed unit strings', () => {
+		const blocks = [
+			{ attributes: { width: '20%' } },
 			{ attributes: { width: '90px' } },
 		];
 
-		const result = hasExplicitColumnWidths( blocks );
+		const result = hasExplicitPercentColumnWidths( blocks );
 
-		expect( result ).toBe( true );
+		expect( result ).toBe( false );
 	} );
 } );
 
