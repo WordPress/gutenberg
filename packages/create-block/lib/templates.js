@@ -16,6 +16,7 @@ const lazyImport = require( '@wordpress/lazy-import' );
  * Internal dependencies
  */
 const CLIError = require( './cli-error' );
+const { info } = require( './log' );
 const prompts = require( './prompts' );
 
 const predefinedBlockTemplates = {
@@ -94,12 +95,16 @@ const getBlockTemplate = async ( templateName ) => {
 	}
 
 	try {
+		info( '' );
+		info( 'Downloading template files. It might take some time...' );
+
 		const { defaultValues = {}, templatesPath } = await lazyImport(
 			templateName
 		);
 		if ( ! isObject( defaultValues ) || ! templatesPath ) {
 			throw new Error();
 		}
+
 		return {
 			defaultValues,
 			outputTemplates: await getOutputTemplates( templatesPath ),

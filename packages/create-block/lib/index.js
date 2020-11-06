@@ -91,6 +91,8 @@ program
 						( { name } ) =>
 							! Object.keys( optionsValues ).includes( name )
 					);
+					log.info( '' );
+					log.info( "Let's customize your block:" );
 					const answers = await inquirer.prompt( prompts );
 					await scaffold( blockTemplate, {
 						...defaultValues,
