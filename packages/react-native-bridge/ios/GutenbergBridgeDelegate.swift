@@ -231,6 +231,20 @@ public protocol GutenbergBridgeDelegate: class {
     func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool)
 
     func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType)
+
+    // Media Collection
+
+    /// Tells the delegate that a media collection block requested to reconnect with media save coordinator.
+    ///
+    func gutenbergDidRequestMediaSaveSync()
+
+    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String)
+
+    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String])
+
+    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String])
+
+    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String])
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
@@ -240,4 +254,12 @@ public extension GutenbergBridgeDelegate {
     func gutenbergDidLayout() { }
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block) { }
     func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType) { }
+
+    // Media Collection
+
+    func gutenbergDidRequestMediaSaveSync() {}
+    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) { }
+    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) { }
+    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) { }
+    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) { }
 }
