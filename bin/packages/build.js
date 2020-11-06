@@ -32,6 +32,29 @@ function getPackageName( file ) {
 }
 
 /**
+ * Parses all Sass import statements in a given file
+ *
+ * @param  {string} file File name
+ * @return {Array}       List of Import Statements in a file
+ */
+function parseImportStatements( file ) {
+	const fileContent = fs.readFileSync( file, 'utf8' );
+	return fileContent.toString().match( /@import "(.*?)"/g );
+}
+
+function isFileImportedInStyleEntry( file, importStatements ) {
+	const packageName = getPackageName( file );
+	const regex = new RegExp( `/${ packageName }/`, 'g' );
+
+	return (
+		importStatements &&
+		importStatements.find( ( importStatement ) =>
+			importStatement.match( regex )
+		)
+	);
+}
+
+/**
  * Finds all stylesheet entry points that contain import statements
  * that include the given file name
  *
@@ -41,23 +64,13 @@ function getPackageName( file ) {
 function findStyleEntriesThatImportFile( file ) {
 	const entriesWithImport = stylesheetEntryPoints.reduce(
 		( acc, entryPoint ) => {
-			const content = fs.readFileSync( entryPoint, 'utf8' );
+			const styleEntryImportStatements = parseImportStatements(
+				entryPoint
+			);
 
-			// Returns all import statements from a stylesheet
-			const importStatements = content
-				.toString()
-				.match( /@import "(.*?)"/g );
-
-			const packageName = getPackageName( file );
-			const regex = new RegExp( `/${ packageName }/`, 'g' );
-
-			const fileIsImportedInStyleEntry =
-				importStatements &&
-				importStatements.find( ( importStatement ) =>
-					importStatement.match( regex )
-				);
-
-			if ( fileIsImportedInStyleEntry ) {
+			if (
+				isFileImportedInStyleEntry( file, styleEntryImportStatements )
+			) {
 				acc.push( entryPoint );
 			}
 
