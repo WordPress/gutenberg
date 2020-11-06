@@ -134,11 +134,11 @@ supports: {
 - Type: `boolean`
 - Default value: `false`
 
-This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set the font-size value.
+This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.
 
 ```js
 supports: {
-    // Enable UI control for font-size
+    // Enable UI control for font-size.
     fontSize: true,
 }
 ```
@@ -154,6 +154,20 @@ By default, a block's markup can be edited individually. To disable this behavio
 supports: {
     // Remove support for an HTML mode.
     html: false
+}
+```
+
+## lineHeight
+
+- Type: `boolean`
+- Default value: `false`
+
+This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value.
+
+```js
+supports: {
+    // Enable UI control for line-height.
+    lineHeight: true,
 }
 ```
 
