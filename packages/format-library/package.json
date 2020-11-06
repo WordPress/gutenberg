@@ -23,6 +23,7 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
