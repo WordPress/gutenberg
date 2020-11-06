@@ -36,17 +36,17 @@ function gutenberg_register_template_part_post_type() {
 	);
 
 	$args = array(
-		'labels'                => $labels,
-		'description'           => __( 'Template parts to include in your templates.', 'gutenberg' ),
-		'public'                => false,
-		'has_archive'           => false,
-		'show_ui'               => true,
-		'show_in_menu'          => 'themes.php',
-		'show_in_admin_bar'     => false,
-		'show_in_rest'          => true,
-		'rest_base'             => 'template-parts',
-		'map_meta_cap'          => true,
-		'supports'              => array(
+		'labels'            => $labels,
+		'description'       => __( 'Template parts to include in your templates.', 'gutenberg' ),
+		'public'            => false,
+		'has_archive'       => false,
+		'show_ui'           => true,
+		'show_in_menu'      => 'themes.php',
+		'show_in_admin_bar' => false,
+		'show_in_rest'      => true,
+		'rest_base'         => 'template-parts',
+		'map_meta_cap'      => true,
+		'supports'          => array(
 			'title',
 			'slug',
 			'editor',
@@ -210,9 +210,9 @@ add_filter( 'rest_wp_template_part_query', 'filter_rest_wp_template_part_query',
  * @param mixed           $dispatch_result Dispatch result, will be used if not empty.
  * @param WP_REST_Request $request         Request used to generate the response.
  * @param string          $route           Route matched for the request.
- * @param array           $handler         Route handler used for the request.
+ * @return mixed Dispatch result.
  */
-function gutenberg_filter_rest_wp_template_part_dispatch( $dispatch_result, $request, $route, $handler ) {
+function gutenberg_filter_rest_wp_template_part_dispatch( $dispatch_result, $request, $route ) {
 	if ( null !== $dispatch_result ) {
 		return $dispatch_result;
 	}
@@ -224,4 +224,4 @@ function gutenberg_filter_rest_wp_template_part_dispatch( $dispatch_result, $req
 	return null;
 }
 
-add_filter( 'rest_dispatch_request', 'gutenberg_filter_rest_wp_template_part_dispatch', 10, 4 );
+add_filter( 'rest_dispatch_request', 'gutenberg_filter_rest_wp_template_part_dispatch', 10, 3 );

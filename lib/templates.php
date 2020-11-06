@@ -264,9 +264,9 @@ add_filter( 'rest_wp_template_query', 'filter_rest_wp_template_query', 99, 2 );
  * @param mixed           $dispatch_result Dispatch result, will be used if not empty.
  * @param WP_REST_Request $request         Request used to generate the response.
  * @param string          $route           Route matched for the request.
- * @param array           $handler         Route handler used for the request.
+ * @return mixed Dispatch result.
  */
-function gutenberg_filter_rest_wp_template_dispatch( $dispatch_result, $request, $route, $handler ) {
+function gutenberg_filter_rest_wp_template_dispatch( $dispatch_result, $request, $route ) {
 	if ( null !== $dispatch_result ) {
 		return $dispatch_result;
 	}
@@ -278,4 +278,4 @@ function gutenberg_filter_rest_wp_template_dispatch( $dispatch_result, $request,
 	return null;
 }
 
-add_filter( 'rest_dispatch_request', 'gutenberg_filter_rest_wp_template_dispatch', 10, 4 );
+add_filter( 'rest_dispatch_request', 'gutenberg_filter_rest_wp_template_dispatch', 10, 3 );
