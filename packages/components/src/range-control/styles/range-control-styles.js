@@ -115,6 +115,7 @@ export const Track = styled.span`
 export const MarksWrapper = styled.span`
 	box-sizing: border-box;
 	display: block;
+	pointer-events: none;
 	position: relative;
 	width: 100%;
 	user-select: none;
@@ -202,7 +203,6 @@ export const Thumb = styled.span`
 	box-sizing: border-box;
 	height: 100%;
 	outline: 0;
-	pointer-events: none;
 	position: absolute;
 	user-select: none;
 	width: 100%;
