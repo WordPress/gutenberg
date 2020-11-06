@@ -60,7 +60,7 @@ function UncontrolledInnerBlocks( props ) {
 		templateLock,
 		captureToolbars,
 		orientation,
-		dropZonesDisabled
+		dropZonesDisabled,
 	);
 
 	useInnerBlockTemplateSync(
