@@ -20,7 +20,7 @@ class WP_REST_Template_Parts_Controller extends WP_REST_Posts_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		synchronize_theme_template_parts();
+		_gutenberg_synchronize_theme_templates( 'template-part' );
 
 		return parent::get_items( $request );
 	}
@@ -32,7 +32,7 @@ class WP_REST_Template_Parts_Controller extends WP_REST_Posts_Controller {
 	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
 	 */
 	public function get_item( $request ) {
-		synchronize_theme_template_parts();
+		_gutenberg_synchronize_theme_templates( 'template-part' );
 
 		return parent::get_items( $request );
 	}

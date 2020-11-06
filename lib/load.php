@@ -107,6 +107,7 @@ require dirname( __FILE__ ) . '/compat.php';
 require dirname( __FILE__ ) . '/utils.php';
 
 require dirname( __FILE__ ) . '/full-site-editing.php';
+require dirname( __FILE__ ) . '/templates-sync.php';
 require dirname( __FILE__ ) . '/templates.php';
 require dirname( __FILE__ ) . '/template-parts.php';
 require dirname( __FILE__ ) . '/template-loader.php';

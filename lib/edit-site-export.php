@@ -12,8 +12,8 @@
 function gutenberg_edit_site_export() {
 	// Theme templates and template parts need to be synchronized
 	// before the export.
-	synchronize_theme_template_parts();
-	synchronize_theme_templates();
+	_gutenberg_synchronize_theme_templates( 'template-part' );
+	_gutenberg_synchronize_theme_templates( 'template' );
 
 	// Create ZIP file and directories.
 	$filename = tempnam( get_temp_dir(), 'edit-site-export' );

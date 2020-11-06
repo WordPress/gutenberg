@@ -141,7 +141,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 	}
 
 	// Create auto-drafts for each theme template files.
-	synchronize_theme_templates();
+	_gutenberg_synchronize_theme_templates( 'template' );
 
 	if ( empty( $template_hierarchy ) ) {
 		if ( 'index' === $template_type ) {
