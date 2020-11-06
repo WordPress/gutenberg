@@ -39,7 +39,7 @@ describe( 'Template Part', () => {
 			await page.waitForSelector( '.edit-site-visual-editor' );
 		} );
 
-		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
+		async function updateHeader() {
 			// Switch to editing the header template part.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
@@ -62,12 +62,49 @@ describe( 'Template Part', () => {
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( 'Front Page' );
+		}
+
+		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
+			await updateHeader();
 
 			// Verify that the header template part is updated.
 			const [ headerTemplatePart ] = await page.$x(
 				'//*[@data-type="core/template-part"][//p[text()="Header Template Part 123"]]'
 			);
 			expect( headerTemplatePart ).not.toBeUndefined();
+		} );
+
+		it( 'Should detach blocks from template part', async () => {
+			await updateHeader();
+
+			const initialTemplateParts = await page.$$(
+				'*[data-type="core/template-part"]'
+			);
+
+			// Detach blocks from template part using ellipsis menu.
+			await initialTemplateParts[ 0 ].click();
+			const ellipsisMenu = await page.waitForSelector(
+				'.components-dropdown-menu__toggle[aria-label="More options"]'
+			);
+			await ellipsisMenu.click();
+			const detachButton = await page.waitForXPath(
+				'//span[contains(text(), "Detach blocks from template part")]'
+			);
+			await detachButton.click();
+
+			// Verify there is one less template part on the page.
+			const finalTemplateParts = await page.$$(
+				'*[data-type="core/template-part"]'
+			);
+			expect(
+				initialTemplateParts.length - finalTemplateParts.length
+			).toEqual( 1 );
+
+			// Verify content of the template part is still present.
+			const [ expectedContent ] = await page.$x(
+				'//p[contains(text(), "Header Template Part 123")]'
+			);
+			expect( expectedContent ).not.toBeUndefined();
 		} );
 	} );
 
