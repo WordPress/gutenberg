@@ -191,6 +191,55 @@ describe( 'Function date', () => {
 	} );
 } );
 
+// Custom formatting  token functions, in order to support PHP formatting tokens
+describe( 'PHP Format Tokens', () => {
+	it( 'should support "S" to obtain ordinal suffix of day of the month', () => {
+		const formattedDate = dateNoI18n( 'S', '2019-06-18T11:00:00.000Z' );
+
+		// th for 18th
+		expect( formattedDate ).toBe( 'th' );
+	} );
+
+	it( 'should support "z" to obtain zero-indexed day of the year', () => {
+		const formattedDate = dateNoI18n( 'z', '2019-01-01' );
+
+		expect( formattedDate ).toBe( '0' );
+	} );
+
+	it( 'should support "t" to obtain the days in a given month', () => {
+		const formattedDate = dateNoI18n( 't', '2019-02' );
+
+		expect( formattedDate ).toBe( '28' );
+	} );
+
+	it( 'should support "L" to obtain whether or not the year is a leap year', () => {
+		const formattedDate = dateNoI18n( 'L', '2020' );
+
+		expect( formattedDate ).toBe( '1' );
+	} );
+
+	it( 'should support "B" to obtain the time in Swatch Internet Time (.beats)', () => {
+		const formattedDate = dateNoI18n( 'B', '2020-10-09T11:00:00.000Z' );
+
+		expect( formattedDate ).toBe( '500' );
+	} );
+
+	it.skip( 'should support "I" to obtain whether or not the timezone is observing DST', () => {
+		const formattedFall = dateNoI18n( 'I', '2020-10-09T11:00:00.000Z' );
+
+		expect( formattedFall ).toBe( '1' );
+
+		const formattedWinter = dateNoI18n( 'I', '2020-01-09T11:00:00.000Z' );
+
+		expect( formattedWinter ).toBe( '0' );
+	} );
+	it.skip( 'should support "Z" to obtain timezone offset in seconds', () => {
+		const formattedDate = dateNoI18n( 'Z', '2020-10-09T11:00:00.000Z' );
+
+		expect( formattedDate ).toBe( '0' );
+	} );
+} );
+
 describe( 'Function gmdate', () => {
 	it( 'should format date in English, ignoring locale settings', () => {
 		const settings = __experimentalGetSettings();

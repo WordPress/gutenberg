@@ -5,7 +5,15 @@ import momentLib from 'moment';
 import 'moment-timezone/moment-timezone';
 import 'moment-timezone/moment-timezone-utils';
 
-import { format as dateFnsFormat, isFuture, parseISO, toDate } from 'date-fns';
+import {
+	addHours,
+	format as dateFnsFormat,
+	getDaysInMonth,
+	isFuture,
+	isLeapYear,
+	parseISO,
+	toDate,
+} from 'date-fns';
 import { format as formatIntl, utcToZonedTime } from 'date-fns-tz';
 import originalLocale from 'date-fns/locale/en-US/index';
 import buildLocalizeFn from 'date-fns/locale/_lib/buildLocalizeFn';
@@ -182,14 +190,13 @@ const formatMap = {
 	/**
 	 * Gets the ordinal suffix.
 	 *
-	 * @param {Moment} momentDate Moment instance.
+	 * @param {Date|string} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */
-	S( momentDate ) {
-		// Do - D
-		const num = momentDate.format( 'D' );
-		const withOrdinal = momentDate.format( 'Do' );
+	S( dateValue ) {
+		const num = formatIntl( parseISO( dateValue ), 'd' );
+		const withOrdinal = formatIntl( parseISO( dateValue ), 'do' );
 		return withOrdinal.replace( num, '' );
 	},
 
@@ -197,13 +204,15 @@ const formatMap = {
 	/**
 	 * Gets the day of the year (zero-indexed).
 	 *
-	 * @param {Moment} momentDate Moment instance.
+	 * @param {Date|string} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */
-	z( momentDate ) {
+	z( dateValue ) {
 		// DDD - 1
-		return '' + parseInt( momentDate.format( 'DDD' ), 10 ) - 1;
+		return `${
+			parseInt( formatIntl( parseISO( dateValue ), 'DDD' ), 10 ) - 1
+		}`;
 	},
 
 	// Week
@@ -217,24 +226,24 @@ const formatMap = {
 	/**
 	 * Gets the days in the month.
 	 *
-	 * @param {Moment} momentDate Moment instance.
+	 * @param {Date|string} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */
-	t( momentDate ) {
-		return momentDate.daysInMonth();
+	t( dateValue ) {
+		return getDaysInMonth( parseISO( dateValue ) );
 	},
 
 	// Year
 	/**
 	 * Gets whether the current year is a leap year.
 	 *
-	 * @param {Moment} momentDate Moment instance.
+	 * @param {Date|string} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */
-	L( momentDate ) {
-		return momentDate.isLeapYear() ? '1' : '0';
+	L( dateValue ) {
+		return isLeapYear( parseISO( dateValue ) ) ? '1' : '0';
 	},
 	o: 'GGGG',
 	Y: 'yyyy',
@@ -246,21 +255,25 @@ const formatMap = {
 	/**
 	 * Gets the current time in Swatch Internet Time (.beats).
 	 *
-	 * @param {Moment} momentDate Moment instance.
+	 * @param {Date|string} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */
-	B( momentDate ) {
-		const timezoned = momentLib( momentDate ).utcOffset( 60 );
-		const seconds = parseInt( timezoned.format( 's' ), 10 ),
-			minutes = parseInt( timezoned.format( 'm' ), 10 ),
-			hours = parseInt( timezoned.format( 'H' ), 10 );
-		return parseInt(
+	B( dateValue ) {
+		const parsedDate = addHours( utcToZonedTime( dateValue, 'UTC' ), 1 );
+		const seconds = parseInt( formatIntl( parsedDate, 's' ), 10 ),
+			minutes = parseInt( formatIntl( parsedDate, 'm' ), 10 ),
+			hours = parseInt( formatIntl( parsedDate, 'H' ), 10 );
+
+		/*
+		 * Rounding up to match results on the same timestamp using
+		 * PHP's date_format.
+		 */
+		return Math.ceil(
 			( seconds +
 				minutes * MINUTE_IN_SECONDS +
 				hours * HOUR_IN_SECONDS ) /
-				86.4,
-			10
+				86.4
 		);
 	},
 	g: 'h',
@@ -276,12 +289,12 @@ const formatMap = {
 	/**
 	 * Gets whether the timezone is in DST currently.
 	 *
-	 * @param {Moment} momentDate Moment instance.
+	 * @param {Date|string} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */
-	I( momentDate ) {
-		return momentDate.isDST() ? '1' : '0';
+	I() {
+		return ''; // @todo
 	},
 	O: 'xx',
 	P: 'xxx',
@@ -289,13 +302,13 @@ const formatMap = {
 	/**
 	 * Gets the timezone offset in seconds.
 	 *
-	 * @param {Moment} momentDate Moment instance.
+	 * @param {Date|string} dateValue Date ISO string or object.
 	 *
 	 * @return {string} Formatted date.
 	 */
-	Z( momentDate ) {
+	Z( dateValue ) {
 		// Timezone offset in seconds.
-		const offset = momentDate.format( 'Z' );
+		const offset = formatIntl( utcToZonedTime( dateValue, 'UTC' ), 'XXX' );
 		const sign = offset[ 0 ] === '-' ? -1 : 1;
 		const parts = offset.substring( 1 ).split( ':' );
 		return (
@@ -310,7 +323,7 @@ const formatMap = {
 	U: 'X', // @todo: find out how to get epoc
 };
 
-function translateFormat( formatString ) {
+function translateFormat( formatString, dateValue ) {
 	let i, char;
 	let newFormat = [];
 
@@ -324,14 +337,13 @@ function translateFormat( formatString ) {
 			continue;
 		}
 		if ( char in formatMap ) {
-			// @todo: the following is commented out until format functions are implemented
-			// if ( typeof formatMap[ char ] !== 'string' ) {
-			// 	// If the format is a function, call it.
-			// 	newFormat.push( '[' + formatMap[ char ]( momentDate ) + ']' );
-			// } else {
-			// Otherwise, add as a formatting string.
-			newFormat.push( formatMap[ char ] );
-			// }
+			if ( typeof formatMap[ char ] !== 'string' ) {
+				// If the format is a function, call it.
+				newFormat.push( "'" + formatMap[ char ]( dateValue ) + "'" );
+			} else {
+				// Otherwise, add as a formatting string.
+				newFormat.push( formatMap[ char ] );
+			}
 		} else {
 			newFormat.push( char );
 		}
@@ -445,7 +457,7 @@ function getActualTimezone( timezone = '' ) {
  * @return {string} Formatted date.
  */
 export function format( dateFormat, dateValue = new Date() ) {
-	const formatString = translateFormat( dateFormat );
+	const formatString = translateFormat( dateFormat, dateValue );
 	return dateFnsFormat( new Date( dateValue ), formatString );
 }
 
@@ -466,10 +478,10 @@ export function format( dateFormat, dateValue = new Date() ) {
  * @return {string} Formatted date in English.
  */
 export function date( dateFormat, dateValue = new Date(), timezone ) {
-	const formatString = translateFormat( dateFormat );
+	const formatString = translateFormat( dateFormat, dateValue );
 
 	return formatIntl(
-		utcToZonedTime( parseISO( dateValue ), getActualTimezone( timezone ) ),
+		utcToZonedTime( dateValue, getActualTimezone( timezone ) ),
 		formatString,
 		{ timeZone: getActualTimezone( timezone ) }
 	);
@@ -486,12 +498,9 @@ export function date( dateFormat, dateValue = new Date(), timezone ) {
  * @return {string} Formatted date in English.
  */
 export function gmdate( dateFormat, dateValue = new Date() ) {
-	const formatString = translateFormat( dateFormat );
+	const formatString = translateFormat( dateFormat, dateValue );
 
-	return formatIntl(
-		utcToZonedTime( parseISO( dateValue ), 'UTC' ),
-		formatString
-	);
+	return formatIntl( utcToZonedTime( dateValue, 'UTC' ), formatString );
 }
 
 /**
@@ -525,8 +534,8 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
 	}
 
 	return formatIntl(
-		utcToZonedTime( parseISO( dateValue ), getActualTimezone( timezone ) ),
-		translateFormat( dateFormat ),
+		utcToZonedTime( dateValue, getActualTimezone( timezone ) ),
+		translateFormat( dateFormat, dateValue ),
 		{
 			timeZone: getActualTimezone( timezone ),
 			locale: {
@@ -552,7 +561,7 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
  */
 export function gmdateI18n( dateFormat, dateValue = new Date() ) {
 	return formatIntl(
-		utcToZonedTime( parseISO( dateValue ) ),
+		utcToZonedTime( dateValue ),
 		translateFormat( dateFormat ),
 		{
 			timeZone: 'UTC',
