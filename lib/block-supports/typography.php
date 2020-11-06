@@ -76,7 +76,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		if ( $has_named_font_size ) {
 			$classes[] = sprintf( 'has-%s-font-size', $block_attributes['fontSize'] );
 		} elseif ( $has_custom_font_size ) {
-			$styles[] = sprintf( 'font-size: %spx;', $block_attributes['style']['typography']['fontSize'] );
+			$styles[] = sprintf( 'font-size: %s;', $block_attributes['style']['typography']['fontSize'] );
 		}
 	}
 
