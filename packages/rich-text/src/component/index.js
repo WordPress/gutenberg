@@ -1138,7 +1138,7 @@ function RichText(
 					onChange={ handleChange }
 					onFocus={ focus }
 					formatTypes={ formatTypes }
-					getWin={ getWin }
+					forwardedRef={ ref }
 				/>
 			) }
 			{ children &&

@@ -6,7 +6,8 @@ import { useMemo, useContext } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { Range, FormatSettings, IsActive } from './format-edit';
+import { Ref, FormatSettings, Value } from './format-edit';
+import { getActiveFormat } from '../get-active-format';
 
 /**
  * This hook, to be used in a format type's Edit component, returns the active
@@ -17,12 +18,23 @@ import { Range, FormatSettings, IsActive } from './format-edit';
  * @return {Element|Range} The active element or selection range.
  */
 export function useAnchorRef() {
-	const range = useContext( Range );
-	const { tagName, className } = useContext( FormatSettings );
-	const isActive = useContext( IsActive );
+	const ref = useContext( Ref );
+	const { tagName, className, name } = useContext( FormatSettings );
+	const value = useContext( Value );
+	const activeFormat = getActiveFormat( value, name );
 
 	return useMemo( () => {
-		if ( ! isActive ) {
+		const { ownerDocument } = ref.current;
+		const { defaultView } = ownerDocument;
+		const selection = defaultView.getSelection();
+
+		if ( ! selection.rangeCount ) {
+			return;
+		}
+
+		const range = selection.getRangeAt( 0 );
+
+		if ( ! activeFormat ) {
 			return range;
 		}
 
@@ -38,5 +50,5 @@ export function useAnchorRef() {
 		return element.closest(
 			tagName + ( className ? '.' + className : '' )
 		);
-	}, [ isActive, range, tagName, className ] );
+	}, [ activeFormat, value.start, value.end, tagName, className ] );
 }

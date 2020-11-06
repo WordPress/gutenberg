@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo, createContext } from '@wordpress/element';
+import { createContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -28,9 +28,9 @@ const interactiveContentTags = new Set( [
 	'video',
 ] );
 
-export const Range = createContext();
-export const FormatSettings = createContext( {} );
-export const IsActive = createContext( false );
+export const Ref = createContext();
+export const FormatSettings = createContext();
+export const Value = createContext();
 
 export default function FormatEdit( {
 	formatTypes,
@@ -39,18 +39,8 @@ export default function FormatEdit( {
 	value,
 	allowedFormats,
 	withoutInteractiveFormatting,
-	getWin,
+	forwardedRef,
 } ) {
-	const range = useMemo( () => {
-		const selection = getWin().getSelection();
-
-		if ( ! selection.rangeCount ) {
-			return;
-		}
-
-		return selection.getRangeAt( 0 );
-	}, [ value.start, value.end ] );
-
 	const edits = formatTypes.map( ( settings ) => {
 		const { name, edit: Edit, tagName } = settings;
 
@@ -93,12 +83,10 @@ export default function FormatEdit( {
 
 		return (
 			<FormatSettings.Provider key={ name } value={ settings }>
-				<IsActive.Provider value={ isActive }>
-					{ edit }
-				</IsActive.Provider>
+				<Value.Provider value={ value }>{ edit }</Value.Provider>
 			</FormatSettings.Provider>
 		);
 	} );
 
-	return <Range.Provider value={ range }>{ edits }</Range.Provider>;
+	return <Ref.Provider value={ forwardedRef }>{ edits }</Ref.Provider>;
 }
