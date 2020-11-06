@@ -587,6 +587,6 @@ export function isInTheFuture( dateValue ) {
  * @return {Date} Date
  */
 export function getDate( dateString ) {
-	const actualDate = dateString ? dateString : new Date();
+	const actualDate = dateString ? parseISO( dateString ) : new Date();
 	return toDate( actualDate, { timeZone: WP_ZONE } );
 }
