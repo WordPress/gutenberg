@@ -714,11 +714,7 @@ _Returns_
 
 <a name="useStoreSelectors" href="#useStoreSelectors">#</a> **useStoreSelectors**
 
-A shorthand for useSelect() that returns all the selectors from a given store.
-
-_Related_
-
--   useSelect
+Custom react hook for retrieving selectors from registered stores
 
 _Usage_
 

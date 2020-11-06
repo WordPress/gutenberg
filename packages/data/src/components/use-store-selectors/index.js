@@ -4,7 +4,7 @@
 import useSelect from '../use-select';
 
 /**
- * A shorthand for useSelect() that returns all the selectors from a given store.
+ * Custom react hook for retrieving selectors from registered stores
  *
  * @param {string}   storeKey      Store to return selectors from.
  * @param {Function} mapSelectors  Function called on every state change. The
@@ -43,7 +43,6 @@ import useSelect from '../use-select';
  * doesn't change and other props are passed in that do change, the price will
  * not change because the dependency is just the currency.
  *
- * @see useSelect
  * @return {Function} A custom react hook.
  */
 export default function useStoreSelectors( storeKey, mapSelectors, deps = [] ) {
