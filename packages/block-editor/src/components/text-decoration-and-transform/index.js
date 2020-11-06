@@ -2,6 +2,10 @@
  * Internal dependencies
  */
 import {
+	TextDecorationEdit,
+	useIsTextDecorationDisabled,
+} from '../../hooks/text-decoration';
+import {
 	TextTransformEdit,
 	useIsTextTransformDisabled,
 } from '../../hooks/text-transform';
@@ -15,21 +19,17 @@ import {
  * @return {WPElement}      Component containing text decoration or transform controls.
  */
 export default function TextDecorationAndTransformEdit( props ) {
-	// Once text decorations block support is added additional checks will
-	// need to be added below and it's edit component included.
+	const decorationAvailable = ! useIsTextDecorationDisabled( props );
 	const transformAvailable = ! useIsTextTransformDisabled( props );
 
-	if ( ! transformAvailable ) {
+	if ( ! decorationAvailable && ! transformAvailable ) {
 		return null;
 	}
 
 	return (
-		<>
-			{ transformAvailable && (
-				<div className="block-editor-text-decoration-and-transform">
-					{ transformAvailable && <TextTransformEdit { ...props } /> }
-				</div>
-			) }
-		</>
+		<div className="block-editor-text-decoration-and-transform">
+			{ decorationAvailable && <TextDecorationEdit { ...props } /> }
+			{ transformAvailable && <TextTransformEdit { ...props } /> }
+		</div>
 	);
 }
