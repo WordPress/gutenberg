@@ -92,12 +92,67 @@ supports: {
 
 This value signals that a block supports some of the CSS style properties related to color. When it does, the block editor will show UI controls for the user to set their values.
 
+The controls for background, text, and link will source their colors from the `editor-color-palette` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), while the gradient's from `editor-gradient-presets` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets).
+
 ```js
 supports: {
     background: true, // Enable background color UI control.
     gradient: true, // Enable gradients UI control.
     link: true, // Enable link color UI control.
     text: true, // Eneble text color UI control.
+}
+```
+
+When the block declares support for a specific color property, the attributes definition is extended to include some attributes.
+
+- `style`: attribute of `object` type with no default assigned. This is added when any of support color properties are declared. It stores the custom values set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            color: {
+                background: 'value',
+                gradient: 'value',
+                link: 'value',
+                text: 'value'
+            }
+        }
+    }
+}
+```
+
+- When `background` support is declared: it'll be added a new `backgroundColor` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default background color by specifying its own attribute with a default e.g.:
+
+```js
+attributes: {
+    backgroundColor: {
+        type: 'string',
+        default: 'some-value',
+    }
+}
+```
+
+- When `gradient` support is declared: it'll be added a new `gradient` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default text color by specifying its own attribute with a default e.g.:
+
+```js
+attributes: {
+    gradient: {
+        type: 'string',
+        default: 'some-value',
+    }
+}
+```
+
+- When `text` support is declared: it'll be added a new `textColor` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default text color by specifying its own attribute with a default e.g.:
+
+```js
+attributes: {
+    textColor: {
+        type: 'string',
+        default: 'some-value',
+    }
 }
 ```
 
