@@ -90,16 +90,14 @@ supports: {
   - `link`: type `boolean`, default value `false`
   - `text`: type `boolean`, default value `false`
 
-This value enables a block to declare support for some color style properties. When it does, the block editor will show UI controls for the user to set the values of these variables.
-
-For example, this will enable all controls:
+This value signals that a block supports some of the CSS style properties related to color. When it does, the block editor will show UI controls for the user to set their values.
 
 ```js
 supports: {
-    background: true,
-    text: true,
-    link: true,
-    text: true,
+    background: true, // Enable background color UI control.
+    gradient: true, // Enable gradients UI control.
+    link: true, // Enable link color UI control.
+    text: true, // Eneble text color UI control.
 }
 ```
 
@@ -128,6 +126,20 @@ When the style picker is shown, a dropdown is displayed so the user can select a
 supports: {
     // Remove the Default Style picker.
     defaultStylePicker: false
+}
+```
+
+## fontSize
+
+- Type: `boolean`
+- Default value: `false`
+
+This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set the font-size value.
+
+```js
+supports: {
+    // Enable UI control for font-size
+    fontSize: true,
 }
 ```
 
