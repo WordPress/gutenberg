@@ -333,7 +333,7 @@ function translateFormat( formatString ) {
 			newFormat.push( formatMap[ char ] );
 			// }
 		} else {
-			newFormat.push( "'" + char + "'" );
+			newFormat.push( char );
 		}
 	}
 	// Join with [] between to separate characters, and replace
