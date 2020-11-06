@@ -1,10 +1,6 @@
 /**
  * External dependencies
  */
-import momentLib from 'moment';
-import 'moment-timezone/moment-timezone';
-import 'moment-timezone/moment-timezone-utils';
-
 import {
 	addHours,
 	format as dateFnsFormat,
@@ -22,10 +18,6 @@ import {
 import originalLocale from 'date-fns/locale/en-US/index';
 import buildLocalizeFn from 'date-fns/locale/_lib/buildLocalizeFn';
 import buildFormatLongFn from 'date-fns/locale/_lib/buildFormatLongFn';
-
-/** @typedef {import('moment').Moment} Moment */
-
-const WP_ZONE = 'WP';
 
 // This regular expression tests positive for UTC offsets as described in ISO 8601.
 // See: https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
@@ -107,39 +99,6 @@ let settings = {
  */
 export function setSettings( dateSettings ) {
 	settings = dateSettings;
-
-	// Backup and restore current locale.
-	const currentLocale = momentLib.locale();
-	momentLib.updateLocale( dateSettings.l10n.locale, {
-		// Inherit anything missing from the default locale.
-		parentLocale: currentLocale,
-		months: dateSettings.l10n.months,
-		monthsShort: dateSettings.l10n.monthsShort,
-		weekdays: dateSettings.l10n.weekdays,
-		weekdaysShort: dateSettings.l10n.weekdaysShort,
-		meridiem( hour, minute, isLowercase ) {
-			if ( hour < 12 ) {
-				return isLowercase
-					? dateSettings.l10n.meridiem.am
-					: dateSettings.l10n.meridiem.AM;
-			}
-			return isLowercase
-				? dateSettings.l10n.meridiem.pm
-				: dateSettings.l10n.meridiem.PM;
-		},
-		longDateFormat: {
-			LT: dateSettings.formats.time,
-			LTS: null,
-			L: null,
-			LL: dateSettings.formats.date,
-			LLL: dateSettings.formats.datetime,
-			LLLL: null,
-		},
-		// From human_time_diff?
-		// Set to `(number, withoutSuffix, key, isFuture) => {}` instead.
-		relativeTime: dateSettings.l10n.relative,
-	} );
-	momentLib.locale( currentLocale );
 }
 
 /**
@@ -255,7 +214,7 @@ const formatMap = {
 	a: 'a',
 	A: 'A',
 	/**
-	 * Gets the current time in Swatch Internet Time (.beats).
+	 * Gets the given time in Swatch Internet Time (.beats).
 	 *
 	 * @param {Date|string} dateValue Date ISO string or object.
 	 *
@@ -439,6 +398,11 @@ function isValidUTCOffset( offset ) {
 	return VALID_UTC_OFFSET.test( offset );
 }
 
+/**
+ * Transform the given integer into a valid UTC Offset in hours.
+ *
+ * @param {number} offset A UTC offset as an integer
+ */
 function integerToUTCOffset( offset ) {
 	const offsetInHours = offset > 23 ? offset / 60 : offset;
 	const sign = offset < 0 ? '-' : '+';
@@ -450,11 +414,24 @@ function integerToUTCOffset( offset ) {
 		: `${ sign }${ absoluteOffset }`;
 }
 
+/**
+ * Determines whether or not the given value can be parsed as a UTC offset,
+ * by checking if it is parseable as an integer and if it isn't a
+ * valid UTC offset already.
+ *
+ * @param {string} offset An offset as an integer or a string.
+ */
 function shouldParseAsUTCOffset( offset ) {
 	const isNumber = ! Number.isNaN( Number.parseInt( offset, 10 ) );
 	return isNumber && ! isValidUTCOffset( offset );
 }
 
+/**
+ * Get a properly formatted timezone from a timezone string or offset.
+ * Return system timezone or offset if no timezone was given.
+ *
+ * @param {string} timezone
+ */
 function getActualTimezone( timezone = '' ) {
 	if ( ! timezone ) {
 		const { string, offset } = settings.timezone;
@@ -478,8 +455,7 @@ function getActualTimezone( timezone = '' ) {
  *
  * @param {string}                  dateFormat PHP-style formatting string.
  *                                             See php.net/date.
- * @param {Date|string|Moment|null} dateValue  Date object or string,
- *                                             parsable by moment.js.
+ * @param {Date|string|null} dateValue  Date object or ISO string.
  *
  * @return {string} Formatted date.
  */
@@ -493,7 +469,7 @@ export function format( dateFormat, dateValue = new Date() ) {
  *
  * @param {string}                  dateFormat PHP-style formatting string.
  *                                             See php.net/date.
- * @param {Date|string|Moment|null} dateValue  Date object or string, parsable
+ * @param {Date|string|null} dateValue  Date object or ISO string, parsable
  *                                             by moment.js.
  * @param {string|number|null}      timezone   Timezone to output result in or a
  *                                             UTC offset. Defaults to timezone from
@@ -516,8 +492,7 @@ export function date( dateFormat, dateValue = new Date(), timezone ) {
  *
  * @param {string}                  dateFormat PHP-style formatting string.
  *                                             See php.net/date.
- * @param {Date|string|Moment|null} dateValue  Date object or string,
- *                                             parsable by moment.js.
+ * @param {Date|string|null} dateValue  Date object or ISO string.
  *
  * @return {string} Formatted date in English.
  */
@@ -533,7 +508,7 @@ export function gmdate( dateFormat, dateValue = new Date() ) {
  *
  * @param {string}                     dateFormat PHP-style formatting string.
  *                                                See php.net/date.
- * @param {Date|string|Moment|null}    dateValue  Date object or string, parsable by
+ * @param {Date|string|null}    dateValue  Date object or string, parsable by
  *                                                moment.js.
  * @param {string|number|boolean|null} timezone   Timezone to output result in or a
  *                                                UTC offset. Defaults to timezone from
@@ -576,8 +551,7 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
  *
  * @param {string}                  dateFormat PHP-style formatting string.
  *                                             See php.net/date.
- * @param {Date|string|Moment|null} dateValue  Date object or string,
- *                                             parsable by moment.js.
+ * @param {Date|string|null} dateValue  Date object or ISO string.
  *
  * @return {string} Formatted date.
  */
@@ -605,7 +579,7 @@ export function gmdateI18n( dateFormat, dateValue = new Date() ) {
  * @return {boolean} Is in the future.
  */
 export function isInTheFuture( dateValue ) {
-	const dateObject = toDate( dateValue, { timeZone: WP_ZONE } );
+	const dateObject = toDate( dateValue, { timeZone: getActualTimezone() } );
 
 	return isFuture( dateObject );
 }
@@ -619,5 +593,5 @@ export function isInTheFuture( dateValue ) {
  */
 export function getDate( dateString ) {
 	const actualDate = dateString ? new Date( dateString ) : new Date();
-	return toDate( actualDate, { timeZone: WP_ZONE } );
+	return toDate( actualDate, { timeZone: getActualTimezone() } );
 }
