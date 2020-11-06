@@ -8,6 +8,9 @@ import {
 	visitAdminPage,
 	trashAllPosts,
 	activateTheme,
+	getAllBlocks,
+	selectBlockByClientId,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -78,15 +81,22 @@ describe( 'Template Part', () => {
 			await updateHeader();
 
 			const initialTemplateParts = await page.$$(
-				'*[data-type="core/template-part"]'
+				'.wp-block-template-part'
+			);
+
+			// Select the header template part block.
+			const allBlocks = await getAllBlocks();
+			const headerBlock = allBlocks.find(
+				( block ) => block.name === 'core/template-part'
+			);
+			await selectBlockByClientId( headerBlock.clientId );
+			// TODO: Remove when toolbar supports text fields
+			expect( console ).toHaveWarnedWith(
+				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
 			);
 
 			// Detach blocks from template part using ellipsis menu.
-			await initialTemplateParts[ 0 ].click();
-			const ellipsisMenu = await page.waitForSelector(
-				'.components-dropdown-menu__toggle[aria-label="More options"]'
-			);
-			await ellipsisMenu.click();
+			await clickBlockToolbarButton( 'More options' );
 			const detachButton = await page.waitForXPath(
 				'//span[contains(text(), "Detach blocks from template part")]'
 			);
@@ -94,7 +104,7 @@ describe( 'Template Part', () => {
 
 			// Verify there is one less template part on the page.
 			const finalTemplateParts = await page.$$(
-				'*[data-type="core/template-part"]'
+				'.wp-block-template-part'
 			);
 			expect(
 				initialTemplateParts.length - finalTemplateParts.length
