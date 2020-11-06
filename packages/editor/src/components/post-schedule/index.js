@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalGetSettings } from '@wordpress/date';
+import { __experimentalGetSettings, getDate } from '@wordpress/date';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { DateTimePicker } from '@wordpress/components';
@@ -9,6 +9,7 @@ import { useRef } from '@wordpress/element';
 
 export function PostSchedule( { date, onUpdateDate } ) {
 	const ref = useRef();
+
 	const settings = __experimentalGetSettings();
 	// To know if the current timezone is a 12 hour time with look for "a" in the time format
 	// We also make sure this a is not escaped by a "/"
@@ -22,7 +23,7 @@ export function PostSchedule( { date, onUpdateDate } ) {
 	);
 
 	function onChange( newDate ) {
-		onUpdateDate( newDate );
+		onUpdateDate( null !== newDate ? newDate : getDate() );
 		const { ownerDocument } = ref.current;
 		ownerDocument.activeElement.blur();
 	}

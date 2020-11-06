@@ -8,14 +8,16 @@ import { dateI18n, __experimentalGetSettings } from '@wordpress/date';
 import { withSelect } from '@wordpress/data';
 
 export function PostScheduleLabel( { date, isFloating } ) {
+	if ( isFloating ) {
+		return __( 'Immediately' );
+	}
+
 	const settings = __experimentalGetSettings();
 
-	return date && ! isFloating
-		? dateI18n(
-				`${ settings.formats.date } ${ settings.formats.time }`,
-				date
-		  )
-		: __( 'Immediately' );
+	return dateI18n(
+		`${ settings.formats.date } ${ settings.formats.time }`,
+		date
+	);
 }
 
 export default withSelect( ( select ) => {
