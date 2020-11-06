@@ -87,18 +87,16 @@ supports: {
 - Subproperties:
   - `background`: type `boolean`, default value `false`
   - `gradient`: type `boolean`, default value `false`
-  - `link`: type `boolean`, default value `false`
   - `text`: type `boolean`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to color. When it does, the block editor will show UI controls for the user to set their values.
 
-The controls for background, text, and link will source their colors from the `editor-color-palette` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), while the gradient's from `editor-gradient-presets` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets).
+The controls for background and text will source their colors from the `editor-color-palette` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), while the gradient's from `editor-gradient-presets` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets).
 
 ```js
 supports: {
     background: true, // Enable background color UI control.
     gradient: true, // Enable gradients UI control.
-    link: true, // Enable link color UI control.
     text: true, // Eneble text color UI control.
 }
 ```
@@ -115,7 +113,6 @@ attributes: {
             color: {
                 background: 'value',
                 gradient: 'value',
-                link: 'value',
                 text: 'value'
             }
         }
