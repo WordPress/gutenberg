@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/nux",
-	"version": "3.22.0",
+	"version": "3.23.1",
 	"description": "NUX (New User eXperience) module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,7 +23,8 @@
 	"react-native": "src/index",
 	"sideEffects": [
 		"build-style/**",
-		"!((src|build|build-module)/components/**)"
+		"src/**/*.scss",
+		"{src,build,build-module}/{index.js,store/index.js}"
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",

@@ -141,7 +141,7 @@ function gutenberg_experimental_global_styles_get_user() {
 function gutenberg_experimental_global_styles_get_user_cpt( $should_create_cpt = false, $post_status_filter = array( 'publish' ) ) {
 	$user_cpt         = array();
 	$post_type_filter = 'wp_global_styles';
-	$post_name_filter = 'wp-global-styles-' . strtolower( wp_get_theme()->get( 'TextDomain' ) );
+	$post_name_filter = 'wp-global-styles-' . urlencode( wp_get_theme()->get_stylesheet() );
 	$recent_posts     = wp_get_recent_posts(
 		array(
 			'numberposts' => 1,
@@ -250,6 +250,40 @@ function gutenberg_experimental_global_styles_get_core() {
 			$font_size['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
 		}
 	}
+
+	$default_font_styles_i18n = array(
+		'normal'  => __( 'Regular', 'gutenberg' ),
+		'italic'  => __( 'Italic', 'gutenberg' ),
+		'initial' => __( 'Initial', 'gutenberg' ),
+		'inherit' => __( 'Inherit', 'gutenberg' ),
+	);
+
+	if ( ! empty( $config['global']['settings']['typography']['fontStyles'] ) ) {
+		foreach ( $config['global']['settings']['typography']['fontStyles'] as &$font_style ) {
+			$font_style['name'] = $default_font_styles_i18n[ $font_style['slug'] ];
+		}
+	}
+
+	$default_font_weights_i18n = array(
+		'100'     => __( 'Ultralight', 'gutenberg' ),
+		'200'     => __( 'Thin', 'gutenberg' ),
+		'300'     => __( 'Light', 'gutenberg' ),
+		'400'     => __( 'Regular', 'gutenberg' ),
+		'500'     => __( 'Medium', 'gutenberg' ),
+		'600'     => __( 'Semibold', 'gutenberg' ),
+		'700'     => __( 'Bold', 'gutenberg' ),
+		'800'     => __( 'Heavy', 'gutenberg' ),
+		'900'     => __( 'Black', 'gutenberg' ),
+		'initial' => __( 'Initial', 'gutenberg' ),
+		'inherit' => __( 'Inherit', 'gutenberg' ),
+	);
+
+	if ( ! empty( $config['global']['settings']['typography']['fontWeights'] ) ) {
+		foreach ( $config['global']['settings']['typography']['fontWeights'] as &$font_weight ) {
+			$font_weight['name'] = $default_font_weights_i18n[ $font_weight['slug'] ];
+		}
+	}
+
 	// End i18n logic to remove when JSON i18 strings are extracted.
 	return $config;
 }
@@ -334,6 +368,12 @@ function gutenberg_experimental_global_styles_get_theme_support_settings() {
 			$theme_settings['global']['settings']['typography'] = array();
 		}
 		$theme_settings['global']['settings']['typography']['fontSizes'] = array();
+		// Back-compatibility for presets without units.
+		foreach ( $theme_font_sizes[0] as &$font_size ) {
+			if ( is_numeric( $font_size['size'] ) ) {
+				$font_size['size'] = $font_size['size'] . 'px';
+			}
+		}
 		$theme_settings['global']['settings']['typography']['fontSizes'] = $theme_font_sizes[0];
 	}
 
@@ -387,8 +427,18 @@ function gutenberg_experimental_global_styles_get_css_property( $style_property 
 			return 'background-color';
 		case 'fontSize':
 			return 'font-size';
+		case 'fontStyle':
+			return 'font-style';
+		case 'fontWeight':
+			return 'font-weight';
 		case 'lineHeight':
 			return 'line-height';
+		case 'fontFamily':
+			return 'font-family';
+		case 'textDecoration':
+			return 'text-decoration';
+		case 'textTransform':
+			return 'text-transform';
 		default:
 			return $style_property;
 	}
@@ -406,7 +456,12 @@ function gutenberg_experimental_global_styles_get_style_property() {
 		'backgroundColor'          => array( 'color', 'background' ),
 		'color'                    => array( 'color', 'text' ),
 		'fontSize'                 => array( 'typography', 'fontSize' ),
+		'fontFamily'               => array( 'typography', 'fontFamily' ),
+		'fontStyle'                => array( 'typography', 'fontStyle' ),
+		'fontWeight'               => array( 'typography', 'fontWeight' ),
 		'lineHeight'               => array( 'typography', 'lineHeight' ),
+		'textDecoration'           => array( 'typography', 'textDecoration' ),
+		'textTransform'            => array( 'typography', 'textTransform' ),
 	);
 }
 
@@ -422,7 +477,12 @@ function gutenberg_experimental_global_styles_get_support_keys() {
 		'backgroundColor'          => array( 'color' ),
 		'color'                    => array( 'color' ),
 		'fontSize'                 => array( 'fontSize' ),
+		'fontStyle'                => array( '__experimentalFontAppearance' ),
+		'fontWeight'               => array( '__experimentalFontAppearance' ),
 		'lineHeight'               => array( 'lineHeight' ),
+		'fontFamily'               => array( '__experimentalFontFamily' ),
+		'textDecoration'           => array( '__experimentalTextDecoration' ),
+		'textTransform'            => array( '__experimentalTextTransform' ),
 	);
 }
 
@@ -433,17 +493,37 @@ function gutenberg_experimental_global_styles_get_support_keys() {
  */
 function gutenberg_experimental_global_styles_get_presets_structure() {
 	return array(
-		'color'    => array(
+		'color'          => array(
 			'path' => array( 'color', 'palette' ),
 			'key'  => 'color',
 		),
-		'gradient' => array(
+		'gradient'       => array(
 			'path' => array( 'color', 'gradients' ),
 			'key'  => 'gradient',
 		),
-		'fontSize' => array(
+		'fontSize'       => array(
 			'path' => array( 'typography', 'fontSizes' ),
 			'key'  => 'size',
+		),
+		'fontFamily'     => array(
+			'path' => array( 'typography', 'fontFamilies' ),
+			'key'  => 'fontFamily',
+		),
+		'fontStyle'      => array(
+			'path' => array( 'typography', 'fontStyles' ),
+			'key'  => 'slug',
+		),
+		'fontWeight'     => array(
+			'path' => array( 'typography', 'fontWeights' ),
+			'key'  => 'slug',
+		),
+		'textDecoration' => array(
+			'path' => array( 'typography', 'textDecorations' ),
+			'key'  => 'value',
+		),
+		'textTransform'  => array(
+			'path' => array( 'typography', 'textTransforms' ),
+			'key'  => 'slug',
 		),
 	);
 }
@@ -483,12 +563,17 @@ function gutenberg_experimental_global_styles_get_block_data() {
 				'global',
 				array(
 					'supports' => array(
-						'__experimentalSelector' => ':root',
-						'fontSize'               => true,
-						'color'                  => array(
-							'linkColor' => true,
+						'__experimentalFontAppearance' => false,
+						'__experimentalFontFamily'     => true,
+						'__experimentalSelector'       => ':root',
+						'__experimentalTextDecoration' => true,
+						'__experimentalTextTransform'  => true,
+						'color'                        => array(
 							'gradients' => true,
+							'linkColor' => true,
 						),
+						'fontSize'                     => true,
+						'lineHeight'                   => true,
 					),
 				)
 			),
@@ -500,9 +585,6 @@ function gutenberg_experimental_global_styles_get_block_data() {
 		}
 
 		$supports = gutenberg_experimental_global_styles_get_supported_styles( $block_type->supports );
-		if ( empty( $supports ) ) {
-			continue;
-		}
 
 		/*
 		 * Assign the selector for the block.
@@ -570,11 +652,111 @@ function gutenberg_experimental_global_styles_flatten_styles_tree( $styles ) {
 	foreach ( $mappings as $key => $path ) {
 		$value = gutenberg_experimental_get( $styles, $path, null );
 		if ( null !== $value ) {
-			$result[ $key ] = $value;
+			$variable_reference_prefix               = 'var:';
+			$variable_path_separator_token_attribute = '|';
+			$variable_path_separator_token_style     = '--';
+			$variable_reference_prefix_length        = strlen( $variable_reference_prefix );
+			if ( strncmp( $value, $variable_reference_prefix, $variable_reference_prefix_length ) === 0 ) {
+				$variable       = str_replace( $variable_path_separator_token_attribute, $variable_path_separator_token_style, substr( $value, $variable_reference_prefix_length ) );
+				$result[ $key ] = "var(--wp--$variable)";
+			} else {
+				$result[ $key ] = $value;
+			}
 		}
 	}
 	return $result;
 
+}
+
+/**
+ * Given a selector for a block, and the settings of the block, returns a string
+ * with the stylesheet of the preset classes required for that block.
+ *
+ * @param string $selector  String with the CSS selector for the block.
+ * @param array  $settings  Array containing the settings of the block.
+ *
+ * @return string Stylesheet with the preset classes.
+ */
+function gutenberg_experimental_global_styles_get_preset_classes( $selector, $settings ) {
+	if ( empty( $settings ) || empty( $selector ) ) {
+		return '';
+	}
+
+	$stylesheet        = '';
+	$class_prefix      = 'has';
+	$classes_structure = array(
+		'color'               => array(
+			'path'     => array( 'color', 'palette' ),
+			'key'      => 'color',
+			'property' => 'color',
+		),
+		'background-color'    => array(
+			'path'     => array( 'color', 'palette' ),
+			'key'      => 'color',
+			'property' => 'background-color',
+		),
+		'gradient-background' => array(
+			'path'     => array( 'color', 'gradients' ),
+			'key'      => 'gradient',
+			'property' => 'background',
+		),
+		'font-size'           => array(
+			'path'     => array( 'typography', 'fontSizes' ),
+			'key'      => 'size',
+			'property' => 'font-size',
+		),
+		'font-style'          => array(
+			'path'     => array( 'typography', 'fontStyles' ),
+			'key'      => 'slug',
+			'property' => 'font-style',
+		),
+		'font-weight'         => array(
+			'path'     => array( 'typography', 'fontWeights' ),
+			'key'      => 'slug',
+			'property' => 'font-weight',
+		),
+		'text-decoration'     => array(
+			'path'     => array( 'typography', 'textDecorations' ),
+			'key'      => 'value',
+			'property' => 'text-decoration',
+		),
+		'text-transform'      => array(
+			'path'     => array( 'typography', 'textTransforms' ),
+			'key'      => 'slug',
+			'property' => 'text-transform',
+		),
+	);
+
+	foreach ( $classes_structure as $class_suffix => $preset_structure ) {
+		$path    = $preset_structure['path'];
+		$presets = gutenberg_experimental_get( $settings, $path );
+
+		if ( empty( $presets ) ) {
+			continue;
+		}
+
+		$key      = $preset_structure['key'];
+		$property = $preset_structure['property'];
+
+		foreach ( $presets as $preset ) {
+			$slug  = $preset['slug'];
+			$value = $preset[ $key ];
+
+			$class_to_use    = ".$class_prefix-$slug-$class_suffix";
+			$selector_to_use = '';
+			if ( ':root' === $selector ) {
+				$selector_to_use = $class_to_use;
+			} else {
+				$selector_to_use = "$selector$class_to_use";
+			}
+			if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
+				$stylesheet .= "$selector_to_use {\n\t$property: $value;\n}\n";
+			} else {
+				$stylesheet .= $selector_to_use . '{' . "$property:$value;}\n";
+			}
+		}
+	}
+	return $stylesheet;
 }
 
 /**
@@ -633,6 +815,8 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 				$theme_variables
 			)
 		);
+
+		$stylesheet .= gutenberg_experimental_global_styles_get_preset_classes( $block_data[ $block_name ]['selector'], $tree[ $block_name ]['settings'] );
 	}
 
 	if ( gutenberg_experimental_global_styles_has_theme_json_support() ) {

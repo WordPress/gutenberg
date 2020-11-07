@@ -60,7 +60,7 @@ function TemplatePartItem( {
 	return (
 		<CompositeItem
 			className="wp-block-template-part__selection-preview-item"
-			role="listitem"
+			role="option"
 			onClick={ onClick }
 			onKeyDown={ ( event ) => {
 				if ( ENTER === event.keyCode || SPACE === event.keyCode ) {
@@ -109,7 +109,8 @@ function TemplatePartsByTheme( {
 	return templatePartsByTheme.map( ( templatePartList ) => (
 		<PanelGroup
 			key={ templatePartList[ 0 ].meta.theme }
-			title={ templatePartList[ 0 ].meta.theme }
+			// Falsy theme implies custom template part.
+			title={ templatePartList[ 0 ].meta.theme || __( 'Custom' ) }
 		>
 			{ templatePartList.map( ( templatePart ) => {
 				return currentShownTPs.includes( templatePart ) ? (
@@ -178,7 +179,10 @@ function TemplatePartSearchResults( {
 	const currentShownTPs = useAsyncList( filteredTPs );
 
 	return filteredTPs.map( ( templatePart ) => (
-		<PanelGroup key={ templatePart.id } title={ templatePart.meta.theme }>
+		<PanelGroup
+			key={ templatePart.id }
+			title={ templatePart.meta.theme || __( 'Custom' ) }
+		>
 			{ currentShownTPs.includes( templatePart ) ? (
 				<TemplatePartItem
 					key={ templatePart.id }
@@ -209,7 +213,8 @@ export default function TemplateParts( {
 				per_page: -1,
 			}
 		);
-		const currentTheme = select( 'core' ).getCurrentTheme()?.textdomain;
+		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
+
 		const themeTemplateParts = select( 'core' ).getEntityRecords(
 			'postType',
 			'wp_template_part',
@@ -237,7 +242,7 @@ export default function TemplateParts( {
 		return (
 			<Composite
 				{ ...composite }
-				role="list"
+				role="listbox"
 				aria-label={ __( 'List of template parts' ) }
 			>
 				<TemplatePartSearchResults
@@ -254,7 +259,7 @@ export default function TemplateParts( {
 	return (
 		<Composite
 			{ ...composite }
-			role="list"
+			role="listbox"
 			aria-label={ __( 'List of template parts' ) }
 		>
 			<TemplatePartsByTheme

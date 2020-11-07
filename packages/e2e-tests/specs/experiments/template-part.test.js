@@ -7,30 +7,25 @@ import {
 	disablePrePublishChecks,
 	visitAdminPage,
 	trashAllPosts,
+	activateTheme,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import {
-	useExperimentalFeatures,
-	navigationPanel,
-} from '../../experimental-features';
+import { navigationPanel } from '../../experimental-features';
 
 describe( 'Template Part', () => {
-	useExperimentalFeatures( [
-		'#gutenberg-full-site-editing',
-		'#gutenberg-full-site-editing-demo',
-	] );
-
 	beforeAll( async () => {
+		await activateTheme( 'twentytwentyone-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
 	afterAll( async () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
+		await activateTheme( 'twentytwentyone' );
 	} );
 
 	describe( 'Template part block', () => {
@@ -66,13 +61,13 @@ describe( 'Template Part', () => {
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Front page' );
+			await navigationPanel.clickItemByText( 'Front Page' );
 
 			// Verify that the header template part is updated.
 			const [ headerTemplatePart ] = await page.$x(
-				'//*[@data-type="core/template-part"][//p[text()="Header Template Part123"]]'
+				'//*[@data-type="core/template-part"][//p[text()="Header Template Part 123"]]'
 			);
-			expect( headerTemplatePart ).not.toBeNull();
+			expect( headerTemplatePart ).not.toBeUndefined();
 		} );
 	} );
 

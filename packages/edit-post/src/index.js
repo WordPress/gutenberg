@@ -5,6 +5,7 @@ import '@wordpress/core-data';
 import '@wordpress/block-editor';
 import '@wordpress/editor';
 import '@wordpress/keyboard-shortcuts';
+import '@wordpress/reusable-blocks';
 import '@wordpress/viewport';
 import '@wordpress/notices';
 import {
@@ -96,7 +97,9 @@ export function initializeEditor(
 	);
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks(
+			settings.__unstableEnableFullSiteEditingBlocks
+		);
 	}
 
 	// Show a console log warning if the browser is not in Standards rendering mode.

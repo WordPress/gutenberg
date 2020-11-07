@@ -17,6 +17,7 @@ import {
 	BlockBreadcrumb,
 	__unstableEditorStyles as EditorStyles,
 	__experimentalUseResizeCanvas as useResizeCanvas,
+	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
 import {
 	FullscreenMode,
@@ -26,6 +27,8 @@ import {
 import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
+import { close } from '@wordpress/icons';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -36,17 +39,17 @@ import { SidebarComplementaryAreaFills } from '../sidebar';
 import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
-import LeftSidebar from '../left-sidebar';
+import NavigationSidebar from '../navigation-sidebar';
 
 const interfaceLabels = {
 	leftSidebar: __( 'Block Library' ),
+	drawer: __( 'Navigation Sidebar' ),
 };
 
 function Editor() {
-	const [ leftSidebarContent, setLeftSidebarContent ] = useState( null );
-
 	const {
 		isFullscreenActive,
+		isInserterOpen,
 		deviceType,
 		sidebarIsOpened,
 		settings,
@@ -55,15 +58,18 @@ function Editor() {
 		page,
 		template,
 		select,
+		isNavigationOpen,
 	} = useSelect( ( _select ) => {
 		const {
 			isFeatureActive,
+			isInserterOpened,
 			__experimentalGetPreviewDeviceType,
 			getSettings,
 			getTemplateId,
 			getTemplatePartId,
 			getTemplateType,
 			getPage,
+			isNavigationOpened,
 		} = _select( 'core/edit-site' );
 		const _templateId = getTemplateId();
 		const _templatePartId = getTemplatePartId();
@@ -77,6 +83,7 @@ function Editor() {
 		}
 
 		return {
+			isInserterOpen: isInserterOpened(),
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 			deviceType: __experimentalGetPreviewDeviceType(),
 			sidebarIsOpened: !! _select(
@@ -94,10 +101,11 @@ function Editor() {
 				: null,
 			select: _select,
 			entityId: _entityId,
+			isNavigationOpen: isNavigationOpened(),
 		};
 	}, [] );
 	const { editEntityRecord } = useDispatch( 'core' );
-	const { setPage } = useDispatch( 'core/edit-site' );
+	const { setPage, setIsInserterOpened } = useDispatch( 'core/edit-site' );
 
 	const inlineStyles = useResizeCanvas( deviceType );
 
@@ -153,8 +161,6 @@ function Editor() {
 		[ page?.context ]
 	);
 
-	const isNavigationOpen = leftSidebarContent === 'navigation';
-
 	useEffect( () => {
 		if ( isNavigationOpen ) {
 			document.body.classList.add( 'is-navigation-sidebar-open' );
@@ -163,8 +169,7 @@ function Editor() {
 		}
 	}, [ isNavigationOpen ] );
 
-	const toggleLeftSidebarContent = ( value ) =>
-		setLeftSidebarContent( leftSidebarContent === value ? null : value );
+	const isMobile = useViewportMatch( 'medium', '<' );
 
 	return (
 		<>
@@ -213,15 +218,40 @@ function Editor() {
 												<SidebarComplementaryAreaFills />
 												<InterfaceSkeleton
 													labels={ interfaceLabels }
+													drawer={
+														<NavigationSidebar />
+													}
 													leftSidebar={
-														<LeftSidebar
-															content={
-																leftSidebarContent
-															}
-															setContent={
-																setLeftSidebarContent
-															}
-														/>
+														isInserterOpen ? (
+															<div className="edit-site-editor__inserter-panel">
+																<div className="edit-site-editor__inserter-panel-header">
+																	<Button
+																		icon={
+																			close
+																		}
+																		onClick={ () =>
+																			setIsInserterOpened(
+																				false
+																			)
+																		}
+																	/>
+																</div>
+																<div className="edit-site-editor__inserter-panel-content">
+																	<Library
+																		showInserterHelpPanel
+																		onSelect={ () => {
+																			if (
+																				isMobile
+																			) {
+																				setIsInserterOpened(
+																					false
+																				);
+																			}
+																		} }
+																	/>
+																</div>
+															</div>
+														) : null
 													}
 													sidebar={
 														sidebarIsOpened && (
@@ -232,23 +262,6 @@ function Editor() {
 														<Header
 															openEntitiesSavedStates={
 																openEntitiesSavedStates
-															}
-															isInserterOpen={
-																leftSidebarContent ===
-																'inserter'
-															}
-															onToggleInserter={ () =>
-																toggleLeftSidebarContent(
-																	'inserter'
-																)
-															}
-															isNavigationOpen={
-																isNavigationOpen
-															}
-															onToggleNavigation={ () =>
-																toggleLeftSidebarContent(
-																	'navigation'
-																)
 															}
 														/>
 													}
@@ -263,14 +276,8 @@ function Editor() {
 															<Popover.Slot name="block-toolbar" />
 															{ template && (
 																<BlockEditor
-																	setIsInserterOpen={ (
-																		isInserterOpen
-																	) =>
-																		setLeftSidebarContent(
-																			isInserterOpen
-																				? 'inserter'
-																				: null
-																		)
+																	setIsInserterOpen={
+																		setIsInserterOpened
 																	}
 																/>
 															) }

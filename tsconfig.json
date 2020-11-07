@@ -5,12 +5,14 @@
 		{ "path": "packages/autop" },
 		{ "path": "packages/blob" },
 		{ "path": "packages/block-editor" },
+		{ "path": "packages/components" },
 		{ "path": "packages/element" },
 		{ "path": "packages/dependency-extraction-webpack-plugin" },
 		{ "path": "packages/dom-ready" },
 		{ "path": "packages/escape-html" },
 		{ "path": "packages/eslint-plugin" },
 		{ "path": "packages/html-entities" },
+		{ "path": "packages/hooks" },
 		{ "path": "packages/i18n" },
 		{ "path": "packages/icons" },
 		{ "path": "packages/is-shallow-equal" },
@@ -21,7 +23,8 @@
 		{ "path": "packages/project-management-automation" },
 		{ "path": "packages/token-list" },
 		{ "path": "packages/url" },
-		{ "path": "packages/warning" }
+		{ "path": "packages/warning" },
+		{ "path": "packages/wordcount" }
 	],
 	"files": []
 }

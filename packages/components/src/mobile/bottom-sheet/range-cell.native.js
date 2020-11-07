@@ -217,6 +217,7 @@ class BottomSheetRangeCell extends Component {
 				activeOpacity={ 1 }
 				accessible={ accessible }
 				onPress={ this.onCellPress }
+				valueStyle={ styles.valueStyle }
 				accessibilityLabel={ accessibilityLabel }
 				accessibilityHint={
 					/* translators: accessibility text (hint for focusing a slider) */
@@ -239,7 +240,9 @@ class BottomSheetRangeCell extends Component {
 						ref={ ( slider ) => {
 							this.sliderRef = slider;
 						} }
-						style={ styles.slider }
+						style={
+							isIOS ? styles.sliderIOS : styles.sliderAndroid
+						}
 						accessibilityRole={ 'adjustable' }
 					/>
 					{ shouldDisplayTextInput && (

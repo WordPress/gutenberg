@@ -4,7 +4,7 @@
 
 	.components-menu-items__item-icon {
 		margin-right: -2px; // This optically balances the icon.
-		margin-left: auto;
+		margin-left: $grid-unit-30;
 		display: inline-block;
 		flex: 0 0 auto;
 	}
@@ -23,19 +23,28 @@
 .components-menu-item__info-wrapper {
 	display: flex;
 	flex-direction: column;
+	margin-right: auto;
 }
 
 .components-menu-item__info {
 	margin-top: $grid-unit-05;
 	font-size: $helptext-font-size;
 	color: $gray-700;
+	white-space: normal;
+}
+
+.components-menu-item__item {
+	white-space: nowrap;
+	margin-right: auto;
+	display: inline-flex;
+	align-items: center;
 }
 
 .components-menu-item__shortcut {
 	align-self: center;
 	margin-right: 0;
 	margin-left: auto;
-	padding-left: $grid-unit-15;
+	padding-left: $grid-unit-30;
 	color: currentColor;
 
 	// Hide the keyboard shortcuts on mobile, because they aren't super-useful

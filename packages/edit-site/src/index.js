@@ -61,11 +61,11 @@ export function initialize( id, settings ) {
 
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
+		__experimentalRegisterExperimentalCoreBlocks( true );
 	}
 
 	render( <Editor />, document.getElementById( id ) );
 }
 
 export { default as __experimentalFullscreenModeClose } from './components/header/fullscreen-mode-close';
-export { default as __experimentalNavigationToggle } from './components/header/navigation-toggle';
+export { default as __experimentalNavigationToggle } from './components/navigation-sidebar/navigation-toggle';

@@ -1100,17 +1100,17 @@ describe( 'actions', () => {
 				blocks: [ block ],
 				rootClientId: 'root',
 				time: expect.any( Number ),
-				updateSelection: true,
+				updateSelection: false,
 			} );
 		} );
 
-		it( 'should return the REPLACE_INNER_BLOCKS action with updateSelection false', () => {
-			expect( replaceInnerBlocks( 'root', [ block ], false ) ).toEqual( {
+		it( 'should return the REPLACE_INNER_BLOCKS action with updateSelection true', () => {
+			expect( replaceInnerBlocks( 'root', [ block ], true ) ).toEqual( {
 				type: 'REPLACE_INNER_BLOCKS',
 				blocks: [ block ],
 				rootClientId: 'root',
 				time: expect.any( Number ),
-				updateSelection: false,
+				updateSelection: true,
 			} );
 		} );
 	} );

@@ -7,51 +7,87 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { LINK_COLOR } from '../editor/utils';
+import {
+	LINK_COLOR,
+	useEditorFeature,
+	getPresetValueFromVariable,
+	getPresetVariable,
+} from '../editor/utils';
 import ColorPalettePanel from './color-palette-panel';
 
-export default ( {
+export function useHasColorPanel( { supports } ) {
+	return (
+		supports.includes( 'color' ) ||
+		supports.includes( 'backgroundColor' ) ||
+		supports.includes( 'background' ) ||
+		supports.includes( LINK_COLOR )
+	);
+}
+
+export default function ColorPanel( {
 	context: { supports, name },
 	getStyleProperty,
 	setStyleProperty,
 	getSetting,
 	setSetting,
-} ) => {
-	if (
-		! supports.includes( 'color' ) &&
-		! supports.includes( 'backgrounColor' ) &&
-		! supports.includes( 'background' ) &&
-		! supports.includes( LINK_COLOR )
-	) {
-		return null;
-	}
+} ) {
+	const colors = useEditorFeature( 'color.palette', name );
+	const disableCustomColors = ! useEditorFeature( 'color.custom', name );
+	const gradients = useEditorFeature( 'color.gradients', name );
+	const disableCustomGradients = ! useEditorFeature(
+		'color.customGradient',
+		name
+	);
 
 	const settings = [];
 
 	if ( supports.includes( 'color' ) ) {
+		const color = getStyleProperty( name, 'color' );
 		settings.push( {
-			colorValue: getStyleProperty( name, 'color' ),
+			colorValue:
+				getPresetValueFromVariable( 'color', colors, color ) || color,
 			onColorChange: ( value ) =>
-				setStyleProperty( name, 'color', value ),
+				setStyleProperty(
+					name,
+					'color',
+					getPresetVariable( 'color', colors, value ) || value
+				),
 			label: __( 'Text color' ),
 		} );
 	}
 
 	let backgroundSettings = {};
 	if ( supports.includes( 'backgroundColor' ) ) {
+		const backgroundColor = getStyleProperty( name, 'backgroundColor' );
 		backgroundSettings = {
-			colorValue: getStyleProperty( name, 'backgroundColor' ),
+			colorValue:
+				getPresetValueFromVariable(
+					'color',
+					colors,
+					backgroundColor
+				) || backgroundColor,
 			onColorChange: ( value ) =>
-				setStyleProperty( name, 'backgroundColor', value ),
+				setStyleProperty(
+					name,
+					'backgroundColor',
+					getPresetVariable( 'color', colors, value ) || value
+				),
 		};
 	}
 
 	let gradientSettings = {};
 	if ( supports.includes( 'background' ) ) {
+		const gradient = getStyleProperty( name, 'background' );
 		gradientSettings = {
-			gradientValue: getStyleProperty( name, 'background' ),
+			gradientValue:
+				getPresetValueFromVariable( 'gradient', gradients, gradient ) ||
+				gradient,
 			onGradientChange: ( value ) =>
-				setStyleProperty( name, 'background', value ),
+				setStyleProperty(
+					name,
+					'background',
+					getPresetVariable( 'gradient', gradients, value ) || value
+				),
 		};
 	}
 
@@ -67,18 +103,27 @@ export default ( {
 	}
 
 	if ( supports.includes( LINK_COLOR ) ) {
+		const color = getStyleProperty( name, LINK_COLOR );
 		settings.push( {
-			colorValue: getStyleProperty( name, LINK_COLOR ),
+			colorValue:
+				getPresetValueFromVariable( 'color', colors, color ) || color,
 			onColorChange: ( value ) =>
-				setStyleProperty( name, LINK_COLOR, value ),
+				setStyleProperty(
+					name,
+					LINK_COLOR,
+					getPresetVariable( 'color', colors, value ) || value
+				),
 			label: __( 'Link color' ),
 		} );
 	}
-
 	return (
 		<PanelColorGradientSettings
 			title={ __( 'Color' ) }
 			settings={ settings }
+			colors={ colors }
+			gradients={ gradients }
+			disableCustomColors={ disableCustomColors }
+			disableCustomGradients={ disableCustomGradients }
 		>
 			<ColorPalettePanel
 				key={ 'color-palette-panel-' + name }
@@ -88,4 +133,4 @@ export default ( {
 			/>
 		</PanelColorGradientSettings>
 	);
-};
+}

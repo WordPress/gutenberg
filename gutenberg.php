@@ -5,7 +5,7 @@
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
  * Requires at least: 5.3
  * Requires PHP: 5.6
- * Version: 9.1.1
+ * Version: 9.3.0
  * Author: Gutenberg Team
  * Text Domain: gutenberg
  *
@@ -65,16 +65,21 @@ function gutenberg_menu() {
 				'gutenberg_navigation_page'
 			);
 		}
-		if ( array_key_exists( 'gutenberg-full-site-editing', get_option( 'gutenberg-experiments' ) ) ) {
-			add_menu_page(
-				__( 'Site Editor (beta)', 'gutenberg' ),
-				__( 'Site Editor (beta)', 'gutenberg' ),
-				'edit_theme_options',
-				'gutenberg-edit-site',
-				'gutenberg_edit_site_page',
-				'dashicons-layout'
-			);
-		}
+	}
+
+	if ( gutenberg_is_fse_theme() ) {
+		add_menu_page(
+			__( 'Site Editor (beta)', 'gutenberg' ),
+			sprintf(
+				/* translators: %s: "beta" label. */
+				__( 'Site Editor %s', 'gutenberg' ),
+				'<span class="awaiting-mod">' . __( 'beta', 'gutenberg' ) . '</span>'
+			),
+			'edit_theme_options',
+			'gutenberg-edit-site',
+			'gutenberg_edit_site_page',
+			'dashicons-layout'
+		);
 	}
 
 	if ( current_user_can( 'edit_posts' ) ) {
@@ -104,6 +109,23 @@ function gutenberg_menu() {
 	);
 }
 add_action( 'admin_menu', 'gutenberg_menu', 9 );
+
+/**
+ * Modify WP admin bar.
+ *
+ * @param WP_Admin_Bar $wp_admin_bar Core class used to implement the Toolbar API.
+ */
+function modify_admin_bar( $wp_admin_bar ) {
+	if ( gutenberg_use_widgets_block_editor() ) {
+		$wp_admin_bar->add_menu(
+			array(
+				'id'   => 'widgets',
+				'href' => admin_url( 'themes.php?page=gutenberg-widgets' ),
+			)
+		);
+	}
+}
+add_action( 'admin_bar_menu', 'modify_admin_bar', 40 );
 
 /**
  * Display a version notice and deactivate the Gutenberg plugin.

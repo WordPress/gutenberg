@@ -50,6 +50,9 @@ $z-layers: (
 	// The floated blocks should be above the other blocks to allow selection.
 	"{core/image aligned left or right} .wp-block": 21,
 
+	// Needs to be bellow media library that has a z-index of 160000.
+	"{core/video track editor popover}": 160000 - 10,
+
 	// Small screen inner blocks overlay must be displayed above drop zone,
 	// settings menu, and movers.
 	".block-editor-block-list__layout.has-overlay::after": 60,
@@ -83,6 +86,15 @@ $z-layers: (
 	".interface-interface-skeleton__sidebar {greater than small}": 90,
 	".edit-site-sidebar {greater than small}": 90,
 	".edit-widgets-sidebar {greater than small}": 90,
+
+	// Show interface skeleton footer above interface skeleton drawer
+	".interface-interface-skeleton__footer": 90,
+
+	// Show the navigation toggle above the skeleton header
+	".edit-site-navigation-toggle": 31,
+
+	// Show the FSE template previews above the editor (same z-index as the skeleton header)
+	".edit-site-navigation-panel__preview": 30,
 
 	// Show notices below expanded editor bar
 	// .edit-post-header { z-index: 30 }

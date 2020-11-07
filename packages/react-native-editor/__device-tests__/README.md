@@ -22,9 +22,23 @@ TBA
 
 TLDR; to run the tests locally ensure metro isn't running and then run `npm run native test:e2e:ios:local` and `npm run native test:e2e:android:local` for the desired platform.
 
-Those commands include the process to build a testable version of the app, if it's the case you don't want to run the 
-full suite and want to run a specific file or files you can use the e2e build commands that can be found in the package.json for the respective platform and then 
-run `TEST_RN_PLATFORM=android npm run native device-tests <pattern>` where the pattern can just be the file path.
+Those commands include the process to build a testable version of the app with these steps:
+1. Create the JS bundle via `test:e2e:bundle:(ios|android)` 
+1. Compile the native app code via `test:e2e:build-app:(ios|android)`
+1. Call the test runner via `device-tests:local`
+
+Once the JS bundle and native app code are created they can be re-used by the test runner `device-tests:local` in subsequent runs. While writing tests: 
+- If you only changed the native app code you can run only `test:e2e:build-app:(ios|android)` followed by `device-tests:local`
+- If you only changed JS app code you can run only `test:e2e:bundle:(ios|android)` followed by `device-tests:local`
+- If you didn't change native or JS app code but only have modified e2e tests under `__device-tests__` you only need to re-rerun `device-tests:local` which uses the pre-built native and JS app code
+- If it's the case you don't want to run the 
+full suite and want to run a specific file or files you can run `TEST_RN_PLATFORM=android npm run native device-tests <pattern>` where the pattern can just be the file name.
+
+### Debugging
+
+There's a debug variant of the command: `device-tests:debug`, which starts a Node.js process that listens for a debugging client. You can use any inspector client at that point to attach and add breakpoints. More information about that can be found here: https://nodejs.org/en/docs/guides/debugging-getting-started/
+
+You can also write `debugger;` in the JS code in any line to add a breakpoint. 
 
 ### Starting the Appium Server
 

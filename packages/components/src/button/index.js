@@ -40,6 +40,7 @@ export function Button( props, ref ) {
 		shortcut,
 		label,
 		children,
+		text,
 		__experimentalIsFocusable: isFocusable,
 		...additionalProps
 	} = props;
@@ -111,6 +112,7 @@ export function Button( props, ref ) {
 			ref={ ref }
 		>
 			{ icon && <Icon icon={ icon } size={ iconSize } /> }
+			{ text && <>{ text }</> }
 			{ children }
 		</Tag>
 	);
