@@ -22,6 +22,11 @@ import {
 	getColorObjectByAttributeValues,
 } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { textColor as settings } from './index';
+
 export function getActiveColor( formatName, formatValue, colors ) {
 	const activeColorFormat = getActiveFormat( formatValue, formatName );
 	if ( ! activeColorFormat ) {
@@ -80,8 +85,14 @@ const ColorPicker = ( { name, value, onChange } ) => {
 	return <ColorPalette value={ activeColor } onChange={ onColorChange } />;
 };
 
-export default function InlineColorUI( { name, value, onChange, onClose } ) {
-	const anchorRef = useAnchorRef();
+export default function InlineColorUI( {
+	name,
+	value,
+	onChange,
+	onClose,
+	contentRef,
+} ) {
+	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
 	return (
 		<URLPopover
 			value={ value }

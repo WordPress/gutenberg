@@ -23,6 +23,7 @@ import { __experimentalLinkControl as LinkControl } from '@wordpress/block-edito
  * Internal dependencies
  */
 import { createLinkFormat, isValidHref } from './utils';
+import { link as settings } from './index';
 
 function InlineLinkUI( {
 	isActive,
@@ -32,6 +33,7 @@ function InlineLinkUI( {
 	onChange,
 	speak,
 	stopAddingLink,
+	contentRef,
 } ) {
 	/**
 	 * A unique key is generated when switching between editing and not editing
@@ -142,7 +144,7 @@ function InlineLinkUI( {
 		}
 	}
 
-	const anchorRef = useAnchorRef();
+	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
 
 	return (
 		<Popover

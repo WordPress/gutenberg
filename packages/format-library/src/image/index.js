@@ -18,6 +18,22 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const name = 'core/image';
 const title = __( 'Inline image' );
 
+export const image = {
+	name,
+	title,
+	keywords: [ __( 'photo' ), __( 'media' ) ],
+	object: true,
+	tagName: 'img',
+	className: null,
+	attributes: {
+		className: 'class',
+		style: 'style',
+		url: 'src',
+		alt: 'alt',
+	},
+	edit: Edit,
+};
+
 function stopKeyPropagation( event ) {
 	event.stopPropagation();
 }
@@ -33,10 +49,14 @@ function onKeyDown( event ) {
 	}
 }
 
-function InlineUI( { value, onChange, activeObjectAttributes } ) {
+function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 	const { style } = activeObjectAttributes;
 	const [ width, setWidth ] = useState( style.replace( /\D/g, '' ) );
-	const anchorRef = useAnchorRef();
+	const anchorRef = useAnchorRef( {
+		ref: contentRef,
+		value,
+		settings: image,
+	} );
 
 	return (
 		<Popover
@@ -96,6 +116,7 @@ function Edit( {
 	onFocus,
 	isObjectActive,
 	activeObjectAttributes,
+	contentRef,
 } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
@@ -152,24 +173,9 @@ function Edit( {
 					value={ value }
 					onChange={ onChange }
 					activeObjectAttributes={ activeObjectAttributes }
+					contentRef={ contentRef }
 				/>
 			) }
 		</MediaUploadCheck>
 	);
 }
-
-export const image = {
-	name,
-	title,
-	keywords: [ __( 'photo' ), __( 'media' ) ],
-	object: true,
-	tagName: 'img',
-	className: null,
-	attributes: {
-		className: 'class',
-		style: 'style',
-		url: 'src',
-		alt: 'alt',
-	},
-	edit: Edit,
-};

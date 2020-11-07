@@ -1,9 +1,4 @@
 /**
- * WordPress dependencies
- */
-import { createContext } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import { getActiveFormat } from '../get-active-format';
@@ -28,10 +23,6 @@ const interactiveContentTags = new Set( [
 	'video',
 ] );
 
-export const Ref = createContext();
-export const FormatSettings = createContext();
-export const Value = createContext();
-
 export default function FormatEdit( {
 	formatTypes,
 	onChange,
@@ -41,7 +32,7 @@ export default function FormatEdit( {
 	withoutInteractiveFormatting,
 	forwardedRef,
 } ) {
-	const edits = formatTypes.map( ( settings ) => {
+	return formatTypes.map( ( settings ) => {
 		const { name, edit: Edit, tagName } = settings;
 
 		if ( ! Edit ) {
@@ -65,8 +56,9 @@ export default function FormatEdit( {
 		const isObjectActive =
 			activeObject !== undefined && activeObject.type === name;
 
-		const edit = (
+		return (
 			<Edit
+				key={ name }
 				isActive={ isActive }
 				activeAttributes={
 					isActive ? activeFormat.attributes || {} : {}
@@ -78,15 +70,8 @@ export default function FormatEdit( {
 				value={ value }
 				onChange={ onChange }
 				onFocus={ onFocus }
+				contentRef={ forwardedRef }
 			/>
 		);
-
-		return (
-			<FormatSettings.Provider key={ name } value={ settings }>
-				<Value.Provider value={ value }>{ edit }</Value.Provider>
-			</FormatSettings.Provider>
-		);
 	} );
-
-	return <Ref.Provider value={ forwardedRef }>{ edits }</Ref.Provider>;
 }
