@@ -8,6 +8,54 @@
 
 class WP_Theme_JSON_Test extends WP_UnitTestCase {
 
+	function test_properties_adhere_to_schema() {
+		$theme_json = new WP_Theme_JSON( array(
+			'global' => array(
+				'selector'   => ':root',
+				'supports'   => array('fontSize', 'color'),
+				'invalidKey' => 'invalid value',
+				'settings'   => array(
+					'color' => array(
+						'custom'     => 'false',
+						'invalidKey' => 'invalid value',
+					),
+					'invalidSection' => array(
+						'invalidKey' => 'invalid value'
+					),
+				),
+				'styles' => array(
+					'typography' => array(
+						'fontSize'        => '12',
+						'invalidProperty' => 'invalid value',
+					),
+					'invalidSection' => array(
+						'invalidProperty' => 'invalid value',
+					),
+				),
+			),
+		) );
+		$result = $theme_json->get_raw_data();
+
+		$expected = array(
+			'global' => array(
+				'selector'   => ':root',
+				'supports'   => array('fontSize', 'color'),
+				'settings'   => array(
+					'color' => array(
+						'custom'     => 'false',
+					),
+				),
+				'styles' => array(
+					'typography' => array(
+						'fontSize'        => '12',
+					),
+				),
+			),
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
+
 	function test_get_settings() {
 		// See schema at WP_Theme_JSON::SCHEMA
 		$theme_json = new WP_Theme_JSON(

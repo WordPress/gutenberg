@@ -19,27 +19,33 @@ class WP_Theme_JSON {
 				'text'       => null,
 			),
 			'typography' => array(
-				'fontSize'   => null,
-				'lineHeight' => null,
+				'fontFamily'     => null,
+				'fontSize'       => null,
+				'fontStyle'      => null,
+				'fontWeight'     => null,
+				'lineHeight'     => null,
+				'textDecoration' => null,
+				'textTransform'  => null,
 			),
 		),
 		'settings' => array(
 			'color' => array(
-				'custom' => null,
+				'custom'         => null,
 				'customGradient' => null,
-				'gradients' => null,
-				'link' => null,
-				'palette' => null,
+				'gradients'      => null,
+				'link'           => null,
+				'palette'        => null,
 			),
 			'spacing' => array(
 				'customPadding' => null,
-				'units' => null,
+				'units'         => null,
 			),
 			'typography' => array(
-				'customFontSize' => null,
+				'customFontSize'   => null,
 				'customLineHeight' => null,
-				'dropCap' => null,
-				'fontSizes' => null,
+				'dropCap'          => null,
+				'fontSizes'        => null,
+				'fontFamilies'     => null
 			),
 			'custom' => null,
 		),
@@ -82,6 +88,108 @@ class WP_Theme_JSON {
 					'property' => 'font-size',
 				),
 			),
+		),
+		array(
+			'path'         => array( 'settings', 'typography', 'fontFamilies' ),
+			'value_key'    => 'fontFamily',
+			'preset_infix' => 'font-family',
+			'class' => array(
+				array(
+					'suffix'   => 'font-family',
+					'property' => 'font-family',
+				),
+			),
+		),
+		array(
+			'path'         => array( 'settings', 'typography', 'fontStyles' ),
+			'value_key'    => 'slug',
+			'preset_infix' => 'font-style',
+			'class' => array(
+				array(
+					'suffix'   => 'font-style',
+					'property' => 'font-style',
+				),
+			),
+		),
+		array(
+			'path'         => array( 'settings', 'typography', 'fontWeights' ),
+			'value_key'    => 'slug',
+			'preset_infix' => 'font-weight',
+			'class' => array(
+				array(
+					'suffix'   => 'font-weight',
+					'property' => 'font-weight',
+				),
+			),
+		),
+		array(
+			'path'         => array( 'settings', 'typography', 'textDecorations' ),
+			'value_key'    => 'value',
+			'preset_infix' => 'text-decoration',
+			'class' => array(
+				array(
+					'suffix'   => 'text-decoration',
+					'property' => 'text-decoration',
+				),
+			),
+		),
+		array(
+			'path'         => array( 'settings', 'typography', 'textTransforms' ),
+			'value_key'    => 'slug',
+			'preset_infix' => 'text-transform',
+			'class' => array(
+				array(
+					'suffix'   => 'text-transform',
+					'property' => 'text-transform',
+				),
+			),
+		),
+	);
+
+	private const SUPPORTED_PROPERTIES = array(
+		'--wp--style--color--link' => array(
+			'path'     => array( 'color', 'link' ),
+			'property' => '--wp--style--color--link',
+		),
+		'background'               => array(
+			'path'     => array( 'color', 'gradient' ),
+			'property' => 'background',
+		),
+		'backgroundColor'          => array(
+			'path'     => array( 'color', 'background' ),
+			'property' => 'background-color',
+		),
+		'color'                    => array(
+			'path'     => array( 'color', 'text' ),
+			'property' => 'color',
+		),
+		'fontFamily'               => array(
+			'path'     => array( 'typography', 'fontFamily' ),
+			'property' => 'font-family',
+		),
+		'fontSize'                 => array(
+			'path'     => array( 'typography', 'fontSize' ),
+			'property' => 'font-size'
+		),
+		'fontStyle'                => array(
+			'path'     => array( 'typography', 'fontStyle' ),
+			'property' => 'font-style',
+		),
+		'fontWeight'               => array(
+			'path'     => array( 'typography', 'fontWeight' ),
+			'property' => 'font-weight',
+		),
+		'lineHeight'               => array(
+			'path'     => array( 'typography', 'lineHeight' ),
+			'property' => 'line-height',
+		),
+		'textDecoration'           => array(
+			'path'     => array( 'typography', 'textDecoration' ),
+			'property' => 'text-decoration',
+		),
+		'textTransform'            => array(
+			'path'     => array( 'typography', 'textTransform' ),
+			'property' => 'text-transform',
 		),
 	);
 
@@ -244,33 +352,7 @@ class WP_Theme_JSON {
 			return;
 		}
 
-		$supported_properties = array(
-			'--wp--style--color--link' => array(
-				'path'     => array( 'color', 'link' ),
-				'property' => '--wp--style--color--link',
-			),
-			'background'               => array(
-				'path'     => array( 'color', 'gradient' ),
-				'property' => 'background',
-			),
-			'backgroundColor'          => array(
-				'path' => array( 'color', 'background' ),
-				'property' => 'background-color',
-			),
-			'color'                    => array(
-				'path' => array( 'color', 'text' ),
-				'property' => 'color',
-			),
-			'fontSize'                 => array(
-				'path' => array( 'typography', 'fontSize' ),
-				'property' => 'font-size'
-			),
-			'lineHeight'              => array(
-				'path' => array( 'typography', 'lineHeight' ),
-				'property' => 'line-height',
-			),
-		);
-		foreach ( $supported_properties as $name => $metadata ) {
+		foreach ( self::SUPPORTED_PROPERTIES as $name => $metadata ) {
 			if ( ! in_array( $name, $context['supports'] ) ) {
 				continue;
 			}
