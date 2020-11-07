@@ -30,6 +30,8 @@ const listener = new Listener();
  * manages unbinding when the component unmounts, and binding at most a single
  * event handler for the entire application.
  *
+ * @deprecated
+ *
  * @param {Object<string,string>} eventTypesToHandlers Object with keys of DOM
  *                                                     event type, the value a
  *                                                     name of the function on
@@ -39,11 +41,7 @@ const listener = new Listener();
  *
  * @return {Function} Higher-order component.
  */
-function withGlobalEvents( eventTypesToHandlers ) {
-	deprecated( 'wp.compose.withGlobalEvents', {
-		alternative: 'useEffect',
-	} );
-
+export function withGlobalEvents( eventTypesToHandlers ) {
 	return createHigherOrderComponent( ( WrappedComponent ) => {
 		class Wrapper extends Component {
 			constructor() {
@@ -98,4 +96,15 @@ function withGlobalEvents( eventTypesToHandlers ) {
 	}, 'withGlobalEvents' );
 }
 
-export default withGlobalEvents;
+/**
+ * @deprecated
+ *
+ * @param {...any} passedArguments
+ */
+export default ( ...passedArguments ) => {
+	deprecated( 'wp.compose.withGlobalEvents', {
+		alternative: 'useEffect',
+	} );
+
+	return withGlobalEvents( ...passedArguments );
+};

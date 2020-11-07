@@ -11,7 +11,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import withGlobalEvents from '../';
+import { withGlobalEvents } from '../';
 import Listener from '../listener';
 
 jest.mock( '../listener', () => {
