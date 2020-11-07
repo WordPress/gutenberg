@@ -107,6 +107,30 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
 
+	function test_metadata_is_attached() {
+		$theme_json = new WP_Theme_JSON( array( 'global' => array() ) );
+		$result  = $theme_json->get_raw_data();
+
+		$expected = array(
+			'global' => array(
+				'selector' => ':root',
+				'supports' => array(
+					'--wp--style--color--link',
+					'background',
+					'backgroundColor',
+					'color',
+					'fontFamily',
+					'fontSize',
+					'lineHeight',
+					'textDecoration',
+					'textTransform',
+				),
+			)
+		);
+
+		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
+
 	function test_get_settings() {
 		// See schema at WP_Theme_JSON::SCHEMA
 		$theme_json = new WP_Theme_JSON(

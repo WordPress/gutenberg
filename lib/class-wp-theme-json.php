@@ -205,7 +205,7 @@ class WP_Theme_JSON {
 	 *
 	 * @param array $contexts Definitions.
 	 */
-	public function __construct( $contexts ){
+	public function __construct( $contexts = array() ){
 		$this->contexts = array();
 
 		if ( ! is_array( $contexts ) ) {
