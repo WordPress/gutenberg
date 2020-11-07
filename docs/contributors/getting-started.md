@@ -1,10 +1,10 @@
 # Getting Started
 
-The following guide is for setting up your local environment to contribute to the Gutenberg project. There is significant overlap between an environment to contribute and an environment used to extend the WordPress block editor. You can review the [Development Enviornment tutorial](/docs/designers-developers/developers/tutorials/devenv/readme.md) for additional setup information.
+The following guide is for setting up your local environment to contribute to the Gutenberg project. There is significant overlap between an environment to contribute and an environment used to extend the WordPress block editor. You can review the [Development Environment tutorial](/docs/designers-developers/developers/tutorials/devenv/readme.md) for additional setup information.
 
 ## Development Tools (Node)
 
-Gutenberg is a JavaScript project and requires [Node.js](https://nodejs.org/). The project is built using the latest active LTS release of node, and the latest verion of NPM. See the [LTS release schedule](https://github.com/nodejs/Release#release-schedule) for details.
+Gutenberg is a JavaScript project and requires [Node.js](https://nodejs.org/). The project is built using the latest active LTS release of node, and the latest version of NPM. See the [LTS release schedule](https://github.com/nodejs/Release#release-schedule) for details.
 
 We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nvm) since it is the easiest way to install and manage node for macOS, Linux, and Windows 10 using WSL2. See [our Development Tools guide](/docs/designers-developers/developers/tutorials/devenv/readme.md#development-tools) or the Nodejs site for additional installation instructions.
 
@@ -32,7 +32,7 @@ If you do not have a local WordPress environment setup, follow the steps in the 
 
 The [wp-env package](/packages/env/README.md) was developed with the Gutenberg project as a quick way to create a standard WordPress environment using Docker. It is also published as the `@wordpress/env` npm package.
 
-By default, `wp-env` can run in a plugin directory to create and run a WordPress enviornment, mounting and activating the plugin automatically. You can also configure `wp-env` to use existing installs, multiple plugins, or themes. See the [wp-env package](/packages/env/README.md#wp-envjson) for complete documentation.
+By default, `wp-env` can run in a plugin directory to create and run a WordPress environment, mounting and activating the plugin automatically. You can also configure `wp-env` to use existing installs, multiple plugins, or themes. See the [wp-env package](/packages/env/README.md#wp-envjson) for complete documentation.
 
 If you don't already have it, you'll need to install Docker and Docker Compose in order to use `wp-env`. See the [Development Environment tutorial for additional details](/docs/designers-developers/developers/tutorials/devenv/readme.md).
 
@@ -164,7 +164,7 @@ With the extension installed, ESLint will use the [.eslintrc.js](https://github.
 
 [Prettier](https://prettier.io/) is a tool that allows you to define an opinionated format, and automate fixing the code to match that format. Prettier and ESlint are similar, Prettier is more about formatting and style, while ESlint is for detecting coding errors.
 
-To use Prettier with Visual Studio Code, you should install the [Prettier - Code formatter extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode). You can then configure it to be the default formatter and to automatically fix issues on save, by adding the following to your settings. __**Note**: depending on where you are viewing htis document, the brackets may show as double, the proper format is just a single bracket.__
+To use Prettier with Visual Studio Code, you should install the [Prettier - Code formatter extension](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode). You can then configure it to be the default formatter and to automatically fix issues on save, by adding the following to your settings. __**Note**: depending on where you are viewing this document, the brackets may show as double, the proper format is just a single bracket.__
 
 ```json
 "[[javascript]]": {
