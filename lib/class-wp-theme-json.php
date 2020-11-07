@@ -2,11 +2,18 @@
 
 class WP_Theme_JSON {
 
-
 	/**
 	 * Container of data in theme.json format.
 	*/
-	private $contexts = array();
+	private $contexts = null;
+
+	/**
+	 * Holds block metadata extracted from block.json
+	 * to be shared among all instances.
+	 *
+	 * @var array
+	 */
+	private static $blocks_metadata = null;
 
 	private const SCHEMA = array(
 		'selector' => null,
@@ -196,10 +203,185 @@ class WP_Theme_JSON {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $contexts Denitions.
+	 * @param array $contexts Definitions.
 	 */
 	public function __construct( $contexts ){
-		$this->contexts = array_map( array( $this, 'normalize_schema' ), $contexts );
+		$this->contexts = array();
+
+		if ( ! is_array( $contexts ) ) {
+			return;
+		}
+
+		$metadata = $this->get_blocks_metadata();
+		foreach ( $contexts as $key => $context ) {
+			if ( ! array_key_exists( $key, $metadata ) ) {
+				// Skip incoming contexts that can't be found
+				// within the contexts registered by blocks.
+				continue;
+			}
+
+			// Filter out top-level keys that aren't valid according to the schema.
+			$context = array_intersect_key( $context, self::SCHEMA );
+
+			// Selector & Supports are always taken from metadata.
+			$this->contexts[ $key ]['selector'] = $metadata[ $key ]['selector'];
+			$this->contexts[ $key ]['supports'] = $metadata[ $key ]['supports'];
+
+			// Process styles subtree.
+			$this->process_key( 'styles', $context, self::SCHEMA );
+			if ( array_key_exists( 'styles', $context ) ) {
+				$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'] );
+				$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'] );
+
+				if ( 0 === count( $context['styles'] ) ) {
+					unset( $context['styles'] );
+				} else {
+					$this->contexts[ $key ]['styles'] = $context['styles'];
+				}
+			}
+
+			// Process settings subtree.
+			$this->process_key( 'settings', $context, self::SCHEMA );
+			if ( array_key_exists( 'settings', $context ) ) {
+				$this->process_key( 'color', $context['settings'], self::SCHEMA['settings'] );
+				$this->process_key( 'spacing', $context['settings'], self::SCHEMA['settings'] );
+				$this->process_key( 'typography', $context['settings'], self::SCHEMA['settings'] );
+
+				if ( 0 === count( $context['settings'] ) ) {
+					unset( $context['settings'] );
+				} else {
+					$this->contexts[ $key ]['settings'] = $context['settings'];
+				}
+			}
+		}
+	}
+
+	/**
+	* Returns the style features a particular block supports.
+	*
+	* @param array $supports The block supports array.
+	*
+	* @return array Style features supported by the block.
+	*/
+	private function get_supported_styles( $supports ) {
+		$support_keys       = array(
+			'--wp--style--color--link' => array( 'color', 'linkColor' ),
+			'background'               => array( 'color', 'gradients' ),
+			'backgroundColor'          => array( 'color' ),
+			'color'                    => array( 'color' ),
+			'fontFamily'               => array( '__experimentalFontFamily' ),
+			'fontSize'                 => array( 'fontSize' ),
+			'fontStyle'                => array( '__experimentalFontAppearance' ),
+			'fontWeight'               => array( '__experimentalFontAppearance' ),
+			'lineHeight'               => array( 'lineHeight' ),
+			'textDecoration'           => array( '__experimentalTextDecoration' ),
+			'textTransform'            => array( '__experimentalTextTransform' ),
+		);
+		$supported_features = array();
+		foreach ( $support_keys as $key => $path ) {
+			if ( gutenberg_experimental_get( $supports, $path ) ) {
+				$supported_features[] = $key;
+			}
+		}
+
+		return $supported_features;
+	}
+
+	public function get_blocks_metadata() {
+		if ( null !== self::$blocks_metadata ) {
+			return self::$blocks_metadata;
+		}
+
+		self::$blocks_metadata = array();
+
+		$registry = WP_Block_Type_Registry::get_instance();
+		$blocks   = array_merge(
+			$registry->get_all_registered(),
+			array(
+				'global' => new WP_Block_Type(
+					'global',
+					array(
+						'supports' => array(
+							'__experimentalFontAppearance' => false,
+							'__experimentalFontFamily'     => true,
+							'__experimentalSelector'       => ':root',
+							'__experimentalTextDecoration' => true,
+							'__experimentalTextTransform'  => true,
+							'color'                        => array(
+								'gradients' => true,
+								'linkColor' => true,
+							),
+							'fontSize'                     => true,
+							'lineHeight'                   => true,
+						),
+					),
+				),
+			),
+		);
+		foreach ( $blocks as $block_name => $block_type ) {
+			if (
+				! property_exists( $block_type, 'supports' ) ||
+				empty( $block_type->supports ) ||
+				! is_array( $block_type->supports ) ) {
+
+				// Skips blocks that don't declare support.
+				//
+				// TODO: what if there are blocks that don't support
+				// any style but still need the settings passed down?
+				continue;
+			}
+
+			$supports = $this->get_supported_styles( $block_type->supports );
+
+			/*
+			 * Assign the selector for the block.
+			 *
+			 * Some blocks can declare multiple selectors:
+			 *
+			 * - core/heading represents the H1-H6 HTML elements
+			 * - core/list represents the UL and OL HTML elements
+			 * - core/group is meant to represent DIV and other HTML elements
+			 *
+			 * Some other blocks don't provide a selector,
+			 * so we generate a class for them based on their name:
+			 *
+			 * - 'core/group' => '.wp-block-group'
+			 * - 'my-custom-library/block-name' => '.wp-block-my-custom-library-block-name'
+			 *
+			 * Note that, for core blocks, we don't add the `core/` prefix to its class name.
+			 * This is for historical reasons, as they come with a class without that infix.
+			 *
+			 */
+			if (
+				isset( $block_type->supports['__experimentalSelector'] ) &&
+				is_string( $block_type->supports['__experimentalSelector'] )
+			) {
+				self::$blocks_metadata[ $block_name ] = array(
+					'selector'  => $block_type->supports['__experimentalSelector'],
+					'supports'  => $supports,
+					'blockName' => $block_name,
+				);
+			} elseif (
+				isset( $block_type->supports['__experimentalSelector'] ) &&
+				is_array( $block_type->supports['__experimentalSelector'] )
+			) {
+				foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector ) {
+					self::$blocks_metadata[ $key ] = array(
+						'selector'  => $selector,
+						'supports'  => $supports,
+						'blockName' => $block_name,
+					);
+				}
+			} else {
+				self::$blocks_metadata[ $block_name ] = array(
+					'selector'  => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
+					'supports'  => $supports,
+					'blockName' => $block_name,
+				);
+			}
+		}
+
+		return self::$blocks_metadata;
 	}
 
 	private function process_key( $key, &$input, $schema ) {
@@ -227,34 +409,32 @@ class WP_Theme_JSON {
 		}
 	}
 
-	private function normalize_schema( $context ) {
-		// Filter out keys other than styles and settings.
-		$context = array_intersect_key( $context, self::SCHEMA );
-
-		// Filter out keys that aren't valid as defined in schema['styles'].
-		$this->process_key( 'styles', $context, self::SCHEMA );
-		if ( array_key_exists( 'styles', $context ) ) {
-			$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'] );
-			$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'] );
-
-			if ( 0 === count( $context['styles'] ) ) {
-				unset( $context['styles'] );
+	/**
+	* Given a tree that adheres to the theme.json schema
+	* it adds the block data (selector, support) to each context.
+	*
+	* @param array $tree Tree to augment with block data.
+	*
+	* @return array Tree with block data.
+	*/
+	private function gutenberg_experimental_global_styles_augment_with_block_data( $tree ) {
+		self::$blocks_metadata = gutenberg_experimental_global_styles_get_block_data();
+		foreach ( array_keys( $tree ) as $block_name ) {
+			if (
+				 array_key_exists( $block_name, self::$blocks_metadata ) ||
+				! array_key_exists( 'selector', self::$blocks_metadata[ $block_name ] ) ||
+				! array_key_exists( 'supports', self::$blocks_metadata[ $block_name ] )
+			) {
+				// Skip blocks that haven't declared support,
+				// because we don't know to process them.
+				continue;
 			}
+
+			$tree[ $block_name ]['selector'] = self::$blocks_metadata[ $block_name ]['selector'];
+			$tree[ $block_name ]['supports'] = self::$blocks_metadata[ $block_name ]['supports'];
 		}
 
-		// Filter out keys that aren't valid as defined in schema['settings'].
-		$this->process_key( 'settings', $context, self::SCHEMA );
-		if ( array_key_exists( 'settings', $context ) ) {
-			$this->process_key( 'color', $context['settings'], self::SCHEMA['settings'] );
-			$this->process_key( 'spacing', $context['settings'], self::SCHEMA['settings'] );
-			$this->process_key( 'typography', $context['settings'], self::SCHEMA['settings'] );
-
-			if ( 0 === count( $context['settings'] ) ) {
-				unset( $context['settings'] );
-			}
-		}
-
-		return $context;
+		return $tree;
 	}
 
 	private function extract_settings( $context ) {
