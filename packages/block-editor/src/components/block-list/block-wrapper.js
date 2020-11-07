@@ -71,14 +71,12 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		initialPosition,
 		shouldFocusFirstElement,
 		isNavigationMode,
-		isFullSiteEditingActive,
 	} = useSelect(
 		( select ) => {
 			const {
 				getSelectedBlocksInitialCaretPosition,
 				isMultiSelecting: _isMultiSelecting,
 				isNavigationMode: _isNavigationMode,
-				getSettings,
 			} = select( 'core/block-editor' );
 
 			return {
@@ -90,8 +88,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					? getSelectedBlocksInitialCaretPosition()
 					: undefined,
 				isNavigationMode: _isNavigationMode,
-				isFullSiteEditingActive: getSettings()
-					.__experimentalEnableFullSiteEditing,
 			};
 		},
 		[ isSelected ]
@@ -286,10 +282,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	}, [ isNavigationMode, isHovered, setHovered ] );
 
 	useEffect( () => {
-		if ( ! isFullSiteEditingActive ) {
-			return;
-		}
-
 		ref.current.addEventListener( 'mouseenter', evaluateHoveredBlocks );
 		ref.current.addEventListener( 'mouseleave', evaluateHoveredBlocks );
 

@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { select, dispatch } from '@wordpress/data';
+import { dispatch } from '@wordpress/data';
+
+/**
+ * External dependencies
+ */
+import { debounce } from 'lodash';
 
 /**
  * Returns an array of block clientIds found under the cursor.
@@ -30,35 +35,20 @@ export function getHoveredBlocksFromCursor( event ) {
  *
  * @param {Object} event Mouse event object.
  */
-export function evaluateHoveredBlocks( event ) {
-	// Check last event data to determine if we should reevaluate hovered blocks.
-	// Requiring different mouseCoords limits unnecessary evaluations triggered from the same
-	// event firing from multiple nested blocks.  Checking the time allows us to re-evaluate
-	// even when mouseCoords have not changed, such as when scrolling via mouse-wheel.
-	// However, this deltaTime checked must be sufficiently long to ensure slow CPUs do not
-	// trigger unnecessary recalculations for events triggered simultaneously.
-	const { time, mouseCoords } =
-		select(
-			'core/block-editor'
-		).__experimentalGetHoveredBlocksEventData() || {};
-	const eventCoords = `${ event.clientX }-${ event.clientY }`;
-	if ( mouseCoords !== eventCoords || event.timeStamp - ( time || 0 ) > 50 ) {
+export const evaluateHoveredBlocks = debounce(
+	( event ) => {
 		// To accurately determine which blocks are hovered we must look at the elements under the cursor.
 		// Internal block inserters will fire events like mouseleave for blocks they are visually contained within,
 		// which makes an add/remove by clientId per individual block approach inaccurate.
 		const hoveredBlocks = getHoveredBlocksFromCursor( event );
 
-		// Get an updated timeStamp to set on the dispatch.
-		// The event.timeStamp may be outdated by this time.
-		// In some browsers, simultaneously triggered events may not have the same timestamp,
-		// and the difference may correspond to queue and processing time for the previous event.
-		// eslint-disable-next-line no-undef
-		const dispatchTimeStamp = new Event( 'foobar' ).timeStamp;
-
 		dispatch( 'core/block-editor' ).__experimentalSetHoveredBlocks(
-			hoveredBlocks,
-			dispatchTimeStamp,
-			eventCoords
+			hoveredBlocks
 		);
-	}
-}
+	},
+	// Debounce this on 20ms to ensure we do not unnecessarily evaluate and dispatch
+	// multiple times when this is called simultaneously from groups of nested blocks.
+	20,
+	// Apply a maxWait to ensure this still fires during lots of mouse movement.
+	{ maxWait: 50 }
+);

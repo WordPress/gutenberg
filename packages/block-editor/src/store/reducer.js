@@ -1653,20 +1653,10 @@ export function highlightedBlock( state, action ) {
  *
  * @return {Object} Updated state.
  */
-export function hoveredBlocks(
-	state = { hoveredBlockIds: [], eventData: {} },
-	action
-) {
+export function hoveredBlocks( state = [], action ) {
 	switch ( action.type ) {
 		case 'SET_HOVERED_BLOCKS':
-			const { hoveredBlockIds, timeStamp, mouseCoords } = action;
-			return {
-				hoveredBlockIds,
-				eventData: {
-					time: timeStamp,
-					mouseCoords,
-				},
-			};
+			return action.hoveredBlockIds;
 	}
 
 	return state;

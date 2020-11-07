@@ -1808,7 +1808,7 @@ export function areInnerBlocksControlled( state, clientId ) {
  * @return {string[]} Array of clientIds for hovered blocks.
  */
 export function __experimentalGetHoveredBlocks( state ) {
-	return state.hoveredBlocks.hoveredBlockIds;
+	return state.hoveredBlocks;
 }
 
 /**
@@ -1821,26 +1821,13 @@ export function __experimentalGetHoveredBlocks( state ) {
  */
 export const __experimentalGetHoveredBlockIdByBlockName = createSelector(
 	( state, blockName ) => {
-		const matchingBlockClientId = state.hoveredBlocks.hoveredBlockIds.find(
+		const matchingBlockClientId = state.hoveredBlocks.find(
 			( blockId ) => getBlockName( state, blockId ) === blockName
 		);
 		return matchingBlockClientId;
 	},
-	( state ) => [ state.hoveredBlocks.hoveredBlockIds ]
+	( state ) => [ state.hoveredBlocks ]
 );
-
-/**
- * Returns an object containing time and position corresponding to the last
- * hoveredBlocks calculation.  This can be used to limit unnecessary evalations and
- * action dispatches.
- *
- * @param {Object} state Global application state.
- *
- * @return {Object} Object containing time and position of last evaluation.
- */
-export function __experimentalGetHoveredBlocksEventData( state ) {
-	return state.hoveredBlocks.eventData;
-}
 
 /** Returns the clientId for the first 'active' block of a given array of block names.
  * A block is 'active' if it (or a child) is the selected block.
