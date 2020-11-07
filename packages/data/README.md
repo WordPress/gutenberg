@@ -712,6 +712,48 @@ _Returns_
 
 -   `Function`: A custom react hook.
 
+<a name="useStoreSelectors" href="#useStoreSelectors">#</a> **useStoreSelectors**
+
+Custom react hook for retrieving selectors from registered stores
+
+_Usage_
+
+```js
+const { useStoreSelectors } = wp.data;
+
+function HammerPriceDisplay( { currency } ) {
+  const price = useStoreSelectors(
+    'my-shop',
+    ( { getPrice } ) => getPrice( 'hammer', currency ),
+    [ currency ]
+  );
+  return new Intl.NumberFormat( 'en-US', {
+    style: 'currency',
+    currency,
+  } ).format( price );
+}
+
+// Rendered in the application:
+// <HammerPriceDisplay currency="USD" />
+```
+
+In the above example, when `HammerPriceDisplay` is rendered into an
+application, the price will be retrieved from the store state using the
+`mapSelectors` callback on `useStoreSelectors`. If the currency prop changes then
+any price in the state for that currency is retrieved. If the currency prop
+doesn't change and other props are passed in that do change, the price will
+not change because the dependency is just the currency.
+
+_Parameters_
+
+-   _storeKey_ `string`: Store to return selectors from.
+-   _mapSelectors_ `Function`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the object with all the store selectors as its only argument.
+-   _deps_ `Array`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
+
+_Returns_
+
+-   `Function`: A custom react hook.
+
 <a name="withDispatch" href="#withDispatch">#</a> **withDispatch**
 
 Higher-order component used to add dispatch props using registered action
