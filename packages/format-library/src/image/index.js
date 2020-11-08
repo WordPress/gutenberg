@@ -3,8 +3,8 @@
  */
 import { Path, SVG, TextControl, Popover, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useMemo, useState } from '@wordpress/element';
-import { insertObject } from '@wordpress/rich-text';
+import { useState } from '@wordpress/element';
+import { insertObject, useAnchorRef } from '@wordpress/rich-text';
 import {
 	MediaUpload,
 	RichTextToolbarButton,
@@ -17,6 +17,22 @@ const ALLOWED_MEDIA_TYPES = [ 'image' ];
 
 const name = 'core/image';
 const title = __( 'Inline image' );
+
+export const image = {
+	name,
+	title,
+	keywords: [ __( 'photo' ), __( 'media' ) ],
+	object: true,
+	tagName: 'img',
+	className: null,
+	attributes: {
+		className: 'class',
+		style: 'style',
+		url: 'src',
+		alt: 'alt',
+	},
+	edit: Edit,
+};
 
 function stopKeyPropagation( event ) {
 	event.stopPropagation();
@@ -33,18 +49,14 @@ function onKeyDown( event ) {
 	}
 }
 
-function InlineUI( {
-	value,
-	onChange,
-	isObjectActive,
-	activeObjectAttributes,
-} ) {
+function InlineUI( { value, onChange, activeObjectAttributes, contentRef } ) {
 	const { style } = activeObjectAttributes;
 	const [ width, setWidth ] = useState( style.replace( /\D/g, '' ) );
-	const anchorRef = useMemo( () => {
-		const selection = window.getSelection();
-		return selection.rangeCount ? selection.getRangeAt( 0 ) : null;
-	}, [ isObjectActive ] );
+	const anchorRef = useAnchorRef( {
+		ref: contentRef,
+		value,
+		settings: image,
+	} );
 
 	return (
 		<Popover
@@ -104,6 +116,7 @@ function Edit( {
 	onFocus,
 	isObjectActive,
 	activeObjectAttributes,
+	contentRef,
 } ) {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 
@@ -159,26 +172,10 @@ function Edit( {
 				<InlineUI
 					value={ value }
 					onChange={ onChange }
-					isObjectActive={ isObjectActive }
 					activeObjectAttributes={ activeObjectAttributes }
+					contentRef={ contentRef }
 				/>
 			) }
 		</MediaUploadCheck>
 	);
 }
-
-export const image = {
-	name,
-	title,
-	keywords: [ __( 'photo' ), __( 'media' ) ],
-	object: true,
-	tagName: 'img',
-	className: null,
-	attributes: {
-		className: 'class',
-		style: 'style',
-		url: 'src',
-		alt: 'alt',
-	},
-	edit: Edit,
-};
