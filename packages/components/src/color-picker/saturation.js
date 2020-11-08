@@ -60,7 +60,7 @@ export default function Saturation( { hsv, hsl, onChange = noop } ) {
 		fn( data, e );
 	}, 50 );
 
-	const saturate = ( amount = 0.01 ) => {
+	function saturate( amount = 0.01 ) {
 		const intSaturation = clamp(
 			hsv.s + Math.round( amount * 100 ),
 			0,
@@ -75,9 +75,9 @@ export default function Saturation( { hsv, hsl, onChange = noop } ) {
 		};
 
 		onChange( change );
-	};
+	}
 
-	const brighten = ( amount = 0.01 ) => {
+	function brighten( amount = 0.01 ) {
 		const intValue = clamp( hsv.v + Math.round( amount * 100 ), 0, 100 );
 		const change = {
 			h: hsv.h,
@@ -88,37 +88,37 @@ export default function Saturation( { hsv, hsl, onChange = noop } ) {
 		};
 
 		onChange( change );
-	};
+	}
 
-	const handleChange = ( e ) => {
+	function handleChange( e ) {
 		const change = calculateSaturationChange(
 			e,
 			{ hsl },
 			container.current
 		);
 		throttle( onChange, change, e );
-	};
+	}
 
-	const handleMouseDown = () => {
+	function handleMouseDown() {
 		window.addEventListener( 'mousemove', handleChange );
 		window.addEventListener( 'mouseup', handleMouseUp );
-	};
+	}
 
-	const handleMouseUp = () => {
+	function handleMouseUp() {
 		setMouseDown( false );
-	};
+	}
 
-	const preventKeyEvents = ( e ) => {
+	function preventKeyEvents( e ) {
 		if ( e.keyCode === TAB ) {
 			return;
 		}
 		e.preventDefault();
-	};
+	}
 
-	const unbindEventListeners = () => {
+	function unbindEventListeners() {
 		window.removeEventListener( 'mousemove', handleChange );
 		window.removeEventListener( 'mouseup', handleMouseUp );
-	};
+	}
 
 	useEffect( () => {
 		if ( mouseDown ) {

@@ -53,33 +53,33 @@ export default function Hue( { hsl, onChange = noop } ) {
 
 	const pointerLocation = { left: `${ ( hsl.h * 100 ) / 360 }%` };
 
-	const handleChange = ( e ) => {
+	function handleChange( e ) {
 		const change = calculateHueChange( e, { hsl }, container.current );
 		if ( change ) {
 			onChange( change, e );
 		}
-	};
+	}
 
-	const handleMouseDown = () => {
+	function handleMouseDown() {
 		window.addEventListener( 'mousemove', handleChange );
 		window.addEventListener( 'mouseup', handleMouseUp );
-	};
+	}
 
-	const handleMouseUp = () => {
+	function handleMouseUp() {
 		setMouseDown( false );
-	};
+	}
 
-	const unbindEventListeners = () => {
+	function unbindEventListeners() {
 		window.removeEventListener( 'mousemove', handleChange );
 		window.removeEventListener( 'mouseup', handleMouseUp );
-	};
+	}
 
-	const preventKeyEvents = ( event ) => {
+	function preventKeyEvents( event ) {
 		if ( event.keyCode === TAB ) {
 			return;
 		}
 		event.preventDefault();
-	};
+	}
 
 	useEffect( () => {
 		if ( mouseDown ) {
@@ -91,7 +91,7 @@ export default function Hue( { hsl, onChange = noop } ) {
 		return unbindEventListeners;
 	}, [ mouseDown ] );
 
-	const increase = ( amount = 1 ) => {
+	function increase( amount = 1 ) {
 		const change = {
 			h: hsl.h + amount >= 359 ? 359 : hsl.h + amount,
 			s: hsl.s,
@@ -100,9 +100,9 @@ export default function Hue( { hsl, onChange = noop } ) {
 			source: 'rgb',
 		};
 		onChange( change );
-	};
+	}
 
-	const decrease = ( amount = 1 ) => {
+	function decrease( amount = 1 ) {
 		const change = {
 			h: hsl.h <= amount ? 0 : hsl.h - amount,
 			s: hsl.s,
@@ -111,7 +111,7 @@ export default function Hue( { hsl, onChange = noop } ) {
 			source: 'rgb',
 		};
 		onChange( change );
-	};
+	}
 
 	const shortcuts = {
 		up: () => increase(),

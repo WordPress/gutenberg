@@ -45,8 +45,11 @@ import Inputs from './inputs';
 import Saturation from './saturation';
 import { colorToState, simpleCheckForValidColor, isValidHex } from './utils';
 
-const toLowerCase = ( value ) => String( value ).toLowerCase();
-const isValueEmpty = ( data ) => {
+function toLowerCase( value ) {
+	return String( value ).toLowerCase();
+}
+
+function isValueEmpty( data ) {
 	if ( data.source === 'hex' && ! data.hex ) {
 		return true;
 	} else if (
@@ -63,9 +66,13 @@ const isValueEmpty = ( data ) => {
 		return true;
 	}
 	return false;
-};
-const isValidColor = ( colors ) =>
-	colors.hex ? isValidHex( colors.hex ) : simpleCheckForValidColor( colors );
+}
+
+function isValidColor( colors ) {
+	return colors.hex
+		? isValidHex( colors.hex )
+		: simpleCheckForValidColor( colors );
+}
 
 /**
  * Function that creates the new color object
@@ -95,7 +102,7 @@ const isValidColor = ( colors ) =>
  * @return {Object} A new color object for a specific source. For example:
  * { source: 'rgb', r: 1, g: 2, b:3, a:0 }
  */
-const dataToColors = ( oldColors, { source, valueKey, value } ) => {
+function dataToColors( oldColors, { source, valueKey, value } ) {
 	if ( source === 'hex' ) {
 		return {
 			source,
@@ -106,7 +113,7 @@ const dataToColors = ( oldColors, { source, valueKey, value } ) => {
 		source,
 		...{ ...oldColors[ source ], ...{ [ valueKey ]: value } },
 	};
-};
+}
 
 export default function ColorPicker( {
 	color = '0071a1',
@@ -130,7 +137,7 @@ export default function ColorPicker( {
 		'is-alpha-enabled': ! disableAlpha,
 	} );
 
-	const commitValues = ( data ) => {
+	function commitValues( data ) {
 		if ( isValidColor( data ) ) {
 			const newColors = colorToState( data, data.h || oldHue );
 			setColors( {
@@ -142,18 +149,18 @@ export default function ColorPicker( {
 
 			debounce( partial( onChangeComplete, newColors ), 100 );
 		}
-	};
+	}
 
-	const resetDraftValues = () => {
+	function resetDraftValues() {
 		setColors( {
 			...colors,
 			draftHex: hex,
 			draftHsl: hsl,
 			draftRgb: rgb,
 		} );
-	};
+	}
 
-	const setDraftValues = ( data ) => {
+	function setDraftValues( data ) {
 		switch ( data.source ) {
 			case 'hex':
 				setColors( {
@@ -174,9 +181,9 @@ export default function ColorPicker( {
 				} );
 				break;
 		}
-	};
+	}
 
-	const handleInputChange = ( data ) => {
+	function handleInputChange( data ) {
 		switch ( data.state ) {
 			case 'reset':
 				resetDraftValues();
@@ -191,7 +198,7 @@ export default function ColorPicker( {
 				setDraftValues( dataToColors( colors, data ) );
 				break;
 		}
-	};
+	}
 
 	return (
 		<div className={ classes }>

@@ -53,33 +53,33 @@ export default function Alpha( { rgb, hsl, onChange = noop } ) {
 	};
 	const pointerLocation = { left: `${ rgb.a * 100 }%` };
 
-	const handleChange = ( e ) => {
+	function handleChange( e ) {
 		const change = calculateAlphaChange( e, { hsl }, container.current );
 		if ( change ) {
 			onChange( change, e );
 		}
-	};
+	}
 
-	const handleMouseDown = () => {
+	function handleMouseDown() {
 		window.addEventListener( 'mousemove', handleChange );
 		window.addEventListener( 'mouseup', handleMouseUp );
-	};
+	}
 
-	const handleMouseUp = () => {
+	function handleMouseUp() {
 		setMouseDown( false );
-	};
+	}
 
-	const unbindEventListeners = () => {
+	function unbindEventListeners() {
 		window.removeEventListener( 'mousemove', handleChange );
 		window.removeEventListener( 'mouseup', handleMouseUp );
-	};
+	}
 
-	const preventKeyEvents = ( event ) => {
+	function preventKeyEvents( event ) {
 		if ( event.keyCode === TAB ) {
 			return;
 		}
 		event.preventDefault();
-	};
+	}
 
 	useEffect( () => {
 		if ( mouseDown ) {
@@ -91,7 +91,7 @@ export default function Alpha( { rgb, hsl, onChange = noop } ) {
 		return unbindEventListeners;
 	}, [ mouseDown ] );
 
-	const increase = ( amount = 0.01 ) => {
+	function increase( amount = 0.01 ) {
 		amount = parseInt( amount * 100, 10 );
 		const change = {
 			h: hsl.h,
@@ -101,9 +101,9 @@ export default function Alpha( { rgb, hsl, onChange = noop } ) {
 			source: 'rgb',
 		};
 		onChange( change );
-	};
+	}
 
-	const decrease = ( amount = 0.01 ) => {
+	function decrease( amount = 0.01 ) {
 		const intValue =
 			parseInt( hsl.a * 100, 10 ) - parseInt( amount * 100, 10 );
 		const change = {
@@ -114,7 +114,7 @@ export default function Alpha( { rgb, hsl, onChange = noop } ) {
 			source: 'rgb',
 		};
 		onChange( change );
-	};
+	}
 
 	const shortcuts = {
 		up: () => increase(),

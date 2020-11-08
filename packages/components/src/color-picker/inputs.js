@@ -30,16 +30,16 @@ export function Input( {
 	source,
 	...props
 } ) {
-	const handleBlur = () => {
+	function handleBlur() {
 		onChange( {
 			source,
 			state: 'commit',
 			value,
 			valueKey,
 		} );
-	};
+	}
 
-	const handleChange = ( newValue ) => {
+	function handleChange( newValue ) {
 		if ( newValue.length > 4 && isValidHex( newValue ) ) {
 			onChange( {
 				source,
@@ -55,9 +55,9 @@ export function Input( {
 				valueKey,
 			} );
 		}
-	};
+	}
 
-	const handleKeyDown = ( { keyCode } ) => {
+	function handleKeyDown( { keyCode } ) {
 		if ( keyCode !== ENTER && keyCode !== UP && keyCode !== DOWN ) {
 			return;
 		}
@@ -67,7 +67,7 @@ export function Input( {
 			value,
 			valueKey,
 		} );
-	};
+	}
 
 	return (
 		<TextControl
@@ -82,7 +82,7 @@ export function Input( {
 	);
 }
 
-const normalizeValue = ( valueKey, value ) => {
+function normalizeValue( valueKey, value ) {
 	if ( valueKey !== 'a' ) {
 		return value;
 	}
@@ -93,7 +93,7 @@ const normalizeValue = ( valueKey, value ) => {
 		return 1;
 	}
 	return Math.round( value * 100 ) / 100;
-};
+}
 
 export default function Inputs( {
 	hex,
@@ -108,7 +108,7 @@ export default function Inputs( {
 		setView( 'rgb' );
 	}
 
-	const toggleViews = () => {
+	function toggleViews() {
 		if ( view === 'hex' ) {
 			setView( 'rgb' );
 			resetDraftValues();
@@ -132,24 +132,24 @@ export default function Inputs( {
 				speak( __( 'RGB mode active' ) );
 			}
 		}
-	};
+	}
 
-	const resetDraftValues = () => {
+	function resetDraftValues() {
 		return onChange( {
 			state: 'reset',
 		} );
-	};
+	}
 
-	const handleChange = ( { source, state, value, valueKey } ) => {
+	function handleChange( { source, state, value, valueKey } ) {
 		onChange( {
 			source,
 			state,
 			valueKey,
 			value: normalizeValue( valueKey, value ),
 		} );
-	};
+	}
 
-	const renderFields = () => {
+	function renderFields() {
 		if ( view === 'hex' ) {
 			return (
 				<div className="components-color-picker__inputs-fields">
@@ -271,7 +271,7 @@ export default function Inputs( {
 				</fieldset>
 			);
 		}
-	};
+	}
 
 	return (
 		<div className="components-color-picker__inputs-wrapper">
