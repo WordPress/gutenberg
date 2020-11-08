@@ -15,10 +15,17 @@
 function render_block_core_template_part( $attributes ) {
 	$content = null;
 
-	if ( ! empty( $attributes['postId'] ) && get_post_status( $attributes['postId'] ) ) {
-		// If we have a post ID and the post exists, which means this template part
-		// is user-customized, render the corresponding post content.
-		$content = get_post( $attributes['postId'] )->post_content;
+	if ( ! empty( $attributes['postId'] ) ) {
+		// If we have a post ID, and it's a published template part,
+		// then render the corresponding post content.
+		// Else treat this as an error.
+		$post = get_post( $attributes['postId'] );
+		if ( $post && ( 'wp_template_part' === $post->post_type ) ) {
+			$post_status = get_post_status( $attributes['postId'] );
+			if ( 'publish' === $post_status ) {
+				$content = $post->post_content;
+			}
+		}
 	} elseif ( isset( $attributes['theme'] ) && basename( wp_get_theme()->get_stylesheet() ) === $attributes['theme'] ) {
 		$template_part_query = new WP_Query(
 			array(
@@ -47,7 +54,7 @@ function render_block_core_template_part( $attributes ) {
 	}
 
 	if ( is_null( $content ) ) {
-		return 'Template Part Not Found';
+		return 'Template Part Not Found: ' . $attributes['slug'];
 	}
 
 	// Run through the actions that are typically taken on the_content.
