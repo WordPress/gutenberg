@@ -6,6 +6,7 @@ module.exports = {
 		'@wordpress/no-unguarded-get-range-at': 'error',
 		'@wordpress/no-global-active-element': 'warn',
 		'@wordpress/no-global-get-selection': 'error',
+		'@wordpress/no-global-add-event-listener': 'warn',
 	},
 	overrides: [
 		{
@@ -23,6 +24,7 @@ module.exports = {
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',
+				'@wordpress/no-global-add-event-listener': 'off',
 			},
 		},
 	],
