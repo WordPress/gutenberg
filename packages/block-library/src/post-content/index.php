@@ -17,6 +17,9 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
+	if ( 'revision' === $block->context['postType'] ) {
+		return '';
+	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
 
