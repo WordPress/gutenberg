@@ -41,20 +41,19 @@ const transforms = {
 					: undefined;
 
 				const validImages = filter( attributes, ( { url } ) => url );
-
-				return createBlock( 'core/gallery', {
-					images: validImages.map(
-						( { id, url, alt, caption } ) => ( {
-							id: toString( id ),
-							url,
-							alt,
-							caption,
-						} )
-					),
-					ids: validImages.map( ( { id } ) => parseInt( id, 10 ) ),
-					align,
-					sizeSlug,
+				const innerBlocks = validImages.map( ( image ) => {
+					return createBlock( 'core/image', image );
 				} );
+
+				return createBlock(
+					'core/gallery',
+					{
+						imageCount: innerBlocks.length,
+						align,
+						sizeSlug,
+					},
+					innerBlocks
+				);
 			},
 		},
 		{
