@@ -8,6 +8,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { getActiveFormat } from '../get-active-format';
 
+/** @typedef {import('@wordpress/element').RefObject} RefObject */
 /** @typedef {import('../register-format-type').RichTextFormatType} RichTextFormatType */
 /** @typedef {import('../create').RichTextValue} RichTextValue */
 
@@ -17,11 +18,11 @@ import { getActiveFormat } from '../get-active-format';
  * The returned value is meant to be used for positioning UI, e.g. by passing it
  * to the `Popover` component.
  *
- * @param {Object}             $1          Named parameters.
- * @param {Object}             $1.ref      React ref of the element containing
- *                                         the editable content.
- * @param {RichTextValue}      $1.value    Value to check for selection.
- * @param {RichTextFormatType} $1.settings The format type's settings.
+ * @param {Object}                 $1          Named parameters.
+ * @param {RefObject<HTMLElement>} $1.ref      React ref of the element
+ *                                             containing  the editable content.
+ * @param {RichTextValue}          $1.value    Value to check for selection.
+ * @param {RichTextFormatType}     $1.settings The format type's settings.
  *
  * @return {Element|Range} The active element or selection range.
  */
