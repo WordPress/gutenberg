@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { speak } from '@wordpress/a11y';
@@ -77,7 +72,7 @@ export function Input( {
 			onChange={ ( newValue ) => handleChange( newValue ) }
 			onBlur={ handleBlur }
 			onKeyDown={ handleKeyDown }
-			{ ...omit( props, [ 'onChange', 'valueKey', 'source' ] ) }
+			{ ...props }
 		/>
 	);
 }
