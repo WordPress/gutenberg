@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+- Expose `useStoreSelectors` hook for usage in functional components. ([#26692](https://github.com/WordPress/gutenberg/pull/26692))
+
 ## 4.6.0 (2019-06-12)
 
 ### New Feature

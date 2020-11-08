@@ -37,7 +37,7 @@ Our editor will have the following features:
 
 * Ability to add and edit all Core Blocks.
 * Familiar visual styles and main/sidebar layout.
-* _Basic_ block persistance between page reloads.
+* _Basic_ block persistence between page reloads.
 
 With that in mind, let's start taking our first steps towards building this.
 
@@ -131,7 +131,7 @@ With our target HTML in place we can now enqueue some JavaScript (as well as som
 
 To do this we hook into `admin_enqueue_scripts`.
 
-First, we meed to make sure we only run our custom code on our own admin page, so at the top of our callback function let's exit early if the page doesn't match our page's identifier:
+First, we need to make sure we only run our custom code on our own admin page, so at the top of our callback function let's exit early if the page doesn't match our page's identifier:
 
 ```php
 // init.php
