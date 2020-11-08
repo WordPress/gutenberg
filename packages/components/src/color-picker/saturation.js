@@ -99,11 +99,6 @@ export default function Saturation( { hsv, hsl, onChange = noop } ) {
 		throttle( onChange, change, e );
 	}
 
-	function handleMouseDown() {
-		window.addEventListener( 'mousemove', handleChange );
-		window.addEventListener( 'mouseup', handleMouseUp );
-	}
-
 	function handleMouseUp() {
 		setMouseDown( false );
 	}
@@ -115,14 +110,17 @@ export default function Saturation( { hsv, hsl, onChange = noop } ) {
 		e.preventDefault();
 	}
 
-	function unbindEventListeners() {
-		window.removeEventListener( 'mousemove', handleChange );
-		window.removeEventListener( 'mouseup', handleMouseUp );
-	}
-
 	useEffect( () => {
+		const { ownerDocument } = container.current;
+
+		function unbindEventListeners() {
+			ownerDocument.removeEventListener( 'mousemove', handleChange );
+			ownerDocument.removeEventListener( 'mouseup', handleMouseUp );
+		}
+
 		if ( mouseDown ) {
-			handleMouseDown();
+			ownerDocument.addEventListener( 'mousemove', handleChange );
+			ownerDocument.addEventListener( 'mouseup', handleMouseUp );
 		} else {
 			unbindEventListeners();
 		}

@@ -60,18 +60,8 @@ export default function Hue( { hsl, onChange = noop } ) {
 		}
 	}
 
-	function handleMouseDown() {
-		window.addEventListener( 'mousemove', handleChange );
-		window.addEventListener( 'mouseup', handleMouseUp );
-	}
-
 	function handleMouseUp() {
 		setMouseDown( false );
-	}
-
-	function unbindEventListeners() {
-		window.removeEventListener( 'mousemove', handleChange );
-		window.removeEventListener( 'mouseup', handleMouseUp );
 	}
 
 	function preventKeyEvents( event ) {
@@ -82,8 +72,16 @@ export default function Hue( { hsl, onChange = noop } ) {
 	}
 
 	useEffect( () => {
+		const { ownerDocument } = container.current;
+
+		function unbindEventListeners() {
+			ownerDocument.removeEventListener( 'mousemove', handleChange );
+			ownerDocument.removeEventListener( 'mouseup', handleMouseUp );
+		}
+
 		if ( mouseDown ) {
-			handleMouseDown();
+			ownerDocument.addEventListener( 'mousemove', handleChange );
+			ownerDocument.addEventListener( 'mouseup', handleMouseUp );
 		} else {
 			unbindEventListeners();
 		}
