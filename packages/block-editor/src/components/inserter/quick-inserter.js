@@ -154,14 +154,19 @@ export default function QuickInserter( {
 		[ filterValue, patterns ]
 	);
 
-	const { setInserterIsOpened, blockIndex } = useSelect( ( select ) => {
-		const { getSettings, getBlockIndex } = select( 'core/block-editor' );
-		return {
-			setInserterIsOpened: getSettings()
-				.__experimentalSetIsInserterOpened,
-			blockIndex: getBlockIndex( clientId, rootClientId ),
-		};
-	}, [] );
+	const { setInserterIsOpened, blockIndex } = useSelect(
+		( select ) => {
+			const { getSettings, getBlockIndex } = select(
+				'core/block-editor'
+			);
+			return {
+				setInserterIsOpened: getSettings()
+					.__experimentalSetIsInserterOpened,
+				blockIndex: getBlockIndex( clientId, rootClientId ),
+			};
+		},
+		[ clientId, rootClientId ]
+	);
 
 	useEffect( () => {
 		if ( setInserterIsOpened ) {
