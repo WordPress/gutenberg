@@ -26,7 +26,7 @@ import { getActiveFormat } from '../get-active-format';
  *
  * @return {Element|Range} The active element or selection range.
  */
-export function useAnchorRef( { ref, value, settings } ) {
+export function useAnchorRef( { ref, value, settings = {} } ) {
 	const { tagName, className, name } = settings;
 	const activeFormat = name ? getActiveFormat( value, name ) : undefined;
 
