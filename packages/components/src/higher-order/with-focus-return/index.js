@@ -79,7 +79,7 @@ function withFocusReturn( options ) {
 				}
 
 				const stack = without(
-					this.props.focus.focusHistory,
+					this.props.focusHistory,
 					...ownFocusedElements
 				);
 
@@ -108,7 +108,10 @@ function withFocusReturn( options ) {
 		return ( props ) => (
 			<Consumer>
 				{ ( context ) => (
-					<FocusReturn childProps={ props } focus={ context } />
+					<FocusReturn
+						childProps={ props }
+						focusHistory={ context }
+					/>
 				) }
 			</Consumer>
 		);
