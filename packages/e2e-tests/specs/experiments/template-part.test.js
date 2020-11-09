@@ -118,7 +118,7 @@ describe( 'Template Part', () => {
 			expect( expectedContent ).not.toBeUndefined();
 		} );
 
-		it( 'Should convert selected block(s) to template part', async () => {
+		it( 'Should convert selected block to template part', async () => {
 			await page.waitForSelector( '.wp-block-template-part' );
 			const initialTemplateParts = await page.$$(
 				'.wp-block-template-part'
@@ -149,6 +149,71 @@ describe( 'Template Part', () => {
 				'//*[@data-type="core/template-part"][//p[text()="Some block..."]]'
 			);
 			expect( newTemplatePart ).not.toBeNull();
+
+			// TODO: Remove when toolbar supports text fields
+			expect( console ).toHaveWarnedWith(
+				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
+			);
+
+			// Verify there is 1 more template part on the page than previously.
+			const finalTemplateParts = await page.$$(
+				'.wp-block-template-part'
+			);
+			expect(
+				finalTemplateParts.length - initialTemplateParts.length
+			).toBe( 1 );
+		} );
+
+		it( 'Should convert multiple selected blocks to template part', async () => {
+			await page.waitForSelector( '.wp-block-template-part' );
+			const initialTemplateParts = await page.$$(
+				'.wp-block-template-part'
+			);
+
+			// Add two blocks.
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( 'Some block #1' );
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( 'Some block #2' );
+
+			// Select the blocks.
+			const allBlocks = await getAllBlocks();
+			const { cleintId: block1Id } = allBlocks.find(
+				( block ) =>
+					block.name === 'core/paragraph' &&
+					block.attributes.content === 'Some block #1'
+			);
+			const { cleintId: block2Id } = allBlocks.find(
+				( block ) =>
+					block.name === 'core/paragraph' &&
+					block.attributes.content === 'Some block #2'
+			);
+			await page.evaluate(
+				( id1, id2 ) => {
+					wp.data
+						.dispatch( 'core/block-editor' )
+						.multiSelect( id1, id2 );
+				},
+				block1Id,
+				block2Id
+			);
+
+			// Convert block to a template part.
+			await clickBlockToolbarButton( 'More options' );
+			const convertButton = await page.waitForXPath(
+				'//span[contains(text(), "Make template part")]'
+			);
+			await convertButton.click();
+
+			// Verify new template part is created with expected content.
+			const block1InNewTemplatePart = await page.waitForXPath(
+				'//*[@data-type="core/template-part"][//p[text()="Some block #1"]]'
+			);
+			expect( block1InNewTemplatePart ).not.toBeNull();
+			const block2InNewTemplatePart = await page.waitForXPath(
+				'//*[@data-type="core/template-part"][//p[text()="Some block #2"]]'
+			);
+			expect( block2InNewTemplatePart ).not.toBeNull();
 
 			// TODO: Remove when toolbar supports text fields
 			expect( console ).toHaveWarnedWith(
