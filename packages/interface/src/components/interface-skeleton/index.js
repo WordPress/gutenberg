@@ -28,7 +28,7 @@ function InterfaceSkeleton( {
 	footer,
 	header,
 	sidebar,
-	leftSidebar,
+	secondarySidebar,
 	content,
 	drawer,
 	actions,
@@ -44,8 +44,8 @@ function InterfaceSkeleton( {
 		header: __( 'Header' ),
 		/* translators: accessibility text for the content landmark region. */
 		body: __( 'Content' ),
-		/* translators: accessibility text for the left sidebar landmark region. */
-		leftSidebar: __( 'Left sidebar' ),
+		/* translators: accessibility text for the secondary sidebar landmark region. */
+		secondarySidebar: __( 'Block Library' ),
 		/* translators: accessibility text for the settings landmark region. */
 		sidebar: __( 'Settings' ),
 		/* translators: accessibility text for the publish landmark region. */
@@ -84,14 +84,14 @@ function InterfaceSkeleton( {
 					</div>
 				) }
 				<div className="interface-interface-skeleton__body">
-					{ !! leftSidebar && (
+					{ !! secondarySidebar && (
 						<div
-							className="interface-interface-skeleton__left-sidebar"
+							className="interface-interface-skeleton__secondary-sidebar"
 							role="region"
-							aria-label={ mergedLabels.leftSidebar }
+							aria-label={ mergedLabels.secondarySidebar }
 							tabIndex="-1"
 						>
-							{ leftSidebar }
+							{ secondarySidebar }
 						</div>
 					) }
 					<div

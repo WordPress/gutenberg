@@ -27,7 +27,14 @@ import InlineLinkUI from './inline';
 const name = 'core/link';
 const title = __( 'Link' );
 
-function Edit( { isActive, activeAttributes, value, onChange, onFocus } ) {
+function Edit( {
+	isActive,
+	activeAttributes,
+	value,
+	onChange,
+	onFocus,
+	contentRef,
+} ) {
 	const [ addingLink, setAddingLink ] = useState( false );
 
 	function addLink() {
@@ -100,6 +107,7 @@ function Edit( { isActive, activeAttributes, value, onChange, onFocus } ) {
 					activeAttributes={ activeAttributes }
 					value={ value }
 					onChange={ onChange }
+					contentRef={ contentRef }
 				/>
 			) }
 		</>

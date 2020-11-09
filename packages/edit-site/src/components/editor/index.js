@@ -42,7 +42,7 @@ import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
 
 const interfaceLabels = {
-	leftSidebar: __( 'Block Library' ),
+	secondarySidebar: __( 'Block Library' ),
 	drawer: __( 'Navigation Sidebar' ),
 };
 
@@ -221,7 +221,7 @@ function Editor() {
 													drawer={
 														<NavigationSidebar />
 													}
-													leftSidebar={
+													secondarySidebar={
 														isInserterOpen ? (
 															<div className="edit-site-editor__inserter-panel">
 																<div className="edit-site-editor__inserter-panel-header">

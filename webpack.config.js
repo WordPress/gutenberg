@@ -55,6 +55,9 @@ module.exports = {
 					output: {
 						comments: /translators:/i,
 					},
+					compress: {
+						passes: 2,
+					},
 				},
 				extractComments: false,
 			} ),

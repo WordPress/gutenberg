@@ -11,9 +11,12 @@ import { sumBy, merge, mapValues } from 'lodash';
  *
  * @return {number} Value rounded to standard precision.
  */
-export const toWidthPrecision = ( value ) =>
-	Number.isFinite( value ) ? parseFloat( value.toFixed( 2 ) ) : undefined;
-
+export const toWidthPrecision = ( value ) => {
+	const unitlessValue = parseFloat( value );
+	return Number.isFinite( unitlessValue )
+		? parseFloat( unitlessValue.toFixed( 2 ) )
+		: undefined;
+};
 /**
  * Returns an effective width for a given block. An effective width is equal to
  * its attribute value if set, or a computed value assuming equal distribution.
@@ -96,10 +99,15 @@ export function getRedistributedColumnWidths(
  *
  * @return {boolean} Whether columns have explicit widths.
  */
-export function hasExplicitColumnWidths( blocks ) {
-	return blocks.every( ( block ) =>
-		Number.isFinite( block.attributes.width )
-	);
+export function hasExplicitPercentColumnWidths( blocks ) {
+	return blocks.every( ( block ) => {
+		const blockWidth = block.attributes.width;
+		return Number.isFinite(
+			blockWidth?.endsWith?.( '%' )
+				? parseFloat( blockWidth )
+				: blockWidth
+		);
+	} );
 }
 
 /**

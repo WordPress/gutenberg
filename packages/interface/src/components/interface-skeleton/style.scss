@@ -85,7 +85,7 @@ html.interface-interface-skeleton__html-container {
 
 }
 
-.interface-interface-skeleton__left-sidebar,
+.interface-interface-skeleton__secondary-sidebar,
 .interface-interface-skeleton__sidebar {
 	display: block;
 	flex-shrink: 0;
@@ -113,7 +113,7 @@ html.interface-interface-skeleton__html-container {
 	}
 }
 
-.interface-interface-skeleton__left-sidebar {
+.interface-interface-skeleton__secondary-sidebar {
 	@include break-medium() {
 		border-right: $border-width solid $gray-200;
 	}

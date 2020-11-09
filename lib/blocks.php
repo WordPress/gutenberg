@@ -100,9 +100,6 @@ function gutenberg_reregister_core_block_types() {
 		),
 	);
 	foreach ( $blocks_dirs as $blocks_dir => $details ) {
-		if ( ! file_exists( $blocks_dir ) ) {
-			return;
-		}
 		$block_folders = $details['block_folders'];
 		$block_names   = $details['block_names'];
 
@@ -110,9 +107,6 @@ function gutenberg_reregister_core_block_types() {
 
 		foreach ( $block_folders as $folder_name ) {
 			$block_json_file = $blocks_dir . $folder_name . '/block.json';
-			if ( ! file_exists( $block_json_file ) ) {
-				return;
-			}
 
 			// Ideally, all paths to block metadata files should be listed in
 			// WordPress core. In this place we should rather use filter
