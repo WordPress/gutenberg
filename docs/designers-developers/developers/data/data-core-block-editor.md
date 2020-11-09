@@ -1358,21 +1358,6 @@ _Parameters_
 -   _clientId_ `string`: The block's clientId.
 -   _hasControlledInnerBlocks_ `boolean`: True if the block's inner blocks are controlled.
 
-<a name="setInsertionPoint" href="#setInsertionPoint">#</a> **setInsertionPoint**
-
-Sets the insertion point without showing it to users.
-
-Components like <Inserter> will default to inserting blocks at this point.
-
-_Parameters_
-
--   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
--   _index_ `?number`: Index at which block should be inserted.
-
-_Returns_
-
--   `Object`: Action object.
-
 <a name="setNavigationMode" href="#setNavigationMode">#</a> **setNavigationMode**
 
 Generators that triggers an action used to enable or disable the navigation mode.

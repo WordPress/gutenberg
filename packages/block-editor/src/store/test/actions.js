@@ -24,7 +24,7 @@ import {
 	resetBlocks,
 	selectBlock,
 	selectPreviousBlock,
-	setInsertionPoint,
+	__unstableSetInsertionPoint,
 	showInsertionPoint,
 	startMultiSelect,
 	startTyping,
@@ -700,16 +700,18 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( 'setInsertionPoint', () => {
+	describe( '__unstableSetInsertionPoint', () => {
 		it( 'should return the SET_INSERTION_POINT action', () => {
-			expect( setInsertionPoint() ).toEqual( {
+			expect( __unstableSetInsertionPoint() ).toEqual( {
 				type: 'SET_INSERTION_POINT',
 			} );
-			expect( setInsertionPoint( 'rootClientId', 2 ) ).toEqual( {
-				type: 'SET_INSERTION_POINT',
-				rootClientId: 'rootClientId',
-				index: 2,
-			} );
+			expect( __unstableSetInsertionPoint( 'rootClientId', 2 ) ).toEqual(
+				{
+					type: 'SET_INSERTION_POINT',
+					rootClientId: 'rootClientId',
+					index: 2,
+				}
+			);
 		} );
 	} );
 

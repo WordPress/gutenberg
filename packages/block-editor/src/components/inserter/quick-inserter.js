@@ -174,7 +174,7 @@ export default function QuickInserter( {
 		}
 	}, [ setInserterIsOpened ] );
 
-	const { setInsertionPoint } = useDispatch( 'core/block-editor' );
+	const { __unstableSetInsertionPoint } = useDispatch( 'core/block-editor' );
 
 	// Announce search results on change
 	useEffect( () => {
@@ -191,7 +191,7 @@ export default function QuickInserter( {
 	}, [ filterValue, debouncedSpeak ] );
 
 	const onBrowseAll = () => {
-		setInsertionPoint( rootClientId, blockIndex );
+		__unstableSetInsertionPoint( rootClientId, blockIndex );
 		setInserterIsOpened( true );
 	};
 

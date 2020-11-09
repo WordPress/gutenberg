@@ -533,7 +533,7 @@ export function* insertBlocks(
  *
  * @return {Object} Action object.
  */
-export function setInsertionPoint( rootClientId, index ) {
+export function __unstableSetInsertionPoint( rootClientId, index ) {
 	return {
 		type: 'SET_INSERTION_POINT',
 		rootClientId,
