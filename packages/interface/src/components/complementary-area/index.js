@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Animate, Button, Panel, Slot, Fill } from '@wordpress/components';
+import { Button, Panel, Slot, Fill } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
@@ -27,9 +27,7 @@ function ComplementaryAreaSlot( { scope, ...props } ) {
 function ComplementaryAreaFill( { scope, children, className } ) {
 	return (
 		<Fill name={ `ComplementaryArea/${ scope }` }>
-			<Animate type="slide-in" options={ { origin: 'left' } }>
-				{ () => <div className={ className }>{ children }</div> }
-			</Animate>
+			<div className={ className }>{ children }</div>
 		</Fill>
 	);
 }

@@ -6,7 +6,7 @@ import { uniq } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Component, createContext } from '@wordpress/element';
+import { createContext, useEffect, useRef, useState } from '@wordpress/element';
 
 const { Provider, Consumer } = createContext( {
 	focusHistory: [],
@@ -23,20 +23,19 @@ Consumer.displayName = 'FocusReturnConsumer';
  */
 const MAX_STACK_LENGTH = 100;
 
-class FocusReturnProvider extends Component {
-	constructor() {
-		super( ...arguments );
+function FocusReturnProvider( { children, className } ) {
+	const ref = useRef();
+	const [ focusHistory, setFocusHistory ] = useState( [] );
 
-		this.onFocus = this.onFocus.bind( this );
+	// Prepend the focus history with the active element on mount.
+	useEffect( () => {
+		setFocusHistory( [
+			ref.current.ownerDocument.activeElement,
+			...focusHistory,
+		] );
+	}, [] );
 
-		this.state = {
-			focusHistory: [],
-		};
-	}
-
-	onFocus( event ) {
-		const { focusHistory } = this.state;
-
+	function onFocus( event ) {
 		// Push the focused element to the history stack, keeping only unique
 		// members but preferring the _last_ occurrence of any duplicates.
 		// Lodash's `uniq` behavior favors the first occurrence, so the array
@@ -51,20 +50,16 @@ class FocusReturnProvider extends Component {
 				.reverse()
 		).reverse();
 
-		this.setState( { focusHistory: nextFocusHistory } );
+		setFocusHistory( nextFocusHistory );
 	}
 
-	render() {
-		const { children, className } = this.props;
-
-		return (
-			<Provider value={ this.state }>
-				<div onFocus={ this.onFocus } className={ className }>
-					{ children }
-				</div>
-			</Provider>
-		);
-	}
+	return (
+		<Provider value={ focusHistory }>
+			<div ref={ ref } onFocus={ onFocus } className={ className }>
+				{ children }
+			</div>
+		</Provider>
+	);
 }
 
 export default FocusReturnProvider;

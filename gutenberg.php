@@ -5,7 +5,7 @@
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
  * Requires at least: 5.3
  * Requires PHP: 5.6
- * Version: 9.2.2
+ * Version: 9.3.0
  * Author: Gutenberg Team
  * Text Domain: gutenberg
  *
@@ -70,7 +70,11 @@ function gutenberg_menu() {
 	if ( gutenberg_is_fse_theme() ) {
 		add_menu_page(
 			__( 'Site Editor (beta)', 'gutenberg' ),
-			__( 'Site Editor (beta)', 'gutenberg' ),
+			sprintf(
+				/* translators: %s: "beta" label. */
+				__( 'Site Editor %s', 'gutenberg' ),
+				'<span class="awaiting-mod">' . __( 'beta', 'gutenberg' ) . '</span>'
+			),
 			'edit_theme_options',
 			'gutenberg-edit-site',
 			'gutenberg_edit_site_page',
