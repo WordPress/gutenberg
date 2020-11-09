@@ -28,7 +28,7 @@ import { getActiveFormat } from '../get-active-format';
  */
 export function useAnchorRef( { ref, value, settings } ) {
 	const { tagName, className, name } = settings;
-	const activeFormat = getActiveFormat( value, name );
+	const activeFormat = name ? getActiveFormat( value, name ) : undefined;
 
 	return useMemo( () => {
 		const { ownerDocument } = ref.current;
