@@ -13,6 +13,23 @@ import { DOWN, ENTER, UP } from '@wordpress/keycodes';
  */
 import ColorPicker from '../';
 
+function createNodeMock( element ) {
+	if (
+		element.type === 'div' &&
+		[
+			'components-color-picker__alpha-bar',
+			'components-color-picker__hue-bar',
+			'components-color-picker__saturation-color',
+		].includes( element.props.className )
+	) {
+		return {
+			ownerDocument: document,
+		};
+	}
+
+	return null;
+}
+
 describe( 'ColorPicker', () => {
 	test( 'should render color picker', () => {
 		const color = '#FFF';
@@ -24,7 +41,8 @@ describe( 'ColorPicker', () => {
 					color={ color }
 					onChangeComplete={ () => {} }
 					disableAlpha
-				/>
+				/>,
+				{ createNodeMock }
 			);
 		} );
 	});
@@ -43,7 +61,8 @@ describe( 'ColorPicker', () => {
 					color={ color }
 					onChangeComplete={ () => {} }
 					disableAlpha
-				/>
+				/>,
+				{ createNodeMock }
 			);
 		} );
 
@@ -66,7 +85,8 @@ describe( 'ColorPicker', () => {
 					color={ color }
 					onChangeComplete={ () => {} }
 					disableAlpha
-				/>
+				/>,
+				{ createNodeMock }
 			);
 		} );
 
@@ -93,7 +113,8 @@ describe( 'ColorPicker', () => {
 					color={ color }
 					onChangeComplete={ () => {} }
 					disableAlpha
-				/>
+				/>,
+				{ createNodeMock }
 			);
 		} );
 
@@ -122,7 +143,8 @@ describe( 'ColorPicker', () => {
 					color={ color }
 					onChangeComplete={ () => {} }
 					disableAlpha
-				/>
+				/>,
+				{ createNodeMock }
 			);
 		} );
 
@@ -151,7 +173,8 @@ describe( 'ColorPicker', () => {
 					color={ color }
 					onChangeComplete={ () => {} }
 					disableAlpha
-				/>
+				/>,
+				{ createNodeMock }
 			);
 		} );
 
