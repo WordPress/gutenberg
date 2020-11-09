@@ -189,10 +189,6 @@
 	}
 }
 
-.edit-post-header-toolbar__left > * + * {
-	margin-left: $grid-unit-10;
-}
-
 .edit-post-header__dropdown {
 	.components-menu-item__button.components-menu-item__button,
 	.components-button.editor-history__undo,
