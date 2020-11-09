@@ -3,11 +3,10 @@
 
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.
-	// This is copied from edit-post/src/components/style.scss.
+	// This is copied from edit-post/src/components/style.scss but without the padding.
 	& .components-button {
 		font-family: $default-font;
 		font-size: $default-font-size;
-		padding: 6px 12px;
 
 		&.is-tertiary,
 		&.has-icon {
