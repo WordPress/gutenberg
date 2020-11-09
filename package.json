@@ -223,7 +223,7 @@
 		"check-local-changes": "( git diff -U0 | xargs -0 node bin/process-git-diff ) || ( echo \"There are local uncommitted changes after one or both of 'npm install' or 'npm run docs:build'!\" && git diff --exit-code && exit 1 );",
 		"dev": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\"",
 		"dev:packages": "node ./bin/packages/watch.js",
-		"dev:edit-site": "npm run hmr:on && webpack-dev-server packages/edit-site/hot.js --config webpack.config.dev.js",
+		"dev:edit-site": "npm run build:packages && concurrently \"wp-scripts start\" \"npm run dev:packages\" \"npm run hmr:on && webpack-dev-server packages/edit-site/hot.js --config webpack.config.dev.js\"",
 		"docs:build": "node ./docs/tool/index.js && node ./bin/api-docs/update-api-docs.js",
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
