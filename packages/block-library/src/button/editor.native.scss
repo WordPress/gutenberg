@@ -3,6 +3,7 @@
 	align-self: flex-start;
 }
 
+$block-spacing: 4px;
 .outline {
 	// Border Width has to be spread since width is thicker
 	// on Android when border radius is decreased to 0
