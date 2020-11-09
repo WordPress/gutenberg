@@ -11,9 +11,12 @@
 		border-top: $border-width solid $gray-200;
 	}
 
-	.block-editor-block-card,
-	.block-editor-block-variation-transforms {
+	.block-editor-block-card {
 		padding: $grid-unit-20;
+	}
+
+	.block-editor-block-variation-transforms {
+		padding: 0 $grid-unit-20 $grid-unit-20;
 	}
 }
 
