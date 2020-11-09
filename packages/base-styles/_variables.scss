@@ -13,7 +13,6 @@ $editor-font-size: 16px;
 $default-block-margin: 28px; // This value provides a consistent, contiguous spacing between blocks (it's 2x $block-padding).
 $text-editor-font-size: 15px;
 $editor-line-height: 1.8;
-$big-font-size: 18px;
 $mobile-text-min-font-size: 16px; // Any font size below 16px will cause Mobile Safari to "zoom in"
 $border-width: 1px;
 $border-width-focus: 1.5px;
@@ -66,7 +65,6 @@ $mobile-color-swatch: 48px;
 
 $shadow-popover: 0 2px 6px rgba($black, 0.05);
 $shadow-modal: 0 3px 30px rgba($black, 0.2);
-
 
 /**
  * Editor widths.
