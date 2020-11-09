@@ -75,10 +75,9 @@ function useInsertionPoint( {
 			} else {
 				// Otherwise, we're in "auto mode" where the insertion point is
 				// decided by getBlockInsertionPoint().
-
-				_destinationRootClientId = getBlockInsertionPoint()
-					.rootClientId;
-				_destinationIndex = getBlockInsertionPoint().index;
+				const insertionPoint = getBlockInsertionPoint();
+				_destinationRootClientId = insertionPoint.rootClientId;
+				_destinationIndex = insertionPoint.index;
 			}
 
 			return {
