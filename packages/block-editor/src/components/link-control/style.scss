@@ -59,6 +59,10 @@ $block-editor-link-control-number-of-actions: 1;
 	right: $grid-unit-20 + 1px + min($grid-unit-10, ( 40px - $button-size ) / 2);
 }
 
+.components-button .block-editor-link-control__search-submit .has-icon {
+	margin: -1px;
+}
+
 .block-editor-link-control__search-results-wrapper {
 	position: relative;
 	margin-top: -$grid-unit-20 + 1px;
