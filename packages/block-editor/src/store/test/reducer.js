@@ -2031,7 +2031,22 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				rootClientId: 'clientId1',
 				index: 0,
-				isVisible: false,
+			} );
+		} );
+
+		it( 'should not modify isVisible when setting insertion point', () => {
+			const currentState = { isVisible: true };
+
+			const state = insertionPoint( currentState, {
+				type: 'SET_INSERTION_POINT',
+				rootClientId: 'clientId1',
+				index: 0,
+			} );
+
+			expect( state ).toEqual( {
+				isVisible: true,
+				rootClientId: 'clientId1',
+				index: 0,
 			} );
 		} );
 
