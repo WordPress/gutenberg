@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalGetSettings, getDate } from '@wordpress/date';
+import { __experimentalGetSettings } from '@wordpress/date';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { DateTimePicker } from '@wordpress/components';
@@ -23,7 +23,7 @@ export function PostSchedule( { date, onUpdateDate } ) {
 	);
 
 	function onChange( newDate ) {
-		onUpdateDate( null !== newDate ? newDate : getDate() );
+		onUpdateDate( newDate );
 		const { ownerDocument } = ref.current;
 		ownerDocument.activeElement.blur();
 	}
@@ -31,7 +31,7 @@ export function PostSchedule( { date, onUpdateDate } ) {
 	return (
 		<DateTimePicker
 			ref={ ref }
-			currentDate={ date ? date : getDate() }
+			currentDate={ date }
 			onChange={ onChange }
 			is12Hour={ is12HourTime }
 		/>

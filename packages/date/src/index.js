@@ -85,7 +85,7 @@ let settings = {
 		},
 	},
 	formats: {
-		time: 'g: i a',
+		time: 'g:i a',
 		date: 'F j, Y',
 		datetime: 'F j, Y g: i a',
 		datetimeAbbreviated: 'M j, Y g: i a',
@@ -298,7 +298,7 @@ const formatMap = {
 			'XXX'
 		);
 		const sign = offset[ 0 ] === '-' ? -1 : 1;
-		const parts = offset.substring( 1 ).split( ':' );
+		const parts = offset.substring( 1 ).split( ':' ).map( Number );
 		return (
 			sign *
 			( parts[ 0 ] * HOUR_IN_MINUTES + parts[ 1 ] ) *
