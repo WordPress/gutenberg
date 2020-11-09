@@ -282,15 +282,14 @@ describe( 'selectors', () => {
 					{ name: 'no-scope' },
 				];
 				const state = createBlockVariationsState( variations );
-				const expectedVariationNames = [
-					'only-block',
-					'multiple-scopes-with-block',
-					'no-scope',
-				];
 				const result = getBlockVariations( state, blockName, 'block' );
 				expect( result ).toHaveLength( 3 );
 				expect( result.map( ( { name } ) => name ) ).toEqual(
-					expect.arrayContaining( expectedVariationNames )
+					expect.arrayContaining( [
+						'only-block',
+						'multiple-scopes-with-block',
+						'no-scope',
+					] )
 				);
 			} );
 		} );

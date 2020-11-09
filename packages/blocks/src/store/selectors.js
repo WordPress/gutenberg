@@ -89,15 +89,10 @@ export function getBlockVariations( state, blockName, scope ) {
 	if ( ! variations || ! scope ) {
 		return variations;
 	}
-	// There are cases like `transform` where we want strict filtering of
-	// block variations and not return all the variations that do not have
-	// the `scope` set.
-	const variationFilterCb =
-		scope === 'transform'
-			? ( variation ) => variation.scope?.includes( scope )
-			: ( variation ) =>
-					! variation.scope || variation.scope.includes( scope );
-	return variations.filter( variationFilterCb );
+	return variations.filter( ( variation ) => {
+		// For backward compatibility reasons, variation's scope defaults to `block` and `inserter` when not set.
+		return ( variation.scope || [ 'block', 'inserter' ] ).includes( scope );
+	} );
 }
 
 /**
