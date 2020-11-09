@@ -29,7 +29,7 @@ const block = {
 }
 ```
 
-Note the attributes keys and types, the allowed inner blocks are defined by the block type. For example, the core quote block has a `cite` string attribute reprensing the cite content while a heading block has a numeric `level` attribute, representing the level of the heading (1 to 6). 
+Note the attributes keys and types, the allowed inner blocks are defined by the block type. For example, the core quote block has a `cite` string attribute representing the cite content while a heading block has a numeric `level` attribute, representing the level of the heading (1 to 6). 
 
 During the lifecycle of the block in the editor, the block object can receive extra metadata:
 

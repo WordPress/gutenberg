@@ -5,7 +5,7 @@
 	align-items: flex-start;
 	width: 100%;
 	margin: 0 0 $grid-unit-10 0;
-	padding: $grid-unit-05;
+	padding: $grid-unit-05/2 $grid-unit-05;
 	cursor: text;
 
 
@@ -133,13 +133,14 @@
 	line-height: 24px;
 	height: auto;
 	background: $gray-300;
+	min-width: unset;
 	transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
 	@include reduce-motion;
 }
 
 .components-form-token-field__token-text {
-	border-radius: 12px 0 0 12px;
-	padding: 0 4px 0 8px;
+	border-radius: 2px 0 0 2px;
+	padding: 0 0 0 8px;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -147,9 +148,9 @@
 
 .components-form-token-field__remove-token.components-button {
 	cursor: pointer;
-	border-radius: 0 12px 12px 0;
+	border-radius: 0 2px 2px 0;
 	padding: 0 2px;
-	color: $gray-700;
+	color: $gray-900;
 	line-height: 10px;
 	overflow: initial;
 

@@ -47,7 +47,7 @@ To add a new documentation page requires a working JavaScript development enviro
 4. Run `npm run docs:build` to update `manifest.json`.
 5. Commit `manifest.json` with other files updated.
 
-If you forget to run, `npm run docs:build` your PR will fail the static analysis check, since the `manifest.json` file is an uncommited local change that must be commited.
+If you forget to run, `npm run docs:build` your PR will fail the static analysis check, since the `manifest.json` file is an uncommitted local change that must be committed.
 
 ### Using Links
 

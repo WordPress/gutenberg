@@ -26,23 +26,8 @@ Promise.all( [
 	lazyImport( 'shallow-equal@^1.2.1' ),
 	lazyImport( 'is-equal-shallow@^0.1.3' ),
 	lazyImport( 'shallow-equals@^1.0.0' ),
-	new Promise( async ( resolve ) => {
-		try {
-			await lazyImport( 'fbjs@^1.0.0' );
-		} catch ( error ) {
-			// The fjbs package throws an error when imported directly. Since
-			// lazyImport will automatically require the module for the resolved
-			// value, anticipate and disregard the error, as long as it's the
-			// expected error message.
-			if (
-				'The fbjs package should not be required without a full path.' !==
-				error.message
-			) {
-				throw error;
-			}
-		}
-
-		resolve( require( 'fbjs/lib/shallowEqual' ) );
+	lazyImport( 'fbjs@^1.0.0', {
+		localPath: './lib/shallowEqual',
 	} ),
 ] ).then(
 	( [

@@ -69,7 +69,6 @@ export const Select = styled.select`
 		color: ${ color( 'black' ) };
 		display: block;
 		margin: 0;
-		outline: none;
 		width: 100%;
 
 		${ disabledStyles };
