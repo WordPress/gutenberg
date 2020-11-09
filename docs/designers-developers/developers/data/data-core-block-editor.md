@@ -175,7 +175,7 @@ _Parameters_
 
 _Returns_
 
--   `Object`: Insertion point object with `rootClientId`, `index`, `isVisible`.
+-   `Object`: Insertion point object with `rootClientId` and `index`.
 
 <a name="getBlockListSettings" href="#getBlockListSettings">#</a> **getBlockListSettings**
 

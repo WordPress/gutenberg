@@ -1368,42 +1368,65 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block insertion point visibility, either null if there
- * is not an explicit insertion point assigned, or an object of its `index` and
- * `rootClientId`.
+ * A helper for resetting the insertion point state.
  *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
+ * @param {Object} state        Current state.
+ * @param {Object} action       Dispatched action.
+ * @param {*}      defaultValue The default value for the reducer.
  *
- * @return {Object} Updated state.
+ * @return {*} Either the default value if a reset is required, or the state.
  */
-export function insertionPoint( state = null, action ) {
+function resetInsertionPoint( state, action, defaultValue ) {
 	switch ( action.type ) {
-		case 'SET_INSERTION_POINT': {
-			const { rootClientId, index } = action;
-			return state
-				? { ...state, rootClientId, index }
-				: { rootClientId, index };
-		}
-
-		case 'SHOW_INSERTION_POINT': {
-			const { rootClientId, index } = action;
-			return { rootClientId, index, isVisible: true };
-		}
-
 		case 'HIDE_INSERTION_POINT':
-			return state ? { ...state, isVisible: false } : state;
-
 		case 'CLEAR_SELECTED_BLOCK':
 		case 'SELECT_BLOCK':
 		case 'REPLACE_INNER_BLOCKS':
 		case 'INSERT_BLOCKS':
 		case 'REMOVE_BLOCKS':
 		case 'REPLACE_BLOCKS':
-			return null;
+			return defaultValue;
 	}
 
 	return state;
+}
+
+/**
+ * Reducer returning the insertion point position, consisting of the
+ * rootClientId and an index.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function insertionPoint( state = {}, action ) {
+	switch ( action.type ) {
+		case 'SET_INSERTION_POINT':
+		case 'SHOW_INSERTION_POINT': {
+			const { rootClientId, index } = action;
+			return { rootClientId, index };
+		}
+	}
+
+	return resetInsertionPoint( state, action, {} );
+}
+
+/**
+ * Reducer returning the visibility of the insertion point.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function insertionPointVisibility( state = false, action ) {
+	switch ( action.type ) {
+		case 'SHOW_INSERTION_POINT':
+			return true;
+	}
+
+	return resetInsertionPoint( state, action, false );
 }
 
 /**
@@ -1674,6 +1697,7 @@ export default combineReducers( {
 	blocksMode,
 	blockListSettings,
 	insertionPoint,
+	insertionPointVisibility,
 	template,
 	settings,
 	preferences,

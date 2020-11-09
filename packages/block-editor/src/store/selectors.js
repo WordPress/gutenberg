@@ -1149,8 +1149,7 @@ export function isCaretWithinFormattedText( state ) {
  *
  * @param {Object} state Global application state.
  *
- * @return {Object} Insertion point object with `rootClientId`, `index`,
- *                  `isVisible`.
+ * @return {Object} Insertion point object with `rootClientId` and `index`.
  */
 export function getBlockInsertionPoint( state ) {
 	let rootClientId, index;
@@ -1169,7 +1168,7 @@ export function getBlockInsertionPoint( state ) {
 		index = getBlockOrder( state ).length;
 	}
 
-	return { rootClientId, index, isVisible: false };
+	return { rootClientId, index };
 }
 
 /**
@@ -1181,7 +1180,7 @@ export function getBlockInsertionPoint( state ) {
  * @return {?boolean} Whether the insertion point should be shown.
  */
 export function isBlockInsertionPointVisible( state ) {
-	return !! state.insertionPoint?.isVisible;
+	return state.insertionPointVisibility;
 }
 
 /**
