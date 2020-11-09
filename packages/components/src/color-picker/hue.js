@@ -74,12 +74,14 @@ export default function Hue( { hsl, onChange = noop } ) {
 	useEffect( () => {
 		const { ownerDocument } = container.current;
 
-		if ( mouseDown ) {
-			ownerDocument.addEventListener( 'mousemove', handleChange );
-			ownerDocument.addEventListener( 'mouseup', handleMouseUp );
+		if ( ! mouseDown ) {
+			return;
 		}
 
-		return function cleanup() {
+		ownerDocument.addEventListener( 'mousemove', handleChange );
+		ownerDocument.addEventListener( 'mouseup', handleMouseUp );
+
+		return () => {
 			ownerDocument.removeEventListener( 'mousemove', handleChange );
 			ownerDocument.removeEventListener( 'mouseup', handleMouseUp );
 		};
