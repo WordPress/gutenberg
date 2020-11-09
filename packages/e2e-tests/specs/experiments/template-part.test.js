@@ -71,7 +71,7 @@ describe( 'Template Part', () => {
 		async function triggerEllipsisMenuItem( textPrompt ) {
 			await clickBlockToolbarButton( 'More options' );
 			const button = await page.waitForXPath(
-				`//span[contains(text(), "${ textPrompt }"]`
+				`//span[contains(text(), "${ textPrompt }")]`
 			);
 			await button.click();
 		}
