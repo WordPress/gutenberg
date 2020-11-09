@@ -42,7 +42,7 @@ export function Provider( { children, className } ) {
 
 		const overflow = focusHistory.current.length - MAX_STACK_LENGTH;
 
-		if ( overflow ) {
+		if ( overflow > 0 ) {
 			focusHistory.current.splice( 0, overflow );
 		}
 	}
