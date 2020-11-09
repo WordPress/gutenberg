@@ -67,7 +67,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		}
 	}
 
-	if ( isset( $block->content['queryId']) ) {
+	if ( isset( $block->context['queryId']) ) {
 
 		$posts = get_posts( $query );
 
