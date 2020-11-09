@@ -255,22 +255,6 @@ describe( 'selectors', () => {
 					variations
 				);
 			} );
-			it( 'should strict filter the variations if `transform` is passed', () => {
-				const variations = [
-					{ ...firstBlockVariation, scope: [ 'transform' ] },
-					secondBlockVariation,
-					thirdBlockVariation,
-				];
-				const state = createBlockVariationsState( variations );
-				expect(
-					getBlockVariations( state, blockName, 'transform' )
-				).toEqual( [
-					expect.objectContaining( {
-						name: firstBlockVariation.name,
-					} ),
-				] );
-			} );
-			// Testing the assumption that no scope means all scopes, except the `transform` scope.
 			it( 'should return variations with scope not set at all or explicitly set', () => {
 				const variations = [
 					{ ...firstBlockVariation, scope: [ 'inserter' ] },
