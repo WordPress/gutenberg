@@ -294,7 +294,21 @@ async function runPerformanceTests( branches, options ) {
 	log( '\n>> 🎉 Results.\n' );
 	for ( const testSuite of testSuites ) {
 		log( `\n>> ${ testSuite }\n` );
-		console.table( results[ testSuite ] );
+
+		/** @type {Record<string, Record<string, string>>} */
+		const invertedResult = {};
+		Object.entries( results[ testSuite ] ).reduce(
+			( acc, [ key, val ] ) => {
+				for ( const entry of Object.keys( val ) ) {
+					if ( ! acc[ entry ] ) acc[ entry ] = {};
+					// @ts-ignore
+					acc[ entry ][ key ] = val[ entry ];
+				}
+				return acc;
+			},
+			invertedResult
+		);
+		console.table( invertedResult );
 	}
 }
 
