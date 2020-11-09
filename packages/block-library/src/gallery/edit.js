@@ -8,7 +8,6 @@ import { isEqual, isEmpty, find } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import {
-	Button,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
@@ -35,6 +34,8 @@ import { defaultColumnsNumber, pickRelevantMediaFiles } from './shared';
 import { getHrefAndDestination, getImageSizeAttributes } from './utils';
 import { getUpdatedLinkTargetSettings } from '../image/utils';
 import Gallery from './gallery';
+import DirtyImageOptions from './dirty-image-options';
+
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
@@ -281,7 +282,6 @@ function GalleryEdit( props ) {
 
 	const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
 	const hasLinkTo = linkTo && linkTo !== 'none';
-
 	return (
 		<>
 			<InspectorControls>
@@ -324,21 +324,12 @@ function GalleryEdit( props ) {
 							onChange={ updateImagesSize }
 						/>
 					) }
-					{ /* TODO - fix for mobile */ }
-					{ /* { dirtyImageOptions && (
-						<div className={ 'gallery-settings-buttons' }>
-							<Button isPrimary onClick={ applyImageOptions }>
-								{ __( 'Apply to all images' ) }
-							</Button>
-							<Button
-								className={ 'cancel-apply-to-images' }
-								isLink
-								onClick={ cancelImageOptions }
-							>
-								{ __( 'Cancel' ) }
-							</Button>
-						</div>
-					) } */ }
+					{ dirtyImageOptions && (
+						<DirtyImageOptions
+							applyImageOptions={ applyImageOptions }
+							cancelImageOptions={ cancelImageOptions }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			{ noticeUI }
