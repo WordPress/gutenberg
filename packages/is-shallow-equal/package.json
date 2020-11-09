@@ -25,7 +25,8 @@
 		"build-types",
 		"*.md"
 	],
-	"main": "lib/index.js",
+	"main": "build/index.js",
+	"module": "build-module/index.js",
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
