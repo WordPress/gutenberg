@@ -11,7 +11,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Disabled, { Disableable } from '../';
+import Disabled from '../';
 
 jest.mock( '@wordpress/dom', () => {
 	const focus = jest.requireActual( '../../../../dom/src' ).focus;
@@ -68,9 +68,9 @@ describe( 'Disabled', () => {
 	// this is needed because TestUtils does not accept a stateless component.
 	class DisabledComponent extends Component {
 		render() {
-			const { children } = this.props;
+			const { children, isDisabled } = this.props;
 
-			return <Disabled>{ children }</Disabled>;
+			return <Disabled isDisabled={ isDisabled }>{ children }</Disabled>;
 		}
 	}
 
@@ -133,6 +133,46 @@ describe( 'Disabled', () => {
 		expect( div.hasAttribute( 'tabindex' ) ).toBe( true );
 	} );
 
+	it( 'will disable descendant fields if isDisabled prop is set to true', () => {
+		const wrapper = TestUtils.renderIntoDocument(
+			<DisabledComponent isDisabled>
+				<Form />
+			</DisabledComponent>
+		);
+
+		const input = TestUtils.findRenderedDOMComponentWithTag(
+			wrapper,
+			'input'
+		);
+		const div = TestUtils.scryRenderedDOMComponentsWithTag(
+			wrapper,
+			'div'
+		)[ 1 ];
+
+		expect( input.hasAttribute( 'disabled' ) ).toBe( true );
+		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
+	} );
+
+	it( 'will not disable descendant fields if isDisabled prop is set to false', () => {
+		const wrapper = TestUtils.renderIntoDocument(
+			<DisabledComponent isDisabled={ false }>
+				<Form />
+			</DisabledComponent>
+		);
+
+		const input = TestUtils.findRenderedDOMComponentWithTag(
+			wrapper,
+			'input'
+		);
+		const div = TestUtils.scryRenderedDOMComponentsWithTag(
+			wrapper,
+			'div'
+		)[ 0 ];
+
+		expect( input.hasAttribute( 'disabled' ) ).toBe( false );
+		expect( div.getAttribute( 'contenteditable' ) ).not.toBe( 'false' );
+	} );
+
 	// Ideally, we'd have two more test cases here:
 	//
 	//  - it( 'will disable all fields on component render change' )
@@ -170,6 +210,19 @@ describe( 'Disabled', () => {
 			expect( wrapperElement.textContent ).toBe( 'Disabled' );
 		} );
 
+		test( "lets components know that they're not disabled via context when isDisabled is false", () => {
+			const wrapper = TestUtils.renderIntoDocument(
+				<DisabledComponent isDisabled={ false }>
+					<DisabledStatus />
+				</DisabledComponent>
+			);
+			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag(
+				wrapper,
+				'p'
+			);
+			expect( wrapperElement.textContent ).toBe( 'Not disabled' );
+		} );
+
 		test( "lets components know that they're not disabled via context", () => {
 			const wrapper = TestUtils.renderIntoDocument( <DisabledStatus /> );
 			const wrapperElement = TestUtils.findRenderedDOMComponentWithTag(
@@ -177,60 +230,6 @@ describe( 'Disabled', () => {
 				'p'
 			);
 			expect( wrapperElement.textContent ).toBe( 'Not disabled' );
-		} );
-	} );
-
-	describe( 'Disableable', () => {
-		class DisableableComponent extends Component {
-			render() {
-				const { children, disabled } = this.props;
-
-				return (
-					<Disableable disabled={ disabled }>
-						{ children }
-					</Disableable>
-				);
-			}
-		}
-
-		it( 'will not disable fields by default', () => {
-			const wrapper = TestUtils.renderIntoDocument(
-				<DisableableComponent>
-					<Form />
-				</DisableableComponent>
-			);
-
-			const input = TestUtils.findRenderedDOMComponentWithTag(
-				wrapper,
-				'input'
-			);
-			const div = TestUtils.scryRenderedDOMComponentsWithTag(
-				wrapper,
-				'div'
-			)[ 0 ];
-
-			expect( input.hasAttribute( 'disabled' ) ).toBe( false );
-			expect( div.getAttribute( 'contenteditable' ) ).not.toBe( 'false' );
-		} );
-
-		it( 'will disable all fields if disabled prop is true', () => {
-			const wrapper = TestUtils.renderIntoDocument(
-				<DisableableComponent disabled>
-					<Form />
-				</DisableableComponent>
-			);
-
-			const input = TestUtils.findRenderedDOMComponentWithTag(
-				wrapper,
-				'input'
-			);
-			const div = TestUtils.scryRenderedDOMComponentsWithTag(
-				wrapper,
-				'div'
-			)[ 1 ];
-
-			expect( input.hasAttribute( 'disabled' ) ).toBe( true );
-			expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
 		} );
 	} );
 } );

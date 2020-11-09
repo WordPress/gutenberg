@@ -6,7 +6,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import Disabled, { Disableable as DisableableComponent } from '../';
+import Disabled from '../';
 import Button from '../../button/';
 import SelectControl from '../../select-control/';
 import TextControl from '../../text-control/';
@@ -42,19 +42,19 @@ export const _default = () => {
 	);
 };
 
-export const Disableable = () => {
-	const [ isDisabled, setState ] = useState( false );
+export const DisabledWithProp = () => {
+	const [ isDisabled, setState ] = useState( true );
 	const toggleDisabled = () => {
 		setState( () => ! isDisabled );
 	};
 
 	return (
 		<div>
-			<DisableableComponent disabled={ isDisabled }>
+			<Disabled isDisabled={ isDisabled }>
 				<Form />
-			</DisableableComponent>
+			</Disabled>
 			<Button isPrimary onClick={ toggleDisabled }>
-				Toggle Disabled
+				Set isDisabled to { isDisabled ? 'false' : 'true' }
 			</Button>
 		</div>
 	);

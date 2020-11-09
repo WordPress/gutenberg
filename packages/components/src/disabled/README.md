@@ -50,27 +50,14 @@ function CustomButton() {
 }
 ```
 
-A component can be conditionally wrapped in a `<Disabled>` with the help of `<Disableable>`.
+### Props
 
-```jsx
-import { Button, Disableable, TextControl } from '@wordpress/components';
+The component accepts the following props:
 
-const MyDisabled = withState( {
-	isDisabled: true,
-} )( ( { isDisabled, setState } ) => {
-	const toggleDisabled = () => {
-		setState( ( state ) => ( { isDisabled: ! state.isDisabled } ) );
-	};
+#### isDisabled
 
-	return (
-		<div>
-			<Disableable disabled={ isDisabled }>
-				<TextControl label="Input" onChange={ () => {} } />
-			</Disableable>
-			<Button isPrimary onClick={ toggleDisabled }>
-				Toggle Disabled
-			</Button>
-		</div>
-	);
-} );
-```
+Whether to disable all the descendant fields. Defaults to `true`.
+
+- Type: `Boolean`
+- Required: No
+- Default: `true`
