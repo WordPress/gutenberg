@@ -51,8 +51,12 @@ class WP_Theme_JSON {
 				'customFontSize'   => null,
 				'customLineHeight' => null,
 				'dropCap'          => null,
+				'fontFamilies'     => null,
 				'fontSizes'        => null,
-				'fontFamilies'     => null
+				'fontStyles'       => null,
+				'fontWeights'      => null,
+				'textDecorations'  => null,
+				'textTransforms'   => null,
 			),
 			'custom' => null,
 		),
@@ -682,10 +686,21 @@ class WP_Theme_JSON {
 					continue;
 				}
 
-				$this->contexts[ $context ][ $subtree ] = array_replace_recursive(
-					$this->contexts[ $context ][ $subtree ],
-					$incoming_data[ $context ][ $subtree ],
-				);
+				foreach ( array_keys( self::SCHEMA[ $subtree ] ) as $leaf ) {
+					if ( ! array_key_exists( $leaf, $incoming_data[ $context ][ $subtree ] ) ) {
+						continue;
+					}
+
+					if ( ! array_key_exists( $leaf, $this->contexts[ $context ][ $subtree ] ) ) {
+						$this->contexts[ $context ][ $subtree ][ $leaf ] = $incoming_data[ $context ][ $subtree ][ $leaf ];
+						continue;
+					}
+
+					$this->contexts[ $context ][ $subtree ][ $leaf ] = array_merge(
+						$this->contexts[ $context ][ $subtree ][ $leaf ],
+						$incoming_data[ $context ][ $subtree ][ $leaf ],
+					);
+				}
 			}
 		}
 	}
