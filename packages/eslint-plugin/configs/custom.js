@@ -15,7 +15,11 @@ module.exports = {
 			},
 		},
 		{
-			files: [ '*.test.js', '**/test/*.js' ],
+			files: [
+				'*.test.js',
+				'**/test/*.js',
+				'packages/e2e-test-utils/**/*.js',
+			],
 			rules: {
 				'@wordpress/no-global-active-element': 'off',
 				'@wordpress/no-global-get-selection': 'off',
