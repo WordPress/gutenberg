@@ -527,9 +527,10 @@ export function* insertBlocks(
  *
  * Components like <Inserter> will default to inserting blocks at this point.
  *
- * @param {?string} rootClientId Optional root client ID of block list on
- *                               which to insert.
- * @param {?number} index        Index at which block should be inserted.
+ * @param {?string} rootClientId Root client ID of block list in which to
+ *                               insert. Use `undefined` for the root block
+ *                               list.
+ * @param {number} index         Index at which block should be inserted.
  *
  * @return {Object} Action object.
  */
@@ -546,9 +547,10 @@ export function __unstableSetInsertionPoint( rootClientId, index ) {
  *
  * Components like <Inserter> will default to inserting blocks at this point.
  *
- * @param {?string} rootClientId Optional root client ID of block list on
- *                               which to insert.
- * @param {?number} index        Index at which block should be inserted.
+ * @param {?string} rootClientId Root client ID of block list in which to
+ *                               insert. Use `undefined` for the root block
+ *                               list.
+ * @param {number} index         Index at which block should be inserted.
  *
  * @return {Object} Action object.
  */

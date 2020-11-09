@@ -1386,8 +1386,8 @@ Components like <Inserter> will default to inserting blocks at this point.
 
 _Parameters_
 
--   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
--   _index_ `?number`: Index at which block should be inserted.
+-   _rootClientId_ `?string`: Root client ID of block list in which to insert. Use `undefined` for the root block list.
+-   _index_ `number`: Index at which block should be inserted.
 
 _Returns_
 
