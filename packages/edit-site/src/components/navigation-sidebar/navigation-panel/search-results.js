@@ -7,25 +7,24 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { getTemplateInfo } from '../../../utils';
+import { normalizedSearch } from './utils';
+
 export default function SearchResults( {
 	items,
 	isDebouncing,
-	search,
-	children,
+	searchQuery,
+	renderItem,
 } ) {
 	const loading = items === null || isDebouncing;
 
-	if ( search.length === 1 ) {
-		return (
-			<NavigationGroup title={ __( 'Search results' ) }>
-				<NavigationItem
-					title={ __(
-						'Type at least 2 characters to start searching…'
-					) }
-				/>
-			</NavigationGroup>
-		);
-	}
+	const itemsFiltered = items.filter( ( item ) => {
+		const { title } = getTemplateInfo( item );
+		return normalizedSearch( title, searchQuery );
+	} );
 
 	return (
 		<NavigationGroup title={ __( 'Search results' ) }>
@@ -35,7 +34,7 @@ export default function SearchResults( {
 				<NavigationItem title={ __( 'No results found.' ) } />
 			) }
 
-			{ ! loading && children }
+			{ ! loading && itemsFiltered.map( renderItem ) }
 		</NavigationGroup>
 	);
 }

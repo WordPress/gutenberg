@@ -32,6 +32,13 @@ import TemplateNavigationItem from '../template-navigation-item';
 import SearchResults from '../search-results';
 import useDebouncedSearch from '../use-debounced-search';
 
+const renderSearchResultItem = ( template ) => (
+	<TemplateNavigationItem
+		item={ template }
+		key={ `wp_template-${ template.id }` }
+	/>
+);
+
 export default function TemplatesMenu() {
 	const {
 		search,
@@ -45,9 +52,8 @@ export default function TemplatesMenu() {
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
 				status: [ 'publish', 'auto-draft' ],
 				per_page: -1,
-				search: searchQuery,
 			} ),
-		[ searchQuery ]
+		[]
 	);
 
 	const generalTemplates = templates?.filter( ( { slug } ) =>
@@ -68,15 +74,9 @@ export default function TemplatesMenu() {
 				<SearchResults
 					items={ templates }
 					isDebouncing={ isDebouncing }
-					search={ search }
-				>
-					{ map( templates, ( template ) => (
-						<TemplateNavigationItem
-							item={ template }
-							key={ `wp_template-${ template.id }` }
-						/>
-					) ) }
-				</SearchResults>
+					searchQuery={ searchQuery }
+					renderItem={ renderSearchResultItem }
+				/>
 			) }
 
 			{ ! search && (
