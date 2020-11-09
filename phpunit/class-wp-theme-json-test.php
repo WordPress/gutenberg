@@ -297,7 +297,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				),
 			),
 		);
-		$udpate_presets = array(
+		$update_presets = array(
 			'global' => array(
 				'settings' => array(
 					'color' => array(
