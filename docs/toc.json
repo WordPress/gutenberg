@@ -12,7 +12,8 @@
 		{ "docs/architecture/folder-structure.md": [] },
 		{ "docs/architecture/modularity.md": [] },
 		{ "docs/architecture/performance.md": [] },
-		{ "docs/architecture/automated-testing.md": [] }
+		{ "docs/architecture/automated-testing.md": [] },
+		{ "docs/architecture/fse-templates.md": [] }
 	] },
 	{ "docs/designers-developers/developers/README.md": [
 		{ "docs/designers-developers/developers/block-api/README.md": [
