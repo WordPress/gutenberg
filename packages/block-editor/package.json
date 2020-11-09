@@ -60,7 +60,7 @@
 		"inherits": "^2.0.3",
 		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
-		"react-autosize-textarea": "^3.0.2",
+		"react-autosize-textarea": "^7.1.0",
 		"react-spring": "^8.0.19",
 		"react-transition-group": "^2.9.0",
 		"reakit": "1.1.0",
