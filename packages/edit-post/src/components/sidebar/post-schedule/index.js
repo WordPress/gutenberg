@@ -32,6 +32,7 @@ export function PostSchedule() {
 					renderContent={ () => <PostScheduleForm /> }
 				/>
 			</PanelRow>
+			<PostScheduleForm.Warning />
 		</PostScheduleCheck>
 	);
 }

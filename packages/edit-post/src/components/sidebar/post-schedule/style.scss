@@ -12,3 +12,11 @@
 .components-button.edit-post-post-schedule__toggle {
 	text-align: right;
 }
+
+.edit-post-post-schedule-warning {
+	margin: 0;
+
+	.edit-post-post-status & {
+		margin-top: $grid-unit;
+	}
+}

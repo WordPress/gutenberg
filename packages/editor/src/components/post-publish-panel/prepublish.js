@@ -80,6 +80,9 @@ function PostPublishPanelPrepublish( {
 					>
 						<PostSchedule />
 					</PanelBody>
+					<PanelBody className="editor-post-publish-panel_warning">
+						<PostSchedule.Warning />
+					</PanelBody>
 				</>
 			) }
 			<MaybePostFormatPanel />
