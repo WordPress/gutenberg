@@ -23,7 +23,7 @@ import { mediaUploadSync } from '@wordpress/react-native-bridge';
 import { useSelect } from '@wordpress/data';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
 
-const TILE_SPACING = 15;
+const TILE_SPACING = 8;
 
 // we must limit displayed columns since readable content max-width is 580px
 const MAX_DISPLAYED_COLUMNS = 4;
@@ -61,17 +61,17 @@ export const Gallery = ( props ) => {
 			orientation: 'horizontal',
 			renderAppender: false,
 			numColumns: displayedColumns,
+			marginHorizontal: TILE_SPACING,
+			marginVertical: TILE_SPACING,
 		}
 	);
 
 	const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 
 	return (
-		<View style={ { flex: 1 } }>
-			<View style={ [ isFullWidth && styles.fullWidth ] }>
-				<View { ...innerBlocksProps } />
-				{ mediaPlaceholder }
-			</View>
+		<View style={ [ isFullWidth && styles.fullWidth ] }>
+			<View { ...innerBlocksProps } />
+			{ mediaPlaceholder }
 		</View>
 	);
 };

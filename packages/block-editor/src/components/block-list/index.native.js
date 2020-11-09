@@ -274,24 +274,26 @@ export class BlockList extends Component {
 			marginHorizontal = styles.defaultBlock.marginLeft,
 		} = this.props;
 		return (
-			<BlockListItem
-				isStackedHorizontally={ isStackedHorizontally }
-				rootClientId={ rootClientId }
-				clientId={ clientId }
-				parentWidth={ parentWidth }
-				contentResizeMode={ contentResizeMode }
-				contentStyle={ contentStyle }
-				onAddBlock={ onAddBlock }
-				marginVertical={ marginVertical }
-				marginHorizontal={ marginHorizontal }
-				onDeleteBlock={ onDeleteBlock }
-				shouldShowInnerBlockAppender={
-					this.shouldShowInnerBlockAppender
-				}
-				onCaretVerticalPositionChange={
-					this.onCaretVerticalPositionChange
-				}
-			/>
+			<View style={ { flex: 1 } }>
+				<BlockListItem
+					isStackedHorizontally={ isStackedHorizontally }
+					rootClientId={ rootClientId }
+					clientId={ clientId }
+					parentWidth={ parentWidth }
+					contentResizeMode={ contentResizeMode }
+					contentStyle={ contentStyle }
+					onAddBlock={ onAddBlock }
+					marginVertical={ marginVertical }
+					marginHorizontal={ marginHorizontal }
+					onDeleteBlock={ onDeleteBlock }
+					shouldShowInnerBlockAppender={
+						this.shouldShowInnerBlockAppender
+					}
+					onCaretVerticalPositionChange={
+						this.onCaretVerticalPositionChange
+					}
+				/>
+			</View>
 		);
 	}
 
