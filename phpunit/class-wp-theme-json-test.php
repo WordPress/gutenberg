@@ -204,7 +204,17 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			'global' => array(
 				'settings' => array(
 					'color' => array(
-						'custom' => 'false'
+						'custom'  => 'false',
+						'palette' => array(
+							array(
+								'slug'  => 'red',
+								'color' => 'red'
+							),
+							array(
+								'slug'  => 'blue',
+								'color' => 'blue'
+							),
+						),
 					),
 				),
 				'styles' => array(
@@ -287,6 +297,62 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				),
 			),
 		);
+		$udpate_presets = array(
+			'global' => array(
+				'settings' => array(
+					'color' => array(
+						'palette' => array(
+							array(
+								'slug'  => 'color',
+								'color' => 'color',
+							),
+						),
+						'gradients' => array(
+							array(
+								'slug'     => 'gradient',
+								'gradient' => 'gradient',
+							),
+						),
+					),
+					'typography' => array(
+						'fontSizes' => array(
+							array(
+								'slug' => 'fontSize',
+								'size' => 'fontSize'
+							),
+						),
+						'fontFamilies' => array(
+							array(
+								'slug'       => 'fontFamily',
+								'fontFamily' => 'fontFamily',
+							),
+						),
+						'fontStyles' => array(
+							array(
+								'slug' => 'fontStyle',
+							),
+						),
+						'fontWeights' => array(
+							array(
+								'slug' => 'fontWeight',
+							),
+						),
+						'textDecorations' => array(
+							array(
+								'slug'  => 'textDecoration',
+								'value' => 'textDecoration'
+							),
+						),
+						'textTransforms' => array(
+							array(
+								'slug'  => 'textTransform',
+								'value' => 'textTransform'
+							),
+						),
+					),
+				),
+			),
+		);
 
 		$expected = array(
 			'global' => array(
@@ -306,11 +372,59 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 					'color' => array(
 						'custom' => 'true',
 						'customGradient' => 'true',
+						'palette' => array(
+							array(
+								'slug'  => 'color',
+								'color' => 'color',
+							),
+						),
+						'gradients' => array(
+							array(
+								'slug'     => 'gradient',
+								'gradient' => 'gradient',
+							),
+						),
+					),
+					'typography' => array(
+						'fontSizes' => array(
+							array(
+								'slug' => 'fontSize',
+								'size' => 'fontSize'
+							),
+						),
+						'fontFamilies' => array(
+							array(
+								'slug'       => 'fontFamily',
+								'fontFamily' => 'fontFamily',
+							),
+						),
+						'fontStyles' => array(
+							array(
+								'slug' => 'fontStyle',
+							),
+						),
+						'fontWeights' => array(
+							array(
+								'slug' => 'fontWeight',
+							),
+						),
+						'textDecorations' => array(
+							array(
+								'slug'  => 'textDecoration',
+								'value' => 'textDecoration'
+							),
+						),
+						'textTransforms' => array(
+							array(
+								'slug'  => 'textTransform',
+								'value' => 'textTransform'
+							),
+						),
 					),
 				),
 				'styles' => array(
 					'typography' => array(
-						'fontSize' => '12',
+						'fontSize' => '12'
 					),
 				),
 			),
@@ -370,6 +484,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$theme_json->merge( new WP_Theme_JSON( $add_styles ) );
 		$theme_json->merge( new WP_Theme_JSON( $add_key_in_styles ) );
 		$theme_json->merge( new WP_Theme_JSON( $add_invalid_context ) );
+		$theme_json->merge( new WP_Theme_JSON( $update_presets ) );
 		$result = $theme_json->get_raw_data();
 
 		$this->assertEqualSetsWithIndex( $expected, $result );
