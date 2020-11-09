@@ -1,5 +1,14 @@
 <?php
+/**
+ * Process of structures that adhere to the theme.json schema.
+ *
+ * @package gutenberg
+ */
 
+/**
+ * Class that encapsulates the processing of
+ * structures that adhere to the theme.json spec.
+ */
 class WP_Theme_JSON {
 
 	/**
@@ -9,12 +18,40 @@ class WP_Theme_JSON {
 
 	/**
 	 * Holds block metadata extracted from block.json
-	 * to be shared among all instances.
+	 * to be shared among all instances so we don't
+	 * process it twice.
 	 *
 	 * @var array
 	 */
 	private static $blocks_metadata = null;
 
+	/**
+	 * Data schema of each context within a theme.json.
+	 *
+	 * Example:
+	 *
+	 * {
+	 *   'context-one': {
+	 *     'styles': {
+	 *       'color': {
+	 *         'background': 'color'
+	 *       }
+	 *     },
+	 *     'settings': {
+	 *       'color': {
+	 *         'custom': true
+	 *       }
+	 *     }
+	 *   },
+	 *   'context-two': {
+	 *     'styles': {
+	 *       'color': {
+	 *         'link': 'color'
+	 *       }
+	 *     }
+	 *   }
+	 * }
+	 */
 	private const SCHEMA = array(
 		'selector' => null,
 		'supports' => null,
@@ -62,7 +99,13 @@ class WP_Theme_JSON {
 		),
 	);
 
-	private const PRESETS = array(
+	/**
+	 * Presets are a set of values that serve
+	 * to bootstrap some styles: colors, font sizes, etc.
+	 *
+	 * This contains the necessary metadata to process them.
+	 */
+	private const PRESETS_METADATA = array(
 		array(
 			'path'         => array( 'settings', 'color', 'palette' ),
 			'value_key'    => 'color',
@@ -157,7 +200,11 @@ class WP_Theme_JSON {
 		),
 	);
 
-	private const SUPPORTED_PROPERTIES = array(
+	/**
+	 * Metadata to know which style properties are supported
+	 * by theme.json and block.json an how to process them.
+	 */
+	private const PROPERTIES_METADATA = array(
 		'--wp--style--color--link' => array(
 			'theme_json' => array( 'color', 'link' ),
 			'block_json' => array( 'color', 'link' ),
@@ -218,7 +265,7 @@ class WP_Theme_JSON {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $contexts Definitions.
+	 * @param array $contexts A structure that follows the theme.json schema.
 	 */
 	public function __construct( $contexts = array() ){
 		$this->contexts = array();
@@ -231,7 +278,7 @@ class WP_Theme_JSON {
 		foreach ( $contexts as $key => $context ) {
 			if ( ! array_key_exists( $key, $metadata ) ) {
 				// Skip incoming contexts that can't be found
-				// within the contexts registered by blocks.
+				// within the contexts registered.
 				continue;
 			}
 
@@ -271,6 +318,26 @@ class WP_Theme_JSON {
 		}
 	}
 
+	/**
+	 * Returns the metadata for each block.
+	 *
+	 * Example:
+	 *
+	 * {
+	 *   'global': {
+	 *     'selector': ':root'
+	 *     'supports': [ 'fontSize', 'backgroundColor' ],
+	 *     'blockName': 'global',
+	 *   },
+	 *   'core/heading/h1': {
+	 *     'selector': 'h1'
+	 *     'supports': [ 'fontSize', 'backgroundColor' ],
+	 *     'blockName': 'core/heading',
+	 *   }
+	 * }
+	 *
+	 * @return array Block metadata.
+	 */
 	public function get_blocks_metadata() {
 		if ( null !== self::$blocks_metadata ) {
 			return self::$blocks_metadata;
@@ -316,7 +383,7 @@ class WP_Theme_JSON {
 			}
 
 			$block_supports = array();
-			foreach ( self::SUPPORTED_PROPERTIES as $key => $metadata ) {
+			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
 				if ( $this->get_from_path( $block_type->supports, $metadata['block_json'] ) ) {
 					$block_supports[] = $key;
 				}
@@ -373,6 +440,15 @@ class WP_Theme_JSON {
 		return self::$blocks_metadata;
 	}
 
+	/**
+	 * Normalize the subtree according to the given schema.
+	 * This function modifies the given input by removing
+	 * the nodes that aren't valid per the schema.
+	 *
+	 * @param string $key Key of the subtree to normalize.
+	 * @param array $input Whole tree to normalize.
+	 * @param array $schema Schema to use for normalization.
+	 */
 	private function process_key( $key, &$input, $schema ) {
 		if ( ! is_array( $input ) || ! array_key_exists( $key, $input ) ) {
 			return;
@@ -398,6 +474,13 @@ class WP_Theme_JSON {
 		}
 	}
 
+	/**
+	 * Given a context, it returns its settings subtree.
+	 *
+	 * @param array $context Context adhering to the theme.json schema.
+	 *
+	 * @return array|null The settings subtree.
+	 */
 	private function extract_settings( $context ) {
 		if (
 			! array_key_exists( 'settings', $context ) ||
@@ -467,8 +550,16 @@ class WP_Theme_JSON {
 		return $result;
 	}
 
+	/**
+	 * Utility to extract a path from an array.
+	 *
+	 * @param array $array    Array we want to retrieve data from.
+	 * @param array $path     Array containing the path to retrieve.
+	 * @param array $default  Value to return if $array doesn't contain the $path.
+	 *
+	 * @return array Data at the given $path or $default.
+	 */
 	private function get_from_path( $array, $path, $default = array() ) {
-		// Confirm input values are expected type to avoid notice warnings.
 		if ( ! is_array( $array ) || ! is_array( $path ) ) {
 			return $default;
 		}
@@ -483,6 +574,18 @@ class WP_Theme_JSON {
 		return $array;
 	}
 
+	/**
+	 * Returns the style property for the given path.
+	 *
+	 * It also converts CSS Custom Property stored as
+	 * "var:preset|color|secondary" to the form
+	 * "--wp--preset--color--secondary".
+	 *
+	 * @param array $styles Styles subtree.
+	 * @param array $path Which property to process.
+	 *
+	 * @return string Style property value.
+	 */
 	private function get_property_value( $styles, $path ) {
 		$value = $this->get_from_path( $styles, $path, '' );
 
@@ -490,9 +593,6 @@ class WP_Theme_JSON {
 			return $value;
 		}
 
-		// In some cases, a CSS Custom Property with name
-		// "--wp--preset--color--secondary" will be stored as
-		// "var:preset|color|secondary".
 		$prefix     = 'var:';
 		$prefix_len = strlen( $prefix );
 		$token_in   = '|';
@@ -509,6 +609,20 @@ class WP_Theme_JSON {
 		return $value;
 	}
 
+	/**
+	 * Given a context, it extracts the style properties
+	 * and adds them to the $declarations array following the format:
+	 *
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 *
+	 * Note that this modifies the $declarations in place.
+	 *
+	 * @param array $declarations Holds the existing declarations.
+	 * @param array $context Input context to process.
+	 */
 	private function compute_style_properties( &$declarations, $context ) {
 		if (
 			! array_key_exists( 'supports', $context ) ||
@@ -519,7 +633,7 @@ class WP_Theme_JSON {
 			return;
 		}
 
-		foreach ( self::SUPPORTED_PROPERTIES as $name => $metadata ) {
+		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
 			if ( ! in_array( $name, $context['supports'] ) ) {
 				continue;
 			}
@@ -532,12 +646,19 @@ class WP_Theme_JSON {
 				);
 			}
 		}
-
-		return $declarations;
 	}
 
+	/**
+	 * Given a context, it extracts its presets
+	 * and adds them to the given input $stylesheet.
+	 *
+	 * Note this function modifies $stylesheet in place.
+	 *
+	 * @param string $stylesheet Input stylesheet to add the presets to.
+	 * @param array $context Context to process.
+	 */
 	private function compute_preset_classes( &$stylesheet, $context ) {
-		foreach ( self::PRESETS as $preset ) {
+		foreach ( self::PRESETS_METADATA as $preset ) {
 			$values = $this->get_from_path( $context, $preset['path'], array() );
 			foreach ( $values as $value ) {
 				foreach ( $preset['class'] as $class ) {
@@ -555,8 +676,23 @@ class WP_Theme_JSON {
 		}
 	}
 
+	/**
+	 * Given a context, it extracts the CSS Custom Properties
+	 * for the presets and adds them to the $declarations array
+	 * following the format:
+	 *
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 *
+	 * Note that this modifies the $declarations in place.
+	 *
+	 * @param array $declarations Holds the existing declarations.
+	 * @param array $context Input context to process.
+	 */
 	private function compute_preset_vars( &$declarations, $context ) {
-		foreach ( self::PRESETS as $preset ) {
+		foreach ( self::PRESETS_METADATA as $preset ) {
 			$values = $this->get_from_path( $context, $preset['path'], array() );
 			foreach ( $values as $value ) {
 				$declarations[] = array(
@@ -567,6 +703,21 @@ class WP_Theme_JSON {
 		}
 	}
 
+	/**
+	 * Given a context, it extracts the CSS Custom Properties
+	 * for the custom values and adds them to the $declarations
+	 * array following the format:
+	 *
+	 * array(
+	 *   'name'  => 'property_name',
+	 *   'value' => 'property_value,
+	 * )
+	 *
+	 * Note that this modifies the $declarations in place.
+	 *
+	 * @param array $declarations Holds the existing declarations.
+	 * @param array $context Input context to process.
+	 */
 	private function compute_theme_vars( &$declarations, $context ) {
 		$custom_values = $this->get_from_path( $context, [ 'settings', 'custom' ] );
 		$css_vars      = $this->flatten_tree( $custom_values );
@@ -679,6 +830,26 @@ class WP_Theme_JSON {
 		return $stylesheet;
 	}
 
+	/**
+	 * Returns the existing settings for each context.
+	 *
+	 * Example:
+	 *
+	 * {
+	 *   'global': {
+	 *     'color': {
+	 *       'custom': true
+	 *     }
+	 *   },
+	 *   'core/paragraph': {
+	 *     'spacing': {
+	 *       'customPadding': true
+	 *     }
+	 *   }
+	 * }
+	 *
+	 * @return array Settings per context.
+	 */
 	public function get_settings() {
 		return array_filter(
 			array_map( array( $this, 'extract_settings' ), $this->contexts ),
@@ -686,6 +857,12 @@ class WP_Theme_JSON {
 		);
 	}
 
+	/**
+	 * Returs the stylesheet that results of processing
+	 * the theme.json structure this object represents.
+	 *
+	 * @return string Stylesheet.
+	 */
 	public function get_stylesheet() {
 		return array_reduce( $this->contexts, array( $this, 'to_stylesheet' ), '' );
 	}
@@ -697,10 +874,12 @@ class WP_Theme_JSON {
 	 */
 	public function merge( $theme_json ) {
 		$incoming_data = $theme_json->get_raw_data();
+		$metadata      = $this->get_blocks_metadata();
 
 		foreach ( array_keys( $incoming_data ) as $context ) {
-			$this->contexts[ $context ]['selector'] = $incoming_data[ $context ]['selector'];
-			$this->contexts[ $context ]['supports'] = $incoming_data[ $context ]['supports'];
+			// Selector & Supports are always taken from metadata.
+			$this->contexts[ $context ]['selector'] = $metadata[ $context ]['selector'];
+			$this->contexts[ $context ]['supports'] = $metadata[ $context ]['supports'];
 
 			foreach ( [ 'settings', 'styles' ] as $subtree ) {
 				if ( ! array_key_exists( $subtree, $incoming_data[ $context ] ) ) {
