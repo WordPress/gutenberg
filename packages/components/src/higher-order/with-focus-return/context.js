@@ -1,19 +1,12 @@
 /**
- * External dependencies
- */
-import { uniq } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { createContext, useEffect, useRef, useState } from '@wordpress/element';
+import { createContext, useLayoutEffect, useRef } from '@wordpress/element';
 
-const { Provider, Consumer } = createContext( {
-	focusHistory: [],
-} );
+const context = createContext( [] );
 
-Provider.displayName = 'FocusReturnProvider';
-Consumer.displayName = 'FocusReturnConsumer';
+context.Provider.displayName = 'FocusReturnProvider';
+context.Consumer.displayName = 'FocusReturnConsumer';
 
 /**
  * The maximum history length to capture for the focus stack. When exceeded,
@@ -23,44 +16,44 @@ Consumer.displayName = 'FocusReturnConsumer';
  */
 const MAX_STACK_LENGTH = 100;
 
-function FocusReturnProvider( { children, className } ) {
+export function Provider( { children, className } ) {
 	const ref = useRef();
-	const [ focusHistory, setFocusHistory ] = useState( [] );
+	const focusHistory = useRef( [] );
 
 	// Prepend the focus history with the active element on mount.
-	useEffect( () => {
-		setFocusHistory( [
-			ref.current.ownerDocument.activeElement,
-			...focusHistory,
-		] );
+	useLayoutEffect( () => {
+		focusHistory.current.unshift( ref.current.ownerDocument.activeElement );
 	}, [] );
 
-	function onFocus( event ) {
+	function onFocus( { target } ) {
 		// Push the focused element to the history stack, keeping only unique
 		// members but preferring the _last_ occurrence of any duplicates.
-		// Lodash's `uniq` behavior favors the first occurrence, so the array
-		// is temporarily reversed prior to it being called upon. Uniqueness
-		// helps avoid situations where, such as in a constrained tabbing area,
-		// the user changes focus enough within a transient element that the
-		// stack may otherwise only consist of members pending destruction, at
-		// which point focus might have been lost.
-		const nextFocusHistory = uniq(
-			[ ...focusHistory, event.target ]
-				.slice( -1 * MAX_STACK_LENGTH )
-				.reverse()
-		).reverse();
+		// Uniqueness helps avoid situations where, such as in a constrained
+		// tabbing area, the user changes focus enough within a transient
+		// element that the stack may otherwise only consist of members pending
+		// destruction, at which point focus might have been lost.
+		focusHistory.current.forEach( ( element, index ) => {
+			if ( element === target ) {
+				focusHistory.current.splice( index, 1 );
+			}
+		} );
 
-		setFocusHistory( nextFocusHistory );
+		focusHistory.current.push( target );
+
+		const overflow = focusHistory.current.length - MAX_STACK_LENGTH;
+
+		if ( overflow ) {
+			focusHistory.current.splice( 0, overflow );
+		}
 	}
 
 	return (
-		<Provider value={ focusHistory }>
+		<context.Provider value={ focusHistory.current }>
 			<div ref={ ref } onFocus={ onFocus } className={ className }>
 				{ children }
 			</div>
-		</Provider>
+		</context.Provider>
 	);
 }
 
-export default FocusReturnProvider;
-export { Consumer };
+export default context;

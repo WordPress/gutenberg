@@ -1,18 +1,18 @@
 /**
  * External dependencies
  */
-import { stubTrue, without } from 'lodash';
+import { stubTrue } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { Component, useContext, useEffect, useRef } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import Provider, { Consumer } from './context';
+import context, { Provider } from './context';
 
 /**
  * Returns true if the given object is component-like. An object is component-
@@ -49,23 +49,22 @@ function withFocusReturn( options ) {
 
 	const { onFocusReturn = stubTrue } = options;
 
-	return ( WrappedComponent ) => {
-		class FocusReturn extends Component {
-			constructor() {
-				super( ...arguments );
+	return ( WrappedComponent ) => ( props ) => {
+		const ref = useRef();
+		const stack = useRef();
+		const focusHistory = useContext( context );
 
-				this.ownFocusedElements = new Set();
-				this.setIsFocusedFalse = () => ( this.isFocused = false );
-				this.setIsFocusedTrue = ( event ) => {
-					this.ownFocusedElements.add( event.target );
-					this.isFocused = true;
-				};
-			}
+		useEffect( () => {
+			// The focus history is a mutating array. Take a snapshot on mount
+			// to use later on unmount.
+			stack.current = [ ...focusHistory ];
 
-			componentWillUnmount() {
-				const { isFocused, ownFocusedElements } = this;
+			return () => {
+				const containsFocus = ref.current.contains(
+					ref.current.ownerDocument.activeElement
+				);
 
-				if ( ! isFocused ) {
+				if ( ! containsFocus ) {
 					return;
 				}
 
@@ -78,42 +77,23 @@ function withFocusReturn( options ) {
 					return;
 				}
 
-				const stack = without(
-					this.props.focusHistory,
-					...ownFocusedElements
-				);
-
 				let candidate;
 
-				while ( ( candidate = stack.pop() ) ) {
-					if ( document.body.contains( candidate ) ) {
+				while ( ( candidate = stack.current.pop() ) ) {
+					const { ownerDocument } = candidate;
+
+					if ( ownerDocument.body.contains( candidate ) ) {
 						candidate.focus();
 						return;
 					}
 				}
-			}
+			};
+		}, [] );
 
-			render() {
-				return (
-					<div
-						onFocus={ this.setIsFocusedTrue }
-						onBlur={ this.setIsFocusedFalse }
-					>
-						<WrappedComponent { ...this.props.childProps } />
-					</div>
-				);
-			}
-		}
-
-		return ( props ) => (
-			<Consumer>
-				{ ( context ) => (
-					<FocusReturn
-						childProps={ props }
-						focusHistory={ context }
-					/>
-				) }
-			</Consumer>
+		return (
+			<div ref={ ref }>
+				<WrappedComponent { ...props } />
+			</div>
 		);
 	};
 }
