@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useMemo } from '@wordpress/element';
 import {
 	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationGroup as NavigationGroup,
@@ -21,20 +22,31 @@ export default function SearchResults( {
 } ) {
 	const loading = items === null || isDebouncing;
 
-	const itemsFiltered = items.filter( ( item ) => {
-		const { title } = getTemplateInfo( item );
-		return normalizedSearch( title, searchQuery );
-	} );
+	const itemsFiltered = useMemo( () => {
+		if ( items === null || searchQuery.length === 0 ) {
+			return [];
+		}
+
+		return items.filter( ( item ) => {
+			const { title } = getTemplateInfo( item );
+			return normalizedSearch( title, searchQuery );
+		} );
+	}, [ items, searchQuery ] );
+
+	const itemsRendered = useMemo( () => itemsFiltered.map( renderItem ), [
+		itemsFiltered,
+		renderItem,
+	] );
 
 	return (
 		<NavigationGroup title={ __( 'Search results' ) }>
 			{ loading && <NavigationItem title={ __( 'Loading…' ) } /> }
 
-			{ ! loading && items?.length === 0 && (
+			{ ! loading && itemsRendered.length === 0 && (
 				<NavigationItem title={ __( 'No results found.' ) } />
 			) }
 
-			{ ! loading && itemsFiltered.map( renderItem ) }
+			{ ! loading && itemsRendered }
 		</NavigationGroup>
 	);
 }
