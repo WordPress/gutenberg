@@ -24,19 +24,21 @@ export const BlockQuotation = withPreferredColorScheme( ( props ) => {
 			borderLeftColor: style.color,
 		},
 	];
+	const colorStyle = style?.color ? { color: style.color } : {};
+
 	const newChildren = Children.map( props.children, ( child ) => {
 		if ( child && child.props.identifier === 'citation' ) {
 			return cloneElement( child, {
 				style: {
 					...styles.wpBlockQuoteCitation,
-					...( style?.color ? { color: style.color } : {} ),
+					...colorStyle,
 				},
 			} );
 		}
 		if ( child && child.props.identifier === 'value' ) {
 			return cloneElement( child, {
 				tagsToEliminate: [ 'div' ],
-				...( style?.color ? { style: { color: style.color } } : {} ),
+				style: colorStyle,
 			} );
 		}
 		return child;
