@@ -121,15 +121,15 @@ function Editor() {
 		( entitiesToSave ) => {
 			if ( entitiesToSave ) {
 				const { getEditedEntityRecord } = select( 'core' );
-				const { getDefaultTemplateType } = select( 'core/edit-site' );
+				const { getTemplateInfo } = select( 'core/edit-site' );
 				entitiesToSave.forEach( ( { kind, name, key } ) => {
 					const record = getEditedEntityRecord( kind, name, key );
 
 					if ( 'postType' === kind && name === 'wp_template' ) {
-						const { title } = getDefaultTemplateType( record.slug );
+						const { title } = getTemplateInfo( record.slug );
 						return editEntityRecord( kind, name, key, {
 							status: 'publish',
-							title: title || record.slug,
+							title,
 						} );
 					}
 

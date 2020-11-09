@@ -3,17 +3,19 @@
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button, __experimentalText as Text } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import useTemplateInfo from '../../hooks/use-template-info';
 import { MENU_TEMPLATES } from '../navigation-sidebar/navigation-panel/constants';
 
 export default function TemplateDetails( { template, onClose } ) {
+	const { title, description } = useSelect(
+		( select ) => select( 'core/edit-site' ).getTemplateInfo( template ),
+		[]
+	);
 	const { openNavigationPanelToMenu } = useDispatch( 'core/edit-site' );
-	const { title, description } = useTemplateInfo( template );
 
 	if ( ! template ) {
 		return null;

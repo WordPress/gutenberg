@@ -5,7 +5,7 @@ import {
 	Button,
 	__experimentalNavigationItem as NavigationItem,
 } from '@wordpress/components';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -14,17 +14,17 @@ import { __ } from '@wordpress/i18n';
  */
 import TemplatePreview from './template-preview';
 import { NavigationPanelPreviewFill } from '../index';
-import useTemplateInfo from '../../../hooks/use-template-info';
 
 export default function TemplateNavigationItem( { item } ) {
+	const { title, description } = useSelect(
+		( select ) =>
+			'wp_template' === item.type
+				? select( 'core/edit-site' ).getTemplateInfo( item )
+				: { title: item?.slug, description: '' },
+		[]
+	);
 	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
 	const [ isPreviewVisible, setIsPreviewVisible ] = useState( false );
-
-	let { title, description } = useTemplateInfo( item );
-	if ( 'wp_template_part' === item.type ) {
-		title = item?.slug;
-		description = '';
-	}
 
 	if ( ! item ) {
 		return null;
