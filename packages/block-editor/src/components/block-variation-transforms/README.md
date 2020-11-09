@@ -1,6 +1,8 @@
 # Block Variation Transforms
 
-// TODO compile readme
+This component allows to display the selected block's variations which have the `transform` option set in `scope` property and to choose one of them.
+
+By selecting such a variation an update to the selected block's attributes happen, based on the variation's attributes.
 
 ## Table of contents
 
@@ -11,13 +13,54 @@
 
 ### Usage
 
-Renders the variations of a block.
+Renders the selected block's variations which have the `transform` option set in `scope` property.
 
 ```jsx
+import { useSelect } from '@wordpress/data';
+import {
+	__experimentalBlockVariationTransforms as BlockVariationTransforms,
+} from '@wordpress/block-editor';
 
+const MyBlockVariationTransforms = () => {
+	const { selectedBlockName, selectedBlockClientId } = useSelect(
+		( select ) => {
+			const { getSelectedBlockClientId, getBlockName } = select(
+				'core/block-editor'
+			);
+			const _selectedBlockClientId = getSelectedBlockClientId();
+			const _selectedBlockName =
+				_selectedBlockClientId &&
+				getBlockName( _selectedBlockClientId );
+			return {
+				selectedBlockName: _selectedBlockName,
+				selectedBlockClientId: _selectedBlockClientId,
+			};
+		}
+	);
+
+	return (
+		<BlockVariationTransforms
+			blockName={ selectedBlockName }
+			selectedBlockClientId={ selectedBlockClientId }
+		/>
+	);
+};
 ```
 
 ### Props
+
+#### blockName
+
+The selected block's name.
+
+- Type: `string`
+
+
+#### selectedBlockClientId
+
+The selected block's client id.
+
+- Type: `string`
 
 ## Related components
 
