@@ -11,21 +11,27 @@ import { useSelect } from '@wordpress/data';
  * @return {Object} Information about the template, including title and description.
  */
 export default function useTemplateInfo( template ) {
+	const templateTitle = template?.title?.rendered;
+	const templateSlug = template?.slug;
+
 	const { defaultTitle, defaultDescription } = useSelect(
 		( select ) => {
 			const { title, description } = select(
 				'core/edit-site'
-			).getDefaultTemplateType( template?.slug );
+			).getDefaultTemplateType( templateSlug );
 			return { defaultTitle: title, defaultDescription: description };
 		},
-		[ template?.slug ]
+		[ templateSlug ]
 	);
 
 	if ( ! template ) {
 		return {};
 	}
 
-	const title = template?.title?.rendered || defaultTitle || template.slug;
+	const title =
+		templateTitle && templateTitle !== templateSlug
+			? templateTitle
+			: defaultTitle || templateSlug;
 	const description = template?.excerpt?.raw || defaultDescription;
 	return { title, description };
 }

@@ -80,9 +80,7 @@ export function receiveEntityRecords(
 ) {
 	// Auto drafts should not have titles, but some plugins rely on them so we can't filter this
 	// on the server.
-	// Exception: auto draft templates are automatically converted from files and can have titles,
-	// either default or provided through filters.
-	if ( kind === 'postType' && name !== 'wp_template' ) {
+	if ( kind === 'postType' ) {
 		records = castArray( records ).map( ( record ) =>
 			record.status === 'auto-draft' ? { ...record, title: '' } : record
 		);

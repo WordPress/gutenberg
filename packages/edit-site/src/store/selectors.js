@@ -193,3 +193,33 @@ export function getDefaultTemplateTypes( state ) {
 export function getDefaultTemplateType( state, slug ) {
 	return find( getDefaultTemplateTypes( state ), { slug } ) || {};
 }
+
+/**
+ * Given a template entity, return information about it which is ready to be
+ * rendered, such as the title and description.
+ *
+ * @param {Object} state Global application state.
+ * @param {Object} template The template for which we need information.
+ * @return {Object} Information about the template, including title and description.
+ */
+export function getTemplateInfo( state, template ) {
+	if ( ! template ) {
+		return {};
+	}
+
+	const templateTitle = template?.title?.rendered;
+	const templateSlug = template?.slug;
+
+	const {
+		title: defaultTitle,
+		description: defaultDescription,
+	} = getDefaultTemplateType( state, templateSlug );
+
+	const title =
+		templateTitle && templateTitle !== templateSlug
+			? templateTitle
+			: defaultTitle || templateSlug;
+	const description = template?.excerpt?.raw || defaultDescription;
+
+	return { title, description };
+}
