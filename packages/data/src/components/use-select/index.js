@@ -13,6 +13,7 @@ import {
 	useCallback,
 	useEffect,
 	useReducer,
+	useMemo,
 } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 
@@ -106,6 +107,11 @@ export default function useSelect( _mapSelect, deps ) {
 		[ registry ]
 	);
 
+	// Generate a "flag" for used in the effect dependency array.
+	// It's different than just using `mapSelect` since deps could be undefined,
+	// in that case, we would still want to memoize it.
+	const depsChangedFlag = useMemo( () => ( {} ), deps || [] );
+
 	let mapOutput;
 
 	try {
@@ -187,9 +193,13 @@ export default function useSelect( _mapSelect, deps ) {
 			}
 		};
 
-		const unsubscribers = listeningStores.current.map( ( storeKey ) =>
-			registry.stores[ storeKey ].subscribe( onChange )
-		);
+		const unsubscribers = listeningStores.current
+			// The registry could be a sub-registry that doesn't have the store directly.
+			// Skip subscribing to the store that doesn't exist.
+			.filter( ( storeKey ) => storeKey in registry.stores )
+			.map( ( storeKey ) =>
+				registry.stores[ storeKey ].subscribe( onChange )
+			);
 		const unsubscribe = () => {
 			unsubscribers.map( ( unsubscriber ) => unsubscriber() );
 		};
@@ -201,7 +211,7 @@ export default function useSelect( _mapSelect, deps ) {
 			// Reset the registered stores when mapSelect changes. In case it subscribes to different stores.
 			listeningStores.current = [];
 		};
-	}, [ registry, onStoreChange, mapSelect ] );
+	}, [ registry, onStoreChange, depsChangedFlag ] );
 
 	return mapOutput;
 }
