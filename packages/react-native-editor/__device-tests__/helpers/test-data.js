@@ -2,7 +2,7 @@ exports.shortText = `Rock music approaches at high velocity.`;
 
 exports.mediumText = `The finer continuum interprets the polynomial rabbit. When can the geology runs? An astronomer runs. Should a communist consent?`;
 
-exports.longText = `Beneath the busy continuum blinks the ineffective husband. Why a metric now outside the official subway? How can the prompt crop exhaust his tree 
+exports.longText = `Beneath the busy continuum blinks the ineffective husband. Why a metric now outside the official subway? How can the prompt crop exhaust his tree
 Does this chord crowd my emptied search? A theory bubbles under the cartoon. The discontinued speaker cracks every thick epic. extraordinary twin shifts behind
 The finer continuum interprets the polynomial rabbit. When can the geology runs? An astronomer runs. Should a communist consent?`;
 
@@ -102,4 +102,27 @@ exports.imageShorteHtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
 exports.unsupportedBlockHtml = `<!-- wp:audio -->
 <figure class="wp-block-audio"><audio controls src="https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav"></audio></figure>
 <!-- /wp:audio -->
+`;
+
+exports.columnsWithDifferentUnitsHtml = `<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"35%"} -->
+<div class="wp-block-column" style="flex-basis:35%"></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"55vw"} -->
+<div class="wp-block-column" style="flex-basis:55vw"></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"74rem"} -->
+<div class="wp-block-column" style="flex-basis:74rem"></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"74em"} -->
+<div class="wp-block-column" style="flex-basis:74em"></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"82px"} -->
+<div class="wp-block-column" style="flex-basis:82px"></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
 `;
