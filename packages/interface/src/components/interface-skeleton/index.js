@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { useEffect } from '@wordpress/element';
 import { navigateRegions } from '@wordpress/components';
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
 function useHTMLClass( className ) {
@@ -34,6 +35,8 @@ function InterfaceSkeleton( {
 	actions,
 	labels,
 	className,
+	// Deprecated props.
+	leftSidebar,
 } ) {
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
@@ -55,6 +58,15 @@ function InterfaceSkeleton( {
 	};
 
 	const mergedLabels = { ...defaultLabels, ...labels };
+
+	if ( leftSidebar ) {
+		deprecated( 'leftSidebar prop in InterfaceSkeleton component', {
+			alternative: 'secondarySidebar prop',
+			version: '9.7.0',
+			plugin: 'Gutenberg',
+		} );
+		secondarySidebar = leftSidebar;
+	}
 
 	return (
 		<div
