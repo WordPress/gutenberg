@@ -28,7 +28,7 @@
 /**
  * External dependencies
  */
-import { clamp, noop, throttle as _throttle } from 'lodash';
+import { clamp, noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -36,7 +36,7 @@ import { clamp, noop, throttle as _throttle } from 'lodash';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { TAB } from '@wordpress/keycodes';
-import { useInstanceId } from '@wordpress/compose';
+import { useThrottle, useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -56,9 +56,7 @@ export default function Saturation( { hsv, hsl, onChange = noop } ) {
 		left: `${ hsv.s }%`,
 	};
 
-	const throttle = _throttle( ( fn, data, e ) => {
-		fn( data, e );
-	}, 50 );
+	const throttledOnChange = useThrottle( onChange, 50 );
 
 	function saturate( amount = 0.01 ) {
 		const intSaturation = clamp(
@@ -96,7 +94,7 @@ export default function Saturation( { hsv, hsl, onChange = noop } ) {
 			{ hsl },
 			container.current
 		);
-		throttle( onChange, change, e );
+		throttledOnChange( change, e );
 	}
 
 	function handleMouseUp() {
@@ -119,7 +117,6 @@ export default function Saturation( { hsv, hsl, onChange = noop } ) {
 		}
 
 		return function cleanup() {
-			throttle.cancel();
 			ownerDocument.removeEventListener( 'mousemove', handleChange );
 			ownerDocument.removeEventListener( 'mouseup', handleMouseUp );
 		};

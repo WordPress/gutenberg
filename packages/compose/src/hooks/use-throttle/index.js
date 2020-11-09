@@ -16,6 +16,8 @@ import { useEffect } from '@wordpress/element';
  * render in components in `useCallback`.
  *
  * @param {...any} args Arguments passed to Lodash's `throttle`.
+ *
+ * @return {Function} returns the throttled function
  */
 export default function useThrottle( ...args ) {
 	const throttled = useMemoOne( () => throttle( ...args ), args );

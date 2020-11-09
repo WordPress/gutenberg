@@ -400,6 +400,10 @@ _Parameters_
 
 -   _args_ `...any`: Arguments passed to Lodash's `throttle`.
 
+_Returns_
+
+-   `Function`: returns the throttled function
+
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
 Returns true if the viewport matches the given query, or false otherwise.
