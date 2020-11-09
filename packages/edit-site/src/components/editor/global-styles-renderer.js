@@ -45,7 +45,7 @@ export default ( blockData, tree ) => {
 	 *
 	 * @return {Array} An array of style declarations.
 	 */
-	const getBlockStylesDeclarations = ( blockSupports, blockStyles ) => {
+	const getBlockStylesDeclarations = ( blockSupports, blockStyles = {} ) => {
 		const declarations = [];
 		Object.keys( STYLE_PROPERTY ).forEach( ( key ) => {
 			const cssProperty = key.startsWith( '--' ) ? key : kebabCase( key );
@@ -96,7 +96,7 @@ export default ( blockData, tree ) => {
 	 *
 	 * @return {Array} An array of style declarations.
 	 */
-	const getBlockPresetsDeclarations = ( blockPresets ) => {
+	const getBlockPresetsDeclarations = ( blockPresets = {} ) => {
 		return reduce(
 			PRESET_CATEGORIES,
 			( declarations, { path, key }, category ) => {
@@ -133,7 +133,7 @@ export default ( blockData, tree ) => {
 		return result;
 	};
 
-	const getCustomDeclarations = ( blockCustom ) => {
+	const getCustomDeclarations = ( blockCustom = {} ) => {
 		if ( Object.keys( blockCustom ).length === 0 ) {
 			return [];
 		}
@@ -154,22 +154,13 @@ export default ( blockData, tree ) => {
 	Object.keys( blockData ).forEach( ( context ) => {
 		const blockSelector = getBlockSelector( blockData[ context ].selector );
 
-		const blockStyles = tree?.[ context ]?.styles
-			? getBlockStylesDeclarations(
-					blockData[ context ].supports,
-					tree[ context ].styles
-			  )
-			: [];
-		const blockPresets = tree?.[ context ]?.presets
-			? getBlockPresetsDeclarations( tree[ context ].settings )
-			: [];
-		const blockCustom = tree?.[ context ]?.custom
-			? getCustomDeclarations( tree[ context ].settings.custom )
-			: [];
 		const blockDeclarations = [
-			...blockStyles,
-			...blockPresets,
-			...blockCustom,
+			...getBlockStylesDeclarations(
+				blockData[ context ].supports,
+				tree?.[ context ]?.styles
+			),
+			...getBlockPresetsDeclarations( tree?.[ context ]?.settings ),
+			...getCustomDeclarations( tree?.[ context ]?.settings?.custom ),
 		];
 
 		styles.push(
