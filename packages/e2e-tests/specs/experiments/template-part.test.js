@@ -131,7 +131,9 @@ describe( 'Template Part', () => {
 			// Select the block.
 			const allBlocks = await getAllBlocks();
 			const paragraphBlock = allBlocks.find(
-				( block ) => block.name === 'core/paragraph'
+				( block ) =>
+					block.name === 'core/paragraph' &&
+					block.attributes.content === 'Some block...'
 			);
 			await selectBlockByClientId( paragraphBlock.clientId );
 
