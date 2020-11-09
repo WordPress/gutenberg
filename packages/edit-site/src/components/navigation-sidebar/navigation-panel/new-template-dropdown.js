@@ -49,7 +49,8 @@ export default function NewTemplateDropdown() {
 		addTemplate( {
 			content: closestAvailableTemplate.content.raw,
 			excerpt: description,
-			slug,
+			// Slugs need to be strings, so this is for template `404`
+			slug: slug.toString(),
 			status: 'draft',
 			title,
 		} );
