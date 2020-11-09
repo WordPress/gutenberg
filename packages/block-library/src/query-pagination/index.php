@@ -15,6 +15,25 @@
  * @return string Returns the pagination for the query.
  */
 function render_block_core_query_pagination( $attributes, $content, $block ) {
+	if ( isset( $block->context['queryId'] ) ) {
+		$html = render_block_core_query_pagination_selected_query( $attributes, $content, $block );
+	} else {
+		$html = render_block_core_query_pagination_main_query( $attributes, $content, $block );
+	}
+	return $html;
+}
+
+/**
+ * Renders the `core/query-pagination` block on the server for the selected query.
+ *
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
+ *
+ * @return string Returns the pagination for the query.
+ */
+function render_block_core_query_pagination_selected_query( $attributes, $content, $block ) {
+
 	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : filter_var( $_GET[ $page_key ], FILTER_VALIDATE_INT );
 
@@ -34,6 +53,22 @@ function render_block_core_query_pagination( $attributes, $content, $block ) {
 		);
 	}
 	return $content;
+}
+
+/**
+ * Renders the `core/query-pagination` block on the server for the main query.
+ *
+ * @param array    $attributes Block attributes.
+ * @param string   $content    Block default content.
+ * @param WP_Block $block      Block instance.
+ *
+ * @return string Returns the pagination for the query.
+ */
+function render_block_core_query_pagination_main_query( $attributes, $content, $block ) {
+	$html = '<div class="wp-block-query-pagination">';
+	$html .= paginate_links( [ 'type' => 'list'] );
+	$html .= "</div>";
+	return $html;
 }
 
 /**
