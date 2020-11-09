@@ -28,11 +28,12 @@ function AngleCircle( { value, onChange, ...props } ) {
 
 	const changeAngleToPosition = ( event ) => {
 		const { x: centerX, y: centerY } = angleCircleCenter.current;
+		const { ownerDocument } = angleCircleRef.current;
 		// Prevent (drag) mouse events from selecting and accidentally
 		// triggering actions from other elements.
 		event.preventDefault();
 		// Ensure the input isn't focused as preventDefault would leave it
-		document.activeElement.blur();
+		ownerDocument.activeElement.blur();
 		onChange( getAngle( centerX, centerY, event.clientX, event.clientY ) );
 	};
 

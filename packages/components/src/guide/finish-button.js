@@ -8,28 +8,19 @@ import { useRef, useLayoutEffect } from '@wordpress/element';
  */
 import Button from '../button';
 
-export default function FinishButton( { className, onClick, children } ) {
-	const button = useRef( null );
+export default function FinishButton( props ) {
+	const ref = useRef();
 
 	// Focus the button on mount if nothing else is focused. This prevents a
 	// focus loss when the 'Next' button is swapped out.
 	useLayoutEffect( () => {
-		if (
-			! document.activeElement ||
-			document.activeElement === document.body
-		) {
-			button.current.focus();
-		}
-	}, [ button ] );
+		const { ownerDocument } = ref.current;
+		const { activeElement, body } = ownerDocument;
 
-	return (
-		<Button
-			ref={ button }
-			className={ className }
-			isPrimary
-			onClick={ onClick }
-		>
-			{ children }
-		</Button>
-	);
+		if ( ! activeElement || activeElement === body ) {
+			ref.current.focus();
+		}
+	}, [] );
+
+	return <Button { ...props } ref={ ref } />;
 }

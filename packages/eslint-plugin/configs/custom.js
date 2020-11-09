@@ -4,7 +4,7 @@ module.exports = {
 		'@wordpress/no-unused-vars-before-return': 'error',
 		'@wordpress/no-base-control-with-label-without-id': 'error',
 		'@wordpress/no-unguarded-get-range-at': 'error',
-		'@wordpress/no-global-active-element': 'warn',
+		'@wordpress/no-global-active-element': 'error',
 		'@wordpress/no-global-get-selection': 'error',
 	},
 	overrides: [
