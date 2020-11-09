@@ -103,16 +103,12 @@ function PostExcerptEditor( {
 						! showMoreOnNewLine &&
 						'wp-block-post-excerpt__excerpt is-inline'
 					}
-					placeholder={ postContentExcerpt }
 					value={
 						excerpt ||
-						( isSelected
-							? ''
-							: postContentExcerpt ||
-							  __( 'No post excerpt found' ) )
+						postContentExcerpt ||
+						( isSelected ? '' : __( 'No post excerpt found' ) )
 					}
 					onChange={ setExcerpt }
-					keepPlaceholderOnFocus
 				/>
 				{ ! showMoreOnNewLine && ' ' }
 				{ showMoreOnNewLine ? (

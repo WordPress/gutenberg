@@ -20,7 +20,6 @@ import { defaultColumnsNumber } from './shared';
 export const Gallery = ( props ) => {
 	const {
 		attributes,
-		className,
 		isSelected,
 		setAttributes,
 		selectedImage,
@@ -33,6 +32,7 @@ export const Gallery = ( props ) => {
 		onSetImageAttributes,
 		onFocusGalleryCaption,
 		insertBlocksAfter,
+		blockProps,
 	} = props;
 
 	const {
@@ -45,7 +45,8 @@ export const Gallery = ( props ) => {
 
 	return (
 		<figure
-			className={ classnames( className, {
+			{ ...blockProps }
+			className={ classnames( blockProps.className, {
 				[ `align${ align }` ]: align,
 				[ `columns-${ columns }` ]: columns,
 				'is-cropped': imageCrop,

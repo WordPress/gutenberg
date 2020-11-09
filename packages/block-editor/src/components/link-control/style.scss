@@ -59,6 +59,10 @@ $block-editor-link-control-number-of-actions: 1;
 	right: $grid-unit-20 + 1px + min($grid-unit-10, ( 40px - $button-size ) / 2);
 }
 
+.components-button .block-editor-link-control__search-submit .has-icon {
+	margin: -1px;
+}
+
 .block-editor-link-control__search-results-wrapper {
 	position: relative;
 	margin-top: -$grid-unit-20 + 1px;
@@ -78,21 +82,19 @@ $block-editor-link-control-number-of-actions: 1;
 		height: $grid-unit-20/2;
 		top: 0;
 		bottom: auto;
-		background: linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 100%);
 	}
 
 	&::after {
 		height: $grid-unit-20;
 		bottom: 0;
 		top: auto;
-		background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 1) 100%);
 	}
 }
 
 .block-editor-link-control__search-results-label {
-	padding: 15px 30px 0 30px;
+	padding: $grid-unit-20 $grid-unit-40 0;
 	display: block;
-	font-size: 1.1em;
+	font-weight: 600;
 }
 
 .block-editor-link-control__search-results {
@@ -116,7 +118,7 @@ $block-editor-link-control-number-of-actions: 1;
 	width: 100%;
 	border: none;
 	text-align: left;
-	padding: 10px 15px;
+	padding: $grid-unit-15 $grid-unit-20;
 	border-radius: 5px;
 	height: auto;
 
@@ -211,9 +213,8 @@ $block-editor-link-control-number-of-actions: 1;
 
 // Separate Create button when following other suggestions.
 .components-button + .block-editor-link-control__search-create {
-	margin-top: 20px;
 	overflow: visible;
-	padding: 12px 15px;
+	padding: $grid-unit-15 $grid-unit-20;
 
 	// Create fake border. We cannot use border because the button has a border
 	// radius applied to it
@@ -224,7 +225,6 @@ $block-editor-link-control-number-of-actions: 1;
 		left: 0;
 		display: block;
 		width: 100%;
-		border-top: 1px solid $gray-300;
 	}
 }
 

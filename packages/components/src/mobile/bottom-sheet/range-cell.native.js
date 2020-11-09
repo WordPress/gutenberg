@@ -217,6 +217,7 @@ class BottomSheetRangeCell extends Component {
 				activeOpacity={ 1 }
 				accessible={ accessible }
 				onPress={ this.onCellPress }
+				valueStyle={ styles.valueStyle }
 				accessibilityLabel={ accessibilityLabel }
 				accessibilityHint={
 					/* translators: accessibility text (hint for focusing a slider) */

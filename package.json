@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "9.2.2",
+	"version": "9.3.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -267,7 +267,7 @@
 		"playground:build": "npm run storybook:build",
 		"playground:dev": "echo \"Please use storybook:dev instead.\"",
 		"env": "wp-scripts env",
-		"wp-env": "packages/env/bin/wp-env"
+		"wp-env": "wp-env"
 	},
 	"husky": {
 		"hooks": {

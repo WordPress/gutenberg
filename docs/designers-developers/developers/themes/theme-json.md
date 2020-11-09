@@ -320,7 +320,7 @@ These are the current typography properties supported by blocks:
 
 | Context | Font Size | Line Height |
 | --- | --- | --- |
-| Global | Yes | - |
+| Global | Yes | Yes |
 | Columns | - | - |
 | Group | - | - |
 | Heading [1] | Yes | Yes |

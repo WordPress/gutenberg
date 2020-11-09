@@ -93,15 +93,18 @@ if ( ! class_exists( 'WP_Block' ) ) {
 if ( ! class_exists( 'WP_Block_List' ) ) {
 	require dirname( __FILE__ ) . '/class-wp-block-list.php';
 }
+
 if ( ! class_exists( 'WP_Widget_Block' ) ) {
 	require_once dirname( __FILE__ ) . '/class-wp-widget-block.php';
 }
+
 require_once dirname( __FILE__ ) . '/widgets-page.php';
 
 require dirname( __FILE__ ) . '/compat.php';
 require dirname( __FILE__ ) . '/utils.php';
 
 require dirname( __FILE__ ) . '/full-site-editing.php';
+require dirname( __FILE__ ) . '/templates-sync.php';
 require dirname( __FILE__ ) . '/templates.php';
 require dirname( __FILE__ ) . '/template-parts.php';
 require dirname( __FILE__ ) . '/template-loader.php';

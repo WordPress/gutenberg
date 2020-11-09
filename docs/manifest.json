@@ -78,6 +78,12 @@
 		"parent": "architecture"
 	},
 	{
+		"title": "FseTemplates",
+		"slug": "fse-templates",
+		"markdown_source": "../docs/architecture/fse-templates.md",
+		"parent": "architecture"
+	},
+	{
 		"title": "Developer Documentation",
 		"slug": "developers",
 		"markdown_source": "../docs/designers-developers/developers/README.md",

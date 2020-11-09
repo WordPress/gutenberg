@@ -8,3 +8,9 @@
 	padding-right: $block-edge-to-content;
 	padding-top: $block-edge-to-content/2;
 }
+
+.content {
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
+	padding-bottom: 0;
+}
