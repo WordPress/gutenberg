@@ -126,7 +126,7 @@ function Editor() {
 					const record = getEditedEntityRecord( kind, name, key );
 
 					if ( 'postType' === kind && name === 'wp_template' ) {
-						const { title } = getTemplateInfo( record.slug );
+						const { title } = getTemplateInfo( record );
 						return editEntityRecord( kind, name, key, {
 							status: 'publish',
 							title,
