@@ -16,8 +16,10 @@ export default function save( { attributes } ) {
 	} );
 
 	let style;
+
 	if ( width ) {
-		style = { flexBasis: width };
+		// Numbers are handled for backward compatibility as they can be still provided with templates.
+		style = { flexBasis: Number.isFinite( width ) ? width + '%' : width };
 	}
 
 	return (
