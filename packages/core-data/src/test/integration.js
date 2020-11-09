@@ -9,10 +9,14 @@ import { createRegistry, controls } from '@wordpress/data';
 import { receiveEntityRecords } from '../actions';
 import * as selectors from '../selectors';
 import * as resolvers from '../resolvers';
+import * as locksActions from '../locks/actions';
+import * as locksSelectors from '../locks/selectors';
 
 // Mock to prevent calling window.fetch in test environment
 jest.mock( '@wordpress/data-controls', () => {
+	const dataControls = jest.requireActual( '@wordpress/data-controls' );
 	return {
+		...dataControls,
 		apiFetch: jest.fn(),
 	};
 } );
@@ -27,13 +31,17 @@ describe( 'receiveEntityRecord', () => {
 			},
 		};
 		registry.registerStore( 'core', {
+			actions: {
+				...locksActions,
+			},
 			selectors: {
 				getEntitiesByKind: () => [
 					{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
 					{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
 				],
+				...locksSelectors,
 			},
-			reducer: () => ( {} ),
+			reducer: () => ( { locks: { requests: [], children: {} } } ),
 		} );
 		registry.registerStore( 'test/resolution', {
 			actions: {
