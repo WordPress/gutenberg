@@ -6,14 +6,14 @@ import { size, map, without, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createBlock, store as blocksStore } from '@wordpress/blocks';
+import { parse, store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	EditorProvider,
 	ErrorBoundary,
 	PostLockedModal,
 } from '@wordpress/editor';
-import { StrictMode, useMemo } from '@wordpress/element';
+import { StrictMode, useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	KeyboardShortcuts,
 	SlotFillProvider,
@@ -27,6 +27,25 @@ import preventEventDiscovery from './prevent-event-discovery';
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import EditPostSettings from './components/edit-post-settings';
+import findTemplate from './utils/find-template';
+
+function useTemplate( link ) {
+	const getEntityRecords = useSelect(
+		( select ) => select( 'core' ).getEntityRecords,
+		[]
+	);
+	const [ template, setTemplate ] = useState( null, getEntityRecords );
+
+	useEffect( () => {
+		setTemplate( undefined );
+		if ( ! link ) {
+			return;
+		}
+		findTemplate( link ).then( setTemplate );
+	}, [ link ] );
+
+	return template;
+}
 
 function Editor( {
 	postId,
@@ -47,6 +66,7 @@ function Editor( {
 		blockTypes,
 		__experimentalLocalAutosaveInterval,
 		keepCaretInsideBlock,
+		templateZoomOut,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -73,6 +93,7 @@ function Editor( {
 				'localAutosaveInterval'
 			),
 			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
+			templateZoomOut: isFeatureActive( 'templateZoomOut' ),
 		};
 	} );
 
@@ -134,13 +155,10 @@ function Editor( {
 		keepCaretInsideBlock,
 	] );
 
-	const template = useMemo(
-		() => [
-			createBlock( 'core/post-title' ),
-			createBlock( 'core/post-content' ),
-		],
-		[]
-	);
+	const template = useTemplate( post && post.link );
+	const templateContent = useMemo( () => {
+		return template ? parse( template.post_content ) : [];
+	}, [ template ] );
 
 	return (
 		<StrictMode>
@@ -152,7 +170,9 @@ function Editor( {
 							post={ post }
 							initialEdits={ initialEdits }
 							useSubRegistry={ false }
-							__unstableTemplate={ template }
+							__unstableTemplate={
+								templateZoomOut ? templateContent : undefined
+							}
 							{ ...props }
 						>
 							<ErrorBoundary onError={ onError }>

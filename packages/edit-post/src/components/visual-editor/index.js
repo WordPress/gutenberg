@@ -28,8 +28,14 @@ import { useSelect } from '@wordpress/data';
 
 export default function VisualEditor() {
 	const ref = useRef();
-	const deviceType = useSelect( ( select ) => {
-		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
+	const { deviceType, templateZoomOut } = useSelect( ( select ) => {
+		const { isFeatureActive, __experimentalGetPreviewDeviceType } = select(
+			'core/edit-post'
+		);
+		return {
+			deviceType: __experimentalGetPreviewDeviceType(),
+			templateZoomOut: isFeatureActive( 'templateZoomOut' ),
+		};
 	}, [] );
 	const hasMetaBoxes = useSelect(
 		( select ) => select( 'core/edit-post' ).hasMetaBoxes(),
@@ -61,9 +67,11 @@ export default function VisualEditor() {
 				style={ resizedCanvasStyles || desktopCanvasStyles }
 			>
 				<WritingFlow>
-					<div className="edit-post-visual-editor__post-title-wrapper">
-						<PostTitle />
-					</div>
+					{ ! templateZoomOut && (
+						<div className="edit-post-visual-editor__post-title-wrapper">
+							<PostTitle />
+						</div>
+					) }
 					<BlockList />
 				</WritingFlow>
 			</div>

@@ -25,6 +25,11 @@ import {
 import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import TemplateZoomToggle from '../template-zoom-toggle';
+
 function HeaderToolbar() {
 	const inserterButton = useRef();
 	const { setIsInserterOpened } = useDispatch( 'core/edit-post' );
@@ -204,6 +209,7 @@ characters. */
 						) }
 					</DropdownMenu>
 				) }
+				<TemplateZoomToggle />
 			</div>
 
 			{ displayBlockToolbar && (
