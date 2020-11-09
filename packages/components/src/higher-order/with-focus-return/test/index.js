@@ -24,6 +24,14 @@ class Test extends Component {
 	}
 }
 
+const options = {
+	createNodeMock() {
+		return {
+			ownerDocument: {},
+		};
+	},
+};
+
 describe( 'withFocusReturn()', () => {
 	describe( 'testing rendering and focus handling', () => {
 		const Composite = withFocusReturn( Test );
@@ -41,7 +49,7 @@ describe( 'withFocusReturn()', () => {
 		} );
 
 		it( 'should render a basic Test component inside the HOC', () => {
-			const renderedComposite = renderer.create( <Composite /> );
+			const renderedComposite = renderer.create( <Composite />, options );
 			const wrappedElement = renderedComposite.root.findByType( Test );
 			const wrappedElementShallow = wrappedElement.children[ 0 ];
 			expect( wrappedElementShallow.props.className ).toBe( 'test' );
@@ -53,7 +61,8 @@ describe( 'withFocusReturn()', () => {
 
 		it( 'should pass own props through to the wrapped element', () => {
 			const renderedComposite = renderer.create(
-				<Composite test="test" />
+				<Composite test="test" />,
+				options
 			);
 			const wrappedElement = renderedComposite.root.findByType( Test );
 			// Ensure that the wrapped Test element has the appropriate props.
@@ -62,7 +71,8 @@ describe( 'withFocusReturn()', () => {
 
 		it( 'should not pass any withFocusReturn context props through to the wrapped element', () => {
 			const renderedComposite = renderer.create(
-				<Composite test="test" />
+				<Composite test="test" />,
+				options
 			);
 			const wrappedElement = renderedComposite.root.findByType( Test );
 			// Ensure that the wrapped Test element has the appropriate props.
@@ -70,16 +80,11 @@ describe( 'withFocusReturn()', () => {
 		} );
 
 		it( 'should not switch focus back to the bound focus element', () => {
-			const { unmount } = render(
-				<Provider>
-					<Composite />
-				</Provider>,
-				{
-					container: document.body.appendChild(
-						document.createElement( 'div' )
-					),
-				}
-			);
+			const { unmount } = render( <Composite />, {
+				container: document.body.appendChild(
+					document.createElement( 'div' )
+				),
+			} );
 
 			// Change activeElement.
 			switchFocusTo.focus();
@@ -91,16 +96,11 @@ describe( 'withFocusReturn()', () => {
 		} );
 
 		it( 'should switch focus back when unmounted while having focus', () => {
-			const { container, unmount } = render(
-				<Provider>
-					<Composite />
-				</Provider>,
-				{
-					container: document.body.appendChild(
-						document.createElement( 'div' )
-					),
-				}
-			);
+			const { container, unmount } = render( <Composite />, {
+				container: document.body.appendChild(
+					document.createElement( 'div' )
+				),
+			} );
 
 			const textarea = container.querySelector( 'textarea' );
 			textarea.focus();

@@ -3,7 +3,7 @@
  */
 import { createContext, useLayoutEffect, useRef } from '@wordpress/element';
 
-const context = createContext( [] );
+const context = createContext();
 
 context.Provider.displayName = 'FocusReturnProvider';
 context.Consumer.displayName = 'FocusReturnConsumer';
@@ -48,11 +48,11 @@ export function Provider( { children, className } ) {
 	}
 
 	return (
-		<context.Provider value={ focusHistory.current }>
-			<div ref={ ref } onFocus={ onFocus } className={ className }>
+		<div ref={ ref } onFocus={ onFocus } className={ className }>
+			<context.Provider value={ focusHistory.current }>
 				{ children }
-			</div>
-		</context.Provider>
+			</context.Provider>
+		</div>
 	);
 }
 

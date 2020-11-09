@@ -55,16 +55,16 @@ function withFocusReturn( options ) {
 		const focusHistory = useContext( context );
 
 		useEffect( () => {
+			const { ownerDocument } = ref.current;
+
 			// The focus history is a mutating array. Take a snapshot on mount
 			// to use later on unmount.
-			stack.current = [ ...focusHistory ];
+			stack.current = focusHistory
+				? [ ...focusHistory ]
+				: [ ownerDocument.activeElement ];
 
 			return () => {
-				const containsFocus = ref.current.contains(
-					ref.current.ownerDocument.activeElement
-				);
-
-				if ( ! containsFocus ) {
+				if ( ! ref.current.contains( ownerDocument.activeElement ) ) {
 					return;
 				}
 
@@ -80,8 +80,6 @@ function withFocusReturn( options ) {
 				let candidate;
 
 				while ( ( candidate = stack.current.pop() ) ) {
-					const { ownerDocument } = candidate;
-
 					if ( ownerDocument.body.contains( candidate ) ) {
 						candidate.focus();
 						return;
