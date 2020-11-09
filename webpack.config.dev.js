@@ -43,6 +43,7 @@ module.exports = {
 			// Requests come from the WP port.
 			'Access-Control-Allow-Origin': '*',
 		},
+		port: 8081,
 	},
 	module: {
 		rules,
