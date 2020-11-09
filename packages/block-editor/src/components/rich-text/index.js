@@ -632,6 +632,7 @@ function RichTextWrapper(
 						record={ value }
 						onChange={ onChange }
 						isSelected={ nestedIsSelected }
+						contentRef={ ref }
 					>
 						{ ( { listBoxId, activeId, onKeyDown } ) => (
 							<TagName
