@@ -29,13 +29,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { debounce, noop, partial } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
-
+import { useDebounce } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -129,6 +129,9 @@ export default function ColorPicker( {
 		draftRgb: initialColor.rgb,
 		draftHsl: initialColor.hsl,
 	} );
+
+	const debouncedOnChangeComplete = useDebounce( onChangeComplete, 100 );
+
 	const { hex, hsl, hsv, rgb, draftHex, draftHsl, draftRgb } = colors;
 
 	const classes = classnames( className, {
@@ -147,7 +150,7 @@ export default function ColorPicker( {
 				draftRgb: newColors.rgb,
 			} );
 
-			debounce( partial( onChangeComplete, newColors ), 100 );
+			debouncedOnChangeComplete( newColors );
 		}
 	}
 
