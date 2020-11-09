@@ -74,19 +74,15 @@ export default function Hue( { hsl, onChange = noop } ) {
 	useEffect( () => {
 		const { ownerDocument } = container.current;
 
-		function unbindEventListeners() {
-			ownerDocument.removeEventListener( 'mousemove', handleChange );
-			ownerDocument.removeEventListener( 'mouseup', handleMouseUp );
-		}
-
 		if ( mouseDown ) {
 			ownerDocument.addEventListener( 'mousemove', handleChange );
 			ownerDocument.addEventListener( 'mouseup', handleMouseUp );
-		} else {
-			unbindEventListeners();
 		}
 
-		return unbindEventListeners;
+		return function cleanup() {
+			ownerDocument.removeEventListener( 'mousemove', handleChange );
+			ownerDocument.removeEventListener( 'mouseup', handleMouseUp );
+		};
 	}, [ mouseDown ] );
 
 	function increase( amount = 1 ) {
