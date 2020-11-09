@@ -32,7 +32,7 @@ function __experimentalBlockVariationTransforms( {
 		{ value: '', label: __( 'Select a variation' ) },
 		...variations.map( ( variation ) => ( {
 			value: variation.name,
-			label: variation.title || 'no title??? change me',
+			label: variation.title,
 		} ) ),
 	];
 	const onSelectVariation = ( variationName ) => {
