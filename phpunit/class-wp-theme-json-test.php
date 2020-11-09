@@ -173,7 +173,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 							'text' => 'value',
 							'palette' => array(
 								array(
-									'slug' => 'my-color',
+									'slug'  => 'grey',
 									'color' => 'grey',
 								)
 							)
@@ -184,7 +184,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 					'styles' => array(
 						'color' => array(
 							'link'       => '#111',
-							'text'       => '#222',
+							'text'       => 'var:preset|color|grey',
 						),
 						'misc'  => 'value'
 					),
@@ -194,7 +194,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$result = $theme_json->get_stylesheet();
-		$stylesheet = ':root{--wp--style--color--link: #111;color: #222;--wp--preset--color--my-color: grey;}:root.has-my-color-color{color: grey;}:root.has-my-color-background-color{background-color: grey;}';
+		$stylesheet = ':root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);--wp--preset--color--grey: grey;}:root.has-grey-color{color: grey;}:root.has-grey-background-color{background-color: grey;}';
 
 		$this->assertEquals( $stylesheet, $result );
 	}
@@ -292,7 +292,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			'core/para' => array(
 				'styles' => array(
 					'typography' => array(
-					'lineHeight' => '12',
+						'lineHeight' => '12',
 					),
 				),
 			),

@@ -483,6 +483,32 @@ class WP_Theme_JSON {
 		return $array;
 	}
 
+	private function get_property_value( $styles, $path ) {
+		$value = $this->get_from_path( $styles, $path, '' );
+
+		if ( '' === $value ) {
+			return $value;
+		}
+
+		// In some cases, a CSS Custom Property with name
+		// "--wp--preset--color--secondary" will be stored as
+		// "var:preset|color|secondary".
+		$prefix     = 'var:';
+		$prefix_len = strlen( $prefix );
+		$token_in   = '|';
+		$token_out  = '--';
+		if ( 0 === strncmp( $value, $prefix, $prefix_len ) ) {
+			$unwrapped_name = str_replace(
+				$token_in,
+				$token_out,
+				substr( $value, $prefix_len )
+			);
+			$value = "var(--wp--$unwrapped_name)";
+		}
+
+		return $value;
+	}
+
 	private function compute_style_properties( &$declarations, $context ) {
 		if (
 			! array_key_exists( 'supports', $context ) ||
@@ -498,11 +524,11 @@ class WP_Theme_JSON {
 				continue;
 			}
 
-			$value = $this->get_from_path( $context['styles'], $metadata['theme_json'], '' );
+			$value = $this->get_property_value( $context['styles'], $metadata['theme_json'] );
 			if ( ! empty( $value ) ) {
 				$declarations[] = array(
 					'name'  => $metadata['property'],
-					'value' => $value
+					'value' => $value,
 				);
 			}
 		}
