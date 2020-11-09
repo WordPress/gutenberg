@@ -26,7 +26,10 @@ import {
 } from './actions';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
-import { __unstableAcquireStoreLock, __unstableReleaseStoreLock } from './locks';
+import {
+	__unstableAcquireStoreLock,
+	__unstableReleaseStoreLock,
+} from './locks';
 
 /**
  * Requests authors from the REST API.

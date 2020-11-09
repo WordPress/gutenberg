@@ -5,7 +5,9 @@ import { awaitPromise } from '@wordpress/data-controls';
 import { controls } from '@wordpress/data';
 
 export function* __unstableAcquireStoreLock( store, path, { exclusive } ) {
-	const promise = yield* __unstableEnqueueLockRequest( store, path, { exclusive } );
+	const promise = yield* __unstableEnqueueLockRequest( store, path, {
+		exclusive,
+	} );
 	yield* __unstableProcessPendingLockRequests();
 	return yield awaitPromise( promise );
 }

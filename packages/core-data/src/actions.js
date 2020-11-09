@@ -16,7 +16,10 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
-import { __unstableAcquireStoreLock, __unstableReleaseStoreLock } from './locks';
+import {
+	__unstableAcquireStoreLock,
+	__unstableReleaseStoreLock,
+} from './locks';
 
 /**
  * Returns an action object used in signalling that authors have been received.

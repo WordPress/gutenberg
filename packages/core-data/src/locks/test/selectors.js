@@ -6,7 +6,10 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { __unstableGetPendingLockRequests, __unstableIsLockAvailable } from '../selectors';
+import {
+	__unstableGetPendingLockRequests,
+	__unstableIsLockAvailable,
+} from '../selectors';
 import { deepCopyLocksTreePath, getNode } from '../utils';
 
 describe( '__unstableGetPendingLockRequests', () => {
@@ -17,7 +20,11 @@ describe( '__unstableGetPendingLockRequests', () => {
 			},
 		} );
 
-		expect( __unstableGetPendingLockRequests( state ) ).toEqual( [ 1, 2, 3 ] );
+		expect( __unstableGetPendingLockRequests( state ) ).toEqual( [
+			1,
+			2,
+			3,
+		] );
 	} );
 } );
 
@@ -34,7 +41,9 @@ describe( '__unstableIsLockAvailable', () => {
 			} );
 
 			expect(
-				__unstableIsLockAvailable( state, 'core', [], { exclusive: true } )
+				__unstableIsLockAvailable( state, 'core', [], {
+					exclusive: true,
+				} )
 			).toBe( true );
 		} );
 		it( 'returns false if lock is not available', () => {
@@ -48,7 +57,9 @@ describe( '__unstableIsLockAvailable', () => {
 			} );
 
 			expect(
-				__unstableIsLockAvailable( state, 'core', [], { exclusive: true } )
+				__unstableIsLockAvailable( state, 'core', [], {
+					exclusive: true,
+				} )
 			).toBe( false );
 		} );
 	} );
