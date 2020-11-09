@@ -22,25 +22,19 @@ import {
 } from '@wordpress/block-editor';
 
 const MyBlockVariationTransforms = () => {
-	const { selectedBlockName, selectedBlockClientId } = useSelect(
+	const { selectedBlockClientId } = useSelect(
 		( select ) => {
-			const { getSelectedBlockClientId, getBlockName } = select(
+			const { getSelectedBlockClientId } = select(
 				'core/block-editor'
 			);
-			const _selectedBlockClientId = getSelectedBlockClientId();
-			const _selectedBlockName =
-				_selectedBlockClientId &&
-				getBlockName( _selectedBlockClientId );
 			return {
-				selectedBlockName: _selectedBlockName,
-				selectedBlockClientId: _selectedBlockClientId,
+				selectedBlockClientId: getSelectedBlockClientId(),
 			};
 		}
 	);
 
 	return (
 		<BlockVariationTransforms
-			blockName={ selectedBlockName }
 			selectedBlockClientId={ selectedBlockClientId }
 		/>
 	);
@@ -48,13 +42,6 @@ const MyBlockVariationTransforms = () => {
 ```
 
 ### Props
-
-#### blockName
-
-The selected block's name.
-
-- Type: `string`
-
 
 #### selectedBlockClientId
 

@@ -6,27 +6,23 @@ import { SelectControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 
-function __experimentalBlockVariationTransforms( {
-	blockName,
-	selectedBlockClientId,
-} ) {
+function __experimentalBlockVariationTransforms( { selectedBlockClientId } ) {
 	const [ variationsSelectValue, setVariationsSelectValue ] = useState( '' );
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 	const { variations } = useSelect(
 		( select ) => {
 			const { getBlockVariations } = select( 'core/blocks' );
-			const scope = 'transform';
-			const _variations = getBlockVariations(
-				blockName,
-				scope
-			).filter( ( variation ) => variation.scope?.includes( scope ) );
+			const { getBlockName } = select( 'core/block-editor' );
+			const blockName =
+				selectedBlockClientId && getBlockName( selectedBlockClientId );
 			return {
-				variations: _variations,
+				variations:
+					blockName && getBlockVariations( blockName, 'transform' ),
 			};
 		},
-		[ blockName ]
+		[ selectedBlockClientId ]
 	);
-	if ( ! variations.length ) return null;
+	if ( ! variations?.length ) return null;
 
 	const selectOptions = [
 		{ value: '', label: __( 'Select a variation' ) },

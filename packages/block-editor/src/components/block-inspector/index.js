@@ -68,7 +68,6 @@ const BlockInspector = ( {
 		<div className="block-editor-block-inspector">
 			<BlockCard blockType={ blockType } />
 			<BlockVariationTransforms
-				blockName={ selectedBlockName }
 				selectedBlockClientId={ selectedBlockClientId }
 			/>
 			{ hasBlockStyles && (
