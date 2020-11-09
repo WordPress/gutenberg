@@ -144,133 +144,133 @@ export default function Inputs( {
 		} );
 	}
 
-	function renderFields() {
-		if ( view === 'hex' ) {
-			return (
+	let fields;
+
+	if ( view === 'hex' ) {
+		fields = (
+			<div className="components-color-picker__inputs-fields">
+				<Input
+					source={ view }
+					label={ __( 'Color value in hexadecimal' ) }
+					valueKey="hex"
+					value={ hex }
+					onChange={ handleChange }
+				/>
+			</div>
+		);
+	} else if ( view === 'rgb' ) {
+		const legend = disableAlpha
+			? __( 'Color value in RGB' )
+			: __( 'Color value in RGBA' );
+		fields = (
+			<fieldset>
+				<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
 				<div className="components-color-picker__inputs-fields">
 					<Input
 						source={ view }
-						label={ __( 'Color value in hexadecimal' ) }
-						valueKey="hex"
-						value={ hex }
+						label="r"
+						valueKey="r"
+						value={ rgb.r }
 						onChange={ handleChange }
+						type="number"
+						min="0"
+						max="255"
 					/>
+					<Input
+						source={ view }
+						label="g"
+						valueKey="g"
+						value={ rgb.g }
+						onChange={ handleChange }
+						type="number"
+						min="0"
+						max="255"
+					/>
+					<Input
+						source={ view }
+						label="b"
+						valueKey="b"
+						value={ rgb.b }
+						onChange={ handleChange }
+						type="number"
+						min="0"
+						max="255"
+					/>
+					{ disableAlpha ? null : (
+						<Input
+							source={ view }
+							label="a"
+							valueKey="a"
+							value={ rgb.a }
+							onChange={ handleChange }
+							type="number"
+							min="0"
+							max="1"
+							step="0.01"
+						/>
+					) }
 				</div>
-			);
-		} else if ( view === 'rgb' ) {
-			const legend = disableAlpha
-				? __( 'Color value in RGB' )
-				: __( 'Color value in RGBA' );
-			return (
-				<fieldset>
-					<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
-					<div className="components-color-picker__inputs-fields">
+			</fieldset>
+		);
+	} else if ( view === 'hsl' ) {
+		const legend = disableAlpha
+			? __( 'Color value in HSL' )
+			: __( 'Color value in HSLA' );
+		fields = (
+			<fieldset>
+				<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
+				<div className="components-color-picker__inputs-fields">
+					<Input
+						source={ view }
+						label="h"
+						valueKey="h"
+						value={ hsl.h }
+						onChange={ handleChange }
+						type="number"
+						min="0"
+						max="359"
+					/>
+					<Input
+						source={ view }
+						label="s"
+						valueKey="s"
+						value={ hsl.s }
+						onChange={ handleChange }
+						type="number"
+						min="0"
+						max="100"
+					/>
+					<Input
+						source={ view }
+						label="l"
+						valueKey="l"
+						value={ hsl.l }
+						onChange={ handleChange }
+						type="number"
+						min="0"
+						max="100"
+					/>
+					{ disableAlpha ? null : (
 						<Input
 							source={ view }
-							label="r"
-							valueKey="r"
-							value={ rgb.r }
+							label="a"
+							valueKey="a"
+							value={ hsl.a }
 							onChange={ handleChange }
 							type="number"
 							min="0"
-							max="255"
+							max="1"
+							step="0.05"
 						/>
-						<Input
-							source={ view }
-							label="g"
-							valueKey="g"
-							value={ rgb.g }
-							onChange={ handleChange }
-							type="number"
-							min="0"
-							max="255"
-						/>
-						<Input
-							source={ view }
-							label="b"
-							valueKey="b"
-							value={ rgb.b }
-							onChange={ handleChange }
-							type="number"
-							min="0"
-							max="255"
-						/>
-						{ disableAlpha ? null : (
-							<Input
-								source={ view }
-								label="a"
-								valueKey="a"
-								value={ rgb.a }
-								onChange={ handleChange }
-								type="number"
-								min="0"
-								max="1"
-								step="0.01"
-							/>
-						) }
-					</div>
-				</fieldset>
-			);
-		} else if ( view === 'hsl' ) {
-			const legend = disableAlpha
-				? __( 'Color value in HSL' )
-				: __( 'Color value in HSLA' );
-			return (
-				<fieldset>
-					<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
-					<div className="components-color-picker__inputs-fields">
-						<Input
-							source={ view }
-							label="h"
-							valueKey="h"
-							value={ hsl.h }
-							onChange={ handleChange }
-							type="number"
-							min="0"
-							max="359"
-						/>
-						<Input
-							source={ view }
-							label="s"
-							valueKey="s"
-							value={ hsl.s }
-							onChange={ handleChange }
-							type="number"
-							min="0"
-							max="100"
-						/>
-						<Input
-							source={ view }
-							label="l"
-							valueKey="l"
-							value={ hsl.l }
-							onChange={ handleChange }
-							type="number"
-							min="0"
-							max="100"
-						/>
-						{ disableAlpha ? null : (
-							<Input
-								source={ view }
-								label="a"
-								valueKey="a"
-								value={ hsl.a }
-								onChange={ handleChange }
-								type="number"
-								min="0"
-								max="1"
-								step="0.05"
-							/>
-						) }
-					</div>
-				</fieldset>
-			);
-		}
+					) }
+				</div>
+			</fieldset>
+		);
 	}
 
 	return (
 		<div className="components-color-picker__inputs-wrapper">
-			{ renderFields() }
+			{ fields }
 			<div className="components-color-picker__inputs-toggle-wrapper">
 				<Button
 					className="components-color-picker__inputs-toggle"
