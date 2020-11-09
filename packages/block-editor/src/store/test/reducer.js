@@ -2016,10 +2016,10 @@ describe( 'state', () => {
 	} );
 
 	describe( 'insertionPoint', () => {
-		it( 'defaults to {}', () => {
+		it( 'defaults to `null`', () => {
 			const state = insertionPoint( undefined, {} );
 
-			expect( state ).toEqual( {} );
+			expect( state ).toEqual( null );
 		} );
 
 		it.each( [ 'SET_INSERTION_POINT', 'SHOW_INSERTION_POINT' ] )(
@@ -2052,7 +2052,7 @@ describe( 'state', () => {
 			'INSERT_BLOCKS',
 			'REMOVE_BLOCKS',
 			'REPLACE_BLOCKS',
-		] )( 'resets the insertion point on %s', ( type ) => {
+		] )( 'resets the insertion point to `null` on %s', ( type ) => {
 			const original = deepFreeze( {
 				rootClientId: 'clientId1',
 				index: 0,
@@ -2061,7 +2061,7 @@ describe( 'state', () => {
 				type,
 			} );
 
-			expect( state ).toEqual( {} );
+			expect( state ).toEqual( null );
 		} );
 	} );
 

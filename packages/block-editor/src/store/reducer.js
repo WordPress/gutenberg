@@ -1400,7 +1400,7 @@ function resetInsertionPoint( state, action, defaultValue ) {
  *
  * @return {Object} Updated state.
  */
-export function insertionPoint( state = {}, action ) {
+export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
 		case 'SET_INSERTION_POINT':
 		case 'SHOW_INSERTION_POINT': {
@@ -1409,7 +1409,7 @@ export function insertionPoint( state = {}, action ) {
 		}
 	}
 
-	return resetInsertionPoint( state, action, {} );
+	return resetInsertionPoint( state, action, null );
 }
 
 /**
