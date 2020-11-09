@@ -42,7 +42,7 @@ describe( 'Template Part', () => {
 			await page.waitForSelector( '.edit-site-visual-editor' );
 		} );
 
-		async function updateHeader() {
+		async function updateHeader( content ) {
 			// Switch to editing the header template part.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
@@ -51,7 +51,7 @@ describe( 'Template Part', () => {
 
 			// Edit it.
 			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Header Template Part 123' );
+			await page.keyboard.type( content );
 
 			// Save it.
 			await page.click( '.edit-site-save-button__button' );
@@ -68,18 +68,42 @@ describe( 'Template Part', () => {
 			await navigationPanel.close();
 		}
 
+		async function triggerEllipsisMenuItem( textPrompt ) {
+			await clickBlockToolbarButton( 'More options' );
+			const button = await page.waitForXPath(
+				`//span[contains(text(), "${ textPrompt }"]`
+			);
+			await button.click();
+		}
+
+		async function createParagraphAndGetClientId( content ) {
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( content );
+			const allBlocks = await getAllBlocks();
+			const paragraphBlock = allBlocks.find(
+				( block ) =>
+					block.name === 'core/paragraph' &&
+					block.attributes.content === content
+			);
+			return paragraphBlock.clientId;
+		}
+
+		async function assertParagraphInTemplatePart( content ) {
+			const paragraphInTemplatePart = await page.waitForXPath(
+				`//*[@data-type="core/template-part"][//p[text()="${ content }"]]`
+			);
+			expect( paragraphInTemplatePart ).not.toBeNull();
+		}
+
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
-			await updateHeader();
+			await updateHeader( 'Header Template Part 123' );
 
 			// Verify that the header template part is updated.
-			const [ headerTemplatePart ] = await page.$x(
-				'//*[@data-type="core/template-part"][//p[text()="Header Template Part 123"]]'
-			);
-			expect( headerTemplatePart ).not.toBeUndefined();
+			await assertParagraphInTemplatePart( 'Header Template Part 123' );
 		} );
 
 		it( 'Should detach blocks from template part', async () => {
-			await updateHeader();
+			await updateHeader( 'Header Template Part 456' );
 
 			const initialTemplateParts = await page.$$(
 				'.wp-block-template-part'
@@ -97,11 +121,7 @@ describe( 'Template Part', () => {
 			);
 
 			// Detach blocks from template part using ellipsis menu.
-			await clickBlockToolbarButton( 'More options' );
-			const detachButton = await page.waitForXPath(
-				'//span[contains(text(), "Detach blocks from template part")]'
-			);
-			await detachButton.click();
+			await triggerEllipsisMenuItem( 'Detach blocks from template part' );
 
 			// Verify there is one less template part on the page.
 			const finalTemplateParts = await page.$$(
@@ -113,7 +133,7 @@ describe( 'Template Part', () => {
 
 			// Verify content of the template part is still present.
 			const [ expectedContent ] = await page.$x(
-				'//p[contains(text(), "Header Template Part 123")]'
+				'//p[contains(text(), "Header Template Part 456")]'
 			);
 			expect( expectedContent ).not.toBeUndefined();
 		} );
@@ -124,31 +144,17 @@ describe( 'Template Part', () => {
 				'.wp-block-template-part'
 			);
 
-			// Add some block.
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Some block...' );
-
-			// Select the block.
-			const allBlocks = await getAllBlocks();
-			const paragraphBlock = allBlocks.find(
-				( block ) =>
-					block.name === 'core/paragraph' &&
-					block.attributes.content === 'Some block...'
+			// Add some block and select it.
+			const clientId = await createParagraphAndGetClientId(
+				'Some block...'
 			);
-			await selectBlockByClientId( paragraphBlock.clientId );
+			await selectBlockByClientId( clientId );
 
 			// Convert block to a template part.
-			await clickBlockToolbarButton( 'More options' );
-			const convertButton = await page.waitForXPath(
-				'//span[contains(text(), "Make template part")]'
-			);
-			await convertButton.click();
+			await triggerEllipsisMenuItem( 'Make template part' );
 
 			// Verify new template part is created with expected content.
-			const newTemplatePart = await page.waitForXPath(
-				'//*[@data-type="core/template-part"][//p[text()="Some block..."]]'
-			);
-			expect( newTemplatePart ).not.toBeNull();
+			await assertParagraphInTemplatePart( 'Some block...' );
 
 			// TODO: Remove when toolbar supports text fields
 			expect( console ).toHaveWarnedWith(
@@ -170,23 +176,12 @@ describe( 'Template Part', () => {
 				'.wp-block-template-part'
 			);
 
-			// Add two blocks.
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Some block #1' );
-			await insertBlock( 'Paragraph' );
-			await page.keyboard.type( 'Some block #2' );
-
-			// Select the blocks.
-			const allBlocks = await getAllBlocks();
-			const { cleintId: block1Id } = allBlocks.find(
-				( block ) =>
-					block.name === 'core/paragraph' &&
-					block.attributes.content === 'Some block #1'
+			// Add two blocks and select them.
+			const block1Id = await createParagraphAndGetClientId(
+				'Some block #1'
 			);
-			const { cleintId: block2Id } = allBlocks.find(
-				( block ) =>
-					block.name === 'core/paragraph' &&
-					block.attributes.content === 'Some block #2'
+			const block2Id = await createParagraphAndGetClientId(
+				'Some block #2'
 			);
 			await page.evaluate(
 				( id1, id2 ) => {
@@ -199,21 +194,11 @@ describe( 'Template Part', () => {
 			);
 
 			// Convert block to a template part.
-			await clickBlockToolbarButton( 'More options' );
-			const convertButton = await page.waitForXPath(
-				'//span[contains(text(), "Make template part")]'
-			);
-			await convertButton.click();
+			await triggerEllipsisMenuItem( 'Make template part' );
 
 			// Verify new template part is created with expected content.
-			const block1InNewTemplatePart = await page.waitForXPath(
-				'//*[@data-type="core/template-part"][//p[text()="Some block #1"]]'
-			);
-			expect( block1InNewTemplatePart ).not.toBeNull();
-			const block2InNewTemplatePart = await page.waitForXPath(
-				'//*[@data-type="core/template-part"][//p[text()="Some block #2"]]'
-			);
-			expect( block2InNewTemplatePart ).not.toBeNull();
+			await assertParagraphInTemplatePart( 'Some block #1' );
+			await assertParagraphInTemplatePart( 'Some block #2' );
 
 			// TODO: Remove when toolbar supports text fields
 			expect( console ).toHaveWarnedWith(
