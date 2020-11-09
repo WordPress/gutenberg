@@ -59,7 +59,7 @@
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
-		"react-autosize-textarea": "^3.0.2",
+		"react-autosize-textarea": "^7.1.0",
 		"redux-optimist": "^1.0.0",
 		"refx": "^3.0.0",
 		"rememo": "^3.0.0"

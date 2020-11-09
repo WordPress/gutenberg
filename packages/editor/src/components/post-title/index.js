@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import Textarea from 'react-autosize-textarea';
+import TextareaAutosize from 'react-autosize-textarea';
 import classnames from 'classnames';
 
 /**
@@ -179,7 +179,7 @@ export default function PostTitle() {
 				>
 					{ decodedPlaceholder || __( 'Add title' ) }
 				</VisuallyHidden>
-				<Textarea
+				<TextareaAutosize
 					ref={ ref }
 					id={ `post-title-${ instanceId }` }
 					className="editor-post-title__input"
