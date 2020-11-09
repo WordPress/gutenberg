@@ -317,6 +317,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			'core/paragraph' => array(
 				'selector' => 'p',
 				'supports' => array(
+					'--wp--style--color--link',
 					'backgroundColor',
 					'color',
 					'fontSize',

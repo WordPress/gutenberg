@@ -155,48 +155,59 @@ class WP_Theme_JSON {
 
 	private const SUPPORTED_PROPERTIES = array(
 		'--wp--style--color--link' => array(
-			'path'     => array( 'color', 'link' ),
-			'property' => '--wp--style--color--link',
+			'theme_json' => array( 'color', 'link' ),
+			'block_json' => array( 'color', 'link' ),
+			'property'   => '--wp--style--color--link',
 		),
 		'background'               => array(
-			'path'     => array( 'color', 'gradient' ),
-			'property' => 'background',
+			'theme_json' => array( 'color', 'gradient' ),
+			'block_json' => array( 'color', 'gradients' ),
+			'property'   => 'background',
 		),
 		'backgroundColor'          => array(
-			'path'     => array( 'color', 'background' ),
-			'property' => 'background-color',
+			'theme_json' => array( 'color', 'background' ),
+			'block_json' => array( 'color' ),
+			'property'   => 'background-color',
 		),
 		'color'                    => array(
-			'path'     => array( 'color', 'text' ),
-			'property' => 'color',
+			'theme_json' => array( 'color', 'text' ),
+			'block_json' => array( 'color' ),
+			'property'   => 'color',
 		),
 		'fontFamily'               => array(
-			'path'     => array( 'typography', 'fontFamily' ),
-			'property' => 'font-family',
+			'theme_json' => array( 'typography', 'fontFamily' ),
+			'block_json' => array( '__experimentalFontFamily' ),
+			'property'   => 'font-family',
 		),
 		'fontSize'                 => array(
-			'path'     => array( 'typography', 'fontSize' ),
-			'property' => 'font-size'
+			'theme_json' => array( 'typography', 'fontSize' ),
+			'block_json' => array( 'fontSize' ),
+			'property'   => 'font-size'
 		),
 		'fontStyle'                => array(
-			'path'     => array( 'typography', 'fontStyle' ),
-			'property' => 'font-style',
+			'theme_json' => array( 'typography', 'fontStyle' ),
+			'block_json' => array( '__experimentalFontAppearance' ),
+			'property'   => 'font-style',
 		),
 		'fontWeight'               => array(
-			'path'     => array( 'typography', 'fontWeight' ),
+			'theme_json' => array( 'typography', 'fontWeight' ),
+			'block_json' => array( '__experimentalFontAppearance' ),
 			'property' => 'font-weight',
 		),
 		'lineHeight'               => array(
-			'path'     => array( 'typography', 'lineHeight' ),
-			'property' => 'line-height',
+			'theme_json' => array( 'typography', 'lineHeight' ),
+			'block_json' => array( 'lineHeight' ),
+			'property'   => 'line-height',
 		),
 		'textDecoration'           => array(
-			'path'     => array( 'typography', 'textDecoration' ),
-			'property' => 'text-decoration',
+			'theme_json' => array( 'typography', 'textDecoration' ),
+			'block_json' => array( '__experimentalTextDecoration' ),
+			'property'   => 'text-decoration',
 		),
 		'textTransform'            => array(
-			'path'     => array( 'typography', 'textTransform' ),
-			'property' => 'text-transform',
+			'theme_json' => array( 'typography', 'textTransform' ),
+			'block_json' => array( '__experimentalTextTransform' ),
+			'property'   => 'text-transform',
 		),
 	);
 
@@ -256,37 +267,6 @@ class WP_Theme_JSON {
 		}
 	}
 
-	/**
-	* Returns the style features a particular block supports.
-	*
-	* @param array $supports The block supports array.
-	*
-	* @return array Style features supported by the block.
-	*/
-	private function get_supported_styles( $supports ) {
-		$support_keys       = array(
-			'--wp--style--color--link' => array( 'color', 'linkColor' ),
-			'background'               => array( 'color', 'gradients' ),
-			'backgroundColor'          => array( 'color' ),
-			'color'                    => array( 'color' ),
-			'fontFamily'               => array( '__experimentalFontFamily' ),
-			'fontSize'                 => array( 'fontSize' ),
-			'fontStyle'                => array( '__experimentalFontAppearance' ),
-			'fontWeight'               => array( '__experimentalFontAppearance' ),
-			'lineHeight'               => array( 'lineHeight' ),
-			'textDecoration'           => array( '__experimentalTextDecoration' ),
-			'textTransform'            => array( '__experimentalTextTransform' ),
-		);
-		$supported_features = array();
-		foreach ( $support_keys as $key => $path ) {
-			if ( gutenberg_experimental_get( $supports, $path ) ) {
-				$supported_features[] = $key;
-			}
-		}
-
-		return $supported_features;
-	}
-
 	public function get_blocks_metadata() {
 		if ( null !== self::$blocks_metadata ) {
 			return self::$blocks_metadata;
@@ -309,7 +289,7 @@ class WP_Theme_JSON {
 							'__experimentalTextTransform'  => true,
 							'color'                        => array(
 								'gradients' => true,
-								'linkColor' => true,
+								'link'      => true,
 							),
 							'fontSize'                     => true,
 							'lineHeight'                   => true,
@@ -331,7 +311,12 @@ class WP_Theme_JSON {
 				continue;
 			}
 
-			$supports = $this->get_supported_styles( $block_type->supports );
+			$block_supports = array();
+			foreach ( self::SUPPORTED_PROPERTIES as $key => $metadata ) {
+				if ( $this->get_from_path( $block_type->supports, $metadata['block_json'] ) ) {
+					$block_supports[] = $key;
+				}
+			}
 
 			/*
 			 * Assign the selector for the block.
@@ -358,7 +343,7 @@ class WP_Theme_JSON {
 			) {
 				self::$blocks_metadata[ $block_name ] = array(
 					'selector'  => $block_type->supports['__experimentalSelector'],
-					'supports'  => $supports,
+					'supports'  => $block_supports,
 					'blockName' => $block_name,
 				);
 			} elseif (
@@ -368,14 +353,14 @@ class WP_Theme_JSON {
 				foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector ) {
 					self::$blocks_metadata[ $key ] = array(
 						'selector'  => $selector,
-						'supports'  => $supports,
+						'supports'  => $block_supports,
 						'blockName' => $block_name,
 					);
 				}
 			} else {
 				self::$blocks_metadata[ $block_name ] = array(
 					'selector'  => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
-					'supports'  => $supports,
+					'supports'  => $block_supports,
 					'blockName' => $block_name,
 				);
 			}
@@ -407,34 +392,6 @@ class WP_Theme_JSON {
 		if ( 0 === count( $input[ $key ] ) ) {
 			unset( $input[ $key ] );
 		}
-	}
-
-	/**
-	* Given a tree that adheres to the theme.json schema
-	* it adds the block data (selector, support) to each context.
-	*
-	* @param array $tree Tree to augment with block data.
-	*
-	* @return array Tree with block data.
-	*/
-	private function gutenberg_experimental_global_styles_augment_with_block_data( $tree ) {
-		self::$blocks_metadata = gutenberg_experimental_global_styles_get_block_data();
-		foreach ( array_keys( $tree ) as $block_name ) {
-			if (
-				 array_key_exists( $block_name, self::$blocks_metadata ) ||
-				! array_key_exists( 'selector', self::$blocks_metadata[ $block_name ] ) ||
-				! array_key_exists( 'supports', self::$blocks_metadata[ $block_name ] )
-			) {
-				// Skip blocks that haven't declared support,
-				// because we don't know to process them.
-				continue;
-			}
-
-			$tree[ $block_name ]['selector'] = self::$blocks_metadata[ $block_name ]['selector'];
-			$tree[ $block_name ]['supports'] = self::$blocks_metadata[ $block_name ]['supports'];
-		}
-
-		return $tree;
 	}
 
 	private function extract_settings( $context ) {
@@ -537,7 +494,7 @@ class WP_Theme_JSON {
 				continue;
 			}
 
-			$value = $this->get_from_path( $context['styles'], $metadata['path'], '' );
+			$value = $this->get_from_path( $context['styles'], $metadata['theme_json'], '' );
 			if ( ! empty( $value ) ) {
 				$declarations[] = array(
 					'name'  => $metadata['property'],
