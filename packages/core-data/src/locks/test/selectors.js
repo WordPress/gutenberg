@@ -6,10 +6,10 @@ import deepFreeze from 'deep-freeze';
 /**
  * Internal dependencies
  */
-import { getPendingLockRequests, isLockAvailable } from '../selectors';
+import { __unstableGetPendingLockRequests, __unstableIsLockAvailable } from '../selectors';
 import { deepCopyLocksTreePath, getNode } from '../utils';
 
-describe( 'getPendingLockRequests', () => {
+describe( '__unstableGetPendingLockRequests', () => {
 	it( 'returns pending lock requests', () => {
 		const state = deepFreeze( {
 			locks: {
@@ -17,11 +17,11 @@ describe( 'getPendingLockRequests', () => {
 			},
 		} );
 
-		expect( getPendingLockRequests( state ) ).toEqual( [ 1, 2, 3 ] );
+		expect( __unstableGetPendingLockRequests( state ) ).toEqual( [ 1, 2, 3 ] );
 	} );
 } );
 
-describe( 'isLockAvailable', () => {
+describe( '__unstableIsLockAvailable', () => {
 	describe( 'smoke tests', () => {
 		it( 'returns true if lock is available', () => {
 			const state = deepFreeze( {
@@ -34,7 +34,7 @@ describe( 'isLockAvailable', () => {
 			} );
 
 			expect(
-				isLockAvailable( state, 'core', [], { exclusive: true } )
+				__unstableIsLockAvailable( state, 'core', [], { exclusive: true } )
 			).toBe( true );
 		} );
 		it( 'returns false if lock is not available', () => {
@@ -48,7 +48,7 @@ describe( 'isLockAvailable', () => {
 			} );
 
 			expect(
-				isLockAvailable( state, 'core', [], { exclusive: true } )
+				__unstableIsLockAvailable( state, 'core', [], { exclusive: true } )
 			).toBe( false );
 		} );
 	} );
@@ -64,7 +64,7 @@ describe( 'isLockAvailable', () => {
 		} );
 		it( `returns true if no parent or descendant has any locks`, () => {
 			expect(
-				isLockAvailable(
+				__unstableIsLockAvailable(
 					deepFreeze( state ),
 					'core',
 					[ 'entities', 'root' ],
@@ -78,7 +78,7 @@ describe( 'isLockAvailable', () => {
 				exclusive: true,
 			} );
 			expect(
-				isLockAvailable(
+				__unstableIsLockAvailable(
 					deepFreeze( state ),
 					'core',
 					[ 'entities', 'root' ],
@@ -92,7 +92,7 @@ describe( 'isLockAvailable', () => {
 				exclusive: true,
 			} );
 			expect(
-				isLockAvailable(
+				__unstableIsLockAvailable(
 					deepFreeze( state ),
 					'core',
 					[ 'entities', 'root' ],
@@ -147,7 +147,7 @@ describe( 'isLockAvailable', () => {
 				},
 			};
 			expect(
-				isLockAvailable(
+				__unstableIsLockAvailable(
 					deepFreeze( subState ),
 					'core',
 					[ 'postType', 'wp_template_part', 17 ],
@@ -208,7 +208,7 @@ describe( 'isLockAvailable', () => {
 				},
 			};
 			expect(
-				isLockAvailable(
+				__unstableIsLockAvailable(
 					deepFreeze( subState ),
 					'core',
 					[ 'entities', 'data', 'postType', 'book', 67 ],
@@ -220,7 +220,7 @@ describe( 'isLockAvailable', () => {
 		[ true, false ].forEach( ( exclusive ) => {
 			it( `returns true if the path is not accessible and no parent holds a lock`, () => {
 				expect(
-					isLockAvailable(
+					__unstableIsLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'fake', 'path' ],
@@ -234,7 +234,7 @@ describe( 'isLockAvailable', () => {
 					exclusive,
 				} );
 				expect(
-					isLockAvailable(
+					__unstableIsLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'fake', 'path' ],
@@ -248,7 +248,7 @@ describe( 'isLockAvailable', () => {
 					exclusive,
 				} );
 				expect(
-					isLockAvailable(
+					__unstableIsLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -262,7 +262,7 @@ describe( 'isLockAvailable', () => {
 					exclusive,
 				} );
 				expect(
-					isLockAvailable(
+					__unstableIsLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -276,7 +276,7 @@ describe( 'isLockAvailable', () => {
 					exclusive,
 				} );
 				expect(
-					isLockAvailable(
+					__unstableIsLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -295,7 +295,7 @@ describe( 'isLockAvailable', () => {
 					}
 				);
 				expect(
-					isLockAvailable(
+					__unstableIsLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -314,7 +314,7 @@ describe( 'isLockAvailable', () => {
 					}
 				);
 				expect(
-					isLockAvailable(
+					__unstableIsLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -334,7 +334,7 @@ describe( 'isLockAvailable', () => {
 		} );
 		it( `returns true if no parent or descendant has any locks`, () => {
 			expect(
-				isLockAvailable(
+				__unstableIsLockAvailable(
 					deepFreeze( state ),
 					'core',
 					[ 'entities', 'root' ],
@@ -350,7 +350,7 @@ describe( 'isLockAvailable', () => {
 					exclusive: isOtherLockExclusive,
 				} );
 				expect(
-					isLockAvailable(
+					__unstableIsLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'fake', 'path' ],
@@ -364,7 +364,7 @@ describe( 'isLockAvailable', () => {
 					exclusive: isOtherLockExclusive,
 				} );
 				expect(
-					isLockAvailable(
+					__unstableIsLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -378,7 +378,7 @@ describe( 'isLockAvailable', () => {
 					exclusive: isOtherLockExclusive,
 				} );
 				expect(
-					isLockAvailable(
+					__unstableIsLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -392,7 +392,7 @@ describe( 'isLockAvailable', () => {
 					exclusive: isOtherLockExclusive,
 				} );
 				expect(
-					isLockAvailable(
+					__unstableIsLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -411,7 +411,7 @@ describe( 'isLockAvailable', () => {
 					}
 				);
 				expect(
-					isLockAvailable(
+					__unstableIsLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],
@@ -430,7 +430,7 @@ describe( 'isLockAvailable', () => {
 					}
 				);
 				expect(
-					isLockAvailable(
+					__unstableIsLockAvailable(
 						deepFreeze( state ),
 						'core',
 						[ 'entities', 'root' ],

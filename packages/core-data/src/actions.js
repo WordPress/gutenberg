@@ -16,7 +16,7 @@ import { addQueryArgs } from '@wordpress/url';
  */
 import { receiveItems, removeItems, receiveQueriedItems } from './queried-data';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
-import { acquireStoreLock, releaseStoreLock } from './locks';
+import { __unstableAcquireStoreLock, __unstableReleaseStoreLock } from './locks';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -164,7 +164,7 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
 		return;
 	}
 
-	const lock = yield* acquireStoreLock(
+	const lock = yield* __unstableAcquireStoreLock(
 		'core',
 		[ 'entities', 'data', kind, name, recordId ],
 		{ exclusive: true }
@@ -204,7 +204,7 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
 
 		return deletedRecord;
 	} finally {
-		yield* releaseStoreLock( lock );
+		yield* __unstableReleaseStoreLock( lock );
 	}
 }
 
@@ -345,7 +345,7 @@ export function* saveEntityRecord(
 	const entityIdKey = entity.key || DEFAULT_ENTITY_KEY;
 	const recordId = record[ entityIdKey ];
 
-	const lock = yield* acquireStoreLock(
+	const lock = yield* __unstableAcquireStoreLock(
 		'core',
 		[ 'entities', 'data', kind, name, recordId || uuid() ],
 		{ exclusive: true }
@@ -594,7 +594,7 @@ export function* saveEntityRecord(
 
 		return updatedRecord;
 	} finally {
-		yield* releaseStoreLock( lock );
+		yield* __unstableReleaseStoreLock( lock );
 	}
 }
 

@@ -2,18 +2,18 @@
  * Internal dependencies
  */
 import {
-	acquireStoreLock,
-	enqueueLockRequest,
-	releaseStoreLock,
-	processPendingLockRequests,
+	__unstableAcquireStoreLock,
+	__unstableEnqueueLockRequest,
+	__unstableReleaseStoreLock,
+	__unstableProcessPendingLockRequests,
 } from '../actions';
 
 const store = 'test';
 const path = [ 'blue', 'bird' ];
 
-describe( 'enqueueLockRequest', () => {
+describe( '__unstableEnqueueLockRequest', () => {
 	it( 'Enqueues a lock request', async () => {
-		const fulfillment = enqueueLockRequest( store, path, {
+		const fulfillment = __unstableEnqueueLockRequest( store, path, {
 			exclusive: true,
 		} );
 
@@ -36,7 +36,7 @@ describe( 'enqueueLockRequest', () => {
 	} );
 
 	it( 'Returns a promise fulfilled only after calling notifyAcquired', async () => {
-		const fulfillment = enqueueLockRequest( store, path, {
+		const fulfillment = __unstableEnqueueLockRequest( store, path, {
 			exclusive: true,
 		} );
 		const { request } = fulfillment.next().value;
@@ -61,7 +61,7 @@ describe( 'enqueueLockRequest', () => {
 	} );
 } );
 
-describe( 'processPendingLockRequests', () => {
+describe( '__unstableProcessPendingLockRequests', () => {
 	const exclusive = true;
 	const lock = { store, path, exclusive };
 
@@ -74,7 +74,7 @@ describe( 'processPendingLockRequests', () => {
 	} );
 
 	it( 'Grants a lock request that may be granted', async () => {
-		const fulfillment = processPendingLockRequests();
+		const fulfillment = __unstableProcessPendingLockRequests();
 
 		// Start
 		expect( fulfillment.next().value.type ).toBe(
@@ -115,7 +115,7 @@ describe( 'processPendingLockRequests', () => {
 	} );
 
 	it( 'Does not grants a lock request that may not be granted', async () => {
-		const fulfillment = processPendingLockRequests();
+		const fulfillment = __unstableProcessPendingLockRequests();
 
 		// Start
 		expect( fulfillment.next().value.type ).toBe(
@@ -138,7 +138,7 @@ describe( 'processPendingLockRequests', () => {
 	} );
 
 	it( 'Handles multiple lock requests', async () => {
-		const fulfillment = processPendingLockRequests();
+		const fulfillment = __unstableProcessPendingLockRequests();
 
 		// Start
 		expect( fulfillment.next().value.type ).toBe(
@@ -181,7 +181,7 @@ describe( 'processPendingLockRequests', () => {
 	} );
 } );
 
-describe( 'acquireStoreLock', () => {
+describe( '__unstableAcquireStoreLock', () => {
 	const exclusive = true;
 	const lock = { store, path, exclusive };
 
@@ -194,7 +194,7 @@ describe( 'acquireStoreLock', () => {
 	} );
 
 	it( 'Enqueues a lock request and attempts to fulfill it', async () => {
-		const fulfillment = acquireStoreLock( store, path, {
+		const fulfillment = __unstableAcquireStoreLock( store, path, {
 			exclusive,
 		} );
 
@@ -236,7 +236,7 @@ describe( 'acquireStoreLock', () => {
 	} );
 
 	it( 'Enqueues a lock request and waits until fultillment it when not available', async () => {
-		const fulfillment = acquireStoreLock( store, path, {
+		const fulfillment = __unstableAcquireStoreLock( store, path, {
 			exclusive,
 		} );
 
@@ -274,11 +274,11 @@ describe( 'acquireStoreLock', () => {
 	} );
 } );
 
-describe( 'releaseStoreLock', () => {
+describe( '__unstableReleaseStoreLock', () => {
 	const lock = { store, path, exclusive: true };
 
 	it( 'Releases a lock request and attempts to fulfill pending lock requests', async () => {
-		const fulfillment = releaseStoreLock( lock );
+		const fulfillment = __unstableReleaseStoreLock( lock );
 
 		// Start
 		expect( fulfillment.next().value ).toMatchObject( {

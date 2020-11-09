@@ -26,7 +26,7 @@ import {
 } from './actions';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
-import { acquireStoreLock, releaseStoreLock } from './locks';
+import { __unstableAcquireStoreLock, __unstableReleaseStoreLock } from './locks';
 
 /**
  * Requests authors from the REST API.
@@ -62,7 +62,7 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 		return;
 	}
 
-	const lock = yield* acquireStoreLock(
+	const lock = yield* __unstableAcquireStoreLock(
 		'core',
 		[ 'entities', 'data', kind, name, key ],
 		{ exclusive: false }
@@ -114,7 +114,7 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 		const record = yield apiFetch( { path } );
 		yield receiveEntityRecords( kind, name, record, query );
 	} finally {
-		yield* releaseStoreLock( lock );
+		yield* __unstableReleaseStoreLock( lock );
 	}
 }
 
@@ -148,7 +148,7 @@ export function* getEntityRecords( kind, name, query = {} ) {
 		return;
 	}
 
-	const lock = yield* acquireStoreLock(
+	const lock = yield* __unstableAcquireStoreLock(
 		'core',
 		[ 'entities', 'data', kind, name ],
 		{ exclusive: false }
@@ -209,7 +209,7 @@ export function* getEntityRecords( kind, name, query = {} ) {
 			}
 		}
 	} finally {
-		yield* releaseStoreLock( lock );
+		yield* __unstableReleaseStoreLock( lock );
 	}
 }
 

@@ -8,11 +8,11 @@ import {
 	getNode,
 } from './utils';
 
-export function getPendingLockRequests( state ) {
+export function __unstableGetPendingLockRequests( state ) {
 	return state.locks.requests;
 }
 
-export function isLockAvailable( state, store, path, { exclusive } ) {
+export function __unstableIsLockAvailable( state, store, path, { exclusive } ) {
 	const storePath = [ store, ...path ];
 	const locks = state.locks.tree;
 

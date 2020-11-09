@@ -23,12 +23,12 @@ import {
 } from '../actions';
 
 jest.mock( '../locks/actions', () => ( {
-	acquireStoreLock: jest.fn( () => [
+	__unstableAcquireStoreLock: jest.fn( () => [
 		{
 			type: 'MOCKED_ACQUIRE_LOCK',
 		},
 	] ),
-	releaseStoreLock: jest.fn( () => [
+	__unstableReleaseStoreLock: jest.fn( () => [
 		{
 			type: 'MOCKED_RELEASE_LOCK',
 		},
