@@ -234,10 +234,11 @@ public class WPAndroidGlueCode {
             @Override
             public void requestMediaPickFromDeviceLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
                 mMediaPickedByUserOnBlock = true;
-                mAppendsMultipleSelectedToSiblingBlocks = false;
+                // image blocks do not respect the multiple selection flag, so we set the append as siblings flag instead
+                mAppendsMultipleSelectedToSiblingBlocks = mediaType == MediaType.IMAGE && !allowMultipleSelection;
                 mMediaSelectedCallback = mediaSelectedCallback;
                 if (mediaType == MediaType.IMAGE) {
-                    mOnMediaLibraryButtonListener.onUploadPhotoButtonClicked(allowMultipleSelection);
+                    mOnMediaLibraryButtonListener.onUploadPhotoButtonClicked(true);
                 } else if (mediaType == MediaType.VIDEO) {
                     mOnMediaLibraryButtonListener.onUploadVideoButtonClicked(allowMultipleSelection);
                 } else if (mediaType == MediaType.MEDIA) {
