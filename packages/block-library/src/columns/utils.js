@@ -101,15 +101,12 @@ export function getRedistributedColumnWidths(
  */
 export function hasExplicitPercentColumnWidths( blocks ) {
 	return blocks.every( ( block ) => {
-		if (
-			typeof block.attributes.width === 'string' &&
-			block.attributes.width.charAt(
-				block.attributes.width.length - 1
-			) === '%'
-		) {
-			return Number.isFinite( parseFloat( block.attributes.width ) );
-		}
-		return Number.isFinite( block.attributes.width );
+		const blockWidth = block.attributes.width;
+		return Number.isFinite(
+			blockWidth?.endsWith?.( '%' )
+				? parseFloat( blockWidth )
+				: blockWidth
+		);
 	} );
 }
 
