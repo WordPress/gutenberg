@@ -89,9 +89,15 @@ export function getBlockVariations( state, blockName, scope ) {
 	if ( ! variations || ! scope ) {
 		return variations;
 	}
-	return variations.filter( ( variation ) => {
-		return ! variation.scope || variation.scope.includes( scope );
-	} );
+	// There are cases like `transform` where we want strict filtering of
+	// block variations and not return all the variations that do not have
+	// the `scope` set.
+	const variationFilterCb =
+		scope === 'transform'
+			? ( variation ) => variation.scope?.includes( scope )
+			: ( variation ) =>
+					! variation.scope || variation.scope.includes( scope );
+	return variations.filter( variationFilterCb );
 }
 
 /**
