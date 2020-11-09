@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { every } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { createBlobURL } from '@wordpress/blob';
@@ -138,6 +143,29 @@ const transforms = {
 				return createBlock( 'core/image', {
 					url: createBlobURL( file ),
 				} );
+			},
+		},
+		{
+			// When drag and dropping multiple files onto a gallery this overrrides the
+			// gallery transform in order to add new images to the gallery instead of
+			// creating a new gallery.
+			type: 'files',
+			isMatch( files ) {
+				return (
+					files.length !== 1 &&
+					every(
+						files,
+						( file ) => file.type.indexOf( 'image/' ) === 0
+					)
+				);
+			},
+			transform( files ) {
+				const blocks = files.map( ( file ) => {
+					return createBlock( 'core/image', {
+						url: createBlobURL( file ),
+					} );
+				} );
+				return blocks;
 			},
 		},
 		{
