@@ -21,6 +21,7 @@ $helptext-font-size: 12px;
 $radio-input-size: 20px;
 $radio-input-size-sm: 24px; // Width & height for small viewports.
 
+
 /**
  * Grid System.
  * https://make.wordpress.org/design/2019/10/31/proposal-a-consistent-spacing-system-for-wordpress/
@@ -35,6 +36,7 @@ $grid-unit-30: 3 * $grid-unit;		// 24px
 $grid-unit-40: 4 * $grid-unit;		// 32px
 $grid-unit-50: 5 * $grid-unit;		// 40px
 $grid-unit-60: 6 * $grid-unit;		// 48px
+
 
 /**
  * Dimensions.
@@ -59,12 +61,14 @@ $mobile-floating-toolbar-height: 44px;
 $mobile-floating-toolbar-margin: 8px;
 $mobile-color-swatch: 48px;
 
+
 /**
  * Shadows.
  */
 
 $shadow-popover: 0 2px 6px rgba($black, 0.05);
 $shadow-modal: 0 3px 30px rgba($black, 0.2);
+
 
 /**
  * Editor widths.
@@ -75,15 +79,13 @@ $content-width: 840px;
 $wide-content-width: 1100px;
 $widget-area-width: 700px;
 
+
 /**
  * Block UI.
  */
 
 $block-toolbar-height: $grid-unit-60;
 $mobile-block-toolbar-height: 44px;
-$block-padding: 14px; // Space between block footprint and focus boundaries. These are drawn outside the block footprint, and do not affect the size.
-$block-side-ui-width: $button-size; // Width of the movers/drag handle UI.
-$block-side-ui-clearance: 2px; // Space between movers/drag handle UI, and block.
 $dimmed-opacity: 1;
 
 $block-edge-to-content: 16px;
@@ -95,12 +97,17 @@ $block-selected-padding: 0;
 $block-selected-child-margin: 5px;
 $block-selected-to-content: $block-edge-to-content - $block-selected-margin - $block-selected-border-width;
 
+// Deprecated, please avoid using these.
+$block-padding: 14px; // Used to define space between block footprint and surrouding borders.
+
+
 /**
  * Border radii.
  */
 
 $radius-round: 50%;
 $radius-block-ui: 2px;
+
 
 /**
  * Block paddings.
