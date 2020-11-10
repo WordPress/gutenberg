@@ -67,8 +67,48 @@ export function subscribeUpdateHtml( callback ) {
 	return gutenbergBridgeEvents.addListener( 'updateHtml', callback );
 }
 
+/**
+ * Request to subscribe to mediaUpload events
+ *
+ * When a media item exists as a local file and is to be uploaded, these are the generated events that are useful listening to.
+ * see subscribeMediaSave for events during a save operation.
+ *
+ * @param {Function}       callback  RN Callback function to be called with the following
+ * 										state and params:
+ * 	state:
+ * 		MEDIA_UPLOAD_STATE_SAVING: this is a progress update. Takes String mediaId, float progress.
+ * 		MEDIA_UPLOAD_STATE_SUCCEEDED: sent when one media is finished being saved. Takes String mediaId, String mediaUrl, String serverID
+ * 									(which is the remote id assigned to this file after having been uploaded).
+ * 		MEDIA_UPLOAD_STATE_FAILED: sent in case of saving failure (final state). Takes String mediaId.
+ * 		MEDIA_UPLOAD_STATE_RESET: sent when the progress and state needs be reset (a retry for example, for cleanup). Takes String mediaId.
+ */
 export function subscribeMediaUpload( callback ) {
 	return gutenbergBridgeEvents.addListener( 'mediaUpload', callback );
+}
+
+/**
+ * Request to subscribe to mediaSave events
+ *
+ * When a media item does not yet exist as a local file and is progressively being saved, these are the generated events that are useful listening to.
+ * see subscribeMediaUpload for events during an upload operation.
+ *
+ * @param {Function}       callback  RN Callback function to be called with the following
+ * 										state and params:
+ *  Note that the first 4 states described are similar to upload events.
+ * 	state:
+ * 		MEDIA_SAVE_STATE_SAVING: this is a progress update. Takes String mediaId, float progress.
+ * 		MEDIA_SAVE_STATE_SUCCEEDED: sent when one media is finished being saved. Takes String mediaId, String mediaUrl.
+ * 		MEDIA_SAVE_STATE_FAILED: sent in case of saving failure (final state). Takes String mediaId.
+ * 		MEDIA_SAVE_STATE_RESET: sent when the progress and state needs be reset (a retry for example, for cleanup). Takes String mediaId.
+ * 		MEDIA_SAVE_FINAL_STATE_RESULT: used in media collections, sent when ALL media items in a collection have reached
+ * 									a final state (either FAILED or SUCCEEDED). Handy to know when to show a final state to the user, on
+ * 									a media collection based block when we don't know if there are still events to be received for other
+ * 									items in the collection.
+ * 		MEDIA_SAVE_MEDIAID_CHANGED:	used when changing a media item id from a temporary id to a local file id, and then from a local file
+ * 									id to a remote file id.
+ */
+export function subscribeMediaSave( callback ) {
+	return gutenbergBridgeEvents.addListener( 'mediaSave', callback );
 }
 
 export function subscribeMediaAppend( callback ) {
@@ -158,11 +198,6 @@ export function requestUnsupportedBlockFallback(
 	);
 }
 
-/**
- * Messages the client that an action button was pressed.
- *
- * @param {string} htmlContent One of the values deffined on `actionButtons` constant object.
- */
 export function sendActionButtonPressedAction( buttonType ) {
 	RNReactNativeGutenbergBridge.actionButtonPressed( buttonType );
 }
@@ -171,8 +206,24 @@ export function requestMediaImport( url, callback ) {
 	return RNReactNativeGutenbergBridge.requestMediaImport( url, callback );
 }
 
+/**
+ * Request to start listening to upload events when in-progress uploads are in place
+ *
+ * For example, when media is being uploaded and the user re-enters the editor
+ *
+ */
 export function mediaUploadSync() {
 	return RNReactNativeGutenbergBridge.mediaUploadSync();
+}
+
+/**
+ * Request to start listening to save events when in-progress saves are in place
+ *
+ * For example, when media is being saved and the user re-enters the editor
+ *
+ */
+export function mediaSaveSync() {
+	return RNReactNativeGutenbergBridge.mediaSaveSync();
 }
 
 export function requestImageFailedRetryDialog( mediaId ) {
@@ -241,6 +292,65 @@ export function requestStarterPageTemplatesTooltipShown( callback ) {
 export function setStarterPageTemplatesTooltipShown( tooltipShown ) {
 	return RNReactNativeGutenbergBridge.setStarterPageTemplatesTooltipShown(
 		tooltipShown
+	);
+}
+
+/**
+ * Request the host app to show the block for editing its mediaFiles collection
+ *
+ * For example, a mediaFiles collection editor can make special handling of visualization
+ * in this regard.
+ *
+ * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item.
+ * @param {string} blockClientId the clientId of the block.
+ */
+export function requestMediaFilesEditorLoad( mediaFiles, blockClientId ) {
+	RNReactNativeGutenbergBridge.requestMediaFilesEditorLoad(
+		mediaFiles,
+		blockClientId
+	);
+}
+
+/**
+ * Request the host app to show a retry dialog for mediaFiles arrays which contained items that failed
+ * to upload
+ *
+ * For example, tapping on a failed-media overlay would trigger this request and a "Retry?" dialog
+ * would be presented to the user
+ *
+ * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
+ */
+export function requestMediaFilesFailedRetryDialog( mediaFiles ) {
+	RNReactNativeGutenbergBridge.requestMediaFilesFailedRetryDialog(
+		mediaFiles
+	);
+}
+
+/**
+ * Request the host app to show a cancel dialog for mediaFiles arrays currently being uploaded
+ *
+ * For example, tapping on a block containing mediaFiles that are currently being uplaoded would trigger this request
+ * and a "Cancel upload?" dialog would be presented to the user.
+ *
+ * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item
+ */
+export function requestMediaFilesUploadCancelDialog( mediaFiles ) {
+	RNReactNativeGutenbergBridge.requestMediaFilesUploadCancelDialog(
+		mediaFiles
+	);
+}
+
+/**
+ * Request the host app to show a cancel dialog for mediaFiles arrays currently undergoing a save operation
+ *
+ * Save operations on mediaFiles collection could  be lengthy so for example, tapping on a mediaFiles-type block
+ * currently being saved would trigger this request and a "Cancel save?" dialog would be presented to the user
+ *
+ * @param {Array<Map>} mediaFiles the mediaFiles attribute of the block, containing data about each media item.
+ */
+export function requestMediaFilesSaveCancelDialog( mediaFiles ) {
+	RNReactNativeGutenbergBridge.requestMediaFilesSaveCancelDialog(
+		mediaFiles
 	);
 }
 
