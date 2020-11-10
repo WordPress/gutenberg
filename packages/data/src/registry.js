@@ -223,6 +223,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	let registry = {
+		parent,
 		registerGenericStore,
 		stores,
 		namespaces: stores, // TODO: Deprecate/remove this.

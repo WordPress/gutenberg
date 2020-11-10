@@ -518,5 +518,52 @@ describe( 'useSelect', () => {
 				'count1'
 			);
 		} );
+
+		it( "handles subscriptions to the parent's stores", () => {
+			registry.registerStore( 'parent-store', counterStore );
+
+			const subRegistry = createRegistry( {}, registry );
+			subRegistry.registerStore( 'child-store', counterStore );
+
+			let renderer;
+
+			const TestComponent = jest.fn( () => {
+				const state = useSelect(
+					( select ) => ( {
+						parentCount: select( 'parent-store' ).getCounter(),
+						childCount: select( 'child-store' ).getCounter(),
+					} ),
+					[]
+				);
+
+				return <div data={ state } />;
+			} );
+
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<RegistryProvider value={ subRegistry }>
+							<TestComponent />
+						</RegistryProvider>
+					</RegistryProvider>
+				);
+			} );
+
+			const testInstance = renderer.root;
+
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
+				parentCount: 0,
+				childCount: 0,
+			} );
+
+			act( () => {
+				registry.dispatch( 'parent-store' ).increment();
+			} );
+
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
+				parentCount: 1,
+				childCount: 0,
+			} );
+		} );
 	} );
 } );
