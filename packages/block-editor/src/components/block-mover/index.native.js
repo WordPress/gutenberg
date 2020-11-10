@@ -2,18 +2,24 @@
  * External dependencies
  */
 import { first, last, partial, castArray } from 'lodash';
+import React, { useRef, useState } from 'react';
+import { Platform } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { ToolbarButton } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { Picker, ToolbarButton } from '@wordpress/components';
 import { withInstanceId, compose } from '@wordpress/compose';
+import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { getMoversSetup } from './mover-description';
+
+const DIRECTION_TOP = 'blockPageMoverOptions-moveToTop';
+const DIRECTION_BOTTOM = 'blockPageMoverOptions-moveToBottom';
 
 const BlockMover = ( {
 	isFirst,
@@ -21,10 +27,50 @@ const BlockMover = ( {
 	isLocked,
 	onMoveDown,
 	onMoveUp,
+	onLongMove,
 	firstIndex,
+	numberOfBlocks,
 	rootClientId,
 	isStackedHorizontally,
 } ) => {
+	const pickerRef = useRef();
+	const [ blockPageMoverState, setBlockPageMoverState ] = useState(
+		undefined
+	);
+	const showBlockPageMover = ( direction ) => () => {
+		if ( ! pickerRef.current ) {
+			setBlockPageMoverState( undefined );
+			return;
+		}
+
+		setBlockPageMoverState( direction );
+		pickerRef.current.presentPicker();
+	};
+
+	const blockPageMoverOptions = [
+		{
+			label: __( 'Move to top' ),
+			value: DIRECTION_TOP,
+			onSelect: () => {
+				onLongMove()( 0 );
+			},
+		},
+		{
+			label: __( 'Move to bottom' ),
+			value: DIRECTION_BOTTOM,
+			onSelect: () => {
+				onLongMove()( numberOfBlocks );
+			},
+		},
+	].filter( ( el ) => el.value === blockPageMoverState );
+
+	const onPickerSelect = ( value ) => {
+		const option = blockPageMoverOptions.find(
+			( el ) => el.value === value
+		);
+		if ( option && option.onSelect ) option.onSelect();
+	};
+
 	const {
 		description: {
 			backwardButtonHint,
@@ -46,6 +92,7 @@ const BlockMover = ( {
 				title={ ! isFirst ? backwardButtonTitle : firstBlockTitle }
 				isDisabled={ isFirst }
 				onClick={ onMoveUp }
+				onLongPress={ showBlockPageMover( DIRECTION_TOP ) }
 				icon={ backwardButtonIcon }
 				extraProps={ { hint: backwardButtonHint } }
 			/>
@@ -54,10 +101,19 @@ const BlockMover = ( {
 				title={ ! isLast ? forwardButtonTitle : lastBlockTitle }
 				isDisabled={ isLast }
 				onClick={ onMoveDown }
+				onLongPress={ showBlockPageMover( DIRECTION_BOTTOM ) }
 				icon={ forwardButtonIcon }
 				extraProps={ {
 					hint: forwardButtonHint,
 				} }
+			/>
+
+			<Picker
+				ref={ pickerRef }
+				options={ blockPageMoverOptions }
+				onChange={ onPickerSelect }
+				leftAlign={ true }
+				hideCancelButton={ Platform.OS !== 'ios' }
 			/>
 		</>
 	);
@@ -83,6 +139,7 @@ export default compose(
 
 		return {
 			firstIndex,
+			numberOfBlocks: blockOrder.length - 1,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
 			isLocked: getTemplateLock( rootClientId ) === 'all',
@@ -90,12 +147,19 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, { clientIds, rootClientId } ) => {
-		const { moveBlocksDown, moveBlocksUp } = dispatch(
+		const { moveBlocksDown, moveBlocksUp, moveBlocksToPosition } = dispatch(
 			'core/block-editor'
 		);
 		return {
 			onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
 			onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
+			onLongMove: ( targetIndex ) =>
+				partial(
+					moveBlocksToPosition,
+					clientIds,
+					rootClientId,
+					targetIndex
+				),
 		};
 	} ),
 	withInstanceId
