@@ -14,13 +14,8 @@ import { __ } from '@wordpress/i18n';
 import { getTemplateInfo } from '../../../utils';
 import { normalizedSearch } from './utils';
 
-export default function SearchResults( {
-	items,
-	isDebouncing,
-	searchQuery,
-	renderItem,
-} ) {
-	const loading = items === null || isDebouncing;
+export default function SearchResults( { items, searchQuery, renderItem } ) {
+	const loading = items === null;
 
 	const itemsFiltered = useMemo( () => {
 		if ( items === null || searchQuery.length === 0 ) {
