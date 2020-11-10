@@ -6,7 +6,7 @@ import {
 	getBlockTransforms,
 	pasteHandler,
 } from '@wordpress/blocks';
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect, select } from '@wordpress/data';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -136,6 +136,30 @@ export function onFilesDrop(
 ) {
 	return ( files ) => {
 		if ( ! hasUploadPermissions ) {
+			return;
+		}
+
+		const parentBlock = select( 'core/block-editor' ).getBlock(
+			targetRootClientId
+		);
+
+		const imageFiles = files.filter(
+			( file ) => file.type.indexOf( 'image/' ) === 0
+		);
+		if ( parentBlock?.name === 'core/gallery' && imageFiles?.length > 0 ) {
+			const transformation = findTransform(
+				getBlockTransforms( 'from' ),
+				( transform ) =>
+					transform.type === 'files' &&
+					transform.isMatch( [ imageFiles[ 0 ] ] )
+			);
+			if ( transformation ) {
+				const blocks = imageFiles.map( ( file ) =>
+					transformation.transform( [ file ], updateBlockAttributes )
+				);
+
+				insertBlocks( blocks, targetBlockIndex, targetRootClientId );
+			}
 			return;
 		}
 

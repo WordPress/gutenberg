@@ -41,20 +41,19 @@ const transforms = {
 					: undefined;
 
 				const validImages = filter( attributes, ( { url } ) => url );
-
-				return createBlock( 'core/gallery', {
-					images: validImages.map(
-						( { id, url, alt, caption } ) => ( {
-							id: toString( id ),
-							url,
-							alt,
-							caption,
-						} )
-					),
-					ids: validImages.map( ( { id } ) => parseInt( id, 10 ) ),
-					align,
-					sizeSlug,
+				const innerBlocks = validImages.map( ( image ) => {
+					return createBlock( 'core/image', image );
 				} );
+
+				return createBlock(
+					'core/gallery',
+					{
+						imageCount: innerBlocks.length,
+						align,
+						sizeSlug,
+					},
+					innerBlocks
+				);
 			},
 		},
 		{
@@ -122,17 +121,20 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { images, align, sizeSlug, ids } ) => {
-				if ( images.length > 0 ) {
-					return images.map( ( { url, alt, caption }, index ) =>
-						createBlock( 'core/image', {
-							id: ids[ index ],
-							url,
-							alt,
-							caption,
-							align,
-							sizeSlug,
-						} )
+			transform: ( { align }, innerBlocks ) => {
+				if ( innerBlocks.length > 0 ) {
+					return innerBlocks.map(
+						( {
+							attributes: { id, url, alt, caption, sizeSlug },
+						} ) =>
+							createBlock( 'core/image', {
+								id,
+								url,
+								alt,
+								caption,
+								sizeSlug,
+								align,
+							} )
 					);
 				}
 				return createBlock( 'core/image', { align } );

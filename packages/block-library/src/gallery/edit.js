@@ -8,6 +8,7 @@ import { isEqual, isEmpty, find } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import {
+	Button,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
@@ -282,6 +283,7 @@ function GalleryEdit( props ) {
 
 	const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
 	const hasLinkTo = linkTo && linkTo !== 'none';
+
 	return (
 		<>
 			<InspectorControls>

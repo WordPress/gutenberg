@@ -18,6 +18,11 @@ import {
 	useIsLineHeightDisabled,
 } from './line-height';
 import {
+	FONT_FAMILY_SUPPORT_KEY,
+	FontFamilyEdit,
+	useIsFontFamilyDisabled,
+} from './font-family';
+import {
 	FONT_SIZE_SUPPORT_KEY,
 	FontSizeEdit,
 	useIsFontSizeDisabled,
@@ -30,6 +35,7 @@ import {
 export const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
+	FONT_FAMILY_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,
 ];
 
@@ -42,6 +48,7 @@ export function TypographyPanel( props ) {
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Typography' ) }>
+				<FontFamilyEdit { ...props } />
 				<FontSizeEdit { ...props } />
 				<LineHeightEdit { ...props } />
 				<TextDecorationAndTransformEdit { ...props } />
@@ -63,6 +70,7 @@ function useIsTypographyDisabled( props = {} ) {
 	const configs = [
 		useIsFontSizeDisabled( props ),
 		useIsLineHeightDisabled( props ),
+		useIsFontFamilyDisabled( props ),
 		useIsTextTransformDisabled( props ),
 	];
 
