@@ -96,7 +96,6 @@ export const Gallery = ( props ) => {
 				accessibilityLabelCreator={ ( caption ) =>
 					isEmpty( caption )
 						? /* translators: accessibility text. Empty gallery caption. */
-
 						  'Gallery caption. Empty'
 						: sprintf(
 								/* translators: accessibility text. %s: gallery caption. */
