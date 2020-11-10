@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import React from 'react';
 import {
 	FlatList,
 	View,
@@ -30,6 +31,14 @@ import styles from './style.scss';
 
 const MIN_COL_NUM = 3;
 
+const SeparatorComponent = () => {
+	return (
+		<TouchableWithoutFeedback accessible={ false }>
+			<View style={ styles.rowSeparator } />
+		</TouchableWithoutFeedback>
+	);
+};
+
 export class InserterMenu extends Component {
 	constructor() {
 		super( ...arguments );
@@ -37,6 +46,7 @@ export class InserterMenu extends Component {
 		this.onClose = this.onClose.bind( this );
 		this.onLayout = this.onLayout.bind( this );
 		this.renderItem = this.renderItem.bind( this );
+		this.listStyles = {};
 		this.state = {
 			numberOfColumns: MIN_COL_NUM,
 		};
@@ -124,6 +134,18 @@ export class InserterMenu extends Component {
 		);
 	}
 
+	keyExtractor( item ) {
+		return item.name;
+	}
+
+	getStyles( listStyles ) {
+		if (
+			JSON.stringify( listStyles ) !== JSON.stringify( this.listStyles )
+		) {
+			this.listStyles = listStyles;
+		}
+	}
+
 	render() {
 		const { items } = this.props;
 		const { numberOfColumns } = this.state;
@@ -144,16 +166,11 @@ export class InserterMenu extends Component {
 								keyboardShouldPersistTaps="always"
 								numColumns={ numberOfColumns }
 								data={ items }
-								ItemSeparatorComponent={ () => (
-									<TouchableWithoutFeedback
-										accessible={ false }
-									>
-										<View style={ styles.rowSeparator } />
-									</TouchableWithoutFeedback>
-								) }
-								keyExtractor={ ( item ) => item.name }
+								ItemSeparatorComponent={ SeparatorComponent }
+								keyExtractor={ this.keyExtractor }
 								renderItem={ this.renderItem }
 								{ ...listProps }
+								style={ this.listStyles }
 								contentContainerStyle={ [
 									...listProps.contentContainerStyle,
 									{
