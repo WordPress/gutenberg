@@ -24,6 +24,7 @@ export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
+export { createAtom, createAtomRegistry } from './atom';
 
 /**
  * Object of available plugins to use with a registry.
@@ -185,3 +186,5 @@ export const use = defaultRegistry.use;
  * @param {import('./types').WPDataStore} store Store definition.
  */
 export const register = defaultRegistry.register;
+
+export const registerAtomicStore = defaultRegistry.registerAtomicStore;

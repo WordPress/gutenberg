@@ -345,6 +345,14 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="createAtom" href="#createAtom">#</a> **createAtom**
+
+Undocumented declaration.
+
+<a name="createAtomRegistry" href="#createAtomRegistry">#</a> **createAtomRegistry**
+
+Undocumented declaration.
+
 <a name="createReduxStore" href="#createReduxStore">#</a> **createReduxStore**
 
 Creates a namespace object with a store derived from the reducer given.
@@ -490,6 +498,10 @@ Registers a standard `@wordpress/data` store definition.
 _Parameters_
 
 -   _store_ (unknown type): Store definition.
+
+<a name="registerAtomicStore" href="#registerAtomicStore">#</a> **registerAtomicStore**
+
+Undocumented declaration.
 
 <a name="registerGenericStore" href="#registerGenericStore">#</a> **registerGenericStore**
 

@@ -18,15 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 <a name="store" href="#store">#</a> **store**
 
-Store definition for the keyboard shortcuts namespace.
-
-_Related_
-
--   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
-
-_Type_
-
--   `Object` 
+Undocumented declaration.
 
 <a name="useShortcut" href="#useShortcut">#</a> **useShortcut**
 

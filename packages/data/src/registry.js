@@ -9,6 +9,8 @@ import memize from 'memize';
  */
 import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
+import { createAtomRegistry } from './atom';
+import { createAtomicStore } from './atomic-store';
 
 /**
  * @typedef {Object} WPDataRegistry An isolated orchestrator of store registrations.
@@ -47,6 +49,16 @@ import createCoreDataStore from './store';
  */
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
+	const atomsUnsubscribe = {};
+	const atomRegistry = createAtomRegistry( {
+		onAdd: ( atom ) => {
+			const unsubscribeFromAtom = atom.subscribe( globalListener );
+			atomsUnsubscribe[ atom ] = unsubscribeFromAtom;
+		},
+		onDelete: ( atom ) => {
+			atomsUnsubscribe[ atom ]();
+		},
+	} );
 	let listeners = [];
 
 	/**
@@ -212,6 +224,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	let registry = {
+		atomRegistry,
 		registerGenericStore,
 		stores,
 		namespaces: stores, // TODO: Deprecate/remove this.
@@ -241,6 +254,11 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		);
 		registerGenericStore( storeName, store );
 		return store.store;
+	};
+
+	registry.registerAtomicStore = ( reducerKey, options ) => {
+		const store = createAtomicStore( options, registry );
+		registerGenericStore( reducerKey, store );
 	};
 
 	//
