@@ -45,10 +45,6 @@ _Returns_
 
 -   `Object`: The control descriptor.
 
-<a name="awaitPromise" href="#awaitPromise">#</a> **awaitPromise**
-
-Undocumented declaration.
-
 <a name="controls" href="#controls">#</a> **controls**
 
 The default export is what you use to register the controls with your custom
