@@ -37,6 +37,13 @@ const runPromise = async ( promise ) => {
 	await promise;
 };
 
+const runPendingPromises = async () => {
+	jest.runAllTimers();
+	const p = new Promise( ( resolve ) => setTimeout( resolve ) );
+	jest.runAllTimers();
+	await p;
+};
+
 describe( 'receiveEntityRecord', () => {
 	function createTestRegistry( getEntityRecord ) {
 		const registry = createRegistry();
@@ -99,6 +106,7 @@ describe( 'receiveEntityRecord', () => {
 				.getEntityRecords( 'root', 'postType' )
 		);
 		jest.runAllTimers();
+		await runPendingPromises();
 
 		// Select record with id = 2, it is available and should not trigger the resolver
 		await runPromise(
@@ -206,7 +214,7 @@ describe( 'saveEntityRecord', () => {
 				slug: 'post-1',
 				newField: 'a',
 			} );
-		jest.runAllTimers();
+		await runPendingPromises();
 
 		// There should ONLY be a single hanging API call (PUT) by this point.
 		// If there have been any other requests, it is a race condition of some sorts,
@@ -248,7 +256,7 @@ describe( 'saveEntityRecord', () => {
 
 		// Calling the selector after the save is finished should trigger a resolver and a GET request
 		registry.select( 'core' ).getEntityRecords( 'root', 'postType' );
-		jest.runAllTimers();
+		await runPendingPromises();
 		expect( triggerFetch ).toBeCalledTimes( 1 );
 		expect( triggerFetch ).toBeCalledWith( {
 			path: '/wp/v2/types?context=edit',
