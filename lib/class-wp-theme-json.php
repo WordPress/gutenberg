@@ -203,64 +203,55 @@ class WP_Theme_JSON {
 	);
 
 	/**
-	 * Metadata to know which style properties are supported
-	 * by theme.json and block.json an how to process them.
+	 * Metadata for style properties.
+	 *
+	 * - 'theme_json' => where the property value is stored
+	 * - 'block_json' => whether the block has declared support for it
 	 */
 	const PROPERTIES_METADATA = array(
 		'--wp--style--color--link' => array(
 			'theme_json' => array( 'color', 'link' ),
 			'block_json' => array( 'color', 'link' ),
-			'property'   => '--wp--style--color--link',
 		),
 		'background'               => array(
 			'theme_json' => array( 'color', 'gradient' ),
 			'block_json' => array( 'color', 'gradients' ),
-			'property'   => 'background',
 		),
 		'backgroundColor'          => array(
 			'theme_json' => array( 'color', 'background' ),
 			'block_json' => array( 'color' ),
-			'property'   => 'background-color',
 		),
 		'color'                    => array(
 			'theme_json' => array( 'color', 'text' ),
 			'block_json' => array( 'color' ),
-			'property'   => 'color',
 		),
 		'fontFamily'               => array(
 			'theme_json' => array( 'typography', 'fontFamily' ),
 			'block_json' => array( '__experimentalFontFamily' ),
-			'property'   => 'font-family',
 		),
 		'fontSize'                 => array(
 			'theme_json' => array( 'typography', 'fontSize' ),
 			'block_json' => array( 'fontSize' ),
-			'property'   => 'font-size',
 		),
 		'fontStyle'                => array(
 			'theme_json' => array( 'typography', 'fontStyle' ),
 			'block_json' => array( '__experimentalFontAppearance' ),
-			'property'   => 'font-style',
 		),
 		'fontWeight'               => array(
 			'theme_json' => array( 'typography', 'fontWeight' ),
 			'block_json' => array( '__experimentalFontAppearance' ),
-			'property'   => 'font-weight',
 		),
 		'lineHeight'               => array(
 			'theme_json' => array( 'typography', 'lineHeight' ),
 			'block_json' => array( 'lineHeight' ),
-			'property'   => 'line-height',
 		),
 		'textDecoration'           => array(
 			'theme_json' => array( 'typography', 'textDecoration' ),
 			'block_json' => array( '__experimentalTextDecoration' ),
-			'property'   => 'text-decoration',
 		),
 		'textTransform'            => array(
 			'theme_json' => array( 'typography', 'textTransform' ),
 			'block_json' => array( '__experimentalTextTransform' ),
-			'property'   => 'text-transform',
 		),
 	);
 
@@ -644,8 +635,9 @@ class WP_Theme_JSON {
 
 			$value = $this->get_property_value( $context['styles'], $metadata['theme_json'] );
 			if ( ! empty( $value ) ) {
+				$kebabcased_name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $name ) );
 				$declarations[] = array(
-					'name'  => $metadata['property'],
+					'name'  => $kebabcased_name,
 					'value' => $value,
 				);
 			}
