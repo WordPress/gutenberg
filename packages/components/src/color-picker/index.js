@@ -34,7 +34,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import { useDebounce } from '@wordpress/compose';
 /**
  * Internal dependencies
@@ -130,7 +130,10 @@ export default function ColorPicker( {
 		draftHsl: initialColor.hsl,
 	} );
 
-	const debouncedOnChangeComplete = useDebounce( onChangeComplete, 100 );
+	const debouncedOnChangeComplete = useCallback(
+		useDebounce( onChangeComplete, 100 ),
+		[ onChangeComplete ]
+	);
 
 	const { hex, hsl, hsv, rgb, draftHex, draftHsl, draftRgb } = colors;
 

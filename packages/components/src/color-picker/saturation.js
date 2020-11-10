@@ -34,7 +34,7 @@ import { clamp, noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { TAB } from '@wordpress/keycodes';
 import { useThrottle, useInstanceId } from '@wordpress/compose';
 
@@ -56,7 +56,9 @@ export default function Saturation( { hsv, hsl, onChange = noop } ) {
 		left: `${ hsv.s }%`,
 	};
 
-	const throttledOnChange = useThrottle( onChange, 50 );
+	const throttledOnChange = useCallback( useThrottle( onChange, 50 ), [
+		onChange,
+	] );
 
 	function saturate( amount = 0.01 ) {
 		const intSaturation = clamp(
