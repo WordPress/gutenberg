@@ -103,16 +103,15 @@ describe( 'receiveEntityRecord', () => {
 		await runPromise(
 			registry
 				.dispatch( 'test/resolution' )
-				.getEntityRecords( 'root', 'postType' )
+				.getEntityRecords( 'root', 'site' )
 		);
 		jest.runAllTimers();
-		await runPendingPromises();
 
 		// Select record with id = 2, it is available and should not trigger the resolver
 		await runPromise(
 			registry
 				.dispatch( 'test/resolution' )
-				.getEntityRecord( 'root', 'postType', 2 )
+				.getEntityRecord( 'root', 'site', 2 )
 		);
 		expect( getEntityRecord ).not.toHaveBeenCalled();
 
@@ -120,7 +119,7 @@ describe( 'receiveEntityRecord', () => {
 		await runPromise(
 			registry
 				.dispatch( 'test/resolution' )
-				.getEntityRecord( 'root', 'postType', 4 )
+				.getEntityRecord( 'root', 'site', 4 )
 		);
 		expect( getEntityRecord ).toHaveBeenCalled();
 	} );
@@ -136,7 +135,7 @@ describe( 'receiveEntityRecord', () => {
 		await runPromise(
 			registry
 				.dispatch( 'test/resolution' )
-				.getEntityRecords( 'root', 'template' )
+				.getEntityRecords( 'root', 'taxonomy' )
 		);
 		jest.runAllTimers();
 
@@ -144,7 +143,7 @@ describe( 'receiveEntityRecord', () => {
 		await runPromise(
 			registry
 				.dispatch( 'test/resolution' )
-				.getEntityRecord( 'root', 'template', 'test-1' )
+				.getEntityRecord( 'root', 'taxonomy', 'test-1' )
 		);
 		expect( getEntityRecord ).not.toHaveBeenCalled();
 
@@ -152,7 +151,7 @@ describe( 'receiveEntityRecord', () => {
 		await runPromise(
 			registry
 				.dispatch( 'test/resolution' )
-				.getEntityRecord( 'root', 'template', 'test-2' )
+				.getEntityRecord( 'root', 'taxonomy', 'test-2' )
 		);
 		expect( getEntityRecord ).toHaveBeenCalled();
 	} );
