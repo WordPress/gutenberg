@@ -49,6 +49,7 @@ import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceMediaFilesEditedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgePackage;
@@ -82,7 +83,8 @@ public class WPAndroidGlueCode {
     private boolean mAppendsMultipleSelectedToSiblingBlocks = false;
 
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
-    private OnReattachQueryListener mOnReattachQueryListener;
+    private OnReattachMediaUploadQueryListener mOnReattachMediaUploadQueryListener;
+    private OnReattachMediaSavingQueryListener mOnReattachMediaSavingQueryListener;
     private OnEditorMountListener mOnEditorMountListener;
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
@@ -92,6 +94,8 @@ public class WPAndroidGlueCode {
     private OnGutenbergDidSendButtonPressedActionListener mOnGutenbergDidSendButtonPressedActionListener;
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
     private OnStarterPageTemplatesTooltipShownEventListener mOnStarterPageTemplatesTooltipShownListener;
+    private OnMediaFilesCollectionBasedBlockEditorListener mOnMediaFilesCollectionBasedBlockEditorListener;
+    private ReplaceMediaFilesEditedBlockCallback mReplaceMediaFilesEditedBlockCallback;
     private boolean mIsEditorMounted;
 
     private String mContentHtml = "";
@@ -146,12 +150,23 @@ public class WPAndroidGlueCode {
         void onOtherMediaButtonClicked(String mediaSource, boolean allowMultipleSelection);
     }
 
+    public interface OnMediaFilesCollectionBasedBlockEditorListener {
+        void onRequestMediaFilesEditorLoad(ArrayList<Object> mediaFiles, String blockId);
+        void onCancelUploadForMediaCollection(ArrayList<Object> mediaFiles);
+        void onRetryUploadForMediaCollection(ArrayList<Object> mediaFiles);
+        void onCancelSaveForMediaCollection(ArrayList<Object> mediaFiles);
+    }
+
     public interface OnImageFullscreenPreviewListener {
         void onImageFullscreenPreviewClicked(String mediaUrl);
     }
 
-    public interface OnReattachQueryListener {
+    public interface OnReattachMediaUploadQueryListener {
         void onQueryCurrentProgressForUploadingMedia();
+    }
+
+    public interface OnReattachMediaSavingQueryListener {
+        void onQueryCurrentProgressForSavingMedia();
     }
 
     public interface OnEditorMountListener {
@@ -267,7 +282,13 @@ public class WPAndroidGlueCode {
             @Override
             public void mediaUploadSync(MediaSelectedCallback mediaSelectedCallback) {
                 mMediaSelectedCallback = mediaSelectedCallback;
-                mOnReattachQueryListener.onQueryCurrentProgressForUploadingMedia();
+                mOnReattachMediaUploadQueryListener.onQueryCurrentProgressForUploadingMedia();
+            }
+
+            @Override
+            public void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback) {
+                mMediaSelectedCallback = mediaSelectedCallback;
+                mOnReattachMediaSavingQueryListener.onQueryCurrentProgressForSavingMedia();
             }
 
             @Override
@@ -399,6 +420,38 @@ public class WPAndroidGlueCode {
                 boolean tooltipShown = mOnStarterPageTemplatesTooltipShownListener.onRequestStarterPageTemplatesTooltipShown();
                 starterPageTemplatesTooltipShownCallback.onRequestStarterPageTemplatesTooltipShown(tooltipShown);
             }
+
+            @Override
+            public void requestMediaFilesEditorLoad(
+                    ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
+                    ReadableArray mediaFiles,
+                    String blockId
+            ) {
+                mReplaceMediaFilesEditedBlockCallback = replaceMediaFilesEditedBlockCallback;
+                mOnMediaFilesCollectionBasedBlockEditorListener
+                        .onRequestMediaFilesEditorLoad(mediaFiles.toArrayList(), blockId);
+            }
+
+            @Override
+            public void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles) {
+                mOnMediaFilesCollectionBasedBlockEditorListener.onRetryUploadForMediaCollection(
+                        mediaFiles.toArrayList()
+                );
+            }
+
+            @Override
+            public void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles) {
+                mOnMediaFilesCollectionBasedBlockEditorListener.onCancelUploadForMediaCollection(
+                        mediaFiles.toArrayList()
+                );
+            }
+
+            @Override
+            public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
+                mOnMediaFilesCollectionBasedBlockEditorListener.onCancelSaveForMediaCollection(
+                        mediaFiles.toArrayList()
+                );
+            }
         }, mIsDarkMode);
 
         return Arrays.asList(
@@ -462,7 +515,8 @@ public class WPAndroidGlueCode {
 
     public void attachToContainer(ViewGroup viewGroup,
                                   OnMediaLibraryButtonListener onMediaLibraryButtonListener,
-                                  OnReattachQueryListener onReattachQueryListener,
+                                  OnReattachMediaUploadQueryListener onReattachMediaUploadQueryListener,
+                                  OnReattachMediaSavingQueryListener onReattachMediaSavingQueryListener,
                                   OnEditorMountListener onEditorMountListener,
                                   OnEditorAutosaveListener onEditorAutosaveListener,
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
@@ -474,12 +528,14 @@ public class WPAndroidGlueCode {
                                   OnGutenbergDidSendButtonPressedActionListener onGutenbergDidSendButtonPressedActionListener,
                                   AddMentionUtil addMentionUtil,
                                   OnStarterPageTemplatesTooltipShownEventListener onStarterPageTemplatesTooltipListener,
+                                  OnMediaFilesCollectionBasedBlockEditorListener onMediaFilesCollectionBasedBlockEditorListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
 
         mOnMediaLibraryButtonListener = onMediaLibraryButtonListener;
-        mOnReattachQueryListener = onReattachQueryListener;
+        mOnReattachMediaUploadQueryListener = onReattachMediaUploadQueryListener;
+        mOnReattachMediaSavingQueryListener = onReattachMediaSavingQueryListener;
         mOnEditorMountListener = onEditorMountListener;
         mOnEditorAutosaveListener = onEditorAutosaveListener;
         mRequestExecutor = fetchExecutor;
@@ -490,6 +546,7 @@ public class WPAndroidGlueCode {
         mOnGutenbergDidSendButtonPressedActionListener = onGutenbergDidSendButtonPressedActionListener;
         mAddMentionUtil = addMentionUtil;
         mOnStarterPageTemplatesTooltipShownListener = onStarterPageTemplatesTooltipListener;
+        mOnMediaFilesCollectionBasedBlockEditorListener = onMediaFilesCollectionBasedBlockEditorListener;
 
         sAddCookiesInterceptor.setOnAuthHeaderRequestedListener(onAuthHeaderRequestedListener);
 
@@ -857,10 +914,41 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onUploadMediaFileClear(mediaId);
     }
 
+    public void clearFileSaveStatus(final String mediaId) {
+        mDeferredEventEmitter.onSaveMediaFileClear(mediaId);
+    }
+
+    public void mediaFileSaveProgress(final String mediaId, final float progress) {
+        mDeferredEventEmitter.onMediaFileSaveProgress(mediaId, progress);
+    }
+
+    public void mediaFileSaveFailed(final String mediaId) {
+        mDeferredEventEmitter.onMediaFileSaveFailed(mediaId);
+    }
+
+    public void mediaFileSaveSucceeded(final String mediaId, final String mediaUrl) {
+        mDeferredEventEmitter.onMediaFileSaveSucceeded(mediaId, mediaUrl);
+    }
+
+    public void mediaCollectionFinalSaveResult(final String blockFirstMediaId, final boolean success) {
+        mDeferredEventEmitter.onMediaCollectionSaveResult(blockFirstMediaId, success);
+    }
+
+    public void mediaIdChanged(final String oldId, final String newId, final String oldUrl) {
+        mDeferredEventEmitter.onMediaIdChanged(oldId, newId, oldUrl);
+    }
+
     public void replaceUnsupportedBlock(String content, String blockId) {
         if (mReplaceUnsupportedBlockCallback != null) {
             mReplaceUnsupportedBlockCallback.replaceUnsupportedBlock(content, blockId);
             mReplaceUnsupportedBlockCallback = null;
+        }
+    }
+
+    public void replaceMediaFilesEditedBlock(String mediaFiles, String blockId) {
+        if (mReplaceMediaFilesEditedBlockCallback != null) {
+            mReplaceMediaFilesEditedBlockCallback.replaceMediaFilesEditedBlock(mediaFiles, blockId);
+            mReplaceMediaFilesEditedBlockCallback = null;
         }
     }
 

@@ -289,6 +289,43 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
+    func requestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFilesEditorLoad(mediaFiles, blockId: blockId)
+        }
+    }
+
+    @objc
+    func requestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFilesFailedRetryDialog(mediaFiles)
+        }
+    }
+
+    @objc
+    func requestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFilesUploadCancelDialog(mediaFiles)
+        }
+    }
+
+    @objc
+    func requestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFilesSaveCancelDialog(mediaFiles)
+        }
+    }
+
+    @objc
+    func mediaSaveSync() {
+        DispatchQueue.main.async {
+            if self.hasObservers {
+                self.delegate?.gutenbergDidRequestMediaSaveSync()
+            }
+        }
+    }
+
+    @objc
     func actionButtonPressed(_ buttonType: String) {
         guard let button = Gutenberg.ActionButtonType(rawValue: buttonType) else {
             return
@@ -321,6 +358,7 @@ extension RNReactNativeGutenbergBridge {
         case replaceBlock
         case updateCapabilities
         case showNotice
+        case mediaSave
     }
 
     public override func supportedEvents() -> [String]! {
