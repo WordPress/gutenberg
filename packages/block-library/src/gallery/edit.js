@@ -8,7 +8,6 @@ import { isEqual, isEmpty, find } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import {
-	Button,
 	PanelBody,
 	SelectControl,
 	ToggleControl,

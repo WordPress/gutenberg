@@ -20,7 +20,6 @@ import {
 } from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import { mediaUploadSync } from '@wordpress/react-native-bridge';
-import { useSelect } from '@wordpress/data';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
 
 const TILE_SPACING = 8;
@@ -33,11 +32,14 @@ export const Gallery = ( props ) => {
 	const [ isCaptionSelected, setIsCaptionSelected ] = useState( false );
 	useEffect( mediaUploadSync, [] );
 
-	const isRTL = useSelect( ( select ) => {
-		return !! select( 'core/block-editor' ).getSettings().isRTL;
-	}, [] );
-
-	const { mediaPlaceholder, attributes, isNarrow } = props;
+	const {
+		mediaPlaceholder,
+		attributes,
+		isNarrow,
+		onBlur,
+		insertBlocksAfter,
+		clientId,
+	} = props;
 
 	const {
 		imageCount,
@@ -52,9 +54,7 @@ export const Gallery = ( props ) => {
 	);
 
 	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: 'blocks-gallery-grid',
-		},
+		{},
 		{
 			contentResizeMode: 'stretch',
 			allowedBlocks: [ 'core/image' ],
@@ -70,12 +70,44 @@ export const Gallery = ( props ) => {
 		}
 	);
 
+	const focusGalleryCaption = () => {
+		if ( ! isCaptionSelected ) {
+			setIsCaptionSelected( true );
+		}
+	};
+
 	const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 
 	return (
-		<View style={ [ isFullWidth && styles.fullWidth ] }>
+		<View style={ isFullWidth && styles.fullWidth }>
 			<View { ...innerBlocksProps } />
-			{ mediaPlaceholder }
+			<View
+				style={ [
+					isFullWidth && styles.fullWidth,
+					styles.galleryAppender,
+				] }
+			>
+				{ mediaPlaceholder }
+			</View>
+			<BlockCaption
+				clientId={ clientId }
+				isSelected={ isCaptionSelected }
+				accessible={ true }
+				accessibilityLabelCreator={ ( caption ) =>
+					isEmpty( caption )
+						? /* translators: accessibility text. Empty gallery caption. */
+
+						  'Gallery caption. Empty'
+						: sprintf(
+								/* translators: accessibility text. %s: gallery caption. */
+								__( 'Gallery caption. %s' ),
+								caption
+						  )
+				}
+				onFocus={ focusGalleryCaption }
+				onBlur={ onBlur } // always assign onBlur as props
+				insertBlocksAfter={ insertBlocksAfter }
+			/>
 		</View>
 	);
 };
