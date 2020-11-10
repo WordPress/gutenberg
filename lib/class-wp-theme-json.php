@@ -13,7 +13,9 @@ class WP_Theme_JSON {
 
 	/**
 	 * Container of data in theme.json format.
-	*/
+	 *
+	 * @var array
+	 */
 	private $contexts = null;
 
 	/**
@@ -52,11 +54,11 @@ class WP_Theme_JSON {
 	 *   }
 	 * }
 	 */
-	private const SCHEMA = array(
+	const SCHEMA = array(
 		'selector' => null,
 		'supports' => null,
-		'styles' => array(
-			'color' => array(
+		'styles'   => array(
+			'color'      => array(
 				'background' => null,
 				'gradient'   => null,
 				'link'       => null,
@@ -73,14 +75,14 @@ class WP_Theme_JSON {
 			),
 		),
 		'settings' => array(
-			'color' => array(
+			'color'      => array(
 				'custom'         => null,
 				'customGradient' => null,
 				'gradients'      => null,
 				'link'           => null,
 				'palette'        => null,
 			),
-			'spacing' => array(
+			'spacing'    => array(
 				'customPadding' => null,
 				'units'         => null,
 			),
@@ -95,7 +97,7 @@ class WP_Theme_JSON {
 				'textDecorations'  => null,
 				'textTransforms'   => null,
 			),
-			'custom' => null,
+			'custom'     => null,
 		),
 	);
 
@@ -105,15 +107,15 @@ class WP_Theme_JSON {
 	 *
 	 * This contains the necessary metadata to process them.
 	 */
-	private const PRESETS_METADATA = array(
+	const PRESETS_METADATA = array(
 		array(
 			'path'         => array( 'settings', 'color', 'palette' ),
 			'value_key'    => 'color',
 			'preset_infix' => 'color',
-			'class' => array(
+			'class'        => array(
 				array(
-					'suffix' => 'color',
-					'property' => 'color'
+					'suffix'   => 'color',
+					'property' => 'color',
 				),
 				array(
 					'suffix'   => 'background-color',
@@ -125,10 +127,10 @@ class WP_Theme_JSON {
 			'path'         => array( 'settings', 'color', 'gradients' ),
 			'value_key'    => 'gradient',
 			'preset_infix' => 'gradient',
-			'class' => array(
+			'class'        => array(
 				array(
 					'suffix'   => 'gradient-background',
-					'property' => 'background'
+					'property' => 'background',
 				),
 			),
 		),
@@ -136,7 +138,7 @@ class WP_Theme_JSON {
 			'path'         => array( 'settings', 'typography', 'fontSizes' ),
 			'value_key'    => 'size',
 			'preset_infix' => 'font-size',
-			'class' => array(
+			'class'        => array(
 				array(
 					'suffix'   => 'font-size',
 					'property' => 'font-size',
@@ -147,7 +149,7 @@ class WP_Theme_JSON {
 			'path'         => array( 'settings', 'typography', 'fontFamilies' ),
 			'value_key'    => 'fontFamily',
 			'preset_infix' => 'font-family',
-			'class' => array(
+			'class'        => array(
 				array(
 					'suffix'   => 'font-family',
 					'property' => 'font-family',
@@ -158,7 +160,7 @@ class WP_Theme_JSON {
 			'path'         => array( 'settings', 'typography', 'fontStyles' ),
 			'value_key'    => 'slug',
 			'preset_infix' => 'font-style',
-			'class' => array(
+			'class'        => array(
 				array(
 					'suffix'   => 'font-style',
 					'property' => 'font-style',
@@ -169,7 +171,7 @@ class WP_Theme_JSON {
 			'path'         => array( 'settings', 'typography', 'fontWeights' ),
 			'value_key'    => 'slug',
 			'preset_infix' => 'font-weight',
-			'class' => array(
+			'class'        => array(
 				array(
 					'suffix'   => 'font-weight',
 					'property' => 'font-weight',
@@ -180,7 +182,7 @@ class WP_Theme_JSON {
 			'path'         => array( 'settings', 'typography', 'textDecorations' ),
 			'value_key'    => 'value',
 			'preset_infix' => 'text-decoration',
-			'class' => array(
+			'class'        => array(
 				array(
 					'suffix'   => 'text-decoration',
 					'property' => 'text-decoration',
@@ -191,7 +193,7 @@ class WP_Theme_JSON {
 			'path'         => array( 'settings', 'typography', 'textTransforms' ),
 			'value_key'    => 'slug',
 			'preset_infix' => 'text-transform',
-			'class' => array(
+			'class'        => array(
 				array(
 					'suffix'   => 'text-transform',
 					'property' => 'text-transform',
@@ -204,7 +206,7 @@ class WP_Theme_JSON {
 	 * Metadata to know which style properties are supported
 	 * by theme.json and block.json an how to process them.
 	 */
-	private const PROPERTIES_METADATA = array(
+	const PROPERTIES_METADATA = array(
 		'--wp--style--color--link' => array(
 			'theme_json' => array( 'color', 'link' ),
 			'block_json' => array( 'color', 'link' ),
@@ -233,7 +235,7 @@ class WP_Theme_JSON {
 		'fontSize'                 => array(
 			'theme_json' => array( 'typography', 'fontSize' ),
 			'block_json' => array( 'fontSize' ),
-			'property'   => 'font-size'
+			'property'   => 'font-size',
 		),
 		'fontStyle'                => array(
 			'theme_json' => array( 'typography', 'fontStyle' ),
@@ -243,7 +245,7 @@ class WP_Theme_JSON {
 		'fontWeight'               => array(
 			'theme_json' => array( 'typography', 'fontWeight' ),
 			'block_json' => array( '__experimentalFontAppearance' ),
-			'property' => 'font-weight',
+			'property'   => 'font-weight',
 		),
 		'lineHeight'               => array(
 			'theme_json' => array( 'typography', 'lineHeight' ),
@@ -267,7 +269,7 @@ class WP_Theme_JSON {
 	 *
 	 * @param array $contexts A structure that follows the theme.json schema.
 	 */
-	public function __construct( $contexts = array() ){
+	public function __construct( $contexts = array() ) {
 		$this->contexts = array();
 
 		if ( ! is_array( $contexts ) ) {
@@ -365,9 +367,9 @@ class WP_Theme_JSON {
 							'fontSize'                     => true,
 							'lineHeight'                   => true,
 						),
-					),
+					)
 				),
-			),
+			)
 		);
 		foreach ( $blocks as $block_name => $block_type ) {
 			if (
@@ -446,8 +448,8 @@ class WP_Theme_JSON {
 	 * the nodes that aren't valid per the schema.
 	 *
 	 * @param string $key Key of the subtree to normalize.
-	 * @param array $input Whole tree to normalize.
-	 * @param array $schema Schema to use for normalization.
+	 * @param array  $input Whole tree to normalize.
+	 * @param array  $schema Schema to use for normalization.
 	 */
 	private function process_key( $key, &$input, $schema ) {
 		if ( ! is_array( $input ) || ! array_key_exists( $key, $input ) ) {
@@ -466,7 +468,7 @@ class WP_Theme_JSON {
 
 		$input[ $key ] = array_intersect_key(
 			$input[ $key ],
-			$schema[ $key ],
+			$schema[ $key ]
 		);
 
 		if ( 0 === count( $input[ $key ] ) ) {
@@ -603,7 +605,7 @@ class WP_Theme_JSON {
 				$token_out,
 				substr( $value, $prefix_len )
 			);
-			$value = "var(--wp--$unwrapped_name)";
+			$value          = "var(--wp--$unwrapped_name)";
 		}
 
 		return $value;
@@ -613,10 +615,12 @@ class WP_Theme_JSON {
 	 * Given a context, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
 	 *
+	 * ```php
 	 * array(
 	 *   'name'  => 'property_name',
 	 *   'value' => 'property_value,
 	 * )
+	 * ```
 	 *
 	 * Note that this modifies the $declarations in place.
 	 *
@@ -634,7 +638,7 @@ class WP_Theme_JSON {
 		}
 
 		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
-			if ( ! in_array( $name, $context['supports'] ) ) {
+			if ( ! in_array( $name, $context['supports'], true ) ) {
 				continue;
 			}
 
@@ -655,7 +659,7 @@ class WP_Theme_JSON {
 	 * Note this function modifies $stylesheet in place.
 	 *
 	 * @param string $stylesheet Input stylesheet to add the presets to.
-	 * @param array $context Context to process.
+	 * @param array  $context Context to process.
 	 */
 	private function compute_preset_classes( &$stylesheet, $context ) {
 		foreach ( self::PRESETS_METADATA as $preset ) {
@@ -663,12 +667,12 @@ class WP_Theme_JSON {
 			foreach ( $values as $value ) {
 				foreach ( $preset['class'] as $class ) {
 					$stylesheet .= $this->to_ruleset(
-						$context['selector'] . ".has-" . $value['slug'] . "-" . $class['suffix'],
+						$context['selector'] . '.has-' . $value['slug'] . '-' . $class['suffix'],
 						array(
 							array(
 								'name'  => $class['property'],
-								'value' => $value[ $preset['value_key'] ]
-							)
+								'value' => $value[ $preset['value_key'] ],
+							),
 						)
 					);
 				}
@@ -681,10 +685,12 @@ class WP_Theme_JSON {
 	 * for the presets and adds them to the $declarations array
 	 * following the format:
 	 *
+	 * ```php
 	 * array(
 	 *   'name'  => 'property_name',
 	 *   'value' => 'property_value,
 	 * )
+	 * ```
 	 *
 	 * Note that this modifies the $declarations in place.
 	 *
@@ -708,10 +714,12 @@ class WP_Theme_JSON {
 	 * for the custom values and adds them to the $declarations
 	 * array following the format:
 	 *
+	 * ```php
 	 * array(
 	 *   'name'  => 'property_name',
 	 *   'value' => 'property_value,
 	 * )
+	 * ```
 	 *
 	 * Note that this modifies the $declarations in place.
 	 *
@@ -719,7 +727,7 @@ class WP_Theme_JSON {
 	 * @param array $context Input context to process.
 	 */
 	private function compute_theme_vars( &$declarations, $context ) {
-		$custom_values = $this->get_from_path( $context, [ 'settings', 'custom' ] );
+		$custom_values = $this->get_from_path( $context, array( 'settings', 'custom' ) );
 		$css_vars      = $this->flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
 			$declarations[] = array(
@@ -737,7 +745,7 @@ class WP_Theme_JSON {
 	 * if SCRIPT_DEBUG is defined and true.
 	 *
 	 * @param string $selector CSS selector.
-	 * @param array $declarations List of declarations.
+	 * @param array  $declarations List of declarations.
 	 *
 	 * @return string CSS ruleset.
 	 */
@@ -747,17 +755,19 @@ class WP_Theme_JSON {
 		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
 			$declaration_block = array_reduce(
 				$declarations,
-				function ( $carry, $element ) { return $carry .= "\t" . $element['name'] . ': ' . $element['value'] . ";\n"; },
-				'',
+				function ( $carry, $element ) {
+					return $carry .= "\t" . $element['name'] . ': ' . $element['value'] . ";\n"; },
+				''
 			);
-			$ruleset .= $selector . " {\n" . $declaration_block . "}\n";
+			$ruleset          .= $selector . " {\n" . $declaration_block . "}\n";
 		} else {
 			$declaration_block = array_reduce(
 				$declarations,
-				function ( $carry, $element ) { return $carry .= $element['name'] . ': ' . $element['value'] . ';'; },
-				'',
+				function ( $carry, $element ) {
+					return $carry .= $element['name'] . ': ' . $element['value'] . ';'; },
+				''
 			);
-			$ruleset .= $selector . '{' . $declaration_block . '}';
+			$ruleset          .= $selector . '{' . $declaration_block . '}';
 		}
 
 		return $ruleset;
@@ -796,8 +806,8 @@ class WP_Theme_JSON {
 	 *     background: value;
 	 *   }
 	 *
-	 * @param string $stylesheet
-	 * @param array $context Context to be processed.
+	 * @param string $stylesheet Stylesheet to append new rules to.
+	 * @param array  $context Context to be processed.
 	 *
 	 * @return string The new stylesheet.
 	 */
@@ -853,7 +863,9 @@ class WP_Theme_JSON {
 	public function get_settings() {
 		return array_filter(
 			array_map( array( $this, 'extract_settings' ), $this->contexts ),
-			function ( $element ) { return $element !== null; }
+			function ( $element ) {
+				return null !== $element;
+			}
 		);
 	}
 
@@ -870,7 +882,7 @@ class WP_Theme_JSON {
 	/**
 	 * Merge new incoming data.
 	 *
-	 * @param WP_Theme_JSON $incoming Data to merge.
+	 * @param WP_Theme_JSON $theme_json Data to merge.
 	 */
 	public function merge( $theme_json ) {
 		$incoming_data = $theme_json->get_raw_data();
@@ -881,7 +893,7 @@ class WP_Theme_JSON {
 			$this->contexts[ $context ]['selector'] = $metadata[ $context ]['selector'];
 			$this->contexts[ $context ]['supports'] = $metadata[ $context ]['supports'];
 
-			foreach ( [ 'settings', 'styles' ] as $subtree ) {
+			foreach ( array( 'settings', 'styles' ) as $subtree ) {
 				if ( ! array_key_exists( $subtree, $incoming_data[ $context ] ) ) {
 					continue;
 				}
@@ -903,7 +915,7 @@ class WP_Theme_JSON {
 
 					$this->contexts[ $context ][ $subtree ][ $leaf ] = array_merge(
 						$this->contexts[ $context ][ $subtree ][ $leaf ],
-						$incoming_data[ $context ][ $subtree ][ $leaf ],
+						$incoming_data[ $context ][ $subtree ][ $leaf ]
 					);
 				}
 			}
