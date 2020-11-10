@@ -173,25 +173,27 @@ export default function useSelect( _mapSelect, deps ) {
 		}
 	} );
 
-	const onStoreChange = useCallback( () => {
-		if ( isMountedAndNotUnsubscribing.current ) {
-			try {
-				const newMapOutput = trapSelect( () =>
-					latestMapSelect.current( registry.select, registry )
-				);
-
-				if ( isShallowEqual( latestMapOutput.current, newMapOutput ) ) {
-					return;
-				}
-				latestMapOutput.current = newMapOutput;
-			} catch ( error ) {
-				latestMapOutputError.current = error;
-			}
-			forceRender();
-		}
-	}, [ registry ] );
-
 	useIsomorphicLayoutEffect( () => {
+		const onStoreChange = () => {
+			if ( isMountedAndNotUnsubscribing.current ) {
+				try {
+					const newMapOutput = trapSelect( () =>
+						latestMapSelect.current( registry.select, registry )
+					);
+
+					if (
+						isShallowEqual( latestMapOutput.current, newMapOutput )
+					) {
+						return;
+					}
+					latestMapOutput.current = newMapOutput;
+				} catch ( error ) {
+					latestMapOutputError.current = error;
+				}
+				forceRender();
+			}
+		};
+
 		// catch any possible state changes during mount before the subscription
 		// could be set.
 		if ( latestIsAsync.current ) {
@@ -225,7 +227,7 @@ export default function useSelect( _mapSelect, deps ) {
 			// Reset the registered stores when mapSelect changes. In case it subscribes to different stores.
 			listeningStores.current = [];
 		};
-	}, [ registry, onStoreChange, depsChangedFlag ] );
+	}, [ registry, trapSelect, depsChangedFlag ] );
 
 	return mapOutput;
 }
