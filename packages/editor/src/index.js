@@ -12,9 +12,9 @@ import '@wordpress/rich-text';
 /**
  * Internal dependencies
  */
-import './store';
 import './hooks';
 
+export { default as editorStore } from './store';
 export * from './components';
 export * from './utils';
 export { storeConfig } from './store';

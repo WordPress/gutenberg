@@ -12,5 +12,5 @@ import '@wordpress/notices';
 import './hooks';
 export * from './components';
 export * from './utils';
-export { storeConfig } from './store';
+export { default as blockEditorStore, storeConfig } from './store';
 export { SETTINGS_DEFAULTS } from './store/defaults';

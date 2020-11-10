@@ -13,7 +13,7 @@ import * as selectors from './selectors';
 import { STORE_KEY } from './constants';
 
 /**
- * Data store configuration.
+ * Store registered for the reusable blocks namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
  *

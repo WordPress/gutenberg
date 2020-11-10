@@ -78,7 +78,15 @@ _Returns_
 
 <a name="viewportStore" href="#viewportStore">#</a> **viewportStore**
 
-Undocumented declaration.
+Store registered for the viewport namespace.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore>
+
+_Type_
+
+-   `Object` 
 
 <a name="withViewportMatch" href="#withViewportMatch">#</a> **withViewportMatch**
 

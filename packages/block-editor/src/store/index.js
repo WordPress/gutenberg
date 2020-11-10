@@ -37,4 +37,11 @@ const store = registerStore( MODULE_KEY, {
 } );
 applyMiddlewares( store );
 
+/**
+ * Store registered for the block editor namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ *
+ * @type {Object}
+ */
 export default store;
