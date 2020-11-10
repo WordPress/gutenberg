@@ -26,7 +26,7 @@
  * @see https://developer.wordpress.org/block-editor/tutorials/block-tutorial/applying-styles-with-stylesheets/
  */
 function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
-	$dir = dirname( __FILE__ );
+	$dir = __DIR__;
 
 	$index_js = 'index.js';
 	wp_register_script(

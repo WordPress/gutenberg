@@ -11,6 +11,16 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+* [***] Adding support for selecting different unit of value in Cover and Columns blocks
+
+## 1.41.0
+
+* [***] Faster editor start and overall operation on Android [#26732]
+
+* [*] [Android] Enable multiple upload support for Image block
+
+## 1.40.0
+
 ## 1.39.1
 
 * [*] Heading block - Disable full-width/wide alignment [#26308]

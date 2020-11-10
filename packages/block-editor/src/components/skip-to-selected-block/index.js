@@ -12,7 +12,10 @@ import { getBlockDOMNode } from '../../utils/dom';
 
 const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 	const onClick = () => {
-		const selectedBlockElement = getBlockDOMNode( selectedBlockClientId );
+		const selectedBlockElement = getBlockDOMNode(
+			selectedBlockClientId,
+			document
+		);
 		selectedBlockElement.focus();
 	};
 

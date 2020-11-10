@@ -15,6 +15,7 @@ import {
 	useCallback,
 	Children,
 	useRef,
+	cloneElement,
 } from '@wordpress/element';
 
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
@@ -108,12 +109,19 @@ function BottomSheetNavigationContainer( { children, animate, main, theme } ) {
 
 	const screens = useMemo( () => {
 		return Children.map( children, ( child ) => {
+			let screen = child;
 			const { name, ...otherProps } = child.props;
+			if ( ! main ) {
+				screen = cloneElement( child, {
+					...child.props,
+					isNested: true,
+				} );
+			}
 			return (
 				<Stack.Screen
 					name={ name }
 					{ ...otherProps }
-					children={ () => child }
+					children={ () => screen }
 				/>
 			);
 		} );

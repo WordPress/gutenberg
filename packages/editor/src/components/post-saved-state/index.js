@@ -6,7 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Animate, Button } from '@wordpress/components';
+import {
+	__unstableUseAnimate as useAnimate,
+	Button,
+} from '@wordpress/components';
 import { usePrevious, useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
@@ -97,6 +100,8 @@ export default function PostSavedState( {
 		return () => clearTimeout( timeoutId );
 	}, [ isSaving ] );
 
+	const animateClassName = useAnimate( { type: 'loading' } );
+
 	if ( isSaving ) {
 		// TODO: Classes generation should be common across all return
 		// paths of this function, including proper naming convention for
@@ -106,14 +111,10 @@ export default function PostSavedState( {
 		} );
 
 		return (
-			<Animate type="loading">
-				{ ( { className: animateClassName } ) => (
-					<span className={ classnames( classes, animateClassName ) }>
-						<Icon icon={ cloud } />
-						{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
-					</span>
-				) }
-			</Animate>
+			<span className={ classnames( classes, animateClassName ) }>
+				<Icon icon={ cloud } />
+				{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
+			</span>
 		);
 	}
 

@@ -21,7 +21,7 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - Gutenberg (1.39.1):
+  - Gutenberg (1.40.0):
     - React-Core (= 0.63.2)
     - React-CoreModules (= 0.63.2)
     - React-RCTImage (= 0.63.2)
@@ -279,7 +279,7 @@ PODS:
     - React-Core
   - RNSVG (9.13.6-gb):
     - React-Core
-  - RNTAztecView (1.39.1):
+  - RNTAztecView (1.40.0):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.3)
   - WordPress-Aztec-iOS (1.19.3)
@@ -427,7 +427,7 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: dc7fa9088f0f2a998503a352b0554d69a4391c5a
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
-  Gutenberg: 6b47731293f63fda57f4320e29bd7b840eec54f8
+  Gutenberg: 99b3b40eff6df8097381541fa3cac1a08f17c4b0
   RCTRequired: f13f25e7b12f925f1f6a6a8c69d929a03c0129fe
   RCTTypeSafety: 44982c5c8e43ff4141eb519a8ddc88059acd1f3a
   React: e1c65dd41cb9db13b99f24608e47dd595f28ca9a
@@ -460,7 +460,7 @@ SPEC CHECKSUMS:
   RNReanimated: f05baf4cd76b6eab2e4d7e2b244424960b968918
   RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
   RNSVG: 46c4b680fe18237fa01eb7d7b311d77618fde31f
-  RNTAztecView: ad6d95c0536a06ed2e862979847400a37e32d335
+  RNTAztecView: 7fb49235388967f36b922f6ed481b97302ec298e
   WordPress-Aztec-iOS: b7ac8b30f746992e85d9668453ac87c2cdcecf4f
   Yoga: 7740b94929bbacbddda59bf115b5317e9a161598
 

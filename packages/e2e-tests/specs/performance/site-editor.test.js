@@ -5,11 +5,6 @@ import { basename, join } from 'path';
 import { writeFileSync } from 'fs';
 
 /**
- * Internal dependencies
- */
-import { useExperimentalFeatures } from '../../experimental-features';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -22,12 +17,10 @@ import { addQueryArgs } from '@wordpress/url';
 jest.setTimeout( 1000000 );
 
 describe( 'Site Editor Performance', () => {
-	useExperimentalFeatures( [ '#gutenberg-full-site-editing' ] );
-
 	beforeAll( async () => {
+		await activateTheme( 'twentytwentyone-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
-		await activateTheme( 'twentytwentyone-blocks' );
 	} );
 	afterAll( async () => {
 		await trashAllPosts( 'wp_template' );
