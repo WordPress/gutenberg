@@ -116,7 +116,6 @@ describe( 'useSelect', () => {
 		} );
 
 		// rerender with dependency changed
-		// rerender with non dependency changed
 		act( () => {
 			renderer.update(
 				<RegistryProvider value={ registry }>
@@ -126,7 +125,7 @@ describe( 'useSelect', () => {
 		} );
 
 		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
-		expect( selectSpyBar ).toHaveBeenCalledTimes( 1 );
+		expect( selectSpyBar ).toHaveBeenCalledTimes( 2 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 3 );
 
 		// ensure expected state was rendered
@@ -387,9 +386,19 @@ describe( 'useSelect', () => {
 				setDep( 1 );
 			} );
 
-			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 3 );
+			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 4 );
 			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
 				count1: 0,
+				dep: 1,
+			} );
+
+			act( () => {
+				registry.dispatch( 'store-1' ).increment();
+			} );
+
+			expect( selectCount1AndDep ).toHaveBeenCalledTimes( 5 );
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
+				count1: 1,
 				dep: 1,
 			} );
 		} );
@@ -503,7 +512,7 @@ describe( 'useSelect', () => {
 				toggle();
 			} );
 
-			expect( selectCount1 ).toHaveBeenCalledTimes( 1 );
+			expect( selectCount1 ).toHaveBeenCalledTimes( 2 );
 			expect( selectCount2 ).toHaveBeenCalledTimes( 2 );
 			expect( testInstance.findByType( 'div' ).props.data ).toBe(
 				'count1'

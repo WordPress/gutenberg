@@ -182,9 +182,7 @@ export default function useSelect( _mapSelect, deps ) {
 		} else {
 			onStoreChange();
 		}
-	}, [ onStoreChange ] );
 
-	useIsomorphicLayoutEffect( () => {
 		const onChange = () => {
 			if ( latestIsAsync.current ) {
 				renderQueue.add( queueContext, onStoreChange );
