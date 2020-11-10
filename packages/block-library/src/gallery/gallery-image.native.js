@@ -17,7 +17,7 @@ import {
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
 } from '@wordpress/react-native-bridge';
-import { Component } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { Image } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { Caption, MediaUploadProgress } from '@wordpress/block-editor';
@@ -39,53 +39,57 @@ const separatorStyle = compose( style.separator, {
 const buttonStyle = compose( style.button, { aspectRatio: 1 } );
 const ICON_SIZE_ARROW = 15;
 
-class GalleryImage extends Component {
-	constructor() {
-		super( ...arguments );
+function GalleryImage( {
+	id,
+	url,
+	image,
+	isSelected,
+	isBlockSelected,
+	isFirstItem,
+	isLastItem,
+	caption,
+	isCropped,
+	getStylesFromColorScheme,
+	isRTL,
+	'aria-label': ariaLabel,
+	onSelect,
+	onSelectBlock,
+	onRemove,
+	onMoveForward,
+	onMoveBackward,
+	setAttributes,
+} ) {
+	const [ captionSelected, setCaptionSelected ] = useState( false );
+	const [ isUploadInProgress, setIsUploadInProgress ] = useState( false );
+	const [ didUploadFail, setDidUploadFail ] = useState( false );
 
-		this.onSelectImage = this.onSelectImage.bind( this );
-		this.onSelectCaption = this.onSelectCaption.bind( this );
-		this.onMediaPressed = this.onMediaPressed.bind( this );
-		this.onCaptionChange = this.onCaptionChange.bind( this );
-		this.onSelectMedia = this.onSelectMedia.bind( this );
-
-		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
-			this
-		);
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
-			this
-		);
-		this.renderContent = this.renderContent.bind( this );
-
-		this.state = {
-			captionSelected: false,
-			isUploadInProgress: false,
-			didUploadFail: false,
-		};
-	}
-
-	onSelectCaption() {
-		if ( ! this.state.captionSelected ) {
-			this.setState( {
-				captionSelected: true,
+	useEffect( () => {
+		if ( image && ! url ) {
+			setAttributes( {
+				url: image.source_url,
+				alt: image.alt_text,
 			} );
 		}
 
-		if ( ! this.props.isSelected ) {
-			this.props.onSelect();
+		// unselect the caption so when the user selects other image and comeback
+		// the caption is not immediately selected
+		if ( captionSelected && ! isSelected ) {
+			setCaptionSelected( false );
 		}
-	}
+	}, [ isSelected, image, url, captionSelected ] );
 
-	onMediaPressed() {
-		const { id, url, isSelected } = this.props;
-		const {
-			captionSelected,
-			isUploadInProgress,
-			didUploadFail,
-		} = this.state;
+	const onSelectCaption = () => {
+		if ( ! captionSelected ) {
+			setCaptionSelected( true );
+		}
 
-		this.onSelectImage();
+		if ( ! isSelected ) {
+			onSelect();
+		}
+	};
+
+	const onMediaPressed = () => {
+		onSelectImage();
 
 		if ( isUploadInProgress ) {
 			requestImageUploadCancelDialog( id );
@@ -97,98 +101,52 @@ class GalleryImage extends Component {
 		} else if ( isSelected && ! captionSelected ) {
 			requestImageFullscreenPreview( url );
 		}
-	}
+	};
 
-	onSelectImage() {
-		if ( ! this.props.isBlockSelected ) {
-			this.props.onSelectBlock();
+	const onSelectImage = () => {
+		if ( ! isBlockSelected ) {
+			onSelectBlock();
 		}
 
-		if ( ! this.props.isSelected ) {
-			this.props.onSelect();
+		if ( ! isSelected ) {
+			onSelect();
 		}
 
-		if ( this.state.captionSelected ) {
-			this.setState( {
-				captionSelected: false,
-			} );
+		if ( captionSelected ) {
+			setCaptionSelected( false );
 		}
-	}
+	};
 
-	onSelectMedia( media ) {
-		const { setAttributes } = this.props;
+	const onSelectMedia = ( media ) => {
 		setAttributes( media );
-	}
+	};
 
-	onCaptionChange( caption ) {
-		const { setAttributes } = this.props;
-		setAttributes( { caption } );
-	}
+	const onCaptionChange = ( newCaption ) => {
+		setAttributes( { newCaption } );
+	};
 
-	componentDidUpdate( prevProps ) {
-		const { isSelected, image, url } = this.props;
-		if ( image && ! url ) {
-			this.props.setAttributes( {
-				url: image.source_url,
-				alt: image.alt_text,
-			} );
+	const updateMediaProgress = () => {
+		if ( ! isUploadInProgress ) {
+			setIsUploadInProgress( true );
 		}
+	};
 
-		// unselect the caption so when the user selects other image and comeback
-		// the caption is not immediately selected
-		if (
-			this.state.captionSelected &&
-			! isSelected &&
-			prevProps.isSelected
-		) {
-			this.setState( {
-				captionSelected: false,
-			} );
-		}
-	}
+	const finishMediaUploadWithSuccess = ( payload ) => {
+		setIsUploadInProgress( false );
+		setDidUploadFail( false );
 
-	updateMediaProgress() {
-		if ( ! this.state.isUploadInProgress ) {
-			this.setState( { isUploadInProgress: true } );
-		}
-	}
-
-	finishMediaUploadWithSuccess( payload ) {
-		this.setState( {
-			isUploadInProgress: false,
-			didUploadFail: false,
-		} );
-
-		this.props.setAttributes( {
+		setAttributes( {
 			id: payload.mediaServerId,
 			url: payload.mediaUrl,
 		} );
-	}
+	};
 
-	finishMediaUploadWithFailure() {
-		this.setState( {
-			isUploadInProgress: false,
-			didUploadFail: true,
-		} );
-	}
+	const finishMediaUploadWithFailure = () => {
+		setIsUploadInProgress( false );
+		setDidUploadFail( true );
+	};
 
-	renderContent( params ) {
-		const {
-			url,
-			isFirstItem,
-			isLastItem,
-			isSelected,
-			caption,
-			onRemove,
-			onMoveForward,
-			onMoveBackward,
-			'aria-label': ariaLabel,
-			isCropped,
-			getStylesFromColorScheme,
-			isRTL,
-		} = this.props;
-
-		const { isUploadInProgress, captionSelected } = this.state;
+	const renderContent = ( params ) => {
 		const { isUploadFailed, retryMessage } = params;
 		const resizeMode = isCropped ? 'cover' : 'contain';
 
@@ -229,7 +187,7 @@ class GalleryImage extends Component {
 					isUploadFailed={ isUploadFailed }
 					isUploadInProgress={ isUploadInProgress }
 					mediaPickerOptions={ mediaPickerOptions }
-					onSelectMediaUploadOption={ this.onSelectMedia }
+					onSelectMediaUploadOption={ onSelectMedia }
 					resizeMode={ resizeMode }
 					url={ url }
 					retryMessage={ retryMessage }
@@ -284,8 +242,8 @@ class GalleryImage extends Component {
 								<Caption
 									inlineToolbar
 									isSelected={ captionSelected }
-									onChange={ this.onCaptionChange }
-									onFocus={ this.onSelectCaption }
+									onChange={ onCaptionChange }
+									onFocus={ onSelectCaption }
 									placeholder={
 										isSelected
 											? __( 'Write caption…' )
@@ -302,49 +260,14 @@ class GalleryImage extends Component {
 					) }
 			</>
 		);
-	}
+	};
 
-	render() {
-		const {
-			id,
-			onRemove,
-			getStylesFromColorScheme,
-			isSelected,
-		} = this.props;
+	const containerStyle = getStylesFromColorScheme(
+		style.galleryImageContainer,
+		style.galleryImageContainerDark
+	);
 
-		const containerStyle = getStylesFromColorScheme(
-			style.galleryImageContainer,
-			style.galleryImageContainerDark
-		);
-
-		return (
-			<TouchableWithoutFeedback
-				onPress={ this.onMediaPressed }
-				accessible={ ! isSelected } // We need only child views to be accessible after the selection
-				accessibilityLabel={ this.accessibilityLabelImageContainer() } // if we don't set this explicitly it reads system provided accessibilityLabels of all child components and those include pretty technical words which don't make sense
-				accessibilityRole={ 'imagebutton' } // this makes VoiceOver to read a description of image provided by system on iOS and lets user know this is a button which conveys the message of tappablity
-			>
-				<View style={ containerStyle }>
-					<MediaUploadProgress
-						mediaId={ id }
-						onUpdateMediaProgress={ this.updateMediaProgress }
-						onFinishMediaUploadWithSuccess={
-							this.finishMediaUploadWithSuccess
-						}
-						onFinishMediaUploadWithFailure={
-							this.finishMediaUploadWithFailure
-						}
-						onMediaUploadStateReset={ onRemove }
-						renderContent={ this.renderContent }
-					/>
-				</View>
-			</TouchableWithoutFeedback>
-		);
-	}
-
-	accessibilityLabelImageContainer() {
-		const { caption, 'aria-label': ariaLabel } = this.props;
-
+	const accessibilityLabelImageContainer = () => {
 		return isEmpty( caption )
 			? ariaLabel
 			: ariaLabel +
@@ -354,7 +277,31 @@ class GalleryImage extends Component {
 						__( 'Image caption. %s' ),
 						caption
 					);
-	}
+	};
+
+	return (
+		<TouchableWithoutFeedback
+			onPress={ onMediaPressed }
+			accessible={ ! isSelected } // We need only child views to be accessible after the selection
+			accessibilityLabel={ accessibilityLabelImageContainer() } // if we don't set this explicitly it reads system provided accessibilityLabels of all child components and those include pretty technical words which don't make sense
+			accessibilityRole={ 'imagebutton' } // this makes VoiceOver to read a description of image provided by system on iOS and lets user know this is a button which conveys the message of tappablity
+		>
+			<View style={ containerStyle }>
+				<MediaUploadProgress
+					mediaId={ id }
+					onUpdateMediaProgress={ updateMediaProgress }
+					onFinishMediaUploadWithSuccess={
+						finishMediaUploadWithSuccess
+					}
+					onFinishMediaUploadWithFailure={
+						finishMediaUploadWithFailure
+					}
+					onMediaUploadStateReset={ onRemove }
+					renderContent={ renderContent }
+				/>
+			</View>
+		</TouchableWithoutFeedback>
+	);
 }
 
 export default withPreferredColorScheme( GalleryImage );
