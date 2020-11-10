@@ -86,7 +86,10 @@ describe( 'Multi-entity save flow', () => {
 			expect( multiSaveButton ).not.toBeNull();
 		};
 		const assertMultiSaveDisabled = async () => {
-			const multiSaveButton = await page.$( multiSaveSelector );
+			const multiSaveButton = await page.waitForSelector(
+				multiSaveSelector,
+				{ hidden: true }
+			);
 			expect( multiSaveButton ).toBeNull();
 		};
 

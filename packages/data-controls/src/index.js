@@ -73,10 +73,18 @@ export function dispatch( ...args ) {
 	return dataControls.dispatch( ...args );
 }
 
+export const awaitPromise = function ( promise ) {
+	return {
+		type: 'AWAIT_PROMISE',
+		promise,
+	};
+};
+
 /**
  * The default export is what you use to register the controls with your custom
  * store.
  *
+ * @param paths
  * @example
  * ```js
  * // WordPress dependencies
@@ -90,18 +98,20 @@ export function dispatch( ...args ) {
  * import * as resolvers from './resolvers';
  *
  * registerStore( 'my-custom-store', {
- * 	reducer,
- * 	controls,
- * 	actions,
- * 	selectors,
- * 	resolvers,
+ * reducer,
+ * controls,
+ * actions,
+ * selectors,
+ * resolvers,
  * } );
  * ```
- *
  * @return {Object} An object for registering the default controls with the
- *                  store.
+ * store.
  */
 export const controls = {
+	AWAIT_PROMISE: async ( { promise } ) => {
+		return await promise;
+	},
 	API_FETCH( { request } ) {
 		return triggerFetch( request );
 	},
