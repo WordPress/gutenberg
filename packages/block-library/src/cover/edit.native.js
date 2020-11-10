@@ -175,7 +175,7 @@ const Cover = ( {
 		}
 	};
 
-	const onOpactiyChange = ( value ) => {
+	const onOpacityChange = ( value ) => {
 		setAttributes( { dimRatio: value } );
 	};
 
@@ -281,6 +281,10 @@ const Cover = ( {
 	const onChangeUnit = ( nextUnit ) => {
 		setAttributes( {
 			minHeightUnit: nextUnit,
+			minHeight:
+				nextUnit === 'px'
+					? Math.max( CONTAINER_HEIGHT, COVER_MIN_HEIGHT )
+					: CONTAINER_HEIGHT,
 		} );
 	};
 
@@ -297,7 +301,7 @@ const Cover = ( {
 						minimumValue={ 0 }
 						maximumValue={ 100 }
 						value={ dimRatio }
-						onChange={ onOpactiyChange }
+						onChange={ onOpacityChange }
 						style={ styles.rangeCellContainer }
 						separatorType={ 'topFullWidth' }
 					/>
@@ -306,7 +310,7 @@ const Cover = ( {
 			<PanelBody title={ __( 'Dimensions' ) }>
 				<UnitControl
 					label={ __( 'Minimum height' ) }
-					min={ COVER_MIN_HEIGHT }
+					min={ minHeightUnit === 'px' ? COVER_MIN_HEIGHT : 1 }
 					max={ COVER_MAX_HEIGHT }
 					unit={ minHeightUnit }
 					value={ CONTAINER_HEIGHT }
@@ -314,6 +318,7 @@ const Cover = ( {
 					onUnitChange={ onChangeUnit }
 					units={ CSS_UNITS }
 					style={ styles.rangeCellContainer }
+					key={ `${ minHeightUnit }-${ minHeight }` }
 				/>
 			</PanelBody>
 
