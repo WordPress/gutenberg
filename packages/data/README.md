@@ -476,7 +476,7 @@ Registers a standard `@wordpress/data` store.
 
 _Parameters_
 
--   _key_ `string`: Unique namespace identifier for the store.
+-   _storeName_ `string`: Unique namespace identifier for the store.
 -   _options_ `Object`: Store description (reducer, actions, selectors, resolvers).
 
 _Returns_

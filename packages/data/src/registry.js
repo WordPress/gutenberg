@@ -74,19 +74,19 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Calls a selector given the current state and extra arguments.
 	 *
-	 * @param {string|Object} key Unique namespace identifier for the store
-	 *                            or the store instance.
+	 * @param {string|Object} storeName Unique namespace identifier for the store
+	 *                                  or the store instance.
 	 *
 	 * @return {*} The selector's returned value.
 	 */
-	function select( key ) {
-		key = String( key );
-		const store = stores[ key ];
+	function select( storeName ) {
+		storeName = String( storeName );
+		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getSelectors();
 		}
 
-		return parent && parent.select( key );
+		return parent && parent.select( storeName );
 	}
 
 	const getResolveSelectors = memize(
@@ -136,31 +136,31 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * and modified so that they return promises that resolve to their eventual values,
 	 * after any resolvers have ran.
 	 *
-	 * @param {string|Object} key Unique namespace identifier for the store
-	 *                            or the store instance.
+	 * @param {string|Object} storeName Unique namespace identifier for the store
+	 *                                  or the store instance.
 	 *
 	 * @return {Object} Each key of the object matches the name of a selector.
 	 */
-	function __experimentalResolveSelect( key ) {
-		return getResolveSelectors( select( key ) );
+	function __experimentalResolveSelect( storeName ) {
+		return getResolveSelectors( select( storeName ) );
 	}
 
 	/**
 	 * Returns the available actions for a part of the state.
 	 *
-	 * @param {string|Object} key Unique namespace identifier for the store
-	 *                            or the store instance.
+	 * @param {string|Object} storeName Unique namespace identifier for the store
+	 *                                  or the store instance.
 	 *
 	 * @return {*} The action's returned value.
 	 */
-	function dispatch( key ) {
-		key = String( key );
-		const store = stores[ key ];
+	function dispatch( storeName ) {
+		storeName = String( storeName );
+		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getActions();
 		}
 
-		return parent && parent.dispatch( key );
+		return parent && parent.dispatch( storeName );
 	}
 
 	//
@@ -212,19 +212,19 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Registers a standard `@wordpress/data` store.
 	 *
-	 * @param {string} key        Unique namespace identifier.
+	 * @param {string} storeName  Unique namespace identifier.
 	 * @param {Object} options    Store description (reducer, actions, selectors, resolvers).
 	 *
 	 * @return {Object} Registered store object.
 	 */
-	registry.registerStore = ( key, options ) => {
+	registry.registerStore = ( storeName, options ) => {
 		if ( ! options.reducer ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		const namespace = createNamespace( key, options, registry );
-		registerGenericStore( key, namespace );
-		namespace.store.toString = () => key;
+		const namespace = createNamespace( storeName, options, registry );
+		registerGenericStore( storeName, namespace );
+		namespace.store.toString = () => storeName;
 		return namespace.store;
 	};
 
