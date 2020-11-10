@@ -162,8 +162,8 @@ export const registerGenericStore = defaultRegistry.registerGenericStore;
 /**
  * Registers a standard `@wordpress/data` store.
  *
- * @param {string} reducerKey Reducer key.
- * @param {Object} options    Store description (reducer, actions, selectors, resolvers).
+ * @param {string} key     Unique namespace identifier for the store.
+ * @param {Object} options Store description (reducer, actions, selectors, resolvers).
  *
  * @return {Object} Registered store object.
  */
