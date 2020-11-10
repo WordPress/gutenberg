@@ -44,43 +44,96 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 					'permission_callback' => array( $this, 'permission_callback' ),
 					'args'                => array(
 						// Src is required to check for correct $image_meta.
-						'src'      => array(
+						'src'       => array(
 							'type'     => 'string',
 							'required' => true,
 						),
 
 						'modifiers' => array(
-							'type'     => 'array',
-							'items'    => $this->schema_merge_object_properties(
-								$this->get_modifier_schema(),
-								$this->get_crop_schema( false ),
-								$this->get_rotate_schema( false )
+							'type'  => 'array',
+							'items' => array(
+								'type'  => 'object',
+								'oneOf' => array(
+									// Rotate. Angle is in degrees.
+									array(
+										'properties' => array(
+											'type'  => array(
+												'type'  => 'string',
+												'const' => 'rotate',
+											),
+											'angle' => array(
+												'type' => 'number',
+											),
+										),
+										'required'   => array(
+											'type',
+											'angle',
+										),
+									),
+
+									// Crop. Values are in percentages.
+									array(
+										'properties' => array(
+											'type'   => array(
+												'type'  => 'string',
+												'const' => 'crop',
+											),
+											'left'   => array(
+												'type'    => 'number',
+												'minimum' => 0,
+												'maximum' => 100,
+											),
+											'top'    => array(
+												'type'    => 'number',
+												'minimum' => 0,
+												'maximum' => 100,
+											),
+											'width'  => array(
+												'type'    => 'number',
+												'minimum' => 1,
+												'maximum' => 100,
+											),
+											'height' => array(
+												'type'    => 'number',
+												'minimum' => 1,
+												'maximum' => 100,
+											),
+										),
+										'required'   => array(
+											'type',
+											'left',
+											'top',
+											'width',
+											'height',
+										),
+									),
+								),
 							),
 						),
 
 						// Deprecated. Use `modifiers` instead.
-						'rotation' => array(
+						'rotation'  => array(
 							'type' => 'integer',
 						),
 
 						// Deprecated. Use `modifiers` instead.
 						// Crop values are in percents.
-						'x'        => array(
+						'x'         => array(
 							'type'    => 'number',
 							'minimum' => 0,
 							'maximum' => 100,
 						),
-						'y'        => array(
+						'y'         => array(
 							'type'    => 'number',
 							'minimum' => 0,
 							'maximum' => 100,
 						),
-						'width'    => array(
+						'width'     => array(
 							'type'    => 'number',
 							'minimum' => 0,
 							'maximum' => 100,
 						),
-						'height'   => array(
+						'height'    => array(
 							'type'    => 'number',
 							'minimum' => 0,
 							'maximum' => 100,
@@ -88,105 +141,6 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 					),
 				),
 			)
-		);
-	}
-
-
-	/**
-	 * Merge the properties of a list of schema.
-	 *
-	 * @return array New schema with object properties merged.
-	 */
-	private function schema_merge_object_properties() {
-		$schemas    = func_get_args();
-		$properties = array();
-		foreach ( $schemas as $schema ) {
-			if ( 'object' === $schema['type'] && count( $schema['properties'] ) > 0 ) {
-				foreach ( $schema['properties'] as $property => $value ) {
-					$properties[ $property ] = $value;
-				}
-			}
-		}
-		return array(
-			'type'       => 'object',
-			'properties' => $properties,
-		);
-	}
-
-	/**
-	 * Retrieves the modifier's shared schema, conforming to JSON Schema properties.
-	 *
-	 * @return array Modifier schema properties.
-	 */
-	private function get_modifier_schema() {
-		return array(
-			'type'       => 'object',
-			'properties' => array(
-				'type' => array(
-					'type'     => 'string',
-					'enum'     => array(
-						'crop',
-						'rotate',
-					),
-					'required' => true,
-				),
-			),
-		);
-	}
-
-	/**
-	 * Retrieves the crop modifier's properties, conforming to JSON Schema properties.
-	 *
-	 * @param boolean $is_required If the properties are required.
-	 * @return array Crop modifier schema properties.
-	 */
-	private function get_crop_schema( $is_required ) {
-		return array(
-			'type'       => 'object',
-			'properties' => array(
-				'left'   => array(
-					'type'     => 'number',
-					'minimum'  => 0,
-					'maximum'  => 100,
-					'required' => $is_required,
-				),
-				'top'    => array(
-					'type'     => 'number',
-					'minimum'  => 0,
-					'maximum'  => 100,
-					'required' => $is_required,
-				),
-				'width'  => array(
-					'type'     => 'number',
-					'minimum'  => 1,
-					'maximum'  => 100,
-					'required' => $is_required,
-				),
-				'height' => array(
-					'type'     => 'number',
-					'minimum'  => 1,
-					'maximum'  => 100,
-					'required' => $is_required,
-				),
-			),
-		);
-	}
-
-	/**
-	 * Retrieves the rotate modifier's properties, conforming to JSON Schema properties.
-	 *
-	 * @param boolean $is_required If the properties are required.
-	 * @return array Rotate modifier schema properties.
-	 */
-	private function get_rotate_schema( $is_required ) {
-		return array(
-			'type'       => 'object',
-			'properties' => array(
-				'angle' => array(
-					'type'     => 'number',
-					'required' => $is_required,
-				),
-			),
 		);
 	}
 
@@ -307,24 +261,6 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 		if ( 0 === count( $modifiers ) ) {
 			$error = __( 'The image was not edited. Edit the image before applying the changes.', 'gutenberg' );
 			return new WP_Error( 'rest_image_not_edited', $error, array( 'status' => 400 ) );
-		}
-
-		// Validate parameters more specifically since the part of JSON Schema validation that has been implemented so far can't handle unique array object items.
-		// Properties are marked as required on this check so you won't end up with, for example, a crop modifier without all the required crop properties.
-		foreach ( $modifiers as $modifier ) {
-			if ( 'rotate' === $modifier['type'] ) {
-				$valid_modifier = rest_validate_value_from_schema( $modifier, $this->get_rotate_schema( true ) );
-				if ( is_wp_error( $valid_modifier ) ) {
-					$error = __( 'Invalid rotate properties.', 'gutenberg' );
-					return new WP_Error( 'rest_image_rotation_properties', $error, array( 'status' => 400 ) );
-				}
-			} elseif ( 'crop' === $modifier['type'] ) {
-				$valid_modifier = rest_validate_value_from_schema( $modifier, $this->get_crop_schema( true ) );
-				if ( is_wp_error( $valid_modifier ) ) {
-					$error = __( 'Invalid crop properties.', 'gutenberg' );
-					return new WP_Error( 'rest_image_crop_properties', $error, array( 'status' => 400 ) );
-				}
-			}
 		}
 
 		// If the file doesn't exist, attempt a URL fopen on the src link.
