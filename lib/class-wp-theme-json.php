@@ -105,98 +105,125 @@ class WP_Theme_JSON {
 	 * Presets are a set of values that serve
 	 * to bootstrap some styles: colors, font sizes, etc.
 	 *
-	 * This contains the necessary metadata to process them.
+	 * They are a unkeyed array of values such as:
+	 *
+	 * ```php
+	 * array(
+	 *   array(
+	 *     'slug'      => 'unique-name-within-the-set',
+	 *     'name'      => 'Name for the UI',
+	 *     <value_key> => 'value'
+	 *   ),
+	 * )
+	 * ```
+	 *
+	 * This contains the necessary metadata to process them:
+	 *
+	 * - path          => where to find the preset in a theme.json context
+	 *
+	 * - value_key     => the key that represents the value
+	 *
+	 * - css_var_infix => infix to use in generating the CSS Custom Property. Example:
+	 *                   --wp--preset--<preset_infix>--<slug>: <preset_value>
+	 *
+	 * - classes      => array containing a structure with the classes to
+	 *                   generate for the presets. Each class should have
+	 *                   the class suffix and the property name. Example:
+	 *
+	 *                   .has-<slug>-<class_suffix> {
+	 *                       <property_name>: <preset_value>
+	 *                   }
 	 */
 	const PRESETS_METADATA = array(
 		array(
-			'path'         => array( 'settings', 'color', 'palette' ),
-			'value_key'    => 'color',
-			'preset_infix' => 'color',
-			'class'        => array(
+			'path'          => array( 'settings', 'color', 'palette' ),
+			'value_key'     => 'color',
+			'css_var_infix' => 'color',
+			'classes'       => array(
 				array(
-					'suffix'   => 'color',
-					'property' => 'color',
+					'class_suffix'  => 'color',
+					'property_name' => 'color',
 				),
 				array(
-					'suffix'   => 'background-color',
-					'property' => 'background-color',
-				),
-			),
-		),
-		array(
-			'path'         => array( 'settings', 'color', 'gradients' ),
-			'value_key'    => 'gradient',
-			'preset_infix' => 'gradient',
-			'class'        => array(
-				array(
-					'suffix'   => 'gradient-background',
-					'property' => 'background',
+					'class_suffix'  => 'background-color',
+					'property_name' => 'background-color',
 				),
 			),
 		),
 		array(
-			'path'         => array( 'settings', 'typography', 'fontSizes' ),
-			'value_key'    => 'size',
-			'preset_infix' => 'font-size',
-			'class'        => array(
+			'path'          => array( 'settings', 'color', 'gradients' ),
+			'value_key'     => 'gradient',
+			'css_var_infix' => 'gradient',
+			'classes'       => array(
 				array(
-					'suffix'   => 'font-size',
-					'property' => 'font-size',
+					'class_suffix'  => 'gradient-background',
+					'property_name' => 'background',
 				),
 			),
 		),
 		array(
-			'path'         => array( 'settings', 'typography', 'fontFamilies' ),
-			'value_key'    => 'fontFamily',
-			'preset_infix' => 'font-family',
-			'class'        => array(
+			'path'          => array( 'settings', 'typography', 'fontSizes' ),
+			'value_key'     => 'size',
+			'css_var_infix' => 'font-size',
+			'classes'       => array(
 				array(
-					'suffix'   => 'font-family',
-					'property' => 'font-family',
+					'class_suffix'  => 'font-size',
+					'property_name' => 'font-size',
 				),
 			),
 		),
 		array(
-			'path'         => array( 'settings', 'typography', 'fontStyles' ),
-			'value_key'    => 'slug',
-			'preset_infix' => 'font-style',
-			'class'        => array(
+			'path'          => array( 'settings', 'typography', 'fontFamilies' ),
+			'value_key'     => 'fontFamily',
+			'css_var_infix' => 'font-family',
+			'classes'       => array(
 				array(
-					'suffix'   => 'font-style',
-					'property' => 'font-style',
+					'class_suffix'  => 'font-family',
+					'property_name' => 'font-family',
 				),
 			),
 		),
 		array(
-			'path'         => array( 'settings', 'typography', 'fontWeights' ),
-			'value_key'    => 'slug',
-			'preset_infix' => 'font-weight',
-			'class'        => array(
+			'path'          => array( 'settings', 'typography', 'fontStyles' ),
+			'value_key'     => 'slug',
+			'css_var_infix' => 'font-style',
+			'classes'       => array(
 				array(
-					'suffix'   => 'font-weight',
-					'property' => 'font-weight',
+					'class_suffix'  => 'font-style',
+					'property_name' => 'font-style',
 				),
 			),
 		),
 		array(
-			'path'         => array( 'settings', 'typography', 'textDecorations' ),
-			'value_key'    => 'value',
-			'preset_infix' => 'text-decoration',
-			'class'        => array(
+			'path'          => array( 'settings', 'typography', 'fontWeights' ),
+			'value_key'     => 'slug',
+			'css_var_infix' => 'font-weight',
+			'classes'       => array(
 				array(
-					'suffix'   => 'text-decoration',
-					'property' => 'text-decoration',
+					'class_suffix'  => 'font-weight',
+					'property_name' => 'font-weight',
 				),
 			),
 		),
 		array(
-			'path'         => array( 'settings', 'typography', 'textTransforms' ),
-			'value_key'    => 'slug',
-			'preset_infix' => 'text-transform',
-			'class'        => array(
+			'path'          => array( 'settings', 'typography', 'textDecorations' ),
+			'value_key'     => 'value',
+			'css_var_infix' => 'text-decoration',
+			'classes'       => array(
 				array(
-					'suffix'   => 'text-transform',
-					'property' => 'text-transform',
+					'class_suffix'  => 'text-decoration',
+					'property_name' => 'text-decoration',
+				),
+			),
+		),
+		array(
+			'path'          => array( 'settings', 'typography', 'textTransforms' ),
+			'value_key'     => 'slug',
+			'css_var_infix' => 'text-transform',
+			'classes'       => array(
+				array(
+					'class_suffix'  => 'text-transform',
+					'property_name' => 'text-transform',
 				),
 			),
 		),
@@ -657,12 +684,12 @@ class WP_Theme_JSON {
 		foreach ( self::PRESETS_METADATA as $preset ) {
 			$values = $this->get_from_path( $context, $preset['path'], array() );
 			foreach ( $values as $value ) {
-				foreach ( $preset['class'] as $class ) {
+				foreach ( $preset['classes'] as $class ) {
 					$stylesheet .= $this->to_ruleset(
-						$context['selector'] . '.has-' . $value['slug'] . '-' . $class['suffix'],
+						$context['selector'] . '.has-' . $value['slug'] . '-' . $class['class_suffix'],
 						array(
 							array(
-								'name'  => $class['property'],
+								'name'  => $class['property_name'],
 								'value' => $value[ $preset['value_key'] ],
 							),
 						)
@@ -694,7 +721,7 @@ class WP_Theme_JSON {
 			$values = $this->get_from_path( $context, $preset['path'], array() );
 			foreach ( $values as $value ) {
 				$declarations[] = array(
-					'name'  => '--wp--preset--' . $preset['preset_infix'] . '--' . $value['slug'],
+					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . $value['slug'],
 					'value' => $value[ $preset['value_key'] ],
 				);
 			}
