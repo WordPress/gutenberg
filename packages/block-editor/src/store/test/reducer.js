@@ -30,6 +30,7 @@ import {
 	preferences,
 	blocksMode,
 	insertionPoint,
+	insertionPointVisibility,
 	template,
 	blockListSettings,
 	lastBlockAttributesChange,
@@ -2015,35 +2016,82 @@ describe( 'state', () => {
 	} );
 
 	describe( 'insertionPoint', () => {
-		it( 'should default to null', () => {
+		it( 'defaults to `null`', () => {
 			const state = insertionPoint( undefined, {} );
 
-			expect( state ).toBe( null );
+			expect( state ).toEqual( null );
 		} );
 
-		it( 'should set insertion point', () => {
-			const state = insertionPoint( null, {
-				type: 'SHOW_INSERTION_POINT',
-				rootClientId: 'clientId1',
-				index: 0,
-			} );
+		it.each( [ 'SET_INSERTION_POINT', 'SHOW_INSERTION_POINT' ] )(
+			'sets the insertion point on %s',
+			( type ) => {
+				const original = deepFreeze( {
+					rootClientId: 'clientId1',
+					index: 0,
+				} );
 
-			expect( state ).toEqual( {
-				rootClientId: 'clientId1',
-				index: 0,
-			} );
-		} );
+				const expectedNewState = {
+					rootClientId: 'clientId2',
+					index: 1,
+				};
 
-		it( 'should clear the insertion point', () => {
+				const state = insertionPoint( original, {
+					type,
+					...expectedNewState,
+				} );
+
+				expect( state ).toEqual( expectedNewState );
+			}
+		);
+
+		it.each( [
+			'CLEAR_SELECTED_BLOCK',
+			'SELECT_BLOCK',
+			'REPLACE_INNER_BLOCKS',
+			'INSERT_BLOCKS',
+			'REMOVE_BLOCKS',
+			'REPLACE_BLOCKS',
+		] )( 'resets the insertion point to `null` on %s', ( type ) => {
 			const original = deepFreeze( {
 				rootClientId: 'clientId1',
 				index: 0,
 			} );
 			const state = insertionPoint( original, {
-				type: 'HIDE_INSERTION_POINT',
+				type,
 			} );
 
-			expect( state ).toBe( null );
+			expect( state ).toEqual( null );
+		} );
+	} );
+
+	describe( 'insertionPointVisibility', () => {
+		it( 'defaults to `false`', () => {
+			const state = insertionPointVisibility( undefined, {} );
+			expect( state ).toBe( false );
+		} );
+
+		it( 'shows the insertion point', () => {
+			const state = insertionPointVisibility( false, {
+				type: 'SHOW_INSERTION_POINT',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it.each( [
+			'HIDE_INSERTION_POINT',
+			'CLEAR_SELECTED_BLOCK',
+			'SELECT_BLOCK',
+			'REPLACE_INNER_BLOCKS',
+			'INSERT_BLOCKS',
+			'REMOVE_BLOCKS',
+			'REPLACE_BLOCKS',
+		] )( 'sets the insertion point on %s to `false`', ( type ) => {
+			const state = insertionPointVisibility( true, {
+				type,
+			} );
+
+			expect( state ).toBe( false );
 		} );
 	} );
 
