@@ -51,7 +51,6 @@ class WP_REST_Image_Editor_Controller extends WP_REST_Controller {
 
 						'modifiers' => array(
 							'type'     => 'array',
-							'required' => true,
 							'items'    => $this->schema_merge_object_properties(
 								$this->get_modifier_schema(),
 								$this->get_crop_schema( false ),
