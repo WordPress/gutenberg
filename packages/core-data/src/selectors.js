@@ -13,7 +13,7 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { REDUCER_KEY } from './name';
+import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
 import { getNormalizedCommaSeparable } from './utils';
@@ -41,7 +41,7 @@ const EMPTY_ARRAY = [];
 export const isRequestingEmbedPreview = createRegistrySelector(
 	( select ) => ( state, url ) => {
 		return select( 'core/data' ).isResolving(
-			REDUCER_KEY,
+			STORE_NAME,
 			'getEmbedPreview',
 			[ url ]
 		);
@@ -692,7 +692,7 @@ export function getAutosave( state, postType, postId, authorId ) {
  */
 export const hasFetchedAutosaves = createRegistrySelector(
 	( select ) => ( state, postType, postId ) => {
-		return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [
+		return select( STORE_NAME ).hasFinishedResolution( 'getAutosaves', [
 			postType,
 			postId,
 		] );
