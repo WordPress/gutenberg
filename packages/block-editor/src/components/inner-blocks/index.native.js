@@ -89,8 +89,8 @@ function UncontrolledInnerBlocks( props ) {
 		horizontalAlignment,
 		filterInnerBlocks,
 		numColumns,
+		blockProps,
 	} = props;
-
 	const block = useSelect(
 		( select ) => select( 'core/block-editor' ).getBlock( clientId ),
 		[ clientId ]
@@ -123,6 +123,7 @@ function UncontrolledInnerBlocks( props ) {
 			onDeleteBlock={ onDeleteBlock }
 			filterInnerBlocks={ filterInnerBlocks }
 			numColumns={ numColumns }
+			blockProps={ blockProps }
 		/>
 	);
 

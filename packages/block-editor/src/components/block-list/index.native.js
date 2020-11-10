@@ -119,13 +119,15 @@ export class BlockList extends Component {
 			onDeleteBlock,
 			contentStyle,
 			renderAppender,
+			blockProps,
 		} = this.props;
 		if (
 			this.extraData.parentWidth !== parentWidth ||
 			this.extraData.renderFooterAppender !== renderFooterAppender ||
 			this.extraData.onDeleteBlock !== onDeleteBlock ||
 			this.extraData.contentStyle !== contentStyle ||
-			this.extraData.renderAppender !== renderAppender
+			this.extraData.renderAppender !== renderAppender ||
+			this.extraData.blockProps !== blockProps
 		) {
 			this.extraData = {
 				parentWidth,
@@ -133,6 +135,7 @@ export class BlockList extends Component {
 				onDeleteBlock,
 				contentStyle,
 				renderAppender,
+				blockProps,
 			};
 		}
 		return this.extraData;
@@ -272,9 +275,11 @@ export class BlockList extends Component {
 			parentWidth,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
+			blockProps,
+			numColumns,
 		} = this.props;
 		return (
-			<View style={ { flex: 1 } }>
+			<View style={ numColumns && { flex: 1 } }>
 				<BlockListItem
 					isStackedHorizontally={ isStackedHorizontally }
 					rootClientId={ rootClientId }
@@ -292,6 +297,7 @@ export class BlockList extends Component {
 					onCaretVerticalPositionChange={
 						this.onCaretVerticalPositionChange
 					}
+					blockProps={ blockProps }
 				/>
 			</View>
 		);

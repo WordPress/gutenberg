@@ -346,6 +346,8 @@ export class ImageEdit extends React.Component {
 			image,
 			imageSizes,
 			clientId,
+			isGallery,
+			imageCrop,
 		} = this.props;
 		const {
 			align,
@@ -451,6 +453,13 @@ export class ImageEdit extends React.Component {
 			wide: 'center',
 		};
 
+		const additionalImageProps = isGallery
+			? {
+					height: '100%',
+					resizeMode: imageCrop ? 'cover' : 'contain',
+			  }
+			: {};
+
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
 			<>
 				<TouchableWithoutFeedback
@@ -485,10 +494,12 @@ export class ImageEdit extends React.Component {
 								return (
 									/// TEMPORARY FOR GALLERY!! TODO
 									<View
-										style={ {
-											height: 150,
-											overflow: 'hidden',
-										} }
+										style={
+											this.props.isGallery && {
+												height: 150,
+												overflow: 'hidden',
+											}
+										}
 									>
 										<Image
 											align={
@@ -513,8 +524,7 @@ export class ImageEdit extends React.Component {
 											url={ url }
 											shapeStyle={ styles[ className ] }
 											width={ this.getWidth() }
-											height={ '100%' }
-											resizeMode={ 'cover' }
+											{ ...additionalImageProps }
 										/>
 									</View>
 								);

@@ -339,6 +339,7 @@ function GalleryEdit( props ) {
 				mediaPlaceholder={ mediaPlaceholder }
 				blockProps={ blockProps }
 				insertBlocksAfter={ insertBlocksAfter }
+				imageCrop={ imageCrop }
 			/>
 		</>
 	);

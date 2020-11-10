@@ -63,6 +63,10 @@ export const Gallery = ( props ) => {
 			numColumns: displayedColumns,
 			marginHorizontal: TILE_SPACING,
 			marginVertical: TILE_SPACING,
+			blockProps: {
+				imageCrop,
+				isGallery: true,
+			},
 		}
 	);
 

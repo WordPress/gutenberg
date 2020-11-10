@@ -93,6 +93,7 @@ class BlockListBlock extends Component {
 								parentWidth={ this.props.parentWidth }
 								contentStyle={ this.props.contentStyle }
 								onDeleteBlock={ this.props.onDeleteBlock }
+								{ ...( this.props.blockProps || {} ) }
 							/>
 							<View onLayout={ this.getBlockWidth } />
 						</GlobalStylesContext.Provider>
