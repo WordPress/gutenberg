@@ -11,6 +11,10 @@ export const createAtomRegistry = ( {
 
 	return {
 		getAtom( atomCreator ) {
+			if ( ! atomCreator ) {
+				debugger;
+			}
+
 			if ( ! atoms.get( atomCreator ) ) {
 				const atom = atomCreator( this );
 				atoms.set( atomCreator, atom );
@@ -31,7 +35,7 @@ export const createAtomRegistry = ( {
 	};
 };
 
-const createObservable = ( initialValue ) => () => {
+export const createAtom = ( initialValue ) => () => {
 	let value = initialValue;
 	let listeners = [];
 
@@ -56,7 +60,18 @@ const createObservable = ( initialValue ) => () => {
 	};
 };
 
-const createDerivedObservable = (
+export const createStoreAtom = ( { get, subscribe } ) => () => {
+	return {
+		type: 'store',
+		get() {
+			return get();
+		},
+		subscribe,
+		isResolved: true,
+	};
+};
+
+export const createDerivedAtom = (
 	getCallback,
 	modifierCallback = noop,
 	id
@@ -113,8 +128,11 @@ const createDerivedObservable = (
 			dependenciesUnsubscribeMap.set( d, d.subscribe( refresh ) );
 		} );
 		removedDependencies.forEach( ( d ) => {
-			dependenciesUnsubscribeMap.get( d )();
+			const unsubscribe = dependenciesUnsubscribeMap.get( d );
 			dependenciesUnsubscribeMap.delete( d );
+			if ( unsubscribe ) {
+				unsubscribe();
+			}
 		} );
 		if ( ! didThrow && newValue !== value ) {
 			value = newValue;
@@ -150,45 +168,3 @@ const createDerivedObservable = (
 		},
 	};
 };
-
-export const createAtom = function ( config, ...args ) {
-	if ( isFunction( config ) ) {
-		return createDerivedObservable( config, ...args );
-	}
-	return createObservable( config, ...args );
-};
-
-/*
-const shortcutsData = [ { id: '1' }, { id: '2' }, { id: '3' } ];
-
-const shortcutsById = createAtom( {} );
-const allShortcutIds = createAtom( [] );
-const shortcuts = createAtom( ( get ) => {
-	return get( allShortcutIds ).map( ( id ) =>
-		get( get( shortcutsById )[ id ] )
-	);
-} );
-
-const reg = createAtomRegistry();
-
-console.log( 'shortcuts', reg.getAtom( shortcuts ).get() );
-reg.getAtom( shortcuts ).subscribe( () => {
-	console.log( 'shortcuts', reg.getAtom( shortcuts ).get() );
-} );
-
-setTimeout( () => {
-	const map = shortcutsData.reduce( ( acc, val ) => {
-		acc[ val.id ] = createAtom( val );
-		return acc;
-	}, {} );
-	reg.getAtom( shortcutsById ).set( map );
-}, 1000 );
-
-setTimeout( () => {
-	reg.getAtom( allShortcutIds ).set( [ 1 ] );
-}, 2000 );
-
-setTimeout( () => {
-	reg.getAtom( allShortcutIds ).set( [ 1, 2 ] );
-}, 3000 );
-*/

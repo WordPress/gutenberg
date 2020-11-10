@@ -9,7 +9,7 @@ import memize from 'memize';
  */
 import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
-import { createAtomRegistry } from './atom';
+import { createDerivedAtom, createAtomRegistry, createStoreAtom } from './atom';
 import { createAtomicStore } from './atomic-store';
 
 /**
@@ -49,6 +49,7 @@ import { createAtomicStore } from './atomic-store';
  */
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
+	const selectorsAtom = {};
 	const atomsUnsubscribe = {};
 	const atomRegistry = createAtomRegistry( {
 		onAdd: ( atom ) => {
@@ -194,6 +195,24 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		} );
 	}
 
+	function getGenericSelectorsAtom( config ) {
+		const storeAtom = createStoreAtom( {
+			get() {
+				return null;
+			},
+			subscribe: config.subscribe,
+		} );
+		return createDerivedAtom( ( get ) => {
+			get( storeAtom );
+			if ( ! config.getAtomSelectors ) {
+				return config.getSelectors();
+			}
+			return mapValues( config.getAtomSelectors(), ( atomSelector ) => {
+				return ( ...args ) => atomSelector( get )( ...args );
+			} );
+		} );
+	}
+
 	/**
 	 * Registers a generic store.
 	 *
@@ -211,6 +230,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			throw new TypeError( 'config.subscribe must be a function' );
 		}
 		stores[ key ] = config;
+		selectorsAtom[ key ] = getGenericSelectorsAtom( config );
 		config.subscribe( globalListener );
 	}
 
@@ -221,6 +241,15 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 */
 	function register( store ) {
 		registerGenericStore( store.name, store.instantiate( registry ) );
+	}
+
+	function getAtomSelectors( key ) {
+		const atom = selectorsAtom[ key ];
+		if ( atom ) {
+			return atom;
+		}
+
+		return parent.getAtomSelectors( key );
 	}
 
 	let registry = {
@@ -234,6 +263,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		dispatch,
 		use,
 		register,
+		getAtomSelectors,
 	};
 
 	/**

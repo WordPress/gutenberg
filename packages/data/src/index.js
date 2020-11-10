@@ -24,7 +24,12 @@ export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 export { controls } from './controls';
 export { default as createReduxStore } from './redux-store';
-export { createAtom, createAtomRegistry } from './atom';
+export {
+	createDerivedAtom,
+	createStoreAtom,
+	createAtom,
+	createAtomRegistry,
+} from './atom';
 
 /**
  * Object of available plugins to use with a registry.

@@ -46,6 +46,7 @@ export default function createRuntime( controls = {}, dispatch ) {
 		if ( ! isAction( value ) ) {
 			return false;
 		}
+
 		dispatch( value );
 		next();
 		return true;
