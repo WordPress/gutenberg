@@ -258,7 +258,7 @@ supports: {
 - Type: `boolean`
 - Default value: `false`
 
-This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value.
+This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if [the theme declares support](/docs/designers-developers/developers/themes/theme-support.md#supporting-custom-line-heights).
 
 ```js
 supports: {
@@ -317,7 +317,7 @@ supports: {
 - Subproperties:
   - `padding`: type `boolean`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values.
+This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/designers-developers/developers/themes/theme-support.md##cover-block-padding).
 
 ```js
 supports: {
