@@ -9,6 +9,20 @@ import RNTAztecView
 
 @objc
 public class Gutenberg: NSObject {
+    public static func supportedBlocks(isDev: Bool = false) -> [String] {
+        guard let json = try? SourceFile.supportedBlocks.getContent() else { return [] }
+        let data = Data(json.utf8)
+        guard let blockSupport = try? JSONSerialization.jsonObject(with: data, options: []) as? [String : [String]] else { return [] }
+        var supportedBlocks = [String]()
+        supportedBlocks += blockSupport["common"] ?? []
+        supportedBlocks += blockSupport["iOSOnly"] ?? []
+
+        if isDev {
+            supportedBlocks += blockSupport["devOnly"] ?? []
+        }
+
+        return supportedBlocks
+    }
 
     private var extraModules: [RCTBridgeModule];
 
@@ -68,8 +82,9 @@ public class Gutenberg: NSObject {
             initialProps["translations"] = translations
         }
 
-        if let capabilities = dataSource.gutenbergCapabilities() {
-            initialProps["capabilities"] = capabilities
+        let capabilities = dataSource.gutenbergCapabilities()
+        if capabilities.isEmpty == false {
+            initialProps["capabilities"] = capabilities.toJSPayload()
         }
 
         let editorTheme = dataSource.gutenbergEditorTheme()
@@ -80,6 +95,8 @@ public class Gutenberg: NSObject {
         if let gradients = editorTheme?.gradients {
             initialProps["gradients"] = gradients
         }
+
+        initialProps["editorMode"] = dataSource.isPreview ? "preview" : "editor"
 
         return initialProps
     }
@@ -114,6 +131,11 @@ public class Gutenberg: NSObject {
 
     public func replace(block: Block) {
         sendEvent(.replaceBlock, body: ["html": block.content, "clientId": block.id])
+    }
+
+    public func updateCapabilities() {
+        let capabilites = dataSource.gutenbergCapabilities()
+        sendEvent(.updateCapabilities, body: capabilites.toJSPayload())
     }
 
     private func sendEvent(_ event: RNReactNativeGutenbergBridge.EventName, body: [String: Any]? = nil) {
@@ -162,6 +184,10 @@ public class Gutenberg: NSObject {
         }
 
         bridgeModule.sendEventIfNeeded(.updateTheme, body:themeUpdates)
+    }
+
+    public func showNotice(_ message: String) {
+        sendEvent(.showNotice, body: ["message": message])
     }
 }
 
@@ -228,5 +254,13 @@ public extension Gutenberg.MediaSource {
         self.id = id
         self.label = label
         self.types = Set(types)
+    }
+}
+
+private extension Dictionary where Key == Capabilities, Value == Bool {
+    func toJSPayload() -> [String: Bool] {
+        Dictionary<String, Bool>(uniqueKeysWithValues: self.map { key, value in
+            (key.rawValue, value)
+        })
     }
 }

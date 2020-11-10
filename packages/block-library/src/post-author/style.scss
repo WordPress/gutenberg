@@ -1,7 +1,6 @@
 .wp-block-post-author {
 	display: flex;
 	flex-wrap: wrap;
-	line-height: 1.5;
 
 	&__byline {
 		width: 100%;
@@ -11,11 +10,11 @@
 	}
 
 	&__avatar {
-		margin-right: $grid-unit-20;
+		margin-right: 1em;
 	}
 
 	&__bio {
-		margin-bottom: $grid-unit-10;
+		margin-bottom: 0.7em;
 		font-size: 0.7em;
 	}
 
@@ -28,5 +27,4 @@
 		font-weight: bold;
 		margin: 0;
 	}
-
 }

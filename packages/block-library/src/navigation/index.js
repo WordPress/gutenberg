@@ -21,7 +21,9 @@ export const settings = {
 
 	icon,
 
-	description: __( 'Add a navigation block to your site.' ),
+	description: __(
+		'A collection of blocks that allow visitors to get around your site.'
+	),
 
 	keywords: [ __( 'menu' ), __( 'navigation' ), __( 'links' ) ],
 
@@ -69,11 +71,6 @@ export const settings = {
 			},
 		],
 	},
-
-	styles: [
-		{ name: 'light', label: __( 'Light' ), isDefault: true },
-		{ name: 'dark', label: __( 'Dark' ) },
-	],
 
 	edit,
 

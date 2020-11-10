@@ -2,23 +2,19 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	RichText,
-	__experimentalBlock as Block,
-} from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function PreformattedEdit( {
 	attributes,
 	mergeBlocks,
 	setAttributes,
-	className,
-	style,
 } ) {
 	const { content } = attributes;
+	const blockProps = useBlockProps();
 
 	return (
 		<RichText
-			tagName={ Block.pre }
+			tagName="pre"
 			identifier="content"
 			preserveWhiteSpace
 			value={ content }
@@ -28,9 +24,8 @@ export default function PreformattedEdit( {
 				} );
 			} }
 			placeholder={ __( 'Write preformatted text…' ) }
-			className={ className }
-			style={ style }
 			onMerge={ mergeBlocks }
+			{ ...blockProps }
 		/>
 	);
 }

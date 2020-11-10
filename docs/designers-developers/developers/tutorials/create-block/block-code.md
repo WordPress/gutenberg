@@ -1,6 +1,6 @@
 # Code Implementation
 
-The basic block is in place, the next step is to add styles to the block. Feel free to style and adjust for your own preference, the main lesson is showing how to create and load external resources. For this example I'm going to load the colorized gilbert font from [Type with Pride](https://www.typewithpride.com/).
+The basic block is in place, the next step is to add styles to the block. Feel free to style and adjust for your own preference, the main lesson is showing how to create and load external resources. For this example we're going to load the colorized gilbert font from [Type with Pride](https://www.typewithpride.com/).
 
 Note: The color may not work with all browsers until they support the proper color font properly, but the font itself still loads and styles. See [colorfonts.wtf](https://www.colorfonts.wtf/) for browser support and details on color fonts.
 
@@ -41,7 +41,7 @@ Note: the block classname is prefixed with `wp-block`. The `create-block/gutenpr
 }
 ```
 
-After updating, reload the post and refresh the brwoser. If you are using a browser that supports color fonts (Firefox) then you will see it styled.
+After updating, reload the post and refresh the browser. If you are using a browser that supports color fonts (Firefox) then you will see it styled.
 
 ## Use Sass for Style (optional)
 
@@ -64,4 +64,4 @@ Update **gutenpride.php** to enqueue from generated file location:
 $editor_css = "build/index.css";
 ```
 
-Next Section: [Authoring Experience](author-experience.md)
+Next Section: [Authoring Experience](/docs/designers-developers/developers/tutorials/create-block/author-experience.md)

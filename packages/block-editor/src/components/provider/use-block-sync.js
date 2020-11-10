@@ -96,7 +96,7 @@ export default function useBlockSync( {
 		if ( clientId ) {
 			setHasControlledInnerBlocks( clientId, true );
 			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( clientId, controlledBlocks, false );
+			replaceInnerBlocks( clientId, controlledBlocks );
 		} else {
 			resetBlocks( controlledBlocks );
 		}
@@ -171,7 +171,9 @@ export default function useBlockSync( {
 
 				// Inform the controlling entity that changes have been made to
 				// the block-editor store they should be aware about.
-				const updateParent = isPersistent ? onChange : onInput;
+				const updateParent = isPersistent
+					? onChangeRef.current
+					: onInputRef.current;
 				updateParent( blocks, {
 					selectionStart: getSelectionStart(),
 					selectionEnd: getSelectionEnd(),

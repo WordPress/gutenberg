@@ -12,7 +12,6 @@ import {
 	keys,
 	isEqual,
 	isEmpty,
-	get,
 	identity,
 	difference,
 	omitBy,
@@ -411,11 +410,7 @@ function withPersistentBlockChange( reducer ) {
 			markNextChangeAsNotPersistent =
 				action.type === 'MARK_NEXT_CHANGE_AS_NOT_PERSISTENT';
 
-			const nextIsPersistentChange = get(
-				state,
-				[ 'isPersistentChange' ],
-				true
-			);
+			const nextIsPersistentChange = state?.isPersistentChange ?? true;
 			if ( state.isPersistentChange === nextIsPersistentChange ) {
 				return state;
 			}
@@ -1131,20 +1126,20 @@ export function isTyping( state = false, action ) {
 }
 
 /**
- * Reducer returning dragging state.
+ * Reducer returning dragged block client id.
  *
- * @param {boolean} state  Current state.
+ * @param {string[]} state  Current state.
  * @param {Object}  action Dispatched action.
  *
- * @return {boolean} Updated state.
+ * @return {string[]} Updated state.
  */
-export function isDraggingBlocks( state = false, action ) {
+export function draggedBlocks( state = [], action ) {
 	switch ( action.type ) {
 		case 'START_DRAGGING_BLOCKS':
-			return true;
+			return action.clientIds;
 
 		case 'STOP_DRAGGING_BLOCKS':
-			return false;
+			return [];
 	}
 
 	return state;
@@ -1373,9 +1368,31 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
- * Reducer returning the block insertion point visibility, either null if there
- * is not an explicit insertion point assigned, or an object of its `index` and
- * `rootClientId`.
+ * A helper for resetting the insertion point state.
+ *
+ * @param {Object} state        Current state.
+ * @param {Object} action       Dispatched action.
+ * @param {*}      defaultValue The default value for the reducer.
+ *
+ * @return {*} Either the default value if a reset is required, or the state.
+ */
+function resetInsertionPoint( state, action, defaultValue ) {
+	switch ( action.type ) {
+		case 'CLEAR_SELECTED_BLOCK':
+		case 'SELECT_BLOCK':
+		case 'REPLACE_INNER_BLOCKS':
+		case 'INSERT_BLOCKS':
+		case 'REMOVE_BLOCKS':
+		case 'REPLACE_BLOCKS':
+			return defaultValue;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning the insertion point position, consisting of the
+ * rootClientId and an index.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -1384,15 +1401,33 @@ export function blocksMode( state = {}, action ) {
  */
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
-		case 'SHOW_INSERTION_POINT':
+		case 'SET_INSERTION_POINT':
+		case 'SHOW_INSERTION_POINT': {
 			const { rootClientId, index } = action;
 			return { rootClientId, index };
-
-		case 'HIDE_INSERTION_POINT':
-			return null;
+		}
 	}
 
-	return state;
+	return resetInsertionPoint( state, action, null );
+}
+
+/**
+ * Reducer returning the visibility of the insertion point.
+ *
+ * @param {Object} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function insertionPointVisibility( state = false, action ) {
+	switch ( action.type ) {
+		case 'SHOW_INSERTION_POINT':
+			return true;
+		case 'HIDE_INSERTION_POINT':
+			return false;
+	}
+
+	return resetInsertionPoint( state, action, false );
 }
 
 /**
@@ -1630,14 +1665,21 @@ export function automaticChangeStatus( state, action ) {
  * @return {string} Updated state.
  */
 export function highlightedBlock( state, action ) {
-	const { clientId, isHighlighted } = action;
+	switch ( action.type ) {
+		case 'TOGGLE_BLOCK_HIGHLIGHT':
+			const { clientId, isHighlighted } = action;
 
-	if ( action.type === 'TOGGLE_BLOCK_HIGHLIGHT' ) {
-		if ( isHighlighted ) {
-			return clientId;
-		} else if ( state === clientId ) {
-			return null;
-		}
+			if ( isHighlighted ) {
+				return clientId;
+			} else if ( state === clientId ) {
+				return null;
+			}
+
+			return state;
+		case 'SELECT_BLOCK':
+			if ( action.clientId !== state ) {
+				return null;
+			}
 	}
 
 	return state;
@@ -1646,7 +1688,7 @@ export function highlightedBlock( state, action ) {
 export default combineReducers( {
 	blocks,
 	isTyping,
-	isDraggingBlocks,
+	draggedBlocks,
 	isCaretWithinFormattedText,
 	selectionStart,
 	selectionEnd,
@@ -1656,6 +1698,7 @@ export default combineReducers( {
 	blocksMode,
 	blockListSettings,
 	insertionPoint,
+	insertionPointVisibility,
 	template,
 	settings,
 	preferences,

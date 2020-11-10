@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { Platform } from 'react-native';
+import { sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -60,6 +61,8 @@ import * as tagCloud from './tag-cloud';
 import * as classic from './classic';
 import * as group from './group';
 import * as buttons from './buttons';
+import * as socialLink from './social-link';
+import * as socialLinks from './social-links';
 
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
@@ -83,8 +86,6 @@ export const coreBlocks = [
 	column,
 	cover,
 	embed,
-	...embed.common,
-	...embed.others,
 	file,
 	html,
 	mediaText,
@@ -108,6 +109,8 @@ export const coreBlocks = [
 	video,
 	classic,
 	buttons,
+	socialLink,
+	socialLinks,
 ].reduce( ( accumulator, block ) => {
 	accumulator[ block.name ] = block;
 	return accumulator;
@@ -130,20 +133,43 @@ const registerBlock = ( block ) => {
 	} );
 };
 
+/**
+ * Function to register a block variations e.g. social icons different types.
+ *
+ * @param {Object} block The block which variations will be registered.
+ *
+ */
+const registerBlockVariations = ( block ) => {
+	const { metadata, settings, name } = block;
+
+	sortBy( settings.variations, 'title' ).forEach( ( v ) => {
+		registerBlockType( `${ name }-${ v.name }`, {
+			...metadata,
+			name: `${ name }-${ v.name }`,
+			...settings,
+			icon: v.icon(),
+			title: v.title,
+			variations: [],
+		} );
+	} );
+};
+
 // only enable code block for development
 // eslint-disable-next-line no-undef
 const devOnly = ( block ) => ( !! __DEV__ ? block : null );
 
+// eslint-disable-next-line no-unused-vars
 const iOSOnly = ( block ) =>
 	Platform.OS === 'ios' ? block : devOnly( block );
 
-// Hide the Classic block
+// Hide the Classic block and SocialLink block
 addFilter(
 	'blocks.registerBlockType',
 	'core/react-native-editor',
 	( settings, name ) => {
+		const hiddenBlocks = [ 'core/freeform', 'core/social-link' ];
 		if (
-			name === 'core/freeform' &&
+			hiddenBlocks.includes( name ) &&
 			hasBlockSupport( settings, 'inserter', true )
 		) {
 			settings.supports = {
@@ -167,6 +193,7 @@ addFilter(
  * ```
  */
 export const registerCoreBlocks = () => {
+	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
 	[
 		paragraph,
 		heading,
@@ -193,9 +220,12 @@ export const registerCoreBlocks = () => {
 		latestPosts,
 		verse,
 		cover,
-		iOSOnly( pullquote ),
+		socialLink,
+		socialLinks,
+		pullquote,
 	].forEach( registerBlock );
 
+	registerBlockVariations( socialLink );
 	setDefaultBlockName( paragraph.name );
 	setFreeformContentHandlerName( classic.name );
 	setUnregisteredTypeHandlerName( missing.name );

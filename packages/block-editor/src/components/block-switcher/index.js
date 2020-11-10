@@ -11,7 +11,7 @@ import {
 	DropdownMenu,
 	ToolbarButton,
 	ToolbarGroup,
-	__experimentalToolbarItem as ToolbarItem,
+	ToolbarItem,
 	MenuGroup,
 	Popover,
 } from '@wordpress/components';
@@ -25,7 +25,7 @@ import {
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { layout } from '@wordpress/icons';
+import { stack } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -123,7 +123,7 @@ export class BlockSwitcher extends Component {
 			const blockType = getBlockType( sourceBlockName );
 			icon = blockType.icon;
 		} else {
-			icon = layout;
+			icon = stack;
 		}
 
 		const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;

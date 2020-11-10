@@ -52,12 +52,24 @@ async function toggleGlobalBlockInserter() {
 }
 
 /**
+ * Retrieves the document container by css class and checks to make sure the document's active element is within it
+ */
+async function waitForInserterCloseAndContentFocus() {
+	await page.waitForFunction( () =>
+		document.body
+			.querySelector( '.block-editor-block-list__layout' )
+			.contains( document.activeElement )
+	);
+}
+
+/**
  * Search for block in the global inserter
  *
  * @param {string} searchTerm The text to search the inserter for.
  */
 export async function searchForBlock( searchTerm ) {
 	await openGlobalBlockInserter();
+	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
 	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );
@@ -71,10 +83,37 @@ export async function searchForBlock( searchTerm ) {
 export async function searchForPattern( searchTerm ) {
 	await openGlobalBlockInserter();
 	// Select the patterns tab
-	const [ tab ] = await page.$x(
+	const tab = await page.waitForXPath(
 		'//div[contains(@class, "block-editor-inserter__tabs")]//button[.="Patterns"]'
 	);
 	await tab.click();
+	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
+	await page.focus( INSERTER_SEARCH_SELECTOR );
+	await pressKeyWithModifier( 'primary', 'a' );
+	await page.keyboard.type( searchTerm );
+}
+
+/**
+ * Search for reusable block in the global inserter.
+ *
+ * @param {string} searchTerm The text to search the inserter for.
+ */
+export async function searchForReusableBlock( searchTerm ) {
+	await openGlobalBlockInserter();
+
+	// The reusable blocks tab won't appear until the reusable blocks have been
+	// fetched. They aren't fetched until an inserter is used or the post
+	// already contains reusable blocks, so wait for the tab to appear.
+	await page.waitForXPath(
+		'//div[contains(@class, "block-editor-inserter__tabs")]//button[text()="Reusable"]'
+	);
+
+	// Select the reusable blocks tab.
+	const tab = await page.waitForXPath(
+		'//div[contains(@class, "block-editor-inserter__tabs")]//button[text()="Reusable"]'
+	);
+	await tab.click();
+	await page.waitForSelector( INSERTER_SEARCH_SELECTOR );
 	await page.focus( INSERTER_SEARCH_SELECTOR );
 	await pressKeyWithModifier( 'primary', 'a' );
 	await page.keyboard.type( searchTerm );
@@ -92,6 +131,8 @@ export async function insertBlock( searchTerm ) {
 		await page.$x( `//button//span[contains(text(), '${ searchTerm }')]` )
 	 )[ 0 ];
 	await insertButton.click();
+	// We should wait until the inserter closes and the focus moves to the content.
+	await waitForInserterCloseAndContentFocus();
 }
 
 /**
@@ -102,10 +143,50 @@ export async function insertBlock( searchTerm ) {
  */
 export async function insertPattern( searchTerm ) {
 	await searchForPattern( searchTerm );
+	const insertButton = await page.waitForXPath(
+		`//div[@role = 'button']//div[contains(text(), '${ searchTerm }')]`
+	);
+	await insertButton.click();
+	// We should wait until the inserter closes and the focus moves to the content.
+	await waitForInserterCloseAndContentFocus();
+}
+
+/**
+ * Opens the inserter, searches for the given reusable block, then selects the
+ * first result that appears. It then waits briefly for the block list to
+ * update.
+ *
+ * @param {string} searchTerm The text to search the inserter for.
+ */
+export async function insertReusableBlock( searchTerm ) {
+	await searchForReusableBlock( searchTerm );
 	const insertButton = (
-		await page.$x(
-			`//div[@role = 'button']//div[contains(text(), '${ searchTerm }')]`
-		)
+		await page.$x( `//button//span[contains(text(), '${ searchTerm }')]` )
 	 )[ 0 ];
 	await insertButton.click();
+	// We should wait until the inserter closes and the focus moves to the content.
+	await waitForInserterCloseAndContentFocus();
+	// We should wait until the block is loaded
+	await page.waitForXPath(
+		'//*[@class="block-library-block__reusable-block-container"]'
+	);
+}
+
+/**
+ * Opens the inserter, searches for the given block, then selects the
+ * first result that appears from the block directory. It then waits briefly for the block list to
+ * update.
+ *
+ * @param {string} searchTerm The text to search the inserter for.
+ */
+export async function insertBlockDirectoryBlock( searchTerm ) {
+	await searchForBlock( searchTerm );
+
+	// Grab the first block in the list
+	const insertButton = await page.waitForSelector(
+		'.block-directory-downloadable-blocks-list li:first-child button'
+	);
+	await insertButton.click();
+	// We should wait until the inserter closes and the focus moves to the content.
+	await waitForInserterCloseAndContentFocus();
 }

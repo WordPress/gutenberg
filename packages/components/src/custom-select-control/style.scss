@@ -8,7 +8,7 @@
 }
 
 .components-custom-select-control__button {
-	border: 1px solid $medium-gray-text;
+	border: 1px solid $gray-700;
 	border-radius: $radius-block-ui;
 	min-height: 30px;
 	min-width: 130px;
@@ -41,7 +41,7 @@
 	// Show border around the dropdown menu when open.
 	&:focus {
 		// Block UI appearance.
-		border: $border-width solid $dark-gray-primary;
+		border: $border-width solid $gray-900;
 		border-radius: $radius-block-ui;
 		outline: none;
 		transition: none;
@@ -64,7 +64,7 @@
 
 
 	&.is-highlighted {
-		background: $light-gray-500;
+		background: $gray-300;
 	}
 
 	&-icon {

@@ -196,6 +196,7 @@ class VideoEdit extends React.Component {
 		const toolbarEditButton = (
 			<MediaUpload
 				allowedTypes={ [ MEDIA_TYPE_VIDEO ] }
+				isReplacingMedia={ true }
 				onSelect={ this.onSelectMediaUploadOption }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
@@ -339,7 +340,7 @@ class VideoEdit extends React.Component {
 						accessibilityLabelCreator={ ( caption ) =>
 							isEmpty( caption )
 								? /* translators: accessibility text. Empty video caption. */
-								  'Video caption. Empty'
+								  __( 'Video caption. Empty' )
 								: sprintf(
 										/* translators: accessibility text. %s: video caption. */
 										__( 'Video caption. %s' ),

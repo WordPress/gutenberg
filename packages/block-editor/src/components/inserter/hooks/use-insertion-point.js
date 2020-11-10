@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -14,10 +9,17 @@ import { speak } from '@wordpress/a11y';
 /**
  * @typedef WPInserterConfig
  *
- * @property {string=} rootClientId        Inserter Root Client ID.
- * @property {string=} clientId            Inserter Client ID.
- * @property {boolean} isAppender          Whether the inserter is an appender or not.
- * @property {boolean} selectBlockOnInsert Whether the block should be selected on insert.
+ * @property {string=}   rootClientId        If set, insertion will be into the
+ *                                           block with this ID.
+ * @property {number=}   insertionIndex      If set, insertion will be into this
+ *                                           explicit position.
+ * @property {string=}   clientId            If set, insertion will be after the
+ *                                           block with this ID.
+ * @property {boolean=}  isAppender          Whether the inserter is an appender
+ *                                           or not.
+ * @property {boolean=}  selectBlockOnInsert Whether the block should be
+ *                                           selected on insert.
+ * @property {Function=} onSelect            Called after insertion.
  */
 
 /**
@@ -28,45 +30,65 @@ import { speak } from '@wordpress/a11y';
  */
 function useInsertionPoint( {
 	rootClientId,
+	insertionIndex,
 	clientId,
 	isAppender,
 	selectBlockOnInsert,
+	onSelect,
 } ) {
 	const {
+		selectedBlock,
 		destinationRootClientId,
-		getSelectedBlock,
-		getBlockIndex,
-		getBlockSelectionEnd,
-		getBlockOrder,
+		destinationIndex,
 	} = useSelect(
 		( select ) => {
 			const {
-				getSettings,
-				getBlockRootClientId,
-				getBlockSelectionEnd: _getBlockSelectionEnd,
+				getSelectedBlock,
+				getBlockIndex,
+				getBlockOrder,
+				getBlockInsertionPoint,
 			} = select( 'core/block-editor' );
 
-			let destRootClientId = rootClientId;
-			if ( ! destRootClientId && ! clientId && ! isAppender ) {
-				const end = _getBlockSelectionEnd();
-				if ( end ) {
-					destRootClientId = getBlockRootClientId( end );
+			let _destinationRootClientId, _destinationIndex;
+
+			if ( rootClientId || insertionIndex || clientId || isAppender ) {
+				// If any of these arguments are set, we're in "manual mode"
+				// meaning the insertion point is set by the caller.
+
+				_destinationRootClientId = rootClientId;
+
+				if ( insertionIndex ) {
+					// Insert into a specific index.
+					_destinationIndex = insertionIndex;
+				} else if ( clientId ) {
+					// Insert after a specific client ID.
+					_destinationIndex = getBlockIndex(
+						clientId,
+						_destinationRootClientId
+					);
+				} else {
+					// Insert at the end of the list.
+					_destinationIndex = getBlockOrder(
+						_destinationRootClientId
+					).length;
 				}
+			} else {
+				// Otherwise, we're in "auto mode" where the insertion point is
+				// decided by getBlockInsertionPoint().
+				const insertionPoint = getBlockInsertionPoint();
+				_destinationRootClientId = insertionPoint.rootClientId;
+				_destinationIndex = insertionPoint.index;
 			}
+
 			return {
-				hasPatterns: !! getSettings().__experimentalBlockPatterns
-					?.length,
-				destinationRootClientId: destRootClientId,
-				...pick( select( 'core/block-editor' ), [
-					'getSelectedBlock',
-					'getBlockIndex',
-					'getBlockSelectionEnd',
-					'getBlockOrder',
-				] ),
+				selectedBlock: getSelectedBlock(),
+				destinationRootClientId: _destinationRootClientId,
+				destinationIndex: _destinationIndex,
 			};
 		},
-		[ isAppender, clientId, rootClientId ]
+		[ rootClientId, insertionIndex, clientId, isAppender ]
 	);
+
 	const {
 		replaceBlocks,
 		insertBlocks,
@@ -74,36 +96,20 @@ function useInsertionPoint( {
 		hideInsertionPoint,
 	} = useDispatch( 'core/block-editor' );
 
-	function getInsertionIndex() {
-		// If the clientId is defined, we insert at the position of the block.
-		if ( clientId ) {
-			return getBlockIndex( clientId, destinationRootClientId );
-		}
-
-		// If there a selected block, we insert after the selected block.
-		const end = getBlockSelectionEnd();
-		if ( ! isAppender && end ) {
-			return getBlockIndex( end, destinationRootClientId ) + 1;
-		}
-
-		// Otherwise, we insert at the end of the current rootClientId
-		return getBlockOrder( destinationRootClientId ).length;
-	}
-
-	const onInsertBlocks = ( blocks ) => {
-		const selectedBlock = getSelectedBlock();
+	const onInsertBlocks = ( blocks, meta ) => {
 		if (
 			! isAppender &&
 			selectedBlock &&
 			isUnmodifiedDefaultBlock( selectedBlock )
 		) {
-			replaceBlocks( selectedBlock.clientId, blocks );
+			replaceBlocks( selectedBlock.clientId, blocks, null, null, meta );
 		} else {
 			insertBlocks(
 				blocks,
-				getInsertionIndex(),
+				destinationIndex,
 				destinationRootClientId,
-				selectBlockOnInsert
+				selectBlockOnInsert,
+				meta
 			);
 		}
 
@@ -111,17 +117,20 @@ function useInsertionPoint( {
 			// translators: %d: the name of the block that has been added
 			const message = _n(
 				'%d block added.',
-				'%d blocks added',
+				'%d blocks added.',
 				blocks.length
 			);
 			speak( message );
+		}
+
+		if ( onSelect ) {
+			onSelect();
 		}
 	};
 
 	const onToggleInsertionPoint = ( show ) => {
 		if ( show ) {
-			const index = getInsertionIndex();
-			showInsertionPoint( destinationRootClientId, index );
+			showInsertionPoint( destinationRootClientId, destinationIndex );
 		} else {
 			hideInsertionPoint();
 		}

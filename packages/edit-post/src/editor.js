@@ -2,7 +2,7 @@
  * External dependencies
  */
 import memize from 'memize';
-import { size, map, without } from 'lodash';
+import { size, map, without, omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -42,25 +42,35 @@ class Editor extends Component {
 		settings,
 		hasFixedToolbar,
 		focusMode,
+		hasReducedUI,
+		hasThemeStyles,
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
 		__experimentalLocalAutosaveInterval,
 		__experimentalSetIsInserterOpened,
-		updatePreferredStyleVariations
+		updatePreferredStyleVariations,
+		keepCaretInsideBlock
 	) {
 		settings = {
-			...settings,
+			...( hasThemeStyles
+				? settings
+				: omit( settings, [ 'defaultEditorStyles' ] ) ),
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
 			},
 			hasFixedToolbar,
 			focusMode,
+			hasReducedUI,
 			__experimentalLocalAutosaveInterval,
 
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened,
+			keepCaretInsideBlock,
+			styles: hasThemeStyles
+				? settings.styles
+				: settings.defaultEditorStyles,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -87,6 +97,8 @@ class Editor extends Component {
 			settings,
 			hasFixedToolbar,
 			focusMode,
+			hasReducedUI,
+			hasThemeStyles,
 			post,
 			postId,
 			initialEdits,
@@ -97,6 +109,7 @@ class Editor extends Component {
 			__experimentalLocalAutosaveInterval,
 			setIsInserterOpened,
 			updatePreferredStyleVariations,
+			keepCaretInsideBlock,
 			...props
 		} = this.props;
 
@@ -108,12 +121,15 @@ class Editor extends Component {
 			settings,
 			hasFixedToolbar,
 			focusMode,
+			hasReducedUI,
+			hasThemeStyles,
 			hiddenBlockTypes,
 			blockTypes,
 			preferredStyleVariations,
 			__experimentalLocalAutosaveInterval,
 			setIsInserterOpened,
-			updatePreferredStyleVariations
+			updatePreferredStyleVariations,
+			keepCaretInsideBlock
 		);
 
 		return (
@@ -160,6 +176,8 @@ export default compose( [
 				isFeatureActive( 'fixedToolbar' ) ||
 				__experimentalGetPreviewDeviceType() !== 'Desktop',
 			focusMode: isFeatureActive( 'focusMode' ),
+			hasReducedUI: isFeatureActive( 'reducedUI' ),
+			hasThemeStyles: isFeatureActive( 'themeStyles' ),
 			post: getEntityRecord( 'postType', postType, postId ),
 			preferredStyleVariations: getPreference(
 				'preferredStyleVariations'
@@ -169,6 +187,7 @@ export default compose( [
 			__experimentalLocalAutosaveInterval: getPreference(
 				'localAutosaveInterval'
 			),
+			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

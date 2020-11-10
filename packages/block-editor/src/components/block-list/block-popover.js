@@ -7,12 +7,19 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useContext } from '@wordpress/element';
+import {
+	useState,
+	useCallback,
+	useContext,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useViewportMatch } from '@wordpress/compose';
+import { getScrollContainer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -21,6 +28,7 @@ import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
 import { BlockNodes } from './root-container';
+import { getBlockDOMNode } from '../../utils/dom';
 
 function selector( select ) {
 	const {
@@ -47,7 +55,6 @@ function BlockPopover( {
 	clientId,
 	rootClientId,
 	isValid,
-	moverDirection,
 	isEmptyDefaultBlock,
 	capturingClientId,
 } ) {
@@ -65,8 +72,10 @@ function BlockPopover( {
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
 	const blockNodes = useContext( BlockNodes );
 
+	// Controls when the side inserter on empty lines should
+	// be shown, including writing and selection modes.
 	const showEmptyBlockSideInserter =
-		! isNavigationMode && isEmptyDefaultBlock && isValid;
+		! isTyping && ! isNavigationMode && isEmptyDefaultBlock && isValid;
 	const shouldShowBreadcrumb = isNavigationMode;
 	const shouldShowContextualToolbar =
 		! isNavigationMode &&
@@ -91,6 +100,16 @@ function BlockPopover( {
 		}
 	);
 
+	// Stores the active toolbar item index so the block toolbar can return focus
+	// to it when re-mounting.
+	const initialToolbarItemIndexRef = useRef();
+
+	useEffect( () => {
+		// Resets the index whenever the active block changes so this is not
+		// persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+		initialToolbarItemIndexRef.current = undefined;
+	}, [ clientId ] );
+
 	if (
 		! shouldShowBreadcrumb &&
 		! shouldShowContextualToolbar &&
@@ -102,12 +121,14 @@ function BlockPopover( {
 
 	let node = blockNodes[ clientId ];
 
-	if ( capturingClientId ) {
-		node = document.getElementById( 'block-' + capturingClientId );
-	}
-
 	if ( ! node ) {
 		return null;
+	}
+
+	const { ownerDocument } = node;
+
+	if ( capturingClientId ) {
+		node = getBlockDOMNode( capturingClientId, ownerDocument );
 	}
 
 	let anchorRef = node;
@@ -142,6 +163,9 @@ function BlockPopover( {
 	const popoverPosition = showEmptyBlockSideInserter
 		? 'top left right'
 		: 'top right left';
+	const stickyBoundaryElement = showEmptyBlockSideInserter
+		? undefined
+		: getScrollContainer( node ) || ownerDocument.body;
 
 	return (
 		<Popover
@@ -151,7 +175,7 @@ function BlockPopover( {
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
 			className="block-editor-block-list__block-popover"
-			__unstableSticky={ ! showEmptyBlockSideInserter }
+			__unstableStickyBoundaryElement={ stickyBoundaryElement }
 			__unstableSlotName="block-toolbar"
 			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
@@ -189,13 +213,18 @@ function BlockPopover( {
 					// If the toolbar is being shown because of being forced
 					// it should focus the toolbar right after the mount.
 					focusOnMount={ isToolbarForced }
+					__experimentalInitialIndex={
+						initialToolbarItemIndexRef.current
+					}
+					__experimentalOnIndexChange={ ( index ) => {
+						initialToolbarItemIndexRef.current = index;
+					} }
 				/>
 			) }
 			{ shouldShowBreadcrumb && (
 				<BlockSelectionButton
 					clientId={ clientId }
 					rootClientId={ rootClientId }
-					moverDirection={ moverDirection }
 				/>
 			) }
 			{ showEmptyBlockSideInserter && (
@@ -219,7 +248,6 @@ function wrapperSelector( select ) {
 		getBlockRootClientId,
 		__unstableGetBlockWithoutInnerBlocks,
 		getBlockParents,
-		getBlockListSettings,
 		__experimentalGetBlockListSettingsForBlocks,
 	} = select( 'core/block-editor' );
 
@@ -230,12 +258,9 @@ function wrapperSelector( select ) {
 		return;
 	}
 
-	const rootClientId = getBlockRootClientId( clientId );
 	const { name, attributes = {}, isValid } =
 		__unstableGetBlockWithoutInnerBlocks( clientId ) || {};
 	const blockParentsClientIds = getBlockParents( clientId );
-	const { __experimentalMoverDirection } =
-		getBlockListSettings( rootClientId ) || {};
 
 	// Get Block List Settings for all ancestors of the current Block clientId
 	const ancestorBlockListSettings = __experimentalGetBlockListSettingsForBlocks(
@@ -263,7 +288,6 @@ function wrapperSelector( select ) {
 		rootClientId: getBlockRootClientId( clientId ),
 		name,
 		isValid,
-		moverDirection: __experimentalMoverDirection,
 		isEmptyDefaultBlock:
 			name && isUnmodifiedDefaultBlock( { name, attributes } ),
 		capturingClientId,
@@ -282,7 +306,6 @@ export default function WrappedBlockPopover() {
 		rootClientId,
 		name,
 		isValid,
-		moverDirection,
 		isEmptyDefaultBlock,
 		capturingClientId,
 	} = selected;
@@ -296,7 +319,6 @@ export default function WrappedBlockPopover() {
 			clientId={ clientId }
 			rootClientId={ rootClientId }
 			isValid={ isValid }
-			moverDirection={ moverDirection }
 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
 			capturingClientId={ capturingClientId }
 		/>

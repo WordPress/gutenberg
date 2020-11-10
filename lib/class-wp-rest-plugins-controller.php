@@ -10,6 +10,8 @@
 /**
  * Core class to access plugins via the REST API.
  *
+ * This class can be removed when plugin support requires WordPress 5.5.0+.
+ *
  * @since 5.5.0
  *
  * @see   WP_REST_Controller
@@ -24,7 +26,7 @@ class WP_REST_Plugins_Controller extends WP_REST_Controller {
 	 * @since 5.5.0
 	 */
 	public function __construct() {
-		$this->namespace = '__experimental';
+		$this->namespace = 'wp/v2';
 		$this->rest_base = 'plugins';
 	}
 

@@ -30,12 +30,13 @@ const BlockInspector = ( {
 	selectedBlockClientId,
 	selectedBlockName,
 	showNoBlockSelectedMessage = true,
+	bubblesVirtually = true,
 } ) => {
 	if ( count > 1 ) {
 		return (
 			<div className="block-editor-block-inspector">
 				<MultiSelectionInspector />
-				<InspectorControls.Slot bubblesVirtually />
+				<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
 			</div>
 		);
 	}
@@ -79,10 +80,11 @@ const BlockInspector = ( {
 					</PanelBody>
 				</div>
 			) }
-			<InspectorControls.Slot bubblesVirtually />
+			<InspectorControls.Slot bubblesVirtually={ bubblesVirtually } />
 			<div>
 				<AdvancedControls
 					slotName={ InspectorAdvancedControls.slotName }
+					bubblesVirtually={ bubblesVirtually }
 				/>
 			</div>
 			<SkipToSelectedBlock key="back" />
@@ -90,7 +92,7 @@ const BlockInspector = ( {
 	);
 };
 
-const AdvancedControls = ( { slotName } ) => {
+const AdvancedControls = ( { slotName, bubblesVirtually } ) => {
 	const slot = useSlot( slotName );
 	const hasFills = Boolean( slot.fills && slot.fills.length );
 
@@ -104,7 +106,9 @@ const AdvancedControls = ( { slotName } ) => {
 			title={ __( 'Advanced' ) }
 			initialOpen={ false }
 		>
-			<InspectorAdvancedControls.Slot bubblesVirtually />
+			<InspectorAdvancedControls.Slot
+				bubblesVirtually={ bubblesVirtually }
+			/>
 		</PanelBody>
 	);
 };

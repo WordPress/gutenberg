@@ -1,15 +1,21 @@
 /**
  * External dependencies
  */
-import { map, findIndex, flow, sortBy, groupBy, isEmpty } from 'lodash';
+import {
+	map,
+	findIndex,
+	flow,
+	sortBy,
+	groupBy,
+	isEmpty,
+	orderBy,
+} from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, _x, _n, sprintf } from '@wordpress/i18n';
 import { withSpokenMessages } from '@wordpress/components';
-import { addQueryArgs } from '@wordpress/url';
-import { controlsRepeat } from '@wordpress/icons';
 import { useMemo, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
@@ -57,14 +63,11 @@ export function BlockTypesTab( {
 	}, [ filterValue, items, categories, collections ] );
 
 	const suggestedItems = useMemo( () => {
-		return items.slice( 0, MAX_SUGGESTED_ITEMS );
-	}, [ items ] );
-
-	const reusableItems = useMemo( () => {
-		return filteredItems.filter(
-			( { category } ) => category === 'reusable'
+		return orderBy( items, [ 'frecency' ], [ 'desc' ] ).slice(
+			0,
+			MAX_SUGGESTED_ITEMS
 		);
-	}, [ filteredItems ] );
+	}, [ items ] );
 
 	const uncategorizedItems = useMemo( () => {
 		return filteredItems.filter( ( item ) => ! item.category );
@@ -89,7 +92,7 @@ export function BlockTypesTab( {
 	}, [ filteredItems, categories ] );
 
 	const itemsPerCollection = useMemo( () => {
-		// Create a new Object to avoid mutating collection
+		// Create a new Object to avoid mutating collection.
 		const result = { ...collections };
 		Object.keys( collections ).forEach( ( namespace ) => {
 			result[ namespace ] = filteredItems.filter(
@@ -103,7 +106,10 @@ export function BlockTypesTab( {
 		return result;
 	}, [ filteredItems, collections ] );
 
-	// Announce search results on change
+	// Hide block preview on unmount.
+	useEffect( () => () => onHover( null ), [] );
+
+	// Announce search results on change.
 	useEffect( () => {
 		const resultsFoundMessage = sprintf(
 			/* translators: %d: number of results. */
@@ -126,6 +132,7 @@ export function BlockTypesTab( {
 						items={ filteredItems }
 						onSelect={ onSelectItem }
 						onHover={ onHover }
+						label={ __( 'Child Blocks' ) }
 					/>
 				</ChildBlocks>
 			) }
@@ -139,6 +146,7 @@ export function BlockTypesTab( {
 							items={ suggestedItems }
 							onSelect={ onSelectItem }
 							onHover={ onHover }
+							label={ _x( 'Most used', 'blocks' ) }
 						/>
 					</InserterPanel>
 				) }
@@ -159,6 +167,7 @@ export function BlockTypesTab( {
 								items={ categoryItems }
 								onSelect={ onSelectItem }
 								onHover={ onHover }
+								label={ category.title }
 							/>
 						</InserterPanel>
 					);
@@ -173,6 +182,7 @@ export function BlockTypesTab( {
 						items={ uncategorizedItems }
 						onSelect={ onSelectItem }
 						onHover={ onHover }
+						label={ __( 'Uncategorized' ) }
 					/>
 				</InserterPanel>
 			) }
@@ -194,32 +204,11 @@ export function BlockTypesTab( {
 								items={ collectionItems }
 								onSelect={ onSelectItem }
 								onHover={ onHover }
+								label={ collection.title }
 							/>
 						</InserterPanel>
 					);
 				} ) }
-
-			{ ! hasChildItems && !! reusableItems.length && (
-				<InserterPanel
-					className="block-editor-inserter__reusable-blocks-panel"
-					title={ __( 'Reusable' ) }
-					icon={ controlsRepeat }
-				>
-					<BlockTypesList
-						items={ reusableItems }
-						onSelect={ onSelectItem }
-						onHover={ onHover }
-					/>
-					<a
-						className="block-editor-inserter__manage-reusable-blocks"
-						href={ addQueryArgs( 'edit.php', {
-							post_type: 'wp_block',
-						} ) }
-					>
-						{ __( 'Manage all reusable blocks' ) }
-					</a>
-				</InserterPanel>
-			) }
 
 			<__experimentalInserterMenuExtension.Slot
 				fillProps={ {

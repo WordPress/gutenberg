@@ -87,6 +87,7 @@ describe( 'New User Experience (NUX)', () => {
 
 		// Reload the editor
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		// Guide should be closed
 		welcomeGuide = await page.$( '.edit-post-welcome-guide' );
@@ -108,6 +109,7 @@ describe( 'New User Experience (NUX)', () => {
 
 		// Reload the editor
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		// Guide should be closed
 		welcomeGuide = await page.$( '.edit-post-welcome-guide' );

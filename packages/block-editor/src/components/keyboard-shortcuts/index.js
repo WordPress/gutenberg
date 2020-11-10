@@ -131,7 +131,7 @@ function KeyboardShortcuts() {
 			},
 			[ clientIds, removeBlocks ]
 		),
-		{ isDisabled: clientIds.length < 1 }
+		{ isDisabled: clientIds.length < 2 }
 	);
 
 	useShortcut(
@@ -154,7 +154,9 @@ function KeyboardShortcuts() {
 			( event ) => {
 				event.preventDefault();
 				clearSelectedBlock();
-				window.getSelection().removeAllRanges();
+				event.target.ownerDocument.defaultView
+					.getSelection()
+					.removeAllRanges();
 			},
 			[ clientIds, clearSelectedBlock ]
 		),

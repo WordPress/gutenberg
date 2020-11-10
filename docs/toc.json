@@ -1,18 +1,19 @@
 [
-	{ "docs/readme.md": [] },
-
-	{ "docs/contributors/principles.md": [
-		{ "docs/architecture/readme.md": [
-			{ "docs/architecture/folder-structure.md": [] },
-			{ "docs/architecture/modularity.md": [] },
-			{ "docs/architecture/performance.md": [] },
-			{ "docs/architecture/automated-testing.md": [] }
-		] },
-		{ "docs/designers-developers/key-concepts.md": [] },
+	{ "docs/readme.md": [
 		{ "docs/designers-developers/glossary.md": [] },
 		{ "docs/designers-developers/faq.md": [] },
+		{ "docs/contributors/versions-in-wordpress.md": [] },
 		{ "docs/contributors/history.md": [] },
 		{ "docs/contributors/outreach.md": [] }
+	] },
+	{ "docs/architecture/readme.md": [
+		{ "docs/architecture/key-concepts.md": [] },
+		{ "docs/architecture/data-flow.md": [] },
+		{ "docs/architecture/folder-structure.md": [] },
+		{ "docs/architecture/modularity.md": [] },
+		{ "docs/architecture/performance.md": [] },
+		{ "docs/architecture/automated-testing.md": [] },
+		{ "docs/architecture/fse-templates.md": [] }
 	] },
 	{ "docs/designers-developers/developers/README.md": [
 		{ "docs/designers-developers/developers/block-api/README.md": [
@@ -21,6 +22,7 @@
 			{ "docs/designers-developers/developers/block-api/block-attributes.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-context.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-deprecation.md": [] },
+			{ "docs/designers-developers/developers/block-api/block-supports.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-transforms.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-templates.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-patterns.md": [] },
@@ -77,10 +79,11 @@
 			{ "docs/contributors/scripts.md": [] },
 			{ "docs/contributors/managing-packages.md": [] },
 			{ "docs/contributors/release.md": [] },
-			{ "docs/contributors/native-mobile.md": [] }
+			{ "docs/contributors/native-mobile.md": [] },
+			{ "docs/contributors/getting-started-native-mobile.md": [] }
 		] },
 		{ "docs/contributors/design.md": [
-			{ "docs/contributors/principles/the-block.md": [] },
+			{ "docs/contributors/the-block.md": [] },
 			{ "docs/contributors/reference.md": [] }
 		] },
 		{ "docs/contributors/document.md": [
@@ -91,6 +94,9 @@
 		{ "docs/contributors/repository-management.md": [] }
 	] },
 	{ "docs/designers-developers/developers/tutorials/readme.md": [
+		{ "docs/designers-developers/developers/tutorials/devenv/readme.md": [
+			{ "docs/designers-developers/developers/tutorials/devenv/docker-ubuntu.md": [] }
+		] },
 		{ "docs/designers-developers/developers/tutorials/javascript/readme.md": [
 			{ "docs/designers-developers/developers/tutorials/javascript/plugins-background.md": [] },
 			{ "docs/designers-developers/developers/tutorials/javascript/loading-javascript.md": [] },
@@ -98,7 +104,16 @@
 			{ "docs/designers-developers/developers/tutorials/javascript/troubleshooting.md": [] },
 			{ "docs/designers-developers/developers/tutorials/javascript/versions-and-building.md": [] },
 			{ "docs/designers-developers/developers/tutorials/javascript/scope-your-code.md": [] },
-			{ "docs/designers-developers/developers/tutorials/javascript/js-build-setup.md": [] }
+			{ "docs/designers-developers/developers/tutorials/javascript/js-build-setup.md": [] },
+			{ "docs/designers-developers/developers/tutorials/javascript/esnext-js.md": [] }
+		] },
+		{ "docs/designers-developers/developers/tutorials/create-block/readme.md": [
+			{ "docs/designers-developers/developers/tutorials/create-block/wp-plugin.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/block-anatomy.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/attributes.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/block-code.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/author-experience.md": [] },
+			{ "docs/designers-developers/developers/tutorials/create-block/finishing.md": [] }
 		] },
 		{ "docs/designers-developers/developers/tutorials/block-tutorial/readme.md": [
 			{ "docs/designers-developers/developers/tutorials/block-tutorial/writing-your-first-block-type.md": [] },
@@ -129,6 +144,9 @@
 			{ "docs/designers-developers/developers/tutorials/format-api/1-register-format.md": [] },
 			{ "docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md": [] },
 			{ "docs/designers-developers/developers/tutorials/format-api/3-apply-format.md": [] }
+		] },
+		{ "docs/designers-developers/developers/tutorials/block-based-themes/README.md": [
+			{ "docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-2-adding-blocks.md": [] }
 		] }
 	] },
 	{ "packages/components/README.md": "{{components}}" },

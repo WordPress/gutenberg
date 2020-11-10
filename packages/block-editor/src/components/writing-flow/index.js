@@ -45,11 +45,9 @@ import {
 } from '../../utils/dom';
 import FocusCapture from './focus-capture';
 
-/**
- * Browser constants
- */
-
-const { getSelection, getComputedStyle } = window;
+function getComputedStyle( node ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
 
 /**
  * Given an element, returns true if the element is a tabbable text field, or
@@ -214,6 +212,7 @@ function selector( select ) {
 		isSelectionEnabled,
 		getBlockSelectionStart,
 		isMultiSelecting,
+		getSettings,
 	} = select( 'core/block-editor' );
 
 	const selectedBlockClientId = getSelectedBlockClientId();
@@ -243,6 +242,7 @@ function selector( select ) {
 		isSelectionEnabled: isSelectionEnabled(),
 		blockSelectionStart: getBlockSelectionStart(),
 		isMultiSelecting: isMultiSelecting(),
+		keepCaretInsideBlock: getSettings().keepCaretInsideBlock,
 	};
 }
 
@@ -289,6 +289,7 @@ export default function WritingFlow( { children } ) {
 		getClientIdsOfDescendants,
 		canInsertBlockType,
 		getBlockName,
+		keepCaretInsideBlock,
 	} = useSelect( selector, [] );
 	const {
 		multiSelect,
@@ -304,12 +305,14 @@ export default function WritingFlow( { children } ) {
 	function onMouseDown( event ) {
 		verticalRect.current = null;
 
+		const { ownerDocument } = event.target;
+
 		// Clicking inside a selected block should exit navigation mode and block moving mode.
 		if (
 			isNavigationMode &&
 			selectedBlockClientId &&
 			isInsideRootBlock(
-				getBlockDOMNode( selectedBlockClientId ),
+				getBlockDOMNode( selectedBlockClientId, ownerDocument ),
 				event.target
 			)
 		) {
@@ -416,6 +419,8 @@ export default function WritingFlow( { children } ) {
 		const hasModifier =
 			isShift || event.ctrlKey || event.altKey || event.metaKey;
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
+		const { ownerDocument } = container.current;
+		const { defaultView } = ownerDocument;
 
 		// In navigation mode, tab and arrows navigate from block to block.
 		if ( isNavigationMode ) {
@@ -488,7 +493,10 @@ export default function WritingFlow( { children } ) {
 					event.preventDefault();
 					selectBlock( focusedBlockUid );
 				} else if ( isTab && selectedBlockClientId ) {
-					const wrapper = getBlockDOMNode( selectedBlockClientId );
+					const wrapper = getBlockDOMNode(
+						selectedBlockClientId,
+						ownerDocument
+					);
 					let nextTabbable;
 
 					if ( navigateDown ) {
@@ -516,7 +524,10 @@ export default function WritingFlow( { children } ) {
 		// Navigation mode (press Esc), to navigate through blocks.
 		if ( selectedBlockClientId ) {
 			if ( isTab ) {
-				const wrapper = getBlockDOMNode( selectedBlockClientId );
+				const wrapper = getBlockDOMNode(
+					selectedBlockClientId,
+					ownerDocument
+				);
 
 				if ( isShift ) {
 					if ( target === wrapper ) {
@@ -567,7 +578,7 @@ export default function WritingFlow( { children } ) {
 		if ( ! isVertical ) {
 			verticalRect.current = null;
 		} else if ( ! verticalRect.current ) {
-			verticalRect.current = computeCaretRect();
+			verticalRect.current = computeCaretRect( defaultView );
 		}
 
 		// This logic inside this condition needs to be checked before
@@ -637,7 +648,11 @@ export default function WritingFlow( { children } ) {
 			// Moving from block multi-selection to single block selection
 			moveSelection( isReverse );
 			event.preventDefault();
-		} else if ( isVertical && isVerticalEdge( target, isReverse ) ) {
+		} else if (
+			isVertical &&
+			isVerticalEdge( target, isReverse ) &&
+			! keepCaretInsideBlock
+		) {
 			const closestTabbable = getClosestTabbable(
 				target,
 				isReverse,
@@ -655,8 +670,9 @@ export default function WritingFlow( { children } ) {
 			}
 		} else if (
 			isHorizontal &&
-			getSelection().isCollapsed &&
-			isHorizontalEdge( target, isReverseDir )
+			defaultView.getSelection().isCollapsed &&
+			isHorizontalEdge( target, isReverseDir ) &&
+			! keepCaretInsideBlock
 		) {
 			const closestTabbable = getClosestTabbable(
 				target,

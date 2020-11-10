@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+
+import { omit } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -76,22 +82,6 @@ export const blockManagement = (
 };
 
 /**
- * Reducer returning an array of downloadable blocks.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function hasPermission( state = true, action ) {
-	if ( action.type === 'SET_INSTALL_BLOCKS_PERMISSION' ) {
-		return action.hasPermission;
-	}
-
-	return state;
-}
-
-/**
  * Reducer returning an object of error notices.
  *
  * @param {Object} state  Current state.
@@ -104,8 +94,13 @@ export const errorNotices = ( state = {}, action ) => {
 		case 'SET_ERROR_NOTICE':
 			return {
 				...state,
-				[ action.blockId ]: action.notice,
+				[ action.blockId ]: {
+					message: action.message,
+					isFatal: action.isFatal,
+				},
 			};
+		case 'CLEAR_ERROR_NOTICE':
+			return omit( state, action.blockId );
 	}
 	return state;
 };
@@ -113,6 +108,5 @@ export const errorNotices = ( state = {}, action ) => {
 export default combineReducers( {
 	downloadableBlocks,
 	blockManagement,
-	hasPermission,
 	errorNotices,
 } );

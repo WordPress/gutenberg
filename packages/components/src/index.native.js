@@ -10,6 +10,7 @@ export {
 } from '@wordpress/primitives';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
+export { default as ColorPicker } from './color-picker';
 export { default as Dashicon } from './dashicon';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
@@ -17,9 +18,8 @@ export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
-export { default as __experimentalToolbarItem } from './toolbar-item';
+export { default as ToolbarItem } from './toolbar-item';
 export { default as Icon } from './icon';
-export { default as IconButton } from './button/deprecated';
 export { default as Spinner } from './spinner';
 export {
 	createSlotFill,
@@ -39,7 +39,7 @@ export { default as ToggleControl } from './toggle-control';
 export { default as SelectControl } from './select-control';
 export { default as RangeControl } from './range-control';
 export { default as ResizableBox } from './resizable-box';
-export { default as UnsupportedFooterControl } from './unsupported-footer-control';
+export { default as FooterMessageControl } from './footer-message-control';
 export { default as ColorControl } from './color-control';
 export { default as QueryControls } from './query-controls';
 export { default as Notice } from './notice';
@@ -58,7 +58,11 @@ export * from './text';
 
 // Mobile Components
 export { default as BottomSheet } from './mobile/bottom-sheet';
-export { BottomSheetConsumer } from './mobile/bottom-sheet/bottom-sheet-context';
+export {
+	BottomSheetConsumer,
+	BottomSheetProvider,
+	BottomSheetContext,
+} from './mobile/bottom-sheet/bottom-sheet-context';
 export { default as HTMLTextInput } from './mobile/html-text-input';
 export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
@@ -66,18 +70,23 @@ export { default as ModalHeaderBar } from './mobile/modal-header-bar';
 export { default as Picker } from './mobile/picker';
 export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
-export { default as ImageWithFocalPoint } from './mobile/image-with-focalpoint';
 export { default as Gradient } from './mobile/gradient';
 export { default as ColorSettings } from './mobile/color-settings';
+export { LinkPicker } from './mobile/link-picker';
 export { default as LinkSettings } from './mobile/link-settings';
+export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
+export { default as ImageEditingButton } from './mobile/image/image-editing-button';
+export { default as InserterButton } from './mobile/inserter-button';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';
+export {
+	WIDE_ALIGNMENTS,
+	ALIGNMENT_BREAKPOINTS,
+} from './mobile/utils/alignments';
 
 export {
 	default as GlobalStylesContext,
 	useGlobalStyles,
 	withGlobalStyles,
 } from './mobile/global-styles-context';
-
-export * from './mobile/site-capabilities';

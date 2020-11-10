@@ -12,18 +12,21 @@ import classnames from 'classnames';
 import { BlockControls } from '@wordpress/block-editor';
 import { useState } from '@wordpress/element';
 import {
+	search,
+	check,
 	rotateRight as rotateRightIcon,
 	aspectRatio as aspectRatioIcon,
 } from '@wordpress/icons';
 import {
 	ToolbarGroup,
 	ToolbarButton,
-	__experimentalToolbarItem as ToolbarItem,
+	ToolbarItem,
 	Spinner,
 	RangeControl,
 	DropdownMenu,
 	MenuGroup,
 	MenuItem,
+	Dropdown,
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch } from '@wordpress/data';
@@ -31,18 +34,24 @@ import apiFetch from '@wordpress/api-fetch';
 
 const MIN_ZOOM = 100;
 const MAX_ZOOM = 300;
-const POPOVER_PROPS = { position: 'bottom right' };
+const POPOVER_PROPS = {
+	position: 'bottom right',
+	isAlternate: true,
+};
 
-function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
+function AspectGroup( { aspectRatios, isDisabled, label, onClick, value } ) {
 	return (
 		<MenuGroup label={ label }>
 			{ aspectRatios.map( ( { title, aspect } ) => (
 				<MenuItem
 					key={ aspect }
-					isDisabled={ isDisabled }
+					disabled={ isDisabled }
 					onClick={ () => {
 						onClick( aspect );
 					} }
+					role="menuitemradio"
+					isSelected={ aspect === value }
+					icon={ aspect === value ? check : undefined }
 				>
 					{ title }
 				</MenuItem>
@@ -51,16 +60,41 @@ function AspectGroup( { aspectRatios, isDisabled, label, onClick } ) {
 	);
 }
 
-function AspectMenu( { isDisabled, onClick, toggleProps } ) {
+function AspectMenu( {
+	toggleProps,
+	isDisabled,
+	onClick,
+	value,
+	defaultValue,
+} ) {
 	return (
 		<DropdownMenu
 			icon={ aspectRatioIcon }
 			label={ __( 'Aspect Ratio' ) }
 			popoverProps={ POPOVER_PROPS }
 			toggleProps={ toggleProps }
+			className="wp-block-image__aspect-ratio"
 		>
 			{ ( { onClose } ) => (
 				<>
+					<AspectGroup
+						isDisabled={ isDisabled }
+						onClick={ ( aspect ) => {
+							onClick( aspect );
+							onClose();
+						} }
+						value={ value }
+						aspectRatios={ [
+							{
+								title: __( 'Original' ),
+								aspect: defaultValue,
+							},
+							{
+								title: __( 'Square' ),
+								aspect: 1,
+							},
+						] }
+					/>
 					<AspectGroup
 						label={ __( 'Landscape' ) }
 						isDisabled={ isDisabled }
@@ -68,6 +102,7 @@ function AspectMenu( { isDisabled, onClick, toggleProps } ) {
 							onClick( aspect );
 							onClose();
 						} }
+						value={ value }
 						aspectRatios={ [
 							{
 								title: __( '16:10' ),
@@ -94,6 +129,7 @@ function AspectMenu( { isDisabled, onClick, toggleProps } ) {
 							onClick( aspect );
 							onClose();
 						} }
+						value={ value }
 						aspectRatios={ [
 							{
 								title: __( '10:16' ),
@@ -110,19 +146,6 @@ function AspectMenu( { isDisabled, onClick, toggleProps } ) {
 							{
 								title: __( '2:3' ),
 								aspect: 2 / 3,
-							},
-						] }
-					/>
-					<AspectGroup
-						isDisabled={ isDisabled }
-						onClick={ ( aspect ) => {
-							onClick( aspect );
-							onClose();
-						} }
-						aspectRatios={ [
-							{
-								title: __( 'Square' ),
-								aspect: 1,
 							},
 						] }
 					/>
@@ -176,8 +199,10 @@ export default function ImageEditor( {
 			attrs.rotation = rotation;
 		}
 
+		attrs.src = url;
+
 		apiFetch( {
-			path: `wp/v2/media/${ id }/edit`,
+			path: `/wp/v2/media/${ id }/edit`,
 			method: 'POST',
 			data: attrs,
 		} )
@@ -268,7 +293,7 @@ export default function ImageEditor( {
 	return (
 		<>
 			<div
-				className={ classnames( 'richimage__crop-area', {
+				className={ classnames( 'wp-block-image__crop-area', {
 					'is-applying': inProgress,
 				} ) }
 				style={ {
@@ -285,24 +310,50 @@ export default function ImageEditor( {
 					zoom={ zoom / 100 }
 					aspect={ aspect }
 					onCropChange={ setPosition }
-					onCropComplete={ setCrop }
+					onCropComplete={ ( newCropPercent ) => {
+						setCrop( newCropPercent );
+					} }
 					onZoomChange={ ( newZoom ) => {
 						setZoom( newZoom * 100 );
 					} }
 				/>
 				{ inProgress && <Spinner /> }
 			</div>
-			{ ! inProgress && (
-				<RangeControl
-					className="richimage__zoom-control"
-					label={ __( 'Zoom' ) }
-					min={ MIN_ZOOM }
-					max={ MAX_ZOOM }
-					value={ Math.round( zoom ) }
-					onChange={ setZoom }
-				/>
-			) }
 			<BlockControls>
+				<ToolbarGroup>
+					<Dropdown
+						contentClassName="wp-block-image__zoom"
+						popoverProps={ POPOVER_PROPS }
+						renderToggle={ ( { isOpen, onToggle } ) => (
+							<ToolbarButton
+								icon={ search }
+								label={ __( 'Zoom' ) }
+								onClick={ onToggle }
+								aria-expanded={ isOpen }
+								disabled={ inProgress }
+							/>
+						) }
+						renderContent={ () => (
+							<RangeControl
+								min={ MIN_ZOOM }
+								max={ MAX_ZOOM }
+								value={ Math.round( zoom ) }
+								onChange={ setZoom }
+							/>
+						) }
+					/>
+					<ToolbarItem>
+						{ ( toggleProps ) => (
+							<AspectMenu
+								toggleProps={ toggleProps }
+								isDisabled={ inProgress }
+								onClick={ setAspect }
+								value={ aspect }
+								defaultValue={ naturalWidth / naturalHeight }
+							/>
+						) }
+					</ToolbarItem>
+				</ToolbarGroup>
 				<ToolbarGroup>
 					<ToolbarButton
 						icon={ rotateRightIcon }
@@ -310,17 +361,6 @@ export default function ImageEditor( {
 						onClick={ rotate }
 						disabled={ inProgress }
 					/>
-				</ToolbarGroup>
-				<ToolbarGroup>
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<AspectMenu
-								toggleProps={ toggleProps }
-								isDisabled={ inProgress }
-								onClick={ setAspect }
-							/>
-						) }
-					</ToolbarItem>
 				</ToolbarGroup>
 				<ToolbarGroup>
 					<ToolbarButton onClick={ apply } disabled={ inProgress }>

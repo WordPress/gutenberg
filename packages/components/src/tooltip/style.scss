@@ -7,7 +7,7 @@
 }
 
 .components-tooltip .components-popover__content {
-	background: $dark-gray-primary;
+	background: $gray-900;
 	border-radius: $radius-block-ui;
 	border-width: 0;
 	color: $white;
@@ -16,9 +16,6 @@
 	line-height: 1.4;
 	font-size: 12px;
 	box-shadow: none;
-
-	// This prevents quickly hovering the tooltip from blocking hovering something else.
-	pointer-events: none;
 
 	> div {
 		padding: $grid-unit-05 $grid-unit-10;

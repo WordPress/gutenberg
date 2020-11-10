@@ -5,7 +5,6 @@
         "isValid": true,
         "attributes": {
             "label": "WordPress",
-            "nofollow": false,
             "opensInNewTab": false,
             "url": "https://wordpress.org/"
         },

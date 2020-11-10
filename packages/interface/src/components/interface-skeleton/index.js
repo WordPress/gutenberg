@@ -28,8 +28,9 @@ function InterfaceSkeleton( {
 	footer,
 	header,
 	sidebar,
-	leftSidebar,
+	secondarySidebar,
 	content,
+	drawer,
 	actions,
 	labels,
 	className,
@@ -37,12 +38,14 @@ function InterfaceSkeleton( {
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
+		/* translators: accessibility text for the nav bar landmark region. */
+		drawer: __( 'Drawer' ),
 		/* translators: accessibility text for the top bar landmark region. */
 		header: __( 'Header' ),
 		/* translators: accessibility text for the content landmark region. */
 		body: __( 'Content' ),
-		/* translators: accessibility text for the left sidebar landmark region. */
-		leftSidebar: __( 'Left sidebar' ),
+		/* translators: accessibility text for the secondary sidebar landmark region. */
+		secondarySidebar: __( 'Block Library' ),
 		/* translators: accessibility text for the settings landmark region. */
 		sidebar: __( 'Settings' ),
 		/* translators: accessibility text for the publish landmark region. */
@@ -60,55 +63,66 @@ function InterfaceSkeleton( {
 				'interface-interface-skeleton'
 			) }
 		>
-			{ !! header && (
+			{ !! drawer && (
 				<div
-					className="interface-interface-skeleton__header"
+					className="interface-interface-skeleton__drawer"
 					role="region"
-					aria-label={ mergedLabels.header }
-					tabIndex="-1"
+					aria-label={ mergedLabels.drawer }
 				>
-					{ header }
+					{ drawer }
 				</div>
 			) }
-			<div className="interface-interface-skeleton__body">
-				{ !! leftSidebar && (
+			<div className="interface-interface-skeleton__editor">
+				{ !! header && (
 					<div
-						className="interface-interface-skeleton__left-sidebar"
+						className="interface-interface-skeleton__header"
 						role="region"
-						aria-label={ mergedLabels.leftSidebar }
+						aria-label={ mergedLabels.header }
 						tabIndex="-1"
 					>
-						{ leftSidebar }
+						{ header }
 					</div>
 				) }
-				<div
-					className="interface-interface-skeleton__content"
-					role="region"
-					aria-label={ mergedLabels.body }
-					tabIndex="-1"
-				>
-					{ content }
+				<div className="interface-interface-skeleton__body">
+					{ !! secondarySidebar && (
+						<div
+							className="interface-interface-skeleton__secondary-sidebar"
+							role="region"
+							aria-label={ mergedLabels.secondarySidebar }
+							tabIndex="-1"
+						>
+							{ secondarySidebar }
+						</div>
+					) }
+					<div
+						className="interface-interface-skeleton__content"
+						role="region"
+						aria-label={ mergedLabels.body }
+						tabIndex="-1"
+					>
+						{ content }
+					</div>
+					{ !! sidebar && (
+						<div
+							className="interface-interface-skeleton__sidebar"
+							role="region"
+							aria-label={ mergedLabels.sidebar }
+							tabIndex="-1"
+						>
+							{ sidebar }
+						</div>
+					) }
+					{ !! actions && (
+						<div
+							className="interface-interface-skeleton__actions"
+							role="region"
+							aria-label={ mergedLabels.actions }
+							tabIndex="-1"
+						>
+							{ actions }
+						</div>
+					) }
 				</div>
-				{ !! sidebar && (
-					<div
-						className="interface-interface-skeleton__sidebar"
-						role="region"
-						aria-label={ mergedLabels.sidebar }
-						tabIndex="-1"
-					>
-						{ sidebar }
-					</div>
-				) }
-				{ !! actions && (
-					<div
-						className="interface-interface-skeleton__actions"
-						role="region"
-						aria-label={ mergedLabels.actions }
-						tabIndex="-1"
-					>
-						{ actions }
-					</div>
-				) }
 			</div>
 			{ !! footer && (
 				<div

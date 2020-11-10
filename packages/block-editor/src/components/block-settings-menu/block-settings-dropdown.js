@@ -6,7 +6,7 @@ import { castArray, flow, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	DropdownMenu,
 	MenuGroup,
@@ -14,7 +14,7 @@ import {
 	ClipboardButton,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { moreHorizontal } from '@wordpress/icons';
+import { moreVertical } from '@wordpress/icons';
 
 import { Children, cloneElement, useCallback } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
@@ -25,7 +25,6 @@ import { serialize } from '@wordpress/blocks';
 import BlockActions from '../block-actions';
 import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
-import BlockUnknownConvertButton from './block-unknown-convert-button';
 import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 
@@ -75,6 +74,9 @@ export function BlockSettingsDropdown( {
 		[ __experimentalSelectBlock ]
 	);
 
+	const removeBlockLabel =
+		count === 1 ? __( 'Remove block' ) : __( 'Remove blocks' );
+
 	return (
 		<BlockActions
 			clientIds={ clientIds }
@@ -93,7 +95,7 @@ export function BlockSettingsDropdown( {
 				blocks,
 			} ) => (
 				<DropdownMenu
-					icon={ moreHorizontal }
+					icon={ moreVertical }
 					label={ __( 'More options' ) }
 					className="block-editor-block-settings-menu"
 					popoverProps={ POPOVER_PROPS }
@@ -106,11 +108,6 @@ export function BlockSettingsDropdown( {
 								<__experimentalBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }
 								/>
-								{ count === 1 && (
-									<BlockUnknownConvertButton
-										clientId={ firstBlockClientId }
-									/>
-								) }
 								{ count === 1 && (
 									<BlockHTMLConvertButton
 										clientId={ firstBlockClientId }
@@ -191,11 +188,7 @@ export function BlockSettingsDropdown( {
 										) }
 										shortcut={ shortcuts.remove }
 									>
-										{ _n(
-											'Remove Block',
-											'Remove Blocks',
-											count
-										) }
+										{ removeBlockLabel }
 									</MenuItem>
 								) }
 							</MenuGroup>

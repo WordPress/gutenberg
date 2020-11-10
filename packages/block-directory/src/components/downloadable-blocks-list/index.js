@@ -15,6 +15,7 @@ import DownloadableBlockListItem from '../downloadable-block-list-item';
 
 function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 	const { installBlockType } = useDispatch( 'core/block-directory' );
+	const { setIsInserterOpened } = useDispatch( 'core/edit-post' );
 
 	if ( ! items.length ) {
 		return null;
@@ -35,6 +36,7 @@ function DownloadableBlocksList( { items, onHover = noop, onSelect } ) {
 							installBlockType( item ).then( ( success ) => {
 								if ( success ) {
 									onSelect( item );
+									setIsInserterOpened( false );
 								}
 							} );
 							onHover( null );
