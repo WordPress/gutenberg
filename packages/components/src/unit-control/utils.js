@@ -34,7 +34,7 @@ export function getParsedValue( value, unit, units, type ) {
 		return getCSSValues( value, type );
 	}
 
-	return parseUnit( initialValue, units );
+	return parseUnit( initialValue );
 }
 
 /**
