@@ -736,6 +736,9 @@ describe( 'createRegistry', () => {
 						if ( key === 'stores' ) {
 							return expect.any( Object );
 						}
+						if ( key === 'parent' ) {
+							return expect.any( Object ) || null;
+						}
 						// TODO: Remove this after namsespaces is removed.
 						if ( key === 'namespaces' ) {
 							return registry.stores;
