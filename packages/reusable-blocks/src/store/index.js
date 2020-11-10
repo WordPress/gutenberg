@@ -10,7 +10,7 @@ import * as actions from './actions';
 import controls from './controls';
 import reducer from './reducer';
 import * as selectors from './selectors';
-import { STORE_KEY } from './constants';
+import { STORE_NAME } from './constants';
 
 /**
  * Store registered for the reusable blocks namespace.
@@ -19,7 +19,7 @@ import { STORE_KEY } from './constants';
  *
  * @type {Object}
  */
-export default registerStore( STORE_KEY, {
+export default registerStore( STORE_NAME, {
 	actions,
 	controls,
 	reducer,

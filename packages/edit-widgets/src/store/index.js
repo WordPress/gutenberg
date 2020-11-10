@@ -17,7 +17,7 @@ import './batch-support';
 /**
  * Module Constants
  */
-const MODULE_KEY = 'core/edit-widgets';
+const STORE_NAME = 'core/edit-widgets';
 
 /**
  * Block editor data store configuration.
@@ -34,7 +34,7 @@ export const storeConfig = {
 	actions,
 };
 
-const store = registerStore( MODULE_KEY, storeConfig );
+const store = registerStore( STORE_NAME, storeConfig );
 
 // This package uses a few in-memory post types as wrappers for convenience.
 // This middleware prevents any network requests related to these types as they are

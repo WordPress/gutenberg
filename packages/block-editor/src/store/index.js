@@ -15,7 +15,7 @@ import controls from './controls';
 /**
  * Module Constants
  */
-const MODULE_KEY = 'core/block-editor';
+const STORE_NAME = 'core/block-editor';
 
 /**
  * Block editor data store configuration.
@@ -31,7 +31,7 @@ export const storeConfig = {
 	controls,
 };
 
-const store = registerStore( MODULE_KEY, {
+const store = registerStore( STORE_NAME, {
 	...storeConfig,
 	persist: [ 'preferences' ],
 } );

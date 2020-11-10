@@ -11,7 +11,7 @@ import { BlockSettingsMenuControls } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { STORE_KEY } from '../../store/constants';
+import { STORE_NAME } from '../../store/constants';
 
 function ReusableBlockDeleteButton( { clientId } ) {
 	const { isVisible, isDisabled, block } = useSelect(
@@ -43,7 +43,7 @@ function ReusableBlockDeleteButton( { clientId } ) {
 
 	const {
 		__experimentalDeleteReusableBlock: deleteReusableBlock,
-	} = useDispatch( STORE_KEY );
+	} = useDispatch( STORE_NAME );
 
 	const { createSuccessNotice, createErrorNotice } = useDispatch(
 		'core/notices'

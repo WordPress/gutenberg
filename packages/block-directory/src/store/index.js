@@ -16,7 +16,7 @@ import controls from './controls';
 /**
  * Module Constants
  */
-const MODULE_KEY = 'core/block-directory';
+const STORE_NAME = 'core/block-directory';
 
 /**
  * Block editor data store configuration.
@@ -33,7 +33,7 @@ export const storeConfig = {
 	resolvers,
 };
 
-const store = registerStore( MODULE_KEY, storeConfig );
+const store = registerStore( STORE_NAME, storeConfig );
 
 /**
  * Store registered for the block directory namespace.

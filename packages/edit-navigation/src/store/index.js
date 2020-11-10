@@ -15,7 +15,7 @@ import controls from './controls';
 /**
  * Module Constants
  */
-const MODULE_KEY = 'core/edit-navigation';
+const STORE_NAME = 'core/edit-navigation';
 
 /**
  * Block editor data store configuration.
@@ -39,4 +39,4 @@ export const storeConfig = {
  *
  * @type {Object}
  */
-export default registerStore( MODULE_KEY, storeConfig );
+export default registerStore( STORE_NAME, storeConfig );

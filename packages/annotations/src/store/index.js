@@ -13,7 +13,7 @@ import * as actions from './actions';
 /**
  * Module Constants
  */
-const MODULE_KEY = 'core/annotations';
+const STORE_NAME = 'core/annotations';
 
 /**
  * Store registered for the annotations namespace.
@@ -22,7 +22,7 @@ const MODULE_KEY = 'core/annotations';
  *
  * @type {Object}
  */
-export default registerStore( MODULE_KEY, {
+export default registerStore( STORE_NAME, {
 	reducer,
 	selectors,
 	actions,
