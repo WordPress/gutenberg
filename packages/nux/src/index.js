@@ -3,11 +3,7 @@
  */
 import deprecated from '@wordpress/deprecated';
 
-/**
- * Internal dependencies
- */
-import './store';
-
+export { default as nuxStore } from './store';
 export { default as DotTip } from './components/dot-tip';
 
 deprecated( 'wp.nux', {

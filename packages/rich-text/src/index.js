@@ -1,8 +1,4 @@
-/**
- * Internal dependencies
- */
-import './store';
-
+export { default as richTextStore } from './store';
 export { applyFormat } from './apply-format';
 export { concat } from './concat';
 export { create } from './create';

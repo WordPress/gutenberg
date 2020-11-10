@@ -32,6 +32,11 @@ export const storeConfig = {
 	actions,
 };
 
-const store = registerStore( MODULE_KEY, storeConfig );
-
-export default store;
+/**
+ * Store registered for the edit navigation namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ *
+ * @type {Object}
+ */
+export default registerStore( MODULE_KEY, storeConfig );

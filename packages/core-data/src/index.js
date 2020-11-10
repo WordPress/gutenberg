@@ -63,7 +63,14 @@ export const storeConfig = {
 	selectors: { ...selectors, ...entitySelectors, ...locksSelectors },
 	resolvers: { ...resolvers, ...entityResolvers },
 };
-registerStore( REDUCER_KEY, storeConfig );
+/**
+ * Store registered for the code data namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ *
+ * @type {Object}
+ */
+export default registerStore( REDUCER_KEY, storeConfig );
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';

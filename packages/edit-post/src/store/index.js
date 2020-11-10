@@ -21,4 +21,11 @@ const store = registerStore( STORE_KEY, {
 
 applyMiddlewares( store );
 
+/**
+ * Store registered for the edit post namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ *
+ * @type {Object}
+ */
 export default store;

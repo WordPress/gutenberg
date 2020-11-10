@@ -30,9 +30,14 @@ export const storeConfig = {
 	},
 };
 
-const store = registerStore( STORE_KEY, {
+/**
+ * Store registered for the editor namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ *
+ * @type {Object}
+ */
+export default registerStore( STORE_KEY, {
 	...storeConfig,
 	persist: [ 'preferences' ],
 } );
-
-export default store;

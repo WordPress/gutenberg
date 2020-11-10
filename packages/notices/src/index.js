@@ -1,4 +1,1 @@
-/**
- * Internal dependencies
- */
-import './store';
+export { default as noticesStore } from './store';

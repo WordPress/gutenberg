@@ -47,4 +47,11 @@ apiFetch.use( function ( options, next ) {
 	return next( options );
 } );
 
+/**
+ * Store registered for the edit widgets namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ *
+ * @type {Object}
+ */
 export default store;

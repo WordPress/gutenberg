@@ -10,11 +10,16 @@ import reducer from './reducer';
 import * as actions from './actions';
 import * as selectors from './selectors';
 
-const store = registerStore( 'core/nux', {
+/**
+ * Store registered for the nux namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ *
+ * @type {Object}
+ */
+export default registerStore( 'core/nux', {
 	reducer,
 	actions,
 	selectors,
 	persist: [ 'preferences' ],
 } );
-
-export default store;
