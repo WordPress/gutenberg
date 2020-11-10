@@ -27,7 +27,7 @@ module.exports = {
 				context.report( {
 					node,
 					message:
-						'Avoid using globals in combination with (add|remove)EventListener. Use a `ownerDocument` or `defaultView` on a ref instead.',
+						'Avoid using (add|remove)EventListener with globals. Use `ownerDocument` or `ownerDocument.defaultView` on a node ref instead.',
 				} );
 			},
 		};

@@ -6,7 +6,7 @@ import { RuleTester } from 'eslint';
 /**
  * Internal dependencies
  */
-import rule from '../no-global-add-event-listener';
+import rule from '../no-global-event-listener';
 
 const ruleTester = new RuleTester( {
 	parserOptions: {
@@ -14,7 +14,7 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-ruleTester.run( 'no-global-add-event-listener', rule, {
+ruleTester.run( 'no-global-event-listener', rule, {
 	valid: [
 		{
 			code: 'ownerDocument.addEventListener();',
@@ -35,7 +35,7 @@ ruleTester.run( 'no-global-add-event-listener', rule, {
 			errors: [
 				{
 					message:
-						'Avoid using globals in combination with (add|remove)EventListener. Use a `ownerDocument` or `defaultView` on a ref instead.',
+						'Avoid using (add|remove)EventListener with globals. Use `ownerDocument` or `ownerDocument.defaultView` on a node ref instead.',
 				},
 			],
 		},
@@ -44,7 +44,7 @@ ruleTester.run( 'no-global-add-event-listener', rule, {
 			errors: [
 				{
 					message:
-						'Avoid using globals in combination with (add|remove)EventListener. Use a `ownerDocument` or `defaultView` on a ref instead.',
+						'Avoid using (add|remove)EventListener with globals. Use `ownerDocument` or `ownerDocument.defaultView` on a node ref instead.',
 				},
 			],
 		},
@@ -53,7 +53,7 @@ ruleTester.run( 'no-global-add-event-listener', rule, {
 			errors: [
 				{
 					message:
-						'Avoid using globals in combination with (add|remove)EventListener. Use a `ownerDocument` or `defaultView` on a ref instead.',
+						'Avoid using (add|remove)EventListener with globals. Use `ownerDocument` or `ownerDocument.defaultView` on a node ref instead.',
 				},
 			],
 		},
@@ -62,7 +62,7 @@ ruleTester.run( 'no-global-add-event-listener', rule, {
 			errors: [
 				{
 					message:
-						'Avoid using globals in combination with (add|remove)EventListener. Use a `ownerDocument` or `defaultView` on a ref instead.',
+						'Avoid using (add|remove)EventListener with globals. Use `ownerDocument` or `ownerDocument.defaultView` on a node ref instead.',
 				},
 			],
 		},
