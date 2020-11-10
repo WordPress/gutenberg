@@ -21,6 +21,13 @@ import { MENU_ROOT, MENU_TEMPLATE_PARTS } from '../constants';
 import SearchResults from '../search-results';
 import useDebouncedSearch from '../use-debounced-search';
 
+const renderSearchResultItem = ( templatePart ) => (
+	<TemplateNavigationItem
+		item={ templatePart }
+		key={ `wp_template_part-${ templatePart.id }` }
+	/>
+);
+
 export default function TemplatePartsMenu() {
 	const {
 		search,
@@ -29,27 +36,18 @@ export default function TemplatePartsMenu() {
 		isDebouncing,
 	} = useDebouncedSearch();
 
-	const templateParts = useSelect(
-		( select ) => {
-			const unfilteredTemplateParts =
-				select( 'core' ).getEntityRecords(
-					'postType',
-					'wp_template_part',
-					{
-						status: [ 'publish', 'auto-draft' ],
-						per_page: -1,
-						search: searchQuery,
-					}
-				) || [];
-			const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
-			return unfilteredTemplateParts.filter(
-				( item ) =>
-					item.status === 'publish' ||
-					item.wp_theme_slug === currentTheme
-			);
-		},
-		[ searchQuery ]
-	);
+	const templateParts = useSelect( ( select ) => {
+		const unfilteredTemplateParts =
+			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
+				status: [ 'publish', 'auto-draft' ],
+				per_page: -1,
+			} ) || [];
+		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
+		return unfilteredTemplateParts.filter(
+			( item ) =>
+				item.status === 'publish' || item.wp_theme_slug === currentTheme
+		);
+	}, [] );
 
 	return (
 		<NavigationMenu
@@ -63,16 +61,10 @@ export default function TemplatePartsMenu() {
 			{ search && (
 				<SearchResults
 					items={ templateParts }
+					searchQuery={ searchQuery }
+					renderItem={ renderSearchResultItem }
 					isDebouncing={ isDebouncing }
-					search={ search }
-				>
-					{ map( templateParts, ( templatePart ) => (
-						<TemplateNavigationItem
-							item={ templatePart }
-							key={ `wp_template_part-${ templatePart.id }` }
-						/>
-					) ) }
-				</SearchResults>
+				/>
 			) }
 
 			{ ! search &&

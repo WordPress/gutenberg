@@ -40,7 +40,12 @@ const renderSearchResultItem = ( template ) => (
 );
 
 export default function TemplatesMenu() {
-	const { search, searchQuery, onSearch } = useDebouncedSearch();
+	const {
+		search,
+		searchQuery,
+		onSearch,
+		isDebouncing,
+	} = useDebouncedSearch();
 
 	const templates = useSelect(
 		( select ) =>
@@ -70,6 +75,7 @@ export default function TemplatesMenu() {
 					items={ templates }
 					searchQuery={ searchQuery }
 					renderItem={ renderSearchResultItem }
+					isDebouncing={ isDebouncing }
 				/>
 			) }
 

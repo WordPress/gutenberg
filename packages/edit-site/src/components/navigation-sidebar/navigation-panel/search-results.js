@@ -14,7 +14,12 @@ import { __ } from '@wordpress/i18n';
 import { getTemplateInfo } from '../../../utils';
 import { normalizedSearch } from './utils';
 
-export default function SearchResults( { items, searchQuery, renderItem } ) {
+export default function SearchResults( {
+	items,
+	searchQuery,
+	renderItem,
+	isDebouncing,
+} ) {
 	const loading = items === null;
 
 	const itemsFiltered = useMemo( () => {
@@ -37,7 +42,7 @@ export default function SearchResults( { items, searchQuery, renderItem } ) {
 		<NavigationGroup title={ __( 'Search results' ) }>
 			{ loading && <NavigationItem title={ __( 'Loading…' ) } /> }
 
-			{ ! loading && itemsRendered.length === 0 && (
+			{ ! loading && ! isDebouncing && itemsRendered.length === 0 && (
 				<NavigationItem title={ __( 'No results found.' ) } />
 			) }
 
