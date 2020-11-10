@@ -117,7 +117,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 				{ 'wp_template' === templateType && (
 					<DocumentActions
 						entityTitle={ entityTitle }
-						entityLabel="wp_template"
+						entityLabel="template"
 					>
 						{ ( { onClose } ) => (
 							<TemplateDetails
@@ -130,7 +130,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 				{ 'wp_template_part' === templateType && (
 					<DocumentActions
 						entityTitle={ entityTitle }
-						entityLabel="wp_template_part"
+						entityLabel="template part"
 					/>
 				) }
 			</div>
