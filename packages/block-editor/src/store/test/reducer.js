@@ -2045,7 +2045,6 @@ describe( 'state', () => {
 		);
 
 		it.each( [
-			'HIDE_INSERTION_POINT',
 			'CLEAR_SELECTED_BLOCK',
 			'SELECT_BLOCK',
 			'REPLACE_INNER_BLOCKS',
@@ -2087,7 +2086,7 @@ describe( 'state', () => {
 			'INSERT_BLOCKS',
 			'REMOVE_BLOCKS',
 			'REPLACE_BLOCKS',
-		] )( 'resets the insertion point on %s to `false`', ( type ) => {
+		] )( 'sets the insertion point on %s to `false`', ( type ) => {
 			const state = insertionPointVisibility( true, {
 				type,
 			} );

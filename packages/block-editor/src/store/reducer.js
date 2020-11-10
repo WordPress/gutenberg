@@ -1378,7 +1378,6 @@ export function blocksMode( state = {}, action ) {
  */
 function resetInsertionPoint( state, action, defaultValue ) {
 	switch ( action.type ) {
-		case 'HIDE_INSERTION_POINT':
 		case 'CLEAR_SELECTED_BLOCK':
 		case 'SELECT_BLOCK':
 		case 'REPLACE_INNER_BLOCKS':
@@ -1424,6 +1423,8 @@ export function insertionPointVisibility( state = false, action ) {
 	switch ( action.type ) {
 		case 'SHOW_INSERTION_POINT':
 			return true;
+		case 'HIDE_INSERTION_POINT':
+			return false;
 	}
 
 	return resetInsertionPoint( state, action, false );
