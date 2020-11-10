@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
-import {
-	__experimentalNavigationItem as NavigationItem,
-	__experimentalNavigationGroup as NavigationGroup,
-} from '@wordpress/components';
+import { __experimentalNavigationGroup as NavigationGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -13,6 +10,7 @@ import { __ } from '@wordpress/i18n';
  */
 import { getTemplateInfo } from '../../../utils';
 import { normalizedSearch } from './utils';
+import NavigationItemText from './navigation-item-text';
 
 export default function SearchResults( {
 	items,
@@ -40,10 +38,10 @@ export default function SearchResults( {
 
 	return (
 		<NavigationGroup title={ __( 'Search results' ) }>
-			{ loading && <NavigationItem title={ __( 'Loading…' ) } /> }
+			{ loading && <NavigationItemText title={ __( 'Loading…' ) } /> }
 
 			{ ! loading && ! isDebouncing && itemsRendered.length === 0 && (
-				<NavigationItem title={ __( 'No results found.' ) } />
+				<NavigationItemText title={ __( 'No results found.' ) } />
 			) }
 
 			{ ! loading && itemsRendered }
