@@ -7,7 +7,7 @@ import { applyFormat, removeFormat } from '@wordpress/rich-text';
 const FORMAT_NAME = 'core/annotation';
 
 const ANNOTATION_ATTRIBUTE_PREFIX = 'annotation-text-';
-const STORE_KEY = 'core/annotations';
+const STORE_NAME = 'core/annotations';
 
 /**
  * Applies given annotations to the given record.
@@ -145,7 +145,7 @@ export const annotation = {
 	) {
 		return {
 			annotations: select(
-				STORE_KEY
+				STORE_NAME
 			).__experimentalGetAnnotationsForRichText(
 				blockClientId,
 				richTextIdentifier
@@ -165,9 +165,9 @@ export const annotation = {
 	},
 	__experimentalGetPropsForEditableTreeChangeHandler( dispatch ) {
 		return {
-			removeAnnotation: dispatch( STORE_KEY )
+			removeAnnotation: dispatch( STORE_NAME )
 				.__experimentalRemoveAnnotation,
-			updateAnnotationRange: dispatch( STORE_KEY )
+			updateAnnotationRange: dispatch( STORE_NAME )
 				.__experimentalUpdateAnnotationRange,
 		};
 	},

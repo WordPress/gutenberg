@@ -6,7 +6,7 @@ import { createRegistryControl } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { MODULE_KEY, STATE_ERROR } from './constants';
+import { STORE_NAME, STATE_ERROR } from './constants';
 
 /**
  * Calls a selector using chosen registry.
@@ -58,25 +58,25 @@ export function enqueueItemAndAutocommit( queue, context, item ) {
 const controls = {
 	SELECT: createRegistryControl(
 		( registry ) => ( { selectorName, args } ) => {
-			return registry.select( MODULE_KEY )[ selectorName ]( ...args );
+			return registry.select( STORE_NAME )[ selectorName ]( ...args );
 		}
 	),
 
 	DISPATCH: createRegistryControl(
 		( registry ) => ( { actionName, args } ) => {
-			return registry.dispatch( MODULE_KEY )[ actionName ]( ...args );
+			return registry.dispatch( STORE_NAME )[ actionName ]( ...args );
 		}
 	),
 
 	ENQUEUE_ITEM_AND_AUTOCOMMIT: createRegistryControl(
 		( registry ) => async ( { queue, context, item } ) => {
 			const { itemId } = await registry
-				.dispatch( MODULE_KEY )
+				.dispatch( STORE_NAME )
 				.enqueueItem( queue, context, item );
 
 			// @TODO autocommit when batch size exceeds the maximum or n milliseconds passes
 			const batch = await registry
-				.dispatch( MODULE_KEY )
+				.dispatch( STORE_NAME )
 				.processBatch( queue, context );
 
 			if ( batch.state === STATE_ERROR ) {
@@ -92,12 +92,12 @@ const controls = {
 			const { transactions, queue } = batch;
 			const transaction = transactions[ transactionId ];
 			const processor = registry
-				.select( MODULE_KEY )
+				.select( STORE_NAME )
 				.getProcessor( queue );
 			if ( ! processor ) {
 				throw new Error(
 					`There is no batch processor registered for "${ queue }" queue. ` +
-						`Register one by dispatching registerProcessor() action on ${ MODULE_KEY } store.`
+						`Register one by dispatching registerProcessor() action on ${ STORE_NAME } store.`
 				);
 			}
 			const itemIds = transaction.items.map( ( { id } ) => id );

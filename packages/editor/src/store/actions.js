@@ -15,7 +15,7 @@ import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
  * Internal dependencies
  */
 import {
-	STORE_KEY,
+	STORE_NAME,
 	POST_UPDATE_TRANSACTION_ID,
 	TRASH_POST_NOTICE_ID,
 } from './constants';
@@ -118,7 +118,7 @@ export function* resetAutosave( newAutosave ) {
 		plugin: 'Gutenberg',
 	} );
 
-	const postId = yield controls.select( STORE_KEY, 'getCurrentPostId' );
+	const postId = yield controls.select( STORE_NAME, 'getCurrentPostId' );
 	yield controls.dispatch( 'core', 'receiveAutosaves', postId, newAutosave );
 
 	return { type: '__INERT__' };
@@ -192,7 +192,7 @@ export function setupEditorState( post ) {
  * @yield {Object} Action object or control.
  */
 export function* editPost( edits, options ) {
-	const { id, type } = yield controls.select( STORE_KEY, 'getCurrentPost' );
+	const { id, type } = yield controls.select( STORE_NAME, 'getCurrentPost' );
 	yield controls.dispatch(
 		'core',
 		'editEntityRecord',
@@ -225,20 +225,23 @@ export function __experimentalOptimisticUpdatePost( edits ) {
  * @param {Object} options
  */
 export function* savePost( options = {} ) {
-	if ( ! ( yield controls.select( STORE_KEY, 'isEditedPostSaveable' ) ) ) {
+	if ( ! ( yield controls.select( STORE_NAME, 'isEditedPostSaveable' ) ) ) {
 		return;
 	}
 	let edits = {
-		content: yield controls.select( STORE_KEY, 'getEditedPostContent' ),
+		content: yield controls.select( STORE_NAME, 'getEditedPostContent' ),
 	};
 	if ( ! options.isAutosave ) {
-		yield controls.dispatch( STORE_KEY, 'editPost', edits, {
+		yield controls.dispatch( STORE_NAME, 'editPost', edits, {
 			undoIgnore: true,
 		} );
 	}
 
 	yield __experimentalRequestPostUpdateStart( options );
-	const previousRecord = yield controls.select( STORE_KEY, 'getCurrentPost' );
+	const previousRecord = yield controls.select(
+		STORE_NAME,
+		'getCurrentPost'
+	);
 	edits = {
 		id: previousRecord.id,
 		...( yield controls.select(
@@ -282,7 +285,7 @@ export function* savePost( options = {} ) {
 		}
 	} else {
 		const updatedRecord = yield controls.select(
-			STORE_KEY,
+			STORE_NAME,
 			'getCurrentPost'
 		);
 		const args = getNotificationArgumentsForSaveSuccess( {
@@ -317,9 +320,9 @@ export function* savePost( options = {} ) {
  * Action generator for handling refreshing the current post.
  */
 export function* refreshPost() {
-	const post = yield controls.select( STORE_KEY, 'getCurrentPost' );
+	const post = yield controls.select( STORE_NAME, 'getCurrentPost' );
 	const postTypeSlug = yield controls.select(
-		STORE_KEY,
+		STORE_NAME,
 		'getCurrentPostType'
 	);
 	const postType = yield controls.resolveSelect(
@@ -334,7 +337,7 @@ export function* refreshPost() {
 			`/wp/v2/${ postType.rest_base }/${ post.id }` +
 			`?context=edit&_timestamp=${ Date.now() }`,
 	} );
-	yield controls.dispatch( STORE_KEY, 'resetPost', newPost );
+	yield controls.dispatch( STORE_NAME, 'resetPost', newPost );
 }
 
 /**
@@ -342,7 +345,7 @@ export function* refreshPost() {
  */
 export function* trashPost() {
 	const postTypeSlug = yield controls.select(
-		STORE_KEY,
+		STORE_NAME,
 		'getCurrentPostType'
 	);
 	const postType = yield controls.resolveSelect(
@@ -356,13 +359,13 @@ export function* trashPost() {
 		TRASH_POST_NOTICE_ID
 	);
 	try {
-		const post = yield controls.select( STORE_KEY, 'getCurrentPost' );
+		const post = yield controls.select( STORE_NAME, 'getCurrentPost' );
 		yield apiFetch( {
 			path: `/wp/v2/${ postType.rest_base }/${ post.id }`,
 			method: 'DELETE',
 		} );
 
-		yield controls.dispatch( STORE_KEY, 'savePost' );
+		yield controls.dispatch( STORE_NAME, 'savePost' );
 	} catch ( error ) {
 		yield controls.dispatch(
 			'core/notices',
@@ -382,20 +385,23 @@ export function* trashPost() {
  */
 export function* autosave( { local = false, ...options } = {} ) {
 	if ( local ) {
-		const post = yield controls.select( STORE_KEY, 'getCurrentPost' );
-		const isPostNew = yield controls.select( STORE_KEY, 'isEditedPostNew' );
+		const post = yield controls.select( STORE_NAME, 'getCurrentPost' );
+		const isPostNew = yield controls.select(
+			STORE_NAME,
+			'isEditedPostNew'
+		);
 		const title = yield controls.select(
-			STORE_KEY,
+			STORE_NAME,
 			'getEditedPostAttribute',
 			'title'
 		);
 		const content = yield controls.select(
-			STORE_KEY,
+			STORE_NAME,
 			'getEditedPostAttribute',
 			'content'
 		);
 		const excerpt = yield controls.select(
-			STORE_KEY,
+			STORE_NAME,
 			'getEditedPostAttribute',
 			'excerpt'
 		);
@@ -408,7 +414,7 @@ export function* autosave( { local = false, ...options } = {} ) {
 			excerpt,
 		};
 	} else {
-		yield controls.dispatch( STORE_KEY, 'savePost', {
+		yield controls.dispatch( STORE_NAME, 'savePost', {
 			isAutosave: true,
 			...options,
 		} );
@@ -610,7 +616,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 
 	if ( __unstableShouldCreateUndoLevel !== false ) {
 		const { id, type } = yield controls.select(
-			STORE_KEY,
+			STORE_NAME,
 			'getCurrentPost'
 		);
 		const noChange =

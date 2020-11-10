@@ -3,4 +3,4 @@
  *
  * @type {string}
  */
-export const STORE_KEY = 'core/reusable-blocks';
+export const STORE_NAME = 'core/reusable-blocks';

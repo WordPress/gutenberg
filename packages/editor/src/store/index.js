@@ -11,7 +11,7 @@ import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import controls from './controls';
-import { STORE_KEY } from './constants';
+import { STORE_NAME } from './constants';
 
 /**
  * Post editor data store configuration.
@@ -37,7 +37,7 @@ export const storeConfig = {
  *
  * @type {Object}
  */
-export default registerStore( STORE_KEY, {
+export default registerStore( STORE_NAME, {
 	...storeConfig,
 	persist: [ 'preferences' ],
 } );

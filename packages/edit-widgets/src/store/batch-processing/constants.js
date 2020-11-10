@@ -1,7 +1,7 @@
 /**
  * Module Constants
  */
-export const MODULE_KEY = 'core/__experimental-batch-processing';
+export const STORE_NAME = 'core/__experimental-batch-processing';
 
 export const BATCH_MAX_SIZE = 20;
 
