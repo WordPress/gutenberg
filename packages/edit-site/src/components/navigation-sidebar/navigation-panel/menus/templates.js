@@ -31,6 +31,7 @@ import NewTemplateDropdown from '../new-template-dropdown';
 import TemplateNavigationItem from '../template-navigation-item';
 import SearchResults from '../search-results';
 import useDebouncedSearch from '../use-debounced-search';
+import NavigationItemText from '../navigation-item-text';
 
 const renderSearchResultItem = ( template ) => (
 	<TemplateNavigationItem
@@ -103,7 +104,7 @@ export default function TemplatesMenu() {
 			) }
 
 			{ ! search && templates === null && (
-				<NavigationItem title={ __( 'Loading…' ) } />
+				<NavigationItemText title={ __( 'Loading…' ) } />
 			) }
 
 			<TemplatesPostsMenu templates={ templates } />
