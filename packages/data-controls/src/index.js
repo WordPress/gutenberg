@@ -109,9 +109,7 @@ export const awaitPromise = function ( promise ) {
  * store.
  */
 export const controls = {
-	AWAIT_PROMISE: async ( { promise } ) => {
-		return await promise;
-	},
+	AWAIT_PROMISE: ( { promise } ) => promise,
 	API_FETCH( { request } ) {
 		return triggerFetch( request );
 	},

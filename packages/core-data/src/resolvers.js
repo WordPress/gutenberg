@@ -196,17 +196,18 @@ export function* getEntityRecords( kind, name, query = {} ) {
 		// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
 		// See https://github.com/WordPress/gutenberg/pull/26575
 		if ( ! query?._fields ) {
+			const key = entity.key || DEFAULT_ENTITY_KEY;
 			for ( const record of records ) {
-				if ( record.id ) {
+				if ( record[ key ] ) {
 					yield {
 						type: 'START_RESOLUTION',
 						selectorName: 'getEntityRecord',
-						args: [ kind, name, record.id ],
+						args: [ kind, name, record[ key ] ],
 					};
 					yield {
 						type: 'FINISH_RESOLUTION',
 						selectorName: 'getEntityRecord',
-						args: [ kind, name, record.id ],
+						args: [ kind, name, record[ key ] ],
 					};
 				}
 			}
