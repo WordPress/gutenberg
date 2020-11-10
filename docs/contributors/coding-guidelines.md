@@ -172,9 +172,10 @@ String literals should be declared with single-quotes _unless_ the string itself
 
 In general, avoid backslash-escaping quotes:
 
+<!-- prettier-ignore -->
 ```js
 // Bad:
-const name = 'Matt';
+const name = "Matt";
 // Good:
 const name = 'Matt';
 
