@@ -14,7 +14,7 @@ import * as resolvers from './resolvers';
 import * as locksSelectors from './locks/selectors';
 import * as locksActions from './locks/actions';
 import { defaultEntities, getMethodName } from './entities';
-import { REDUCER_KEY } from './name';
+import { STORE_NAME } from './name';
 
 // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
 // (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecordss)
@@ -70,7 +70,7 @@ export const storeConfig = {
  *
  * @type {Object}
  */
-export default registerStore( REDUCER_KEY, storeConfig );
+export default registerStore( STORE_NAME, storeConfig );
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';
