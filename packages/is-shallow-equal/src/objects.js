@@ -1,5 +1,3 @@
-const keys = Object.keys;
-
 /**
  * Returns true if the two objects are shallow equal, or false otherwise.
  *
@@ -13,8 +11,8 @@ export default function isShallowEqualObjects( a, b ) {
 		return true;
 	}
 
-	const aKeys = keys( a );
-	const bKeys = keys( b );
+	const aKeys = Object.keys( a );
+	const bKeys = Object.keys( b );
 
 	if ( aKeys.length !== bKeys.length ) {
 		return false;

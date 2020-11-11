@@ -7,8 +7,6 @@ import isShallowEqualArrays from './arrays';
 export { default as isShallowEqualObjects } from './objects';
 export { default as isShallowEqualArrays } from './arrays';
 
-const isArray = Array.isArray;
-
 /**
  * @typedef {Record<string, any>} ComparableObject
  */
@@ -26,7 +24,7 @@ export default function isShallowEqual( a, b ) {
 	if ( a && b ) {
 		if ( a.constructor === Object && b.constructor === Object ) {
 			return isShallowEqualObjects( a, b );
-		} else if ( isArray( a ) && isArray( b ) ) {
+		} else if ( Array.isArray( a ) && Array.isArray( b ) ) {
 			return isShallowEqualArrays( a, b );
 		}
 	}
