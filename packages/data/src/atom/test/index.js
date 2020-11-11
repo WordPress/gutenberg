@@ -32,10 +32,8 @@ describe( 'createAtom', () => {
 
 		// Atoms don't compute any value unless there's a subscriber.
 		const unsubscribe = sumInstance.subscribe( () => {} );
-		await flushImmediatesAndTicks();
 		expect( sumInstance.get() ).toEqual( 3 );
 		registry.getAtom( count1 ).set( 2 );
-		await flushImmediatesAndTicks();
 		expect( sumInstance.get() ).toEqual( 4 );
 		unsubscribe();
 	} );

@@ -4,6 +4,7 @@
 import { mapValues } from 'lodash';
 
 export function createAtomicStore( config, registry ) {
+	// I'm probably missing the atom resolver here
 	const selectors = mapValues( config.selectors, ( atomSelector ) => {
 		return ( ...args ) => {
 			return atomSelector( ( atomCreator ) =>
