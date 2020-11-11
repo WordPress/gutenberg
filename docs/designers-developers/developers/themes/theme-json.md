@@ -339,7 +339,7 @@ These are the current color properties supported by blocks:
 These are the current typography properties supported by blocks:
 
 | Context | Font Family | Font Size | Font Style | Font Weight | Line Height | Text Decoration | Text Transform |
-| --- | --- | --- | --- | --- | --- | --- |
+| --- | --- | --- | --- | --- | --- | --- | --- |
 | Global | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
 | Heading [1] | - | Yes | - | - | Yes | - | - |
 | List | - | Yes | - | - | - | - | - |
