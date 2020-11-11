@@ -87,7 +87,18 @@
 .edit-site-navigation-panel__template-item {
 	display: block;
 
-	.components-button {
+	&.is-active {
+		.edit-site-navigation-panel__template-item-description {
+			color: $gray-100;
+		}
+
+		.edit-site-navigation-panel__template-item-customized-dot {
+			background: #fff;
+		}
+	}
+
+	.components-button,
+	button {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
@@ -114,4 +125,22 @@
 	button {
 		margin: 0;
 	}
+}
+
+.edit-site-navigation-panel__template-item-title {
+	display: inline-block;
+	padding-right: $grid-unit-20;
+	position: relative;
+}
+
+.edit-site-navigation-panel__template-item-customized-dot {
+	position: absolute;
+	right: $grid-unit-05;
+	top: 50%;
+	margin-top: -$grid-unit-05;
+	width: $grid-unit-10;
+	height: $grid-unit-10;
+	display: block;
+	background: var(--wp-admin-theme-color);
+	border-radius: 50%;
 }
