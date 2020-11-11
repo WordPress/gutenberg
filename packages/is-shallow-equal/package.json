@@ -21,8 +21,10 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"files": [
-		"lib",
+		"build",
+		"build-module",
 		"build-types",
+		"src",
 		"*.md"
 	],
 	"main": "build/index.js",
