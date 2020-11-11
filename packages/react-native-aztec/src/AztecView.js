@@ -187,7 +187,7 @@ class AztecView extends React.Component {
 	}
 
 	isFocused() {
-		const focusedField = TextInputState.currentlyFocusedField();
+		const focusedField = TextInputState.currentlyFocusedInput();
 		return focusedField && focusedField === this.aztecViewRef.current;
 	}
 
