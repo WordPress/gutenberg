@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 const debug = require( '../../debug' );
-const getAuthorCommitCount = require( '../../get-author-commit-count' );
 
 /** @typedef {import('@actions/github').GitHub} GitHub */
 /** @typedef {import('@octokit/webhooks').WebhookPayloadPullRequest} WebhookPayloadPullRequest */
@@ -22,16 +21,13 @@ async function firstTimeContributorLabel( payload, octokit ) {
 		`first-time-contributor: Searching for commits in ${ owner }/${ repo } by @${ author }`
 	);
 
-	const commitCount = await getAuthorCommitCount(
-		{
-			owner,
-			repo,
-			author,
-		},
-		octokit
-	);
+	const { data: commits } = await octokit.repos.listCommits( {
+		owner,
+		repo,
+		author,
+	} );
 
-	if ( commitCount > 0 ) {
+	if ( commits.length > 0 ) {
 		debug(
 			`first-time-contributor-label: Not the first commit for author. Aborting`
 		);

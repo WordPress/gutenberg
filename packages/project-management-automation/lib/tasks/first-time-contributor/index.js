@@ -4,7 +4,6 @@
 const debug = require( '../../debug' );
 const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
 const hasWordPressProfile = require( '../../has-wordpress-profile' );
-const getAuthorCommitCount = require( '../../get-author-commit-count' );
 
 /** @typedef {import('@actions/github').GitHub} GitHub */
 /** @typedef {import('@octokit/webhooks').WebhookPayloadPush} WebhookPayloadPush */
@@ -64,16 +63,13 @@ async function firstTimeContributor( payload, octokit ) {
 		`first-time-contributor: Searching for commits in ${ owner }/${ repo } by @${ author }`
 	);
 
-	const commitCount = await getAuthorCommitCount(
-		{
-			owner,
-			repo,
-			author,
-		},
-		octokit
-	);
+	const { data: commits } = await octokit.repos.listCommits( {
+		owner,
+		repo,
+		author,
+	} );
 
-	if ( commitCount > 1 ) {
+	if ( commits.length > 1 ) {
 		debug(
 			`first-time-contributor: Not the first commit for author. Aborting`
 		);
