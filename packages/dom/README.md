@@ -74,6 +74,10 @@ _Returns_
 Object grouping `focusable` and `tabbable` utils
 under the keys with the same name.
 
+<a name="getFilesFromDataTransfer" href="#getFilesFromDataTransfer">#</a> **getFilesFromDataTransfer**
+
+Undocumented declaration.
+
 <a name="getOffsetParent" href="#getOffsetParent">#</a> **getOffsetParent**
 
 Returns the closest positioned element, or null under any of the conditions
