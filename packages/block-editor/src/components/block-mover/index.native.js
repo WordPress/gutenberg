@@ -18,10 +18,11 @@ import { withSelect, withDispatch } from '@wordpress/data';
  */
 import { getMoversSetup } from './mover-description';
 
-const DIRECTION_TOP = 'blockPageMoverOptions-moveToTop';
-const DIRECTION_BOTTOM = 'blockPageMoverOptions-moveToBottom';
+export const BLOCK_MOVER_DIRECTION_TOP = 'blockPageMoverOptions-moveToTop';
+export const BLOCK_MOVER_DIRECTION_BOTTOM =
+	'blockPageMoverOptions-moveToBottom';
 
-const BlockMover = ( {
+export const BlockMover = ( {
 	isFirst,
 	isLast,
 	isLocked,
@@ -50,14 +51,14 @@ const BlockMover = ( {
 	const blockPageMoverOptions = [
 		{
 			label: __( 'Move to top' ),
-			value: DIRECTION_TOP,
+			value: BLOCK_MOVER_DIRECTION_TOP,
 			onSelect: () => {
 				onLongMove()( 0 );
 			},
 		},
 		{
 			label: __( 'Move to bottom' ),
-			value: DIRECTION_BOTTOM,
+			value: BLOCK_MOVER_DIRECTION_BOTTOM,
 			onSelect: () => {
 				onLongMove()( numberOfBlocks );
 			},
@@ -92,7 +93,7 @@ const BlockMover = ( {
 				title={ ! isFirst ? backwardButtonTitle : firstBlockTitle }
 				isDisabled={ isFirst }
 				onClick={ onMoveUp }
-				onLongPress={ showBlockPageMover( DIRECTION_TOP ) }
+				onLongPress={ showBlockPageMover( BLOCK_MOVER_DIRECTION_TOP ) }
 				icon={ backwardButtonIcon }
 				extraProps={ { hint: backwardButtonHint } }
 			/>
@@ -101,7 +102,9 @@ const BlockMover = ( {
 				title={ ! isLast ? forwardButtonTitle : lastBlockTitle }
 				isDisabled={ isLast }
 				onClick={ onMoveDown }
-				onLongPress={ showBlockPageMover( DIRECTION_BOTTOM ) }
+				onLongPress={ showBlockPageMover(
+					BLOCK_MOVER_DIRECTION_BOTTOM
+				) }
 				icon={ forwardButtonIcon }
 				extraProps={ {
 					hint: forwardButtonHint,
