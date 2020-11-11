@@ -35,6 +35,34 @@ class WP_Theme_JSON {
 	const GLOBAL_SELECTOR = ':root';
 
 	/**
+	 * The block type and name for the global context.
+	 *
+	 * @var string
+	 */
+	const GLOBAL_TYPE = 'global';
+
+	/**
+	 * The block arguments for the global context.
+	 *
+	 * @var array
+	 */
+	const GLOBAL_ARGS = array(
+		'supports' => array(
+			'__experimentalFontAppearance' => false,
+			'__experimentalFontFamily'     => true,
+			'__experimentalSelector'       => self::GLOBAL_SELECTOR,
+			'__experimentalTextDecoration' => true,
+			'__experimentalTextTransform'  => true,
+			'color'                        => array(
+				'gradients' => true,
+				'link'      => true,
+			),
+			'fontSize'                     => true,
+			'lineHeight'                   => true,
+		),
+	);
+
+	/**
 	 * Data schema of each context within a theme.json.
 	 *
 	 * Example:
@@ -370,26 +398,7 @@ class WP_Theme_JSON {
 		$registry = WP_Block_Type_Registry::get_instance();
 		$blocks   = array_merge(
 			$registry->get_all_registered(),
-			array(
-				'global' => new WP_Block_Type(
-					'global',
-					array(
-						'supports' => array(
-							'__experimentalFontAppearance' => false,
-							'__experimentalFontFamily'     => true,
-							'__experimentalSelector'       => self::GLOBAL_SELECTOR,
-							'__experimentalTextDecoration' => true,
-							'__experimentalTextTransform'  => true,
-							'color'                        => array(
-								'gradients' => true,
-								'link'      => true,
-							),
-							'fontSize'                     => true,
-							'lineHeight'                   => true,
-						),
-					)
-				),
-			)
+			array( self::GLOBAL_TYPE => new WP_Block_Type( self::GLOBAL_TYPE, self::GLOBAL_ARGS ) )
 		);
 		foreach ( $blocks as $block_name => $block_type ) {
 			if (
