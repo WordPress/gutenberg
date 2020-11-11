@@ -69,6 +69,7 @@ class DropZoneProvider extends Component {
 			this.toggleDraggingOverDocument.bind( this ),
 			200
 		);
+		this.getNewState = this.getNewState.bind( this );
 
 		this.dropZones = [];
 		this.dropZoneCallbacks = {
@@ -135,7 +136,7 @@ class DropZoneProvider extends Component {
 		);
 	}
 
-	toggleDraggingOverDocument( event, dragEventType ) {
+	getNewState( event, dragEventType ) {
 		// In some contexts, it may be necessary to capture and redirect the
 		// drag event (e.g. atop an `iframe`). To accommodate this, you can
 		// create an instance of CustomEvent with the original event specified
@@ -181,6 +182,18 @@ class DropZoneProvider extends Component {
 			position = { x: detail.clientX, y: detail.clientY };
 		}
 
+		return {
+			isDraggingOverDocument: true,
+			hoveredDropZone: hoveredDropZoneIndex,
+			position,
+		};
+	}
+
+	toggleDraggingOverDocument( event, dragEventType ) {
+		const newState = this.getNewState( event, dragEventType );
+		const { hoveredDropZone: hoveredDropZoneIndex, position } = newState;
+		const hoveredDropZone = this.dropZones[ hoveredDropZoneIndex ];
+
 		// Optimisation: Only update the changed dropzones
 		let toUpdate = [];
 
@@ -216,11 +229,6 @@ class DropZoneProvider extends Component {
 			} );
 		} );
 
-		const newState = {
-			isDraggingOverDocument: true,
-			hoveredDropZone: hoveredDropZoneIndex,
-			position,
-		};
 		if ( ! isShallowEqual( newState, this.state ) ) {
 			this.setState( newState );
 		}
@@ -236,8 +244,11 @@ class DropZoneProvider extends Component {
 		// where files dragged directly from the dock are not recognized
 		event.dataTransfer && event.dataTransfer.files.length; // eslint-disable-line no-unused-expressions
 
-		const { position, hoveredDropZone } = this.state;
 		const dragEventType = getDragEventType( event );
+		const { position, hoveredDropZone } = this.getNewState(
+			event,
+			dragEventType
+		);
 		const dropZone = this.dropZones[ hoveredDropZone ];
 		this.resetDragState();
 
