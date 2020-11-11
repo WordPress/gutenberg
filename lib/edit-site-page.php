@@ -108,7 +108,7 @@ function gutenberg_edit_site_init( $hook ) {
 			'siteUrl'      => site_url(),
 			'postsPerPage' => get_option( 'posts_per_page' ),
 			'styles'       => gutenberg_get_editor_styles(),
-		),
+		)
 	);
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
 

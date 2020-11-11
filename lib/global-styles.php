@@ -348,7 +348,7 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 		$theme_settings['global']['settings']['spacing']['custom'] = true;
 	}
 
-	if ( current ( (array) get_theme_support( 'experimental-link-color' ) ) ) {
+	if ( current( (array) get_theme_support( 'experimental-link-color' ) ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
 			$theme_settings['global']['settings']['color'] = array();
 		}
