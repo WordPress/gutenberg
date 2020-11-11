@@ -207,6 +207,8 @@ export function ImageEdit( {
 			setAttributes( {
 				url: newURL,
 				id: undefined,
+				width: undefined,
+				height: undefined,
 				sizeSlug: DEFAULT_SIZE_SLUG,
 			} );
 		}
