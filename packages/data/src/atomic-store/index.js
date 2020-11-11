@@ -29,6 +29,5 @@ export function createAtomicStore( config, registry ) {
 		getActions: () => actions,
 		// The registry subscribes to all atomRegistry by default.
 		subscribe: () => () => {},
-		getAtomSelectors: () => config.selectors,
 	};
 }

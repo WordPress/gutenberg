@@ -2,9 +2,16 @@
  * Internal dependencies
  */
 import { createRegistry } from '../../registry';
-import { createRegistryControl } from '../../factory';
+import { createRegistryControl, createRegistrySelector } from '../../factory';
+import { createDerivedAtom } from '../../atom';
 
 jest.useFakeTimers();
+async function flushImmediatesAndTicks( count = 1 ) {
+	for ( let i = 0; i < count; i++ ) {
+		await jest.runAllTicks();
+		await jest.runAllImmediates();
+	}
+}
 
 describe( 'controls', () => {
 	let registry;
@@ -231,6 +238,174 @@ describe( 'controls', () => {
 			await expect( dispatchedAction ).rejects.toThrow(
 				'Actions must be plain objects. Use custom middleware for async actions.'
 			);
+		} );
+	} );
+
+	describe( 'atomSelectors', () => {
+		const createUseSelectAtom = ( mapSelectToProps ) => {
+			return createDerivedAtom(
+				( get ) => {
+					const current = registry.__unstableGetAtomResolver();
+					registry.__unstableSetAtomResolver( get );
+					const ret = mapSelectToProps( registry.select );
+					registry.__unstableSetAtomResolver( current );
+					return ret;
+				},
+				() => {},
+				'test-atom'
+			);
+		};
+
+		beforeEach( () => {
+			registry = createRegistry();
+			const action1 = ( value ) => ( { type: 'set', value } );
+			registry.registerStore( 'store1', {
+				reducer: ( state = 'default', action ) => {
+					if ( action.type === 'set' ) {
+						return action.value;
+					}
+					return state;
+				},
+				actions: {
+					set: action1,
+				},
+				selectors: {
+					getValue( state ) {
+						return state;
+					},
+				},
+			} );
+		} );
+
+		it( 'should subscribe to atom selectors', async () => {
+			const atomInstance = registry.atomRegistry.getAtom(
+				createUseSelectAtom( ( select ) => {
+					return {
+						value: select( 'store1' ).getValue(),
+					};
+				} )
+			);
+
+			const unsubscribe = atomInstance.subscribe( () => {} );
+			await flushImmediatesAndTicks();
+			expect( atomInstance.get().value ).toEqual( 'default' );
+			registry.dispatch( 'store1' ).set( 'new' );
+			await flushImmediatesAndTicks();
+			expect( atomInstance.get().value ).toEqual( 'new' );
+			unsubscribe();
+		} );
+
+		it( 'should subscribe to not subscribe to unrelated stores', async () => {
+			const action1 = ( value ) => ( { type: 'set', value } );
+			registry.registerStore( 'store2', {
+				reducer: ( state = 'default', action ) => {
+					if ( action.type === 'set' ) {
+						return action.value;
+					}
+					return state;
+				},
+				actions: {
+					set: action1,
+				},
+				selectors: {
+					getValue( state ) {
+						return state;
+					},
+				},
+			} );
+
+			const atomInstance = registry.atomRegistry.getAtom(
+				createUseSelectAtom( ( select ) => {
+					return {
+						value: select( 'store1' ).getValue(),
+					};
+				} )
+			);
+
+			const update = jest.fn();
+			const unsubscribe = atomInstance.subscribe( update );
+			await flushImmediatesAndTicks( 2 );
+			expect( atomInstance.get().value ).toEqual( 'default' );
+			// Reset the call that happens for initialization.
+			update.mockClear();
+			registry.dispatch( 'store2' ).set( 'new' );
+			await flushImmediatesAndTicks( 2 );
+			expect( update ).not.toHaveBeenCalled();
+			unsubscribe();
+		} );
+
+		it( 'should subscribe to sub stores for registry selectors', async () => {
+			registry.registerStore( 'store2', {
+				reducer: () => 'none',
+				actions: {},
+				selectors: {
+					getSubStoreValue: createRegistrySelector(
+						( select ) => () => {
+							return select( 'store1' ).getValue();
+						}
+					),
+				},
+			} );
+
+			const atomInstance = registry.atomRegistry.getAtom(
+				createUseSelectAtom( ( select ) => {
+					return {
+						value: select( 'store2' ).getSubStoreValue(),
+					};
+				} )
+			);
+
+			const unsubscribe = atomInstance.subscribe( () => {} );
+			await flushImmediatesAndTicks( 10 );
+			expect( atomInstance.get().value ).toEqual( 'default' );
+			registry.dispatch( 'store1' ).set( 'new' );
+			await flushImmediatesAndTicks( 10 );
+			expect( atomInstance.get().value ).toEqual( 'new' );
+			unsubscribe();
+		} );
+
+		it( 'should subscribe to nested sub stores for registry selectors', async () => {
+			registry.registerStore( 'store2', {
+				reducer: () => 'none',
+				actions: {},
+				selectors: {
+					getSubStoreValue: createRegistrySelector(
+						( select ) => () => {
+							return select( 'store1' ).getValue();
+						}
+					),
+				},
+			} );
+
+			const getSubStoreValue = createRegistrySelector(
+				( select ) => () => {
+					return select( 'store2' ).getValue();
+				}
+			);
+			registry.registerStore( 'store3', {
+				reducer: () => 'none',
+				actions: {},
+				selectors: {
+					getSubStoreValue,
+					getAdjacentSelectValue: () => getSubStoreValue(),
+				},
+			} );
+
+			const atomInstance = registry.atomRegistry.getAtom(
+				createUseSelectAtom( ( select ) => {
+					return {
+						value: select( 'store3' ).getSubStoreValue(),
+					};
+				} )
+			);
+
+			const unsubscribe = atomInstance.subscribe( () => {} );
+			await flushImmediatesAndTicks( 4 );
+			// expect( atomInstance.get().value ).toEqual( 'default' );
+			registry.dispatch( 'store1' ).set( 'new' );
+			await flushImmediatesAndTicks( 4 );
+			// expect( atomInstance.get().value ).toEqual( 'new' );
+			unsubscribe();
 		} );
 	} );
 } );

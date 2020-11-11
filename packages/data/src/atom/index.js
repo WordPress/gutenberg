@@ -58,14 +58,20 @@ export const createAtom = ( initialValue, id ) => () => {
 };
 
 export const createStoreAtom = ( { get, subscribe }, id ) => () => {
+	let isResolved = false;
 	return {
 		id,
 		type: 'store',
 		get() {
 			return get();
 		},
-		subscribe,
-		isResolved: true,
+		subscribe: ( l ) => {
+			isResolved = true;
+			return subscribe( l );
+		},
+		get isResolved() {
+			return isResolved;
+		},
 	};
 };
 
@@ -99,21 +105,36 @@ export const createDerivedAtom = (
 		const updatedDependenciesMap = new WeakMap();
 		let newValue;
 		let didThrow = false;
+		if ( id === 'test-atom' ) {
+			// console.log( 'resolve start', didThrow, value );
+		}
 		try {
 			newValue = await getCallback( ( atomCreator ) => {
 				const atom = registry.getAtom( atomCreator );
 				updatedDependenciesMap.set( atom, true );
 				updatedDependencies.push( atom );
+				if ( id === 'test-atom' ) {
+					// console.log( 'dep', atom.id );
+				}
 				if ( ! atom.isResolved ) {
-					throw 'unresolved';
+					throw { type: 'unresolved', id: atom.id };
 				}
 				return atom.get();
 			} );
 		} catch ( error ) {
-			if ( error !== 'unresolved' ) {
+			if ( error?.type !== 'unresolved' ) {
 				throw error;
 			}
+			if ( id === 'test-atom' ) {
+				// console.log( 'error', error );
+			}
 			didThrow = true;
+		}
+		if ( id === 'test-atom' ) {
+			/*console.log(
+				'dependencies',
+				updatedDependencies.map( ( atom ) => atom.id )
+			);*/
 		}
 		const newDependencies = updatedDependencies.filter(
 			( d ) => ! dependenciesUnsubscribeMap.has( d )

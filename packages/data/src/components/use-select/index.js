@@ -26,27 +26,26 @@ const renderQueue = createQueue();
  * [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
  *
  * @param {Function} _mapSelect  Function called on every state change. The
- *                               returned value is exposed to the component
- *                               implementing this hook. The function receives
- *                               the `registry.select` method on the first
- *                               argument and the `registry` on the second
- *                               argument.
- * @param {Array}    deps        If provided, this memoizes the mapSelect so the
- *                               same `mapSelect` is invoked on every state
- *                               change unless the dependencies change.
- *
+ * returned value is exposed to the component
+ * implementing this hook. The function receives
+ * the `registry.select` method on the first
+ * argument and the `registry` on the second
+ * argument.
+ * @param {Array} deps        If provided, this memoizes the mapSelect so the
+ * same `mapSelect` is invoked on every state
+ * change unless the dependencies change.
  * @example
  * ```js
  * const { useSelect } = wp.data;
  *
  * function HammerPriceDisplay( { currency } ) {
- *   const price = useSelect( ( select ) => {
- *     return select( 'my-shop' ).getPrice( 'hammer', currency )
- *   }, [ currency ] );
- *   return new Intl.NumberFormat( 'en-US', {
- *     style: 'currency',
- *     currency,
- *   } ).format( price );
+ * const price = useSelect( ( select ) => {
+ * return select( 'my-shop' ).getPrice( 'hammer', currency )
+ * }, [ currency ] );
+ * return new Intl.NumberFormat( 'en-US', {
+ * style: 'currency',
+ * currency,
+ * } ).format( price );
  * }
  *
  * // Rendered in the application:
@@ -59,7 +58,6 @@ const renderQueue = createQueue();
  * any price in the state for that currency is retrieved. If the currency prop
  * doesn't change and other props are passed in that do change, the price will
  * not change because the dependency is just the currency.
- *
  * @return {Function}  A custom react hook.
  */
 export default function useSelect( _mapSelect, deps = [] ) {
@@ -86,16 +84,13 @@ export default function useSelect( _mapSelect, deps = [] ) {
 	const atomCreator = useMemo( () => {
 		return createDerivedAtom(
 			( get ) => {
-				const current = registry.__unstableMutableResolverGet;
-				registry.__unstableMutableResolverGet = get;
-				const ret = mapSelect.current( ( storeKey ) => {
-					return get( registry.getAtomSelectors( storeKey ) );
-				} );
-				registry.__unstableMutableResolverGet = current;
+				const current = registry.__unstableGetAtomResolver();
+				registry.__unstableSetAtomResolver( get );
+				const ret = mapSelect.current( registry.select );
+				registry.__unstableSetAtomResolver( current );
 				return ret;
 			},
-			() => {},
-			'use-select'
+			() => {}
 		);
 	}, [ registry, ...deps ] );
 

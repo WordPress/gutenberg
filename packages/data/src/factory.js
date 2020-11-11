@@ -40,7 +40,7 @@ export function createRegistrySelector( registrySelector ) {
 	// and that has the same API as a regular selector. Binding it in such a way makes it
 	// possible to call the selector directly from another selector.
 	const selector = ( ...args ) =>
-		registrySelector( selector.__ustableGetSelect() )( ...args );
+		registrySelector( selector.__ustableGetSelect )( ...args );
 
 	/**
 	 * Flag indicating that the selector is a registry selector that needs the correct registry

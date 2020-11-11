@@ -733,13 +733,13 @@ _Usage_
 const { useSelect } = wp.data;
 
 function HammerPriceDisplay( { currency } ) {
-  const price = useSelect( ( select ) => {
-    return select( 'my-shop' ).getPrice( 'hammer', currency )
-  }, [ currency ] );
-  return new Intl.NumberFormat( 'en-US', {
-    style: 'currency',
-    currency,
-  } ).format( price );
+const price = useSelect( ( select ) => {
+return select( 'my-shop' ).getPrice( 'hammer', currency )
+}, [ currency ] );
+return new Intl.NumberFormat( 'en-US', {
+style: 'currency',
+currency,
+} ).format( price );
 }
 
 // Rendered in the application:

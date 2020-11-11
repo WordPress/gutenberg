@@ -9,7 +9,7 @@ import memize from 'memize';
  */
 import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
-import { createDerivedAtom, createAtomRegistry, createStoreAtom } from './atom';
+import { createAtomRegistry, createStoreAtom } from './atom';
 import { createAtomicStore } from './atomic-store';
 
 /**
@@ -49,7 +49,7 @@ import { createAtomicStore } from './atomic-store';
  */
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
-	const selectorsAtom = {};
+	const storesAtoms = {};
 	const atomsUnsubscribe = {};
 	const atomRegistry = createAtomRegistry( {
 		onAdd: ( atom ) => {
@@ -96,12 +96,25 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		const storeName = isObject( storeNameOrDefinition )
 			? storeNameOrDefinition.name
 			: storeNameOrDefinition;
+
 		const store = stores[ storeName ];
 		if ( store ) {
+			if ( registry.__unstableGetAtomResolver() ) {
+				registry.__unstableGetAtomResolver()(
+					registry.getStoreAtom( storeName )
+				);
+			}
+
 			return store.getSelectors();
 		}
 
-		return parent && parent.select( storeName );
+		if ( parent ) {
+			parent.__unstableSetAtomResolver(
+				registry.__unstableGetAtomResolver()
+			);
+			const ret = parent.select( storeName );
+			return ret;
+		}
 	}
 
 	const getResolveSelectors = memize(
@@ -195,34 +208,6 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		} );
 	}
 
-	function getGenericSelectorsAtom( key, config ) {
-		const storeAtom = createStoreAtom(
-			{
-				get() {
-					return null;
-				},
-				subscribe: config.subscribe,
-			},
-			key
-		);
-		return createDerivedAtom(
-			( get ) => {
-				get( storeAtom );
-				if ( ! config.getAtomSelectors ) {
-					return config.getSelectors();
-				}
-				return mapValues(
-					config.getAtomSelectors(),
-					( atomSelector ) => {
-						return ( ...args ) => atomSelector( get )( ...args );
-					}
-				);
-			},
-			() => {},
-			'selectors--' + key
-		);
-	}
-
 	/**
 	 * Registers a generic store.
 	 *
@@ -240,7 +225,15 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			throw new TypeError( 'config.subscribe must be a function' );
 		}
 		stores[ key ] = config;
-		selectorsAtom[ key ] = getGenericSelectorsAtom( key, config );
+		storesAtoms[ key ] = createStoreAtom(
+			{
+				get() {
+					return null;
+				},
+				subscribe: config.subscribe,
+			},
+			key
+		);
 		config.subscribe( globalListener );
 	}
 
@@ -253,13 +246,21 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		registerGenericStore( store.name, store.instantiate( registry ) );
 	}
 
-	function getAtomSelectors( key ) {
-		const atom = selectorsAtom[ key ];
+	function getStoreAtom( key ) {
+		const atom = storesAtoms[ key ];
 		if ( atom ) {
 			return atom;
 		}
 
-		return parent.getAtomSelectors( key );
+		return parent.getStoreAtom( key );
+	}
+
+	let __unstableAtomResolver;
+	function __unstableGetAtomResolver() {
+		return __unstableAtomResolver;
+	}
+	function __unstableSetAtomResolver( value ) {
+		__unstableAtomResolver = value;
 	}
 
 	let registry = {
@@ -273,7 +274,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		dispatch,
 		use,
 		register,
-		getAtomSelectors,
+		getStoreAtom,
+		__unstableGetAtomResolver,
+		__unstableSetAtomResolver,
 	};
 
 	/**

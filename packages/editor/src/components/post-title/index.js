@@ -42,26 +42,30 @@ export default function PostTitle() {
 		placeholder,
 		isFocusMode,
 		hasFixedToolbar,
-	} = useSelect( ( select ) => {
-		const {
-			getEditedPostAttribute,
-			isCleanNewPost: _isCleanNewPost,
-		} = select( 'core/editor' );
-		const { getSettings } = select( 'core/block-editor' );
-		const {
-			titlePlaceholder,
-			focusMode,
-			hasFixedToolbar: _hasFixedToolbar,
-		} = getSettings();
+	} = useSelect(
+		( select ) => {
+			const {
+				getEditedPostAttribute,
+				isCleanNewPost: _isCleanNewPost,
+			} = select( 'core/editor' );
+			const { getSettings } = select( 'core/block-editor' );
+			const {
+				titlePlaceholder,
+				focusMode,
+				hasFixedToolbar: _hasFixedToolbar,
+			} = getSettings();
 
-		return {
-			isCleanNewPost: _isCleanNewPost(),
-			title: getEditedPostAttribute( 'title' ),
-			placeholder: titlePlaceholder,
-			isFocusMode: focusMode,
-			hasFixedToolbar: _hasFixedToolbar,
-		};
-	} );
+			return {
+				isCleanNewPost: _isCleanNewPost(),
+				title: getEditedPostAttribute( 'title' ),
+				placeholder: titlePlaceholder,
+				isFocusMode: focusMode,
+				hasFixedToolbar: _hasFixedToolbar,
+			};
+		},
+		[],
+		'test-atom'
+	);
 
 	useEffect( () => {
 		const { ownerDocument } = ref.current;

@@ -75,16 +75,6 @@ export default function createReduxStore( key, options ) {
 				store
 			);
 
-			const __ustableGetSelect = () => {
-				return ( storeKey ) => {
-					return ! registry.__unstableMutableResolverGet
-						? registry.select( storeKey )
-						: registry.__unstableMutableResolverGet(
-								registry.getAtomSelectors( storeKey )
-						  );
-				};
-			};
-
 			// Inject registry into selectors
 			// It is important that this injection happens first because __ustableGetSelect
 			// is injected using a mutation of the original selector function.
@@ -92,7 +82,7 @@ export default function createReduxStore( key, options ) {
 				options.selectors,
 				( selector ) => {
 					if ( selector.isRegistrySelector ) {
-						selector.__ustableGetSelect = __ustableGetSelect;
+						selector.__ustableGetSelect = registry.select;
 					}
 					return selector;
 				}
@@ -202,20 +192,8 @@ export default function createReduxStore( key, options ) {
 				}
 			);
 
-			// Atom selectors
-			const atomSelectors = mapValues( selectors, ( selector ) => {
-				return ( getAtomValue ) => ( ...args ) => {
-					const current = registry.__unstableMutableResolverGet;
-					registry.__unstableMutableResolverGet = getAtomValue;
-					const result = selector( ...args );
-					registry.__unstableMutableResolverGet = current;
-					return result;
-				};
-			} );
-
 			const getSelectors = () => selectors;
 			const getActions = () => actions;
-			const getAtomSelectors = () => atomSelectors;
 
 			// We have some modules monkey-patching the store object
 			// It's wrong to do so but until we refactor all of our effects to controls
@@ -251,7 +229,6 @@ export default function createReduxStore( key, options ) {
 				getSelectors,
 				getActions,
 				subscribe,
-				getAtomSelectors,
 			};
 		},
 	};
