@@ -59,7 +59,7 @@ export function useDropZone( {
 	return state;
 }
 
-function DropZoneComponent( {
+export default function DropZoneComponent( {
 	className,
 	label,
 	onFilesDrop,
@@ -110,5 +110,3 @@ function DropZoneComponent( {
 		</div>
 	);
 }
-
-export default DropZoneComponent;

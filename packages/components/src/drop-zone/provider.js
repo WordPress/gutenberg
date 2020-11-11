@@ -16,7 +16,7 @@ import { useThrottle } from '@wordpress/compose';
 
 export const Context = createContext();
 
-const { Provider, Consumer } = Context;
+const { Provider } = Context;
 
 function getDragEventType( { dataTransfer } ) {
 	if ( dataTransfer ) {
@@ -97,7 +97,7 @@ function getHoveredDropZone( dropZones, position, dragEventType ) {
 	} );
 }
 
-function DropZoneProvider( { children } ) {
+export default function DropZoneProvider( { children } ) {
 	const ref = useRef();
 	const dropZones = useRef( new Set( [] ) );
 	const lastRelative = useRef();
@@ -234,6 +234,3 @@ function DropZoneProvider( { children } ) {
 		</div>
 	);
 }
-
-export default DropZoneProvider;
-export { Consumer as DropZoneConsumer };
