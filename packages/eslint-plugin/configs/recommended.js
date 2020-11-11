@@ -17,6 +17,7 @@ module.exports = {
 		require.resolve( './recommended-with-formatting.js' ),
 		'plugin:prettier/recommended',
 		'prettier/react',
+		require.resolve( './prettier-overrides.js' ),
 	],
 	rules: {
 		'prettier/prettier': [ 'error', prettierConfig ],
