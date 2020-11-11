@@ -26,6 +26,10 @@ import {
 } from './actions';
 import { getKindEntities, DEFAULT_ENTITY_KEY } from './entities';
 import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
+import {
+	__unstableAcquireStoreLock,
+	__unstableReleaseStoreLock,
+} from './locks';
 
 /**
  * Requests authors from the REST API.
@@ -61,51 +65,60 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 		return;
 	}
 
-	if ( query !== undefined && query._fields ) {
-		// If requesting specific fields, items and query assocation to said
-		// records are stored by ID reference. Thus, fields must always include
-		// the ID.
-		query = {
-			...query,
-			_fields: uniq( [
-				...( getNormalizedCommaSeparable( query._fields ) || [] ),
-				entity.key || DEFAULT_ENTITY_KEY,
-			] ).join(),
-		};
-	}
-
-	// Disable reason: While true that an early return could leave `path`
-	// unused, it's important that path is derived using the query prior to
-	// additional query modifications in the condition below, since those
-	// modifications are relevant to how the data is tracked in state, and not
-	// for how the request is made to the REST API.
-
-	// eslint-disable-next-line @wordpress/no-unused-vars-before-return
-	const path = addQueryArgs( entity.baseURL + '/' + key, {
-		...query,
-		context: 'edit',
-	} );
-
-	if ( query !== undefined ) {
-		query = { ...query, include: [ key ] };
-
-		// The resolution cache won't consider query as reusable based on the
-		// fields, so it's tested here, prior to initiating the REST request,
-		// and without causing `getEntityRecords` resolution to occur.
-		const hasRecords = yield controls.select(
-			'core',
-			'hasEntityRecords',
-			kind,
-			name,
-			query
-		);
-		if ( hasRecords ) {
-			return;
+	const lock = yield* __unstableAcquireStoreLock(
+		'core',
+		[ 'entities', 'data', kind, name, key ],
+		{ exclusive: false }
+	);
+	try {
+		if ( query !== undefined && query._fields ) {
+			// If requesting specific fields, items and query assocation to said
+			// records are stored by ID reference. Thus, fields must always include
+			// the ID.
+			query = {
+				...query,
+				_fields: uniq( [
+					...( getNormalizedCommaSeparable( query._fields ) || [] ),
+					entity.key || DEFAULT_ENTITY_KEY,
+				] ).join(),
+			};
 		}
-	}
 
-	const record = yield apiFetch( { path } );
-	yield receiveEntityRecords( kind, name, record, query );
+		// Disable reason: While true that an early return could leave `path`
+		// unused, it's important that path is derived using the query prior to
+		// additional query modifications in the condition below, since those
+		// modifications are relevant to how the data is tracked in state, and not
+		// for how the request is made to the REST API.
+
+		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
+		const path = addQueryArgs( entity.baseURL + '/' + key, {
+			...query,
+			context: 'edit',
+		} );
+
+		if ( query !== undefined ) {
+			query = { ...query, include: [ key ] };
+
+			// The resolution cache won't consider query as reusable based on the
+			// fields, so it's tested here, prior to initiating the REST request,
+			// and without causing `getEntityRecords` resolution to occur.
+			const hasRecords = yield controls.select(
+				'core',
+				'hasEntityRecords',
+				kind,
+				name,
+				query
+			);
+			if ( hasRecords ) {
+				return;
+			}
+		}
+
+		const record = yield apiFetch( { path } );
+		yield receiveEntityRecords( kind, name, record, query );
+	} finally {
+		yield* __unstableReleaseStoreLock( lock );
+	}
 }
 
 /**
@@ -138,59 +151,69 @@ export function* getEntityRecords( kind, name, query = {} ) {
 		return;
 	}
 
-	if ( query._fields ) {
-		// If requesting specific fields, items and query assocation to said
-		// records are stored by ID reference. Thus, fields must always include
-		// the ID.
-		query = {
+	const lock = yield* __unstableAcquireStoreLock(
+		'core',
+		[ 'entities', 'data', kind, name ],
+		{ exclusive: false }
+	);
+	try {
+		if ( query._fields ) {
+			// If requesting specific fields, items and query assocation to said
+			// records are stored by ID reference. Thus, fields must always include
+			// the ID.
+			query = {
+				...query,
+				_fields: uniq( [
+					...( getNormalizedCommaSeparable( query._fields ) || [] ),
+					entity.key || DEFAULT_ENTITY_KEY,
+				] ).join(),
+			};
+		}
+
+		const path = addQueryArgs( entity.baseURL, {
 			...query,
-			_fields: uniq( [
-				...( getNormalizedCommaSeparable( query._fields ) || [] ),
-				entity.key || DEFAULT_ENTITY_KEY,
-			] ).join(),
-		};
-	}
-
-	const path = addQueryArgs( entity.baseURL, {
-		...query,
-		context: 'edit',
-	} );
-
-	let records = Object.values( yield apiFetch( { path } ) );
-	// If we request fields but the result doesn't contain the fields,
-	// explicitely set these fields as "undefined"
-	// that way we consider the query "fullfilled".
-	if ( query._fields ) {
-		records = records.map( ( record ) => {
-			query._fields.split( ',' ).forEach( ( field ) => {
-				if ( ! record.hasOwnProperty( field ) ) {
-					record[ field ] = undefined;
-				}
-			} );
-
-			return record;
+			context: 'edit',
 		} );
-	}
 
-	yield receiveEntityRecords( kind, name, records, query );
-	// When requesting all fields, the list of results can be used to
-	// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
-	// See https://github.com/WordPress/gutenberg/pull/26575
-	if ( ! query?._fields ) {
-		for ( const record of records ) {
-			if ( record.id ) {
-				yield {
-					type: 'START_RESOLUTION',
-					selectorName: 'getEntityRecord',
-					args: [ kind, name, record.id ],
-				};
-				yield {
-					type: 'FINISH_RESOLUTION',
-					selectorName: 'getEntityRecord',
-					args: [ kind, name, record.id ],
-				};
+		let records = Object.values( yield apiFetch( { path } ) );
+		// If we request fields but the result doesn't contain the fields,
+		// explicitely set these fields as "undefined"
+		// that way we consider the query "fullfilled".
+		if ( query._fields ) {
+			records = records.map( ( record ) => {
+				query._fields.split( ',' ).forEach( ( field ) => {
+					if ( ! record.hasOwnProperty( field ) ) {
+						record[ field ] = undefined;
+					}
+				} );
+
+				return record;
+			} );
+		}
+
+		yield receiveEntityRecords( kind, name, records, query );
+		// When requesting all fields, the list of results can be used to
+		// resolve the `getEntityRecord` selector in addition to `getEntityRecords`.
+		// See https://github.com/WordPress/gutenberg/pull/26575
+		if ( ! query?._fields ) {
+			const key = entity.key || DEFAULT_ENTITY_KEY;
+			for ( const record of records ) {
+				if ( record[ key ] ) {
+					yield {
+						type: 'START_RESOLUTION',
+						selectorName: 'getEntityRecord',
+						args: [ kind, name, record[ key ] ],
+					};
+					yield {
+						type: 'FINISH_RESOLUTION',
+						selectorName: 'getEntityRecord',
+						args: [ kind, name, record[ key ] ],
+					};
+				}
 			}
 		}
+	} finally {
+		yield* __unstableReleaseStoreLock( lock );
 	}
 }
 

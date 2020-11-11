@@ -16,6 +16,8 @@ import { useEffect } from '@wordpress/element';
  * render in components in `useCallback`.
  *
  * @param {...any} args Arguments passed to Lodash's `debounce`.
+ *
+ * @return {Function} Debounced function.
  */
 export default function useDebounce( ...args ) {
 	const debounced = useMemoOne( () => debounce( ...args ), args );

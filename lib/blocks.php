@@ -12,7 +12,7 @@
 function gutenberg_reregister_core_block_types() {
 	// Blocks directory may not exist if working from a fresh clone.
 	$blocks_dirs = array(
-		dirname( __FILE__ ) . '/../build/block-library/blocks/' => array(
+		__DIR__ . '/../build/block-library/blocks/' => array(
 			'block_folders' => array(
 				'audio',
 				'button',
@@ -88,7 +88,7 @@ function gutenberg_reregister_core_block_types() {
 				)
 			),
 		),
-		dirname( __FILE__ ) . '/../build/edit-widgets/blocks/'  => array(
+		__DIR__ . '/../build/edit-widgets/blocks/'  => array(
 			'block_folders' => array(
 				'legacy-widget',
 				'widget-area',
@@ -100,9 +100,6 @@ function gutenberg_reregister_core_block_types() {
 		),
 	);
 	foreach ( $blocks_dirs as $blocks_dir => $details ) {
-		if ( ! file_exists( $blocks_dir ) ) {
-			return;
-		}
 		$block_folders = $details['block_folders'];
 		$block_names   = $details['block_names'];
 
@@ -110,9 +107,6 @@ function gutenberg_reregister_core_block_types() {
 
 		foreach ( $block_folders as $folder_name ) {
 			$block_json_file = $blocks_dir . $folder_name . '/block.json';
-			if ( ! file_exists( $block_json_file ) ) {
-				return;
-			}
 
 			// Ideally, all paths to block metadata files should be listed in
 			// WordPress core. In this place we should rather use filter
