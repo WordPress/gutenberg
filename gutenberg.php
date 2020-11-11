@@ -68,18 +68,19 @@ function gutenberg_menu() {
 	}
 
 	if ( gutenberg_is_fse_theme() ) {
-		add_menu_page(
-			__( 'Site Editor (beta)', 'gutenberg' ),
+		add_theme_page(
+			__( 'Theme Editor (beta)', 'gutenberg' ),
 			sprintf(
 				/* translators: %s: "beta" label. */
-				__( 'Site Editor %s', 'gutenberg' ),
+				__( 'Theme Editor %s', 'gutenberg' ),
 				'<span class="awaiting-mod">' . __( 'beta', 'gutenberg' ) . '</span>'
 			),
 			'edit_theme_options',
 			'gutenberg-edit-site',
 			'gutenberg_edit_site_page',
-			'dashicons-layout'
+			2,
 		);
+		remove_submenu_page( 'themes.php', 'theme-editor.php' );
 	}
 
 	if ( current_user_can( 'edit_posts' ) ) {
@@ -108,7 +109,7 @@ function gutenberg_menu() {
 		'the_gutenberg_experiments'
 	);
 }
-add_action( 'admin_menu', 'gutenberg_menu', 9 );
+add_action( 'admin_menu', 'gutenberg_menu', 200 );
 
 /**
  * Modify WP admin bar.
