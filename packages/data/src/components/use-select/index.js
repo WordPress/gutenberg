@@ -224,7 +224,7 @@ export default function useSelect( _mapSelect, deps ) {
 			isMountedAndNotUnsubscribing.current = false;
 			unsubscribe();
 			renderQueue.flush( queueContext );
-			// Reset the registered stores when mapSelect changes. In case it subscribes to different stores.
+			// Reset the registered stores when depsChangedFlag changes. In case it subscribes to different stores.
 			listeningStores.current = [];
 		};
 	}, [ registry, trapSelect, depsChangedFlag ] );
