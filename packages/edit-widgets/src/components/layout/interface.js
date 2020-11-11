@@ -59,7 +59,7 @@ function Interface( { blockEditorSettings } ) {
 		<InterfaceSkeleton
 			labels={ interfaceLabels }
 			header={ <Header /> }
-			leftSidebar={
+			secondarySidebar={
 				isInserterOpened && (
 					<PopoverWrapper
 						className="edit-widgets-layout__inserter-panel-popover-wrapper"

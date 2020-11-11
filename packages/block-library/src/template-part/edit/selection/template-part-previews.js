@@ -59,6 +59,7 @@ function TemplatePartItem( {
 
 	return (
 		<CompositeItem
+			as="div"
 			className="wp-block-template-part__selection-preview-item"
 			role="option"
 			onClick={ onClick }

@@ -167,6 +167,20 @@ export default class EditorPage {
 		await hideKeyboardToolbarButton.click();
 	}
 
+	async dismissAndroidClipboardSmartSuggestion() {
+		if ( ! isAndroid() ) {
+			return;
+		}
+
+		const dismissClipboardSmartSuggestionLocator = `//*[@${ this.accessibilityIdXPathAttrib }="Dismiss Smart Suggestion"]`;
+		const smartSuggestions = await this.driver.elementsByXPath(
+			dismissClipboardSmartSuggestionLocator
+		);
+		if ( smartSuggestions.length !== 0 ) {
+			smartSuggestions[ 0 ].click();
+		}
+	}
+
 	// =========================
 	// Block toolbar functions
 	// =========================

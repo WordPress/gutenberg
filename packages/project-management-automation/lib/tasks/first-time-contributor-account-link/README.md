@@ -1,7 +1,7 @@
-First Time Contributor
+First Time Contributor Account Link
 ===
 
-Adds the "First Time Contributor" label to pull requests merged on behalf of contributors that have not previously made a contribution, and prompts the user to link their GitHub account to their WordPress.org profile if necessary for release notes credit.
+Prompts the user to link their GitHub account to their WordPress.org profile if necessary for release notes credit.
 
 ## Rationale
 

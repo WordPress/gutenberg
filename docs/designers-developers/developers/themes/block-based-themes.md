@@ -4,7 +4,7 @@
 
 > Documentation has been shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. You can provide feedback in the weekly #core-editor chats where the latest progress of this effort will be shared and discussed, or async via Github issues.
 
-**Note:** In order to use these features, make sure to enable the "Full Site Editing" flag from the **Experiments** page of the Gutenberg plugin.
+**Note:** In order to use these features, make sure to use a block-based theme.
 
 ## What is a block-based theme?
 

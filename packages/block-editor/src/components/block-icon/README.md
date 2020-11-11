@@ -1,6 +1,6 @@
 # Block Icon
 
-The BlockIcon component provides an icon for blocks in different places in the editor: the toolbar of a selected block, the placeholders of certain blocks (gallery, image), the block insertion panel of the editor or the left sidebar.
+The BlockIcon component provides an icon for blocks in different places in the editor: the toolbar of a selected block, the placeholders of certain blocks (gallery, image), the block insertion panel of the editor or the secondary sidebar.
 
 The rendered an [Icon](https://github.com/WordPress/gutenberg/tree/master/packages/components/src/icon) component with default styles.
 
@@ -26,4 +26,4 @@ const MyBlockIcon = () => <BlockIcon icon={ icon } />
 
 ## Related components
 
-Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/provider/README.md) in the components tree. 
+Block Editor components are components that can be used to compose the UI of your block editor. Thus, they can only be used under a [`BlockEditorProvider`](https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/provider/README.md) in the components tree.

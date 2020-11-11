@@ -9,6 +9,7 @@ import { some } from 'lodash';
 import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useViewportMatch } from '@wordpress/compose';
 
 export default function SaveButton( { openEntitiesSavedStates } ) {
 	const { isDirty, isSaving } = useSelect( ( select ) => {
@@ -26,6 +27,8 @@ export default function SaveButton( { openEntitiesSavedStates } ) {
 	} );
 
 	const disabled = ! isDirty || isSaving;
+	const isMobile = useViewportMatch( 'medium', '<' );
+
 	return (
 		<>
 			<Button
@@ -36,7 +39,7 @@ export default function SaveButton( { openEntitiesSavedStates } ) {
 				isBusy={ isSaving }
 				onClick={ disabled ? undefined : openEntitiesSavedStates }
 			>
-				{ __( 'Update Design' ) }
+				{ isMobile ? __( 'Update' ) : __( 'Update Design' ) }
 			</Button>
 		</>
 	);

@@ -262,7 +262,7 @@ const Popover = ( {
 	animate = true,
 	onClickOutside,
 	onFocusOutside,
-	__unstableSticky,
+	__unstableStickyBoundaryElement,
 	__unstableSlotName = SLOT_NAME,
 	__unstableObserveElement,
 	__unstableBoundaryParent,
@@ -352,7 +352,7 @@ const Popover = ( {
 				anchor,
 				usedContentSize,
 				position,
-				__unstableSticky,
+				__unstableStickyBoundaryElement,
 				containerRef.current,
 				relativeOffsetTop,
 				boundaryElement
@@ -451,7 +451,7 @@ const Popover = ( {
 		shouldAnchorIncludePadding,
 		position,
 		contentSize,
-		__unstableSticky,
+		__unstableStickyBoundaryElement,
 		__unstableObserveElement,
 		__unstableBoundaryParent,
 	] );

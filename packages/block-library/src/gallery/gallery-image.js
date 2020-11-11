@@ -83,7 +83,7 @@ class GalleryImage extends Component {
 
 	onRemoveImage( event ) {
 		if (
-			this.container === document.activeElement &&
+			this.container === this.container.ownerDocument.activeElement &&
 			this.props.isSelected &&
 			[ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
 		) {
