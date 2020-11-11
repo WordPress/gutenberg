@@ -13,7 +13,7 @@ import { upload, Icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { DropZoneConsumer, Context } from './provider';
+import { Context } from './provider';
 
 export function useDropZone( {
 	element,
@@ -22,9 +22,9 @@ export function useDropZone( {
 	onDrop,
 	isDisabled,
 	withPosition,
-	__unstableIsRelative = false,
+	__unstableIsRelative: isRelative = false,
 } ) {
-	const { addDropZone, removeDropZone } = useContext( Context );
+	const dropZones = useContext( Context );
 	const [ state, setState ] = useState( {
 		isDraggingOverDocument: false,
 		isDraggingOverElement: false,
@@ -40,29 +40,24 @@ export function useDropZone( {
 				onHTMLDrop,
 				setState,
 				withPosition,
-				isRelative: __unstableIsRelative,
+				isRelative,
 			};
-			addDropZone( dropZone );
+			dropZones.add( dropZone );
 			return () => {
-				removeDropZone( dropZone );
+				dropZones.delete( dropZone );
 			};
 		}
-	}, [ isDisabled, onDrop, onFilesDrop, onHTMLDrop, withPosition ] );
+	}, [
+		isDisabled,
+		onDrop,
+		onFilesDrop,
+		onHTMLDrop,
+		withPosition,
+		isRelative,
+	] );
 
 	return state;
 }
-
-const DropZone = ( props ) => (
-	<DropZoneConsumer>
-		{ ( { addDropZone, removeDropZone } ) => (
-			<DropZoneComponent
-				addDropZone={ addDropZone }
-				removeDropZone={ removeDropZone }
-				{ ...props }
-			/>
-		) }
-	</DropZoneConsumer>
-);
 
 function DropZoneComponent( {
 	className,
@@ -116,4 +111,4 @@ function DropZoneComponent( {
 	);
 }
 
-export default DropZone;
+export default DropZoneComponent;
