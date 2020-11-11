@@ -388,7 +388,7 @@ class WP_Theme_JSON {
 	 *
 	 * @return array Block metadata.
 	 */
-	public function get_blocks_metadata() {
+	public static function get_blocks_metadata() {
 		if ( null !== self::$blocks_metadata ) {
 			return self::$blocks_metadata;
 		}
@@ -415,7 +415,7 @@ class WP_Theme_JSON {
 
 			$block_supports = array();
 			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
-				if ( $this->get_from_path( $block_type->supports, $metadata['block_json'] ) ) {
+				if ( self::get_from_path( $block_type->supports, $metadata['block_json'] ) ) {
 					$block_supports[] = $key;
 				}
 			}
