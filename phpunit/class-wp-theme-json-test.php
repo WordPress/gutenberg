@@ -199,7 +199,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$result     = $theme_json->get_stylesheet();
-		$stylesheet = ':root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);--wp--preset--color--grey: grey;}:root.has-grey-color{color: grey;}:root.has-grey-background-color{background-color: grey;}';
+		$stylesheet = ':root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);--wp--preset--color--grey: grey;}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}';
 
 		$this->assertEquals( $stylesheet, $result );
 	}

@@ -28,6 +28,13 @@ class WP_Theme_JSON {
 	private static $blocks_metadata = null;
 
 	/**
+	 * The CSS selector for the global context.
+	 *
+	 * @var string
+	 */
+	const GLOBAL_SELECTOR = ':root';
+
+	/**
 	 * Data schema of each context within a theme.json.
 	 *
 	 * Example:
@@ -375,7 +382,7 @@ class WP_Theme_JSON {
 						'supports' => array(
 							'__experimentalFontAppearance' => false,
 							'__experimentalFontFamily'     => true,
-							'__experimentalSelector'       => ':root',
+							'__experimentalSelector'       => self::GLOBAL_SELECTOR,
 							'__experimentalTextDecoration' => true,
 							'__experimentalTextTransform'  => true,
 							'color'                        => array(
@@ -681,12 +688,19 @@ class WP_Theme_JSON {
 	 * @param array  $context Context to process.
 	 */
 	private function compute_preset_classes( &$stylesheet, $context ) {
+		$selector = $context['selector'];
+		if ( self::GLOBAL_SELECTOR === $selector ) {
+			// Classes at the global level do not need any CSS prefixed,
+			// and we don't want to increase its specificity.
+			$selector = '';
+		}
+
 		foreach ( self::PRESETS_METADATA as $preset ) {
 			$values = $this->get_from_path( $context, $preset['path'], array() );
 			foreach ( $values as $value ) {
 				foreach ( $preset['classes'] as $class ) {
 					$stylesheet .= $this->to_ruleset(
-						$context['selector'] . '.has-' . $value['slug'] . '-' . $class['class_suffix'],
+						$selector . '.has-' . $value['slug'] . '-' . $class['class_suffix'],
 						array(
 							array(
 								'name'  => $class['property_name'],

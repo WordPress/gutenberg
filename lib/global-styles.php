@@ -136,6 +136,7 @@ function gutenberg_experimental_global_styles_get_core() {
 	$config = gutenberg_experimental_global_styles_get_from_file(
 		__DIR__ . '/experimental-default-theme.json'
 	);
+
 	// Start i18n logic to remove when JSON i18 strings are extracted.
 	$default_colors_i18n = array(
 		'black'                 => __( 'Black', 'gutenberg' ),
@@ -151,7 +152,6 @@ function gutenberg_experimental_global_styles_get_core() {
 		'vivid-cyan-blue'       => __( 'Vivid cyan blue', 'gutenberg' ),
 		'vivid-purple'          => __( 'Vivid purple', 'gutenberg' ),
 	);
-
 	if ( ! empty( $config['global']['settings']['color']['palette'] ) ) {
 		foreach ( $config['global']['settings']['color']['palette'] as &$color ) {
 			$color['name'] = $default_colors_i18n[ $color['slug'] ];
@@ -172,7 +172,6 @@ function gutenberg_experimental_global_styles_get_core() {
 		'electric-grass'                                => __( 'Electric grass', 'gutenberg' ),
 		'midnight'                                      => __( 'Midnight', 'gutenberg' ),
 	);
-
 	if ( ! empty( $config['global']['settings']['color']['gradients'] ) ) {
 		foreach ( $config['global']['settings']['color']['gradients'] as &$gradient ) {
 			$gradient['name'] = $default_gradients_i18n[ $gradient['slug'] ];
@@ -186,7 +185,6 @@ function gutenberg_experimental_global_styles_get_core() {
 		'large'  => __( 'Large', 'gutenberg' ),
 		'huge'   => __( 'Huge', 'gutenberg' ),
 	);
-
 	if ( ! empty( $config['global']['settings']['typography']['fontSizes'] ) ) {
 		foreach ( $config['global']['settings']['typography']['fontSizes'] as &$font_size ) {
 			$font_size['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
@@ -199,7 +197,6 @@ function gutenberg_experimental_global_styles_get_core() {
 		'initial' => __( 'Initial', 'gutenberg' ),
 		'inherit' => __( 'Inherit', 'gutenberg' ),
 	);
-
 	if ( ! empty( $config['global']['settings']['typography']['fontStyles'] ) ) {
 		foreach ( $config['global']['settings']['typography']['fontStyles'] as &$font_style ) {
 			$font_style['name'] = $default_font_styles_i18n[ $font_style['slug'] ];
@@ -219,7 +216,6 @@ function gutenberg_experimental_global_styles_get_core() {
 		'initial' => __( 'Initial', 'gutenberg' ),
 		'inherit' => __( 'Inherit', 'gutenberg' ),
 	);
-
 	if ( ! empty( $config['global']['settings']['typography']['fontWeights'] ) ) {
 		foreach ( $config['global']['settings']['typography']['fontWeights'] as &$font_weight ) {
 			$font_weight['name'] = $default_font_weights_i18n[ $font_weight['slug'] ];
@@ -247,30 +243,35 @@ function gutenberg_experimental_global_styles_get_theme_support_settings() {
 		}
 		$theme_settings['global']['settings']['color']['custom'] = false;
 	}
+
 	if ( get_theme_support( 'disable-custom-gradients' ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
 			$theme_settings['global']['settings']['color'] = array();
 		}
 		$theme_settings['global']['settings']['color']['customGradient'] = false;
 	}
+
 	if ( get_theme_support( 'disable-custom-font-sizes' ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['typography'] ) ) {
 			$theme_settings['global']['settings']['typography'] = array();
 		}
 		$theme_settings['global']['settings']['typography']['customFontSize'] = false;
 	}
+
 	if ( get_theme_support( 'custom-line-height' ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['typography'] ) ) {
 			$theme_settings['global']['settings']['typography'] = array();
 		}
 		$theme_settings['global']['settings']['typography']['customLineHeight'] = true;
 	}
+
 	if ( get_theme_support( 'custom-spacing' ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['spacing'] ) ) {
 			$theme_settings['global']['settings']['spacing'] = array();
 		}
 		$theme_settings['global']['settings']['spacing']['custom'] = true;
 	}
+
 	if ( get_theme_support( 'experimental-link-color' ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
 			$theme_settings['global']['settings']['color'] = array();
