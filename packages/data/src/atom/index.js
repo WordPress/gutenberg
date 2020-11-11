@@ -9,7 +9,7 @@ function isPromise( obj ) {
 
 export const createAtomRegistry = ( {
 	onAdd = noop,
-	onRemove = noop,
+	onDelete = noop,
 } = {} ) => {
 	const atoms = new WeakMap();
 
@@ -30,7 +30,7 @@ export const createAtomRegistry = ( {
 		deleteAtom( atomCreator ) {
 			const atom = atoms.get( atomCreator );
 			atoms.delete( atomCreator );
-			onRemove( atom );
+			onDelete( atom );
 		},
 	};
 };

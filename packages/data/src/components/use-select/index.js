@@ -77,8 +77,11 @@ export default function useSelect( _mapSelect, deps = [] ) {
 	const mapSelect = useRef( _mapSelect );
 	useLayoutEffect( () => {
 		mapSelect.current = _mapSelect;
-		isAsync.current = isAsyncValue;
 		isMountedAndNotUnsubscribing.current = true;
+		if ( isAsync.current !== isAsync ) {
+			isAsync.current = isAsync;
+			renderQueue.flush( queueContext );
+		}
 	} );
 
 	const atomCreator = useMemo( () => {
