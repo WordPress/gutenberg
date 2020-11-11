@@ -44,7 +44,7 @@ function gutenberg_widgets_init( $hook ) {
 	$initializer_name = 'initialize';
 
 	$settings = array_merge(
-		gutenberg_get_block_editor_settings_common(),
+		gutenberg_get_common_block_editor_settings(),
 		gutenberg_get_legacy_widget_settings()
 	);
 

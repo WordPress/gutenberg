@@ -102,7 +102,7 @@ function gutenberg_edit_site_init( $hook ) {
 	$current_screen->is_block_editor( true );
 
 	$settings = array_merge(
-		gutenberg_get_block_editor_settings_common(),
+		gutenberg_get_common_block_editor_settings(),
 		array(
 			'alignWide'    => get_theme_support( 'align-wide' ),
 			'siteUrl'      => site_url(),
