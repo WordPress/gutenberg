@@ -76,7 +76,15 @@ under the keys with the same name.
 
 <a name="getFilesFromDataTransfer" href="#getFilesFromDataTransfer">#</a> **getFilesFromDataTransfer**
 
-Undocumented declaration.
+Gets all files from a DataTransfer object.
+
+_Parameters_
+
+-   _dataTransfer_ `DataTransfer`: DataTransfer object to inspect.
+
+_Returns_
+
+-   `Set`: A set containing all files.
 
 <a name="getOffsetParent" href="#getOffsetParent">#</a> **getOffsetParent**
 
