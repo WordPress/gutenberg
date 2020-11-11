@@ -5,6 +5,7 @@ const {
 	setupDriver,
 	stopDriver,
 	isAndroid,
+	longPressMiddleOfElement,
 	swipeUp,
 	swipeDown,
 	typeString,
@@ -299,11 +300,7 @@ class EditorPage {
 			);
 		}
 
-		const action = new wd.TouchAction( this.driver );
-		action.press( { el: toolBarButton } );
-		action.wait( 1000 );
-		action.release();
-		await action.perform();
+		await longPressMiddleOfElement( this.driver, toolBarButton );
 	}
 
 	// =========================
@@ -594,11 +591,11 @@ class EditorPage {
 	async sauceJobStatus( allPassed ) {
 		await this.driver.sauceJobStatus( allPassed );
 	}
-	
+
 	// =============================
 	// Misc functions
 	// =============================
-	async findElement( name, iosElementType ) {
+	async findElementByXPath( name, iosElementType ) {
 		const elementName = isAndroid()
 			? '//*'
 			: `//XCUIElementType${ iosElementType }`;
@@ -608,7 +605,7 @@ class EditorPage {
 	}
 
 	async selectElement( name, iosElementType ) {
-		const el = await this.findElement( name, iosElementType );
+		const el = await this.findElementByXPath( name, iosElementType );
 		el.click();
 	}
 
