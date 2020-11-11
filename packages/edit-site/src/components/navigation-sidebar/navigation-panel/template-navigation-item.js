@@ -44,7 +44,7 @@ export default function TemplateNavigationItem( { item } ) {
 					{ item.type === 'wp_template' &&
 						item.status !== 'auto-draft' && (
 							<Tooltip
-								text={ __( 'Customized' ) }
+								text={ __( 'This theme template has been customized' ) }
 								position="top center"
 							>
 								<span className="edit-site-navigation-panel__template-item-customized-dot" />

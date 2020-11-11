@@ -135,7 +135,7 @@
 
 .edit-site-navigation-panel__template-item-customized-dot {
 	position: absolute;
-	right: $grid-unit-05;
+	right: 0;
 	top: 50%;
 	margin-top: -$grid-unit-05;
 	width: $grid-unit-10;
@@ -143,4 +143,5 @@
 	display: block;
 	background: var(--wp-admin-theme-color);
 	border-radius: 50%;
+	cursor: default;
 }
