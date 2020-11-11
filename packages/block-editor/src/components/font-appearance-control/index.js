@@ -13,13 +13,13 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 export default function FontAppearanceControl( props ) {
 	const {
-		disableFontStyles,
-		disableFontWeights,
 		onChange,
 		options: { fontStyles = [], fontWeights = [] },
 		value: { fontStyle, fontWeight },
 	} = props;
-	const hasStylesOrWeights = fontStyles.length > 0 || fontWeights.length > 0;
+	const hasStyles = !! fontStyles.length;
+	const hasWeights = !! fontWeights.length;
+	const hasStylesOrWeights = hasStyles || hasWeights;
 	const defaultOption = {
 		key: 'default',
 		name: __( 'Default' ),
@@ -81,17 +81,12 @@ export default function FontAppearanceControl( props ) {
 
 	// Map font styles and weights to select options.
 	const selectOptions = useMemo( () => {
-		if ( ! disableFontStyles && ! disableFontWeights ) {
+		if ( hasStyles && hasWeights ) {
 			return combineOptions();
 		}
 
-		return ! disableFontStyles ? styleOptions() : weightOptions();
+		return hasStyles ? styleOptions() : weightOptions();
 	}, [ props.options ] );
-
-	// Do not render control if both styles and weights were disabled.
-	if ( disableFontStyles && disableFontWeights ) {
-		return null;
-	}
 
 	// Find current selection by comparing font style & weight against options.
 	const currentSelection = selectOptions.find(
@@ -102,11 +97,11 @@ export default function FontAppearanceControl( props ) {
 
 	// Adjusts field label in case either styles or weights are disabled.
 	const getLabel = () => {
-		if ( disableFontStyles ) {
+		if ( ! hasStyles ) {
 			return __( 'Font weight' );
 		}
 
-		if ( disableFontWeights ) {
+		if ( ! hasWeights ) {
 			return __( 'Font style' );
 		}
 

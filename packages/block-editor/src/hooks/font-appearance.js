@@ -82,10 +82,11 @@ export function FontAppearanceEdit( props ) {
 
 	return (
 		<FontAppearanceControl
-			disableFontStyles={ isFontStyleDisabled }
-			disableFontWeights={ isFontWeightDisabled }
 			onChange={ onChange }
-			options={ { fontStyles, fontWeights } }
+			options={ {
+				fontStyles: isFontStyleDisabled ? undefined : fontStyles,
+				fontWeights: isFontWeightDisabled ? undefined : fontWeights,
+			} }
 			value={ { fontStyle, fontWeight } }
 		/>
 	);
