@@ -7,6 +7,7 @@
 ### Bug Fixes
 
 -   Fix TypeError for projects without a local Prettier configuration.
+-   Re-enable 'curly' rule, which prettier disables.
 
 ## 7.2.0 (2020-09-03)
 
