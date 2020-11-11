@@ -41,7 +41,9 @@ function getPromptMessageText( author ) {
  */
 async function firstTimeContributorAccountLink( payload, octokit ) {
 	if ( payload.ref !== 'refs/heads/master' ) {
-		debug( 'first-time-contributor: Commit is not to `master`. Aborting' );
+		debug(
+			'first-time-contributor-account-link: Commit is not to `master`. Aborting'
+		);
 		return;
 	}
 
@@ -50,7 +52,7 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 	const pullRequest = getAssociatedPullRequest( commit );
 	if ( ! pullRequest ) {
 		debug(
-			'first-time-contributor: Cannot determine pull request associated with commit. Aborting'
+			'first-time-contributor-account-link: Cannot determine pull request associated with commit. Aborting'
 		);
 		return;
 	}
@@ -60,7 +62,7 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 	const author = commit.author.username;
 
 	debug(
-		`first-time-contributor: Searching for commits in ${ owner }/${ repo } by @${ author }`
+		`first-time-contributor-account-link: Searching for commits in ${ owner }/${ repo } by @${ author }`
 	);
 
 	const { data: commits } = await octokit.repos.listCommits( {
@@ -71,13 +73,13 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 
 	if ( commits.length > 1 ) {
 		debug(
-			`first-time-contributor: Not the first commit for author. Aborting`
+			`first-time-contributor-account-link: Not the first commit for author. Aborting`
 		);
 		return;
 	}
 
 	debug(
-		`first-time-contributor: Checking for WordPress username associated with @${ author }`
+		`first-time-contributor-account-link: Checking for WordPress username associated with @${ author }`
 	);
 
 	let hasProfile;
@@ -85,20 +87,20 @@ async function firstTimeContributorAccountLink( payload, octokit ) {
 		hasProfile = await hasWordPressProfile( author );
 	} catch ( error ) {
 		debug(
-			`first-time-contributor: Error retrieving from profile API:\n\n${ error.toString() }`
+			`first-time-contributor-account-link: Error retrieving from profile API:\n\n${ error.toString() }`
 		);
 		return;
 	}
 
 	if ( hasProfile ) {
 		debug(
-			`first-time-contributor: User already known. No need to prompt for account link!`
+			`first-time-contributor-account-link: User already known. No need to prompt for account link!`
 		);
 		return;
 	}
 
 	debug(
-		'first-time-contributor: User not known. Adding comment to prompt for account link.'
+		'first-time-contributor-account-link: User not known. Adding comment to prompt for account link.'
 	);
 
 	await octokit.issues.createComment( {
