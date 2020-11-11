@@ -400,6 +400,18 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="isThemeInstalled" href="#isThemeInstalled">#</a> **isThemeInstalled**
+
+Checks whether a theme exists on the site.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug to check.
+
+_Returns_
+
+-   `boolean`: Whether the theme exists.
+
 <a name="loginUser" href="#loginUser">#</a> **loginUser**
 
 Performs log in with specified username and password.
@@ -585,18 +597,6 @@ running the test is not already the admin user).
 
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
-
-<a name="isThemeInstalled" href="#isThemeInstalled">#</a> **isThemeInstalled**
-
-Checks whether a theme exists on the site.
-
-_Parameters_
-
--   _slug_ `string`: Theme slug to check.
-
-_Returns_
-
--   `boolean`: Whether the theme exists.
 
 <a name="toggleMoreMenu" href="#toggleMoreMenu">#</a> **toggleMoreMenu**
 
