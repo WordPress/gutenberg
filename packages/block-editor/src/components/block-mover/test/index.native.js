@@ -9,12 +9,8 @@ import { shallow } from 'enzyme';
 import {
 	BlockMover,
 	BLOCK_MOVER_DIRECTION_TOP,
-	// BLOCK_MOVER_DIRECTION_BOTTOM,
+	BLOCK_MOVER_DIRECTION_BOTTOM,
 } from '../index';
-/**
- * WordPress dependencies
- */
-import { Picker, ToolbarButton } from '@wordpress/components';
 
 describe( 'Block Mover Picker', () => {
 	it( 'renders without crashing', () => {
@@ -54,18 +50,16 @@ describe( 'Block Mover Picker', () => {
 				isStackedHorizontally: true,
 			},
 		} );
-		console.log( wrapper.debug() );
-		console.log( wrapper.find( ToolbarButton ).first().debug() );
-		// jest.mock( wrapper.showBlockPageMover, () => {} );
-		// jest.mock(
-		// 	wrapper.blockPageMoverState,
-		// 	() => 'blockPageMoverOptions-moveToTop'
-		// );
+		jest.mock( wrapper.showBlockPageMover, () => {} );
+		jest.mock(
+			wrapper.blockPageMoverState,
+			() => 'blockPageMoverOptions-moveToTop'
+		);
 
-		// expect( wrapper.blockPageMoverOptions.length ).toEqual( 1 );
-		// expect( wrapper.blockPageMoverOptions[ 0 ].value ).toEqual(
-		// 	BLOCK_MOVER_DIRECTION_TOP
-		// );
+		expect( wrapper.blockPageMoverOptions.length ).toEqual( 1 );
+		expect( wrapper.blockPageMoverOptions[ 0 ].value ).toEqual(
+			BLOCK_MOVER_DIRECTION_TOP
+		);
 	} );
 
 	// it( 'moves block to first in list when pressing "Move to top"', () => {
