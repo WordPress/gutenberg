@@ -13,6 +13,7 @@ import {
 	useRef,
 } from '@wordpress/element';
 import { useThrottle } from '@wordpress/compose';
+import { getFilesFromDataTransfer } from '@wordpress/dom';
 
 export const Context = createContext();
 
@@ -20,13 +21,13 @@ const { Provider } = Context;
 
 function getDragEventType( { dataTransfer } ) {
 	if ( dataTransfer ) {
-		// Use lodash `includes` here as in the Edge browser `types` is implemented
-		// as a DomStringList, whereas in other browsers it's an array. `includes`
-		// happily works with both types.
-		if ( includes( dataTransfer.types, 'Files' ) ) {
+		if ( getFilesFromDataTransfer( dataTransfer ).size > 0 ) {
 			return 'file';
 		}
 
+		// Use lodash `includes` here as in the Edge browser `types` is implemented
+		// as a DomStringList, whereas in other browsers it's an array. `includes`
+		// happily works with both types.
 		if ( includes( dataTransfer.types, 'text/html' ) ) {
 			return 'html';
 		}
@@ -187,7 +188,7 @@ export default function DropZoneProvider( { children } ) {
 			switch ( dragEventType ) {
 				case 'file':
 					hoveredDropZone.onFilesDrop(
-						[ ...event.dataTransfer.files ],
+						[ ...getFilesFromDataTransfer( event.dataTransfer ) ],
 						position
 					);
 					break;
