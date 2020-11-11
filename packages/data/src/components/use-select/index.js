@@ -84,11 +84,19 @@ export default function useSelect( _mapSelect, deps = [] ) {
 	} );
 
 	const atomCreator = useMemo( () => {
-		return createDerivedAtom( ( get ) => {
-			return mapSelect.current( ( storeKey ) => {
-				return get( registry.getAtomSelectors( storeKey ) );
-			} );
-		} );
+		return createDerivedAtom(
+			( get ) => {
+				const current = registry.__unstableMutableResolverGet;
+				registry.__unstableMutableResolverGet = get;
+				const ret = mapSelect.current( ( storeKey ) => {
+					return get( registry.getAtomSelectors( storeKey ) );
+				} );
+				registry.__unstableMutableResolverGet = current;
+				return ret;
+			},
+			() => {},
+			'use-select'
+		);
 	}, [ registry, ...deps ] );
 
 	useLayoutEffect( () => {

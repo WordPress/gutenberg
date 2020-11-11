@@ -195,22 +195,32 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		} );
 	}
 
-	function getGenericSelectorsAtom( config ) {
-		const storeAtom = createStoreAtom( {
-			get() {
-				return null;
+	function getGenericSelectorsAtom( key, config ) {
+		const storeAtom = createStoreAtom(
+			{
+				get() {
+					return null;
+				},
+				subscribe: config.subscribe,
 			},
-			subscribe: config.subscribe,
-		} );
-		return createDerivedAtom( ( get ) => {
-			get( storeAtom );
-			if ( ! config.getAtomSelectors ) {
-				return config.getSelectors();
-			}
-			return mapValues( config.getAtomSelectors(), ( atomSelector ) => {
-				return ( ...args ) => atomSelector( get )( ...args );
-			} );
-		} );
+			key
+		);
+		return createDerivedAtom(
+			( get ) => {
+				get( storeAtom );
+				if ( ! config.getAtomSelectors ) {
+					return config.getSelectors();
+				}
+				return mapValues(
+					config.getAtomSelectors(),
+					( atomSelector ) => {
+						return ( ...args ) => atomSelector( get )( ...args );
+					}
+				);
+			},
+			() => {},
+			'selectors--' + key
+		);
 	}
 
 	/**
@@ -230,7 +240,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			throw new TypeError( 'config.subscribe must be a function' );
 		}
 		stores[ key ] = config;
-		selectorsAtom[ key ] = getGenericSelectorsAtom( config );
+		selectorsAtom[ key ] = getGenericSelectorsAtom( key, config );
 		config.subscribe( globalListener );
 	}
 

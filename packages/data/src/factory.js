@@ -36,6 +36,12 @@
  * @return {Function} Registry selector that can be registered with a store.
  */
 export function createRegistrySelector( registrySelector ) {
+	// create a selector function that is bound to the registry referenced by `selector.__ustableGetSelect`
+	// and that has the same API as a regular selector. Binding it in such a way makes it
+	// possible to call the selector directly from another selector.
+	const selector = ( ...args ) =>
+		registrySelector( selector.__ustableGetSelect() )( ...args );
+
 	/**
 	 * Flag indicating that the selector is a registry selector that needs the correct registry
 	 * reference to be assigned to `selecto.registry` to make it work correctly.
@@ -43,9 +49,9 @@ export function createRegistrySelector( registrySelector ) {
 	 *
 	 * @type {boolean}
 	 */
-	registrySelector.isRegistrySelector = true;
+	selector.isRegistrySelector = true;
 
-	return registrySelector;
+	return selector;
 }
 
 /**

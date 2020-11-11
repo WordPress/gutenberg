@@ -75,36 +75,50 @@ export default function createReduxStore( key, options ) {
 				store
 			);
 
-			// Inject state into selectors
-			const selectorsWithState = {
-				...mapValues(
-					metadataSelectors,
-					( selector ) => ( ...args ) => {
-						return selector(
-							store.__unstableOriginalGetState().metadata,
-							...args
-						);
-					}
-				),
-				...mapValues( options.selectors, ( selector ) => {
-					let mappedSelector;
+			const __ustableGetSelect = () => {
+				return ( storeKey ) => {
+					return ! registry.__unstableMutableResolverGet
+						? registry.select( storeKey )
+						: registry.__unstableMutableResolverGet(
+								registry.getAtomSelectors( storeKey )
+						  );
+				};
+			};
+
+			// Inject registry into selectors
+			// It is important that this injection happens first because __ustableGetSelect
+			// is injected using a mutation of the original selector function.
+			const selectorsWithRegistry = mapValues(
+				options.selectors,
+				( selector ) => {
 					if ( selector.isRegistrySelector ) {
-						mappedSelector = ( select ) => ( ...args ) =>
-							selector( select )(
-								store.__unstableOriginalGetState().root,
-								...args
-							);
-					} else {
-						mappedSelector = ( ...args ) =>
-							selector(
-								store.__unstableOriginalGetState().root,
-								...args
-							);
+						selector.__ustableGetSelect = __ustableGetSelect;
 					}
-					mappedSelector.isRegistrySelector =
-						selector.isRegistrySelector;
-					return mappedSelector;
-				} ),
+					return selector;
+				}
+			);
+
+			// Inject state into selectors
+			const injectState = ( getState, selector ) => {
+				const mappedSelector = ( ...args ) =>
+					selector( getState(), ...args );
+				mappedSelector.__unstableRegistrySelector =
+					selector.__unstableRegistrySelector;
+				return mappedSelector;
+			};
+			const selectorsWithState = {
+				...mapValues( metadataSelectors, ( selector ) =>
+					injectState(
+						() => store.__unstableOriginalGetState().metadata,
+						selector
+					)
+				),
+				...mapValues( selectorsWithRegistry, ( selector ) =>
+					injectState(
+						() => store.__unstableOriginalGetState().root,
+						selector
+					)
+				),
 			};
 
 			// Normalize resolvers
@@ -120,7 +134,7 @@ export default function createReduxStore( key, options ) {
 			} );
 
 			// Inject resolvers fullfilment call into selectors.
-			const selectorsWithResolvers = mapValues(
+			const selectors = mapValues(
 				selectorsWithState,
 				( selector, selectorName ) => {
 					const resolver = resolvers[ selectorName ];
@@ -176,56 +190,28 @@ export default function createReduxStore( key, options ) {
 						} );
 					}
 
-					let mappedSelector;
-					if ( selector.isRegistrySelector ) {
-						mappedSelector = ( select ) => ( ...args ) => {
-							fulfillSelector( args );
-							return selector( select )( ...args );
-						};
-					} else {
-						mappedSelector = ( ...args ) => {
-							fulfillSelector( args );
-							return selector( ...args );
-						};
-					}
+					const mappedSelector = ( ...args ) => {
+						fulfillSelector( args );
+						return selector( ...args );
+					};
+					mappedSelector.__unstableRegistrySelector =
+						selector.__unstableRegistrySelector;
 					mappedSelector.hasResolver = true;
-					mappedSelector.isRegistrySelector =
-						selector.isRegistrySelector;
 
 					return mappedSelector;
 				}
 			);
 
-			// Inject registry into selectors
-			const selectors = mapValues(
-				selectorsWithResolvers,
-				( selector ) => {
-					const selectorWithRegistry = ( ...args ) => {
-						return selector.isRegistrySelector
-							? selector( registry.select )( ...args )
-							: selector( ...args );
-					};
-					selectorWithRegistry.hasResolver = selector.hasResolver;
-					return selectorWithRegistry;
-				}
-			);
-
 			// Atom selectors
-			const atomSelectors = mapValues(
-				selectorsWithResolvers,
-				( selector ) => {
-					return ( getAtomValue ) => ( ...args ) => {
-						if ( selector.isRegistrySelector ) {
-							return selector( ( storeKey ) => {
-								return getAtomValue(
-									registry.getAtomSelectors( storeKey )
-								);
-							} )( ...args );
-						}
-						return selector( ...args );
-					};
-				}
-			);
+			const atomSelectors = mapValues( selectors, ( selector ) => {
+				return ( getAtomValue ) => ( ...args ) => {
+					const current = registry.__unstableMutableResolverGet;
+					registry.__unstableMutableResolverGet = getAtomValue;
+					const result = selector( ...args );
+					registry.__unstableMutableResolverGet = current;
+					return result;
+				};
+			} );
 
 			const getSelectors = () => selectors;
 			const getActions = () => actions;

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isFunction, noop } from 'lodash';
+import { noop } from 'lodash';
 
 export const createAtomRegistry = ( {
 	onAdd = noop,
@@ -11,10 +11,6 @@ export const createAtomRegistry = ( {
 
 	return {
 		getAtom( atomCreator ) {
-			if ( ! atomCreator ) {
-				debugger;
-			}
-
 			if ( ! atoms.get( atomCreator ) ) {
 				const atom = atomCreator( this );
 				atoms.set( atomCreator, atom );
@@ -35,11 +31,12 @@ export const createAtomRegistry = ( {
 	};
 };
 
-export const createAtom = ( initialValue ) => () => {
+export const createAtom = ( initialValue, id ) => () => {
 	let value = initialValue;
 	let listeners = [];
 
 	return {
+		id,
 		type: 'root',
 		set( newValue ) {
 			value = newValue;
@@ -60,8 +57,9 @@ export const createAtom = ( initialValue ) => () => {
 	};
 };
 
-export const createStoreAtom = ( { get, subscribe } ) => () => {
+export const createStoreAtom = ( { get, subscribe }, id ) => () => {
 	return {
+		id,
 		type: 'store',
 		get() {
 			return get();

@@ -53,7 +53,7 @@ export const registerShortcut = ( get, set, atomRegistry ) => ( config ) => {
 	} else {
 		atomRegistry.deleteAtom( existingAtom );
 	}
-	const newAtomCreator = createAtom( config );
+	const newAtomCreator = createAtom( config, 'shortcuts-one-' + config.name );
 	// This registers the atom in the registry (we might want a dedicated function?)
 	atomRegistry.getAtom( newAtomCreator );
 	set( shortcutsByNameAtom, {

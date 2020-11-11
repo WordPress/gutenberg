@@ -3,8 +3,8 @@
  */
 import { createAtom, createDerivedAtom } from '@wordpress/data';
 
-export const shortcutsByNameAtom = createAtom( {} );
-export const shortcutNamesAtom = createAtom( [] );
+export const shortcutsByNameAtom = createAtom( {}, 'shortcuts-by-name' );
+export const shortcutNamesAtom = createAtom( [], 'shortcut-names' );
 export const shortcutsAtom = createDerivedAtom(
 	( get ) => {
 		const shortcutsByName = get( shortcutsByNameAtom );
