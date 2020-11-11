@@ -1,18 +1,13 @@
 /**
  * External dependencies
  */
-import { useDarkModeContext, eventEmitter } from 'react-native-dark-mode';
-
-// Conditional needed to pass UI Tests on CI
-if ( eventEmitter.setMaxListeners ) {
-	eventEmitter.setMaxListeners( 150 );
-}
+import { useColorScheme } from 'react-native';
 
 /**
  * Returns the color scheme value when it changes. Possible values: [ 'light', 'dark' ]
  *
  * @return {string} return current color scheme.
  */
-const usePreferredColorScheme = useDarkModeContext;
+const usePreferredColorScheme = useColorScheme;
 
 export default usePreferredColorScheme;

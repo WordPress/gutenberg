@@ -8,7 +8,7 @@ import { View } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { Component, Fragment } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { PanelBody } from '@wordpress/components';
 
@@ -64,14 +64,13 @@ export default class Picker extends Component {
 				hideHeader
 			>
 				<PanelBody title={ title } style={ styles.panelBody }>
-					{ options.map( ( option, index ) => (
-						<>
+					{ options.map( ( option ) => (
+						<Fragment key={ option.value }>
 							{ options.length > 1 && option.separated && (
 								<Separator />
 							) }
 							<BottomSheet.Cell
 								icon={ option.icon }
-								key={ index }
 								leftAlign={ leftAlign }
 								label={ option.label }
 								separatorType={ 'none' }
@@ -81,7 +80,7 @@ export default class Picker extends Component {
 								disabled={ option.disabled }
 								style={ option.disabled && styles.disabled }
 							/>
-						</>
+						</Fragment>
 					) ) }
 					{ ! hideCancelButton && (
 						<BottomSheet.Cell

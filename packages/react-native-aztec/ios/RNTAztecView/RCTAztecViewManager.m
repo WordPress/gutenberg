@@ -32,5 +32,8 @@ RCT_EXPORT_VIEW_PROPERTY(disableEditingMenu, BOOL)
 RCT_REMAP_VIEW_PROPERTY(textAlign, textAlignment, NSTextAlignment)
 RCT_REMAP_VIEW_PROPERTY(selectionColor, tintColor, UIColor)
 
+RCT_EXTERN_METHOD(focus:(nonnull NSNumber *)viewTag)
+RCT_EXTERN_METHOD(blur:(nonnull NSNumber *)viewTag)
+
 
 @end

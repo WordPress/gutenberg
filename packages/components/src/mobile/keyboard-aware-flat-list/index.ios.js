@@ -29,7 +29,7 @@ export const KeyboardAwareFlatList = ( {
 		extraHeight={ 0 }
 		inputAccessoryViewHeight={ inputAccessoryViewHeight }
 		enableAutomaticScroll={ autoScroll === undefined ? false : autoScroll }
-		innerRef={ ( ref ) => {
+		ref={ ( ref ) => {
 			this.scrollViewRef = ref;
 			innerRef( ref );
 		} }
@@ -45,7 +45,7 @@ export const KeyboardAwareFlatList = ( {
 				) {
 					// Reset the content position if keyboard is still closed
 					if ( this.scrollViewRef ) {
-						this.scrollViewRef.props.scrollToPosition(
+						this.scrollViewRef.scrollToPosition(
 							0,
 							this.latestContentOffsetY,
 							true
@@ -74,7 +74,7 @@ KeyboardAwareFlatList.handleCaretVerticalPositionChange = (
 ) => {
 	if ( previousCaretY ) {
 		//if this is not the first tap
-		scrollView.props.refreshScrollForField( targetId );
+		scrollView.refreshScrollForField( targetId );
 	}
 };
 
