@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
@@ -44,8 +49,13 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 
 	const isLargeViewport = useViewportMatch( 'large' );
 
+	const classes = classnames( {
+		'edit-post-header': true,
+		'has-reduced-ui': hasReducedUI,
+	} );
+
 	return (
-		<div className="edit-post-header">
+		<div className={ classes }>
 			<MainDashboardButton.Slot>
 				<FullscreenModeClose />
 			</MainDashboardButton.Slot>
@@ -53,7 +63,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				<HeaderToolbar />
 			</div>
 			<div className="edit-post-header__settings">
-				{ ! hasReducedUI && (
+				{
 					<>
 						{ ! isPublishSidebarOpened && (
 							// This button isn't completely hidden by the publish sidebar.
@@ -73,7 +83,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 							forcePreviewLink={ isSaving ? null : undefined }
 						/>
 					</>
-				) }
+				}
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
