@@ -79,13 +79,13 @@ const style = `
 	html,
 	body,
 	body > div,
-	body > div > iframe {
+	body > div iframe {
 		width: 100%;
 	}
 	html.wp-has-aspect-ratio,
 	body.wp-has-aspect-ratio,
 	body.wp-has-aspect-ratio > div,
-	body.wp-has-aspect-ratio > div > iframe {
+	body.wp-has-aspect-ratio > div iframe {
 		height: 100%;
 		overflow: hidden; /* If it has an aspect ratio, it shouldn't scroll. */
 	}
