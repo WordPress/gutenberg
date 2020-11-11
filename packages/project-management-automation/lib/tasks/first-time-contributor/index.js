@@ -4,6 +4,7 @@
 const debug = require( '../../debug' );
 const getAssociatedPullRequest = require( '../../get-associated-pull-request' );
 const hasWordPressProfile = require( '../../has-wordpress-profile' );
+const getAuthorCommitCount = require( '../../get-author-commit-count' );
 
 /** @typedef {import('@actions/github').GitHub} GitHub */
 /** @typedef {import('@octokit/webhooks').WebhookPayloadPush} WebhookPayloadPush */
@@ -33,10 +34,8 @@ function getPromptMessageText( author ) {
 }
 
 /**
- * Adds the 'First Time Contributor' label to PRs merged on behalf of
- * contributors that have not yet made a commit, and prompts the user to link
- * their GitHub account to their WordPress.org profile if neccessary for props
- * credit.
+ * Prompts the user to link their GitHub account to their WordPress.org profile
+ * if neccessary for props credit.
  *
  * @param {WebhookPayloadPush} payload Push event payload.
  * @param {GitHub}             octokit Initialized Octokit REST client.
@@ -60,33 +59,26 @@ async function firstTimeContributor( payload, octokit ) {
 	const repo = payload.repository.name;
 	const owner = payload.repository.owner.login;
 	const author = commit.author.username;
+
 	debug(
 		`first-time-contributor: Searching for commits in ${ owner }/${ repo } by @${ author }`
 	);
 
-	const { data: commits } = await octokit.repos.listCommits( {
-		owner,
-		repo,
-		author,
-	} );
+	const commitCount = await getAuthorCommitCount(
+		{
+			owner,
+			repo,
+			author,
+		},
+		octokit
+	);
 
-	if ( commits.length > 1 ) {
+	if ( commitCount > 1 ) {
 		debug(
 			`first-time-contributor: Not the first commit for author. Aborting`
 		);
 		return;
 	}
-
-	debug(
-		`first-time-contributor: Adding 'First Time Contributor' label to issue #${ pullRequest }`
-	);
-
-	await octokit.issues.addLabels( {
-		owner,
-		repo,
-		issue_number: pullRequest,
-		labels: [ 'First-time Contributor' ],
-	} );
 
 	debug(
 		`first-time-contributor: Checking for WordPress username associated with @${ author }`

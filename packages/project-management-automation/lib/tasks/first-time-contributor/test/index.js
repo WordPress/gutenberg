@@ -88,51 +88,16 @@ describe( 'firstTimeContributor', () => {
 				),
 			},
 			issues: {
-				addLabels: jest.fn(),
-			},
-		};
-
-		await firstTimeContributor( payload, octokit );
-
-		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			author: 'ghost',
-		} );
-		expect( octokit.issues.addLabels ).not.toHaveBeenCalled();
-	} );
-
-	it( 'adds the label if this was the first commit for the user', async () => {
-		const octokit = {
-			repos: {
-				listCommits: jest.fn( () =>
-					Promise.resolve( {
-						data: [
-							{ sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241' },
-						],
-					} )
-				),
-			},
-			issues: {
-				addLabels: jest.fn(),
 				createComment: jest.fn(),
 			},
 		};
 
-		hasWordPressProfile.mockReturnValue( Promise.resolve( true ) );
-
 		await firstTimeContributor( payload, octokit );
 
 		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			author: 'ghost',
-		} );
-		expect( octokit.issues.addLabels ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			issue_number: 123,
-			labels: [ 'First-time Contributor' ],
 		} );
 		expect( octokit.issues.createComment ).not.toHaveBeenCalled();
 	} );
@@ -149,7 +114,6 @@ describe( 'firstTimeContributor', () => {
 				),
 			},
 			issues: {
-				addLabels: jest.fn(),
 				createComment: jest.fn(),
 			},
 		};
@@ -164,12 +128,6 @@ describe( 'firstTimeContributor', () => {
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			author: 'ghost',
-		} );
-		expect( octokit.issues.addLabels ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			issue_number: 123,
-			labels: [ 'First-time Contributor' ],
 		} );
 		expect( octokit.issues.createComment ).not.toHaveBeenCalled();
 	} );
@@ -186,7 +144,6 @@ describe( 'firstTimeContributor', () => {
 				),
 			},
 			issues: {
-				addLabels: jest.fn(),
 				createComment: jest.fn(),
 			},
 		};
@@ -199,12 +156,6 @@ describe( 'firstTimeContributor', () => {
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			author: 'ghost',
-		} );
-		expect( octokit.issues.addLabels ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			issue_number: 123,
-			labels: [ 'First-time Contributor' ],
 		} );
 		expect( octokit.issues.createComment ).toHaveBeenCalledWith( {
 			owner: 'WordPress',

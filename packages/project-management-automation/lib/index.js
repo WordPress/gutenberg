@@ -9,6 +9,7 @@ const { context, GitHub } = require( '@actions/github' );
  */
 const assignFixedIssues = require( './tasks/assign-fixed-issues' );
 const firstTimeContributor = require( './tasks/first-time-contributor' );
+const firstTimeContributorLabel = require( './tasks/first-time-contributor-label' );
 const addMilestone = require( './tasks/add-milestone' );
 const debug = require( './debug' );
 const ifNotFork = require( './if-not-fork' );
@@ -40,6 +41,11 @@ const automations = [
 		event: 'pull_request',
 		action: 'opened',
 		task: ifNotFork( assignFixedIssues ),
+	},
+	{
+		event: 'pull_request_target',
+		action: 'opened',
+		task: firstTimeContributorLabel,
 	},
 	{
 		event: 'push',
