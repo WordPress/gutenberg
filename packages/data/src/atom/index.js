@@ -3,6 +3,13 @@
  */
 import { noop, isObject, isFunction } from 'lodash';
 
+/**
+ * WordPress dependencies
+ */
+import { createQueue } from '@wordpress/priority-queue';
+
+const resolveQueue = createQueue();
+
 function isPromise( obj ) {
 	return isObject( obj ) && isFunction( obj?.then );
 }
@@ -82,12 +89,14 @@ export const createStoreAtom = ( { get, subscribe }, id ) => () => {
 export const createDerivedAtom = (
 	getCallback,
 	modifierCallback = noop,
+	isAsync = false,
 	id
 ) => ( registry ) => {
 	let value = null;
 	let listeners = [];
 	let isListening = false;
 	let isResolved = false;
+	const context = {};
 
 	const dependenciesUnsubscribeMap = new WeakMap();
 	let dependencies = [];
@@ -98,7 +107,11 @@ export const createDerivedAtom = (
 
 	const refresh = () => {
 		if ( listeners.length ) {
-			resolve();
+			if ( isAsync ) {
+				resolveQueue.add( context, resolve );
+			} else {
+				resolve();
+			}
 		} else {
 			isListening = false;
 		}

@@ -252,6 +252,7 @@ describe( 'controls', () => {
 					return ret;
 				},
 				() => {},
+				false,
 				'test-atom'
 			);
 		};

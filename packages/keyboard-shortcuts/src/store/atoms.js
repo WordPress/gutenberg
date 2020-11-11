@@ -13,5 +13,6 @@ export const shortcutsAtom = createDerivedAtom(
 		);
 	},
 	() => {},
+	false,
 	'shortcuts'
 );

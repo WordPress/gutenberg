@@ -1,14 +1,8 @@
 /**
- * External dependencies
- */
-import { useMemoOne } from 'use-memo-one';
-
-/**
  * WordPress dependencies
  */
 import { useLayoutEffect, useRef, useState, useMemo } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
-import { createQueue } from '@wordpress/priority-queue';
 
 /**
  * Internal dependencies
@@ -16,8 +10,6 @@ import { createQueue } from '@wordpress/priority-queue';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
 import useRegistry from '../registry-provider/use-registry';
 import { createDerivedAtom } from '../../atom';
-
-const renderQueue = createQueue();
 
 /**
  * Custom react hook for retrieving props from registered selectors.
@@ -62,26 +54,17 @@ const renderQueue = createQueue();
  */
 export default function useSelect( _mapSelect, deps = [] ) {
 	const registry = useRegistry();
-	const isAsyncValue = useAsyncMode();
+	const isAsync = useAsyncMode();
 	const initialResult = _mapSelect( registry.select );
 	const [ , dispatch ] = useState( {} );
 	const rerender = () => dispatch( {} );
 	const result = useRef( initialResult );
 	const isMountedAndNotUnsubscribing = useRef( true );
-	// React can sometimes clear the `useMemo` cache.
-	// We use the cache-stable `useMemoOne` to avoid
-	// losing queues.
-	const queueContext = useMemoOne( () => ( { queue: true } ), [ registry ] );
 
-	const isAsync = useRef( isAsyncValue );
 	const mapSelect = useRef( _mapSelect );
 	useLayoutEffect( () => {
 		mapSelect.current = _mapSelect;
 		isMountedAndNotUnsubscribing.current = true;
-		if ( isAsync.current !== isAsync ) {
-			isAsync.current = isAsync;
-			renderQueue.flush( queueContext );
-		}
 	} );
 
 	const atomCreator = useMemo( () => {
@@ -93,9 +76,10 @@ export default function useSelect( _mapSelect, deps = [] ) {
 				registry.__unstableSetAtomResolver( current );
 				return ret;
 			},
-			() => {}
+			() => {},
+			isAsync
 		);
-	}, [ registry, ...deps ] );
+	}, [ isAsync, registry, ...deps ] );
 
 	useLayoutEffect( () => {
 		const atom = atomCreator( registry.atomRegistry );
@@ -110,18 +94,11 @@ export default function useSelect( _mapSelect, deps = [] ) {
 			}
 		};
 
-		const unsubscribe = atom.subscribe( () => {
-			if ( isAsync.current ) {
-				renderQueue.add( queueContext, onStoreChange );
-			} else {
-				onStoreChange();
-			}
-		} );
+		const unsubscribe = atom.subscribe( onStoreChange );
 
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;
 			unsubscribe();
-			renderQueue.flush( queueContext );
 		};
 	}, [ atomCreator ] );
 
