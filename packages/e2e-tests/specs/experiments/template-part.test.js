@@ -113,9 +113,7 @@ describe( 'Template Part', () => {
 			expect( console ).toHaveWarnedWith(
 				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
 			);
-		} );
 
-		it( 'Should preview newly added template part', async () => {
 			await createNewPost();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
@@ -125,10 +123,7 @@ describe( 'Template Part', () => {
 			await chooseExistingButton.click();
 			const preview = await page.waitForXPath( testContentSelector );
 			expect( preview ).toBeTruthy();
-		} );
 
-		it( 'Should insert template part when preview is selected', async () => {
-			const [ preview ] = await page.$x( testContentSelector );
 			await preview.click();
 			await page.waitForSelector( activatedTemplatePartSelector );
 			const templatePartContent = await page.waitForXPath(
