@@ -183,12 +183,7 @@ class WP_Theme_JSON {
 			'path'          => array( 'settings', 'typography', 'fontFamilies' ),
 			'value_key'     => 'fontFamily',
 			'css_var_infix' => 'font-family',
-			'classes'       => array(
-				array(
-					'class_suffix'  => 'font-family',
-					'property_name' => 'font-family',
-				),
-			),
+			'classes'       => array(),
 		),
 		array(
 			'path'          => array( 'settings', 'typography', 'fontStyles' ),
