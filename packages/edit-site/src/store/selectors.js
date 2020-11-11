@@ -191,9 +191,7 @@ export function getDefaultTemplateTypes( state ) {
  * @return {Object} The template type.
  */
 export function getDefaultTemplateType( state, slug ) {
-	// Slugs are strings, but numeric template types are encoded as numbers in JS.
-	const parsedSlug = ! isNaN( Number( slug ) ) ? Number( slug ) : slug;
-	return find( getDefaultTemplateTypes( state ), { slug: parsedSlug } ) || {};
+	return find( getDefaultTemplateTypes( state ), { slug } ) || {};
 }
 
 /**

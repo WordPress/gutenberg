@@ -110,7 +110,7 @@ function gutenberg_get_indexed_default_template_types() {
 	$indexed_template_types = array();
 	$default_template_types = gutenberg_get_default_template_types();
 	foreach ( $default_template_types as $slug => $template_type ) {
-		$template_type['slug']    = $slug;
+		$template_type['slug']    = (string) $slug;
 		$indexed_template_types[] = $template_type;
 	}
 	return $indexed_template_types;

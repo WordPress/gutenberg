@@ -28,7 +28,7 @@ describe( 'selectors', () => {
 		{
 			title: '404 (Not Found)',
 			description: 'Applied when content cannot be found',
-			slug: 404,
+			slug: '404',
 		},
 	];
 	const canUser = jest.fn( () => true );
@@ -226,11 +226,11 @@ describe( 'selectors', () => {
 			} );
 		} );
 
-		it( 'returns the requested default template type even when the slug is numeric with mismatched types', () => {
+		it( 'returns the requested default template type even when the slug is numeric', () => {
 			expect( getDefaultTemplateType( state, '404' ) ).toEqual( {
 				title: '404 (Not Found)',
 				description: 'Applied when content cannot be found',
-				slug: 404,
+				slug: '404',
 			} );
 		} );
 	} );
