@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { View } from 'react-native';
+import { findIndex } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,7 +21,9 @@ import styles from './editor.scss';
 function GroupEdit( {
 	attributes,
 	hasInnerBlocks,
+	isInnerBlockSelected,
 	isSelected,
+	isLastInnerBlock,
 	getStylesFromColorScheme,
 	mergedStyle,
 } ) {
@@ -67,9 +70,16 @@ function GroupEdit( {
 					styles.fullWidth,
 				mergedStyle,
 				isSelected &&
+					hasInnerBlocks &&
 					mergedStyle?.backgroundColor && {
 						paddingBottom:
 							styles.hasBackgroundAppender.paddingBottom,
+					},
+				hasInnerBlocks &&
+					isInnerBlockSelected &&
+					isLastInnerBlock &&
+					mergedStyle?.backgroundColor && {
+						paddingBottom: 0,
 					},
 			] }
 		>
@@ -80,12 +90,33 @@ function GroupEdit( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlock } = select( 'core/block-editor' );
+		const {
+			getBlock,
+			hasSelectedInnerBlock,
+			getSelectedBlockClientId,
+		} = select( 'core/block-editor' );
 
 		const block = getBlock( clientId );
+		const hasInnerBlocks = !! ( block && block.innerBlocks.length );
+		const isInnerBlockSelected =
+			hasInnerBlocks && hasSelectedInnerBlock( clientId );
+		let isLastInnerBlock = hasInnerBlocks;
+
+		if ( hasInnerBlocks && isInnerBlockSelected ) {
+			const { innerBlocks } = block;
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const totalInnerBlocks = innerBlocks.length - 1;
+			const selectedInnerBlockIndex = findIndex(
+				innerBlocks,
+				( innerBlock ) => innerBlock.clientId === selectedBlockClientId
+			);
+			isLastInnerBlock = totalInnerBlocks === selectedInnerBlockIndex;
+		}
 
 		return {
-			hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+			hasInnerBlocks,
+			isInnerBlockSelected,
+			isLastInnerBlock,
 		};
 	} ),
 	withPreferredColorScheme,
