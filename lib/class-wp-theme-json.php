@@ -471,7 +471,7 @@ class WP_Theme_JSON {
 	 * @param array  $input Whole tree to normalize.
 	 * @param array  $schema Schema to use for normalization.
 	 */
-	private function process_key( $key, &$input, $schema ) {
+	private static function process_key( $key, &$input, $schema ) {
 		if ( ! is_array( $input ) || ! array_key_exists( $key, $input ) ) {
 			return;
 		}
@@ -503,7 +503,7 @@ class WP_Theme_JSON {
 	 *
 	 * @return array|null The settings subtree.
 	 */
-	private function extract_settings( $context ) {
+	private static function extract_settings( $context ) {
 		if (
 			! array_key_exists( 'settings', $context ) ||
 			empty( $context['settings'] )
@@ -550,7 +550,7 @@ class WP_Theme_JSON {
 	 *
 	 * @return array The flattened tree.
 	 */
-	private function flatten_tree( $tree, $prefix = '', $token = '--' ) {
+	private static function flatten_tree( $tree, $prefix = '', $token = '--' ) {
 		$result = array();
 		foreach ( $tree as $property => $value ) {
 			$new_key = $prefix . str_replace(
@@ -563,7 +563,7 @@ class WP_Theme_JSON {
 				$new_prefix = $new_key . $token;
 				$result     = array_merge(
 					$result,
-					$this->flatten_tree( $value, $new_prefix, $token )
+					self::flatten_tree( $value, $new_prefix, $token )
 				);
 			} else {
 				$result[ $new_key ] = $value;
@@ -581,7 +581,7 @@ class WP_Theme_JSON {
 	 *
 	 * @return array Data at the given $path or $default.
 	 */
-	private function get_from_path( $array, $path, $default = array() ) {
+	private static function get_from_path( $array, $path, $default = array() ) {
 		if ( ! is_array( $array ) || ! is_array( $path ) ) {
 			return $default;
 		}
@@ -608,8 +608,8 @@ class WP_Theme_JSON {
 	 *
 	 * @return string Style property value.
 	 */
-	private function get_property_value( $styles, $path ) {
-		$value = $this->get_from_path( $styles, $path, '' );
+	private static function get_property_value( $styles, $path ) {
+		$value = self::get_from_path( $styles, $path, '' );
 
 		if ( '' === $value ) {
 			return $value;
@@ -647,7 +647,7 @@ class WP_Theme_JSON {
 	 * @param array $declarations Holds the existing declarations.
 	 * @param array $context Input context to process.
 	 */
-	private function compute_style_properties( &$declarations, $context ) {
+	private static function compute_style_properties( &$declarations, $context ) {
 		if (
 			! array_key_exists( 'supports', $context ) ||
 			empty( $context['supports'] ) ||
@@ -662,7 +662,7 @@ class WP_Theme_JSON {
 				continue;
 			}
 
-			$value = $this->get_property_value( $context['styles'], $metadata['theme_json'] );
+			$value = self::get_property_value( $context['styles'], $metadata['theme_json'] );
 			if ( ! empty( $value ) ) {
 				$kebabcased_name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $name ) );
 				$declarations[] = array(
@@ -682,7 +682,7 @@ class WP_Theme_JSON {
 	 * @param string $stylesheet Input stylesheet to add the presets to.
 	 * @param array  $context Context to process.
 	 */
-	private function compute_preset_classes( &$stylesheet, $context ) {
+	private static function compute_preset_classes( &$stylesheet, $context ) {
 		$selector = $context['selector'];
 		if ( self::GLOBAL_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
@@ -691,10 +691,10 @@ class WP_Theme_JSON {
 		}
 
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = $this->get_from_path( $context, $preset['path'], array() );
+			$values = self::get_from_path( $context, $preset['path'], array() );
 			foreach ( $values as $value ) {
 				foreach ( $preset['classes'] as $class ) {
-					$stylesheet .= $this->to_ruleset(
+					$stylesheet .= self::to_ruleset(
 						$selector . '.has-' . $value['slug'] . '-' . $class['class_suffix'],
 						array(
 							array(
@@ -725,9 +725,9 @@ class WP_Theme_JSON {
 	 * @param array $declarations Holds the existing declarations.
 	 * @param array $context Input context to process.
 	 */
-	private function compute_preset_vars( &$declarations, $context ) {
+	private static function compute_preset_vars( &$declarations, $context ) {
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = $this->get_from_path( $context, $preset['path'], array() );
+			$values = self::get_from_path( $context, $preset['path'], array() );
 			foreach ( $values as $value ) {
 				$declarations[] = array(
 					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . $value['slug'],
@@ -754,9 +754,9 @@ class WP_Theme_JSON {
 	 * @param array $declarations Holds the existing declarations.
 	 * @param array $context Input context to process.
 	 */
-	private function compute_theme_vars( &$declarations, $context ) {
-		$custom_values = $this->get_from_path( $context, array( 'settings', 'custom' ) );
-		$css_vars      = $this->flatten_tree( $custom_values );
+	private static function compute_theme_vars( &$declarations, $context ) {
+		$custom_values = self::get_from_path( $context, array( 'settings', 'custom' ) );
+		$css_vars      = self::flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
 			$declarations[] = array(
 				'name'  => '--wp--custom--' . $key,
@@ -777,7 +777,7 @@ class WP_Theme_JSON {
 	 *
 	 * @return string CSS ruleset.
 	 */
-	private function to_ruleset( $selector, $declarations ) {
+	private static function to_ruleset( $selector, $declarations ) {
 		$ruleset = '';
 
 		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
@@ -839,7 +839,7 @@ class WP_Theme_JSON {
 	 *
 	 * @return string The new stylesheet.
 	 */
-	private function to_stylesheet( $stylesheet, $context ) {
+	private static function to_stylesheet( $stylesheet, $context ) {
 		if (
 			! array_key_exists( 'selector', $context ) ||
 			empty( $context['selector'] )
@@ -848,9 +848,9 @@ class WP_Theme_JSON {
 		}
 
 		$declarations = array();
-		$this->compute_style_properties( $declarations, $context );
-		$this->compute_preset_vars( $declarations, $context );
-		$this->compute_theme_vars( $declarations, $context );
+		self::compute_style_properties( $declarations, $context );
+		self::compute_preset_vars( $declarations, $context );
+		self::compute_theme_vars( $declarations, $context );
 
 		// If there are no declarations at this point,
 		// it won't have any preset classes either,
@@ -860,10 +860,10 @@ class WP_Theme_JSON {
 		}
 
 		// Attach the ruleset for style and custom properties.
-		$stylesheet .= $this->to_ruleset( $context['selector'], $declarations );
+		$stylesheet .= self::to_ruleset( $context['selector'], $declarations );
 
 		// Attach the rulesets for the classes.
-		$this->compute_preset_classes( $stylesheet, $context );
+		self::compute_preset_classes( $stylesheet, $context );
 
 		return $stylesheet;
 	}
