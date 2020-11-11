@@ -586,7 +586,7 @@ running the test is not already the admin user).
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
 
-<a name="themeInstalled" href="#themeInstalled">#</a> **themeInstalled**
+<a name="isThemeInstalled" href="#isThemeInstalled">#</a> **isThemeInstalled**
 
 Checks whether a theme exists on the site.
 

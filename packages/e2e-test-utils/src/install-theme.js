@@ -4,7 +4,7 @@
 import { switchUserToAdmin } from './switch-user-to-admin';
 import { switchUserToTest } from './switch-user-to-test';
 import { visitAdminPage } from './visit-admin-page';
-import { themeInstalled } from './theme-installed';
+import { isThemeInstalled } from './theme-installed';
 
 /**
  * Installs a theme from the WP.org repository.
@@ -15,7 +15,7 @@ import { themeInstalled } from './theme-installed';
 export async function installTheme( slug, searchTerm ) {
 	await switchUserToAdmin();
 
-	const installed = await themeInstalled( slug );
+	const installed = await isThemeInstalled( slug );
 	if ( installed ) {
 		return;
 	}

@@ -6,7 +6,7 @@ import { installTheme } from './install-theme';
 import { switchUserToAdmin } from './switch-user-to-admin';
 import { switchUserToTest } from './switch-user-to-test';
 import { visitAdminPage } from './visit-admin-page';
-import { themeInstalled } from './theme-installed';
+import { isThemeInstalled } from './theme-installed';
 
 /**
  * Deletes a theme from the site, activating another theme if necessary.
@@ -25,7 +25,7 @@ export async function deleteTheme( slug, newThemeSlug, newThemeSearchTerm ) {
 		await visitAdminPage( 'themes.php' );
 	}
 
-	if ( ! ( await themeInstalled( slug ) ) ) {
+	if ( ! ( await isThemeInstalled( slug ) ) ) {
 		await switchUserToTest();
 		return;
 	}

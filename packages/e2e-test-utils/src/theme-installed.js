@@ -11,7 +11,7 @@ import { switchUserToTest } from './switch-user-to-test';
  * @param {string} slug Theme slug to check.
  * @return {boolean} Whether the theme exists.
  */
-export async function themeInstalled( slug ) {
+export async function isThemeInstalled( slug ) {
 	await switchUserToAdmin();
 	await visitAdminPage( 'themes.php' );
 
