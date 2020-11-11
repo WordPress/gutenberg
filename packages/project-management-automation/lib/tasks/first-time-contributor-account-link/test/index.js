@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import firstTimeContributor from '../';
+import firstTimeContributorAccountLink from '../';
 import hasWordPressProfile from '../../../has-wordpress-profile';
 
 jest.mock( '../../../has-wordpress-profile', () => jest.fn() );
 
-describe( 'firstTimeContributor', () => {
+describe( 'firstTimeContributorAccountLink', () => {
 	beforeEach( () => {
 		hasWordPressProfile.mockReset();
 	} );
@@ -44,7 +44,7 @@ describe( 'firstTimeContributor', () => {
 			},
 		};
 
-		await firstTimeContributor( payloadForBranchPush, octokit );
+		await firstTimeContributorAccountLink( payloadForBranchPush, octokit );
 
 		expect( octokit.repos.listCommits ).not.toHaveBeenCalled();
 	} );
@@ -70,7 +70,7 @@ describe( 'firstTimeContributor', () => {
 			},
 		};
 
-		await firstTimeContributor( payloadDirectToMaster, octokit );
+		await firstTimeContributorAccountLink( payloadDirectToMaster, octokit );
 
 		expect( octokit.repos.listCommits ).not.toHaveBeenCalled();
 	} );
@@ -88,51 +88,16 @@ describe( 'firstTimeContributor', () => {
 				),
 			},
 			issues: {
-				addLabels: jest.fn(),
-			},
-		};
-
-		await firstTimeContributor( payload, octokit );
-
-		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			author: 'ghost',
-		} );
-		expect( octokit.issues.addLabels ).not.toHaveBeenCalled();
-	} );
-
-	it( 'adds the label if this was the first commit for the user', async () => {
-		const octokit = {
-			repos: {
-				listCommits: jest.fn( () =>
-					Promise.resolve( {
-						data: [
-							{ sha: '4c535288a6a2b75ff23ee96c75f7d9877e919241' },
-						],
-					} )
-				),
-			},
-			issues: {
-				addLabels: jest.fn(),
 				createComment: jest.fn(),
 			},
 		};
 
-		hasWordPressProfile.mockReturnValue( Promise.resolve( true ) );
-
-		await firstTimeContributor( payload, octokit );
+		await firstTimeContributorAccountLink( payload, octokit );
 
 		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			author: 'ghost',
-		} );
-		expect( octokit.issues.addLabels ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			issue_number: 123,
-			labels: [ 'First-time Contributor' ],
 		} );
 		expect( octokit.issues.createComment ).not.toHaveBeenCalled();
 	} );
@@ -149,7 +114,6 @@ describe( 'firstTimeContributor', () => {
 				),
 			},
 			issues: {
-				addLabels: jest.fn(),
 				createComment: jest.fn(),
 			},
 		};
@@ -158,18 +122,12 @@ describe( 'firstTimeContributor', () => {
 			return Promise.reject( new Error( 'Whoops!' ) );
 		} );
 
-		await firstTimeContributor( payload, octokit );
+		await firstTimeContributorAccountLink( payload, octokit );
 
 		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			author: 'ghost',
-		} );
-		expect( octokit.issues.addLabels ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			issue_number: 123,
-			labels: [ 'First-time Contributor' ],
 		} );
 		expect( octokit.issues.createComment ).not.toHaveBeenCalled();
 	} );
@@ -186,25 +144,18 @@ describe( 'firstTimeContributor', () => {
 				),
 			},
 			issues: {
-				addLabels: jest.fn(),
 				createComment: jest.fn(),
 			},
 		};
 
 		hasWordPressProfile.mockReturnValue( Promise.resolve( false ) );
 
-		await firstTimeContributor( payload, octokit );
+		await firstTimeContributorAccountLink( payload, octokit );
 
 		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
 			repo: 'gutenberg',
 			author: 'ghost',
-		} );
-		expect( octokit.issues.addLabels ).toHaveBeenCalledWith( {
-			owner: 'WordPress',
-			repo: 'gutenberg',
-			issue_number: 123,
-			labels: [ 'First-time Contributor' ],
 		} );
 		expect( octokit.issues.createComment ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
