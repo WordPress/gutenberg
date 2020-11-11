@@ -924,12 +924,6 @@
 		"parent": "components"
 	},
 	{
-		"title": "FocusableIframe",
-		"slug": "focusable-iframe",
-		"markdown_source": "../packages/components/src/focusable-iframe/README.md",
-		"parent": "components"
-	},
-	{
 		"title": "FontSizePicker",
 		"slug": "font-size-picker",
 		"markdown_source": "../packages/components/src/font-size-picker/README.md",

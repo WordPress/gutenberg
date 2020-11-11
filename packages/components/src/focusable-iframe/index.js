@@ -1,42 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
+import { useFocusableIframe } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 
-export default function FocusableIframe( { iframeRef, onFocus, ...props } ) {
+export default function FocusableIframe( { iframeRef, ...props } ) {
 	const fallbackRef = useRef();
 	const ref = iframeRef || fallbackRef;
 
-	useEffect( () => {
-		const iframe = ref.current;
-		const { ownerDocument } = iframe;
-		const { defaultView } = ownerDocument;
-		const { FocusEvent } = defaultView;
-
-		/**
-		 * Checks whether the iframe is the activeElement, inferring that it has
-		 * then received focus, and calls the `onFocus` prop callback.
-		 */
-		function checkFocus() {
-			if ( ownerDocument.activeElement !== iframe ) {
-				return;
-			}
-
-			const focusEvent = new FocusEvent( 'focus', { bubbles: true } );
-
-			iframe.dispatchEvent( focusEvent );
-
-			if ( onFocus ) {
-				onFocus( focusEvent );
-			}
-		}
-
-		defaultView.addEventListener( 'blur', checkFocus );
-
-		return () => {
-			defaultView.removeEventListener( 'blur', checkFocus );
-		};
-	}, [ onFocus ] );
+	useFocusableIframe( iframeRef || fallbackRef );
+	deprecated( 'wp.components.FocusableIframe', {
+		alternative: 'wp.compose.useFocusableIframe',
+	} );
 
 	// Disable reason: The rendered iframe is a pass-through component,
 	// assigning props inherited from the rendering parent. It's the

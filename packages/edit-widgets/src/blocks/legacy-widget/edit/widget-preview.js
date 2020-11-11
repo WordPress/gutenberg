@@ -7,8 +7,9 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
-import { Disabled, FocusableIframe } from '@wordpress/components';
+import { Disabled } from '@wordpress/components';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 function WidgetPreview( { widgetAreaId, attributes, hidden, ...props } ) {
 	const DEFAULT_HEIGHT = 300;
@@ -43,7 +44,8 @@ function WidgetPreview( { widgetAreaId, attributes, hidden, ...props } ) {
 
 	return (
 		<Disabled hidden={ hidden }>
-			<FocusableIframe
+			<iframe
+				title={ __( 'Widget preview' ) }
 				onLoad={ () => {
 					resetIframeHeight();
 				} }
