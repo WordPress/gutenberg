@@ -12,7 +12,6 @@ const firstTimeContributorAccountLink = require( './tasks/first-time-contributor
 const firstTimeContributorLabel = require( './tasks/first-time-contributor-label' );
 const addMilestone = require( './tasks/add-milestone' );
 const debug = require( './debug' );
-const ifNotFork = require( './if-not-fork' );
 
 /** @typedef {import('@actions/github').GitHub} GitHub */
 
@@ -38,9 +37,9 @@ const ifNotFork = require( './if-not-fork' );
  */
 const automations = [
 	{
-		event: 'pull_request',
+		event: 'pull_request_target',
 		action: 'opened',
-		task: ifNotFork( assignFixedIssues ),
+		task: assignFixedIssues,
 	},
 	{
 		event: 'pull_request_target',
