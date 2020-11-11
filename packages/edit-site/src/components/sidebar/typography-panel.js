@@ -7,11 +7,12 @@ import {
 } from '@wordpress/block-editor';
 import { PanelBody, FontSizePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { useEditorFeature } from '../editor/utils';
+import { useEditorFeature, getValueFromVariable } from '../editor/utils';
 
 export function useHasTypographyPanel( { supports, name } ) {
 	return (
@@ -29,9 +30,12 @@ function useHasLineHeightControl( { supports, name } ) {
 
 export default function TypographyPanel( {
 	context: { supports, name },
-	getMergedStyleProperty,
+	getStyleProperty,
 	setStyleProperty,
 } ) {
+	const features = useSelect( ( select ) => {
+		return select( 'core/edit-site' ).getSettings().__experimentalFeatures;
+	} );
 	const fontSizes = useEditorFeature( 'typography.fontSizes', name );
 	const disableCustomFontSizes = ! useEditorFeature(
 		'typography.customFontSize',
@@ -40,12 +44,18 @@ export default function TypographyPanel( {
 	const fontFamilies = useEditorFeature( 'typography.fontFamilies', name );
 	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
 
+	const fontFamily = getStyleProperty( name, 'fontFamily' );
+	const fontSize = getStyleProperty( name, 'fontSize' );
+	const lineHeight = getStyleProperty( name, 'lineHeight' );
 	return (
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
 			{ supports.includes( 'fontFamily' ) && (
 				<FontFamilyControl
 					fontFamilies={ fontFamilies }
-					value={ getMergedStyleProperty( name, 'fontFamily' ) }
+					value={
+						getValueFromVariable( features, name, fontFamily ) ||
+						fontFamily
+					}
 					onChange={ ( value ) =>
 						setStyleProperty( name, 'fontFamily', value )
 					}
@@ -53,7 +63,10 @@ export default function TypographyPanel( {
 			) }
 			{ supports.includes( 'fontSize' ) && (
 				<FontSizePicker
-					value={ getMergedStyleProperty( name, 'fontSize' ) }
+					value={
+						getValueFromVariable( features, name, fontSize ) ||
+						fontSize
+					}
 					onChange={ ( value ) =>
 						setStyleProperty( name, 'fontSize', value )
 					}
@@ -63,7 +76,10 @@ export default function TypographyPanel( {
 			) }
 			{ hasLineHeightEnabled && (
 				<LineHeightControl
-					value={ getMergedStyleProperty( name, 'lineHeight' ) }
+					value={
+						getValueFromVariable( features, name, lineHeight ) ||
+						lineHeight
+					}
 					onChange={ ( value ) =>
 						setStyleProperty( name, 'lineHeight', value )
 					}

@@ -3,6 +3,7 @@
  */
 import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	LINK_COLOR,
 	useEditorFeature,
-	getPresetValueFromVariable,
+	getValueFromVariable,
 	getPresetVariable,
 } from '../editor/utils';
 import ColorPalettePanel from './color-palette-panel';
@@ -27,11 +28,13 @@ export function useHasColorPanel( { supports } ) {
 export default function ColorPanel( {
 	context: { supports, name },
 	getStyleProperty,
-	getMergedStyleProperty,
 	setStyleProperty,
 	getSetting,
 	setSetting,
 } ) {
+	const features = useSelect( ( select ) => {
+		return select( 'core/edit-site' ).getSettings().__experimentalFeatures;
+	} );
 	const colors = useEditorFeature( 'color.palette', name );
 	const disableCustomColors = ! useEditorFeature( 'color.custom', name );
 	const gradients = useEditorFeature( 'color.gradients', name );
@@ -43,11 +46,10 @@ export default function ColorPanel( {
 	const settings = [];
 
 	if ( supports.includes( 'color' ) ) {
-		const color = getMergedStyleProperty( name, 'color' );
-		const userColor = getStyleProperty( name, 'color' );
+		const color = getStyleProperty( name, 'color' );
+		const userColor = getStyleProperty( name, 'color', 'user' );
 		settings.push( {
-			colorValue:
-				getPresetValueFromVariable( 'color', colors, color ) || color,
+			colorValue: getValueFromVariable( features, name, color ) || color,
 			onColorChange: ( value ) =>
 				setStyleProperty(
 					name,
@@ -61,18 +63,16 @@ export default function ColorPanel( {
 
 	let backgroundSettings = {};
 	if ( supports.includes( 'backgroundColor' ) ) {
-		const backgroundColor = getMergedStyleProperty(
+		const backgroundColor = getStyleProperty( name, 'backgroundColor' );
+		const userBackgroundColor = getStyleProperty(
 			name,
-			'backgroundColor'
+			'backgroundColor',
+			'user'
 		);
-		const userBackgroundColor = getStyleProperty( name, 'backgroundColor' );
 		backgroundSettings = {
 			colorValue:
-				getPresetValueFromVariable(
-					'color',
-					colors,
-					backgroundColor
-				) || backgroundColor,
+				getValueFromVariable( features, name, backgroundColor ) ||
+				backgroundColor,
 			onColorChange: ( value ) =>
 				setStyleProperty(
 					name,
@@ -88,12 +88,11 @@ export default function ColorPanel( {
 
 	let gradientSettings = {};
 	if ( supports.includes( 'background' ) ) {
-		const gradient = getMergedStyleProperty( name, 'background' );
-		const userGradient = getStyleProperty( name, 'background' );
+		const gradient = getStyleProperty( name, 'background' );
+		const userGradient = getStyleProperty( name, 'background', 'user' );
 		gradientSettings = {
 			gradientValue:
-				getPresetValueFromVariable( 'gradient', gradients, gradient ) ||
-				gradient,
+				getValueFromVariable( features, name, gradient ) || gradient,
 			onGradientChange: ( value ) =>
 				setStyleProperty(
 					name,
@@ -118,11 +117,10 @@ export default function ColorPanel( {
 	}
 
 	if ( supports.includes( LINK_COLOR ) ) {
-		const color = getMergedStyleProperty( name, LINK_COLOR );
-		const userColor = getStyleProperty( name, LINK_COLOR );
+		const color = getStyleProperty( name, LINK_COLOR );
+		const userColor = getStyleProperty( name, LINK_COLOR, 'user' );
 		settings.push( {
-			colorValue:
-				getPresetValueFromVariable( 'color', colors, color ) || color,
+			colorValue: getValueFromVariable( features, name, color ) || color,
 			onColorChange: ( value ) =>
 				setStyleProperty(
 					name,

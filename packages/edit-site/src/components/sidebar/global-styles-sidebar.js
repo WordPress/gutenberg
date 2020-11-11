@@ -29,7 +29,6 @@ function GlobalStylesPanel( {
 	hasWrapper = true,
 	context,
 	getStyleProperty,
-	getMergedStyleProperty,
 	setStyleProperty,
 	getSetting,
 	setSetting,
@@ -47,14 +46,12 @@ function GlobalStylesPanel( {
 				<TypographyPanel
 					context={ context }
 					getStyleProperty={ getStyleProperty }
-					getMergedStyleProperty={ getMergedStyleProperty }
 					setStyleProperty={ setStyleProperty }
 				/>
 			) }
 			{ hasColorPanel && (
 				<ColorPanel
 					context={ context }
-					getMergedStyleProperty={ getMergedStyleProperty }
 					getStyleProperty={ getStyleProperty }
 					setStyleProperty={ setStyleProperty }
 					getSetting={ getSetting }
@@ -105,7 +102,6 @@ export default function GlobalStylesSidebar( {
 } ) {
 	const {
 		contexts,
-		getMergedStyleProperty,
 		getStyleProperty,
 		setStyleProperty,
 		getSetting,
@@ -158,9 +154,6 @@ export default function GlobalStylesSidebar( {
 									key={ 'panel-' + name }
 									context={ { ...context, name } }
 									getStyleProperty={ getStyleProperty }
-									getMergedStyleProperty={
-										getMergedStyleProperty
-									}
 									setStyleProperty={ setStyleProperty }
 									getSetting={ getSetting }
 									setSetting={ setSetting }
@@ -176,7 +169,6 @@ export default function GlobalStylesSidebar( {
 								name: GLOBAL_CONTEXT,
 							} }
 							getStyleProperty={ getStyleProperty }
-							getMergedStyleProperty={ getMergedStyleProperty }
 							setStyleProperty={ setStyleProperty }
 							getSetting={ getSetting }
 							setSetting={ setSetting }
