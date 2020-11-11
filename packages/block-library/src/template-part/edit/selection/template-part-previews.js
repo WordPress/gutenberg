@@ -69,6 +69,9 @@ function TemplatePartItem( {
 			} }
 			tabIndex={ 0 }
 			aria-label={ templatePart.slug }
+			// The block list that is nested in this item may contain button
+			// elements.
+			as="div"
 			{ ...composite }
 		>
 			<BlockPreview blocks={ blocks } />
