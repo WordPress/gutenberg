@@ -84,3 +84,45 @@ export function removeNotice( id ) {
 		id,
 	};
 }
+
+/**
+ * Returns an action object to create a block insertion event.
+ *
+ * @param {Object} clientId The client id of the block.
+ *
+ * @return {Object} Action object.
+ */
+export function createBlockInsertionEvent( clientId ) {
+	return {
+		type: 'CREATE_BLOCK_INSERTION_EVENT',
+		clientId,
+	};
+}
+
+/**
+ * Returns an action object to remove a block insertion event by client id.
+ *
+ * @param {Object} clientId The id of the block to remove.
+ *
+ * @return {Object} Action object.
+ */
+export function removeBlockInsertionEvent( clientId ) {
+	return {
+		type: 'REMOVE_BLOCK_INSERTION_EVENT',
+		clientId,
+	};
+}
+
+/**
+ * Returns an action object to get a block insertion event by client id.
+ *
+ * @param {Object} clientId The id of the block to remove.
+ *
+ * @return {Object} Action object.
+ */
+export function getBlockInsertionEvent( clientId ) {
+	return {
+		type: 'GET_BLOCK_INSERTION_EVENT',
+		clientId,
+	};
+}
