@@ -52,6 +52,12 @@ function gutenberg_get_common_block_editor_settings() {
 
 	$font_sizes = current( (array) get_theme_support( 'editor-font-sizes' ) );
 	if ( false !== $font_sizes ) {
+		// Back-compatibility for presets without units.
+		foreach ( $font_sizes as &$font_size ) {
+			if ( is_numeric( $font_size['size'] ) ) {
+				$font_size['size'] = $font_size['size'] . 'px';
+			}
+		}
 		$settings['fontSizes'] = $font_sizes;
 	}
 
