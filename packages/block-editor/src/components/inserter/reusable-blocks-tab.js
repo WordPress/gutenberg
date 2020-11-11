@@ -67,6 +67,11 @@ function ReusableBlocksList( {
 				items={ filteredItems }
 				onSelect={ onSelectItem }
 				onHover={ onHover }
+				label={
+					filterValue
+						? __( 'Search Results' )
+						: __( 'Reusable blocks' )
+				}
 			/>
 		</InserterPanel>
 	);

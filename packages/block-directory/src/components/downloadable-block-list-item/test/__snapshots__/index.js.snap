@@ -12,6 +12,8 @@ exports[`DownloadableBlockListItem should render a block item 1`] = `
     >
       <DownloadableBlockHeader
         icon="block-default"
+        isInstallable={true}
+        isLoading={false}
         onClick={[MockFunction]}
         rating={5}
         title="Boxer"

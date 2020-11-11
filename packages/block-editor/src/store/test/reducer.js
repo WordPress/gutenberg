@@ -21,6 +21,7 @@ import {
 	isUpdatingSameBlockAttribute,
 	blocks,
 	isTyping,
+	draggedBlocks,
 	isCaretWithinFormattedText,
 	selectionStart,
 	selectionEnd,
@@ -29,6 +30,7 @@ import {
 	preferences,
 	blocksMode,
 	insertionPoint,
+	insertionPointVisibility,
 	template,
 	blockListSettings,
 	lastBlockAttributesChange,
@@ -2014,35 +2016,82 @@ describe( 'state', () => {
 	} );
 
 	describe( 'insertionPoint', () => {
-		it( 'should default to null', () => {
+		it( 'defaults to `null`', () => {
 			const state = insertionPoint( undefined, {} );
 
-			expect( state ).toBe( null );
+			expect( state ).toEqual( null );
 		} );
 
-		it( 'should set insertion point', () => {
-			const state = insertionPoint( null, {
-				type: 'SHOW_INSERTION_POINT',
-				rootClientId: 'clientId1',
-				index: 0,
-			} );
+		it.each( [ 'SET_INSERTION_POINT', 'SHOW_INSERTION_POINT' ] )(
+			'sets the insertion point on %s',
+			( type ) => {
+				const original = deepFreeze( {
+					rootClientId: 'clientId1',
+					index: 0,
+				} );
 
-			expect( state ).toEqual( {
-				rootClientId: 'clientId1',
-				index: 0,
-			} );
-		} );
+				const expectedNewState = {
+					rootClientId: 'clientId2',
+					index: 1,
+				};
 
-		it( 'should clear the insertion point', () => {
+				const state = insertionPoint( original, {
+					type,
+					...expectedNewState,
+				} );
+
+				expect( state ).toEqual( expectedNewState );
+			}
+		);
+
+		it.each( [
+			'CLEAR_SELECTED_BLOCK',
+			'SELECT_BLOCK',
+			'REPLACE_INNER_BLOCKS',
+			'INSERT_BLOCKS',
+			'REMOVE_BLOCKS',
+			'REPLACE_BLOCKS',
+		] )( 'resets the insertion point to `null` on %s', ( type ) => {
 			const original = deepFreeze( {
 				rootClientId: 'clientId1',
 				index: 0,
 			} );
 			const state = insertionPoint( original, {
-				type: 'HIDE_INSERTION_POINT',
+				type,
 			} );
 
-			expect( state ).toBe( null );
+			expect( state ).toEqual( null );
+		} );
+	} );
+
+	describe( 'insertionPointVisibility', () => {
+		it( 'defaults to `false`', () => {
+			const state = insertionPointVisibility( undefined, {} );
+			expect( state ).toBe( false );
+		} );
+
+		it( 'shows the insertion point', () => {
+			const state = insertionPointVisibility( false, {
+				type: 'SHOW_INSERTION_POINT',
+			} );
+
+			expect( state ).toBe( true );
+		} );
+
+		it.each( [
+			'HIDE_INSERTION_POINT',
+			'CLEAR_SELECTED_BLOCK',
+			'SELECT_BLOCK',
+			'REPLACE_INNER_BLOCKS',
+			'INSERT_BLOCKS',
+			'REMOVE_BLOCKS',
+			'REPLACE_BLOCKS',
+		] )( 'sets the insertion point on %s to `false`', ( type ) => {
+			const state = insertionPointVisibility( true, {
+				type,
+			} );
+
+			expect( state ).toBe( false );
 		} );
 	} );
 
@@ -2061,6 +2110,27 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( false );
+		} );
+	} );
+
+	describe( 'draggedBlocks', () => {
+		it( 'should store the dragged client ids when a user starts dragging blocks', () => {
+			const clientIds = [ 'block-1', 'block-2', 'block-3' ];
+			const state = draggedBlocks( [], {
+				type: 'START_DRAGGING_BLOCKS',
+				clientIds,
+			} );
+
+			expect( state ).toBe( clientIds );
+		} );
+
+		it( 'should set the state to an empty array when a user stops dragging blocks', () => {
+			const previousState = [ 'block-1', 'block-2', 'block-3' ];
+			const state = draggedBlocks( previousState, {
+				type: 'STOP_DRAGGING_BLOCKS',
+			} );
+
+			expect( state ).toEqual( [] );
 		} );
 	} );
 
@@ -2404,7 +2474,7 @@ describe( 'state', () => {
 				blocks: [
 					{
 						clientId: 'bacon',
-						name: 'core-embed/twitter',
+						name: 'core/embed',
 					},
 				],
 				time: 123456,
@@ -2412,10 +2482,10 @@ describe( 'state', () => {
 
 			expect( state ).toEqual( {
 				insertUsage: {
-					'core-embed/twitter': {
+					'core/embed': {
 						time: 123456,
 						count: 1,
-						insert: { name: 'core-embed/twitter' },
+						insert: { name: 'core/embed' },
 					},
 				},
 			} );
@@ -2423,10 +2493,10 @@ describe( 'state', () => {
 			const twoRecentBlocks = preferences(
 				deepFreeze( {
 					insertUsage: {
-						'core-embed/twitter': {
+						'core/embed': {
 							time: 123456,
 							count: 1,
-							insert: { name: 'core-embed/twitter' },
+							insert: { name: 'core/embed' },
 						},
 					},
 				} ),
@@ -2435,7 +2505,7 @@ describe( 'state', () => {
 					blocks: [
 						{
 							clientId: 'eggs',
-							name: 'core-embed/twitter',
+							name: 'core/embed',
 						},
 						{
 							clientId: 'bacon',
@@ -2449,10 +2519,10 @@ describe( 'state', () => {
 
 			expect( twoRecentBlocks ).toEqual( {
 				insertUsage: {
-					'core-embed/twitter': {
+					'core/embed': {
 						time: 123457,
 						count: 2,
-						insert: { name: 'core-embed/twitter' },
+						insert: { name: 'core/embed' },
 					},
 					'core/block/123': {
 						time: 123457,

@@ -54,7 +54,8 @@ Clicks a block toolbar button.
 
 _Parameters_
 
--   _buttonAriaLabel_ `string`: The aria label of the button to click.
+-   _label_ `string`: The text string of the button label.
+-   _type_ `[string]`: The type of button label: 'ariaLabel' or 'content'.
 
 <a name="clickButton" href="#clickButton">#</a> **clickButton**
 
@@ -63,6 +64,14 @@ Clicks a button based on the text on the button.
 _Parameters_
 
 -   _buttonText_ `string`: The text that appears on the button to click.
+
+<a name="clickMenuItem" href="#clickMenuItem">#</a> **clickMenuItem**
+
+Searches for an item in the menu with the text provided and clicks it.
+
+_Parameters_
+
+-   _label_ `string`: The label to search the menu item for.
 
 <a name="clickOnCloseModalButton" href="#clickOnCloseModalButton">#</a> **clickOnCloseModalButton**
 
@@ -271,6 +280,14 @@ _Returns_
 
 -   `Promise`: Promise resolving with a string containing the block title.
 
+<a name="getCurrentPostContent" href="#getCurrentPostContent">#</a> **getCurrentPostContent**
+
+Returns a promise which resolves with the current post content (HTML string).
+
+_Returns_
+
+-   `Promise`: Promise resolving with current post content markup.
+
 <a name="getEditedPostContent" href="#getEditedPostContent">#</a> **getEditedPostContent**
 
 Returns a promise which resolves with the edited post content (HTML string).
@@ -306,6 +323,16 @@ _Returns_
 
 Opens the inserter, searches for the given term, then selects the first
 result that appears. It then waits briefly for the block list to update.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
+<a name="insertBlockDirectoryBlock" href="#insertBlockDirectoryBlock">#</a> **insertBlockDirectoryBlock**
+
+Opens the inserter, searches for the given block, then selects the
+first result that appears from the block directory. It then waits briefly for the block list to
+update.
 
 _Parameters_
 

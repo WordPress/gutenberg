@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	clickMenuItem,
 	createNewPost,
 	insertBlock,
 	getEditedPostContent,
@@ -24,10 +25,7 @@ describe( 'Duplicating blocks', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 
 		await clickBlockToolbarButton( 'More options' );
-		const duplicateButton = await page.waitForXPath(
-			'//button[text()="Duplicate"]'
-		);
-		await duplicateButton.click();
+		await clickMenuItem( 'Duplicate' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

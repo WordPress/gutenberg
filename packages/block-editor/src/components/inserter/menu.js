@@ -26,12 +26,18 @@ function InserterMenu( {
 	clientId,
 	isAppender,
 	__experimentalSelectBlockOnInsert,
+	__experimentalInsertionIndex,
 	onSelect,
 	showInserterHelpPanel,
 	showMostUsedBlocks,
 } ) {
+	const [ activeTab, setActiveTab ] = useState( 'blocks' );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
+	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
+		null
+	);
+
 	const [
 		destinationRootClientId,
 		onInsertBlocks,
@@ -41,6 +47,7 @@ function InserterMenu( {
 		clientId,
 		isAppender,
 		selectBlockOnInsert: __experimentalSelectBlockOnInsert,
+		insertionIndex: __experimentalInsertionIndex,
 	} );
 	const { hasPatterns, hasReusableBlocks } = useSelect( ( select ) => {
 		const {
@@ -72,9 +79,18 @@ function InserterMenu( {
 		onSelect();
 	};
 
+	const onInsertPattern = ( blocks, patternName ) => {
+		onInsertBlocks( blocks, { patternName } );
+		onSelect();
+	};
+
 	const onHover = ( item ) => {
 		onToggleInsertionPoint( !! item );
 		setHoveredItem( item );
+	};
+
+	const onClickPatternCategory = ( patternCategory ) => {
+		setSelectedPatternCategory( patternCategory );
 	};
 
 	const blocksTab = (
@@ -100,7 +116,12 @@ function InserterMenu( {
 	);
 
 	const patternsTab = (
-		<BlockPatternsTabs onInsert={ onInsert } filterValue={ filterValue } />
+		<BlockPatternsTabs
+			onInsert={ onInsertPattern }
+			filterValue={ filterValue }
+			onClickCategory={ onClickPatternCategory }
+			selectedCategory={ selectedPatternCategory }
+		/>
 	);
 
 	const reusableBlocksTab = (
@@ -111,6 +132,18 @@ function InserterMenu( {
 			filterValue={ filterValue }
 		/>
 	);
+
+	const searchFormPlaceholder = () => {
+		if ( activeTab === 'reusable' ) {
+			return __( 'Search for a reusable block' );
+		}
+
+		if ( activeTab === 'patterns' ) {
+			return __( 'Search for a pattern' );
+		}
+
+		return __( 'Search for a block' );
+	};
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 	// is always visible, and one which already incurs this behavior of autoFocus via
@@ -128,13 +161,18 @@ function InserterMenu( {
 				{ /* the following div is necessary to fix the sticky position of the search form */ }
 				<div className="block-editor-inserter__content">
 					<InserterSearchForm
-						onChange={ setFilterValue }
+						onChange={ ( value ) => {
+							if ( hoveredItem ) setHoveredItem( null );
+							setFilterValue( value );
+						} }
 						value={ filterValue }
+						placeholder={ searchFormPlaceholder() }
 					/>
 					{ ( showPatterns || hasReusableBlocks ) && (
 						<InserterTabs
 							showPatterns={ showPatterns }
 							showReusableBlocks={ hasReusableBlocks }
+							onSelect={ setActiveTab }
 						>
 							{ ( tab ) => {
 								if ( tab.name === 'blocks' ) {
@@ -150,9 +188,7 @@ function InserterMenu( {
 				</div>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (
-				<div className="block-editor-inserter__preview-container">
-					<InserterPreviewPanel item={ hoveredItem } />
-				</div>
+				<InserterPreviewPanel item={ hoveredItem } />
 			) }
 		</div>
 	);

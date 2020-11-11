@@ -5,6 +5,7 @@ export { clearLocalStorage } from './clear-local-storage';
 export { clickBlockAppender } from './click-block-appender';
 export { clickBlockToolbarButton } from './click-block-toolbar-button';
 export { clickButton } from './click-button';
+export { clickMenuItem } from './click-menu-item';
 export { clickOnCloseModalButton } from './click-on-close-modal-button';
 export { clickOnMoreMenuItem } from './click-on-more-menu-item';
 export { createNewPost } from './create-new-post';
@@ -23,6 +24,7 @@ export { getAllBlocks } from './get-all-blocks';
 export { getAvailableBlockTransforms } from './get-available-block-transforms';
 export { getBlockSetting } from './get-block-setting';
 export { getEditedPostContent } from './get-edited-post-content';
+export { getCurrentPostContent } from './get-current-post-content';
 export { hasBlockSwitcher } from './has-block-switcher';
 export { getPageError } from './get-page-error';
 export {
@@ -32,6 +34,7 @@ export {
 	searchForBlock,
 	searchForPattern,
 	searchForReusableBlock,
+	insertBlockDirectoryBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
 } from './inserter';

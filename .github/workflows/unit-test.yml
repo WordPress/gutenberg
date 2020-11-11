@@ -2,8 +2,12 @@ name: Unit Tests
 
 on:
   pull_request:
+    paths-ignore:
+    - '**.md'
   push:
     branches: [master]
+    paths-ignore:
+    - '**.md'
 
 jobs:
   unit-js:
@@ -27,10 +31,10 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
-    - name: Use Node.js 12.x
+    - name: Use Node.js 14.x
       uses: actions/setup-node@v1
       with:
-        node-version: 12.x
+        node-version: 14.x
 
     - name: Npm install and build
       # It's not necessary to run the full build, since Jest can interpret
@@ -64,10 +68,10 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
-    - name: Use Node.js 12.x
+    - name: Use Node.js 14.x
       uses: actions/setup-node@v1
       with:
-        node-version: 12.x
+        node-version: 14.x
 
     - name: Npm install and build
       run: |
@@ -76,7 +80,6 @@ jobs:
 
     - name: Install WordPress
       run: |
-        echo '{ "config": { "SCRIPT_DEBUG": false, "WP_PHP_BINARY": "php", "WP_TESTS_EMAIL": "admin@example.org", "WP_TESTS_TITLE": "Test Blog" } }' > .wp-env.override.json
         chmod -R 767 ./ # TODO: Possibly integrate in wp-env
         npm run wp-env start
 
@@ -104,10 +107,10 @@ jobs:
           ${{ runner.os }}-build-
           ${{ runner.os }}-
 
-    - name: Use Node.js 12.x
+    - name: Use Node.js 14.x
       uses: actions/setup-node@v1
       with:
-        node-version: 12.x
+        node-version: 14.x
 
     - name: Npm install and build
       # It's not necessary to run the full build, since Jest can interpret

@@ -2,7 +2,7 @@
 	flex-shrink: 0;
 }
 .edit-post-layout__metaboxes:not(:empty) {
-	border-top: $border-width solid $gray-200;
+	border-top: $border-width solid $gray-300;
 	padding: 10px 0 10px;
 	clear: both;
 
@@ -35,7 +35,7 @@
 		top: $admin-bar-height;
 		left: auto;
 		width: $sidebar-width + $border-width;
-		border-left: $border-width solid $gray-200;
+		border-left: $border-width solid $gray-300;
 		transform: translateX(+100%);
 		animation: edit-post-post-publish-panel__slide-in-animation 0.1s forwards;
 		@include reduce-motion("animation");
@@ -59,6 +59,7 @@
 
 .interface-interface-skeleton__sidebar > div {
 	height: 100%;
+	padding-bottom: $grid-unit-60;
 }
 
 .edit-post-layout .editor-post-publish-panel__header-publish-button {
@@ -77,14 +78,12 @@
 	right: 0;
 	width: $sidebar-width;
 	background-color: $white;
-	border: 1px dotted $gray-200;
+	border: 1px dotted $gray-300;
 	height: auto !important; // Need to override the default sidebar positionnings
 	padding: $grid-unit-30;
 	display: flex;
 	justify-content: center;
 
-	.interface-interface-skeleton__actions:focus &,
-	.interface-interface-skeleton__actions:focus-within &,
 	.interface-interface-skeleton__actions:focus &,
 	.interface-interface-skeleton__actions:focus-within & {
 		top: auto;
@@ -92,23 +91,19 @@
 	}
 }
 
-.edit-post-layout__footer {
-	display: none;
-	z-index: z-index(".edit-post-layout__footer");
-
-	// Stretch to mimic outline padding on desktop.
-	@include break-medium() {
-		display: flex;
-		background: $white;
-		height: $footer-height;
-		align-items: center;
-		font-size: $default-font-size;
-		padding: 0 ($grid-unit-15 + 6px);
-	}
+.edit-post-layout .interface-interface-skeleton__content {
+	background-color: $gray-400;
 }
 
-.edit-post-layout .interface-interface-skeleton__content {
-	background-color: $light-gray-700;
+// Ideally  we don't need all these nested divs.
+// Removing these requires a refactoring of the different a11y HoCs.
+.edit-post-layout__inserter-panel-popover-wrapper {
+	&,
+	& > div,
+	& > div > div,
+	& > div > div > div {
+		height: 100%;
+	}
 }
 
 .edit-post-layout__inserter-panel {

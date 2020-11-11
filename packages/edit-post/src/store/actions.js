@@ -6,7 +6,7 @@ import { castArray } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { dispatch } from '@wordpress/data-controls';
+import { controls } from '@wordpress/data';
 
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
@@ -16,7 +16,7 @@ import { dispatch } from '@wordpress/data-controls';
  * @yield {Object} Action object.
  */
 export function* openGeneralSidebar( name ) {
-	yield dispatch(
+	yield controls.dispatch(
 		'core/interface',
 		'enableComplementaryArea',
 		'core/edit-post',
@@ -30,7 +30,7 @@ export function* openGeneralSidebar( name ) {
  * @yield {Object} Action object.
  */
 export function* closeGeneralSidebar() {
-	yield dispatch(
+	yield controls.dispatch(
 		'core/interface',
 		'disableComplementaryArea',
 		'core/edit-post'

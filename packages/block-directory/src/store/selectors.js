@@ -11,11 +11,10 @@ import hasBlockType from './utils/has-block-type';
 /**
  * Returns true if application is requesting for downloadable blocks.
  *
- * @param {Object} state Global application state.
+ * @param {Object} state       Global application state.
  * @param {string} filterValue Search string.
  *
- *
- * @return {Array} Downloadable blocks
+ * @return {boolean} Whether a request is in progress for the blocks list.
  */
 export function isRequestingDownloadableBlocks( state, filterValue ) {
 	if (
@@ -28,12 +27,12 @@ export function isRequestingDownloadableBlocks( state, filterValue ) {
 }
 
 /**
- * Returns the available uninstalled blocks
+ * Returns the available uninstalled blocks.
  *
  * @param {Object} state       Global application state.
  * @param {string} filterValue Search string.
  *
- * @return {Array} Downloadable blocks
+ * @return {Array} Downloadable blocks.
  */
 export function getDownloadableBlocks( state, filterValue ) {
 	if (
@@ -46,11 +45,12 @@ export function getDownloadableBlocks( state, filterValue ) {
 }
 
 /**
- * Returns the block types that have been installed on the server.
+ * Returns the block types that have been installed on the server in this
+ * session.
  *
  * @param {Object} state Global application state.
  *
- * @return {Array} Block type items.
+ * @return {Array} Block type items
  */
 export function getInstalledBlockTypes( state ) {
 	return state.blockManagement.installedBlockTypes;
@@ -69,14 +69,9 @@ export const getNewBlockTypes = createRegistrySelector(
 		const usedBlockTree = select( 'core/block-editor' ).getBlocks();
 		const installedBlockTypes = getInstalledBlockTypes( state );
 
-		const newBlockTypes = [];
-		installedBlockTypes.forEach( ( blockType ) => {
-			if ( hasBlockType( blockType, usedBlockTree ) ) {
-				newBlockTypes.push( blockType );
-			}
-		} );
-
-		return newBlockTypes;
+		return installedBlockTypes.filter( ( blockType ) =>
+			hasBlockType( blockType, usedBlockTree )
+		);
 	}
 );
 
@@ -93,31 +88,26 @@ export const getUnusedBlockTypes = createRegistrySelector(
 		const usedBlockTree = select( 'core/block-editor' ).getBlocks();
 		const installedBlockTypes = getInstalledBlockTypes( state );
 
-		const newBlockTypes = [];
-		installedBlockTypes.forEach( ( blockType ) => {
-			if ( ! hasBlockType( blockType, usedBlockTree ) ) {
-				newBlockTypes.push( blockType );
-			}
-		} );
-
-		return newBlockTypes;
+		return installedBlockTypes.filter(
+			( blockType ) => ! hasBlockType( blockType, usedBlockTree )
+		);
 	}
 );
 
 /**
- * Returns true if application is calling install endpoint.
+ * Returns true if a block plugin install is in progress.
  *
- * @param {Object} state Global application state.
+ * @param {Object} state   Global application state.
  * @param {string} blockId Id of the block.
  *
- * @return {boolean} Whether its currently installing
+ * @return {boolean} Whether this block is currently being installed.
  */
 export function isInstalling( state, blockId ) {
 	return state.blockManagement.isInstalling[ blockId ] || false;
 }
 
 /**
- * Returns the error notices
+ * Returns all block error notices.
  *
  * @param {Object} state Global application state.
  *
@@ -136,5 +126,5 @@ export function getErrorNotices( state ) {
  * @return {string|boolean} The error text, or false if no error.
  */
 export function getErrorNoticeForBlock( state, blockId ) {
-	return state.errorNotices[ blockId ] || false;
+	return state.errorNotices[ blockId ];
 }

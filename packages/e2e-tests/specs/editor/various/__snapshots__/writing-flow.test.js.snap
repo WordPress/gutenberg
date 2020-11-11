@@ -116,6 +116,12 @@ exports[`Writing Flow should merge forwards 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Writing Flow should merge paragraphs 1`] = `
+"<!-- wp:paragraph -->
+<p>12</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Writing Flow should navigate around inline boundaries 1`] = `
 "<!-- wp:paragraph -->
 <p>FirstAfter</p>
@@ -230,6 +236,16 @@ exports[`Writing Flow should not delete surrounding space when deleting a word w
 "<!-- wp:paragraph -->
 <p>1 2 3</p>
 <!-- /wp:paragraph -->"
+`;
+
+exports[`Writing Flow should not have a dead zone above an aligned block 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {\\"align\\":\\"wide\\"} -->
+<figure class=\\"wp-block-image alignwide\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->"
 `;
 
 exports[`Writing Flow should not have a dead zone between blocks (lower) 1`] = `

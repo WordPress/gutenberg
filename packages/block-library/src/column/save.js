@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const { verticalAlignment, width } = attributes;
@@ -16,12 +16,19 @@ export default function save( { attributes } ) {
 	} );
 
 	let style;
-	if ( Number.isFinite( width ) ) {
-		style = { flexBasis: width + '%' };
+
+	if ( width ) {
+		// Numbers are handled for backward compatibility as they can be still provided with templates.
+		style = { flexBasis: Number.isFinite( width ) ? width + '%' : width };
 	}
 
 	return (
-		<div className={ wrapperClasses } style={ style }>
+		<div
+			{ ...useBlockProps.save( {
+				className: wrapperClasses,
+				style,
+			} ) }
+		>
 			<InnerBlocks.Content />
 		</div>
 	);

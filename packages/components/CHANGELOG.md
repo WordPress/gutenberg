@@ -2,9 +2,18 @@
 
 ## Unreleased
 
+- Introduce `Navigation` component as `__experimentalNavigation` for displaying a hierarchy of items.
+
+### Breaking Change
+
+- Introduce support for other units and advanced CSS properties on `FontSizePicker`. Provided the value passed to the `FontSizePicker` is a string or one of the size options passed is a string, onChange will start to be called with a string value instead of a number. On WordPress usage, font size options are now automatically converted to strings with the default "px" unit added.
+
+## 10.0.0 (2020-07-07)
+
 ### Breaking Change
 
 - `NumberControl` no longer automatically transforms values when rendering `value` into a `<input />` HTML element.
+- `Dashicon` component no longer renders SVGs. If you rely on this component, make sure to load the dashicon font.
 
 ## 9.6.0 (2020-05-14)
 

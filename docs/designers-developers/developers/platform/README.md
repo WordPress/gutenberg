@@ -35,7 +35,7 @@ The [wp-scripts package](https://developer.wordpress.org/block-editor/packages/p
 
 Here is a quick example, on how to use wp-scripts in your project.
 
-Install the depenency:
+Install the dependency:
 
 ```bash
 npm install --save-dev @wordpress/scripts

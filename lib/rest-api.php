@@ -57,7 +57,7 @@ add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10
  *
  * @todo Remove once Gutenberg's minimum required WordPress version is v5.5.
  * @see https://core.trac.wordpress.org/ticket/49906
- * @see https://github.com/WordPress/wordpress-develop/pull/222
+ * @see https://core.trac.wordpress.org/changeset/47921
  *
  * @param WP_REST_Response $response The response object.
  * @param WP_Theme         $theme    Theme object used to create response.
@@ -128,31 +128,6 @@ function gutenberg_filter_rest_prepare_theme( $response, $theme, $request ) {
 add_filter( 'rest_prepare_theme', 'gutenberg_filter_rest_prepare_theme', 10, 3 );
 
 /**
- * Start: Include for phase 2
- */
-/**
- * Registers the REST API routes needed by the legacy widget block.
- *
- * @since 5.0.0
- */
-function gutenberg_register_rest_widget_updater_routes() {
-	$widget_forms = new WP_REST_Widget_Forms();
-	$widget_forms->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_widget_updater_routes' );
-
-/**
- * Registers the widget area REST API routes.
- *
- * @since 5.7.0
- */
-function gutenberg_register_rest_widget_areas() {
-	$widget_areas_controller = new WP_REST_Widget_Areas_Controller();
-	$widget_areas_controller->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_widget_areas' );
-
-/**
  * Registers the block directory.
  *
  * @since 6.5.0
@@ -198,6 +173,29 @@ function gutenberg_register_plugins_endpoint() {
 	$plugins->register_routes();
 }
 add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
+
+/**
+ * Registers the Sidebars & Widgets REST API routes.
+ */
+function gutenberg_register_sidebars_and_widgets_endpoint() {
+	$sidebars = new WP_REST_Sidebars_Controller();
+	$sidebars->register_routes();
+
+	$widget_types = new WP_REST_Widget_Types_Controller();
+	$widget_types->register_routes();
+	$widgets = new WP_REST_Widgets_Controller();
+	$widgets->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_sidebars_and_widgets_endpoint' );
+
+/**
+ * Registers the Batch REST API routes.
+ */
+function gutenberg_register_batch_endpoint() {
+	$batch = new WP_REST_Batch_Controller();
+	$batch->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_batch_endpoint' );
 
 /**
  * Hook in to the nav menu item post type and enable a post type rest endpoint.
@@ -316,7 +314,44 @@ add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink',
  * @since 7.x.0
  */
 function gutenberg_register_image_editor() {
-	$image_editor = new WP_REST_Image_Editor_Controller();
-	$image_editor->register_routes();
+	global $wp_version;
+
+	// Strip '-src' from the version string. Messes up version_compare().
+	$version = str_replace( '-src', '', $wp_version );
+
+	// Only register routes for versions older than WP 5.5.
+	if ( version_compare( $version, '5.5-beta', '<' ) ) {
+		$image_editor = new WP_REST_Image_Editor_Controller();
+		$image_editor->register_routes();
+	}
 }
 add_filter( 'rest_api_init', 'gutenberg_register_image_editor' );
+
+/**
+ * Registers the post format search handler.
+ *
+ * @param string $search_handlers     Title list of current handlers.
+ *
+ * @return array Title updated list of handlers.
+ */
+function gutenberg_post_format_search_handler( $search_handlers ) {
+	if ( current_theme_supports( 'post-formats' ) ) {
+		$search_handlers[] = new WP_REST_Post_Format_Search_Handler();
+	}
+
+	return $search_handlers;
+}
+add_filter( 'wp_rest_search_handlers', 'gutenberg_post_format_search_handler', 10, 5 );
+
+/**
+ * Registers the terms search handler.
+ *
+ * @param string $search_handlers Title list of current handlers.
+ *
+ * @return array Title updated list of handlers.
+ */
+function gutenberg_term_search_handler( $search_handlers ) {
+	$search_handlers[] = new WP_REST_Term_Search_Handler();
+	return $search_handlers;
+}
+add_filter( 'wp_rest_search_handlers', 'gutenberg_term_search_handler', 10, 5 );

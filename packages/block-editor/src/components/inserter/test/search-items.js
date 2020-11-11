@@ -10,29 +10,69 @@ import items, {
 	youtubeItem,
 	paragraphEmbedItem,
 } from './fixtures';
-import { normalizeSearchTerm, searchBlockItems } from '../search-items';
+import {
+	getNormalizedSearchTerms,
+	searchBlockItems,
+	getItemSearchRank,
+} from '../search-items';
 
-describe( 'normalizeSearchTerm', () => {
+describe( 'getNormalizedSearchTerms', () => {
 	it( 'should return an empty array when no words detected', () => {
-		expect( normalizeSearchTerm( ' - !? *** ' ) ).toEqual( [] );
+		expect( getNormalizedSearchTerms( ' - !? *** ' ) ).toEqual( [] );
 	} );
 
 	it( 'should remove diacritics', () => {
-		expect( normalizeSearchTerm( 'média' ) ).toEqual( [ 'media' ] );
+		expect( getNormalizedSearchTerms( 'média' ) ).toEqual( [ 'media' ] );
 	} );
 
 	it( 'should trim whitespace', () => {
-		expect( normalizeSearchTerm( '  média  ' ) ).toEqual( [ 'media' ] );
+		expect( getNormalizedSearchTerms( '  média  ' ) ).toEqual( [
+			'media',
+		] );
 	} );
 
 	it( 'should convert to lowercase', () => {
-		expect( normalizeSearchTerm( '  Média  ' ) ).toEqual( [ 'media' ] );
+		expect( getNormalizedSearchTerms( '  Média  ' ) ).toEqual( [
+			'media',
+		] );
 	} );
 
 	it( 'should extract only words', () => {
 		expect(
-			normalizeSearchTerm( '  Média  &   Text Tag-Cloud > 123' )
+			getNormalizedSearchTerms( '  Média  &   Text Tag-Cloud > 123' )
 		).toEqual( [ 'media', 'text', 'tag', 'cloud', '123' ] );
+	} );
+} );
+
+describe( 'getItemSearchRank', () => {
+	it( 'should return the highest rank for exact matches', () => {
+		expect( getItemSearchRank( { title: 'Button' }, 'button' ) ).toEqual(
+			30
+		);
+	} );
+
+	it( 'should return a high rank if the start of title matches the search term', () => {
+		expect(
+			getItemSearchRank( { title: 'Button Advanced' }, 'button' )
+		).toEqual( 20 );
+	} );
+
+	it( 'should add a bonus point to items with core namespaces', () => {
+		expect(
+			getItemSearchRank(
+				{ name: 'core/button', title: 'Button' },
+				'button'
+			)
+		).toEqual( 31 );
+	} );
+
+	it( 'should have a small rank if it matches keywords, category...', () => {
+		expect(
+			getItemSearchRank(
+				{ title: 'link', keywords: [ 'button' ] },
+				'button'
+			)
+		).toEqual( 10 );
 	} );
 } );
 
@@ -50,6 +90,16 @@ describe( 'searchBlockItems', () => {
 			paragraphItem,
 			advancedParagraphItem,
 			paragraphEmbedItem,
+		] );
+	} );
+
+	it( 'should use the ranking algorithm to order the blocks', () => {
+		expect(
+			searchBlockItems( items, categories, collections, 'a para' )
+		).toEqual( [
+			paragraphEmbedItem,
+			paragraphItem,
+			advancedParagraphItem,
 		] );
 	} );
 
@@ -80,35 +130,5 @@ describe( 'searchBlockItems', () => {
 				'youtube embed video'
 			)
 		).toEqual( [ youtubeItem ] );
-	} );
-
-	it( 'should match words using also variations and return all matched variations', () => {
-		const filteredItems = searchBlockItems(
-			items,
-			categories,
-			collections,
-			'variation'
-		);
-
-		expect( filteredItems ).toHaveLength( 1 );
-		expect( filteredItems[ 0 ].variations ).toHaveLength( 3 );
-	} );
-
-	it( 'should match words using also variations and filter out unmatched variations', () => {
-		const filteredItems = searchBlockItems(
-			items,
-			categories,
-			collections,
-			'variations two three'
-		);
-
-		expect( filteredItems ).toHaveLength( 1 );
-		expect( filteredItems[ 0 ].variations ).toHaveLength( 2 );
-		expect( filteredItems[ 0 ].variations[ 0 ].title ).toBe(
-			'Variation Two'
-		);
-		expect( filteredItems[ 0 ].variations[ 1 ].title ).toBe(
-			'Variation Three'
-		);
 	} );
 } );

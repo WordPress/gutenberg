@@ -12,7 +12,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
-import { edit as editIcon } from '@wordpress/icons';
+import { Icon, edit as editIcon } from '@wordpress/icons';
 
 const selectIcon = (
 	<SVG
@@ -44,14 +44,16 @@ function ToolSelector( props, ref ) {
 					ref={ ref }
 					icon={ isNavigationTool ? selectIcon : editIcon }
 					aria-expanded={ isOpen }
+					aria-haspopup="true"
 					onClick={ onToggle }
-					label={ __( 'Tools' ) }
+					/* translators: button label text should, if possible, be under 16 characters. */
+					label={ __( 'Modes' ) }
 				/>
 			) }
 			position="bottom right"
 			renderContent={ () => (
 				<>
-					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
+					<NavigableMenu role="menu" aria-label={ __( 'Modes' ) }>
 						<MenuItemsChoice
 							value={ isNavigationTool ? 'select' : 'edit' }
 							onSelect={ onSwitchMode }
@@ -60,7 +62,7 @@ function ToolSelector( props, ref ) {
 									value: 'edit',
 									label: (
 										<>
-											{ editIcon }
+											<Icon icon={ editIcon } />
 											{ __( 'Edit' ) }
 										</>
 									),

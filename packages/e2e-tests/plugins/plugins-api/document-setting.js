@@ -9,7 +9,8 @@
 			PluginDocumentSettingPanel,
 			{
 				className: 'my-document-setting-plugin',
-				title: 'My Custom Panel'
+				title: 'My Custom Panel',
+				name: 'my-custom-panel'
 			},
 			__( 'My Document Setting Panel' )
 		);

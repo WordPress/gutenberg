@@ -55,6 +55,9 @@ export default function useScrollWhenDragging() {
 	}, [] );
 
 	const scrollOnDragOver = useCallback( ( event ) => {
+		if ( ! scrollParentY.current ) {
+			return;
+		}
 		const scrollParentHeight = scrollParentY.current.offsetHeight;
 		const offsetDragStartPosition =
 			dragStartY.current - scrollParentY.current.offsetTop;

@@ -68,7 +68,7 @@ registerBlockType( 'gutenberg-examples/example-06', {
 
 ## Allowed Blocks
 
-Using the `ALLOWED_BLOCKS` property, you can define the set of blocks allowed in your InnerBlock. This restricts the that can be included only to those listed, all other blocks will not show in the inserter.
+Using the `ALLOWED_BLOCKS` property, you can define the set of blocks allowed in your InnerBlock. This restricts the blocks that can be included only to those listed, all other blocks will not show in the inserter.
 
 ```js
 const ALLOWED_BLOCKS = [ 'core/image', 'core/paragraph' ];
@@ -135,7 +135,7 @@ const MY_TEMPLATE = [
 ```
 {% end %}
 
-Use the `templateLock` property to lock down the template. Using `all` locks the template complete, no changes can be made. Using `insert` prevents additional blocks to be inserted, but existing blocks can be reorderd. See [templateLock documentation](https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/src/components/inner-blocks/README.md#templatelock) for additional information.
+Use the `templateLock` property to lock down the template. Using `all` locks the template complete, no changes can be made. Using `insert` prevents additional blocks to be inserted, but existing blocks can be reordered. See [templateLock documentation](https://github.com/WordPress/gutenberg/tree/master/packages/block-editor/src/components/inner-blocks/README.md#templatelock) for additional information.
 
 ### Post Template
 

@@ -6,10 +6,29 @@
  */
 
 /**
+ * Returns all block template file path of the current theme and its parent theme.
+ * Includes demo block template files if demo experiment is enabled.
+ *
+ * @return array $block_template_files A list of paths to all template files.
+ */
+function gutenberg_get_template_paths() {
+	$block_template_files = glob( get_stylesheet_directory() . '/block-templates/*.html' );
+	$block_template_files = is_array( $block_template_files ) ? $block_template_files : array();
+
+	if ( is_child_theme() ) {
+		$child_block_template_files = glob( get_template_directory() . '/block-templates/*.html' );
+		$child_block_template_files = is_array( $child_block_template_files ) ? $child_block_template_files : array();
+		$block_template_files       = array_merge( $block_template_files, $child_block_template_files );
+	}
+
+	return $block_template_files;
+}
+
+/**
  * Registers block editor 'wp_template' post type.
  */
 function gutenberg_register_template_post_type() {
-	if ( ! gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ) ) {
+	if ( ! gutenberg_is_fse_theme() ) {
 		return;
 	}
 
@@ -56,8 +75,40 @@ function gutenberg_register_template_post_type() {
 	);
 
 	register_post_type( 'wp_template', $args );
+
+	$meta_args = array(
+		'object_subtype' => 'wp_template',
+		'type'           => 'string',
+		'description'    => 'The theme that provided the template, if any.',
+		'single'         => true,
+		'show_in_rest'   => true,
+	);
+
+	register_post_type( 'wp_template', $args );
+	register_meta( 'post', 'theme', $meta_args );
 }
 add_action( 'init', 'gutenberg_register_template_post_type' );
+
+/**
+ * Automatically set the theme meta for templates.
+ *
+ * @param array $post_id Template ID.
+ * @param array $post    Template Post.
+ * @param bool  $update  Is update.
+ */
+function gutenberg_set_template_post_theme( $post_id, $post, $update ) {
+	if ( 'wp_template' !== $post->post_type || $update || 'trash' === $post->post_status ) {
+		return;
+	}
+
+	$theme = get_post_meta( $post_id, 'theme', true );
+
+	if ( ! $theme ) {
+		update_post_meta( $post_id, 'theme', wp_get_theme()->get_stylesheet() );
+	}
+}
+
+add_action( 'save_post', 'gutenberg_set_template_post_theme', 10, 3 );
 
 /**
  * Filters the capabilities of a user to conditionally grant them capabilities for managing 'wp_template' posts.
@@ -109,6 +160,9 @@ add_filter( 'wp_unique_post_slug', 'gutenberg_filter_wp_template_wp_unique_post_
  * Fixes the label of the 'wp_template' admin menu entry.
  */
 function gutenberg_fix_template_admin_menu_entry() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
 	global $submenu;
 	if ( ! isset( $submenu['themes.php'] ) ) {
 		return;
@@ -191,9 +245,9 @@ function filter_rest_wp_template_query( $args, $request ) {
 				continue;
 			}
 
-			$current_template = gutenberg_find_template_post_and_parts( $template_type );
-			if ( isset( $current_template ) ) {
-				$template_ids[] = $current_template['template_post']->ID;
+			$current_template = gutenberg_resolve_template( $template_type );
+			if ( $current_template ) {
+				$template_ids[] = $current_template->ID;
 			}
 		}
 		$args['post__in']    = $template_ids;
@@ -203,3 +257,25 @@ function filter_rest_wp_template_query( $args, $request ) {
 	return $args;
 }
 add_filter( 'rest_wp_template_query', 'filter_rest_wp_template_query', 99, 2 );
+
+/**
+ * Run synchrnonization for template API requests
+ *
+ * @param mixed           $dispatch_result Dispatch result, will be used if not empty.
+ * @param WP_REST_Request $request         Request used to generate the response.
+ * @param string          $route           Route matched for the request.
+ * @return mixed Dispatch result.
+ */
+function gutenberg_filter_rest_wp_template_dispatch( $dispatch_result, $request, $route ) {
+	if ( null !== $dispatch_result ) {
+		return $dispatch_result;
+	}
+
+	if ( 0 === strpos( $route, '/wp/v2/templates' ) && 'GET' === $request->get_method() ) {
+		_gutenberg_synchronize_theme_templates( 'template' );
+	}
+
+	return null;
+}
+
+add_filter( 'rest_dispatch_request', 'gutenberg_filter_rest_wp_template_dispatch', 10, 3 );

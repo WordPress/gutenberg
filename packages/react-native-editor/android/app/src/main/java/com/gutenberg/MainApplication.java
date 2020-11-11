@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.util.Consumer;
 
@@ -31,6 +32,11 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.soloader.SoLoader;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
+import com.swmansion.reanimated.ReanimatedPackage;
+import com.swmansion.rnscreens.RNScreensPackage;
+import com.th3rdwave.safeareacontext.SafeAreaContextPackage;
+import org.reactnative.maskedview.RNCMaskedViewPackage;
 
 import java.util.Arrays;
 import java.util.List;
@@ -76,6 +82,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void mediaUploadSync(MediaSelectedCallback mediaSelectedCallback) {
+            }
+
+            @Override
+            public void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback) {
             }
 
             @Override
@@ -166,6 +176,35 @@ public class MainApplication extends Application implements ReactApplication, Gu
                 onSuccess.accept("matt");
             }
 
+            @Override
+            public void requestMediaFilesEditorLoad(
+                    ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
+                    ReadableArray mediaFiles,
+                    String blockId
+            ) {
+                Toast.makeText(MainApplication.this, "requestMediaFilesEditorLoad called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles) {
+                Toast.makeText(MainApplication.this, "requestMediaFilesFailedRetryDialog called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles) {
+                Toast.makeText(MainApplication.this, "requestMediaFilesUploadCancelDialog called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
+                Toast.makeText(MainApplication.this, "requestMediaFilesSaveCancelDialog called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void gutenbergDidSendButtonPressedAction(String buttonType) {
+
+            }
+
         }, isDarkMode());
 
         return new ReactNativeHost(this) {
@@ -185,6 +224,11 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         new ReactAztecPackage(null, null),
                         new LinearGradientPackage(),
                         new RNGetRandomValuesPackage(),
+                        new RNCMaskedViewPackage(),
+                        new RNGestureHandlerPackage(),
+                        new ReanimatedPackage(),
+                        new SafeAreaContextPackage(),
+                        new RNScreensPackage(),
                         mRnReactNativeGutenbergBridgePackage);
             }
 

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, first, get, last, some } from 'lodash';
+import { castArray, first, last, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,10 +14,7 @@ import {
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { __ } from '@wordpress/i18n';
-/**
- * Internal dependencies
- */
-import { select } from './controls';
+import { controls } from '@wordpress/data';
 
 /**
  * Generator which will yield a default block insert action if there
@@ -26,7 +23,7 @@ import { select } from './controls';
  * replacement, etc).
  */
 function* ensureDefaultBlock() {
-	const count = yield select( 'core/block-editor', 'getBlockCount' );
+	const count = yield controls.select( 'core/block-editor', 'getBlockCount' );
 
 	// To avoid a focus loss when removing the last block, assure there is
 	// always a default block if the last of the blocks have been removed.
@@ -156,7 +153,7 @@ export function selectBlock( clientId, initialPosition = null ) {
  * @param {string} clientId Block client ID.
  */
 export function* selectPreviousBlock( clientId ) {
-	const previousBlockClientId = yield select(
+	const previousBlockClientId = yield controls.select(
 		'core/block-editor',
 		'getPreviousBlockClientId',
 		clientId
@@ -175,7 +172,7 @@ export function* selectPreviousBlock( clientId ) {
  * @param {string} clientId Block client ID.
  */
 export function* selectNextBlock( clientId ) {
-	const nextBlockClientId = yield select(
+	const nextBlockClientId = yield controls.select(
 		'core/block-editor',
 		'getNextBlockClientId',
 		clientId
@@ -252,11 +249,9 @@ export function toggleSelection( isSelectionEnabled = true ) {
 }
 
 function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
-	const preferredStyleVariations = get(
-		blockEditorSettings,
-		[ '__experimentalPreferredStyleVariations', 'value' ],
-		{}
-	);
+	const preferredStyleVariations =
+		blockEditorSettings?.__experimentalPreferredStyleVariations?.value ??
+		{};
 	return blocks.map( ( block ) => {
 		const blockName = block.name;
 		if ( ! hasBlockSupport( blockName, 'defaultStylePicker', true ) ) {
@@ -265,7 +260,7 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
 		if ( ! preferredStyleVariations[ blockName ] ) {
 			return block;
 		}
-		const className = get( block, [ 'attributes', 'className' ] );
+		const className = block.attributes?.className;
 		if ( className?.includes( 'is-style-' ) ) {
 			return block;
 		}
@@ -287,10 +282,11 @@ function getBlocksWithDefaultStylesApplied( blocks, blockEditorSettings ) {
  * Returns an action object signalling that a blocks should be replaced with
  * one or more replacement blocks.
  *
- * @param {(string|string[])} clientIds     Block client ID(s) to replace.
- * @param {(Object|Object[])} blocks        Replacement block(s).
- * @param {number}            indexToSelect Index of replacement block to select.
+ * @param {(string|string[])} clientIds       Block client ID(s) to replace.
+ * @param {(Object|Object[])} blocks          Replacement block(s).
+ * @param {number}            indexToSelect   Index of replacement block to select.
  * @param {number}            initialPosition Index of caret after in the selected block after the operation.
+ * @param {?Object}           meta            Optional Meta values to be passed to the action object.
  *
  * @yield {Object} Action object.
  */
@@ -298,14 +294,15 @@ export function* replaceBlocks(
 	clientIds,
 	blocks,
 	indexToSelect,
-	initialPosition
+	initialPosition,
+	meta
 ) {
 	clientIds = castArray( clientIds );
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
-		yield select( 'core/block-editor', 'getSettings' )
+		yield controls.select( 'core/block-editor', 'getSettings' )
 	);
-	const rootClientId = yield select(
+	const rootClientId = yield controls.select(
 		'core/block-editor',
 		'getBlockRootClientId',
 		first( clientIds )
@@ -313,7 +310,7 @@ export function* replaceBlocks(
 	// Replace is valid if the new blocks can be inserted in the root block.
 	for ( let index = 0; index < blocks.length; index++ ) {
 		const block = blocks[ index ];
-		const canInsertBlock = yield select(
+		const canInsertBlock = yield controls.select(
 			'core/block-editor',
 			'canInsertBlockType',
 			block.name,
@@ -330,6 +327,7 @@ export function* replaceBlocks(
 		time: Date.now(),
 		indexToSelect,
 		initialPosition,
+		meta,
 	};
 	yield* ensureDefaultBlock();
 }
@@ -385,7 +383,7 @@ export function* moveBlocksToPosition(
 	toRootClientId = '',
 	index
 ) {
-	const templateLock = yield select(
+	const templateLock = yield controls.select(
 		'core/block-editor',
 		'getTemplateLock',
 		fromRootClientId
@@ -418,7 +416,7 @@ export function* moveBlocksToPosition(
 		return;
 	}
 
-	const canInsertBlocks = yield select(
+	const canInsertBlocks = yield controls.select(
 		'core/block-editor',
 		'canInsertBlocks',
 		clientIds,
@@ -480,10 +478,11 @@ export function insertBlock(
  * Returns an action object used in signalling that an array of blocks should
  * be inserted, optionally at a specific index respective a root block list.
  *
- * @param {Object[]} blocks          Block objects to insert.
- * @param {?number}  index           Index at which block should be inserted.
- * @param {?string}  rootClientId    Optional root client ID of block list on which to insert.
- * @param {?boolean} updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
+ * @param {Object[]}   blocks          Block objects to insert.
+ * @param {?number}    index           Index at which block should be inserted.
+ * @param {?string}    rootClientId    Optional root client ID of block list on which to insert.
+ * @param {?boolean}   updateSelection If true block selection will be updated.  If false, block selection will not change. Defaults to true.
+ * @param {?Object}  meta             Optional Meta values to be passed to the action object.
  *
  *  @return {Object} Action object.
  */
@@ -491,15 +490,16 @@ export function* insertBlocks(
 	blocks,
 	index,
 	rootClientId,
-	updateSelection = true
+	updateSelection = true,
+	meta
 ) {
 	blocks = getBlocksWithDefaultStylesApplied(
 		castArray( blocks ),
-		yield select( 'core/block-editor', 'getSettings' )
+		yield controls.select( 'core/block-editor', 'getSettings' )
 	);
 	const allowedBlocks = [];
 	for ( const block of blocks ) {
-		const isValid = yield select(
+		const isValid = yield controls.select(
 			'core/block-editor',
 			'canInsertBlockType',
 			block.name,
@@ -517,17 +517,40 @@ export function* insertBlocks(
 			rootClientId,
 			time: Date.now(),
 			updateSelection,
+			meta,
 		};
 	}
 }
 
 /**
- * Returns an action object used in signalling that the insertion point should
- * be shown.
+ * Sets the insertion point without showing it to users.
  *
- * @param {?string} rootClientId Optional root client ID of block list on
- *                               which to insert.
- * @param {?number} index        Index at which block should be inserted.
+ * Components like <Inserter> will default to inserting blocks at this point.
+ *
+ * @param {?string} rootClientId Root client ID of block list in which to
+ *                               insert. Use `undefined` for the root block
+ *                               list.
+ * @param {number} index         Index at which block should be inserted.
+ *
+ * @return {Object} Action object.
+ */
+export function __unstableSetInsertionPoint( rootClientId, index ) {
+	return {
+		type: 'SET_INSERTION_POINT',
+		rootClientId,
+		index,
+	};
+}
+
+/**
+ * Sets the insertion point and shows it to users.
+ *
+ * Components like <Inserter> will default to inserting blocks at this point.
+ *
+ * @param {?string} rootClientId Root client ID of block list in which to
+ *                               insert. Use `undefined` for the root block
+ *                               list.
+ * @param {number} index         Index at which block should be inserted.
  *
  * @return {Object} Action object.
  */
@@ -540,7 +563,7 @@ export function showInsertionPoint( rootClientId, index ) {
 }
 
 /**
- * Returns an action object hiding the insertion point.
+ * Hides the insertion point for users.
  *
  * @return {Object} Action object.
  */
@@ -604,12 +627,12 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 	}
 
 	clientIds = castArray( clientIds );
-	const rootClientId = yield select(
+	const rootClientId = yield controls.select(
 		'core/block-editor',
 		'getBlockRootClientId',
 		clientIds[ 0 ]
 	);
-	const isLocked = yield select(
+	const isLocked = yield controls.select(
 		'core/block-editor',
 		'getTemplateLock',
 		rootClientId
@@ -622,7 +645,7 @@ export function* removeBlocks( clientIds, selectPrevious = true ) {
 	if ( selectPrevious ) {
 		previousBlockId = yield selectPreviousBlock( clientIds[ 0 ] );
 	} else {
-		previousBlockId = yield select(
+		previousBlockId = yield controls.select(
 			'core/block-editor',
 			'getPreviousBlockClientId',
 			clientIds[ 0 ]
@@ -660,14 +683,14 @@ export function removeBlock( clientId, selectPrevious ) {
  *
  * @param {string}   rootClientId    Client ID of the block whose InnerBlocks will re replaced.
  * @param {Object[]} blocks          Block objects to insert as new InnerBlocks
- * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
+ * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to false.
  *
  * @return {Object} Action object.
  */
 export function replaceInnerBlocks(
 	rootClientId,
 	blocks,
-	updateSelection = true
+	updateSelection = false
 ) {
 	return {
 		type: 'REPLACE_INNER_BLOCKS',
@@ -718,11 +741,14 @@ export function stopTyping() {
 /**
  * Returns an action object used in signalling that the user has begun to drag blocks.
  *
+ * @param {string[]} clientIds An array of client ids being dragged
+ *
  * @return {Object} Action object.
  */
-export function startDraggingBlocks() {
+export function startDraggingBlocks( clientIds = [] ) {
 	return {
 		type: 'START_DRAGGING_BLOCKS',
+		clientIds,
 	};
 }
 
@@ -857,7 +883,7 @@ export function __unstableSaveReusableBlock( id, updatedId ) {
 }
 
 /**
- * Returns an action object used in signalling that the last block change should be marked explicitely as persistent.
+ * Returns an action object used in signalling that the last block change should be marked explicitly as persistent.
  *
  * @return {Object} Action object.
  */
@@ -944,12 +970,12 @@ export function* duplicateBlocks( clientIds, updateSelection = true ) {
 	if ( ! clientIds && ! clientIds.length ) {
 		return;
 	}
-	const blocks = yield select(
+	const blocks = yield controls.select(
 		'core/block-editor',
 		'getBlocksByClientId',
 		clientIds
 	);
-	const rootClientId = yield select(
+	const rootClientId = yield controls.select(
 		'core/block-editor',
 		'getBlockRootClientId',
 		clientIds[ 0 ]
@@ -969,7 +995,7 @@ export function* duplicateBlocks( clientIds, updateSelection = true ) {
 		return;
 	}
 
-	const lastSelectedIndex = yield select(
+	const lastSelectedIndex = yield controls.select(
 		'core/block-editor',
 		'getBlockIndex',
 		last( castArray( clientIds ) ),
@@ -1000,12 +1026,12 @@ export function* insertBeforeBlock( clientId ) {
 	if ( ! clientId ) {
 		return;
 	}
-	const rootClientId = yield select(
+	const rootClientId = yield controls.select(
 		'core/block-editor',
 		'getBlockRootClientId',
 		clientId
 	);
-	const isLocked = yield select(
+	const isLocked = yield controls.select(
 		'core/block-editor',
 		'getTemplateLock',
 		rootClientId
@@ -1014,7 +1040,7 @@ export function* insertBeforeBlock( clientId ) {
 		return;
 	}
 
-	const firstSelectedIndex = yield select(
+	const firstSelectedIndex = yield controls.select(
 		'core/block-editor',
 		'getBlockIndex',
 		clientId,
@@ -1032,12 +1058,12 @@ export function* insertAfterBlock( clientId ) {
 	if ( ! clientId ) {
 		return;
 	}
-	const rootClientId = yield select(
+	const rootClientId = yield controls.select(
 		'core/block-editor',
 		'getBlockRootClientId',
 		clientId
 	);
-	const isLocked = yield select(
+	const isLocked = yield controls.select(
 		'core/block-editor',
 		'getTemplateLock',
 		rootClientId
@@ -1046,7 +1072,7 @@ export function* insertAfterBlock( clientId ) {
 		return;
 	}
 
-	const firstSelectedIndex = yield select(
+	const firstSelectedIndex = yield controls.select(
 		'core/block-editor',
 		'getBlockIndex',
 		clientId,

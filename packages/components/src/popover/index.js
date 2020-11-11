@@ -29,7 +29,7 @@ import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, useSlot } from '../slot-fill';
-import Animate from '../animate';
+import { useAnimate } from '../animate';
 
 const FocusManaged = withConstrainedTabbing(
 	withFocusReturn( ( { children } ) => children )
@@ -62,7 +62,12 @@ function computeAnchorRect(
 	}
 
 	if ( anchorRef !== false ) {
-		if ( ! anchorRef ) {
+		if (
+			! anchorRef ||
+			! window.Range ||
+			! window.Element ||
+			! window.DOMRect
+		) {
 			return;
 		}
 
@@ -111,13 +116,17 @@ function computeAnchorRect(
 	return withoutPadding( rect, parentNode );
 }
 
+function getComputedStyle( node ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
+
 function withoutPadding( rect, element ) {
 	const {
 		paddingTop,
 		paddingBottom,
 		paddingLeft,
 		paddingRight,
-	} = window.getComputedStyle( element );
+	} = getComputedStyle( element );
 	const top = paddingTop ? parseInt( paddingTop, 10 ) : 0;
 	const bottom = paddingBottom ? parseInt( paddingBottom, 10 ) : 0;
 	const left = paddingLeft ? parseInt( paddingLeft, 10 ) : 0;
@@ -253,10 +262,9 @@ const Popover = ( {
 	animate = true,
 	onClickOutside,
 	onFocusOutside,
-	__unstableSticky,
+	__unstableStickyBoundaryElement,
 	__unstableSlotName = SLOT_NAME,
 	__unstableObserveElement,
-	__unstableFixedPosition = true,
 	__unstableBoundaryParent,
 	/* eslint-enable no-unused-vars */
 	...contentProps
@@ -281,7 +289,6 @@ const Popover = ( {
 			setStyle( containerRef.current, 'left' );
 			setStyle( contentRef.current, 'maxHeight' );
 			setStyle( contentRef.current, 'maxWidth' );
-			setStyle( containerRef.current, 'position' );
 			return;
 		}
 
@@ -302,6 +309,8 @@ const Popover = ( {
 				return;
 			}
 
+			const { offsetParent, ownerDocument } = containerRef.current;
+
 			let relativeOffsetTop = 0;
 
 			// If there is a positioned ancestor element that is not the body,
@@ -309,10 +318,7 @@ const Popover = ( {
 			// the popover is fixed, the offset parent is null or the body
 			// element, in which case the position is relative to the viewport.
 			// See https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/offsetParent
-			if ( ! __unstableFixedPosition ) {
-				setStyle( containerRef.current, 'position', 'absolute' );
-
-				const { offsetParent } = containerRef.current;
+			if ( offsetParent && offsetParent !== ownerDocument.body ) {
 				const offsetParentRect = offsetParent.getBoundingClientRect();
 
 				relativeOffsetTop = offsetParentRect.top;
@@ -322,8 +328,6 @@ const Popover = ( {
 					anchor.width,
 					anchor.height
 				);
-			} else {
-				setStyle( containerRef.current, 'position' );
 			}
 
 			let boundaryElement;
@@ -348,7 +352,7 @@ const Popover = ( {
 				anchor,
 				usedContentSize,
 				position,
-				__unstableSticky,
+				__unstableStickyBoundaryElement,
 				containerRef.current,
 				relativeOffsetTop,
 				boundaryElement
@@ -396,8 +400,7 @@ const Popover = ( {
 			setAnimateOrigin( animateXAxis + ' ' + animateYAxis );
 		};
 
-		// Height may still adjust between now and the next tick.
-		const timeoutId = window.setTimeout( refresh );
+		refresh();
 
 		/*
 		 * There are sometimes we need to reposition or resize the popover that
@@ -430,7 +433,6 @@ const Popover = ( {
 		}
 
 		return () => {
-			window.clearTimeout( timeoutId );
 			window.clearInterval( intervalHandle );
 			window.removeEventListener( 'resize', refresh );
 			window.removeEventListener( 'scroll', refresh, true );
@@ -449,7 +451,7 @@ const Popover = ( {
 		shouldAnchorIncludePadding,
 		position,
 		contentSize,
-		__unstableSticky,
+		__unstableStickyBoundaryElement,
 		__unstableObserveElement,
 		__unstableBoundaryParent,
 	] );
@@ -527,57 +529,55 @@ const Popover = ( {
 		onClickOutside( clickEvent );
 	}
 
+	const animateClassName = useAnimate( {
+		type: animate && animateOrigin ? 'appear' : null,
+		origin: animateOrigin,
+	} );
+
 	// Disable reason: We care to capture the _bubbled_ events from inputs
 	// within popover as inferring close intent.
 
 	let content = (
 		<PopoverDetectOutside onFocusOutside={ handleOnFocusOutside }>
-			<Animate
-				type={ animate && animateOrigin ? 'appear' : null }
-				options={ { origin: animateOrigin } }
-			>
-				{ ( { className: animateClassName } ) => (
-					<IsolatedEventContainer
-						className={ classnames(
-							'components-popover',
-							className,
-							animateClassName,
-							{
-								'is-expanded': isExpanded,
-								'is-without-arrow': noArrow,
-								'is-alternate': isAlternate,
-							}
-						) }
-						{ ...contentProps }
-						onKeyDown={ maybeClose }
-						ref={ containerRef }
-					>
-						{ isExpanded && <ScrollLock /> }
-						{ isExpanded && (
-							<div className="components-popover__header">
-								<span className="components-popover__header-title">
-									{ headerTitle }
-								</span>
-								<Button
-									className="components-popover__close"
-									icon={ close }
-									onClick={ onClose }
-								/>
-							</div>
-						) }
-						<div
-							ref={ contentRef }
-							className="components-popover__content"
-							tabIndex="-1"
-						>
-							<div style={ { position: 'relative' } }>
-								{ containerResizeListener }
-								{ children }
-							</div>
-						</div>
-					</IsolatedEventContainer>
+			<IsolatedEventContainer
+				className={ classnames(
+					'components-popover',
+					className,
+					animateClassName,
+					{
+						'is-expanded': isExpanded,
+						'is-without-arrow': noArrow,
+						'is-alternate': isAlternate,
+					}
 				) }
-			</Animate>
+				{ ...contentProps }
+				onKeyDown={ maybeClose }
+				ref={ containerRef }
+			>
+				{ isExpanded && <ScrollLock /> }
+				{ isExpanded && (
+					<div className="components-popover__header">
+						<span className="components-popover__header-title">
+							{ headerTitle }
+						</span>
+						<Button
+							className="components-popover__close"
+							icon={ close }
+							onClick={ onClose }
+						/>
+					</div>
+				) }
+				<div
+					ref={ contentRef }
+					className="components-popover__content"
+					tabIndex="-1"
+				>
+					<div style={ { position: 'relative' } }>
+						{ containerResizeListener }
+						{ children }
+					</div>
+				</div>
+			</IsolatedEventContainer>
 		</PopoverDetectOutside>
 	);
 

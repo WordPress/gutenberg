@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/primitives",
-	"version": "1.6.0",
+	"version": "1.10.0",
 	"description": "WordPress cross-platform primitives.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,10 +22,12 @@
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
-	"sideEffects": false,
+	"sideEffects": [
+		"src/**/*.scss"
+	],
 	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
+		"@babel/runtime": "^7.11.2",
 		"@wordpress/element": "file:../element",
 		"classnames": "^2.2.5"
 	},

@@ -31,31 +31,16 @@ function filterUnitsWithSettings( settings = [], units = [] ) {
 /**
  * Custom hook to retrieve and consolidate units setting from add_theme_support().
  *
- * @param {Array} unitsProp Collection of available units.
+ * @param {Array} units Collection of available units.
  *
  * @return {Array} Filtered units based on settings.
  */
-export function useCustomUnits( unitsProp ) {
-	const settings = useEditorFeature( '__experimentalDisableCustomUnits' );
-	const isDisabled = !! settings;
+export function useCustomUnits( units ) {
+	const availableUnits = useEditorFeature( 'spacing.units' );
+	const usedUnits = filterUnitsWithSettings(
+		! availableUnits ? [] : availableUnits,
+		units
+	);
 
-	// Adjust units based on add_theme_support( 'experimental-custom-units' );
-	let units;
-
-	/**
-	 * Handle extra arguments for add_theme_support
-	 *
-	 * Example: add_theme_support( 'experimental-custom-units', 'rem' );
-	 * Or: add_theme_support( 'experimental-custom-units', 'px, 'rem', 'em' );
-	 *
-	 * Note: If there are unit argument (e.g. 'em'), these units are enabled
-	 * within the control.
-	 */
-	if ( Array.isArray( settings ) ) {
-		units = filterUnitsWithSettings( settings, unitsProp );
-	} else {
-		units = isDisabled ? false : unitsProp;
-	}
-
-	return units;
+	return usedUnits.length === 0 ? false : usedUnits;
 }

@@ -205,6 +205,21 @@ _Returns_
 
 -   `Object`: Block object.
 
+<a name="createBlocksFromInnerBlocksTemplate" href="#createBlocksFromInnerBlocksTemplate">#</a> **createBlocksFromInnerBlocksTemplate**
+
+Given an array of InnerBlocks templates or Block Objects,
+returns an array of created Blocks from them.
+It handles the case of having InnerBlocks as Blocks by
+converting them to the proper format to continue recursively.
+
+_Parameters_
+
+-   _innerBlocksOrTemplate_ `Array`: Nested blocks or InnerBlocks templates.
+
+_Returns_
+
+-   `Array<Object>`: Array of Block objects.
+
 <a name="doBlocksMatchTemplate" href="#doBlocksMatchTemplate">#</a> **doBlocksMatchTemplate**
 
 Checks whether a list of blocks matches a template by comparing the block names.
@@ -348,6 +363,19 @@ _Returns_
 
 -   `Array`: Block settings.
 
+<a name="getBlockVariations" href="#getBlockVariations">#</a> **getBlockVariations**
+
+Returns an array with the variations of a given block type.
+
+_Parameters_
+
+-   _blockName_ `string`: Name of block (example: “core/columns”).
+-   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
+
+_Returns_
+
+-   `(Array<WPBlockVariation>|void)`: Block variations.
+
 <a name="getCategories" href="#getCategories">#</a> **getCategories**
 
 Returns all the block categories.
@@ -395,19 +423,7 @@ _Returns_
 
 <a name="getPhrasingContentSchema" href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema**
 
-Get schema of possible paths for phrasing content.
-
-_Related_
-
--   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
-
-_Parameters_
-
--   _context_ `string`: Set to "paste" to exclude invisible elements and sensitive data.
-
-_Returns_
-
--   `Object`: Schema.
+Undocumented declaration.
 
 <a name="getPossibleBlockTransformations" href="#getPossibleBlockTransformations">#</a> **getPossibleBlockTransformations**
 
@@ -608,6 +624,7 @@ _Parameters_
 -   _options.plainText_ `[string]`: Plain text version.
 -   _options.mode_ `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
 -   _options.tagName_ `[Array]`: The tag into which content will be inserted.
+-   _options.preserveWhiteSpace_ `[boolean]`: Whether or not to preserve consequent white space.
 
 _Returns_
 

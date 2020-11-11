@@ -1,5 +1,5 @@
 .components-dropdown-menu__popover .components-popover__content {
-	width: 200px;
+	min-width: 200px;
 }
 
 .components-dropdown-menu__menu {
@@ -14,7 +14,6 @@
 		padding: 6px;
 		outline: none;
 		cursor: pointer;
-		margin-bottom: $grid-unit-05;
 
 		&.has-separator {
 			margin-top: 6px;
@@ -26,7 +25,7 @@
 			display: block;
 			content: "";
 			box-sizing: content-box;
-			background-color: $gray-200;
+			background-color: $gray-300;
 			position: absolute;
 			top: -3px;
 			left: 0;
@@ -54,12 +53,9 @@
 	.components-menu-item__button.components-button {
 		min-height: $button-size;
 		height: auto;
-		padding-left: $button-size-small + $grid-unit-10 + $grid-unit-10;
 		text-align: left;
-
-		&.has-icon {
-			padding-left: $grid-unit-10;
-		}
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
 	}
 
 	.components-menu-group {
@@ -87,8 +83,4 @@
 			border-color: $gray-900;
 		}
 	}
-}
-
-.components-dropdown-menu__menu.no-icons  .components-menu-item__button.components-button {
-	padding: 0 $grid-unit-15;
 }

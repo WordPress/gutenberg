@@ -175,7 +175,10 @@ describe( 'selectors', () => {
 	describe( 'getErrorNoticeForBlock', () => {
 		const state = {
 			errorNotices: {
-				'block/has-error': 'Error notice',
+				'block/has-error': {
+					message: 'Error notice',
+					isFatal: false,
+				},
 			},
 		};
 
@@ -184,7 +187,9 @@ describe( 'selectors', () => {
 				state,
 				'block/has-error'
 			);
-			expect( errorNotice ).toEqual( 'Error notice' );
+			expect( errorNotice ).toEqual(
+				state.errorNotices[ 'block/has-error' ]
+			);
 		} );
 
 		it( "should retrieve no error notice for a block that doesn't have one", () => {
@@ -192,7 +197,7 @@ describe( 'selectors', () => {
 				state,
 				'block/no-error'
 			);
-			expect( errorNotice ).toEqual( false );
+			expect( errorNotice ).toEqual( undefined );
 		} );
 	} );
 

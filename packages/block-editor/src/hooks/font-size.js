@@ -3,8 +3,8 @@
  */
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 import TokenList from '@wordpress/token-list';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -16,8 +16,9 @@ import {
 	FontSizePicker,
 } from '../components/font-sizes';
 import { cleanEmptyObject } from './utils';
+import useEditorFeature from '../components/use-editor-feature';
 
-export const FONT_SIZE_SUPPORT_KEY = '__experimentalFontSize';
+export const FONT_SIZE_SUPPORT_KEY = 'fontSize';
 
 /**
  * Filters registered block settings, extending attributes to include
@@ -102,10 +103,7 @@ export function FontSizeEdit( props ) {
 		setAttributes,
 	} = props;
 	const isDisabled = useIsFontSizeDisabled( props );
-
-	const { fontSizes } = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getSettings()
-	);
+	const fontSizes = useEditorFeature( 'typography.fontSizes' );
 
 	if ( isDisabled ) {
 		return null;
@@ -143,15 +141,60 @@ export function FontSizeEdit( props ) {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsFontSizeDisabled( { name: blockName } = {} ) {
-	const { fontSizes } = useSelect( ( select ) =>
-		select( 'core/block-editor' ).getSettings()
-	);
-	const hasFontSizes = fontSizes.length;
+	const fontSizes = useEditorFeature( 'typography.fontSizes' );
+	const hasFontSizes = !! fontSizes?.length;
 
 	return (
 		! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) || ! hasFontSizes
 	);
 }
+
+/**
+ * Add inline styles for font sizes.
+ * Ideally, this is not needed and themes load the font-size classes on the
+ * editor.
+ *
+ * @param  {Function} BlockListBlock Original component
+ * @return {Function}                Wrapped component
+ */
+const withFontSizeInlineStyles = createHigherOrderComponent(
+	( BlockListBlock ) => ( props ) => {
+		const fontSizes = useEditorFeature( 'typography.fontSizes' );
+		const {
+			name: blockName,
+			attributes: { fontSize, style },
+			wrapperProps,
+		} = props;
+
+		const newProps = { ...props };
+
+		// Only add inline styles if the block supports font sizes, doesn't
+		// already have an inline font size, and does have a class to extract
+		// the font size from.
+		if (
+			hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) &&
+			fontSize &&
+			! style?.typography?.fontSize
+		) {
+			const fontSizeValue = getFontSize(
+				fontSizes,
+				fontSize,
+				style?.typography?.fontSize
+			).size;
+
+			newProps.wrapperProps = {
+				...wrapperProps,
+				style: {
+					fontSize: fontSizeValue,
+					...wrapperProps?.style,
+				},
+			};
+		}
+
+		return <BlockListBlock { ...newProps } />;
+	},
+	'withFontSizeInlineStyles'
+);
 
 addFilter(
 	'blocks.registerBlockType',
@@ -166,3 +209,9 @@ addFilter(
 );
 
 addFilter( 'blocks.registerBlockType', 'core/font/addEditProps', addEditProps );
+
+addFilter(
+	'editor.BlockListBlock',
+	'core/font-size/with-font-size-inline-styles',
+	withFontSizeInlineStyles
+);

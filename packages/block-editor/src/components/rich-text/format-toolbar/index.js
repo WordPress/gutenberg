@@ -10,7 +10,7 @@ import { orderBy } from 'lodash';
 
 import { __ } from '@wordpress/i18n';
 import {
-	__experimentalToolbarItem as ToolbarItem,
+	ToolbarItem,
 	ToolbarGroup,
 	DropdownMenu,
 	Slot,

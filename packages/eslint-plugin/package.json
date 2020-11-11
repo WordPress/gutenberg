@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/eslint-plugin",
-	"version": "7.1.0",
+	"version": "7.3.0",
 	"description": "ESLint plugin for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,9 +29,10 @@
 	"dependencies": {
 		"@wordpress/prettier-config": "file:../prettier-config",
 		"babel-eslint": "^10.1.0",
+		"cosmiconfig": "^7.0.0",
 		"eslint-config-prettier": "^6.10.1",
 		"eslint-plugin-jest": "^23.8.2",
-		"eslint-plugin-jsdoc": "^26.0.0",
+		"eslint-plugin-jsdoc": "^30.2.2",
 		"eslint-plugin-jsx-a11y": "^6.2.3",
 		"eslint-plugin-prettier": "^3.1.2",
 		"eslint-plugin-react": "^7.20.0",

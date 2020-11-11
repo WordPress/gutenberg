@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/plugins",
-	"version": "2.19.0",
+	"version": "2.23.0",
 	"description": "Plugins module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,12 +22,12 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
+		"@babel/runtime": "^7.11.2",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/icons": "file:../icons",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.19"
 	},
 	"publishConfig": {
 		"access": "public"

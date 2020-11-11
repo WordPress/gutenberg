@@ -2,15 +2,17 @@
  * WordPress dependencies
  */
 import { registerStore } from '@wordpress/data';
+import { controls } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
  */
 import reducer from './reducer';
-import controls from './controls';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import * as resolvers from './resolvers';
+import * as locksSelectors from './locks/selectors';
+import * as locksActions from './locks/actions';
 import { defaultEntities, getMethodName } from './entities';
 import { REDUCER_KEY } from './name';
 
@@ -49,16 +51,19 @@ const entityActions = defaultEntities.reduce( ( result, entity ) => {
 	const { kind, name } = entity;
 	result[ getMethodName( kind, name, 'save' ) ] = ( key ) =>
 		actions.saveEntityRecord( kind, name, key );
+	result[ getMethodName( kind, name, 'delete' ) ] = ( key, query ) =>
+		actions.deleteEntityRecord( kind, name, key, query );
 	return result;
 }, {} );
 
-registerStore( REDUCER_KEY, {
+export const storeConfig = {
 	reducer,
 	controls,
-	actions: { ...actions, ...entityActions },
-	selectors: { ...selectors, ...entitySelectors },
+	actions: { ...actions, ...entityActions, ...locksActions },
+	selectors: { ...selectors, ...entitySelectors, ...locksSelectors },
 	resolvers: { ...resolvers, ...entityResolvers },
-} );
+};
+registerStore( REDUCER_KEY, storeConfig );
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';

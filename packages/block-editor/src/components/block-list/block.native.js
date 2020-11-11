@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { GlobalStylesContext } from '@wordpress/components';
+import { GlobalStylesContext, WIDE_ALIGNMENTS } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
@@ -136,7 +136,7 @@ class BlockListBlock extends Component {
 		}
 
 		const { blockWidth } = this.state;
-
+		const { align } = attributes;
 		const accessibilityLabel = getAccessibleBlockLabel(
 			blockType,
 			attributes,
@@ -144,6 +144,8 @@ class BlockListBlock extends Component {
 		);
 
 		const accessible = ! ( isSelected || isInnerBlockSelected );
+		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
+		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 
 		return (
 			<TouchableWithoutFeedback
@@ -165,8 +167,12 @@ class BlockListBlock extends Component {
 					>
 						{ isSelected && (
 							<View
+								pointerEvents="box-none"
 								style={ [
 									styles.solidBorder,
+									isFullWidth &&
+										blockWidth < screenWidth &&
+										styles.borderFullWidth,
 									getStylesFromColorScheme(
 										styles.solidBorderColor,
 										styles.solidBorderColorDark
@@ -206,6 +212,7 @@ class BlockListBlock extends Component {
 									}
 									blockWidth={ blockWidth }
 									anchorNodeRef={ this.anchorNodeRef.current }
+									isFullWidth={ isFullWidth }
 								/>
 							) }
 						</View>

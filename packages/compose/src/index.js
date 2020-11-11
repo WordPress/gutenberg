@@ -23,3 +23,5 @@ export { default as useReducedMotion } from './hooks/use-reduced-motion';
 export { default as useViewportMatch } from './hooks/use-viewport-match';
 export { default as useResizeObserver } from './hooks/use-resize-observer';
 export { default as useAsyncList } from './hooks/use-async-list';
+export { default as useWarnOnChange } from './hooks/use-warn-on-change';
+export { default as useDebounce } from './hooks/use-debounce';
