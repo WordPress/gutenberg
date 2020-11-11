@@ -246,13 +246,15 @@ class DropZoneProvider extends Component {
 				case 'file':
 					dropZone.onFilesDrop(
 						[ ...event.dataTransfer.files ],
-						position
+						position,
+						event
 					);
 					break;
 				case 'html':
 					dropZone.onHTMLDrop(
 						event.dataTransfer.getData( 'text/html' ),
-						position
+						position,
+						event
 					);
 					break;
 				case 'default':
