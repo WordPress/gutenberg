@@ -8,7 +8,7 @@ const { context, GitHub } = require( '@actions/github' );
  * Internal dependencies
  */
 const assignFixedIssues = require( './tasks/assign-fixed-issues' );
-const firstTimeContributor = require( './tasks/first-time-contributor' );
+const firstTimeContributorAccountLink = require( './tasks/first-time-contributor-account-link' );
 const firstTimeContributorLabel = require( './tasks/first-time-contributor-label' );
 const addMilestone = require( './tasks/add-milestone' );
 const debug = require( './debug' );
@@ -49,7 +49,7 @@ const automations = [
 	},
 	{
 		event: 'push',
-		task: firstTimeContributor,
+		task: firstTimeContributorAccountLink,
 	},
 	{
 		event: 'push',

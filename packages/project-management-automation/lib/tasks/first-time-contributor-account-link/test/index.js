@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import firstTimeContributor from '../';
+import firstTimeContributorAccountLink from '../';
 import hasWordPressProfile from '../../../has-wordpress-profile';
 
 jest.mock( '../../../has-wordpress-profile', () => jest.fn() );
 
-describe( 'firstTimeContributor', () => {
+describe( 'firstTimeContributorAccountLink', () => {
 	beforeEach( () => {
 		hasWordPressProfile.mockReset();
 	} );
@@ -44,7 +44,7 @@ describe( 'firstTimeContributor', () => {
 			},
 		};
 
-		await firstTimeContributor( payloadForBranchPush, octokit );
+		await firstTimeContributorAccountLink( payloadForBranchPush, octokit );
 
 		expect( octokit.repos.listCommits ).not.toHaveBeenCalled();
 	} );
@@ -70,7 +70,7 @@ describe( 'firstTimeContributor', () => {
 			},
 		};
 
-		await firstTimeContributor( payloadDirectToMaster, octokit );
+		await firstTimeContributorAccountLink( payloadDirectToMaster, octokit );
 
 		expect( octokit.repos.listCommits ).not.toHaveBeenCalled();
 	} );
@@ -92,7 +92,7 @@ describe( 'firstTimeContributor', () => {
 			},
 		};
 
-		await firstTimeContributor( payload, octokit );
+		await firstTimeContributorAccountLink( payload, octokit );
 
 		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -122,7 +122,7 @@ describe( 'firstTimeContributor', () => {
 			return Promise.reject( new Error( 'Whoops!' ) );
 		} );
 
-		await firstTimeContributor( payload, octokit );
+		await firstTimeContributorAccountLink( payload, octokit );
 
 		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',
@@ -150,7 +150,7 @@ describe( 'firstTimeContributor', () => {
 
 		hasWordPressProfile.mockReturnValue( Promise.resolve( false ) );
 
-		await firstTimeContributor( payload, octokit );
+		await firstTimeContributorAccountLink( payload, octokit );
 
 		expect( octokit.repos.listCommits ).toHaveBeenCalledWith( {
 			owner: 'WordPress',

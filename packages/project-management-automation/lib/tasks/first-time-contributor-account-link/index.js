@@ -39,7 +39,7 @@ function getPromptMessageText( author ) {
  * @param {WebhookPayloadPush} payload Push event payload.
  * @param {GitHub}             octokit Initialized Octokit REST client.
  */
-async function firstTimeContributor( payload, octokit ) {
+async function firstTimeContributorAccountLink( payload, octokit ) {
 	if ( payload.ref !== 'refs/heads/master' ) {
 		debug( 'first-time-contributor: Commit is not to `master`. Aborting' );
 		return;
@@ -109,4 +109,4 @@ async function firstTimeContributor( payload, octokit ) {
 	} );
 }
 
-module.exports = firstTimeContributor;
+module.exports = firstTimeContributorAccountLink;

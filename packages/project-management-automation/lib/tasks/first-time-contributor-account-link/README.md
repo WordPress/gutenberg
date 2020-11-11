@@ -1,4 +1,4 @@
-First Time Contributor
+First Time Contributor Account Link
 ===
 
 Prompts the user to link their GitHub account to their WordPress.org profile if necessary for release notes credit.
