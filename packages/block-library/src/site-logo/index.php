@@ -49,7 +49,7 @@ function register_block_core_site_logo() {
 			'render_callback' => 'render_block_core_site_logo',
 		)
 	);
-	add_filter( 'pre_set_theme_mod_custom_logo', 'sync_site_logo_to_theme_mod' );
+	add_filter( 'pre_set_theme_mod_custom_logo', 'delete_site_logo_when_setting_theme_mod' );
 	add_filter( 'theme_mod_custom_logo', 'override_custom_logo_theme_mod' );
 }
 add_action( 'init', 'register_block_core_site_logo' );
@@ -67,15 +67,15 @@ function override_custom_logo_theme_mod( $custom_logo ) {
 }
 
 /**
- * Syncs the site logo with the theme modified logo.
+ * Delete the site logo upon setting the custom logo theme mod.
  *
  * @param string $custom_logo The custom logo set by a theme.
  *
  * @return string The custom logo.
  */
-function sync_site_logo_to_theme_mod( $custom_logo ) {
+function delete_site_logo_when_setting_theme_mod( $custom_logo ) {
 	if ( $custom_logo ) {
-		update_option( 'sitelogo', $custom_logo );
+		delete_option( 'sitelogo' );
 	}
 	return $custom_logo;
 }
