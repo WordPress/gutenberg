@@ -71,13 +71,11 @@ export function FontAppearanceEdit( props ) {
 	};
 
 	const fontStyle = getFontAppearanceValueFromStyle(
-		'font-style',
 		fontStyles,
 		style?.typography?.fontStyle
 	);
 
 	const fontWeight = getFontAppearanceValueFromStyle(
-		'font-weight',
 		fontWeights,
 		style?.typography?.fontWeight
 	);
@@ -137,22 +135,21 @@ export function useIsFontAppearanceDisabled( props ) {
 }
 
 /**
- * Extracts the current selection, if available, from the CSS variable set as
- * the corresponding style attribute property e.g. `style.typography.fontStyle`
+ * Extracts the current selection, if available, from the CSS variable set
+ * within a style attribute property e.g. `style.typography.fontStyle`
  * or `style.typography.fontWeight`.
  *
- * @param  {string} property Which CSS property to parse.
  * @param  {Array}  presets  Available preset options.
- * @param  {string} style    Style attribute value for desired CSS property.
+ * @param  {string} style    Style attribute value to parse
  * @return {string}          Actual CSS property value.
  */
-const getFontAppearanceValueFromStyle = ( property, presets, style ) => {
-	const regex = new RegExp( `var:preset\\|${ property }\\|(.+)` );
-	const parsed = regex.exec( style );
-
-	if ( parsed && parsed[ 1 ] ) {
-		return presets.find( ( { slug } ) => slug === parsed[ 1 ] )?.slug;
+const getFontAppearanceValueFromStyle = ( presets, style ) => {
+	if ( ! style ) {
+		return undefined;
 	}
 
-	return style;
+	const parsedValue = style.slice( style.lastIndexOf( '|' ) + 1 );
+	const preset = presets.find( ( { slug } ) => slug === parsedValue );
+
+	return preset?.slug || style;
 };
