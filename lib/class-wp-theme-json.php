@@ -415,7 +415,7 @@ class WP_Theme_JSON {
 
 			$block_supports = array();
 			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
-				if ( self::get_from_path( $block_type->supports, $metadata['block_json'] ) ) {
+				if ( gutenberg_experimental_get( $block_type->supports, $metadata['block_json'] ) ) {
 					$block_supports[] = $key;
 				}
 			}
@@ -582,30 +582,6 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Utility to extract a path from an array.
-	 *
-	 * @param array $array    Array we want to retrieve data from.
-	 * @param array $path     Array containing the path to retrieve.
-	 * @param array $default  Value to return if $array doesn't contain the $path.
-	 *
-	 * @return array Data at the given $path or $default.
-	 */
-	private static function get_from_path( $array, $path, $default = array() ) {
-		if ( ! is_array( $array ) || ! is_array( $path ) ) {
-			return $default;
-		}
-
-		$path_length = count( $path );
-		for ( $i = 0; $i < $path_length; ++$i ) {
-			if ( ! isset( $array[ $path[ $i ] ] ) ) {
-				return $default;
-			}
-			$array = $array[ $path[ $i ] ];
-		}
-		return $array;
-	}
-
-	/**
 	 * Returns the style property for the given path.
 	 *
 	 * It also converts CSS Custom Property stored as
@@ -618,7 +594,7 @@ class WP_Theme_JSON {
 	 * @return string Style property value.
 	 */
 	private static function get_property_value( $styles, $path ) {
-		$value = self::get_from_path( $styles, $path, '' );
+		$value = gutenberg_experimental_get( $styles, $path, '' );
 
 		if ( '' === $value ) {
 			return $value;
@@ -700,7 +676,7 @@ class WP_Theme_JSON {
 		}
 
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = self::get_from_path( $context, $preset['path'], array() );
+			$values = gutenberg_experimental_get( $context, $preset['path'], array() );
 			foreach ( $values as $value ) {
 				foreach ( $preset['classes'] as $class ) {
 					$stylesheet .= self::to_ruleset(
@@ -736,7 +712,7 @@ class WP_Theme_JSON {
 	 */
 	private static function compute_preset_vars( &$declarations, $context ) {
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = self::get_from_path( $context, $preset['path'], array() );
+			$values = gutenberg_experimental_get( $context, $preset['path'], array() );
 			foreach ( $values as $value ) {
 				$declarations[] = array(
 					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . $value['slug'],
@@ -764,7 +740,7 @@ class WP_Theme_JSON {
 	 * @param array $context Input context to process.
 	 */
 	private static function compute_theme_vars( &$declarations, $context ) {
-		$custom_values = self::get_from_path( $context, array( 'settings', 'custom' ) );
+		$custom_values = gutenberg_experimental_get( $context, array( 'settings', 'custom' ) );
 		$css_vars      = self::flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
 			$declarations[] = array(
