@@ -166,8 +166,7 @@ $block-inserter-tabs-height: 44px;
 }
 
 .block-editor-inserter__panel-title,
-.block-editor-inserter__panel-title button,
-.components-custom-select-control__menu li {
+.block-editor-inserter__panel-title button {
 	margin: 0 $grid-unit-15 0 0;
 	color: $gray-700;
 	text-transform: uppercase;
