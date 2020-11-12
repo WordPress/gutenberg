@@ -79,3 +79,24 @@ export function createRegistryControl( registryControl ) {
 
 	return registryControl;
 }
+
+/**
+ * Create a store definition to pass to store API methods.
+ *
+ * @example
+ * ```js
+ * const storeDefinition = createStoreDefinition( 'my-shop' );
+ * ```
+ *
+ * @param {string} storeName Unique namespace identifier for the store.
+ *
+ * @return {Object} Store definition object.
+ */
+export function createStoreDefinition( storeName ) {
+	return {
+		name: storeName,
+		toString() {
+			return this.name;
+		},
+	};
+}

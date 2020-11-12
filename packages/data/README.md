@@ -80,7 +80,7 @@ registerStore( 'my-shop', {
 			const { prices, discountPercent } = state;
 			const price = prices[ item ];
 
-			return price * ( 1 - ( 0.01 * discountPercent ) );
+			return price * ( 1 - 0.01 * discountPercent );
 		},
 	},
 
@@ -91,7 +91,7 @@ registerStore( 'my-shop', {
 	},
 
 	resolvers: {
-		* getPrice( item ) {
+		*getPrice( item ) {
 			const path = '/wp/v2/prices/' + item;
 			const price = yield actions.fetchFromAPI( path );
 			return actions.setPrice( item, price );
@@ -151,7 +151,7 @@ The `@wordpress/data` module offers a more advanced and generic interface for th
     -   Behaves as Redux [`subscribe`](https://redux.js.org/api/store#subscribelistener)
         with the following differences:
         -   Doesn't have to implement an unsubscribe, since the registry never uses it.
-            			  \- Only has to support one listener (the registry).
+            \- Only has to support one listener (the registry).
 
 By implementing the above interface for your custom store, you gain the benefits of using the registry and the `withSelect` and `withDispatch` higher order components in your application code. This provides seamless integration with existing and alternative data systems.
 
@@ -168,16 +168,23 @@ const { registerGenericStore } = wp.data;
 
 const reduxStore = createStore();
 
-const mappedSelectors = Object.keys( existingSelectors ).reduce( ( acc, selectorKey ) => {
-	acc[ selectorKey ] = ( ...args ) =>
-		existingSelectors[ selectorKey ]( reduxStore.getState(), ...args );
-	return acc;
-}, {} );
+const mappedSelectors = Object.keys( existingSelectors ).reduce(
+	( acc, selectorKey ) => {
+		acc[ selectorKey ] = ( ...args ) =>
+			existingSelectors[ selectorKey ]( reduxStore.getState(), ...args );
+		return acc;
+	},
+	{}
+);
 
-const mappedActions = Object.keys( existingActions ).reduce( ( acc, actionKey ) => {
-	acc[ actionKey ] = ( ...args ) => reduxStore.dispatch( existingActions[ actionKey ]( ...args ) );
-	return acc;
-}, {} );
+const mappedActions = Object.keys( existingActions ).reduce(
+	( acc, actionKey ) => {
+		acc[ actionKey ] = ( ...args ) =>
+			reduxStore.dispatch( existingActions[ actionKey ]( ...args ) );
+		return acc;
+	},
+	{}
+);
 
 const genericStore = {
 	getSelectors() {
@@ -201,7 +208,7 @@ const { registerGenericStore } = wp.data;
 
 function createCustomStore() {
 	let storeChanged = () => {};
-	const prices = { hammer: 7.50 };
+	const prices = { hammer: 7.5 };
 
 	const selectors = {
 		getPrice( itemName ) {
@@ -225,7 +232,7 @@ function createCustomStore() {
 		},
 		subscribe( listener ) {
 			storeChanged = listener;
-		}
+		},
 	};
 }
 
@@ -424,6 +431,24 @@ _Parameters_
 _Returns_
 
 -   `Function`: Registry selector that can be registered with a store.
+
+<a name="createStoreDefinition" href="#createStoreDefinition">#</a> **createStoreDefinition**
+
+Create a store definition to pass to store API methods.
+
+_Usage_
+
+```js
+const storeDefinition = createStoreDefinition( 'my-shop' );
+```
+
+_Parameters_
+
+-   _storeName_ `string`: Unique namespace identifier for the store.
+
+_Returns_
+
+-   `Object`: Store definition object.
 
 <a name="dispatch" href="#dispatch">#</a> **dispatch**
 

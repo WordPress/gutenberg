@@ -78,7 +78,7 @@ _Returns_
 
 <a name="storeDefinition" href="#storeDefinition">#</a> **storeDefinition**
 
-Store registered for the viewport namespace.
+Store definition for the viewport namespace.
 
 _Related_
 

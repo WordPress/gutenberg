@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createStoreDefinition, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -31,17 +31,19 @@ export const storeConfig = {
 	controls,
 };
 
+/**
+ * Store definition for the block editor namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ *
+ * @type {Object}
+ */
+export const storeDefinition = createStoreDefinition( STORE_NAME );
+
 const store = registerStore( STORE_NAME, {
 	...storeConfig,
 	persist: [ 'preferences' ],
 } );
 applyMiddlewares( store );
 
-/**
- * Store registered for the block editor namespace.
- *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
- *
- * @type {Object}
- */
 export default store;
