@@ -52,10 +52,7 @@
 		"fontSize": true,
 		"__experimentalFontAppearance": true,
 		"__experimentalTextTransform": true,
-		"color": {
-			"textColor": true,
-			"backgroundColor": true
-		},
+		"color": true,
 		"__experimentalFontFamily": true,
 		"__experimentalTextDecoration": true
 	}
