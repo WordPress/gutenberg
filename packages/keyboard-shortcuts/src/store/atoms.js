@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createAtom, createDerivedAtom } from '@wordpress/data';
+import { createAtom, createDerivedAtom } from '@wordpress/stan';
 
 export const shortcutsByNameAtom = createAtom( {}, 'shortcuts-by-name' );
 export const shortcutNamesAtom = createAtom( [], 'shortcut-names' );

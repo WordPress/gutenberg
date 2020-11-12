@@ -1,0 +1,36 @@
+{
+	"name": "@wordpress/stan",
+	"version": "0.0.1",
+	"description": "WordPress state library.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+        "state",
+        "stan",
+        "recoil"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/stan/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/stan"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@babel/runtime": "^7.11.2",
+		"@wordpress/priority-queue": "file:../priority-queue",
+		"lodash": "^4.17.19"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

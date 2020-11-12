@@ -3,13 +3,13 @@
  */
 import { useLayoutEffect, useRef, useState, useMemo } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import { createDerivedAtom } from '@wordpress/stan';
 
 /**
  * Internal dependencies
  */
 import useAsyncMode from '../async-mode-provider/use-async-mode';
 import useRegistry from '../registry-provider/use-registry';
-import { createDerivedAtom } from '../../atom';
 
 /**
  * Custom react hook for retrieving props from registered selectors.

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, isObject, isFunction } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -10,96 +10,52 @@ import { createQueue } from '@wordpress/priority-queue';
 
 const resolveQueue = createQueue();
 
-function isPromise( obj ) {
-	return isObject( obj ) && isFunction( obj?.then );
-}
+/**
+ * @template T
+ * @typedef {(atom: import("./types").WPAtom<T>) => T} WPAtomResolver
+ */
 
-export const createAtomRegistry = ( {
-	onAdd = noop,
-	onDelete = noop,
-} = {} ) => {
-	const atoms = new WeakMap();
+/**
+ * @template T
+ * @typedef {(atom: import("./types").WPAtom<T>, value: any) => void} WPAtomUpdater
+ */
 
-	return {
-		getAtom( atomCreator ) {
-			if ( ! atoms.get( atomCreator ) ) {
-				const atom = atomCreator( this );
-				atoms.set( atomCreator, atom );
-				onAdd( atom );
-			}
-
-			return atoms.get( atomCreator );
-		},
-
-		// This shouldn't be necessary since we rely on week map
-		// But the legacy selectors/actions API requires us to know when
-		// some atoms are removed entirely to unsubscribe.
-		deleteAtom( atomCreator ) {
-			const atom = atoms.get( atomCreator );
-			atoms.delete( atomCreator );
-			onDelete( atom );
-		},
-	};
-};
-
-export const createAtom = ( initialValue, id ) => () => {
-	let value = initialValue;
-	let listeners = [];
-
-	return {
-		id,
-		type: 'root',
-		set( newValue ) {
-			value = newValue;
-			listeners.forEach( ( l ) => l() );
-		},
-		get() {
-			return value;
-		},
-		async resolve() {
-			return value;
-		},
-		subscribe( listener ) {
-			listeners.push( listener );
-			return () =>
-				( listeners = listeners.filter( ( l ) => l !== listener ) );
-		},
-		isResolved: true,
-	};
-};
-
-export const createStoreAtom = ( { get, subscribe }, id ) => () => {
-	let isResolved = false;
-	return {
-		id,
-		type: 'store',
-		get() {
-			return get();
-		},
-		subscribe: ( l ) => {
-			isResolved = true;
-			return subscribe( l );
-		},
-		get isResolved() {
-			return isResolved;
-		},
-	};
-};
+/**
+ * Creates a derived atom.
+ *
+ * @template T
+ * @param {(resolver: WPAtomResolver<any>) => T}                                 resolver Atom Resolver.
+ * @param {(resolver: WPAtomResolver<any>, updater: WPAtomUpdater<any>) => void} updater  Atom updater.
+ * @param {boolean=}                                                             isAsync  Atom resolution strategy.
+ * @param {string=}                                                              id       Atom id.
+ * @return {import("./types").WPAtom<T>}           Createtd atom.
+ */
 
 export const createDerivedAtom = (
-	getCallback,
-	modifierCallback = noop,
+	resolver,
+	updater = noop,
 	isAsync = false,
 	id
 ) => ( registry ) => {
+	/**
+	 * @type {any}
+	 */
 	let value = null;
+
+	/**
+	 * @type {(() => void)[]}
+	 */
 	let listeners = [];
+
+	/**
+	 * @type {(import("./types").WPAtomInstance<any>)[]}
+	 */
+	let dependencies = [];
 	let isListening = false;
 	let isResolved = false;
 	const context = {};
 
 	const dependenciesUnsubscribeMap = new WeakMap();
-	let dependencies = [];
 
 	const notifyListeners = () => {
 		listeners.forEach( ( l ) => l() );
@@ -118,15 +74,15 @@ export const createDerivedAtom = (
 	};
 
 	const resolve = () => {
+		/**
+		 * @type {(import("./types").WPAtomInstance<any>)[]}
+		 */
 		const updatedDependencies = [];
 		const updatedDependenciesMap = new WeakMap();
 		let result;
 		let didThrow = false;
-		if ( id === 'test-atom' ) {
-			// console.log( 'resolve start', didThrow, value );
-		}
 		try {
-			result = getCallback( ( atomCreator ) => {
+			result = resolver( ( atomCreator ) => {
 				const atom = registry.getAtom( atomCreator );
 				updatedDependenciesMap.set( atom, true );
 				updatedDependencies.push( atom );
@@ -162,6 +118,9 @@ export const createDerivedAtom = (
 			} );
 		}
 
+		/**
+		 * @param {any} newValue
+		 */
 		function checkNewValue( newValue ) {
 			if ( ! didThrow && newValue !== value ) {
 				value = newValue;
@@ -170,8 +129,9 @@ export const createDerivedAtom = (
 			}
 		}
 
-		if ( isPromise( result ) ) {
+		if ( result instanceof Promise ) {
 			// Should make this promise cancelable.
+
 			result
 				.then( ( newValue ) => {
 					syncDependencies();
@@ -197,7 +157,7 @@ export const createDerivedAtom = (
 			return value;
 		},
 		async set( arg ) {
-			await modifierCallback(
+			await updater(
 				( atomCreator ) => registry.getAtom( atomCreator ).get(),
 				( atomCreator ) => registry.getAtom( atomCreator ).set( arg )
 			);

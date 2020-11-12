@@ -5,11 +5,15 @@ import { omit, without, mapValues, isObject } from 'lodash';
 import memize from 'memize';
 
 /**
+ * WordPress dependencies
+ */
+import { createAtomRegistry, createStoreAtom } from '@wordpress/stan';
+
+/**
  * Internal dependencies
  */
 import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
-import { createAtomRegistry, createStoreAtom } from './atom';
 import { createAtomicStore } from './atomic-store';
 
 /**
@@ -51,15 +55,15 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
 	const storesAtoms = {};
 	const atomsUnsubscribe = {};
-	const atomRegistry = createAtomRegistry( {
-		onAdd: ( atom ) => {
+	const atomRegistry = createAtomRegistry(
+		( atom ) => {
 			const unsubscribeFromAtom = atom.subscribe( globalListener );
 			atomsUnsubscribe[ atom ] = unsubscribeFromAtom;
 		},
-		onDelete: ( atom ) => {
+		( atom ) => {
 			atomsUnsubscribe[ atom ]();
-		},
-	} );
+		}
+	);
 	let listeners = [];
 
 	/**
@@ -226,12 +230,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		}
 		stores[ key ] = config;
 		storesAtoms[ key ] = createStoreAtom(
-			{
-				get() {
-					return null;
-				},
-				subscribe: config.subscribe,
-			},
+			config.subscribe,
+			() => null,
+			() => {},
 			key
 		);
 		config.subscribe( globalListener );

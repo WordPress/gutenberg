@@ -1,9 +1,13 @@
 /**
+ * WordPress dependencies
+ */
+import { createDerivedAtom } from '@wordpress/stan';
+
+/**
  * Internal dependencies
  */
 import { createRegistry } from '../../registry';
 import { createRegistryControl, createRegistrySelector } from '../../factory';
-import { createDerivedAtom } from '../../atom';
 
 jest.useFakeTimers();
 async function flushImmediatesAndTicks( count = 1 ) {

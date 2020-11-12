@@ -6,7 +6,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createAtom } from '@wordpress/data';
+import { createAtom } from '@wordpress/stan';
 
 /**
  * Internal dependencies
