@@ -302,7 +302,7 @@ _Returns_
 
 -   `Array<RichTextValue>`: An array of new values.
 
-<a name="store" href="#store">#</a> **store**
+<a name="storeDefinition" href="#storeDefinition">#</a> **storeDefinition**
 
 Store registered for the rich-text namespace.
 

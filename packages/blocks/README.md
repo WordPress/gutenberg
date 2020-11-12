@@ -740,7 +740,7 @@ _Parameters_
 
 -   _blockName_ `string`: Block name.
 
-<a name="store" href="#store">#</a> **store**
+<a name="storeDefinition" href="#storeDefinition">#</a> **storeDefinition**
 
 Store registered for the blocks namespace.
 
