@@ -29,13 +29,13 @@ function __experimentalBlockVariationTransforms( { selectedBlockClientId } ) {
 	);
 	if ( ! variations?.length ) return null;
 
-	const selectOptions = [
-		...variations.map( ( { name, title, description } ) => ( {
+	const selectOptions = variations.map(
+		( { name, title, description } ) => ( {
 			value: name,
 			label: title,
 			info: description,
-		} ) ),
-	];
+		} )
+	);
 	const onSelectVariation = ( variationName ) => {
 		setSelectedValue( variationName );
 		updateBlockAttributes( selectedBlockClientId, {
