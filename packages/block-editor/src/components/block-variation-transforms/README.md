@@ -13,7 +13,7 @@ By selecting such a variation an update to the selected block's attributes happe
 
 ### Usage
 
-Renders the selected block's variations which have the `transform` option set in `scope` property.
+Renders the block's variations which have the `transform` option set in `scope` property.
 
 ```jsx
 import { useSelect } from '@wordpress/data';
@@ -35,7 +35,7 @@ const MyBlockVariationTransforms = () => {
 
 	return (
 		<BlockVariationTransforms
-			selectedBlockClientId={ selectedBlockClientId }
+			blockClientId={ selectedBlockClientId }
 		/>
 	);
 };
@@ -43,9 +43,9 @@ const MyBlockVariationTransforms = () => {
 
 ### Props
 
-#### selectedBlockClientId
+#### blockClientId
 
-The selected block's client id.
+The block's client id.
 
 - Type: `string`
 

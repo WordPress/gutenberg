@@ -11,21 +11,20 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { chevronDown } from '@wordpress/icons';
 
-function __experimentalBlockVariationTransforms( { selectedBlockClientId } ) {
+function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const [ selectedValue, setSelectedValue ] = useState( '' );
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 	const { variations } = useSelect(
 		( select ) => {
 			const { getBlockVariations } = select( 'core/blocks' );
 			const { getBlockName } = select( 'core/block-editor' );
-			const blockName =
-				selectedBlockClientId && getBlockName( selectedBlockClientId );
+			const blockName = blockClientId && getBlockName( blockClientId );
 			return {
 				variations:
 					blockName && getBlockVariations( blockName, 'transform' ),
 			};
 		},
-		[ selectedBlockClientId ]
+		[ blockClientId ]
 	);
 	if ( ! variations?.length ) return null;
 
@@ -38,7 +37,7 @@ function __experimentalBlockVariationTransforms( { selectedBlockClientId } ) {
 	);
 	const onSelectVariation = ( variationName ) => {
 		setSelectedValue( variationName );
-		updateBlockAttributes( selectedBlockClientId, {
+		updateBlockAttributes( blockClientId, {
 			...variations.find( ( { name } ) => name === variationName )
 				.attributes,
 		} );
