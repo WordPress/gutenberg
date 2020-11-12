@@ -58,6 +58,19 @@ function Navigation( {
 		clientId
 	);
 
+	const emptyStatePlaceholder = (
+		<div
+			style={ {
+				fontSize: '13px',
+				backgroundColor: 'purple',
+				color: 'white',
+				padding: '4px',
+			} }
+		>
+			Click [+] to add links
+		</div>
+	);
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-navigation__container',
@@ -81,6 +94,7 @@ function Navigation( {
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
+			placeholder: emptyStatePlaceholder,
 		}
 	);
 
