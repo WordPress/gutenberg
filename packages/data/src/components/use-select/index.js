@@ -67,15 +67,35 @@ export default function useSelect( _mapSelect, deps ) {
 	const [ , dispatch ] = useState( {} );
 	const rerender = () => dispatch( {} );
 	const isMountedAndNotUnsubscribing = useRef( true );
-	if ( mapSelect !== previousMapSelect.current ) {
-		// This makes sure initialization happens synchronously
-		// whenever mapSelect changes.
-		result.current = mapSelect( registry.select );
+
+	// This is important to handle zombie bugs ,
+	// Unfortunately, it seems tthere's no way around them for Redux subscriptions.
+	const previousMapError = useRef();
+	try {
+		if (
+			previousMapSelect.current !== mapSelect ||
+			previousMapError.current
+		) {
+			result.current = mapSelect( registry.select, registry );
+		}
+	} catch ( error ) {
+		let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
+		if ( previousMapError.current ) {
+			errorMessage += `\nThe error may be correlated with this previous error:\n`;
+			errorMessage += `${ previousMapError.current.stack }\n\n`;
+			errorMessage += 'Original stack trace:';
+
+			throw new Error( errorMessage );
+		} else {
+			// eslint-disable-next-line no-console
+			console.error( errorMessage );
+		}
 	}
 
 	useLayoutEffect( () => {
 		previousMapSelect.current = mapSelect;
 		isMountedAndNotUnsubscribing.current = true;
+		previousMapError.current = undefined;
 	} );
 
 	const atomCreator = useMemo( () => {
@@ -83,7 +103,16 @@ export default function useSelect( _mapSelect, deps ) {
 			( get ) => {
 				const current = registry.__unstableGetAtomResolver();
 				registry.__unstableSetAtomResolver( get );
-				const ret = previousMapSelect.current( registry.select );
+				let ret;
+				try {
+					ret = previousMapSelect.current(
+						registry.select,
+						registry
+					);
+				} catch ( error ) {
+					ret = result.current;
+					previousMapError.current = error;
+				}
 				registry.__unstableSetAtomResolver( current );
 				return ret;
 			},
