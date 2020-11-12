@@ -83,12 +83,10 @@ export default function GlobalStylesProvider( {
 				setContent( JSON.stringify( newContent ) );
 			},
 			getStyleProperty: ( context, propertyName, origin = 'merged' ) => {
-				const styleOrigins = {
-					merged: mergedStyles,
-					user: userStyles,
-				};
+				const styles = 'user' === origin ? userStyles : mergedStyles;
+
 				return get(
-					styleOrigins[ origin ]?.[ context ]?.styles,
+					styles?.[ context ]?.styles,
 					STYLE_PROPERTY[ propertyName ]
 				);
 			},
