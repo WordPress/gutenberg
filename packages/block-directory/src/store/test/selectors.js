@@ -89,9 +89,9 @@ describe( 'selectors', () => {
 
 	describe( 'getNewBlockTypes', () => {
 		it( 'should retrieve the block types that are installed and in the post content', () => {
-			getNewBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => blockList } ) ),
-			};
+			getNewBlockTypes.__unstableGetSelect = jest.fn( () => ( {
+				getBlocks: () => blockList,
+			} ) );
 			const state = {
 				blockManagement: {
 					installedBlockTypes: [
@@ -106,9 +106,9 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return an empty array if no blocks are used', () => {
-			getNewBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => [] } ) ),
-			};
+			getNewBlockTypes.__unstableGetSelect = jest.fn( () => ( {
+				getBlocks: () => [],
+			} ) );
 			const state = {
 				blockManagement: {
 					installedBlockTypes: [
@@ -124,9 +124,10 @@ describe( 'selectors', () => {
 
 	describe( 'getUnusedBlockTypes', () => {
 		it( 'should retrieve the block types that are installed but not used', () => {
-			getUnusedBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => blockList } ) ),
-			};
+			getUnusedBlockTypes.__unstableGetSelect = jest.fn( () => ( {
+				getBlocks: () => blockList,
+			} ) );
+
 			const state = {
 				blockManagement: {
 					installedBlockTypes: [
@@ -141,9 +142,10 @@ describe( 'selectors', () => {
 		} );
 
 		it( 'should return all block types if no blocks are used', () => {
-			getUnusedBlockTypes.registry = {
-				select: jest.fn( () => ( { getBlocks: () => [] } ) ),
-			};
+			getUnusedBlockTypes.__unstableGetSelect = jest.fn( () => ( {
+				getBlocks: () => [],
+			} ) );
+
 			const state = {
 				blockManagement: {
 					installedBlockTypes: [

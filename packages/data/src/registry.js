@@ -265,7 +265,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	let registry = {
-		atomRegistry,
+		getAtomRegistry() {
+			return atomRegistry;
+		},
 		registerGenericStore,
 		stores,
 		namespaces: stores, // TODO: Deprecate/remove this.

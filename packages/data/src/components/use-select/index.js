@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useRef, useState, useMemo } from '@wordpress/element';
+import {
+	useLayoutEffect,
+	useRef,
+	useState,
+	useMemo,
+	useCallback,
+} from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { createDerivedAtom } from '@wordpress/stan';
 
@@ -52,18 +58,22 @@ import useRegistry from '../registry-provider/use-registry';
  * not change because the dependency is just the currency.
  * @return {Function}  A custom react hook.
  */
-export default function useSelect( _mapSelect, deps = [] ) {
+export default function useSelect( _mapSelect, deps ) {
+	const mapSelect = useCallback( _mapSelect, deps );
+	const previousMapSelect = useRef();
+	const result = useRef();
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
-	const initialResult = _mapSelect( registry.select );
 	const [ , dispatch ] = useState( {} );
 	const rerender = () => dispatch( {} );
-	const result = useRef( initialResult );
 	const isMountedAndNotUnsubscribing = useRef( true );
+	if ( mapSelect !== previousMapSelect.current ) {
+		// This makes sure initialization only happens once.
+		result.current = mapSelect( registry.select );
+	}
 
-	const mapSelect = useRef( _mapSelect );
 	useLayoutEffect( () => {
-		mapSelect.current = _mapSelect;
+		previousMapSelect.current = mapSelect;
 		isMountedAndNotUnsubscribing.current = true;
 	} );
 
@@ -72,17 +82,17 @@ export default function useSelect( _mapSelect, deps = [] ) {
 			( get ) => {
 				const current = registry.__unstableGetAtomResolver();
 				registry.__unstableSetAtomResolver( get );
-				const ret = mapSelect.current( registry.select );
+				const ret = mapSelect( registry.select );
 				registry.__unstableSetAtomResolver( current );
 				return ret;
 			},
 			() => {},
 			isAsync
 		);
-	}, [ isAsync, registry, ...deps ] );
+	}, [ isAsync, registry, mapSelect ] );
 
 	useLayoutEffect( () => {
-		const atom = atomCreator( registry.atomRegistry );
+		const atom = atomCreator( registry.getAtomRegistry() );
 
 		const onStoreChange = () => {
 			if (
@@ -93,8 +103,15 @@ export default function useSelect( _mapSelect, deps = [] ) {
 				rerender();
 			}
 		};
+		const unsubscribe = atom.subscribe( () => {
+			onStoreChange();
+		} );
 
-		const unsubscribe = atom.subscribe( onStoreChange );
+		// This is necessary
+		// If the value changes during mount
+		// It also important to run after "subscribe"
+		// Otherwise the atom value might not be good.
+		onStoreChange();
 
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;

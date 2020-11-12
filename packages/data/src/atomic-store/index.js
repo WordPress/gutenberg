@@ -8,7 +8,7 @@ export function createAtomicStore( config, registry ) {
 	const selectors = mapValues( config.selectors, ( atomSelector ) => {
 		return ( ...args ) => {
 			return atomSelector( ( atomCreator ) =>
-				registry.atomRegistry.getAtom( atomCreator ).get()
+				registry.getAtomRegistry().getAtom( atomCreator ).get()
 			)( ...args );
 		};
 	} );
@@ -17,10 +17,13 @@ export function createAtomicStore( config, registry ) {
 		return ( ...args ) => {
 			return atomAction(
 				( atomCreator ) =>
-					registry.atomRegistry.getAtom( atomCreator ).get(),
+					registry.getAtomRegistry().getAtom( atomCreator ).get(),
 				( atomCreator, value ) =>
-					registry.atomRegistry.getAtom( atomCreator ).set( value ),
-				registry.atomRegistry
+					registry
+						.getAtomRegistry()
+						.getAtom( atomCreator )
+						.set( value ),
+				registry.getAtomRegistry()
 			)( ...args );
 		};
 	} );

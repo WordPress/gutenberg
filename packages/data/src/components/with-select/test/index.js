@@ -127,7 +127,7 @@ describe( 'withSelect', () => {
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 		// 2 times:
 		// - 1 on initial render
-		// - 1 on effect before subscription set.
+		// - 1 on atom subscription (resolve).
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( mapDispatchToProps ).toHaveBeenCalledTimes( 1 );
 
@@ -143,10 +143,11 @@ describe( 'withSelect', () => {
 		expect( mapDispatchToProps ).toHaveBeenCalledTimes( 2 );
 		// 4 times
 		// - 1 on initial render
-		// - 1 on effect before subscription set.
-		// - 1 on click triggering subscription firing.
+		// - 1 on atom subscription.
+		// - 1 on click subscription firing.
 		// - 1 on rerender.
-		expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
+		// - 1 on new atom subscription.
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 5 );
 		// verifies component only renders twice.
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
@@ -223,9 +224,10 @@ describe( 'withSelect', () => {
 			expect( testInstance.findByType( 'div' ).props.children ).toBe( 2 );
 			// Expected 3 times because:
 			// - 1 on initial render
-			// - 1 on effect before subscription set.
+			// - 1 on atom subscription (resolve).
 			// - 1 for the rerender because of the mapOutput change detected.
-			expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
+			// - 1 on new atom subscription (resolve).
+			expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
 			expect( renderSpy ).toHaveBeenCalledTimes( 2 );
 		} );
 		it( 'should rerun on unmount and mount', () => {
@@ -235,11 +237,7 @@ describe( 'withSelect', () => {
 			} );
 			testInstance = testRenderer.root;
 			expect( testInstance.findByType( 'div' ).props.children ).toBe( 4 );
-			// Expected an additional 3 times because of the unmount and remount:
-			// - 1 on initial render
-			// - 1 on effect before subscription set.
-			// - once for the rerender because of the mapOutput change detected.
-			expect( mapSelectToProps ).toHaveBeenCalledTimes( 6 );
+			expect( mapSelectToProps ).toHaveBeenCalledTimes( 8 );
 			expect( renderSpy ).toHaveBeenCalledTimes( 4 );
 		} );
 	} );
@@ -284,7 +282,7 @@ describe( 'withSelect', () => {
 
 		// 2 times:
 		// - 1 on initial render
-		// - 1 on effect before subscription set.
+		// - 1 on subscription (resolve the value of the atom)
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -297,7 +295,10 @@ describe( 'withSelect', () => {
 		} );
 
 		expect( testInstance.findByType( 'div' ).props.children ).toBe( 10 );
-		expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
+		// 2 times more
+		// - 1 on update of mapSelect
+		// - 1 on subscription (resolve the value of the new atom)
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
 
@@ -418,7 +419,7 @@ describe( 'withSelect', () => {
 
 		// 2 times:
 		// - 1 on initial render
-		// - 1 on effect before subscription set.
+		// - 1 on atom subscription (resolve).
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -430,7 +431,7 @@ describe( 'withSelect', () => {
 			);
 		} );
 
-		expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
 
@@ -508,7 +509,7 @@ describe( 'withSelect', () => {
 
 		// 2 times:
 		// - 1 on initial render
-		// - 1 on effect before subscription set.
+		// - 1 on atom subscription.
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -527,7 +528,7 @@ describe( 'withSelect', () => {
 			);
 		} );
 
-		expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 		expect(
 			JSON.parse( testInstance.findByType( 'div' ).props.children )
@@ -577,7 +578,7 @@ describe( 'withSelect', () => {
 
 		// 2 times:
 		// - 1 on initial render
-		// - 1 on effect before subscription set.
+		// - 1 on atom subscription (resolve).
 		expect( mapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( testInstance.findByType( 'div' ).props.children ).toBe(
@@ -592,7 +593,7 @@ describe( 'withSelect', () => {
 			);
 		} );
 
-		expect( mapSelectToProps ).toHaveBeenCalledTimes( 3 );
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 2 );
 		expect( testInstance.findByType( 'div' ).props.children ).toBe( 'OK' );
 
@@ -604,7 +605,7 @@ describe( 'withSelect', () => {
 			);
 		} );
 
-		expect( mapSelectToProps ).toHaveBeenCalledTimes( 4 );
+		expect( mapSelectToProps ).toHaveBeenCalledTimes( 6 );
 		expect( OriginalComponent ).toHaveBeenCalledTimes( 3 );
 		expect( testInstance.findByType( 'div' ).props.children ).toBe(
 			'Unknown'
@@ -656,7 +657,7 @@ describe( 'withSelect', () => {
 
 		// 2 times:
 		// - 1 on initial render
-		// - 1 on effect before subscription set.
+		// - 1 on atom subscription (resolve)
 		expect( childMapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( parentMapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
@@ -669,9 +670,9 @@ describe( 'withSelect', () => {
 		// 3 times because
 		// - 1 on initial render
 		// - 1 on effect before subscription set.
-		// - 1 child subscription fires.
-		expect( childMapSelectToProps ).toHaveBeenCalledTimes( 3 );
-		expect( parentMapSelectToProps ).toHaveBeenCalledTimes( 4 );
+		// - child subscription doesn't fire because we didn't subscribe to that store.
+		expect( childMapSelectToProps ).toHaveBeenCalledTimes( 2 );
+		expect( parentMapSelectToProps ).toHaveBeenCalledTimes( 5 );
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 2 );
 	} );
