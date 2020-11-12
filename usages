@@ -1,0 +1,1053 @@
+docs/contributors/coding-guidelines.md: * select( 'my-shop' ).getPrice( 'hammer' );
+docs/designers-developers/developers/backward-compatibility/deprecations.md:- `wp.editor.RichTextProvider` has been removed. Please use `wp.data.select( 'core/editor' )` methods instead.
+docs/designers-developers/developers/backward-compatibility/deprecations.md: - `wp.data.select("core").getTerms` has been deprecated. Please use `wp.data.select("core").getEntityRecords` instead.
+docs/designers-developers/developers/backward-compatibility/deprecations.md: - `wp.data.select("core").getCategories` has been deprecated. Please use `wp.data.select("core").getEntityRecords` instead.
+docs/designers-developers/developers/backward-compatibility/deprecations.md: - `wp.data.select("core").isRequestingCategories` has been deprecated. Please use `wp.data.select("core/data").isResolving` instead.
+docs/designers-developers/developers/backward-compatibility/deprecations.md: - `wp.data.select("core").isRequestingTerms` has been deprecated. Please use `wp.data.select("core").isResolving` instead.
+docs/designers-developers/developers/backward-compatibility/deprecations.md: - `wp.blocks.withEditorSettings` is removed. Please use the data module to access the editor settings `wp.data.select( "core/editor" ).getEditorSettings()`.
+docs/designers-developers/developers/backward-compatibility/deprecations.md: - `wp.data.select( 'selector', ...args )` removed. Please use `wp.data.select( reducerKey' ).*` instead.
+docs/designers-developers/developers/block-api/block-annotations.md:	blockClientId: wp.data.select( 'core/editor' ).getBlockOrder()[0],
+docs/designers-developers/developers/block-api/block-annotations.md:	blockClientId: wp.data.select( 'core/editor' ).getBlockOrder()[0],
+docs/designers-developers/developers/block-api/block-edit-save.md:It can not have any side effect or retrieve information from another source, e.g. it is not possible to use the data module inside it `select( store ).selector( ... )`.
+docs/designers-developers/developers/data/data-core-editor.md:    const initialPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+docs/designers-developers/developers/data/data-core-editor.md:    		const currentPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+docs/designers-developers/developers/data/data-core-editor.md:    			const postDate = new Date( wp.data.select( 'core/editor' ).getEditedPostAttribute( 'date' ) );
+docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md:			posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
+docs/designers-developers/developers/tutorials/block-tutorial/creating-dynamic-blocks.md:				posts: select( 'core' ).getEntityRecords( 'postType', 'post' ),
+docs/designers-developers/developers/tutorials/format-api/1-register-format.md:	wp.data.select( 'core/rich-text' ).getFormatTypes();
+docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md:				selectedBlock: select( 'core/editor' ).getSelectedBlock()
+docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md:			selectedBlock: select( 'core/editor' ).getSelectedBlock()
+docs/designers-developers/developers/tutorials/javascript/troubleshooting.md:wp.data.select( 'core/block-editor' ).getBlockCount();
+docs/designers-developers/developers/tutorials/metabox/meta-block-3-add.md:			( select ) => select( 'core/editor' ).getCurrentPostType(),
+docs/designers-developers/developers/tutorials/metabox/meta-block-3-add.md:					return select( 'core/editor' ).getCurrentPostType();
+docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-3-register-meta.md:wp.data.select( 'core/editor' ).getCurrentPost().meta;
+docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-4-initialize-input.md:			metaFieldValue: select( 'core/editor' )
+docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-5-update-meta.md:			metaFieldValue: select( 'core/editor' )
+docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-5-update-meta.md:wp.data.select( 'core/editor' ).getEditedPostAttribute( 'meta' )[
+docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-5-update-meta.md:wp.data.select( 'core/editor' ).getCurrentPost()[ 'meta' ][
+docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-5-update-meta.md:wp.data.select( 'core/editor' ).getEditedPostAttribute( 'meta' )[
+docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md:			metaFieldValue: select( 'core/editor' )
+docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md:				metaFieldValue: select( 'core/editor' )
+docs/designers-developers/developers/tutorials/sidebar-tutorial/plugin-sidebar-6-finishing-touches.md:				metaFieldValue: select( 'core/editor' )
+packages/annotations/src/block/index.js:		const annotations = select(
+packages/annotations/src/format/annotation.js:			annotations: select(
+packages/block-directory/README.md:The following selectors are available on the object returned by `wp.data.select( 'core/block-directory' )`:
+packages/block-directory/src/components/auto-block-uninstaller/index.js:		const { isAutosavingPost, isSavingPost } = select( 'core/editor' );
+packages/block-directory/src/components/auto-block-uninstaller/index.js:		( select ) => select( 'core/block-directory' ).getUnusedBlockTypes(),
+packages/block-directory/src/components/downloadable-block-list-item/index.js:			const { isInstalling, getErrorNoticeForBlock } = select(
+packages/block-directory/src/components/downloadable-block-notice/index.js:			select( 'core/block-directory' ).getErrorNoticeForBlock( block.id ),
+packages/block-directory/src/components/downloadable-blocks-panel/index.js:		} = select( 'core/block-directory' );
+packages/block-directory/src/components/downloadable-blocks-panel/index.js:		const hasPermission = select( 'core' ).canUser(
+packages/block-directory/src/plugins/get-install-missing/index.js:			const { getDownloadableBlocks } = select( 'core/block-directory' );
+packages/block-directory/src/plugins/get-install-missing/index.js:				hasPermission: select( 'core' ).canUser(
+packages/block-directory/src/plugins/get-install-missing/install-button.js:		select( 'core/block-directory' ).isInstalling( block.id )
+packages/block-directory/src/plugins/installed-blocks-pre-publish-panel/index.js:		( select ) => select( 'core/block-directory' ).getNewBlockTypes(),
+packages/block-directory/src/store/actions.js:		const registeredBlocks = yield controls.select(
+packages/block-directory/src/store/selectors.js:		const usedBlockTree = select( 'core/block-editor' ).getBlocks();
+packages/block-directory/src/store/selectors.js:		const usedBlockTree = select( 'core/block-editor' ).getBlocks();
+packages/block-editor/src/autocompleters/block.js:					} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-actions/index.js:	} = useSelect( ( select ) => select( 'core/block-editor' ), [] );
+packages/block-editor/src/components/block-actions/index.js:		( select ) => select( 'core/blocks' ),
+packages/block-editor/src/components/block-alignment-toolbar/index.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-editor/src/components/block-breadcrumb/index.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-caption/index.native.js:		const { getBlockAttributes, getSelectedBlockClientId } = select(
+packages/block-editor/src/components/block-draggable/draggable-chip.js:			const { getBlockName } = select( 'core/block-editor' );
+packages/block-editor/src/components/block-draggable/index.js:			const { getBlockRootClientId, getTemplateLock } = select(
+packages/block-editor/src/components/block-inspector/index.js:	} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-inspector/index.js:	const { getBlockStyles } = select( 'core/blocks' );
+packages/block-editor/src/components/block-list-appender/index.js:	} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list-appender/index.native.js:	const { getBlockOrder, canInsertBlockType, getTemplateLock } = select(
+packages/block-editor/src/components/block-list/block-contextual-toolbar.js:		const { getBlockName, getSelectedBlockClientIds } = select(
+packages/block-editor/src/components/block-list/block-contextual-toolbar.js:		const { getBlockType } = select( 'core/blocks' );
+packages/block-editor/src/components/block-list/block-html.js:		( select ) => select( 'core/block-editor' ).getBlock( clientId ),
+packages/block-editor/src/components/block-list/block-invalid-warning.js:		block: select( 'core/block-editor' ).getBlock( clientId ),
+packages/block-editor/src/components/block-list/block-list-item.native.js:			} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/block-popover.js:	} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/block-popover.js:	} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/block-selection-button.js:			} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/block-selection-button.native.js:		const { getBlockRootClientId, getBlockName, getSettings } = select(
+packages/block-editor/src/components/block-list/block-wrapper.js:			} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/block.js:			} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/block.js:	} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/block.js:			const { getBlockIndex } = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/block.js:			const { getPreviousBlockClientId, getNextBlockClientId } = select(
+packages/block-editor/src/components/block-list/block.native.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/block.native.js:				} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/index.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/index.native.js:			} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/index.native.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/insertion-point.js:			} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/insertion-point.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-list/root-container.js:	const { getSelectedBlockClientId, hasMultiSelection } = select(
+packages/block-editor/src/components/block-list/use-multi-selection.js:	} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-mobile-toolbar/block-actions-menu.native.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-mobile-toolbar/block-actions-menu.native.js:		const { getClipboard } = select( 'core/editor' );
+packages/block-editor/src/components/block-mobile-toolbar/block-actions-menu.native.js:			const { getBlockSelectionEnd, getBlock } = select(
+packages/block-editor/src/components/block-mobile-toolbar/index.native.js:		const { getBlockIndex } = select( 'core/block-editor' );
+packages/block-editor/src/components/block-mover/button.js:				} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-mover/index.js:	} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-mover/index.native.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-navigation/appender.js:			const { isBlockBeingDragged, isAncestorBeingDragged } = select(
+packages/block-editor/src/components/block-navigation/block-contents.js:				} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-navigation/block.js:			const { isBlockBeingDragged, isAncestorBeingDragged } = select(
+packages/block-editor/src/components/block-navigation/dropdown.js:			select( 'core/keyboard-shortcuts' ).getShortcutRepresentation(
+packages/block-editor/src/components/block-navigation/dropdown.js:		( select ) => !! select( 'core/block-editor' ).getBlockCount(),
+packages/block-editor/src/components/block-navigation/index.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-navigation/use-block-navigation-drop-zone.js:		const selectors = select( 'core/block-editor' );
+packages/block-editor/src/components/block-parent-selector/index.js:			} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-parent-selector/index.js:			const { hasBlockSupport } = select( 'core/blocks' );
+packages/block-editor/src/components/block-preview/index.js:		( select ) => select( 'core/block-editor' ).getSettings(),
+packages/block-editor/src/components/block-selection-clearer/index.js:		const { hasSelectedBlock, hasMultiSelection } = select(
+packages/block-editor/src/components/block-settings-menu-controls/index.js:			const { getBlocksByClientId, getSelectedBlockClientIds } = select(
+packages/block-editor/src/components/block-settings-menu/block-html-convert-button.js:		const block = select( 'core/block-editor' ).getBlock( clientId );
+packages/block-editor/src/components/block-settings-menu/block-mode-toggle.js:		const { getBlock, getBlockMode, getSettings } = select(
+packages/block-editor/src/components/block-settings-menu/block-settings-dropdown.js:		const { getShortcutRepresentation } = select(
+packages/block-editor/src/components/block-settings/container.native.js:		const { isEditorSidebarOpened } = select( 'core/edit-post' );
+packages/block-editor/src/components/block-settings/container.native.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-editor/src/components/block-styles/index.js:		const { getBlock } = select( 'core/block-editor' );
+packages/block-editor/src/components/block-styles/index.js:		const { getBlockStyles } = select( 'core/blocks' );
+packages/block-editor/src/components/block-styles/index.native.js:		const { getBlock } = select( 'core/block-editor' );
+packages/block-editor/src/components/block-styles/index.native.js:		const { getBlockStyles } = select( 'core/blocks' );
+packages/block-editor/src/components/block-switcher/index.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-switcher/index.js:		const { getBlockStyles } = select( 'core/blocks' );
+packages/block-editor/src/components/block-title/index.js:			const { getBlockName, getBlockAttributes } = select(
+packages/block-editor/src/components/block-toolbar/index.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-toolbar/index.native.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/block-variation-picker/index.native.js:		const { getBlockVariations } = select( 'core/blocks' );
+packages/block-editor/src/components/colors/use-colors.js:			const { getBlockAttributes } = select( 'core/block-editor' );
+packages/block-editor/src/components/copy-handler/index.js:		( select ) => select( 'core/block-editor' ),
+packages/block-editor/src/components/copy-handler/index.js:		( select ) => select( 'core/blocks' ),
+packages/block-editor/src/components/copy-handler/index.js:	} = useSelect( ( select ) => select( 'core/block-editor' ), [] );
+packages/block-editor/src/components/default-block-appender/index.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/default-block-appender/index.native.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/default-style-picker/index.js:			const settings = select( 'core/block-editor' ).getSettings();
+packages/block-editor/src/components/default-style-picker/index.js:				styles: select( 'core/blocks' ).getBlockStyles( blockName ),
+packages/block-editor/src/components/floating-toolbar/index.native.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/gradients/use-gradient.js:			const { getBlockAttributes } = select( 'core/block-editor' );
+packages/block-editor/src/components/inner-blocks/default-block-appender.js:		const { getBlockOrder } = select( 'core/block-editor' );
+packages/block-editor/src/components/inner-blocks/index.js:			const block = select( 'core/block-editor' ).getBlock( clientId );
+packages/block-editor/src/components/inner-blocks/index.js:			} = select( 'core/block-editor' );
+packages/block-editor/src/components/inner-blocks/index.native.js:		( select ) => select( 'core/block-editor' ).getBlock( clientId ),
+packages/block-editor/src/components/inner-blocks/use-inner-block-template-sync.js:		( select ) => select( 'core/block-editor' ).getBlocks( clientId ),
+packages/block-editor/src/components/inner-blocks/use-nested-settings-update.js:			const rootClientId = select(
+packages/block-editor/src/components/inner-blocks/use-nested-settings-update.js:				blockListSettings: select(
+packages/block-editor/src/components/inner-blocks/use-nested-settings-update.js:				parentLock: select( 'core/block-editor' ).getTemplateLock(
+packages/block-editor/src/components/inserter/block-types-tab.js:			const { getBlockName } = select( 'core/block-editor' );
+packages/block-editor/src/components/inserter/block-types-tab.js:			const { getChildBlockNames } = select( 'core/blocks' );
+packages/block-editor/src/components/inserter/child-blocks.js:		const { getBlockType } = select( 'core/blocks' );
+packages/block-editor/src/components/inserter/child-blocks.js:		const { getBlockName } = select( 'core/block-editor' );
+packages/block-editor/src/components/inserter/hooks/use-block-types-state.js:			const { getInserterItems } = select( 'core/block-editor' );
+packages/block-editor/src/components/inserter/hooks/use-block-types-state.js:			const { getCategories, getCollections } = select( 'core/blocks' );
+packages/block-editor/src/components/inserter/hooks/use-insertion-point.js:			} = select( 'core/block-editor' );
+packages/block-editor/src/components/inserter/hooks/use-insertion-point.js:				...pick( select( 'core/block-editor' ), [
+packages/block-editor/src/components/inserter/hooks/use-patterns-state.js:		} = select( 'core/block-editor' ).getSettings();
+packages/block-editor/src/components/inserter/index.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/inserter/index.js:		const { getBlockVariations } = select( 'core/blocks' );
+packages/block-editor/src/components/inserter/index.js:					} = select( 'core/block-editor' );
+packages/block-editor/src/components/inserter/index.native.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/inserter/index.native.js:			const { getSettings } = select( 'core/block-editor' );
+packages/block-editor/src/components/inserter/library.js:			const { getBlockRootClientId } = select( 'core/block-editor' );
+packages/block-editor/src/components/inserter/menu.js:		} = select( 'core/block-editor' ).getSettings();
+packages/block-editor/src/components/inserter/menu.native.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/inserter/menu.native.js:		const { getChildBlockNames, getBlockType } = select( 'core/blocks' );
+packages/block-editor/src/components/inserter/menu.native.js:		const { getClipboard } = select( 'core/editor' );
+packages/block-editor/src/components/inserter/menu.native.js:					const { getBlockOrder, getBlockCount } = select(
+packages/block-editor/src/components/inserter/quick-inserter.js:			select( 'core/block-editor' ).getSettings()
+packages/block-editor/src/components/inserter/quick-inserter.js:			select( 'core/block-editor' ).getPreviousBlockClientId( clientId ),
+packages/block-editor/src/components/keyboard-shortcuts/index.js:			} = select( 'core/block-editor' );
+packages/block-editor/src/components/link-control/use-search-handler.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-editor/src/components/media-placeholder/index.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-editor/src/components/media-replace-flow/index.js:		return select( 'core/block-editor' ).getSettings().mediaUpload;
+packages/block-editor/src/components/media-upload/check.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-editor/src/components/multi-select-scroll-into-view/index.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/multi-selection-inspector/index.js:	const { getMultiSelectedBlocks } = select( 'core/block-editor' );
+packages/block-editor/src/components/observe-typing/index.js:		select( 'core/block-editor' ).isTyping()
+packages/block-editor/src/components/page-template-picker/picker.native.js:		const { getEditedPostAttribute } = select( 'core/editor' );
+packages/block-editor/src/components/page-template-picker/preview.native.js:		return select( 'core/block-editor' ).getSettings();
+packages/block-editor/src/components/page-template-picker/use-page-template-picker.native.js:		const { getCurrentPostType } = select( 'core/editor' );
+packages/block-editor/src/components/page-template-picker/use-page-template-picker.native.js:		const { getBlockOrder, getBlock } = select( 'core/block-editor' );
+packages/block-editor/src/components/provider/test/use-block-sync.js:			.select( 'core/block-editor' )
+packages/block-editor/src/components/provider/use-block-sync.js:	const { getBlockName, getBlocks } = registry.select( 'core/block-editor' );
+packages/block-editor/src/components/provider/use-block-sync.js:		} = registry.select( 'core/block-editor' );
+packages/block-editor/src/components/rich-text/index.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/skip-to-selected-block/index.js:		selectedBlockClientId: select(
+packages/block-editor/src/components/tool-selector/index.js:		( select ) => select( 'core/block-editor' ).isNavigationMode(),
+packages/block-editor/src/components/typewriter/index.js:			const { getSelectedBlockClientId } = select( 'core/block-editor' );
+packages/block-editor/src/components/ungroup-button/index.native.js:		const { getSelectedBlockClientId, getBlock } = select(
+packages/block-editor/src/components/ungroup-button/index.native.js:		const { getGroupingBlockName } = select( 'core/blocks' );
+packages/block-editor/src/components/url-input/index.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-editor/src/components/use-block-drop-zone/index.js:			const { getBlockListSettings, getTemplateLock } = select(
+packages/block-editor/src/components/use-display-block-controls/index.js:			} = select( 'core/block-editor' );
+packages/block-editor/src/components/use-editor-feature/index.js:			const settings = select( 'core/block-editor' ).getSettings();
+packages/block-editor/src/components/use-on-block-drop/index.js:		} = select( 'core/block-editor' );
+packages/block-editor/src/components/use-resize-canvas/README.md:		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
+packages/block-editor/src/components/writing-flow/focus-capture.js:			select( 'core/block-editor' ).isNavigationMode()
+packages/block-editor/src/components/writing-flow/index.js:	} = select( 'core/block-editor' );
+packages/block-editor/src/hooks/align.js:				!! select( 'core/block-editor' ).getSettings().alignWide,
+packages/block-editor/src/hooks/padding.js:	return Platform.select( {
+packages/block-editor/src/store/actions.js:	const count = yield controls.select( 'core/block-editor', 'getBlockCount' );
+packages/block-editor/src/store/actions.js:	const previousBlockClientId = yield controls.select(
+packages/block-editor/src/store/actions.js:	const nextBlockClientId = yield controls.select(
+packages/block-editor/src/store/actions.js:		yield controls.select( 'core/block-editor', 'getSettings' )
+packages/block-editor/src/store/actions.js:	const rootClientId = yield controls.select(
+packages/block-editor/src/store/actions.js:		const canInsertBlock = yield controls.select(
+packages/block-editor/src/store/actions.js:	const templateLock = yield controls.select(
+packages/block-editor/src/store/actions.js:	const canInsertBlocks = yield controls.select(
+packages/block-editor/src/store/actions.js:		yield controls.select( 'core/block-editor', 'getSettings' )
+packages/block-editor/src/store/actions.js:		const isValid = yield controls.select(
+packages/block-editor/src/store/actions.js:	const rootClientId = yield controls.select(
+packages/block-editor/src/store/actions.js:	const isLocked = yield controls.select(
+packages/block-editor/src/store/actions.js:		previousBlockId = yield controls.select(
+packages/block-editor/src/store/actions.js:	const blocks = yield controls.select(
+packages/block-editor/src/store/actions.js:	const rootClientId = yield controls.select(
+packages/block-editor/src/store/actions.js:	const lastSelectedIndex = yield controls.select(
+packages/block-editor/src/store/actions.js:	const rootClientId = yield controls.select(
+packages/block-editor/src/store/actions.js:	const isLocked = yield controls.select(
+packages/block-editor/src/store/actions.js:	const firstSelectedIndex = yield controls.select(
+packages/block-editor/src/store/actions.js:	const rootClientId = yield controls.select(
+packages/block-editor/src/store/actions.js:	const isLocked = yield controls.select(
+packages/block-editor/src/store/actions.js:	const firstSelectedIndex = yield controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select( 'core/block-editor', 'getBlockCount' )
+packages/block-editor/src/store/test/actions.js:				controls.select( 'core/block-editor', 'getSettings' )
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select( 'core/block-editor', 'getBlockCount' )
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select( 'core/block-editor', 'getSettings' )
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select( 'core/block-editor', 'getSettings' )
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select( 'core/block-editor', 'getBlockCount' ),
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select( 'core/block-editor', 'getBlockCount' ),
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select(
+packages/block-editor/src/store/test/actions.js:				controls.select( 'core/block-editor', 'getBlockCount' ),
+packages/block-library/src/audio/edit.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-library/src/block/edit-panel/index.js:			titleField.current.select();
+packages/block-library/src/block/edit.js:			reusableBlock: select( 'core' ).getEditedEntityRecord(
+packages/block-library/src/block/edit.js:			hasResolved: select( 'core' ).hasFinishedResolution(
+packages/block-library/src/block/edit.js:			isSaving: select( 'core' ).isSavingEntityRecord( ...recordArgs ),
+packages/block-library/src/block/edit.js:			canUserUpdate: select( 'core' ).canUser( 'update', 'blocks', ref ),
+packages/block-library/src/block/edit.js:			isEditing: select(
+packages/block-library/src/block/edit.js:			settings: select( 'core/block-editor' ).getSettings(),
+packages/block-library/src/button/edit.native.js:		const { isEditorSidebarOpened } = select( 'core/edit-post' );
+packages/block-library/src/button/edit.native.js:		} = select( 'core/block-editor' );
+packages/block-library/src/buttons/edit.native.js:			} = select( 'core/block-editor' );
+packages/block-library/src/calendar/edit.js:		const { getEditedPostAttribute } = select( 'core/editor' );
+packages/block-library/src/categories/edit.js:		const { getEntityRecords } = select( 'core' );
+packages/block-library/src/categories/edit.js:		const { isResolving } = select( 'core/data' );
+packages/block-library/src/classic/convert-to-blocks-button.js:			return select( 'core/block-editor' ).getBlock( clientId );
+packages/block-library/src/column/edit.js:			const { getBlockOrder, getBlockRootClientId } = select(
+packages/block-library/src/column/edit.native.js:		} = select( 'core/block-editor' );
+packages/block-library/src/columns/edit.js:				count: select( 'core/block-editor' ).getBlockCount( clientId ),
+packages/block-library/src/columns/edit.js:			const { getBlockOrder } = registry.select( 'core/block-editor' );
+packages/block-library/src/columns/edit.js:			const { getBlocks } = registry.select( 'core/block-editor' );
+packages/block-library/src/columns/edit.js:			} = select( 'core/blocks' );
+packages/block-library/src/columns/edit.js:			select( 'core/block-editor' ).getBlocks( clientId ).length > 0,
+packages/block-library/src/columns/edit.native.js:			const { getBlockOrder } = registry.select( 'core/block-editor' );
+packages/block-library/src/columns/edit.native.js:			const { getBlocks, getBlockAttributes } = registry.select(
+packages/block-library/src/columns/edit.native.js:			const { getBlocks, getBlockAttributes } = registry.select(
+packages/block-library/src/columns/edit.native.js:			const { getBlockCount, getBlock } = select( 'core/block-editor' );
+packages/block-library/src/cover/edit.native.js:		const { getSelectedBlockClientId } = select( 'core/block-editor' );
+packages/block-library/src/cover/edit.native.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-library/src/embed/edit.js:			} = select( 'core' );
+packages/block-library/src/file/edit.js:				id === undefined ? undefined : select( 'core' ).getMedia( id ),
+packages/block-library/src/file/edit.js:			mediaUpload: select( 'core/block-editor' ).getSettings()
+packages/block-library/src/file/transforms.js:				const { getMedia } = select( 'core' );
+packages/block-library/src/file/transforms.js:				const { getMedia } = select( 'core' );
+packages/block-library/src/file/transforms.js:				const { getMedia } = select( 'core' );
+packages/block-library/src/gallery/edit.js:const PLACEHOLDER_TEXT = Platform.select( {
+packages/block-library/src/gallery/edit.js:const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
+packages/block-library/src/gallery/edit.js:		const { getMedia } = select( 'core' );
+packages/block-library/src/gallery/edit.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-library/src/gallery/gallery-image.js:		this.props.onDeselect();
+packages/block-library/src/gallery/gallery-image.js:		const { getMedia } = select( 'core' );
+packages/block-library/src/gallery/gallery.native.js:		return !! select( 'core/block-editor' ).getSettings().isRTL;
+packages/block-library/src/group/edit.js:			const { getBlock } = select( 'core/block-editor' );
+packages/block-library/src/group/edit.native.js:		const { getBlock } = select( 'core/block-editor' );
+packages/block-library/src/html/edit.js:				select( 'core/block-editor' ).getSettings().styles
+packages/block-library/src/image/edit.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-library/src/image/edit.native.js:		const { getMedia } = select( 'core' );
+packages/block-library/src/image/edit.native.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-library/src/image/image.js:			const { getMedia } = select( 'core' );
+packages/block-library/src/image/image.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-library/src/latest-posts/edit.js:			const { getEntityRecords, getMedia } = select( 'core' );
+packages/block-library/src/latest-posts/edit.js:			const { getSettings } = select( 'core/block-editor' );
+packages/block-library/src/list/edit.js:		return !! select( 'core/block-editor' ).getSettings().isRTL;
+packages/block-library/src/media-text/edit.js:			mediaId && isSelected ? select( 'core' ).getMedia( mediaId ) : null,
+packages/block-library/src/media-text/edit.js:		const settings = select( 'core/block-editor' ).getSettings();
+packages/block-library/src/media-text/edit.native.js:		} = select( 'core/block-editor' );
+packages/block-library/src/missing/edit.native.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-library/src/navigation-link/edit.js:		( select ) => select( 'core/block-editor' ).isDraggingBlocks(),
+packages/block-library/src/navigation-link/edit.js:		} = select( 'core/block-editor' );
+packages/block-library/src/navigation-link/edit.js:			userCanCreatePages: select( 'core' ).canUser( 'create', 'pages' ),
+packages/block-library/src/navigation-link/edit.js:			userCanCreatePosts: select( 'core' ).canUser( 'create', 'posts' ),
+packages/block-library/src/navigation-link/edit.js:				const { getClientIdsOfDescendants } = registry.select(
+packages/block-library/src/navigation/block-navigation-list.js:			const { getSelectedBlockClientId, getBlock } = select(
+packages/block-library/src/navigation/edit.js:		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
+packages/block-library/src/navigation/edit.js:		} = select( 'core/block-editor' );
+packages/block-library/src/navigation/placeholder.js:			} = select( 'core' );
+packages/block-library/src/paragraph/edit.js:		return !! select( 'core/block-editor' ).getSettings().isRTL;
+packages/block-library/src/paragraph/edit.js:			const { fontSizes } = select( 'core/block-editor' ).getSettings();
+packages/block-library/src/paragraph/edit.native.js:		return !! select( 'core/block-editor' ).getSettings().isRTL;
+packages/block-library/src/post-author/edit.js:			const { getEditedEntityRecord, getUser, getUsers } = select(
+packages/block-library/src/post-comment-author/edit.js:		const { getEntityRecord } = select( 'core' );
+packages/block-library/src/post-comments/edit.js:			const comments = select( 'core' ).getEntityRecords(
+packages/block-library/src/post-content/edit.js:		( select ) => select( 'core/editor' ).getCurrentPost() ?? {}
+packages/block-library/src/post-featured-image/edit.js:			featuredImage && select( 'core' ).getMedia( featuredImage ),
+packages/block-library/src/post-hierarchical-terms/edit.js:			} = select( 'core/blocks' );
+packages/block-library/src/post-hierarchical-terms/edit.js:			const taxonomies = select( 'core' ).getTaxonomies( {
+packages/block-library/src/post-hierarchical-terms/use-hierarchical-term-links.js:			const { getEntityRecord } = select( 'core' );
+packages/block-library/src/post-tags/edit.js:			const { getEntityRecord } = select( 'core' );
+packages/block-library/src/post-title/edit.js:			select( 'core' ).getEditedEntityRecord(
+packages/block-library/src/pullquote/deprecated.js:					select( 'core/block-editor' ).getSettings(),
+packages/block-library/src/query-loop/edit.js:			const { getEntityRecords } = select( 'core' );
+packages/block-library/src/query-loop/edit.js:			const { getBlocks } = select( 'core/block-editor' );
+packages/block-library/src/query/edit/index.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-library/src/query/edit/index.js:			!! select( 'core/block-editor' ).getBlocks( clientId ).length,
+packages/block-library/src/query/edit/query-inspector-controls.js:			const { getEntityRecords, getPostTypes } = select( 'core' );
+packages/block-library/src/query/edit/query-placeholder.js:			} = select( 'core/blocks' );
+packages/block-library/src/site-logo/edit.js:		const { getSettings } = select( 'core/block-editor' );
+packages/block-library/src/site-logo/edit.js:		const siteEntities = select( 'core' ).getEditedEntityRecord(
+packages/block-library/src/site-logo/edit.js:		const siteSettings = select( 'core' ).getEditedEntityRecord(
+packages/block-library/src/site-logo/edit.js:		const mediaItem = select( 'core' ).getEntityRecord(
+packages/block-library/src/social-link/edit.native.js:		const { getBlock } = select( 'core/block-editor' );
+packages/block-library/src/social-links/edit.native.js:		} = select( 'core/block-editor' );
+packages/block-library/src/tag-cloud/edit.js:		taxonomies: select( 'core' ).getTaxonomies(),
+packages/block-library/src/template-part/edit/index.js:			const { getBlocks } = select( 'core/block-editor' );
+packages/block-library/src/template-part/edit/index.js:			const entityRecord = select( 'core' ).getEntityRecord(
+packages/block-library/src/template-part/edit/name-panel.js:				onFocus={ ( event ) => event.target.select() }
+packages/block-library/src/template-part/edit/selection/template-part-previews.js:		const publishedTemplateParts = select( 'core' ).getEntityRecords(
+packages/block-library/src/template-part/edit/selection/template-part-previews.js:		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
+packages/block-library/src/template-part/edit/selection/template-part-previews.js:		const themeTemplateParts = select( 'core' ).getEntityRecords(
+packages/block-library/src/template-part/edit/use-template-part-post.js:					select( 'core' ).getEntityRecord(
+packages/block-library/src/template-part/edit/use-template-part-post.js:				const posts = select( 'core' ).getEntityRecords(
+packages/block-library/src/video/edit.js:		( select ) => select( 'core/block-editor' ).getSettings().mediaUpload
+packages/block-library/src/video/tracks-editor.js:		return select( 'core/block-editor' ).getSettings().mediaUpload;
+packages/blocks/src/api/categories.js:	return select( 'core/blocks' ).getCategories();
+packages/blocks/src/api/registration.js:	if ( select( 'core/blocks' ).getBlockType( name ) ) {
+packages/blocks/src/api/registration.js:		! some( select( 'core/blocks' ).getCategories(), {
+packages/blocks/src/api/registration.js:	const oldBlock = select( 'core/blocks' ).getBlockType( name );
+packages/blocks/src/api/registration.js:	return select( 'core/blocks' ).getFreeformFallbackBlockName();
+packages/blocks/src/api/registration.js:	return select( 'core/blocks' ).getGroupingBlockName();
+packages/blocks/src/api/registration.js:	return select( 'core/blocks' ).getUnregisteredFallbackBlockName();
+packages/blocks/src/api/registration.js:	return select( 'core/blocks' ).getDefaultBlockName();
+packages/blocks/src/api/registration.js:	return select( 'core/blocks' ).getBlockType( name );
+packages/blocks/src/api/registration.js:	return select( 'core/blocks' ).getBlockTypes();
+packages/blocks/src/api/registration.js:	return select( 'core/blocks' ).getBlockSupport(
+packages/blocks/src/api/registration.js:	return select( 'core/blocks' ).hasBlockSupport(
+packages/blocks/src/api/registration.js:	return select( 'core/blocks' ).getChildBlockNames( blockName );
+packages/blocks/src/api/registration.js:	return select( 'core/blocks' ).hasChildBlocks( blockName );
+packages/blocks/src/api/registration.js:	return select( 'core/blocks' ).hasChildBlocksWithInserterSupport(
+packages/blocks/src/api/registration.js:	return select( 'core/blocks' ).getBlockVariations( blockName, scope );
+packages/blocks/src/api/test/registration.js:			expect( select( 'core/blocks' ).getCollections() ).toEqual( {
+packages/blocks/src/api/test/registration.js:			expect( select( 'core/blocks' ).getCollections() ).toEqual( {
+packages/components/src/alignment-matrix-control/stories/index.js:		value: select( 'value', alignmentOptions, 'center center' ),
+packages/components/src/alignment-matrix-control/stories/index.js:		value: select( 'value', alignmentOptions, 'center center' ),
+packages/components/src/autocomplete/index.js:	function select( option ) {
+packages/components/src/autocomplete/index.js:				select( filteredOptions[ selectedIndex ] );
+packages/components/src/card/stories/_utils.js:		size: select(
+packages/components/src/card/stories/_utils.js:	const width = select(
+packages/components/src/card/stories/media.js:	const align = select(
+packages/components/src/flex/stories/index.js:	const align = select(
+packages/components/src/flex/stories/index.js:	const justify = select(
+packages/components/src/input-control/stories/index.js:		labelPosition: select(
+packages/components/src/input-control/stories/index.js:		size: select(
+packages/components/src/mobile/html-text-input/index.native.js:		const { getEditedPostAttribute, getEditedPostContent } = select(
+packages/components/src/mobile/link-picker/link-picker-results.native.js:		const { getSettings } = select( 'core/block-editor' );
+packages/components/src/mobile/link-settings/index.native.js:		const { isEditorSidebarOpened } = select( 'core/edit-post' );
+packages/components/src/mobile/modal-header-bar/button.native.js:	const props = Platform.select( {
+packages/components/src/notice/list.native.js:		const { getNotices } = select( 'core/editor' );
+packages/components/src/notice/stories/index.js:	const status = select(
+packages/components/src/notice/stories/index.js:	const status = select(
+packages/components/src/notice/stories/index.js:	const politeness = select(
+packages/components/src/popover/stories/index.js:	const focusOnMount = select(
+packages/components/src/select-control/stories/index.js:		labelPosition: select(
+packages/components/src/select-control/stories/index.js:		size: select(
+packages/components/src/tooltip/stories/index.js:	const position = select( 'Position', positionOptions, 'top center' );
+packages/components/src/unit-control/stories/index.js:		size: select(
+packages/core-data/CHANGELOG.md:- `select("core").getTerms` has been deprecated. Please use `select("core").getEntityRecords` instead.
+packages/core-data/CHANGELOG.md:- `select("core").getCategories` has been deprecated. Please use `select("core").getEntityRecords` instead.
+packages/core-data/CHANGELOG.md:- `wp.data.select("core").isRequestingCategories` has been deprecated. Please use `wp.data.select("core/data").isResolving` instead.
+packages/core-data/CHANGELOG.md:- `select("core").isRequestingTerms` has been deprecated. Please use `select("core").isResolving` instead.
+packages/core-data/README.md:	authors: select( 'core' ).getAuthors(),
+packages/core-data/README.md:The following selectors are available on the object returned by `wp.data.select( 'core' )`:
+packages/core-data/src/actions.js:	const entity = yield controls.select( 'core', 'getEntity', kind, name );
+packages/core-data/src/actions.js:	const record = yield controls.select(
+packages/core-data/src/actions.js:	const editedRecord = yield controls.select(
+packages/core-data/src/actions.js:	const undoEdit = yield controls.select( 'core', 'getUndoEdit' );
+packages/core-data/src/actions.js:	const redoEdit = yield controls.select( 'core', 'getRedoEdit' );
+packages/core-data/src/actions.js:				yield controls.select(
+packages/core-data/src/actions.js:		const persistedRecord = yield controls.select(
+packages/core-data/src/actions.js:			const currentUser = yield controls.select(
+packages/core-data/src/actions.js:			const autosavePost = yield controls.select(
+packages/core-data/src/actions.js:			persistedEntity = yield controls.select(
+packages/core-data/src/actions.js:			currentEdits = yield controls.select(
+packages/core-data/src/actions.js:					...( yield controls.select(
+packages/core-data/src/actions.js:		! ( yield controls.select(
+packages/core-data/src/actions.js:	const edits = yield controls.select(
+packages/core-data/src/entities.js:	let entities = yield controls.select( 'core', 'getEntitiesByKind', kind );
+packages/core-data/src/entity-provider.js:			const { getEntityRecord, getEditedEntityRecord } = select( 'core' );
+packages/core-data/src/resolvers.js:		const hasRecords = yield controls.select(
+packages/core-data/src/resolvers.js:	deprecated( "select( 'core' ).hasUploadPermissions()", {
+packages/core-data/src/resolvers.js:		alternative: "select( 'core' ).canUser( 'create', 'media' )",
+packages/core-data/src/selectors.js:		return select( 'core/data' ).isResolving(
+packages/core-data/src/selectors.js:	deprecated( "select( 'core' ).getAuthors()", {
+packages/core-data/src/selectors.js:		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
+packages/core-data/src/selectors.js:	deprecated( "select( 'core' ).hasUploadPermissions()", {
+packages/core-data/src/selectors.js:		alternative: "select( 'core' ).canUser( 'create', 'media' )",
+packages/core-data/src/selectors.js:		return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [
+packages/core-data/src/test/actions.js:			controls.select( 'core', 'getEntity', entity.kind, entity.name )
+packages/core-data/src/utils/if-not-resolved.js:		const hasStartedResolution = yield controls.select(
+packages/data-controls/src/index.js:export function select( ...args ) {
+packages/data-controls/src/index.js:	return dataControls.select( ...args );
+packages/data/README.md:    return select( 'core/block-editor' ).getBlockCount()
+packages/data/README.md:  return select( 'core/editor' ).getCurrentPostId();
+packages/data/README.md: return select( 'core' ).getEntityRecordEdits( 'postType', postType, postId );
+packages/data/README.md:select( 'my-shop' ).getPrice( 'hammer' );
+packages/data/README.md:    ( select ) => select( 'my-shop' ).getStockNumber(),
+packages/data/README.md:    return select( 'my-shop' ).getPrice( 'hammer', currency )
+packages/data/README.md:   const { getStockNumber } = select( 'my-shop' );
+packages/data/README.md:	const { getPrice } = select( 'my-shop' );
+packages/data/src/components/async-mode-provider/context.js: *     return select( 'core/block-editor' ).getBlockCount()
+packages/data/src/components/use-dispatch/use-dispatch.js: *     ( select ) => select( 'my-shop' ).getStockNumber(),
+packages/data/src/components/use-select/index.js: *     return select( 'my-shop' ).getPrice( 'hammer', currency )
+packages/data/src/components/use-select/test/index.js:			results: select( 'testStore' ).testSelector( props.keyName ),
+packages/data/src/components/use-select/test/index.js:			select( 'testStore' ).testSelector()
+packages/data/src/components/use-store-selectors/index.js:	return useSelect( ( select ) => mapSelectors( select( storeKey ) ), deps );
+packages/data/src/components/with-dispatch/index.js: *    const { getStockNumber } = select( 'my-shop' );
+packages/data/src/components/with-dispatch/test/index.js:					const outerCount = _select( 'counter' ).getCount();
+packages/data/src/components/with-dispatch/test/index.js:							const innerCount = _select( 'counter' ).getCount();
+packages/data/src/components/with-select/index.js: * 	const { getPrice } = select( 'my-shop' );
+packages/data/src/components/with-select/test/index.js:				data: _select( 'reactReducer' ).reactSelector(
+packages/data/src/components/with-select/test/index.js:				count: _select( 'counter' ).getCount(),
+packages/data/src/components/with-select/test/index.js:				count: _select( 'counter' ).getCount(),
+packages/data/src/components/with-select/test/index.js:				count: _select( 'counter' ).getCount( ownProps.offset ),
+packages/data/src/components/with-select/test/index.js:				value: _select( 'demo' ).getUnchangingValue(),
+packages/data/src/components/with-select/test/index.js:					[ ownProps.propName ]: _select( 'demo' ).getValue(),
+packages/data/src/components/with-select/test/index.js:						count: _select( 'demo' ).getValue(),
+packages/data/src/components/with-select/test/index.js:				isRenderingChild: _select( 'childRender' ).getValue(),
+packages/data/src/components/with-select/test/index.js:				value: _select( 'demo' ).getValue(),
+packages/data/src/controls.js: *   const isEditorSideBarOpened = yield controls.select( 'core/edit-post', 'isEditorSideBarOpened' );
+packages/data/src/controls.js:function select( storeKey, selectorName, ...args ) {
+packages/data/src/controls.js:			registry.select( storeKey )[ selectorName ]( ...args )
+packages/data/src/controls.js:			const method = registry.select( storeKey )[ selectorName ]
+packages/data/src/factory.js: *   return select( 'core/editor' ).getCurrentPostId();
+packages/data/src/factory.js: *	 return select( 'core' ).getEntityRecordEdits( 'postType', postType, postId );
+packages/data/src/index.js: * select( 'my-shop' ).getPrice( 'hammer' );
+packages/data/src/namespace-store/test/index.js:					.select( 'store' )
+packages/data/src/namespace-store/test/index.js:					const items = registry.select( 'store' ).getItems();
+packages/data/src/namespace-store/test/index.js:			registry.select( 'store' ).getItems();
+packages/data/src/namespace-store/test/index.js:			expect( registry.select( 'store' ).getItems.hasResolver ).toBe(
+packages/data/src/namespace-store/test/index.js:			expect( registry.select( 'store' ).getItem.hasResolver ).toBe(
+packages/data/src/namespace-store/test/index.js:			expect( registry.select( 'store' ).getItems.hasResolver ).toBe(
+packages/data/src/plugins/persistence/test/index.js:		expect( registry.select( 'test' ).getState() ).toEqual( { a: 1 } );
+packages/data/src/plugins/persistence/test/index.js:		expect( registry.select( 'test' ).getState() ).toEqual( {
+packages/data/src/plugins/persistence/test/index.js:		expect( registry.select( 'test' ).getState() ).toEqual( {
+packages/data/src/plugins/persistence/test/index.js:		expect( registry.select( 'test' ).getState() ).toEqual( {
+packages/data/src/plugins/persistence/test/index.js:		expect( registry.select( 'test' ).getState() ).toBe( null );
+packages/data/src/plugins/persistence/test/index.js:		expect( registry.select( 'test' ).getState() ).toBe( 1 );
+packages/data/src/registry.js:	function select( reducerKey ) {
+packages/data/src/registry.js:		return parent && parent.select( reducerKey );
+packages/data/src/registry.js:		return getResolveSelectors( select( reducerKey ) );
+packages/data/src/resolvers-cache-middleware.js:		.select( 'core/data' )
+packages/data/src/store/index.js:		return registry.select( reducerKey )[ selectorName ]( ...args );
+packages/data/src/test/controls.js:				const value = yield controls.select(
+packages/data/src/test/controls.js:				const value = yield controls.select(
+packages/data/src/test/controls.js:			expect( registry.select( 'test/dispatch' ).get() ).toBe( 0 );
+packages/data/src/test/controls.js:			expect( registry.select( 'test/dispatch' ).get() ).toBe( 2 );
+packages/data/src/test/registry.js:				expect( registry.select( 'grocer' ).getPrice ).toEqual(
+packages/data/src/test/registry.js:				expect( registry.select( 'grocer' ).getQuantity ).toEqual(
+packages/data/src/test/registry.js:			expect( registry.select( 'butcher' ) ).toHaveProperty( 'getPrice' );
+packages/data/src/test/registry.js:			expect( registry.select( 'butcher' ).getPrice( 'chicken' ) ).toBe(
+packages/data/src/test/registry.js:			expect( registry.select( 'butcher' ).getPrice( 'ribs' ) ).toBe( 6 );
+packages/data/src/test/registry.js:			expect( registry.select( 'butcher' ).getPrice( 'chicken' ) ).toBe(
+packages/data/src/test/registry.js:			expect( registry.select( 'butcher' ).getPrice( 'ribs' ) ).toBe( 6 );
+packages/data/src/test/registry.js:			expect( registry.select( 'demo' ).getValue() ).toBe( 'OK' );
+packages/data/src/test/registry.js:			const value = registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getValue( 'arg3', 'arg4' );
+packages/data/src/test/registry.js:			const value = registry.select( 'demo' ).getValue( 'arg1', 'arg2' );
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getPage( 1 );
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getPage( 2 );
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getPage( 1 );
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getPage( 2 );
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getPage( 3, {} );
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getPage( 1 );
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getPage( 2 );
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getPage( 3, {} );
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getPage( 4 );
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getPage( 4, {} );
+packages/data/src/test/registry.js:				() => registry.select( 'demo' ).getValue() === 'OK',
+packages/data/src/test/registry.js:						.select( 'core/data' )
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getValue();
+packages/data/src/test/registry.js:				() => registry.select( 'demo' ).getValue() === 'OK',
+packages/data/src/test/registry.js:						.select( 'core/data' )
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getValue();
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getValue();
+packages/data/src/test/registry.js:				() => registry.select( 'demo' ).getValue() === 'OK'
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getValue();
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getValue();
+packages/data/src/test/registry.js:				() => registry.select( 'demo' ).getValue() === 'OK'
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getValue(); // Triggers resolver switches to OK
+packages/data/src/test/registry.js:				() => registry.select( 'demo' ).getValue() === 'NOTOK'
+packages/data/src/test/registry.js:			registry.select( 'demo' ).getValue(); // Triggers the resolver again and switch to NOTOK
+packages/data/src/test/registry.js:			expect( registry.select( 'reducer1' ).selector1() ).toEqual(
+packages/data/src/test/registry.js:			expect( registry.select( 'reducer1' ).selector2() ).toEqual(
+packages/data/src/test/registry.js:				select( 'reducer1' ).selector1()
+packages/data/src/test/registry.js:			expect( registry.select( 'reducer2' ).selector2() ).toEqual(
+packages/data/src/test/registry.js:				select( 'reducer1' ).selector1()
+packages/data/src/test/registry.js:			expect( registry.select( 'reducer2' ).selector3() ).toEqual(
+packages/data/src/test/registry.js:					.select( 'myAwesomeReducer' )
+packages/data/src/test/registry.js:			expect( registry.select() ).toBe( 10 );
+packages/data/src/test/registry.js:			subRegistry.select( 'store' ).mySelector();
+packages/data/src/test/registry.js:			subRegistry.select( 'store' ).mySelector();
+packages/e2e-test-utils/README.md:Returns an array with all blocks; Equivalent to calling wp.data.select( 'core/block-editor' ).getBlocks();
+packages/e2e-test-utils/src/create-new-post.js:		wp.data.select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' )
+packages/e2e-test-utils/src/create-new-post.js:		wp.data.select( 'core/edit-post' ).isFeatureActive( 'fullscreenMode' )
+packages/e2e-test-utils/src/get-all-blocks.js: * Returns an array with all blocks; Equivalent to calling wp.data.select( 'core/block-editor' ).getBlocks();
+packages/e2e-test-utils/src/get-block-setting.js:				.select( 'core/blocks' )
+packages/e2e-test-utils/src/posts.js:	await page.select( '#bulk-action-selector-top', 'trash' );
+packages/e2e-test-utils/src/wp-data-select.js:				.select( _store )
+packages/e2e-tests/plugins/inner-blocks-allowed-blocks/index.js:			var getBlockOrder = select( 'core/block-editor' ).getBlockOrder;
+packages/e2e-tests/plugins/inner-blocks-render-appender/index.js:					const { getBlockOrder } = select( 'core/block-editor' );
+packages/e2e-tests/plugins/plugins-api/annotations-sidebar.js:								blockClientId: select( 'core/block-editor' ).getBlockOrder()[ 0 ],
+packages/e2e-tests/plugins/plugins-api/sidebar.js:				title: select( 'core/editor' ).getEditedPostAttribute( 'title' ),
+packages/e2e-tests/specs/editor/plugins/templates.test.js:			await page.select( '#default_post_format', format );
+packages/e2e-tests/specs/editor/various/autosave.test.js:		window.wp.data.select( 'core/editor' ).getCurrentPostId()
+packages/e2e-tests/specs/editor/various/autosave.test.js:				window.wp.data.select( 'core/editor' ).getEditorSettings()
+packages/e2e-tests/specs/editor/various/block-deletion.test.js:				.select( 'core/blocks' )
+packages/e2e-tests/specs/editor/various/block-deletion.test.js:				.select( 'core/block-editor' )
+packages/e2e-tests/specs/editor/various/change-detection.test.js:			window.wp.data.select( 'core/editor' ).getCurrentPostId()
+packages/e2e-tests/specs/editor/various/links.test.js:			const isCurrentlyFixed = select( 'core/edit-post' ).isFeatureActive(
+packages/e2e-tests/specs/editor/various/navigable-toolbar.test.js:			const isCurrentlyUnified = select(
+packages/e2e-tests/specs/editor/various/post-visibility.test.js:					.select( 'core/editor' )
+packages/e2e-tests/specs/editor/various/post-visibility.test.js:				.select( 'core/editor' )
+packages/e2e-tests/specs/editor/various/reusable-blocks.test.js:			const blocks = wp.data.select( 'core/block-editor' ).getBlocks();
+packages/e2e-tests/specs/editor/various/taxonomies.test.js:			const post = wp.data.select( 'core/editor' ).getCurrentPost();
+packages/e2e-tests/specs/editor/various/writing-flow.test.js:		() => wp.data.select( 'core/block-editor' ).getSelectedBlock().name
+packages/e2e-tests/specs/local/demo.test.js:			return select( 'core/editor' ).isEditedPostDirty();
+packages/edit-navigation/src/components/header/manage-locations.js:	const menus = useSelect( ( select ) => select( 'core' ).getMenus(), [] );
+packages/edit-navigation/src/components/inspector-additions/auto-add-pages-panel.js:	const menu = useSelect( ( select ) => select( 'core' ).getMenu( menuId ), [
+packages/edit-navigation/src/components/inspector-additions/index.js:		( select ) => select( 'core/block-editor' ).getSelectedBlock(),
+packages/edit-navigation/src/components/layout/use-menu-notifications.js:			lastSaveError: select( 'core' ).getLastEntitySaveError(
+packages/edit-navigation/src/components/layout/use-menu-notifications.js:			lastDeleteError: select( 'core' ).getLastEntityDeleteError(
+packages/edit-navigation/src/components/layout/use-navigation-editor.js:		( select ) => select( 'core' ).getMenus( { per_page: -1 } ),
+packages/edit-navigation/src/components/layout/use-navigation-editor.js:			select( 'core/edit-navigation' ).getNavigationPostForMenu(
+packages/edit-navigation/src/components/notices/index.js:		( select ) => select( 'core/notices' ).getNotices(),
+packages/edit-navigation/src/store/controls.js:export function select( registryName, selectorName, ...args ) {
+packages/edit-navigation/src/store/controls.js:			return registry.select( registryName )[ selectorName ]( ...args );
+packages/edit-navigation/src/store/selectors.js:		return select( 'core' ).getEditedEntityRecord(
+packages/edit-navigation/src/store/selectors.js:		return select( 'core' ).hasFinishedResolution( 'getEntityRecord', [
+packages/edit-navigation/src/store/selectors.js:		return select( 'core' ).getMenuItem( mapping[ clientId ] );
+packages/edit-navigation/src/store/test/controls.js:			select( 'registryName', 'selectorName', 'arg1', 'arg2' )
+packages/edit-post/src/components/browser-url/index.js:	const { getCurrentPost, isSavingPost } = select( 'core/editor' );
+packages/edit-post/src/components/device-preview/index.js:			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+packages/edit-post/src/components/device-preview/index.js:			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+packages/edit-post/src/components/device-preview/index.js:			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
+packages/edit-post/src/components/device-preview/index.js:			deviceType: select(
+packages/edit-post/src/components/editor-initialization/listener-hooks.js:			hasBlockSelection: !! select(
+packages/edit-post/src/components/editor-initialization/listener-hooks.js:			isEditorSidebarOpened: select( STORE_KEY ).isEditorSidebarOpened(),
+packages/edit-post/src/components/editor-initialization/listener-hooks.js:			newPermalink: select( 'core/editor' ).getCurrentPost().link,
+packages/edit-post/src/components/header/feature-toggle/index.js:		isActive: select( 'core/edit-post' ).isFeatureActive( feature ),
+packages/edit-post/src/components/header/fullscreen-mode-close/index.js:			const { getCurrentPostType } = select( 'core/editor' );
+packages/edit-post/src/components/header/fullscreen-mode-close/index.js:			const { isFeatureActive } = select( 'core/edit-post' );
+packages/edit-post/src/components/header/fullscreen-mode-close/index.js:			const { isResolving } = select( 'core/data' );
+packages/edit-post/src/components/header/fullscreen-mode-close/index.js:			const { getEntityRecord, getPostType } = select( 'core' );
+packages/edit-post/src/components/header/header-toolbar/index.js:		} = select( 'core/block-editor' );
+packages/edit-post/src/components/header/header-toolbar/index.js:			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
+packages/edit-post/src/components/header/header-toolbar/index.js:				select( 'core/edit-post' ).getEditorMode() === 'visual' &&
+packages/edit-post/src/components/header/header-toolbar/index.js:				select( 'core/editor' ).getEditorSettings()
+packages/edit-post/src/components/header/header-toolbar/index.js:			isInserterOpened: select( 'core/edit-post' ).isInserterOpened(),
+packages/edit-post/src/components/header/header-toolbar/index.js:				select( 'core/edit-post' ).getEditorMode() === 'text',
+packages/edit-post/src/components/header/header-toolbar/index.js:			previewDeviceType: select(
+packages/edit-post/src/components/header/header-toolbar/index.js:			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+packages/edit-post/src/components/header/header-toolbar/index.js:			isNavigationTool: select( 'core/block-editor' ).isNavigationMode(),
+packages/edit-post/src/components/header/header-toolbar/index.js:			hasReducedUI: select( 'core/edit-post' ).isFeatureActive(
+packages/edit-post/src/components/header/header-toolbar/index.native.js:		hasRedo: select( 'core/editor' ).hasEditorRedo(),
+packages/edit-post/src/components/header/header-toolbar/index.native.js:		hasUndo: select( 'core/editor' ).hasEditorUndo(),
+packages/edit-post/src/components/header/header-toolbar/index.native.js:			select( 'core/edit-post' ).getEditorMode() === 'visual' &&
+packages/edit-post/src/components/header/header-toolbar/index.native.js:			select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+packages/edit-post/src/components/header/header-toolbar/index.native.js:			select( 'core/edit-post' ).getEditorMode() === 'text',
+packages/edit-post/src/components/header/header-toolbar/index.native.js:		isRTL: select( 'core/block-editor' ).getSettings().isRTL,
+packages/edit-post/src/components/header/index.js:			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+packages/edit-post/src/components/header/index.js:			isPublishSidebarOpened: select(
+packages/edit-post/src/components/header/index.js:			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+packages/edit-post/src/components/header/index.js:			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+packages/edit-post/src/components/header/index.js:			hasReducedUI: select( 'core/edit-post' ).isFeatureActive(
+packages/edit-post/src/components/header/mode-switcher/index.js:			shortcut: select(
+packages/edit-post/src/components/header/mode-switcher/index.js:			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
+packages/edit-post/src/components/header/mode-switcher/index.js:			isCodeEditingEnabled: select( 'core/editor' ).getEditorSettings()
+packages/edit-post/src/components/header/mode-switcher/index.js:			mode: select( 'core/edit-post' ).getEditorMode(),
+packages/edit-post/src/components/header/post-publish-button-or-toggle.js:			select( 'core/editor' ).getCurrentPost(),
+packages/edit-post/src/components/header/post-publish-button-or-toggle.js:		isBeingScheduled: select( 'core/editor' ).isEditedPostBeingScheduled(),
+packages/edit-post/src/components/header/post-publish-button-or-toggle.js:		isPending: select( 'core/editor' ).isCurrentPostPending(),
+packages/edit-post/src/components/header/post-publish-button-or-toggle.js:		isPublished: select( 'core/editor' ).isCurrentPostPublished(),
+packages/edit-post/src/components/header/post-publish-button-or-toggle.js:		isPublishSidebarEnabled: select(
+packages/edit-post/src/components/header/post-publish-button-or-toggle.js:		isPublishSidebarOpened: select(
+packages/edit-post/src/components/header/post-publish-button-or-toggle.js:		isScheduled: select( 'core/editor' ).isCurrentPostScheduled(),
+packages/edit-post/src/components/keyboard-shortcut-help-modal/dynamic-shortcut.js:		} = select( 'core/keyboard-shortcuts' );
+packages/edit-post/src/components/keyboard-shortcut-help-modal/index.js:			return select( 'core/keyboard-shortcuts' ).getCategoryShortcuts(
+packages/edit-post/src/components/keyboard-shortcut-help-modal/index.js:		isModalActive: select( 'core/edit-post' ).isModalActive( MODAL_NAME ),
+packages/edit-post/src/components/keyboard-shortcuts/index.js:		const settings = select( 'core/editor' ).getEditorSettings();
+packages/edit-post/src/components/keyboard-shortcuts/index.js:			getBlockSelectionStart: select( 'core/block-editor' )
+packages/edit-post/src/components/keyboard-shortcuts/index.js:			getEditorMode: select( 'core/edit-post' ).getEditorMode,
+packages/edit-post/src/components/keyboard-shortcuts/index.js:			isEditorSidebarOpened: select( 'core/edit-post' )
+packages/edit-post/src/components/layout/actions-panel.js:			publishSidebarOpened: select(
+packages/edit-post/src/components/layout/actions-panel.js:			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+packages/edit-post/src/components/layout/actions-panel.js:			isSavingMetaBoxes: select( 'core/edit-post' ).isSavingMetaBoxes(),
+packages/edit-post/src/components/layout/actions-panel.js:			hasNonPostEntityChanges: select(
+packages/edit-post/src/components/layout/index.js:			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
+packages/edit-post/src/components/layout/index.js:				select( 'core/interface' ).getActiveComplementaryArea(
+packages/edit-post/src/components/layout/index.js:				) || select( 'core/edit-post' ).isPublishSidebarOpened()
+packages/edit-post/src/components/layout/index.js:			isFullscreenActive: select( 'core/edit-post' ).isFeatureActive(
+packages/edit-post/src/components/layout/index.js:			showMostUsedBlocks: select( 'core/edit-post' ).isFeatureActive(
+packages/edit-post/src/components/layout/index.js:			isInserterOpened: select( 'core/edit-post' ).isInserterOpened(),
+packages/edit-post/src/components/layout/index.js:			mode: select( 'core/edit-post' ).getEditorMode(),
+packages/edit-post/src/components/layout/index.js:			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
+packages/edit-post/src/components/layout/index.js:			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
+packages/edit-post/src/components/layout/index.js:			previousShortcut: select(
+packages/edit-post/src/components/layout/index.js:			nextShortcut: select(
+packages/edit-post/src/components/layout/index.js:			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+packages/edit-post/src/components/layout/index.js:			hasReducedUI: select( 'core/edit-post' ).isFeatureActive(
+packages/edit-post/src/components/layout/index.native.js:		const { __unstableIsEditorReady: isEditorReady } = select(
+packages/edit-post/src/components/layout/index.native.js:		const { getEditorMode } = select( 'core/edit-post' );
+packages/edit-post/src/components/layout/index.native.js:		const { getSettings } = select( 'core/block-editor' );
+packages/edit-post/src/components/manage-blocks-modal/category.js:		const { getPreference } = select( 'core/edit-post' );
+packages/edit-post/src/components/manage-blocks-modal/index.js:		const { isModalActive } = select( 'core/edit-post' );
+packages/edit-post/src/components/manage-blocks-modal/manager.js:		} = select( 'core/blocks' );
+packages/edit-post/src/components/manage-blocks-modal/manager.js:		const { getPreference } = select( 'core/edit-post' );
+packages/edit-post/src/components/meta-boxes/index.js:	const { isMetaBoxLocationVisible, getMetaBoxesPerLocation } = select(
+packages/edit-post/src/components/meta-boxes/meta-box-visibility.js:	isVisible: select( 'core/edit-post' ).isEditorPanelEnabled(
+packages/edit-post/src/components/meta-boxes/meta-boxes-area/index.js:		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+packages/edit-post/src/components/preferences-modal/index.js:		const { getEditedPostAttribute } = select( 'core/editor' );
+packages/edit-post/src/components/preferences-modal/index.js:		const { getPostType } = select( 'core' );
+packages/edit-post/src/components/preferences-modal/index.js:			isModalActive: select( 'core/edit-post' ).isModalActive(
+packages/edit-post/src/components/preferences-modal/meta-boxes-section.js:	const { getEditorSettings } = select( 'core/editor' );
+packages/edit-post/src/components/preferences-modal/meta-boxes-section.js:	const { getAllMetaBoxes } = select( 'core/edit-post' );
+packages/edit-post/src/components/preferences-modal/options/enable-custom-fields.js:	areCustomFieldsEnabled: !! select( 'core/editor' ).getEditorSettings()
+packages/edit-post/src/components/preferences-modal/options/enable-feature.js:		const { isFeatureActive } = select( 'core/edit-post' );
+packages/edit-post/src/components/preferences-modal/options/enable-panel.js:		const { isEditorPanelEnabled, isEditorPanelRemoved } = select(
+packages/edit-post/src/components/preferences-modal/options/enable-publish-sidebar.js:		isChecked: select( 'core/editor' ).isPublishSidebarEnabled(),
+packages/edit-post/src/components/sidebar/discussion-panel/index.js:			isEnabled: select( 'core/edit-post' ).isEditorPanelEnabled(
+packages/edit-post/src/components/sidebar/discussion-panel/index.js:			isOpened: select( 'core/edit-post' ).isEditorPanelOpened(
+packages/edit-post/src/components/sidebar/featured-image/index.js:	const { getEditedPostAttribute } = select( 'core/editor' );
+packages/edit-post/src/components/sidebar/featured-image/index.js:	const { getPostType } = select( 'core' );
+packages/edit-post/src/components/sidebar/featured-image/index.js:	const { isEditorPanelEnabled, isEditorPanelOpened } = select(
+packages/edit-post/src/components/sidebar/page-attributes/index.js:	const { getEditedPostAttribute } = select( 'core/editor' );
+packages/edit-post/src/components/sidebar/page-attributes/index.js:	const { isEditorPanelEnabled, isEditorPanelOpened } = select(
+packages/edit-post/src/components/sidebar/page-attributes/index.js:	const { getPostType } = select( 'core' );
+packages/edit-post/src/components/sidebar/plugin-document-setting-panel/index.js:			opened: select( 'core/edit-post' ).isEditorPanelOpened( panelName ),
+packages/edit-post/src/components/sidebar/plugin-document-setting-panel/index.js:			isEnabled: select( 'core/edit-post' ).isEditorPanelEnabled(
+packages/edit-post/src/components/sidebar/plugin-sidebar/index.js:			postTitle: select( 'core/editor' ).getEditedPostAttribute(
+packages/edit-post/src/components/sidebar/plugin-sidebar/index.js:			shortcut: select(
+packages/edit-post/src/components/sidebar/plugin-sidebar/index.js:			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+packages/edit-post/src/components/sidebar/post-excerpt/index.js:			isEnabled: select( 'core/edit-post' ).isEditorPanelEnabled(
+packages/edit-post/src/components/sidebar/post-excerpt/index.js:			isOpened: select( 'core/edit-post' ).isEditorPanelOpened(
+packages/edit-post/src/components/sidebar/post-link/index.js:		} = select( 'core/editor' );
+packages/edit-post/src/components/sidebar/post-link/index.js:		const { isEditorPanelEnabled, isEditorPanelOpened } = select(
+packages/edit-post/src/components/sidebar/post-link/index.js:		const { getPostType } = select( 'core' );
+packages/edit-post/src/components/sidebar/post-status/index.js:		const { isEditorPanelRemoved, isEditorPanelOpened } = select(
+packages/edit-post/src/components/sidebar/post-taxonomies/taxonomy-panel.js:				? select( 'core/edit-post' ).isEditorPanelEnabled( panelName )
+packages/edit-post/src/components/sidebar/post-taxonomies/taxonomy-panel.js:				? select( 'core/edit-post' ).isEditorPanelOpened( panelName )
+packages/edit-post/src/components/sidebar/settings-header/index.js:		const currentPostType = select( 'core/editor' ).getCurrentPostType();
+packages/edit-post/src/components/sidebar/settings-header/index.js:		const postType = select( 'core' ).getPostType( currentPostType );
+packages/edit-post/src/components/sidebar/settings-sidebar/index.js:const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
+packages/edit-post/src/components/sidebar/settings-sidebar/index.js:		let sidebar = select( 'core/interface' ).getActiveComplementaryArea(
+packages/edit-post/src/components/sidebar/settings-sidebar/index.js:			if ( select( 'core/block-editor' ).getBlockSelectionStart() ) {
+packages/edit-post/src/components/sidebar/settings-sidebar/index.js:		const shortcut = select(
+packages/edit-post/src/components/text-editor/index.js:		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
+packages/edit-post/src/components/visual-editor/block-inspector-button.js:			shortcut: select(
+packages/edit-post/src/components/visual-editor/block-inspector-button.js:				select( 'core/edit-post' ).getActiveGeneralSidebarName() ===
+packages/edit-post/src/components/visual-editor/header.native.js:		const { getEditedPostAttribute } = select( 'core/editor' );
+packages/edit-post/src/components/visual-editor/index.js:		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
+packages/edit-post/src/components/welcome-guide/index.js:			select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' ),
+packages/edit-post/src/editor.js:		} = select( 'core/edit-post' );
+packages/edit-post/src/editor.js:		const { getEntityRecord } = select( 'core' );
+packages/edit-post/src/editor.js:		const { getBlockTypes } = select( 'core/blocks' );
+packages/edit-post/src/editor.native.js:		} = select( 'core/edit-post' );
+packages/edit-post/src/editor.native.js:		const { getBlockTypes } = select( 'core/blocks' );
+packages/edit-post/src/hooks/validate-multiple-use/index.js:		const blocks = select( 'core/block-editor' ).getBlocks();
+packages/edit-post/src/plugins/copy-content-menu-item/index.js:		editedPostContent: select( 'core/editor' ).getEditedPostAttribute(
+packages/edit-post/src/store/effects.js:			const postType = select( 'core/editor' ).getCurrentPostType();
+packages/edit-post/src/store/effects.js:		let wasSavingPost = select( 'core/editor' ).isSavingPost();
+packages/edit-post/src/store/effects.js:		let wasAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+packages/edit-post/src/store/effects.js:		const hasActiveMetaBoxes = select( 'core/edit-post' ).hasMetaBoxes();
+packages/edit-post/src/store/effects.js:			const isSavingPost = select( 'core/editor' ).isSavingPost();
+packages/edit-post/src/store/effects.js:			const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+packages/edit-post/src/store/effects.js:		const post = select( 'core/editor' ).getCurrentPost( state );
+packages/edit-post/src/store/selectors.js:		const activeGeneralSidebar = select(
+packages/edit-post/src/store/selectors.js:		const activeGeneralSidebar = select(
+packages/edit-post/src/store/selectors.js:		return select( 'core/interface' ).getActiveComplementaryArea(
+packages/edit-post/src/store/selectors.js:		return select( 'core/interface' ).isItemPinned(
+packages/edit-site/src/components/block-editor/index.js:			const { getSettings, getTemplateType, getPage } = select(
+packages/edit-site/src/components/editor/global-styles-provider.js:		select( 'core/edit-site' ).getSettings()
+packages/edit-site/src/components/editor/index.js:		} = _select( 'core/edit-site' );
+packages/edit-site/src/components/editor/index.js:			sidebarIsOpened: !! _select(
+packages/edit-site/src/components/editor/index.js:				? _select( 'core' ).getEntityRecord(
+packages/edit-site/src/components/editor/index.js:				const { getEditedEntityRecord } = select( 'core' );
+packages/edit-site/src/components/editor/utils.js:		return select( 'core/edit-site' ).getSettings();
+packages/edit-site/src/components/header/document-actions/index.js:			activeEntityBlockId: select(
+packages/edit-site/src/components/header/document-actions/index.js:			getBlock: select( 'core/block-editor' ).getBlock,
+packages/edit-site/src/components/header/feature-toggle/index.js:		return select( 'core/edit-site' ).isFeatureActive( feature );
+packages/edit-site/src/components/header/fullscreen-mode-close/index.js:			const { isFeatureActive } = select( 'core/edit-site' );
+packages/edit-site/src/components/header/fullscreen-mode-close/index.js:			const { getEntityRecord } = select( 'core' );
+packages/edit-site/src/components/header/fullscreen-mode-close/index.js:			const { isResolving } = select( 'core/data' );
+packages/edit-site/src/components/header/index.js:		} = select( 'core/edit-site' );
+packages/edit-site/src/components/header/index.js:		const { getEntityRecord } = select( 'core' );
+packages/edit-site/src/components/header/undo-redo/redo.js:	const hasRedo = useSelect( ( select ) => select( 'core' ).hasRedo() );
+packages/edit-site/src/components/header/undo-redo/undo.js:	const hasUndo = useSelect( ( select ) => select( 'core' ).hasUndo() );
+packages/edit-site/src/components/navigate-to-link/index.js:			select( 'core' ).getEntityRecord( 'postType', type, id ),
+packages/edit-site/src/components/navigation-sidebar/index.js:		return select( 'core/edit-site' ).isNavigationOpened();
+packages/edit-site/src/components/navigation-sidebar/navigation-panel/content-navigation.js:		( select ) => select( 'core/edit-site' ).getPage(),
+packages/edit-site/src/components/navigation-sidebar/navigation-panel/index.js:		const { getNavigationPanelActiveMenu } = select( 'core/edit-site' );
+packages/edit-site/src/components/navigation-sidebar/navigation-panel/index.js:		const { getEntityRecord } = select( 'core' );
+packages/edit-site/src/components/navigation-sidebar/navigation-panel/menus/content-posts.js:			select( 'core' ).getEditedEntityRecord( 'root', 'site' )
+packages/edit-site/src/components/navigation-sidebar/navigation-panel/menus/template-parts.js:		return select( 'core' ).getEntityRecords(
+packages/edit-site/src/components/navigation-sidebar/navigation-panel/menus/templates.js:			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
+packages/edit-site/src/components/navigation-sidebar/navigation-panel/navigation-entity-items.js:		( select ) => select( 'core' ).getEntityRecords( kind, name, query ),
+packages/edit-site/src/components/navigation-sidebar/navigation-panel/new-template-dropdown.js:			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
+packages/edit-site/src/components/navigation-sidebar/navigation-panel/templates-navigation.js:			} = select( 'core/edit-site' );
+packages/edit-site/src/components/navigation-sidebar/navigation-toggle/index.js:			const { isFeatureActive } = select( 'core/edit-site' );
+packages/edit-site/src/components/navigation-sidebar/navigation-toggle/index.js:			const { getEntityRecord } = select( 'core' );
+packages/edit-site/src/components/navigation-sidebar/navigation-toggle/index.js:			const { isResolving } = select( 'core/data' );
+packages/edit-site/src/components/notices/index.js:			select( 'core/notices' )
+packages/edit-site/src/components/save-button/index.js:		} = select( 'core' );
+packages/edit-site/src/components/template-part-converter/convert-to-regular.js:			select( 'core/block-editor' ).__unstableGetBlockWithBlockTree(
+packages/edit-site/src/components/template-part-converter/index.js:		const { getSelectedBlockClientIds, getBlocksByClientId } = select(
+packages/edit-site/src/store/actions.js:	const page = yield controls.select( 'core/edit-site', 'getPage' );
+packages/edit-site/src/store/selectors.js:	select( 'core' ).canUser( 'create', 'media' )
+packages/edit-widgets/src/blocks/legacy-widget/edit/index.js:	let widgetId = select( 'core/edit-widgets' ).getWidgetIdForClientId(
+packages/edit-widgets/src/blocks/legacy-widget/edit/index.js:	const widget = select( 'core/edit-widgets' ).getWidget( widgetId );
+packages/edit-widgets/src/blocks/legacy-widget/edit/index.js:	const widgetArea = select( 'core/edit-widgets' ).getWidgetAreaForClientId(
+packages/edit-widgets/src/blocks/legacy-widget/edit/index.js:	const editorSettings = select( 'core/block-editor' ).getSettings();
+packages/edit-widgets/src/blocks/legacy-widget/edit/index.js:		const referenceWidgetBlocks = select(
+packages/edit-widgets/src/blocks/legacy-widget/edit/widget-select-control.js:		select( 'core/edit-widgets' )
+packages/edit-widgets/src/blocks/widget-area/edit/index.js:			select( 'core/edit-widgets' ).getIsWidgetAreaOpen( clientId ),
+packages/edit-widgets/src/components/header/index.js:			select( 'core/edit-widgets' ).getIsWidgetAreaOpen(
+packages/edit-widgets/src/components/header/index.js:		select( 'core/edit-widgets' ).isInserterOpened()
+packages/edit-widgets/src/components/header/undo-redo/redo.js:	const hasRedo = useSelect( ( select ) => select( 'core' ).hasRedo() );
+packages/edit-widgets/src/components/header/undo-redo/undo.js:	const hasUndo = useSelect( ( select ) => select( 'core' ).hasUndo() );
+packages/edit-widgets/src/components/layout/interface.js:		hasSidebarEnabled: !! select(
+packages/edit-widgets/src/components/layout/interface.js:		isInserterOpened: !! select( 'core/edit-widgets' ).isInserterOpened(),
+packages/edit-widgets/src/components/layout/unsaved-changes-warning.js:			const { __experimentalGetDirtyEntityRecords } = select( 'core' );
+packages/edit-widgets/src/components/notices/index.js:			notices: select( 'core/notices' ).getNotices(),
+packages/edit-widgets/src/components/save-button/index.js:		const { getEditedWidgetAreas, isSavingWidgetAreas } = select(
+packages/edit-widgets/src/components/sidebar/index.js:const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
+packages/edit-widgets/src/components/sidebar/index.js:		} = select( 'core/block-editor' );
+packages/edit-widgets/src/components/sidebar/index.js:		const { getActiveComplementaryArea } = select( 'core/interface' );
+packages/edit-widgets/src/components/sidebar/widget-areas.js:		( select ) => select( 'core/edit-widgets' ).getWidgetAreas(),
+packages/edit-widgets/src/components/widget-areas-block-editor-provider/index.js:				select( 'core' ).canUser( 'create', 'media' ),
+packages/edit-widgets/src/components/widget-areas-block-editor-provider/index.js:			widgetAreas: select( 'core/edit-widgets' ).getWidgetAreas(),
+packages/edit-widgets/src/components/widget-areas-block-editor-provider/index.js:			widgets: select( 'core/edit-widgets' ).getWidgets(),
+packages/edit-widgets/src/components/widget-areas-block-editor-provider/index.js:			reusableBlocks: select( 'core' ).getEntityRecords(
+packages/edit-widgets/src/hooks/use-last-selected-widget-area.js:		const { getBlockSelectionEnd, getBlockParents, getBlockName } = select(
+packages/edit-widgets/src/hooks/use-last-selected-widget-area.js:		const { getEntityRecord } = select( 'core' );
+packages/edit-widgets/src/hooks/use-widget-library-insertion-point.js:		const { getEntityRecord } = select( 'core' );
+packages/edit-widgets/src/hooks/use-widget-library-insertion-point.js:			} = select( 'core/block-editor' );
+packages/edit-widgets/src/store/actions.js:	const editedWidgetAreas = yield select(
+packages/edit-widgets/src/store/actions.js:	const widgets = yield select( 'core/edit-widgets', 'getWidgets' );
+packages/edit-widgets/src/store/actions.js:	const post = yield select(
+packages/edit-widgets/src/store/actions.js:			const hasEdits = yield select(
+packages/edit-widgets/src/store/actions.js:	const saveErrorBefore = yield select(
+packages/edit-widgets/src/store/actions.js:	const saveErrorAfter = yield select(
+packages/edit-widgets/src/store/batch-processing/actions.js:	const promise = yield select( 'getPromise', queue, context );
+packages/edit-widgets/src/store/batch-processing/actions.js:	return yield select( 'getPromise', queue, context );
+packages/edit-widgets/src/store/batch-processing/actions.js:	const { transactions } = yield select( 'getBatch', batchId );
+packages/edit-widgets/src/store/batch-processing/actions.js:	const promise = yield select( 'getPromise', queue, context );
+packages/edit-widgets/src/store/batch-processing/actions.js:	const batch = yield select( 'getBatch', batchId );
+packages/edit-widgets/src/store/batch-processing/actions.js:	const batch = yield select( 'getBatch', batchId );
+packages/edit-widgets/src/store/batch-processing/controls.js:export function select( selectorName, ...args ) {
+packages/edit-widgets/src/store/batch-processing/controls.js:			return registry.select( MODULE_KEY )[ selectorName ]( ...args );
+packages/edit-widgets/src/store/batch-processing/controls.js:				.select( MODULE_KEY )
+packages/edit-widgets/src/store/batch-support.js:				select( 'core/__experimental-batch-processing' ).getPromises(
+packages/edit-widgets/src/store/controls.js:export function select( registryName, selectorName, ...args ) {
+packages/edit-widgets/src/store/controls.js:			return registry.select( registryName )[ selectorName ]( ...args );
+packages/edit-widgets/src/store/resolvers.js:	const widgetAreas = yield select(
+packages/edit-widgets/src/store/resolvers.js:	const widgets = yield select(
+packages/edit-widgets/src/store/selectors.js:	const widgets = select( 'core' ).getEntityRecords(
+packages/edit-widgets/src/store/selectors.js:		const widgets = select( 'core/edit-widgets' ).getWidgets();
+packages/edit-widgets/src/store/selectors.js:	return select( 'core' ).getEntityRecords(
+packages/edit-widgets/src/store/selectors.js:		const widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
+packages/edit-widgets/src/store/selectors.js:			const post = select( 'core' ).getEditedEntityRecord(
+packages/edit-widgets/src/store/selectors.js:		let widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
+packages/edit-widgets/src/store/selectors.js:				select( 'core' ).hasEditsForEntityRecord(
+packages/edit-widgets/src/store/selectors.js:				select( 'core' ).getEditedEntityRecord(
+packages/edit-widgets/src/store/selectors.js:		const widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
+packages/edit-widgets/src/store/selectors.js:			const post = select( 'core' ).getEditedEntityRecord(
+packages/edit-widgets/src/store/selectors.js:	const widgetAreasIds = select( 'core/edit-widgets' )
+packages/edit-widgets/src/store/selectors.js:		const isSaving = select( 'core' ).isSavingEntityRecord(
+packages/edit-widgets/src/store/selectors.js:		...Object.keys( select( 'core/edit-widgets' ).getWidgets() ),
+packages/edit-widgets/src/store/selectors.js:		const isSaving = select( 'core' ).isSavingEntityRecord(
+packages/editor/CHANGELOG.md:- `RichTextProvider` has been removed. Please use `wp.data.select( 'core/editor' )` methods instead.
+packages/editor/CHANGELOG.md:- `RichTextProvider` flagged for deprecation. Please use `wp.data.select( 'core/editor' )` methods instead.
+packages/editor/src/components/autosave-monitor/index.js:		const { getReferenceByDistinctEdits } = select( 'core' );
+packages/editor/src/components/autosave-monitor/index.js:		} = select( 'core/editor' );
+packages/editor/src/components/character-count/index.js:		select( 'core/editor' ).getEditedPostAttribute( 'content' )
+packages/editor/src/components/convert-to-group-buttons/index.js:		} = select( 'core/block-editor' );
+packages/editor/src/components/convert-to-group-buttons/index.js:		const { getGroupingBlockName } = select( 'core/blocks' );
+packages/editor/src/components/document-outline/check.js:	blocks: select( 'core/block-editor' ).getBlocks(),
+packages/editor/src/components/document-outline/index.js:		const { getBlocks } = select( 'core/block-editor' );
+packages/editor/src/components/document-outline/index.js:		const { getEditedPostAttribute } = select( 'core/editor' );
+packages/editor/src/components/document-outline/index.js:		const { getPostType } = select( 'core' );
+packages/editor/src/components/editor-history/redo.js:		( select ) => select( 'core/editor' ).hasEditorRedo(),
+packages/editor/src/components/editor-history/undo.js:		( select ) => select( 'core/editor' ).hasEditorUndo(),
+packages/editor/src/components/editor-notices/index.js:		notices: select( 'core/notices' ).getNotices(),
+packages/editor/src/components/entities-saved-states/entity-record-item.js:		const { blocks = [] } = select( 'core' ).getEditedEntityRecord(
+packages/editor/src/components/entities-saved-states/entity-record-item.js:		const parents = select( 'core/block-editor' ).getBlockParents(
+packages/editor/src/components/entities-saved-states/entity-record-item.js:			const selectedBlockId = select(
+packages/editor/src/components/entities-saved-states/entity-type-list.js:			select( 'core' ).getEntity( firstRecord.kind, firstRecord.name ),
+packages/editor/src/components/entities-saved-states/index.js:			dirtyEntityRecords: select(
+packages/editor/src/components/error-boundary/index.js:			return select( 'core/editor' ).getEditedPostContent();
+packages/editor/src/components/global-keyboard-shortcuts/save-shortcut.js:		} = select( 'core/editor' );
+packages/editor/src/components/local-autosave-monitor/index.js:			postId: select( 'core/editor' ).getCurrentPostId(),
+packages/editor/src/components/local-autosave-monitor/index.js:			isEditedPostNew: select( 'core/editor' ).isEditedPostNew(),
+packages/editor/src/components/local-autosave-monitor/index.js:			getEditedPostAttribute: select( 'core/editor' )
+packages/editor/src/components/local-autosave-monitor/index.js:			hasRemoteAutosave: !! select( 'core/editor' ).getEditorSettings()
+packages/editor/src/components/local-autosave-monitor/index.js:			postId: select( 'core/editor' ).getCurrentPostId(),
+packages/editor/src/components/local-autosave-monitor/index.js:			isEditedPostNew: select( 'core/editor' ).isEditedPostNew(),
+packages/editor/src/components/local-autosave-monitor/index.js:			isDirty: select( 'core/editor' ).isEditedPostDirty(),
+packages/editor/src/components/local-autosave-monitor/index.js:			isAutosaving: select( 'core/editor' ).isAutosavingPost(),
+packages/editor/src/components/local-autosave-monitor/index.js:			didError: select( 'core/editor' ).didPostSaveRequestFail(),
+packages/editor/src/components/local-autosave-monitor/index.js:			localAutosaveInterval: select( 'core/editor' ).getEditorSettings()
+packages/editor/src/components/page-attributes/check.js:	const { getEditedPostAttribute, getEditorSettings } = select(
+packages/editor/src/components/page-attributes/check.js:	const { getPostType } = select( 'core' );
+packages/editor/src/components/page-attributes/order.js:			order: select( 'core/editor' ).getEditedPostAttribute(
+packages/editor/src/components/page-attributes/parent.js:			const { getPostType, getEntityRecords, getEntityRecord } = select(
+packages/editor/src/components/page-attributes/parent.js:			const { getCurrentPostId, getEditedPostAttribute } = select(
+packages/editor/src/components/page-attributes/template.js:		const { getEditedPostAttribute, getEditorSettings } = select(
+packages/editor/src/components/post-author/check.js:		const post = select( 'core/editor' ).getCurrentPost();
+packages/editor/src/components/post-author/check.js:			postType: select( 'core/editor' ).getCurrentPostType(),
+packages/editor/src/components/post-author/check.js:			authors: select( 'core' ).getUsers( { who: 'authors' } ),
+packages/editor/src/components/post-author/index.js:			const { getUser, getUsers, isResolving } = select( 'core' );
+packages/editor/src/components/post-author/index.js:			const { getEditedPostAttribute } = select( 'core/editor' );
+packages/editor/src/components/post-comments/index.js:			commentStatus: select( 'core/editor' ).getEditedPostAttribute(
+packages/editor/src/components/post-excerpt/index.js:			excerpt: select( 'core/editor' ).getEditedPostAttribute(
+packages/editor/src/components/post-featured-image/index.js:	const { getMedia, getPostType } = select( 'core' );
+packages/editor/src/components/post-featured-image/index.js:	const { getCurrentPostId, getEditedPostAttribute } = select(
+packages/editor/src/components/post-featured-image/index.js:				select( 'core/block-editor' )
+packages/editor/src/components/post-format/check.js:	const editorSettings = select( 'core/editor' ).getEditorSettings();
+packages/editor/src/components/post-format/index.js:			const { getEditedPostAttribute, getSuggestedPostFormat } = select(
+packages/editor/src/components/post-format/index.js:			const themeSupports = select( 'core' ).getThemeSupports();
+packages/editor/src/components/post-last-revision/check.js:	} = select( 'core/editor' );
+packages/editor/src/components/post-last-revision/index.js:	} = select( 'core/editor' );
+packages/editor/src/components/post-locked-modal/index.js:		} = select( 'core/editor' );
+packages/editor/src/components/post-locked-modal/index.js:		const { getPostType } = select( 'core' );
+packages/editor/src/components/post-pending-status/check.js:		} = select( 'core/editor' );
+packages/editor/src/components/post-pending-status/index.js:		status: select( 'core/editor' ).getEditedPostAttribute( 'status' ),
+packages/editor/src/components/post-pingbacks/index.js:			pingStatus: select( 'core/editor' ).getEditedPostAttribute(
+packages/editor/src/components/post-preview-button/index.js:		} = select( 'core/editor' );
+packages/editor/src/components/post-preview-button/index.js:		const { getPostType } = select( 'core' );
+packages/editor/src/components/post-publish-button/index.js:		} = select( 'core/editor' );
+packages/editor/src/components/post-publish-button/label.js:		} = select( 'core/editor' );
+packages/editor/src/components/post-publish-panel/index.js:		const { getPostType } = select( 'core' );
+packages/editor/src/components/post-publish-panel/index.js:		} = select( 'core/editor' );
+packages/editor/src/components/post-publish-panel/index.js:		const { isPublishSidebarEnabled } = select( 'core/editor' );
+packages/editor/src/components/post-publish-panel/maybe-post-format-panel.js:		const { getEditedPostAttribute, getSuggestedPostFormat } = select(
+packages/editor/src/components/post-publish-panel/maybe-post-format-panel.js:			select( 'core' ).getThemeSupports(),
+packages/editor/src/components/post-publish-panel/maybe-tags-panel.js:		const postType = select( 'core/editor' ).getCurrentPostType();
+packages/editor/src/components/post-publish-panel/maybe-tags-panel.js:		const tagsTaxonomy = select( 'core' ).getTaxonomy( 'post_tag' );
+packages/editor/src/components/post-publish-panel/maybe-tags-panel.js:			select( 'core/editor' ).getEditedPostAttribute(
+packages/editor/src/components/post-publish-panel/postpublish.js:		event.target.select();
+packages/editor/src/components/post-publish-panel/postpublish.js:	} = select( 'core/editor' );
+packages/editor/src/components/post-publish-panel/postpublish.js:	const { getPostType } = select( 'core' );
+packages/editor/src/components/post-publish-panel/prepublish.js:	const { getCurrentPost, isEditedPostBeingScheduled } = select(
+packages/editor/src/components/post-saved-state/index.js:			} = select( 'core/editor' );
+packages/editor/src/components/post-schedule/check.js:		const { getCurrentPost, getCurrentPostType } = select( 'core/editor' );
+packages/editor/src/components/post-schedule/index.js:			date: select( 'core/editor' ).getEditedPostAttribute( 'date' ),
+packages/editor/src/components/post-schedule/label.js:		date: select( 'core/editor' ).getEditedPostAttribute( 'date' ),
+packages/editor/src/components/post-schedule/label.js:		isFloating: select( 'core/editor' ).isEditedPostDateFloating(),
+packages/editor/src/components/post-slug/index.js:		const { getCurrentPost, getEditedPostAttribute } = select(
+packages/editor/src/components/post-sticky/check.js:		const post = select( 'core/editor' ).getCurrentPost();
+packages/editor/src/components/post-sticky/check.js:			postType: select( 'core/editor' ).getCurrentPostType(),
+packages/editor/src/components/post-sticky/index.js:			postSticky: select( 'core/editor' ).getEditedPostAttribute(
+packages/editor/src/components/post-switch-to-draft-button/index.js:		} = select( 'core/editor' );
+packages/editor/src/components/post-taxonomies/check.js:			postType: select( 'core/editor' ).getCurrentPostType(),
+packages/editor/src/components/post-taxonomies/check.js:			taxonomies: select( 'core' ).getTaxonomies( { per_page: -1 } ),
+packages/editor/src/components/post-taxonomies/flat-term-selector.js:		const { getCurrentPost } = select( 'core/editor' );
+packages/editor/src/components/post-taxonomies/flat-term-selector.js:		const { getTaxonomy } = select( 'core' );
+packages/editor/src/components/post-taxonomies/flat-term-selector.js:				? select( 'core/editor' ).getEditedPostAttribute(
+packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js:		const { getCurrentPost } = select( 'core/editor' );
+packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js:		const { getTaxonomy } = select( 'core' );
+packages/editor/src/components/post-taxonomies/hierarchical-term-selector.js:				? select( 'core/editor' ).getEditedPostAttribute(
+packages/editor/src/components/post-taxonomies/index.js:			postType: select( 'core/editor' ).getCurrentPostType(),
+packages/editor/src/components/post-taxonomies/index.js:			taxonomies: select( 'core' ).getTaxonomies( { per_page: -1 } ),
+packages/editor/src/components/post-text-editor/index.js:		( select ) => select( 'core/editor' ).getEditedPostContent(),
+packages/editor/src/components/post-title/index.js:	onUnselect() {
+packages/editor/src/components/post-title/index.js:	const { getEditedPostAttribute, isCleanNewPost } = select( 'core/editor' );
+packages/editor/src/components/post-title/index.js:	const { getSettings } = select( 'core/block-editor' );
+packages/editor/src/components/post-title/index.native.js:			this.props.onUnselect();
+packages/editor/src/components/post-title/index.native.js:		this.props.onUnselect();
+packages/editor/src/components/post-title/index.native.js:		const { isPostTitleSelected, getEditedPostAttribute } = select(
+packages/editor/src/components/post-title/index.native.js:		const { getSelectedBlockClientId, getBlockRootClientId } = select(
+packages/editor/src/components/post-title/index.native.js:			onUnselect() {
+packages/editor/src/components/post-trash/check.js:	const { isEditedPostNew, getCurrentPostId, getCurrentPostType } = select(
+packages/editor/src/components/post-trash/check.js:	const { getPostType, canUser } = select( 'core' );
+packages/editor/src/components/post-trash/index.js:		} = select( 'core/editor' );
+packages/editor/src/components/post-type-support-check/index.js:	const { getEditedPostAttribute } = select( 'core/editor' );
+packages/editor/src/components/post-type-support-check/index.js:	const { getPostType } = select( 'core' );
+packages/editor/src/components/post-visibility/check.js:		const { getCurrentPost, getCurrentPostType } = select( 'core/editor' );
+packages/editor/src/components/post-visibility/index.js:		const { getEditedPostAttribute, getEditedPostVisibility } = select(
+packages/editor/src/components/post-visibility/label.js:	visibility: select( 'core/editor' ).getEditedPostVisibility(),
+packages/editor/src/components/provider/index.js:		} = select( 'core/editor' );
+packages/editor/src/components/provider/index.js:		const { canUser } = select( 'core' );
+packages/editor/src/components/provider/index.js:			reusableBlocks: select( 'core' ).getEntityRecords(
+packages/editor/src/components/provider/index.native.js:		} = select( 'core/editor' );
+packages/editor/src/components/provider/index.native.js:		const { getEditorMode } = select( 'core/edit-post' );
+packages/editor/src/components/provider/index.native.js:		} = select( 'core/block-editor' );
+packages/editor/src/components/table-of-contents/index.js:		( select ) => !! select( 'core/block-editor' ).getBlockCount(),
+packages/editor/src/components/table-of-contents/panel.js:			const { getGlobalBlockCount } = select( 'core/block-editor' );
+packages/editor/src/components/template-validation-notice/index.js:		isValid: select( 'core/block-editor' ).isValidTemplate(),
+packages/editor/src/components/theme-support-check/index.js:	const { getThemeSupports } = select( 'core' );
+packages/editor/src/components/theme-support-check/index.js:	const { getEditedPostAttribute } = select( 'core/editor' );
+packages/editor/src/components/unsaved-changes-warning/index.js:			const { __experimentalGetDirtyEntityRecords } = select( 'core' );
+packages/editor/src/components/word-count/index.js:		select( 'core/editor' ).getEditedPostAttribute( 'content' )
+packages/editor/src/hooks/custom-sources-backwards-compatibility.js:				( select ) => select( 'core/editor' ).getCurrentPostType(),
+packages/editor/src/store/actions.js:	const postId = yield controls.select( STORE_KEY, 'getCurrentPostId' );
+packages/editor/src/store/actions.js:	const { id, type } = yield controls.select( STORE_KEY, 'getCurrentPost' );
+packages/editor/src/store/actions.js:	if ( ! ( yield controls.select( STORE_KEY, 'isEditedPostSaveable' ) ) ) {
+packages/editor/src/store/actions.js:		content: yield controls.select( STORE_KEY, 'getEditedPostContent' ),
+packages/editor/src/store/actions.js:	const previousRecord = yield controls.select( STORE_KEY, 'getCurrentPost' );
+packages/editor/src/store/actions.js:		...( yield controls.select(
+packages/editor/src/store/actions.js:	const error = yield controls.select(
+packages/editor/src/store/actions.js:		const updatedRecord = yield controls.select(
+packages/editor/src/store/actions.js:	const post = yield controls.select( STORE_KEY, 'getCurrentPost' );
+packages/editor/src/store/actions.js:	const postTypeSlug = yield controls.select(
+packages/editor/src/store/actions.js:	const postTypeSlug = yield controls.select(
+packages/editor/src/store/actions.js:		const post = yield controls.select( STORE_KEY, 'getCurrentPost' );
+packages/editor/src/store/actions.js:		const post = yield controls.select( STORE_KEY, 'getCurrentPost' );
+packages/editor/src/store/actions.js:		const isPostNew = yield controls.select( STORE_KEY, 'isEditedPostNew' );
+packages/editor/src/store/actions.js:		const title = yield controls.select(
+packages/editor/src/store/actions.js:		const content = yield controls.select(
+packages/editor/src/store/actions.js:		const excerpt = yield controls.select(
+packages/editor/src/store/actions.js: * const initialPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+packages/editor/src/store/actions.js: * 		const currentPostStatus = wp.data.select( 'core/editor' ).getEditedPostAttribute( 'status' );
+packages/editor/src/store/actions.js: * 			const postDate = new Date( wp.data.select( 'core/editor' ).getEditedPostAttribute( 'date' ) );
+packages/editor/src/store/actions.js:		const { id, type } = yield controls.select(
+packages/editor/src/store/actions.js:			( yield controls.select(
+packages/editor/src/store/selectors.js:	return select( 'core' ).hasUndo();
+packages/editor/src/store/selectors.js:	return select( 'core' ).hasRedo();
+packages/editor/src/store/selectors.js:			select( 'core' ).hasEditsForEntityRecord(
+packages/editor/src/store/selectors.js:		const dirtyEntityRecords = select(
+packages/editor/src/store/selectors.js:		const post = select( 'core' ).getRawEntityRecord(
+packages/editor/src/store/selectors.js:		select( 'core' ).getEntityRecordEdits( 'postType', postType, postId ) ||
+packages/editor/src/store/selectors.js:			"`wp.data.select( 'core/editor' ).getReferenceByDistinctEdits`",
+packages/editor/src/store/selectors.js:					"`wp.data.select( 'core' ).getReferenceByDistinctEdits`",
+packages/editor/src/store/selectors.js:		return select( 'core' ).getReferenceByDistinctEdits();
+packages/editor/src/store/selectors.js:		const currentUserId = get( select( 'core' ).getCurrentUser(), [
+packages/editor/src/store/selectors.js:		const autosave = select( 'core' ).getAutosave(
+packages/editor/src/store/selectors.js:		const hasFetchedAutosave = select( 'core' ).hasFetchedAutosaves(
+packages/editor/src/store/selectors.js:		const currentUserId = get( select( 'core' ).getCurrentUser(), [
+packages/editor/src/store/selectors.js:		const autosave = select( 'core' ).getAutosave(
+packages/editor/src/store/selectors.js:	deprecated( "`wp.data.select( 'core/editor' ).getAutosave()`", {
+packages/editor/src/store/selectors.js:			"`wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
+packages/editor/src/store/selectors.js:	const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
+packages/editor/src/store/selectors.js:	const autosave = select( 'core' ).getAutosave(
+packages/editor/src/store/selectors.js:	deprecated( "`wp.data.select( 'core/editor' ).hasAutosave()`", {
+packages/editor/src/store/selectors.js:			"`!! wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
+packages/editor/src/store/selectors.js:	const currentUserId = get( select( 'core' ).getCurrentUser(), [ 'id' ] );
+packages/editor/src/store/selectors.js:	return !! select( 'core' ).getAutosave( postType, postId, currentUserId );
+packages/editor/src/store/selectors.js:	return select( 'core' ).isSavingEntityRecord(
+packages/editor/src/store/selectors.js:		return ! select( 'core' ).getLastEntitySaveError(
+packages/editor/src/store/selectors.js:		return !! select( 'core' ).getLastEntitySaveError(
+packages/editor/src/store/selectors.js:		const record = select( 'core' ).getEditedEntityRecord(
+packages/editor/src/store/selectors.js:		deprecated( "`wp.data.select( 'core/editor' )." + name + '`', {
+packages/editor/src/store/selectors.js:			alternative: "`wp.data.select( 'core/block-editor' )." + name + '`',
+packages/editor/src/store/selectors.js:		return select( 'core/block-editor' )[ name ]( ...args );
+packages/editor/src/store/test/actions.js:						controls.select( STORE_KEY, 'isEditedPostSaveable' )
+packages/editor/src/store/test/actions.js:						controls.select( STORE_KEY, 'getEditedPostContent' )
+packages/editor/src/store/test/actions.js:						controls.select( STORE_KEY, 'getCurrentPost' )
+packages/editor/src/store/test/actions.js:						controls.select(
+packages/editor/src/store/test/actions.js:						controls.select(
+packages/editor/src/store/test/actions.js:						controls.select( STORE_KEY, 'getCurrentPost' )
+packages/editor/src/store/test/actions.js:				controls.select( STORE_KEY, 'getCurrentPostType' )
+packages/editor/src/store/test/actions.js:				controls.select( STORE_KEY, 'getCurrentPost' )
+packages/editor/src/store/test/actions.js:				controls.select( STORE_KEY, 'getCurrentPost' )
+packages/editor/src/store/test/actions.js:				controls.select( STORE_KEY, 'getCurrentPostType' )
+packages/editor/src/store/test/actions.js:				value: controls.select( STORE_KEY, 'getCurrentPost' ),
+packages/editor/src/store/test/selectors.js:			select: () => _selectors[ name ].registry.select(),
+packages/editor/src/utils/media-upload/index.js:	const { getCurrentPostId, getEditorSettings } = select( 'core/editor' );
+packages/element/README.md:const placeholderLabel = Platform.select( {
+packages/element/src/platform.js: * const placeholderLabel = Platform.select( {
+packages/element/src/test/platform.js:		const element = Platform.select( {
+packages/element/src/test/platform.native.js:		const element = Platform.select( {
+packages/format-library/src/text-color/inline.js:		const { getSettings } = select( 'core/block-editor' );
+packages/interface/README.md:wp.data.select( 'core/interface' ).getActiveComplementaryArea( 'core/edit-post' );
+packages/interface/README.md:wp.data.select( 'core/interface' ).getActiveComplementaryArea( 'core/edit-post' );
+packages/interface/README.md:wp.data.select( 'core/interface' ).getActiveComplementaryArea( 'core/edit-post' );
+packages/interface/README.md:wp.data.select( 'core/interface' ).isItemPinned( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' );
+packages/interface/README.md:wp.data.select( 'core/interface' ).isItemPinned( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' );
+packages/interface/README.md:wp.data.select( 'core/interface' ).isItemPinned( 'core/edit-post', 'edit-post-block-patterns/block-patterns-sidebar' ); -> false
+packages/interface/src/components/complementary-area-toggle/index.js:			select( 'core/interface' ).getActiveComplementaryArea( scope ) ===
+packages/interface/src/components/complementary-area/index.js:			const { getActiveComplementaryArea, isItemPinned } = select(
+packages/interface/src/components/complementary-area/index.js:				isSmall: select( 'core/viewport' ).isViewportMatch(
+packages/interface/src/components/complementary-area/index.js:				isLarge: select( 'core/viewport' ).isViewportMatch( 'large' ),
+packages/keyboard-shortcuts/src/hooks/use-shortcut.js:			return select(
+packages/nux/README.md:const isVisible = select( 'core/nux' ).isTipVisible( 'acme/add-to-cart' );
+packages/nux/README.md:const areTipsEnabled = select( 'core/nux' ).areTipsEnabled();
+packages/nux/README.md:const guide = select( 'core/nux' ).getAssociatedGuide( 'acme/add-to-cart' );
+packages/nux/src/components/dot-tip/index.js:		const { isTipVisible, getAssociatedGuide } = select( 'core/nux' );
+packages/react-native-bridge/common/gutenberg-web-single-block/content-functions.js:			window.wp.data.select( 'core/block-editor' ) ||
+packages/react-native-bridge/common/gutenberg-web-single-block/content-functions.js:			window.wp.data.select( 'core/editor' ), // For WP v5.0 and v5.1
+packages/react-native-bridge/common/gutenberg-web-single-block/content-functions.js:	const post = window.wp.data.select( 'core/editor' ).getCurrentPost();
+packages/react-native-bridge/common/gutenberg-web-single-block/content-functions.js:	const currentPost = window.wp.data.select( 'core/editor' ).getCurrentPost();
+packages/react-native-bridge/common/gutenberg-web-single-block/prevent-autosaves.js:	const settings = window.wp.data.select( 'core/editor' ).getEditorSettings();
+packages/reusable-blocks/README.md:    ( select ) => select( 'core' ).getEntityRecords(
+packages/reusable-blocks/README.md:    ( select ) => select( 'core' ).getEntityRecords(
+packages/reusable-blocks/src/components/reusable-blocks-menu-items/index.js:	const { getSelectedBlockClientIds } = select( 'core/block-editor' );
+packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js:			const { canUser } = select( 'core' );
+packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js:			const { getBlocksByClientId, canInsertBlockType } = select(
+packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-convert-button.js:				!! select( 'core' ).getEntityRecord(
+packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-delete-button.js:			const { getBlock } = select( 'core/block-editor' );
+packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-delete-button.js:			const { canUser } = select( 'core' );
+packages/reusable-blocks/src/components/reusable-blocks-menu-items/reusable-block-delete-button.js:					? select( 'core' ).getEntityRecord(
+packages/reusable-blocks/src/store/controls.js:				.select( 'core/block-editor' )
+packages/reusable-blocks/src/store/controls.js:				.select( 'core' )
+packages/reusable-blocks/src/store/controls.js:							.select( 'core/block-editor' )
+packages/reusable-blocks/src/store/controls.js:					.select( 'core' )
+packages/reusable-blocks/src/store/controls.js:					.select( 'core/block-editor' )
+packages/rich-text/src/component/index.native.js:		const { getBlockParents, getBlock, getSettings } = select(
+packages/rich-text/src/component/index.native.js:			formatTypes: select( 'core/rich-text' ).getFormatTypes(),
+packages/rich-text/src/component/use-format-types.js:	return select( 'core/rich-text' ).getFormatTypes();
+packages/rich-text/src/create.js:		formatType = select( 'core/rich-text' ).getFormatTypeForClassName(
+packages/rich-text/src/create.js:		formatType = select( 'core/rich-text' ).getFormatTypeForBareElement(
+packages/rich-text/src/get-format-type.js:	return select( 'core/rich-text' ).getFormatType( name );
+packages/rich-text/src/get-format-types.js:	return select( 'core/rich-text' ).getFormatTypes();
+packages/rich-text/src/register-format-type.js:	if ( select( 'core/rich-text' ).getFormatType( settings.name ) ) {
+packages/rich-text/src/register-format-type.js:		const formatTypeForBareElement = select(
+packages/rich-text/src/register-format-type.js:		const formatTypeForClassName = select(
+packages/rich-text/src/test/register-format-type.js:		select( 'core/rich-text' )
+packages/rich-text/src/unregister-format-type.js:	const oldFormat = select( 'core/rich-text' ).getFormatType( name );
+packages/server-side-render/src/index.js:	const coreEditorSelect = select( 'core/editor' );
+packages/viewport/README.md:const isSmall = select( 'core/viewport' ).isViewportMatch( '< medium' );
+packages/viewport/README.md:const { isViewportMatch } = select( 'core/viewport' );
+packages/viewport/src/with-viewport-match.native.js:				return select( 'core/viewport' ).isViewportMatch( query );
