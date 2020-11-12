@@ -68,7 +68,8 @@ export default function useSelect( _mapSelect, deps ) {
 	const rerender = () => dispatch( {} );
 	const isMountedAndNotUnsubscribing = useRef( true );
 	if ( mapSelect !== previousMapSelect.current ) {
-		// This makes sure initialization only happens once.
+		// This makes sure initialization happens synchronously
+		// whenever mapSelect changes.
 		result.current = mapSelect( registry.select );
 	}
 
@@ -82,14 +83,14 @@ export default function useSelect( _mapSelect, deps ) {
 			( get ) => {
 				const current = registry.__unstableGetAtomResolver();
 				registry.__unstableSetAtomResolver( get );
-				const ret = mapSelect( registry.select );
+				const ret = previousMapSelect.current( registry.select );
 				registry.__unstableSetAtomResolver( current );
 				return ret;
 			},
 			() => {},
 			isAsync
 		);
-	}, [ isAsync, registry, mapSelect ] );
+	}, [ isAsync, registry ] );
 
 	useLayoutEffect( () => {
 		const atom = atomCreator( registry.getAtomRegistry() );
@@ -110,7 +111,7 @@ export default function useSelect( _mapSelect, deps ) {
 		// This is necessary
 		// If the value changes during mount
 		// It also important to run after "subscribe"
-		// Otherwise the atom value might not be good.
+		// Otherwise the atom value won't be resolved.
 		onStoreChange();
 
 		return () => {

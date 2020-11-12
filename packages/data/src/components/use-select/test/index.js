@@ -120,7 +120,7 @@ describe( 'useSelect', () => {
 		} );
 
 		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
-		expect( selectSpyBar ).toHaveBeenCalledTimes( 2 );
+		expect( selectSpyBar ).toHaveBeenCalledTimes( 1 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 3 );
 
 		// ensure expected state was rendered
@@ -201,7 +201,7 @@ describe( 'useSelect', () => {
 				expect( testInstance.findByType( 'div' ).props.data ).toEqual(
 					valueB
 				);
-				expect( mapSelectSpy ).toHaveBeenCalledTimes( 4 );
+				expect( mapSelectSpy ).toHaveBeenCalledTimes( 3 );
 			}
 		);
 	} );
