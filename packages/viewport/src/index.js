@@ -3,7 +3,7 @@
  */
 import addDimensionsEventListener from './listener';
 
-export { default as viewportStore } from './store';
+export { default as store } from './store';
 export { default as ifViewportMatches } from './if-viewport-matches';
 export { default as withViewportMatch } from './with-viewport-match';
 

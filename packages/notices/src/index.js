@@ -1,1 +1,1 @@
-export { default as noticesStore } from './store';
+export { default as store } from './store';
