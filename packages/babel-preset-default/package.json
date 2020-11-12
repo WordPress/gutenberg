@@ -32,7 +32,6 @@
 		"@babel/plugin-transform-react-jsx": "^7.10.4",
 		"@babel/plugin-transform-runtime": "^7.11.5",
 		"@babel/preset-env": "^7.11.5",
-		"@babel/runtime": "^7.11.2",
 		"@wordpress/babel-plugin-import-jsx-pragma": "file:../babel-plugin-import-jsx-pragma",
 		"@wordpress/browserslist-config": "file:../browserslist-config",
 		"@wordpress/element": "file:../element",
