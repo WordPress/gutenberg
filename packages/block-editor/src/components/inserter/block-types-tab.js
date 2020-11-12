@@ -10,6 +10,7 @@ import {
 	isEmpty,
 	orderBy,
 } from 'lodash';
+import { useCompositeState } from 'reakit/Composite';
 
 /**
  * WordPress dependencies
@@ -29,6 +30,7 @@ import { searchBlockItems } from './search-items';
 import InserterPanel from './panel';
 import InserterNoResults from './no-results';
 import useBlockTypesState from './hooks/use-block-types-state';
+import InserterContext from './context';
 
 const getBlockNamespace = ( item ) => item.name.split( '/' )[ 0 ];
 
@@ -42,6 +44,10 @@ export function BlockTypesTab( {
 	debouncedSpeak,
 	showMostUsedBlocks,
 } ) {
+	const compositeState = useCompositeState( {
+		shift: true,
+		wrap: 'horizontal',
+	} );
 	const [ items, categories, collections, onSelectItem ] = useBlockTypesState(
 		rootClientId,
 		onInsert
@@ -122,113 +128,115 @@ export function BlockTypesTab( {
 	const hasItems = ! isEmpty( filteredItems );
 
 	return (
-		<div>
-			{ hasChildItems && (
-				<ChildBlocks rootClientId={ rootClientId }>
-					<BlockTypesList
-						// Pass along every block, as useBlockTypesState() and
-						// getInserterItems() will have already filtered out
-						// non-child blocks.
-						items={ filteredItems }
-						onSelect={ onSelectItem }
-						onHover={ onHover }
-						label={ __( 'Child Blocks' ) }
-					/>
-				</ChildBlocks>
-			) }
-
-			{ showMostUsedBlocks &&
-				! hasChildItems &&
-				!! suggestedItems.length &&
-				! filterValue && (
-					<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
+		<InserterContext.Provider value={ compositeState }>
+			<div>
+				{ hasChildItems && (
+					<ChildBlocks rootClientId={ rootClientId }>
 						<BlockTypesList
-							items={ suggestedItems }
+							// Pass along every block, as useBlockTypesState() and
+							// getInserterItems() will have already filtered out
+							// non-child blocks.
+							items={ filteredItems }
 							onSelect={ onSelectItem }
 							onHover={ onHover }
-							label={ _x( 'Most used', 'blocks' ) }
+							label={ __( 'Child Blocks' ) }
+						/>
+					</ChildBlocks>
+				) }
+
+				{ showMostUsedBlocks &&
+					! hasChildItems &&
+					!! suggestedItems.length &&
+					! filterValue && (
+						<InserterPanel title={ _x( 'Most used', 'blocks' ) }>
+							<BlockTypesList
+								items={ suggestedItems }
+								onSelect={ onSelectItem }
+								onHover={ onHover }
+								label={ _x( 'Most used', 'blocks' ) }
+							/>
+						</InserterPanel>
+					) }
+
+				{ ! hasChildItems &&
+					map( categories, ( category ) => {
+						const categoryItems = itemsPerCategory[ category.slug ];
+						if ( ! categoryItems || ! categoryItems.length ) {
+							return null;
+						}
+						return (
+							<InserterPanel
+								key={ category.slug }
+								title={ category.title }
+								icon={ category.icon }
+							>
+								<BlockTypesList
+									items={ categoryItems }
+									onSelect={ onSelectItem }
+									onHover={ onHover }
+									label={ category.title }
+								/>
+							</InserterPanel>
+						);
+					} ) }
+
+				{ ! hasChildItems && !! uncategorizedItems.length && (
+					<InserterPanel
+						className="block-editor-inserter__uncategorized-blocks-panel"
+						title={ __( 'Uncategorized' ) }
+					>
+						<BlockTypesList
+							items={ uncategorizedItems }
+							onSelect={ onSelectItem }
+							onHover={ onHover }
+							label={ __( 'Uncategorized' ) }
 						/>
 					</InserterPanel>
 				) }
 
-			{ ! hasChildItems &&
-				map( categories, ( category ) => {
-					const categoryItems = itemsPerCategory[ category.slug ];
-					if ( ! categoryItems || ! categoryItems.length ) {
-						return null;
-					}
-					return (
-						<InserterPanel
-							key={ category.slug }
-							title={ category.title }
-							icon={ category.icon }
-						>
-							<BlockTypesList
-								items={ categoryItems }
-								onSelect={ onSelectItem }
-								onHover={ onHover }
-								label={ category.title }
-							/>
-						</InserterPanel>
-					);
-				} ) }
+				{ ! hasChildItems &&
+					map( collections, ( collection, namespace ) => {
+						const collectionItems = itemsPerCollection[ namespace ];
+						if ( ! collectionItems || ! collectionItems.length ) {
+							return null;
+						}
 
-			{ ! hasChildItems && !! uncategorizedItems.length && (
-				<InserterPanel
-					className="block-editor-inserter__uncategorized-blocks-panel"
-					title={ __( 'Uncategorized' ) }
+						return (
+							<InserterPanel
+								key={ namespace }
+								title={ collection.title }
+								icon={ collection.icon }
+							>
+								<BlockTypesList
+									items={ collectionItems }
+									onSelect={ onSelectItem }
+									onHover={ onHover }
+									label={ collection.title }
+								/>
+							</InserterPanel>
+						);
+					} ) }
+
+				<__experimentalInserterMenuExtension.Slot
+					fillProps={ {
+						onSelect: onSelectItem,
+						onHover,
+						filterValue,
+						hasItems,
+					} }
 				>
-					<BlockTypesList
-						items={ uncategorizedItems }
-						onSelect={ onSelectItem }
-						onHover={ onHover }
-						label={ __( 'Uncategorized' ) }
-					/>
-				</InserterPanel>
-			) }
-
-			{ ! hasChildItems &&
-				map( collections, ( collection, namespace ) => {
-					const collectionItems = itemsPerCollection[ namespace ];
-					if ( ! collectionItems || ! collectionItems.length ) {
+					{ ( fills ) => {
+						if ( fills.length ) {
+							return fills;
+						}
+						if ( ! hasItems ) {
+							return <InserterNoResults />;
+						}
 						return null;
-					}
-
-					return (
-						<InserterPanel
-							key={ namespace }
-							title={ collection.title }
-							icon={ collection.icon }
-						>
-							<BlockTypesList
-								items={ collectionItems }
-								onSelect={ onSelectItem }
-								onHover={ onHover }
-								label={ collection.title }
-							/>
-						</InserterPanel>
-					);
-				} ) }
-
-			<__experimentalInserterMenuExtension.Slot
-				fillProps={ {
-					onSelect: onSelectItem,
-					onHover,
-					filterValue,
-					hasItems,
-				} }
-			>
-				{ ( fills ) => {
-					if ( fills.length ) {
-						return fills;
-					}
-					if ( ! hasItems ) {
-						return <InserterNoResults />;
-					}
-					return null;
-				} }
-			</__experimentalInserterMenuExtension.Slot>
-		</div>
+					} }
+				</__experimentalInserterMenuExtension.Slot>
+			</div>
+		</InserterContext.Provider>
 	);
 }
 

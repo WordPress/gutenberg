@@ -63,7 +63,7 @@
 		"react-autosize-textarea": "^7.1.0",
 		"react-spring": "^8.0.19",
 		"react-transition-group": "^2.9.0",
-		"reakit": "1.1.0",
+		"reakit": "1.3.0",
 		"redux-multi": "^0.1.12",
 		"refx": "^3.0.0",
 		"rememo": "^3.0.0",

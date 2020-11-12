@@ -7,12 +7,14 @@ import { CompositeItem } from 'reakit';
 /**
  * WordPress dependencies
  */
+import { useContext } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
+import InserterContext from '../inserter/context';
 
 function InserterListItem( {
 	icon,
@@ -20,9 +22,10 @@ function InserterListItem( {
 	isDisabled,
 	title,
 	className,
-	composite,
+	isFirst,
 	...props
 } ) {
+	const compositeState = useContext( InserterContext );
 	const itemIconStyle = icon
 		? {
 				backgroundColor: icon.background,
@@ -33,9 +36,8 @@ function InserterListItem( {
 	return (
 		<div className="block-editor-block-types-list__list-item">
 			<CompositeItem
+				state={ compositeState }
 				role="option"
-				as={ Button }
-				{ ...composite }
 				className={ classnames(
 					'block-editor-block-types-list__item',
 					className
@@ -47,15 +49,22 @@ function InserterListItem( {
 				disabled={ isDisabled }
 				{ ...props }
 			>
-				<span
-					className="block-editor-block-types-list__item-icon"
-					style={ itemIconStyle }
-				>
-					<BlockIcon icon={ icon } showColors />
-				</span>
-				<span className="block-editor-block-types-list__item-title">
-					{ title }
-				</span>
+				{ ( htmlProps ) => (
+					<Button
+						{ ...htmlProps }
+						tabIndex={ isFirst ? 0 : htmlProps.tabIndex }
+					>
+						<span
+							className="block-editor-block-types-list__item-icon"
+							style={ itemIconStyle }
+						>
+							<BlockIcon icon={ icon } showColors />
+						</span>
+						<span className="block-editor-block-types-list__item-title">
+							{ title }
+						</span>
+					</Button>
+				) }
 			</CompositeItem>
 		</div>
 	);

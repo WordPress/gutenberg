@@ -1,18 +1,26 @@
 /**
- * External dependencies
- */
-import { Composite, useCompositeState } from 'reakit';
-
-/**
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
-import { useEffect } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
+/**
+ * External dependencies
+ */
+import { CompositeGroup } from 'reakit/Composite';
+
+function chunk( array, size ) {
+	const chunks = [];
+	for ( let i = 0, j = array.length; i < j; i += size ) {
+		chunks.push( array.slice( i, i + size ) );
+	}
+	return chunks;
+}
 
 /**
  * Internal dependencies
  */
 import InserterListItem from '../inserter-list-item';
+import InserterContext from '../inserter/context';
 
 function BlockTypesList( {
 	items = [],
@@ -21,48 +29,48 @@ function BlockTypesList( {
 	children,
 	label,
 } ) {
-	const composite = useCompositeState();
-	const orderId = items.reduce( ( acc, item ) => acc + '--' + item.id, '' );
-
-	// This ensures the composite state refreshes when the list order changes.
-	useEffect( () => {
-		composite.unstable_sort();
-	}, [ composite.unstable_sort, orderId ] );
-
+	const compositeState = useContext( InserterContext );
 	return (
 		/*
 		 * Disable reason: The `list` ARIA role is redundant but
 		 * Safari+VoiceOver won't announce the list otherwise.
 		 */
 		/* eslint-disable jsx-a11y/no-redundant-roles */
-		<Composite
-			{ ...composite }
+		<div
 			role="listbox"
 			className="block-editor-block-types-list"
 			aria-label={ label }
 		>
-			{ items.map( ( item ) => {
-				return (
-					<InserterListItem
-						key={ item.id }
-						className={ getBlockMenuDefaultClassName( item.id ) }
-						icon={ item.icon }
-						onClick={ () => {
-							onSelect( item );
-							onHover( null );
-						} }
-						onFocus={ () => onHover( item ) }
-						onMouseEnter={ () => onHover( item ) }
-						onMouseLeave={ () => onHover( null ) }
-						onBlur={ () => onHover( null ) }
-						isDisabled={ item.isDisabled }
-						title={ item.title }
-						composite={ composite }
-					/>
-				);
-			} ) }
+			{ chunk( items, 3 ).map( ( row, i ) => (
+				<CompositeGroup
+					state={ compositeState }
+					key={ i }
+					role="presentation"
+				>
+					{ row.map( ( item, j ) => (
+						<InserterListItem
+							key={ item.id }
+							className={ getBlockMenuDefaultClassName(
+								item.id
+							) }
+							icon={ item.icon }
+							onClick={ () => {
+								onSelect( item );
+								onHover( null );
+							} }
+							onFocus={ () => onHover( item ) }
+							onMouseEnter={ () => onHover( item ) }
+							onMouseLeave={ () => onHover( null ) }
+							onBlur={ () => onHover( null ) }
+							isDisabled={ item.isDisabled }
+							title={ item.title }
+							isFirst={ i + j === 0 }
+						/>
+					) ) }
+				</CompositeGroup>
+			) ) }
 			{ children }
-		</Composite>
+		</div>
 		/* eslint-enable jsx-a11y/no-redundant-roles */
 	);
 }
