@@ -11,7 +11,7 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { withGlobalEvents } from '../';
+import withGlobalEvents from '../';
 import Listener from '../listener';
 
 jest.mock( '../listener', () => {
@@ -72,6 +72,7 @@ describe( 'withGlobalEvents', () => {
 	it( 'renders with original component', () => {
 		mountEnhancedComponent();
 
+		expect( console ).toHaveWarned();
 		expect( wrapper.root.findByType( 'div' ).children[ 0 ] ).toBe(
 			'Hello'
 		);

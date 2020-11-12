@@ -41,7 +41,11 @@ const listener = new Listener();
  *
  * @return {Function} Higher-order component.
  */
-export function withGlobalEvents( eventTypesToHandlers ) {
+export default function withGlobalEvents( eventTypesToHandlers ) {
+	deprecated( 'wp.compose.withGlobalEvents', {
+		alternative: 'useEffect',
+	} );
+
 	return createHigherOrderComponent( ( WrappedComponent ) => {
 		class Wrapper extends Component {
 			constructor() {
@@ -95,16 +99,3 @@ export function withGlobalEvents( eventTypesToHandlers ) {
 		} );
 	}, 'withGlobalEvents' );
 }
-
-/**
- * @deprecated
- *
- * @param {...any} passedArguments
- */
-export default ( ...passedArguments ) => {
-	deprecated( 'wp.compose.withGlobalEvents', {
-		alternative: 'useEffect',
-	} );
-
-	return withGlobalEvents( ...passedArguments );
-};
