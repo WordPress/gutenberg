@@ -5,9 +5,5 @@ import '@wordpress/block-editor';
 import '@wordpress/core-data';
 import '@wordpress/notices';
 
-/**
- * Internal dependencies
- */
-import './store';
-
+export { storeDefinition } from './store';
 export * from './components';

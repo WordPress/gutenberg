@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createStoreDefinition, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -12,12 +12,14 @@ import * as selectors from './selectors';
 import { STORE_NAME } from './constants';
 
 /**
- * Store registered for the interface namespace.
+ * Store definition for the interface namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
  *
  * @type {Object}
  */
+export const storeDefinition = createStoreDefinition( STORE_NAME );
+
 export default registerStore( STORE_NAME, {
 	reducer,
 	actions,

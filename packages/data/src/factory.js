@@ -81,7 +81,7 @@ export function createRegistryControl( registryControl ) {
 }
 
 /**
- * Create a store definition to pass to store API methods.
+ * Creates a store definition to pass to store API methods.
  *
  * @example
  * ```js

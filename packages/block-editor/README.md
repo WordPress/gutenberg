@@ -522,7 +522,7 @@ Store definition for the block editor namespace.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore>
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition>
 
 _Type_
 

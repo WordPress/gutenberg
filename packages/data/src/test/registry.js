@@ -7,7 +7,7 @@ import { castArray, mapValues } from 'lodash';
  * Internal dependencies
  */
 import { createRegistry } from '../registry';
-import { createRegistrySelector } from '../factory';
+import { createRegistrySelector, createStoreDefinition } from '../factory';
 
 jest.useFakeTimers();
 
@@ -185,16 +185,6 @@ describe( 'createRegistry', () => {
 	} );
 
 	describe( 'registerStore', () => {
-		it( 'should return the reducer name for registered store', () => {
-			const store = registry.registerStore( 'butcher', {
-				reducer( state ) {
-					return state;
-				},
-			} );
-
-			expect( store.toString() ).toEqual( 'butcher' );
-		} );
-
 		it( 'should be shorthand for reducer, actions, selectors registration', () => {
 			const store = registry.registerStore( 'butcher', {
 				reducer( state = {}, action ) {
@@ -561,8 +551,10 @@ describe( 'createRegistry', () => {
 			);
 		} );
 
-		it( 'should work with the store object as param for select', () => {
-			const store = registry.registerStore( 'demo', {
+		it( 'should work with the store definition as param for select', () => {
+			const STORE_NAME = 'demo';
+			const storeDefinition = createStoreDefinition( STORE_NAME );
+			registry.registerStore( STORE_NAME, {
 				reducer: ( state = 'OK' ) => state,
 				selectors: {
 					getValue: ( state ) => state,
@@ -570,7 +562,9 @@ describe( 'createRegistry', () => {
 				resolvers: {},
 			} );
 
-			expect( registry.select( store ).getValue() ).toBe( 'OK' );
+			expect( registry.select( storeDefinition ).getValue() ).toBe(
+				'OK'
+			);
 		} );
 
 		it( 'should run the registry selector from a non-registry selector', () => {
@@ -704,7 +698,9 @@ describe( 'createRegistry', () => {
 		} );
 
 		it( 'should work with the store object as param for dispatch', async () => {
-			const store = registry.registerStore( 'demo', {
+			const STORE_NAME = 'demo';
+			const storeDefinition = createStoreDefinition( STORE_NAME );
+			const store = registry.registerStore( STORE_NAME, {
 				reducer( state = 'OK', action ) {
 					if ( action.type === 'UPDATE' ) {
 						return 'UPDATED';
@@ -719,7 +715,7 @@ describe( 'createRegistry', () => {
 			} );
 
 			expect( store.getState() ).toBe( 'OK' );
-			await registry.dispatch( store ).update();
+			await registry.dispatch( storeDefinition ).update();
 			expect( store.getState() ).toBe( 'UPDATED' );
 		} );
 	} );

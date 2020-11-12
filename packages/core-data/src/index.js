@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createStoreDefinition, registerStore } from '@wordpress/data';
 import { controls } from '@wordpress/data-controls';
 
 /**
@@ -64,13 +64,15 @@ export const storeConfig = {
 	resolvers: { ...resolvers, ...entityResolvers },
 };
 /**
- * Store registered for the code data namespace.
+ * Store definition for the code data namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
  *
  * @type {Object}
  */
-export default registerStore( STORE_NAME, storeConfig );
+export const storeDefinition = createStoreDefinition( STORE_NAME );
+
+registerStore( STORE_NAME, storeConfig );
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';

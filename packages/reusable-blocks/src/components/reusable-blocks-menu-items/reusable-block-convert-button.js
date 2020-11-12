@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { STORE_NAME } from '../../store/constants';
+import { storeDefinition } from '../../store';
 
 /**
  * Menu control to convert block(s) to reusable block.
@@ -69,7 +69,7 @@ export default function ReusableBlockConvertButton( {
 
 	const {
 		__experimentalConvertBlocksToReusable: convertBlocksToReusable,
-	} = useDispatch( STORE_NAME );
+	} = useDispatch( storeDefinition );
 
 	const { createSuccessNotice, createErrorNotice } = useDispatch(
 		'core/notices'

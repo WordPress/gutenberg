@@ -3,9 +3,5 @@
  */
 import '@wordpress/core-data';
 
-/**
- * Internal dependencies
- */
-import './store';
-
+export { storeDefinition } from './store';
 export * from './components';

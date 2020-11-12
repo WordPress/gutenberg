@@ -18,11 +18,11 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 <a name="storeDefinition" href="#storeDefinition">#</a> **storeDefinition**
 
-Store registered for the keyboard shortcuts namespace.
+Store definition for the keyboard shortcuts namespace.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore>
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition>
 
 _Type_
 

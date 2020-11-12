@@ -75,7 +75,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * Calls a selector given the current state and extra arguments.
 	 *
 	 * @param {string|Object} storeName Unique namespace identifier for the store
-	 *                                  or the store instance.
+	 *                                  or the store definition.
 	 *
 	 * @return {*} The selector's returned value.
 	 */
@@ -137,7 +137,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * after any resolvers have ran.
 	 *
 	 * @param {string|Object} storeName Unique namespace identifier for the store
-	 *                                  or the store instance.
+	 *                                  or the store definition.
 	 *
 	 * @return {Object} Each key of the object matches the name of a selector.
 	 */
@@ -149,7 +149,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * Returns the available actions for a part of the state.
 	 *
 	 * @param {string|Object} storeName Unique namespace identifier for the store
-	 *                                  or the store instance.
+	 *                                  or the store definition.
 	 *
 	 * @return {*} The action's returned value.
 	 */
@@ -224,7 +224,6 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 
 		const namespace = createNamespace( storeName, options, registry );
 		registerGenericStore( storeName, namespace );
-		namespace.store.toString = () => storeName;
 		return namespace.store;
 	};
 

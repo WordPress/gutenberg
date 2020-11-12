@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createStoreDefinition, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -33,10 +33,12 @@ export const storeConfig = {
 };
 
 /**
- * Store registered for the edit navigation namespace.
+ * Store definition for the edit navigation namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
  *
  * @type {Object}
  */
+export const storeDefinition = createStoreDefinition( STORE_NAME );
+
 export default registerStore( STORE_NAME, storeConfig );

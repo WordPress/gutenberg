@@ -434,7 +434,7 @@ _Returns_
 
 <a name="createStoreDefinition" href="#createStoreDefinition">#</a> **createStoreDefinition**
 
-Create a store definition to pass to store API methods.
+Creates a store definition to pass to store API methods.
 
 _Usage_
 
