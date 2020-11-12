@@ -1,2 +1,2 @@
-export { default as interfaceStore } from './store';
+export { default as store } from './store';
 export * from './components';

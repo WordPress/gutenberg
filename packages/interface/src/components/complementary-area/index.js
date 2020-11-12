@@ -11,7 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
 import { useEffect, useRef } from '@wordpress/element';
-import { viewportStore } from '@wordpress/viewport';
+import { store as viewportStore } from '@wordpress/viewport';
 
 /**
  * Internal dependencies

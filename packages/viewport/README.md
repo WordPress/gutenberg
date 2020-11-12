@@ -76,7 +76,7 @@ _Returns_
 
 -   `Function`: Higher-order component.
 
-<a name="viewportStore" href="#viewportStore">#</a> **viewportStore**
+<a name="store" href="#store">#</a> **store**
 
 Store registered for the viewport namespace.
 
