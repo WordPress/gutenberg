@@ -237,7 +237,7 @@ describe( 'Multi-entity editor states', () => {
 			);
 			await page.keyboard.type( 'Nested test words!' );
 
-			expect( await isEntityDirty( templateName ) ).toBe( true ); // Broken on purpose to test the screenshots
+			expect( await isEntityDirty( templateName ) ).toBe( false );
 			expect( await isEntityDirty( templatePartName ) ).toBe( false );
 			expect( await isEntityDirty( nestedTPName ) ).toBe( true );
 		} );
