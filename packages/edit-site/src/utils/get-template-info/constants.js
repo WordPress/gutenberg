@@ -8,50 +8,33 @@ import { __, _x } from '@wordpress/i18n';
  */
 export const TEMPLATES_DEFAULT_DETAILS = [
 	{
-		slug: 'front-page',
-		title: _x( 'Front Page', 'template name' ),
-		description: __(
-			'Front page template, whether it displays the blog posts index or a static page'
-		),
-	},
-	{
-		slug: 'index',
-		title: _x( 'Index', 'template name' ),
-		description: __( 'Default template' ),
-	},
-	{
-		slug: 'home',
-		title: __( 'Home Page' ),
-		description: __( 'Template for the latest blog posts' ),
+		slug: 'single-post',
+		title: __( 'Post' ),
+		description: __( 'Resolves when a post is requested' ),
 	},
 	{
 		slug: 'page',
-		title: __( 'Single Page' ),
-		description: __( 'Template for single pages' ),
-	},
-	{
-		slug: 'singular',
-		title: _x( 'Singular', 'template name' ),
-		description: __( 'Default template for both single posts and pages' ),
-	},
-	{
-		slug: 'single',
-		title: __( 'Single Post' ),
-		description: __( 'Template for single posts' ),
+		title: __( 'Page' ),
+		description: __( 'Resolves when a page is requested' ),
 	},
 	{
 		slug: 'archive',
 		title: _x( 'Archive', 'template name' ),
-		description: __( 'Generic archive template' ),
+		description: __( 'Resolves when archives like post categories are requested' ),
 	},
 	{
 		slug: 'search',
 		title: _x( 'Search Results', 'template name' ),
-		description: __( 'Search results template' ),
+		description: __( 'Resolves when a visitor searches the site' ),
 	},
 	{
 		slug: '404',
-		title: _x( '404 (Not Found)', 'template name' ),
-		description: __( 'Template for "not found" errors' ),
+		title: _x( '404', 'template name' ),
+		description: __( 'Resolves when the requested content cannot be found' ),
+	},
+	{
+		slug: 'index',
+		title: _x( 'Index', 'template name' ),
+		description: __( 'Resolves when no other template can be found' ),
 	},
 ];
