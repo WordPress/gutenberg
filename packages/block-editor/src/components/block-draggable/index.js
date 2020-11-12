@@ -58,14 +58,14 @@ const BlockDraggable = ( {
 	}, [] );
 
 	const blockNodes = useContext( BlockNodes );
-
-	if ( ! isDraggable ) {
-		return children( { isDraggable: false } );
-	}
-
 	const element = elementId
 		? document.getElementById( elementId )
 		: blockNodes[ clientIds[ 0 ] ];
+
+	if ( ! isDraggable || ! element ) {
+		return children( { isDraggable: false } );
+	}
+
 	const transferData = {
 		type: 'block',
 		srcClientIds: clientIds,
