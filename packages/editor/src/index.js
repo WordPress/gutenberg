@@ -14,7 +14,7 @@ import '@wordpress/rich-text';
  */
 import './hooks';
 
-export { default as store } from './store';
+export { default as storeDefinition } from './store';
 export * from './components';
 export * from './utils';
 export { storeConfig } from './store';

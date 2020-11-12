@@ -156,7 +156,7 @@ export { default as stack } from './library/stack';
 export { default as starEmpty } from './library/star-empty';
 export { default as starFilled } from './library/star-filled';
 export { default as starHalf } from './library/star-half';
-export { default as store } from './library/store';
+export { default as storeDefinition } from './library/store';
 export { default as stretchFullWidth } from './library/stretch-full-width';
 export { default as shipping } from './library/shipping';
 export { default as stretchWide } from './library/stretch-wide';
