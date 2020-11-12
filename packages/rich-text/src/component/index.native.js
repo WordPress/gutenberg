@@ -422,10 +422,12 @@ export class RichText extends Component {
 		if ( triggeredKeyCodeChar ) {
 			const record = this.getRecord();
 			const text = getTextContent( record );
-			// Only respond to the trigger if the selection is on the start of text or the character before is a space
+			// Only respond to the trigger if the selection is on the start of text or line
+			// or if the character before is a space
 			const useTrigger =
 				text.length === 0 ||
 				record.start === 0 ||
+				text.charAt( record.start - 1 ) === '\n' ||
 				text.charAt( record.start - 1 ) === ' ';
 
 			if ( useTrigger ) {
