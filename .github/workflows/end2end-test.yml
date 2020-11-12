@@ -51,11 +51,11 @@ jobs:
         $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 0' < ~/.jest-e2e-tests )
 
-    - name: Archive screenshots
+    - name: Archive debug artifacts (screenshots, HTML snapshots)
       uses: actions/upload-artifact@v2
       if: always()
       with:
-        name: failures-screenshots
+        name: failures-artifacts
         path: artifacts
 
   admin-2:
@@ -99,11 +99,11 @@ jobs:
         $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 1' < ~/.jest-e2e-tests )
 
-    - name: Archive screenshots
+    - name: Archive debug artifacts (screenshots, HTML snapshots)
       uses: actions/upload-artifact@v2
       if: always()
       with:
-        name: failures-screenshots
+        name: failures-artifacts
         path: artifacts
 
   admin-3:
@@ -147,11 +147,11 @@ jobs:
         $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 2' < ~/.jest-e2e-tests )
 
-    - name: Archive screenshots
+    - name: Archive debug artifacts (screenshots, HTML snapshots)
       uses: actions/upload-artifact@v2
       if: always()
       with:
-        name: failures-screenshots
+        name: failures-artifacts
         path: artifacts
 
   admin-4:
@@ -195,10 +195,10 @@ jobs:
         $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
         $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == 3' < ~/.jest-e2e-tests )
 
-    - name: Archive screenshots
+    - name: Archive debug artifacts (screenshots, HTML snapshots)
       uses: actions/upload-artifact@v2
       if: always()
       with:
-        name: failures-screenshots
+        name: failures-artifacts
         path: artifacts
 
