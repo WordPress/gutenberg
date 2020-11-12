@@ -264,6 +264,8 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
 		}, {} ),
 		transientEdits,
 	};
+
+	console.log( 'actions.js', { edit } );
 	return {
 		type: 'EDIT_ENTITY_RECORD',
 		...edit,

@@ -64,6 +64,9 @@ export function addAttribute( settings ) {
 export const withInspectorControl = createHigherOrderComponent(
 	( BlockEdit ) => {
 		return ( props ) => {
+			console.log( 'anchor.js', {
+				propsAttributesAnchor: props.attributes.anchor,
+			} );
 			const hasAnchor = hasBlockSupport( props.name, 'anchor' );
 
 			if ( hasAnchor && props.isSelected ) {
