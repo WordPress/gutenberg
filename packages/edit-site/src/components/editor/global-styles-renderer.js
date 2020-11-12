@@ -71,7 +71,7 @@ export default ( blockData, tree ) => {
 	 * @param {Object} blockPresets
 	 * @return {string} CSS declarations for the preset classes.
 	 */
-	const getBlockPresetClasses = ( blockSelector, blockPresets ) => {
+	const getBlockPresetClasses = ( blockSelector, blockPresets = {} ) => {
 		return reduce(
 			PRESET_CLASSES,
 			( declarations, { path, key, property }, classSuffix ) => {
@@ -162,15 +162,18 @@ export default ( blockData, tree ) => {
 			...getBlockPresetsDeclarations( tree?.[ context ]?.settings ),
 			...getCustomDeclarations( tree?.[ context ]?.settings?.custom ),
 		];
-
-		styles.push(
-			getBlockPresetClasses( blockSelector, tree[ context ].settings )
-		);
-
 		if ( blockDeclarations.length > 0 ) {
 			styles.push(
 				`${ blockSelector } { ${ blockDeclarations.join( ';' ) } }`
 			);
+		}
+
+		const presetClasses = getBlockPresetClasses(
+			blockSelector,
+			tree?.[ context ]?.settings
+		);
+		if ( presetClasses ) {
+			styles.push( presetClasses );
 		}
 	} );
 
