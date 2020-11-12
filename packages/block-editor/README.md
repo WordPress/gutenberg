@@ -132,15 +132,7 @@ Undocumented declaration.
 
 <a name="blockEditorStore" href="#blockEditorStore">#</a> **blockEditorStore**
 
-Store registered for the block editor namespace.
-
-_Related_
-
--   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore>
-
-_Type_
-
--   `Object` 
+Undocumented declaration.
 
 <a name="BlockFormatControls" href="#BlockFormatControls">#</a> **BlockFormatControls**
 
