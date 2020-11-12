@@ -4,4 +4,4 @@
 import './format';
 import './block';
 
-export { default as storeDefinition } from './store';
+export { storeDefinition } from './store';

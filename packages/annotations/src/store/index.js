@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createStoreDefinition, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -16,12 +16,14 @@ import * as actions from './actions';
 const STORE_NAME = 'core/annotations';
 
 /**
- * Store registered for the annotations namespace.
+ * Store definition for the annotations namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
  *
  * @type {Object}
  */
+export const storeDefinition = createStoreDefinition( STORE_NAME );
+
 export default registerStore( STORE_NAME, {
 	reducer,
 	selectors,

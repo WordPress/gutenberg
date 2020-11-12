@@ -742,7 +742,7 @@ _Parameters_
 
 <a name="storeDefinition" href="#storeDefinition">#</a> **storeDefinition**
 
-Store registered for the blocks namespace.
+Store definition for the blocks namespace.
 
 _Related_
 
