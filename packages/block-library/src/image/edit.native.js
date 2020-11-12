@@ -41,7 +41,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	external,
 	link,
@@ -581,6 +581,22 @@ export default compose( [
 		return {
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
+		};
+	} ),
+	withDispatch( ( dispatch, { select, clientId } ) => {
+		return {
+			wasBlockJustInserted() {
+				const { removeBlockInsertionEvent } = dispatch( 'core/editor' );
+				const { wasBlockJustInserted } = select( 'core/editor' );
+
+				const result = wasBlockJustInserted( clientId );
+
+				if ( result ) {
+					removeBlockInsertionEvent( clientId );
+					return true;
+				}
+				return false;
+			},
 		};
 	} ),
 	withPreferredColorScheme,
