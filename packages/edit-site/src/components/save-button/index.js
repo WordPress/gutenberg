@@ -28,7 +28,8 @@ export default function SaveButton( { openEntitiesSavedStates } ) {
 				),
 				getDirtyEntityRecords: __experimentalGetDirtyEntityRecords,
 			};
-		}
+		},
+		[]
 	);
 	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
@@ -42,7 +43,7 @@ export default function SaveButton( { openEntitiesSavedStates } ) {
 				character: 's',
 			},
 		} );
-	} );
+	}, [] );
 
 	useShortcut(
 		'core/edit-site/save',
