@@ -181,6 +181,8 @@ function gutenberg_edit_site_init( $hook ) {
 		'after'
 	);
 
+	wp_tinymce_inline_scripts();
+
 	/**
 	 * Fires after block assets have been enqueued for the editing interface.
 	 *
