@@ -1,4 +1,9 @@
 <?php
+/**
+ * Utilities to manage editor settings.
+ *
+ * @package gutenberg
+ */
 
 /**
  * Returns editor settings that are common to all editors:
@@ -17,7 +22,7 @@ function gutenberg_get_common_block_editor_settings() {
 
 	$available_image_sizes = array();
 	// This filter is documented in wp-admin/includes/media.php.
-	$image_size_names      = apply_filters(
+	$image_size_names = apply_filters(
 		'image_size_names_choose',
 		array(
 			'thumbnail' => __( 'Thumbnail', 'gutenberg' ),
@@ -69,7 +74,14 @@ function gutenberg_get_common_block_editor_settings() {
 	return $settings;
 }
 
-function gutenberg_extend_post_editor_settings( $settings ){
+/**
+ * Extends the block editor with settings that are only in the plugin.
+ *
+ * @param array $settings Existing editor settings.
+ *
+ * @return array Filtered settings.
+ */
+function gutenberg_extend_post_editor_settings( $settings ) {
 	$settings['__unstableEnableFullSiteEditingBlocks'] = gutenberg_is_fse_theme();
 	return $settings;
 }
