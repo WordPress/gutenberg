@@ -3,14 +3,13 @@
  */
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useContext, useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockDraggableChip from './draggable-chip';
 import useScrollWhenDragging from './use-scroll-when-dragging';
-import { BlockNodes } from '../block-list/root-container';
 
 const BlockDraggable = ( {
 	children,
@@ -57,12 +56,7 @@ const BlockDraggable = ( {
 		};
 	}, [] );
 
-	const blockNodes = useContext( BlockNodes );
-	const element = elementId
-		? document.getElementById( elementId )
-		: blockNodes[ clientIds[ 0 ] ];
-
-	if ( ! isDraggable || ! element ) {
+	if ( ! isDraggable ) {
 		return children( { isDraggable: false } );
 	}
 
@@ -75,7 +69,7 @@ const BlockDraggable = ( {
 	return (
 		<Draggable
 			cloneClassname={ cloneClassname }
-			element={ element }
+			elementId={ elementId }
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
 				startDraggingBlocks( clientIds );
