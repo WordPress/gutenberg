@@ -239,78 +239,49 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 	$theme_settings['global']['settings'] = array();
 
 	// Deprecated theme supports.
-	if (
-		array_key_exists( 'disableCustomColors', $settings ) &&
-		$settings['disableCustomColors']
-	) {
+	if ( isset( $settings['disableCustomColors'] ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
 			$theme_settings['global']['settings']['color'] = array();
 		}
-		$theme_settings['global']['settings']['color']['custom'] = false;
+		$theme_settings['global']['settings']['color']['custom'] = $settings['disableCustomColors'];
 		unset( $settings['disableCustomColors'] );
 	}
 
-	if (
-		array_key_exists( 'disableCustomGradients', $settings ) &&
-		$settings['disableCustomGradients']
-	) {
+	if ( isset( $settings['disableCustomGradients'] ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
 			$theme_settings['global']['settings']['color'] = array();
 		}
-		$theme_settings['global']['settings']['color']['customGradient'] = false;
+		$theme_settings['global']['settings']['color']['customGradient'] = $settings['disableCustomGradients'];
 		unset( $settings['disableCustomGradients'] );
 	}
 
-	if (
-		array_key_exists( 'disableCustomFontSizes', $settings ) &&
-		$settings['disableCustomFontSizes']
-	) {
+	if ( isset( $settings['disableCustomFontSizes'] ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['typography'] ) ) {
 			$theme_settings['global']['settings']['typography'] = array();
 		}
-		$theme_settings['global']['settings']['typography']['customFontSize'] = false;
+		$theme_settings['global']['settings']['typography']['customFontSize'] = $settings['disableCustomFontSizes'];
 		unset( $settings['disableCustomFontSizes'] );
 	}
 
-	if (
-		array_key_exists( 'enableCustomLineHeight', $settings ) &&
-		$settings['enableCustomLineHeight']
-	) {
+	if ( isset( $settings['enableCustomLineHeight'] ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['typography'] ) ) {
 			$theme_settings['global']['settings']['typography'] = array();
 		}
-		$theme_settings['global']['settings']['typography']['customLineHeight'] = true;
+		$theme_settings['global']['settings']['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
+		unset( $settings['enableCustomLineHeight'] );
 	}
 
-	if ( get_theme_support( 'custom-spacing' ) ) {
+	if ( isset( $settings['enableCustomUnits'] ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['spacing'] ) ) {
 			$theme_settings['global']['settings']['spacing'] = array();
 		}
-		$theme_settings['global']['settings']['spacing']['custom'] = true;
-	}
-
-	if ( get_theme_support( 'experimental-link-color' ) ) {
-		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
-			$theme_settings['global']['settings']['color'] = array();
-		}
-		$theme_settings['global']['settings']['color']['link'] = true;
-	}
-
-	$custom_units = array_key_exists( 'enableCustomUnits', $settings ) ? $settings['enableCustomUnits'] : false;
-	if ( $custom_units ) {
-		if ( ! isset( $theme_settings['global']['settings']['spacing'] ) ) {
-			$theme_settings['global']['settings']['spacing'] = array();
-		}
-		$theme_settings['global']['settings']['spacing']['units'] = ( true === $custom_units ) ?
+		$theme_settings['global']['settings']['spacing']['units'] = ( true === $settings['enableCustomUnits'] ) ?
 			array( 'px', 'em', 'rem', 'vh', 'vw' ) :
-			$custom_units;
+			$settings['enableCustomUnits'];
 		unset( $settings['enableCustomUnits'] );
 	}
 
-	if (
-		array_key_exists( 'colors', $settings ) &&
-		$settings['colors']
-	) {
+	if ( isset( $settings['colors'] ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
 			$theme_settings['global']['settings']['color'] = array();
 		}
@@ -318,10 +289,7 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 		unset( $settings['colors'] );
 	}
 
-	if (
-		array_key_exists( 'gradients', $settings ) &&
-		$settings['gradients']
-	) {
+	if ( isset( $settings['gradients'] ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
 			$theme_settings['global']['settings']['color'] = array();
 		}
@@ -329,10 +297,7 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 		unset( $settings['gradients'] );
 	}
 
-	if (
-		array_key_exists( 'fontSizes', $settings ) &&
-		$settings['fontSizes']
-	) {
+	if ( isset( $settings['fontSizes'] ) ) {
 		if ( ! isset( $theme_settings['global']['settings']['typography'] ) ) {
 			$theme_settings['global']['settings']['typography'] = array();
 		}
