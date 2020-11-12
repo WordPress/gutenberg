@@ -2,6 +2,7 @@
  * External dependencies
  */
 import optimist from 'redux-optimist';
+import { omit } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -81,6 +82,25 @@ export function notices( state = [], action ) {
 			return [];
 		case 'REMOVE_NOTICE':
 			return state.filter( ( notice ) => notice.id !== action.id );
+	}
+	return state;
+}
+
+/**
+ * Reducer returning the block insertion event list state.
+ *
+ * @param {Object}  state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function blockInsertionEvents( state = {}, action ) {
+	switch ( action.type ) {
+		case 'CREATE_BLOCK_INSERTION_EVENT':
+			return { ...state, ...action.clientId };
+
+		case 'REMOVE_BLOCK_INSERTION_EVENT':
+			return omit( state, action.clientId );
 	}
 	return state;
 }

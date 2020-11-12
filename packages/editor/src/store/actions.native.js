@@ -112,17 +112,3 @@ export function removeBlockInsertionEvent( clientId ) {
 		clientId,
 	};
 }
-
-/**
- * Returns an action object to get a block insertion event by client id.
- *
- * @param {Object} clientId The id of the block to remove.
- *
- * @return {Object} Action object.
- */
-export function getBlockInsertionEvent( clientId ) {
-	return {
-		type: 'GET_BLOCK_INSERTION_EVENT',
-		clientId,
-	};
-}

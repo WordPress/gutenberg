@@ -77,3 +77,15 @@ export function getClipboard( state ) {
 export function getNotices( state ) {
 	return state.notices;
 }
+
+/**
+ * Returns the current block insertion event.
+ *
+ * @param {Object} state Global application state.
+ * @param {Object} clientId client id of the block.
+ * @return {boolean} If block inserrtion event exists then the block was just inserted.
+ */
+export function wasBlockJustInserted( state, clientId ) {
+	const value = state.filter( ( id ) => id !== clientId );
+	return value ? true : false;
+}
