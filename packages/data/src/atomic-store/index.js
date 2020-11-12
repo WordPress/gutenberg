@@ -7,8 +7,14 @@ export function createAtomicStore( config, registry ) {
 	// I'm probably missing the atom resolver here
 	const selectors = mapValues( config.selectors, ( atomSelector ) => {
 		return ( ...args ) => {
-			return atomSelector( ( atomCreator ) =>
-				registry.getAtomRegistry().getAtom( atomCreator ).get()
+			return atomSelector(
+				registry.__unstableGetAtomResolver()
+					? registry.__unstableGetAtomResolver()
+					: ( atomCreator ) =>
+							registry
+								.getAtomRegistry()
+								.getAtom( atomCreator )
+								.get()
 			)( ...args );
 		};
 	} );
