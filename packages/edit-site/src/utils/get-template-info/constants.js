@@ -20,7 +20,9 @@ export const TEMPLATES_DEFAULT_DETAILS = [
 	{
 		slug: 'archive',
 		title: _x( 'Archive', 'template name' ),
-		description: __( 'Resolves when archives like post categories are requested' ),
+		description: __(
+			'Resolves when archives like post categories are requested'
+		),
 	},
 	{
 		slug: 'search',
@@ -30,7 +32,9 @@ export const TEMPLATES_DEFAULT_DETAILS = [
 	{
 		slug: '404',
 		title: _x( '404', 'template name' ),
-		description: __( 'Resolves when the requested content cannot be found' ),
+		description: __(
+			'Resolves when the requested content cannot be found'
+		),
 	},
 	{
 		slug: 'index',
