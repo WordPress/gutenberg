@@ -4,6 +4,7 @@
 import {
 	LineHeightControl,
 	__experimentalFontFamilyControl as FontFamilyControl,
+	__experimentalFontAppearanceControl as FontAppearanceControl,
 } from '@wordpress/block-editor';
 import { PanelBody, FontSizePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -14,9 +15,10 @@ import { __ } from '@wordpress/i18n';
 import { useEditorFeature } from '../editor/utils';
 
 export function useHasTypographyPanel( { supports, name } ) {
+	const hasLineHeight = useHasLineHeightControl( { supports, name } );
+	const hasFontAppearence = useHasAppearenceControl( { supports, name } );
 	return (
-		useHasLineHeightControl( { supports, name } ) ||
-		supports.includes( 'fontSize' )
+		hasLineHeight || hasFontAppearence || supports.includes( 'fontSize' )
 	);
 }
 
@@ -24,6 +26,18 @@ function useHasLineHeightControl( { supports, name } ) {
 	return (
 		useEditorFeature( 'typography.customLineHeight', name ) &&
 		supports.includes( 'lineHeight' )
+	);
+}
+
+function useHasAppearenceControl( { supports, name } ) {
+	const fontStyles = useEditorFeature( 'typography.fontStyles', name );
+	const fontWeights = useEditorFeature( 'typography.fontWeights', name );
+	const hasFontAppearance = !! fontStyles?.length && !! fontWeights?.length;
+
+	return (
+		hasFontAppearance &&
+		supports.includes( 'fontStyle' ) &&
+		supports.includes( 'fontWeight' )
 	);
 }
 
@@ -38,7 +52,10 @@ export default function TypographyPanel( {
 		name
 	);
 	const fontFamilies = useEditorFeature( 'typography.fontFamilies', name );
+	const fontStyles = useEditorFeature( 'typography.fontStyles', name );
+	const fontWeights = useEditorFeature( 'typography.fontWeights', name );
 	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
+	const hasAppearenceControl = useHasAppearenceControl( { supports, name } );
 
 	return (
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
@@ -67,6 +84,19 @@ export default function TypographyPanel( {
 					onChange={ ( value ) =>
 						setStyleProperty( name, 'lineHeight', value )
 					}
+				/>
+			) }
+			{ hasAppearenceControl && (
+				<FontAppearanceControl
+					value={ {
+						fontStyle: getStyleProperty( name, 'fontStyle' ),
+						fontWeight: getStyleProperty( name, 'fontWeight' ),
+					} }
+					options={ { fontStyles, fontWeights } }
+					onChange={ ( { fontStyle, fontWeight } ) => {
+						setStyleProperty( name, 'fontStyle', fontStyle );
+						setStyleProperty( name, 'fontWeight', fontWeight );
+					} }
 				/>
 			) }
 		</PanelBody>
