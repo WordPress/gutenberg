@@ -68,8 +68,8 @@ export const MenuTitleHeadingUI = styled( Text )`
 	margin-bottom: ${ space( 1 ) };
 	padding: ${ ( props ) =>
 		props.isRTL
-			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } 0`
-			: `${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) }` };
+			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } ${ space( 1.5 ) }`
+			: `${ space( 0.5 ) } ${ space( 1.5 ) } ${ space( 0.5 ) } ${ space( 2 ) }` };
 `;
 
 export const MenuTitleActionsUI = styled.span`
