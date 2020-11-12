@@ -165,22 +165,24 @@ function isEdge( container, isReverse, onlyVertical ) {
 	}
 
 	const testRect = getRectangleFromRange( testRange );
-	const verticalSide = isReverse ? 'top' : 'bottom';
-	const verticalEdge =
-		Math.abs( testRect[ verticalSide ] - rangeRect[ verticalSide ] ) <= 1;
 
-	if ( ! verticalEdge ) {
+	if ( ! testRect ) {
 		return false;
 	}
 
-	if ( onlyVertical ) {
-		return true;
-	}
-
-	const side = isReverseDir ? 'left' : 'right';
+	const verticalSide = isReverse ? 'top' : 'bottom';
+	const horizontalSide = isReverseDir ? 'left' : 'right';
+	const verticalDiff = testRect[ verticalSide ] - rangeRect[ verticalSide ];
+	const horizontalDiff =
+		testRect[ horizontalSide ] - collapsedRangeRect[ horizontalSide ];
 
 	// Allow the position to be 1px off.
-	return Math.abs( testRect[ side ] - collapsedRangeRect[ side ] ) <= 1;
+	const hasVerticalDiff = Math.abs( verticalDiff ) <= 1;
+	const hasHorizontalDiff = Math.abs( horizontalDiff ) <= 1;
+
+	return onlyVertical
+		? hasVerticalDiff
+		: hasVerticalDiff && hasHorizontalDiff;
 }
 
 /**
