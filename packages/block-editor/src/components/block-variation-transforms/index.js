@@ -2,12 +2,17 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { SelectControl } from '@wordpress/components';
+import {
+	DropdownMenu,
+	MenuGroup,
+	MenuItemsChoice,
+} from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { chevronDown } from '@wordpress/icons';
 
 function __experimentalBlockVariationTransforms( { selectedBlockClientId } ) {
-	const [ variationsSelectValue, setVariationsSelectValue ] = useState( '' );
+	const [ selectedValue, setSelectedValue ] = useState( '' );
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 	const { variations } = useSelect(
 		( select ) => {
@@ -25,29 +30,44 @@ function __experimentalBlockVariationTransforms( { selectedBlockClientId } ) {
 	if ( ! variations?.length ) return null;
 
 	const selectOptions = [
-		{ value: '', label: __( 'Select a variation' ) },
-		...variations.map( ( variation ) => ( {
-			value: variation.name,
-			label: variation.title,
+		...variations.map( ( { name, title, description } ) => ( {
+			value: name,
+			label: title,
+			info: description,
 		} ) ),
 	];
 	const onSelectVariation = ( variationName ) => {
-		setVariationsSelectValue( variationName );
-		if ( ! variationName ) return;
+		setSelectedValue( variationName );
 		updateBlockAttributes( selectedBlockClientId, {
 			...variations.find( ( { name } ) => name === variationName )
 				.attributes,
 		} );
 	};
+	const baseClass = 'block-editor-block-variation-transforms';
 	return (
-		<div className="block-editor-block-variation-transforms">
-			<SelectControl
-				label={ __( 'Transform to variation' ) }
-				value={ variationsSelectValue }
-				options={ selectOptions }
-				onChange={ onSelectVariation }
-			/>
-		</div>
+		<DropdownMenu
+			className={ baseClass }
+			label={ __( 'Transform to variation' ) }
+			text={ __( 'Transform to variation' ) }
+			popoverProps={ {
+				position: 'bottom center',
+				className: `${ baseClass }__popover`,
+			} }
+			icon={ chevronDown }
+			iconPosition="right"
+		>
+			{ () => (
+				<div className={ `${ baseClass }__container` }>
+					<MenuGroup>
+						<MenuItemsChoice
+							choices={ selectOptions }
+							value={ selectedValue }
+							onSelect={ onSelectVariation }
+						/>
+					</MenuGroup>
+				</div>
+			) }
+		</DropdownMenu>
 	);
 }
 
