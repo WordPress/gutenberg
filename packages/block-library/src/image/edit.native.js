@@ -68,7 +68,6 @@ export class ImageEdit extends React.Component {
 		super( props );
 		this.state = {
 			isCaptionSelected: false,
-			alreadyAutoOpenedMediaUpload: false,
 		};
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
@@ -305,10 +304,6 @@ export class ImageEdit extends React.Component {
 			...mediaAttributes,
 			...additionalAttributes,
 		} );
-
-		this.setState( {
-			alreadyAutoOpenedMediaUpload: true,
-		} );
 	}
 
 	onFocusCaption() {
@@ -324,9 +319,6 @@ export class ImageEdit extends React.Component {
 
 	onClearMedia() {
 		this.props.setAttributes( { id: null, url: null } );
-		this.setState( {
-			alreadyAutoOpenedMediaUpload: true,
-		} );
 	}
 
 	getPlaceholderIcon() {
@@ -351,13 +343,14 @@ export class ImageEdit extends React.Component {
 	}
 
 	render() {
-		const { isCaptionSelected, alreadyAutoOpenedMediaUpload } = this.state;
+		const { isCaptionSelected } = this.state;
 		const {
 			attributes,
 			isSelected,
 			image,
 			imageSizes,
 			clientId,
+			wasBlockJustInserted,
 		} = this.props;
 		const {
 			align,
@@ -450,11 +443,7 @@ export class ImageEdit extends React.Component {
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getPlaceholderIcon() }
 						onFocus={ this.props.onFocus }
-						autoOpenMediaUpload={
-							isSelected &&
-							! url &&
-							! alreadyAutoOpenedMediaUpload
-						}
+						autoOpenMediaUpload={ wasBlockJustInserted() }
 					/>
 				</View>
 			);
@@ -583,7 +572,7 @@ export default compose( [
 			imageSizes,
 		};
 	} ),
-	withDispatch( ( dispatch, { select, clientId } ) => {
+	withDispatch( ( dispatch, { clientId }, { select } ) => {
 		return {
 			wasBlockJustInserted() {
 				const { removeBlockInsertionEvent } = dispatch( 'core/editor' );
