@@ -130,10 +130,6 @@ Undocumented declaration.
 
 Undocumented declaration.
 
-<a name="blockEditorStore" href="#blockEditorStore">#</a> **blockEditorStore**
-
-Undocumented declaration.
-
 <a name="BlockFormatControls" href="#BlockFormatControls">#</a> **BlockFormatControls**
 
 Undocumented declaration.
@@ -511,6 +507,18 @@ Undocumented declaration.
 <a name="storeConfig" href="#storeConfig">#</a> **storeConfig**
 
 Block editor data store configuration.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore>
+
+_Type_
+
+-   `Object` 
+
+<a name="storeDefinition" href="#storeDefinition">#</a> **storeDefinition**
+
+Store definition for the block editor namespace.
 
 _Related_
 

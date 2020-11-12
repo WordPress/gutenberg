@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createStoreDefinition, registerStore } from '@wordpress/data';
 import { controls as dataControls } from '@wordpress/data-controls';
 
 /**
@@ -33,13 +33,13 @@ export const storeConfig = {
 	resolvers,
 };
 
-const store = registerStore( STORE_NAME, storeConfig );
-
 /**
- * Store registered for the block directory namespace.
+ * Store definition for the block directory namespace.
  *
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
  *
  * @type {Object}
  */
-export default store;
+export const storeDefinition = createStoreDefinition( STORE_NAME );
+
+export default registerStore( STORE_NAME, storeConfig );
