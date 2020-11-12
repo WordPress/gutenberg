@@ -229,6 +229,8 @@ export default compose(
 			insertDefaultBlock,
 		} = dispatch( 'core/block-editor' );
 
+		const { createBlockInsertionEvent } = dispatch( 'core/editor' );
+
 		return {
 			showInsertionPoint() {
 				if ( ownProps.shouldReplaceBlock ) {
@@ -265,6 +267,10 @@ export default compose(
 					initialAttributes,
 					innerBlocks
 				);
+
+				const { clientId } = insertedBlock;
+
+				createBlockInsertionEvent( clientId );
 
 				insertBlock(
 					insertedBlock,
