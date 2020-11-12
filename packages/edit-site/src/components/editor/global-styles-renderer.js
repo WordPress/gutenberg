@@ -81,7 +81,7 @@ export default ( blockData, tree ) => {
 					const value = preset[ key ];
 					const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
 					const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
-					declarations += `${ selectorToUse } {${ property }: ${ value };}\n`;
+					declarations += `${ selectorToUse } {${ property }: ${ value };}`;
 				} );
 				return declarations;
 			},
