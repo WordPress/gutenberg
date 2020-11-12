@@ -13,6 +13,25 @@ function getComputedStyle( node ) {
 }
 
 /**
+ * Gets the height of the range without ignoring zero width rectangles, which
+ * some browsers ignore when creating a union.
+ *
+ * @param {Range} range The range to check.
+ */
+function getRangeHeight( range ) {
+	const rects = Array.from( range.getClientRects() );
+
+	if ( ! rects.length ) {
+		return;
+	}
+
+	const highestTop = Math.min( ...rects.map( ( { top } ) => top ) );
+	const lowestBottom = Math.max( ...rects.map( ( { bottom } ) => bottom ) );
+
+	return lowestBottom - highestTop;
+}
+
+/**
  * Returns true if the given selection object is in the forward direction, or
  * false otherwise.
  *
@@ -88,39 +107,36 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return false;
 	}
 
-	const originalRange = selection.getRangeAt( 0 );
-	const range = originalRange.cloneRange();
+	const range = selection.getRangeAt( 0 );
+	const collapsedRange = range.cloneRange();
 	const isForward = isSelectionForward( selection );
 	const isCollapsed = selection.isCollapsed;
 
 	// Collapse in direction of selection.
 	if ( ! isCollapsed ) {
-		range.collapse( ! isForward );
+		collapsedRange.collapse( ! isForward );
 	}
 
+	const collapsedRangeRect = getRectangleFromRange( collapsedRange );
 	const rangeRect = getRectangleFromRange( range );
 
-	if ( ! rangeRect ) {
+	if ( ! collapsedRangeRect || ! rangeRect ) {
 		return false;
 	}
 
-	const computedStyle = getComputedStyle( container );
-	const lineHeight =
-		// Line height may not be in pixels, so fall back to range height.
-		parseInt( computedStyle.lineHeight, 10 ) || rangeRect.height;
-
 	// Only consider the multiline selection at the edge if the direction is
-	// towards the edge.
+	// towards the edge. The selection is multiline if it is taller than the
+	// collapsed  selection.
 	if (
 		! isCollapsed &&
-		rangeRect.height > lineHeight &&
+		getRangeHeight( range ) > collapsedRangeRect.height &&
 		isForward === isReverse
 	) {
 		return false;
 	}
 
 	// In the case of RTL scripts, the horizontal edge is at the opposite side.
-	const { direction } = computedStyle;
+	const { direction } = getComputedStyle( container );
 	const isReverseDir = direction === 'rtl' ? ! isReverse : isReverse;
 
 	const containerRect = container.getBoundingClientRect();
@@ -149,12 +165,9 @@ function isEdge( container, isReverse, onlyVertical ) {
 	}
 
 	const testRect = getRectangleFromRange( testRange );
-	const originalRangeRect = getRectangleFromRange( originalRange );
 	const verticalSide = isReverse ? 'top' : 'bottom';
 	const verticalEdge =
-		Math.abs(
-			testRect[ verticalSide ] - originalRangeRect[ verticalSide ]
-		) <= 1;
+		Math.abs( testRect[ verticalSide ] - rangeRect[ verticalSide ] ) <= 1;
 
 	if ( ! verticalEdge ) {
 		return false;
@@ -167,7 +180,7 @@ function isEdge( container, isReverse, onlyVertical ) {
 	const side = isReverseDir ? 'left' : 'right';
 
 	// Allow the position to be 1px off.
-	return Math.abs( testRect[ side ] - rangeRect[ side ] ) <= 1;
+	return Math.abs( testRect[ side ] - collapsedRangeRect[ side ] ) <= 1;
 }
 
 /**
