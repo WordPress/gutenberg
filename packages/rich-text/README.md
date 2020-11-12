@@ -304,11 +304,11 @@ _Returns_
 
 <a name="storeDefinition" href="#storeDefinition">#</a> **storeDefinition**
 
-Store registered for the rich-text namespace.
+Store definition for the rich-text namespace.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore>
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition>
 
 _Type_
 

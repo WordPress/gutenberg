@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createStoreDefinition, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,15 +10,18 @@ import * as actions from './actions';
 import controls from './controls';
 import reducer from './reducer';
 import * as selectors from './selectors';
-import { STORE_NAME } from './constants';
+
+const STORE_NAME = 'core/reusable-blocks';
 
 /**
- * Store registered for the reusable blocks namespace.
+ * Store definition for the reusable blocks namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
  *
  * @type {Object}
  */
+export const storeDefinition = createStoreDefinition( STORE_NAME );
+
 export default registerStore( STORE_NAME, {
 	actions,
 	controls,

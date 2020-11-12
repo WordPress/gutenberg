@@ -1,4 +1,4 @@
-export { default as storeDefinition } from './store';
+export { storeDefinition } from './store';
 export { applyFormat } from './apply-format';
 export { concat } from './concat';
 export { create } from './create';

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createStoreDefinition, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -12,6 +12,15 @@ import * as actions from './actions';
 import * as selectors from './selectors';
 import { STORE_NAME } from './constants';
 
+/**
+ * Store definition for the edit post namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
+ *
+ * @type {Object}
+ */
+export const storeDefinition = createStoreDefinition( STORE_NAME );
+
 const store = registerStore( STORE_NAME, {
 	reducer,
 	actions,
@@ -21,11 +30,4 @@ const store = registerStore( STORE_NAME, {
 
 applyMiddlewares( store );
 
-/**
- * Store registered for the edit post namespace.
- *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
- *
- * @type {Object}
- */
 export default store;

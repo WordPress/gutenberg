@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createStoreDefinition, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,14 +10,18 @@ import reducer from './reducer';
 import * as actions from './actions';
 import * as selectors from './selectors';
 
+const STORE_NAME = 'core/notices';
+
 /**
- * Store registered for the notices namespace.
+ * Store definition for the notices namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
  *
  * @type {Object}
  */
-export default registerStore( 'core/notices', {
+export const storeDefinition = createStoreDefinition( STORE_NAME );
+
+export default registerStore( STORE_NAME, {
 	reducer,
 	actions,
 	selectors,

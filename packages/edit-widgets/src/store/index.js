@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { registerStore } from '@wordpress/data';
+import { createStoreDefinition, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -34,6 +34,15 @@ export const storeConfig = {
 	actions,
 };
 
+/**
+ * Store definition for the edit widgets namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
+ *
+ * @type {Object}
+ */
+export const storeDefinition = createStoreDefinition( STORE_NAME );
+
 const store = registerStore( STORE_NAME, storeConfig );
 
 // This package uses a few in-memory post types as wrappers for convenience.
@@ -47,11 +56,4 @@ apiFetch.use( function ( options, next ) {
 	return next( options );
 } );
 
-/**
- * Store registered for the edit widgets namespace.
- *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
- *
- * @type {Object}
- */
 export default store;

@@ -15,7 +15,7 @@ const STORE_NAME = 'core/viewport';
 /**
  * Store definition for the viewport namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
  *
  * @type {Object}
  */
