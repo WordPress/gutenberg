@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
 import {
 	__experimentalNavigation as Navigation,
 	__experimentalNavigationMenu as NavigationMenu,
@@ -19,14 +18,6 @@ import TemplatePartsMenu from './menus/template-parts';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS, MENU_TEMPLATES } from './constants';
 
 export default function TemplatesNavigation() {
-	const ref = useRef();
-
-	useEffect( () => {
-		if ( ref.current ) {
-			ref.current.focus();
-		}
-	}, [ ref ] );
-
 	const { templateId, templatePartId, templateType, activeMenu } = useSelect(
 		( select ) => {
 			const {
@@ -63,7 +54,6 @@ export default function TemplatesNavigation() {
 					backButtonLabel={ __( 'Dashboard' ) }
 					className="edit-site-navigation-panel__back-to-dashboard"
 					href="index.php"
-					ref={ ref }
 				/>
 			) }
 

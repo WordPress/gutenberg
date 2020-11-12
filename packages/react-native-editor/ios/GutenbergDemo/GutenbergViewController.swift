@@ -50,7 +50,6 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
-
     func gutenbergDidRequestFetch(path: String, completion: @escaping (Result<Any, NSError>) -> Void) {
         completion(Result.success([:]))
     }
@@ -222,6 +221,26 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool) {
         print("Gutenberg requested setting tooltip flag")
     }
+
+    func gutenbergDidRequestMediaSaveSync() {
+        print(#function)
+    }
+
+    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) {
+        print(#function)
+    }
+
+    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) {
+        print(#function)
+    }
+
+    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) {
+        print(#function)
+    }
+
+    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) {
+        print(#function)
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {
@@ -270,6 +289,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .mentions: true,
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
+            .mediaFilesCollectionBlock: true,
         ]
     }
 

@@ -1,4 +1,23 @@
 .wp-block-search {
+
+	.wp-block-search__button {
+		background: #f7f7f7;
+		border: 1px solid #ccc;
+		padding: 6px 10px;
+		color: #32373c;
+		margin-left: 0.625em;
+		word-break: normal;
+
+		&.has-icon {
+			line-height: 0;
+		}
+
+		svg {
+			min-width: 1.5em;
+			min-height: 1.5em;
+		}
+	}
+
 	.wp-block-search__inside-wrapper {
 		display: flex;
 		flex: auto;
@@ -14,16 +33,6 @@
 		flex-grow: 1;
 		min-width: 3em;
 		border: 1px solid $gray-600;
-	}
-
-	.wp-block-search__button {
-		margin-left: 0.625em;
-		word-break: normal;
-
-		svg {
-			min-width: 1.5em;
-			min-height: 1.5em;
-		}
 	}
 
 	&.wp-block-search__button-only {

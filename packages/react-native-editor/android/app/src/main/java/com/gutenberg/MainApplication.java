@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.Toast;
 
 import androidx.core.util.Consumer;
 
@@ -81,6 +82,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void mediaUploadSync(MediaSelectedCallback mediaSelectedCallback) {
+            }
+
+            @Override
+            public void mediaSaveSync(MediaSelectedCallback mediaSelectedCallback) {
             }
 
             @Override
@@ -172,10 +177,34 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void requestMediaFilesEditorLoad(
+                    ReplaceMediaFilesEditedBlockCallback replaceMediaFilesEditedBlockCallback,
+                    ReadableArray mediaFiles,
+                    String blockId
+            ) {
+                Toast.makeText(MainApplication.this, "requestMediaFilesEditorLoad called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestMediaFilesFailedRetryDialog(ReadableArray mediaFiles) {
+                Toast.makeText(MainApplication.this, "requestMediaFilesFailedRetryDialog called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestMediaFilesUploadCancelDialog(ReadableArray mediaFiles) {
+                Toast.makeText(MainApplication.this, "requestMediaFilesUploadCancelDialog called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void requestMediaFilesSaveCancelDialog(ReadableArray mediaFiles) {
+                Toast.makeText(MainApplication.this, "requestMediaFilesSaveCancelDialog called", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
             public void gutenbergDidSendButtonPressedAction(String buttonType) {
 
             }
-            
+
         }, isDarkMode());
 
         return new ReactNativeHost(this) {

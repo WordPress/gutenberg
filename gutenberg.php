@@ -159,7 +159,7 @@ function gutenberg_build_files_notice() {
  */
 function gutenberg_pre_init() {
 	global $wp_version;
-	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( dirname( __FILE__ ) . '/build/blocks' ) ) {
+	if ( defined( 'GUTENBERG_DEVELOPMENT_MODE' ) && GUTENBERG_DEVELOPMENT_MODE && ! file_exists( __DIR__ . '/build/blocks' ) ) {
 		add_action( 'admin_notices', 'gutenberg_build_files_notice' );
 		return;
 	}
@@ -175,7 +175,7 @@ function gutenberg_pre_init() {
 		return;
 	}
 
-	require_once dirname( __FILE__ ) . '/lib/load.php';
+	require_once __DIR__ . '/lib/load.php';
 }
 
 /**

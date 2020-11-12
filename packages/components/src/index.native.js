@@ -45,6 +45,7 @@ export { default as QueryControls } from './query-controls';
 export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
 export { default as RadioControl } from './radio-control';
+export { default as UnitControl } from './unit-control';
 
 // Higher-Order Components
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
@@ -87,6 +88,12 @@ export {
 	WIDE_ALIGNMENTS,
 	ALIGNMENT_BREAKPOINTS,
 } from './mobile/utils/alignments';
+
+// Hooks
+export {
+	useConvertUnitToMobile,
+	getValueAndUnit,
+} from './mobile/utils/use-unit-converter-to-mobile';
 
 export {
 	default as GlobalStylesContext,

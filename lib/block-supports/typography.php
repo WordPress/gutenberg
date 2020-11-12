@@ -11,26 +11,22 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_typography_support( $block_type ) {
-	$has_font_size_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_font_size_support = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
+	if ( ! property_exists( $block_type, 'supports' ) ) {
+		return;
 	}
 
-	$has_line_height_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_line_height_support = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
-	}
-
-	$has_text_transform_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_text_transform_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
-	}
+	$has_font_appearance_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontAppearance' ), false );
+	$has_font_size_support       = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
+	$has_line_height_support     = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
+	$has_text_decoration_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
+	$has_text_transform_support  = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
+	$has_typography_support      = $has_font_appearance_support || $has_font_size_support || $has_line_height_support || $has_text_transform_support || $has_text_decoration_support;
 
 	if ( ! $block_type->attributes ) {
 		$block_type->attributes = array();
 	}
 
-	if ( ( $has_font_size_support || $has_line_height_support || $has_text_transform_support ) && ! array_key_exists( 'style', $block_type->attributes ) ) {
+	if ( $has_typography_support && ! array_key_exists( 'style', $block_type->attributes ) ) {
 		$block_type->attributes['style'] = array(
 			'type' => 'object',
 		);
@@ -44,13 +40,14 @@ function gutenberg_register_typography_support( $block_type ) {
 }
 
 /**
- * Add CSS classes and inline styles for font sizes to the incoming attributes array.
- * This will be applied to the block markup in the front-end.
+ * Add CSS classes and inline styles for typography features such as font sizes
+ * to the incoming attributes array. This will be applied to the block markup in
+ * the front-end.
  *
  * @param  WP_Block_Type $block_type       Block type.
  * @param  array         $block_attributes Block attributes.
  *
- * @return array Font size CSS classes and inline styles.
+ * @return array Typography CSS classes and inline styles.
  */
 function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	if ( ! property_exists( $block_type, 'supports' ) ) {
@@ -60,14 +57,12 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$classes = array();
 	$styles  = array();
 
-	$has_font_size_support      = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
-	$has_line_height_support    = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
-	$has_text_transform_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
-
-	$has_font_family_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_font_family_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontFamily' ), false );
-	}
+	$has_font_appearance_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontAppearance' ), false );
+	$has_font_family_support     = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontFamily' ), false );
+	$has_font_size_support       = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
+	$has_line_height_support     = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
+	$has_text_decoration_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
+	$has_text_transform_support  = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
 
 	// Font Size.
 	if ( $has_font_size_support ) {
@@ -78,7 +73,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		if ( $has_named_font_size ) {
 			$classes[] = sprintf( 'has-%s-font-size', $block_attributes['fontSize'] );
 		} elseif ( $has_custom_font_size ) {
-			$styles[] = sprintf( 'font-size: %spx;', $block_attributes['style']['typography']['fontSize'] );
+			$styles[] = sprintf( 'font-size: %s;', $block_attributes['style']['typography']['fontSize'] );
 		}
 	}
 
@@ -99,12 +94,35 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		}
 	}
 
+	// Font appearance - style and weight.
+	if ( $has_font_appearance_support ) {
+		// Apply font style.
+		$font_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontStyle', 'font-style' );
+		if ( $font_style ) {
+			$styles[] = $font_style;
+		}
+
+		// Apply font weight.
+		$font_weight = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontWeight', 'font-weight' );
+		if ( $font_weight ) {
+			$styles[] = $font_weight;
+		}
+	}
+
 	// Line Height.
 	if ( $has_line_height_support ) {
 		$has_line_height = isset( $block_attributes['style']['typography']['lineHeight'] );
 		// Add the style (no classes for line-height).
 		if ( $has_line_height ) {
 			$styles[] = sprintf( 'line-height: %s;', $block_attributes['style']['typography']['lineHeight'] );
+		}
+	}
+
+	// Text Decoration.
+	if ( $has_text_decoration_support ) {
+		$text_decoration_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textDecoration', 'text-decoration' );
+		if ( $text_decoration_style ) {
+			$styles[] = $text_decoration_style;
 		}
 	}
 
@@ -126,15 +144,6 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 
 	return $attributes;
 }
-
-// Register the block support.
-WP_Block_Supports::get_instance()->register(
-	'typography',
-	array(
-		'register_attribute' => 'gutenberg_register_typography_support',
-		'apply'              => 'gutenberg_apply_typography_support',
-	)
-);
 
 /**
  * Generates an inline style for a typography feature e.g. text decoration,
@@ -166,3 +175,12 @@ function gutenberg_typography_get_css_variable_inline_style( $attributes, $featu
 	// Return the actual CSS inline style e.g. `text-decoration:var(--wp--preset--text-decoration--underline);`.
 	return sprintf( '%s:var(--wp--preset--%s--%s);', $css_property, $css_property, $slug );
 }
+
+// Register the block support.
+WP_Block_Supports::get_instance()->register(
+	'typography',
+	array(
+		'register_attribute' => 'gutenberg_register_typography_support',
+		'apply'              => 'gutenberg_apply_typography_support',
+	)
+);

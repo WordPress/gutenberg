@@ -2155,20 +2155,17 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isBlockInsertionPointVisible', () => {
-		it( 'should return false if no assigned insertion point', () => {
+		it( 'should return false if insertion point is set to not show', () => {
 			const state = {
-				insertionPoint: null,
+				insertionPointVisibility: false,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
 		} );
 
-		it( 'should return true if assigned insertion point', () => {
+		it( 'should return true if insertion point is set to show', () => {
 			const state = {
-				insertionPoint: {
-					rootClientId: undefined,
-					index: 5,
-				},
+				insertionPointVisibility: true,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );

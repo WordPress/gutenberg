@@ -11,7 +11,11 @@ import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/bloc
 /**
  * Internal dependencies
  */
-import { PRESET_CATEGORIES, LINK_COLOR_DECLARATION } from './utils';
+import {
+	PRESET_CATEGORIES,
+	PRESET_CLASSES,
+	LINK_COLOR_DECLARATION,
+} from './utils';
 
 export const mergeTrees = ( baseData, userData ) => {
 	// Deep clone from base data.
@@ -99,6 +103,31 @@ export default ( blockData, tree ) => {
 	};
 
 	/**
+	 * Transform given preset tree into a set of preset class declarations.
+	 *
+	 * @param {string} blockSelector
+	 * @param {Object} blockPresets
+	 * @return {string} CSS declarations for the preset classes.
+	 */
+	const getBlockPresetClasses = ( blockSelector, blockPresets ) => {
+		return reduce(
+			PRESET_CLASSES,
+			( declarations, { path, key, property }, classSuffix ) => {
+				const presets = get( blockPresets, path, [] );
+				presets.forEach( ( preset ) => {
+					const slug = preset.slug;
+					const value = preset[ key ];
+					const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
+					const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
+					declarations += `${ selectorToUse } {${ property }: ${ value };}\n`;
+				} );
+				return declarations;
+			},
+			''
+		);
+	};
+
+	/**
 	 * Transform given preset tree into a set of style declarations.
 	 *
 	 * @param {Object} blockPresets
@@ -170,6 +199,9 @@ export default ( blockData, tree ) => {
 			...getBlockPresetsDeclarations( tree[ context ].settings ),
 			...getCustomDeclarations( tree[ context ].settings.custom ),
 		];
+		styles.push(
+			getBlockPresetClasses( blockSelector, tree[ context ].settings )
+		);
 		if ( blockDeclarations.length > 0 ) {
 			styles.push(
 				`${ blockSelector } { ${ blockDeclarations.join( ';' ) } }`
