@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, kebabCase, reduce } from 'lodash';
+import { get, kebabCase, reduce, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,11 @@ import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/bloc
 /**
  * Internal dependencies
  */
-import { PRESET_CATEGORIES, LINK_COLOR_DECLARATION } from './utils';
+import {
+	PRESET_CATEGORIES,
+	PRESET_CLASSES,
+	LINK_COLOR_DECLARATION,
+} from './utils';
 
 export const mergeTrees = ( baseData, userData ) => {
 	// Deep clone from base data.
@@ -51,6 +55,20 @@ export const mergeTrees = ( baseData, userData ) => {
 	return mergedTree;
 };
 
+function compileStyleValue( uncompiledValue ) {
+	const VARIABLE_REFERENCE_PREFIX = 'var:';
+	const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
+	const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
+	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
+		const variable = uncompiledValue
+			.slice( VARIABLE_REFERENCE_PREFIX.length )
+			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
+			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
+		return `var(--wp--${ variable })`;
+	}
+	return uncompiledValue;
+}
+
 export default ( blockData, tree ) => {
 	const styles = [];
 	// Can this be converted to a context, as the global context?
@@ -74,15 +92,39 @@ export default ( blockData, tree ) => {
 				get( blockStyles, STYLE_PROPERTY[ key ], false )
 			) {
 				declarations.push(
-					`${ cssProperty }: ${ get(
-						blockStyles,
-						STYLE_PROPERTY[ key ]
+					`${ cssProperty }: ${ compileStyleValue(
+						get( blockStyles, STYLE_PROPERTY[ key ] )
 					) }`
 				);
 			}
 		} );
 
 		return declarations;
+	};
+
+	/**
+	 * Transform given preset tree into a set of preset class declarations.
+	 *
+	 * @param {string} blockSelector
+	 * @param {Object} blockPresets
+	 * @return {string} CSS declarations for the preset classes.
+	 */
+	const getBlockPresetClasses = ( blockSelector, blockPresets ) => {
+		return reduce(
+			PRESET_CLASSES,
+			( declarations, { path, key, property }, classSuffix ) => {
+				const presets = get( blockPresets, path, [] );
+				presets.forEach( ( preset ) => {
+					const slug = preset.slug;
+					const value = preset[ key ];
+					const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
+					const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
+					declarations += `${ selectorToUse } {${ property }: ${ value };}\n`;
+				} );
+				return declarations;
+			},
+			''
+		);
 	};
 
 	/**
@@ -157,6 +199,9 @@ export default ( blockData, tree ) => {
 			...getBlockPresetsDeclarations( tree[ context ].settings ),
 			...getCustomDeclarations( tree[ context ].settings.custom ),
 		];
+		styles.push(
+			getBlockPresetClasses( blockSelector, tree[ context ].settings )
+		);
 		if ( blockDeclarations.length > 0 ) {
 			styles.push(
 				`${ blockSelector } { ${ blockDeclarations.join( ';' ) } }`

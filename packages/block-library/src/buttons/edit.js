@@ -39,6 +39,7 @@ function ButtonsEdit( {
 			type: 'default',
 			alignments: [],
 		},
+		templateInsertUpdatesSelection: true,
 	} );
 	return (
 		<>

@@ -37,7 +37,7 @@ export { default as ColorPicker } from './color-picker';
 export { default as ComboboxControl } from './combobox-control';
 export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
-export { DateTimePicker, DatePicker, TimePicker } from './date-time';
+export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
 export { default as Draggable } from './draggable';

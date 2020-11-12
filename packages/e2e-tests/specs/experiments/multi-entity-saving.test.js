@@ -14,10 +14,7 @@ import { addQueryArgs } from '@wordpress/url';
 /**
  * Internal dependencies
  */
-import {
-	useExperimentalFeatures,
-	navigationPanel,
-} from '../../experimental-features';
+import { navigationPanel } from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -58,12 +55,10 @@ describe( 'Multi-entity save flow', () => {
 		}
 	};
 
-	useExperimentalFeatures( [ '#gutenberg-full-site-editing' ] );
-
 	beforeAll( async () => {
+		await activateTheme( 'twentytwentyone-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
-		await activateTheme( 'twentytwentyone-blocks' );
 	} );
 
 	afterAll( async () => {
@@ -91,7 +86,10 @@ describe( 'Multi-entity save flow', () => {
 			expect( multiSaveButton ).not.toBeNull();
 		};
 		const assertMultiSaveDisabled = async () => {
-			const multiSaveButton = await page.$( multiSaveSelector );
+			const multiSaveButton = await page.waitForSelector(
+				multiSaveSelector,
+				{ hidden: true }
+			);
 			expect( multiSaveButton ).toBeNull();
 		};
 
@@ -209,7 +207,7 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Front page' );
+			await navigationPanel.clickItemByText( 'Front Page' );
 			await navigationPanel.close();
 
 			// Click the first block so that the template part inserts in the right place.

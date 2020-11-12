@@ -65,21 +65,28 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Author Settings' ) }>
-					<SelectControl
-						label={ __( 'Author' ) }
-						value={ authorId }
-						options={ authors.map( ( { id, name } ) => {
-							return {
-								value: id,
-								label: name,
-							};
-						} ) }
-						onChange={ ( nextAuthorId ) => {
-							editEntityRecord( 'postType', postType, postId, {
-								author: nextAuthorId,
-							} );
-						} }
-					/>
+					{ !! authors?.length && (
+						<SelectControl
+							label={ __( 'Author' ) }
+							value={ authorId }
+							options={ authors.map( ( { id, name } ) => {
+								return {
+									value: id,
+									label: name,
+								};
+							} ) }
+							onChange={ ( nextAuthorId ) => {
+								editEntityRecord(
+									'postType',
+									postType,
+									postId,
+									{
+										author: nextAuthorId,
+									}
+								);
+							} }
+						/>
+					) }
 					<ToggleControl
 						label={ __( 'Show avatar' ) }
 						checked={ showAvatar }

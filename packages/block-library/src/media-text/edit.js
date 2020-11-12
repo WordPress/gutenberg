@@ -286,13 +286,8 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	} );
 
 	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: 'wp-block-media-text__content',
-		},
-		{
-			template: TEMPLATE,
-			templateInsertUpdatesSelection: false,
-		}
+		{ className: 'wp-block-media-text__content' },
+		{ template: TEMPLATE }
 	);
 
 	return (

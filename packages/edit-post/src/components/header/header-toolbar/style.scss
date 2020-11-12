@@ -135,7 +135,17 @@
 	}
 }
 
+.edit-post-header-toolbar .edit-post-header-toolbar__left > .edit-post-header-toolbar__inserter-toggle.has-text.has-icon {
+	width: auto;
+	padding: 0 $grid-unit-10;
+}
+
 .show-icon-labels {
+
+	.edit-post-header-toolbar__left > * + * {
+		margin-left: $grid-unit-10;
+	}
+
 	// Always display block toolbar under main toolbar when text labels are visible
 	.edit-post-header-toolbar__block-toolbar {
 		@include break-wide {

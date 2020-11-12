@@ -116,7 +116,7 @@ export default function LinkPickerResults( {
 					{ ...listProps }
 					contentContainerStyle={ [
 						...listProps.contentContainerStyle,
-						{ paddingBottom: 0 },
+						styles.list,
 					] }
 				/>
 			) }
