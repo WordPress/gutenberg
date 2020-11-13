@@ -5,30 +5,54 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { Button, Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { wordpress } from '@wordpress/icons';
+import { store as coreDataStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
+import {
+	MENU_TEMPLATE_PARTS,
+	MENU_TEMPLATES,
+} from '../navigation-panel/constants';
 
 function NavigationToggle( { icon, isOpen } ) {
-	const { isRequestingSiteIcon, siteIconUrl } = useSelect( ( select ) => {
-		const { getEntityRecord } = select( 'core' );
-		const { isResolving } = select( 'core/data' );
-		const siteData =
-			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+	const { isRequestingSiteIcon, templateType, siteIconUrl } = useSelect(
+		( select ) => {
+			const { getTemplateType } = select( editSiteStore );
+			const { getEntityRecord, isResolving } = select( coreDataStore );
+			const siteData =
+				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
-		return {
-			isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
-				'root',
-				'__unstableBase',
-				undefined,
-			] ),
-			siteIconUrl: siteData.site_icon_url,
-		};
-	}, [] );
+			return {
+				isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
+					'root',
+					'__unstableBase',
+					undefined,
+				] ),
+				templateType: getTemplateType(),
+				siteIconUrl: siteData.site_icon_url,
+			};
+		},
+		[]
+	);
 
-	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
+	const {
+		openNavigationPanelToMenu,
+		setIsNavigationPanelOpened,
+	} = useDispatch( editSiteStore );
+
+	const toggleNavigationPanel = () => {
+		if ( isOpen ) {
+			setIsNavigationPanelOpened( ! isOpen );
+			return;
+		}
+		openNavigationPanelToMenu(
+			'wp_template' === templateType
+				? MENU_TEMPLATES
+				: MENU_TEMPLATE_PARTS
+		);
+	};
 
 	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
 
@@ -55,7 +79,7 @@ function NavigationToggle( { icon, isOpen } ) {
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
 				label={ __( 'Toggle navigation' ) }
-				onClick={ () => setIsNavigationPanelOpened( ! isOpen ) }
+				onClick={ toggleNavigationPanel }
 				showTooltip
 			>
 				{ buttonIcon }
