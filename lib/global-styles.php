@@ -454,15 +454,14 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
 		$settings['__experimentalGlobalStylesContexts']     = $base->get_blocks_metadata();
 		$settings['__experimentalGlobalStylesBaseStyles']   = $base->get_raw_data();
-	} else {
-		// STEP 3 - OTHERWISE, ADD STYLES
-		//
-		// If we are in a block editor context, but not in edit-site,
-		// we need to add the styles via the settings. This is because
-		// we want them processed as if they were added via add_editor_styles,
-		// which adds the editor wrapper class.
-		$settings['styles'][] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $all ) );
 	}
+
+	// STEP 3 - OTHERWISE, ADD STYLES
+	//
+	// If we are in a block editor context we need to add the styles via the settings.
+	// This is because we want them processed as if they were added via add_editor_styles,
+	// which adds the editor wrapper class.
+	$settings['styles'][] = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $all ) );
 
 	return $settings;
 }
