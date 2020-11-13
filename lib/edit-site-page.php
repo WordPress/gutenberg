@@ -12,11 +12,7 @@
  */
 function gutenberg_edit_site_page() {
 	?>
-	<div
-		id="edit-site-editor"
-		class="edit-site"
-	>
-	</div>
+	<div id="edit-site-editor" class="edit-site block-editor"></div>
 	<?php
 }
 
