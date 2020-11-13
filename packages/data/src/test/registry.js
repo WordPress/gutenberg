@@ -7,7 +7,10 @@ import { castArray, mapValues } from 'lodash';
  * Internal dependencies
  */
 import { createRegistry } from '../registry';
-import { createRegistrySelector, createStoreDefinition } from '../factory';
+import {
+	createRegistrySelector,
+	__unstableCreateStoreDefinition,
+} from '../factory';
 
 jest.useFakeTimers();
 
@@ -553,7 +556,9 @@ describe( 'createRegistry', () => {
 
 		it( 'should work with the store definition as param for select', () => {
 			const STORE_NAME = 'demo';
-			const storeDefinition = createStoreDefinition( STORE_NAME );
+			const storeDefinition = __unstableCreateStoreDefinition(
+				STORE_NAME
+			);
 			registry.registerStore( STORE_NAME, {
 				reducer: ( state = 'OK' ) => state,
 				selectors: {
@@ -699,7 +704,9 @@ describe( 'createRegistry', () => {
 
 		it( 'should work with the store object as param for dispatch', async () => {
 			const STORE_NAME = 'demo';
-			const storeDefinition = createStoreDefinition( STORE_NAME );
+			const storeDefinition = __unstableCreateStoreDefinition(
+				STORE_NAME
+			);
 			const store = registry.registerStore( STORE_NAME, {
 				reducer( state = 'OK', action ) {
 					if ( action.type === 'UPDATE' ) {

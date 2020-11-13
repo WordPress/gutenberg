@@ -24,7 +24,7 @@ export { createRegistry } from './registry';
 export {
 	createRegistrySelector,
 	createRegistryControl,
-	createStoreDefinition,
+	__unstableCreateStoreDefinition,
 } from './factory';
 export { controls } from './controls';
 

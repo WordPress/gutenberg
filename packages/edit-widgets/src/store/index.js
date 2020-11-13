@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import { createStoreDefinition, registerStore } from '@wordpress/data';
+import {
+	__unstableCreateStoreDefinition,
+	registerStore,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -41,7 +44,7 @@ export const storeConfig = {
  *
  * @type {Object}
  */
-export const storeDefinition = createStoreDefinition( STORE_NAME );
+export const storeDefinition = __unstableCreateStoreDefinition( STORE_NAME );
 
 const store = registerStore( STORE_NAME, storeConfig );
 

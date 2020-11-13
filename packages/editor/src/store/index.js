@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { createStoreDefinition, registerStore } from '@wordpress/data';
+import {
+	__unstableCreateStoreDefinition,
+	registerStore,
+} from '@wordpress/data';
 import { controls as dataControls } from '@wordpress/data-controls';
 
 /**
@@ -37,7 +40,7 @@ export const storeConfig = {
  *
  * @type {Object}
  */
-export const storeDefinition = createStoreDefinition( STORE_NAME );
+export const storeDefinition = __unstableCreateStoreDefinition( STORE_NAME );
 
 export default registerStore( STORE_NAME, {
 	...storeConfig,

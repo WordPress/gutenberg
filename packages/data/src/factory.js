@@ -85,14 +85,14 @@ export function createRegistryControl( registryControl ) {
  *
  * @example
  * ```js
- * const storeDefinition = createStoreDefinition( 'my-shop' );
+ * const storeDefinition = __unstableCreateStoreDefinition( 'my-shop' );
  * ```
  *
  * @param {string} storeName Unique namespace identifier for the store.
  *
  * @return {Object} Store definition object.
  */
-export function createStoreDefinition( storeName ) {
+export function __unstableCreateStoreDefinition( storeName ) {
 	return {
 		name: storeName,
 		toString() {
