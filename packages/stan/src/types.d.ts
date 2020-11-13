@@ -32,15 +32,51 @@ export type WPAtomInstance<T> = {
 
 export type WPAtom<T> = ( registry: WPAtomRegistry) => WPAtomInstance<T>;
 
+export type WPAtomFamilyConfig = {
+    /**
+     * Creates an atom for the given key
+     */
+    createAtom: (key: any) => WPAtom<any>
+}
+
+export type WPAtomFamilyItem = {
+    /**
+     * Type which value is "family" to indicate that this is a family.
+     */
+    type: string,
+
+    /**
+     * Family config used for this item.
+     */
+    config: WPAtomFamilyConfig,
+
+    /**
+     * Item key
+     */
+    key: any,
+}
+
 export type WPAtomRegistry = {
     /**
-     * Retrieves an atom from the registry.
+     * Retrieves or creates an atom from the registry.
      */
-    getAtom: (atom: WPAtom<any>) => WPAtomInstance<any>
+    getAtom: (atom: WPAtom<any> | WPAtomFamilyItem) => WPAtomInstance<any>
 
     /**
      * Removes an atom from the registry.
      */
-    deleteAtom: (atom: WPAtom<any>) => void
+    deleteAtom: (atom: WPAtom<any> | WPAtomFamilyItem) => void
 }
+
+export type WPAtomResolver = (atom: WPAtom<any> | WPAtomFamilyItem) => any;
+
+export type WPAtomUpdater = (atom: WPAtom<any> | WPAtomFamilyItem, value: any) => void;
+
+export type WPDerivedAtomResolver<T> = (resolver: WPAtomResolver) => T;
+
+export type WPDerivedAtomUpdater = (resolver: WPAtomResolver, update: WPAtomUpdater, value: any) => void;
+
+export type WPAtomFamilyResolver<T> = (key: any) => WPDerivedAtomResolver<any>;
+
+export type WPAtomFamilyUpdater =  (key: any) => WPDerivedAtomUpdater;
 

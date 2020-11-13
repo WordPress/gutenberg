@@ -15,7 +15,7 @@ import {
 /**
  * Internal dependencies
  */
-import { shortcutsAtom, shortcutsByNameAtom } from './atoms';
+import { shortcutsAtom, shortcutsByNameFamily } from './atoms';
 
 /** @typedef {import('./actions').WPShortcutKeyCombination} WPShortcutKeyCombination */
 
@@ -71,8 +71,7 @@ function getKeyCombinationRepresentation( shortcut, representation ) {
  * @return {WPShortcutKeyCombination?} Key combination.
  */
 const getShortcut = ( get ) => ( name ) => {
-	const shortcutsByName = get( shortcutsByNameAtom );
-	return shortcutsByName[ name ] ? get( shortcutsByName[ name ] ) : null;
+	return get( shortcutsByNameFamily( name ) );
 };
 
 /**

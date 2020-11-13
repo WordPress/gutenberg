@@ -4,14 +4,14 @@
 
 It share the same goals as Recoil and Jotai:
 
- - Based on atoms (or observables) which means it's highly performant at scale: Only what needs to update get updated.
- - Shares with Jotai the goal of maintaining a very light API surface.
- - Supports async and sync state.
+-   Based on atoms (or observables) which means it's highly performant at scale: Only what needs to update get updated.
+-   Shares with Jotai the goal of maintaining a very light API surface.
+-   Supports async and sync state.
 
 Unlike these frameworks, it has the following goals too: (which justified the creation of a separate library)
 
- - It is React independent. You can create binding for any of your desired framework.
- - It needs to be flexible enough to offer bindings for `@wordpress/data` consumer API. (useSelect and useDispatch).
+-   It is React independent. You can create binding for any of your desired framework.
+-   It needs to be flexible enough to offer bindings for `@wordpress/data` consumer API. (useSelect and useDispatch).
 
 ## Installation
 
@@ -140,7 +140,7 @@ It is important to note that stan instance and registries API are low-level APIs
 
 Currently available bindings:
 
-- `@wordpress/data`: WordPress data users can continue to use their existing high-level APIs useSelect/useDispatch (selectors and actions) to access the atoms. The selectors are just high-level atoms that can rely on lower-level ones and the actions are just functions that trigger atom setters. The API for `@wordpress/data` store authors to bridge the gap is still experimental.
+-   `@wordpress/data`: WordPress data users can continue to use their existing high-level APIs useSelect/useDispatch (selectors and actions) to access the atoms. The selectors are just high-level atoms that can rely on lower-level ones and the actions are just functions that trigger atom setters. The API for `@wordpress/data` store authors to bridge the gap is still experimental.
 
 ## API Reference
 
@@ -158,6 +158,19 @@ _Parameters_
 _Returns_
 
 -   (unknown type): Createtd atom.
+
+<a name="createAtomFamily" href="#createAtomFamily">#</a> **createAtomFamily**
+
+_Parameters_
+
+-   _resolver_ (unknown type): 
+-   _updater_ (unknown type): 
+-   _isAsync_ `boolean`: 
+-   _id_ `[string]`: 
+
+_Returns_
+
+-   (unknown type): Atom Family Item creator.
 
 <a name="createAtomRegistry" href="#createAtomRegistry">#</a> **createAtomRegistry**
 

@@ -97,9 +97,9 @@ Returns an action object used to register a new keyboard shortcut.
 
 _Parameters_
 
--   _get_ `Function`: get atom value.
--   _set_ `Function`: set atom value.
--   _atomRegistry_ `Object`: atom registry.
+-   _get_ `Function`: Atom resover.
+-   _set_ `Function`: Atom updater.
+-   _atomRegistry_ `Object`: Atom Regstry.
 -   _config_ `WPShortcutConfig`: Shortcut config.
 
 <a name="unregisterShortcut" href="#unregisterShortcut">#</a> **unregisterShortcut**
@@ -110,7 +110,6 @@ _Parameters_
 
 -   _get_ `Function`: get atom value.
 -   _set_ `Function`: set atom value.
--   _atomRegistry_ `Object`: atom registry.
 -   _name_ `string`: Shortcut name.
 
 
