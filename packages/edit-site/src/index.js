@@ -53,6 +53,12 @@ const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
  * @param {Object} settings Editor settings.
  */
 export function initialize( id, settings ) {
+	// Classic block is only loaded if window.wp.oldEditor is defined
+	// deleting this property will make sure that Classic block is totally disabled
+	if ( window.wp && window.wp.oldEditor ) {
+		delete window.wp.oldEditor;
+	}
+
 	findTemplate.siteUrl = settings.siteUrl;
 	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
 	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
