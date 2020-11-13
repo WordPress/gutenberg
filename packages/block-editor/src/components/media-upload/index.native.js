@@ -60,7 +60,7 @@ export class MediaUpload extends React.Component {
 			this.setState( { otherMediaOptions: otherMediaOptionsWithIcons } );
 		} );
 
-		if ( autoOpenMediaUpload ===true ) {
+		if ( autoOpenMediaUpload ) {
 			this.onPickerPresent();
 		}
 	}
