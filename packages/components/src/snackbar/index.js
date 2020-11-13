@@ -48,17 +48,34 @@ function Snackbar(
 		actions = [],
 		onRemove = noop,
 		icon = null,
+		explicitDismiss = false,
+		// onDismiss is a callback executed when the snackbar is dismissed.
+		// It is distinct from onRemove, which _looks_ like a callback but is
+		// actually the function to call to remove the snackbar from the UI.
+		onDismiss = noop,
 	},
 	ref
 ) {
+	function dismissMe( event ) {
+		if ( event && event.preventDefault ) {
+			event.preventDefault();
+		}
+
+		onDismiss();
+		onRemove();
+	}
+
 	useSpokenMessage( spokenMessage, politeness );
 	useEffect( () => {
 		const timeoutHandle = setTimeout( () => {
 			onRemove();
+			if ( ! explicitDismiss ) {
+				onDismiss();
+			}
 		}, NOTICE_TIMEOUT );
 
 		return () => clearTimeout( timeoutHandle );
-	}, [] );
+	}, [ explicitDismiss, onDismiss, onRemove ] );
 
 	const classes = classnames( className, 'components-snackbar' );
 	if ( actions && actions.length > 1 ) {
@@ -81,11 +98,11 @@ function Snackbar(
 		<div
 			ref={ ref }
 			className={ classes }
-			onClick={ onRemove }
+			onClick={ ! explicitDismiss ? dismissMe : noop }
 			tabIndex="0"
-			role="button"
-			onKeyPress={ onRemove }
-			aria-label={ __( 'Dismiss this notice' ) }
+			role={ ! explicitDismiss ? 'button' : '' }
+			onKeyPress={ ! explicitDismiss ? dismissMe : noop }
+			aria-label={ ! explicitDismiss ? __( 'Dismiss this notice' ) : '' }
 		>
 			<div className={ snackbarContentClassnames }>
 				{ icon && (
@@ -110,6 +127,18 @@ function Snackbar(
 						</Button>
 					);
 				} ) }
+				{ explicitDismiss && (
+					<span
+						role="button"
+						aria-label="Dismiss this notice"
+						tabIndex="0"
+						className="components-snackbar__explicit-dismiss"
+						onClick={ dismissMe }
+						onKeyPress={ dismissMe }
+					>
+						&#x2715;
+					</span>
+				) }
 			</div>
 		</div>
 	);

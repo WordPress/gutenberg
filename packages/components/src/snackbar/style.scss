@@ -22,13 +22,17 @@
 	}
 
 	.components-snackbar__content-with-icon {
-		margin-left: 32px;
+		margin-left: 24px;
 	}
 
 	.components-snackbar__icon {
 		position: absolute;
 		top: 24px;
-		left: 26px;
+		left: 28px;
+	}
+
+	.components-snackbar__explicit-dismiss {
+		margin-left: 32px;
 	}
 }
 

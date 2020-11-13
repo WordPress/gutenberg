@@ -53,3 +53,12 @@ export const withIcon = () => {
 		</Snackbar>
 	);
 };
+
+export const withExplicitDismiss = () => {
+	const content = text(
+		'Content',
+		'Add a cross to explicitly close the snackbar, and do not hide it automatically'
+	);
+
+	return <Snackbar explicitDismiss={ true }>{ content }</Snackbar>;
+};
