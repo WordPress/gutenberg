@@ -31,12 +31,15 @@ function getDefaultOrigin( type ) {
  * @param {UseAnimateOptions} options
  * @return {string | undefined} Classname that applies the animations
  */
-export function useAnimate( { type } ) {
+export function useAnimate( options ) {
+	const { type } = options;
 	if ( type === 'loading' ) {
 		return classnames( 'components-animate__loading' );
 	}
 
-	const origin = getDefaultOrigin( type );
+	const {
+		origin = getDefaultOrigin( type ),
+	} = /** @type {AppearOptions|SlideInOptions} */ ( options );
 
 	if ( type === 'appear' ) {
 		const [ yAxis, xAxis = 'center' ] = origin.split( ' ' );
