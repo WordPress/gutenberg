@@ -16,16 +16,16 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 import { chevronDown } from '@wordpress/icons';
 
-const getMatchedVariation = ( blockAttributes, variations ) => {
+export const getMatchingVariationName = ( blockAttributes, variations ) => {
 	if ( ! variations || ! blockAttributes ) return;
 	return variations.find( ( { attributes } ) => {
 		if ( ! attributes || ! Object.keys( attributes ).length ) return false;
 		return isMatch( blockAttributes, attributes );
-	} );
+	} )?.name;
 };
 
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
-	const [ selectedValue, setSelectedValue ] = useState( '' );
+	const [ selectedValue, setSelectedValue ] = useState();
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 	const { variations, blockAttributes } = useSelect(
 		( select ) => {
@@ -43,11 +43,9 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		[ blockClientId ]
 	);
 	useEffect( () => {
-		const matchedVariation = getMatchedVariation(
-			blockAttributes,
-			variations
+		setSelectedValue(
+			getMatchingVariationName( blockAttributes, variations )
 		);
-		setSelectedValue( matchedVariation?.name || '' );
 	}, [ blockAttributes, variations ] );
 	if ( ! variations?.length ) return null;
 
@@ -75,7 +73,7 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 				className: `${ baseClass }__popover`,
 			} }
 			icon={ chevronDown }
-			iconPosition="right"
+			toggleProps={ { iconPosition: 'right' } }
 		>
 			{ () => (
 				<div className={ `${ baseClass }__container` }>
