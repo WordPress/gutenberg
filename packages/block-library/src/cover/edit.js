@@ -21,7 +21,7 @@ import {
 	ToggleControl,
 	withNotices,
 	ButtonGroup,
-	 __experimentalUnitControl as BaseUnitControl,
+	__experimentalUnitControl as BaseUnitControl,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
@@ -129,19 +129,22 @@ function BackgroundSizeControl( { size = 'cover', onSelect } ) {
 			label={ __( ' Background size' ) }
 			id={ 'background-size' }
 		>
-			<ButtonGroup label={ __( 'Size' ) } defaultChecked="size-content">
-				{ SIZE_OPTIONS.map( ( { slug, label } ) => (
+			<ButtonGroup
+				label={ __( 'Size' ) }
+				defaultChecked="size-content"
+				className="background-size-options"
+			>
+				{ SIZE_OPTIONS.map( ( { slug, label, icon: sizeIcon } ) => (
 					<Button
 						key={ slug }
-						isSmall
+						icon={ sizeIcon }
+						label={ label }
 						isPressed={
 							slug === size ||
 							( slug === 'custom' && isCustomSize )
 						}
 						onClick={ () => onSelect( slug ) }
-					>
-						{ label }
-					</Button>
+					/>
 				) ) }
 			</ButtonGroup>
 

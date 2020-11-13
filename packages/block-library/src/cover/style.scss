@@ -182,6 +182,15 @@
 	object-fit: cover;
 }
 
+// Tweak sidebar settings
+.components-button-group.background-size-options {
+	display: flex;
+
+	.components-button {
+		box-shadow: none;
+	}
+}
+
 // Styles bellow only exist to support older versions of the block.
 // Versions that not had inner blocks and used an h2 heading had a section (and not a div) with a class wp-block-cover-image (and not a wp-block-cover).
 // We are using the previous referred differences to target old versions.
