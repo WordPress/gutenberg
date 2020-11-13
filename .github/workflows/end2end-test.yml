@@ -41,6 +41,9 @@ jobs:
         npm ci
         FORCE_REDUCED_MOTION=true npm run build
 
+    - name: Install ffmpeg
+      run: sudo apt-get install ffmpeg
+
     - name: Install WordPress
       run: |
         chmod -R 767 ./ # TODO: Possibly integrate in wp-env
@@ -88,6 +91,9 @@ jobs:
       run: |
         npm ci
         FORCE_REDUCED_MOTION=true npm run build
+
+    - name: Install ffmpeg
+      run: sudo apt-get install ffmpeg
 
     - name: Install WordPress
       run: |
@@ -137,6 +143,9 @@ jobs:
         npm ci
         FORCE_REDUCED_MOTION=true npm run build
 
+    - name: Install ffmpeg
+      run: sudo apt-get install ffmpeg
+
     - name: Install WordPress
       run: |
         chmod -R 767 ./ # TODO: Possibly integrate in wp-env
@@ -184,6 +193,9 @@ jobs:
       run: |
         npm ci
         FORCE_REDUCED_MOTION=true npm run build
+
+    - name: Install ffmpeg
+      run: sudo apt-get install ffmpeg
 
     - name: Install WordPress
       run: |
