@@ -23,7 +23,7 @@ import { mediaUploadSync } from '@wordpress/react-native-bridge';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
 import { useResizeObserver } from '@wordpress/compose';
 
-const TILE_SPACING = 8;
+const TILE_SPACING = 12;
 
 // we must limit displayed columns since readable content max-width is 580px
 const MAX_DISPLAYED_COLUMNS = 4;
