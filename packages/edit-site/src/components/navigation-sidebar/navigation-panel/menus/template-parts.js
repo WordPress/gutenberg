@@ -21,34 +21,19 @@ import { MENU_ROOT, MENU_TEMPLATE_PARTS } from '../constants';
 
 export default function TemplatePartsMenu() {
 	const templateParts = useSelect( ( select ) => {
-		const publishedTemplateParts = select( 'core' ).getEntityRecords(
-			'postType',
-			'wp_template_part',
-			{
+		const publishedTemplateParts =
+			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
 				status: [ 'publish' ],
 				per_page: -1,
-			}
-		);
+			} ) || [];
 		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
-		const themeTemplateParts = select( 'core' ).getEntityRecords(
-			'postType',
-			'wp_template_part',
-			{
+		const themeTemplateParts =
+			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
 				status: [ 'auto-draft' ],
 				per_page: -1,
 				theme: currentTheme,
-			}
-		);
-		// Results above can be 'null' in early steps of editor loading,
-		// so we must check before using the spread operator to combine them.
-		const combinedTemplateParts = [];
-		if ( publishedTemplateParts ) {
-			combinedTemplateParts.push( ...publishedTemplateParts );
-		}
-		if ( themeTemplateParts ) {
-			combinedTemplateParts.push( ...themeTemplateParts );
-		}
-		return combinedTemplateParts;
+			} ) || [];
+		return [ ...themeTemplateParts, ...publishedTemplateParts ];
 	}, [] );
 
 	return (
