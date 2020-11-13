@@ -10,6 +10,7 @@
 		position: relative;
 		text-align: left;
 		justify-content: left;
+		padding: 6px 12px;
 
 		// For all button sizes allow sufficient space for the
 		// dropdown "arrow" icon to display.
@@ -30,4 +31,8 @@
 			top: 0;
 		}
 	}
+}
+
+.block-editor-block-variation-transforms__popover .components-popover__content {
+	min-width: 230px;
 }
