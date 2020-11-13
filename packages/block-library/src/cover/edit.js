@@ -21,6 +21,7 @@ import {
 	ToggleControl,
 	withNotices,
 	ButtonGroup,
+	SelectControl,
 	__experimentalUnitControl as BaseUnitControl,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
@@ -86,32 +87,113 @@ function retrieveFastAverageColor() {
 }
 
 function CustomSizeControl( { value, onSelect } ) {
-	// Split and pick up values + units from the CSS inline.
-	let inlineStyleValues = value && value.split( /(%|px)/ );
-	if ( inlineStyleValues.length < 2 ) {
-		inlineStyleValues = [];
+	let initMode = value.search( /auto/ );
+	if ( initMode < 1 ) {
+		initMode = 'both';
+	} else if ( initMode === 0 ) {
+		initMode = 'width';
+	} else {
+		initMode = 'height';
 	}
 
-	const xValue = inlineStyleValues[ 0 ] || 50;
-	const xUnit = inlineStyleValues[ 1 ] || '%';
+	const [ currentMode, setMode ] = useState( initMode );
+
+	const customUnits = [
+		{ value: 'px', label: 'px', default: 0 },
+		{ value: '%', label: '%', default: 10 },
+	];
+
+	// Split and pick up values + units from the CSS inline.
+	let wh =
+		value &&
+		value
+			.replace( /auto/, '50%' )
+			.split( /(\d+|%|px|auto)/ )
+			.filter( ( v ) => !! v && v !== ' ' );
+
+	// default values.
+	if ( wh.length < 2 ) {
+		wh = [ '50', '%', '50', '%' ];
+	}
+
+	function customSizeHandler( data ) {
+		const { mode, w, wu, h, hu } = data;
+
+		if ( mode ) {
+			setMode( mode );
+		}
+
+		let inlineStyle = '';
+		switch ( mode || currentMode ) {
+			case 'width':
+				inlineStyle = `${ w || wh[ 0 ] }${ wu || wh[ 1 ] } auto`;
+				break;
+
+			case 'height':
+				inlineStyle = `auto ${ h || wh[ 2 ] }${ hu || wh[ 3 ] }`;
+				break;
+
+			case 'both':
+				inlineStyle =
+					`${ w || wh[ 0 ] }${ wu || wh[ 1 ] } ` +
+					`${ h || wh[ 2 ] }${ hu || wh[ 3 ] }`;
+				break;
+		}
+
+		onSelect( inlineStyle );
+	}
 
 	return (
-		<CoverValueUnitInput
-			label={ __( 'Custom size' ) }
-			value={ xValue }
-			unit={ xUnit }
-			units={ [
-				{ value: 'px', label: 'px', default: 0 },
-				{ value: '%', label: '%', default: 10 },
-			] }
-			onChange={ ( sizeValue ) => {
-				onSelect( `${ sizeValue }${  xUnit }` );
-			} }
-			onUnitChange={ ( unit ) => {
-				onSelect( `${ xValue }${  unit }` );
-			} }
-			customUnits= { false }
-		/>
+		<Fragment>
+			<SelectControl
+				label={ __( 'Size mode' ) }
+				options={ [
+					{
+						value: 'width',
+						label: __( 'Width' ),
+					},
+					{
+						value: 'height',
+						label: __( 'Height' ),
+					},
+					{
+						value: 'both',
+						label: __( 'Width & Height' ),
+					},
+				] }
+				value={ currentMode }
+				onChange={ ( newMode ) =>
+					customSizeHandler( { mode: newMode } )
+				}
+				labelPosition="top"
+			/>
+
+			<div className="background-size-custom-options">
+				{ ( currentMode === 'width' || currentMode === 'both' ) && (
+					<CoverValueUnitInput
+						label={ __( 'Width' ) }
+						value={ wh[ 0 ] }
+						unit={ wh[ 1 ] }
+						units={ customUnits }
+						onChange={ ( w ) => customSizeHandler( { w } ) }
+						onUnitChange={ ( wu ) => customSizeHandler( { wu } ) }
+						customUnits={ false }
+					/>
+				) }
+
+				{ ( currentMode === 'height' || currentMode === 'both' ) && (
+					<CoverValueUnitInput
+						label={ __( 'Height' ) }
+						value={ wh[ 2 ] }
+						unit={ wh[ 3 ] }
+						units={ customUnits }
+						onChange={ ( h ) => customSizeHandler( { h } ) }
+						onUnitChange={ ( hu ) => customSizeHandler( { hu } ) }
+						customUnits={ false }
+					/>
+				) }
+			</div>
+		</Fragment>
 	);
 }
 
@@ -130,33 +212,34 @@ function isCustomSize( size ) {
 
 function BackgroundSizeControl( { size = 'cover', onSelect } ) {
 	return (
-		<BaseControl
-			label={ __( ' Background size' ) }
-			id={ 'background-size' }
-		>
-			<ButtonGroup
-				label={ __( 'Size' ) }
-				defaultChecked="size-content"
-				className="background-size-options"
+		<Fragment>
+			<BaseControl
+				label={ __( ' Background size' ) }
+				id={ 'background-size' }
 			>
-				{ SIZE_OPTIONS.map( ( { slug, label, icon: sizeIcon } ) => (
-					<Button
-						key={ slug }
-						icon={ sizeIcon }
-						label={ label }
-						isPressed={
-							slug === size ||
-							( slug === 'custom' && isCustomSize( size ) )
-						}
-						onClick={ () => onSelect( slug ) }
-					/>
-				) ) }
-			</ButtonGroup>
-
-			{ isCustomSize && (
+				<ButtonGroup
+					label={ __( 'Size' ) }
+					defaultChecked="size-content"
+					className="background-size-options"
+				>
+					{ SIZE_OPTIONS.map( ( { slug, label, icon: sizeIcon } ) => (
+						<Button
+							key={ slug }
+							icon={ sizeIcon }
+							label={ label }
+							isPressed={
+								slug === size ||
+								( slug === 'custom' && isCustomSize( size ) )
+							}
+							onClick={ () => onSelect( slug ) }
+						/>
+					) ) }
+				</ButtonGroup>
+			</BaseControl>
+			{ isCustomSize( size ) && (
 				<CustomSizeControl value={ size } onSelect={ onSelect } />
 			) }
-		</BaseControl>
+		</Fragment>
 	);
 }
 

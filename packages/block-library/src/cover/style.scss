@@ -182,12 +182,33 @@
 	object-fit: cover;
 }
 
-// Tweak sidebar settings
+// Tweak block settings sidebar.
 .components-button-group.background-size-options {
 	display: flex;
-
 	.components-button {
-		box-shadow: none;
+		box-shadow: 0 0 1px inset;
+	}
+}
+
+.background-size-custom-options {
+	display: flex;
+
+	.components-base-control:first-child {
+		margin-right: 10px;
+		margin-bottom: 8px;
+	}
+
+	.components-base-control__field {
+		display: flex;
+		align-items: center;
+
+		.components-base-control__label {
+			margin: 0 12px 0 0;
+		}
+	}
+
+	.components-unit-control-wrapper {
+		width: 65px;
 	}
 }
 

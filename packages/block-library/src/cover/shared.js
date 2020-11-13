@@ -4,7 +4,7 @@
 import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
 import { __ } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
-import { SVG, Rect, Path } from '@wordpress/components';
+import { SVG, Rect } from '@wordpress/components';
 
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
@@ -78,7 +78,7 @@ export const SIZE_OPTIONS = [
 					width="20"
 					height="20"
 					stroke="currentColor"
-					strokeWidth="2"
+					strokeWidth="1"
 				/>
 				<Rect x="7" y="2" width="10" height="20" />
 			</SVG>
@@ -96,7 +96,7 @@ export const SIZE_OPTIONS = [
 					width="20"
 					height="20"
 					stroke="currentColor"
-					strokeWidth="2"
+					strokeWidth="1"
 				/>
 				<Rect x="8" y="4" width="8" height="16" />
 			</SVG>
@@ -114,7 +114,7 @@ export const SIZE_OPTIONS = [
 					width="20"
 					height="20"
 					stroke="currentColor"
-					strokeWidth="2"
+					strokeWidth="1"
 				/>
 				<Rect x="7" y="8" width="10" height="8" />
 			</SVG>
