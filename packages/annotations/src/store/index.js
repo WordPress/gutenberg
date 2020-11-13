@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { createStoreDefinition, registerStore } from '@wordpress/data';
+import {
+	__unstableCreateStoreDefinition,
+	registerStore,
+} from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -22,7 +25,7 @@ const STORE_NAME = 'core/annotations';
  *
  * @type {Object}
  */
-export const storeDefinition = createStoreDefinition( STORE_NAME );
+export const storeDefinition = __unstableCreateStoreDefinition( STORE_NAME );
 
 export default registerStore( STORE_NAME, {
 	reducer,

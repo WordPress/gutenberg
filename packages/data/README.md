@@ -432,24 +432,6 @@ _Returns_
 
 -   `Function`: Registry selector that can be registered with a store.
 
-<a name="createStoreDefinition" href="#createStoreDefinition">#</a> **createStoreDefinition**
-
-Creates a store definition to pass to store API methods.
-
-_Usage_
-
-```js
-const storeDefinition = createStoreDefinition( 'my-shop' );
-```
-
-_Parameters_
-
--   _storeName_ `string`: Unique namespace identifier for the store.
-
-_Returns_
-
--   `Object`: Store definition object.
-
 <a name="dispatch" href="#dispatch">#</a> **dispatch**
 
 Given the name of a registered store, returns an object of the store's action creators.
