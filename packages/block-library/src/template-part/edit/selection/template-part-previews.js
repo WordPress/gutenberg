@@ -199,7 +199,7 @@ function TemplatePartSearchResults( {
 	) );
 }
 
-export default function TemplateParts( {
+export default function TemplatePartPreviews( {
 	setAttributes,
 	filterValue,
 	onClose,
