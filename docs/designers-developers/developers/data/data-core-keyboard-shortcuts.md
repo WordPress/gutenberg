@@ -99,7 +99,6 @@ _Parameters_
 
 -   _get_ `Function`: Atom resover.
 -   _set_ `Function`: Atom updater.
--   _atomRegistry_ `Object`: Atom Regstry.
 -   _config_ `WPShortcutConfig`: Shortcut config.
 
 <a name="unregisterShortcut" href="#unregisterShortcut">#</a> **unregisterShortcut**

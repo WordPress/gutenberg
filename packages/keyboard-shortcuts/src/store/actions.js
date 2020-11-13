@@ -36,24 +36,19 @@ import { shortcutsByNameAtom, shortcutNamesAtom } from './atoms';
  *
  * @param {Function} get          Atom resover.
  * @param {Function} set          Atom updater.
- * @param {Object}   atomRegistry Atom Regstry.
  * @param {WPShortcutConfig} config  Shortcut config.
  */
-export const registerShortcut = ( get, set, atomRegistry ) => ( config ) => {
+export const registerShortcut = ( get, set ) => ( config ) => {
 	const shortcutNames = get( shortcutNamesAtom );
 	const hasShortcut = shortcutNames.includes( config.name );
 	if ( ! hasShortcut ) {
 		set( shortcutNamesAtom, [ ...shortcutNames, config.name ] );
 	}
 	const shortcutsByName = get( shortcutsByNameAtom );
-	atomRegistry.getAtom( shortcutsByNameAtom ).set( {
+	set( shortcutsByNameAtom, {
 		...shortcutsByName,
 		[ config.name ]: config,
 	} );
-	/* set( shortcutsByName, {
-		...shortcutsByName,
-		[ config.name ]: config,
-	} ); */
 };
 
 /**

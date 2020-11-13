@@ -157,7 +157,7 @@ export const createDerivedAtom = (
 		async set( action ) {
 			await updater(
 				( atomCreator ) => {
-					return registry.getAtom( atomCreator );
+					return registry.getAtom( atomCreator ).get();
 				},
 				( atomCreator, arg ) =>
 					registry.getAtom( atomCreator ).set( arg ),
