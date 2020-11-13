@@ -38,15 +38,10 @@
 		"@react-navigation/routers": "5.4.9",
 		"@react-navigation/stack": "5.6.2",
 		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
-		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
-		"@wordpress/data": "file:../data",
 		"@wordpress/edit-post": "file:../edit-post",
 		"@wordpress/element": "file:../element",
-		"@wordpress/hooks": "file:../hooks",
-		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/react-native-aztec": "file:../react-native-aztec",
 		"@wordpress/react-native-bridge": "file:../react-native-bridge",
 		"fast-average-color": "^4.3.0",
@@ -73,6 +68,13 @@
 		"react-native-svg": "git+https://github.com/wordpress-mobile/react-native-svg.git#a628e92990a2404e30a0086f168bd2b5b7b4ce96",
 		"react-native-url-polyfill": "^1.1.2",
 		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#1b964b107863351ed744fc104d7952bbec3e2d4f"
+	},
+	"peerDependencies": {
+		"@wordpress/block-editor": "^5.1.2",
+		"@wordpress/blocks": "^6.24.1",
+		"@wordpress/data": "^4.25.0",
+		"@wordpress/hooks": "^2.10.0",
+		"@wordpress/i18n": "^3.16.0"
 	},
 	"publishConfig": {
 		"access": "public"

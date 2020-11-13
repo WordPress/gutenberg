@@ -25,9 +25,11 @@
 		"@babel/runtime": "^7.11.2",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
-		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/icons": "file:../icons",
 		"lodash": "^4.17.19"
+	},
+	"peerDependencies": {
+		"@wordpress/hooks": "^2.10.0"
 	},
 	"publishConfig": {
 		"access": "public"

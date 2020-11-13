@@ -30,13 +30,10 @@
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
 		"@wordpress/compose": "file:../compose",
-		"@wordpress/data": "file:../data",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
-		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
-		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/shortcode": "file:../shortcode",
@@ -47,6 +44,11 @@
 		"simple-html-tokenizer": "^0.5.7",
 		"tinycolor2": "^1.4.1",
 		"uuid": "^8.3.0"
+	},
+	"peerDependencies": {
+		"@wordpress/data": "^4.25.0",
+		"@wordpress/hooks": "^2.10.0",
+		"@wordpress/i18n": "^3.16.0"
 	},
 	"publishConfig": {
 		"access": "public"

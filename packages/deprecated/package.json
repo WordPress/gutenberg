@@ -23,8 +23,10 @@
 	"react-native": "src/index",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.11.2",
-		"@wordpress/hooks": "file:../hooks"
+		"@babel/runtime": "^7.11.2"
+	},
+	"peerDependencies": {
+		"@wordpress/hooks": "^2.10.0"
 	},
 	"publishConfig": {
 		"access": "public"

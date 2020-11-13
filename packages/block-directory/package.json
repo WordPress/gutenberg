@@ -25,22 +25,25 @@
 		"@babel/runtime": "^7.11.2",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
-		"@wordpress/block-editor": "file:../block-editor",
-		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
-		"@wordpress/data": "file:../data",
 		"@wordpress/data-controls": "file:../data-controls",
-		"@wordpress/edit-post": "file:../edit-post",
 		"@wordpress/element": "file:../element",
-		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
-		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
-		"@wordpress/notices": "file:../notices",
-		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/url": "file:../url",
 		"lodash": "^4.17.19"
+	},
+	"peerDependencies": {
+		"@wordpress/block-editor": "^5.1.2",
+		"@wordpress/blocks": "^6.24.1",
+		"@wordpress/data": "^4.25.0",
+		"@wordpress/edit-post": "^3.25.2",
+		"@wordpress/editor": "^9.24.2",
+		"@wordpress/hooks": "^2.10.0",
+		"@wordpress/i18n": "^3.16.0",
+		"@wordpress/notices": "^2.11.0",
+		"@wordpress/plugins": "^2.23.0"
 	},
 	"publishConfig": {
 		"access": "public"
