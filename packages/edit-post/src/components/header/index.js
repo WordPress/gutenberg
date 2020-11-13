@@ -49,8 +49,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 
 	const isLargeViewport = useViewportMatch( 'large' );
 
-	const classes = classnames( {
-		'edit-post-header': true,
+	const classes = classnames( 'edit-post-header', {
 		'has-reduced-ui': hasReducedUI,
 	} );
 
@@ -63,27 +62,23 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				<HeaderToolbar />
 			</div>
 			<div className="edit-post-header__settings">
-				{
-					<>
-						{ ! isPublishSidebarOpened && (
-							// This button isn't completely hidden by the publish sidebar.
-							// We can't hide the whole toolbar when the publish sidebar is open because
-							// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
-							// We track that DOM node to return focus to the PostPublishButtonOrToggle
-							// when the publish sidebar has been closed.
-							<PostSavedState
-								forceIsDirty={ hasActiveMetaboxes }
-								forceIsSaving={ isSaving }
-								showIconLabels={ showIconLabels }
-							/>
-						) }
-						<DevicePreview />
-						<PostPreviewButton
-							forceIsAutosaveable={ hasActiveMetaboxes }
-							forcePreviewLink={ isSaving ? null : undefined }
-						/>
-					</>
-				}
+				{ ! isPublishSidebarOpened && (
+					// This button isn't completely hidden by the publish sidebar.
+					// We can't hide the whole toolbar when the publish sidebar is open because
+					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
+					// We track that DOM node to return focus to the PostPublishButtonOrToggle
+					// when the publish sidebar has been closed.
+					<PostSavedState
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
+						showIconLabels={ showIconLabels }
+					/>
+				) }
+				<DevicePreview />
+				<PostPreviewButton
+					forceIsAutosaveable={ hasActiveMetaboxes }
+					forcePreviewLink={ isSaving ? null : undefined }
+				/>
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
