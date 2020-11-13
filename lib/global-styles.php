@@ -768,6 +768,24 @@ function gutenberg_experimental_global_styles_get_preset_classes( $selector, $se
  * @return string Stylesheet.
  */
 function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
+
+	// Check if we can use cached.
+	$can_use_cached = (
+		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
+		( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
+		( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
+		! is_admin()
+	);
+
+	if ( $can_use_cached ) {
+
+		// Check if we have the styles already cached.
+		$cached = get_transient( 'global_styles' );
+		if ( $cached ) {
+			return $cached;
+		}
+	}
+
 	$stylesheet = '';
 	$block_data = gutenberg_experimental_global_styles_get_block_data();
 	foreach ( array_keys( $tree ) as $block_name ) {
@@ -826,6 +844,13 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 		// We add this here to make it work for themes that opt-in to theme.json
 		// In the future, we may do this differently.
 		$stylesheet .= 'a{color:var(--wp--style--color--link, #00e);}';
+	}
+
+	if ( $can_use_cached ) {
+
+		// Cache for a minute.
+		// This cache doesn't need to be any longer, we only want to avoid spikes on high-trafic sites.
+		set_transient( 'global_styles', $stylesheet, MINUTE_IN_SECONDS );
 	}
 
 	return $stylesheet;
