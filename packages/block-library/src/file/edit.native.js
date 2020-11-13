@@ -23,26 +23,25 @@ import {
 	PanelBody,
 	ToggleControl,
 	BottomSheet,
-	withNotices,
 } from '@wordpress/components';
 import { file as icon, replace, button, external } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
-import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 
-export class FileEdit extends Component {
+export default class FileEdit extends Component {
 	constructor( props ) {
 		super( props );
 
 		this.state = {
 			isUploadInProgress: false,
 		};
+
+		this.timerRef = null;
 
 		this.onSelectFile = this.onSelectFile.bind( this );
 		this.onChangeFileName = this.onChangeFileName.bind( this );
@@ -74,6 +73,10 @@ export class FileEdit extends Component {
 		}
 	}
 
+	componentWillUnmount() {
+		clearTimeout( this.timerRef );
+	}
+
 	onSelectFile( media ) {
 		this.props.setAttributes( {
 			href: media.url,
@@ -96,10 +99,16 @@ export class FileEdit extends Component {
 	}
 
 	onCopyURL() {
+		if ( this.state.isUrlCopied ) {
+			return;
+		}
 		const { href } = this.props.attributes;
 		Clipboard.setString( href );
-		this.props.closeSettings();
-		this.props.createInfoNotice( __( 'Copied!' ) );
+
+		this.setState( { isUrlCopied: true } );
+		this.timerRef = setTimeout( () => {
+			this.setState( { isUrlCopied: false } );
+		}, 1000 );
 	}
 
 	onChangeOpenInNewWindow( newValue ) {
@@ -180,7 +189,11 @@ export class FileEdit extends Component {
 						onChange={ this.onChangeDownloadButtonVisibility }
 					/>
 					<BottomSheet.Cell
-						label={ __( 'Copy file URL' ) }
+						label={
+							this.state.isUrlCopied
+								? __( 'Copied!' )
+								: __( 'Copy file URL' )
+						}
 						onPress={ this.onCopyURL }
 					/>
 				</PanelBody>
@@ -322,16 +335,3 @@ export class FileEdit extends Component {
 		);
 	}
 }
-
-export default compose( [
-	withDispatch( ( dispatch ) => {
-		const { createInfoNotice } = dispatch( 'core/editor' );
-		return {
-			closeSettings() {
-				dispatch( 'core/edit-post' ).closeGeneralSidebar();
-			},
-			createInfoNotice,
-		};
-	} ),
-	withNotices,
-] )( FileEdit );
