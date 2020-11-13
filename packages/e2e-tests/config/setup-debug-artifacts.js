@@ -3,7 +3,7 @@
  */
 const fs = require( 'fs' );
 const util = require( 'util' );
-const root = process.env.GITHUB_WORKSPACE || __dirname + '/../../../';
+const root = process.env.GITHUB_WORKSPACE || process.cwd();
 const ARTIFACTS_PATH = root + '/artifacts';
 
 const writeFile = util.promisify( fs.writeFile );
