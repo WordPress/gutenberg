@@ -23,6 +23,7 @@ import {
 
 export const MEDIA_TYPE_IMAGE = 'image';
 export const MEDIA_TYPE_VIDEO = 'video';
+export const MEDIA_TYPE_ALL = 'all';
 
 export const OPTION_TAKE_VIDEO = __( 'Take a Video' );
 export const OPTION_TAKE_PHOTO = __( 'Take a Photo' );
@@ -86,7 +87,7 @@ export class MediaUpload extends React.Component {
 			id: mediaSources.siteMediaLibrary,
 			value: mediaSources.siteMediaLibrary,
 			label: __( 'WordPress Media Library' ),
-			types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ],
+			types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO, MEDIA_TYPE_ALL ],
 			icon: wordpress,
 			mediaLibrary: true,
 		};

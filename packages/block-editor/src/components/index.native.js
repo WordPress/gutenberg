@@ -26,6 +26,7 @@ export {
 	default as MediaUpload,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
+	MEDIA_TYPE_ALL,
 } from './media-upload';
 export { default as MediaUploadProgress } from './media-upload-progress';
 export { default as BlockMediaUpdateProgress } from './block-media-update-progress';

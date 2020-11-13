@@ -258,6 +258,7 @@ extension Gutenberg {
         case video
         case audio
         case other
+        case all
     }
 }
 
