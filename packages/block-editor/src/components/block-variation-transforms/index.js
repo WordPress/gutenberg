@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isMatch } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -8,24 +13,42 @@ import {
 	MenuItemsChoice,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { chevronDown } from '@wordpress/icons';
+
+const getMatchedVariation = ( blockAttributes, variations ) => {
+	if ( ! variations || ! blockAttributes ) return;
+	return variations.find( ( { attributes } ) => {
+		if ( ! attributes || ! Object.keys( attributes ).length ) return false;
+		return isMatch( blockAttributes, attributes );
+	} );
+};
 
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const [ selectedValue, setSelectedValue ] = useState( '' );
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
-	const { variations } = useSelect(
+	const { variations, blockAttributes } = useSelect(
 		( select ) => {
 			const { getBlockVariations } = select( 'core/blocks' );
-			const { getBlockName } = select( 'core/block-editor' );
+			const { getBlockName, getBlockAttributes } = select(
+				'core/block-editor'
+			);
 			const blockName = blockClientId && getBlockName( blockClientId );
 			return {
 				variations:
 					blockName && getBlockVariations( blockName, 'transform' ),
+				blockAttributes: getBlockAttributes( blockClientId ),
 			};
 		},
 		[ blockClientId ]
 	);
+	useEffect( () => {
+		const matchedVariation = getMatchedVariation(
+			blockAttributes,
+			variations
+		);
+		setSelectedValue( matchedVariation?.name || '' );
+	}, [ blockAttributes, variations ] );
 	if ( ! variations?.length ) return null;
 
 	const selectOptions = variations.map(
@@ -36,7 +59,6 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 		} )
 	);
 	const onSelectVariation = ( variationName ) => {
-		setSelectedValue( variationName );
 		updateBlockAttributes( blockClientId, {
 			...variations.find( ( { name } ) => name === variationName )
 				.attributes,
