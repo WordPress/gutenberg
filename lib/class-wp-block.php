@@ -209,12 +209,9 @@ class WP_Block {
 	 * @return string Rendered block output.
 	 */
 	public function render( $options = array() ) {
-		if ( in_array( $this->parsed_block, self::$currently_rendering ) )
-		{
+		if ( in_array( $this->parsed_block, self::$currently_rendering ) ) {
 			return '';
-		}
-		else
-		{
+		} else {
 			self::$currently_rendering[] = $this->parsed_block;
 		}
 		
@@ -253,11 +250,11 @@ class WP_Block {
 		}
 
 		/** This filter is documented in src/wp-includes/blocks.php */
-		$return = apply_filters( 'render_block', $block_content, $this->parsed_block );
+		$block_content = apply_filters( 'render_block', $block_content, $this->parsed_block );
 
 		array_pop( self::$currently_rendering );
 
-		return $return;
+		return $block_content;
 	}
 
 }
