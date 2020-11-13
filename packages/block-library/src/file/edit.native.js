@@ -27,13 +27,14 @@ import {
 import { file as icon, replace, button, external } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 
-export default class FileEdit extends Component {
+export class FileEdit extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -108,7 +109,7 @@ export default class FileEdit extends Component {
 		this.setState( { isUrlCopied: true } );
 		this.timerRef = setTimeout( () => {
 			this.setState( { isUrlCopied: false } );
-		}, 1000 );
+		}, 1500 );
 	}
 
 	onChangeOpenInNewWindow( newValue ) {
@@ -172,6 +173,11 @@ export default class FileEdit extends Component {
 	}
 
 	getInspectorControls( { showDownloadButton, textLinkTarget } ) {
+		const actionButtonStyle = this.props.getStylesFromColorScheme(
+			styles.actionButton,
+			styles.actionButtonDark
+		);
+
 		return (
 			<InspectorControls>
 				<PanelBody title={ __( 'File block settings' ) } />
@@ -193,6 +199,9 @@ export default class FileEdit extends Component {
 							this.state.isUrlCopied
 								? __( 'Copied!' )
 								: __( 'Copy file URL' )
+						}
+						labelStyle={
+							this.state.isUrlCopied || actionButtonStyle
 						}
 						onPress={ this.onCopyURL }
 					/>
@@ -335,3 +344,5 @@ export default class FileEdit extends Component {
 		);
 	}
 }
+
+export default withPreferredColorScheme( FileEdit );
