@@ -244,7 +244,6 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 			$theme_settings['global']['settings']['color'] = array();
 		}
 		$theme_settings['global']['settings']['color']['custom'] = $settings['disableCustomColors'];
-		unset( $settings['disableCustomColors'] );
 	}
 
 	if ( isset( $settings['disableCustomGradients'] ) ) {
@@ -252,7 +251,6 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 			$theme_settings['global']['settings']['color'] = array();
 		}
 		$theme_settings['global']['settings']['color']['customGradient'] = $settings['disableCustomGradients'];
-		unset( $settings['disableCustomGradients'] );
 	}
 
 	if ( isset( $settings['disableCustomFontSizes'] ) ) {
@@ -260,7 +258,6 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 			$theme_settings['global']['settings']['typography'] = array();
 		}
 		$theme_settings['global']['settings']['typography']['customFontSize'] = $settings['disableCustomFontSizes'];
-		unset( $settings['disableCustomFontSizes'] );
 	}
 
 	if ( isset( $settings['enableCustomLineHeight'] ) ) {
@@ -268,7 +265,6 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 			$theme_settings['global']['settings']['typography'] = array();
 		}
 		$theme_settings['global']['settings']['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
-		unset( $settings['enableCustomLineHeight'] );
 	}
 
 	if ( isset( $settings['enableCustomUnits'] ) ) {
@@ -278,7 +274,6 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 		$theme_settings['global']['settings']['spacing']['units'] = ( true === $settings['enableCustomUnits'] ) ?
 			array( 'px', 'em', 'rem', 'vh', 'vw' ) :
 			$settings['enableCustomUnits'];
-		unset( $settings['enableCustomUnits'] );
 	}
 
 	if ( isset( $settings['colors'] ) ) {
@@ -286,7 +281,6 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 			$theme_settings['global']['settings']['color'] = array();
 		}
 		$theme_settings['global']['settings']['color']['palette'] = $settings['colors'];
-		unset( $settings['colors'] );
 	}
 
 	if ( isset( $settings['gradients'] ) ) {
@@ -294,7 +288,6 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 			$theme_settings['global']['settings']['color'] = array();
 		}
 		$theme_settings['global']['settings']['color']['gradients'] = $settings['gradients'];
-		unset( $settings['gradients'] );
 	}
 
 	if ( isset( $settings['fontSizes'] ) ) {
@@ -302,7 +295,6 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 			$theme_settings['global']['settings']['typography'] = array();
 		}
 		$theme_settings['global']['settings']['typography']['fontSizes'] = $settings['fontSizes'];
-		unset( $settings['fontSizes'] );
 	}
 
 	// Things that didn't land in core yet, so didn't have a setting assigned.
@@ -334,18 +326,17 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
  * @return WP_Theme_JSON Entity that holds theme data.
  */
 function gutenberg_experimental_global_styles_get_theme( $settings ) {
-	$theme_support_settings = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
-	$theme_json_data        = gutenberg_experimental_global_styles_get_from_file(
+	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
+	$theme_json_data    = gutenberg_experimental_global_styles_get_from_file(
 		locate_template( 'experimental-theme.json' )
 	);
 
 	/*
-	 * We want the presets declared in theme.json
+	 * We want the presets and settings declared in theme.json
 	 * to override the ones declared via add_theme_support.
 	 */
 	$result = new WP_Theme_JSON( $theme_support_data );
-	$all    = new WP_Theme_JSON( $theme_json_data );
-	$result->merge( $all );
+	$result->merge( new WP_Theme_JSON( $theme_json_data ) );
 
 	return $result;
 }
@@ -400,8 +391,9 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	$all = gutenberg_experimental_global_styles_get_core();
-	$all->merge( gutenberg_experimental_global_styles_get_theme() );
+	$settings = gutenberg_get_common_block_editor_settings();
+	$all      = gutenberg_experimental_global_styles_get_core();
+	$all->merge( gutenberg_experimental_global_styles_get_theme( $settings ) );
 	$all->merge( gutenberg_experimental_global_styles_get_user() );
 
 	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
@@ -421,17 +413,28 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	$base = gutenberg_experimental_global_styles_get_core();
-	$base->merge( gutenberg_experimental_global_styles_get_theme() );
+	$base  = gutenberg_experimental_global_styles_get_core();
+	$all   = gutenberg_experimental_global_styles_get_core();
+	$theme = gutenberg_experimental_global_styles_get_theme( $settings );
+	$user  = gutenberg_experimental_global_styles_get_user();
 
-	$all = gutenberg_experimental_global_styles_get_core();
-	$all->merge( gutenberg_experimental_global_styles_get_theme() );
-	$all->merge( gutenberg_experimental_global_styles_get_user() );
+	$base->merge( $theme );
+
+	$all->merge( $theme );
+	$all->merge( $user );
 
 	// STEP 1: ADD FEATURES
 	// These need to be added to settings always.
 	// We also need to unset the deprecated settings defined by core.
 	$settings['__experimentalFeatures'] = $all->get_settings();
+	unset( $settings['colors'] );
+	unset( $settings['disableCustomColors'] );
+	unset( $settings['disableCustomFontSizes'] );
+	unset( $settings['disableCustomGradients'] );
+	unset( $settings['enableCustomLineHeight'] );
+	unset( $settings['enableCustomUnits'] );
+	unset( $settings['fontSizes'] );
+	unset( $settings['gradients'] );
 
 	// STEP 2 - IF EDIT-SITE, ADD DATA REQUIRED FOR GLOBAL STYLES SIDEBAR
 	// The client needs some information to be able to access/update the user styles.
