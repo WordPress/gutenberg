@@ -6,6 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+// Ignore due to missing types: https://github.com/WordPress/gutenberg/pull/26429
+// @ts-ignore
 import deprecated from '@wordpress/deprecated';
 
 /**
