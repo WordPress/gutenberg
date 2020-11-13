@@ -26,8 +26,13 @@ import { useEditorFeature, GLOBAL_CONTEXT } from '../editor/utils';
  */
 const EMPTY_ARRAY = [];
 
-export default function ColorPalettePanel( { contextName, setSetting } ) {
+export default function ColorPalettePanel( {
+	contextName,
+	getSetting,
+	setSetting,
+} ) {
 	const colors = useEditorFeature( 'color.palette', contextName );
+	const userColors = getSetting( contextName, 'color.palette' );
 	const immutableColorSlugs = useSelect(
 		( select ) => {
 			const baseStyles = select( 'core/edit-site' ).getSettings()
@@ -62,6 +67,7 @@ export default function ColorPalettePanel( { contextName, setSetting } ) {
 			emptyUI={ __(
 				'Colors are empty! Add some colors to create your own color palette.'
 			) }
+			canReset={ colors === userColors }
 		/>
 	);
 }
