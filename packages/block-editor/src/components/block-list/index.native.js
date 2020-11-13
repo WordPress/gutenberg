@@ -24,6 +24,7 @@ import { __ } from '@wordpress/i18n';
 import styles from './style.scss';
 import BlockListAppender from '../block-list-appender';
 import BlockListItem from './block-list-item.native';
+import Grid from './grid-item';
 
 const BlockListContext = createContext();
 
@@ -31,10 +32,9 @@ const stylesMemo = {};
 const getStyles = (
 	isRootList,
 	isStackedHorizontally,
-	horizontalAlignment,
-	numColumns
+	horizontalAlignment
 ) => {
-	if ( isRootList || numColumns ) {
+	if ( isRootList ) {
 		return;
 	}
 	const styleName = `${ isStackedHorizontally }-${ horizontalAlignment }`;
@@ -44,6 +44,7 @@ const getStyles = (
 	const computedStyles = [
 		isStackedHorizontally && styles.horizontal,
 		horizontalAlignment && styles[ `is-aligned-${ horizontalAlignment }` ],
+		styles.overflowVisible,
 	];
 	stylesMemo[ styleName ] = computedStyles;
 	return computedStyles;
@@ -74,6 +75,7 @@ export class BlockList extends Component {
 		);
 		this.renderEmptyList = this.renderEmptyList.bind( this );
 		this.getExtraData = this.getExtraData.bind( this );
+		this.getBlockListItem = this.getBlockListItem.bind( this );
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -173,7 +175,6 @@ export class BlockList extends Component {
 			isFloatingToolbarVisible,
 			isStackedHorizontally,
 			horizontalAlignment,
-			numColumns,
 		} = this.props;
 		const { parentScrollRef } = extraProps;
 
@@ -183,7 +184,6 @@ export class BlockList extends Component {
 			headerToolbar,
 			floatingToolbar,
 		} = styles;
-
 		const containerStyle = {
 			flex: isRootList ? 1 : 0,
 			// We set negative margin in the parent to remove the edge spacing between parent block and child block in ineer blocks
@@ -227,14 +227,11 @@ export class BlockList extends Component {
 					style={ getStyles(
 						isRootList,
 						isStackedHorizontally,
-						horizontalAlignment,
-						numColumns
+						horizontalAlignment
 					) }
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
-					numColumns={ numColumns }
-					key={ numColumns }
 					shouldPreventAutomaticScroll={
 						this.shouldFlatListPreventAutomaticScroll
 					}
@@ -262,7 +259,7 @@ export class BlockList extends Component {
 		);
 	}
 
-	renderItem( { item: clientId } ) {
+	getBlockListItem( clientId ) {
 		const {
 			contentResizeMode,
 			contentStyle,
@@ -274,31 +271,45 @@ export class BlockList extends Component {
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 			blockProps,
-			numColumns,
 		} = this.props;
 		return (
-			<View style={ numColumns && { flex: 1 } }>
-				<BlockListItem
-					isStackedHorizontally={ isStackedHorizontally }
-					rootClientId={ rootClientId }
-					clientId={ clientId }
-					parentWidth={ parentWidth }
-					contentResizeMode={ contentResizeMode }
-					contentStyle={ contentStyle }
-					onAddBlock={ onAddBlock }
-					marginVertical={ marginVertical }
-					marginHorizontal={ marginHorizontal }
-					onDeleteBlock={ onDeleteBlock }
-					shouldShowInnerBlockAppender={
-						this.shouldShowInnerBlockAppender
-					}
-					onCaretVerticalPositionChange={
-						this.onCaretVerticalPositionChange
-					}
-					blockProps={ blockProps }
-				/>
-			</View>
+			<BlockListItem
+				isStackedHorizontally={ isStackedHorizontally }
+				rootClientId={ rootClientId }
+				clientId={ clientId }
+				parentWidth={ parentWidth }
+				contentResizeMode={ contentResizeMode }
+				contentStyle={ contentStyle }
+				onAddBlock={ onAddBlock }
+				marginVertical={ marginVertical }
+				marginHorizontal={ marginHorizontal }
+				onDeleteBlock={ onDeleteBlock }
+				shouldShowInnerBlockAppender={
+					this.shouldShowInnerBlockAppender
+				}
+				onCaretVerticalPositionChange={
+					this.onCaretVerticalPositionChange
+				}
+				blockProps={ blockProps }
+			/>
 		);
+	}
+
+	renderItem( { item: clientId } ) {
+		const { gridProperties, blockClientIds, parentWidth } = this.props;
+		if ( gridProperties ) {
+			return (
+				<Grid
+					columns={ gridProperties.numColumns }
+					tileCount={ blockClientIds.length }
+					index={ blockClientIds.indexOf( clientId ) }
+					maxWidth={ parentWidth }
+				>
+					{ this.getBlockListItem( clientId ) }
+				</Grid>
+			);
+		}
+		return this.getBlockListItem( clientId );
 	}
 
 	renderBlockListFooter() {

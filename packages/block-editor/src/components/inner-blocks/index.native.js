@@ -90,7 +90,7 @@ function UncontrolledInnerBlocks( props ) {
 		horizontalAlignment,
 		filterInnerBlocks,
 		__experimentalLayout: layout = defaultLayout,
-		numColumns,
+		gridProperties,
 		blockProps,
 	} = props;
 	const block = useSelect(
@@ -124,7 +124,7 @@ function UncontrolledInnerBlocks( props ) {
 			onAddBlock={ onAddBlock }
 			onDeleteBlock={ onDeleteBlock }
 			filterInnerBlocks={ filterInnerBlocks }
-			numColumns={ numColumns }
+			gridProperties={ gridProperties }
 			blockProps={ blockProps }
 		/>
 	);
