@@ -13,32 +13,33 @@ import createDidHook from './createDidHook';
  * Returns an instance of the hooks object.
  */
 function createHooks() {
-	/** @type {import('.').Hooks} */
+	/** @type {import('.').Store} */
 	const actions = Object.create( null );
-	/** @type {import('.').Hooks} */
+	/** @type {import('.').Store} */
 	const filters = Object.create( null );
 	actions.__current = [];
 	filters.__current = [];
 
+	/** @type {import('.').Hooks} */
 	const hooks = Object.create( null );
 
 	Object.assign( hooks, {
-		addAction: createAddHook( actions ).bind( hooks ),
-		addFilter: createAddHook( filters ).bind( hooks ),
-		removeAction: createRemoveHook( actions ).bind( hooks ),
-		removeFilter: createRemoveHook( filters ).bind( hooks ),
-		hasAction: createHasHook( actions ),
-		hasFilter: createHasHook( filters ),
-		removeAllActions: createRemoveHook( actions, true ).bind( hooks ),
-		removeAllFilters: createRemoveHook( filters, true ).bind( hooks ),
-		doAction: createRunHook( actions ),
-		applyFilters: createRunHook( filters, true ),
-		currentAction: createCurrentHook( actions ),
-		currentFilter: createCurrentHook( filters ),
-		doingAction: createDoingHook( actions ),
-		doingFilter: createDoingHook( filters ),
-		didAction: createDidHook( actions ),
-		didFilter: createDidHook( filters ),
+		addAction: createAddHook( hooks, 'actions' ),
+		addFilter: createAddHook( hooks, 'filters' ),
+		removeAction: createRemoveHook( hooks, 'actions' ),
+		removeFilter: createRemoveHook( hooks, 'filters' ),
+		hasAction: createHasHook( hooks, 'actions' ),
+		hasFilter: createHasHook( hooks, 'filters' ),
+		removeAllActions: createRemoveHook( hooks, 'actions', true ),
+		removeAllFilters: createRemoveHook( hooks, 'filters', true ),
+		doAction: createRunHook( hooks, 'actions' ),
+		applyFilters: createRunHook( hooks, 'filters', true ),
+		currentAction: createCurrentHook( hooks, 'actions' ),
+		currentFilter: createCurrentHook( hooks, 'filters' ),
+		doingAction: createDoingHook( hooks, 'actions' ),
+		doingFilter: createDoingHook( hooks, 'filters' ),
+		didAction: createDidHook( hooks, 'actions' ),
+		didFilter: createDidHook( hooks, 'filters' ),
 		actions,
 		filters,
 	} );

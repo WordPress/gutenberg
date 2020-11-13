@@ -12,18 +12,21 @@ import validateHookName from './validateHookName.js';
  * @param {string}               hookName  Name of hook to add
  * @param {string}               namespace The unique namespace identifying the callback in the form `vendor/plugin/function`.
  * @param {import('.').Callback} callback  Function to call when the hook is run
- * @param {number}              [priority=10]  Priority of this hook
+ * @param {number}               [priority=10]  Priority of this hook
  */
 
 /**
  * Returns a function which, when invoked, will add a hook.
  *
- * @param  {import('.').Hooks} hooks Stored hooks, keyed by hook name.
+ * @param  {import('.').Hooks}    hooks Hooks instance.
+ * @param  {import('.').StoreKey} storeKey
  *
  * @return {AddHook} Function that adds a new hook.
  */
-function createAddHook( hooks ) {
+function createAddHook( hooks, storeKey ) {
 	return function addHook( hookName, namespace, callback, priority = 10 ) {
+		const hooksStore = hooks[ storeKey ];
+
 		if ( ! validateHookName( hookName ) ) {
 			return;
 		}
@@ -49,9 +52,9 @@ function createAddHook( hooks ) {
 
 		const handler = { callback, priority, namespace };
 
-		if ( hooks[ hookName ] ) {
+		if ( hooksStore[ hookName ] ) {
 			// Find the correct insert index of the new hook.
-			const handlers = hooks[ hookName ].handlers;
+			const handlers = hooksStore[ hookName ].handlers;
 
 			/** @type {number} */
 			let i;
@@ -73,7 +76,7 @@ function createAddHook( hooks ) {
 			// we're adding would come after the current callback, there's no
 			// problem; otherwise we need to increase the execution index of
 			// any other runs by 1 to account for the added element.
-			hooks.__current.forEach( ( hookInfo ) => {
+			hooksStore.__current.forEach( ( hookInfo ) => {
 				if (
 					hookInfo.name === hookName &&
 					hookInfo.currentIndex >= i
@@ -83,14 +86,14 @@ function createAddHook( hooks ) {
 			} );
 		} else {
 			// This is the first hook of its type.
-			hooks[ hookName ] = {
+			hooksStore[ hookName ] = {
 				handlers: [ handler ],
 				runs: 0,
 			};
 		}
 
 		if ( hookName !== 'hookAdded' ) {
-			this.doAction(
+			hooks.doAction(
 				'hookAdded',
 				hookName,
 				namespace,
