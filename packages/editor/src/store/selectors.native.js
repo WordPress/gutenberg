@@ -86,6 +86,5 @@ export function getNotices( state ) {
  * @return {boolean} If block inserrtion event exists then the block was just inserted.
  */
 export function wasBlockJustInserted( state, clientId ) {
-	const value = state.filter( ( id ) => id !== clientId );
-	return value ? true : false;
+	return state.blockInsertionEvent.clientId === clientId;
 }
