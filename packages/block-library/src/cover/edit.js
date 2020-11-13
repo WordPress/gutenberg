@@ -21,6 +21,7 @@ import {
 	ToggleControl,
 	withNotices,
 	ButtonGroup,
+	 __experimentalUnitControl as BaseUnitControl,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
@@ -53,6 +54,7 @@ import {
 	VIDEO_BACKGROUND_TYPE,
 	COVER_MIN_HEIGHT,
 	CSS_UNITS,
+	SIZE_OPTIONS,
 	backgroundImageStyles,
 	dimRatioToClass,
 	isContentPositionCenter,
@@ -83,52 +85,82 @@ function retrieveFastAverageColor() {
 	return retrieveFastAverageColor.fastAverageColor;
 }
 
-const backgroundSizesOptions = [
-	{
-		slug: 'cover',
-		label: __( 'Cover' ),
-	},
-	{
-		slug: 'contain',
-		label: __( 'Contain' ),
-	},
-	{
-		slug: 'initial',
-		label: __( 'Original' ),
-	},
-	{
-		slug: 'custom',
-		label: __( 'Custom' ),
-	},
-];
+function CustomSizeControl( { value, onSelect } ) {
+	if ( [ 'cover', 'contain', 'initial'].indexOf( value ) >= 0 ) {
+		return null;
+	}
+
+	// Strip up and get value + units from the CSS inline.
+	let inlineStyleValues = value && value.split( /(%|px)/ );
+	if ( inlineStyleValues.length < 2 ) {
+		inlineStyleValues = [];
+	}
+
+	const xValue = inlineStyleValues[ 0 ] || 50;
+	const xUnit = inlineStyleValues[ 1 ] || 'px';
+
+	return (
+		<CoverValueUnitInput
+			label={ __( 'Custom size' ) }
+			value={ xValue }
+			unit={ xUnit }
+			units={ [
+				{ value: 'px', label: 'px', default: 0 },
+				{ value: '%', label: '%', default: 10 },
+			] }
+			onChange={ ( sizeValue ) => {
+				onSelect( `${ sizeValue }${  xUnit }` );
+			} }
+			onUnitChange={ ( unit ) => {
+				onSelect( `${ xValue }${  unit }` );
+			} }
+			customUnits= { false }
+		/>
+	);
+}
 
 function BackgroundSizeControl( { size = 'cover', onSelect } ) {
+	const isCustomSize =
+		SIZE_OPTIONS.map( ( opt ) => opt.slug ).indexOf( size ) < 0 ||
+		size === 'custom';
+
 	return (
 		<BaseControl
 			label={ __( ' Background size' ) }
 			id={ 'background-size' }
 		>
 			<ButtonGroup label={ __( 'Size' ) } defaultChecked="size-content">
-				{ backgroundSizesOptions.map( ( { slug, label } ) => (
+				{ SIZE_OPTIONS.map( ( { slug, label } ) => (
 					<Button
 						key={ slug }
 						isSmall
-						isPressed={ slug === size }
+						isPressed={
+							slug === size ||
+							( slug === 'custom' && isCustomSize )
+						}
 						onClick={ () => onSelect( slug ) }
 					>
 						{ label }
 					</Button>
 				) ) }
 			</ButtonGroup>
+
+			{ isCustomSize && (
+				<CustomSizeControl value={ size } onSelect={ onSelect } />
+			) }
 		</BaseControl>
 	);
 }
 
-function CoverHeightInput( {
+function CoverValueUnitInput( {
 	onChange,
 	onUnitChange,
 	unit = 'px',
 	value = '',
+
+	label,
+	units = CSS_UNITS,
+	customUnits = true,
 } ) {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
 	const instanceId = useInstanceId( UnitControl );
@@ -161,21 +193,29 @@ function CoverHeightInput( {
 	const inputValue = temporaryInput !== null ? temporaryInput : value;
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
+	const controlUnitProps = {
+		id: inputId,
+		min,
+		onBlur: handleOnBlur,
+		onChange: handleOnChange,
+		onUnitChange,
+		step: '1',
+		style: { maxWidth: 80 },
+		unit,
+		units,
+		value: inputValue,
+	};
+
 	return (
-		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
-			<UnitControl
-				id={ inputId }
-				isResetValueOnUnitChange
-				min={ min }
-				onBlur={ handleOnBlur }
-				onChange={ handleOnChange }
-				onUnitChange={ onUnitChange }
-				step="1"
-				style={ { maxWidth: 80 } }
-				unit={ unit }
-				units={ CSS_UNITS }
-				value={ inputValue }
-			/>
+		<BaseControl label={ label } id={ inputId }>
+			{ customUnits ? (
+				<UnitControl isResetValueOnUnitChange { ...controlUnitProps } />
+			) : (
+				<BaseUnitControl
+					isResetValueOnUnitChange
+					{ ...controlUnitProps }
+				/>
+			) }
 		</BaseControl>
 	);
 }
@@ -407,11 +447,12 @@ function CoverEdit( {
 
 								<BackgroundSizeControl
 									size={ backgroundSize }
-									onSelect={ ( newSize ) =>
+									onSelect={ ( newSize ) => {
+										console.log( { newSize } );
 										setAttributes( {
 											backgroundSize: newSize,
 										} )
-									}
+									} }
 								/>
 							</Fragment>
 						) }
@@ -452,7 +493,7 @@ function CoverEdit( {
 				{ hasBackground && (
 					<>
 						<PanelBody title={ __( 'Dimensions' ) }>
-							<CoverHeightInput
+							<CoverValueUnitInput
 								value={ temporaryMinHeight || minHeight }
 								unit={ minHeightUnit }
 								onChange={ ( newMinHeight ) =>
@@ -463,6 +504,7 @@ function CoverEdit( {
 										minHeightUnit: nextUnit,
 									} );
 								} }
+								label={ __( 'Minimum height of cover' ) }
 							/>
 						</PanelBody>
 						<PanelColorGradientSettings

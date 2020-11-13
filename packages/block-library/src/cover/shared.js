@@ -55,6 +55,25 @@ export const CSS_UNITS = [
 	},
 ];
 
+export const SIZE_OPTIONS = [
+	{
+		slug: 'cover',
+		label: __( 'Cover' ),
+	},
+	{
+		slug: 'contain',
+		label: __( 'Contain' ),
+	},
+	{
+		slug: 'initial',
+		label: __( 'Original' ),
+	},
+	{
+		slug: 'custom',
+		label: __( 'Custom' ),
+	},
+];
+
 export function dimRatioToClass( ratio ) {
 	return ratio === 0 || ratio === 50 || ! ratio
 		? null
