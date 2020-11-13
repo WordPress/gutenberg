@@ -18,7 +18,7 @@ export const _default = () => (
 
 // Unexported helper for different origins.
 const Appear = ( { origin } ) => (
-	<Animate type="appear" options={ { origin } }>
+	<Animate type="appear" origin={ origin }>
 		{ ( { className } ) => (
 			<Notice className={ className } status="success">
 				<p>Appear animation. Origin: { origin }.</p>
@@ -31,6 +31,9 @@ export const appearTopLeft = () => <Appear origin="top left" />;
 export const appearTopRight = () => <Appear origin="top right" />;
 export const appearBottomLeft = () => <Appear origin="bottom left" />;
 export const appearBottomRight = () => <Appear origin="bottom right" />;
+export const appearMiddle = () => <Appear origin="middle" />;
+export const appearMiddleLeft = () => <Appear origin="middle left" />;
+export const appearMiddleRight = () => <Appear origin="middle right" />;
 
 export const loading = () => (
 	<Animate type="loading">
@@ -42,12 +45,15 @@ export const loading = () => (
 	</Animate>
 );
 
-export const slideIn = () => (
-	<Animate type="slide-in">
+const SlideIn = ( { origin } ) => (
+	<Animate type="slide-in" origin={ origin }>
 		{ ( { className } ) => (
 			<Notice className={ className } status="success">
-				<p>Slide-in animation.</p>
+				<p>Slide-in animation. Origin: { origin }.</p>
 			</Notice>
 		) }
 	</Animate>
 );
+
+export const slideInLeft = () => <SlideIn origin="left" />;
+export const slideInight = () => <SlideIn origin="right" />;
