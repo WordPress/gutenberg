@@ -20,6 +20,16 @@
 			0 0 0 1px $white,
 			0 0 0 3px var(--wp-admin-theme-color);
 	}
+
+	.components-snackbar__content-with-icon {
+		margin-left: 32px;
+	}
+
+	.components-snackbar__icon {
+		position: absolute;
+		top: 24px;
+		left: 26px;
+	}
 }
 
 .components-snackbar__action.components-button {
