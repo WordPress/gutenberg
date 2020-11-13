@@ -18,10 +18,12 @@ import { chevronDown } from '@wordpress/icons';
 
 export const getMatchingVariationName = ( blockAttributes, variations ) => {
 	if ( ! variations || ! blockAttributes ) return;
-	return variations.find( ( { attributes } ) => {
+	const matches = variations.filter( ( { attributes } ) => {
 		if ( ! attributes || ! Object.keys( attributes ).length ) return false;
 		return isMatch( blockAttributes, attributes );
-	} )?.name;
+	} );
+	if ( matches.length !== 1 ) return;
+	return matches[ 0 ].name;
 };
 
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
