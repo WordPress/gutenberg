@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, find, camelCase, isString } from 'lodash';
+import { get, find, camelCase, kebabCase, isString } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -54,6 +54,13 @@ export const PRESET_CLASSES = {
 		property: 'font-size',
 	},
 };
+
+const STYLE_PROPERTIES_TO_PRESETS = {
+	backgroundColor: 'color',
+	LINK_COLOR: 'color',
+	background: 'gradient',
+};
+
 export const LINK_COLOR = '--wp--style--color--link';
 export const LINK_COLOR_DECLARATION = `a { color: var(${ LINK_COLOR }, #00e); }`;
 
@@ -76,35 +83,48 @@ export function useEditorFeature(
 	);
 }
 
-export function getPresetVariable( presetCategory, presets, value ) {
+export function getPresetVariable( styles, blockName, propertyName, value ) {
 	if ( ! value ) {
-		return;
+		return value;
+	}
+	const presetCategory =
+		STYLE_PROPERTIES_TO_PRESETS[ propertyName ] || propertyName;
+	if ( ! presetCategory ) {
+		return value;
 	}
 	const presetData = PRESET_CATEGORIES[ presetCategory ];
-	const { key } = presetData;
+	if ( ! presetData ) {
+		return value;
+	}
+	const { key, path } = presetData;
+	const presets =
+		get( styles, [ blockName, 'settings', ...path ] ) ??
+		get( styles, [ GLOBAL_CONTEXT, 'settings', ...path ] );
 	const presetObject = find( presets, ( preset ) => {
 		return preset[ key ] === value;
 	} );
-	return (
-		presetObject && `var:preset|${ presetCategory }|${ presetObject.slug }`
-	);
+	if ( ! presetObject ) {
+		return value;
+	}
+	return `var:preset|${ kebabCase( presetCategory ) }|${ presetObject.slug }`;
 }
 
 function getValueFromPresetVariable(
-	features,
+	styles,
 	blockName,
+	variable,
 	[ presetType, slug ]
 ) {
 	presetType = camelCase( presetType );
 	const presetData = PRESET_CATEGORIES[ presetType ];
 	if ( ! presetData ) {
-		return;
+		return variable;
 	}
 	const presets =
-		get( features, [ blockName, ...presetData.path ] ) ??
-		get( features, [ GLOBAL_CONTEXT_NAME, ...presetData.path ] );
+		get( styles, [ blockName, 'settings', ...presetData.path ] ) ??
+		get( styles, [ GLOBAL_CONTEXT_NAME, 'settings', ...presetData.path ] );
 	if ( ! presets ) {
-		return;
+		return variable;
 	}
 	const presetObject = find( presets, ( preset ) => {
 		return preset.slug === slug;
@@ -112,21 +132,25 @@ function getValueFromPresetVariable(
 	if ( presetObject ) {
 		const { key } = presetData;
 		const result = presetObject[ key ];
-		return getValueFromVariable( features, blockName, result ) || result;
+		return getValueFromVariable( styles, blockName, result );
 	}
+	return variable;
 }
 
-function getValueFromCustomVariable( features, blockName, path ) {
+function getValueFromCustomVariable( styles, blockName, variable, path ) {
 	const result =
-		get( features, [ blockName, 'custom', ...path ] ) ??
-		get( features, [ GLOBAL_CONTEXT_NAME, 'custom', ...path ] );
+		get( styles, [ blockName, 'settings', 'custom', ...path ] ) ??
+		get( styles, [ GLOBAL_CONTEXT_NAME, 'settings', 'custom', ...path ] );
+	if ( ! result ) {
+		return variable;
+	}
 	// A variable may reference another variable so we need recursion until we find the value.
-	return getValueFromVariable( features, blockName, result ) || result;
+	return getValueFromVariable( styles, blockName, result );
 }
 
-export function getValueFromVariable( features, blockName, variable ) {
+export function getValueFromVariable( styles, blockName, variable ) {
 	if ( ! variable || ! isString( variable ) ) {
-		return;
+		return variable;
 	}
 	let parsedVar;
 	const INTERNAL_REFERENCE_PREFIX = 'var:';
@@ -144,14 +168,15 @@ export function getValueFromVariable( features, blockName, variable ) {
 			.slice( CSS_REFERENCE_PREFIX.length, -CSS_REFERENCE_SUFFIX.length )
 			.split( '--' );
 	} else {
-		return;
+		return variable;
 	}
 
 	const [ type, ...path ] = parsedVar;
 	if ( type === 'preset' ) {
-		return getValueFromPresetVariable( features, blockName, path );
+		return getValueFromPresetVariable( styles, blockName, variable, path );
 	}
 	if ( type === 'custom' ) {
-		return getValueFromCustomVariable( features, blockName, path );
+		return getValueFromCustomVariable( styles, blockName, variable, path );
 	}
+	return variable;
 }
