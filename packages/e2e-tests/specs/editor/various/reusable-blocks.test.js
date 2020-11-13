@@ -72,7 +72,6 @@ describe( 'Reusable blocks', () => {
 		const block = await page.$(
 			'.block-editor-block-list__block[data-type="core/block"]'
 		);
-
 		expect( block ).not.toBeNull();
 
 		// Check that its title is displayed
@@ -362,7 +361,6 @@ describe( 'Reusable blocks', () => {
 
 		// Save the reusable block
 		await page.click( '.editor-post-publish-button__button' );
-
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Reusable Block updated."]'
 		);
