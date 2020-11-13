@@ -74,7 +74,7 @@ export default function Animate( {
 } ) {
 	if ( Boolean( _deprecatedOptions ) ) {
 		deprecated( '<Animate /> options prop', {
-			version: '9.4',
+			version: '9.6',
 			hint: 'Pass options directly as props instead.',
 		} );
 	}
