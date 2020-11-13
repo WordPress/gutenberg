@@ -116,7 +116,7 @@ export const SIZE_OPTIONS = [
 					stroke="currentColor"
 					strokeWidth="2"
 				/>
-				<Rect x="5" y="7" width="14" height="10" />
+				<Rect x="7" y="8" width="10" height="8" />
 			</SVG>
 		),
 	},
