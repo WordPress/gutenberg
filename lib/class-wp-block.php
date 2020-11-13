@@ -18,6 +18,13 @@
 class WP_Block {
 
 	/**
+	 * Array of parsed blocks currently being rendered.
+	 *
+	 * @var array
+	 */
+	private static $currently_rendering = array();
+
+	/**
 	 * Original parsed array representation of block.
 	 *
 	 * @var array
@@ -202,6 +209,15 @@ class WP_Block {
 	 * @return string Rendered block output.
 	 */
 	public function render( $options = array() ) {
+		if ( in_array( $this->parsed_block, self::$currently_rendering ) )
+		{
+			return '';
+		}
+		else
+		{
+			self::$currently_rendering[] = $this->parsed_block;
+		}
+		
 		global $post;
 		$options = array_replace(
 			array(
@@ -237,7 +253,11 @@ class WP_Block {
 		}
 
 		/** This filter is documented in src/wp-includes/blocks.php */
-		return apply_filters( 'render_block', $block_content, $this->parsed_block );
+		$return = apply_filters( 'render_block', $block_content, $this->parsed_block );
+
+		array_pop( self::$currently_rendering );
+
+		return $return;
 	}
 
 }
