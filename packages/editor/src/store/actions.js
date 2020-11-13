@@ -231,6 +231,7 @@ export function* savePost( options = {} ) {
 	let edits = {
 		content: yield controls.select( STORE_KEY, 'getEditedPostContent' ),
 	};
+	console.log( 'editor savePost actions.js', { edits } );
 	if ( ! options.isAutosave ) {
 		yield controls.dispatch( STORE_KEY, 'editPost', edits, {
 			undoIgnore: true,

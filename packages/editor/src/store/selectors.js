@@ -978,8 +978,13 @@ export const getEditedPostContent = createRegistrySelector(
 			postType,
 			postId
 		);
+		console.log( 'getEditedPostContent selectors.js', { record } );
 		if ( record ) {
 			if ( typeof record.content === 'function' ) {
+				console.log(
+					'record content selectors.js',
+					record.content( record )
+				);
 				return record.content( record );
 			} else if ( record.blocks ) {
 				return serializeBlocks( record.blocks );

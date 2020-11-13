@@ -58,8 +58,6 @@ export class PostPublishButton extends Component {
 				return noop;
 			}
 
-			console.log( 'PostPublishButton', { args } );
-
 			return callback( ...args );
 		};
 	}
