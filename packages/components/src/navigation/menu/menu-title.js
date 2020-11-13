@@ -82,7 +82,7 @@ export default function NavigationMenuTitle( {
 			) }
 
 			{ isSearching && (
-				<Animate type="slide-in" options={ { origin: 'left' } }>
+				<Animate type="slide-in" origin="left">
 					{ ( { className: animateClassName } ) => (
 						<div className={ animateClassName }>
 							<MenuTitleSearch
