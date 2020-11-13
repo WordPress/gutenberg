@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Preformatted should delete block when backspace in an empty preformatted 1`] = `""`;
+
 exports[`Preformatted should preserve character newlines 1`] = `
 "<!-- wp:html -->
 <pre>1
