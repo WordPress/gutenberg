@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { set, get, mapValues } from 'lodash';
+import { set, get, mapValues, mergeWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,10 +20,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import {
-	default as getGlobalStyles,
-	mergeTrees,
-} from './global-styles-renderer';
+import { default as getGlobalStyles } from './global-styles-renderer';
 
 const EMPTY_CONTENT = '{}';
 
@@ -33,9 +30,18 @@ const GlobalStylesContext = createContext( {
 	setSetting: ( context, path, newValue ) => {},
 	getStyleProperty: ( context, propertyName, origin ) => {},
 	setStyleProperty: ( context, propertyName, newValue ) => {},
-	globalContext: {},
+	contexts: {},
 	/* eslint-enable no-unused-vars */
 } );
+
+const mergeTreesCustomizer = ( objValue, srcValue ) => {
+	// We only pass as arrays the presets,
+	// in which case we want the new array of values
+	// to override the old array (no merging).
+	if ( Array.isArray( srcValue ) ) {
+		return srcValue;
+	}
+};
 
 export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
 
@@ -60,10 +66,17 @@ export default function GlobalStylesProvider( {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
 
 	const { userStyles, mergedStyles } = useMemo( () => {
-		const parsedContent = content ? JSON.parse( content ) : {};
+		const newUserStyles = content ? JSON.parse( content ) : {};
+		const newMergedStyles = mergeWith(
+			{},
+			baseStyles,
+			newUserStyles,
+			mergeTreesCustomizer
+		);
+
 		return {
-			userStyles: parsedContent,
-			mergedStyles: mergeTrees( baseStyles, parsedContent ),
+			userStyles: newUserStyles,
+			mergedStyles: newMergedStyles,
 		};
 	}, [ content ] );
 
@@ -137,7 +150,7 @@ export default function GlobalStylesProvider( {
 			...settings,
 			__experimentalFeatures: mapValues(
 				mergedStyles,
-				( value ) => value.settings || {}
+				( value ) => value?.settings || {}
 			),
 		} );
 	}, [ mergedStyles ] );
