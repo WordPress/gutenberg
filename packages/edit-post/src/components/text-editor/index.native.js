@@ -20,10 +20,10 @@ import {
 /**
  * Internal dependencies
  */
-import HTMLInputContainer from './container';
+import TextEditorContainer from './native-container';
 import styles from './style.scss';
 
-export class HTMLTextInput extends Component {
+export class TextEditor extends Component {
 	constructor() {
 		super( ...arguments );
 
@@ -83,7 +83,7 @@ export class HTMLTextInput extends Component {
 			styles.placeholderDark
 		);
 		return (
-			<HTMLInputContainer parentHeight={ this.props.parentHeight }>
+			<TextEditorContainer parentHeight={ this.props.parentHeight }>
 				<TextInput
 					autoCorrect={ false }
 					accessibilityLabel="html-view-title"
@@ -106,9 +106,9 @@ export class HTMLTextInput extends Component {
 					onBlur={ this.stopEditing }
 					placeholder={ __( 'Start writing…' ) }
 					placeholderTextColor={ placeholderStyle.color }
-					scrollEnabled={ HTMLInputContainer.scrollEnabled }
+					scrollEnabled={ TextEditorContainer.scrollEnabled }
 				/>
-			</HTMLInputContainer>
+			</TextEditorContainer>
 		);
 	}
 }
@@ -141,4 +141,4 @@ export default compose( [
 	} ),
 	withInstanceId,
 	withPreferredColorScheme,
-] )( HTMLTextInput );
+] )( TextEditor );

@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { HTMLTextInput } from '..';
+import { TextEditor } from '..';
 
 // Utility to find a TextInput in a ShallowWrapper
 const findTextInputInWrapper = ( wrapper, matchingProps ) => {
@@ -40,21 +40,19 @@ const getStylesFromColorScheme = () => {
 	return { color: 'white' };
 };
 
-describe( 'HTMLTextInput', () => {
-	it( 'HTMLTextInput renders', () => {
+describe( 'TextEditor', () => {
+	it( 'TextEditor renders', () => {
 		const wrapper = shallow(
-			<HTMLTextInput
-				getStylesFromColorScheme={ getStylesFromColorScheme }
-			/>
+			<TextEditor getStylesFromColorScheme={ getStylesFromColorScheme } />
 		);
 		expect( wrapper ).toBeTruthy();
 	} );
 
-	it( 'HTMLTextInput updates store and state on HTML text change', () => {
+	it( 'TextEditor updates store and state on HTML text change', () => {
 		const onChange = jest.fn();
 
 		const wrapper = shallow(
-			<HTMLTextInput
+			<TextEditor
 				onChange={ onChange }
 				getStylesFromColorScheme={ getStylesFromColorScheme }
 			/>
@@ -63,8 +61,8 @@ describe( 'HTMLTextInput', () => {
 		expect( wrapper.instance().state.isDirty ).toBeFalsy();
 
 		// Simulate user typing text
-		const htmlTextInput = findContentTextInput( wrapper );
-		htmlTextInput.simulate( 'changeText', 'text' );
+		const textEditor = findContentTextInput( wrapper );
+		textEditor.simulate( 'changeText', 'text' );
 
 		//Check if the onChange is called and the state is updated
 		expect( onChange ).toHaveBeenCalledTimes( 1 );
@@ -74,11 +72,11 @@ describe( 'HTMLTextInput', () => {
 		expect( wrapper.instance().state.value ).toEqual( 'text' );
 	} );
 
-	it( 'HTMLTextInput persists changes in HTML text input on blur', () => {
+	it( 'TextEditor persists changes in HTML text input on blur', () => {
 		const onPersist = jest.fn();
 
 		const wrapper = shallow(
-			<HTMLTextInput
+			<TextEditor
 				onPersist={ onPersist }
 				onChange={ jest.fn() }
 				getStylesFromColorScheme={ getStylesFromColorScheme }
@@ -86,11 +84,11 @@ describe( 'HTMLTextInput', () => {
 		);
 
 		// Simulate user typing text
-		const htmlTextInput = findContentTextInput( wrapper );
-		htmlTextInput.simulate( 'changeText', 'text' );
+		const textEditor = findContentTextInput( wrapper );
+		textEditor.simulate( 'changeText', 'text' );
 
 		//Simulate blur event
-		htmlTextInput.simulate( 'blur' );
+		textEditor.simulate( 'blur' );
 
 		//Normally prop.value is updated with the help of withSelect
 		//But we don't have it in tests so we just simulate it
@@ -106,11 +104,11 @@ describe( 'HTMLTextInput', () => {
 		expect( wrapper.instance().state.value ).toEqual( 'text' );
 	} );
 
-	it( 'HTMLTextInput propagates title changes to store', () => {
+	it( 'TextEditor propagates title changes to store', () => {
 		const editTitle = jest.fn();
 
 		const wrapper = shallow(
-			<HTMLTextInput
+			<TextEditor
 				editTitle={ editTitle }
 				getStylesFromColorScheme={ getStylesFromColorScheme }
 			/>

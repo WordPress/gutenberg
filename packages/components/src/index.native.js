@@ -64,7 +64,6 @@ export {
 	BottomSheetProvider,
 	BottomSheetContext,
 } from './mobile/bottom-sheet/bottom-sheet-context';
-export { default as HTMLTextInput } from './mobile/html-text-input';
 export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
 export { default as ModalHeaderBar } from './mobile/modal-header-bar';
