@@ -86,18 +86,14 @@ function retrieveFastAverageColor() {
 }
 
 function CustomSizeControl( { value, onSelect } ) {
-	if ( [ 'cover', 'contain', 'initial'].indexOf( value ) >= 0 ) {
-		return null;
-	}
-
-	// Strip up and get value + units from the CSS inline.
+	// Split and pick up values + units from the CSS inline.
 	let inlineStyleValues = value && value.split( /(%|px)/ );
 	if ( inlineStyleValues.length < 2 ) {
 		inlineStyleValues = [];
 	}
 
 	const xValue = inlineStyleValues[ 0 ] || 50;
-	const xUnit = inlineStyleValues[ 1 ] || 'px';
+	const xUnit = inlineStyleValues[ 1 ] || '%';
 
 	return (
 		<CoverValueUnitInput
@@ -119,11 +115,20 @@ function CustomSizeControl( { value, onSelect } ) {
 	);
 }
 
-function BackgroundSizeControl( { size = 'cover', onSelect } ) {
-	const isCustomSize =
+/**
+ * Helper function to fetect if the given size is custom or not.
+ *
+ * @param {string} size - Background size
+ * @return {boolean} True if size is custom. Otherwise, False.
+ */
+function isCustomSize( size ) {
+	return (
 		SIZE_OPTIONS.map( ( opt ) => opt.slug ).indexOf( size ) < 0 ||
-		size === 'custom';
+		size === 'custom'
+	);
+}
 
+function BackgroundSizeControl( { size = 'cover', onSelect } ) {
 	return (
 		<BaseControl
 			label={ __( ' Background size' ) }
@@ -141,7 +146,7 @@ function BackgroundSizeControl( { size = 'cover', onSelect } ) {
 						label={ label }
 						isPressed={
 							slug === size ||
-							( slug === 'custom' && isCustomSize )
+							( slug === 'custom' && isCustomSize( size ) )
 						}
 						onClick={ () => onSelect( slug ) }
 					/>
@@ -350,6 +355,16 @@ function CoverEdit( {
 	const onSelectMedia = attributesFromMedia( setAttributes );
 	const isBlogUrl = isBlobURL( url );
 
+	// Store the previous background custom size.
+	const [ prevBackgroundSize, setPrevbackgroundSize ] = useState();
+	useEffect( () => {
+		if ( ! isCustomSize( backgroundSize ) ) {
+			return;
+		}
+
+		setPrevbackgroundSize( backgroundSize );
+	}, [ backgroundSize ] );
+
 	const toggleParallax = () => {
 		setAttributes( {
 			hasParallax: ! hasParallax,
@@ -451,10 +466,13 @@ function CoverEdit( {
 								<BackgroundSizeControl
 									size={ backgroundSize }
 									onSelect={ ( newSize ) => {
-										console.log( { newSize } );
 										setAttributes( {
-											backgroundSize: newSize,
-										} )
+											backgroundSize:
+												newSize === 'custom' &&
+												!! prevBackgroundSize
+													? prevBackgroundSize
+													: newSize,
+										} );
 									} }
 								/>
 							</Fragment>
