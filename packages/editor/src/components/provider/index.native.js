@@ -73,9 +73,14 @@ class NativeEditorProvider extends Component {
 	}
 
 	componentDidMount() {
-		const { capabilities } = this.props;
+		const { capabilities, colors, gradients } = this.props;
 
-		this.props.updateSettings( capabilities );
+		this.props.updateSettings( {
+			...capabilities,
+			// Set theme colors for the editor
+			...( colors ? { colors } : {} ),
+			...( gradients ? { gradients } : {} ),
+		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
 			this.serializeToNativeAction();
