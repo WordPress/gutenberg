@@ -452,12 +452,16 @@ class WP_Theme_JSON {
 				isset( $block_type->supports['__experimentalSelector'] ) &&
 				is_array( $block_type->supports['__experimentalSelector'] )
 			) {
-				foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector ) {
+				foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector_data ) {
 					self::$blocks_metadata[ $key ] = array(
-						'selector'  => $selector,
-						'supports'  => $block_supports,
-						'blockName' => $block_name,
+						'selector'   => $selector_data['selector'],
+						'supports'   => $block_supports,
+						'blockName'  => $block_name,
+						'attributes' => $selector_data['attributes'],
 					);
+					if ( isset( $selector_data['title'] ) ) {
+						self::$blocks_metadata[ $key ]['title'] = $selector_data['title'];
+					}
 				}
 			} else {
 				self::$blocks_metadata[ $block_name ] = array(
