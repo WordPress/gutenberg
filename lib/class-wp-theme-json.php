@@ -454,10 +454,10 @@ class WP_Theme_JSON {
 			) {
 				foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector_data ) {
 					self::$blocks_metadata[ $key ] = array(
-						'selector'   => $selector_data['selector'],
+						'selector'   => isset( $selector_data['selector'] ) ? $selector_data['selector'] : null,
 						'supports'   => $block_supports,
 						'blockName'  => $block_name,
-						'attributes' => $selector_data['attributes'],
+						'attributes' => isset( $selector_data['attributes'] ) ? $selector_data['attributes']  : null,
 					);
 					if ( isset( $selector_data['title'] ) ) {
 						self::$blocks_metadata[ $key ]['title'] = $selector_data['title'];
