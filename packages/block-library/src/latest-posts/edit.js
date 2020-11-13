@@ -513,7 +513,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							<a
 								href={ post.link }
 								target="_blank"
-								rel="noopener noreferrer"
+								rel="noopener"
 							>
 								{ __( 'Read more' ) }
 							</a>
@@ -530,7 +530,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 										<a
 											href={ post.link }
 											target="_blank"
-											rel="noreferrer noopener"
+											rel="noopener"
 										>
 											{ featuredImage }
 										</a>
@@ -542,7 +542,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 							<a
 								href={ post.link }
 								target="_blank"
-								rel="noreferrer noopener"
+								rel="noopener"
 							>
 								{ titleTrimmed ? (
 									<RawHTML>{ titleTrimmed }</RawHTML>

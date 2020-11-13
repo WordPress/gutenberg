@@ -25,7 +25,7 @@ import LinkRelIcon from './link-rel';
 
 import styles from './style.scss';
 
-const NEW_TAB_REL = 'noreferrer noopener';
+const NEW_TAB_REL = 'noopener';
 
 function LinkSettings( {
 	// Control link settings `BottomSheet` visibility

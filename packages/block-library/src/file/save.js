@@ -20,7 +20,7 @@ export default function save( { attributes } ) {
 					<a
 						href={ textLinkHref }
 						target={ textLinkTarget }
-						rel={ textLinkTarget ? 'noreferrer noopener' : false }
+						rel={ textLinkTarget ? 'noopener' : false }
 					>
 						<RichText.Content value={ fileName } />
 					</a>

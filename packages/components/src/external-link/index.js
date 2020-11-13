@@ -22,7 +22,7 @@ export function ExternalLink(
 	ref
 ) {
 	rel = uniq(
-		compact( [ ...rel.split( ' ' ), 'external', 'noreferrer', 'noopener' ] )
+		compact( [ ...rel.split( ' ' ), 'external', 'noopener' ] )
 	).join( ' ' );
 	const classes = classnames( 'components-external-link', className );
 	return (
