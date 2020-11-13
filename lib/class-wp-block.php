@@ -214,7 +214,7 @@ class WP_Block {
 		} else {
 			self::$currently_rendering[] = $this->parsed_block;
 		}
-		
+
 		global $post;
 		$options = array_replace(
 			array(
