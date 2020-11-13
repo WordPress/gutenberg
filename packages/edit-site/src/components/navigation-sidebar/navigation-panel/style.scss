@@ -106,3 +106,12 @@
 	font-size: 12px;
 	line-height: 16px;
 }
+
+.edit-site-navigation-panel__new-template-dropdown {
+	display: flex;
+	margin: 0 0 0 $grid-unit-15;
+
+	button {
+		margin: 0;
+	}
+}

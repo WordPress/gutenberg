@@ -120,6 +120,7 @@ require __DIR__ . '/widgets.php';
 require __DIR__ . '/navigation.php';
 require __DIR__ . '/navigation-page.php';
 require __DIR__ . '/experiments-page.php';
+require __DIR__ . '/class-wp-theme-json.php';
 require __DIR__ . '/global-styles.php';
 
 if ( ! class_exists( 'WP_Block_Supports' ) ) {

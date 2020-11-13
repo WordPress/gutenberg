@@ -399,23 +399,17 @@ extension RNReactNativeGutenbergBridge {
     }
 }
 
-extension RNReactNativeGutenbergBridge {
-    enum MediaKey {
-        static let id = "id"
-        static let url = "url"
-        static let type = "type"
-        static let caption = "caption"
-    }
-}
-
 extension MediaInfo {
-
+    /// Dynamically wraps up all properties into a Json Object to be sent to JS Side.
     func encodeForJS() -> [String: Any] {
-        return [
-            RNReactNativeGutenbergBridge.MediaKey.id: id as Any,
-            RNReactNativeGutenbergBridge.MediaKey.url: url as Any,
-            RNReactNativeGutenbergBridge.MediaKey.type: type as Any,
-            RNReactNativeGutenbergBridge.MediaKey.caption: caption as Any
-        ]
+        guard
+            let data = try? JSONEncoder().encode(self),
+            let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else
+        {
+            assertionFailure("Encoding of MediaInfo failed")
+            return [String: Any]()
+        }
+
+        return jsonObject
     }
 }

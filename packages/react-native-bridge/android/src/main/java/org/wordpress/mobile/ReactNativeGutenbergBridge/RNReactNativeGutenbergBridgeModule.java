@@ -313,14 +313,12 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     }
 
     private OtherMediaOptionsReceivedCallback getNewOtherMediaReceivedCallback(final Callback jsCallback) {
-        return new OtherMediaOptionsReceivedCallback() {
-            @Override public void onOtherMediaOptionsReceived(ArrayList<MediaOption> mediaOptions) {
-                WritableArray writableArray = new WritableNativeArray();
-                for (MediaOption mediaOption : mediaOptions) {
-                    writableArray.pushMap(mediaOption.toMap());
-                }
-                jsCallback.invoke(writableArray);
+        return mediaOptions -> {
+            WritableArray writableArray = new WritableNativeArray();
+            for (MediaOption mediaOption : mediaOptions) {
+                writableArray.pushMap(mediaOption.toMap());
             }
+            jsCallback.invoke(writableArray);
         };
     }
 

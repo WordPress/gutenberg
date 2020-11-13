@@ -30,7 +30,7 @@ const CONTROLS = {
 	},
 };
 
-const DEFAULT_ICON = CONTROLS.center.icon;
+const DEFAULT_ICON = CONTROLS.left.icon;
 
 /**
  * Dropdown for selecting a content justification option.

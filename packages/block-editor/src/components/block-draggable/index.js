@@ -69,7 +69,7 @@ const BlockDraggable = ( {
 	return (
 		<Draggable
 			cloneClassname={ cloneClassname }
-			elementId={ elementId || `block-${ clientIds[ 0 ] }` }
+			elementId={ elementId }
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
 				startDraggingBlocks( clientIds );
