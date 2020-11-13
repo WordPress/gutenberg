@@ -38,7 +38,6 @@ function DropdownMenu( {
 	className,
 	controls,
 	icon = 'menu',
-	iconPosition,
 	label,
 	popoverProps,
 	toggleProps,
@@ -116,7 +115,6 @@ function DropdownMenu( {
 					<Button
 						{ ...mergedToggleProps }
 						icon={ icon }
-						iconPosition={ iconPosition }
 						onClick={ ( event ) => {
 							onToggle( event );
 							if ( mergedToggleProps.onClick ) {
