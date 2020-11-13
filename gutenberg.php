@@ -101,7 +101,7 @@ add_action( 'admin_menu', 'gutenberg_menu', 9 );
  *
  * @since 9.4.0
  */
-function site_editor_menu() {
+function gutenberg_site_editor_menu() {
 	if ( gutenberg_is_fse_theme() ) {
 		add_menu_page(
 			__( 'Site Editor (beta)', 'gutenberg' ),
@@ -117,7 +117,7 @@ function site_editor_menu() {
 		);
 	}
 }
-add_action( 'admin_menu', 'site_editor_menu', 9 );
+add_action( 'admin_menu', 'gutenberg_site_editor_menu', 9 );
 
 /**
  * Modify WP admin bar.
