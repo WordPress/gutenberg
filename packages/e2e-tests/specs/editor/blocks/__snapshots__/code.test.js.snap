@@ -5,5 +5,3 @@ exports[`Code can be created by three backticks and enter 1`] = `
 <pre class=\\"wp-block-code\\"><code>&lt;?php</code></pre>
 <!-- /wp:code -->"
 `;
-
-exports[`Code should delete block when backspace in an empty code 1`] = `""`;

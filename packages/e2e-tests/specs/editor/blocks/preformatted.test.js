@@ -56,6 +56,6 @@ describe( 'Preformatted', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		// Expect preformatted block to be deleted.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 } );

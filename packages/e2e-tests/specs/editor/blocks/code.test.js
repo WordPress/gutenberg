@@ -30,6 +30,6 @@ describe( 'Code', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		// Expect code block to be deleted.
-		expect( await getEditedPostContent() ).toMatchSnapshot();
+		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 } );
