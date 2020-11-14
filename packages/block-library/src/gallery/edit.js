@@ -29,7 +29,7 @@ import { MediaPlaceholder, InspectorControls } from '@wordpress/block-editor';
 import { Platform, useEffect, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 
 /**
@@ -75,6 +75,7 @@ function GalleryEdit( props ) {
 		imageSizes,
 		resizedImages,
 		onFocus,
+		wasBlockJustInserted,
 	} = props;
 	const {
 		columns = defaultColumnsNumber( attributes ),
@@ -85,10 +86,6 @@ function GalleryEdit( props ) {
 	} = attributes;
 	const [ selectedImage, setSelectedImage ] = useState();
 	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
-	const [
-		alreadyAutoOpenedMediaUpload,
-		setAlreadyAutoOpenedMediaUpload,
-	] = useState();
 
 	function setAttributes( newAttrs ) {
 		if ( newAttrs.ids ) {
@@ -107,8 +104,6 @@ function GalleryEdit( props ) {
 		}
 
 		props.setAttributes( newAttrs );
-
-		setAlreadyAutoOpenedMediaUpload( true );
 	}
 
 	function onSelectImage( index ) {
@@ -341,7 +336,7 @@ function GalleryEdit( props ) {
 			notices={ hasImages ? undefined : noticeUI }
 			onFocus={ onFocus }
 			autoOpenMediaUpload={
-				! hasImages && isSelected && ! alreadyAutoOpenedMediaUpload
+				! hasImages && isSelected && wasBlockJustInserted()
 			}
 		/>
 	);
@@ -457,6 +452,22 @@ export default compose( [
 			imageSizes,
 			mediaUpload,
 			resizedImages,
+		};
+	} ),
+	withDispatch( ( dispatch, { clientId }, { select } ) => {
+		return {
+			wasBlockJustInserted() {
+				const { clearLastBlockInserted } = dispatch( 'core/editor' );
+				const { wasBlockJustInserted } = select( 'core/editor' );
+
+				const result = wasBlockJustInserted( clientId );
+
+				if ( result ) {
+					clearLastBlockInserted( clientId );
+					return true;
+				}
+				return false;
+			},
 		};
 	} ),
 	withNotices,
