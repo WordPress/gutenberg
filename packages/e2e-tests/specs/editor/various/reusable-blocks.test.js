@@ -346,6 +346,7 @@ describe( 'Reusable blocks', () => {
 		await page.waitForNavigation();
 
 		// Give focus to the editor
+		await page.waitForSelector( '.block-editor-writing-flow' );
 		await page.click( '.block-editor-writing-flow' );
 
 		// Move focus to the paragraph block
