@@ -248,7 +248,7 @@ describe( 'controls', () => {
 	describe( 'atomSelectors', () => {
 		const createUseSelectAtom = ( mapSelectToProps ) => {
 			return createDerivedAtom(
-				( get ) => {
+				( { get } ) => {
 					const current = registry.__unstableGetAtomResolver();
 					registry.__unstableSetAtomResolver( get );
 					const ret = mapSelectToProps( registry.select );

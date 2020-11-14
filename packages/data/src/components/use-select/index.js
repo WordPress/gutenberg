@@ -74,7 +74,7 @@ export default function useSelect( _mapSelect, deps ) {
 
 	const atomInstance = useMemo( () => {
 		return createDerivedAtom(
-			( get ) => {
+			( { get } ) => {
 				const current = registry.__unstableGetAtomResolver();
 				registry.__unstableSetAtomResolver( get );
 				let ret;

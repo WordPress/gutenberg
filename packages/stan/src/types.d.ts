@@ -72,9 +72,9 @@ export type WPAtomResolver = (atom: WPAtom<any> | WPAtomFamilyItem) => any;
 
 export type WPAtomUpdater = (atom: WPAtom<any> | WPAtomFamilyItem, value: any) => void;
 
-export type WPDerivedAtomResolver<T> = (resolver: WPAtomResolver) => T;
+export type WPDerivedAtomResolver<T> = (props: { get: WPAtomResolver } ) => T;
 
-export type WPDerivedAtomUpdater = (resolver: WPAtomResolver, update: WPAtomUpdater, value: any) => void;
+export type WPDerivedAtomUpdater = ( props: { get: WPAtomResolver, set: WPAtomUpdater }, value: any) => void;
 
 export type WPAtomFamilyResolver<T> = (key: any) => WPDerivedAtomResolver<any>;
 

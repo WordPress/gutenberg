@@ -6,7 +6,7 @@ import { createAtomRegistry, createAtom, createAtomFamily } from '../';
 describe( 'creating and subscribing to atom families', () => {
 	it( 'should allow adding and removing items to families', () => {
 		const itemsByIdAtom = createAtom( {} );
-		const itemFamilyAtom = createAtomFamily( ( key ) => ( get ) =>
+		const itemFamilyAtom = createAtomFamily( ( key ) => ( { get } ) =>
 			get( itemsByIdAtom )[ key ]
 		);
 
@@ -41,7 +41,7 @@ describe( 'creating and subscribing to atom families', () => {
 	it( 'should allow creating families based on other families', () => {
 		const itemsByIdAtom = createAtom( {}, 'items-by-id' );
 		const itemFamilyAtom = createAtomFamily(
-			( key ) => ( get ) => {
+			( key ) => ( { get } ) => {
 				return get( itemsByIdAtom )[ key ];
 			},
 			undefined,
@@ -50,7 +50,7 @@ describe( 'creating and subscribing to atom families', () => {
 		);
 		// Family atom that depends on another family atom.
 		const itemNameFamilyAtom = createAtomFamily(
-			( key ) => ( get ) => {
+			( key ) => ( { get } ) => {
 				return get( itemFamilyAtom( key ) )?.name;
 			},
 			undefined,
@@ -78,7 +78,7 @@ describe( 'creating and subscribing to atom families', () => {
 	it( 'should not recompute a family dependency if its untouched', () => {
 		const itemsByIdAtom = createAtom( {}, 'items-by-id' );
 		const itemFamilyAtom = createAtomFamily(
-			( key ) => ( get ) => {
+			( key ) => ( { get } ) => {
 				return get( itemsByIdAtom )[ key ];
 			},
 			undefined,
@@ -87,7 +87,7 @@ describe( 'creating and subscribing to atom families', () => {
 		);
 		// Family atom that depends on another family atom.
 		const itemNameFamilyAtom = createAtomFamily(
-			( key ) => ( get ) => {
+			( key ) => ( { get } ) => {
 				return get( itemFamilyAtom( key ) )?.name;
 			},
 			undefined,
@@ -132,8 +132,8 @@ describe( 'updating family atoms', () => {
 	it( 'should allow family atoms to update dependencies', () => {
 		const itemsByIdAtom = createAtom( {} );
 		const itemFamilyAtom = createAtomFamily(
-			( key ) => ( get ) => get( itemsByIdAtom )[ key ],
-			( key ) => ( get, set, value ) => {
+			( key ) => ( { get } ) => get( itemsByIdAtom )[ key ],
+			( key ) => ( { get, set }, value ) => {
 				set( itemsByIdAtom, {
 					...get( itemsByIdAtom ),
 					[ key ]: value,
@@ -151,8 +151,8 @@ describe( 'updating family atoms', () => {
 	it( 'should allow updating nested family atoms', () => {
 		const itemsByIdAtom = createAtom( {} );
 		const itemFamilyAtom = createAtomFamily(
-			( key ) => ( get ) => get( itemsByIdAtom )[ key ],
-			( key ) => ( get, set, value ) => {
+			( key ) => ( { get } ) => get( itemsByIdAtom )[ key ],
+			( key ) => ( { get, set }, value ) => {
 				set( itemsByIdAtom, {
 					...get( itemsByIdAtom ),
 					[ key ]: value,
@@ -160,8 +160,8 @@ describe( 'updating family atoms', () => {
 			}
 		);
 		const itemNameFamilyAtom = createAtomFamily(
-			( key ) => ( get ) => get( itemFamilyAtom( key ) ).name,
-			( key ) => ( get, set, value ) => {
+			( key ) => ( { get } ) => get( itemFamilyAtom( key ) ).name,
+			( key ) => ( { get, set }, value ) => {
 				set( itemFamilyAtom( key ), {
 					...get( itemFamilyAtom( key ) ),
 					name: value,

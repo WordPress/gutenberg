@@ -16,7 +16,7 @@ describe( 'creating derived atoms', () => {
 		const count2 = createAtom( 1 );
 		const count3 = createAtom( 1 );
 		const sum = createDerivedAtom(
-			( get ) => get( count1 ) + get( count2 ) + get( count3 )
+			( { get } ) => get( count1 ) + get( count2 ) + get( count3 )
 		);
 		const registry = createAtomRegistry();
 		const sumInstance = registry.getAtom( sum );
@@ -31,7 +31,7 @@ describe( 'creating derived atoms', () => {
 
 	it( 'should allow async derived atoms', async () => {
 		const count1 = createAtom( 1 );
-		const sum = createDerivedAtom( async ( get ) => {
+		const sum = createDerivedAtom( async ( { get } ) => {
 			const value = await Promise.resolve( 10 );
 			return get( count1 ) + value;
 		} );
@@ -47,10 +47,10 @@ describe( 'creating derived atoms', () => {
 	it( 'should allow nesting derived atoms', async () => {
 		const count1 = createAtom( 1 );
 		const count2 = createAtom( 10 );
-		const asyncCount = createDerivedAtom( async ( get ) => {
+		const asyncCount = createDerivedAtom( async ( { get } ) => {
 			return ( await get( count2 ) ) * 2;
 		} );
-		const sum = createDerivedAtom( async ( get ) => {
+		const sum = createDerivedAtom( async ( { get } ) => {
 			return get( count1 ) + get( asyncCount );
 		} );
 		const registry = createAtomRegistry();
@@ -68,7 +68,7 @@ describe( 'creating derived atoms', () => {
 		const count1 = createAtom( 1 );
 		const count2 = createAtom( 1 );
 		const sum = createDerivedAtom(
-			( get ) => get( count1 ) + get( count2 ) + mock()
+			( { get } ) => get( count1 ) + get( count2 ) + mock()
 		);
 		const registry = createAtomRegistry();
 		const sumInstance = registry.getAtom( sum );
@@ -93,7 +93,7 @@ describe( 'creating derived atoms', () => {
 		const count1 = createAtom( 1 );
 		const count2 = createAtom( 1 );
 		const sum = createDerivedAtom(
-			( get ) => get( count1 ) + get( count2 )
+			( { get } ) => get( count1 ) + get( count2 )
 		);
 		const registry = createAtomRegistry();
 		const sumInstance = registry.getAtom( sum );
@@ -115,8 +115,8 @@ describe( 'updating derived atoms', () => {
 		const count1 = createAtom( 1 );
 		const count2 = createAtom( 1 );
 		const sum = createDerivedAtom(
-			( get ) => get( count1 ) + get( count2 ),
-			( get, set, value ) => {
+			( { get } ) => get( count1 ) + get( count2 ),
+			( { set }, value ) => {
 				set( count1, value / 2 );
 				set( count2, value / 2 );
 			}
@@ -132,15 +132,15 @@ describe( 'updating derived atoms', () => {
 		const count1 = createAtom( 1 );
 		const count2 = createAtom( 1 );
 		const sum = createDerivedAtom(
-			( get ) => get( count1 ) + get( count2 ),
-			( get, set, value ) => {
+			( { get } ) => get( count1 ) + get( count2 ),
+			( { set }, value ) => {
 				set( count1, value / 2 );
 				set( count2, value / 2 );
 			}
 		);
 		const multiply = createDerivedAtom(
-			( get ) => get( sum ) * 3,
-			( get, set, value ) => {
+			( { get } ) => get( sum ) * 3,
+			( { set }, value ) => {
 				set( sum, value / 3 );
 			}
 		);

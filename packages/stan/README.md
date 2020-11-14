@@ -85,7 +85,7 @@ import { createAtom, createDerivedAtom } from '@wordpress/stan';
 const counter1 = createAtom( 1 );
 const counter2 = createAtom( 2 );
 const sum = createDerivedAtom(
-    ( get ) => get( counter1 ) + get( counter2 )
+    ( { get } ) => get( counter1 ) + get( counter2 )
 );
 ```
 
@@ -125,7 +125,7 @@ Derived atoms can use async functions to compute their values. They can for inst
 
 ```js
 const sum2 = createDerivedAtom(
-    async ( get ) => {
+    async ( { get } ) => {
         const val1 = await Promise.resolve(10);
         return val1 * get( counter );
     } 
