@@ -345,13 +345,10 @@ describe( 'Reusable blocks', () => {
 
 		await page.waitForNavigation();
 
-		// Give focus to the editor
-		await page.waitForSelector( '.block-editor-writing-flow' );
-		await page.click( '.block-editor-writing-flow' );
-
-		// Move focus to the paragraph block
-		await page.keyboard.press( 'Tab' );
-		await page.keyboard.press( 'Tab' );
+		// Click the block to give it focus
+		const blockSelector = 'p[data-title="Paragraph"]';
+		await page.waitForSelector( blockSelector );
+		await page.click( blockSelector );
 
 		// Delete the block, leaving the reusable block empty
 		await clickBlockToolbarButton( 'More options' );
