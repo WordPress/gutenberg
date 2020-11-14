@@ -3049,9 +3049,9 @@ describe( '__experimentalGetParsedReusableBlock', () => {
 	};
 
 	// Regression test for https://github.com/WordPress/gutenberg/issues/26485. See https://github.com/WordPress/gutenberg/issues/26548.
-	it( "should not throw an exception if reusable block's content.raw is an empty string", () => {
-		expect( () =>
-			__experimentalGetParsedReusableBlock( state, 1 )
-		).not.toThrowError();
+	it( "Should return an empty array if reusable block's content.raw is an empty string", () => {
+		expect( __experimentalGetParsedReusableBlock( state, 1 ) ).toEqual(
+			[]
+		);
 	} );
 } );
