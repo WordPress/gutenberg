@@ -19,7 +19,7 @@ import {
 	ToolbarGroup,
 	PanelBody,
 } from '@wordpress/components';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { withPreferredColorScheme, compose } from '@wordpress/compose';
 import {
 	BlockCaption,
 	MediaPlaceholder,
@@ -35,6 +35,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { video as SvgIcon, replace } from '@wordpress/icons';
+import { withDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -56,7 +57,6 @@ class VideoEdit extends React.Component {
 		this.state = {
 			isCaptionSelected: false,
 			videoContainerHeight: 0,
-			alreadyAutoOpenedMediaUpload: false,
 		};
 
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
@@ -157,9 +157,6 @@ class VideoEdit extends React.Component {
 	onSelectMediaUploadOption( { id, url } ) {
 		const { setAttributes } = this.props;
 		setAttributes( { id, src: url } );
-		this.setState( {
-			alreadyAutoOpenedMediaUpload: true,
-		} );
 	}
 
 	onVideoContanerLayout( event ) {
@@ -193,12 +190,14 @@ class VideoEdit extends React.Component {
 	}
 
 	render() {
-		const { setAttributes, attributes, isSelected } = this.props;
-		const { id, src } = attributes;
 		const {
-			videoContainerHeight,
-			alreadyAutoOpenedMediaUpload,
-		} = this.state;
+			setAttributes,
+			attributes,
+			isSelected,
+			wasBlockJustInserted,
+		} = this.props;
+		const { id, src } = attributes;
+		const { videoContainerHeight } = this.state;
 
 		const toolbarEditButton = (
 			<MediaUpload
@@ -229,9 +228,7 @@ class VideoEdit extends React.Component {
 						icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 						onFocus={ this.props.onFocus }
 						autoOpenMediaUpload={
-							isSelected &&
-							! src &&
-							! alreadyAutoOpenedMediaUpload
+							isSelected && ! src && wasBlockJustInserted()
 						}
 					/>
 				</View>
@@ -371,4 +368,22 @@ class VideoEdit extends React.Component {
 	}
 }
 
-export default withPreferredColorScheme( VideoEdit );
+export default compose( [
+	withDispatch( ( dispatch, { clientId }, { select } ) => {
+		return {
+			wasBlockJustInserted() {
+				const { clearLastBlockInserted } = dispatch( 'core/editor' );
+				const { wasBlockJustInserted } = select( 'core/editor' );
+
+				const result = wasBlockJustInserted( clientId );
+
+				if ( result ) {
+					clearLastBlockInserted( clientId );
+					return true;
+				}
+				return false;
+			},
+		};
+	} ),
+	withPreferredColorScheme,
+] )( VideoEdit );
