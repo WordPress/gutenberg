@@ -575,13 +575,13 @@ export default compose( [
 	withDispatch( ( dispatch, { clientId }, { select } ) => {
 		return {
 			wasBlockJustInserted() {
-				const { removeBlockInsertionEvent } = dispatch( 'core/editor' );
+				const { clearLastBlockInserted } = dispatch( 'core/editor' );
 				const { wasBlockJustInserted } = select( 'core/editor' );
 
 				const result = wasBlockJustInserted( clientId );
 
 				if ( result ) {
-					removeBlockInsertionEvent( clientId );
+					clearLastBlockInserted( clientId );
 					return true;
 				}
 				return false;

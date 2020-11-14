@@ -229,7 +229,7 @@ export default compose(
 			insertDefaultBlock,
 		} = dispatch( 'core/block-editor' );
 
-		const { createBlockInsertionEvent } = dispatch( 'core/editor' );
+		const { addLastBlockInserted } = dispatch( 'core/editor' );
 
 		return {
 			showInsertionPoint() {
@@ -270,7 +270,7 @@ export default compose(
 
 				const { clientId } = insertedBlock;
 
-				createBlockInsertionEvent( clientId );
+				addLastBlockInserted( clientId );
 
 				insertBlock(
 					insertedBlock,

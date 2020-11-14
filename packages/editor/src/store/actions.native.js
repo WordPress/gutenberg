@@ -92,9 +92,9 @@ export function removeNotice( id ) {
  *
  * @return {Object} Action object.
  */
-export function createBlockInsertionEvent( clientId ) {
+export function addLastBlockInserted( clientId ) {
 	return {
-		type: 'CREATE_BLOCK_INSERTION_EVENT',
+		type: 'ADD_LAST_BLOCK_INSERTED',
 		clientId,
 	};
 }
@@ -106,9 +106,9 @@ export function createBlockInsertionEvent( clientId ) {
  *
  * @return {Object} Action object.
  */
-export function removeBlockInsertionEvent( clientId ) {
+export function clearLastBlockInserted( clientId ) {
 	return {
-		type: 'REMOVE_BLOCK_INSERTION_EVENT',
+		type: 'CLEAR_LAST_BLOCK_INSERTED',
 		clientId,
 	};
 }

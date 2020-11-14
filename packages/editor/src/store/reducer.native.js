@@ -93,12 +93,12 @@ export function notices( state = [], action ) {
  *
  * @return {Object} Updated state.
  */
-export function blockInsertionEvent( state = {}, action ) {
+export function lastBlockInserted( state = {}, action ) {
 	switch ( action.type ) {
-		case 'CREATE_BLOCK_INSERTION_EVENT':
+		case 'ADD_LAST_BLOCK_INSERTED':
 			return { ...state, clientId: action.clientId };
 
-		case 'REMOVE_BLOCK_INSERTION_EVENT':
+		case 'CLEAR_LAST_BLOCK_INSERTED':
 			return {};
 	}
 	return state;
@@ -118,6 +118,6 @@ export default optimist(
 		editorSettings,
 		clipboard,
 		notices,
-		blockInsertionEvent,
+		lastBlockInserted,
 	} )
 );
