@@ -443,7 +443,9 @@ export class ImageEdit extends React.Component {
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getPlaceholderIcon() }
 						onFocus={ this.props.onFocus }
-						autoOpenMediaUpload={ wasBlockJustInserted() }
+						autoOpenMediaUpload={
+							isSelected && ! url && wasBlockJustInserted()
+						}
 					/>
 				</View>
 			);
