@@ -35,7 +35,7 @@ A short-list of useful articles around defining, extending, and contributing to 
 
 ## Talks
 
-Talks were given about Gutenberg, including slides and videos as they are available.
+Talks given about Gutenberg, including slides and videos as they are available.
 
 ### Slides
 - [The new core WordPress editor](http://kimb.me/talk-bigwp-london-new-core-wordpress-editor/) at BigWP London (18. May 2017)
@@ -62,4 +62,3 @@ https://www.facebook.com/events/278785795934302/
 https://www.meetup.com/WordPress-Melbourne/events/241543639
 
 https://wpmeetups.de/termin/29-wp-meetup-stuttgart-gutenberg-editor-rueckblick-wordcamp-europe/
-

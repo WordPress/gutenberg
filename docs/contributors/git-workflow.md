@@ -43,7 +43,7 @@ git push --force-with-lease origin your-branch-name
 
 Working on a pull request starts with forking the Gutenberg repository, your separate working copy. Which can easily go out of sync as new pull requests are merged into the main repository. Here your working repository is a `fork` and the main Gutenberg repository is `upstream`. When working on a new pull request you should always update your fork before you do `git checkout -b my-new-branch` to work on a feature or fix.
 
-You will need to add an `upstream` remote in the order to keep your fork updated.
+You will need to add an `upstream` remote in order to keep your fork updated.
 
 ```sh
 git remote add upstream https://github.com/WordPress/gutenberg.git
