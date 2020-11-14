@@ -37,7 +37,6 @@ export {
 	insertBlockDirectoryBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
-	toggleGlobalBlockInserter,
 } from './inserter';
 export { installPlugin } from './install-plugin';
 export { installTheme } from './install-theme';
