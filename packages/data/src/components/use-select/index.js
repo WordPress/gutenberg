@@ -10,6 +10,7 @@ import {
 } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
 import { createDerivedAtom } from '@wordpress/stan';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -60,23 +61,40 @@ import useRegistry from '../registry-provider/use-registry';
  */
 export default function useSelect( _mapSelect, deps ) {
 	const mapSelect = useCallback( _mapSelect, deps );
-	const previousMapSelect = useRef();
+	const previousMapSelect = usePrevious( mapSelect );
 	const result = useRef();
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
 	const [ , dispatch ] = useState( {} );
 	const rerender = () => dispatch( {} );
 	const isMountedAndNotUnsubscribing = useRef( true );
-
-	// This is important to handle zombie bugs ,
-	// Unfortunately, it seems tthere's no way around them for Redux subscriptions.
 	const previousMapError = useRef();
+	const shouldSyncCompute =
+		previousMapSelect !== mapSelect || !! previousMapError.current;
+
+	const atomInstance = useMemo( () => {
+		return createDerivedAtom(
+			( get ) => {
+				const current = registry.__unstableGetAtomResolver();
+				registry.__unstableSetAtomResolver( get );
+				let ret;
+				try {
+					ret = mapSelect( registry.select, registry );
+				} catch ( error ) {
+					ret = result.current;
+					previousMapError.current = error;
+				}
+				registry.__unstableSetAtomResolver( current );
+				return ret;
+			},
+			() => {},
+			isAsync
+		)( registry.getAtomRegistry() );
+	}, [ isAsync, registry, mapSelect ] );
+
 	try {
-		if (
-			previousMapSelect.current !== mapSelect ||
-			previousMapError.current
-		) {
-			result.current = mapSelect( registry.select, registry );
+		if ( shouldSyncCompute ) {
+			result.current = atomInstance.get();
 		}
 	} catch ( error ) {
 		let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
@@ -91,63 +109,33 @@ export default function useSelect( _mapSelect, deps ) {
 			console.error( errorMessage );
 		}
 	}
-
 	useLayoutEffect( () => {
-		previousMapSelect.current = mapSelect;
-		isMountedAndNotUnsubscribing.current = true;
 		previousMapError.current = undefined;
+		isMountedAndNotUnsubscribing.current = true;
 	} );
 
-	const atomCreator = useMemo( () => {
-		return createDerivedAtom(
-			( get ) => {
-				const current = registry.__unstableGetAtomResolver();
-				registry.__unstableSetAtomResolver( get );
-				let ret;
-				try {
-					ret = previousMapSelect.current(
-						registry.select,
-						registry
-					);
-				} catch ( error ) {
-					ret = result.current;
-					previousMapError.current = error;
-				}
-				registry.__unstableSetAtomResolver( current );
-				return ret;
-			},
-			() => {},
-			isAsync
-		);
-	}, [ isAsync, registry ] );
-
 	useLayoutEffect( () => {
-		const atom = atomCreator( registry.getAtomRegistry() );
-
 		const onStoreChange = () => {
 			if (
 				isMountedAndNotUnsubscribing.current &&
-				! isShallowEqual( atom.get(), result.current )
+				! isShallowEqual( atomInstance.get(), result.current )
 			) {
-				result.current = atom.get();
+				result.current = atomInstance.get();
 				rerender();
 			}
 		};
-		const unsubscribe = atom.subscribe( () => {
+		const unsubscribe = atomInstance.subscribe( () => {
 			onStoreChange();
 		} );
 
-		// This is necessary
-		// If the value changes during mount
-		// It also important to run after "subscribe"
-		// Otherwise the atom value won't be resolved.
+		// This is necessary if the value changes during mount.
 		onStoreChange();
 
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;
 			unsubscribe();
 		};
-	}, [ atomCreator ] );
+	}, [ atomInstance ] );
 
 	return result.current;
 }

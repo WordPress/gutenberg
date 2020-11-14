@@ -62,21 +62,31 @@ describe( 'creating derived atoms', () => {
 		unsubscribe();
 	} );
 
-	it( 'should only compute derived atoms when they have subscribers be lazy', () => {
+	it( 'should only compute derived atoms when they have subscribers or when you try to retrieve their value', () => {
+		const mock = jest.fn();
+		mock.mockImplementation( () => 10 );
 		const count1 = createAtom( 1 );
 		const count2 = createAtom( 1 );
 		const sum = createDerivedAtom(
-			( get ) => get( count1 ) + get( count2 )
+			( get ) => get( count1 ) + get( count2 ) + mock()
 		);
 		const registry = createAtomRegistry();
 		const sumInstance = registry.getAtom( sum );
-		expect( sumInstance.get() ).toEqual( null );
-		const unsubscribe = sumInstance.subscribe( () => {} );
-		expect( sumInstance.get() ).toEqual( 2 );
-		unsubscribe();
-		// This shouldn't recompute the derived atom because it doesn't have any subscriber.
+		// Creating an atom or adding it to the registry don't trigger its resolution
+		expect( mock ).not.toHaveBeenCalled();
+		expect( sumInstance.get() ).toEqual( 12 );
+		// Calling "get" triggers a resolution.
+		expect( mock ).toHaveBeenCalledTimes( 1 );
+
+		// This shouldn't trigger the resolution because the atom has no listener.
 		registry.getAtom( count1 ).set( 2 );
-		expect( sumInstance.get() ).toEqual( 2 );
+		expect( mock ).toHaveBeenCalledTimes( 1 );
+
+		// Subscribing triggers the resolution again.
+		const unsubscribe = sumInstance.subscribe( () => {} );
+		expect( mock ).toHaveBeenCalledTimes( 2 );
+		expect( sumInstance.get() ).toEqual( 13 );
+		unsubscribe();
 	} );
 
 	it( 'should notify subscribers on change', () => {

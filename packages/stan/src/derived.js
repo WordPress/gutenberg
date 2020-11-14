@@ -86,8 +86,9 @@ export const createDerivedAtom = (
 		try {
 			result = resolver( ( atomCreator ) => {
 				const atomInstance = registry.getAtom( atomCreator );
-				// It is important to add the dependency before the "get" all
-				// This allows the resolution to trigger.
+				// It is important to add the dependency as soon as it's used
+				// because it's important to retrigger the resolution if the dependency
+				// changes before the resolution finishes.
 				addDependency( atomInstance );
 				updatedDependenciesMap.set( atomInstance, true );
 				updatedDependencies.push( atomInstance );
@@ -152,6 +153,10 @@ export const createDerivedAtom = (
 		id,
 		type: 'derived',
 		get() {
+			if ( ! isListening ) {
+				isListening = true;
+				resolve();
+			}
 			return value;
 		},
 		async set( action ) {
@@ -167,8 +172,8 @@ export const createDerivedAtom = (
 		resolve,
 		subscribe( listener ) {
 			if ( ! isListening ) {
-				resolve();
 				isListening = true;
+				resolve();
 			}
 			listeners.push( listener );
 			return () =>

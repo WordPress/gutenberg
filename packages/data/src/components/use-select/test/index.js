@@ -47,8 +47,7 @@ describe( 'useSelect', () => {
 		const testInstance = renderer.root;
 		// 2 times expected
 		// - 1 for initial mount
-		// - 1 for after mount before subscription set.
-		expect( selectSpy ).toHaveBeenCalledTimes( 2 );
+		expect( selectSpy ).toHaveBeenCalledTimes( 1 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
 		// ensure expected state was rendered
@@ -82,7 +81,7 @@ describe( 'useSelect', () => {
 		} );
 		const testInstance = renderer.root;
 
-		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 1 );
 		expect( selectSpyBar ).toHaveBeenCalledTimes( 0 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -100,7 +99,7 @@ describe( 'useSelect', () => {
 			);
 		} );
 
-		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 1 );
 		expect( selectSpyBar ).toHaveBeenCalledTimes( 0 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 
@@ -119,7 +118,7 @@ describe( 'useSelect', () => {
 			);
 		} );
 
-		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 1 );
 		expect( selectSpyBar ).toHaveBeenCalledTimes( 1 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 3 );
 
@@ -201,7 +200,7 @@ describe( 'useSelect', () => {
 				expect( testInstance.findByType( 'div' ).props.data ).toEqual(
 					valueB
 				);
-				expect( mapSelectSpy ).toHaveBeenCalledTimes( 3 );
+				expect( mapSelectSpy ).toHaveBeenCalledTimes( 2 );
 			}
 		);
 	} );
