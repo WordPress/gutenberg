@@ -600,10 +600,6 @@ running the test is not already the admin user).
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
 
-<a name="toggleGlobalBlockInserter" href="#toggleGlobalBlockInserter">#</a> **toggleGlobalBlockInserter**
-
-Toggles the global inserter.
-
 <a name="toggleMoreMenu" href="#toggleMoreMenu">#</a> **toggleMoreMenu**
 
 Toggles the More Menu.
