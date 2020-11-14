@@ -357,8 +357,14 @@ describe( 'Reusable blocks', () => {
 		);
 		deleteButton.click();
 
+		// Wait for the Update button to become enabled
+		const publishButtonSelector = '.editor-post-publish-button__button';
+		await page.waitForSelector(
+			publishButtonSelector + '[aria-disabled="false"]'
+		);
+
 		// Save the reusable block
-		await page.click( '.editor-post-publish-button__button' );
+		await page.click( publishButtonSelector );
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Reusable Block updated."]'
 		);
