@@ -86,7 +86,7 @@ export function removeNotice( id ) {
 }
 
 /**
- * Returns an action object to create a block insertion event.
+ * Returns an action object to track the last block that was inserted.
  *
  * @param {Object} clientId The client id of the block.
  *
@@ -100,7 +100,7 @@ export function addLastBlockInserted( clientId ) {
 }
 
 /**
- * Returns an action object to remove a block insertion event by client id.
+ * Returns an action object to clear the last block that was inserted.
  *
  * @param {Object} clientId The id of the block to remove.
  *
