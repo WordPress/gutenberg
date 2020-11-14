@@ -36,6 +36,18 @@
 		background-repeat: repeat;
 	}
 
+	&.is-cover-background-size {
+		background-size: cover;
+	}
+
+	&.is-contain-background-size {
+		background-size: contain;
+	}
+
+	&.is-initial-background-size {
+		background-size: initial;
+	}
+
 	/**
 	 * Set a default background color for has-background-dim _unless_ it includes another
 	 * background-color class (e.g. has-green-background-color). The presence of another
