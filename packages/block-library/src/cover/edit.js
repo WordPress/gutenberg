@@ -203,7 +203,7 @@ function CustomSizeControl( { value, onSelect } ) {
  * @param {string} size - Background size
  * @return {boolean} True if size is custom. Otherwise, False.
  */
-function isCustomSize( size ) {
+export function isCustomSize( size ) {
 	return (
 		SIZE_OPTIONS.map( ( opt ) => opt.slug ).indexOf( size ) < 0 ||
 		size === 'custom'
