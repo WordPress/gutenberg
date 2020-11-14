@@ -79,11 +79,11 @@ export function getNotices( state ) {
 }
 
 /**
- * Returns the current block insertion event.
+ * Tells if the block with the passed clientId was just inserted.
  *
  * @param {Object} state Global application state.
  * @param {Object} clientId client id of the block.
- * @return {boolean} If block inserrtion event exists then the block was just inserted.
+ * @return {boolean} If a client id exists within the lastBlockInserted state then the block was just inserted.
  */
 export function wasBlockJustInserted( state, clientId ) {
 	return state.lastBlockInserted.clientId === clientId;
