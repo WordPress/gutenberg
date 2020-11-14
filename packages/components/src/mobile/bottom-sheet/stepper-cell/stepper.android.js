@@ -22,6 +22,8 @@ function Stepper( {
 	onPressInIncrement,
 	onPressOut,
 	value,
+	shouldDisplayTextInput,
+	children,
 } ) {
 	const valueStyle = getStylesFromColorScheme(
 		styles.value,
@@ -33,11 +35,7 @@ function Stepper( {
 	);
 
 	return (
-		<View
-			style={ styles.container }
-			accesibility={ false }
-			importantForAccessibility="no-hide-descendants"
-		>
+		<View style={ styles.container }>
 			<TouchableOpacity
 				disabled={ isMinValue }
 				onPressIn={ onPressInDecrement }
@@ -49,11 +47,14 @@ function Stepper( {
 			>
 				<Icon
 					icon={ chevronDown }
-					size={ 18 }
+					size={ 24 }
 					color={ buttonIconStyle.color }
 				/>
 			</TouchableOpacity>
-			<Text style={ valueStyle }>{ value }</Text>
+			{ ! shouldDisplayTextInput && (
+				<Text style={ [ valueStyle, styles.spacings ] }>{ value }</Text>
+			) }
+			{ children }
 			<TouchableOpacity
 				disabled={ isMaxValue }
 				onPressIn={ onPressInIncrement }
@@ -65,7 +66,7 @@ function Stepper( {
 			>
 				<Icon
 					icon={ chevronUp }
-					size={ 18 }
+					size={ 24 }
 					color={ buttonIconStyle.color }
 				/>
 			</TouchableOpacity>

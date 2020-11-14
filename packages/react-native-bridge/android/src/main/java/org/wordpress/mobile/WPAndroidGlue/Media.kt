@@ -13,13 +13,15 @@ data class Media(
     override val id: Int,
     override val url: String,
     override val type: String,
-    override val caption: String = ""
+    override val caption: String = "",
+    override val title: String = ""
 ) : RNMedia {
     override fun toMap(): WritableMap = WritableNativeMap().apply {
         putInt("id", id)
         putString("url", url)
         putString("type", type)
         putString("caption", caption)
+        putString("title", title)
     }
 
     companion object {
@@ -28,7 +30,8 @@ data class Media(
             id: Int,
             url: String,
             mimeType: String?,
-            caption: String?
+            caption: String?,
+            title: String?
         ): Media {
             val isMediaType = { mediaType: MediaType ->
                 mimeType?.startsWith(mediaType.name.toLowerCase(Locale.ROOT)) == true
@@ -38,7 +41,7 @@ data class Media(
                 isMediaType(VIDEO) -> VIDEO
                 else -> OTHER
             }.name.toLowerCase(Locale.ROOT)
-            return Media(id, url, type, caption ?: "")
+            return Media(id, url, type, caption ?: "", title ?: "")
         }
     }
 }

@@ -30,8 +30,11 @@ export default function FormatEdit( {
 	value,
 	allowedFormats,
 	withoutInteractiveFormatting,
+	forwardedRef,
 } ) {
-	return formatTypes.map( ( { name, edit: Edit, tagName } ) => {
+	return formatTypes.map( ( settings ) => {
+		const { name, edit: Edit, tagName } = settings;
+
 		if ( ! Edit ) {
 			return null;
 		}
@@ -67,6 +70,7 @@ export default function FormatEdit( {
 				value={ value }
 				onChange={ onChange }
 				onFocus={ onFocus }
+				contentRef={ forwardedRef }
 			/>
 		);
 	} );

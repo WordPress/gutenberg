@@ -27,6 +27,7 @@ import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
+import { defaultLayout, LayoutProvider } from './layout';
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -48,6 +49,8 @@ function UncontrolledInnerBlocks( props ) {
 		__experimentalAppenderTagName,
 		renderAppender,
 		orientation,
+		placeholder,
+		__experimentalLayout: layout = defaultLayout,
 	} = props;
 
 	useNestedSettingsUpdate(
@@ -82,14 +85,19 @@ function UncontrolledInnerBlocks( props ) {
 	// This component needs to always be synchronous as it's the one changing
 	// the async mode depending on the block selection.
 	return (
-		<BlockContextProvider value={ context }>
-			<BlockListItems
-				rootClientId={ clientId }
-				renderAppender={ renderAppender }
-				__experimentalAppenderTagName={ __experimentalAppenderTagName }
-				wrapperRef={ wrapperRef }
-			/>
-		</BlockContextProvider>
+		<LayoutProvider value={ layout }>
+			<BlockContextProvider value={ context }>
+				<BlockListItems
+					rootClientId={ clientId }
+					renderAppender={ renderAppender }
+					__experimentalAppenderTagName={
+						__experimentalAppenderTagName
+					}
+					wrapperRef={ wrapperRef }
+					placeholder={ placeholder }
+				/>
+			</BlockContextProvider>
+		</LayoutProvider>
 	);
 }
 

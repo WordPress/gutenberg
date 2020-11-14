@@ -21,6 +21,7 @@ export { BlockNavigationBlockFill as __experimentalBlockNavigationBlockFill } fr
 export { default as __experimentalBlockNavigationEditor } from './block-navigation/editor';
 export { default as __experimentalBlockNavigationTree } from './block-navigation/tree';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
+export { default as __experimentalBlockVariationTransforms } from './block-variation-transforms';
 export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
 export { default as ButtonBlockerAppender } from './button-block-appender';
 export { default as ColorPalette } from './color-palette';
@@ -29,6 +30,8 @@ export { default as ContrastChecker } from './contrast-checker';
 export { default as __experimentalGradientPicker } from './gradient-picker';
 export { default as __experimentalGradientPickerControl } from './gradient-picker/control';
 export { default as __experimentalGradientPickerPanel } from './gradient-picker/panel';
+export { default as __experimentalFontAppearanceControl } from './font-appearance-control';
+export { default as __experimentalFontFamilyControl } from './font-family';
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export { default as __experimentalImageSizeControl } from './image-size-control';

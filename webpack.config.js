@@ -55,6 +55,9 @@ module.exports = {
 					output: {
 						comments: /translators:/i,
 					},
+					compress: {
+						passes: 2,
+					},
 				},
 				extractComments: false,
 			} ),
@@ -71,7 +74,7 @@ module.exports = {
 		filename: './build/[basename]/index.js',
 		path: __dirname,
 		library: [ 'wp', '[name]' ],
-		libraryTarget: 'this',
+		libraryTarget: 'window',
 	},
 	module: {
 		rules: compact( [

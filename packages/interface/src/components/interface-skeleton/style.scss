@@ -37,6 +37,7 @@ html.interface-interface-skeleton__html-container {
 	display: flex;
 	flex-direction: column;
 	flex-grow: 1;
+	max-width: 100%;
 }
 
 @include editor-left(".interface-interface-skeleton");
@@ -61,6 +62,11 @@ html.interface-interface-skeleton__html-container {
 	// it is added, it should take care of the issue.
 	// See also: https://drafts.csswg.org/css-overscroll/
 	overscroll-behavior-y: none;
+
+	// Footer overlap prevention
+	@include break-medium() {
+		padding-bottom: $button-size-small + $border-width;
+	}
 }
 
 .interface-interface-skeleton__content {
@@ -79,10 +85,9 @@ html.interface-interface-skeleton__html-container {
 
 }
 
-.interface-interface-skeleton__left-sidebar,
+.interface-interface-skeleton__secondary-sidebar,
 .interface-interface-skeleton__sidebar {
 	display: block;
-	width: auto; // Keep the sidebar width flexible.
 	flex-shrink: 0;
 	position: absolute;
 	z-index: z-index(".interface-interface-skeleton__sidebar");
@@ -97,6 +102,7 @@ html.interface-interface-skeleton__html-container {
 	@include break-medium() {
 		position: relative !important;
 		z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
+		width: auto; // Keep the sidebar width flexible.
 	}
 }
 
@@ -107,7 +113,7 @@ html.interface-interface-skeleton__html-container {
 	}
 }
 
-.interface-interface-skeleton__left-sidebar {
+.interface-interface-skeleton__secondary-sidebar {
 	@include break-medium() {
 		border-right: $border-width solid $gray-200;
 	}
@@ -141,6 +147,13 @@ html.interface-interface-skeleton__html-container {
 	width: 100%;
 	background-color: $white;
 	z-index: z-index(".interface-interface-skeleton__footer");
+
+	// When the navigate regions shortcut is used it applies position: relative
+	// to regions. The footer should always stay stuck to the bottom though, so
+	// override using a more specific selector with position: fixed.
+	.is-focusing-regions &[role="region"] {
+		position: fixed;
+	}
 
 	// On Mobile the footer is hidden
 	display: none;

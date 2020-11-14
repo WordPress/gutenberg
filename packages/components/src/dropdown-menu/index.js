@@ -43,6 +43,7 @@ function DropdownMenu( {
 	toggleProps,
 	menuProps,
 	disableOpenOnArrowDown = false,
+	text,
 	// The following props exist for backward compatibility.
 	menuLabel,
 	position,
@@ -129,6 +130,7 @@ function DropdownMenu( {
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
 						label={ label }
+						text={ text }
 						showTooltip={ toggleProps?.showTooltip ?? true }
 					>
 						{ mergedToggleProps.children }

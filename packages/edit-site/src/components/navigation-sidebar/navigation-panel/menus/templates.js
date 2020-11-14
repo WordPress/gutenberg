@@ -1,18 +1,23 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
 	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import TemplatesPagesMenu from './templates-pages';
-import TemplateNavigationItems from '../template-navigation-items';
-import TemplatePostsMenu from './templates-posts';
+import TemplatesPostsMenu from './templates-posts';
 import {
 	MENU_ROOT,
 	MENU_TEMPLATES,
@@ -21,10 +26,11 @@ import {
 	MENU_TEMPLATES_POSTS,
 	TEMPLATES_GENERAL,
 } from '../constants';
-import { useSelect } from '@wordpress/data';
 import TemplatesAllMenu from './templates-all';
+import NewTemplateDropdown from '../new-template-dropdown';
+import TemplateNavigationItem from '../template-navigation-item';
 
-export default function TemplatesMenu( { onActivateItem } ) {
+export default function TemplatesMenu() {
 	const templates = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
@@ -42,8 +48,15 @@ export default function TemplatesMenu( { onActivateItem } ) {
 		<NavigationMenu
 			menu={ MENU_TEMPLATES }
 			title={ __( 'Templates' ) }
+			titleAction={ <NewTemplateDropdown /> }
 			parentMenu={ MENU_ROOT }
 		>
+			{ map( generalTemplates, ( template ) => (
+				<TemplateNavigationItem
+					item={ template }
+					key={ `wp_template-${ template.id }` }
+				/>
+			) ) }
 			<NavigationItem
 				navigateToMenu={ MENU_TEMPLATES_ALL }
 				title={ _x( 'All', 'all templates' ) }
@@ -56,26 +69,9 @@ export default function TemplatesMenu( { onActivateItem } ) {
 				navigateToMenu={ MENU_TEMPLATES_POSTS }
 				title={ __( 'Posts' ) }
 			/>
-
-			<TemplateNavigationItems
-				templates={ generalTemplates }
-				onActivateItem={ onActivateItem }
-			/>
-
-			<TemplatePostsMenu
-				templates={ templates }
-				onActivateItem={ onActivateItem }
-			/>
-
-			<TemplatesPagesMenu
-				templates={ templates }
-				onActivateItem={ onActivateItem }
-			/>
-
-			<TemplatesAllMenu
-				templates={ templates }
-				onActivateItem={ onActivateItem }
-			/>
+			<TemplatesPostsMenu templates={ templates } />
+			<TemplatesPagesMenu templates={ templates } />
+			<TemplatesAllMenu templates={ templates } />
 		</NavigationMenu>
 	);
 }

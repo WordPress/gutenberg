@@ -148,6 +148,9 @@ describe( 'Multi-block selection', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
 		await pressKeyWithModifier( 'shift', 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '3' );
+		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.type( '2' );
 
 		await pressKeyWithModifier( 'shift', 'ArrowUp' );
@@ -305,12 +308,22 @@ describe( 'Multi-block selection', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
-		await page.keyboard.type( '/cover' );
+		await page.keyboard.type( '/group' );
 		await page.waitForXPath(
-			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Cover')]`
+			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Group')]`
 		);
 		await page.keyboard.press( 'Enter' );
-		await page.click( '.components-circular-option-picker__option' );
+
+		const groupAppender = await page.waitForSelector(
+			'.block-editor-button-block-appender'
+		);
+		await groupAppender.click();
+
+		const paragraphBlockButton = await page.waitForSelector(
+			'.editor-block-list-item-paragraph'
+		);
+		await paragraphBlockButton.click();
+
 		await page.keyboard.type( '2' );
 
 		const [ coord1, coord2 ] = await page.evaluate( () => {
@@ -319,6 +332,7 @@ describe( 'Multi-block selection', () => {
 			);
 			const rect1 = elements[ 0 ].getBoundingClientRect();
 			const rect2 = elements[ 1 ].getBoundingClientRect();
+
 			return [
 				{
 					x: rect1.x + rect1.width / 2,

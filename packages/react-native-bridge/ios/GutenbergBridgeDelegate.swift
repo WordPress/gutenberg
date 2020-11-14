@@ -1,19 +1,22 @@
-public struct MediaInfo {
+public struct MediaInfo: Encodable {
     public let id: Int32?
     public let url: String?
     public let type: String?
+    public let title: String?
     public let caption: String?
 
-    public init(id: Int32?, url: String?, type: String?, caption: String? = nil) {
+    public init(id: Int32?, url: String?, type: String?, caption: String? = nil, title: String? = nil) {
         self.id = id
         self.url = url
         self.type = type
         self.caption = caption
+        self.title = title
     }
 }
 
 /// Definition of capabilities to enable in the Block Editor
 public enum Capabilities: String {
+    case mediaFilesCollectionBlock
     case mentions
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
@@ -117,10 +120,10 @@ extension RCTLogLevel {
 }
 
 public enum GutenbergUserEvent {
-    
+
     case editorSessionTemplateApply(_ template: String)
     case editorSessionTemplatePreview(_ template: String)
-    
+
     init?(event: String, properties:[AnyHashable: Any]?) {
         switch event {
         case "editor_session_template_apply":
@@ -210,7 +213,7 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate to display the media editor from a given URL
     ///
     func gutenbergDidRequestMediaEditor(with mediaUrl: URL, callback: @escaping MediaPickerDidPickMediaCallback)
-    
+
     /// Tells the delegate that the editor needs to log a custom event
     /// - Parameter event: The event key to be logged
     func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent)
@@ -224,12 +227,26 @@ public protocol GutenbergBridgeDelegate: class {
 
     /// Tells the delegate that the editor requested to show the tooltip
     func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool
-    
+
     /// Tells the delegate that the editor requested to set the tooltip's visibility
-    /// - Parameter tooltipShown: Tooltip's visibility value    
+    /// - Parameter tooltipShown: Tooltip's visibility value
     func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool)
 
     func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType)
+
+    // Media Collection
+
+    /// Tells the delegate that a media collection block requested to reconnect with media save coordinator.
+    ///
+    func gutenbergDidRequestMediaSaveSync()
+
+    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String)
+
+    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String])
+
+    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String])
+
+    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String])
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
@@ -239,4 +256,12 @@ public extension GutenbergBridgeDelegate {
     func gutenbergDidLayout() { }
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block) { }
     func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType) { }
+
+    // Media Collection
+
+    func gutenbergDidRequestMediaSaveSync() {}
+    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) { }
+    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) { }
+    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) { }
+    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) { }
 }

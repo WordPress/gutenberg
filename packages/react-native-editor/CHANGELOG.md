@@ -11,9 +11,27 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+* [***] Adding support for selecting different unit of value in Cover and Columns blocks
+* [**] Button block - Add link picker to the block settings
+
+## 1.41.0
+
+* [***] Faster editor start and overall operation on Android [#26732]
+
+* [*] [Android] Enable multiple upload support for Image block
+
+## 1.40.0
+
+## 1.39.1
+
+* [*] Heading block - Disable full-width/wide alignment [#26308]
+
 ## 1.39.0
 
-* [***] Full-width and wide alignment support for Video, Latest-posts, Gallery, Media & text, and Pullquote block [https://github.com/WordPress/gutenberg/pull/25184/]
+* [***] Full-width and wide alignment support for Video, Latest-posts, Gallery, Media & text, and Pullquote block
+* [***] Fix unsupported block bottom sheet is triggered when device is rotated
+* [***] Unsupported Block Editor: Fixed issue when cannot view or interact with the classic block on Jetpack site
+
 
 ## 1.38.0
 

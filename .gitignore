@@ -12,6 +12,7 @@ gutenberg.zip
 phpcs.xml
 yarn.lock
 /wordpress
+/artifacts
 
 playground/dist
 .cache

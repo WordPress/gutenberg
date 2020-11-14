@@ -24,6 +24,14 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
+<a name="activateTheme" href="#activateTheme">#</a> **activateTheme**
+
+Activates an installed theme.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+
 <a name="arePrePublishChecksEnabled" href="#arePrePublishChecksEnabled">#</a> **arePrePublishChecksEnabled**
 
 Verifies if publish checks are enabled.
@@ -56,6 +64,14 @@ Clicks a button based on the text on the button.
 _Parameters_
 
 -   _buttonText_ `string`: The text that appears on the button to click.
+
+<a name="clickMenuItem" href="#clickMenuItem">#</a> **clickMenuItem**
+
+Searches for an item in the menu with the text provided and clicks it.
+
+_Parameters_
+
+-   _label_ `string`: The label to search the menu item for.
 
 <a name="clickOnCloseModalButton" href="#clickOnCloseModalButton">#</a> **clickOnCloseModalButton**
 
@@ -146,6 +162,17 @@ Deactivates an active plugin.
 _Parameters_
 
 -   _slug_ `string`: Plugin slug.
+
+<a name="deleteTheme" href="#deleteTheme">#</a> **deleteTheme**
+
+Deletes a theme from the site, activating another theme if necessary.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+-   _settings_ `?Object`: Optional settings object.
+-   _settings.newThemeSlug_ `?string`: A theme to switch to if the theme to delete is active. Required if the theme to delete is active.
+-   _settings.newThemeSearchTerm_ `?string`: A search term to use if the new theme is not findable by its slug.
 
 <a name="disableFocusLossObservation" href="#disableFocusLossObservation">#</a> **disableFocusLossObservation**
 
@@ -340,6 +367,16 @@ _Parameters_
 -   _slug_ `string`: Plugin slug.
 -   _searchTerm_ `?string`: If the plugin is not findable by its slug use an alternative term to search.
 
+<a name="installTheme" href="#installTheme">#</a> **installTheme**
+
+Installs a theme from the WP.org repository.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+-   _settings_ `?Object`: Optional settings object.
+-   _settings.searchTerm_ `?string`: Search term to use if the theme is not findable by its slug.
+
 <a name="isCurrentURL" href="#isCurrentURL">#</a> **isCurrentURL**
 
 Checks if current URL is a WordPress path.
@@ -364,6 +401,18 @@ _Returns_
 <a name="isOfflineMode" href="#isOfflineMode">#</a> **isOfflineMode**
 
 Undocumented declaration.
+
+<a name="isThemeInstalled" href="#isThemeInstalled">#</a> **isThemeInstalled**
+
+Checks whether a theme exists on the site.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug to check.
+
+_Returns_
+
+-   `boolean`: Whether the theme exists.
 
 <a name="loginUser" href="#loginUser">#</a> **loginUser**
 

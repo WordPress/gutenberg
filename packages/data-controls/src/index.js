@@ -3,8 +3,7 @@
  */
 import triggerFetch from '@wordpress/api-fetch';
 import { controls as dataControls } from '@wordpress/data';
-// TODO: mark the deprecated controls after all Gutenberg usages are removed
-// import deprecated from '@wordpress/deprecated';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Dispatches a control action for triggering an api fetch call.
@@ -39,9 +38,9 @@ export function apiFetch( request ) {
  * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
  */
 export function select( ...args ) {
-	// deprecated( '`select` control in `@wordpress/data-controls`', {
-	// 	alternative: 'built-in `resolveSelect` control in `@wordpress/data`',
-	// } );
+	deprecated( '`select` control in `@wordpress/data-controls`', {
+		alternative: 'built-in `resolveSelect` control in `@wordpress/data`',
+	} );
 
 	return dataControls.resolveSelect( ...args );
 }
@@ -53,9 +52,9 @@ export function select( ...args ) {
  * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
  */
 export function syncSelect( ...args ) {
-	// deprecated( '`syncSelect` control in `@wordpress/data-controls`', {
-	// 	alternative: 'built-in `select` control in `@wordpress/data`',
-	// } );
+	deprecated( '`syncSelect` control in `@wordpress/data-controls`', {
+		alternative: 'built-in `select` control in `@wordpress/data`',
+	} );
 
 	return dataControls.select( ...args );
 }
@@ -67,17 +66,25 @@ export function syncSelect( ...args ) {
  * @param {Array} args Arguments passed without change to the `@wordpress/data` control.
  */
 export function dispatch( ...args ) {
-	// deprecated( '`dispatch` control in `@wordpress/data-controls`', {
-	// 	alternative: 'built-in `dispatch` control in `@wordpress/data`',
-	// } );
+	deprecated( '`dispatch` control in `@wordpress/data-controls`', {
+		alternative: 'built-in `dispatch` control in `@wordpress/data`',
+	} );
 
 	return dataControls.dispatch( ...args );
 }
+
+export const awaitPromise = function ( promise ) {
+	return {
+		type: 'AWAIT_PROMISE',
+		promise,
+	};
+};
 
 /**
  * The default export is what you use to register the controls with your custom
  * store.
  *
+ * @param paths
  * @example
  * ```js
  * // WordPress dependencies
@@ -91,18 +98,18 @@ export function dispatch( ...args ) {
  * import * as resolvers from './resolvers';
  *
  * registerStore( 'my-custom-store', {
- * 	reducer,
- * 	controls,
- * 	actions,
- * 	selectors,
- * 	resolvers,
+ * reducer,
+ * controls,
+ * actions,
+ * selectors,
+ * resolvers,
  * } );
  * ```
- *
  * @return {Object} An object for registering the default controls with the
- *                  store.
+ * store.
  */
 export const controls = {
+	AWAIT_PROMISE: ( { promise } ) => promise,
 	API_FETCH( { request } ) {
 		return triggerFetch( request );
 	},

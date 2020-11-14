@@ -125,7 +125,7 @@ export default class EditorPage {
 		let blockLocator = `//*[@${ this.accessibilityIdXPathAttrib }="${ accessibilityId }"]`;
 
 		if ( ! isAndroid() ) {
-			blockLocator += '//XCUIElementTypeTextView';
+			blockLocator = `//XCUIElementTypeTextView[starts-with(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityId }")]`;
 		}
 		return await this.driver.elementByXPath( blockLocator );
 	}
@@ -143,11 +143,11 @@ export default class EditorPage {
 	}
 
 	// set html editor content explicitly
-	async setHtmlContentAndroid( html ) {
+	async setHtmlContent( html ) {
 		await toggleHtmlMode( this.driver, true );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
-		await htmlContentView.setText( html );
+		await htmlContentView.type( html );
 
 		await toggleHtmlMode( this.driver, false );
 	}
@@ -165,6 +165,20 @@ export default class EditorPage {
 			'//XCUIElementTypeButton[@name="Hide keyboard"]'
 		);
 		await hideKeyboardToolbarButton.click();
+	}
+
+	async dismissAndroidClipboardSmartSuggestion() {
+		if ( ! isAndroid() ) {
+			return;
+		}
+
+		const dismissClipboardSmartSuggestionLocator = `//*[@${ this.accessibilityIdXPathAttrib }="Dismiss Smart Suggestion"]`;
+		const smartSuggestions = await this.driver.elementsByXPath(
+			dismissClipboardSmartSuggestionLocator
+		);
+		if ( smartSuggestions.length !== 0 ) {
+			smartSuggestions[ 0 ].click();
+		}
 	}
 
 	// =========================
@@ -493,5 +507,44 @@ export default class EditorPage {
 			);
 			await dismissButton.click();
 		}
+	}
+
+	// =============================
+	// Unsupported Block functions
+	// =============================
+
+	async getUnsupportedBlockHelpButton() {
+		const accessibilityId = 'Help button';
+		let blockLocator =
+			'//android.widget.Button[@content-desc="Help button, Tap here to show help"]';
+
+		if ( ! isAndroid() ) {
+			blockLocator = `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
+		}
+		return await this.driver.elementByXPath( blockLocator );
+	}
+
+	async getUnsupportedBlockBottomSheetEditButton() {
+		const accessibilityId = 'Edit using web editor';
+		let blockLocator =
+			'//android.widget.Button[@content-desc="Edit using web editor"]';
+
+		if ( ! isAndroid() ) {
+			blockLocator = `//XCUIElementTypeButton[@name="${ accessibilityId }"]`;
+		}
+		return await this.driver.elementByXPath( blockLocator );
+	}
+
+	async getUnsupportedBlockWebView() {
+		let blockLocator = '//android.webkit.WebView';
+
+		if ( ! isAndroid() ) {
+			blockLocator = '//XCUIElementTypeWebView';
+		}
+
+		this.driver.setImplicitWaitTimeout( 20000 );
+		const element = await this.driver.elementByXPath( blockLocator );
+		this.driver.setImplicitWaitTimeout( 5000 );
+		return element;
 	}
 }

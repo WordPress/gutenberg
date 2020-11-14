@@ -1,14 +1,17 @@
 export { activatePlugin } from './activate-plugin';
+export { activateTheme } from './activate-theme';
 export { arePrePublishChecksEnabled } from './are-pre-publish-checks-enabled';
 export { clearLocalStorage } from './clear-local-storage';
 export { clickBlockAppender } from './click-block-appender';
 export { clickBlockToolbarButton } from './click-block-toolbar-button';
 export { clickButton } from './click-button';
+export { clickMenuItem } from './click-menu-item';
 export { clickOnCloseModalButton } from './click-on-close-modal-button';
 export { clickOnMoreMenuItem } from './click-on-more-menu-item';
 export { createNewPost } from './create-new-post';
 export { createURL } from './create-url';
 export { deactivatePlugin } from './deactivate-plugin';
+export { deleteTheme } from './delete-theme';
 export { disablePrePublishChecks } from './disable-pre-publish-checks';
 export { dragAndResize } from './drag-and-resize';
 export { enablePageDialogAccept } from './enable-page-dialog-accept';
@@ -36,6 +39,7 @@ export {
 	closeGlobalBlockInserter,
 } from './inserter';
 export { installPlugin } from './install-plugin';
+export { installTheme } from './install-theme';
 export { isCurrentURL } from './is-current-url';
 export { isInDefaultBlock } from './is-in-default-block';
 export { loginUser } from './login-user';
@@ -57,6 +61,7 @@ export { setPostContent } from './set-post-content';
 export { switchEditorModeTo } from './switch-editor-mode-to';
 export { switchUserToAdmin } from './switch-user-to-admin';
 export { switchUserToTest } from './switch-user-to-test';
+export { isThemeInstalled } from './theme-installed';
 export { toggleMoreMenu } from './toggle-more-menu';
 export { toggleOfflineMode, isOfflineMode } from './offline-mode';
 export { toggleScreenOption } from './toggle-screen-option';
