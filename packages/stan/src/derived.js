@@ -38,7 +38,7 @@ export const createDerivedAtom = (
 	let listeners = [];
 
 	/**
-	 * @type {(import("./types").WPAtomInstance<any>)[]}
+	 * @type {(import("./types").WPAtomState<any>)[]}
 	 */
 	let dependencies = [];
 	let isListening = false;
@@ -64,20 +64,20 @@ export const createDerivedAtom = (
 	};
 
 	/**
-	 * @param {import('./types').WPAtomInstance<any>} atomInstance
+	 * @param {import('./types').WPAtomState<any>} atomState
 	 */
-	const addDependency = ( atomInstance ) => {
-		if ( ! dependenciesUnsubscribeMap.has( atomInstance ) ) {
+	const addDependency = ( atomState ) => {
+		if ( ! dependenciesUnsubscribeMap.has( atomState ) ) {
 			dependenciesUnsubscribeMap.set(
-				atomInstance,
-				atomInstance.subscribe( refresh )
+				atomState,
+				atomState.subscribe( refresh )
 			);
 		}
 	};
 
 	const resolve = () => {
 		/**
-		 * @type {(import("./types").WPAtomInstance<any>)[]}
+		 * @type {(import("./types").WPAtomState<any>)[]}
 		 */
 		const updatedDependencies = [];
 		const updatedDependenciesMap = new WeakMap();
@@ -86,17 +86,17 @@ export const createDerivedAtom = (
 		try {
 			result = resolver( {
 				get: ( atomCreator ) => {
-					const atomInstance = registry.getAtom( atomCreator );
+					const atomState = registry.getAtom( atomCreator );
 					// It is important to add the dependency as soon as it's used
 					// because it's important to retrigger the resolution if the dependency
 					// changes before the resolution finishes.
-					addDependency( atomInstance );
-					updatedDependenciesMap.set( atomInstance, true );
-					updatedDependencies.push( atomInstance );
-					if ( ! atomInstance.isResolved ) {
-						throw { type: 'unresolved', id: atomInstance.id };
+					addDependency( atomState );
+					updatedDependenciesMap.set( atomState, true );
+					updatedDependencies.push( atomState );
+					if ( ! atomState.isResolved ) {
+						throw { type: 'unresolved', id: atomState.id };
 					}
-					return atomInstance.get();
+					return atomState.get();
 				},
 			} );
 		} catch ( error ) {

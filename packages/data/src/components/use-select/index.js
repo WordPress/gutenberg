@@ -72,7 +72,7 @@ export default function useSelect( _mapSelect, deps ) {
 	const shouldSyncCompute =
 		previousMapSelect !== mapSelect || !! previousMapError.current;
 
-	const atomInstance = useMemo( () => {
+	const atomState = useMemo( () => {
 		return createDerivedAtom(
 			( { get } ) => {
 				const current = registry.__unstableGetAtomResolver();
@@ -94,7 +94,7 @@ export default function useSelect( _mapSelect, deps ) {
 
 	try {
 		if ( shouldSyncCompute ) {
-			result.current = atomInstance.get();
+			result.current = atomState.get();
 		}
 	} catch ( error ) {
 		let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
@@ -118,13 +118,13 @@ export default function useSelect( _mapSelect, deps ) {
 		const onStoreChange = () => {
 			if (
 				isMountedAndNotUnsubscribing.current &&
-				! isShallowEqual( atomInstance.get(), result.current )
+				! isShallowEqual( atomState.get(), result.current )
 			) {
-				result.current = atomInstance.get();
+				result.current = atomState.get();
 				rerender();
 			}
 		};
-		const unsubscribe = atomInstance.subscribe( () => {
+		const unsubscribe = atomState.subscribe( () => {
 			onStoreChange();
 		} );
 
@@ -135,7 +135,7 @@ export default function useSelect( _mapSelect, deps ) {
 			isMountedAndNotUnsubscribing.current = false;
 			unsubscribe();
 		};
-	}, [ atomInstance ] );
+	}, [ atomState ] );
 
 	return result.current;
 }

@@ -4,7 +4,7 @@
 import { noop, isObject } from 'lodash';
 
 /**
- * @typedef {( atomInstance: import('./types').WPAtomInstance<any> ) => void} RegistryListener
+ * @typedef {( atomState: import('./types').WPAtomState<any> ) => void} RegistryListener
  */
 
 /**
@@ -38,7 +38,7 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 		/**
 		 * @param {import('./types').WPAtomFamilyConfig} atomFamilyConfig
 		 * @param {any} key
-		 * @return {import('./types').WPAtom<any>} Atom instance
+		 * @return {import('./types').WPAtomState<any>} Atom state.
 		 */
 		getAtomFromFamily( atomFamilyConfig, key ) {
 			if ( ! families.get( atomFamilyConfig ) ) {

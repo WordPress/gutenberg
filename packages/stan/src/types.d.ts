@@ -1,4 +1,4 @@
-export type WPAtomInstance<T> = {
+export type WPAtomState<T> = {
     /**
      * Optional atom id used for debug.
      */
@@ -10,27 +10,27 @@ export type WPAtomInstance<T> = {
     type:  string,
 
     /**
-     * Whether the atom instance value is resolved or not. 
+     * Whether the atom state value is resolved or not. 
      */
     readonly isResolved: boolean,
     
     /**
-     * Atom instance setter, used to modify one or multiple atom values.
+     * Atom state setter, used to modify one or multiple atom values.
      */
     set: (t: any)  => void,
     
     /**
-     * Retrieves the current value of the atom instance.
+     * Retrieves the current value of the atom state.
      */
     get: () => T,
 
     /**
-     * Subscribes to the value changes of the atom instance.
+     * Subscribes to the value changes of the atom state.
      */
     subscribe: (listener: () => void) => (() => void)
 }
 
-export type WPAtom<T> = ( registry: WPAtomRegistry) => WPAtomInstance<T>;
+export type WPAtom<T> = ( registry: WPAtomRegistry) => WPAtomState<T>;
 
 export type WPAtomFamilyConfig = {
     /**
@@ -60,7 +60,7 @@ export type WPAtomRegistry = {
     /**
      * Retrieves or creates an atom from the registry.
      */
-    getAtom: (atom: WPAtom<any> | WPAtomFamilyItem) => WPAtomInstance<any>
+    getAtom: (atom: WPAtom<any> | WPAtomFamilyItem) => WPAtomState<any>
 
     /**
      * Removes an atom from the registry.
