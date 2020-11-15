@@ -209,12 +209,6 @@ class WP_Block {
 	 * @return string Rendered block output.
 	 */
 	public function render( $options = array() ) {
-		if ( in_array( $this->parsed_block, self::$currently_rendering ) ) {
-			return '';
-		} else {
-			self::$currently_rendering[] = $this->parsed_block;
-		}
-
 		global $post;
 		$options = array_replace(
 			array(
@@ -224,6 +218,13 @@ class WP_Block {
 		);
 
 		$is_dynamic    = $options['dynamic'] && $this->name && null !== $this->block_type && $this->block_type->is_dynamic();
+
+		if ( in_array( $this->parsed_block, self::$currently_rendering ) ) {
+			return '';
+		} else {
+			self::$currently_rendering[] = $this->parsed_block;
+		}
+
 		$block_content = '';
 
 		if ( ! $options['dynamic'] || empty( $this->block_type->skip_inner_blocks ) ) {
