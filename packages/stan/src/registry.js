@@ -34,6 +34,30 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 	const atoms = new WeakMap();
 	const families = new WeakMap();
 
+	/**
+	 * @param {import('./types').WPAtom<any>|import('./types').WPAtomFamilyItem} atom Atom.
+	 * @return {import('./types').WPAtomState<any>} Atom state;
+	 */
+	const getAtomState = ( atom ) => {
+		if ( isAtomFamilyItem( atom ) ) {
+			const {
+				config,
+				key,
+			} = /** @type {import('./types').WPAtomFamilyItem} */ ( atom );
+			return familyRegistry.getAtomFromFamily( config, key );
+		}
+
+		if ( ! atoms.get( atom ) ) {
+			const atomState = /** @type {import('./types').WPAtom<any>} */ ( atom )(
+				registry
+			);
+			atoms.set( atom, atomState );
+			onAdd( atomState );
+		}
+
+		return atoms.get( atom );
+	};
+
 	const familyRegistry = {
 		/**
 		 * @param {import('./types').WPAtomFamilyConfig} atomFamilyConfig
@@ -71,40 +95,34 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 
 	/** @type {import('./types').WPAtomRegistry} */
 	const registry = {
-		getAtom( atomCreator ) {
-			if ( isAtomFamilyItem( atomCreator ) ) {
-				const {
-					config,
-					key,
-				} = /** @type {import('./types').WPAtomFamilyItem} */ ( atomCreator );
-				return familyRegistry.getAtomFromFamily( config, key );
-			}
+		__unstableGetAtomState: getAtomState,
 
-			if ( ! atoms.get( atomCreator ) ) {
-				const atom = /** @type {import('./types').WPAtom<any>} */ ( atomCreator )(
-					registry
-				);
-				atoms.set( atomCreator, atom );
-				onAdd( atom );
-			}
+		read( atom ) {
+			return getAtomState( atom ).get();
+		},
 
-			return atoms.get( atomCreator );
+		write( atom, value ) {
+			return getAtomState( atom ).set( value );
+		},
+
+		subscribe( atom, listener ) {
+			return getAtomState( atom ).subscribe( listener );
 		},
 
 		// This shouldn't be necessary since we rely on week map
 		// But the legacy selectors/actions API requires us to know when
 		// some atoms are removed entirely to unsubscribe.
-		deleteAtom( atomCreator ) {
-			if ( isAtomFamilyItem( atomCreator ) ) {
+		delete( atom ) {
+			if ( isAtomFamilyItem( atom ) ) {
 				const {
 					config,
 					key,
-				} = /** @type {import('./types').WPAtomFamilyItem} */ ( atomCreator );
+				} = /** @type {import('./types').WPAtomFamilyItem} */ ( atom );
 				return familyRegistry.deleteAtomFromFamily( config, key );
 			}
-			const atom = atoms.get( atomCreator );
-			atoms.delete( atomCreator );
-			onDelete( atom );
+			const atomState = atoms.get( atom );
+			atoms.delete( atom );
+			onDelete( atomState );
 		},
 	};
 

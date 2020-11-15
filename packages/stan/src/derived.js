@@ -85,8 +85,8 @@ export const createDerivedAtom = (
 		let didThrow = false;
 		try {
 			result = resolver( {
-				get: ( atomCreator ) => {
-					const atomState = registry.getAtom( atomCreator );
+				get: ( atom ) => {
+					const atomState = registry.__unstableGetAtomState( atom );
 					// It is important to add the dependency as soon as it's used
 					// because it's important to retrigger the resolution if the dependency
 					// changes before the resolution finishes.
@@ -164,11 +164,8 @@ export const createDerivedAtom = (
 		async set( action ) {
 			await updater(
 				{
-					get: ( atomCreator ) => {
-						return registry.getAtom( atomCreator ).get();
-					},
-					set: ( atomCreator, arg ) =>
-						registry.getAtom( atomCreator ).set( arg ),
+					get: ( atom ) => registry.read( atom ),
+					set: ( atom, arg ) => registry.write( atom, arg ),
 				},
 				action
 			);

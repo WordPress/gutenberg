@@ -42,24 +42,20 @@ const counter = createAtom( 1 );
 ### Manipulating atoms
 
 In this example we created an atom that can hold a counter that starts with `1`. 
-But in order to manipulate that data, we need to create an "instance" of that atom.
-We do so by adding the atom to a registry of atoms. 
-The registry will then become a container of all instanciated atoms.
+To manipulate we need a registry. The registry is the container of all atom states.
 
 ```js
 import { createAtomRegistry } from '@wordpress/stan';
 
 const registry = createAtomRegistry();
 
-// this creates the "counter" atom or retrieves it if it's already in the registry.
-const counterInstance = registry.getAtom( counter );
-
-// Manipulate the atom.
-console.log( counterInstance.get() ); //  prints 1.
+// Read the counter.
+console.log( registry.read( counter ) ); //  prints 1.
 
 // Modify the value of the counter
-counterInstance.set( 10 );
-console.log( counterInstance.get() ); //  prints 10.
+registry.write( counter, 10 );
+
+console.log( registry.read( counter ) ); //  prints 10.
 ```
 
 ### Subscribing to changes
@@ -67,12 +63,12 @@ console.log( counterInstance.get() ); //  prints 10.
 Each atom is an observable to which we can subscribe:
 
 ```js
-counterInstance.subscribe( () => {
-    console.log( conterInstance.get() );
+registry.subscribe( counter, () => {
+    console.log( registry.read( counter ) );
 } );
 
-counterInstance.set( 2 ); // prints 2.
-counterInstance.set( 4 ); // prints 4.
+registry.write( counter, 2 ); // prints 2.
+registry.write( counter, 4 ); // prints 4.
 ```
 
 ### Derived atoms
@@ -89,34 +85,22 @@ const sum = createDerivedAtom(
 );
 ```
 
-In the example above, we create two simple counter atoms and third derived "sum" atom which value is the sum of both counters. Let's see how we can interact this atom. 
-
-So just like any other kind of atoms, we need an instance to manipulate it. Note also that adding an atom to a registry, automatically adds all its dependencies to the registry and creates instances for them if not already there.
+In the example above, we create two simple counter atoms and third derived "sum" atom which value is the sum of both counters.
 
 ```js
-// Retrieve the sum instance and adds the counter1 and counter2 atoms to the registry as well
-const sumInstance = registry.getAtom( sum );
-```
+console.log( registry.read( sum ) ); // prints 3.
 
-One important thing to note here as well is that atoms are "lazy", which means unless someone subscribes to their changes, they won't bother computing their state. This is an important property of atoms for performance reasons. 
-
-```js
-// No one has subscribed to the sum instance yet, its value is "null"
-console.log( sumInstance.get() ); // prints null.
-
-// Adding a listener automatically triggers the resolution of the value
-const unsubscribe = sumInstance.subscribe( () => {} );
-console.log( sumInstance.get() ); // prints 3.
-unsubscribe(); // unsubscribing stops the resolution if it's the last listener of the atom.
-
-// Let's manipuate the value of sub atoms and see how the sum changes.
+// Adding a listener automatically triggers the refreshing of the value.
+// If the atom has no subscriber, it will only attempt a resolution when initially read. 
+// But it won't bother refreshing its value, if any of its dependencies change.
+// This property (laziness) is important for performance reasons.
 sumInstance.subscribe( () => {
-    console.log( sumInstance.get() );
+    console.log( registry.read( sum ) );
 } );
 
 // This edits counter1, triggering a resolution of sumInstance which triggers the console.log above.
-registry.getAtom( counter1 ).set( 2 ); // now both counters equal 2 which means sum will print 4.
-registry.getAtom( counter1 ).set( 4 ); // prints 6
+registry.write( counter1, 2 ); // now both counters equal 2 which means sum will print 4.
+registry.write( counter1, 4 ); // prints 6
 ```
 
 ### Async derived atoms

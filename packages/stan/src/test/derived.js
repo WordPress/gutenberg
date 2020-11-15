@@ -19,13 +19,12 @@ describe( 'creating derived atoms', () => {
 			( { get } ) => get( count1 ) + get( count2 ) + get( count3 )
 		);
 		const registry = createAtomRegistry();
-		const sumInstance = registry.getAtom( sum );
 
 		// Atoms don't compute any value unless there's a subscriber.
-		const unsubscribe = sumInstance.subscribe( () => {} );
-		expect( sumInstance.get() ).toEqual( 3 );
-		registry.getAtom( count1 ).set( 2 );
-		expect( sumInstance.get() ).toEqual( 4 );
+		const unsubscribe = registry.subscribe( sum, () => {} );
+		expect( registry.read( sum ) ).toEqual( 3 );
+		registry.write( count1, 2 );
+		expect( registry.read( sum ) ).toEqual( 4 );
 		unsubscribe();
 	} );
 
@@ -36,11 +35,10 @@ describe( 'creating derived atoms', () => {
 			return get( count1 ) + value;
 		} );
 		const registry = createAtomRegistry();
-		const sumInstance = registry.getAtom( sum );
 		// Atoms don't compute any value unless there's a subscriber.
-		const unsubscribe = sumInstance.subscribe( () => {} );
+		const unsubscribe = registry.subscribe( sum, () => {} );
 		await flushImmediatesAndTicks();
-		expect( sumInstance.get() ).toEqual( 11 );
+		expect( registry.read( sum ) ).toEqual( 11 );
 		unsubscribe();
 	} );
 
@@ -54,11 +52,10 @@ describe( 'creating derived atoms', () => {
 			return get( count1 ) + get( asyncCount );
 		} );
 		const registry = createAtomRegistry();
-		const sumInstance = registry.getAtom( sum );
 		// Atoms don't compute any value unless there's a subscriber.
-		const unsubscribe = sumInstance.subscribe( () => {} );
+		const unsubscribe = registry.subscribe( sum, () => {} );
 		await flushImmediatesAndTicks( 2 );
-		expect( sumInstance.get() ).toEqual( 21 );
+		expect( registry.read( sum ) ).toEqual( 21 );
 		unsubscribe();
 	} );
 
@@ -71,21 +68,20 @@ describe( 'creating derived atoms', () => {
 			( { get } ) => get( count1 ) + get( count2 ) + mock()
 		);
 		const registry = createAtomRegistry();
-		const sumInstance = registry.getAtom( sum );
 		// Creating an atom or adding it to the registry don't trigger its resolution
 		expect( mock ).not.toHaveBeenCalled();
-		expect( sumInstance.get() ).toEqual( 12 );
+		expect( registry.read( sum ) ).toEqual( 12 );
 		// Calling "get" triggers a resolution.
 		expect( mock ).toHaveBeenCalledTimes( 1 );
 
 		// This shouldn't trigger the resolution because the atom has no listener.
-		registry.getAtom( count1 ).set( 2 );
+		registry.write( count1, 2 );
 		expect( mock ).toHaveBeenCalledTimes( 1 );
 
 		// Subscribing triggers the resolution again.
-		const unsubscribe = sumInstance.subscribe( () => {} );
+		const unsubscribe = registry.subscribe( sum, () => {} );
 		expect( mock ).toHaveBeenCalledTimes( 2 );
-		expect( sumInstance.get() ).toEqual( 13 );
+		expect( registry.read( sum ) ).toEqual( 13 );
 		unsubscribe();
 	} );
 
@@ -96,14 +92,13 @@ describe( 'creating derived atoms', () => {
 			( { get } ) => get( count1 ) + get( count2 )
 		);
 		const registry = createAtomRegistry();
-		const sumInstance = registry.getAtom( sum );
 		const listener = jest.fn();
-		const unsubscribe = sumInstance.subscribe( listener );
+		const unsubscribe = registry.subscribe( sum, listener );
 
-		registry.getAtom( count1 ).set( 2 );
+		registry.write( count1, 2 );
 		expect( listener ).toHaveBeenCalledTimes( 1 );
 
-		registry.getAtom( count2 ).set( 2 );
+		registry.write( count2, 2 );
 		expect( listener ).toHaveBeenCalledTimes( 2 );
 
 		unsubscribe();
@@ -122,10 +117,9 @@ describe( 'updating derived atoms', () => {
 			}
 		);
 		const registry = createAtomRegistry();
-		const sumInstance = registry.getAtom( sum );
-		sumInstance.set( 4 );
-		expect( registry.getAtom( count1 ).get() ).toEqual( 2 );
-		expect( registry.getAtom( count2 ).get() ).toEqual( 2 );
+		registry.write( sum, 4 );
+		expect( registry.read( count1 ) ).toEqual( 2 );
+		expect( registry.read( count2 ) ).toEqual( 2 );
 	} );
 
 	it( 'should allow nested derived atoms to update dependencies', () => {
@@ -145,9 +139,8 @@ describe( 'updating derived atoms', () => {
 			}
 		);
 		const registry = createAtomRegistry();
-		const multiplyInstance = registry.getAtom( multiply );
-		multiplyInstance.set( 18 );
-		expect( registry.getAtom( count1 ).get() ).toEqual( 3 );
-		expect( registry.getAtom( count2 ).get() ).toEqual( 3 );
+		registry.write( multiply, 18 );
+		expect( registry.read( count1 ) ).toEqual( 3 );
+		expect( registry.read( count2 ) ).toEqual( 3 );
 	} );
 } );

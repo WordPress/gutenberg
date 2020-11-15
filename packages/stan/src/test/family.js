@@ -12,114 +12,96 @@ describe( 'creating and subscribing to atom families', () => {
 
 		const registry = createAtomRegistry();
 		// Retrieve family atom
-		const firstItemAtom = registry.getAtom( itemFamilyAtom( 1 ) );
-		expect( firstItemAtom ).toBe( registry.getAtom( itemFamilyAtom( 1 ) ) );
+		const firstItemAtom = registry.__unstableGetAtomState(
+			itemFamilyAtom( 1 )
+		);
+		expect( firstItemAtom ).toBe(
+			registry.__unstableGetAtomState( itemFamilyAtom( 1 ) )
+		);
 		// Atoms don't compute any value unless there's a subscriber.
-		const unsubscribe = firstItemAtom.subscribe( () => {} );
+		const unsubscribe = registry.subscribe( itemFamilyAtom( 1 ), () => {} );
 		expect( firstItemAtom.get() ).toBe( undefined );
 
 		// Add some items
-		const itemsByIdAtomInstance = registry.getAtom( itemsByIdAtom );
-		itemsByIdAtomInstance.set( {
+		registry.write( itemsByIdAtom, {
 			1: { name: 'first' },
 			2: { name: 'second' },
 		} );
 
 		// Should update the value automatically as we set the items.
-		expect( firstItemAtom.get() ).toEqual( { name: 'first' } );
+		expect( registry.read( itemFamilyAtom( 1 ) ) ).toEqual( {
+			name: 'first',
+		} );
 
 		// Remove items
-		itemsByIdAtomInstance.set( {
+		registry.write( itemsByIdAtom, {
 			2: { name: 'second' },
 		} );
 
 		// Should update the value automatically as we unset the items.
-		expect( firstItemAtom.get() ).toBe( undefined );
+		expect( registry.read( itemFamilyAtom( 1 ) ) ).toBe( undefined );
 		unsubscribe();
 	} );
 
 	it( 'should allow creating families based on other families', () => {
 		const itemsByIdAtom = createAtom( {}, 'items-by-id' );
-		const itemFamilyAtom = createAtomFamily(
-			( key ) => ( { get } ) => {
-				return get( itemsByIdAtom )[ key ];
-			},
-			undefined,
-			false,
-			'atom'
-		);
+		const itemFamilyAtom = createAtomFamily( ( key ) => ( { get } ) => {
+			return get( itemsByIdAtom )[ key ];
+		} );
 		// Family atom that depends on another family atom.
-		const itemNameFamilyAtom = createAtomFamily(
-			( key ) => ( { get } ) => {
-				return get( itemFamilyAtom( key ) )?.name;
-			},
-			undefined,
-			false,
-			'atomname'
-		);
+		const itemNameFamilyAtom = createAtomFamily( ( key ) => ( { get } ) => {
+			return get( itemFamilyAtom( key ) )?.name;
+		} );
 
 		const registry = createAtomRegistry();
-		const itemsByIdAtomInstance = registry.getAtom( itemsByIdAtom );
-		itemsByIdAtomInstance.set( {
+		registry.write( itemsByIdAtom, {
 			1: { name: 'first' },
 			2: { name: 'second' },
 		} );
 
-		const firstItemNameAtom = registry.getAtom( itemNameFamilyAtom( 1 ) );
-		expect( firstItemNameAtom ).toBe(
-			registry.getAtom( itemNameFamilyAtom( 1 ) )
-		);
 		// Atoms don't compute any value unless there's a subscriber.
-		const unsubscribe = firstItemNameAtom.subscribe( () => {} );
-		expect( firstItemNameAtom.get() ).toEqual( 'first' );
+		const unsubscribe = registry.subscribe(
+			itemNameFamilyAtom( 1 ),
+			() => {}
+		);
+		expect( registry.read( itemNameFamilyAtom( 1 ) ) ).toEqual( 'first' );
 		unsubscribe();
 	} );
 
 	it( 'should not recompute a family dependency if its untouched', () => {
 		const itemsByIdAtom = createAtom( {}, 'items-by-id' );
-		const itemFamilyAtom = createAtomFamily(
-			( key ) => ( { get } ) => {
-				return get( itemsByIdAtom )[ key ];
-			},
-			undefined,
-			false,
-			'atom'
-		);
+		const itemFamilyAtom = createAtomFamily( ( key ) => ( { get } ) => {
+			return get( itemsByIdAtom )[ key ];
+		} );
 		// Family atom that depends on another family atom.
-		const itemNameFamilyAtom = createAtomFamily(
-			( key ) => ( { get } ) => {
-				return get( itemFamilyAtom( key ) )?.name;
-			},
-			undefined,
-			false,
-			'atomname'
-		);
+		const itemNameFamilyAtom = createAtomFamily( ( key ) => ( { get } ) => {
+			return get( itemFamilyAtom( key ) )?.name;
+		} );
 
 		const registry = createAtomRegistry();
-		const itemsByIdAtomInstance = registry.getAtom( itemsByIdAtom );
 		const initialItems = {
 			1: { name: 'first' },
 			2: { name: 'second' },
 		};
-		itemsByIdAtomInstance.set( initialItems );
+		registry.write( itemsByIdAtom, initialItems );
 
 		const name1Listener = jest.fn();
 		const name2Listener = jest.fn();
 
-		const name1 = registry.getAtom( itemNameFamilyAtom( 1 ) );
-		const name2 = registry.getAtom( itemNameFamilyAtom( 2 ) );
+		const name1 = itemNameFamilyAtom( 1 );
+		const name2 = itemNameFamilyAtom( 2 );
 
-		const unsubscribe = name1.subscribe( name1Listener );
-		const unsubscribe2 = name2.subscribe( name2Listener );
+		const unsubscribe = registry.subscribe( name1, name1Listener );
+		const unsubscribe2 = registry.subscribe( name2, name2Listener );
 
 		// If I update item 1, item 2 dedendencies shouldn't recompute.
-		itemsByIdAtomInstance.set( {
+		registry.write( itemsByIdAtom, {
 			...initialItems,
 			1: { name: 'updated first' },
 		} );
 
-		expect( name1.get() ).toEqual( 'updated first' );
-		expect( name2.get() ).toEqual( 'second' );
+		expect( registry.read( name1 ) ).toEqual( 'updated first' );
+		expect( registry.read( name2 ) ).toEqual( 'second' );
 		expect( name1Listener ).toHaveBeenCalledTimes( 1 );
 		expect( name2Listener ).not.toHaveBeenCalled();
 
@@ -141,9 +123,8 @@ describe( 'updating family atoms', () => {
 			}
 		);
 		const registry = createAtomRegistry();
-		const firstItemInstance = registry.getAtom( itemFamilyAtom( 1 ) );
-		firstItemInstance.set( { name: 'first' } );
-		expect( registry.getAtom( itemsByIdAtom ).get() ).toEqual( {
+		registry.write( itemFamilyAtom( 1 ), { name: 'first' } );
+		expect( registry.read( itemsByIdAtom ) ).toEqual( {
 			1: { name: 'first' },
 		} );
 	} );
@@ -169,9 +150,8 @@ describe( 'updating family atoms', () => {
 			}
 		);
 		const registry = createAtomRegistry();
-		const firstItemInstance = registry.getAtom( itemNameFamilyAtom( 1 ) );
-		firstItemInstance.set( 'first' );
-		expect( registry.getAtom( itemsByIdAtom ).get() ).toEqual( {
+		registry.write( itemNameFamilyAtom( 1 ), 'first' );
+		expect( registry.read( itemsByIdAtom ) ).toEqual( {
 			1: { name: 'first' },
 		} );
 	} );

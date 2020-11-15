@@ -283,20 +283,18 @@ describe( 'controls', () => {
 		} );
 
 		it( 'should subscribe to atom selectors', async () => {
-			const atomState = registry.getAtomRegistry().getAtom(
-				createUseSelectAtom( ( select ) => {
-					return {
-						value: select( 'store1' ).getValue(),
-					};
-				} )
-			);
-
-			const unsubscribe = atomState.subscribe( () => {} );
+			const atomRegistry = registry.getAtomRegistry();
+			const atom = createUseSelectAtom( ( select ) => {
+				return {
+					value: select( 'store1' ).getValue(),
+				};
+			} );
+			const unsubscribe = atomRegistry.subscribe( atom, () => {} );
 			await flushImmediatesAndTicks();
-			expect( atomState.get().value ).toEqual( 'default' );
+			expect( atomRegistry.read( atom ).value ).toEqual( 'default' );
 			registry.dispatch( 'store1' ).set( 'new' );
 			await flushImmediatesAndTicks();
-			expect( atomState.get().value ).toEqual( 'new' );
+			expect( atomRegistry.read( atom ).value ).toEqual( 'new' );
 			unsubscribe();
 		} );
 
@@ -319,18 +317,17 @@ describe( 'controls', () => {
 				},
 			} );
 
-			const atomState = registry.getAtomRegistry().getAtom(
-				createUseSelectAtom( ( select ) => {
-					return {
-						value: select( 'store1' ).getValue(),
-					};
-				} )
-			);
+			const atom = createUseSelectAtom( ( select ) => {
+				return {
+					value: select( 'store1' ).getValue(),
+				};
+			} );
+			const atomRegistry = registry.getAtomRegistry();
 
 			const update = jest.fn();
-			const unsubscribe = atomState.subscribe( update );
+			const unsubscribe = atomRegistry.subscribe( atom, update );
 			await flushImmediatesAndTicks( 2 );
-			expect( atomState.get().value ).toEqual( 'default' );
+			expect( atomRegistry.read( atom ).value ).toEqual( 'default' );
 			// Reset the call that happens for initialization.
 			update.mockClear();
 			registry.dispatch( 'store2' ).set( 'new' );
@@ -352,20 +349,19 @@ describe( 'controls', () => {
 				},
 			} );
 
-			const atomState = registry.getAtomRegistry().getAtom(
-				createUseSelectAtom( ( select ) => {
-					return {
-						value: select( 'store2' ).getSubStoreValue(),
-					};
-				} )
-			);
+			const atomRegistry = registry.getAtomRegistry();
+			const atom = createUseSelectAtom( ( select ) => {
+				return {
+					value: select( 'store2' ).getSubStoreValue(),
+				};
+			} );
 
-			const unsubscribe = atomState.subscribe( () => {} );
+			const unsubscribe = atomRegistry.subscribe( atom, () => {} );
 			await flushImmediatesAndTicks( 10 );
-			expect( atomState.get().value ).toEqual( 'default' );
+			expect( atomRegistry.read( atom ).value ).toEqual( 'default' );
 			registry.dispatch( 'store1' ).set( 'new' );
 			await flushImmediatesAndTicks( 10 );
-			expect( atomState.get().value ).toEqual( 'new' );
+			expect( atomRegistry.read( atom ).value ).toEqual( 'new' );
 			unsubscribe();
 		} );
 
@@ -396,20 +392,19 @@ describe( 'controls', () => {
 				},
 			} );
 
-			const atomState = registry.getAtomRegistry().getAtom(
-				createUseSelectAtom( ( select ) => {
-					return {
-						value: select( 'store3' ).getSubStoreValue(),
-					};
-				} )
-			);
+			const atomRegistry = registry.getAtomRegistry();
+			const atom = createUseSelectAtom( ( select ) => {
+				return {
+					value: select( 'store3' ).getSubStoreValue(),
+				};
+			} );
 
-			const unsubscribe = atomState.subscribe( () => {} );
+			const unsubscribe = atomRegistry.subscribe( atom, () => {} );
 			await flushImmediatesAndTicks( 4 );
-			expect( atomState.get().value ).toEqual( 'default' );
+			expect( atomRegistry.read( atom ).value ).toEqual( 'default' );
 			registry.dispatch( 'store1' ).set( 'new' );
 			await flushImmediatesAndTicks( 4 );
-			expect( atomState.get().value ).toEqual( 'new' );
+			expect( atomRegistry.read( atom ).value ).toEqual( 'new' );
 			unsubscribe();
 		} );
 	} );
