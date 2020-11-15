@@ -13,7 +13,7 @@
 
 	.block-editor-block-mover__move-button-container,
 	.components-toolbar {
-		flex: 1;
+		flex-grow: 1;
 
 		// Increase touch targets on mobile.
 		flex-direction: row;
