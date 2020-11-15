@@ -37,6 +37,8 @@
 			// Position the focus rectangle.
 			left: $grid-unit-10;
 			right: $grid-unit-10;
+			// Required in IE11 because it doesn't apply { justify-content: center; } to pseudo elements
+			top: calc(50% - #{$grid-unit-40 / 2});
 			z-index: -1;
 
 			// Animate in.
