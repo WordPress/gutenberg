@@ -219,7 +219,7 @@ class WP_Block {
 
 		$is_dynamic    = $options['dynamic'] && $this->name && null !== $this->block_type && $this->block_type->is_dynamic();
 
-		if ( in_array( $this->parsed_block, self::$currently_rendering ) ) {
+		if ( in_array( $this->parsed_block, self::$currently_rendering ) && $is_dynamic ) {
 			return '';
 		} else {
 			self::$currently_rendering[] = $this->parsed_block;
