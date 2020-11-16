@@ -438,9 +438,8 @@ function gutenberg_inject_default_block_context( $args ) {
 				return $block_render_callback( $attributes, $content );
 			}
 
-			$registry = WP_Block_Type_Registry::get_instance();
+			$registry   = WP_Block_Type_Registry::get_instance();
 			$block_type = $registry->get_registered( $block->name );
-
 
 			// For WordPress versions that don't support the context API.
 			if ( ! $block->context ) {
