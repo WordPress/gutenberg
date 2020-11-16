@@ -127,3 +127,8 @@ require dirname( __FILE__ ) . '/block-supports/colors.php';
 require dirname( __FILE__ ) . '/block-supports/align.php';
 require dirname( __FILE__ ) . '/block-supports/typography.php';
 require dirname( __FILE__ ) . '/block-supports/custom-classname.php';
+
+if ( !class_exists( 'WP_Block_Recursion_Control') ) {
+	require_once __DIR__ . '/class-wp-block-recursion-control.php';
+}
+require_once __DIR__ . '/block-recursion-control.php';
