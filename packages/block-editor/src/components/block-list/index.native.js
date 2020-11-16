@@ -78,6 +78,7 @@ export class BlockList extends Component {
 			this
 		);
 		this.listRef = createRef();
+		this.listContainerRef = createRef();
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -211,6 +212,7 @@ export class BlockList extends Component {
 		};
 		return (
 			<View
+				ref={ this.listContainerRef }
 				style={ containerStyle }
 				onAccessibilityEscape={ clearSelectedBlock }
 			>
@@ -298,6 +300,7 @@ export class BlockList extends Component {
 				rootClientId={ rootClientId }
 				clientId={ clientId }
 				listRef={ this.listRef }
+				listContainerRef={ this.listContainerRef }
 				parentWidth={ parentWidth }
 				contentResizeMode={ contentResizeMode }
 				contentStyle={ contentStyle }

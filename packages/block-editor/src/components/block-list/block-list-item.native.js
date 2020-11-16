@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, findNodeHandle, Dimensions } from 'react-native';
+import { View, findNodeHandle } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -100,40 +100,102 @@ export class BlockListItem extends Component {
 	scrollToSelectedBlockIfItsNotVisible() {
 		const { isSelected } = this.props;
 
-		if ( this.blockRef.current ) {
-			// first we are measuring the layout to determine where {x,y} within the List Component the current Block based View is located.
-			this.blockRef.current.measureLayout(
-				findNodeHandle( this.props.listRef.current ),
-				( x, y ) => {
-					// once we have the {x,y} of that View we can then determine if it is currently visible.
-					this.blockRef.current.measure(
-						( _x, _y, blockWidth, blockHeight, px, py ) => {
-							const window = Dimensions.get( 'window' );
+		if ( this.props.listContainerRef.current ) {
+			this.props.listContainerRef.current.measure(
+				( _x, _y, _containerWidth, containerHeight ) => {
+					// first we are measuring the layout to determine where {x,y} within the List Component the current Block based View is located.
+					this.blockRef.current.measureLayout(
+						findNodeHandle( this.props.listRef.current ),
+						( x, y ) => {
+							// once we have the {x,y} of that View we can then determine if it is currently visible.
+							this.blockRef.current.measure(
+								(
+									_blockMeasureX,
+									_blockMeasureY,
+									_blockWidth,
+									blockHeight,
+									px,
+									py
+								) => {
+									if ( isSelected ) {
+										const {
+											scrollToBlockListOffset,
+										} = this.props;
 
-							if ( isSelected ) {
-								const { scrollToBlockListOffset } = this.props;
+										// this adjustment factor is utilized to create an invisible bounds at the top and bottom of the screen where once the View enters within
+										//any of these bounds then the scrolling action is triggered.
+										const scrollAdjustmentYOffset =
+											0.2 * containerHeight;
 
-								// this adjustment factor is utilized to create an invisible bounds at the top and bottom of the screen where once the View enters within
-								//any of these bounds then the scrolling action is triggered.
-								const scrollAdjustmentY = 0.2 * window.height;
-
-								// if the view has gone beyond the top of the screen we scroll to that location.
-								if ( py - scrollAdjustmentY < 0 ) {
-									scrollToBlockListOffset(
-										y - blockHeight - scrollAdjustmentY
-									);
-								} // if the view has gone below the bottom of the screen we scroll to that location.
-								else if (
-									py + blockHeight + scrollAdjustmentY >
-									window.height
-								) {
-									scrollToBlockListOffset( y );
+										// if the view has gone beyond the top of the screen we scroll to that location.
+										if (
+											py - scrollAdjustmentYOffset <
+											0
+										) {
+											const yOffset = this.calculateYOffsetInsideVisibleScreenBounds(
+												containerHeight,
+												scrollAdjustmentYOffset,
+												y,
+												blockHeight,
+												false
+											);
+											scrollToBlockListOffset( yOffset );
+										} // if the view has gone below the bottom of the screen we scroll to that location.
+										else if (
+											py +
+												blockHeight +
+												scrollAdjustmentYOffset >
+												containerHeight &&
+											blockHeight < containerHeight * 0.6
+										) {
+											const yOffset = this.calculateYOffsetInsideVisibleScreenBounds(
+												containerHeight,
+												scrollAdjustmentYOffset,
+												y,
+												blockHeight,
+												true
+											);
+											scrollToBlockListOffset( yOffset );
+										}
+									}
 								}
-							}
+							);
 						}
 					);
 				}
 			);
+		}
+	}
+
+	calculateYOffsetInsideVisibleScreenBounds(
+		listContainerHeight,
+		scrollAdjustmentYOffset,
+		blockYOffset,
+		blockHeight,
+		scrollDown = true
+	) {
+		const targetBlockYOffset = () => {
+			if ( scrollDown ) {
+				return blockYOffset;
+			}
+			return blockYOffset - blockHeight - scrollAdjustmentYOffset;
+		};
+
+		const topOfScreenBoundsYOffset = scrollAdjustmentYOffset;
+		const bottomOfScreenBoundsYOffset =
+			listContainerHeight - scrollAdjustmentYOffset;
+
+		if ( targetBlockYOffset < topOfScreenBoundsYOffset ) {
+			const yOffsetChange = topOfScreenBoundsYOffset - targetBlockYOffset;
+
+			return targetBlockYOffset + yOffsetChange;
+		}
+
+		if ( targetBlockYOffset > bottomOfScreenBoundsYOffset ) {
+			const yOffsetChange =
+				targetBlockYOffset - bottomOfScreenBoundsYOffset;
+
+			return targetBlockYOffset - yOffsetChange;
 		}
 	}
 
