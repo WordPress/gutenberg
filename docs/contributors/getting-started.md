@@ -12,7 +12,7 @@ After installing Node, you can build Gutenberg by running the following from wit
 
 
 ```bash
-npm install
+npm ci
 npm run build
 ```
 
@@ -124,7 +124,7 @@ Tools like MAMP tend to configure MySQL to use ports other than the default 3306
 
 You can use a remote server in development by building locally and then uploading the built files as a plugin to the remote server.
 
-To build: open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm install` to get the dependencies all set up. Once that finishes, you can type `npm run build`.
+To build: open a terminal (or if on Windows, a command prompt) and navigate to the repository you cloned. Now type `npm ci` to get the dependencies all set up. Once that finishes, you can type `npm run build`.
 
 After building the cloned gutenberg directory contains the complete plugin, you can upload the entire repository to your `wp-content/plugins` directory and activate the plugin from the WordPress admin.
 

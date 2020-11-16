@@ -41,6 +41,7 @@ function ColorOption( {
 	isEditingNameOnMount = false,
 	isEditingColorOnMount = false,
 	onCancel,
+	immutableColorSlugs = [],
 } ) {
 	const [ isHover, setIsHover ] = useState( false );
 	const [ isFocused, setIsFocused ] = useState( false );
@@ -118,7 +119,9 @@ function ColorOption( {
 							onChange={ ( newColorName ) =>
 								onChange( {
 									color,
-									slug: kebabCase( newColorName ),
+									slug: immutableColorSlugs.includes( slug )
+										? slug
+										: kebabCase( newColorName ),
 									name: newColorName,
 								} )
 							}
@@ -222,7 +225,12 @@ function ColorInserter( { onInsert, onCancel } ) {
 	);
 }
 
-export default function ColorEdit( { colors, onChange, emptyUI } ) {
+export default function ColorEdit( {
+	colors,
+	onChange,
+	emptyUI,
+	immutableColorSlugs,
+} ) {
 	const [ isInsertingColor, setIsInsertingColor ] = useState( false );
 	return (
 		<BaseControl>
@@ -254,6 +262,7 @@ export default function ColorEdit( { colors, onChange, emptyUI } ) {
 									color={ color.color }
 									name={ color.name }
 									slug={ color.slug }
+									immutableColorSlugs={ immutableColorSlugs }
 									onChange={ ( newColor ) => {
 										onChange(
 											colors.map(

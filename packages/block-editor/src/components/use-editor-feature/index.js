@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, isObject } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -47,6 +47,15 @@ const deprecatedFlags = {
 	},
 };
 
+function blockAttributesMatch( blockAttributes, attributes ) {
+	for ( const attribute in attributes ) {
+		if ( attributes[ attribute ] !== blockAttributes[ attribute ] ) {
+			return false;
+		}
+	}
+	return true;
+}
+
 /**
  * Hook that retrieves the setting for the given editor feature.
  * It works with nested objects using by finding the value at path.
@@ -61,11 +70,31 @@ const deprecatedFlags = {
  * ```
  */
 export default function useEditorFeature( featurePath ) {
-	const { name: blockName } = useBlockEditContext();
+	const { name: blockName, clientId } = useBlockEditContext();
 
 	const setting = useSelect(
 		( select ) => {
-			const settings = select( 'core/block-editor' ).getSettings();
+			const { getBlockAttributes, getSettings } = select(
+				'core/block-editor'
+			);
+			const settings = getSettings();
+			const blockType = select( 'core/blocks' ).getBlockType( blockName );
+
+			let context = blockName;
+			const selectors = get( blockType, [
+				'supports',
+				'__experimentalSelector',
+			] );
+			if ( isObject( selectors ) ) {
+				const blockAttributes = getBlockAttributes( clientId );
+				for ( const contextSelector in selectors ) {
+					const { attributes } = selectors[ contextSelector ];
+					if ( blockAttributesMatch( blockAttributes, attributes ) ) {
+						context = contextSelector;
+						break;
+					}
+				}
+			}
 
 			// 1 - Use __experimental features, if available.
 			// We cascade to the global value if the block one is not available.
@@ -73,7 +102,7 @@ export default function useEditorFeature( featurePath ) {
 			// TODO: make it work for blocks that define multiple selectors
 			// such as core/heading or core/post-title.
 			const globalPath = `__experimentalFeatures.global.${ featurePath }`;
-			const blockPath = `__experimentalFeatures.${ blockName }.${ featurePath }`;
+			const blockPath = `__experimentalFeatures.${ context }.${ featurePath }`;
 			const experimentalFeaturesResult =
 				get( settings, blockPath ) ?? get( settings, globalPath );
 			if ( experimentalFeaturesResult !== undefined ) {
@@ -94,7 +123,7 @@ export default function useEditorFeature( featurePath ) {
 			// To remove when __experimentalFeatures are ported to core.
 			return featurePath === 'typography.dropCap' ? true : undefined;
 		},
-		[ blockName, featurePath ]
+		[ blockName, clientId, featurePath ]
 	);
 
 	return setting;

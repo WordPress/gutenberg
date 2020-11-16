@@ -12,7 +12,7 @@
 function gutenberg_reregister_core_block_types() {
 	// Blocks directory may not exist if working from a fresh clone.
 	$blocks_dirs = array(
-		dirname( __FILE__ ) . '/../build/block-library/blocks/' => array(
+		__DIR__ . '/../build/block-library/blocks/' => array(
 			'block_folders' => array(
 				'audio',
 				'button',
@@ -88,7 +88,7 @@ function gutenberg_reregister_core_block_types() {
 				)
 			),
 		),
-		dirname( __FILE__ ) . '/../build/edit-widgets/blocks/'  => array(
+		__DIR__ . '/../build/edit-widgets/blocks/'  => array(
 			'block_folders' => array(
 				'legacy-widget',
 				'widget-area',

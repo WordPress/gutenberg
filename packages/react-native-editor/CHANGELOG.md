@@ -11,8 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
-## 1.42.0
-
+* [***] Adding support for selecting different unit of value in Cover and Columns blocks [#26161]
+* [**] Button block - Add link picker to the block settings [#26206]
 * [*] Fix theme colors syncing with the editor [#26821]
 
 ## 1.41.0

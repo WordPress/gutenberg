@@ -16,6 +16,8 @@ import { Panel, PanelBody } from '@wordpress/components';
  */
 import WidgetAreaInnerBlocks from './inner-blocks';
 
+/** @typedef {import('@wordpress/element').RefObject} RefObject */
+
 export default function WidgetAreaEdit( {
 	clientId,
 	className,
@@ -33,7 +35,7 @@ export default function WidgetAreaEdit( {
 		( openState ) => setIsWidgetAreaOpen( clientId, openState ),
 		[ clientId ]
 	);
-	const isDragging = useIsDragging();
+	const isDragging = useIsDragging( wrapper );
 	const isDraggingWithin = useIsDraggingWithin( wrapper );
 
 	const [ openedWhileDragging, setOpenedWhileDragging ] = useState( false );
@@ -82,14 +84,16 @@ export default function WidgetAreaEdit( {
 /**
  * A React hook to determine if dragging is active.
  *
- * @typedef {import('@wordpress/element').RefObject} RefObject
+ * @param {RefObject<HTMLElement>} elementRef The target elementRef object.
  *
  * @return {boolean} Is dragging within the entire document.
  */
-const useIsDragging = () => {
+const useIsDragging = ( elementRef ) => {
 	const [ isDragging, setIsDragging ] = useState( false );
 
 	useEffect( () => {
+		const { ownerDocument } = elementRef.current;
+
 		function handleDragStart() {
 			setIsDragging( true );
 		}
@@ -98,12 +102,12 @@ const useIsDragging = () => {
 			setIsDragging( false );
 		}
 
-		document.addEventListener( 'dragstart', handleDragStart );
-		document.addEventListener( 'dragend', handleDragEnd );
+		ownerDocument.addEventListener( 'dragstart', handleDragStart );
+		ownerDocument.addEventListener( 'dragend', handleDragEnd );
 
 		return () => {
-			document.removeEventListener( 'dragstart', handleDragStart );
-			document.removeEventListener( 'dragend', handleDragEnd );
+			ownerDocument.removeEventListener( 'dragstart', handleDragStart );
+			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
 		};
 	}, [] );
 
@@ -113,8 +117,6 @@ const useIsDragging = () => {
 /**
  * A React hook to determine if it's dragging within the target element.
  *
- * @typedef {import('@wordpress/element').RefObject} RefObject
- *
  * @param {RefObject<HTMLElement>} elementRef The target elementRef object.
  *
  * @return {boolean} Is dragging within the target element.
@@ -123,6 +125,8 @@ const useIsDraggingWithin = ( elementRef ) => {
 	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
 
 	useEffect( () => {
+		const { ownerDocument } = elementRef.current;
+
 		function handleDragStart( event ) {
 			// Check the first time when the dragging starts.
 			handleDragEnter( event );
@@ -144,14 +148,14 @@ const useIsDraggingWithin = ( elementRef ) => {
 
 		// Bind these events to the document to catch all drag events.
 		// Ideally, we can also use `event.relatedTarget`, but sadly that doesn't work in Safari.
-		document.addEventListener( 'dragstart', handleDragStart );
-		document.addEventListener( 'dragend', handleDragEnd );
-		document.addEventListener( 'dragenter', handleDragEnter );
+		ownerDocument.addEventListener( 'dragstart', handleDragStart );
+		ownerDocument.addEventListener( 'dragend', handleDragEnd );
+		ownerDocument.addEventListener( 'dragenter', handleDragEnter );
 
 		return () => {
-			document.removeEventListener( 'dragstart', handleDragStart );
-			document.removeEventListener( 'dragend', handleDragEnd );
-			document.removeEventListener( 'dragenter', handleDragEnter );
+			ownerDocument.removeEventListener( 'dragstart', handleDragStart );
+			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
+			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
 		};
 	}, [] );
 
