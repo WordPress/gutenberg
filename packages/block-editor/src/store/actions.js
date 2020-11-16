@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { castArray, first, last, some } from 'lodash';
+import { castArray, findKey, first, last, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,12 +9,18 @@ import { castArray, first, last, some } from 'lodash';
 import {
 	cloneBlock,
 	createBlock,
+	doBlocksMatchTemplate,
+	getBlockType,
 	getDefaultBlockName,
 	hasBlockSupport,
+	switchToBlockType,
+	synchronizeBlocksWithTemplate,
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
-import { __ } from '@wordpress/i18n';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import { controls } from '@wordpress/data';
+import { awaitPromise } from '@wordpress/data-controls';
+import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 
 /**
  * Generator which will yield a default block insert action if there
@@ -41,11 +47,46 @@ function* ensureDefaultBlock() {
  *
  * @return {Object} Action object.
  */
-export function resetBlocks( blocks ) {
-	return {
+export function* resetBlocks( blocks ) {
+	yield {
 		type: 'RESET_BLOCKS',
 		blocks,
 	};
+	yield* validateBlocksToTemplate( blocks );
+}
+
+/**
+ * Block validity is a function of blocks state (at the point of a
+ * reset) and the template setting. As a compromise to its placement
+ * across distinct parts of state, it is implemented here as a side-
+ * effect of the block reset action.
+ *
+ * @param {Object} action RESET_BLOCKS action.
+ * @param {Object} store  Store instance.
+ * @param blocks
+ * @return {?Object} New validity set action if validity has changed.
+ */
+export function* validateBlocksToTemplate( blocks ) {
+	const template = controls.select( 'core/block-editor', 'getTemplate' );
+	const templateLock = controls.select(
+		'core/block-editor',
+		'getTemplateLock'
+	);
+
+	// Unlocked templates are considered always valid because they act
+	// as default values only.
+	const isBlocksValidToTemplate =
+		! template ||
+		templateLock !== 'all' ||
+		doBlocksMatchTemplate( blocks, template );
+
+	// Update if validity has changed.
+	if (
+		isBlocksValidToTemplate !==
+		controls.select( 'core/block-editor', 'getTemplateLocisValidTemplate' )
+	) {
+		return setTemplateValidity( isBlocksValidToTemplate );
+	}
 }
 
 /**
@@ -189,10 +230,24 @@ export function* selectNextBlock( clientId ) {
  *
  * @return {Object} Action object.
  */
-export function startMultiSelect() {
-	return {
+export function* startMultiSelect() {
+	yield {
 		type: 'START_MULTI_SELECT',
 	};
+
+	const blockCount = yield controls.select(
+		'core/block-editor',
+		'getSelectedBlockCount'
+	);
+
+	speak(
+		sprintf(
+			/* translators: %s: number of selected blocks */
+			_n( '%s block selected.', '%s blocks selected.', blockCount ),
+			blockCount
+		),
+		'assertive'
+	);
 }
 
 /**
@@ -592,10 +647,18 @@ export function setTemplateValidity( isValid ) {
  *
  * @return {Object} Action object.
  */
-export function synchronizeTemplate() {
-	return {
+export function* synchronizeTemplate() {
+	yield {
 		type: 'SYNCHRONIZE_TEMPLATE',
 	};
+	const blocks = yield controls.select( 'core/block-editor', 'getBlocks' );
+	const template = yield controls.select(
+		'core/block-editor',
+		'getTemplate'
+	);
+	const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
+
+	return resetBlocks( updatedBlockList );
 }
 
 /**
@@ -606,11 +669,167 @@ export function synchronizeTemplate() {
  *
  * @return {Object} Action object.
  */
-export function mergeBlocks( firstBlockClientId, secondBlockClientId ) {
-	return {
+export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
+	const blocks = [ firstBlockClientId, secondBlockClientId ];
+	yield {
 		type: 'MERGE_BLOCKS',
-		blocks: [ firstBlockClientId, secondBlockClientId ],
+		blocks,
 	};
+
+	const [ clientIdA, clientIdB ] = blocks;
+	const blockA = yield controls.select(
+		'core/block-editor',
+		'getBlock',
+		clientIdA
+	);
+	const blockAType = getBlockType( blockA.name );
+
+	// Only focus the previous block if it's not mergeable
+	if ( ! blockAType.merge ) {
+		yield controls.dispatch(
+			'core/block-editor',
+			selectBlock( blockA.clientId )
+		);
+		return;
+	}
+
+	const blockB = yield controls.select(
+		'core/block-editor',
+		'getBlock',
+		clientIdB
+	);
+	const blockBType = getBlockType( blockB.name );
+	const { clientId, attributeKey, offset } = yield controls.select(
+		'core/block-editor',
+		'getSelectionStart'
+	);
+	const selectedBlockType = clientId === clientIdA ? blockAType : blockBType;
+	const attributeDefinition = selectedBlockType.attributes[ attributeKey ];
+	const canRestoreTextSelection =
+		( clientId === clientIdA || clientId === clientIdB ) &&
+		attributeKey !== undefined &&
+		offset !== undefined &&
+		// We cannot restore text selection if the RichText identifier
+		// is not a defined block attribute key. This can be the case if the
+		// fallback intance ID is used to store selection (and no RichText
+		// identifier is set), or when the identifier is wrong.
+		!! attributeDefinition;
+
+	if ( ! attributeDefinition ) {
+		if ( typeof attributeKey === 'number' ) {
+			window.console.error(
+				`RichText needs an identifier prop that is the block attribute key of the attribute it controls. Its type is expected to be a string, but was ${ typeof attributeKey }`
+			);
+		} else {
+			window.console.error(
+				'The RichText identifier prop does not match any attributes defined by the block.'
+			);
+		}
+	}
+
+	// A robust way to retain selection position through various transforms
+	// is to insert a special character at the position and then recover it.
+	const START_OF_SELECTED_AREA = '\u0086';
+
+	// Clone the blocks so we don't insert the character in a "live" block.
+	const cloneA = cloneBlock( blockA );
+	const cloneB = cloneBlock( blockB );
+
+	if ( canRestoreTextSelection ) {
+		const selectedBlock = clientId === clientIdA ? cloneA : cloneB;
+		const html = selectedBlock.attributes[ attributeKey ];
+		const {
+			multiline: multilineTag,
+			__unstableMultilineWrapperTags: multilineWrapperTags,
+			__unstablePreserveWhiteSpace: preserveWhiteSpace,
+		} = attributeDefinition;
+		const value = insert(
+			create( {
+				html,
+				multilineTag,
+				multilineWrapperTags,
+				preserveWhiteSpace,
+			} ),
+			START_OF_SELECTED_AREA,
+			offset,
+			offset
+		);
+
+		selectedBlock.attributes[ attributeKey ] = toHTMLString( {
+			value,
+			multilineTag,
+			preserveWhiteSpace,
+		} );
+	}
+
+	// We can only merge blocks with similar types
+	// thus, we transform the block to merge first
+	const blocksWithTheSameType =
+		blockA.name === blockB.name
+			? [ cloneB ]
+			: switchToBlockType( cloneB, blockA.name );
+
+	// If the block types can not match, do nothing
+	if ( ! blocksWithTheSameType || ! blocksWithTheSameType.length ) {
+		return;
+	}
+
+	// Calling the merge to update the attributes and remove the block to be merged
+	const updatedAttributes = blockAType.merge(
+		cloneA.attributes,
+		blocksWithTheSameType[ 0 ].attributes
+	);
+
+	if ( canRestoreTextSelection ) {
+		const newAttributeKey = findKey(
+			updatedAttributes,
+			( v ) =>
+				typeof v === 'string' &&
+				v.indexOf( START_OF_SELECTED_AREA ) !== -1
+		);
+		const convertedHtml = updatedAttributes[ newAttributeKey ];
+		const {
+			multiline: multilineTag,
+			__unstableMultilineWrapperTags: multilineWrapperTags,
+			__unstablePreserveWhiteSpace: preserveWhiteSpace,
+		} = blockAType.attributes[ newAttributeKey ];
+		const convertedValue = create( {
+			html: convertedHtml,
+			multilineTag,
+			multilineWrapperTags,
+			preserveWhiteSpace,
+		} );
+		const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
+		const newValue = remove( convertedValue, newOffset, newOffset + 1 );
+		const newHtml = toHTMLString( {
+			value: newValue,
+			multilineTag,
+			preserveWhiteSpace,
+		} );
+
+		updatedAttributes[ newAttributeKey ] = newHtml;
+
+		yield selectionChange(
+			blockA.clientId,
+			newAttributeKey,
+			newOffset,
+			newOffset
+		);
+	}
+
+	yield* replaceBlocks(
+		[ blockA.clientId, blockB.clientId ],
+		[
+			{
+				...blockA,
+				attributes: {
+					...blockA.attributes,
+					...updatedAttributes,
+				},
+			},
+			...blocksWithTheSameType.slice( 1 ),
+		]
+	);
 }
 
 /**
@@ -910,8 +1129,14 @@ export function __unstableMarkNextChangeAsNotPersistent() {
  *
  * @return {Object} Action object.
  */
-export function __unstableMarkAutomaticChange() {
-	return { type: 'MARK_AUTOMATIC_CHANGE' };
+export function* __unstableMarkAutomaticChange() {
+	yield { type: 'MARK_AUTOMATIC_CHANGE' };
+
+	// @TODO: replace this straightforward migration from effects.js with a proper requestIdleCallback
+	yield awaitPromise(
+		new Promise( ( resolve ) => setTimeout( resolve, 100 ) )
+	);
+	yield controls.dispatch( { type: 'MARK_AUTOMATIC_CHANGE_FINAL' } );
 }
 
 /**
