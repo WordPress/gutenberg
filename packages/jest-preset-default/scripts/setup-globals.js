@@ -5,7 +5,8 @@ global.window.tinyMCEPreInit = {
 	// <script> tag where it was loaded from, which of course fails here.
 	baseURL: 'about:blank',
 };
-global.window.requestAnimationFrame = setTimeout;
+global.window.requestAnimationFrame = ( callback ) =>
+	setTimeout( () => callback( Date.now() ) );
 global.window.cancelAnimationFrame = clearTimeout;
 global.window.matchMedia = () => ( {
 	matches: false,

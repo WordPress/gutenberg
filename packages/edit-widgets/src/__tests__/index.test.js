@@ -2,22 +2,20 @@
  * External dependencies
  */
 import {
-	act,
+	render,
 	screen,
 	getByRole,
+	findByRole,
 	findAllByRole,
 	queryAllByRole,
+	fireEvent,
 } from '@testing-library/react';
-
-/**
- * WordPress dependencies
- */
-import { unmountComponentAtNode } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { initialize } from '../';
+import Layout from '../components/layout';
 import { server } from './mocks/server';
 import availableLegacyWidgets from './mocks/available-legacy-widgets';
 
@@ -25,65 +23,119 @@ beforeAll( () => server.listen() );
 afterEach( () => server.resetHandlers() );
 afterAll( () => server.close() );
 
-let container;
+jest.setTimeout( 10000 );
 
-beforeEach( () => {
-	container = document.createElement( 'div' );
-	container.id = 'root';
-	document.body.appendChild( container );
+const editorSettings = {
+	availableLegacyWidgets,
+};
+
+// Mock "@wordpress/element".render, so that initialize() doesn't actually render the component.
+jest.mock( '@wordpress/element', () => {
+	const WPElement = require.requireActual( '@wordpress/element' );
+	return {
+		...WPElement,
+		render: () => {},
+	};
 } );
 
-afterEach( () => {
-	unmountComponentAtNode( container );
-	document.body.removeChild( container );
+beforeAll( () => {
+	initialize( 'root', editorSettings );
 } );
 
-test( 'it renders', async () => {
-	act( () => {
-		initialize( 'root', {
-			availableLegacyWidgets,
+describe( 'edit-widgets', () => {
+	it( 'renders', async () => {
+		render( <Layout blockEditorSettings={ editorSettings } /> );
+
+		const widgetAreas = await screen.findAllByRole( 'group', {
+			name: 'Block: Widget Area',
 		} );
+		expect( widgetAreas.length ).toBe( 2 );
+
+		const [ footer, inactiveWidgets ] = widgetAreas;
+
+		const footerHeading = getByRole( footer, 'heading', { level: 2 } );
+		expect( footerHeading ).toHaveTextContent( 'Footer' );
+
+		const inactiveWidgetsHeading = getByRole( inactiveWidgets, 'heading', {
+			level: 2,
+		} );
+		expect( inactiveWidgetsHeading ).toHaveTextContent(
+			'Inactive widgets'
+		);
+
+		const footerBlocks = await findAllByRole( footer, 'group' );
+		expect( footerBlocks.length ).toBe( 4 );
+
+		const [
+			firstParagraph,
+			recentPosts,
+			search,
+			secondParagraph,
+		] = footerBlocks;
+
+		expect( firstParagraph ).toHaveTextContent( 'First Paragraph' );
+
+		const recentPostsHeading = getByRole( recentPosts, 'heading', {
+			level: 3,
+		} );
+		expect( recentPostsHeading ).toHaveTextContent(
+			'Recent Posts: Recent Posts'
+		);
+
+		const searchHeading = getByRole( search, 'heading', { level: 3 } );
+		expect( searchHeading ).toHaveTextContent( 'Search: Search' );
+
+		expect( secondParagraph ).toHaveTextContent( 'Second Paragraph' );
+
+		const inactiveWidgetsBlocks = queryAllByRole(
+			inactiveWidgets,
+			'group'
+		);
+		expect( inactiveWidgetsBlocks ).toEqual( [] );
 	} );
 
-	const widgetAreas = await screen.findAllByRole( 'group', {
-		name: 'Block: Widget Area',
+	it( 'should default to insert blocks to the first widget area', async () => {
+		render( <Layout blockEditorSettings={ editorSettings } /> );
+
+		const widgetAreas = await screen.findAllByRole( 'group', {
+			name: 'Block: Widget Area',
+		} );
+
+		const [ footer ] = widgetAreas;
+
+		let footerBlocks = await findAllByRole( footer, 'group' );
+		expect( footerBlocks.length ).toBe( 4 );
+
+		const globalInserterButton = screen.getByRole( 'button', {
+			name: 'Add block',
+		} );
+
+		fireEvent.click( globalInserterButton );
+
+		const globalInserterBlocksList = await screen.findByRole( 'listbox', {
+			name: 'Child Blocks',
+		} );
+
+		const addParagraphBlockButton = await findByRole(
+			globalInserterBlocksList,
+			'option',
+			{
+				name: 'Paragraph',
+			}
+		);
+
+		fireEvent.click( addParagraphBlockButton );
+
+		footerBlocks = await findAllByRole( footer, 'group' );
+		expect( footerBlocks.length ).toBe( 5 );
+
+		const insertedParagraphBlock = footerBlocks[ 4 ];
+
+		expect( insertedParagraphBlock ).toHaveFocus();
+		expect( insertedParagraphBlock ).toHaveAttribute( 'role', 'group' );
+		expect( insertedParagraphBlock ).toHaveAttribute(
+			'contenteditable',
+			'true'
+		);
 	} );
-	expect( widgetAreas.length ).toBe( 2 );
-
-	const [ footer, inactiveWidgets ] = widgetAreas;
-
-	const footerHeading = getByRole( footer, 'heading', { level: 2 } );
-	expect( footerHeading ).toHaveTextContent( 'Footer' );
-
-	const inactiveWidgetsHeading = getByRole( inactiveWidgets, 'heading', {
-		level: 2,
-	} );
-	expect( inactiveWidgetsHeading ).toHaveTextContent( 'Inactive widgets' );
-
-	const footerBlocks = await findAllByRole( footer, 'group' );
-	expect( footerBlocks.length ).toBe( 4 );
-
-	const [
-		firstParagraph,
-		recentPosts,
-		search,
-		secondParagraph,
-	] = footerBlocks;
-
-	expect( firstParagraph ).toHaveTextContent( 'First Paragraph' );
-
-	const recentPostsHeading = getByRole( recentPosts, 'heading', {
-		level: 3,
-	} );
-	expect( recentPostsHeading ).toHaveTextContent(
-		'Recent Posts: Recent Posts'
-	);
-
-	const searchHeading = getByRole( search, 'heading', { level: 3 } );
-	expect( searchHeading ).toHaveTextContent( 'Search: Search' );
-
-	expect( secondParagraph ).toHaveTextContent( 'Second Paragraph' );
-
-	const inactiveWidgetsBlocks = queryAllByRole( inactiveWidgets, 'group' );
-	expect( inactiveWidgetsBlocks ).toEqual( [] );
 } );

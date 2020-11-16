@@ -9,3 +9,9 @@ import 'whatwg-fetch';
 import jQuery from 'jquery';
 
 window.jQuery = jQuery;
+
+// Mock window.getSelection.
+window.getSelection = jest.fn( () => ( {
+	addRange: jest.fn(),
+	removeAllRanges: jest.fn(),
+} ) );

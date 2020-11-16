@@ -36,7 +36,7 @@ export default function BlockParentSelector() {
 				parentBlockType: _parentBlockType,
 				firstParentClientId: _firstParentClientId,
 				shouldHide: ! hasBlockSupport(
-					parentBlockType,
+					_parentBlockType,
 					'__experimentalParentSelector',
 					true
 				),
