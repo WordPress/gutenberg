@@ -441,7 +441,6 @@ function gutenberg_inject_default_block_context( $args ) {
 			$registry = WP_Block_Type_Registry::get_instance();
 			$block_type = $registry->get_registered( $block->name );
 
-
 			// For WordPress versions that don't support the context API.
 			if ( ! $block->context ) {
 				$block->context = array();
