@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { keyBy } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
@@ -38,18 +33,9 @@ export default function useTemplatePartPost( postId, slug, theme ) {
 						theme,
 					}
 				);
-				const themeTaxonomies = keyBy(
-					select( 'core' ).getEntityRecords( 'taxonomy', 'wp_theme', {
-						per_page: -1,
-					} ),
-					'name'
-				);
 
 				const foundPosts = posts?.filter(
-					( post ) =>
-						post.slug === cleanedSlug &&
-						themeTaxonomies[ theme ] &&
-						post.wp_theme.includes( themeTaxonomies[ theme ].id )
+					( post ) => post.slug === cleanedSlug
 				);
 				// A published post might already exist if this template part was customized elsewhere
 				// or if it's part of a customized template.
