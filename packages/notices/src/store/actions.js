@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { noop, uniqueId } from 'lodash';
+import { uniqueId } from 'lodash';
 
 /**
  * Internal dependencies
@@ -60,7 +60,7 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 		__unstableHTML,
 		icon = null,
 		explicitDismiss = false,
-		onDismiss = noop,
+		onDismiss = null,
 	} = options;
 
 	// The supported value shape of content is currently limited to plain text

@@ -56,6 +56,8 @@ function Snackbar(
 	},
 	ref
 ) {
+	onDismiss = onDismiss || noop;
+
 	function dismissMe( event ) {
 		if ( event && event.preventDefault ) {
 			event.preventDefault();
@@ -71,8 +73,8 @@ function Snackbar(
 	useEffect( () => {
 		const timeoutHandle = setTimeout( () => {
 			if ( ! explicitDismiss ) {
-				onRemove();
 				onDismiss();
+				onRemove();
 			}
 		}, NOTICE_TIMEOUT );
 
