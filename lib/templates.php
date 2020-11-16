@@ -90,6 +90,35 @@ function gutenberg_register_template_post_type() {
 add_action( 'init', 'gutenberg_register_template_post_type' );
 
 /**
+ * Registers block editor 'wp_theme' taxonomy.
+ */
+function gutenberg_register_wp_theme_taxonomy() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
+	register_taxonomy(
+		'wp_theme',
+		array( 'wp_template', 'wp_template_part' ),
+		array(
+			'public'            => false,
+			'hierarchical'      => false,
+			'labels'            => array(
+				'name'          => __( 'Themes' ),
+				'singular_name' => __( 'Theme' ),
+			),
+			'query_var'         => false,
+			'rewrite'           => false,
+			'show_ui'           => false,
+			'_builtin'          => true,
+			'show_in_nav_menus' => false,
+			'show_in_rest'      => true,
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
+
+/**
  * Automatically set the theme meta for templates.
  *
  * @param array $post_id Template ID.
