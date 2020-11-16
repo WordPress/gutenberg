@@ -372,8 +372,6 @@ add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
  * This hooks into block registration to wrap the render_callback
  * of dynamic blocks to inject context for WordPress versions that don't support it.
  *
- * The context handling can be removed when plugin support requires WordPress 5.5.0+.
- *
  * @see https://core.trac.wordpress.org/ticket/49927
  * @see https://core.trac.wordpress.org/changeset/48243
  *
@@ -397,34 +395,40 @@ function gutenberg_render_block_with_assigned_block_context( $args ) {
 				return $block_render_callback( $attributes, $content );
 			}
 
-			if ( property_exists( $block, 'context' ) ) {
-				$context = array();
+			// For WordPress versions that don't support the context API.
+			$core_has_context_support = property_exists( $block, 'context' );
+			if ( ! $core_has_context_support ) {
+				$block->context = array();
+			}
 
-				if ( $post instanceof WP_Post ) {
-					$context['postId'] = $post->ID;
+			// Inject the post context if not done by Core.
+			if ( $post instanceof WP_Post && ! isset( $block->context['postId'] ) && ! isset( $block->context['postType'] ) ) {
+				$block->context['postId'] = $post->ID;
 
-					/*
-					* The `postType` context is largely unnecessary server-side, since the
-					* ID is usually sufficient on its own. That being said, since a block's
-					* manifest is expected to be shared between the server and the client,
-					* it should be included to consistently fulfill the expectation.
-					*/
-					$context['postType'] = $post->post_type;
-				}
+				/*
+				* The `postType` context is largely unnecessary server-side, since the
+				* ID is usually sufficient on its own. That being said, since a block's
+				* manifest is expected to be shared between the server and the client,
+				* it should be included to consistently fulfill the expectation.
+				*/
+				$block->context['postType'] = $post->post_type;
+			}
 
+			// Inject the query context if not done by Core.
+			if ( ! isset( $block->context['query'] ) ) {
 				if ( isset( $wp_query->tax_query->queried_terms['category'] ) ) {
-					$context['query'] = array( 'categoryIds' => array() );
+					$block->context['query'] = array( 'categoryIds' => array() );
 
 					foreach ( $wp_query->tax_query->queried_terms['category']['terms'] as $category_slug_or_id ) {
-						$context['query']['categoryIds'][] = 'slug' === $wp_query->tax_query->queried_terms['category']['field'] ? get_cat_ID( $category_slug_or_id ) : $category_slug_or_id;
+						$block->context['query']['categoryIds'][] = 'slug' === $wp_query->tax_query->queried_terms['category']['field'] ? get_cat_ID( $category_slug_or_id ) : $category_slug_or_id;
 					}
 				}
 
 				if ( isset( $wp_query->tax_query->queried_terms['post_tag'] ) ) {
-					if ( isset( $context['query'] ) ) {
-						$context['query']['tagIds'] = array();
+					if ( isset( $block->context['query'] ) ) {
+						$block->context['query']['tagIds'] = array();
 					} else {
-						$context['query'] = array( 'tagIds' => array() );
+						$block->context['query'] = array( 'tagIds' => array() );
 					}
 
 					foreach ( $wp_query->tax_query->queried_terms['post_tag']['terms'] as $tag_slug_or_id ) {
@@ -437,11 +441,19 @@ function gutenberg_render_block_with_assigned_block_context( $args ) {
 								$tag_ID = $tag->term_id;
 							}
 						}
-						$context['query']['tagIds'][] = $tag_ID;
+						$block->context['query']['tagIds'][] = $tag_ID;
 					}
 				}
+			}
 
-				$block->context = $context;
+			if ( $core_has_context_support ) {
+				/**
+				 * Filters the default context provided to a rendered block.
+				 *
+				 * @param array $context      Default context.
+				 * @param array $parsed_block Block being rendered, filtered by `render_block_data`.
+				 */
+				$context = apply_filters( 'render_block_context', $context, $block );
 			}
 
 			return $block_render_callback( $attributes, $content, $block );
