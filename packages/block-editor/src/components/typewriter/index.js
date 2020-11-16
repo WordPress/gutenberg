@@ -243,7 +243,11 @@ function Typewriter( { children } ) {
 		};
 	}, [ hasSelectedBlock ] );
 
-	return <div ref={ ref }>{ children }</div>;
+	return (
+		<div ref={ ref } className="block-editor__typewriter">
+			{ children }
+		</div>
+	);
 }
 
 /**
