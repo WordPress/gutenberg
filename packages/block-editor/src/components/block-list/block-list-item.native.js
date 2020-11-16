@@ -20,6 +20,8 @@ import {
  */
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
+import Grid from './grid-item';
+
 import styles from './block-list-item.native.scss';
 
 const stretchStyle = {
@@ -73,11 +75,19 @@ export class BlockListItem extends Component {
 	}
 
 	getContentStyles( readableContentViewStyle ) {
-		const { blockAlignment, hasParents } = this.props;
+		const {
+			blockAlignment,
+			hasParents,
+			marginHorizontal,
+			parentBlockAlignment,
+		} = this.props;
 		const isFullWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.full;
 
 		return [
 			readableContentViewStyle,
+			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full && {
+				marginHorizontal: -marginHorizontal / 2,
+			},
 			isFullWidth &&
 				! hasParents && {
 					width: styles.fullAlignment.width,
@@ -89,7 +99,7 @@ export class BlockListItem extends Component {
 		];
 	}
 
-	render() {
+	renderContent() {
 		const {
 			blockAlignment,
 			clientId,
@@ -130,6 +140,23 @@ export class BlockListItem extends Component {
 				</View>
 			</ReadableContentView>
 		);
+	}
+
+	render() {
+		const { gridProperties, clientId, parentWidth, items } = this.props;
+		if ( gridProperties ) {
+			return (
+				<Grid
+					columns={ gridProperties.numColumns }
+					tileCount={ items.length }
+					index={ items.indexOf( clientId ) }
+					maxWidth={ parentWidth }
+				>
+					{ this.renderContent() }
+				</Grid>
+			);
+		}
+		return this.renderContent();
 	}
 }
 

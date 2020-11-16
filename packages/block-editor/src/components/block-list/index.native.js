@@ -24,7 +24,6 @@ import { __ } from '@wordpress/i18n';
 import styles from './style.scss';
 import BlockListAppender from '../block-list-appender';
 import BlockListItem from './block-list-item.native';
-import Grid from './grid-item';
 
 const BlockListContext = createContext();
 
@@ -75,7 +74,6 @@ export class BlockList extends Component {
 		);
 		this.renderEmptyList = this.renderEmptyList.bind( this );
 		this.getExtraData = this.getExtraData.bind( this );
-		this.getBlockListItem = this.getBlockListItem.bind( this );
 	}
 
 	addBlockToEndOfPost( newBlock ) {
@@ -122,6 +120,7 @@ export class BlockList extends Component {
 			contentStyle,
 			renderAppender,
 			blockProps,
+			gridProperties,
 		} = this.props;
 		if (
 			this.extraData.parentWidth !== parentWidth ||
@@ -129,7 +128,8 @@ export class BlockList extends Component {
 			this.extraData.onDeleteBlock !== onDeleteBlock ||
 			this.extraData.contentStyle !== contentStyle ||
 			this.extraData.renderAppender !== renderAppender ||
-			this.extraData.blockProps !== blockProps
+			this.extraData.blockProps !== blockProps ||
+			this.extraData.gridProperties !== gridProperties
 		) {
 			this.extraData = {
 				parentWidth,
@@ -138,6 +138,7 @@ export class BlockList extends Component {
 				contentStyle,
 				renderAppender,
 				blockProps,
+				gridProperties,
 			};
 		}
 		return this.extraData;
@@ -259,7 +260,7 @@ export class BlockList extends Component {
 		);
 	}
 
-	getBlockListItem( clientId ) {
+	renderItem( { item: clientId } ) {
 		const {
 			contentResizeMode,
 			contentStyle,
@@ -267,10 +268,12 @@ export class BlockList extends Component {
 			onDeleteBlock,
 			rootClientId,
 			isStackedHorizontally,
+			blockClientIds,
 			parentWidth,
 			marginVertical = styles.defaultBlock.marginTop,
 			marginHorizontal = styles.defaultBlock.marginLeft,
 			blockProps,
+			gridProperties,
 		} = this.props;
 		return (
 			<BlockListItem
@@ -291,25 +294,10 @@ export class BlockList extends Component {
 					this.onCaretVerticalPositionChange
 				}
 				blockProps={ blockProps }
+				gridProperties={ gridProperties }
+				items={ blockClientIds }
 			/>
 		);
-	}
-
-	renderItem( { item: clientId } ) {
-		const { gridProperties, blockClientIds, parentWidth } = this.props;
-		if ( gridProperties ) {
-			return (
-				<Grid
-					columns={ gridProperties.numColumns }
-					tileCount={ blockClientIds.length }
-					index={ blockClientIds.indexOf( clientId ) }
-					maxWidth={ parentWidth }
-				>
-					{ this.getBlockListItem( clientId ) }
-				</Grid>
-			);
-		}
-		return this.getBlockListItem( clientId );
 	}
 
 	renderBlockListFooter() {

@@ -102,13 +102,17 @@ function GalleryEdit( props ) {
 		}
 	}, [ currentImageOptions, imageSettings ] );
 
-	const { getBlock, getMedia, getSettings } = useSelect( ( select ) => {
-		return {
-			getBlock: select( 'core/block-editor' ).getBlock,
-			getSettings: select( 'core/block-editor' ).getSettings,
-			getMedia: select( 'core' ).getMedia,
-		};
-	}, [] );
+	const { getBlock, getMedia, getSettings, getBlocks } = useSelect(
+		( select ) => {
+			return {
+				getBlock: select( 'core/block-editor' ).getBlock,
+				getSettings: select( 'core/block-editor' ).getSettings,
+				getMedia: select( 'core' ).getMedia,
+				getBlocks: select( 'core/block-editor' ).getBlocks,
+			};
+		},
+		[]
+	);
 
 	const images = useSelect( ( select ) => {
 		const newImages = select( 'core/block-editor' )
@@ -163,14 +167,19 @@ function GalleryEdit( props ) {
 	}
 
 	function onSelectImages( newImages ) {
+		const innerBlocks = getBlocks( clientId );
+
 		const newBlocks = newImages.map( ( image ) => {
-			const existingBlock = find(
-				images,
-				( img ) => img.id === image.id
-			);
+			const existingInnerBlock = find( innerBlocks, ( block ) => {
+				return block.attributes.id === image.id;
+			} );
+
+			if ( existingInnerBlock ) {
+				return existingInnerBlock;
+			}
 
 			return createBlock( 'core/image', {
-				...buildImageAttributes( existingBlock, image ),
+				...buildImageAttributes( undefined, image ),
 				id: image.id,
 			} );
 		} );

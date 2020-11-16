@@ -492,13 +492,10 @@ export class ImageEdit extends React.Component {
 								retryMessage,
 							} ) => {
 								return (
-									/// TEMPORARY FOR GALLERY!! TODO
 									<View
 										style={
-											this.props.isGallery && {
-												height: 150,
-												overflow: 'hidden',
-											}
+											this.props.isGallery &&
+											styles.isGallery
 										}
 									>
 										<Image
