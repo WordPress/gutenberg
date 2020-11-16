@@ -48,7 +48,7 @@ export { default as __experimentalLinkControlSearchItem } from './link-control/s
 export { default as LineHeightControl } from './line-height-control';
 export { default as MediaReplaceFlow } from './media-replace-flow';
 export { default as MediaPlaceholder } from './media-placeholder';
-export { default as MediaUpload } from './media-upload';
+export { default as MediaUpload, FilteredMediaUpload } from './media-upload';
 export { default as MediaUploadCheck } from './media-upload/check';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as PlainText } from './plain-text';

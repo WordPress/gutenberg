@@ -19,12 +19,12 @@ import {
 	BlockEditorProvider,
 	BlockList,
 	WritingFlow,
-	ObserveTyping
+	ObserveTyping,
 } from '@wordpress/block-editor';
 import { SlotFillProvider, Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
-function MyEditorComponent () {
+function MyEditorComponent() {
 	const [ blocks, updateBlocks ] = useState( [] );
 
 	return (
@@ -268,6 +268,15 @@ _Returns_
 <a name="DefaultBlockAppender" href="#DefaultBlockAppender">#</a> **DefaultBlockAppender**
 
 Undocumented declaration.
+
+<a name="FilteredMediaUpload" href="#FilteredMediaUpload">#</a> **FilteredMediaUpload**
+
+Helper component for `MediaUpload` that enables extensibility through
+Plugins API.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/plugins/README.md#FilteredComponent>
 
 <a name="FontSizePicker" href="#FontSizePicker">#</a> **FontSizePicker**
 

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added a component wrapper `FilteredComponent` that makes it possible to integrate WordPress hooks API applied to components with Plugins API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
+-   Added a factory method `createFilteredComponent` that creates a new variation of `FilteredComponent` component, with a provided hook name set, to be used with Plugins API ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
+
 ## 2.0.10 (2019-01-03)
 
 ## 2.0.9 (2018-11-15)
@@ -20,4 +25,4 @@
 
 ### Breaking Change
 
-- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)).  If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
+-   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

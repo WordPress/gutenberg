@@ -1,10 +1,10 @@
 /**
  * WordPress dependencies
  */
+import { FilteredMediaUpload } from '@wordpress/block-editor';
 import { MenuItem, VisuallyHidden } from '@wordpress/components';
 import { external } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { FilteredComponent } from '@wordpress/interface';
 import { MediaUpload } from '@wordpress/media-utils';
 import { registerPlugin } from '@wordpress/plugins';
 import { addQueryArgs } from '@wordpress/url';
@@ -22,8 +22,7 @@ registerPlugin( 'edit-post', {
 	render() {
 		return (
 			<>
-				<FilteredComponent
-					hookName="editor.MediaUpload"
+				<FilteredMediaUpload
 					namespace="core/edit-post/replace-media-upload"
 					as={ MediaUpload }
 				/>

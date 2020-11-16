@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import { withFilters } from '@wordpress/components';
+import { createFilteredComponent } from '@wordpress/plugins';
+
+const FILTER_NAME = 'editor.MediaUpload';
 
 /**
  * This is a placeholder for the media upload component necessary to make it possible to provide
@@ -13,6 +16,14 @@ import { withFilters } from '@wordpress/components';
 const MediaUpload = () => null;
 
 /**
+ * Helper component for `MediaUpload` that enables extensibility through
+ * Plugins API.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/plugins/README.md#FilteredComponent
+ */
+export const FilteredMediaUpload = createFilteredComponent( FILTER_NAME );
+
+/**
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-upload/README.md
  */
-export default withFilters( 'editor.MediaUpload' )( MediaUpload );
+export default withFilters( FILTER_NAME )( MediaUpload );
