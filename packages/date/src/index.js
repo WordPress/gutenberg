@@ -7,6 +7,7 @@ import {
 	getDaysInMonth,
 	isFuture,
 	isLeapYear,
+	formatISO,
 	parseISO,
 	toDate,
 } from 'date-fns';
@@ -306,7 +307,9 @@ const formatMap = {
 		);
 	},
 	// Full date/time
-	c: 'yyyy-MM-DDTHH:mm:ssZ', // .toISOString
+	c( dateValue ) {
+		return formatISO( dateValue ); // .toISOString
+	},
 	r: 'ddd, D MMM yyyy HH:mm:ss ZZ',
 	U( dateValue ) {
 		return formatTZ(
