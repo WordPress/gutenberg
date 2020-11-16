@@ -452,16 +452,22 @@ class WP_Theme_JSON {
 				isset( $block_type->supports['__experimentalSelector'] ) &&
 				is_array( $block_type->supports['__experimentalSelector'] )
 			) {
-				foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector_data ) {
+				foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector_metadata ) {
+					if (
+						! isset( $selector_metadata['selector'] ) ||
+						! isset( $selector_metadata['attributes'] ) ||
+						! isset( $selector_metadata['title'] )
+					) {
+						continue;
+					}
+
 					self::$blocks_metadata[ $key ] = array(
-						'selector'   => $selector_data['selector'],
+						'selector'   => $selector_metadata['selector'],
+						'title'      => $selector_metadata['title'],
 						'supports'   => $block_supports,
 						'blockName'  => $block_name,
-						'attributes' => $selector_data['attributes'],
+						'attributes' => $selector_metadata['attributes'],
 					);
-					if ( isset( $selector_data['title'] ) ) {
-						self::$blocks_metadata[ $key ]['title'] = $selector_data['title'];
-					}
 				}
 			} else {
 				self::$blocks_metadata[ $block_name ] = array(
@@ -654,7 +660,7 @@ class WP_Theme_JSON {
 			$value = self::get_property_value( $context['styles'], $metadata['theme_json'] );
 			if ( ! empty( $value ) ) {
 				$kebabcased_name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $name ) );
-				$declarations[] = array(
+				$declarations[]  = array(
 					'name'  => $kebabcased_name,
 					'value' => $value,
 				);
