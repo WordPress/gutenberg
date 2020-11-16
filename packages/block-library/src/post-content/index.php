@@ -17,17 +17,22 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
-	if ( 'revision' === $block->context['postType'] ) {
-		return '';
+
+	if ( gutenberg_process_this_content( $block->context['postId'], $block->name ) ) {
+		if ('revision' === $block->context['postType']) {
+			return '';
+		}
+
+		$wrapper_attributes = get_block_wrapper_attributes(array('class' => 'entry-content'));
+
+		$html = '<div ' . $wrapper_attributes . '>' .
+			apply_filters('the_content', str_replace(']]>', ']]&gt;', get_the_content(null, false, $block->context['postId']))) .
+			'</div>';
+		gutenberg_clear_processed_content();
+	} else {
+		$html = gutenberg_report_recursion_error();
 	}
-
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
-
-	return (
-		'<div ' . $wrapper_attributes . '>' .
-			apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', get_the_content( null, false, $block->context['postId'] ) ) ) .
-		'</div>'
-	);
+	return $html;
 }
 
 /**
