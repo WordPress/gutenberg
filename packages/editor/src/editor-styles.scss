@@ -9,7 +9,7 @@
  */
 
 body {
-	font-family: $default-font !important;	// This !important is added temporary to start the conversation. It will need a core patch if we agree.
+	font-family: $default-font;
 	font-size: $editor-font-size;
 	line-height: $editor-line-height;
 	color: $gray-900;
