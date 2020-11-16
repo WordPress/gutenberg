@@ -8,12 +8,12 @@ import {
 	isFuture,
 	isLeapYear,
 	parseISO,
-	toDate,
 } from 'date-fns';
 import {
 	format as formatTZ,
 	utcToZonedTime,
 	zonedTimeToUtc,
+	toDate,
 } from 'date-fns-tz';
 import originalLocale from 'date-fns/locale/en-US/index';
 import buildLocalizeFn from 'date-fns/locale/_lib/buildLocalizeFn';
@@ -306,8 +306,30 @@ const formatMap = {
 		);
 	},
 	// Full date/time
-	c: 'yyyy-MM-DDTHH:mm:ssZ', // .toISOString
-	r: 'ddd, D MMM yyyy HH:mm:ss ZZ',
+	c( dateValue ) {
+		return formatTZ(
+			utcToZonedTime(
+				zonedTimeToUtc( dateValue, getActualTimezone() ),
+				'UTC'
+			), // Offsets the time to the correct timezone
+			"yyyy-MM-dd'T'HH:mm:ssXXX",
+			{
+				timeZone: getActualTimezone(), // Adds the timezone offset to the Date object that will be formatted.
+			}
+		);
+	}, // .toISOString
+	r( dateValue ) {
+		return formatTZ(
+			utcToZonedTime(
+				zonedTimeToUtc( dateValue, getActualTimezone() ),
+				'UTC'
+			), // Offsets the time to the correct timezone
+			'iii, d MMM yyyy HH:mm:ss XX',
+			{
+				timeZone: getActualTimezone(), // Adds the timezone offset to the Date object that will be formatted.
+			}
+		);
+	},
 	U( dateValue ) {
 		return formatTZ(
 			zonedTimeToUtc( dateValue, getActualTimezone() ),
