@@ -10,7 +10,6 @@ import { Icon, wordpress } from '@wordpress/icons';
 import Navigation from '..';
 import NavigationGroup from '../group';
 import NavigationItem from '../item';
-import NavigationItemText from '../item/text';
 import NavigationMenu from '../menu';
 
 export function MoreExamplesStory() {
@@ -81,14 +80,16 @@ export function MoreExamplesStory() {
 					</NavigationItem>
 				</NavigationGroup>
 				<NavigationGroup title="Text only items">
-					<NavigationItemText
+					<NavigationItem
 						item="item-text-only"
 						title="This is just text, doesn't have any functionality"
+						isText
 					/>
-					<NavigationItemText
+					<NavigationItem
 						item="item-text-only-with-badge"
 						title="Text with badge"
 						badge="2"
+						isText
 					/>
 				</NavigationGroup>
 			</NavigationMenu>

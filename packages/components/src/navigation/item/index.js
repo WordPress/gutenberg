@@ -30,6 +30,7 @@ export default function NavigationItem( props ) {
 		onClick = noop,
 		title,
 		hideIfTargetMenuEmpty,
+		isText,
 		...restProps
 	} = props;
 
@@ -63,12 +64,13 @@ export default function NavigationItem( props ) {
 		onClick( event );
 	};
 	const icon = isRTL ? chevronLeft : chevronRight;
+	const as = isText ? 'div' : Button;
 
 	return (
 		<NavigationItemBase { ...props } className={ classes }>
 			{ children || (
 				<ItemBaseUI
-					as={ Button }
+					as={ as }
 					href={ href }
 					onClick={ onItemClick }
 					{ ...restProps }
