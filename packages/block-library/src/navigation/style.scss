@@ -20,3 +20,19 @@
 .items-justified-right > ul {
 	justify-content: flex-end;
 }
+
+// CSS inspired by Placeholder component
+.wp-block-navigation-placeholder {
+	padding: 0.5em;
+	border-radius: $radius-block-ui;
+	background-color: $white;
+	box-shadow: inset 0 0 0 $border-width $gray-900;
+	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
+}
+
+.wp-block-navigation-placeholder__actions {
+	font-size: $default-font-size;
+	span {
+		margin-right: 1em;
+	}
+}
