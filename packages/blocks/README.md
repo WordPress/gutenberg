@@ -746,7 +746,7 @@ Store definition for the blocks namespace.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition>
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStoreDefinition>
 
 _Type_
 

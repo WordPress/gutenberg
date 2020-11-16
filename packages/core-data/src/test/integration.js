@@ -9,7 +9,7 @@ import { createRegistry, controls } from '@wordpress/data';
 import * as actions from '../actions';
 import * as selectors from '../selectors';
 import * as resolvers from '../resolvers';
-import { storeConfig as coreStoreConfig } from '../';
+import { storeDefinition } from '../';
 
 // Mock to prevent calling window.fetch in test environment
 jest.mock( '@wordpress/data-controls', () => {
@@ -52,7 +52,7 @@ describe( 'receiveEntityRecord', () => {
 				data: {},
 			},
 		};
-		registry.registerStore( 'core', coreStoreConfig );
+		registry.register( storeDefinition );
 		registry.registerStore( 'test/resolution', {
 			actions: {
 				receiveEntityRecords: actions.receiveEntityRecords,
@@ -160,7 +160,7 @@ describe( 'receiveEntityRecord', () => {
 describe( 'saveEntityRecord', () => {
 	function createTestRegistry() {
 		const registry = createRegistry();
-		registry.registerStore( 'core', coreStoreConfig );
+		registry.registerStore( storeDefinition );
 		return registry;
 	}
 

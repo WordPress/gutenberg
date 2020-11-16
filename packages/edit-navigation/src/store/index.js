@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__unstableCreateStoreDefinition,
-	registerStore,
-} from '@wordpress/data';
+import { createReduxStoreDefinition, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -27,7 +24,7 @@ const STORE_NAME = 'core/edit-navigation';
  *
  * @type {Object}
  */
-export const storeConfig = {
+const storeConfig = {
 	reducer,
 	controls,
 	selectors,
@@ -38,10 +35,13 @@ export const storeConfig = {
 /**
  * Store definition for the edit navigation namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStoreDefinition
  *
  * @type {Object}
  */
-export const storeDefinition = __unstableCreateStoreDefinition( STORE_NAME );
+export const storeDefinition = createReduxStoreDefinition(
+	STORE_NAME,
+	storeConfig
+);
 
-export default registerStore( STORE_NAME, storeConfig );
+register( storeDefinition );

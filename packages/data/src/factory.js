@@ -79,24 +79,3 @@ export function createRegistryControl( registryControl ) {
 
 	return registryControl;
 }
-
-/**
- * Creates a store definition to pass to store API methods.
- *
- * @example
- * ```js
- * const storeDefinition = __unstableCreateStoreDefinition( 'my-shop' );
- * ```
- *
- * @param {string} storeName Unique namespace identifier for the store.
- *
- * @return {Object} Store definition object.
- */
-export function __unstableCreateStoreDefinition( storeName ) {
-	return {
-		name: storeName,
-		toString() {
-			return this.name;
-		},
-	};
-}

@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__unstableCreateStoreDefinition,
-	registerStore,
-} from '@wordpress/data';
+import { createReduxStoreDefinition, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -18,14 +15,14 @@ const STORE_NAME = 'core/rich-text';
 /**
  * Store definition for the rich-text namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStoreDefinition
  *
  * @type {Object}
  */
-export const storeDefinition = __unstableCreateStoreDefinition( STORE_NAME );
-
-export default registerStore( STORE_NAME, {
+export const storeDefinition = createReduxStoreDefinition( STORE_NAME, {
 	reducer,
 	selectors,
 	actions,
 } );
+
+register( storeDefinition );

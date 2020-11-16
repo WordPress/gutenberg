@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__unstableCreateStoreDefinition,
-	registerStore,
-} from '@wordpress/data';
+import { createReduxStoreDefinition, register } from '@wordpress/data';
 import { controls } from '@wordpress/data-controls';
 
 /**
@@ -59,23 +56,27 @@ const entityActions = defaultEntities.reduce( ( result, entity ) => {
 	return result;
 }, {} );
 
-export const storeConfig = {
+const storeConfig = {
 	reducer,
 	controls,
 	actions: { ...actions, ...entityActions, ...locksActions },
 	selectors: { ...selectors, ...entitySelectors, ...locksSelectors },
 	resolvers: { ...resolvers, ...entityResolvers },
 };
+
 /**
  * Store definition for the code data namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStoreDefinition
  *
  * @type {Object}
  */
-export const storeDefinition = __unstableCreateStoreDefinition( STORE_NAME );
+export const storeDefinition = createReduxStoreDefinition(
+	STORE_NAME,
+	storeConfig
+);
 
-registerStore( STORE_NAME, storeConfig );
+register( storeDefinition );
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';

@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__unstableCreateStoreDefinition,
-	registerStore,
-} from '@wordpress/data';
+import { register, createReduxStoreDefinition } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -21,14 +18,14 @@ const STORE_NAME = 'core/annotations';
 /**
  * Store definition for the annotations namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStoreDefinition
  *
  * @type {Object}
  */
-export const storeDefinition = __unstableCreateStoreDefinition( STORE_NAME );
-
-export default registerStore( STORE_NAME, {
+export const storeDefinition = createReduxStoreDefinition( STORE_NAME, {
 	reducer,
 	selectors,
 	actions,
 } );
+
+register( storeDefinition );
