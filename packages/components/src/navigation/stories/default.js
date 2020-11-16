@@ -8,6 +8,7 @@ import { useState } from '@wordpress/element';
  */
 import Navigation from '..';
 import NavigationItem from '../item';
+import NavigationItemText from '../item/text';
 import NavigationMenu from '../menu';
 
 export function DefaultStory() {
@@ -30,6 +31,15 @@ export function DefaultStory() {
 					item="item-sub-menu"
 					navigateToMenu="sub-menu"
 					title="Sub-Menu"
+				/>
+				<NavigationItemText
+					item="item-sub-menu-text"
+					title="This is just text, doesn't have any functionality"
+				/>
+				<NavigationItemText
+					item="item-sub-menu-text-badge"
+					title="Text with badge"
+					badge="2"
 				/>
 			</NavigationMenu>
 			<NavigationMenu menu="sub-menu" parentMenu="root" title="Sub-Menu">
