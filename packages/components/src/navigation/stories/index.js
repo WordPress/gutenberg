@@ -11,7 +11,7 @@ import { GroupStory } from './group';
 import { ControlledStateStory } from './controlled-state';
 import { SearchStory } from './search';
 import { MoreExamplesStory } from './more-examples';
-import { HideIFEmptyStory } from './hide-if-empty';
+import { HideIfEmptyStory } from './hide-if-empty';
 import './style.css';
 
 export default {
@@ -30,4 +30,4 @@ export const controlledState = () => <ControlledStateStory />;
 export const groups = () => <GroupStory />;
 export const search = () => <SearchStory />;
 export const moreExamples = () => <MoreExamplesStory />;
-export const hideIfEmpty = () => <HideIFEmptyStory />;
+export const hideIfEmpty = () => <HideIfEmptyStory />;

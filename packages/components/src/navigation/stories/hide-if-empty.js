@@ -5,7 +5,7 @@ import Navigation from '..';
 import NavigationItem from '../item';
 import NavigationMenu from '../menu';
 
-export function HideIFEmptyStory() {
+export function HideIfEmptyStory() {
 	return (
 		<>
 			<Navigation className="navigation-story">
