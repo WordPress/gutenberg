@@ -297,4 +297,19 @@ describe( 'adding blocks', () => {
 		expect( indicatorRect.x ).toBe( paragraphRect.x );
 		expect( indicatorRect.y > paragraphRect.y ).toBe( true );
 	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/24403
+	it( 'inserts a block in proper place after having clicked `Browse All` from block appender', async () => {
+		await insertBlock( 'Group' );
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Paragraph after group' );
+		await page.click( '[data-type="core/group"] [aria-label="Add block"]' );
+		const browseAll = await page.waitForXPath(
+			'//button[text()="Browse all"]'
+		);
+		await browseAll.click();
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Paragraph inside group' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

@@ -76,7 +76,7 @@ export function useIsFontAppearanceDisabled( { name: blockName } = {} ) {
 	);
 	const fontStyles = useEditorFeature( 'typography.fontStyles' );
 	const fontWeights = useEditorFeature( 'typography.fontWeights' );
-	const hasFontAppearance = !! fontStyles.length && !! fontWeights.length;
+	const hasFontAppearance = !! fontStyles?.length && !! fontWeights?.length;
 
 	return notSupported || ! hasFontAppearance;
 }

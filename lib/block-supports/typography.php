@@ -40,13 +40,14 @@ function gutenberg_register_typography_support( $block_type ) {
 }
 
 /**
- * Add CSS classes and inline styles for font sizes to the incoming attributes array.
- * This will be applied to the block markup in the front-end.
+ * Add CSS classes and inline styles for typography features such as font sizes
+ * to the incoming attributes array. This will be applied to the block markup in
+ * the front-end.
  *
  * @param  WP_Block_Type $block_type       Block type.
  * @param  array         $block_attributes Block attributes.
  *
- * @return array Font size CSS classes and inline styles.
+ * @return array Typography CSS classes and inline styles.
  */
 function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	if ( ! property_exists( $block_type, 'supports' ) ) {
@@ -57,15 +58,11 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$styles  = array();
 
 	$has_font_appearance_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontAppearance' ), false );
+	$has_font_family_support     = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontFamily' ), false );
 	$has_font_size_support       = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
 	$has_line_height_support     = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
 	$has_text_decoration_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support  = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
-
-	$has_font_family_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_font_family_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontFamily' ), false );
-	}
 
 	// Font Size.
 	if ( $has_font_size_support ) {
@@ -76,7 +73,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		if ( $has_named_font_size ) {
 			$classes[] = sprintf( 'has-%s-font-size', $block_attributes['fontSize'] );
 		} elseif ( $has_custom_font_size ) {
-			$styles[] = sprintf( 'font-size: %spx;', $block_attributes['style']['typography']['fontSize'] );
+			$styles[] = sprintf( 'font-size: %s;', $block_attributes['style']['typography']['fontSize'] );
 		}
 	}
 

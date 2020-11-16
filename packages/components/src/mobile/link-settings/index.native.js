@@ -8,16 +8,14 @@ import { Platform, Clipboard } from 'react-native';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL, prependHTTP } from '@wordpress/url';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState, useRef, useContext } from '@wordpress/element';
 import { link, external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import BottomSheet from '../bottom-sheet';
+import { BottomSheetContext } from '../bottom-sheet/bottom-sheet-context';
 import PanelBody from '../../panel/body';
 import TextControl from '../../text-control';
 import ToggleControl from '../../toggle-control';
@@ -80,12 +78,21 @@ function LinkSettings( {
 	editorSidebarOpened,
 	// Specifies whether icon should be displayed next to the label
 	showIcon,
+	onLinkCellPressed,
+	urlValue,
 } ) {
 	const { url, label, linkTarget, rel } = attributes;
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );
 	const [ linkRelInputValue, setLinkRelInputValue ] = useState( '' );
 	const prevEditorSidebarOpenedRef = useRef();
+
+	const { onHandleClosingBottomSheet } = useContext( BottomSheetContext );
+	useEffect( () => {
+		if ( ! onLinkCellPressed ) {
+			onHandleClosingBottomSheet( onCloseSettingsSheet );
+		}
+	}, [ urlInputValue, labelInputValue, linkRelInputValue ] );
 
 	useEffect( () => {
 		prevEditorSidebarOpenedRef.current = editorSidebarOpened;
@@ -114,6 +121,15 @@ function LinkSettings( {
 			onSetAttributes();
 		}
 	}, [ editorSidebarOpened, isVisible ] );
+
+	useEffect( () => {
+		if ( ! urlValue && onEmptyURL ) {
+			onEmptyURL();
+		}
+		setAttributes( {
+			url: prependHTTP( urlValue ),
+		} );
+	}, [ urlValue ] );
 
 	function onChangeURL( value ) {
 		if ( ! value && onEmptyURL ) {
@@ -176,23 +192,30 @@ function LinkSettings( {
 	function getSettings() {
 		return (
 			<>
-				{ options.url && (
-					<TextControl
-						icon={ showIcon && link }
-						label={ options.url.label }
-						value={ urlInputValue }
-						valuePlaceholder={ options.url.placeholder }
-						onChange={ onChangeURL }
-						onSubmit={ onCloseSettingsSheet }
-						autoCapitalize="none"
-						autoCorrect={ false }
-						// eslint-disable-next-line jsx-a11y/no-autofocus
-						autoFocus={
-							Platform.OS === 'ios' && options.url.autoFocus
-						}
-						keyboardType="url"
-					/>
-				) }
+				{ options.url &&
+					( onLinkCellPressed ? (
+						<BottomSheet.LinkCell
+							showIcon={ showIcon }
+							value={ url }
+							onPress={ onLinkCellPressed }
+						/>
+					) : (
+						<TextControl
+							icon={ showIcon && link }
+							label={ options.url.label }
+							value={ urlInputValue }
+							valuePlaceholder={ options.url.placeholder }
+							onChange={ onChangeURL }
+							onSubmit={ onCloseSettingsSheet }
+							autoCapitalize="none"
+							autoCorrect={ false }
+							// eslint-disable-next-line jsx-a11y/no-autofocus
+							autoFocus={
+								Platform.OS === 'ios' && options.url.autoFocus
+							}
+							keyboardType="url"
+						/>
+					) ) }
 				{ options.linkLabel && (
 					<TextControl
 						label={ options.linkLabel.label }
@@ -231,11 +254,7 @@ function LinkSettings( {
 	}
 
 	return (
-		<BottomSheet
-			isVisible={ isVisible }
-			onClose={ onCloseSettingsSheet }
-			hideHeader
-		>
+		<>
 			<PanelBody style={ styles.linkSettingsPanel }>
 				{ getSettings() }
 			</PanelBody>
@@ -248,7 +267,7 @@ function LinkSettings( {
 				</PanelBody>
 			) }
 			{ actions && <PanelActions actions={ actions } /> }
-		</BottomSheet>
+		</>
 	);
 }
 

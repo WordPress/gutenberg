@@ -25,7 +25,13 @@ const title = __( 'Text Color' );
 
 const EMPTY_ARRAY = [];
 
-function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
+function TextColorEdit( {
+	value,
+	onChange,
+	isActive,
+	activeAttributes,
+	contentRef,
+} ) {
 	const allowCustomControl = useEditorFeature( 'color.custom' );
 	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 	const [ isAddingColor, setIsAddingColor ] = useState( false );
@@ -78,11 +84,11 @@ function TextColorEdit( { value, onChange, isActive, activeAttributes } ) {
 			{ isAddingColor && (
 				<InlineColorUI
 					name={ name }
-					addingColor={ isAddingColor }
 					onClose={ disableIsAddingColor }
 					activeAttributes={ activeAttributes }
 					value={ value }
 					onChange={ onChange }
+					contentRef={ contentRef }
 				/>
 			) }
 		</>
