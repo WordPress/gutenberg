@@ -42,7 +42,7 @@ export default function NewTemplateDropdown() {
 			content: closestAvailableTemplate.content.raw,
 			slug,
 			title: slug,
-			status: 'draft',
+			status: 'publish',
 		} );
 	};
 
