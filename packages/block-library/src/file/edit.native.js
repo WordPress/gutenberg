@@ -174,12 +174,19 @@ export class FileEdit extends Component {
 		);
 	}
 
-	getInspectorControls( { showDownloadButton, textLinkTarget } ) {
+	getInspectorControls(
+		{ showDownloadButton, textLinkTarget },
+		isUploadInProgress,
+		isUploadFailed
+	) {
 		const actionButtonStyle = this.props.getStylesFromColorScheme(
 			styles.actionButton,
 			styles.actionButtonDark
 		);
 
+		const isCopyUrlDisabled = isUploadFailed || isUploadInProgress;
+		const shouldStyleCopyUrlButton =
+			! isCopyUrlDisabled && ! this.state.isUrlCopied;
 		return (
 			<InspectorControls>
 				<PanelBody title={ __( 'File block settings' ) } />
@@ -197,13 +204,14 @@ export class FileEdit extends Component {
 						onChange={ this.onChangeDownloadButtonVisibility }
 					/>
 					<BottomSheet.Cell
+						disabled={ isCopyUrlDisabled }
 						label={
 							this.state.isUrlCopied
 								? __( 'Copied!' )
 								: __( 'Copy file URL' )
 						}
 						labelStyle={
-							this.state.isUrlCopied || actionButtonStyle
+							shouldStyleCopyUrlButton && actionButtonStyle
 						}
 						onPress={ this.onCopyURL }
 					/>
@@ -278,7 +286,11 @@ export class FileEdit extends Component {
 							{ isUploadInProgress ||
 								this.getToolbarEditButton( openMediaOptions ) }
 							{ getMediaOptions() }
-							{ this.getInspectorControls( attributes ) }
+							{ this.getInspectorControls(
+								attributes,
+								isUploadInProgress,
+								isUploadFailed
+							) }
 							<RichText
 								__unstableMobileNoFocusOnMount
 								onChange={ this.onChangeFileName }
