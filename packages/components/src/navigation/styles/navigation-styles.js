@@ -154,16 +154,6 @@ export const ItemUI = styled.li`
 
 	button,
 	a {
-		height: auto;
-		min-height: 32px;
-		margin: 0;
-		font-weight: 400;
-		line-height: 20px;
-		padding-left: ${ space( 2 ) };
-		padding-right: ${ space( 2 ) };
-		width: 100%;
-		color: ${ G2.lightGray.ui };
-
 		&:hover,
 		&:focus:not( [aria-disabled='true'] ):active,
 		&:active:not( [aria-disabled='true'] ):active {
@@ -184,6 +174,19 @@ export const ItemUI = styled.li`
 	svg path {
 		color: ${ G2.lightGray.ui };
 	}
+`;
+
+export const ItemBaseUI = styled.div`
+	display: flex;
+	align-items: center;
+	height: auto;
+	min-height: 32px;
+	margin: 0;
+	padding: ${ space( 0.75 ) } ${ space( 2 ) };
+	font-weight: 400;
+	line-height: 20px;
+	width: 100%;
+	color: ${ G2.lightGray.ui };
 `;
 
 export const ItemBadgeUI = styled.span`
