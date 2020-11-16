@@ -171,4 +171,4 @@ function gutenberg_clear_synchronize_last_checks_after_delete( $postid, $post ) 
 		gutenberg_clear_synchronize_last_checks();
 	}
 }
-add_action( 'after_delete_post', 'gutenberg_clear_synchronize_last_checks_after_delete' );
+add_action( 'after_delete_post', 'gutenberg_clear_synchronize_last_checks_after_delete', 10, 2 );
