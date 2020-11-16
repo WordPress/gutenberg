@@ -132,3 +132,7 @@ if ( !class_exists( 'WP_Block_Recursion_Control') ) {
 	require_once __DIR__ . '/class-wp-block-recursion-control.php';
 }
 require_once __DIR__ . '/block-recursion-control.php';
+if ( !class_exists( 'WP_Block_Recursion_Error') ) {
+	require_once __DIR__ . '/class-wp-block-recursion-error.php';
+}
+require_once __DIR__ . '/block-recursion-error.php';
