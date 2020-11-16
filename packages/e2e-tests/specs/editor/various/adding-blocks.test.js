@@ -259,6 +259,10 @@ describe( 'adding blocks', () => {
 			inserterMenuInputSelector
 		);
 		inserterMenuSearchInput.type( 'cover' );
+		// We need to wait a bit after typing otherwise we might an "early" result
+		// that is going to be "detached" when trying to click on it
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitFor( 100 );
 		const coverBlock = await page.waitForSelector(
 			'.block-editor-block-types-list .editor-block-list-item-cover'
 		);
@@ -271,6 +275,13 @@ describe( 'adding blocks', () => {
 		// First insert a random Paragraph.
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'First paragraph' );
+		await insertBlock( 'Image' );
+		await showBlockToolbar();
+		const paragraphBlock = await page.$(
+			'p[aria-label="Paragraph block"]'
+		);
+		paragraphBlock.click();
+		await showBlockToolbar();
 
 		// Open the global inserter and search for the Heading block.
 		await searchForBlock( 'Heading' );
@@ -287,10 +298,6 @@ describe( 'adding blocks', () => {
 			'.block-editor-block-list__insertion-point-indicator'
 		);
 		const indicatorRect = await indicator.boundingBox();
-
-		const paragraphBlock = await page.$(
-			'p[aria-label="Paragraph block"]'
-		);
 		const paragraphRect = await paragraphBlock.boundingBox();
 
 		// The blue line indicator should be below the last block.
