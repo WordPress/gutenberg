@@ -71,10 +71,10 @@ function gutenberg_set_template_part_post_theme( $post_id, $post, $update ) {
 		return;
 	}
 
-	$theme = get_post_meta( $post_id, 'theme', true );
+	$themes = get_post_taxonomies( $post_id, 'wp_theme', true );
 
-	if ( ! $theme ) {
-		update_post_meta( $post_id, 'theme', wp_get_theme()->get_stylesheet() );
+	if ( ! $themes ) {
+		wp_set_post_terms( $post_id, array( wp_get_theme()->get_stylesheet() ), 'wp_theme', true );
 	}
 }
 
@@ -182,13 +182,14 @@ add_filter( 'rest_wp_template_part_collection_params', 'filter_rest_wp_template_
  */
 function filter_rest_wp_template_part_query( $args, $request ) {
 	if ( $request['theme'] ) {
-		$meta_query   = isset( $args['meta_query'] ) ? $args['meta_query'] : array();
-		$meta_query[] = array(
-			'key'   => 'theme',
-			'value' => $request['theme'],
+		$tax_query   = isset( $args['tax_query'] ) ? $args['tax_query'] : array();
+		$tax_query[] = array(
+			'taxonomy' => 'wp_theme',
+			'field'    => 'name',
+			'terms'    => $request['theme'],
 		);
 
-		$args['meta_query'] = $meta_query;
+		$args['tax_query'] = $tax_query;
 	}
 
 	return $args;
