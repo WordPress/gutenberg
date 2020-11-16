@@ -126,3 +126,9 @@ exports.columnsWithDifferentUnitsHtml = `<!-- wp:columns -->
 <!-- /wp:column --></div>
 <!-- /wp:columns -->
 `;
+
+exports.coverHeightWithRemUnit = `<!-- wp:cover {"customOverlayColor":"#ffffff","minHeight":20,"minHeightUnit":"rem"} -->
+<div class="wp-block-cover has-background-dim" style="background-color:#ffffff;min-height:20rem"><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
+<p class="has-text-align-center"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->`;
