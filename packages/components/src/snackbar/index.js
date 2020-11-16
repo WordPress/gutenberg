@@ -66,18 +66,22 @@ function Snackbar(
 	}
 
 	useSpokenMessage( spokenMessage, politeness );
+
+	// Only set up the timeout dismiss if we're not explicitly dismissing.
 	useEffect( () => {
 		const timeoutHandle = setTimeout( () => {
-			onRemove();
 			if ( ! explicitDismiss ) {
+				onRemove();
 				onDismiss();
 			}
 		}, NOTICE_TIMEOUT );
 
 		return () => clearTimeout( timeoutHandle );
-	}, [ explicitDismiss, onDismiss, onRemove ] );
+	}, [ onDismiss, onRemove ] );
 
-	const classes = classnames( className, 'components-snackbar' );
+	const classes = classnames( className, 'components-snackbar', {
+		'components-snackbar-explicit-dismiss': !! explicitDismiss,
+	} );
 	if ( actions && actions.length > 1 ) {
 		// we need to inform developers that snackbar only accepts 1 action
 		warning(
