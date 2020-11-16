@@ -367,91 +367,90 @@ function gutenberg_replace_default_block_categories( $default_categories ) {
 add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
 
 /**
- * Shim that hooks into `pre_render_block` so as to override `render_block` with
- * a function that assigns block context.
+ * Callback hooked to the register_block_type_args filter.
+ *
+ * This hooks into block registration to wrap the render_callback
+ * of dynamic blocks to inject context for WordPress versions that don't support it.
  *
  * The context handling can be removed when plugin support requires WordPress 5.5.0+.
  *
  * @see https://core.trac.wordpress.org/ticket/49927
  * @see https://core.trac.wordpress.org/changeset/48243
  *
- * @param string|null $pre_render   The pre-rendered content. Defaults to null.
- * @param array       $parsed_block The parsed block being rendered.
- *
- * @return string String of rendered HTML.
+ * @param array $args Block attributes.
+ * @return array Block attributes.
  */
-function gutenberg_render_block_with_assigned_block_context( $pre_render, $parsed_block ) {
-	global $post, $wp_query;
+function gutenberg_render_block_with_assigned_block_context( $args ) {
+	if ( is_callable( $args['render_callback'] ) ) {
+		$block_render_callback   = $args['render_callback'];
+		$args['render_callback'] = function( $attributes, $content, $block = null ) use ( $block_render_callback ) {
+			global $post, $wp_query;
 
-	/*
-	 * If a non-null value is provided, a filter has run at an earlier priority
-	 * and has already handled custom rendering and should take precedence.
-	 */
-	if ( null !== $pre_render ) {
-		return $pre_render;
-	}
+			// Check for null for back compatibility with WP_Block_Type->render
+			// which is unused since the introduction of WP_Block class.
+			//
+			// See:
+			// - https://core.trac.wordpress.org/ticket/49927
+			// - commit 910de8f6890c87f93359c6f2edc6c27b9a3f3292 at wordpress-develop.
 
-	$source_block = $parsed_block;
-
-	/** This filter is documented in src/wp-includes/blocks.php */
-	$parsed_block = apply_filters( 'render_block_data', $parsed_block, $source_block );
-
-	$context = array();
-
-	if ( $post instanceof WP_Post ) {
-		$context['postId'] = $post->ID;
-
-		/*
-		 * The `postType` context is largely unnecessary server-side, since the
-		 * ID is usually sufficient on its own. That being said, since a block's
-		 * manifest is expected to be shared between the server and the client,
-		 * it should be included to consistently fulfill the expectation.
-		 */
-		$context['postType'] = $post->post_type;
-	}
-
-	if ( isset( $wp_query->tax_query->queried_terms['category'] ) ) {
-		$context['query'] = array( 'categoryIds' => array() );
-
-		foreach ( $wp_query->tax_query->queried_terms['category']['terms'] as $category_slug_or_id ) {
-			$context['query']['categoryIds'][] = 'slug' === $wp_query->tax_query->queried_terms['category']['field'] ? get_cat_ID( $category_slug_or_id ) : $category_slug_or_id;
-		}
-	}
-
-	if ( isset( $wp_query->tax_query->queried_terms['post_tag'] ) ) {
-		if ( isset( $context['query'] ) ) {
-			$context['query']['tagIds'] = array();
-		} else {
-			$context['query'] = array( 'tagIds' => array() );
-		}
-
-		foreach ( $wp_query->tax_query->queried_terms['post_tag']['terms'] as $tag_slug_or_id ) {
-			$tag_ID = $tag_slug_or_id;
-
-			if ( 'slug' === $wp_query->tax_query->queried_terms['post_tag']['field'] ) {
-				$tag = get_term_by( 'slug', $tag_slug_or_id, 'post_tag' );
-
-				if ( $tag ) {
-					$tag_ID = $tag->term_id;
-				}
+			if ( null === $block ) {
+				return $block_render_callback( $attributes, $content );
 			}
-			$context['query']['tagIds'][] = $tag_ID;
-		}
+
+			if ( property_exists( $block, 'context' ) ) {
+				$context = array();
+
+				if ( $post instanceof WP_Post ) {
+					$context['postId'] = $post->ID;
+
+					/*
+					* The `postType` context is largely unnecessary server-side, since the
+					* ID is usually sufficient on its own. That being said, since a block's
+					* manifest is expected to be shared between the server and the client,
+					* it should be included to consistently fulfill the expectation.
+					*/
+					$context['postType'] = $post->post_type;
+				}
+
+				if ( isset( $wp_query->tax_query->queried_terms['category'] ) ) {
+					$context['query'] = array( 'categoryIds' => array() );
+
+					foreach ( $wp_query->tax_query->queried_terms['category']['terms'] as $category_slug_or_id ) {
+						$context['query']['categoryIds'][] = 'slug' === $wp_query->tax_query->queried_terms['category']['field'] ? get_cat_ID( $category_slug_or_id ) : $category_slug_or_id;
+					}
+				}
+
+				if ( isset( $wp_query->tax_query->queried_terms['post_tag'] ) ) {
+					if ( isset( $context['query'] ) ) {
+						$context['query']['tagIds'] = array();
+					} else {
+						$context['query'] = array( 'tagIds' => array() );
+					}
+
+					foreach ( $wp_query->tax_query->queried_terms['post_tag']['terms'] as $tag_slug_or_id ) {
+						$tag_ID = $tag_slug_or_id;
+
+						if ( 'slug' === $wp_query->tax_query->queried_terms['post_tag']['field'] ) {
+							$tag = get_term_by( 'slug', $tag_slug_or_id, 'post_tag' );
+
+							if ( $tag ) {
+								$tag_ID = $tag->term_id;
+							}
+						}
+						$context['query']['tagIds'][] = $tag_ID;
+					}
+				}
+
+				$block->context = $context;
+			}
+
+			return $block_render_callback( $attributes, $content, $block );
+		};
 	}
-
-	/**
-	 * Filters the default context provided to a rendered block.
-	 *
-	 * @param array $context      Default context.
-	 * @param array $parsed_block Block being rendered, filtered by `render_block_data`.
-	 */
-	$context = apply_filters( 'render_block_context', $context, $parsed_block );
-
-	$block = new WP_Block( $parsed_block, $context );
-
-	return $block->render();
+	return $args;
 }
-add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
+
+add_filter( 'register_block_type_args', 'gutenberg_render_block_with_assigned_block_context' );
 
 /**
  * Amends the paths to preload when initializing edit post.
