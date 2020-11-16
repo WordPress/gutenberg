@@ -367,18 +367,61 @@ function gutenberg_replace_default_block_categories( $default_categories ) {
 add_filter( 'block_categories', 'gutenberg_replace_default_block_categories' );
 
 /**
- * Callback hooked to the register_block_type_args filter.
+ * Shim that hooks into `pre_render_block` so as to override `render_block` with
+ * a function that assigns block context.
  *
- * This hooks into block registration to wrap the render_callback
- * of dynamic blocks to inject context for WordPress versions that don't support it.
+ * The context handling can be removed when plugin support requires WordPress 5.5.0+.
  *
  * @see https://core.trac.wordpress.org/ticket/49927
  * @see https://core.trac.wordpress.org/changeset/48243
  *
+ * @param string|null $pre_render   The pre-rendered content. Defaults to null.
+ * @param array       $parsed_block The parsed block being rendered.
+ *
+ * @return string String of rendered HTML.
+ */
+function gutenberg_render_block_with_assigned_block_context( $pre_render, $parsed_block ) {
+	$already_supports_context = version_compare( get_bloginfo( 'version' ), '5.5', '>=' );
+
+	/*
+	 * If a non-null value is provided, a filter has run at an earlier priority
+	 * and has already handled custom rendering and should take precedence.
+	 */
+	if ( null !== $pre_render || $already_supports_context ) {
+		return $pre_render;
+	}
+
+	$source_block = $parsed_block;
+
+	/** This filter is documented in src/wp-includes/blocks.php */
+	$parsed_block = apply_filters( 'render_block_data', $parsed_block, $source_block );
+
+	$context = array();
+
+	/**
+	 * Filters the default context provided to a rendered block.
+	 *
+	 * @param array $context      Default context.
+	 * @param array $parsed_block Block being rendered, filtered by `render_block_data`.
+	 */
+	$context = apply_filters( 'render_block_context', $context, $parsed_block );
+
+	$block = new WP_Block( $parsed_block, $context );
+
+	return $block->render();
+}
+add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
+
+/**
+ * Callback hooked to the register_block_type_args filter.
+ *
+ * This hooks into block registration to inject the default context into the block object.
+ * It can be removed once the default context is added into Core.
+ *
  * @param array $args Block attributes.
  * @return array Block attributes.
  */
-function gutenberg_render_block_with_assigned_block_context( $args ) {
+function gutenberg_inject_default_block_context( $args ) {
 	if ( is_callable( $args['render_callback'] ) ) {
 		$block_render_callback   = $args['render_callback'];
 		$args['render_callback'] = function( $attributes, $content, $block = null ) use ( $block_render_callback ) {
@@ -395,16 +438,22 @@ function gutenberg_render_block_with_assigned_block_context( $args ) {
 				return $block_render_callback( $attributes, $content );
 			}
 
+			$registry = WP_Block_Type_Registry::get_instance();
+			$block_type = $registry->get_registered( $block->name );
+
+
 			// For WordPress versions that don't support the context API.
-			$core_has_context_support = property_exists( $block, 'context' );
-			if ( ! $core_has_context_support ) {
+			if ( ! $block->context ) {
 				$block->context = array();
 			}
 
 			// Inject the post context if not done by Core.
-			if ( $post instanceof WP_Post && ! isset( $block->context['postId'] ) && ! isset( $block->context['postType'] ) ) {
+			$needs_post_id = empty( $block_type->uses_context ) && in_array( 'postId', $block_type->uses_context, true );
+			if ( $post instanceof WP_Post && $needs_post_id ) {
 				$block->context['postId'] = $post->ID;
-
+			}
+			$needs_post_type = empty( $block_type->uses_context ) && in_array( 'postType', $block_type->uses_context, true );
+			if ( $post instanceof WP_Post && $needs_post_type ) {
 				/*
 				* The `postType` context is largely unnecessary server-side, since the
 				* ID is usually sufficient on its own. That being said, since a block's
@@ -415,7 +464,8 @@ function gutenberg_render_block_with_assigned_block_context( $args ) {
 			}
 
 			// Inject the query context if not done by Core.
-			if ( ! isset( $block->context['query'] ) ) {
+			$needs_query = empty( $block_type->uses_context ) && in_array( 'qery', $block_type->uses_context, true );
+			if ( ! isset( $block->context['query'] ) && $needs_query ) {
 				if ( isset( $wp_query->tax_query->queried_terms['category'] ) ) {
 					$block->context['query'] = array( 'categoryIds' => array() );
 
@@ -446,23 +496,13 @@ function gutenberg_render_block_with_assigned_block_context( $args ) {
 				}
 			}
 
-			if ( $core_has_context_support ) {
-				/**
-				 * Filters the default context provided to a rendered block.
-				 *
-				 * @param array $context      Default context.
-				 * @param array $parsed_block Block being rendered, filtered by `render_block_data`.
-				 */
-				$context = apply_filters( 'render_block_context', $context, $block );
-			}
-
 			return $block_render_callback( $attributes, $content, $block );
 		};
 	}
 	return $args;
 }
 
-add_filter( 'register_block_type_args', 'gutenberg_render_block_with_assigned_block_context' );
+add_filter( 'register_block_type_args', 'gutenberg_inject_default_block_context' );
 
 /**
  * Amends the paths to preload when initializing edit post.
