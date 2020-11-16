@@ -21,12 +21,9 @@ export { default as useSelect } from './components/use-select';
 export { useDispatch } from './components/use-dispatch';
 export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
-export {
-	createRegistrySelector,
-	createRegistryControl,
-	__unstableCreateStoreDefinition,
-} from './factory';
+export { createRegistrySelector, createRegistryControl } from './factory';
 export { controls } from './controls';
+export { default as createReduxStoreDefinition } from './redux-store';
 
 /**
  * Object of available plugins to use with a registry.
@@ -181,3 +178,10 @@ export const registerStore = defaultRegistry.registerStore;
  * @param {Object} plugin Plugin object.
  */
 export const use = defaultRegistry.use;
+
+/**
+ * Registers a standard `@wordpress/data` store definition.
+ *
+ * @param {import('./types').WPDataStoreDefinition} storeDefinition Store definition.
+ */
+export const register = defaultRegistry.register;

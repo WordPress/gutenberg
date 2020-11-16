@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__unstableCreateStoreDefinition,
-	registerStore,
-} from '@wordpress/data';
+import { createReduxStoreDefinition, register } from '@wordpress/data';
 import { controls as dataControls } from '@wordpress/data-controls';
 
 /**
@@ -39,10 +36,13 @@ export const storeConfig = {
 /**
  * Store definition for the block directory namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStoreDefinition
  *
  * @type {Object}
  */
-export const storeDefinition = __unstableCreateStoreDefinition( STORE_NAME );
+export const storeDefinition = createReduxStoreDefinition(
+	STORE_NAME,
+	storeConfig
+);
 
-export default registerStore( STORE_NAME, storeConfig );
+register( storeDefinition );

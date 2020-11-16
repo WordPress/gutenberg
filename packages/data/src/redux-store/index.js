@@ -50,109 +50,110 @@ function createResolversCache() {
 }
 
 /**
- * @typedef {WPDataRegistry} WPDataRegistry
- */
-
-/**
  * Creates a namespace object with a store derived from the reducer given.
  *
- * @param {string}         key      Unique namespace identifier.
- * @param {Object}         options  Registered store options, with properties
- *                                  describing reducer, actions, selectors, and
- *                                  resolvers.
- * @param {WPDataRegistry} registry Registry reference.
+ * @param {string}                                    key      Unique namespace identifier.
+ * @param {import('../types').WPDataReduxStoreConfig} options  Registered store options, with properties
+ *                                                             describing reducer, actions, selectors, and
+ *                                                             resolvers.
  *
- * @return {Object} Store Object.
+ * @return {import('../types').WPDataStoreDefinition} Store Object.
  */
-export default function createNamespace( key, options, registry ) {
-	const reducer = options.reducer;
-	const store = createReduxStore( key, options, registry );
-	const resolversCache = createResolversCache();
-
-	let resolvers;
-	const actions = mapActions(
-		{
-			...metadataActions,
-			...options.actions,
-		},
-		store
-	);
-	let selectors = mapSelectors(
-		{
-			...mapValues(
-				metadataSelectors,
-				( selector ) => ( state, ...args ) =>
-					selector( state.metadata, ...args )
-			),
-			...mapValues( options.selectors, ( selector ) => {
-				if ( selector.isRegistrySelector ) {
-					selector.registry = registry;
-				}
-
-				return ( state, ...args ) => selector( state.root, ...args );
-			} ),
-		},
-		store
-	);
-	if ( options.resolvers ) {
-		const result = mapResolvers(
-			options.resolvers,
-			selectors,
-			store,
-			resolversCache
-		);
-		resolvers = result.resolvers;
-		selectors = result.selectors;
-	}
-
-	const getSelectors = () => selectors;
-	const getActions = () => actions;
-
-	// We have some modules monkey-patching the store object
-	// It's wrong to do so but until we refactor all of our effects to controls
-	// We need to keep the same "store" instance here.
-	store.__unstableOriginalGetState = store.getState;
-	store.getState = () => store.__unstableOriginalGetState().root;
-
-	// Customize subscribe behavior to call listeners only on effective change,
-	// not on every dispatch.
-	const subscribe =
-		store &&
-		( ( listener ) => {
-			let lastState = store.__unstableOriginalGetState();
-			store.subscribe( () => {
-				const state = store.__unstableOriginalGetState();
-				const hasChanged = state !== lastState;
-				lastState = state;
-
-				if ( hasChanged ) {
-					listener();
-				}
-			} );
-		} );
-
-	// This can be simplified to just { subscribe, getSelectors, getActions }
-	// Once we remove the use function.
+export default function createReduxStoreDefinition( key, options ) {
 	return {
-		reducer,
-		store,
-		actions,
-		selectors,
-		resolvers,
-		getSelectors,
-		getActions,
-		subscribe,
+		name: key,
+		__internalAttach: ( registry ) => {
+			const reducer = options.reducer;
+			const store = createReduxStore( key, options, registry );
+			const resolversCache = createResolversCache();
+
+			let resolvers;
+			const actions = mapActions(
+				{
+					...metadataActions,
+					...options.actions,
+				},
+				store
+			);
+			let selectors = mapSelectors(
+				{
+					...mapValues(
+						metadataSelectors,
+						( selector ) => ( state, ...args ) =>
+							selector( state.metadata, ...args )
+					),
+					...mapValues( options.selectors, ( selector ) => {
+						if ( selector.isRegistrySelector ) {
+							selector.registry = registry;
+						}
+
+						return ( state, ...args ) =>
+							selector( state.root, ...args );
+					} ),
+				},
+				store
+			);
+			if ( options.resolvers ) {
+				const result = mapResolvers(
+					options.resolvers,
+					selectors,
+					store,
+					resolversCache
+				);
+				resolvers = result.resolvers;
+				selectors = result.selectors;
+			}
+
+			const getSelectors = () => selectors;
+			const getActions = () => actions;
+
+			// We have some modules monkey-patching the store object
+			// It's wrong to do so but until we refactor all of our effects to controls
+			// We need to keep the same "store" instance here.
+			store.__unstableOriginalGetState = store.getState;
+			store.getState = () => store.__unstableOriginalGetState().root;
+
+			// Customize subscribe behavior to call listeners only on effective change,
+			// not on every dispatch.
+			const subscribe =
+				store &&
+				( ( listener ) => {
+					let lastState = store.__unstableOriginalGetState();
+					store.subscribe( () => {
+						const state = store.__unstableOriginalGetState();
+						const hasChanged = state !== lastState;
+						lastState = state;
+
+						if ( hasChanged ) {
+							listener();
+						}
+					} );
+				} );
+
+			// This can be simplified to just { subscribe, getSelectors, getActions }
+			// Once we remove the use function.
+			return {
+				reducer,
+				store,
+				actions,
+				selectors,
+				resolvers,
+				getSelectors,
+				getActions,
+				subscribe,
+			};
+		},
 	};
 }
 
 /**
  * Creates a redux store for a namespace.
  *
- * @param {string}         key      Unique namespace identifier.
- * @param {Object}         options  Registered store options, with properties
- *                                  describing reducer, actions, selectors, and
- *                                  resolvers.
- * @param {WPDataRegistry} registry Registry reference.
+ * @param {string}                            key      Unique namespace identifier.
+ * @param {Object}                            options  Registered store options, with properties
+ *                                                     describing reducer, actions, selectors, and
+ *                                                     resolvers.
+ * @param {import('../types').WPDataRegistry} registry Registry reference.
  *
  * @return {Object} Newly created redux store.
  */

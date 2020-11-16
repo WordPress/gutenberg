@@ -19,7 +19,7 @@ import { STORE_NAME } from './constants';
  *
  * @type {Object}
  */
-export const storeConfig = {
+const storeConfig = {
 	actions,
 	reducer,
 	controls,

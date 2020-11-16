@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { omit, without, mapValues } from 'lodash';
+import { omit, without, mapValues, isObject } from 'lodash';
 import memize from 'memize';
 
 /**
  * Internal dependencies
  */
-import createNamespace from './namespace-store';
+import createReduxStoreDefinition from './redux-store';
 import createCoreDataStore from './store';
 
 /**
@@ -74,13 +74,15 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Calls a selector given the current state and extra arguments.
 	 *
-	 * @param {string|Object} storeName Unique namespace identifier for the store
-	 *                                  or the store definition.
+	 * @param {string|import('./types').WPDataStoreDefinition} storeNameOrDefinition Unique namespace identifier for the store
+	 *                                                                               or the store definition.
 	 *
 	 * @return {*} The selector's returned value.
 	 */
-	function select( storeName ) {
-		storeName = String( storeName );
+	function select( storeNameOrDefinition ) {
+		const storeName = isObject( storeNameOrDefinition )
+			? storeNameOrDefinition.name
+			: storeNameOrDefinition;
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getSelectors();
@@ -148,13 +150,15 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Returns the available actions for a part of the state.
 	 *
-	 * @param {string|Object} storeName Unique namespace identifier for the store
-	 *                                  or the store definition.
+	 * @param {string|import('./types').WPDataStoreDefinition} storeNameOrDefinition Unique namespace identifier for the store
+	 *                                                                               or the store definition.
 	 *
 	 * @return {*} The action's returned value.
 	 */
-	function dispatch( storeName ) {
-		storeName = String( storeName );
+	function dispatch( storeNameOrDefinition ) {
+		const storeName = isObject( storeNameOrDefinition )
+			? storeNameOrDefinition.name
+			: storeNameOrDefinition;
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getActions();
@@ -198,6 +202,18 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		config.subscribe( globalListener );
 	}
 
+	/**
+	 * Registers a new store.
+	 *
+	 * @param {import('./types').WPDataStoreDefinition} storeDefinition Store definition.
+	 */
+	function register( storeDefinition ) {
+		registerGenericStore(
+			storeDefinition.name,
+			storeDefinition.__internalAttach( registry )
+		);
+	}
+
 	let registry = {
 		registerGenericStore,
 		stores,
@@ -207,6 +223,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		__experimentalResolveSelect,
 		dispatch,
 		use,
+		register,
 	};
 
 	/**
@@ -222,9 +239,12 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		const namespace = createNamespace( storeName, options, registry );
-		registerGenericStore( storeName, namespace );
-		return namespace.store;
+		const store = createReduxStoreDefinition(
+			storeName,
+			options
+		).__internalAttach( registry );
+		registerGenericStore( storeName, store );
+		return store.store;
 	};
 
 	//
