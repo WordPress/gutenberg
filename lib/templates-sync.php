@@ -27,8 +27,13 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 			'post_type'      => $post_type,
 			'post_status'    => array( 'publish', 'auto-draft' ),
 			'title'          => $slug,
-			'meta_key'       => 'theme',
-			'meta_value'     => $theme,
+			'tax_query'      => array(
+				array(
+					'taxonomy' => 'wp_theme',
+					'field'    => 'name',
+					'terms'    => $theme,
+				),
+			),
 			'posts_per_page' => 1,
 			'no_found_rows'  => true,
 		)
@@ -42,6 +47,7 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 				'post_status'  => 'auto-draft',
 				'post_type'    => $post_type,
 				'post_name'    => $slug,
+				'tax_input'    => array( 'wp_theme' => array( $theme, 'wp_file_based' ) ),
 			)
 		);
 	} elseif ( 'auto-draft' === $post->post_status && $content !== $post->post_content ) {

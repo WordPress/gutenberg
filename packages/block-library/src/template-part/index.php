@@ -25,8 +25,13 @@ function render_block_core_template_part( $attributes ) {
 				'post_type'      => 'wp_template_part',
 				'post_status'    => 'publish',
 				'name'           => $attributes['slug'],
-				'meta_key'       => 'theme',
-				'meta_value'     => $attributes['theme'],
+				'tax_query'      => array(
+					array(
+						'taxonomy' => 'wp_theme',
+						'field'    => 'name',
+						'terms'    => $attributes['theme'],
+					),
+				),
 				'posts_per_page' => 1,
 				'no_found_rows'  => true,
 			)

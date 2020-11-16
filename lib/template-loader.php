@@ -162,8 +162,13 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 			'orderby'        => 'post_name__in',
 			'posts_per_page' => -1,
 			'no_found_rows'  => true,
-			'meta_key'       => 'theme',
-			'meta_value'     => wp_get_theme()->get_stylesheet(),
+			'tax_query'      => array(
+				array(
+					'taxonomy' => 'wp_theme',
+					'field'    => 'name',
+					'terms'    => wp_get_theme()->get_stylesheet(),
+				),
+			),
 		)
 	);
 	$templates      = $template_query->get_posts();
