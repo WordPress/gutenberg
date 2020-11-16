@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, isEmpty, find } from 'lodash';
+import { isEqual, isEmpty, find, uniqBy, concat } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -27,6 +27,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { View } from '@wordpress/primitives';
 import { createBlock } from '@wordpress/blocks';
+import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -162,8 +163,41 @@ function GalleryEdit( props ) {
 		};
 	}
 
-	function onSelectImages( newImages ) {
-		const newBlocks = newImages.map( ( image ) => {
+	function onSelectImages( selectedImages ) {
+		const imageArray =
+			Object.prototype.toString.call( selectedImages ) ===
+			'[object FileList]'
+				? Array.from( selectedImages ).map( ( file ) => {
+						if ( ! file.url ) {
+							return pickRelevantMediaFiles( {
+								url: createBlobURL( file ),
+							} );
+						}
+
+						return file;
+				  } )
+				: selectedImages;
+
+		const newImages = imageArray
+			.filter(
+				( file ) => file.url || file.type?.indexOf( 'image/' ) === 0
+			)
+			.map( ( file ) => {
+				if ( ! file.url ) {
+					return pickRelevantMediaFiles( {
+						url: createBlobURL( file ),
+					} );
+				}
+
+				return file;
+			} );
+
+		const newAndExistingImages = uniqBy(
+			concat( newImages, images ),
+			'url'
+		);
+
+		const newBlocks = newAndExistingImages.map( ( image ) => {
 			const existingBlock = find(
 				images,
 				( img ) => img.id === image.id
@@ -256,7 +290,7 @@ function GalleryEdit( props ) {
 
 	const mediaPlaceholder = (
 		<MediaPlaceholder
-			addToGallery={ hasImages }
+			addToGallery={ true }
 			isAppender={ hasImages }
 			disableMediaButtons={ hasImages && ! isSelected }
 			icon={ ! hasImages && sharedIcon }
