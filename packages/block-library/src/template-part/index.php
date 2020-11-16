@@ -6,15 +6,35 @@
  */
 
 /**
- * Renders the `core/template-part` block on the server.
+ * Renders the `core/template-part` block on the server if safe to do so.
+ *
+ * @param array $attributes The block attributes.
+ * @param string $content The block content.
+ * @param object $block The block being rendered.
+ *
+ * @return string The render.
+ */
+function render_block_core_template_part( $attributes, $content, $block ) {
+	$template_id = render_block_core_template_get_template_id( $attributes );
+	if ( gutenberg_process_this_content( $template_id, $block->name ) ) {
+		$html = render_block_core_template_part_details( $attributes );
+		gutenberg_clear_processed_content();
+	} else {
+		$html = gutenberg_report_recursion_error();
+	}
+	return $html;
+}
+
+/**
+ * Safely renders the `core/template-part` block on the server.
  *
  * @param array $attributes The block attributes.
  *
  * @return string The render.
  */
-function render_block_core_template_part( $attributes ) {
-	$content = null;
 
+function render_block_core_template_part_details( $attributes ) 	{
+	$content = null;
 	if ( ! empty( $attributes['postId'] ) && get_post_status( $attributes['postId'] ) ) {
 		// If we have a post ID and the post exists, which means this template part
 		// is user-customized, render the corresponding post content.
@@ -40,7 +60,7 @@ function render_block_core_template_part( $attributes ) {
 			// Else, if the template part was provided by the active theme,
 			// render the corresponding file content.
 			$template_part_file_path = get_stylesheet_directory() . '/block-template-parts/' . $attributes['slug'] . '.html';
-			if ( 0 === validate_file( $template_part_file_path ) && file_exists( $template_part_file_path ) ) {
+			if ( 0 === validate_file( $attributes['slug'] ) && file_exists( $template_part_file_path ) ) {
 				$content = file_get_contents( $template_part_file_path );
 			}
 		}
@@ -54,7 +74,6 @@ function render_block_core_template_part( $attributes ) {
 	$content = do_blocks( $content );
 	$content = wptexturize( $content );
 	$content = convert_smilies( $content );
-	$content = wpautop( $content );
 	$content = shortcode_unautop( $content );
 	if ( function_exists( 'wp_filter_content_tags' ) ) {
 		$content = wp_filter_content_tags( $content );
@@ -66,6 +85,25 @@ function render_block_core_template_part( $attributes ) {
 	$wrapper_attributes = get_block_wrapper_attributes();
 
 	return "<$html_tag $wrapper_attributes>" . str_replace( ']]>', ']]&gt;', $content ) . "</$html_tag>";
+}
+
+/**
+ * Returns the unique template ID.
+ *
+ * The template ID is a concatenation of strings with a separator. eg slug:theme:postID
+ * The separator should not be something that could be used in a slug or theme name.
+ * Colon's not valid in a Windows directory name.
+ *
+ * @param $attributes array Attributes passed to the template-part
+ * @return string Template ID
+ */
+function render_block_core_template_get_template_id( $attributes ) {
+	$parts = [];
+	$parts[] = isset( $attributes['slug'] ) ? $attributes['slug'] : '';
+	$parts[] = isset( $attributes['theme'] ) ? $attributes['theme'] : '';
+	$parts[] = isset( $attributes['postId'] ) ? $attributes['postId'] : '0';
+	$template_id = implode( ':', $parts );
+	return $template_id;
 }
 
 /**
