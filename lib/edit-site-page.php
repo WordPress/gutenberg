@@ -198,6 +198,12 @@ function gutenberg_edit_site_init( $hook ) {
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-edit-site' );
 	wp_enqueue_style( 'wp-format-library' );
+
+	wp_deregister_script( 'editor' );
+	wp_deregister_script( 'wp-tinymce' );
+	wp_deregister_script( 'wp-tinymce-root' );
+	wp_deregister_script( 'wp-tinymce-lists' );
+	wp_deregister_script( 'mce-view' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
 
