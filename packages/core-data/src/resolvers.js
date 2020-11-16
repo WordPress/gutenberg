@@ -34,10 +34,12 @@ import { ifNotResolved, getNormalizedCommaSeparable } from './utils';
  *                                 include with request.
  */
 export function* getAuthors( query ) {
-	const users = yield apiFetch( {
-		path: addQueryArgs( '/wp/v2/users/?who=authors&per_page=100', query ),
-	} );
-	yield receiveUserQuery( 'authors', users );
+	const path = addQueryArgs(
+		'/wp/v2/users/?who=authors&per_page=100',
+		query
+	);
+	const users = yield apiFetch( { path } );
+	yield receiveUserQuery( path, users );
 }
 
 /**
@@ -46,9 +48,8 @@ export function* getAuthors( query ) {
  * @param {number} id The author id.
  */
 export function* __unstableGetAuthor( id ) {
-	const users = yield apiFetch( {
-		path: `/wp/v2/users?who=authors&include=${ id }`,
-	} );
+	const path = `/wp/v2/users?who=authors&include=${ id }`;
+	const users = yield apiFetch( { path } );
 	yield receiveUserQuery( 'author', users );
 }
 

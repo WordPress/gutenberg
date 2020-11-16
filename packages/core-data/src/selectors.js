@@ -63,12 +63,12 @@ export function getAuthors( state ) {
  * Returns all available authors.
  *
  * @param {Object} state Data state.
+ * @param {number} id The author id.
  *
  * @return {Array} Authors list.
  */
-export function __unstableGetAuthor( state ) {
-	const authors = getUserQueryResults( state, 'author' );
-	return authors ? authors[ 0 ] : [];
+export function __unstableGetAuthor( state, id ) {
+	return get( state, [ 'users', 'byId', id ], null );
 }
 
 /**

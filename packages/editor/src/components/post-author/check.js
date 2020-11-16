@@ -8,7 +8,6 @@ import { get } from 'lodash';
  */
 import { withInstanceId, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,13 +18,8 @@ export function PostAuthorCheck( {
 	hasAssignAuthorAction,
 	authors,
 	children,
-	post,
 } ) {
-	const initialAuthors = useMemo( () => {
-		return authors;
-	}, [ post ] );
-
-	if ( ! hasAssignAuthorAction || ! authors || 1 >= initialAuthors.length ) {
+	if ( ! hasAssignAuthorAction || ! authors || 1 >= authors.length ) {
 		return null;
 	}
 
@@ -47,7 +41,6 @@ export default compose( [
 			),
 			postType: select( 'core/editor' ).getCurrentPostType(),
 			authors: select( 'core' ).getAuthors(),
-			post,
 		};
 	} ),
 	withInstanceId,
