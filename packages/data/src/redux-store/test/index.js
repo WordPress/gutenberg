@@ -286,10 +286,10 @@ describe( 'controls', () => {
 			} );
 			const unsubscribe = atomRegistry.subscribe( atom, () => {} );
 			await flushImmediatesAndTicks();
-			expect( atomRegistry.read( atom ).value ).toEqual( 'default' );
+			expect( atomRegistry.get( atom ).value ).toEqual( 'default' );
 			registry.dispatch( 'store1' ).set( 'new' );
 			await flushImmediatesAndTicks();
-			expect( atomRegistry.read( atom ).value ).toEqual( 'new' );
+			expect( atomRegistry.get( atom ).value ).toEqual( 'new' );
 			unsubscribe();
 		} );
 
@@ -322,7 +322,7 @@ describe( 'controls', () => {
 			const update = jest.fn();
 			const unsubscribe = atomRegistry.subscribe( atom, update );
 			await flushImmediatesAndTicks( 2 );
-			expect( atomRegistry.read( atom ).value ).toEqual( 'default' );
+			expect( atomRegistry.get( atom ).value ).toEqual( 'default' );
 			// Reset the call that happens for initialization.
 			update.mockClear();
 			registry.dispatch( 'store2' ).set( 'new' );
@@ -353,10 +353,10 @@ describe( 'controls', () => {
 
 			const unsubscribe = atomRegistry.subscribe( atom, () => {} );
 			await flushImmediatesAndTicks( 10 );
-			expect( atomRegistry.read( atom ).value ).toEqual( 'default' );
+			expect( atomRegistry.get( atom ).value ).toEqual( 'default' );
 			registry.dispatch( 'store1' ).set( 'new' );
 			await flushImmediatesAndTicks( 10 );
-			expect( atomRegistry.read( atom ).value ).toEqual( 'new' );
+			expect( atomRegistry.get( atom ).value ).toEqual( 'new' );
 			unsubscribe();
 		} );
 
@@ -396,10 +396,10 @@ describe( 'controls', () => {
 
 			const unsubscribe = atomRegistry.subscribe( atom, () => {} );
 			await flushImmediatesAndTicks( 4 );
-			expect( atomRegistry.read( atom ).value ).toEqual( 'default' );
+			expect( atomRegistry.get( atom ).value ).toEqual( 'default' );
 			registry.dispatch( 'store1' ).set( 'new' );
 			await flushImmediatesAndTicks( 4 );
-			expect( atomRegistry.read( atom ).value ).toEqual( 'new' );
+			expect( atomRegistry.get( atom ).value ).toEqual( 'new' );
 			unsubscribe();
 		} );
 	} );

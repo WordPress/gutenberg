@@ -50,12 +50,12 @@ import { createAtomRegistry } from '@wordpress/stan';
 const registry = createAtomRegistry();
 
 // Read the counter.
-console.log( registry.read( counter ) ); //  prints 1.
+console.log( registry.get( counter ) ); //  prints 1.
 
 // Modify the value of the counter
-registry.write( counter, 10 );
+registry.set( counter, 10 );
 
-console.log( registry.read( counter ) ); //  prints 10.
+console.log( registry.get( counter ) ); //  prints 10.
 ```
 
 ### Subscribing to changes
@@ -64,11 +64,11 @@ Each atom is an observable to which we can subscribe:
 
 ```js
 registry.subscribe( counter, () => {
-    console.log( registry.read( counter ) );
+    console.log( registry.get( counter ) );
 } );
 
-registry.write( counter, 2 ); // prints 2.
-registry.write( counter, 4 ); // prints 4.
+registry.set( counter, 2 ); // prints 2.
+registry.set( counter, 4 ); // prints 4.
 ```
 
 ### Derived atoms
@@ -88,19 +88,19 @@ const sum = createDerivedAtom(
 In the example above, we create two simple counter atoms and third derived "sum" atom which value is the sum of both counters.
 
 ```js
-console.log( registry.read( sum ) ); // prints 3.
+console.log( registry.get( sum ) ); // prints 3.
 
 // Adding a listener automatically triggers the refreshing of the value.
 // If the atom has no subscriber, it will only attempt a resolution when initially read. 
 // But it won't bother refreshing its value, if any of its dependencies change.
 // This property (laziness) is important for performance reasons.
 sumInstance.subscribe( () => {
-    console.log( registry.read( sum ) );
+    console.log( registry.get( sum ) );
 } );
 
 // This edits counter1, triggering a resolution of sumInstance which triggers the console.log above.
-registry.write( counter1, 2 ); // now both counters equal 2 which means sum will print 4.
-registry.write( counter1, 4 ); // prints 6
+registry.set( counter1, 2 ); // now both counters equal 2 which means sum will print 4.
+registry.set( counter1, 4 ); // prints 6
 ```
 
 ### Async derived atoms

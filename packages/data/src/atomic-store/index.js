@@ -11,7 +11,7 @@ export function createAtomicStore( config, registry ) {
 				registry.__unstableGetAtomResolver()
 					? registry.__unstableGetAtomResolver()
 					: ( atomCreator ) =>
-							registry.getAtomRegistry().read( atomCreator )
+							registry.getAtomRegistry().get( atomCreator )
 			)( ...args );
 		};
 	} );
@@ -20,9 +20,9 @@ export function createAtomicStore( config, registry ) {
 		return ( ...args ) => {
 			return atomAction(
 				( atomCreator ) =>
-					registry.getAtomRegistry().read( atomCreator ),
+					registry.getAtomRegistry().get( atomCreator ),
 				( atomCreator, value ) =>
-					registry.getAtomRegistry().write( atomCreator, value ),
+					registry.getAtomRegistry().set( atomCreator, value ),
 				registry.getAtomRegistry()
 			)( ...args );
 		};

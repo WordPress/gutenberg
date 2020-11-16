@@ -22,9 +22,9 @@ describe( 'creating derived atoms', () => {
 
 		// Atoms don't compute any value unless there's a subscriber.
 		const unsubscribe = registry.subscribe( sum, () => {} );
-		expect( registry.read( sum ) ).toEqual( 3 );
-		registry.write( count1, 2 );
-		expect( registry.read( sum ) ).toEqual( 4 );
+		expect( registry.get( sum ) ).toEqual( 3 );
+		registry.set( count1, 2 );
+		expect( registry.get( sum ) ).toEqual( 4 );
 		unsubscribe();
 	} );
 
@@ -38,7 +38,7 @@ describe( 'creating derived atoms', () => {
 		// Atoms don't compute any value unless there's a subscriber.
 		const unsubscribe = registry.subscribe( sum, () => {} );
 		await flushImmediatesAndTicks();
-		expect( registry.read( sum ) ).toEqual( 11 );
+		expect( registry.get( sum ) ).toEqual( 11 );
 		unsubscribe();
 	} );
 
@@ -55,7 +55,7 @@ describe( 'creating derived atoms', () => {
 		// Atoms don't compute any value unless there's a subscriber.
 		const unsubscribe = registry.subscribe( sum, () => {} );
 		await flushImmediatesAndTicks( 2 );
-		expect( registry.read( sum ) ).toEqual( 21 );
+		expect( registry.get( sum ) ).toEqual( 21 );
 		unsubscribe();
 	} );
 
@@ -70,18 +70,18 @@ describe( 'creating derived atoms', () => {
 		const registry = createAtomRegistry();
 		// Creating an atom or adding it to the registry don't trigger its resolution
 		expect( mock ).not.toHaveBeenCalled();
-		expect( registry.read( sum ) ).toEqual( 12 );
+		expect( registry.get( sum ) ).toEqual( 12 );
 		// Calling "get" triggers a resolution.
 		expect( mock ).toHaveBeenCalledTimes( 1 );
 
 		// This shouldn't trigger the resolution because the atom has no listener.
-		registry.write( count1, 2 );
+		registry.set( count1, 2 );
 		expect( mock ).toHaveBeenCalledTimes( 1 );
 
 		// Subscribing triggers the resolution again.
 		const unsubscribe = registry.subscribe( sum, () => {} );
 		expect( mock ).toHaveBeenCalledTimes( 2 );
-		expect( registry.read( sum ) ).toEqual( 13 );
+		expect( registry.get( sum ) ).toEqual( 13 );
 		unsubscribe();
 	} );
 
@@ -95,10 +95,10 @@ describe( 'creating derived atoms', () => {
 		const listener = jest.fn();
 		const unsubscribe = registry.subscribe( sum, listener );
 
-		registry.write( count1, 2 );
+		registry.set( count1, 2 );
 		expect( listener ).toHaveBeenCalledTimes( 1 );
 
-		registry.write( count2, 2 );
+		registry.set( count2, 2 );
 		expect( listener ).toHaveBeenCalledTimes( 2 );
 
 		unsubscribe();
@@ -117,9 +117,9 @@ describe( 'updating derived atoms', () => {
 			}
 		);
 		const registry = createAtomRegistry();
-		registry.write( sum, 4 );
-		expect( registry.read( count1 ) ).toEqual( 2 );
-		expect( registry.read( count2 ) ).toEqual( 2 );
+		registry.set( sum, 4 );
+		expect( registry.get( count1 ) ).toEqual( 2 );
+		expect( registry.get( count2 ) ).toEqual( 2 );
 	} );
 
 	it( 'should allow nested derived atoms to update dependencies', () => {
@@ -139,8 +139,8 @@ describe( 'updating derived atoms', () => {
 			}
 		);
 		const registry = createAtomRegistry();
-		registry.write( multiply, 18 );
-		expect( registry.read( count1 ) ).toEqual( 3 );
-		expect( registry.read( count2 ) ).toEqual( 3 );
+		registry.set( multiply, 18 );
+		expect( registry.get( count1 ) ).toEqual( 3 );
+		expect( registry.get( count2 ) ).toEqual( 3 );
 	} );
 } );

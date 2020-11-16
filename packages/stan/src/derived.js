@@ -164,8 +164,8 @@ export const createDerivedAtom = (
 		async set( action ) {
 			await updater(
 				{
-					get: ( atom ) => registry.read( atom ),
-					set: ( atom, arg ) => registry.write( atom, arg ),
+					get: ( atom ) => registry.get( atom ),
+					set: ( atom, arg ) => registry.set( atom, arg ),
 				},
 				action
 			);

@@ -97,11 +97,11 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 	const registry = {
 		__unstableGetAtomState: getAtomState,
 
-		read( atom ) {
+		get( atom ) {
 			return getAtomState( atom ).get();
 		},
 
-		write( atom, value ) {
+		set( atom, value ) {
 			return getAtomState( atom ).set( value );
 		},
 

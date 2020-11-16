@@ -7,9 +7,9 @@ describe( 'atoms', () => {
 	it( 'should allow getting and setting atom values', () => {
 		const count = createAtom( 1 );
 		const registry = createAtomRegistry();
-		expect( registry.read( count ) ).toEqual( 1 );
-		registry.write( count, 2 );
-		expect( registry.read( count ) ).toEqual( 2 );
+		expect( registry.get( count ) ).toEqual( 1 );
+		registry.set( count, 2 );
+		expect( registry.get( count ) ).toEqual( 2 );
 	} );
 
 	it( 'should allow subscribing to atom changes', () => {
@@ -17,11 +17,11 @@ describe( 'atoms', () => {
 		const registry = createAtomRegistry();
 		const listener = jest.fn();
 		registry.subscribe( count, listener );
-		expect( registry.read( count ) ).toEqual( 1 );
-		registry.write( count, 2 ); // listener called once
-		expect( registry.read( count ) ).toEqual( 2 );
-		registry.write( count, 3 ); // listener called once
-		expect( registry.read( count ) ).toEqual( 3 );
+		expect( registry.get( count ) ).toEqual( 1 );
+		registry.set( count, 2 ); // listener called once
+		expect( registry.get( count ) ).toEqual( 2 );
+		registry.set( count, 3 ); // listener called once
+		expect( registry.get( count ) ).toEqual( 3 );
 		expect( listener ).toHaveBeenCalledTimes( 2 );
 	} );
 } );

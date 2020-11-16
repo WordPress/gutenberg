@@ -62,12 +62,12 @@ export type WPAtomRegistry = {
 	/**
 	 * Reads an atom vale.
 	 */
-	read: (atom: WPAtom<any> | WPAtomFamilyItem) => any
+	get: (atom: WPAtom<any> | WPAtomFamilyItem) => any
 
 	/**
 	 * Update an atom value.
 	 */
-	write: (atom: WPAtom<any> | WPAtomFamilyItem, value: any) => void
+	set: (atom: WPAtom<any> | WPAtomFamilyItem, value: any) => void
 
 	/**
 	 * Retrieves or creates an atom from the registry.

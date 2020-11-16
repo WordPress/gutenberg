@@ -23,23 +23,23 @@ describe( 'creating and subscribing to atom families', () => {
 		expect( firstItemAtom.get() ).toBe( undefined );
 
 		// Add some items
-		registry.write( itemsByIdAtom, {
+		registry.set( itemsByIdAtom, {
 			1: { name: 'first' },
 			2: { name: 'second' },
 		} );
 
 		// Should update the value automatically as we set the items.
-		expect( registry.read( itemFamilyAtom( 1 ) ) ).toEqual( {
+		expect( registry.get( itemFamilyAtom( 1 ) ) ).toEqual( {
 			name: 'first',
 		} );
 
 		// Remove items
-		registry.write( itemsByIdAtom, {
+		registry.set( itemsByIdAtom, {
 			2: { name: 'second' },
 		} );
 
 		// Should update the value automatically as we unset the items.
-		expect( registry.read( itemFamilyAtom( 1 ) ) ).toBe( undefined );
+		expect( registry.get( itemFamilyAtom( 1 ) ) ).toBe( undefined );
 		unsubscribe();
 	} );
 
@@ -54,7 +54,7 @@ describe( 'creating and subscribing to atom families', () => {
 		} );
 
 		const registry = createAtomRegistry();
-		registry.write( itemsByIdAtom, {
+		registry.set( itemsByIdAtom, {
 			1: { name: 'first' },
 			2: { name: 'second' },
 		} );
@@ -64,7 +64,7 @@ describe( 'creating and subscribing to atom families', () => {
 			itemNameFamilyAtom( 1 ),
 			() => {}
 		);
-		expect( registry.read( itemNameFamilyAtom( 1 ) ) ).toEqual( 'first' );
+		expect( registry.get( itemNameFamilyAtom( 1 ) ) ).toEqual( 'first' );
 		unsubscribe();
 	} );
 
@@ -83,7 +83,7 @@ describe( 'creating and subscribing to atom families', () => {
 			1: { name: 'first' },
 			2: { name: 'second' },
 		};
-		registry.write( itemsByIdAtom, initialItems );
+		registry.set( itemsByIdAtom, initialItems );
 
 		const name1Listener = jest.fn();
 		const name2Listener = jest.fn();
@@ -95,13 +95,13 @@ describe( 'creating and subscribing to atom families', () => {
 		const unsubscribe2 = registry.subscribe( name2, name2Listener );
 
 		// If I update item 1, item 2 dedendencies shouldn't recompute.
-		registry.write( itemsByIdAtom, {
+		registry.set( itemsByIdAtom, {
 			...initialItems,
 			1: { name: 'updated first' },
 		} );
 
-		expect( registry.read( name1 ) ).toEqual( 'updated first' );
-		expect( registry.read( name2 ) ).toEqual( 'second' );
+		expect( registry.get( name1 ) ).toEqual( 'updated first' );
+		expect( registry.get( name2 ) ).toEqual( 'second' );
 		expect( name1Listener ).toHaveBeenCalledTimes( 1 );
 		expect( name2Listener ).not.toHaveBeenCalled();
 
@@ -123,8 +123,8 @@ describe( 'updating family atoms', () => {
 			}
 		);
 		const registry = createAtomRegistry();
-		registry.write( itemFamilyAtom( 1 ), { name: 'first' } );
-		expect( registry.read( itemsByIdAtom ) ).toEqual( {
+		registry.set( itemFamilyAtom( 1 ), { name: 'first' } );
+		expect( registry.get( itemsByIdAtom ) ).toEqual( {
 			1: { name: 'first' },
 		} );
 	} );
@@ -150,8 +150,8 @@ describe( 'updating family atoms', () => {
 			}
 		);
 		const registry = createAtomRegistry();
-		registry.write( itemNameFamilyAtom( 1 ), 'first' );
-		expect( registry.read( itemsByIdAtom ) ).toEqual( {
+		registry.set( itemNameFamilyAtom( 1 ), 'first' );
+		expect( registry.get( itemsByIdAtom ) ).toEqual( {
 			1: { name: 'first' },
 		} );
 	} );
