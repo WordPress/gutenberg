@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { postList } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -14,6 +15,27 @@ import {
 } from './icons';
 
 const variations = [
+	{
+		name: '',
+		title: __( 'Posts List' ),
+		icon: postList,
+		attributes: {
+			query: {
+				perPage: 4,
+				pages: 1,
+				offset: 0,
+				postType: 'post',
+				categoryIds: [],
+				tagIds: [],
+				order: 'desc',
+				orderBy: 'date',
+				autor: '',
+				search: '',
+				sticky: 'exclude',
+			},
+		},
+		scope: [ 'inserter' ],
+	},
 	{
 		name: 'title-date',
 		title: __( 'Title and Date' ),
