@@ -25,13 +25,11 @@ function PostAuthor() {
 				'core'
 			);
 			const { getEditedPostAttribute } = select( 'core/editor' );
-			const author =
-				postAuthor ||
-				__unstableGetAuthor( getEditedPostAttribute( 'author' ) );
+			const author = __unstableGetAuthor(
+				getEditedPostAttribute( 'author' )
+			);
 			const query =
-				! fieldValue || '' === fieldValue || fieldValue === author.name
-					? {}
-					: { search: fieldValue };
+				! fieldValue || '' === fieldValue ? {} : { search: fieldValue };
 			return {
 				authorId: getEditedPostAttribute( 'author' ),
 				postAuthor: author,
