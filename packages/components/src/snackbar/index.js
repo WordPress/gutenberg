@@ -123,6 +123,9 @@ function Snackbar(
 							isTertiary
 							onClick={ ( event ) => {
 								event.stopPropagation();
+								if ( explicitDismiss) {
+									onRemove();
+								}
 								if ( onClick ) {
 									onClick( event );
 								}
