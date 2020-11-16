@@ -80,6 +80,92 @@ supports: {
 }
 ```
 
+## color
+
+- Type: `Object`
+- Default value: null
+- Subproperties:
+  - `background`: type `boolean`, default value `true`
+  - `gradient`: type `boolean`, default value `true`
+  - `text`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS style properties related to color. When it does, the block editor will show UI controls for the user to set their values.
+
+The controls for background and text will source their colors from the `editor-color-palette` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), while the gradient's from `editor-gradient-presets` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets).
+
+Note that the `text` and `background` keys have a default value of `true`, so if the `color` property is present they'll also be considered enabled:
+
+```js
+supports: {
+    color: { // This also enables text and background UI controls.
+        gradient: true // Enable gradients UI control.
+    }
+}
+```
+
+It's possible to disable them individually:
+
+```js
+supports: {
+    color: { // Text UI control is enabled.
+        background: false, // Disable background UI control.
+        gradient: true // Enable gradients UI control.
+    }
+}
+```
+
+When the block has support for a specific color property, the attributes definition is extended to include some attributes.
+
+- `style`: attribute of `object` type with no default assigned. This is added when any of support color properties are declared. It stores the custom values set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            color: {
+                background: 'value',
+                gradient: 'value',
+                text: 'value'
+            }
+        }
+    }
+}
+```
+
+- When `background` support is declared: it'll be added a new `backgroundColor` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default background color by specifying its own attribute with a default e.g.:
+
+```js
+attributes: {
+    backgroundColor: {
+        type: 'string',
+        default: 'some-value',
+    }
+}
+```
+
+- When `gradient` support is declared: it'll be added a new `gradient` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default text color by specifying its own attribute with a default e.g.:
+
+```js
+attributes: {
+    gradient: {
+        type: 'string',
+        default: 'some-value',
+    }
+}
+```
+
+- When `text` support is declared: it'll be added a new `textColor` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default text color by specifying its own attribute with a default e.g.:
+
+```js
+attributes: {
+    textColor: {
+        type: 'string',
+        default: 'some-value',
+    }
+}
+```
+
 ## customClassName
 
 - Type: `boolean`
@@ -105,6 +191,50 @@ When the style picker is shown, a dropdown is displayed so the user can select a
 supports: {
     // Remove the Default Style picker.
     defaultStylePicker: false
+}
+```
+
+## fontSize
+
+- Type: `boolean`
+- Default value: `false`
+
+This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.
+
+The values shown in this control are the ones declared by the theme via the `editor-font-sizes` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), or the default ones if none is provided.
+
+```js
+supports: {
+    // Enable UI control for font-size.
+    fontSize: true,
+}
+```
+
+When the block declares support for `fontSize`, the attributes definition is extended to include two new attributes: `fontSize` and `style`:
+
+- `fontSize`: attribute of `string` type with no default assigned. It stores the preset values set by the user. The block can apply a default fontSize by specifying its own `fontSize` attribute with a default e.g.:
+
+```js
+attributes: {
+    fontSize: {
+        type: 'string',
+        default: 'some-value',
+    }
+}
+```
+
+- `style`: attribute of `object` type with no default assigned. It stores the custom values set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            typography: {
+                fontSize: 'value'
+            }
+        }
+    }
 }
 ```
 
@@ -136,6 +266,35 @@ supports: {
 }
 ```
 
+## lineHeight
+
+- Type: `boolean`
+- Default value: `false`
+
+This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if [the theme declares support](/docs/designers-developers/developers/themes/theme-support.md#supporting-custom-line-heights).
+
+```js
+supports: {
+    // Enable UI control for line-height.
+    lineHeight: true,
+}
+```
+
+When the block declares support for `lineHeight`, the attributes definition is extended to include a new attribute `style` of `object` type with no default assigned. It stores the custom value set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            typography: {
+                lineHeight: 'value'
+            }
+        }
+    }
+}
+```
+
 ## multiple
 
 - Type: `boolean`
@@ -161,5 +320,42 @@ A block may want to disable the ability of being converted into a reusable block
 supports: {
     // Don't allow the block to be converted into a reusable block.
     reusable: false
+}
+```
+
+## spacing
+
+- Type: `Object`
+- Default value: null
+- Subproperties:
+  - `padding`: type `boolean`, default value `false`
+
+This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/designers-developers/developers/themes/theme-support.md##cover-block-padding).
+
+```js
+supports: {
+    padding: true, // Enable padding color UI control.
+}
+```
+
+When the block declares support for a specific spacing property, the attributes definition is extended to include some attributes.
+
+- `style`: attribute of `object` type with no default assigned. This is added when `padding` support is declared. It stores the custom values set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
+
+```js
+attributes: {
+    style: {
+        type: 'object',
+        default: {
+            spacing: {
+                padding: {
+                    top: 'value',
+                    right: 'value',
+                    bottom: 'value',
+                    left: 'value'
+                }
+            }
+        }
+    }
 }
 ```

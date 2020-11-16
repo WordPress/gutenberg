@@ -40,6 +40,7 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  *                                                             readers.
  * @param {Array<WPNoticeAction>} [options.actions]            User actions to be
  *                                                             presented with notice.
+ * @param {Object}                [options.icon]               An icon displayed with the notice.
  *
  * @return {Object} Action object.
  */
@@ -52,6 +53,7 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 		actions = [],
 		type = 'default',
 		__unstableHTML,
+		icon = null,
 	} = options;
 
 	// The supported value shape of content is currently limited to plain text
@@ -71,6 +73,7 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 			isDismissible,
 			actions,
 			type,
+			icon,
 		},
 	};
 }

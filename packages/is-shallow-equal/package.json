@@ -21,11 +21,15 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"files": [
-		"lib",
+		"build",
+		"build-module",
 		"build-types",
+		"src",
 		"*.md"
 	],
-	"main": "lib/index.js",
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {

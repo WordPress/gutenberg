@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 0.1.0
  */
 function gutenberg_dir_path() {
-	return plugin_dir_path( dirname( __FILE__ ) );
+	return plugin_dir_path( __DIR__ );
 }
 
 /**
@@ -31,7 +31,7 @@ function gutenberg_dir_path() {
  * @since 0.1.0
  */
 function gutenberg_url( $path ) {
-	return plugins_url( $path, dirname( __FILE__ ) );
+	return plugins_url( $path, __DIR__ );
 }
 
 /**
@@ -526,15 +526,25 @@ function gutenberg_register_vendor_script( $scripts, $handle, $src, $deps = arra
 		// Determine whether we can write to this file.  If not, don't waste
 		// time doing a network request.
 		// @codingStandardsIgnoreStart
-		$f = @fopen( $full_path, 'a' );
+
+		$is_writable = is_writable( $full_path );
+		if ( $is_writable ) {
+			$f = @fopen( $full_path, 'a' );
+			if ( ! $f ) {
+				$is_writable = false;
+			} else {
+				fclose( $f );
+			}
+		}
+
 		// @codingStandardsIgnoreEnd
-		if ( ! $f ) {
+		if ( ! $is_writable ) {
 			// Failed to open the file for writing, probably due to server
 			// permissions.  Enqueue the script directly from the URL instead.
 			gutenberg_override_script( $scripts, $handle, $src, $deps, $ver, $in_footer );
 			return;
 		}
-		fclose( $f );
+
 		$response = wp_remote_get( $src );
 		if ( wp_remote_retrieve_response_code( $response ) === 200 ) {
 			$f = fopen( $full_path, 'w' );

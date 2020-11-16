@@ -57,9 +57,9 @@ Every context has the same structure, divided in two sections: `settings` and `s
   "some/context": {
     "settings": {
       "color": [ ... ],
-      "typography": [ ... ],
+      "custom": [ ... ],
       "spacing": [ ... ],
-      "custom": [ ... ]
+      "typography": [ ... ]
     },
     "styles": {
       "color": { ... },
@@ -86,6 +86,7 @@ The settings section has the following structure and default values:
         "link": false, /* true to opt-in, as in add_theme_support('experimental-link-color') */
         "palette": [ ... ], /* color presets, as in add_theme_support('editor-color-palette', ... ) */
       },
+      "custom": { ... },
       "spacing": {
         "customPadding": false, /* true to opt-in, as in add_theme_support('custom-spacing') */
         "units": [ "px", "em", "rem", "vh", "vw" ], /* filter values, as in add_theme_support('custom-units', ... ) */
@@ -94,9 +95,12 @@ The settings section has the following structure and default values:
         "customFontSize": true, /* false to opt-out, as in add_theme_support( 'disable-custom-font-sizes' ) */
         "customLineHeight": false, /* true to opt-in, as in add_theme_support( 'custom-line-height' ) */
         "dropCap": true, /* false to opt-out */
+        "fontFamilies": [ ... ], /* font family presets */
         "fontSizes": [ ... ], /* font size presets, as in add_theme_support('editor-font-sizes', ... ) */
-      },
-      "custom": { ... }
+        "fontWeights": [ ... ], /* font weight presets */
+        "textDecorations": [ ... ], /* text decoration presets */
+        "textTransforms": [ ... ] /* text transform presets */
+      }
     }
   }
 }
@@ -230,19 +234,24 @@ Note that, the name of the variable is created by adding `--` in between each ne
 
 Each block declares which style properties it exposes. This has been coined as "implicit style attributes" of the block. These properties are then used to automatically generate the UI controls for the block in the editor, as well as being available through the `experimental-theme.json` file for themes to target.
 
-```
+```json
 {
   "some/context": {
     "styles": {
       "color": {
-        "background": <value>,
-        "gradient": <value>,
-        "link": <value>,
-        "text": <value>
+        "background": "value",
+        "gradient": "value",
+        "link": "value",
+        "text": "value"
       },
       "typography": {
-        "fontSize": <value>,
-        "lineHeight": <value>
+        "fontFamily": "value",
+        "fontSize": "value",
+        "fontStyle": "value",
+        "fontWeight": "value",
+        "lineHeight": "value",
+        "textDecoration": "value",
+        "textTransform": "value"
       }
     }
   }
@@ -299,7 +308,9 @@ These are the current color properties supported by blocks:
 | Columns | Yes | Yes | Yes | Yes |
 | Group | Yes | Yes | Yes | Yes |
 | Heading [1] | Yes | - | Yes | Yes |
+| List | Yes | Yes | - | Yes |
 | Media & text | Yes | Yes | Yes | Yes |
+| Navigation | Yes | - | - | Yes |
 | Paragraph | Yes | - | Yes | Yes |
 | Post Author | Yes | Yes | Yes | Yes |
 | Post Comments | Yes | Yes | Yes | Yes |
@@ -307,34 +318,43 @@ These are the current color properties supported by blocks:
 | Post Comments Form | Yes | Yes | Yes | Yes |
 | Post Date | Yes | Yes | - | Yes |
 | Post Excerpt | Yes | Yes | Yes | Yes |
+| Post Hierarchical Terms | Yes | Yes | Yes | Yes |
 | Post Tags | Yes | Yes | Yes | Yes |
 | Post Title | Yes | Yes | - | Yes |
 | Site Tagline | Yes | Yes | - | Yes |
 | Site Title | Yes | Yes | - | Yes |
+| Template Part | Yes | Yes | Yes | Yes |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
+
+#### Spacing Properties
+
+| Context | Padding |
+| --- | --- |
+| Cover | Yes |
+| Group | Yes |
 
 #### Typography Properties
 
 These are the current typography properties supported by blocks:
 
-| Context | Font Size | Line Height |
-| --- | --- | --- |
-| Global | Yes | Yes |
-| Columns | - | - |
-| Group | - | - |
-| Heading [1] | Yes | Yes |
-| Media & text | - | - |
-| Paragraph | Yes | Yes |
-| Post Author | Yes | Yes |
-| Post Comments | Yes | Yes |
-| Post Comments Count | Yes | Yes |
-| Post Comments Form | Yes | Yes |
-| Post Date | Yes | Yes |
-| Post Excerpt | Yes | Yes |
-| Post Tags | Yes | Yes |
-| Post Title | Yes | Yes |
-| Site Tagline | Yes | Yes |
-| Site Title | Yes | Yes |
+| Context | Font Family | Font Size | Font Style | Font Weight | Line Height | Text Decoration | Text Transform |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Global | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
+| Heading [1] | - | Yes | - | - | Yes | - | - |
+| List | - | Yes | - | - | - | - | - |
+| Navigation | Yes | Yes | Yes | Yes | - | Yes | Yes |
+| Paragraph | - | Yes | - | - | Yes | - | - |
+| Post Author | - | Yes | - | - | Yes | - | - |
+| Post Comments | - | Yes | - | - | Yes | - | - |
+| Post Comments Count | - | Yes | - | - | Yes | - | - |
+| Post Comments Form | - | Yes | - | - | Yes | - | - |
+| Post Date | - | Yes | - | - | Yes | - | - |
+| Post Excerpt | - | Yes | - | - | Yes | - | - |
+| Post Hierarchical Terms | - | Yes | - | - | Yes | - | - |
+| Post Tags | - | Yes | - | - | Yes | - | - |
+| Post Title | Yes | Yes | - | - | Yes | - | - |
+| Site Tagline | Yes | Yes | - | - | Yes | - | - |
+| Site Title | Yes | Yes | - | - | Yes | - | - |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).

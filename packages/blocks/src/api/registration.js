@@ -70,7 +70,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
 /**
  * Named block variation scopes.
  *
- * @typedef {'block'|'inserter'} WPBlockVariationScope
+ * @typedef {'block'|'inserter'|'transform'} WPBlockVariationScope
  */
 
 /**
