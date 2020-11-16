@@ -19,6 +19,12 @@
 .wp-block-social-links__social-placeholder {
 	display: flex;
 	opacity: 0.8;
+	transition: all 0.1s ease-in-out;
+	@include reduce-motion("transition");
+
+	.is-selected & {
+		opacity: 0.1;
+	}
 
 	// Use the first link to set the height.
 	> .wp-social-link {

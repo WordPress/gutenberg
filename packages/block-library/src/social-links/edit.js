@@ -46,9 +46,8 @@ export function SocialLinksEdit( props ) {
 		<div className="wp-block-social-links__social-placeholder">
 			<div className="wp-social-link"></div>
 			<div className="wp-block-social-links__social-placeholder-icons">
-				<div className="wp-social-link"></div>
-				<div className="wp-social-link wp-social-link-facebook"></div>
 				<div className="wp-social-link wp-social-link-twitter"></div>
+				<div className="wp-social-link wp-social-link-facebook"></div>
 				<div className="wp-social-link wp-social-link-instagram"></div>
 			</div>
 		</div>
