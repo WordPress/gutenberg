@@ -44,8 +44,11 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 				'post_name'    => $slug,
 			)
 		);
-	} else {
-		// Potentially we could decide to update the content if different.
+	} elseif ( 'auto-draft' === $post->post_status && $content !== $post->post_content ) {
+		// If the template already exists, but it was never changed by the user
+		// and the template file content changed then update the content of auto-draft.
+		$post->post_content = $content;
+		wp_insert_post( $post );
 	}
 }
 
@@ -86,23 +89,86 @@ function _gutenberg_synchronize_theme_templates( $template_type ) {
 		'template'      => 'block-templates',
 		'template-part' => 'block-template-parts',
 	);
+	$themes              = array(
+		get_stylesheet() => get_stylesheet_directory(),
+		get_template()   => get_template_directory(),
+	);
 
-	// Get file paths for all theme supplied template.
-	$template_files = _gutenberg_get_template_paths( get_stylesheet_directory() . '/' . $template_base_paths[ $template_type ] );
-	if ( is_child_theme() ) {
-		$template_files = array_merge( $template_files, _gutenberg_get_template_paths( get_template_directory() . '/' . $template_base_paths[ $template_type ] ) );
+	// Get file paths for all theme supplied template that changed since last check.
+	$template_files = array();
+	$option_name    = 'gutenberg_last_synchronize_theme_' . $template_type . '_checks';
+	$last_checks    = get_option( $option_name, array() );
+	$current_time   = time();
+	foreach ( $themes as $theme_slug => $theme_dir ) {
+		$last_check = isset( $last_checks[ $theme_slug ] ) ? $last_checks[ $theme_slug ] : 0;
+
+		$theme_template_files = _gutenberg_get_template_paths( $theme_dir . '/' . $template_base_paths[ $template_type ] );
+		foreach ( $theme_template_files as $template_file ) {
+			if ( filemtime( $template_file ) > $last_check ) {
+				$template_files[] = array(
+					'path'  => $template_file,
+					'theme' => $theme_slug,
+				);
+			}
+		}
+
+		$last_checks[ $theme_slug ] = $current_time;
 	}
 
 	// Build and save each template part.
 	foreach ( $template_files as $template_file ) {
-		$content = file_get_contents( $template_file );
+		$path               = $template_file['path'];
+		$theme              = $template_file['theme'];
+		$template_base_path = $template_base_paths[ $template_type ];
+
+		$content = file_get_contents( $path );
 		$slug    = substr(
-			$template_file,
+			$path,
 			// Starting position of slug.
-			strpos( $template_file, $template_base_paths[ $template_type ] . '/' ) + 1 + strlen( $template_base_paths[ $template_type ] ),
+			strpos( $path, $template_base_path . '/' ) + 1 + strlen( $template_base_path ),
 			// Subtract ending '.html'.
 			-5
 		);
-		_gutenberg_create_auto_draft_for_template( $template_post_types[ $template_type ], $slug, wp_get_theme()->get_stylesheet(), $content );
+		_gutenberg_create_auto_draft_for_template( $template_post_types[ $template_type ], $slug, $theme, $content );
+	}
+
+	update_option( $option_name, $last_checks );
+}
+
+/**
+ * Synchronize changed template and template part files after WordPress is loaded
+ */
+function gutenberg_synchronize_theme_templates_on_load() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
+	_gutenberg_synchronize_theme_templates( 'template-part' );
+	_gutenberg_synchronize_theme_templates( 'template' );
+}
+add_action( 'wp_loaded', 'gutenberg_synchronize_theme_templates_on_load' );
+
+/**
+ * Clears synchronization last check timestamps.
+ */
+function gutenberg_clear_synchronize_last_checks() {
+	update_option( 'gutenberg_last_synchronize_theme_template_checks', array() );
+	update_option( 'gutenberg_last_synchronize_theme_template-part_checks', array() );
+}
+
+// Clear synchronization last check timestamps after trashing a template or template part.
+add_action( 'trash_wp_template', 'gutenberg_clear_synchronize_last_checks' );
+add_action( 'trash_wp_template_part', 'gutenberg_clear_synchronize_last_checks' );
+
+/**
+ * Clear synchronization last check timestamps after deleting a template or template part.
+ *
+ * @param int     $post_id ID of the deleted post.
+ * @param WP_Post $post WP_Post instance of the deleted post.
+ */
+function gutenberg_clear_synchronize_last_checks_after_delete( $postid, $post ) {
+	if ( 'wp_template' !== $post->post_type || 'wp_template_part' !== $post->post_type ) {
+		gutenberg_clear_synchronize_last_checks();
 	}
 }
+add_action( 'after_delete_post', 'gutenberg_clear_synchronize_last_checks_after_delete', 10, 2 );
