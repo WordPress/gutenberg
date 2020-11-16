@@ -13,7 +13,7 @@ import { useAsyncList } from '@wordpress/compose';
 /**
  * External dependencies
  */
-import { groupBy, uniq, deburr } from 'lodash';
+import { groupBy, deburr } from 'lodash';
 import { Composite, useCompositeState, CompositeItem } from 'reakit';
 
 function PreviewPlaceholder() {
@@ -199,40 +199,27 @@ function TemplatePartSearchResults( {
 	) );
 }
 
-export default function TemplateParts( {
+export default function TemplatePartPreviews( {
 	setAttributes,
 	filterValue,
 	onClose,
 } ) {
 	const composite = useCompositeState();
 	const templateParts = useSelect( ( select ) => {
-		const publishedTemplateParts = select( 'core' ).getEntityRecords(
-			'postType',
-			'wp_template_part',
-			{
+		const publishedTemplateParts =
+			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
 				status: [ 'publish' ],
 				per_page: -1,
-			}
-		);
-		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
+			} ) || [];
 
-		const themeTemplateParts = select( 'core' ).getEntityRecords(
-			'postType',
-			'wp_template_part',
-			{
+		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
+		const themeTemplateParts =
+			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
 				theme: currentTheme,
-				status: [ 'publish', 'auto-draft' ],
+				status: [ 'auto-draft' ],
 				per_page: -1,
-			}
-		);
-		const combinedTemplateParts = [];
-		if ( publishedTemplateParts ) {
-			combinedTemplateParts.push( ...publishedTemplateParts );
-		}
-		if ( themeTemplateParts ) {
-			combinedTemplateParts.push( ...themeTemplateParts );
-		}
-		return uniq( combinedTemplateParts );
+			} ) || [];
+		return [ ...themeTemplateParts, ...publishedTemplateParts ];
 	}, [] );
 
 	if ( ! templateParts || ! templateParts.length ) {

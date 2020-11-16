@@ -1,12 +1,11 @@
-'use strict';
-
 /**
- * Internal dependencies;
+ * Internal dependencies
  */
-var isShallowEqualObjects = require( './objects' );
-var isShallowEqualArrays = require( './arrays' );
+import isShallowEqualObjects from './objects';
+import isShallowEqualArrays from './arrays';
 
-var isArray = Array.isArray;
+export { default as isShallowEqualObjects } from './objects';
+export { default as isShallowEqualArrays } from './arrays';
 
 /**
  * @typedef {Record<string, any>} ComparableObject
@@ -21,18 +20,14 @@ var isArray = Array.isArray;
  *
  * @return {boolean} Whether the two values are shallow equal.
  */
-function isShallowEqual( a, b ) {
+export default function isShallowEqual( a, b ) {
 	if ( a && b ) {
 		if ( a.constructor === Object && b.constructor === Object ) {
 			return isShallowEqualObjects( a, b );
-		} else if ( isArray( a ) && isArray( b ) ) {
+		} else if ( Array.isArray( a ) && Array.isArray( b ) ) {
 			return isShallowEqualArrays( a, b );
 		}
 	}
 
 	return a === b;
 }
-
-module.exports = isShallowEqual;
-module.exports.isShallowEqualObjects = isShallowEqualObjects;
-module.exports.isShallowEqualArrays = isShallowEqualArrays;

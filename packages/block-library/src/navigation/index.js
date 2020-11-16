@@ -11,6 +11,7 @@ import metadata from './block.json';
 import edit from './edit';
 import save from './save';
 import deprecated from './deprecated';
+import variations from './variations';
 
 const { name } = metadata;
 
@@ -18,31 +19,12 @@ export { metadata, name };
 
 export const settings = {
 	title: __( 'Navigation' ),
-
 	icon,
-
 	description: __(
 		'A collection of blocks that allow visitors to get around your site.'
 	),
-
 	keywords: [ __( 'menu' ), __( 'navigation' ), __( 'links' ) ],
-
-	variations: [
-		{
-			name: 'horizontal',
-			isDefault: true,
-			title: __( 'Navigation (horizontal)' ),
-			description: __( 'Links shown in a row.' ),
-			attributes: { orientation: 'horizontal' },
-		},
-		{
-			name: 'vertical',
-			title: __( 'Navigation (vertical)' ),
-			description: __( 'Links shown in a column.' ),
-			attributes: { orientation: 'vertical' },
-		},
-	],
-
+	variations,
 	example: {
 		innerBlocks: [
 			{
@@ -71,10 +53,7 @@ export const settings = {
 			},
 		],
 	},
-
 	edit,
-
 	save,
-
 	deprecated,
 };

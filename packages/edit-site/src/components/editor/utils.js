@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, find } from 'lodash';
+import { get, find, camelCase, isString } from 'lodash';
 /**
  * WordPress dependencies
  */
@@ -18,6 +18,21 @@ export const PRESET_CATEGORIES = {
 	fontWeight: { path: [ 'typography', 'fontWeights' ], key: 'slug' },
 	textDecoration: { path: [ 'typography', 'textDecorations' ], key: 'value' },
 	textTransform: { path: [ 'typography', 'textTransforms' ], key: 'slug' },
+};
+export const PRESET_CLASSES = {
+	color: { ...PRESET_CATEGORIES.color, property: 'color' },
+	'background-color': {
+		...PRESET_CATEGORIES.color,
+		property: 'background-color',
+	},
+	'gradient-background': {
+		...PRESET_CATEGORIES.gradient,
+		property: 'background',
+	},
+	'font-size': {
+		...PRESET_CATEGORIES.fontSize,
+		property: 'font-size',
+	},
 };
 export const LINK_COLOR = '--wp--style--color--link';
 export const LINK_COLOR_DECLARATION = `a { color: var(${ LINK_COLOR }, #00e); }`;
@@ -52,21 +67,68 @@ export function getPresetVariable( presetCategory, presets, value ) {
 	);
 }
 
-export function getPresetValueFromVariable(
-	presetCategory,
-	presets,
-	variable
+function getValueFromPresetVariable(
+	features,
+	blockName,
+	[ presetType, slug ]
 ) {
-	if ( ! variable ) {
+	presetType = camelCase( presetType );
+	const presetData = PRESET_CATEGORIES[ presetType ];
+	if ( ! presetData ) {
 		return;
 	}
-	const slug = variable.slice( variable.lastIndexOf( '|' ) + 1 );
+	const presets =
+		get( features, [ blockName, ...presetData.path ] ) ??
+		get( features, [ GLOBAL_CONTEXT, ...presetData.path ] );
+	if ( ! presets ) {
+		return;
+	}
 	const presetObject = find( presets, ( preset ) => {
 		return preset.slug === slug;
 	} );
 	if ( presetObject ) {
-		const presetData = PRESET_CATEGORIES[ presetCategory ];
 		const { key } = presetData;
-		return presetObject[ key ];
+		const result = presetObject[ key ];
+		return getValueFromVariable( features, blockName, result ) || result;
+	}
+}
+
+function getValueFromCustomVariable( features, blockName, path ) {
+	const result =
+		get( features, [ blockName, 'custom', ...path ] ) ??
+		get( features, [ GLOBAL_CONTEXT, 'custom', ...path ] );
+	// A variable may reference another variable so we need recursion until we find the value.
+	return getValueFromVariable( features, blockName, result ) || result;
+}
+
+export function getValueFromVariable( features, blockName, variable ) {
+	if ( ! variable || ! isString( variable ) ) {
+		return;
+	}
+	let parsedVar;
+	const INTERNAL_REFERENCE_PREFIX = 'var:';
+	const CSS_REFERENCE_PREFIX = 'var(--wp--';
+	const CSS_REFERENCE_SUFFIX = ')';
+	if ( variable.startsWith( INTERNAL_REFERENCE_PREFIX ) ) {
+		parsedVar = variable
+			.slice( INTERNAL_REFERENCE_PREFIX.length )
+			.split( '|' );
+	} else if (
+		variable.startsWith( CSS_REFERENCE_PREFIX ) &&
+		variable.endsWith( CSS_REFERENCE_SUFFIX )
+	) {
+		parsedVar = variable
+			.slice( CSS_REFERENCE_PREFIX.length, -CSS_REFERENCE_SUFFIX.length )
+			.split( '--' );
+	} else {
+		return;
+	}
+
+	const [ type, ...path ] = parsedVar;
+	if ( type === 'preset' ) {
+		return getValueFromPresetVariable( features, blockName, path );
+	}
+	if ( type === 'custom' ) {
+		return getValueFromCustomVariable( features, blockName, path );
 	}
 }

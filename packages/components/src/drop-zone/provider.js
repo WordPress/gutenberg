@@ -1,47 +1,50 @@
 /**
  * External dependencies
  */
-import { isEqual, find, some, filter, throttle, includes } from 'lodash';
+import { find, some, filter, includes } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, createContext, createRef } from '@wordpress/element';
-import isShallowEqual from '@wordpress/is-shallow-equal';
+import {
+	createContext,
+	useCallback,
+	useEffect,
+	useRef,
+} from '@wordpress/element';
+import { useThrottle } from '@wordpress/compose';
+import { getFilesFromDataTransfer } from '@wordpress/dom';
 
-export const Context = createContext( {
-	addDropZone: () => {},
-	removeDropZone: () => {},
-} );
+export const Context = createContext();
 
-const { Provider, Consumer } = Context;
+const { Provider } = Context;
 
-const getDragEventType = ( { dataTransfer } ) => {
+function getDragEventType( { dataTransfer } ) {
 	if ( dataTransfer ) {
-		// Use lodash `includes` here as in the Edge browser `types` is implemented
-		// as a DomStringList, whereas in other browsers it's an array. `includes`
-		// happily works with both types.
-		if ( includes( dataTransfer.types, 'Files' ) ) {
+		if ( getFilesFromDataTransfer( dataTransfer ).size > 0 ) {
 			return 'file';
 		}
 
+		// Use lodash `includes` here as in the Edge browser `types` is implemented
+		// as a DomStringList, whereas in other browsers it's an array. `includes`
+		// happily works with both types.
 		if ( includes( dataTransfer.types, 'text/html' ) ) {
 			return 'html';
 		}
 	}
 
 	return 'default';
-};
+}
 
-const isTypeSupportedByDropZone = ( type, dropZone ) => {
+function isTypeSupportedByDropZone( type, dropZone ) {
 	return (
 		( type === 'file' && dropZone.onFilesDrop ) ||
 		( type === 'html' && dropZone.onHTMLDrop ) ||
 		( type === 'default' && dropZone.onDrop )
 	);
-};
+}
 
-const isWithinElementBounds = ( element, x, y ) => {
+function isWithinElementBounds( element, x, y ) {
 	const rect = element.getBoundingClientRect();
 	/// make sure the rect is a valid rect
 	if ( rect.bottom === rect.top || rect.left === rect.right ) {
@@ -51,81 +54,112 @@ const isWithinElementBounds = ( element, x, y ) => {
 	return (
 		x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom
 	);
-};
+}
 
-class DropZoneProvider extends Component {
-	constructor() {
-		super( ...arguments );
+function getPosition( event ) {
+	// In some contexts, it may be necessary to capture and redirect the
+	// drag event (e.g. atop an `iframe`). To accommodate this, you can
+	// create an instance of CustomEvent with the original event specified
+	// as the `detail` property.
+	//
+	// See: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
+	const detail =
+		window.CustomEvent && event instanceof window.CustomEvent
+			? event.detail
+			: event;
 
-		// Event listeners
-		this.onDragOver = this.onDragOver.bind( this );
-		this.onDrop = this.onDrop.bind( this );
-		// Context methods so this component can receive data from consumers
-		this.addDropZone = this.addDropZone.bind( this );
-		this.removeDropZone = this.removeDropZone.bind( this );
-		// Utility methods
-		this.resetDragState = this.resetDragState.bind( this );
-		this.toggleDraggingOverDocument = throttle(
-			this.toggleDraggingOverDocument.bind( this ),
-			200
+	return { x: detail.clientX, y: detail.clientY };
+}
+
+function getHoveredDropZone( dropZones, position, dragEventType ) {
+	const hoveredDropZones = filter(
+		Array.from( dropZones.current ),
+		( dropZone ) =>
+			isTypeSupportedByDropZone( dragEventType, dropZone ) &&
+			isWithinElementBounds(
+				dropZone.element.current,
+				position.x,
+				position.y
+			)
+	);
+
+	// Find the leaf dropzone not containing another dropzone
+	return find( hoveredDropZones, ( zone ) => {
+		const container = zone.isRelative
+			? zone.element.current.parentElement
+			: zone.element.current;
+
+		return ! some(
+			hoveredDropZones,
+			( subZone ) =>
+				subZone !== zone &&
+				container.contains( subZone.element.current )
 		);
+	} );
+}
 
-		this.dropZones = [];
-		this.dropZoneCallbacks = {
-			addDropZone: this.addDropZone,
-			removeDropZone: this.removeDropZone,
-		};
-		this.state = {
-			hoveredDropZone: -1,
-			isDraggingOverDocument: false,
-			position: null,
-		};
-		this.ref = createRef();
-	}
+export default function DropZoneProvider( { children } ) {
+	const ref = useRef();
+	const dropZones = useRef( new Set( [] ) );
+	const lastRelative = useRef();
 
-	componentDidMount() {
-		const { ownerDocument } = this.ref.current;
-		const { defaultView } = ownerDocument;
-		defaultView.addEventListener( 'dragover', this.onDragOver );
-		defaultView.addEventListener( 'mouseup', this.resetDragState );
-		// Note that `dragend` doesn't fire consistently for file and HTML drag
-		// events where the drag origin is outside the browser window.
-		// In Firefox it may also not fire if the originating node is removed.
-		defaultView.addEventListener( 'dragend', this.resetDragState );
-	}
-
-	componentWillUnmount() {
-		const { ownerDocument } = this.ref.current;
-		const { defaultView } = ownerDocument;
-		defaultView.removeEventListener( 'dragover', this.onDragOver );
-		defaultView.removeEventListener( 'mouseup', this.resetDragState );
-		defaultView.removeEventListener( 'dragend', this.resetDragState );
-	}
-
-	addDropZone( dropZone ) {
-		this.dropZones.push( dropZone );
-	}
-
-	removeDropZone( dropZone ) {
-		this.dropZones = filter( this.dropZones, ( dz ) => dz !== dropZone );
-	}
-
-	resetDragState() {
-		// Avoid throttled drag over handler calls
-		this.toggleDraggingOverDocument.cancel();
-
-		const { isDraggingOverDocument, hoveredDropZone } = this.state;
-		if ( ! isDraggingOverDocument && hoveredDropZone === -1 ) {
+	const updateDragZones = useCallback( ( event ) => {
+		if (
+			lastRelative.current &&
+			lastRelative.current.contains( event.target )
+		) {
 			return;
 		}
 
-		this.setState( {
-			hoveredDropZone: -1,
-			isDraggingOverDocument: false,
-			position: null,
+		const dragEventType = getDragEventType( event );
+		const position = getPosition( event );
+		const hoveredDropZone = getHoveredDropZone(
+			dropZones,
+			position,
+			dragEventType
+		);
+
+		if ( hoveredDropZone && hoveredDropZone.isRelative ) {
+			lastRelative.current = hoveredDropZone.element.current.offsetParent;
+		} else {
+			lastRelative.current = null;
+		}
+
+		// Notifying the dropzones
+		dropZones.current.forEach( ( dropZone ) => {
+			const isDraggingOverDropZone = dropZone === hoveredDropZone;
+			dropZone.setState( {
+				isDraggingOverDocument: isTypeSupportedByDropZone(
+					dragEventType,
+					dropZone
+				),
+				isDraggingOverElement: isDraggingOverDropZone,
+				position:
+					isDraggingOverDropZone && dropZone.withPosition
+						? position
+						: null,
+				type: isDraggingOverDropZone ? dragEventType : null,
+			} );
 		} );
 
-		this.dropZones.forEach( ( dropZone ) =>
+		event.preventDefault();
+	}, [] );
+
+	const throttledUpdateDragZones = useThrottle( updateDragZones, 200 );
+
+	const onDragOver = useCallback(
+		( event ) => {
+			throttledUpdateDragZones( event );
+			event.preventDefault();
+		},
+		[ throttledUpdateDragZones ]
+	);
+
+	const resetDragState = useCallback( () => {
+		// Avoid throttled drag over handler calls
+		throttledUpdateDragZones.cancel();
+
+		dropZones.current.forEach( ( dropZone ) =>
 			dropZone.setState( {
 				isDraggingOverDocument: false,
 				isDraggingOverElement: false,
@@ -133,130 +167,39 @@ class DropZoneProvider extends Component {
 				type: null,
 			} )
 		);
-	}
+	}, [] );
 
-	toggleDraggingOverDocument( event, dragEventType ) {
-		// In some contexts, it may be necessary to capture and redirect the
-		// drag event (e.g. atop an `iframe`). To accommodate this, you can
-		// create an instance of CustomEvent with the original event specified
-		// as the `detail` property.
-		//
-		// See: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
-		const detail =
-			window.CustomEvent && event instanceof window.CustomEvent
-				? event.detail
-				: event;
-
-		// Index of hovered dropzone.
-		const hoveredDropZones = filter(
-			this.dropZones,
-			( dropZone ) =>
-				isTypeSupportedByDropZone( dragEventType, dropZone ) &&
-				isWithinElementBounds(
-					dropZone.element.current,
-					detail.clientX,
-					detail.clientY
-				)
-		);
-
-		// Find the leaf dropzone not containing another dropzone
-		const hoveredDropZone = find( hoveredDropZones, ( zone ) => {
-			const container = zone.isRelative
-				? zone.element.current.parentElement
-				: zone.element.current;
-
-			return ! some(
-				hoveredDropZones,
-				( subZone ) =>
-					subZone !== zone &&
-					container.contains( subZone.element.current )
-			);
-		} );
-
-		const hoveredDropZoneIndex = this.dropZones.indexOf( hoveredDropZone );
-
-		let position = null;
-
-		if ( hoveredDropZone && hoveredDropZone.withPosition ) {
-			position = { x: detail.clientX, y: detail.clientY };
-		}
-
-		// Optimisation: Only update the changed dropzones
-		let toUpdate = [];
-
-		if ( ! this.state.isDraggingOverDocument ) {
-			toUpdate = this.dropZones;
-		} else if ( hoveredDropZoneIndex !== this.state.hoveredDropZone ) {
-			if ( this.state.hoveredDropZone !== -1 ) {
-				toUpdate.push( this.dropZones[ this.state.hoveredDropZone ] );
-			}
-			if ( hoveredDropZone ) {
-				toUpdate.push( hoveredDropZone );
-			}
-		} else if (
-			hoveredDropZone &&
-			hoveredDropZoneIndex === this.state.hoveredDropZone &&
-			! isEqual( position, this.state.position )
-		) {
-			toUpdate.push( hoveredDropZone );
-		}
-
-		// Notifying the dropzones
-		toUpdate.forEach( ( dropZone ) => {
-			const index = this.dropZones.indexOf( dropZone );
-			const isDraggingOverDropZone = index === hoveredDropZoneIndex;
-			dropZone.setState( {
-				isDraggingOverDocument: isTypeSupportedByDropZone(
-					dragEventType,
-					dropZone
-				),
-				isDraggingOverElement: isDraggingOverDropZone,
-				position: isDraggingOverDropZone ? position : null,
-				type: isDraggingOverDropZone ? dragEventType : null,
-			} );
-		} );
-
-		const newState = {
-			isDraggingOverDocument: true,
-			hoveredDropZone: hoveredDropZoneIndex,
-			position,
-		};
-		if ( ! isShallowEqual( newState, this.state ) ) {
-			this.setState( newState );
-		}
-	}
-
-	onDragOver( event ) {
-		this.toggleDraggingOverDocument( event, getDragEventType( event ) );
-		event.preventDefault();
-	}
-
-	onDrop( event ) {
+	function onDrop( event ) {
 		// This seemingly useless line has been shown to resolve a Safari issue
 		// where files dragged directly from the dock are not recognized
 		event.dataTransfer && event.dataTransfer.files.length; // eslint-disable-line no-unused-expressions
 
-		const { position, hoveredDropZone } = this.state;
 		const dragEventType = getDragEventType( event );
-		const dropZone = this.dropZones[ hoveredDropZone ];
-		this.resetDragState();
+		const position = getPosition( event );
+		const hoveredDropZone = getHoveredDropZone(
+			dropZones,
+			position,
+			dragEventType
+		);
 
-		if ( dropZone ) {
+		resetDragState();
+
+		if ( hoveredDropZone ) {
 			switch ( dragEventType ) {
 				case 'file':
-					dropZone.onFilesDrop(
-						[ ...event.dataTransfer.files ],
+					hoveredDropZone.onFilesDrop(
+						[ ...getFilesFromDataTransfer( event.dataTransfer ) ],
 						position
 					);
 					break;
 				case 'html':
-					dropZone.onHTMLDrop(
+					hoveredDropZone.onHTMLDrop(
 						event.dataTransfer.getData( 'text/html' ),
 						position
 					);
 					break;
 				case 'default':
-					dropZone.onDrop( event, position );
+					hoveredDropZone.onDrop( event, position );
 			}
 		}
 
@@ -264,20 +207,31 @@ class DropZoneProvider extends Component {
 		event.preventDefault();
 	}
 
-	render() {
-		return (
-			<div
-				ref={ this.ref }
-				onDrop={ this.onDrop }
-				className="components-drop-zone__provider"
-			>
-				<Provider value={ this.dropZoneCallbacks }>
-					{ this.props.children }
-				</Provider>
-			</div>
-		);
-	}
-}
+	useEffect( () => {
+		const { ownerDocument } = ref.current;
+		const { defaultView } = ownerDocument;
 
-export default DropZoneProvider;
-export { Consumer as DropZoneConsumer };
+		defaultView.addEventListener( 'dragover', onDragOver );
+		defaultView.addEventListener( 'mouseup', resetDragState );
+		// Note that `dragend` doesn't fire consistently for file and HTML drag
+		// events where the drag origin is outside the browser window.
+		// In Firefox it may also not fire if the originating node is removed.
+		defaultView.addEventListener( 'dragend', resetDragState );
+
+		return () => {
+			defaultView.removeEventListener( 'dragover', onDragOver );
+			defaultView.removeEventListener( 'mouseup', resetDragState );
+			defaultView.removeEventListener( 'dragend', resetDragState );
+		};
+	}, [ onDragOver, resetDragState ] );
+
+	return (
+		<div
+			ref={ ref }
+			onDrop={ onDrop }
+			className="components-drop-zone__provider"
+		>
+			<Provider value={ dropZones.current }>{ children }</Provider>
+		</div>
+	);
+}

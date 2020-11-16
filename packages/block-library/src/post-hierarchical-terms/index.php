@@ -19,6 +19,9 @@ function render_block_core_post_hierarchical_terms( $attributes, $content, $bloc
 	}
 
 	$post_hierarchical_terms = get_the_terms( $block->context['postId'], $attributes['term'] );
+	if ( is_wp_error( $post_hierarchical_terms ) ) {
+		return '';
+	}
 	if ( empty( $post_hierarchical_terms ) ) {
 		return '';
 	}
