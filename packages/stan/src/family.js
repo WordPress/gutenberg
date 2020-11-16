@@ -4,13 +4,13 @@
 import { createDerivedAtom } from './derived';
 
 /**
- *
- * @param {import('./types').WPAtomFamilyResolver<any>} resolver
- * @param {import('./types').WPAtomFamilyUpdater}       updater
+ * @template T
+ * @param {import('./types').WPAtomFamilyResolver<T>} resolver
+ * @param {import('./types').WPAtomFamilyUpdater<T>}       updater
  * @param {boolean}                                     isAsync
  * @param {string=}                                     id
  *
- * @return {(key:string) => import('./types').WPAtomFamilyItem} Atom Family Item creator.
+ * @return {(key:string) => import('./types').WPAtomFamilyItem<T>} Atom Family Item creator.
  */
 export const createAtomFamily = ( resolver, updater, isAsync, id ) => {
 	const config = {

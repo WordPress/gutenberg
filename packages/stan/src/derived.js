@@ -15,7 +15,7 @@ const resolveQueue = createQueue();
  *
  * @template T
  * @param {import('./types').WPDerivedAtomResolver<T>} resolver Atom Resolver.
- * @param {import('./types').WPDerivedAtomUpdater}     updater  Atom updater.
+ * @param {import('./types').WPDerivedAtomUpdater<T>}  updater  Atom updater.
  * @param {boolean=}                                   isAsync  Atom resolution strategy.
  * @param {string=}                                    id       Atom id.
  * @return {import("./types").WPAtom<T>} Createtd atom.

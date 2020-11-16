@@ -8,13 +8,14 @@ import { noop, isObject } from 'lodash';
  */
 
 /**
- * @param {import('./types').WPAtom<any>|import('./types').WPAtomFamilyItem} maybeAtomFamilyItem
- * @return {boolean} maybeAtomFamilyItem is WPAtomFamilyItem.
+ * @template T
+ * @param {import('./types').WPAtom<any>|import('./types').WPAtomFamilyItem<T>} maybeAtomFamilyItem
+ * @return {boolean} maybeAtomFamilyItem is WPAtomFamilyItem<T>.
  */
 export function isAtomFamilyItem( maybeAtomFamilyItem ) {
 	if (
 		isObject( maybeAtomFamilyItem ) &&
-		/** @type {import('./types').WPAtomFamilyItem} */ ( maybeAtomFamilyItem )
+		/** @type {import('./types').WPAtomFamilyItem<any>} */ ( maybeAtomFamilyItem )
 			.type === 'family'
 	) {
 		return true;
@@ -35,15 +36,16 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 	const families = new WeakMap();
 
 	/**
-	 * @param {import('./types').WPAtom<any>|import('./types').WPAtomFamilyItem} atom Atom.
-	 * @return {import('./types').WPAtomState<any>} Atom state;
+	 * @template T
+	 * @param {import('./types').WPAtom<T>|import('./types').WPAtomFamilyItem<T>} atom Atom.
+	 * @return {import('./types').WPAtomState<T>} Atom state;
 	 */
 	const getAtomState = ( atom ) => {
 		if ( isAtomFamilyItem( atom ) ) {
 			const {
 				config,
 				key,
-			} = /** @type {import('./types').WPAtomFamilyItem} */ ( atom );
+			} = /** @type {import('./types').WPAtomFamilyItem<any>} */ ( atom );
 			return familyRegistry.getAtomFromFamily( config, key );
 		}
 
@@ -60,9 +62,10 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 
 	const familyRegistry = {
 		/**
-		 * @param {import('./types').WPAtomFamilyConfig} atomFamilyConfig
+		 * @template T
+		 * @param {import('./types').WPAtomFamilyConfig<T>} atomFamilyConfig
 		 * @param {any} key
-		 * @return {import('./types').WPAtomState<any>} Atom state.
+		 * @return {import('./types').WPAtomState<T>} Atom state.
 		 */
 		getAtomFromFamily( atomFamilyConfig, key ) {
 			if ( ! families.get( atomFamilyConfig ) ) {
@@ -80,7 +83,8 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 		},
 
 		/**
-		 * @param {import('./types').WPAtomFamilyConfig} atomFamilyConfig
+		 * @template T
+		 * @param {import('./types').WPAtomFamilyConfig<T>} atomFamilyConfig
 		 * @param {any} key
 		 */
 		deleteAtomFromFamily( atomFamilyConfig, key ) {
@@ -117,7 +121,7 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 				const {
 					config,
 					key,
-				} = /** @type {import('./types').WPAtomFamilyItem} */ ( atom );
+				} = /** @type {import('./types').WPAtomFamilyItem<any>} */ ( atom );
 				return familyRegistry.deleteAtomFromFamily( config, key );
 			}
 			const atomState = atoms.get( atom );
