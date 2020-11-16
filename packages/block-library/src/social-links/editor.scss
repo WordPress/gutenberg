@@ -6,17 +6,9 @@
 	}
 }
 
-// Reduce the paddings, margins, and UI of inner-blocks.
-// @todo: eventually we may add a feature that lets a parent container absorb the block UI of a child block.
-// When that happens, leverage that instead of the following overrides.
-.editor-styles-wrapper .wp-block-social-link {
-	margin: 0 8px 8px 0;
-
-	// Prevent toolbar from jumping when selecting / hovering a link.
-	&.is-selected,
-	&.is-hovered {
-		transform: none;
-	}
+// Prevent toolbar from jumping when selecting / hovering a link.
+.wp-social-link:hover {
+	transform: none;
 }
 
 .editor-styles-wrapper .wp-block-social-links {
@@ -26,40 +18,40 @@
 // Placeholder/setup state.
 .wp-block-social-links__social-placeholder {
 	display: flex;
-
-	.wp-block-social-link {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		margin: 0 $grid-unit-10 $grid-unit-10 0;
-		width: 36px;
-		height: 36px;
-		border-radius: $radius-round;
-		opacity: 0.8;
-	}
-}
-
-.is-style-logos-only .wp-block-social-links__social-placeholder .wp-block-social-link::before {
-	content: "";
-	display: block;
-	width: 18px;
-	height: 18px;
-	border-radius: $radius-round;
 	opacity: 0.8;
-	background: currentColor;
-}
 
-.is-style-pill-shape .wp-block-social-links__social-placeholder .wp-block-social-link {
-	border-radius: 9999px;
-	padding-left: 16px + 12px;
-	padding-right: 16px + 12px;
+	.wp-social-link {
+		padding: 0.25em;
+
+		.is-style-pill-shape & {
+			padding-left: calc((2/3) * 1em);
+			padding-right: calc((2/3) * 1em);
+		}
+	}
+
+	.wp-social-link::before {
+		content: "";
+		display: block;
+		width: 1em;
+		height: 1em;
+		border-radius: $radius-round;
+
+		.is-style-logos-only & {
+			background: currentColor;
+		}
+	}
 }
 
 // Polish the Appender.
 .wp-block-social-links .block-list-appender {
-	margin: 0 0 $grid-unit-10 0;
+	margin: -$grid-unit-10 0;
 	display: flex;
 	align-items: center;
+
+	svg {
+		width: $icon-size;
+		height: $icon-size;
+	}
 }
 
 // Center flex items. This has an equivalent in style.scss.
@@ -69,14 +61,8 @@
 
 // Improve the preview, ensure buttons are fully opaque despite being disabled.
 // @todo: Look at improving the preview component to make this unnecessary.
-.block-editor-block-preview__content .wp-social-link:disabled {
+.block-editor-block-preview__content .components-button:disabled {
 	opacity: 1;
-}
-
-// Selected/unselected states.
-// Unselected block is preview, selected has additional options.
-[data-type="core/social-links"]:not(.is-selected):not(.has-child-selected) .wp-block-social-links {
-	min-height: 36px; // This height matches the height of the buttons and ensures an empty block doesn't collapse.
 }
 
 // Unconfigured placeholder links are semitransparent.
@@ -100,11 +86,4 @@
 
 	// Windows High Contrast mode will show this outline, but not the box-shadow.
 	outline: 2px solid transparent;
-}
-
-// To ensure a better selection footprint when editing, attach the margin to the block container.
-// @todo: This can very probably be removed entirely when this block receives a lighter DOM.
-.is-navigate-mode .block-editor-block-list__layout .block-editor-block-list__block[data-type="core/social-link"].is-selected::after,
-.block-editor-block-list__layout .block-editor-block-list__block[data-type="core/social-link"]:not([contenteditable]):focus::after {
-	right: 8px;
 }

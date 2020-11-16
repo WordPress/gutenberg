@@ -56,9 +56,10 @@ function InsertionPointInserter( {
 			return;
 		}
 
+		const { ownerDocument } = containerRef.current;
 		const targetRect = target.getBoundingClientRect();
 		const isReverse = clientY < targetRect.top + targetRect.height / 2;
-		const blockNode = getBlockDOMNode( clientId );
+		const blockNode = getBlockDOMNode( clientId, ownerDocument );
 		const container = isReverse ? containerRef.current : blockNode;
 		const closest =
 			getClosestTabbable( blockNode, true, container ) || blockNode;
@@ -109,7 +110,8 @@ function InsertionPointPopover( {
 	const appenderNodesMap = useContext( AppenderNodesContext );
 	const element = useMemo( () => {
 		if ( clientId ) {
-			return getBlockDOMNode( clientId );
+			const { ownerDocument } = containerRef.current;
+			return getBlockDOMNode( clientId, ownerDocument );
 		}
 
 		// Can't find the element, might be at the end of the block list, or inside an empty block list.

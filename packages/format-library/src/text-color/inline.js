@@ -8,11 +8,11 @@ import { get } from 'lodash';
  */
 import { useCallback, useMemo } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { getRectangleFromRange } from '@wordpress/dom';
 import {
 	applyFormat,
 	removeFormat,
 	getActiveFormat,
+	useAnchorRef,
 } from '@wordpress/rich-text';
 import {
 	ColorPalette,
@@ -21,6 +21,11 @@ import {
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { textColor as settings } from './index';
 
 export function getActiveColor( formatName, formatValue, colors ) {
 	const activeColorFormat = getActiveFormat( formatValue, formatName );
@@ -40,44 +45,6 @@ export function getActiveColor( formatName, formatValue, colors ) {
 		return getColorObjectByAttributeValues( colors, colorSlug ).color;
 	}
 }
-
-const ColorPopoverAtLink = ( { addingColor, ...props } ) => {
-	// There is no way to open a text formatter popover when another one is mounted.
-	// The first popover will always be dismounted when a click outside happens, so we can store the
-	// anchor Rect during the lifetime of the component.
-	const anchorRect = useMemo( () => {
-		const selection = window.getSelection();
-		const range =
-			selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
-		if ( ! range ) {
-			return;
-		}
-
-		if ( addingColor ) {
-			return getRectangleFromRange( range );
-		}
-
-		let element = range.startContainer;
-
-		// If the caret is right before the element, select the next element.
-		element = element.nextElementSibling || element;
-
-		while ( element.nodeType !== element.ELEMENT_NODE ) {
-			element = element.parentNode;
-		}
-
-		const closest = element.closest( 'span' );
-		if ( closest ) {
-			return closest.getBoundingClientRect();
-		}
-	}, [] );
-
-	if ( ! anchorRect ) {
-		return null;
-	}
-
-	return <URLPopover anchorRect={ anchorRect } { ...props } />;
-};
 
 const ColorPicker = ( { name, value, onChange } ) => {
 	const colors = useSelect( ( select ) => {
@@ -123,16 +90,17 @@ export default function InlineColorUI( {
 	value,
 	onChange,
 	onClose,
-	addingColor,
+	contentRef,
 } ) {
+	const anchorRef = useAnchorRef( { ref: contentRef, value, settings } );
 	return (
-		<ColorPopoverAtLink
+		<URLPopover
 			value={ value }
-			addingColor={ addingColor }
 			onClose={ onClose }
 			className="components-inline-color-popover"
+			anchorRef={ anchorRef }
 		>
 			<ColorPicker name={ name } value={ value } onChange={ onChange } />
-		</ColorPopoverAtLink>
+		</URLPopover>
 	);
 }

@@ -161,6 +161,54 @@
 						"size": 42
 					}
 				],
+				"fontStyles": [
+					{
+						"name": "Regular",
+						"slug": "normal"
+					},
+					{
+						"name": "Italic",
+						"slug": "italic"
+					}
+				],
+				"fontWeights": [
+					{
+						"name": "Ultralight",
+						"slug": "100"
+					},
+					{
+						"name": "Thin",
+						"slug": "200"
+					},
+					{
+						"name": "Light",
+						"slug": "300"
+					},
+					{
+						"name": "Regular",
+						"slug": "400"
+					},
+					{
+						"name": "Medium",
+						"slug": "500"
+					},
+					{
+						"name": "Semibold",
+						"slug": "600"
+					},
+					{
+						"name": "Bold",
+						"slug": "700"
+					},
+					{
+						"name": "Heavy",
+						"slug": "800"
+					},
+					{
+						"name": "Black",
+						"slug": "900"
+					}
+				],
 				"textTransforms": [
 					{
 						"name": "AB",
@@ -173,6 +221,18 @@
 					{
 						"name": "Ab",
 						"slug": "capitalize"
+					}
+				],
+				"textDecorations": [
+					{
+						"name": "Underline",
+						"slug": "underline",
+						"value": "underline"
+					},
+					{
+						"name": "Strikethrough",
+						"slug": "strikethrough",
+						"value": "line-through"
 					}
 				]
 			},

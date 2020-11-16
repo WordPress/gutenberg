@@ -30,6 +30,7 @@
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
 		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",

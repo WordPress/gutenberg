@@ -139,10 +139,12 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$inner_blocks_html .= $inner_block->render();
 	}
 
+	$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
+
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
 			'class' => implode( ' ', $classes ),
-			'style' => $colors['inline_styles'] . $font_sizes['inline_styles'],
+			'style' => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
 		)
 	);
 

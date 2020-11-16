@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Image should drag and drop files into media placeholder 1`] = `
+"<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->"
+`;

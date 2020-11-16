@@ -56,6 +56,11 @@ class Editor extends Component {
 
 		// Omit hidden block types if exists and non-empty.
 		if ( size( hiddenBlockTypes ) > 0 ) {
+			if ( settings.allowedBlockTypes === undefined ) {
+				// if no specific flags for allowedBlockTypes are set, assume `true`
+				// meaning allow all block types
+				settings.allowedBlockTypes = true;
+			}
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
@@ -190,7 +195,6 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
-
 		return {
 			switchEditorMode,
 		};

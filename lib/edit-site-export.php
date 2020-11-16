@@ -10,6 +10,11 @@
  * and template parts from the site editor, and close the connection.
  */
 function gutenberg_edit_site_export() {
+	// Theme templates and template parts need to be synchronized
+	// before the export.
+	_gutenberg_synchronize_theme_templates( 'template-part' );
+	_gutenberg_synchronize_theme_templates( 'template' );
+
 	// Create ZIP file and directories.
 	$filename = tempnam( get_temp_dir(), 'edit-site-export' );
 	$zip      = new ZipArchive();
@@ -18,26 +23,44 @@ function gutenberg_edit_site_export() {
 	$zip->addEmptyDir( 'theme/block-templates' );
 	$zip->addEmptyDir( 'theme/block-template-parts' );
 
-	// Load files into ZIP file.
-	foreach ( get_template_types() as $template_type ) {
-		// Skip 'embed' for now because it is not a regular template type.
-		// Skip 'index' because it's a fallback that we handle differently.
-		if ( in_array( $template_type, array( 'embed', 'index' ), true ) ) {
-			continue;
-		}
+	$theme = wp_get_theme()->get_stylesheet();
 
-		$current_template = gutenberg_find_template_post_and_parts( $template_type );
-		if ( isset( $current_template ) ) {
-			$zip->addFromString(
-				'theme/block-templates/' . $current_template['template_post']->post_name . '.html',
-				gutenberg_strip_post_ids_from_template_part_blocks( $current_template['template_post']->post_content )
-			);
+	// Load templates into the zip file.
+	$template_query = new WP_Query(
+		array(
+			'post_type'      => 'wp_template',
+			'post_status'    => array( 'publish', 'auto-draft' ),
+			'meta_key'       => 'theme',
+			'meta_value'     => $theme,
+			'posts_per_page' => -1,
+			'no_found_rows'  => true,
+		)
+	);
+	while ( $template_query->have_posts() ) {
+		$template = $template_query->next_post();
+		$zip->addFromString(
+			'theme/block-templates/' . $template->post_name . '.html',
+			gutenberg_strip_post_ids_from_template_part_blocks( $template->post_content )
+		);
+	}
 
-			foreach ( $current_template['template_part_ids'] as $template_part_id ) {
-				$template_part = get_post( $template_part_id );
-				$zip->addFromString( 'theme/block-template-parts/' . $template_part->post_name . '.html', $template_part->post_content );
-			}
-		}
+	// Load template parts into the zip file.
+	$template_part_query = new WP_Query(
+		array(
+			'post_type'      => 'wp_template_part',
+			'post_status'    => array( 'publish', 'auto-draft' ),
+			'meta_key'       => 'theme',
+			'meta_value'     => $theme,
+			'posts_per_page' => -1,
+			'no_found_rows'  => true,
+		)
+	);
+	while ( $template_part_query->have_posts() ) {
+		$template_part = $template_part_query->next_post();
+		$zip->addFromString(
+			'theme/block-template-parts/' . $template_part->post_name . '.html',
+			gutenberg_strip_post_ids_from_template_part_blocks( $template_part->post_content )
+		);
 	}
 
 	// Send back the ZIP file.
@@ -49,6 +72,7 @@ function gutenberg_edit_site_export() {
 	echo readfile( $filename );
 	die();
 }
+
 add_action(
 	'rest_api_init',
 	function () {

@@ -22,6 +22,19 @@ import {
 	receiveCurrentUser,
 } from '../actions';
 
+jest.mock( '../locks/actions', () => ( {
+	__unstableAcquireStoreLock: jest.fn( () => [
+		{
+			type: 'MOCKED_ACQUIRE_LOCK',
+		},
+	] ),
+	__unstableReleaseStoreLock: jest.fn( () => [
+		{
+			type: 'MOCKED_RELEASE_LOCK',
+		},
+	] ),
+} ) );
+
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
 
@@ -32,8 +45,12 @@ describe( 'getEntityRecord', () => {
 		const fulfillment = getEntityRecord( 'root', 'postType', 'post' );
 		// Trigger generator
 		fulfillment.next();
-		// Provide entities and trigger apiFetch
-		const { value: apiFetchAction } = fulfillment.next( entities );
+		// Provide entities and acquire lock
+		expect( fulfillment.next( entities ).value.type ).toEqual(
+			'MOCKED_ACQUIRE_LOCK'
+		);
+		// trigger apiFetch
+		const { value: apiFetchAction } = fulfillment.next();
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/types/post?context=edit',
 		} );
@@ -41,6 +58,10 @@ describe( 'getEntityRecord', () => {
 		const { value: received } = fulfillment.next( POST_TYPE );
 		expect( received ).toEqual(
 			receiveEntityRecords( 'root', 'postType', POST_TYPE )
+		);
+		// Release lock
+		expect( fulfillment.next().value.type ).toEqual(
+			'MOCKED_RELEASE_LOCK'
 		);
 	} );
 } );
@@ -60,8 +81,13 @@ describe( 'getEntityRecords', () => {
 
 		// Trigger generator
 		fulfillment.next();
-		// Provide entities and trigger apiFetch
-		const { value: apiFetchAction } = fulfillment.next( ENTITIES );
+
+		// Provide entities and acquire lock
+		fulfillment.next( ENTITIES );
+
+		// trigger apiFetch
+		const { value: apiFetchAction } = fulfillment.next();
+
 		expect( apiFetchAction.request ).toEqual( {
 			path: '/wp/v2/types?context=edit',
 		} );
@@ -77,12 +103,35 @@ describe( 'getEntityRecords', () => {
 		);
 	} );
 
+	it( 'Uses state locks', async () => {
+		const fulfillment = getEntityRecords( 'root', 'postType' );
+
+		// Repeat the steps from `yields with requested post type` test
+		fulfillment.next();
+		// Provide entities and acquire lock
+		expect( fulfillment.next( ENTITIES ).value.type ).toEqual(
+			'MOCKED_ACQUIRE_LOCK'
+		);
+		fulfillment.next();
+		fulfillment.next( POST_TYPES );
+
+		// Resolve specific entity records
+		fulfillment.next();
+		fulfillment.next();
+
+		// Release lock
+		expect( fulfillment.next().value.type ).toEqual(
+			'MOCKED_RELEASE_LOCK'
+		);
+	} );
+
 	it( 'marks specific entity records as resolved', async () => {
 		const fulfillment = getEntityRecords( 'root', 'postType' );
 
 		// Repeat the steps from `yields with requested post type` test
 		fulfillment.next();
 		fulfillment.next( ENTITIES );
+		fulfillment.next();
 		fulfillment.next( POST_TYPES );
 
 		// It should mark the entity record that has an ID as resolved
@@ -96,8 +145,6 @@ describe( 'getEntityRecords', () => {
 			selectorName: 'getEntityRecord',
 			args: [ ENTITIES[ 1 ].kind, ENTITIES[ 1 ].name, 2 ],
 		} );
-
-		expect( fulfillment.next().done ).toEqual( true );
 	} );
 } );
 

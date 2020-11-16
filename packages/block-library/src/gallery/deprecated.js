@@ -13,10 +13,6 @@ import { RichText } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import { defaultColumnsNumber } from './shared';
-import {
-	LINK_DESTINATION_ATTACHMENT,
-	LINK_DESTINATION_MEDIA,
-} from './constants';
 
 const deprecated = [
 	// Just temporarily comment these out until new structure is finalised

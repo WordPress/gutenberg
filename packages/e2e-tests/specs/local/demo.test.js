@@ -39,6 +39,8 @@ describe( 'new editor state', () => {
 		} );
 		expect( isDirty ).toBeTruthy();
 
+		await page.waitForSelector( 'button.editor-post-save-draft' );
+
 		expect( await page.$( 'button.editor-post-save-draft' ) ).toBeTruthy();
 	} );
 } );

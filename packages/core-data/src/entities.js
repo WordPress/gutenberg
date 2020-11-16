@@ -135,9 +135,13 @@ function* loadPostTypeEntities() {
 			mergedEdits: { meta: true },
 			getTitle( record ) {
 				if ( [ 'wp_template_part', 'wp_template' ].includes( name ) ) {
-					return startCase( record.slug );
+					return (
+						record?.title?.rendered ||
+						record?.title ||
+						startCase( record.slug )
+					);
 				}
-				return record?.title?.renderd || record?.title || record.id;
+				return record?.title?.rendered || record?.title || record.id;
 			},
 		};
 	} );

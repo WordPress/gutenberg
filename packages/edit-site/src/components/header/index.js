@@ -92,10 +92,14 @@ export default function Header( { openEntitiesSavedStates } ) {
 							'Generic label for block inserter button'
 						) }
 					/>
-					<ToolSelector />
-					<UndoButton />
-					<RedoButton />
-					<BlockNavigationDropdown />
+					{ isLargeViewport && (
+						<>
+							<ToolSelector />
+							<UndoButton />
+							<RedoButton />
+							<BlockNavigationDropdown />
+						</>
+					) }
 					{ displayBlockToolbar && (
 						<div className="edit-site-header-toolbar__block-toolbar">
 							<BlockToolbar hideDragHandle />

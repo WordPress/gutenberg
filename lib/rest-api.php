@@ -61,9 +61,8 @@ add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10
  *
  * @param WP_REST_Response $response The response object.
  * @param WP_Theme         $theme    Theme object used to create response.
- * @param WP_REST_Request  $request  Request object.
  */
-function gutenberg_filter_rest_prepare_theme( $response, $theme, $request ) {
+function gutenberg_filter_rest_prepare_theme( $response, $theme ) {
 	$data   = $response->get_data();
 	$fields = array_keys( $data );
 
@@ -125,7 +124,7 @@ function gutenberg_filter_rest_prepare_theme( $response, $theme, $request ) {
 	$response->set_data( $data );
 	return $response;
 }
-add_filter( 'rest_prepare_theme', 'gutenberg_filter_rest_prepare_theme', 10, 3 );
+add_filter( 'rest_prepare_theme', 'gutenberg_filter_rest_prepare_theme', 10, 2 );
 
 /**
  * Registers the block directory.
