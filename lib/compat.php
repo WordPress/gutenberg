@@ -447,11 +447,11 @@ function gutenberg_inject_default_block_context( $args ) {
 			}
 
 			// Inject the post context if not done by Core.
-			$needs_post_id = ! empty( $block_type->uses_context ) && in_array( 'postId', $block_type->uses_context, true );
+			$needs_post_id = false;
 			if ( $post instanceof WP_Post && $needs_post_id ) {
 				$block->context['postId'] = $post->ID;
 			}
-			$needs_post_type = ! empty( $block_type->uses_context ) && in_array( 'postType', $block_type->uses_context, true );
+			$needs_post_type = false;
 			if ( $post instanceof WP_Post && $needs_post_type ) {
 				/*
 				* The `postType` context is largely unnecessary server-side, since the
@@ -463,7 +463,7 @@ function gutenberg_inject_default_block_context( $args ) {
 			}
 
 			// Inject the query context if not done by Core.
-			$needs_query = ! empty( $block_type->uses_context ) && in_array( 'query', $block_type->uses_context, true );
+			$needs_query = false;
 			if ( ! isset( $block->context['query'] ) && $needs_query ) {
 				if ( isset( $wp_query->tax_query->queried_terms['category'] ) ) {
 					$block->context['query'] = array( 'categoryIds' => array() );
