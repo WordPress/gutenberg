@@ -13,6 +13,11 @@ global.window.matchMedia = () => ( {
 	addListener: () => {},
 	removeListener: () => {},
 } );
+// Mock window.getSelection.
+global.window.getSelection = jest.fn( () => ( {
+	addRange: jest.fn(),
+	removeAllRanges: jest.fn(),
+} ) );
 
 // Setup fake localStorage
 const storage = {};
