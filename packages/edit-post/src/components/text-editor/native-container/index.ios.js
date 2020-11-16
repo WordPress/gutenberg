@@ -11,8 +11,8 @@ import { Component } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import KeyboardAvoidingView from '../keyboard-avoiding-view';
-import styles from './style.ios.scss';
+import { KeyboardAvoidingView } from '@wordpress/components';
+import styles from './style.scss';
 
 class HTMLInputContainer extends Component {
 	constructor() {

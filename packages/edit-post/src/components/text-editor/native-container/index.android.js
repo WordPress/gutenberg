@@ -4,10 +4,14 @@
 import { ScrollView } from 'react-native';
 
 /**
+ * WordPress dependencies
+ */
+import { KeyboardAvoidingView } from '@wordpress/components';
+
+/**
  * Internal dependencies
  */
-import KeyboardAvoidingView from '../keyboard-avoiding-view';
-import styles from './style.android.scss';
+import styles from './style.scss';
 
 const HTMLInputContainer = ( { children, parentHeight } ) => (
 	<KeyboardAvoidingView

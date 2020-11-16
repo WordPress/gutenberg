@@ -9,24 +9,20 @@ import SafeArea from 'react-native-safe-area';
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import { BottomSheetSettings, FloatingToolbar } from '@wordpress/block-editor';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { KeyboardAvoidingView, NoticeList } from '@wordpress/components';
 import {
-	BottomSheetSettings,
+	AutosaveMonitor,
 	__experimentalPageTemplatePicker,
 	__experimentalWithPageTemplatePicker,
-	FloatingToolbar,
-} from '@wordpress/block-editor';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import {
-	HTMLTextInput,
-	KeyboardAvoidingView,
-	NoticeList,
-} from '@wordpress/components';
-import { AutosaveMonitor } from '@wordpress/editor';
+} from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
  */
+import TextEditor from '../text-editor';
 import styles from './style.scss';
 import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
@@ -84,7 +80,7 @@ class Layout extends Component {
 	}
 
 	renderHTML() {
-		return <HTMLTextInput parentHeight={ this.state.rootViewHeight } />;
+		return <TextEditor parentHeight={ this.state.rootViewHeight } />;
 	}
 
 	renderVisual() {
