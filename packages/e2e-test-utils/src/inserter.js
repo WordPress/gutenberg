@@ -44,8 +44,10 @@ async function isGlobalInserterOpen() {
 		);
 	} );
 }
-
-async function toggleGlobalBlockInserter() {
+/**
+ * Toggles the global inserter.
+ */
+export async function toggleGlobalBlockInserter() {
 	await page.click(
 		'.edit-post-header [aria-label="Add block"], .edit-site-header [aria-label="Add block"]'
 	);
