@@ -34,6 +34,8 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
+const URL_COPIED_NOTIFICATION_DURATION_MS = 1500;
+
 export class FileEdit extends Component {
 	constructor( props ) {
 		super( props );
@@ -109,7 +111,7 @@ export class FileEdit extends Component {
 		this.setState( { isUrlCopied: true } );
 		this.timerRef = setTimeout( () => {
 			this.setState( { isUrlCopied: false } );
-		}, 1500 );
+		}, URL_COPIED_NOTIFICATION_DURATION_MS );
 	}
 
 	onChangeOpenInNewWindow( newValue ) {
