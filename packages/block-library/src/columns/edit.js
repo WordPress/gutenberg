@@ -28,7 +28,7 @@ import {
  * Internal dependencies
  */
 import {
-	hasExplicitColumnWidths,
+	hasExplicitPercentColumnWidths,
 	getMappedColumnWidths,
 	getRedistributedColumnWidths,
 	toWidthPrecision,
@@ -145,7 +145,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 			const { getBlocks } = registry.select( 'core/block-editor' );
 
 			let innerBlocks = getBlocks( clientId );
-			const hasExplicitWidths = hasExplicitColumnWidths( innerBlocks );
+			const hasExplicitWidths = hasExplicitPercentColumnWidths(
+				innerBlocks
+			);
 
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;

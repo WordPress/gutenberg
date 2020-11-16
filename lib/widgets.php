@@ -278,7 +278,7 @@ function gutenberg_load_widget_preview_if_requested() {
 		current_user_can( 'edit_theme_options' )
 	) {
 		define( 'IFRAME_REQUEST', true );
-		require_once dirname( __FILE__ ) . '/widget-preview-template.php';
+		require_once __DIR__ . '/widget-preview-template.php';
 		exit;
 	}
 }

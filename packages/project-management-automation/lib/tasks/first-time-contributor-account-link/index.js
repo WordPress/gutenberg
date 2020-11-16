@@ -33,17 +33,17 @@ function getPromptMessageText( author ) {
 }
 
 /**
- * Adds the 'First Time Contributor' label to PRs merged on behalf of
- * contributors that have not yet made a commit, and prompts the user to link
- * their GitHub account to their WordPress.org profile if neccessary for props
- * credit.
+ * Prompts the user to link their GitHub account to their WordPress.org profile
+ * if neccessary for props credit.
  *
  * @param {WebhookPayloadPush} payload Push event payload.
  * @param {GitHub}             octokit Initialized Octokit REST client.
  */
-async function firstTimeContributor( payload, octokit ) {
+async function firstTimeContributorAccountLink( payload, octokit ) {
 	if ( payload.ref !== 'refs/heads/master' ) {
-		debug( 'first-time-contributor: Commit is not to `master`. Aborting' );
+		debug(
+			'first-time-contributor-account-link: Commit is not to `master`. Aborting'
+		);
 		return;
 	}
 
@@ -52,7 +52,7 @@ async function firstTimeContributor( payload, octokit ) {
 	const pullRequest = getAssociatedPullRequest( commit );
 	if ( ! pullRequest ) {
 		debug(
-			'first-time-contributor: Cannot determine pull request associated with commit. Aborting'
+			'first-time-contributor-account-link: Cannot determine pull request associated with commit. Aborting'
 		);
 		return;
 	}
@@ -60,8 +60,9 @@ async function firstTimeContributor( payload, octokit ) {
 	const repo = payload.repository.name;
 	const owner = payload.repository.owner.login;
 	const author = commit.author.username;
+
 	debug(
-		`first-time-contributor: Searching for commits in ${ owner }/${ repo } by @${ author }`
+		`first-time-contributor-account-link: Searching for commits in ${ owner }/${ repo } by @${ author }`
 	);
 
 	const { data: commits } = await octokit.repos.listCommits( {
@@ -72,24 +73,13 @@ async function firstTimeContributor( payload, octokit ) {
 
 	if ( commits.length > 1 ) {
 		debug(
-			`first-time-contributor: Not the first commit for author. Aborting`
+			`first-time-contributor-account-link: Not the first commit for author. Aborting`
 		);
 		return;
 	}
 
 	debug(
-		`first-time-contributor: Adding 'First Time Contributor' label to issue #${ pullRequest }`
-	);
-
-	await octokit.issues.addLabels( {
-		owner,
-		repo,
-		issue_number: pullRequest,
-		labels: [ 'First-time Contributor' ],
-	} );
-
-	debug(
-		`first-time-contributor: Checking for WordPress username associated with @${ author }`
+		`first-time-contributor-account-link: Checking for WordPress username associated with @${ author }`
 	);
 
 	let hasProfile;
@@ -97,20 +87,20 @@ async function firstTimeContributor( payload, octokit ) {
 		hasProfile = await hasWordPressProfile( author );
 	} catch ( error ) {
 		debug(
-			`first-time-contributor: Error retrieving from profile API:\n\n${ error.toString() }`
+			`first-time-contributor-account-link: Error retrieving from profile API:\n\n${ error.toString() }`
 		);
 		return;
 	}
 
 	if ( hasProfile ) {
 		debug(
-			`first-time-contributor: User already known. No need to prompt for account link!`
+			`first-time-contributor-account-link: User already known. No need to prompt for account link!`
 		);
 		return;
 	}
 
 	debug(
-		'first-time-contributor: User not known. Adding comment to prompt for account link.'
+		'first-time-contributor-account-link: User not known. Adding comment to prompt for account link.'
 	);
 
 	await octokit.issues.createComment( {
@@ -121,4 +111,4 @@ async function firstTimeContributor( payload, octokit ) {
 	} );
 }
 
-module.exports = firstTimeContributor;
+module.exports = firstTimeContributorAccountLink;

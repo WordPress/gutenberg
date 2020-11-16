@@ -238,6 +238,8 @@ The data module shares many of the same [core principles](https://redux.js.org/i
 
 The [higher-order components](#higher-order-components) were created to complement this distinction. The intention with splitting `withSelect` and `withDispatch` — where in React Redux they are combined under `connect` as `mapStateToProps` and `mapDispatchToProps` arguments — is to more accurately reflect that dispatch is not dependent upon a subscription to state changes, and to allow for state-derived values to be used in `withDispatch` (via [higher-order component composition](/packages/compose/README.md)).
 
+The data module also has built-in solutions for handling asynchronous side-effects, through [resolvers](#resolvers) and [controls](#controls). These differ slightly from [standard redux async solutions](https://redux.js.org/advanced/async-actions) like [`redux-thunk`](https://github.com/gaearon/redux-thunk) or [`redux-saga`](https://redux-saga.js.org/).
+
 Specific implementation differences from Redux and React Redux:
 
 -   In Redux, a `subscribe` listener is called on every dispatch, regardless of whether the value of state has changed.
@@ -706,48 +708,6 @@ not change because the dependency is just the currency.
 _Parameters_
 
 -   _\_mapSelect_ `Function`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument.
--   _deps_ `Array`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
-
-_Returns_
-
--   `Function`: A custom react hook.
-
-<a name="useStoreSelectors" href="#useStoreSelectors">#</a> **useStoreSelectors**
-
-Custom react hook for retrieving selectors from registered stores
-
-_Usage_
-
-```js
-const { useStoreSelectors } = wp.data;
-
-function HammerPriceDisplay( { currency } ) {
-  const price = useStoreSelectors(
-    'my-shop',
-    ( { getPrice } ) => getPrice( 'hammer', currency ),
-    [ currency ]
-  );
-  return new Intl.NumberFormat( 'en-US', {
-    style: 'currency',
-    currency,
-  } ).format( price );
-}
-
-// Rendered in the application:
-// <HammerPriceDisplay currency="USD" />
-```
-
-In the above example, when `HammerPriceDisplay` is rendered into an
-application, the price will be retrieved from the store state using the
-`mapSelectors` callback on `useStoreSelectors`. If the currency prop changes then
-any price in the state for that currency is retrieved. If the currency prop
-doesn't change and other props are passed in that do change, the price will
-not change because the dependency is just the currency.
-
-_Parameters_
-
--   _storeKey_ `string`: Store to return selectors from.
--   _mapSelectors_ `Function`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the object with all the store selectors as its only argument.
 -   _deps_ `Array`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_

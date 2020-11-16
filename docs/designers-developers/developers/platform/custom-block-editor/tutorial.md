@@ -175,7 +175,7 @@ wp_enqueue_style(
     'getdave-sbe-styles', // Handle.
     plugins_url( 'build/index.css', __FILE__ ), // Block editor CSS.
     array( 'wp-edit-blocks' ), // Dependency to include the CSS after it.
-    filemtime( dirname( __FILE__ ) . '/build/index.css' )
+    filemtime( __DIR__ . '/build/index.css' )
 );
 ```
 

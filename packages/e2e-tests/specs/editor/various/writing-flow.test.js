@@ -397,6 +397,18 @@ describe( 'Writing Flow', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
+	it( 'should navigate contenteditable with normal line height', async () => {
+		await clickBlockAppender();
+		await page.keyboard.press( 'Enter' );
+		await page.evaluate( () => {
+			document.activeElement.style.lineHeight = 'normal';
+		} );
+		await page.keyboard.press( 'ArrowUp' );
+		await page.keyboard.type( '1' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
 	it( 'should not prematurely multi-select', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );

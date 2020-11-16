@@ -69,6 +69,27 @@ function gutenberg_register_template_part_post_type() {
 add_action( 'init', 'gutenberg_register_template_part_post_type' );
 
 /**
+ * Automatically set the theme meta for template parts.
+ *
+ * @param array $post_id Template Part ID.
+ * @param array $post    Template Part Post.
+ * @param bool  $update  Is update.
+ */
+function gutenberg_set_template_part_post_theme( $post_id, $post, $update ) {
+	if ( 'wp_template_part' !== $post->post_type || $update || 'trash' === $post->post_status ) {
+		return;
+	}
+
+	$theme = get_post_meta( $post_id, 'theme', true );
+
+	if ( ! $theme ) {
+		update_post_meta( $post_id, 'theme', wp_get_theme()->get_stylesheet() );
+	}
+}
+
+add_action( 'save_post', 'gutenberg_set_template_part_post_theme', 10, 3 );
+
+/**
  * Filters `wp_template_part` posts slug resolution to bypass deduplication logic as
  * template part slugs should be unique.
  *
@@ -145,22 +166,14 @@ add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_tem
 
 
 /**
- * Filter for adding a `resolved`, a `template`, and a `theme` parameter to `wp_template_part` queries.
+ * Filter for adding and a `theme` parameter to `wp_template_part` queries.
  *
  * @param array $query_params The query parameters.
  * @return array Filtered $query_params.
  */
 function filter_rest_wp_template_part_collection_params( $query_params ) {
 	$query_params += array(
-		'resolved' => array(
-			'description' => __( 'Whether to filter for resolved template parts.', 'gutenberg' ),
-			'type'        => 'boolean',
-		),
-		'template' => array(
-			'description' => __( 'The template slug for the template that the template part is used by.', 'gutenberg' ),
-			'type'        => 'string',
-		),
-		'theme'    => array(
+		'theme' => array(
 			'description' => __( 'The theme slug for the theme that created the template part.', 'gutenberg' ),
 			'type'        => 'string',
 		),
@@ -177,39 +190,6 @@ add_filter( 'rest_wp_template_part_collection_params', 'filter_rest_wp_template_
  * @return array Filtered $args.
  */
 function filter_rest_wp_template_part_query( $args, $request ) {
-	/**
-	 * Unlike `filter_rest_wp_template_query`, we resolve queries also if there's only a `template` argument set.
-	 * The difference is that in the case of templates, we can use the `slug` field that already exists (as part
-	 * of the entities endpoint, wheras for template parts, we have to register the extra `template` argument),
-	 * so we need the `resolved` flag to convey the different semantics (only return 'resolved' templates that match
-	 * the `slug` vs return _all_ templates that match it (e.g. including all auto-drafts)).
-	 *
-	 * A template parts query with a `template` arg but not a `resolved` one is conceivable, but probably wouldn't be
-	 * very useful: It'd be all template parts for all templates matching that `template` slug (including auto-drafts etc).
-	 *
-	 * @see filter_rest_wp_template_query
-	 * @see filter_rest_wp_template_part_collection_params
-	 * @see https://github.com/WordPress/gutenberg/pull/21878#discussion_r436961706
-	 */
-	if ( $request['resolved'] || $request['template'] ) {
-		$template_part_ids = array( 0 ); // Return nothing by default (the 0 is needed for `post__in`).
-		$template_types    = $request['template'] ? array( $request['template'] ) : get_template_types();
-
-		foreach ( $template_types as $template_type ) {
-			// Skip 'embed' for now because it is not a regular template type.
-			if ( in_array( $template_type, array( 'embed' ), true ) ) {
-				continue;
-			}
-
-			$current_template = gutenberg_find_template_post_and_parts( $template_type );
-			if ( isset( $current_template ) ) {
-				$template_part_ids = $template_part_ids + $current_template['template_part_ids'];
-			}
-		}
-		$args['post__in']    = $template_part_ids;
-		$args['post_status'] = array( 'publish', 'auto-draft' );
-	}
-
 	if ( $request['theme'] ) {
 		$meta_query   = isset( $args['meta_query'] ) ? $args['meta_query'] : array();
 		$meta_query[] = array(
@@ -217,52 +197,31 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 			'value' => $request['theme'],
 		);
 
-		// Ensure auto-drafts of all theme supplied template parts are created.
-		if ( wp_get_theme()->stylesheet === $request['theme'] ) {
-			/**
-			 * Finds all nested template part file paths in a theme's directory.
-			 *
-			 * @param string $base_directory The theme's file path.
-			 * @return array $path_list A list of paths to all template part files.
-			 */
-			function get_template_part_paths( $base_directory ) {
-				$path_list = array();
-				if ( file_exists( $base_directory . '/block-template-parts' ) ) {
-					$nested_files      = new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $base_directory . '/block-template-parts' ) );
-					$nested_html_files = new RegexIterator( $nested_files, '/^.+\.html$/i', RecursiveRegexIterator::GET_MATCH );
-					foreach ( $nested_html_files as $path => $file ) {
-						$path_list[] = $path;
-					}
-				}
-				return $path_list;
-			}
-
-			// Get file paths for all theme supplied template parts.
-			$template_part_files = get_template_part_paths( get_stylesheet_directory() );
-			if ( is_child_theme() ) {
-				$template_part_files = array_merge( $template_part_files, get_template_part_paths( get_template_directory() ) );
-			}
-			// Build and save each template part.
-			foreach ( $template_part_files as $template_part_file ) {
-				$content = file_get_contents( $template_part_file );
-				// Infer slug from filepath.
-				$slug = substr(
-					$template_part_file,
-					// Starting position of slug.
-					strpos( $template_part_file, 'block-template-parts/' ) + 21,
-					// Subtract ending '.html'.
-					-5
-				);
-				// Wrap content with the template part block, parse, and create auto-draft.
-				$template_part_string = '<!-- wp:template-part {"slug":"' . $slug . '","theme":"' . wp_get_theme()->get( 'TextDomain' ) . '"} -->' . $content . '<!-- /wp:template-part -->';
-				$template_part_block  = parse_blocks( $template_part_string )[0];
-				create_auto_draft_for_template_part_block( $template_part_block );
-			}
-		};
-
 		$args['meta_query'] = $meta_query;
 	}
 
 	return $args;
 }
 add_filter( 'rest_wp_template_part_query', 'filter_rest_wp_template_part_query', 99, 2 );
+
+/**
+ * Run synchrnonization for template part API requests
+ *
+ * @param mixed           $dispatch_result Dispatch result, will be used if not empty.
+ * @param WP_REST_Request $request         Request used to generate the response.
+ * @param string          $route           Route matched for the request.
+ * @return mixed Dispatch result.
+ */
+function gutenberg_filter_rest_wp_template_part_dispatch( $dispatch_result, $request, $route ) {
+	if ( null !== $dispatch_result ) {
+		return $dispatch_result;
+	}
+
+	if ( 0 === strpos( $route, '/wp/v2/template-parts' ) && 'GET' === $request->get_method() ) {
+		_gutenberg_synchronize_theme_templates( 'template-part' );
+	}
+
+	return null;
+}
+
+add_filter( 'rest_dispatch_request', 'gutenberg_filter_rest_wp_template_part_dispatch', 10, 3 );

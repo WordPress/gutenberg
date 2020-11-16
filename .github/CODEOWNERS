@@ -114,6 +114,8 @@
 
 # PHP
 /lib                                            @timothybjacobs @spacedmonkey
+/lib/global-styles.php                          @timothybjabocs @spacedmonkey @nosolosw
+/lib/experimental-default-theme.json            @timothybjabocs @spacedmonkey @nosolosw
 
 # Native (Unowned)
 *.native.js                                     @ghost

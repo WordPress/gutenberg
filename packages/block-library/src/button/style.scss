@@ -33,7 +33,8 @@ $blocks-button__height: 3.1em;
 	}
 }
 
-.wp-block-button {
+// Increased specificity needed to override margins
+.wp-block-buttons > .wp-block-button {
 	&.has-custom-width {
 		max-width: none;
 		.wp-block-button__link {
@@ -42,19 +43,19 @@ $blocks-button__height: 3.1em;
 	}
 
 	&.wp-block-button__width-25 {
-		width: 25%;
+		width: calc(25% - #{ $button-margin });
 	}
 
 	&.wp-block-button__width-50 {
-		width: 50%;
+		width: calc(50% - #{ $button-margin });
 	}
 
 	&.wp-block-button__width-75 {
-		width: 75%;
+		width: calc(75% - #{ $button-margin });
 	}
 
 	&.wp-block-button__width-100 {
-		width: 100%;
+		width: calc(100% - #{ $button-margin });
 	}
 }
 

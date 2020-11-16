@@ -154,17 +154,18 @@ export default function QuickInserter( {
 		[ filterValue, patterns ]
 	);
 
-	const setInserterIsOpened = useSelect(
-		( select ) =>
-			select( 'core/block-editor' ).getSettings()
-				.__experimentalSetIsInserterOpened,
-		[]
-	);
-
-	const previousBlockClientId = useSelect(
-		( select ) =>
-			select( 'core/block-editor' ).getPreviousBlockClientId( clientId ),
-		[ clientId ]
+	const { setInserterIsOpened, blockIndex } = useSelect(
+		( select ) => {
+			const { getSettings, getBlockIndex } = select(
+				'core/block-editor'
+			);
+			return {
+				setInserterIsOpened: getSettings()
+					.__experimentalSetIsInserterOpened,
+				blockIndex: getBlockIndex( clientId, rootClientId ),
+			};
+		},
+		[ clientId, rootClientId ]
 	);
 
 	useEffect( () => {
@@ -173,7 +174,7 @@ export default function QuickInserter( {
 		}
 	}, [ setInserterIsOpened ] );
 
-	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const { __unstableSetInsertionPoint } = useDispatch( 'core/block-editor' );
 
 	// Announce search results on change
 	useEffect( () => {
@@ -189,17 +190,9 @@ export default function QuickInserter( {
 		debouncedSpeak( resultsFoundMessage );
 	}, [ filterValue, debouncedSpeak ] );
 
-	// When clicking Browse All select the appropriate block so as
-	// the insertion point can work as expected
 	const onBrowseAll = () => {
-		// We have to select the previous block because the menu inserter
-		// inserts the new block after the selected one.
-		// Ideally, this selection shouldn't focus the block to avoid the setTimeout.
-		selectBlock( previousBlockClientId );
-		// eslint-disable-next-line @wordpress/react-no-unsafe-timeout
-		setTimeout( () => {
-			setInserterIsOpened( true );
-		} );
+		__unstableSetInsertionPoint( rootClientId, blockIndex );
+		setInserterIsOpened( true );
 	};
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
