@@ -147,3 +147,28 @@ function gutenberg_synchronize_theme_templates_on_load() {
 	_gutenberg_synchronize_theme_templates( 'template' );
 }
 add_action( 'wp_loaded', 'gutenberg_synchronize_theme_templates_on_load' );
+
+/**
+ * Clears synchronization last check timestamps.
+ */
+function gutenberg_clear_synchronize_last_checks() {
+	update_option( 'gutenberg_last_synchronize_theme_template_checks', array() );
+	update_option( 'gutenberg_last_synchronize_theme_template-part_checks', array() );
+}
+
+// Clear synchronization last check timestamps after trashing a template or template part.
+add_action( 'trash_wp_template', 'gutenberg_clear_synchronize_last_checks' );
+add_action( 'trash_wp_template_part', 'gutenberg_clear_synchronize_last_checks' );
+
+/**
+ * Clear synchronization last check timestamps after deleting a template or template part.
+ *
+ * @param int     $post_id ID of the deleted post.
+ * @param WP_Post $post WP_Post instance of the deleted post.
+ */
+function gutenberg_clear_synchronize_last_checks_after_delete( $postid, $post ) {
+	if ( 'wp_template' !== $post->post_type || 'wp_template_part' !== $post->post_type ) {
+		gutenberg_clear_synchronize_last_checks();
+	}
+}
+add_action( 'after_delete_post', 'gutenberg_clear_synchronize_last_checks_after_delete' );
