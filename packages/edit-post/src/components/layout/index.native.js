@@ -9,15 +9,14 @@ import SafeArea from 'react-native-safe-area';
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import {
-	BottomSheetSettings,
-	__experimentalPageTemplatePicker,
-	__experimentalWithPageTemplatePicker,
-	FloatingToolbar,
-} from '@wordpress/block-editor';
+import { BottomSheetSettings, FloatingToolbar } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { KeyboardAvoidingView, NoticeList } from '@wordpress/components';
-import { AutosaveMonitor } from '@wordpress/editor';
+import {
+	AutosaveMonitor,
+	__experimentalPageTemplatePicker,
+	__experimentalWithPageTemplatePicker,
+} from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 
 /**

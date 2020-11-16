@@ -8,3 +8,10 @@ export { default as EditorHistoryUndo } from './editor-history/undo';
 export { default as EditorProvider } from './provider';
 
 export * from './deprecated';
+
+export {
+	__experimentalPageTemplatePicker,
+	__experimentalWithPageTemplatePicker,
+	Preview,
+} from './page-template-picker';
+
