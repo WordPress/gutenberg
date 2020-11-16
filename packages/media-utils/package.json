@@ -26,8 +26,10 @@
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
 		"lodash": "^4.17.19"
+	},
+	"peerDependencies": {
+		"@wordpress/i18n": "^3.16.0"
 	},
 	"publishConfig": {
 		"access": "public"

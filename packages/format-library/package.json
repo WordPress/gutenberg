@@ -24,19 +24,21 @@
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
 		"@wordpress/a11y": "file:../a11y",
-		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
-		"@wordpress/data": "file:../data",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/html-entities": "file:../html-entities",
-		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/keycodes": "file:../keycodes",
-		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/url": "file:../url",
 		"lodash": "^4.17.19"
+	},
+	"peerDependencies": {
+		"@wordpress/block-editor": "^5.1.2",
+		"@wordpress/data": "^4.25.0",
+		"@wordpress/i18n": "^3.16.0",
+		"@wordpress/rich-text": "^3.23.0"
 	},
 	"publishConfig": {
 		"access": "public"

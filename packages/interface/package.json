@@ -30,14 +30,16 @@
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
 		"@wordpress/components": "file:../components",
-		"@wordpress/data": "file:../data",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/element": "file:../element",
-		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
-		"@wordpress/plugins": "file:../plugins",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19"
+	},
+	"peerDependencies": {
+		"@wordpress/data": "^4.25.0",
+		"@wordpress/i18n": "^3.16.0",
+		"@wordpress/plugins": "^2.23.0"
 	},
 	"publishConfig": {
 		"access": "public"
