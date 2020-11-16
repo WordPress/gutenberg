@@ -64,17 +64,14 @@ export default function NavigationItem( props ) {
 		onClick( event );
 	};
 	const icon = isRTL ? chevronLeft : chevronRight;
-	const as = isText ? 'div' : Button;
+	const baseProps = isText
+		? { as: 'div', ...restProps }
+		: { as: Button, href, onClick: onItemClick, ...restProps };
 
 	return (
 		<NavigationItemBase { ...props } className={ classes }>
 			{ children || (
-				<ItemBaseUI
-					as={ as }
-					href={ href }
-					onClick={ onItemClick }
-					{ ...restProps }
-				>
+				<ItemBaseUI { ...baseProps }>
 					<NavigationItemBaseContent
 						title={ title }
 						badge={ badge }
