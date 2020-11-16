@@ -464,7 +464,7 @@ function gutenberg_inject_default_block_context( $args ) {
 			}
 
 			// Inject the query context if not done by Core.
-			$needs_query = empty( $block_type->uses_context ) && in_array( 'qery', $block_type->uses_context, true );
+			$needs_query = empty( $block_type->uses_context ) && in_array( 'query', $block_type->uses_context, true );
 			if ( ! isset( $block->context['query'] ) && $needs_query ) {
 				if ( isset( $wp_query->tax_query->queried_terms['category'] ) ) {
 					$block->context['query'] = array( 'categoryIds' => array() );
