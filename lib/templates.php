@@ -75,17 +75,6 @@ function gutenberg_register_template_post_type() {
 	);
 
 	register_post_type( 'wp_template', $args );
-
-	$meta_args = array(
-		'object_subtype' => 'wp_template',
-		'type'           => 'string',
-		'description'    => 'The theme that provided the template, if any.',
-		'single'         => true,
-		'show_in_rest'   => true,
-	);
-
-	register_post_type( 'wp_template', $args );
-	register_meta( 'post', 'theme', $meta_args );
 }
 add_action( 'init', 'gutenberg_register_template_post_type' );
 
