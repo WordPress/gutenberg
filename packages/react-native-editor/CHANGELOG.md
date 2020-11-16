@@ -17,7 +17,6 @@ For each user feature we should also add a importance categorization label  to i
 ## 1.41.0
 
 * [***] Faster editor start and overall operation on Android [#26732]
-
 * [*] [Android] Enable multiple upload support for Image block
 
 ## 1.40.0
