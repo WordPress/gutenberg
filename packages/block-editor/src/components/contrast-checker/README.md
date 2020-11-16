@@ -15,7 +15,7 @@ A notice will be rendered if the color combination of text and background colors
 Checks the contrast of a `13px` dark gray font against a light gray background.
 
 ```jsx
-import { ContrastChecker } from '@wordpress/block-editor/';
+import { ContrastChecker } from '@wordpress/block-editor';
 
 const Example = () => {
 	return (
