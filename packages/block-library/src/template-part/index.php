@@ -14,10 +14,10 @@
  *
  * @return string The render.
  */
-function render_block_core_template_part( $attributes, $content, $block ) {
+function render_block_core_template_part_safely( $attributes, $content, $block ) {
 	$template_id = render_block_core_template_get_template_id( $attributes );
 	if ( gutenberg_process_this_content( $template_id, $block->name ) ) {
-		$html = render_block_core_template_part_details( $attributes );
+		$html = render_block_core_template_part( $attributes );
 		gutenberg_clear_processed_content();
 	} else {
 		$html = gutenberg_report_recursion_error();
@@ -26,14 +26,13 @@ function render_block_core_template_part( $attributes, $content, $block ) {
 }
 
 /**
- * Safely renders the `core/template-part` block on the server.
+ * Renders the `core/template-part` block on the server.
  *
  * @param array $attributes The block attributes.
  *
  * @return string The render.
  */
-
-function render_block_core_template_part_details( $attributes ) 	{
+function render_block_core_template_part( $attributes ) 	{
 	$content = null;
 	if ( ! empty( $attributes['postId'] ) && get_post_status( $attributes['postId'] ) ) {
 		// If we have a post ID and the post exists, which means this template part
@@ -113,7 +112,7 @@ function register_block_core_template_part() {
 	register_block_type_from_metadata(
 		__DIR__ . '/template-part',
 		array(
-			'render_callback' => 'render_block_core_template_part',
+			'render_callback' => 'render_block_core_template_part_safely',
 		)
 	);
 }
