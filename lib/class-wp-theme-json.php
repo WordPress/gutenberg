@@ -660,7 +660,7 @@ class WP_Theme_JSON {
 			$value = self::get_property_value( $context['styles'], $metadata['theme_json'] );
 			if ( ! empty( $value ) ) {
 				$kebabcased_name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $name ) );
-				$declarations[] = array(
+				$declarations[]  = array(
 					'name'  => $kebabcased_name,
 					'value' => $value,
 				);
