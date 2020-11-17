@@ -185,8 +185,13 @@ export class FileEdit extends Component {
 		);
 
 		const isCopyUrlDisabled = isUploadFailed || isUploadInProgress;
-		const shouldStyleCopyUrlButton =
-			! isCopyUrlDisabled && ! this.state.isUrlCopied;
+		const dimmedStyle = isCopyUrlDisabled && styles.disabledButton;
+		const finalButtonStyle = Object.assign(
+			{},
+			actionButtonStyle,
+			dimmedStyle
+		);
+
 		return (
 			<InspectorControls>
 				<PanelBody title={ __( 'File block settings' ) } />
@@ -211,7 +216,7 @@ export class FileEdit extends Component {
 								: __( 'Copy file URL' )
 						}
 						labelStyle={
-							shouldStyleCopyUrlButton && actionButtonStyle
+							this.state.isUrlCopied || finalButtonStyle
 						}
 						onPress={ this.onCopyURL }
 					/>
