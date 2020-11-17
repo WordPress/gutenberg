@@ -71,7 +71,7 @@ export function useNotifyCopy() {
 	}, [] );
 }
 
-function useClipboardHandler( ref ) {
+export function useClipboardHandler( ref ) {
 	const {
 		getBlocksByClientId,
 		getSelectedBlockClientIds,

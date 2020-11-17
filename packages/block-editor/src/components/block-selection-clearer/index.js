@@ -4,7 +4,7 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 
-function useBlockSelectionClearer( ref ) {
+export function useBlockSelectionClearer( ref ) {
 	const hasSelection = useSelect( ( select ) => {
 		const { hasSelectedBlock, hasMultiSelection } = select(
 			'core/block-editor'
