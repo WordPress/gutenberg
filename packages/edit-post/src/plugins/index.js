@@ -44,7 +44,7 @@ registerPlugin( 'edit-post', {
 									'https://wordpress.org/support/article/wordpress-editor/'
 								) }
 								target="_blank"
-								rel="noopener noreferrer"
+								rel="noopener"
 							>
 								{ __( 'Help' ) }
 								<VisuallyHidden as="span">

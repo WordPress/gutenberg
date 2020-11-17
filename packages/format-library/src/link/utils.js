@@ -106,7 +106,7 @@ export function createLinkFormat( { url, type, id, opensInNewWindow } ) {
 
 	if ( opensInNewWindow ) {
 		format.attributes.target = '_blank';
-		format.attributes.rel = 'noreferrer noopener';
+		format.attributes.rel = 'noopener';
 	}
 
 	return format;

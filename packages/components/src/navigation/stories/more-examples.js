@@ -72,7 +72,7 @@ export function MoreExamplesStory() {
 							className="navigation-story__wordpress-icon"
 							href="https://wordpress.org/"
 							target="_blank"
-							rel="noreferrer"
+							rel="noopener"
 						>
 							<Icon icon={ wordpress } />
 							<em>Custom Content</em>

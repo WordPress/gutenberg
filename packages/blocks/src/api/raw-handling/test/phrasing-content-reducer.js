@@ -55,7 +55,7 @@ describe( 'phrasingContentReducer', () => {
 		const input =
 			'<a href="https://wordpress.org" target="_blank">WordPress</a>';
 		const output =
-			'<a href="https://wordpress.org" target="_blank" rel="noreferrer noopener">WordPress</a>';
+			'<a href="https://wordpress.org" target="_blank" rel="noopener">WordPress</a>';
 		expect(
 			deepFilterHTML( input, [ phrasingContentReducer ], {} )
 		).toEqual( output );
