@@ -244,6 +244,8 @@ public class WPAndroidGlueCode {
                     mOnMediaLibraryButtonListener.onMediaLibraryVideoButtonClicked(allowMultipleSelection);
                 } else if (mediaType == MediaType.MEDIA) {
                     mOnMediaLibraryButtonListener.onMediaLibraryMediaButtonClicked(allowMultipleSelection);
+                } else if (mediaType == MediaType.ALL) {
+                    mOnMediaLibraryButtonListener.onMediaLibraryMediaButtonClicked(allowMultipleSelection);
                 }
             }
 
@@ -259,6 +261,8 @@ public class WPAndroidGlueCode {
                     mOnMediaLibraryButtonListener.onUploadVideoButtonClicked(allowMultipleSelection);
                 } else if (mediaType == MediaType.MEDIA) {
                     mOnMediaLibraryButtonListener.onUploadMediaButtonClicked(allowMultipleSelection);
+                } else if (mediaType == MediaType.ALL) {
+                    mOnMediaLibraryButtonListener.onMediaLibraryMediaButtonClicked(allowMultipleSelection);
                 }
             }
 

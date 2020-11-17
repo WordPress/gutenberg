@@ -72,10 +72,18 @@ public class MainApplication extends Application implements ReactApplication, Gu
             @Override
             public void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType) {
                 List<RNMedia> rnMediaList = new ArrayList<>();
-                if (mediaType == MediaType.IMAGE) {
-                    rnMediaList.add(new Media(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain",""));
-                } else if (mediaType == MediaType.VIDEO) {
-                    rnMediaList.add(new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup","" ));
+
+                switch (mediaType) {
+                    case IMAGE:
+                        rnMediaList.add(new Media(1, "https://cldup.com/cXyG__fTLN.jpg", "image", "Mountain", ""));
+                        break;
+                    case VIDEO:
+                        rnMediaList.add(new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", ""));
+                    case ALL:
+                    case OTHER:
+                        rnMediaList.add(new Media(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip"));
+                        break;
+
                 }
                 mediaSelectedCallback.onMediaFileSelected(rnMediaList);
             }
@@ -111,7 +119,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void getOtherMediaPickerOptions(OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback, MediaType mediaType) {
-                if (mediaType == MediaType.OTHER) {
+                if (mediaType == MediaType.ALL) {
                     ArrayList<MediaOption> mediaOptions = new ArrayList<>();
                     mediaOptions.add(new MediaOption("1", "Choose from device"));
                     otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(mediaOptions);
