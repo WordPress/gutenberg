@@ -132,8 +132,8 @@ function gutenberg_migrate_theme_meta_to_taxonomy() {
 	);
 	while ( $query->have_posts() ) {
 		$query->the_post();
-		$post = get_post();
-		$terms  = array();
+		$post  = get_post();
+		$terms = array();
 
 		$theme = get_post_meta( $post->ID, 'theme', true );
 		if ( ! $theme ) {
