@@ -89,7 +89,14 @@ function GalleryEdit( props ) {
 		'core/block-editor'
 	);
 
-	const currentImageOptions = { linkTarget, linkTo, sizeSlug };
+	const currentImageOptions = useMemo(
+		() => ( {
+			linkTarget,
+			linkTo,
+			sizeSlug,
+		} ),
+		[ linkTarget, linkTo, sizeSlug ]
+	);
 	const [ imageSettings, setImageSettings ] = useState( currentImageOptions );
 	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
 
@@ -115,16 +122,16 @@ function GalleryEdit( props ) {
 		return select( 'core/block-editor' ).getBlock( clientId ).innerBlocks;
 	} );
 
-	const images = useMemo( () => {
-		return innerBlockImages.map( ( block ) => {
-			return {
+	const images = useMemo(
+		() =>
+			innerBlockImages.map( ( block ) => ( {
 				id: block.attributes.id,
 				url: block.attributes.url,
 				attributes: block.attributes,
 				imageData: getMedia( block.attributes.id ),
-			};
-		} );
-	}, [ innerBlockImages ] );
+			} ) ),
+		[ innerBlockImages ]
+	);
 
 	useEffect( () => {
 		if ( images.length !== imageCount ) {
@@ -352,12 +359,11 @@ function GalleryEdit( props ) {
 							onChange={ updateImagesSize }
 						/>
 					) }
-					{ dirtyImageOptions && (
-						<DirtyImageOptions
-							applyImageOptions={ applyImageOptions }
-							cancelImageOptions={ cancelImageOptions }
-						/>
-					) }
+					<DirtyImageOptions
+						isVisible={ dirtyImageOptions }
+						applyImageOptions={ applyImageOptions }
+						cancelImageOptions={ cancelImageOptions }
+					/>
 				</PanelBody>
 			</InspectorControls>
 			{ noticeUI }

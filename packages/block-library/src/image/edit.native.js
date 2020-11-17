@@ -468,7 +468,7 @@ export class ImageEdit extends React.Component {
 					onLongPress={ openMediaOptions }
 					disabled={ ! isSelected }
 				>
-					<View style={ [ styles.content ] }>
+					<View style={ styles.content }>
 						{ getInspectorControls() }
 						{ getMediaOptions() }
 						{ ! this.state.isCaptionSelected &&
