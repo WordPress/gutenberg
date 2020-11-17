@@ -273,7 +273,7 @@ ID      user_login      display_name    user_email      user_registered roles
 #### Creating a post on the tests instance:
 
 ```sh
-npx wp-env run tests-cli "wp post create --post_type=page --post_title='Ready'"
+wp-env run tests-cli "wp post create --post_type=page --post_title='Ready'"
 
 ℹ Starting 'wp post create --post_type=page --post_title='Ready'' on the tests-cli container.
 
