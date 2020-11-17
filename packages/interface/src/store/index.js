@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__unstableCreateStoreDefinition,
-	registerStore,
-} from '@wordpress/data';
+import { createReduxStore, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -17,13 +14,20 @@ import { STORE_NAME } from './constants';
 /**
  * Store definition for the interface namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore
  *
  * @type {Object}
  */
-export const storeDefinition = __unstableCreateStoreDefinition( STORE_NAME );
+export const store = createReduxStore( STORE_NAME, {
+	reducer,
+	actions,
+	selectors,
+	persist: [ 'enableItems' ],
+} );
 
-export default registerStore( STORE_NAME, {
+// Once we build a more generic persistence plugin that works across types of stores
+// we'd be able to replace this with a register call.
+registerStore( STORE_NAME, {
 	reducer,
 	actions,
 	selectors,

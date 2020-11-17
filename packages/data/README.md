@@ -345,6 +345,19 @@ _Returns_
 
 Undocumented declaration.
 
+<a name="createReduxStore" href="#createReduxStore">#</a> **createReduxStore**
+
+Creates a namespace object with a store derived from the reducer given.
+
+_Parameters_
+
+-   _key_ `string`: Unique namespace identifier.
+-   _options_ (unknown type): Registered store options, with properties describing reducer, actions, selectors, and resolvers.
+
+_Returns_
+
+-   (unknown type): Store Object.
+
 <a name="createRegistry" href="#createRegistry">#</a> **createRegistry**
 
 Creates a new store registry, given an optional object of initial store
@@ -469,6 +482,14 @@ _Related_
 _Type_
 
 -   `Object` 
+
+<a name="register" href="#register">#</a> **register**
+
+Registers a standard `@wordpress/data` store definition.
+
+_Parameters_
+
+-   _store_ (unknown type): Store definition.
 
 <a name="registerGenericStore" href="#registerGenericStore">#</a> **registerGenericStore**
 

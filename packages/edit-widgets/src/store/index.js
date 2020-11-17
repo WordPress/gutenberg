@@ -2,10 +2,7 @@
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
-import {
-	__unstableCreateStoreDefinition,
-	registerStore,
-} from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -29,7 +26,7 @@ const STORE_NAME = 'core/edit-widgets';
  *
  * @type {Object}
  */
-export const storeConfig = {
+const storeConfig = {
 	reducer,
 	controls,
 	selectors,
@@ -40,13 +37,13 @@ export const storeConfig = {
 /**
  * Store definition for the edit widgets namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore
  *
  * @type {Object}
  */
-export const storeDefinition = __unstableCreateStoreDefinition( STORE_NAME );
+export const store = createReduxStore( STORE_NAME, storeConfig );
 
-const store = registerStore( STORE_NAME, storeConfig );
+register( store );
 
 // This package uses a few in-memory post types as wrappers for convenience.
 // This middleware prevents any network requests related to these types as they are
@@ -58,5 +55,3 @@ apiFetch.use( function ( options, next ) {
 
 	return next( options );
 } );
-
-export default store;

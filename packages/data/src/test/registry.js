@@ -7,10 +7,8 @@ import { castArray, mapValues } from 'lodash';
  * Internal dependencies
  */
 import { createRegistry } from '../registry';
-import {
-	createRegistrySelector,
-	__unstableCreateStoreDefinition,
-} from '../factory';
+import { createRegistrySelector } from '../factory';
+import createReduxStore from '../redux-store';
 
 jest.useFakeTimers();
 
@@ -556,20 +554,16 @@ describe( 'createRegistry', () => {
 
 		it( 'should work with the store definition as param for select', () => {
 			const STORE_NAME = 'demo';
-			const storeDefinition = __unstableCreateStoreDefinition(
-				STORE_NAME
-			);
-			registry.registerStore( STORE_NAME, {
+			const store = createReduxStore( STORE_NAME, {
 				reducer: ( state = 'OK' ) => state,
 				selectors: {
 					getValue: ( state ) => state,
 				},
 				resolvers: {},
 			} );
+			registry.register( store );
 
-			expect( registry.select( storeDefinition ).getValue() ).toBe(
-				'OK'
-			);
+			expect( registry.select( store ).getValue() ).toBe( 'OK' );
 		} );
 
 		it( 'should run the registry selector from a non-registry selector', () => {
@@ -704,9 +698,6 @@ describe( 'createRegistry', () => {
 
 		it( 'should work with the store object as param for dispatch', async () => {
 			const STORE_NAME = 'demo';
-			const storeDefinition = __unstableCreateStoreDefinition(
-				STORE_NAME
-			);
 			const store = registry.registerStore( STORE_NAME, {
 				reducer( state = 'OK', action ) {
 					if ( action.type === 'UPDATE' ) {
@@ -722,7 +713,7 @@ describe( 'createRegistry', () => {
 			} );
 
 			expect( store.getState() ).toBe( 'OK' );
-			await registry.dispatch( storeDefinition ).update();
+			await registry.dispatch( STORE_NAME ).update();
 			expect( store.getState() ).toBe( 'UPDATED' );
 		} );
 	} );

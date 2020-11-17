@@ -12,7 +12,7 @@ import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { storeDefinition } from './store';
+import { store } from './store';
 
 /**
  * Higher-order component creator, creating a new component which renders with
@@ -41,7 +41,7 @@ const withViewportMatch = ( queries ) =>
 	createHigherOrderComponent(
 		withSelect( ( select ) => {
 			return mapValues( queries, ( query ) => {
-				return select( storeDefinition ).isViewportMatch( query );
+				return select( store ).isViewportMatch( query );
 			} );
 		} ),
 		'withViewportMatch'

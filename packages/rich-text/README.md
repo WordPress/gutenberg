@@ -302,13 +302,13 @@ _Returns_
 
 -   `Array<RichTextValue>`: An array of new values.
 
-<a name="storeDefinition" href="#storeDefinition">#</a> **storeDefinition**
+<a name="store" href="#store">#</a> **store**
 
 Store definition for the rich-text namespace.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createStoreDefinition>
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
 
 _Type_
 
