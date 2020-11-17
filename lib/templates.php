@@ -109,63 +109,6 @@ function gutenberg_register_wp_theme_taxonomy() {
 add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
 
 /**
- * Migrates old meta based theme storage to taxonomy
- * for wp_template and wp_template_part posts.
- */
-function gutenberg_migrate_theme_meta_to_taxonomy() {
-	if ( ! gutenberg_is_fse_theme() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
-		return;
-	}
-
-	$terms = get_terms(
-		array(
-			'taxonomy'       => 'wp_theme',
-			'posts_per_page' => 1,
-			'hide_empty'     => false,
-			'fields'         => 'ids',
-		)
-	);
-	if ( $terms ) {
-		return;
-	}
-
-	$query = new WP_Query(
-		array(
-			'post_type'      => array( 'wp_template', 'wp_template_part' ),
-			'posts_per_page' => -1,
-			'post_status'    => array( 'publish', 'auto-draft', 'draft', 'trash' ),
-		)
-	);
-	if ( ! $query->have_posts() ) {
-		return;
-	}
-
-	while ( $query->have_posts() ) {
-		$query->the_post();
-		$post  = get_post();
-		$terms = array();
-
-		$theme = get_post_meta( $post->ID, 'theme', true );
-		if ( ! $theme ) {
-			$theme = wp_get_theme()->get_stylesheet();
-		}
-		$terms[] = $theme;
-
-		if ( 'auto-draft' === $post->post_status ) {
-			$terms[] = 'wp_file_based';
-		}
-
-		wp_set_post_terms( $post->ID, $terms, 'wp_theme', true );
-	}
-	wp_reset_postdata();
-
-	global $wp;
-	wp_redirect( add_query_arg( $wp->query_vars, home_url( $wp->request ) ) );
-	exit;
-}
-add_action( 'init', 'gutenberg_migrate_theme_meta_to_taxonomy' );
-
-/**
  * Automatically set the theme meta for templates.
  *
  * @param array $post_id Template ID.
