@@ -145,7 +145,7 @@ function gutenberg_migrate_theme_meta_to_taxonomy() {
 		}
 		$terms[] = $theme;
 
-		if ( $post->post_status === 'auto-draft' ) {
+		if ( 'auto-draft' === $post->post_status ) {
 			$terms[] = 'wp_file_based';
 		}
 
