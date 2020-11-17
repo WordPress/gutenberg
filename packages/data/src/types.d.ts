@@ -1,17 +1,13 @@
-export type WPDataFunctionOrGeneratorArray = {
-    [index: number]: Function|Generator;
-};
-export type WPDataFunctionArray = {
-    [index: number]: Function;
-};
+export type WPDataFunctionOrGeneratorArray = Array< Function | Generator >;
+export type WPDataFunctionArray = Array< Function >;
 
-export type WPDataAttachedStore = {
+export interface WPDataAttachedStore {
     getSelectors: () => WPDataFunctionArray,
     getActions: () => WPDataFunctionArray,
     subscribe: (listener: () => void) => (() => void)
 };
 
-export type WPDataStore = {
+export interface WPDataStore {
     /**
      * Store Name
      */
@@ -23,7 +19,7 @@ export type WPDataStore = {
     instantiate: (registry: WPDataRegistry) => WPDataAttachedStore,
 };
 
-export type WPDataReduxStoreConfig = {
+export interface WPDataReduxStoreConfig {
     reducer: ( state: any, action: any ) => any,
     actions?: WPDataFunctionOrGeneratorArray,
     resolvers?: WPDataFunctionOrGeneratorArray,
@@ -31,6 +27,6 @@ export type WPDataReduxStoreConfig = {
     controls?: WPDataFunctionArray,
 }
 
-export type WPDataRegistry = {
+export interface WPDataRegistry {
     register: ( store: WPDataStore ) => void,
 }
