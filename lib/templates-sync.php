@@ -47,7 +47,7 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 				'post_status'  => 'auto-draft',
 				'post_type'    => $post_type,
 				'post_name'    => $slug,
-				'tax_input'    => array( 'wp_theme' => array( $theme, 'wp_file_based' ) ),
+				'tax_input'    => array( 'wp_theme' => array( $theme, '_wp_file_based' ) ),
 			)
 		);
 	} elseif ( 'auto-draft' === $post->post_status && $content !== $post->post_content ) {
