@@ -63,6 +63,7 @@ export function MediaPlaceholder( {
 	isAppender,
 	accept,
 	addToGallery,
+	isGallery = false,
 	multiple = false,
 	dropZoneUIOnly,
 	disableDropZone,
@@ -126,7 +127,7 @@ export function MediaPlaceholder( {
 	};
 
 	const onFilesUpload = ( files ) => {
-		if ( addToGallery ) {
+		if ( isGallery ) {
 			// Because the Gallery hands the files over to Image component InnerBlocks just
 			// hand the handling of the files over to the Gallery
 			onSelect( files );
