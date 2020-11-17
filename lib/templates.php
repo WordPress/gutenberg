@@ -150,7 +150,7 @@ function gutenberg_migrate_theme_meta_to_taxonomy() {
 
 	wp_reset_postdata();
 }
-add_action( 'wp_loaded', 'gutenberg_migrate_theme_meta_to_taxonomy' );
+add_action( 'init', 'gutenberg_migrate_theme_meta_to_taxonomy' );
 
 /**
  * Automatically set the theme meta for templates.
