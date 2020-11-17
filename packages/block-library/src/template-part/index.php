@@ -28,7 +28,7 @@ function render_block_core_template_part( $attributes ) {
 				'tax_query'      => array(
 					array(
 						'taxonomy' => 'wp_theme',
-						'field'    => 'name',
+						'field'    => 'slug',
 						'terms'    => $attributes['theme'],
 					),
 				),
