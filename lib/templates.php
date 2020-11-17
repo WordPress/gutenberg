@@ -120,7 +120,7 @@ function gutenberg_migrate_theme_meta_to_taxonomy() {
 			'hide_empty'     => false,
 		)
 	);
-	if ( ! $terms ) {
+	if ( $terms ) {
 		return;
 	}
 
@@ -133,10 +133,10 @@ function gutenberg_migrate_theme_meta_to_taxonomy() {
 	);
 	while ( $query->have_posts() ) {
 		$query->the_post();
-		$postId = get_the_ID();
+		$post = get_post();
 		$terms  = array();
 
-		$theme = get_post_meta( $postId, 'theme', true );
+		$theme = get_post_meta( $post->ID, 'theme', true );
 		if ( ! $theme ) {
 			$theme = wp_get_theme()->get_stylesheet();
 		}
@@ -146,7 +146,7 @@ function gutenberg_migrate_theme_meta_to_taxonomy() {
 			$terms[] = 'wp_file_based';
 		}
 
-		wp_set_post_terms( $postId, $terms, 'wp_theme', true );
+		wp_set_post_terms( $post->ID, $terms, 'wp_theme', true );
 	}
 
 	wp_reset_postdata();
