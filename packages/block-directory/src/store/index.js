@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 import { controls as dataControls } from '@wordpress/data-controls';
 
 /**
@@ -16,7 +16,7 @@ import controls from './controls';
 /**
  * Module Constants
  */
-const MODULE_KEY = 'core/block-directory';
+const STORE_NAME = 'core/block-directory';
 
 /**
  * Block editor data store configuration.
@@ -33,6 +33,13 @@ export const storeConfig = {
 	resolvers,
 };
 
-const store = registerStore( MODULE_KEY, storeConfig );
+/**
+ * Store definition for the block directory namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore
+ *
+ * @type {Object}
+ */
+export const store = createReduxStore( STORE_NAME, storeConfig );
 
-export default store;
+register( store );
