@@ -118,7 +118,7 @@ export function MediaPlaceholder( {
 	};
 
 	const onMediaLibrarySelection = ( files ) => {
-		if ( addToGallery ) {
+		if ( isGallery ) {
 			onSelect( files, true );
 			return;
 		}
