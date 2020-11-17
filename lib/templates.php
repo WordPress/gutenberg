@@ -120,8 +120,7 @@ function gutenberg_set_template_and_template_part_post_theme( $post_id, $post, $
 		return;
 	}
 
-	$themes = get_post_taxonomies( $post_id, 'wp_theme', true );
-
+	$themes = wp_get_post_terms( $post_id, 'wp_theme' );
 	if ( ! $themes ) {
 		wp_set_post_terms( $post_id, array( wp_get_theme()->get_stylesheet() ), 'wp_theme', true );
 	}
