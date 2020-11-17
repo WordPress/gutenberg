@@ -23,7 +23,7 @@ export { AsyncModeProvider } from './components/async-mode-provider';
 export { createRegistry } from './registry';
 export { createRegistrySelector, createRegistryControl } from './factory';
 export { controls } from './controls';
-export { default as createReduxStoreDefinition } from './redux-store';
+export { default as createReduxStore } from './redux-store';
 
 /**
  * Object of available plugins to use with a registry.
@@ -182,6 +182,6 @@ export const use = defaultRegistry.use;
 /**
  * Registers a standard `@wordpress/data` store definition.
  *
- * @param {import('./types').WPDataStoreDefinition} storeDefinition Store definition.
+ * @param {import('./types').WPDataStore} store Store definition.
  */
 export const register = defaultRegistry.register;

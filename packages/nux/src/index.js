@@ -3,7 +3,7 @@
  */
 import deprecated from '@wordpress/deprecated';
 
-export { storeDefinition } from './store';
+export { store } from './store';
 export { default as DotTip } from './components/dot-tip';
 
 deprecated( 'wp.nux', {

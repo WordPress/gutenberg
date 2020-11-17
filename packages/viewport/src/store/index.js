@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStoreDefinition, register } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,14 +15,14 @@ const STORE_NAME = 'core/viewport';
 /**
  * Store definition for the viewport namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStoreDefinition
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore
  *
  * @type {Object}
  */
-export const storeDefinition = createReduxStoreDefinition( STORE_NAME, {
+export const store = createReduxStore( STORE_NAME, {
 	reducer,
 	actions,
 	selectors,
 } );
 
-register( storeDefinition );
+register( store );

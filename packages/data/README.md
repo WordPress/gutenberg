@@ -343,7 +343,7 @@ _Returns_
 
 Undocumented declaration.
 
-<a name="createReduxStoreDefinition" href="#createReduxStoreDefinition">#</a> **createReduxStoreDefinition**
+<a name="createReduxStore" href="#createReduxStore">#</a> **createReduxStore**
 
 Creates a namespace object with a store derived from the reducer given.
 
@@ -487,7 +487,7 @@ Registers a standard `@wordpress/data` store definition.
 
 _Parameters_
 
--   _storeDefinition_ (unknown type): Store definition.
+-   _store_ (unknown type): Store definition.
 
 <a name="registerGenericStore" href="#registerGenericStore">#</a> **registerGenericStore**
 

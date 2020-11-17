@@ -11,7 +11,7 @@ import { dispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { storeDefinition } from './store';
+import { store } from './store';
 
 const addDimensionsEventListener = ( breakpoints, operators ) => {
 	/**
@@ -21,7 +21,7 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 	const setIsMatching = debounce(
 		() => {
 			const values = mapValues( queries, ( query ) => query.matches );
-			dispatch( storeDefinition ).setIsMatching( values );
+			dispatch( store ).setIsMatching( values );
 		},
 		{ leading: true }
 	);

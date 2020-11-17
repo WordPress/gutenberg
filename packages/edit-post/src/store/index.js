@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStoreDefinition, registerStore } from '@wordpress/data';
+import { createReduxStore, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -22,16 +22,13 @@ const storeConfig = {
 /**
  * Store definition for the edit post namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStoreDefinition
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore
  *
  * @type {Object}
  */
-export const storeDefinition = createReduxStoreDefinition(
-	STORE_NAME,
-	storeConfig
-);
+export const store = createReduxStore( STORE_NAME, storeConfig );
 
 // Ideally we use register instead of register store.
 // We shouuld be able to make the switch once we remove the effects.
-const store = registerStore( STORE_NAME, storeConfig );
-applyMiddlewares( store );
+const instantiatedStore = registerStore( STORE_NAME, storeConfig );
+applyMiddlewares( instantiatedStore );

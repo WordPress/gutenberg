@@ -8,4 +8,4 @@ import '@wordpress/notices';
  */
 import './plugins';
 
-export { storeDefinition } from './store';
+export { store } from './store';

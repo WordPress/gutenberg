@@ -1,1 +1,1 @@
-export { storeDefinition } from './store';
+export { store } from './store';
