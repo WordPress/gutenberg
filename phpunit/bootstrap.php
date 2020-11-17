@@ -1,6 +1,6 @@
 <?php
 /**
- * PHPUnit bootstrap file
+ * PHPUnit bootstrap files
  *
  * @package Gutenberg
  */
