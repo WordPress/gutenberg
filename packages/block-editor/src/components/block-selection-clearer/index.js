@@ -19,10 +19,8 @@ export function useBlockSelectionClearer( ref ) {
 			return;
 		}
 
-		function onFocus( event ) {
-			if ( event.target === event.currentTarget ) {
-				clearSelectedBlock();
-			}
+		function onFocus() {
+			clearSelectedBlock();
 		}
 
 		ref.current.addEventListener( 'focus', onFocus );
