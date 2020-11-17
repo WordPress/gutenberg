@@ -92,6 +92,7 @@ function GalleryEdit( props ) {
 	const currentImageOptions = { linkTarget, linkTo, sizeSlug };
 	const [ imageSettings, setImageSettings ] = useState( currentImageOptions );
 	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
+	const [ images, setImages ] = useState( [] );
 
 	useEffect( () => {
 		const currentOptionsState = ! isEqual(
@@ -111,19 +112,21 @@ function GalleryEdit( props ) {
 		};
 	}, [] );
 
-	const images = useSelect( ( select ) => {
-		const newImages = select( 'core/block-editor' )
-			.getBlock( clientId )
-			.innerBlocks.map( ( block ) => {
-				return {
-					id: block.attributes.id,
-					url: block.attributes.url,
-					attributes: block.attributes,
-					imageData: getMedia( block.attributes.id ),
-				};
-			} );
-		return newImages;
+	const innerBlockImages = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).getBlock( clientId ).innerBlocks;
 	} );
+
+	useEffect( () => {
+		const newImages = innerBlockImages.map( ( block ) => {
+			return {
+				id: block.attributes.id,
+				url: block.attributes.url,
+				attributes: block.attributes,
+				imageData: getMedia( block.attributes.id ),
+			};
+		} );
+		setImages( newImages );
+	}, [ innerBlockImages ] );
 
 	useEffect( () => {
 		if ( images.length !== imageCount ) {
@@ -208,7 +211,6 @@ function GalleryEdit( props ) {
 				id: image.id,
 			} );
 		} );
-
 		replaceInnerBlocks( clientId, newBlocks );
 	}
 
