@@ -20,7 +20,7 @@ import {
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Platform, useEffect, useState } from '@wordpress/element';
+import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -88,7 +88,14 @@ function GalleryEdit( props ) {
 		'core/block-editor'
 	);
 
-	const currentImageOptions = { linkTarget, linkTo, sizeSlug };
+	const currentImageOptions = useMemo(
+		() => ( {
+			linkTarget,
+			linkTo,
+			sizeSlug,
+		} ),
+		[ linkTarget, linkTo, sizeSlug ]
+	);
 	const [ imageSettings, setImageSettings ] = useState( currentImageOptions );
 	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
 	const [ images, setImages ] = useState( [] );
