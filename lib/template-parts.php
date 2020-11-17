@@ -185,7 +185,7 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 		$tax_query   = isset( $args['tax_query'] ) ? $args['tax_query'] : array();
 		$tax_query[] = array(
 			'taxonomy' => 'wp_theme',
-			'field'    => 'name',
+			'field'    => 'slug',
 			'terms'    => $request['theme'],
 		);
 

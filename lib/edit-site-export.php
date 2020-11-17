@@ -33,7 +33,7 @@ function gutenberg_edit_site_export() {
 			'tax_query'      => array(
 				array(
 					'taxonomy' => 'wp_theme',
-					'field'    => 'name',
+					'field'    => 'slug',
 					'terms'    => $theme,
 				),
 			),
@@ -57,7 +57,7 @@ function gutenberg_edit_site_export() {
 			'tax_query'      => array(
 				array(
 					'taxonomy' => 'wp_theme',
-					'field'    => 'name',
+					'field'    => 'slug',
 					'terms'    => $theme,
 				),
 			),

@@ -165,7 +165,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 			'tax_query'      => array(
 				array(
 					'taxonomy' => 'wp_theme',
-					'field'    => 'name',
+					'field'    => 'slug',
 					'terms'    => wp_get_theme()->get_stylesheet(),
 				),
 			),

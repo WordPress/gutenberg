@@ -30,7 +30,7 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 			'tax_query'      => array(
 				array(
 					'taxonomy' => 'wp_theme',
-					'field'    => 'name',
+					'field'    => 'slug',
 					'terms'    => $theme,
 				),
 			),
