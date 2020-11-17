@@ -3,12 +3,15 @@
  */
 import { createStore, applyMiddleware } from 'redux';
 import { flowRight, get, mapValues } from 'lodash';
+// @ts-ignore
 import combineReducers from 'turbo-combine-reducers';
+// @ts-ignore
 import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
  * WordPress dependencies
  */
+// @ts-ignore
 import createReduxRoutineMiddleware from '@wordpress/redux-routine';
 
 /**
@@ -27,18 +30,36 @@ import * as metadataActions from './metadata/actions';
  * @return {Object} Resolvers Cache.
  */
 function createResolversCache() {
+	/**
+	 * @todo The following should be `Map<…, true | undefined >`. Eslint complains about `true`, fixed in default branch.
+	 * @todo The type of `isRunning` should be updated accordingly.
+	 */
+	/** @type {Record< string, Map< unknown[] | undefined, boolean | undefined > >} */
 	const cache = {};
 	return {
+		/**
+		 * @param {string} selectorName
+		 * @param {unknown[]} [args]
+		 * @return {boolean|undefined} True if the selector is running
+		 */
 		isRunning( selectorName, args ) {
 			return cache[ selectorName ] && cache[ selectorName ].get( args );
 		},
 
+		/**
+		 * @param {string} selectorName
+		 * @param {unknown[]} [args]
+		 */
 		clear( selectorName, args ) {
 			if ( cache[ selectorName ] ) {
 				cache[ selectorName ].delete( args );
 			}
 		},
 
+		/**
+		 * @param {string} selectorName
+		 * @param {unknown[]} [args]
+		 */
 		markAsRunning( selectorName, args ) {
 			if ( ! cache[ selectorName ] ) {
 				cache[ selectorName ] = new EquivalentKeyMap();

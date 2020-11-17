@@ -1,0 +1,33 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+		"noImplicitAny": false
+	},
+	"references": [
+		// { "path": "../compose" },
+
+		// Deprecated has landed in master and can be enabled
+		// { "path": "../deprecated" },
+		{ "path": "../element" },
+		{ "path": "../is-shallow-equal" },
+		{ "path": "../priority-queue" }
+		// { "path": "../redux-routine" }
+	],
+	"files": [
+		"src/controls.js",
+		"src/promise-middleware.js",
+		"src/registry.js",
+		"src/resolvers-cache-middleware.js"
+	],
+	"include": [ "src/redux-store/**/*", "src/store/**/*" ],
+	"exclude": [
+		"src/**/*.android.js",
+		"src/**/*.ios.js",
+		"src/**/*.native.js",
+		"src/**/react-native-*",
+		"src/**/stories",
+		"src/**/test"
+	]
+}

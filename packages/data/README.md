@@ -485,9 +485,9 @@ _Type_
 
 Registers a standard `@wordpress/data` store definition.
 
-_Parameters_
+_Type_
 
--   _store_ (unknown type): Store definition.
+-   (unknown type) 
 
 <a name="registerGenericStore" href="#registerGenericStore">#</a> **registerGenericStore**
 

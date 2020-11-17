@@ -179,9 +179,13 @@ export const registerStore = defaultRegistry.registerStore;
  */
 export const use = defaultRegistry.use;
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * Registers a standard `@wordpress/data` store definition.
  *
- * @param {import('./types').WPDataStore} store Store definition.
+ * @type {import('./types').WPDataRegistry['register']}
  */
 export const register = defaultRegistry.register;
+/* eslint-enable jsdoc/valid-types */
+
+register();
