@@ -46,4 +46,16 @@ describe( 'Preformatted', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should delete block when backspace in an empty preformatted', async () => {
+		await insertBlock( 'Preformatted' );
+
+		await page.keyboard.type( 'a' );
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+
+		// Expect preformatted block to be deleted.
+		expect( await getEditedPostContent() ).toBe( '' );
+	} );
 } );
