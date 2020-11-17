@@ -137,12 +137,19 @@ The parent menu slug; used by nested menus to indicate their parent menu.
 
 When `hasSearch` is active and `onSearch` is provided, this controls the value of the search input. Required when the `onSearch` prop is provided.
 
+### `isEmpty`
+
+-   Type: `boolean`
+-   Required: No
+
+Indicates whether the menu is empty or not. Used together with the `hideIfTargetMenuEmpty` prop of Navigation Item.
+
 ### `title`
 
 -   Type: `string`
 -   Required: No
 
-The menu title. It's also the field used by the menu search function. 
+The menu title. It's also the field used by the menu search function.
 
 ## Navigation Group Props
 
@@ -200,6 +207,13 @@ The unique identifier of the item.
 -   Required: No
 
 The child menu slug. If provided, clicking on the item will navigate to the target menu.
+
+### `hideIfTargetMenuEmpty`
+
+-   Type: `boolean`
+-   Required: No
+
+Indicates whether this item should be hidden if the menu specified in `navigateToMenu` is marked as empty in the `isEmpty` prop. Used together with the `isEmpty` prop of Navigation Menu.
 
 ### `onClick`
 

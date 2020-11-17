@@ -7,43 +7,15 @@ import { fromPairs } from 'lodash';
  * WordPress dependencies
  */
 import { useMemo, useCallback, useEffect } from '@wordpress/element';
-import { __, _x } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { useAsyncList } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import InserterPanel from './panel';
 import PatternInserterPanel from './pattern-panel';
-import { searchItems } from './search-items';
-import InserterNoResults from './no-results';
 import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
-
-function BlockPatternsSearchResults( { filterValue, onInsert } ) {
-	const [ allPatterns, , onClick ] = usePatternsState( onInsert );
-
-	const filteredPatterns = useMemo(
-		() => searchItems( allPatterns, filterValue ),
-		[ filterValue, allPatterns ]
-	);
-
-	const currentShownPatterns = useAsyncList( filteredPatterns );
-
-	if ( filterValue ) {
-		return !! filteredPatterns.length ? (
-			<InserterPanel title={ __( 'Search Results' ) }>
-				<BlockPatternList
-					shownPatterns={ currentShownPatterns }
-					blockPatterns={ filteredPatterns }
-					onClickPattern={ onClick }
-				/>
-			</InserterPanel>
-		) : (
-			<InserterNoResults />
-		);
-	}
-}
 
 function BlockPatternsCategory( {
 	onInsert,
@@ -148,18 +120,8 @@ function BlockPatternsCategory( {
 	);
 }
 
-function BlockPatternsTabs( {
-	onInsert,
-	onClickCategory,
-	filterValue,
-	selectedCategory,
-} ) {
-	return filterValue ? (
-		<BlockPatternsSearchResults
-			onInsert={ onInsert }
-			filterValue={ filterValue }
-		/>
-	) : (
+function BlockPatternsTabs( { onInsert, onClickCategory, selectedCategory } ) {
+	return (
 		<BlockPatternsCategory
 			selectedCategory={ selectedCategory }
 			onInsert={ onInsert }
