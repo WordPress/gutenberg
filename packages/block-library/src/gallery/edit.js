@@ -139,7 +139,12 @@ function GalleryEdit( props ) {
 		}
 	}, [ images ] );
 
-	const imageSizeOptions = useImageSizes( images, isSelected, getSettings );
+	const imageSizeOptions = useImageSizes(
+		images,
+		isSelected,
+		getSettings,
+		getMedia
+	);
 
 	const { replaceInnerBlocks, updateBlockAttributes } = useDispatch(
 		'core/block-editor'
@@ -255,7 +260,9 @@ function GalleryEdit( props ) {
 			const image = block.attributes.id
 				? find( images, { id: block.attributes.id } )
 				: null;
-
+			if ( ! image.imageData ) {
+				image.imageData = getMedia( image.id );
+			}
 			updateBlockAttributes( block.clientId, {
 				...getHrefAndDestination( image.imageData, linkTo ),
 				...getUpdatedLinkTargetSettings( linkTarget, block.attributes ),
