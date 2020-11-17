@@ -14,7 +14,6 @@ import { createAtomRegistry, createStoreAtom } from '@wordpress/stan';
  */
 import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
-import { createAtomicStore } from './atomic-store';
 
 /**
  * @typedef {Object} WPDataRegistry An isolated orchestrator of store registrations.
@@ -300,11 +299,6 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		);
 		registerGenericStore( storeName, store );
 		return store.store;
-	};
-
-	registry.registerAtomicStore = ( reducerKey, options ) => {
-		const store = createAtomicStore( options, registry );
-		registerGenericStore( reducerKey, store );
 	};
 
 	//

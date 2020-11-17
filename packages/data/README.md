@@ -491,10 +491,6 @@ _Parameters_
 
 -   _store_ (unknown type): Store definition.
 
-<a name="registerAtomicStore" href="#registerAtomicStore">#</a> **registerAtomicStore**
-
-Undocumented declaration.
-
 <a name="registerGenericStore" href="#registerGenericStore">#</a> **registerGenericStore**
 
 Registers a generic store.
