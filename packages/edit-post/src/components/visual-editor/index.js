@@ -27,10 +27,10 @@ import { useSelect } from '@wordpress/data';
 
 export default function VisualEditor() {
 	const ref = useRef();
-	const inlineStyles = useResizeCanvas( deviceType );
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
 	}, [] );
+	const inlineStyles = useResizeCanvas( deviceType );
 
 	useScrollMultiSelectionIntoView( ref );
 	useBlockSelectionClearer( ref );
@@ -39,12 +39,12 @@ export default function VisualEditor() {
 	useTypingObserver( ref );
 
 	return (
-		<>
+		<div className="edit-post-visual-editor">
 			<VisualEditorGlobalKeyboardShortcuts />
 			<Popover.Slot name="block-toolbar" />
 			<div
 				ref={ ref }
-				className=" edit-post-visual-editor editor-styles-wrapper"
+				className="editor-styles-wrapper"
 				tabIndex="-1"
 				style={ inlineStyles }
 			>
@@ -60,6 +60,6 @@ export default function VisualEditor() {
 					<BlockInspectorButton onClick={ onClose } />
 				) }
 			</__experimentalBlockSettingsMenuFirstItem>
-		</>
+		</div>
 	);
 }
