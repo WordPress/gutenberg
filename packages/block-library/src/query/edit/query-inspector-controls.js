@@ -57,7 +57,7 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 				termsQuery
 			);
 			const excludedPostTypes = [ 'attachment' ];
-			const filteredPostTypes = getPostTypes()?.filter(
+			const filteredPostTypes = getPostTypes( { per_page: -1 } )?.filter(
 				( { viewable, slug } ) =>
 					viewable && ! excludedPostTypes.includes( slug )
 			);
@@ -130,6 +130,7 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
+
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
