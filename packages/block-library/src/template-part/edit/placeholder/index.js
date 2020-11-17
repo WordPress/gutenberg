@@ -29,7 +29,6 @@ export default function TemplatePartPlaceholder( {
 				title,
 				status: 'publish',
 				slug,
-				meta: { theme: '' },
 				content: serialize( innerBlocks ),
 			}
 		);
