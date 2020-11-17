@@ -130,7 +130,6 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
-
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
