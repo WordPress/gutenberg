@@ -163,10 +163,10 @@ add_action( 'trash_wp_template_part', 'gutenberg_clear_synchronize_last_checks' 
 /**
  * Clear synchronization last check timestamps after deleting a template or template part.
  *
- * @param int     $postid ID of the deleted post.
+ * @param int     $post_id ID of the deleted post.
  * @param WP_Post $post WP_Post instance of the deleted post.
  */
-function gutenberg_clear_synchronize_last_checks_after_delete( $postid, $post ) {
+function gutenberg_clear_synchronize_last_checks_after_delete( $post_id, $post ) {
 	if ( 'wp_template' !== $post->post_type || 'wp_template_part' !== $post->post_type ) {
 		gutenberg_clear_synchronize_last_checks();
 	}
