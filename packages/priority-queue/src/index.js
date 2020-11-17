@@ -82,7 +82,7 @@ export const createQueue = () => {
 	 */
 	const runWaitingList = ( deadline ) => {
 		const hasTimeRemaining =
-			typeof deadline === 'number' || typeof deadline === 'undefined'
+			typeof deadline === 'number'
 				? () => false
 				: () => deadline.timeRemaining() > 0;
 
