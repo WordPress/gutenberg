@@ -211,15 +211,18 @@ function filter_rest_prepare_wp_template_part( $response ) {
 
 		// If a theme is assigned, add it to the REST response.
 		if ( $wp_themes && is_array( $wp_themes ) ) {
-			$wp_theme_slugs = array_column($wp_themes, 'slug');
+			$wp_theme_slugs = array_column( $wp_themes, 'slug' );
 
-			$file_based = in_array('wp_file_based', $wp_theme_slugs);
+			$file_based                   = in_array( 'wp_file_based', $wp_theme_slugs );
 			$response->data['file_based'] = $file_based;
 
-			$theme_slug = array_filter($wp_theme_slugs, function($slug) {
-				return $slug !== 'wp_file_based';
-			});
-			if ($theme_slug) {
+			$theme_slug = array_filter(
+				$wp_theme_slugs,
+				function( $slug ) {
+					return $slug !== 'wp_file_based';
+				}
+			);
+			if ( $theme_slug ) {
 				$response->data['wp_theme_slug'] = $theme_slug[0];
 			}
 		}
