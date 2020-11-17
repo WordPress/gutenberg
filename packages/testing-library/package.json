@@ -1,0 +1,37 @@
+{
+	"name": "@wordpress/testing-library",
+	"version": "0.0.0",
+	"description": "@wordpress/element testing library.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"element",
+		"react",
+		"testing-library"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/testing-library/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/testing-library"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"main": "build/index.js",
+	"module": "build-module/index.js",
+	"react-native": "src/index",
+	"types": "build-types",
+	"sideEffects": false,
+	"dependencies": {
+		"@testing-library/dom": "^7.26.6"
+	},
+	"peerDependencies": {
+		"@wordpress/element": ">= 2.18.1"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

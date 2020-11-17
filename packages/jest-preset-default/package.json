@@ -32,11 +32,14 @@
 	"main": "index.js",
 	"dependencies": {
 		"@jest/reporters": "^25.3.0",
+		"@testing-library/jest-dom": "^5.11.5",
 		"@wordpress/jest-console": "file:../jest-console",
 		"babel-jest": "^25.3.0",
 		"enzyme": "^3.11.0",
 		"enzyme-adapter-react-16": "^1.15.2",
-		"enzyme-to-json": "^3.4.4"
+		"enzyme-to-json": "^3.4.4",
+		"jquery": "^3.5.1",
+		"whatwg-fetch": "^3.5.0"
 	},
 	"peerDependencies": {
 		"jest": ">=25"

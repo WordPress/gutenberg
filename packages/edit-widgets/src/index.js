@@ -23,24 +23,32 @@ import { create as createLegacyWidget } from './blocks/legacy-widget';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
 
+let hasInitialized = false;
+
 /**
  * Initializes the block editor in the widgets screen.
  *
- * @param {string} id       ID of the root element to render the screen in.
- * @param {Object} settings Block editor settings.
+ * @param {string}   id             ID of the root element to render the screen in.
+ * @param {Object}   settings       Block editor settings.
+ * @param {Function} renderCallback The function to call when rendering.
  */
-export function initialize( id, settings ) {
-	const coreBlocks = __experimentalGetCoreBlocks().filter(
-		( block ) => ! [ 'core/more' ].includes( block.name )
-	);
-	registerCoreBlocks( coreBlocks );
+export function initialize( id, settings, renderCallback = render ) {
+	if ( ! hasInitialized ) {
+		const coreBlocks = __experimentalGetCoreBlocks().filter(
+			( block ) => ! [ 'core/more' ].includes( block.name )
+		);
+		registerCoreBlocks( coreBlocks );
 
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks();
+		if ( process.env.GUTENBERG_PHASE === 2 ) {
+			__experimentalRegisterExperimentalCoreBlocks();
+		}
+		registerBlock( createLegacyWidget( settings ) );
+		registerBlock( widgetArea );
+
+		hasInitialized = true;
 	}
-	registerBlock( createLegacyWidget( settings ) );
-	registerBlock( widgetArea );
-	render(
+
+	return renderCallback(
 		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )
 	);

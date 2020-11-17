@@ -1,50 +1,34 @@
 /**
- * External dependencies
+ * WordPress dependencies
  */
 import {
-	render,
+	renderInitialize,
 	screen,
 	getByRole,
 	findByRole,
 	findAllByRole,
 	queryAllByRole,
 	fireEvent,
-} from '@testing-library/react';
+} from '@wordpress/testing-library';
 
 /**
  * Internal dependencies
  */
-import { initialize } from '../';
-import Layout from '../components/layout';
-import { server } from './mocks/server';
+import { initialize } from '..';
+import './mocks/server';
 import availableLegacyWidgets from './mocks/available-legacy-widgets';
 
-beforeAll( () => server.listen() );
-afterEach( () => server.resetHandlers() );
-afterAll( () => server.close() );
-
+// We need this since some tests run over 5 seconds threshold.
+// Also keep this as a TODO for us to improve the performance of the components.
 jest.setTimeout( 10000 );
 
 const editorSettings = {
 	availableLegacyWidgets,
 };
 
-// Mock "@wordpress/element".render, so that initialize() doesn't actually render the component.
-jest.mock( '@wordpress/element', () => {
-	const WPElement = require.requireActual( '@wordpress/element' );
-	return {
-		...WPElement,
-		render: () => {},
-	};
-} );
-
-beforeAll( () => {
-	initialize( 'root', editorSettings );
-} );
-
 describe( 'edit-widgets', () => {
 	it( 'renders', async () => {
-		render( <Layout blockEditorSettings={ editorSettings } /> );
+		renderInitialize( initialize, editorSettings );
 
 		const widgetAreas = await screen.findAllByRole( 'group', {
 			name: 'Block: Widget Area',
@@ -95,7 +79,7 @@ describe( 'edit-widgets', () => {
 	} );
 
 	it( 'should default to insert blocks to the first widget area', async () => {
-		render( <Layout blockEditorSettings={ editorSettings } /> );
+		renderInitialize( initialize, editorSettings );
 
 		const widgetAreas = await screen.findAllByRole( 'group', {
 			name: 'Block: Widget Area',

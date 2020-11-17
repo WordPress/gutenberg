@@ -1,3 +1,6 @@
+// Fetch polyfill for Node.js environment.
+require( 'whatwg-fetch' );
+
 // These are necessary to load TinyMCE successfully
 global.URL = window.URL;
 global.window.tinyMCEPreInit = {
@@ -18,6 +21,9 @@ global.window.getSelection = jest.fn( () => ( {
 	addRange: jest.fn(),
 	removeAllRanges: jest.fn(),
 } ) );
+
+// Expose window.jQuery for third-party code.
+window.jQuery = require( 'jquery' );
 
 // Setup fake localStorage
 const storage = {};

@@ -1,3 +1,9 @@
+/**
+ * External dependencies
+ */
+// Custom Jest matchers.
+require( '@testing-library/jest-dom' );
+
 require( '@wordpress/jest-console' );
 
 // It "mocks" enzyme, so that we can delay loading of
