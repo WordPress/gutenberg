@@ -136,6 +136,10 @@ function gutenberg_migrate_theme_meta_to_taxonomy() {
 			'post_status'    => array( 'publish', 'auto-draft', 'draft', 'trash' ),
 		)
 	);
+	if ( ! $query->have_posts() ) {
+		return;
+	}
+
 	while ( $query->have_posts() ) {
 		$query->the_post();
 		$post  = get_post();
