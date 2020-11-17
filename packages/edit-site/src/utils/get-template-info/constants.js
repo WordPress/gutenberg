@@ -8,13 +8,20 @@ import { __, _x } from '@wordpress/i18n';
  */
 export const TEMPLATES_DEFAULT_DETAILS = [
 	{
+		slug: 'front-page',
+		title: _x( 'Front Page', 'template name' ),
+		description: __(
+			'Resolves when the site home page is requested'
+		),
+	},
+	{
 		slug: 'single-post',
-		title: __( 'Post' ),
+		title: _x( 'Post', 'template name' ),
 		description: __( 'Resolves when a post is requested' ),
 	},
 	{
 		slug: 'page',
-		title: __( 'Page' ),
+		title: _x( 'Page', 'template name' ),
 		description: __( 'Resolves when a page is requested' ),
 	},
 	{
