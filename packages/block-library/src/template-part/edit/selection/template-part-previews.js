@@ -31,11 +31,7 @@ function TemplatePartItem( {
 	onClose,
 	composite,
 } ) {
-	const {
-		id,
-		slug,
-		meta: { theme },
-	} = templatePart;
+	const { id, slug, wp_theme_slug: theme } = templatePart;
 	// The 'raw' property is not defined for a brief period in the save cycle.
 	// The fallback prevents an error in the parse function while saving.
 	const content = templatePart.content.raw || '';
@@ -142,7 +138,7 @@ function TemplatePartSearchResults( {
 		// Remove diacritics and convert to lowercase to normalize.
 		const normalizedFilterValue = deburr( filterValue ).toLowerCase();
 		const searchResults = templateParts.filter(
-			( { slug, meta: { theme } } ) =>
+			( { slug, wp_theme_slug: theme } ) =>
 				slug.toLowerCase().includes( normalizedFilterValue ) ||
 				// Since diacritics can be used in theme names, remove them for the comparison.
 				deburr( theme ).toLowerCase().includes( normalizedFilterValue )
