@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, register } from '@wordpress/data';
+import { createReduxStore, registerStore } from '@wordpress/data';
 import { controls as dataControls } from '@wordpress/data-controls';
 
 /**
@@ -42,4 +42,9 @@ export const store = createReduxStore( STORE_NAME, {
 	persist: [ 'preferences' ],
 } );
 
-register( store );
+// Once we build a more generic persistence plugin that works across types of stores
+// we'd be able to replace this with a register call.
+registerStore( STORE_NAME, {
+	...storeConfig,
+	persist: [ 'preferences' ],
+} );
