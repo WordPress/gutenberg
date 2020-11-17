@@ -110,7 +110,7 @@ describe( 'Order of block keyboard navigation', () => {
 
 		// Clear the selected block and put focus in front of the block list.
 		await page.evaluate( () => {
-			document.querySelector( '.edit-post-visual-editor' ).focus();
+			document.querySelector( '.editor-styles-wrapper' ).focus();
 		} );
 
 		await page.keyboard.press( 'Tab' );
@@ -145,7 +145,7 @@ describe( 'Order of block keyboard navigation', () => {
 
 		// Clear the selected block and put focus behind the block list.
 		await page.evaluate( () => {
-			document.querySelector( '.edit-post-visual-editor' ).focus();
+			document.querySelector( '.editor-styles-wrapper' ).focus();
 			document
 				.querySelector( '.interface-interface-skeleton__sidebar' )
 				.focus();

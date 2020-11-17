@@ -43,7 +43,7 @@ function isKeyDownEligibleForStartTyping( event ) {
 	return ! shiftKey && KEY_DOWN_ELIGIBLE_KEY_CODES.has( keyCode );
 }
 
-function useTypingObserver( ref ) {
+export function useTypingObserver( ref ) {
 	const isTyping = useSelect( ( select ) =>
 		select( 'core/block-editor' ).isTyping()
 	);
