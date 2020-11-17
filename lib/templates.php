@@ -147,8 +147,11 @@ function gutenberg_migrate_theme_meta_to_taxonomy() {
 
 		wp_set_post_terms( $post->ID, $terms, 'wp_theme', true );
 	}
-
 	wp_reset_postdata();
+
+	global $wp;
+	wp_redirect( add_query_arg( $wp->query_vars, home_url( $wp->request ) ) );
+	exit;
 }
 add_action( 'init', 'gutenberg_migrate_theme_meta_to_taxonomy' );
 
