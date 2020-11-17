@@ -295,6 +295,8 @@ _Parameters_
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
 
+> **Deprecated** 
+
 Higher-order component creator which, given an object of DOM event types and
 values corresponding to a callback function name on the component, will
 create or update a window event handler to invoke the callback when an event
