@@ -6,9 +6,9 @@ import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockContextProvider,
-	InnerBlocks,
 	BlockPreview,
 	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -35,6 +35,7 @@ export default function QueryLoopEdit( {
 			author,
 			search,
 			exclude,
+			sticky,
 		} = {},
 		queryContext,
 	},
@@ -65,6 +66,12 @@ export default function QueryLoopEdit( {
 			if ( exclude?.length ) {
 				query.exclude = exclude;
 			}
+			// If sticky is not set, it will return all posts in the results.
+			// If sticky is set to `only`, it will limit the results to sticky posts only.
+			// If it is anything else, it will exclude sticky posts from results. For the record the value stored is `exclude`.
+			if ( sticky ) {
+				query.sticky = sticky === 'only';
+			}
 			return {
 				posts: getEntityRecords( 'postType', postType, query ),
 				blocks: getBlocks( clientId ),
@@ -83,6 +90,7 @@ export default function QueryLoopEdit( {
 			search,
 			postType,
 			exclude,
+			sticky,
 		]
 	);
 
@@ -95,6 +103,7 @@ export default function QueryLoopEdit( {
 		[ posts ]
 	);
 	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 
 	if ( ! posts ) {
 		return <p { ...blockProps }>{ __( 'Loading…' ) }</p>;
@@ -114,10 +123,7 @@ export default function QueryLoopEdit( {
 					>
 						{ blockContext ===
 						( activeBlockContext || blockContexts[ 0 ] ) ? (
-							<InnerBlocks
-								template={ TEMPLATE }
-								templateInsertUpdatesSelection={ false }
-							/>
+							<div { ...innerBlocksProps } />
 						) : (
 							<BlockPreview
 								blocks={ blocks }

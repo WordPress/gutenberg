@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -11,18 +16,20 @@ import {
 /**
  * Internal dependencies
  */
-import TemplateNavigationItems from '../template-navigation-items';
+import TemplateNavigationItem from '../template-navigation-item';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS } from '../constants';
 
-export default function TemplatePartsMenu( { onActivateItem } ) {
+export default function TemplatePartsMenu() {
 	const templateParts = useSelect( ( select ) => {
-		return select( 'core' ).getEntityRecords(
-			'postType',
-			'wp_template_part',
-			{
+		const unfilteredTemplateParts =
+			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
 				status: [ 'publish', 'auto-draft' ],
 				per_page: -1,
-			}
+			} ) || [];
+		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
+		return unfilteredTemplateParts.filter(
+			( item ) =>
+				item.status === 'publish' || item.meta.theme === currentTheme
 		);
 	}, [] );
 
@@ -32,11 +39,12 @@ export default function TemplatePartsMenu( { onActivateItem } ) {
 			title={ __( 'Template Parts' ) }
 			parentMenu={ MENU_ROOT }
 		>
-			<TemplateNavigationItems
-				entityType="wp_template_part"
-				templates={ templateParts }
-				onActivateItem={ onActivateItem }
-			/>
+			{ map( templateParts, ( templatePart ) => (
+				<TemplateNavigationItem
+					item={ templatePart }
+					key={ `wp_template_part-${ templatePart.id }` }
+				/>
+			) ) }
 
 			{ ! templateParts && <NavigationItem title={ __( 'Loading…' ) } /> }
 		</NavigationMenu>

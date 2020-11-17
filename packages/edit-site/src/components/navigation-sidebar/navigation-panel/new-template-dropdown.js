@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, omit } from 'lodash';
+import { map, filter, includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -46,9 +46,11 @@ export default function NewTemplateDropdown() {
 		} );
 	};
 
-	const missingTemplates = omit(
+	const existingTemplateSlugs = map( templates, 'slug' );
+
+	const missingTemplates = filter(
 		TEMPLATES_DEFAULT_DETAILS,
-		map( templates, 'slug' )
+		( template ) => ! includes( existingTemplateSlugs, template.slug )
 	);
 
 	return (
@@ -70,7 +72,7 @@ export default function NewTemplateDropdown() {
 					<MenuGroup label={ __( 'Add Template' ) }>
 						{ map(
 							missingTemplates,
-							( { title, description }, slug ) => (
+							( { title, description, slug } ) => (
 								<MenuItem
 									info={ description }
 									key={ slug }

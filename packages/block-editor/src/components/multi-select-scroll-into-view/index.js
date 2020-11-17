@@ -6,7 +6,7 @@ import scrollIntoView from 'dom-scroll-into-view';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { getScrollContainer } from '@wordpress/dom';
 
@@ -37,13 +37,15 @@ export default function MultiSelectScrollIntoView() {
 		selector,
 		[]
 	);
+	const ref = useRef();
 
 	useEffect( () => {
 		if ( ! selectionEnd || isMultiSelecting || ! isMultiSelection ) {
 			return;
 		}
 
-		const extentNode = getBlockDOMNode( selectionEnd );
+		const { ownerDocument } = ref.current;
+		const extentNode = getBlockDOMNode( selectionEnd, ownerDocument );
 
 		if ( ! extentNode ) {
 			return;
@@ -62,5 +64,5 @@ export default function MultiSelectScrollIntoView() {
 		} );
 	}, [ isMultiSelection, selectionEnd, isMultiSelecting ] );
 
-	return null;
+	return <div ref={ ref } />;
 }

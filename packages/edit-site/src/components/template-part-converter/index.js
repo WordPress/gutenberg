@@ -1,11 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import { BlockSettingsMenuControls } from '@wordpress/block-editor';
-import { MenuItem } from '@wordpress/components';
-import { createBlock } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import ConvertToRegularBlocks from './convert-to-regular';
+import ConvertToTemplatePart from './convert-to-template-part';
 
 export default function TemplatePartConverter() {
 	const { clientIds, blocks } = useSelect( ( select ) => {
@@ -18,38 +20,11 @@ export default function TemplatePartConverter() {
 			blocks: getBlocksByClientId( selectedBlockClientIds ),
 		};
 	} );
-	const { replaceBlocks } = useDispatch( 'core/block-editor' );
 
-	// Avoid transforming a single `core/template-part` block.
+	// Allow converting a single template part to standard blocks.
 	if ( blocks.length === 1 && blocks[ 0 ]?.name === 'core/template-part' ) {
-		return null;
+		return <ConvertToRegularBlocks clientId={ clientIds[ 0 ] } />;
 	}
 
-	return (
-		<BlockSettingsMenuControls>
-			{ ( { onClose } ) => (
-				<MenuItem
-					onClick={ () => {
-						replaceBlocks(
-							clientIds,
-							createBlock(
-								'core/template-part',
-								{},
-								blocks.map( ( block ) =>
-									createBlock(
-										block.name,
-										block.attributes,
-										block.innerBlocks
-									)
-								)
-							)
-						);
-						onClose();
-					} }
-				>
-					{ __( 'Make template part' ) }
-				</MenuItem>
-			) }
-		</BlockSettingsMenuControls>
-	);
+	return <ConvertToTemplatePart clientIds={ clientIds } blocks={ blocks } />;
 }

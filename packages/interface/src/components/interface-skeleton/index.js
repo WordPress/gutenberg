@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { useEffect } from '@wordpress/element';
 import { navigateRegions } from '@wordpress/components';
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
 function useHTMLClass( className ) {
@@ -28,12 +29,14 @@ function InterfaceSkeleton( {
 	footer,
 	header,
 	sidebar,
-	leftSidebar,
+	secondarySidebar,
 	content,
 	drawer,
 	actions,
 	labels,
 	className,
+	// Deprecated props.
+	leftSidebar,
 } ) {
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
@@ -44,8 +47,8 @@ function InterfaceSkeleton( {
 		header: __( 'Header' ),
 		/* translators: accessibility text for the content landmark region. */
 		body: __( 'Content' ),
-		/* translators: accessibility text for the left sidebar landmark region. */
-		leftSidebar: __( 'Left sidebar' ),
+		/* translators: accessibility text for the secondary sidebar landmark region. */
+		secondarySidebar: __( 'Block Library' ),
 		/* translators: accessibility text for the settings landmark region. */
 		sidebar: __( 'Settings' ),
 		/* translators: accessibility text for the publish landmark region. */
@@ -55,6 +58,15 @@ function InterfaceSkeleton( {
 	};
 
 	const mergedLabels = { ...defaultLabels, ...labels };
+
+	if ( leftSidebar ) {
+		deprecated( 'leftSidebar prop in InterfaceSkeleton component', {
+			alternative: 'secondarySidebar prop',
+			version: '9.7.0',
+			plugin: 'Gutenberg',
+		} );
+		secondarySidebar = leftSidebar;
+	}
 
 	return (
 		<div
@@ -84,14 +96,14 @@ function InterfaceSkeleton( {
 					</div>
 				) }
 				<div className="interface-interface-skeleton__body">
-					{ !! leftSidebar && (
+					{ !! secondarySidebar && (
 						<div
-							className="interface-interface-skeleton__left-sidebar"
+							className="interface-interface-skeleton__secondary-sidebar"
 							role="region"
-							aria-label={ mergedLabels.leftSidebar }
+							aria-label={ mergedLabels.secondarySidebar }
 							tabIndex="-1"
 						>
-							{ leftSidebar }
+							{ secondarySidebar }
 						</div>
 					) }
 					<div

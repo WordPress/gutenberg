@@ -102,7 +102,10 @@ export default function useMultiSelection( ref ) {
 			const selection = defaultView.getSelection();
 
 			if ( selection.rangeCount && ! selection.isCollapsed ) {
-				const blockNode = getBlockDOMNode( selectedBlockClientId );
+				const blockNode = getBlockDOMNode(
+					selectedBlockClientId,
+					ownerDocument
+				);
 				const { startContainer, endContainer } = selection.getRangeAt(
 					0
 				);
@@ -129,8 +132,8 @@ export default function useMultiSelection( ref ) {
 		const start = multiSelectedBlockClientIds[ 0 ];
 		const end = multiSelectedBlockClientIds[ length - 1 ];
 
-		let startNode = getBlockDOMNode( start );
-		let endNode = getBlockDOMNode( end );
+		let startNode = getBlockDOMNode( start, ownerDocument );
+		let endNode = getBlockDOMNode( end, ownerDocument );
 
 		const selection = defaultView.getSelection();
 		const range = ownerDocument.createRange();

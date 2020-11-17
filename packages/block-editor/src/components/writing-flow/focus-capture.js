@@ -80,7 +80,10 @@ const FocusCapture = forwardRef(
 
 			// If there is a selected block, move focus to the first or last
 			// tabbable element depending on the direction.
-			const wrapper = getBlockDOMNode( selectedClientId );
+			const wrapper = getBlockDOMNode(
+				selectedClientId,
+				ref.current.ownerDocument
+			);
 
 			if ( isReverse ) {
 				const tabbables = focus.tabbable.find( wrapper );

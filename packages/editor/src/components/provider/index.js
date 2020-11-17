@@ -169,8 +169,6 @@ class EditorProvider extends Component {
 				'__experimentalBlockDirectory',
 				'__experimentalBlockPatterns',
 				'__experimentalBlockPatternCategories',
-				'__experimentalEnableFullSiteEditing',
-				'__experimentalEnableFullSiteEditingDemo',
 				'__experimentalFeatures',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBaseStyles',
@@ -323,7 +321,8 @@ export default compose( [
 			selectionEnd: getEditorSelectionEnd(),
 			reusableBlocks: select( 'core' ).getEntityRecords(
 				'postType',
-				'wp_block'
+				'wp_block',
+				{ per_page: -1 }
 			),
 			hasUploadPermissions: defaultTo(
 				canUser( 'create', 'media' ),

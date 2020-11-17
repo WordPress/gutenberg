@@ -6,7 +6,7 @@ import { castArray, flow, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	DropdownMenu,
 	MenuGroup,
@@ -73,6 +73,9 @@ export function BlockSettingsDropdown( {
 			: noop,
 		[ __experimentalSelectBlock ]
 	);
+
+	const removeBlockLabel =
+		count === 1 ? __( 'Remove block' ) : __( 'Remove blocks' );
 
 	return (
 		<BlockActions
@@ -185,11 +188,7 @@ export function BlockSettingsDropdown( {
 										) }
 										shortcut={ shortcuts.remove }
 									>
-										{ _n(
-											'Remove block',
-											'Remove blocks',
-											count
-										) }
+										{ removeBlockLabel }
 									</MenuItem>
 								) }
 							</MenuGroup>

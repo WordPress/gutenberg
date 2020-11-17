@@ -21,7 +21,11 @@ module.exports = {
 		'**/test/*.[jt]s',
 		'**/?(*.)test.[jt]s',
 	],
-	testPathIgnorePatterns: [ '/node_modules/', '<rootDir>/wordpress/' ],
+	testPathIgnorePatterns: [
+		'/node_modules/',
+		'<rootDir>/vendor/',
+		'<rootDir>/wordpress/',
+	],
 	timers: 'fake',
 	transform: {
 		'^.+\\.[jt]sx?$': require.resolve( 'babel-jest' ),
