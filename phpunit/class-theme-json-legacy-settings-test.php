@@ -1,12 +1,13 @@
 <?php
 
 /**
- * Test Global Styles functions.
+ * Test that legacy settings are properly
+ * reorganized into the theme.json structure.
  *
  * @package Gutenberg
  */
 
-class Global_Styles_Test extends WP_UnitTestCase {
+class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 
 	function get_editor_settings_no_theme_support() {
 		return array(
@@ -35,17 +36,9 @@ class Global_Styles_Test extends WP_UnitTestCase {
 				),
 			),
 			'isRTL'                                 => false,
-			'maxUploadFileSize'                     => 2097152,
+			'maxUploadFileSize'                     => 123,
 		);
 	}
-
-	function test_editor_settings_no_theme_support() {
-		$expected = $this->get_editor_settings_no_theme_support();
-		$actual   = gutenberg_get_common_block_editor_settings();
-
-		$this->assertEqualSetsWithIndex( $expected, $actual );
-	}
-
 
 	function test_legacy_settings_blank() {
 		$input    = array();
