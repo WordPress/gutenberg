@@ -112,7 +112,7 @@ add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
  * for wp_template and wp_template_part posts.
  */
 function gutenberg_migrate_theme_meta_to_taxonomy() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_is_fse_theme() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) || ( defined( 'DOING_AJAX' ) && DOING_AJAX ) ) {
 		return;
 	}
 
