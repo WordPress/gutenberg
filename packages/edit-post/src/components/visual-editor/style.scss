@@ -28,11 +28,6 @@
 	}
 }
 
-.edit-post-visual-editor > .block-editor-writing-flow,
-.edit-post-visual-editor > .block-editor-writing-flow > .block-editor-writing-flow__click-redirect {
-	height: 100%;
-}
-
 .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
 	// Allow the page to be scrolled with the last block in the middle.
 	min-height: 40vh;
