@@ -88,7 +88,8 @@ export function* validateBlocksToTemplate( blocks ) {
 		'isValidTemplate'
 	);
 	if ( isBlocksValidToTemplate !== isValidTemplate ) {
-		return yield setTemplateValidity( isBlocksValidToTemplate );
+		yield setTemplateValidity( isBlocksValidToTemplate );
+		return isBlocksValidToTemplate;
 	}
 }
 
