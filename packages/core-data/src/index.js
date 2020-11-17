@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStoreDefinition, register } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 import { controls } from '@wordpress/data-controls';
 
 /**
@@ -67,16 +67,13 @@ const storeConfig = {
 /**
  * Store definition for the code data namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStoreDefinition
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore
  *
  * @type {Object}
  */
-export const storeDefinition = createReduxStoreDefinition(
-	STORE_NAME,
-	storeConfig
-);
+export const store = createReduxStore( STORE_NAME, storeConfig );
 
-register( storeDefinition );
+register( store );
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';

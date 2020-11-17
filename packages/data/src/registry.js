@@ -7,7 +7,7 @@ import memize from 'memize';
 /**
  * Internal dependencies
  */
-import createReduxStoreDefinition from './redux-store';
+import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
 
 /**
@@ -205,13 +205,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Registers a new store.
 	 *
-	 * @param {import('./types').WPDataStoreDefinition} storeDefinition Store definition.
+	 * @param {import('./types').WPDataStore} store Store definition.
 	 */
-	function register( storeDefinition ) {
-		registerGenericStore(
-			storeDefinition.name,
-			storeDefinition.__internalAttach( registry )
-		);
+	function register( store ) {
+		registerGenericStore( store.name, store.instantiate( registry ) );
 	}
 
 	let registry = {
@@ -239,10 +236,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		const store = createReduxStoreDefinition(
-			storeName,
-			options
-		).__internalAttach( registry );
+		const store = createReduxStore( storeName, options ).instantiate(
+			registry
+		);
 		registerGenericStore( storeName, store );
 		return store.store;
 	};

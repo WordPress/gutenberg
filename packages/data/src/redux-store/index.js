@@ -59,12 +59,12 @@ function createResolversCache() {
  *
  * @return {import('../types').WPDataStoreDefinition} Store Object.
  */
-export default function createReduxStoreDefinition( key, options ) {
+export default function createReduxStore( key, options ) {
 	return {
 		name: key,
-		__internalAttach: ( registry ) => {
+		instantiate: ( registry ) => {
 			const reducer = options.reducer;
-			const store = createReduxStore( key, options, registry );
+			const store = instantiateReduxStore( key, options, registry );
 			const resolversCache = createResolversCache();
 
 			let resolvers;
@@ -157,7 +157,7 @@ export default function createReduxStoreDefinition( key, options ) {
  *
  * @return {Object} Newly created redux store.
  */
-function createReduxStore( key, options, registry ) {
+function instantiateReduxStore( key, options, registry ) {
 	const controls = {
 		...options.controls,
 		...builtinControls,

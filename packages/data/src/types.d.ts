@@ -11,7 +11,7 @@ export type WPDataAttachedStore = {
     subscribe: (listener: () => void) => (() => void)
 };
 
-export type WPDataStoreDefinition = {
+export type WPDataStore = {
     /**
      * Store Name
      */
@@ -20,7 +20,7 @@ export type WPDataStoreDefinition = {
     /**
      * Store configuration object.
      */
-    __internalAttach: (registry: WPDataRegistry) => WPDataAttachedStore,
+    instantiate: (registry: WPDataRegistry) => WPDataAttachedStore,
 };
 
 export type WPDataReduxStoreConfig = {
@@ -32,5 +32,5 @@ export type WPDataReduxStoreConfig = {
 }
 
 export type WPDataRegistry = {
-    register: ( storeDefinition: WPDataStoreDefinition ) => void,
+    register: ( store: WPDataStore ) => void,
 }
