@@ -28,4 +28,3 @@ registerPlugin( 'block-settings-menu-group-test', {
 ## Location
 
 ![Location](https://raw.githubusercontent.com/WordPress/gutenberg/master/docs/designers-developers/assets/plugin-block-settings-menu-item-screenshot.png?raw=true "PluginBlockSettingsMenuItem Location")
-

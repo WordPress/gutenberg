@@ -422,7 +422,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	$base = gutenberg_experimental_global_styles_get_core();
 	$base->merge( gutenberg_experimental_global_styles_get_theme() );
 
-	$all  = gutenberg_experimental_global_styles_get_core();
+	$all = gutenberg_experimental_global_styles_get_core();
 	$all->merge( gutenberg_experimental_global_styles_get_theme() );
 	$all->merge( gutenberg_experimental_global_styles_get_user() );
 

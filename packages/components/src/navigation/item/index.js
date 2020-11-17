@@ -29,6 +29,7 @@ export default function NavigationItem( props ) {
 		navigateToMenu,
 		onClick = noop,
 		title,
+		hideIfTargetMenuEmpty,
 		...restProps
 	} = props;
 
@@ -43,6 +44,17 @@ export default function NavigationItem( props ) {
 	const isRTL = useRTL();
 
 	if ( ! navigationTree.getItem( itemId )?._isVisible ) {
+		return null;
+	}
+
+	// If hideIfTargetMenuEmpty prop is true
+	// And the menu we are supposed to navigate to
+	// Is marked as empty, then we skip rendering the item
+	if (
+		hideIfTargetMenuEmpty &&
+		navigateToMenu &&
+		navigationTree.isMenuEmpty( navigateToMenu )
+	) {
 		return null;
 	}
 
