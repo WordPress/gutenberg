@@ -18,6 +18,9 @@ const variations = [
 	{
 		name: '',
 		title: __( 'Posts List' ),
+		description: __(
+			'Display a list of your most recent posts, excluding sticky posts.'
+		),
 		icon: postList,
 		attributes: {
 			query: {
