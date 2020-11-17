@@ -117,6 +117,14 @@ export function MediaPlaceholder( {
 		}
 	};
 
+	const onMediaLibrarySelection = ( files ) => {
+		if ( addToGallery ) {
+			onSelect( files, true );
+			return;
+		}
+		onSelect( files );
+	};
+
 	const onFilesUpload = ( files ) => {
 		if ( addToGallery ) {
 			// Because the Gallery hands the files over to Image component InnerBlocks just
@@ -275,7 +283,7 @@ export function MediaPlaceholder( {
 				addToGallery={ addToGallery }
 				gallery={ multiple && onlyAllowsImages() }
 				multiple={ multiple }
-				onSelect={ onSelect }
+				onSelect={ onMediaLibrarySelection }
 				allowedTypes={ allowedTypes }
 				value={
 					Array.isArray( value )
