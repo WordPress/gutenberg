@@ -478,8 +478,8 @@ describe( 'readConfig', () => {
 						type: 'zip',
 						url:
 							'https://www.example.com/test/path/to/gutenberg.8.1.0.zip',
-						path: expect.stringMatching( /^\/.*gutenberg$/ ),
-						basename: 'gutenberg',
+						path: expect.stringMatching( /^\/.*gutenberg.8.1.0$/ ),
+						basename: 'gutenberg.8.1.0',
 					},
 					{
 						type: 'zip',
@@ -492,14 +492,14 @@ describe( 'readConfig', () => {
 						type: 'zip',
 						url:
 							'https://www.example.com/test/path/to/twentytwenty.1.3.zip',
-						path: expect.stringMatching( /^\/.*twentytwenty$/ ),
-						basename: 'twentytwenty',
+						path: expect.stringMatching( /^\/.*twentytwenty.1.3$/ ),
+						basename: 'twentytwenty.1.3',
 					},
 					{
 						type: 'zip',
 						url: 'https://example.com/twentytwenty.1.3.zip',
-						path: expect.stringMatching( /^\/.*twentytwenty$/ ),
-						basename: 'twentytwenty',
+						path: expect.stringMatching( /^\/.*twentytwenty.1.3$/ ),
+						basename: 'twentytwenty.1.3',
 					},
 				],
 			};
