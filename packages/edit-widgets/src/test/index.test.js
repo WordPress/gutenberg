@@ -20,7 +20,7 @@ import availableLegacyWidgets from './mocks/available-legacy-widgets';
 
 // We need this since some tests run over 5 seconds threshold.
 // Also keep this as a TODO for us to improve the performance of the components.
-jest.setTimeout( 10000 );
+jest.setTimeout( 30000 );
 
 const editorSettings = {
 	availableLegacyWidgets,
