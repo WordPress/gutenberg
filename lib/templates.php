@@ -127,8 +127,8 @@ function gutenberg_set_template_and_template_part_post_theme( $post_id, $post, $
 	}
 }
 
-add_action( 'save_post_wp_template', 'gutenberg_set_template_post_theme', 10, 3 );
-add_action( 'save_post_wp_template_part', 'gutenberg_set_template_post_theme', 10, 3 );
+add_action( 'save_post_wp_template', 'gutenberg_set_template_and_template_part_post_theme', 10, 3 );
+add_action( 'save_post_wp_template_part', 'gutenberg_set_template_and_template_part_post_theme', 10, 3 );
 
 /**
  * Filters the capabilities of a user to conditionally grant them capabilities for managing 'wp_template' posts.
