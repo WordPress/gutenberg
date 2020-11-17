@@ -44,8 +44,6 @@ function* ensureDefaultBlock() {
  * content reflected as an edit in state.
  *
  * @param {Array} blocks Array of blocks.
- *
- * @return {Object} Action object.
  */
 export function* resetBlocks( blocks ) {
 	yield {
@@ -61,10 +59,7 @@ export function* resetBlocks( blocks ) {
  * across distinct parts of state, it is implemented here as a side-
  * effect of the block reset action.
  *
- * @param {Object} action RESET_BLOCKS action.
- * @param {Object} store  Store instance.
- * @param blocks
- * @return {?Object} New validity set action if validity has changed.
+ * @param {Array} blocks Array of blocks.
  */
 export function* validateBlocksToTemplate( blocks ) {
 	const template = controls.select( 'core/block-editor', 'getTemplate' );
@@ -85,7 +80,7 @@ export function* validateBlocksToTemplate( blocks ) {
 		isBlocksValidToTemplate !==
 		controls.select( 'core/block-editor', 'getTemplateLocisValidTemplate' )
 	) {
-		return setTemplateValidity( isBlocksValidToTemplate );
+		yield setTemplateValidity( isBlocksValidToTemplate );
 	}
 }
 
@@ -227,8 +222,6 @@ export function* selectNextBlock( clientId ) {
 
 /**
  * Returns an action object used in signalling that a block multi-selection has started.
- *
- * @return {Object} Action object.
  */
 export function* startMultiSelect() {
 	yield {
@@ -666,8 +659,6 @@ export function* synchronizeTemplate() {
  *
  * @param {string} firstBlockClientId  Client ID of the first block to merge.
  * @param {string} secondBlockClientId Client ID of the second block to merge.
- *
- * @return {Object} Action object.
  */
 export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 	const blocks = [ firstBlockClientId, secondBlockClientId ];
@@ -1123,8 +1114,6 @@ export function __unstableMarkNextChangeAsNotPersistent() {
  * after the change was made, and any actions that are a consequence of it, so
  * it is recommended to be called at the next idle period to ensure all
  * selection changes have been recorded.
- *
- * @return {Object} Action object.
  */
 export function* __unstableMarkAutomaticChange() {
 	yield { type: 'MARK_AUTOMATIC_CHANGE' };

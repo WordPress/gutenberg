@@ -41,10 +41,10 @@ import {
 
 describe( 'actions', () => {
 	describe( 'resetBlocks', () => {
-		it( 'should return the RESET_BLOCKS actions', () => {
+		it( 'should yield the RESET_BLOCKS actions', () => {
 			const blocks = [];
-			const result = resetBlocks( blocks );
-			expect( result ).toEqual( {
+			const fulfillment = resetBlocks( blocks );
+			expect( fulfillment.next().value ).toEqual( {
 				type: 'RESET_BLOCKS',
 				blocks,
 			} );
@@ -102,7 +102,8 @@ describe( 'actions', () => {
 
 	describe( 'startMultiSelect', () => {
 		it( 'should return the START_MULTI_SELECT', () => {
-			expect( startMultiSelect() ).toEqual( {
+			const fulfillment = startMultiSelect();
+			expect( fulfillment.next().value ).toEqual( {
 				type: 'START_MULTI_SELECT',
 			} );
 		} );
@@ -740,9 +741,11 @@ describe( 'actions', () => {
 		it( 'should return MERGE_BLOCKS action', () => {
 			const firstBlockClientId = 'blockA';
 			const secondBlockClientId = 'blockB';
-			expect(
-				mergeBlocks( firstBlockClientId, secondBlockClientId )
-			).toEqual( {
+			const fulfillment = mergeBlocks(
+				firstBlockClientId,
+				secondBlockClientId
+			);
+			expect( fulfillment.next().value ).toEqual( {
 				type: 'MERGE_BLOCKS',
 				blocks: [ firstBlockClientId, secondBlockClientId ],
 			} );
