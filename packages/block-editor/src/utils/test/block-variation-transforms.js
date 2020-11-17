@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { getMatchingVariation } from '../block-variation-transforms';
+import { __experimentalGetMatchingVariation as getMatchingVariation } from '../block-variation-transforms';
 
 describe( 'getMatchingVariation', () => {
 	describe( 'should not find a match', () => {
