@@ -202,7 +202,7 @@ add_filter( 'rest_wp_template_part_query', 'filter_rest_wp_template_part_query',
  * @param WP_REST_Response $response The response object.
  * @return WP_REST_Response
  */
-function filter_rest_prepare_wp_template_part( $response ) {
+function filter_rest_prepare_add_wp_theme_slug_and_file_based( $response ) {
 	if ( isset( $response->data ) && is_array( $response->data ) && isset( $response->data['id'] ) ) {
 		$response->data['wp_theme_slug'] = false;
 
@@ -232,4 +232,5 @@ function filter_rest_prepare_wp_template_part( $response ) {
 
 	return $response;
 }
-add_filter( 'rest_prepare_wp_template_part', 'filter_rest_prepare_wp_template_part' );
+add_filter( 'rest_prepare_wp_template', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
+add_filter( 'rest_prepare_wp_template_part', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
