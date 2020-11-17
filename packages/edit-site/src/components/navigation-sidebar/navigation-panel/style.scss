@@ -101,6 +101,23 @@
 	}
 }
 
+.edit-site-navigation-panel__template-item-title {
+	display: inline-block;
+	padding-right: $grid-unit-20;
+	position: relative;
+}
+
+.edit-site-navigation-panel__template-item-theme-template {
+	display: inline-block;
+	margin-left: $grid-unit-10;
+	padding: 0 $grid-unit-05;
+	border-radius: $grid-unit-10;
+	background-color: #ca4a1f;
+	color: $white;
+	font-size: 11px;
+	text-align: center;
+}
+
 .edit-site-navigation-panel__template-item-description {
 	padding-top: $grid-unit-05;
 	font-size: 12px;

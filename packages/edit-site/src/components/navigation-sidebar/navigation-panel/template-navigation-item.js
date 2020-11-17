@@ -7,6 +7,7 @@ import {
 } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { useState } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -37,7 +38,16 @@ export default function TemplateNavigationItem( { item } ) {
 				onMouseEnter={ () => setIsPreviewVisible( true ) }
 				onMouseLeave={ () => setIsPreviewVisible( false ) }
 			>
-				{ title }
+				<div className="edit-site-navigation-panel__template-item-title">
+					{ title }
+					{ item.type === 'wp_template' &&
+						item.status === 'auto-draft' && (
+							<span className="edit-site-navigation-panel__template-item-theme-template">
+								{ __( 'theme' ) }
+							</span>
+						) }
+				</div>
+
 				{ description && (
 					<div className="edit-site-navigation-panel__template-item-description">
 						{ description }
