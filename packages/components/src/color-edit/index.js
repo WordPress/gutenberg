@@ -230,6 +230,7 @@ export default function ColorEdit( {
 	onChange,
 	emptyUI,
 	immutableColorSlugs,
+	canReset = true,
 } ) {
 	const [ isInsertingColor, setIsInsertingColor ] = useState( false );
 	return (
@@ -311,6 +312,16 @@ export default function ColorEdit( {
 					) }
 					{ ! isInsertingColor && isEmpty( colors ) && emptyUI }
 				</div>
+				{ !! canReset && (
+					<Button
+						isSmall
+						isSecondary
+						className="components-color-edit__reset-button"
+						onClick={ () => onChange() }
+					>
+						{ __( 'Reset' ) }
+					</Button>
+				) }
 			</fieldset>
 		</BaseControl>
 	);
