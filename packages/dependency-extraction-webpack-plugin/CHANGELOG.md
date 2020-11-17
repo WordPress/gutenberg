@@ -7,6 +7,7 @@
 ### New feature
 
 - Include TypeScript type declarations ([#22498](https://github.com/WordPress/gutenberg/pull/22498))
+- Add new option parameter `defaultDependencies` to add values to dependency arrays by default.
 
 ## 2.5.0 (2020-04-01)
 

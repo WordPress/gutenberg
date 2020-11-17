@@ -56,6 +56,7 @@ const {
  * @property {RequestToHandle|undefined}   [requestToHandle]   Map module requests to a script handle.
  * @property {string|null}                 combinedOutputFile  This option is useful only when the combineAssets option is enabled. It allows providing a custom output file for the generated single assets file. It's possible to provide a path that is relative to the output directory.
  * @property {boolean|undefined}           combineAssets       By default, one asset file is created for each entry point. When this flag is set to true, all information about assets is combined into a single assets.(json|php) file generated in the output directory.
+ * @property {string[]|undefined}          defaultDependencies An array of dependencies to be added by default for each entry point. 
  */
 
 class DependencyExtractionWebpackPlugin {
@@ -184,6 +185,7 @@ class DependencyExtractionWebpackPlugin {
 				combinedOutputFile,
 				injectPolyfill,
 				outputFormat,
+				defaultDependencies,
 			} = this.options;
 
 			/** @type {Record<string, AssetData>} */
@@ -198,6 +200,12 @@ class DependencyExtractionWebpackPlugin {
 				const entrypointExternalizedWpDeps = new Set();
 				if ( injectPolyfill ) {
 					entrypointExternalizedWpDeps.add( 'wp-polyfill' );
+				}
+				
+				if ( defaultDependencies && Array.isArray( defaultDependencies ) ) {
+					defaultDependencies.forEach( dependency => {
+						entrypointExternalizedWpDeps.add( dependency );
+					} );
 				}
 
 				// Search for externalized modules in all chunks.
