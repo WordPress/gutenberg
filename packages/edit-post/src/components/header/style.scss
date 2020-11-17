@@ -53,14 +53,11 @@
 	@include break-small () {
 		padding-right: $grid-unit-20;
 	}
-}
 
+	/**
+	 * Buttons in the Toolbar
+ 	 */
 
-/**
- * Buttons in the Toolbar
- */
-
-.edit-post-header__settings {
 	// Adjust button paddings to scale better to mobile.
 	.editor-post-saved-state,
 	.components-button.components-button {

@@ -1,0 +1,42 @@
+.edit-site-navigation-toggle {
+	display: none;
+
+	@include break-medium() {
+		align-items: center;
+		background: $gray-900;
+		border-radius: 0;
+		display: flex;
+		position: absolute;
+		z-index: z-index(".edit-site-navigation-toggle");
+		height: $header-height + $border-width; // Cover header border
+		width: $header-height;
+	}
+}
+
+.edit-site-navigation-toggle__button {
+	align-items: center;
+	background: $gray-900;
+	color: $white;
+	height: $header-height + $border-width; // Cover header border
+	width: $header-height;
+	z-index: 1;
+
+	&.has-icon {
+		min-width: $header-height;
+
+		&:hover {
+			background: #32373d; // WP-admin light-gray.
+			color: $white;
+		}
+		&:active {
+			color: $white;
+		}
+		&:focus {
+			box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color), inset 0 0 0 3px $white;
+		}
+	}
+}
+
+.edit-site-navigation-toggle__site-icon {
+	width: 36px;
+}

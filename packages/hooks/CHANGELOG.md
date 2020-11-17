@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+- Include TypeScript type declarations ([#26430](https://github.com/WordPress/gutenberg/pull/26430))
+
 ## 2.6.0 (2019-08-29)
 
 ### New Feature

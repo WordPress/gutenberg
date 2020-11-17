@@ -52,13 +52,17 @@
 		},
 		"gradient": {
 			"type": "string"
+		},
+		"width": {
+			"type": "number"
 		}
 	},
 	"supports": {
 		"anchor": true,
 		"align": true,
 		"alignWide": false,
-		"reusable": false
+		"reusable": false,
+		"__experimentalSelector": ".wp-block-button > a"
 	},
 	"editorStyle": "wp-block-button-editor",
 	"style": "wp-block-button"

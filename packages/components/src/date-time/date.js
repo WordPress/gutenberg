@@ -37,10 +37,14 @@ class DatePicker extends Component {
 		if ( ! this.nodeRef.current ) {
 			return;
 		}
+
+		const { ownerDocument } = this.nodeRef.current;
+		const { activeElement } = ownerDocument;
+
 		// If focus was lost.
 		if (
-			! document.activeElement ||
-			! this.nodeRef.current.contains( document.activeElement )
+			! activeElement ||
+			! this.nodeRef.current.contains( ownerDocument.activeElement )
 		) {
 			// Retrieve the focus region div.
 			const focusRegion = this.nodeRef.current.querySelector(

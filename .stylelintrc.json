@@ -7,7 +7,6 @@
 		"font-weight-notation": null,
 		"max-line-length": null,
 		"no-descending-specificity": null,
-		"no-duplicate-selectors": null,
 		"rule-empty-line-before": null,
 		"selector-class-pattern": null,
 		"value-keyword-case": null

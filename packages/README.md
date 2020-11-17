@@ -308,17 +308,4 @@ If your package includes a few files with side effects, you can list them instea
 }
 ```
 
-Many `@wordpress` UI-focused packages rely on side effects for registering blocks, plugins, and data stores. To reduce maintenance costs, it may be preferable to opt for an inverse glob strategy, where you instead list the paths where side effects are *not* present, leaving the bundler to assume that everything else might have them. This results in a glob with multiple roots (to match `@wordpress` package structure) and one or more excluded directories.
-
-Here is an example where we declare that the `components` and `utils` directories are side effect-free:
-
-```json
-{
-	"name": "package",
-	"sideEffects": [
-		"!((src|build|build-module)/(components|utils)/**)"
-	],
-}
-```
-
 Please consult the [side effects documentation](./side-effects.md) for more information on identifying and declaring side effects.

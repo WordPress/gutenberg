@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	insertBlock,
 	clickBlockAppender,
 	getEditedPostContent,
 	createNewPost,
@@ -19,5 +20,16 @@ describe( 'Code', () => {
 		await page.keyboard.type( '<?php' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should delete block when backspace in an empty code', async () => {
+		await insertBlock( 'Code' );
+		await page.keyboard.type( 'a' );
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+
+		// Expect code block to be deleted.
+		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 } );

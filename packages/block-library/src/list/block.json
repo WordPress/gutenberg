@@ -28,6 +28,7 @@
 	"supports": {
 		"anchor": true,
 		"className": false,
+		"fontSize": true,
 		"color": {
 			"gradients": true
 		},

@@ -14,7 +14,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import useMultiSelection from './use-multi-selection';
 import { getBlockClientId } from '../../utils/dom';
-import InsertionPoint from './insertion-point';
+import useInsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
@@ -77,25 +77,25 @@ function RootContainer( { children, className }, ref ) {
 	}
 
 	const [ blockNodes, setBlockNodes ] = useState( {} );
+	const insertionPoint = useInsertionPoint( ref );
 
 	return (
-		<InsertionPoint containerRef={ ref }>
-			<BlockNodes.Provider value={ blockNodes }>
-				<BlockPopover />
-				<div
-					ref={ ref }
-					className={ classnames( className, 'is-root-container' ) }
-					onFocus={ onFocus }
-					onDragStart={ onDragStart }
-				>
-					<SetBlockNodes.Provider value={ setBlockNodes }>
-						<Context.Provider value={ onSelectionStart }>
-							{ children }
-						</Context.Provider>
-					</SetBlockNodes.Provider>
-				</div>
-			</BlockNodes.Provider>
-		</InsertionPoint>
+		<BlockNodes.Provider value={ blockNodes }>
+			{ insertionPoint }
+			<BlockPopover />
+			<div
+				ref={ ref }
+				className={ classnames( className, 'is-root-container' ) }
+				onFocus={ onFocus }
+				onDragStart={ onDragStart }
+			>
+				<SetBlockNodes.Provider value={ setBlockNodes }>
+					<Context.Provider value={ onSelectionStart }>
+						{ children }
+					</Context.Provider>
+				</SetBlockNodes.Provider>
+			</div>
+		</BlockNodes.Provider>
 	);
 }
 

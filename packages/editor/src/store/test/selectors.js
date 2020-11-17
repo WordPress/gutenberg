@@ -161,10 +161,6 @@ const {
 	didPostSaveRequestFail,
 	getSuggestedPostFormat,
 	getEditedPostContent,
-	__experimentalGetReusableBlock: getReusableBlock,
-	__experimentalIsSavingReusableBlock: isSavingReusableBlock,
-	__experimentalIsFetchingReusableBlock: isFetchingReusableBlock,
-	__experimentalGetReusableBlocks: getReusableBlocks,
 	getStateBeforeOptimisticTransaction,
 	isPublishingPost,
 	isPublishSidebarEnabled,
@@ -456,26 +452,9 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'hasNonPostEntityChanges', () => {
-		it( 'should return false if the full site editing experiment is disabled.', () => {
-			const state = {
-				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: false,
-				},
-				__experimentalGetDirtyEntityRecords() {
-					return [
-						{ kind: 'someKind', name: 'someName', key: 'someKey' },
-					];
-				},
-			};
-			expect( hasNonPostEntityChanges( state ) ).toBe( false );
-		} );
 		it( 'should return true if there are changes to an arbitrary entity', () => {
 			const state = {
 				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: true,
-				},
 				__experimentalGetDirtyEntityRecords() {
 					return [
 						{ kind: 'someKind', name: 'someName', key: 'someKey' },
@@ -487,9 +466,6 @@ describe( 'selectors', () => {
 		it( 'should return false if there are only changes for the current post', () => {
 			const state = {
 				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: true,
-				},
 				__experimentalGetDirtyEntityRecords() {
 					return [ { kind: 'postType', name: 'post', key: 1 } ];
 				},
@@ -499,9 +475,6 @@ describe( 'selectors', () => {
 		it( 'should return true if there are changes to multiple posts', () => {
 			const state = {
 				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: true,
-				},
 				__experimentalGetDirtyEntityRecords() {
 					return [
 						{ kind: 'postType', name: 'post', key: 1 },
@@ -514,9 +487,6 @@ describe( 'selectors', () => {
 		it( 'should return true if there are changes to multiple posts of different post types', () => {
 			const state = {
 				currentPost: { id: 1, type: 'post' },
-				editorSettings: {
-					__experimentalEnableFullSiteEditing: true,
-				},
 				__experimentalGetDirtyEntityRecords() {
 					return [
 						{ kind: 'postType', name: 'post', key: 1 },
@@ -2484,87 +2454,6 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getReusableBlock', () => {
-		it( 'should return a reusable block', () => {
-			const state = {
-				reusableBlocks: {
-					data: {
-						8109: {
-							clientId: 'foo',
-							title: 'My cool block',
-						},
-					},
-				},
-			};
-
-			const actualReusableBlock = getReusableBlock( state, 8109 );
-			expect( actualReusableBlock ).toEqual( {
-				id: 8109,
-				isTemporary: false,
-				clientId: 'foo',
-				title: 'My cool block',
-			} );
-		} );
-
-		it( 'should return a temporary reusable block', () => {
-			const state = {
-				reusableBlocks: {
-					data: {
-						reusable1: {
-							clientId: 'foo',
-							title: 'My cool block',
-						},
-					},
-				},
-			};
-
-			const actualReusableBlock = getReusableBlock( state, 'reusable1' );
-			expect( actualReusableBlock ).toEqual( {
-				id: 'reusable1',
-				isTemporary: true,
-				clientId: 'foo',
-				title: 'My cool block',
-			} );
-		} );
-
-		it( 'should return null when no reusable block exists', () => {
-			const state = {
-				reusableBlocks: {
-					data: {},
-				},
-			};
-
-			const reusableBlock = getReusableBlock( state, 123 );
-			expect( reusableBlock ).toBeNull();
-		} );
-	} );
-
-	describe( 'isSavingReusableBlock', () => {
-		it( 'should return false when the block is not being saved', () => {
-			const state = {
-				reusableBlocks: {
-					isSaving: {},
-				},
-			};
-
-			const isSaving = isSavingReusableBlock( state, 5187 );
-			expect( isSaving ).toBe( false );
-		} );
-
-		it( 'should return true when the block is being saved', () => {
-			const state = {
-				reusableBlocks: {
-					isSaving: {
-						5187: true,
-					},
-				},
-			};
-
-			const isSaving = isSavingReusableBlock( state, 5187 );
-			expect( isSaving ).toBe( true );
-		} );
-	} );
-
 	describe( 'isPublishSidebarEnabled', () => {
 		it( 'should return the value on state if it is thruthy', () => {
 			const state = {
@@ -2595,62 +2484,6 @@ describe( 'selectors', () => {
 			expect( isPublishSidebarEnabled( state ) ).toBe(
 				PREFERENCES_DEFAULTS.isPublishSidebarEnabled
 			);
-		} );
-	} );
-
-	describe( 'isFetchingReusableBlock', () => {
-		it( 'should return false when the block is not being fetched', () => {
-			const state = {
-				reusableBlocks: {
-					isFetching: {},
-				},
-			};
-
-			const isFetching = isFetchingReusableBlock( state, 5187 );
-			expect( isFetching ).toBe( false );
-		} );
-
-		it( 'should return true when the block is being fetched', () => {
-			const state = {
-				reusableBlocks: {
-					isFetching: {
-						5187: true,
-					},
-				},
-			};
-
-			const isFetching = isFetchingReusableBlock( state, 5187 );
-			expect( isFetching ).toBe( true );
-		} );
-	} );
-
-	describe( 'getReusableBlocks', () => {
-		it( 'should return an array of reusable blocks', () => {
-			const state = {
-				reusableBlocks: {
-					data: {
-						123: { clientId: 'carrot' },
-						reusable1: { clientId: 'broccoli' },
-					},
-				},
-			};
-
-			const reusableBlocks = getReusableBlocks( state );
-			expect( reusableBlocks ).toEqual( [
-				{ id: 123, isTemporary: false, clientId: 'carrot' },
-				{ id: 'reusable1', isTemporary: true, clientId: 'broccoli' },
-			] );
-		} );
-
-		it( 'should return an empty array when no reusable blocks exist', () => {
-			const state = {
-				reusableBlocks: {
-					data: {},
-				},
-			};
-
-			const reusableBlocks = getReusableBlocks( state );
-			expect( reusableBlocks ).toEqual( [] );
 		} );
 	} );
 

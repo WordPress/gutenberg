@@ -1,6 +1,11 @@
 name: React Native E2E Tests (iOS)
+
 on:
   pull_request:
+    paths-ignore:
+    - '**.md'
+  push:
+    branches: [master]
     paths-ignore:
     - '**.md'
 
@@ -52,10 +57,10 @@ jobs:
       run: npm run native test:e2e:bundle:ios
 
     - name: Switch Xcode Version
-      run: sudo xcode-select --switch /Applications/Xcode_11.4.1.app
+      run: sudo xcode-select --switch /Applications/Xcode_12.app
 
     - name: Build (if needed)
-      run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/gutenberg || SKIP_BUNDLING=true npm run native test:e2e:build-app:ios
+      run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/gutenberg || npm run native test:e2e:build-app:ios
 
     - name: Run iOS Device Tests
       run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}

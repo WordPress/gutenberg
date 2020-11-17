@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { Placeholder, TextControl, Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { blockDefault } from '@wordpress/icons';
-import { InnerBlocks } from '@wordpress/block-editor';
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 const ALLOWED_BLOCKS = [
 	'core/post-comment-content',
@@ -13,36 +13,41 @@ const ALLOWED_BLOCKS = [
 ];
 
 // TODO: JSDOC types
-export default function Edit( { className, attributes, setAttributes } ) {
+export default function Edit( { attributes, setAttributes } ) {
 	const { commentId } = attributes;
 	const [ commentIdInput, setCommentIdInput ] = useState( commentId );
+	const blockProps = useBlockProps();
 
 	if ( ! commentId ) {
 		return (
-			<Placeholder
-				icon={ blockDefault }
-				label={ __( 'Post Comment' ) }
-				instructions={ __( 'Input post comment ID' ) }
-			>
-				<TextControl
-					value={ commentId }
-					onChange={ ( val ) => setCommentIdInput( parseInt( val ) ) }
-				/>
-
-				<Button
-					isPrimary
-					onClick={ () => {
-						setAttributes( { commentId: commentIdInput } );
-					} }
+			<div { ...blockProps }>
+				<Placeholder
+					icon={ blockDefault }
+					label={ __( 'Post Comment' ) }
+					instructions={ __( 'Input post comment ID' ) }
 				>
-					{ __( 'Save' ) }
-				</Button>
-			</Placeholder>
+					<TextControl
+						value={ commentId }
+						onChange={ ( val ) =>
+							setCommentIdInput( parseInt( val ) )
+						}
+					/>
+
+					<Button
+						isPrimary
+						onClick={ () => {
+							setAttributes( { commentId: commentIdInput } );
+						} }
+					>
+						{ __( 'Save' ) }
+					</Button>
+				</Placeholder>
+			</div>
 		);
 	}
 
 	return (
-		<div className={ className }>
+		<div { ...blockProps }>
 			<InnerBlocks allowedBlocks={ ALLOWED_BLOCKS } />
 		</div>
 	);

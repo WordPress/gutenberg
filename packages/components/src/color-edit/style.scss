@@ -1,7 +1,8 @@
 .components-color-edit__color-option-main-area {
 	display: flex;
 	align-items: center;
-	.components-circular-option-picker__option-wrapper {
+	div.components-circular-option-picker__option-wrapper {
+		display: block;
 		margin: $grid-unit-10;
 	}
 }
