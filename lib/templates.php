@@ -107,6 +107,51 @@ function gutenberg_register_wp_theme_taxonomy() {
 }
 add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
 
+function gutenberg_migrate_theme_meta_to_taxonomy() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
+	$terms = get_terms(
+		array(
+			'taxonomy'       => 'wp_theme',
+			'posts_per_page' => 1,
+			'hide_empty'     => false,
+		)
+	);
+	if ( ! $terms ) {
+		return;
+	}
+
+	$query = new WP_Query(
+		array(
+			'post_type'      => array( 'wp_template', 'wp_template_part' ),
+			'posts_per_page' => -1,
+			'post_status'    => array( 'publish', 'auto-draft', 'draft', 'trash' ),
+		)
+	);
+	while ( $query->have_posts() ) {
+		$query->the_post();
+		$postId = get_the_ID();
+		$terms  = array();
+
+		$theme = get_post_meta( $postId, 'theme', true );
+		if ( ! $theme ) {
+			$theme = wp_get_theme()->get_stylesheet();
+		}
+		$terms[] = $theme;
+
+		if ( $post->post_status === 'auto-draft' ) {
+			$terms[] = 'wp_file_based';
+		}
+
+		wp_set_post_terms( $postId, $terms, 'wp_theme', true );
+	}
+
+	wp_reset_postdata();
+}
+add_action( 'wp_loaded', 'gutenberg_migrate_theme_meta_to_taxonomy' );
+
 /**
  * Automatically set the theme meta for templates.
  *
