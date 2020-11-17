@@ -48,6 +48,24 @@
 	}
 }
 
+// Reduced UI.
+.edit-post-header.has-reduced-ui {
+	@include break-small () {
+		// Apply transition to every button but the first one.
+		.edit-post-header-toolbar__left > * + .components-button,
+		.edit-post-header-toolbar__left > * + .components-dropdown > [aria-expanded="false"] {
+			transition: opacity 0.1s linear;
+			@include reduce-motion("transition");
+		}
+
+		// Zero out opacity unless hovered.
+		&:not(:hover) .edit-post-header-toolbar__left > * + .components-button,
+		&:not(:hover) .edit-post-header-toolbar__left > * + .components-dropdown > [aria-expanded="false"] {
+			opacity: 0;
+		}
+	}
+}
+
 .edit-post-header-toolbar__left {
 	display: inline-flex;
 	align-items: center;
@@ -135,7 +153,17 @@
 	}
 }
 
+.edit-post-header-toolbar .edit-post-header-toolbar__left > .edit-post-header-toolbar__inserter-toggle.has-text.has-icon {
+	width: auto;
+	padding: 0 $grid-unit-10;
+}
+
 .show-icon-labels {
+
+	.edit-post-header-toolbar__left > * + * {
+		margin-left: $grid-unit-10;
+	}
+
 	// Always display block toolbar under main toolbar when text labels are visible
 	.edit-post-header-toolbar__block-toolbar {
 		@include break-wide {

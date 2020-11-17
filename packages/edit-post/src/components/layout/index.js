@@ -53,7 +53,7 @@ import ActionsPanel from './actions-panel';
 import PopoverWrapper from './popover-wrapper';
 
 const interfaceLabels = {
-	leftSidebar: __( 'Block library' ),
+	secondarySidebar: __( 'Block library' ),
 	/* translators: accessibility text for the editor top bar landmark region. */
 	header: __( 'Editor top bar' ),
 	/* translators: accessibility text for the editor content landmark region. */
@@ -149,7 +149,7 @@ function Layout() {
 	}, [ isInserterOpened, isHugeViewport ] );
 
 	// Local state for save panel.
-	// Note 'thruthy' callback implies an open panel.
+	// Note 'truthy' callback implies an open panel.
 	const [
 		entitiesSavedStatesCallback,
 		setEntitiesSavedStatesCallback,
@@ -185,7 +185,7 @@ function Layout() {
 							}
 						/>
 					}
-					leftSidebar={
+					secondarySidebar={
 						mode === 'visual' &&
 						isInserterOpened && (
 							<PopoverWrapper

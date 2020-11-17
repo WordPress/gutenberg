@@ -7,14 +7,11 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { MenuItem, withSpokenMessages } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
 
-export function BlockInspectorButton( {
-	onClick = noop,
-	small = false,
-	speak,
-} ) {
+export function BlockInspectorButton( { onClick = noop, small = false } ) {
 	const { shortcut, areAdvancedSettingsOpened } = useSelect(
 		( select ) => ( {
 			shortcut: select(
@@ -64,4 +61,4 @@ export function BlockInspectorButton( {
 	);
 }
 
-export default withSpokenMessages( BlockInspectorButton );
+export default BlockInspectorButton;

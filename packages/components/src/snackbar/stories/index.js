@@ -33,3 +33,23 @@ export const withActions = () => {
 
 	return <Snackbar actions={ actions }>{ content }</Snackbar>;
 };
+
+export const withIcon = () => {
+	const content = text(
+		'Content',
+		'Add an icon to make your snackbar stand out'
+	);
+	const icon = text( 'Icon (as unicode emoji)', '🌮' );
+
+	return (
+		<Snackbar
+			icon={
+				<span role="img" aria-label="Icon" style={ { fontSize: 21 } }>
+					{ icon }
+				</span>
+			}
+		>
+			{ content }
+		</Snackbar>
+	);
+};

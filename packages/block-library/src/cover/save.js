@@ -35,6 +35,7 @@ export default function save( { attributes } ) {
 		dimRatio,
 		focalPoint,
 		hasParallax,
+		isRepeated,
 		overlayColor,
 		url,
 		minHeight: minHeightProp,
@@ -86,6 +87,7 @@ export default function save( { attributes } ) {
 		{
 			'has-background-dim': dimRatio !== 0,
 			'has-parallax': hasParallax,
+			'is-repeated': isRepeated,
 			'has-background-gradient': gradient || customGradient,
 			[ gradientClass ]: ! url && gradientClass,
 			'has-custom-content-position': ! isContentPositionCenter(

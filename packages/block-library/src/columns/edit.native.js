@@ -13,6 +13,8 @@ import {
 	RangeControl,
 	FooterMessageControl,
 	WIDE_ALIGNMENTS,
+	UnitControl,
+	getValueAndUnit,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -22,7 +24,7 @@ import {
 	BlockVariationPicker,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState, useMemo } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { columns } from '@wordpress/icons';
@@ -32,11 +34,13 @@ import { columns } from '@wordpress/icons';
 import variations from './variations';
 import styles from './editor.scss';
 import {
-	hasExplicitColumnWidths,
+	hasExplicitPercentColumnWidths,
 	getMappedColumnWidths,
 	getRedistributedColumnWidths,
 	toWidthPrecision,
-	getColumnWidths,
+	getWidths,
+	getWidthWithUnit,
+	CSS_UNITS,
 } from './utils';
 import {
 	getColumnsInRow,
@@ -107,11 +111,6 @@ function ColumnsEditContainer( {
 		}
 	}, [ width, columnCount ] );
 
-	// Array of column width attribute values
-	const columnWidthsValues = Object.values(
-		getColumnWidths( innerColumns, columnCount )
-	);
-
 	const renderAppender = () => {
 		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 		const isParentFullWidth =
@@ -137,41 +136,65 @@ function ColumnsEditContainer( {
 		return null;
 	};
 
-	const getColumnsSliders = useMemo( () => {
-		if ( ! editorSidebarOpened || ! isSelected ) {
-			return null;
-		}
-
-		return innerColumns.map( ( column, index ) => (
-			<RangeControl
-				min={ 1 }
-				max={ 100 }
-				step={ 0.1 }
-				value={ columnWidthsValues[ index ] }
-				onChange={ ( value ) => setTempWidth( value ) }
-				onComplete={ () =>
-					updateInnerColumnWidth( tempWidth, column.clientId )
-				}
-				cellContainerStyle={ styles.cellContainerStyle }
-				decimalNum={ 1 }
-				rangePreview={
-					<ColumnsPreview
-						columnWidths={ columnWidthsValues }
-						selectedColumnIndex={ index }
-					/>
-				}
-				key={ `${ column.clientId }-${ columnWidthsValues.length }` }
-				shouldDisplayTextInput={ false }
-			/>
-		) );
-	}, [ innerColumns, columnWidthsValues, editorSidebarOpened ] );
-
 	const contentWidths = getContentWidths(
 		columnsInRow,
 		width,
 		columnCount,
 		innerColumns
 	);
+
+	const onChangeWidth = ( valueUnit, columnId ) => {
+		const widthWithUnit = getWidthWithUnit( tempWidth, valueUnit );
+
+		updateInnerColumnWidth( widthWithUnit, columnId );
+	};
+
+	const onChangeUnit = ( nextUnit, index, columnId ) => {
+		const widthWithoutUnit = parseFloat(
+			getWidths( innerColumns )[ index ]
+		);
+		const widthWithUnit = getWidthWithUnit( widthWithoutUnit, nextUnit );
+
+		updateInnerColumnWidth( widthWithUnit, columnId );
+	};
+
+	const getColumnsSliders = () => {
+		if ( ! editorSidebarOpened || ! isSelected ) {
+			return null;
+		}
+
+		return innerColumns.map( ( column, index ) => {
+			const { valueUnit } =
+				getValueAndUnit( column.attributes.width ) || {};
+			return (
+				<UnitControl
+					label={ `Column ${ index + 1 }` }
+					key={ `${ column.clientId }-${
+						getWidths( innerColumns ).length
+					}` }
+					min={ 1 }
+					max={ valueUnit === '%' || ! valueUnit ? 100 : undefined }
+					decimalNum={ 1 }
+					value={ getWidths( innerColumns )[ index ] }
+					onChange={ ( value ) => setTempWidth( value ) }
+					onUnitChange={ ( nextUnit ) =>
+						onChangeUnit( nextUnit, index, column.clientId )
+					}
+					onComplete={ () => {
+						onChangeWidth( valueUnit, column.clientId );
+					} }
+					unit={ valueUnit || '%' }
+					units={ CSS_UNITS }
+					preview={
+						<ColumnsPreview
+							columnWidths={ getWidths( innerColumns, false ) }
+							selectedColumnIndex={ index }
+						/>
+					}
+				/>
+			);
+		} );
+	};
 
 	return (
 		<>
@@ -188,7 +211,7 @@ function ColumnsEditContainer( {
 						max={ columnCount + 1 }
 						type="stepper"
 					/>
-					{ getColumnsSliders }
+					{ getColumnsSliders() }
 				</PanelBody>
 				<PanelBody>
 					<FooterMessageControl
@@ -288,7 +311,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 			);
 
 			let innerBlocks = getBlocks( clientId );
-			const hasExplicitWidths = hasExplicitColumnWidths( innerBlocks );
+			const hasExplicitWidths = hasExplicitPercentColumnWidths(
+				innerBlocks
+			);
 
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;
@@ -344,7 +369,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 				}
 			}
 
-			replaceInnerBlocks( clientId, innerBlocks, false );
+			replaceInnerBlocks( clientId, innerBlocks );
 		},
 		onAddNextColumn: () => {
 			const { clientId } = ownProps;

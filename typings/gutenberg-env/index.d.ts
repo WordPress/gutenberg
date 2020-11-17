@@ -1,7 +1,7 @@
 interface Environment {
-	NODE_ENV?: unknown;
+	NODE_ENV: unknown;
 }
 interface Process {
-	env?: Environment;
+	env: Environment;
 }
 declare var process: Process;

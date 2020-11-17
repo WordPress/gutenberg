@@ -90,7 +90,8 @@ export function getBlockVariations( state, blockName, scope ) {
 		return variations;
 	}
 	return variations.filter( ( variation ) => {
-		return ! variation.scope || variation.scope.includes( scope );
+		// For backward compatibility reasons, variation's scope defaults to `block` and `inserter` when not set.
+		return ( variation.scope || [ 'block', 'inserter' ] ).includes( scope );
 	} );
 }
 

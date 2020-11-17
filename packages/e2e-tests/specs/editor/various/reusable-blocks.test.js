@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	clickMenuItem,
 	insertBlock,
 	insertReusableBlock,
 	createNewPost,
@@ -10,6 +11,8 @@ import {
 	searchForReusableBlock,
 	getEditedPostContent,
 	trashAllPosts,
+	visitAdminPage,
+	toggleGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
 
 function waitForAndAcceptDialog() {
@@ -42,15 +45,14 @@ describe( 'Reusable blocks', () => {
 		await page.keyboard.type( 'Hello there!' );
 
 		await clickBlockToolbarButton( 'More options' );
-
-		const convertButton = await page.waitForXPath(
-			'//button[text()="Add to Reusable blocks"]'
-		);
-		await convertButton.click();
+		await clickMenuItem( 'Add to Reusable blocks' );
 
 		// Wait for creation to finish
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
+		);
+		await page.waitForXPath(
+			'//*[@class="block-library-block__reusable-block-container"]'
 		);
 
 		// Select all of the text in the title field.
@@ -86,15 +88,14 @@ describe( 'Reusable blocks', () => {
 		await page.keyboard.type( 'Hello there!' );
 
 		await clickBlockToolbarButton( 'More options' );
-
-		const convertButton = await page.waitForXPath(
-			'//button[text()="Add to Reusable blocks"]'
-		);
-		await convertButton.click();
+		await clickMenuItem( 'Add to Reusable blocks' );
 
 		// Wait for creation to finish
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
+		);
+		await page.waitForXPath(
+			'//*[@class="block-library-block__reusable-block-container"]'
 		);
 
 		// Save the reusable block
@@ -177,15 +178,14 @@ describe( 'Reusable blocks', () => {
 		await page.keyboard.type( 'Awesome Paragraph' );
 
 		await clickBlockToolbarButton( 'More options' );
-
-		const convertButton = await page.waitForXPath(
-			'//button[text()="Add to Reusable blocks"]'
-		);
-		await convertButton.click();
+		await clickMenuItem( 'Add to Reusable blocks' );
 
 		// Wait for creation to finish
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
+		);
+		await page.waitForXPath(
+			'//*[@class="block-library-block__reusable-block-container"]'
 		);
 
 		// Select all of the text in the title field.
@@ -248,7 +248,7 @@ describe( 'Reusable blocks', () => {
 		// Delete the block and accept the confirmation dialog
 		await clickBlockToolbarButton( 'More options' );
 		const deleteButton = await page.waitForXPath(
-			'//button[text()="Remove from Reusable blocks"]'
+			'//button/span[text()="Remove from Reusable blocks"]'
 		);
 		await Promise.all( [ waitForAndAcceptDialog(), deleteButton.click() ] );
 
@@ -285,14 +285,14 @@ describe( 'Reusable blocks', () => {
 
 		// Convert block to a reusable block
 		await clickBlockToolbarButton( 'More options' );
-		const convertButton = await page.waitForXPath(
-			'//button[text()="Add to Reusable blocks"]'
-		);
-		await convertButton.click();
+		await clickMenuItem( 'Add to Reusable blocks' );
 
 		// Wait for creation to finish
 		await page.waitForXPath(
 			'//*[contains(@class, "components-snackbar")]/*[text()="Block created."]'
+		);
+		await page.waitForXPath(
+			'//*[@class="block-library-block__reusable-block-container"]'
 		);
 
 		// Select all of the text in the title field.
@@ -331,5 +331,48 @@ describe( 'Reusable blocks', () => {
 
 		// Check that we have two paragraph blocks on the page
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'will not break the editor if empty', async () => {
+		await insertReusableBlock( 'Awesome block' );
+
+		await visitAdminPage( 'edit.php', [ 'post_type=wp_block' ] );
+
+		const [ editButton ] = await page.$x(
+			`//a[contains(@aria-label, 'Awesome block')]`
+		);
+		await editButton.click();
+
+		await page.waitForNavigation();
+
+		// Click the block to give it focus
+		const blockSelector = 'p[data-title="Paragraph"]';
+		await page.waitForSelector( blockSelector );
+		await page.click( blockSelector );
+
+		// Delete the block, leaving the reusable block empty
+		await clickBlockToolbarButton( 'More options' );
+		const deleteButton = await page.waitForXPath(
+			'//button/span[text()="Remove block"]'
+		);
+		deleteButton.click();
+
+		// Wait for the Update button to become enabled
+		const publishButtonSelector = '.editor-post-publish-button__button';
+		await page.waitForSelector(
+			publishButtonSelector + '[aria-disabled="false"]'
+		);
+
+		// Save the reusable block
+		await page.click( publishButtonSelector );
+		await page.waitForXPath(
+			'//*[contains(@class, "components-snackbar")]/*[text()="Reusable Block updated."]'
+		);
+
+		await createNewPost();
+
+		await toggleGlobalBlockInserter();
+
+		expect( console ).not.toHaveErrored();
 	} );
 } );

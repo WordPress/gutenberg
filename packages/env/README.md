@@ -179,7 +179,7 @@ Start `wp-env` in debug mode
 wp-env start --debug
 ```
 
-`wp-env` will output its config which includes `dockerComposeConfigPath`. 
+`wp-env` will output its config which includes `dockerComposeConfigPath`.
 
 ```sh
 ℹ Config:
@@ -312,7 +312,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 | ------------ | -------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
 | `"core"`     | `string\|null` | `null`                                 | The WordPress installation to use. If `null` is specified, `wp-env` will use the latest production release of WordPress.   |
 | `"plugins"`  | `string[]`     | `[]`                                   | A list of plugins to install and activate in the environment.                                                              |
-| `"themes"`   | `string[]`     | `[]`                                   | A list of themes to install in the environment. The first theme in the list will be activated.                             |
+| `"themes"`   | `string[]`     | `[]`                                   | A list of themes to install in the environment.                                                                            |
 | `"port"`     | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'. |
 | `"config"`   | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                |
 | `"mappings"` | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                             |
@@ -431,7 +431,7 @@ This is useful for integration testing: that is, testing how old versions of Wor
 
 #### Add mu-plugins and other mapped directories
 
-You can add mu-plugins via the mapping config. The mapping config also allows you to mount a directory to any location in the wordpress install, so you could even mount a subdirectory. Note here that theme-1, will not be activated, despite being the "first" mapped theme.
+You can add mu-plugins via the mapping config. The mapping config also allows you to mount a directory to any location in the wordpress install, so you could even mount a subdirectory. Note here that theme-1, will not be activated.
 
 ```json
 {
@@ -446,7 +446,7 @@ You can add mu-plugins via the mapping config. The mapping config also allows yo
 
 #### Avoid activating plugins or themes on the instance
 
-Since all plugins in the `plugins` key are activated by default, you should use the `mappings` key to avoid this behavior. This might be helpful if you have a test plugin that should not be activated all the time. The same applies for a theme which should not be activated.
+Since all plugins in the `plugins` key are activated by default, you should use the `mappings` key to avoid this behavior. This might be helpful if you have a test plugin that should not be activated all the time.
 
 ```json
 {

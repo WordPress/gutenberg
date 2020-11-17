@@ -1,6 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ColorPicker should commit changes to all views on blur 1`] = `
+.emotion-4 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+}
+
+.emotion-2 {
+  margin-bottom: 8px;
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+.emotion-0 {
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
 <div
   className="components-color-picker is-alpha-disabled"
 >
@@ -117,13 +135,13 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field"
+          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
         >
           <div
-            className="components-base-control__field"
+            className="components-base-control__field emotion-2 emotion-3"
           >
             <label
-              className="components-base-control__label"
+              className="components-base-control__label emotion-0 emotion-1"
               htmlFor="inspector-text-control-2"
             >
               Color value in hexadecimal
@@ -175,6 +193,24 @@ exports[`ColorPicker should commit changes to all views on blur 1`] = `
 `;
 
 exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = `
+.emotion-4 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+}
+
+.emotion-2 {
+  margin-bottom: 8px;
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+.emotion-0 {
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
 <div
   className="components-color-picker is-alpha-disabled"
 >
@@ -291,13 +327,13 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field"
+          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
         >
           <div
-            className="components-base-control__field"
+            className="components-base-control__field emotion-2 emotion-3"
           >
             <label
-              className="components-base-control__label"
+              className="components-base-control__label emotion-0 emotion-1"
               htmlFor="inspector-text-control-4"
             >
               Color value in hexadecimal
@@ -349,6 +385,24 @@ exports[`ColorPicker should commit changes to all views on keyDown = DOWN 1`] = 
 `;
 
 exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] = `
+.emotion-4 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+}
+
+.emotion-2 {
+  margin-bottom: 8px;
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+.emotion-0 {
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
 <div
   className="components-color-picker is-alpha-disabled"
 >
@@ -465,13 +519,13 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field"
+          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
         >
           <div
-            className="components-base-control__field"
+            className="components-base-control__field emotion-2 emotion-3"
           >
             <label
-              className="components-base-control__label"
+              className="components-base-control__label emotion-0 emotion-1"
               htmlFor="inspector-text-control-5"
             >
               Color value in hexadecimal
@@ -523,6 +577,24 @@ exports[`ColorPicker should commit changes to all views on keyDown = ENTER 1`] =
 `;
 
 exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
+.emotion-4 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+}
+
+.emotion-2 {
+  margin-bottom: 8px;
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+.emotion-0 {
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
 <div
   className="components-color-picker is-alpha-disabled"
 >
@@ -639,13 +711,13 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field"
+          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
         >
           <div
-            className="components-base-control__field"
+            className="components-base-control__field emotion-2 emotion-3"
           >
             <label
-              className="components-base-control__label"
+              className="components-base-control__label emotion-0 emotion-1"
               htmlFor="inspector-text-control-3"
             >
               Color value in hexadecimal
@@ -697,6 +769,24 @@ exports[`ColorPicker should commit changes to all views on keyDown = UP 1`] = `
 `;
 
 exports[`ColorPicker should only update input view for draft changes 1`] = `
+.emotion-4 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+}
+
+.emotion-2 {
+  margin-bottom: 8px;
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+.emotion-0 {
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
 <div
   className="components-color-picker is-alpha-disabled"
 >
@@ -813,13 +903,13 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field"
+          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
         >
           <div
-            className="components-base-control__field"
+            className="components-base-control__field emotion-2 emotion-3"
           >
             <label
-              className="components-base-control__label"
+              className="components-base-control__label emotion-0 emotion-1"
               htmlFor="inspector-text-control-1"
             >
               Color value in hexadecimal
@@ -871,6 +961,24 @@ exports[`ColorPicker should only update input view for draft changes 1`] = `
 `;
 
 exports[`ColorPicker should render color picker 1`] = `
+.emotion-4 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+}
+
+.emotion-2 {
+  margin-bottom: 8px;
+}
+
+.components-panel__row .emotion-2 {
+  margin-bottom: inherit;
+}
+
+.emotion-0 {
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
 <div
   className="components-color-picker is-alpha-disabled"
 >
@@ -987,13 +1095,13 @@ exports[`ColorPicker should render color picker 1`] = `
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field"
+          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
         >
           <div
-            className="components-base-control__field"
+            className="components-base-control__field emotion-2 emotion-3"
           >
             <label
-              className="components-base-control__label"
+              className="components-base-control__label emotion-0 emotion-1"
               htmlFor="inspector-text-control-0"
             >
               Color value in hexadecimal

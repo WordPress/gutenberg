@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isNumber, isString } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -16,12 +21,11 @@ import VisuallyHidden from '../visually-hidden';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';
+const MAX_FONT_SIZE_DISPLAY = '25px';
 
 function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
-		const fontSizeValue = fontSizes.find(
-			( font ) => font.size === Number( value )
-		);
+		const fontSizeValue = fontSizes.find( ( font ) => font.size === value );
 		return fontSizeValue ? fontSizeValue.slug : CUSTOM_FONT_SIZE;
 	}
 	return DEFAULT_FONT_SIZE;
@@ -41,7 +45,10 @@ function getSelectOptions( optionsArray, disableCustomFontSizes ) {
 	return optionsArray.map( ( option ) => ( {
 		key: option.slug,
 		name: option.name,
-		style: { fontSize: option.size },
+		size: option.size,
+		style: {
+			fontSize: `min( ${ option.size }, ${ MAX_FONT_SIZE_DISPLAY } )`,
+		},
 	} ) );
 }
 
@@ -53,6 +60,20 @@ export default function FontSizePicker( {
 	value,
 	withSlider = false,
 } ) {
+	const hasUnits =
+		isString( value ) ||
+		( fontSizes[ 0 ] && isString( fontSizes[ 0 ].size ) );
+
+	let noUnitsValue;
+	if ( ! hasUnits ) {
+		noUnitsValue = value;
+	} else {
+		noUnitsValue = parseInt( value );
+	}
+
+	const isPixelValue =
+		isNumber( value ) || ( isString( value ) && value.endsWith( 'px' ) );
+
 	const instanceId = useInstanceId( FontSizePicker );
 
 	const options = useMemo(
@@ -81,10 +102,11 @@ export default function FontSizePicker( {
 							( option ) => option.key === selectedFontSizeSlug
 						) }
 						onChange={ ( { selectedItem } ) => {
-							const selectedValue =
-								selectedItem.style &&
-								selectedItem.style.fontSize;
-							onChange( Number( selectedValue ) );
+							if ( hasUnits ) {
+								onChange( selectedItem.size );
+							} else {
+								onChange( Number( selectedItem.size ) );
+							}
 						} }
 					/>
 				) }
@@ -99,10 +121,14 @@ export default function FontSizePicker( {
 							type="number"
 							min={ 1 }
 							onChange={ ( event ) => {
-								onChange( Number( event.target.value ) );
+								if ( hasUnits ) {
+									onChange( event.target.value + 'px' );
+								} else {
+									onChange( Number( event.target.value ) );
+								}
 							} }
 							aria-label={ __( 'Custom' ) }
-							value={ value || '' }
+							value={ ( isPixelValue && noUnitsValue ) || '' }
 						/>
 					</div>
 				) }
@@ -122,10 +148,10 @@ export default function FontSizePicker( {
 				<RangeControl
 					className="components-font-size-picker__custom-input"
 					label={ __( 'Custom Size' ) }
-					value={ value || '' }
+					value={ ( isPixelValue && noUnitsValue ) || '' }
 					initialPosition={ fallbackFontSize }
 					onChange={ ( newValue ) => {
-						onChange( newValue );
+						onChange( hasUnits ? newValue + 'px' : newValue );
 					} }
 					min={ 12 }
 					max={ 100 }

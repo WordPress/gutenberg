@@ -34,7 +34,7 @@ program
 	.arguments( '[slug]' )
 	.option(
 		'-t, --template <name>',
-		'block template type name, allowed values: "es5", "esnext"',
+		'block template type name, allowed values: "es5", "esnext", or the name of an external npm package',
 		'esnext'
 	)
 	.option( '--namespace <value>', 'internal namespace for the block name' )
@@ -91,6 +91,8 @@ program
 						( { name } ) =>
 							! Object.keys( optionsValues ).includes( name )
 					);
+					log.info( '' );
+					log.info( "Let's customize your block:" );
 					const answers = await inquirer.prompt( prompts );
 					await scaffold( blockTemplate, {
 						...defaultValues,

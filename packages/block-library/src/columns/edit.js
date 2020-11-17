@@ -28,7 +28,7 @@ import {
  * Internal dependencies
  */
 import {
-	hasExplicitColumnWidths,
+	hasExplicitPercentColumnWidths,
 	getMappedColumnWidths,
 	getRedistributedColumnWidths,
 	toWidthPrecision,
@@ -89,7 +89,7 @@ function ColumnsEditContainer( {
 						label={ __( 'Columns' ) }
 						value={ count }
 						onChange={ ( value ) => updateColumns( count, value ) }
-						min={ 2 }
+						min={ 1 }
 						max={ Math.max( 6, count ) }
 					/>
 					{ count > 6 && (
@@ -145,7 +145,9 @@ const ColumnsEditContainerWrapper = withDispatch(
 			const { getBlocks } = registry.select( 'core/block-editor' );
 
 			let innerBlocks = getBlocks( clientId );
-			const hasExplicitWidths = hasExplicitColumnWidths( innerBlocks );
+			const hasExplicitWidths = hasExplicitPercentColumnWidths(
+				innerBlocks
+			);
 
 			// Redistribute available width for existing inner blocks.
 			const isAddingColumn = newColumns > previousColumns;
@@ -195,7 +197,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 				}
 			}
 
-			replaceInnerBlocks( clientId, innerBlocks, false );
+			replaceInnerBlocks( clientId, innerBlocks );
 		},
 	} )
 )( ColumnsEditContainer );
@@ -235,7 +237,8 @@ function Placeholder( { clientId, name, setAttributes } ) {
 							clientId,
 							createBlocksFromInnerBlocksTemplate(
 								nextVariation.innerBlocks
-							)
+							),
+							true
 						);
 					}
 				} }

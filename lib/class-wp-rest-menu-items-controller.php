@@ -44,7 +44,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 					'permission_callback' => array( $this, 'create_item_permissions_check' ),
 					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
 				),
-				'allow_batch' => true,
+				'allow_batch' => array( 'v1' => true ),
 				'schema'      => array( $this, 'get_public_item_schema' ),
 			)
 		);
@@ -93,7 +93,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 						),
 					),
 				),
-				'allow_batch' => true,
+				'allow_batch' => array( 'v1' => true ),
 				'schema'      => array( $this, 'get_public_item_schema' ),
 			)
 		);

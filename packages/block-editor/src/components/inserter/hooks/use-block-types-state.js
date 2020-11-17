@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
 import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
@@ -16,30 +15,19 @@ import { useSelect } from '@wordpress/data';
  * @return {Array} Returns the block types state. (block types, categories, collections, onSelect handler)
  */
 const useBlockTypesState = ( rootClientId, onInsert ) => {
-	const { categories, collections, items, fetchReusableBlocks } = useSelect(
+	const { categories, collections, items } = useSelect(
 		( select ) => {
-			const { getInserterItems, getSettings } = select(
-				'core/block-editor'
-			);
+			const { getInserterItems } = select( 'core/block-editor' );
 			const { getCategories, getCollections } = select( 'core/blocks' );
-			const { __experimentalFetchReusableBlocks } = getSettings();
 
 			return {
 				categories: getCategories(),
 				collections: getCollections(),
 				items: getInserterItems( rootClientId ),
-				fetchReusableBlocks: __experimentalFetchReusableBlocks,
 			};
 		},
 		[ rootClientId ]
 	);
-
-	// Fetch resuable blocks on mount
-	useEffect( () => {
-		if ( fetchReusableBlocks ) {
-			fetchReusableBlocks();
-		}
-	}, [] );
 
 	const onSelectItem = ( { name, initialAttributes, innerBlocks } ) => {
 		const insertedBlock = createBlock(

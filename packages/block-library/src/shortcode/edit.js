@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PlainText } from '@wordpress/block-editor';
+import { PlainText, useBlockProps } from '@wordpress/block-editor';
 import { useInstanceId } from '@wordpress/compose';
 import { Icon, shortcode } from '@wordpress/icons';
 
@@ -11,7 +11,7 @@ export default function ShortcodeEdit( { attributes, setAttributes } ) {
 	const inputId = `blocks-shortcode-input-${ instanceId }`;
 
 	return (
-		<div className="wp-block-shortcode components-placeholder">
+		<div { ...useBlockProps( { className: 'components-placeholder' } ) }>
 			<label
 				htmlFor={ inputId }
 				className="components-placeholder__label"
