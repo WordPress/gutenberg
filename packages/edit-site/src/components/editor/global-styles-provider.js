@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { set, get } from 'lodash';
+import { set, get, mapValues, mergeWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,11 +15,12 @@ import {
 } from '@wordpress/element';
 import { useEntityProp } from '@wordpress/core-data';
 import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import getGlobalStyles from './global-styles-renderer';
+import { default as getGlobalStyles } from './global-styles-renderer';
 
 const EMPTY_CONTENT = '{}';
 
@@ -27,11 +28,20 @@ const GlobalStylesContext = createContext( {
 	/* eslint-disable no-unused-vars */
 	getSetting: ( context, path ) => {},
 	setSetting: ( context, path, newValue ) => {},
-	getStyleProperty: ( context, propertyName ) => {},
+	getStyleProperty: ( context, propertyName, origin ) => {},
 	setStyleProperty: ( context, propertyName, newValue ) => {},
-	globalContext: {},
+	contexts: {},
 	/* eslint-enable no-unused-vars */
 } );
+
+const mergeTreesCustomizer = ( objValue, srcValue ) => {
+	// We only pass as arrays the presets,
+	// in which case we want the new array of values
+	// to override the old array (no merging).
+	if ( Array.isArray( srcValue ) ) {
+		return srcValue;
+	}
+};
 
 export const useGlobalStylesContext = () => useContext( GlobalStylesContext );
 
@@ -48,13 +58,27 @@ export const useGlobalStylesReset = () => {
 	];
 };
 
-export default ( { children, baseStyles, contexts } ) => {
+export default function GlobalStylesProvider( {
+	children,
+	baseStyles,
+	contexts,
+} ) {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
 
-	const userStyles = useMemo(
-		() => ( content ? JSON.parse( content ) : {} ),
-		[ content ]
-	);
+	const { userStyles, mergedStyles } = useMemo( () => {
+		const newUserStyles = content ? JSON.parse( content ) : {};
+		const newMergedStyles = mergeWith(
+			{},
+			baseStyles,
+			newUserStyles,
+			mergeTreesCustomizer
+		);
+
+		return {
+			userStyles: newUserStyles,
+			mergedStyles: newMergedStyles,
+		};
+	}, [ content ] );
 
 	const nextValue = useMemo(
 		() => ( {
@@ -71,11 +95,14 @@ export default ( { children, baseStyles, contexts } ) => {
 				set( contextSettings, path, newValue );
 				setContent( JSON.stringify( newContent ) );
 			},
-			getStyleProperty: ( context, propertyName ) =>
-				get(
-					userStyles?.[ context ]?.styles,
+			getStyleProperty: ( context, propertyName, origin = 'merged' ) => {
+				const styles = 'user' === origin ? userStyles : mergedStyles;
+
+				return get(
+					styles?.[ context ]?.styles,
 					STYLE_PROPERTY[ propertyName ]
-				),
+				);
+			},
 			setStyleProperty: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
 				let contextStyles = newContent?.[ context ]?.styles;
@@ -110,16 +137,27 @@ export default ( { children, baseStyles, contexts } ) => {
 				.appendChild( styleNode );
 		}
 
-		styleNode.innerText = getGlobalStyles(
-			contexts,
-			baseStyles,
-			userStyles
-		);
+		styleNode.innerText = getGlobalStyles( contexts, mergedStyles );
 	}, [ contexts, baseStyles, content ] );
+
+	const settings = useSelect( ( select ) =>
+		select( 'core/edit-site' ).getSettings()
+	);
+	const { updateSettings } = useDispatch( 'core/edit-site' );
+
+	useEffect( () => {
+		updateSettings( {
+			...settings,
+			__experimentalFeatures: mapValues(
+				mergedStyles,
+				( value ) => value?.settings || {}
+			),
+		} );
+	}, [ mergedStyles ] );
 
 	return (
 		<GlobalStylesContext.Provider value={ nextValue }>
 			{ children }
 		</GlobalStylesContext.Provider>
 	);
-};
+}

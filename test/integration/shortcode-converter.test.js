@@ -248,4 +248,55 @@ describe( 'segmentHTMLToShortcodeBlock', () => {
 		expect( transformed[ 3 ] ).toHaveProperty( 'name', 'test/gallery' );
 		expect( transformed[ 4 ] ).toBe( '</p>' );
 	} );
+
+	it( 'should convert regardless of shortcode order', () => {
+		const original = `<p>[my-gallery ids="4,5,6"]</p>
+<p>[my-broccoli id="42"]</p>`;
+
+		const transformed = segmentHTMLToShortcodeBlock( original, 0 );
+
+		expect( transformed[ 0 ] ).toBe( '<p>' );
+
+		let firstExpectedBlock = createBlock( 'test/gallery', {
+			ids: [ 4, 5, 6 ],
+		} );
+		// clientId will always be random.
+		firstExpectedBlock.clientId = transformed[ 1 ].clientId;
+		expect( transformed[ 1 ] ).toEqual( firstExpectedBlock );
+
+		expect( transformed[ 2 ] ).toBe( '</p>\n<p>' );
+
+		let secondExpectedBlock = createBlock( 'test/broccoli', { id: 42 } );
+		// clientId will always be random.
+		secondExpectedBlock.clientId = transformed[ 3 ].clientId;
+		expect( transformed[ 3 ] ).toEqual( secondExpectedBlock );
+
+		expect( transformed[ 4 ] ).toBe( '</p>' );
+		expect( transformed ).toHaveLength( 5 );
+
+		// Flip the order of the shortcodes.
+		const reversed = `<p>[my-broccoli id="42"]</p>
+<p>[my-gallery ids="4,5,6"]</p>`;
+
+		const reverseTransformed = segmentHTMLToShortcodeBlock( reversed, 0 );
+
+		expect( reverseTransformed[ 0 ] ).toBe( '<p>' );
+
+		firstExpectedBlock = createBlock( 'test/broccoli', { id: 42 } );
+		// clientId will always be random.
+		firstExpectedBlock.clientId = reverseTransformed[ 1 ].clientId;
+		expect( reverseTransformed[ 1 ] ).toEqual( firstExpectedBlock );
+
+		expect( reverseTransformed[ 2 ] ).toBe( '</p>\n<p>' );
+
+		secondExpectedBlock = createBlock( 'test/gallery', {
+			ids: [ 4, 5, 6 ],
+		} );
+		// clientId will always be random.
+		secondExpectedBlock.clientId = reverseTransformed[ 3 ].clientId;
+		expect( reverseTransformed[ 3 ] ).toEqual( secondExpectedBlock );
+
+		expect( reverseTransformed[ 4 ] ).toBe( '</p>' );
+		expect( reverseTransformed ).toHaveLength( 5 );
+	} );
 } );

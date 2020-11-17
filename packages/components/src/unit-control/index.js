@@ -8,6 +8,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { forwardRef, useRef } from '@wordpress/element';
+import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -48,11 +49,8 @@ function UnitControl(
 		initial: initialUnit,
 	} );
 
-	/*
-	 * Storing parsed unit changes to be applied during the onChange callback
-	 * cycle.
-	 */
-	const nextParsedUnitRef = useRef();
+	// Stores parsed value for hand-off in state reducer
+	const refParsedValue = useRef( null );
 
 	const classes = classnames( 'components-unit-control', className );
 
@@ -66,30 +64,9 @@ function UnitControl(
 		 * Customizing the onChange callback.
 		 * This allows as to broadcast a combined value+unit to onChange.
 		 */
-		const [ parsedValue, parsedUnit ] = getValidParsedUnit(
-			next,
-			units,
-			value,
-			unit
-		);
-		const nextParsedUnit = nextParsedUnitRef.current;
+		next = getValidParsedUnit( next, units, value, unit ).join( '' );
 
-		/*
-		 * If we've noticed a (parsed) unit change, which would have been
-		 * stored in nextParsedUnitRef, we'll update our local unit set,
-		 * as well as fire the onUnitChange callback.
-		 */
-		if ( nextParsedUnit ) {
-			onUnitChange( nextParsedUnit, changeProps );
-			setUnit( nextParsedUnit );
-			// We have to reset this ref value to properly track new changes.
-			nextParsedUnitRef.current = null;
-		}
-
-		const nextUnit = nextParsedUnit || parsedUnit;
-		const nextValue = `${ parsedValue }${ nextUnit }`;
-
-		onChange( nextValue, changeProps );
+		onChange( next, changeProps );
 	};
 
 	const handleOnUnitChange = ( next, changeProps ) => {
@@ -107,6 +84,42 @@ function UnitControl(
 		setUnit( next );
 	};
 
+	const mayUpdateUnit = ( event ) => {
+		if ( ! isNaN( event.target.value ) ) {
+			refParsedValue.current = null;
+			return;
+		}
+		const [ parsedValue, parsedUnit ] = getValidParsedUnit(
+			event.target.value,
+			units,
+			value,
+			unit
+		);
+
+		refParsedValue.current = parsedValue;
+
+		if ( isPressEnterToChange && parsedUnit !== unit ) {
+			const data = units.find(
+				( option ) => option.value === parsedUnit
+			);
+			const changeProps = { event, data };
+
+			onChange( `${ parsedValue }${ parsedUnit }`, changeProps );
+			onUnitChange( parsedUnit, changeProps );
+
+			setUnit( parsedUnit );
+		}
+	};
+
+	const handleOnBlur = mayUpdateUnit;
+
+	const handleOnKeyDown = ( event ) => {
+		const { keyCode } = event;
+		if ( keyCode === ENTER ) {
+			mayUpdateUnit( event );
+		}
+	};
+
 	/**
 	 * "Middleware" function that intercepts updates from InputControl.
 	 * This allows us to tap into actions to transform the (next) state for
@@ -117,39 +130,15 @@ function UnitControl(
 	 * @return {Object} The updated state to apply to InputControl
 	 */
 	const unitControlStateReducer = ( state, action ) => {
-		const { type, payload } = action;
-		const event = payload?.event;
-
 		/*
-		 * Customizes the commit interaction.
-		 *
-		 * This occurs when pressing ENTER to fire a change.
-		 * By intercepting the state change, we can parse the incoming
-		 * value to determine if the unit needs to be updated.
+		 * On commits (when pressing ENTER and on blur if
+		 * isPressEnterToChange is true), if a parse has been performed
+		 * then use that result to update the state.
 		 */
-		if ( type === inputControlActionTypes.COMMIT ) {
-			const valueToParse = event?.target?.value;
-
-			const [ parsedValue, parsedUnit ] = getValidParsedUnit(
-				valueToParse,
-				units,
-				value,
-				unit
-			);
-
-			state.value = parsedValue;
-
-			// Update unit if the incoming parsed unit is different.
-			if ( unit !== parsedUnit ) {
-				/*
-				 * We start by storing the next parsedUnit value in our
-				 * nextParsedUnitRef. We can't set the unit during this
-				 * stateReducer callback as it cause state update
-				 * conflicts within React's render cycle.
-				 *
-				 * https://github.com/facebook/react/issues/18178
-				 */
-				nextParsedUnitRef.current = parsedUnit;
+		if ( action.type === inputControlActionTypes.COMMIT ) {
+			if ( refParsedValue.current !== null ) {
+				state.value = refParsedValue.current;
+				refParsedValue.current = null;
 			}
 		}
 
@@ -179,6 +168,8 @@ function UnitControl(
 				disableUnits={ disableUnits }
 				isPressEnterToChange={ isPressEnterToChange }
 				label={ label }
+				onBlur={ handleOnBlur }
+				onKeyDown={ handleOnKeyDown }
 				onChange={ handleOnChange }
 				ref={ ref }
 				size={ size }

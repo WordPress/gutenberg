@@ -88,6 +88,7 @@ function ColorGradientControlInner( {
 	onGradientChange,
 	colorValue,
 	gradientValue,
+	clearable,
 } ) {
 	const canChooseAColor =
 		onColorChange && ( ! isEmpty( colors ) || ! disableCustomColors );
@@ -151,6 +152,7 @@ function ColorGradientControlInner( {
 								: onColorChange
 						}
 						{ ...{ colors, disableCustomColors } }
+						clearable={ clearable }
 					/>
 				) }
 				{ ( currentTab === 'gradient' || ! canChooseAColor ) && (
@@ -165,6 +167,7 @@ function ColorGradientControlInner( {
 								: onGradientChange
 						}
 						{ ...{ gradients, disableCustomGradients } }
+						clearable={ clearable }
 					/>
 				) }
 			</fieldset>

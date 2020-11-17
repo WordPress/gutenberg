@@ -137,5 +137,9 @@ exports[`Multi-block selection should set attributes for multiple paragraphs 1`]
 exports[`Multi-block selection should use selection direction to determine vertical edge 1`] = `
 "<!-- wp:paragraph -->
 <p>1<br>2.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>3</p>
 <!-- /wp:paragraph -->"
 `;

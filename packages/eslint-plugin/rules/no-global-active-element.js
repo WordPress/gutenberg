@@ -10,7 +10,8 @@ module.exports = {
 			) {
 				context.report( {
 					node,
-					message: 'Avoid global active element',
+					message:
+						'Avoid accessing the active element with a global. Use the ownerDocument property on a node ref instead.',
 				} );
 			},
 		};

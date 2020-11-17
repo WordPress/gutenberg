@@ -731,6 +731,42 @@ describe( 'readConfig', () => {
 			} );
 		} );
 
+		it( 'should not overwrite port number for WP_HOME if set', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						port: 1000,
+						testsPort: 2000,
+						config: {
+							WP_HOME: 'http://localhost:3000/',
+						},
+					} )
+				)
+			);
+			const config = await readConfig( '.wp-env.json' );
+			// Custom port is overriden while testsPort gets the deault value.
+			expect( config ).toMatchObject( {
+				env: {
+					development: {
+						port: 1000,
+						config: {
+							WP_TESTS_DOMAIN: 'http://localhost:1000/',
+							WP_SITEURL: 'http://localhost:1000/',
+							WP_HOME: 'http://localhost:3000/',
+						},
+					},
+					tests: {
+						port: 2000,
+						config: {
+							WP_TESTS_DOMAIN: 'http://localhost:2000/',
+							WP_SITEURL: 'http://localhost:2000/',
+							WP_HOME: 'http://localhost:3000/',
+						},
+					},
+				},
+			} );
+		} );
+
 		it( 'should throw an error if the port number environment variable is invalid', async () => {
 			readFile.mockImplementation( () =>
 				Promise.resolve( JSON.stringify( {} ) )

@@ -13,6 +13,25 @@ function getComputedStyle( node ) {
 }
 
 /**
+ * Gets the height of the range without ignoring zero width rectangles, which
+ * some browsers ignore when creating a union.
+ *
+ * @param {Range} range The range to check.
+ */
+function getRangeHeight( range ) {
+	const rects = Array.from( range.getClientRects() );
+
+	if ( ! rects.length ) {
+		return;
+	}
+
+	const highestTop = Math.min( ...rects.map( ( { top } ) => top ) );
+	const lowestBottom = Math.max( ...rects.map( ( { bottom } ) => bottom ) );
+
+	return lowestBottom - highestTop;
+}
+
+/**
  * Returns true if the given selection object is in the forward direction, or
  * false otherwise.
  *
@@ -88,73 +107,52 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return false;
 	}
 
-	const originalRange = selection.getRangeAt( 0 );
-	const range = originalRange.cloneRange();
+	const range = selection.getRangeAt( 0 );
+	const collapsedRange = range.cloneRange();
 	const isForward = isSelectionForward( selection );
 	const isCollapsed = selection.isCollapsed;
 
 	// Collapse in direction of selection.
 	if ( ! isCollapsed ) {
-		range.collapse( ! isForward );
+		collapsedRange.collapse( ! isForward );
 	}
 
+	const collapsedRangeRect = getRectangleFromRange( collapsedRange );
 	const rangeRect = getRectangleFromRange( range );
 
-	if ( ! rangeRect ) {
+	if ( ! collapsedRangeRect || ! rangeRect ) {
 		return false;
 	}
 
-	const computedStyle = getComputedStyle( container );
-	const lineHeight = parseInt( computedStyle.lineHeight, 10 ) || 0;
-
 	// Only consider the multiline selection at the edge if the direction is
-	// towards the edge.
+	// towards the edge. The selection is multiline if it is taller than the
+	// collapsed  selection.
 	if (
 		! isCollapsed &&
-		rangeRect.height > lineHeight &&
+		getRangeHeight( range ) > collapsedRangeRect.height &&
 		isForward === isReverse
 	) {
 		return false;
 	}
 
-	const padding =
-		parseInt(
-			computedStyle[ `padding${ isReverse ? 'Top' : 'Bottom' }` ],
-			10
-		) || 0;
-
-	// Calculate a buffer that is half the line height. In some browsers, the
-	// selection rectangle may not fill the entire height of the line, so we add
-	// 3/4 the line height to the selection rectangle to ensure that it is well
-	// over its line boundary.
-	const buffer = ( 3 * parseInt( lineHeight, 10 ) ) / 4;
-	const containerRect = container.getBoundingClientRect();
-	const originalRangeRect = getRectangleFromRange( originalRange );
-	const verticalEdge = isReverse
-		? containerRect.top + padding > originalRangeRect.top - buffer
-		: containerRect.bottom - padding < originalRangeRect.bottom + buffer;
-
-	if ( ! verticalEdge ) {
-		return false;
-	}
-
-	if ( onlyVertical ) {
-		return true;
-	}
-
 	// In the case of RTL scripts, the horizontal edge is at the opposite side.
-	const { direction } = computedStyle;
+	const { direction } = getComputedStyle( container );
 	const isReverseDir = direction === 'rtl' ? ! isReverse : isReverse;
 
-	// To calculate the horizontal position, we insert a test range and see if
-	// this test range has the same horizontal position. This method proves to
-	// be better than a DOM-based calculation, because it ignores empty text
-	// nodes and a trailing line break element. In other words, we need to check
-	// visual positioning, not DOM positioning.
+	const containerRect = container.getBoundingClientRect();
+
+	// To check if a selection is at the edge, we insert a test selection at the
+	// edge of the container and check if the selections have the same vertical
+	// or horizontal position. If they do, the selection is at the edge.
+	// This method proves to be better than a DOM-based calculation for the
+	// horizontal edge, since it ignores empty textnodes and a trailing line
+	// break element. In other words, we need to check visual positioning, not
+	// DOM positioning.
+	// It also proves better than using the computed style for the vertical
+	// edge, because we cannot know the padding and line height reliably in
+	// pixels. `getComputedStyle` may return a value with different units.
 	const x = isReverseDir ? containerRect.left + 1 : containerRect.right - 1;
-	const y = isReverse
-		? containerRect.top + buffer
-		: containerRect.bottom - buffer;
+	const y = isReverse ? containerRect.top + 1 : containerRect.bottom - 1;
 	const testRange = hiddenCaretRangeFromPoint(
 		ownerDocument,
 		x,
@@ -166,11 +164,25 @@ function isEdge( container, isReverse, onlyVertical ) {
 		return false;
 	}
 
-	const side = isReverseDir ? 'left' : 'right';
 	const testRect = getRectangleFromRange( testRange );
 
+	if ( ! testRect ) {
+		return false;
+	}
+
+	const verticalSide = isReverse ? 'top' : 'bottom';
+	const horizontalSide = isReverseDir ? 'left' : 'right';
+	const verticalDiff = testRect[ verticalSide ] - rangeRect[ verticalSide ];
+	const horizontalDiff =
+		testRect[ horizontalSide ] - collapsedRangeRect[ horizontalSide ];
+
 	// Allow the position to be 1px off.
-	return Math.abs( testRect[ side ] - rangeRect[ side ] ) <= 1;
+	const hasVerticalDiff = Math.abs( verticalDiff ) <= 1;
+	const hasHorizontalDiff = Math.abs( horizontalDiff ) <= 1;
+
+	return onlyVertical
+		? hasVerticalDiff
+		: hasVerticalDiff && hasHorizontalDiff;
 }
 
 /**

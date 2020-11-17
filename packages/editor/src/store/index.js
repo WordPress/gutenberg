@@ -8,7 +8,6 @@ import { controls as dataControls } from '@wordpress/data-controls';
  * Internal dependencies
  */
 import reducer from './reducer';
-import applyMiddlewares from './middlewares';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import controls from './controls';
@@ -35,6 +34,5 @@ const store = registerStore( STORE_KEY, {
 	...storeConfig,
 	persist: [ 'preferences' ],
 } );
-applyMiddlewares( store );
 
 export default store;

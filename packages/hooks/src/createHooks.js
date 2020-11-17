@@ -11,11 +11,11 @@ import createDidHook from './createDidHook';
 
 /**
  * Returns an instance of the hooks object.
- *
- * @return {Object} Object that contains all hooks.
  */
 function createHooks() {
+	/** @type {import('.').Hooks} */
 	const actions = Object.create( null );
+	/** @type {import('.').Hooks} */
 	const filters = Object.create( null );
 	actions.__current = [];
 	filters.__current = [];

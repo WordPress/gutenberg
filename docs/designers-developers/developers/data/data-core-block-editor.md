@@ -160,16 +160,22 @@ _Returns_
 
 <a name="getBlockInsertionPoint" href="#getBlockInsertionPoint">#</a> **getBlockInsertionPoint**
 
-Returns the insertion point, the index at which the new inserted block would
-be placed. Defaults to the last index.
+Returns the insertion point. This will be:
+
+1) The insertion point manually set using setInsertionPoint() or
+   showInsertionPoint(); or
+2) The point after the current block selection, if there is a selection; or
+3) The point at the end of the block list.
+
+Components like <Inserter> will default to inserting blocks at this point.
 
 _Parameters_
 
--   _state_ `Object`: Editor state.
+-   _state_ `Object`: Global application state.
 
 _Returns_
 
--   `Object`: Insertion point object with `rootClientId`, `index`.
+-   `Object`: Insertion point object with `rootClientId` and `index`.
 
 <a name="getBlockListSettings" href="#getBlockListSettings">#</a> **getBlockListSettings**
 
@@ -243,15 +249,17 @@ _Returns_
 
 <a name="getBlockParentsByBlockName" href="#getBlockParentsByBlockName">#</a> **getBlockParentsByBlockName**
 
-Given a block client ID and a block name,
-returns the list of all its parents from top to bottom,
-filtered by the given name.
+Given a block client ID and a block name, returns the list of all its parents
+from top to bottom, filtered by the given name(s). For example, if passed
+'core/group' as the blockName, it will only return parents which are group
+blocks. If passed `[ 'core/group', 'core/cover']`, as the blockName, it will
+return parents which are group blocks and parents which are cover blocks.
 
 _Parameters_
 
 -   _state_ `Object`: Editor state.
 -   _clientId_ `string`: Block from which to find root client ID.
--   _blockName_ `string`: Block name to filter.
+-   _blockName_ `(string|Array<string>)`: Block name(s) to filter.
 -   _ascending_ `boolean`: Order results from bottom to top (true) or top to bottom (false).
 
 _Returns_
@@ -810,7 +818,8 @@ _Returns_
 
 <a name="isBlockInsertionPointVisible" href="#isBlockInsertionPointVisible">#</a> **isBlockInsertionPointVisible**
 
-Returns true if we should show the block insertion point.
+Whether or not the insertion point should be shown to users. This is set
+using showInsertionPoint() or hideInsertionPoint().
 
 _Parameters_
 
@@ -818,7 +827,7 @@ _Parameters_
 
 _Returns_
 
--   `?boolean`: Whether the insertion point is visible or not.
+-   `?boolean`: Whether the insertion point should be shown.
 
 <a name="isBlockMultiSelected" href="#isBlockMultiSelected">#</a> **isBlockMultiSelected**
 
@@ -1046,7 +1055,7 @@ _Parameters_
 
 <a name="hideInsertionPoint" href="#hideInsertionPoint">#</a> **hideInsertionPoint**
 
-Returns an action object hiding the insertion point.
+Hides the insertion point for users.
 
 _Returns_
 
@@ -1248,7 +1257,7 @@ _Parameters_
 
 -   _rootClientId_ `string`: Client ID of the block whose InnerBlocks will re replaced.
 -   _blocks_ `Array<Object>`: Block objects to insert as new InnerBlocks
--   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to true.
+-   _updateSelection_ `?boolean`: If true block selection will be updated. If false, block selection will not change. Defaults to false.
 
 _Returns_
 
@@ -1371,13 +1380,14 @@ _Returns_
 
 <a name="showInsertionPoint" href="#showInsertionPoint">#</a> **showInsertionPoint**
 
-Returns an action object used in signalling that the insertion point should
-be shown.
+Sets the insertion point and shows it to users.
+
+Components like <Inserter> will default to inserting blocks at this point.
 
 _Parameters_
 
--   _rootClientId_ `?string`: Optional root client ID of block list on which to insert.
--   _index_ `?number`: Index at which block should be inserted.
+-   _rootClientId_ `?string`: Root client ID of block list in which to insert. Use `undefined` for the root block list.
+-   _index_ `number`: Index at which block should be inserted.
 
 _Returns_
 

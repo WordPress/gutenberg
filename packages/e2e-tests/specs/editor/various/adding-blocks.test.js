@@ -9,6 +9,7 @@ import {
 	setBrowserViewport,
 	closeGlobalBlockInserter,
 	searchForBlock,
+	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
@@ -137,6 +138,7 @@ describe( 'adding blocks', () => {
 	it( 'should not allow transfer of focus outside of the block-insertion menu once open', async () => {
 		// Enter the default block and click the inserter toggle button to the left of it.
 		await page.keyboard.press( 'ArrowDown' );
+		await showBlockToolbar();
 		await page.click(
 			'.block-editor-block-list__empty-block-inserter .block-editor-inserter__toggle'
 		);
@@ -257,6 +259,10 @@ describe( 'adding blocks', () => {
 			inserterMenuInputSelector
 		);
 		inserterMenuSearchInput.type( 'cover' );
+		// We need to wait a bit after typing otherwise we might an "early" result
+		// that is going to be "detached" when trying to click on it
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitFor( 100 );
 		const coverBlock = await page.waitForSelector(
 			'.block-editor-block-types-list .editor-block-list-item-cover'
 		);
@@ -269,6 +275,13 @@ describe( 'adding blocks', () => {
 		// First insert a random Paragraph.
 		await insertBlock( 'Paragraph' );
 		await page.keyboard.type( 'First paragraph' );
+		await insertBlock( 'Image' );
+		await showBlockToolbar();
+		const paragraphBlock = await page.$(
+			'p[aria-label="Paragraph block"]'
+		);
+		paragraphBlock.click();
+		await showBlockToolbar();
 
 		// Open the global inserter and search for the Heading block.
 		await searchForBlock( 'Heading' );
@@ -285,14 +298,25 @@ describe( 'adding blocks', () => {
 			'.block-editor-block-list__insertion-point-indicator'
 		);
 		const indicatorRect = await indicator.boundingBox();
-
-		const paragraphBlock = await page.$(
-			'p[aria-label="Paragraph block"]'
-		);
 		const paragraphRect = await paragraphBlock.boundingBox();
 
 		// The blue line indicator should be below the last block.
 		expect( indicatorRect.x ).toBe( paragraphRect.x );
 		expect( indicatorRect.y > paragraphRect.y ).toBe( true );
+	} );
+
+	// Check for regression of https://github.com/WordPress/gutenberg/issues/24403
+	it( 'inserts a block in proper place after having clicked `Browse All` from block appender', async () => {
+		await insertBlock( 'Group' );
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Paragraph after group' );
+		await page.click( '[data-type="core/group"] [aria-label="Add block"]' );
+		const browseAll = await page.waitForXPath(
+			'//button[text()="Browse all"]'
+		);
+		await browseAll.click();
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type( 'Paragraph inside group' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

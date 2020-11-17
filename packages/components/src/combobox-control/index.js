@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __, _n, sprintf } from '@wordpress/i18n';
@@ -26,6 +31,7 @@ function ComboboxControl( {
 	hideLabelFromVision,
 	help,
 	allowReset = true,
+	className,
 	messages = {
 		selected: __( 'Item selected.' ),
 	},
@@ -155,7 +161,7 @@ function ComboboxControl( {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<BaseControl
-			className="components-combobox-control"
+			className={ classnames( className, 'components-combobox-control' ) }
 			tabIndex="-1"
 			label={ label }
 			id={ `components-form-token-input-${ instanceId }` }

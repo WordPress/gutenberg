@@ -47,6 +47,7 @@ function Snackbar(
 		politeness = 'polite',
 		actions = [],
 		onRemove = noop,
+		icon = null,
 	},
 	ref
 ) {
@@ -69,6 +70,13 @@ function Snackbar(
 		actions = [ actions[ 0 ] ];
 	}
 
+	const snackbarContentClassnames = classnames(
+		'components-snackbar__content',
+		{
+			'components-snackbar__content-with-icon': !! icon,
+		}
+	);
+
 	return (
 		<div
 			ref={ ref }
@@ -79,7 +87,10 @@ function Snackbar(
 			onKeyPress={ onRemove }
 			aria-label={ __( 'Dismiss this notice' ) }
 		>
-			<div className="components-snackbar__content">
+			<div className={ snackbarContentClassnames }>
+				{ icon && (
+					<div className="components-snackbar__icon">{ icon }</div>
+				) }
 				{ children }
 				{ actions.map( ( { label, onClick, url }, index ) => {
 					return (

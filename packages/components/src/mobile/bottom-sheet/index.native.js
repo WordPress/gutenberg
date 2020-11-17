@@ -7,9 +7,9 @@ import {
 	Platform,
 	PanResponder,
 	Dimensions,
-	ScrollView,
 	Keyboard,
 	StatusBar,
+	ScrollView,
 	TouchableHighlight,
 } from 'react-native';
 import Modal from 'react-native-modal';
@@ -284,9 +284,9 @@ class BottomSheet extends Component {
 			contentStyle = {},
 			getStylesFromColorScheme,
 			onDismiss,
-			isChildrenScrollable,
 			children,
 			withHeaderSeparator = false,
+			hasNavigation,
 			...rest
 		} = this.props;
 		const {
@@ -343,8 +343,6 @@ class BottomSheet extends Component {
 				styles.content,
 				hideHeader && styles.emptyHeader,
 				contentStyle,
-				isChildrenScrollable && this.getContentStyle(),
-				contentStyle,
 				isFullScreen && { flexGrow: 1 },
 			],
 			style: listStyle,
@@ -353,7 +351,7 @@ class BottomSheet extends Component {
 			automaticallyAdjustContentInsets: false,
 		};
 
-		const WrapperView = isChildrenScrollable ? View : ScrollView;
+		const WrapperView = hasNavigation ? View : ScrollView;
 
 		const getHeader = () => (
 			<>
@@ -370,7 +368,6 @@ class BottomSheet extends Component {
 				{ withHeaderSeparator && <View style={ styles.separator } /> }
 			</>
 		);
-
 		return (
 			<Modal
 				isVisible={ isVisible }
@@ -421,7 +418,7 @@ class BottomSheet extends Component {
 					) }
 					{ ! hideHeader && getHeader() }
 					<WrapperView
-						{ ...( isChildrenScrollable
+						{ ...( hasNavigation
 							? { style: listProps.style }
 							: listProps ) }
 					>
@@ -438,14 +435,25 @@ class BottomSheet extends Component {
 									.onHandleHardwareButtonPress,
 								listProps,
 								setIsFullScreen: this.setIsFullScreen,
+								safeAreaBottomInset,
 							} }
 						>
-							<TouchableHighlight accessible={ false }>
+							{ hasNavigation ? (
 								<>{ children }</>
-							</TouchableHighlight>
+							) : (
+								<TouchableHighlight accessible={ false }>
+									<>{ children }</>
+								</TouchableHighlight>
+							) }
 						</BottomSheetProvider>
-						{ ! isChildrenScrollable && (
-							<View style={ { height: safeAreaBottomInset } } />
+						{ ! hasNavigation && (
+							<View
+								style={ {
+									height:
+										safeAreaBottomInset ||
+										styles.scrollableContent.paddingBottom,
+								} }
+							/>
 						) }
 					</WrapperView>
 				</KeyboardAvoidingView>

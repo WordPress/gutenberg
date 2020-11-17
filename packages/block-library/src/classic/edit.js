@@ -6,7 +6,7 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { BlockControls } from '@wordpress/block-editor';
+import { BlockControls, useBlockProps } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -220,19 +220,21 @@ export default function ClassicEdit( {
 					<ConvertToBlocksButton clientId={ clientId } />
 				</ToolbarGroup>
 			</BlockControls>
-			<div
-				key="toolbar"
-				id={ `toolbar-${ clientId }` }
-				className="block-library-classic__toolbar"
-				onClick={ focus }
-				data-placeholder={ __( 'Classic' ) }
-				onKeyDown={ onToolbarKeyDown }
-			/>
-			<div
-				key="editor"
-				id={ `editor-${ clientId }` }
-				className="wp-block-freeform block-library-rich-text__tinymce"
-			/>
+			<div { ...useBlockProps() }>
+				<div
+					key="toolbar"
+					id={ `toolbar-${ clientId }` }
+					className="block-library-classic__toolbar"
+					onClick={ focus }
+					data-placeholder={ __( 'Classic' ) }
+					onKeyDown={ onToolbarKeyDown }
+				/>
+				<div
+					key="editor"
+					id={ `editor-${ clientId }` }
+					className="wp-block-freeform block-library-rich-text__tinymce"
+				/>
+			</div>
 		</>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */

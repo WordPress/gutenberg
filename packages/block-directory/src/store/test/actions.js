@@ -81,7 +81,7 @@ describe( 'actions', () => {
 				args: [],
 				selectorName: 'getBlockTypes',
 				storeKey: 'core/blocks',
-				type: '@@data/RESOLVE_SELECT',
+				type: '@@data/SELECT',
 			} );
 
 			expect( generator.next( [ block ] ).value ).toEqual( {
@@ -143,7 +143,7 @@ describe( 'actions', () => {
 				args: [],
 				selectorName: 'getBlockTypes',
 				storeKey: 'core/blocks',
-				type: '@@data/RESOLVE_SELECT',
+				type: '@@data/SELECT',
 			} );
 
 			expect( generator.next( [ inactiveBlock ] ).value ).toEqual( {

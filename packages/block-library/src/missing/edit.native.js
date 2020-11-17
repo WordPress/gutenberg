@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { View, Text, TouchableWithoutFeedback } from 'react-native';
+import {
+	View,
+	Text,
+	TouchableWithoutFeedback,
+	TouchableHighlight,
+} from 'react-native';
 
 /**
  * WordPress dependencies
@@ -18,7 +23,7 @@ import { normalizeIconObject } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { help, plugins } from '@wordpress/icons';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { applyFilters } from '@wordpress/hooks';
 
 /**
@@ -31,12 +36,20 @@ export class UnsupportedBlockEdit extends Component {
 		super( props );
 		this.state = { showHelp: false };
 		this.toggleSheet = this.toggleSheet.bind( this );
+		this.closeSheet = this.closeSheet.bind( this );
 		this.requestFallback = this.requestFallback.bind( this );
+		this.onHelpButtonPressed = this.onHelpButtonPressed.bind( this );
 	}
 
 	toggleSheet() {
 		this.setState( {
 			showHelp: ! this.state.showHelp,
+		} );
+	}
+
+	closeSheet() {
+		this.setState( {
+			showHelp: false,
 		} );
 	}
 
@@ -53,15 +66,28 @@ export class UnsupportedBlockEdit extends Component {
 		);
 
 		return (
-			<View style={ styles.helpIconContainer }>
+			<TouchableHighlight
+				onPress={ this.onHelpButtonPressed }
+				style={ styles.helpIconContainer }
+				accessibilityLabel={ __( 'Help button' ) }
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Tap here to show help' ) }
+			>
 				<Icon
 					className="unsupported-icon-help"
 					label={ __( 'Help icon' ) }
 					icon={ help }
 					color={ infoIconStyle.color }
 				/>
-			</View>
+			</TouchableHighlight>
 		);
+	}
+
+	onHelpButtonPressed() {
+		if ( ! this.props.isSelected ) {
+			this.props.selectBlock();
+		}
+		this.toggleSheet();
 	}
 
 	requestFallback() {
@@ -123,7 +149,7 @@ export class UnsupportedBlockEdit extends Component {
 			<BottomSheet
 				isVisible={ this.state.showHelp }
 				hideHeader
-				onClose={ this.toggleSheet }
+				onClose={ this.closeSheet }
 				onModalHide={ () => {
 					if ( this.state.sendFallbackMessage ) {
 						// On iOS, onModalHide is called when the controller is still part of the hierarchy.
@@ -251,6 +277,14 @@ export default compose( [
 			canEnableUnsupportedBlockEditor:
 				getSettings( 'capabilities' )
 					.canEnableUnsupportedBlockEditor === true,
+		};
+	} ),
+	withDispatch( ( dispatch, ownProps ) => {
+		const { selectBlock } = dispatch( 'core/block-editor' );
+		return {
+			selectBlock() {
+				selectBlock( ownProps.clientId );
+			},
 		};
 	} ),
 	withPreferredColorScheme,

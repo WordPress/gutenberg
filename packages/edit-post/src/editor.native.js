@@ -43,9 +43,7 @@ class Editor extends Component {
 		hasFixedToolbar,
 		focusMode,
 		hiddenBlockTypes,
-		blockTypes,
-		colors,
-		gradients
+		blockTypes
 	) {
 		settings = {
 			...settings,
@@ -56,6 +54,11 @@ class Editor extends Component {
 
 		// Omit hidden block types if exists and non-empty.
 		if ( size( hiddenBlockTypes ) > 0 ) {
+			if ( settings.allowedBlockTypes === undefined ) {
+				// if no specific flags for allowedBlockTypes are set, assume `true`
+				// meaning allow all block types
+				settings.allowedBlockTypes = true;
+			}
 			// Defer to passed setting for `allowedBlockTypes` if provided as
 			// anything other than `true` (where `true` is equivalent to allow
 			// all block types).
@@ -68,14 +71,6 @@ class Editor extends Component {
 				defaultAllowedBlockTypes,
 				...hiddenBlockTypes
 			);
-		}
-
-		if ( colors !== undefined ) {
-			settings.colors = colors;
-		}
-
-		if ( gradients !== undefined ) {
-			settings.gradients = gradients;
 		}
 
 		return settings;
@@ -119,8 +114,6 @@ class Editor extends Component {
 			post,
 			postId,
 			postType,
-			colors,
-			gradients,
 			initialHtml,
 			editorMode,
 			...props
@@ -131,9 +124,7 @@ class Editor extends Component {
 			hasFixedToolbar,
 			focusMode,
 			hiddenBlockTypes,
-			blockTypes,
-			colors,
-			gradients
+			blockTypes
 		);
 
 		const normalizedPost = post || {
@@ -190,7 +181,6 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
-
 		return {
 			switchEditorMode,
 		};

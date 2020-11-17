@@ -17,6 +17,7 @@ import {
 /**
  * Internal dependencies
  */
+import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 
@@ -49,6 +50,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			useSubRegistry={ false }
 		>
 			<BlockEditorKeyboardShortcuts />
+			<TemplatePartConverter />
 			<__experimentalLinkControl.ViewerFill>
 				{ useCallback(
 					( fillProps ) => (
