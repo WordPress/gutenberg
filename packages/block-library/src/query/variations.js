@@ -29,7 +29,7 @@ const variations = [
 				tagIds: [],
 				order: 'desc',
 				orderBy: 'date',
-				autor: '',
+				author: '',
 				search: '',
 				sticky: 'exclude',
 			},
