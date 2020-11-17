@@ -42,161 +42,156 @@ describe( 'effects', () => {
 	};
 
 	describe( '.MERGE_BLOCKS', () => {
-		const defaultGetBlock = selectors.getBlock;
+		afterEach( () => {
+			getBlockTypes().forEach( ( block ) => {
+				unregisterBlockType( block.name );
+			} );
+		} );
 
-		// afterEach( () => {
-		// 	getBlockTypes().forEach( ( block ) => {
-		// 		unregisterBlockType( block.name );
-		// 	} );
-		// 	selectors.getBlock = defaultGetBlock;
-		// } );
-		//
-		// // it( 'should only focus the blockA if the blockA has no merge function', () => {
-		// // 	registerBlockType( 'core/test-block', defaultBlockSettings );
-		// // 	const blockA = deepFreeze( {
-		// // 		clientId: 'chicken',
-		// // 		name: 'core/test-block',
-		// // 	} );
-		// // 	const blockB = deepFreeze( {
-		// // 		clientId: 'ribs',
-		// // 		name: 'core/test-block',
-		// // 	} );
-		// // 	selectors.getBlock = ( state, clientId ) => {
-		// // 		return blockA.clientId === clientId ? blockA : blockB;
-		// // 	};
-		// //
-		// // 	const dispatch = jest.fn();
-		// // 	const getState = () => ( {} );
-		// // 	handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
-		// // 		dispatch,
-		// // 		getState,
-		// // 	} );
-		// //
-		// // 	expect( dispatch ).toHaveBeenCalledTimes( 1 );
-		// // 	expect( dispatch ).toHaveBeenCalledWith( selectBlock( 'chicken' ) );
-		// // } );
-		//
-		// it( 'should merge the blocks if blocks of the same type', () => {
-		// 	registerBlockType( 'core/test-block', {
-		// 		attributes: {
-		// 			content: {},
-		// 		},
-		// 		merge( attributes, attributesToMerge ) {
-		// 			return {
-		// 				content:
-		// 					attributes.content +
-		// 					' ' +
-		// 					attributesToMerge.content,
-		// 			};
-		// 		},
-		// 		save: noop,
-		// 		category: 'text',
-		// 		title: 'test block',
-		// 	} );
-		// 	const blockA = deepFreeze( {
-		// 		clientId: 'chicken',
-		// 		name: 'core/test-block',
-		// 		attributes: { content: 'chicken' },
-		// 		innerBlocks: [],
-		// 	} );
-		// 	const blockB = deepFreeze( {
-		// 		clientId: 'ribs',
-		// 		name: 'core/test-block',
-		// 		attributes: { content: 'ribs' },
-		// 		innerBlocks: [],
-		// 	} );
-		// 	selectors.getBlock = ( state, clientId ) => {
-		// 		return blockA.clientId === clientId ? blockA : blockB;
-		// 	};
-		// 	const dispatch = jest.fn();
-		// 	const getState = () => ( {
-		// 		selectionStart: {
-		// 			clientId: blockB.clientId,
-		// 			attributeKey: 'content',
-		// 			offset: 0,
-		// 		},
-		// 	} );
-		// 	handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
-		// 		dispatch,
-		// 		getState,
-		// 	} );
-		//
-		// 	expect( dispatch ).toHaveBeenCalledTimes( 2 );
-		// 	expect( dispatch ).toHaveBeenCalledWith(
-		// 		selectionChange(
-		// 			blockA.clientId,
-		// 			'content',
-		// 			'chicken'.length + 1,
-		// 			'chicken'.length + 1
-		// 		)
-		// 	);
-		// 	const lastCall = dispatch.mock.calls[ 1 ];
-		// 	expect( lastCall ).toHaveLength( 1 );
-		// 	const [ lastCallArgument ] = lastCall;
-		// 	const expectedGenerator = replaceBlocks(
-		// 		[ 'chicken', 'ribs' ],
-		// 		[
-		// 			{
-		// 				clientId: 'chicken',
-		// 				name: 'core/test-block',
-		// 				attributes: { content: 'chicken ribs' },
-		// 			},
-		// 		]
-		// 	);
-		// 	expect( Array.from( lastCallArgument ) ).toEqual(
-		// 		Array.from( expectedGenerator )
-		// 	);
-		// } );
-		//
-		// it( 'should not merge the blocks have different types without transformation', () => {
-		// 	registerBlockType( 'core/test-block', {
-		// 		attributes: {
-		// 			content: {},
-		// 		},
-		// 		merge( attributes, attributesToMerge ) {
-		// 			return {
-		// 				content:
-		// 					attributes.content +
-		// 					' ' +
-		// 					attributesToMerge.content,
-		// 			};
-		// 		},
-		// 		save: noop,
-		// 		category: 'text',
-		// 		title: 'test block',
-		// 	} );
-		// 	registerBlockType( 'core/test-block-2', defaultBlockSettings );
-		// 	const blockA = deepFreeze( {
-		// 		clientId: 'chicken',
-		// 		name: 'core/test-block',
-		// 		attributes: { content: 'chicken' },
-		// 		innerBlocks: [],
-		// 	} );
-		// 	const blockB = deepFreeze( {
-		// 		clientId: 'ribs',
-		// 		name: 'core/test-block-2',
-		// 		attributes: { content: 'ribs' },
-		// 		innerBlocks: [],
-		// 	} );
-		// 	selectors.getBlock = ( state, clientId ) => {
-		// 		return blockA.clientId === clientId ? blockA : blockB;
-		// 	};
-		// 	const dispatch = jest.fn();
-		// 	const getState = () => ( {
-		// 		selectionStart: {
-		// 			clientId: blockB.clientId,
-		// 			attributeKey: 'content',
-		// 			offset: 0,
-		// 		},
-		// 	} );
-		// 	handler( mergeBlocks( blockA.clientId, blockB.clientId ), {
-		// 		dispatch,
-		// 		getState,
-		// 	} );
-		//
-		// 	expect( dispatch ).not.toHaveBeenCalled();
-		// } );
-		//
+		it( 'should only focus the blockA if the blockA has no merge function', () => {
+			registerBlockType( 'core/test-block', defaultBlockSettings );
+			const blockA = deepFreeze( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+			} );
+			const blockB = deepFreeze( {
+				clientId: 'ribs',
+				name: 'core/test-block',
+			} );
+
+			const fulfillment = mergeBlocks( blockA.clientId, blockB.clientId );
+			expect( fulfillment.next() ).toEqual( {
+				done: false,
+				value: {
+					type: 'MERGE_BLOCKS',
+					blocks: [ blockA.clientId, blockB.clientId ],
+				},
+			} );
+			fulfillment.next();
+			expect( fulfillment.next( blockA ) ).toEqual( {
+				done: false,
+				value: selectBlock( 'chicken' ),
+			} );
+			expect( fulfillment.next( blockA ).done ).toEqual( true );
+		} );
+
+		it( 'should merge the blocks if blocks of the same type', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					content: {},
+				},
+				merge( attributes, attributesToMerge ) {
+					return {
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
+					};
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block',
+			} );
+			const blockA = deepFreeze( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'chicken' },
+				innerBlocks: [],
+			} );
+			const blockB = deepFreeze( {
+				clientId: 'ribs',
+				name: 'core/test-block',
+				attributes: { content: 'ribs' },
+				innerBlocks: [],
+			} );
+
+			const fulfillment = mergeBlocks( blockA.clientId, blockB.clientId );
+			// MERGE_BLOCKS
+			fulfillment.next();
+			// getBlock A
+			fulfillment.next();
+			fulfillment.next( blockA );
+			// getBlock B
+			fulfillment.next( blockB );
+			// getSelectionStart
+			fulfillment.next( {
+				clientId: blockB.clientId,
+				attributeKey: 'content',
+				offset: 0,
+			} );
+			// selectionChange
+			fulfillment.next(
+				selectionChange(
+					blockA.clientId,
+					'content',
+					'chicken'.length + 1,
+					'chicken'.length + 1
+				)
+			);
+			fulfillment.next();
+			fulfillment.next();
+			expect( fulfillment.next( blockA ).value ).toMatchObject( {
+				type: 'REPLACE_BLOCKS',
+				clientIds: [ 'chicken', 'ribs' ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: { content: 'chicken ribs' },
+					},
+				],
+			} );
+		} );
+
+		it( 'should not merge the blocks have different types without transformation', () => {
+			registerBlockType( 'core/test-block', {
+				attributes: {
+					content: {},
+				},
+				merge( attributes, attributesToMerge ) {
+					return {
+						content:
+							attributes.content +
+							' ' +
+							attributesToMerge.content,
+					};
+				},
+				save: noop,
+				category: 'text',
+				title: 'test block',
+			} );
+			registerBlockType( 'core/test-block-2', defaultBlockSettings );
+			const blockA = deepFreeze( {
+				clientId: 'chicken',
+				name: 'core/test-block',
+				attributes: { content: 'chicken' },
+				innerBlocks: [],
+			} );
+			const blockB = deepFreeze( {
+				clientId: 'ribs',
+				name: 'core/test-block-2',
+				attributes: { content: 'ribs' },
+				innerBlocks: [],
+			} );
+
+			const fulfillment = mergeBlocks( blockA.clientId, blockB.clientId );
+			// MERGE_BLOCKS
+			fulfillment.next();
+			// getBlock A
+			fulfillment.next();
+			fulfillment.next( blockA );
+			// getBlock B
+			expect( fulfillment.next( blockB ).value ).toEqual( {} );
+			// getSelectionStart
+			fulfillment.next( {
+				clientId: blockB.clientId,
+				attributeKey: 'content',
+				offset: 0,
+			} );
+			// Don't do anything else
+			expect( fulfillment.next().done ).toBe( true );
+		} );
+
 		// it( 'should transform and merge the blocks', () => {
 		// 	registerBlockType( 'core/test-block', {
 		// 		attributes: {
