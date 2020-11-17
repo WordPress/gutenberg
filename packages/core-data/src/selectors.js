@@ -9,6 +9,7 @@ import { set, map, find, get, filter, compact, defaultTo } from 'lodash';
  */
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -51,12 +52,17 @@ export const isRequestingEmbedPreview = createRegistrySelector(
 /**
  * Returns all available authors.
  *
- * @param {Object} state Data state.
- *
+ * @param {Object}           state Data state.
+ * @param {Object|undefined} query Optional object of query parameters to
+ *                                 include with request.
  * @return {Array} Authors list.
  */
-export function getAuthors( state ) {
-	return getUserQueryResults( state, 'authors' );
+export function getAuthors( state, query ) {
+	const path = addQueryArgs(
+		'/wp/v2/users/?who=authors&per_page=100',
+		query
+	);
+	return getUserQueryResults( state, path );
 }
 
 /**

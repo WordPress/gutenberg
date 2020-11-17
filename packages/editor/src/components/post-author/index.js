@@ -34,9 +34,7 @@ function PostAuthor() {
 				authorId: getEditedPostAttribute( 'author' ),
 				postAuthor: author,
 				authors: getAuthors( query ),
-				isLoading: isResolving( 'core', 'getAuthors', [
-					{ search: fieldValue },
-				] ),
+				isLoading: isResolving( 'core', 'getAuthors', [ query ] ),
 			};
 		},
 		[ fieldValue ]
