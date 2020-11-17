@@ -5,11 +5,17 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useBlockProps,
 	__experimentalBlockVariationPicker,
+	__experimentalGetMatchingVariation as getMatchingVariation,
 } from '@wordpress/block-editor';
 import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
 
-const QueryPlaceholder = ( { clientId, name, setAttributes } ) => {
-	const { blockType, defaultVariation, variations } = useSelect(
+const QueryPlaceholder = ( { clientId, name, attributes, setAttributes } ) => {
+	const {
+		blockType,
+		defaultVariation,
+		scopeVariations,
+		allVariations,
+	} = useSelect(
 		( select ) => {
 			const {
 				getBlockVariations,
@@ -20,19 +26,23 @@ const QueryPlaceholder = ( { clientId, name, setAttributes } ) => {
 			return {
 				blockType: getBlockType( name ),
 				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				variations: getBlockVariations( name, 'block' ),
+				scopeVariations: getBlockVariations( name, 'block' ),
+				allVariations: getBlockVariations( name ),
 			};
 		},
 		[ name ]
 	);
 	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
 	const blockProps = useBlockProps();
+	const matchingVariation = getMatchingVariation( attributes, allVariations );
+	const icon = matchingVariation?.icon || blockType?.icon?.src;
+	const label = matchingVariation?.title || blockType?.title;
 	return (
 		<div { ...blockProps }>
 			<__experimentalBlockVariationPicker
-				icon={ blockType?.icon?.src }
-				label={ blockType?.title }
-				variations={ variations }
+				icon={ icon }
+				label={ label }
+				variations={ scopeVariations }
 				onSelect={ ( nextVariation = defaultVariation ) => {
 					if ( nextVariation.attributes ) {
 						setAttributes( nextVariation.attributes );
