@@ -471,22 +471,35 @@ describe( 'PHP Format Tokens', () => {
 		setSettings( settings );
 	} );
 
-	it.skip( 'should support "c" to obtain ISO 8601 date', () => {
+	it( 'should support "c" to obtain ISO 8601 date', () => {
 		const settings = __experimentalGetSettings();
 
 		setSettings( {
 			...settings,
-			timezone: { offset: -2 },
+			timezone: { offset: -5, string: 'America/Bogota' },
 		} );
 
 		const formattedDate = dateNoI18n( 'c', '2019-06-18T11:00:00.000Z' );
 
-		expect( formattedDate ).toBe( '2019-06-18T11:00:00-02:00' );
+		expect( formattedDate ).toBe( '2019-06-18T11:00:00-05:00' );
 
 		setSettings( settings );
 	} );
 
-	it( 'should support "r" RFC 2822 formatted date', () => {} );
+	it( 'should support "r" RFC 2822 formatted date', () => {
+		const settings = __experimentalGetSettings();
+
+		setSettings( {
+			...settings,
+			timezone: { offset: -5, string: 'America/Bogota' },
+		} );
+
+		const formattedDate = dateNoI18n( 'r', '2019-06-18T11:00:00.000Z' );
+
+		expect( formattedDate ).toBe( 'Tue, 18 Jun 2019 11:00:00 -0500' );
+
+		setSettings( settings );
+	} );
 
 	it( 'should support "U" to get epoc for given date', () => {
 		const settings = __experimentalGetSettings();
