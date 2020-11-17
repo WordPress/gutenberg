@@ -121,6 +121,7 @@ function gutenberg_migrate_theme_meta_to_taxonomy() {
 			'taxonomy'       => 'wp_theme',
 			'posts_per_page' => 1,
 			'hide_empty'     => false,
+			'fields'         => 'ids',
 		)
 	);
 	if ( $terms ) {
