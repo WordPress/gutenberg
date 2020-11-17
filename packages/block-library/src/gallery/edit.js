@@ -88,7 +88,14 @@ function GalleryEdit( props ) {
 		'core/block-editor'
 	);
 
-	const currentImageOptions = { linkTarget, linkTo, sizeSlug };
+	const currentImageOptions = useMemo(
+		() => ( {
+			linkTarget,
+			linkTo,
+			sizeSlug,
+		} ),
+		[ linkTarget, linkTo, sizeSlug ]
+	);
 	const [ imageSettings, setImageSettings ] = useState( currentImageOptions );
 	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
 	const [ images, setImages ] = useState( [] );
