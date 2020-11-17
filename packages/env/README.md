@@ -243,7 +243,7 @@ bash and the WordPress shell in the WordPress instance. For example, `wp-env run
 cli bash` will open bash in the development WordPress instance. When using long
 commands with arguments and quotation marks, you need to wrap the "command"
 param in quotation marks. For example: `wp-env run tests-cli "wp post create
---post_type=page --post_title='Test'" will create a post on the tests WordPress
+--post_type=page --post_title='Test'"` will create a post on the tests WordPress
 instance.
 
 Positionals:
