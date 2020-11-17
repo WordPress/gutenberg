@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, isEmpty, find, uniqBy, concat } from 'lodash';
+import { isEqual, isEmpty, find, concat, differenceBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -173,7 +173,7 @@ function GalleryEdit( props ) {
 		};
 	}
 
-	function onSelectImages( selectedImages ) {
+	function onSelectImages( selectedImages, replace = false ) {
 		const imageArray =
 			Object.prototype.toString.call( selectedImages ) ===
 			'[object FileList]'
@@ -188,7 +188,7 @@ function GalleryEdit( props ) {
 				  } )
 				: selectedImages;
 
-		const newImages = imageArray
+		const processedImages = imageArray
 			.filter(
 				( file ) => file.url || file.type?.indexOf( 'image/' ) === 0
 			)
@@ -202,23 +202,27 @@ function GalleryEdit( props ) {
 				return file;
 			} );
 
-		const newAndExistingImages = uniqBy(
-			concat( newImages, images ),
-			'url'
-		);
+		const existingImageBlocks = replace
+			? innerBlockImages.filter( ( block ) =>
+					processedImages.find(
+						( img ) => img.url === block.attributes.url
+					)
+			  )
+			: innerBlockImages;
 
-		const newBlocks = newAndExistingImages.map( ( image ) => {
-			const existingBlock = find(
-				images,
-				( img ) => img.id === image.id
-			);
+		const newImages = differenceBy( processedImages, images, 'url' );
 
+		const newBlocks = newImages.map( ( image ) => {
 			return createBlock( 'core/image', {
-				...buildImageAttributes( existingBlock, image ),
+				...buildImageAttributes( false, image ),
 				id: image.id,
 			} );
 		} );
-		replaceInnerBlocks( clientId, newBlocks );
+
+		replaceInnerBlocks(
+			clientId,
+			concat( existingImageBlocks, newBlocks )
+		);
 	}
 
 	function onUploadError( message ) {
