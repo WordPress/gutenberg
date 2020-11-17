@@ -176,10 +176,15 @@ function gutenberg_set_template_post_theme( $post_id, $post, $update ) {
 		return;
 	}
 
-	$theme = get_post_meta( $post_id, 'theme', true );
+	$wp_theme_term = get_term_by( 'slug', wp_get_theme()->get_stylesheet(), 'wp_theme' );
+	if ( $wp_theme_term ) {
 
-	if ( ! $theme ) {
-		update_post_meta( $post_id, 'theme', wp_get_theme()->get_stylesheet() );
+		// If the term was found, assign it to this post.
+		wp_set_object_terms( $post_id, $wp_theme_term->term_id, 'wp_theme' );
+	} else {
+
+		// Using a string instead of integer will create the term and assign it to the post.
+		wp_set_object_terms( $post_id, wp_get_theme()->get_stylesheet(), 'wp_theme' );
 	}
 }
 
