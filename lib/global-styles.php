@@ -302,7 +302,7 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 		if ( ! isset( $theme_settings['global']['settings']['spacing'] ) ) {
 			$theme_settings['global']['settings']['spacing'] = array();
 		}
-		$theme_settings['global']['settings']['spacing']['custom'] = true;
+		$theme_settings['global']['settings']['spacing']['customPadding'] = true;
 	}
 
 	if ( current( (array) get_theme_support( 'experimental-link-color' ) ) ) {
