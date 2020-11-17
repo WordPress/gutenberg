@@ -216,11 +216,13 @@ function filter_rest_prepare_wp_template_part( $response ) {
 			$file_based                   = in_array( '_wp_file_based', $wp_theme_slugs, true );
 			$response->data['file_based'] = $file_based;
 
-			$theme_slug = array_filter(
-				$wp_theme_slugs,
-				function( $slug ) {
-					return '_wp_file_based' !== $slug;
-				}
+			$theme_slug = array_values(
+				array_filter(
+					$wp_theme_slugs,
+					function( $slug ) {
+						return '_wp_file_based' !== $slug;
+					}
+				)
 			);
 			if ( $theme_slug ) {
 				$response->data['wp_theme_slug'] = $theme_slug[0];
