@@ -195,3 +195,36 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 	return $args;
 }
 add_filter( 'rest_wp_template_part_query', 'filter_rest_wp_template_part_query', 99, 2 );
+
+/**
+ * Filters the post data for a response.
+ *
+ * @param WP_REST_Response $response The response object.
+ * @return WP_REST_Response
+ */
+function filter_rest_prepare_wp_template_part( $response ) {
+	if ( isset( $response->data ) && is_array( $response->data ) && isset( $response->data['id'] ) ) {
+		$response->data['wp_theme_slug'] = 'false';
+
+		// Get the wp_theme terms.
+		$wp_themes = wp_get_post_terms( $response->data['id'], 'wp_theme' );
+
+		// If a theme is assigned, add it to the REST response.
+		if ( $wp_themes && is_array( $wp_themes ) ) {
+			$wp_theme_slugs = array_column($wp_themes, 'slug');
+
+			$file_based = in_array('wp_file_based', $wp_theme_slugs);
+			$response->data['file_based'] = $file_based;
+
+			$theme_slug = array_filter($wp_theme_slugs, function($slug) {
+				return $slug !== 'wp_file_based';
+			});
+			if ($theme_slug) {
+				$response->data['wp_theme_slug'] = $theme_slug[0];
+			}
+		}
+	}
+
+	return $response;
+}
+add_filter( 'rest_prepare_wp_template_part', 'filter_rest_prepare_wp_template_part' );
