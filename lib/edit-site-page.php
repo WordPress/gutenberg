@@ -208,6 +208,15 @@ function gutenberg_edit_site_init( $hook ) {
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
 
 /**
+ * Disallow rich editing in the site editor.
+ * This prevents tinymce from loading.
+ */
+function gutenberg_disable_richedit_tinymce() {
+	return ! gutenberg_is_edit_site_page( get_current_screen()->id );
+}
+add_filter( 'user_can_richedit', 'gutenberg_disable_richedit_tinymce' );
+
+/**
  * Register a core site setting for front page information.
  */
 function register_site_editor_homepage_settings() {
