@@ -19,7 +19,7 @@ import {
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { controls } from '@wordpress/data';
-import { awaitPromise } from '@wordpress/data-controls';
+import { __unstableAwaitPromise } from '@wordpress/data-controls';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
 
 /**
@@ -686,10 +686,7 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 
 	// Only focus the previous block if it's not mergeable
 	if ( ! blockAType.merge ) {
-		yield controls.dispatch(
-			'core/block-editor',
-			selectBlock( blockA.clientId )
-		);
+		yield selectBlock( blockA.clientId );
 		return;
 	}
 
@@ -1133,10 +1130,12 @@ export function* __unstableMarkAutomaticChange() {
 	yield { type: 'MARK_AUTOMATIC_CHANGE' };
 
 	// @TODO: replace this straightforward migration from effects.js with a proper requestIdleCallback
-	yield awaitPromise(
+	yield __unstableAwaitPromise(
 		new Promise( ( resolve ) => setTimeout( resolve, 100 ) )
 	);
-	yield controls.dispatch( { type: 'MARK_AUTOMATIC_CHANGE_FINAL' } );
+	yield {
+		type: 'MARK_AUTOMATIC_CHANGE_FINAL',
+	};
 }
 
 /**
