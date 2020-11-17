@@ -121,8 +121,17 @@ function Editor() {
 		( entitiesToSave ) => {
 			if ( entitiesToSave ) {
 				const { getEditedEntityRecord } = select( 'core' );
+				const { getTemplateInfo } = select( 'core/edit-site' );
 				entitiesToSave.forEach( ( { kind, name, key } ) => {
 					const record = getEditedEntityRecord( kind, name, key );
+
+					if ( 'postType' === kind && name === 'wp_template' ) {
+						const { title } = getTemplateInfo( record );
+						return editEntityRecord( kind, name, key, {
+							status: 'publish',
+							title,
+						} );
+					}
 
 					const edits = record.slug
 						? { status: 'publish', title: record.slug }

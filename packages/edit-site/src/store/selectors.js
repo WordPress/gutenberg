@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { find, get } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -169,4 +169,57 @@ export function isNavigationOpened( state ) {
  */
 export function isInserterOpened( state ) {
 	return state.blockInserterPanel;
+}
+
+/**
+ * Returns the default template types.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The template types.
+ */
+export function getDefaultTemplateTypes( state ) {
+	return state.settings?.defaultTemplateTypes;
+}
+
+/**
+ * Returns a default template type searched by slug.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} slug The template type slug.
+ *
+ * @return {Object} The template type.
+ */
+export function getDefaultTemplateType( state, slug ) {
+	return find( getDefaultTemplateTypes( state ), { slug } ) || {};
+}
+
+/**
+ * Given a template entity, return information about it which is ready to be
+ * rendered, such as the title and description.
+ *
+ * @param {Object} state Global application state.
+ * @param {Object} template The template for which we need information.
+ * @return {Object} Information about the template, including title and description.
+ */
+export function getTemplateInfo( state, template ) {
+	if ( ! template ) {
+		return {};
+	}
+
+	const templateTitle = template?.title?.rendered;
+	const templateSlug = template?.slug;
+
+	const {
+		title: defaultTitle,
+		description: defaultDescription,
+	} = getDefaultTemplateType( state, templateSlug );
+
+	const title =
+		templateTitle && templateTitle !== templateSlug
+			? templateTitle
+			: defaultTitle || templateSlug;
+	const description = template?.excerpt?.raw || defaultDescription;
+
+	return { title, description };
 }
