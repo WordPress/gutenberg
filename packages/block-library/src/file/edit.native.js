@@ -23,11 +23,19 @@ import {
 	PanelBody,
 	ToggleControl,
 	BottomSheet,
+	SelectControl,
 } from '@wordpress/components';
-import { file as icon, replace, button, external } from '@wordpress/icons';
+import {
+	file as icon,
+	replace,
+	button,
+	external,
+	link,
+} from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -45,7 +53,6 @@ export class FileEdit extends Component {
 		};
 
 		this.timerRef = null;
-
 		this.onSelectFile = this.onSelectFile.bind( this );
 		this.onChangeFileName = this.onChangeFileName.bind( this );
 		this.onChangeDownloadButtonText = this.onChangeDownloadButtonText.bind(
@@ -61,6 +68,10 @@ export class FileEdit extends Component {
 		);
 		this.onCopyURL = this.onCopyURL.bind( this );
 		this.onChangeOpenInNewWindow = this.onChangeOpenInNewWindow.bind(
+			this
+		);
+
+		this.onChangeLinkDestinationOption = this.onChangeLinkDestinationOption.bind(
 			this
 		);
 	}
@@ -99,6 +110,11 @@ export class FileEdit extends Component {
 
 	onChangeDownloadButtonVisibility( showDownloadButton ) {
 		this.props.setAttributes( { showDownloadButton } );
+	}
+
+	onChangeLinkDestinationOption( newHref ) {
+		// Choose Media File or Attachment Page (when file is in Media Library)
+		this.props.setAttributes( { textLinkHref: newHref } );
 	}
 
 	onCopyURL() {
@@ -175,10 +191,21 @@ export class FileEdit extends Component {
 	}
 
 	getInspectorControls(
-		{ showDownloadButton, textLinkTarget },
+		{ showDownloadButton, textLinkTarget, href, textLinkHref },
+		media,
 		isUploadInProgress,
 		isUploadFailed
 	) {
+		let linkDestinationOptions = [ { value: href, label: __( 'URL' ) } ];
+		const attachmentPage = media && media.link;
+
+		if ( attachmentPage ) {
+			linkDestinationOptions = [
+				{ value: href, label: __( 'Media file' ) },
+				{ value: attachmentPage, label: __( 'Attachment page' ) },
+			];
+		}
+
 		const actionButtonStyle = this.props.getStylesFromColorScheme(
 			styles.actionButton,
 			styles.actionButtonDark
@@ -191,6 +218,13 @@ export class FileEdit extends Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'File block settings' ) } />
 				<PanelBody>
+					<SelectControl
+						icon={ link }
+						label={ __( 'Link to' ) }
+						value={ textLinkHref }
+						onChange={ this.onChangeLinkDestinationOption }
+						options={ linkDestinationOptions }
+					/>
 					<ToggleControl
 						icon={ external }
 						label={ __( 'Open in new tab' ) }
@@ -246,7 +280,8 @@ export class FileEdit extends Component {
 	}
 
 	getFileComponent( openMediaOptions, getMediaOptions ) {
-		const { attributes } = this.props;
+		const { attributes, media } = this.props;
+
 		const {
 			fileName,
 			downloadButtonText,
@@ -288,6 +323,7 @@ export class FileEdit extends Component {
 							{ getMediaOptions() }
 							{ this.getInspectorControls(
 								attributes,
+								media,
 								isUploadInProgress,
 								isUploadFailed
 							) }
@@ -359,4 +395,14 @@ export class FileEdit extends Component {
 	}
 }
 
-export default withPreferredColorScheme( FileEdit );
+export default compose( [
+	withSelect( ( select, props ) => {
+		const { attributes } = props;
+		const { id } = attributes;
+		return {
+			media:
+				id === undefined ? undefined : select( 'core' ).getMedia( id ),
+		};
+	} ),
+	withPreferredColorScheme,
+] )( FileEdit );
