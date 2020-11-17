@@ -93,8 +93,8 @@ function gutenberg_register_wp_theme_taxonomy() {
 			'public'            => false,
 			'hierarchical'      => false,
 			'labels'            => array(
-				'name'          => __( 'Themes' ),
-				'singular_name' => __( 'Theme' ),
+				'name'          => __( 'Themes', 'gutenberg' ),
+				'singular_name' => __( 'Theme', 'gutenberg' ),
 			),
 			'query_var'         => false,
 			'rewrite'           => false,
