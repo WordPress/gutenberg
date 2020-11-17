@@ -561,7 +561,7 @@ describe( 'createRegistry', () => {
 				},
 				resolvers: {},
 			} );
-			registry.registry( store );
+			registry.register( store );
 
 			expect( registry.select( store ).getValue() ).toBe( 'OK' );
 		} );
@@ -713,7 +713,7 @@ describe( 'createRegistry', () => {
 			} );
 
 			expect( store.getState() ).toBe( 'OK' );
-			await registry.dispatch( store ).update();
+			await registry.dispatch( STORE_NAME ).update();
 			expect( store.getState() ).toBe( 'UPDATED' );
 		} );
 	} );
