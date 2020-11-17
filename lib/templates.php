@@ -115,24 +115,20 @@ add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
  * @param array $post    Template Post.
  * @param bool  $update  Is update.
  */
-function gutenberg_set_template_post_theme( $post_id, $post, $update ) {
-	if ( 'wp_template' !== $post->post_type || $update || 'trash' === $post->post_status ) {
+function gutenberg_set_template_and_template_part_post_theme( $post_id, $post, $update ) {
+	if ( $update || 'trash' === $post->post_status ) {
 		return;
 	}
 
-	$wp_theme_term = get_term_by( 'slug', wp_get_theme()->get_stylesheet(), 'wp_theme' );
-	if ( $wp_theme_term ) {
+	$themes = get_post_taxonomies( $post_id, 'wp_theme', true );
 
-		// If the term was found, assign it to this post.
-		wp_set_object_terms( $post_id, $wp_theme_term->term_id, 'wp_theme' );
-	} else {
-
-		// Using a string instead of integer will create the term and assign it to the post.
-		wp_set_object_terms( $post_id, wp_get_theme()->get_stylesheet(), 'wp_theme' );
+	if ( ! $themes ) {
+		wp_set_post_terms( $post_id, array( wp_get_theme()->get_stylesheet() ), 'wp_theme', true );
 	}
 }
 
-add_action( 'save_post', 'gutenberg_set_template_post_theme', 10, 3 );
+add_action( 'save_post_wp_template', 'gutenberg_set_template_post_theme', 10, 3 );
+add_action( 'save_post_wp_template_part', 'gutenberg_set_template_post_theme', 10, 3 );
 
 /**
  * Filters the capabilities of a user to conditionally grant them capabilities for managing 'wp_template' posts.
