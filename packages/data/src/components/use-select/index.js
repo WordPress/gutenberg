@@ -88,7 +88,7 @@ export default function useSelect( _mapSelect, deps ) {
 				return ret;
 			},
 			() => {},
-			isAsync
+			{ isAsync }
 		)( registry.getAtomRegistry() );
 	}, [ isAsync, registry, mapSelect ] );
 

@@ -1,5 +1,17 @@
 export type WPAtomListener =  () => void;
 
+export type WPCommonAtomConfig = {
+	/**
+	 * Optinal id used for debug.
+	 */
+	id?: string,
+
+	/**
+	 * Whether the atom is sync or async.
+	 */
+	isAsync?: boolean
+}
+
 export type WPAtomState<T> = {
 	/**
 	 * Optional atom id used for debug.

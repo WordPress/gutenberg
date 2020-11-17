@@ -16,17 +16,12 @@ const resolveQueue = createQueue();
  * @template T
  * @param {import('./types').WPDerivedAtomResolver<T>} resolver Atom Resolver.
  * @param {import('./types').WPDerivedAtomUpdater<T>}  updater  Atom updater.
- * @param {boolean=}                                   isAsync  Atom resolution strategy.
- * @param {string=}                                    id       Atom id.
+ * @param {import('./types').WPCommonAtomConfig=}      config   Common Atom config.
  * @return {import("./types").WPAtom<T>} Createtd atom.
  */
-
-export const createDerivedAtom = (
-	resolver,
-	updater = noop,
-	isAsync = false,
-	id
-) => ( registry ) => {
+export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
+	registry
+) => {
 	/**
 	 * @type {any}
 	 */
@@ -53,7 +48,7 @@ export const createDerivedAtom = (
 
 	const refresh = () => {
 		if ( listeners.length ) {
-			if ( isAsync ) {
+			if ( config.isAsync ) {
 				resolveQueue.add( context, resolve );
 			} else {
 				resolve();
@@ -152,7 +147,7 @@ export const createDerivedAtom = (
 	};
 
 	return {
-		id,
+		id: config.id,
 		type: 'derived',
 		get() {
 			if ( ! isListening ) {

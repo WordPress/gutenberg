@@ -233,7 +233,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			config.subscribe,
 			() => null,
 			() => {},
-			key
+			{ id: key }
 		);
 		config.subscribe( globalListener );
 	}

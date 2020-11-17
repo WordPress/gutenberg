@@ -2,16 +2,21 @@
  * Creates a store atom.
  *
  * @template T
- * @param {() => T}                                get       Get the state value.
  * @param {(listener: () => void) => (() => void)} subscribe Subscribe to state changes.
+ * @param {() => T}                                get       Get the state value.
  * @param {(action: any) => void}                  dispatch  Dispatch store changes,
- * @param {string=}                                id        Atom id.
+ * @param {import('./types').WPCommonAtomConfig=}  config    Common Atom config.
  * @return {import("./types").WPAtom<T>} Store Atom.
  */
-export const createStoreAtom = ( subscribe, get, dispatch, id ) => () => {
+export const createStoreAtom = (
+	subscribe,
+	get,
+	dispatch,
+	config = {}
+) => () => {
 	let isResolved = false;
 	return {
-		id,
+		id: config.id,
 		type: 'store',
 		get() {
 			return get();

@@ -5,14 +5,12 @@ import { createDerivedAtom } from './derived';
 
 /**
  * @template T
- * @param {import('./types').WPAtomFamilyResolver<T>} resolver
- * @param {import('./types').WPAtomFamilyUpdater<T>}       updater
- * @param {boolean}                                     isAsync
- * @param {string=}                                     id
- *
+ * @param {import('./types').WPAtomFamilyResolver<T>} resolver   Atom resolver.
+ * @param {import('./types').WPAtomFamilyUpdater<T>}  updater    Atom updater.
+ * @param {import('./types').WPCommonAtomConfig=}     atomConfig Common Atom config.
  * @return {(key:string) => import('./types').WPAtomFamilyItem<T>} Atom Family Item creator.
  */
-export const createAtomFamily = ( resolver, updater, isAsync, id ) => {
+export const createAtomFamily = ( resolver, updater, atomConfig = {} ) => {
 	const config = {
 		/**
 		 *
@@ -23,8 +21,10 @@ export const createAtomFamily = ( resolver, updater, isAsync, id ) => {
 			return createDerivedAtom(
 				resolver( key ),
 				updater ? updater( key ) : undefined,
-				isAsync,
-				id ? id + '--' + key : undefined
+				{
+					...atomConfig,
+					id: atomConfig.id ? atomConfig.id + '--' + key : undefined,
+				}
 			);
 		},
 	};

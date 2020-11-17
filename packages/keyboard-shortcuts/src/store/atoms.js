@@ -7,8 +7,11 @@ import {
 	createAtomFamily,
 } from '@wordpress/stan';
 
-export const shortcutNamesAtom = createAtom( [], 'shortcut-names' );
-export const shortcutsByNameAtom = createAtom( {}, 'shortcuts-by-name' );
+export const shortcutNamesAtom = createAtom( [], { id: 'shortcut-names' } );
+export const shortcutsByNameAtom = createAtom(
+	{},
+	{ id: 'shortcuts-by-name' }
+);
 export const shortcutsByNameFamily = createAtomFamily( ( key ) => ( { get } ) =>
 	get( shortcutsByNameAtom )[ key ]
 );
@@ -18,6 +21,5 @@ export const shortcutsAtom = createDerivedAtom(
 		return get( shortcutNamesAtom ).map( ( id ) => shortcutsByName[ id ] );
 	},
 	() => {},
-	false,
-	'shortcuts'
+	{ id: 'shortcuts' }
 );

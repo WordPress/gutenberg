@@ -44,7 +44,7 @@ describe( 'creating and subscribing to atom families', () => {
 	} );
 
 	it( 'should allow creating families based on other families', () => {
-		const itemsByIdAtom = createAtom( {}, 'items-by-id' );
+		const itemsByIdAtom = createAtom( {} );
 		const itemFamilyAtom = createAtomFamily( ( key ) => ( { get } ) => {
 			return get( itemsByIdAtom )[ key ];
 		} );
@@ -69,7 +69,7 @@ describe( 'creating and subscribing to atom families', () => {
 	} );
 
 	it( 'should not recompute a family dependency if its untouched', () => {
-		const itemsByIdAtom = createAtom( {}, 'items-by-id' );
+		const itemsByIdAtom = createAtom( {} );
 		const itemFamilyAtom = createAtomFamily( ( key ) => ( { get } ) => {
 			return get( itemsByIdAtom )[ key ];
 		} );

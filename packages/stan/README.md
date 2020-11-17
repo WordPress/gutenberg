@@ -136,8 +136,8 @@ Creates a basic atom.
 
 _Parameters_
 
--   _initialValue_ `T`: Initial Value in the atom.
--   _id_ `[string]`: Atom id.
+-   _initialValue_ `T`: Initial Value in the atom. \*
+-   _config_ (unknown type): Common Atom config.
 
 _Returns_
 
@@ -147,10 +147,9 @@ _Returns_
 
 _Parameters_
 
--   _resolver_ (unknown type): 
--   _updater_ (unknown type): 
--   _isAsync_ `boolean`: 
--   _id_ `[string]`: 
+-   _resolver_ (unknown type): Atom resolver.
+-   _updater_ (unknown type): Atom updater.
+-   _atomConfig_ (unknown type): Common Atom config.
 
 _Returns_
 
@@ -177,8 +176,7 @@ _Parameters_
 
 -   _resolver_ (unknown type): Atom Resolver.
 -   _updater_ (unknown type): Atom updater.
--   _isAsync_ `[boolean]`: Atom resolution strategy.
--   _id_ `[string]`: Atom id.
+-   _config_ (unknown type): Common Atom config.
 
 _Returns_
 
@@ -190,10 +188,10 @@ Creates a store atom.
 
 _Parameters_
 
--   _get_ (unknown type): Get the state value.
 -   _subscribe_ (unknown type): Subscribe to state changes.
+-   _get_ (unknown type): Get the state value.
 -   _dispatch_ (unknown type): Dispatch store changes,
--   _id_ `[string]`: Atom id.
+-   _config_ (unknown type): Common Atom config.
 
 _Returns_
 

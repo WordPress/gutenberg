@@ -2,11 +2,11 @@
  * Creates a basic atom.
  *
  * @template T
- * @param {T}       initialValue Initial Value in the atom.
- * @param {string=} id           Atom id.
- * @return {import("./types").WPAtom<T>}           Createtd atom.
+ * @param {T}                                     initialValue Initial Value in the atom. *
+ * @param {import('./types').WPCommonAtomConfig=} config       Common Atom config.
+ * @return {import("./types").WPAtom<T>} Createtd atom.
  */
-export const createAtom = ( initialValue, id ) => () => {
+export const createAtom = ( initialValue, config = {} ) => () => {
 	let value = initialValue;
 
 	/**
@@ -15,7 +15,7 @@ export const createAtom = ( initialValue, id ) => () => {
 	let listeners = [];
 
 	return {
-		id,
+		id: config.id,
 		type: 'root',
 		set( newValue ) {
 			value = newValue;
