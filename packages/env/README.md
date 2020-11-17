@@ -258,6 +258,8 @@ Options:
 
 For example:
 
+#### Displaying the users on the development instance:
+
 ```sh
 wp-env run cli wp user list
 ⠏ Running `wp user list` in 'cli'.
@@ -268,6 +270,8 @@ ID      user_login      display_name    user_email      user_registered roles
 ✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
 ```
 
+#### Creating a post on the tests instance:
+
 ```sh
 npx wp-env run tests-cli "wp post create --post_type=page --post_title='Ready'"
 
@@ -276,6 +280,8 @@ npx wp-env run tests-cli "wp post create --post_type=page --post_title='Ready'"
 Success: Created post 5.
 ✔ Ran `wp post create --post_type=page --post_title='Ready'` in 'tests-cli'. (in 3s 293ms)
 ```
+
+#### Opening the WordPress shell on the tests instance and running PHP commands:
 
 ```sh
 wp-env run tests-cli wp shell
