@@ -7,7 +7,7 @@ jobs:
     timeout-minutes: 3
     steps:
       - name: Get all workflow ids and set to env variable
-        run: echo ::set-env name=WORKFLOW_IDS_TO_CANCEL::$(curl https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows -s | jq -r '.workflows | map(.id|tostring) | join(",")')
+        run: echo "WORKFLOW_IDS_TO_CANCEL=$(curl https://api.github.com/repos/${GITHUB_REPOSITORY}/actions/workflows -s | jq -r '.workflows | map(.id|tostring) | join(",")')" >> $GITHUB_ENV
 
       - uses: styfle/cancel-workflow-action@0.4.0
         with:

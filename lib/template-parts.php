@@ -203,25 +203,3 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 	return $args;
 }
 add_filter( 'rest_wp_template_part_query', 'filter_rest_wp_template_part_query', 99, 2 );
-
-/**
- * Run synchrnonization for template part API requests
- *
- * @param mixed           $dispatch_result Dispatch result, will be used if not empty.
- * @param WP_REST_Request $request         Request used to generate the response.
- * @param string          $route           Route matched for the request.
- * @return mixed Dispatch result.
- */
-function gutenberg_filter_rest_wp_template_part_dispatch( $dispatch_result, $request, $route ) {
-	if ( null !== $dispatch_result ) {
-		return $dispatch_result;
-	}
-
-	if ( 0 === strpos( $route, '/wp/v2/template-parts' ) && 'GET' === $request->get_method() ) {
-		_gutenberg_synchronize_theme_templates( 'template-part' );
-	}
-
-	return null;
-}
-
-add_filter( 'rest_dispatch_request', 'gutenberg_filter_rest_wp_template_part_dispatch', 10, 3 );

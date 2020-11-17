@@ -1,0 +1,20 @@
+.defaultButton {
+	border-radius: $border-width * 4;
+	padding: $block-spacing * 2;
+	border-width: $border-width;
+	margin-top: $grid-unit-20;
+	background-color: $button-fallback-bg;
+	color: $white;
+	align-self: flex-start;
+}
+
+.uploadFailedText {
+	color: #fff;
+	font-size: 14;
+	margin-top: 5;
+}
+
+.retryContainer {
+	flex: 1;
+	background-color: "rgba(0, 0, 0, 0.5)";
+}

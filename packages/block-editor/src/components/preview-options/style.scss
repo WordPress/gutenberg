@@ -39,3 +39,30 @@
 		}
 	}
 }
+
+// Reduced UI.
+.edit-post-header.has-reduced-ui {
+	@include break-small() {
+		// Apply transition to first two buttons.
+		.edit-post-header__settings .editor-post-save-draft,
+		.edit-post-header__settings .editor-post-saved-state,
+		.edit-post-header__settings .block-editor-post-preview__button-toggle {
+			transition: opacity 0.1s linear;
+			@include reduce-motion("transition");
+		}
+
+		// Zero out opacity unless hovered.
+		&:not(:hover) {
+			.edit-post-header__settings .editor-post-save-draft,
+			.edit-post-header__settings .editor-post-saved-state,
+			.edit-post-header__settings .block-editor-post-preview__button-toggle {
+				opacity: 0;
+			}
+
+			// ... or opened.
+			.edit-post-header__settings .block-editor-post-preview__button-toggle.is-opened {
+				opacity: 1;
+			}
+		}
+	}
+}

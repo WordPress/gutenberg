@@ -11,6 +11,7 @@ import deepFreeze from 'deep-freeze';
 import {
 	getBlockSupport,
 	getChildBlockNames,
+	getBlockVariations,
 	getDefaultBlockVariation,
 	getGroupingBlockName,
 	isMatchingSearchTerm,
@@ -220,7 +221,7 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getDefaultBlockVariation', () => {
+	describe( 'Testing block variations selectors', () => {
 		const blockName = 'block/name';
 		const createBlockVariationsState = ( variations ) => {
 			return deepFreeze( {
@@ -238,55 +239,94 @@ describe( 'selectors', () => {
 		const thirdBlockVariation = {
 			name: 'third-block-variation',
 		};
-
-		it( 'should return the default variation when set', () => {
-			const defaultBlockVariation = {
-				...secondBlockVariation,
-				isDefault: true,
-			};
-			const state = createBlockVariationsState( [
-				firstBlockVariation,
-				defaultBlockVariation,
-				thirdBlockVariation,
-			] );
-
-			const result = getDefaultBlockVariation( state, blockName );
-
-			expect( result ).toEqual( defaultBlockVariation );
+		describe( 'getBlockVariations', () => {
+			it( 'should return undefined if no variations exists', () => {
+				expect(
+					getBlockVariations( { blockVariations: {} }, blockName )
+				).toBeUndefined();
+			} );
+			it( 'should return all variations if scope is not provided', () => {
+				const variations = [
+					firstBlockVariation,
+					secondBlockVariation,
+				];
+				const state = createBlockVariationsState( variations );
+				expect( getBlockVariations( state, blockName ) ).toEqual(
+					variations
+				);
+			} );
+			it( 'should return variations with scope not set at all or explicitly set', () => {
+				const variations = [
+					{ ...firstBlockVariation, scope: [ 'inserter' ] },
+					{ name: 'only-block', scope: [ 'block' ] },
+					{
+						name: 'multiple-scopes-with-block',
+						scope: [ 'transform', 'block' ],
+					},
+					{ name: 'no-scope' },
+				];
+				const state = createBlockVariationsState( variations );
+				const result = getBlockVariations( state, blockName, 'block' );
+				expect( result ).toHaveLength( 3 );
+				expect( result.map( ( { name } ) => name ) ).toEqual(
+					expect.arrayContaining( [
+						'only-block',
+						'multiple-scopes-with-block',
+						'no-scope',
+					] )
+				);
+			} );
 		} );
-
-		it( 'should return the last variation when multiple default variations added', () => {
-			const defaultBlockVariation = {
-				...thirdBlockVariation,
-				isDefault: true,
-			};
-			const state = createBlockVariationsState( [
-				{
-					...firstBlockVariation,
-					isDefault: true,
-				},
-				{
+		describe( 'getDefaultBlockVariation', () => {
+			it( 'should return the default variation when set', () => {
+				const defaultBlockVariation = {
 					...secondBlockVariation,
 					isDefault: true,
-				},
-				defaultBlockVariation,
-			] );
+				};
+				const state = createBlockVariationsState( [
+					firstBlockVariation,
+					defaultBlockVariation,
+					thirdBlockVariation,
+				] );
 
-			const result = getDefaultBlockVariation( state, blockName );
+				const result = getDefaultBlockVariation( state, blockName );
 
-			expect( result ).toEqual( defaultBlockVariation );
-		} );
+				expect( result ).toEqual( defaultBlockVariation );
+			} );
 
-		it( 'should return the first variation when no default variation set', () => {
-			const state = createBlockVariationsState( [
-				firstBlockVariation,
-				secondBlockVariation,
-				thirdBlockVariation,
-			] );
+			it( 'should return the last variation when multiple default variations added', () => {
+				const defaultBlockVariation = {
+					...thirdBlockVariation,
+					isDefault: true,
+				};
+				const state = createBlockVariationsState( [
+					{
+						...firstBlockVariation,
+						isDefault: true,
+					},
+					{
+						...secondBlockVariation,
+						isDefault: true,
+					},
+					defaultBlockVariation,
+				] );
 
-			const result = getDefaultBlockVariation( state, blockName );
+				const result = getDefaultBlockVariation( state, blockName );
 
-			expect( result ).toEqual( firstBlockVariation );
+				expect( result ).toEqual( defaultBlockVariation );
+			} );
+
+			it( 'should return the first variation when no default variation set', () => {
+				const state = createBlockVariationsState( [
+					firstBlockVariation,
+					secondBlockVariation,
+					thirdBlockVariation,
+				] );
+
+				const result = getDefaultBlockVariation( state, blockName );
+
+				expect( result ).toEqual( firstBlockVariation );
+			} );
 		} );
 	} );
 

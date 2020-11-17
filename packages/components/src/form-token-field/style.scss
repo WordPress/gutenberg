@@ -21,11 +21,13 @@
 	// Token input
 	input[type="text"].components-form-token-field__input {
 		display: inline-block;
+		flex: 1;
 		width: 100%;
 		max-width: 100%;
 		margin-left: 4px;
 		padding: 0;
 		min-height: 24px;
+		min-width: 50px;
 		background: inherit;
 		border: 0;
 		color: $gray-900;

@@ -6,8 +6,8 @@ import { useInstanceId } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
-	InnerBlocks,
 	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -27,6 +27,7 @@ export function QueryContent( {
 } ) {
 	const instanceId = useInstanceId( QueryContent );
 	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return {
@@ -66,7 +67,7 @@ export function QueryContent( {
 			</BlockControls>
 			<div { ...blockProps }>
 				<QueryProvider>
-					<InnerBlocks template={ TEMPLATE } />
+					<div { ...innerBlocksProps } />
 				</QueryProvider>
 			</div>
 		</>

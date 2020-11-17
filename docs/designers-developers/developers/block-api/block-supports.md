@@ -85,23 +85,36 @@ supports: {
 - Type: `Object`
 - Default value: null
 - Subproperties:
-  - `background`: type `boolean`, default value `false`
-  - `gradient`: type `boolean`, default value `false`
+  - `background`: type `boolean`, default value `true`
+  - `gradient`: type `boolean`, default value `true`
   - `text`: type `boolean`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to color. When it does, the block editor will show UI controls for the user to set their values.
 
 The controls for background and text will source their colors from the `editor-color-palette` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), while the gradient's from `editor-gradient-presets` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets).
 
+Note that the `text` and `background` keys have a default value of `true`, so if the `color` property is present they'll also be considered enabled:
+
 ```js
 supports: {
-    background: true, // Enable background color UI control.
-    gradient: true, // Enable gradients UI control.
-    text: true, // Eneble text color UI control.
+    color: { // This also enables text and background UI controls.
+        gradient: true // Enable gradients UI control.
+    }
 }
 ```
 
-When the block declares support for a specific color property, the attributes definition is extended to include some attributes.
+It's possible to disable them individually:
+
+```js
+supports: {
+    color: { // Text UI control is enabled.
+        background: false, // Disable background UI control.
+        gradient: true // Enable gradients UI control.
+    }
+}
+```
+
+When the block has support for a specific color property, the attributes definition is extended to include some attributes.
 
 - `style`: attribute of `object` type with no default assigned. This is added when any of support color properties are declared. It stores the custom values set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
 

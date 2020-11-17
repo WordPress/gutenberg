@@ -5,8 +5,13 @@
  * Description: Zip from master of Gutenberg GitHub repo: Gutenberg This is the development plugin for the new block editor in core. Ping @bph on WPSlack for questions. 
  * Requires at least: 5.3
  * Requires PHP: 5.6
+<<<<<<< HEAD
  * Version: 9.3.0.20201117
  * Author: Gutenberg Team / Birgit Pauli-Haack (Gutenberg Times)
+=======
+ * Version: 9.4.0-rc.1
+ * Author: Gutenberg Team
+>>>>>>> upstream/master
  * Text Domain: gutenberg
  * GitHub Plugin URI: bph/gutenberg
  * Release Asset: true
@@ -92,22 +97,6 @@ function gutenberg_menu() {
 			);
 		}
 	}
-
-	if ( gutenberg_is_fse_theme() ) {
-		add_menu_page(
-			__( 'Site Editor (beta)', 'gutenberg' ),
-			sprintf(
-				/* translators: %s: "beta" label. */
-				__( 'Site Editor %s', 'gutenberg' ),
-				'<span class="awaiting-mod">' . __( 'beta', 'gutenberg' ) . '</span>'
-			),
-			'edit_theme_options',
-			'gutenberg-edit-site',
-			'gutenberg_edit_site_page',
-			'dashicons-layout'
-		);
-	}
-
 	if ( current_user_can( 'edit_posts' ) ) {
 		add_submenu_page(
 			'gutenberg',
@@ -135,6 +124,31 @@ function gutenberg_menu() {
 	);
 }
 add_action( 'admin_menu', 'gutenberg_menu', 9 );
+
+/**
+ * Site editor's Menu.
+ *
+ * Adds a new wp-admin menu item for the Site editor.
+ *
+ * @since 9.4.0
+ */
+function gutenberg_site_editor_menu() {
+	if ( gutenberg_is_fse_theme() ) {
+		add_menu_page(
+			__( 'Site Editor (beta)', 'gutenberg' ),
+			sprintf(
+			/* translators: %s: "beta" label. */
+				__( 'Site Editor %s', 'gutenberg' ),
+				'<span class="awaiting-mod">' . __( 'beta', 'gutenberg' ) . '</span>'
+			),
+			'edit_theme_options',
+			'gutenberg-edit-site',
+			'gutenberg_edit_site_page',
+			'dashicons-layout'
+		);
+	}
+}
+add_action( 'admin_menu', 'gutenberg_site_editor_menu', 9 );
 
 /**
  * Modify WP admin bar.
