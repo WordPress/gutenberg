@@ -99,7 +99,6 @@ function GalleryEdit( props ) {
 	);
 	const [ imageSettings, setImageSettings ] = useState( currentImageOptions );
 	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
-	const [ images, setImages ] = useState( [] );
 
 	useEffect( () => {
 		const currentOptionsState = ! isEqual(
@@ -123,17 +122,16 @@ function GalleryEdit( props ) {
 		return select( 'core/block-editor' ).getBlock( clientId ).innerBlocks;
 	} );
 
-	useEffect( () => {
-		const newImages = innerBlockImages.map( ( block ) => {
-			return {
+	const images = useMemo(
+		() =>
+			innerBlockImages.map( ( block ) => ( {
 				id: block.attributes.id,
 				url: block.attributes.url,
 				attributes: block.attributes,
 				imageData: getMedia( block.attributes.id ),
-			};
-		} );
-		setImages( newImages );
-	}, [ innerBlockImages ] );
+			} ) ),
+		[ innerBlockImages ]
+	);
 
 	useEffect( () => {
 		if ( images.length !== imageCount ) {
