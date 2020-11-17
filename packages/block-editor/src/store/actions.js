@@ -19,8 +19,12 @@ import {
 import { speak } from '@wordpress/a11y';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { controls } from '@wordpress/data';
-import { __unstableAwaitPromise } from '@wordpress/data-controls';
 import { create, insert, remove, toHTMLString } from '@wordpress/rich-text';
+
+/**
+ * Internal dependencies
+ */
+import { __unstableMarkAutomaticChangeFinalControl } from '../store/controls';
 
 /**
  * Generator which will yield a default block insert action if there
@@ -1121,12 +1125,11 @@ export function __unstableMarkNextChangeAsNotPersistent() {
  */
 export function* __unstableMarkAutomaticChange() {
 	yield { type: 'MARK_AUTOMATIC_CHANGE' };
+	yield __unstableMarkAutomaticChangeFinalControl();
+}
 
-	// @TODO: replace this straightforward migration from effects.js with a proper requestIdleCallback
-	yield __unstableAwaitPromise(
-		new Promise( ( resolve ) => setTimeout( resolve, 100 ) )
-	);
-	yield {
+export function __unstableMarkAutomaticChangeFinal() {
+	return {
 		type: 'MARK_AUTOMATIC_CHANGE_FINAL',
 	};
 }
