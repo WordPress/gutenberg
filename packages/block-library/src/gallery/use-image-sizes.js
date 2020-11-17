@@ -3,7 +3,12 @@
  */
 import { get, reduce, map, filter, some } from 'lodash';
 
-export default function useImageSizes( images, isSelected, getSettings ) {
+export default function useImageSizes(
+	images,
+	isSelected,
+	getSettings,
+	getMedia
+) {
 	const { imageSizes } = getSettings();
 
 	let resizedImages = {};
@@ -15,7 +20,9 @@ export default function useImageSizes( images, isSelected, getSettings ) {
 				if ( ! img.id ) {
 					return currentResizedImages;
 				}
-				const image = img.imageData;
+				const image = img.imageData
+					? img.imageData
+					: getMedia( img.id );
 				const sizes = reduce(
 					imageSizes,
 					( currentSizes, size ) => {
