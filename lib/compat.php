@@ -438,9 +438,8 @@ function gutenberg_inject_default_block_context( $args ) {
 				return $block_render_callback( $attributes, $content );
 			}
 
-			$registry = WP_Block_Type_Registry::get_instance();
+			$registry   = WP_Block_Type_Registry::get_instance();
 			$block_type = $registry->get_registered( $block->name );
-
 
 			// For WordPress versions that don't support the context API.
 			if ( ! $block->context ) {
@@ -448,12 +447,12 @@ function gutenberg_inject_default_block_context( $args ) {
 			}
 
 			// Inject the post context if not done by Core.
-			$needs_post_id = empty( $block_type->uses_context ) && in_array( 'postId', $block_type->uses_context, true );
-			if ( $post instanceof WP_Post && $needs_post_id ) {
+			$needs_post_id = ! empty( $block_type->uses_context ) && in_array( 'postId', $block_type->uses_context, true );
+			if ( $post instanceof WP_Post && $needs_post_id && ! isset( $block->context['postId'] ) && 'wp_template' !== $post->post_type && 'wp_template_part' !== $post->post_type ) {
 				$block->context['postId'] = $post->ID;
 			}
-			$needs_post_type = empty( $block_type->uses_context ) && in_array( 'postType', $block_type->uses_context, true );
-			if ( $post instanceof WP_Post && $needs_post_type ) {
+			$needs_post_type = ! empty( $block_type->uses_context ) && in_array( 'postType', $block_type->uses_context, true );
+			if ( $post instanceof WP_Post && $needs_post_type && ! isset( $block->context['postType'] ) && 'wp_template' !== $post->post_type && 'wp_template_part' !== $post->post_type ) {
 				/*
 				* The `postType` context is largely unnecessary server-side, since the
 				* ID is usually sufficient on its own. That being said, since a block's
@@ -464,7 +463,7 @@ function gutenberg_inject_default_block_context( $args ) {
 			}
 
 			// Inject the query context if not done by Core.
-			$needs_query = empty( $block_type->uses_context ) && in_array( 'query', $block_type->uses_context, true );
+			$needs_query = ! empty( $block_type->uses_context ) && in_array( 'query', $block_type->uses_context, true );
 			if ( ! isset( $block->context['query'] ) && $needs_query ) {
 				if ( isset( $wp_query->tax_query->queried_terms['category'] ) ) {
 					$block->context['query'] = array( 'categoryIds' => array() );

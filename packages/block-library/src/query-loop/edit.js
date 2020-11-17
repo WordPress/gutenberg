@@ -6,9 +6,9 @@ import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import {
 	BlockContextProvider,
-	InnerBlocks,
 	BlockPreview,
 	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -103,6 +103,7 @@ export default function QueryLoopEdit( {
 		[ posts ]
 	);
 	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 
 	if ( ! posts ) {
 		return <p { ...blockProps }>{ __( 'Loading…' ) }</p>;
@@ -122,7 +123,7 @@ export default function QueryLoopEdit( {
 					>
 						{ blockContext ===
 						( activeBlockContext || blockContexts[ 0 ] ) ? (
-							<InnerBlocks template={ TEMPLATE } />
+							<div { ...innerBlocksProps } />
 						) : (
 							<BlockPreview
 								blocks={ blocks }
