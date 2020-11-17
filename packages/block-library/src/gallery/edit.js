@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isEqual, isEmpty, find } from 'lodash';
+import { isEqual, isEmpty, find, concat, differenceBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,12 +19,13 @@ import {
 	InspectorControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { Platform, useEffect, useState } from '@wordpress/element';
+import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { View } from '@wordpress/primitives';
 import { createBlock } from '@wordpress/blocks';
+import { createBlobURL } from '@wordpress/blob';
 
 /**
  * Internal dependencies
@@ -88,7 +89,14 @@ function GalleryEdit( props ) {
 		'core/block-editor'
 	);
 
-	const currentImageOptions = { linkTarget, linkTo, sizeSlug };
+	const currentImageOptions = useMemo(
+		() => ( {
+			linkTarget,
+			linkTo,
+			sizeSlug,
+		} ),
+		[ linkTarget, linkTo, sizeSlug ]
+	);
 	const [ imageSettings, setImageSettings ] = useState( currentImageOptions );
 	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
 
@@ -102,31 +110,28 @@ function GalleryEdit( props ) {
 		}
 	}, [ currentImageOptions, imageSettings ] );
 
-	const { getBlock, getMedia, getSettings, getBlocks } = useSelect(
-		( select ) => {
-			return {
-				getBlock: select( 'core/block-editor' ).getBlock,
-				getSettings: select( 'core/block-editor' ).getSettings,
-				getMedia: select( 'core' ).getMedia,
-				getBlocks: select( 'core/block-editor' ).getBlocks,
-			};
-		},
-		[]
-	);
+	const { getBlock, getMedia, getSettings } = useSelect( ( select ) => {
+		return {
+			getBlock: select( 'core/block-editor' ).getBlock,
+			getSettings: select( 'core/block-editor' ).getSettings,
+			getMedia: select( 'core' ).getMedia,
+		};
+	}, [] );
 
-	const images = useSelect( ( select ) => {
-		const newImages = select( 'core/block-editor' )
-			.getBlock( clientId )
-			.innerBlocks.map( ( block ) => {
-				return {
-					id: block.attributes.id,
-					url: block.attributes.url,
-					attributes: block.attributes,
-					imageData: getMedia( block.attributes.id ),
-				};
-			} );
-		return newImages;
+	const innerBlockImages = useSelect( ( select ) => {
+		return select( 'core/block-editor' ).getBlock( clientId ).innerBlocks;
 	} );
+
+	const images = useMemo(
+		() =>
+			innerBlockImages.map( ( block ) => ( {
+				id: block.attributes.id,
+				url: block.attributes.url,
+				attributes: block.attributes,
+				imageData: getMedia( block.attributes.id ),
+			} ) ),
+		[ innerBlockImages ]
+	);
 
 	useEffect( () => {
 		if ( images.length !== imageCount ) {
@@ -166,25 +171,45 @@ function GalleryEdit( props ) {
 		};
 	}
 
-	function onSelectImages( newImages ) {
-		const innerBlocks = getBlocks( clientId );
+	function onSelectImages( selectedImages ) {
+		const imageArray =
+			Object.prototype.toString.call( selectedImages ) ===
+			'[object FileList]'
+				? Array.from( selectedImages ).map( ( file ) => {
+						if ( ! file.url ) {
+							return pickRelevantMediaFiles( {
+								url: createBlobURL( file ),
+							} );
+						}
 
-		const newBlocks = newImages.map( ( image ) => {
-			const existingInnerBlock = find( innerBlocks, ( block ) => {
-				return block.attributes.id === image.id;
+						return file;
+				  } )
+				: selectedImages;
+
+		const newImages = imageArray
+			.filter(
+				( file ) => file.url || file.type?.indexOf( 'image/' ) === 0
+			)
+			.map( ( file ) => {
+				if ( ! file.url ) {
+					return pickRelevantMediaFiles( {
+						url: createBlobURL( file ),
+					} );
+				}
+
+				return file;
 			} );
 
-			if ( existingInnerBlock ) {
-				return existingInnerBlock;
-			}
+		const onlyNewImages = differenceBy( newImages, images, 'url' );
 
+		const newBlocks = onlyNewImages.map( ( image ) => {
 			return createBlock( 'core/image', {
 				...buildImageAttributes( undefined, image ),
 				id: image.id,
 			} );
 		} );
 
-		replaceInnerBlocks( clientId, newBlocks );
+		replaceInnerBlocks( clientId, concat( innerBlockImages, newBlocks ) );
 	}
 
 	function onUploadError( message ) {
@@ -265,7 +290,7 @@ function GalleryEdit( props ) {
 
 	const mediaPlaceholder = (
 		<MediaPlaceholder
-			addToGallery={ hasImages }
+			addToGallery={ true }
 			isAppender={ hasImages }
 			disableMediaButtons={ hasImages && ! isSelected }
 			icon={ ! hasImages && sharedIcon }
@@ -334,12 +359,11 @@ function GalleryEdit( props ) {
 							onChange={ updateImagesSize }
 						/>
 					) }
-					{ dirtyImageOptions && (
-						<DirtyImageOptions
-							applyImageOptions={ applyImageOptions }
-							cancelImageOptions={ cancelImageOptions }
-						/>
-					) }
+					<DirtyImageOptions
+						isVisible={ dirtyImageOptions }
+						applyImageOptions={ applyImageOptions }
+						cancelImageOptions={ cancelImageOptions }
+					/>
 				</PanelBody>
 			</InspectorControls>
 			{ noticeUI }

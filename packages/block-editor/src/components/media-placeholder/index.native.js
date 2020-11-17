@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback } from 'react-native';
-import { uniqWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,17 +21,8 @@ import { Icon, plusCircleFilled } from '@wordpress/icons';
  */
 import styles from './styles.scss';
 
-// remove duplicates after gallery append
-const dedupMedia = ( media ) =>
-	uniqWith(
-		media,
-		( media1, media2 ) =>
-			media1.id === media2.id || media1.url === media2.url
-	);
-
 function MediaPlaceholder( props ) {
 	const {
-		addToGallery,
 		allowedTypes = [],
 		labels = {},
 		icon,
@@ -52,15 +42,6 @@ function MediaPlaceholder( props ) {
 	// use ref to keep media array current for callbacks during rerenders
 	const mediaRef = useRef( value );
 	mediaRef.current = value;
-
-	// append and deduplicate media array for gallery use case
-	const setMedia =
-		multiple && addToGallery
-			? ( selected ) =>
-					onSelect(
-						dedupMedia( [ ...mediaRef.current, ...selected ] )
-					)
-			: onSelect;
 
 	const isOneType = allowedTypes.length === 1;
 	const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
@@ -146,7 +127,7 @@ function MediaPlaceholder( props ) {
 		<View style={ { flex: 1 } }>
 			<MediaUpload
 				allowedTypes={ allowedTypes }
-				onSelect={ setMedia }
+				onSelect={ onSelect }
 				__experimentalOnlyMediaLibrary={
 					__experimentalOnlyMediaLibrary
 				}
