@@ -1,0 +1,16 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types"
+	},
+	"references": [
+		{ "path": "../stan" },
+	],
+	"include": [
+		"src/atomic-store/*",
+	],
+	"exclude": [
+		"src/**/test"
+	]
+}

@@ -1,3 +1,5 @@
+import { WPAtom, WPAtomFamilyItem } from '@wordpress/stan';
+
 export type WPDataFunctionOrGeneratorArray = Array< Function | Generator >;
 export type WPDataFunctionArray = Array< Function >;
 
@@ -25,6 +27,12 @@ export interface WPDataReduxStoreConfig {
     resolvers?: WPDataFunctionOrGeneratorArray,
     selectors?: WPDataFunctionArray,
     controls?: WPDataFunctionArray,
+}
+
+export interface WPDataAtomicStoreConfig {
+    atoms: { [key: string]: WPAtom<any> | WPAtomFamilyItem<any> },
+    actions?: WPDataFunctionArray,
+    selectors?: WPDataFunctionArray,
 }
 
 export interface WPDataRegistry {

@@ -3,6 +3,12 @@
  */
 import { mapValues } from 'lodash';
 
+/**
+ *
+ * @param {string}                                     name   Store name.
+ * @param {import('../types').WPDataAtomicStoreConfig} config Atomic store config.
+ * @return {import('../types').WPDataStore} Store.
+ */
 export default function createAtomicStore( name, config ) {
 	return {
 		name,
