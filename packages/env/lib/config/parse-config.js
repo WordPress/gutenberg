@@ -98,11 +98,14 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		/^https?:\/\/([^\s$.?#].[^\s]*)\.zip$/
 	);
 
-	if ( zipFields && zipFields[ 1 ] ) {
-		// URL: "https://www.example.com/path/to/example-plugin.1.0.2.zip"
-		// Match group: "www.example.com/path/to/example-plugin.1.0.2"
-		// Basename: "example-plugin"
-		const basename = path.basename( zipFields[ 1 ] ).split( '.' )[ 0 ];
+	if ( zipFields ) {
+		const wpOrgFields = sourceString.match(
+			/^https?:\/\/downloads\.wordpress\.org\/(?:plugin|theme)\/([^\s\.]*)([^\s]*)?\.zip$/
+		);
+		const basename = wpOrgFields
+			? encodeURIComponent( wpOrgFields[ 1 ] )
+			: encodeURIComponent( path.basename( zipFields[ 1 ] ) );
+
 		return {
 			type: 'zip',
 			url: sourceString,
