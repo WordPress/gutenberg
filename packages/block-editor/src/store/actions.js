@@ -50,7 +50,7 @@ export function* resetBlocks( blocks ) {
 		type: 'RESET_BLOCKS',
 		blocks,
 	};
-	yield* validateBlocksToTemplate( blocks );
+	return yield* validateBlocksToTemplate( blocks );
 }
 
 /**
@@ -62,8 +62,11 @@ export function* resetBlocks( blocks ) {
  * @param {Array} blocks Array of blocks.
  */
 export function* validateBlocksToTemplate( blocks ) {
-	const template = controls.select( 'core/block-editor', 'getTemplate' );
-	const templateLock = controls.select(
+	const template = yield controls.select(
+		'core/block-editor',
+		'getTemplate'
+	);
+	const templateLock = yield controls.select(
 		'core/block-editor',
 		'getTemplateLock'
 	);
@@ -76,11 +79,12 @@ export function* validateBlocksToTemplate( blocks ) {
 		doBlocksMatchTemplate( blocks, template );
 
 	// Update if validity has changed.
-	if (
-		isBlocksValidToTemplate !==
-		controls.select( 'core/block-editor', 'getTemplateLocisValidTemplate' )
-	) {
-		yield setTemplateValidity( isBlocksValidToTemplate );
+	const isValidTemplate = yield controls.select(
+		'core/block-editor',
+		'isValidTemplate'
+	);
+	if ( isBlocksValidToTemplate !== isValidTemplate ) {
+		return yield setTemplateValidity( isBlocksValidToTemplate );
 	}
 }
 
@@ -651,7 +655,7 @@ export function* synchronizeTemplate() {
 	);
 	const updatedBlockList = synchronizeBlocksWithTemplate( blocks, template );
 
-	return resetBlocks( updatedBlockList );
+	return yield resetBlocks( updatedBlockList );
 }
 
 /**
