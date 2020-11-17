@@ -147,7 +147,7 @@ function Snackbar(
 						role="button"
 						aria-label="Dismiss this notice"
 						tabIndex="0"
-						className="components-snackbar__explicit-dismiss"
+						className="components-snackbar__dismiss-button"
 						onClick={ dismissMe }
 						onKeyPress={ dismissMe }
 					>
