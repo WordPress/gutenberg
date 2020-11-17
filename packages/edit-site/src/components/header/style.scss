@@ -63,6 +63,21 @@ body.is-navigation-sidebar-open {
 	}
 }
 
+// Centred document title on small screens with sidebar open
+@media ( max-width: #{ ($break-medium - 1) } ) {
+	body.is-navigation-sidebar-open .edit-site-header {
+		.edit-site-header_start {
+			flex-basis: 0;
+		}
+		.block-editor-post-preview__button-toggle {
+			display: none;
+		}
+		.edit-site-save-button__button {
+			margin-right: 0;
+		}
+	}
+}
+
 .edit-site-header__toolbar {
 	display: flex;
 	align-items: center;
