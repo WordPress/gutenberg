@@ -34,7 +34,9 @@ export default createHigherOrderComponent( ( WrappedComponent ) => {
 				return;
 			}
 			let nextRegion = regions[ 0 ];
-			const selectedIndex = regions.indexOf( document.activeElement );
+			const selectedIndex = regions.indexOf(
+				container.current.ownerDocument.activeElement
+			);
 			if ( selectedIndex !== -1 ) {
 				let nextIndex = selectedIndex + offset;
 				nextIndex = nextIndex === -1 ? regions.length - 1 : nextIndex;

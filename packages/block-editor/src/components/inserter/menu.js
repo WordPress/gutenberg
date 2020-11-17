@@ -16,6 +16,7 @@ import InserterPreviewPanel from './preview-panel';
 import BlockTypesTab from './block-types-tab';
 import BlockPatternsTabs from './block-patterns-tab';
 import ReusableBlocksTab from './reusable-blocks-tab';
+import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
 
@@ -26,11 +27,11 @@ function InserterMenu( {
 	clientId,
 	isAppender,
 	__experimentalSelectBlockOnInsert,
+	__experimentalInsertionIndex,
 	onSelect,
 	showInserterHelpPanel,
 	showMostUsedBlocks,
 } ) {
-	const [ activeTab, setActiveTab ] = useState( 'blocks' );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
 	const [ selectedPatternCategory, setSelectedPatternCategory ] = useState(
@@ -46,6 +47,7 @@ function InserterMenu( {
 		clientId,
 		isAppender,
 		selectBlockOnInsert: __experimentalSelectBlockOnInsert,
+		insertionIndex: __experimentalInsertionIndex,
 	} );
 	const { hasPatterns, hasReusableBlocks } = useSelect( ( select ) => {
 		const {
@@ -98,7 +100,6 @@ function InserterMenu( {
 					rootClientId={ destinationRootClientId }
 					onInsert={ onInsert }
 					onHover={ onHover }
-					filterValue={ filterValue }
 					showMostUsedBlocks={ showMostUsedBlocks }
 				/>
 			</div>
@@ -116,7 +117,6 @@ function InserterMenu( {
 	const patternsTab = (
 		<BlockPatternsTabs
 			onInsert={ onInsertPattern }
-			filterValue={ filterValue }
 			onClickCategory={ onClickPatternCategory }
 			selectedCategory={ selectedPatternCategory }
 		/>
@@ -127,21 +127,8 @@ function InserterMenu( {
 			rootClientId={ destinationRootClientId }
 			onInsert={ onInsert }
 			onHover={ onHover }
-			filterValue={ filterValue }
 		/>
 	);
-
-	const searchFormPlaceholder = () => {
-		if ( activeTab === 'reusable' ) {
-			return __( 'Search for a reusable block' );
-		}
-
-		if ( activeTab === 'patterns' ) {
-			return __( 'Search for a pattern' );
-		}
-
-		return __( 'Search for a block' );
-	};
 
 	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
 	// is always visible, and one which already incurs this behavior of autoFocus via
@@ -164,13 +151,25 @@ function InserterMenu( {
 							setFilterValue( value );
 						} }
 						value={ filterValue }
-						placeholder={ searchFormPlaceholder() }
+						placeholder={ __( 'Search' ) }
 					/>
-					{ ( showPatterns || hasReusableBlocks ) && (
+					{ !! filterValue && (
+						<InserterSearchResults
+							filterValue={ filterValue }
+							onSelect={ onSelect }
+							rootClientId={ rootClientId }
+							clientId={ clientId }
+							isAppender={ isAppender }
+							selectBlockOnInsert={
+								__experimentalSelectBlockOnInsert
+							}
+							showBlockDirectory
+						/>
+					) }
+					{ ! filterValue && ( showPatterns || hasReusableBlocks ) && (
 						<InserterTabs
 							showPatterns={ showPatterns }
 							showReusableBlocks={ hasReusableBlocks }
-							onSelect={ setActiveTab }
 						>
 							{ ( tab ) => {
 								if ( tab.name === 'blocks' ) {
@@ -182,7 +181,10 @@ function InserterMenu( {
 							} }
 						</InserterTabs>
 					) }
-					{ ! showPatterns && ! hasReusableBlocks && blocksTab }
+					{ ! filterValue &&
+						! showPatterns &&
+						! hasReusableBlocks &&
+						blocksTab }
 				</div>
 			</div>
 			{ showInserterHelpPanel && hoveredItem && (

@@ -9,8 +9,10 @@ import '@wordpress/notices';
 import { render } from '@wordpress/element';
 import {
 	registerCoreBlocks,
+	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
+import '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
@@ -18,8 +20,8 @@ import {
 import './store';
 import './hooks';
 import { create as createLegacyWidget } from './blocks/legacy-widget';
-import EditWidgetsInitializer from './components/edit-widgets-initializer';
-import CustomizerEditWidgetsInitializer from './components/customizer-edit-widgets-initializer';
+import * as widgetArea from './blocks/widget-area';
+import Layout from './components/layout';
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -28,31 +30,18 @@ import CustomizerEditWidgetsInitializer from './components/customizer-edit-widge
  * @param {Object} settings Block editor settings.
  */
 export function initialize( id, settings ) {
-	registerCoreBlocks();
-	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
-		registerBlock( createLegacyWidget( settings ) );
-	}
-	render(
-		<EditWidgetsInitializer settings={ settings } />,
-		document.getElementById( id )
+	const coreBlocks = __experimentalGetCoreBlocks().filter(
+		( block ) => ! [ 'core/more' ].includes( block.name )
 	);
-}
+	registerCoreBlocks( coreBlocks );
 
-/**
- * Initializes the block editor in the widgets Customizer section.
- *
- * @param {string} id       ID of the root element to render the section in.
- * @param {Object} settings Block editor settings.
- */
-export function customizerInitialize( id, settings ) {
-	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( settings );
-		registerBlock( createLegacyWidget( settings ) );
+		__experimentalRegisterExperimentalCoreBlocks();
 	}
+	registerBlock( createLegacyWidget( settings ) );
+	registerBlock( widgetArea );
 	render(
-		<CustomizerEditWidgetsInitializer settings={ settings } />,
+		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )
 	);
 }

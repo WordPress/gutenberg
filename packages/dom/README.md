@@ -18,6 +18,10 @@ npm install @wordpress/dom --save
 
 Get the rectangle for the selection in a container.
 
+_Parameters_
+
+-   _win_ `Window`: The window of the selection.
+
 _Returns_
 
 -   `?DOMRect`: The rectangle.
@@ -26,6 +30,10 @@ _Returns_
 
 Check whether the current document has a selection. This checks for both
 focus in an input field and general text selection.
+
+_Parameters_
+
+-   _doc_ `Document`: The document to check.
 
 _Returns_
 
@@ -39,6 +47,10 @@ elements.
 
 See: <https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects>.
 
+_Parameters_
+
+-   _doc_ `Document`: The document to check.
+
 _Returns_
 
 -   `boolean`: True if there is selection, false if not.
@@ -49,6 +61,10 @@ Check whether the current document has any sort of selection. This includes
 ranges of text across elements and any selection inside <input> and
 <textarea> elements.
 
+_Parameters_
+
+-   _doc_ `Document`: The document to check.
+
 _Returns_
 
 -   `boolean`: Whether there is any sort of "selection" in the document.
@@ -57,6 +73,18 @@ _Returns_
 
 Object grouping `focusable` and `tabbable` utils
 under the keys with the same name.
+
+<a name="getFilesFromDataTransfer" href="#getFilesFromDataTransfer">#</a> **getFilesFromDataTransfer**
+
+Gets all files from a DataTransfer object.
+
+_Parameters_
+
+-   _dataTransfer_ `DataTransfer`: DataTransfer object to inspect.
+
+_Returns_
+
+-   `Set`: A set containing all files.
 
 <a name="getOffsetParent" href="#getOffsetParent">#</a> **getOffsetParent**
 

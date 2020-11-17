@@ -5,7 +5,10 @@ function createNonceMiddleware( nonce ) {
 		// If an 'X-WP-Nonce' header (or any case-insensitive variation
 		// thereof) was specified, no need to add a nonce header.
 		for ( const headerName in headers ) {
-			if ( headerName.toLowerCase() === 'x-wp-nonce' ) {
+			if (
+				headerName.toLowerCase() === 'x-wp-nonce' &&
+				headers[ headerName ] === middleware.nonce
+			) {
 				return next( options );
 			}
 		}

@@ -96,7 +96,6 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
     >
       <ForwardRef(Button)
         isSecondary={true}
-        label="Close panel"
       >
         Cancel
       </ForwardRef(Button)>
@@ -137,7 +136,6 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
     >
       <ForwardRef(Button)
         isSecondary={true}
-        label="Close panel"
       >
         Cancel
       </ForwardRef(Button)>
@@ -178,7 +176,6 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
     >
       <ForwardRef(Button)
         isSecondary={true}
-        label="Close panel"
       >
         Cancel
       </ForwardRef(Button)>

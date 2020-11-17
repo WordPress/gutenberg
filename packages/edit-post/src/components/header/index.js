@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
@@ -24,6 +29,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		isPublishSidebarOpened,
 		isSaving,
 		showIconLabels,
+		hasReducedUI,
 	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
@@ -34,14 +40,21 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
 				'showIconLabels'
 			),
+			hasReducedUI: select( 'core/edit-post' ).isFeatureActive(
+				'reducedUI'
+			),
 		} ),
 		[]
 	);
 
 	const isLargeViewport = useViewportMatch( 'large' );
 
+	const classes = classnames( 'edit-post-header', {
+		'has-reduced-ui': hasReducedUI,
+	} );
+
 	return (
-		<div className="edit-post-header">
+		<div className={ classes }>
 			<MainDashboardButton.Slot>
 				<FullscreenModeClose />
 			</MainDashboardButton.Slot>

@@ -52,6 +52,7 @@ function BlockNavigationDropdownToggle( {
 			ref={ innerRef }
 			icon={ MenuIcon }
 			aria-expanded={ isOpen }
+			aria-haspopup="true"
 			onClick={ isEnabled ? onToggle : undefined }
 			/* translators: button label text should, if possible, be under 16 characters. */
 			label={ __( 'Outline' ) }

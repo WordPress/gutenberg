@@ -61,9 +61,8 @@ add_filter( 'rest_request_after_callbacks', 'gutenberg_filter_oembed_result', 10
  *
  * @param WP_REST_Response $response The response object.
  * @param WP_Theme         $theme    Theme object used to create response.
- * @param WP_REST_Request  $request  Request object.
  */
-function gutenberg_filter_rest_prepare_theme( $response, $theme, $request ) {
+function gutenberg_filter_rest_prepare_theme( $response, $theme ) {
 	$data   = $response->get_data();
 	$fields = array_keys( $data );
 
@@ -125,21 +124,7 @@ function gutenberg_filter_rest_prepare_theme( $response, $theme, $request ) {
 	$response->set_data( $data );
 	return $response;
 }
-add_filter( 'rest_prepare_theme', 'gutenberg_filter_rest_prepare_theme', 10, 3 );
-
-/**
- * Start: Include for phase 2
- */
-/**
- * Registers the REST API routes needed by the legacy widget block.
- *
- * @since 5.0.0
- */
-function gutenberg_register_rest_widget_updater_routes() {
-	$widget_forms = new WP_REST_Widget_Utils_Controller();
-	$widget_forms->register_routes();
-}
-add_action( 'rest_api_init', 'gutenberg_register_rest_widget_updater_routes' );
+add_filter( 'rest_prepare_theme', 'gutenberg_filter_rest_prepare_theme', 10, 2 );
 
 /**
  * Registers the block directory.
@@ -189,13 +174,27 @@ function gutenberg_register_plugins_endpoint() {
 add_action( 'rest_api_init', 'gutenberg_register_plugins_endpoint' );
 
 /**
- * Registers the Sidebars REST API routes.
+ * Registers the Sidebars & Widgets REST API routes.
  */
-function gutenberg_register_sidebars_endpoint() {
+function gutenberg_register_sidebars_and_widgets_endpoint() {
 	$sidebars = new WP_REST_Sidebars_Controller();
 	$sidebars->register_routes();
+
+	$widget_types = new WP_REST_Widget_Types_Controller();
+	$widget_types->register_routes();
+	$widgets = new WP_REST_Widgets_Controller();
+	$widgets->register_routes();
 }
-add_action( 'rest_api_init', 'gutenberg_register_sidebars_endpoint' );
+add_action( 'rest_api_init', 'gutenberg_register_sidebars_and_widgets_endpoint' );
+
+/**
+ * Registers the Batch REST API routes.
+ */
+function gutenberg_register_batch_endpoint() {
+	$batch = new WP_REST_Batch_Controller();
+	$batch->register_routes();
+}
+add_action( 'rest_api_init', 'gutenberg_register_batch_endpoint' );
 
 /**
  * Hook in to the nav menu item post type and enable a post type rest endpoint.

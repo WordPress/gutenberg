@@ -154,7 +154,9 @@ function KeyboardShortcuts() {
 			( event ) => {
 				event.preventDefault();
 				clearSelectedBlock();
-				window.getSelection().removeAllRanges();
+				event.target.ownerDocument.defaultView
+					.getSelection()
+					.removeAllRanges();
 			},
 			[ clientIds, clearSelectedBlock ]
 		),

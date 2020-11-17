@@ -182,8 +182,7 @@ class Register_Block_Type_From_Metadata_Test extends WP_UnitTestCase {
 		$this->assertEqualSets( array( 'groupId' ), $result->uses_context );
 		$this->assertEquals(
 			array(
-				'align'             => true,
-				'lightBlockWrapper' => true,
+				'align' => true,
 			),
 			$result->supports
 		);

@@ -1,10 +1,14 @@
 {
+	"apiVersion": 2,
 	"name": "core/social-links",
 	"category": "widgets",
 	"attributes": {
 		"openInNewTab": {
 			"type": "boolean",
 			"default": false
+		},
+		"size": {
+			"type": "string"
 		}
 	},
 	"providesContext": {
@@ -16,7 +20,6 @@
 			"center",
 			"right"
 		],
-		"lightBlockWrapper": true,
 		"anchor": true
 	}
 }

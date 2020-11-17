@@ -51,28 +51,6 @@ function gutenberg_initialize_experiments_settings() {
 			'id'    => 'gutenberg-navigation',
 		)
 	);
-	add_settings_field(
-		'gutenberg-full-site-editing',
-		__( 'Full Site Editing', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable Full Site Editing (Warning: this will replace your theme and cause potentially irreversible changes to your site. We recommend using this only in a development environment.)', 'gutenberg' ),
-			'id'    => 'gutenberg-full-site-editing',
-		)
-	);
-	add_settings_field(
-		'gutenberg-full-site-editing-demo',
-		__( 'Full Site Editing Demo Templates', 'gutenberg' ),
-		'gutenberg_display_experiment_field',
-		'gutenberg-experiments',
-		'gutenberg_experiments_section',
-		array(
-			'label' => __( 'Enable Full Site Editing demo templates', 'gutenberg' ),
-			'id'    => 'gutenberg-full-site-editing-demo',
-		)
-	);
 	register_setting(
 		'gutenberg-experiments',
 		'gutenberg-experiments'
@@ -120,11 +98,9 @@ function gutenberg_display_experiment_section() {
  */
 function gutenberg_experiments_editor_settings( $settings ) {
 	$experiments_settings = array(
-		'__experimentalEnableFullSiteEditing'     => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing' ),
-		'__experimentalEnableFullSiteEditingDemo' => gutenberg_is_experiment_enabled( 'gutenberg-full-site-editing-demo' ),
+		'__unstableEnableFullSiteEditingBlocks' => gutenberg_is_fse_theme(),
 	);
-
-	$gradient_presets = current( (array) get_theme_support( 'editor-gradient-presets' ) );
+	$gradient_presets     = current( (array) get_theme_support( 'editor-gradient-presets' ) );
 	if ( false !== $gradient_presets ) {
 		$experiments_settings['gradients'] = $gradient_presets;
 	}

@@ -1,7 +1,7 @@
 .edit-navigation-toolbar {
 	align-items: center;
 	background: $white;
-	border: $border-width solid $gray-200;
+	border: $border-width solid $gray-300;
 	display: flex;
 	height: $grid-unit-60 * 2;
 	padding-bottom: $grid-unit-60;
@@ -25,7 +25,7 @@
 	border-bottom: none;
 	border-left: none;
 	border-right: none;
-	border-top: 1px solid $gray-200;
+	border-top: 1px solid $gray-300;
 	position: absolute;
 	top: $grid-unit-60;
 	width: 100%;

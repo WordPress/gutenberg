@@ -89,6 +89,7 @@ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`]
 exports[`ColorPalette Dropdown .renderToggle should render dropdown content 1`] = `
 <button
   aria-expanded={true}
+  aria-haspopup="true"
   aria-label="Custom color picker"
   className="components-button is-link"
   onClick={[MockFunction]}
@@ -110,12 +111,14 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
   >
     <ForwardRef(Button)
       aria-expanded={false}
+      aria-haspopup="true"
       aria-label="Custom color picker"
       isLink={true}
       onClick={[Function]}
     >
       <button
         aria-expanded={false}
+        aria-haspopup="true"
         aria-label="Custom color picker"
         className="components-button is-link"
         onClick={[Function]}
@@ -538,12 +541,14 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
             >
               <ForwardRef(Button)
                 aria-expanded={false}
+                aria-haspopup="true"
                 aria-label="Custom color picker"
                 isLink={true}
                 onClick={[Function]}
               >
                 <button
                   aria-expanded={false}
+                  aria-haspopup="true"
                   aria-label="Custom color picker"
                   className="components-button is-link"
                   onClick={[Function]}

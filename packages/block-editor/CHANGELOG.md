@@ -2,9 +2,11 @@
 
 ## Unreleased
 
+## 5.0.0 (2020-10-06)
+
 ### Breaking Changes
 
-- The block editor does not contain default colors and gradients anymore. If one wants to take advantage of these features, please explicitly pass colors and gradients settings or use the new __experimentalFeatures setting that is available.
+- The block editor does not contain default colors, gradients, and font sizes anymore. If one wants to take advantage of these features, please explicitly pass colors, gradients, and/or settings or use the new __experimentalFeatures setting that is available.
 
 
 ## 4.0.0 (2020-05-28)

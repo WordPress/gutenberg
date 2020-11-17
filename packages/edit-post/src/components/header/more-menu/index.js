@@ -11,8 +11,8 @@ import { useViewportMatch } from '@wordpress/compose';
  * Internal dependencies
  */
 import ModeSwitcher from '../mode-switcher';
+import PreferencesMenuItem from '../preferences-menu-item';
 import ToolsMoreMenuGroup from '../tools-more-menu-group';
-import OptionsMenuItem from '../options-menu-item';
 import WritingMenu from '../writing-menu';
 
 const POPOVER_PROPS = {
@@ -57,7 +57,7 @@ const MoreMenu = ( { showIconLabels } ) => {
 					/>
 					<ToolsMoreMenuGroup.Slot fillProps={ { onClose } } />
 					<MenuGroup>
-						<OptionsMenuItem />
+						<PreferencesMenuItem />
 					</MenuGroup>
 				</>
 			) }

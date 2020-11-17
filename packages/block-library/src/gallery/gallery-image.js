@@ -27,6 +27,10 @@ import {
  * Internal dependencies
  */
 import { pickRelevantMediaFiles } from './shared';
+import {
+	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_MEDIA,
+} from './constants';
 
 const isTemporaryImage = ( id, url ) => ! id && isBlobURL( url );
 
@@ -79,7 +83,7 @@ class GalleryImage extends Component {
 
 	onRemoveImage( event ) {
 		if (
-			this.container === document.activeElement &&
+			this.container === this.container.ownerDocument.activeElement &&
 			this.props.isSelected &&
 			[ BACKSPACE, DELETE ].indexOf( event.keyCode ) !== -1
 		) {
@@ -190,10 +194,10 @@ class GalleryImage extends Component {
 		let href;
 
 		switch ( linkTo ) {
-			case 'media':
+			case LINK_DESTINATION_MEDIA:
 				href = url;
 				break;
-			case 'attachment':
+			case LINK_DESTINATION_ATTACHMENT:
 				href = link;
 				break;
 		}

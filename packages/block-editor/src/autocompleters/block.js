@@ -1,13 +1,16 @@
 /**
  * External dependencies
  */
-import { noop, map, orderBy } from 'lodash';
+import { noop, orderBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { createBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
+} from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
 
 /**
@@ -18,18 +21,6 @@ import useBlockTypesState from '../components/inserter/hooks/use-block-types-sta
 import BlockIcon from '../components/block-icon';
 
 const SHOWN_BLOCK_TYPES = 9;
-
-const createBlocksFromInnerBlocksTemplate = ( innerBlocksTemplate ) => {
-	return map(
-		innerBlocksTemplate,
-		( [ name, attributes, innerBlocks = [] ] ) =>
-			createBlock(
-				name,
-				attributes,
-				createBlocksFromInnerBlocksTemplate( innerBlocks )
-			)
-	);
-};
 
 /** @typedef {import('@wordpress/block-editor').WPEditorInserterItem} WPEditorInserterItem */
 

@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
-import { hasBlockSupport } from '@wordpress/blocks';
+import { getBlockSupport } from '@wordpress/blocks';
 import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 
 /**
@@ -12,7 +12,12 @@ import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 import { cleanEmptyObject } from './utils';
 import { useCustomUnits } from '../components/unit-control';
 
-export const PADDING_SUPPORT_KEY = '__experimentalPadding';
+export const SPACING_SUPPORT_KEY = 'spacing';
+
+const hasPaddingSupport = ( blockName ) => {
+	const spacingSupport = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
+	return spacingSupport && spacingSupport.padding !== false;
+};
 
 /**
  * Inspector control panel containing the line height related configuration
@@ -30,7 +35,7 @@ export function PaddingEdit( props ) {
 
 	const units = useCustomUnits();
 
-	if ( ! hasBlockSupport( blockName, PADDING_SUPPORT_KEY ) ) {
+	if ( ! hasPaddingSupport( blockName ) ) {
 		return null;
 	}
 

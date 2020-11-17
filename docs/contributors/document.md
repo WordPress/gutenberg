@@ -25,7 +25,7 @@ The Block Editor Handbook is a mix of markdown files in the `/docs/` directory o
 
 An automated job publishes the docs every 15 minutes to the [Block Editor Handbook site](https://developer.wordpress.org/block-editor/).
 
-See [the Git Workflow](/docs/contributors/git-workflow.md) documentation for how to use git to deploy changes using pull requests.
+See [the Git Workflow](/docs/contributors/git-workflow.md) documentation for how to use git to deploy changes using pull requests. Additionally, see the [video walk-through](https://wordpress.tv/2020/09/02/marcus-kazmierczak-contribute-developer-documentation-to-gutenberg/) and the accompanying [slides for contributing documentation to Gutenberg](https://mkaz.blog/wordpress/contribute-documentation-to-gutenberg/).
 
 ### Update a Document
 
@@ -47,7 +47,7 @@ To add a new documentation page requires a working JavaScript development enviro
 4. Run `npm run docs:build` to update `manifest.json`.
 5. Commit `manifest.json` with other files updated.
 
-If you forget to run, `npm run docs:build` your PR will fail the static analysis check, since the `manifest.json` file is an uncommited local change that must be commited.
+If you forget to run, `npm run docs:build` your PR will fail the static analysis check, since the `manifest.json` file is an uncommitted local change that must be committed.
 
 ### Using Links
 

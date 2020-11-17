@@ -29,10 +29,11 @@ import { __, sprintf } from '@wordpress/i18n';
 import {
 	BlockControls,
 	InnerBlocks,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	RichText,
 	__experimentalLinkControl as LinkControl,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { isURL, prependHTTP } from '@wordpress/url';
 import {
@@ -63,6 +64,8 @@ const useIsDraggingWithin = ( elementRef ) => {
 	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
 
 	useEffect( () => {
+		const { ownerDocument } = elementRef.current;
+
 		function handleDragStart( event ) {
 			// Check the first time when the dragging starts.
 			handleDragEnter( event );
@@ -83,15 +86,16 @@ const useIsDraggingWithin = ( elementRef ) => {
 		}
 
 		// Bind these events to the document to catch all drag events.
-		// Ideally, we can also use `event.relatedTarget`, but sadly that doesn't work in Safari.
-		document.addEventListener( 'dragstart', handleDragStart );
-		document.addEventListener( 'dragend', handleDragEnd );
-		document.addEventListener( 'dragenter', handleDragEnter );
+		// Ideally, we can also use `event.relatedTarget`, but sadly that
+		// doesn't work in Safari.
+		ownerDocument.addEventListener( 'dragstart', handleDragStart );
+		ownerDocument.addEventListener( 'dragend', handleDragEnd );
+		ownerDocument.addEventListener( 'dragenter', handleDragEnter );
 
 		return () => {
-			document.removeEventListener( 'dragstart', handleDragStart );
-			document.removeEventListener( 'dragend', handleDragEnd );
-			document.removeEventListener( 'dragenter', handleDragEnter );
+			ownerDocument.removeEventListener( 'dragstart', handleDragStart );
+			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
+			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
 		};
 	}, [] );
 
@@ -206,8 +210,10 @@ function NavigationLinkEdit( {
 	 */
 	function selectLabelText() {
 		ref.current.focus();
-		const selection = window.getSelection();
-		const range = document.createRange();
+		const { ownerDocument } = ref.current;
+		const { defaultView } = ownerDocument;
+		const selection = defaultView.getSelection();
+		const range = ownerDocument.createRange();
 		// Get the range of the current ref contents so we can add this range to the selection.
 		range.selectNodeContents( ref.current );
 		selection.removeAllRanges();
@@ -236,6 +242,52 @@ function NavigationLinkEdit( {
 			url: page.link,
 		};
 	}
+
+	const blockProps = useBlockProps( {
+		ref: listItemRef,
+		className: classnames( {
+			'is-editing':
+				( isSelected || isParentOfSelectedBlock ) &&
+				// Don't show the element as editing while dragging.
+				! isDraggingBlocks,
+			// Don't select the element while dragging.
+			'is-selected': isSelected && ! isDraggingBlocks,
+			'is-dragging-within': isDraggingWithin,
+			'has-link': !! url,
+			'has-child': hasDescendants,
+			'has-text-color': rgbTextColor,
+			[ `has-${ textColor }-color` ]: !! textColor,
+			'has-background': rgbBackgroundColor,
+			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+		} ),
+		style: {
+			color: rgbTextColor,
+			backgroundColor: rgbBackgroundColor,
+		},
+	} );
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: classnames( 'wp-block-navigation__container', {
+				'is-parent-of-selected-block':
+					isParentOfSelectedBlock &&
+					// Don't select as parent of selected block while dragging.
+					! isDraggingBlocks,
+			} ),
+		},
+		{
+			allowedBlocks: [ 'core/navigation-link' ],
+			renderAppender:
+				( isSelected && hasDescendants ) ||
+				( isImmediateParentOfSelectedBlock &&
+					! selectedBlockHasDescendants ) ||
+				// Show the appender while dragging to allow inserting element between item and the appender.
+				( isDraggingBlocks && hasDescendants )
+					? InnerBlocks.DefaultAppender
+					: false,
+			__experimentalAppenderTagName: 'li',
+		}
+	);
 
 	return (
 		<Fragment>
@@ -293,28 +345,7 @@ function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<Block.li
-				className={ classnames( {
-					'is-editing':
-						( isSelected || isParentOfSelectedBlock ) &&
-						// Don't show the element as editing while dragging.
-						! isDraggingBlocks,
-					// Don't select the element while dragging.
-					'is-selected': isSelected && ! isDraggingBlocks,
-					'is-dragging-within': isDraggingWithin,
-					'has-link': !! url,
-					'has-child': hasDescendants,
-					'has-text-color': rgbTextColor,
-					[ `has-${ textColor }-color` ]: !! textColor,
-					'has-background': rgbBackgroundColor,
-					[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
-				} ) }
-				style={ {
-					color: rgbTextColor,
-					backgroundColor: rgbBackgroundColor,
-				} }
-				ref={ listItemRef }
-			>
+			<li { ...blockProps }>
 				<div className="wp-block-navigation-link__content">
 					<RichText
 						ref={ ref }
@@ -416,32 +447,8 @@ function NavigationLinkEdit( {
 						<ItemSubmenuIcon />
 					</span>
 				) }
-				<InnerBlocks
-					allowedBlocks={ [ 'core/navigation-link' ] }
-					renderAppender={
-						( isSelected && hasDescendants ) ||
-						( isImmediateParentOfSelectedBlock &&
-							! selectedBlockHasDescendants ) ||
-						// Show the appender while dragging to allow inserting element between item and the appender.
-						( isDraggingBlocks && hasDescendants )
-							? InnerBlocks.DefaultAppender
-							: false
-					}
-					__experimentalTagName="ul"
-					__experimentalAppenderTagName="li"
-					__experimentalPassedProps={ {
-						className: classnames(
-							'wp-block-navigation__container',
-							{
-								'is-parent-of-selected-block':
-									isParentOfSelectedBlock &&
-									// Don't select as parent of selected block while dragging.
-									! isDraggingBlocks,
-							}
-						),
-					} }
-				/>
-			</Block.li>
+				<ul { ...innerBlocksProps } />
+			</li>
 		</Fragment>
 	);
 }

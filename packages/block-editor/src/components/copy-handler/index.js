@@ -100,12 +100,14 @@ function CopyHandler( { children } ) {
 
 		// Always handle multiple selected blocks.
 		if ( ! hasMultiSelection() ) {
+			const { target } = event;
+			const { ownerDocument } = target;
 			// If copying, only consider actual text selection as selection.
 			// Otherwise, any focus on an input field is considered.
 			const hasSelection =
 				event.type === 'copy' || event.type === 'cut'
-					? documentHasUncollapsedSelection()
-					: documentHasSelection();
+					? documentHasUncollapsedSelection( ownerDocument )
+					: documentHasSelection( ownerDocument );
 
 			// Let native copy behaviour take over in input fields.
 			if ( hasSelection ) {

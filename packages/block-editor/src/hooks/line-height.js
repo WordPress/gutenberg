@@ -10,7 +10,7 @@ import LineHeightControl from '../components/line-height-control';
 import { cleanEmptyObject } from './utils';
 import useEditorFeature from '../components/use-editor-feature';
 
-export const LINE_HEIGHT_SUPPORT_KEY = '__experimentalLineHeight';
+export const LINE_HEIGHT_SUPPORT_KEY = 'lineHeight';
 
 /**
  * Inspector control panel containing the line height related configuration

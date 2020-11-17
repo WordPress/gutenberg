@@ -77,7 +77,9 @@ function isValidFocusableArea( element ) {
 		return false;
 	}
 
-	const img = document.querySelector( 'img[usemap="#' + map.name + '"]' );
+	const img = element.ownerDocument.querySelector(
+		'img[usemap="#' + map.name + '"]'
+	);
 	return !! img && isVisible( img );
 }
 

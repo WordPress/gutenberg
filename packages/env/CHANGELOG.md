@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+- Update nodegit dependency to 0.27.0, the earlier version does not have pre-built binaries for Node 14.15.0 LTS. Upgrading provides support without requiring building nodegit locally.
+
 ## 2.0.0 (2020-09-03)
 
 ### Breaking Changes

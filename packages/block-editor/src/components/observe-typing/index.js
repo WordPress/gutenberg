@@ -62,9 +62,13 @@ function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 	 */
 	function toggleEventBindings( isBound ) {
 		const bindFn = isBound ? 'addEventListener' : 'removeEventListener';
-		document[ bindFn ](
+		typingContainer.current.ownerDocument[ bindFn ](
 			'selectionchange',
 			stopTypingOnSelectionUncollapse
+		);
+		typingContainer.current.ownerDocument[ bindFn ](
+			'mousemove',
+			stopTypingOnMouseMove
 		);
 		document[ bindFn ]( 'mousemove', stopTypingOnMouseMove );
 	}
@@ -97,8 +101,8 @@ function ObserveTyping( { children, setTimeout: setSafeTimeout } ) {
 	 * On selection change, unset typing flag if user has made an uncollapsed
 	 * (shift) selection.
 	 */
-	function stopTypingOnSelectionUncollapse() {
-		const selection = window.getSelection();
+	function stopTypingOnSelectionUncollapse( { target } ) {
+		const selection = target.defaultView.getSelection();
 		const isCollapsed =
 			selection.rangeCount > 0 && selection.getRangeAt( 0 ).collapsed;
 

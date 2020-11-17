@@ -9,6 +9,7 @@ export const DEPRECATED_ENTRY_KEYS = [
 	'save',
 	'migrate',
 	'isEligible',
+	'apiVersion',
 ];
 
 export const __EXPERIMENTAL_STYLE_PROPERTY = {
@@ -17,9 +18,14 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	backgroundColor: [ 'color', 'background' ],
 	color: [ 'color', 'text' ],
 	fontSize: [ 'typography', 'fontSize' ],
+	fontStyle: [ 'typography', 'fontStyle' ],
+	fontWeight: [ 'typography', 'fontWeight' ],
 	lineHeight: [ 'typography', 'lineHeight' ],
+	textDecoration: [ 'typography', 'textDecoration' ],
+	textTransform: [ 'typography', 'textTransform' ],
 	paddingBottom: [ 'spacing', 'padding', 'bottom' ],
 	paddingLeft: [ 'spacing', 'padding', 'left' ],
 	paddingRight: [ 'spacing', 'padding', 'right' ],
 	paddingTop: [ 'spacing', 'padding', 'top' ],
+	fontFamily: [ 'typography', 'fontFamily' ],
 };

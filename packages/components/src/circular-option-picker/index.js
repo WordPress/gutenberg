@@ -64,6 +64,7 @@ function DropdownLinkAction( {
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					aria-expanded={ isOpen }
+					aria-haspopup="true"
 					onClick={ onToggle }
 					isLink
 					{ ...buttonProps }

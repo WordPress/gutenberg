@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
+import { useBlockProps } from '@wordpress/block-editor';
 
 // TODO: JSDOC types
 export default function Edit( { attributes, context } ) {
@@ -15,5 +16,9 @@ export default function Edit( { attributes, context } ) {
 		commentId
 	);
 
-	return <p className={ className }>{ content }</p>;
+	return (
+		<div { ...useBlockProps() }>
+			<p className={ className }>{ content }</p>
+		</div>
+	);
 }

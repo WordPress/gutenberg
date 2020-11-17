@@ -34,17 +34,33 @@
 		font-weight: bold;
 		line-height: 1.4;
 
-		// Large text needs a 3:1 contrast ratio.
 		&::-webkit-input-placeholder {
-			color: $medium-gray-placeholder;
+			color: $dark-gray-placeholder;
 		}
 
 		&::-moz-placeholder {
-			color: $medium-gray-placeholder;
+			color: $dark-gray-placeholder;
+			// Override Firefox default.
+			opacity: 1;
 		}
 
 		&:-ms-input-placeholder {
-			color: $medium-gray-placeholder;
+			color: $dark-gray-placeholder;
+		}
+
+		.is-dark-theme & {
+			&::-webkit-input-placeholder {
+				color: $light-gray-placeholder;
+			}
+
+			&::-moz-placeholder {
+				opacity: 1; // Necessary because Firefox reduces this from 1.
+				color: $light-gray-placeholder;
+			}
+
+			&:-ms-input-placeholder {
+				color: $light-gray-placeholder;
+			}
 		}
 
 		&:focus {

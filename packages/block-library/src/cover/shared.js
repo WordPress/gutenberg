@@ -1,3 +1,10 @@
+/**
+ * WordPress dependencies
+ */
+import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
+import { __ } from '@wordpress/i18n';
+import { Platform } from '@wordpress/element';
+
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
 	'top center': 'is-position-top-center',
@@ -18,12 +25,34 @@ export function backgroundImageStyles( url ) {
 	return url ? { backgroundImage: `url(${ url })` } : {};
 }
 
+const isWeb = Platform.OS === 'web';
+
 export const CSS_UNITS = [
-	{ value: 'px', label: 'px', default: 430 },
-	{ value: 'em', label: 'em', default: 20 },
-	{ value: 'rem', label: 'rem', default: 20 },
-	{ value: 'vw', label: 'vw', default: 20 },
-	{ value: 'vh', label: 'vh', default: 50 },
+	{
+		value: 'px',
+		label: isWeb ? 'px' : __( 'Pixels (px)' ),
+		default: '430',
+	},
+	{
+		value: 'em',
+		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
+		default: '20',
+	},
+	{
+		value: 'rem',
+		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
+		default: '20',
+	},
+	{
+		value: 'vw',
+		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
+		default: '20',
+	},
+	{
+		value: 'vh',
+		label: isWeb ? 'vh' : __( 'Viewport height (vh)' ),
+		default: '50',
+	},
 ];
 
 export function dimRatioToClass( ratio ) {
@@ -38,6 +67,11 @@ export function attributesFromMedia( setAttributes ) {
 			setAttributes( { url: undefined, id: undefined } );
 			return;
 		}
+
+		if ( isBlobURL( media.url ) ) {
+			media.type = getBlobTypeByURL( media.url );
+		}
+
 		let mediaType;
 		// for media selections originated from a file upload.
 		if ( media.media_type ) {

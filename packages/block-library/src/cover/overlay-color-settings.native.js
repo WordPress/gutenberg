@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -13,12 +12,13 @@ import {
 	getGradientValueBySlug,
 	getGradientSlugByValue,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
+	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 
 function OverlayColorSettings( { attributes, setAttributes } ) {
-	const { colors, gradients } = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings();
-	}, [] );
+	const EMPTY_ARRAY = [];
+	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
+	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
 
 	const {
 		overlayColor,

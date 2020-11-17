@@ -1,6 +1,6 @@
 # ComboboxControl
 
-`ComboboxControl` is an enhanced version of a [`CustomSelectControl`](/packages/components/src/custom-select-control/readme.md), with the addition of being able to search for options using a search input.
+`ComboboxControl` is an enhanced version of a [`SelectControl`](/packages/components/src/select-control/readme.md), with the addition of being able to search for options using a search input.
 
 ## Table of contents
 
@@ -10,7 +10,7 @@
 
 ## Design guidelines
 
-These are the same as [the ones for `CustomSelectControl`s](/packages/components/src/select-control/readme.md#design-guidelines), but this component is better suited for when there are too many items to scroll through or load at once so you need to filter them based on user input.
+These are the same as [the ones for `SelectControl`s](/packages/components/src/select-control/readme.md#design-guidelines), but this component is better suited for when there are too many items to scroll through or load at once so you need to filter them based on user input.
 
 ## Development guidelines
 
@@ -25,82 +25,45 @@ import { useState } from "@wordpress/compose";
 
 const options = [
 	{
-		key: "small",
-		name: "Small",
-		style: { fontSize: "50%" }
+		value: "small",
+		label: "Small"
 	},
 	{
-		key: "normal",
-		name: "Normal",
-		style: { fontSize: "100%" }
+		value: "normal",
+		label: "Normal"
 	},
 	{
-		key: "large",
-		name: "Large",
-		style: { fontSize: "200%" }
+		value: "large",
+		label: "Large"
 	},
 	{
-		key: "huge",
-		name: "Huge",
-		style: { fontSize: "300%" }
+		value: "huge",
+		label: "Huge"
 	}
 ];
 
 function MyComboboxControl() {
-	const [, setFontSize] = useState();
+	const [fontSize, setFontSize] = useState();
 	const [filteredOptions, setFilteredOptions] = useState(options);
 	return (
 		<ComboboxControl
 			label="Font Size"
+			value={fontSize}
+			onChange={setFontSize}
 			options={filteredOptions}
-			onInputValueChange={({ inputValue }) =>
+			onInputChange={(inputValue) =>
 				setFilteredOptions(
 					options.filter(option =>
-						option.name.toLowerCase().startsWith(inputValue.toLowerCase())
+						option.label.toLowerCase().startsWith(inputValue.toLowerCase())
 					)
 				)
 			}
-			onChange={({ selectedItem }) => setFontSize(selectedItem)}
-		/>
-	);
-}
-
-function MyControlledComboboxControl() {
-	const [fontSize, setFontSize] = useState(options[0]);
-	const [filteredOptions, setFilteredOptions] = useState(options);
-	return (
-		<ComboboxControl
-			label="Font Size"
-			options={filteredOptions}
-			onInputValueChange={({ inputValue }) =>
-				setFilteredOptions(
-					options.filter(option =>
-						option.name.toLowerCase().startsWith(inputValue.toLowerCase())
-					)
-				)
-			}
-			onChange={({ selectedItem }) => setFontSize(selectedItem)}
-			value={options.find(option => option.key === fontSize.key)}
 		/>
 	);
 }
 ```
 
 ### Props
-
-#### className
-
-A custom class name to append to the outer `<div>`.
-
-- Type: `String`
-- Required: No
-
-#### hideLabelFromVision
-
-Used to visually hide the label. It will always be visible to screen readers.
-
-- Type: `Boolean`
-- Required: No
 
 #### label
 
@@ -109,33 +72,45 @@ The label for the control.
 - Type: `String`
 - Required: Yes
 
+#### hideLabelFromVision
+If true, the label will only be visible to screen readers.
+
+- Type: `Boolean`
+- Required: No
+
+#### help
+If this property is added, a help text will be generated using help property as the content.
+
+- Type: `String`
+- Required: No
+
 #### options
 
 The options that can be chosen from.
 
-- Type: `Array<{ key: String, name: String, style: ?{}, ...rest }>`
+- Type: `Array<{ value: String, label: String }>`
 - Required: Yes
 
-#### onInputValueChange
+#### onInputChange
 
-Function called with the control's search input value changes. The `inputValue` property contains the next input value.
+Function called with the control's search input value changes. The argument contains the next input value.
 
 - Type: `Function`
 - Required: No
 
 #### onChange
 
-Function called with the control's internal state changes. The `selectedItem` property contains the next selected item.
+Function called with the selected value changes.
 
 - Type: `Function`
 - Required: No
 
 #### value
 
-Can be used to externally control the value of the control, like in the `MyControlledComboboxControl` example above.
+The current value of the input.
 
-- Type: `Object`
-- Required: No
+- Type: `mixed`
+- Required: Yes
 
 ## Related components
 

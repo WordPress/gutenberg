@@ -8,7 +8,7 @@ import { View } from 'react-native';
  */
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { useEffect } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	InnerBlocks,
 	BlockControls,
@@ -17,8 +17,9 @@ import {
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
-	RangeControl,
 	FooterMessageControl,
+	UnitControl,
+	getValueAndUnit,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -26,7 +27,7 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './editor.scss';
 import ColumnsPreview from './column-preview';
-import { getColumnWidths } from '../columns/utils';
+import { getWidths, getWidthWithUnit, CSS_UNITS } from '../columns/utils';
 
 function ColumnEdit( {
 	attributes,
@@ -37,15 +38,21 @@ function ColumnEdit( {
 	isParentSelected,
 	contentStyle,
 	columns,
-	columnCount,
 	selectedColumnIndex,
 	parentAlignment,
 } ) {
-	const { verticalAlignment } = attributes;
+	const { verticalAlignment, width } = attributes;
+	const { valueUnit = '%' } = getValueAndUnit( width ) || {};
+
+	const [ widthUnit, setWidthUnit ] = useState( valueUnit );
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
 	};
+
+	useEffect( () => {
+		setWidthUnit( valueUnit );
+	}, [ valueUnit ] );
 
 	useEffect( () => {
 		if ( ! verticalAlignment && parentAlignment ) {
@@ -53,15 +60,24 @@ function ColumnEdit( {
 		}
 	}, [] );
 
-	const onWidthChange = ( width ) => {
+	const onChangeWidth = ( nextWidth ) => {
+		const widthWithUnit = getWidthWithUnit( nextWidth, widthUnit );
+
 		setAttributes( {
-			width,
+			width: widthWithUnit,
 		} );
 	};
 
-	const columnWidths = Object.values(
-		getColumnWidths( columns, columnCount )
-	);
+	const onChangeUnit = ( nextUnit ) => {
+		setWidthUnit( nextUnit );
+		const tempWidth = parseFloat(
+			width || getWidths( columns )[ selectedColumnIndex ]
+		);
+
+		setAttributes( {
+			width: getWidthWithUnit( tempWidth, nextUnit ),
+		} );
+	};
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
@@ -89,16 +105,19 @@ function ColumnEdit( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Column settings' ) }>
-					<RangeControl
+					<UnitControl
 						label={ __( 'Width' ) }
 						min={ 1 }
-						max={ 100 }
-						value={ columnWidths[ selectedColumnIndex ] }
-						onChange={ onWidthChange }
-						toFixed={ 1 }
-						rangePreview={
+						max={ widthUnit === '%' ? 100 : undefined }
+						decimalNum={ 1 }
+						value={ getWidths( columns )[ selectedColumnIndex ] }
+						onChange={ onChangeWidth }
+						onUnitChange={ onChangeUnit }
+						unit={ widthUnit }
+						units={ CSS_UNITS }
+						preview={
 							<ColumnsPreview
-								columnWidths={ columnWidths }
+								columnWidths={ getWidths( columns, false ) }
 								selectedColumnIndex={ selectedColumnIndex }
 							/>
 						}
@@ -168,7 +187,6 @@ export default compose( [
 		const blockOrder = getBlockOrder( parentId );
 
 		const selectedColumnIndex = blockOrder.indexOf( clientId );
-		const columnCount = getBlockCount( parentId );
 		const columns = getBlocks( parentId );
 
 		const parentAlignment = getBlockAttributes( parentId )
@@ -180,7 +198,6 @@ export default compose( [
 			isSelected,
 			selectedColumnIndex,
 			columns,
-			columnCount,
 			parentAlignment,
 		};
 	} ),

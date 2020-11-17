@@ -10,7 +10,7 @@ import { addFilter } from '@wordpress/hooks';
 import AutoBlockUninstaller from '../components/auto-block-uninstaller';
 import InserterMenuDownloadableBlocksPanel from './inserter-menu-downloadable-blocks-panel';
 import InstalledBlocksPrePublishPanel from './installed-blocks-pre-publish-panel';
-import filterMissing from './filter-missing';
+import getInstallMissing from './get-install-missing';
 
 registerPlugin( 'block-directory', {
 	render() {
@@ -25,7 +25,14 @@ registerPlugin( 'block-directory', {
 } );
 
 addFilter(
-	'editor.missingEdit',
-	'block-directory/install-missing',
-	filterMissing
+	'blocks.registerBlockType',
+	'block-directory/fallback',
+	( settings, name ) => {
+		if ( name !== 'core/missing' ) {
+			return settings;
+		}
+		settings.edit = getInstallMissing( settings.edit );
+
+		return settings;
+	}
 );

@@ -4,11 +4,6 @@
 import { remove, replace } from '@wordpress/dom';
 
 /**
- * Browser dependencies
- */
-const { COMMENT_NODE } = window.Node;
-
-/**
  * Looks for `<!--nextpage-->` and `<!--more-->` comments, as well as the
  * `<!--more Some text-->` variant and its `<!--noteaser-->` companion,
  * and replaces them with a custom element representing a future block.
@@ -25,7 +20,7 @@ const { COMMENT_NODE } = window.Node;
  * @return {void}
  */
 export default function specialCommentConverter( node, doc ) {
-	if ( node.nodeType !== COMMENT_NODE ) {
+	if ( node.nodeType !== node.COMMENT_NODE ) {
 		return;
 	}
 
@@ -47,7 +42,7 @@ export default function specialCommentConverter( node, doc ) {
 		let noTeaser = false;
 		while ( ( sibling = sibling.nextSibling ) ) {
 			if (
-				sibling.nodeType === COMMENT_NODE &&
+				sibling.nodeType === sibling.COMMENT_NODE &&
 				sibling.nodeValue === 'noteaser'
 			) {
 				noTeaser = true;

@@ -26,6 +26,7 @@ import {
 	MastodonIcon,
 	MeetupIcon,
 	MediumIcon,
+	PatreonIcon,
 	PinterestIcon,
 	PocketIcon,
 	RedditIcon,
@@ -33,6 +34,8 @@ import {
 	SnapchatIcon,
 	SoundCloudIcon,
 	SpotifyIcon,
+	TelegramIcon,
+	TiktokIcon,
 	TumblrIcon,
 	TwitchIcon,
 	TwitterIcon,
@@ -176,6 +179,7 @@ const variations = [
 		name: 'mail',
 		attributes: { service: 'mail' },
 		title: 'Mail',
+		keywords: [ 'email', 'e-mail' ],
 		icon: MailIcon,
 	},
 	{
@@ -195,6 +199,12 @@ const variations = [
 		attributes: { service: 'medium' },
 		title: 'Medium',
 		icon: MediumIcon,
+	},
+	{
+		name: 'patreon',
+		attributes: { service: 'patreon' },
+		title: 'Patreon',
+		icon: PatreonIcon,
 	},
 	{
 		name: 'pinterest',
@@ -237,6 +247,18 @@ const variations = [
 		attributes: { service: 'spotify' },
 		title: 'Spotify',
 		icon: SpotifyIcon,
+	},
+	{
+		name: 'telegram',
+		attributes: { service: 'telegram' },
+		title: 'Telegram',
+		icon: TelegramIcon,
+	},
+	{
+		name: 'tiktok',
+		attributes: { service: 'tiktok' },
+		title: 'TikTok',
+		icon: TiktokIcon,
 	},
 	{
 		name: 'tumblr',

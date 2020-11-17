@@ -12,7 +12,8 @@
 		{ "docs/architecture/folder-structure.md": [] },
 		{ "docs/architecture/modularity.md": [] },
 		{ "docs/architecture/performance.md": [] },
-		{ "docs/architecture/automated-testing.md": [] }
+		{ "docs/architecture/automated-testing.md": [] },
+		{ "docs/architecture/fse-templates.md": [] }
 	] },
 	{ "docs/designers-developers/developers/README.md": [
 		{ "docs/designers-developers/developers/block-api/README.md": [
@@ -21,6 +22,7 @@
 			{ "docs/designers-developers/developers/block-api/block-attributes.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-context.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-deprecation.md": [] },
+			{ "docs/designers-developers/developers/block-api/block-supports.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-transforms.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-templates.md": [] },
 			{ "docs/designers-developers/developers/block-api/block-patterns.md": [] },

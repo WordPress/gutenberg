@@ -2,12 +2,11 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { compose } from '@wordpress/compose';
 import { RawHTML } from '@wordpress/element';
-import { Button, withFilters } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { getBlockType, createBlock } from '@wordpress/blocks';
 import { withDispatch } from '@wordpress/data';
-import { Warning } from '@wordpress/block-editor';
+import { Warning, useBlockProps } from '@wordpress/block-editor';
 
 function MissingBlockWarning( { attributes, convertToHTML } ) {
 	const { originalName, originalUndelimitedContent } = attributes;
@@ -40,28 +39,25 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	}
 
 	return (
-		<>
+		<div { ...useBlockProps() }>
 			<Warning actions={ actions }>{ messageHTML }</Warning>
 			<RawHTML>{ originalUndelimitedContent }</RawHTML>
-		</>
+		</div>
 	);
 }
 
-const MissingEdit = compose(
-	withDispatch( ( dispatch, { clientId, attributes } ) => {
-		const { replaceBlock } = dispatch( 'core/block-editor' );
-		return {
-			convertToHTML() {
-				replaceBlock(
-					clientId,
-					createBlock( 'core/html', {
-						content: attributes.originalUndelimitedContent,
-					} )
-				);
-			},
-		};
-	} ),
-	withFilters( 'editor.missingEdit' )
-)( MissingBlockWarning );
+const MissingEdit = withDispatch( ( dispatch, { clientId, attributes } ) => {
+	const { replaceBlock } = dispatch( 'core/block-editor' );
+	return {
+		convertToHTML() {
+			replaceBlock(
+				clientId,
+				createBlock( 'core/html', {
+					content: attributes.originalUndelimitedContent,
+				} )
+			);
+		},
+	};
+} )( MissingBlockWarning );
 
 export default MissingEdit;

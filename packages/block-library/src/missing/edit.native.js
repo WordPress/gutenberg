@@ -1,12 +1,21 @@
 /**
  * External dependencies
  */
-import { Platform, View, Text, TouchableWithoutFeedback } from 'react-native';
+import {
+	View,
+	Text,
+	TouchableWithoutFeedback,
+	TouchableHighlight,
+} from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { requestUnsupportedBlockFallback } from '@wordpress/react-native-bridge';
+import {
+	requestUnsupportedBlockFallback,
+	sendActionButtonPressedAction,
+	actionButtons,
+} from '@wordpress/react-native-bridge';
 import { BottomSheet, Icon } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { coreBlocks } from '@wordpress/block-library';
@@ -14,7 +23,8 @@ import { normalizeIconObject } from '@wordpress/blocks';
 import { Component } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { help, plugins } from '@wordpress/icons';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -26,12 +36,20 @@ export class UnsupportedBlockEdit extends Component {
 		super( props );
 		this.state = { showHelp: false };
 		this.toggleSheet = this.toggleSheet.bind( this );
+		this.closeSheet = this.closeSheet.bind( this );
 		this.requestFallback = this.requestFallback.bind( this );
+		this.onHelpButtonPressed = this.onHelpButtonPressed.bind( this );
 	}
 
 	toggleSheet() {
 		this.setState( {
 			showHelp: ! this.state.showHelp,
+		} );
+	}
+
+	closeSheet() {
+		this.setState( {
+			showHelp: false,
 		} );
 	}
 
@@ -48,20 +66,41 @@ export class UnsupportedBlockEdit extends Component {
 		);
 
 		return (
-			<View style={ styles.helpIconContainer }>
+			<TouchableHighlight
+				onPress={ this.onHelpButtonPressed }
+				style={ styles.helpIconContainer }
+				accessibilityLabel={ __( 'Help button' ) }
+				accessibilityRole={ 'button' }
+				accessibilityHint={ __( 'Tap here to show help' ) }
+			>
 				<Icon
 					className="unsupported-icon-help"
 					label={ __( 'Help icon' ) }
 					icon={ help }
 					color={ infoIconStyle.color }
 				/>
-			</View>
+			</TouchableHighlight>
 		);
 	}
 
-	requestFallback() {
+	onHelpButtonPressed() {
+		if ( ! this.props.isSelected ) {
+			this.props.selectBlock();
+		}
 		this.toggleSheet();
-		this.setState( { sendFallbackMessage: true } );
+	}
+
+	requestFallback() {
+		if (
+			this.props.canEnableUnsupportedBlockEditor &&
+			this.props.isUnsupportedBlockEditorSupported === false
+		) {
+			this.toggleSheet();
+			this.setState( { sendButtonPressMessage: true } );
+		} else {
+			this.toggleSheet();
+			this.setState( { sendFallbackMessage: true } );
+		}
 	}
 
 	renderSheet( blockTitle, blockName ) {
@@ -70,6 +109,7 @@ export class UnsupportedBlockEdit extends Component {
 			attributes,
 			clientId,
 			isUnsupportedBlockEditorSupported,
+			canEnableUnsupportedBlockEditor,
 		} = this.props;
 		const infoTextStyle = getStylesFromColorScheme(
 			styles.infoText,
@@ -88,13 +128,17 @@ export class UnsupportedBlockEdit extends Component {
 			styles.infoSheetIconDark
 		);
 
-		const titleFormat =
-			Platform.OS === 'android'
-				? // translators: %s: Name of the block
-				  __( "'%s' isn't yet supported on WordPress for Android" )
-				: // translators: %s: Name of the block
-				  __( "'%s' isn't yet supported on WordPress for iOS" );
+		/* translators: Missing block alert title. %s: The localized block name */
+		const titleFormat = __( "'%s' is not fully-supported" );
 		const infoTitle = sprintf( titleFormat, blockTitle );
+		const missingBlockDetail = applyFilters(
+			'native.missing_block_detail',
+			__( 'We are working hard to add more blocks with each release.' )
+		);
+		const missingBlockActionButton = applyFilters(
+			'native.missing_block_action_button',
+			__( 'Edit using web editor' )
+		);
 
 		const actionButtonStyle = getStylesFromColorScheme(
 			styles.actionButton,
@@ -105,7 +149,7 @@ export class UnsupportedBlockEdit extends Component {
 			<BottomSheet
 				isVisible={ this.state.showHelp }
 				hideHeader
-				onClose={ this.toggleSheet }
+				onClose={ this.closeSheet }
 				onModalHide={ () => {
 					if ( this.state.sendFallbackMessage ) {
 						// On iOS, onModalHide is called when the controller is still part of the hierarchy.
@@ -124,6 +168,13 @@ export class UnsupportedBlockEdit extends Component {
 							);
 						}, 100 );
 						this.setState( { sendFallbackMessage: false } );
+					} else if ( this.state.sendButtonPressMessage ) {
+						this.timeout = setTimeout( () => {
+							sendActionButtonPressedAction(
+								actionButtons.missingBlockAlertActionButton
+							);
+						}, 100 );
+						this.setState( { sendButtonPressMessage: false } );
 					}
 				} }
 			>
@@ -137,19 +188,14 @@ export class UnsupportedBlockEdit extends Component {
 						{ infoTitle }
 					</Text>
 					<Text style={ [ infoTextStyle, infoDescriptionStyle ] }>
-						{ isUnsupportedBlockEditorSupported
-							? __(
-									"We are working hard to add more blocks with each release. In the meantime, you can also edit this block using your device's web browser."
-							  )
-							: __(
-									'We are working hard to add more blocks with each release. In the meantime, you can also edit this post on the web.'
-							  ) }
+						{ missingBlockDetail }
 					</Text>
 				</View>
-				{ isUnsupportedBlockEditorSupported && (
+				{ ( isUnsupportedBlockEditorSupported ||
+					canEnableUnsupportedBlockEditor ) && (
 					<>
 						<BottomSheet.Cell
-							label={ __( 'Edit block in web browser' ) }
+							label={ missingBlockActionButton }
 							separatorType="topFullWidth"
 							onPress={ this.requestFallback }
 							labelStyle={ actionButtonStyle }
@@ -228,6 +274,17 @@ export default compose( [
 		return {
 			isUnsupportedBlockEditorSupported:
 				getSettings( 'capabilities' ).unsupportedBlockEditor === true,
+			canEnableUnsupportedBlockEditor:
+				getSettings( 'capabilities' )
+					.canEnableUnsupportedBlockEditor === true,
+		};
+	} ),
+	withDispatch( ( dispatch, ownProps ) => {
+		const { selectBlock } = dispatch( 'core/block-editor' );
+		return {
+			selectBlock() {
+				selectBlock( ownProps.clientId );
+			},
 		};
 	} ),
 	withPreferredColorScheme,

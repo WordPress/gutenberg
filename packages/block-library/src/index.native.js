@@ -193,6 +193,7 @@ addFilter(
  * ```
  */
 export const registerCoreBlocks = () => {
+	// When adding new blocks to this list please also consider updating /src/block-support/supported-blocks.json in the Gutenberg-Mobile repo
 	[
 		paragraph,
 		heading,
@@ -222,6 +223,7 @@ export const registerCoreBlocks = () => {
 		socialLink,
 		socialLinks,
 		pullquote,
+		devOnly( file ),
 	].forEach( registerBlock );
 
 	registerBlockVariations( socialLink );

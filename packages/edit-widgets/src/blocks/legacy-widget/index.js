@@ -40,6 +40,7 @@ export const create = ( editorSettings ) => {
 		name,
 		settings: {
 			...settings,
+			__experimentalLabel: ( { name: widgetName } ) => widgetName,
 			variations: legacyWidgetsToBlockVariations( legacyWidgets ),
 		},
 	};
@@ -66,14 +67,17 @@ function legacyWidgetToBlockVariation( className, widget ) {
 		name: className,
 		title: widget.name,
 	};
+
 	if ( widget.isReferenceWidget ) {
 		blockVariation.attributes = {
+			name: widget.name,
 			referenceWidgetName: className,
 			instance: {},
 		};
 	} else {
 		blockVariation.attributes = {
-			id_base: widget.id_base,
+			name: widget.name,
+			idBase: widget.id_base,
 			widgetClass: className,
 			instance: {},
 		};

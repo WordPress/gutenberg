@@ -1,4 +1,5 @@
 {
+	"apiVersion": 2,
 	"name": "core/site-logo",
 	"category": "layout",
 	"attributes": {
@@ -10,7 +11,6 @@
 		}
 	},
 	"supports": {
-		"html": false,
-		"lightBlockWrapper": true
+		"html": false
 	}
 }

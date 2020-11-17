@@ -46,15 +46,11 @@ const BlockPreview = ( { blocks } ) => {
 };
 BlockPreview.displayName = 'BlockPreview';
 
-const Preview = ( props ) => {
+const ModalPreview = ( props ) => {
 	const { template, onDismiss, onApply } = props;
 	const previewContainerStyle = usePreferredColorSchemeStyle(
 		styles.previewContainer,
 		styles.previewContainerDark
-	);
-	const previewContentStyle = usePreferredColorSchemeStyle(
-		styles.previewContent,
-		styles.previewContentDark
 	);
 	const androidModalClosedSubscription = useRef();
 
@@ -105,13 +101,28 @@ const Preview = ( props ) => {
 					title={ template.name }
 					subtitle={ __( 'Template Preview' ) }
 				/>
-				<View style={ previewContentStyle }>
-					<BlockPreview blocks={ template.blocks } />
-				</View>
+				<Preview blocks={ template.blocks } />
 			</SafeAreaView>
 		</Modal>
 	);
 };
-Preview.displayName = 'TemplatePreview';
+ModalPreview.displayName = 'TemplatePreview';
 
-export default Preview;
+export const Preview = ( props ) => {
+	const { blocks } = props;
+	const previewContentStyle = usePreferredColorSchemeStyle(
+		styles.previewContent,
+		styles.previewContentDark
+	);
+
+	if ( blocks === undefined ) {
+		return null;
+	}
+	return (
+		<View style={ previewContentStyle }>
+			<BlockPreview blocks={ blocks } />
+		</View>
+	);
+};
+
+export default ModalPreview;

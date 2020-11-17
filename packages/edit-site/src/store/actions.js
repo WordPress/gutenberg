@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { select, dispatch, apiFetch } from '@wordpress/data-controls';
+import { controls } from '@wordpress/data';
+import { apiFetch } from '@wordpress/data-controls';
 
 /**
  * Internal dependencies
@@ -58,7 +59,7 @@ export function setTemplate( templateId ) {
  * @return {Object} Action object used to set the current template.
  */
 export function* addTemplate( template ) {
-	const newTemplate = yield dispatch(
+	const newTemplate = yield controls.dispatch(
 		'core',
 		'saveEntityRecord',
 		'postType',
@@ -81,11 +82,8 @@ export function* removeTemplate( templateId ) {
 		path: `/wp/v2/templates/${ templateId }`,
 		method: 'DELETE',
 	} );
-	yield dispatch(
-		'core/edit-site',
-		'setPage',
-		yield select( 'core/edit-site', 'getPage' )
-	);
+	const page = yield controls.select( 'core/edit-site', 'getPage' );
+	yield controls.dispatch( 'core/edit-site', 'setPage', page );
 }
 
 /**
@@ -143,7 +141,12 @@ export function* showHomepage() {
 	const {
 		show_on_front: showOnFront,
 		page_on_front: frontpageId,
-	} = yield select( 'core', 'getEntityRecord', 'root', 'site' );
+	} = yield controls.resolveSelect(
+		'core',
+		'getEntityRecord',
+		'root',
+		'site'
+	);
 
 	const page = {
 		path: '/',
@@ -158,4 +161,70 @@ export function* showHomepage() {
 
 	const homeTemplate = yield* setPage( page );
 	yield setHomeTemplateId( homeTemplate );
+}
+
+/**
+ * Returns an action object used to set the active navigation panel menu.
+ *
+ * @param {string} menu Menu prop of active menu.
+ *
+ * @return {Object} Action object.
+ */
+export function setNavigationPanelActiveMenu( menu ) {
+	return {
+		type: 'SET_NAVIGATION_PANEL_ACTIVE_MENU',
+		menu,
+	};
+}
+
+/**
+ * Opens the navigation panel and sets its active menu at the same time.
+ *
+ * @param {string} menu Identifies the menu to open.
+ */
+export function openNavigationPanelToMenu( menu ) {
+	return {
+		type: 'OPEN_NAVIGATION_PANEL_TO_MENU',
+		menu,
+	};
+}
+
+/**
+ * Sets whether the navigation panel should be open.
+ *
+ * @param {boolean} isOpen If true, opens the nav panel. If false, closes it. It
+ *                         does not toggle the state, but sets it directly.
+ */
+export function setIsNavigationPanelOpened( isOpen ) {
+	return {
+		type: 'SET_IS_NAVIGATION_PANEL_OPENED',
+		isOpen,
+	};
+}
+
+/**
+ * Sets whether the block inserter panel should be open.
+ *
+ * @param {boolean} isOpen If true, opens the inserter. If false, closes it. It
+ *                         does not toggle the state, but sets it directly.
+ */
+export function setIsInserterOpened( isOpen ) {
+	return {
+		type: 'SET_IS_INSERTER_OPENED',
+		isOpen,
+	};
+}
+
+/**
+ * Returns an action object used to update the settings.
+ *
+ * @param {Object} settings New settings.
+ *
+ * @return {Object} Action object.
+ */
+export function updateSettings( settings ) {
+	return {
+		type: 'UPDATE_SETTINGS',
+		settings,
+	};
 }

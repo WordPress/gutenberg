@@ -1,4 +1,5 @@
 {
+	"apiVersion": 2,
 	"name": "my-plugin/notice",
 	"title": "Notice",
 	"category": "common",
@@ -26,8 +27,7 @@
 		}
 	},
 	"supports": {
-		"align": true,
-		"lightBlockWrapper": true
+		"align": true
 	},
 	"styles": [
 		{

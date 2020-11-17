@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isString, kebabCase, reduce, upperFirst } from 'lodash';
+import { isString, kebabCase, reduce, upperFirst } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -161,9 +161,7 @@ function createColorHOC( colorTypes, withColorPalette ) {
 
 							const previousColorObject =
 								previousState[ colorAttributeName ];
-							const previousColor = get( previousColorObject, [
-								'color',
-							] );
+							const previousColor = previousColorObject?.color;
 							/**
 							 * The "and previousColorObject" condition checks that a previous color object was already computed.
 							 * At the start previousColorObject and colorValue are both equal to undefined

@@ -12,13 +12,15 @@ import ContrastChecker from '../components/contrast-checker';
 import InspectorControls from '../components/inspector-controls';
 import { getBlockDOMNode } from '../utils/dom';
 
+function getComputedStyle( node ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
+
 export default function ColorPanel( {
 	settings,
 	clientId,
 	enableContrastChecking = true,
 } ) {
-	const { getComputedStyle, Node } = window;
-
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
 
@@ -27,7 +29,7 @@ export default function ColorPanel( {
 			return;
 		}
 
-		const colorsDetectionElement = getBlockDOMNode( clientId );
+		const colorsDetectionElement = getBlockDOMNode( clientId, document );
 		if ( ! colorsDetectionElement ) {
 			return;
 		}
@@ -39,7 +41,8 @@ export default function ColorPanel( {
 		while (
 			backgroundColor === 'rgba(0, 0, 0, 0)' &&
 			backgroundColorNode.parentNode &&
-			backgroundColorNode.parentNode.nodeType === Node.ELEMENT_NODE
+			backgroundColorNode.parentNode.nodeType ===
+				backgroundColorNode.parentNode.ELEMENT_NODE
 		) {
 			backgroundColorNode = backgroundColorNode.parentNode;
 			backgroundColor = getComputedStyle( backgroundColorNode )

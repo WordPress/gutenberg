@@ -43,7 +43,7 @@ import VisualEditor from '../visual-editor';
 import EditPostKeyboardShortcuts from '../keyboard-shortcuts';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import ManageBlocksModal from '../manage-blocks-modal';
-import OptionsModal from '../options-modal';
+import PreferencesModal from '../preferences-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import SettingsSidebar from '../sidebar/settings-sidebar';
@@ -53,7 +53,7 @@ import ActionsPanel from './actions-panel';
 import PopoverWrapper from './popover-wrapper';
 
 const interfaceLabels = {
-	leftSidebar: __( 'Block library' ),
+	secondarySidebar: __( 'Block library' ),
 	/* translators: accessibility text for the editor top bar landmark region. */
 	header: __( 'Editor top bar' ),
 	/* translators: accessibility text for the editor content landmark region. */
@@ -87,6 +87,7 @@ function Layout() {
 		showMostUsedBlocks,
 		isInserterOpened,
 		showIconLabels,
+		hasReducedUI,
 	} = useSelect( ( select ) => {
 		return {
 			hasFixedToolbar: select( 'core/edit-post' ).isFeatureActive(
@@ -119,6 +120,9 @@ function Layout() {
 			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
 				'showIconLabels'
 			),
+			hasReducedUI: select( 'core/edit-post' ).isFeatureActive(
+				'reducedUI'
+			),
 		};
 	}, [] );
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -145,7 +149,7 @@ function Layout() {
 	}, [ isInserterOpened, isHugeViewport ] );
 
 	// Local state for save panel.
-	// Note 'thruthy' callback implies an open panel.
+	// Note 'truthy' callback implies an open panel.
 	const [
 		entitiesSavedStatesCallback,
 		setEntitiesSavedStatesCallback,
@@ -181,7 +185,7 @@ function Layout() {
 							}
 						/>
 					}
-					leftSidebar={
+					secondarySidebar={
 						mode === 'visual' &&
 						isInserterOpened && (
 							<PopoverWrapper
@@ -258,6 +262,7 @@ function Layout() {
 						</>
 					}
 					footer={
+						! hasReducedUI &&
 						! isMobileViewport &&
 						isRichEditingEnabled &&
 						mode === 'visual' && (
@@ -285,7 +290,7 @@ function Layout() {
 					} }
 				/>
 				<ManageBlocksModal />
-				<OptionsModal />
+				<PreferencesModal />
 				<KeyboardShortcutHelpModal />
 				<WelcomeGuide />
 				<Popover.Slot />

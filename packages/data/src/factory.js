@@ -1,11 +1,4 @@
 /**
- * Internal dependencies
- */
-import defaultRegistry from './default-registry';
-
-/** @typedef {import('./registry').WPDataRegistry} WPDataRegistry */
-
-/**
  * Creates a selector function that takes additional curried argument with the
  * registry `select` function. While a regular selector has signature
  * ```js
@@ -57,15 +50,6 @@ export function createRegistrySelector( registrySelector ) {
 	 * @type {boolean}
 	 */
 	selector.isRegistrySelector = true;
-
-	/**
-	 * Registry on which to call `select`. The `defaultRegistry` value is overwritten with
-	 * the actual registry when the selector is registered with a store. Therefore, it's never
-	 * used and is assigned here only to satisfy the type constraint of the `registry` field.
-	 *
-	 * @type {WPDataRegistry}
-	 */
-	selector.registry = defaultRegistry;
 
 	return selector;
 }

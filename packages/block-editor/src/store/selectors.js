@@ -5,7 +5,6 @@ import {
 	castArray,
 	flatMap,
 	first,
-	get,
 	isArray,
 	isBoolean,
 	last,
@@ -513,14 +512,16 @@ export const getBlockParents = createSelector(
 );
 
 /**
- * Given a block client ID and a block name,
- * returns the list of all its parents from top to bottom,
- * filtered by the given name.
+ * Given a block client ID and a block name, returns the list of all its parents
+ * from top to bottom, filtered by the given name(s). For example, if passed
+ * 'core/group' as the blockName, it will only return parents which are group
+ * blocks. If passed `[ 'core/group', 'core/cover']`, as the blockName, it will
+ * return parents which are group blocks and parents which are cover blocks.
  *
- * @param {Object} state     Editor state.
- * @param {string} clientId  Block from which to find root client ID.
- * @param {string} blockName Block name to filter.
- * @param {boolean} ascending Order results from bottom to top (true) or top to bottom (false).
+ * @param {Object}          state     Editor state.
+ * @param {string}          clientId  Block from which to find root client ID.
+ * @param {string|string[]} blockName Block name(s) to filter.
+ * @param {boolean}         ascending Order results from bottom to top (true) or top to bottom (false).
  *
  * @return {Array} ClientIDs of the parent blocks.
  */
@@ -533,7 +534,12 @@ export const getBlockParentsByBlockName = createSelector(
 					id,
 					name: getBlockName( state, id ),
 				} ) ),
-				{ name: blockName }
+				( { name } ) => {
+					if ( Array.isArray( blockName ) ) {
+						return blockName.includes( name );
+					}
+					return name === blockName;
+				}
 			),
 			( { id } ) => id
 		);
@@ -1132,12 +1138,18 @@ export function isCaretWithinFormattedText( state ) {
 }
 
 /**
- * Returns the insertion point, the index at which the new inserted block would
- * be placed. Defaults to the last index.
+ * Returns the insertion point. This will be:
  *
- * @param {Object} state Editor state.
+ * 1) The insertion point manually set using setInsertionPoint() or
+ *    showInsertionPoint(); or
+ * 2) The point after the current block selection, if there is a selection; or
+ * 3) The point at the end of the block list.
  *
- * @return {Object} Insertion point object with `rootClientId`, `index`.
+ * Components like <Inserter> will default to inserting blocks at this point.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} Insertion point object with `rootClientId` and `index`.
  */
 export function getBlockInsertionPoint( state ) {
 	let rootClientId, index;
@@ -1160,14 +1172,15 @@ export function getBlockInsertionPoint( state ) {
 }
 
 /**
- * Returns true if we should show the block insertion point.
+ * Whether or not the insertion point should be shown to users. This is set
+ * using showInsertionPoint() or hideInsertionPoint().
  *
  * @param {Object} state Global application state.
  *
- * @return {?boolean} Whether the insertion point is visible or not.
+ * @return {?boolean} Whether the insertion point should be shown.
  */
 export function isBlockInsertionPointVisible( state ) {
-	return state.insertionPoint !== null;
+	return state.insertionPointVisibility;
 }
 
 /**
@@ -1273,9 +1286,7 @@ const canInsertBlockTypeUnmemoized = (
 		return false;
 	}
 
-	const parentAllowedBlocks = get( parentBlockListSettings, [
-		'allowedBlocks',
-	] );
+	const parentAllowedBlocks = parentBlockListSettings?.allowedBlocks;
 	const hasParentAllowedBlock = checkAllowList(
 		parentAllowedBlocks,
 		blockName
@@ -1345,7 +1356,7 @@ export function canInsertBlocks( state, clientIds, rootClientId = null ) {
  *                                            the number of inserts that have occurred.
  */
 function getInsertUsage( state, id ) {
-	return get( state.preferences.insertUsage, [ id ], null );
+	return state.preferences.insertUsage?.[ id ] ?? null;
 }
 
 /**
@@ -1500,7 +1511,7 @@ export const getInserterItems = createSelector(
 				id,
 				name: 'core/block',
 				initialAttributes: { ref: reusableBlock.id },
-				title: reusableBlock.title,
+				title: reusableBlock.title.raw,
 				icon: referencedBlockType
 					? referencedBlockType.icon
 					: templateIcon,
@@ -1691,7 +1702,13 @@ export const __experimentalGetParsedReusableBlock = createSelector(
 			return null;
 		}
 
-		return parse( reusableBlock.content );
+		// Only reusableBlock.content.raw should be used here, `reusableBlock.content` is a
+		// workaround until #22127 is fixed.
+		return parse(
+			typeof reusableBlock.content.raw === 'string'
+				? reusableBlock.content.raw
+				: reusableBlock.content
+		);
 	},
 	( state ) => [ getReusableBlocks( state ) ]
 );
@@ -1735,11 +1752,7 @@ export function __experimentalGetLastBlockAttributeChanges( state ) {
  * @return {Array} Reusable blocks
  */
 function getReusableBlocks( state ) {
-	return get(
-		state,
-		[ 'settings', '__experimentalReusableBlocks' ],
-		EMPTY_ARRAY
-	);
+	return state?.settings?.__experimentalReusableBlocks ?? EMPTY_ARRAY;
 }
 
 /**
@@ -1798,3 +1811,49 @@ export function isBlockHighlighted( state, clientId ) {
 export function areInnerBlocksControlled( state, clientId ) {
 	return !! state.blocks.controlledInnerBlocks[ clientId ];
 }
+
+/**
+ * Returns the clientId for the first 'active' block of a given array of block names.
+ * A block is 'active' if it (or a child) is the selected block.
+ * Returns the first match moving up the DOM from the selected block.
+ *
+ * @param {Object} state Global application state.
+ * @param {string[]} validBlocksNames The names of block types to check for.
+ *
+ * @return {string} The matching block's clientId.
+ */
+export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
+	( state, validBlockNames ) => {
+		if ( ! validBlockNames.length ) {
+			return null;
+		}
+		// Check if selected block is a valid entity area.
+		const selectedBlockClientId = getSelectedBlockClientId( state );
+		if (
+			validBlockNames.includes(
+				getBlockName( state, selectedBlockClientId )
+			)
+		) {
+			return selectedBlockClientId;
+		}
+		// Check if first selected block is a child of a valid entity area.
+		const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds(
+			state
+		);
+		const entityAreaParents = getBlockParentsByBlockName(
+			state,
+			selectedBlockClientId || multiSelectedBlockClientIds[ 0 ],
+			validBlockNames
+		);
+		if ( entityAreaParents ) {
+			// Last parent closest/most interior.
+			return last( entityAreaParents );
+		}
+		return null;
+	},
+	( state, validBlockNames ) => [
+		state.selectionStart.clientId,
+		state.selectionEnd.clientId,
+		validBlockNames,
+	]
+);

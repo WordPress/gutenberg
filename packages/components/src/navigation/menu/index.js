@@ -6,48 +6,45 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { Icon, chevronLeft } from '@wordpress/icons';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { ROOT_MENU } from '../constants';
-import { useNavigationContext } from '../context';
-import {
-	MenuBackButtonUI,
-	MenuTitleUI,
-	MenuUI,
-} from '../styles/navigation-styles';
 import { NavigationMenuContext } from './context';
+import { useNavigationContext } from '../context';
 import { useNavigationTreeMenu } from './use-navigation-tree-menu';
+import NavigationBackButton from '../back-button';
+import NavigationMenuTitle from './menu-title';
+import { NavigableMenu } from '../../navigable-container';
+import { MenuUI } from '../styles/navigation-styles';
 
 export default function NavigationMenu( props ) {
 	const {
 		backButtonLabel,
 		children,
 		className,
+		hasSearch,
 		menu = ROOT_MENU,
+		onBackButtonClick,
+		onSearch: setControlledSearch,
 		parentMenu,
+		search: controlledSearch,
 		title,
+		titleAction,
 	} = props;
+	const [ uncontrolledSearch, setUncontrolledSearch ] = useState( '' );
 	useNavigationTreeMenu( props );
-	const {
-		activeMenu,
-		setActiveMenu,
-		navigationTree,
-	} = useNavigationContext();
-	const isActive = activeMenu === menu;
-
-	const classes = classnames( 'components-navigation__menu', className );
+	const { activeMenu } = useNavigationContext();
 
 	const context = {
 		menu,
-		isActive,
+		search: uncontrolledSearch,
 	};
 
-	// Keep the children rendered to make sure inactive items are included in the navigation tree
-	if ( ! isActive ) {
+	// Keep the children rendered to make sure invisible items are included in the navigation tree
+	if ( activeMenu !== menu ) {
 		return (
 			<NavigationMenuContext.Provider value={ context }>
 				{ children }
@@ -55,31 +52,37 @@ export default function NavigationMenu( props ) {
 		);
 	}
 
-	const parentMenuTitle = navigationTree.getMenu( parentMenu )?.title;
+	const isControlledSearch = !! setControlledSearch;
+	const search = isControlledSearch ? controlledSearch : uncontrolledSearch;
+	const onSearch = isControlledSearch
+		? setControlledSearch
+		: setUncontrolledSearch;
+
+	const menuTitleId = `components-navigation__menu-title-${ menu }`;
+	const classes = classnames( 'components-navigation__menu', className );
 
 	return (
 		<NavigationMenuContext.Provider value={ context }>
 			<MenuUI className={ classes }>
-				{ parentMenu && (
-					<MenuBackButtonUI
-						className="components-navigation__back-button"
-						isTertiary
-						onClick={ () => setActiveMenu( parentMenu, 'right' ) }
-					>
-						<Icon icon={ chevronLeft } />
-						{ backButtonLabel || parentMenuTitle || __( 'Back' ) }
-					</MenuBackButtonUI>
+				{ ( parentMenu || onBackButtonClick ) && (
+					<NavigationBackButton
+						backButtonLabel={ backButtonLabel }
+						parentMenu={ parentMenu }
+						onClick={ onBackButtonClick }
+					/>
 				) }
-				{ title && (
-					<MenuTitleUI
-						as="h2"
-						className="components-navigation__menu-title"
-						variant="subtitle"
-					>
-						{ title }
-					</MenuTitleUI>
-				) }
-				<ul>{ children }</ul>
+
+				<NavigationMenuTitle
+					hasSearch={ hasSearch }
+					onSearch={ onSearch }
+					search={ search }
+					title={ title }
+					titleAction={ titleAction }
+				/>
+
+				<NavigableMenu>
+					<ul aria-labelledby={ menuTitleId }>{ children }</ul>
+				</NavigableMenu>
 			</MenuUI>
 		</NavigationMenuContext.Provider>
 	);

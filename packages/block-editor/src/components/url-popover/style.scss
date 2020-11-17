@@ -1,5 +1,5 @@
 .block-editor-url-popover__additional-controls {
-	border-top: $border-width solid $gray-200;
+	border-top: $border-width solid $gray-300;
 }
 
 .block-editor-url-popover__additional-controls > div[role="menu"] .components-button:not(:disabled):not([aria-disabled="true"]):not(.is-secondary) > svg {
@@ -45,7 +45,7 @@
 
 	// Add a left divider to the toggle button.
 	border-radius: 0;
-	border-left: $border-width solid $gray-200;
+	border-left: $border-width solid $gray-300;
 	margin-left: 1px;
 
 	&[aria-expanded="true"] .dashicon {
@@ -62,7 +62,7 @@
 .block-editor-url-popover__settings {
 	display: block;
 	padding: $grid-unit-20;
-	border-top: $border-width solid $gray-200;
+	border-top: $border-width solid $gray-300;
 }
 
 .block-editor-url-popover__link-editor,

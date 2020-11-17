@@ -98,3 +98,8 @@ exports.imageShorteHtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
 <!-- wp:paragraph -->
 <p>rock music approaches at high velocity.</p>
 <!-- /wp:paragraph -->`;
+
+exports.unsupportedBlockHtml = `<!-- wp:audio -->
+<figure class="wp-block-audio"><audio controls src="https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav"></audio></figure>
+<!-- /wp:audio -->
+`;
