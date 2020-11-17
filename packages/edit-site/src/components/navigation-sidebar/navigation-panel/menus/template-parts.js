@@ -29,7 +29,7 @@ export default function TemplatePartsMenu() {
 		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
 		return unfilteredTemplateParts.filter(
 			( item ) =>
-				item.status === 'publish' || item.meta.theme === currentTheme
+				item.status === 'publish' || item.wp_theme_slug === currentTheme
 		);
 	}, [] );
 
