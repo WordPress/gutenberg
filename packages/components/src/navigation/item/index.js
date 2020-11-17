@@ -14,7 +14,7 @@ import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
  */
 import Button from '../../button';
 import { useNavigationContext } from '../context';
-import { ItemBaseUI } from '../styles/navigation-styles';
+import { ItemUI } from '../styles/navigation-styles';
 import { useRTL } from '../../utils/rtl';
 import NavigationItemBaseContent from './base-content';
 import NavigationItemBase from './base';
@@ -71,7 +71,7 @@ export default function NavigationItem( props ) {
 	return (
 		<NavigationItemBase { ...props } className={ classes }>
 			{ children || (
-				<ItemBaseUI { ...baseProps }>
+				<ItemUI { ...baseProps }>
 					<NavigationItemBaseContent
 						title={ title }
 						badge={ badge }
@@ -79,7 +79,7 @@ export default function NavigationItem( props ) {
 					/>
 
 					{ navigateToMenu && <Icon icon={ icon } /> }
-				</ItemBaseUI>
+				</ItemUI>
 			) }
 		</NavigationItemBase>
 	);

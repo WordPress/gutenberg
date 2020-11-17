@@ -147,7 +147,7 @@ export const GroupTitleUI = styled( Text )`
 	color: ${ G2.gray[ 100 ] };
 `;
 
-export const ItemUI = styled.li`
+export const ItemBaseUI = styled.li`
 	border-radius: 2px;
 	color: ${ G2.lightGray.ui };
 	margin-bottom: 0;
@@ -176,7 +176,7 @@ export const ItemUI = styled.li`
 	}
 `;
 
-export const ItemBaseUI = styled.div`
+export const ItemUI = styled.div`
 	display: flex;
 	align-items: center;
 	height: auto;

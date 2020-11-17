@@ -14,7 +14,7 @@ import { useState } from '@wordpress/element';
  */
 import { useNavigationContext } from '../context';
 import { useNavigationTreeItem } from './use-navigation-tree-item';
-import { ItemUI } from '../styles/navigation-styles';
+import { ItemBaseUI } from '../styles/navigation-styles';
 
 export default function NavigationItemBase( props ) {
 	const { children, className, ...restProps } = props;
@@ -31,8 +31,8 @@ export default function NavigationItemBase( props ) {
 	const classes = classnames( 'components-navigation__item', className );
 
 	return (
-		<ItemUI className={ classes } { ...restProps }>
+		<ItemBaseUI className={ classes } { ...restProps }>
 			{ children }
-		</ItemUI>
+		</ItemBaseUI>
 	);
 }
