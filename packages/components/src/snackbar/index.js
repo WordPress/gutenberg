@@ -73,7 +73,7 @@ function Snackbar(
 		if ( explicitDismiss ) {
 			onRemove();
 		}
-		
+
 		if ( onClick ) {
 			onClick( event );
 		}
@@ -133,7 +133,7 @@ function Snackbar(
 							key={ index }
 							href={ url }
 							isTertiary
-							onClick={ ( event ) => 
+							onClick={ ( event ) =>
 								onActionClick( event, onClick )
 							}
 							className="components-snackbar__action"
