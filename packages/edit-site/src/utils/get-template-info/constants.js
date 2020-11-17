@@ -10,9 +10,7 @@ export const TEMPLATES_DEFAULT_DETAILS = [
 	{
 		slug: 'front-page',
 		title: _x( 'Front Page', 'template name' ),
-		description: __(
-			'Resolves when the site home page is requested'
-		),
+		description: __( 'Resolves when the site home page is requested' ),
 	},
 	{
 		slug: 'single-post',
