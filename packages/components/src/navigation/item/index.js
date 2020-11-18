@@ -65,7 +65,7 @@ export default function NavigationItem( props ) {
 	};
 	const icon = isRTL ? chevronLeft : chevronRight;
 	const baseProps = isText
-		? { as: 'div', ...restProps }
+		? restProps
 		: { as: Button, href, onClick: onItemClick, ...restProps };
 
 	return (
