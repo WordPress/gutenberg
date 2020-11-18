@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useMemo,
+	useCallback,
+	useRef,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
@@ -15,7 +21,6 @@ import {
 	BlockContextProvider,
 	BlockSelectionClearer,
 	BlockBreadcrumb,
-	__unstableEditorStyles as EditorStyles,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
@@ -40,6 +45,7 @@ import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
+import useEditorStyles from '../../../../block-editor/src/components/editor-styles';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
@@ -191,10 +197,12 @@ function Editor() {
 	}, [ isNavigationOpen ] );
 
 	const isMobile = useViewportMatch( 'medium', '<' );
+	const ref = useRef();
+
+	useEditorStyles( ref, settings.styles );
 
 	return (
 		<>
-			<EditorStyles styles={ settings.styles } />
 			<FullscreenMode isActive={ isFullscreenActive } />
 			<UnsavedChangesWarning />
 			<SlotFillProvider>
@@ -235,6 +243,7 @@ function Editor() {
 												<KeyboardShortcuts.Register />
 												<SidebarComplementaryAreaFills />
 												<InterfaceSkeleton
+													ref={ ref }
 													labels={ interfaceLabels }
 													drawer={
 														<NavigationSidebar />
