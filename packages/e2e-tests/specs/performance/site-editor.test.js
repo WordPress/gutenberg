@@ -11,7 +11,6 @@ import {
 	trashAllPosts,
 	visitAdminPage,
 	activateTheme,
-	publishPost,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -23,7 +22,6 @@ describe( 'Site Editor Performance', () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template', 'auto-draft' );
 		await trashAllPosts( 'wp_template_part' );
-		await publishPost();
 	} );
 	afterAll( async () => {
 		await trashAllPosts( 'wp_template' );
