@@ -1,13 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, registerStore } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import reducer from './reducer';
-import applyMiddlewares from './middlewares';
 import * as actions from './actions';
 import * as selectors from './selectors';
 import { STORE_NAME } from './constants';
@@ -28,7 +27,4 @@ const storeConfig = {
  */
 export const store = createReduxStore( STORE_NAME, storeConfig );
 
-// Ideally we use register instead of register store.
-// We shouuld be able to make the switch once we remove the effects.
-const instantiatedStore = registerStore( STORE_NAME, storeConfig );
-applyMiddlewares( instantiatedStore );
+register( store );
