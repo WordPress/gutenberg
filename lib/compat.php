@@ -412,24 +412,30 @@ function gutenberg_render_block_with_assigned_block_context( $pre_render, $parse
 }
 add_filter( 'pre_render_block', 'gutenberg_render_block_with_assigned_block_context', 9, 2 );
 
-if (
-	current_theme_supports( 'split-block-styles' ) &&
-	( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) )
-) {
-	/**
-	 * Avoid enqueueing block assets of all registered blocks for all posts, instead
-	 * deferring to block render mechanics to enqueue scripts, thereby ensuring only
-	 * blocks of the content have their assets enqueued.
-	 *
-	 * This can be removed once minimum support for the plugin is outside the range
-	 * of the version associated with closure of the following ticket.
-	 *
-	 * @see https://core.trac.wordpress.org/ticket/50328
-	 *
-	 * @see WP_Block::render
-	 */
-	remove_action( 'enqueue_block_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
+/**
+ * Remove the `wp_enqueue_registered_block_scripts_and_styles` hook if needed.
+ *
+ * @return void
+ */
+function gutenberg_remove_hook_wp_enqueue_registered_block_scripts_and_styles() {
+	if ( current_theme_supports( 'split-block-styles' ) ) {
+		/**
+		 * Avoid enqueueing block assets of all registered blocks for all posts, instead
+		 * deferring to block render mechanics to enqueue scripts, thereby ensuring only
+		 * blocks of the content have their assets enqueued.
+		 *
+		 * This can be removed once minimum support for the plugin is outside the range
+		 * of the version associated with closure of the following ticket.
+		 *
+		 * @see https://core.trac.wordpress.org/ticket/50328
+		 *
+		 * @see WP_Block::render
+		 */
+		remove_action( 'enqueue_block_assets', 'wp_enqueue_registered_block_scripts_and_styles' );
+	}
 }
+
+add_action( 'init', 'gutenberg_remove_hook_wp_enqueue_registered_block_scripts_and_styles' );
 
 /**
  * Callback hooked to the register_block_type_args filter.
