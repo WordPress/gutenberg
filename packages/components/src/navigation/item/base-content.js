@@ -1,10 +1,12 @@
 /**
  * Internal dependencies
  */
+import { useRTL } from '../../utils';
 import { ItemBadgeUI, ItemTitleUI } from '../styles/navigation-styles';
 
 export default function NavigationItemBaseContent( props ) {
-	const { badge, title, isRTL } = props;
+	const { badge, title } = props;
+	const isRTL = useRTL();
 
 	return (
 		<>

@@ -75,7 +75,6 @@ export default function NavigationItem( props ) {
 					<NavigationItemBaseContent
 						title={ title }
 						badge={ badge }
-						isRTL={ isRTL }
 					/>
 
 					{ navigateToMenu && <Icon icon={ icon } /> }
