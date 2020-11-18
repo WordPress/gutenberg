@@ -8,15 +8,13 @@ import { get, reduce, map, filter, some } from 'lodash';
  */
 import { useMemo } from '@wordpress/element';
 
-export default function useImageSizes(
-	images,
-	isSelected,
-	getSettings,
-	getMedia
-) {
+export default function useImageSizes( images, isSelected, getSettings ) {
 	return useMemo( () => getImageSizing(), [ images, isSelected ] );
 
 	function getImageSizing() {
+		if ( some( images, ( img ) => ! img.data ) ) {
+			return [];
+		}
 		const { imageSizes } = getSettings();
 		let resizedImages = {};
 
@@ -27,9 +25,7 @@ export default function useImageSizes(
 					if ( ! img.id ) {
 						return currentResizedImages;
 					}
-					const image = img.imageData
-						? img.imageData
-						: getMedia( img.id );
+					const image = img.data;
 					const sizes = reduce(
 						imageSizes,
 						( currentSizes, size ) => {
