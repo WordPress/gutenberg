@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { Text, View, TouchableWithoutFeedback, Platform } from 'react-native';
+import {
+	Text,
+	View,
+	TouchableWithoutFeedback,
+	Platform,
+	findNodeHandle,
+} from 'react-native';
 
 /**
  * Internal dependencies
@@ -35,6 +41,7 @@ function UnitControl( {
 	...props
 } ) {
 	const pickerRef = useRef();
+	const anchorNodeRef = useRef();
 
 	function onPickerPresent() {
 		if ( pickerRef?.current ) {
@@ -79,7 +86,7 @@ function UnitControl( {
 
 	const renderUnitPicker = () => {
 		return (
-			<View style={ styles.unitMenu }>
+			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
 				{ renderUnitButton() }
 				<Picker
 					ref={ pickerRef }
@@ -87,6 +94,11 @@ function UnitControl( {
 					onChange={ onUnitChange }
 					hideCancelButton
 					leftAlign
+					anchor={
+						anchorNodeRef?.current
+							? findNodeHandle( anchorNodeRef?.current )
+							: undefined
+					}
 				/>
 			</View>
 		);

@@ -174,7 +174,7 @@ function ColumnsEditContainer( {
 
 	const getColumnsSliders = () => {
 		return innerColumns.map( ( column, index ) => {
-			const { valueUnit } =
+			const { valueUnit = '%' } =
 				getValueAndUnit( column.attributes.width ) || {};
 
 			return (
@@ -193,7 +193,7 @@ function ColumnsEditContainer( {
 					onUnitChange={ ( nextUnit ) =>
 						onChangeUnit( nextUnit, index, column.clientId )
 					}
-					unit={ valueUnit || '%' }
+					unit={ valueUnit }
 					units={ CSS_UNITS }
 					preview={
 						<ColumnsPreview
