@@ -326,7 +326,7 @@ class WP_Theme_JSON {
 
 		$metadata = $this->get_blocks_metadata();
 		foreach ( $contexts as $key => $context ) {
-			if ( ! array_key_exists( $key, $metadata ) ) {
+			if ( ! isset( $metadata[ $key ] ) ) {
 				// Skip incoming contexts that can't be found
 				// within the contexts registered.
 				continue;
@@ -341,7 +341,7 @@ class WP_Theme_JSON {
 
 			// Process styles subtree.
 			$this->process_key( 'styles', $context, self::SCHEMA );
-			if ( array_key_exists( 'styles', $context ) ) {
+			if ( isset( $context['styles'] ) ) {
 				$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'] );
 				$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'] );
 
@@ -354,7 +354,7 @@ class WP_Theme_JSON {
 
 			// Process settings subtree.
 			$this->process_key( 'settings', $context, self::SCHEMA );
-			if ( array_key_exists( 'settings', $context ) ) {
+			if ( isset( $context['settings'] ) ) {
 				$this->process_key( 'color', $context['settings'], self::SCHEMA['settings'] );
 				$this->process_key( 'spacing', $context['settings'], self::SCHEMA['settings'] );
 				$this->process_key( 'typography', $context['settings'], self::SCHEMA['settings'] );
@@ -491,7 +491,7 @@ class WP_Theme_JSON {
 	 * @param array  $schema Schema to use for normalization.
 	 */
 	private static function process_key( $key, &$input, $schema ) {
-		if ( ! is_array( $input ) || ! array_key_exists( $key, $input ) ) {
+		if ( ! is_array( $input ) || ! isset( $input[ $key ] ) ) {
 			return;
 		}
 
@@ -523,10 +523,7 @@ class WP_Theme_JSON {
 	 * @return array|null The settings subtree.
 	 */
 	private static function extract_settings( $context ) {
-		if (
-			! array_key_exists( 'settings', $context ) ||
-			empty( $context['settings'] )
-		) {
+		if ( ! isset( $context['settings'] ) ) {
 			return null;
 		}
 
@@ -643,12 +640,7 @@ class WP_Theme_JSON {
 	 * @param array $context Input context to process.
 	 */
 	private static function compute_style_properties( &$declarations, $context ) {
-		if (
-			! array_key_exists( 'supports', $context ) ||
-			empty( $context['supports'] ) ||
-			! array_key_exists( 'styles', $context ) ||
-			empty( $context['styles'] )
-		) {
+		if ( ! isset( $context['supports'] ) || ! isset( $context['styles'] ) ) {
 			return;
 		}
 
@@ -835,10 +827,7 @@ class WP_Theme_JSON {
 	 * @return string The new stylesheet.
 	 */
 	private static function to_stylesheet( $stylesheet, $context ) {
-		if (
-			! array_key_exists( 'selector', $context ) ||
-			empty( $context['selector'] )
-		) {
+		if ( ! isset( $context['selector'] ) ) {
 			return '';
 		}
 
