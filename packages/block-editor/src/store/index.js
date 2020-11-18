@@ -49,4 +49,5 @@ const instantiatedStore = registerStore( STORE_NAME, {
 	...storeConfig,
 	persist: [ 'preferences' ],
 } );
-applyMiddlewares( instantiatedStore );
+
+export default instantiatedStore;
