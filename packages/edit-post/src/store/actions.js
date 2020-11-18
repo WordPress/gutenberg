@@ -9,6 +9,14 @@ import { castArray } from 'lodash';
 import { controls } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import {
+	__unstableSwitchMode,
+	__unstableSetMetaBoxesPerLocation,
+} from './controls';
+
+/**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
  * @param {?string} name Sidebar name to be opened.
@@ -153,11 +161,8 @@ export function toggleFeature( feature ) {
 	};
 }
 
-export function switchEditorMode( mode ) {
-	return {
-		type: 'SWITCH_MODE',
-		mode,
-	};
+export function* switchEditorMode( mode ) {
+	yield __unstableSwitchMode( mode );
 }
 
 /**
@@ -239,14 +244,9 @@ export function showBlockTypes( blockNames ) {
  * what Meta boxes are available in which location.
  *
  * @param {Object} metaBoxesPerLocation Meta boxes per location.
- *
- * @return {Object} Action object.
  */
-export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
-	return {
-		type: 'SET_META_BOXES_PER_LOCATIONS',
-		metaBoxesPerLocation,
-	};
+export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
+	yield __unstableSetMetaBoxesPerLocation( metaBoxesPerLocation );
 }
 
 /**

@@ -87,6 +87,7 @@ export function* validateBlocksToTemplate( blocks ) {
 		'core/block-editor',
 		'isValidTemplate'
 	);
+
 	if ( isBlocksValidToTemplate !== isValidTemplate ) {
 		yield setTemplateValidity( isBlocksValidToTemplate );
 		return isBlocksValidToTemplate;

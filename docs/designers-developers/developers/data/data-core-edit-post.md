@@ -385,10 +385,6 @@ _Parameters_
 
 -   _metaBoxesPerLocation_ `Object`: Meta boxes per location.
 
-_Returns_
-
--   `Object`: Action object.
-
 <a name="setIsInserterOpened" href="#setIsInserterOpened">#</a> **setIsInserterOpened**
 
 Returns an action object used to open/close the inserter.
