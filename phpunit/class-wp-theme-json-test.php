@@ -458,6 +458,20 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						'fontSize' => '12',
 					),
 				),
+				'deactivatedSettings' => array(
+					'color' => array(
+						'palette' => array(
+							array(
+								'slug'  => 'red',
+								'color' => 'red',
+							),
+							array(
+								'slug'  => 'blue',
+								'color' => 'blue',
+							),
+						),
+					),
+				),
 			),
 			'core/paragraph' => array(
 				'selector' => 'p',

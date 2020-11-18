@@ -177,7 +177,7 @@ class WP_Theme_JSON {
 	 */
 	const PRESETS_METADATA = array(
 		array(
-			'path'          => array( 'settings', 'color', 'palette' ),
+			'path'          => array( 'color', 'palette' ),
 			'value_key'     => 'color',
 			'css_var_infix' => 'color',
 			'classes'       => array(
@@ -192,7 +192,7 @@ class WP_Theme_JSON {
 			),
 		),
 		array(
-			'path'          => array( 'settings', 'color', 'gradients' ),
+			'path'          => array( 'color', 'gradients' ),
 			'value_key'     => 'gradient',
 			'css_var_infix' => 'gradient',
 			'classes'       => array(
@@ -203,7 +203,7 @@ class WP_Theme_JSON {
 			),
 		),
 		array(
-			'path'          => array( 'settings', 'typography', 'fontSizes' ),
+			'path'          => array( 'typography', 'fontSizes' ),
 			'value_key'     => 'size',
 			'css_var_infix' => 'font-size',
 			'classes'       => array(
@@ -214,13 +214,13 @@ class WP_Theme_JSON {
 			),
 		),
 		array(
-			'path'          => array( 'settings', 'typography', 'fontFamilies' ),
+			'path'          => array( 'typography', 'fontFamilies' ),
 			'value_key'     => 'fontFamily',
 			'css_var_infix' => 'font-family',
 			'classes'       => array(),
 		),
 		array(
-			'path'          => array( 'settings', 'typography', 'fontStyles' ),
+			'path'          => array( 'typography', 'fontStyles' ),
 			'value_key'     => 'slug',
 			'css_var_infix' => 'font-style',
 			'classes'       => array(
@@ -231,7 +231,7 @@ class WP_Theme_JSON {
 			),
 		),
 		array(
-			'path'          => array( 'settings', 'typography', 'fontWeights' ),
+			'path'          => array( 'typography', 'fontWeights' ),
 			'value_key'     => 'slug',
 			'css_var_infix' => 'font-weight',
 			'classes'       => array(
@@ -242,7 +242,7 @@ class WP_Theme_JSON {
 			),
 		),
 		array(
-			'path'          => array( 'settings', 'typography', 'textDecorations' ),
+			'path'          => array( 'typography', 'textDecorations' ),
 			'value_key'     => 'value',
 			'css_var_infix' => 'text-decoration',
 			'classes'       => array(
@@ -253,7 +253,7 @@ class WP_Theme_JSON {
 			),
 		),
 		array(
-			'path'          => array( 'settings', 'typography', 'textTransforms' ),
+			'path'          => array( 'typography', 'textTransforms' ),
 			'value_key'     => 'slug',
 			'css_var_infix' => 'text-transform',
 			'classes'       => array(
@@ -701,9 +701,19 @@ class WP_Theme_JSON {
 			// and we don't want to increase its specificity.
 			$selector = '';
 		}
+		if ( empty( $context['settings'] ) ) {
+			return;
+		}
 
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = gutenberg_experimental_get( $context, $preset['path'], array() );
+			$values = gutenberg_experimental_get( $context['settings'], $preset['path'], array() );
+			if ( isset( $context['deactivatedSettings'] ) ) {
+				$values = array_merge(
+					gutenberg_experimental_get( $context['deactivatedSettings'], $preset['path'], array() ),
+					$values
+				);
+			}
+
 			foreach ( $values as $value ) {
 				foreach ( $preset['classes'] as $class ) {
 					$stylesheet .= self::to_ruleset(
@@ -738,8 +748,17 @@ class WP_Theme_JSON {
 	 * @param array $context Input context to process.
 	 */
 	private static function compute_preset_vars( &$declarations, $context ) {
+		if ( empty( $context['settings'] ) ) {
+			return;
+		}
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = gutenberg_experimental_get( $context, $preset['path'], array() );
+			$values = gutenberg_experimental_get( $context['settings'], $preset['path'], array() );
+			if ( isset( $context['deactivatedSettings'] ) ) {
+				$values = array_merge(
+					gutenberg_experimental_get( $context['deactivatedSettings'], $preset['path'], array() ),
+					$values
+				);
+			}
 			foreach ( $values as $value ) {
 				$declarations[] = array(
 					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . $value['slug'],
@@ -929,6 +948,45 @@ class WP_Theme_JSON {
 			// Selector & Supports are always taken from metadata.
 			$this->contexts[ $context ]['selector'] = $metadata[ $context ]['selector'];
 			$this->contexts[ $context ]['supports'] = $metadata[ $context ]['supports'];
+
+			// Add the presets to the deactivated settings if they will be overwritten.
+			if (
+				! empty( $incoming_data[ $context ]['settings'] ) &&
+				! empty( $this->contexts[ $context ]['settings'] )
+			) {
+				foreach ( self::PRESETS_METADATA as $preset ) {
+					$incoming_preset = gutenberg_experimental_get(
+						$incoming_data[ $context ]['settings'],
+						$preset['path'],
+						null
+					);
+					$current_preset  = gutenberg_experimental_get(
+						$this->contexts[ $context ]['settings'],
+						$preset['path'],
+						null
+					);
+					// If the preset will be overwritten.
+					if (
+						! empty( $current_preset ) &&
+						! empty( $incoming_preset )
+					) {
+						if ( ! isset( $this->contexts[ $context ]['deactivatedSettings'] ) ) {
+							$this->contexts[ $context ]['deactivatedSettings'] = array();
+						}
+						// Append the presets that will be overwritten to the set of deactivated presets that already exist.
+						$inactive_preset = gutenberg_experimental_get(
+							$this->contexts[ $context ]['deactivatedSettings'],
+							$preset['path'],
+							array()
+						);
+						gutenberg_experimental_set(
+							$this->contexts[ $context ]['deactivatedSettings'],
+							$preset['path'],
+							array_merge( $inactive_preset, $current_preset )
+						);
+					}
+				}
+			}
 
 			foreach ( array( 'settings', 'styles' ) as $subtree ) {
 				if ( ! isset( $incoming_data[ $context ][ $subtree ] ) ) {

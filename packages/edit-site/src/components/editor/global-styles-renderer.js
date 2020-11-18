@@ -64,13 +64,21 @@ export default ( blockData, tree, metadata ) => {
 	 *
 	 * @param {string} blockSelector
 	 * @param {Object} blockPresets
+	 * @param {Object} deactivatedPresets
 	 * @return {string} CSS declarations for the preset classes.
 	 */
-	const getBlockPresetClasses = ( blockSelector, blockPresets = {} ) => {
+	const getBlockPresetClasses = (
+		blockSelector,
+		blockPresets = {},
+		deactivatedPresets = {}
+	) => {
 		return reduce(
 			PRESET_CLASSES,
 			( declarations, { path, key, property }, classSuffix ) => {
-				const presets = get( blockPresets, path, [] );
+				const presets = [
+					...get( deactivatedPresets, path, [] ),
+					...get( blockPresets, path, [] ),
+				];
 				presets.forEach( ( preset ) => {
 					const slug = preset.slug;
 					const value = preset[ key ];
@@ -88,14 +96,21 @@ export default ( blockData, tree, metadata ) => {
 	 * Transform given preset tree into a set of style declarations.
 	 *
 	 * @param {Object} blockPresets
+	 * @param {Object} deactivatedPresets
 	 *
 	 * @return {Array} An array of style declarations.
 	 */
-	const getBlockPresetsDeclarations = ( blockPresets = {} ) => {
+	const getBlockPresetsDeclarations = (
+		blockPresets = {},
+		deactivatedPresets = {}
+	) => {
 		return reduce(
 			PRESET_CATEGORIES,
 			( declarations, { path, key }, category ) => {
-				const preset = get( blockPresets, path, [] );
+				const preset = [
+					...get( deactivatedPresets, path, [] ),
+					...get( blockPresets, path, [] ),
+				];
 				preset.forEach( ( value ) => {
 					declarations.push(
 						`--wp--preset--${ kebabCase( category ) }--${
@@ -144,7 +159,10 @@ export default ( blockData, tree, metadata ) => {
 				blockData[ context ].supports,
 				tree?.[ context ]?.styles
 			),
-			...getBlockPresetsDeclarations( tree?.[ context ]?.settings ),
+			...getBlockPresetsDeclarations(
+				tree?.[ context ]?.settings,
+				tree?.[ context ]?.deactivatedSettings
+			),
 			...getCustomDeclarations( tree?.[ context ]?.settings?.custom ),
 		];
 		if ( blockDeclarations.length > 0 ) {
@@ -155,7 +173,8 @@ export default ( blockData, tree, metadata ) => {
 
 		const presetClasses = getBlockPresetClasses(
 			blockSelector,
-			tree?.[ context ]?.settings
+			tree?.[ context ]?.settings,
+			tree?.[ context ]?.deactivatedSettings
 		);
 		if ( presetClasses ) {
 			styles.push( presetClasses );
