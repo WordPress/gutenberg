@@ -138,6 +138,7 @@ public class WPAndroidGlueCode {
         void onMediaLibraryImageButtonClicked(boolean allowMultipleSelection);
         void onMediaLibraryVideoButtonClicked(boolean allowMultipleSelection);
         void onMediaLibraryMediaButtonClicked(boolean allowMultipleSelection);
+        void onMediaLibraryFileButtonClicked(boolean allowMultipleSelection);
         void onUploadPhotoButtonClicked(boolean allowMultipleSelection);
         void onCapturePhotoButtonClicked();
         void onUploadVideoButtonClicked(boolean allowMultipleSelection);
@@ -245,7 +246,7 @@ public class WPAndroidGlueCode {
                 } else if (mediaType == MediaType.MEDIA) {
                     mOnMediaLibraryButtonListener.onMediaLibraryMediaButtonClicked(allowMultipleSelection);
                 } else if (mediaType == MediaType.ALL) {
-                    mOnMediaLibraryButtonListener.onMediaLibraryMediaButtonClicked(allowMultipleSelection);
+                    mOnMediaLibraryButtonListener.onMediaLibraryFileButtonClicked(allowMultipleSelection);
                 }
             }
 
@@ -261,8 +262,6 @@ public class WPAndroidGlueCode {
                     mOnMediaLibraryButtonListener.onUploadVideoButtonClicked(allowMultipleSelection);
                 } else if (mediaType == MediaType.MEDIA) {
                     mOnMediaLibraryButtonListener.onUploadMediaButtonClicked(allowMultipleSelection);
-                } else if (mediaType == MediaType.ALL) {
-                    mOnMediaLibraryButtonListener.onMediaLibraryMediaButtonClicked(allowMultipleSelection);
                 }
             }
 
