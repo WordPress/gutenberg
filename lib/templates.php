@@ -116,10 +116,6 @@ add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
  * @param bool  $update  Is update.
  */
 function gutenberg_set_template_and_template_part_post_theme( $post_id, $post, $update ) {
-	if ( $update || 'trash' === $post->post_status ) {
-		return;
-	}
-
 	$themes = wp_get_post_terms( $post_id, 'wp_theme' );
 	if ( ! $themes ) {
 		wp_set_post_terms( $post_id, array( wp_get_theme()->get_stylesheet() ), 'wp_theme', true );
