@@ -640,7 +640,7 @@ class WP_Theme_JSON {
 	 * @param array $context Input context to process.
 	 */
 	private static function compute_style_properties( &$declarations, $context ) {
-		if ( ! isset( $context['supports'] ) || ! isset( $context['styles'] ) ) {
+		if ( empty( $context['supports'] ) || empty( $context['styles'] ) ) {
 			return;
 		}
 
@@ -827,7 +827,7 @@ class WP_Theme_JSON {
 	 * @return string The new stylesheet.
 	 */
 	private static function to_stylesheet( $stylesheet, $context ) {
-		if ( ! isset( $context['selector'] ) ) {
+		if ( empty( $context['selector'] ) ) {
 			return '';
 		}
 
