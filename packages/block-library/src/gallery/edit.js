@@ -78,7 +78,7 @@ function GalleryEdit( props ) {
 	const {
 		imageCount,
 		linkTarget,
-		linkTo,
+		linkTo = Platform.OS !== 'web' ? 'none' : undefined,
 		columns = defaultColumnsNumber( imageCount ),
 		sizeSlug,
 		imageUploads,
