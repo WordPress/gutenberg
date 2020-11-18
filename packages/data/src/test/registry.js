@@ -506,6 +506,44 @@ describe( 'createRegistry', () => {
 		} );
 	} );
 
+	describe( 'register', () => {
+		it( 'should work with the store definition as param for select', () => {
+			const store = createReduxStore( 'demo', {
+				reducer: ( state = 'OK' ) => state,
+				selectors: {
+					getValue: ( state ) => state,
+				},
+			} );
+			registry.register( store );
+
+			expect( registry.select( store ).getValue() ).toBe( 'OK' );
+		} );
+
+		it( 'should work with the store definition as param for dispatch', async () => {
+			const store = createReduxStore( 'demo', {
+				reducer( state = 'OK', action ) {
+					if ( action.type === 'UPDATE' ) {
+						return 'UPDATED';
+					}
+					return state;
+				},
+				actions: {
+					update() {
+						return { type: 'UPDATE' };
+					},
+				},
+				selectors: {
+					getValue: ( state ) => state,
+				},
+			} );
+			registry.register( store );
+
+			expect( registry.select( store ).getValue() ).toBe( 'OK' );
+			await registry.dispatch( store ).update();
+			expect( registry.select( store ).getValue() ).toBe( 'UPDATED' );
+		} );
+	} );
+
 	describe( 'select', () => {
 		it( 'registers multiple selectors to the public API', () => {
 			const selector1 = jest.fn( () => 'result1' );
@@ -550,20 +588,6 @@ describe( 'createRegistry', () => {
 			expect( registry.select( 'reducer2' ).selector2() ).toEqual(
 				'result1'
 			);
-		} );
-
-		it( 'should work with the store definition as param for select', () => {
-			const STORE_NAME = 'demo';
-			const store = createReduxStore( STORE_NAME, {
-				reducer: ( state = 'OK' ) => state,
-				selectors: {
-					getValue: ( state ) => state,
-				},
-				resolvers: {},
-			} );
-			registry.register( store );
-
-			expect( registry.select( store ).getValue() ).toBe( 'OK' );
 		} );
 
 		it( 'should run the registry selector from a non-registry selector', () => {
@@ -694,30 +718,6 @@ describe( 'createRegistry', () => {
 			} );
 			registry.dispatch( 'counter' ).increment( 4 ); // state = 5
 			expect( store.getState() ).toBe( 5 );
-		} );
-
-		it( 'should work with the store object as param for dispatch', async () => {
-			const store = createReduxStore( 'demo', {
-				reducer( state = 'OK', action ) {
-					if ( action.type === 'UPDATE' ) {
-						return 'UPDATED';
-					}
-					return state;
-				},
-				actions: {
-					update() {
-						return { type: 'UPDATE' };
-					},
-				},
-				selectors: {
-					getValue: ( state ) => state,
-				},
-			} );
-			registry.register( store );
-
-			expect( registry.select( store ).getValue() ).toBe( 'OK' );
-			await registry.dispatch( store ).update();
-			expect( registry.select( store ).getValue() ).toBe( 'UPDATED' );
 		} );
 	} );
 

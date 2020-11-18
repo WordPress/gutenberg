@@ -186,7 +186,15 @@ export const use = defaultRegistry.use;
  *
  * @example
  * ```js
- * import { register } from '@wordpress/data';
+ * import { createReduxStore, register } from '@wordpress/data';
+ *
+ * const store = createReduxStore( 'demo', {
+ *     reducer: ( state = 'OK' ) => state,
+ *     selectors: {
+ *         getValue: ( state ) => state,
+ *     },
+ * } );
+ * registry.register( store );
  * ```
  *
  * @param {WPDataStore} store Store definition.

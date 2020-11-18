@@ -56,6 +56,18 @@ function createResolversCache() {
 /**
  * Creates a namespace object with a store derived from the reducer given.
  *
+ * @example
+ * ```js
+ * import { createReduxStore } from '@wordpress/data';
+ *
+ * const store = createReduxStore( 'demo', {
+ *     reducer: ( state = 'OK' ) => state,
+ *     selectors: {
+ *         getValue: ( state ) => state,
+ *     },
+ * } );
+ * ```
+ *
  * @param {string}                 key      Unique namespace identifier.
  * @param {WPDataReduxStoreConfig} options  Registered store options, with properties
  *                                          describing reducer, actions, selectors,

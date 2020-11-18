@@ -349,6 +349,19 @@ Undocumented declaration.
 
 Creates a namespace object with a store derived from the reducer given.
 
+_Usage_
+
+```js
+import { createReduxStore } from '@wordpress/data';
+
+const store = createReduxStore( 'demo', {
+    reducer: ( state = 'OK' ) => state,
+    selectors: {
+        getValue: ( state ) => state,
+    },
+} );
+```
+
 _Parameters_
 
 -   _key_ `string`: Unique namespace identifier.
@@ -490,7 +503,15 @@ Registers a standard `@wordpress/data` store definition.
 _Usage_
 
 ```js
-import { register } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
+
+const store = createReduxStore( 'demo', {
+    reducer: ( state = 'OK' ) => state,
+    selectors: {
+        getValue: ( state ) => state,
+    },
+} );
+registry.register( store );
 ```
 
 _Parameters_
