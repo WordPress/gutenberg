@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 // Custom Jest matchers.
 require( '@testing-library/jest-dom' );
 
