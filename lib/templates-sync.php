@@ -125,7 +125,7 @@ function _gutenberg_synchronize_theme_templates( $template_type ) {
 		$slug    = substr(
 			$path,
 			// Starting position of slug.
-			strpos( $path, $template_base_path . '/' ) + 1 + strlen( $template_base_path ),
+			strpos( $path, $template_base_path . DIRECTORY_SEPARATOR ) + 1 + strlen( $template_base_path ),
 			// Subtract ending '.html'.
 			-5
 		);
