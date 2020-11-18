@@ -26,5 +26,6 @@
 			"padding": true
 		}
 	},
-	"editorStyle": "wp-block-group-editor"
+	"editorStyle": "wp-block-group-editor",
+	"style": "wp-block-group"
 }
