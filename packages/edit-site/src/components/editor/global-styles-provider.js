@@ -123,15 +123,17 @@ export default function GlobalStylesProvider( {
 	const { updateSettings } = useDispatch( 'core/edit-site' );
 
 	useEffect( () => {
-		const newStyles = settings.styles.filter( style => ! style.isGlobalStyles );
+		const newStyles = settings.styles.filter(
+			( style ) => ! style.isGlobalStyles
+		);
 		updateSettings( {
 			...settings,
 			styles: [
 				...newStyles,
 				{
 					css: getGlobalStyles( contexts, mergedStyles ),
-					isGlobalStyles: true
-				}
+					isGlobalStyles: true,
+				},
 			],
 			__experimentalFeatures: mapValues(
 				mergedStyles,
