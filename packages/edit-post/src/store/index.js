@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, registerStore } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -27,8 +27,4 @@ const storeConfig = {
  */
 export const store = createReduxStore( STORE_NAME, storeConfig );
 
-// Ideally we use register instead of register store.
-// We shouuld be able to make the switch once we remove the effects.
-const instantiatedStore = registerStore( STORE_NAME, storeConfig );
-
-export default instantiatedStore;
+register( store );

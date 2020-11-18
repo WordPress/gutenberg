@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, registerStore } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -42,12 +42,4 @@ export const store = createReduxStore( STORE_NAME, {
 	persist: [ 'preferences' ],
 } );
 
-// Ideally we'd use register instead of register stores.
-// We should be able to make the switch once we remove the "effects" middleware.
-// We also need a more generic way of defining persistence and not rely on a plugin.
-const instantiatedStore = registerStore( STORE_NAME, {
-	...storeConfig,
-	persist: [ 'preferences' ],
-} );
-
-export default instantiatedStore;
+register( store );
