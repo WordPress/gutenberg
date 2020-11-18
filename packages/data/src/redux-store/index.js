@@ -54,7 +54,8 @@ function createResolversCache() {
 }
 
 /**
- * Creates a namespace object with a store derived from the reducer given.
+ * Creates a data store definition for the provided Redux store options containing
+ * properties describing reducer, actions, selectors, controls and resolvers.
  *
  * @example
  * ```js

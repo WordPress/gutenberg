@@ -347,7 +347,8 @@ Undocumented declaration.
 
 <a name="createReduxStore" href="#createReduxStore">#</a> **createReduxStore**
 
-Creates a namespace object with a store derived from the reducer given.
+Creates a data store definition for the provided Redux store options containing
+properties describing reducer, actions, selectors, controls and resolvers.
 
 _Usage_
 
@@ -678,7 +679,7 @@ const SaleButton = ( { children } ) => {
 
 _Parameters_
 
--   _storeName_ `[string]`: Optionally provide the name of the store from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+-   _storeNameOrDefinition_ `[(string|WPDataStoreDefinition)]`: Optionally provide the name of the store or its definition from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
 
 _Returns_
 
