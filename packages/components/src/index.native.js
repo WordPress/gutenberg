@@ -91,6 +91,7 @@ export {
 
 // Hooks
 export {
+	convertUnitToMobile,
 	useConvertUnitToMobile,
 	getValueAndUnit,
 } from './mobile/utils/use-unit-converter-to-mobile';

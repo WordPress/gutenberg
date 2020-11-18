@@ -15,6 +15,7 @@ import {
 	WIDE_ALIGNMENTS,
 	UnitControl,
 	getValueAndUnit,
+	GlobalStylesContext,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -24,7 +25,7 @@ import {
 	BlockVariationPicker,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useContext } from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { columns } from '@wordpress/icons';
@@ -91,6 +92,7 @@ function ColumnsEditContainer( {
 	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUM );
 	const [ tempWidth, setTempWidth ] = useState( 0 );
 	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+	const { globalStyles } = useContext( GlobalStylesContext );
 
 	const { verticalAlignment, align } = attributes;
 	const { width } = sizes || {};
@@ -140,7 +142,8 @@ function ColumnsEditContainer( {
 		columnsInRow,
 		width,
 		columnCount,
-		innerColumns
+		innerColumns,
+		globalStyles
 	);
 
 	const onChangeWidth = ( valueUnit, columnId ) => {

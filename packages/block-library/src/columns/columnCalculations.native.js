@@ -1,12 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { ALIGNMENT_BREAKPOINTS } from '@wordpress/components';
+import {
+	ALIGNMENT_BREAKPOINTS,
+	convertUnitToMobile,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { getColumnWidths } from './utils';
+import { getColumnWidths, getWidths } from './utils';
 
 /**
  * Maximum number of columns in a row
@@ -48,13 +51,17 @@ export const getContentWidths = (
 	columnsInRow,
 	width,
 	columnCount,
-	innerColumns
+	innerColumns,
+	globalStyles
 ) => {
 	const widths = {};
+	const columnWidthsWithUnits = getWidths( innerColumns, false );
 	const columnWidths = getColumnWidths( innerColumns, columnCount );
 
 	// Array of column width attribute values
-	const columnWidthsValues = Object.values( columnWidths );
+	const columnWidthsValues = columnWidthsWithUnits.map( ( v ) =>
+		convertUnitToMobile( { width }, globalStyles, v )
+	);
 
 	// The sum of column width attribute values
 	const columnWidthsSum = columnWidthsValues.reduce(
@@ -108,10 +115,13 @@ export const getContentWidths = (
 
 	innerColumns.forEach(
 		( { attributes: innerColumnAttributes, clientId } ) => {
-			const attributeWidth =
-				innerColumnAttributes.width || columnWidths[ clientId ];
+			const attributeWidth = convertUnitToMobile(
+				{ width },
+				globalStyles,
+				innerColumnAttributes.width || columnWidths[ clientId ]
+			);
 			const proportionalRatio = attributeWidth / columnWidthsSum;
-			const percentageRatio = attributeWidth / 100;
+			const percentageRatio = attributeWidth / width;
 			const initialColumnWidth = proportionalRatio * containerWidth;
 
 			if ( columnCount === 1 && width > ALIGNMENT_BREAKPOINTS.medium ) {
@@ -133,7 +143,7 @@ export const getContentWidths = (
 
 					maxColumnWidth = columnWidth;
 
-					if ( Math.round( columnWidthsSum ) < 100 ) {
+					if ( Math.round( columnWidthsSum ) < width ) {
 						// In case that column width attribute values does not exceed 100, each column
 						// should have attribute percentage of container width
 						const newColumnWidth = percentageRatio * containerWidth;
