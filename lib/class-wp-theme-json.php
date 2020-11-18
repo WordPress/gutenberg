@@ -345,7 +345,7 @@ class WP_Theme_JSON {
 				$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'] );
 				$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'] );
 
-				if ( 0 === count( $context['styles'] ) ) {
+				if ( empty( $context['styles'] ) ) {
 					unset( $context['styles'] );
 				} else {
 					$this->contexts[ $key ]['styles'] = $context['styles'];
@@ -359,7 +359,7 @@ class WP_Theme_JSON {
 				$this->process_key( 'spacing', $context['settings'], self::SCHEMA['settings'] );
 				$this->process_key( 'typography', $context['settings'], self::SCHEMA['settings'] );
 
-				if ( 0 === count( $context['settings'] ) ) {
+				if ( empty( $context['settings'] ) ) {
 					unset( $context['settings'] );
 				} else {
 					$this->contexts[ $key ]['settings'] = $context['settings'];
@@ -906,21 +906,21 @@ class WP_Theme_JSON {
 			$this->contexts[ $context ]['supports'] = $metadata[ $context ]['supports'];
 
 			foreach ( array( 'settings', 'styles' ) as $subtree ) {
-				if ( ! array_key_exists( $subtree, $incoming_data[ $context ] ) ) {
+				if ( ! isset( $incoming_data[ $context ][ $subtree ] ) ) {
 					continue;
 				}
 
-				if ( ! array_key_exists( $subtree, $this->contexts[ $context ] ) ) {
+				if ( ! isset( $this->contexts[ $context ][ $subtree ] ) ) {
 					$this->contexts[ $context ][ $subtree ] = $incoming_data[ $context ][ $subtree ];
 					continue;
 				}
 
 				foreach ( array_keys( self::SCHEMA[ $subtree ] ) as $leaf ) {
-					if ( ! array_key_exists( $leaf, $incoming_data[ $context ][ $subtree ] ) ) {
+					if ( ! isset( $incoming_data[ $context ][ $subtree ][ $leaf ] ) ) {
 						continue;
 					}
 
-					if ( ! array_key_exists( $leaf, $this->contexts[ $context ][ $subtree ] ) ) {
+					if ( ! isset( $this->contexts[ $context ][ $subtree ][ $leaf ] ) ) {
 						$this->contexts[ $context ][ $subtree ][ $leaf ] = $incoming_data[ $context ][ $subtree ][ $leaf ];
 						continue;
 					}
