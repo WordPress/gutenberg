@@ -126,15 +126,15 @@ function persistencePlugin( registry, pluginOptions ) {
 
 	/**
 	 * Creates an enhanced store dispatch function, triggering the state of the
-	 * given reducer key to be persisted when changed.
+	 * given store name to be persisted when changed.
 	 *
-	 * @param {Function}       getState   Function which returns current state.
-	 * @param {string}         reducerKey Reducer key.
-	 * @param {?Array<string>} keys       Optional subset of keys to save.
+	 * @param {Function}       getState  Function which returns current state.
+	 * @param {string}         storeName Store name.
+	 * @param {?Array<string>} keys      Optional subset of keys to save.
 	 *
 	 * @return {Function} Enhanced dispatch function.
 	 */
-	function createPersistOnChange( getState, reducerKey, keys ) {
+	function createPersistOnChange( getState, storeName, keys ) {
 		let getPersistedState;
 		if ( Array.isArray( keys ) ) {
 			// Given keys, the persisted state should by produced as an object
@@ -166,20 +166,20 @@ function persistencePlugin( registry, pluginOptions ) {
 				nextState: getState(),
 			} );
 			if ( state !== lastState ) {
-				persistence.set( reducerKey, state );
+				persistence.set( storeName, state );
 				lastState = state;
 			}
 		};
 	}
 
 	return {
-		registerStore( reducerKey, options ) {
+		registerStore( storeName, options ) {
 			if ( ! options.persist ) {
-				return registry.registerStore( reducerKey, options );
+				return registry.registerStore( storeName, options );
 			}
 
 			// Load from persistence to use as initial state.
-			const persistedState = persistence.get()[ reducerKey ];
+			const persistedState = persistence.get()[ storeName ];
 			if ( persistedState !== undefined ) {
 				let initialState = options.reducer( options.initialState, {
 					type: '@@WP/PERSISTENCE_RESTORE',
@@ -207,12 +207,12 @@ function persistencePlugin( registry, pluginOptions ) {
 				};
 			}
 
-			const store = registry.registerStore( reducerKey, options );
+			const store = registry.registerStore( storeName, options );
 
 			store.subscribe(
 				createPersistOnChange(
 					store.getState,
-					reducerKey,
+					storeName,
 					options.persist
 				)
 			);

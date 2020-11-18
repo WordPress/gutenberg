@@ -2,15 +2,16 @@
 
 ## Unreleased
 
+### Enhancement
+
+- File Block: Copy url button is moved to Block toolbar.
+- Code and Preformatted Blocks: delete on backspace from an empty block.
+
 ### Bug Fixes
 
 - Fix a regression where the Cover would not show opacity controls for the default overlay color ([#26625](https://github.com/WordPress/gutenberg/pull/26625)).
 - Fix a regression ([#26545](https://github.com/WordPress/gutenberg/pull/26545)) where the Cover block lost its default background overlay color
   ([#26569](https://github.com/WordPress/gutenberg/pull/26569)).
-
-### Enhancement
-
-- File Block: Copy url button is moved to Block toolbar.
 
 ## 2.23.0 (2020-09-03)
 

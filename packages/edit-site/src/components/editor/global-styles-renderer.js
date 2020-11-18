@@ -17,44 +17,6 @@ import {
 	LINK_COLOR_DECLARATION,
 } from './utils';
 
-export const mergeTrees = ( baseData, userData ) => {
-	// Deep clone from base data.
-	//
-	// We don't use cloneDeep from lodash here
-	// because we know the data is JSON compatible,
-	// see https://github.com/lodash/lodash/issues/1984
-	const mergedTree = baseData ? JSON.parse( JSON.stringify( baseData ) ) : {};
-
-	const styleKeys = [ 'typography', 'color' ];
-	const settingKeys = [ 'typography', 'color', 'custom', 'spacing' ];
-	Object.keys( userData ).forEach( ( context ) => {
-		styleKeys.forEach( ( key ) => {
-			// Normalize object shape.
-			if ( ! mergedTree[ context ].styles?.[ key ] ) {
-				mergedTree[ context ].styles[ key ] = {};
-			}
-			// Merge base + user data.
-			mergedTree[ context ].styles[ key ] = {
-				...mergedTree[ context ].styles[ key ],
-				...userData[ context ]?.styles?.[ key ],
-			};
-		} );
-		settingKeys.forEach( ( key ) => {
-			// Normalize object shape.
-			if ( ! mergedTree[ context ].settings?.[ key ] ) {
-				mergedTree[ context ].settings[ key ] = {};
-			}
-			// Merge base + user data.
-			mergedTree[ context ].settings[ key ] = {
-				...mergedTree[ context ].settings[ key ],
-				...userData[ context ]?.settings?.[ key ],
-			};
-		} );
-	} );
-
-	return mergedTree;
-};
-
 function compileStyleValue( uncompiledValue ) {
 	const VARIABLE_REFERENCE_PREFIX = 'var:';
 	const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
@@ -83,7 +45,7 @@ export default ( blockData, tree ) => {
 	 *
 	 * @return {Array} An array of style declarations.
 	 */
-	const getBlockStylesDeclarations = ( blockSupports, blockStyles ) => {
+	const getBlockStylesDeclarations = ( blockSupports, blockStyles = {} ) => {
 		const declarations = [];
 		Object.keys( STYLE_PROPERTY ).forEach( ( key ) => {
 			const cssProperty = key.startsWith( '--' ) ? key : kebabCase( key );
@@ -109,7 +71,7 @@ export default ( blockData, tree ) => {
 	 * @param {Object} blockPresets
 	 * @return {string} CSS declarations for the preset classes.
 	 */
-	const getBlockPresetClasses = ( blockSelector, blockPresets ) => {
+	const getBlockPresetClasses = ( blockSelector, blockPresets = {} ) => {
 		return reduce(
 			PRESET_CLASSES,
 			( declarations, { path, key, property }, classSuffix ) => {
@@ -119,7 +81,7 @@ export default ( blockData, tree ) => {
 					const value = preset[ key ];
 					const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
 					const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
-					declarations += `${ selectorToUse } {${ property }: ${ value };}\n`;
+					declarations += `${ selectorToUse } {${ property }: ${ value };}`;
 				} );
 				return declarations;
 			},
@@ -134,7 +96,7 @@ export default ( blockData, tree ) => {
 	 *
 	 * @return {Array} An array of style declarations.
 	 */
-	const getBlockPresetsDeclarations = ( blockPresets ) => {
+	const getBlockPresetsDeclarations = ( blockPresets = {} ) => {
 		return reduce(
 			PRESET_CATEGORIES,
 			( declarations, { path, key }, category ) => {
@@ -171,7 +133,7 @@ export default ( blockData, tree ) => {
 		return result;
 	};
 
-	const getCustomDeclarations = ( blockCustom ) => {
+	const getCustomDeclarations = ( blockCustom = {} ) => {
 		if ( Object.keys( blockCustom ).length === 0 ) {
 			return [];
 		}
@@ -191,21 +153,27 @@ export default ( blockData, tree ) => {
 
 	Object.keys( blockData ).forEach( ( context ) => {
 		const blockSelector = getBlockSelector( blockData[ context ].selector );
+
 		const blockDeclarations = [
 			...getBlockStylesDeclarations(
 				blockData[ context ].supports,
-				tree[ context ].styles
+				tree?.[ context ]?.styles
 			),
-			...getBlockPresetsDeclarations( tree[ context ].settings ),
-			...getCustomDeclarations( tree[ context ].settings.custom ),
+			...getBlockPresetsDeclarations( tree?.[ context ]?.settings ),
+			...getCustomDeclarations( tree?.[ context ]?.settings?.custom ),
 		];
-		styles.push(
-			getBlockPresetClasses( blockSelector, tree[ context ].settings )
-		);
 		if ( blockDeclarations.length > 0 ) {
 			styles.push(
 				`${ blockSelector } { ${ blockDeclarations.join( ';' ) } }`
 			);
+		}
+
+		const presetClasses = getBlockPresetClasses(
+			blockSelector,
+			tree?.[ context ]?.settings
+		);
+		if ( presetClasses ) {
+			styles.push( presetClasses );
 		}
 	} );
 
