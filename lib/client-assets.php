@@ -311,7 +311,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-block-editor',
 		gutenberg_url( 'build/block-editor/style.css' ),
-		array( 'wp-components', 'wp-editor-font' ),
+		array( 'wp-components' ),
 		filemtime( gutenberg_dir_path() . 'build/editor/style.css' )
 	);
 	$styles->add_data( 'wp-block-editor', 'rtl', 'replace' );
