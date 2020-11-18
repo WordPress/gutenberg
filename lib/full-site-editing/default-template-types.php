@@ -115,3 +115,14 @@ function gutenberg_get_indexed_default_template_types() {
 	}
 	return $indexed_template_types;
 }
+
+/**
+ * Return a list of all overrideable default template type slugs.
+ *
+ * @see get_query_template
+ *
+ * @return string[] List of all overrideable default template type slugs.
+ */
+function gutenberg_get_template_type_slugs() {
+	return array_keys( gutenberg_get_default_template_types() );
+}
