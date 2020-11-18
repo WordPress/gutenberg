@@ -3,7 +3,12 @@
  */
 import { createContext, useContext } from '@wordpress/element';
 
-const GlobalStylesContext = createContext( { style: {} } );
+/**
+ * Internal dependencies
+ */
+import styles from '../../../../block-library/src/style.native.scss';
+
+const GlobalStylesContext = createContext( styles );
 
 export const useGlobalStyles = () => {
 	const globalStyles = useContext( GlobalStylesContext );

@@ -1,0 +1,39 @@
+// This tag marks the start of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
+#start-resizable-editor-section {
+	display: none;
+}
+
+// Background colors.
+@include background-colors();
+
+// Foreground colors.
+@include foreground-colors();
+
+.has-link-color a {
+	color: var(--wp--style--color--link, #00e);
+}
+
+// Text alignments.
+.has-text-align-center {
+	text-align: center;
+}
+
+.has-text-align-left {
+	/*rtl:ignore*/
+	text-align: left;
+}
+
+.has-text-align-right {
+	/*rtl:ignore*/
+	text-align: right;
+}
+
+// This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
+#end-resizable-editor-section {
+	display: none;
+}
+
+// Block alignments.
+.aligncenter {
+	clear: both;
+}
