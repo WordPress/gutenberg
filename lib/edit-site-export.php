@@ -30,8 +30,13 @@ function gutenberg_edit_site_export() {
 		array(
 			'post_type'      => 'wp_template',
 			'post_status'    => array( 'publish', 'auto-draft' ),
-			'meta_key'       => 'theme',
-			'meta_value'     => $theme,
+			'tax_query'      => array(
+				array(
+					'taxonomy' => 'wp_theme',
+					'field'    => 'slug',
+					'terms'    => $theme,
+				),
+			),
 			'posts_per_page' => -1,
 			'no_found_rows'  => true,
 		)
@@ -49,8 +54,13 @@ function gutenberg_edit_site_export() {
 		array(
 			'post_type'      => 'wp_template_part',
 			'post_status'    => array( 'publish', 'auto-draft' ),
-			'meta_key'       => 'theme',
-			'meta_value'     => $theme,
+			'tax_query'      => array(
+				array(
+					'taxonomy' => 'wp_theme',
+					'field'    => 'slug',
+					'terms'    => $theme,
+				),
+			),
 			'posts_per_page' => -1,
 			'no_found_rows'  => true,
 		)
