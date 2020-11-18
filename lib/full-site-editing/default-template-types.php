@@ -77,10 +77,6 @@ function gutenberg_get_default_template_types() {
 			'title'       => _x( '404 (Not Found)', 'Template name', 'gutenberg' ),
 			'description' => __( 'Applied when content cannot be found', 'gutenberg' ),
 		),
-		'embed'          => array(
-			'title'       => __( 'Embed', 'gutenberg' ),
-			'description' => __( '[Currently unsupported]', 'gutenberg' ),
-		),
 	);
 
 	/**

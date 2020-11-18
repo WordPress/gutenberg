@@ -376,16 +376,3 @@ function filter_rest_prepare_add_wp_theme_slug_and_file_based( $response ) {
 }
 add_filter( 'rest_prepare_wp_template', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
 add_filter( 'rest_prepare_wp_template_part', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
-
-/**
- * Filter the default template types to temporarily remove 'embed',
- * because it is not a regular template type.
- *
- * @param array $default_template_types The array of template types definitions.
- * @return array Filtered $default_template_types.
- */
-function gutenberg_filter_default_template_types( $default_template_types ) {
-	unset( $default_template_types['embed'] );
-	return $default_template_types;
-}
-add_filter( 'default_template_types', 'gutenberg_filter_default_template_types' );
