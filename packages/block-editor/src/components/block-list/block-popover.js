@@ -92,7 +92,9 @@ function BlockPopover( {
 
 	useShortcut(
 		'core/block-editor/focus-toolbar',
-		useCallback( () => setIsToolbarForced( true ), [] ),
+		useCallback( () => {
+			setIsToolbarForced( true );
+		}, [] ),
 		{
 			bindGlobal: true,
 			eventName: 'keydown',
@@ -180,7 +182,9 @@ function BlockPopover( {
 			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ node }
-			onBlur={ () => setIsToolbarForced( false ) }
+			onFocusOutside={ () => {
+				setIsToolbarForced( false );
+			} }
 			shouldAnchorIncludePadding
 		>
 			{ ( shouldShowContextualToolbar || isToolbarForced ) && (

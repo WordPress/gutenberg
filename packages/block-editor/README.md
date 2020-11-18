@@ -504,6 +504,18 @@ _Properties_
 
 Undocumented declaration.
 
+<a name="store" href="#store">#</a> **store**
+
+Store definition for the block editor namespace.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
+
+_Type_
+
+-   `Object` 
+
 <a name="storeConfig" href="#storeConfig">#</a> **storeConfig**
 
 Block editor data store configuration.

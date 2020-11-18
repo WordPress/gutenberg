@@ -15,32 +15,29 @@ import { getScrollContainer } from '@wordpress/dom';
  */
 import { getBlockDOMNode } from '../../utils/dom';
 
-/**
- * Scrolls the multi block selection end into view if not in view already. This
- * is important to do after selection by keyboard.
- */
-export default function MultiSelectScrollIntoView() {
-	const selector = ( select ) => {
+export function useScrollMultiSelectionIntoView( ref ) {
+	const selectionEnd = useSelect( ( select ) => {
 		const {
 			getBlockSelectionEnd,
 			hasMultiSelection,
 			isMultiSelecting,
 		} = select( 'core/block-editor' );
 
-		return {
-			selectionEnd: getBlockSelectionEnd(),
-			isMultiSelection: hasMultiSelection(),
-			isMultiSelecting: isMultiSelecting(),
-		};
-	};
-	const { isMultiSelection, selectionEnd, isMultiSelecting } = useSelect(
-		selector,
-		[]
-	);
-	const ref = useRef();
+		const blockSelectionEnd = getBlockSelectionEnd();
+
+		if (
+			! blockSelectionEnd ||
+			isMultiSelecting() ||
+			! hasMultiSelection()
+		) {
+			return;
+		}
+
+		return blockSelectionEnd;
+	}, [] );
 
 	useEffect( () => {
-		if ( ! selectionEnd || isMultiSelecting || ! isMultiSelection ) {
+		if ( ! selectionEnd ) {
 			return;
 		}
 
@@ -62,7 +59,15 @@ export default function MultiSelectScrollIntoView() {
 		scrollIntoView( extentNode, scrollContainer, {
 			onlyScrollIfNeeded: true,
 		} );
-	}, [ isMultiSelection, selectionEnd, isMultiSelecting ] );
+	}, [ selectionEnd ] );
+}
 
+/**
+ * Scrolls the multi block selection end into view if not in view already. This
+ * is important to do after selection by keyboard.
+ */
+export default function MultiSelectScrollIntoView() {
+	const ref = useRef();
+	useScrollMultiSelectionIntoView( ref );
 	return <div ref={ ref } />;
 }

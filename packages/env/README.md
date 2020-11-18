@@ -235,10 +235,15 @@ Positionals:
 ```sh
 wp-env run <container> [command..]
 
-Runs an arbitrary command in one of the underlying Docker containers. For
-example, it can be useful for running wp cli commands. You can also use it to
-open shell sessions like bash and the WordPress shell in the WordPress instance.
-For example, `wp-env run cli bash` will open bash in the development WordPress
+Runs an arbitrary command in one of the underlying Docker containers. The
+"container" param should reference one of the underlying Docker services like
+"development", "tests", or "cli". To run a wp-cli command, use the "cli" or
+"tests-cli" service. You can also use this command to open shell sessions like
+bash and the WordPress shell in the WordPress instance. For example, `wp-env run
+cli bash` will open bash in the development WordPress instance. When using long
+commands with arguments and quotation marks, you need to wrap the "command"
+param in quotation marks. For example: `wp-env run tests-cli "wp post create
+--post_type=page --post_title='Test'"` will create a post on the tests WordPress
 instance.
 
 Positionals:
@@ -253,6 +258,8 @@ Options:
 
 For example:
 
+#### Displaying the users on the development instance:
+
 ```sh
 wp-env run cli wp user list
 ⠏ Running `wp user list` in 'cli'.
@@ -262,6 +269,19 @@ ID      user_login      display_name    user_email      user_registered roles
 
 ✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
 ```
+
+#### Creating a post on the tests instance:
+
+```sh
+wp-env run tests-cli "wp post create --post_type=page --post_title='Ready'"
+
+ℹ Starting 'wp post create --post_type=page --post_title='Ready'' on the tests-cli container.
+
+Success: Created post 5.
+✔ Ran `wp post create --post_type=page --post_title='Ready'` in 'tests-cli'. (in 3s 293ms)
+```
+
+#### Opening the WordPress shell on the tests instance and running PHP commands:
 
 ```sh
 wp-env run tests-cli wp shell
