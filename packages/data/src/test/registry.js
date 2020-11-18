@@ -697,8 +697,7 @@ describe( 'createRegistry', () => {
 		} );
 
 		it( 'should work with the store object as param for dispatch', async () => {
-			const STORE_NAME = 'demo';
-			const store = registry.registerStore( STORE_NAME, {
+			const store = createReduxStore( 'demo', {
 				reducer( state = 'OK', action ) {
 					if ( action.type === 'UPDATE' ) {
 						return 'UPDATED';
@@ -710,11 +709,15 @@ describe( 'createRegistry', () => {
 						return { type: 'UPDATE' };
 					},
 				},
+				selectors: {
+					getValue: ( state ) => state,
+				},
 			} );
+			registry.register( store );
 
-			expect( store.getState() ).toBe( 'OK' );
-			await registry.dispatch( STORE_NAME ).update();
-			expect( store.getState() ).toBe( 'UPDATED' );
+			expect( registry.select( store ).getValue() ).toBe( 'OK' );
+			await registry.dispatch( store ).update();
+			expect( registry.select( store ).getValue() ).toBe( 'UPDATED' );
 		} );
 	} );
 

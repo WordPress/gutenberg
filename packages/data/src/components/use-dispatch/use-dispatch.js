@@ -20,8 +20,8 @@ import useRegistry from '../registry-provider/use-registry';
  * action.
  *
  * ```jsx
- * const { useDispatch, useSelect } = wp.data;
- * const { useCallback } = wp.element;
+ * import { useDispatch, useSelect } from '@wordpress/data';
+ * import { useCallback } from '@wordpress/element';
  *
  * function Button( { onClick, children } ) {
  *   return <button type="button" onClick={ onClick }>{ children }</button>

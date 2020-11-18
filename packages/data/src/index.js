@@ -9,6 +9,8 @@ import combineReducers from 'turbo-combine-reducers';
 import defaultRegistry from './default-registry';
 import * as plugins from './plugins';
 
+/** @typedef {import('./types').WPDataStore} WPDataStore */
+
 export { default as withSelect } from './components/with-select';
 export { default as withDispatch } from './components/with-dispatch';
 export { default as withRegistry } from './components/with-registry';
@@ -43,7 +45,7 @@ export { plugins };
  *
  * @example
  * ```js
- * const { combineReducers, registerStore } = wp.data;
+ * import { combineReducers, registerStore } from '@wordpress/data';
  *
  * const prices = ( state = {}, action ) => {
  * 	return action.type === 'SET_PRICE' ?
@@ -82,7 +84,7 @@ export { combineReducers };
  *
  * @example
  * ```js
- * const { select } = wp.data;
+ * import { select } from '@wordpress/data';
  *
  * select( 'my-shop' ).getPrice( 'hammer' );
  * ```
@@ -101,7 +103,7 @@ export const select = defaultRegistry.select;
  *
  * @example
  * ```js
- * const { __experimentalResolveSelect } = wp.data;
+ * import { __experimentalResolveSelect } from '@wordpress/data';
  *
  * __experimentalResolveSelect( 'my-shop' ).getPrice( 'hammer' ).then(console.log)
  * ```
@@ -122,7 +124,7 @@ export const __experimentalResolveSelect =
  *
  * @example
  * ```js
- * const { dispatch } = wp.data;
+ * import { dispatch } from '@wordpress/data';
  *
  * dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
  * ```
@@ -139,7 +141,7 @@ export const dispatch = defaultRegistry.dispatch;
  *
  * @example
  * ```js
- * const { subscribe } = wp.data;
+ * import { subscribe } from '@wordpress/data';
  *
  * const unsubscribe = subscribe( () => {
  * 	// You could use this opportunity to test whether the derived result of a
@@ -182,6 +184,11 @@ export const use = defaultRegistry.use;
 /**
  * Registers a standard `@wordpress/data` store definition.
  *
- * @param {import('./types').WPDataStore} store Store definition.
+ * @example
+ * ```js
+ * import { register } from '@wordpress/data';
+ * ```
+ *
+ * @param {WPDataStore} store Store definition.
  */
 export const register = defaultRegistry.register;

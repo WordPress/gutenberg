@@ -19,8 +19,8 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 Use the `registerStore` function to add your own store to the centralized data registry. This function accepts two arguments: a name to identify the module, and an object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
 
 ```js
-const { apiFetch } = wp;
-const { registerStore } = wp.data;
+import apiFetch from '@wordpress/api-fetch';
+import { registerStore } from '@wordpress/data';
 
 const DEFAULT_STATE = {
 	prices: {},
@@ -164,7 +164,7 @@ import existingSelectors from './existing-app/selectors';
 import existingActions from './existing-app/actions';
 import createStore from './existing-app/store';
 
-const { registerGenericStore } = wp.data;
+import { registerGenericStore } from 'wordpress/data';
 
 const reduxStore = createStore();
 
@@ -204,7 +204,7 @@ It is also possible to implement a completely custom store from scratch:
 _Example:_
 
 ```js
-const { registerGenericStore } = wp.data;
+import { registerGenericStore } from '@wordpress/data';
 
 function createCustomStore() {
 	let storeChanged = () => {};
@@ -308,7 +308,7 @@ reducing functions into a single reducing function you can pass to registerReduc
 _Usage_
 
 ```js
-const { combineReducers, registerStore } = wp.data;
+import { combineReducers, registerStore } from '@wordpress/data';
 
 const prices = ( state = {}, action ) => {
 	return action.type === 'SET_PRICE' ?
@@ -352,11 +352,11 @@ Creates a namespace object with a store derived from the reducer given.
 _Parameters_
 
 -   _key_ `string`: Unique namespace identifier.
--   _options_ (unknown type): Registered store options, with properties describing reducer, actions, selectors, and resolvers.
+-   _options_ `WPDataReduxStoreConfig`: Registered store options, with properties describing reducer, actions, selectors, and resolvers.
 
 _Returns_
 
--   (unknown type): Store Object.
+-   `WPDataStoreDefinition`: Store Object.
 
 <a name="createRegistry" href="#createRegistry">#</a> **createRegistry**
 
@@ -458,7 +458,7 @@ they are called.
 _Usage_
 
 ```js
-const { dispatch } = wp.data;
+import { dispatch } from '@wordpress/data';
 
 dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
 ```
@@ -487,9 +487,15 @@ _Type_
 
 Registers a standard `@wordpress/data` store definition.
 
+_Usage_
+
+```js
+import { register } from '@wordpress/data';
+```
+
 _Parameters_
 
--   _store_ (unknown type): Store definition.
+-   _store_ `WPDataStore`: Store definition.
 
 <a name="registerGenericStore" href="#registerGenericStore">#</a> **registerGenericStore**
 
@@ -524,11 +530,11 @@ You can read more about the react context api here:
 _Usage_
 
 ```js
-const {
+import {
   RegistryProvider,
   RegistryConsumer,
   createRegistry
-} = wp.data;
+} from '@wordpress/data';
 
 const registry = createRegistry( {} );
 
@@ -563,7 +569,7 @@ As a consumer, you need only pass arguments of the selector, if applicable.
 _Usage_
 
 ```js
-const { select } = wp.data;
+import { select } from '@wordpress/data';
 
 select( 'my-shop' ).getPrice( 'hammer' );
 ```
@@ -585,7 +591,7 @@ function used to stop the subscription.
 _Usage_
 
 ```js
-const { subscribe } = wp.data;
+import { subscribe } from '@wordpress/data';
 
 const unsubscribe = subscribe( () => {
 	// You could use this opportunity to test whether the derived result of a
@@ -624,8 +630,8 @@ the server via the `useSelect` hook to use in combination with the dispatch
 action.
 
 ```jsx
-const { useDispatch, useSelect } = wp.data;
-const { useCallback } = wp.element;
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useCallback } from '@wordpress/element';
 
 function Button( { onClick, children } ) {
   return <button type="button" onClick={ onClick }>{ children }</button>
@@ -668,18 +674,18 @@ this hook.
 It acts similarly to the `useContext` react hook.
 
 Note: Generally speaking, `useRegistry` is a low level hook that in most cases
-won't be needed for implementation. Most interactions with the wp.data api
-can be performed via the `useSelect` hook,  or the `withSelect` and
+won't be needed for implementation. Most interactions with the `@wordpress/data`
+API can be performed via the `useSelect` hook,  or the `withSelect` and
 `withDispatch` higher order components.
 
 _Usage_
 
 ```js
-const {
+import {
   RegistryProvider,
   createRegistry,
   useRegistry,
-} = wp.data
+} from '@wordpress/data';
 
 const registry = createRegistry( {} );
 
@@ -710,7 +716,7 @@ In general, this custom React hook follows the
 _Usage_
 
 ```js
-const { useSelect } = wp.data;
+import { useSelect } from '@wordpress/data';
 
 function HammerPriceDisplay( { currency } ) {
   const price = useSelect( ( select ) => {
@@ -754,7 +760,7 @@ function Button( { onClick, children } ) {
     return <button type="button" onClick={ onClick }>{ children }</button>;
 }
 
-const { withDispatch } = wp.data;
+import { withDispatch } from '@wordpress/data';
 
 const SaleButton = withDispatch( ( dispatch, ownProps ) => {
     const { startSale } = dispatch( 'my-shop' );
@@ -790,7 +796,7 @@ function Button( { onClick, children } ) {
     return <button type="button" onClick={ onClick }>{ children }</button>;
 }
 
-const { withDispatch } = wp.data;
+import { withDispatch } from '@wordpress/data';
 
 const SaleButton = withDispatch( ( dispatch, ownProps, { select } ) => {
    // Stock number changes frequently.
@@ -842,14 +848,14 @@ selectors.
 _Usage_
 
 ```js
+import { withSelect } from '@wordpress/data';
+
 function PriceDisplay( { price, currency } ) {
 	return new Intl.NumberFormat( 'en-US', {
 		style: 'currency',
 		currency,
 	} ).format( price );
 }
-
-const { withSelect } = wp.data;
 
 const HammerPriceDisplay = withSelect( ( select, ownProps ) => {
 	const { getPrice } = select( 'my-shop' );

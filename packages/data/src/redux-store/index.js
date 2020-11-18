@@ -21,6 +21,10 @@ import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
+/** @typedef {import('../types').WPDataRegistry} WPDataRegistry */
+/** @typedef {import('../types').WPDataStoreDefinition} WPDataStoreDefinition */
+/** @typedef {import('../types').WPDataReduxStoreConfig} WPDataReduxStoreConfig */
+
 /**
  * Create a cache to track whether resolvers started running or not.
  *
@@ -52,12 +56,12 @@ function createResolversCache() {
 /**
  * Creates a namespace object with a store derived from the reducer given.
  *
- * @param {string}                                    key      Unique namespace identifier.
- * @param {import('../types').WPDataReduxStoreConfig} options  Registered store options, with properties
- *                                                             describing reducer, actions, selectors, and
- *                                                             resolvers.
+ * @param {string}                 key      Unique namespace identifier.
+ * @param {WPDataReduxStoreConfig} options  Registered store options, with properties
+ *                                          describing reducer, actions, selectors,
+ *                                          and resolvers.
  *
- * @return {import('../types').WPDataStoreDefinition} Store Object.
+ * @return {WPDataStoreDefinition} Store Object.
  */
 export default function createReduxStore( key, options ) {
 	return {
@@ -149,11 +153,11 @@ export default function createReduxStore( key, options ) {
 /**
  * Creates a redux store for a namespace.
  *
- * @param {string}                            key      Unique namespace identifier.
- * @param {Object}                            options  Registered store options, with properties
- *                                                     describing reducer, actions, selectors, and
- *                                                     resolvers.
- * @param {import('../types').WPDataRegistry} registry Registry reference.
+ * @param {string}         key      Unique namespace identifier.
+ * @param {Object}         options  Registered store options, with properties
+ *                                  describing reducer, actions, selectors,
+ *                                  and resolvers.
+ * @param {WPDataRegistry} registry Registry reference.
  *
  * @return {Object} Newly created redux store.
  */
