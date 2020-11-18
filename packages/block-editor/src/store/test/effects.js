@@ -333,10 +333,7 @@ describe( 'effects', () => {
 			);
 
 			const result = await store.dispatch(
-				validateBlocksToTemplate(
-					resetBlocks( [ createBlock( 'core/test-block' ) ] ),
-					store
-				)
+				validateBlocksToTemplate( [ createBlock( 'core/test-block' ) ] )
 			);
 
 			expect( result ).toEqual( undefined );
@@ -351,10 +348,7 @@ describe( 'effects', () => {
 			);
 
 			const result = await store.dispatch(
-				validateBlocksToTemplate(
-					resetBlocks( [ createBlock( 'core/test-block' ) ] ),
-					store
-				)
+				validateBlocksToTemplate( [ createBlock( 'core/test-block' ) ] )
 			);
 
 			expect( result ).toEqual( undefined );
@@ -369,10 +363,7 @@ describe( 'effects', () => {
 			);
 
 			const result = await store.dispatch(
-				validateBlocksToTemplate(
-					resetBlocks( [ createBlock( 'core/test-block' ) ] ),
-					store
-				)
+				validateBlocksToTemplate( [ createBlock( 'core/test-block' ) ] )
 			);
 
 			expect( result ).toEqual( false );
