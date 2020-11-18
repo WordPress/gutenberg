@@ -444,8 +444,10 @@ export class RichText extends Component {
 		}
 
 		return {
-			'+': this.handleXpostSuggestion,
-			...( this.props.isMentionsSupported && {
+			...( this.props.areXPostsSupported && {
+				'+': this.handleXpostSuggestion,
+			} ),
+			...( this.props.areMentionsSupported && {
 				'@': this.handleUserSuggestion,
 			} ),
 		};
@@ -790,7 +792,7 @@ export class RichText extends Component {
 			withoutInteractiveFormatting,
 			accessibilityLabel,
 			disableEditingMenu = false,
-			isMentionsSupported,
+			areMentionsSupported,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -951,12 +953,14 @@ export class RichText extends Component {
 						<BlockFormatControls>
 							{
 								// eslint-disable-next-line no-undef
-								isMentionsSupported && (
+								areMentionsSupported && (
 									<Toolbar>
 										<ToolbarButton
 											title={ __( 'Insert mention' ) }
 											icon={ <Icon icon={ atSymbol } /> }
-											onClick={ this.handleUserSuggestion }
+											onClick={
+												this.handleUserSuggestion
+											}
 										/>
 									</Toolbar>
 								)
@@ -987,8 +991,11 @@ export default compose( [
 
 		return {
 			formatTypes: select( 'core/rich-text' ).getFormatTypes(),
-			isMentionsSupported:
+			areMentionsSupported:
 				getSettings( 'capabilities' ).mentions === true,
+			areXPostsSupported:
+				getSettings( 'capabilities' ).xposts === true ||
+				Platform.OS === 'ios',
 			...{ parentBlockStyles },
 		};
 	} ),
