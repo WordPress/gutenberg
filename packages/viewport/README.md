@@ -76,6 +76,18 @@ _Returns_
 
 -   `Function`: Higher-order component.
 
+<a name="store" href="#store">#</a> **store**
+
+Store definition for the viewport namespace.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
+
+_Type_
+
+-   `Object` 
+
 <a name="withViewportMatch" href="#withViewportMatch">#</a> **withViewportMatch**
 
 Higher-order component creator, creating a new component which renders with

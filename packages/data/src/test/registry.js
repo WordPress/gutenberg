@@ -8,6 +8,7 @@ import { castArray, mapValues } from 'lodash';
  */
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
+import createReduxStore from '../redux-store';
 
 jest.useFakeTimers();
 
@@ -551,6 +552,20 @@ describe( 'createRegistry', () => {
 			);
 		} );
 
+		it( 'should work with the store definition as param for select', () => {
+			const STORE_NAME = 'demo';
+			const store = createReduxStore( STORE_NAME, {
+				reducer: ( state = 'OK' ) => state,
+				selectors: {
+					getValue: ( state ) => state,
+				},
+				resolvers: {},
+			} );
+			registry.register( store );
+
+			expect( registry.select( store ).getValue() ).toBe( 'OK' );
+		} );
+
 		it( 'should run the registry selector from a non-registry selector', () => {
 			const selector1 = () => 'result1';
 			const selector2 = createRegistrySelector( ( select ) => () =>
@@ -679,6 +694,27 @@ describe( 'createRegistry', () => {
 			} );
 			registry.dispatch( 'counter' ).increment( 4 ); // state = 5
 			expect( store.getState() ).toBe( 5 );
+		} );
+
+		it( 'should work with the store object as param for dispatch', async () => {
+			const STORE_NAME = 'demo';
+			const store = registry.registerStore( STORE_NAME, {
+				reducer( state = 'OK', action ) {
+					if ( action.type === 'UPDATE' ) {
+						return 'UPDATED';
+					}
+					return state;
+				},
+				actions: {
+					update() {
+						return { type: 'UPDATE' };
+					},
+				},
+			} );
+
+			expect( store.getState() ).toBe( 'OK' );
+			await registry.dispatch( STORE_NAME ).update();
+			expect( store.getState() ).toBe( 'UPDATED' );
 		} );
 	} );
 

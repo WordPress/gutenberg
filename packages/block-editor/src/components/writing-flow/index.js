@@ -708,7 +708,7 @@ export default function WritingFlow( { children } ) {
 	// bubbling events from children to determine focus transition intents.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<div className={ className }>
+		<>
 			<FocusCapture
 				ref={ focusCaptureBeforeRef }
 				selectedClientId={ selectedBlockClientId }
@@ -719,6 +719,7 @@ export default function WritingFlow( { children } ) {
 			/>
 			<div
 				ref={ container }
+				className={ className }
 				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
 			>
@@ -751,7 +752,7 @@ export default function WritingFlow( { children } ) {
 				onClick={ focusLastTextField }
 				className="block-editor-writing-flow__click-redirect"
 			/>
-		</div>
+		</>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }

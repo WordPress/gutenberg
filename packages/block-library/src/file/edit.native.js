@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Text } from 'react-native';
+import { View, Text, Clipboard } from 'react-native';
 import React from 'react';
 
 /**
@@ -13,23 +13,38 @@ import {
 	MediaUploadProgress,
 	RichText,
 	PlainText,
+	BlockControls,
+	MediaUpload,
+	InspectorControls,
 } from '@wordpress/block-editor';
-import { file as icon } from '@wordpress/icons';
+import {
+	ToolbarButton,
+	ToolbarGroup,
+	PanelBody,
+	ToggleControl,
+	BottomSheet,
+} from '@wordpress/components';
+import { file as icon, replace, button, external } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
 
-export default class FileEdit extends Component {
+const URL_COPIED_NOTIFICATION_DURATION_MS = 1500;
+
+export class FileEdit extends Component {
 	constructor( props ) {
 		super( props );
 
 		this.state = {
 			isUploadInProgress: false,
 		};
+
+		this.timerRef = null;
 
 		this.onSelectFile = this.onSelectFile.bind( this );
 		this.onChangeFileName = this.onChangeFileName.bind( this );
@@ -38,6 +53,14 @@ export default class FileEdit extends Component {
 		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
+			this
+		);
+		this.getFileComponent = this.getFileComponent.bind( this );
+		this.onChangeDownloadButtonVisibility = this.onChangeDownloadButtonVisibility.bind(
+			this
+		);
+		this.onCopyURL = this.onCopyURL.bind( this );
+		this.onChangeOpenInNewWindow = this.onChangeOpenInNewWindow.bind(
 			this
 		);
 	}
@@ -51,6 +74,10 @@ export default class FileEdit extends Component {
 				downloadButtonText: _x( 'Download', 'button label' ),
 			} );
 		}
+	}
+
+	componentWillUnmount() {
+		clearTimeout( this.timerRef );
 	}
 
 	onSelectFile( media ) {
@@ -68,6 +95,29 @@ export default class FileEdit extends Component {
 
 	onChangeDownloadButtonText( downloadButtonText ) {
 		this.props.setAttributes( { downloadButtonText } );
+	}
+
+	onChangeDownloadButtonVisibility( showDownloadButton ) {
+		this.props.setAttributes( { showDownloadButton } );
+	}
+
+	onCopyURL() {
+		if ( this.state.isUrlCopied ) {
+			return;
+		}
+		const { href } = this.props.attributes;
+		Clipboard.setString( href );
+
+		this.setState( { isUrlCopied: true } );
+		this.timerRef = setTimeout( () => {
+			this.setState( { isUrlCopied: false } );
+		}, URL_COPIED_NOTIFICATION_DURATION_MS );
+	}
+
+	onChangeOpenInNewWindow( newValue ) {
+		this.props.setAttributes( {
+			textLinkTarget: newValue ? '_blank' : false,
+		} );
 	}
 
 	updateMediaProgress( payload ) {
@@ -110,9 +160,181 @@ export default class FileEdit extends Component {
 		);
 	}
 
+	getToolbarEditButton( open ) {
+		return (
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarButton
+						title={ __( 'Edit file' ) }
+						icon={ replace }
+						onClick={ open }
+					/>
+				</ToolbarGroup>
+			</BlockControls>
+		);
+	}
+
+	getInspectorControls(
+		{ showDownloadButton, textLinkTarget },
+		isUploadInProgress,
+		isUploadFailed
+	) {
+		const actionButtonStyle = this.props.getStylesFromColorScheme(
+			styles.actionButton,
+			styles.actionButtonDark
+		);
+
+		const isCopyUrlDisabled = isUploadFailed || isUploadInProgress;
+		const dimmedStyle = isCopyUrlDisabled && styles.disabledButton;
+		const finalButtonStyle = Object.assign(
+			{},
+			actionButtonStyle,
+			dimmedStyle
+		);
+
+		return (
+			<InspectorControls>
+				<PanelBody title={ __( 'File block settings' ) } />
+				<PanelBody>
+					<ToggleControl
+						icon={ external }
+						label={ __( 'Open in new tab' ) }
+						checked={ textLinkTarget === '_blank' }
+						onChange={ this.onChangeOpenInNewWindow }
+					/>
+					<ToggleControl
+						icon={ button }
+						label={ __( 'Show download button' ) }
+						checked={ showDownloadButton }
+						onChange={ this.onChangeDownloadButtonVisibility }
+					/>
+					<BottomSheet.Cell
+						disabled={ isCopyUrlDisabled }
+						label={
+							this.state.isUrlCopied
+								? __( 'Copied!' )
+								: __( 'Copy file URL' )
+						}
+						labelStyle={
+							this.state.isUrlCopied || finalButtonStyle
+						}
+						onPress={ this.onCopyURL }
+					/>
+				</PanelBody>
+			</InspectorControls>
+		);
+	}
+
+	getStyleForAlignment( align ) {
+		const getFlexAlign = ( alignment ) => {
+			switch ( alignment ) {
+				case 'right':
+					return 'flex-end';
+				case 'center':
+					return 'center';
+				default:
+					return 'flex-start';
+			}
+		};
+		return { alignSelf: getFlexAlign( align ) };
+	}
+
+	getTextAlignmentForAlignment( align ) {
+		switch ( align ) {
+			case 'right':
+				return 'right';
+			case 'center':
+				return 'center';
+			default:
+				return 'left';
+		}
+	}
+
+	getFileComponent( openMediaOptions, getMediaOptions ) {
+		const { attributes } = this.props;
+		const {
+			fileName,
+			downloadButtonText,
+			id,
+			showDownloadButton,
+			align,
+		} = attributes;
+
+		const dimmedStyle =
+			this.state.isUploadInProgress && styles.disabledButton;
+		const finalButtonStyle = Object.assign(
+			{},
+			styles.defaultButton,
+			dimmedStyle
+		);
+
+		return (
+			<MediaUploadProgress
+				mediaId={ id }
+				onUpdateMediaProgress={ this.updateMediaProgress }
+				onFinishMediaUploadWithSuccess={
+					this.finishMediaUploadWithSuccess
+				}
+				onFinishMediaUploadWithFailure={ () => {} }
+				onMediaUploadStateReset={ this.mediaUploadStateReset }
+				renderContent={ ( {
+					isUploadInProgress,
+					isUploadFailed,
+					retryMessage,
+				} ) => {
+					if ( isUploadFailed ) {
+						return this.getErrorComponent( retryMessage );
+					}
+
+					return (
+						<View>
+							{ isUploadInProgress ||
+								this.getToolbarEditButton( openMediaOptions ) }
+							{ getMediaOptions() }
+							{ this.getInspectorControls(
+								attributes,
+								isUploadInProgress,
+								isUploadFailed
+							) }
+							<RichText
+								__unstableMobileNoFocusOnMount
+								onChange={ this.onChangeFileName }
+								placeholder={ __( 'File name' ) }
+								rootTagsToEliminate={ [ 'p' ] }
+								tagName="p"
+								underlineColorAndroid="transparent"
+								value={ fileName }
+								deleteEnter={ true }
+								textAlign={ this.getTextAlignmentForAlignment(
+									align
+								) }
+							/>
+							{ showDownloadButton && (
+								<View
+									style={ [
+										finalButtonStyle,
+										this.getStyleForAlignment( align ),
+									] }
+								>
+									<PlainText
+										style={ styles.buttonText }
+										value={ downloadButtonText }
+										onChange={
+											this.onChangeDownloadButtonText
+										}
+									/>
+								</View>
+							) }
+						</View>
+					);
+				} }
+			/>
+		);
+	}
+
 	render() {
 		const { attributes } = this.props;
-		const { href, fileName, downloadButtonText, id } = attributes;
+		const { href } = attributes;
 
 		if ( ! href ) {
 			return (
@@ -130,42 +352,16 @@ export default class FileEdit extends Component {
 		}
 
 		return (
-			<MediaUploadProgress
-				mediaId={ id }
-				onUpdateMediaProgress={ this.updateMediaProgress }
-				onFinishMediaUploadWithSuccess={
-					this.finishMediaUploadWithSuccess
-				}
-				onFinishMediaUploadWithFailure={ () => {} }
-				onMediaUploadStateReset={ this.mediaUploadStateReset }
-				renderContent={ ( { isUploadFailed, retryMessage } ) => {
-					if ( isUploadFailed ) {
-						return this.getErrorComponent( retryMessage );
-					}
-
-					return (
-						<View>
-							<RichText
-								__unstableMobileNoFocusOnMount
-								fontSize={ 14 }
-								onChange={ this.onChangeFileName }
-								placeholder={ __( 'File name' ) }
-								rootTagsToEliminate={ [ 'p' ] }
-								tagName="p"
-								underlineColorAndroid="transparent"
-								value={ fileName }
-								deleteEnter={ true }
-							/>
-							<View style={ styles.defaultButton }>
-								<PlainText
-									value={ downloadButtonText }
-									onChange={ this.onChangeDownloadButtonText }
-								/>
-							</View>
-						</View>
-					);
+			<MediaUpload
+				allowedTypes={ [ 'other' ] }
+				isReplacingMedia={ true }
+				onSelect={ this.onSelectFile }
+				render={ ( { open, getMediaOptions } ) => {
+					return this.getFileComponent( open, getMediaOptions );
 				} }
 			/>
 		);
 	}
 }
+
+export default withPreferredColorScheme( FileEdit );

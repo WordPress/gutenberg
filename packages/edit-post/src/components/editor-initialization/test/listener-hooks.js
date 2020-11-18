@@ -15,7 +15,7 @@ import {
 	useBlockSelectionListener,
 	useUpdatePostLinkListener,
 } from '../listener-hooks';
-import { STORE_KEY } from '../../../store/constants';
+import { STORE_NAME } from '../../../store/constants';
 
 describe( 'listener hook tests', () => {
 	const mockStores = {
@@ -28,7 +28,7 @@ describe( 'listener hook tests', () => {
 		'core/viewport': {
 			isViewportMatch: jest.fn(),
 		},
-		[ STORE_KEY ]: {
+		[ STORE_NAME ]: {
 			isEditorSidebarOpened: jest.fn(),
 			openGeneralSidebar: jest.fn(),
 			closeGeneralSidebar: jest.fn(),
@@ -78,19 +78,19 @@ describe( 'listener hook tests', () => {
 	} );
 	describe( 'useBlockSelectionListener', () => {
 		it( 'does nothing when editor sidebar is not open', () => {
-			setMockReturnValue( STORE_KEY, 'isEditorSidebarOpened', false );
+			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', false );
 			act( () => {
 				renderComponent( useBlockSelectionListener, 10 );
 			} );
 			expect(
-				getSpyedFunction( STORE_KEY, 'isEditorSidebarOpened' )
+				getSpyedFunction( STORE_NAME, 'isEditorSidebarOpened' )
 			).toHaveBeenCalled();
 			expect(
-				getSpyedFunction( STORE_KEY, 'openGeneralSidebar' )
+				getSpyedFunction( STORE_NAME, 'openGeneralSidebar' )
 			).toHaveBeenCalledTimes( 0 );
 		} );
 		it( 'opens block sidebar if block is selected', () => {
-			setMockReturnValue( STORE_KEY, 'isEditorSidebarOpened', true );
+			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
 			setMockReturnValue(
 				'core/block-editor',
 				'getBlockSelectionStart',
@@ -100,11 +100,11 @@ describe( 'listener hook tests', () => {
 				renderComponent( useBlockSelectionListener, 10 );
 			} );
 			expect(
-				getSpyedFunction( STORE_KEY, 'openGeneralSidebar' )
+				getSpyedFunction( STORE_NAME, 'openGeneralSidebar' )
 			).toHaveBeenCalledWith( 'edit-post/block' );
 		} );
 		it( 'opens document sidebar if block is not selected', () => {
-			setMockReturnValue( STORE_KEY, 'isEditorSidebarOpened', true );
+			setMockReturnValue( STORE_NAME, 'isEditorSidebarOpened', true );
 			setMockReturnValue(
 				'core/block-editor',
 				'getBlockSelectionStart',
@@ -114,7 +114,7 @@ describe( 'listener hook tests', () => {
 				renderComponent( useBlockSelectionListener, 10 );
 			} );
 			expect(
-				getSpyedFunction( STORE_KEY, 'openGeneralSidebar' )
+				getSpyedFunction( STORE_NAME, 'openGeneralSidebar' )
 			).toHaveBeenCalledWith( 'edit-post/document' );
 		} );
 	} );

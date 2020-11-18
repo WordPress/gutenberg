@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createReduxStore, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -15,7 +15,7 @@ import controls from './controls';
 /**
  * Module Constants
  */
-const MODULE_KEY = 'core/block-editor';
+const STORE_NAME = 'core/block-editor';
 
 /**
  * Block editor data store configuration.
@@ -31,10 +31,23 @@ export const storeConfig = {
 	controls,
 };
 
-const store = registerStore( MODULE_KEY, {
+/**
+ * Store definition for the block editor namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore
+ *
+ * @type {Object}
+ */
+export const store = createReduxStore( STORE_NAME, {
 	...storeConfig,
 	persist: [ 'preferences' ],
 } );
-applyMiddlewares( store );
 
-export default store;
+// Ideally we'd use register instead of register stores.
+// We should be able to make the switch once we remove the "effects" middleware.
+// We also need a more generic way of defining persistence and not rely on a plugin.
+const instantiatedStore = registerStore( STORE_NAME, {
+	...storeConfig,
+	persist: [ 'preferences' ],
+} );
+applyMiddlewares( instantiatedStore );
