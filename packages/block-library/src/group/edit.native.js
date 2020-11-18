@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { View } from 'react-native';
-import { findIndex } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,9 +20,8 @@ import styles from './editor.scss';
 function GroupEdit( {
 	attributes,
 	hasInnerBlocks,
-	isInnerBlockSelected,
 	isSelected,
-	isLastInnerBlock,
+	isLastInnerBlockSelected,
 	getStylesFromColorScheme,
 	mergedStyle,
 } ) {
@@ -71,16 +69,11 @@ function GroupEdit( {
 				mergedStyle,
 				isSelected &&
 					hasInnerBlocks &&
-					mergedStyle?.backgroundColor && {
-						paddingBottom:
-							styles.hasBackgroundAppender.paddingBottom,
-					},
-				hasInnerBlocks &&
-					isInnerBlockSelected &&
-					isLastInnerBlock &&
-					mergedStyle?.backgroundColor && {
-						paddingBottom: 0,
-					},
+					mergedStyle?.backgroundColor &&
+					styles.hasBackgroundAppender,
+				isLastInnerBlockSelected &&
+					mergedStyle?.backgroundColor &&
+					styles.isLastInnerBlockSelected,
 			] }
 		>
 			<InnerBlocks renderAppender={ isSelected && renderAppender } />
@@ -92,6 +85,7 @@ export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const {
 			getBlock,
+			getBlockIndex,
 			hasSelectedInnerBlock,
 			getSelectedBlockClientId,
 		} = select( 'core/block-editor' );
@@ -99,24 +93,20 @@ export default compose( [
 		const block = getBlock( clientId );
 		const hasInnerBlocks = !! ( block && block.innerBlocks.length );
 		const isInnerBlockSelected =
-			hasInnerBlocks && hasSelectedInnerBlock( clientId );
-		let isLastInnerBlock = hasInnerBlocks;
+			hasInnerBlocks && hasSelectedInnerBlock( clientId, true );
+		let isLastInnerBlockSelected = false;
 
-		if ( hasInnerBlocks && isInnerBlockSelected ) {
+		if ( isInnerBlockSelected ) {
 			const { innerBlocks } = block;
 			const selectedBlockClientId = getSelectedBlockClientId();
 			const totalInnerBlocks = innerBlocks.length - 1;
-			const selectedInnerBlockIndex = findIndex(
-				innerBlocks,
-				( innerBlock ) => innerBlock.clientId === selectedBlockClientId
-			);
-			isLastInnerBlock = totalInnerBlocks === selectedInnerBlockIndex;
+			const blockIndex = getBlockIndex( selectedBlockClientId, clientId );
+			isLastInnerBlockSelected = totalInnerBlocks === blockIndex;
 		}
 
 		return {
 			hasInnerBlocks,
-			isInnerBlockSelected,
-			isLastInnerBlock,
+			isLastInnerBlockSelected,
 		};
 	} ),
 	withPreferredColorScheme,

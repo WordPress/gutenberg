@@ -25,6 +25,7 @@ export function getBlockPaddings(
 			blockStyleAttributes?.backgroundColor )
 	) {
 		blockPaddings.padding = PADDING;
+		return blockPaddings;
 	}
 
 	// Prevent adding extra paddings to inner blocks without background colors
