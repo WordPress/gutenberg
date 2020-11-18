@@ -294,6 +294,31 @@ _Returns_
 
 -   `string`: Post type.
 
+<a name="getDefaultTemplateType" href="#getDefaultTemplateType">#</a> **getDefaultTemplateType**
+
+Returns a default template type searched by slug.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _slug_ `string`: The template type slug.
+
+_Returns_
+
+-   `Object`: The template type.
+
+<a name="getDefaultTemplateTypes" href="#getDefaultTemplateTypes">#</a> **getDefaultTemplateTypes**
+
+Returns the default template types.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+
+_Returns_
+
+-   `Object`: The template types.
+
 <a name="getEditedPostAttribute" href="#getEditedPostAttribute">#</a> **getEditedPostAttribute**
 
 Returns a single attribute of the post being edited, preferring the unsaved
@@ -599,6 +624,20 @@ _Returns_
 _Related_
 
 -   getTemplate in core/block-editor store.
+
+<a name="getTemplateInfo" href="#getTemplateInfo">#</a> **getTemplateInfo**
+
+Given a template entity, return information about it which is ready to be
+rendered, such as the title and description.
+
+_Parameters_
+
+-   _state_ `Object`: Global application state.
+-   _template_ `Object`: The template for which we need information.
+
+_Returns_
+
+-   `Object`: Information about the template, including title and description.
 
 <a name="getTemplateLock" href="#getTemplateLock">#</a> **getTemplateLock**
 

@@ -37,12 +37,12 @@ export default function Header( { openEntitiesSavedStates } ) {
 			__experimentalGetPreviewDeviceType,
 			isFeatureActive,
 			getTemplateId,
-			getTemplateInfo,
 			getTemplatePartId,
 			getTemplateType,
 			isInserterOpened,
 		} = select( 'core/edit-site' );
 		const { getEntityRecord } = select( 'core' );
+		const { getTemplateInfo } = select( 'core/editor' );
 
 		const _templateType = getTemplateType();
 		const _template = getEntityRecord(

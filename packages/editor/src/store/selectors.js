@@ -1,7 +1,17 @@
 /**
  * External dependencies
  */
-import { find, get, has, pick, mapValues, includes, some } from 'lodash';
+import {
+	find,
+	get,
+	has,
+	isString,
+	pick,
+	mapValues,
+	includes,
+	some,
+} from 'lodash';
+import createSelector from 'rememo';
 
 /**
  * WordPress dependencies
@@ -1650,3 +1660,58 @@ export const hasInserterItems = getBlockEditorSelector( 'hasInserterItems' );
 export const getBlockListSettings = getBlockEditorSelector(
 	'getBlockListSettings'
 );
+
+/**
+ * Returns the default template types.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The template types.
+ */
+export function getDefaultTemplateTypes( state ) {
+	return getEditorSettings( state )?.defaultTemplateTypes;
+}
+
+/**
+ * Returns a default template type searched by slug.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} slug The template type slug.
+ *
+ * @return {Object} The template type.
+ */
+export const getDefaultTemplateType = createSelector(
+	( state, slug ) => find( getDefaultTemplateTypes( state ), { slug } ) || {},
+	( state, slug ) => [ getDefaultTemplateTypes( state ), slug ]
+);
+
+/**
+ * Given a template entity, return information about it which is ready to be
+ * rendered, such as the title and description.
+ *
+ * @param {Object} state Global application state.
+ * @param {Object} template The template for which we need information.
+ * @return {Object} Information about the template, including title and description.
+ */
+export function getTemplateInfo( state, template ) {
+	if ( ! template ) {
+		return {};
+	}
+
+	const { excerpt, slug, title } = template;
+	const {
+		title: defaultTitle,
+		description: defaultDescription,
+	} = getDefaultTemplateType( state, slug );
+
+	const templateTitle = isString( title ) ? title : title?.rendered;
+	const templateDescription = isString( excerpt ) ? excerpt : excerpt?.raw;
+
+	return {
+		title:
+			templateTitle && templateTitle !== slug
+				? templateTitle
+				: defaultTitle || slug,
+		description: templateDescription || defaultDescription,
+	};
+}

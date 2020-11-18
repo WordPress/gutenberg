@@ -44,10 +44,7 @@ export default function EntityRecordItem( {
 				name,
 				key
 			);
-			const { title: templateTitle } = select(
-				'core/edit-site'
-			).getTemplateInfo( template );
-			return templateTitle;
+			return select( 'core/editor' ).getTemplateInfo( template ).title;
 		},
 		[ name, kind, title, key ]
 	);

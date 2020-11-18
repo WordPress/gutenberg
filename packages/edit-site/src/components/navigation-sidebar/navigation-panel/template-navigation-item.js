@@ -19,7 +19,7 @@ export default function TemplateNavigationItem( { item } ) {
 	const { title, description } = useSelect(
 		( select ) =>
 			'wp_template' === item.type
-				? select( 'core/edit-site' ).getTemplateInfo( item )
+				? select( 'core/editor' ).getTemplateInfo( item )
 				: { title: item?.slug, description: '' },
 		[]
 	);

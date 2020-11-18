@@ -105,7 +105,17 @@ function Editor() {
 		};
 	}, [] );
 	const { editEntityRecord } = useDispatch( 'core' );
+	const { updateEditorSettings } = useDispatch( 'core/editor' );
 	const { setPage, setIsInserterOpened } = useDispatch( 'core/edit-site' );
+
+	// Keep the defaultTemplateTypes in the core/editor settings too,
+	// so that they can be selected with core/editor selectors in any editor.
+	// This is needed because edit-site doesn't initialize with EditorProvider,
+	// which internally uses updateEditorSettings as well.
+	const { defaultTemplateTypes } = settings;
+	useEffect( () => {
+		updateEditorSettings( { defaultTemplateTypes } );
+	}, [ defaultTemplateTypes ] );
 
 	const inlineStyles = useResizeCanvas( deviceType );
 
@@ -121,7 +131,7 @@ function Editor() {
 		( entitiesToSave ) => {
 			if ( entitiesToSave ) {
 				const { getEditedEntityRecord } = select( 'core' );
-				const { getTemplateInfo } = select( 'core/edit-site' );
+				const { getTemplateInfo } = select( 'core/editor' );
 				entitiesToSave.forEach( ( { kind, name, key } ) => {
 					const record = getEditedEntityRecord( kind, name, key );
 
