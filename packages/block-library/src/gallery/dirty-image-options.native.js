@@ -39,7 +39,7 @@ export default ( { applyImageOptions, cancelImageOptions, isVisible } ) => {
 			onChange={ onChange }
 			onCancel={ cancelImageOptions }
 			leftAlign={ true }
-			title={ __( 'Gallery block options' ) }
+			title={ __( 'Apply to all images in this gallery?' ) }
 		/>
 	);
 };
