@@ -176,7 +176,6 @@ function ColumnsEditContainer( {
 		return innerColumns.map( ( column, index ) => {
 			const { valueUnit = '%' } =
 				getValueAndUnit( column.attributes.width ) || {};
-
 			return (
 				<UnitControl
 					label={ `Column ${ index + 1 }` }
