@@ -75,8 +75,8 @@ export default function useSelect( _mapSelect, deps ) {
 	const atomState = useMemo( () => {
 		return createDerivedAtom(
 			( { get } ) => {
-				const current = registry.__unstableGetAtomResolver();
-				registry.__unstableSetAtomResolver( get );
+				const current = registry.__internalGetAtomResolver();
+				registry.__internalSetAtomResolver( get );
 				let ret;
 				try {
 					ret = mapSelect( registry.select, registry );
@@ -84,12 +84,12 @@ export default function useSelect( _mapSelect, deps ) {
 					ret = result.current;
 					previousMapError.current = error;
 				}
-				registry.__unstableSetAtomResolver( current );
+				registry.__internalSetAtomResolver( current );
 				return ret;
 			},
 			() => {},
 			{ isAsync }
-		)( registry.getAtomRegistry() );
+		)( registry.__internalGetAtomRegistry() );
 	}, [ isAsync, registry, mapSelect ] );
 
 	try {

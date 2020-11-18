@@ -12,7 +12,6 @@ Returns the raw representation of all the keyboard combinations of a given short
 
 _Parameters_
 
--   _get_ `Function`: get atom value.
 -   _name_ `string`: Shortcut name.
 
 _Returns_
@@ -25,7 +24,6 @@ Returns the shortcut names list for a given category name.
 
 _Parameters_
 
--   _get_ `Function`: get atom value.
 -   _categoryName_ `string`: Category name.
 
 _Returns_
@@ -38,7 +36,6 @@ Returns the aliases for a given shortcut name.
 
 _Parameters_
 
--   _get_ `Function`: get atom value.
 -   _name_ `string`: Shortcut name.
 
 _Returns_
@@ -51,7 +48,6 @@ Returns the shortcut description given its name.
 
 _Parameters_
 
--   _get_ `Function`: get atom value.
 -   _name_ `string`: Shortcut name.
 
 _Returns_
@@ -64,7 +60,6 @@ Returns the main key combination for a given shortcut name.
 
 _Parameters_
 
--   _get_ `Function`: get atom value.
 -   _name_ `string`: Shortcut name.
 
 _Returns_
@@ -77,7 +72,6 @@ Returns a string representing the main key combination for a given shortcut name
 
 _Parameters_
 
--   _get_ `Function`: get atom value.
 -   _name_ `string`: Shortcut name.
 -   _representation_ (unknown type): Type of representation (display, raw, ariaLabel).
 

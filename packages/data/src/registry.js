@@ -53,16 +53,7 @@ import createCoreDataStore from './store';
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
 	const storesAtoms = {};
-	const atomsUnsubscribe = {};
-	const atomRegistry = createAtomRegistry(
-		( atom ) => {
-			const unsubscribeFromAtom = atom.subscribe( globalListener );
-			atomsUnsubscribe[ atom ] = unsubscribeFromAtom;
-		},
-		( atom ) => {
-			atomsUnsubscribe[ atom ]();
-		}
-	);
+	const atomRegistry = createAtomRegistry();
 	let listeners = [];
 
 	/**
@@ -88,6 +79,12 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	};
 
 	/**
+	 * This is used to track the current atom resolver
+	 * and inject it into registry selectors.
+	 */
+	let currentAtomResolver;
+
+	/**
 	 * Calls a selector given the current state and extra arguments.
 	 *
 	 * @param {string|import('./types').WPDataStoreDefinition} storeNameOrDefinition Unique namespace identifier for the store
@@ -102,8 +99,9 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 
 		const store = stores[ storeName ];
 		if ( store ) {
-			if ( registry.__unstableGetAtomResolver() ) {
-				registry.__unstableGetAtomResolver()(
+			// If it's not an atomic store subscribe to the global store.
+			if ( registry.__internalGetAtomResolver() ) {
+				registry.__internalGetAtomResolver()(
 					registry.getStoreAtom( storeName )
 				);
 			}
@@ -112,8 +110,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		}
 
 		if ( parent ) {
-			parent.__unstableSetAtomResolver(
-				registry.__unstableGetAtomResolver()
+			parent.__internalSetAtomResolver(
+				registry.__internalGetAtomResolver()
 			);
 			const ret = parent.select( storeName );
 			return ret;
@@ -255,18 +253,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		return parent.getStoreAtom( key );
 	}
 
-	let __unstableAtomResolver;
-	function __unstableGetAtomResolver() {
-		return __unstableAtomResolver;
-	}
-	function __unstableSetAtomResolver( value ) {
-		__unstableAtomResolver = value;
-	}
-
 	let registry = {
-		getAtomRegistry() {
-			return atomRegistry;
-		},
 		registerGenericStore,
 		stores,
 		namespaces: stores, // TODO: Deprecate/remove this.
@@ -277,8 +264,15 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		use,
 		register,
 		getStoreAtom,
-		__unstableGetAtomResolver,
-		__unstableSetAtomResolver,
+		__internalGetAtomResolver() {
+			return currentAtomResolver;
+		},
+		__internalSetAtomResolver( resolver ) {
+			currentAtomResolver = resolver;
+		},
+		__internalGetAtomRegistry() {
+			return atomRegistry;
+		},
 	};
 
 	/**

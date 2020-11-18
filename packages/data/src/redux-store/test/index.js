@@ -248,10 +248,10 @@ describe( 'controls', () => {
 	describe( 'atomSelectors', () => {
 		const createUseSelectAtom = ( mapSelectToProps ) => {
 			return createDerivedAtom( ( { get } ) => {
-				const current = registry.__unstableGetAtomResolver();
-				registry.__unstableSetAtomResolver( get );
+				const current = registry.__internalGetAtomResolver();
+				registry.__internalSetAtomResolver( get );
 				const ret = mapSelectToProps( registry.select );
-				registry.__unstableSetAtomResolver( current );
+				registry.__internalSetAtomResolver( current );
 				return ret;
 			} );
 		};
@@ -278,7 +278,7 @@ describe( 'controls', () => {
 		} );
 
 		it( 'should subscribe to atom selectors', async () => {
-			const atomRegistry = registry.getAtomRegistry();
+			const atomRegistry = registry.__internalGetAtomRegistry();
 			const atom = createUseSelectAtom( ( select ) => {
 				return {
 					value: select( 'store1' ).getValue(),
@@ -317,7 +317,7 @@ describe( 'controls', () => {
 					value: select( 'store1' ).getValue(),
 				};
 			} );
-			const atomRegistry = registry.getAtomRegistry();
+			const atomRegistry = registry.__internalGetAtomRegistry();
 
 			const update = jest.fn();
 			const unsubscribe = atomRegistry.subscribe( atom, update );
@@ -344,7 +344,7 @@ describe( 'controls', () => {
 				},
 			} );
 
-			const atomRegistry = registry.getAtomRegistry();
+			const atomRegistry = registry.__internalGetAtomRegistry();
 			const atom = createUseSelectAtom( ( select ) => {
 				return {
 					value: select( 'store2' ).getSubStoreValue(),
@@ -387,7 +387,7 @@ describe( 'controls', () => {
 				},
 			} );
 
-			const atomRegistry = registry.getAtomRegistry();
+			const atomRegistry = registry.__internalGetAtomRegistry();
 			const atom = createUseSelectAtom( ( select ) => {
 				return {
 					value: select( 'store3' ).getSubStoreValue(),

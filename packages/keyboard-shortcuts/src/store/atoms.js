@@ -23,3 +23,5 @@ export const shortcutsAtom = createDerivedAtom(
 	() => {},
 	{ id: 'shortcuts' }
 );
+
+export const rootAtoms = [ shortcutNamesAtom, shortcutsByNameAtom ];

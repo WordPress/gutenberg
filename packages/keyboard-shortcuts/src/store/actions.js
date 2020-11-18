@@ -38,7 +38,7 @@ import { shortcutsByNameAtom, shortcutNamesAtom } from './atoms';
  * @param {Function} set          Atom updater.
  * @param {WPShortcutConfig} config  Shortcut config.
  */
-export const registerShortcut = ( get, set ) => ( config ) => {
+export const registerShortcut = ( config ) => ( { get, set } ) => {
 	const shortcutNames = get( shortcutNamesAtom );
 	const hasShortcut = shortcutNames.includes( config.name );
 	if ( ! hasShortcut ) {
@@ -58,7 +58,7 @@ export const registerShortcut = ( get, set ) => ( config ) => {
  * @param {Function} set          set atom value.
  * @param {string}   name         Shortcut name.
  */
-export const unregisterShortcut = ( get, set ) => ( name ) => {
+export const unregisterShortcut = ( name ) => ( { get, set } ) => {
 	const shortcutNames = get( shortcutNamesAtom );
 	set(
 		shortcutNamesAtom,

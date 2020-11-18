@@ -37,9 +37,9 @@ describe( 'listener hook tests', () => {
 	};
 	let atomResolver;
 	const registry = {
-		getAtomRegistry: () => ( {} ),
-		__unstableGetAtomResolver: () => atomResolver,
-		__unstableSetAtomResolver: ( resolver ) => {
+		__internalGetAtomRegistry: () => ( {} ),
+		__internalGetAtomResolver: () => atomResolver,
+		__internalSetAtomResolver: ( resolver ) => {
 			atomResolver = resolver;
 		},
 		select: jest

@@ -66,85 +66,79 @@ function getKeyCombinationRepresentation( shortcut, representation ) {
 /**
  * Returns the shortcut object for a given shortcut name.
  *
- * @param {Function} get  get atom value.
  * @param {string}   name Shortcut name.
  * @return {WPShortcutKeyCombination?} Key combination.
  */
-const getShortcut = ( get ) => ( name ) => {
+const getShortcut = ( name ) => ( { get } ) => {
 	return get( shortcutsByNameFamily( name ) );
 };
 
 /**
  * Returns the main key combination for a given shortcut name.
  *
- * @param {Function} get  get atom value.
  * @param {string}   name Shortcut name.
  * @return {WPShortcutKeyCombination?} Key combination.
  */
-export const getShortcutKeyCombination = ( get ) => ( name ) => {
-	const shortcut = getShortcut( get )( name );
+export const getShortcutKeyCombination = ( name ) => ( { get } ) => {
+	const shortcut = getShortcut( name )( { get } );
 	return shortcut ? shortcut.keyCombination : null;
 };
 
 /**
  * Returns a string representing the main key combination for a given shortcut name.
  *
- * @param {Function}                 get            get atom value.
  * @param {string}                   name           Shortcut name.
  * @param {keyof FORMATTING_METHODS} representation Type of representation
  *                                                  (display, raw, ariaLabel).
  *
  * @return {string?} Shortcut representation.
  */
-export const getShortcutRepresentation = ( get ) => (
+export const getShortcutRepresentation = (
 	name,
 	representation = 'display'
-) => {
-	const shortcut = getShortcutKeyCombination( get )( name );
+) => ( { get } ) => {
+	const shortcut = getShortcutKeyCombination( name )( { get } );
 	return getKeyCombinationRepresentation( shortcut, representation );
 };
 
 /**
  * Returns the shortcut description given its name.
  *
- * @param {Function} get  get atom value.
  * @param {string}   name Shortcut name.
  *
  * @return {string?} Shortcut description.
  */
-export const getShortcutDescription = ( get ) => ( name ) => {
-	const shortcut = getShortcut( get )( name );
+export const getShortcutDescription = ( name ) => ( { get } ) => {
+	const shortcut = getShortcut( name )( { get } );
 	return shortcut ? shortcut.description : null;
 };
 
 /**
  * Returns the aliases for a given shortcut name.
  *
- * @param {Function} get  get atom value.
  * @param {string}   name Shortcut name.
  *
  * @return {WPShortcutKeyCombination[]} Key combinations.
  */
-export const getShortcutAliases = ( get ) => ( name ) => {
-	const shortcut = getShortcut( get )( name );
+export const getShortcutAliases = ( name ) => ( { get } ) => {
+	const shortcut = getShortcut( name )( { get } );
 	return shortcut && shortcut.aliases ? shortcut.aliases : EMPTY_ARRAY;
 };
 
 /**
  * Returns the raw representation of all the keyboard combinations of a given shortcut name.
  *
- * @param {Function} get  get atom value.
  * @param {string}   name Shortcut name.
  *
  * @return {string[]} Shortcuts.
  */
-export const getAllShortcutRawKeyCombinations = ( get ) => ( name ) => {
+export const getAllShortcutRawKeyCombinations = ( name ) => ( { get } ) => {
 	return compact( [
 		getKeyCombinationRepresentation(
-			getShortcutKeyCombination( get )( name ),
+			getShortcutKeyCombination( name )( { get } ),
 			'raw'
 		),
-		...getShortcutAliases( get )( name ).map( ( combination ) =>
+		...getShortcutAliases( name )( { get } ).map( ( combination ) =>
 			getKeyCombinationRepresentation( combination, 'raw' )
 		),
 	] );
@@ -153,12 +147,11 @@ export const getAllShortcutRawKeyCombinations = ( get ) => ( name ) => {
 /**
  * Returns the shortcut names list for a given category name.
  *
- * @param {Function} get          get atom value.
  * @param {string}   categoryName Category name.
  *
  * @return {string[]} Shortcut names.
  */
-export const getCategoryShortcuts = ( get ) => ( categoryName ) => {
+export const getCategoryShortcuts = ( categoryName ) => ( { get } ) => {
 	return ( get( shortcutsAtom ) || [] )
 		.filter( ( shortcut ) => shortcut.category === categoryName )
 		.map( ( { name } ) => name );

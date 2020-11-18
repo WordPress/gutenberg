@@ -14,7 +14,6 @@ export const createStoreAtom = (
 	dispatch,
 	config = {}
 ) => () => {
-	let isResolved = false;
 	return {
 		id: config.id,
 		type: 'store',
@@ -25,11 +24,8 @@ export const createStoreAtom = (
 			dispatch( action );
 		},
 		subscribe: ( l ) => {
-			isResolved = true;
 			return subscribe( l );
 		},
-		get isResolved() {
-			return isResolved;
-		},
+		isResolved: true,
 	};
 };
