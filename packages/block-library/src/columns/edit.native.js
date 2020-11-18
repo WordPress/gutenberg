@@ -146,8 +146,11 @@ function ColumnsEditContainer( {
 		globalStyles
 	);
 
-	const onChangeWidth = ( valueUnit, columnId ) => {
-		const widthWithUnit = getWidthWithUnit( tempWidth, valueUnit );
+	const onChangeWidth = ( { nextWidth, valueUnit, columnId } ) => {
+		const widthWithUnit = getWidthWithUnit(
+			valueUnit === '%' || ! valueUnit ? tempWidth : nextWidth,
+			valueUnit
+		);
 
 		updateInnerColumnWidth( widthWithUnit, columnId );
 	};
@@ -159,6 +162,14 @@ function ColumnsEditContainer( {
 		const widthWithUnit = getWidthWithUnit( widthWithoutUnit, nextUnit );
 
 		updateInnerColumnWidth( widthWithUnit, columnId );
+	};
+
+	const onChange = ( nextWidth, valueUnit, columnId ) => {
+		if ( valueUnit === '%' || ! valueUnit ) {
+			setTempWidth( nextWidth );
+		} else {
+			onChangeWidth( { nextWidth, valueUnit, columnId } );
+		}
 	};
 
 	const getColumnsSliders = () => {
@@ -179,12 +190,17 @@ function ColumnsEditContainer( {
 					max={ valueUnit === '%' || ! valueUnit ? 100 : undefined }
 					decimalNum={ 1 }
 					value={ getWidths( innerColumns )[ index ] }
-					onChange={ ( value ) => setTempWidth( value ) }
+					onChange={ ( nextWidth ) => {
+						onChange( nextWidth, valueUnit, column.clientId );
+					} }
 					onUnitChange={ ( nextUnit ) =>
 						onChangeUnit( nextUnit, index, column.clientId )
 					}
 					onComplete={ () => {
-						onChangeWidth( valueUnit, column.clientId );
+						onChangeWidth( {
+							valueUnit,
+							columnId: column.clientId,
+						} );
 					} }
 					unit={ valueUnit }
 					units={ CSS_UNITS }

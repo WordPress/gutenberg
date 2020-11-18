@@ -64,8 +64,11 @@ function ColumnEdit( {
 		}
 	}, [] );
 
-	const onChangeWidth = () => {
-		const widthWithUnit = getWidthWithUnit( tempWidth, widthUnit );
+	const onChangeWidth = ( nextWidth ) => {
+		const widthWithUnit = getWidthWithUnit(
+			widthUnit === '%' || ! widthUnit ? tempWidth : nextWidth,
+			widthUnit
+		);
 
 		setAttributes( {
 			width: widthWithUnit,
@@ -81,6 +84,14 @@ function ColumnEdit( {
 		setAttributes( {
 			width: getWidthWithUnit( widthWithoutUnit, nextUnit ),
 		} );
+	};
+
+	const onChange = ( nextWidth ) => {
+		if ( widthUnit === '%' || ! widthUnit ) {
+			setTempWidth( nextWidth );
+		} else {
+			onChangeWidth( nextWidth );
+		}
 	};
 
 	const renderAppender = () => {
@@ -134,7 +145,7 @@ function ColumnEdit( {
 						label={ __( 'Width' ) }
 						min={ 1 }
 						max={ widthUnit === '%' ? 100 : undefined }
-						onChange={ ( value ) => setTempWidth( value ) }
+						onChange={ onChange }
 						onComplete={ onChangeWidth }
 						onUnitChange={ onChangeUnit }
 						decimalNum={ 1 }
