@@ -33,12 +33,27 @@ import {
 
 /**
  * Requests authors from the REST API.
+ *
+ * @param {Object|undefined} query Optional object of query parameters to
+ *                                 include with request.
  */
-export function* getAuthors() {
+export function* getAuthors( query ) {
 	const users = yield apiFetch( {
-		path: '/wp/v2/users/?who=authors&per_page=-1',
+		path: addQueryArgs( '/wp/v2/users/?who=authors&per_page=100', query ),
 	} );
 	yield receiveUserQuery( 'authors', users );
+}
+
+/**
+ * Temporary approach to resolving editor access to author queries.
+ *
+ * @param {number} id The author id.
+ */
+export function* __unstableGetAuthor( id ) {
+	const users = yield apiFetch( {
+		path: `/wp/v2/users/${ id }`,
+	} );
+	yield receiveUserQuery( 'author', users );
 }
 
 /**

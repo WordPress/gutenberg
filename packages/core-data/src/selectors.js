@@ -56,10 +56,18 @@ export const isRequestingEmbedPreview = createRegistrySelector(
  * @return {Array} Authors list.
  */
 export function getAuthors( state ) {
-	deprecated( "select( 'core' ).getAuthors()", {
-		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
-	} );
 	return getUserQueryResults( state, 'authors' );
+}
+
+/**
+ * Returns all available authors.
+ *
+ * @param {Object} state Data state.
+ *
+ * @return {Array} Authors list.
+ */
+export function __unstableGetAuthor( state ) {
+	return getUserQueryResults( state, 'author' );
 }
 
 /**
