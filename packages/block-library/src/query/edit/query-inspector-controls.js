@@ -13,6 +13,8 @@ import {
 	TextControl,
 	FormTokenField,
 	SelectControl,
+	RangeControl,
+	Notice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -31,7 +33,14 @@ const stickyOptions = [
 	{ label: __( 'Only' ), value: 'only' },
 ];
 
-export default function QueryInspectorControls( { query, setQuery } ) {
+export default function QueryInspectorControls( {
+	attributes: {
+		query,
+		layout: { columns },
+	},
+	setQuery,
+	setLayout,
+} ) {
 	const {
 		order,
 		orderBy,
@@ -132,6 +141,22 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 	}, [ querySearch, onChangeDebounced ] );
 	return (
 		<InspectorControls>
+			<PanelBody title={ __( 'Display' ) }>
+				<RangeControl
+					label={ __( 'Columns' ) }
+					value={ columns }
+					onChange={ ( value ) => setLayout( { columns: value } ) }
+					min={ 1 }
+					max={ Math.max( 6, columns ) }
+				/>
+				{ columns > 6 && (
+					<Notice status="warning" isDismissible={ false }>
+						{ __(
+							'This column count exceeds the recommended amount and may cause visual breakage.'
+						) }
+					</Notice>
+				) }
+			</PanelBody>
 			<PanelBody title={ __( 'Settings' ) }>
 				<SelectControl
 					options={ postTypesSelectOptions }

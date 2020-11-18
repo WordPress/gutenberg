@@ -69,6 +69,18 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 
 	$posts = get_posts( $query );
 
+	$classnames = '';
+	if ( isset( $block->context['layout'] ) && isset( $block->context['query'] ) ) {
+		if ( isset( $block->context['layout']['type'] ) && $block->context['layout']['type'] === 'flex' ) {
+			$columns = $block->context['layout']['columns'];
+			if ( $columns > 1 ) {
+				$classnames = "is-grid columns-{$columns}";
+			}
+		}
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+
 	$content = '';
 	foreach ( $posts as $post ) {
 		$content .= (
@@ -81,7 +93,11 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 			)
 		)->render( array( 'dynamic' => false ) );
 	}
-	return $content;
+	return sprintf(
+		'<div %1$s>%2$s</div>',
+		$wrapper_attributes,
+		$content
+	);
 }
 
 /**

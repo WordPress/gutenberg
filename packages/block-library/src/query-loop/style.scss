@@ -1,0 +1,17 @@
+.wp-block-query-loop {
+	max-width: 100%;
+	display: flex;
+	flex-wrap: wrap;
+	flex-direction: column;
+
+	&.is-grid {
+		flex-direction: row;
+	}
+	@include break-small {
+		@for $i from 2 through 6 {
+			&.is-grid.columns-#{ $i } > div {
+				width: calc((100% / #{$i}) - 1em);
+			}
+		}
+	}
+}

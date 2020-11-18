@@ -4,5 +4,9 @@
 import { InnerBlocks } from '@wordpress/block-editor';
 
 export default function QueryLoopSave() {
-	return <InnerBlocks.Content />;
+	return (
+		<div>
+			<InnerBlocks.Content />
+		</div>
+	);
 }

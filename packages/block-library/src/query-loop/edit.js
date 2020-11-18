@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useState, useMemo } from '@wordpress/element';
@@ -38,6 +43,7 @@ export default function QueryLoopEdit( {
 			sticky,
 		} = {},
 		queryContext,
+		layout: { columns = 1 } = {},
 	},
 } ) {
 	const [ { page } ] = useQueryContext() || queryContext || [ {} ];
@@ -102,7 +108,11 @@ export default function QueryLoopEdit( {
 			} ) ),
 		[ posts ]
 	);
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: classnames( `columns-${ columns }`, {
+			'is-grid': columns > 1,
+		} ),
+	} );
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 
 	if ( ! posts ) {
