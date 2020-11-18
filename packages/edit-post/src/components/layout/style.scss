@@ -45,7 +45,7 @@
 		}
 
 		// Keep it open on focus to avoid conflict with navigate-regions animation.
-		.is-focusing-regions & {
+		[role="region"]:focus & {
 			transform: translateX(0%);
 		}
 	}
