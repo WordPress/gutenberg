@@ -3,6 +3,11 @@
  */
 import classnames from 'classnames';
 
+/**
+ * WordPress dependencies
+ */
+import deprecated from '@wordpress/deprecated';
+
 function getDefaultOrigin( type ) {
 	return type === 'appear' ? 'top' : 'left';
 }
@@ -29,6 +34,10 @@ export function useAnimate( { type, origin = getDefaultOrigin( type ) } ) {
 }
 
 export default function Animate( { type, options = {}, children } ) {
+	deprecated( 'Animate component', {
+		version: '9.6',
+		alternative: 'useAnimate hook',
+	} );
 	return children( {
 		className: useAnimate( { type, ...options } ),
 	} );
