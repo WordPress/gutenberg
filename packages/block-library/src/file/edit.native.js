@@ -53,6 +53,7 @@ export class FileEdit extends Component {
 		};
 
 		this.timerRef = null;
+
 		this.onSelectFile = this.onSelectFile.bind( this );
 		this.onChangeFileName = this.onChangeFileName.bind( this );
 		this.onChangeDownloadButtonText = this.onChangeDownloadButtonText.bind(
