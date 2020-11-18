@@ -125,7 +125,7 @@ function _gutenberg_synchronize_theme_templates( $template_type ) {
 		$slug    = substr(
 			$path,
 			// Starting position of slug.
-			strpos( $path, $template_base_path . '/' ) + 1 + strlen( $template_base_path ),
+			strpos( $path, $template_base_path . DIRECTORY_SEPARATOR ) + 1 + strlen( $template_base_path ),
 			// Subtract ending '.html'.
 			-5
 		);
@@ -167,7 +167,7 @@ add_action( 'trash_wp_template_part', 'gutenberg_clear_synchronize_last_checks' 
  * @param WP_Post $post WP_Post instance of the deleted post.
  */
 function gutenberg_clear_synchronize_last_checks_after_delete( $post_id, $post ) {
-	if ( 'wp_template' !== $post->post_type || 'wp_template_part' !== $post->post_type ) {
+	if ( 'wp_template' === $post->post_type || 'wp_template_part' === $post->post_type ) {
 		gutenberg_clear_synchronize_last_checks();
 	}
 }

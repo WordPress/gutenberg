@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -10,18 +10,21 @@ import * as actions from './actions';
 import controls from './controls';
 import reducer from './reducer';
 import * as selectors from './selectors';
-import { STORE_KEY } from './constants';
+
+const STORE_NAME = 'core/reusable-blocks';
 
 /**
- * Data store configuration.
+ * Store definition for the reusable blocks namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore
  *
  * @type {Object}
  */
-export default registerStore( STORE_KEY, {
+export const store = createReduxStore( STORE_NAME, {
 	actions,
 	controls,
 	reducer,
 	selectors,
 } );
+
+register( store );
