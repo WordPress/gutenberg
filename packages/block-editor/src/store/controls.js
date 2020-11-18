@@ -18,7 +18,11 @@ const controls = {
 
 	MARK_AUTOMATIC_CHANGE_FINAL_CONTROL: createRegistryControl(
 		( registry ) => () => {
-			window.requestIdleCallback( () =>
+			const {
+				requestIdleCallback = ( callback ) =>
+					setTimeout( callback, 100 ),
+			} = window;
+			requestIdleCallback( () =>
 				registry
 					.dispatch( 'core/block-editor' )
 					.__unstableMarkAutomaticChangeFinal()
