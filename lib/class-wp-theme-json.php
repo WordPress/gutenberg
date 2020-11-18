@@ -523,7 +523,7 @@ class WP_Theme_JSON {
 	 * @return array|null The settings subtree.
 	 */
 	private static function extract_settings( $context ) {
-		if ( ! isset( $context['settings'] ) ) {
+		if ( empty( $context['settings'] ) ) {
 			return null;
 		}
 
