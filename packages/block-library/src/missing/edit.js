@@ -16,18 +16,25 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	const actions = [];
 	let messageHTML;
 	if ( hasContent && hasHTMLBlock ) {
-		messageHTML = sprintf(
-			/* translators: %s: block name */
-			__(
-				'Your site doesn’t include support for the "%s" block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely.'
-			),
-			originalName
-		);
-		actions.push(
-			<Button key="convert" onClick={ convertToHTML } isPrimary>
-				{ __( 'Keep as HTML' ) }
-			</Button>
-		);
+		if ( originalName ) {
+			messageHTML = sprintf(
+				/* translators: %s: block name */
+				__(
+					'Your site doesn’t include support for the "%s" block. You can leave this block intact, convert its content to a Custom HTML block, or remove it entirely.'
+				),
+				originalName
+			);
+
+			actions.push(
+				<Button key="convert" onClick={ convertToHTML } isPrimary>
+					{ __( 'Keep as HTML' ) }
+				</Button>
+			);
+		} else {
+			messageHTML = __(
+				'Legacy content cannot be edited in this context.'
+			);
+		}
 	} else {
 		messageHTML = sprintf(
 			/* translators: %s: block name */
