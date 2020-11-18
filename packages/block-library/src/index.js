@@ -87,6 +87,9 @@ import * as postFeaturedImage from './post-featured-image';
 import * as postHierarchicalTerms from './post-hierarchical-terms';
 import * as postTags from './post-tags';
 
+const isClassicEnabled =
+	window.wpEditorL10n && window.wp && window.wp.oldEditor;
+
 /**
  * Function to register an individual block.
  *
@@ -139,7 +142,7 @@ export const __experimentalGetCoreBlocks = () => [
 	embed,
 	file,
 	group,
-	window.wp && window.wp.oldEditor ? classic : null, // Only add the classic block in WP Context
+	isClassicEnabled ? classic : null, // Only add the classic block in WP Context
 	html,
 	mediaText,
 	latestComments,
@@ -182,7 +185,7 @@ export const registerCoreBlocks = (
 	blocks.forEach( registerBlock );
 
 	setDefaultBlockName( paragraph.name );
-	if ( window.wp && window.wp.oldEditor ) {
+	if ( isClassicEnabled ) {
 		setFreeformContentHandlerName( classic.name );
 	}
 	setUnregisteredTypeHandlerName( missing.name );
