@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import { isEqual, isEmpty, find, concat, differenceBy } from 'lodash';
+import {
+	isEqual,
+	isEmpty,
+	find,
+	concat,
+	differenceBy,
+	some,
+	every,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -99,6 +107,7 @@ function GalleryEdit( props ) {
 	);
 	const [ imageSettings, setImageSettings ] = useState( currentImageOptions );
 	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
+	const [ imageData, setImageData ] = useState( [] );
 
 	useEffect( () => {
 		const currentOptionsState = ! isEqual(
@@ -128,10 +137,49 @@ function GalleryEdit( props ) {
 				id: block.attributes.id,
 				url: block.attributes.url,
 				attributes: block.attributes,
-				imageData: getMedia( block.attributes.id ),
 			} ) ),
 		[ innerBlockImages ]
 	);
+
+	// Wait until all the blocks have an image id before we save the imageData array.
+	useEffect( () => {
+		if (
+			innerBlockImages.length === 0 ||
+			some(
+				innerBlockImages,
+				( imageBlock ) => ! imageBlock.attributes.id
+			)
+		) {
+			return;
+		}
+
+		const newImageData = innerBlockImages.map( ( imageBlock ) => {
+			return {
+				id: imageBlock.attributes.id,
+				data: getMedia( imageBlock.attributes.id ),
+			};
+		} );
+		setImageData( newImageData );
+	}, [ innerBlockImages ] );
+
+	// The getMedia call is async so we need to keep resetting the imageData array until we
+	// have the imageData returned for every image.
+	useEffect( () => {
+		if (
+			imageData.length === 0 ||
+			every( imageData, ( img ) => img.data )
+		) {
+			return;
+		}
+
+		const newImageData = imageData.map( ( img ) => {
+			return {
+				id: img.id,
+				data: img.data || getMedia( img.id ),
+			};
+		} );
+		setImageData( newImageData );
+	}, [ imageData ] );
 
 	useEffect( () => {
 		if ( images.length !== imageCount ) {
@@ -140,10 +188,9 @@ function GalleryEdit( props ) {
 	}, [ images ] );
 
 	const imageSizeOptions = useImageSizes(
-		images,
+		imageData,
 		isSelected,
-		getSettings,
-		getMedia
+		getSettings
 	);
 
 	const { replaceInnerBlocks, updateBlockAttributes } = useDispatch(
@@ -258,15 +305,15 @@ function GalleryEdit( props ) {
 	function applyImageOptions() {
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
 			const image = block.attributes.id
-				? find( images, { id: block.attributes.id } )
+				? find( imageData, { id: block.attributes.id } )
 				: null;
-			if ( ! image.imageData ) {
-				image.imageData = getMedia( image.id );
+			if ( ! image.data ) {
+				image.data = getMedia( image.id );
 			}
 			updateBlockAttributes( block.clientId, {
-				...getHrefAndDestination( image.imageData, linkTo ),
+				...getHrefAndDestination( image.data, linkTo ),
 				...getUpdatedLinkTargetSettings( linkTarget, block.attributes ),
-				...getImageSizeAttributes( image.imageData, sizeSlug ),
+				...getImageSizeAttributes( image.data, sizeSlug ),
 			} );
 		} );
 		setDirtyImageOptions( false );
