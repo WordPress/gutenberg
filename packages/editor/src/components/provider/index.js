@@ -268,31 +268,29 @@ class EditorProvider extends Component {
 		);
 
 		return (
-			<>
-				<EntityProvider kind="root" type="site">
-					<EntityProvider
-						kind="postType"
-						type={ post.type }
-						id={ post.id }
-					>
-						<BlockContextProvider value={ defaultBlockContext }>
-							<BlockEditorProvider
-								value={ blocks }
-								onInput={ resetEditorBlocksWithoutUndoLevel }
-								onChange={ resetEditorBlocks }
-								selectionStart={ selectionStart }
-								selectionEnd={ selectionEnd }
-								settings={ editorSettings }
-								useSubRegistry={ false }
-							>
-								{ children }
-								<ReusableBlocksMenuItems />
-								<ConvertToGroupButtons />
-							</BlockEditorProvider>
-						</BlockContextProvider>
-					</EntityProvider>
+			<EntityProvider kind="root" type="site">
+				<EntityProvider
+					kind="postType"
+					type={ post.type }
+					id={ post.id }
+				>
+					<BlockContextProvider value={ defaultBlockContext }>
+						<BlockEditorProvider
+							value={ blocks }
+							onInput={ resetEditorBlocksWithoutUndoLevel }
+							onChange={ resetEditorBlocks }
+							selectionStart={ selectionStart }
+							selectionEnd={ selectionEnd }
+							settings={ editorSettings }
+							useSubRegistry={ false }
+						>
+							{ children }
+							<ReusableBlocksMenuItems />
+							<ConvertToGroupButtons />
+						</BlockEditorProvider>
+					</BlockContextProvider>
 				</EntityProvider>
-			</>
+			</EntityProvider>
 		);
 	}
 }
