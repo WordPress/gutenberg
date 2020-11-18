@@ -90,7 +90,7 @@ module.exports = function cli() {
 			) }} (override with WP_ENV_PORT) and tests on port {bold.underline ${ terminalLink(
 				'8889',
 				'http://localhost:8889'
-			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first insall, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`
+			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first install, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`
 		),
 		( args ) => {
 			args.option( 'update', {

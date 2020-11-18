@@ -202,7 +202,7 @@ wp-env start
 Starts WordPress for development on port 8888 (override with WP_ENV_PORT) and
 tests on port 8889 (override with WP_ENV_TESTS_PORT). The current working
 directory must be a WordPress installation, a plugin, a theme, or contain a
-.wp-env.json file. After first insall, use the '--update' flag to download updates
+.wp-env.json file. After first install, use the '--update' flag to download updates
 to mapped sources and to re-apply WordPress configuration options.
 
 Options:
