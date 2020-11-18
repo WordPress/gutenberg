@@ -491,7 +491,7 @@ class WP_Theme_JSON {
 	 * @param array  $schema Schema to use for normalization.
 	 */
 	private static function process_key( $key, &$input, $schema ) {
-		if ( ! is_array( $input ) || ! isset( $input[ $key ] ) ) {
+		if ( ! isset( $input[ $key ] ) ) {
 			return;
 		}
 
