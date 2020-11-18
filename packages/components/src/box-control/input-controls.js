@@ -82,7 +82,7 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'top' ) }
 					onHoverOff={ createHandleOnHoverOff( 'top' ) }
 					label={ LABELS.top }
-					disableUnits={ top.match( /^(auto|calc)/ ) }
+					disableUnits={ top?.match( /^(auto|calc)/ ) }
 					type={ `${ type }Top` }
 				/>
 				<UnitControl
@@ -93,7 +93,7 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'right' ) }
 					onHoverOff={ createHandleOnHoverOff( 'right' ) }
 					label={ LABELS.right }
-					disableUnits={ right.match( /^(auto|calc)/ ) }
+					disableUnits={ right?.match( /^(auto|calc)/ ) }
 					type={ `${ type }Right` }
 				/>
 				<UnitControl
@@ -104,7 +104,7 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'bottom' ) }
 					onHoverOff={ createHandleOnHoverOff( 'bottom' ) }
 					label={ LABELS.bottom }
-					disableUnits={ bottom.match( /^(auto|calc)/ ) }
+					disableUnits={ bottom?.match( /^(auto|calc)/ ) }
 					type={ `${ type }Bottom` }
 				/>
 				<UnitControl
@@ -116,7 +116,7 @@ export default function BoxInputControls( {
 					onHoverOn={ createHandleOnHoverOn( 'left' ) }
 					onHoverOff={ createHandleOnHoverOff( 'left' ) }
 					label={ LABELS.left }
-					disableUnits={ left.match( /^(auto|calc)/ ) }
+					disableUnits={ left?.match( /^(auto|calc)/ ) }
 					type={ `${ type }Left` }
 				/>
 			</Layout>
