@@ -46,8 +46,7 @@ function InterfaceSkeleton(
 
 	ref = ref || fallbackRef;
 
-	const regionsClassName = useNavigateRegions( ref, shortcuts );
-
+	useNavigateRegions( ref, shortcuts );
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
@@ -82,9 +81,8 @@ function InterfaceSkeleton(
 		<div
 			ref={ ref }
 			className={ classnames(
-				'interface-interface-skeleton',
 				className,
-				regionsClassName
+				'interface-interface-skeleton'
 			) }
 		>
 			{ !! drawer && (
