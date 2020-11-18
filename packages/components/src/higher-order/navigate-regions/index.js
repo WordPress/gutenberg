@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback, useState, useRef, useEffect } from '@wordpress/element';
 import {
 	createHigherOrderComponent,
 	useKeyboardShortcut,
@@ -14,6 +14,8 @@ const defaultShortcuts = {
 };
 
 export function useNavigateRegions( ref, shortcuts = defaultShortcuts ) {
+	const [ isFocusingRegions, setIsFocusingRegions ] = useState( false );
+
 	function focusRegion( offset ) {
 		const regions = Array.from(
 			ref.current.querySelectorAll( '[role="region"]' )
@@ -33,6 +35,7 @@ export function useNavigateRegions( ref, shortcuts = defaultShortcuts ) {
 		}
 
 		nextRegion.focus();
+		setIsFocusingRegions( true );
 	}
 	const focusPrevious = useCallback( () => focusRegion( -1 ), [] );
 	const focusNext = useCallback( () => focusRegion( 1 ), [] );
@@ -41,14 +44,32 @@ export function useNavigateRegions( ref, shortcuts = defaultShortcuts ) {
 		bindGlobal: true,
 	} );
 	useKeyboardShortcut( shortcuts.next, focusNext, { bindGlobal: true } );
+
+	useEffect( () => {
+		function onClick() {
+			setIsFocusingRegions( false );
+		}
+
+		ref.current.addEventListener( 'click', onClick );
+
+		return () => {
+			ref.current.removeEventListener( 'click', onClick );
+		};
+	}, [ setIsFocusingRegions ] );
+
+	if ( ! isFocusingRegions ) {
+		return;
+	}
+
+	return 'is-focusing-regions';
 }
 
 export default createHigherOrderComponent(
 	( Component ) => ( { shortcuts, ...props } ) => {
 		const ref = useRef();
-		useNavigateRegions( ref, shortcuts );
+		const className = useNavigateRegions( ref, shortcuts );
 		return (
-			<div ref={ ref }>
+			<div ref={ ref } className={ className }>
 				<Component { ...props } />
 			</div>
 		);
