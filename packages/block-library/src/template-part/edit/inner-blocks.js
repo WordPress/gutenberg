@@ -25,6 +25,7 @@ export default function TemplatePartInnerBlocks( {
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
+			entityId: `wp_template_part_${ id }`,
 		}
 	);
 	return <div { ...innerBlocksProps } />;

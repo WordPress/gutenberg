@@ -10,6 +10,11 @@ import { useEffect, useRef } from '@wordpress/element';
 import { useRegistry } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import useIsPrimaryEntityManager from './use-entity-manager';
+
+/**
  * A function to call when the block value has been updated in the block-editor
  * store.
  *
@@ -45,6 +50,10 @@ import { useRegistry } from '@wordpress/data';
  *                                If none is passed, then it is assumed to be a
  *                                root controller rather than an inner block
  *                                controller.
+ * @param {string} props.entityId An ID which should identify the "thing" to which
+ *                                the blocks belong. This is used to keep track
+ *                                of times when two different components need to
+ *                                sync the same blocks.
  * @param {Object[]} props.value  The control value for the blocks. This value
  *                                is used to initalize the block-editor store
  *                                and for resetting the blocks to incoming
@@ -65,6 +74,7 @@ import { useRegistry } from '@wordpress/data';
  */
 export default function useBlockSync( {
 	clientId = null,
+	entityId = null,
 	value: controlledBlocks,
 	selectionStart: controlledSelectionStart,
 	selectionEnd: controlledSelectionEnd,
@@ -83,6 +93,7 @@ export default function useBlockSync( {
 	const { getBlockName, getBlocks } = registry.select( 'core/block-editor' );
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
+	const isEntityTracker = useIsPrimaryEntityManager( entityId, clientId );
 
 	const setControlledBlocks = () => {
 		if ( ! controlledBlocks ) {
@@ -102,6 +113,16 @@ export default function useBlockSync( {
 		}
 	};
 
+	useEffect( () => {
+		if ( ! isEntityTracker ) {
+			// TODO: synchronizeBlockTree
+			// this needs to run after the primary template part exists. Unsure
+			// if that will be problematic -- to be fair, if we are not the main
+			// tracker for the entity, then the main tracker has already been
+			// set up, at least partially.
+		}
+	}, [ isEntityTracker ] );
+
 	// Add a subscription to the block-editor registry to detect when changes
 	// have been made. This lets us inform the data source of changes. This
 	// is an effect so that the subscriber can run synchronously without
@@ -114,6 +135,11 @@ export default function useBlockSync( {
 	}, [ onInput, onChange ] );
 
 	useEffect( () => {
+		// Do not listen for changes if we are not the entity tracker.
+		if ( ! isEntityTracker ) {
+			return;
+		}
+
 		const {
 			getSelectionStart,
 			getSelectionEnd,
@@ -183,10 +209,14 @@ export default function useBlockSync( {
 		} );
 
 		return () => unsubscribe();
-	}, [ registry, clientId ] );
+	}, [ registry, clientId, isEntityTracker ] );
 
 	// Determine if blocks need to be reset when they change.
 	useEffect( () => {
+		// Do not listen for changes if the entity is already tracked.
+		if ( ! isEntityTracker ) {
+			return;
+		}
 		if ( pendingChanges.current.outgoing.includes( controlledBlocks ) ) {
 			// Skip block reset if the value matches expected outbound sync
 			// triggered by this component by a preceding change detection.
@@ -215,5 +245,5 @@ export default function useBlockSync( {
 				);
 			}
 		}
-	}, [ controlledBlocks, clientId ] );
+	}, [ controlledBlocks, clientId, isEntityTracker ] );
 }
