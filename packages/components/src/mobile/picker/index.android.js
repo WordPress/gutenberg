@@ -43,10 +43,10 @@ export default class Picker extends Component {
 	}
 
 	onClose() {
-		this.setState( { isVisible: false } );
-		if ( this.props.onCancel ) {
-			this.props.onCancel();
+		if ( this.props.onClose ) {
+			this.props.onClose();
 		}
+		this.setState( { isVisible: false } );
 	}
 
 	onCellPress( value ) {
