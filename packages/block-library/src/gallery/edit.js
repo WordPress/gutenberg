@@ -78,7 +78,7 @@ function GalleryEdit( props ) {
 	const {
 		imageCount,
 		linkTarget,
-		linkTo,
+		linkTo = Platform.OS !== 'web' ? 'none' : undefined,
 		columns = defaultColumnsNumber( imageCount ),
 		sizeSlug,
 		imageUploads,
@@ -139,7 +139,12 @@ function GalleryEdit( props ) {
 		}
 	}, [ images ] );
 
-	const imageSizeOptions = useImageSizes( images, isSelected, getSettings );
+	const imageSizeOptions = useImageSizes(
+		images,
+		isSelected,
+		getSettings,
+		getMedia
+	);
 
 	const { replaceInnerBlocks, updateBlockAttributes } = useDispatch(
 		'core/block-editor'
@@ -171,7 +176,7 @@ function GalleryEdit( props ) {
 		};
 	}
 
-	function onSelectImages( selectedImages ) {
+	function onSelectImages( selectedImages, replace = false ) {
 		const imageArray =
 			Object.prototype.toString.call( selectedImages ) ===
 			'[object FileList]'
@@ -186,7 +191,7 @@ function GalleryEdit( props ) {
 				  } )
 				: selectedImages;
 
-		const newImages = imageArray
+		const processedImages = imageArray
 			.filter(
 				( file ) => file.url || file.type?.indexOf( 'image/' ) === 0
 			)
@@ -200,16 +205,27 @@ function GalleryEdit( props ) {
 				return file;
 			} );
 
-		const onlyNewImages = differenceBy( newImages, images, 'url' );
+		const existingImageBlocks = replace
+			? innerBlockImages.filter( ( block ) =>
+					processedImages.find(
+						( img ) => img.url === block.attributes.url
+					)
+			  )
+			: innerBlockImages;
 
-		const newBlocks = onlyNewImages.map( ( image ) => {
+		const newImages = differenceBy( processedImages, images, 'url' );
+
+		const newBlocks = newImages.map( ( image ) => {
 			return createBlock( 'core/image', {
-				...buildImageAttributes( undefined, image ),
+				...buildImageAttributes( false, image ),
 				id: image.id,
 			} );
 		} );
 
-		replaceInnerBlocks( clientId, concat( innerBlockImages, newBlocks ) );
+		replaceInnerBlocks(
+			clientId,
+			concat( existingImageBlocks, newBlocks )
+		);
 	}
 
 	function onUploadError( message ) {
@@ -244,7 +260,9 @@ function GalleryEdit( props ) {
 			const image = block.attributes.id
 				? find( images, { id: block.attributes.id } )
 				: null;
-
+			if ( ! image.imageData ) {
+				image.imageData = getMedia( image.id );
+			}
 			updateBlockAttributes( block.clientId, {
 				...getHrefAndDestination( image.imageData, linkTo ),
 				...getUpdatedLinkTargetSettings( linkTarget, block.attributes ),
@@ -290,7 +308,8 @@ function GalleryEdit( props ) {
 
 	const mediaPlaceholder = (
 		<MediaPlaceholder
-			addToGallery={ true }
+			addToGallery={ hasImages }
+			isGallery={ true }
 			isAppender={ hasImages }
 			disableMediaButtons={ hasImages && ! isSelected }
 			icon={ ! hasImages && sharedIcon }
