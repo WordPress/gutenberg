@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, get } from 'lodash';
+import { find, get, isString } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -190,9 +190,10 @@ export function getDefaultTemplateTypes( state ) {
  *
  * @return {Object} The template type.
  */
-export function getDefaultTemplateType( state, slug ) {
-	return find( getDefaultTemplateTypes( state ), { slug } ) || {};
-}
+export const getDefaultTemplateType = createSelector(
+	( state, slug ) => find( getDefaultTemplateTypes( state ), { slug } ) || {},
+	( state, slug ) => [ getDefaultTemplateTypes( state ), slug ]
+);
 
 /**
  * Given a template entity, return information about it which is ready to be
@@ -207,19 +208,20 @@ export function getTemplateInfo( state, template ) {
 		return {};
 	}
 
-	const templateTitle = template?.title?.rendered;
-	const templateSlug = template?.slug;
-
+	const { excerpt, slug, title } = template;
 	const {
 		title: defaultTitle,
 		description: defaultDescription,
-	} = getDefaultTemplateType( state, templateSlug );
+	} = getDefaultTemplateType( state, slug );
 
-	const title =
-		templateTitle && templateTitle !== templateSlug
-			? templateTitle
-			: defaultTitle || templateSlug;
-	const description = template?.excerpt?.raw || defaultDescription;
+	const templateTitle = isString( title ) ? title : title?.rendered;
+	const templateDescription = isString( excerpt ) ? excerpt : excerpt?.raw;
 
-	return { title, description };
+	return {
+		title:
+			templateTitle && templateTitle !== slug
+				? templateTitle
+				: defaultTitle || slug,
+		description: templateDescription || defaultDescription,
+	};
 }
