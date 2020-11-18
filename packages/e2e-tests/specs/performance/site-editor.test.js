@@ -11,6 +11,8 @@ import {
 	trashAllPosts,
 	visitAdminPage,
 	activateTheme,
+	createNewPost,
+	publishPost,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -19,6 +21,11 @@ jest.setTimeout( 1000000 );
 describe( 'Site Editor Performance', () => {
 	beforeAll( async () => {
 		await activateTheme( 'twentytwentyone-blocks' );
+		await createNewPost( {
+			postType: 'wp_template',
+			title: 'front page',
+		} );
+		await publishPost();
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
