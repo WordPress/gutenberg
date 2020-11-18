@@ -43,7 +43,7 @@ function ColumnEdit( {
 	clientId,
 } ) {
 	const { verticalAlignment, width } = attributes;
-	const { valueUnit } = getValueAndUnit( width ) || {};
+	const { valueUnit = '%' } = getValueAndUnit( width ) || {};
 
 	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 

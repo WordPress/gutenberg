@@ -22,7 +22,9 @@ import GlobalStylesContext from '../global-styles-context';
 const getValueAndUnit = ( value, unit ) => {
 	const regex = /(\d+\.?\d*)(.*)/;
 
-	const splitValue = `${ value }`?.match( regex );
+	const splitValue = `${ value }`
+		?.match( regex )
+		?.filter( ( v ) => v !== '' );
 
 	if ( splitValue ) {
 		return {

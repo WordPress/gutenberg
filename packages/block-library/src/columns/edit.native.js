@@ -167,7 +167,7 @@ function ColumnsEditContainer( {
 		}
 
 		return innerColumns.map( ( column, index ) => {
-			const { valueUnit } =
+			const { valueUnit = '%' } =
 				getValueAndUnit( column.attributes.width ) || {};
 			return (
 				<UnitControl
@@ -186,7 +186,7 @@ function ColumnsEditContainer( {
 					onComplete={ () => {
 						onChangeWidth( valueUnit, column.clientId );
 					} }
-					unit={ valueUnit || '%' }
+					unit={ valueUnit }
 					units={ CSS_UNITS }
 					preview={
 						<ColumnsPreview
