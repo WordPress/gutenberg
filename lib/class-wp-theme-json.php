@@ -262,69 +262,71 @@ class WP_Theme_JSON {
 	/**
 	 * Metadata for style properties.
 	 *
-	 * - 'theme_json' => where the property value is stored
-	 * - 'block_json' => whether the block has declared support for it
+	 * Each property declares:
+	 *
+	 * - 'value': path to the value in theme.json and block attributes.
+	 * - 'support': path to the block support in block.json.
 	 */
 	const PROPERTIES_METADATA = array(
 		'--wp--style--color--link' => array(
-			'theme_json' => array( 'color', 'link' ),
-			'block_json' => array( 'color', 'link' ),
+			'value'   => array( 'color', 'link' ),
+			'support' => array( 'color', 'link' ),
 		),
 		'background'               => array(
-			'theme_json' => array( 'color', 'gradient' ),
-			'block_json' => array( 'color', 'gradients' ),
+			'value'   => array( 'color', 'gradient' ),
+			'support' => array( 'color', 'gradients' ),
 		),
 		'backgroundColor'          => array(
-			'theme_json' => array( 'color', 'background' ),
-			'block_json' => array( 'color' ),
+			'value'   => array( 'color', 'background' ),
+			'support' => array( 'color' ),
 		),
 		'color'                    => array(
-			'theme_json' => array( 'color', 'text' ),
-			'block_json' => array( 'color' ),
+			'value'   => array( 'color', 'text' ),
+			'support' => array( 'color' ),
 		),
 		'fontFamily'               => array(
-			'theme_json' => array( 'typography', 'fontFamily' ),
-			'block_json' => array( '__experimentalFontFamily' ),
+			'value'   => array( 'typography', 'fontFamily' ),
+			'support' => array( '__experimentalFontFamily' ),
 		),
 		'fontSize'                 => array(
-			'theme_json' => array( 'typography', 'fontSize' ),
-			'block_json' => array( 'fontSize' ),
+			'value'   => array( 'typography', 'fontSize' ),
+			'support' => array( 'fontSize' ),
 		),
 		'fontStyle'                => array(
-			'theme_json' => array( 'typography', 'fontStyle' ),
-			'block_json' => array( '__experimentalFontAppearance' ),
+			'value'   => array( 'typography', 'fontStyle' ),
+			'support' => array( '__experimentalFontAppearance' ),
 		),
 		'fontWeight'               => array(
-			'theme_json' => array( 'typography', 'fontWeight' ),
-			'block_json' => array( '__experimentalFontAppearance' ),
+			'value'   => array( 'typography', 'fontWeight' ),
+			'support' => array( '__experimentalFontAppearance' ),
 		),
 		'lineHeight'               => array(
-			'theme_json' => array( 'typography', 'lineHeight' ),
-			'block_json' => array( 'lineHeight' ),
+			'value'   => array( 'typography', 'lineHeight' ),
+			'support' => array( 'lineHeight' ),
 		),
 		'paddingBottom'            => array(
-			'theme_json' => array( 'spacing', 'padding', 'bottom' ),
-			'block_json' => array( 'spacing', 'padding' ),
+			'value'   => array( 'spacing', 'padding', 'bottom' ),
+			'support' => array( 'spacing', 'padding' ),
 		),
 		'paddingLeft'              => array(
-			'theme_json' => array( 'spacing', 'padding', 'left' ),
-			'block_json' => array( 'spacing', 'padding' ),
+			'value'   => array( 'spacing', 'padding', 'left' ),
+			'support' => array( 'spacing', 'padding' ),
 		),
 		'paddingRight'             => array(
-			'theme_json' => array( 'spacing', 'padding', 'right' ),
-			'block_json' => array( 'spacing', 'padding' ),
+			'value'   => array( 'spacing', 'padding', 'right' ),
+			'support' => array( 'spacing', 'padding' ),
 		),
 		'paddingTop'               => array(
-			'theme_json' => array( 'spacing', 'padding', 'top' ),
-			'block_json' => array( 'spacing', 'padding' ),
+			'value'   => array( 'spacing', 'padding', 'top' ),
+			'support' => array( 'spacing', 'padding' ),
 		),
 		'textDecoration'           => array(
-			'theme_json' => array( 'typography', 'textDecoration' ),
-			'block_json' => array( '__experimentalTextDecoration' ),
+			'value'   => array( 'typography', 'textDecoration' ),
+			'support' => array( '__experimentalTextDecoration' ),
 		),
 		'textTransform'            => array(
-			'theme_json' => array( 'typography', 'textTransform' ),
-			'block_json' => array( '__experimentalTextTransform' ),
+			'value'   => array( 'typography', 'textTransform' ),
+			'support' => array( '__experimentalTextTransform' ),
 		),
 	);
 
@@ -432,7 +434,7 @@ class WP_Theme_JSON {
 			 */
 			$block_supports = array();
 			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
-				if ( gutenberg_experimental_get( $block_type->supports, $metadata['block_json'] ) ) {
+				if ( gutenberg_experimental_get( $block_type->supports, $metadata['support'] ) ) {
 					$block_supports[] = $key;
 				}
 			}
@@ -664,7 +666,7 @@ class WP_Theme_JSON {
 				continue;
 			}
 
-			$value = self::get_property_value( $context['styles'], $metadata['theme_json'] );
+			$value = self::get_property_value( $context['styles'], $metadata['value'] );
 			if ( ! empty( $value ) ) {
 				$kebabcased_name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $name ) );
 				$declarations[]  = array(

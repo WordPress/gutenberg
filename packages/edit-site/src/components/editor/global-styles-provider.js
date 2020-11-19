@@ -60,7 +60,7 @@ export const useGlobalStylesReset = () => {
 const extractSupportKeys = ( supports, metadata ) => {
 	const supportKeys = [];
 	Object.keys( metadata ).forEach( ( key ) => {
-		if ( get( supports, metadata[ key ].block_json, false ) ) {
+		if ( get( supports, metadata[ key ].support, false ) ) {
 			supportKeys.push( key );
 		}
 	} );
@@ -150,7 +150,7 @@ export default function GlobalStylesProvider( {
 
 				return get(
 					styles?.[ context ]?.styles,
-					metadata[ propertyName ].theme_json
+					metadata[ propertyName ].value
 				);
 			},
 			setStyleProperty: ( context, propertyName, newValue ) => {
@@ -160,11 +160,7 @@ export default function GlobalStylesProvider( {
 					contextStyles = {};
 					set( newContent, [ context, 'styles' ], contextStyles );
 				}
-				set(
-					contextStyles,
-					metadata[ propertyName ].theme_json,
-					newValue
-				);
+				set( contextStyles, metadata[ propertyName ].value, newValue );
 				setContent( JSON.stringify( newContent ) );
 			},
 		} ),

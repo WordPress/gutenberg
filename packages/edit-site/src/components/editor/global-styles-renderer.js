@@ -46,11 +46,11 @@ export default ( blockData, tree, metadata ) => {
 			const cssProperty = key.startsWith( '--' ) ? key : kebabCase( key );
 			if (
 				blockSupports.includes( key ) &&
-				get( blockStyles, metadata[ key ].theme_json, false )
+				get( blockStyles, metadata[ key ].value, false )
 			) {
 				declarations.push(
 					`${ cssProperty }: ${ compileStyleValue(
-						get( blockStyles, metadata[ key ].theme_json )
+						get( blockStyles, metadata[ key ].value )
 					) }`
 				);
 			}
