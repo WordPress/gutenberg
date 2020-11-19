@@ -35,14 +35,15 @@ figure.wp-block-gallery {
 
 .blocks-gallery-item {
 	// Hide the focus outline that otherwise briefly appears when selecting a block.
-	figure:not( .is-selected ):focus,
+	figure:not(.is-selected):focus,
 	img:focus {
 		outline: none;
 	}
 
 	figure.is-selected {
-		box-shadow: 0 0 0 $border-width $white,
-			0 0 0 3px var( --wp-admin-theme-color );
+		box-shadow:
+			0 0 0 $border-width $white,
+			0 0 0 3px var(--wp-admin-theme-color);
 		border-radius: $radius-block-ui;
 		outline: 2px solid transparent;
 
@@ -86,9 +87,9 @@ figure.wp-block-gallery {
 	position: absolute;
 	top: -2px;
 	margin: $grid-unit-10;
-	z-index: z-index( '.block-library-gallery-item__inline-menu' );
+	z-index: z-index(".block-library-gallery-item__inline-menu");
 	transition: box-shadow 0.2s ease-out;
-	@include reduce-motion( 'transition' );
+	@include reduce-motion( "transition" );
 	border-radius: $radius-block-ui;
 	background: $white;
 	border: $border-width solid $gray-900;
@@ -106,7 +107,7 @@ figure.wp-block-gallery {
 	}
 
 	.components-button.has-icon {
-		&:not( :focus ) {
+		&:not(:focus) {
 			border: none;
 			box-shadow: none;
 		}
@@ -142,5 +143,23 @@ figure.wp-block-gallery {
 .gallery-settings-buttons {
 	.components-button:first-child {
 		margin-right: 8px;
+	}
+}
+
+.gallery-image-sizes {
+	.components-base-control__label {
+		display: block;
+		margin-bottom: 4px;
+	}
+
+	.gallery-image-sizes__loading {
+		display: flex;
+		align-items: center;
+		color: $gray-700;
+		font-size: $helptext-font-size;
+	}
+
+	.components-spinner {
+		margin: 0 8px 0 4px;
 	}
 }
