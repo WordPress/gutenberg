@@ -388,7 +388,7 @@ class WP_Theme_JSON {
 	 *
 	 * @return array Block metadata.
 	 */
-	public static function get_blocks_metadata() {
+	private static function get_blocks_metadata() {
 		if ( null !== self::$blocks_metadata ) {
 			return self::$blocks_metadata;
 		}

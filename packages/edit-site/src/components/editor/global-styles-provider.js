@@ -58,12 +58,9 @@ export const useGlobalStylesReset = () => {
 	];
 };
 
-export default function GlobalStylesProvider( {
-	children,
-	baseStyles,
-	contexts,
-} ) {
+export default function GlobalStylesProvider( { children, baseStyles } ) {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
+	const contexts = [];
 
 	const { userStyles, mergedStyles } = useMemo( () => {
 		const newUserStyles = content ? JSON.parse( content ) : {};
