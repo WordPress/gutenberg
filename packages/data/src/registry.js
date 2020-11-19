@@ -11,7 +11,6 @@ import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
 
 /** @typedef {import('./types').WPDataStore} WPDataStore */
-/** @typedef {import('./types').WPDataStoreDefinition} WPDataStoreDefinition */
 
 /**
  * @typedef {Object} WPDataRegistry An isolated orchestrator of store registrations.
@@ -77,8 +76,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Calls a selector given the current state and extra arguments.
 	 *
-	 * @param {string|WPDataStoreDefinition} storeNameOrDefinition Unique namespace identifier for the store
-	 *                                                                               or the store definition.
+	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
+	 *                                                   or the store definition.
 	 *
 	 * @return {*} The selector's returned value.
 	 */
@@ -153,8 +152,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Returns the available actions for a part of the state.
 	 *
-	 * @param {string|WPDataStoreDefinition} storeNameOrDefinition Unique namespace identifier for the store
-	 *                                                                               or the store definition.
+	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
+	 *                                                   or the store definition.
 	 *
 	 * @return {*} The action's returned value.
 	 */

@@ -22,7 +22,7 @@ import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
 /** @typedef {import('../types').WPDataRegistry} WPDataRegistry */
-/** @typedef {import('../types').WPDataStoreDefinition} WPDataStoreDefinition */
+/** @typedef {import('../types').WPDataStore} WPDataStore */
 /** @typedef {import('../types').WPDataReduxStoreConfig} WPDataReduxStoreConfig */
 
 /**
@@ -74,7 +74,7 @@ function createResolversCache() {
  *                                          describing reducer, actions, selectors,
  *                                          and resolvers.
  *
- * @return {WPDataStoreDefinition} Store Object.
+ * @return {WPDataStore} Store Object.
  */
 export default function createReduxStore( key, options ) {
 	return {

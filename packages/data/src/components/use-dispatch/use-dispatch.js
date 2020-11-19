@@ -3,7 +3,7 @@
  */
 import useRegistry from '../registry-provider/use-registry';
 
-/** @typedef {import('./types').WPDataStoreDefinition} WPDataStoreDefinition */
+/** @typedef {import('./types').WPDataStore} WPDataStore */
 
 /**
  * A custom react hook returning the current registry dispatch actions creators.
@@ -11,11 +11,11 @@ import useRegistry from '../registry-provider/use-registry';
  * Note: The component using this hook must be within the context of a
  * RegistryProvider.
  *
- * @param {string|WPDataStoreDefinition} [storeNameOrDefinition] Optionally provide the name of the
- *                                                               store or its definition from which to
- *                                                               retrieve action creators. If not
- *                                                               provided, the registry.dispatch
- *                                                               function is returned instead.
+ * @param {string|WPDataStore} [storeNameOrDefinition] Optionally provide the name of the
+ *                                                     store or its definition from which to
+ *                                                     retrieve action creators. If not
+ *                                                     provided, the registry.dispatch
+ *                                                     function is returned instead.
  *
  * @example
  * This illustrates a pattern where you may need to retrieve dynamic data from

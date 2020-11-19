@@ -370,7 +370,7 @@ _Parameters_
 
 _Returns_
 
--   `WPDataStoreDefinition`: Store Object.
+-   `WPDataStore`: Store Object.
 
 <a name="createRegistry" href="#createRegistry">#</a> **createRegistry**
 
@@ -679,7 +679,7 @@ const SaleButton = ( { children } ) => {
 
 _Parameters_
 
--   _storeNameOrDefinition_ `[(string|WPDataStoreDefinition)]`: Optionally provide the name of the store or its definition from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+-   _storeNameOrDefinition_ `[(string|WPDataStore)]`: Optionally provide the name of the store or its definition from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
 
 _Returns_
 
