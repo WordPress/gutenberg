@@ -12,7 +12,7 @@ import { useRegistry } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import useIsPrimaryEntityManager from './use-entity-manager';
+import useEntityManager from './use-entity-manager';
 
 /**
  * A function to call when the block value has been updated in the block-editor
@@ -89,11 +89,15 @@ export default function useBlockSync( {
 		replaceInnerBlocks,
 		setHasControlledInnerBlocks,
 		__unstableMarkNextChangeAsNotPersistent,
+		synchronizeBlockSubTrees,
 	} = registry.dispatch( 'core/block-editor' );
 	const { getBlockName, getBlocks } = registry.select( 'core/block-editor' );
 
 	const pendingChanges = useRef( { incoming: null, outgoing: [] } );
-	const isEntityTracker = useIsPrimaryEntityManager( entityId, clientId );
+	const { isPrimaryManager, primaryManagerId } = useEntityManager(
+		entityId,
+		clientId
+	);
 
 	const setControlledBlocks = () => {
 		if ( ! controlledBlocks ) {
@@ -114,14 +118,18 @@ export default function useBlockSync( {
 	};
 
 	useEffect( () => {
-		if ( ! isEntityTracker ) {
-			// TODO: synchronizeBlockTree
+		if ( ! isPrimaryManager ) {
+			// Since we are not the primary, we want to synchronize our inner
+			// blocks to be the same as the ones under the actual primary.
+			synchronizeBlockSubTrees( primaryManagerId, clientId );
 			// this needs to run after the primary template part exists. Unsure
 			// if that will be problematic -- to be fair, if we are not the main
 			// tracker for the entity, then the main tracker has already been
 			// set up, at least partially.
 		}
-	}, [ isEntityTracker ] );
+		// Note: we do NOT want the effect to run again when the primary ID changes.
+		// It would introduce unecessary calculations so it is not a dependency.
+	}, [ isPrimaryManager ] );
 
 	// Add a subscription to the block-editor registry to detect when changes
 	// have been made. This lets us inform the data source of changes. This
@@ -136,7 +144,7 @@ export default function useBlockSync( {
 
 	useEffect( () => {
 		// Do not listen for changes if we are not the entity tracker.
-		if ( ! isEntityTracker ) {
+		if ( ! isPrimaryManager ) {
 			return;
 		}
 
@@ -209,12 +217,12 @@ export default function useBlockSync( {
 		} );
 
 		return () => unsubscribe();
-	}, [ registry, clientId, isEntityTracker ] );
+	}, [ registry, clientId, isPrimaryManager ] );
 
 	// Determine if blocks need to be reset when they change.
 	useEffect( () => {
 		// Do not listen for changes if the entity is already tracked.
-		if ( ! isEntityTracker ) {
+		if ( ! isPrimaryManager ) {
 			return;
 		}
 		if ( pendingChanges.current.outgoing.includes( controlledBlocks ) ) {
@@ -245,5 +253,5 @@ export default function useBlockSync( {
 				);
 			}
 		}
-	}, [ controlledBlocks, clientId, isEntityTracker ] );
+	}, [ controlledBlocks, clientId, isPrimaryManager ] );
 }

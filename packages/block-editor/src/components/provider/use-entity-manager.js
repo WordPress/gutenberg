@@ -128,7 +128,7 @@ function removeEntityManager( entityId, managerId ) {
  *                             always the primary manager.
  * @param {string} managerId   The ID to use for the entity manager.
  */
-export default function useIsPrimaryEntityManager( entityId, managerId ) {
+export default function useEntityManager( entityId, managerId ) {
 	/**
 	 * This method sets that we are now the tracker. It is called when a different
 	 * primary manager has been removed to let this manager know that it is now
@@ -136,9 +136,9 @@ export default function useIsPrimaryEntityManager( entityId, managerId ) {
 	 *
 	 * @type {setAsPrimary}
 	 */
-	const setAsPrimary = ( isPrimary ) => setIsTracker( isPrimary );
+	const setAsPrimary = ( isPrimary ) => setIsPrimary( isPrimary );
 
-	const [ isTracker, setIsTracker ] = useState( () =>
+	const [ isPrimaryManager, setIsPrimary ] = useState( () =>
 		addEntityManager( entityId, {
 			id: managerId,
 			setAsPrimary,
@@ -158,7 +158,7 @@ export default function useIsPrimaryEntityManager( entityId, managerId ) {
 				id: managerId,
 				setAsPrimary,
 			} );
-			setIsTracker( isNewPrimary );
+			setIsPrimary( isNewPrimary );
 			oldEntityId.current = entityId;
 			oldManagerId.current = managerId;
 		}
@@ -166,5 +166,8 @@ export default function useIsPrimaryEntityManager( entityId, managerId ) {
 		return () => removeEntityManager( entityId, managerId );
 	}, [ entityId, managerId ] );
 
-	return isTracker;
+	return {
+		isPrimaryManager,
+		primaryManagerId: _ENTITY_MANAGERS[ entityId ]?.[ 0 ]?.id,
+	};
 }
