@@ -720,37 +720,130 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 	return reducer( state, action );
 };
 
-function aliasBlockTree( state, clientId ) {
-	return map( state.order[ clientId ], ( sourceClientId ) => {
-		const block = state.byClientId[ sourceClientId ];
-		if ( ! block ) {
-			return null;
-		}
+function aliasBlockTree( state, rootClientId, oldAliasState ) {
+	const aliasState = { ...oldAliasState };
 
-		return {
-			...block,
-			attributes: state.attributes[ sourceClientId ],
-			innerBlocks: !! state.controlledInnerBlocks[ sourceClientId ]
-				? EMPTY_ARRAY
-				: aliasBlockTree( state, sourceClientId ),
-			aliasOf: sourceClientId,
-			clientId: uuid(),
-		};
-	} );
+	const doAliasing = ( _rootClientId ) => {
+		return map( state.order[ _rootClientId ], ( clientId ) => {
+			const block = state.byClientId[ clientId ];
+			if ( ! block ) {
+				return null;
+			}
+
+			// Modify alias state along the way to keep everything organized.
+			const newId = uuid();
+			aliasState.aliasesOf[ newId ] = clientId;
+			if ( ! Array.isArray( aliasState.aliases[ clientId ] ) ) {
+				aliasState.aliases[ clientId ] = [];
+			}
+			aliasState.aliases[ clientId ].push( newId );
+
+			return {
+				...block,
+				attributes: state.attributes[ clientId ],
+				innerBlocks: !! state.controlledInnerBlocks[ clientId ]
+					? EMPTY_ARRAY
+					: doAliasing( clientId ),
+				clientId: newId,
+			};
+		} );
+	};
+
+	// Return the new information:
+	const newBlockTree = doAliasing( rootClientId );
+	return {
+		aliasState,
+		newBlockTree,
+	};
+}
+
+function getAliasedIds( state, clientId ) {
+	const isSource = !! state.aliases.aliases[ clientId ]; // has mapping source -> aliases
+	const isAlias = !! state.aliases.aliasesOf[ clientId ]; // has mapping alias -> source
+	if ( ! isSource && ! isAlias ) {
+		return null;
+	}
+	const sourceId = isSource ? clientId : state.aliases.aliasesOf[ clientId ];
+
+	// TODO: do I need to return the sourceID as well to include it in the chained action dispatch?
+	return [ ...state.aliases.aliases[ sourceId ], sourceId ];
+}
+
+// Actions which would otherwise be aliased, but should not be. These are mostly
+// UI-related, where we want the UI to show up for the specific block, not for
+// all blocks of the same alias.
+const actionsToIgnore = [
+	'SHOW_INSERTION_POINT',
+	'SET_INSERTION_POINT',
+	'SELECT_BLOCK',
+	'START_DRAGGING_BLOCKS',
+];
+function getAliasedActions( state, action ) {
+	if ( actionsToIgnore.includes( action.type ) ) {
+		return;
+	}
+	if ( action.clientId ) {
+		const aliasedIds = getAliasedIds( state, action.clientId );
+		if ( aliasedIds ) {
+			return aliasedIds.map( ( clientId ) => ( {
+				...action,
+				clientId,
+			} ) );
+		}
+	}
+	// TODO: how to handle "INSERT_BLOCKS"?
+
+	// TODO: how to handle block movement?
+
+	// TODO: how to handle block duplication?
+
+	// TODO: how to handle replace blocks?
+
+	// TODO: how to handle actions with `clientIds`
+	if ( action.clientIds ) {
+		// won't work with REPLACE_BLOCKS
+		// won't work with createOnMove
+		// MOVE_BLOCKS_TO_POSITION
+		//
+
+		// should work with insert and remove. remove could be weird when removing the template part, though.
+		const clientIds = action.clientIds.reduce( ( acc, id ) => {
+			return acc.concat( getAliasedIds( id ) ?? [] );
+		}, action.clientIds );
+		return [
+			{
+				...action,
+				clientIds,
+			},
+		];
+	}
 }
 
 const withBlockAliases = ( reducer ) => ( state, action ) => {
-	if ( action.type !== 'SYNCHRONIZE_BLOCK_SUB_TREES' ) {
-		return reducer( state, action );
-	}
-	const aliasedBlockTree = aliasBlockTree( state, action.sourceTree );
+	if ( action.type === 'SYNCHRONIZE_BLOCK_SUB_TREES' ) {
+		const existingAliasState = state.aliases;
+		const { newBlockTree, aliasState } = aliasBlockTree(
+			state,
+			action.sourceTree,
+			existingAliasState
+		);
 
-	return reducer( state, {
-		rootClientId: action.targetTree,
-		blocks: aliasedBlockTree,
-		type: 'INSERT_BLOCKS',
-		index: 0,
-	} );
+		// Update the alias state and insert the new blocks:
+		state.aliases = aliasState;
+		return reducer( state, {
+			rootClientId: action.targetTree,
+			blocks: newBlockTree,
+			type: 'INSERT_BLOCKS',
+			index: 0,
+		} );
+	}
+
+	const aliasedActions = getAliasedActions( state, action );
+	if ( aliasedActions ) {
+		// Call reducer with each action, passing the state through, and returning the final state.
+		return aliasedActions.reduce( reducer, state );
+	}
+	return reducer( state, action );
 };
 
 /**
@@ -1139,6 +1232,9 @@ export const blocks = flow(
 				[ clientId ]: hasControlledInnerBlocks,
 			};
 		}
+		return state;
+	},
+	aliases( state = { aliases: {}, aliasesOf: {} } ) {
 		return state;
 	},
 } );
