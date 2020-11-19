@@ -65,7 +65,7 @@ extension Gutenberg.MediaType {
             return String(kUTTypeMovie)
         case .audio:
             return String(kUTTypeAudio)
-         case .all:
+         case .any:
              return String(kUTTypeItem)
          case .other:
              return nil

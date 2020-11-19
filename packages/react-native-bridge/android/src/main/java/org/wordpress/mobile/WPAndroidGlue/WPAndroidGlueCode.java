@@ -245,7 +245,7 @@ public class WPAndroidGlueCode {
                     mOnMediaLibraryButtonListener.onMediaLibraryVideoButtonClicked(allowMultipleSelection);
                 } else if (mediaType == MediaType.MEDIA) {
                     mOnMediaLibraryButtonListener.onMediaLibraryMediaButtonClicked(allowMultipleSelection);
-                } else if (mediaType == MediaType.ALL) {
+                } else if (mediaType == MediaType.ANY) {
                     mOnMediaLibraryButtonListener.onMediaLibraryFileButtonClicked(allowMultipleSelection);
                 }
             }

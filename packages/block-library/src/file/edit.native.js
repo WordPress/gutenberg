@@ -16,7 +16,7 @@ import {
 	BlockControls,
 	MediaUpload,
 	InspectorControls,
-	MEDIA_TYPE_ALL,
+	MEDIA_TYPE_ANY,
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
@@ -415,14 +415,14 @@ export class FileEdit extends Component {
 					} }
 					onSelect={ this.onSelectFile }
 					onFocus={ this.props.onFocus }
-					allowedTypes={ [ MEDIA_TYPE_ALL ] }
+					allowedTypes={ [ MEDIA_TYPE_ANY ] }
 				/>
 			);
 		}
 
 		return (
 			<MediaUpload
-				allowedTypes={ [ MEDIA_TYPE_ALL ] }
+				allowedTypes={ [ MEDIA_TYPE_ANY ] }
 				isReplacingMedia={ true }
 				onSelect={ this.onSelectFile }
 				render={ ( { open, getMediaOptions } ) => {

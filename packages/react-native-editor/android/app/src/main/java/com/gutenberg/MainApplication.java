@@ -79,7 +79,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
                         break;
                     case VIDEO:
                         rnMediaList.add(new Media(2, "https://i.cloudup.com/YtZFJbuQCE.mov", "video", "Cloudup", ""));
-                    case ALL:
+                    case ANY:
                     case OTHER:
                         rnMediaList.add(new Media(3, "https://wordpress.org/latest.zip", "zip", "WordPress latest version", "WordPress.zip"));
                         break;
@@ -119,7 +119,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
 
             @Override
             public void getOtherMediaPickerOptions(OtherMediaOptionsReceivedCallback otherMediaOptionsReceivedCallback, MediaType mediaType) {
-                if (mediaType == MediaType.ALL) {
+                if (mediaType == MediaType.ANY) {
                     ArrayList<MediaOption> mediaOptions = new ArrayList<>();
                     mediaOptions.add(new MediaOption("1", "Choose from device"));
                     otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(mediaOptions);

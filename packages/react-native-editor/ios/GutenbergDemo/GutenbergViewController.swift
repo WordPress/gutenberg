@@ -100,7 +100,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
                 } else {
                     callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video", caption: "Cloudup")])
                 }
-            case .other, .all:
+            case .other, .any:
                  callback([MediaInfo(id: 1, url: "https://wordpress.org/latest.zip", type: "zip", caption: "WordPress latest version", title: "WordPress.zip")])
             default:
                 break
@@ -112,7 +112,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             print("Gutenberg did request a device media picker, opening the camera picker")
             pickAndUpload(from: .camera, filter: currentFilter, callback: callback)
 
-        case .filesApp, .otherApp:
+        case .filesApp, .otherApps:
             pickAndUploadFromFilesApp(filter: currentFilter, callback: callback)
         default: break
         }
@@ -313,13 +313,13 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     }
 
     func gutenbergMediaSources() -> [Gutenberg.MediaSource] {
-        return [.filesApp, .otherApp]
+        return [.filesApp, .otherApps]
     }
 }
 
 extension Gutenberg.MediaSource {
-    static let filesApp = Gutenberg.MediaSource(id: "files-app", label: "Pick a file", types: [.all])
-    static let otherApp = Gutenberg.MediaSource(id: "other-apps", label: "Other Apps", types: [.image, .video, .audio, .other])
+    static let filesApp = Gutenberg.MediaSource(id: "files-app", label: "Pick a file", types: [.any])
+    static let otherApps = Gutenberg.MediaSource(id: "other-apps", label: "Other Apps", types: [.image, .video, .audio, .other])
 }
 
 //MARK: - Navigation bar
