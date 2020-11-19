@@ -9,7 +9,11 @@ import {
 } from '@wordpress/blocks';
 import { createRegistryControl } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+
+/**
+ * Internal dependencies
+ */
+import { store as reusableBlocksStore } from './index.js';
 
 /**
  * Convert a reusable block to a static block effect handler
