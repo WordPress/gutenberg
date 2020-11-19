@@ -26,8 +26,7 @@
 		"layout": {
 			"type": "object",
 			"default": {
-				"type": "flex",
-				"columns": 1
+				"type": "list"
 			}
 		}
 	},

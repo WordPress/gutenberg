@@ -70,7 +70,11 @@ export function QueryContent( {
 				setLayout={ updateLayout }
 			/>
 			<BlockControls>
-				<QueryToolbar query={ query } setQuery={ updateQuery } />
+				<QueryToolbar
+					attributes={ attributes }
+					setQuery={ updateQuery }
+					setLayout={ updateLayout }
+				/>
 			</BlockControls>
 			<div { ...blockProps }>
 				<QueryProvider>

@@ -34,10 +34,7 @@ const stickyOptions = [
 ];
 
 export default function QueryInspectorControls( {
-	attributes: {
-		query,
-		layout: { columns },
-	},
+	attributes: { query, layout },
 	setQuery,
 	setLayout,
 } ) {
@@ -141,22 +138,26 @@ export default function QueryInspectorControls( {
 	}, [ querySearch, onChangeDebounced ] );
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Display' ) }>
-				<RangeControl
-					label={ __( 'Columns' ) }
-					value={ columns }
-					onChange={ ( value ) => setLayout( { columns: value } ) }
-					min={ 1 }
-					max={ Math.max( 6, columns ) }
-				/>
-				{ columns > 6 && (
-					<Notice status="warning" isDismissible={ false }>
-						{ __(
-							'This column count exceeds the recommended amount and may cause visual breakage.'
-						) }
-					</Notice>
-				) }
-			</PanelBody>
+			{ layout?.type === 'flex' && (
+				<PanelBody title={ __( 'Display' ) }>
+					<RangeControl
+						label={ __( 'Columns' ) }
+						value={ layout.columns }
+						onChange={ ( value ) =>
+							setLayout( { columns: value } )
+						}
+						min={ 1 }
+						max={ Math.max( 6, layout.columns ) }
+					/>
+					{ layout.columns > 6 && (
+						<Notice status="warning" isDismissible={ false }>
+							{ __(
+								'This column count exceeds the recommended amount and may cause visual breakage.'
+							) }
+						</Notice>
+					) }
+				</PanelBody>
+			) }
 			<PanelBody title={ __( 'Settings' ) }>
 				<SelectControl
 					options={ postTypesSelectOptions }

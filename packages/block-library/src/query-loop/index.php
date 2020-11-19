@@ -72,10 +72,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 	$classnames = '';
 	if ( isset( $block->context['layout'] ) && isset( $block->context['query'] ) ) {
 		if ( isset( $block->context['layout']['type'] ) && $block->context['layout']['type'] === 'flex' ) {
-			$columns = $block->context['layout']['columns'];
-			if ( $columns > 1 ) {
-				$classnames = "is-flex-container columns-{$columns}";
-			}
+			$classnames = "is-flex-container columns-{$block->context['layout']['columns']}";
 		}
 	}
 
