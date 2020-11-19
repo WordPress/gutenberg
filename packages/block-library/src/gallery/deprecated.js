@@ -866,17 +866,13 @@ const deprecated = [
 		},
 		migrate( { images, imageCrop, linkTo, sizeSlug } ) {
 			const imageBlocks = images.map( ( image ) => {
-				const { linkDestination } = getHrefAndDestination(
-					image,
-					linkTo
-				);
 				return createBlock( 'core/image', {
 					id: parseInt( image.id ),
 					url: image.url,
 					alt: image.alt,
 					caption: image.caption,
 					sizeSlug,
-					linkDestination,
+					...getHrefAndDestination( image, linkTo ),
 				} );
 			} );
 			return [
