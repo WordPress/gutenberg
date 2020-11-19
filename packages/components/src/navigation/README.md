@@ -222,6 +222,14 @@ Indicates whether this item should be hidden if the menu specified in `navigateT
 
 A callback to handle clicking on a menu item.
 
+### `isText`
+
+-   Type: `boolean`
+-   Required: No
+-   Default: false
+
+If set to true then the menu item will only act as a text-only item rather than a button.
+
 ### `title`
 
 -   Type: `string`

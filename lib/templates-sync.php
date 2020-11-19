@@ -27,8 +27,13 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 			'post_type'      => $post_type,
 			'post_status'    => array( 'publish', 'auto-draft' ),
 			'title'          => $slug,
-			'meta_key'       => 'theme',
-			'meta_value'     => $theme,
+			'tax_query'      => array(
+				array(
+					'taxonomy' => 'wp_theme',
+					'field'    => 'slug',
+					'terms'    => $theme,
+				),
+			),
 			'posts_per_page' => 1,
 			'no_found_rows'  => true,
 		)
@@ -42,6 +47,7 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 				'post_status'  => 'auto-draft',
 				'post_type'    => $post_type,
 				'post_name'    => $slug,
+				'tax_input'    => array( 'wp_theme' => array( $theme, '_wp_file_based' ) ),
 			)
 		);
 	} elseif ( 'auto-draft' === $post->post_status && $content !== $post->post_content ) {
@@ -125,7 +131,7 @@ function _gutenberg_synchronize_theme_templates( $template_type ) {
 		$slug    = substr(
 			$path,
 			// Starting position of slug.
-			strpos( $path, $template_base_path . '/' ) + 1 + strlen( $template_base_path ),
+			strpos( $path, $template_base_path . DIRECTORY_SEPARATOR ) + 1 + strlen( $template_base_path ),
 			// Subtract ending '.html'.
 			-5
 		);
@@ -167,7 +173,7 @@ add_action( 'trash_wp_template_part', 'gutenberg_clear_synchronize_last_checks' 
  * @param WP_Post $post WP_Post instance of the deleted post.
  */
 function gutenberg_clear_synchronize_last_checks_after_delete( $post_id, $post ) {
-	if ( 'wp_template' !== $post->post_type || 'wp_template_part' !== $post->post_type ) {
+	if ( 'wp_template' === $post->post_type || 'wp_template_part' === $post->post_type ) {
 		gutenberg_clear_synchronize_last_checks();
 	}
 }

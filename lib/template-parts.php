@@ -55,39 +55,9 @@ function gutenberg_register_template_part_post_type() {
 		),
 	);
 
-	$meta_args = array(
-		'object_subtype' => 'wp_template_part',
-		'type'           => 'string',
-		'description'    => 'The theme that provided the template part, if any.',
-		'single'         => true,
-		'show_in_rest'   => true,
-	);
-
 	register_post_type( 'wp_template_part', $args );
-	register_meta( 'post', 'theme', $meta_args );
 }
 add_action( 'init', 'gutenberg_register_template_part_post_type' );
-
-/**
- * Automatically set the theme meta for template parts.
- *
- * @param array $post_id Template Part ID.
- * @param array $post    Template Part Post.
- * @param bool  $update  Is update.
- */
-function gutenberg_set_template_part_post_theme( $post_id, $post, $update ) {
-	if ( 'wp_template_part' !== $post->post_type || $update || 'trash' === $post->post_status ) {
-		return;
-	}
-
-	$theme = get_post_meta( $post_id, 'theme', true );
-
-	if ( ! $theme ) {
-		update_post_meta( $post_id, 'theme', wp_get_theme()->get_stylesheet() );
-	}
-}
-
-add_action( 'save_post', 'gutenberg_set_template_part_post_theme', 10, 3 );
 
 /**
  * Filters `wp_template_part` posts slug resolution to bypass deduplication logic as
@@ -191,13 +161,14 @@ add_filter( 'rest_wp_template_part_collection_params', 'filter_rest_wp_template_
  */
 function filter_rest_wp_template_part_query( $args, $request ) {
 	if ( $request['theme'] ) {
-		$meta_query   = isset( $args['meta_query'] ) ? $args['meta_query'] : array();
-		$meta_query[] = array(
-			'key'   => 'theme',
-			'value' => $request['theme'],
+		$tax_query   = isset( $args['tax_query'] ) ? $args['tax_query'] : array();
+		$tax_query[] = array(
+			'taxonomy' => 'wp_theme',
+			'field'    => 'slug',
+			'terms'    => $request['theme'],
 		);
 
-		$args['meta_query'] = $meta_query;
+		$args['tax_query'] = $tax_query;
 	}
 
 	return $args;

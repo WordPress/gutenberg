@@ -75,18 +75,38 @@ function gutenberg_register_template_post_type() {
 		),
 	);
 
-	$meta_args = array(
-		'object_subtype' => 'wp_template',
-		'type'           => 'string',
-		'description'    => 'The theme that provided the template, if any.',
-		'single'         => true,
-		'show_in_rest'   => true,
-	);
-
 	register_post_type( 'wp_template', $args );
-	register_meta( 'post', 'theme', $meta_args );
 }
 add_action( 'init', 'gutenberg_register_template_post_type' );
+
+/**
+ * Registers block editor 'wp_theme' taxonomy.
+ */
+function gutenberg_register_wp_theme_taxonomy() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
+	register_taxonomy(
+		'wp_theme',
+		array( 'wp_template', 'wp_template_part' ),
+		array(
+			'public'            => false,
+			'hierarchical'      => false,
+			'labels'            => array(
+				'name'          => __( 'Themes', 'gutenberg' ),
+				'singular_name' => __( 'Theme', 'gutenberg' ),
+			),
+			'query_var'         => false,
+			'rewrite'           => false,
+			'show_ui'           => false,
+			'_builtin'          => true,
+			'show_in_nav_menus' => false,
+			'show_in_rest'      => true,
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
 
 /**
  * Automatically set the theme meta for templates.
@@ -95,19 +115,15 @@ add_action( 'init', 'gutenberg_register_template_post_type' );
  * @param array $post    Template Post.
  * @param bool  $update  Is update.
  */
-function gutenberg_set_template_post_theme( $post_id, $post, $update ) {
-	if ( 'wp_template' !== $post->post_type || $update || 'trash' === $post->post_status ) {
-		return;
-	}
-
-	$theme = get_post_meta( $post_id, 'theme', true );
-
-	if ( ! $theme ) {
-		update_post_meta( $post_id, 'theme', wp_get_theme()->get_stylesheet() );
+function gutenberg_set_template_and_template_part_post_theme( $post_id, $post, $update ) {
+	$themes = wp_get_post_terms( $post_id, 'wp_theme' );
+	if ( ! $themes ) {
+		wp_set_post_terms( $post_id, array( wp_get_theme()->get_stylesheet() ), 'wp_theme', true );
 	}
 }
 
-add_action( 'save_post', 'gutenberg_set_template_post_theme', 10, 3 );
+add_action( 'save_post_wp_template', 'gutenberg_set_template_and_template_part_post_theme', 10, 3 );
+add_action( 'save_post_wp_template_part', 'gutenberg_set_template_and_template_part_post_theme', 10, 3 );
 
 /**
  * Filters the capabilities of a user to conditionally grant them capabilities for managing 'wp_template' posts.
@@ -322,3 +338,41 @@ function filter_rest_wp_template_query( $args, $request ) {
 }
 add_filter( 'rest_wp_template_query', 'filter_rest_wp_template_query', 99, 2 );
 
+/**
+ * Filters the post data for a response.
+ *
+ * @param WP_REST_Response $response The response object.
+ * @return WP_REST_Response
+ */
+function filter_rest_prepare_add_wp_theme_slug_and_file_based( $response ) {
+	if ( isset( $response->data ) && is_array( $response->data ) && isset( $response->data['id'] ) ) {
+		$response->data['wp_theme_slug'] = false;
+
+		// Get the wp_theme terms.
+		$wp_themes = wp_get_post_terms( $response->data['id'], 'wp_theme' );
+
+		// If a theme is assigned, add it to the REST response.
+		if ( $wp_themes && is_array( $wp_themes ) ) {
+			$wp_theme_slugs = array_column( $wp_themes, 'slug' );
+
+			$file_based                   = in_array( '_wp_file_based', $wp_theme_slugs, true );
+			$response->data['file_based'] = $file_based;
+
+			$theme_slug = array_values(
+				array_filter(
+					$wp_theme_slugs,
+					function( $slug ) {
+						return '_wp_file_based' !== $slug;
+					}
+				)
+			);
+			if ( $theme_slug ) {
+				$response->data['wp_theme_slug'] = $theme_slug[0];
+			}
+		}
+	}
+
+	return $response;
+}
+add_filter( 'rest_prepare_wp_template', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
+add_filter( 'rest_prepare_wp_template_part', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );

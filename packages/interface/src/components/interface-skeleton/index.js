@@ -6,8 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
-import { navigateRegions } from '@wordpress/components';
+import { forwardRef, useEffect, useRef } from '@wordpress/element';
+import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
 import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
@@ -25,19 +25,29 @@ function useHTMLClass( className ) {
 	}, [ className ] );
 }
 
-function InterfaceSkeleton( {
-	footer,
-	header,
-	sidebar,
-	secondarySidebar,
-	content,
-	drawer,
-	actions,
-	labels,
-	className,
-	// Deprecated props.
-	leftSidebar,
-} ) {
+function InterfaceSkeleton(
+	{
+		footer,
+		header,
+		sidebar,
+		secondarySidebar,
+		content,
+		drawer,
+		actions,
+		labels,
+		className,
+		// Deprecated props.
+		leftSidebar,
+		shortcuts,
+	},
+	ref
+) {
+	const fallbackRef = useRef();
+
+	ref = ref || fallbackRef;
+
+	const regionsClassName = useNavigateRegions( ref, shortcuts );
+
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
 	const defaultLabels = {
@@ -70,9 +80,11 @@ function InterfaceSkeleton( {
 
 	return (
 		<div
+			ref={ ref }
 			className={ classnames(
 				className,
-				'interface-interface-skeleton'
+				'interface-interface-skeleton',
+				regionsClassName
 			) }
 		>
 			{ !! drawer && (
@@ -150,4 +162,4 @@ function InterfaceSkeleton( {
 	);
 }
 
-export default navigateRegions( InterfaceSkeleton );
+export default forwardRef( InterfaceSkeleton );
