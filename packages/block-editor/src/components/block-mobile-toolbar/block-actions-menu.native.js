@@ -208,7 +208,7 @@ const BlockActionsMenu = ( {
 				disabledButtonIndices={ disabledButtonIndices }
 				hideCancelButton={ Platform.OS !== 'ios' }
 				leftAlign={ true }
-				anchor={ getAnchor }
+				getAnchor={ getAnchor }
 				// translators: %s: block title e.g: "Paragraph".
 				title={ sprintf( __( '%s block options' ), blockTitle ) }
 			/>

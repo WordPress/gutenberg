@@ -99,7 +99,7 @@ function UnitControl( {
 					onChange={ onUnitChange }
 					hideCancelButton
 					leftAlign
-					anchor={ getAnchor }
+					getAnchor={ getAnchor }
 				/>
 			</View>
 		);
