@@ -13,21 +13,17 @@ function ReusableBlocksManageButton( { clientId } ) {
 		( select ) => {
 			const { getBlock } = select( 'core/block-editor' );
 			const { canUser } = select( 'core' );
-			const blockObj = getBlock( clientId );
-
-			const reusableBlock =
-				blockObj && isReusableBlock( blockObj )
-					? select( 'core' ).getEntityRecord(
-							'postType',
-							'wp_block',
-							blockObj.attributes.ref
-					  )
-					: null;
+			const reusableBlock = getBlock( clientId );
 
 			return {
 				isVisible:
 					!! reusableBlock &&
-					!! canUser( 'update', 'blocks', reusableBlock.id ),
+					isReusableBlock( reusableBlock ) &&
+					!! canUser(
+						'update',
+						'blocks',
+						reusableBlock.attributes.ref
+					),
 			};
 		},
 		[ clientId ]
@@ -40,11 +36,7 @@ function ReusableBlocksManageButton( { clientId } ) {
 	return (
 		<BlockSettingsMenuControls>
 			<MenuItem
-				onClick={ () => {
-					window.location = addQueryArgs( 'edit.php', {
-						post_type: 'wp_block',
-					} );
-				} }
+				href={ addQueryArgs( 'edit.php', { post_type: 'wp_block' } ) }
 			>
 				{ __( 'Manage Reusable blocks' ) }
 			</MenuItem>
