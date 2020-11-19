@@ -1,12 +1,16 @@
 .wp-block-query-loop {
 	max-width: 100%;
-	display: grid;
-	grid-gap: 1em;
 
-	@include break-small {
-		@for $i from 2 through 6 {
-			&.is-grid.columns-#{ $i } {
-				grid-template-columns: repeat(#{ $i }, 1fr);
+	&.is-flex-container {
+		flex-direction: row;
+		display: flex;
+		flex-wrap: wrap;
+
+		@include break-small {
+			@for $i from 2 through 6 {
+				&.is-flex-container.columns-#{ $i } > div {
+					width: calc((100% / #{$i}));
+				}
 			}
 		}
 	}

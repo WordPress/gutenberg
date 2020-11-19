@@ -43,7 +43,7 @@ export default function QueryLoopEdit( {
 			sticky,
 		} = {},
 		queryContext,
-		layout: { columns = 1 } = {},
+		layout: { type: layoutType = 'flex', columns = 1 } = {},
 	},
 } ) {
 	const [ { page } ] = useQueryContext() || queryContext || [ {} ];
@@ -108,9 +108,11 @@ export default function QueryLoopEdit( {
 			} ) ),
 		[ posts ]
 	);
+	const hasLayoutFlex = layoutType === 'flex' && columns > 1;
 	const blockProps = useBlockProps( {
-		className: classnames( `columns-${ columns }`, {
-			'is-grid': columns > 1,
+		className: classnames( {
+			'is-flex-container': hasLayoutFlex,
+			[ `columns-${ columns }` ]: hasLayoutFlex,
 		} ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
