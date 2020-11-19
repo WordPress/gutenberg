@@ -29,7 +29,7 @@ class Picker extends Component {
 				cancelButtonIndex: 0,
 				destructiveButtonIndex,
 				disabledButtonIndices,
-				anchor,
+				anchor: anchor(),
 			},
 			( buttonIndex ) => {
 				if ( buttonIndex === 0 ) {

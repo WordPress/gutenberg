@@ -84,6 +84,11 @@ function UnitControl( {
 		);
 	};
 
+	const getAnchor = () =>
+		anchorNodeRef?.current
+			? findNodeHandle( anchorNodeRef?.current )
+			: undefined;
+
 	const renderUnitPicker = () => {
 		return (
 			<View style={ styles.unitMenu } ref={ anchorNodeRef }>
@@ -94,11 +99,7 @@ function UnitControl( {
 					onChange={ onUnitChange }
 					hideCancelButton
 					leftAlign
-					anchor={
-						anchorNodeRef?.current
-							? findNodeHandle( anchorNodeRef?.current )
-							: undefined
-					}
+					anchor={ getAnchor }
 				/>
 			</View>
 		);
