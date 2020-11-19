@@ -1,10 +1,16 @@
+/** @typedef {import('./types').WPCommonAtomConfig} WPCommonAtomConfig */
+/**
+ * @template T
+ * @typedef {import("./types").WPAtom<T>} WPAtom
+ */
+
 /**
  * Creates a basic atom.
  *
  * @template T
  * @param {T}                                     initialValue Initial Value in the atom. *
- * @param {import('./types').WPCommonAtomConfig=} config       Common Atom config.
- * @return {import("./types").WPAtom<T>} Createtd atom.
+ * @param {WPCommonAtomConfig=} config       Common Atom config.
+ * @return {WPAtom<T>} Createtd atom.
  */
 export const createAtom = ( initialValue, config = {} ) => () => {
 	let value = initialValue;

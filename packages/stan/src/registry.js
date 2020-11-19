@@ -3,20 +3,41 @@
  */
 import { noop, isObject } from 'lodash';
 
+/** @typedef {import('./types').WPAtomRegistry} WPAtomRegistry */
+/**
+ * @template T
+ * @typedef {import("./types").WPAtomFamilyResolver<T>} WPAtomFamilyResolver
+ */
+/**
+ * @template T
+ * @typedef {import("./types").WPAtomState<T>} WPAtomState
+ */
+/**
+ * @template T
+ * @typedef {import("./types").WPAtom<T>} WPAtom
+ */
+/**
+ * @template T
+ * @typedef {import("./types").WPAtomFamilyItem<T>} WPAtomFamilyItem
+ */
+/**
+ * @template T
+ * @typedef {import("./types").WPAtomFamilyConfig<T>} WPAtomFamilyConfig
+ */
 /**
  * @typedef {( atomState: import('./types').WPAtomState<any> ) => void} RegistryListener
  */
 
 /**
  * @template T
- * @param {import('./types').WPAtom<any>|import('./types').WPAtomFamilyItem<T>} maybeAtomFamilyItem
+ * @param {WPAtom<any>|WPAtomFamilyItem<T>} maybeAtomFamilyItem
  * @return {boolean} maybeAtomFamilyItem is WPAtomFamilyItem<T>.
  */
 export function isAtomFamilyItem( maybeAtomFamilyItem ) {
 	if (
 		isObject( maybeAtomFamilyItem ) &&
-		/** @type {import('./types').WPAtomFamilyItem<any>} */ ( maybeAtomFamilyItem )
-			.type === 'family'
+		/** @type {WPAtomFamilyItem<any>} */ ( maybeAtomFamilyItem ).type ===
+			'family'
 	) {
 		return true;
 	}
@@ -29,7 +50,7 @@ export function isAtomFamilyItem( maybeAtomFamilyItem ) {
  * @param {RegistryListener} onAdd
  * @param {RegistryListener} onDelete
  *
- * @return {import('./types').WPAtomRegistry} Atom Registry.
+ * @return {WPAtomRegistry} Atom Registry.
  */
 export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 	const atoms = new WeakMap();
@@ -37,22 +58,20 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 
 	/**
 	 * @template T
-	 * @param {import('./types').WPAtom<T>|import('./types').WPAtomFamilyItem<T>} atom Atom.
-	 * @return {import('./types').WPAtomState<T>} Atom state;
+	 * @param {WPAtom<T>|WPAtomFamilyItem<T>} atom Atom.
+	 * @return {WPAtomState<T>} Atom state;
 	 */
 	const getAtomState = ( atom ) => {
 		if ( isAtomFamilyItem( atom ) ) {
 			const {
 				config,
 				key,
-			} = /** @type {import('./types').WPAtomFamilyItem<any>} */ ( atom );
+			} = /** @type {WPAtomFamilyItem<any>} */ ( atom );
 			return familyRegistry.getAtomFromFamily( config, key );
 		}
 
 		if ( ! atoms.get( atom ) ) {
-			const atomState = /** @type {import('./types').WPAtom<any>} */ ( atom )(
-				registry
-			);
+			const atomState = /** @type {WPAtom<any>} */ ( atom )( registry );
 			atoms.set( atom, atomState );
 			onAdd( atomState );
 		}
@@ -63,9 +82,9 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 	const familyRegistry = {
 		/**
 		 * @template T
-		 * @param {import('./types').WPAtomFamilyConfig<T>} atomFamilyConfig
+		 * @param {WPAtomFamilyConfig<T>} atomFamilyConfig
 		 * @param {any} key
-		 * @return {import('./types').WPAtomState<T>} Atom state.
+		 * @return {WPAtomState<T>} Atom state.
 		 */
 		getAtomFromFamily( atomFamilyConfig, key ) {
 			if ( ! families.get( atomFamilyConfig ) ) {
@@ -84,7 +103,7 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 
 		/**
 		 * @template T
-		 * @param {import('./types').WPAtomFamilyConfig<T>} atomFamilyConfig
+		 * @param {WPAtomFamilyConfig<T>} atomFamilyConfig
 		 * @param {any} key
 		 */
 		deleteAtomFromFamily( atomFamilyConfig, key ) {
@@ -97,7 +116,7 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 		},
 	};
 
-	/** @type {import('./types').WPAtomRegistry} */
+	/** @type {WPAtomRegistry} */
 	const registry = {
 		__unstableGetAtomState: getAtomState,
 
@@ -121,7 +140,7 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 				const {
 					config,
 					key,
-				} = /** @type {import('./types').WPAtomFamilyItem<any>} */ ( atom );
+				} = /** @type {WPAtomFamilyItem<any>} */ ( atom );
 				return familyRegistry.deleteAtomFromFamily( config, key );
 			}
 			const atomState = atoms.get( atom );

@@ -20,7 +20,6 @@ playground/dist
 
 # Report generated from tests
 test/native/junit.xml
-artifacts
 
 # Local overrides
 .wp-env.override.json

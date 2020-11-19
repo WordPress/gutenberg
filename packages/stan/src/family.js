@@ -3,19 +3,37 @@
  */
 import { createDerivedAtom } from './derived';
 
+/** @typedef {import('./types').WPCommonAtomConfig} WPCommonAtomConfig */
 /**
  * @template T
- * @param {import('./types').WPAtomFamilyResolver<T>} resolver   Atom resolver.
- * @param {import('./types').WPAtomFamilyUpdater<T>}  updater    Atom updater.
- * @param {import('./types').WPCommonAtomConfig=}     atomConfig Common Atom config.
- * @return {(key:string) => import('./types').WPAtomFamilyItem<T>} Atom Family Item creator.
+ * @typedef {import("./types").WPAtomFamilyResolver<T>} WPAtomFamilyResolver
+ */
+/**
+ * @template T
+ * @typedef {import("./types").WPAtomFamilyUpdater<T>} WPAtomFamilyUpdater
+ */
+/**
+ * @template T
+ * @typedef {import("./types").WPAtom<T>} WPAtom
+ */
+/**
+ * @template T
+ * @typedef {import("./types").WPAtomFamilyItem<T>} WPAtomFamilyItem
+ */
+
+/**
+ * @template T
+ * @param {WPAtomFamilyResolver<T>} resolver   Atom resolver.
+ * @param {WPAtomFamilyUpdater<T>}  updater    Atom updater.
+ * @param {WPCommonAtomConfig=}     atomConfig Common Atom config.
+ * @return {(key:string) => WPAtomFamilyItem<T>} Atom Family Item creator.
  */
 export const createAtomFamily = ( resolver, updater, atomConfig = {} ) => {
 	const config = {
 		/**
 		 *
 		 * @param {any} key Key of the family item.
-		 * @return {import('./types').WPAtom<any>} Atom.
+		 * @return {WPAtom<any>} Atom.
 		 */
 		createAtom( key ) {
 			return createDerivedAtom(

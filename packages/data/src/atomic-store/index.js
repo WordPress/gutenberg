@@ -9,22 +9,36 @@ import { mapValues } from 'lodash';
 import { createDerivedAtom } from '@wordpress/stan';
 
 /**
+ * @typedef {import("../types").WPDataAtomicStoreConfig} WPDataAtomicStoreConfig
+ */
+/**
+ * @typedef {import("../types").WPDataStore} WPDataStore
+ */
+/**
+ * @template T
+ * @typedef {import('@wordpress/stan/src/types').WPAtom<T>} WPAtom
+ */
+/**
+ * @template T
+ * @typedef {import('@wordpress/stan/src/types').WPAtomFamilyItem<T>} WPAtomFamilyItem
+ */
+
+/**
  *
  * @param {string}                                     name   Store name.
- * @param {import('../types').WPDataAtomicStoreConfig} config Atomic store config.
- * @return {import('../types').WPDataStore} Store.
+ * @param {WPDataAtomicStoreConfig} config Atomic store config.
+ * @return {WPDataStore} Store.
  */
 export default function createAtomicStore( name, config ) {
 	return {
 		name,
 		instantiate: ( registry ) => {
-			// I'm probably missing the atom resolver here
 			const selectors = mapValues( config.selectors, ( atomSelector ) => {
 				return ( /** @type {any[]} **/ ...args ) => {
 					const get = registry.__internalGetAtomResolver()
 						? registry.__internalGetAtomResolver()
 						: (
-								/** @type {import('@wordpress/stan/src/types').WPAtom<any>|import('@wordpress/stan/src/types').WPAtomFamilyItem<any>} **/ atom
+								/** @type {WPAtom<any>|WPAtomFamilyItem<any>} **/ atom
 						  ) => registry.__internalGetAtomRegistry().get( atom );
 					return atomSelector( ...args )( { get } );
 				};

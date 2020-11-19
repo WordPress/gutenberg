@@ -1,15 +1,15 @@
 {
 	"name": "@wordpress/stan",
 	"version": "0.0.1",
-	"description": "WordPress state library.",
+	"description": "WordPress state library based on atoms.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
 		"gutenberg",
-        "state",
-        "stan",
-        "recoil"
+		"state",
+		"stan",
+		"recoil"
 	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/stan/README.md",
 	"repository": {

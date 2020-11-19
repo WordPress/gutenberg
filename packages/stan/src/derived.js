@@ -10,14 +10,32 @@ import { createQueue } from '@wordpress/priority-queue';
 
 const resolveQueue = createQueue();
 
+/** @typedef {import('./types').WPCommonAtomConfig} WPCommonAtomConfig */
+/**
+ * @template T
+ * @typedef {import("./types").WPDerivedAtomResolver<T>} WPDerivedAtomResolver
+ */
+/**
+ * @template T
+ * @typedef {import("./types").WPDerivedAtomUpdater<T>} WPDerivedAtomUpdater
+ */
+/**
+ * @template T
+ * @typedef {import("./types").WPAtom<T>} WPAtom
+ */
+/**
+ * @template T
+ * @typedef {import("./types").WPAtomState<T>} WPAtomState
+ */
+
 /**
  * Creates a derived atom.
  *
  * @template T
- * @param {import('./types').WPDerivedAtomResolver<T>} resolver Atom Resolver.
- * @param {import('./types').WPDerivedAtomUpdater<T>}  updater  Atom updater.
- * @param {import('./types').WPCommonAtomConfig=}      config   Common Atom config.
- * @return {import("./types").WPAtom<T>} Createtd atom.
+ * @param {WPDerivedAtomResolver<T>} resolver Atom Resolver.
+ * @param {WPDerivedAtomUpdater<T>}  updater  Atom updater.
+ * @param {WPCommonAtomConfig=}      config   Common Atom config.
+ * @return {WPAtom<T>} Createtd atom.
  */
 export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 	registry
@@ -33,7 +51,7 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 	let listeners = [];
 
 	/**
-	 * @type {(import("./types").WPAtomState<any>)[]}
+	 * @type {(WPAtomState<any>)[]}
 	 */
 	let dependencies = [];
 	let isListening = false;
@@ -59,7 +77,7 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 	};
 
 	/**
-	 * @param {import('./types').WPAtomState<any>} atomState
+	 * @param {WPAtomState<any>} atomState
 	 */
 	const addDependency = ( atomState ) => {
 		if ( ! dependenciesUnsubscribeMap.has( atomState ) ) {
@@ -72,7 +90,7 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 
 	const resolve = () => {
 		/**
-		 * @type {(import("./types").WPAtomState<any>)[]}
+		 * @type {(WPAtomState<any>)[]}
 		 */
 		const updatedDependencies = [];
 		const updatedDependenciesMap = new WeakMap();
