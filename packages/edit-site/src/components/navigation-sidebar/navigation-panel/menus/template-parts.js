@@ -8,7 +8,10 @@ import { map } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { __experimentalNavigationMenu as NavigationMenu } from '@wordpress/components';
+import {
+	__experimentalNavigationMenu as NavigationMenu,
+	__experimentalNavigationItem as NavigationItem,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -17,7 +20,6 @@ import TemplateNavigationItem from '../template-navigation-item';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS } from '../constants';
 import SearchResults from '../search-results';
 import useDebouncedSearch from '../use-debounced-search';
-import NavigationItemText from '../navigation-item-text';
 
 const renderSearchResultItem = ( templatePart ) => (
 	<TemplateNavigationItem
@@ -74,7 +76,7 @@ export default function TemplatePartsMenu() {
 				) ) }
 
 			{ ! search && templateParts === null && (
-				<NavigationItemText title={ __( 'Loading…' ) } />
+				<NavigationItem title={ __( 'Loading…' ) } isText />
 			) }
 		</NavigationMenu>
 	);
