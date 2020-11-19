@@ -141,7 +141,7 @@ describe( 'selectors', () => {
 	describe( 'getPage', () => {
 		it( 'returns the page object', () => {
 			const state = { page: {} };
-			expect( getPage( state ) ).toBe( state.page );
+			expect( getPage( state ) ).toBe( state.page.contentInfo );
 		} );
 	} );
 

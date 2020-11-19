@@ -81,6 +81,8 @@ export function templateId( state, action ) {
 		case 'SET_TEMPLATE':
 		case 'SET_PAGE':
 			return action.templateId;
+		case 'SET_TEMPLATE_PART':
+			return undefined;
 	}
 
 	return state;
@@ -98,6 +100,9 @@ export function templatePartId( state, action ) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE_PART':
 			return action.templatePartId;
+		case 'SET_TEMPLATE':
+		case 'SET_PAGE':
+			return undefined;
 	}
 
 	return state;
@@ -131,10 +136,17 @@ export function templateType( state = 'wp_template', action ) {
  *
  * @return {Object} Updated state.
  */
-export function page( state, action ) {
+export function page( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SET_PAGE':
-			return action.page;
+			return { contentInfo: action.page, templateId: action.templateId };
+		case 'SET_TEMPLATE':
+			if ( action.templateId === state.templateId ) {
+				return state;
+			}
+			return {};
+		case 'SET_TEMPLATE_PART':
+			return {};
 	}
 
 	return state;

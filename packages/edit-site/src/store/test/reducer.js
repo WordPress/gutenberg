@@ -173,7 +173,7 @@ describe( 'state', () => {
 
 	describe( 'page()', () => {
 		it( 'should apply default state', () => {
-			expect( page( undefined, {} ) ).toEqual( undefined );
+			expect( page( undefined, {} ) ).toEqual( {} );
 		} );
 
 		it( 'should default to returning the same state', () => {
@@ -187,7 +187,7 @@ describe( 'state', () => {
 				page( undefined, {
 					type: 'SET_PAGE',
 					page: newPage,
-				} )
+				} ).contentInfo
 			).toBe( newPage );
 		} );
 	} );
