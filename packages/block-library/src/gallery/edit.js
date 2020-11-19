@@ -414,14 +414,14 @@ function GalleryEdit( props ) {
 							<BaseControl.VisualLabel>
 								{ __( 'Image size' ) }
 							</BaseControl.VisualLabel>
-							<div className={ 'gallery-image-sizes__loading' }>
+							<View className={ 'gallery-image-sizes__loading' }>
 								<Spinner />
 								{ __( 'Loading options…' ) }
-							</div>
+							</View>
 						</BaseControl>
 					) }
 					{ dirtyImageOptions && (
-						<div className={ 'gallery-settings-buttons' }>
+						<View className={ 'gallery-settings-buttons' }>
 							<Button isPrimary onClick={ applyImageOptions }>
 								{ __( 'Apply to all images' ) }
 							</Button>
@@ -432,7 +432,7 @@ function GalleryEdit( props ) {
 							>
 								{ __( 'Cancel' ) }
 							</Button>
-						</div>
+						</View>
 					) }
 				</PanelBody>
 			</InspectorControls>
