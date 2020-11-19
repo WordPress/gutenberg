@@ -38,10 +38,10 @@ function getDragEventType( { dataTransfer } ) {
 }
 
 function isTypeSupportedByDropZone( type, dropZone ) {
-	return (
-		( type === 'file' && !! dropZone.onFilesDrop ) ||
-		( type === 'html' && !! dropZone.onHTMLDrop ) ||
-		( type === 'default' && !! dropZone.onDrop )
+	return Boolean(
+		( type === 'file' && dropZone.onFilesDrop ) ||
+			( type === 'html' && dropZone.onHTMLDrop ) ||
+			( type === 'default' && dropZone.onDrop )
 	);
 }
 
