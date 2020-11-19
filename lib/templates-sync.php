@@ -26,7 +26,7 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 		array(
 			'post_type'      => $post_type,
 			'post_status'    => array( 'publish', 'auto-draft' ),
-			'name'           => $slug,
+			'post_name__in'  => array( $slug ),
 			'tax_query'      => array(
 				array(
 					'taxonomy' => 'wp_theme',
