@@ -59,19 +59,21 @@ export const useGlobalStylesReset = () => {
 
 const extractSupportKeys = ( supports, metadata ) => {
 	const supportKeys = [];
-	Object.keys( metadata ).forEach( ( key ) => {
-		if ( get( supports, metadata[ key ].support, false ) ) {
-			supportKeys.push( key );
+	Object.keys( metadata.properties ).forEach( ( name ) => {
+		if ( get( supports, metadata.properties[ name ].support, false ) ) {
+			supportKeys.push( name );
 		}
 	} );
 	return supportKeys;
 };
 
 const useContextsFromBlockMetadata = ( metadata ) => {
+	const contexts = {};
+
+	// Add contexts from block metadata.
 	const blockTypes = useSelect( ( select ) =>
 		select( 'core/blocks' ).getBlockTypes()
 	);
-	const contexts = {};
 	blockTypes.forEach( ( blockType ) => {
 		const blockName = blockType.name;
 		const blockSelector = blockType?.supports?.__experimentalSelector;
@@ -102,6 +104,11 @@ const useContextsFromBlockMetadata = ( metadata ) => {
 				blockName,
 			};
 		}
+	} );
+
+	// Add contexts provided by the metadata.
+	Object.keys( metadata.contexts ).forEach( ( key ) => {
+		contexts[ key ] = metadata.contexts[ key ];
 	} );
 
 	return contexts;
@@ -150,7 +157,7 @@ export default function GlobalStylesProvider( {
 
 				return get(
 					styles?.[ context ]?.styles,
-					metadata[ propertyName ].value
+					metadata.properties[ propertyName ].value
 				);
 			},
 			setStyleProperty: ( context, propertyName, newValue ) => {
@@ -160,7 +167,11 @@ export default function GlobalStylesProvider( {
 					contextStyles = {};
 					set( newContent, [ context, 'styles' ], contextStyles );
 				}
-				set( contextStyles, metadata[ propertyName ].value, newValue );
+				set(
+					contextStyles,
+					metadata.properties[ propertyName ].value,
+					newValue
+				);
 				setContent( JSON.stringify( newContent ) );
 			},
 		} ),

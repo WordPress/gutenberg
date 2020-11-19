@@ -42,15 +42,15 @@ export default ( blockData, tree, metadata ) => {
 	 */
 	const getBlockStylesDeclarations = ( blockSupports, blockStyles = {} ) => {
 		const declarations = [];
-		Object.keys( metadata ).forEach( ( key ) => {
+		Object.keys( metadata.properties ).forEach( ( key ) => {
 			const cssProperty = key.startsWith( '--' ) ? key : kebabCase( key );
 			if (
 				blockSupports.includes( key ) &&
-				get( blockStyles, metadata[ key ].value, false )
+				get( blockStyles, metadata.properties[ key ].value, false )
 			) {
 				declarations.push(
 					`${ cssProperty }: ${ compileStyleValue(
-						get( blockStyles, metadata[ key ].value )
+						get( blockStyles, metadata.properties[ key ].value )
 					) }`
 				);
 			}

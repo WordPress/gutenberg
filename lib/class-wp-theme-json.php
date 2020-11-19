@@ -28,6 +28,13 @@ class WP_Theme_JSON {
 	private static $blocks_metadata = null;
 
 	/**
+	 * The name of the global context.
+	 *
+	 * @var string
+	 */
+	const GLOBAL_NAME = 'global';
+
+	/**
 	 * The CSS selector for the global context.
 	 *
 	 * @var string
@@ -35,31 +42,22 @@ class WP_Theme_JSON {
 	const GLOBAL_SELECTOR = ':root';
 
 	/**
-	 * The block type and name for the global context.
-	 *
-	 * @var string
-	 */
-	const GLOBAL_TYPE = 'global';
-
-	/**
-	 * The block arguments for the global context.
+	 * The supported properties of the global context.
 	 *
 	 * @var array
 	 */
-	const GLOBAL_ARGS = array(
-		'supports' => array(
-			'__experimentalFontAppearance' => true,
-			'__experimentalFontFamily'     => true,
-			'__experimentalSelector'       => self::GLOBAL_SELECTOR,
-			'__experimentalTextDecoration' => true,
-			'__experimentalTextTransform'  => true,
-			'color'                        => array(
-				'gradients' => true,
-				'link'      => true,
-			),
-			'fontSize'                     => true,
-			'lineHeight'                   => true,
-		),
+	const GLOBAL_SUPPORTS = array(
+		'--wp--style--color--link',
+		'background',
+		'backgroundColor',
+		'color',
+		'fontFamily',
+		'fontSize',
+		'fontStyle',
+		'fontWeight',
+		'lineHeight',
+		'textDecoration',
+		'textTransform',
 	);
 
 	/**
@@ -409,13 +407,15 @@ class WP_Theme_JSON {
 			return self::$blocks_metadata;
 		}
 
-		self::$blocks_metadata = array();
+		self::$blocks_metadata = array(
+			self::GLOBAL_NAME => array(
+				'selector' => self::GLOBAL_SELECTOR,
+				'supports' => self::GLOBAL_SUPPORTS,
+			),
+		);
 
 		$registry = WP_Block_Type_Registry::get_instance();
-		$blocks   = array_merge(
-			$registry->get_all_registered(),
-			array( self::GLOBAL_TYPE => new WP_Block_Type( self::GLOBAL_TYPE, self::GLOBAL_ARGS ) )
-		);
+		$blocks   = $registry->get_all_registered();
 		foreach ( $blocks as $block_name => $block_type ) {
 			/*
 			 * Skips blocks that don't declare support,
@@ -966,7 +966,15 @@ class WP_Theme_JSON {
 	 * @return array
 	 */
 	public function get_metadata() {
-		return self::PROPERTIES_METADATA;
+		return array(
+			'properties' => self::PROPERTIES_METADATA,
+			'contexts'   => array(
+				self::GLOBAL_NAME => array(
+					'selector' => self::GLOBAL_SELECTOR,
+					'supports' => self::GLOBAL_SUPPORTS,
+				),
+			),
+		);
 	}
 
 }
