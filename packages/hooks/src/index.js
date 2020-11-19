@@ -33,7 +33,7 @@ import createHooks from './createHooks';
  */
 
 /**
- * @typedef {Record<string, Function> & Record<StoreKey, Store>} Hooks
+ * @typedef {import('./createHooks').Hooks} Hooks
  */
 
 const {
