@@ -68,8 +68,12 @@ export const MenuTitleHeadingUI = styled( Text )`
 	margin-bottom: ${ space( 1 ) };
 	padding: ${ ( props ) =>
 		props.isRTL
-			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } 0`
-			: `${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) }` };
+			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } ${ space(
+					1.5
+			  ) }`
+			: `${ space( 0.5 ) } ${ space( 1.5 ) } ${ space( 0.5 ) } ${ space(
+					2
+			  ) }` };
 `;
 
 export const MenuTitleActionsUI = styled.span`
@@ -143,23 +147,13 @@ export const GroupTitleUI = styled( Text )`
 	color: ${ G2.gray[ 100 ] };
 `;
 
-export const ItemUI = styled.li`
+export const ItemBaseUI = styled.li`
 	border-radius: 2px;
 	color: ${ G2.lightGray.ui };
 	margin-bottom: 0;
 
 	button,
 	a {
-		height: auto;
-		min-height: 32px;
-		margin: 0;
-		font-weight: 400;
-		line-height: 20px;
-		padding-left: ${ space( 2 ) };
-		padding-right: ${ space( 2 ) };
-		width: 100%;
-		color: ${ G2.lightGray.ui };
-
 		&:hover,
 		&:focus:not( [aria-disabled='true'] ):active,
 		&:active:not( [aria-disabled='true'] ):active {
@@ -180,6 +174,19 @@ export const ItemUI = styled.li`
 	svg path {
 		color: ${ G2.lightGray.ui };
 	}
+`;
+
+export const ItemUI = styled.div`
+	display: flex;
+	align-items: center;
+	height: auto;
+	min-height: 32px;
+	margin: 0;
+	padding: ${ space( 0.75 ) } ${ space( 2 ) };
+	font-weight: 400;
+	line-height: 20px;
+	width: 100%;
+	color: ${ G2.lightGray.ui };
 `;
 
 export const ItemBadgeUI = styled.span`

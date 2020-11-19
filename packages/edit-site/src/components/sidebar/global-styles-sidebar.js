@@ -84,7 +84,7 @@ function GlobalStylesPanel( {
 
 	let panelTitle = blockType.title;
 	if ( 'object' === typeof blockType?.supports?.__experimentalSelector ) {
-		panelTitle += ` (${ context.selector })`;
+		panelTitle += ` (${ context.title })`;
 	}
 
 	return (

@@ -80,7 +80,7 @@ registerStore( 'my-shop', {
 			const { prices, discountPercent } = state;
 			const price = prices[ item ];
 
-			return price * ( 1 - ( 0.01 * discountPercent ) );
+			return price * ( 1 - 0.01 * discountPercent );
 		},
 	},
 
@@ -91,7 +91,7 @@ registerStore( 'my-shop', {
 	},
 
 	resolvers: {
-		* getPrice( item ) {
+		*getPrice( item ) {
 			const path = '/wp/v2/prices/' + item;
 			const price = yield actions.fetchFromAPI( path );
 			return actions.setPrice( item, price );
@@ -151,7 +151,7 @@ The `@wordpress/data` module offers a more advanced and generic interface for th
     -   Behaves as Redux [`subscribe`](https://redux.js.org/api/store#subscribelistener)
         with the following differences:
         -   Doesn't have to implement an unsubscribe, since the registry never uses it.
-            			  \- Only has to support one listener (the registry).
+            \- Only has to support one listener (the registry).
 
 By implementing the above interface for your custom store, you gain the benefits of using the registry and the `withSelect` and `withDispatch` higher order components in your application code. This provides seamless integration with existing and alternative data systems.
 
@@ -168,16 +168,23 @@ const { registerGenericStore } = wp.data;
 
 const reduxStore = createStore();
 
-const mappedSelectors = Object.keys( existingSelectors ).reduce( ( acc, selectorKey ) => {
-	acc[ selectorKey ] = ( ...args ) =>
-		existingSelectors[ selectorKey ]( reduxStore.getState(), ...args );
-	return acc;
-}, {} );
+const mappedSelectors = Object.keys( existingSelectors ).reduce(
+	( acc, selectorKey ) => {
+		acc[ selectorKey ] = ( ...args ) =>
+			existingSelectors[ selectorKey ]( reduxStore.getState(), ...args );
+		return acc;
+	},
+	{}
+);
 
-const mappedActions = Object.keys( existingActions ).reduce( ( acc, actionKey ) => {
-	acc[ actionKey ] = ( ...args ) => reduxStore.dispatch( existingActions[ actionKey ]( ...args ) );
-	return acc;
-}, {} );
+const mappedActions = Object.keys( existingActions ).reduce(
+	( acc, actionKey ) => {
+		acc[ actionKey ] = ( ...args ) =>
+			reduxStore.dispatch( existingActions[ actionKey ]( ...args ) );
+		return acc;
+	},
+	{}
+);
 
 const genericStore = {
 	getSelectors() {
@@ -201,7 +208,7 @@ const { registerGenericStore } = wp.data;
 
 function createCustomStore() {
 	let storeChanged = () => {};
-	const prices = { hammer: 7.50 };
+	const prices = { hammer: 7.5 };
 
 	const selectors = {
 		getPrice( itemName ) {
@@ -225,7 +232,7 @@ function createCustomStore() {
 		},
 		subscribe( listener ) {
 			storeChanged = listener;
-		}
+		},
 	};
 }
 
@@ -237,6 +244,8 @@ registerGenericStore( 'custom-data', createCustomStore() );
 The data module shares many of the same [core principles](https://redux.js.org/introduction/three-principles) and [API method naming](https://redux.js.org/api/api-reference) of [Redux](https://redux.js.org/). In fact, it is implemented atop Redux. Where it differs is in establishing a modularization pattern for creating separate but interdependent stores, and in codifying conventions such as selector functions as the primary entry point for data access.
 
 The [higher-order components](#higher-order-components) were created to complement this distinction. The intention with splitting `withSelect` and `withDispatch` — where in React Redux they are combined under `connect` as `mapStateToProps` and `mapDispatchToProps` arguments — is to more accurately reflect that dispatch is not dependent upon a subscription to state changes, and to allow for state-derived values to be used in `withDispatch` (via [higher-order component composition](/packages/compose/README.md)).
+
+The data module also has built-in solutions for handling asynchronous side-effects, through [resolvers](#resolvers) and [controls](#controls). These differ slightly from [standard redux async solutions](https://redux.js.org/advanced/async-actions) like [`redux-thunk`](https://github.com/gaearon/redux-thunk) or [`redux-saga`](https://redux-saga.js.org/).
 
 Specific implementation differences from Redux and React Redux:
 
@@ -335,6 +344,19 @@ _Returns_
 <a name="controls" href="#controls">#</a> **controls**
 
 Undocumented declaration.
+
+<a name="createReduxStore" href="#createReduxStore">#</a> **createReduxStore**
+
+Creates a namespace object with a store derived from the reducer given.
+
+_Parameters_
+
+-   _key_ `string`: Unique namespace identifier.
+-   _options_ (unknown type): Registered store options, with properties describing reducer, actions, selectors, and resolvers.
+
+_Returns_
+
+-   (unknown type): Store Object.
 
 <a name="createRegistry" href="#createRegistry">#</a> **createRegistry**
 
@@ -461,6 +483,14 @@ _Type_
 
 -   `Object` 
 
+<a name="register" href="#register">#</a> **register**
+
+Registers a standard `@wordpress/data` store definition.
+
+_Parameters_
+
+-   _store_ (unknown type): Store definition.
+
 <a name="registerGenericStore" href="#registerGenericStore">#</a> **registerGenericStore**
 
 Registers a generic store.
@@ -476,7 +506,7 @@ Registers a standard `@wordpress/data` store.
 
 _Parameters_
 
--   _reducerKey_ `string`: Reducer key.
+-   _storeName_ `string`: Unique namespace identifier for the store.
 -   _options_ `Object`: Store description (reducer, actions, selectors, resolvers).
 
 _Returns_

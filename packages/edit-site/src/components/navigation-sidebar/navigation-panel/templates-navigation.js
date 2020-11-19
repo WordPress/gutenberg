@@ -7,6 +7,7 @@ import {
 	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationBackButton as NavigationBackButton,
 } from '@wordpress/components';
+import { __experimentalMainDashboardButton as MainDashboardButton } from '@wordpress/interface';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -50,11 +51,13 @@ export default function TemplatesNavigation() {
 			onActivateMenu={ setNavigationPanelActiveMenu }
 		>
 			{ activeMenu === MENU_ROOT && (
-				<NavigationBackButton
-					backButtonLabel={ __( 'Dashboard' ) }
-					className="edit-site-navigation-panel__back-to-dashboard"
-					href="index.php"
-				/>
+				<MainDashboardButton.Slot>
+					<NavigationBackButton
+						backButtonLabel={ __( 'Dashboard' ) }
+						className="edit-site-navigation-panel__back-to-dashboard"
+						href="index.php"
+					/>
+				</MainDashboardButton.Slot>
 			) }
 
 			<NavigationMenu title={ __( 'Theme' ) }>
