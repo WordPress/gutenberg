@@ -206,7 +206,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	/**
-	 * Registers a new store.
+	 * Registers a new store definition.
 	 *
 	 * @param {WPDataStore} store Store definition.
 	 */

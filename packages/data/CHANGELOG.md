@@ -4,7 +4,7 @@
 
 ### New Features
 
--   Added new `register` factory function for registering a standard `@wordpress/data` store definition ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
+-   Added new `register` function for registering a standard `@wordpress/data` store definition ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 -   Added new `createReduxStore` factory function that creates a data store definition for the provided Redux store options to use with `register` function ([#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 -   Extended `select` and `dispatch` functions to accept a data store definition as their first param in addition to a string-based store name value [#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 -   Extended `useDispatch` hook to accept a data store definition as their first param in addition to a string-based store name value [#26655](https://github.com/WordPress/gutenberg/pull/26655)).
