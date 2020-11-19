@@ -7,7 +7,6 @@ import {
 	pasteHandler,
 } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -213,41 +212,24 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 	} = useDispatch( 'core/block-editor' );
 
 	return {
-		onDrop: useCallback(
-			onBlockDrop(
-				targetRootClientId,
-				targetBlockIndex,
-				getBlockIndex,
-				getClientIdsOfDescendants,
-				moveBlocksToPosition
-			),
-			[
-				targetRootClientId,
-				targetBlockIndex,
-				getBlockIndex,
-				getClientIdsOfDescendants,
-				moveBlocksToPosition,
-			]
+		onDrop: onBlockDrop(
+			targetRootClientId,
+			targetBlockIndex,
+			getBlockIndex,
+			getClientIdsOfDescendants,
+			moveBlocksToPosition
 		),
-		onFilesDrop: useCallback(
-			onFilesDrop(
-				targetRootClientId,
-				targetBlockIndex,
-				hasUploadPermissions,
-				updateBlockAttributes,
-				insertBlocks
-			),
-			[
-				targetRootClientId,
-				targetBlockIndex,
-				hasUploadPermissions,
-				updateBlockAttributes,
-				insertBlocks,
-			]
+		onFilesDrop: onFilesDrop(
+			targetRootClientId,
+			targetBlockIndex,
+			hasUploadPermissions,
+			updateBlockAttributes,
+			insertBlocks
 		),
-		onHTMLDrop: useCallback(
-			onHTMLDrop( targetRootClientId, targetBlockIndex, insertBlocks ),
-			[ targetRootClientId, targetBlockIndex, insertBlocks ]
+		onHTMLDrop: onHTMLDrop(
+			targetRootClientId,
+			targetBlockIndex,
+			insertBlocks
 		),
 	};
 }
