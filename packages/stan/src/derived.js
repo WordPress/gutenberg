@@ -95,7 +95,7 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 		const updatedDependencies = [];
 		const updatedDependenciesMap = new WeakMap();
 		let result;
-		let didThrow = false;
+		const unresolved = [];
 		try {
 			result = resolver( {
 				get: ( atom ) => {
@@ -107,16 +107,15 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 					updatedDependenciesMap.set( atomState, true );
 					updatedDependencies.push( atomState );
 					if ( ! atomState.isResolved ) {
-						throw { type: 'unresolved', id: atomState.id };
+						unresolved.push( atomState );
 					}
 					return atomState.get();
 				},
 			} );
 		} catch ( error ) {
-			if ( error?.type !== 'unresolved' ) {
+			if ( unresolved.length === 0 ) {
 				throw error;
 			}
-			didThrow = true;
 		}
 
 		function removeExtraDependencies() {
@@ -137,7 +136,7 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 		 * @param {any} newValue
 		 */
 		function checkNewValue( newValue ) {
-			if ( ! didThrow && newValue !== value ) {
+			if ( unresolved.length === 0 && newValue !== value ) {
 				value = newValue;
 				isResolved = true;
 				notifyListeners();
@@ -152,10 +151,9 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 					checkNewValue( newValue );
 				} )
 				.catch( ( error ) => {
-					if ( error?.type !== 'unresolved' ) {
+					if ( unresolved.length === 0 ) {
 						throw error;
 					}
-					didThrow = true;
 					removeExtraDependencies();
 				} );
 		} else {

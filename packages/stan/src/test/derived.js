@@ -10,6 +10,8 @@ async function flushImmediatesAndTicks( count = 1 ) {
 	}
 }
 
+jest.useFakeTimers();
+
 describe( 'creating derived atoms', () => {
 	it( 'should allow creating derived atom', async () => {
 		const count1 = createAtom( 1 );
@@ -39,6 +41,27 @@ describe( 'creating derived atoms', () => {
 		const unsubscribe = registry.subscribe( sum, () => {} );
 		await flushImmediatesAndTicks();
 		expect( registry.get( sum ) ).toEqual( 11 );
+		unsubscribe();
+	} );
+
+	it( 'should allow parallel async atoms', async () => {
+		const count1 = createDerivedAtom( async () => {
+			await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
+			return 10;
+		} );
+		const count2 = createDerivedAtom( async () => {
+			await new Promise( ( resolve ) => setTimeout( resolve, 1000 ) );
+			return 10;
+		} );
+		const sum = createDerivedAtom( async ( { get } ) => {
+			return get( count1 ) + get( count2 );
+		} );
+		const registry = createAtomRegistry();
+		// Atoms don't compute any value unless there's a subscriber.
+		const unsubscribe = registry.subscribe( sum, () => {} );
+		await jest.advanceTimersByTime( 1000 );
+		await flushImmediatesAndTicks();
+		expect( registry.get( sum ) ).toEqual( 20 );
 		unsubscribe();
 	} );
 
