@@ -25,6 +25,7 @@ import {
 	useHasTypographyPanel,
 } from './typography-panel';
 import { default as ColorPanel, useHasColorPanel } from './color-panel';
+import { default as SpacingPanel, useHasSpacingPanel } from './spacing-panel';
 
 function GlobalStylesPanel( {
 	wrapperPanelTitle,
@@ -36,8 +37,9 @@ function GlobalStylesPanel( {
 } ) {
 	const hasColorPanel = useHasColorPanel( context );
 	const hasTypographyPanel = useHasTypographyPanel( context );
+	const hasSpacingPanel = useHasSpacingPanel( context );
 
-	if ( ! hasColorPanel && ! hasTypographyPanel ) {
+	if ( ! hasColorPanel && ! hasTypographyPanel && ! hasSpacingPanel ) {
 		return null;
 	}
 
@@ -57,6 +59,13 @@ function GlobalStylesPanel( {
 					setStyleProperty={ setStyleProperty }
 					getSetting={ getSetting }
 					setSetting={ setSetting }
+				/>
+			) }
+			{ hasSpacingPanel && (
+				<SpacingPanel
+					context={ context }
+					getStyleProperty={ getStyleProperty }
+					setStyleProperty={ setStyleProperty }
 				/>
 			) }
 		</>
