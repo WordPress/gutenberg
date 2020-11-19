@@ -52,7 +52,16 @@ export function useDropZone( {
 		isRelative,
 	] );
 
-	return state;
+	return {
+		...state,
+		position:
+			state.x && state.y
+				? {
+						x: state.x,
+						y: state.y,
+				  }
+				: null,
+	};
 }
 
 export default function DropZoneComponent( {
