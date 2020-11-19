@@ -9,7 +9,7 @@ import useRegistry from '../registry-provider/use-registry';
  * Note: The component using this hook must be within the context of a
  * RegistryProvider.
  *
- * @param {string} [storeName]  Optionally provide the name of the store from
+ * @param {string|import('../../types').WPDataStoreDefinition} [storeNameOrDefinition]  Optionally provide the name of the store or unique namespace identifier from
  *                             which to retrieve action creators. If not
  *                             provided, the registry.dispatch function is
  *                             returned instead.
@@ -46,9 +46,9 @@ import useRegistry from '../registry-provider/use-registry';
  * ```
  * @return {Function}  A custom react hook.
  */
-const useDispatch = ( storeName ) => {
+const useDispatch = ( storeNameOrDefinition ) => {
 	const { dispatch } = useRegistry();
-	return storeName === void 0 ? dispatch : dispatch( storeName );
+	return storeNameOrDefinition === void 0 ? dispatch : dispatch( storeNameOrDefinition );
 };
 
 export default useDispatch;
