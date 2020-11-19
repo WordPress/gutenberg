@@ -244,6 +244,14 @@ Each block declares which style properties it exposes. This has been coined as "
         "link": "value",
         "text": "value"
       },
+      "spacing": {
+        "padding": {
+          "top": "value",
+          "right": "value",
+          "bottom": "value",
+          "left": "value",
+        },
+      },
       "typography": {
         "fontFamily": "value",
         "fontSize": "value",

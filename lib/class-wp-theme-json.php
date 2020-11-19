@@ -97,6 +97,14 @@ class WP_Theme_JSON {
 				'link'       => null,
 				'text'       => null,
 			),
+			'spacing'    => array(
+				'padding' => array(
+					'top'    => null,
+					'right'  => null,
+					'bottom' => null,
+					'left'   => null
+				),
+			),
 			'typography' => array(
 				'fontFamily'     => null,
 				'fontSize'       => null,
