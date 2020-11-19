@@ -3,6 +3,6 @@
  */
 import { createContext } from '@wordpress/element';
 
-const InserterContext = createContext();
+const InserterListboxContext = createContext();
 
-export default InserterContext;
+export default InserterListboxContext;

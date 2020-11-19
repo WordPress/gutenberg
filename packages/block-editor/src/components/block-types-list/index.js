@@ -2,11 +2,12 @@
  * WordPress dependencies
  */
 import { getBlockMenuDefaultClassName } from '@wordpress/blocks';
-import { useContext } from '@wordpress/element';
+
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { CompositeGroup } from 'reakit/Composite';
+import InserterListItem from '../inserter-list-item';
+import { InserterListboxGroup, InserterListboxRow } from '../inserter-listbox';
 
 function chunk( array, size ) {
 	const chunks = [];
@@ -16,12 +17,6 @@ function chunk( array, size ) {
 	return chunks;
 }
 
-/**
- * Internal dependencies
- */
-import InserterListItem from '../inserter-list-item';
-import InserterContext from '../inserter/context';
-
 function BlockTypesList( {
 	items = [],
 	onSelect,
@@ -29,24 +24,13 @@ function BlockTypesList( {
 	children,
 	label,
 } ) {
-	const compositeState = useContext( InserterContext );
 	return (
-		/*
-		 * Disable reason: The `list` ARIA role is redundant but
-		 * Safari+VoiceOver won't announce the list otherwise.
-		 */
-		/* eslint-disable jsx-a11y/no-redundant-roles */
-		<div
-			role="listbox"
+		<InserterListboxGroup
 			className="block-editor-block-types-list"
 			aria-label={ label }
 		>
 			{ chunk( items, 3 ).map( ( row, i ) => (
-				<CompositeGroup
-					state={ compositeState }
-					key={ i }
-					role="presentation"
-				>
+				<InserterListboxRow key={ i } role="presentation">
 					{ row.map( ( item, j ) => (
 						<InserterListItem
 							key={ item.id }
@@ -67,11 +51,10 @@ function BlockTypesList( {
 							isFirst={ i + j === 0 }
 						/>
 					) ) }
-				</CompositeGroup>
+				</InserterListboxRow>
 			) ) }
 			{ children }
-		</div>
-		/* eslint-enable jsx-a11y/no-redundant-roles */
+		</InserterListboxGroup>
 	);
 }
 
