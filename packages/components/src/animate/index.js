@@ -32,7 +32,7 @@ function getDefaultOrigin( type ) {
  *
  * @return {string | undefined} ClassName that applies the animations
  */
-export function animateClassName( options ) {
+export function getAnimateClassName( options ) {
 	const { type } = options;
 	if ( type === 'loading' ) {
 		return classnames( 'components-animate__loading' );
@@ -64,6 +64,6 @@ export default function Animate( { type, options = {}, children } ) {
 		alternative: 'useAnimate hook',
 	} );
 	return children( {
-		className: animateClassName( { type, ...options } ),
+		className: getAnimateClassName( { type, ...options } ),
 	} );
 }

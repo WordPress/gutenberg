@@ -29,7 +29,7 @@ import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, useSlot } from '../slot-fill';
-import { useAnimate } from '../animate';
+import { getAnimateClassName } from '../animate';
 
 const FocusManaged = withConstrainedTabbing(
 	withFocusReturn( ( { children } ) => children )
@@ -529,7 +529,7 @@ const Popover = ( {
 		onClickOutside( clickEvent );
 	}
 
-	const animateClassName = useAnimate( {
+	const animateClassName = getAnimateClassName( {
 		type: animate && animateOrigin ? 'appear' : null,
 		origin: animateOrigin,
 	} );

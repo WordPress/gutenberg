@@ -8,7 +8,7 @@ import { Icon, search as searchIcon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { animateClassName } from '../../animate';
+import { getAnimateClassName } from '../../animate';
 import Button from '../../button';
 import MenuTitleSearch from './menu-title-search';
 import {
@@ -83,7 +83,7 @@ export default function NavigationMenuTitle( {
 
 			{ isSearching && (
 				<div
-					className={ animateClassName( {
+					className={ getAnimateClassName( {
 						type: 'slide-in',
 						origin: 'left',
 					} ) }
