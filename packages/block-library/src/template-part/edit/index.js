@@ -3,8 +3,14 @@
  */
 import { useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { BlockControls, useBlockProps } from '@wordpress/block-editor';
 import {
+	BlockControls,
+	InspectorControls,
+	useBlockProps,
+} from '@wordpress/block-editor';
+import {
+	PanelBody,
+	SelectControl,
 	Dropdown,
 	ToolbarGroup,
 	ToolbarButton,
@@ -23,7 +29,7 @@ import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
 
 export default function TemplatePartEdit( {
-	attributes: { postId: _postId, slug, theme, tagName: TagName = 'div' },
+	attributes: { postId: _postId, slug, theme, tagName: TagName = 'section' },
 	setAttributes,
 	clientId,
 } ) {
@@ -96,53 +102,81 @@ export default function TemplatePartEdit( {
 	// Part of a template file, post ID not resolved yet.
 	const isUnresolvedTemplateFile = ! isPlaceholder && ! postId;
 
+	const inspectorControls = (
+		<InspectorControls>
+			<PanelBody title={ __( 'Semantics' ) }>
+				<SelectControl
+					label={ __( 'Wrapping HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<div>)' ), value: 'div' },
+						{ label: '<header>', value: 'header' },
+						{ label: '<main>', value: 'main' },
+						{ label: '<section>', value: 'section' },
+						{ label: '<article>', value: 'article' },
+						{ label: '<aside>', value: 'aside' },
+						{ label: '<footer>', value: 'footer' },
+					] }
+					value={ TagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+				/>
+			</PanelBody>
+		</InspectorControls>
+	);
+
 	return (
-		<TagName { ...blockProps }>
-			{ isPlaceholder && (
-				<TemplatePartPlaceholder
-					setAttributes={ setAttributes }
-					innerBlocks={ innerBlocks }
-				/>
-			) }
-			{ isTemplateFile && (
-				<BlockControls>
-					<ToolbarGroup className="wp-block-template-part__block-control-group">
-						<TemplatePartNamePanel
-							postId={ postId }
-							setAttributes={ setAttributes }
-						/>
-						<Dropdown
-							className="wp-block-template-part__preview-dropdown-button"
-							contentClassName="wp-block-template-part__preview-dropdown-content"
-							position="bottom right left"
-							renderToggle={ ( { isOpen, onToggle } ) => (
-								<ToolbarButton
-									aria-expanded={ isOpen }
-									icon={ isOpen ? chevronUp : chevronDown }
-									label={ __( 'Choose another' ) }
-									onClick={ onToggle }
-									// Disable when open to prevent odd FireFox bug causing reopening.
-									// As noted in https://github.com/WordPress/gutenberg/pull/24990#issuecomment-689094119 .
-									disabled={ isOpen }
-								/>
-							) }
-							renderContent={ ( { onClose } ) => (
-								<TemplatePartSelection
-									setAttributes={ setAttributes }
-									onClose={ onClose }
-								/>
-							) }
-						/>
-					</ToolbarGroup>
-				</BlockControls>
-			) }
-			{ isTemplateFile && (
-				<TemplatePartInnerBlocks
-					postId={ postId }
-					hasInnerBlocks={ innerBlocks.length > 0 }
-				/>
-			) }
-			{ isUnresolvedTemplateFile && <Spinner /> }
-		</TagName>
+		<>
+			{ inspectorControls }
+			<TagName { ...blockProps }>
+				{ isPlaceholder && (
+					<TemplatePartPlaceholder
+						setAttributes={ setAttributes }
+						innerBlocks={ innerBlocks }
+					/>
+				) }
+				{ isTemplateFile && (
+					<BlockControls>
+						<ToolbarGroup className="wp-block-template-part__block-control-group">
+							<TemplatePartNamePanel
+								postId={ postId }
+								setAttributes={ setAttributes }
+							/>
+							<Dropdown
+								className="wp-block-template-part__preview-dropdown-button"
+								contentClassName="wp-block-template-part__preview-dropdown-content"
+								position="bottom right left"
+								renderToggle={ ( { isOpen, onToggle } ) => (
+									<ToolbarButton
+										aria-expanded={ isOpen }
+										icon={
+											isOpen ? chevronUp : chevronDown
+										}
+										label={ __( 'Choose another' ) }
+										onClick={ onToggle }
+										// Disable when open to prevent odd FireFox bug causing reopening.
+										// As noted in https://github.com/WordPress/gutenberg/pull/24990#issuecomment-689094119 .
+										disabled={ isOpen }
+									/>
+								) }
+								renderContent={ ( { onClose } ) => (
+									<TemplatePartSelection
+										setAttributes={ setAttributes }
+										onClose={ onClose }
+									/>
+								) }
+							/>
+						</ToolbarGroup>
+					</BlockControls>
+				) }
+				{ isTemplateFile && (
+					<TemplatePartInnerBlocks
+						postId={ postId }
+						hasInnerBlocks={ innerBlocks.length > 0 }
+					/>
+				) }
+				{ isUnresolvedTemplateFile && <Spinner /> }
+			</TagName>
+		</>
 	);
 }
