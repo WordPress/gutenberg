@@ -32,7 +32,7 @@ the post editor, that can be achieved in the following way:
 import { registerPlugin } from '@wordpress/plugins';
 import {
 	__experimentalFullscreenModeClose as FullscreenModeClose,
-} from '@wordpress/edit-site';
+} from '@wordpress/edit-post';
 import {
 	__experimentalMainDashboardButton as MainDashboardButton,
 } from '@wordpress/interface';

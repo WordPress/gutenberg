@@ -10,7 +10,7 @@ import * as actions from './actions';
 import reducer from './reducer';
 import controls from './controls';
 import * as selectors from './selectors';
-import { MODULE_KEY } from './constants';
+import { STORE_NAME } from './constants';
 
 /**
  * Block editor data store configuration.
@@ -19,13 +19,13 @@ import { MODULE_KEY } from './constants';
  *
  * @type {Object}
  */
-export const storeConfig = {
+const storeConfig = {
 	actions,
 	reducer,
 	controls,
 	selectors,
 };
 
-const store = registerStore( MODULE_KEY, storeConfig );
+const store = registerStore( STORE_NAME, storeConfig );
 
 export default store;

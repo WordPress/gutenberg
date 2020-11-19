@@ -636,6 +636,7 @@ Navigates to the post listing screen and bulk-trashes any posts which exist.
 _Parameters_
 
 -   _postType_ `string`: String slug for type of post to trash.
+-   _postStatus_ `string`: String status of posts to trash.
 
 _Returns_
 

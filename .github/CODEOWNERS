@@ -11,7 +11,7 @@
 /packages/data-controls                         @nerrad
 
 # Blocks
-/packages/block-library                         @Soean @ajitbohra @talldan
+/packages/block-library                         @ajitbohra @talldan
 /packages/block-library/src/gallery             @mkevins
 /packages/block-library/src/social-links        @mkaz
 /packages/block-library/src/social-link         @mkaz
