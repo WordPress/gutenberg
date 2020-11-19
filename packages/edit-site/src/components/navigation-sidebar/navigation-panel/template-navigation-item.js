@@ -42,7 +42,8 @@ export default function TemplateNavigationItem( { item } ) {
 				<div className="edit-site-navigation-panel__template-item-title">
 					{ title }
 					{ item.type === 'wp_template' &&
-						item.status !== 'auto-draft' && (
+						item.status !== 'auto-draft' &&
+						item.file_based && (
 							<Tooltip
 								text={ __(
 									'This theme template has been customized'
