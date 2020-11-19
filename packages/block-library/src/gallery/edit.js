@@ -16,12 +16,14 @@ import {
  */
 import { compose } from '@wordpress/compose';
 import {
+	BaseControl,
 	Button,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
 	withNotices,
 	RangeControl,
+	Spinner,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
@@ -363,7 +365,7 @@ function GalleryEdit( props ) {
 		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
 	}
 
-	const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
+	const shouldShowSizeOptions = ! isEmpty( imageSizeOptions );
 	const hasLinkTo = linkTo && linkTo !== 'none';
 
 	return (
@@ -400,13 +402,23 @@ function GalleryEdit( props ) {
 							onChange={ toggleOpenInNewTab }
 						/>
 					) }
-					{ shouldShowSizeOptions && (
+					{ shouldShowSizeOptions ? (
 						<SelectControl
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
 						/>
+					) : (
+						<BaseControl className={ 'gallery-image-sizes' }>
+							<BaseControl.VisualLabel>
+								{ __( 'Image size' ) }
+							</BaseControl.VisualLabel>
+							<div className={ 'gallery-image-sizes__loading' }>
+								<Spinner />
+								{ __( 'Loading options…' ) }
+							</div>
+						</BaseControl>
 					) }
 					{ dirtyImageOptions && (
 						<div className={ 'gallery-settings-buttons' }>
