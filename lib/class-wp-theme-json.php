@@ -414,14 +414,20 @@ class WP_Theme_JSON {
 			}
 
 			/*
-			 * Extract block supports: only those
-			 * related to the style properties.
+			 * Extract block support keys that are related to the style properties.
 			 */
 			$block_supports = array();
 			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
 				if ( gutenberg_experimental_get( $block_type->supports, $metadata['block_json'] ) ) {
 					$block_supports[] = $key;
 				}
+			}
+
+			/*
+			 * Skip blocks that don't support anything related to styles.
+			 */
+			if ( empty( $block_supports ) ) {
+				continue;
 			}
 
 			/*
