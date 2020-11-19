@@ -53,7 +53,7 @@ const renderQueue = createQueue();
  *
  * @example
  * ```js
- * const { useSelect } = wp.data;
+ * import { useSelect } from '@wordpress/data';
  *
  * function HammerPriceDisplay( { currency } ) {
  *   const price = useSelect( ( select ) => {
