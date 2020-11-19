@@ -12,7 +12,11 @@ export default function useImageSizes( images, isSelected, getSettings ) {
 	return useMemo( () => getImageSizing(), [ images, isSelected ] );
 
 	function getImageSizing() {
-		if ( some( images, ( img ) => ! img.data ) ) {
+		if (
+			! images ||
+			images.length === 0 ||
+			some( images, ( img ) => ! img.data )
+		) {
 			return [];
 		}
 		const { imageSizes } = getSettings();
