@@ -61,23 +61,23 @@ export default function useIsPrimaryEntityManager( entityId, clientId ) {
 	// should only trigger a re-render if the tracker status actually changes.
 	const setAsPrimary = ( isPrimary ) => setIsTracker( isPrimary );
 
-	const isPrimary = addEntityManager( entityId, {
-		id: clientId,
-		setAsPrimary,
-	} );
-
-	const [ isTracker, setIsTracker ] = useState( isPrimary );
+	const [ isTracker, setIsTracker ] = useState( () =>
+		addEntityManager( entityId, {
+			id: clientId,
+			setAsPrimary,
+		} )
+	);
 
 	const oldEntityId = useRef( entityId );
 	const oldClientId = useRef( clientId );
 
 	useEffect( () => {
-		const didEntityChange = oldEntityId.current !== clientId;
+		const didEntityChange = oldEntityId.current !== entityId;
 		const didClientIdChange = oldClientId.current !== clientId;
 		// If the info changed, we need to reset the tracker information.
 		if ( didEntityChange || didClientIdChange ) {
 			removeEntityManager( oldEntityId.current, oldClientId.current );
-			const isNewPrimary = addEntityManager( {
+			const isNewPrimary = addEntityManager( entityId, {
 				id: clientId,
 				setAsPrimary,
 			} );
