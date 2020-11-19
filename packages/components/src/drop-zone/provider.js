@@ -98,6 +98,13 @@ function getHoveredDropZone( dropZones, position, dragEventType ) {
 	} );
 }
 
+export const INITIAL_DROP_ZONE_STATE = {
+	isDraggingOverDocument: false,
+	isDraggingOverElement: false,
+	position: null,
+	type: null,
+};
+
 export default function DropZoneProvider( { children } ) {
 	const ref = useRef();
 	const dropZones = useRef( new Set( [] ) );
@@ -160,12 +167,7 @@ export default function DropZoneProvider( { children } ) {
 		throttledUpdateDragZones.cancel();
 
 		dropZones.current.forEach( ( dropZone ) =>
-			dropZone.setState( {
-				isDraggingOverDocument: false,
-				isDraggingOverElement: false,
-				position: null,
-				type: null,
-			} )
+			dropZone.setState( INITIAL_DROP_ZONE_STATE )
 		);
 	}, [] );
 
