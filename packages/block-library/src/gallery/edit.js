@@ -1,15 +1,7 @@
 /**
  * External dependencies
  */
-import {
-	isEqual,
-	isEmpty,
-	find,
-	concat,
-	differenceBy,
-	some,
-	every,
-} from 'lodash';
+import { isEqual, isEmpty, find, concat, differenceBy, some } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -107,7 +99,6 @@ function GalleryEdit( props ) {
 	);
 	const [ imageSettings, setImageSettings ] = useState( currentImageOptions );
 	const [ dirtyImageOptions, setDirtyImageOptions ] = useState( false );
-	const [ imageData, setImageData ] = useState( [] );
 
 	useEffect( () => {
 		const currentOptionsState = ! isEqual(
@@ -119,11 +110,10 @@ function GalleryEdit( props ) {
 		}
 	}, [ currentImageOptions, imageSettings ] );
 
-	const { getBlock, getMedia, getSettings } = useSelect( ( select ) => {
+	const { getBlock, getSettings } = useSelect( ( select ) => {
 		return {
 			getBlock: select( 'core/block-editor' ).getBlock,
 			getSettings: select( 'core/block-editor' ).getSettings,
-			getMedia: select( 'core' ).getMedia,
 		};
 	}, [] );
 
@@ -141,45 +131,28 @@ function GalleryEdit( props ) {
 		[ innerBlockImages ]
 	);
 
-	// Wait until all the blocks have an image id before we save the imageData array.
-	useEffect( () => {
-		if (
-			innerBlockImages.length === 0 ||
-			some(
-				innerBlockImages,
-				( imageBlock ) => ! imageBlock.attributes.id
-			)
-		) {
-			return;
-		}
+	const imageData = useSelect(
+		( select ) => {
+			if (
+				innerBlockImages.length === 0 ||
+				some(
+					innerBlockImages,
+					( imageBlock ) => ! imageBlock.attributes.id
+				)
+			) {
+				return imageData;
+			}
 
-		const newImageData = innerBlockImages.map( ( imageBlock ) => {
-			return {
-				id: imageBlock.attributes.id,
-				data: getMedia( imageBlock.attributes.id ),
-			};
-		} );
-		setImageData( newImageData );
-	}, [ innerBlockImages ] );
-
-	// The getMedia call is async so we need to keep resetting the imageData array until we
-	// have the imageData returned for every image.
-	useEffect( () => {
-		if (
-			imageData.length === 0 ||
-			every( imageData, ( img ) => img.data )
-		) {
-			return;
-		}
-
-		const newImageData = imageData.map( ( img ) => {
-			return {
-				id: img.id,
-				data: img.data || getMedia( img.id ),
-			};
-		} );
-		setImageData( newImageData );
-	}, [ imageData ] );
+			const getMedia = select( 'core' ).getMedia;
+			return innerBlockImages.map( ( imageBlock ) => {
+				return {
+					id: imageBlock.attributes.id,
+					data: getMedia( imageBlock.attributes.id ),
+				};
+			} );
+		},
+		[ innerBlockImages ]
+	);
 
 	useEffect( () => {
 		if ( images.length !== imageCount ) {
@@ -307,9 +280,6 @@ function GalleryEdit( props ) {
 			const image = block.attributes.id
 				? find( imageData, { id: block.attributes.id } )
 				: null;
-			if ( ! image.data ) {
-				image.data = getMedia( image.id );
-			}
 			updateBlockAttributes( block.clientId, {
 				...getHrefAndDestination( image.data, linkTo ),
 				...getUpdatedLinkTargetSettings( linkTarget, block.attributes ),
