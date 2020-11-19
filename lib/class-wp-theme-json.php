@@ -393,12 +393,10 @@ class WP_Theme_JSON {
 	 *   'global': {
 	 *     'selector': ':root'
 	 *     'supports': [ 'fontSize', 'backgroundColor' ],
-	 *     'blockName': 'global',
 	 *   },
 	 *   'core/heading/h1': {
 	 *     'selector': 'h1'
 	 *     'supports': [ 'fontSize', 'backgroundColor' ],
-	 *     'blockName': 'core/heading',
 	 *   }
 	 * }
 	 *
