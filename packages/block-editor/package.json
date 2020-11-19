@@ -65,7 +65,8 @@
 		"redux-multi": "^0.1.12",
 		"rememo": "^3.0.0",
 		"tinycolor2": "^1.4.1",
-		"traverse": "^0.6.6"
+		"traverse": "^0.6.6",
+		"uuid": "^8.3.1"
 	},
 	"publishConfig": {
 		"access": "public"

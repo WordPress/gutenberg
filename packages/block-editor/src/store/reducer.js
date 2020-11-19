@@ -8,6 +8,7 @@ import {
 	last,
 	omit,
 	without,
+	map,
 	mapValues,
 	keys,
 	isEqual,
@@ -17,6 +18,7 @@ import {
 	omitBy,
 	pickBy,
 } from 'lodash';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
@@ -28,6 +30,8 @@ import { isReusableBlock } from '@wordpress/blocks';
  */
 import { PREFERENCES_DEFAULTS, SETTINGS_DEFAULTS } from './defaults';
 import { insertAt, moveTo } from './array';
+
+const EMPTY_ARRAY = [];
 
 /**
  * Given an array of blocks, returns an object where each key is a nesting
@@ -716,6 +720,39 @@ const withSaveReusableBlock = ( reducer ) => ( state, action ) => {
 	return reducer( state, action );
 };
 
+function aliasBlockTree( state, clientId ) {
+	return map( state.order[ clientId ], ( sourceClientId ) => {
+		const block = state.byClientId[ sourceClientId ];
+		if ( ! block ) {
+			return null;
+		}
+
+		return {
+			...block,
+			attributes: state.attributes[ sourceClientId ],
+			innerBlocks: !! state.controlledInnerBlocks[ sourceClientId ]
+				? EMPTY_ARRAY
+				: aliasBlockTree( state, sourceClientId ),
+			aliasOf: sourceClientId,
+			clientId: uuid(),
+		};
+	} );
+}
+
+const withBlockAliases = ( reducer ) => ( state, action ) => {
+	if ( action.type !== 'SYNCHRONIZE_BLOCK_SUB_TREES' ) {
+		return reducer( state, action );
+	}
+	const aliasedBlockTree = aliasBlockTree( state, action.sourceTree );
+
+	return reducer( state, {
+		rootClientId: action.targetTree,
+		blocks: aliasedBlockTree,
+		type: 'INSERT_BLOCKS',
+		index: 0,
+	} );
+};
+
 /**
  * Reducer returning the blocks state.
  *
@@ -732,7 +769,8 @@ export const blocks = flow(
 	withReplaceInnerBlocks, // needs to be after withInnerBlocksRemoveCascade
 	withBlockReset,
 	withPersistentBlockChange,
-	withIgnoredBlockChange
+	withIgnoredBlockChange,
+	withBlockAliases
 )( {
 	byClientId( state = {}, action ) {
 		switch ( action.type ) {

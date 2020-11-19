@@ -1348,3 +1348,18 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+/**
+ * Returns an action object that sets the block tree underneath the given target
+ * to be the same as the one under the source using block aliases.
+ *
+ * @param {string} sourceTree The client ID of the source for the sync.
+ * @param {string} targetTree The client ID of the target for the sync.
+ */
+export function synchronizeBlockSubTrees( sourceTree, targetTree ) {
+	return {
+		type: 'SYNCHRONIZE_BLOCK_SUB_TREES',
+		sourceTree,
+		targetTree,
+	};
+}

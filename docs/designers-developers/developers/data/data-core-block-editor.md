@@ -1433,6 +1433,16 @@ _Returns_
 
 -   `Object`: Action object.
 
+<a name="synchronizeBlockSubTrees" href="#synchronizeBlockSubTrees">#</a> **synchronizeBlockSubTrees**
+
+Returns an action object that sets the block tree underneath the given target
+to be the same as the one under the source using block aliases.
+
+_Parameters_
+
+-   _sourceTree_ `string`: The client ID of the source for the sync.
+-   _targetTree_ `string`: The client ID of the target for the sync.
+
 <a name="synchronizeTemplate" href="#synchronizeTemplate">#</a> **synchronizeTemplate**
 
 Returns an action object synchronize the template with the list of blocks
