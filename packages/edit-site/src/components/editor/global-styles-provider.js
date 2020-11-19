@@ -14,7 +14,6 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { useEntityProp } from '@wordpress/core-data';
-import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -58,48 +57,63 @@ export const useGlobalStylesReset = () => {
 	];
 };
 
-const useContextsFromBlockMetadata = () => {
+const extractSupportKeys = ( supports, metadata ) => {
+	const supportKeys = [];
+	Object.keys( metadata ).forEach( ( key ) => {
+		if ( get( supports, metadata[ key ].block_json, false ) ) {
+			supportKeys.push( key );
+		}
+	} );
+	return supportKeys;
+};
+
+const useContextsFromBlockMetadata = ( metadata ) => {
 	const blockTypes = useSelect( ( select ) =>
 		select( 'core/blocks' ).getBlockTypes()
 	);
 	const contexts = {};
 	blockTypes.forEach( ( blockType ) => {
-		if ( typeof blockType?.supports?.__experimentalSelector === 'string' ) {
-			contexts[ blockType.name ] = {
-				selector: blockType.supports.__experimentalSelector,
-				supports: blockType.supports,
-				blockName: blockType.name,
+		const blockName = blockType.name;
+		const blockSelector = blockType?.supports?.__experimentalSelector;
+		const supports = extractSupportKeys( blockType?.supports, metadata );
+		const hasSupport = supports.length > 0;
+
+		if ( hasSupport && typeof blockSelector === 'string' ) {
+			contexts[ blockName ] = {
+				selector: blockSelector,
+				supports,
+				blockName,
 			};
-		} else if (
-			typeof blockType?.supports?.__experimentalSelector === 'object'
-		) {
-			const selectors = blockType.supports.__experimentalSelector;
-			Object.keys( selectors ).forEach( ( key ) => {
+		} else if ( hasSupport && typeof blockSelector === 'object' ) {
+			Object.keys( blockSelector ).forEach( ( key ) => {
 				contexts[ key ] = {
-					selector: selectors[ key ].selector,
-					supports: blockType.supports,
-					blockName: blockType.name,
-					title: selectors[ key ].title,
-					attributes: selectors[ key ].attributes,
+					selector: blockSelector[ key ].selector,
+					supports,
+					blockName,
+					title: blockSelector[ key ].title,
+					attributes: blockSelector[ key ].attributes,
 				};
 			} );
-		} else if ( blockType?.supports ) {
-			const contextName = blockType.name
-				.replace( 'core/', '' )
-				.replace( '/', '-' );
-			contexts[ blockType.name ] = {
-				selector: '.wp-block-' + contextName,
-				supports: blockType.supports,
-				blockName: blockType.name,
+		} else if ( hasSupport ) {
+			const suffix = blockName.replace( 'core/', '' ).replace( '/', '-' );
+			contexts[ blockName ] = {
+				selector: '.wp-block-' + suffix,
+				supports,
+				blockName,
 			};
 		}
 	} );
+
 	return contexts;
 };
 
-export default function GlobalStylesProvider( { children, baseStyles } ) {
+export default function GlobalStylesProvider( {
+	children,
+	baseStyles,
+	metadata,
+} ) {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
-	const contexts = useContextsFromBlockMetadata();
+	const contexts = useContextsFromBlockMetadata( metadata );
 
 	const { userStyles, mergedStyles } = useMemo( () => {
 		const newUserStyles = content ? JSON.parse( content ) : {};
@@ -136,7 +150,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 
 				return get(
 					styles?.[ context ]?.styles,
-					STYLE_PROPERTY[ propertyName ]
+					metadata[ propertyName ].theme_json
 				);
 			},
 			setStyleProperty: ( context, propertyName, newValue ) => {
@@ -146,7 +160,11 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					contextStyles = {};
 					set( newContent, [ context, 'styles' ], contextStyles );
 				}
-				set( contextStyles, STYLE_PROPERTY[ propertyName ], newValue );
+				set(
+					contextStyles,
+					metadata[ propertyName ].theme_json,
+					newValue
+				);
 				setContent( JSON.stringify( newContent ) );
 			},
 		} ),
@@ -167,7 +185,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 			styles: [
 				...newStyles,
 				{
-					css: getGlobalStyles( contexts, mergedStyles ),
+					css: getGlobalStyles( contexts, mergedStyles, metadata ),
 					isGlobalStyles: true,
 				},
 			],
@@ -176,7 +194,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				( value ) => value?.settings || {}
 			),
 		} );
-	}, [ contexts, mergedStyles ] );
+	}, [ contexts, mergedStyles, metadata ] );
 
 	return (
 		<GlobalStylesContext.Provider value={ nextValue }>
