@@ -119,13 +119,12 @@ export default function Header( { openEntitiesSavedStates } ) {
 						entityTitle={ entityTitle }
 						entityLabel="template"
 					>
-						{ templateType === 'wp_template' &&
-							( ( { onClose } ) => (
-								<TemplateDetails
-									template={ template }
-									onClose={ onClose }
-								/>
-							) ) }
+						{ ( { onClose } ) => (
+							<TemplateDetails
+								template={ template }
+								onClose={ onClose }
+							/>
+						) }
 					</DocumentActions>
 				) }
 				{ 'wp_template_part' === templateType && (
