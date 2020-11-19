@@ -72,14 +72,11 @@ export const withActionAndExpicitDismiss = () => {
 		{
 			label: text( 'Label', 'Open WP.org' ),
 			url: text( 'URL', 'https://wordpress.org' ),
-		}
+		},
 	];
 
 	return (
-		<Snackbar
-			actions={ actions }
-			explicitDismiss={ true }
-		>
+		<Snackbar actions={ actions } explicitDismiss={ true }>
 			{ content }
 		</Snackbar>
 	);
