@@ -26,7 +26,7 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 		array(
 			'post_type'      => $post_type,
 			'post_status'    => array( 'publish', 'auto-draft' ),
-			'title'          => $slug,
+			'name'           => $slug,
 			'tax_query'      => array(
 				array(
 					'taxonomy' => 'wp_theme',
@@ -40,16 +40,24 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 	);
 	$post           = $template_query->have_posts() ? $template_query->next_post() : null;
 	if ( ! $post ) {
-		wp_insert_post(
-			array(
-				'post_content' => $content,
-				'post_title'   => $slug,
-				'post_status'  => 'auto-draft',
-				'post_type'    => $post_type,
-				'post_name'    => $slug,
-				'tax_input'    => array( 'wp_theme' => array( $theme, '_wp_file_based' ) ),
-			)
+		$template_post = array(
+			'post_content' => $content,
+			'post_title'   => $slug,
+			'post_status'  => 'auto-draft',
+			'post_type'    => $post_type,
+			'post_name'    => $slug,
+			'tax_input'    => array( 'wp_theme' => array( $theme, '_wp_file_based' ) ),
 		);
+
+		if ( 'wp_template' === $post_type ) {
+			$default_template_types = gutenberg_get_default_template_types();
+			if ( isset( $default_template_types[ $slug ] ) ) {
+				$template_post['post_title']   = $default_template_types[ $slug ]['title'];
+				$template_post['post_excerpt'] = $default_template_types[ $slug ]['description'];
+			}
+		}
+
+		wp_insert_post( $template_post );
 	} elseif ( 'auto-draft' === $post->post_status && $content !== $post->post_content ) {
 		// If the template already exists, but it was never changed by the user
 		// and the template file content changed then update the content of auto-draft.
