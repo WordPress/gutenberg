@@ -67,13 +67,10 @@ const extractSupportKeys = ( supports, metadata ) => {
 	return supportKeys;
 };
 
-const useContextsFromBlockMetadata = ( metadata ) => {
+const getContexts = ( blockTypes, metadata ) => {
 	const contexts = {};
 
 	// Add contexts from block metadata.
-	const blockTypes = useSelect( ( select ) =>
-		select( 'core/blocks' ).getBlockTypes()
-	);
 	blockTypes.forEach( ( blockType ) => {
 		const blockName = blockType.name;
 		const blockSelector = blockType?.supports?.__experimentalSelector;
@@ -120,7 +117,15 @@ export default function GlobalStylesProvider( {
 	metadata,
 } ) {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
-	const contexts = useContextsFromBlockMetadata( metadata );
+	const { blockTypes, settings } = useSelect( ( select ) => {
+		return {
+			blockTypes: select( 'core/blocks' ).getBlockTypes(),
+			settings: select( 'core/edit-site' ).getSettings(),
+		};
+	} );
+	const { updateSettings } = useDispatch( 'core/edit-site' );
+
+	const contexts = getContexts( blockTypes, metadata );
 
 	const { userStyles, mergedStyles } = useMemo( () => {
 		const newUserStyles = content ? JSON.parse( content ) : {};
@@ -175,13 +180,8 @@ export default function GlobalStylesProvider( {
 				setContent( JSON.stringify( newContent ) );
 			},
 		} ),
-		[ contexts, content ]
+		[ content, mergedStyles ]
 	);
-
-	const settings = useSelect( ( select ) =>
-		select( 'core/edit-site' ).getSettings()
-	);
-	const { updateSettings } = useDispatch( 'core/edit-site' );
 
 	useEffect( () => {
 		const newStyles = settings.styles.filter(
@@ -201,7 +201,7 @@ export default function GlobalStylesProvider( {
 				( value ) => value?.settings || {}
 			),
 		} );
-	}, [ contexts, mergedStyles, metadata ] );
+	}, [ mergedStyles ] );
 
 	return (
 		<GlobalStylesContext.Provider value={ nextValue }>
