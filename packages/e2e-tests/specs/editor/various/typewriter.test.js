@@ -3,6 +3,14 @@
  */
 import { createNewPost } from '@wordpress/e2e-test-utils';
 
+async function waitForTheTypewriterEffectToTrigger() {
+	// Wait for the browser to be idle
+	// the typewriter effect uses the same delay.
+	await page.waitForFunction( () => {
+		return new Promise( window.requestAnimationFrame );
+	} );
+}
+
 describe( 'TypeWriter', () => {
 	beforeEach( async () => {
 		await createNewPost();
@@ -47,6 +55,8 @@ describe( 'TypeWriter', () => {
 		// Now the scroll position should be maintained.
 		await page.keyboard.press( 'Enter' );
 
+		await waitForTheTypewriterEffectToTrigger();
+
 		expect( await getDiff( newPosition ) ).toBeLessThanOrEqual( BUFFER );
 
 		// Type until the text wraps.
@@ -63,11 +73,15 @@ describe( 'TypeWriter', () => {
 			await page.keyboard.type( 'a' );
 		}
 
+		await waitForTheTypewriterEffectToTrigger();
+
 		expect( await getDiff( newPosition ) ).toBeLessThanOrEqual( BUFFER );
 
 		// Pressing backspace will reposition the caret to the previous line.
 		// Scroll position should be adjusted again.
 		await page.keyboard.press( 'Backspace' );
+
+		await waitForTheTypewriterEffectToTrigger();
 
 		expect( await getDiff( newPosition ) ).toBeLessThanOrEqual( BUFFER );
 
@@ -80,6 +94,8 @@ describe( 'TypeWriter', () => {
 
 		// Should be scrolled to new position.
 		await page.keyboard.press( 'Enter' );
+
+		await waitForTheTypewriterEffectToTrigger();
 
 		expect( await getDiff( positionAfterArrowUp ) ).toBeLessThanOrEqual(
 			BUFFER
@@ -111,6 +127,8 @@ describe( 'TypeWriter', () => {
 		// Should maintain scroll position.
 		await page.keyboard.press( 'Enter' );
 
+		await waitForTheTypewriterEffectToTrigger();
+
 		expect( await getDiff( initialPosition ) ).toBeLessThanOrEqual(
 			BUFFER
 		);
@@ -131,6 +149,8 @@ describe( 'TypeWriter', () => {
 
 		// Should maintain scroll position.
 		await page.keyboard.press( 'Enter' );
+
+		await waitForTheTypewriterEffectToTrigger();
 
 		expect( await getDiff( initialPosition ) ).toBeLessThanOrEqual(
 			BUFFER
@@ -186,6 +206,8 @@ describe( 'TypeWriter', () => {
 		// Should maintain new caret position.
 		await page.keyboard.press( 'Enter' );
 
+		await waitForTheTypewriterEffectToTrigger();
+
 		expect( await getDiff( newBottomPosition ) ).toBeLessThanOrEqual(
 			BUFFER
 		);
@@ -215,6 +237,8 @@ describe( 'TypeWriter', () => {
 
 		// Should maintain new caret position.
 		await page.keyboard.press( 'Enter' );
+
+		await waitForTheTypewriterEffectToTrigger();
 
 		expect( await getDiff( newTopPosition ) ).toBeLessThanOrEqual( BUFFER );
 	} );
