@@ -61,7 +61,8 @@ export function getAnimateClassName( options ) {
 export default function Animate( { type, options = {}, children } ) {
 	deprecated( 'Animate component', {
 		version: '9.6',
-		alternative: 'useAnimate hook',
+		alternative: 'getAnimateClassName',
+		hint: '`<AnimatedComponent className={ getAnimateClassName() } />`',
 	} );
 	return children( {
 		className: getAnimateClassName( { type, ...options } ),
