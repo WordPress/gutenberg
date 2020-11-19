@@ -19,7 +19,7 @@ import {
 	BlockControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import {store as reusableBlocksStore} from '@wordpress/reusable-blocks';
+import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
@@ -72,7 +72,7 @@ export default function ReusableBlockEdit( {
 
 	const {
 		__experimentalConvertBlockToStatic: convertBlockToStatic,
-	} = useDispatch( 'core/reusable-blocks' );
+	} = useDispatch( reusableBlocksStore );
 
 	const { createSuccessNotice, createErrorNotice } = useDispatch(
 		'core/notices'
