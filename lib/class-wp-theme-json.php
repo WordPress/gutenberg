@@ -302,6 +302,22 @@ class WP_Theme_JSON {
 			'theme_json' => array( 'typography', 'lineHeight' ),
 			'block_json' => array( 'lineHeight' ),
 		),
+		'paddingBottom'            => array(
+			'theme_json' => array( 'spacing', 'padding', 'bottom' ),
+			'block_json' => array( 'spacing', 'padding' ),
+		),
+		'paddingLeft'              => array(
+			'theme_json' => array( 'spacing', 'padding', 'left' ),
+			'block_json' => array( 'spacing', 'padding' ),
+		),
+		'paddingRight'             => array(
+			'theme_json' => array( 'spacing', 'padding', 'right' ),
+			'block_json' => array( 'spacing', 'padding' ),
+		),
+		'paddingTop'               => array(
+			'theme_json' => array( 'spacing', 'padding', 'top' ),
+			'block_json' => array( 'spacing', 'padding' ),
+		),
 		'textDecoration'           => array(
 			'theme_json' => array( 'typography', 'textDecoration' ),
 			'block_json' => array( '__experimentalTextDecoration' ),
@@ -942,6 +958,15 @@ class WP_Theme_JSON {
 	 */
 	public function get_raw_data() {
 		return $this->contexts;
+	}
+
+	/**
+	 * Returns the necessary metadata for the client.
+	 *
+	 * @return array
+	 */
+	public function get_metadata() {
+		return self::PROPERTIES_METADATA;
 	}
 
 }
