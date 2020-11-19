@@ -401,18 +401,22 @@ class WP_Theme_JSON {
 			array( self::GLOBAL_TYPE => new WP_Block_Type( self::GLOBAL_TYPE, self::GLOBAL_ARGS ) )
 		);
 		foreach ( $blocks as $block_name => $block_type ) {
+			/*
+			 * Skips blocks that don't declare support,
+			 * they don't generate styles.
+			 */
 			if (
 				! property_exists( $block_type, 'supports' ) ||
-				empty( $block_type->supports ) ||
-				! is_array( $block_type->supports ) ) {
-
-				// Skips blocks that don't declare support.
-				//
-				// TODO: what if there are blocks that don't support
-				// any style but still need the settings passed down?
+				! is_array( $block_type->supports ) ||
+				empty( $block_type->supports )
+			) {
 				continue;
 			}
 
+			/*
+			 * Extract block supports: only those
+			 * related to the style properties.
+			 */
 			$block_supports = array();
 			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
 				if ( gutenberg_experimental_get( $block_type->supports, $metadata['block_json'] ) ) {
@@ -446,34 +450,25 @@ class WP_Theme_JSON {
 				self::$blocks_metadata[ $block_name ] = array(
 					'selector'  => $block_type->supports['__experimentalSelector'],
 					'supports'  => $block_supports,
-					'blockName' => $block_name,
 				);
 			} elseif (
 				isset( $block_type->supports['__experimentalSelector'] ) &&
 				is_array( $block_type->supports['__experimentalSelector'] )
 			) {
 				foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector_metadata ) {
-					if (
-						! isset( $selector_metadata['selector'] ) ||
-						! isset( $selector_metadata['attributes'] ) ||
-						! isset( $selector_metadata['title'] )
-					) {
+					if ( ! isset( $selector_metadata['selector'] ) ) {
 						continue;
 					}
 
 					self::$blocks_metadata[ $key ] = array(
-						'selector'   => $selector_metadata['selector'],
-						'title'      => $selector_metadata['title'],
-						'supports'   => $block_supports,
-						'blockName'  => $block_name,
-						'attributes' => $selector_metadata['attributes'],
+						'selector' => $selector_metadata['selector'],
+						'supports' => $block_supports,
 					);
 				}
 			} else {
 				self::$blocks_metadata[ $block_name ] = array(
 					'selector'  => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
 					'supports'  => $block_supports,
-					'blockName' => $block_name,
 				);
 			}
 		}
