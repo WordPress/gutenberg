@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import { isEqual, isEmpty, find, concat, differenceBy, some } from 'lodash';
+import {
+	isEqual,
+	isEmpty,
+	find,
+	concat,
+	differenceBy,
+	some,
+	every,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -144,12 +152,18 @@ function GalleryEdit( props ) {
 			}
 
 			const getMedia = select( 'core' ).getMedia;
-			return innerBlockImages.map( ( imageBlock ) => {
+			const newImageData = innerBlockImages.map( ( imageBlock ) => {
 				return {
 					id: imageBlock.attributes.id,
 					data: getMedia( imageBlock.attributes.id ),
 				};
 			} );
+
+			if ( every( newImageData, ( img ) => img.data ) ) {
+				return newImageData;
+			}
+
+			return imageData;
 		},
 		[ innerBlockImages ]
 	);
