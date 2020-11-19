@@ -58,9 +58,48 @@ export const useGlobalStylesReset = () => {
 	];
 };
 
+const useContextsFromBlockMetadata = () => {
+	const blockTypes = useSelect( ( select ) =>
+		select( 'core/blocks' ).getBlockTypes()
+	);
+	const contexts = {};
+	blockTypes.forEach( ( blockType ) => {
+		if ( typeof blockType?.supports?.__experimentalSelector === 'string' ) {
+			contexts[ blockType.name ] = {
+				selector: blockType.supports.__experimentalSelector,
+				supports: blockType.supports,
+				blockName: blockType.name,
+			};
+		} else if (
+			typeof blockType?.supports?.__experimentalSelector === 'object'
+		) {
+			const selectors = blockType.supports.__experimentalSelector;
+			Object.keys( selectors ).forEach( ( key ) => {
+				contexts[ key ] = {
+					selector: selectors[ key ].selector,
+					supports: blockType.supports,
+					blockName: blockType.name,
+					title: selectors[ key ].title,
+					attributes: selectors[ key ].attributes,
+				};
+			} );
+		} else if ( blockType?.supports ) {
+			const contextName = blockType.name
+				.replace( 'core/', '' )
+				.replace( '/', '-' );
+			contexts[ blockType.name ] = {
+				selector: '.wp-block-' + contextName,
+				supports: blockType.supports,
+				blockName: blockType.name,
+			};
+		}
+	} );
+	return contexts;
+};
+
 export default function GlobalStylesProvider( { children, baseStyles } ) {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
-	const contexts = [];
+	const contexts = useContextsFromBlockMetadata();
 
 	const { userStyles, mergedStyles } = useMemo( () => {
 		const newUserStyles = content ? JSON.parse( content ) : {};
