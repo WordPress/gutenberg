@@ -52,15 +52,16 @@ export function useDropZone( {
 		isRelative,
 	] );
 
+	const { x, y, ...remainingState } = state;
+	let position = null;
+
+	if ( x !== null && y !== null ) {
+		position = { x, y };
+	}
+
 	return {
-		...state,
-		position:
-			state.x && state.y
-				? {
-						x: state.x,
-						y: state.y,
-				  }
-				: null,
+		...remainingState,
+		position,
 	};
 }
 
