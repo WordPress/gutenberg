@@ -18,10 +18,11 @@ describe( 'atoms', () => {
 		const listener = jest.fn();
 		registry.subscribe( count, listener );
 		expect( registry.get( count ) ).toEqual( 1 );
-		registry.set( count, 2 ); // listener called once
+		registry.set( count, 2 );
+		expect( listener ).toHaveBeenCalledTimes( 1 );
 		expect( registry.get( count ) ).toEqual( 2 );
-		registry.set( count, 3 ); // listener called once
-		expect( registry.get( count ) ).toEqual( 3 );
+		registry.set( count, 3 );
 		expect( listener ).toHaveBeenCalledTimes( 2 );
+		expect( registry.get( count ) ).toEqual( 3 );
 	} );
 } );

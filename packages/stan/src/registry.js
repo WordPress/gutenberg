@@ -34,14 +34,11 @@ import { noop, isObject } from 'lodash';
  * @return {boolean} maybeAtomFamilyItem is WPAtomFamilyItem<T>.
  */
 export function isAtomFamilyItem( maybeAtomFamilyItem ) {
-	if (
+	return (
 		isObject( maybeAtomFamilyItem ) &&
 		/** @type {WPAtomFamilyItem<any>} */ ( maybeAtomFamilyItem ).type ===
 			'family'
-	) {
-		return true;
-	}
-	return false;
+	);
 }
 
 /**
@@ -59,7 +56,7 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 	/**
 	 * @template T
 	 * @param {WPAtom<T>|WPAtomFamilyItem<T>} atom Atom.
-	 * @return {WPAtomState<T>} Atom state;
+	 * @return {WPAtomState<T>} Atom state.
 	 */
 	const getAtomState = ( atom ) => {
 		if ( isAtomFamilyItem( atom ) ) {

@@ -8,7 +8,7 @@
  * Creates a basic atom.
  *
  * @template T
- * @param {T}                                     initialValue Initial Value in the atom. *
+ * @param {T}                   initialValue Initial value in the atom. *
  * @param {WPCommonAtomConfig=} config       Common Atom config.
  * @return {WPAtom<T>} Createtd atom.
  */

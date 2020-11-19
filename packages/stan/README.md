@@ -136,7 +136,7 @@ Creates a basic atom.
 
 _Parameters_
 
--   _initialValue_ `T`: Initial Value in the atom. \*
+-   _initialValue_ `T`: Initial value in the atom. \*
 -   _config_ `[WPCommonAtomConfig]`: Common Atom config.
 
 _Returns_

@@ -13,7 +13,7 @@
  * @param {(listener: () => void) => (() => void)} subscribe Subscribe to state changes.
  * @param {() => T}                                get       Get the state value.
  * @param {(action: any) => void}                  dispatch  Dispatch store changes,
- * @param {WPCommonAtomConfig=}  config    Common Atom config.
+ * @param {WPCommonAtomConfig=}                    config    Common Atom config.
  * @return {WPAtom<T>} Store Atom.
  */
 export const createStoreAtom = (
