@@ -88,18 +88,33 @@ describe( 'DOM', () => {
 
 	describe( 'placeCaretAtHorizontalEdge', () => {
 		describe( 'when provided an input', () => {
-			it( 'should place caret at the start of the input', () => {
-				const input = document.createElement( 'input' );
-				input.value = 'value';
-				placeCaretAtHorizontalEdge( input, true );
-				expect( isHorizontalEdge( input, false ) ).toBe( true );
+			describe( 'and the input type supports setting a selection range', () => {
+				it( 'should place caret at the start of the input', () => {
+					const input = document.createElement( 'input' );
+					input.type = 'text';
+					input.value = 'value';
+					placeCaretAtHorizontalEdge( input, true );
+					expect( isHorizontalEdge( input, false ) ).toBe( true );
+				} );
+
+				it( 'should place caret at the end of the input', () => {
+					const input = document.createElement( 'input' );
+					input.type = 'text';
+					input.value = 'value';
+					placeCaretAtHorizontalEdge( input, false );
+					expect( isHorizontalEdge( input, true ) ).toBe( true );
+				} );
 			} );
 
-			it( 'should place caret at the end of the input', () => {
-				const input = document.createElement( 'input' );
-				input.value = 'value';
-				placeCaretAtHorizontalEdge( input, false );
-				expect( isHorizontalEdge( input, true ) ).toBe( true );
+			describe( 'and the input does not support setting a selection range', () => {
+				it( 'does not error', () => {
+					const input = document.createElement( 'input' );
+					input.type = 'time';
+					input.value = 'value';
+					expect( () =>
+						placeCaretAtHorizontalEdge( input, true )
+					).not.toThrow();
+				} );
 			} );
 		} );
 
