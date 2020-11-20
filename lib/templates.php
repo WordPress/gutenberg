@@ -209,6 +209,7 @@ function gutenberg_filter_template_list_table_columns( array $columns ) {
 	return $columns;
 }
 add_filter( 'manage_wp_template_posts_columns', 'gutenberg_filter_template_list_table_columns' );
+add_filter( 'manage_wp_template_part_posts_columns', 'gutenberg_filter_template_list_table_columns' );
 
 /**
  * Renders column content for the 'wp_template' post type list table.
@@ -223,7 +224,7 @@ function gutenberg_render_template_list_table_column( $column_name, $post_id ) {
 		return;
 	}
 
-	if ( 'description' === $column_name ) {
+	if ( 'description' === $column_name && has_excerpt( $post_id ) ) {
 		the_excerpt( $post_id );
 		return;
 	}
@@ -259,6 +260,7 @@ function gutenberg_render_template_list_table_column( $column_name, $post_id ) {
 	}
 }
 add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_template_list_table_column', 10, 2 );
+add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_template_list_table_column', 10, 2 );
 
 /**
  * Adds the auto-draft view to the 'wp_template' post type list.
@@ -266,9 +268,10 @@ add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_template
  * @param array $views The edit views to filter.
  */
 function gutenberg_filter_templates_edit_views( $views ) {
+	$post_type = get_current_screen()->post_type;
 	$url                = add_query_arg(
 		array(
-			'post_type'   => 'wp_template',
+			'post_type'   => $post_type,
 			'post_status' => 'auto-draft',
 		),
 		'edit.php'
@@ -276,7 +279,7 @@ function gutenberg_filter_templates_edit_views( $views ) {
 	$is_auto_draft_view = isset( $_REQUEST['post_status'] ) && 'auto-draft' === $_REQUEST['post_status'];
 	$class_html         = $is_auto_draft_view ? ' class="current"' : '';
 	$aria_current       = $is_auto_draft_view ? ' aria-current="page"' : '';
-	$post_count         = wp_count_posts( 'wp_template', 'readable' );
+	$post_count         = wp_count_posts( $post_type, 'readable' );
 	$label              = sprintf(
 		// The auto-draft status doesn't have localized labels.
 		translate_nooped_plural(
@@ -305,6 +308,7 @@ function gutenberg_filter_templates_edit_views( $views ) {
 	return $views;
 }
 add_filter( 'views_edit-wp_template', 'gutenberg_filter_templates_edit_views' );
+add_filter( 'views_edit-wp_template_part', 'gutenberg_filter_templates_edit_views' );
 
 /**
  * Filter for adding a `resolved` parameter to `wp_template` queries.
