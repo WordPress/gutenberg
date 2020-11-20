@@ -20,7 +20,7 @@ import { createDerivedAtom } from '@wordpress/stan';
  */
 /**
  * @template T
- * @typedef {import('@wordpress/stan/src/types').WPAtomFamilyItem<T>} WPAtomFamilyItem
+ * @typedef {import('@wordpress/stan/src/types').WPAtomSelector<T>} WPAtomSelector
  */
 
 /**
@@ -38,9 +38,9 @@ export default function createAtomicStore( name, config ) {
 					const get = registry.__internalGetAtomResolver()
 						? registry.__internalGetAtomResolver()
 						: (
-								/** @type {WPAtom<any>|WPAtomFamilyItem<any>} **/ atom
+								/** @type {WPAtom<any>|WPAtomSelector<any>} **/ atom
 						  ) => registry.__internalGetAtomRegistry().get( atom );
-					return atomSelector( ...args )( { get } );
+					return get( atomSelector( ...args ) );
 				};
 			} );
 

@@ -11,11 +11,12 @@ import {
 	shortcutAriaLabel,
 	rawShortcut,
 } from '@wordpress/keycodes';
+import { createAtomSelector } from '@wordpress/stan';
 
 /**
  * Internal dependencies
  */
-import { shortcutsAtom, shortcutsByNameFamily } from './atoms';
+import { shortcutsAtom, shortcutsByNameAtom } from './atoms';
 
 /** @typedef {import('./actions').WPShortcutKeyCombination} WPShortcutKeyCombination */
 
@@ -69,9 +70,9 @@ function getKeyCombinationRepresentation( shortcut, representation ) {
  * @param {string}   name Shortcut name.
  * @return {WPShortcutKeyCombination?} Key combination.
  */
-const getShortcut = ( name ) => ( { get } ) => {
-	return get( shortcutsByNameFamily( name ) );
-};
+const getShortcut = createAtomSelector( ( name ) => ( { get } ) => {
+	return get( shortcutsByNameAtom )[ name ];
+} );
 
 /**
  * Returns the main key combination for a given shortcut name.
@@ -79,10 +80,12 @@ const getShortcut = ( name ) => ( { get } ) => {
  * @param {string}   name Shortcut name.
  * @return {WPShortcutKeyCombination?} Key combination.
  */
-export const getShortcutKeyCombination = ( name ) => ( { get } ) => {
-	const shortcut = getShortcut( name )( { get } );
-	return shortcut ? shortcut.keyCombination : null;
-};
+export const getShortcutKeyCombination = createAtomSelector(
+	( name ) => ( { get } ) => {
+		const shortcut = get( getShortcut( name ) );
+		return shortcut ? shortcut.keyCombination : null;
+	}
+);
 
 /**
  * Returns a string representing the main key combination for a given shortcut name.
@@ -93,13 +96,12 @@ export const getShortcutKeyCombination = ( name ) => ( { get } ) => {
  *
  * @return {string?} Shortcut representation.
  */
-export const getShortcutRepresentation = (
-	name,
-	representation = 'display'
-) => ( { get } ) => {
-	const shortcut = getShortcutKeyCombination( name )( { get } );
-	return getKeyCombinationRepresentation( shortcut, representation );
-};
+export const getShortcutRepresentation = createAtomSelector(
+	( name, representation = 'display' ) => ( { get } ) => {
+		const shortcut = get( getShortcutKeyCombination( name ) );
+		return getKeyCombinationRepresentation( shortcut, representation );
+	}
+);
 
 /**
  * Returns the shortcut description given its name.
@@ -108,10 +110,12 @@ export const getShortcutRepresentation = (
  *
  * @return {string?} Shortcut description.
  */
-export const getShortcutDescription = ( name ) => ( { get } ) => {
-	const shortcut = getShortcut( name )( { get } );
-	return shortcut ? shortcut.description : null;
-};
+export const getShortcutDescription = createAtomSelector(
+	( name ) => ( { get } ) => {
+		const shortcut = get( getShortcut( name ) );
+		return shortcut ? shortcut.description : null;
+	}
+);
 
 /**
  * Returns the aliases for a given shortcut name.
@@ -120,10 +124,12 @@ export const getShortcutDescription = ( name ) => ( { get } ) => {
  *
  * @return {WPShortcutKeyCombination[]} Key combinations.
  */
-export const getShortcutAliases = ( name ) => ( { get } ) => {
-	const shortcut = getShortcut( name )( { get } );
-	return shortcut && shortcut.aliases ? shortcut.aliases : EMPTY_ARRAY;
-};
+export const getShortcutAliases = createAtomSelector(
+	( name ) => ( { get } ) => {
+		const shortcut = get( getShortcut( name ) );
+		return shortcut && shortcut.aliases ? shortcut.aliases : EMPTY_ARRAY;
+	}
+);
 
 /**
  * Returns the raw representation of all the keyboard combinations of a given shortcut name.
@@ -132,17 +138,19 @@ export const getShortcutAliases = ( name ) => ( { get } ) => {
  *
  * @return {string[]} Shortcuts.
  */
-export const getAllShortcutRawKeyCombinations = ( name ) => ( { get } ) => {
-	return compact( [
-		getKeyCombinationRepresentation(
-			getShortcutKeyCombination( name )( { get } ),
-			'raw'
-		),
-		...getShortcutAliases( name )( { get } ).map( ( combination ) =>
-			getKeyCombinationRepresentation( combination, 'raw' )
-		),
-	] );
-};
+export const getAllShortcutRawKeyCombinations = createAtomSelector(
+	( name ) => ( { get } ) => {
+		return compact( [
+			getKeyCombinationRepresentation(
+				get( getShortcutKeyCombination( name ) ),
+				'raw'
+			),
+			...get( getShortcutAliases( name ) ).map( ( combination ) =>
+				getKeyCombinationRepresentation( combination, 'raw' )
+			),
+		] );
+	}
+);
 
 /**
  * Returns the shortcut names list for a given category name.
@@ -151,8 +159,10 @@ export const getAllShortcutRawKeyCombinations = ( name ) => ( { get } ) => {
  *
  * @return {string[]} Shortcut names.
  */
-export const getCategoryShortcuts = ( categoryName ) => ( { get } ) => {
-	return ( get( shortcutsAtom ) || [] )
-		.filter( ( shortcut ) => shortcut.category === categoryName )
-		.map( ( { name } ) => name );
-};
+export const getCategoryShortcuts = createAtomSelector(
+	( categoryName ) => ( { get } ) => {
+		return ( get( shortcutsAtom ) || [] )
+			.filter( ( shortcut ) => shortcut.category === categoryName )
+			.map( ( { name } ) => name );
+	}
+);

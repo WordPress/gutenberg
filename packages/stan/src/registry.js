@@ -2,11 +2,13 @@
  * External dependencies
  */
 import { noop, isObject } from 'lodash';
+// @ts-ignore
+import EquivalentKeyMap from 'equivalent-key-map';
 
 /** @typedef {import('./types').WPAtomRegistry} WPAtomRegistry */
 /**
  * @template T
- * @typedef {import("./types").WPAtomFamilyResolver<T>} WPAtomFamilyResolver
+ * @typedef {import("./types").WPAtomSelectorResolver<T>} WPAtomSelectorResolver
  */
 /**
  * @template T
@@ -18,11 +20,11 @@ import { noop, isObject } from 'lodash';
  */
 /**
  * @template T
- * @typedef {import("./types").WPAtomFamilyItem<T>} WPAtomFamilyItem
+ * @typedef {import("./types").WPAtomSelector<T>} WPAtomSelector
  */
 /**
  * @template T
- * @typedef {import("./types").WPAtomFamilyConfig<T>} WPAtomFamilyConfig
+ * @typedef {import("./types").WPAtomSelectorConfig<T>} WPAtomSelectorConfig
  */
 /**
  * @typedef {( atomState: import('./types').WPAtomState<any> ) => void} RegistryListener
@@ -30,14 +32,14 @@ import { noop, isObject } from 'lodash';
 
 /**
  * @template T
- * @param {WPAtom<any>|WPAtomFamilyItem<T>} maybeAtomFamilyItem
- * @return {boolean} maybeAtomFamilyItem Returns `true` when atom family item detected.
+ * @param {WPAtom<any>|WPAtomSelector<T>} maybeAtomSelector
+ * @return {boolean} maybeAtomSelector Returns `true` when atom selector detected.
  */
-export function isAtomFamilyItem( maybeAtomFamilyItem ) {
+export function isAtomSelector( maybeAtomSelector ) {
 	return (
-		isObject( maybeAtomFamilyItem ) &&
-		/** @type {WPAtomFamilyItem<any>} */ ( maybeAtomFamilyItem ).type ===
-			'family'
+		isObject( maybeAtomSelector ) &&
+		/** @type {WPAtomSelector<any>} */ ( maybeAtomSelector ).type ===
+			'selector'
 	);
 }
 
@@ -51,20 +53,20 @@ export function isAtomFamilyItem( maybeAtomFamilyItem ) {
  */
 export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 	const atoms = new WeakMap();
-	const families = new WeakMap();
+	const selectors = new WeakMap();
 
 	/**
 	 * @template T
-	 * @param {WPAtom<T>|WPAtomFamilyItem<T>} atom Atom.
+	 * @param {WPAtom<T>|WPAtomSelector<T>} atom Atom.
 	 * @return {WPAtomState<T>} Atom state.
 	 */
 	const getAtomState = ( atom ) => {
-		if ( isAtomFamilyItem( atom ) ) {
+		if ( isAtomSelector( atom ) ) {
 			const {
 				config,
-				key,
-			} = /** @type {WPAtomFamilyItem<any>} */ ( atom );
-			return familyRegistry.getAtomFromFamily( config, key );
+				args,
+			} = /** @type {WPAtomSelector<any>} */ ( atom );
+			return selectorRegistry.getAtomSelector( config, args );
 		}
 
 		if ( ! atoms.get( atom ) ) {
@@ -76,39 +78,38 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 		return atoms.get( atom );
 	};
 
-	const familyRegistry = {
+	const selectorRegistry = {
 		/**
 		 * @template T
-		 * @param {WPAtomFamilyConfig<T>} atomFamilyConfig
-		 * @param {any} key
+		 * @param {WPAtomSelectorConfig<T>} atomSelectorConfig
+		 * @param {any[]} args
 		 * @return {WPAtomState<T>} Atom state.
 		 */
-		getAtomFromFamily( atomFamilyConfig, key ) {
-			if ( ! families.get( atomFamilyConfig ) ) {
-				families.set( atomFamilyConfig, new Map() );
+		getAtomSelector( atomSelectorConfig, args ) {
+			if ( ! selectors.get( atomSelectorConfig ) ) {
+				selectors.set( atomSelectorConfig, new EquivalentKeyMap() );
 			}
 
-			if ( ! families.get( atomFamilyConfig ).has( key ) ) {
-				const atomCreator = atomFamilyConfig.createAtom( key );
-				families
-					.get( atomFamilyConfig )
-					.set( key, atomCreator( registry ) );
+			const selectorsMap = selectors.get( atomSelectorConfig );
+			if ( ! selectorsMap.has( args ) ) {
+				const atomCreator = atomSelectorConfig.createAtom( ...args );
+				selectorsMap.set( args, atomCreator( registry ) );
 			}
 
-			return families.get( atomFamilyConfig ).get( key );
+			return selectorsMap.get( args );
 		},
 
 		/**
 		 * @template T
-		 * @param {WPAtomFamilyConfig<T>} atomFamilyConfig
-		 * @param {any} key
+		 * @param {WPAtomSelectorConfig<T>} atomSelectorConfig
+		 * @param {any[]} args
 		 */
-		deleteAtomFromFamily( atomFamilyConfig, key ) {
+		deleteAtomSelector( atomSelectorConfig, args ) {
 			if (
-				families.has( atomFamilyConfig ) &&
-				families.get( atomFamilyConfig ).has( key )
+				selectors.has( atomSelectorConfig ) &&
+				selectors.get( atomSelectorConfig ).has( args )
 			) {
-				families.get( atomFamilyConfig ).delete( key );
+				selectors.get( atomSelectorConfig ).delete( args );
 			}
 		},
 	};
@@ -133,12 +134,12 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 		// But the legacy selectors/actions API requires us to know when
 		// some atoms are removed entirely to unsubscribe.
 		delete( atom ) {
-			if ( isAtomFamilyItem( atom ) ) {
+			if ( isAtomSelector( atom ) ) {
 				const {
 					config,
-					key,
-				} = /** @type {WPAtomFamilyItem<any>} */ ( atom );
-				return familyRegistry.deleteAtomFromFamily( config, key );
+					args,
+				} = /** @type {WPAtomSelector<any>} */ ( atom );
+				return selectorRegistry.deleteAtomSelector( config, args );
 			}
 			const atomState = atoms.get( atom );
 			atoms.delete( atom );
