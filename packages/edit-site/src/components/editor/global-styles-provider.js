@@ -120,9 +120,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 	} );
 	const { updateSettings } = useDispatch( 'core/edit-site' );
 
-	const contexts = useMemo( () => {
-		getContexts( blockTypes );
-	}, [ blockTypes ] );
+	const contexts = useMemo( () => getContexts( blockTypes ), [ blockTypes ] );
 
 	const { userStyles, mergedStyles } = useMemo( () => {
 		const newUserStyles = content ? JSON.parse( content ) : {};
