@@ -35,7 +35,7 @@ const resolveQueue = createQueue();
  * @param {WPDerivedAtomResolver<T>} resolver Atom Resolver.
  * @param {WPDerivedAtomUpdater<T>}  updater  Atom updater.
  * @param {WPCommonAtomConfig=}      config   Common Atom config.
- * @return {WPAtom<T>} Createtd atom.
+ * @return {WPAtom<T>} Created atom.
  */
 export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 	registry
