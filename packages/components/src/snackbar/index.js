@@ -71,7 +71,7 @@ function Snackbar(
 		event.stopPropagation();
 
 		onRemove();
-		
+
 		if ( onClick ) {
 			onClick( event );
 		}
