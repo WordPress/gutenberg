@@ -968,21 +968,4 @@ class WP_Theme_JSON {
 		return $this->contexts;
 	}
 
-	/**
-	 * Returns the necessary metadata for the client.
-	 *
-	 * @return array
-	 */
-	public function get_metadata() {
-		return array(
-			'properties' => self::PROPERTIES_METADATA,
-			'contexts'   => array(
-				self::GLOBAL_NAME => array(
-					'selector' => self::GLOBAL_SELECTOR,
-					'supports' => self::GLOBAL_SUPPORTS,
-				),
-			),
-		);
-	}
-
 }

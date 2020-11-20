@@ -172,7 +172,6 @@ class EditorProvider extends Component {
 				'__experimentalFeatures',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBaseStyles',
-				'__experimentalGlobalStylesMetadata',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
 				'alignWide',
