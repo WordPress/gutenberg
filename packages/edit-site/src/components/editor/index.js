@@ -107,6 +107,9 @@ function Editor() {
 	const { editEntityRecord } = useDispatch( 'core' );
 	const { updateEditorSettings } = useDispatch( 'core/editor' );
 	const { setPage, setIsInserterOpened } = useDispatch( 'core/edit-site' );
+	const { updateDefaultTemplateTypes } = useDispatch(
+		'core/full-site-editing'
+	);
 
 	// Keep the defaultTemplateTypes in the core/editor settings too,
 	// so that they can be selected with core/editor selectors in any editor.
@@ -115,6 +118,9 @@ function Editor() {
 	const { defaultTemplateTypes } = settings;
 	useEffect( () => {
 		updateEditorSettings( { defaultTemplateTypes } );
+	}, [ defaultTemplateTypes ] );
+	useEffect( () => {
+		updateDefaultTemplateTypes( defaultTemplateTypes );
 	}, [ defaultTemplateTypes ] );
 
 	const inlineStyles = useResizeCanvas( deviceType );
