@@ -48,7 +48,7 @@ class WP_Theme_JSON {
 	 */
 	const GLOBAL_ARGS = array(
 		'supports' => array(
-			'__experimentalFontAppearance' => false,
+			'__experimentalFontAppearance' => true,
 			'__experimentalFontFamily'     => true,
 			'__experimentalSelector'       => self::GLOBAL_SELECTOR,
 			'__experimentalTextDecoration' => true,
@@ -882,7 +882,7 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Returs the stylesheet that results of processing
+	 * Returns the stylesheet that results of processing
 	 * the theme.json structure this object represents.
 	 *
 	 * @return string Stylesheet.
