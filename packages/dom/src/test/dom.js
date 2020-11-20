@@ -87,18 +87,36 @@ describe( 'DOM', () => {
 	} );
 
 	describe( 'placeCaretAtHorizontalEdge', () => {
-		it( 'should place caret at the start of the input', () => {
-			const input = document.createElement( 'input' );
-			input.value = 'value';
-			placeCaretAtHorizontalEdge( input, true );
-			expect( isHorizontalEdge( input, false ) ).toBe( true );
+		describe( 'when provided an input', () => {
+			it( 'should place caret at the start of the input', () => {
+				const input = document.createElement( 'input' );
+				input.value = 'value';
+				placeCaretAtHorizontalEdge( input, true );
+				expect( isHorizontalEdge( input, false ) ).toBe( true );
+			} );
+
+			it( 'should place caret at the end of the input', () => {
+				const input = document.createElement( 'input' );
+				input.value = 'value';
+				placeCaretAtHorizontalEdge( input, false );
+				expect( isHorizontalEdge( input, true ) ).toBe( true );
+			} );
 		} );
 
-		it( 'should place caret at the end of the input', () => {
-			const input = document.createElement( 'input' );
-			input.value = 'value';
-			placeCaretAtHorizontalEdge( input, false );
-			expect( isHorizontalEdge( input, true ) ).toBe( true );
+		describe( 'when provided a text area', () => {
+			it( 'should place caret at the start of the input', () => {
+				const textarea = document.createElement( 'textarea' );
+				textarea.value = 'value';
+				placeCaretAtHorizontalEdge( textarea, true );
+				expect( isHorizontalEdge( textarea, false ) ).toBe( true );
+			} );
+
+			it( 'should place caret at the end of the input', () => {
+				const textarea = document.createElement( 'textarea' );
+				textarea.value = 'value';
+				placeCaretAtHorizontalEdge( textarea, false );
+				expect( isHorizontalEdge( textarea, true ) ).toBe( true );
+			} );
 		} );
 	} );
 
