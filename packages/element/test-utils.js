@@ -1,3 +1,3 @@
 'use strict';
 
-module.exports = require( './test-utils/' );
+module.exports = require( 'react-dom/test-utils' );
