@@ -94,7 +94,7 @@ console.log( registry.get( sum ) ); // prints 3.
 // If the atom has no subscriber, it will only attempt a resolution when initially read. 
 // But it won't bother refreshing its value, if any of its dependencies change.
 // This property (laziness) is important for performance reasons.
-sumInstance.subscribe( () => {
+registry.subscribe( sum, () => {
     console.log( registry.get( sum ) );
 } );
 
