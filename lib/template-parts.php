@@ -104,6 +104,11 @@ function gutenberg_fix_template_part_admin_menu_entry() {
 }
 add_action( 'admin_menu', 'gutenberg_fix_template_part_admin_menu_entry' );
 
+// Customize the `wp_template` admin list.
+add_filter( 'manage_wp_template_part_posts_columns', 'gutenberg_templates_lists_custom_columns' );
+add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_templates_lists_custom_column', 10, 2 );
+add_filter( 'views_edit-wp_template_part', 'gutenberg_filter_templates_edit_views' );
+
 /**
  * Filter for adding and a `theme` parameter to `wp_template_part` queries.
  *
