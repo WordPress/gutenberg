@@ -53,8 +53,6 @@ class WP_Theme_JSON {
 		'color',
 		'fontFamily',
 		'fontSize',
-		'fontStyle',
-		'fontWeight',
 		'lineHeight',
 		'textDecoration',
 		'textTransform',
