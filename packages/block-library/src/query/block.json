@@ -22,11 +22,18 @@
 				"exclude": [],
 				"sticky": ""
 			}
+		},
+		"layout": {
+			"type": "object",
+			"default": {
+				"type": "list"
+			}
 		}
 	},
 	"providesContext": {
 		"queryId": "queryId",
-		"query": "query"
+		"query": "query",
+		"layout": "layout"
 	},
 	"usesContext": [
 		"postId"
