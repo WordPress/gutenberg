@@ -8,7 +8,27 @@ import { get, find, camelCase, isString } from 'lodash';
 import { useSelect } from '@wordpress/data';
 
 /* Supporting data */
-export const GLOBAL_CONTEXT = 'global';
+export const GLOBAL_CONTEXT_NAME = 'global';
+export const GLOBAL_CONTEXT_SELECTOR = ':root';
+export const GLOBAL_CONTEXT = {
+	[ GLOBAL_CONTEXT_NAME ]: {
+		selector: GLOBAL_CONTEXT_SELECTOR,
+		supports: [
+			'--wp--style--color--link',
+			'background',
+			'backgroundColor',
+			'color',
+			'fontFamily',
+			'fontSize',
+			'fontStyle',
+			'fontWeight',
+			'lineHeight',
+			'textDecoration',
+			'textTransform',
+		],
+	},
+};
+
 export const PRESET_CATEGORIES = {
 	color: { path: [ 'color', 'palette' ], key: 'color' },
 	gradient: { path: [ 'color', 'gradients' ], key: 'gradient' },
@@ -37,7 +57,10 @@ export const PRESET_CLASSES = {
 export const LINK_COLOR = '--wp--style--color--link';
 export const LINK_COLOR_DECLARATION = `a { color: var(${ LINK_COLOR }, #00e); }`;
 
-export function useEditorFeature( featurePath, blockName = GLOBAL_CONTEXT ) {
+export function useEditorFeature(
+	featurePath,
+	blockName = GLOBAL_CONTEXT_NAME
+) {
 	const settings = useSelect( ( select ) => {
 		return select( 'core/edit-site' ).getSettings();
 	} );
@@ -48,7 +71,7 @@ export function useEditorFeature( featurePath, blockName = GLOBAL_CONTEXT ) {
 		) ??
 		get(
 			settings,
-			`__experimentalFeatures.${ GLOBAL_CONTEXT }.${ featurePath }`
+			`__experimentalFeatures.${ GLOBAL_CONTEXT_NAME }.${ featurePath }`
 		)
 	);
 }
@@ -79,7 +102,7 @@ function getValueFromPresetVariable(
 	}
 	const presets =
 		get( features, [ blockName, ...presetData.path ] ) ??
-		get( features, [ GLOBAL_CONTEXT, ...presetData.path ] );
+		get( features, [ GLOBAL_CONTEXT_NAME, ...presetData.path ] );
 	if ( ! presets ) {
 		return;
 	}
@@ -96,7 +119,7 @@ function getValueFromPresetVariable(
 function getValueFromCustomVariable( features, blockName, path ) {
 	const result =
 		get( features, [ blockName, 'custom', ...path ] ) ??
-		get( features, [ GLOBAL_CONTEXT, 'custom', ...path ] );
+		get( features, [ GLOBAL_CONTEXT_NAME, 'custom', ...path ] );
 	// A variable may reference another variable so we need recursion until we find the value.
 	return getValueFromVariable( features, blockName, result ) || result;
 }

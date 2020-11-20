@@ -20,6 +20,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { default as getGlobalStyles } from './global-styles-renderer';
+import { GLOBAL_CONTEXT } from './utils';
 
 const EMPTY_CONTENT = '{}';
 
@@ -68,7 +69,9 @@ const extractSupportKeys = ( supports, metadata ) => {
 };
 
 const getContexts = ( blockTypes, metadata ) => {
-	const contexts = {};
+	const result = {
+		...GLOBAL_CONTEXT,
+	};
 
 	// Add contexts from block metadata.
 	blockTypes.forEach( ( blockType ) => {
@@ -78,14 +81,14 @@ const getContexts = ( blockTypes, metadata ) => {
 		const hasSupport = supports.length > 0;
 
 		if ( hasSupport && typeof blockSelector === 'string' ) {
-			contexts[ blockName ] = {
+			result[ blockName ] = {
 				selector: blockSelector,
 				supports,
 				blockName,
 			};
 		} else if ( hasSupport && typeof blockSelector === 'object' ) {
 			Object.keys( blockSelector ).forEach( ( key ) => {
-				contexts[ key ] = {
+				result[ key ] = {
 					selector: blockSelector[ key ].selector,
 					supports,
 					blockName,
@@ -95,7 +98,7 @@ const getContexts = ( blockTypes, metadata ) => {
 			} );
 		} else if ( hasSupport ) {
 			const suffix = blockName.replace( 'core/', '' ).replace( '/', '-' );
-			contexts[ blockName ] = {
+			result[ blockName ] = {
 				selector: '.wp-block-' + suffix,
 				supports,
 				blockName,
@@ -103,12 +106,7 @@ const getContexts = ( blockTypes, metadata ) => {
 		}
 	} );
 
-	// Add contexts provided by the metadata.
-	Object.keys( metadata.contexts ).forEach( ( key ) => {
-		contexts[ key ] = metadata.contexts[ key ];
-	} );
-
-	return contexts;
+	return result;
 };
 
 export default function GlobalStylesProvider( {
