@@ -169,7 +169,7 @@ export default {
 	isEligible( { ids } ) {
 		return !! ids;
 	},
-	migrate( { images, imageCrop, linkTo, sizeSlug } ) {
+	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
 		const imageBlocks = images.map( ( image ) => {
 			return createBlock( 'core/image', {
 				id: parseInt( image.id ),
@@ -182,6 +182,8 @@ export default {
 		} );
 		return [
 			{
+				caption,
+				columns,
 				imageCrop,
 				linkTo,
 				sizeSlug,
