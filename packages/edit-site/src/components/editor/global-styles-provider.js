@@ -200,7 +200,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				( value ) => value?.settings || {}
 			),
 		} );
-	}, [ mergedStyles ] );
+	}, [ contexts, mergedStyles ] );
 
 	return (
 		<GlobalStylesContext.Provider value={ nextValue }>
