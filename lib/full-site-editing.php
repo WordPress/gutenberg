@@ -63,6 +63,12 @@ add_action( 'admin_menu', 'gutenberg_remove_legacy_pages' );
  * @param WP_Admin_Bar $wp_admin_bar The admin-bar instance.
  */
 function gutenberg_remove_legacy_adminbar_items( $wp_admin_bar ) {
+
+	// Early exit if not an FSE theme.
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
 	$wp_admin_bar->remove_node( 'customize' );
 	$wp_admin_bar->remove_node( 'customize-background' );
 	$wp_admin_bar->remove_node( 'customize-header' );
