@@ -102,8 +102,10 @@ require_once __DIR__ . '/widgets-page.php';
 
 require __DIR__ . '/compat.php';
 require __DIR__ . '/utils.php';
+require __DIR__ . '/editor-settings.php';
 
 require __DIR__ . '/full-site-editing.php';
+require __DIR__ . '/full-site-editing/default-template-types.php';
 require __DIR__ . '/templates-sync.php';
 require __DIR__ . '/templates.php';
 require __DIR__ . '/template-parts.php';

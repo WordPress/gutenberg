@@ -41,3 +41,11 @@
 	margin-left: $grid-unit-10;
 	margin-right: $grid-unit-10;
 }
+
+.hasBackgroundAppender {
+	padding-bottom: $grid-unit-30;
+}
+
+.isLastInnerBlockSelected {
+	padding-bottom: 0;
+}

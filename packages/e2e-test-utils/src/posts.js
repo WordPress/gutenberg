@@ -14,14 +14,16 @@ import { visitAdminPage } from './visit-admin-page';
  * Navigates to the post listing screen and bulk-trashes any posts which exist.
  *
  * @param {string} postType - String slug for type of post to trash.
+ * @param {string} postStatus - String status of posts to trash.
  *
  * @return {Promise} Promise resolving once posts have been trashed.
  */
-export async function trashAllPosts( postType = 'post' ) {
+export async function trashAllPosts( postType = 'post', postStatus ) {
 	await switchUserToAdmin();
 	// Visit `/wp-admin/edit.php` so we can see a list of posts and delete them.
 	const query = addQueryArgs( '', {
 		post_type: postType,
+		post_status: postStatus,
 	} ).slice( 1 );
 	await visitAdminPage( 'edit.php', query );
 

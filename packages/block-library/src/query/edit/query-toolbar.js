@@ -10,7 +10,7 @@ import {
 	__experimentalNumberControl as NumberControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { postList } from '@wordpress/icons';
+import { settings } from '@wordpress/icons';
 
 export default function QueryToolbar( { query, setQuery } ) {
 	return (
@@ -19,8 +19,8 @@ export default function QueryToolbar( { query, setQuery } ) {
 				contentClassName="block-library-query-toolbar__popover"
 				renderToggle={ ( { onToggle } ) => (
 					<ToolbarButton
-						icon={ postList }
-						label={ __( 'Query' ) }
+						icon={ settings }
+						label={ __( 'Display settings' ) }
 						onClick={ onToggle }
 					/>
 				) }

@@ -3,7 +3,6 @@
 @import "./components/block-editor/style.scss";
 @import "./components/header/style.scss";
 @import "./components/header/document-actions/style.scss";
-@import "./components/header/fullscreen-mode-close/style.scss";
 @import "./components/header/more-menu/style.scss";
 @import "./components/navigation-sidebar/navigation-toggle/style.scss";
 @import "./components/navigation-sidebar/navigation-panel/style.scss";
@@ -43,10 +42,6 @@ body.toplevel_page_gutenberg-edit-site {
 	// The WP header height changes at this breakpoint.
 	@include break-medium {
 		min-height: calc(100vh - #{$admin-bar-height});
-	}
-
-	> .components-navigate-regions {
-		height: 100%;
 	}
 
 	// Todo: Remove this rule when edit site gets support

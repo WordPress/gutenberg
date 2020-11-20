@@ -194,7 +194,7 @@ wp-env start --debug
 
 ### `wp-env start`
 
-The start command installs and initalizes the WordPress environment, which includes downloading any specified remote sources. By default, `wp-env` will not update or re-configure the environment except when the configuration file changes. Tell `wp-env` to update sources and apply the configuration options again with `wp-env start --update`. This will not overrwrite any existing content.
+The start command installs and initializes the WordPress environment, which includes downloading any specified remote sources. By default, `wp-env` will not update or re-configure the environment except when the configuration file changes. Tell `wp-env` to update sources and apply the configuration options again with `wp-env start --update`. This will not overwrite any existing content.
 
 ```sh
 wp-env start
@@ -202,7 +202,7 @@ wp-env start
 Starts WordPress for development on port 8888 (override with WP_ENV_PORT) and
 tests on port 8889 (override with WP_ENV_TESTS_PORT). The current working
 directory must be a WordPress installation, a plugin, a theme, or contain a
-.wp-env.json file. After first insall, use the '--update' flag to download updates
+.wp-env.json file. After first install, use the '--update' flag to download updates
 to mapped sources and to re-apply WordPress configuration options.
 
 Options:
@@ -235,10 +235,15 @@ Positionals:
 ```sh
 wp-env run <container> [command..]
 
-Runs an arbitrary command in one of the underlying Docker containers. For
-example, it can be useful for running wp cli commands. You can also use it to
-open shell sessions like bash and the WordPress shell in the WordPress instance.
-For example, `wp-env run cli bash` will open bash in the development WordPress
+Runs an arbitrary command in one of the underlying Docker containers. The
+"container" param should reference one of the underlying Docker services like
+"development", "tests", or "cli". To run a wp-cli command, use the "cli" or
+"tests-cli" service. You can also use this command to open shell sessions like
+bash and the WordPress shell in the WordPress instance. For example, `wp-env run
+cli bash` will open bash in the development WordPress instance. When using long
+commands with arguments and quotation marks, you need to wrap the "command"
+param in quotation marks. For example: `wp-env run tests-cli "wp post create
+--post_type=page --post_title='Test'"` will create a post on the tests WordPress
 instance.
 
 Positionals:
@@ -253,6 +258,8 @@ Options:
 
 For example:
 
+#### Displaying the users on the development instance:
+
 ```sh
 wp-env run cli wp user list
 ⠏ Running `wp user list` in 'cli'.
@@ -262,6 +269,19 @@ ID      user_login      display_name    user_email      user_registered roles
 
 ✔ Ran `wp user list` in 'cli'. (in 2s 374ms)
 ```
+
+#### Creating a post on the tests instance:
+
+```sh
+wp-env run tests-cli "wp post create --post_type=page --post_title='Ready'"
+
+ℹ Starting 'wp post create --post_type=page --post_title='Ready'' on the tests-cli container.
+
+Success: Created post 5.
+✔ Ran `wp post create --post_type=page --post_title='Ready'` in 'tests-cli'. (in 3s 293ms)
+```
+
+#### Opening the WordPress shell on the tests instance and running PHP commands:
 
 ```sh
 wp-env run tests-cli wp shell
@@ -355,9 +375,9 @@ Additionally, the key `env` is available to override any of the above options on
 
 On the development instance, `cwd` will be mapped as a plugin, `one-theme` will be mapped as a theme, KEY_1 will be set to true, and KEY_2 will be set to false. Also note that the default port, 8888, will be used as well.
 
-On the tests instance, `cwd` is still mapped as a plugin, but no theme is mapped. Additionaly, while KEY_2 is still set to false, KEY_1 is overriden and set to false. 3000 overrides the default port as well.
+On the tests instance, `cwd` is still mapped as a plugin, but no theme is mapped. Additionally, while KEY_2 is still set to false, KEY_1 is overridden and set to false. 3000 overrides the default port as well.
 
-This gives you a lot of power to change the options appliciable to each environment.
+This gives you a lot of power to change the options applicable to each environment.
 
 ## .wp-env.override.json
 

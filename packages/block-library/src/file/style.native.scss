@@ -4,8 +4,16 @@
 	border-width: $border-width;
 	margin-top: $grid-unit-20;
 	background-color: $button-fallback-bg;
+}
+
+.buttonText {
+	background-color: transparent;
 	color: $white;
-	align-self: flex-start;
+	font-size: 16;
+}
+
+.disabledButton {
+	opacity: 0.25;
 }
 
 .uploadFailedText {
@@ -17,4 +25,12 @@
 .retryContainer {
 	flex: 1;
 	background-color: "rgba(0, 0, 0, 0.5)";
+}
+
+.actionButton {
+	color: $blue-50;
+}
+
+.actionButtonDark {
+	color: $blue-30;
 }

@@ -1,6 +1,8 @@
 withGlobalEvents
 ================
 
+**Deprecated**
+
 `withGlobalEvents` is a higher-order component used to facilitate responding to global events, where one would otherwise use `window.addEventListener`.
 
 On behalf of the consuming developer, the higher-order component manages:

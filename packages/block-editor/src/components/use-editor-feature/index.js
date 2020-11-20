@@ -98,9 +98,6 @@ export default function useEditorFeature( featurePath ) {
 
 			// 1 - Use __experimental features, if available.
 			// We cascade to the global value if the block one is not available.
-			//
-			// TODO: make it work for blocks that define multiple selectors
-			// such as core/heading or core/post-title.
 			const globalPath = `__experimentalFeatures.global.${ featurePath }`;
 			const blockPath = `__experimentalFeatures.${ context }.${ featurePath }`;
 			const experimentalFeaturesResult =

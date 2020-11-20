@@ -12,7 +12,7 @@ import {
 	withPreferredColorScheme,
 	useResizeObserver,
 } from '@wordpress/compose';
-import { InnerBlocks, withColors } from '@wordpress/block-editor';
+import { InnerBlocks } from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
 
@@ -25,8 +25,10 @@ function GroupEdit( {
 	attributes,
 	hasInnerBlocks,
 	isSelected,
+	isLastInnerBlockSelected,
 	getStylesFromColorScheme,
 	parentBlockAlignment,
+	mergedStyle,
 } ) {
 	const { align } = attributes;
 	const [ resizeObserver, sizes ] = useResizeObserver();
@@ -71,7 +73,19 @@ function GroupEdit( {
 	}
 
 	return (
-		<View style={ [ isSelected && hasInnerBlocks && styles.innerBlocks ] }>
+		<View
+			style={ [
+				isSelected && hasInnerBlocks && styles.innerBlocks,
+				mergedStyle,
+				isSelected &&
+					hasInnerBlocks &&
+					mergedStyle?.backgroundColor &&
+					styles.hasBackgroundAppender,
+				isLastInnerBlockSelected &&
+					mergedStyle?.backgroundColor &&
+					styles.isLastInnerBlockSelected,
+			] }
+		>
 			{ resizeObserver }
 			<InnerBlocks
 				renderAppender={ isSelected && renderAppender }
@@ -82,17 +96,29 @@ function GroupEdit( {
 }
 
 export default compose( [
-	withColors( 'backgroundColor' ),
 	withSelect( ( select, { clientId } ) => {
 		const {
+			getBlock,
+			getBlockIndex,
+			hasSelectedInnerBlock,
 			getBlockRootClientId,
 			getSelectedBlockClientId,
 			getBlockAttributes,
 		} = select( 'core/block-editor' );
 
-		const { getBlock } = select( 'core/block-editor' );
-
 		const block = getBlock( clientId );
+		const hasInnerBlocks = !! ( block && block.innerBlocks.length );
+		const isInnerBlockSelected =
+			hasInnerBlocks && hasSelectedInnerBlock( clientId, true );
+		let isLastInnerBlockSelected = false;
+
+		if ( isInnerBlockSelected ) {
+			const { innerBlocks } = block;
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const totalInnerBlocks = innerBlocks.length - 1;
+			const blockIndex = getBlockIndex( selectedBlockClientId, clientId );
+			isLastInnerBlockSelected = totalInnerBlocks === blockIndex;
+		}
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const isSelected = selectedBlockClientId === clientId;
@@ -101,8 +127,9 @@ export default compose( [
 		const parentBlockAlignment = getBlockAttributes( parentId )?.align;
 
 		return {
+			hasInnerBlocks,
+			isLastInnerBlockSelected,
 			isSelected,
-			hasInnerBlocks: !! ( block && block.innerBlocks.length ),
 			parentBlockAlignment,
 		};
 	} ),

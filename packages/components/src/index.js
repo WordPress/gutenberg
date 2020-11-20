@@ -130,7 +130,10 @@ export {
 } from './slot-fill';
 
 // Higher-Order Components
-export { default as navigateRegions } from './higher-order/navigate-regions';
+export {
+	default as navigateRegions,
+	useNavigateRegions as __unstableUseNavigateRegions,
+} from './higher-order/navigate-regions';
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';

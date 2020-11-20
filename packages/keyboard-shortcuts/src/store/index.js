@@ -1,17 +1,29 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { __experimentalCreateAtomicStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import reducer from './reducer';
+import { rootAtoms } from './atoms';
 import * as actions from './actions';
 import * as selectors from './selectors';
 
-export default registerStore( 'core/keyboard-shortcuts', {
-	reducer,
-	actions,
-	selectors,
-} );
+/**
+ * Store definition for the keyboard shortcuts namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore
+ *
+ * @type {Object}
+ */
+export const store = __experimentalCreateAtomicStore(
+	'core/keyboard-shortcuts',
+	{
+		rootAtoms,
+		actions,
+		selectors,
+	}
+);
+
+register( store );
