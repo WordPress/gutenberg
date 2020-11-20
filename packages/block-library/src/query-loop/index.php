@@ -65,6 +65,13 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		if ( isset( $block->context['query']['search'] ) ) {
 			$query['s'] = $block->context['query']['search'];
 		}
+
+		if ( isset( $block->context['query']['customQuery'] ) && false === $block->context['query']['customQuery'] ) {
+			global $wp_query;
+			if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) ) {
+				$query = $wp_query->query_vars;
+			}
+		}
 	}
 
 	$posts = get_posts( $query );

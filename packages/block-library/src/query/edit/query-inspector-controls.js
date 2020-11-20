@@ -13,6 +13,7 @@ import {
 	TextControl,
 	FormTokenField,
 	SelectControl,
+	CheckboxControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -38,6 +39,7 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		author: selectedAuthorId,
 		postType,
 		sticky,
+		customQuery,
 	} = query;
 	const [ showCategories, setShowCategories ] = useState( true );
 	const [ showTags, setShowTags ] = useState( true );
@@ -126,6 +128,7 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		debounce( () => setQuery( { search: querySearch } ), 250 ),
 		[ querySearch ]
 	);
+
 	useEffect( () => {
 		onChangeDebounced();
 		return onChangeDebounced.cancel;
@@ -133,19 +136,35 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
-				<SelectControl
-					options={ postTypesSelectOptions }
-					value={ postType }
-					label={ __( 'Post Type' ) }
-					onChange={ onPostTypeChange }
-				/>
-				<QueryControls
-					{ ...{ order, orderBy } }
-					onOrderChange={ ( value ) => setQuery( { order: value } ) }
-					onOrderByChange={ ( value ) =>
-						setQuery( { orderBy: value } )
+				<CheckboxControl
+					label={ __( 'Customize Query' ) }
+					help={ __(
+						'Enable this option to customize the query arguments. Leave disabled to inherit the global query.'
+					) }
+					checked={ !! customQuery }
+					onChange={ ( value ) =>
+						setQuery( { customQuery: !! value } )
 					}
 				/>
+				{ customQuery && (
+					<SelectControl
+						options={ postTypesSelectOptions }
+						value={ postType }
+						label={ __( 'Post Type' ) }
+						onChange={ onPostTypeChange }
+					/>
+				) }
+				{ customQuery && (
+					<QueryControls
+						{ ...{ order, orderBy } }
+						onOrderChange={ ( value ) =>
+							setQuery( { order: value } )
+						}
+						onOrderByChange={ ( value ) =>
+							setQuery( { orderBy: value } )
+						}
+					/>
+				) }
 				{ showSticky && (
 					<SelectControl
 						label={ __( 'Sticky posts' ) }
@@ -155,45 +174,48 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 					/>
 				) }
 			</PanelBody>
-			<PanelBody title={ __( 'Filters' ) }>
-				{ showCategories && categories?.terms?.length > 0 && (
-					<FormTokenField
-						label={ __( 'Categories' ) }
-						value={ ( query.categoryIds || [] ).map(
-							( categoryId ) => ( {
-								id: categoryId,
-								value: categories.mapById[ categoryId ].name,
+			{ customQuery && (
+				<PanelBody title={ __( 'Filters' ) }>
+					{ showCategories && categories?.terms?.length > 0 && (
+						<FormTokenField
+							label={ __( 'Categories' ) }
+							value={ ( query.categoryIds || [] ).map(
+								( categoryId ) => ( {
+									id: categoryId,
+									value:
+										categories.mapById[ categoryId ].name,
+								} )
+							) }
+							suggestions={ categories.names }
+							onChange={ onCategoriesChange }
+						/>
+					) }
+					{ showTags && tags?.terms?.length > 0 && (
+						<FormTokenField
+							label={ __( 'Tags' ) }
+							value={ ( query.tagIds || [] ).map( ( tagId ) => ( {
+								id: tagId,
+								value: tags.mapById[ tagId ].name,
+							} ) ) }
+							suggestions={ tags.names }
+							onChange={ onTagsChange }
+						/>
+					) }
+					<QueryControls
+						{ ...{ selectedAuthorId, authorList } }
+						onAuthorChange={ ( value ) =>
+							setQuery( {
+								author: value !== '' ? +value : undefined,
 							} )
-						) }
-						suggestions={ categories.names }
-						onChange={ onCategoriesChange }
+						}
 					/>
-				) }
-				{ showTags && tags?.terms?.length > 0 && (
-					<FormTokenField
-						label={ __( 'Tags' ) }
-						value={ ( query.tagIds || [] ).map( ( tagId ) => ( {
-							id: tagId,
-							value: tags.mapById[ tagId ].name,
-						} ) ) }
-						suggestions={ tags.names }
-						onChange={ onTagsChange }
+					<TextControl
+						label={ __( 'Keyword' ) }
+						value={ querySearch }
+						onChange={ setQuerySearch }
 					/>
-				) }
-				<QueryControls
-					{ ...{ selectedAuthorId, authorList } }
-					onAuthorChange={ ( value ) =>
-						setQuery( {
-							author: value !== '' ? +value : undefined,
-						} )
-					}
-				/>
-				<TextControl
-					label={ __( 'Keyword' ) }
-					value={ querySearch }
-					onChange={ setQuerySearch }
-				/>
-			</PanelBody>
+				</PanelBody>
+			) }
 		</InspectorControls>
 	);
 }
