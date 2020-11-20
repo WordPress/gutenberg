@@ -23,17 +23,18 @@ import { create as createLegacyWidget } from './blocks/legacy-widget';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
 
-let hasInitialized = false;
+let hasRegistered = false;
 
 /**
- * Initializes the block editor in the widgets screen.
+ * @typedef {import('@wordpress/element').ReactElement} ReactElement
  *
- * @param {string}   id             ID of the root element to render the screen in.
- * @param {Object}   settings       Block editor settings.
- * @param {Function} renderCallback The function to call when rendering.
+ * Registered the block editor in the widgets screen.
+ *
+ * @param {Object} settings Block editor settings.
+ * @return {ReactElement} The React element should be rendered.
  */
-export function initialize( id, settings, renderCallback = render ) {
-	if ( ! hasInitialized ) {
+export function register( settings ) {
+	if ( ! hasRegistered ) {
 		const coreBlocks = __experimentalGetCoreBlocks().filter(
 			( block ) => ! [ 'core/more' ].includes( block.name )
 		);
@@ -45,13 +46,22 @@ export function initialize( id, settings, renderCallback = render ) {
 		registerBlock( createLegacyWidget( settings ) );
 		registerBlock( widgetArea );
 
-		hasInitialized = true;
+		hasRegistered = true;
 	}
 
-	return renderCallback(
-		<Layout blockEditorSettings={ settings } />,
-		document.getElementById( id )
-	);
+	return <Layout blockEditorSettings={ settings } />;
+}
+
+/**
+ * Initializes the block editor in the widgets screen.
+ *
+ * @param {string} id       ID of the root element to render the screen in.
+ * @param {Object} settings Block editor settings.
+ */
+export function initialize( id, settings ) {
+	const element = register( settings );
+
+	return render( element, document.getElementById( id ) );
 }
 
 /**

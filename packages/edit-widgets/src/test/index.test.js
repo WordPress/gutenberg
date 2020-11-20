@@ -1,20 +1,20 @@
 /**
- * WordPress dependencies
+ * External dependencies
  */
 import {
-	renderInitialize,
+	render,
 	screen,
 	getByRole,
 	findByRole,
 	findAllByRole,
 	queryAllByRole,
 	fireEvent,
-} from '@wordpress/testing-library';
+} from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
-import { initialize } from '..';
+import { register } from '..';
 import './mocks/server';
 import availableLegacyWidgets from './mocks/available-legacy-widgets';
 
@@ -28,7 +28,7 @@ const editorSettings = {
 
 describe( 'edit-widgets', () => {
 	it( 'renders', async () => {
-		renderInitialize( initialize, editorSettings );
+		render( register( editorSettings ) );
 
 		const widgetAreas = await screen.findAllByRole( 'group', {
 			name: 'Block: Widget Area',
@@ -79,7 +79,7 @@ describe( 'edit-widgets', () => {
 	} );
 
 	it( 'should default to insert blocks to the first widget area', async () => {
-		renderInitialize( initialize, editorSettings );
+		render( register( editorSettings ) );
 
 		const widgetAreas = await screen.findAllByRole( 'group', {
 			name: 'Block: Widget Area',
