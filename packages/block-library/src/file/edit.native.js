@@ -205,7 +205,6 @@ export class FileEdit extends Component {
 			href: null,
 			textLinkHref: null,
 			fileName: null,
-			downloadButtonText: null,
 		} );
 		this.setState( { isUploadInProgress: false } );
 	}
@@ -344,7 +343,7 @@ export class FileEdit extends Component {
 			requestImageUploadCancelDialog( attributes.id );
 		} else if (
 			attributes.id &&
-			getProtocol( attributes.url ) === 'file:'
+			getProtocol( attributes.href ) === 'file:'
 		) {
 			requestImageFailedRetryDialog( attributes.id );
 		}
@@ -361,14 +360,6 @@ export class FileEdit extends Component {
 			align,
 		} = attributes;
 
-		const dimmedStyle =
-			this.state.isUploadInProgress && styles.disabledButton;
-		const finalButtonStyle = Object.assign(
-			{},
-			styles.defaultButton,
-			dimmedStyle
-		);
-
 		return (
 			<MediaUploadProgress
 				mediaId={ id }
@@ -381,6 +372,20 @@ export class FileEdit extends Component {
 				}
 				onMediaUploadStateReset={ this.mediaUploadStateReset }
 				renderContent={ ( { isUploadInProgress, isUploadFailed } ) => {
+					const dimmedStyle =
+						( this.state.isUploadInProgress || isUploadFailed ) &&
+						styles.disabledButton;
+					const finalButtonStyle = [
+						styles.defaultButton,
+						dimmedStyle,
+					];
+
+					const errorIconStyle = Object.assign(
+						{},
+						styles.errorIcon,
+						styles.uploadFailed
+					);
+
 					return (
 						<TouchableWithoutFeedback
 							accessible={ ! isSelected }
@@ -415,12 +420,10 @@ export class FileEdit extends Component {
 										) }
 									/>
 									{ isUploadFailed && (
-										<View
-											style={ { flexDirection: 'row' } }
-										>
+										<View style={ styles.errorContainer }>
 											<Icon
 												icon={ warning }
-												style={ styles.uploadFailed }
+												style={ errorIconStyle }
 											/>
 											<PlainText
 												value={ __( 'Error' ) }
@@ -437,6 +440,7 @@ export class FileEdit extends Component {
 										] }
 									>
 										<PlainText
+											editable={ ! isUploadFailed }
 											style={ styles.buttonText }
 											value={ downloadButtonText }
 											onChange={

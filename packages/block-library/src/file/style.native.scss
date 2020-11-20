@@ -35,6 +35,14 @@
 	color: $blue-30;
 }
 
+.errorContainer {
+	flex-direction: row;
+}
+
+.errorIcon {
+	margin-left: -4px;
+}
+
 .uploadFailed {
 	color: $alert-red;
 }
