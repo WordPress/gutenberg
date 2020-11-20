@@ -62,7 +62,7 @@ add_action( 'admin_menu', 'gutenberg_remove_legacy_pages' );
  *
  * @param WP_Admin_Bar $wp_admin_bar The admin-bar instance.
  */
-function gutenberg_remove_legacy_adminbar_items( $wp_admin_bar ) {
+function gutenberg_adminbar_items( $wp_admin_bar ) {
 
 	// Early exit if not an FSE theme.
 	if ( ! gutenberg_is_fse_theme() ) {
@@ -74,7 +74,7 @@ function gutenberg_remove_legacy_adminbar_items( $wp_admin_bar ) {
 	$wp_admin_bar->remove_node( 'customize-header' );
 }
 
-add_action( 'admin_bar_menu', 'gutenberg_remove_legacy_adminbar_items', 999 );
+add_action( 'admin_bar_menu', 'gutenberg_adminbar_items', 999 );
 
 /**
  * Activates the 'menu_order' filter and then hooks into 'menu_order'
