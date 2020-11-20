@@ -6,7 +6,11 @@ import { mapValues } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createDerivedAtom } from '@wordpress/stan';
+import {
+	createDerivedAtom,
+	createAtomRegistry,
+	createStoreAtomSelector,
+} from '@wordpress/stan';
 
 /**
  * @typedef {import("../types").WPDataAtomicStoreConfig} WPDataAtomicStoreConfig
@@ -33,28 +37,51 @@ export default function createAtomicStore( name, config ) {
 	return {
 		name,
 		instantiate: ( registry ) => {
-			const selectors = mapValues( config.selectors, ( atomSelector ) => {
-				return ( /** @type {any[]} **/ ...args ) => {
-					const get = registry.__internalGetAtomResolver()
-						? registry.__internalGetAtomResolver()
-						: (
-								/** @type {WPAtom<any>|WPAtomSelector<any>} **/ atom
-						  ) => registry.__internalGetAtomRegistry().get( atom );
-					return get( atomSelector( ...args ) );
-				};
-			} );
+			// Having a dedicated atom registry per store allow us to support
+			// registry inheritance as we won't be retrieving atoms from the wrong registries.
+			const atomRegistry = createAtomRegistry();
+
+			// These are used inside of useSelect when mapSelect can merge selectors
+			// from different stores and different data registries.
+			const registryAtomSelectors = mapValues(
+				config.selectors,
+				( atomSelector ) => {
+					return createStoreAtomSelector(
+						( ...args ) => ( listener ) =>
+							atomRegistry.subscribe(
+								atomSelector( ...args ),
+								listener
+							),
+						( ...args ) => () =>
+							atomRegistry.get( atomSelector( ...args ) ),
+						( ...args ) => ( value ) =>
+							atomRegistry.set( atomSelector( ...args ), value )
+					);
+				}
+			);
+
+			const selectors = mapValues(
+				registryAtomSelectors,
+				( atomSelector, selectorName ) => {
+					return ( /** @type {any[]} **/ ...args ) => {
+						return registry.__internalGetAtomResolver()
+							? registry.__internalGetAtomResolver()(
+									atomSelector( ...args )
+							  )
+							: atomRegistry.get(
+									// @ts-ignore
+									config.selectors[ selectorName ]( ...args )
+							  );
+					};
+				}
+			);
 
 			const actions = mapValues( config.actions, ( atomAction ) => {
 				return ( /** @type {any[]} **/ ...args ) => {
 					return atomAction( ...args )( {
-						get: ( atomCreator ) =>
-							registry
-								.__internalGetAtomRegistry()
-								.get( atomCreator ),
+						get: ( atomCreator ) => atomRegistry.get( atomCreator ),
 						set: ( atomCreator, value ) =>
-							registry
-								.__internalGetAtomRegistry()
-								.set( atomCreator, value ),
+							atomRegistry.set( atomCreator, value ),
 					} );
 				};
 			} );
@@ -73,9 +100,7 @@ export default function createAtomicStore( name, config ) {
 						);
 					} );
 
-					return registry
-						.__internalGetAtomRegistry()
-						.subscribe( atom, listener );
+					return atomRegistry.subscribe( atom, listener );
 				},
 			};
 		},

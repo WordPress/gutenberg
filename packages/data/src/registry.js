@@ -7,7 +7,7 @@ import memize from 'memize';
 /**
  * WordPress dependencies
  */
-import { createAtomRegistry, createStoreAtom } from '@wordpress/stan';
+import { createStoreAtom } from '@wordpress/stan';
 
 /**
  * Internal dependencies
@@ -55,7 +55,6 @@ import createCoreDataStore from './store';
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
 	const storesAtoms = {};
-	const atomRegistry = createAtomRegistry();
 	let listeners = [];
 
 	/**
@@ -101,7 +100,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 
 		const store = stores[ storeName ];
 		if ( store ) {
-			// If it's not an atomic store subscribe to the global store.
+			// If it's not an atomic store subscribe to the store.
 			if (
 				! store.__internalIsAtomic &&
 				registry.__internalGetAtomResolver()
@@ -115,11 +114,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		}
 
 		if ( parent ) {
-			parent.__internalSetAtomResolver(
-				registry.__internalGetAtomResolver()
-			);
-			const ret = parent.select( storeName );
-			return ret;
+			return parent.select( storeName );
 		}
 	}
 
@@ -273,10 +268,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			return currentAtomResolver;
 		},
 		__internalSetAtomResolver( resolver ) {
+			if ( parent ) {
+				parent.__internalSetAtomResolver( resolver );
+			}
 			currentAtomResolver = resolver;
-		},
-		__internalGetAtomRegistry() {
-			return atomRegistry;
 		},
 	};
 

@@ -5,7 +5,6 @@ import type {
 	WPAtom,
 	WPAtomSelector,
 	WPAtomResolver,
-	WPAtomRegistry,
 	WPAtomUpdater,
 } from '@wordpress/stan';
 
@@ -56,11 +55,6 @@ export interface WPDataRegistry {
 	 * Registers a store.
 	 */
 	register: ( store: WPDataStore ) => void;
-
-	/**
-	 * Retrieves the atom registry.
-	 */
-	__internalGetAtomRegistry: () => WPAtomRegistry;
 
 	/**
 	 * For registry selectors we need to be able to inject the atom resolver.
