@@ -1,4 +1,13 @@
-import { WPAtom, WPAtomFamilyItem, WPAtomResolver, WPAtomRegistry, WPAtomUpdater } from '@wordpress/stan/src/types';
+/**
+ * WordPress dependencies
+ */
+import type {
+	WPAtom,
+	WPAtomFamilyItem,
+	WPAtomResolver,
+	WPAtomRegistry,
+	WPAtomUpdater,
+} from '@wordpress/stan';
 
 export type WPDataFunctionOrGeneratorArray = { [key: string]: Function|Generator };
 export type WPDataFunctionArray = { [key: string]: Function };
