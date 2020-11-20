@@ -100,9 +100,12 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		const store = stores[ storeName ];
 		if ( store ) {
 			// If it's not an atomic store subscribe to the global store.
-			if ( registry.__internalGetAtomResolver() ) {
+			if (
+				! store.__internalIsAtomic &&
+				registry.__internalGetAtomResolver()
+			) {
 				registry.__internalGetAtomResolver()(
-					registry.getStoreAtom( storeName )
+					registry.__internalGetAtomForStore( storeName )
 				);
 			}
 
@@ -244,13 +247,13 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		registerGenericStore( store.name, store.instantiate( registry ) );
 	}
 
-	function getStoreAtom( key ) {
+	function __internalGetAtomForStore( key ) {
 		const atom = storesAtoms[ key ];
 		if ( atom ) {
 			return atom;
 		}
 
-		return parent.getStoreAtom( key );
+		return parent.__internalGetAtomForStore( key );
 	}
 
 	let registry = {
@@ -263,7 +266,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		dispatch,
 		use,
 		register,
-		getStoreAtom,
+		__internalGetAtomForStore,
 		__internalGetAtomResolver() {
 			return currentAtomResolver;
 		},

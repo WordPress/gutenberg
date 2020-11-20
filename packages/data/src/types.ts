@@ -46,11 +46,6 @@ export interface WPDataRegistry {
     register: ( store: WPDataStore ) => void,
 
     /**
-     * Creates an atom that can be used to subscribe to a selector.
-     */
-    __internalGetSelectorAtom: <T> ( selector: ( get: WPAtomResolver<any> ) => any ) => WPAtom<T>
-
-    /**
      * Retrieves the atom registry.
      */
     __internalGetAtomRegistry: () => WPAtomRegistry,
@@ -60,4 +55,15 @@ export interface WPDataRegistry {
      * This setter/getter allows us to so.
      */
 	__internalGetAtomResolver: () => WPAtomResolver<any>,
+
+    /**
+     * Sets the current  atom resolver in the registry.
+     */
+    __internalSetAtomResolver: ( resolver: WPAtomResolver<any> ) => void,
+    
+    /**
+     * Retrieve or creates an atom per store.
+     * This atom allows selectors to refresh when any change happen on that store.
+     */
+    __internalGetAtomForStore: ( storeName: string ) => WPAtom<any>
 }

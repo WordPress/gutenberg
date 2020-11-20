@@ -8,6 +8,7 @@
 		{ "path": "../stan" },
 	],
 	"include": [
+		"src/types.ts",
 		"src/atomic-store/*",
 	],
 	"exclude": [
