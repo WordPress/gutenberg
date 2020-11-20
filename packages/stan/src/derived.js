@@ -32,7 +32,7 @@ const resolveQueue = createQueue();
  * Creates a derived atom.
  *
  * @template T
- * @param {WPDerivedAtomResolver<T>} resolver Atom Resolver.
+ * @param {WPDerivedAtomResolver<T>} resolver Atom resolver.
  * @param {WPDerivedAtomUpdater<T>}  updater  Atom updater.
  * @param {WPCommonAtomConfig=}      config   Common Atom config.
  * @return {WPAtom<T>} Created atom.
