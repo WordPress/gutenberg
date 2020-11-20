@@ -50,6 +50,7 @@ export class FileEdit extends Component {
 
 		this.state = {
 			isUploadInProgress: false,
+			isLinkSettingsVisible: false,
 		};
 
 		this.timerRef = null;
@@ -75,6 +76,8 @@ export class FileEdit extends Component {
 		this.onChangeLinkDestinationOption = this.onChangeLinkDestinationOption.bind(
 			this
 		);
+		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
+		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
 	}
 
 	componentDidMount() {
@@ -177,7 +180,7 @@ export class FileEdit extends Component {
 		);
 	}
 
-	getToolbarEditButton( open ) {
+	getToolbarButtons( open ) {
 		return (
 			<BlockControls>
 				<ToolbarGroup>
@@ -186,16 +189,24 @@ export class FileEdit extends Component {
 						icon={ replace }
 						onClick={ open }
 					/>
+					<ToolbarButton
+						title={ __( 'Link To' ) }
+						icon={ link }
+						onClick={ this.onShowLinkSettings }
+					/>
 				</ToolbarGroup>
 			</BlockControls>
 		);
 	}
 
-	getInspectorControls(
+	getLinkSettings(
 		{ showDownloadButton, textLinkTarget, href, textLinkHref },
 		media,
 		isUploadInProgress,
-		isUploadFailed
+		isUploadFailed,
+		panelTitle,
+		withBottomSheet,
+		isBottomSheetVisible
 	) {
 		let linkDestinationOptions = [ { value: href, label: __( 'URL' ) } ];
 		const attachmentPage = media && media.link;
@@ -219,45 +230,92 @@ export class FileEdit extends Component {
 			actionButtonStyle,
 			dimmedStyle
 		);
+		const settings = (
+			<>
+				{ panelTitle && <PanelBody title={ panelTitle } /> }
+				{
+					<PanelBody>
+						<SelectControl
+							icon={ link }
+							label={ __( 'Link to' ) }
+							value={ textLinkHref }
+							onChange={ this.onChangeLinkDestinationOption }
+							options={ linkDestinationOptions }
+						/>
+						<ToggleControl
+							icon={ external }
+							label={ __( 'Open in new tab' ) }
+							checked={ textLinkTarget === '_blank' }
+							onChange={ this.onChangeOpenInNewWindow }
+						/>
+						<ToggleControl
+							icon={ button }
+							label={ __( 'Show download button' ) }
+							checked={ showDownloadButton }
+							onChange={ this.onChangeDownloadButtonVisibility }
+						/>
+						<BottomSheet.Cell
+							disabled={ isCopyUrlDisabled }
+							label={
+								this.state.isUrlCopied
+									? __( 'Copied!' )
+									: __( 'Copy file URL' )
+							}
+							labelStyle={
+								this.state.isUrlCopied || finalButtonStyle
+							}
+							onPress={ this.onCopyURL }
+						/>
+					</PanelBody>
+				}
+			</>
+		);
 
+		if ( withBottomSheet ) {
+			return (
+				<BottomSheet
+					isVisible={ isBottomSheetVisible }
+					onClose={ this.onHideLinkSettings }
+				>
+					{ settings }
+				</BottomSheet>
+			);
+		}
+
+		return settings;
+	}
+
+	getInspectorControls(
+		attributes,
+		media,
+		isUploadInProgress,
+		isUploadFailed
+	) {
 		return (
 			<InspectorControls>
-				<PanelBody title={ __( 'File block settings' ) } />
-				<PanelBody>
-					<SelectControl
-						icon={ link }
-						label={ __( 'Link to' ) }
-						value={ textLinkHref }
-						onChange={ this.onChangeLinkDestinationOption }
-						options={ linkDestinationOptions }
-					/>
-					<ToggleControl
-						icon={ external }
-						label={ __( 'Open in new tab' ) }
-						checked={ textLinkTarget === '_blank' }
-						onChange={ this.onChangeOpenInNewWindow }
-					/>
-					<ToggleControl
-						icon={ button }
-						label={ __( 'Show download button' ) }
-						checked={ showDownloadButton }
-						onChange={ this.onChangeDownloadButtonVisibility }
-					/>
-					<BottomSheet.Cell
-						disabled={ isCopyUrlDisabled }
-						label={
-							this.state.isUrlCopied
-								? __( 'Copied!' )
-								: __( 'Copy file URL' )
-						}
-						labelStyle={
-							this.state.isUrlCopied || finalButtonStyle
-						}
-						onPress={ this.onCopyURL }
-					/>
-				</PanelBody>
+				{ this.getLinkSettings(
+					attributes,
+					media,
+					isUploadInProgress,
+					isUploadFailed,
+					__( 'File block settings' ),
+					false,
+					false
+				) }
 			</InspectorControls>
 		);
+	}
+
+	onShowLinkSettings() {
+		this.setState( { isLinkSettingsVisible: true } );
+	}
+
+	onHideLinkSettings() {
+		this.setState( { isLinkSettingsVisible: false } );
+	}
+
+	dismissSheet() {
+		this.onHideLinkSettings();
 	}
 
 	getStyleForAlignment( align ) {
@@ -296,6 +354,8 @@ export class FileEdit extends Component {
 			align,
 		} = attributes;
 
+		const { isLinkSettingsVisible } = this.state;
+
 		const dimmedStyle =
 			this.state.isUploadInProgress && styles.disabledButton;
 		const finalButtonStyle = Object.assign(
@@ -325,13 +385,22 @@ export class FileEdit extends Component {
 					return (
 						<View>
 							{ isUploadInProgress ||
-								this.getToolbarEditButton( openMediaOptions ) }
+								this.getToolbarButtons( openMediaOptions ) }
 							{ getMediaOptions() }
 							{ this.getInspectorControls(
 								attributes,
 								media,
 								isUploadInProgress,
 								isUploadFailed
+							) }
+							{ this.getLinkSettings(
+								attributes,
+								media,
+								isUploadInProgress,
+								isUploadFailed,
+								null,
+								true,
+								isLinkSettingsVisible
 							) }
 							<RichText
 								__unstableMobileNoFocusOnMount
