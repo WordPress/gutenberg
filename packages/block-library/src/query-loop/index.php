@@ -26,8 +26,18 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		'post__not_in' => array(),
 	);
 
+	$use_global_query = ( isset( $block->context['query']['customQuery'] ) && false === $block->context['query']['customQuery'] );
+
+	// Override the custom query with the global query if needed.
+	if ( $use_global_query ) {
+		global $wp_query;
+		if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) ) {
+			$query = $wp_query->query_vars;
+		}
+	}
+
 	if ( isset( $block->context['query'] ) ) {
-		if ( isset( $block->context['query']['postType'] ) ) {
+		if ( ! $use_global_query && isset( $block->context['query']['postType'] ) ) {
 			$query['post_type'] = $block->context['query']['postType'];
 		}
 		if ( isset( $block->context['query']['sticky'] ) && ! empty( $block->context['query']['sticky'] ) ) {
@@ -44,58 +54,26 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		if ( isset( $block->context['query']['perPage'] ) ) {
 			$query['offset'] = ( $block->context['query']['perPage'] * ( $page - 1 ) ) + $block->context['query']['offset'];
 		}
-		if ( isset( $block->context['query']['categoryIds'] ) ) {
+		if ( ! $use_global_query && isset( $block->context['query']['categoryIds'] ) ) {
 			$query['category__in'] = $block->context['query']['categoryIds'];
 		}
-		if ( isset( $block->context['query']['tagIds'] ) ) {
+		if ( ! $use_global_query && isset( $block->context['query']['tagIds'] ) ) {
 			$query['tag__in'] = $block->context['query']['tagIds'];
 		}
-		if ( isset( $block->context['query']['order'] ) ) {
+		if ( ! $use_global_query && isset( $block->context['query']['order'] ) ) {
 			$query['order'] = strtoupper( $block->context['query']['order'] );
 		}
-		if ( isset( $block->context['query']['orderBy'] ) ) {
+		if ( ! $use_global_query && isset( $block->context['query']['orderBy'] ) ) {
 			$query['orderby'] = $block->context['query']['orderBy'];
 		}
 		if ( isset( $block->context['query']['perPage'] ) ) {
 			$query['posts_per_page'] = $block->context['query']['perPage'];
 		}
-		if ( isset( $block->context['query']['author'] ) ) {
+		if ( ! $use_global_query && isset( $block->context['query']['author'] ) ) {
 			$query['author'] = $block->context['query']['author'];
 		}
-		if ( isset( $block->context['query']['search'] ) ) {
+		if ( ! $use_global_query && isset( $block->context['query']['search'] ) ) {
 			$query['s'] = $block->context['query']['search'];
-		}
-
-		// Override the custom query with the global query if needed.
-		if ( isset( $block->context['query']['customQuery'] ) && false === $block->context['query']['customQuery'] ) {
-
-			// Get the global query.
-			global $wp_query;
-
-			// Make sure the query has vars before using it.
-			if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) ) {
-				$query = $wp_query->query_vars;
-			}
-
-			// Override global query for sticky posts.
-			if ( isset( $block->context['query']['sticky'] ) && ! empty( $block->context['query']['sticky'] ) ) {
-				$sticky = get_option( 'sticky_posts' );
-				if ( 'only' === $block->context['query']['sticky'] ) {
-					$query['post__in'] = $sticky;
-				} else {
-					$query['post__not_in'] = array_merge( $query['post__not_in'], $sticky );
-				}
-			}
-
-			// Override offset.
-			if ( isset( $block->context['query']['perPage'] ) ) {
-				$query['offset'] = ( $block->context['query']['perPage'] * ( $page - 1 ) ) + $block->context['query']['offset'];
-			}
-
-			// Override posts_per_page.
-			if ( isset( $block->context['query']['perPage'] ) ) {
-				$query['posts_per_page'] = $block->context['query']['perPage'];
-			}
 		}
 	}
 
