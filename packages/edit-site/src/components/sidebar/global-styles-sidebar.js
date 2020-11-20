@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map } from 'lodash';
+import { map, sortBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,6 +9,7 @@ import { map } from 'lodash';
 import { Button, PanelBody, TabPanel } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -26,7 +27,7 @@ import {
 import { default as ColorPanel, useHasColorPanel } from './color-panel';
 
 function GlobalStylesPanel( {
-	hasWrapper = true,
+	wrapperPanelTitle,
 	context,
 	getStyleProperty,
 	setStyleProperty,
@@ -60,9 +61,17 @@ function GlobalStylesPanel( {
 			) }
 		</>
 	);
-	if ( ! hasWrapper ) {
+	if ( ! wrapperPanelTitle ) {
 		return content;
 	}
+	return (
+		<PanelBody title={ wrapperPanelTitle } initialOpen={ false }>
+			{ content }
+		</PanelBody>
+	);
+}
+
+function getPanelTitle( context ) {
 	/*
 	 * We use the block's name as the panel title.
 	 *
@@ -74,7 +83,6 @@ function GlobalStylesPanel( {
 	 * as it's translatable and the block.json doesn't
 	 * have it yet.
 	 */
-
 	const blockType = getBlockType( context.blockName );
 	// Protect against blocks that aren't registered
 	// eg: widget-area
@@ -86,12 +94,47 @@ function GlobalStylesPanel( {
 	if ( 'object' === typeof blockType?.supports?.__experimentalSelector ) {
 		panelTitle += ` (${ context.title })`;
 	}
+	return panelTitle;
+}
 
-	return (
-		<PanelBody title={ panelTitle } initialOpen={ false }>
-			{ content }
-		</PanelBody>
+function GlobalStylesBlockPanels( {
+	contexts,
+	getStyleProperty,
+	setStyleProperty,
+	getSetting,
+	setSetting,
+} ) {
+	const panels = useMemo(
+		() =>
+			sortBy(
+				map( contexts, ( context, name ) => {
+					return {
+						context,
+						name,
+						wrapperPanelTitle: getPanelTitle( context ),
+					};
+				} ),
+				( { wrapperPanelTitle } ) => wrapperPanelTitle
+			),
+		[ contexts ]
 	);
+
+	return map( panels, ( { context, name, wrapperPanelTitle } ) => {
+		if ( name === GLOBAL_CONTEXT_NAME ) {
+			return null;
+		}
+		return (
+			<GlobalStylesPanel
+				key={ 'panel-' + name }
+				wrapperPanelTitle={ wrapperPanelTitle }
+				context={ { ...context, name } }
+				getStyleProperty={ getStyleProperty }
+				setStyleProperty={ setStyleProperty }
+				getSetting={ getSetting }
+				setSetting={ setSetting }
+			/>
+		);
+	} );
 }
 
 export default function GlobalStylesSidebar( {
@@ -145,21 +188,15 @@ export default function GlobalStylesSidebar( {
 				{ ( tab ) => {
 					/* Per Block Context */
 					if ( 'block' === tab.name ) {
-						return map( contexts, ( context, name ) => {
-							if ( name === GLOBAL_CONTEXT_NAME ) {
-								return null;
-							}
-							return (
-								<GlobalStylesPanel
-									key={ 'panel-' + name }
-									context={ { ...context, name } }
-									getStyleProperty={ getStyleProperty }
-									setStyleProperty={ setStyleProperty }
-									getSetting={ getSetting }
-									setSetting={ setSetting }
-								/>
-							);
-						} );
+						return (
+							<GlobalStylesBlockPanels
+								contexts={ contexts }
+								getStyleProperty={ getStyleProperty }
+								setStyleProperty={ setStyleProperty }
+								getSetting={ getSetting }
+								setSetting={ setSetting }
+							/>
+						);
 					}
 					return (
 						<GlobalStylesPanel
