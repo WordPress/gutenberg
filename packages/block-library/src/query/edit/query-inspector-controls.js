@@ -153,7 +153,7 @@ export default function QueryInspectorControls( {
 							onChange={ ( value ) =>
 								setLayout( { columns: value } )
 							}
-							min={ 1 }
+							min={ 2 }
 							max={ Math.max( 6, layout.columns ) }
 						/>
 						{ layout.columns > 6 && (

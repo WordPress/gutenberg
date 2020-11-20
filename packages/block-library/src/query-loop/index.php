@@ -80,7 +80,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 
 	$content = '';
 	foreach ( $posts as $post ) {
-		$content .= (
+		$block_content = (
 			new WP_Block(
 				$block->parsed_block,
 				array(
@@ -89,6 +89,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 				)
 			)
 		)->render( array( 'dynamic' => false ) );
+		$content .= "<li>{$block_content}</li>";
 	}
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',
