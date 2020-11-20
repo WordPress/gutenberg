@@ -117,43 +117,30 @@ export default function GlobalStylesProvider( {
 		[ contexts, content ]
 	);
 
-	useEffect( () => {
-		if (
-			typeof contexts !== 'object' ||
-			typeof baseStyles !== 'object' ||
-			typeof userStyles !== 'object'
-		) {
-			return;
-		}
-
-		const embeddedStylesheetId = 'global-styles-inline-css';
-		let styleNode = document.getElementById( embeddedStylesheetId );
-
-		if ( ! styleNode ) {
-			styleNode = document.createElement( 'style' );
-			styleNode.id = embeddedStylesheetId;
-			document
-				.getElementsByTagName( 'head' )[ 0 ]
-				.appendChild( styleNode );
-		}
-
-		styleNode.innerText = getGlobalStyles( contexts, mergedStyles );
-	}, [ contexts, baseStyles, content ] );
-
 	const settings = useSelect( ( select ) =>
 		select( 'core/edit-site' ).getSettings()
 	);
 	const { updateSettings } = useDispatch( 'core/edit-site' );
 
 	useEffect( () => {
+		const newStyles = settings.styles.filter(
+			( style ) => ! style.isGlobalStyles
+		);
 		updateSettings( {
 			...settings,
+			styles: [
+				...newStyles,
+				{
+					css: getGlobalStyles( contexts, mergedStyles ),
+					isGlobalStyles: true,
+				},
+			],
 			__experimentalFeatures: mapValues(
 				mergedStyles,
 				( value ) => value?.settings || {}
 			),
 		} );
-	}, [ mergedStyles ] );
+	}, [ contexts, mergedStyles ] );
 
 	return (
 		<GlobalStylesContext.Provider value={ nextValue }>

@@ -1,3 +1,13 @@
+/**
+ * External dependencies
+ */
+import { omit } from 'lodash';
+
+/**
+ * Internal dependencies
+ */
+import { shortcutsByNameAtom, shortcutNamesAtom } from './atoms';
+
 /** @typedef {import('@wordpress/keycodes').WPKeycodeModifier} WPKeycodeModifier */
 
 /**
@@ -24,37 +34,40 @@
 /**
  * Returns an action object used to register a new keyboard shortcut.
  *
- * @param {WPShortcutConfig} config Shortcut config.
- *
- * @return {Object} action.
+ * @param {Function} get          Atom resover.
+ * @param {Function} set          Atom updater.
+ * @param {WPShortcutConfig} config  Shortcut config.
  */
-export function registerShortcut( {
-	name,
-	category,
-	description,
-	keyCombination,
-	aliases,
-} ) {
-	return {
-		type: 'REGISTER_SHORTCUT',
-		name,
-		category,
-		keyCombination,
-		aliases,
-		description,
-	};
-}
+export const registerShortcut = ( config ) => ( { get, set } ) => {
+	const shortcutNames = get( shortcutNamesAtom );
+	const hasShortcut = shortcutNames.includes( config.name );
+	if ( ! hasShortcut ) {
+		set( shortcutNamesAtom, [ ...shortcutNames, config.name ] );
+	}
+	const shortcutsByName = get( shortcutsByNameAtom );
+	set( shortcutsByNameAtom, {
+		...shortcutsByName,
+		[ config.name ]: config,
+	} );
+};
 
 /**
  * Returns an action object used to unregister a keyboard shortcut.
  *
- * @param {string} name Shortcut name.
- *
- * @return {Object} action.
+ * @param {Function} get          get atom value.
+ * @param {Function} set          set atom value.
+ * @param {string}   name         Shortcut name.
  */
-export function unregisterShortcut( name ) {
-	return {
-		type: 'UNREGISTER_SHORTCUT',
-		name,
-	};
-}
+export const unregisterShortcut = ( name ) => ( { get, set } ) => {
+	const shortcutNames = get( shortcutNamesAtom );
+	set(
+		shortcutNamesAtom,
+		shortcutNames.filter( ( n ) => n !== name )
+	);
+	const shortcutByNames = get( shortcutsByNameAtom );
+	set( shortcutsByNameAtom, omit( shortcutByNames, [ name ] ) );
+
+	// The atom will remain in the family atoms
+	// We need to build a way to remove it automatically once the parent atom changes.
+	// atomRegistry.deleteAtom( shortcutByNames[ name ] );
+};

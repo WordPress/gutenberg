@@ -14,6 +14,7 @@ import {
 } from '@wordpress/element';
 import { useThrottle } from '@wordpress/compose';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 export const Context = createContext();
 
@@ -37,10 +38,10 @@ function getDragEventType( { dataTransfer } ) {
 }
 
 function isTypeSupportedByDropZone( type, dropZone ) {
-	return (
+	return Boolean(
 		( type === 'file' && dropZone.onFilesDrop ) ||
-		( type === 'html' && dropZone.onHTMLDrop ) ||
-		( type === 'default' && dropZone.onDrop )
+			( type === 'html' && dropZone.onHTMLDrop ) ||
+			( type === 'default' && dropZone.onDrop )
 	);
 }
 
@@ -98,6 +99,14 @@ function getHoveredDropZone( dropZones, position, dragEventType ) {
 	} );
 }
 
+export const INITIAL_DROP_ZONE_STATE = {
+	isDraggingOverDocument: false,
+	isDraggingOverElement: false,
+	x: null,
+	y: null,
+	type: null,
+};
+
 export default function DropZoneProvider( { children } ) {
 	const ref = useRef();
 	const dropZones = useRef( new Set( [] ) );
@@ -128,17 +137,29 @@ export default function DropZoneProvider( { children } ) {
 		// Notifying the dropzones
 		dropZones.current.forEach( ( dropZone ) => {
 			const isDraggingOverDropZone = dropZone === hoveredDropZone;
-			dropZone.setState( {
+			const newState = {
 				isDraggingOverDocument: isTypeSupportedByDropZone(
 					dragEventType,
 					dropZone
 				),
 				isDraggingOverElement: isDraggingOverDropZone,
-				position:
+				x:
 					isDraggingOverDropZone && dropZone.withPosition
-						? position
+						? position.x
+						: null,
+				y:
+					isDraggingOverDropZone && dropZone.withPosition
+						? position.y
 						: null,
 				type: isDraggingOverDropZone ? dragEventType : null,
+			};
+
+			dropZone.setState( ( state ) => {
+				if ( isShallowEqual( state, newState ) ) {
+					return state;
+				}
+
+				return newState;
 			} );
 		} );
 
@@ -160,12 +181,7 @@ export default function DropZoneProvider( { children } ) {
 		throttledUpdateDragZones.cancel();
 
 		dropZones.current.forEach( ( dropZone ) =>
-			dropZone.setState( {
-				isDraggingOverDocument: false,
-				isDraggingOverElement: false,
-				position: null,
-				type: null,
-			} )
+			dropZone.setState( INITIAL_DROP_ZONE_STATE )
 		);
 	}, [] );
 

@@ -61,7 +61,7 @@ export default function PostTitle() {
 			isFocusMode: focusMode,
 			hasFixedToolbar: _hasFixedToolbar,
 		};
-	} );
+	}, [] );
 
 	useEffect( () => {
 		const { ownerDocument } = ref.current;

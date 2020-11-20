@@ -116,7 +116,7 @@ selectorNames.forEach( ( name ) => {
 
 		selectorNames.forEach( ( otherName ) => {
 			if ( _selectors[ otherName ].isRegistrySelector ) {
-				_selectors[ otherName ].registry = { select };
+				_selectors[ otherName ].__unstableGetSelect = select;
 			}
 		} );
 
@@ -125,9 +125,8 @@ selectorNames.forEach( ( name ) => {
 	selectors[ name ].isRegistrySelector =
 		_selectors[ name ].isRegistrySelector;
 	if ( selectors[ name ].isRegistrySelector ) {
-		selectors[ name ].registry = {
-			select: () => _selectors[ name ].registry.select(),
-		};
+		selectors[ name ].__unstableGetSelect =
+			_selectors[ name ].__unstableGetSelect;
 	}
 } );
 const {
