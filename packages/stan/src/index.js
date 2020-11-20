@@ -1,7 +1,7 @@
 export { createAtom } from './atom';
 export { createDerivedAtom } from './derived';
 export { createStoreAtom } from './store';
-export { createAtomFamily } from './family';
+export { createAtomSelector } from './selector';
 export { createAtomRegistry } from './registry';
 
 /**
@@ -10,7 +10,7 @@ export { createAtomRegistry } from './registry';
  */
 /**
  * @template T
- * @typedef {import('./types').WPAtomFamilyItem<T>} WPAtomFamilyItem
+ * @typedef {import('./types').WPAtomSelector<T>} WPAtomSelector
  */
 /**
  * @template T

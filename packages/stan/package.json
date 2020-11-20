@@ -28,6 +28,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
 		"@wordpress/priority-queue": "file:../priority-queue",
+		"equivalent-key-map": "^0.2.2",
 		"lodash": "^4.17.19"
 	},
 	"publishConfig": {
