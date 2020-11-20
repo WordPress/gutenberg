@@ -24,17 +24,18 @@ import { TEMPLATES_STATUSES } from './constants';
 
 export default function NewTemplateDropdown() {
 	const { defaultTemplateTypes, templates } = useSelect( ( select ) => {
+		const theme = select( 'core' ).getCurrentTheme()?.stylesheet;
 		const {
 			__experimentalGetDefaultTemplateTypes: getDefaultTemplateTypes,
 		} = select( 'core/editor' );
-		const templateEntities = select( 'core' ).getEntityRecords(
+		const _templates = select( 'core' ).getEntityRecords(
 			'postType',
 			'wp_template',
-			{ status: TEMPLATES_STATUSES, per_page: -1 }
+			{ status: TEMPLATES_STATUSES, per_page: -1, theme }
 		);
 		return {
 			defaultTemplateTypes: getDefaultTemplateTypes(),
-			templates: templateEntities,
+			templates: _templates,
 		};
 	}, [] );
 	const { addTemplate } = useDispatch( 'core/edit-site' );

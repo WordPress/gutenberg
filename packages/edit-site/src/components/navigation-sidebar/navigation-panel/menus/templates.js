@@ -32,14 +32,14 @@ import NewTemplateDropdown from '../new-template-dropdown';
 import TemplateNavigationItem from '../template-navigation-item';
 
 export default function TemplatesMenu() {
-	const templates = useSelect(
-		( select ) =>
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
-				status: TEMPLATES_STATUSES,
-				per_page: -1,
-			} ),
-		[]
-	);
+	const templates = useSelect( ( select ) => {
+		const theme = select( 'core' ).getCurrentTheme()?.stylesheet;
+		return select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
+			status: TEMPLATES_STATUSES,
+			per_page: -1,
+			theme,
+		} );
+	}, [] );
 
 	const generalTemplates = templates?.filter( ( { slug } ) =>
 		TEMPLATES_GENERAL.includes( slug )

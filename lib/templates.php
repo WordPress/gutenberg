@@ -324,7 +324,7 @@ function filter_rest_wp_template_collection_params( $query_params ) {
 apply_filters( 'rest_wp_template_collection_params', 'filter_rest_wp_template_collection_params', 99, 1 );
 
 /**
- * Filter for supporting the `resolved` parameter in `wp_template` queries.
+ * Filter for supporting the `resolved` and `theme` parameter in `wp_template` queries.
  *
  * @param array           $args    The query arguments.
  * @param WP_REST_Request $request The request object.
@@ -348,6 +348,17 @@ function filter_rest_wp_template_query( $args, $request ) {
 		}
 		$args['post__in']    = $template_ids;
 		$args['post_status'] = array( 'publish', 'auto-draft' );
+	}
+
+	if ( $request['theme'] ) {
+		$tax_query   = isset( $args['tax_query'] ) ? $args['tax_query'] : array();
+		$tax_query[] = array(
+			'taxonomy' => 'wp_theme',
+			'field'    => 'slug',
+			'terms'    => $request['theme'],
+		);
+
+		$args['tax_query'] = $tax_query;
 	}
 
 	return $args;
