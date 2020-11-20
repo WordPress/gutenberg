@@ -1,6 +1,6 @@
 export type WPAtomListener = () => void;
 
-export type WPCommonAtomConfig = {
+export interface WPCommonAtomConfig {
 	/**
 	 * Optinal id used for debug.
 	 */
@@ -10,9 +10,9 @@ export type WPCommonAtomConfig = {
 	 * Whether the atom is sync or async.
 	 */
 	isAsync?: boolean;
-};
+}
 
-export type WPAtomState< T > = {
+export interface WPAtomState< T > {
 	/**
 	 * Optional atom id used for debug.
 	 */
@@ -42,18 +42,18 @@ export type WPAtomState< T > = {
 	 * Subscribes to the value changes of the atom state.
 	 */
 	subscribe: ( listener: WPAtomListener ) => () => void;
-};
+}
 
 export type WPAtom< T > = ( registry: WPAtomRegistry ) => WPAtomState< T >;
 
-export type WPAtomFamilyConfig< T > = {
+export interface WPAtomFamilyConfig< T > {
 	/**
 	 * Creates an atom for the given key
 	 */
 	createAtom: ( key: any ) => WPAtom< T >;
-};
+}
 
-export type WPAtomFamilyItem< T > = {
+export interface WPAtomFamilyItem< T > {
 	/**
 	 * Type which value is "family" to indicate that this is a family.
 	 */
@@ -68,9 +68,9 @@ export type WPAtomFamilyItem< T > = {
 	 * Item key
 	 */
 	key: any;
-};
+}
 
-export type WPAtomRegistry = {
+export interface WPAtomRegistry {
 	/**
 	 * Reads an atom vale.
 	 */
@@ -101,7 +101,7 @@ export type WPAtomRegistry = {
 	__unstableGetAtomState: < T >(
 		atom: WPAtom< T > | WPAtomFamilyItem< T >
 	) => WPAtomState< any >;
-};
+}
 
 export type WPAtomResolver< T > = (
 	atom: WPAtom< T > | WPAtomFamilyItem< T >
