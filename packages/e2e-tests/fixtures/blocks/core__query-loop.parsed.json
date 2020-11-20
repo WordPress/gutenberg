@@ -3,8 +3,10 @@
         "blockName": "core/query-loop",
         "attrs": {},
         "innerBlocks": [],
-        "innerHTML": "",
-        "innerContent": []
+        "innerHTML": "<li></li>",
+        "innerContent": [
+            "<li></li>"
+        ]
     },
     {
         "blockName": null,

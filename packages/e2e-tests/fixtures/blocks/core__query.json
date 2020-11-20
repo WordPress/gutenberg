@@ -17,6 +17,9 @@
                 "search": "",
                 "exclude": [],
                 "sticky": ""
+            },
+            "layout": {
+                "type": "list"
             }
         },
         "innerBlocks": [],
