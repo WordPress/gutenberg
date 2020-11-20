@@ -110,7 +110,7 @@ Derived atoms can use async functions to compute their values. They can for inst
 ```js
 const sum2 = createDerivedAtom(
     async ( { get } ) => {
-        const val1 = await Promise.resolve(10);
+        const val1 = await Promise.resolve( 10 );
         return val1 * get( counter );
     } 
 );
