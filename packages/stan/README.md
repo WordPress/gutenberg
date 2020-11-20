@@ -8,7 +8,7 @@ It share the same goals as Recoil and Jotai:
 -   Shares with Jotai the goal of maintaining a very light API surface.
 -   Supports async and sync state.
 
-Unlike these frameworks, it has the following goals too: (which justified the creation of a separate library)
+Unlike these frameworks, it has the following goals that justified the creation of a separate library:
 
 -   It is React independent. You can create binding for any of your desired framework.
 -   It needs to be flexible enough to offer bindings for `@wordpress/data` consumer API. (useSelect and useDispatch).
