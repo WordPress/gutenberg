@@ -28,6 +28,13 @@ class WP_Theme_JSON {
 	private static $blocks_metadata = null;
 
 	/**
+	 * The name of the global context.
+	 *
+	 * @var string
+	 */
+	const GLOBAL_NAME = 'global';
+
+	/**
 	 * The CSS selector for the global context.
 	 *
 	 * @var string
@@ -35,31 +42,22 @@ class WP_Theme_JSON {
 	const GLOBAL_SELECTOR = ':root';
 
 	/**
-	 * The block type and name for the global context.
-	 *
-	 * @var string
-	 */
-	const GLOBAL_TYPE = 'global';
-
-	/**
-	 * The block arguments for the global context.
+	 * The supported properties of the global context.
 	 *
 	 * @var array
 	 */
-	const GLOBAL_ARGS = array(
-		'supports' => array(
-			'__experimentalFontAppearance' => true,
-			'__experimentalFontFamily'     => true,
-			'__experimentalSelector'       => self::GLOBAL_SELECTOR,
-			'__experimentalTextDecoration' => true,
-			'__experimentalTextTransform'  => true,
-			'color'                        => array(
-				'gradients' => true,
-				'link'      => true,
-			),
-			'fontSize'                     => true,
-			'lineHeight'                   => true,
-		),
+	const GLOBAL_SUPPORTS = array(
+		'--wp--style--color--link',
+		'background',
+		'backgroundColor',
+		'color',
+		'fontFamily',
+		'fontSize',
+		'fontStyle',
+		'fontWeight',
+		'lineHeight',
+		'textDecoration',
+		'textTransform',
 	);
 
 	/**
@@ -98,6 +96,14 @@ class WP_Theme_JSON {
 				'gradient'   => null,
 				'link'       => null,
 				'text'       => null,
+			),
+			'spacing'    => array(
+				'padding' => array(
+					'top'    => null,
+					'right'  => null,
+					'bottom' => null,
+					'left'   => null,
+				),
 			),
 			'typography' => array(
 				'fontFamily'     => null,
@@ -262,53 +268,71 @@ class WP_Theme_JSON {
 	/**
 	 * Metadata for style properties.
 	 *
-	 * - 'theme_json' => where the property value is stored
-	 * - 'block_json' => whether the block has declared support for it
+	 * Each property declares:
+	 *
+	 * - 'value': path to the value in theme.json and block attributes.
+	 * - 'support': path to the block support in block.json.
 	 */
 	const PROPERTIES_METADATA = array(
 		'--wp--style--color--link' => array(
-			'theme_json' => array( 'color', 'link' ),
-			'block_json' => array( 'color', 'link' ),
+			'value'   => array( 'color', 'link' ),
+			'support' => array( 'color', 'link' ),
 		),
 		'background'               => array(
-			'theme_json' => array( 'color', 'gradient' ),
-			'block_json' => array( 'color', 'gradients' ),
+			'value'   => array( 'color', 'gradient' ),
+			'support' => array( 'color', 'gradients' ),
 		),
 		'backgroundColor'          => array(
-			'theme_json' => array( 'color', 'background' ),
-			'block_json' => array( 'color' ),
+			'value'   => array( 'color', 'background' ),
+			'support' => array( 'color' ),
 		),
 		'color'                    => array(
-			'theme_json' => array( 'color', 'text' ),
-			'block_json' => array( 'color' ),
+			'value'   => array( 'color', 'text' ),
+			'support' => array( 'color' ),
 		),
 		'fontFamily'               => array(
-			'theme_json' => array( 'typography', 'fontFamily' ),
-			'block_json' => array( '__experimentalFontFamily' ),
+			'value'   => array( 'typography', 'fontFamily' ),
+			'support' => array( '__experimentalFontFamily' ),
 		),
 		'fontSize'                 => array(
-			'theme_json' => array( 'typography', 'fontSize' ),
-			'block_json' => array( 'fontSize' ),
+			'value'   => array( 'typography', 'fontSize' ),
+			'support' => array( 'fontSize' ),
 		),
 		'fontStyle'                => array(
-			'theme_json' => array( 'typography', 'fontStyle' ),
-			'block_json' => array( '__experimentalFontAppearance' ),
+			'value'   => array( 'typography', 'fontStyle' ),
+			'support' => array( '__experimentalFontAppearance' ),
 		),
 		'fontWeight'               => array(
-			'theme_json' => array( 'typography', 'fontWeight' ),
-			'block_json' => array( '__experimentalFontAppearance' ),
+			'value'   => array( 'typography', 'fontWeight' ),
+			'support' => array( '__experimentalFontAppearance' ),
 		),
 		'lineHeight'               => array(
-			'theme_json' => array( 'typography', 'lineHeight' ),
-			'block_json' => array( 'lineHeight' ),
+			'value'   => array( 'typography', 'lineHeight' ),
+			'support' => array( 'lineHeight' ),
+		),
+		'paddingBottom'            => array(
+			'value'   => array( 'spacing', 'padding', 'bottom' ),
+			'support' => array( 'spacing', 'padding' ),
+		),
+		'paddingLeft'              => array(
+			'value'   => array( 'spacing', 'padding', 'left' ),
+			'support' => array( 'spacing', 'padding' ),
+		),
+		'paddingRight'             => array(
+			'value'   => array( 'spacing', 'padding', 'right' ),
+			'support' => array( 'spacing', 'padding' ),
+		),
+		'paddingTop'               => array(
+			'value'   => array( 'spacing', 'padding', 'top' ),
+			'support' => array( 'spacing', 'padding' ),
 		),
 		'textDecoration'           => array(
-			'theme_json' => array( 'typography', 'textDecoration' ),
-			'block_json' => array( '__experimentalTextDecoration' ),
+			'value'   => array( 'typography', 'textDecoration' ),
+			'support' => array( '__experimentalTextDecoration' ),
 		),
 		'textTransform'            => array(
-			'theme_json' => array( 'typography', 'textTransform' ),
-			'block_json' => array( '__experimentalTextTransform' ),
+			'value'   => array( 'typography', 'textTransform' ),
+			'support' => array( '__experimentalTextTransform' ),
 		),
 	);
 
@@ -377,47 +401,57 @@ class WP_Theme_JSON {
 	 *   'global': {
 	 *     'selector': ':root'
 	 *     'supports': [ 'fontSize', 'backgroundColor' ],
-	 *     'blockName': 'global',
 	 *   },
 	 *   'core/heading/h1': {
 	 *     'selector': 'h1'
 	 *     'supports': [ 'fontSize', 'backgroundColor' ],
-	 *     'blockName': 'core/heading',
 	 *   }
 	 * }
 	 *
 	 * @return array Block metadata.
 	 */
-	public static function get_blocks_metadata() {
+	private static function get_blocks_metadata() {
 		if ( null !== self::$blocks_metadata ) {
 			return self::$blocks_metadata;
 		}
 
-		self::$blocks_metadata = array();
+		self::$blocks_metadata = array(
+			self::GLOBAL_NAME => array(
+				'selector' => self::GLOBAL_SELECTOR,
+				'supports' => self::GLOBAL_SUPPORTS,
+			),
+		);
 
 		$registry = WP_Block_Type_Registry::get_instance();
-		$blocks   = array_merge(
-			$registry->get_all_registered(),
-			array( self::GLOBAL_TYPE => new WP_Block_Type( self::GLOBAL_TYPE, self::GLOBAL_ARGS ) )
-		);
+		$blocks   = $registry->get_all_registered();
 		foreach ( $blocks as $block_name => $block_type ) {
+			/*
+			 * Skips blocks that don't declare support,
+			 * they don't generate styles.
+			 */
 			if (
 				! property_exists( $block_type, 'supports' ) ||
-				empty( $block_type->supports ) ||
-				! is_array( $block_type->supports ) ) {
-
-				// Skips blocks that don't declare support.
-				//
-				// TODO: what if there are blocks that don't support
-				// any style but still need the settings passed down?
+				! is_array( $block_type->supports ) ||
+				empty( $block_type->supports )
+			) {
 				continue;
 			}
 
+			/*
+			 * Extract block support keys that are related to the style properties.
+			 */
 			$block_supports = array();
 			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
-				if ( gutenberg_experimental_get( $block_type->supports, $metadata['block_json'] ) ) {
+				if ( gutenberg_experimental_get( $block_type->supports, $metadata['support'] ) ) {
 					$block_supports[] = $key;
 				}
+			}
+
+			/*
+			 * Skip blocks that don't support anything related to styles.
+			 */
+			if ( empty( $block_supports ) ) {
+				continue;
 			}
 
 			/*
@@ -444,36 +478,27 @@ class WP_Theme_JSON {
 				is_string( $block_type->supports['__experimentalSelector'] )
 			) {
 				self::$blocks_metadata[ $block_name ] = array(
-					'selector'  => $block_type->supports['__experimentalSelector'],
-					'supports'  => $block_supports,
-					'blockName' => $block_name,
+					'selector' => $block_type->supports['__experimentalSelector'],
+					'supports' => $block_supports,
 				);
 			} elseif (
 				isset( $block_type->supports['__experimentalSelector'] ) &&
 				is_array( $block_type->supports['__experimentalSelector'] )
 			) {
 				foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector_metadata ) {
-					if (
-						! isset( $selector_metadata['selector'] ) ||
-						! isset( $selector_metadata['attributes'] ) ||
-						! isset( $selector_metadata['title'] )
-					) {
+					if ( ! isset( $selector_metadata['selector'] ) ) {
 						continue;
 					}
 
 					self::$blocks_metadata[ $key ] = array(
-						'selector'   => $selector_metadata['selector'],
-						'title'      => $selector_metadata['title'],
-						'supports'   => $block_supports,
-						'blockName'  => $block_name,
-						'attributes' => $selector_metadata['attributes'],
+						'selector' => $selector_metadata['selector'],
+						'supports' => $block_supports,
 					);
 				}
 			} else {
 				self::$blocks_metadata[ $block_name ] = array(
-					'selector'  => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
-					'supports'  => $block_supports,
-					'blockName' => $block_name,
+					'selector' => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
+					'supports' => $block_supports,
 				);
 			}
 		}
@@ -649,7 +674,7 @@ class WP_Theme_JSON {
 				continue;
 			}
 
-			$value = self::get_property_value( $context['styles'], $metadata['theme_json'] );
+			$value = self::get_property_value( $context['styles'], $metadata['value'] );
 			if ( ! empty( $value ) ) {
 				$kebabcased_name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $name ) );
 				$declarations[]  = array(

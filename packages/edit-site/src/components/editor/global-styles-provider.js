@@ -13,14 +13,15 @@ import {
 	useEffect,
 	useMemo,
 } from '@wordpress/element';
-import { useEntityProp } from '@wordpress/core-data';
 import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
+import { useEntityProp } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { default as getGlobalStyles } from './global-styles-renderer';
+import { GLOBAL_CONTEXT } from './utils';
 
 const EMPTY_CONTENT = '{}';
 
@@ -58,12 +59,68 @@ export const useGlobalStylesReset = () => {
 	];
 };
 
-export default function GlobalStylesProvider( {
-	children,
-	baseStyles,
-	contexts,
-} ) {
+const extractSupportKeys = ( supports ) => {
+	const supportKeys = [];
+	Object.keys( STYLE_PROPERTY ).forEach( ( name ) => {
+		if ( get( supports, STYLE_PROPERTY[ name ].support, false ) ) {
+			supportKeys.push( name );
+		}
+	} );
+	return supportKeys;
+};
+
+const getContexts = ( blockTypes ) => {
+	const result = {
+		...GLOBAL_CONTEXT,
+	};
+
+	// Add contexts from block metadata.
+	blockTypes.forEach( ( blockType ) => {
+		const blockName = blockType.name;
+		const blockSelector = blockType?.supports?.__experimentalSelector;
+		const supports = extractSupportKeys( blockType?.supports );
+		const hasSupport = supports.length > 0;
+
+		if ( hasSupport && typeof blockSelector === 'string' ) {
+			result[ blockName ] = {
+				selector: blockSelector,
+				supports,
+				blockName,
+			};
+		} else if ( hasSupport && typeof blockSelector === 'object' ) {
+			Object.keys( blockSelector ).forEach( ( key ) => {
+				result[ key ] = {
+					selector: blockSelector[ key ].selector,
+					supports,
+					blockName,
+					title: blockSelector[ key ].title,
+					attributes: blockSelector[ key ].attributes,
+				};
+			} );
+		} else if ( hasSupport ) {
+			const suffix = blockName.replace( 'core/', '' ).replace( '/', '-' );
+			result[ blockName ] = {
+				selector: '.wp-block-' + suffix,
+				supports,
+				blockName,
+			};
+		}
+	} );
+
+	return result;
+};
+
+export default function GlobalStylesProvider( { children, baseStyles } ) {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
+	const { blockTypes, settings } = useSelect( ( select ) => {
+		return {
+			blockTypes: select( 'core/blocks' ).getBlockTypes(),
+			settings: select( 'core/edit-site' ).getSettings(),
+		};
+	} );
+	const { updateSettings } = useDispatch( 'core/edit-site' );
+
+	const contexts = useMemo( () => getContexts( blockTypes ), [ blockTypes ] );
 
 	const { userStyles, mergedStyles } = useMemo( () => {
 		const newUserStyles = content ? JSON.parse( content ) : {};
@@ -100,7 +157,7 @@ export default function GlobalStylesProvider( {
 
 				return get(
 					styles?.[ context ]?.styles,
-					STYLE_PROPERTY[ propertyName ]
+					STYLE_PROPERTY[ propertyName ].value
 				);
 			},
 			setStyleProperty: ( context, propertyName, newValue ) => {
@@ -110,17 +167,16 @@ export default function GlobalStylesProvider( {
 					contextStyles = {};
 					set( newContent, [ context, 'styles' ], contextStyles );
 				}
-				set( contextStyles, STYLE_PROPERTY[ propertyName ], newValue );
+				set(
+					contextStyles,
+					STYLE_PROPERTY[ propertyName ].value,
+					newValue
+				);
 				setContent( JSON.stringify( newContent ) );
 			},
 		} ),
-		[ contexts, content ]
+		[ content, mergedStyles ]
 	);
-
-	const settings = useSelect( ( select ) =>
-		select( 'core/edit-site' ).getSettings()
-	);
-	const { updateSettings } = useDispatch( 'core/edit-site' );
 
 	useEffect( () => {
 		const newStyles = settings.styles.filter(
@@ -131,7 +187,11 @@ export default function GlobalStylesProvider( {
 			styles: [
 				...newStyles,
 				{
-					css: getGlobalStyles( contexts, mergedStyles ),
+					css: getGlobalStyles(
+						contexts,
+						mergedStyles,
+						STYLE_PROPERTY
+					),
 					isGlobalStyles: true,
 				},
 			],
