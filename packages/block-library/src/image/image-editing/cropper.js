@@ -16,19 +16,31 @@ import { MIN_ZOOM, MAX_ZOOM } from './constants';
 
 import { useImageEditingContext } from './context';
 
-export default function ImageCropper( { url } ) {
+export default function ImageCropper( {
+	url,
+	width,
+	height,
+	clientWidth,
+	naturalHeight,
+	naturalWidth,
+} ) {
 	const {
 		isInProgress,
 		editedUrl,
-		editedWidth,
-		editedHeight,
 		position,
 		zoom,
 		aspect,
 		setPosition,
 		setCrop,
 		setZoom,
+		rotation,
 	} = useImageEditingContext();
+
+	let editedHeight = height || ( clientWidth * naturalHeight ) / naturalWidth;
+
+	if ( rotation % 180 === 90 ) {
+		editedHeight = ( clientWidth * naturalWidth ) / naturalHeight;
+	}
 
 	return (
 		<div
@@ -36,7 +48,7 @@ export default function ImageCropper( { url } ) {
 				'is-applying': isInProgress,
 			} ) }
 			style={ {
-				width: editedWidth,
+				width,
 				height: editedHeight,
 			} }
 		>

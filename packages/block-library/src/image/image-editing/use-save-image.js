@@ -3,7 +3,7 @@
  */
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 
 export default function useSaveImage( {
@@ -20,12 +20,12 @@ export default function useSaveImage( {
 	const { createErrorNotice } = useDispatch( 'core/notices' );
 	const [ isInProgress, setIsInProgress ] = useState( false );
 
-	const cancel = () => {
+	const cancel = useCallback( () => {
 		setIsInProgress( false );
 		onFinishEditing();
-	};
+	}, [ setIsInProgress, onFinishEditing ] );
 
-	function apply() {
+	const apply = useCallback( () => {
 		setIsInProgress( true );
 
 		let attrs = {};
@@ -71,11 +71,26 @@ export default function useSaveImage( {
 				setIsInProgress( false );
 				onFinishEditing();
 			} );
-	}
+	}, [
+		setIsInProgress,
+		crop,
+		rotation,
+		height,
+		width,
+		aspect,
+		url,
+		onSaveImage,
+		createErrorNotice,
+		setIsInProgress,
+		onFinishEditing,
+	] );
 
-	return {
-		isInProgress,
-		apply,
-		cancel,
-	};
+	return useMemo(
+		() => ( {
+			isInProgress,
+			apply,
+			cancel,
+		} ),
+		[ isInProgress, apply, cancel ]
+	);
 }

@@ -18,21 +18,19 @@ export default function ImageEditingProvider( {
 	url,
 	naturalWidth,
 	naturalHeight,
-	width,
-	height,
-	clientWidth,
+	isEditing,
 	onFinishEditing,
 	onSaveImage,
 	children,
 } ) {
-	const transformImage = useTransformImage( {
-		url,
-		naturalWidth,
-		naturalHeight,
-		width,
-		height,
-		clientWidth,
-	} );
+	const transformImage = useTransformImage(
+		{
+			url,
+			naturalWidth,
+			naturalHeight,
+		},
+		isEditing
+	);
 
 	const saveImage = useSaveImage( {
 		id,

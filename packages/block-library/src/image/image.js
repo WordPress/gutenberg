@@ -413,7 +413,16 @@ export default function Image( {
 	}
 
 	if ( canEditImage && isEditingImage ) {
-		img = <ImageEditor url={ url } />;
+		img = (
+			<ImageEditor
+				url={ url }
+				width={ width }
+				height={ height }
+				clientWidth={ clientWidth }
+				naturalHeight={ naturalHeight }
+				naturalWidth={ naturalWidth }
+			/>
+		);
 	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
 		img = <div style={ { width, height } }>{ img }</div>;
 	} else {
@@ -501,12 +510,11 @@ export default function Image( {
 			url={ url }
 			naturalWidth={ naturalWidth }
 			naturalHeight={ naturalHeight }
-			width={ width }
-			height={ height }
 			clientWidth={ clientWidth }
 			onSaveImage={ ( imageAttributes ) =>
 				setAttributes( imageAttributes )
 			}
+			isEditing={ isEditingImage }
 			onFinishEditing={ () => setIsEditingImage( false ) }
 		>
 			{ controls }

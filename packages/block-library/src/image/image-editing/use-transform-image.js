@@ -1,64 +1,41 @@
 /**
- * External dependencies
- */
-import { isNumber } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useState } from '@wordpress/element';
 
-function getAspectRatio( width, height ) {
-	return isNumber( width ) && isNumber( height ) ? width / height : undefined;
-}
-
-function useLazyAspectRatio( width, height ) {
-	const initialAspect = getAspectRatio( width, height );
-	const [ aspect, setAspect ] = useState( initialAspect );
-	const [ defaultAspect, setDefaultAspect ] = useState( initialAspect );
-
-	// Wait for a valid width/height before setting the aspect ratio.
-	useEffect( () => {
-		if ( aspect === undefined ) {
-			const newInitialAspect = getAspectRatio( width, height );
-			setAspect( newInitialAspect );
-			setDefaultAspect( newInitialAspect );
-		}
-	}, [ aspect, width, height ] );
-
-	return [ defaultAspect, aspect, setAspect ];
-}
-
-export default function useTransformImage( {
-	url,
-	naturalWidth,
-	naturalHeight,
-	width,
-	height,
-	clientWidth,
-} ) {
+function useTransformState( { url, naturalWidth, naturalHeight } ) {
 	const [ editedUrl, setEditedUrl ] = useState();
-	const [ crop, setCrop ] = useState( null );
+	const [ crop, setCrop ] = useState();
 	const [ position, setPosition ] = useState( { x: 0, y: 0 } );
-	const [ zoom, setZoom ] = useState( 100 );
-	const [ rotation, setRotation ] = useState( 0 );
-	const [ defaultAspect, aspect, setAspect ] = useLazyAspectRatio(
-		width,
-		height
-	);
+	const [ zoom, setZoom ] = useState();
+	const [ rotation, setRotation ] = useState();
+	const [ aspect, setAspect ] = useState();
+	const [ defaultAspect, setDefaultAspect ] = useState();
 
-	// TODO - remove inlined logic.
-	const editedWidth = width;
-	let editedHeight = height || ( clientWidth * naturalHeight ) / naturalWidth;
-	let naturalAspectRatio = naturalWidth / naturalHeight;
+	const initializeTransformValues = useCallback( () => {
+		setPosition( { x: 0, y: 0 } );
+		setZoom( 100 );
+		setRotation( 0 );
+		setAspect( naturalWidth / naturalHeight );
+		setDefaultAspect( naturalWidth / naturalHeight );
+	}, [
+		naturalWidth,
+		naturalHeight,
+		setPosition,
+		setZoom,
+		setRotation,
+		setAspect,
+		setDefaultAspect,
+	] );
 
-	if ( rotation % 180 === 90 ) {
-		editedHeight = ( clientWidth * naturalWidth ) / naturalHeight;
-		naturalAspectRatio = naturalHeight / naturalWidth;
-	}
-
-	function rotateClockwise() {
+	const rotateClockwise = useCallback( () => {
 		const angle = ( rotation + 90 ) % 360;
+
+		let naturalAspectRatio = naturalWidth / naturalHeight;
+
+		if ( rotation % 180 === 90 ) {
+			naturalAspectRatio = naturalHeight / naturalWidth;
+		}
 
 		if ( angle === 0 ) {
 			setEditedUrl();
@@ -113,22 +90,63 @@ export default function useTransformImage( {
 		const el = new window.Image();
 		el.src = url;
 		el.onload = editImage;
-	}
-
-	return {
-		position,
-		setPosition,
-		crop,
-		setCrop,
-		zoom,
-		setZoom,
+	}, [
 		rotation,
-		rotateClockwise,
-		defaultAspect,
-		aspect,
+		naturalWidth,
+		naturalHeight,
+		setEditedUrl,
+		setRotation,
 		setAspect,
-		editedUrl,
-		editedWidth,
-		editedHeight,
-	};
+		setPosition,
+	] );
+
+	return useMemo(
+		() => ( {
+			editedUrl,
+			setEditedUrl,
+			crop,
+			setCrop,
+			position,
+			setPosition,
+			zoom,
+			setZoom,
+			rotation,
+			setRotation,
+			rotateClockwise,
+			aspect,
+			setAspect,
+			defaultAspect,
+			initializeTransformValues,
+		} ),
+		[
+			editedUrl,
+			setEditedUrl,
+			crop,
+			setCrop,
+			position,
+			setPosition,
+			zoom,
+			setZoom,
+			rotation,
+			setRotation,
+			rotateClockwise,
+			aspect,
+			setAspect,
+			defaultAspect,
+			initializeTransformValues,
+		]
+	);
+}
+
+export default function useTransformImage( imageProperties, isEditing ) {
+	const transformState = useTransformState( imageProperties );
+	const { initializeTransformValues } = transformState;
+
+	useEffect( () => {
+		if ( isEditing ) {
+			initializeTransformValues();
+		}
+	}, [ isEditing, initializeTransformValues ] );
+
+	return transformState;
 }
