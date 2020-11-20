@@ -131,7 +131,9 @@ function Editor() {
 		( entitiesToSave ) => {
 			if ( entitiesToSave ) {
 				const { getEditedEntityRecord } = select( 'core' );
-				const { getTemplateInfo } = select( 'core/editor' );
+				const {
+					__experimentalGetTemplateInfo: getTemplateInfo,
+				} = select( 'core/editor' );
 				entitiesToSave.forEach( ( { kind, name, key } ) => {
 					const record = getEditedEntityRecord( kind, name, key );
 

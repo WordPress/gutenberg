@@ -1668,7 +1668,7 @@ export const getBlockListSettings = getBlockEditorSelector(
  *
  * @return {Object} The template types.
  */
-export function getDefaultTemplateTypes( state ) {
+export function __experimentalGetDefaultTemplateTypes( state ) {
 	return getEditorSettings( state )?.defaultTemplateTypes;
 }
 
@@ -1680,9 +1680,10 @@ export function getDefaultTemplateTypes( state ) {
  *
  * @return {Object} The template type.
  */
-export const getDefaultTemplateType = createSelector(
-	( state, slug ) => find( getDefaultTemplateTypes( state ), { slug } ) || {},
-	( state, slug ) => [ getDefaultTemplateTypes( state ), slug ]
+export const __experimentalGetDefaultTemplateType = createSelector(
+	( state, slug ) =>
+		find( __experimentalGetDefaultTemplateTypes( state ), { slug } ) || {},
+	( state, slug ) => [ __experimentalGetDefaultTemplateTypes( state ), slug ]
 );
 
 /**
@@ -1693,7 +1694,7 @@ export const getDefaultTemplateType = createSelector(
  * @param {Object} template The template for which we need information.
  * @return {Object} Information about the template, including title and description.
  */
-export function getTemplateInfo( state, template ) {
+export function __experimentalGetTemplateInfo( state, template ) {
 	if ( ! template ) {
 		return {};
 	}
@@ -1702,7 +1703,7 @@ export function getTemplateInfo( state, template ) {
 	const {
 		title: defaultTitle,
 		description: defaultDescription,
-	} = getDefaultTemplateType( state, slug );
+	} = __experimentalGetDefaultTemplateType( state, slug );
 
 	const templateTitle = isString( title ) ? title : title?.rendered;
 	const templateDescription = isString( excerpt ) ? excerpt : excerpt?.raw;

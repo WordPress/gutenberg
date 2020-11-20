@@ -42,7 +42,9 @@ export default function Header( { openEntitiesSavedStates } ) {
 			isInserterOpened,
 		} = select( 'core/edit-site' );
 		const { getEntityRecord } = select( 'core' );
-		const { getTemplateInfo } = select( 'core/editor' );
+		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
+			'core/editor'
+		);
 
 		const _templateType = getTemplateType();
 		const _template = getEntityRecord(

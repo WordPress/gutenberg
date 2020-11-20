@@ -24,7 +24,9 @@ import { TEMPLATES_STATUSES } from './constants';
 
 export default function NewTemplateDropdown() {
 	const { defaultTemplateTypes, templates } = useSelect( ( select ) => {
-		const { getDefaultTemplateTypes } = select( 'core/editor' );
+		const {
+			__experimentalGetDefaultTemplateTypes: getDefaultTemplateTypes,
+		} = select( 'core/editor' );
 		const templateEntities = select( 'core' ).getEntityRecords(
 			'postType',
 			'wp_template',

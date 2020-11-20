@@ -31,11 +31,7 @@ export default function EntityRecordItem( {
 	// Handle templates that might use default descriptive titles
 	const entityRecordTitle = useSelect(
 		( select ) => {
-			if (
-				! select( 'core/edit-site' ) ||
-				'postType' !== kind ||
-				'wp_template' !== name
-			) {
+			if ( 'postType' !== kind || 'wp_template' !== name ) {
 				return title;
 			}
 
@@ -44,7 +40,9 @@ export default function EntityRecordItem( {
 				name,
 				key
 			);
-			return select( 'core/editor' ).getTemplateInfo( template ).title;
+			return select( 'core/editor' ).__experimentalGetTemplateInfo(
+				template
+			).title;
 		},
 		[ name, kind, title, key ]
 	);

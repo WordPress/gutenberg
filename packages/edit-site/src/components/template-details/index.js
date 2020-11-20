@@ -12,7 +12,8 @@ import { MENU_TEMPLATES } from '../navigation-sidebar/navigation-panel/constants
 
 export default function TemplateDetails( { template, onClose } ) {
 	const { title, description } = useSelect(
-		( select ) => select( 'core/editor' ).getTemplateInfo( template ),
+		( select ) =>
+			select( 'core/editor' ).__experimentalGetTemplateInfo( template ),
 		[]
 	);
 	const { openNavigationPanelToMenu } = useDispatch( 'core/edit-site' );
