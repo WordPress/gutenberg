@@ -141,7 +141,7 @@ _Parameters_
 
 _Returns_
 
--   `WPAtom<T>`: Createtd atom.
+-   `WPAtom<T>`: Created atom.
 
 <a name="createAtomFamily" href="#createAtomFamily">#</a> **createAtomFamily**
 
@@ -153,7 +153,7 @@ _Parameters_
 
 _Returns_
 
--   (unknown type): Atom Family Item creator.
+-   (unknown type): Atom family item creator.
 
 <a name="createAtomRegistry" href="#createAtomRegistry">#</a> **createAtomRegistry**
 
@@ -174,13 +174,13 @@ Creates a derived atom.
 
 _Parameters_
 
--   _resolver_ `WPDerivedAtomResolver<T>`: Atom Resolver.
+-   _resolver_ `WPDerivedAtomResolver<T>`: Atom resolver.
 -   _updater_ `WPDerivedAtomUpdater<T>`: Atom updater.
 -   _config_ `[WPCommonAtomConfig]`: Common Atom config.
 
 _Returns_
 
--   `WPAtom<T>`: Createtd atom.
+-   `WPAtom<T>`: Created atom.
 
 <a name="createStoreAtom" href="#createStoreAtom">#</a> **createStoreAtom**
 
