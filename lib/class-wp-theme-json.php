@@ -100,7 +100,7 @@ class WP_Theme_JSON {
 					'top'    => null,
 					'right'  => null,
 					'bottom' => null,
-					'left'   => null
+					'left'   => null,
 				),
 			),
 			'typography' => array(
@@ -476,8 +476,8 @@ class WP_Theme_JSON {
 				is_string( $block_type->supports['__experimentalSelector'] )
 			) {
 				self::$blocks_metadata[ $block_name ] = array(
-					'selector'  => $block_type->supports['__experimentalSelector'],
-					'supports'  => $block_supports,
+					'selector' => $block_type->supports['__experimentalSelector'],
+					'supports' => $block_supports,
 				);
 			} elseif (
 				isset( $block_type->supports['__experimentalSelector'] ) &&
@@ -495,8 +495,8 @@ class WP_Theme_JSON {
 				}
 			} else {
 				self::$blocks_metadata[ $block_name ] = array(
-					'selector'  => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
-					'supports'  => $block_supports,
+					'selector' => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
+					'supports' => $block_supports,
 				);
 			}
 		}
