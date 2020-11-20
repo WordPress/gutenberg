@@ -91,7 +91,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		)->render( array( 'dynamic' => false ) );
 	}
 	return sprintf(
-		'<div %1$s>%2$s</div>',
+		'<ul %1$s>%2$s</ul>',
 		$wrapper_attributes,
 		$content
 	);

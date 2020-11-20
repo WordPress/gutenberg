@@ -138,26 +138,6 @@ export default function QueryInspectorControls( {
 	}, [ querySearch, onChangeDebounced ] );
 	return (
 		<InspectorControls>
-			{ layout?.type === 'flex' && (
-				<PanelBody title={ __( 'Display' ) }>
-					<RangeControl
-						label={ __( 'Columns' ) }
-						value={ layout.columns }
-						onChange={ ( value ) =>
-							setLayout( { columns: value } )
-						}
-						min={ 1 }
-						max={ Math.max( 6, layout.columns ) }
-					/>
-					{ layout.columns > 6 && (
-						<Notice status="warning" isDismissible={ false }>
-							{ __(
-								'This column count exceeds the recommended amount and may cause visual breakage.'
-							) }
-						</Notice>
-					) }
-				</PanelBody>
-			) }
 			<PanelBody title={ __( 'Settings' ) }>
 				<SelectControl
 					options={ postTypesSelectOptions }
@@ -165,6 +145,26 @@ export default function QueryInspectorControls( {
 					label={ __( 'Post Type' ) }
 					onChange={ onPostTypeChange }
 				/>
+				{ layout?.type === 'flex' && (
+					<>
+						<RangeControl
+							label={ __( 'Columns' ) }
+							value={ layout.columns }
+							onChange={ ( value ) =>
+								setLayout( { columns: value } )
+							}
+							min={ 1 }
+							max={ Math.max( 6, layout.columns ) }
+						/>
+						{ layout.columns > 6 && (
+							<Notice status="warning" isDismissible={ false }>
+								{ __(
+									'This column count exceeds the recommended amount and may cause visual breakage.'
+								) }
+							</Notice>
+						) }
+					</>
+				) }
 				<QueryControls
 					{ ...{ order, orderBy } }
 					onOrderChange={ ( value ) => setQuery( { order: value } ) }

@@ -126,7 +126,7 @@ export default function QueryLoopEdit( {
 	}
 
 	return (
-		<div { ...blockProps }>
+		<ul { ...blockProps }>
 			{ blockContexts &&
 				blockContexts.map( ( blockContext ) => (
 					<BlockContextProvider
@@ -135,18 +135,20 @@ export default function QueryLoopEdit( {
 					>
 						{ blockContext ===
 						( activeBlockContext || blockContexts[ 0 ] ) ? (
-							<div { ...innerBlocksProps } />
+							<li { ...innerBlocksProps } />
 						) : (
-							<BlockPreview
-								blocks={ blocks }
-								__experimentalLive
-								__experimentalOnClick={ () =>
-									setActiveBlockContext( blockContext )
-								}
-							/>
+							<li>
+								<BlockPreview
+									blocks={ blocks }
+									__experimentalLive
+									__experimentalOnClick={ () =>
+										setActiveBlockContext( blockContext )
+									}
+								/>
+							</li>
 						) }
 					</BlockContextProvider>
 				) ) }
-		</div>
+		</ul>
 	);
 }

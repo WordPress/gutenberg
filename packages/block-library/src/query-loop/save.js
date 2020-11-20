@@ -5,8 +5,8 @@ import { InnerBlocks } from '@wordpress/block-editor';
 
 export default function QueryLoopSave() {
 	return (
-		<div>
+		<li>
 			<InnerBlocks.Content />
-		</div>
+		</li>
 	);
 }
