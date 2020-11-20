@@ -26,7 +26,7 @@ import { createDerivedAtom } from './derived';
  * @param {WPAtomFamilyResolver<T>} resolver   Atom resolver.
  * @param {WPAtomFamilyUpdater<T>}  updater    Atom updater.
  * @param {WPCommonAtomConfig=}     atomConfig Common Atom config.
- * @return {(key:string) => WPAtomFamilyItem<T>} Atom Family Item creator.
+ * @return {(key:string) => WPAtomFamilyItem<T>} Atom family item creator.
  */
 export const createAtomFamily = ( resolver, updater, atomConfig = {} ) => {
 	const config = {
