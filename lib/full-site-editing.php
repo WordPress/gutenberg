@@ -80,7 +80,7 @@ function gutenberg_adminbar_items( $wp_admin_bar ) {
 		$wp_admin_bar->add_node(
 			array(
 				'id'    => 'site-editor',
-				'title' => __( 'Site Editor', 'gutenberg' ),
+				'title' => __( 'Edit site', 'gutenberg' ),
 				'href'  => admin_url( 'admin.php?page=gutenberg-edit-site' ),
 			)
 		);
