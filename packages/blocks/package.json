@@ -40,6 +40,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/shortcode": "file:../shortcode",
+		"@wordpress/stan": "file:../stan",
 		"hpq": "^1.3.0",
 		"lodash": "^4.17.19",
 		"rememo": "^3.0.0",

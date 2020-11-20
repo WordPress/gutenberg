@@ -1,16 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, register } from '@wordpress/data';
+import { __experimentalCreateAtomicStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
-
-const STORE_NAME = 'core/blocks';
+import { rootAtoms } from './atoms';
 
 /**
  * Store definition for the blocks namespace.
@@ -19,10 +17,10 @@ const STORE_NAME = 'core/blocks';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
-	reducer,
-	selectors,
+export const store = __experimentalCreateAtomicStore( 'core/blocks', {
+	rootAtoms,
 	actions,
+	selectors,
 } );
 
 register( store );
