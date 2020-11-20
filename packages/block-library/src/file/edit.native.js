@@ -1,12 +1,17 @@
 /**
  * External dependencies
  */
-import { View, Text, Clipboard } from 'react-native';
+import { View, Clipboard, TouchableWithoutFeedback } from 'react-native';
 import React from 'react';
 
 /**
  * WordPress dependencies
  */
+import {
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+	mediaUploadSync,
+} from '@wordpress/react-native-bridge';
 import {
 	BlockIcon,
 	MediaPlaceholder,
@@ -24,6 +29,7 @@ import {
 	ToggleControl,
 	BottomSheet,
 	SelectControl,
+	Icon,
 } from '@wordpress/components';
 import {
 	file as icon,
@@ -31,11 +37,13 @@ import {
 	button,
 	external,
 	link,
+	warning,
 } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { getProtocol } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -64,6 +72,9 @@ export class FileEdit extends Component {
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
 			this
 		);
+		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
+			this
+		);
 		this.getFileComponent = this.getFileComponent.bind( this );
 		this.onChangeDownloadButtonVisibility = this.onChangeDownloadButtonVisibility.bind(
 			this
@@ -77,6 +88,8 @@ export class FileEdit extends Component {
 			this
 		);
 		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
+		this.onFilePressed = this.onFilePressed.bind( this );
+		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
 	}
 
 	componentDidMount() {
@@ -87,6 +100,14 @@ export class FileEdit extends Component {
 			setAttributes( {
 				downloadButtonText: _x( 'Download', 'button label' ),
 			} );
+		}
+
+		if (
+			attributes.id &&
+			attributes.url &&
+			getProtocol( attributes.url ) === 'file:'
+		) {
+			mediaUploadSync();
 		}
 	}
 
@@ -170,23 +191,22 @@ export class FileEdit extends Component {
 		this.setState( { isUploadInProgress: false } );
 	}
 
-	mediaUploadStateReset() {
-		const { setAttributes } = this.props;
-
-		setAttributes( { id: null, url: null } );
+	finishMediaUploadWithFailure( payload ) {
+		this.props.setAttributes( { id: payload.mediaId } );
 		this.setState( { isUploadInProgress: false } );
 	}
 
-	getErrorComponent( retryMessage ) {
-		return (
-			retryMessage && (
-				<View style={ styles.retryContainer }>
-					<Text style={ styles.uploadFailedText }>
-						{ retryMessage }
-					</Text>
-				</View>
-			)
-		);
+	mediaUploadStateReset() {
+		const { setAttributes } = this.props;
+
+		setAttributes( {
+			id: null,
+			href: null,
+			textLinkHref: null,
+			fileName: null,
+			downloadButtonText: null,
+		} );
+		this.setState( { isUploadInProgress: false } );
 	}
 
 	onShowLinkSettings() {
@@ -316,8 +336,21 @@ export class FileEdit extends Component {
 		}
 	}
 
+	onFilePressed() {
+		const { attributes } = this.props;
+
+		if ( this.state.isUploadInProgress ) {
+			requestImageUploadCancelDialog( attributes.id );
+		} else if (
+			attributes.id &&
+			getProtocol( attributes.url ) === 'file:'
+		) {
+			requestImageFailedRetryDialog( attributes.id );
+		}
+	}
+
 	getFileComponent( openMediaOptions, getMediaOptions ) {
-		const { attributes, media } = this.props;
+		const { attributes, media, isSelected } = this.props;
 
 		const {
 			fileName,
@@ -342,58 +375,77 @@ export class FileEdit extends Component {
 				onFinishMediaUploadWithSuccess={
 					this.finishMediaUploadWithSuccess
 				}
-				onFinishMediaUploadWithFailure={ () => {} }
+				onFinishMediaUploadWithFailure={
+					this.finishMediaUploadWithFailure
+				}
 				onMediaUploadStateReset={ this.mediaUploadStateReset }
-				renderContent={ ( {
-					isUploadInProgress,
-					isUploadFailed,
-					retryMessage,
-				} ) => {
-					if ( isUploadFailed ) {
-						return this.getErrorComponent( retryMessage );
-					}
-
+				renderContent={ ( { isUploadInProgress, isUploadFailed } ) => {
 					return (
-						<View>
-							{ isUploadInProgress ||
-								this.getToolbarEditButton( openMediaOptions ) }
-							{ getMediaOptions() }
-							{ this.getInspectorControls(
-								attributes,
-								media,
-								isUploadInProgress,
-								isUploadFailed
-							) }
-							<RichText
-								__unstableMobileNoFocusOnMount
-								onChange={ this.onChangeFileName }
-								placeholder={ __( 'File name' ) }
-								rootTagsToEliminate={ [ 'p' ] }
-								tagName="p"
-								underlineColorAndroid="transparent"
-								value={ fileName }
-								deleteEnter={ true }
-								textAlign={ this.getTextAlignmentForAlignment(
-									align
+						<TouchableWithoutFeedback
+							accessible={ ! isSelected }
+							onPress={ this.onFilePressed }
+							onLongPress={ openMediaOptions }
+							disabled={ ! isSelected }
+						>
+							<View>
+								{ isUploadInProgress ||
+									this.getToolbarEditButton(
+										openMediaOptions
+									) }
+								{ getMediaOptions() }
+								{ this.getInspectorControls(
+									attributes,
+									media,
+									isUploadInProgress,
+									isUploadFailed
 								) }
-							/>
-							{ showDownloadButton && (
-								<View
-									style={ [
-										finalButtonStyle,
-										this.getStyleForAlignment( align ),
-									] }
-								>
-									<PlainText
-										style={ styles.buttonText }
-										value={ downloadButtonText }
-										onChange={
-											this.onChangeDownloadButtonText
-										}
+								<View>
+									<RichText
+										__unstableMobileNoFocusOnMount
+										onChange={ this.onChangeFileName }
+										placeholder={ __( 'File name' ) }
+										rootTagsToEliminate={ [ 'p' ] }
+										tagName="p"
+										underlineColorAndroid="transparent"
+										value={ fileName }
+										deleteEnter={ true }
+										textAlign={ this.getTextAlignmentForAlignment(
+											align
+										) }
 									/>
+									{ isUploadFailed && (
+										<View
+											style={ { flexDirection: 'row' } }
+										>
+											<Icon
+												icon={ warning }
+												style={ styles.uploadFailed }
+											/>
+											<PlainText
+												value={ __( 'Error' ) }
+												style={ styles.uploadFailed }
+											/>
+										</View>
+									) }
 								</View>
-							) }
-						</View>
+								{ showDownloadButton && (
+									<View
+										style={ [
+											finalButtonStyle,
+											this.getStyleForAlignment( align ),
+										] }
+									>
+										<PlainText
+											style={ styles.buttonText }
+											value={ downloadButtonText }
+											onChange={
+												this.onChangeDownloadButtonText
+											}
+										/>
+									</View>
+								) }
+							</View>
+						</TouchableWithoutFeedback>
 					);
 				} }
 			/>
