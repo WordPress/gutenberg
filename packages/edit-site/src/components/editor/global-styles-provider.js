@@ -21,7 +21,11 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { default as getGlobalStyles } from './global-styles-renderer';
-import { GLOBAL_CONTEXT } from './utils';
+import {
+	GLOBAL_CONTEXT,
+	getValueFromVariable,
+	getPresetVariable,
+} from './utils';
 
 const EMPTY_CONTENT = '{}';
 
@@ -155,10 +159,11 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 			getStyleProperty: ( context, propertyName, origin = 'merged' ) => {
 				const styles = 'user' === origin ? userStyles : mergedStyles;
 
-				return get(
+				const value = get(
 					styles?.[ context ]?.styles,
 					STYLE_PROPERTY[ propertyName ].value
 				);
+				return getValueFromVariable( mergedStyles, context, value );
 			},
 			setStyleProperty: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
@@ -170,7 +175,12 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				set(
 					contextStyles,
 					STYLE_PROPERTY[ propertyName ].value,
-					newValue
+					getPresetVariable(
+						mergedStyles,
+						context,
+						propertyName,
+						newValue
+					)
 				);
 				setContent( JSON.stringify( newContent ) );
 			},
