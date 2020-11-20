@@ -46,9 +46,9 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 	let value = null;
 
 	/**
-	 * @type {(() => void)[]}
+	 * @type {Set<() => void>}
 	 */
-	let listeners = [];
+	const listeners = new Set();
 
 	/**
 	 * @type {(WPAtomState<any>)[]}
@@ -65,7 +65,7 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 	};
 
 	const refresh = () => {
-		if ( listeners.length ) {
+		if ( listeners.size > 0 ) {
 			if ( config.isAsync ) {
 				resolveQueue.add( context, resolve );
 			} else {
@@ -187,9 +187,10 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 				isListening = true;
 				resolve();
 			}
-			listeners.push( listener );
-			return () =>
-				( listeners = listeners.filter( ( l ) => l !== listener ) );
+			listeners.add( listener );
+			return () => {
+				listeners.delete( listener );
+			};
 		},
 		get isResolved() {
 			return isResolved;

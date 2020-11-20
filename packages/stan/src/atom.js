@@ -16,9 +16,9 @@ export const createAtom = ( initialValue, config = {} ) => () => {
 	let value = initialValue;
 
 	/**
-	 * @type {(() => void)[]}
+	 * @type {Set<() => void>}
 	 */
-	let listeners = [];
+	const listeners = new Set();
 
 	return {
 		id: config.id,
@@ -34,9 +34,10 @@ export const createAtom = ( initialValue, config = {} ) => () => {
 			return value;
 		},
 		subscribe( listener ) {
-			listeners.push( listener );
-			return () =>
-				( listeners = listeners.filter( ( l ) => l !== listener ) );
+			listeners.add( listener );
+			return () => {
+				listeners.delete( listener );
+			};
 		},
 		isResolved: true,
 	};
