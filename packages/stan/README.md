@@ -10,7 +10,7 @@ It share the same goals as Recoil and Jotai:
 
 Unlike these frameworks, it has the following goals that justified the creation of a separate library:
 
--   It is React independent. You can create binding for any of your desired framework.
+-   It is independent from other libraries like React. You can create binding for any of your desired frameworks.
 -   It needs to be flexible enough to offer bindings for `@wordpress/data` consumer API. (useSelect and useDispatch).
 
 ## Installation
