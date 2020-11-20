@@ -10,7 +10,7 @@
  * @template T
  * @param {T}                   initialValue Initial value in the atom. *
  * @param {WPCommonAtomConfig=} config       Common Atom config.
- * @return {WPAtom<T>} Createtd atom.
+ * @return {WPAtom<T>} Created atom.
  */
 export const createAtom = ( initialValue, config = {} ) => () => {
 	let value = initialValue;
