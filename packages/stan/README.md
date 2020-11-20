@@ -124,7 +124,7 @@ It is important to note that stan instance and registries are low-level APIs mea
 
 Currently available bindings:
 
--   `@wordpress/data`: WordPress data users can continue to use their existing high-level APIs useSelect/useDispatch (selectors and actions) to access the atoms. The selectors are just high-level atoms that can rely on lower-level ones and the actions are just functions that trigger atom setters. The API for `@wordpress/data` store authors to bridge the gap is still experimental.
+-   `@wordpress/data`: WordPress data users can continue to use their existing high-level APIs `useSelect`/`useDispatch` (selectors and actions) to access the atoms. The selectors are just high-level atoms that can rely on lower-level ones and the actions are just functions that trigger atom setters. The API for `@wordpress/data` store authors to bridge the gap is still experimental.
 
 ## API Reference
 
