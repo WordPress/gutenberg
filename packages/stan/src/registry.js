@@ -31,7 +31,7 @@ import { noop, isObject } from 'lodash';
 /**
  * @template T
  * @param {WPAtom<any>|WPAtomFamilyItem<T>} maybeAtomFamilyItem
- * @return {boolean} maybeAtomFamilyItem is WPAtomFamilyItem<T>.
+ * @return {boolean} maybeAtomFamilyItem Returns `true` when atom family item detected.
  */
 export function isAtomFamilyItem( maybeAtomFamilyItem ) {
 	return (
