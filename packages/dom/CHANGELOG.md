@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+## 2.12.0 (2020-11-19)
+
+### Bug Fix
+
+- Update `placeCaretAtHorizontalEdge` to account for input element types that don't support selectionStart or selectionEnd attributes.
+
 ## 2.11.0 (2020-06-15)
 
 ### New Feature

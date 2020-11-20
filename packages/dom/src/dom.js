@@ -277,6 +277,22 @@ export function computeCaretRect( win ) {
 }
 
 /**
+ * Only certain types of inputs support the selection start and selection end
+ * attributes. This method ensures that the provided selection attributes are
+ * available on the given HTML Input element.
+ * See https://html.spec.whatwg.org/multipage/input.html#do-not-apply
+ *
+ * @param {HTMLInputElement} container Focusable input element.
+ *
+ * @return {boolean} True if selection start and end are supported. False if not.
+ */
+function canSetInputSelectionRange( container ) {
+	const selectableTypes = [ 'text', 'search', 'password', 'tel', 'url' ];
+
+	return includes( selectableTypes, container.type );
+}
+
+/**
  * Places the caret at start or end of a given element.
  *
  * @param {Element} container Focusable element.
@@ -289,13 +305,20 @@ export function placeCaretAtHorizontalEdge( container, isReverse ) {
 
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
 		container.focus();
-		if ( isReverse ) {
-			container.selectionStart = container.value.length;
-			container.selectionEnd = container.value.length;
-		} else {
-			container.selectionStart = 0;
-			container.selectionEnd = 0;
+
+		if (
+			container.tagName === 'TEXTAREA' ||
+			canSetInputSelectionRange( container )
+		) {
+			if ( isReverse ) {
+				container.selectionStart = container.value.length;
+				container.selectionEnd = container.value.length;
+			} else {
+				container.selectionStart = 0;
+				container.selectionEnd = 0;
+			}
 		}
+
 		return;
 	}
 
