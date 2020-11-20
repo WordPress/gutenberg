@@ -1590,6 +1590,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/full-site-editing",
+		"slug": "packages-full-site-editing",
+		"markdown_source": "../packages/full-site-editing/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/hooks",
 		"slug": "packages-hooks",
 		"markdown_source": "../packages/hooks/README.md",
