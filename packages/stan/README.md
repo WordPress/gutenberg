@@ -4,7 +4,7 @@
 
 It share the same goals as Recoil and Jotai:
 
--   Based on atoms (or observables) which means it's highly performant at scale: Only what needs to update get updated.
+-   Based on atoms (or observables) which means it's highly performant at scale - only what needs to update gets updated.
 -   Shares with Jotai the goal of maintaining a very light API surface.
 -   Supports async and sync state.
 
