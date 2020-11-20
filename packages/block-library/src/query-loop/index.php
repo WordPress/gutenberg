@@ -26,7 +26,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		'post__not_in' => array(),
 	);
 
-	$use_global_query = ( isset( $block->context['query']['customQuery'] ) && false === $block->context['query']['customQuery'] );
+	$use_global_query = ( isset( $block->context['query']['useGlobalQuery'] ) && $block->context['query']['useGlobalQuery'] );
 
 	// Override the custom query with the global query if needed.
 	if ( $use_global_query ) {

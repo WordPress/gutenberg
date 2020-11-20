@@ -39,7 +39,7 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		author: selectedAuthorId,
 		postType,
 		sticky,
-		customQuery,
+		useGlobalQuery,
 	} = query;
 	const [ showCategories, setShowCategories ] = useState( true );
 	const [ showTags, setShowTags ] = useState( true );
@@ -137,22 +137,22 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
 				<ToggleControl
-					label={ __( 'Customize Query' ) }
+					label={ __( 'Inherit query from URL' ) }
 					help={ __(
-						'Enable this option to customize the query arguments. Leave disabled to inherit the global query.'
+						'Disable the option to customize the query arguments. Leave enabled to inherit the global query depending on the URL.'
 					) }
-					checked={ !! customQuery }
+					checked={ !! useGlobalQuery }
 					onChange={ ( value ) =>
-						setQuery( { customQuery: !! value } )
+						setQuery( { useGlobalQuery: !! value } )
 					}
 				/>
 				<SelectControl
 					options={ postTypesSelectOptions }
 					value={ postType }
 					label={
-						customQuery
-							? __( 'Post Type' )
-							: __( 'Post Type (preview)' )
+						useGlobalQuery
+							? __( 'Post Type (preview)' )
+							: __( 'Post Type' )
 					}
 					onChange={ onPostTypeChange }
 				/>
@@ -174,7 +174,7 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 			</PanelBody>
 			<PanelBody
 				title={
-					customQuery ? __( 'Filters' ) : __( 'Filters (preview)' )
+					useGlobalQuery ? __( 'Filters (preview)' ) : __( 'Filters' )
 				}
 			>
 				{ showCategories && categories?.terms?.length > 0 && (
