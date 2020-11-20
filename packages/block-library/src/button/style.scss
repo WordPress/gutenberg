@@ -31,6 +31,10 @@ $blocks-block__margin: 0.5em;
 		/*rtl:ignore*/
 		text-align: right;
 	}
+
+	.wp-block-buttons > .wp-block-button > & {
+		font-size: inherit;
+	}
 }
 
 // Increased specificity needed to override margins

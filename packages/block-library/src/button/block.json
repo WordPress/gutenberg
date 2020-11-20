@@ -65,6 +65,7 @@
 			"__experimentalSkipSerialization": true,
 			"gradients": true
 		},
+		"fontSize": true,
 		"reusable": false,
 		"__experimentalSelector": ".wp-block-button__link"
 	},
