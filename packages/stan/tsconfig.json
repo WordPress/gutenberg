@@ -4,5 +4,8 @@
 		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
-	"include": [ "src/**/*" ]
+	"include": [ "src/**/*" ],
+	"references: [
+		{ "path": "../priority-queue" }
+	]
 }
