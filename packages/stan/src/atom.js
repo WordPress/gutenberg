@@ -25,19 +25,19 @@ export const createAtom = ( initialValue, config = {} ) => () => {
 		type: 'root',
 		set( newValue ) {
 			value = newValue;
-			listeners.forEach( ( l ) => l() );
+			return Promise.all( Array.from( listeners ).map( ( l ) => l() ) );
 		},
 		get() {
-			return value;
+			return Promise.resolve( value );
 		},
 		async resolve() {
-			return value;
+			return Promise.resolve( value );
 		},
 		subscribe( listener ) {
 			listeners.add( listener );
-			return () => {
+			return Promise.resolve( () => {
 				listeners.delete( listener );
-			};
+			} );
 		},
 		isResolved: true,
 	};

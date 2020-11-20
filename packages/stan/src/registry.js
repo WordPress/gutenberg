@@ -132,7 +132,7 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 		// This shouldn't be necessary since we rely on week map
 		// But the legacy selectors/actions API requires us to know when
 		// some atoms are removed entirely to unsubscribe.
-		delete( atom ) {
+		async delete( atom ) {
 			if ( isAtomFamilyItem( atom ) ) {
 				const {
 					config,
@@ -140,8 +140,8 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 				} = /** @type {WPAtomFamilyItem<any>} */ ( atom );
 				return familyRegistry.deleteAtomFromFamily( config, key );
 			}
-			const atomState = atoms.get( atom );
-			atoms.delete( atom );
+			const atomState = await atoms.get( atom );
+			await atoms.delete( atom );
 			onDelete( atomState );
 		},
 	};

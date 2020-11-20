@@ -43,7 +43,7 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 	/**
 	 * @type {any}
 	 */
-	let value = null;
+	const valueContainer = { value: null };
 
 	/**
 	 * @type {Set<() => void>}
@@ -60,16 +60,15 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 
 	const dependenciesUnsubscribeMap = new WeakMap();
 
-	const notifyListeners = () => {
-		listeners.forEach( ( l ) => l() );
-	};
+	const notifyListeners = async () =>
+		Promise.all( Array.from( listeners ).map( ( l ) => l() ) );
 
-	const refresh = () => {
+	const refresh = async () => {
 		if ( listeners.size > 0 ) {
 			if ( config.isAsync ) {
 				resolveQueue.add( context, resolve );
 			} else {
-				resolve();
+				await resolve();
 			}
 		} else {
 			isListening = false;
@@ -79,44 +78,33 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 	/**
 	 * @param {WPAtomState<any>} atomState
 	 */
-	const addDependency = ( atomState ) => {
+	const addDependency = async ( atomState ) => {
 		if ( ! dependenciesUnsubscribeMap.has( atomState ) ) {
 			dependenciesUnsubscribeMap.set(
 				atomState,
-				atomState.subscribe( refresh )
+				await atomState.subscribe( refresh )
 			);
 		}
 	};
 
-	const resolve = () => {
+	const resolve = async () => {
 		/**
 		 * @type {(WPAtomState<any>)[]}
 		 */
 		const updatedDependencies = [];
 		const updatedDependenciesMap = new WeakMap();
-		let result;
-		const unresolved = [];
-		try {
-			result = resolver( {
-				get: ( atom ) => {
-					const atomState = registry.__unstableGetAtomState( atom );
-					// It is important to add the dependency as soon as it's used
-					// because it's important to retrigger the resolution if the dependency
-					// changes before the resolution finishes.
-					addDependency( atomState );
-					updatedDependenciesMap.set( atomState, true );
-					updatedDependencies.push( atomState );
-					if ( ! atomState.isResolved ) {
-						unresolved.push( atomState );
-					}
-					return atomState.get();
-				},
-			} );
-		} catch ( error ) {
-			if ( unresolved.length === 0 ) {
-				throw error;
-			}
-		}
+		const result = await resolver( {
+			get: async ( atom ) => {
+				const atomState = registry.__unstableGetAtomState( atom );
+				// It is important to add the dependency as soon as it's used
+				// because it's important to retrigger the resolution if the dependency
+				// changes before the resolution finishes.
+				await addDependency( atomState );
+				updatedDependenciesMap.set( atomState, true );
+				updatedDependencies.push( atomState );
+				return await atomState.get();
+			},
+		} );
 
 		function removeExtraDependencies() {
 			const removedDependencies = dependencies.filter(
@@ -135,42 +123,28 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 		/**
 		 * @param {any} newValue
 		 */
-		function checkNewValue( newValue ) {
-			if ( unresolved.length === 0 && newValue !== value ) {
-				value = newValue;
+		async function checkNewValue( newValue ) {
+			if ( newValue !== valueContainer.value ) {
+				valueContainer.value = newValue;
 				isResolved = true;
-				notifyListeners();
+				await notifyListeners();
 			}
 		}
 
-		if ( result instanceof Promise ) {
-			// Should make this promise cancelable.
-			result
-				.then( ( newValue ) => {
-					removeExtraDependencies();
-					checkNewValue( newValue );
-				} )
-				.catch( ( error ) => {
-					if ( unresolved.length === 0 ) {
-						throw error;
-					}
-					removeExtraDependencies();
-				} );
-		} else {
-			removeExtraDependencies();
-			checkNewValue( result );
-		}
+		removeExtraDependencies();
+		await checkNewValue( result );
+		return result;
 	};
 
 	return {
 		id: config.id,
 		type: 'derived',
-		get() {
+		async get() {
 			if ( ! isListening ) {
 				isListening = true;
-				resolve();
+				await resolve();
 			}
-			return value;
+			return valueContainer.value;
 		},
 		async set( action ) {
 			await updater(
@@ -182,10 +156,10 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 			);
 		},
 		resolve,
-		subscribe( listener ) {
+		async subscribe( listener ) {
 			if ( ! isListening ) {
 				isListening = true;
-				resolve();
+				await resolve();
 			}
 			listeners.add( listener );
 			return () => {
