@@ -99,4 +99,5 @@ export {
 	default as GlobalStylesContext,
 	useGlobalStyles,
 	withGlobalStyles,
+	getMergedGlobalStyles,
 } from './mobile/global-styles-context';

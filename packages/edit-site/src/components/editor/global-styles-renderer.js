@@ -141,18 +141,8 @@ export default ( blockData, tree ) => {
 		return flattenTree( blockCustom, '--wp--custom--', '--' );
 	};
 
-	const getBlockSelector = ( selector ) => {
-		// Can we hook into the styles generation mechanism
-		// so we can avoid having to increase the class specificity here
-		// and remap :root?
-		if ( ':root' === selector ) {
-			selector = '';
-		}
-		return `.editor-styles-wrapper.editor-styles-wrapper ${ selector }`;
-	};
-
 	Object.keys( blockData ).forEach( ( context ) => {
-		const blockSelector = getBlockSelector( blockData[ context ].selector );
+		const blockSelector = blockData[ context ].selector;
 
 		const blockDeclarations = [
 			...getBlockStylesDeclarations(
