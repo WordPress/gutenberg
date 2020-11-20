@@ -22,10 +22,10 @@ const defaultTemplateTypes = [
 
 describe( 'selectors', () => {
 	describe( 'getDefaultTemplateTypes', () => {
-		const state = { editorSettings: { defaultTemplateTypes } };
+		const state = { defaultTemplateTypes };
 
 		it( 'returns undefined if there are no default template types', () => {
-			const emptyState = { editorSettings: {} };
+			const emptyState = {};
 			expect( getDefaultTemplateTypes( emptyState ) ).toBeUndefined();
 		} );
 
@@ -35,10 +35,10 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getDefaultTemplateType', () => {
-		const state = { editorSettings: { defaultTemplateTypes } };
+		const state = { defaultTemplateTypes };
 
 		it( 'returns an empty object if there are no default template types', () => {
-			const emptyState = { editorSettings: {} };
+			const emptyState = {};
 			expect( getDefaultTemplateType( emptyState, 'slug' ) ).toEqual(
 				{}
 			);
@@ -66,7 +66,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'getTemplateInfo', () => {
-		const state = { editorSettings: { defaultTemplateTypes } };
+		const state = { defaultTemplateTypes };
 
 		it( 'should return an empty object if no template is passed', () => {
 			expect( getTemplateInfo( state, null ) ).toEqual( {} );
