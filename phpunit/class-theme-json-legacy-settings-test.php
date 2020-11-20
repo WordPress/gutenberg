@@ -150,7 +150,7 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 		$expected = array(
 			'global' => array(
 				'settings' => array(
-					'color'              => array(
+					'color'      => array(
 						'custom'         => false,
 						'customGradient' => false,
 						'gradients'      => array(
