@@ -120,7 +120,7 @@ The value of async atoms will be equal to `null` until the resolution function f
 
 ### Bindings
 
-It is important to note that stan instance and registries API are low-level APIs meant to be used by developpers to build bindings for their preferred frameworks. By in general, a higher-level API is preferred.
+It is important to note that stan instance and registries are low-level APIs meant to be used by developers to build bindings for frameworks of their choice. In general, a higher-level API is preferred.
 
 Currently available bindings:
 
