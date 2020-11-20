@@ -18,8 +18,6 @@ import { register } from '..';
 import './mocks/server';
 import availableLegacyWidgets from './mocks/available-legacy-widgets';
 
-// We need this since some tests run over 5 seconds threshold.
-// Also keep this as a TODO for us to improve the performance of the components.
 jest.setTimeout( 30000 );
 
 const editorSettings = {
@@ -59,7 +57,7 @@ describe( 'edit-widgets', () => {
 
 		expect( firstParagraph ).toHaveTextContent( 'First Paragraph' );
 
-		const recentPostsHeading = getByRole( recentPosts, 'heading', {
+		const recentPostsHeading = await findByRole( recentPosts, 'heading', {
 			level: 3,
 		} );
 		expect( recentPostsHeading ).toHaveTextContent(
@@ -90,21 +88,27 @@ describe( 'edit-widgets', () => {
 		let footerBlocks = await findAllByRole( footer, 'group' );
 		expect( footerBlocks.length ).toBe( 4 );
 
-		const globalInserterButton = screen.getByRole( 'button', {
+		const documentTools = screen.getByRole( 'toolbar', {
+			name: 'Document tools',
+			hidden: true,
+		} );
+		const globalInserterButton = getByRole( documentTools, 'button', {
 			name: 'Add block',
+			hidden: true,
 		} );
 
 		fireEvent.click( globalInserterButton );
 
 		const globalInserterBlocksList = await screen.findByRole( 'listbox', {
 			name: 'Child Blocks',
+			hidden: true,
 		} );
-
-		const addParagraphBlockButton = await findByRole(
+		const addParagraphBlockButton = getByRole(
 			globalInserterBlocksList,
 			'option',
 			{
 				name: 'Paragraph',
+				hidden: true,
 			}
 		);
 
