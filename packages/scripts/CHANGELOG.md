@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Autoformat TypeScript files (`*.ts` and `*.tsx`) in `format-js` script (#)[].
+
 ## 12.5.0 (2020-10-30)
 
 ### Enhancements
