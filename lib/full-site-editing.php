@@ -69,12 +69,25 @@ function gutenberg_adminbar_items( $wp_admin_bar ) {
 		return;
 	}
 
+	// Remove customizer link.
 	$wp_admin_bar->remove_node( 'customize' );
 	$wp_admin_bar->remove_node( 'customize-background' );
 	$wp_admin_bar->remove_node( 'customize-header' );
+	$wp_admin_bar->remove_node( 'widgets' );
+
+	// Add site-editor link.
+	if ( ! is_admin() ) {
+		$wp_admin_bar->add_node(
+			array(
+				'id'    => 'site-editor',
+				'title' => __( 'Site Editor', 'gutenberg' ),
+				'href'  => admin_url( 'admin.php?page=gutenberg-edit-site' ),
+			)
+		);
+	}
 }
 
-add_action( 'admin_bar_menu', 'gutenberg_adminbar_items', 999 );
+add_action( 'admin_bar_menu', 'gutenberg_adminbar_items', 50 );
 
 /**
  * Activates the 'menu_order' filter and then hooks into 'menu_order'
