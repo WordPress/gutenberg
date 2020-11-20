@@ -13,6 +13,7 @@ const { config: localPrettierConfig } =
 const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
 
 module.exports = {
+	parser: '@typescript-eslint/parser',
 	extends: [
 		require.resolve( './recommended-with-formatting.js' ),
 		'plugin:prettier/recommended',
