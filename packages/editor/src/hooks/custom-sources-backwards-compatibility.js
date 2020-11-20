@@ -1,12 +1,16 @@
 /**
  * External dependencies
  */
-import { pickBy, mapValues, isEmpty, mapKeys } from 'lodash';
+import { pickBy, mapValues, isEmpty, mapKeys, find } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { select as globalSelect, useSelect } from '@wordpress/data';
+import {
+	select as globalSelect,
+	dispatch as globalDispatch,
+	useSelect,
+} from '@wordpress/data';
 import { useEntityProp } from '@wordpress/core-data';
 import { useMemo } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -138,4 +142,10 @@ addFilter(
 globalSelect( 'core/blocks' )
 	.getBlockTypes()
 	.map( ( { name } ) => globalSelect( 'core/blocks' ).getBlockType( name ) )
-	.forEach( shimAttributeSource );
+	.forEach( ( blockType ) => {
+		const hasMeta = find( blockType.attributes, { source: 'meta' } );
+		if ( hasMeta ) {
+			const settings = shimAttributeSource( blockType );
+			globalDispatch( 'core/blocks' ).addBlockTypes( settings );
+		}
+	} );

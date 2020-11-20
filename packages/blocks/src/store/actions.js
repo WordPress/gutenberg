@@ -87,6 +87,17 @@ export const removeBlockTypes = ( names ) => ( { get, set } ) => {
 		blockVariationsByBlockName,
 		omit( get( blockVariationsByBlockName ), names )
 	);
+	[
+		defaultBlockName,
+		unregisteredFallbackBlockName,
+		freeformFallbackBlockName,
+		groupingBlockName,
+	].forEach( ( atom ) => {
+		const value = get( atom );
+		if ( names.includes( value ) ) {
+			set( atom, null );
+		}
+	} );
 };
 
 /**

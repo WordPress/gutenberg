@@ -1,6 +1,7 @@
 ( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
+	console.log( 'register block early' );
 
 	registerBlockType( 'test/test-meta-attribute-block-early', {
 		title: 'Test Meta Attribute Block (Early Registration)',
