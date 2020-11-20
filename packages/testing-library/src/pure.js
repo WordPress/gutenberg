@@ -2,6 +2,9 @@
  * WordPress dependencies
  */
 import * as Element from '@wordpress/element';
+// Disable the eslint rule since this is the intended way to access the dependency.
+// eslint-disable-next-line no-restricted-syntax
+import { act } from '@wordpress/element/test-utils';
 
 /**
  * External dependencies
@@ -20,14 +23,14 @@ import { fireEvent } from './fire-event';
 configureDTL( {
 	asyncWrapper: async ( cb ) => {
 		let result;
-		await Element.act( async () => {
+		await act( async () => {
 			result = await cb();
 		} );
 		return result;
 	},
 	eventWrapper: ( cb ) => {
 		let result;
-		Element.act( () => {
+		act( () => {
 			result = cb();
 		} );
 		return result;
@@ -65,7 +68,7 @@ function render(
 			? Element.createElement( WrapperComponent, null, innerElement )
 			: innerElement;
 
-	Element.act( () => {
+	act( () => {
 		if ( hydrate ) {
 			Element.hydrate( wrapUiIfNeeded( ui ), container );
 		} else {
@@ -85,7 +88,7 @@ function render(
 				: // eslint-disable-next-line no-console,
 				  console.log( prettyDOM( el, maxLength, options ) ),
 		unmount: () => {
-			Element.act( () => {
+			act( () => {
 				Element.unmountComponentAtNode( container );
 			} );
 		},
@@ -121,7 +124,7 @@ function cleanup() {
 // maybe one day we'll expose this (perhaps even as a utility returned by render).
 // but let's wait until someone asks for it.
 function cleanupAtContainer( container ) {
-	Element.act( () => {
+	act( () => {
 		Element.unmountComponentAtNode( container );
 	} );
 	if ( container.parentNode === document.body ) {
@@ -132,5 +135,5 @@ function cleanupAtContainer( container ) {
 
 // just re-export everything from dom-testing-library
 export * from '@testing-library/dom';
-export { act } from '@wordpress/element';
+export { act };
 export { render, renderInitialize, cleanup, fireEvent };

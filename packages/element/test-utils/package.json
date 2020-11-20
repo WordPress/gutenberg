@@ -1,0 +1,7 @@
+{
+	"main": "../build/test-utils.js",
+	"module": "../build-module/test-utils.js",
+	"react-native": "../src/test-utils",
+	"types": "../build-types/test-utils.d.ts",
+	"sideEffects": false
+}
