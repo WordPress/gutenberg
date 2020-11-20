@@ -42,7 +42,7 @@ exports.deviceRotationHtml = `<!-- wp:paragraph -->
 <!-- /wp:paragraph -->`;
 
 exports.blockInsertionHtml = `<!-- wp:paragraph -->
-<p>Beneath the busy continuum blinks the ineffective husband. Why a metric now outside the official subway? How can the prompt crop exhaust his tree </p>
+<p>Beneath the busy continuum blinks the ineffective husband. Why a metric now outside the official subway? How can the prompt crop exhaust his tree</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
