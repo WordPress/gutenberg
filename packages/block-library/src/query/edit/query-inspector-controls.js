@@ -13,7 +13,7 @@ import {
 	TextControl,
 	FormTokenField,
 	SelectControl,
-	CheckboxControl,
+	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -136,7 +136,7 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Settings' ) }>
-				<CheckboxControl
+				<ToggleControl
 					label={ __( 'Customize Query' ) }
 					help={ __(
 						'Enable this option to customize the query arguments. Leave disabled to inherit the global query.'
