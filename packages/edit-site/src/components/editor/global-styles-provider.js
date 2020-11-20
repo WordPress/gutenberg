@@ -13,6 +13,7 @@ import {
 	useEffect,
 	useMemo,
 } from '@wordpress/element';
+import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -58,17 +59,17 @@ export const useGlobalStylesReset = () => {
 	];
 };
 
-const extractSupportKeys = ( supports, metadata ) => {
+const extractSupportKeys = ( supports ) => {
 	const supportKeys = [];
-	Object.keys( metadata.properties ).forEach( ( name ) => {
-		if ( get( supports, metadata.properties[ name ].support, false ) ) {
+	Object.keys( STYLE_PROPERTY ).forEach( ( name ) => {
+		if ( get( supports, STYLE_PROPERTY[ name ].support, false ) ) {
 			supportKeys.push( name );
 		}
 	} );
 	return supportKeys;
 };
 
-const getContexts = ( blockTypes, metadata ) => {
+const getContexts = ( blockTypes ) => {
 	const result = {
 		...GLOBAL_CONTEXT,
 	};
@@ -77,7 +78,7 @@ const getContexts = ( blockTypes, metadata ) => {
 	blockTypes.forEach( ( blockType ) => {
 		const blockName = blockType.name;
 		const blockSelector = blockType?.supports?.__experimentalSelector;
-		const supports = extractSupportKeys( blockType?.supports, metadata );
+		const supports = extractSupportKeys( blockType?.supports );
 		const hasSupport = supports.length > 0;
 
 		if ( hasSupport && typeof blockSelector === 'string' ) {
@@ -109,11 +110,7 @@ const getContexts = ( blockTypes, metadata ) => {
 	return result;
 };
 
-export default function GlobalStylesProvider( {
-	children,
-	baseStyles,
-	metadata,
-} ) {
+export default function GlobalStylesProvider( { children, baseStyles } ) {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
 	const { blockTypes, settings } = useSelect( ( select ) => {
 		return {
@@ -124,8 +121,8 @@ export default function GlobalStylesProvider( {
 	const { updateSettings } = useDispatch( 'core/edit-site' );
 
 	const contexts = useMemo( () => {
-		getContexts( blockTypes, metadata );
-	}, [ metadata, blockTypes ] );
+		getContexts( blockTypes );
+	}, [ blockTypes ] );
 
 	const { userStyles, mergedStyles } = useMemo( () => {
 		const newUserStyles = content ? JSON.parse( content ) : {};
@@ -162,7 +159,7 @@ export default function GlobalStylesProvider( {
 
 				return get(
 					styles?.[ context ]?.styles,
-					metadata.properties[ propertyName ].value
+					STYLE_PROPERTY[ propertyName ].value
 				);
 			},
 			setStyleProperty: ( context, propertyName, newValue ) => {
@@ -174,7 +171,7 @@ export default function GlobalStylesProvider( {
 				}
 				set(
 					contextStyles,
-					metadata.properties[ propertyName ].value,
+					STYLE_PROPERTY[ propertyName ].value,
 					newValue
 				);
 				setContent( JSON.stringify( newContent ) );
@@ -192,7 +189,11 @@ export default function GlobalStylesProvider( {
 			styles: [
 				...newStyles,
 				{
-					css: getGlobalStyles( contexts, mergedStyles, metadata ),
+					css: getGlobalStyles(
+						contexts,
+						mergedStyles,
+						STYLE_PROPERTY
+					),
 					isGlobalStyles: true,
 				},
 			],
