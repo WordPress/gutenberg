@@ -147,9 +147,9 @@ const BlockActionsMenu = ( {
 				onMoveUp();
 				break;
 			case transformButtonOption.value:
-			// STOPSHIP (blixt): First, let's just hard-code the transition to a header block.
-			// Then, I'll handle presenting a second Picker, with the handful of options outlined in
-			// https://github.com/wordpress-mobile/gutenberg-mobile/issues/2814
+				// STOPSHIP (blixt): First, let's just hard-code the transition to a header block.
+				// Then, I'll handle presenting a second Picker, with the handful of options outlined in
+				// https://github.com/wordpress-mobile/gutenberg-mobile/issues/2814
 				createInfoNotice(
 					'STOPSHIP: Implement transform'
 				);
@@ -227,15 +227,6 @@ const BlockActionsMenu = ( {
 				// translators: %s: block title e.g: "Paragraph".
 				title={ sprintf( __( '%s block options' ), blockTitle ) }
 			/>
-
-			{
-			/* TODO (blixt): I'm going to initially build out a second Picker here.
-			Should we extract this second picker out to its own
-			component? I'll leave it here for now, so I can get the hang of the
-			underlying "block-transform" implementation - but at some point I
-			think it'd be nice to have a second transform-menu rather than
-			bloating this component further.*/
-			}
 		</>
 	);
 };
