@@ -3,11 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
-
-/**
- * Internal dependencies
- */
-import icon from './icon';
+import { fullscreen } from '@wordpress/icons';
 
 function BlockFullHeightAlignmentToolbar( {
 	isActive,
@@ -18,7 +14,7 @@ function BlockFullHeightAlignmentToolbar( {
 		<ToolbarGroup>
 			<ToolbarButton
 				isActive={ isActive }
-				icon={ icon }
+				icon={ fullscreen }
 				label={ label }
 				onClick={ () => onToggle( ! isActive ) }
 			/>
