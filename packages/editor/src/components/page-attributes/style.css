@@ -1,0 +1,29 @@
+.editor-page-attributes__template {
+  margin-bottom: 10px;
+}
+
+.editor-page-attributes__template label,
+.editor-page-attributes__template select {
+  width: 100%;
+}
+
+.editor-page-attributes__order {
+  width: 100%;
+}
+
+.editor-page-attributes__order .components-base-control__field {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.editor-page-attributes__order input {
+  width: 66px;
+}
+/*# sourceMappingURL=style.css.map */

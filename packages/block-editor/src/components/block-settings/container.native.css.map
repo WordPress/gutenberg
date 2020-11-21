@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,QAAQ,CAAC;EACR,YAAY,EAAE,CAAC;EACf,aAAa,EAAE,CAAC;CAChB",
+    "sources": [
+        "container.native.scss"
+    ],
+    "names": [],
+    "file": "container.native.css"
+}

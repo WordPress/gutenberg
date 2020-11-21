@@ -1,0 +1,13 @@
+.block-editor-plain-text {
+  -webkit-box-shadow: none;
+          box-shadow: none;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  line-height: inherit;
+  border: none;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+}
+/*# sourceMappingURL=style.css.map */

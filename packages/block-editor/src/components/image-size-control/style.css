@@ -1,0 +1,31 @@
+.block-editor-image-size-control {
+  margin-bottom: 1em;
+}
+
+.block-editor-image-size-control .block-editor-image-size-control__row {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.block-editor-image-size-control .block-editor-image-size-control__row .block-editor-image-size-control__width,
+.block-editor-image-size-control .block-editor-image-size-control__row .block-editor-image-size-control__height {
+  margin-bottom: 0.5em;
+}
+
+.block-editor-image-size-control .block-editor-image-size-control__row .block-editor-image-size-control__width input,
+.block-editor-image-size-control .block-editor-image-size-control__row .block-editor-image-size-control__height input {
+  line-height: 1.25;
+}
+
+.block-editor-image-size-control .block-editor-image-size-control__row .block-editor-image-size-control__width {
+  margin-right: 5px;
+}
+
+.block-editor-image-size-control .block-editor-image-size-control__row .block-editor-image-size-control__height {
+  margin-left: 5px;
+}
+/*# sourceMappingURL=style.css.map */

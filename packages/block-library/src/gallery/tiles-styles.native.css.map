@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,eAAe,CAAC;EACf,cAAc,EAAE,GAAG;EACnB,SAAS,EAAE,IAAI;CACf;;AAED,AAAA,UAAU,CAAC;EACV,QAAQ,EAAE,MAAM;EAChB,cAAc,EAAE,GAAG;EACnB,WAAW,EAAE,MAAM;EACnB,YAAY,EAAE,WAAW;CACzB",
+    "sources": [
+        "tiles-styles.native.scss"
+    ],
+    "names": [],
+    "file": "tiles-styles.native.css"
+}

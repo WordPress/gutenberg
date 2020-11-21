@@ -1,0 +1,29 @@
+[role="region"] {
+  position: relative;
+}
+
+.is-focusing-regions [role="region"]:focus::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  outline: 4px solid transparent;
+  -webkit-box-shadow: inset 0 0 0 4px var(--wp-admin-theme-color);
+          box-shadow: inset 0 0 0 4px var(--wp-admin-theme-color);
+}
+
+@supports (outline-offset: 1px) {
+  .is-focusing-regions [role="region"]:focus::after {
+    content: none;
+  }
+  .is-focusing-regions [role="region"]:focus {
+    outline-style: solid;
+    outline-color: var(--wp-admin-theme-color);
+    outline-width: 4px;
+    outline-offset: -4px;
+  }
+}
+/*# sourceMappingURL=style.css.map */

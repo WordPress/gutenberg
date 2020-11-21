@@ -1,0 +1,28 @@
+.block-editor-dimension-control .components-base-control__field {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.block-editor-dimension-control .components-base-control__label {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  margin-right: 1em;
+  margin-bottom: 0;
+}
+
+.block-editor-dimension-control .components-base-control__label .dashicon {
+  margin-right: 0.5em;
+}
+
+.block-editor-dimension-control.is-manual .components-base-control__label {
+  width: 10em;
+}
+/*# sourceMappingURL=style.css.map */

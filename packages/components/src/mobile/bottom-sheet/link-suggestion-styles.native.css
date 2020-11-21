@@ -1,0 +1,29 @@
+.titleStyle {
+  text-align: left;
+  font-weight: bold;
+}
+
+.summaryStyle {
+  text-align: left;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+.itemContainerStyle {
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.containerStyle {
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
+.hidden {
+  display: none;
+}
+/*# sourceMappingURL=link-suggestion-styles.native.css.map */

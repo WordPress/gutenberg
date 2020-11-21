@@ -1,0 +1,17 @@
+.wp-block-social-links .wp-social-link {
+  line-height: 0;
+}
+
+.wp-block-social-links .wp-social-link button {
+  font-size: inherit;
+  color: currentColor;
+  height: auto;
+  line-height: 0;
+  padding: 0.25em;
+}
+
+.wp-block-social-links.is-style-pill-shape .wp-social-link button {
+  padding-left: calc((2/3) * 1em);
+  padding-right: calc((2/3) * 1em);
+}
+/*# sourceMappingURL=editor.css.map */

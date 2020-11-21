@@ -1,0 +1,13 @@
+.block-editor-block-types-list {
+  list-style: none;
+  padding: 4px;
+  margin-left: -4px;
+  margin-right: -4px;
+  overflow: hidden;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+}
+/*# sourceMappingURL=style.css.map */

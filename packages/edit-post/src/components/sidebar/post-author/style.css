@@ -1,0 +1,11 @@
+.editor-post-author__select {
+  margin: -5px 0;
+  width: 100%;
+}
+
+@supports ((position: -webkit-sticky) or (position: sticky)) {
+  .editor-post-author__select {
+    width: auto;
+  }
+}
+/*# sourceMappingURL=style.css.map */

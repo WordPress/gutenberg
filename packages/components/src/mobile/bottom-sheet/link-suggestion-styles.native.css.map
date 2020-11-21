@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,WAAW,CAAC;EACX,UAAU,EAAE,IAAI;EAChB,WAAW,EAAE,IAAI;CACjB;;AAED,AAAA,aAAa,CAAC;EACb,UAAU,EAAE,IAAI;EAChB,SAAS,EAAE,IAAI;EACf,WAAW,EAAE,IAAI;CACjB;;AAED,AAAA,mBAAmB,CAAC;EACnB,eAAe,EAAE,UAAU;EAC3B,UAAU,EAAE,IAAI;EAChB,aAAa,EAAE,IAAI;CACnB;;AAED,AAAA,eAAe,CAAC;EACf,WAAW,EAAE,UAAU;CACvB;;AAED,AAAA,OAAO,CAAC;EACP,OAAO,EAAE,IAAI;CACb",
+    "sources": [
+        "link-suggestion-styles.native.scss"
+    ],
+    "names": [],
+    "file": "link-suggestion-styles.native.css"
+}

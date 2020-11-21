@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,MAAM,CAAC;EACN,SAAS,EAAE,IAAI;CACf;;AAED,AAAA,SAAS,CAAC;EACT,SAAS,EAAE,IAAI;EACf,UAAU,EAAE,IAAI;CAChB",
+    "sources": [
+        "blockquote.native.scss"
+    ],
+    "names": [],
+    "file": "blockquote.native.css"
+}

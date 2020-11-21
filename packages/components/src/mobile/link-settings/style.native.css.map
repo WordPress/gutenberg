@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,kBAAkB,CAAC;EAClB,YAAY,EAAE,CAAC;EACf,aAAa,EAAE,CAAC;CAChB",
+    "sources": [
+        "style.native.scss"
+    ],
+    "names": [],
+    "file": "style.native.css"
+}

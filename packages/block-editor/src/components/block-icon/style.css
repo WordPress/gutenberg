@@ -1,0 +1,25 @@
+.block-editor-block-icon {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.block-editor-block-icon.has-colors svg {
+  fill: currentColor;
+}
+
+.block-editor-block-icon svg {
+  min-width: 20px;
+  min-height: 20px;
+  max-width: 24px;
+  max-height: 24px;
+}
+/*# sourceMappingURL=style.css.map */

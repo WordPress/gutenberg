@@ -1,0 +1,23 @@
+.block-editor-text-decoration-control {
+  -webkit-box-flex: 0;
+      -ms-flex: 0 0 50%;
+          flex: 0 0 50%;
+}
+
+.block-editor-text-decoration-control legend {
+  margin-bottom: 8px;
+}
+
+.block-editor-text-decoration-control .block-editor-text-decoration-control__buttons {
+  display: -webkit-inline-box;
+  display: -ms-inline-flexbox;
+  display: inline-flex;
+  margin-bottom: 24px;
+}
+
+.block-editor-text-decoration-control .block-editor-text-decoration-control__buttons .components-button.has-icon {
+  min-width: 24px;
+  padding: 0;
+  margin-right: 4px;
+}
+/*# sourceMappingURL=style.css.map */

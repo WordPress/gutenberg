@@ -1,0 +1,17 @@
+.edit-post-post-schedule {
+  width: 100%;
+  position: relative;
+  -webkit-box-pack: left;
+      -ms-flex-pack: left;
+          justify-content: left;
+}
+
+.edit-post-post-schedule span {
+  display: block;
+  width: 45%;
+}
+
+.components-button.edit-post-post-schedule__toggle {
+  text-align: right;
+}
+/*# sourceMappingURL=style.css.map */

@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,SAAS,CAAC;EACT,QAAQ,EAAE,MAAM;CAChB;;AAED,AAAA,sBAAsB,CAAC;EACtB,QAAQ,EAAE,QAAQ;EAClB,OAAO,EAAE,CAAC;CACV",
+    "sources": [
+        "style.native.scss"
+    ],
+    "names": [],
+    "file": "style.native.css"
+}

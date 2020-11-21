@@ -1,0 +1,10 @@
+.wp-block-categories.alignleft {
+  /*rtl:ignore*/
+  margin-right: 2em;
+}
+
+.wp-block-categories.alignright {
+  /*rtl:ignore*/
+  margin-left: 2em;
+}
+/*# sourceMappingURL=style.css.map */

@@ -1,0 +1,31 @@
+.wp-block-quote {
+  border-left: 0.25em solid currentColor;
+  margin: 0 0 1.75em 0;
+  padding-left: 1em;
+}
+
+.wp-block-quote cite,
+.wp-block-quote footer, .wp-block-quote__citation {
+  color: currentColor;
+  font-size: 0.8125em;
+  margin-top: 1em;
+  position: relative;
+  font-style: normal;
+}
+
+.wp-block-quote.has-text-align-right {
+  border-left: none;
+  border-right: 0.25em solid currentColor;
+  padding-left: 0;
+  padding-right: 1em;
+}
+
+.wp-block-quote.has-text-align-center {
+  border: none;
+  padding-left: 0;
+}
+
+.wp-block-quote.is-style-large, .wp-block-quote.is-large {
+  border: none;
+}
+/*# sourceMappingURL=theme.css.map */

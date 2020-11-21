@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAAA,sBAAsB,CAAC;EACtB,GAAG,EAAE,CAAC;EACN,UAAU,EAAE,GAAG;CACf",
+    "sources": [
+        "floatingToolbar.android.scss"
+    ],
+    "names": [],
+    "file": "floatingToolbar.android.css"
+}

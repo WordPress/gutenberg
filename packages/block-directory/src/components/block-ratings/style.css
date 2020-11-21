@@ -1,0 +1,21 @@
+.block-directory-block-ratings {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.block-directory-block-ratings > div {
+  line-height: 1;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+.block-directory-block-ratings .block-directory-block-ratings__rating-count {
+  font-size: ms(-2);
+}
+
+.block-directory-block-ratings svg {
+  fill: #ffb900;
+}
+/*# sourceMappingURL=style.css.map */
