@@ -21,6 +21,10 @@ import metadataReducer from './metadata/reducer';
 import * as metadataSelectors from './metadata/selectors';
 import * as metadataActions from './metadata/actions';
 
+/** @typedef {import('../types').WPDataRegistry} WPDataRegistry */
+/** @typedef {import('../types').WPDataStore} WPDataStore */
+/** @typedef {import('../types').WPDataReduxStoreConfig} WPDataReduxStoreConfig */
+
 /**
  * Create a cache to track whether resolvers started running or not.
  *
@@ -50,98 +54,112 @@ function createResolversCache() {
 }
 
 /**
- * @typedef {WPDataRegistry} WPDataRegistry
- */
-
-/**
- * Creates a namespace object with a store derived from the reducer given.
+ * Creates a data store definition for the provided Redux store options containing
+ * properties describing reducer, actions, selectors, controls and resolvers.
  *
- * @param {string}         key      Unique namespace identifier.
- * @param {Object}         options  Registered store options, with properties
- *                                  describing reducer, actions, selectors, and
- *                                  resolvers.
- * @param {WPDataRegistry} registry Registry reference.
+ * @example
+ * ```js
+ * import { createReduxStore } from '@wordpress/data';
  *
- * @return {Object} Store Object.
+ * const store = createReduxStore( 'demo', {
+ *     reducer: ( state = 'OK' ) => state,
+ *     selectors: {
+ *         getValue: ( state ) => state,
+ *     },
+ * } );
+ * ```
+ *
+ * @param {string}                 key      Unique namespace identifier.
+ * @param {WPDataReduxStoreConfig} options  Registered store options, with properties
+ *                                          describing reducer, actions, selectors,
+ *                                          and resolvers.
+ *
+ * @return {WPDataStore} Store Object.
  */
-export default function createNamespace( key, options, registry ) {
-	const reducer = options.reducer;
-	const store = createReduxStore( key, options, registry );
-	const resolversCache = createResolversCache();
-
-	let resolvers;
-	const actions = mapActions(
-		{
-			...metadataActions,
-			...options.actions,
-		},
-		store
-	);
-	let selectors = mapSelectors(
-		{
-			...mapValues(
-				metadataSelectors,
-				( selector ) => ( state, ...args ) =>
-					selector( state.metadata, ...args )
-			),
-			...mapValues( options.selectors, ( selector ) => {
-				if ( selector.isRegistrySelector ) {
-					selector.registry = registry;
-				}
-
-				return ( state, ...args ) => selector( state.root, ...args );
-			} ),
-		},
-		store
-	);
-	if ( options.resolvers ) {
-		const result = mapResolvers(
-			options.resolvers,
-			selectors,
-			store,
-			resolversCache
-		);
-		resolvers = result.resolvers;
-		selectors = result.selectors;
-	}
-
-	const getSelectors = () => selectors;
-	const getActions = () => actions;
-
-	// We have some modules monkey-patching the store object
-	// It's wrong to do so but until we refactor all of our effects to controls
-	// We need to keep the same "store" instance here.
-	store.__unstableOriginalGetState = store.getState;
-	store.getState = () => store.__unstableOriginalGetState().root;
-
-	// Customize subscribe behavior to call listeners only on effective change,
-	// not on every dispatch.
-	const subscribe =
-		store &&
-		( ( listener ) => {
-			let lastState = store.__unstableOriginalGetState();
-			store.subscribe( () => {
-				const state = store.__unstableOriginalGetState();
-				const hasChanged = state !== lastState;
-				lastState = state;
-
-				if ( hasChanged ) {
-					listener();
-				}
-			} );
-		} );
-
-	// This can be simplified to just { subscribe, getSelectors, getActions }
-	// Once we remove the use function.
+export default function createReduxStore( key, options ) {
 	return {
-		reducer,
-		store,
-		actions,
-		selectors,
-		resolvers,
-		getSelectors,
-		getActions,
-		subscribe,
+		name: key,
+		instantiate: ( registry ) => {
+			const reducer = options.reducer;
+			const store = instantiateReduxStore( key, options, registry );
+			const resolversCache = createResolversCache();
+
+			let resolvers;
+			const actions = mapActions(
+				{
+					...metadataActions,
+					...options.actions,
+				},
+				store
+			);
+			let selectors = mapSelectors(
+				{
+					...mapValues(
+						metadataSelectors,
+						( selector ) => ( state, ...args ) =>
+							selector( state.metadata, ...args )
+					),
+					...mapValues( options.selectors, ( selector ) => {
+						if ( selector.isRegistrySelector ) {
+							selector.registry = registry;
+						}
+
+						return ( state, ...args ) =>
+							selector( state.root, ...args );
+					} ),
+				},
+				store
+			);
+			if ( options.resolvers ) {
+				const result = mapResolvers(
+					options.resolvers,
+					selectors,
+					store,
+					resolversCache
+				);
+				resolvers = result.resolvers;
+				selectors = result.selectors;
+			}
+
+			const getSelectors = () => selectors;
+			const getActions = () => actions;
+
+			// We have some modules monkey-patching the store object
+			// It's wrong to do so but until we refactor all of our effects to controls
+			// We need to keep the same "store" instance here.
+			store.__unstableOriginalGetState = store.getState;
+			store.getState = () => store.__unstableOriginalGetState().root;
+
+			// Customize subscribe behavior to call listeners only on effective change,
+			// not on every dispatch.
+			const subscribe =
+				store &&
+				( ( listener ) => {
+					let lastState = store.__unstableOriginalGetState();
+					store.subscribe( () => {
+						const state = store.__unstableOriginalGetState();
+						const hasChanged = state !== lastState;
+						lastState = state;
+
+						if ( hasChanged ) {
+							listener();
+						}
+					} );
+				} );
+
+			// This can be simplified to just { subscribe, getSelectors, getActions }
+			// Once we remove the use function.
+			return {
+				reducer,
+				store,
+				actions,
+				selectors,
+				resolvers,
+				getSelectors,
+				getActions,
+				subscribe,
+			};
+		},
 	};
 }
 
@@ -150,13 +168,13 @@ export default function createNamespace( key, options, registry ) {
  *
  * @param {string}         key      Unique namespace identifier.
  * @param {Object}         options  Registered store options, with properties
- *                                  describing reducer, actions, selectors, and
- *                                  resolvers.
+ *                                  describing reducer, actions, selectors,
+ *                                  and resolvers.
  * @param {WPDataRegistry} registry Registry reference.
  *
  * @return {Object} Newly created redux store.
  */
-function createReduxStore( key, options, registry ) {
+function instantiateReduxStore( key, options, registry ) {
 	const controls = {
 		...options.controls,
 		...builtinControls,

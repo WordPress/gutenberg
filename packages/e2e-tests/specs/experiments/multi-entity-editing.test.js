@@ -43,8 +43,8 @@ const createTemplatePart = async (
 	await createNewButton.click();
 	await page.waitForSelector(
 		isNested
-			? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
-			: '.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
+			? '.wp-block-template-part .wp-block-template-part .block-editor-block-list__layout'
+			: '.wp-block-template-part .block-editor-block-list__layout'
 	);
 	await page.focus( '.wp-block-template-part__name-panel input' );
 	await page.keyboard.type( templatePartName );
@@ -54,8 +54,8 @@ const editTemplatePart = async ( textToAdd, isNested = false ) => {
 	await page.click(
 		`${
 			isNested
-				? '.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"]'
-				: '.wp-block[data-type="core/template-part"]'
+				? '.wp-block-template-part .wp-block-template-part'
+				: '.wp-block-template-part'
 		} .block-editor-button-block-appender`
 	);
 	await page.click( '.editor-block-list-item-paragraph' );
@@ -198,7 +198,7 @@ describe( 'Multi-entity editor states', () => {
 			await visitSiteEditor();
 			// Waits for the template part to load...
 			await page.waitForSelector(
-				'.wp-block[data-type="core/template-part"] .block-editor-block-list__layout'
+				'.wp-block-template-part .block-editor-block-list__layout'
 			);
 			removeErrorMocks();
 		} );
@@ -222,7 +222,7 @@ describe( 'Multi-entity editor states', () => {
 
 		it( 'should only dirty the child when editing the child', async () => {
 			await page.click(
-				'.wp-block[data-type="core/template-part"] .wp-block[data-type="core/paragraph"]'
+				'.wp-block-template-part .wp-block[data-type="core/paragraph"]'
 			);
 			await page.keyboard.type( 'Some more test words!' );
 
@@ -233,7 +233,7 @@ describe( 'Multi-entity editor states', () => {
 
 		it( 'should only dirty the nested entity when editing the nested entity', async () => {
 			await page.click(
-				'.wp-block[data-type="core/template-part"] .wp-block[data-type="core/template-part"] .wp-block[data-type="core/paragraph"]'
+				'.wp-block-template-part .wp-block-template-part .wp-block[data-type="core/paragraph"]'
 			);
 			await page.keyboard.type( 'Nested test words!' );
 
