@@ -272,17 +272,6 @@ function CoverEdit( {
 	);
 	const isMinFullHeight = minHeightUnit === 'vh' && minHeight === 100;
 
-	// Remember previous values of height,
-	// to be able to implement Full Height toggle.
-	useEffect( () => {
-		if ( isMinFullHeight ) {
-			return;
-		}
-
-		setPrevMinHeightValue( minHeight );
-		setPrevMinHeightUnit( minHeightUnit );
-	}, [ isMinFullHeight, minHeight, minHeightUnit ] );
-
 	const toggleMinFullHeight = () => {
 		if ( isMinFullHeight ) {
 			// If there aren't previous values, take the default ones.
@@ -299,6 +288,9 @@ function CoverEdit( {
 				minHeightUnit: prevMinHeightUnit,
 			} );
 		}
+
+		setPrevMinHeightValue( minHeight );
+		setPrevMinHeightUnit( minHeightUnit );
 
 		// Set full height.
 		return setAttributes( {
