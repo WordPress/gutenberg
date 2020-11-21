@@ -46,6 +46,7 @@ const BlockActionsMenu = ( {
 	removeBlocks,
 	pasteBlock,
 	isPasteEnabled,
+	isTransformEnabled,
 } ) => {
 	const pickerRef = useRef();
 	const moversOptions = { keys: [ 'icon', 'actionTitle' ] };
@@ -85,6 +86,12 @@ const BlockActionsMenu = ( {
 		disabled: isLast,
 	};
 
+	const transformButtonOption = {
+		id: 'transformButtonOption',
+		label: __( 'Transform block' ),
+		value: 'transformButtonOption',
+	};
+
 	const copyButtonOption = {
 		id: 'copyButtonOption',
 		label: __( 'Copy block' ),
@@ -113,6 +120,7 @@ const BlockActionsMenu = ( {
 		wrapBlockMover && backwardButtonOption,
 		wrapBlockMover && forwardButtonOption,
 		wrapBlockSettings && settingsOption,
+		isTransformEnabled && transformButtonOption,
 		copyButtonOption,
 		cutButtonOption,
 		isPasteEnabled && pasteButtonOption,
@@ -137,6 +145,14 @@ const BlockActionsMenu = ( {
 				break;
 			case backwardButtonOption.value:
 				onMoveUp();
+				break;
+			case transformButtonOption.value:
+			// STOPSHIP (blixt): First, let's just hard-code the transition to a header block.
+			// Then, I'll handle presenting a second Picker, with the handful of options outlined in
+			// https://github.com/wordpress-mobile/gutenberg-mobile/issues/2814
+				createInfoNotice(
+					'STOPSHIP: Implement transform'
+				);
 				break;
 			case copyButtonOption.value:
 				const copyBlock = getBlocksByClientId( selectedBlockClientId );
@@ -211,6 +227,15 @@ const BlockActionsMenu = ( {
 				// translators: %s: block title e.g: "Paragraph".
 				title={ sprintf( __( '%s block options' ), blockTitle ) }
 			/>
+
+			{
+			/* TODO (blixt): I'm going to initially build out a second Picker here.
+			Should we extract this second picker out to its own
+			component? I'll leave it here for now, so I can get the hang of the
+			underlying "block-transform" implementation - but at some point I
+			think it'd be nice to have a second transform-menu rather than
+			bloating this component further.*/
+			}
 		</>
 	);
 };
@@ -256,6 +281,12 @@ export default compose(
 			clipboardBlock &&
 			canInsertBlockType( clipboardBlock.name, rootClientId );
 
+		// NOTE (blixt): To start, we're enabling the Transform menu just for
+		// Paragraph blocks - we can expand this list later-on!
+		// TODO (blixt): A unit-testable function would be nice, once there are 
+		// multiple blockType.name values that have this feature.
+		const isTransformEnabled = blockType.name === 'core/paragraph';
+
 		return {
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
@@ -267,6 +298,7 @@ export default compose(
 			currentIndex: firstIndex,
 			isPasteEnabled,
 			clipboardBlock,
+			isTransformEnabled,
 		};
 	} ),
 	withDispatch(
