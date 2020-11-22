@@ -12,6 +12,7 @@ import { speak } from '@wordpress/a11y';
  * Internal dependencies
  */
 import DownloadableBlocksList from '../downloadable-blocks-list';
+import { store as blockDirectoryStore } from '../../store';
 
 function DownloadableBlocksPanel( {
 	downloadableItems,
@@ -80,7 +81,7 @@ export default compose( [
 		const {
 			getDownloadableBlocks,
 			isRequestingDownloadableBlocks,
-		} = select( 'core/block-directory' );
+		} = select( blockDirectoryStore );
 
 		const hasPermission = select( 'core' ).canUser(
 			'read',
