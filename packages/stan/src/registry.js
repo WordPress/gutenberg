@@ -94,12 +94,14 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 			}
 
 			const selectorsMap = selectors.get( atomSelectorConfig );
-			if ( ! selectorsMap.has( args ) ) {
+			let value = selectorsMap.get( args );
+			if ( ! value ) {
 				const atomCreator = atomSelectorConfig.createAtom( ...args );
-				selectorsMap.set( args, atomCreator( registry ) );
+				value = atomCreator( registry );
+				selectorsMap.set( args, value );
 			}
 
-			return selectorsMap.get( args );
+			return value;
 		},
 
 		/**
