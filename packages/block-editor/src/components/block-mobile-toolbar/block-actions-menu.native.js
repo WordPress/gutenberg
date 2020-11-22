@@ -274,7 +274,7 @@ export default compose(
 		// Paragraph blocks - we can expand this list later-on!
 		// TODO (blixt): A unit-testable function would be nice, once there are
 		// multiple blockType.name values that have this feature.
-		const isTransformEnabled = blockType.name === 'core/paragraph';
+		const isTransformEnabled = blockName === 'core/paragraph';
 
 		return {
 			isFirst: firstIndex === 0,
