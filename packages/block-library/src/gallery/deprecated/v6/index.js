@@ -188,6 +188,7 @@ export default {
 				linkTo,
 				sizeSlug,
 				imageCount: imageBlocks.length,
+				allowResize: false,
 				isListItem: true,
 			},
 			imageBlocks,
