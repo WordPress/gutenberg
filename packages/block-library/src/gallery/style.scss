@@ -73,8 +73,11 @@
 
 	// Cropped
 	&.is-cropped ul.blocks-gallery-grid li.wp-block-image:not(#individual-image) {
-		a,
-		img {
+		figure > div {
+			display: flex;
+		}
+
+		a, img {
 			// IE11 doesn't support object-fit, so just make sure images aren't skewed.
 			// The following rules are for all browsers.
 			width: 100%;
