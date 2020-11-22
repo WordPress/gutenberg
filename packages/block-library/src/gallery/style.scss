@@ -7,7 +7,7 @@
 		// Some themes give all <ul> default margin instead of padding.
 		margin: 0;
 
-		// Need to add the bogus :not(#individual-image) to override long not:() specificity chain 
+		// Need to add the bogus :not(#individual-image) to override long not:() specificity chain
 		// on default image block on front end.
 		// Add space between thumbnails, and unset right most thumbnails later.
 		li.wp-block-image:not(#individual-image) {
@@ -53,12 +53,7 @@
 				color: $white;
 				text-align: center;
 				font-size: $default-font-size;
-				background: linear-gradient(
-					0deg,
-					rgba( $color: $black, $alpha: 0.7 ) 0,
-					rgba( $color: $black, $alpha: 0.3 ) 70%,
-					transparent
-				);
+				background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
 
 				img {
 					display: inline;
@@ -77,7 +72,8 @@
 			display: flex;
 		}
 
-		a, img {
+		a,
+		img {
 			// IE11 doesn't support object-fit, so just make sure images aren't skewed.
 			// The following rules are for all browsers.
 			width: 100%;
@@ -93,9 +89,9 @@
 
 	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
 	& .wp-block-image:not(#individual-image) {
-		width: calc( 50% - #{$grid-unit-20} );
+		width: calc(50% - #{$grid-unit-20});
 
-		&:nth-of-type( even ) {
+		&:nth-of-type(even) {
 			margin-right: 0;
 		}
 	}
@@ -109,19 +105,14 @@
 	@include break-small {
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } .wp-block-image:not(#individual-image) {
-				width: calc(
-					#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i}
-				);
+				width: calc(#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i});
 				margin-right: $grid-unit-20;
 			}
 		}
 
 		// Unset the right margin on every rightmost gallery item to ensure center balance.
 		@for $column-count from 1 through 8 {
-			&.columns-#{
-				$column-count
-				}
-				.wp-block-image:not(#individual-image):nth-of-type( #{ $column-count }n ) {
+			&.columns-#{$column-count} .wp-block-image:not(#individual-image):nth-of-type( #{ $column-count }n ) {
 				margin-right: 0;
 			}
 		}
