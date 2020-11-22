@@ -150,9 +150,7 @@ const BlockActionsMenu = ( {
 				// STOPSHIP (blixt): First, let's just hard-code the transition to a header block.
 				// Then, I'll handle presenting a second Picker, with the handful of options outlined in
 				// https://github.com/wordpress-mobile/gutenberg-mobile/issues/2814
-				createInfoNotice(
-					'STOPSHIP: Implement transform'
-				);
+				createInfoNotice( 'STOPSHIP: Implement transform' );
 				break;
 			case copyButtonOption.value:
 				const copyBlock = getBlocksByClientId( selectedBlockClientId );
@@ -274,7 +272,7 @@ export default compose(
 
 		// NOTE (blixt): To start, we're enabling the Transform menu just for
 		// Paragraph blocks - we can expand this list later-on!
-		// TODO (blixt): A unit-testable function would be nice, once there are 
+		// TODO (blixt): A unit-testable function would be nice, once there are
 		// multiple blockType.name values that have this feature.
 		const isTransformEnabled = blockType.name === 'core/paragraph';
 
