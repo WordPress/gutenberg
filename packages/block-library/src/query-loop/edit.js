@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useState, useMemo } from '@wordpress/element';
@@ -38,6 +43,7 @@ export default function QueryLoopEdit( {
 			sticky,
 		} = {},
 		queryContext,
+		layout: { type: layoutType = 'flex', columns = 1 } = {},
 	},
 } ) {
 	const [ { page } ] = useQueryContext() || queryContext || [ {} ];
@@ -102,7 +108,13 @@ export default function QueryLoopEdit( {
 			} ) ),
 		[ posts ]
 	);
-	const blockProps = useBlockProps();
+	const hasLayoutFlex = layoutType === 'flex' && columns > 1;
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			'is-flex-container': hasLayoutFlex,
+			[ `columns-${ columns }` ]: hasLayoutFlex,
+		} ),
+	} );
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 
 	if ( ! posts ) {
@@ -114,7 +126,7 @@ export default function QueryLoopEdit( {
 	}
 
 	return (
-		<div { ...blockProps }>
+		<ul { ...blockProps }>
 			{ blockContexts &&
 				blockContexts.map( ( blockContext ) => (
 					<BlockContextProvider
@@ -123,18 +135,20 @@ export default function QueryLoopEdit( {
 					>
 						{ blockContext ===
 						( activeBlockContext || blockContexts[ 0 ] ) ? (
-							<div { ...innerBlocksProps } />
+							<li { ...innerBlocksProps } />
 						) : (
-							<BlockPreview
-								blocks={ blocks }
-								__experimentalLive
-								__experimentalOnClick={ () =>
-									setActiveBlockContext( blockContext )
-								}
-							/>
+							<li>
+								<BlockPreview
+									blocks={ blocks }
+									__experimentalLive
+									__experimentalOnClick={ () =>
+										setActiveBlockContext( blockContext )
+									}
+								/>
+							</li>
 						) }
 					</BlockContextProvider>
 				) ) }
-		</div>
+		</ul>
 	);
 }

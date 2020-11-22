@@ -1,16 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, register } from '@wordpress/data';
+import { __experimentalCreateAtomicStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import reducer from './reducer';
+import { rootAtoms } from './atoms';
 import * as actions from './actions';
 import * as selectors from './selectors';
-
-const STORE_NAME = 'core/keyboard-shortcuts';
 
 /**
  * Store definition for the keyboard shortcuts namespace.
@@ -19,10 +17,13 @@ const STORE_NAME = 'core/keyboard-shortcuts';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
-	reducer,
-	actions,
-	selectors,
-} );
+export const store = __experimentalCreateAtomicStore(
+	'core/keyboard-shortcuts',
+	{
+		rootAtoms,
+		actions,
+		selectors,
+	}
+);
 
 register( store );
