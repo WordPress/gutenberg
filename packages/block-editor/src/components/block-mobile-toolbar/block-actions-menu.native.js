@@ -153,9 +153,11 @@ const BlockActionsMenu = ( {
 				// Future diff: Handle presenting a second Picker, with the
 				// handful of options outlined in
 				// https://github.com/wordpress-mobile/gutenberg-mobile/issues/2814
-				const transformedBlock = getBlocksByClientId( selectedBlockClientId );
+				const transformedBlock = getBlocksByClientId(
+					selectedBlockClientId
+				);
 				onTransform( transformedBlock, 'core/heading' );
-				
+
 				break;
 			case copyButtonOption.value:
 				const copyBlock = getBlocksByClientId( selectedBlockClientId );
@@ -350,10 +352,10 @@ export default compose(
 						replaceBlocks( clientIds, clipboardBlock );
 					}
 				},
-				onTransform( blocks, name) {
+				onTransform( blocks, name ) {
 					dispatch( 'core/block-editor' ).replaceBlocks(
 						clientIds,
-						switchToBlockType( blocks, name ),
+						switchToBlockType( blocks, name )
 					);
 				},
 			};
