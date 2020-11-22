@@ -14,6 +14,7 @@ import {
 	rawHandler,
 	createBlock,
 	isUnmodifiedDefaultBlock,
+	switchToBlockType,
 } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -47,6 +48,7 @@ const BlockActionsMenu = ( {
 	pasteBlock,
 	isPasteEnabled,
 	isTransformEnabled,
+	onTransform,
 } ) => {
 	const pickerRef = useRef();
 	const moversOptions = { keys: [ 'icon', 'actionTitle' ] };
@@ -147,10 +149,13 @@ const BlockActionsMenu = ( {
 				onMoveUp();
 				break;
 			case transformButtonOption.value:
-				// STOPSHIP (blixt): First, let's just hard-code the transition to a header block.
-				// Then, I'll handle presenting a second Picker, with the handful of options outlined in
+				// STOPSHIP (blixt): For now, it's hard-coded to transform to a header block.
+				// Future diff: Handle presenting a second Picker, with the
+				// handful of options outlined in
 				// https://github.com/wordpress-mobile/gutenberg-mobile/issues/2814
-				createInfoNotice( 'STOPSHIP: Implement transform' );
+				const transformedBlock = getBlocksByClientId( selectedBlockClientId );
+				onTransform( transformedBlock, 'core/heading' );
+				
 				break;
 			case copyButtonOption.value:
 				const copyBlock = getBlocksByClientId( selectedBlockClientId );
@@ -274,6 +279,7 @@ export default compose(
 		// Paragraph blocks - we can expand this list later-on!
 		// TODO (blixt): A unit-testable function would be nice, once there are
 		// multiple blockType.name values that have this feature.
+		// TODO (blixt): Check out /block-switcher/index.js for web's implementation
 		const isTransformEnabled = blockName === 'core/paragraph';
 
 		return {
@@ -343,6 +349,12 @@ export default compose(
 					} else {
 						replaceBlocks( clientIds, clipboardBlock );
 					}
+				},
+				onTransform( blocks, name) {
+					dispatch( 'core/block-editor' ).replaceBlocks(
+						clientIds,
+						switchToBlockType( blocks, name ),
+					);
 				},
 			};
 		}
