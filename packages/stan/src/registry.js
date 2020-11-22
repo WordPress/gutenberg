@@ -54,6 +54,9 @@ export function isAtomSelector( maybeAtomSelector ) {
 export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 	const atoms = new WeakMap();
 	const selectors = new WeakMap();
+	let batchedUpdateKeys = new WeakMap();
+	let batchedUpdates = new Map();
+	let isBatchingUpdates = false;
 
 	/**
 	 * @template T
@@ -144,6 +147,38 @@ export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
 			const atomState = atoms.get( atom );
 			atoms.delete( atom );
 			onDelete( atomState );
+		},
+
+		async batch( callback ) {
+			if ( isBatchingUpdates ) {
+				callback();
+				return;
+			}
+			isBatchingUpdates = true;
+			await callback();
+			isBatchingUpdates = false;
+			const updates = batchedUpdates;
+			batchedUpdateKeys = new WeakMap();
+			batchedUpdates = new Map();
+
+			// Running this after the reset
+			// to avoid having an update that batches new updates..
+			updates.forEach( ( update ) => update() );
+		},
+
+		updateListeners( identifier, callback ) {
+			if ( ! isBatchingUpdates ) {
+				callback();
+			} else {
+				let key;
+				if ( batchedUpdateKeys.has( identifier ) ) {
+					key = batchedUpdateKeys.get( identifier );
+				} else {
+					key = batchedUpdates.size;
+					batchedUpdateKeys.set( identifier, key );
+				}
+				batchedUpdates.set( key, callback );
+			}
 		},
 	};
 

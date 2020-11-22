@@ -49,6 +49,7 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 	 * @type {Set<() => void>}
 	 */
 	const listeners = new Set();
+	const identifier = {};
 
 	/**
 	 * @type {(WPAtomState<any>)[]}
@@ -143,7 +144,7 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 
 			if ( unresolved.length === 0 && newValue !== value ) {
 				value = newValue;
-				notifyListeners();
+				registry.updateListeners( identifier, notifyListeners );
 			}
 		}
 
@@ -177,13 +178,15 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 			return value;
 		},
 		async set( action ) {
-			await updater(
-				{
-					get: ( atom ) => registry.get( atom ),
-					set: ( atom, arg ) => registry.set( atom, arg ),
-				},
-				action
-			);
+			registry.batch( async () => {
+				await updater(
+					{
+						get: ( atom ) => registry.get( atom ),
+						set: ( atom, arg ) => registry.set( atom, arg ),
+					},
+					action
+				);
+			} );
 		},
 		resolve,
 		subscribe( listener ) {

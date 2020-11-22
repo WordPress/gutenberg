@@ -78,10 +78,13 @@ export default function createAtomicStore( name, config ) {
 
 			const actions = mapValues( config.actions, ( atomAction ) => {
 				return ( /** @type {any[]} **/ ...args ) => {
-					return atomAction( ...args )( {
-						get: ( atomCreator ) => atomRegistry.get( atomCreator ),
-						set: ( atomCreator, value ) =>
-							atomRegistry.set( atomCreator, value ),
+					atomRegistry.batch( () => {
+						atomAction( ...args )( {
+							get: ( atomCreator ) =>
+								atomRegistry.get( atomCreator ),
+							set: ( atomCreator, value ) =>
+								atomRegistry.set( atomCreator, value ),
+						} );
 					} );
 				};
 			} );

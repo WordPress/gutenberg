@@ -95,6 +95,18 @@ export interface WPAtomRegistry {
 	delete: < T >( atom: WPAtom< T > | WPAtomSelector< T > ) => void;
 
 	/**
+	 * Creates a transaction where updates to atoms are not passed to children
+	 * until the transaction is finished.
+	 */
+	batch: (callback: () => void) => void;
+
+	/**
+	 * Alert the registry that an atom wants to notify its listeners 
+	 * that an update is necessary. this is used to batch updates.
+	 */
+	updateListeners: ( identifier: Object, callback: () => void) => void;
+
+	/**
 	 * Retrieves the atom state for a given atom.
 	 * This shouldn't be used directly, prefer the other methods.
 	 */

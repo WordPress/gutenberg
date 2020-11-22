@@ -12,20 +12,24 @@
  * @param {WPCommonAtomConfig=} config       Common Atom config.
  * @return {WPAtom<T>} Created atom.
  */
-export const createAtom = ( initialValue, config = {} ) => () => {
+export const createAtom = ( initialValue, config = {} ) => ( registry ) => {
 	let value = initialValue;
+	const identifier = {};
 
 	/**
 	 * @type {Set<() => void>}
 	 */
 	const listeners = new Set();
+	const notifyListeners = () => {
+		listeners.forEach( ( l ) => l() );
+	};
 
 	return {
 		id: config.id,
 		type: 'root',
 		set( newValue ) {
 			value = newValue;
-			listeners.forEach( ( l ) => l() );
+			registry.updateListeners( identifier, notifyListeners );
 		},
 		get() {
 			return value;
