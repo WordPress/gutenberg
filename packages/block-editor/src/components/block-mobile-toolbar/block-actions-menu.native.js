@@ -41,7 +41,7 @@ const BlockActionsMenu = ( {
 	getBlocksByClientId,
 	selectedBlockClientId,
 	updateClipboard,
-	createInfoNotice,
+	createSuccessNotice,
 	duplicateBlock,
 	removeBlocks,
 	pasteBlock,
@@ -124,7 +124,7 @@ const BlockActionsMenu = ( {
 		switch ( value ) {
 			case deleteOption.value:
 				onDelete();
-				createInfoNotice(
+				createSuccessNotice(
 					// translators: displayed right after the block is removed.
 					__( 'Block removed' )
 				);
@@ -141,7 +141,7 @@ const BlockActionsMenu = ( {
 			case copyButtonOption.value:
 				const copyBlock = getBlocksByClientId( selectedBlockClientId );
 				updateClipboard( serialize( copyBlock ) );
-				createInfoNotice(
+				createSuccessNotice(
 					// translators: displayed right after the block is copied.
 					__( 'Block copied' )
 				);
@@ -150,21 +150,21 @@ const BlockActionsMenu = ( {
 				const cutBlock = getBlocksByClientId( selectedBlockClientId );
 				updateClipboard( serialize( cutBlock ) );
 				removeBlocks( selectedBlockClientId );
-				createInfoNotice(
+				createSuccessNotice(
 					// translators: displayed right after the block is cut.
 					__( 'Block cut' )
 				);
 				break;
 			case pasteButtonOption.value:
 				pasteBlock();
-				createInfoNotice(
+				createSuccessNotice(
 					// translators: displayed right after the block is pasted.
 					__( 'Block pasted' )
 				);
 				break;
 			case duplicateButtonOption.value:
 				duplicateBlock();
-				createInfoNotice(
+				createSuccessNotice(
 					// translators: displayed right after the block is duplicated.
 					__( 'Block duplicated' )
 				);
@@ -285,12 +285,11 @@ export default compose(
 				replaceBlocks,
 			} = dispatch( 'core/block-editor' );
 			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
-			const { updateClipboard, createInfoNotice } = dispatch(
-				'core/editor'
-			);
+			const { updateClipboard } = dispatch( 'core/editor' );
 			const { getBlockSelectionEnd, getBlock } = select(
 				'core/block-editor'
 			);
+			const { createSuccessNotice } = dispatch( 'core/notices' );
 
 			return {
 				onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
@@ -298,7 +297,7 @@ export default compose(
 				openGeneralSidebar: () =>
 					openGeneralSidebar( 'edit-post/block' ),
 				updateClipboard,
-				createInfoNotice,
+				createSuccessNotice,
 				duplicateBlock() {
 					return duplicateBlocks( clientIds );
 				},

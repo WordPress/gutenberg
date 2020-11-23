@@ -59,18 +59,17 @@ class NoticeList extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getNotices } = select( 'core/editor' );
+		const { getNotices } = select( 'core/notices' );
 
 		return {
 			notices: getNotices(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { removeNotice, removeAllNotices } = dispatch( 'core/editor' );
+		const { removeNotice } = dispatch( 'core/notices' );
 
 		return {
 			removeNotice,
-			removeAllNotices,
 		};
 	} ),
 ] )( NoticeList );

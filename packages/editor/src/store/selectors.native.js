@@ -66,14 +66,3 @@ export const isEditedPostAutosaveable = createRegistrySelector(
 export function getClipboard( state ) {
 	return state.clipboard;
 }
-
-/**
- * Returns the current notice data.
- *
- * @param {Object} state Global application state.
- *
- * @return {Object} Current notice data.
- */
-export function getNotices( state ) {
-	return state.notices;
-}
