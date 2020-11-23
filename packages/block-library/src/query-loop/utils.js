@@ -11,10 +11,7 @@ export const getTemplateQuery = () => {
 			.getEntityRecord( 'postType', 'wp_template', templateId );
 
 		// Change the post-type if needed.
-		if (
-			'attachment' === template.slug ||
-			0 === template.slug.indexOf( 'archive-' )
-		) {
+		if ( 0 === template.slug.indexOf( 'archive-' ) ) {
 			return { postType: template.slug.replace( 'archive-', '' ) };
 		}
 	}
