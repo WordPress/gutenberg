@@ -13,7 +13,9 @@ import {
 	TextControl,
 	FormTokenField,
 	SelectControl,
+	RangeControl,
 	ToggleControl,
+	Notice,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls } from '@wordpress/block-editor';
@@ -32,7 +34,11 @@ const stickyOptions = [
 	{ label: __( 'Only' ), value: 'only' },
 ];
 
-export default function QueryInspectorControls( { query, setQuery } ) {
+export default function QueryInspectorControls( {
+	attributes: { query, layout },
+	setQuery,
+	setLayout,
+} ) {
 	const {
 		order,
 		orderBy,
@@ -156,6 +162,26 @@ export default function QueryInspectorControls( { query, setQuery } ) {
 					}
 					onChange={ onPostTypeChange }
 				/>
+				{ layout?.type === 'flex' && (
+					<>
+						<RangeControl
+							label={ __( 'Columns' ) }
+							value={ layout.columns }
+							onChange={ ( value ) =>
+								setLayout( { columns: value } )
+							}
+							min={ 2 }
+							max={ Math.max( 6, layout.columns ) }
+						/>
+						{ layout.columns > 6 && (
+							<Notice status="warning" isDismissible={ false }>
+								{ __(
+									'This column count exceeds the recommended amount and may cause visual breakage.'
+								) }
+							</Notice>
+						) }
+					</>
+				) }
 				<QueryControls
 					{ ...{ order, orderBy } }
 					onOrderChange={ ( value ) => setQuery( { order: value } ) }
