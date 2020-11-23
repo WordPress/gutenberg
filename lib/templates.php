@@ -112,16 +112,13 @@ add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
  * Automatically set the theme meta for templates.
  *
  * @param array $post_id Template ID.
- * @param array $post    Template Post.
- * @param bool  $update  Is update.
  */
-function gutenberg_set_template_and_template_part_post_theme( $post_id, $post, $update ) {
+function gutenberg_set_template_and_template_part_post_theme( $post_id ) {
 	$themes = wp_get_post_terms( $post_id, 'wp_theme' );
 	if ( ! $themes ) {
 		wp_set_post_terms( $post_id, array( wp_get_theme()->get_stylesheet() ), 'wp_theme', true );
 	}
 }
-
 add_action( 'save_post_wp_template', 'gutenberg_set_template_and_template_part_post_theme', 10, 3 );
 add_action( 'save_post_wp_template_part', 'gutenberg_set_template_and_template_part_post_theme', 10, 3 );
 
@@ -205,6 +202,7 @@ function gutenberg_filter_template_list_table_columns( array $columns ) {
 	$columns['slug']        = __( 'Slug', 'gutenberg' );
 	$columns['description'] = __( 'Description', 'gutenberg' );
 	$columns['status']      = __( 'Status', 'gutenberg' );
+	$columns['theme']       = __( 'Theme', 'gutenberg' );
 	if ( isset( $columns['date'] ) ) {
 		unset( $columns['date'] );
 	}
@@ -239,6 +237,24 @@ function gutenberg_render_template_list_table_column( $column_name, $post_id ) {
 		}
 		$post_status_object = get_post_status_object( $post_status );
 		echo esc_html( $post_status_object->label );
+		return;
+	}
+
+	if ( 'theme' === $column_name ) {
+		$terms         = get_the_terms( $post_id, 'wp_theme' );
+		$themes        = array();
+		$is_file_based = false;
+		foreach ( $terms as $term ) {
+			if ( '_wp_file_based' === $term->slug ) {
+				$is_file_based = true;
+			} else {
+				$themes[] = esc_html( wp_get_theme( $term->slug ) );
+			}
+		}
+		echo implode( '<br />', $themes );
+		if ( $is_file_based ) {
+			echo '<br />' . __( '(Created from a template file)', 'gutenberg' );
+		}
 		return;
 	}
 }

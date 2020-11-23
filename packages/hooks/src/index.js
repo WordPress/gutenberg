@@ -16,7 +16,6 @@ import createHooks from './createHooks';
  * @typedef Hook
  * @property {Handler[]} handlers Array of handlers
  * @property {number}    runs     Run counter
- *
  */
 
 /**
@@ -26,7 +25,15 @@ import createHooks from './createHooks';
  */
 
 /**
- * @typedef {Record<string, Hook> & {__current: Current[]}} Hooks
+ * @typedef {Record<string, Hook> & {__current: Current[]}} Store
+ */
+
+/**
+ * @typedef {'actions' | 'filters'} StoreKey
+ */
+
+/**
+ * @typedef {import('./createHooks').Hooks} Hooks
  */
 
 const {

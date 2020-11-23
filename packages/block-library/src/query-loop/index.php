@@ -69,9 +69,18 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 
 	$posts = get_posts( $query );
 
+	$classnames = '';
+	if ( isset( $block->context['layout'] ) && isset( $block->context['query'] ) ) {
+		if ( isset( $block->context['layout']['type'] ) && 'flex' === $block->context['layout']['type'] ) {
+			$classnames = "is-flex-container columns-{$block->context['layout']['columns']}";
+		}
+	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+
 	$content = '';
 	foreach ( $posts as $post ) {
-		$content .= (
+		$block_content = (
 			new WP_Block(
 				$block->parsed_block,
 				array(
@@ -80,8 +89,13 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 				)
 			)
 		)->render( array( 'dynamic' => false ) );
+		$content .= "<li>{$block_content}</li>";
 	}
-	return $content;
+	return sprintf(
+		'<ul %1$s>%2$s</ul>',
+		$wrapper_attributes,
+		$content
+	);
 }
 
 /**

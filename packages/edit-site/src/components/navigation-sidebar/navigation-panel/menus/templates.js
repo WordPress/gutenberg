@@ -25,6 +25,7 @@ import {
 	MENU_TEMPLATES_PAGES,
 	MENU_TEMPLATES_POSTS,
 	TEMPLATES_GENERAL,
+	TEMPLATES_STATUSES,
 } from '../constants';
 import TemplatesAllMenu from './templates-all';
 import NewTemplateDropdown from '../new-template-dropdown';
@@ -34,7 +35,7 @@ export default function TemplatesMenu() {
 	const templates = useSelect(
 		( select ) =>
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
-				status: [ 'publish', 'auto-draft' ],
+				status: TEMPLATES_STATUSES,
 				per_page: -1,
 			} ),
 		[]

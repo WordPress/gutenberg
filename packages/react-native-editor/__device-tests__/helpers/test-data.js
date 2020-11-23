@@ -103,3 +103,32 @@ exports.unsupportedBlockHtml = `<!-- wp:audio -->
 <figure class="wp-block-audio"><audio controls src="https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav"></audio></figure>
 <!-- /wp:audio -->
 `;
+
+exports.columnsWithDifferentUnitsHtml = `<!-- wp:columns -->
+<div class="wp-block-columns"><!-- wp:column {"width":"35%"} -->
+<div class="wp-block-column" style="flex-basis:35%"></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"55vw"} -->
+<div class="wp-block-column" style="flex-basis:55vw"></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"74rem"} -->
+<div class="wp-block-column" style="flex-basis:74rem"></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"74em"} -->
+<div class="wp-block-column" style="flex-basis:74em"></div>
+<!-- /wp:column -->
+
+<!-- wp:column {"width":"82px"} -->
+<div class="wp-block-column" style="flex-basis:82px"></div>
+<!-- /wp:column --></div>
+<!-- /wp:columns -->
+`;
+
+exports.coverHeightWithRemUnit = `<!-- wp:cover {"customOverlayColor":"#ffffff","minHeight":20,"minHeightUnit":"rem"} -->
+<div class="wp-block-cover has-background-dim" style="background-color:#ffffff;min-height:20rem"><div class="wp-block-cover__inner-container"><!-- wp:paragraph {"align":"center","placeholder":"Write title…"} -->
+<p class="has-text-align-center"></p>
+<!-- /wp:paragraph --></div></div>
+<!-- /wp:cover -->`;
