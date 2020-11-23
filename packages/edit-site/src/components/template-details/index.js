@@ -11,16 +11,30 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { MENU_TEMPLATES } from '../navigation-sidebar/navigation-panel/constants';
 
 export default function TemplateDetails( { template, onClose } ) {
-	const { title, description } = useSelect(
-		( select ) =>
-			select( 'core/editor' ).__experimentalGetTemplateInfo( template ),
-		[]
+	const { title, description, currentTheme } = useSelect( ( select ) => {
+		const templateInfo = select(
+			'core/editor'
+		).__experimentalGetTemplateInfo( template );
+		return {
+			title: templateInfo?.title,
+			description: templateInfo?.description,
+			currentTheme: select( 'core' ).getCurrentTheme()?.stylesheet,
+		};
+	}, [] );
+	const { openNavigationPanelToMenu, revertTemplate } = useDispatch(
+		'core/edit-site'
 	);
-	const { openNavigationPanelToMenu } = useDispatch( 'core/edit-site' );
 
 	if ( ! template ) {
 		return null;
 	}
+
+	/* eslint-disable camelcase */
+	const isRevertable =
+		'auto-draft' !== template.status &&
+		template?.file_based &&
+		currentTheme === template?.wp_theme_slug;
+	/* eslint-enable camelcase */
 
 	const showTemplateInSidebar = () => {
 		onClose();
@@ -54,6 +68,23 @@ export default function TemplateDetails( { template, onClose } ) {
 					</Text>
 				) }
 			</div>
+
+			{ isRevertable && (
+				<div className="edit-site-template-details">
+					<Text variant="body">
+						<Button
+							isLink
+							onClick={ () => revertTemplate( template ) }
+						>
+							{ __( 'Revert' ) }
+						</Button>
+						<br />
+						{ __(
+							'Reset this template to the theme supplied default'
+						) }
+					</Text>
+				</div>
+			) }
 
 			<Button
 				className="edit-site-template-details__show-all-button"

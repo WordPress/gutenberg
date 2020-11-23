@@ -3,6 +3,7 @@
  */
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -227,4 +228,86 @@ export function updateSettings( settings ) {
 		type: 'UPDATE_SETTINGS',
 		settings,
 	};
+}
+
+/**
+ * Reverts a template to its original theme-provided file.
+ *
+ * This works with the assumption that the template being reverted
+ * belongs to the current theme.
+ *
+ * @param {Object} template The template to revert.
+ */
+export function* revertTemplate( template ) {
+	const postType = yield controls.resolveSelect(
+		'core',
+		'getPostType',
+		'wp_template'
+	);
+
+	const currentTheme = yield controls.resolveSelect(
+		'core',
+		'getCurrentTheme'
+	);
+
+	if (
+		/* eslint-disable camelcase */
+		'auto-draft' !== template.status &&
+		template?.file_based &&
+		currentTheme === template?.wp_theme_slug
+		/* eslint-enable camelcase */
+	) {
+		yield controls.dispatch(
+			'core/notices',
+			'createErrorNotice',
+			__( 'This template is not revertable' )
+		);
+		return;
+	}
+
+	try {
+		yield apiFetch( {
+			path: `/wp/v2/${ postType.rest_base }/${ template.id }`,
+			method: 'DELETE',
+		} );
+
+		const fileTemplates = yield controls.resolveSelect(
+			'core',
+			'getEntityRecords',
+			'postType',
+			'wp_template',
+			{
+				slug: template.slug,
+				status: 'auto-draft',
+				per_page: 1,
+				theme: currentTheme?.stylesheet,
+			}
+		);
+
+		if ( ! fileTemplates.length ) {
+			yield controls.dispatch(
+				'core/notices',
+				'createErrorNotice',
+				__( 'This template is not revertable' )
+			);
+			return;
+		}
+
+		yield setTemplate( fileTemplates[ 0 ].id );
+		yield controls.dispatch(
+			'core/notices',
+			'createSuccessNotice',
+			__( 'Template reverted' )
+		);
+	} catch ( error ) {
+		const errorMessage =
+			error.message && error.code !== 'unknown_error'
+				? error.message
+				: __( 'Template revert failed' );
+		yield controls.dispatch(
+			'core/notices',
+			'createErrorNotice',
+			errorMessage
+		);
+	}
 }
