@@ -183,7 +183,11 @@ class RCTAztecView: Aztec.TextView {
         if (maxWidth > 0 && minWidth > 0) {
             let maxSize = CGSize(width: maxWidth, height: CGFloat.greatestFiniteMagnitude)
             let newWidth = sizeThatFits(maxSize).width
-            if (newWidth != frame.size.width) {
+            if placeholderLabel.isHidden == false {
+                // When placeholder is visible, we set the view's with to match the placeholder label's width
+                placeholderLabel.sizeToFit()
+                frame.size.width = placeholderLabel.frame.width
+            } else if (newWidth != frame.size.width) {
                 frame.size.width = max(newWidth, minWidth)
             }
         }
@@ -202,6 +206,10 @@ class RCTAztecView: Aztec.TextView {
         let minimumHeight = placeholderLabel.frame.height
         let fittingSize = super.sizeThatFits(size)
         let height = max(fittingSize.height, minimumHeight)
+
+        if placeholderLabel.isHidden == false {
+            return CGSize(width: placeholderLabel.frame.width, height: height)
+        }
         return CGSize(width: fittingSize.width, height: height)
     }
 

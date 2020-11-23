@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, AccessibilityInfo, Platform, Text } from 'react-native';
+import { View, AccessibilityInfo, Platform } from 'react-native';
 /**
  * WordPress dependencies
  */
@@ -37,7 +37,6 @@ import getColorAndStyleProps from './color-props';
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const INITIAL_MAX_WIDTH = 108;
-const MIN_WIDTH = 40;
 
 class ButtonEdit extends Component {
 	constructor( props ) {
@@ -53,13 +52,11 @@ class ButtonEdit extends Component {
 		this.onToggleButtonFocus = this.onToggleButtonFocus.bind( this );
 		this.setRef = this.setRef.bind( this );
 		this.onRemove = this.onRemove.bind( this );
-		this.getPlaceholderWidth = this.getPlaceholderWidth.bind( this );
 
 		this.state = {
 			maxWidth: INITIAL_MAX_WIDTH,
 			isLinkSheetVisible: false,
 			isButtonFocused: true,
-			placeholderTextWidth: 0,
 		};
 	}
 
@@ -260,31 +257,6 @@ class ButtonEdit extends Component {
 		this.richTextRef = richText;
 	}
 
-	// Render `Text` with `placeholderText` styled as a placeholder
-	// to calculate its width which then is set as a `minWidth`
-	getPlaceholderWidth( placeholderText ) {
-		const { maxWidth, placeholderTextWidth } = this.state;
-		return (
-			<Text
-				style={ styles.placeholder }
-				onTextLayout={ ( { nativeEvent } ) => {
-					const textWidth =
-						nativeEvent.lines[ 0 ] && nativeEvent.lines[ 0 ].width;
-					if ( textWidth && textWidth !== placeholderTextWidth ) {
-						this.setState( {
-							placeholderTextWidth: Math.min(
-								textWidth,
-								maxWidth
-							),
-						} );
-					}
-				} }
-			>
-				{ placeholderText }
-			</Text>
-		);
-	}
-
 	render() {
 		const {
 			attributes,
@@ -295,7 +267,7 @@ class ButtonEdit extends Component {
 			parentWidth,
 		} = this.props;
 		const { placeholder, text, borderRadius, url } = attributes;
-		const { maxWidth, isButtonFocused, placeholderTextWidth } = this.state;
+		const { maxWidth, isButtonFocused } = this.state;
 		const { paddingTop: spacing, borderWidth } = styles.defaultButton;
 
 		if ( parentWidth === 0 ) {
@@ -310,13 +282,6 @@ class ButtonEdit extends Component {
 				? borderRadiusValue + spacing + borderWidth
 				: 0;
 
-		// To achieve proper expanding and shrinking `RichText` on iOS, there is a need to set a `minWidth`
-		// value at least on 1 when `RichText` is focused or when is not focused, but `RichText` value is
-		// different than empty string.
-		const minWidth =
-			isButtonFocused || ( ! isButtonFocused && text && text !== '' )
-				? MIN_WIDTH
-				: placeholderTextWidth;
 		// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
 		// a `placeholder` as an empty string when `RichText` is focused,
 		// because `AztecView` is calculating a `minWidth` based on placeholder text.
@@ -330,7 +295,6 @@ class ButtonEdit extends Component {
 
 		return (
 			<View onLayout={ this.onLayout }>
-				{ this.getPlaceholderWidth( placeholderText ) }
 				<ColorBackground
 					borderRadiusValue={ borderRadiusValue }
 					backgroundColor={ backgroundColor }
@@ -363,7 +327,7 @@ class ButtonEdit extends Component {
 						}
 						identifier="text"
 						tagName="p"
-						minWidth={ minWidth }
+						minWidth={ 1 }
 						maxWidth={ maxWidth }
 						id={ clientId }
 						isSelected={ isButtonFocused }

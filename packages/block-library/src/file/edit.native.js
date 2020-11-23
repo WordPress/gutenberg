@@ -12,7 +12,6 @@ import {
 	MediaPlaceholder,
 	MediaUploadProgress,
 	RichText,
-	PlainText,
 	BlockControls,
 	MediaUpload,
 	InspectorControls,
@@ -43,6 +42,7 @@ import { withSelect } from '@wordpress/data';
 import styles from './style.scss';
 
 const URL_COPIED_NOTIFICATION_DURATION_MS = 1500;
+const DEFAULT_DOWNLOAD_BUTTON_TEXT = _x( 'Download', 'button label' );
 
 export class FileEdit extends Component {
 	constructor( props ) {
@@ -50,10 +50,12 @@ export class FileEdit extends Component {
 
 		this.state = {
 			isUploadInProgress: false,
+			maxWidth: 0,
 		};
 
 		this.timerRef = null;
 
+		this.onLayout = this.onLayout.bind( this );
 		this.onSelectFile = this.onSelectFile.bind( this );
 		this.onChangeFileName = this.onChangeFileName.bind( this );
 		this.onChangeDownloadButtonText = this.onChangeDownloadButtonText.bind(
@@ -83,7 +85,7 @@ export class FileEdit extends Component {
 
 		if ( downloadButtonText === undefined || downloadButtonText === '' ) {
 			setAttributes( {
-				downloadButtonText: _x( 'Download', 'button label' ),
+				downloadButtonText: DEFAULT_DOWNLOAD_BUTTON_TEXT,
 			} );
 		}
 	}
@@ -285,6 +287,14 @@ export class FileEdit extends Component {
 		}
 	}
 
+	onLayout( { nativeEvent } ) {
+		const { width } = nativeEvent.layout;
+		const { paddingLeft, paddingRight } = styles.defaultButton;
+		this.setState( {
+			maxWidth: width - ( paddingLeft + paddingRight ),
+		} );
+	}
+
 	getFileComponent( openMediaOptions, getMediaOptions ) {
 		const { attributes, media } = this.props;
 
@@ -323,7 +333,7 @@ export class FileEdit extends Component {
 					}
 
 					return (
-						<View>
+						<View onLayout={ this.onLayout }>
 							{ isUploadInProgress ||
 								this.getToolbarEditButton( openMediaOptions ) }
 							{ getMediaOptions() }
@@ -334,6 +344,7 @@ export class FileEdit extends Component {
 								isUploadFailed
 							) }
 							<RichText
+								withoutInteractiveFormatting
 								__unstableMobileNoFocusOnMount
 								onChange={ this.onChangeFileName }
 								placeholder={ __( 'File name' ) }
@@ -353,9 +364,23 @@ export class FileEdit extends Component {
 										this.getStyleForAlignment( align ),
 									] }
 								>
-									<PlainText
+									<RichText
+										withoutInteractiveFormatting
+										__unstableMobileNoFocusOnMount
+										rootTagsToEliminate={ [ 'p' ] }
+										tagName="p"
+										minWidth={ 1 }
+										maxWidth={ this.state.maxWidth }
+										deleteEnter={ true }
 										style={ styles.buttonText }
 										value={ downloadButtonText }
+										placeholder={
+											DEFAULT_DOWNLOAD_BUTTON_TEXT
+										}
+										placeholderTextColor={
+											styles.placeholderTextColor.color
+										}
+										underlineColorAndroid="transparent"
 										onChange={
 											this.onChangeDownloadButtonText
 										}
