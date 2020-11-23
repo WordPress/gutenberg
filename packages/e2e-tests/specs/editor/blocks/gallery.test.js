@@ -47,7 +47,7 @@ describe( 'Gallery', () => {
 		const filename = await upload( '.wp-block-gallery input[type="file"]' );
 
 		const regex = new RegExp(
-			`<!-- wp:gallery {\\"linkTo\\":\\"none\\",\\"imageCount\\":\\d+} -->\\s*<figure class=\\"wp-block-gallery columns-1 is-cropped\\"><ul class=\\"blocks-gallery-grid\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"large\\",\\"linkDestination\\":\\"none\\",\\"isListItem\\":true} -->\\s*<li class=\\"list-image\\"><figure class=\\"size-large\\"><img src=\\"[^"]+\/${ filename }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure><\/li>\\s*<!-- \/wp:image --><\/ul><\/figure>\\s*<!-- \/wp:gallery -->` 
+			`<!-- wp:gallery {\\"linkTo\\":\\"none\\",\\"imageCount\\":\\d+} -->\\s*<figure class=\\"wp-block-gallery columns-1 is-cropped\\"><ul class=\\"blocks-gallery-grid\\"><!-- wp:image {\\"id\\":\\d+,\\"sizeSlug\\":\\"large\\",\\"linkDestination\\":\\"none\\",\\"isListItem\\":true} -->\\s*<li class=\\"list-image\\"><figure class=\\"size-large\\"><img src=\\"[^"]+\/${ filename }\.png\\" alt=\\"\\" class=\\"wp-image-\\d+\\"\/><\/figure><\/li>\\s*<!-- \/wp:image --><\/ul><\/figure>\\s*<!-- \/wp:gallery -->`
 		);
 		expect( await getEditedPostContent() ).toMatch( regex );
 	} );
