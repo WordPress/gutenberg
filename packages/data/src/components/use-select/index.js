@@ -9,7 +9,7 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
-import { createDerivedAtom } from '@wordpress/stan';
+import { createDerivedAtom, createAtomRegistry } from '@wordpress/stan';
 import { usePrevious } from '@wordpress/compose';
 
 /**
@@ -60,6 +60,7 @@ import useRegistry from '../registry-provider/use-registry';
  * @return {Function}  A custom react hook.
  */
 export default function useSelect( _mapSelect, deps ) {
+	const atomRegistry = useMemo( () => createAtomRegistry(), [] );
 	const mapSelect = useCallback( _mapSelect, deps );
 	const previousMapSelect = usePrevious( mapSelect );
 	const result = useRef();
@@ -89,7 +90,7 @@ export default function useSelect( _mapSelect, deps ) {
 			},
 			() => {},
 			{ isAsync }
-		)( registry.__internalGetAtomRegistry() );
+		)( atomRegistry );
 	}, [ isAsync, registry, mapSelect ] );
 
 	try {

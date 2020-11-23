@@ -3,9 +3,8 @@
  */
 import type {
 	WPAtom,
-	WPAtomFamilyItem,
+	WPAtomSelector,
 	WPAtomResolver,
-	WPAtomRegistry,
 	WPAtomUpdater,
 } from '@wordpress/stan';
 
@@ -41,17 +40,14 @@ export interface WPDataReduxStoreConfig {
 	controls?: WPDataFunctionArray;
 }
 
-export type WPDataAtomicStoreSelector< T > = (
-	...args: any[]
-) => ( props: { get: WPAtomResolver< T > } ) => T;
 export type WPDataAtomicStoreAction< T > = (
 	...args: any[]
 ) => ( props: { get: WPAtomResolver< T >; set: WPAtomUpdater< T > } ) => void;
 
 export interface WPDataAtomicStoreConfig {
-	rootAtoms: Array< WPAtom< any > | WPAtomFamilyItem< any > >;
+	rootAtoms: Array< WPAtom< any > >;
 	actions?: { [ key: string ]: WPDataAtomicStoreAction< any > };
-	selectors?: { [ key: string ]: WPDataAtomicStoreSelector< any > };
+	selectors?: { [ key: string ]: (...args:any[]) => WPAtomSelector<any> };
 }
 
 export interface WPDataRegistry {
@@ -59,11 +55,6 @@ export interface WPDataRegistry {
 	 * Registers a store.
 	 */
 	register: ( store: WPDataStore ) => void;
-
-	/**
-	 * Retrieves the atom registry.
-	 */
-	__internalGetAtomRegistry: () => WPAtomRegistry;
 
 	/**
 	 * For registry selectors we need to be able to inject the atom resolver.

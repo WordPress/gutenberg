@@ -4,11 +4,6 @@
 import { get, kebabCase, reduce, startsWith } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
 import {
@@ -31,7 +26,7 @@ function compileStyleValue( uncompiledValue ) {
 	return uncompiledValue;
 }
 
-export default ( blockData, tree ) => {
+export default ( blockData, tree, metadata ) => {
 	const styles = [];
 	// Can this be converted to a context, as the global context?
 	// See comment in the server.
@@ -47,15 +42,15 @@ export default ( blockData, tree ) => {
 	 */
 	const getBlockStylesDeclarations = ( blockSupports, blockStyles = {} ) => {
 		const declarations = [];
-		Object.keys( STYLE_PROPERTY ).forEach( ( key ) => {
+		Object.keys( metadata ).forEach( ( key ) => {
 			const cssProperty = key.startsWith( '--' ) ? key : kebabCase( key );
 			if (
 				blockSupports.includes( key ) &&
-				get( blockStyles, STYLE_PROPERTY[ key ], false )
+				get( blockStyles, metadata[ key ].value, false )
 			) {
 				declarations.push(
 					`${ cssProperty }: ${ compileStyleValue(
-						get( blockStyles, STYLE_PROPERTY[ key ] )
+						get( blockStyles, metadata[ key ].value )
 					) }`
 				);
 			}

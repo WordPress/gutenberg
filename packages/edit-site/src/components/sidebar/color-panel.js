@@ -3,17 +3,11 @@
  */
 import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import {
-	LINK_COLOR,
-	useEditorFeature,
-	getValueFromVariable,
-	getPresetVariable,
-} from '../editor/utils';
+import { LINK_COLOR, useEditorFeature } from '../editor/utils';
 import ColorPalettePanel from './color-palette-panel';
 
 export function useHasColorPanel( { supports } ) {
@@ -32,9 +26,6 @@ export default function ColorPanel( {
 	getSetting,
 	setSetting,
 } ) {
-	const features = useSelect( ( select ) => {
-		return select( 'core/edit-site' ).getSettings().__experimentalFeatures;
-	} );
 	const colors = useEditorFeature( 'color.palette', name );
 	const disableCustomColors = ! useEditorFeature( 'color.custom', name );
 	const gradients = useEditorFeature( 'color.gradients', name );
@@ -49,13 +40,9 @@ export default function ColorPanel( {
 		const color = getStyleProperty( name, 'color' );
 		const userColor = getStyleProperty( name, 'color', 'user' );
 		settings.push( {
-			colorValue: getValueFromVariable( features, name, color ) || color,
+			colorValue: color,
 			onColorChange: ( value ) =>
-				setStyleProperty(
-					name,
-					'color',
-					getPresetVariable( 'color', colors, value ) || value
-				),
+				setStyleProperty( name, 'color', value ),
 			label: __( 'Text color' ),
 			clearable: color === userColor,
 		} );
@@ -70,15 +57,9 @@ export default function ColorPanel( {
 			'user'
 		);
 		backgroundSettings = {
-			colorValue:
-				getValueFromVariable( features, name, backgroundColor ) ||
-				backgroundColor,
+			colorValue: backgroundColor,
 			onColorChange: ( value ) =>
-				setStyleProperty(
-					name,
-					'backgroundColor',
-					getPresetVariable( 'color', colors, value ) || value
-				),
+				setStyleProperty( name, 'backgroundColor', value ),
 		};
 		if ( backgroundColor ) {
 			backgroundSettings.clearable =
@@ -91,14 +72,9 @@ export default function ColorPanel( {
 		const gradient = getStyleProperty( name, 'background' );
 		const userGradient = getStyleProperty( name, 'background', 'user' );
 		gradientSettings = {
-			gradientValue:
-				getValueFromVariable( features, name, gradient ) || gradient,
+			gradientValue: gradient,
 			onGradientChange: ( value ) =>
-				setStyleProperty(
-					name,
-					'background',
-					getPresetVariable( 'gradient', gradients, value ) || value
-				),
+				setStyleProperty( name, 'background', value ),
 		};
 		if ( gradient ) {
 			gradientSettings.clearable = gradient === userGradient;
@@ -120,13 +96,9 @@ export default function ColorPanel( {
 		const color = getStyleProperty( name, LINK_COLOR );
 		const userColor = getStyleProperty( name, LINK_COLOR, 'user' );
 		settings.push( {
-			colorValue: getValueFromVariable( features, name, color ) || color,
+			colorValue: color,
 			onColorChange: ( value ) =>
-				setStyleProperty(
-					name,
-					LINK_COLOR,
-					getPresetVariable( 'color', colors, value ) || value
-				),
+				setStyleProperty( name, LINK_COLOR, value ),
 			label: __( 'Link color' ),
 			clearable: color === userColor,
 		} );
