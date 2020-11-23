@@ -46,69 +46,69 @@ export interface WPAtomState< T > {
 
 export type WPAtom< T > = ( registry: WPAtomRegistry ) => WPAtomState< T >;
 
-export interface WPAtomSelectorConfig< T > {
+export interface WPAtomFamilyConfig< T > {
 	/**
 	 * Creates an atom for the given key
 	 */
-	createAtom: ( ...args: any[] ) => WPAtom< T >;
+	createAtom: ( key: any ) => WPAtom< T >;
 }
 
-export interface WPAtomSelector< T > {
+export interface WPAtomFamilyItem< T > {
 	/**
-	 * Type which value is "selector" to indicate that this is a selector.
+	 * Type which value is "family" to indicate that this is a family.
 	 */
 	type: string;
 
 	/**
-	 * Selector config used for this item.
+	 * Family config used for this item.
 	 */
-	config: WPAtomSelectorConfig< T >;
+	config: WPAtomFamilyConfig< T >;
 
 	/**
-	 * Selector args
+	 * Item key
 	 */
-	args: any[];
+	key: any;
 }
 
 export interface WPAtomRegistry {
 	/**
 	 * Reads an atom vale.
 	 */
-	get: < T >( atom: WPAtom< T > | WPAtomSelector< T > ) => T;
+	get: < T >( atom: WPAtom< T > | WPAtomFamilyItem< T > ) => T;
 
 	/**
 	 * Update an atom value.
 	 */
-	set: < T >( atom: WPAtom< T > | WPAtomSelector< T >, value: any ) => void;
+	set: < T >( atom: WPAtom< T > | WPAtomFamilyItem< T >, value: any ) => void;
 
 	/**
 	 * Retrieves or creates an atom from the registry.
 	 */
 	subscribe: < T >(
-		atom: WPAtom< T > | WPAtomSelector< T >,
+		atom: WPAtom< T > | WPAtomFamilyItem< T >,
 		listener: WPAtomListener
 	) => () => void;
 
 	/**
 	 * Removes an atom from the registry.
 	 */
-	delete: < T >( atom: WPAtom< T > | WPAtomSelector< T > ) => void;
+	delete: < T >( atom: WPAtom< T > | WPAtomFamilyItem< T > ) => void;
 
 	/**
 	 * Retrieves the atom state for a given atom.
 	 * This shouldn't be used directly, prefer the other methods.
 	 */
 	__unstableGetAtomState: < T >(
-		atom: WPAtom< T > | WPAtomSelector< T >
+		atom: WPAtom< T > | WPAtomFamilyItem< T >
 	) => WPAtomState< any >;
 }
 
 export type WPAtomResolver< T > = (
-	atom: WPAtom< T > | WPAtomSelector< T >
+	atom: WPAtom< T > | WPAtomFamilyItem< T >
 ) => T;
 
 export type WPAtomUpdater< T > = (
-	atom: WPAtom< T > | WPAtomSelector< T >,
+	atom: WPAtom< T > | WPAtomFamilyItem< T >,
 	value: any
 ) => void;
 
@@ -121,10 +121,10 @@ export type WPDerivedAtomUpdater< T > = (
 	value: any
 ) => void;
 
-export type WPAtomSelectorResolver< T > = (
-	...args: any[]
+export type WPAtomFamilyResolver< T > = (
+	key: any
 ) => WPDerivedAtomResolver< T >;
 
-export type WPAtomSelectorUpdater< T > = (
-	...args: any[]
+export type WPAtomFamilyUpdater< T > = (
+	key: any
 ) => WPDerivedAtomUpdater< T >;

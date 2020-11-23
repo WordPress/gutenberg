@@ -106,11 +106,10 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 					addDependency( atomState );
 					updatedDependenciesMap.set( atomState, true );
 					updatedDependencies.push( atomState );
-					const ret = atomState.get();
 					if ( ! atomState.isResolved ) {
 						unresolved.push( atomState );
 					}
-					return ret;
+					return atomState.get();
 				},
 			} );
 		} catch ( error ) {
@@ -137,12 +136,9 @@ export const createDerivedAtom = ( resolver, updater = noop, config = {} ) => (
 		 * @param {any} newValue
 		 */
 		function checkNewValue( newValue ) {
-			if ( unresolved.length === 0 ) {
-				isResolved = true;
-			}
-
 			if ( unresolved.length === 0 && newValue !== value ) {
 				value = newValue;
+				isResolved = true;
 				notifyListeners();
 			}
 		}

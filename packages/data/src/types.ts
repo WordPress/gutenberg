@@ -3,7 +3,7 @@
  */
 import type {
 	WPAtom,
-	WPAtomSelector,
+	WPAtomFamilyItem,
 	WPAtomResolver,
 	WPAtomRegistry,
 	WPAtomUpdater,
@@ -41,14 +41,17 @@ export interface WPDataReduxStoreConfig {
 	controls?: WPDataFunctionArray;
 }
 
+export type WPDataAtomicStoreSelector< T > = (
+	...args: any[]
+) => ( props: { get: WPAtomResolver< T > } ) => T;
 export type WPDataAtomicStoreAction< T > = (
 	...args: any[]
 ) => ( props: { get: WPAtomResolver< T >; set: WPAtomUpdater< T > } ) => void;
 
 export interface WPDataAtomicStoreConfig {
-	rootAtoms: Array< WPAtom< any > >;
+	rootAtoms: Array< WPAtom< any > | WPAtomFamilyItem< any > >;
 	actions?: { [ key: string ]: WPDataAtomicStoreAction< any > };
-	selectors?: { [ key: string ]: (...args:any[]) => WPAtomSelector<any> };
+	selectors?: { [ key: string ]: WPDataAtomicStoreSelector< any > };
 }
 
 export interface WPDataRegistry {
