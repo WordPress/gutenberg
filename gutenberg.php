@@ -135,7 +135,6 @@ remove_action( 'welcome_panel', 'wp_welcome_panel' );
  * When widgets are merged in core this should go into `wp-admin/includes/dashboard.php`
  * and replace the widgets link in the `wp_welcome_panel` checking for the same condition,
  * because then `gutenberg_use_widgets_block_editor` will exist in core.
- * 
  */
 function modify_welcome_panel() {
 	ob_start();
