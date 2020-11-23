@@ -17,6 +17,10 @@
 			"type": "boolean",
 			"default": false
 		},
+		"backgroundSize": {
+			"type": "string",
+			"default": "cover"
+		},
 		"dimRatio": {
 			"type": "number",
 			"default": 50

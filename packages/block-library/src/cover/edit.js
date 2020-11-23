@@ -20,6 +20,9 @@ import {
 	Spinner,
 	ToggleControl,
 	withNotices,
+	ButtonGroup,
+	SelectControl,
+	__experimentalUnitControl as BaseUnitControl,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
@@ -52,6 +55,7 @@ import {
 	VIDEO_BACKGROUND_TYPE,
 	COVER_MIN_HEIGHT,
 	CSS_UNITS,
+	SIZE_OPTIONS,
 	backgroundImageStyles,
 	dimRatioToClass,
 	isContentPositionCenter,
@@ -82,11 +86,172 @@ function retrieveFastAverageColor() {
 	return retrieveFastAverageColor.fastAverageColor;
 }
 
-function CoverHeightInput( {
+function CustomSizeControl( { value, onSelect } ) {
+	let initMode = value.search( /auto/ );
+	if ( initMode < 1 ) {
+		initMode = 'both';
+	} else if ( initMode === 0 ) {
+		initMode = 'width';
+	} else {
+		initMode = 'height';
+	}
+
+	const [ currentMode, setMode ] = useState( initMode );
+
+	const customUnits = [
+		{ value: 'px', label: 'px', default: 0 },
+		{ value: '%', label: '%', default: 10 },
+	];
+
+	// Split and pick up values + units from the CSS inline.
+	let wh =
+		value &&
+		value
+			.replace( /auto/, '50%' )
+			.split( /(\d+|%|px|auto)/ )
+			.filter( ( v ) => !! v && v !== ' ' );
+
+	// default values.
+	if ( wh.length < 2 ) {
+		wh = [ '50', '%', '50', '%' ];
+	}
+
+	function customSizeHandler( data ) {
+		const { mode, w, wu, h, hu } = data;
+
+		if ( mode ) {
+			setMode( mode );
+		}
+
+		let inlineStyle = '';
+		switch ( mode || currentMode ) {
+			case 'width':
+				inlineStyle = `${ w || wh[ 0 ] }${ wu || wh[ 1 ] } auto`;
+				break;
+
+			case 'height':
+				inlineStyle = `auto ${ h || wh[ 2 ] }${ hu || wh[ 3 ] }`;
+				break;
+
+			case 'both':
+				inlineStyle =
+					`${ w || wh[ 0 ] }${ wu || wh[ 1 ] } ` +
+					`${ h || wh[ 2 ] }${ hu || wh[ 3 ] }`;
+				break;
+		}
+
+		onSelect( inlineStyle );
+	}
+
+	return (
+		<Fragment>
+			<SelectControl
+				label={ __( 'Size mode' ) }
+				options={ [
+					{
+						value: 'width',
+						label: __( 'Width' ),
+					},
+					{
+						value: 'height',
+						label: __( 'Height' ),
+					},
+					{
+						value: 'both',
+						label: __( 'Width & Height' ),
+					},
+				] }
+				value={ currentMode }
+				onChange={ ( newMode ) =>
+					customSizeHandler( { mode: newMode } )
+				}
+				labelPosition="top"
+			/>
+
+			<div className="background-size-custom-options">
+				{ ( currentMode === 'width' || currentMode === 'both' ) && (
+					<CoverValueUnitInput
+						label={ __( 'Width' ) }
+						value={ wh[ 0 ] }
+						unit={ wh[ 1 ] }
+						units={ customUnits }
+						onChange={ ( w ) => customSizeHandler( { w } ) }
+						onUnitChange={ ( wu ) => customSizeHandler( { wu } ) }
+						customUnits={ false }
+					/>
+				) }
+
+				{ ( currentMode === 'height' || currentMode === 'both' ) && (
+					<CoverValueUnitInput
+						label={ __( 'Height' ) }
+						value={ wh[ 2 ] }
+						unit={ wh[ 3 ] }
+						units={ customUnits }
+						onChange={ ( h ) => customSizeHandler( { h } ) }
+						onUnitChange={ ( hu ) => customSizeHandler( { hu } ) }
+						customUnits={ false }
+					/>
+				) }
+			</div>
+		</Fragment>
+	);
+}
+
+/**
+ * Helper function to fetect if the given size is custom or not.
+ *
+ * @param {string} size - Background size
+ * @return {boolean} True if size is custom. Otherwise, False.
+ */
+export function isCustomSize( size ) {
+	return (
+		SIZE_OPTIONS.map( ( opt ) => opt.slug ).indexOf( size ) < 0 ||
+		size === 'custom'
+	);
+}
+
+function BackgroundSizeControl( { size = 'cover', onSelect } ) {
+	return (
+		<Fragment>
+			<BaseControl
+				label={ __( ' Background size' ) }
+				id={ 'background-size' }
+			>
+				<ButtonGroup
+					label={ __( 'Size' ) }
+					defaultChecked="size-content"
+					className="background-size-options"
+				>
+					{ SIZE_OPTIONS.map( ( { slug, label, icon: sizeIcon } ) => (
+						<Button
+							key={ slug }
+							icon={ sizeIcon }
+							label={ label }
+							isPressed={
+								slug === size ||
+								( slug === 'custom' && isCustomSize( size ) )
+							}
+							onClick={ () => onSelect( slug ) }
+						/>
+					) ) }
+				</ButtonGroup>
+			</BaseControl>
+			{ isCustomSize( size ) && (
+				<CustomSizeControl value={ size } onSelect={ onSelect } />
+			) }
+		</Fragment>
+	);
+}
+
+function CoverValueUnitInput( {
 	onChange,
 	onUnitChange,
 	unit = 'px',
 	value = '',
+
+	label,
+	units = CSS_UNITS,
+	customUnits = true,
 } ) {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
 	const instanceId = useInstanceId( UnitControl );
@@ -119,21 +284,29 @@ function CoverHeightInput( {
 	const inputValue = temporaryInput !== null ? temporaryInput : value;
 	const min = isPx ? COVER_MIN_HEIGHT : 0;
 
+	const controlUnitProps = {
+		id: inputId,
+		min,
+		onBlur: handleOnBlur,
+		onChange: handleOnChange,
+		onUnitChange,
+		step: '1',
+		style: { maxWidth: 80 },
+		unit,
+		units,
+		value: inputValue,
+	};
+
 	return (
-		<BaseControl label={ __( 'Minimum height of cover' ) } id={ inputId }>
-			<UnitControl
-				id={ inputId }
-				isResetValueOnUnitChange
-				min={ min }
-				onBlur={ handleOnBlur }
-				onChange={ handleOnChange }
-				onUnitChange={ onUnitChange }
-				step="1"
-				style={ { maxWidth: 80 } }
-				unit={ unit }
-				units={ CSS_UNITS }
-				value={ inputValue }
-			/>
+		<BaseControl label={ label } id={ inputId }>
+			{ customUnits ? (
+				<UnitControl isResetValueOnUnitChange { ...controlUnitProps } />
+			) : (
+				<BaseUnitControl
+					isResetValueOnUnitChange
+					{ ...controlUnitProps }
+				/>
+			) }
 		</BaseControl>
 	);
 }
@@ -247,6 +420,7 @@ function CoverEdit( {
 		contentPosition,
 		id,
 		backgroundType,
+		backgroundSize,
 		dimRatio,
 		focalPoint,
 		hasParallax,
@@ -263,6 +437,16 @@ function CoverEdit( {
 	} = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes );
 	const isBlogUrl = isBlobURL( url );
+
+	// Store the previous background custom size.
+	const [ prevBackgroundSize, setPrevbackgroundSize ] = useState();
+	useEffect( () => {
+		if ( ! isCustomSize( backgroundSize ) ) {
+			return;
+		}
+
+		setPrevbackgroundSize( backgroundSize );
+	}, [ backgroundSize ] );
 
 	const toggleParallax = () => {
 		setAttributes( {
@@ -299,6 +483,7 @@ function CoverEdit( {
 		...( isImageBackground ? backgroundImageStyles( url ) : {} ),
 		backgroundColor: overlayColor.color,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
+		backgroundSize,
 	};
 
 	if ( gradientValue && ! url ) {
@@ -360,6 +545,19 @@ function CoverEdit( {
 									checked={ isRepeated }
 									onChange={ toggleIsRepeated }
 								/>
+
+								<BackgroundSizeControl
+									size={ backgroundSize }
+									onSelect={ ( newSize ) => {
+										setAttributes( {
+											backgroundSize:
+												newSize === 'custom' &&
+												!! prevBackgroundSize
+													? prevBackgroundSize
+													: newSize,
+										} );
+									} }
+								/>
 							</Fragment>
 						) }
 						{ showFocalPointPicker && (
@@ -399,7 +597,7 @@ function CoverEdit( {
 				{ hasBackground && (
 					<>
 						<PanelBody title={ __( 'Dimensions' ) }>
-							<CoverHeightInput
+							<CoverValueUnitInput
 								value={ temporaryMinHeight || minHeight }
 								unit={ minHeightUnit }
 								onChange={ ( newMinHeight ) =>
@@ -410,6 +608,7 @@ function CoverEdit( {
 										minHeightUnit: nextUnit,
 									} );
 								} }
+								label={ __( 'Minimum height of cover' ) }
 							/>
 						</PanelBody>
 						<PanelColorGradientSettings

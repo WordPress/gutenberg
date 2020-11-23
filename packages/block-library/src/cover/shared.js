@@ -4,6 +4,7 @@
 import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
 import { __ } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
+import { SVG, Rect } from '@wordpress/components';
 
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
@@ -52,6 +53,72 @@ export const CSS_UNITS = [
 		value: 'vh',
 		label: isWeb ? 'vh' : __( 'Viewport height (vh)' ),
 		default: '50',
+	},
+];
+
+export const SIZE_OPTIONS = [
+	{
+		slug: 'cover',
+		label: __( 'Cover' ),
+		icon: (
+			<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+				<Rect height="20" width="20" y="2" x="2" />
+			</SVG>
+		),
+	},
+	{
+		slug: 'contain',
+		label: __( 'Contain' ),
+		icon: (
+			<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+				<Rect
+					x="2"
+					y="2"
+					fill="none"
+					width="20"
+					height="20"
+					stroke="currentColor"
+					strokeWidth="1"
+				/>
+				<Rect x="7" y="2" width="10" height="20" />
+			</SVG>
+		),
+	},
+	{
+		slug: 'initial',
+		label: __( 'Original' ),
+		icon: (
+			<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+				<Rect
+					x="2"
+					y="2"
+					fill="none"
+					width="20"
+					height="20"
+					stroke="currentColor"
+					strokeWidth="1"
+				/>
+				<Rect x="8" y="4" width="8" height="16" />
+			</SVG>
+		),
+	},
+	{
+		slug: 'custom',
+		label: __( 'Custom' ),
+		icon: (
+			<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+				<Rect
+					x="2"
+					y="2"
+					fill="none"
+					width="20"
+					height="20"
+					stroke="currentColor"
+					strokeWidth="1"
+				/>
+				<Rect x="7" y="8" width="10" height="8" />
+			</SVG>
+		),
 	},
 ];
 

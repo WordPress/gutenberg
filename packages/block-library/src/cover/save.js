@@ -25,6 +25,8 @@ import {
 	getPositionClassName,
 } from './shared';
 
+import { isCustomSize } from './edit';
+
 export default function save( { attributes } ) {
 	const {
 		backgroundType,
@@ -40,6 +42,7 @@ export default function save( { attributes } ) {
 		url,
 		minHeight: minHeightProp,
 		minHeightUnit,
+		backgroundSize,
 	} = attributes;
 	const overlayColorClass = getColorClassName(
 		'background-color',
@@ -64,6 +67,11 @@ export default function save( { attributes } ) {
 		style.background = customGradient;
 	}
 	style.minHeight = minHeight || undefined;
+
+	const hasCustomBackgroundSize = isCustomSize( backgroundSize );
+	if ( hasCustomBackgroundSize ) {
+		style.backgroundSize = backgroundSize;
+	}
 
 	let positionValue;
 
@@ -93,6 +101,10 @@ export default function save( { attributes } ) {
 			'has-custom-content-position': ! isContentPositionCenter(
 				contentPosition
 			),
+			'has-background-size': backgroundSize,
+			[ ! hasCustomBackgroundSize
+				? `is-${ backgroundSize }-background-size`
+				: null ]: ! hasCustomBackgroundSize,
 		},
 		getPositionClassName( contentPosition )
 	);
