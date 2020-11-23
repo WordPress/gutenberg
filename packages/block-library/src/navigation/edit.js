@@ -78,9 +78,20 @@ function Navigation( {
 		}
 	);
 
+	const blockClassNames = classnames( className, {
+		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+		'is-vertical': attributes.orientation === 'vertical',
+	} );
+
 	if ( isPlaceholderShown ) {
 		return (
-			<div { ...blockProps }>
+			<div
+				{ ...blockProps }
+				className={ classnames(
+					blockProps.className,
+					blockClassNames
+				) }
+			>
 				<NavigationPlaceholder
 					onCreate={ ( blocks, selectNavigationBlock ) => {
 						setIsPlaceholderShown( false );
@@ -103,11 +114,6 @@ function Navigation( {
 			} );
 		};
 	}
-
-	const blockClassNames = classnames( className, {
-		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-		'is-vertical': attributes.orientation === 'vertical',
-	} );
 
 	return (
 		<>
