@@ -152,16 +152,14 @@ export default function QueryInspectorControls( {
 						setQuery( { useGlobalQuery: !! value } )
 					}
 				/>
-				<SelectControl
-					options={ postTypesSelectOptions }
-					value={ postType }
-					label={
-						useGlobalQuery
-							? __( 'Post Type (preview)' )
-							: __( 'Post Type' )
-					}
-					onChange={ onPostTypeChange }
-				/>
+				{ ! useGlobalQuery && (
+					<SelectControl
+						options={ postTypesSelectOptions }
+						value={ postType }
+						label={ __( 'Post Type' ) }
+						onChange={ onPostTypeChange }
+					/>
+				) }
 				{ layout?.type === 'flex' && (
 					<>
 						<RangeControl
@@ -182,13 +180,15 @@ export default function QueryInspectorControls( {
 						) }
 					</>
 				) }
-				<QueryControls
-					{ ...{ order, orderBy } }
-					onOrderChange={ ( value ) => setQuery( { order: value } ) }
-					onOrderByChange={ ( value ) =>
-						setQuery( { orderBy: value } )
-					}
-				/>
+				{ ! useGlobalQuery && (
+					<QueryControls
+						{ ...{ order, orderBy } }
+						onOrderChange={ ( value ) => setQuery( { order: value } ) }
+						onOrderByChange={ ( value ) =>
+							setQuery( { orderBy: value } )
+						}
+					/>
+				) }
 				{ showSticky && (
 					<SelectControl
 						label={ __( 'Sticky posts' ) }
@@ -198,49 +198,47 @@ export default function QueryInspectorControls( {
 					/>
 				) }
 			</PanelBody>
-			<PanelBody
-				title={
-					useGlobalQuery ? __( 'Filters (preview)' ) : __( 'Filters' )
-				}
-			>
-				{ showCategories && categories?.terms?.length > 0 && (
-					<FormTokenField
-						label={ __( 'Categories' ) }
-						value={ ( query.categoryIds || [] ).map(
-							( categoryId ) => ( {
-								id: categoryId,
-								value: categories.mapById[ categoryId ].name,
+			{ ! useGlobalQuery && (
+				<PanelBody title={ __( 'Filters' ) }>
+					{ showCategories && categories?.terms?.length > 0 && (
+						<FormTokenField
+							label={ __( 'Categories' ) }
+							value={ ( query.categoryIds || [] ).map(
+								( categoryId ) => ( {
+									id: categoryId,
+									value: categories.mapById[ categoryId ].name,
+								} )
+							) }
+							suggestions={ categories.names }
+							onChange={ onCategoriesChange }
+						/>
+					) }
+					{ showTags && tags?.terms?.length > 0 && (
+						<FormTokenField
+							label={ __( 'Tags' ) }
+							value={ ( query.tagIds || [] ).map( ( tagId ) => ( {
+								id: tagId,
+								value: tags.mapById[ tagId ].name,
+							} ) ) }
+							suggestions={ tags.names }
+							onChange={ onTagsChange }
+						/>
+					) }
+					<QueryControls
+						{ ...{ selectedAuthorId, authorList } }
+						onAuthorChange={ ( value ) =>
+							setQuery( {
+								author: value !== '' ? +value : undefined,
 							} )
-						) }
-						suggestions={ categories.names }
-						onChange={ onCategoriesChange }
+						}
 					/>
-				) }
-				{ showTags && tags?.terms?.length > 0 && (
-					<FormTokenField
-						label={ __( 'Tags' ) }
-						value={ ( query.tagIds || [] ).map( ( tagId ) => ( {
-							id: tagId,
-							value: tags.mapById[ tagId ].name,
-						} ) ) }
-						suggestions={ tags.names }
-						onChange={ onTagsChange }
+					<TextControl
+						label={ __( 'Keyword' ) }
+						value={ querySearch }
+						onChange={ setQuerySearch }
 					/>
-				) }
-				<QueryControls
-					{ ...{ selectedAuthorId, authorList } }
-					onAuthorChange={ ( value ) =>
-						setQuery( {
-							author: value !== '' ? +value : undefined,
-						} )
-					}
-				/>
-				<TextControl
-					label={ __( 'Keyword' ) }
-					value={ querySearch }
-					onChange={ setQuerySearch }
-				/>
-			</PanelBody>
+				</PanelBody>
+			) }
 		</InspectorControls>
 	);
 }
