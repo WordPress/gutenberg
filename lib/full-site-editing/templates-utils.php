@@ -54,7 +54,7 @@ function gutenberg_render_templates_lists_custom_column( $column_name, $post_id 
 
 	if ( 'theme' === $column_name ) {
 		$terms = get_the_terms( $post_id, 'wp_theme' );
-		if ( ! is_array( $terms ) ) {
+		if ( empty( $terms ) ) {
 			return;
 		}
 		$themes        = array();
@@ -80,7 +80,7 @@ function gutenberg_render_templates_lists_custom_column( $column_name, $post_id 
  * @param array $views The edit views to filter.
  */
 function gutenberg_filter_templates_edit_views( $views ) {
-	$post_type = get_current_screen()->post_type;
+	$post_type          = get_current_screen()->post_type;
 	$url                = add_query_arg(
 		array(
 			'post_type'   => $post_type,
