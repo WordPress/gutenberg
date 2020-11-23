@@ -23,16 +23,26 @@
 
 // CSS inspired by Placeholder component
 .wp-block-navigation-placeholder {
-	padding: 0.5em;
+	padding: $grid-unit-10 $grid-unit-15;
 	border-radius: $radius-block-ui;
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
-	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
+.wp-block-navigation-placeholder__icon {
+	margin-right: $grid-unit-15;
+	height: $button-size; // Prevents jumpiness.
 }
 
 .wp-block-navigation-placeholder__actions {
 	font-size: $default-font-size;
-	span {
-		margin-right: 1em;
+	display: flex;
+
+	.components-dropdown-menu__toggle {
+		display: flex;
+		flex-direction: row-reverse; // This puts the chevron, which is hidden from screen readers, on the right.
 	}
 }

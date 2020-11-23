@@ -22,6 +22,7 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { Icon, chevronDown, navigation } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -234,9 +235,13 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 
 	return (
 		<div className="wp-block-navigation-placeholder">
+			<Icon
+				icon={ navigation }
+				className="wp-block-navigation-placeholder__icon"
+			/>
 			{ isLoading && (
 				<div ref={ ref }>
-					<Spinner /> { __( 'Loading…' ) }
+					<Spinner />
 				</div>
 			) }
 			{ ! isLoading && (
@@ -244,15 +249,11 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 					ref={ ref }
 					className="wp-block-navigation-placeholder__actions"
 				>
-					{ hasPages ? (
-						<Button onClick={ onCreateAllPages }>
-							Add all pages
-						</Button>
-					) : undefined }
 					{ hasMenus ? (
 						<DropdownMenu
-							icon={ null }
-							text={ __( 'Existing Menu' ) }
+							text={ __( 'Existing menu' ) }
+							icon={ chevronDown }
+							className="wp-block-navigation-placeholder__actions__dropdown"
 						>
 							{ ( { onClose } ) => (
 								<MenuGroup>
@@ -274,7 +275,14 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 							) }
 						</DropdownMenu>
 					) : undefined }
-					<Button onClick={ onCreateEmptyMenu }>Start Empty</Button>
+					{ hasPages ? (
+						<Button onClick={ onCreateAllPages }>
+							{ __( 'Add all pages' ) }
+						</Button>
+					) : undefined }
+					<Button onClick={ onCreateEmptyMenu }>
+						{ __( 'Start empty' ) }
+					</Button>
 				</div>
 			) }
 		</div>
