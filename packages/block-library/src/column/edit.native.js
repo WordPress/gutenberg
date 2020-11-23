@@ -27,7 +27,12 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './editor.scss';
 import ColumnsPreview from './column-preview';
-import { getWidths, getWidthWithUnit, CSS_UNITS } from '../columns/utils';
+import {
+	getWidths,
+	getWidthWithUnit,
+	isPercentageUnit,
+	CSS_UNITS,
+} from '../columns/utils';
 
 function ColumnEdit( {
 	attributes,
@@ -66,7 +71,9 @@ function ColumnEdit( {
 
 	const onChangeWidth = ( nextWidth ) => {
 		const widthWithUnit = getWidthWithUnit(
-			widthUnit === '%' || ! widthUnit ? tempWidth : nextWidth,
+			isPercentageUnit( widthUnit ) || ! widthUnit
+				? tempWidth
+				: nextWidth,
 			widthUnit
 		);
 
@@ -87,7 +94,7 @@ function ColumnEdit( {
 	};
 
 	const onChange = ( nextWidth ) => {
-		if ( widthUnit === '%' || ! widthUnit ) {
+		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
 			setTempWidth( nextWidth );
 		} else {
 			onChangeWidth( nextWidth );
@@ -144,7 +151,7 @@ function ColumnEdit( {
 					<UnitControl
 						label={ __( 'Width' ) }
 						min={ 1 }
-						max={ widthUnit === '%' ? 100 : undefined }
+						max={ isPercentageUnit( widthUnit ) ? 100 : undefined }
 						onChange={ onChange }
 						onComplete={ onChangeWidth }
 						onUnitChange={ onChangeUnit }

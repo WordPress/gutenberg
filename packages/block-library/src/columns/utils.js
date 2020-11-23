@@ -163,7 +163,7 @@ export function getWidths( blocks, withParsing = true ) {
 export function getWidthWithUnit( width, unit ) {
 	width = 0 > parseFloat( width ) ? '0' : width;
 
-	if ( unit === '%' ) {
+	if ( isPercentageUnit( unit ) ) {
 		width = Math.min( width, 100 );
 	}
 
@@ -199,3 +199,14 @@ export const CSS_UNITS = [
 		default: '',
 	},
 ];
+
+/**
+ * Returns a boolean whether passed unit is percentage
+ *
+ * @param {string} unit Column width unit.
+ *
+ * @return {boolean} 	Whether unit is '%'.
+ */
+export function isPercentageUnit( unit ) {
+	return unit === '%';
+}

@@ -41,6 +41,7 @@ import {
 	toWidthPrecision,
 	getWidths,
 	getWidthWithUnit,
+	isPercentageUnit,
 	CSS_UNITS,
 } from './utils';
 import {
@@ -148,7 +149,9 @@ function ColumnsEditContainer( {
 
 	const onChangeWidth = ( { nextWidth, valueUnit, columnId } ) => {
 		const widthWithUnit = getWidthWithUnit(
-			valueUnit === '%' || ! valueUnit ? tempWidth : nextWidth,
+			isPercentageUnit( valueUnit ) || ! valueUnit
+				? tempWidth
+				: nextWidth,
 			valueUnit
 		);
 
@@ -165,7 +168,7 @@ function ColumnsEditContainer( {
 	};
 
 	const onChange = ( nextWidth, valueUnit, columnId ) => {
-		if ( valueUnit === '%' || ! valueUnit ) {
+		if ( isPercentageUnit( valueUnit ) || ! valueUnit ) {
 			setTempWidth( nextWidth );
 		} else {
 			onChangeWidth( { nextWidth, valueUnit, columnId } );
@@ -187,7 +190,11 @@ function ColumnsEditContainer( {
 						getWidths( innerColumns ).length
 					}` }
 					min={ 1 }
-					max={ valueUnit === '%' || ! valueUnit ? 100 : undefined }
+					max={
+						isPercentageUnit( valueUnit ) || ! valueUnit
+							? 100
+							: undefined
+					}
 					decimalNum={ 1 }
 					value={ getWidths( innerColumns )[ index ] }
 					onChange={ ( nextWidth ) => {
