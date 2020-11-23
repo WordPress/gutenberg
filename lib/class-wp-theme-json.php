@@ -300,11 +300,11 @@ class WP_Theme_JSON {
 		),
 		'fontStyle'                => array(
 			'value'   => array( 'typography', 'fontStyle' ),
-			'support' => array( '__experimentalFontAppearance' ),
+			'support' => array( '__experimentalFontStyle' ),
 		),
 		'fontWeight'               => array(
 			'value'   => array( 'typography', 'fontWeight' ),
-			'support' => array( '__experimentalFontAppearance' ),
+			'support' => array( '__experimentalFontWeight' ),
 		),
 		'lineHeight'               => array(
 			'value'   => array( 'typography', 'lineHeight' ),
