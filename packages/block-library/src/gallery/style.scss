@@ -10,14 +10,14 @@
 		// Need to add the bogus :not(#individual-image) to override long not:() specificity chain
 		// on default image block on front end.
 		// Add space between thumbnails, and unset right most thumbnails later.
-		li.wp-block-image:not(#individual-image) {
+		li.list-image:not(#individual-image) {
 			margin: 0 $grid-unit-20 $grid-unit-20 0;
 			&:last-child {
 				margin-right: 0;
 			}
 		}
 
-		li.wp-block-image {
+		li.list-image {
 			display: flex;
 			flex-grow: 1;
 			flex-direction: column;
@@ -67,7 +67,7 @@
 	}
 
 	// Cropped
-	&.is-cropped ul.blocks-gallery-grid li.wp-block-image:not(#individual-image) {
+	&.is-cropped ul.blocks-gallery-grid li.list-image:not(#individual-image) {
 		figure > div {
 			display: flex;
 		}
@@ -88,7 +88,7 @@
 	}
 
 	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
-	& .wp-block-image:not(#individual-image) {
+	& li:not(#individual-image) {
 		width: calc(50% - #{$grid-unit-20});
 
 		&:nth-of-type(even) {
@@ -96,7 +96,7 @@
 		}
 	}
 
-	&.columns-1 .wp-block-image:not(#individual-image) {
+	&.columns-1 li:not(#individual-image) {
 		width: 100%;
 		margin-right: 0;
 	}
@@ -104,7 +104,7 @@
 	// Beyond mobile viewports, we allow up to 8 columns.
 	@include break-small {
 		@for $i from 3 through 8 {
-			&.columns-#{ $i } .wp-block-image:not(#individual-image) {
+			&.columns-#{ $i } li.list-image:not(#individual-image) {
 				width: calc(#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i});
 				margin-right: $grid-unit-20;
 			}
@@ -112,7 +112,7 @@
 
 		// Unset the right margin on every rightmost gallery item to ensure center balance.
 		@for $column-count from 1 through 8 {
-			&.columns-#{$column-count} .wp-block-image:not(#individual-image):nth-of-type( #{ $column-count }n ) {
+			&.columns-#{$column-count} li.list-image:not(#individual-image):nth-of-type( #{ $column-count }n ) {
 				margin-right: 0;
 			}
 		}

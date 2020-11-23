@@ -334,8 +334,8 @@ export function ImageEdit( {
 		return (
 			<>
 				{ controls }
-				<li { ...blockProps }>
-					<figure>
+				<li className="list-image">
+					<figure { ...blockProps }>
 						{ image }
 						{ mediaPlaceholder }
 					</figure>
