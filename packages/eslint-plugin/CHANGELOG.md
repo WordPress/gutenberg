@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Documentation
+
+-   Include a note about the minimum version required for `node` (10.0.0) and `npm` (6.9.0).
+
 ## 7.2.1 (2020-09-17)
 
 ### Bug Fixes
