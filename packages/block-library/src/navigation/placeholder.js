@@ -22,7 +22,7 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Icon, chevronDown, navigation, search } from '@wordpress/icons';
+import { Icon, chevronDown, search } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -243,10 +243,6 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 			</div>
 
 			<div className="wp-block-navigation-placeholder__controls">
-				<Icon
-					icon={ navigation }
-					className="wp-block-navigation-placeholder__icon"
-				/>
 				{ isLoading && (
 					<div ref={ ref }>
 						<Spinner />
