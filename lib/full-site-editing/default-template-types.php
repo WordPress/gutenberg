@@ -13,69 +13,33 @@
  */
 function gutenberg_get_default_template_types() {
 	$default_template_types = array(
-		'index'          => array(
-			'title'       => _x( 'Default (Index)', 'Template name', 'gutenberg' ),
-			'description' => __( 'Main template, applied when no other template is found', 'gutenberg' ),
-		),
-		'home'           => array(
-			'title'       => _x( 'Home', 'Template name', 'gutenberg' ),
-			'description' => __( 'Template for the latest blog posts', 'gutenberg' ),
-		),
 		'front-page'     => array(
 			'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
-			'description' => __( 'Front page template, whether it displays the blog posts index or a static page', 'gutenberg' ),
+			'description' => __( 'Resolves when the site home page is requested', 'gutenberg' ),
 		),
-		'singular'       => array(
-			'title'       => _x( 'Default Singular', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays any content on a single page', 'gutenberg' ),
-		),
-		'single'         => array(
-			'title'       => _x( 'Default Single', 'Template name', 'gutenberg' ),
-			'description' => __( 'Applied to individual content like a blog post', 'gutenberg' ),
+		'single-post'    => array(
+			'title'       => _x( 'Post', 'Template name', 'gutenberg' ),
+			'description' => __( 'Resolves when a post is requested', 'gutenberg' ),
 		),
 		'page'           => array(
-			'title'       => _x( 'Default Page', 'Template name', 'gutenberg' ),
-			'description' => __( 'Applied to individual pages', 'gutenberg' ),
+			'title'       => _x( 'Page', 'Template name', 'gutenberg' ),
+			'description' => __( 'Resolves when a page is requested', 'gutenberg' ),
 		),
 		'archive'        => array(
-			'title'       => _x( 'Default Archive', 'Template name', 'gutenberg' ),
-			'description' => __( 'Applied to archives like your posts page, categories, or tags', 'gutenberg' ),
-		),
-		'author'         => array(
-			'title'       => _x( 'Default Author Archive', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays a list of posts by a single author', 'gutenberg' ),
-		),
-		'category'       => array(
-			'title'       => _x( 'Default Post Category Archive', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays a list of posts in a category', 'gutenberg' ),
-		),
-		'taxonomy'       => array(
-			'title'       => _x( 'Default Taxonomy Archive', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays a list of posts in a taxonomy', 'gutenberg' ),
-		),
-		'date'           => array(
-			'title'       => _x( 'Default Date Archive', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays a list of posts in a date range', 'gutenberg' ),
-		),
-		'tag'            => array(
-			'title'       => _x( 'Default Tag Archive', 'Template name', 'gutenberg' ),
-			'description' => __( 'Displays a list of posts with a tag', 'gutenberg' ),
-		),
-		'attachment'     => array(
-			'title'       => __( 'Media', 'gutenberg' ),
-			'description' => __( 'Displays media content', 'gutenberg' ),
+			'title'       => _x( 'Archive', 'Template name', 'gutenberg' ),
+			'description' => __( 'Resolves when archives like post categories are requested', 'gutenberg' ),
 		),
 		'search'         => array(
-			'title'       => __( 'Search Results', 'gutenberg' ),
-			'description' => __( 'Applied to search results', 'gutenberg' ),
-		),
-		'privacy-policy' => array(
-			'title'       => __( 'Privacy Policy', 'gutenberg' ),
-			'description' => '',
+			'title'       => _x( 'Search Results', 'Template name', 'gutenberg' ),
+			'description' => __( 'Resolves when a visitor searches the site', 'gutenberg' ),
 		),
 		'404'            => array(
-			'title'       => _x( '404 (Not Found)', 'Template name', 'gutenberg' ),
-			'description' => __( 'Applied when content cannot be found', 'gutenberg' ),
+			'title'       => _x( '404', 'Template name', 'gutenberg' ),
+			'description' => __( 'Resolves when the requested content cannot be found', 'gutenberg' ),
+		),
+		'index'          => array(
+			'title'       => _x( 'Index', 'Template name', 'gutenberg' ),
+			'description' => __( 'Resolves when no other template can be found', 'gutenberg' ),
 		),
 	);
 
