@@ -221,7 +221,7 @@ class WP_Theme_JSON {
 		),
 		array(
 			'path'          => array( 'settings', 'typography', 'fontStyles' ),
-			'value_key'     => 'slug',
+			'value_key'     => 'value',
 			'css_var_infix' => 'font-style',
 			'classes'       => array(
 				array(
@@ -232,7 +232,7 @@ class WP_Theme_JSON {
 		),
 		array(
 			'path'          => array( 'settings', 'typography', 'fontWeights' ),
-			'value_key'     => 'slug',
+			'value_key'     => 'value',
 			'css_var_infix' => 'font-weight',
 			'classes'       => array(
 				array(
