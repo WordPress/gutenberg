@@ -269,7 +269,9 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 											return (
 												<MenuItem
 													onClick={ () => {
-														setSelectedMenu( menu.id );
+														setSelectedMenu(
+															menu.id
+														);
 														onCreateFromMenu();
 													} }
 													onClose={ onClose }
