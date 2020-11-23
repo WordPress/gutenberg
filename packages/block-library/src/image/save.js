@@ -69,8 +69,8 @@ export default function save( { attributes } ) {
 	const blockProps = useBlockProps.save();
 	if ( isListItem ) {
 		return (
-			<li { ...blockProps }>
-				<figure className={ classes }>{ figure }</figure>
+			<li className="list-image">
+				<figure { ...blockProps } className={ classes }>{ figure }</figure>
 			</li>
 		);
 	}
