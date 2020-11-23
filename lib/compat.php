@@ -261,45 +261,98 @@ function gutenberg_add_date_settings_timezone( $scripts ) {
 		$timezone_abbr = $timezone_date->format( 'T' );
 	}
 
+	$default_settings = wp_json_encode(
+		array(
+			'l10n'     => array(
+				'locale'        => get_user_locale(),
+				'months'        => array_values( $wp_locale->month ),
+				'monthsShort'   => array_values( $wp_locale->month_abbrev ),
+				'weekdays'      => array_values( $wp_locale->weekday ),
+				'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
+				'meridiem'      => (object) $wp_locale->meridiem,
+				'relative'      => array(
+					/* translators: %s: Duration. */
+					'future' => __( '%s from now', 'default' ),
+					/* translators: %s: Duration. */
+					'past'   => __( '%s ago', 'default' ),
+				),
+			),
+			'formats'  => array(
+				/* translators: Time format, see https://www.php.net/date */
+				'time'                => get_option( 'time_format', __( 'g:i a', 'default' ) ),
+				/* translators: Date format, see https://www.php.net/date */
+				'date'                => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
+				/* translators: Date/Time format, see https://www.php.net/date */
+				'datetime'            => __( 'F j, Y g:i a', 'default' ),
+				/* translators: Abbreviated date/time format, see https://www.php.net/date */
+				'datetimeAbbreviated' => __( 'M j, Y g:i a', 'default' ),
+			),
+			'timezone' => array(
+				'offset' => get_option( 'gmt_offset', 0 ),
+				'string' => $timezone_string,
+				'abbr'   => $timezone_abbr,
+			),
+		)
+	);
+
 	$scripts->add_inline_script(
 		'wp-date',
 		sprintf(
 			'wp.date.setSettings( %s );',
-			wp_json_encode(
-				array(
-					'l10n'     => array(
-						'locale'        => get_user_locale(),
-						'months'        => array_values( $wp_locale->month ),
-						'monthsShort'   => array_values( $wp_locale->month_abbrev ),
-						'weekdays'      => array_values( $wp_locale->weekday ),
-						'weekdaysShort' => array_values( $wp_locale->weekday_abbrev ),
-						'meridiem'      => (object) $wp_locale->meridiem,
-						'relative'      => array(
-							/* translators: %s: Duration. */
-							'future' => __( '%s from now', 'default' ),
-							/* translators: %s: Duration. */
-							'past'   => __( '%s ago', 'default' ),
-						),
-					),
-					'formats'  => array(
-						/* translators: Time format, see https://www.php.net/date */
-						'time'                => get_option( 'time_format', __( 'g:i a', 'default' ) ),
-						/* translators: Date format, see https://www.php.net/date */
-						'date'                => get_option( 'date_format', __( 'F j, Y', 'default' ) ),
-						/* translators: Date/Time format, see https://www.php.net/date */
-						'datetime'            => __( 'F j, Y g:i a', 'default' ),
-						/* translators: Abbreviated date/time format, see https://www.php.net/date */
-						'datetimeAbbreviated' => __( 'M j, Y g:i a', 'default' ),
-					),
-					'timezone' => array(
-						'offset' => get_option( 'gmt_offset', 0 ),
-						'string' => $timezone_string,
-						'abbr'   => $timezone_abbr,
-					),
-				)
-			)
+			$default_settings
 		),
 		'after'
+	);
+
+	$scripts->add_inline_script(
+		'wp-date',
+		"
+			const WP_ZONE = 'WP';
+			const currentLocale = moment.locale();
+			const settings = wp.date.__experimentalGetSettings();
+
+			moment.updateLocale( settings.l10n.locale, {
+				// Inherit anything missing from the default locale.
+				parentLocale: currentLocale,
+				months: settings.l10n.months,
+				monthsShort: settings.l10n.monthsShort,
+				weekdays: settings.l10n.weekdays,
+				weekdaysShort: settings.l10n.weekdaysShort,
+				meridiem( hour, minute, isLowercase ) {
+					if ( hour < 12 ) {
+						return isLowercase
+							? settings.l10n.meridiem.am
+							: settings.l10n.meridiem.AM;
+					}
+					return isLowercase
+						? settings.l10n.meridiem.pm
+						: settings.l10n.meridiem.PM;
+				},
+				longDateFormat: {
+					LT: settings.formats.time,
+					LTS: null,
+					L: null,
+					LL: settings.formats.date,
+					LLL: settings.formats.datetime,
+					LLLL: null,
+				},
+				// From human_time_diff?
+				// Set to `(number, withoutSuffix, key, isFuture) => {}` instead.
+				relativeTime: settings.l10n.relative,
+			} );
+
+			moment.locale( currentLocale );
+
+			// Create WP timezone based off dateSettings.
+			moment.tz.add(
+				moment.tz.pack( {
+					name: WP_ZONE,
+					abbrs: [ WP_ZONE ],
+					untils: [ null ],
+					offsets: [ -settings.timezone.offset * 60 || 0 ],
+				} )
+			);
+		"
 	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_add_date_settings_timezone', 20 );

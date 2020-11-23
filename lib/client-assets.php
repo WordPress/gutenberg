@@ -209,6 +209,7 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 	$suffix = SCRIPT_DEBUG ? '' : '.min';
 
 	$react_suffix = ( SCRIPT_DEBUG ? '.development' : '.production' ) . $suffix;
+
 	gutenberg_register_vendor_script(
 		$scripts,
 		'react',
@@ -233,6 +234,27 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 		array(),
 		'4.17.19',
 		true
+	);
+
+	gutenberg_register_vendor_script(
+		$scripts,
+		'moment',
+		'https://unpkg.com/moment@2.29.1/moment.js',
+		array(),
+	);
+
+	gutenberg_register_vendor_script(
+		$scripts,
+		'moment-timezone/moment-timezone',
+		'https://unpkg.com/moment-timezone@0.5.32/moment-timezone.js',
+		array( 'moment' ),
+	);
+
+	gutenberg_register_vendor_script(
+		$scripts,
+		'moment-timezone/moment-timezone-utils',
+		'https://unpkg.com/moment-timezone@0.5.32/moment-timezone-utils.js',
+		array( 'moment' ),
 	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
