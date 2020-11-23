@@ -18,6 +18,8 @@ const BUNDLED_PACKAGES = [
 function defaultRequestToExternal( request ) {
 	switch ( request ) {
 		case 'moment':
+		case 'moment-timezone/moment-timezone':
+		case 'moment-timezone/moment-timezone-utils':
 			return request;
 
 		case '@babel/runtime/regenerator':
