@@ -70,7 +70,9 @@ export default function save( { attributes } ) {
 	if ( isListItem ) {
 		return (
 			<li className="list-image">
-				<figure { ...blockProps } className={ classes }>{ figure }</figure>
+				<figure { ...blockProps } className={ classes }>
+					{ figure }
+				</figure>
 			</li>
 		);
 	}
