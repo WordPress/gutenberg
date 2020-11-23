@@ -20,6 +20,7 @@ import {
  * Internal dependencies
  */
 import { useQueryContext } from '../query';
+import { getTemplateQuery } from './utils';
 
 const TEMPLATE = [
 	[ 'core/post-title' ],
@@ -41,6 +42,7 @@ export default function QueryLoopEdit( {
 			search,
 			exclude,
 			sticky,
+			useGlobalQuery,
 		} = {},
 		queryContext,
 		layout: { type: layoutType = 'flex', columns = 1 } = {},
@@ -78,6 +80,14 @@ export default function QueryLoopEdit( {
 			if ( sticky ) {
 				query.sticky = sticky === 'only';
 			}
+
+			if ( useGlobalQuery ) {
+				const templateQuery = getTemplateQuery();
+				Object.keys( templateQuery ).forEach( ( key ) => {
+					query[ key ] = templateQuery[ key ];
+				} );
+			}
+
 			return {
 				posts: getEntityRecords( 'postType', postType, query ),
 				blocks: getBlocks( clientId ),

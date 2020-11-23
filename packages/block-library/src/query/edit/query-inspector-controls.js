@@ -183,7 +183,9 @@ export default function QueryInspectorControls( {
 				{ ! useGlobalQuery && (
 					<QueryControls
 						{ ...{ order, orderBy } }
-						onOrderChange={ ( value ) => setQuery( { order: value } ) }
+						onOrderChange={ ( value ) =>
+							setQuery( { order: value } )
+						}
 						onOrderByChange={ ( value ) =>
 							setQuery( { orderBy: value } )
 						}
@@ -206,7 +208,8 @@ export default function QueryInspectorControls( {
 							value={ ( query.categoryIds || [] ).map(
 								( categoryId ) => ( {
 									id: categoryId,
-									value: categories.mapById[ categoryId ].name,
+									value:
+										categories.mapById[ categoryId ].name,
 								} )
 							) }
 							suggestions={ categories.names }
