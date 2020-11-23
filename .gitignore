@@ -18,7 +18,7 @@ playground/dist
 .cache
 *.tsbuildinfo
 
-# Report generated from tests
+# Report generated from jest-junit
 test/native/junit.xml
 
 # Local overrides

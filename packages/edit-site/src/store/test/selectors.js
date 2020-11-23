@@ -17,9 +17,9 @@ import {
 
 describe( 'selectors', () => {
 	const canUser = jest.fn( () => true );
-	getCanUserCreateMedia.__unstableGetSelect = jest.fn( () => ( {
-		canUser,
-	} ) );
+	getCanUserCreateMedia.registry = {
+		select: jest.fn( () => ( { canUser } ) ),
+	};
 
 	describe( 'isFeatureActive', () => {
 		it( 'is tolerant to an undefined features preference', () => {
@@ -70,7 +70,7 @@ describe( 'selectors', () => {
 		it( "selects `canUser( 'create', 'media' )` from the core store", () => {
 			expect( getCanUserCreateMedia() ).toBe( true );
 			expect(
-				getCanUserCreateMedia.__unstableGetSelect
+				getCanUserCreateMedia.registry.select
 			).toHaveBeenCalledWith( 'core' );
 			expect( canUser ).toHaveBeenCalledWith( 'create', 'media' );
 		} );

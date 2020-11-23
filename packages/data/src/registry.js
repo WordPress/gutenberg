@@ -5,11 +5,6 @@ import { omit, without, mapValues, isObject } from 'lodash';
 import memize from 'memize';
 
 /**
- * WordPress dependencies
- */
-import { createAtomRegistry, createStoreAtom } from '@wordpress/stan';
-
-/**
  * Internal dependencies
  */
 import createReduxStore from './redux-store';
@@ -54,8 +49,6 @@ import createCoreDataStore from './store';
  */
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
-	const storesAtoms = {};
-	const atomRegistry = createAtomRegistry();
 	let listeners = [];
 
 	/**
@@ -81,12 +74,6 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	};
 
 	/**
-	 * This is used to track the current atom resolver
-	 * and inject it into registry selectors.
-	 */
-	let currentAtomResolver;
-
-	/**
 	 * Calls a selector given the current state and extra arguments.
 	 *
 	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
@@ -98,29 +85,12 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		const storeName = isObject( storeNameOrDefinition )
 			? storeNameOrDefinition.name
 			: storeNameOrDefinition;
-
 		const store = stores[ storeName ];
 		if ( store ) {
-			// If it's not an atomic store subscribe to the global store.
-			if (
-				! store.__internalIsAtomic &&
-				registry.__internalGetAtomResolver()
-			) {
-				registry.__internalGetAtomResolver()(
-					registry.__internalGetAtomForStore( storeName )
-				);
-			}
-
 			return store.getSelectors();
 		}
 
-		if ( parent ) {
-			parent.__internalSetAtomResolver(
-				registry.__internalGetAtomResolver()
-			);
-			const ret = parent.select( storeName );
-			return ret;
-		}
+		return parent && parent.select( storeName );
 	}
 
 	const getResolveSelectors = memize(
@@ -231,12 +201,6 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			throw new TypeError( 'config.subscribe must be a function' );
 		}
 		stores[ key ] = config;
-		storesAtoms[ key ] = createStoreAtom(
-			config.subscribe,
-			() => null,
-			() => {},
-			{ id: key }
-		);
 		config.subscribe( globalListener );
 	}
 
@@ -249,15 +213,6 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		registerGenericStore( store.name, store.instantiate( registry ) );
 	}
 
-	function __internalGetAtomForStore( key ) {
-		const atom = storesAtoms[ key ];
-		if ( atom ) {
-			return atom;
-		}
-
-		return parent.__internalGetAtomForStore( key );
-	}
-
 	let registry = {
 		registerGenericStore,
 		stores,
@@ -268,16 +223,6 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		dispatch,
 		use,
 		register,
-		__internalGetAtomForStore,
-		__internalGetAtomResolver() {
-			return currentAtomResolver;
-		},
-		__internalSetAtomResolver( resolver ) {
-			currentAtomResolver = resolver;
-		},
-		__internalGetAtomRegistry() {
-			return atomRegistry;
-		},
 	};
 
 	/**

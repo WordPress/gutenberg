@@ -35,20 +35,17 @@ describe( 'listener hook tests', () => {
 			getActiveGeneralSidebarName: jest.fn(),
 		},
 	};
-	let atomResolver;
+	let subscribeTrigger;
 	const registry = {
-		__internalGetAtomRegistry: () => ( {} ),
-		__internalGetAtomResolver: () => atomResolver,
-		__internalSetAtomResolver: ( resolver ) => {
-			atomResolver = resolver;
-		},
 		select: jest
 			.fn()
 			.mockImplementation( ( storeName ) => mockStores[ storeName ] ),
 		dispatch: jest
 			.fn()
 			.mockImplementation( ( storeName ) => mockStores[ storeName ] ),
-		subscribe: () => {},
+		subscribe: ( subscription ) => {
+			subscribeTrigger = subscription;
+		},
 	};
 	const setMockReturnValue = ( store, functionName, value ) => {
 		mockStores[ store ][ functionName ] = jest
@@ -77,6 +74,7 @@ describe( 'listener hook tests', () => {
 				mock.mockClear();
 			} );
 		} );
+		subscribeTrigger = undefined;
 	} );
 	describe( 'useBlockSelectionListener', () => {
 		it( 'does nothing when editor sidebar is not open', () => {
@@ -159,6 +157,10 @@ describe( 'listener hook tests', () => {
 				renderComponent( useUpdatePostLinkListener, 20, renderer );
 			} );
 			expect( mockSelector ).toHaveBeenCalledTimes( 1 );
+			act( () => {
+				subscribeTrigger();
+			} );
+			expect( mockSelector ).toHaveBeenCalledTimes( 1 );
 		} );
 		it( 'only updates the permalink when it changes', () => {
 			setMockReturnValue( 'core/editor', 'getCurrentPost', {
@@ -167,7 +169,26 @@ describe( 'listener hook tests', () => {
 			act( () => {
 				renderComponent( useUpdatePostLinkListener, 10 );
 			} );
+			act( () => {
+				subscribeTrigger();
+			} );
 			expect( setAttribute ).toHaveBeenCalledTimes( 1 );
+		} );
+		it( 'updates the permalink when it changes', () => {
+			setMockReturnValue( 'core/editor', 'getCurrentPost', {
+				link: 'foo',
+			} );
+			act( () => {
+				renderComponent( useUpdatePostLinkListener, 10 );
+			} );
+			setMockReturnValue( 'core/editor', 'getCurrentPost', {
+				link: 'bar',
+			} );
+			act( () => {
+				subscribeTrigger();
+			} );
+			expect( setAttribute ).toHaveBeenCalledTimes( 2 );
+			expect( setAttribute ).toHaveBeenCalledWith( 'href', 'bar' );
 		} );
 	} );
 } );
