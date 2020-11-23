@@ -22,7 +22,7 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Icon, chevronDown, navigation } from '@wordpress/icons';
+import { Icon, chevronDown, navigation, search } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -235,56 +235,65 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 
 	return (
 		<div className="wp-block-navigation-placeholder">
-			<Icon
-				icon={ navigation }
-				className="wp-block-navigation-placeholder__icon"
-			/>
-			{ isLoading && (
-				<div ref={ ref }>
-					<Spinner />
-				</div>
-			) }
-			{ ! isLoading && (
-				<div
-					ref={ ref }
-					className="wp-block-navigation-placeholder__actions"
-				>
-					{ hasMenus ? (
-						<DropdownMenu
-							text={ __( 'Existing menu' ) }
-							icon={ chevronDown }
-							className="wp-block-navigation-placeholder__actions__dropdown"
-						>
-							{ ( { onClose } ) => (
-								<MenuGroup>
-									{ menus.map( ( menu ) => {
-										return (
-											<MenuItem
-												onClick={ () => {
-													setSelectedMenu( menu.id );
-													onCreateFromMenu();
-												} }
-												onClose={ onClose }
-												key={ menu.id }
-											>
-												{ menu.name }
-											</MenuItem>
-										);
-									} ) }
-								</MenuGroup>
-							) }
-						</DropdownMenu>
-					) : undefined }
-					{ hasPages ? (
-						<Button onClick={ onCreateAllPages }>
-							{ __( 'Add all pages' ) }
+			<div className="wp-block-navigation-placeholder__preview">
+				<span className="wp-block-navigation-link"></span>
+				<span className="wp-block-navigation-link"></span>
+				<span className="wp-block-navigation-link"></span>
+				<Icon icon={ search } />
+			</div>
+
+			<div className="wp-block-navigation-placeholder__controls">
+				<Icon
+					icon={ navigation }
+					className="wp-block-navigation-placeholder__icon"
+				/>
+				{ isLoading && (
+					<div ref={ ref }>
+						<Spinner />
+					</div>
+				) }
+				{ ! isLoading && (
+					<div
+						ref={ ref }
+						className="wp-block-navigation-placeholder__actions"
+					>
+						{ hasMenus ? (
+							<DropdownMenu
+								text={ __( 'Existing menu' ) }
+								icon={ chevronDown }
+								className="wp-block-navigation-placeholder__actions__dropdown"
+							>
+								{ ( { onClose } ) => (
+									<MenuGroup>
+										{ menus.map( ( menu ) => {
+											return (
+												<MenuItem
+													onClick={ () => {
+														setSelectedMenu( menu.id );
+														onCreateFromMenu();
+													} }
+													onClose={ onClose }
+													key={ menu.id }
+												>
+													{ menu.name }
+												</MenuItem>
+											);
+										} ) }
+									</MenuGroup>
+								) }
+							</DropdownMenu>
+						) : undefined }
+						{ hasPages ? (
+							<Button onClick={ onCreateAllPages }>
+								{ __( 'Add all pages' ) }
+							</Button>
+						) : undefined }
+						<Button onClick={ onCreateEmptyMenu }>
+							{ __( 'Start empty' ) }
 						</Button>
-					) : undefined }
-					<Button onClick={ onCreateEmptyMenu }>
-						{ __( 'Start empty' ) }
-					</Button>
-				</div>
-			) }
+					</div>
+				) }
+			</div>
 		</div>
 	);
 }

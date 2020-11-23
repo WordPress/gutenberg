@@ -21,25 +21,58 @@
 	justify-content: flex-end;
 }
 
-// CSS inspired by Placeholder component
-.wp-block-navigation-placeholder {
+// Setup state.
+.wp-block-navigation-placeholder__preview {
+	min-height: $grid-unit-10 + $grid-unit-10 + $button-size;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	// Hide when selected.
+	.is-selected & {
+		display: none;
+	}
+
+	// Style skeleton elements.
+	// Needs specificity.
+	.wp-block-navigation-link.wp-block-navigation-link {
+		border-radius: $radius-block-ui;
+		background: currentColor;
+		min-width: 72px;
+		height: $grid-unit-20;
+		margin-right: $grid-unit-30;
+	}
+
+	.wp-block-navigation-link.wp-block-navigation-link,
+	svg {
+		opacity: 0.3;
+	}
+
+}
+
+.wp-block-navigation-placeholder__controls {
 	padding: $grid-unit-10 $grid-unit-15;
 	border-radius: $radius-block-ui;
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
-	display: flex;
 	flex-direction: row;
 	align-items: center;
-}
+	display: none;
 
-.wp-block-navigation-placeholder__icon {
-	margin-right: $grid-unit-15;
-	height: $button-size; // Prevents jumpiness.
+	// Show when selectec.
+	.is-selected & {
+		display: flex;
+	}
+
+	.wp-block-navigation-placeholder__icon {
+		margin-right: $grid-unit-15;
+		height: $button-size; // Prevents jumpiness.
+	}
 }
 
 .wp-block-navigation-placeholder__actions {
-	font-size: $default-font-size;
 	display: flex;
+	font-size: $default-font-size;
 
 	.components-dropdown-menu__toggle {
 		display: flex;
