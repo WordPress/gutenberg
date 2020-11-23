@@ -76,7 +76,7 @@ function gutenberg_adminbar_items( $wp_admin_bar ) {
 	$wp_admin_bar->remove_node( 'widgets' );
 
 	// Add site-editor link.
-	if ( ! is_admin() ) {
+	if ( ! is_admin() && current_user_can( 'edit_theme_options' ) ) {
 		$wp_admin_bar->add_node(
 			array(
 				'id'    => 'site-editor',
