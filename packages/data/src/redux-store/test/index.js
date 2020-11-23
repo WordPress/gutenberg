@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createAtomRegistry, createDerivedAtom } from '@wordpress/stan';
+import { createDerivedAtom } from '@wordpress/stan';
 
 /**
  * Internal dependencies
@@ -278,7 +278,7 @@ describe( 'controls', () => {
 		} );
 
 		it( 'should subscribe to atom selectors', async () => {
-			const atomRegistry = createAtomRegistry();
+			const atomRegistry = registry.__internalGetAtomRegistry();
 			const atom = createUseSelectAtom( ( select ) => {
 				return {
 					value: select( 'store1' ).getValue(),
@@ -317,7 +317,8 @@ describe( 'controls', () => {
 					value: select( 'store1' ).getValue(),
 				};
 			} );
-			const atomRegistry = createAtomRegistry();
+			const atomRegistry = registry.__internalGetAtomRegistry();
+
 			const update = jest.fn();
 			const unsubscribe = atomRegistry.subscribe( atom, update );
 			await flushImmediatesAndTicks( 2 );
@@ -343,7 +344,7 @@ describe( 'controls', () => {
 				},
 			} );
 
-			const atomRegistry = createAtomRegistry();
+			const atomRegistry = registry.__internalGetAtomRegistry();
 			const atom = createUseSelectAtom( ( select ) => {
 				return {
 					value: select( 'store2' ).getSubStoreValue(),
@@ -386,7 +387,7 @@ describe( 'controls', () => {
 				},
 			} );
 
-			const atomRegistry = createAtomRegistry();
+			const atomRegistry = registry.__internalGetAtomRegistry();
 			const atom = createUseSelectAtom( ( select ) => {
 				return {
 					value: select( 'store3' ).getSubStoreValue(),
