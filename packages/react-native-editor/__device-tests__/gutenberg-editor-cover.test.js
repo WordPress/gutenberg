@@ -45,6 +45,8 @@ describe( 'Gutenberg Editor Cover Block test', () => {
 			coverBlockName
 		);
 
+		// Temporarily this test is skipped on Android,due to the inconsistency of the results,
+		// which are related to getting values in raw pixels instead of density pixels on Android.
 		if ( ! isAndroid() ) {
 			const { height } = await coverBlock.getSize();
 			// Height is set to 20rem, where 1rem is 16.
