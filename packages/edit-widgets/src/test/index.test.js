@@ -25,7 +25,8 @@ const editorSettings = {
 };
 
 describe( 'edit-widgets', () => {
-	it( 'renders', async () => {
+	// eslint-disable-next-line jest/no-focused-tests
+	it.only( 'renders', async () => {
 		render( register( editorSettings ) );
 
 		const widgetAreas = await screen.findAllByRole( 'group', {

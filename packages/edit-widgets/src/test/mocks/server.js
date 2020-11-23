@@ -12,7 +12,11 @@ export const server = setupServer( ...handlers );
 
 if ( typeof jest === 'object' ) {
 	// Auto run the server when in Jest environment.
-	beforeAll( () => server.listen() );
+	beforeAll( () =>
+		server.listen( {
+			onUnhandledRequest: 'error',
+		} )
+	);
 	afterEach( () => server.resetHandlers() );
 	afterAll( () => server.close() );
 }
