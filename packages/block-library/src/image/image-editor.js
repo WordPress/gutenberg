@@ -45,7 +45,7 @@ function AspectGroup( { aspectRatios, isDisabled, label, onClick, value } ) {
 			{ aspectRatios.map( ( { title, aspect } ) => (
 				<MenuItem
 					key={ aspect }
-					isDisabled={ isDisabled }
+					disabled={ isDisabled }
 					onClick={ () => {
 						onClick( aspect );
 					} }
@@ -60,12 +60,19 @@ function AspectGroup( { aspectRatios, isDisabled, label, onClick, value } ) {
 	);
 }
 
-function AspectMenu( { isDisabled, onClick, value, defaultValue } ) {
+function AspectMenu( {
+	toggleProps,
+	isDisabled,
+	onClick,
+	value,
+	defaultValue,
+} ) {
 	return (
 		<DropdownMenu
 			icon={ aspectRatioIcon }
 			label={ __( 'Aspect Ratio' ) }
 			popoverProps={ POPOVER_PROPS }
+			toggleProps={ toggleProps }
 			className="wp-block-image__aspect-ratio"
 		>
 			{ ( { onClose } ) => (

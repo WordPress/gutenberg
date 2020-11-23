@@ -45,7 +45,7 @@ const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
 		await page.keyboard.press( 'Tab' );
 
 		isRemoveButton = await page.evaluate( () => {
-			return document.activeElement.innerText.includes( 'Remove Block' );
+			return document.activeElement.innerText.includes( 'Remove block' );
 		} );
 
 		// Stop looping once we find the button

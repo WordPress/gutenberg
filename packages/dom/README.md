@@ -18,6 +18,10 @@ npm install @wordpress/dom --save
 
 Get the rectangle for the selection in a container.
 
+_Parameters_
+
+-   _win_ `Window`: The window of the selection.
+
 _Returns_
 
 -   `?DOMRect`: The rectangle.
@@ -26,6 +30,10 @@ _Returns_
 
 Check whether the current document has a selection. This checks for both
 focus in an input field and general text selection.
+
+_Parameters_
+
+-   _doc_ `Document`: The document to check.
 
 _Returns_
 
@@ -39,6 +47,10 @@ elements.
 
 See: <https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects>.
 
+_Parameters_
+
+-   _doc_ `Document`: The document to check.
+
 _Returns_
 
 -   `boolean`: True if there is selection, false if not.
@@ -49,6 +61,10 @@ Check whether the current document has any sort of selection. This includes
 ranges of text across elements and any selection inside <input> and
 <textarea> elements.
 
+_Parameters_
+
+-   _doc_ `Document`: The document to check.
+
 _Returns_
 
 -   `boolean`: Whether there is any sort of "selection" in the document.
@@ -57,6 +73,18 @@ _Returns_
 
 Object grouping `focusable` and `tabbable` utils
 under the keys with the same name.
+
+<a name="getFilesFromDataTransfer" href="#getFilesFromDataTransfer">#</a> **getFilesFromDataTransfer**
+
+Gets all files from a DataTransfer object.
+
+_Parameters_
+
+-   _dataTransfer_ `DataTransfer`: DataTransfer object to inspect.
+
+_Returns_
+
+-   `Set`: A set containing all files.
 
 <a name="getOffsetParent" href="#getOffsetParent">#</a> **getOffsetParent**
 
@@ -75,6 +103,22 @@ _Parameters_
 _Returns_
 
 -   `?Node`: Offset parent.
+
+<a name="getPhrasingContentSchema" href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema**
+
+Get schema of possible paths for phrasing content.
+
+_Related_
+
+-   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
+
+_Parameters_
+
+-   _context_ `string`: Set to "paste" to exclude invisible elements and sensitive data.
+
+_Returns_
+
+-   `Object`: Schema.
 
 <a name="getRectangleFromRange" href="#getRectangleFromRange">#</a> **getRectangleFromRange**
 
@@ -114,6 +158,19 @@ _Returns_
 
 -   `void`: 
 
+<a name="isEmpty" href="#isEmpty">#</a> **isEmpty**
+
+Recursively checks if an element is empty. An element is not empty if it
+contains text or contains elements with attributes such as images.
+
+_Parameters_
+
+-   _element_ `Element`: The element to check.
+
+_Returns_
+
+-   `boolean`: Wether or not the element is empty.
+
 <a name="isEntirelySelected" href="#isEntirelySelected">#</a> **isEntirelySelected**
 
 Check whether the contents of the element have been entirely selected.
@@ -152,6 +209,26 @@ _Parameters_
 _Returns_
 
 -   `boolean`: True if the element is input and holds a number.
+
+<a name="isPhrasingContent" href="#isPhrasingContent">#</a> **isPhrasingContent**
+
+Find out whether or not the given node is phrasing content.
+
+_Related_
+
+-   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
+
+_Parameters_
+
+-   _node_ `Element`: The node to test.
+
+_Returns_
+
+-   `boolean`: True if phrasing content, false if not.
+
+<a name="isTextContent" href="#isTextContent">#</a> **isTextContent**
+
+Undocumented declaration.
 
 <a name="isTextField" href="#isTextField">#</a> **isTextField**
 
@@ -212,6 +289,20 @@ _Parameters_
 _Returns_
 
 -   `void`: 
+
+<a name="removeInvalidHTML" href="#removeInvalidHTML">#</a> **removeInvalidHTML**
+
+Given a schema, unwraps or removes nodes, attributes and classes on HTML.
+
+_Parameters_
+
+-   _HTML_ `string`: The HTML to clean up.
+-   _schema_ `Object`: Schema for the HTML.
+-   _inline_ `Object`: Whether to clean for inline mode.
+
+_Returns_
+
+-   `string`: The cleaned up HTML.
 
 <a name="replace" href="#replace">#</a> **replace**
 

@@ -1,10 +1,8 @@
 {
+	"apiVersion": 2,
 	"name": "core/rss",
 	"category": "widgets",
 	"attributes": {
-		"className": {
-			"type": "string"
-		},
 		"columns": {
 			"type": "number",
 			"default": 2

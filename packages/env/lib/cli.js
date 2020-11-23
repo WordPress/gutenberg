@@ -90,7 +90,7 @@ module.exports = function cli() {
 			) }} (override with WP_ENV_PORT) and tests on port {bold.underline ${ terminalLink(
 				'8889',
 				'http://localhost:8889'
-			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first insall, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`
+			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first install, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`
 		),
 		( args ) => {
 			args.option( 'update', {
@@ -147,7 +147,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'run <container> [command..]',
-		'Runs an arbitrary command in one of the underlying Docker containers. For example, it can be useful for running wp cli commands. You can also use it to open shell sessions like bash and the WordPress shell in the WordPress instance. For example, `wp-env run cli bash` will open bash in the development WordPress instance.',
+		'Runs an arbitrary command in one of the underlying Docker containers. The "container" param should reference one of the underlying Docker services like "development", "tests", or "cli". To run a wp-cli command, use the "cli" or "tests-cli" service. You can also use this command to open shell sessions like bash and the WordPress shell in the WordPress instance. For example, `wp-env run cli bash` will open bash in the development WordPress instance. When using long commands with arguments and quotation marks, you need to wrap the "command" param in quotation marks. For example: `wp-env run tests-cli "wp post create --post_type=page --post_title=\'Test\'"` will create a post on the tests WordPress instance.',
 		( args ) => {
 			args.positional( 'container', {
 				type: 'string',

@@ -39,6 +39,7 @@ A transformation of type `block` is an object that takes the following parameter
 - **blocks** _(array)_: a list of known block types. It also accepts the wildcard value (`"*"`), meaning that the transform is available to _all_ block types (eg: all blocks can transform into `core/group`).
 - **transform** _(function)_: a callback that receives the attributes and inner blocks of the block being processed. It should return a block object or an array of block objects.
 - **isMatch** _(function, optional)_: a callback that receives the block attributes and should return a boolean. Returning `false` from this function will prevent the transform from being available and displayed as an option to the user.
+- **isMultiblock** _(boolean, optional)_: whether the transformation can be applied when multiple blocks are selected. If true, the `transform` function's first parameter will be an array containing each selected block's attributes, and the second an array of each selected block's inner blocks. False by default.
 - **priority** _(number, optional)_: controls the priority with which a transformation is applied, where a lower value will take precedence over higher values. This behaves much like a [WordPress hook](https://codex.wordpress.org/Plugin_API#Hook_to_WordPress). Like hooks, the default priority is `10` when not otherwise set.
 
 **Example: from Paragraph block to Heading block**
@@ -289,7 +290,7 @@ transforms: {
 
 ### Raw
 
-This type of transformations support the _from_ direction, allowing blocks to be created from raw HTML nodes. They're applied when the user executes the "Convert to Blocks" action frow within the block setting UI menu, as well as when some content is pasted or dropped into the editor.
+This type of transformations support the _from_ direction, allowing blocks to be created from raw HTML nodes. They're applied when the user executes the "Convert to Blocks" action from within the block setting UI menu, as well as when some content is pasted or dropped into the editor.
 
 A transformation of type `raw` is an object that takes the following parameters:
 

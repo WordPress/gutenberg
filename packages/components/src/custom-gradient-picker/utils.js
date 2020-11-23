@@ -12,6 +12,7 @@ import {
 	INSERT_POINT_WIDTH,
 	MINIMUM_ABSOLUTE_LEFT_POSITION,
 	MINIMUM_DISTANCE_BETWEEN_POINTS,
+	KEYBOARD_CONTROL_POINT_VARIATION,
 	HORIZONTAL_GRADIENT_ORIENTATION,
 } from './constants';
 import {
@@ -119,7 +120,7 @@ export function getGradientWithPositionAtIndexIncreased( gradientAST, index ) {
 	return getGradientWithPositionAtIndexSummed(
 		gradientAST,
 		index,
-		MINIMUM_DISTANCE_BETWEEN_POINTS
+		KEYBOARD_CONTROL_POINT_VARIATION
 	);
 }
 
@@ -127,7 +128,7 @@ export function getGradientWithPositionAtIndexDecreased( gradientAST, index ) {
 	return getGradientWithPositionAtIndexSummed(
 		gradientAST,
 		index,
-		-MINIMUM_DISTANCE_BETWEEN_POINTS
+		-KEYBOARD_CONTROL_POINT_VARIATION
 	);
 }
 

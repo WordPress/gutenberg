@@ -23,6 +23,83 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 	}
 
 	/**
+	 * Overrides the route registration to support "allow_batch".
+	 *
+	 * @since 9.2.0
+	 */
+	public function register_routes() {
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base,
+			array(
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_items' ),
+					'permission_callback' => array( $this, 'get_items_permissions_check' ),
+					'args'                => $this->get_collection_params(),
+				),
+				array(
+					'methods'             => WP_REST_Server::CREATABLE,
+					'callback'            => array( $this, 'create_item' ),
+					'permission_callback' => array( $this, 'create_item_permissions_check' ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::CREATABLE ),
+				),
+				'allow_batch' => array( 'v1' => true ),
+				'schema'      => array( $this, 'get_public_item_schema' ),
+			)
+		);
+
+		$schema        = $this->get_item_schema();
+		$get_item_args = array(
+			'context' => $this->get_context_param( array( 'default' => 'view' ) ),
+		);
+		if ( isset( $schema['properties']['password'] ) ) {
+			$get_item_args['password'] = array(
+				'description' => __( 'The password for the post if it is password protected.', 'gutenberg' ),
+				'type'        => 'string',
+			);
+		}
+		register_rest_route(
+			$this->namespace,
+			'/' . $this->rest_base . '/(?P<id>[\d]+)',
+			array(
+				'args'        => array(
+					'id' => array(
+						'description' => __( 'Unique identifier for the object.', 'gutenberg' ),
+						'type'        => 'integer',
+					),
+				),
+				array(
+					'methods'             => WP_REST_Server::READABLE,
+					'callback'            => array( $this, 'get_item' ),
+					'permission_callback' => array( $this, 'get_item_permissions_check' ),
+					'args'                => $get_item_args,
+				),
+				array(
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => array( $this, 'update_item' ),
+					'permission_callback' => array( $this, 'update_item_permissions_check' ),
+					'args'                => $this->get_endpoint_args_for_item_schema( WP_REST_Server::EDITABLE ),
+				),
+				array(
+					'methods'             => WP_REST_Server::DELETABLE,
+					'callback'            => array( $this, 'delete_item' ),
+					'permission_callback' => array( $this, 'delete_item_permissions_check' ),
+					'args'                => array(
+						'force' => array(
+							'type'        => 'boolean',
+							'default'     => false,
+							'description' => __( 'Whether to bypass Trash and force deletion.', 'gutenberg' ),
+						),
+					),
+				),
+				'allow_batch' => array( 'v1' => true ),
+				'schema'      => array( $this, 'get_public_item_schema' ),
+			)
+		);
+	}
+
+	/**
 	 * Get the post, if the ID is valid.
 	 *
 	 * @param int $id Supplied ID.
@@ -440,10 +517,10 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 			}
 		}
 
-		// If menu item is type html, then content is required.
-		if ( 'html' === $prepared_nav_item['menu-item-type'] ) {
+		// If menu item is type block, then content is required.
+		if ( 'block' === $prepared_nav_item['menu-item-type'] ) {
 			if ( empty( $prepared_nav_item['menu-item-content'] ) ) {
-				return new WP_Error( 'rest_content_required', __( 'Content required if menu item of type html.', 'gutenberg' ), array( 'status' => 400 ) );
+				return new WP_Error( 'rest_content_required', __( 'Content required if menu item of type block.', 'gutenberg' ), array( 'status' => 400 ) );
 			}
 		}
 
@@ -569,9 +646,15 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		if ( in_array( 'title', $fields, true ) ) {
 			add_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
 
+			/** This filter is documented in wp-includes/post-template.php */
+			$title = apply_filters( 'the_title', $menu_item->title, $menu_item->ID );
+
+			/** This filter is documented in wp-includes/class-walker-nav-menu.php */
+			$title = apply_filters( 'nav_menu_item_title', $title, $menu_item, null, 0 );
+
 			$data['title'] = array(
-				'raw'      => $menu_item->post_title,
-				'rendered' => $menu_item->title,
+				'raw'      => $menu_item->title,
+				'rendered' => $title,
 			);
 
 			remove_filter( 'protected_title_format', array( $this, 'protected_title_format' ) );
@@ -819,7 +902,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		$schema['properties']['type'] = array(
 			'description' => __( 'The family of objects originally represented, such as "post_type" or "taxonomy".', 'gutenberg' ),
 			'type'        => 'string',
-			'enum'        => array( 'taxonomy', 'post_type', 'post_type_archive', 'custom', 'html' ),
+			'enum'        => array( 'taxonomy', 'post_type', 'post_type_archive', 'custom', 'block' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'default'     => 'custom',
 		);
@@ -894,7 +977,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 		);
 
 		$schema['properties']['content'] = array(
-			'description' => __( 'HTML content to display for this menu item. May contain blocks.', 'gutenberg' ),
+			'description' => __( 'HTML content to display for this block menu item.', 'gutenberg' ),
 			'context'     => array( 'view', 'edit', 'embed' ),
 			'type'        => 'object',
 			'arg_options' => array(

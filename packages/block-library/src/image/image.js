@@ -17,7 +17,7 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
@@ -28,7 +28,7 @@ import {
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 } from '@wordpress/block-editor';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
 import { createBlock } from '@wordpress/blocks';
@@ -80,10 +80,24 @@ export default function Image( {
 	onUploadError,
 	containerRef,
 } ) {
-	const image = useSelect(
+	const captionRef = useRef();
+	const prevUrl = usePrevious( url );
+	const { image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( 'core' );
-			return id && isSelected ? getMedia( id ) : null;
+			const { getMultiSelectedBlockClientIds, getBlockName } = select(
+				'core/block-editor'
+			);
+			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
+			return {
+				image: id && isSelected ? getMedia( id ) : null,
+				multiImageSelection:
+					multiSelectedClientIds.length &&
+					multiSelectedClientIds.every(
+						( clientId ) =>
+							getBlockName( clientId ) === 'core/image'
+					),
+			};
 		},
 		[ id, isSelected ]
 	);
@@ -141,6 +155,16 @@ export default function Image( {
 			.then( ( response ) => response.blob() )
 			.then( ( blob ) => setExternalBlob( blob ) );
 	}, [ id, url, isSelected, externalBlob ] );
+
+	// Focus the caption after inserting an image from the placeholder. This is
+	// done to preserve the behaviour of focussing the first tabbable element
+	// when a block is mounted. Previously, the image block would remount when
+	// the placeholder is removed. Maybe this behaviour could be removed.
+	useEffect( () => {
+		if ( url && ! prevUrl && isSelected ) {
+			captionRef.current.focus();
+		}
+	}, [ url, prevUrl ] );
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -232,17 +256,18 @@ export default function Image( {
 	}, [ isSelected ] );
 
 	const canEditImage = id && naturalWidth && naturalHeight && imageEditing;
+	const allowCrop = ! multiImageSelection && canEditImage && ! isEditingImage;
 
 	const controls = (
 		<>
 			<BlockControls>
-				{ ! isEditingImage && (
+				{ ! multiImageSelection && ! isEditingImage && (
 					<ToolbarGroup>
 						<ImageURLInputUI
 							url={ href || '' }
 							onChangeUrl={ onSetHref }
 							linkDestination={ linkDestination }
-							mediaUrl={ image && image.source_url }
+							mediaUrl={ ( image && image.source_url ) || url }
 							mediaLink={ image && image.link }
 							linkTarget={ linkTarget }
 							linkClass={ linkClass }
@@ -250,7 +275,7 @@ export default function Image( {
 						/>
 					</ToolbarGroup>
 				) }
-				{ canEditImage && ! isEditingImage && (
+				{ allowCrop && (
 					<ToolbarGroup>
 						<ToolbarButton
 							onClick={ () => setIsEditingImage( true ) }
@@ -268,7 +293,7 @@ export default function Image( {
 						/>
 					</ToolbarGroup>
 				) }
-				{ ! isEditingImage && (
+				{ ! multiImageSelection && ! isEditingImage && (
 					<MediaReplaceFlow
 						mediaId={ id }
 						mediaURL={ url }
@@ -282,23 +307,25 @@ export default function Image( {
 			</BlockControls>
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) }>
-					<TextareaControl
-						label={ __( 'Alt text (alternative text)' ) }
-						value={ alt }
-						onChange={ updateAlt }
-						help={
-							<>
-								<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+					{ ! multiImageSelection && (
+						<TextareaControl
+							label={ __( 'Alt text (alternative text)' ) }
+							value={ alt }
+							onChange={ updateAlt }
+							help={
+								<>
+									<ExternalLink href="https://www.w3.org/WAI/tutorials/images/decision-tree">
+										{ __(
+											'Describe the purpose of the image'
+										) }
+									</ExternalLink>
 									{ __(
-										'Describe the purpose of the image'
+										'Leave empty if the image is purely decorative.'
 									) }
-								</ExternalLink>
-								{ __(
-									'Leave empty if the image is purely decorative.'
-								) }
-							</>
-						}
-					/>
+								</>
+							}
+						/>
+					) }
 					<ImageSizeControl
 						onChangeImage={ updateImage }
 						onChange={ ( value ) => setAttributes( value ) }
@@ -486,6 +513,7 @@ export default function Image( {
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
+					ref={ captionRef }
 					tagName="figcaption"
 					placeholder={ __( 'Write caption…' ) }
 					value={ caption }

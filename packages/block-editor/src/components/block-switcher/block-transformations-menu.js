@@ -23,12 +23,12 @@ const BlockTransformationsMenu = ( {
 					<MenuItem
 						key={ name }
 						className={ getBlockMenuDefaultClassName( name ) }
-						icon={ <BlockIcon icon={ icon } showColors /> }
 						onClick={ ( event ) => {
 							event.preventDefault();
 							onSelect( name );
 						} }
 					>
+						<BlockIcon icon={ icon } showColors />
 						{ title }
 					</MenuItem>
 				);

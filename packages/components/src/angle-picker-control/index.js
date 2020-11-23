@@ -1,116 +1,74 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
-import {
-	useInstanceId,
-	__experimentalUseDragging as useDragging,
-} from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BaseControl from '../base-control';
-
-function getAngle( centerX, centerY, pointX, pointY ) {
-	const y = pointY - centerY;
-	const x = pointX - centerX;
-
-	const angleInRadians = Math.atan2( y, x );
-	const angleInDeg = Math.round( angleInRadians * ( 180 / Math.PI ) ) + 90;
-	if ( angleInDeg < 0 ) {
-		return 360 + angleInDeg;
-	}
-	return angleInDeg;
-}
-
-const AngleCircle = ( { value, onChange, ...props } ) => {
-	const angleCircleRef = useRef();
-	const angleCircleCenter = useRef();
-
-	const setAngleCircleCenter = () => {
-		const rect = angleCircleRef.current.getBoundingClientRect();
-		angleCircleCenter.current = {
-			x: rect.x + rect.width / 2,
-			y: rect.y + rect.height / 2,
-		};
-	};
-
-	const changeAngleToPosition = ( event ) => {
-		const { x: centerX, y: centerY } = angleCircleCenter.current;
-		// Prevent (drag) mouse events from selecting and accidentally
-		// triggering actions from other elements.
-		event.preventDefault();
-
-		onChange( getAngle( centerX, centerY, event.clientX, event.clientY ) );
-	};
-
-	const { startDrag, isDragging } = useDragging( {
-		onDragStart: ( event ) => {
-			setAngleCircleCenter();
-			changeAngleToPosition( event );
-		},
-		onDragMove: changeAngleToPosition,
-		onDragEnd: changeAngleToPosition,
-	} );
-	return (
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		<div
-			ref={ angleCircleRef }
-			onMouseDown={ startDrag }
-			className="components-angle-picker-control__angle-circle"
-			style={ isDragging ? { cursor: 'grabbing' } : undefined }
-			{ ...props }
-		>
-			<div
-				style={
-					value ? { transform: `rotate(${ value }deg)` } : undefined
-				}
-				className="components-angle-picker-control__angle-circle-indicator-wrapper"
-			>
-				<span className="components-angle-picker-control__angle-circle-indicator" />
-			</div>
-		</div>
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
-	);
-};
+import { FlexBlock, FlexItem } from '../flex';
+import NumberControl from '../number-control';
+import AngleCircle from './angle-circle';
+import { Root } from './styles/angle-picker-control-styles';
 
 export default function AnglePickerControl( {
-	value,
-	onChange,
+	className,
+	hideLabelFromVision,
+	id: idProp,
 	label = __( 'Angle' ),
+	onChange,
+	value,
+	...props
 } ) {
-	const instanceId = useInstanceId( AnglePickerControl );
-	const inputId = `components-angle-picker-control__input-${ instanceId }`;
+	const instanceId = useInstanceId(
+		AnglePickerControl,
+		'components-angle-picker-control__input'
+	);
+	const id = idProp || instanceId;
+
+	const handleOnNumberChange = ( unprocessedValue ) => {
+		const inputValue =
+			unprocessedValue !== '' ? parseInt( unprocessedValue, 10 ) : 0;
+		onChange( inputValue );
+	};
+
+	const classes = classnames( 'components-angle-picker-control', className );
+
 	return (
 		<BaseControl
+			className={ classes }
+			hideLabelFromVision={ hideLabelFromVision }
+			id={ id }
 			label={ label }
-			id={ inputId }
-			className="components-angle-picker-control"
+			{ ...props }
 		>
-			<AngleCircle
-				value={ value }
-				onChange={ onChange }
-				aria-hidden="true"
-			/>
-			<input
-				className="components-angle-picker-control__input-field"
-				type="number"
-				id={ inputId }
-				onChange={ ( event ) => {
-					const unprocessedValue = event.target.value;
-					const inputValue =
-						unprocessedValue !== ''
-							? parseInt( event.target.value, 10 )
-							: 0;
-					onChange( inputValue );
-				} }
-				value={ value }
-				min={ 0 }
-				max={ 360 }
-				step="1"
-			/>
+			<Root>
+				<FlexBlock>
+					<NumberControl
+						className="components-angle-picker-control__input-field"
+						id={ id }
+						max={ 360 }
+						min={ 0 }
+						onChange={ handleOnNumberChange }
+						step="1"
+						value={ value }
+					/>
+				</FlexBlock>
+				<FlexItem>
+					<AngleCircle
+						aria-hidden="true"
+						value={ value }
+						onChange={ onChange }
+					/>
+				</FlexItem>
+			</Root>
 		</BaseControl>
 	);
 }

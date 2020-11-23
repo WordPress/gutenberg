@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { filter, get } from 'lodash';
+import { filter } from 'lodash';
 import { match } from 'css-mediaquery';
 
 /**
@@ -20,18 +20,15 @@ function getStyleSheetsThatMatchHostname() {
 		return [];
 	}
 
-	return filter(
-		get( window, [ 'document', 'styleSheets' ], [] ),
-		( styleSheet ) => {
-			if ( ! styleSheet.href ) {
-				return false;
-			}
-			return (
-				getProtocol( styleSheet.href ) === window.location.protocol &&
-				getAuthority( styleSheet.href ) === window.location.host
-			);
+	return filter( window?.document?.styleSheets ?? [], ( styleSheet ) => {
+		if ( ! styleSheet.href ) {
+			return false;
 		}
-	);
+		return (
+			getProtocol( styleSheet.href ) === window.location.protocol &&
+			getAuthority( styleSheet.href ) === window.location.host
+		);
+	} );
 }
 
 function isReplaceableMediaRule( rule ) {

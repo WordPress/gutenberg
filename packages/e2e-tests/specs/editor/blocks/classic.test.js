@@ -15,6 +15,7 @@ import {
 	insertBlock,
 	pressKeyWithModifier,
 	clickBlockToolbarButton,
+	saveDraft,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Classic', () => {
@@ -46,6 +47,7 @@ describe( 'Classic', () => {
 		// Click the image button.
 		await page.waitForSelector( 'div[aria-label^="Add Media"]' );
 		await page.click( 'div[aria-label^="Add Media"]' );
+
 		await page.click( '.media-menu-item#menu-item-gallery' );
 
 		// Wait for media modal to appear and upload image.
@@ -97,5 +99,43 @@ describe( 'Classic', () => {
 		await clickBlockToolbarButton( 'Convert to blocks', 'content' );
 		await page.waitForSelector( '.wp-block[data-type="core/gallery"]' );
 		expect( await getEditedPostContent() ).toMatch( /<!-- wp:gallery/ );
+	} );
+
+	it( 'Should not fail after save/reload', async () => {
+		// Might move to utils if this becomes useful enough for other tests
+		const runWithoutCache = async ( cb ) => {
+			try {
+				await page.setCacheEnabled( false );
+				await cb();
+			} finally {
+				await page.setCacheEnabled( true );
+			}
+		};
+
+		await insertBlock( 'Classic' );
+
+		// Wait for TinyMCE to initialise.
+		await page.waitForSelector( '.mce-content-body' );
+
+		// Ensure there is focus.
+		await page.focus( '.mce-content-body' );
+		await page.keyboard.type( 'test' );
+
+		// Move focus away.
+		await pressKeyWithModifier( 'shift', 'Tab' );
+
+		// Save
+		await saveDraft();
+
+		// Reload
+		// Disabling the browser disk cache is needed in order to reproduce the issue
+		// in case it regresses. To test this, revert commit 65c9f74, build and run the test.
+		await runWithoutCache( () => page.reload() );
+
+		const classicBlockSelector = 'div[aria-label^="Block: Classic"]';
+		await page.waitForSelector( classicBlockSelector );
+		await page.focus( classicBlockSelector );
+		expect( console ).not.toHaveErrored();
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 } );

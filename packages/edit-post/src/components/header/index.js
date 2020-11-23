@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
@@ -7,6 +12,7 @@ import {
 	PinnedItems,
 	__experimentalMainDashboardButton as MainDashboardButton,
 } from '@wordpress/interface';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -18,19 +24,37 @@ import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
-	const { hasActiveMetaboxes, isPublishSidebarOpened, isSaving } = useSelect(
+	const {
+		hasActiveMetaboxes,
+		isPublishSidebarOpened,
+		isSaving,
+		showIconLabels,
+		hasReducedUI,
+	} = useSelect(
 		( select ) => ( {
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			isPublishSidebarOpened: select(
 				'core/edit-post'
 			).isPublishSidebarOpened(),
 			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+				'showIconLabels'
+			),
+			hasReducedUI: select( 'core/edit-post' ).isFeatureActive(
+				'reducedUI'
+			),
 		} ),
 		[]
 	);
 
+	const isLargeViewport = useViewportMatch( 'large' );
+
+	const classes = classnames( 'edit-post-header', {
+		'has-reduced-ui': hasReducedUI,
+	} );
+
 	return (
-		<div className="edit-post-header">
+		<div className={ classes }>
 			<MainDashboardButton.Slot>
 				<FullscreenModeClose />
 			</MainDashboardButton.Slot>
@@ -47,6 +71,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					<PostSavedState
 						forceIsDirty={ hasActiveMetaboxes }
 						forceIsSaving={ isSaving }
+						showIconLabels={ showIconLabels }
 					/>
 				) }
 				<DevicePreview />
@@ -61,8 +86,15 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 						setEntitiesSavedStatesCallback
 					}
 				/>
-				<PinnedItems.Slot scope="core/edit-post" />
-				<MoreMenu />
+				{ ( isLargeViewport || ! showIconLabels ) && (
+					<>
+						<PinnedItems.Slot scope="core/edit-post" />
+						<MoreMenu showIconLabels={ showIconLabels } />
+					</>
+				) }
+				{ showIconLabels && ! isLargeViewport && (
+					<MoreMenu showIconLabels={ showIconLabels } />
+				) }
 			</div>
 		</div>
 	);

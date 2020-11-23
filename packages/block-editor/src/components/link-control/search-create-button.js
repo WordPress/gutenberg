@@ -2,22 +2,39 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { isFunction } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, Icon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { createInterpolateElement } from '@wordpress/element';
+import { Icon, plus } from '@wordpress/icons';
 
 export const LinkControlSearchCreate = ( {
 	searchTerm,
 	onClick,
 	itemProps,
 	isSelected,
+	buttonText,
 } ) => {
 	if ( ! searchTerm ) {
 		return null;
+	}
+
+	let text;
+	if ( buttonText ) {
+		text = isFunction( buttonText ) ? buttonText( searchTerm ) : buttonText;
+	} else {
+		text = createInterpolateElement(
+			sprintf(
+				/* translators: %s: search term. */
+				__( 'Create: <mark>%s</mark>' ),
+				searchTerm
+			),
+			{ mark: <mark /> }
+		);
 	}
 
 	return (
@@ -33,19 +50,12 @@ export const LinkControlSearchCreate = ( {
 		>
 			<Icon
 				className="block-editor-link-control__search-item-icon"
-				icon="insert"
+				icon={ plus }
 			/>
 
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
-					{ createInterpolateElement(
-						sprintf(
-							/* translators: %s: search term. */
-							__( 'New page: <mark>%s</mark>' ),
-							searchTerm
-						),
-						{ mark: <mark /> }
-					) }
+					{ text }
 				</span>
 			</span>
 		</Button>

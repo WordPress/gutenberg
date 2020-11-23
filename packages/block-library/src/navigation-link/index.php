@@ -115,7 +115,6 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		$colors['css_classes'],
 		$font_sizes['css_classes']
 	);
-	$classes[]       = 'wp-block-navigation-link';
 	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] );
 
 	$css_classes = trim( implode( ' ', $classes ) );
@@ -128,8 +127,14 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		$css_classes .= ' ' . $class_name;
 	};
 
-	$html = '<li class="' . esc_attr( $css_classes . ( $has_submenu ? ' has-child' : '' ) ) .
-		( $is_active ? ' current-menu-item' : '' ) . '"' . $style_attribute . '>' .
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => $css_classes . ( $has_submenu ? ' has-child' : '' ) .
+				( $is_active ? ' current-menu-item' : '' ),
+			'style' => $style_attribute,
+		)
+	);
+	$html               = '<li ' . $wrapper_attributes . '>' .
 		'<a class="wp-block-navigation-link__content" ';
 
 	// Start appending HTML attributes to anchor tag.
@@ -141,11 +146,14 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		$html .= ' target="_blank"  ';
 	}
 
-	// Start appending HTML attributes to anchor tag.
 	if ( isset( $attributes['rel'] ) ) {
 		$html .= ' rel="' . esc_attr( $attributes['rel'] ) . '"';
 	} elseif ( isset( $attributes['nofollow'] ) && $attributes['nofollow'] ) {
 		$html .= ' rel="nofollow"';
+	}
+
+	if ( isset( $attributes['title'] ) ) {
+		$html .= ' title="' . esc_attr( $attributes['title'] ) . '"';
 	}
 
 	// End appending HTML attributes to anchor tag.

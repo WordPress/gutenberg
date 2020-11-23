@@ -30,15 +30,14 @@ function render_block_core_post_author( $attributes, $content, $block ) {
 
 	$byline  = ! empty( $attributes['byline'] ) ? $attributes['byline'] : false;
 	$classes = array_merge(
-		array( 'wp-block-post-author' ),
 		isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
 		isset( $attributes['textAlign'] ) ? array( 'has-text-align-' . $attributes['textAlign'] ) : array()
 	);
 
-	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classes ) ) );
 
-	return sprintf( '<div %1$s>', $class_attribute ) .
+	return sprintf( '<div %1$s>', $wrapper_attributes ) .
 	( ! empty( $attributes['showAvatar'] ) ? '<div class="wp-block-post-author__avatar">' . $avatar . '</div>' : '' ) .
 	'<div class="wp-block-post-author__content">' .
 	( ! empty( $byline ) ? '<p class="wp-block-post-author__byline">' . $byline . '</p>' : '' ) .

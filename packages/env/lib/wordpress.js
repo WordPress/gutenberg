@@ -83,7 +83,7 @@ async function configureWordPress( environment, config, spinner ) {
 		// Add quotes around string values to work with multi-word strings better.
 		value = typeof value === 'string' ? `"${ value }"` : value;
 		setupCommands.push(
-			`wp config set ${ key } ${ value }${
+			`wp config set ${ key } ${ value } --anchor="define( 'WP_DEBUG',"${
 				typeof value !== 'string' ? ' --raw' : ''
 			}`
 		);

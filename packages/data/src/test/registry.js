@@ -8,6 +8,7 @@ import { castArray, mapValues } from 'lodash';
  */
 import { createRegistry } from '../registry';
 import { createRegistrySelector } from '../factory';
+import createReduxStore from '../redux-store';
 
 jest.useFakeTimers();
 
@@ -505,6 +506,44 @@ describe( 'createRegistry', () => {
 		} );
 	} );
 
+	describe( 'register', () => {
+		it( 'should work with the store definition as param for select', () => {
+			const store = createReduxStore( 'demo', {
+				reducer: ( state = 'OK' ) => state,
+				selectors: {
+					getValue: ( state ) => state,
+				},
+			} );
+			registry.register( store );
+
+			expect( registry.select( store ).getValue() ).toBe( 'OK' );
+		} );
+
+		it( 'should work with the store definition as param for dispatch', async () => {
+			const store = createReduxStore( 'demo', {
+				reducer( state = 'OK', action ) {
+					if ( action.type === 'UPDATE' ) {
+						return 'UPDATED';
+					}
+					return state;
+				},
+				actions: {
+					update() {
+						return { type: 'UPDATE' };
+					},
+				},
+				selectors: {
+					getValue: ( state ) => state,
+				},
+			} );
+			registry.register( store );
+
+			expect( registry.select( store ).getValue() ).toBe( 'OK' );
+			await registry.dispatch( store ).update();
+			expect( registry.select( store ).getValue() ).toBe( 'UPDATED' );
+		} );
+	} );
+
 	describe( 'select', () => {
 		it( 'registers multiple selectors to the public API', () => {
 			const selector1 = jest.fn( () => 'result1' );
@@ -574,17 +613,6 @@ describe( 'createRegistry', () => {
 			expect( registry.select( 'reducer2' ).selector3() ).toEqual(
 				'result1'
 			);
-		} );
-
-		it( 'gracefully stubs select on selector calls', () => {
-			const selector = createRegistrySelector( ( select ) => () =>
-				select
-			);
-
-			const maybeSelect = selector();
-
-			expect( maybeSelect ).toEqual( expect.any( Function ) );
-			expect( maybeSelect() ).toEqual( expect.any( Object ) );
 		} );
 	} );
 

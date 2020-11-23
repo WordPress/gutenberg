@@ -85,7 +85,7 @@ const deprecated = [
 		supports: {
 			align: true,
 			alignWide: false,
-			__experimentalColor: { gradients: true },
+			color: { gradients: true },
 		},
 		attributes: {
 			...blockAttributes,

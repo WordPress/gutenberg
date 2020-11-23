@@ -36,14 +36,14 @@ const gapStyle = ( { gap, isReversed } ) => {
 	const base = 4;
 	const value = typeof gap === 'number' ? base * gap : base;
 	const dir = isReversed ? 'left' : 'right';
-	const padding = `padding-${ dir }`;
+	const margin = `margin-${ dir }`;
 
 	return css`
 		> * {
-			${ padding }: ${ value }px;
+			${ margin }: ${ value }px;
 
 			&:last-child {
-				${ padding }: 0;
+				${ margin }: 0;
 			}
 		}
 	`;
@@ -60,11 +60,12 @@ const reversedStyles = ( { isReversed } ) => {
 export const Flex = styled.div`
 	box-sizing: border-box;
 	display: flex;
+	width: 100%;
 
-	${ alignStyle };
-	${ justifyStyle };
-	${ gapStyle };
-	${ reversedStyles };
+	${ alignStyle }
+	${ justifyStyle }
+	${ gapStyle }
+	${ reversedStyles }
 `;
 
 export const Item = styled.div`

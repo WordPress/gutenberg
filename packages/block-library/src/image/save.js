@@ -7,7 +7,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
@@ -67,11 +67,15 @@ export default function save( { attributes } ) {
 
 	if ( 'left' === align || 'right' === align || 'center' === align ) {
 		return (
-			<div>
+			<div { ...useBlockProps.save() }>
 				<figure className={ classes }>{ figure }</figure>
 			</div>
 		);
 	}
 
-	return <figure className={ classes }>{ figure }</figure>;
+	return (
+		<figure { ...useBlockProps.save( { className: classes } ) }>
+			{ figure }
+		</figure>
+	);
 }

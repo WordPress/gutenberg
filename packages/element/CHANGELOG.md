@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 2.17.1 (2020-09-17)
+
+### Bug fix
+
+- Declare @types/react and @types/react-dom dependencies which could cause type errors when using
+  this package with TypeScript ([#25086](https://github.com/WordPress/gutenberg/pull/25086))
+
 ## 2.14.0 (2020-05-14)
 
 ### New Feature

@@ -15,45 +15,44 @@
 		padding: 0;
 		margin: 0;
 	}
-}
 
-.block-editor-block-preview__content {
-	// This element receives inline styles for width, height, and transform-scale.
-	// Those inline styles are calculated to fit a perfect thumbnail.
+	.block-editor-block-preview__content {
+		// This element receives inline styles for width, height, and transform-scale.
+		// Those inline styles are calculated to fit a perfect thumbnail.
 
-	// Position above the padding.
-	position: absolute;
+		// Position above the padding.
+		position: absolute;
 
-	// Vertical alignment. It works with the transform: translate(-50%, -50%)`,
-	top: 0;
-	left: 0;
+		// Vertical alignment. It works with the transform: translate(-50%, -50%)`,
+		top: 0;
+		left: 0;
 
-	// Important to set the origin.
-	transform-origin: top left;
+		// Important to set the origin.
+		transform-origin: top left;
 
-	// Resetting paddings, margins, and other.
+		// Resetting paddings, margins, and other.
 
-	text-align: initial;
-	margin: 0;
-	overflow: visible;
-	min-height: auto;
+		text-align: initial;
+		margin: 0;
+		overflow: visible;
+		min-height: auto;
 
-	.block-editor-block-list__insertion-point,
-	.block-editor-block-drop-zone,
-	.reusable-block-indicator,
-	.block-list-appender {
-		display: none;
-	}
+		.block-editor-block-list__insertion-point,
+		.block-editor-block-drop-zone,
+		.reusable-block-indicator,
+		.block-list-appender {
+			display: none;
+		}
 
-	// Reset default editor padding
-	.block-editor-block-list__layout.is-root-container {
-		padding-left: 0;
-		padding-right: 0;
+		// Reset default editor padding
+		.block-editor-block-list__layout.is-root-container {
+			padding-left: 0;
+			padding-right: 0;
 
-		> .wp-block[data-align="full"] {
-			margin-left: 0;
-			margin-right: 0;
+			> .wp-block[data-align="full"] {
+				margin-left: 0;
+				margin-right: 0;
+			}
 		}
 	}
 }
-

@@ -70,7 +70,7 @@ Creates a media replace notice.
 - Type: `func`
 - Required: No
 
-### remvovedNotice
+### removeNotice
 
 Removes a media replace notice.
 

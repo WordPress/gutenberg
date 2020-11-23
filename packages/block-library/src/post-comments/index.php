@@ -31,12 +31,13 @@ function render_block_core_post_comments( $attributes, $content, $block ) {
 	comments_template();
 	$post = $post_before;
 
-	$classes = 'wp-block-post-comments';
+	$classes = '';
 	if ( isset( $attributes['textAlign'] ) ) {
-		$classes .= ' has-text-align-' . $attributes['textAlign'];
+		$classes .= 'has-text-align-' . $attributes['textAlign'];
 	}
 
-	$output = sprintf( '<div class="%1$s">', esc_attr( $classes ) ) . ob_get_clean() . '</div>';
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	$output             = sprintf( '<div %1$s>', $wrapper_attributes ) . ob_get_clean() . '</div>';
 	return $output;
 }
 

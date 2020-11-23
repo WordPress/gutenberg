@@ -249,6 +249,17 @@ async function createEmptyNavBlock() {
 	await clickCreateButton();
 }
 
+async function addLinkBlock() {
+	// Using 'click' here checks for regressions of https://github.com/WordPress/gutenberg/issues/18329,
+	// an issue where the block appender requires two clicks.
+	await page.click( '.wp-block-navigation .block-list-appender' );
+
+	const [ linkButton ] = await page.$x(
+		"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Link']"
+	);
+	await linkButton.click();
+}
+
 beforeEach( async () => {
 	await createNewPost();
 } );
@@ -364,8 +375,7 @@ describe( 'Navigation', () => {
 			);
 
 			// Assert an empty Nav Block is created.
-			// We expect 1 here because a "placeholder" Nav Item Block is automatically inserted
-			expect( navBlockItemsLength ).toEqual( 1 );
+			expect( navBlockItemsLength ).toEqual( 0 );
 
 			// Snapshot should contain the mocked menu items.
 			expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -410,7 +420,9 @@ describe( 'Navigation', () => {
 
 		await createEmptyNavBlock();
 
-		// Add a link to the default Link block.
+		await addLinkBlock();
+
+		// Add a link to the Link block.
 		await updateActiveNavigationLink( {
 			url: 'https://wordpress.org',
 			label: 'WP',
@@ -419,16 +431,7 @@ describe( 'Navigation', () => {
 
 		await showBlockToolbar();
 
-		// Add another block.
-		// Using 'click' here checks for regressions of https://github.com/WordPress/gutenberg/issues/18329,
-		// an issue where the block appender requires two clicks.
-		await page.click( '.wp-block-navigation .block-list-appender' );
-
-		// Select a Link block.
-		const [ linkButton ] = await page.$x(
-			"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Link']"
-		);
-		await linkButton.click();
+		await addLinkBlock();
 
 		// After adding a new block, search input should be shown immediately.
 		// Verify that Escape would close the popover.
@@ -495,6 +498,8 @@ describe( 'Navigation', () => {
 
 		// Create an empty nav block.
 		await createEmptyNavBlock();
+
+		await addLinkBlock();
 
 		// Wait for URL input to be focused
 		await page.waitForSelector(

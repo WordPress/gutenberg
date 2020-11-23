@@ -91,15 +91,21 @@ export default function useMultiSelection( ref ) {
 	 * select the entire block contents.
 	 */
 	useEffect( () => {
+		const { ownerDocument } = ref.current;
+		const { defaultView } = ownerDocument;
+
 		if ( ! hasMultiSelection || isMultiSelecting ) {
 			if ( ! selectedBlockClientId || isMultiSelecting ) {
 				return;
 			}
 
-			const selection = window.getSelection();
+			const selection = defaultView.getSelection();
 
 			if ( selection.rangeCount && ! selection.isCollapsed ) {
-				const blockNode = getBlockDOMNode( selectedBlockClientId );
+				const blockNode = getBlockDOMNode(
+					selectedBlockClientId,
+					ownerDocument
+				);
 				const { startContainer, endContainer } = selection.getRangeAt(
 					0
 				);
@@ -126,11 +132,11 @@ export default function useMultiSelection( ref ) {
 		const start = multiSelectedBlockClientIds[ 0 ];
 		const end = multiSelectedBlockClientIds[ length - 1 ];
 
-		let startNode = getBlockDOMNode( start );
-		let endNode = getBlockDOMNode( end );
+		let startNode = getBlockDOMNode( start, ownerDocument );
+		let endNode = getBlockDOMNode( end, ownerDocument );
 
-		const selection = window.getSelection();
-		const range = document.createRange();
+		const selection = defaultView.getSelection();
+		const range = ownerDocument.createRange();
 
 		// The most stable way to select the whole block contents is to start
 		// and end at the deepest points.
@@ -152,7 +158,9 @@ export default function useMultiSelection( ref ) {
 
 	const onSelectionChange = useCallback(
 		( { isSelectionEnd } ) => {
-			const selection = window.getSelection();
+			const { ownerDocument } = ref.current;
+			const { defaultView } = ownerDocument;
+			const selection = defaultView.getSelection();
 
 			// If no selection is found, end multi selection and enable all rich
 			// text areas.
@@ -207,29 +215,36 @@ export default function useMultiSelection( ref ) {
 	 * Handles a mouseup event to end the current mouse multi-selection.
 	 */
 	const onSelectionEnd = useCallback( () => {
-		document.removeEventListener( 'selectionchange', onSelectionChange );
+		const { ownerDocument } = ref.current;
+		const { defaultView } = ownerDocument;
+		ownerDocument.removeEventListener(
+			'selectionchange',
+			onSelectionChange
+		);
 		// Equivalent to attaching the listener once.
-		window.removeEventListener( 'mouseup', onSelectionEnd );
+		defaultView.removeEventListener( 'mouseup', onSelectionEnd );
 		// The browser selection won't have updated yet at this point, so wait
 		// until the next animation frame to get the browser selection.
-		rafId.current = window.requestAnimationFrame( () => {
+		rafId.current = defaultView.requestAnimationFrame( () => {
 			onSelectionChange( { isSelectionEnd: true } );
 			stopMultiSelect();
 		} );
 	}, [ onSelectionChange, stopMultiSelect ] );
 
 	// Only clean up when unmounting, these are added and cleaned up elsewhere.
-	useEffect(
-		() => () => {
-			document.removeEventListener(
+	useEffect( () => {
+		const { ownerDocument } = ref.current;
+		const { defaultView } = ownerDocument;
+
+		return () => {
+			ownerDocument.removeEventListener(
 				'selectionchange',
 				onSelectionChange
 			);
-			window.removeEventListener( 'mouseup', onSelectionEnd );
-			window.cancelAnimationFrame( rafId.current );
-		},
-		[ onSelectionChange, onSelectionEnd ]
-	);
+			defaultView.removeEventListener( 'mouseup', onSelectionEnd );
+			defaultView.cancelAnimationFrame( rafId.current );
+		};
+	}, [ onSelectionChange, onSelectionEnd ] );
 
 	/**
 	 * Binds event handlers to the document for tracking a pending multi-select
@@ -241,15 +256,21 @@ export default function useMultiSelection( ref ) {
 				return;
 			}
 
+			const { ownerDocument } = ref.current;
+			const { defaultView } = ownerDocument;
+
 			startClientId.current = clientId;
-			anchorElement.current = document.activeElement;
+			anchorElement.current = ownerDocument.activeElement;
 			startMultiSelect();
 
 			// `onSelectionStart` is called after `mousedown` and `mouseleave`
 			// (from a block). The selection ends when `mouseup` happens anywhere
 			// in the window.
-			document.addEventListener( 'selectionchange', onSelectionChange );
-			window.addEventListener( 'mouseup', onSelectionEnd );
+			ownerDocument.addEventListener(
+				'selectionchange',
+				onSelectionChange
+			);
+			defaultView.addEventListener( 'mouseup', onSelectionEnd );
 
 			// Removing the contenteditable attributes within the block editor is
 			// essential for selection to work across editable areas. The edible

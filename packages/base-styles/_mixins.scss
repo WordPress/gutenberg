@@ -205,9 +205,13 @@
 }
 
 @mixin caption-style-theme() {
-	color: $dark-gray-500;
+	color: #555;
 	font-size: $default-font-size;
 	text-align: center;
+
+	.is-dark-theme & {
+		color: $light-gray-placeholder;
+	}
 }
 
 
@@ -678,8 +682,20 @@
 	/* stylelint-enable function-comma-space-after */
 }
 
-// It is important to include these styles in all built stylesheets.
-// This allows to CSS variables post CSS plugin to generate fallbacks.
-:root {
-	@include admin-scheme(#007cba);
+/**
+ * These are default block editor widths in case the theme doesn't provide them.
+ */
+@mixin default-block-widths {
+
+	.wp-block {
+		max-width: $content-width;
+
+		&[data-align="wide"] {
+			max-width: $wide-content-width;
+		}
+
+		&[data-align="full"] {
+			max-width: none;
+		}
+	}
 }

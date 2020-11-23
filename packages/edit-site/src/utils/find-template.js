@@ -18,7 +18,9 @@ const { fetch } = window;
  */
 export default async function findTemplate( path, getEntityRecords ) {
 	const { data } = await fetch(
-		addQueryArgs( path, { '_wp-find-template': true } )
+		addQueryArgs( findTemplate.siteUrl + path, {
+			'_wp-find-template': true,
+		} )
 	).then( ( res ) => res.json() );
 
 	let newTemplateId = data.ID;
@@ -33,3 +35,5 @@ export default async function findTemplate( path, getEntityRecords ) {
 
 	return newTemplateId;
 }
+
+findTemplate.siteUrl = '';

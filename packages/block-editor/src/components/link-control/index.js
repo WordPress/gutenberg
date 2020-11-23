@@ -50,14 +50,12 @@ import { ViewerFill } from './viewer-slot';
  * @property {string} title Human-readable label to show in user interface.
  */
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * Properties associated with a link control value, composed as a union of the
  * default properties and any custom settings values.
  *
  * @typedef {WPLinkControlDefaultValue&WPLinkControlSettingsValue} WPLinkControlValue
  */
-/* eslint-enable */
 
 /** @typedef {(nextValue:WPLinkControlValue)=>void} WPLinkControlOnChangeProp */
 
@@ -78,18 +76,21 @@ import { ViewerFill } from './viewer-slot';
 /**
  * @typedef WPLinkControlProps
  *
- * @property {(WPLinkControlSetting[])=}            settings               An array of settings objects. Each object will used to
- *                                                                         render a `ToggleControl` for that setting.
- * @property {boolean=}                             forceIsEditingLink     If passed as either `true` or `false`, controls the
- *                                                                         internal editing state of the component to respective
- *                                                                         show or not show the URL input field.
- * @property {WPLinkControlValue=}                  value                  Current link value.
- * @property {WPLinkControlOnChangeProp=}           onChange               Value change handler, called with the updated value if
- *                                                                         the user selects a new link or updates settings.
- * @property {boolean=}                             noDirectEntry          Whether to disable direct entries or not.
- * @property {boolean=}                             showSuggestions        Whether to present suggestions when typing the URL.
- * @property {boolean=}                             showInitialSuggestions Whether to present initial suggestions immediately.
- * @property {boolean=}                             withCreateSuggestion   Whether to allow creation of link value from suggestion.
+ * @property {(WPLinkControlSetting[])=}  settings                   An array of settings objects. Each object will used to
+ *                                                                   render a `ToggleControl` for that setting.
+ * @property {boolean=}                   forceIsEditingLink         If passed as either `true` or `false`, controls the
+ *                                                                   internal editing state of the component to respective
+ *                                                                   show or not show the URL input field.
+ * @property {WPLinkControlValue=}        value                      Current link value.
+ * @property {WPLinkControlOnChangeProp=} onChange                   Value change handler, called with the updated value if
+ *                                                                   the user selects a new link or updates settings.
+ * @property {boolean=}                   noDirectEntry              Whether to allow turning a URL-like search query directly into a link.
+ * @property {boolean=}                   showSuggestions            Whether to present suggestions when typing the URL.
+ * @property {boolean=}                   showInitialSuggestions     Whether to present initial suggestions immediately.
+ * @property {boolean=}                   withCreateSuggestion       Whether to allow creation of link value from suggestion.
+ * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
+ * @property {boolean=}                   noURLSuggestion            Whether to add a fallback suggestion which treats the search query as a URL.
+ * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
  */
 
 /**
@@ -111,6 +112,9 @@ function LinkControl( {
 	createSuggestion,
 	withCreateSuggestion,
 	inputValue: propInputValue = '',
+	suggestionsQuery = {},
+	noURLSuggestion = false,
+	createSuggestionButtonText,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -148,7 +152,9 @@ function LinkControl( {
 		const hadFocusLoss =
 			isEndingEditWithFocus.current &&
 			wrapperNode.current &&
-			! wrapperNode.current.contains( document.activeElement );
+			! wrapperNode.current.contains(
+				wrapperNode.current.ownerDocument.activeElement
+			);
 
 		if ( hadFocusLoss ) {
 			// Prefer to focus a natural focusable descendent of the wrapper,
@@ -169,7 +175,7 @@ function LinkControl( {
 	 */
 	function stopEditing() {
 		isEndingEditWithFocus.current = !! wrapperNode.current?.contains(
-			document.activeElement
+			wrapperNode.current.ownerDocument.activeElement
 		);
 
 		setIsEditingLink( false );
@@ -211,6 +217,11 @@ function LinkControl( {
 							showInitialSuggestions={ showInitialSuggestions }
 							allowDirectEntry={ ! noDirectEntry }
 							showSuggestions={ showSuggestions }
+							suggestionsQuery={ suggestionsQuery }
+							withURLSuggestion={ ! noURLSuggestion }
+							createSuggestionButtonText={
+								createSuggestionButtonText
+							}
 						>
 							<div className="block-editor-link-control__search-actions">
 								<Button

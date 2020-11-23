@@ -15,11 +15,13 @@ import {
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
+
+/* global wp */
 
 /**
  * Internal dependencies
@@ -30,8 +32,10 @@ import Image from './image';
  * Module constants
  */
 import {
-	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_ATTACHMENT,
+	LINK_DESTINATION_CUSTOM,
+	LINK_DESTINATION_MEDIA,
+	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
 	DEFAULT_SIZE_SLUG,
 } from './constants';
@@ -83,11 +87,21 @@ export function ImageEdit( {
 		caption,
 		align,
 		id,
-		linkDestination,
 		width,
 		height,
 		sizeSlug,
 	} = attributes;
+
+	const altRef = useRef();
+	useEffect( () => {
+		altRef.current = alt;
+	}, [ alt ] );
+
+	const captionRef = useRef();
+	useEffect( () => {
+		captionRef.current = caption;
+	}, [ caption ] );
+
 	const ref = useRef();
 	const mediaUpload = useSelect( ( select ) => {
 		const { getSettings } = select( 'core/block-editor' );
@@ -116,14 +130,14 @@ export function ImageEdit( {
 		// If the current image is temporary but an alt text was meanwhile
 		// written by the user, make sure the text is not overwritten.
 		if ( isTemporaryImage( id, url ) ) {
-			if ( alt ) {
+			if ( altRef.current ) {
 				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
 			}
 		}
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
-		if ( caption && ! get( mediaAttributes, [ 'caption' ] ) ) {
+		if ( captionRef.current && ! get( mediaAttributes, [ 'caption' ] ) ) {
 			mediaAttributes = omit( mediaAttributes, [ 'caption' ] );
 		}
 
@@ -141,21 +155,49 @@ export function ImageEdit( {
 			additionalAttributes = { url };
 		}
 
-		// Check if the image is linked to it's media.
-		if ( linkDestination === LINK_DESTINATION_MEDIA ) {
-			// Update the media link.
-			mediaAttributes.href = media.url;
+		// Check if default link setting should be used.
+		let linkDestination = attributes.linkDestination;
+		if ( ! linkDestination ) {
+			// Use the WordPress option to determine the proper default.
+			// The constants used in Gutenberg do not match WP options so a little more complicated than ideal.
+			// TODO: fix this in a follow up PR, requires updating media-text and ui component.
+			switch (
+				wp?.media?.view?.settings?.defaultProps?.link ||
+				LINK_DESTINATION_NONE
+			) {
+				case 'file':
+				case LINK_DESTINATION_MEDIA:
+					linkDestination = LINK_DESTINATION_MEDIA;
+					break;
+				case 'post':
+				case LINK_DESTINATION_ATTACHMENT:
+					linkDestination = LINK_DESTINATION_ATTACHMENT;
+					break;
+				case LINK_DESTINATION_CUSTOM:
+					linkDestination = LINK_DESTINATION_CUSTOM;
+					break;
+				case LINK_DESTINATION_NONE:
+					linkDestination = LINK_DESTINATION_NONE;
+					break;
+			}
 		}
 
-		// Check if the image is linked to the attachment page.
-		if ( linkDestination === LINK_DESTINATION_ATTACHMENT ) {
-			// Update the media link.
-			mediaAttributes.href = media.link;
+		// Check if the image is linked to it's media.
+		let href;
+		switch ( linkDestination ) {
+			case LINK_DESTINATION_MEDIA:
+				href = media.url;
+				break;
+			case LINK_DESTINATION_ATTACHMENT:
+				href = media.link;
+				break;
 		}
+		mediaAttributes.href = href;
 
 		setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,
+			linkDestination,
 		} );
 	}
 
@@ -198,6 +240,11 @@ export function ImageEdit( {
 				allowedTypes: ALLOWED_MEDIA_TYPES,
 				onError: ( message ) => {
 					noticeOperations.createErrorNotice( message );
+					setAttributes( {
+						src: undefined,
+						id: undefined,
+						url: undefined,
+					} );
 				},
 			} );
 		}
@@ -256,14 +303,15 @@ export function ImageEdit( {
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 	} );
 
-	// Focussing the image caption after inserting an image relies on the
-	// component remounting. This needs to be fixed.
-	const key = !! url;
+	const blockProps = useBlockProps( {
+		ref,
+		className: classes,
+	} );
 
 	return (
 		<>
 			{ controls }
-			<Block.figure ref={ ref } className={ classes } key={ key }>
+			<figure { ...blockProps }>
 				{ url && (
 					<Image
 						attributes={ attributes }
@@ -278,7 +326,7 @@ export function ImageEdit( {
 					/>
 				) }
 				{ mediaPlaceholder }
-			</Block.figure>
+			</figure>
 		</>
 	);
 }

@@ -57,6 +57,28 @@ describe( 'PanelBody', () => {
 
 			expect( panelContent ).toBeTruthy();
 		} );
+
+		it( 'should call the children function, if specified', () => {
+			const { container, rerender } = render(
+				<PanelBody opened={ true }>
+					{ ( { opened } ) => <div hidden={ opened }>Content</div> }
+				</PanelBody>
+			);
+			let panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeTruthy();
+			expect( panelContent.getAttribute( 'hidden' ) ).toBe( '' );
+
+			rerender(
+				<PanelBody opened={ false }>
+					{ ( { opened } ) => <div hidden={ opened }>Content</div> }
+				</PanelBody>
+			);
+			panelContent = getPanelBodyContent( container );
+
+			expect( panelContent ).toBeTruthy();
+			expect( panelContent.getAttribute( 'hidden' ) ).toBeNull();
+		} );
 	} );
 
 	describe( 'toggling', () => {

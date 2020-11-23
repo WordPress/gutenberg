@@ -19,7 +19,7 @@ import {
 	withFilters,
 } from '@wordpress/components';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { DOWN } from '@wordpress/keycodes';
+import { DOWN, TAB, ESCAPE } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
 import { upload, media as mediaIcon } from '@wordpress/icons';
 
@@ -121,6 +121,7 @@ const MediaReplaceFlow = ( {
 					<ToolbarButton
 						ref={ editMediaButtonRef }
 						aria-expanded={ isOpen }
+						aria-haspopup="true"
 						onClick={ onToggle }
 						onKeyDown={ openOnArrowDown }
 					>
@@ -167,10 +168,18 @@ const MediaReplaceFlow = ( {
 						<form
 							className="block-editor-media-flow__url-input"
 							onKeyDown={ ( event ) => {
-								event.stopPropagation();
+								if (
+									! [ TAB, ESCAPE ].includes( event.keyCode )
+								) {
+									event.stopPropagation();
+								}
 							} }
 							onKeyPress={ ( event ) => {
-								event.stopPropagation();
+								if (
+									! [ TAB, ESCAPE ].includes( event.keyCode )
+								) {
+									event.stopPropagation();
+								}
 							} }
 						>
 							<span className="block-editor-media-replace-flow__image-url-label">

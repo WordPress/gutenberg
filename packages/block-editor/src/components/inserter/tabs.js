@@ -24,6 +24,7 @@ function InserterTabs( {
 	children,
 	showPatterns = false,
 	showReusableBlocks = false,
+	onSelect,
 } ) {
 	const tabs = [ blocksTab ];
 
@@ -35,7 +36,11 @@ function InserterTabs( {
 	}
 
 	return (
-		<TabPanel className="block-editor-inserter__tabs" tabs={ tabs }>
+		<TabPanel
+			className="block-editor-inserter__tabs"
+			tabs={ tabs }
+			onSelect={ onSelect }
+		>
 			{ children }
 		</TabPanel>
 	);

@@ -44,7 +44,7 @@ getPackages().forEach( ( p ) => {
 		fs.accessSync( srcDir, fs.F_OK );
 		watch(
 			path.resolve( p, 'src' ),
-			{ recursive: true },
+			{ recursive: true, delay: 500 },
 			( event, filename ) => {
 				if ( ! isSourceFile( filename ) ) {
 					return;

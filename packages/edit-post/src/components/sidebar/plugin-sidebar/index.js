@@ -72,7 +72,7 @@ import { __ } from '@wordpress/i18n';
  * ```
  */
 export default function PluginSidebarEditPost( { className, ...props } ) {
-	const { postTitle, shortcut } = useSelect( ( select ) => {
+	const { postTitle, shortcut, showIconLabels } = useSelect( ( select ) => {
 		return {
 			postTitle: select( 'core/editor' ).getEditedPostAttribute(
 				'title'
@@ -80,6 +80,9 @@ export default function PluginSidebarEditPost( { className, ...props } ) {
 			shortcut: select(
 				'core/keyboard-shortcuts'
 			).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
+			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
+				'showIconLabels'
+			),
 		};
 	} );
 	return (
@@ -89,6 +92,7 @@ export default function PluginSidebarEditPost( { className, ...props } ) {
 			smallScreenTitle={ postTitle || __( '(no title)' ) }
 			scope="core/edit-post"
 			toggleShortcut={ shortcut }
+			showIconLabels={ showIconLabels }
 			{ ...props }
 		/>
 	);

@@ -12,7 +12,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	__experimentalBlock as Block,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import { PanelBody, SelectControl, ToggleControl } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -23,7 +23,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 
 	const { authorId, authorDetails, authors } = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, getUser, getAuthors } = select(
+			const { getEditedEntityRecord, getUser, getUsers } = select(
 				'core'
 			);
 			const _authorId = getEditedEntityRecord(
@@ -35,7 +35,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 			return {
 				authorId: _authorId,
 				authorDetails: _authorId ? getUser( _authorId ) : null,
-				authors: getAuthors(),
+				authors: getUsers( { who: 'authors' } ),
 			};
 		},
 		[ postType, postId ]
@@ -55,25 +55,38 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 		} );
 	}
 
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
+
 	return (
 		<>
 			<InspectorControls>
 				<PanelBody title={ __( 'Author Settings' ) }>
-					<SelectControl
-						label={ __( 'Author' ) }
-						value={ authorId }
-						options={ authors.map( ( { id, name } ) => {
-							return {
-								value: id,
-								label: name,
-							};
-						} ) }
-						onChange={ ( nextAuthorId ) => {
-							editEntityRecord( 'postType', postType, postId, {
-								author: nextAuthorId,
-							} );
-						} }
-					/>
+					{ !! authors?.length && (
+						<SelectControl
+							label={ __( 'Author' ) }
+							value={ authorId }
+							options={ authors.map( ( { id, name } ) => {
+								return {
+									value: id,
+									label: name,
+								};
+							} ) }
+							onChange={ ( nextAuthorId ) => {
+								editEntityRecord(
+									'postType',
+									postType,
+									postId,
+									{
+										author: nextAuthorId,
+									}
+								);
+							} }
+						/>
+					) }
 					<ToggleControl
 						label={ __( 'Show avatar' ) }
 						checked={ showAvatar }
@@ -112,11 +125,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 				/>
 			</BlockControls>
 
-			<Block.div
-				className={ classnames( {
-					[ `has-text-align-${ textAlign }` ]: textAlign,
-				} ) }
-			>
+			<div { ...blockProps }>
 				{ showAvatar && authorDetails && (
 					<div className="wp-block-post-author__avatar">
 						<img
@@ -151,7 +160,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 						</p>
 					) }
 				</div>
-			</Block.div>
+			</div>
 		</>
 	);
 }

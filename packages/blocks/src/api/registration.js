@@ -70,7 +70,7 @@ import { DEPRECATED_ENTRY_KEYS } from './constants';
 /**
  * Named block variation scopes.
  *
- * @typedef {'block'|'inserter'} WPBlockVariationScope
+ * @typedef {'block'|'inserter'|'transform'} WPBlockVariationScope
  */
 
 /**
@@ -519,6 +519,18 @@ export const unregisterBlockStyle = ( blockName, styleVariationName ) => {
 		blockName,
 		styleVariationName
 	);
+};
+
+/**
+ * Returns an array with the variations of a given block type.
+ *
+ * @param {string}                blockName Name of block (example: “core/columns”).
+ * @param {WPBlockVariationScope} [scope]   Block variation scope name.
+ *
+ * @return {(WPBlockVariation[]|void)} Block variations.
+ */
+export const getBlockVariations = ( blockName, scope ) => {
+	return select( 'core/blocks' ).getBlockVariations( blockName, scope );
 };
 
 /**

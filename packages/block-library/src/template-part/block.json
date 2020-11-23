@@ -1,4 +1,5 @@
 {
+	"apiVersion": 2,
 	"name": "core/template-part",
 	"category": "design",
 	"attributes": {
@@ -10,10 +11,18 @@
 		},
 		"theme": {
 			"type": "string"
+		},
+		"tagName": {
+			"type": "string",
+			"default": "div"
 		}
 	},
 	"supports": {
 		"align": true,
-		"html": false
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true
+		}
 	}
 }

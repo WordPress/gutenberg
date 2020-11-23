@@ -22,7 +22,7 @@
 		top: $admin-bar-height;
 		left: auto;
 		width: $sidebar-width;
-		border-left: $border-width solid $gray-200;
+		border-left: $border-width solid $gray-300;
 
 		body.is-fullscreen-mode & {
 			top: 0;
@@ -41,7 +41,7 @@
 		padding-left: $grid-unit-10;
 		padding-right: $grid-unit-10;
 		height: $header-height + $border-width;
-		border-bottom: $border-width solid $gray-200;
+		border-bottom: $border-width solid $gray-300;
 		display: flex;
 		align-items: center;
 		align-content: space-between;
@@ -57,7 +57,7 @@
 	}
 
 	.entities-saved-states__text-prompt {
-		border-bottom: $border-width solid $gray-200;
+		border-bottom: $border-width solid $gray-300;
 		padding: $grid-unit-20;
 		padding-bottom: $grid-unit-05;
 	}

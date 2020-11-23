@@ -21,6 +21,7 @@ import {
 	IMAGE_DEFAULT_FOCAL_POINT,
 	PanelBody,
 	RangeControl,
+	UnitControl,
 	BottomSheet,
 	ToolbarButton,
 	ToolbarGroup,
@@ -28,6 +29,7 @@ import {
 	ColorPalette,
 	ColorPicker,
 	BottomSheetConsumer,
+	useConvertUnitToMobile,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -40,11 +42,12 @@ import {
 	MediaUploadProgress,
 	withColors,
 	__experimentalUseGradient,
+	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState, useRef } from '@wordpress/element';
-import { cover as icon, replace, image } from '@wordpress/icons';
+import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
 
 /**
@@ -56,6 +59,7 @@ import {
 	COVER_MIN_HEIGHT,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
+	CSS_UNITS,
 } from './shared';
 import OverlayColorSettings from './overlay-color-settings';
 
@@ -83,7 +87,6 @@ const Cover = ( {
 	overlayColor,
 	setAttributes,
 	openGeneralSidebar,
-	settings,
 	closeSettingsBottomSheet,
 } ) => {
 	const {
@@ -95,13 +98,22 @@ const Cover = ( {
 		id,
 		style,
 		customOverlayColor,
+		minHeightUnit = 'px',
 	} = attributes;
+
 	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
+
+	const convertedMinHeight = useConvertUnitToMobile(
+		minHeight || COVER_DEFAULT_HEIGHT,
+		minHeightUnit
+	);
+
 	const isImage = backgroundType === MEDIA_TYPE_IMAGE;
 
 	const THEME_COLORS_COUNT = 4;
+	const colorsDefault = useEditorFeature( 'color.palette' ) || [];
 	const coverDefaultPalette = {
-		colors: settings.colors.slice( 0, THEME_COLORS_COUNT ),
+		colors: colorsDefault.slice( 0, THEME_COLORS_COUNT ),
 	};
 
 	const { gradientValue } = __experimentalUseGradient();
@@ -163,7 +175,7 @@ const Cover = ( {
 		}
 	};
 
-	const onOpactiyChange = ( value ) => {
+	const onOpacityChange = ( value ) => {
 		setAttributes( { dimRatio: value } );
 	};
 
@@ -266,6 +278,16 @@ const Cover = ( {
 		</TouchableWithoutFeedback>
 	);
 
+	const onChangeUnit = ( nextUnit ) => {
+		setAttributes( {
+			minHeightUnit: nextUnit,
+			minHeight:
+				nextUnit === 'px'
+					? Math.max( CONTAINER_HEIGHT, COVER_MIN_HEIGHT )
+					: CONTAINER_HEIGHT,
+		} );
+	};
+
 	const controls = (
 		<InspectorControls>
 			<OverlayColorSettings
@@ -279,20 +301,24 @@ const Cover = ( {
 						minimumValue={ 0 }
 						maximumValue={ 100 }
 						value={ dimRatio }
-						onChange={ onOpactiyChange }
+						onChange={ onOpacityChange }
 						style={ styles.rangeCellContainer }
 						separatorType={ 'topFullWidth' }
 					/>
 				</PanelBody>
 			) : null }
 			<PanelBody title={ __( 'Dimensions' ) }>
-				<RangeControl
-					label={ __( 'Minimum height in pixels' ) }
-					minimumValue={ COVER_MIN_HEIGHT }
-					maximumValue={ COVER_MAX_HEIGHT }
+				<UnitControl
+					label={ __( 'Minimum height' ) }
+					min={ minHeightUnit === 'px' ? COVER_MIN_HEIGHT : 1 }
+					max={ COVER_MAX_HEIGHT }
+					unit={ minHeightUnit }
 					value={ CONTAINER_HEIGHT }
 					onChange={ onHeightChange }
+					onUnitChange={ onChangeUnit }
+					units={ CSS_UNITS }
 					style={ styles.rangeCellContainer }
+					key={ minHeightUnit }
 				/>
 			</PanelBody>
 
@@ -410,6 +436,7 @@ const Cover = ( {
 							onSelectMediaUploadOption={ onSelectMedia }
 							openMediaOptions={ openMediaOptionsRef.current }
 							url={ url }
+							width={ styles.image.width }
 						/>
 					</View>
 				) }
@@ -453,19 +480,26 @@ const Cover = ( {
 					onFocus={ onFocus }
 				>
 					<View style={ styles.colorPaletteWrapper }>
-						<ColorPalette
-							customColorIndicatorStyles={
-								styles.paletteColorIndicator
-							}
-							customIndicatorWrapperStyles={
-								styles.paletteCustomIndicatorWrapper
-							}
-							setColor={ setColor }
-							onCustomPress={ openColorPicker }
-							defaultSettings={ coverDefaultPalette }
-							shouldShowCustomLabel={ false }
-							shouldShowCustomVerticalSeparator={ false }
-						/>
+						<BottomSheetConsumer>
+							{ ( { shouldEnableBottomSheetScroll } ) => (
+								<ColorPalette
+									customColorIndicatorStyles={
+										styles.paletteColorIndicator
+									}
+									customIndicatorWrapperStyles={
+										styles.paletteCustomIndicatorWrapper
+									}
+									setColor={ setColor }
+									onCustomPress={ openColorPicker }
+									defaultSettings={ coverDefaultPalette }
+									shouldShowCustomLabel={ false }
+									shouldShowCustomVerticalSeparator={ false }
+									shouldEnableBottomSheetScroll={
+										shouldEnableBottomSheetScroll
+									}
+								/>
+							) }
+						</BottomSheetConsumer>
 					</View>
 				</MediaPlaceholder>
 			</View>
@@ -503,9 +537,12 @@ const Cover = ( {
 
 			<View
 				pointerEvents="box-none"
-				style={ [ styles.content, { minHeight: CONTAINER_HEIGHT } ] }
+				style={ [ styles.content, { minHeight: convertedMinHeight } ] }
 			>
-				<InnerBlocks template={ INNER_BLOCKS_TEMPLATE } />
+				<InnerBlocks
+					template={ INNER_BLOCKS_TEMPLATE }
+					templateInsertUpdatesSelection
+				/>
 			</View>
 
 			<View pointerEvents="none" style={ styles.overlayContainer }>
@@ -535,10 +572,7 @@ const Cover = ( {
 					style={ styles.uploadFailedContainer }
 				>
 					<View style={ styles.uploadFailed }>
-						<Icon
-							icon={ 'warning' }
-							{ ...styles.uploadFailedIcon }
-						/>
+						<Icon icon={ warning } { ...styles.uploadFailedIcon } />
 					</View>
 				</View>
 			) }

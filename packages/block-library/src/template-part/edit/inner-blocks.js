@@ -2,9 +2,11 @@
  * WordPress dependencies
  */
 import { useEntityBlockEditor } from '@wordpress/core-data';
-import { InnerBlocks } from '@wordpress/block-editor';
+import {
+	InnerBlocks,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+} from '@wordpress/block-editor';
 
-const renderAppender = () => <InnerBlocks.ButtonBlockAppender />;
 export default function TemplatePartInnerBlocks( {
 	postId: id,
 	hasInnerBlocks,
@@ -14,12 +16,16 @@ export default function TemplatePartInnerBlocks( {
 		'wp_template_part',
 		{ id }
 	);
-	return (
-		<InnerBlocks
-			value={ blocks }
-			onInput={ onInput }
-			onChange={ onChange }
-			renderAppender={ hasInnerBlocks ? undefined : renderAppender }
-		/>
+	const innerBlocksProps = useInnerBlocksProps(
+		{},
+		{
+			value: blocks,
+			onInput,
+			onChange,
+			renderAppender: hasInnerBlocks
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
+		}
 	);
+	return <div { ...innerBlocksProps } />;
 }

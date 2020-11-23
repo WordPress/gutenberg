@@ -24,7 +24,6 @@ function Example() {
 	const props = {
 		disabled: boolean( 'disabled', false ),
 		hideLabelFromVision: boolean( 'hideLabelFromVision', false ),
-		isFloatingLabel: boolean( 'isFloatingLabel', false ),
 		isPressEnterToChange: boolean( 'isPressEnterToChange', false ),
 		label: text( 'label', 'Value' ),
 		labelPosition: select(

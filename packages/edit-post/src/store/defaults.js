@@ -9,6 +9,8 @@ export const PREFERENCES_DEFAULTS = {
 		fixedToolbar: false,
 		welcomeGuide: true,
 		fullscreenMode: true,
+		showIconLabels: false,
+		themeStyles: true,
 	},
 	hiddenBlockTypes: [],
 	preferredStyleVariations: {},

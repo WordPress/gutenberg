@@ -7,7 +7,7 @@ import { includes } from 'lodash';
  * WordPress dependencies
  */
 import { focus } from '@wordpress/dom';
-import { useCallback } from '@wordpress/element';
+import { forwardRef, useCallback } from '@wordpress/element';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
@@ -39,11 +39,11 @@ function getRowFocusables( rowElement ) {
  * Renders both a table and tbody element, used to create a tree hierarchy.
  *
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/components/src/tree-grid/README.md
- *
  * @param {Object}    props          Component props.
- * @param {WPElement} props.children Children to be rendered
+ * @param {WPElement} props.children Children to be rendered.
+ * @param {Object}    ref            A ref to the underlying DOM table element.
  */
-export default function TreeGrid( { children, ...props } ) {
+function TreeGrid( { children, ...props }, ref ) {
 	const onKeyDown = useCallback( ( event ) => {
 		const { keyCode, metaKey, ctrlKey, altKey, shiftKey } = event;
 
@@ -147,17 +147,24 @@ export default function TreeGrid( { children, ...props } ) {
 		}
 	}, [] );
 
+	/* Disable reason: A treegrid is implemented using a table element. */
+	/* eslint-disable jsx-a11y/no-noninteractive-element-to-interactive-role */
 	return (
 		<RovingTabIndexContainer>
-			{ /* Disable reason: A treegrid is implemented using a table element. */ }
-			{ /* eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role */ }
-			<table { ...props } role="treegrid" onKeyDown={ onKeyDown }>
+			<table
+				{ ...props }
+				role="treegrid"
+				onKeyDown={ onKeyDown }
+				ref={ ref }
+			>
 				<tbody>{ children }</tbody>
 			</table>
 		</RovingTabIndexContainer>
 	);
+	/* eslint-enable jsx-a11y/no-noninteractive-element-to-interactive-role */
 }
 
+export default forwardRef( TreeGrid );
 export { default as TreeGridRow } from './row';
 export { default as TreeGridCell } from './cell';
 export { default as TreeGridItem } from './item';

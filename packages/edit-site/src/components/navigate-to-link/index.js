@@ -5,6 +5,7 @@ import { getPathAndQueryString } from '@wordpress/url';
 import { useState, useEffect, useMemo } from '@wordpress/element';
 import { useSelect, useRegistry } from '@wordpress/data';
 import { Button } from '@wordpress/components';
+import { edit } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -58,7 +59,7 @@ export default function NavigateToLink( {
 	return (
 		onClick && (
 			<Button
-				icon="welcome-write-blog"
+				icon={ edit }
 				label={ __( 'Edit Page Template' ) }
 				onClick={ onClick }
 			/>

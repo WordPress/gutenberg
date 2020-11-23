@@ -9,6 +9,7 @@ import { noop, times } from 'lodash';
  */
 import {
 	createBlock,
+	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
@@ -156,6 +157,108 @@ describe( 'block factory', () => {
 
 			expect( block.attributes ).toEqual( {
 				content: 'test',
+			} );
+		} );
+	} );
+
+	describe( 'createBlocksFromInnerBlocksTemplate', () => {
+		it( 'should create a block without InnerBlocks', () => {
+			const blockName = 'core/test-block';
+			registerBlockType( blockName, { ...defaultBlockSettings } );
+			const res = createBlock(
+				blockName,
+				{ ...defaultBlockSettings },
+				createBlocksFromInnerBlocksTemplate()
+			);
+			expect( res ).toEqual(
+				expect.objectContaining( {
+					name: blockName,
+					innerBlocks: [],
+				} )
+			);
+		} );
+		describe( 'create block with InnerBlocks', () => {
+			beforeEach( () => {
+				registerBlockType( 'core/test-block', {
+					...defaultBlockSettings,
+				} );
+				registerBlockType( 'core/test-other', {
+					...defaultBlockSettings,
+				} );
+				registerBlockType( 'core/test-paragraph', {
+					...defaultBlockSettings,
+					attributes: {
+						content: {
+							type: 'string',
+							default: 'hello',
+						},
+					},
+				} );
+			} );
+			it( 'should create block with InnerBlocks from template', () => {
+				const res = createBlock(
+					'core/test-block',
+					defaultBlockSettings,
+					createBlocksFromInnerBlocksTemplate( [
+						[ 'core/test-other' ],
+						[ 'core/test-paragraph', { content: 'fromTemplate' } ],
+						[ 'core/test-paragraph' ],
+					] )
+				);
+				expect( res.innerBlocks ).toHaveLength( 3 );
+				expect( res.innerBlocks ).toEqual(
+					expect.arrayContaining( [
+						expect.objectContaining( {
+							name: 'core/test-other',
+						} ),
+						expect.objectContaining( {
+							name: 'core/test-paragraph',
+							attributes: { content: 'fromTemplate' },
+						} ),
+						expect.objectContaining( {
+							name: 'core/test-paragraph',
+							attributes: { content: 'hello' },
+						} ),
+					] )
+				);
+			} );
+			it( 'should create blocks with InnerBlocks template and InnerBlock objects', () => {
+				const nestedInnerBlocks = [
+					createBlock( 'core/test-other' ),
+					createBlock( 'core/test-paragraph' ),
+				];
+				const res = createBlock(
+					'core/test-block',
+					defaultBlockSettings,
+					createBlocksFromInnerBlocksTemplate( [
+						[ 'core/test-other' ],
+						[
+							'core/test-paragraph',
+							{ content: 'fromTemplate' },
+							nestedInnerBlocks,
+						],
+					] )
+				);
+				expect( res.innerBlocks ).toHaveLength( 2 );
+				expect( res.innerBlocks ).toEqual(
+					expect.arrayContaining( [
+						expect.objectContaining( {
+							name: 'core/test-other',
+						} ),
+						expect.objectContaining( {
+							name: 'core/test-paragraph',
+							attributes: { content: 'fromTemplate' },
+							innerBlocks: expect.arrayContaining( [
+								expect.objectContaining( {
+									name: 'core/test-other',
+								} ),
+								expect.objectContaining( {
+									name: 'core/test-other',
+								} ),
+							] ),
+						} ),
+					] )
+				);
 			} );
 		} );
 	} );

@@ -24,6 +24,14 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
+<a name="activateTheme" href="#activateTheme">#</a> **activateTheme**
+
+Activates an installed theme.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+
 <a name="arePrePublishChecksEnabled" href="#arePrePublishChecksEnabled">#</a> **arePrePublishChecksEnabled**
 
 Verifies if publish checks are enabled.
@@ -56,6 +64,14 @@ Clicks a button based on the text on the button.
 _Parameters_
 
 -   _buttonText_ `string`: The text that appears on the button to click.
+
+<a name="clickMenuItem" href="#clickMenuItem">#</a> **clickMenuItem**
+
+Searches for an item in the menu with the text provided and clicks it.
+
+_Parameters_
+
+-   _label_ `string`: The label to search the menu item for.
 
 <a name="clickOnCloseModalButton" href="#clickOnCloseModalButton">#</a> **clickOnCloseModalButton**
 
@@ -146,6 +162,17 @@ Deactivates an active plugin.
 _Parameters_
 
 -   _slug_ `string`: Plugin slug.
+
+<a name="deleteTheme" href="#deleteTheme">#</a> **deleteTheme**
+
+Deletes a theme from the site, activating another theme if necessary.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+-   _settings_ `?Object`: Optional settings object.
+-   _settings.newThemeSlug_ `?string`: A theme to switch to if the theme to delete is active. Required if the theme to delete is active.
+-   _settings.newThemeSearchTerm_ `?string`: A search term to use if the new theme is not findable by its slug.
 
 <a name="disableFocusLossObservation" href="#disableFocusLossObservation">#</a> **disableFocusLossObservation**
 
@@ -302,6 +329,16 @@ _Parameters_
 
 -   _searchTerm_ `string`: The text to search the inserter for.
 
+<a name="insertBlockDirectoryBlock" href="#insertBlockDirectoryBlock">#</a> **insertBlockDirectoryBlock**
+
+Opens the inserter, searches for the given block, then selects the
+first result that appears from the block directory. It then waits briefly for the block list to
+update.
+
+_Parameters_
+
+-   _searchTerm_ `string`: The text to search the inserter for.
+
 <a name="insertPattern" href="#insertPattern">#</a> **insertPattern**
 
 Opens the inserter, searches for the given pattern, then selects the first
@@ -330,6 +367,16 @@ _Parameters_
 -   _slug_ `string`: Plugin slug.
 -   _searchTerm_ `?string`: If the plugin is not findable by its slug use an alternative term to search.
 
+<a name="installTheme" href="#installTheme">#</a> **installTheme**
+
+Installs a theme from the WP.org repository.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug.
+-   _settings_ `?Object`: Optional settings object.
+-   _settings.searchTerm_ `?string`: Search term to use if the theme is not findable by its slug.
+
 <a name="isCurrentURL" href="#isCurrentURL">#</a> **isCurrentURL**
 
 Checks if current URL is a WordPress path.
@@ -354,6 +401,18 @@ _Returns_
 <a name="isOfflineMode" href="#isOfflineMode">#</a> **isOfflineMode**
 
 Undocumented declaration.
+
+<a name="isThemeInstalled" href="#isThemeInstalled">#</a> **isThemeInstalled**
+
+Checks whether a theme exists on the site.
+
+_Parameters_
+
+-   _slug_ `string`: Theme slug to check.
+
+_Returns_
+
+-   `boolean`: Whether the theme exists.
 
 <a name="loginUser" href="#loginUser">#</a> **loginUser**
 
@@ -541,6 +600,10 @@ running the test is not already the admin user).
 Switches the current user to whichever user we should be
 running the tests as (if we're not already that user).
 
+<a name="toggleGlobalBlockInserter" href="#toggleGlobalBlockInserter">#</a> **toggleGlobalBlockInserter**
+
+Toggles the global inserter.
+
 <a name="toggleMoreMenu" href="#toggleMoreMenu">#</a> **toggleMoreMenu**
 
 Toggles the More Menu.
@@ -573,6 +636,7 @@ Navigates to the post listing screen and bulk-trashes any posts which exist.
 _Parameters_
 
 -   _postType_ `string`: String slug for type of post to trash.
+-   _postStatus_ `string`: String status of posts to trash.
 
 _Returns_
 

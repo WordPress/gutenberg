@@ -91,9 +91,9 @@ describe( 'displayShortcutList', () => {
 			expect( shortcut ).toEqual( [ 'Shift', '+', 'Alt', '+', 'M' ] );
 		} );
 
-		it( 'should output [^, ⌥, M ] on MacOS', () => {
+		it( 'should output [⌃, ⌥, M ] on MacOS', () => {
 			const shortcut = displayShortcutList.access( 'm', isAppleOSTrue );
-			expect( shortcut ).toEqual( [ '^', '⌥', 'M' ] );
+			expect( shortcut ).toEqual( [ '⌃', '⌥', 'M' ] );
 		} );
 	} );
 } );
@@ -159,7 +159,7 @@ describe( 'displayShortcut', () => {
 
 		it( 'should output control+option symbols on MacOS', () => {
 			const shortcut = displayShortcut.access( 'm', isAppleOSTrue );
-			expect( shortcut ).toEqual( '^⌥M' );
+			expect( shortcut ).toEqual( '⌃⌥M' );
 		} );
 	} );
 } );

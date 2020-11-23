@@ -6,13 +6,14 @@ import { upperFirst, camelCase, map, find, get, startCase } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { controls } from '@wordpress/data';
+import { apiFetch } from '@wordpress/data-controls';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { addEntities } from './actions';
-import { apiFetch, select } from './controls';
 
 export const DEFAULT_ENTITY_KEY = 'id';
 
@@ -57,10 +58,18 @@ export const defaultEntities = [
 	{
 		name: 'sidebar',
 		kind: 'root',
-		baseURL: '/__experimental/sidebars',
+		baseURL: '/wp/v2/sidebars',
 		plural: 'sidebars',
 		transientEdits: { blocks: true },
 		label: __( 'Widget areas' ),
+	},
+	{
+		name: 'widget',
+		kind: 'root',
+		baseURL: '/wp/v2/widgets',
+		plural: 'widgets',
+		transientEdits: { blocks: true },
+		label: __( 'Widgets' ),
 	},
 	{
 		label: __( 'User' ),
@@ -125,10 +134,14 @@ function* loadPostTypeEntities() {
 			},
 			mergedEdits: { meta: true },
 			getTitle( record ) {
-				if ( name === 'wp_template_part' || name === 'wp_template' ) {
-					return startCase( record.slug );
+				if ( [ 'wp_template_part', 'wp_template' ].includes( name ) ) {
+					return (
+						record?.title?.rendered ||
+						record?.title ||
+						startCase( record.slug )
+					);
 				}
-				return get( record, [ 'title', 'rendered' ], record.id );
+				return record?.title?.rendered || record?.title || record.id;
 			},
 		};
 	} );
@@ -188,7 +201,7 @@ export const getMethodName = (
  * @return {Array} Entities
  */
 export function* getKindEntities( kind ) {
-	let entities = yield select( 'getEntitiesByKind', kind );
+	let entities = yield controls.select( 'core', 'getEntitiesByKind', kind );
 	if ( entities && entities.length !== 0 ) {
 		return entities;
 	}

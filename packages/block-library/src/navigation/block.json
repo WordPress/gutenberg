@@ -1,11 +1,9 @@
 {
+	"apiVersion": 2,
 	"name": "core/navigation",
 	"category": "design",
 	"attributes": {
 		"orientation": {
-			"type": "string"
-		},
-		"className": {
 			"type": "string"
 		},
 		"textColor": {
@@ -44,11 +42,18 @@
 		"showSubmenuIcon": "showSubmenuIcon"
 	},
 	"supports": {
-		"align": [ "wide", "full" ],
+		"align": [
+			"wide",
+			"full"
+		],
 		"anchor": true,
 		"html": false,
 		"inserter": true,
-		"lightBlockWrapper": true,
-		"__experimentalFontSize": true
+		"fontSize": true,
+		"__experimentalFontAppearance": true,
+		"__experimentalTextTransform": true,
+		"color": true,
+		"__experimentalFontFamily": true,
+		"__experimentalTextDecoration": true
 	}
 }

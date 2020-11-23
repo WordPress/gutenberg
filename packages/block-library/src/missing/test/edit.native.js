@@ -2,7 +2,7 @@
  * External dependencies
  */
 import renderer from 'react-test-renderer';
-import { Text, Platform } from 'react-native';
+import { Text } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -56,12 +56,10 @@ describe( 'Missing block', () => {
 			const testInstance = component.root;
 			const bottomSheet = testInstance.findByType( BottomSheet );
 			const children = bottomSheet.props.children[ 0 ].props.children;
-			const expectedOSString = Platform.OS === 'ios' ? 'iOS' : 'Android';
 			expect( children[ 1 ].props.children ).toBe(
 				"'" +
 					defaultAttributes.originalName +
-					"' isn't yet supported on WordPress for " +
-					expectedOSString
+					"' is not fully-supported"
 			);
 		} );
 	} );

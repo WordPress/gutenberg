@@ -1,8 +1,10 @@
+/** @typedef {import('./create').RichTextFormat} RichTextFormat */
+
 /**
  * Optimised equality check for format objects.
  *
- * @param {?Object} format1 Format to compare.
- * @param {?Object} format2 Format to compare.
+ * @param {?RichTextFormat} format1 Format to compare.
+ * @param {?RichTextFormat} format2 Format to compare.
  *
  * @return {boolean} True if formats are equal, false if not.
  */

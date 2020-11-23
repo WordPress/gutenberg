@@ -1,28 +1,28 @@
 /**
  * External dependencies
  */
-import { invert, keyBy, omit } from 'lodash';
+import { invert } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { serialize } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import {
-	getNavigationPostForMenu,
-	getPendingActions,
-	isProcessingPost,
 	getMenuItemToClientIdMapping,
 	resolveMenuItems,
 	dispatch,
 	apiFetch,
 } from './controls';
-import { menuItemsQuery } from './utils';
+import {
+	menuItemsQuery,
+	serializeProcessing,
+	computeCustomizedAttribute,
+} from './utils';
 
 /**
  * Creates a menu item for every block that doesn't have an associated menuItem.
@@ -34,10 +34,7 @@ import { menuItemsQuery } from './utils';
 export const createMissingMenuItems = serializeProcessing( function* ( post ) {
 	const menuId = post.meta.menuId;
 
-	const mapping = yield {
-		type: 'GET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
-		postId: post.id,
-	};
+	const mapping = yield getMenuItemToClientIdMapping( post.id );
 	const clientIdToMenuId = invert( mapping );
 
 	const stack = [ post.blocks[ 0 ] ];
@@ -163,130 +160,4 @@ function* batchSave( menuId, menuItemsByClientId, navigationBlock ) {
 		method: 'POST',
 		body,
 	} );
-}
-
-function computeCustomizedAttribute( blocks, menuId, menuItemsByClientId ) {
-	const blocksList = blocksTreeToFlatList( blocks );
-	const dataList = blocksList.map( ( { block, parentId, position } ) =>
-		blockToRequestItem( block, parentId, position )
-	);
-
-	// Create an object like { "nav_menu_item[12]": {...}} }
-	const computeKey = ( item ) => `nav_menu_item[${ item.id }]`;
-	const dataObject = keyBy( dataList, computeKey );
-
-	// Deleted menu items should be sent as false, e.g. { "nav_menu_item[13]": false }
-	for ( const clientId in menuItemsByClientId ) {
-		const key = computeKey( menuItemsByClientId[ clientId ] );
-		if ( ! ( key in dataObject ) ) {
-			dataObject[ key ] = false;
-		}
-	}
-
-	return JSON.stringify( dataObject );
-
-	function blocksTreeToFlatList( innerBlocks, parentId = 0 ) {
-		return innerBlocks.flatMap( ( block, index ) =>
-			[ { block, parentId, position: index + 1 } ].concat(
-				blocksTreeToFlatList(
-					block.innerBlocks,
-					getMenuItemForBlock( block )?.id
-				)
-			)
-		);
-	}
-
-	function blockToRequestItem( block, parentId, position ) {
-		const menuItem = omit( getMenuItemForBlock( block ), 'menus', 'meta' );
-
-		let attributes;
-
-		if ( block.name === 'core/navigation-link' ) {
-			attributes = {
-				type: 'custom',
-				title: block.attributes?.label,
-				original_title: '',
-				url: block.attributes.url,
-			};
-		} else {
-			attributes = {
-				type: 'html',
-				content: serialize( block ),
-			};
-		}
-
-		return {
-			...menuItem,
-			...attributes,
-			position,
-			classes: ( menuItem.classes || [] ).join( ' ' ),
-			xfn: ( menuItem.xfn || [] ).join( ' ' ),
-			nav_menu_term_id: menuId,
-			menu_item_parent: parentId,
-			status: 'publish',
-			_invalid: false,
-		};
-	}
-
-	function getMenuItemForBlock( block ) {
-		return omit( menuItemsByClientId[ block.clientId ] || {}, '_links' );
-	}
-}
-
-/**
- * This wrapper guarantees serial execution of data processing actions.
- *
- * Examples:
- * * saveNavigationPost() needs to wait for all the missing items to be created.
- * * Concurrent createMissingMenuItems() could result in sending more requests than required.
- *
- * @param {Function} callback An action creator to wrap
- * @return {Function} Original callback wrapped in a serial execution context
- */
-function serializeProcessing( callback ) {
-	return function* ( post ) {
-		const postId = post.id;
-		const isProcessing = yield isProcessingPost( postId );
-
-		if ( isProcessing ) {
-			yield {
-				type: 'ENQUEUE_AFTER_PROCESSING',
-				postId,
-				action: callback,
-			};
-			return { status: 'pending' };
-		}
-		yield {
-			type: 'POP_PENDING_ACTION',
-			postId,
-			action: callback,
-		};
-
-		yield {
-			type: 'START_PROCESSING_POST',
-			postId,
-		};
-
-		try {
-			yield* callback(
-				// re-select the post as it could be outdated by now
-				yield getNavigationPostForMenu( post.meta.menuId )
-			);
-		} finally {
-			yield {
-				type: 'FINISH_PROCESSING_POST',
-				postId,
-				action: callback,
-			};
-
-			const pendingActions = yield getPendingActions( postId );
-			if ( pendingActions.length ) {
-				const serializedCallback = serializeProcessing(
-					pendingActions[ 0 ]
-				);
-
-				yield* serializedCallback( post );
-			}
-		}
-	};
 }

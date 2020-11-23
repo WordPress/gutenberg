@@ -27,26 +27,14 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
+			rangeInput.focus();
 			fireEvent.change( rangeInput, { target: { value: '5' } } );
 
+			numberInput.focus();
 			fireEvent.change( numberInput, { target: { value: '10' } } );
-			fireEvent.blur( numberInput );
 
 			expect( onChange ).toHaveBeenCalledWith( 5 );
 			expect( onChange ).toHaveBeenCalledWith( 10 );
-		} );
-
-		it( 'should not render with icons, by default', () => {
-			const { container } = render(
-				<RangeControl
-					beforeIcon="format-image"
-					afterIcon="format-video"
-				/>
-			);
-
-			const icon = container.querySelector( '.dashicons' );
-
-			expect( icon ).toBeFalsy();
 		} );
 
 		it( 'should render with icons', () => {
@@ -70,7 +58,7 @@ describe( 'RangeControl', () => {
 	} );
 
 	describe( 'validation', () => {
-		it( 'should not apply new value is lower than minimum', () => {
+		it( 'should not apply if new value is lower than minimum', () => {
 			const { container } = render( <RangeControl min={ 11 } /> );
 
 			const rangeInput = getRangeInput( container );
@@ -82,7 +70,7 @@ describe( 'RangeControl', () => {
 			expect( rangeInput.value ).not.toBe( '10' );
 		} );
 
-		it( 'should not apply new value is greater than maximum', () => {
+		it( 'should not apply if new value is greater than maximum', () => {
 			const { container } = render( <RangeControl max={ 20 } /> );
 
 			const rangeInput = getRangeInput( container );
@@ -94,20 +82,38 @@ describe( 'RangeControl', () => {
 			expect( rangeInput.value ).not.toBe( '21' );
 		} );
 
-		it( 'should call onChange if new value is valid', () => {
+		it( 'should not call onChange if new value is invalid', () => {
 			const onChange = jest.fn();
 			const { container } = render(
 				<RangeControl onChange={ onChange } min={ 10 } max={ 20 } />
 			);
 
+			const numberInput = getNumberInput( container );
+
+			numberInput.focus();
+			fireEvent.change( numberInput, { target: { value: '25e' } } );
+
+			expect( onChange ).not.toHaveBeenCalled();
+		} );
+
+		it( 'should keep invalid values in number input until loss of focus', () => {
+			const onChange = jest.fn();
+			const { container } = render(
+				<RangeControl onChange={ onChange } min={ -1 } max={ 1 } />
+			);
+
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
-			fireEvent.change( numberInput, { target: { value: '15' } } );
-			fireEvent.blur( numberInput );
+			numberInput.focus();
+			fireEvent.change( numberInput, { target: { value: '-1.1' } } );
 
-			expect( onChange ).toHaveBeenCalledWith( 15 );
-			expect( rangeInput.value ).toBe( '15' );
+			expect( numberInput.value ).toBe( '-1.1' );
+			expect( rangeInput.value ).toBe( '-1' );
+
+			fireEvent.blur( numberInput );
+			expect( onChange ).toHaveBeenCalledWith( -1 );
+			expect( numberInput.value ).toBe( '-1' );
 		} );
 
 		it( 'should validate when provided a max or min of zero', () => {
@@ -118,6 +124,7 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
+			numberInput.focus();
 			fireEvent.change( numberInput, { target: { value: '1' } } );
 			fireEvent.blur( numberInput );
 
@@ -132,19 +139,15 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
-			fireEvent.change( numberInput, { target: { value: '-101' } } );
-			fireEvent.blur( numberInput );
+			numberInput.focus();
 
+			fireEvent.change( numberInput, { target: { value: '-101' } } );
 			expect( rangeInput.value ).toBe( '-100' );
 
 			fireEvent.change( numberInput, { target: { value: '-49' } } );
-			fireEvent.blur( numberInput );
-
 			expect( rangeInput.value ).toBe( '-50' );
 
 			fireEvent.change( numberInput, { target: { value: '-50' } } );
-			fireEvent.blur( numberInput );
-
 			expect( rangeInput.value ).toBe( '-50' );
 		} );
 
@@ -161,14 +164,13 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
+			numberInput.focus();
 			fireEvent.change( numberInput, { target: { value: '0.125' } } );
-			fireEvent.blur( numberInput );
 
 			expect( onChange ).toHaveBeenCalledWith( 0.125 );
 			expect( rangeInput.value ).toBe( '0.125' );
 
 			fireEvent.change( numberInput, { target: { value: '0.225' } } );
-			fireEvent.blur( numberInput );
 
 			expect( onChange ).toHaveBeenCalledWith( 0.225 );
 			expect( rangeInput.value ).toBe( '0.225' );
@@ -242,13 +244,14 @@ describe( 'RangeControl', () => {
 			const rangeInput = getRangeInput( container );
 			const numberInput = getNumberInput( container );
 
+			rangeInput.focus();
 			fireEvent.change( rangeInput, { target: { value: 13 } } );
 
 			expect( rangeInput.value ).toBe( '13' );
 			expect( numberInput.value ).toBe( '13' );
 
+			numberInput.focus();
 			fireEvent.change( numberInput, { target: { value: 7 } } );
-			fireEvent.blur( numberInput );
 
 			expect( rangeInput.value ).toBe( '7' );
 			expect( numberInput.value ).toBe( '7' );

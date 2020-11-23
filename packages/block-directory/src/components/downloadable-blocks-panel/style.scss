@@ -4,7 +4,7 @@
 	padding: $grid-unit-20;
 	margin: 0;
 	text-align: left;
-	color: $dark-gray-400;
+	color: $gray-700;
 }
 
 .block-directory-downloadable-blocks-panel__description.has-no-results {
@@ -13,7 +13,7 @@
 	padding: 0;
 	margin: $no-result-padding 0;
 	text-align: center;
-	color: $dark-gray-400;
+	color: $gray-700;
 	.components-spinner {
 		float: inherit;
 	}

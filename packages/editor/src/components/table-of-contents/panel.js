@@ -9,6 +9,7 @@ import { useSelect } from '@wordpress/data';
  */
 import WordCount from '../word-count';
 import DocumentOutline from '../document-outline';
+import CharacterCount from '../character-count';
 
 function TableOfContentsPanel( { hasOutlineItemsDisabled, onRequestClose } ) {
 	const { headingCount, paragraphCount, numberOfBlocks } = useSelect(
@@ -36,6 +37,12 @@ function TableOfContentsPanel( { hasOutlineItemsDisabled, onRequestClose } ) {
 				tabIndex="0"
 			>
 				<ul role="list" className="table-of-contents__counts">
+					<li className="table-of-contents__count">
+						{ __( 'Characters' ) }
+						<span className="table-of-contents__number">
+							<CharacterCount />
+						</span>
+					</li>
 					<li className="table-of-contents__count">
 						{ __( 'Words' ) }
 						<WordCount />

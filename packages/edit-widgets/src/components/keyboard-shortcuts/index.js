@@ -8,6 +8,7 @@ import { __ } from '@wordpress/i18n';
 
 function KeyboardShortcuts() {
 	const { redo, undo } = useDispatch( 'core' );
+	const { saveEditedWidgetAreas } = useDispatch( 'core/edit-widgets' );
 
 	useShortcut(
 		'core/edit-widgets/undo',
@@ -27,8 +28,18 @@ function KeyboardShortcuts() {
 		{ bindGlobal: true }
 	);
 
+	useShortcut(
+		'core/edit-widgets/save',
+		( event ) => {
+			event.preventDefault();
+			saveEditedWidgetAreas();
+		},
+		{ bindGlobal: true }
+	);
+
 	return null;
 }
+
 function KeyboardShortcutsRegister() {
 	// Registering the shortcuts
 	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
@@ -50,6 +61,16 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: 'z',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-widgets/save',
+			category: 'global',
+			description: __( 'Save your changes.' ),
+			keyCombination: {
+				modifier: 'primary',
+				character: 's',
 			},
 		} );
 	}, [ registerShortcut ] );

@@ -15,6 +15,10 @@ import warning from '@wordpress/warning';
  */
 import BlockControls from '../block-controls';
 
+function getComputedStyle( node ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
+
 export default function ExpandedBlockControlsContainer( {
 	children,
 	className,
@@ -53,10 +57,7 @@ function ExpandedBlockControlsHandler( { fills, className = '', children } ) {
 			}
 			toolbarContentElement.style.position = 'absolute';
 			toolbarContentElement.style.width = 'auto';
-			const contentCSS = window.getComputedStyle(
-				toolbarContentElement,
-				null
-			);
+			const contentCSS = getComputedStyle( toolbarContentElement );
 			setDimensions( {
 				width: contentCSS.getPropertyValue( 'width' ),
 				height: contentCSS.getPropertyValue( 'height' ),

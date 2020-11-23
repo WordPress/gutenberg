@@ -28,6 +28,7 @@ describe( 'BoxControl', () => {
 			const input = container.querySelector( 'input' );
 			const unitSelect = container.querySelector( 'select' );
 
+			input.focus();
 			fireEvent.change( input, { target: { value: '100%' } } );
 			fireEvent.keyDown( input, { keyCode: ENTER } );
 
@@ -41,14 +42,17 @@ describe( 'BoxControl', () => {
 			const { container, getByText } = render( <BoxControl /> );
 			const input = container.querySelector( 'input' );
 			const unitSelect = container.querySelector( 'select' );
+			const reset = getByText( /Reset/ );
 
+			input.focus();
 			fireEvent.change( input, { target: { value: '100px' } } );
 			fireEvent.keyDown( input, { keyCode: ENTER } );
 
 			expect( input.value ).toBe( '100' );
 			expect( unitSelect.value ).toBe( 'px' );
 
-			fireEvent.click( getByText( /Reset/ ) );
+			reset.focus();
+			fireEvent.click( reset );
 
 			expect( input.value ).toBe( '' );
 			expect( unitSelect.value ).toBe( 'px' );
@@ -68,14 +72,17 @@ describe( 'BoxControl', () => {
 			const { container, getByText } = render( <Example /> );
 			const input = container.querySelector( 'input' );
 			const unitSelect = container.querySelector( 'select' );
+			const reset = getByText( /Reset/ );
 
+			input.focus();
 			fireEvent.change( input, { target: { value: '100px' } } );
 			fireEvent.keyDown( input, { keyCode: ENTER } );
 
 			expect( input.value ).toBe( '100' );
 			expect( unitSelect.value ).toBe( 'px' );
 
-			fireEvent.click( getByText( /Reset/ ) );
+			reset.focus();
+			fireEvent.click( reset );
 
 			expect( input.value ).toBe( '' );
 			expect( unitSelect.value ).toBe( 'px' );
@@ -102,14 +109,17 @@ describe( 'BoxControl', () => {
 			const { container, getByText } = render( <Example /> );
 			const input = container.querySelector( 'input' );
 			const unitSelect = container.querySelector( 'select' );
+			const reset = getByText( /Reset/ );
 
+			input.focus();
 			fireEvent.change( input, { target: { value: '100px' } } );
 			fireEvent.keyDown( input, { keyCode: ENTER } );
 
 			expect( input.value ).toBe( '100' );
 			expect( unitSelect.value ).toBe( 'px' );
 
-			fireEvent.click( getByText( /Reset/ ) );
+			reset.focus();
+			fireEvent.click( reset );
 
 			expect( input.value ).toBe( '' );
 			expect( unitSelect.value ).toBe( 'px' );

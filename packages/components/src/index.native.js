@@ -20,7 +20,6 @@ export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as ToolbarItem } from './toolbar-item';
 export { default as Icon } from './icon';
-export { default as IconButton } from './button/deprecated';
 export { default as Spinner } from './spinner';
 export {
 	createSlotFill,
@@ -46,6 +45,7 @@ export { default as QueryControls } from './query-controls';
 export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
 export { default as RadioControl } from './radio-control';
+export { default as UnitControl } from './unit-control';
 
 // Higher-Order Components
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
@@ -73,17 +73,31 @@ export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as Gradient } from './mobile/gradient';
 export { default as ColorSettings } from './mobile/color-settings';
+export { LinkPicker } from './mobile/link-picker';
+export { default as LinkPickerScreen } from './mobile/link-picker/link-picker-screen';
 export { default as LinkSettings } from './mobile/link-settings';
+export { default as LinkSettingsScreen } from './mobile/link-settings/link-settings-screen';
+export { default as LinkSettingsNavigation } from './mobile/link-settings/link-settings-navigation';
 export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
+export { default as InserterButton } from './mobile/inserter-button';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';
+export {
+	WIDE_ALIGNMENTS,
+	ALIGNMENT_BREAKPOINTS,
+} from './mobile/utils/alignments';
+
+// Hooks
+export {
+	useConvertUnitToMobile,
+	getValueAndUnit,
+} from './mobile/utils/use-unit-converter-to-mobile';
 
 export {
 	default as GlobalStylesContext,
 	useGlobalStyles,
 	withGlobalStyles,
+	getMergedGlobalStyles,
 } from './mobile/global-styles-context';
-
-export * from './mobile/site-capabilities';
