@@ -260,7 +260,8 @@ export function* revertTemplate( template ) {
 		yield controls.dispatch(
 			'core/notices',
 			'createErrorNotice',
-			__( 'This template is not revertable' )
+			__( 'This template is not revertable' ),
+			{ type: 'snackbar' }
 		);
 		return;
 	}
@@ -288,7 +289,8 @@ export function* revertTemplate( template ) {
 			yield controls.dispatch(
 				'core/notices',
 				'createErrorNotice',
-				__( 'This template is not revertable' )
+				__( 'This template is not revertable' ),
+				{ type: 'snackbar' }
 			);
 			return;
 		}
@@ -297,7 +299,8 @@ export function* revertTemplate( template ) {
 		yield controls.dispatch(
 			'core/notices',
 			'createSuccessNotice',
-			__( 'Template reverted' )
+			__( 'Template reverted' ),
+			{ type: 'snackbar' }
 		);
 	} catch ( error ) {
 		const errorMessage =
@@ -307,7 +310,8 @@ export function* revertTemplate( template ) {
 		yield controls.dispatch(
 			'core/notices',
 			'createErrorNotice',
-			errorMessage
+			errorMessage,
+			{ type: 'snackbar' }
 		);
 	}
 }

@@ -36,6 +36,11 @@ export default function TemplateDetails( { template, onClose } ) {
 		currentTheme === template?.wp_theme_slug;
 	/* eslint-enable camelcase */
 
+	const revert = () => {
+		revertTemplate( template );
+		onClose();
+	};
+
 	const showTemplateInSidebar = () => {
 		onClose();
 		openNavigationPanelToMenu( MENU_TEMPLATES );
@@ -72,10 +77,7 @@ export default function TemplateDetails( { template, onClose } ) {
 			{ isRevertable && (
 				<div className="edit-site-template-details">
 					<Text variant="body">
-						<Button
-							isLink
-							onClick={ () => revertTemplate( template ) }
-						>
+						<Button isLink onClick={ revert }>
 							{ __( 'Revert' ) }
 						</Button>
 						<br />
