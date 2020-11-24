@@ -130,8 +130,9 @@ export class MediaUpload extends React.Component {
 		const isOneType = allowedTypes.length === 1;
 		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
 		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
+		const isAnyType = isOneType && allowedTypes.includes( MEDIA_TYPE_ANY );
 
-		if ( isImage || ! isOneType ) {
+		if ( isImage || ! isOneType || isAnyType ) {
 			return image;
 		} else if ( isVideo ) {
 			return video;
