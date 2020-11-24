@@ -8,10 +8,7 @@ import classnames from 'classnames';
  */
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
-import {
-	PinnedItems,
-	__experimentalMainDashboardButton as MainDashboardButton,
-} from '@wordpress/interface';
+import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -22,6 +19,7 @@ import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
+import MainDashboardButton from '../header/main-dashboard-button';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const {
