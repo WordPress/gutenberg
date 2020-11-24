@@ -3,6 +3,11 @@
  */
 import { View } from 'react-native';
 
+/**
+ * Internal dependencies
+ */
+import styles from './block-list-item.scss';
+
 function Grid( props ) {
 	/**
 	 * Since we don't have `calc()`, we must calculate our spacings here in
@@ -28,19 +33,22 @@ function Grid( props ) {
 	 * row).
 	 *
 	 */
-	const { columns, children, tileCount, index, maxWidth } = props;
+	const { numOfColumns, children, tileCount, index, maxWidth } = props;
 	const lastTile = tileCount - 1;
-	const lastRow = Math.floor( lastTile / columns );
+	const lastRow = Math.floor( lastTile / numOfColumns );
 
-	const row = Math.floor( index / columns );
-	const rowLength = row === lastRow ? ( lastTile % columns ) + 1 : columns;
+	const row = Math.floor( index / numOfColumns );
+	const rowLength =
+		row === lastRow ? ( lastTile % numOfColumns ) + 1 : numOfColumns;
 
 	return (
 		<View
-			style={ {
-				width: maxWidth / rowLength,
-				overflow: 'visible',
-			} }
+			style={ [
+				{
+					width: maxWidth / rowLength,
+				},
+				styles.gridItem,
+			] }
 		>
 			{ children }
 		</View>

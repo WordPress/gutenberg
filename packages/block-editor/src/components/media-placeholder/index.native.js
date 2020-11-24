@@ -37,6 +37,7 @@ function MediaPlaceholder( props ) {
 		height,
 		backgroundColor,
 		hideContent,
+		onFocus,
 	} = props;
 
 	// use ref to keep media array current for callbacks during rerenders
@@ -144,8 +145,8 @@ function MediaPlaceholder( props ) {
 							accessibilityRole={ 'button' }
 							accessibilityHint={ accessibilityHint }
 							onPress={ ( event ) => {
-								if ( props.onFocus ) {
-									props.onFocus( event );
+								if ( onFocus ) {
+									onFocus( event );
 								}
 								open();
 							} }

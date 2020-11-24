@@ -82,10 +82,12 @@ export class BlockListItem extends Component {
 			parentBlockAlignment,
 		} = this.props;
 		const isFullWidth = blockAlignment === WIDE_ALIGNMENTS.alignments.full;
+		const isParentFullWidth =
+			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
 
 		return [
 			readableContentViewStyle,
-			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full && {
+			isParentFullWidth && {
 				marginHorizontal: -marginHorizontal / 2,
 			},
 			isFullWidth &&
@@ -147,7 +149,7 @@ export class BlockListItem extends Component {
 		if ( gridProperties ) {
 			return (
 				<Grid
-					columns={ gridProperties.numColumns }
+					numOfColumns={ gridProperties.numColumns }
 					tileCount={ items.length }
 					index={ items.indexOf( clientId ) }
 					maxWidth={ parentWidth }

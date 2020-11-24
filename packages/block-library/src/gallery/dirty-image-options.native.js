@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { View, InteractionManager } from 'react-native';
+import { InteractionManager } from 'react-native';
 /**
  * WordPress dependencies
  */
 import { Picker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect, useState, Platform } from '@wordpress/element';
 
 const applyToAllImagesOption = {
 	id: 'applyToAllImagesOption',
@@ -17,10 +17,11 @@ const applyToAllImagesOption = {
 
 const options = [ applyToAllImagesOption ];
 
+const isIOS = Platform.OS === 'ios';
+
 export default ( { applyImageOptions, cancelImageOptions, isVisible } ) => {
 	const pickerRef = useRef();
-	const [ apply, setApply ] = useState(false);
-
+	const [ apply, setApply ] = useState( false );
 	useEffect( () => {
 		InteractionManager.runAfterInteractions( () => {
 			if ( isVisible && pickerRef.current ) {
@@ -31,30 +32,37 @@ export default ( { applyImageOptions, cancelImageOptions, isVisible } ) => {
 
 	const onChange = ( value ) => {
 		if ( value === applyToAllImagesOption.value ) {
-			setApply(true);
+			if ( isIOS ) {
+				applyImageOptions();
+			} else {
+				setApply( true );
+			}
 		}
 	};
 
 	const onClose = () => {
-		InteractionManager.runAfterInteractions( () => {
-			this.onFinish()
-		} );
-	}
+		if ( ! isIOS ) {
+			InteractionManager.runAfterInteractions( () => {
+				onFinish();
+			} );
+		}
+	};
 
-	onFinish = () => {
-		if( apply ) {
+	const onFinish = () => {
+		if ( apply ) {
 			applyImageOptions();
 		} else {
 			cancelImageOptions();
 		}
-		setApply(false);
-	}
+		setApply( false );
+	};
 
 	return (
 		<Picker
 			ref={ pickerRef }
 			options={ options }
 			onChange={ onChange }
+			onCancel={ isIOS && cancelImageOptions }
 			onClose={ onClose }
 			leftAlign={ true }
 			title={ __( 'Apply to all images in this gallery?' ) }

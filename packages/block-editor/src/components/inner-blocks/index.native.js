@@ -32,9 +32,9 @@ import { defaultLayout, LayoutProvider } from './layout';
  * returns. Optionally, you can also pass any other props through this hook, and
  * they will be merged and returned.
  *
- * @param {Object} props   Optional. Props to pass to the element. Must contain
+ * @param {Object} props   Props to pass to the element. Must contain
  *                         the ref if one is defined.
- * @param {Object} options Optional. Inner blocks options.
+ * @param {Object} options Inner blocks options.
  *
  * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
  */
