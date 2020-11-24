@@ -66,26 +66,22 @@ export default function save( { attributes } ) {
 		</>
 	);
 
-	const blockProps = useBlockProps.save();
+	const blockProps = useBlockProps.save( { className: classes } );
 	if ( isListItem ) {
 		return (
-			<li { ...blockProps }>
-				<figure className={ classes }>{ figure }</figure>
+			<li className="list-image">
+				<figure { ...blockProps }>{ figure }</figure>
 			</li>
 		);
 	}
 
 	if ( 'left' === align || 'right' === align || 'center' === align ) {
 		return (
-			<div { ...blockProps }>
+			<div { ...useBlockProps.save() }>
 				<figure className={ classes }>{ figure }</figure>
 			</div>
 		);
 	}
 
-	return (
-		<figure { ...useBlockProps.save( { className: classes } ) }>
-			{ figure }
-		</figure>
-	);
+	return <figure { ...blockProps }>{ figure }</figure>;
 }

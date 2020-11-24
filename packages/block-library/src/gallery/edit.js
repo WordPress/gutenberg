@@ -1,18 +1,28 @@
 /**
  * External dependencies
  */
-import { isEqual, isEmpty, find, concat, differenceBy } from 'lodash';
+import {
+	isEqual,
+	isEmpty,
+	find,
+	concat,
+	differenceBy,
+	some,
+	every,
+} from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { compose } from '@wordpress/compose';
 import {
+	BaseControl,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
 	withNotices,
 	RangeControl,
+	Spinner,
 } from '@wordpress/components';
 import {
 	MediaPlaceholder,
@@ -110,11 +120,10 @@ function GalleryEdit( props ) {
 		}
 	}, [ currentImageOptions, imageSettings ] );
 
-	const { getBlock, getMedia, getSettings } = useSelect( ( select ) => {
+	const { getBlock, getSettings } = useSelect( ( select ) => {
 		return {
 			getBlock: select( 'core/block-editor' ).getBlock,
 			getSettings: select( 'core/block-editor' ).getSettings,
-			getMedia: select( 'core' ).getMedia,
 		};
 	}, [] );
 
@@ -128,8 +137,36 @@ function GalleryEdit( props ) {
 				id: block.attributes.id,
 				url: block.attributes.url,
 				attributes: block.attributes,
-				imageData: getMedia( block.attributes.id ),
 			} ) ),
+		[ innerBlockImages ]
+	);
+
+	const imageData = useSelect(
+		( select ) => {
+			if (
+				innerBlockImages.length === 0 ||
+				some(
+					innerBlockImages,
+					( imageBlock ) => ! imageBlock.attributes.id
+				)
+			) {
+				return imageData;
+			}
+
+			const getMedia = select( 'core' ).getMedia;
+			const newImageData = innerBlockImages.map( ( imageBlock ) => {
+				return {
+					id: imageBlock.attributes.id,
+					data: getMedia( imageBlock.attributes.id ),
+				};
+			} );
+
+			if ( every( newImageData, ( img ) => img.data ) ) {
+				return newImageData;
+			}
+
+			return imageData;
+		},
 		[ innerBlockImages ]
 	);
 
@@ -140,10 +177,9 @@ function GalleryEdit( props ) {
 	}, [ images ] );
 
 	const imageSizeOptions = useImageSizes(
-		images,
+		imageData,
 		isSelected,
-		getSettings,
-		getMedia
+		getSettings
 	);
 
 	const { replaceInnerBlocks, updateBlockAttributes } = useDispatch(
@@ -258,15 +294,12 @@ function GalleryEdit( props ) {
 	function applyImageOptions() {
 		getBlock( clientId ).innerBlocks.forEach( ( block ) => {
 			const image = block.attributes.id
-				? find( images, { id: block.attributes.id } )
+				? find( imageData, { id: block.attributes.id } )
 				: null;
-			if ( ! image.imageData ) {
-				image.imageData = getMedia( image.id );
-			}
 			updateBlockAttributes( block.clientId, {
-				...getHrefAndDestination( image.imageData, linkTo ),
+				...getHrefAndDestination( image.data, linkTo ),
 				...getUpdatedLinkTargetSettings( linkTarget, block.attributes ),
-				...getImageSizeAttributes( image.imageData, sizeSlug ),
+				...getImageSizeAttributes( image.data, sizeSlug ),
 			} );
 		} );
 		setDirtyImageOptions( false );
@@ -333,7 +366,7 @@ function GalleryEdit( props ) {
 		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
 	}
 
-	const shouldShowSizeOptions = hasImages && ! isEmpty( imageSizeOptions );
+	const shouldShowSizeOptions = ! isEmpty( imageSizeOptions );
 	const hasLinkTo = linkTo && linkTo !== 'none';
 
 	return (
@@ -370,13 +403,23 @@ function GalleryEdit( props ) {
 							onChange={ toggleOpenInNewTab }
 						/>
 					) }
-					{ shouldShowSizeOptions && (
+					{ shouldShowSizeOptions ? (
 						<SelectControl
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
 						/>
+					) : (
+						<BaseControl className={ 'gallery-image-sizes' }>
+							<BaseControl.VisualLabel>
+								{ __( 'Image size' ) }
+							</BaseControl.VisualLabel>
+							<View className={ 'gallery-image-sizes__loading' }>
+								<Spinner />
+								{ __( 'Loading options…' ) }
+							</View>
+						</BaseControl>
 					) }
 					<DirtyImageOptions
 						isVisible={ dirtyImageOptions }

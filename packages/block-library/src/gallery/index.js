@@ -25,17 +25,24 @@ export const settings = {
 	example: {
 		attributes: {
 			columns: 2,
-			images: [
-				{
+			imageCount: 2,
+		},
+		innerBlocks: [
+			{
+				name: 'core/image',
+				attributes: {
 					url:
 						'https://s.w.org/images/core/5.3/Glacial_lakes%2C_Bhutan.jpg',
 				},
-				{
+			},
+			{
+				name: 'core/image',
+				attributes: {
 					url:
 						'https://s.w.org/images/core/5.3/Sediment_off_the_Yucatan_Peninsula.jpg',
 				},
-			],
-		},
+			},
+		],
 	},
 	transforms,
 	edit,
