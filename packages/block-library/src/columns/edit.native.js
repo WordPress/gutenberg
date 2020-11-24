@@ -3,7 +3,6 @@
  */
 import { View, Dimensions } from 'react-native';
 import { dropRight, times, map, compact, delay } from 'lodash';
-
 /**
  * WordPress dependencies
  */
@@ -25,7 +24,13 @@ import {
 	BlockVariationPicker,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState, useContext } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useContext,
+	useMemo,
+	useCallback,
+} from '@wordpress/element';
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { columns } from '@wordpress/icons';
@@ -129,9 +134,7 @@ function ColumnsEditContainer( {
 					] }
 				>
 					<InnerBlocks.ButtonBlockAppender
-						onAddBlock={ () =>
-							updateColumns( columnCount, columnCount + 1 )
-						}
+						onAddBlock={ onAddBlock }
 					/>
 				</View>
 			);
@@ -139,13 +142,21 @@ function ColumnsEditContainer( {
 		return null;
 	};
 
-	const contentWidths = getContentWidths(
-		columnsInRow,
-		width,
-		columnCount,
-		innerColumns,
-		globalStyles
+	const contentWidths = useMemo(
+		() =>
+			getContentWidths(
+				columnsInRow,
+				width,
+				columnCount,
+				innerColumns,
+				globalStyles
+			),
+		[ width, columnsInRow, columnCount, innerColumns, globalStyles ]
 	);
+
+	const onAddBlock = useCallback( () => {
+		updateColumns( columnCount, columnCount + 1 );
+	}, [ columnCount ] );
 
 	const onChangeWidth = ( { nextWidth, valueUnit, columnId } ) => {
 		const widthWithUnit = getWidthWithUnit(
@@ -264,9 +275,7 @@ function ColumnsEditContainer( {
 						horizontal={ true }
 						allowedBlocks={ ALLOWED_BLOCKS }
 						contentResizeMode="stretch"
-						onAddBlock={ () =>
-							updateColumns( columnCount, columnCount + 1 )
-						}
+						onAddBlock={ onAddBlock }
 						onDeleteBlock={
 							columnCount === 1 ? onDeleteBlock : undefined
 						}
