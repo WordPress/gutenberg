@@ -22,11 +22,6 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { postFeaturedImage } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import { unsetPostFeaturedImage } from './icons';
-
 const ALLOWED_MEDIA_TYPES = [ 'image' ];
 const placeholderChip = (
 	<div className="post-featured-image_placeholder">
@@ -109,15 +104,13 @@ function PostFeaturedImageDisplay( {
 			</InspectorControls>
 			<BlockControls>
 				{ !! media && (
-					<>
-						<ToolbarGroup>
-							<ToolbarButton
-								name="unset"
-								icon={ unsetPostFeaturedImage }
-								title={ __( 'Unset' ) }
-								onClick={ () => setFeaturedImage( 0 ) }
-							/>
-						</ToolbarGroup>
+					<ToolbarGroup>
+						<ToolbarButton
+							name="unset"
+							onClick={ () => setFeaturedImage( 0 ) }
+						>
+							{ __( 'Clear' ) }
+						</ToolbarButton>
 						<MediaReplaceFlow
 							mediaId={ featuredImage }
 							mediaURL={ media.source_url }
@@ -126,7 +119,7 @@ function PostFeaturedImageDisplay( {
 							onSelect={ onSelectImage }
 							onError={ onUploadError }
 						/>
-					</>
+					</ToolbarGroup>
 				) }
 			</BlockControls>
 			<div { ...useBlockProps() }>{ image }</div>
