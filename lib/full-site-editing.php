@@ -11,7 +11,7 @@
  * @return boolean Whether the current theme is an FSE theme or not.
  */
 function gutenberg_is_fse_theme() {
-	return is_readable( get_stylesheet_directory() . '/block-templates/index.html' );
+	return is_readable( locate_template( 'block-templates/index.html' ) );
 }
 
 /**
@@ -21,6 +21,7 @@ function gutenberg_full_site_editing_notice() {
 	if ( ! gutenberg_is_fse_theme() ) {
 		return;
 	}
+
 	?>
 	<div class="notice notice-warning">
 		<p><?php _e( 'You\'re using an experimental Full Site Editing theme. Full Site Editing is an experimental feature and potential API changes are to be expected!', 'gutenberg' ); ?></p>
