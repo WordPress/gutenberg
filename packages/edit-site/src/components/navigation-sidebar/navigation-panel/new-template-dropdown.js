@@ -64,6 +64,10 @@ export default function NewTemplateDropdown() {
 			! includes( existingTemplateSlugs, template.slug )
 	);
 
+	if ( ! missingTemplates.length ) {
+		return null;
+	}
+
 	return (
 		<DropdownMenu
 			className="edit-site-navigation-panel__new-template-dropdown"
