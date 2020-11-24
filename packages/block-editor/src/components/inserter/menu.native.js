@@ -21,6 +21,7 @@ import {
 	BottomSheet,
 	BottomSheetConsumer,
 	InserterButton,
+	ClipboardConsumer,
 } from '@wordpress/components';
 
 /**
@@ -111,6 +112,37 @@ export class InserterMenu extends Component {
 		this.setState( { numberOfColumns, itemWidth, maxWidth } );
 	}
 
+	getItems( clipboard ) {
+		const {
+			items,
+			canInsertBlockType,
+			destinationRootClientId,
+			getBlockType,
+		} = this.props;
+
+		const { current: currentClipboard } = clipboard;
+		const clipboardBlock =
+			currentClipboard && rawHandler( { HTML: currentClipboard } )[ 0 ];
+		const shouldAddClipboardBlock =
+			clipboardBlock &&
+			canInsertBlockType( clipboardBlock.name, destinationRootClientId );
+
+		return shouldAddClipboardBlock
+			? [
+					{
+						...pick( getBlockType( clipboardBlock.name ), [
+							'name',
+							'icon',
+						] ),
+						id: 'clipboard',
+						initialAttributes: clipboardBlock.attributes,
+						innerBlocks: clipboardBlock.innerBlocks,
+					},
+					...items,
+			  ]
+			: items;
+	}
+
 	renderItem( { item } ) {
 		const { itemWidth, maxWidth } = this.state;
 		const { onSelect } = this.props;
@@ -125,48 +157,55 @@ export class InserterMenu extends Component {
 	}
 
 	render() {
-		const { items } = this.props;
 		const { numberOfColumns } = this.state;
 
 		return (
-			<BottomSheet
-				isVisible={ true }
-				onClose={ this.onClose }
-				hideHeader
-				hasNavigation
-			>
-				<TouchableHighlight accessible={ false }>
-					<BottomSheetConsumer>
-						{ ( { listProps, safeAreaBottomInset } ) => (
-							<FlatList
-								onLayout={ this.onLayout }
-								key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-								keyboardShouldPersistTaps="always"
-								numColumns={ numberOfColumns }
-								data={ items }
-								ItemSeparatorComponent={ () => (
-									<TouchableWithoutFeedback
-										accessible={ false }
-									>
-										<View style={ styles.rowSeparator } />
-									</TouchableWithoutFeedback>
+			<ClipboardConsumer>
+				{ ( { clipboard } ) => (
+					<BottomSheet
+						isVisible={ true }
+						onClose={ this.onClose }
+						hideHeader
+						hasNavigation
+					>
+						<TouchableHighlight accessible={ false }>
+							<BottomSheetConsumer>
+								{ ( { listProps, safeAreaBottomInset } ) => (
+									<FlatList
+										onLayout={ this.onLayout }
+										key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+										keyboardShouldPersistTaps="always"
+										numColumns={ numberOfColumns }
+										data={ this.getItems( clipboard ) }
+										ItemSeparatorComponent={ () => (
+											<TouchableWithoutFeedback
+												accessible={ false }
+											>
+												<View
+													style={
+														styles.rowSeparator
+													}
+												/>
+											</TouchableWithoutFeedback>
+										) }
+										keyExtractor={ ( item ) => item.name }
+										renderItem={ this.renderItem }
+										{ ...listProps }
+										contentContainerStyle={ [
+											...listProps.contentContainerStyle,
+											{
+												paddingBottom:
+													safeAreaBottomInset ||
+													styles.list.paddingBottom,
+											},
+										] }
+									/>
 								) }
-								keyExtractor={ ( item ) => item.name }
-								renderItem={ this.renderItem }
-								{ ...listProps }
-								contentContainerStyle={ [
-									...listProps.contentContainerStyle,
-									{
-										paddingBottom:
-											safeAreaBottomInset ||
-											styles.list.paddingBottom,
-									},
-								] }
-							/>
-						) }
-					</BottomSheetConsumer>
-				</TouchableHighlight>
-			</BottomSheet>
+							</BottomSheetConsumer>
+						</TouchableHighlight>
+					</BottomSheet>
+				) }
+			</ClipboardConsumer>
 		);
 	}
 }
@@ -182,7 +221,6 @@ export default compose(
 			canInsertBlockType,
 		} = select( 'core/block-editor' );
 		const { getChildBlockNames, getBlockType } = select( 'core/blocks' );
-		const { getClipboard } = select( 'core/editor' );
 
 		let destinationRootClientId = rootClientId;
 		if ( ! destinationRootClientId && ! clientId && ! isAppender ) {
@@ -199,31 +237,14 @@ export default compose(
 		const {
 			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
 		} = getSettings();
-		const clipboard = getClipboard();
-		const clipboardBlock =
-			clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
-		const shouldAddClipboardBlock =
-			clipboardBlock &&
-			canInsertBlockType( clipboardBlock.name, destinationRootClientId );
 
 		return {
 			rootChildBlocks: getChildBlockNames( destinationRootBlockName ),
-			items: shouldAddClipboardBlock
-				? [
-						{
-							...pick( getBlockType( clipboardBlock.name ), [
-								'name',
-								'icon',
-							] ),
-							id: 'clipboard',
-							initialAttributes: clipboardBlock.attributes,
-							innerBlocks: clipboardBlock.innerBlocks,
-						},
-						...getInserterItems( destinationRootClientId ),
-				  ]
-				: getInserterItems( destinationRootClientId ),
+			items: getInserterItems( destinationRootClientId ),
 			destinationRootClientId,
 			shouldInsertAtTheTop,
+			getBlockType,
+			canInsertBlockType,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps, { select } ) => {
