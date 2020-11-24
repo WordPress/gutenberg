@@ -23,23 +23,23 @@ const isTabbableTextField = overEvery( [
 ] );
 
 export function useCanvasClickRedirect( ref ) {
-	function onClick( event ) {
-		// Only handle clicks directly on the canvas itself, not on content.
-		if ( event.target !== ref.current ) {
-			return;
-		}
-
-		const focusableNodes = focus.focusable.find( ref.current );
-		const target = findLast( focusableNodes, isTabbableTextField );
-
-		if ( ! target ) {
-			return;
-		}
-
-		placeCaretAtHorizontalEdge( target, true );
-	}
-
 	useEffect( () => {
+		function onClick( event ) {
+			// Only handle clicks directly on the canvas itself, not on content.
+			if ( event.target !== ref.current ) {
+				return;
+			}
+
+			const focusableNodes = focus.focusable.find( ref.current );
+			const target = findLast( focusableNodes, isTabbableTextField );
+
+			if ( ! target ) {
+				return;
+			}
+
+			placeCaretAtHorizontalEdge( target, true );
+		}
+
 		ref.current.addEventListener( 'click', onClick );
 
 		return () => {
