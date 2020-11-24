@@ -7,6 +7,10 @@ import { castArray } from 'lodash';
  * WordPress dependencies
  */
 import { controls } from '@wordpress/data';
+/**
+ * Internal dependencies
+ */
+import * as postControls from './controls';
 
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
@@ -153,11 +157,12 @@ export function toggleFeature( feature ) {
 	};
 }
 
-export function switchEditorMode( mode ) {
-	return {
+export function* switchEditorMode( mode ) {
+	yield {
 		type: 'SWITCH_MODE',
 		mode,
 	};
+	yield postControls.switchMode( mode );
 }
 
 /**
@@ -239,25 +244,23 @@ export function showBlockTypes( blockNames ) {
  * what Meta boxes are available in which location.
  *
  * @param {Object} metaBoxesPerLocation Meta boxes per location.
- *
- * @return {Object} Action object.
  */
-export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
-	return {
+export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
+	yield {
 		type: 'SET_META_BOXES_PER_LOCATIONS',
 		metaBoxesPerLocation,
 	};
+	yield postControls.setMetaBoxesPerLocation( metaBoxesPerLocation );
 }
 
 /**
  * Returns an action object used to request meta box update.
- *
- * @return {Object} Action object.
  */
-export function requestMetaBoxUpdates() {
-	return {
+export function* requestMetaBoxUpdates() {
+	yield {
 		type: 'REQUEST_META_BOX_UPDATES',
 	};
+	yield postControls.requestMetaBoxUpdates();
 }
 
 /**
