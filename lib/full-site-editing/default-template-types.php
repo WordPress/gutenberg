@@ -31,7 +31,7 @@ function gutenberg_get_default_template_types() {
 		),
 		'single'         => array(
 			'title'       => _x( 'Single', 'Template name', 'gutenberg' ),
-			'description' => __( 'Used when a single entry that is not a Page is queried.', 'gutenberg' ),
+			'description' => __( 'Used when a single entry that is not a Page is queried', 'gutenberg' ),
 		),
 		'single-post'    => array(
 			'title'       => _x( 'Post', 'Template name', 'gutenberg' ),

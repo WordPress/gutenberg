@@ -121,7 +121,8 @@
 		margin: 0;
 	}
 }
-
 .edit-site-navigation-panel__new-template-popover {
-	min-width: 300px;
+	@include break-small() {
+		min-width: 300px;
+	}
 }
