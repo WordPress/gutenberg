@@ -27,9 +27,12 @@
 	}
 }
 
-// Hide the extra space when there are metaboxes.
-.has-metaboxes .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
-	height: 0;
+.editor-styles-wrapper {
+	cursor: text;
+
+	> * {
+		cursor: auto;
+	}
 }
 
 // Ideally this wrapper div is not needed but if we want to match the positioning of blocks

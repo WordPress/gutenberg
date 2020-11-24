@@ -31,9 +31,13 @@ export default function VisualEditor() {
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
 	}, [] );
+	const hasMetaBoxes = useSelect(
+		( select ) => select( 'core/edit-post' ).hasMetaBoxes(),
+		[]
+	);
 	const inlineStyles = useResizeCanvas( deviceType ) || {
 		height: '100%',
-		paddingBottom: '40vh',
+		paddingBottom: hasMetaBoxes ? null : '40vh',
 	};
 
 	useScrollMultiSelectionIntoView( ref );
