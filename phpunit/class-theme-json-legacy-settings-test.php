@@ -48,7 +48,7 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual = WP_Theme_JSON_Resolver::extract_legacy_settings( $input );
+		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );
 
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
@@ -73,7 +73,7 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual = WP_Theme_JSON_Resolver::extract_legacy_settings( $input );
+		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );
 
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
@@ -86,7 +86,7 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 			'units' => array( array() ),
 		);
 
-		$actual = WP_Theme_JSON_Resolver::extract_legacy_settings( $input );
+		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );
 
 		$this->assertEqualSetsWithIndex( $expected, $actual['global']['settings']['spacing'] );
 	}
@@ -99,7 +99,7 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 			'units' => array( 'px', 'em', 'rem', 'vh', 'vw' ),
 		);
 
-		$actual = WP_Theme_JSON_Resolver::extract_legacy_settings( $input );
+		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );
 
 		$this->assertEqualSetsWithIndex( $expected, $actual['global']['settings']['spacing'] );
 	}
@@ -112,7 +112,7 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 			'units' => array( 'rem', 'em' ),
 		);
 
-		$actual = WP_Theme_JSON_Resolver::extract_legacy_settings( $input );
+		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );
 
 		$this->assertEqualSetsWithIndex( $expected, $actual['global']['settings']['spacing'] );
 	}
@@ -186,7 +186,7 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$actual = WP_Theme_JSON_Resolver::extract_legacy_settings( $input );
+		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );
 
 		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
