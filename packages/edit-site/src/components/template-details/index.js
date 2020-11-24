@@ -70,11 +70,10 @@ export default function TemplateDetails( { template, onClose } ) {
 
 			{ isTemplateRevertable( template, currentTheme ) && (
 				<div className="edit-site-template-details">
-					<Text variant="body">
-						<Button isLink onClick={ revert }>
-							{ __( 'Revert' ) }
-						</Button>
-						<br />
+					<Button isLink onClick={ revert }>
+						{ __( 'Revert' ) }
+					</Button>
+					<Text variant="caption">
 						{ __(
 							'Reset this template to the theme supplied default'
 						) }
