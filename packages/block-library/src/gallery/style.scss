@@ -7,8 +7,8 @@
 		// Some themes give all <ul> default margin instead of padding.
 		margin: 0;
 
-		// Need to add the bogus :not(#individual-image) to override long not:() specificity chain
-		// on default image block on front end.
+		// Need to add the bogus :not(#individual-image) to override long :not()
+		// specificity chain on default image block on front end.
 		// Add space between thumbnails, and unset right most thumbnails later.
 		li.list-image:not(#individual-image) {
 			margin: 0 $grid-unit-20 $grid-unit-20 0;
@@ -24,7 +24,9 @@
 			justify-content: center;
 			position: relative;
 
-			figure,
+			// Again, we need :not(#individual-image) to override long :not()
+			// chain on frontend styles.
+			figure:not(#individual-image),
 			figure > div {
 				margin: 0;
 				height: 100%;
