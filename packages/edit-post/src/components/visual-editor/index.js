@@ -15,6 +15,7 @@ import {
 	__unstableUseScrollMultiSelectionIntoView as useScrollMultiSelectionIntoView,
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
+	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
@@ -30,13 +31,17 @@ export default function VisualEditor() {
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
 	}, [] );
-	const inlineStyles = useResizeCanvas( deviceType );
+	const inlineStyles = useResizeCanvas( deviceType ) || {
+		height: '100%',
+		paddingBottom: '40vh',
+	};
 
 	useScrollMultiSelectionIntoView( ref );
 	useBlockSelectionClearer( ref );
 	useTypewriter( ref );
 	useClipboardHandler( ref );
 	useTypingObserver( ref );
+	useCanvasClickRedirect( ref );
 
 	return (
 		<div className="edit-post-visual-editor">
