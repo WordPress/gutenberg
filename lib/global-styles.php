@@ -160,9 +160,11 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	$settings = gutenberg_get_common_block_editor_settings();
+	$settings           = gutenberg_get_common_block_editor_settings();
+	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
+
 	$resolver = new WP_Theme_JSON_Resolver();
-	$all      = $resolver->get_origin( $settings );
+	$all      = $resolver->get_origin( $theme_support_data );
 
 	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
 	if ( empty( $stylesheet ) ) {
@@ -181,14 +183,7 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	$resolver = new WP_Theme_JSON_Resolver();
-	$all      = $resolver->get_origin( $settings );
-	$base     = $resolver->get_origin( $settings, 'theme' );
-
-	// STEP 1: ADD FEATURES
-	// These need to be added to settings always.
-	// We also need to unset the deprecated settings defined by core.
-	$settings['__experimentalFeatures'] = $all->get_settings();
+	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
 	unset( $settings['colors'] );
 	unset( $settings['disableCustomColors'] );
 	unset( $settings['disableCustomFontSizes'] );
@@ -197,6 +192,14 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['enableCustomUnits'] );
 	unset( $settings['fontSizes'] );
 	unset( $settings['gradients'] );
+
+	$resolver = new WP_Theme_JSON_Resolver();
+	$all      = $resolver->get_origin( $theme_support_data );
+	$base     = $resolver->get_origin( $theme_support_data, 'theme' );
+
+	// STEP 1: ADD FEATURES
+	// These need to be added to settings always.
+	$settings['__experimentalFeatures'] = $all->get_settings();
 
 	// STEP 2 - IF EDIT-SITE, ADD DATA REQUIRED FOR GLOBAL STYLES SIDEBAR
 	// The client needs some information to be able to access/update the user styles.
