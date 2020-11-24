@@ -20,7 +20,6 @@ import {
  * Internal dependencies
  */
 import { useQueryContext } from '../query';
-import { getTemplateQuery } from './utils';
 
 const TEMPLATE = [
 	[ 'core/post-title' ],
@@ -81,11 +80,26 @@ export default function QueryLoopEdit( {
 				query.sticky = sticky === 'only';
 			}
 
-			if ( isGlobalQuery ) {
-				const templateQuery = getTemplateQuery();
-				Object.keys( templateQuery ).forEach( ( key ) => {
-					query[ key ] = templateQuery[ key ];
-				} );
+			// When you insert this block outside of the edit site then store
+			// does not exist therefore we check for its existence.
+			if ( isGlobalQuery && select( 'core/edit-site' ) ) {
+				// This should be passed from the context exposed by edit site.
+				const { getTemplateId, getTemplateType } = select(
+					'core/edit-site'
+				);
+
+				if ( 'wp_template' === getTemplateType() ) {
+					const { slug } = select( 'core' ).getEntityRecord(
+						'postType',
+						'wp_template',
+						getTemplateId()
+					);
+
+					// Change the post-type if needed.
+					if ( slug?.startsWith( 'archive-' ) ) {
+						query.postType = slug.replace( 'archive-', '' );
+					}
+				}
 			}
 
 			return {
@@ -107,6 +121,7 @@ export default function QueryLoopEdit( {
 			postType,
 			exclude,
 			sticky,
+			isGlobalQuery,
 		]
 	);
 
