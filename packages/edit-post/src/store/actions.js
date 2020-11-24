@@ -253,6 +253,8 @@ export function showBlockTypes( blockNames ) {
 	};
 }
 
+let saveMetaboxUnsubscribe;
+
 /**
  * Returns an action object used in signaling
  * what Meta boxes are available in which location.
@@ -296,7 +298,7 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 	}
 
 	// Save metaboxes when performing a full save on the post.
-	const saveMetaboxUnsubscribe = subscribe( () => {
+	saveMetaboxUnsubscribe = subscribe( () => {
 		const isSavingPost = select( 'core/editor' ).isSavingPost();
 		const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
 
