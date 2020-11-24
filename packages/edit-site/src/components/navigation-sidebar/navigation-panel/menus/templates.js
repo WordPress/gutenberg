@@ -12,6 +12,7 @@ import {
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
+import { useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -30,7 +31,6 @@ import TemplatesAllMenu from './templates-all';
 import NewTemplateDropdown from '../new-template-dropdown';
 import TemplateNavigationItem from '../template-navigation-item';
 import SearchResults from '../search-results';
-import useDebouncedSearch from '../use-debounced-search';
 
 const renderSearchResultItem = ( template ) => (
 	<TemplateNavigationItem
@@ -40,12 +40,10 @@ const renderSearchResultItem = ( template ) => (
 );
 
 export default function TemplatesMenu() {
-	const {
-		search,
-		searchQuery,
-		onSearch,
-		isDebouncing,
-	} = useDebouncedSearch();
+	const [ search, setSearch ] = useState( '' );
+	const onSearch = useCallback( ( value ) => {
+		setSearch( value );
+	} );
 
 	const templates = useSelect(
 		( select ) =>
@@ -73,9 +71,8 @@ export default function TemplatesMenu() {
 			{ search && (
 				<SearchResults
 					items={ templates }
-					searchQuery={ searchQuery }
+					search={ search }
 					renderItem={ renderSearchResultItem }
-					isDebouncing={ isDebouncing }
 				/>
 			) }
 

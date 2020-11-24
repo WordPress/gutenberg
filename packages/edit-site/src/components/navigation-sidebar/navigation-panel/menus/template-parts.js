@@ -12,6 +12,7 @@ import {
 	__experimentalNavigationMenu as NavigationMenu,
 	__experimentalNavigationItem as NavigationItem,
 } from '@wordpress/components';
+import { useState, useCallback } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -19,7 +20,6 @@ import {
 import TemplateNavigationItem from '../template-navigation-item';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS } from '../constants';
 import SearchResults from '../search-results';
-import useDebouncedSearch from '../use-debounced-search';
 
 const renderSearchResultItem = ( templatePart ) => (
 	<TemplateNavigationItem
@@ -29,12 +29,10 @@ const renderSearchResultItem = ( templatePart ) => (
 );
 
 export default function TemplatePartsMenu() {
-	const {
-		search,
-		searchQuery,
-		onSearch,
-		isDebouncing,
-	} = useDebouncedSearch();
+	const [ search, setSearch ] = useState( '' );
+	const onSearch = useCallback( ( value ) => {
+		setSearch( value );
+	} );
 
 	const templateParts = useSelect( ( select ) => {
 		const unfilteredTemplateParts =
@@ -61,9 +59,8 @@ export default function TemplatePartsMenu() {
 			{ search && (
 				<SearchResults
 					items={ templateParts }
-					searchQuery={ searchQuery }
+					search={ search }
 					renderItem={ renderSearchResultItem }
-					isDebouncing={ isDebouncing }
 				/>
 			) }
 
