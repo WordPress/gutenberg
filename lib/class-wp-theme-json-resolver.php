@@ -1,10 +1,15 @@
 <?php
 /**
- * Class that works with the managed styles.
+ * Process the different data sources for site-level
+ * config and offers and API to work with them.
  *
  * @package gutenberg
  */
 
+/**
+ * Class that abstracts the processing
+ * of the different data sources.
+ */
 class WP_Theme_JSON_Resolver {
 
 	/**
@@ -100,18 +105,18 @@ class WP_Theme_JSON_Resolver {
 		}
 
 		$default_gradients_i18n = array(
-			'vivid-cyan-blue-to-vivid-purple'               => __( 'Vivid cyan blue to vivid purple', 'gutenberg' ),
-			'light-green-cyan-to-vivid-green-cyan'          => __( 'Light green cyan to vivid green cyan', 'gutenberg' ),
+			'vivid-cyan-blue-to-vivid-purple'      => __( 'Vivid cyan blue to vivid purple', 'gutenberg' ),
+			'light-green-cyan-to-vivid-green-cyan' => __( 'Light green cyan to vivid green cyan', 'gutenberg' ),
 			'luminous-vivid-amber-to-luminous-vivid-orange' => __( 'Luminous vivid amber to luminous vivid orange', 'gutenberg' ),
-			'luminous-vivid-orange-to-vivid-red'            => __( 'Luminous vivid orange to vivid red', 'gutenberg' ),
-			'very-light-gray-to-cyan-bluish-gray'           => __( 'Very light gray to cyan bluish gray', 'gutenberg' ),
-			'cool-to-warm-spectrum'                         => __( 'Cool to warm spectrum', 'gutenberg' ),
-			'blush-light-purple'                            => __( 'Blush light purple', 'gutenberg' ),
-			'blush-bordeaux'                                => __( 'Blush bordeaux', 'gutenberg' ),
-			'luminous-dusk'                                 => __( 'Luminous dusk', 'gutenberg' ),
-			'pale-ocean'                                    => __( 'Pale ocean', 'gutenberg' ),
-			'electric-grass'                                => __( 'Electric grass', 'gutenberg' ),
-			'midnight'                                      => __( 'Midnight', 'gutenberg' ),
+			'luminous-vivid-orange-to-vivid-red'   => __( 'Luminous vivid orange to vivid red', 'gutenberg' ),
+			'very-light-gray-to-cyan-bluish-gray'  => __( 'Very light gray to cyan bluish gray', 'gutenberg' ),
+			'cool-to-warm-spectrum'                => __( 'Cool to warm spectrum', 'gutenberg' ),
+			'blush-light-purple'                   => __( 'Blush light purple', 'gutenberg' ),
+			'blush-bordeaux'                       => __( 'Blush bordeaux', 'gutenberg' ),
+			'luminous-dusk'                        => __( 'Luminous dusk', 'gutenberg' ),
+			'pale-ocean'                           => __( 'Pale ocean', 'gutenberg' ),
+			'electric-grass'                       => __( 'Electric grass', 'gutenberg' ),
+			'midnight'                             => __( 'Midnight', 'gutenberg' ),
 		);
 		if ( ! empty( $config['global']['settings']['color']['gradients'] ) ) {
 			foreach ( $config['global']['settings']['color']['gradients'] as &$gradient ) {
@@ -384,9 +389,9 @@ class WP_Theme_JSON_Resolver {
 	 * data merged up to a different level (theme)
 	 * or no merged at all.
 	 *
-	 * @param array $settings Existing block editor settings.
+	 * @param array   $settings Existing block editor settings.
 	 *                        Empty array by default.
-	 * @param string $origin The source of data the consumer wants.
+	 * @param string  $origin The source of data the consumer wants.
 	 *                       Valid values are 'core', 'theme', 'user'.
 	 *                       Default is 'user'.
 	 * @param boolean $merged Whether the data should be merged
@@ -394,7 +399,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON
 	 */
-	public function get_origin( $settings = [], $origin = 'user', $merged = true ) {
+	public function get_origin( $settings = array(), $origin = 'user', $merged = true ) {
 
 		if ( ( 'user' === $origin ) && $merged ) {
 			$result = new WP_Theme_JSON();
@@ -466,7 +471,7 @@ class WP_Theme_JSON_Resolver {
 			return self::$user_custom_post_type_id;
 		}
 
-		$user_cpt    = self::get_user_data_from_custom_post_type( true );
+		$user_cpt = self::get_user_data_from_custom_post_type( true );
 		if ( array_key_exists( 'ID', $user_cpt ) ) {
 			self::$user_custom_post_type_id = $user_cpt['ID'];
 		}
