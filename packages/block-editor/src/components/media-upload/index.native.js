@@ -166,6 +166,8 @@ export class MediaUpload extends React.Component {
 		const isOneType = allowedTypes.length === 1;
 		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
 		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
+		const isAnyType = isOneType && allowedTypes.includes( MEDIA_TYPE_ANY );
+
 		const isImageOrVideo =
 			allowedTypes.length === 2 &&
 			allowedTypes.includes( MEDIA_TYPE_IMAGE ) &&
@@ -192,6 +194,8 @@ export class MediaUpload extends React.Component {
 			} else {
 				pickerTitle = __( 'Choose image or video' );
 			}
+		} else if ( isAnyType ) {
+			pickerTitle = __( 'Choose file' );
 		}
 
 		const getMediaOptions = () => (
