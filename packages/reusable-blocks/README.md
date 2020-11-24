@@ -72,8 +72,10 @@ return (
 This package also provides convenient utilities for managing reusable blocks through redux actions:
 
 ```js
+import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+
 function MyConvertToStaticButton( { clientId } ) {
-    const { __experimentalConvertBlockToStatic } = useDispatch( 'core/reusable-blocks' );
+    const { __experimentalConvertBlockToStatic } = useDispatch( reusableBlocksStore );
     return (
         <button onClick={() => __experimentalConvertBlockToStatic( clientId )} >
             Convert to static
@@ -82,7 +84,7 @@ function MyConvertToStaticButton( { clientId } ) {
 }
 
 function MyConvertToReusableButton( { clientId } ) {
-    const { __experimentalConvertBlocksToReusable } = useDispatch( 'core/reusable-blocks' );
+    const { __experimentalConvertBlocksToReusable } = useDispatch( reusableBlocksStore );
     return (
         <button onClick={() => __experimentalConvertBlocksToReusable( [ clientId ] )} >
             Convert to reusable
@@ -91,7 +93,7 @@ function MyConvertToReusableButton( { clientId } ) {
 }
 
 function MyDeleteReusableBlockButton( { id } ) {
-    const { __experimentalDeleteReusableBlock } = useDispatch( 'core/reusable-blocks' );
+    const { __experimentalDeleteReusableBlock } = useDispatch( reusableBlocksStore );
     return (
         <button onClick={() => __experimentalDeleteReusableBlock( id )} >
             Delete reusable block
