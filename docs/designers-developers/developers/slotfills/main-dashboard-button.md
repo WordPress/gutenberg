@@ -40,7 +40,7 @@ import { close } from '@wordpress/icons';
 
 const MainDashboardButtonIconTest = () => (
     <MainDashboardButton>
-        <FullscreenModeClose icon={ close } />
+        <FullscreenModeClose icon={ close } href="http://wordpress.org" />
     </MainDashboardButton>
 );
 
