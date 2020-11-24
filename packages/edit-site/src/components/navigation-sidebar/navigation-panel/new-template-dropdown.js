@@ -77,7 +77,9 @@ export default function NewTemplateDropdown() {
 			} }
 		>
 			{ ( { onClose } ) => (
-				<NavigableMenu>
+				<NavigableMenu
+					className="edit-site-navigation-panel__new-template-popover"
+				>
 					<MenuGroup label={ __( 'Add Template' ) }>
 						{ map(
 							missingTemplates,
