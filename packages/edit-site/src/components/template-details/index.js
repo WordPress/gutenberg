@@ -8,6 +8,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
+import { isTemplateRevertable } from '../../utils';
 import { MENU_TEMPLATES } from '../navigation-sidebar/navigation-panel/constants';
 
 export default function TemplateDetails( { template, onClose } ) {
@@ -28,13 +29,6 @@ export default function TemplateDetails( { template, onClose } ) {
 	if ( ! template ) {
 		return null;
 	}
-
-	/* eslint-disable camelcase */
-	const isRevertable =
-		'auto-draft' !== template.status &&
-		template?.file_based &&
-		currentTheme === template?.wp_theme_slug;
-	/* eslint-enable camelcase */
 
 	const revert = () => {
 		revertTemplate( template );
@@ -74,7 +68,7 @@ export default function TemplateDetails( { template, onClose } ) {
 				) }
 			</div>
 
-			{ isRevertable && (
+			{ isTemplateRevertable( template, currentTheme ) && (
 				<div className="edit-site-template-details">
 					<Text variant="body">
 						<Button isLink onClick={ revert }>

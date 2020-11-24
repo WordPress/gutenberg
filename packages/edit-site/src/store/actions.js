@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { findTemplate } from './controls';
+import { isTemplateRevertable } from '../utils';
 
 /**
  * Returns an action object used to toggle a feature flag.
@@ -250,13 +251,7 @@ export function* revertTemplate( template ) {
 		'getCurrentTheme'
 	);
 
-	if (
-		/* eslint-disable camelcase */
-		'auto-draft' !== template.status &&
-		template?.file_based &&
-		currentTheme === template?.wp_theme_slug
-		/* eslint-enable camelcase */
-	) {
+	if ( ! isTemplateRevertable( template, currentTheme ) ) {
 		yield controls.dispatch(
 			'core/notices',
 			'createErrorNotice',
