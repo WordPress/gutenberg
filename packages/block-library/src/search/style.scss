@@ -59,5 +59,20 @@
 			padding: 0.125em 0.5em;
 		}
 	}
+
+	&.is-style-rounded {
+		.wp-block-search__inside-wrapper,
+		.wp-block-search__input,
+		.wp-block-search__button {
+			border-radius: var(--wp--search--border-radius, 50px);
+		}
+
+		&.wp-block-search__button-inside {
+			.wp-block-search__input,
+			.wp-block-search__button {
+				border-radius: calc(var(--wp--search--border-radius, 50px) - #{$grid-unit-05});
+			}
+		}
+	}
 }
 

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { search as icon } from '@wordpress/icons';
 
 /**
@@ -23,4 +23,12 @@ export const settings = {
 	example: {},
 	variations,
 	edit,
+	styles: [
+		{
+			name: 'default',
+			label: _x( 'Default', 'block style' ),
+			isDefault: true,
+		},
+		{ name: 'rounded', label: _x( 'Rounded', 'block style' ) },
+	],
 };
