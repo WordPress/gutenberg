@@ -14,16 +14,16 @@
 function gutenberg_get_default_template_types() {
 	$default_template_types = array(
 		'index'          => array(
-		    'title'       => _x( 'Index', 'Template name', 'gutenberg' ),
-		    'description' => __( 'The default template which resolves when no other template can be found', 'gutenberg' ),
+			'title'       => _x( 'Index', 'Template name', 'gutenberg' ),
+			'description' => __( 'The default template which resolves when no other template can be found', 'gutenberg' ),
 		),
 		'home'           => array(
 			'title'       => _x( 'Home', 'Template name', 'gutenberg' ),
 			'description' => __( 'Resolves when the home page is requested and is set to display latest posts', 'gutenberg' ),
 		),
 		'front-page'     => array(
-		    'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
-		    'description' => __( 'Resolves when the site home page is requested', 'gutenberg' ),
+			'title'       => _x( 'Front Page', 'Template name', 'gutenberg' ),
+			'description' => __( 'Resolves when the site home page is requested', 'gutenberg' ),
 		),
 		'singular'       => array(
 			'title'       => _x( 'Singular', 'Template name', 'gutenberg' ),
@@ -34,16 +34,16 @@ function gutenberg_get_default_template_types() {
 			'description' => __( 'Resolves when the requested content is an entry from any post type, excluding Pages', 'gutenberg' ),
 		),
 		'single-post'    => array(
-		    'title'       => _x( 'Post', 'Template name', 'gutenberg' ),
-		    'description' => __( 'Resolves when the requested content is a Post', 'gutenberg' ),
+			'title'       => _x( 'Post', 'Template name', 'gutenberg' ),
+			'description' => __( 'Resolves when the requested content is a Post', 'gutenberg' ),
 		),
 		'page'           => array(
-		    'title'       => _x( 'Page', 'Template name', 'gutenberg' ),
-		    'description' => __( 'Resolves when the requested content is a Page', 'gutenberg' ),
+			'title'       => _x( 'Page', 'Template name', 'gutenberg' ),
+			'description' => __( 'Resolves when the requested content is a Page', 'gutenberg' ),
 		),
 		'archive'        => array(
-		    'title'       => _x( 'Archive', 'Template name', 'gutenberg' ),
-		    'description' => __( 'Resolves when the requested content is an archive like a Post category', 'gutenberg' ),
+			'title'       => _x( 'Archive', 'Template name', 'gutenberg' ),
+			'description' => __( 'Resolves when the requested content is an archive like a Post category', 'gutenberg' ),
 		),
 		'author'         => array(
 			'title'       => _x( 'Author Archive', 'Template name', 'gutenberg' ),
@@ -71,16 +71,16 @@ function gutenberg_get_default_template_types() {
 			'description' => __( 'Resolves when the requested content is a Media entry', 'gutenberg' ),
 		),
 		'search'         => array(
-		    'title'       => _x( 'Search Results', 'Template name', 'gutenberg' ),
-		    'description' => __( 'Resolves when a visitor searches the site', 'gutenberg' ),
+			'title'       => _x( 'Search Results', 'Template name', 'gutenberg' ),
+			'description' => __( 'Resolves when a visitor searches the site', 'gutenberg' ),
 		),
 		'privacy-policy' => array(
 			'title'       => __( 'Privacy Policy', 'gutenberg' ),
 			'description' => '',
 		),
 		'404'            => array(
-		    'title'       => _x( '404', 'Template name', 'gutenberg' ),
-		    'description' => __( 'Resolves when the requested content cannot be found', 'gutenberg' ),
+			'title'       => _x( '404', 'Template name', 'gutenberg' ),
+			'description' => __( 'Resolves when the requested content cannot be found', 'gutenberg' ),
 		),
 	);
 
