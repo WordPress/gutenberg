@@ -170,6 +170,103 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
+	 * Extracts the legacy theme settings and reorganizes them
+	 * into a structue that adheres to the theme.json schema.
+	 *
+	 * @param array $settings Existing editor settings.
+	 *
+	 * @return array Config that adheres to the theme.json schema.
+	 */
+	public static function extract_legacy_settings( $settings ) {
+		$theme_settings                       = array();
+		$theme_settings['global']             = array();
+		$theme_settings['global']['settings'] = array();
+
+		// Deprecated theme supports.
+		if ( isset( $settings['disableCustomColors'] ) ) {
+			if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
+				$theme_settings['global']['settings']['color'] = array();
+			}
+			$theme_settings['global']['settings']['color']['custom'] = ! $settings['disableCustomColors'];
+		}
+
+		if ( isset( $settings['disableCustomGradients'] ) ) {
+			if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
+				$theme_settings['global']['settings']['color'] = array();
+			}
+			$theme_settings['global']['settings']['color']['customGradient'] = ! $settings['disableCustomGradients'];
+		}
+
+		if ( isset( $settings['disableCustomFontSizes'] ) ) {
+			if ( ! isset( $theme_settings['global']['settings']['typography'] ) ) {
+				$theme_settings['global']['settings']['typography'] = array();
+			}
+			$theme_settings['global']['settings']['typography']['customFontSize'] = ! $settings['disableCustomFontSizes'];
+		}
+
+		if ( isset( $settings['enableCustomLineHeight'] ) ) {
+			if ( ! isset( $theme_settings['global']['settings']['typography'] ) ) {
+				$theme_settings['global']['settings']['typography'] = array();
+			}
+			$theme_settings['global']['settings']['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
+		}
+
+		if ( isset( $settings['enableCustomUnits'] ) ) {
+			if ( ! isset( $theme_settings['global']['settings']['spacing'] ) ) {
+				$theme_settings['global']['settings']['spacing'] = array();
+			}
+			$theme_settings['global']['settings']['spacing']['units'] = ( true === $settings['enableCustomUnits'] ) ?
+				array( 'px', 'em', 'rem', 'vh', 'vw' ) :
+				$settings['enableCustomUnits'];
+		}
+
+		if ( isset( $settings['colors'] ) ) {
+			if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
+				$theme_settings['global']['settings']['color'] = array();
+			}
+			$theme_settings['global']['settings']['color']['palette'] = $settings['colors'];
+		}
+
+		if ( isset( $settings['gradients'] ) ) {
+			if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
+				$theme_settings['global']['settings']['color'] = array();
+			}
+			$theme_settings['global']['settings']['color']['gradients'] = $settings['gradients'];
+		}
+
+		if ( isset( $settings['fontSizes'] ) ) {
+			$font_sizes = $settings['fontSizes'];
+			// Back-compatibility for presets without units.
+			foreach ( $font_sizes as &$font_size ) {
+				if ( is_numeric( $font_size['size'] ) ) {
+					$font_size['size'] = $font_size['size'] . 'px';
+				}
+			}
+			if ( ! isset( $theme_settings['global']['settings']['typography'] ) ) {
+				$theme_settings['global']['settings']['typography'] = array();
+			}
+			$theme_settings['global']['settings']['typography']['fontSizes'] = $font_sizes;
+		}
+
+		// Things that didn't land in core yet, so didn't have a setting assigned.
+		if ( current( (array) get_theme_support( 'custom-spacing' ) ) ) {
+			if ( ! isset( $theme_settings['global']['settings']['spacing'] ) ) {
+				$theme_settings['global']['settings']['spacing'] = array();
+			}
+			$theme_settings['global']['settings']['spacing']['customPadding'] = true;
+		}
+
+		if ( current( (array) get_theme_support( 'experimental-link-color' ) ) ) {
+			if ( ! isset( $theme_settings['global']['settings']['color'] ) ) {
+				$theme_settings['global']['settings']['color'] = array();
+			}
+			$theme_settings['global']['settings']['color']['link'] = true;
+		}
+
+		return $theme_settings;
+	}
+
+	/**
 	 * Returns the theme's origin config.
 	 *
 	 * It also fetches the existing presets the theme
@@ -181,7 +278,7 @@ class WP_Theme_JSON_Resolver {
 	 * @return WP_Theme_JSON Entity that holds theme data.
 	 */
 	private function get_theme_origin( $settings ) {
-		$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
+		$theme_support_data = self::extract_legacy_settings( $settings );
 		$theme_json_data    = self::get_from_file( locate_template( 'experimental-theme.json' ) );
 
 		/*
