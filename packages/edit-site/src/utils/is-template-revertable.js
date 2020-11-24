@@ -13,6 +13,7 @@ export default function isTemplateRevertable( template, currentTheme ) {
 		'auto-draft' !== template.status &&
 		/* eslint-disable camelcase */
 		template?.file_based &&
+		template?.original_file_exists &&
 		currentTheme === template?.wp_theme_slug
 		/* eslint-enable camelcase */
 	);
