@@ -386,7 +386,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 
 	if ( $can_use_cached ) {
 		// Cache for a minute.
-		// This cache doesn't need to be any longer, we only want to avoid spikes on high-trafic sites.
+		// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.
 		set_transient( 'global_styles', $stylesheet, MINUTE_IN_SECONDS );
 	}
 
@@ -455,7 +455,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		gutenberg_experimental_global_styles_has_theme_json_support()
 	) {
 		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
-		$settings['__experimentalGlobalStylesContexts']     = $base->get_blocks_metadata();
 		$settings['__experimentalGlobalStylesBaseStyles']   = $base->get_raw_data();
 	} else {
 		// STEP 3 - OTHERWISE, ADD STYLES
