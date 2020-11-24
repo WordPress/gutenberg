@@ -35,7 +35,7 @@ import {
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -50,7 +50,7 @@ export class FileEdit extends Component {
 
 		this.state = {
 			isUploadInProgress: false,
-			isLinkSettingsVisible: false,
+			isSidebarLinkSettings: false,
 		};
 
 		this.timerRef = null;
@@ -77,7 +77,6 @@ export class FileEdit extends Component {
 			this
 		);
 		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
-		this.onHideLinkSettings = this.onHideLinkSettings.bind( this );
 	}
 
 	componentDidMount() {
@@ -93,6 +92,16 @@ export class FileEdit extends Component {
 
 	componentWillUnmount() {
 		clearTimeout( this.timerRef );
+	}
+
+	componentDidUpdate( prevProps ) {
+		if (
+			prevProps.isSidebarOpened &&
+			! this.props.isSidebarOpened &&
+			this.state.isSidebarLinkSettings
+		) {
+			this.setState( { isSidebarLinkSettings: false } );
+		}
 	}
 
 	onSelectFile( media ) {
@@ -180,7 +189,16 @@ export class FileEdit extends Component {
 		);
 	}
 
-	getToolbarButtons( open ) {
+	onShowLinkSettings() {
+		this.setState(
+			{
+				isSidebarLinkSettings: true,
+			},
+			this.props.openSidebar
+		);
+	}
+
+	getToolbarEditButton( open ) {
 		return (
 			<BlockControls>
 				<ToolbarGroup>
@@ -199,17 +217,15 @@ export class FileEdit extends Component {
 		);
 	}
 
-	getLinkSettings(
+	getInspectorControls(
 		{ showDownloadButton, textLinkTarget, href, textLinkHref },
 		media,
 		isUploadInProgress,
-		isUploadFailed,
-		panelTitle,
-		withBottomSheet,
-		isBottomSheetVisible
+		isUploadFailed
 	) {
 		let linkDestinationOptions = [ { value: href, label: __( 'URL' ) } ];
 		const attachmentPage = media && media.link;
+		const { isSidebarLinkSettings } = this.state;
 
 		if ( attachmentPage ) {
 			linkDestinationOptions = [
@@ -231,96 +247,48 @@ export class FileEdit extends Component {
 			dimmedStyle
 		);
 
-		const bottomSheetPadding = withBottomSheet
-			? styles.linkSettingsPanel
-			: undefined;
-
-		const settings = (
-			<>
-				{ panelTitle && <PanelBody title={ panelTitle } /> }
-				{
-					<PanelBody style={ bottomSheetPadding }>
-						<SelectControl
-							icon={ link }
-							label={ __( 'Link to' ) }
-							value={ textLinkHref }
-							onChange={ this.onChangeLinkDestinationOption }
-							options={ linkDestinationOptions }
-						/>
-						<ToggleControl
-							icon={ external }
-							label={ __( 'Open in new tab' ) }
-							checked={ textLinkTarget === '_blank' }
-							onChange={ this.onChangeOpenInNewWindow }
-						/>
+		return (
+			<InspectorControls>
+				{ isSidebarLinkSettings || (
+					<PanelBody title={ __( 'File block settings' ) } />
+				) }
+				<PanelBody>
+					<SelectControl
+						icon={ link }
+						label={ __( 'Link to' ) }
+						value={ textLinkHref }
+						onChange={ this.onChangeLinkDestinationOption }
+						options={ linkDestinationOptions }
+					/>
+					<ToggleControl
+						icon={ external }
+						label={ __( 'Open in new tab' ) }
+						checked={ textLinkTarget === '_blank' }
+						onChange={ this.onChangeOpenInNewWindow }
+					/>
+					{ ! isSidebarLinkSettings && (
 						<ToggleControl
 							icon={ button }
 							label={ __( 'Show download button' ) }
 							checked={ showDownloadButton }
 							onChange={ this.onChangeDownloadButtonVisibility }
 						/>
-						<BottomSheet.Cell
-							disabled={ isCopyUrlDisabled }
-							label={
-								this.state.isUrlCopied
-									? __( 'Copied!' )
-									: __( 'Copy file URL' )
-							}
-							labelStyle={
-								this.state.isUrlCopied || finalButtonStyle
-							}
-							onPress={ this.onCopyURL }
-						/>
-					</PanelBody>
-				}
-			</>
-		);
-
-		if ( withBottomSheet ) {
-			return (
-				<BottomSheet
-					isVisible={ isBottomSheetVisible }
-					onClose={ this.onHideLinkSettings }
-				>
-					{ settings }
-				</BottomSheet>
-			);
-		}
-
-		return settings;
-	}
-
-	getInspectorControls(
-		attributes,
-		media,
-		isUploadInProgress,
-		isUploadFailed
-	) {
-		return (
-			<InspectorControls>
-				{ this.getLinkSettings(
-					attributes,
-					media,
-					isUploadInProgress,
-					isUploadFailed,
-					__( 'File block settings' ),
-					false,
-					false
-				) }
+					) }
+					<BottomSheet.Cell
+						disabled={ isCopyUrlDisabled }
+						label={
+							this.state.isUrlCopied
+								? __( 'Copied!' )
+								: __( 'Copy file URL' )
+						}
+						labelStyle={
+							this.state.isUrlCopied || finalButtonStyle
+						}
+						onPress={ this.onCopyURL }
+					/>
+				</PanelBody>
 			</InspectorControls>
 		);
-	}
-
-	onShowLinkSettings() {
-		this.setState( { isLinkSettingsVisible: true } );
-	}
-
-	onHideLinkSettings() {
-		this.setState( { isLinkSettingsVisible: false } );
-	}
-
-	dismissSheet() {
-		this.onHideLinkSettings();
 	}
 
 	getStyleForAlignment( align ) {
@@ -359,8 +327,6 @@ export class FileEdit extends Component {
 			align,
 		} = attributes;
 
-		const { isLinkSettingsVisible } = this.state;
-
 		const dimmedStyle =
 			this.state.isUploadInProgress && styles.disabledButton;
 		const finalButtonStyle = Object.assign(
@@ -390,22 +356,13 @@ export class FileEdit extends Component {
 					return (
 						<View>
 							{ isUploadInProgress ||
-								this.getToolbarButtons( openMediaOptions ) }
+								this.getToolbarEditButton( openMediaOptions ) }
 							{ getMediaOptions() }
 							{ this.getInspectorControls(
 								attributes,
 								media,
 								isUploadInProgress,
 								isUploadFailed
-							) }
-							{ this.getLinkSettings(
-								attributes,
-								media,
-								isUploadInProgress,
-								isUploadFailed,
-								null,
-								true,
-								isLinkSettingsVisible
 							) }
 							<RichText
 								__unstableMobileNoFocusOnMount
@@ -479,9 +436,17 @@ export default compose( [
 	withSelect( ( select, props ) => {
 		const { attributes } = props;
 		const { id } = attributes;
+		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		return {
 			media:
 				id === undefined ? undefined : select( 'core' ).getMedia( id ),
+			isSidebarOpened: isEditorSidebarOpened(),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+		return {
+			openSidebar: () => openGeneralSidebar( 'edit-post/block' ),
 		};
 	} ),
 	withPreferredColorScheme,
