@@ -251,7 +251,7 @@ export function* revertTemplate( template ) {
 		'getCurrentTheme'
 	);
 
-	if ( ! isTemplateRevertable( template, currentTheme ) ) {
+	if ( ! isTemplateRevertable( template, currentTheme?.stylesheet ) ) {
 		yield controls.dispatch(
 			'core/notices',
 			'createErrorNotice',
