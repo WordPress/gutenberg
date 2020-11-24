@@ -4,6 +4,11 @@
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import { store as editNavigationStore } from '../../store';
+
 export default function useNavigationEditor() {
 	const menus = useSelect(
 		( select ) => select( 'core' ).getMenus( { per_page: -1 } ),
@@ -20,7 +25,7 @@ export default function useNavigationEditor() {
 
 	const navigationPost = useSelect(
 		( select ) =>
-			select( 'core/edit-navigation' ).getNavigationPostForMenu(
+			select( editNavigationStore ).getNavigationPostForMenu(
 				selectedMenuId
 			),
 		[ selectedMenuId ]
