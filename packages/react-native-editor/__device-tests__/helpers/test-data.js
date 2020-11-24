@@ -132,3 +132,5 @@ exports.coverHeightWithRemUnit = `<!-- wp:cover {"customOverlayColor":"#ffffff",
 <p class="has-text-align-center"></p>
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
+
+exports.fileBlockPlaceholder = `<!-- wp:file /-->`;
