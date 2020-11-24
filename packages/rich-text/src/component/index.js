@@ -1,46 +1,36 @@
 /**
  * WordPress dependencies
  */
-import {
-	forwardRef,
-	useEffect,
-	useRef,
-	useState,
-	useMemo,
-	useLayoutEffect,
-} from '@wordpress/element';
-import {
-	BACKSPACE,
-	DELETE,
-	ENTER,
-	LEFT,
-	RIGHT,
-	SPACE,
-	ESCAPE,
-} from '@wordpress/keycodes';
+import {forwardRef, useEffect, useLayoutEffect, useMemo, useRef, useState,} from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-import { getFilesFromDataTransfer } from '@wordpress/dom';
+import {getFilesFromDataTransfer} from '@wordpress/dom';
 
 /**
  * Internal dependencies
  */
 import FormatEdit from './format-edit';
-import { create } from '../create';
-import { apply } from '../to-dom';
-import { toHTMLString } from '../to-html-string';
-import { remove } from '../remove';
-import { removeFormat } from '../remove-format';
-import { isCollapsed } from '../is-collapsed';
-import { LINE_SEPARATOR } from '../special-characters';
-import { indentListItems } from '../indent-list-items';
-import { getActiveFormats } from '../get-active-formats';
-import { updateFormats } from '../update-formats';
-import { removeLineSeparator } from '../remove-line-separator';
-import { isEmptyLine } from '../is-empty';
-import { useFormatTypes } from './use-format-types';
-import { useBoundaryStyle } from './use-boundary-style';
-import { useInlineWarning } from './use-inline-warning';
-import { insert } from '../insert';
+import {getActiveFormats} from '../get-active-formats';
+import {updateFormats} from '../update-formats';
+import {useFormatTypes} from './use-format-types';
+import {useBoundaryStyle} from './use-boundary-style';
+import {useInlineWarning} from './use-inline-warning';
+import {insert} from '../insert';
+import {
+	applyRecord,
+	createRecord,
+	getDefaultView,
+	getInitialRecord,
+	getOwnerDocument,
+	getRange,
+	removeEditorOnlyFormats,
+} from './utils/misc.js';
+/**
+ * External dependencies
+ */
+import {identity, thunkify} from 'ramda';
+import {handleKeyDown} from './kayHandlers/keyDownHandler';
+import {fixPlaceholderSelection} from './utils/fixPlaceholderSelection';
+import {valueToFormat} from './utils/valueToFormat';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -90,41 +80,6 @@ const defaultStyle = { whiteSpace };
 
 const EMPTY_ACTIVE_FORMATS = [];
 
-function createPrepareEditableTree( fns ) {
-	return ( value ) =>
-		fns.reduce(
-			( accumulator, fn ) => fn( accumulator, value.text ),
-			value.formats
-		);
-}
-
-/**
- * If the selection is set on the placeholder element, collapse the selection to
- * the start (before the placeholder).
- *
- * @param {Window} defaultView
- */
-function fixPlaceholderSelection( defaultView ) {
-	const selection = defaultView.getSelection();
-	const { anchorNode, anchorOffset } = selection;
-
-	if ( anchorNode.nodeType !== anchorNode.ELEMENT_NODE ) {
-		return;
-	}
-
-	const targetNode = anchorNode.childNodes[ anchorOffset ];
-
-	if (
-		! targetNode ||
-		targetNode.nodeType !== targetNode.ELEMENT_NODE ||
-		! targetNode.getAttribute( 'data-rich-text-placeholder' )
-	) {
-		return;
-	}
-
-	selection.collapseToStart();
-}
-
 function RichText(
 	{
 		tagName: TagName = 'div',
@@ -140,7 +95,7 @@ function RichText(
 		onPaste,
 		format = 'string',
 		onDelete,
-		onEnter,
+		onEnter = identity,
 		onSelectionChange,
 		onChange,
 		unstableOnFocus: onFocus,
@@ -182,130 +137,34 @@ function RichText(
 		multilineRootTag = TagName;
 	}
 
-	function getDoc() {
-		return ref.current.ownerDocument;
-	}
-
-	function getWin() {
-		return getDoc().defaultView;
-	}
-
-	/**
-	 * Converts the outside data structure to our internal representation.
-	 *
-	 * @param {*} string The outside value, data type depends on props.
-	 *
-	 * @return {Object} An internal rich-text value.
-	 */
-	function formatToValue( string ) {
-		if ( disableFormats ) {
-			return {
-				text: string,
-				formats: Array( string.length ),
-				replacements: Array( string.length ),
-			};
-		}
-
-		if ( format !== 'string' ) {
-			return string;
-		}
-
-		const prepare = createPrepareEditableTree( valueHandlers );
-
-		const result = create( {
-			html: string,
-			multilineTag,
-			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
-			preserveWhiteSpace,
-		} );
-
-		result.formats = prepare( result );
-
-		return result;
-	}
-
-	/**
-	 * Removes editor only formats from the value.
-	 *
-	 * Editor only formats are applied using `prepareEditableTree`, so we need to
-	 * remove them before converting the internal state
-	 *
-	 * @param {Object} val The internal rich-text value.
-	 *
-	 * @return {Object} A new rich-text value.
-	 */
-	function removeEditorOnlyFormats( val ) {
-		formatTypes.forEach( ( formatType ) => {
-			// Remove formats created by prepareEditableTree, because they are editor only.
-			if ( formatType.__experimentalCreatePrepareEditableTree ) {
-				val = removeFormat( val, formatType.name, 0, val.text.length );
-			}
-		} );
-
-		return val;
-	}
-
-	/**
-	 * Converts the internal value to the external data format.
-	 *
-	 * @param {Object} val The internal rich-text value.
-	 *
-	 * @return {*} The external data format, data type depends on props.
-	 */
-	function valueToFormat( val ) {
-		if ( disableFormats ) {
-			return val.text;
-		}
-
-		val = removeEditorOnlyFormats( val );
-
-		if ( format !== 'string' ) {
-			return;
-		}
-
-		return toHTMLString( { value: val, multilineTag, preserveWhiteSpace } );
-	}
+	const getDoc = thunkify( getOwnerDocument )( ref );
+	const getWin = thunkify( getDefaultView )( ref );
+	const initialRecordData = {
+		selectionStart,
+		selectionEnd,
+		string: value,
+		disableFormats,
+		valueHandlers,
+		multilineTag,
+		preserveWhiteSpace,
+		format,
+	};
 
 	// Internal values are updated synchronously, unlike props and state.
 	const _value = useRef( value );
 	const record = useRef(
-		useMemo( () => {
-			const initialRecord = formatToValue( value );
-			initialRecord.start = selectionStart;
-			initialRecord.end = selectionEnd;
-			return initialRecord;
-		}, [] )
+		useMemo( () => getInitialRecord( initialRecordData ), [] )
 	);
 
-	function createRecord() {
-		const selection = getWin().getSelection();
-		const range =
-			selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
+	const valueToFormatData = {
+		formatTypes,
+		disableFormats,
+		format,
+		multilineTag,
+		preserveWhiteSpace
+	};
 
-		return create( {
-			element: ref.current,
-			range,
-			multilineTag,
-			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
-			__unstableIsEditableTree: true,
-			preserveWhiteSpace,
-		} );
-	}
-
-	function applyRecord( newRecord, { domOnly } = {} ) {
-		apply( {
-			value: newRecord,
-			current: ref.current,
-			multilineTag,
-			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
-			prepareEditableTree: createPrepareEditableTree( prepareHandlers ),
-			__unstableDomOnly: domOnly,
-			placeholder,
-		} );
-	}
+	const lastHistoryValue = useRef( value );
 
 	/**
 	 * Handles a paste event.
@@ -377,7 +236,10 @@ function RichText(
 			const files = [ ...getFilesFromDataTransfer( clipboardData ) ];
 
 			onPaste( {
-				value: removeEditorOnlyFormats( record.current ),
+				value: removeEditorOnlyFormats( {
+					val: record.current,
+					formatTypes,
+				} ),
 				onChange: handleChange,
 				html,
 				plainText,
@@ -386,286 +248,6 @@ function RichText(
 			} );
 		}
 	}
-
-	/**
-	 * Handles delete on keydown:
-	 * - outdent list items,
-	 * - delete content if everything is selected,
-	 * - trigger the onDelete prop when selection is uncollapsed and at an edge.
-	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
-	 */
-	function handleDelete( event ) {
-		const { keyCode } = event;
-
-		if (
-			keyCode !== DELETE &&
-			keyCode !== BACKSPACE &&
-			keyCode !== ESCAPE
-		) {
-			return;
-		}
-
-		if ( didAutomaticChange ) {
-			event.preventDefault();
-			undo();
-			return;
-		}
-
-		if ( keyCode === ESCAPE ) {
-			return;
-		}
-
-		const currentValue = createRecord();
-		const { start, end, text } = currentValue;
-		const isReverse = keyCode === BACKSPACE;
-
-		// Always handle full content deletion ourselves.
-		if ( start === 0 && end !== 0 && end === text.length ) {
-			handleChange( remove( currentValue ) );
-			event.preventDefault();
-			return;
-		}
-
-		if ( multilineTag ) {
-			let newValue;
-
-			// Check to see if we should remove the first item if empty.
-			if (
-				isReverse &&
-				currentValue.start === 0 &&
-				currentValue.end === 0 &&
-				isEmptyLine( currentValue )
-			) {
-				newValue = removeLineSeparator( currentValue, ! isReverse );
-			} else {
-				newValue = removeLineSeparator( currentValue, isReverse );
-			}
-
-			if ( newValue ) {
-				handleChange( newValue );
-				event.preventDefault();
-				return;
-			}
-		}
-
-		// Only process delete if the key press occurs at an uncollapsed edge.
-		if (
-			! onDelete ||
-			! isCollapsed( currentValue ) ||
-			activeFormats.length ||
-			( isReverse && start !== 0 ) ||
-			( ! isReverse && end !== text.length )
-		) {
-			return;
-		}
-
-		onDelete( { isReverse, value: currentValue } );
-		event.preventDefault();
-	}
-
-	/**
-	 * Triggers the `onEnter` prop on keydown.
-	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
-	 */
-	function handleEnter( event ) {
-		if ( event.keyCode !== ENTER ) {
-			return;
-		}
-
-		event.preventDefault();
-
-		if ( ! onEnter ) {
-			return;
-		}
-
-		onEnter( {
-			value: removeEditorOnlyFormats( createRecord() ),
-			onChange: handleChange,
-			shiftKey: event.shiftKey,
-		} );
-	}
-
-	/**
-	 * Indents list items on space keydown.
-	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
-	 */
-	function handleSpace( event ) {
-		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
-
-		if (
-			// Only override when no modifiers are pressed.
-			shiftKey ||
-			altKey ||
-			metaKey ||
-			ctrlKey ||
-			keyCode !== SPACE ||
-			multilineTag !== 'li'
-		) {
-			return;
-		}
-
-		const currentValue = createRecord();
-
-		if ( ! isCollapsed( currentValue ) ) {
-			return;
-		}
-
-		const { text, start } = currentValue;
-		const characterBefore = text[ start - 1 ];
-
-		// The caret must be at the start of a line.
-		if ( characterBefore && characterBefore !== LINE_SEPARATOR ) {
-			return;
-		}
-
-		handleChange(
-			indentListItems( currentValue, { type: multilineRootTag } )
-		);
-		event.preventDefault();
-	}
-
-	/**
-	 * Handles horizontal keyboard navigation when no modifiers are pressed. The
-	 * navigation is handled separately to move correctly around format
-	 * boundaries.
-	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
-	 */
-	function handleHorizontalNavigation( event ) {
-		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
-
-		if (
-			// Only override left and right keys without modifiers pressed.
-			shiftKey ||
-			altKey ||
-			metaKey ||
-			ctrlKey ||
-			( keyCode !== LEFT && keyCode !== RIGHT )
-		) {
-			return;
-		}
-
-		const {
-			text,
-			formats,
-			start,
-			end,
-			activeFormats: currentActiveFormats = [],
-		} = record.current;
-		const collapsed = isCollapsed( record.current );
-		// To do: ideally, we should look at visual position instead.
-		const { direction } = getWin().getComputedStyle( ref.current );
-		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
-		const isReverse = event.keyCode === reverseKey;
-
-		// If the selection is collapsed and at the very start, do nothing if
-		// navigating backward.
-		// If the selection is collapsed and at the very end, do nothing if
-		// navigating forward.
-		if ( collapsed && currentActiveFormats.length === 0 ) {
-			if ( start === 0 && isReverse ) {
-				return;
-			}
-
-			if ( end === text.length && ! isReverse ) {
-				return;
-			}
-		}
-
-		// If the selection is not collapsed, let the browser handle collapsing
-		// the selection for now. Later we could expand this logic to set
-		// boundary positions if needed.
-		if ( ! collapsed ) {
-			return;
-		}
-
-		// In all other cases, prevent default behaviour.
-		event.preventDefault();
-
-		const formatsBefore = formats[ start - 1 ] || EMPTY_ACTIVE_FORMATS;
-		const formatsAfter = formats[ start ] || EMPTY_ACTIVE_FORMATS;
-
-		let newActiveFormatsLength = currentActiveFormats.length;
-		let source = formatsAfter;
-
-		if ( formatsBefore.length > formatsAfter.length ) {
-			source = formatsBefore;
-		}
-
-		// If the amount of formats before the caret and after the caret is
-		// different, the caret is at a format boundary.
-		if ( formatsBefore.length < formatsAfter.length ) {
-			if (
-				! isReverse &&
-				currentActiveFormats.length < formatsAfter.length
-			) {
-				newActiveFormatsLength++;
-			}
-
-			if (
-				isReverse &&
-				currentActiveFormats.length > formatsBefore.length
-			) {
-				newActiveFormatsLength--;
-			}
-		} else if ( formatsBefore.length > formatsAfter.length ) {
-			if (
-				! isReverse &&
-				currentActiveFormats.length > formatsAfter.length
-			) {
-				newActiveFormatsLength--;
-			}
-
-			if (
-				isReverse &&
-				currentActiveFormats.length < formatsBefore.length
-			) {
-				newActiveFormatsLength++;
-			}
-		}
-
-		if ( newActiveFormatsLength !== currentActiveFormats.length ) {
-			const newActiveFormats = source.slice( 0, newActiveFormatsLength );
-			const newValue = {
-				...record.current,
-				activeFormats: newActiveFormats,
-			};
-			record.current = newValue;
-			applyRecord( newValue );
-			setActiveFormats( newActiveFormats );
-			return;
-		}
-
-		const newPos = start + ( isReverse ? -1 : 1 );
-		const newActiveFormats = isReverse ? formatsBefore : formatsAfter;
-		const newValue = {
-			...record.current,
-			start: newPos,
-			end: newPos,
-			activeFormats: newActiveFormats,
-		};
-
-		record.current = newValue;
-		applyRecord( newValue );
-		onSelectionChange( newPos, newPos );
-		setActiveFormats( newActiveFormats );
-	}
-
-	function handleKeyDown( event ) {
-		if ( event.defaultPrevented ) {
-			return;
-		}
-
-		handleDelete( event );
-		handleEnter( event );
-		handleSpace( event );
-		handleHorizontalNavigation( event );
-	}
-
-	const lastHistoryValue = useRef( value );
 
 	function createUndoLevel() {
 		// If the content is the same, no level needs to be created.
@@ -712,11 +294,24 @@ function RichText(
 			( inputType.indexOf( 'format' ) === 0 ||
 				INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType ) )
 		) {
-			applyRecord( record.current );
+			applyRecord( {
+				value: record.current,
+				multilineTag,
+				current: ref.current,
+				placeholder,
+				domOnly: false,
+				prepareHandlers,
+			} );
+
 			return;
 		}
 
-		const currentValue = createRecord();
+		const currentValue = createRecord( {
+			element: ref.current,
+			range: getRange( getWin().getSelection() ),
+			multilineTag,
+			preserveWhiteSpace,
+		} );
 		const { start, activeFormats: oldActiveFormats = [] } = record.current;
 
 		// Update the formats between the last and new caret position.
@@ -739,7 +334,10 @@ function RichText(
 		}
 
 		if ( allowPrefixTransformations && inputRule ) {
-			inputRule( change, valueToFormat );
+			inputRule(
+				change,
+				valueToFormat( valueToFormatData)
+			);
 		}
 
 		const transformed = formatTypes.reduce(
@@ -812,7 +410,12 @@ function RichText(
 			return;
 		}
 
-		const { start, end, text } = createRecord();
+		const { start, end, text } = createRecord( {
+			element: ref.current,
+			range: getRange( getWin().getSelection() ),
+			multilineTag,
+			preserveWhiteSpace,
+		} );
 		const oldRecord = record.current;
 
 		// Fallback mechanism for IE11, which doesn't support the input event.
@@ -858,7 +461,15 @@ function RichText(
 		// It is important that the internal value is updated first,
 		// otherwise the value will be wrong on render!
 		record.current = newValue;
-		applyRecord( newValue, { domOnly: true } );
+		applyRecord( {
+			value: newValue,
+			multilineTag,
+			current: ref.current,
+			placeholder,
+			domOnly: true,
+			prepareHandlers,
+		} );
+
 		onSelectionChange( start, end );
 		setActiveFormats( newActiveFormats );
 	}
@@ -877,8 +488,14 @@ function RichText(
 			newRecord.formats = Array( newRecord.text.length );
 			newRecord.replacements = Array( newRecord.text.length );
 		}
-
-		applyRecord( newRecord );
+		applyRecord( {
+			value: newRecord,
+			multilineTag,
+			current: ref.current,
+			placeholder,
+			domOnly: false,
+			prepareHandlers,
+		} );
 
 		const { start, end, activeFormats: newActiveFormats = [] } = newRecord;
 
@@ -886,7 +503,10 @@ function RichText(
 			changeHandler( newRecord.formats, newRecord.text );
 		} );
 
-		_value.current = valueToFormat( newRecord );
+		_value.current = valueToFormat(
+			valueToFormatData,
+			newRecord
+		);
 		record.current = newRecord;
 
 		// Selection must be updated first, so it is recorded in history when
@@ -967,6 +587,7 @@ function RichText(
 		} else {
 			onSelectionChange( record.current.start, record.current.end );
 			setActiveFormats(
+				// toDo fix input
 				getActiveFormats(
 					{
 						...record.current,
@@ -1002,10 +623,17 @@ function RichText(
 
 	function applyFromProps() {
 		_value.current = value;
-		record.current = formatToValue( value );
-		record.current.start = selectionStart;
-		record.current.end = selectionEnd;
-		applyRecord( record.current );
+		record.current = getInitialRecord( {
+			initialRecordData,
+		} );
+		applyRecord( {
+			value: record.current,
+			multilineTag,
+			current: ref.current,
+			placeholder,
+			domOnly: false,
+			prepareHandlers,
+		} );
 	}
 
 	useEffect( () => {
@@ -1047,7 +675,14 @@ function RichText(
 	}, dependencies );
 
 	useLayoutEffect( () => {
-		applyRecord( record.current, { domOnly: true } );
+		applyRecord( {
+			value: record.current,
+			multilineTag,
+			current: ref.current,
+			placeholder,
+			domOnly: true,
+			prepareHandlers,
+		} );
 
 		didMount.current = true;
 
@@ -1063,8 +698,34 @@ function RichText(
 
 	function focus() {
 		ref.current.focus();
-		applyRecord( record.current );
+		applyRecord( {
+			value: record.current,
+			multilineTag,
+			current: ref.current,
+			placeholder,
+			domOnly: false,
+			prepareHandlers,
+		} );
 	}
+
+	const onKeyDown = handleKeyDown( {
+		ref,
+		getWin,
+		multilineTag,
+		formatTypes,
+		didAutomaticChange,
+		undo,
+		onSelectionChange,
+		setActiveFormats,
+		record,
+		placeholder,
+		handleChange,
+		onDelete,
+		multilineRootTag,
+		activeFormats,
+		preserveWhiteSpace,
+		onEnter,
+	} );
 
 	const editableProps = {
 		// Overridable props.
@@ -1078,7 +739,7 @@ function RichText(
 		onInput: handleInput,
 		onCompositionStart: handleCompositionStart,
 		onCompositionEnd: handleCompositionEnd,
-		onKeyDown: handleKeyDown,
+		onKeyDown,
 		onFocus: handleFocus,
 		onBlur: handleBlur,
 		onMouseDown: handlePointerDown,
