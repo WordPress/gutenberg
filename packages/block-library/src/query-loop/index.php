@@ -66,7 +66,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 	}
 
 	// Override the custom query with the global query if needed.
-	$use_global_query = ( isset( $block->context['query']['useGlobalQuery'] ) && $block->context['query']['useGlobalQuery'] );
+	$use_global_query = ( isset( $block->context['query']['isGlobalQuery'] ) && $block->context['query']['isGlobalQuery'] );
 	if ( $use_global_query ) {
 		global $wp_query;
 		if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) ) {

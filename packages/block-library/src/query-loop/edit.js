@@ -42,7 +42,7 @@ export default function QueryLoopEdit( {
 			search,
 			exclude,
 			sticky,
-			useGlobalQuery,
+			isGlobalQuery,
 		} = {},
 		queryContext,
 		layout: { type: layoutType = 'flex', columns = 1 } = {},
@@ -81,7 +81,7 @@ export default function QueryLoopEdit( {
 				query.sticky = sticky === 'only';
 			}
 
-			if ( useGlobalQuery ) {
+			if ( isGlobalQuery ) {
 				const templateQuery = getTemplateQuery();
 				Object.keys( templateQuery ).forEach( ( key ) => {
 					query[ key ] = templateQuery[ key ];
