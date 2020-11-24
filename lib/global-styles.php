@@ -227,6 +227,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	return $settings;
 }
 
-add_action( 'init', [ 'WP_Theme_JSON_Resolver', 'register_user_custom_post_type'] );
+add_action( 'init', array( 'WP_Theme_JSON_Resolver', 'register_user_custom_post_type' ) );
 add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
