@@ -54,7 +54,7 @@ function gutenberg_render_templates_lists_custom_column( $column_name, $post_id 
 
 	if ( 'theme' === $column_name ) {
 		$terms = get_the_terms( $post_id, 'wp_theme' );
-		if ( empty( $terms ) ) {
+		if ( empty( $terms ) || is_wp_error( $terms ) ) {
 			return;
 		}
 		$themes        = array();
