@@ -230,11 +230,16 @@ export class FileEdit extends Component {
 			actionButtonStyle,
 			dimmedStyle
 		);
+
+		const bottomSheetPadding = withBottomSheet
+			? styles.linkSettingsPanel
+			: undefined;
+
 		const settings = (
 			<>
 				{ panelTitle && <PanelBody title={ panelTitle } /> }
 				{
-					<PanelBody>
+					<PanelBody style={ bottomSheetPadding }>
 						<SelectControl
 							icon={ link }
 							label={ __( 'Link to' ) }
