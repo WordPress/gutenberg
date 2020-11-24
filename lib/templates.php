@@ -375,13 +375,13 @@ function filter_rest_prepare_add_wp_theme_slug_and_file_based( $response ) {
 			$response->data['file_based'] = $file_based;
 
 			$response->data['original_file_exists'] = false;
-			$template_files = array_unique(
+			$template_files                         = array_unique(
 				array_merge(
 					_gutenberg_get_template_paths( get_stylesheet_directory() . DIRECTORY_SEPARATOR . 'block-templates' ),
 					_gutenberg_get_template_paths( get_template_directory() . DIRECTORY_SEPARATOR . 'block-templates' )
 				)
 			);
-			foreach( $template_files as $template_file ) {
+			foreach ( $template_files as $template_file ) {
 				if ( basename( $template_file, '.html' ) === $response->data['slug'] ) {
 					$response->data['original_file_exists'] = true;
 					break;
