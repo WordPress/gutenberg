@@ -18,7 +18,8 @@ import {
 	useIsLineHeightDisabled,
 } from './line-height';
 import {
-	FONT_APPEARANCE_SUPPORT_KEY,
+	FONT_STYLE_SUPPORT_KEY,
+	FONT_WEIGHT_SUPPORT_KEY,
 	FontAppearanceEdit,
 	useIsFontAppearanceDisabled,
 } from './font-appearance';
@@ -43,8 +44,9 @@ import {
 
 export const TYPOGRAPHY_SUPPORT_KEYS = [
 	LINE_HEIGHT_SUPPORT_KEY,
-	FONT_APPEARANCE_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
+	FONT_STYLE_SUPPORT_KEY,
+	FONT_WEIGHT_SUPPORT_KEY,
 	FONT_FAMILY_SUPPORT_KEY,
 	TEXT_DECORATION_SUPPORT_KEY,
 	TEXT_TRANSFORM_SUPPORT_KEY,

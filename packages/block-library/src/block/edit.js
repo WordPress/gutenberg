@@ -19,6 +19,7 @@ import {
 	BlockControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
@@ -51,7 +52,7 @@ export default function ReusableBlockEdit( {
 			isSaving: select( 'core' ).isSavingEntityRecord( ...recordArgs ),
 			canUserUpdate: select( 'core' ).canUser( 'update', 'blocks', ref ),
 			isEditing: select(
-				'core/reusable-blocks'
+				reusableBlocksStore
 			).__experimentalIsEditingReusableBlock( clientId ),
 			settings: select( 'core/block-editor' ).getSettings(),
 		} ),
@@ -60,7 +61,7 @@ export default function ReusableBlockEdit( {
 
 	const { editEntityRecord, saveEditedEntityRecord } = useDispatch( 'core' );
 	const { __experimentalSetEditingReusableBlock } = useDispatch(
-		'core/reusable-blocks'
+		reusableBlocksStore
 	);
 	const setIsEditing = useCallback(
 		( value ) => {
@@ -71,7 +72,7 @@ export default function ReusableBlockEdit( {
 
 	const {
 		__experimentalConvertBlockToStatic: convertBlockToStatic,
-	} = useDispatch( 'core/reusable-blocks' );
+	} = useDispatch( reusableBlocksStore );
 
 	const { createSuccessNotice, createErrorNotice } = useDispatch(
 		'core/notices'

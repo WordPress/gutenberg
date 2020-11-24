@@ -374,7 +374,7 @@ function RichText(
 		}
 
 		if ( onPaste ) {
-			const files = [ ...getFilesFromDataTransfer( clipboardData ) ];
+			const files = getFilesFromDataTransfer( clipboardData );
 
 			onPaste( {
 				value: removeEditorOnlyFormats( record.current ),

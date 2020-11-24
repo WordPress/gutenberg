@@ -97,6 +97,7 @@ The settings section has the following structure and default values:
         "dropCap": true, /* false to opt-out */
         "fontFamilies": [ ... ], /* font family presets */
         "fontSizes": [ ... ], /* font size presets, as in add_theme_support('editor-font-sizes', ... ) */
+        "fontStyles": [ ... ], /* font style presets */
         "fontWeights": [ ... ], /* font weight presets */
         "textDecorations": [ ... ], /* text decoration presets */
         "textTransforms": [ ... ] /* text transform presets */

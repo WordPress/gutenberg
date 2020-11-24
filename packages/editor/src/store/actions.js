@@ -54,7 +54,6 @@ export function* setupEditor( post, edits, template ) {
 	}
 
 	yield resetPost( post );
-
 	yield {
 		type: 'SETUP_EDITOR',
 		post,
@@ -65,7 +64,6 @@ export function* setupEditor( post, edits, template ) {
 		__unstableShouldCreateUndoLevel: false,
 	} );
 	yield setupEditorState( post );
-
 	if (
 		edits &&
 		Object.keys( edits ).some(

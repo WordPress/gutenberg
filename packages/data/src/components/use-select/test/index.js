@@ -47,7 +47,8 @@ describe( 'useSelect', () => {
 		const testInstance = renderer.root;
 		// 2 times expected
 		// - 1 for initial mount
-		expect( selectSpy ).toHaveBeenCalledTimes( 1 );
+		// - 1 for after mount before subscription set.
+		expect( selectSpy ).toHaveBeenCalledTimes( 2 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
 		// ensure expected state was rendered
@@ -81,7 +82,7 @@ describe( 'useSelect', () => {
 		} );
 		const testInstance = renderer.root;
 
-		expect( selectSpyFoo ).toHaveBeenCalledTimes( 1 );
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
 		expect( selectSpyBar ).toHaveBeenCalledTimes( 0 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 1 );
 
@@ -99,7 +100,7 @@ describe( 'useSelect', () => {
 			);
 		} );
 
-		expect( selectSpyFoo ).toHaveBeenCalledTimes( 1 );
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
 		expect( selectSpyBar ).toHaveBeenCalledTimes( 0 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 2 );
 
@@ -118,7 +119,7 @@ describe( 'useSelect', () => {
 			);
 		} );
 
-		expect( selectSpyFoo ).toHaveBeenCalledTimes( 1 );
+		expect( selectSpyFoo ).toHaveBeenCalledTimes( 2 );
 		expect( selectSpyBar ).toHaveBeenCalledTimes( 1 );
 		expect( TestComponent ).toHaveBeenCalledTimes( 3 );
 
@@ -128,17 +129,18 @@ describe( 'useSelect', () => {
 		} );
 	} );
 	describe( 'rerenders as expected with various mapSelect return types', () => {
-		const getComponent = ( mapSelectSpy ) => ( { render } ) => {
-			const data = useSelect( ( select ) => mapSelectSpy( select ), [
-				render,
-			] );
+		const getComponent = ( mapSelectSpy ) => () => {
+			const data = useSelect( mapSelectSpy, [] );
 			return <div data={ data } />;
 		};
-		let TestComponent;
+		let subscribedSpy, TestComponent;
 		const mapSelectSpy = jest.fn( ( select ) =>
 			select( 'testStore' ).testSelector()
 		);
 		const selectorSpy = jest.fn();
+		const subscribeCallback = ( subscription ) => {
+			subscribedSpy = subscription;
+		};
 
 		beforeEach( () => {
 			registry.registerStore( 'testStore', {
@@ -147,6 +149,7 @@ describe( 'useSelect', () => {
 					testSelector: selectorSpy,
 				},
 			} );
+			registry.subscribe = subscribeCallback;
 			TestComponent = getComponent( mapSelectSpy );
 		} );
 		afterEach( () => {
@@ -177,7 +180,7 @@ describe( 'useSelect', () => {
 				act( () => {
 					renderer = TestRenderer.create(
 						<RegistryProvider value={ registry }>
-							<TestComponent render="1" />
+							<TestComponent />
 						</RegistryProvider>
 					);
 				} );
@@ -191,16 +194,12 @@ describe( 'useSelect', () => {
 				// subscription which should in turn trigger a re-render.
 				act( () => {
 					selectorSpy.mockReturnValue( valueB );
-					renderer.update(
-						<RegistryProvider value={ registry }>
-							<TestComponent render="2" />
-						</RegistryProvider>
-					);
+					subscribedSpy();
 				} );
 				expect( testInstance.findByType( 'div' ).props.data ).toEqual(
 					valueB
 				);
-				expect( mapSelectSpy ).toHaveBeenCalledTimes( 2 );
+				expect( mapSelectSpy ).toHaveBeenCalledTimes( 3 );
 			}
 		);
 	} );

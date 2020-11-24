@@ -12,64 +12,81 @@ describe( 'getNavigationPostForMenu', () => {
 	it( 'gets navigation post for menu', () => {
 		const getEditedEntityRecord = jest.fn( () => 'record' );
 		const hasFinishedResolution = jest.fn( () => true );
-		const __unstableGetSelect = jest.fn( () => ( {
-			getEditedEntityRecord,
-			hasFinishedResolution,
-		} ) );
+		const registry = {
+			select: jest.fn( () => ( {
+				getEditedEntityRecord,
+				hasFinishedResolution,
+			} ) ),
+		};
 
 		const menuId = 123;
 
-		getNavigationPostForMenu.__unstableGetSelect = __unstableGetSelect;
-		hasResolvedNavigationPost.__unstableGetSelect = __unstableGetSelect;
+		const defaultRegistry = getNavigationPostForMenu.registry;
+		getNavigationPostForMenu.registry = registry;
+		hasResolvedNavigationPost.registry = registry;
 
 		expect( getNavigationPostForMenu( 'state', menuId ) ).toBe( 'record' );
 
-		expect( __unstableGetSelect ).toHaveBeenCalledWith( 'core' );
+		expect( registry.select ).toHaveBeenCalledWith( 'core' );
 		expect( getEditedEntityRecord ).toHaveBeenCalledWith(
 			KIND,
 			POST_TYPE,
 			buildNavigationPostId( menuId )
 		);
+
+		getNavigationPostForMenu.registry = defaultRegistry;
+		hasResolvedNavigationPost.registry = defaultRegistry;
 	} );
 
 	it( 'returns null if has not resolved navigation post yet', () => {
 		const getEditedEntityRecord = jest.fn( () => 'record' );
 		const hasFinishedResolution = jest.fn( () => false );
-		const __unstableGetSelect = jest.fn( () => ( {
-			getEditedEntityRecord,
-			hasFinishedResolution,
-		} ) );
+		const registry = {
+			select: jest.fn( () => ( {
+				getEditedEntityRecord,
+				hasFinishedResolution,
+			} ) ),
+		};
 
 		const menuId = 123;
 
-		getNavigationPostForMenu.__unstableGetSelect = __unstableGetSelect;
-		hasResolvedNavigationPost.__unstableGetSelect = __unstableGetSelect;
+		const defaultRegistry = getNavigationPostForMenu.registry;
+		getNavigationPostForMenu.registry = registry;
+		hasResolvedNavigationPost.registry = registry;
 
 		expect( getNavigationPostForMenu( 'state', menuId ) ).toBe( null );
 
-		expect( __unstableGetSelect ).toHaveBeenCalledWith( 'core' );
+		expect( registry.select ).toHaveBeenCalledWith( 'core' );
 		expect( getEditedEntityRecord ).not.toHaveBeenCalled();
+
+		getNavigationPostForMenu.registry = defaultRegistry;
+		hasResolvedNavigationPost.registry = defaultRegistry;
 	} );
 } );
 
 describe( 'hasResolvedNavigationPost', () => {
 	it( 'returns if it has resolved navigation post yet', () => {
 		const hasFinishedResolution = jest.fn( () => true );
-		const __unstableGetSelect = jest.fn( () => ( {
-			hasFinishedResolution,
-		} ) );
+		const registry = {
+			select: jest.fn( () => ( {
+				hasFinishedResolution,
+			} ) ),
+		};
 
 		const menuId = 123;
 
-		hasResolvedNavigationPost.__unstableGetSelect = __unstableGetSelect;
+		const defaultRegistry = getNavigationPostForMenu.registry;
+		hasResolvedNavigationPost.registry = registry;
 
 		expect( hasResolvedNavigationPost( 'state', menuId ) ).toBe( true );
 
-		expect( __unstableGetSelect ).toHaveBeenCalledWith( 'core' );
+		expect( registry.select ).toHaveBeenCalledWith( 'core' );
 		expect( hasFinishedResolution ).toHaveBeenCalledWith(
 			'getEntityRecord',
 			[ KIND, POST_TYPE, buildNavigationPostId( menuId ) ]
 		);
+
+		hasResolvedNavigationPost.registry = defaultRegistry;
 	} );
 } );
 
@@ -77,9 +94,11 @@ describe( 'getMenuItemForClientId', () => {
 	it( 'gets menu item for client id', () => {
 		const getMenuItem = jest.fn( () => 'menuItem' );
 
-		const __unstableGetSelect = jest.fn( () => ( {
-			getMenuItem,
-		} ) );
+		const registry = {
+			select: jest.fn( () => ( {
+				getMenuItem,
+			} ) ),
+		};
 
 		const state = {
 			mapping: {
@@ -89,13 +108,16 @@ describe( 'getMenuItemForClientId', () => {
 			},
 		};
 
-		getMenuItemForClientId.__unstableGetSelect = __unstableGetSelect;
+		const defaultRegistry = getMenuItemForClientId.registry;
+		getMenuItemForClientId.registry = registry;
 
 		expect( getMenuItemForClientId( state, 'postId', 'clientId' ) ).toBe(
 			'menuItem'
 		);
 
-		expect( __unstableGetSelect ).toHaveBeenCalledWith( 'core' );
+		expect( registry.select ).toHaveBeenCalledWith( 'core' );
 		expect( getMenuItem ).toHaveBeenCalledWith( '123' );
+
+		getMenuItemForClientId.registry = defaultRegistry;
 	} );
 } );
