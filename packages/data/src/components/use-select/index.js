@@ -1,22 +1,39 @@
 /**
+ * External dependencies
+ */
+import { useMemoOne } from 'use-memo-one';
+
+/**
  * WordPress dependencies
  */
+import { createQueue } from '@wordpress/priority-queue';
 import {
 	useLayoutEffect,
 	useRef,
-	useState,
-	useMemo,
 	useCallback,
+	useEffect,
+	useReducer,
 } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
-import { createDerivedAtom, createAtomRegistry } from '@wordpress/stan';
-import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import useAsyncMode from '../async-mode-provider/use-async-mode';
 import useRegistry from '../registry-provider/use-registry';
+import useAsyncMode from '../async-mode-provider/use-async-mode';
+
+/**
+ * Favor useLayoutEffect to ensure the store subscription callback always has
+ * the selector from the latest render. If a store update happens between render
+ * and the effect, this could cause missed/stale updates or inconsistent state.
+ *
+ * Fallback to useEffect for server rendered components because currently React
+ * throws a warning when using useLayoutEffect in that environment.
+ */
+const useIsomorphicLayoutEffect =
+	typeof window !== 'undefined' ? useLayoutEffect : useEffect;
+
+const renderQueue = createQueue();
 
 /**
  * Custom react hook for retrieving props from registered selectors.
@@ -25,14 +42,15 @@ import useRegistry from '../registry-provider/use-registry';
  * [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
  *
  * @param {Function} _mapSelect  Function called on every state change. The
- * returned value is exposed to the component
- * implementing this hook. The function receives
- * the `registry.select` method on the first
- * argument and the `registry` on the second
- * argument.
- * @param {Array} deps        If provided, this memoizes the mapSelect so the
- * same `mapSelect` is invoked on every state
- * change unless the dependencies change.
+ *                               returned value is exposed to the component
+ *                               implementing this hook. The function receives
+ *                               the `registry.select` method on the first
+ *                               argument and the `registry` on the second
+ *                               argument.
+ * @param {Array}    deps        If provided, this memoizes the mapSelect so the
+ *                               same `mapSelect` is invoked on every state
+ *                               change unless the dependencies change.
+ *
  * @example
  * ```js
  * import { useSelect } from '@wordpress/data';
@@ -57,51 +75,42 @@ import useRegistry from '../registry-provider/use-registry';
  * any price in the state for that currency is retrieved. If the currency prop
  * doesn't change and other props are passed in that do change, the price will
  * not change because the dependency is just the currency.
+ *
  * @return {Function}  A custom react hook.
  */
 export default function useSelect( _mapSelect, deps ) {
-	const atomRegistry = useMemo( () => createAtomRegistry(), [] );
 	const mapSelect = useCallback( _mapSelect, deps );
-	const previousMapSelect = usePrevious( mapSelect );
-	const result = useRef();
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
-	const [ , dispatch ] = useState( {} );
-	const rerender = () => dispatch( {} );
-	const isMountedAndNotUnsubscribing = useRef( true );
-	const previousMapError = useRef();
-	const shouldSyncCompute =
-		previousMapSelect !== mapSelect || !! previousMapError.current;
+	// React can sometimes clear the `useMemo` cache.
+	// We use the cache-stable `useMemoOne` to avoid
+	// losing queues.
+	const queueContext = useMemoOne( () => ( { queue: true } ), [ registry ] );
+	const [ , forceRender ] = useReducer( ( s ) => s + 1, 0 );
 
-	const atomState = useMemo( () => {
-		return createDerivedAtom(
-			( { get } ) => {
-				const current = registry.__internalGetAtomResolver();
-				registry.__internalSetAtomResolver( get );
-				let ret;
-				try {
-					ret = mapSelect( registry.select, registry );
-				} catch ( error ) {
-					ret = result.current;
-					previousMapError.current = error;
-				}
-				registry.__internalSetAtomResolver( current );
-				return ret;
-			},
-			() => {},
-			{ isAsync }
-		)( atomRegistry );
-	}, [ isAsync, registry, mapSelect ] );
+	const latestMapSelect = useRef();
+	const latestIsAsync = useRef( isAsync );
+	const latestMapOutput = useRef();
+	const latestMapOutputError = useRef();
+	const isMountedAndNotUnsubscribing = useRef();
+
+	let mapOutput;
 
 	try {
-		if ( shouldSyncCompute ) {
-			result.current = atomState.get();
+		if (
+			latestMapSelect.current !== mapSelect ||
+			latestMapOutputError.current
+		) {
+			mapOutput = mapSelect( registry.select, registry );
+		} else {
+			mapOutput = latestMapOutput.current;
 		}
 	} catch ( error ) {
 		let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
-		if ( previousMapError.current ) {
+
+		if ( latestMapOutputError.current ) {
 			errorMessage += `\nThe error may be correlated with this previous error:\n`;
-			errorMessage += `${ previousMapError.current.stack }\n\n`;
+			errorMessage += `${ latestMapOutputError.current.stack }\n\n`;
 			errorMessage += 'Original stack trace:';
 
 			throw new Error( errorMessage );
@@ -110,33 +119,66 @@ export default function useSelect( _mapSelect, deps ) {
 			console.error( errorMessage );
 		}
 	}
-	useLayoutEffect( () => {
-		previousMapError.current = undefined;
+
+	useIsomorphicLayoutEffect( () => {
+		latestMapSelect.current = mapSelect;
+		latestMapOutput.current = mapOutput;
+		latestMapOutputError.current = undefined;
 		isMountedAndNotUnsubscribing.current = true;
+
+		// This has to run after the other ref updates
+		// to avoid using stale values in the flushed
+		// callbacks or potentially overwriting a
+		// changed `latestMapOutput.current`.
+		if ( latestIsAsync.current !== isAsync ) {
+			latestIsAsync.current = isAsync;
+			renderQueue.flush( queueContext );
+		}
 	} );
 
-	useLayoutEffect( () => {
+	useIsomorphicLayoutEffect( () => {
 		const onStoreChange = () => {
-			if (
-				isMountedAndNotUnsubscribing.current &&
-				! isShallowEqual( atomState.get(), result.current )
-			) {
-				result.current = atomState.get();
-				rerender();
+			if ( isMountedAndNotUnsubscribing.current ) {
+				try {
+					const newMapOutput = latestMapSelect.current(
+						registry.select,
+						registry
+					);
+					if (
+						isShallowEqual( latestMapOutput.current, newMapOutput )
+					) {
+						return;
+					}
+					latestMapOutput.current = newMapOutput;
+				} catch ( error ) {
+					latestMapOutputError.current = error;
+				}
+				forceRender();
 			}
 		};
-		const unsubscribe = atomState.subscribe( () => {
-			onStoreChange();
-		} );
 
-		// This is necessary if the value changes during mount.
-		onStoreChange();
+		// catch any possible state changes during mount before the subscription
+		// could be set.
+		if ( latestIsAsync.current ) {
+			renderQueue.add( queueContext, onStoreChange );
+		} else {
+			onStoreChange();
+		}
+
+		const unsubscribe = registry.subscribe( () => {
+			if ( latestIsAsync.current ) {
+				renderQueue.add( queueContext, onStoreChange );
+			} else {
+				onStoreChange();
+			}
+		} );
 
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;
 			unsubscribe();
+			renderQueue.flush( queueContext );
 		};
-	}, [ atomState ] );
+	}, [ registry ] );
 
-	return result.current;
+	return mapOutput;
 }

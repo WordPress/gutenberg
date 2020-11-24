@@ -22,7 +22,7 @@ const { Provider } = Context;
 
 function getDragEventType( { dataTransfer } ) {
 	if ( dataTransfer ) {
-		if ( getFilesFromDataTransfer( dataTransfer ).size > 0 ) {
+		if ( getFilesFromDataTransfer( dataTransfer ).length > 0 ) {
 			return 'file';
 		}
 
@@ -204,7 +204,7 @@ export default function DropZoneProvider( { children } ) {
 			switch ( dragEventType ) {
 				case 'file':
 					hoveredDropZone.onFilesDrop(
-						[ ...getFilesFromDataTransfer( event.dataTransfer ) ],
+						getFilesFromDataTransfer( event.dataTransfer ),
 						position
 					);
 					break;

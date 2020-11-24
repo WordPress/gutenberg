@@ -6,11 +6,16 @@ import { Button } from '@wordpress/components';
 import { createBlock, getBlockType, parse } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockDirectoryStore } from '../../store';
+
 export default function InstallButton( { attributes, block, clientId } ) {
 	const isInstallingBlock = useSelect( ( select ) =>
-		select( 'core/block-directory' ).isInstalling( block.id )
+		select( blockDirectoryStore ).isInstalling( block.id )
 	);
-	const { installBlockType } = useDispatch( 'core/block-directory' );
+	const { installBlockType } = useDispatch( blockDirectoryStore );
 	const { replaceBlock } = useDispatch( 'core/block-editor' );
 
 	return (

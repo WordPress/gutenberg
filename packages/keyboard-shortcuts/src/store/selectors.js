@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import createSelector from 'rememo';
 import { compact } from 'lodash';
 
 /**
@@ -11,12 +12,6 @@ import {
 	shortcutAriaLabel,
 	rawShortcut,
 } from '@wordpress/keycodes';
-import { createAtomSelector } from '@wordpress/stan';
-
-/**
- * Internal dependencies
- */
-import { shortcutsAtom, shortcutsByNameAtom } from './atoms';
 
 /** @typedef {import('./actions').WPShortcutKeyCombination} WPShortcutKeyCombination */
 
@@ -65,104 +60,98 @@ function getKeyCombinationRepresentation( shortcut, representation ) {
 }
 
 /**
- * Returns the shortcut object for a given shortcut name.
- *
- * @param {string}   name Shortcut name.
- * @return {WPShortcutKeyCombination?} Key combination.
- */
-const getShortcut = createAtomSelector( ( name ) => ( { get } ) => {
-	return get( shortcutsByNameAtom )[ name ];
-} );
-
-/**
  * Returns the main key combination for a given shortcut name.
  *
- * @param {string}   name Shortcut name.
+ * @param {Object} state Global state.
+ * @param {string} name  Shortcut name.
+ *
  * @return {WPShortcutKeyCombination?} Key combination.
  */
-export const getShortcutKeyCombination = createAtomSelector(
-	( name ) => ( { get } ) => {
-		const shortcut = get( getShortcut( name ) );
-		return shortcut ? shortcut.keyCombination : null;
-	}
-);
+export function getShortcutKeyCombination( state, name ) {
+	return state[ name ] ? state[ name ].keyCombination : null;
+}
 
 /**
  * Returns a string representing the main key combination for a given shortcut name.
  *
+ * @param {Object}                   state          Global state.
  * @param {string}                   name           Shortcut name.
  * @param {keyof FORMATTING_METHODS} representation Type of representation
  *                                                  (display, raw, ariaLabel).
  *
  * @return {string?} Shortcut representation.
  */
-export const getShortcutRepresentation = createAtomSelector(
-	( name, representation = 'display' ) => ( { get } ) => {
-		const shortcut = get( getShortcutKeyCombination( name ) );
-		return getKeyCombinationRepresentation( shortcut, representation );
-	}
-);
+export function getShortcutRepresentation(
+	state,
+	name,
+	representation = 'display'
+) {
+	const shortcut = getShortcutKeyCombination( state, name );
+	return getKeyCombinationRepresentation( shortcut, representation );
+}
 
 /**
  * Returns the shortcut description given its name.
  *
- * @param {string}   name Shortcut name.
+ * @param {Object} state Global state.
+ * @param {string} name  Shortcut name.
  *
  * @return {string?} Shortcut description.
  */
-export const getShortcutDescription = createAtomSelector(
-	( name ) => ( { get } ) => {
-		const shortcut = get( getShortcut( name ) );
-		return shortcut ? shortcut.description : null;
-	}
-);
+export function getShortcutDescription( state, name ) {
+	return state[ name ] ? state[ name ].description : null;
+}
 
 /**
  * Returns the aliases for a given shortcut name.
  *
- * @param {string}   name Shortcut name.
+ * @param {Object} state Global state.
+ * @param {string} name  Shortcut name.
  *
  * @return {WPShortcutKeyCombination[]} Key combinations.
  */
-export const getShortcutAliases = createAtomSelector(
-	( name ) => ( { get } ) => {
-		const shortcut = get( getShortcut( name ) );
-		return shortcut && shortcut.aliases ? shortcut.aliases : EMPTY_ARRAY;
-	}
-);
+export function getShortcutAliases( state, name ) {
+	return state[ name ] && state[ name ].aliases
+		? state[ name ].aliases
+		: EMPTY_ARRAY;
+}
 
 /**
  * Returns the raw representation of all the keyboard combinations of a given shortcut name.
  *
- * @param {string}   name Shortcut name.
+ * @param {Object} state Global state.
+ * @param {string} name  Shortcut name.
  *
  * @return {string[]} Shortcuts.
  */
-export const getAllShortcutRawKeyCombinations = createAtomSelector(
-	( name ) => ( { get } ) => {
+export const getAllShortcutRawKeyCombinations = createSelector(
+	( state, name ) => {
 		return compact( [
 			getKeyCombinationRepresentation(
-				get( getShortcutKeyCombination( name ) ),
+				getShortcutKeyCombination( state, name ),
 				'raw'
 			),
-			...get( getShortcutAliases( name ) ).map( ( combination ) =>
+			...getShortcutAliases( state, name ).map( ( combination ) =>
 				getKeyCombinationRepresentation( combination, 'raw' )
 			),
 		] );
-	}
+	},
+	( state, name ) => [ state[ name ] ]
 );
 
 /**
  * Returns the shortcut names list for a given category name.
  *
- * @param {string}   categoryName Category name.
+ * @param {Object} state Global state.
+ * @param {string} name  Category name.
  *
  * @return {string[]} Shortcut names.
  */
-export const getCategoryShortcuts = createAtomSelector(
-	( categoryName ) => ( { get } ) => {
-		return ( get( shortcutsAtom ) || [] )
-			.filter( ( shortcut ) => shortcut.category === categoryName )
-			.map( ( { name } ) => name );
-	}
+export const getCategoryShortcuts = createSelector(
+	( state, categoryName ) => {
+		return Object.entries( state )
+			.filter( ( [ , shortcut ] ) => shortcut.category === categoryName )
+			.map( ( [ name ] ) => name );
+	},
+	( state ) => [ state ]
 );
