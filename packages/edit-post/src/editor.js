@@ -13,7 +13,7 @@ import {
 	ErrorBoundary,
 	PostLockedModal,
 } from '@wordpress/editor';
-import { StrictMode, useEffect, useMemo, useState } from '@wordpress/element';
+import { StrictMode, useMemo } from '@wordpress/element';
 import {
 	KeyboardShortcuts,
 	SlotFillProvider,
@@ -27,25 +27,6 @@ import preventEventDiscovery from './prevent-event-discovery';
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import EditPostSettings from './components/edit-post-settings';
-import findTemplate from './utils/find-template';
-
-function useTemplate( link ) {
-	const getEntityRecords = useSelect(
-		( select ) => select( 'core' ).getEntityRecords,
-		[]
-	);
-	const [ template, setTemplate ] = useState( null, getEntityRecords );
-
-	useEffect( () => {
-		setTemplate( undefined );
-		if ( ! link ) {
-			return;
-		}
-		findTemplate( link ).then( setTemplate );
-	}, [ link ] );
-
-	return template;
-}
 
 function Editor( {
 	postId,
@@ -67,14 +48,18 @@ function Editor( {
 		__experimentalLocalAutosaveInterval,
 		keepCaretInsideBlock,
 		templateZoomOut,
+		template,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
 			getPreference,
 			__experimentalGetPreviewDeviceType,
 		} = select( 'core/edit-post' );
-		const { getEntityRecord } = select( 'core' );
+		const { getEntityRecord, __experimentalGetTemplateForLink } = select(
+			'core'
+		);
 		const { getBlockTypes } = select( blocksStore );
+		const postObject = getEntityRecord( 'postType', postType, postId );
 
 		return {
 			hasFixedToolbar:
@@ -83,7 +68,6 @@ function Editor( {
 			focusMode: isFeatureActive( 'focusMode' ),
 			hasReducedUI: isFeatureActive( 'reducedUI' ),
 			hasThemeStyles: isFeatureActive( 'themeStyles' ),
-			post: getEntityRecord( 'postType', postType, postId ),
 			preferredStyleVariations: getPreference(
 				'preferredStyleVariations'
 			),
@@ -94,6 +78,10 @@ function Editor( {
 			),
 			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 			templateZoomOut: isFeatureActive( 'templateZoomOut' ),
+			template: postObject
+				? __experimentalGetTemplateForLink( postObject.link )
+				: null,
+			post: postObject,
 		};
 	} );
 
@@ -155,7 +143,6 @@ function Editor( {
 		keepCaretInsideBlock,
 	] );
 
-	const template = useTemplate( post && post.link );
 	const templateContent = useMemo( () => {
 		return template ? parse( template.post_content ) : [];
 	}, [ template ] );
