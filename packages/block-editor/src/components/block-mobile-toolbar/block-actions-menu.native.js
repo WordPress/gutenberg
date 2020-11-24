@@ -14,6 +14,7 @@ import {
 	rawHandler,
 	createBlock,
 	isUnmodifiedDefaultBlock,
+	getPossibleBlockTransformations,
 	switchToBlockType,
 } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
@@ -49,8 +50,10 @@ const BlockActionsMenu = ( {
 	isPasteEnabled,
 	isTransformEnabled,
 	onTransform,
+	transformOptions,
 } ) => {
 	const pickerRef = useRef();
+	const transformPickerRef = useRef();
 	const moversOptions = { keys: [ 'icon', 'actionTitle' ] };
 
 	const {
@@ -130,6 +133,19 @@ const BlockActionsMenu = ( {
 		deleteOption,
 	] );
 
+	function onTransformPickerPresent() {
+		if ( transformPickerRef.current ) {
+			transformPickerRef.current.presentPicker();
+		}
+	}
+
+	function onTransformPickerSelect( value ) {
+		const transformedBlock = getBlocksByClientId( selectedBlockClientId );
+		onTransform( transformedBlock, value.name );
+		// translators: %s: block title e.g: "Paragraph"; displayed right after block is transformed.
+		createInfoNotice( sprintf( __( 'Transformed to %s' ), value.title ) );
+	}
+
 	function onPickerSelect( value ) {
 		switch ( value ) {
 			case deleteOption.value:
@@ -149,15 +165,7 @@ const BlockActionsMenu = ( {
 				onMoveUp();
 				break;
 			case transformButtonOption.value:
-				// STOPSHIP (blixt): For now, it's hard-coded to transform to a header block.
-				// Future diff: Handle presenting a second Picker, with the
-				// handful of options outlined in
-				// https://github.com/wordpress-mobile/gutenberg-mobile/issues/2814
-				const transformedBlock = getBlocksByClientId(
-					selectedBlockClientId
-				);
-				onTransform( transformedBlock, 'core/heading' );
-
+				onTransformPickerPresent();
 				break;
 			case copyButtonOption.value:
 				const copyBlock = getBlocksByClientId( selectedBlockClientId );
@@ -232,6 +240,22 @@ const BlockActionsMenu = ( {
 				// translators: %s: block title e.g: "Paragraph".
 				title={ sprintf( __( '%s block options' ), blockTitle ) }
 			/>
+			{ isTransformEnabled && (
+				<Picker
+					ref={ transformPickerRef }
+					options={ transformOptions }
+					onChange={ onTransformPickerSelect }
+					hideCancelButton={ Platform.OS !== 'ios' }
+					leftAlign={ true }
+					anchor={
+						anchorNodeRef
+							? findNodeHandle( anchorNodeRef )
+							: undefined
+					}
+					// translators: %s: block title e.g: "Paragraph".
+					title={ sprintf( __( 'Transform %s to' ), blockTitle ) }
+				/>
+			) }
 		</>
 	);
 };
@@ -279,10 +303,33 @@ export default compose(
 
 		// NOTE (blixt): To start, we're enabling the Transform menu just for
 		// Paragraph blocks - we can expand this list later-on!
-		// TODO (blixt): A unit-testable function would be nice, once there are
-		// multiple blockType.name values that have this feature.
-		// TODO (blixt): Check out /block-switcher/index.js for web's implementation
+		// TODO (blixt): Extracting this to a unit-testable function would be
+		// nice, especially once there are multiple blockType.name values that
+		// have this feature.
 		const isTransformEnabled = blockName === 'core/paragraph';
+
+		// NOTE (blixt): These are the safelisted destination-blocks for a
+		// `core/paragraph` block, as outlined in
+		// https://github.com/wordpress-mobile/gutenberg-mobile/issues/2814
+		const allowedBlockNames = [
+			'core/heading',
+			'core/list',
+			'core/quote',
+			'core/preformatted',
+			'core/pullquote',
+			'core/verse',
+		];
+		const transformOptions = getPossibleBlockTransformations( [ block ] )
+			.filter( ( possibleBlockTransform ) => {
+				return allowedBlockNames.includes(
+					possibleBlockTransform.name
+				);
+			} )
+			.map( ( transformOption ) => ( {
+				id: transformOption.name,
+				label: transformOption.title,
+				value: transformOption,
+			} ) );
 
 		return {
 			isFirst: firstIndex === 0,
@@ -296,6 +343,7 @@ export default compose(
 			isPasteEnabled,
 			clipboardBlock,
 			isTransformEnabled,
+			transformOptions,
 		};
 	} ),
 	withDispatch(
