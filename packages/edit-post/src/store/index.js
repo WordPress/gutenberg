@@ -26,7 +26,7 @@ const storeConfig = {
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, storeConfig );
+export const editPostStore = createReduxStore( STORE_NAME, storeConfig );
 
 // Ideally we use register instead of register store.
 // We shouuld be able to make the switch once we remove the effects.

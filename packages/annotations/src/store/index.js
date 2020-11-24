@@ -22,10 +22,10 @@ const STORE_NAME = 'core/annotations';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
+export const annotationsStore = createReduxStore( STORE_NAME, {
 	reducer,
 	selectors,
 	actions,
 } );
 
-register( store );
+register( annotationsStore );

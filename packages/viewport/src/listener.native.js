@@ -12,7 +12,7 @@ import { dispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { store } from './store';
+import { viewportStore } from './store';
 
 const matchWidth = ( operator, breakpoint ) => {
 	const { width } = Dimensions.get( 'window' );
@@ -39,7 +39,7 @@ const addDimensionsEventListener = ( breakpoints, operators ) => {
 			{}
 		);
 
-		dispatch( store ).setIsMatching( matches );
+		dispatch( viewportStore ).setIsMatching( matches );
 	};
 
 	Dimensions.addEventListener( 'change', setIsMatching );

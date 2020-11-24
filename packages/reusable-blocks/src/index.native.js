@@ -3,5 +3,5 @@
  */
 import '@wordpress/core-data';
 
-export { store } from './store';
+export { reusableBlocksStore } from './store';
 export * from './components';

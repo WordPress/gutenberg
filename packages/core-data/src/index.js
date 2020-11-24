@@ -71,9 +71,9 @@ const storeConfig = {
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, storeConfig );
+export const coreDataStore = createReduxStore( STORE_NAME, storeConfig );
 
-register( store );
+register( coreDataStore );
 
 export { default as EntityProvider } from './entity-provider';
 export * from './entity-provider';

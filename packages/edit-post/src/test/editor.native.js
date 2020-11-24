@@ -10,7 +10,7 @@ import { act } from 'react-dom/test-utils';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import RNReactNativeGutenbergBridge from '@wordpress/react-native-bridge';
 // Force register 'core/editor' store.
-import { store } from '@wordpress/editor'; // eslint-disable-line no-unused-vars
+import { editorStore } from '@wordpress/editor'; // eslint-disable-line no-unused-vars
 
 jest.mock( '../components/layout', () => () => 'Layout' );
 

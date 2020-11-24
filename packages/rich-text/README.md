@@ -271,6 +271,18 @@ _Returns_
 
 -   `RichTextValue`: A new value with replacements applied.
 
+<a name="richTextStore" href="#richTextStore">#</a> **richTextStore**
+
+Store definition for the rich-text namespace.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
+
+_Type_
+
+-   `Object` 
+
 <a name="slice" href="#slice">#</a> **slice**
 
 Slice a Rich Text value from `startIndex` to `endIndex`. Indices are
@@ -301,18 +313,6 @@ _Parameters_
 _Returns_
 
 -   `Array<RichTextValue>`: An array of new values.
-
-<a name="store" href="#store">#</a> **store**
-
-Store definition for the rich-text namespace.
-
-_Related_
-
--   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
-
-_Type_
-
--   `Object` 
 
 <a name="toggleFormat" href="#toggleFormat">#</a> **toggleFormat**
 

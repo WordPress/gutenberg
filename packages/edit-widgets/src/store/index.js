@@ -41,9 +41,9 @@ const storeConfig = {
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, storeConfig );
+export const editWidgetsStore = createReduxStore( STORE_NAME, storeConfig );
 
-register( store );
+register( editWidgetsStore );
 
 // This package uses a few in-memory post types as wrappers for convenience.
 // This middleware prevents any network requests related to these types as they are

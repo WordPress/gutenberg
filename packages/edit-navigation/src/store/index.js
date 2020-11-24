@@ -39,6 +39,6 @@ const storeConfig = {
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, storeConfig );
+export const editNavigationStore = createReduxStore( STORE_NAME, storeConfig );
 
-register( store );
+register( editNavigationStore );
