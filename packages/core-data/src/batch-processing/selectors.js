@@ -6,7 +6,7 @@ export const getProcessor = ( state, queue ) => {
 	return state.processors[ queue ];
 };
 
-export const getPromise = ( state, queue, context ) => {
+export const getPromise = ( state, queue, context = 'default' ) => {
 	return state.promises[ queue ]?.[ context ];
 };
 

@@ -7,12 +7,10 @@ import { invert } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { dispatch as dataDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { STATE_SUCCESS } from './batch-processing/constants';
 import { dispatch, select, getWidgetToClientIdMapping } from './controls';
 import { transformBlockToWidget } from './transformers';
 import {
@@ -133,6 +131,16 @@ export function* saveWidgetArea( widgetAreaId ) {
 		// since order is important.
 		sidebarWidgetsIds.push( widgetId );
 
+		const recordSpec = {
+			kind: 'root',
+			type: 'widget',
+			key: widgetId,
+			record: {
+				...widget,
+				sidebar: widgetAreaId,
+			},
+		};
+
 		if ( widgetId ) {
 			yield dispatch(
 				'core',
@@ -157,36 +165,23 @@ export function* saveWidgetArea( widgetAreaId ) {
 			if ( ! hasEdits ) {
 				continue;
 			}
-
-			dataDispatch( 'core' ).saveEditedEntityRecord(
-				'root',
-				'widget',
-				widgetId,
-				widget
-			);
-		} else {
-			// This is a new widget instance.
-			dataDispatch( 'core' ).saveEntityRecord( 'root', 'widget', {
-				...widget,
-				sidebar: widgetAreaId,
-			} );
 		}
 
 		batchMeta.push( {
 			block,
+			recordSpec,
 			position: i,
 			clientId: block.clientId,
 		} );
 	}
 
 	const batch = yield dispatch(
-		'core/__experimental-batch-processing',
-		'processBatch',
-		'WIDGETS_API_FETCH',
-		'default'
+		'core',
+		'__experimentalBatchSaveEntityRecords',
+		batchMeta.map( ( { recordSpec } ) => recordSpec )
 	);
 
-	if ( batch.state !== STATE_SUCCESS ) {
+	if ( batch.state !== 'SUCCESS' ) {
 		const errors = batch.sortedItemIds.map( ( id ) => batch.errors[ id ] );
 		const failedWidgetNames = [];
 

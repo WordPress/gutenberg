@@ -46,7 +46,7 @@ export function processTransaction( batch, transactionId ) {
 	};
 }
 
-export function enqueueItemAndAutocommit( queue, context, item ) {
+export function enqueueItemAndAutocommit( queue, context = 'default', item ) {
 	return {
 		type: 'ENQUEUE_ITEM_AND_AUTOCOMMIT',
 		queue,
@@ -69,7 +69,7 @@ const controls = {
 	),
 
 	ENQUEUE_ITEM_AND_AUTOCOMMIT: createRegistryControl(
-		( registry ) => async ( { queue, context, item } ) => {
+		( registry ) => async ( { queue, context = 'default', item } ) => {
 			const { itemId } = await registry
 				.dispatch( STORE_NAME )
 				.enqueueItem( queue, context, item );

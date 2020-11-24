@@ -696,6 +696,7 @@ _Parameters_
 -   _record_ `Object`: Record to be saved.
 -   _options_ `Object`: Saving options.
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
+-   _options.isBatch_ `[boolean]`: Whether this should use a batch request.
 
 <a name="undo" href="#undo">#</a> **undo**
 

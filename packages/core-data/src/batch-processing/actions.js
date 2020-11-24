@@ -14,11 +14,19 @@ import {
 } from './controls';
 import { STATE_ERROR, STATE_SUCCESS } from './constants';
 
-export const enqueueItemAndAutocommit = function* ( queue, context, item ) {
+export const enqueueItemAndAutocommit = function* (
+	queue,
+	context = 'default',
+	item
+) {
 	return yield enqueueAutocommitControl( queue, context, item );
 };
 
-export const enqueueItemAndWaitForResults = function* ( queue, context, item ) {
+export const enqueueItemAndWaitForResults = function* (
+	queue,
+	context = 'default',
+	item
+) {
 	const { itemId } = yield dispatch( 'enqueueItem', queue, context, item );
 	const { promise } = yield* getOrSetupPromise( queue, context );
 
@@ -33,7 +41,7 @@ export const enqueueItemAndWaitForResults = function* ( queue, context, item ) {
 	};
 };
 
-export const enqueueItem = function ( queue, context, item ) {
+export const enqueueItem = function ( queue, context = 'default', item ) {
 	const itemId = uuid();
 	return {
 		type: 'ENQUEUE_ITEM',
@@ -44,7 +52,7 @@ export const enqueueItem = function ( queue, context, item ) {
 	};
 };
 
-const setupPromise = function ( queue, context ) {
+const setupPromise = function ( queue, context = 'default' ) {
 	const action = {
 		type: 'SETUP_PROMISE',
 		queue,
@@ -59,7 +67,7 @@ const setupPromise = function ( queue, context ) {
 	return action;
 };
 
-const getOrSetupPromise = function* ( queue, context ) {
+const getOrSetupPromise = function* ( queue, context = 'default' ) {
 	const promise = yield select( 'getPromise', queue, context );
 
 	if ( promise ) {
@@ -71,7 +79,11 @@ const getOrSetupPromise = function* ( queue, context ) {
 	return yield select( 'getPromise', queue, context );
 };
 
-export const processBatch = function* ( queue, context, meta = {} ) {
+export const processBatch = function* (
+	queue,
+	context = 'default',
+	meta = {}
+) {
 	const batchId = uuid();
 	yield prepareBatchForProcessing( queue, context, batchId, meta );
 	const { transactions } = yield select( 'getBatch', batchId );
@@ -152,7 +164,7 @@ export function* commitTransaction( batchId, transactionId ) {
 
 export function prepareBatchForProcessing(
 	queue,
-	context,
+	context = 'default',
 	batchId,
 	meta = {}
 ) {

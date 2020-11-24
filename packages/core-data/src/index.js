@@ -15,6 +15,7 @@ import * as locksSelectors from './locks/selectors';
 import * as locksActions from './locks/actions';
 import { defaultEntities, getMethodName } from './entities';
 import { STORE_NAME } from './name';
+import './batch-support';
 
 // The entity selectors/resolvers and actions are shortcuts to their generic equivalents
 // (getEntityRecord, getEntityRecords, updateEntityRecord, updateEntityRecordss)

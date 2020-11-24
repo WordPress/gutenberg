@@ -7,8 +7,8 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { controls } from '@wordpress/data';
-import { apiFetch } from '@wordpress/data-controls';
+import { controls, dispatch } from '@wordpress/data';
+import { __unstableAwaitPromise, apiFetch } from '@wordpress/data-controls';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -328,17 +328,21 @@ export function __unstableCreateUndoLevel() {
 /**
  * Action triggered to save an entity record.
  *
- * @param {string}  kind                       Kind of the received entity.
- * @param {string}  name                       Name of the received entity.
- * @param {Object}  record                     Record to be saved.
- * @param {Object}  options                    Saving options.
+ * @param {string} kind                       Kind of the received entity.
+ * @param {string} name                       Name of the received entity.
+ * @param {Object} record                     Record to be saved.
+ * @param {Object} options                    Saving options.
  * @param {boolean} [options.isAutosave=false] Whether this is an autosave.
+ * @param {boolean} [options.isBatch=false]    Whether this should use a batch request.
  */
 export function* saveEntityRecord(
 	kind,
 	name,
 	record,
-	{ isAutosave = false } = { isAutosave: false }
+	{ isAutosave = false, isBatch = false } = {
+		isAutosave: false,
+		isBatch: false,
+	}
 ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
@@ -442,11 +446,14 @@ export function* saveEntityRecord(
 								: data.status,
 					}
 				);
-				updatedRecord = yield apiFetch( {
-					path: `${ path }/autosaves`,
-					method: 'POST',
-					data,
-				} );
+				updatedRecord = yield* performRequest(
+					{
+						path: `${ path }/autosaves`,
+						method: 'POST',
+						data,
+					},
+					{ isBatch }
+				);
 				// An autosave may be processed by the server as a regular save
 				// when its update is requested by the author and the post had
 				// draft or auto-draft status.
@@ -542,11 +549,14 @@ export function* saveEntityRecord(
 					false
 				);
 
-				updatedRecord = yield apiFetch( {
-					path,
-					method: recordId ? 'PUT' : 'POST',
-					data,
-				} );
+				updatedRecord = yield* performRequest(
+					{
+						path,
+						method: recordId ? 'PUT' : 'POST',
+						data,
+					},
+					{ isBatch }
+				);
 				yield receiveEntityRecords(
 					kind,
 					name,
@@ -601,6 +611,21 @@ export function* saveEntityRecord(
 	}
 }
 
+function* performRequest( request, options ) {
+	if ( ! options.isBatch ) {
+		return yield apiFetch( request );
+	}
+
+	const { wait } = yield controls.dispatch(
+		'core/__experimental-batch-processing',
+		'enqueueItemAndWaitForResults',
+		'API_FETCH',
+		'default',
+		request
+	);
+	return yield __unstableAwaitPromise( wait );
+}
+
 /**
  * Action triggered to save an entity record's edits.
  *
@@ -630,6 +655,34 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 	);
 	const record = { id: recordId, ...edits };
 	yield* saveEntityRecord( kind, name, record, options );
+}
+
+/**
+ * Adds all specified entity records to a batch, and then saves them using one or more batch requests.
+ *
+ * @param {Object[]} spec List of { kind, name, key, record } of records to save.
+ * @return {Object} Finalized batch object.
+ */
+export function* __experimentalBatchSaveEntityRecords( spec ) {
+	for ( const { kind, type, key, record } of spec ) {
+		if ( key ) {
+			dispatch( 'core' ).saveEditedEntityRecord( kind, type, key, {
+				isBatch: true,
+			} );
+		} else {
+			dispatch( 'core' ).saveEntityRecord( kind, type, record, {
+				isBatch: true,
+			} );
+		}
+	}
+	yield __unstableAwaitPromise(
+		new Promise( ( resolve ) => setTimeout( resolve, 10 ) )
+	);
+	return yield controls.dispatch(
+		'core/__experimental-batch-processing',
+		'processBatch',
+		'API_FETCH'
+	);
 }
 
 /**
