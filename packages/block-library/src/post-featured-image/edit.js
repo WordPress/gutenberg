@@ -87,7 +87,7 @@ function PostFeaturedImageDisplay( {
 		) : (
 			<img
 				src={ media.source_url }
-				alt={ media.alt_text || __( 'No alternative text set' ) }
+				alt={ media.alt_text || __( 'Featured image' ) }
 			/>
 		);
 	}
