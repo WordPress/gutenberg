@@ -93,15 +93,15 @@ function ColumnsEditContainer( {
 	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUM );
 	const [ tempWidth, setTempWidth ] = useState( 0 );
 	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
-	const { globalStyles } = useContext( GlobalStylesContext );
+	const globalStyles = useContext( GlobalStylesContext );
 
 	const { verticalAlignment, align } = attributes;
 	const { width } = sizes || {};
 
-	const newColumnCount = columnCount || DEFAULT_COLUMNS_NUM;
-
 	useEffect( () => {
 		if ( columnCount === 0 ) {
+			const newColumnCount = columnCount || DEFAULT_COLUMNS_NUM;
+
 			updateColumns( columnCount, newColumnCount );
 		}
 	}, [] );

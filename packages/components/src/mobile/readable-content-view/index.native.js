@@ -15,15 +15,8 @@ import { ALIGNMENT_BREAKPOINTS, WIDE_ALIGNMENTS } from '@wordpress/components';
 import styles from './style.scss';
 
 const PIXEL_RATIO = 2;
-const MARGIN = 16;
 
-const ReadableContentView = ( {
-	align,
-	reversed,
-	children,
-	style,
-	parentWidth,
-} ) => {
+const ReadableContentView = ( { align, reversed, children, style } ) => {
 	const { width, height } = Dimensions.get( 'window' );
 	const [ windowWidth, setWindowWidth ] = useState( width );
 	const [ windowRatio, setWindowRatio ] = useState( width / height );
@@ -70,9 +63,6 @@ const ReadableContentView = ( {
 						: styles.centeredContent,
 					style,
 					styles[ align ],
-					parentWidth && {
-						maxWidth: parentWidth + 2 * MARGIN,
-					},
 					align === WIDE_ALIGNMENTS.alignments.wide &&
 						getWideStyles(),
 				] }

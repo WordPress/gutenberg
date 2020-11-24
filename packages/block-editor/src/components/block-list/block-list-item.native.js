@@ -122,6 +122,7 @@ export class BlockListItem extends Component {
 			contentResizeMode,
 			shouldShowInnerBlockAppender,
 			parentWidth,
+			marginHorizontal,
 			...restProps
 		} = this.props;
 		const readableContentViewStyle =
@@ -130,8 +131,12 @@ export class BlockListItem extends Component {
 		return (
 			<ReadableContentView
 				align={ blockAlignment }
-				style={ readableContentViewStyle }
-				parentWidth={ parentWidth }
+				style={ [
+					readableContentViewStyle,
+					parentWidth && {
+						maxWidth: parentWidth + 2 * marginHorizontal,
+					},
+				] }
 			>
 				<View
 					style={ this.getContentStyles( readableContentViewStyle ) }

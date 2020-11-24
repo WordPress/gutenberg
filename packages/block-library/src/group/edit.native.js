@@ -120,16 +120,12 @@ export default compose( [
 			isLastInnerBlockSelected = totalInnerBlocks === blockIndex;
 		}
 
-		const selectedBlockClientId = getSelectedBlockClientId();
-		const isSelected = selectedBlockClientId === clientId;
-
 		const parentId = getBlockRootClientId( clientId );
 		const parentBlockAlignment = getBlockAttributes( parentId )?.align;
 
 		return {
 			hasInnerBlocks,
 			isLastInnerBlockSelected,
-			isSelected,
 			parentBlockAlignment,
 		};
 	} ),
