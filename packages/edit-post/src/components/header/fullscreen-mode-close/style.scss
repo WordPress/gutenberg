@@ -11,7 +11,7 @@
 		background: #23282e; // WP-admin gray.
 		color: $white;
 		border-radius: 0;
-		height: auto;
+		height: $header-height;
 		width: $header-height;
 
 		&:hover {
@@ -31,4 +31,3 @@
 .edit-post-fullscreen-mode-close_site-icon {
 	width: 36px;
 }
-

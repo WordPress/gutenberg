@@ -39,11 +39,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	},
 	fontStyle: {
 		value: [ 'typography', 'fontStyle' ],
-		support: [ '__experimentalFontAppearance' ],
+		support: [ '__experimentalFontStyle' ],
 	},
 	fontWeight: {
 		value: [ 'typography', 'fontWeight' ],
-		support: [ '__experimentalFontAppearance' ],
+		support: [ '__experimentalFontWeight' ],
 	},
 	lineHeight: {
 		value: [ 'typography', 'lineHeight' ],

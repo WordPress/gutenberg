@@ -386,7 +386,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
 
 	if ( $can_use_cached ) {
 		// Cache for a minute.
-		// This cache doesn't need to be any longer, we only want to avoid spikes on high-trafic sites.
+		// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.
 		set_transient( 'global_styles', $stylesheet, MINUTE_IN_SECONDS );
 	}
 

@@ -65,10 +65,12 @@ export default function TemplatesMenu() {
 			<NavigationItem
 				navigateToMenu={ MENU_TEMPLATES_PAGES }
 				title={ __( 'Pages' ) }
+				hideIfTargetMenuEmpty
 			/>
 			<NavigationItem
 				navigateToMenu={ MENU_TEMPLATES_POSTS }
 				title={ __( 'Posts' ) }
+				hideIfTargetMenuEmpty
 			/>
 			<TemplatesPostsMenu templates={ templates } />
 			<TemplatesPagesMenu templates={ templates } />

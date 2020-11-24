@@ -11,11 +11,11 @@ import NumberControl from '../../number-control';
 import { color, reduceMotion, rtl, space } from '../../utils/style-mixins';
 
 const rangeHeight = () => css( { height: 30, minHeight: 30 } );
+const thumbSize = 20;
 
 export const Root = styled.span`
 	-webkit-tap-highlight-color: transparent;
 	box-sizing: border-box;
-	cursor: pointer;
 	align-items: flex-start;
 	display: inline-flex;
 	justify-content: flex-start;
@@ -115,6 +115,7 @@ export const Track = styled.span`
 export const MarksWrapper = styled.span`
 	box-sizing: border-box;
 	display: block;
+	pointer-events: none;
 	position: relative;
 	width: 100%;
 	user-select: none;
@@ -166,7 +167,7 @@ export const ThumbWrapper = styled.span`
 	align-items: center;
 	box-sizing: border-box;
 	display: flex;
-	height: 20px;
+	height: ${ thumbSize }px;
 	justify-content: center;
 	margin-top: 5px;
 	outline: 0;
@@ -174,7 +175,7 @@ export const ThumbWrapper = styled.span`
 	position: absolute;
 	top: 0;
 	user-select: none;
-	width: 20px;
+	width: ${ thumbSize }px;
 
 	${ rtl( { marginLeft: -10 } ) }
 `;
@@ -202,7 +203,6 @@ export const Thumb = styled.span`
 	box-sizing: border-box;
 	height: 100%;
 	outline: 0;
-	pointer-events: none;
 	position: absolute;
 	user-select: none;
 	width: 100%;
@@ -216,13 +216,13 @@ export const InputRange = styled.input`
 	display: block;
 	height: 100%;
 	left: 0;
-	margin: 0;
+	margin: 0 -${ thumbSize / 2 }px;
 	opacity: 0;
 	outline: none;
 	position: absolute;
 	right: 0;
 	top: 0;
-	width: 100%;
+	width: calc( 100% + ${ thumbSize }px );
 `;
 
 const tooltipShow = ( { show } ) => {
