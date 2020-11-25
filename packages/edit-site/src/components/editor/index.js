@@ -21,6 +21,7 @@ import {
 	BlockContextProvider,
 	BlockSelectionClearer,
 	BlockBreadcrumb,
+	__unstableUseEditorStyles as useEditorStyles,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
@@ -45,7 +46,6 @@ import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
-import useEditorStyles from '../../../../block-editor/src/components/editor-styles';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
