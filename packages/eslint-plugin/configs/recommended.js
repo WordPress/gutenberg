@@ -18,6 +18,7 @@ module.exports = {
 		require.resolve( './recommended-with-formatting.js' ),
 		'plugin:prettier/recommended',
 		'prettier/react',
+		'plugin:@typescript-eslint/eslint-recommended',
 	],
 	rules: {
 		'prettier/prettier': [ 'error', prettierConfig ],
