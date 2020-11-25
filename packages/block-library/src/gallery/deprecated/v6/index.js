@@ -166,8 +166,8 @@ export default {
 			</figure>
 		);
 	},
-	isEligible( { ids } ) {
-		return !! ids;
+	isEligible( { imageCount } ) {
+		return ! imageCount;
 	},
 	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
 		const imageBlocks = images.map( ( image ) => {
