@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { overEvery, find, findLast, reverse, first, last } from 'lodash';
+import { find, reverse, first, last } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -48,19 +48,6 @@ import FocusCapture from './focus-capture';
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
 }
-
-/**
- * Given an element, returns true if the element is a tabbable text field, or
- * false otherwise.
- *
- * @param {Element} element Element to test.
- *
- * @return {boolean} Whether element is a tabbable text field.
- */
-const isTabbableTextField = overEvery( [
-	isTextField,
-	focus.tabbable.isTabbableIndex,
-] );
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -684,14 +671,6 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
-	function focusLastTextField() {
-		const focusableNodes = focus.focusable.find( container.current );
-		const target = findLast( focusableNodes, isTabbableTextField );
-		if ( target ) {
-			placeCaretAtHorizontalEdge( target, true );
-		}
-	}
-
 	useEffect( () => {
 		if ( hasMultiSelection && ! isMultiSelecting ) {
 			multiSelectionContainer.current.focus();
@@ -745,12 +724,6 @@ export default function WritingFlow( { children } ) {
 				hasMultiSelection={ hasMultiSelection }
 				multiSelectionContainer={ multiSelectionContainer }
 				isReverse
-			/>
-			<div
-				aria-hidden
-				tabIndex={ -1 }
-				onClick={ focusLastTextField }
-				className="block-editor-writing-flow__click-redirect"
 			/>
 		</>
 	);

@@ -35,7 +35,7 @@ import {
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withDispatch, withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -50,6 +50,7 @@ export class FileEdit extends Component {
 
 		this.state = {
 			isUploadInProgress: false,
+			isSidebarLinkSettings: false,
 		};
 
 		this.timerRef = null;
@@ -75,6 +76,7 @@ export class FileEdit extends Component {
 		this.onChangeLinkDestinationOption = this.onChangeLinkDestinationOption.bind(
 			this
 		);
+		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
 	}
 
 	componentDidMount() {
@@ -90,6 +92,16 @@ export class FileEdit extends Component {
 
 	componentWillUnmount() {
 		clearTimeout( this.timerRef );
+	}
+
+	componentDidUpdate( prevProps ) {
+		if (
+			prevProps.isSidebarOpened &&
+			! this.props.isSidebarOpened &&
+			this.state.isSidebarLinkSettings
+		) {
+			this.setState( { isSidebarLinkSettings: false } );
+		}
 	}
 
 	onSelectFile( media ) {
@@ -177,6 +189,15 @@ export class FileEdit extends Component {
 		);
 	}
 
+	onShowLinkSettings() {
+		this.setState(
+			{
+				isSidebarLinkSettings: true,
+			},
+			this.props.openSidebar
+		);
+	}
+
 	getToolbarEditButton( open ) {
 		return (
 			<BlockControls>
@@ -185,6 +206,11 @@ export class FileEdit extends Component {
 						title={ __( 'Edit file' ) }
 						icon={ replace }
 						onClick={ open }
+					/>
+					<ToolbarButton
+						title={ __( 'Link To' ) }
+						icon={ link }
+						onClick={ this.onShowLinkSettings }
 					/>
 				</ToolbarGroup>
 			</BlockControls>
@@ -199,6 +225,7 @@ export class FileEdit extends Component {
 	) {
 		let linkDestinationOptions = [ { value: href, label: __( 'URL' ) } ];
 		const attachmentPage = media && media.link;
+		const { isSidebarLinkSettings } = this.state;
 
 		if ( attachmentPage ) {
 			linkDestinationOptions = [
@@ -222,7 +249,9 @@ export class FileEdit extends Component {
 
 		return (
 			<InspectorControls>
-				<PanelBody title={ __( 'File block settings' ) } />
+				{ isSidebarLinkSettings || (
+					<PanelBody title={ __( 'File block settings' ) } />
+				) }
 				<PanelBody>
 					<SelectControl
 						icon={ link }
@@ -237,12 +266,14 @@ export class FileEdit extends Component {
 						checked={ textLinkTarget === '_blank' }
 						onChange={ this.onChangeOpenInNewWindow }
 					/>
-					<ToggleControl
-						icon={ button }
-						label={ __( 'Show download button' ) }
-						checked={ showDownloadButton }
-						onChange={ this.onChangeDownloadButtonVisibility }
-					/>
+					{ ! isSidebarLinkSettings && (
+						<ToggleControl
+							icon={ button }
+							label={ __( 'Show download button' ) }
+							checked={ showDownloadButton }
+							onChange={ this.onChangeDownloadButtonVisibility }
+						/>
+					) }
 					<BottomSheet.Cell
 						disabled={ isCopyUrlDisabled }
 						label={
@@ -405,9 +436,17 @@ export default compose( [
 	withSelect( ( select, props ) => {
 		const { attributes } = props;
 		const { id } = attributes;
+		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		return {
 			media:
 				id === undefined ? undefined : select( 'core' ).getMedia( id ),
+			isSidebarOpened: isEditorSidebarOpened(),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+		return {
+			openSidebar: () => openGeneralSidebar( 'edit-post/block' ),
 		};
 	} ),
 	withPreferredColorScheme,
