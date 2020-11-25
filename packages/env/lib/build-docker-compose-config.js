@@ -123,14 +123,10 @@ module.exports = function buildDockerComposeConfig( config ) {
 
 	// Set the WordPress images with the PHP version tag.
 	const developmentWpImage = `wordpress${
-		! developmentPhpVersion || developmentPhpVersion.length === 0
-			? ''
-			: ':php' + developmentPhpVersion
+		developmentPhpVersion ? ':php' + developmentPhpVersion : ''
 	}`;
 	const testsWpImage = `wordpress${
-		! testsPhpVersion || testsPhpVersion.length === 0
-			? ''
-			: ':php' + testsPhpVersion
+		testsPhpVersion ? ':php' + testsPhpVersion : ''
 	}`;
 	// Set the WordPress CLI images with the PHP version tag.
 	const developmentWpCliImage = `wordpress:cli${
