@@ -306,36 +306,9 @@ const formatMap = {
 		);
 	},
 	// Full date/time
-	c( dateValue ) {
-		return formatTZ(
-			utcToZonedTime(
-				zonedTimeToUtc( dateValue, getActualTimezone() ),
-				'UTC'
-			), // Offsets the time to the correct timezone
-			"yyyy-MM-dd'T'HH:mm:ssXXX",
-			{
-				timeZone: getActualTimezone(), // Adds the timezone offset to the Date object that will be formatted.
-			}
-		);
-	}, // .toISOString
-	r( dateValue ) {
-		return formatTZ(
-			utcToZonedTime(
-				zonedTimeToUtc( dateValue, getActualTimezone() ),
-				'UTC'
-			), // Offsets the time to the correct timezone
-			'iii, d MMM yyyy HH:mm:ss XX',
-			{
-				timeZone: getActualTimezone(), // Adds the timezone offset to the Date object that will be formatted.
-			}
-		);
-	},
-	U( dateValue ) {
-		return formatTZ(
-			zonedTimeToUtc( dateValue, getActualTimezone() ),
-			't'
-		);
-	},
+	c: "yyyy-MM-dd'T'HH:mm:ssXXX",
+	r: 'iii, d MMM yyyy HH:mm:ss XX',
+	U: 't',
 };
 
 /**
@@ -344,7 +317,7 @@ const formatMap = {
  * @param {string} formatString
  * @param {Date|string} dateValue
  */
-function translateFormat( formatString, dateValue ) {
+export function translateFormat( formatString, dateValue ) {
 	let i, char;
 	let newFormat = [];
 
@@ -606,13 +579,12 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
  * the website timezone. If the date does not contain a timezone like the dates
  * from the WordPress API, the date is considered to be in the website timezone.
  * For most cases where a date comes from the WordPress API, and we just want to
- * format that date in a given way without chaning timezone this is the recommended
+ * format that date in a given way without changing timezone this is the recommended
  * function to use.
  *
  * @param {string}                     dateFormat PHP-style formatting string.
  *                                                See php.net/date.
- * @param {Date|string|Moment|null}    dateValue  Date object or string, parsable by
- *                                                moment.js.
+ * @param {Date|string|null}           dateValue  Date object or string.
  * @param {string|number|boolean|null} timezone   Timezone to output result in or a
  *                                                UTC offset. Defaults to timezone from
  *                                                site. Notice: `boolean` is effectively
@@ -627,11 +599,23 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
 export function dateI18nAddTimezone(
 	dateFormat,
 	dateValue = new Date(),
-	timezone = WP_ZONE
+	timezone
 ) {
-	const dateMoment = momentLib.tz( dateValue, timezone );
-	dateMoment.locale( settings.l10n.locale );
-	return format( dateFormat, dateMoment );
+	const nDateValue = zonedTimeToUtc(
+		toDate( dateValue, {
+			timeZone: getActualTimezone( timezone ),
+		} )
+	);
+	console.log( { nDateValue, t: translateFormat( dateFormat, dateValue ) } );
+	return formatTZ( nDateValue, translateFormat( dateFormat, dateValue ), {
+		timeZone: getActualTimezone( timezone ),
+		locale: {
+			...originalLocale,
+			locale: settings.l10n.locale,
+			code: settings.l10n.locale,
+			localize: getLocalizationSettings(),
+		},
+	} );
 }
 
 /**
@@ -685,4 +669,4 @@ export function getDate( dateString ) {
 	return toDate( actualDate, { timeZone: getActualTimezone() } );
 }
 
-export { zonedTimeToUtc };
+export { zonedTimeToUtc, toDate, parseISO };
