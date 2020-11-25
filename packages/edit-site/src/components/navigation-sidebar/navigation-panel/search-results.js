@@ -12,31 +12,49 @@ import { normalizedSearch } from './utils';
 import { useSelect } from '@wordpress/data';
 
 export default function SearchResults( { items, search, renderItem } ) {
-	const templateInfos = useSelect(
-		( select ) => {
-			const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
-				'core/editor'
-			);
+	const itemType = items?.length > 0 ? items[ 0 ].type : null;
 
-			return items.map( ( item ) => ( {
-				slug: item.slug,
-				...getTemplateInfo( item ),
-			} ) );
+	const itemInfos = useSelect(
+		( select ) => {
+			if ( itemType === 'wp_template' ) {
+				const {
+					__experimentalGetTemplateInfo: getTemplateInfo,
+				} = select( 'core/editor' );
+
+				return items.map( ( item ) => ( {
+					slug: item.slug,
+					...getTemplateInfo( item ),
+				} ) );
+			} else if ( itemType === 'wp_template_part' ) {
+				return items.map( ( item ) => ( {
+					slug: item.slug,
+					title: item.title?.rendered,
+					description: item.excerpt?.rendered,
+				} ) );
+			}
+
+			return [];
 		},
-		[ items ]
+		[ items, itemType ]
 	);
+
 	const itemsFiltered = useMemo( () => {
 		if ( items === null || search.length === 0 ) {
 			return [];
 		}
 
-		return items.filter( ( item ) => {
-			const { title } = templateInfos.find(
-				( { slug } ) => item.slug === slug
+		return items.filter( ( { slug } ) => {
+			const { title, description } = itemInfos.find(
+				( info ) => info.slug === slug
 			);
-			return normalizedSearch( title, search );
+
+			return (
+				normalizedSearch( slug, search ) ||
+				normalizedSearch( title, search ) ||
+				normalizedSearch( description, search )
+			);
 		} );
-	}, [ items, search ] );
+	}, [ items, itemInfos, search ] );
 
 	const itemsRendered = useMemo( () => itemsFiltered.map( renderItem ), [
 		itemsFiltered,
