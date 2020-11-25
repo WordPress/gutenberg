@@ -20,7 +20,7 @@ import { Icon, plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import getClosestAvailableTemplate from '../../../utils/get-closest-available-template';
-import { TEMPLATES_STATUSES } from './constants';
+import { TEMPLATES_NEW_OPTIONS, TEMPLATES_STATUSES } from './constants';
 
 export default function NewTemplateDropdown() {
 	const { defaultTemplateTypes, templates } = useSelect( ( select ) => {
@@ -59,8 +59,14 @@ export default function NewTemplateDropdown() {
 
 	const missingTemplates = filter(
 		defaultTemplateTypes,
-		( template ) => ! includes( existingTemplateSlugs, template.slug )
+		( template ) =>
+			includes( TEMPLATES_NEW_OPTIONS, template.slug ) &&
+			! includes( existingTemplateSlugs, template.slug )
 	);
+
+	if ( ! missingTemplates.length ) {
+		return null;
+	}
 
 	return (
 		<DropdownMenu
