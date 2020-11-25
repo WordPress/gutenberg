@@ -8,6 +8,7 @@ export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as Autocomplete } from './autocomplete';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
+export { default as __experimentalBlockFullHeightAligmentToolbar } from './block-full-height-alignment-toolbar';
 export { default as __experimentalBlockAlignmentMatrixToolbar } from './block-alignment-matrix-toolbar';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
 export { BlockContextProvider } from './block-context';
@@ -118,6 +119,7 @@ export {
 } from './typewriter';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
+export { useCanvasClickRedirect as __unstableUseCanvasClickRedirect } from './use-canvas-click-redirect';
 
 /*
  * State Related Components
