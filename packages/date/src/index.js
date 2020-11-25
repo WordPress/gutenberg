@@ -356,8 +356,142 @@ export function format( dateFormat, dateValue = new Date() ) {
 	}
 	// Join with [] between to separate characters, and replace
 	// unneeded separators with static text.
+<<<<<<< HEAD
 	newFormat = newFormat.join( '[]' );
 	return momentDate.format( newFormat );
+=======
+
+	newFormat = newFormat.join( '' );
+
+	return newFormat;
+}
+
+/**
+ * Build date-fns locale settings from WordPress localization settings.
+ */
+function getLocalizationSettings() {
+	const monthValues = {
+		abbreviated: settings.l10n.monthsShort,
+		wide: settings.l10n.months,
+	};
+
+	const dayValues = {
+		abbreviated: settings.l10n.weekdaysShort,
+		wide: settings.l10n.weekdays,
+	};
+
+	return {
+		...originalLocale.localize,
+		month: buildLocalizeFn( {
+			values: monthValues,
+			defaultWidth: 'wide',
+		} ),
+		day: buildLocalizeFn( {
+			values: dayValues,
+			defaultWidth: 'wide',
+		} ),
+		formatLong: {
+			date: buildFormatLongFn( {
+				formats: {
+					full: settings.formats.date,
+					defaultWidth: 'full',
+				},
+			} ),
+			time: buildFormatLongFn( {
+				formats: {
+					full: settings.formats.time,
+					defaultWidth: 'full',
+				},
+			} ),
+			dateTime: buildFormatLongFn( {
+				formats: {
+					full: settings.formats.datetime,
+					short: settings.formats.datetimeAbbreviated,
+					defaultWidth: 'full',
+				},
+			} ),
+		},
+	};
+}
+
+/**
+ * Returns whether a certain UTC offset is valid or not.
+ *
+ * @param {number|string} offset a UTC offset.
+ *
+ * @return {boolean} whether a certain UTC offset is valid or not.
+ */
+function isValidUTCOffset( offset ) {
+	return VALID_UTC_OFFSET.test( offset );
+}
+
+/**
+ * Transform the given integer into a valid UTC Offset in hours.
+ *
+ * @param {number} offset A UTC offset as an integer
+ */
+function integerToUTCOffset( offset ) {
+	const offsetInHours = offset > 23 ? offset / 60 : offset;
+	const sign = offset < 0 ? '-' : '+';
+	const absoluteOffset =
+		offsetInHours < 0 ? offsetInHours * -1 : offsetInHours;
+
+	return offsetInHours < 10
+		? `${ sign }0${ absoluteOffset }`
+		: `${ sign }${ absoluteOffset }`;
+}
+
+/**
+ * Determines whether or not the given value can be parsed as a UTC offset,
+ * by checking if it is parseable as an integer and if it isn't a
+ * valid UTC offset already.
+ *
+ * @param {string} offset An offset as an integer or a string.
+ */
+function shouldParseAsUTCOffset( offset ) {
+	const isNumber = ! Number.isNaN( Number.parseInt( offset, 10 ) );
+	return isNumber && ! isValidUTCOffset( offset );
+}
+
+/**
+ * Get a properly formatted timezone from a timezone string or offset.
+ * Return system timezone or offset if no timezone was given.
+ *
+ * @param {string} timezone
+ */
+function getActualTimezone( timezone = '' ) {
+	if ( ! timezone ) {
+		const { string, offset } = settings.timezone;
+
+		if ( string ) {
+			return string;
+		}
+
+		if ( shouldParseAsUTCOffset( offset ) ) {
+			return integerToUTCOffset( offset );
+		}
+	}
+
+	return shouldParseAsUTCOffset( timezone )
+		? integerToUTCOffset( timezone )
+		: timezone;
+}
+
+/**
+ * Formats a date. Does not alter the date's timezone.
+ *
+ * @param {string}                  dateFormat PHP-style formatting string.
+ *                                             See php.net/date.
+ * @param {Date|string|null} dateValue  Date object or ISO string.
+ *
+ * @return {string} Formatted date.
+ */
+export function format( dateFormat, dateValue = new Date() ) {
+	const formatString = translateFormat( dateFormat, dateValue );
+	const parsedDate =
+		dateValue instanceof Date ? dateValue : parseISO( dateValue );
+	return formatTZ( parsedDate, formatString );
+>>>>>>> 067501032f... wip
 }
 
 /**
