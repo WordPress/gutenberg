@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useMemo,
+	useCallback,
+	useRef,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
@@ -15,7 +21,7 @@ import {
 	BlockContextProvider,
 	BlockSelectionClearer,
 	BlockBreadcrumb,
-	__unstableEditorStyles as EditorStyles,
+	__unstableUseEditorStyles as useEditorStyles,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
@@ -191,10 +197,12 @@ function Editor() {
 	}, [ isNavigationOpen ] );
 
 	const isMobile = useViewportMatch( 'medium', '<' );
+	const ref = useRef();
+
+	useEditorStyles( ref, settings.styles );
 
 	return (
 		<>
-			<EditorStyles styles={ settings.styles } />
 			<FullscreenMode isActive={ isFullscreenActive } />
 			<UnsavedChangesWarning />
 			<SlotFillProvider>
@@ -235,6 +243,7 @@ function Editor() {
 												<KeyboardShortcuts.Register />
 												<SidebarComplementaryAreaFills />
 												<InterfaceSkeleton
+													ref={ ref }
 													labels={ interfaceLabels }
 													drawer={
 														<NavigationSidebar />
