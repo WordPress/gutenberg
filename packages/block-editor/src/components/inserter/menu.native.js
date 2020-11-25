@@ -120,9 +120,8 @@ export class InserterMenu extends Component {
 			getBlockType,
 		} = this.props;
 
-		const { current: currentClipboard } = clipboard;
 		const clipboardBlock =
-			currentClipboard && rawHandler( { HTML: currentClipboard } )[ 0 ];
+			clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
 		const shouldAddClipboardBlock =
 			clipboardBlock &&
 			canInsertBlockType( clipboardBlock.name, destinationRootClientId );

@@ -1,16 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useCallback, useRef } from '@wordpress/element';
+import { createContext, useCallback, useState } from '@wordpress/element';
 
 export const ClipboardContext = createContext( {} );
 const { Provider, Consumer } = ClipboardContext;
 export { Consumer as ClipboardConsumer };
 
 export default function ClipboardProvider( { children } ) {
-	const clipboard = useRef();
+	const [ clipboard, setClipboard ] = useState();
 	const updateClipboard = useCallback( ( clipboardUpdate ) => {
-		clipboard.current = clipboardUpdate;
+		setClipboard( clipboardUpdate );
 	}, [] );
 
 	return (

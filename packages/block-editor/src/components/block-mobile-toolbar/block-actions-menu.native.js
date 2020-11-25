@@ -49,10 +49,7 @@ const BlockActionsMenu = ( {
 } ) => {
 	const pickerRef = useRef();
 	const moversOptions = { keys: [ 'icon', 'actionTitle' ] };
-	const {
-		clipboard: { current: currentClipboard },
-		updateClipboard,
-	} = useContext( ClipboardContext );
+	const { clipboard, updateClipboard } = useContext( ClipboardContext );
 
 	const {
 		actionTitle: {
@@ -125,16 +122,19 @@ const BlockActionsMenu = ( {
 	] );
 
 	function onPasteBlock() {
-		if ( ! currentClipboard ) {
+		if ( ! clipboard ) {
 			return;
 		}
 
-		pasteBlock( rawHandler( { HTML: currentClipboard } )[ 0 ] );
+		pasteBlock( rawHandler( { HTML: clipboard } )[ 0 ] );
 	}
 
 	function isPasteEnabled() {
-		const clipboardBlock =
-			currentClipboard && rawHandler( { HTML: currentClipboard } )[ 0 ];
+		if ( ! clipboard ) {
+			return false;
+		}
+
+		const clipboardBlock = rawHandler( { HTML: clipboard } )[ 0 ];
 
 		return (
 			clipboardBlock &&
