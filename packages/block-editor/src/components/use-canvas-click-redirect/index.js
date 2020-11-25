@@ -24,8 +24,8 @@ const isTabbableTextField = overEvery( [
 
 export function useCanvasClickRedirect( ref ) {
 	useEffect( () => {
-		function onClick( event ) {
-			// Only handle clicks directly on the canvas itself, not on content.
+		function onMouseDown( event ) {
+			// Only handle clicks on the canvas, not the content.
 			if ( event.target !== ref.current ) {
 				return;
 			}
@@ -38,12 +38,13 @@ export function useCanvasClickRedirect( ref ) {
 			}
 
 			placeCaretAtHorizontalEdge( target, true );
+			event.preventDefault();
 		}
 
-		ref.current.addEventListener( 'click', onClick );
+		ref.current.addEventListener( 'mousedown', onMouseDown );
 
 		return () => {
-			ref.current.removeEventListener( 'click', onClick );
+			ref.current.addEventListener( 'mousedown', onMouseDown );
 		};
 	}, [] );
 }
