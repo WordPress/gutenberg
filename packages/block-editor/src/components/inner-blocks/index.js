@@ -174,6 +174,9 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 		className: classnames(
 			props.className,
 			'block-editor-block-list__layout',
+			options.__experimentalLayout
+				? `wp-layout-${ options.__experimentalLayout.type }`
+				: undefined,
 			{
 				'has-overlay': hasOverlay,
 			}

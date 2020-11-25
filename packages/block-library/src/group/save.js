@@ -8,7 +8,7 @@ export default function save( { attributes } ) {
 
 	return (
 		<Tag { ...useBlockProps.save() }>
-			<div className="wp-block-group__inner-container">
+			<div className="wp-block-group__inner-container wp-layout-grid">
 				<InnerBlocks.Content />
 			</div>
 		</Tag>

@@ -1,0 +1,46 @@
+// This file should ideally move to the "block-editor" package because it's common to all blocks
+// But it should be loaded in both frontend and backend.
+// For the moment, conveniently, it's addedd to block-library
+
+// Default grid
+:root {
+	--wp-layout-grid-default-start: 3;
+	--wp-layout-grid-default-end: 11;
+
+	--wp-layout-grid-wide-start: 2;
+	--wp-layout-grid-wide-end: 12;
+
+	--wp-layout-grid-full-start: 1;
+	--wp-layout-grid-full-end: 13;
+}
+
+.wp-layout-grid {
+	display: grid;
+	// By default a grid of 12 columns
+	grid-template-columns: repeat(12, 1fr);
+
+	// By default all blocks are center aligned
+	& > * {
+		grid-column-start: var( --wp-layout-grid-default-start );
+		grid-column-end: var( --wp-layout-grid-default-end );
+	}
+
+	& > .wp-layout-grid__wide {
+		grid-column-start: var( --wp-layout-grid-wide-start );
+		grid-column-end: var( --wp-layout-grid-wide-end );
+	}
+
+	& > .wp-layout-grid__full {
+		grid-column-start: var( --wp-layout-grid-full-start );
+		grid-column-end: var( --wp-layout-grid-full-end );
+	}
+}
+
+// This shouldn't be needed but it's there to override the default layout behavior 
+// (which should be moved to its own layout class)
+.wp-layout-grid {
+	> .wp-block {
+		margin-left: unset;
+		margin-right: unset;
+	}
+}

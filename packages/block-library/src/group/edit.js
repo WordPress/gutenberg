@@ -30,6 +30,7 @@ function GroupEdit( { attributes, clientId } ) {
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
+			__experimentalLayout: attributes.layout || { type: 'grid' },
 		}
 	);
 
