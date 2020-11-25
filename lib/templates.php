@@ -259,27 +259,11 @@ function filter_rest_prepare_add_wp_theme_terms( $response ) {
 	if ( isset( $response->data ) && is_array( $response->data ) && isset( $response->data['id'] ) ) {
 		$response->data['wp_theme_slug'] = false;
 
-		// Get the wp_theme terms.
-		$wp_themes = wp_get_post_terms( $response->data['id'], 'wp_theme' );
-
-		// If a theme is assigned, add it to the REST response.
-		if ( $wp_themes && is_array( $wp_themes ) ) {
-			$wp_theme_slugs = array_column( $wp_themes, 'slug' );
-
-			$response->data['file_based']  = in_array( '_wp_file_based', $wp_theme_slugs, true );
-			$response->data['is_original'] = in_array( '_wp_is_original', $wp_theme_slugs, true );
-
-			$theme_slug = array_values(
-				array_filter(
-					$wp_theme_slugs,
-					function( $slug ) {
-						return ! in_array( $slug, array( '_wp_file_based', '_wp_is_original' ) );
-					}
-				)
-			);
-			if ( $theme_slug ) {
-				$response->data['wp_theme_slug'] = $theme_slug[0];
-			}
+		$terms = gutenberg_parse_wp_theme_terms( $response->data['id'] );
+		$response->data['file_based'] = $terms['is_file_based'];
+		$response->data['is_original'] = $terms['is_original'];
+		if ( ! empty( $terms['theme'] ) ) {
+			$response->data['wp_theme_slug'] = $terms['theme'][0];
 		}
 	}
 
