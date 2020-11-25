@@ -14,12 +14,12 @@ import deprecated from '@wordpress/deprecated';
  * @typedef {{ type: 'appear'; origin?: AppearOrigin }} AppearOptions
  * @typedef {{ type: 'slide-in'; origin?: SlideInOrigin }} SlideInOptions
  * @typedef {{ type: 'loading'; origin?: undefined }} LoadingOptions
- * @typedef {AppearOptions | SlideInOptions | LoadingOptions} UseAnimateOptions
+ * @typedef {AppearOptions | SlideInOptions | LoadingOptions} GetAnimateOptions
  */
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * @param {UseAnimateOptions['type']} type The animation type
+ * @param {GetAnimateOptions['type']} type The animation type
  * @return {'top' | 'left'} Default origin
  */
 function getDefaultOrigin( type ) {
@@ -28,7 +28,7 @@ function getDefaultOrigin( type ) {
 /* eslint-enable jsdoc/valid-types */
 
 /**
- * @param {UseAnimateOptions} options
+ * @param {GetAnimateOptions} options
  *
  * @return {string | undefined} ClassName that applies the animations
  */
