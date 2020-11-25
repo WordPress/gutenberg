@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { map } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -10,8 +15,9 @@ import { __ } from '@wordpress/i18n';
  */
 import { normalizedSearch } from './utils';
 import { useSelect } from '@wordpress/data';
+import TemplateNavigationItem from './template-navigation-item';
 
-export default function SearchResults( { items, search, renderItem } ) {
+export default function SearchResults( { items, search } ) {
 	const itemType = items?.length > 0 ? items[ 0 ].type : null;
 
 	const itemInfos = useSelect(
@@ -54,14 +60,14 @@ export default function SearchResults( { items, search, renderItem } ) {
 		} );
 	}, [ items, itemInfos, search ] );
 
-	const itemsRendered = useMemo( () => itemsFiltered.map( renderItem ), [
-		itemsFiltered,
-		renderItem,
-	] );
-
 	return (
 		<NavigationGroup title={ __( 'Search results' ) }>
-			{ itemsRendered }
+			{ map( itemsFiltered, ( item ) => (
+				<TemplateNavigationItem
+					item={ item }
+					key={ `${ item.type }-${ item.id }` }
+				/>
+			) ) }
 		</NavigationGroup>
 	);
 }

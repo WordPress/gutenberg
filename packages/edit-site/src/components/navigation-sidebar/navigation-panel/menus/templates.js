@@ -33,13 +33,6 @@ import NewTemplateDropdown from '../new-template-dropdown';
 import TemplateNavigationItem from '../template-navigation-item';
 import SearchResults from '../search-results';
 
-const renderSearchResultItem = ( template ) => (
-	<TemplateNavigationItem
-		item={ template }
-		key={ `wp_template-${ template.id }` }
-	/>
-);
-
 export default function TemplatesMenu() {
 	const [ search, setSearch ] = useState( '' );
 	const onSearch = useCallback( ( value ) => {
@@ -70,11 +63,7 @@ export default function TemplatesMenu() {
 			search={ search }
 		>
 			{ search && (
-				<SearchResults
-					items={ templates }
-					search={ search }
-					renderItem={ renderSearchResultItem }
-				/>
+				<SearchResults items={ templates } search={ search } />
 			) }
 
 			{ ! search && (

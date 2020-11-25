@@ -21,13 +21,6 @@ import TemplateNavigationItem from '../template-navigation-item';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS } from '../constants';
 import SearchResults from '../search-results';
 
-const renderSearchResultItem = ( templatePart ) => (
-	<TemplateNavigationItem
-		item={ templatePart }
-		key={ `wp_template_part-${ templatePart.id }` }
-	/>
-);
-
 export default function TemplatePartsMenu() {
 	const [ search, setSearch ] = useState( '' );
 	const onSearch = useCallback( ( value ) => {
@@ -57,11 +50,7 @@ export default function TemplatePartsMenu() {
 			search={ search }
 		>
 			{ search && (
-				<SearchResults
-					items={ templateParts }
-					search={ search }
-					renderItem={ renderSearchResultItem }
-				/>
+				<SearchResults items={ templateParts } search={ search } />
 			) }
 
 			{ ! search &&
