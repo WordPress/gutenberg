@@ -28,25 +28,6 @@ export default function EntityRecordItem( {
 		return parents[ parents.length - 1 ];
 	}, [] );
 
-	// Handle templates that might use default descriptive titles
-	const entityRecordTitle = useSelect(
-		( select ) => {
-			if ( 'postType' !== kind || 'wp_template' !== name ) {
-				return title;
-			}
-
-			const template = select( 'core' ).getEditedEntityRecord(
-				kind,
-				name,
-				key
-			);
-			return select( 'core/editor' ).__experimentalGetTemplateInfo(
-				template
-			).title;
-		},
-		[ name, kind, title, key ]
-	);
-
 	const isSelected = useSelect(
 		( select ) => {
 			const selectedBlockId = select(
@@ -69,9 +50,7 @@ export default function EntityRecordItem( {
 	return (
 		<PanelRow>
 			<CheckboxControl
-				label={
-					<strong>{ entityRecordTitle || __( 'Untitled' ) }</strong>
-				}
+				label={ <strong>{ title || __( 'Untitled' ) }</strong> }
 				checked={ checked }
 				onChange={ onChange }
 			/>
