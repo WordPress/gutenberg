@@ -115,6 +115,8 @@ figure.wp-block-image:not(.wp-block) {
 	.components-base-control__field {
 		display: flex;
 		margin-bottom: 0;
+		flex-direction: column;
+		align-items: flex-start;
 	}
 }
 
