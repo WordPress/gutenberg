@@ -34,7 +34,7 @@ class BottomSheetRangeCell extends Component {
 		this.onCellPress = this.onCellPress.bind( this );
 
 		const { value, defaultValue, minimumValue } = props;
-		const initialValue = value || defaultValue || minimumValue;
+		const initialValue = Number( value || defaultValue || minimumValue );
 
 		this.state = {
 			accessible: true,
