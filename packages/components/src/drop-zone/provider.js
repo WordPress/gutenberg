@@ -242,12 +242,20 @@ export function DropZoneContextProvider( props ) {
 	return <Provider { ...props } value={ ref.current } />;
 }
 
-export default function DropZoneProvider( props ) {
+function DropContainer( { children } ) {
 	const ref = useRef();
 	useDrop( ref );
 	return (
 		<div ref={ ref } className="components-drop-zone__provider">
-			<DropZoneContextProvider { ...props } />
+			{ children }
 		</div>
+	);
+}
+
+export default function DropZoneProvider( { children } ) {
+	return (
+		<DropZoneContextProvider>
+			<DropContainer>{ children }</DropContainer>
+		</DropZoneContextProvider>
 	);
 }
