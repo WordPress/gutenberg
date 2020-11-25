@@ -39,6 +39,7 @@ export class InserterMenu extends Component {
 		this.renderItem = this.renderItem.bind( this );
 		this.state = {
 			numberOfColumns: MIN_COL_NUM,
+			isVisible: true,
 		};
 
 		Dimensions.addEventListener( 'change', this.onLayout );
@@ -97,7 +98,7 @@ export class InserterMenu extends Component {
 		if ( this.props.shouldReplaceBlock ) {
 			this.props.insertDefaultBlock();
 		}
-		this.props.onDismiss();
+		this.setState( { isVisible: false } );
 	}
 
 	onLayout() {
@@ -119,19 +120,24 @@ export class InserterMenu extends Component {
 				item={ item }
 				itemWidth={ itemWidth }
 				maxWidth={ maxWidth }
-				onSelect={ onSelect }
+				onSelect={ () => {
+					onSelect( item );
+
+					this.setState( { isVisible: false } );
+				} }
 			/>
 		);
 	}
 
 	render() {
 		const { items } = this.props;
-		const { numberOfColumns } = this.state;
+		const { numberOfColumns, isVisible } = this.state;
 
 		return (
 			<BottomSheet
-				isVisible={ true }
+				isVisible={ isVisible }
 				onClose={ this.onClose }
+				onModalHide={ this.props.onDismiss }
 				hideHeader
 				hasNavigation
 			>
@@ -279,8 +285,6 @@ export default compose(
 					ownProps.insertionIndex,
 					ownProps.destinationRootClientId
 				);
-
-				ownProps.onSelect();
 			},
 			insertDefaultBlock() {
 				insertDefaultBlock(

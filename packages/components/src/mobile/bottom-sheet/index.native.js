@@ -382,7 +382,9 @@ class BottomSheet extends Component {
 				onSwipe={ this.onCloseBottomSheet }
 				onDismiss={ Platform.OS === 'ios' ? onDismiss : undefined }
 				onModalHide={
-					Platform.OS === 'android' ? onDismiss : undefined
+					this.props.onModalHide || Platform.OS === 'android'
+						? onDismiss
+						: undefined
 				}
 				swipeDirection="down"
 				onMoveShouldSetResponder={
