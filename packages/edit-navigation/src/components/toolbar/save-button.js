@@ -5,8 +5,13 @@ import { useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { store as editNavigationStore } from '../../store';
+
 export default function SaveButton( { navigationPost } ) {
-	const { saveNavigationPost } = useDispatch( 'core/edit-navigation' );
+	const { saveNavigationPost } = useDispatch( editNavigationStore );
 
 	return (
 		<Button
