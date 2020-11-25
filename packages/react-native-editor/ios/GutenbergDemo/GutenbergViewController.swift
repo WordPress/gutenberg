@@ -318,7 +318,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
 }
 
 extension Gutenberg.MediaSource {
-    static let filesApp = Gutenberg.MediaSource(id: "files-app", label: "Pick a file", types: [.any])
+    static let filesApp = Gutenberg.MediaSource(id: "files-app", label: "Choose from device", types: [.any])
     static let otherApps = Gutenberg.MediaSource(id: "other-apps", label: "Other Apps", types: [.image, .video, .audio, .other])
 }
 
