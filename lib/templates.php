@@ -255,7 +255,7 @@ add_filter( 'rest_wp_template_query', 'filter_rest_wp_template_query', 99, 2 );
  * @param WP_REST_Response $response The response object.
  * @return WP_REST_Response
  */
-function filter_rest_prepare_add_wp_theme_slug_and_file_based( $response ) {
+function filter_rest_prepare_add_wp_theme_terms( $response ) {
 	if ( isset( $response->data ) && is_array( $response->data ) && isset( $response->data['id'] ) ) {
 		$response->data['wp_theme_slug'] = false;
 
@@ -266,14 +266,14 @@ function filter_rest_prepare_add_wp_theme_slug_and_file_based( $response ) {
 		if ( $wp_themes && is_array( $wp_themes ) ) {
 			$wp_theme_slugs = array_column( $wp_themes, 'slug' );
 
-			$file_based                   = in_array( '_wp_file_based', $wp_theme_slugs, true );
-			$response->data['file_based'] = $file_based;
+			$response->data['file_based']  = in_array( '_wp_file_based', $wp_theme_slugs, true );
+			$response->data['is_original'] = in_array( '_wp_is_original', $wp_theme_slugs, true );
 
 			$theme_slug = array_values(
 				array_filter(
 					$wp_theme_slugs,
 					function( $slug ) {
-						return '_wp_file_based' !== $slug;
+						return ! in_array( $slug, array( '_wp_file_based', '_wp_is_original' ) );
 					}
 				)
 			);
@@ -285,5 +285,5 @@ function filter_rest_prepare_add_wp_theme_slug_and_file_based( $response ) {
 
 	return $response;
 }
-add_filter( 'rest_prepare_wp_template', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
-add_filter( 'rest_prepare_wp_template_part', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
+add_filter( 'rest_prepare_wp_template', 'filter_rest_prepare_add_wp_theme_terms' );
+add_filter( 'rest_prepare_wp_template_part', 'filter_rest_prepare_add_wp_theme_terms' );

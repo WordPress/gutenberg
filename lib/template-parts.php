@@ -117,8 +117,8 @@ add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_tem
 function filter_rest_wp_template_part_collection_params( $query_params ) {
 	$query_params += array(
 		'theme' => array(
-			'description' => __( 'The theme slug for the theme that created the template part.', 'gutenberg' ),
-			'type'        => 'string',
+			'description' => __( 'The theme slugs for the theme that created the template part.', 'gutenberg' ),
+			'type'        => 'array',
 		),
 	);
 	return $query_params;
@@ -139,6 +139,7 @@ function filter_rest_wp_template_part_query( $args, $request ) {
 			'taxonomy' => 'wp_theme',
 			'field'    => 'slug',
 			'terms'    => $request['theme'],
+			'operator' => 'AND',
 		);
 
 		$args['tax_query'] = $tax_query;

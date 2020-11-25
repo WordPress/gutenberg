@@ -21,15 +21,13 @@ import { MENU_ROOT, MENU_TEMPLATE_PARTS } from '../constants';
 
 export default function TemplatePartsMenu() {
 	const templateParts = useSelect( ( select ) => {
-		const unfilteredTemplateParts =
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
-				status: [ 'publish', 'auto-draft' ],
-				per_page: -1,
-			} ) || [];
 		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
-		return unfilteredTemplateParts.filter(
-			( item ) =>
-				item.status === 'publish' || item.wp_theme_slug === currentTheme
+		return (
+			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
+				status: [ 'publish' ],
+				theme: currentTheme,
+				per_page: -1,
+			} ) || []
 		);
 	}, [] );
 

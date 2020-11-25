@@ -20,7 +20,7 @@ export default function useTemplatePartPost( postId, slug, theme ) {
 			}
 
 			// This is not a custom template part,
-			// load the auto-draft created from the
+			// load the original post created from the
 			// relevant file.
 			if ( slug && theme ) {
 				const cleanedSlug = cleanForSlug( slug );
@@ -28,18 +28,12 @@ export default function useTemplatePartPost( postId, slug, theme ) {
 					'postType',
 					'wp_template_part',
 					{
-						status: [ 'publish', 'auto-draft' ],
+						status: [ 'publish' ],
 						slug: cleanedSlug,
 						theme,
 					}
 				);
-
-				// A published post might already exist if this template part was customized elsewhere
-				// or if it's part of a customized template.
-				const foundPost =
-					posts?.find( ( post ) => post.status === 'publish' ) ||
-					posts?.find( ( post ) => post.status === 'auto-draft' );
-				return foundPost?.id;
+				return posts?.[ 0 ]?.id;
 			}
 		},
 		[ postId, slug, theme ]

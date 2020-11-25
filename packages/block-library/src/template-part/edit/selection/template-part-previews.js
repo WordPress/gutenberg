@@ -202,20 +202,14 @@ export default function TemplatePartPreviews( {
 } ) {
 	const composite = useCompositeState();
 	const templateParts = useSelect( ( select ) => {
-		const publishedTemplateParts =
+		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
+		return (
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
+				theme: [ currentTheme, '_wp_is_original' ],
 				status: [ 'publish' ],
 				per_page: -1,
-			} ) || [];
-
-		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
-		const themeTemplateParts =
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
-				theme: currentTheme,
-				status: [ 'auto-draft' ],
-				per_page: -1,
-			} ) || [];
-		return [ ...themeTemplateParts, ...publishedTemplateParts ];
+			} ) || []
+		);
 	}, [] );
 
 	if ( ! templateParts || ! templateParts.length ) {

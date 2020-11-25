@@ -9,7 +9,7 @@ export const TEMPLATES_GENERAL = [
 
 export const TEMPLATES_POSTS = [ 'home', 'single' ];
 
-export const TEMPLATES_STATUSES = [ 'publish', 'draft', 'auto-draft' ];
+export const TEMPLATES_STATUSES = [ 'publish', 'draft' ];
 
 export const TEMPLATES_NEW_OPTIONS = [
 	'front-page',
