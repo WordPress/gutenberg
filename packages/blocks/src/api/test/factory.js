@@ -12,6 +12,7 @@ import {
 	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
 	getPossibleBlockTransformations,
+	getMobileBlockTransformations,
 	switchToBlockType,
 	getBlockTransforms,
 	findTransform,
@@ -980,6 +981,130 @@ describe( 'block factory', () => {
 				{ value: 'ribs' },
 				{ value: 'halloumi' },
 			] );
+		} );
+
+		describe( 'getMobileBlockTransformations', () => {
+			it( 'allows transforms for core/paragraph blocks', () => {
+				registerBlockType( 'core/paragraph', {
+					...defaultBlockSettings,
+					transforms: {
+						from: [
+							{
+								type: 'block',
+								blocks: [ 'core/heading' ],
+								transform: noop,
+								isMatch: () => true,
+							},
+						],
+					},
+				} );
+
+				registerBlockType( 'core/heading', {
+					...defaultBlockSettings,
+					transforms: {
+						from: [
+							{
+								type: 'block',
+								blocks: [ 'core/paragraph' ],
+								transform: noop,
+								isMatch: () => true,
+							},
+						],
+					},
+				} );
+
+				const paragraph = createBlock( 'core/paragraph', {
+					value: 'chicken',
+				} );
+				const heading = createBlock( 'core/heading', {
+					value: 'tofu',
+				} );
+
+				const availableParagraphBlocks = getMobileBlockTransformations(
+					paragraph
+				);
+				expect( availableParagraphBlocks[ 0 ].name ).toEqual(
+					'core/heading'
+				);
+
+				const availableBlocks = getMobileBlockTransformations(
+					heading
+				);
+				expect( availableBlocks ).toEqual( [] );
+			} );
+
+			it( 'disallows transforms for non-core/paragraph blocks', () => {
+				registerBlockType( 'core/paragraph', {
+					...defaultBlockSettings,
+					transforms: {
+						from: [
+							{
+								type: 'block',
+								blocks: [ 'core/heading' ],
+								transform: noop,
+								isMatch: () => true,
+							},
+						],
+					},
+				} );
+
+				registerBlockType( 'core/heading', {
+					...defaultBlockSettings,
+					transforms: {
+						from: [
+							{
+								type: 'block',
+								blocks: [ 'core/paragraph' ],
+								transform: noop,
+								isMatch: () => true,
+							},
+						],
+					},
+				} );
+				const heading = createBlock( 'core/heading', {
+					value: 'tofu',
+				} );
+				const availableBlocks = getMobileBlockTransformations(
+					heading
+				);
+				expect( availableBlocks ).toEqual( [] );
+			} );
+
+			it( 'disallows transforms to core/column or core/group', () => {
+				registerBlockType( 'core/paragraph', defaultBlockSettings );
+				registerBlockType( 'core/column', {
+					...defaultBlockSettings,
+					transforms: {
+						from: [
+							{
+								type: 'block',
+								blocks: [ 'core/paragraph' ],
+								transform: noop,
+								isMatch: () => true,
+							},
+						],
+					},
+				} );
+				registerBlockType( 'core/group', {
+					...defaultBlockSettings,
+					transforms: {
+						from: [
+							{
+								type: 'block',
+								blocks: [ 'core/paragraph' ],
+								transform: noop,
+								isMatch: () => true,
+							},
+						],
+					},
+				} );
+
+				const paragraph = createBlock( 'core/paragraph' );
+				const availableBlocks = getMobileBlockTransformations(
+					paragraph
+				);
+				expect( availableBlocks ).toEqual( [] );
+			} );
 		} );
 
 		describe( 'wildcard block transforms', () => {
