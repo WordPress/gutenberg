@@ -23,7 +23,7 @@ export default function TemplatePartsMenu() {
 	const templateParts = useSelect( ( select ) => {
 		const unfilteredTemplateParts =
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
-				status: [ 'publish', 'auto-draft' ],
+				status: [ 'publish', 'file-based' ],
 				per_page: -1,
 			} ) || [];
 		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;

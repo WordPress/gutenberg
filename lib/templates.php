@@ -268,7 +268,7 @@ function filter_rest_wp_template_query( $args, $request ) {
 			}
 		}
 		$args['post__in']    = $template_ids;
-		$args['post_status'] = array( 'publish', 'auto-draft' );
+		$args['post_status'] = array( 'publish', 'file-based' );
 	}
 
 	return $args;

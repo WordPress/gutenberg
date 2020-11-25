@@ -212,7 +212,7 @@ export default function TemplatePartPreviews( {
 		const themeTemplateParts =
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
 				theme: currentTheme,
-				status: [ 'auto-draft' ],
+				status: [ 'file-based' ],
 				per_page: -1,
 			} ) || [];
 		return [ ...themeTemplateParts, ...publishedTemplateParts ];

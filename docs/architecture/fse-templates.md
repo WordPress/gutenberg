@@ -16,12 +16,12 @@ These capabilities mean that at any point in time, a mix of template files (from
 
 In order to simplify the algorithm used to edit and render the templates from two different places, we performed an operation called "template synchronization".
 
-The synchronization consists of duplicating the theme templates in the `wp_template` (and `wp_template_part`) custom templates with an `auto-draft` status. When a user edits these templates, the status is updated to `publish`.
+The synchronization consists of duplicating the theme templates in the `wp_template` (and `wp_template_part`) custom templates with a `file-based` status. When a user edits these templates, the status is updated to `publish`.
 
 This means:
 
  - The rendering/fetching of templates only need to consider the custom post type templates. It is not necessary to fetch the template files from the theme folder directly. The synchronization will ensure these are duplicated in the CPT.
- - Untouched theme templates have the `auto-draft` status.
+ - Untouched theme templates have the `file-based` status.
  - Edited theme templates have the `publish` status.
 
 The synchronization is important for two different flows:

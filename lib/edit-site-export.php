@@ -29,7 +29,7 @@ function gutenberg_edit_site_export() {
 	$template_query = new WP_Query(
 		array(
 			'post_type'      => 'wp_template',
-			'post_status'    => array( 'publish', 'auto-draft' ),
+			'post_status'    => array( 'publish', 'file-based' ),
 			'tax_query'      => array(
 				array(
 					'taxonomy' => 'wp_theme',
@@ -53,7 +53,7 @@ function gutenberg_edit_site_export() {
 	$template_part_query = new WP_Query(
 		array(
 			'post_type'      => 'wp_template_part',
-			'post_status'    => array( 'publish', 'auto-draft' ),
+			'post_status'    => array( 'publish', 'file-based' ),
 			'tax_query'      => array(
 				array(
 					'taxonomy' => 'wp_theme',
