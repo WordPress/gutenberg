@@ -128,7 +128,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 	$template_query = new WP_Query(
 		array(
 			'post_type'      => 'wp_template',
-			'post_status'    => array( 'publish', 'auto-draft' ),
+			'post_status'    => array( 'publish' ),
 			'post_name__in'  => $slugs,
 			'orderby'        => 'post_name__in',
 			'posts_per_page' => -1,

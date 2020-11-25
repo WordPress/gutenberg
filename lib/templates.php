@@ -111,12 +111,17 @@ add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
 /**
  * Automatically set the theme meta for templates.
  *
- * @param array $post_id Template ID.
+ * @param array   $post_id Template ID.
+ * @param WP_POST $post Template post object.
+ * @param boolean $update Whether this is an existing template being updated.
  */
-function gutenberg_set_template_and_template_part_post_theme( $post_id ) {
+function gutenberg_set_template_and_template_part_post_theme( $post_id, $post, $update ) {
 	$themes = wp_get_post_terms( $post_id, 'wp_theme' );
 	if ( ! $themes ) {
 		wp_set_post_terms( $post_id, array( wp_get_theme()->get_stylesheet() ), 'wp_theme', true );
+	}
+	if ( $update && has_term( '_wp_is_original', 'wp_theme', $post_id ) ) {
+		wp_remove_object_terms( $post_id, '_wp_is_original', 'wp_theme' );
 	}
 }
 add_action( 'save_post_wp_template', 'gutenberg_set_template_and_template_part_post_theme', 10, 3 );
@@ -195,7 +200,6 @@ add_action( 'admin_menu', 'gutenberg_fix_template_admin_menu_entry' );
 // Customize the `wp_template` admin list.
 add_filter( 'manage_wp_template_posts_columns', 'gutenberg_templates_lists_custom_columns' );
 add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_templates_lists_custom_column', 10, 2 );
-add_filter( 'views_edit-wp_template', 'gutenberg_filter_templates_edit_views' );
 
 /**
  * Filter for adding a `resolved` parameter to `wp_template` queries.
@@ -238,7 +242,7 @@ function filter_rest_wp_template_query( $args, $request ) {
 			}
 		}
 		$args['post__in']    = $template_ids;
-		$args['post_status'] = array( 'publish', 'auto-draft' );
+		$args['post_status'] = array( 'publish' );
 	}
 
 	return $args;

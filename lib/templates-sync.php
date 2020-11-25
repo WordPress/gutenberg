@@ -1,13 +1,13 @@
 <?php
 /**
- * Block templates and template parts auto-draft synchronization utils.
+ * Block templates and template parts synchronization utils.
  *
  * @package gutenberg
  */
 
 /**
  * Creates a template (or template part depending on the post type)
- * auto-draft if it doesn't exist yet.
+ * post if it doesn't exist yet.
  *
  * @access private
  * @internal
@@ -18,20 +18,21 @@
  * @param string $content   Template content.
  */
 function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $content ) {
-	// We check if an auto-draft was already created,
+	// We check if a post for this template was already created,
 	// before running the REST API calls
-	// because the site editor needs an existing auto-draft
+	// because the site editor needs an existing post
 	// for each theme template part to work properly.
 	$template_query = new WP_Query(
 		array(
 			'post_type'      => $post_type,
-			'post_status'    => array( 'publish', 'auto-draft' ),
+			'post_status'    => array( 'publish' ),
 			'post_name__in'  => array( $slug ),
 			'tax_query'      => array(
 				array(
 					'taxonomy' => 'wp_theme',
 					'field'    => 'slug',
-					'terms'    => $theme,
+					'terms'    => array( $theme, '_wp_is_original' ),
+					'operator' => 'AND',
 				),
 			),
 			'posts_per_page' => 1,
@@ -43,10 +44,10 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 		$template_post = array(
 			'post_content' => $content,
 			'post_title'   => $slug,
-			'post_status'  => 'auto-draft',
+			'post_status'  => 'publish',
 			'post_type'    => $post_type,
 			'post_name'    => $slug,
-			'tax_input'    => array( 'wp_theme' => array( $theme, '_wp_file_based' ) ),
+			'tax_input'    => array( 'wp_theme' => array( $theme, '_wp_file_based', '_wp_is_original' ) ),
 		);
 
 		if ( 'wp_template' === $post_type ) {
@@ -58,9 +59,9 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 		}
 
 		wp_insert_post( $template_post );
-	} elseif ( 'auto-draft' === $post->post_status && $content !== $post->post_content ) {
+	} elseif ( has_term( '_wp_is_original', 'wp_theme', $post ) && $content !== $post->post_content ) {
 		// If the template already exists, but it was never changed by the user
-		// and the template file content changed then update the content of auto-draft.
+		// and the template file content changed then update the content of the post.
 		$post->post_content = $content;
 		wp_insert_post( $post );
 	}
@@ -87,7 +88,7 @@ function _gutenberg_get_template_paths( $base_directory ) {
 }
 
 /**
- * Create the template parts auto-drafts for the current theme.
+ * Create the template and template part posts for the current theme.
  *
  * @access private
  * @internal
