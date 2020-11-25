@@ -419,7 +419,7 @@ export class FileEdit extends Component {
 											align
 										) }
 									/>
-									{ isUploadFailed && (
+									{ ! isUploadFailed && (
 										<View style={ styles.errorContainer }>
 											<Icon
 												icon={ warning }
