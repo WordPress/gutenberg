@@ -19,16 +19,19 @@
 
 	.blocks-gallery-image,
 	.blocks-gallery-item {
-		// Add space between thumbnails.
-		padding-left: $grid-unit-10;
-		padding-right: $grid-unit-10;
-		padding-bottom: $grid-unit-20;
-
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
 		justify-content: center;
 		position: relative;
+
+		// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
+		width: 50%;
+
+		// Add space between thumbnails.
+		padding-left: $grid-unit-10;
+		padding-right: $grid-unit-10;
+		padding-bottom: $grid-unit-20;
 
 		figure {
 			margin: 0;
@@ -46,10 +49,8 @@
 			display: block;
 			max-width: 100%;
 			height: auto;
-		}
 
-		// IE doesn't handle cropping, so we need an explicit width here.
-		img {
+			// IE doesn't handle cropping, so we need an explicit width here.
 			width: 100%;
 
 			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
@@ -99,12 +100,6 @@
 				object-fit: cover;
 			}
 		}
-	}
-
-	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
-	.blocks-gallery-image,
-	.blocks-gallery-item {
-		width: 50%;
 	}
 
 	&.columns-1 .blocks-gallery-image,
