@@ -31,5 +31,5 @@ export default function useEditorStyles( ref, styles ) {
 
 		return () =>
 			nodes.forEach( ( node ) => ownerDocument.body.removeChild( node ) );
-	}, [ styles ] );
+	}, [ ref, styles ] );
 }
