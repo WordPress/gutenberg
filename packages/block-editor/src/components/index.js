@@ -119,6 +119,7 @@ export {
 } from './typewriter';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
+export { useCanvasClickRedirect as __unstableUseCanvasClickRedirect } from './use-canvas-click-redirect';
 
 /*
  * State Related Components

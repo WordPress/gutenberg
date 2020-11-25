@@ -27,20 +27,12 @@
 	}
 }
 
-.editor-styles-wrapper,
-.editor-styles-wrapper > .block-editor-writing-flow__click-redirect {
-	height: 100%;
-}
+.editor-styles-wrapper {
+	cursor: text;
 
-.edit-post-visual-editor .block-editor-writing-flow__click-redirect {
-	// Allow the page to be scrolled with the last block in the middle.
-	min-height: 40vh;
-	width: 100%;
-}
-
-// Hide the extra space when there are metaboxes.
-.has-metaboxes .edit-post-visual-editor .block-editor-writing-flow__click-redirect {
-	height: 0;
+	> * {
+		cursor: auto;
+	}
 }
 
 // Ideally this wrapper div is not needed but if we want to match the positioning of blocks
