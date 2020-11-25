@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
-	getAnimateClass,
+	__experimentalGetAnimateClassName as getAnimateClassName,
 	withNotices,
 	ToolbarGroup,
 	ToolbarButton,
@@ -129,7 +129,7 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 
 	const blockProps = useBlockProps( {
 		className: classnames(
-			isBlobURL( href ) && getAnimateClass( { type: 'loading' } ),
+			isBlobURL( href ) && getAnimateClassName( { type: 'loading' } ),
 			{
 				'is-transient': isBlobURL( href ),
 			}

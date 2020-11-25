@@ -6,7 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getAnimateClass, Button } from '@wordpress/components';
+import {
+	__experimentalGetAnimateClassName as getAnimateClassName,
+	Button,
+} from '@wordpress/components';
 import { usePrevious, useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
@@ -104,7 +107,7 @@ export default function PostSavedState( {
 		const classes = classnames(
 			'editor-post-saved-state',
 			'is-saving',
-			getAnimateClass( { type: 'loading' } ),
+			getAnimateClassName( { type: 'loading' } ),
 			{
 				'is-autosaving': isAutosaving,
 			}
