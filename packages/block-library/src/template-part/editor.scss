@@ -103,8 +103,18 @@
 			}
 		}
 
+		&.is-hovered {
+			&::after, {
+				// 2px outside.
+				box-shadow: 0 0 0 $border-width $alert-red;
+				// Show a light color for dark themes.
+				.is-dark-theme & {
+					box-shadow: 0 0 0 $border-width $dark-theme-focus;
+				}
+			}
+		}
+
 		&.is-selected,
-		&.is-hovered,
 		&:focus {
 			&::after, {
 				// 2px outside.
