@@ -222,8 +222,10 @@ export class BlockList extends Component {
 					contentContainerStyle={ [
 						horizontal && styles.horizontalContentContainer,
 						contentResizeMode === 'stretch' &&
-							blockWidth > ALIGNMENT_BREAKPOINTS.medium &&
-							styles.horizontalContentContainerStretch,
+						blockWidth > ALIGNMENT_BREAKPOINTS.medium &&
+						blockClientIds.length > 1
+							? styles.horizontalContentContainerStretch
+							: styles.horizontalContentContainerCenter,
 					] }
 					style={ getStyles(
 						isRootList,
