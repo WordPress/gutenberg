@@ -25,15 +25,13 @@ export default function SearchResults( { items, search, renderItem } ) {
 					slug: item.slug,
 					...getTemplateInfo( item ),
 				} ) );
-			} else if ( itemType === 'wp_template_part' ) {
-				return items.map( ( item ) => ( {
-					slug: item.slug,
-					title: item.title?.rendered,
-					description: item.excerpt?.rendered,
-				} ) );
 			}
 
-			return [];
+			return items.map( ( item ) => ( {
+				slug: item.slug,
+				title: item.title?.rendered,
+				description: item.excerpt?.rendered,
+			} ) );
 		},
 		[ items, itemType ]
 	);
