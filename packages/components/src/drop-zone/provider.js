@@ -21,13 +21,16 @@ const { Provider } = Context;
 
 function getDragEventType( { dataTransfer } ) {
 	if ( dataTransfer ) {
-		if ( getFilesFromDataTransfer( dataTransfer ).length > 0 ) {
-			return 'file';
-		}
-
 		// Use lodash `includes` here as in the Edge browser `types` is implemented
 		// as a DomStringList, whereas in other browsers it's an array. `includes`
 		// happily works with both types.
+		if (
+			includes( dataTransfer.types, 'Files' ) ||
+			getFilesFromDataTransfer( dataTransfer ).length > 0
+		) {
+			return 'file';
+		}
+
 		if ( includes( dataTransfer.types, 'text/html' ) ) {
 			return 'html';
 		}
