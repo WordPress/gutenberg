@@ -345,6 +345,43 @@ export function getPossibleBlockTransformations( blocks ) {
 }
 
 /**
+ * Returns a subset of the transforms from `getPossibleBlockTransformations`.
+ * This subset was selected to support transforms that the mobile apps support,
+ * and to avoid "confusing" transforms that don't feel intuitive in a mobile
+ * context.
+ *
+ * @param {Array} block The block to transform.
+ *
+ * @return {Array} Block types that the block argument can be transformed to in
+ * the mobile app.
+ */
+export function getMobileBlockTransformations( block ) {
+	// NOTE (blixt): For now, we only support transforming *from* the paragraph
+	// block. We'll add others soon!
+	const eligibleOriginBlocks = [ 'core/paragraph' ];
+
+	if ( ! eligibleOriginBlocks.includes( block.name ) ) {
+		return [];
+	}
+
+	// NOTE (blixt): From what I can gather, we want to support most-any
+	// transform, except that we don't want to support transforming into a
+	// column or group. If the rules are more nuanced, we could have a mapping
+	// of disallowed transformations - but for now, let's do a simple blocklist!
+	const ineligibleDestinationBlocks = [ 'core/column', 'core/group' ];
+
+	return getPossibleBlockTransformations( [ block ] ).filter(
+		( possibleTransform ) => {
+			const ineligible = ineligibleDestinationBlocks.includes(
+				possibleTransform.name
+			);
+
+			return ! ineligible;
+		}
+	);
+}
+
+/**
  * Given an array of transforms, returns the highest-priority transform where
  * the predicate function returns a truthy value. A higher-priority transform
  * is one with a lower priority value (i.e. first in priority order). Returns

@@ -14,8 +14,8 @@ import {
 	rawHandler,
 	createBlock,
 	isUnmodifiedDefaultBlock,
-	getPossibleBlockTransformations,
 	switchToBlockType,
+	getMobileBlockTransformations,
 } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -301,35 +301,14 @@ export default compose(
 			clipboardBlock &&
 			canInsertBlockType( clipboardBlock.name, rootClientId );
 
-		// NOTE (blixt): To start, we're enabling the Transform menu just for
-		// Paragraph blocks - we can expand this list later-on!
-		// TODO (blixt): Extracting this to a unit-testable function would be
-		// nice, especially once there are multiple blockType.name values that
-		// have this feature.
-		const isTransformEnabled = blockName === 'core/paragraph';
-
-		// NOTE (blixt): These are the safelisted destination-blocks for a
-		// `core/paragraph` block, as outlined in
-		// https://github.com/wordpress-mobile/gutenberg-mobile/issues/2814
-		const allowedBlockNames = [
-			'core/heading',
-			'core/list',
-			'core/quote',
-			'core/preformatted',
-			'core/pullquote',
-			'core/verse',
-		];
-		const transformOptions = getPossibleBlockTransformations( [ block ] )
-			.filter( ( possibleBlockTransform ) => {
-				return allowedBlockNames.includes(
-					possibleBlockTransform.name
-				);
-			} )
-			.map( ( transformOption ) => ( {
+		const transformOptions = getMobileBlockTransformations( block ).map(
+			( transformOption ) => ( {
 				id: transformOption.name,
 				label: transformOption.title,
 				value: transformOption,
-			} ) );
+			} )
+		);
+		const isTransformEnabled = transformOptions.length > 0;
 
 		return {
 			isFirst: firstIndex === 0,
