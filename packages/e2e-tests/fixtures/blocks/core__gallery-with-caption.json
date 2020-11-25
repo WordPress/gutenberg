@@ -28,7 +28,7 @@
                     "isListItem": true
                 },
                 "innerBlocks": [],
-                "originalContent": "<li class=\"list-image\">\n\t\t\t<figure class=\"size-large\">\n\t\t\t\t<img\n\t\t\t\t\tsrc=\"http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg\"\n\t\t\t\t\talt=\"Image gallery image\"\n\t\t\t\t\tclass=\"wp-image-705\"\n\t\t\t\t/>\n\t\t\t</figure>\n\t\t</li>"
+                "originalContent": "<li class=\"list-image\">\n\t\t\t<figure class=\"wp-block-image size-large\">\n\t\t\t\t<img\n\t\t\t\t\tsrc=\"http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg\"\n\t\t\t\t\talt=\"Image gallery image\"\n\t\t\t\t\tclass=\"wp-image-705\"\n\t\t\t\t/>\n\t\t\t</figure>\n\t\t</li>"
             },
             {
                 "clientId": "_clientId_1",
@@ -44,7 +44,7 @@
                     "isListItem": true
                 },
                 "innerBlocks": [],
-                "originalContent": "<li class=\"list-image\">\n\t\t\t<figure class=\"size-large\">\n\t\t\t\t<img\n\t\t\t\t\tsrc=\"http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg\"\n\t\t\t\t\talt=\"Image gallery image\"\n\t\t\t\t\tclass=\"wp-image-704\"\n\t\t\t\t/>\n\t\t\t</figure>\n\t\t</li>"
+                "originalContent": "<li class=\"list-image\">\n\t\t\t<figure class=\"wp-block-image size-large\">\n\t\t\t\t<img\n\t\t\t\t\tsrc=\"http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg\"\n\t\t\t\t\talt=\"Image gallery image\"\n\t\t\t\t\tclass=\"wp-image-704\"\n\t\t\t\t/>\n\t\t\t</figure>\n\t\t</li>"
             }
         ],
         "originalContent": "<figure class=\"wp-block-gallery columns-2 is-cropped\">\n\t<ul class=\"blocks-gallery-grid\">\n\t\t\n\t\t\n\t</ul>\n\t<figcaption class=\"blocks-gallery-caption\">Gallery caption.</figcaption>\n</figure>"
