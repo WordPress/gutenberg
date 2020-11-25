@@ -15,218 +15,6 @@ function gutenberg_experimental_global_styles_has_theme_json_support() {
 }
 
 /**
- * Processes a file that adheres to the theme.json
- * schema and returns an array with its contents,
- * or a void array if none found.
- *
- * @param string $file_path Path to file.
- * @return array Contents that adhere to the theme.json schema.
- */
-function gutenberg_experimental_global_styles_get_from_file( $file_path ) {
-	$config = array();
-	if ( file_exists( $file_path ) ) {
-		$decoded_file = json_decode(
-			file_get_contents( $file_path ),
-			true
-		);
-
-		$json_decoding_error = json_last_error();
-		if ( JSON_ERROR_NONE !== $json_decoding_error ) {
-			error_log( 'Error when decoding file schema: ' . json_last_error_msg() );
-			return $config;
-		}
-
-		if ( is_array( $decoded_file ) ) {
-			$config = $decoded_file;
-		}
-	}
-	return $config;
-}
-
-/**
- * Returns the user's origin config.
- *
- * @return WP_Theme_JSON Entity that holds user data.
- */
-function gutenberg_experimental_global_styles_get_user() {
-	$config   = array();
-	$user_cpt = gutenberg_experimental_global_styles_get_user_cpt();
-	if ( array_key_exists( 'post_content', $user_cpt ) ) {
-		$decoded_data = json_decode( $user_cpt['post_content'], true );
-
-		$json_decoding_error = json_last_error();
-		if ( JSON_ERROR_NONE !== $json_decoding_error ) {
-			error_log( 'Error when decoding user schema: ' . json_last_error_msg() );
-			return $config;
-		}
-
-		if ( is_array( $decoded_data ) ) {
-			$config = $decoded_data;
-		}
-	}
-
-	return new WP_Theme_JSON( $config );
-}
-
-/**
- * Returns the CPT that contains the user's origin config
- * for the current theme or a void array if none found.
- *
- * It can also create and return a new draft CPT.
- *
- * @param bool  $should_create_cpt Whether a new CPT should be created if no one was found.
- *                                   False by default.
- * @param array $post_status_filter  Filter CPT by post status.
- *                                   ['publish'] by default, so it only fetches published posts.
- * @return array Custom Post Type for the user's origin config.
- */
-function gutenberg_experimental_global_styles_get_user_cpt( $should_create_cpt = false, $post_status_filter = array( 'publish' ) ) {
-	$user_cpt         = array();
-	$post_type_filter = 'wp_global_styles';
-	$post_name_filter = 'wp-global-styles-' . urlencode( wp_get_theme()->get_stylesheet() );
-	$recent_posts     = wp_get_recent_posts(
-		array(
-			'numberposts' => 1,
-			'orderby'     => 'date',
-			'order'       => 'desc',
-			'post_type'   => $post_type_filter,
-			'post_status' => $post_status_filter,
-			'name'        => $post_name_filter,
-		)
-	);
-
-	if ( is_array( $recent_posts ) && ( count( $recent_posts ) === 1 ) ) {
-		$user_cpt = $recent_posts[0];
-	} elseif ( $should_create_cpt ) {
-		$cpt_post_id = wp_insert_post(
-			array(
-				'post_content' => '{}',
-				'post_status'  => 'publish',
-				'post_type'    => $post_type_filter,
-				'post_name'    => $post_name_filter,
-			),
-			true
-		);
-		$user_cpt    = get_post( $cpt_post_id, ARRAY_A );
-	}
-
-	return $user_cpt;
-}
-
-/**
- * Returns the post ID of the CPT containing the user's origin config.
- *
- * @return integer
- */
-function gutenberg_experimental_global_styles_get_user_cpt_id() {
-	$user_cpt_id = null;
-	$user_cpt    = gutenberg_experimental_global_styles_get_user_cpt( true );
-	if ( array_key_exists( 'ID', $user_cpt ) ) {
-		$user_cpt_id = $user_cpt['ID'];
-	}
-	return $user_cpt_id;
-}
-
-/**
- * Return core's origin config.
- *
- * @return WP_Theme_JSON Entity that holds core data.
- */
-function gutenberg_experimental_global_styles_get_core() {
-	$config = gutenberg_experimental_global_styles_get_from_file(
-		__DIR__ . '/experimental-default-theme.json'
-	);
-
-	// Start i18n logic to remove when JSON i18 strings are extracted.
-	$default_colors_i18n = array(
-		'black'                 => __( 'Black', 'gutenberg' ),
-		'cyan-bluish-gray'      => __( 'Cyan bluish gray', 'gutenberg' ),
-		'white'                 => __( 'White', 'gutenberg' ),
-		'pale-pink'             => __( 'Pale pink', 'gutenberg' ),
-		'vivid-red'             => __( 'Vivid red', 'gutenberg' ),
-		'luminous-vivid-orange' => __( 'Luminous vivid orange', 'gutenberg' ),
-		'luminous-vivid-amber'  => __( 'Luminous vivid amber', 'gutenberg' ),
-		'light-green-cyan'      => __( 'Light green cyan', 'gutenberg' ),
-		'vivid-green-cyan'      => __( 'Vivid green cyan', 'gutenberg' ),
-		'pale-cyan-blue'        => __( 'Pale cyan blue', 'gutenberg' ),
-		'vivid-cyan-blue'       => __( 'Vivid cyan blue', 'gutenberg' ),
-		'vivid-purple'          => __( 'Vivid purple', 'gutenberg' ),
-	);
-	if ( ! empty( $config['global']['settings']['color']['palette'] ) ) {
-		foreach ( $config['global']['settings']['color']['palette'] as &$color ) {
-			$color['name'] = $default_colors_i18n[ $color['slug'] ];
-		}
-	}
-
-	$default_gradients_i18n = array(
-		'vivid-cyan-blue-to-vivid-purple'               => __( 'Vivid cyan blue to vivid purple', 'gutenberg' ),
-		'light-green-cyan-to-vivid-green-cyan'          => __( 'Light green cyan to vivid green cyan', 'gutenberg' ),
-		'luminous-vivid-amber-to-luminous-vivid-orange' => __( 'Luminous vivid amber to luminous vivid orange', 'gutenberg' ),
-		'luminous-vivid-orange-to-vivid-red'            => __( 'Luminous vivid orange to vivid red', 'gutenberg' ),
-		'very-light-gray-to-cyan-bluish-gray'           => __( 'Very light gray to cyan bluish gray', 'gutenberg' ),
-		'cool-to-warm-spectrum'                         => __( 'Cool to warm spectrum', 'gutenberg' ),
-		'blush-light-purple'                            => __( 'Blush light purple', 'gutenberg' ),
-		'blush-bordeaux'                                => __( 'Blush bordeaux', 'gutenberg' ),
-		'luminous-dusk'                                 => __( 'Luminous dusk', 'gutenberg' ),
-		'pale-ocean'                                    => __( 'Pale ocean', 'gutenberg' ),
-		'electric-grass'                                => __( 'Electric grass', 'gutenberg' ),
-		'midnight'                                      => __( 'Midnight', 'gutenberg' ),
-	);
-	if ( ! empty( $config['global']['settings']['color']['gradients'] ) ) {
-		foreach ( $config['global']['settings']['color']['gradients'] as &$gradient ) {
-			$gradient['name'] = $default_gradients_i18n[ $gradient['slug'] ];
-		}
-	}
-
-	$default_font_sizes_i18n = array(
-		'small'  => __( 'Small', 'gutenberg' ),
-		'normal' => __( 'Normal', 'gutenberg' ),
-		'medium' => __( 'Medium', 'gutenberg' ),
-		'large'  => __( 'Large', 'gutenberg' ),
-		'huge'   => __( 'Huge', 'gutenberg' ),
-	);
-	if ( ! empty( $config['global']['settings']['typography']['fontSizes'] ) ) {
-		foreach ( $config['global']['settings']['typography']['fontSizes'] as &$font_size ) {
-			$font_size['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
-		}
-	}
-
-	$default_font_styles_i18n = array(
-		'normal'  => __( 'Regular', 'gutenberg' ),
-		'italic'  => __( 'Italic', 'gutenberg' ),
-		'initial' => __( 'Initial', 'gutenberg' ),
-		'inherit' => __( 'Inherit', 'gutenberg' ),
-	);
-	if ( ! empty( $config['global']['settings']['typography']['fontStyles'] ) ) {
-		foreach ( $config['global']['settings']['typography']['fontStyles'] as &$font_style ) {
-			$font_style['name'] = $default_font_styles_i18n[ $font_style['slug'] ];
-		}
-	}
-
-	$default_font_weights_i18n = array(
-		'100'     => __( 'Ultralight', 'gutenberg' ),
-		'200'     => __( 'Thin', 'gutenberg' ),
-		'300'     => __( 'Light', 'gutenberg' ),
-		'400'     => __( 'Regular', 'gutenberg' ),
-		'500'     => __( 'Medium', 'gutenberg' ),
-		'600'     => __( 'Semibold', 'gutenberg' ),
-		'700'     => __( 'Bold', 'gutenberg' ),
-		'800'     => __( 'Heavy', 'gutenberg' ),
-		'900'     => __( 'Black', 'gutenberg' ),
-		'initial' => __( 'Initial', 'gutenberg' ),
-		'inherit' => __( 'Inherit', 'gutenberg' ),
-	);
-	if ( ! empty( $config['global']['settings']['typography']['fontWeights'] ) ) {
-		foreach ( $config['global']['settings']['typography']['fontWeights'] as &$font_weight ) {
-			$font_weight['name'] = $default_font_weights_i18n[ $font_weight['slug'] ];
-		}
-	}
-	// End i18n logic to remove when JSON i18 strings are extracted.
-
-	return new WP_Theme_JSON( $config );
-}
-
-/**
  * Returns the theme presets registered via add_theme_support, if any.
  *
  * @param array $settings Existing editor settings.
@@ -323,32 +111,6 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 }
 
 /**
- * Returns the theme's origin config.
- *
- * It also fetches the existing presets the theme declared via add_theme_support
- * and uses them if the theme hasn't declared any via theme.json.
- *
- * @param array $settings Existing editor settings.
- *
- * @return WP_Theme_JSON Entity that holds theme data.
- */
-function gutenberg_experimental_global_styles_get_theme( $settings ) {
-	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
-	$theme_json_data    = gutenberg_experimental_global_styles_get_from_file(
-		locate_template( 'experimental-theme.json' )
-	);
-
-	/*
-	 * We want the presets and settings declared in theme.json
-	 * to override the ones declared via add_theme_support.
-	 */
-	$result = new WP_Theme_JSON( $theme_support_data );
-	$result->merge( new WP_Theme_JSON( $theme_json_data ) );
-
-	return $result;
-}
-
-/**
  * Takes a tree adhering to the theme.json schema and generates
  * the corresponding stylesheet.
  *
@@ -398,10 +160,11 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree ) {
  * and enqueues the resulting stylesheet.
  */
 function gutenberg_experimental_global_styles_enqueue_assets() {
-	$settings = gutenberg_get_common_block_editor_settings();
-	$all      = gutenberg_experimental_global_styles_get_core();
-	$all->merge( gutenberg_experimental_global_styles_get_theme( $settings ) );
-	$all->merge( gutenberg_experimental_global_styles_get_user() );
+	$settings           = gutenberg_get_common_block_editor_settings();
+	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
+
+	$resolver = new WP_Theme_JSON_Resolver();
+	$all      = $resolver->get_origin( $theme_support_data );
 
 	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
 	if ( empty( $stylesheet ) ) {
@@ -420,20 +183,7 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	$base  = gutenberg_experimental_global_styles_get_core();
-	$all   = gutenberg_experimental_global_styles_get_core();
-	$theme = gutenberg_experimental_global_styles_get_theme( $settings );
-	$user  = gutenberg_experimental_global_styles_get_user();
-
-	$base->merge( $theme );
-
-	$all->merge( $theme );
-	$all->merge( $user );
-
-	// STEP 1: ADD FEATURES
-	// These need to be added to settings always.
-	// We also need to unset the deprecated settings defined by core.
-	$settings['__experimentalFeatures'] = $all->get_settings();
+	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
 	unset( $settings['colors'] );
 	unset( $settings['disableCustomColors'] );
 	unset( $settings['disableCustomFontSizes'] );
@@ -442,6 +192,14 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['enableCustomUnits'] );
 	unset( $settings['fontSizes'] );
 	unset( $settings['gradients'] );
+
+	$resolver = new WP_Theme_JSON_Resolver();
+	$all      = $resolver->get_origin( $theme_support_data );
+	$base     = $resolver->get_origin( $theme_support_data, 'theme' );
+
+	// STEP 1: ADD FEATURES
+	// These need to be added to settings always.
+	$settings['__experimentalFeatures'] = $all->get_settings();
 
 	// STEP 2 - IF EDIT-SITE, ADD DATA REQUIRED FOR GLOBAL STYLES SIDEBAR
 	// The client needs some information to be able to access/update the user styles.
@@ -454,7 +212,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		gutenberg_is_edit_site_page( $screen->id ) &&
 		gutenberg_experimental_global_styles_has_theme_json_support()
 	) {
-		$settings['__experimentalGlobalStylesUserEntityId'] = gutenberg_experimental_global_styles_get_user_cpt_id();
+		$settings['__experimentalGlobalStylesUserEntityId'] = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
 		$settings['__experimentalGlobalStylesBaseStyles']   = $base->get_raw_data();
 	} else {
 		// STEP 3 - OTHERWISE, ADD STYLES
@@ -469,39 +227,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	return $settings;
 }
 
-/**
- * Registers a Custom Post Type to store the user's origin config.
- */
-function gutenberg_experimental_global_styles_register_cpt() {
-	if ( ! gutenberg_experimental_global_styles_has_theme_json_support() ) {
-		return;
-	}
-
-	$args = array(
-		'label'        => __( 'Global Styles', 'gutenberg' ),
-		'description'  => 'CPT to store user design tokens',
-		'public'       => false,
-		'show_ui'      => false,
-		'show_in_rest' => true,
-		'rest_base'    => '__experimental/global-styles',
-		'capabilities' => array(
-			'read'                   => 'edit_theme_options',
-			'create_posts'           => 'edit_theme_options',
-			'edit_posts'             => 'edit_theme_options',
-			'edit_published_posts'   => 'edit_theme_options',
-			'delete_published_posts' => 'edit_theme_options',
-			'edit_others_posts'      => 'edit_theme_options',
-			'delete_others_posts'    => 'edit_theme_options',
-		),
-		'map_meta_cap' => true,
-		'supports'     => array(
-			'editor',
-			'revisions',
-		),
-	);
-	register_post_type( 'wp_global_styles', $args );
-}
-
-add_action( 'init', 'gutenberg_experimental_global_styles_register_cpt' );
+add_action( 'init', array( 'WP_Theme_JSON_Resolver', 'register_user_custom_post_type' ) );
 add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
