@@ -33,6 +33,7 @@
 		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/data-controls": "file:../data-controls",
+		"@wordpress/edit-navigation": "file:../edit-navigation",
 		"@wordpress/element": "file:../element",
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
