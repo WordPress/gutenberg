@@ -42,11 +42,6 @@ function gutenberg_render_templates_lists_custom_column( $column_name, $post_id 
 
 	if ( 'status' === $column_name ) {
 		$post_status = get_post_status( $post_id );
-		// The auto-draft status doesn't have localized labels.
-		if ( 'auto-draft' === $post_status ) {
-			echo esc_html_x( 'Auto-Draft', 'Post status', 'gutenberg' );
-			return;
-		}
 		$post_status_object = get_post_status_object( $post_status );
 		echo esc_html( $post_status_object->label );
 		return;
@@ -72,50 +67,4 @@ function gutenberg_render_templates_lists_custom_column( $column_name, $post_id 
 		}
 		return;
 	}
-}
-
-/**
- * Adds the auto-draft view to the templates and template parts admin lists.
- *
- * @param array $views The edit views to filter.
- */
-function gutenberg_filter_templates_edit_views( $views ) {
-	$post_type          = get_current_screen()->post_type;
-	$url                = add_query_arg(
-		array(
-			'post_type'   => $post_type,
-			'post_status' => 'auto-draft',
-		),
-		'edit.php'
-	);
-	$is_auto_draft_view = isset( $_REQUEST['post_status'] ) && 'auto-draft' === $_REQUEST['post_status'];
-	$class_html         = $is_auto_draft_view ? ' class="current"' : '';
-	$aria_current       = $is_auto_draft_view ? ' aria-current="page"' : '';
-	$post_count         = wp_count_posts( $post_type, 'readable' );
-	$label              = sprintf(
-		// The auto-draft status doesn't have localized labels.
-		translate_nooped_plural(
-			/* translators: %s: Number of auto-draft posts. */
-			_nx_noop(
-				'Auto-Draft <span class="count">(%s)</span>',
-				'Auto-Drafts <span class="count">(%s)</span>',
-				'Post status',
-				'gutenberg'
-			),
-			$post_count->{'auto-draft'}
-		),
-		number_format_i18n( $post_count->{'auto-draft'} )
-	);
-
-	$auto_draft_view = sprintf(
-		'<a href="%s"%s%s>%s</a>',
-		esc_url( $url ),
-		$class_html,
-		$aria_current,
-		$label
-	);
-
-	array_splice( $views, 1, 0, array( 'auto-draft' => $auto_draft_view ) );
-
-	return $views;
 }

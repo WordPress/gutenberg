@@ -1,13 +1,13 @@
 <?php
 /**
- * Block templates and template parts auto-draft synchronization utils.
+ * Block templates and template part posts synchronization utils.
  *
  * @package gutenberg
  */
 
 /**
  * Creates a template (or template part depending on the post type)
- * auto-draft if it doesn't exist yet.
+ * post if it doesn't exist yet.
  *
  * @access private
  * @internal
@@ -17,15 +17,15 @@
  * @param string $theme     Template theme.
  * @param string $content   Template content.
  */
-function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $content ) {
-	// We check if an auto-draft was already created,
+function _gutenberg_create_post_for_template( $post_type, $slug, $theme, $content ) {
+	// We check if an file-based post was already created,
 	// before running the REST API calls
-	// because the site editor needs an existing auto-draft
+	// because the site editor needs an existing post
 	// for each theme template part to work properly.
 	$template_query = new WP_Query(
 		array(
 			'post_type'      => $post_type,
-			'post_status'    => array( 'publish', 'auto-draft' ),
+			'post_status'    => array( 'publish', 'file-based' ),
 			'post_name__in'  => array( $slug ),
 			'tax_query'      => array(
 				array(
@@ -43,7 +43,7 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 		$template_post = array(
 			'post_content' => $content,
 			'post_title'   => $slug,
-			'post_status'  => 'auto-draft',
+			'post_status'  => 'file-based',
 			'post_type'    => $post_type,
 			'post_name'    => $slug,
 			'tax_input'    => array( 'wp_theme' => array( $theme, '_wp_file_based' ) ),
@@ -58,9 +58,9 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 		}
 
 		wp_insert_post( $template_post );
-	} elseif ( 'auto-draft' === $post->post_status && $content !== $post->post_content ) {
+	} elseif ( 'file-based' === $post->post_status && $content !== $post->post_content ) {
 		// If the template already exists, but it was never changed by the user
-		// and the template file content changed then update the content of auto-draft.
+		// and the template file content changed then update the content of the post.
 		$post->post_content = $content;
 		wp_insert_post( $post );
 	}
@@ -87,7 +87,7 @@ function _gutenberg_get_template_paths( $base_directory ) {
 }
 
 /**
- * Create the template parts auto-drafts for the current theme.
+ * Create the template part posts for the current theme.
  *
  * @access private
  * @internal
@@ -143,7 +143,7 @@ function _gutenberg_synchronize_theme_templates( $template_type ) {
 			// Subtract ending '.html'.
 			-5
 		);
-		_gutenberg_create_auto_draft_for_template( $template_post_types[ $template_type ], $slug, $theme, $content );
+		_gutenberg_create_post_for_template( $template_post_types[ $template_type ], $slug, $theme, $content );
 	}
 
 	update_option( $option_name, $last_checks );

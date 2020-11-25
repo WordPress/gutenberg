@@ -80,6 +80,37 @@ function gutenberg_register_template_post_type() {
 add_action( 'init', 'gutenberg_register_template_post_type' );
 
 /**
+ * Registers block editor 'file-based' custom status.
+ */
+function gutenberg_register_file_based_status() {
+	if ( ! gutenberg_is_fse_theme() ) {
+		return;
+	}
+
+	register_post_status(
+		'file-based',
+		array(
+			'post_type'                 => array( 'wp_template', 'wp_template_part' ),
+			'label'                     => _x( 'File-Based', 'template status', 'gutenberg' ),
+			'internal'                  => true,
+			'_builtin'                  => true, // internal use only.
+			/* translators: %s: Number of file-based templates and template parts. */
+			'label_count'               => _nx_noop(
+				'File-Based <span class="count">(%s)</span>',
+				'File-Based <span class="count">(%s)</span>',
+				'Post status',
+				'gutenberg'
+			),
+			'exclude_from_search'       => false,
+			'publicly_queryable'        => true,
+			'show_in_admin_all_list'    => false,
+			'show_in_admin_status_list' => true,
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_file_based_status' );
+
+/**
  * Registers block editor 'wp_theme' taxonomy.
  */
 function gutenberg_register_wp_theme_taxonomy() {
@@ -195,7 +226,6 @@ add_action( 'admin_menu', 'gutenberg_fix_template_admin_menu_entry' );
 // Customize the `wp_template` admin list.
 add_filter( 'manage_wp_template_posts_columns', 'gutenberg_templates_lists_custom_columns' );
 add_action( 'manage_wp_template_posts_custom_column', 'gutenberg_render_templates_lists_custom_column', 10, 2 );
-add_filter( 'views_edit-wp_template', 'gutenberg_filter_templates_edit_views' );
 
 /**
  * Filter for adding a `resolved` parameter to `wp_template` queries.
