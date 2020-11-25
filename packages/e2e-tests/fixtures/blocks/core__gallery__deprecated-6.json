@@ -5,19 +5,19 @@
         "isValid": true,
         "attributes": {
             "imageUploads": [],
-            "caption": "Gallery caption.",
+            "caption": "",
             "imageCrop": true,
             "linkTo": "none",
             "sizeSlug": "large",
             "allowResize": false,
             "isListItem": true,
-            "imageCount": 2
+            "imageCount": 3
         },
         "innerBlocks": [
             {
                 "clientId": "_clientId_0",
                 "name": "core/image",
-                "isValid": true,
+                "isValid": false,
                 "attributes": {
                     "url": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1-682x1024.jpg",
                     "alt": "Image gallery image",
@@ -33,7 +33,7 @@
             {
                 "clientId": "_clientId_1",
                 "name": "core/image",
-                "isValid": true,
+                "isValid": false,
                 "attributes": {
                     "url": "http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg",
                     "alt": "Image gallery image",
@@ -44,9 +44,25 @@
                     "isListItem": true
                 },
                 "innerBlocks": [],
-                "originalContent": "<li class=\"list-image\">\n\t\t\t<figure class=\"size-large\">\n\t\t\t\t<img\n\t\t\t\t\tsrc=\"http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg\"\n\t\t\t\t\talt=\"Image gallery image\"\n\t\t\t\t\tclass=\"wp-image-704\"\n\t\t\t\t/>\n\t\t\t</figure>\n\t\t</li>"
+                "originalContent": "<li class=\"list-image\">\n\t\t\t<figure class=\"size-large\">\n\t\t\t\t<img\n\t\t\t\tsrc=\"http://wptest.local/wp-content/uploads/2020/09/test-image-edited-1024x682.jpg\"\"\n\t\t\t\talt=\"Image gallery image\" class=\"wp-image-704\"/>\n\t\t\t</figure>\n\t\t</li>"
+            },
+            {
+                "clientId": "_clientId_2",
+                "name": "core/image",
+                "isValid": false,
+                "attributes": {
+                    "url": "http://wptest.local/wp-content/uploads/2020/04/test-image-1024x683.jpg",
+                    "alt": "Image gallery image",
+                    "caption": "",
+                    "id": 703,
+                    "sizeSlug": "large",
+                    "linkDestination": "none",
+                    "isListItem": true
+                },
+                "innerBlocks": [],
+                "originalContent": "<li class=\"list-image\">\n\t\t\t<figure class=\"size-large\">\n\t\t\t\t<img\n\t\t\t\t\tsrc=\"http://wptest.local/wp-content/uploads/2020/04/test-image-1024x683.jpg\"\n\t\t\t\t\talt=\"Image gallery image\"\n\t\t\t\t\tclass=\"wp-image-703\"\n\t\t\t\t/>\n\t\t\t</figure>\n\t\t</li>"
             }
         ],
-        "originalContent": "<figure class=\"wp-block-gallery columns-2 is-cropped\">\n\t<ul class=\"blocks-gallery-grid\">\n\t\t\n\t\t\n\t</ul>\n\t<figcaption class=\"blocks-gallery-caption\">Gallery caption.</figcaption>\n</figure>"
+        "originalContent": "<figure class=\"wp-block-gallery columns-3 is-cropped\">\n\t<ul class=\"blocks-gallery-grid\">\n\t\t\n\n\t\t\n\n\t\t\n\t</ul>\n</figure>"
     }
 ]
