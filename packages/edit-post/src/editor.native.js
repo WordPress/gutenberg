@@ -21,6 +21,7 @@ import { Preview } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import Layout from './components/layout';
+import perf from './perf';
 
 class Editor extends Component {
 	constructor( props ) {
@@ -143,7 +144,8 @@ class Editor extends Component {
 			meta: [],
 		};
 
-		return (
+		return perf.logComponentPerf(
+			'EDITOR NATIVE',
 			<SlotFillProvider>
 				<EditorProvider
 					settings={ editorSettings }

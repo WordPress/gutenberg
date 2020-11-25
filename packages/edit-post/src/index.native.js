@@ -1,6 +1,10 @@
 /**
  * WordPress dependencies
  */
+/**
+ * Internal dependencies
+ */
+import './perf';
 import '@wordpress/core-data';
 import '@wordpress/notices';
 import '@wordpress/format-library';

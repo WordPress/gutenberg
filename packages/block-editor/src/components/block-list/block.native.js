@@ -28,6 +28,8 @@ import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
 
+import perf from '../../../../edit-post/src/perf';
+
 function BlockForType( {
 	attributes,
 	clientId,
@@ -57,7 +59,8 @@ function BlockForType( {
 					defaultColors
 				);
 
-				return (
+				return perf.logComponentPerf(
+					`BLOCK - ${ name }`,
 					<GlobalStylesContext.Provider value={ mergedStyle }>
 						<BlockEdit
 							name={ name }

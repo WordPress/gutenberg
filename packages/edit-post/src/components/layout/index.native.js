@@ -1,7 +1,13 @@
 /**
  * External dependencies
  */
-import { Platform, SafeAreaView, View } from 'react-native';
+import {
+	Platform,
+	SafeAreaView,
+	TouchableOpacity,
+	View,
+	Text,
+} from 'react-native';
 import SafeArea from 'react-native-safe-area';
 
 /**
@@ -32,6 +38,8 @@ import headerToolbarStyles from '../header/header-toolbar/style.scss';
 import Header from '../header';
 import VisualEditor from '../visual-editor';
 
+import perf from '../../perf';
+
 class Layout extends Component {
 	constructor() {
 		super( ...arguments );
@@ -40,6 +48,7 @@ class Layout extends Component {
 		this.onRootViewLayout = this.onRootViewLayout.bind( this );
 
 		this.state = {
+			showPerf: false,
 			rootViewHeight: 0,
 			safeAreaInsets: { top: 0, bottom: 0, right: 0, left: 0 },
 		};
@@ -128,6 +137,20 @@ class Layout extends Component {
 				) }
 				onLayout={ this.onRootViewLayout }
 			>
+				<TouchableOpacity
+					onPress={ () => {
+						this.setState( { showPerf: true }, () => {
+							setTimeout( () => {
+								console.log(
+									JSON.stringify( perf.getTrace() )
+								);
+							}, 5000 );
+						} );
+					} }
+				>
+					<Text>GET TRACE</Text>
+				</TouchableOpacity>
+				{ this.state.showPerf && <View nativeID="tti_complete"></View> }
 				<AutosaveMonitor disableIntervalChecks />
 				<View
 					style={ getStylesFromColorScheme(
