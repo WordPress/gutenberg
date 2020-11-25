@@ -35,10 +35,13 @@ export default function VisualEditor() {
 		( select ) => select( 'core/edit-post' ).hasMetaBoxes(),
 		[]
 	);
-	const inlineStyles = useResizeCanvas( deviceType ) || {
+	const desktopCanvasStyles = {
 		height: '100%',
+		// Add a constant padding for the typewritter effect. When typing at the
+		// bottom, there needs to be room to scroll up.
 		paddingBottom: hasMetaBoxes ? null : '40vh',
 	};
+	const resizedCanvasStyles = useResizeCanvas( deviceType );
 
 	useScrollMultiSelectionIntoView( ref );
 	useBlockSelectionClearer( ref );
@@ -55,7 +58,7 @@ export default function VisualEditor() {
 				ref={ ref }
 				className="editor-styles-wrapper"
 				tabIndex="-1"
-				style={ inlineStyles }
+				style={ resizedCanvasStyles || desktopCanvasStyles }
 			>
 				<WritingFlow>
 					<div className="edit-post-visual-editor__post-title-wrapper">
