@@ -240,12 +240,6 @@ export function updateSettings( settings ) {
  * @param {Object} template The template to revert.
  */
 export function* revertTemplate( template ) {
-	const postType = yield controls.resolveSelect(
-		'core',
-		'getPostType',
-		'wp_template'
-	);
-
 	const currentTheme = yield controls.resolveSelect(
 		'core',
 		'getCurrentTheme'
@@ -262,10 +256,13 @@ export function* revertTemplate( template ) {
 	}
 
 	try {
-		yield apiFetch( {
-			path: `/wp/v2/${ postType.rest_base }/${ template.id }`,
-			method: 'DELETE',
-		} );
+		yield controls.dispatch(
+			'core',
+			'deleteEntityRecord',
+			'postType',
+			'wp_template',
+			template.id
+		);
 
 		const fileTemplates = yield controls.resolveSelect(
 			'core',
