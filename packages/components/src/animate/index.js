@@ -30,7 +30,7 @@ function getDefaultOrigin( type ) {
 /**
  * @param {GetAnimateOptions} options
  *
- * @return {string | undefined} ClassName that applies the animations
+ * @return {string | void} ClassName that applies the animations
  */
 export function getAnimateClassName( options ) {
 	const { type } = options;
@@ -54,8 +54,6 @@ export function getAnimateClassName( options ) {
 			'is-from-' + origin
 		);
 	}
-
-	return undefined;
 }
 
 export default function Animate( { type, options = {}, children } ) {
