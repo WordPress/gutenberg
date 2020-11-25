@@ -15,6 +15,7 @@ import {
 	__unstableUseScrollMultiSelectionIntoView as useScrollMultiSelectionIntoView,
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
+	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
@@ -30,13 +31,24 @@ export default function VisualEditor() {
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
 	}, [] );
-	const inlineStyles = useResizeCanvas( deviceType );
+	const hasMetaBoxes = useSelect(
+		( select ) => select( 'core/edit-post' ).hasMetaBoxes(),
+		[]
+	);
+	const desktopCanvasStyles = {
+		height: '100%',
+		// Add a constant padding for the typewritter effect. When typing at the
+		// bottom, there needs to be room to scroll up.
+		paddingBottom: hasMetaBoxes ? null : '40vh',
+	};
+	const resizedCanvasStyles = useResizeCanvas( deviceType );
 
 	useScrollMultiSelectionIntoView( ref );
 	useBlockSelectionClearer( ref );
 	useTypewriter( ref );
 	useClipboardHandler( ref );
 	useTypingObserver( ref );
+	useCanvasClickRedirect( ref );
 
 	return (
 		<div className="edit-post-visual-editor">
@@ -46,7 +58,7 @@ export default function VisualEditor() {
 				ref={ ref }
 				className="editor-styles-wrapper"
 				tabIndex="-1"
-				style={ inlineStyles }
+				style={ resizedCanvasStyles || desktopCanvasStyles }
 			>
 				<WritingFlow>
 					<div className="edit-post-visual-editor__post-title-wrapper">
