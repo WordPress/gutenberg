@@ -16,9 +16,17 @@ import { __ } from '@wordpress/i18n';
 import { normalizedSearch } from './utils';
 import { useSelect } from '@wordpress/data';
 import TemplateNavigationItem from './template-navigation-item';
+import ContentNavigationItem from './content-navigation-item';
 
 export default function SearchResults( { items, search } ) {
-	const itemType = items?.length > 0 ? items[ 0 ].type : null;
+	let itemType = null;
+	if ( items.length > 0 ) {
+		if ( items[ 0 ].taxonomy ) {
+			itemType = 'taxonomy';
+		} else {
+			itemType = items[ 0 ].type;
+		}
+	}
 
 	const itemInfos = useSelect(
 		( select ) => {
@@ -30,6 +38,14 @@ export default function SearchResults( { items, search } ) {
 				return items.map( ( item ) => ( {
 					slug: item.slug,
 					...getTemplateInfo( item ),
+				} ) );
+			}
+
+			if ( itemType === 'taxonomy' ) {
+				return items.map( ( item ) => ( {
+					slug: item.slug,
+					title: item.name,
+					description: item.description,
 				} ) );
 			}
 
@@ -60,12 +76,17 @@ export default function SearchResults( { items, search } ) {
 		} );
 	}, [ items, itemInfos, search ] );
 
+	const ItemComponent =
+		itemType === 'wp_template' || itemType === 'wp_template_part'
+			? TemplateNavigationItem
+			: ContentNavigationItem;
+
 	return (
 		<NavigationGroup title={ __( 'Search results' ) }>
 			{ map( itemsFiltered, ( item ) => (
-				<TemplateNavigationItem
+				<ItemComponent
 					item={ item }
-					key={ `${ item.type }-${ item.id }` }
+					key={ `${ item.taxonomy || item.type }-${ item.id }` }
 				/>
 			) ) }
 		</NavigationGroup>
