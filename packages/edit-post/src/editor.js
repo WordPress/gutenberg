@@ -148,6 +148,10 @@ function Editor( {
 		return template ? parse( template.post_content ) : [];
 	}, [ template ] );
 
+	if ( ! post ) {
+		return null;
+	}
+
 	return (
 		<StrictMode>
 			<EditPostSettings.Provider value={ settings }>
