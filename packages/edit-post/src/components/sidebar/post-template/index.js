@@ -51,7 +51,7 @@ function PostTemplate() {
 										setIsEditingTemplate( true );
 										createSuccessNotice(
 											__(
-												"You're now in template mode, changes to the template level are global and applies to all pages sharing the same template."
+												'Editing template. Changes made here affect all posts and pages that use the template.'
 											),
 											{
 												type: 'snackbar',
