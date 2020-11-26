@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, register } from '@wordpress/data';
+import { createReduxStore, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -12,6 +12,14 @@ import * as actions from './actions';
 import * as selectors from './selectors';
 import { STORE_NAME } from './constants';
 
+const storeConfig = {
+	reducer,
+	actions,
+	controls,
+	selectors,
+	persist: [ 'preferences' ],
+};
+
 /**
  * Store definition for the edit post namespace.
  *
@@ -19,14 +27,8 @@ import { STORE_NAME } from './constants';
  *
  * @type {Object}
  */
-export const store = createReduxStore( STORE_NAME, {
-	reducer,
-	actions,
-	controls,
-	selectors,
-	persist: [ 'preferences' ],
-} );
+export const store = createReduxStore( STORE_NAME, storeConfig );
 
 // Ideally we use register instead of register store.
 // We shouuld be able to make the switch once we remove the effects.
-register( store );
+registerStore( STORE_NAME, storeConfig );
