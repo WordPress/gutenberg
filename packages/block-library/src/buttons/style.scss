@@ -5,6 +5,13 @@
 
 	&.is-vertical {
 		flex-direction: column;
+		> .wp-block-button {
+			/*rtl:ignore*/
+			margin-right: 0;
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
 	}
 
 	// Increased specificity to override blocks default margin.
@@ -17,15 +24,6 @@
 		&:last-child {
 			/*rtl:ignore*/
 			margin-right: 0;
-		}
-
-		.is-vertical & {
-			margin-right: 0;
-
-			&:last-child {
-				/*rtl:ignore*/
-				margin-bottom: 0;
-			}
 		}
 	}
 
