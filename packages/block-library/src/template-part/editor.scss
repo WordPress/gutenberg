@@ -123,6 +123,8 @@
 			}
 
 			&.is-hovered:not(.is-selected) {
+				cursor: default;
+
 				&::after {
 					box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
 				}
