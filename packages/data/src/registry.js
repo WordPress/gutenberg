@@ -12,30 +12,6 @@ import createCoreDataStore from './store';
 
 /** @typedef {import('./types').WPDataStore} WPDataStore */
 
-// A map to record each registry and their stores/parent privately.
-const StoresMap = new WeakMap();
-
-/**
- * Traverse up the registries to find the registry that has the store registered.
- *
- * @param {Object} registry  The registry created by createRegistry below.
- * @param {string} storeName The store key name.
- * @return {Object | null} The registered store or null if it doesn't exists in the registry tree.
- */
-function getRegisteredStore( registry, storeName ) {
-	if ( ! registry ) {
-		return null;
-	}
-
-	const { stores, parent } = StoresMap.get( registry );
-
-	if ( storeName in stores ) {
-		return stores[ storeName ];
-	}
-
-	return getRegisteredStore( parent, storeName );
-}
-
 /**
  * @typedef {Object} WPDataRegistry An isolated orchestrator of store registrations.
  *
@@ -247,21 +223,18 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	/**
-	 * Subscribe handler to all the stores.
+	 * Subscribe handler to a store.
 	 *
-	 * @param {string[]} listeningStores Store names in array.
-	 * @param {Function} handler         The function subscribed to the stores.
-	 * @return {Function} A function to unsubscribe every handler.
+	 * @param {string[]} storeName The store name.
+	 * @param {Function} handler   The function subscribed to the store.
+	 * @return {Function} A function to unsubscribe the handler.
 	 */
-	function __experimentalSubscribeStores( listeningStores, handler ) {
-		const unsubscribers = listeningStores
-			.map( ( storeName ) => getRegisteredStore( registry, storeName ) )
-			.filter( ( registeredStore ) => registeredStore !== null )
-			.map( ( registeredStore ) => registeredStore.subscribe( handler ) );
+	function __experimentalSubscribeStore( storeName, handler ) {
+		if ( storeName in stores ) {
+			return stores[ storeName ].subscribe( handler );
+		}
 
-		return () => {
-			unsubscribers.forEach( ( unsubscriber ) => unsubscriber() );
-		};
+		return parent.__experimentalSubscribeStore( storeName, handler );
 	}
 
 	let registry = {
@@ -275,7 +248,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		use,
 		register,
 		__experimentalMarkListeningStores,
-		__experimentalSubscribeStores,
+		__experimentalSubscribeStore,
 	};
 
 	/**
@@ -303,15 +276,10 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	// This function will be deprecated as soon as it is no longer internally referenced.
 	//
 	function use( plugin, options ) {
-		const storesMap = StoresMap.get( registry );
-
 		registry = {
 			...registry,
 			...plugin( registry, options ),
 		};
-
-		// We don't need to do this once `use` is removed.
-		StoresMap.set( registry, storesMap );
 
 		return registry;
 	}
@@ -326,16 +294,5 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		parent.subscribe( globalListener );
 	}
 
-	const storesMap = {
-		stores,
-		parent,
-	};
-	StoresMap.set( registry, storesMap );
-
-	const registryWithPlugins = withPlugins( registry );
-
-	// We don't need to do this once `withPlugins` is removed.
-	StoresMap.set( registryWithPlugins, storesMap );
-
-	return registryWithPlugins;
+	return withPlugins( registry );
 }

@@ -193,14 +193,13 @@ export default function useSelect( _mapSelect, deps ) {
 			}
 		};
 
-		const unsubscribe = registry.__experimentalSubscribeStores(
-			listeningStores.current,
-			onChange
+		const unsubscribers = listeningStores.current.map( ( storeName ) =>
+			registry.__experimentalSubscribeStore( storeName, onChange )
 		);
 
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;
-			unsubscribe();
+			unsubscribers.forEach( ( unsubscribe ) => unsubscribe() );
 			renderQueue.flush( queueContext );
 		};
 	}, [ registry, trapSelect, depsChangedFlag ] );
