@@ -6,7 +6,7 @@ import { map } from 'lodash';
 /**
  * Internal dependencies
  */
-import { defaultColumnsNumber } from '../../shared';
+import { defaultColumnsNumber } from '../shared';
 
 /**
  * WordPress dependencies
@@ -93,7 +93,7 @@ export default {
 	save( { attributes } ) {
 		const {
 			images,
-			columns = defaultColumnsNumber( attributes?.images.length ),
+			columns = defaultColumnsNumber( attributes ),
 			imageCrop,
 			caption,
 			linkTo,

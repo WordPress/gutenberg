@@ -7,7 +7,7 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { defaultColumnsNumber } from '../../shared';
+import { defaultColumnsNumber } from '../shared';
 import {
 	LINK_DESTINATION_ATTACHMENT,
 	LINK_DESTINATION_MEDIA,
@@ -96,7 +96,7 @@ export default {
 	save( { attributes } ) {
 		const {
 			images,
-			columns = defaultColumnsNumber( attributes?.images.length ),
+			columns = defaultColumnsNumber( attributes ),
 			imageCrop,
 			caption,
 			linkTo,

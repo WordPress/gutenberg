@@ -9,7 +9,7 @@ import { createBlock } from '@wordpress/blocks';
  */
 
 import { getHrefAndDestination } from '../../utils';
-import { defaultColumnsNumber } from '../../shared';
+import { defaultColumnsNumber } from '../shared';
 
 export default {
 	attributes: {
@@ -74,7 +74,7 @@ export default {
 	save( { attributes } ) {
 		const {
 			images,
-			columns = defaultColumnsNumber( attributes?.images.length ),
+			columns = defaultColumnsNumber( attributes ),
 			imageCrop,
 			linkTo,
 		} = attributes;
