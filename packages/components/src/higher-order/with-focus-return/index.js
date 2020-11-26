@@ -51,17 +51,19 @@ function withFocusReturn( options ) {
 
 	return ( WrappedComponent ) => ( props ) => {
 		const ref = useRef();
-		const stack = useRef();
 		const focusHistory = useContext( context );
+		// The focus history is a mutating array. Take a snapshot on mount
+		// to use later on unmount.
+		const stack = useRef( [ ...focusHistory ] );
 
 		useEffect( () => {
 			const { ownerDocument } = ref.current;
 
-			// The focus history is a mutating array. Take a snapshot on mount
-			// to use later on unmount.
-			stack.current = focusHistory
-				? [ ...focusHistory ]
-				: [ ownerDocument.activeElement ];
+			// If there is no focus history, simply return focus to the active
+			// element on mount.
+			if ( ! stack.current ) {
+				stack.current = [ ownerDocument.activeElement ];
+			}
 
 			return () => {
 				if ( ! ref.current.contains( ownerDocument.activeElement ) ) {
