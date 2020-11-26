@@ -21,7 +21,7 @@ export function serializeGradientColorStop( { type, value, length } ) {
 	return `${ serializeGradientColor( {
 		type,
 		value,
-	} ) } ${ serializeGradientPosition( length ) }`;
+	} ) } ${ length ? serializeGradientPosition( length ) : '' }`;
 }
 
 export function serializeGradientOrientation( orientation ) {
