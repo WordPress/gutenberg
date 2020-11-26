@@ -1,12 +1,18 @@
 /**
- * Internal dependencies
+ * External dependencies
  */
-import { defaultColumnsNumber } from '../../shared';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { RichText } from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import { defaultColumnsNumber } from '../../shared';
+import { getHrefAndDestination } from '../../utils';
 
 export default {
 	attributes: {
@@ -14,62 +20,25 @@ export default {
 			type: 'array',
 			default: [],
 			source: 'query',
-			selector: '.blocks-gallery-item',
+			selector: 'div.wp-block-gallery figure.blocks-gallery-image img',
 			query: {
 				url: {
-					type: 'string',
 					source: 'attribute',
-					selector: 'img',
 					attribute: 'src',
 				},
-				fullUrl: {
-					type: 'string',
-					source: 'attribute',
-					selector: 'img',
-					attribute: 'data-full-url',
-				},
-				link: {
-					type: 'string',
-					source: 'attribute',
-					selector: 'img',
-					attribute: 'data-link',
-				},
 				alt: {
-					type: 'string',
 					source: 'attribute',
-					selector: 'img',
 					attribute: 'alt',
 					default: '',
 				},
 				id: {
-					type: 'string',
 					source: 'attribute',
-					selector: 'img',
 					attribute: 'data-id',
 				},
-				caption: {
-					type: 'string',
-					source: 'html',
-					selector: '.blocks-gallery-item__caption',
-				},
 			},
-		},
-		ids: {
-			type: 'array',
-			items: {
-				type: 'number',
-			},
-			default: [],
 		},
 		columns: {
 			type: 'number',
-			minimum: 1,
-			maximum: 8,
-		},
-		caption: {
-			type: 'string',
-			source: 'html',
-			selector: '.blocks-gallery-caption',
 		},
 		imageCrop: {
 			type: 'boolean',
@@ -79,103 +48,86 @@ export default {
 			type: 'string',
 			default: 'none',
 		},
-		sizeSlug: {
+		align: {
 			type: 'string',
-			default: 'large',
+			default: 'none',
 		},
 	},
 	supports: {
 		align: true,
 	},
-	isEligible( { linkTo } ) {
-		return ! linkTo || linkTo === 'attachment' || linkTo === 'media';
-	},
-	migrate( attributes ) {
-		let linkTo = attributes.linkTo;
-		if ( ! attributes.linkTo ) {
-			linkTo = 'none';
-		} else if ( attributes.linkTo === 'attachment' ) {
-			linkTo = 'post';
-		} else if ( attributes.linkTo === 'media' ) {
-			linkTo = 'file';
-		}
-		return {
-			...attributes,
-			linkTo,
-		};
-	},
 	save( { attributes } ) {
 		const {
 			images,
-			columns = defaultColumnsNumber( attributes.images.length ),
+			columns = defaultColumnsNumber( attributes?.images.length ),
+			align,
 			imageCrop,
-			caption,
 			linkTo,
 		} = attributes;
-
+		const className = classnames( `columns-${ columns }`, {
+			alignnone: align === 'none',
+			'is-cropped': imageCrop,
+		} );
 		return (
-			<figure
-				className={ `columns-${ columns } ${
-					imageCrop ? 'is-cropped' : ''
-				}` }
-			>
-				<ul className="blocks-gallery-grid">
-					{ images.map( ( image ) => {
-						let href;
+			<div className={ className }>
+				{ images.map( ( image ) => {
+					let href;
 
-						switch ( linkTo ) {
-							case 'media':
-								href = image.fullUrl || image.url;
-								break;
-							case 'attachment':
-								href = image.link;
-								break;
-						}
+					switch ( linkTo ) {
+						case 'media':
+							href = image.url;
+							break;
+						case 'attachment':
+							href = image.link;
+							break;
+					}
 
-						const img = (
-							<img
-								src={ image.url }
-								alt={ image.alt }
-								data-id={ image.id }
-								data-full-url={ image.fullUrl }
-								data-link={ image.link }
-								className={
-									image.id ? `wp-image-${ image.id }` : null
-								}
-							/>
-						);
+					const img = (
+						<img
+							src={ image.url }
+							alt={ image.alt }
+							data-id={ image.id }
+						/>
+					);
 
-						return (
-							<li
-								key={ image.id || image.url }
-								className="blocks-gallery-item"
-							>
-								<figure>
-									{ href ? (
-										<a href={ href }>{ img }</a>
-									) : (
-										img
-									) }
-									{ ! RichText.isEmpty( image.caption ) && (
-										<RichText.Content
-											tagName="figcaption"
-											className="blocks-gallery-item__caption"
-											value={ image.caption }
-										/>
-									) }
-								</figure>
-							</li>
-						);
-					} ) }
-				</ul>
-				{ ! RichText.isEmpty( caption ) && (
-					<RichText.Content
-						tagName="figcaption"
-						className="blocks-gallery-caption"
-						value={ caption }
-					/>
-				) }
-			</figure>
+					return (
+						<figure
+							key={ image.id || image.url }
+							className="blocks-gallery-image"
+						>
+							{ href ? <a href={ href }>{ img }</a> : img }
+						</figure>
+					);
+				} ) }
+			</div>
 		);
+	},
+	isEligible( { imageCount } ) {
+		return ! imageCount;
+	},
+	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
+		const imageBlocks = images.map( ( image ) => {
+			return createBlock( 'core/image', {
+				id: parseInt( image.id ),
+				url: image.url,
+				alt: image.alt,
+				caption: image.caption,
+				sizeSlug,
+				...getHrefAndDestination( image, linkTo ),
+			} );
+		} );
+		return [
+			{
+				caption,
+				columns,
+				imageCrop,
+				linkTo,
+				sizeSlug,
+				imageCount: imageBlocks.length,
+				allowResize: false,
+				isListItem: true,
+			},
+			imageBlocks,
+		];
 	},
 };

@@ -1,12 +1,15 @@
 /**
- * Internal dependencies
- */
-import { defaultColumnsNumber } from '../../shared';
-
-/**
  * WordPress dependencies
  */
 import { RichText } from '@wordpress/block-editor';
+import { createBlock } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+
+import { getHrefAndDestination } from '../../utils';
+import { defaultColumnsNumber } from '../../shared';
 
 export default {
 	attributes: {
@@ -125,5 +128,33 @@ export default {
 				} ) }
 			</ul>
 		);
+	},
+	isEligible( { imageCount } ) {
+		return ! imageCount;
+	},
+	migrate( { images, imageCrop, linkTo, sizeSlug, columns, caption } ) {
+		const imageBlocks = images.map( ( image ) => {
+			return createBlock( 'core/image', {
+				id: parseInt( image.id ),
+				url: image.url,
+				alt: image.alt,
+				caption: image.caption,
+				sizeSlug,
+				...getHrefAndDestination( image, linkTo ),
+			} );
+		} );
+		return [
+			{
+				caption,
+				columns,
+				imageCrop,
+				linkTo,
+				sizeSlug,
+				imageCount: imageBlocks.length,
+				allowResize: false,
+				isListItem: true,
+			},
+			imageBlocks,
+		];
 	},
 };
