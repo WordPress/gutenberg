@@ -7,24 +7,26 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import { store as editPostStore } from '../../../store';
 
-export function PostTemplate() {
-	const { template, isEditingTemplate } = useSelect( ( select ) => {
+function PostTemplate() {
+	const { template, isEditing } = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
 		const { __experimentalGetTemplateForLink } = select( coreStore );
-		const { isFeatureActive } = select( editPostStore );
+		const { isEditingTemplate } = select( editPostStore );
 		const link = getEditedPostAttribute( 'link' );
 		return {
 			template: link ? __experimentalGetTemplateForLink( link ) : null,
-			isEditingTemplate: isFeatureActive( 'templateZoomOut' ),
+			isEditing: isEditingTemplate(),
 		};
 	}, [] );
-	const { toggleFeature } = useDispatch( editPostStore );
+	const { setIsEditingTemplate } = useDispatch( editPostStore );
+	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	if ( ! template ) {
 		return null;
@@ -33,7 +35,7 @@ export function PostTemplate() {
 	return (
 		<PanelRow className="edit-post-post-template">
 			<span>{ __( 'Template' ) }</span>
-			{ ! isEditingTemplate && (
+			{ ! isEditing && (
 				<span>
 					{ createInterpolateElement(
 						sprintf(
@@ -46,7 +48,15 @@ export function PostTemplate() {
 								<Button
 									isLink
 									onClick={ () => {
-										toggleFeature( 'templateZoomOut' );
+										setIsEditingTemplate( true );
+										createSuccessNotice(
+											__(
+												"You're now in template mode, changes to the template level are global and applies to all pages sharing the same template."
+											),
+											{
+												type: 'snackbar',
+											}
+										);
 									} }
 								>
 									{ __( 'Edit' ) }
@@ -56,7 +66,7 @@ export function PostTemplate() {
 					) }
 				</span>
 			) }
-			{ isEditingTemplate && <span>{ template.post_title }</span> }
+			{ isEditing && <span>{ template.post_title }</span> }
 		</PanelRow>
 	);
 }

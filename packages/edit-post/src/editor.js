@@ -47,13 +47,14 @@ function Editor( {
 		blockTypes,
 		__experimentalLocalAutosaveInterval,
 		keepCaretInsideBlock,
-		templateZoomOut,
+		isTemplateMode,
 		template,
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
 			getPreference,
 			__experimentalGetPreviewDeviceType,
+			isEditingTemplate,
 		} = select( 'core/edit-post' );
 		const { getEntityRecord, __experimentalGetTemplateForLink } = select(
 			'core'
@@ -77,7 +78,7 @@ function Editor( {
 				'localAutosaveInterval'
 			),
 			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
-			templateZoomOut: isFeatureActive( 'templateZoomOut' ),
+			isTemplateMode: isEditingTemplate(),
 			template: postObject
 				? __experimentalGetTemplateForLink( postObject.link )
 				: null,
@@ -158,7 +159,7 @@ function Editor( {
 							initialEdits={ initialEdits }
 							useSubRegistry={ false }
 							__unstableTemplate={
-								templateZoomOut ? templateContent : undefined
+								isTemplateMode ? templateContent : undefined
 							}
 							{ ...props }
 						>
