@@ -29,8 +29,7 @@ import { registerBlockType } from '@wordpress/blocks';
 ## Options
 
 The rule can be configured via an object.
-This should be an object where the keys are import package names and the values are arrays of allowed experimental imports.
-Note that `unstable` features are not intended for public use and the rule cannot be configured to allow them.
+This should be an object where the keys are import package names and the values are arrays of allowed unsafe imports.
 
 #### Example configuration
 
