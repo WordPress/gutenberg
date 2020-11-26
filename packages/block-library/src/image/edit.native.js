@@ -345,7 +345,9 @@ export class ImageEdit extends React.Component {
 
 		const mappedAttributes = { ...unMappedAttributes, url };
 		const setMappedAttributes = ( { url: href, ...restAttributes } ) =>
-			setAttributes( { ...restAttributes, href } );
+			href === undefined
+				? setAttributes( restAttributes )
+				: setAttributes( { ...restAttributes, href } );
 
 		const options = {
 			url: {
