@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Clipboard, TouchableWithoutFeedback } from 'react-native';
+import { View, Clipboard, TouchableWithoutFeedback, Text } from 'react-native';
 import React from 'react';
 
 /**
@@ -17,6 +17,7 @@ import {
 	MediaPlaceholder,
 	MediaUploadProgress,
 	RichText,
+	PlainText,
 	BlockControls,
 	MediaUpload,
 	InspectorControls,
@@ -352,7 +353,6 @@ export class FileEdit extends Component {
 		}
 	}
 
-
 	onLayout( { nativeEvent } ) {
 		const { width } = nativeEvent.layout;
 		const { paddingLeft, paddingRight } = styles.defaultButton;
@@ -399,14 +399,6 @@ export class FileEdit extends Component {
 			showDownloadButton,
 			align,
 		} = attributes;
-
-		const dimmedStyle =
-			this.state.isUploadInProgress && styles.disabledButton;
-		const finalButtonStyle = Object.assign(
-			{},
-			styles.defaultButton,
-			dimmedStyle
-		);
 
 		const minWidth =
 			isButtonFocused ||
@@ -530,7 +522,8 @@ export class FileEdit extends Component {
 												styles.buttonText.color
 											}
 											placeholderTextColor={
-												styles.placeholderTextColor.color
+												styles.placeholderTextColor
+													.color
 											}
 											underlineColorAndroid="transparent"
 											onChange={
