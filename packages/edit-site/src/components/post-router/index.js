@@ -3,6 +3,8 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { getQueryArg } from '@wordpress/url';
+
 /**
  * Internal dependencies
  */
@@ -32,10 +34,10 @@ export default function PostRouter() {
 
 	// Set correct entity on load.
 	useEffect( () => {
-		const query = new URLSearchParams( window.location.search );
-		const contextType = query.get( 'contextType' );
-		const id = query.get( 'id' );
-		const content = query.get( 'content' );
+		const url = window.location.href;
+		const contextType = getQueryArg( url, 'contextType' );
+		const id = getQueryArg( url, 'id' );
+		const content = getQueryArg( url, 'content' );
 
 		if ( 'content' === contextType && content ) {
 			setPage( JSON.parse( content ) );
@@ -48,7 +50,7 @@ export default function PostRouter() {
 		}
 	}, [] );
 
-	// Upadte URL when context changes.
+	// Update URL when context changes.
 	useEffect( () => {
 		if ( page ) {
 			updateQueryParams( 'content', JSON.stringify( page ) );
