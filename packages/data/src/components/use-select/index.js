@@ -37,23 +37,6 @@ const useIsomorphicLayoutEffect =
 const renderQueue = createQueue();
 
 /**
- * Traverse up the registries to find the registry that has the store registered.
- *
- * @param {Object} registry The registry obtained by `useRegistry`.
- * @param {string} storeKey The store key name.
- * @return {Object | null} The registered store or null if it doesn't exists in the registry tree.
- */
-function getRegisteredStore( registry, storeKey ) {
-	if ( ! registry ) {
-		return null;
-	} else if ( storeKey in registry.stores ) {
-		return registry.stores[ storeKey ];
-	}
-
-	return getRegisteredStore( registry.parent, storeKey );
-}
-
-/**
  * Custom react hook for retrieving props from registered selectors.
  *
  * In general, this custom React hook follows the
@@ -210,22 +193,15 @@ export default function useSelect( _mapSelect, deps ) {
 			}
 		};
 
-		const unsubscribers = listeningStores.current
-			.map( ( storeKey ) => getRegisteredStore( registry, storeKey ) )
-			.filter( ( registeredStore ) => registeredStore !== null )
-			.map( ( registeredStore ) =>
-				registeredStore.subscribe( onChange )
-			);
-		const unsubscribe = () => {
-			unsubscribers.map( ( unsubscriber ) => unsubscriber() );
-		};
+		const unsubscribe = registry.__experimentalSubscribeStores(
+			listeningStores.current,
+			onChange
+		);
 
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;
 			unsubscribe();
 			renderQueue.flush( queueContext );
-			// Reset the registered stores when depsChangedFlag changes. In case it subscribes to different stores.
-			listeningStores.current = [];
 		};
 	}, [ registry, trapSelect, depsChangedFlag ] );
 
