@@ -338,7 +338,14 @@ export class ImageEdit extends React.Component {
 
 	getLinkSettings() {
 		const { isLinkSheetVisible } = this.state;
-		const { attributes, setAttributes } = this.props;
+		const {
+			attributes: { href: url, ...unMappedAttributes },
+			setAttributes,
+		} = this.props;
+
+		const mappedAttributes = { ...unMappedAttributes, url };
+		const setMappedAttributes = ( { url: href, ...restAttributes } ) =>
+			setAttributes( { ...restAttributes, href } );
 
 		const options = {
 			url: {
@@ -354,15 +361,14 @@ export class ImageEdit extends React.Component {
 				label: __( 'Link Rel' ),
 				placeholder: __( 'None' ),
 			},
-			linkUrlAttributeName: 'href',
 		};
 
 		return (
 			<LinkSettingsNavigation
 				isVisible={ isLinkSheetVisible }
-				attributes={ attributes }
+				attributes={ mappedAttributes }
 				onClose={ this.dismissSheet }
-				setAttributes={ setAttributes }
+				setAttributes={ setMappedAttributes }
 				withBottomSheet={ false }
 				hasPicker
 				// actions={ actions }
