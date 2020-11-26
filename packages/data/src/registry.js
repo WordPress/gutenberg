@@ -303,10 +303,15 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	// This function will be deprecated as soon as it is no longer internally referenced.
 	//
 	function use( plugin, options ) {
+		const storesMap = StoresMap.get( registry );
+
 		registry = {
 			...registry,
 			...plugin( registry, options ),
 		};
+
+		// We don't need to do this once `use` is removed.
+		StoresMap.set( registry, storesMap );
 
 		return registry;
 	}
