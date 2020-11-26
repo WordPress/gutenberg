@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { createRegistryControl } from '@wordpress/data';
-import { STORE_NAME as editNavigationStoreName } from '@wordpress/edit-navigation';
 
 /**
  * Internal dependencies
@@ -75,7 +74,7 @@ export function getWidgetToClientIdMapping() {
 export function getNavigationPostForMenu( menuId ) {
 	return {
 		type: 'SELECT',
-		registryName: editNavigationStoreName,
+		registryName: 'core/edit-navigation',
 		selectorName: 'getNavigationPostForMenu',
 		args: [ menuId ],
 	};
