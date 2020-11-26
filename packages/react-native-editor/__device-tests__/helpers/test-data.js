@@ -133,4 +133,6 @@ exports.coverHeightWithRemUnit = `<!-- wp:cover {"customOverlayColor":"#ffffff",
 <!-- /wp:paragraph --></div></div>
 <!-- /wp:cover -->`;
 
-exports.fileBlockPlaceholder = `<!-- wp:file /-->`;
+exports.fileBlockPlaceholder = `<!-- wp:file {"id":3,"href":"https://wordpress.org/latest.zip"} -->
+<div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button" download>Download</a></div>
+<!-- /wp:file -->`;

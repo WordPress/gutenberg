@@ -33,8 +33,13 @@ describe( 'Gutenberg Editor File Block tests @canary', () => {
 		await expect( editorPage.getBlockList() ).resolves.toBe( true );
 	} );
 
-	it( 'should be able to add an image block', async () => {
+	it( 'should be able to add a file block', async () => {
 		await editorPage.addNewBlock( fileBlockName );
+		const block = await editorPage.getFirstBlockVisible();
+
+		block.click();
+		await editorPage.chooseMediaLibrary();
+
 		await editorPage.verifyHtmlContent( testData.fileBlockPlaceholder );
 	} );
 
