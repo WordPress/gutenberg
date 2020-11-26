@@ -133,11 +133,31 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 			'orderby'        => 'post_name__in',
 			'posts_per_page' => -1,
 			'no_found_rows'  => true,
+			// Templates that either:
+			//
+			// - the active theme has declared (stylesheet)
+			// - its parent theme (template) has declared but there's not an equivalent in the active theme
+			//
 			'tax_query'      => array(
+				'relation' => 'OR',
 				array(
 					'taxonomy' => 'wp_theme',
 					'field'    => 'slug',
 					'terms'    => wp_get_theme()->get_stylesheet(),
+				),
+				array(
+					'relation' => 'AND',
+					array(
+						'taxonomy' => 'wp_theme',
+						'field'    => 'slug',
+						'terms'    => wp_get_theme()->get_template(),
+					),
+					array(
+						'taxonomy' => 'wp_theme',
+						'field'    => 'slug',
+						'terms'    => wp_get_theme()->get_stylesheet(),
+						'operator' => 'NOT IN'
+					),
 				),
 			),
 		)
