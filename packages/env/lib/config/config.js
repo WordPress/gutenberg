@@ -72,7 +72,7 @@ module.exports = async function readConfig( configPath ) {
 	const defaultConfiguration = {
 		core: null,
 		phpVersion: null,
-		dockerComposeOverridePath: null,
+		dockerComposeOverrideConfigPath: null,
 		plugins: [],
 		themes: [],
 		port: 8888,
