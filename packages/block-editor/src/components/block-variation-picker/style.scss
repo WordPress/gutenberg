@@ -31,7 +31,7 @@
 		list-style: none;
 		margin: $grid-unit-10 ( $grid-unit-10 + $grid-unit-15 ) 0 0;
 		flex-shrink: 1;
-		max-width: 100px;
+		width: 75px;
 		text-align: center;
 
 		button {
@@ -48,6 +48,7 @@
 		font-family: $default-font;
 		font-size: 12px;
 		display: block;
+		line-height: 1.4;
 	}
 }
 
