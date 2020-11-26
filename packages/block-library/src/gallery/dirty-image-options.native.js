@@ -7,7 +7,7 @@ import { InteractionManager } from 'react-native';
  */
 import { Picker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useRef, useEffect, useState, Platform } from '@wordpress/element';
+import { useRef, useEffect, Platform } from '@wordpress/element';
 
 const applyToAllImagesOption = {
 	id: 'applyToAllImagesOption',
@@ -19,9 +19,11 @@ const options = [ applyToAllImagesOption ];
 
 const isIOS = Platform.OS === 'ios';
 
+let shouldApplyAndroid = false;
+
 export default ( { applyImageOptions, cancelImageOptions, isVisible } ) => {
 	const pickerRef = useRef();
-	const [ apply, setApply ] = useState( false );
+
 	useEffect( () => {
 		InteractionManager.runAfterInteractions( () => {
 			if ( isVisible && pickerRef.current ) {
@@ -35,7 +37,7 @@ export default ( { applyImageOptions, cancelImageOptions, isVisible } ) => {
 			if ( isIOS ) {
 				applyImageOptions();
 			} else {
-				setApply( true );
+				shouldApplyAndroid = true;
 			}
 		}
 	};
@@ -49,12 +51,12 @@ export default ( { applyImageOptions, cancelImageOptions, isVisible } ) => {
 	};
 
 	const onFinish = () => {
-		if ( apply ) {
+		if ( shouldApplyAndroid ) {
 			applyImageOptions();
 		} else {
 			cancelImageOptions();
 		}
-		setApply( false );
+		shouldApplyAndroid = false;
 	};
 
 	return (
