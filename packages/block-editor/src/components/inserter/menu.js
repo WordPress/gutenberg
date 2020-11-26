@@ -157,6 +157,7 @@ function InserterMenu( {
 						<InserterSearchResults
 							filterValue={ filterValue }
 							onSelect={ onSelect }
+							onHover={ onHover }
 							rootClientId={ rootClientId }
 							clientId={ clientId }
 							isAppender={ isAppender }

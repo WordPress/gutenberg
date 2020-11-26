@@ -1,12 +1,17 @@
 /**
  * External dependencies
  */
-import { View, Text, Clipboard } from 'react-native';
+import { View, Clipboard, TouchableWithoutFeedback, Text } from 'react-native';
 import React from 'react';
 
 /**
  * WordPress dependencies
  */
+import {
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+	mediaUploadSync,
+} from '@wordpress/react-native-bridge';
 import {
 	BlockIcon,
 	MediaPlaceholder,
@@ -16,6 +21,7 @@ import {
 	BlockControls,
 	MediaUpload,
 	InspectorControls,
+	MEDIA_TYPE_ANY,
 } from '@wordpress/block-editor';
 import {
 	ToolbarButton,
@@ -24,6 +30,7 @@ import {
 	ToggleControl,
 	BottomSheet,
 	SelectControl,
+	Icon,
 } from '@wordpress/components';
 import {
 	file as icon,
@@ -31,11 +38,13 @@ import {
 	button,
 	external,
 	link,
+	warning,
 } from '@wordpress/icons';
 import { Component } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { getProtocol } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -43,6 +52,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import styles from './style.scss';
 
 const URL_COPIED_NOTIFICATION_DURATION_MS = 1500;
+const MIN_WIDTH = 40;
 
 export class FileEdit extends Component {
 	constructor( props ) {
@@ -51,10 +61,13 @@ export class FileEdit extends Component {
 		this.state = {
 			isUploadInProgress: false,
 			isSidebarLinkSettings: false,
+			placeholderTextWidth: 0,
+			maxWidth: 0,
 		};
 
 		this.timerRef = null;
 
+		this.onLayout = this.onLayout.bind( this );
 		this.onSelectFile = this.onSelectFile.bind( this );
 		this.onChangeFileName = this.onChangeFileName.bind( this );
 		this.onChangeDownloadButtonText = this.onChangeDownloadButtonText.bind(
@@ -62,6 +75,9 @@ export class FileEdit extends Component {
 		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
+			this
+		);
+		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
 			this
 		);
 		this.getFileComponent = this.getFileComponent.bind( this );
@@ -77,6 +93,8 @@ export class FileEdit extends Component {
 			this
 		);
 		this.onShowLinkSettings = this.onShowLinkSettings.bind( this );
+		this.onFilePressed = this.onFilePressed.bind( this );
+		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
 	}
 
 	componentDidMount() {
@@ -87,6 +105,14 @@ export class FileEdit extends Component {
 			setAttributes( {
 				downloadButtonText: _x( 'Download', 'button label' ),
 			} );
+		}
+
+		if (
+			attributes.id &&
+			attributes.url &&
+			getProtocol( attributes.url ) === 'file:'
+		) {
+			mediaUploadSync();
 		}
 	}
 
@@ -170,23 +196,21 @@ export class FileEdit extends Component {
 		this.setState( { isUploadInProgress: false } );
 	}
 
-	mediaUploadStateReset() {
-		const { setAttributes } = this.props;
-
-		setAttributes( { id: null, url: null } );
+	finishMediaUploadWithFailure( payload ) {
+		this.props.setAttributes( { id: payload.mediaId } );
 		this.setState( { isUploadInProgress: false } );
 	}
 
-	getErrorComponent( retryMessage ) {
-		return (
-			retryMessage && (
-				<View style={ styles.retryContainer }>
-					<Text style={ styles.uploadFailedText }>
-						{ retryMessage }
-					</Text>
-				</View>
-			)
-		);
+	mediaUploadStateReset() {
+		const { setAttributes } = this.props;
+
+		setAttributes( {
+			id: null,
+			href: null,
+			textLinkHref: null,
+			fileName: null,
+		} );
+		this.setState( { isUploadInProgress: false } );
 	}
 
 	onShowLinkSettings() {
@@ -316,8 +340,57 @@ export class FileEdit extends Component {
 		}
 	}
 
+	onFilePressed() {
+		const { attributes } = this.props;
+
+		if ( this.state.isUploadInProgress ) {
+			requestImageUploadCancelDialog( attributes.id );
+		} else if (
+			attributes.id &&
+			getProtocol( attributes.href ) === 'file:'
+		) {
+			requestImageFailedRetryDialog( attributes.id );
+		}
+	}
+
+	onLayout( { nativeEvent } ) {
+		const { width } = nativeEvent.layout;
+		const { paddingLeft, paddingRight } = styles.defaultButton;
+		this.setState( {
+			maxWidth: width - ( paddingLeft + paddingRight ),
+		} );
+	}
+
+	// Render `Text` with `placeholderText` styled as a placeholder
+	// to calculate its width which then is set as a `minWidth`
+	// This should be fixed on RNAztec level. In the mean time,
+	// We use the same strategy implemented in Button block
+	getPlaceholderWidth( placeholderText ) {
+		const { maxWidth, placeholderTextWidth } = this.state;
+		return (
+			<Text
+				style={ styles.placeholder }
+				onTextLayout={ ( { nativeEvent } ) => {
+					const textWidth =
+						nativeEvent.lines[ 0 ] && nativeEvent.lines[ 0 ].width;
+					if ( textWidth && textWidth !== placeholderTextWidth ) {
+						this.setState( {
+							placeholderTextWidth: Math.min(
+								textWidth,
+								maxWidth
+							),
+						} );
+					}
+				} }
+			>
+				{ placeholderText }
+			</Text>
+		);
+	}
+
 	getFileComponent( openMediaOptions, getMediaOptions ) {
-		const { attributes, media } = this.props;
+		const { attributes, media, isSelected } = this.props;
+		const { isButtonFocused, placeholderTextWidth } = this.state;
 
 		const {
 			fileName,
@@ -327,13 +400,21 @@ export class FileEdit extends Component {
 			align,
 		} = attributes;
 
-		const dimmedStyle =
-			this.state.isUploadInProgress && styles.disabledButton;
-		const finalButtonStyle = Object.assign(
-			{},
-			styles.defaultButton,
-			dimmedStyle
-		);
+		const minWidth =
+			isButtonFocused ||
+			( ! isButtonFocused &&
+				downloadButtonText &&
+				downloadButtonText !== '' )
+				? MIN_WIDTH
+				: placeholderTextWidth;
+
+		const placeholderText =
+			isButtonFocused ||
+			( ! isButtonFocused &&
+				downloadButtonText &&
+				downloadButtonText !== '' )
+				? ''
+				: __( 'Add text…' );
 
 		return (
 			<MediaUploadProgress
@@ -342,58 +423,117 @@ export class FileEdit extends Component {
 				onFinishMediaUploadWithSuccess={
 					this.finishMediaUploadWithSuccess
 				}
-				onFinishMediaUploadWithFailure={ () => {} }
+				onFinishMediaUploadWithFailure={
+					this.finishMediaUploadWithFailure
+				}
 				onMediaUploadStateReset={ this.mediaUploadStateReset }
-				renderContent={ ( {
-					isUploadInProgress,
-					isUploadFailed,
-					retryMessage,
-				} ) => {
-					if ( isUploadFailed ) {
-						return this.getErrorComponent( retryMessage );
-					}
+				renderContent={ ( { isUploadInProgress, isUploadFailed } ) => {
+					const dimmedStyle =
+						( this.state.isUploadInProgress || isUploadFailed ) &&
+						styles.disabledButton;
+					const finalButtonStyle = [
+						styles.defaultButton,
+						dimmedStyle,
+					];
+
+					const errorIconStyle = Object.assign(
+						{},
+						styles.errorIcon,
+						styles.uploadFailed
+					);
 
 					return (
-						<View>
-							{ isUploadInProgress ||
-								this.getToolbarEditButton( openMediaOptions ) }
-							{ getMediaOptions() }
-							{ this.getInspectorControls(
-								attributes,
-								media,
-								isUploadInProgress,
-								isUploadFailed
-							) }
-							<RichText
-								__unstableMobileNoFocusOnMount
-								onChange={ this.onChangeFileName }
-								placeholder={ __( 'File name' ) }
-								rootTagsToEliminate={ [ 'p' ] }
-								tagName="p"
-								underlineColorAndroid="transparent"
-								value={ fileName }
-								deleteEnter={ true }
-								textAlign={ this.getTextAlignmentForAlignment(
-									align
+						<TouchableWithoutFeedback
+							accessible={ ! isSelected }
+							onPress={ this.onFilePressed }
+							onLongPress={ openMediaOptions }
+							disabled={ ! isSelected }
+						>
+							<View onLayout={ this.onLayout }>
+								{ this.getPlaceholderWidth( placeholderText ) }
+								{ isUploadInProgress ||
+									this.getToolbarEditButton(
+										openMediaOptions
+									) }
+								{ getMediaOptions() }
+								{ this.getInspectorControls(
+									attributes,
+									media,
+									isUploadInProgress,
+									isUploadFailed
 								) }
-							/>
-							{ showDownloadButton && (
-								<View
-									style={ [
-										finalButtonStyle,
-										this.getStyleForAlignment( align ),
-									] }
-								>
-									<PlainText
-										style={ styles.buttonText }
-										value={ downloadButtonText }
-										onChange={
-											this.onChangeDownloadButtonText
-										}
+								<View>
+									<RichText
+										__unstableMobileNoFocusOnMount
+										onChange={ this.onChangeFileName }
+										placeholder={ __( 'File name' ) }
+										rootTagsToEliminate={ [ 'p' ] }
+										tagName="p"
+										underlineColorAndroid="transparent"
+										value={ fileName }
+										deleteEnter={ true }
+										textAlign={ this.getTextAlignmentForAlignment(
+											align
+										) }
 									/>
+									{ isUploadFailed && (
+										<View style={ styles.errorContainer }>
+											<Icon
+												icon={ warning }
+												style={ errorIconStyle }
+											/>
+											<PlainText
+												value={ __( 'Error' ) }
+												style={ styles.uploadFailed }
+											/>
+										</View>
+									) }
 								</View>
-							) }
-						</View>
+								{ showDownloadButton && (
+									<View
+										style={ [
+											finalButtonStyle,
+											this.getStyleForAlignment( align ),
+										] }
+									>
+										<RichText
+											withoutInteractiveFormatting
+											__unstableMobileNoFocusOnMount
+											rootTagsToEliminate={ [ 'p' ] }
+											tagName="p"
+											textAlign="center"
+											minWidth={ minWidth }
+											maxWidth={ this.state.maxWidth }
+											deleteEnter={ true }
+											style={ styles.buttonText }
+											value={ downloadButtonText }
+											placeholder={ placeholderText }
+											unstableOnFocus={ () =>
+												this.setState( {
+													isButtonFocused: true,
+												} )
+											}
+											onBlur={ () =>
+												this.setState( {
+													isButtonFocused: false,
+												} )
+											}
+											selectionColor={
+												styles.buttonText.color
+											}
+											placeholderTextColor={
+												styles.placeholderTextColor
+													.color
+											}
+											underlineColorAndroid="transparent"
+											onChange={
+												this.onChangeDownloadButtonText
+											}
+										/>
+									</View>
+								) }
+							</View>
+						</TouchableWithoutFeedback>
 					);
 				} }
 			/>
@@ -414,14 +554,14 @@ export class FileEdit extends Component {
 					} }
 					onSelect={ this.onSelectFile }
 					onFocus={ this.props.onFocus }
-					allowedTypes={ [ 'other' ] }
+					allowedTypes={ [ MEDIA_TYPE_ANY ] }
 				/>
 			);
 		}
 
 		return (
 			<MediaUpload
-				allowedTypes={ [ 'other' ] }
+				allowedTypes={ [ MEDIA_TYPE_ANY ] }
 				isReplacingMedia={ true }
 				onSelect={ this.onSelectFile }
 				render={ ( { open, getMediaOptions } ) => {

@@ -6,12 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	AlignmentToolbar,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
+	PlainText,
 } from '@wordpress/block-editor';
 import {
 	ToolbarGroup,
@@ -42,6 +43,7 @@ export default function PostTitleEdit( {
 			),
 		[ postType, postId ]
 	);
+	const { editEntityRecord } = useDispatch( 'core' );
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -53,11 +55,33 @@ export default function PostTitleEdit( {
 		return null;
 	}
 
-	let title = post.title || __( 'Post Title' );
+	const { title, link } = post;
+
+	let titleElement = (
+		<PlainText
+			tagName={ TagName }
+			placeholder={ __( 'No Title' ) }
+			value={ title }
+			onChange={ ( value ) =>
+				editEntityRecord( 'postType', postType, postId, {
+					title: value,
+				} )
+			}
+			__experimentalVersion={ 2 }
+			{ ...( isLink ? {} : blockProps ) }
+		/>
+	);
+
 	if ( isLink ) {
-		title = (
-			<a href={ post.link } target={ linkTarget } rel={ rel }>
-				{ title }
+		titleElement = (
+			<a
+				href={ link }
+				target={ linkTarget }
+				rel={ rel }
+				onClick={ ( event ) => event.preventDefault() }
+				{ ...blockProps }
+			>
+				{ titleElement }
 			</a>
 		);
 	}
@@ -109,7 +133,7 @@ export default function PostTitleEdit( {
 					) }
 				</PanelBody>
 			</InspectorControls>
-			<TagName { ...blockProps }>{ title }</TagName>
+			{ titleElement }
 		</>
 	);
 }
