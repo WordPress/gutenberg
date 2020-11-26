@@ -15,7 +15,9 @@ const ruleTester = new RuleTester( {
 	},
 } );
 
-const options = [ { '@wordpress/safe': [ '__experimentalSafe' ] } ];
+const options = [
+	{ '@wordpress/package': [ '__experimentalSafe', '__unstableSafe' ] },
+];
 
 ruleTester.run( 'wp-no-unsafe-features', rule, {
 	valid: [
@@ -33,32 +35,36 @@ ruleTester.run( 'wp-no-unsafe-features', rule, {
 		{ code: "import _, { __unstableFoo } from './x';", options },
 		{ code: "import * as _ from './x';", options },
 
-		{ code: "import s from '@wordpress/safe';", options },
-		{ code: "import { feature } from '@wordpress/safe';", options },
+		{ code: "import s from '@wordpress/package';", options },
+		{ code: "import { feature } from '@wordpress/package';", options },
 		{
-			code: "import { __experimentalSafe } from '@wordpress/safe';",
+			code: "import { __experimentalSafe } from '@wordpress/package';",
+			options,
+		},
+		{
+			code: "import { __unstableSafe } from '@wordpress/package';",
 			options,
 		},
 		{
 			code:
-				"import { feature, __experimentalSafe } from '@wordpress/safe';",
+				"import { feature, __experimentalSafe } from '@wordpress/package';",
 			options,
 		},
 		{
-			code: "import s, { __experimentalSafe } from '@wordpress/safe';",
+			code: "import s, { __experimentalSafe } from '@wordpress/package';",
 			options,
 		},
-		{ code: "import * as s from '@wordpress/safe';", options },
+		{ code: "import * as s from '@wordpress/package';", options },
 	],
 
 	invalid: [
 		{
-			code: "import { __experimentalUnsafe } from '@wordpress/safe';",
+			code: "import { __experimentalUnsafe } from '@wordpress/package';",
 			options,
 			errors: [
 				{
 					message:
-						'Usage of `__experimentalUnsafe` from `@wordpress/safe` is not allowed',
+						'Usage of `__experimentalUnsafe` from `@wordpress/package` is not allowed',
 					type: 'ImportSpecifier',
 				},
 			],
@@ -87,23 +93,24 @@ ruleTester.run( 'wp-no-unsafe-features', rule, {
 			],
 		},
 		{
-			code: "import s, { __experimentalUnsafe } from '@wordpress/safe';",
+			code:
+				"import s, { __experimentalUnsafe } from '@wordpress/package';",
 			options,
 			errors: [
 				{
 					message:
-						'Usage of `__experimentalUnsafe` from `@wordpress/safe` is not allowed',
+						'Usage of `__experimentalUnsafe` from `@wordpress/package` is not allowed',
 					type: 'ImportSpecifier',
 				},
 			],
 		},
 		{
-			code: "import { __unstableIsNeverSafe } from '@wordpress/safe';",
+			code: "import { __unstableFeature } from '@wordpress/package';",
 			options,
 			errors: [
 				{
 					message:
-						'Usage of `__unstableIsNeverSafe` from `@wordpress/safe` is not allowed',
+						'Usage of `__unstableFeature` from `@wordpress/package` is not allowed',
 					type: 'ImportSpecifier',
 				},
 			],

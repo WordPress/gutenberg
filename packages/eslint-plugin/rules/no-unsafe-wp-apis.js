@@ -17,7 +17,7 @@ module.exports = {
 						minItems: 1,
 						items: {
 							type: 'string',
-							pattern: '^__experimental',
+							pattern: '^(?:__experimental|__unstable)',
 						},
 					},
 				},
@@ -55,7 +55,7 @@ function makeListener( { allowedImports, context } ) {
 
 		const sourceModule = node.source.value.trim();
 
-		// Only interested in @wordpress/* packages
+		// Ignore non-WordPress packages
 		if ( ! sourceModule.startsWith( '@wordpress/' ) ) {
 			return;
 		}
@@ -69,24 +69,25 @@ function makeListener( { allowedImports, context } ) {
 
 			const importedName = specifierNode.imported.name;
 
-			const data = {
-				sourceModule,
-				importedName,
-			};
-
 			if (
-				// Unstable is never allowed
-				importedName.startsWith( '__unstable' ) ||
-				// Experimental may be allowed
-				( importedName.startsWith( '__experimental' ) &&
-					! allowedImportNames.includes( importedName ) )
+				! importedName.startsWith( '__unstable' ) &&
+				! importedName.startsWith( '__experimental' )
 			) {
-				context.report( {
-					messageId: 'noUnsafeFeatures',
-					node: specifierNode,
-					data,
-				} );
+				return;
 			}
+
+			if ( allowedImportNames.includes( importedName ) ) {
+				return;
+			}
+
+			context.report( {
+				messageId: 'noUnsafeFeatures',
+				node: specifierNode,
+				data: {
+					sourceModule,
+					importedName,
+				},
+			} );
 		} );
 	};
 }
