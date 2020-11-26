@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import {
-	__experimentalGetAnimateClassName as getAnimateClassName,
+	__unstableGetAnimateClassName as getAnimateClassName,
 	Button,
 } from '@wordpress/components';
 import { usePrevious, useViewportMatch } from '@wordpress/compose';
