@@ -281,7 +281,9 @@ export function* revertTemplate( template ) {
 			yield controls.dispatch(
 				'core/notices',
 				'createErrorNotice',
-				__( 'This template is not revertable' ),
+				__(
+					'The editor has encountered an unexpected error. Please reload.'
+				),
 				{ type: 'snackbar' }
 			);
 			return;
@@ -298,7 +300,7 @@ export function* revertTemplate( template ) {
 		const errorMessage =
 			error.message && error.code !== 'unknown_error'
 				? error.message
-				: __( 'Template revert failed' );
+				: __( 'Template revert failed. Please reload.' );
 		yield controls.dispatch(
 			'core/notices',
 			'createErrorNotice',
