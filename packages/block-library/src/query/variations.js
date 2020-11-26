@@ -41,7 +41,7 @@ const variations = [
 	},
 	{
 		name: 'title-date',
-		title: __( 'Title and Date' ),
+		title: __( 'Title & Date' ),
 		icon: titleDate,
 		innerBlocks: [
 			[
@@ -54,7 +54,7 @@ const variations = [
 	},
 	{
 		name: 'title-excerpt',
-		title: __( 'Title and Excerpt' ),
+		title: __( 'Title & Excerpt' ),
 		icon: titleExcerpt,
 		innerBlocks: [
 			[
@@ -67,7 +67,7 @@ const variations = [
 	},
 	{
 		name: 'title-date-excerpt',
-		title: __( 'Title, Date and Excerpt' ),
+		title: __( 'Title, Date, & Excerpt' ),
 		icon: titleDateExcerpt,
 		innerBlocks: [
 			[
@@ -84,7 +84,7 @@ const variations = [
 	},
 	{
 		name: 'image-date-title',
-		title: __( 'Image, Date and Title ' ),
+		title: __( 'Image, Date, & Title' ),
 		icon: imageDateTitle,
 		innerBlocks: [
 			[

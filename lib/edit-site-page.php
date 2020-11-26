@@ -104,10 +104,11 @@ function gutenberg_edit_site_init( $hook ) {
 	$settings = array_merge(
 		gutenberg_get_common_block_editor_settings(),
 		array(
-			'alignWide'    => get_theme_support( 'align-wide' ),
-			'siteUrl'      => site_url(),
-			'postsPerPage' => get_option( 'posts_per_page' ),
-			'styles'       => gutenberg_get_editor_styles(),
+			'alignWide'            => get_theme_support( 'align-wide' ),
+			'siteUrl'              => site_url(),
+			'postsPerPage'         => get_option( 'posts_per_page' ),
+			'styles'               => gutenberg_get_editor_styles(),
+			'defaultTemplateTypes' => gutenberg_get_indexed_default_template_types(),
 		)
 	);
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
@@ -181,7 +182,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
  */
 function register_site_editor_homepage_settings() {
 	register_setting(
-		'general',
+		'reading',
 		'show_on_front',
 		array(
 			'show_in_rest' => true,
@@ -191,7 +192,7 @@ function register_site_editor_homepage_settings() {
 	);
 
 	register_setting(
-		'general',
+		'reading',
 		'page_on_front',
 		array(
 			'show_in_rest' => true,

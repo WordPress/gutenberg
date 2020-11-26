@@ -8,18 +8,11 @@ import {
 	createNewPost,
 	clickBlockToolbarButton,
 	pressKeyWithModifier,
-	searchForReusableBlock,
 	getEditedPostContent,
 	trashAllPosts,
 	visitAdminPage,
 	toggleGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
-
-function waitForAndAcceptDialog() {
-	return new Promise( ( resolve ) => {
-		page.once( 'dialog', () => resolve() );
-	} );
-}
 
 describe( 'Reusable blocks', () => {
 	beforeAll( async () => {
@@ -239,35 +232,6 @@ describe( 'Reusable blocks', () => {
 			( element ) => element.innerText
 		);
 		expect( text ).toMatch( 'Oh! Hello there!' );
-	} );
-
-	it( 'can be deleted', async () => {
-		// Insert the reusable block we edited above
-		await insertReusableBlock( 'Surprised greeting block' );
-
-		// Delete the block and accept the confirmation dialog
-		await clickBlockToolbarButton( 'More options' );
-		const deleteButton = await page.waitForXPath(
-			'//button/span[text()="Remove from Reusable blocks"]'
-		);
-		await Promise.all( [ waitForAndAcceptDialog(), deleteButton.click() ] );
-
-		// Wait for deletion to finish
-		await page.waitForXPath(
-			'//*[contains(@class, "components-snackbar")]/*[text()="Block deleted."]'
-		);
-
-		// Check that we have an empty post again
-		expect( await getEditedPostContent() ).toBe( '' );
-
-		// Search for the block in the inserter
-		await searchForReusableBlock( 'Surprised greeting block' );
-
-		// Check that we couldn't find it
-		const items = await page.$$(
-			'.block-editor-block-types-list__item[aria-label="Surprised greeting block"]'
-		);
-		expect( items ).toHaveLength( 0 );
 	} );
 
 	it( 'can be created from multiselection', async () => {

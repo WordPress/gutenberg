@@ -7,7 +7,6 @@ import {
 	__experimentalNavigationItem as NavigationItem,
 	__experimentalNavigationBackButton as NavigationBackButton,
 } from '@wordpress/components';
-import { __experimentalMainDashboardButton as MainDashboardButton } from '@wordpress/interface';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
@@ -16,6 +15,7 @@ import { __ } from '@wordpress/i18n';
  */
 import TemplatesMenu from './menus/templates';
 import TemplatePartsMenu from './menus/template-parts';
+import MainDashboardButton from '../../main-dashboard-button';
 import { MENU_ROOT, MENU_TEMPLATE_PARTS, MENU_TEMPLATES } from './constants';
 
 export default function TemplatesNavigation() {

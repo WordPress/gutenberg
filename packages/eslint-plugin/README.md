@@ -10,6 +10,8 @@ Install the module
 npm install @wordpress/eslint-plugin --save-dev
 ```
 
+**Note**: This package requires `node` 10.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
+
 ## Usage
 
 To opt-in to the default configuration, extend your own project's `.eslintrc` file:
@@ -30,15 +32,15 @@ There is also `recommended-with-formatting` ruleset for projects that want to op
 
 Alternatively, you can opt-in to only the more granular rulesets offered by the plugin. These include:
 
-- `custom`
-- `es5`
-- `esnext`
-- `jsdoc`
-- `jsx-a11y`
-- `react`
-- `i18n`
-- `test-e2e`
-- `test-unit`
+-   `custom`
+-   `es5`
+-   `esnext`
+-   `jsdoc`
+-   `jsx-a11y`
+-   `react`
+-   `i18n`
+-   `test-e2e`
+-   `test-unit`
 
 For example, if your project does not use React, you could consider extending including only the ESNext rules in your project using the following `extends` definition:
 
@@ -54,21 +56,21 @@ The granular rulesets will not define any environment globals. As such, if they 
 
 ### Rules
 
-Rule|Description|Recommended
----|---|---
-[dependency-group](/packages/eslint-plugin/docs/rules/dependency-group.md)|Enforce dependencies docblocks formatting|✓
-[gutenberg-phase](docs/rules/gutenberg-phase.md)|Governs the use of the `process.env.GUTENBERG_PHASE` constant|✓
-[no-unused-vars-before-return](/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)|Disallow assigning variable values if unused before a return|✓
-[react-no-unsafe-timeout](/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)|Disallow unsafe `setTimeout` in component|
-[valid-sprintf](/packages/eslint-plugin/docs/rules/valid-sprintf.md)|Enforce valid sprintf usage|✓
-[no-base-control-with-label-without-id](/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md)| Disallow the usage of BaseControl component with a label prop set but omitting the id property|✓
-[no-unguarded-get-range-at](/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)|Disallow the usage of unguarded `getRangeAt` calls|✓
-[i18n-ellipsis](/packages/eslint-plugin/docs/rules/i18n-ellipsis.md)|Disallow using three dots in translatable strings|✓
-[i18n-no-collapsible-whitespace](/packages/eslint-plugin/docs/rules/i18n-no-collapsible-whitespace.md)|Disallow collapsible whitespace in translatable strings|✓
-[i18n-no-placeholders-only](/packages/eslint-plugin/docs/rules/i18n-no-placeholders-only.md)|Prevent using only placeholders in translatable strings|✓
-[i18n-no-variables](/packages/eslint-plugin/docs/rules/i18n-no-variables.md)|Enforce string literals as translation function arguments|✓
-[i18n-text-domain](/packages/eslint-plugin/docs/rules/i18n-text-domain.md)|Enforce passing valid text domains|✓
-[i18n-translator-comments](/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)|Enforce adding translator comments|✓
+| Rule                                                                                                                 | Description                                                                                    | Recommended |
+| -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------- |
+| [dependency-group](/packages/eslint-plugin/docs/rules/dependency-group.md)                                           | Enforce dependencies docblocks formatting                                                      | ✓           |
+| [gutenberg-phase](docs/rules/gutenberg-phase.md)                                                                     | Governs the use of the `process.env.GUTENBERG_PHASE` constant                                  | ✓           |
+| [no-unused-vars-before-return](/packages/eslint-plugin/docs/rules/no-unused-vars-before-return.md)                   | Disallow assigning variable values if unused before a return                                   | ✓           |
+| [react-no-unsafe-timeout](/packages/eslint-plugin/docs/rules/react-no-unsafe-timeout.md)                             | Disallow unsafe `setTimeout` in component                                                      |
+| [valid-sprintf](/packages/eslint-plugin/docs/rules/valid-sprintf.md)                                                 | Enforce valid sprintf usage                                                                    | ✓           |
+| [no-base-control-with-label-without-id](/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md) | Disallow the usage of BaseControl component with a label prop set but omitting the id property | ✓           |
+| [no-unguarded-get-range-at](/packages/eslint-plugin/docs/rules/no-unguarded-get-range-at.md)                         | Disallow the usage of unguarded `getRangeAt` calls                                             | ✓           |
+| [i18n-ellipsis](/packages/eslint-plugin/docs/rules/i18n-ellipsis.md)                                                 | Disallow using three dots in translatable strings                                              | ✓           |
+| [i18n-no-collapsible-whitespace](/packages/eslint-plugin/docs/rules/i18n-no-collapsible-whitespace.md)               | Disallow collapsible whitespace in translatable strings                                        | ✓           |
+| [i18n-no-placeholders-only](/packages/eslint-plugin/docs/rules/i18n-no-placeholders-only.md)                         | Prevent using only placeholders in translatable strings                                        | ✓           |
+| [i18n-no-variables](/packages/eslint-plugin/docs/rules/i18n-no-variables.md)                                         | Enforce string literals as translation function arguments                                      | ✓           |
+| [i18n-text-domain](/packages/eslint-plugin/docs/rules/i18n-text-domain.md)                                           | Enforce passing valid text domains                                                             | ✓           |
+| [i18n-translator-comments](/packages/eslint-plugin/docs/rules/i18n-translator-comments.md)                           | Enforce adding translator comments                                                             | ✓           |
 
 ### Legacy
 

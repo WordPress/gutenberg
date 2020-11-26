@@ -113,6 +113,51 @@ module.exports = function buildDockerComposeConfig( config ) {
 	const developmentPorts = `\${WP_ENV_PORT:-${ config.env.development.port }}:80`;
 	const testsPorts = `\${WP_ENV_TESTS_PORT:-${ config.env.tests.port }}:80`;
 
+	// Set the WordPress, WP-CLI, PHPUnit PHP version if defined.
+	const developmentPhpVersion = config.env.development.phpVersion
+		? config.env.development.phpVersion
+		: '';
+	const testsPhpVersion = config.env.tests.phpVersion
+		? config.env.tests.phpVersion
+		: '';
+
+	// Set the WordPress images with the PHP version tag.
+	const developmentWpImage = `wordpress${
+		developmentPhpVersion ? ':php' + developmentPhpVersion : ''
+	}`;
+	const testsWpImage = `wordpress${
+		testsPhpVersion ? ':php' + testsPhpVersion : ''
+	}`;
+	// Set the WordPress CLI images with the PHP version tag.
+	const developmentWpCliImage = `wordpress:cli${
+		! developmentPhpVersion || developmentPhpVersion.length === 0
+			? ''
+			: '-php' + developmentPhpVersion
+	}`;
+	const testsWpCliImage = `wordpress:cli${
+		! testsPhpVersion || testsPhpVersion.length === 0
+			? ''
+			: '-php' + testsPhpVersion
+	}`;
+
+	// Defaults are to use the most recent version of PHPUnit that provides
+	// support for the specified version of PHP.
+	// PHP Unit is assumed to be for Tests so use the testsPhpVersion.
+	let phpunitTag = 'latest';
+	const phpunitPhpVersion = '-php-' + testsPhpVersion + '-fpm';
+	if ( testsPhpVersion === '5.6' ) {
+		phpunitTag = '5' + phpunitPhpVersion;
+	} else if ( testsPhpVersion === '7.0' ) {
+		phpunitTag = '6' + phpunitPhpVersion;
+	} else if ( testsPhpVersion === '7.1' ) {
+		phpunitTag = '7' + phpunitPhpVersion;
+	} else if ( [ '7.2', '7.3', '7.4' ].indexOf( testsPhpVersion ) >= 0 ) {
+		phpunitTag = '8' + phpunitPhpVersion;
+	} else if ( testsPhpVersion === '8.0' ) {
+		phpunitTag = '9' + phpunitPhpVersion;
+	}
+	const phpunitImage = `wordpressdevelop/phpunit:${ phpunitTag }`;
+
 	// The www-data user in wordpress:cli has a different UID (82) to the
 	// www-data user in wordpress (33). Ensure we use the wordpress www-data
 	// user for CLI commands.
@@ -132,7 +177,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			wordpress: {
 				depends_on: [ 'mysql' ],
-				image: 'wordpress',
+				image: developmentWpImage,
 				ports: [ developmentPorts ],
 				environment: {
 					WORDPRESS_DB_NAME: 'wordpress',
@@ -141,7 +186,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			'tests-wordpress': {
 				depends_on: [ 'mysql' ],
-				image: 'wordpress',
+				image: testsWpImage,
 				ports: [ testsPorts ],
 				environment: {
 					WORDPRESS_DB_NAME: 'tests-wordpress',
@@ -150,13 +195,13 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 			cli: {
 				depends_on: [ 'wordpress' ],
-				image: 'wordpress:cli',
+				image: developmentWpCliImage,
 				volumes: developmentMounts,
 				user: cliUser,
 			},
 			'tests-cli': {
 				depends_on: [ 'tests-wordpress' ],
-				image: 'wordpress:cli',
+				image: testsWpCliImage,
 				volumes: testsMounts,
 				user: cliUser,
 			},
@@ -165,7 +210,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: [ `${ config.configDirectoryPath }:/app` ],
 			},
 			phpunit: {
-				image: 'wordpressdevelop/phpunit:${LOCAL_PHP-latest}',
+				image: phpunitImage,
 				depends_on: [ 'tests-wordpress' ],
 				volumes: [
 					...testsMounts,

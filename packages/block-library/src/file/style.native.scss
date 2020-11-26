@@ -10,6 +10,7 @@
 	background-color: transparent;
 	color: $white;
 	font-size: 16;
+	padding: 0;
 }
 
 .disabledButton {
@@ -33,4 +34,19 @@
 
 .actionButtonDark {
 	color: $blue-30;
+}
+
+.errorContainer {
+	flex-direction: row;
+	align-items: center;
+	padding-top: 4px;
+}
+
+.errorIcon {
+	margin-left: -4px;
+}
+
+.uploadFailed {
+	padding: 0;
+	color: $alert-red;
 }
