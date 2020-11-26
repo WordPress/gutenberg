@@ -105,12 +105,17 @@
 	}
 
 	&.edit-site-block-editor__block-list {
-		.is-hovered {
+		.block-editor-block-list__block {
 			&::after {
-				box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+				outline: 2px solid transparent;
+			}
+
+			&.is-hovered:not(.is-selected) {
+				&::after {
+					box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
+				}
 			}
 		}
-
 
 		// Do not display a border on rich text blocks when hovered and selected
 		.block-editor-rich-text__editable {
