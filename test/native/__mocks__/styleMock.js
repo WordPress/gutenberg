@@ -96,4 +96,10 @@ module.exports = {
 	scrollableContent: {
 		paddingBottom: 20,
 	},
+	buttonText: {
+		color: 'white',
+	},
+	placeholderTextColor: {
+		color: 'white',
+	},
 };
