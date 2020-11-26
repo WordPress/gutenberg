@@ -8,7 +8,5 @@
 	// NOTE: This package is being progressively typed. You are encouraged to
 	// expand this array with files which can be type-checked. At some point in
 	// the future, this can be simplified to an `includes` of `src/**/*`.
-	"files": [
-		"rules/dependency-group.js"
-	]
+	"files": [ "rules/dependency-group.js", "rules/no-unsafe-wp-apis.js" ]
 }
