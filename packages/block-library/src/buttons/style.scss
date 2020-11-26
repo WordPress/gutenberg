@@ -3,6 +3,10 @@
 	flex-direction: row;
 	flex-wrap: wrap;
 
+	&.is-vertical {
+		flex-direction: column;
+	}
+
 	// Increased specificity to override blocks default margin.
 	> .wp-block-button {
 		display: inline-block;
@@ -14,14 +18,29 @@
 			/*rtl:ignore*/
 			margin-right: 0;
 		}
+
+		.is-vertical & {
+			margin-right: 0;
+
+			&:last-child {
+				/*rtl:ignore*/
+				margin-bottom: 0;
+			}
+		}
 	}
 
 	&.is-content-justification-left {
 		justify-content: flex-start;
+		&.is-vertical {
+			align-items: flex-start;
+		}
 	}
 
 	&.is-content-justification-center {
 		justify-content: center;
+		&.is-vertical {
+			align-items: center;
+		}
 	}
 
 	&.is-content-justification-right {
@@ -37,6 +56,10 @@
 				/*rtl:ignore*/
 				margin-left: 0;
 			}
+		}
+
+		&.is-vertical {
+			align-items: flex-end;
 		}
 	}
 
