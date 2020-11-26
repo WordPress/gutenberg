@@ -5,13 +5,33 @@ When updating static blocks markup and attributes, block authors need to conside
  - Do not deprecate the block and create a new one (a different name)
  - Provide a "deprecated" version of the block allowing users opening these in the block editor to edit them using the updated block.
 
-A block can have several deprecated versions. A deprecation will be tried if a parsed block appears to be invalid, or if there is a deprecation defined for which its `isEligible` property function returns true.
+A block can have several deprecated versions. A deprecation will be tried if a parsed block appears to be invalid, or if there is a deprecation defined for which its `isEligible` property function returns true. It is important to note that if a deprecation's `save` method does not produce a valid block then it is skipped, including its `migrate` method, even if `isEligible` would return true for the given attributes. This means that if you have several deprecations for a block and want to perform a new migration, like moving content to InnerBlocks, you may need to include the `migrate` method in multiple deprecations for it to be applied to all previous versions of the block.
 
-Deprecations do not operate as a chain of updates in the way other software data updates, like database migrations, do. At first glance, it is easy to think that each deprecation is going to make the required changes to the data and then hand this new form of the block onto the next deprecation to make its changes. What happens is that each deprecation is passed the original saved content, and if its `save` method produces a valid block it is used to parse the block attributes. If it has a `migrate` method it will also be run, and the data is then passed back to the current block `save` function to create the new valid version of the block.
+Deprecations do not operate as a chain of updates in the way other software data updates, like database migrations, do. At first glance, it is easy to think that each deprecation is going to make the required changes to the data and then hand this new form of the block onto the next deprecation to make its changes. What happens is that each deprecation is passed the original saved content, and if its `save` method produces a valid block it is used to parse the block attributes. If it has a `migrate` method it will also be run using the attributes parsed by the deprecated `save` method. These attributes are then passed back to the current block `save` function to create the new valid version of the block.
 
-It is also important to note that if a deprecation's `save` method does not produce a valid block then it is skipped, including its `migrate` method, even if `isEligible` returns true. This means that if you have several deprecations for a block and want to perform a new migration, like moving content to InnerBlocks, you may need to include the `migrate` method in multiple deprecations for it to be applied to all previous versions of the block.
+For blocks with a number of deprecations it may be easier to save each deprecation to a constant with the version of the block it applies to, and then add each of these to the `deprecated` array. The deprecations should be ordered in the array from newest to oldest as the block editor tries all versions of the block in the historical order, from the most recent one to the oldest.
 
-For ease of management, it is recommended that you version the deprecations by saving each deprecation into a separate file with the name of the block version it applies to. Then import each of these objects into the `deprecated` property array mentioned below. It is also recommended to keep [fixtures](https://github.com/WordPress/gutenberg/tree/master/packages/e2e-tests/fixtures/blocks) which contain the different versions of the block content to allow you to easily test that new deprecations and migrations are working across all previous versions of the block.
+### Example:
+
+{% codetabs %}
+{% ESNext %}
+```js
+const v1 = {};
+const v2 = {};
+const v3 = {}
+const deprecated = [ v3, v2, v1 ];
+
+```
+{% ES5 %}
+```js
+var v1 = {};
+var v2 = {};
+var v3 = {}
+var deprecated = [ v3, v2, v1 ];
+```
+{% end %}
+
+It is also recommended to keep [fixtures](https://github.com/WordPress/gutenberg/blob/master/packages/e2e-tests/fixtures/blocks/README.md) which contain the different versions of the block content to allow you to easily test that new deprecations and migrations are working across all previous versions of the block.
 
 Deprecations are defined on a block type as its `deprecated` property, an array of deprecation objects where each object takes the form:
 
@@ -19,7 +39,7 @@ Deprecations are defined on a block type as its `deprecated` property, an array 
 - `supports` (Object): The [supports definition](/docs/designers-developers/developers/block-api/block-registration.md) of the deprecated form of the block.
 - `save` (Function): The [save implementation](/docs/designers-developers/developers/block-api/block-edit-save.md) of the deprecated form of the block.
 - `migrate` (Function, Optional): A function which, given the old attributes and inner blocks is expected to return either the new attributes or a tuple array of `[ attributes, innerBlocks ]` compatible with the block. As mentioned above, a deprecation's `migrate` will not be run if its `save` function does not return a valid block so you will need to make sure your migrations are available in all the deprecations where they are relevant.
-- `isEligible` (Function, Optional): A function which, given the attributes and inner blocks of the parsed block, returns true if the deprecation can handle the block migration even if the block is valid. This function is not called when the block is invalid. This is particularly useful in cases where a block is technically valid even once deprecated, and requires updates to its attributes or inner blocks.
+- `isEligible` (Function, Optional): A function which, given the attributes and inner blocks of the parsed block, returns true if the deprecation can handle the block migration even if the block is valid. This is particularly useful in cases where a block is technically valid even once deprecated, and requires updates to its attributes or inner blocks. This function is not called when the result of a deprecation's `save` function is invalid.
 
 It's important to note that `attributes`, `supports`, and `save` are not automatically inherited from the current version, since they can impact parsing and serialization of a block, so they must be defined on the deprecated object in order to be processed during a migration.
 
