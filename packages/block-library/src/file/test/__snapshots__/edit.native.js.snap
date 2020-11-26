@@ -1,68 +1,100 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`File block renders file without crashing 1`] = `
+exports[`File block renders file error state without crashing 1`] = `
 <View
   pointerEvents="box-none"
 >
-  <View>
+  <View
+    accessible={true}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+  >
     Modal
     <View>
-      <RCTAztecView
-        accessible={true}
-        activeFormats={Array []}
-        blockType={
-          Object {
-            "tag": "p",
+      <View>
+        <RCTAztecView
+          accessible={true}
+          activeFormats={Array []}
+          blockType={
+            Object {
+              "tag": "p",
+            }
           }
-        }
-        deleteEnter={true}
-        disableEditingMenu={false}
-        focusable={true}
-        fontFamily="serif"
-        isMultiline={false}
-        maxImagesWidth={200}
-        onBackspace={[Function]}
-        onBlur={[Function]}
-        onChange={[Function]}
-        onClick={[Function]}
-        onContentSizeChange={[Function]}
-        onEnter={[Function]}
-        onFocus={[Function]}
-        onHTMLContentWithCursor={[Function]}
-        onKeyDown={[Function]}
-        onPaste={[Function]}
-        onResponderGrant={[Function]}
-        onResponderMove={[Function]}
-        onResponderRelease={[Function]}
-        onResponderTerminate={[Function]}
-        onResponderTerminationRequest={[Function]}
-        onSelectionChange={[Function]}
-        onStartShouldSetResponder={[Function]}
-        placeholder="File name"
-        placeholderTextColor="gray"
-        style={
-          Object {
-            "backgroundColor": undefined,
-            "maxWidth": undefined,
-            "minHeight": 0,
+          deleteEnter={true}
+          disableEditingMenu={false}
+          focusable={true}
+          fontFamily="serif"
+          isMultiline={false}
+          maxImagesWidth={200}
+          onBackspace={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onClick={[Function]}
+          onContentSizeChange={[Function]}
+          onEnter={[Function]}
+          onFocus={[Function]}
+          onHTMLContentWithCursor={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onSelectionChange={[Function]}
+          onStartShouldSetResponder={[Function]}
+          placeholder="File name"
+          placeholderTextColor="gray"
+          style={
+            Object {
+              "backgroundColor": undefined,
+              "maxWidth": undefined,
+              "minHeight": 0,
+            }
           }
-        }
-        text={
-          Object {
-            "eventCount": undefined,
-            "linkTextColor": undefined,
-            "selection": null,
-            "text": "<p >File name</p>",
+          text={
+            Object {
+              "eventCount": undefined,
+              "linkTextColor": undefined,
+              "selection": null,
+              "text": "<p >File name</p>",
+            }
           }
-        }
-        textAlign="left"
-        triggerKeyCodes={Array []}
-      />
+          textAlign="left"
+          triggerKeyCodes={Array []}
+        />
+      </View>
+      <View>
+        Svg
+        <TextInput
+          allowFontScaling={true}
+          fontFamily="serif"
+          onChange={[Function]}
+          rejectResponderTermination={true}
+          scrollEnabled={false}
+          style={
+            Object {
+              "fontFamily": "serif",
+            }
+          }
+          underlineColorAndroid="transparent"
+          value="Error"
+        />
+      </View>
     </View>
     <View
       style={
         Array [
-          Object {},
+          Array [
+            undefined,
+            undefined,
+          ],
           Object {
             "alignSelf": "flex-start",
           },
@@ -71,6 +103,111 @@ exports[`File block renders file without crashing 1`] = `
     >
       <TextInput
         allowFontScaling={true}
+        editable={false}
+        fontFamily="serif"
+        onChange={[Function]}
+        rejectResponderTermination={true}
+        scrollEnabled={false}
+        style={
+          Object {
+            "fontFamily": "serif",
+          }
+        }
+        underlineColorAndroid="transparent"
+        value="Download"
+      />
+    </View>
+  </View>
+</View>
+`;
+
+exports[`File block renders file without crashing 1`] = `
+<View
+  pointerEvents="box-none"
+>
+  <View
+    accessible={true}
+    focusable={true}
+    onClick={[Function]}
+    onResponderGrant={[Function]}
+    onResponderMove={[Function]}
+    onResponderRelease={[Function]}
+    onResponderTerminate={[Function]}
+    onResponderTerminationRequest={[Function]}
+    onStartShouldSetResponder={[Function]}
+  >
+    Modal
+    <View>
+      <View>
+        <RCTAztecView
+          accessible={true}
+          activeFormats={Array []}
+          blockType={
+            Object {
+              "tag": "p",
+            }
+          }
+          deleteEnter={true}
+          disableEditingMenu={false}
+          focusable={true}
+          fontFamily="serif"
+          isMultiline={false}
+          maxImagesWidth={200}
+          onBackspace={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onClick={[Function]}
+          onContentSizeChange={[Function]}
+          onEnter={[Function]}
+          onFocus={[Function]}
+          onHTMLContentWithCursor={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onSelectionChange={[Function]}
+          onStartShouldSetResponder={[Function]}
+          placeholder="File name"
+          placeholderTextColor="gray"
+          style={
+            Object {
+              "backgroundColor": undefined,
+              "maxWidth": undefined,
+              "minHeight": 0,
+            }
+          }
+          text={
+            Object {
+              "eventCount": undefined,
+              "linkTextColor": undefined,
+              "selection": null,
+              "text": "<p >File name</p>",
+            }
+          }
+          textAlign="left"
+          triggerKeyCodes={Array []}
+        />
+      </View>
+    </View>
+    <View
+      style={
+        Array [
+          Array [
+            undefined,
+            false,
+          ],
+          Object {
+            "alignSelf": "flex-start",
+          },
+        ]
+      }
+    >
+      <TextInput
+        allowFontScaling={true}
+        editable={true}
         fontFamily="serif"
         onChange={[Function]}
         rejectResponderTermination={true}
