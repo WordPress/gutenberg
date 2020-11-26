@@ -13,7 +13,10 @@ import {
 	useEffect,
 	useMemo,
 } from '@wordpress/element';
-import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
+import {
+	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { useEntityProp } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 
@@ -118,7 +121,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 	const [ content, setContent ] = useGlobalStylesEntityContent();
 	const { blockTypes, settings } = useSelect( ( select ) => {
 		return {
-			blockTypes: select( 'core/blocks' ).getBlockTypes(),
+			blockTypes: select( blocksStore ).getBlockTypes(),
 			settings: select( 'core/edit-site' ).getSettings(),
 		};
 	} );
