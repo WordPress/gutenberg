@@ -489,7 +489,7 @@ export class FileEdit extends Component {
 										</View>
 									) }
 								</View>
-								{ showDownloadButton && (
+								{ showDownloadButton && this.state.maxWidth > 0 && (
 									<View
 										style={ [
 											finalButtonStyle,
