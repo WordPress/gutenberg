@@ -489,49 +489,53 @@ export class FileEdit extends Component {
 										</View>
 									) }
 								</View>
-								{ showDownloadButton && this.state.maxWidth > 0 && (
-									<View
-										style={ [
-											finalButtonStyle,
-											this.getStyleForAlignment( align ),
-										] }
-									>
-										<RichText
-											withoutInteractiveFormatting
-											__unstableMobileNoFocusOnMount
-											rootTagsToEliminate={ [ 'p' ] }
-											tagName="p"
-											textAlign="center"
-											minWidth={ minWidth }
-											maxWidth={ this.state.maxWidth }
-											deleteEnter={ true }
-											style={ styles.buttonText }
-											value={ downloadButtonText }
-											placeholder={ placeholderText }
-											unstableOnFocus={ () =>
-												this.setState( {
-													isButtonFocused: true,
-												} )
-											}
-											onBlur={ () =>
-												this.setState( {
-													isButtonFocused: false,
-												} )
-											}
-											selectionColor={
-												styles.buttonText.color
-											}
-											placeholderTextColor={
-												styles.placeholderTextColor
-													.color
-											}
-											underlineColorAndroid="transparent"
-											onChange={
-												this.onChangeDownloadButtonText
-											}
-										/>
-									</View>
-								) }
+								{ showDownloadButton &&
+									this.state.maxWidth > 0 && (
+										<View
+											style={ [
+												finalButtonStyle,
+												this.getStyleForAlignment(
+													align
+												),
+											] }
+										>
+											<RichText
+												withoutInteractiveFormatting
+												__unstableMobileNoFocusOnMount
+												rootTagsToEliminate={ [ 'p' ] }
+												tagName="p"
+												textAlign="center"
+												minWidth={ minWidth }
+												maxWidth={ this.state.maxWidth }
+												deleteEnter={ true }
+												style={ styles.buttonText }
+												value={ downloadButtonText }
+												placeholder={ placeholderText }
+												unstableOnFocus={ () =>
+													this.setState( {
+														isButtonFocused: true,
+													} )
+												}
+												onBlur={ () =>
+													this.setState( {
+														isButtonFocused: false,
+													} )
+												}
+												selectionColor={
+													styles.buttonText.color
+												}
+												placeholderTextColor={
+													styles.placeholderTextColor
+														.color
+												}
+												underlineColorAndroid="transparent"
+												onChange={
+													this
+														.onChangeDownloadButtonText
+												}
+											/>
+										</View>
+									) }
 							</View>
 						</TouchableWithoutFeedback>
 					);
