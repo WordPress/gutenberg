@@ -15,20 +15,26 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as editPostStore } from '../../../store';
 
 function PostTemplate() {
-	const { template, isEditing } = useSelect( ( select ) => {
+	const { template, isEditing, isFSETheme } = useSelect( ( select ) => {
 		const { getEditedPostAttribute } = select( editorStore );
 		const { __experimentalGetTemplateForLink } = select( coreStore );
 		const { isEditingTemplate } = select( editPostStore );
 		const link = getEditedPostAttribute( 'link' );
+		const isFSEEnabled = select( editorStore ).getEditorSettings()
+			.isFSETheme;
 		return {
-			template: link ? __experimentalGetTemplateForLink( link ) : null,
+			template:
+				isFSEEnabled && link
+					? __experimentalGetTemplateForLink( link )
+					: null,
 			isEditing: isEditingTemplate(),
+			isFSETheme: isFSEEnabled,
 		};
 	}, [] );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
-	if ( ! template ) {
+	if ( ! isFSETheme || ! template ) {
 		return null;
 	}
 
