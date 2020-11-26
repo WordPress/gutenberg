@@ -232,25 +232,13 @@ export function* selectNextBlock( clientId ) {
 
 /**
  * Returns an action object used in signalling that a block multi-selection has started.
+ *
+ * @return {Object} Action object.
  */
-export function* startMultiSelect() {
-	yield {
+export function startMultiSelect() {
+	return {
 		type: 'START_MULTI_SELECT',
 	};
-
-	const blockCount = yield controls.select(
-		'core/block-editor',
-		'getSelectedBlockCount'
-	);
-
-	speak(
-		sprintf(
-			/* translators: %s: number of selected blocks */
-			_n( '%s block selected.', '%s blocks selected.', blockCount ),
-			blockCount
-		),
-		'assertive'
-	);
 }
 
 /**
@@ -269,15 +257,27 @@ export function stopMultiSelect() {
  *
  * @param {string} start First block of the multi selection.
  * @param {string} end   Last block of the multiselection.
- *
- * @return {Object} Action object.
  */
-export function multiSelect( start, end ) {
-	return {
+export function* multiSelect( start, end ) {
+	yield {
 		type: 'MULTI_SELECT',
 		start,
 		end,
 	};
+
+	const blockCount = yield controls.select(
+		'core/block-editor',
+		'getSelectedBlockCount'
+	);
+
+	speak(
+		sprintf(
+			/* translators: %s: number of selected blocks */
+			_n( '%s block selected.', '%s blocks selected.', blockCount ),
+			blockCount
+		),
+		'assertive'
+	);
 }
 
 /**

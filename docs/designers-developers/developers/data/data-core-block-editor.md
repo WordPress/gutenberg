@@ -1175,10 +1175,6 @@ _Parameters_
 -   _start_ `string`: First block of the multi selection.
 -   _end_ `string`: Last block of the multiselection.
 
-_Returns_
-
--   `Object`: Action object.
-
 <a name="receiveBlocks" href="#receiveBlocks">#</a> **receiveBlocks**
 
 Returns an action object used in signalling that blocks have been received.
@@ -1400,6 +1396,10 @@ _Returns_
 <a name="startMultiSelect" href="#startMultiSelect">#</a> **startMultiSelect**
 
 Returns an action object used in signalling that a block multi-selection has started.
+
+_Returns_
+
+-   `Object`: Action object.
 
 <a name="startTyping" href="#startTyping">#</a> **startTyping**
 

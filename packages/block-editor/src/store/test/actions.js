@@ -102,8 +102,7 @@ describe( 'actions', () => {
 
 	describe( 'startMultiSelect', () => {
 		it( 'should return the START_MULTI_SELECT', () => {
-			const fulfillment = startMultiSelect();
-			expect( fulfillment.next().value ).toEqual( {
+			expect( startMultiSelect() ).toEqual( {
 				type: 'START_MULTI_SELECT',
 			} );
 		} );
@@ -120,7 +119,8 @@ describe( 'actions', () => {
 		it( 'should return MULTI_SELECT action', () => {
 			const start = 'start';
 			const end = 'end';
-			expect( multiSelect( start, end ) ).toEqual( {
+			const fulfillment = multiSelect( start, end );
+			expect( fulfillment.next().value ).toEqual( {
 				type: 'MULTI_SELECT',
 				start,
 				end,
