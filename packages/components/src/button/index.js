@@ -2,7 +2,6 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -100,7 +99,7 @@ export function Button( props, ref ) {
 			( !! label &&
 				// the children are empty and...
 				( ! children ||
-					( isArray( children ) && ! children.length ) ) &&
+					( Array.isArray( children ) && ! children.length ) ) &&
 				// the tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
