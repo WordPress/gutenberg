@@ -356,10 +356,6 @@ export function format( dateFormat, dateValue = new Date() ) {
 	}
 	// Join with [] between to separate characters, and replace
 	// unneeded separators with static text.
-<<<<<<< HEAD
-	newFormat = newFormat.join( '[]' );
-	return momentDate.format( newFormat );
-=======
 
 	newFormat = newFormat.join( '' );
 
@@ -487,11 +483,21 @@ function getActualTimezone( timezone = '' ) {
  * @return {string} Formatted date.
  */
 export function format( dateFormat, dateValue = new Date() ) {
-	const formatString = translateFormat( dateFormat, dateValue );
 	const parsedDate =
 		dateValue instanceof Date ? dateValue : parseISO( dateValue );
-	return formatTZ( parsedDate, formatString );
->>>>>>> 067501032f... wip
+
+	const hasOffset =
+		formatTZ( parsedDate, 'x' ) ===
+		formatTZ( parsedDate, 'x', { timeZone: getActualTimezone() } );
+
+	const offsetDate = hasOffset
+		? utcToZonedTime( parsedDate, getActualTimezone() )
+		: parsedDate;
+
+	const formatString = translateFormat( dateFormat, offsetDate );
+	return formatTZ( offsetDate, formatString, {
+		timeZone: getActualTimezone(),
+	} );
 }
 
 /**
