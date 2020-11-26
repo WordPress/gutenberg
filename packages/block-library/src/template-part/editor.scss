@@ -133,7 +133,7 @@
 
 		// Do not display a border on rich text blocks when hovered and selected
 		.block-editor-rich-text__editable {
-			&.is-selected.is-hovered {
+			&.is-selected.is-hovered.is-typing {
 				&::after {
 					box-shadow: none;
 				}
