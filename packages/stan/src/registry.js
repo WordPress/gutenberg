@@ -1,186 +1,68 @@
-/**
- * External dependencies
- */
-import { noop, isObject } from 'lodash';
-// @ts-ignore
-import EquivalentKeyMap from 'equivalent-key-map';
-
-/** @typedef {import('./types').WPAtomRegistry} WPAtomRegistry */
-/**
- * @template T
- * @typedef {import("./types").WPAtomSelectorResolver<T>} WPAtomSelectorResolver
- */
-/**
- * @template T
- * @typedef {import("./types").WPAtomState<T>} WPAtomState
- */
-/**
- * @template T
- * @typedef {import("./types").WPAtom<T>} WPAtom
- */
-/**
- * @template T
- * @typedef {import("./types").WPAtomSelector<T>} WPAtomSelector
- */
-/**
- * @template T
- * @typedef {import("./types").WPAtomSelectorConfig<T>} WPAtomSelectorConfig
- */
-/**
- * @typedef {( atomState: import('./types').WPAtomState<any> ) => void} RegistryListener
- */
-
-/**
- * @template T
- * @param {WPAtom<any>|WPAtomSelector<T>} maybeAtomSelector
- * @return {boolean} maybeAtomSelector Returns `true` when atom selector detected.
- */
-export function isAtomSelector( maybeAtomSelector ) {
-	return (
-		isObject( maybeAtomSelector ) &&
-		/** @type {WPAtomSelector<any>} */ ( maybeAtomSelector ).type ===
-			'selector'
-	);
+function nestedGet( map, args ) {
+	const len = args.length;
+	for ( let i = 0; i < len; i++ ) {
+		map = map.get( args[ i ] );
+		if ( ! map ) {
+			return null;
+		}
+	}
+	return map;
 }
 
-/**
- * Creates a new Atom Registry.
- *
- * @param {RegistryListener} onAdd
- * @param {RegistryListener} onDelete
- *
- * @return {WPAtomRegistry} Atom Registry.
- */
-export const createAtomRegistry = ( onAdd = noop, onDelete = noop ) => {
+function nestedSet( map, args, value ) {
+	const nests = args.length - 1;
+	for ( let i = 0; i < nests; i++ ) {
+		const arg = args[ i ];
+		let submap = map.get( arg );
+		if ( ! submap ) {
+			submap = new Map();
+			map.set( arg, submap );
+		}
+		map = submap;
+	}
+	map.set( args[ nests ], value );
+}
+
+export const createAtomRegistry = () => {
 	const atoms = new WeakMap();
 	const selectors = new WeakMap();
-	let batchedUpdateKeys = new WeakMap();
-	let batchedUpdates = new Map();
-	let isBatchingUpdates = false;
 
-	/**
-	 * @template T
-	 * @param {WPAtom<T>|WPAtomSelector<T>} atom Atom.
-	 * @return {WPAtomState<T>} Atom state.
-	 */
 	const getAtomState = ( atom ) => {
-		if ( isAtomSelector( atom ) ) {
-			const {
-				config,
-				args,
-			} = /** @type {WPAtomSelector<any>} */ ( atom );
-			return selectorRegistry.getAtomSelector( config, args );
+		if ( atom.type === 'selector' ) {
+			const { create, args } = atom;
+			return getAtomSelector( create, args );
 		}
 
-		if ( ! atoms.get( atom ) ) {
-			const atomState = /** @type {WPAtom<any>} */ ( atom )( registry );
+		let atomState = atoms.get( atom );
+		if ( ! atomState ) {
+			atomState = atom( registry );
 			atoms.set( atom, atomState );
-			onAdd( atomState );
 		}
 
-		return atoms.get( atom );
+		return atomState;
 	};
 
-	const selectorRegistry = {
-		/**
-		 * @template T
-		 * @param {WPAtomSelectorConfig<T>} atomSelectorConfig
-		 * @param {any[]} args
-		 * @return {WPAtomState<T>} Atom state.
-		 */
-		getAtomSelector( atomSelectorConfig, args ) {
-			if ( ! selectors.get( atomSelectorConfig ) ) {
-				selectors.set( atomSelectorConfig, new EquivalentKeyMap() );
-			}
+	const getAtomSelector = ( create, args ) => {
+		let selectorsMap = selectors.get( create );
+		if ( ! selectorsMap ) {
+			selectorsMap = new Map();
+			selectors.set( create, selectorsMap );
+		}
 
-			const selectorsMap = selectors.get( atomSelectorConfig );
-			let value = selectorsMap.get( args );
-			if ( ! value ) {
-				const atomCreator = atomSelectorConfig.createAtom( ...args );
-				value = atomCreator( registry );
-				selectorsMap.set( args, value );
-			}
+		let value = nestedGet( selectorsMap, args );
+		if ( ! value ) {
+			const atom = create( ...args );
+			value = atom( registry );
+			nestedSet( selectorsMap, args, value );
+		}
 
-			return value;
-		},
-
-		/**
-		 * @template T
-		 * @param {WPAtomSelectorConfig<T>} atomSelectorConfig
-		 * @param {any[]} args
-		 */
-		deleteAtomSelector( atomSelectorConfig, args ) {
-			if (
-				selectors.has( atomSelectorConfig ) &&
-				selectors.get( atomSelectorConfig ).has( args )
-			) {
-				selectors.get( atomSelectorConfig ).delete( args );
-			}
-		},
+		return value;
 	};
 
-	/** @type {WPAtomRegistry} */
 	const registry = {
-		__unstableGetAtomState: getAtomState,
-
+		getAtomState,
 		get( atom ) {
 			return getAtomState( atom ).get();
-		},
-
-		set( atom, value ) {
-			return getAtomState( atom ).set( value );
-		},
-
-		subscribe( atom, listener ) {
-			return getAtomState( atom ).subscribe( listener );
-		},
-
-		// This shouldn't be necessary since we rely on week map
-		// But the legacy selectors/actions API requires us to know when
-		// some atoms are removed entirely to unsubscribe.
-		delete( atom ) {
-			if ( isAtomSelector( atom ) ) {
-				const {
-					config,
-					args,
-				} = /** @type {WPAtomSelector<any>} */ ( atom );
-				return selectorRegistry.deleteAtomSelector( config, args );
-			}
-			const atomState = atoms.get( atom );
-			atoms.delete( atom );
-			onDelete( atomState );
-		},
-
-		async batch( callback ) {
-			if ( isBatchingUpdates ) {
-				callback();
-				return;
-			}
-			isBatchingUpdates = true;
-			await callback();
-			isBatchingUpdates = false;
-			const updates = batchedUpdates;
-			batchedUpdateKeys = new WeakMap();
-			batchedUpdates = new Map();
-
-			// Running this after the reset
-			// to avoid having an update that batches new updates..
-			updates.forEach( ( update ) => update() );
-		},
-
-		updateListeners( identifier, callback ) {
-			if ( ! isBatchingUpdates ) {
-				callback();
-			} else {
-				let key;
-				if ( batchedUpdateKeys.has( identifier ) ) {
-					key = batchedUpdateKeys.get( identifier );
-				} else {
-					key = batchedUpdates.size;
-					batchedUpdateKeys.set( identifier, key );
-				}
-				batchedUpdates.set( key, callback );
-			}
 		},
 	};
 
