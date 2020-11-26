@@ -373,7 +373,6 @@ export class ImageEdit extends React.Component {
 				setAttributes={ setMappedAttributes }
 				withBottomSheet={ false }
 				hasPicker
-				// actions={ actions }
 				options={ options }
 				showIcon={ false }
 			/>
@@ -389,16 +388,7 @@ export class ImageEdit extends React.Component {
 			imageSizes,
 			clientId,
 		} = this.props;
-		const {
-			align,
-			url,
-			alt,
-			href,
-			id,
-			linkTarget,
-			sizeSlug,
-			className,
-		} = attributes;
+		const { align, url, alt, id, sizeSlug, className } = attributes;
 
 		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
 			value: slug,
