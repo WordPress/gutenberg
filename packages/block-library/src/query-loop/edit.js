@@ -98,6 +98,7 @@ export default function QueryLoopEdit( {
 					// Change the post-type if needed.
 					if ( slug?.startsWith( 'archive-' ) ) {
 						query.postType = slug.replace( 'archive-', '' );
+						postType = query.postType;
 					}
 				}
 			}
