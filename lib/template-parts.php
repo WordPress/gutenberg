@@ -109,7 +109,7 @@ add_filter( 'manage_wp_template_part_posts_columns', 'gutenberg_templates_lists_
 add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_templates_lists_custom_column', 10, 2 );
 
 /**
- * Filter for adding and a `theme` parameter to `wp_template_part` queries.
+ * Filter for adding taxonomy parameters to `wp_template_part` queries.
  *
  * @param array $query_params The query parameters.
  * @return array Filtered $query_params.
@@ -117,7 +117,11 @@ add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_tem
 function filter_rest_wp_template_part_collection_params( $query_params ) {
 	$query_params += array(
 		'theme' => array(
-			'description' => __( 'The theme slugs for the theme that created the template part.', 'gutenberg' ),
+			'description' => __( 'The theme slug for the theme that created the template part.', 'gutenberg' ),
+			'type'        => 'string',
+		),
+		'flags' => array(
+			'description' => __( 'Limit this query to template parts with these flags (e.g. `theme_file_original` or `theme_file_based`).', 'gutenberg' ),
 			'type'        => 'array',
 		),
 	);
@@ -126,21 +130,31 @@ function filter_rest_wp_template_part_collection_params( $query_params ) {
 add_filter( 'rest_wp_template_part_collection_params', 'filter_rest_wp_template_part_collection_params', 99, 1 );
 
 /**
- * Filter for supporting the `resolved`, `template`, and `theme` parameters in `wp_template_part` queries.
+ * Filter for supporting taxonomy parameters in `wp_template_part` queries.
  *
  * @param array           $args    The query arguments.
  * @param WP_REST_Request $request The request object.
  * @return array Filtered $args.
  */
 function filter_rest_wp_template_part_query( $args, $request ) {
-	if ( $request['theme'] ) {
-		$tax_query   = isset( $args['tax_query'] ) ? $args['tax_query'] : array();
-		$tax_query[] = array(
-			'taxonomy' => 'wp_theme',
-			'field'    => 'slug',
-			'terms'    => $request['theme'],
-			'operator' => 'AND',
-		);
+	if ( isset( $request['theme'] ) || isset( $request['flags'] ) ) {
+		$tax_query = isset( $args['tax_query'] ) ? $args['tax_query'] : array();
+
+		if ( isset( $request['theme'] ) ) {
+			$tax_query[] = array(
+				'taxonomy' => 'wp_theme',
+				'field'    => 'slug',
+				'terms'    => $request['theme'],
+			);
+		}
+
+		if ( isset( $request['flags'] ) ) {
+			$tax_query[] = array(
+				'taxonomy' => 'wp_flag',
+				'field'    => 'slug',
+				'terms'    => $request['flags'],
+			);
+		}
 
 		$args['tax_query'] = $tax_query;
 	}

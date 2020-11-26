@@ -205,7 +205,8 @@ export default function TemplatePartPreviews( {
 		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
 		return (
 			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
-				theme: [ currentTheme, '_wp_is_original' ],
+				theme: currentTheme,
+				flags: [ 'theme_file_original' ],
 				status: [ 'publish' ],
 				per_page: -1,
 			} ) || []

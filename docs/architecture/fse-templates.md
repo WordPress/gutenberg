@@ -16,13 +16,13 @@ These capabilities mean that at any point in time, a mix of template files (from
 
 In order to simplify the algorithm used to edit and render the templates from two different places, we performed an operation called "template synchronization".
 
-The synchronization consists of duplicating the theme templates in the `wp_template` (and `wp_template_part`) custom templates with `publish` status and a `_wp_is_original` term. When a user edits these templates, the term is removed.
+The synchronization consists of duplicating the theme templates in the `wp_template` (and `wp_template_part`) custom templates with `publish` status and a `theme_file_original` term. When a user edits these templates, the term is removed.
 
 This means:
 
  - The rendering/fetching of templates only need to consider the custom post type templates. It is not necessary to fetch the template files from the theme folder directly. The synchronization will ensure these are duplicated in the CPT.
- - Untouched theme templates have the `_wp_is_original` term.
- - Edited theme templates don't have the `_wp_is_original` term.
+ - Untouched theme templates have the `theme_file_original` term.
+ - Edited theme templates have only the `theme_file_based` term instead.
 
 The synchronization is important for two different flows:
 

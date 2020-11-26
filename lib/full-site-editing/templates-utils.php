@@ -6,40 +6,6 @@
  */
 
 /**
- * Parses the `wp_theme` terms of a template or template part into:
- * [
- *   'is_file_based', // Whether the template is based upon a theme-provided file.
- *   'is_original', // Whether the template is the original theme-provided file.
- *   'themes', // An array of themes that this template belongs to.
- * ]
- *
- * @param int $post_id The template or template part post ID.
- * @return array The parsed wp_theme terms.
- */
-function gutenberg_parse_wp_theme_terms( $post_id ) {
-	$parsed = array(
-	'is_file_based' => false,
-	'is_original'   => false,
-	'themes'        => array(),
-	);
-	$terms  = get_the_terms( $post_id, 'wp_theme' );
-	if ( empty( $terms ) || is_wp_error( $terms ) ) {
-		return $parsed;
-	}
-
-	foreach ( $terms as $term ) {
-		if ( '_wp_file_based' === $term->slug ) {
-			$parsed['is_file_based'] = true;
-		} else if ( '_wp_is_original' === $term->slug ) {
-			$parsed['is_original'] = true;
-		} else {
-			$parsed['themes'][] = $term->slug;
-		}
-	}
-	return $parsed;
-}
-
-/**
  * Filters the admin list columns to add those relevant to templates and template parts.
  *
  * @param array $columns Columns to display.
@@ -82,19 +48,24 @@ function gutenberg_render_templates_lists_custom_column( $column_name, $post_id 
 	}
 
 	if ( 'theme' === $column_name ) {
-		$terms  = gutenberg_parse_wp_theme_terms( $post_id );
 		$themes = array();
-		foreach( $terms['themes'] as $term_theme ) {
-			$theme = wp_get_theme( $term_theme );
+		$flags  = array();
+
+		$theme_terms = get_the_terms( $post_id, 'wp_theme' );
+		foreach( $theme_terms as $theme_term ) {
+			$theme = wp_get_theme( $theme_term->slug );
 			if ( $theme->exists() ) {
 				$themes[] = esc_html( $theme );
+			} else {
+				$themes[] = esc_html( $theme_term->slug );
 			}
 		}
 		echo implode( '<br />', $themes );
-		if ( $terms['is_original'] ) {
+
+		if ( has_term( 'theme_file_original', 'wp_flag', $post_id ) ) {
 			echo '<br />' . __( '(Template file — not customized)', 'gutenberg' );
-		} else if ( $terms['is_file_based'] ) {
-			echo '<br />' . __( '(Originated from a template file)', 'gutenberg' );
+		} else if ( has_term( 'theme_file_based', 'wp_flag', $post_id )) {
+			echo '<br />' . __( '(Template file — customized)', 'gutenberg' );
 		}
 		return;
 	}

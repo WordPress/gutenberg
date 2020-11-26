@@ -31,8 +31,7 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 				array(
 					'taxonomy' => 'wp_theme',
 					'field'    => 'slug',
-					'terms'    => array( $theme, '_wp_is_original' ),
-					'operator' => 'AND',
+					'terms'    => $theme,
 				),
 			),
 			'posts_per_page' => 1,
@@ -47,7 +46,10 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 			'post_status'  => 'publish',
 			'post_type'    => $post_type,
 			'post_name'    => $slug,
-			'tax_input'    => array( 'wp_theme' => array( $theme, '_wp_file_based', '_wp_is_original' ) ),
+			'tax_input'    => array(
+				'wp_flag'  => array( 'theme_file_original', 'theme_file_based' ),
+				'wp_theme' => $theme,
+			),
 		);
 
 		if ( 'wp_template' === $post_type ) {
@@ -59,11 +61,17 @@ function _gutenberg_create_auto_draft_for_template( $post_type, $slug, $theme, $
 		}
 
 		wp_insert_post( $template_post );
-	} elseif ( has_term( '_wp_is_original', 'wp_theme', $post ) && $content !== $post->post_content ) {
+	} elseif ( has_term( 'theme_file_original', 'wp_flag', $post ) && $content !== $post->post_content ) {
 		// If the template already exists, but it was never changed by the user
 		// and the template file content changed then update the content of the post.
-		$post->post_content = $content;
-		wp_insert_post( $post );
+		$template_post = array(
+			'ID'           => $post->ID,
+			'post_content' => $content,
+			'tax_input'    => array(
+				'wp_flag' => array( 'theme_file_original', 'theme_file_based', 'theme_sync' ),
+			),
+		);
+		wp_update_post( $template_post );
 	}
 }
 
