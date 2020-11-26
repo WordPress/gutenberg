@@ -3,7 +3,7 @@
  */
 import { MenuItem } from '@wordpress/components';
 import { _x } from '@wordpress/i18n';
-import { switchToBlockType } from '@wordpress/blocks';
+import { switchToBlockType, store as blocksStore } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { BlockSettingsMenuControls } from '@wordpress/block-editor';
@@ -60,7 +60,7 @@ export default compose( [
 			getSelectedBlockClientIds,
 		} = select( 'core/block-editor' );
 
-		const { getGroupingBlockName } = select( 'core/blocks' );
+		const { getGroupingBlockName } = select( blocksStore );
 
 		const clientIds = getSelectedBlockClientIds();
 		const groupingBlockName = getGroupingBlockName();
