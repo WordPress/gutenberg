@@ -50,7 +50,7 @@ An array of shown block patterns objects.
 
 The performed event after a click on a block pattern. In most cases, the pattern is inserted in the block editor.
 
--   Type: `any`
+-   Type: `Function`
 -   Required: Yes
 
 ## Related components
