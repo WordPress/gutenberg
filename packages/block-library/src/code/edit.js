@@ -15,6 +15,7 @@ export default function CodeEdit( { attributes, setAttributes } ) {
 				placeholder={ __( 'Write code…' ) }
 				aria-label={ __( 'Code' ) }
 				preserveWhiteSpace
+				__unstablePastePlainText
 			/>
 		</pre>
 	);
