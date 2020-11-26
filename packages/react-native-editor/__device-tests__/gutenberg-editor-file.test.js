@@ -38,6 +38,7 @@ describe( 'Gutenberg Editor File Block tests @canary', () => {
 		const block = await editorPage.getFirstBlockVisible();
 
 		block.click();
+		await driver.sleep( 1000 );
 		await editorPage.chooseMediaLibrary();
 
 		await editorPage.verifyHtmlContent( testData.fileBlockPlaceholder );
