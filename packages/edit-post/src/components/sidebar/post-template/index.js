@@ -36,7 +36,7 @@ function PostTemplate() {
 		<PanelRow className="edit-post-post-template">
 			<span>{ __( 'Template' ) }</span>
 			{ ! isEditing && (
-				<span>
+				<span className="edit-post-post-template__value">
 					{ createInterpolateElement(
 						sprintf(
 							/* translators: 1: Template name. */
@@ -66,7 +66,11 @@ function PostTemplate() {
 					) }
 				</span>
 			) }
-			{ isEditing && <span>{ template.post_title }</span> }
+			{ isEditing && (
+				<span className="edit-post-post-template__value">
+					{ template.post_title }
+				</span>
+			) }
 		</PanelRow>
 	);
 }
