@@ -20,11 +20,11 @@ import {
 	Icon,
 	PanelBody,
 	TextControl,
-	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Image,
 	WIDE_ALIGNMENTS,
+	LinkSettingsNavigation,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -43,8 +43,6 @@ import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import {
-	external,
-	link,
 	image as placeholderIcon,
 	textColor,
 	replace,
@@ -338,6 +336,42 @@ export class ImageEdit extends React.Component {
 			: width;
 	}
 
+	getLinkSettings() {
+		const { isLinkSheetVisible } = this.state;
+		const { attributes, setAttributes } = this.props;
+
+		const options = {
+			url: {
+				label: __( 'Image Link URL' ),
+				placeholder: __( 'Add URL' ),
+				autoFocus: false,
+				autoFill: true,
+			},
+			openInNewTab: {
+				label: __( 'Open in new tab' ),
+			},
+			linkRel: {
+				label: __( 'Link Rel' ),
+				placeholder: __( 'None' ),
+			},
+			linkUrlAttributeName: 'href',
+		};
+
+		return (
+			<LinkSettingsNavigation
+				isVisible={ isLinkSheetVisible }
+				attributes={ attributes }
+				onClose={ this.dismissSheet }
+				setAttributes={ setAttributes }
+				withBottomSheet={ false }
+				hasPicker
+				// actions={ actions }
+				options={ options }
+				showIcon={ false }
+			/>
+		);
+	}
+
 	render() {
 		const { isCaptionSelected } = this.state;
 		const {
@@ -391,23 +425,10 @@ export class ImageEdit extends React.Component {
 						<BlockStyles clientId={ clientId } url={ url } />
 					) }
 				</PanelBody>
+				<PanelBody title={ __( 'Link Settings' ) }>
+					{ this.getLinkSettings( true ) }
+				</PanelBody>
 				<PanelBody>
-					<TextControl
-						icon={ link }
-						label={ __( 'Link To' ) }
-						value={ href || '' }
-						valuePlaceholder={ __( 'Add URL' ) }
-						onChange={ this.onSetLinkDestination }
-						autoCapitalize="none"
-						autoCorrect={ false }
-						keyboardType="url"
-					/>
-					<ToggleControl
-						icon={ external }
-						label={ __( 'Open in new tab' ) }
-						checked={ linkTarget === '_blank' }
-						onChange={ this.onSetNewTab }
-					/>
 					{ image && sizeOptionsValid && (
 						<CycleSelectControl
 							icon={ expand }

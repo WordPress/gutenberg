@@ -81,7 +81,13 @@ function LinkSettings( {
 	onLinkCellPressed,
 	urlValue,
 } ) {
-	const { url, label, linkTarget, rel } = attributes;
+	const { linkUrlAttributeName = 'url' } = options;
+	const {
+		[ linkUrlAttributeName ]: url,
+		label,
+		linkTarget,
+		rel,
+	} = attributes;
 	const [ urlInputValue, setUrlInputValue ] = useState( '' );
 	const [ labelInputValue, setLabelInputValue ] = useState( '' );
 	const [ linkRelInputValue, setLinkRelInputValue ] = useState( '' );
@@ -127,7 +133,7 @@ function LinkSettings( {
 			onEmptyURL();
 		}
 		setAttributes( {
-			url: prependHTTP( urlValue ),
+			[ linkUrlAttributeName ]: prependHTTP( urlValue ),
 		} );
 	}, [ urlValue ] );
 
@@ -144,7 +150,7 @@ function LinkSettings( {
 
 	function onSetAttributes() {
 		setAttributes( {
-			url: prependHTTP( urlInputValue ),
+			[ linkUrlAttributeName ]: prependHTTP( urlInputValue ),
 			label: labelInputValue,
 			rel: linkRelInputValue,
 		} );
@@ -186,7 +192,7 @@ function LinkSettings( {
 			return;
 		}
 
-		setAttributes( { url: clipboardText } );
+		setAttributes( { [ linkUrlAttributeName ]: clipboardText } );
 	}
 
 	function getSettings() {
