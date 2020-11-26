@@ -19,7 +19,7 @@ const options = [
 	{ '@wordpress/package': [ '__experimentalSafe', '__unstableSafe' ] },
 ];
 
-ruleTester.run( 'wp-no-unsafe-features', rule, {
+ruleTester.run( 'no-unsafe-wp-apis', rule, {
 	valid: [
 		{ code: "import _ from 'lodash';", options },
 		{ code: "import { map } from 'lodash';", options },
