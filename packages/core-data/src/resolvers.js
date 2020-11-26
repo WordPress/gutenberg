@@ -395,6 +395,7 @@ export function* getAutosave( postType, postId ) {
 export function* __experimentalGetTemplateForLink( link ) {
 	// Ideally this should be using an apiFetch call
 	// We could potentially do so by adding a "filter" to the `wp_template` end point.
+	// Also it seems the returned object is not a regular REST API post type.
 	const template = yield regularFetch(
 		addQueryArgs( link, {
 			'_wp-find-template': true,
