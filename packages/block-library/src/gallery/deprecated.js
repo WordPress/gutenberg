@@ -666,13 +666,8 @@ const v5 = {
 	supports: {
 		align: true,
 	},
-	isEligible( { linkTo, imageCount } ) {
-		return (
-			! linkTo ||
-			linkTo === 'attachment' ||
-			linkTo === 'media' ||
-			! imageCount
-		);
+	isEligible( { linkTo } ) {
+		return ! linkTo || linkTo === 'attachment' || linkTo === 'media';
 	},
 	migrate( attributes ) {
 		let linkTo = attributes.linkTo;
