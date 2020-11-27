@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-### Enhancements
+### New Feature
 
 -   Add `no-unsafe-wp-apis` rule to discourage usage of unsafe APIs ([#27301](https://github.com/WordPress/gutenberg/pull/27301)).
 
