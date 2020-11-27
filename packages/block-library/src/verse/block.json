@@ -10,6 +10,15 @@
 			"default": "",
 			"__unstablePreserveWhiteSpace": true
 		},
+		"style": {
+			"default": {
+				"spacing": {
+					"padding": {
+						"default": 20
+					}
+				}
+			}
+		},
 		"textAlign": {
 			"type": "string"
 		}
