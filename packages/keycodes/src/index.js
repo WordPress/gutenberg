@@ -34,9 +34,10 @@ import { isAppleOS } from './platform';
  *
  * @template T
  *
- * @typedef {{[M in WPKeycodeModifier]:T}} WPModifierHandler
+ * @typedef {Record<WPKeycodeModifier,T>} WPModifierHandler
  */
 
+/* eslint-disable jsdoc/valid-types */
 /**
  * @template T
  *
@@ -48,6 +49,7 @@ import { isAppleOS } from './platform';
  *
  * @typedef {(event:KeyboardEvent,character:string,isApple?:()=>boolean)=>T} WPEventKeyHandler
  */
+/* eslint-enable jsdoc/valid-types */
 
 /**
  * Keycode for BACKSPACE key.
@@ -133,7 +135,7 @@ export const ZERO = 48;
  * Object that contains functions that return the available modifier
  * depending on platform.
  *
- * @type {{[M in WPKeycodeModifier]:(isApple:()=>boolean)=>WPModifierPart[]}}
+ * @type {Record<WPKeycodeModifier, ( isApple: () => boolean ) => WPModifierPart[]>}
  */
 export const modifiers = {
 	primary: ( _isApple ) => ( _isApple() ? [ COMMAND ] : [ CTRL ] ),

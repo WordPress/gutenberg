@@ -42,10 +42,6 @@ onKeyDown( event ) {
 
 Keycode for ALT key.
 
-_Type_
-
--   `WPModifierPart` 
-
 <a name="BACKSPACE" href="#BACKSPACE">#</a> **BACKSPACE**
 
 Keycode for BACKSPACE key.
@@ -54,17 +50,9 @@ Keycode for BACKSPACE key.
 
 Keycode for COMMAND/META key.
 
-_Type_
-
--   `WPModifierPart` 
-
 <a name="CTRL" href="#CTRL">#</a> **CTRL**
 
 Keycode for CTRL key.
-
-_Type_
-
--   `WPModifierPart` 
 
 <a name="DELETE" href="#DELETE">#</a> **DELETE**
 
@@ -140,7 +128,7 @@ depending on platform.
 
 _Type_
 
--   `null` 
+-   (unknown type) 
 
 <a name="rawShortcut" href="#rawShortcut">#</a> **rawShortcut**
 
@@ -165,10 +153,6 @@ Keycode for RIGHT key.
 <a name="SHIFT" href="#SHIFT">#</a> **SHIFT**
 
 Keycode for SHIFT key.
-
-_Type_
-
--   `WPModifierPart` 
 
 <a name="shortcutAriaLabel" href="#shortcutAriaLabel">#</a> **shortcutAriaLabel**
 
