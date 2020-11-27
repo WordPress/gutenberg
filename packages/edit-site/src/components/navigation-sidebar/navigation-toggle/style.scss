@@ -1,15 +1,19 @@
 .edit-site-navigation-toggle {
+	align-items: center;
+	background: $gray-900;
+	border-radius: 0;
 	display: none;
+	position: absolute;
+	z-index: z-index(".edit-site-navigation-toggle");
+	height: $header-height + $border-width; // Cover header border
+	width: $header-height;
 
 	@include break-medium() {
-		align-items: center;
-		background: $gray-900;
-		border-radius: 0;
 		display: flex;
-		position: absolute;
-		z-index: z-index(".edit-site-navigation-toggle");
-		height: $header-height + $border-width; // Cover header border
-		width: $header-height;
+	}
+
+	body.is-navigation-sidebar-open & {
+		display: flex;
 	}
 }
 
