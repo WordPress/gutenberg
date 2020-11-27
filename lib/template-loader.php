@@ -153,7 +153,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 		function ( $template_a, $template_b ) use ( $slug_priorities ) {
 			$priority_a = $slug_priorities[ $template_a->post_name ] * 2 + ( 'publish' === $template_a->post_status ? 1 : 0 );
 			$priority_b = $slug_priorities[ $template_b->post_name ] * 2 + ( 'publish' === $template_b->post_status ? 1 : 0 );
-			return $priority_b - $priority_a;
+			return $priority_a - $priority_b;
 		}
 	);
 
