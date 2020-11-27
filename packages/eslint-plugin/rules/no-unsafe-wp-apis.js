@@ -77,7 +77,7 @@ function makeListener( { allowedImports, context } ) {
 			}
 
 			context.report( {
-				message: `Usage of \`${ importedName }\` from \`${ sourceModule }\` is not allowed`,
+				message: `Usage of \`${ importedName }\` from \`${ sourceModule }\` is not allowed.\nSee https://developer.wordpress.org/block-editor/contributors/develop/coding-guidelines/#experimental-and-unstable-apis for details.`,
 				node: specifierNode,
 			} );
 		} );
