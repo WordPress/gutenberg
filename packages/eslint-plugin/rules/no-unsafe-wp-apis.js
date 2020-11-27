@@ -2,10 +2,6 @@
 module.exports = {
 	type: 'problem',
 	meta: {
-		messages: {
-			noUnsafeFeatures:
-				'Usage of `{{importedName}}` from `{{sourceModule}}` is not allowed',
-		},
 		schema: [
 			{
 				type: 'object',
@@ -81,12 +77,8 @@ function makeListener( { allowedImports, context } ) {
 			}
 
 			context.report( {
-				messageId: 'noUnsafeFeatures',
+				message: `Usage of \`${ importedName }\` from \`${ sourceModule }\` is not allowed`,
 				node: specifierNode,
-				data: {
-					sourceModule,
-					importedName,
-				},
 			} );
 		} );
 	};
