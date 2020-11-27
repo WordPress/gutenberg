@@ -287,11 +287,19 @@ export const shortcutAriaLabel = mapValues( modifiers, ( modifier ) => {
  *
  * @param {KeyboardEvent} event Keyboard event.
  *
- * @return {Array<ALT|CTRL|COMMAND|SHIFT>} Active modifier constants.
+ * @return {Array<WPModifierPart>} Active modifier constants.
  */
 function getEventModifiers( event ) {
-	return [ ALT, CTRL, COMMAND, SHIFT ].filter(
-		( key ) => event[ `${ key }Key` ]
+	return /** @type {WPModifierPart[]} */ ( [
+		ALT,
+		CTRL,
+		COMMAND,
+		SHIFT,
+	] ).filter(
+		( key ) =>
+			event[
+				/** @type {'altKey'|'ctrlKey'|'metaKey'|'shiftKey'} */ ( `${ key }Key` )
+			]
 	);
 }
 
