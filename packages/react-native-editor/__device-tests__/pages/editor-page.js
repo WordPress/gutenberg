@@ -1,16 +1,23 @@
 /**
  * Internal dependencies
  */
-import {
+const {
+	setupDriver,
+	stopDriver,
 	isAndroid,
 	swipeUp,
 	swipeDown,
 	typeString,
 	toggleHtmlMode,
 	swipeFromTo,
-} from '../helpers/utils';
+} = require( '../helpers/utils' );
 
-export default class EditorPage {
+const initializeEditorPage = async () => {
+	const driver = await setupDriver();
+	return new EditorPage( driver );
+};
+
+class EditorPage {
 	driver;
 	accessibilityIdKey;
 	accessibilityIdXPathAttrib;
@@ -536,4 +543,14 @@ export default class EditorPage {
 		this.driver.setImplicitWaitTimeout( 5000 );
 		return element;
 	}
+
+	async stopDriver() {
+		await stopDriver( this.driver );
+	}
+
+	async sauceJobStatus( allPassed ) {
+		await this.driver.sauceJobStatus( allPassed );
+	}
 }
+
+module.exports = { initializeEditorPage };
