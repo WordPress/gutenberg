@@ -11,10 +11,9 @@
 		{ "path": "../primitives" }
 	],
 	"include": [
-		"src/use-animate/**/*",
+		"src/animate/**/*",
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
-		// "src/navigation/**/*",
 		"src/tip/**/*",
 		"src/utils/**/*",
 		"src/visually-hidden/**/*"
