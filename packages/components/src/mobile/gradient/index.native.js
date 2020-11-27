@@ -17,7 +17,7 @@ import { useResizeObserver } from '@wordpress/compose';
 import styles from './style.scss';
 
 function getGradientAngle( gradientValue ) {
-	const matchAngle = /\(((\d+deg)|(to\s[^,]+))/g;
+	const matchAngle = /\(((\d+deg)|(to\s[^,]+))/;
 	const angle = matchAngle.exec( gradientValue )[ 1 ];
 	const angleBase = 45;
 
