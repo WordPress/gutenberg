@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEntityBlockEditor } from '@wordpress/core-data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
 import {
 	Placeholder,
 	Spinner,
@@ -90,11 +90,17 @@ export default function ReusableBlockEdit( {
 		}
 	}, recordArgs );
 
-	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+	const [ blocks, , onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_block',
 		{ id: ref }
 	);
+
+	// Local state used for temporary (newly-created, unsaved) reusable blocks
+	// and reusable blocks being edited. This state is used to make changes to
+	// the block without having to save them.
+	const [ localTitle, setLocalTitle ] = useState();
+	const [ localBlocks, setLocalBlocks ] = useState();
 
 	const blockProps = useBlockProps();
 
@@ -120,9 +126,9 @@ export default function ReusableBlockEdit( {
 
 	let element = (
 		<BlockEditorProvider
-			value={ blocks }
-			onInput={ onInput }
-			onChange={ onChange }
+			value={ isEditing ? localBlocks : blocks }
+			onInput={ setLocalBlocks }
+			onChange={ setLocalBlocks }
 			settings={ settings }
 		>
 			<WritingFlow>
@@ -151,17 +157,24 @@ export default function ReusableBlockEdit( {
 				{ ( isSelected || isEditing ) && (
 					<ReusableBlockEditPanel
 						isEditing={ isEditing }
-						title={ reusableBlock.title }
+						title={ isEditing ? localTitle : reusableBlock.title }
 						isSaving={ isSaving }
 						isEditDisabled={ ! canUserUpdate }
-						onEdit={ () => setIsEditing( true ) }
-						onChangeTitle={ ( title ) =>
-							editEntityRecord( ...recordArgs, { title } )
-						}
+						onEdit={ () => {
+							setLocalBlocks( blocks );
+							setLocalTitle( reusableBlock?.title );
+							setIsEditing( true );
+						} }
+						onChangeTitle={ setLocalTitle }
 						onSave={ () => {
+							onChange( localBlocks );
+							editEntityRecord( ...recordArgs, {
+								title: localTitle,
+							} );
 							save();
 							setIsEditing( false );
 						} }
+						onCancel={ () => setIsEditing( false ) }
 					/>
 				) }
 				{ element }

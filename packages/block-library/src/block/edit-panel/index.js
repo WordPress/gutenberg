@@ -5,6 +5,7 @@ import { Button } from '@wordpress/components';
 import { useInstanceId, usePrevious } from '@wordpress/compose';
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { ESCAPE } from '@wordpress/keycodes';
 
 /** @typedef {import('@wordpress/element').WPComponent} WPComponent */
 
@@ -43,6 +44,7 @@ export default function ReusableBlockEditPanel( {
 	isEditDisabled,
 	isEditing,
 	isSaving,
+	onCancel,
 	onChangeTitle,
 	onEdit,
 	onSave,
@@ -75,6 +77,12 @@ export default function ReusableBlockEditPanel( {
 
 	function handleTitleChange( event ) {
 		onChangeTitle( event.target.value );
+	}
+	function handleTitleKeyDown( event ) {
+		if ( event.keyCode === ESCAPE ) {
+			event.stopPropagation();
+			onCancel();
+		}
 	}
 
 	return (
@@ -111,6 +119,7 @@ export default function ReusableBlockEditPanel( {
 						className="reusable-block-edit-panel__title"
 						value={ title }
 						onChange={ handleTitleChange }
+						onKeyDown={ handleTitleKeyDown }
 						id={ `reusable-block-edit-panel__title-${ instanceId }` }
 					/>
 					<Button
