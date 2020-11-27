@@ -343,7 +343,6 @@ export default function SearchEdit( {
 					width: `${ width }${ widthUnit }`,
 				} }
 				className="wp-block-search__inside-wrapper"
-				isResetValueOnUnitChange
 				minWidth={ MIN_WIDTH }
 				enable={ getResizableSides() }
 				onResizeStart={ ( event, direction, elt ) => {

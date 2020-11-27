@@ -1,7 +1,6 @@
 .defaultButton {
 	border-radius: $border-width * 4;
 	padding: $block-spacing * 2;
-	border-width: $border-width;
 	margin-top: $grid-unit-20;
 	background-color: $button-fallback-bg;
 }
@@ -9,8 +8,10 @@
 .buttonText {
 	background-color: transparent;
 	color: $white;
-	font-size: 16;
 	padding: 0;
+	font-size: 16px;
+	padding-left: $grid-unit-20;
+	padding-right: $grid-unit-20;
 }
 
 .disabledButton {
@@ -49,4 +50,15 @@
 .uploadFailed {
 	padding: 0;
 	color: $alert-red;
+}
+
+.placeholderTextColor {
+	color: rgba($color: $white, $alpha: 0.43);
+}
+
+.placeholder {
+	font-family: $default-regular-font;
+	min-height: 22px;
+	font-size: 16px;
+	display: none;
 }
