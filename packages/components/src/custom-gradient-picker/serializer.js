@@ -13,7 +13,11 @@ export function serializeGradientColor( { type, value } ) {
 	return `${ type }(${ value.join( ',' ) })`;
 }
 
-export function serializeGradientPosition( { type, value } ) {
+export function serializeGradientPosition( position ) {
+	if ( ! position ) {
+		return '';
+	}
+	const { value, type } = position;
 	return `${ value }${ type }`;
 }
 
@@ -21,7 +25,7 @@ export function serializeGradientColorStop( { type, value, length } ) {
 	return `${ serializeGradientColor( {
 		type,
 		value,
-	} ) } ${ length ? serializeGradientPosition( length ) : '' }`;
+	} ) } ${ serializeGradientPosition( length ) }`;
 }
 
 export function serializeGradientOrientation( orientation ) {
