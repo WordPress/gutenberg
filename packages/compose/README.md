@@ -407,9 +407,9 @@ _Returns_
 
 <a name="useWarnOnChange" href="#useWarnOnChange">#</a> **useWarnOnChange**
 
-Hook that performs a shallow comparison between the preview value of an object
-and the new one, if there's a difference, it prints it to the console.
-this is useful in performance related work, to check why a component re-renders.
+Hook that performs a shallow comparison between the previous values of an object
+and the new ones. If there's a difference, it prints it to the console.
+This is useful in performance related work to understand why a component re-renders.
 
 _Usage_
 
@@ -423,8 +423,8 @@ function MyComponent(props) {
 
 _Parameters_
 
--   _object_ `Object`: Object which changes to compare.
--   _prefix_ `string`: Just a prefix to show when console logging.
+-   _object_ (unknown type): Object which changes to compare.
+-   _prefix_ `[string]`: Just a prefix to show when console logging.
 
 <a name="withGlobalEvents" href="#withGlobalEvents">#</a> **withGlobalEvents**
 
