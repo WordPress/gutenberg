@@ -17,6 +17,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
 	__experimentalLibrary as Library,
+	__unstableUseEditorStyles as useEditorStyles,
 } from '@wordpress/block-editor';
 import {
 	Button,
@@ -32,7 +33,7 @@ import {
 	FullscreenMode,
 	InterfaceSkeleton,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { close } from '@wordpress/icons';
 
 /**
@@ -66,7 +67,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-function Layout() {
+function Layout( { settings } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const {
@@ -163,6 +164,9 @@ function Layout() {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
+	const ref = useRef();
+
+	useEditorStyles( ref, settings.styles );
 
 	return (
 		<>
@@ -176,6 +180,7 @@ function Layout() {
 			<SettingsSidebar />
 			<FocusReturnProvider>
 				<InterfaceSkeleton
+					ref={ ref }
 					className={ className }
 					labels={ interfaceLabels }
 					header={
