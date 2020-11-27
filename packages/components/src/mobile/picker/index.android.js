@@ -65,13 +65,12 @@ export default class Picker extends Component {
 			>
 				<PanelBody title={ title } style={ styles.panelBody }>
 					{ options.map( ( option, index ) => (
-						<>
+						<View key={ index }>
 							{ options.length > 1 && option.separated && (
 								<Separator />
 							) }
 							<BottomSheet.Cell
 								icon={ option.icon }
-								key={ index }
 								leftAlign={ leftAlign }
 								label={ option.label }
 								separatorType={ 'none' }
@@ -81,7 +80,7 @@ export default class Picker extends Component {
 								disabled={ option.disabled }
 								style={ option.disabled && styles.disabled }
 							/>
-						</>
+						</View>
 					) ) }
 					{ ! hideCancelButton && (
 						<BottomSheet.Cell
