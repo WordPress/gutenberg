@@ -5,10 +5,17 @@ import { omit, without, mapValues, isObject } from 'lodash';
 import memize from 'memize';
 
 /**
+ * WordPress dependencies
+ */
+import { createStoreAtom } from '@wordpress/stan';
+
+/**
  * Internal dependencies
  */
 import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
+
+/** @typedef {import('./types').WPDataStore} WPDataStore */
 
 /**
  * @typedef {Object} WPDataRegistry An isolated orchestrator of store registrations.
@@ -47,6 +54,7 @@ import createCoreDataStore from './store';
  */
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
+	const storesAtoms = {};
 	let listeners = [];
 
 	/**
@@ -72,10 +80,16 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	};
 
 	/**
+	 * This is used to track the current atom resolver
+	 * and inject it into registry selectors.
+	 */
+	let currentAtomResolver;
+
+	/**
 	 * Calls a selector given the current state and extra arguments.
 	 *
-	 * @param {string|import('./types').WPDataStoreDefinition} storeNameOrDefinition Unique namespace identifier for the store
-	 *                                                                               or the store definition.
+	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
+	 *                                                   or the store definition.
 	 *
 	 * @return {*} The selector's returned value.
 	 */
@@ -83,12 +97,25 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		const storeName = isObject( storeNameOrDefinition )
 			? storeNameOrDefinition.name
 			: storeNameOrDefinition;
+
 		const store = stores[ storeName ];
 		if ( store ) {
+			// If it's not an atomic store subscribe to the store.
+			if (
+				! store.__internalIsAtomic &&
+				registry.__internalGetAtomResolver()
+			) {
+				registry.__internalGetAtomResolver()(
+					registry.__internalGetAtomForStore( storeName )
+				);
+			}
+
 			return store.getSelectors();
 		}
 
-		return parent && parent.select( storeName );
+		if ( parent ) {
+			return parent.select( storeName );
+		}
 	}
 
 	const getResolveSelectors = memize(
@@ -150,8 +177,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Returns the available actions for a part of the state.
 	 *
-	 * @param {string|import('./types').WPDataStoreDefinition} storeNameOrDefinition Unique namespace identifier for the store
-	 *                                                                               or the store definition.
+	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
+	 *                                                   or the store definition.
 	 *
 	 * @return {*} The action's returned value.
 	 */
@@ -199,16 +226,31 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			throw new TypeError( 'config.subscribe must be a function' );
 		}
 		stores[ key ] = config;
+		storesAtoms[ key ] = createStoreAtom(
+			config.subscribe,
+			() => null,
+			() => {},
+			{ id: key }
+		);
 		config.subscribe( globalListener );
 	}
 
 	/**
-	 * Registers a new store.
+	 * Registers a new store definition.
 	 *
-	 * @param {import('./types').WPDataStore} store Store definition.
+	 * @param {WPDataStore} store Store definition.
 	 */
 	function register( store ) {
 		registerGenericStore( store.name, store.instantiate( registry ) );
+	}
+
+	function __internalGetAtomForStore( key ) {
+		const atom = storesAtoms[ key ];
+		if ( atom ) {
+			return atom;
+		}
+
+		return parent.__internalGetAtomForStore( key );
 	}
 
 	let registry = {
@@ -221,6 +263,16 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		dispatch,
 		use,
 		register,
+		__internalGetAtomForStore,
+		__internalGetAtomResolver() {
+			return currentAtomResolver;
+		},
+		__internalSetAtomResolver( resolver ) {
+			if ( parent ) {
+				parent.__internalSetAtomResolver( resolver );
+			}
+			currentAtomResolver = resolver;
+		},
 	};
 
 	/**

@@ -95,12 +95,18 @@
 		height: auto;
 		min-height: $button-size;
 		text-align: left;
-		padding-top: $grid-unit-10;
-		padding-bottom: $grid-unit-10;
+		padding-left: $grid-unit-20;
+		padding-right: $grid-unit-20;
 		margin-bottom: $grid-unit-15;
+		color: inherit;
 	}
 }
 
+.edit-site-navigation-panel__template-item-title {
+	em {
+		margin-right: 1ch;
+	}
+}
 .edit-site-navigation-panel__template-item-description {
 	padding-top: $grid-unit-05;
 	font-size: 12px;

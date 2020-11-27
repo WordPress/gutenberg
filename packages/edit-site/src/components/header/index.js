@@ -23,14 +23,13 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
-import { getTemplateInfo } from '../../utils';
 
 export default function Header( { openEntitiesSavedStates } ) {
 	const {
 		deviceType,
+		entityTitle,
 		hasFixedToolbar,
 		template,
-		templatePart,
 		templateType,
 		isInserterOpen,
 	} = useSelect( ( select ) => {
@@ -43,20 +42,33 @@ export default function Header( { openEntitiesSavedStates } ) {
 			isInserterOpened,
 		} = select( 'core/edit-site' );
 		const { getEntityRecord } = select( 'core' );
+		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
+			'core/editor'
+		);
 
-		const templatePartId = getTemplatePartId();
-		const templateId = getTemplateId();
+		const _templateType = getTemplateType();
+		const _template = getEntityRecord(
+			'postType',
+			'wp_template',
+			getTemplateId()
+		);
+		const _templatePart = getEntityRecord(
+			'postType',
+			'wp_template_part',
+			getTemplatePartId()
+		);
+
+		const _entityTitle =
+			'wp_template' === _templateType
+				? getTemplateInfo( _template ).title
+				: _templatePart?.slug;
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
+			entityTitle: _entityTitle,
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
-			template: getEntityRecord( 'postType', 'wp_template', templateId ),
-			templatePart: getEntityRecord(
-				'postType',
-				'wp_template_part',
-				templatePartId
-			),
-			templateType: getTemplateType(),
+			template: _template,
+			templateType: _templateType,
 			isInserterOpen: isInserterOpened(),
 		};
 	}, [] );
@@ -69,11 +81,6 @@ export default function Header( { openEntitiesSavedStates } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const displayBlockToolbar =
 		! isLargeViewport || deviceType !== 'Desktop' || hasFixedToolbar;
-
-	let { title } = getTemplateInfo( template );
-	if ( 'wp_template_part' === templateType ) {
-		title = templatePart?.slug;
-	}
 
 	return (
 		<div className="edit-site-header">
@@ -109,22 +116,25 @@ export default function Header( { openEntitiesSavedStates } ) {
 			</div>
 
 			<div className="edit-site-header_center">
-				<DocumentActions
-					entityTitle={ title }
-					entityLabel={
-						templateType === 'wp_template'
-							? 'template'
-							: 'template part'
-					}
-				>
-					{ templateType === 'wp_template' &&
-						( ( { onClose } ) => (
+				{ 'wp_template' === templateType && (
+					<DocumentActions
+						entityTitle={ entityTitle }
+						entityLabel="template"
+					>
+						{ ( { onClose } ) => (
 							<TemplateDetails
 								template={ template }
 								onClose={ onClose }
 							/>
-						) ) }
-				</DocumentActions>
+						) }
+					</DocumentActions>
+				) }
+				{ 'wp_template_part' === templateType && (
+					<DocumentActions
+						entityTitle={ entityTitle }
+						entityLabel="template part"
+					/>
+				) }
 			</div>
 
 			<div className="edit-site-header_end">

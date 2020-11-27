@@ -216,6 +216,9 @@ const BlockActionsMenu = ( {
 			? __( 'Double tap to open Action Sheet with available options' )
 			: __( 'Double tap to open Bottom Sheet with available options' );
 
+	const getAnchor = () =>
+		anchorNodeRef ? findNodeHandle( anchorNodeRef ) : undefined;
+
 	return (
 		<>
 			<ToolbarButton
@@ -234,9 +237,7 @@ const BlockActionsMenu = ( {
 				disabledButtonIndices={ disabledButtonIndices }
 				hideCancelButton={ Platform.OS !== 'ios' }
 				leftAlign={ true }
-				anchor={
-					anchorNodeRef ? findNodeHandle( anchorNodeRef ) : undefined
-				}
+				getAnchor={ getAnchor }
 				// translators: %s: block title e.g: "Paragraph".
 				title={ sprintf( __( '%s block options' ), blockTitle ) }
 			/>

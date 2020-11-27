@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Autoformat TypeScript files (`*.ts` and `*.tsx`) in `format-js` script (#27138)[https://github.com/WordPress/gutenberg/pull/27138].
+
 ## 12.5.0 (2020-10-30)
 
 ### Enhancements
