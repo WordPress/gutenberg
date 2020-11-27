@@ -106,29 +106,21 @@ export const F10 = 121;
 
 /**
  * Keycode for ALT key.
- *
- * @type {WPModifierPart}
  */
 export const ALT = 'alt';
 
 /**
  * Keycode for CTRL key.
- *
- * @type {WPModifierPart}
  */
 export const CTRL = 'ctrl';
 
 /**
  * Keycode for COMMAND/META key.
- *
- * @type {WPModifierPart}
  */
 export const COMMAND = 'meta';
 
 /**
  * Keycode for SHIFT key.
- *
- * @type {WPModifierPart}
  */
 export const SHIFT = 'shift';
 
