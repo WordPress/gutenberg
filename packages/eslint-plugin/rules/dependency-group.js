@@ -1,7 +1,8 @@
 /** @typedef {import('estree').Comment} Comment */
 /** @typedef {import('estree').Node} Node */
 
-module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
+/** @type {import('eslint').Rule.RuleModule} */
+module.exports = {
 	meta: {
 		type: 'layout',
 		docs: {
@@ -254,4 +255,4 @@ module.exports = /** @type {import('eslint').Rule.RuleModule} */ ( {
 			},
 		};
 	},
-} );
+};
