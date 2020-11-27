@@ -9,6 +9,10 @@ import ReactDOM from 'react-dom';
  * Internal dependencies
  */
 import Tooltip from '../';
+/**
+ * WordPress dependencies
+ */
+import { TOOLTIP_DELAY } from '../index.js';
 
 describe( 'Tooltip', () => {
 	describe( '#render()', () => {
@@ -44,7 +48,8 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			wrapper.setState( { isOver: true } );
+			const event = { type: 'focus', currentTarget: {} };
+			wrapper.simulate( 'focus', event );
 
 			const button = wrapper.find( 'button' );
 			const popover = wrapper.find( 'Popover' );
@@ -76,7 +81,6 @@ describe( 'Tooltip', () => {
 
 			const popover = wrapper.find( 'Popover' );
 			expect( originalFocus ).toHaveBeenCalledWith( event );
-			expect( wrapper.state( 'isOver' ) ).toBe( true );
 			expect( popover ).toHaveLength( 1 );
 		} );
 
@@ -110,7 +114,6 @@ describe( 'Tooltip', () => {
 			button.simulate( event.type, event );
 
 			const popover = wrapper.find( 'Popover' );
-			expect( wrapper.state( 'isOver' ) ).toBe( false );
 			expect( popover ).toHaveLength( 0 );
 
 			event = new window.MouseEvent( 'mouseup' );
@@ -135,15 +138,14 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const button = TestUtils.findRenderedDOMComponentWithTag(
-				wrapper,
-				'button'
-			);
+			const button = wrapper.find( 'button' );
+
 			// eslint-disable-next-line react/no-find-dom-node
 			TestUtils.Simulate.mouseEnter( ReactDOM.findDOMNode( button ) );
 
+			const popover = wrapper.find( 'Popover' );
+			expect( popover ).toHaveLength( 0 );
 			expect( originalMouseEnter ).toHaveBeenCalledTimes( 1 );
-			expect( wrapper.state.isOver ).toBe( false );
 			expect(
 				TestUtils.scryRenderedDOMComponentsWithClass(
 					wrapper,
@@ -152,9 +154,9 @@ describe( 'Tooltip', () => {
 			).toHaveLength( 0 );
 
 			// Force delayedSetIsOver to be called
-			wrapper.delayedSetIsOver.flush();
+			jest.advanceTimersByTime( TOOLTIP_DELAY );
 
-			expect( wrapper.state.isOver ).toBe( true );
+			expect( popover ).toHaveLength( 1 );
 			expect(
 				TestUtils.scryRenderedDOMComponentsWithClass(
 					wrapper,
@@ -190,7 +192,6 @@ describe( 'Tooltip', () => {
 
 			const popover = wrapper.find( 'Popover' );
 			wrapper.instance().delayedSetIsOver.flush();
-			expect( wrapper.state( 'isOver' ) ).toBe( false );
 			expect( popover ).toHaveLength( 0 );
 		} );
 
@@ -212,11 +213,9 @@ describe( 'Tooltip', () => {
 			const button = wrapper.find( 'button' );
 			button.simulate( 'mouseenter' );
 			button.simulate( 'mouseleave' );
-
-			wrapper.instance().delayedSetIsOver.flush();
+			jest.advanceTimersByTime( TOOLTIP_DELAY );
 
 			const popover = wrapper.find( 'Popover' );
-			expect( wrapper.state( 'isOver' ) ).toBe( false );
 			expect( popover ).toHaveLength( 0 );
 		} );
 	} );

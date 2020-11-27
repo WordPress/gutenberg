@@ -25,7 +25,7 @@ import Shortcut from '../shortcut';
  *
  * @type {number}
  */
-const TOOLTIP_DELAY = 700;
+export const TOOLTIP_DELAY = 700;
 
 const emitToChild = ( children, eventName, event ) => {
 	if ( Children.count( children ) !== 1 ) {
