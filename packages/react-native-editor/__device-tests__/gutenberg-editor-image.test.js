@@ -44,7 +44,11 @@ describe( 'Gutenberg Editor Image Block tests @canary', () => {
 
 		// skip HTML check for Android since we couldn't add image from media library
 		if ( ! isAndroid() ) {
-			await editorPage.verifyHtmlContent( testData.imageShorteHtml );
+			const html = await editorPage.getHtmlContent();
+
+			expect( testData.imageShorteHtml.toLowerCase() ).toBe(
+				html.toLowerCase()
+			);
 		}
 	} );
 } );

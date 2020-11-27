@@ -29,6 +29,9 @@ describe( 'Gutenberg Editor tests for List block (end)', () => {
 		// send an Enter
 		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
 
-		await editorPage.verifyHtmlContent( testData.listEndedHtml );
+		const html = await editorPage.getHtmlContent();
+		expect( testData.listEndedHtml.toLowerCase() ).toBe(
+			html.toLowerCase()
+		);
 	} );
 } );

@@ -49,6 +49,9 @@ describe( 'Gutenberg Editor tests', () => {
 		);
 		await toggleOrientation( editorPage.driver );
 
-		await editorPage.verifyHtmlContent( testData.deviceRotationHtml );
+		const html = await editorPage.getHtmlContent();
+		expect( testData.deviceRotationHtml.toLowerCase() ).toBe(
+			html.toLowerCase()
+		);
 	} );
 } );

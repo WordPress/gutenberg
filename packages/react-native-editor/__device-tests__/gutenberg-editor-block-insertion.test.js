@@ -33,7 +33,11 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await paragraphBlockElement.click();
 		await editorPage.sendTextToParagraphBlock( 3, testData.mediumText );
 
-		await editorPage.verifyHtmlContent( testData.blockInsertionHtml );
+		const html = await editorPage.getHtmlContent();
+
+		expect( testData.blockInsertionHtml.toLowerCase() ).toBe(
+			html.toLowerCase()
+		);
 
 		// wait for the block editor to load and for accessibility ids to update
 		await editorPage.driver.sleep( 3000 );
@@ -112,8 +116,10 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await clickMiddleOfElement( editorPage.driver, paragraphBlockElement );
 		await editorPage.sendTextToParagraphBlock( 1, testData.mediumText );
 		await paragraphBlockElement.click();
-		await editorPage.verifyHtmlContent(
-			testData.blockInsertionHtmlFromTitle
+		const html = await editorPage.getHtmlContent();
+
+		expect( testData.blockInsertionHtmlFromTitle.toLowerCase() ).toBe(
+			html.toLowerCase()
 		);
 	} );
 } );

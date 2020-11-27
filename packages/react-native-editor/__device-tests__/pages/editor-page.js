@@ -137,16 +137,16 @@ class EditorPage {
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
-	// Converts to lower case and checks for a match to lowercased html content
+	// Returns html content
 	// Ensure to take additional steps to handle text being changed by auto correct
-	async verifyHtmlContent( html ) {
+	async getHtmlContent() {
 		await toggleHtmlMode( this.driver, true );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
 		const text = await htmlContentView.text();
-		expect( text.toLowerCase() ).toBe( html.toLowerCase() );
 
 		await toggleHtmlMode( this.driver, false );
+		return text;
 	}
 
 	// set html editor content explicitly

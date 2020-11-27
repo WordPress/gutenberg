@@ -114,6 +114,9 @@ describe( 'Gutenberg Editor paste tests', () => {
 		await tapPasteAboveElement( editorPage.driver, textViewElement2 );
 
 		// check styled text by verifying html contents
-		await editorPage.verifyHtmlContent( testData.pasteHtmlTextResult );
+		const html = await editorPage.getHtmlContent();
+		expect( testData.pasteHtmlTextResult.toLowerCase() ).toBe(
+			html.toLowerCase()
+		);
 	} );
 } );
