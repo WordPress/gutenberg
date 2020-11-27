@@ -53,6 +53,7 @@ module.exports = {
 				allowedTextDomain: 'default',
 			},
 		],
+		'@wordpress/no-unsafe-wp-apis': 'off',
 		'no-restricted-syntax': [
 			'error',
 			// NOTE: We can't include the forward slash in our regex or
