@@ -11,5 +11,5 @@
 		{ "path": "../keycodes" },
 		{ "path": "../priority-queue" }
 	],
-	"include": [ "src/**/*" ]
+	"include": [ "src/hooks/**/*" ]
 }

@@ -7,9 +7,11 @@ import { createQueue } from '@wordpress/priority-queue';
 /**
  * Returns the first items from list that are present on state.
  *
- * @param {Array} list  New array.
- * @param {Array} state Current state.
- * @return {Array} First items present iin state.
+ * @template T
+ *
+ * @param {T[]} list  New array.
+ * @param {T[]} state Current state.
+ * @return {T[]} First items present iin state.
  */
 function getFirstItemsPresentInState( list, state ) {
 	const firstItems = [];
@@ -27,12 +29,19 @@ function getFirstItemsPresentInState( list, state ) {
 }
 
 /**
+ * @template T
+ *
+ * @typedef {{type:'reset', list: T[]}|{type:'append', item:T}} Action
+ */
+/**
  * Reducer keeping track of a list of appended items.
  *
- * @param {Array}  state  Current state
- * @param {Object} action Action
+ * @template T
  *
- * @return {Array} update state.
+ * @param {T[]}  state  Current state
+ * @param {Action<T>} action Action
+ *
+ * @return {T[]} update state.
  */
 function listReducer( state, action ) {
 	if ( action.type === 'reset' ) {
@@ -50,8 +59,10 @@ function listReducer( state, action ) {
  * React hook returns an array which items get asynchronously appended from a source array.
  * This behavior is useful if we want to render a list of items asynchronously for performance reasons.
  *
- * @param {Array} list Source array.
- * @return {Array} Async array.
+ * @template T
+ *
+ * @param {T[]} list Source array.
+ * @return {T[]} Async array.
  */
 function useAsyncList( list ) {
 	const [ current, dispatch ] = useReducer( listReducer, [] );
@@ -64,6 +75,7 @@ function useAsyncList( list ) {
 			list: firstItems,
 		} );
 		const asyncQueue = createQueue();
+		/** @param {number} index */
 		const append = ( index ) => () => {
 			if ( list.length <= index ) {
 				return;
@@ -76,7 +88,22 @@ function useAsyncList( list ) {
 		return () => asyncQueue.reset();
 	}, [ list ] );
 
-	return current;
+	/* eslint-disable jsdoc/valid-types */
+	return /** @type T[] */ ( current );
+	/* eslint-enable jsdoc/valid-types */
 }
 
 export default useAsyncList;
+
+/**
+ * @template R
+ * @typedef {import('react').ReducerState<R>} ReducerState
+ */
+/**
+ * @template R
+ * @typedef {import('react').ReducerAction<R>} ReducerAction
+ */
+/**
+ * @template D
+ * @typedef {import('react').Dispatch<D>} Dispatch
+ */
