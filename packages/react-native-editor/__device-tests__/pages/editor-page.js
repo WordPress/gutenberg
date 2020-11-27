@@ -553,4 +553,19 @@ class EditorPage {
 	}
 }
 
-module.exports = { initializeEditorPage };
+const blockNames = {
+	paragraph: 'Paragraph',
+	gallery: 'Gallery',
+	columns: 'Columns',
+	cover: 'Cover',
+	heading: 'Heading',
+	image: 'Image',
+	latestPosts: 'Latest Posts',
+	list: 'List',
+	more: 'More',
+	separator: 'Separator',
+	spacer: 'Spacer',
+	verse: 'Verse',
+};
+
+module.exports = { initializeEditorPage, blockNames };
