@@ -289,10 +289,10 @@ describe( 'TimePicker', () => {
 		const hoursInput = screen.getByLabelText( 'Hours' ).value;
 		const minutesInput = screen.getByLabelText( 'Minutes' ).value;
 
-		expect( isNaN( monthInput ) ).toBe( false );
-		expect( isNaN( dayInput ) ).toBe( false );
-		expect( isNaN( yearInput ) ).toBe( false );
-		expect( isNaN( hoursInput ) ).toBe( false );
-		expect( isNaN( minutesInput ) ).toBe( false );
+		expect( Number.isNaN( parseInt( monthInput, 10 ) ) ).toBe( false );
+		expect( Number.isNaN( parseInt( dayInput, 10 ) ) ).toBe( false );
+		expect( Number.isNaN( parseInt( yearInput, 10 ) ) ).toBe( false );
+		expect( Number.isNaN( parseInt( hoursInput, 10 ) ) ).toBe( false );
+		expect( Number.isNaN( parseInt( minutesInput, 10 ) ) ).toBe( false );
 	} );
 } );
