@@ -144,20 +144,13 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 	);
 	$templates      = $template_query->get_posts();
 
-	// Order these templates per slug priority.
-	// Build map of template slugs to their priority in the current hierarchy.
-	$slug_priorities = array_flip( $slugs );
-
-	usort(
-		$templates,
-		function ( $template_a, $template_b ) use ( $slug_priorities ) {
-			$priority_a = $slug_priorities[ $template_a->post_name ] * 2 + ( 'publish' === $template_a->post_status ? 1 : 0 );
-			$priority_b = $slug_priorities[ $template_b->post_name ] * 2 + ( 'publish' === $template_b->post_status ? 1 : 0 );
-			return $priority_a - $priority_b;
+	foreach ( $slugs as $slug ) {
+		foreach ( $templates as $template ) {
+			if ( $template->post_name === $slug ) {
+				return $template;
+			}
 		}
-	);
-
-	return count( $templates ) ? $templates[0] : null;
+	}
 }
 
 /**
