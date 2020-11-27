@@ -18,7 +18,8 @@
 
 	.alignleft,
 	.alignright,
-	.aligncenter {
+	.aligncenter,
+	&.is-resized {
 		display: table;
 
 		> figcaption {

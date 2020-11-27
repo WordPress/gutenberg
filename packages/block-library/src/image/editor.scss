@@ -52,6 +52,16 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
+// Overrides styling from style.scss to avoid centering
+// when there has been no alignment set.
+.wp-block-image.is-resized {
+	display: block;
+
+	> figcaption {
+		display: block;
+	}
+}
+
 .wp-block[data-align="left"],
 .wp-block[data-align="center"],
 .wp-block[data-align="right"] {
