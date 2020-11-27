@@ -16,13 +16,13 @@
 		}
 	}
 
-	&.block-editor-block-list__block::after,
-	&.block-editor-block-list__block:not([contenteditable]):focus::after {
-		top: -1px;
-		right: -1px;
-		bottom: -1px;
-		left: -1px;
-	}
+	// &.block-editor-block-list__block::after,
+	// &.block-editor-block-list__block:not([contenteditable]):focus::after {
+	// 	top: -1px;
+	// 	right: -1px;
+	// 	bottom: -1px;
+	// 	left: -1px;
+	// }
 }
 
 figure.wp-block-gallery {
@@ -46,12 +46,25 @@ figure.wp-block-gallery {
 	}
 
 	figure.is-selected {
-		box-shadow: 0 0 0 $border-width $white, 0 0 0 3px var(--wp-admin-theme-color);
+		
 		border-radius: $radius-block-ui;
-		outline: 2px solid transparent;
+		position: relative;
 
 		img {
 			border-radius: $radius-block-ui;
+		}
+
+		&::before {
+			border-radius: $radius-block-ui;
+			bottom: 0;
+			box-shadow: 0 0 0 $border-width $white inset, 0 0 0 3px var(--wp-admin-theme-color) inset;
+			content: "";
+			left: 0;
+			outline: 2px solid transparent;
+			position: absolute;
+			right: 0;
+			top: 0;
+			z-index: 1;
 		}
 	}
 
