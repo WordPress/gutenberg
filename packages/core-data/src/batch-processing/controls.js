@@ -6,7 +6,20 @@ import { createRegistryControl } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { STORE_NAME, STATE_ERROR } from './constants';
+import { STORE_NAME, STATE_ERROR, DEFAULT_BATCH_SIZE } from './constants';
+
+/**
+ * Finds a batch size for a given queue.
+ *
+ * @param {string} queue Queue name.
+ * @return {Object} control descriptor.
+ */
+export function getBatchSize( queue ) {
+	return {
+		type: 'GET_BATCH_SIZE',
+		queue,
+	};
+}
 
 /**
  * Calls a selector using chosen registry.
@@ -65,6 +78,15 @@ const controls = {
 	DISPATCH: createRegistryControl(
 		( registry ) => ( { actionName, args } ) => {
 			return registry.dispatch( STORE_NAME )[ actionName ]( ...args );
+		}
+	),
+
+	GET_BATCH_SIZE: createRegistryControl(
+		( registry ) => async ( { queue } ) => {
+			const callback = registry
+				.select( STORE_NAME )
+				.getBatchSizeCallback( queue );
+			return callback ? await callback() : DEFAULT_BATCH_SIZE;
 		}
 	),
 

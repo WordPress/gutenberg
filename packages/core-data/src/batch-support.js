@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { memoize } from 'lodash/function';
+
+/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
@@ -57,10 +62,19 @@ async function batchProcessor( requests, transaction ) {
 	return response.responses.map( ( { body } ) => body );
 }
 
+const determineBatchSize = memoize( async () => {
+	const response = await apiFetch( {
+		path: '/v1/batch',
+		method: 'OPTIONS',
+	} );
+	return response.endpoints[ 0 ].args.requests.maxItems;
+} );
+
 // Ensure batch-processing store is available for dispatching
 setTimeout( () => {
 	dispatch( 'core/__experimental-batch-processing' ).registerProcessor(
 		'API_FETCH',
-		batchProcessor
+		batchProcessor,
+		determineBatchSize
 	);
 } );

@@ -7,7 +7,6 @@ import { omit } from 'lodash';
  * Internal dependencies
  */
 import {
-	BATCH_MAX_SIZE,
 	STATE_NEW,
 	STATE_IN_PROGRESS,
 	STATE_SUCCESS,
@@ -43,7 +42,7 @@ export default function reducer( state = defaultState, action ) {
 		}
 
 		case 'PREPARE_BATCH_FOR_PROCESSING': {
-			const { queue, context, batchId, meta } = action;
+			const { queue, context, batchId, batchSize, meta } = action;
 
 			if ( batchId in state.batches ) {
 				throw new Error( `Batch ${ batchId } already exists` );
@@ -59,7 +58,7 @@ export default function reducer( state = defaultState, action ) {
 				transactions[ transactionId ] = {
 					number: transactionNb,
 					id: transactionId,
-					items: enqueuedItems.splice( 0, BATCH_MAX_SIZE ),
+					items: enqueuedItems.splice( 0, batchSize ),
 				};
 				++transactionNb;
 			}
@@ -208,13 +207,13 @@ export default function reducer( state = defaultState, action ) {
 		}
 
 		case 'REGISTER_PROCESSOR':
-			const { queue, callback } = action;
+			const { queue, callback, batchSizeCallback } = action;
 
 			return {
 				...state,
 				processors: {
 					...state.processors,
-					[ queue ]: callback,
+					[ queue ]: { callback, batchSizeCallback },
 				},
 			};
 	}

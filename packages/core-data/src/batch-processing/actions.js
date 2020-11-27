@@ -9,6 +9,7 @@ import { v4 as uuid } from 'uuid';
 import {
 	select,
 	dispatch,
+	getBatchSize,
 	enqueueItemAndAutocommit as enqueueAutocommitControl,
 	processTransaction,
 } from './controls';
@@ -85,7 +86,8 @@ export const processBatch = function* (
 	meta = {}
 ) {
 	const batchId = uuid();
-	yield prepareBatchForProcessing( queue, context, batchId, meta );
+	const batchSize = yield getBatchSize(queue);
+	yield prepareBatchForProcessing( queue, context, batchId, batchSize, meta );
 	const { transactions } = yield select( 'getBatch', batchId );
 
 	yield {
@@ -166,6 +168,7 @@ export function prepareBatchForProcessing(
 	queue,
 	context = 'default',
 	batchId,
+	batchSize,
 	meta = {}
 ) {
 	return {
@@ -173,14 +176,20 @@ export function prepareBatchForProcessing(
 		queue,
 		context,
 		batchId,
+		batchSize,
 		meta,
 	};
 }
 
-export const registerProcessor = function ( queue, callback ) {
+export const registerProcessor = function (
+	queue,
+	callback,
+	batchSizeCallback
+) {
 	return {
 		type: 'REGISTER_PROCESSOR',
 		queue,
 		callback,
+		batchSizeCallback,
 	};
 };

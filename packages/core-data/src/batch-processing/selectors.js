@@ -3,7 +3,11 @@ export const getBatch = ( state, batchId ) => {
 };
 
 export const getProcessor = ( state, queue ) => {
-	return state.processors[ queue ];
+	return state.processors[ queue ].callback;
+};
+
+export const getBatchSizeCallback = ( state, queue ) => {
+	return state.processors[ queue ].batchSizeCallback;
 };
 
 export const getPromise = ( state, queue, context = 'default' ) => {
