@@ -9,15 +9,9 @@ import { createContext, useContext } from '@wordpress/element';
 import useMediaQuery from '../use-media-query';
 
 /**
- * @typedef {"huge"|"wide"|"large"|"medium"|"small"|"mobile"} WPBreakpoint
- */
-
-/**
  * Hash of breakpoint names with pixel width at which it becomes effective.
  *
  * @see _breakpoints.scss
- *
- * @type {Object<WPBreakpoint,number>}
  */
 const BREAKPOINTS = {
 	huge: 1440,
@@ -29,13 +23,7 @@ const BREAKPOINTS = {
 };
 
 /**
- * @typedef {">="|"<"} WPViewportOperator
- */
-
-/**
  * Object mapping media query operators to the condition to be used.
- *
- * @type {Object<WPViewportOperator,string>}
  */
 const CONDITIONS = {
 	'>=': 'min-width',
@@ -43,16 +31,23 @@ const CONDITIONS = {
 };
 
 /**
+ * @typedef {keyof BREAKPOINTS} WPBreakpoint
+ * @typedef {keyof CONDITIONS} WPViewportOperator
+ */
+
+/**
  * Object mapping media query operators to a function that given a breakpointValue and a width evaluates if the operator matches the values.
  *
- * @type {Object<WPViewportOperator,Function>}
+ * @type {Record<WPViewportOperator, (breakpointValue: number, width: number) => boolean>}
  */
 const OPERATOR_EVALUATORS = {
 	'>=': ( breakpointValue, width ) => width >= breakpointValue,
 	'<': ( breakpointValue, width ) => width < breakpointValue,
 };
 
-const ViewportMatchWidthContext = createContext( null );
+const ViewportMatchWidthContext = createContext(
+	/** @type {number | null} */ ( null )
+);
 
 /**
  * Returns true if the viewport matches the given query, or false otherwise.
@@ -71,10 +66,14 @@ const ViewportMatchWidthContext = createContext( null );
  */
 const useViewportMatch = ( breakpoint, operator = '>=' ) => {
 	const simulatedWidth = useContext( ViewportMatchWidthContext );
+
 	const mediaQuery =
-		! simulatedWidth &&
-		`(${ CONDITIONS[ operator ] }: ${ BREAKPOINTS[ breakpoint ] }px)`;
+		null === simulatedWidth
+			? undefined
+			: `(${ CONDITIONS[ operator ] }: ${ BREAKPOINTS[ breakpoint ] }px)`;
+
 	const mediaQueryResult = useMediaQuery( mediaQuery );
+
 	if ( simulatedWidth ) {
 		return OPERATOR_EVALUATORS[ operator ](
 			BREAKPOINTS[ breakpoint ],

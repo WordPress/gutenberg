@@ -381,13 +381,9 @@ be returned and any scheduled calls cancelled if any of the arguments change,
 including the function to throttle, so please wrap functions created on
 render in components in `useCallback`.
 
-_Parameters_
+_Type_
 
--   _args_ `...any`: Arguments passed to Lodash's `throttle`.
-
-_Returns_
-
--   `Function`: Throttled function.
+-   (unknown type) 
 
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
