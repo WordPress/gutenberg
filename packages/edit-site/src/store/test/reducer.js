@@ -173,7 +173,7 @@ describe( 'state', () => {
 
 	describe( 'page()', () => {
 		it( 'should apply default state', () => {
-			expect( page( undefined, {} ) ).toEqual( {} );
+			expect( page( undefined, {} ) ).toEqual( undefined );
 		} );
 
 		it( 'should default to returning the same state', () => {

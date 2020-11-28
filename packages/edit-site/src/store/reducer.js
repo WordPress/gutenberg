@@ -136,12 +136,12 @@ export function templateType( state = 'wp_template', action ) {
  *
  * @return {Object} Updated state.
  */
-export function page( state = {}, action ) {
+export function page( state, action ) {
 	switch ( action.type ) {
 		case 'SET_PAGE':
 			return action.page;
 		case 'SET_TEMPLATE_PART':
-			return {};
+			return undefined;
 	}
 
 	return state;
