@@ -104,6 +104,7 @@
 		"@types/estree": "0.0.44",
 		"@types/highlight-words-core": "1.2.0",
 		"@types/lodash": "4.14.149",
+		"@types/mousetrap": "1.6.4",
 		"@types/npm-package-arg": "6.1.0",
 		"@types/prettier": "1.19.0",
 		"@types/qs": "6.9.1",
