@@ -139,12 +139,7 @@ export function templateType( state = 'wp_template', action ) {
 export function page( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SET_PAGE':
-			return { contentInfo: action.page, templateId: action.templateId };
-		case 'SET_TEMPLATE':
-			if ( action.templateId === state.templateId ) {
-				return state;
-			}
-			return {};
+			return action.page;
 		case 'SET_TEMPLATE_PART':
 			return {};
 	}

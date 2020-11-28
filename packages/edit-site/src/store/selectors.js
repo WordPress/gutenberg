@@ -135,7 +135,7 @@ export function getTemplateType( state ) {
  * @return {Object} Page.
  */
 export function getPage( state ) {
-	return state.page.contentInfo;
+	return state.page;
 }
 
 /**

@@ -163,9 +163,9 @@ function Editor() {
 	const blockContext = useMemo(
 		() => ( {
 			...page?.context,
-			query: page?.context.query || { categoryIds: [], tagIds: [] },
+			query: page?.context?.query || { categoryIds: [], tagIds: [] },
 			queryContext: [
-				page?.context.queryContext || { page: 1 },
+				page?.context?.queryContext || { page: 1 },
 				( newQueryContext ) =>
 					setPage( {
 						...page,

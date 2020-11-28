@@ -187,7 +187,7 @@ describe( 'state', () => {
 				page( undefined, {
 					type: 'SET_PAGE',
 					page: newPage,
-				} ).contentInfo
+				} )
 			).toBe( newPage );
 		} );
 	} );
