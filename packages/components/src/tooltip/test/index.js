@@ -199,10 +199,10 @@ describe( 'Tooltip', () => {
 			const button = wrapper.find( 'button' );
 			button.simulate( 'mouseenter' );
 
-			jest.advanceTimersByTime( TOOLTIP_DELAY );
-
-			const popover = wrapper.find( 'Popover' );
-			expect( popover ).toHaveLength( 0 );
+			setTimeout( () => {
+				const popover = wrapper.find( 'Popover' );
+				expect( popover ).toHaveLength( 0 );
+			}, TOOLTIP_DELAY );
 		} );
 	} );
 } );
