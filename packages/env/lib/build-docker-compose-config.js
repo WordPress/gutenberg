@@ -176,6 +176,7 @@ module.exports = function buildDockerComposeConfig( config ) {
 				volumes: [ 'mysql:/var/lib/mysql' ],
 			},
 			wordpress: {
+				build: '.',
 				depends_on: [ 'mysql' ],
 				image: developmentWpImage,
 				ports: [ developmentPorts ],

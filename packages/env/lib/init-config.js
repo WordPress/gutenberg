@@ -38,6 +38,15 @@ module.exports = async function initConfig( { spinner, debug } ) {
 		yaml.dump( dockerComposeConfig )
 	);
 
+	const xDebugMode = 'debug';
+	await fs.writeFile(
+		path.resolve( config.workDirectoryPath, 'Dockerfile' ),
+		dockerFileContents(
+			dockerComposeConfig.services.wordpress.image,
+			xDebugMode
+		)
+	);
+
 	if ( config.debug ) {
 		spinner.info(
 			`Config:\n${ JSON.stringify(
@@ -55,3 +64,18 @@ module.exports = async function initConfig( { spinner, debug } ) {
 
 	return config;
 };
+
+function dockerFileContents( image, xDebugMode ) {
+	return `
+FROM ${ image }
+
+RUN apt -qy install $PHPIZE_DEPS \\
+	&& pecl install xdebug \\
+	&& docker-php-ext-enable xdebug
+
+RUN touch /usr/local/etc/php/php.ini
+RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
+RUN echo 'xdebug.discover_client_host=1' >> /usr/local/etc/php/php.ini
+RUN echo 'xdebug.mode=${ xDebugMode }' >> /usr/local/etc/php/php.ini
+`;
+}
