@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useMemo,
+	useCallback,
+	useRef,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
@@ -15,7 +21,7 @@ import {
 	BlockContextProvider,
 	BlockSelectionClearer,
 	BlockBreadcrumb,
-	__unstableEditorStyles as EditorStyles,
+	__unstableUseEditorStyles as useEditorStyles,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
@@ -134,22 +140,15 @@ function Editor() {
 				const {
 					__experimentalGetTemplateInfo: getTemplateInfo,
 				} = select( 'core/editor' );
-				entitiesToSave.forEach( ( { kind, name, key } ) => {
+				entitiesToSave.forEach( ( { kind, name, key, title } ) => {
 					const record = getEditedEntityRecord( kind, name, key );
-
-					if ( 'postType' === kind && name === 'wp_template' ) {
-						const { title } = getTemplateInfo( record );
-						return editEntityRecord( kind, name, key, {
-							status: 'publish',
-							title,
-						} );
+					if ( kind === 'postType' && name === 'wp_template' ) {
+						( { title } = getTemplateInfo( record ) );
 					}
-
-					const edits = record.slug
-						? { status: 'publish', title: record.slug }
-						: { status: 'publish' };
-
-					editEntityRecord( kind, name, key, edits );
+					editEntityRecord( kind, name, key, {
+						status: 'publish',
+						title: title || record.slug,
+					} );
 				} );
 			}
 			setIsEntitiesSavedStatesOpen( false );
@@ -191,10 +190,12 @@ function Editor() {
 	}, [ isNavigationOpen ] );
 
 	const isMobile = useViewportMatch( 'medium', '<' );
+	const ref = useRef();
+
+	useEditorStyles( ref, settings.styles );
 
 	return (
 		<>
-			<EditorStyles styles={ settings.styles } />
 			<FullscreenMode isActive={ isFullscreenActive } />
 			<UnsavedChangesWarning />
 			<SlotFillProvider>
@@ -235,6 +236,7 @@ function Editor() {
 												<KeyboardShortcuts.Register />
 												<SidebarComplementaryAreaFills />
 												<InterfaceSkeleton
+													ref={ ref }
 													labels={ interfaceLabels }
 													drawer={
 														<NavigationSidebar />

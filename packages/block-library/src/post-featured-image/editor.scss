@@ -1,4 +1,12 @@
 div[data-type="core/post-featured-image"] {
+	img {
+		max-width: 100%;
+		height: auto;
+		display: block;
+	}
+}
+
+.editor-styles-wrapper {
 	.post-featured-image_placeholder {
 		display: flex;
 		flex-direction: row;
@@ -15,10 +23,5 @@ div[data-type="core/post-featured-image"] {
 			font-size: $default-font-size;
 			margin: 0;
 		}
-	}
-	img {
-		max-width: 100%;
-		height: auto;
-		display: block;
 	}
 }
