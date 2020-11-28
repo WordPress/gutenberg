@@ -148,6 +148,28 @@ describe( 'block serializer', () => {
 
 			expect( attributes ).toEqual( { fruit: 'bananas' } );
 		} );
+
+		it( 'should skip attributes of type "object" whose values are equal to the default value of the attribute', () => {
+			const attributes = getCommentAttributes(
+				{
+					attributes: {
+						fruit: {
+							type: 'string',
+						},
+						ripeness: {
+							type: 'object',
+							default: {},
+						},
+					},
+				},
+				{
+					fruit: 'apples',
+					ripeness: {},
+				}
+			);
+
+			expect( attributes ).toEqual( { fruit: 'apples' } );
+		} );
 	} );
 
 	describe( 'serializeAttributes()', () => {

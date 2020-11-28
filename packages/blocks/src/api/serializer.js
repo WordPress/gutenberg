@@ -1,7 +1,14 @@
 /**
  * External dependencies
  */
-import { isEmpty, reduce, isObject, castArray, startsWith } from 'lodash';
+import {
+	isEmpty,
+	reduce,
+	isObject,
+	castArray,
+	startsWith,
+	isEqual,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -219,7 +226,7 @@ export function getCommentAttributes( blockType, attributes ) {
 			// Ignore default value.
 			if (
 				'default' in attributeSchema &&
-				attributeSchema.default === value
+				isEqual( attributeSchema.default, value )
 			) {
 				return accumulator;
 			}
