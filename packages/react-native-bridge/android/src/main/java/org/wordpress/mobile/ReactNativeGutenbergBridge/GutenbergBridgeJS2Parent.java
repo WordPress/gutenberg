@@ -83,6 +83,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         VIDEO("video"),
         MEDIA("media"),
         AUDIO("audio"),
+        ANY("any"),
         OTHER("other");
 
         String name;

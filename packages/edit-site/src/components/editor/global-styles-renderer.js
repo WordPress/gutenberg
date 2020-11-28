@@ -4,11 +4,6 @@
 import { get, kebabCase, reduce, startsWith } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
 import {
@@ -31,151 +26,159 @@ function compileStyleValue( uncompiledValue ) {
 	return uncompiledValue;
 }
 
-export default ( blockData, tree ) => {
-	const styles = [];
-	// Can this be converted to a context, as the global context?
-	// See comment in the server.
-	styles.push( LINK_COLOR_DECLARATION );
+/**
+ * Transform given preset tree into a set of style declarations.
+ *
+ * @param {Object} blockPresets
+ *
+ * @return {Array} An array of style declarations.
+ */
+function getBlockPresetsDeclarations( blockPresets = {} ) {
+	return reduce(
+		PRESET_CATEGORIES,
+		( declarations, { path, key }, category ) => {
+			const preset = get( blockPresets, path, [] );
+			preset.forEach( ( value ) => {
+				declarations.push(
+					`--wp--preset--${ kebabCase( category ) }--${
+						value.slug
+					}: ${ value[ key ] }`
+				);
+			} );
+			return declarations;
+		},
+		[]
+	);
+}
 
-	/**
-	 * Transform given style tree into a set of style declarations.
-	 *
-	 * @param {Object} blockSupports What styles the block supports.
-	 * @param {Object} blockStyles Block styles.
-	 *
-	 * @return {Array} An array of style declarations.
-	 */
-	const getBlockStylesDeclarations = ( blockSupports, blockStyles = {} ) => {
-		const declarations = [];
-		Object.keys( STYLE_PROPERTY ).forEach( ( key ) => {
+/**
+ * Transform given preset tree into a set of preset class declarations.
+ *
+ * @param {string} blockSelector
+ * @param {Object} blockPresets
+ * @return {string} CSS declarations for the preset classes.
+ */
+function getBlockPresetClasses( blockSelector, blockPresets = {} ) {
+	return reduce(
+		PRESET_CLASSES,
+		( declarations, { path, key, property }, classSuffix ) => {
+			const presets = get( blockPresets, path, [] );
+			presets.forEach( ( preset ) => {
+				const slug = preset.slug;
+				const value = preset[ key ];
+				const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
+				const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
+				declarations += `${ selectorToUse } {${ property }: ${ value };}`;
+			} );
+			return declarations;
+		},
+		''
+	);
+}
+
+function flattenTree( input = {}, prefix, token ) {
+	let result = [];
+	Object.keys( input ).forEach( ( key ) => {
+		const newKey = prefix + kebabCase( key.replace( '/', '-' ) );
+		const newLeaf = input[ key ];
+
+		if ( newLeaf instanceof Object ) {
+			const newPrefix = newKey + token;
+			result = [ ...result, ...flattenTree( newLeaf, newPrefix, token ) ];
+		} else {
+			result.push( `${ newKey }: ${ newLeaf }` );
+		}
+	} );
+	return result;
+}
+
+/**
+ * Transform given style tree into a set of style declarations.
+ *
+ * @param {Object} blockSupports What styles the block supports.
+ * @param {Object} blockStyles   Block styles.
+ * @param {Object} metadata      Block styles metadata information.
+ *
+ * @return {Array} An array of style declarations.
+ */
+function getBlockStylesDeclarations(
+	blockSupports,
+	blockStyles = {},
+	metadata
+) {
+	return reduce(
+		metadata,
+		( declarations, { value }, key ) => {
 			const cssProperty = key.startsWith( '--' ) ? key : kebabCase( key );
 			if (
 				blockSupports.includes( key ) &&
-				get( blockStyles, STYLE_PROPERTY[ key ], false )
+				get( blockStyles, value, false )
 			) {
 				declarations.push(
 					`${ cssProperty }: ${ compileStyleValue(
-						get( blockStyles, STYLE_PROPERTY[ key ] )
+						get( blockStyles, value )
 					) }`
 				);
 			}
-		} );
+			return declarations;
+		},
+		[]
+	);
+}
 
-		return declarations;
-	};
-
-	/**
-	 * Transform given preset tree into a set of preset class declarations.
-	 *
-	 * @param {string} blockSelector
-	 * @param {Object} blockPresets
-	 * @return {string} CSS declarations for the preset classes.
-	 */
-	const getBlockPresetClasses = ( blockSelector, blockPresets = {} ) => {
-		return reduce(
-			PRESET_CLASSES,
-			( declarations, { path, key, property }, classSuffix ) => {
-				const presets = get( blockPresets, path, [] );
-				presets.forEach( ( preset ) => {
-					const slug = preset.slug;
-					const value = preset[ key ];
-					const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
-					const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
-					declarations += `${ selectorToUse } {${ property }: ${ value };}`;
-				} );
-				return declarations;
-			},
-			''
-		);
-	};
-
-	/**
-	 * Transform given preset tree into a set of style declarations.
-	 *
-	 * @param {Object} blockPresets
-	 *
-	 * @return {Array} An array of style declarations.
-	 */
-	const getBlockPresetsDeclarations = ( blockPresets = {} ) => {
-		return reduce(
-			PRESET_CATEGORIES,
-			( declarations, { path, key }, category ) => {
-				const preset = get( blockPresets, path, [] );
-				preset.forEach( ( value ) => {
-					declarations.push(
-						`--wp--preset--${ kebabCase( category ) }--${
-							value.slug
-						}: ${ value[ key ] }`
-					);
-				} );
-				return declarations;
-			},
-			[]
-		);
-	};
-
-	const flattenTree = ( input, prefix, token ) => {
-		let result = [];
-		Object.keys( input ).forEach( ( key ) => {
-			const newKey = prefix + kebabCase( key.replace( '/', '-' ) );
-			const newLeaf = input[ key ];
-
-			if ( newLeaf instanceof Object ) {
-				const newPrefix = newKey + token;
-				result = [
-					...result,
-					...flattenTree( newLeaf, newPrefix, token ),
+export default ( blockData, tree, metadata, type = 'all' ) => {
+	return reduce(
+		blockData,
+		( styles, { selector }, context ) => {
+			if ( type === 'all' || type === 'cssVariables' ) {
+				const variableDeclarations = [
+					...getBlockPresetsDeclarations(
+						tree?.[ context ]?.settings
+					),
+					...flattenTree(
+						tree?.[ context ]?.settings?.custom,
+						'--wp--custom--',
+						'--'
+					),
 				];
-			} else {
-				result.push( `${ newKey }: ${ newLeaf }` );
+
+				if ( variableDeclarations.length > 0 ) {
+					styles.push(
+						`${ selector } { ${ variableDeclarations.join(
+							';'
+						) } }`
+					);
+				}
 			}
-		} );
-		return result;
-	};
+			if ( type === 'all' || type === 'blockStyles' ) {
+				const blockStyleDeclarations = getBlockStylesDeclarations(
+					blockData[ context ].supports,
+					tree?.[ context ]?.styles,
+					metadata
+				);
 
-	const getCustomDeclarations = ( blockCustom = {} ) => {
-		if ( Object.keys( blockCustom ).length === 0 ) {
-			return [];
-		}
+				if ( blockStyleDeclarations.length > 0 ) {
+					styles.push(
+						`${ selector } { ${ blockStyleDeclarations.join(
+							';'
+						) } }`
+					);
+				}
 
-		return flattenTree( blockCustom, '--wp--custom--', '--' );
-	};
-
-	const getBlockSelector = ( selector ) => {
-		// Can we hook into the styles generation mechanism
-		// so we can avoid having to increase the class specificity here
-		// and remap :root?
-		if ( ':root' === selector ) {
-			selector = '';
-		}
-		return `.editor-styles-wrapper.editor-styles-wrapper ${ selector }`;
-	};
-
-	Object.keys( blockData ).forEach( ( context ) => {
-		const blockSelector = getBlockSelector( blockData[ context ].selector );
-
-		const blockDeclarations = [
-			...getBlockStylesDeclarations(
-				blockData[ context ].supports,
-				tree?.[ context ]?.styles
-			),
-			...getBlockPresetsDeclarations( tree?.[ context ]?.settings ),
-			...getCustomDeclarations( tree?.[ context ]?.settings?.custom ),
-		];
-		if ( blockDeclarations.length > 0 ) {
-			styles.push(
-				`${ blockSelector } { ${ blockDeclarations.join( ';' ) } }`
-			);
-		}
-
-		const presetClasses = getBlockPresetClasses(
-			blockSelector,
-			tree?.[ context ]?.settings
-		);
-		if ( presetClasses ) {
-			styles.push( presetClasses );
-		}
-	} );
-
-	return styles.join( '' );
+				const presetClasses = getBlockPresetClasses(
+					selector,
+					tree?.[ context ]?.settings
+				);
+				if ( presetClasses ) {
+					styles.push( presetClasses );
+				}
+			}
+			return styles;
+		},
+		// Can this be converted to a context, as the global context?
+		// See comment in the server.
+		type === 'all' || type === 'blockStyles'
+			? [ LINK_COLOR_DECLARATION ]
+			: []
+	).join( '' );
 };

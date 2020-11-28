@@ -19,7 +19,7 @@ import AutoHeightBlockPreview from './auto';
 export function BlockPreview( {
 	blocks,
 	__experimentalPadding = 0,
-	viewportWidth = 700,
+	viewportWidth = 1200,
 	__experimentalLive = false,
 	__experimentalOnClick,
 } ) {

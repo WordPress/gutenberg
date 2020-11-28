@@ -6,35 +6,6 @@
  */
 
 /**
- * Return a list of all overrideable default template types.
- *
- * @see get_query_template
- *
- * @return string[] List of all overrideable default template types.
- */
-function get_template_types() {
-	return array(
-		'index',
-		'404',
-		'archive',
-		'author',
-		'category',
-		'tag',
-		'taxonomy',
-		'date',
-		'embed',
-		'home',
-		'front-page',
-		'privacy-policy',
-		'page',
-		'search',
-		'single',
-		'singular',
-		'attachment',
-	);
-}
-
-/**
  * Adds necessary filters to use 'wp_template' posts instead of theme template files.
  */
 function gutenberg_add_template_loader_filters() {
@@ -42,7 +13,7 @@ function gutenberg_add_template_loader_filters() {
 		return;
 	}
 
-	foreach ( get_template_types() as $template_type ) {
+	foreach ( gutenberg_get_template_type_slugs() as $template_type ) {
 		if ( 'embed' === $template_type ) { // Skip 'embed' for now because it is not a regular template type.
 			continue;
 		}
@@ -60,7 +31,7 @@ add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
  * @return string[] A list of template candidates, in descending order of priority.
  */
 function get_template_hierarchy( $template_type ) {
-	if ( ! in_array( $template_type, get_template_types(), true ) ) {
+	if ( ! in_array( $template_type, gutenberg_get_template_type_slugs(), true ) ) {
 		return array();
 	}
 
@@ -180,9 +151,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 	usort(
 		$templates,
 		function ( $template_a, $template_b ) use ( $slug_priorities ) {
-			$priority_a = $slug_priorities[ $template_a->post_name ] * 2 + ( 'publish' === $template_a->post_status ? 1 : 0 );
-			$priority_b = $slug_priorities[ $template_b->post_name ] * 2 + ( 'publish' === $template_b->post_status ? 1 : 0 );
-			return $priority_b - $priority_a;
+			return $slug_priorities[ $template_a->post_name ] - $slug_priorities[ $template_b->post_name ];
 		}
 	);
 

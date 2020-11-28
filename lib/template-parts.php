@@ -49,9 +49,9 @@ function gutenberg_register_template_part_post_type() {
 		'supports'          => array(
 			'title',
 			'slug',
+			'excerpt',
 			'editor',
 			'revisions',
-			'custom-fields',
 		),
 	);
 
@@ -104,36 +104,10 @@ function gutenberg_fix_template_part_admin_menu_entry() {
 }
 add_action( 'admin_menu', 'gutenberg_fix_template_part_admin_menu_entry' );
 
-/**
- * Filters the 'wp_template_part' post type columns in the admin list table.
- *
- * @param array $columns Columns to display.
- * @return array Filtered $columns.
- */
-function gutenberg_filter_template_part_list_table_columns( array $columns ) {
-	$columns['slug'] = __( 'Slug', 'gutenberg' );
-	if ( isset( $columns['date'] ) ) {
-		unset( $columns['date'] );
-	}
-	return $columns;
-}
-add_filter( 'manage_wp_template_part_posts_columns', 'gutenberg_filter_template_part_list_table_columns' );
-
-/**
- * Renders column content for the 'wp_template_part' post type list table.
- *
- * @param string $column_name Column name to render.
- * @param int    $post_id     Post ID.
- */
-function gutenberg_render_template_part_list_table_column( $column_name, $post_id ) {
-	if ( 'slug' !== $column_name ) {
-		return;
-	}
-	$post = get_post( $post_id );
-	echo esc_html( $post->post_name );
-}
-add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_template_part_list_table_column', 10, 2 );
-
+// Customize the `wp_template` admin list.
+add_filter( 'manage_wp_template_part_posts_columns', 'gutenberg_templates_lists_custom_columns' );
+add_action( 'manage_wp_template_part_posts_custom_column', 'gutenberg_render_templates_lists_custom_column', 10, 2 );
+add_filter( 'views_edit-wp_template_part', 'gutenberg_filter_templates_edit_views' );
 
 /**
  * Filter for adding and a `theme` parameter to `wp_template_part` queries.

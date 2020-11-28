@@ -10,6 +10,8 @@ import memize from 'memize';
 import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
 
+/** @typedef {import('./types').WPDataStore} WPDataStore */
+
 /**
  * @typedef {Object} WPDataRegistry An isolated orchestrator of store registrations.
  *
@@ -48,6 +50,7 @@ import createCoreDataStore from './store';
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
 	let listeners = [];
+	const __experimentalListeningStores = new Set();
 
 	/**
 	 * Global listener called for each store's update.
@@ -74,8 +77,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Calls a selector given the current state and extra arguments.
 	 *
-	 * @param {string|import('./types').WPDataStoreDefinition} storeNameOrDefinition Unique namespace identifier for the store
-	 *                                                                               or the store definition.
+	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
+	 *                                                   or the store definition.
 	 *
 	 * @return {*} The selector's returned value.
 	 */
@@ -83,12 +86,20 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		const storeName = isObject( storeNameOrDefinition )
 			? storeNameOrDefinition.name
 			: storeNameOrDefinition;
+		__experimentalListeningStores.add( storeName );
 		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getSelectors();
 		}
 
 		return parent && parent.select( storeName );
+	}
+
+	function __experimentalMarkListeningStores( callback, ref ) {
+		__experimentalListeningStores.clear();
+		const result = callback.call( this );
+		ref.current = Array.from( __experimentalListeningStores );
+		return result;
 	}
 
 	const getResolveSelectors = memize(
@@ -150,8 +161,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Returns the available actions for a part of the state.
 	 *
-	 * @param {string|import('./types').WPDataStoreDefinition} storeNameOrDefinition Unique namespace identifier for the store
-	 *                                                                               or the store definition.
+	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
+	 *                                                   or the store definition.
 	 *
 	 * @return {*} The action's returned value.
 	 */
@@ -203,12 +214,27 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	}
 
 	/**
-	 * Registers a new store.
+	 * Registers a new store definition.
 	 *
-	 * @param {import('./types').WPDataStore} store Store definition.
+	 * @param {WPDataStore} store Store definition.
 	 */
 	function register( store ) {
 		registerGenericStore( store.name, store.instantiate( registry ) );
+	}
+
+	/**
+	 * Subscribe handler to a store.
+	 *
+	 * @param {string[]} storeName The store name.
+	 * @param {Function} handler   The function subscribed to the store.
+	 * @return {Function} A function to unsubscribe the handler.
+	 */
+	function __experimentalSubscribeStore( storeName, handler ) {
+		if ( storeName in stores ) {
+			return stores[ storeName ].subscribe( handler );
+		}
+
+		return parent.__experimentalSubscribeStore( storeName, handler );
 	}
 
 	let registry = {
@@ -221,6 +247,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		dispatch,
 		use,
 		register,
+		__experimentalMarkListeningStores,
+		__experimentalSubscribeStore,
 	};
 
 	/**
