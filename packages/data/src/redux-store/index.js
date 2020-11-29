@@ -136,7 +136,7 @@ export default function createReduxStore( key, options ) {
 				store &&
 				( ( listener ) => {
 					let lastState = store.__unstableOriginalGetState();
-					store.subscribe( () => {
+					return store.subscribe( () => {
 						const state = store.__unstableOriginalGetState();
 						const hasChanged = state !== lastState;
 						lastState = state;
