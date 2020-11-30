@@ -22,7 +22,7 @@ const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
  *
- * @param {EventTarget} element Element to test.
+ * @param {EventTarget & HTMLButtonElement & HTMLInputElement} element Element to test.
  *
  * @return {boolean} Whether element is a button.
  */
