@@ -47,7 +47,7 @@ function PostTemplate() {
 						sprintf(
 							/* translators: 1: Template name. */
 							__( '%s (<a>Edit</a>)' ),
-							template.post_title
+							template.slug
 						),
 						{
 							a: (
@@ -74,7 +74,7 @@ function PostTemplate() {
 			) }
 			{ isEditing && (
 				<span className="edit-post-post-template__value">
-					{ template.post_title }
+					{ template.slug }
 				</span>
 			) }
 		</PanelRow>

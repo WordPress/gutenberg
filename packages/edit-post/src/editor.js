@@ -6,7 +6,7 @@ import { size, map, without, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { parse, store as blocksStore } from '@wordpress/blocks';
+import { store as blocksStore } from '@wordpress/blocks';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	EditorProvider,
@@ -144,10 +144,6 @@ function Editor( {
 		keepCaretInsideBlock,
 	] );
 
-	const templateContent = useMemo( () => {
-		return template ? parse( template.post_content ) : [];
-	}, [ template ] );
-
 	if ( ! post ) {
 		return null;
 	}
@@ -163,7 +159,7 @@ function Editor( {
 							initialEdits={ initialEdits }
 							useSubRegistry={ false }
 							__unstableTemplate={
-								isTemplateMode ? templateContent : undefined
+								isTemplateMode ? template : undefined
 							}
 							{ ...props }
 						>

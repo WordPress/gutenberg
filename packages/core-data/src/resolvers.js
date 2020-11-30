@@ -402,13 +402,22 @@ export function* __experimentalGetTemplateForLink( link ) {
 		} )
 	);
 
-	yield getEntityRecords( 'postType', 'wp_template', {} );
-
 	if ( template === null ) {
 		return;
 	}
 
-	yield receiveEntityRecords( 'postType', 'wp_template', [ template ], {
-		'find-template': link,
-	} );
+	yield getEntityRecord( 'postType', 'wp_template', template.ID );
+	const record = yield controls.select(
+		'core',
+		'getEntityRecord',
+		'postType',
+		'wp_template',
+		template.ID
+	);
+
+	if ( record ) {
+		yield receiveEntityRecords( 'postType', 'wp_template', [ record ], {
+			'find-template': link,
+		} );
+	}
 }

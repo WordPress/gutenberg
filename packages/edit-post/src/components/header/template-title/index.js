@@ -31,7 +31,7 @@ function TemplateTitle() {
 		<span className="edit-post-template-title">
 			{
 				/* translators: 1: Template name. */
-				sprintf( __( 'Editing template: %s' ), template.post_title )
+				sprintf( __( 'Editing template: %s' ), template.slug )
 			}
 		</span>
 	);
