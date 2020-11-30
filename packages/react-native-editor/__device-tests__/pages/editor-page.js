@@ -115,6 +115,13 @@ class EditorPage {
 		);
 	}
 
+	async addParagraphBlockByTappingEmptyAreaBelowLastBlock() {
+		const emptyAreaBelowLastBlock = await this.driver.elementByAccessibilityId(
+			'Add paragraph block'
+		);
+		await emptyAreaBelowLastBlock.click();
+	}
+
 	async getTitleElement( options = { autoscroll: false } ) {
 		//TODO: Improve the identifier for this element
 		const elements = await this.driver.elementsByXPath(
