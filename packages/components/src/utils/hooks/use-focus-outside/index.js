@@ -59,8 +59,8 @@ export default function useFocusOutside( onFocusOutside ) {
 	};
 
 	useEffect( () => {
-		cancelBlurCheck();
-	}, [ cancelBlurCheck ] );
+		return () => cancelBlurCheck();
+	}, [] );
 
 	/**
 	 * Handles a mousedown or mouseup event to respectively assign and
