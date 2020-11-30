@@ -7,7 +7,10 @@ import {
 	__experimentalBlockVariationPicker,
 	__experimentalGetMatchingVariation as getMatchingVariation,
 } from '@wordpress/block-editor';
-import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
+import {
+	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
+} from '@wordpress/blocks';
 
 const QueryPlaceholder = ( { clientId, name, attributes, setAttributes } ) => {
 	const {
@@ -21,7 +24,7 @@ const QueryPlaceholder = ( { clientId, name, attributes, setAttributes } ) => {
 				getBlockVariations,
 				getBlockType,
 				getDefaultBlockVariation,
-			} = select( 'core/blocks' );
+			} = select( blocksStore );
 
 			return {
 				blockType: getBlockType( name ),

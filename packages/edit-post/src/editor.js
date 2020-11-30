@@ -7,6 +7,7 @@ import { size, map, without, omit } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	EditorProvider,
@@ -169,7 +170,7 @@ export default compose( [
 			__experimentalGetPreviewDeviceType,
 		} = select( 'core/edit-post' );
 		const { getEntityRecord } = select( 'core' );
-		const { getBlockTypes } = select( 'core/blocks' );
+		const { getBlockTypes } = select( blocksStore );
 
 		return {
 			hasFixedToolbar:

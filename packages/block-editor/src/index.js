@@ -1,9 +1,7 @@
 /**
  * WordPress dependencies
  */
-import '@wordpress/blocks';
 import '@wordpress/rich-text';
-import '@wordpress/keyboard-shortcuts';
 import '@wordpress/notices';
 
 /**
