@@ -13,9 +13,6 @@ export default function PostContentEdit( {
 	context: { postId: contextPostId, postType: contextPostType },
 } ) {
 	const blockProps = useBlockProps();
-
-	// Only render InnerBlocks if the context is different from the active post
-	// to avoid infinite recursion of post content.
 	if ( contextPostId && contextPostType ) {
 		return (
 			<div { ...blockProps }>
