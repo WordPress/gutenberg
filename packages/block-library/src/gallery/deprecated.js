@@ -708,7 +708,7 @@ const v5 = {
 		return [
 			{
 				caption: attributes.caption,
-				columns: attributes.colums,
+				columns: attributes.columns,
 				imageCrop: attributes.imageCrop,
 				linkTo,
 				sizeSlug: attributes.sizeSlug,
