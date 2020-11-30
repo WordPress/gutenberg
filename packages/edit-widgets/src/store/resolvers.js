@@ -6,11 +6,12 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { resolveWidgetAreas, select } from './controls';
+import { resolveWidgets, resolveWidgetAreas, select } from './controls';
 import { persistStubPost, setWidgetAreasOpenState } from './actions';
 import {
 	KIND,
 	WIDGET_AREA_ENTITY_TYPE,
+	buildWidgetsQuery,
 	buildWidgetAreasQuery,
 	buildWidgetAreaPostId,
 	buildWidgetAreasPostId,
@@ -29,7 +30,6 @@ export function* getWidgetAreas() {
 	);
 
 	const widgetAreaBlocks = [];
-	const widgetIdToClientId = {};
 	const sortedWidgetAreas = widgetAreas.sort( ( a, b ) => {
 		if ( a.id === 'wp_inactive_widgets' ) {
 			return 1;
@@ -40,25 +40,18 @@ export function* getWidgetAreas() {
 		return 0;
 	} );
 	for ( const widgetArea of sortedWidgetAreas ) {
-		const widgetBlocks = [];
-		for ( const widget of widgetArea.widgets ) {
-			const block = transformWidgetToBlock( widget );
-			widgetIdToClientId[ widget.id ] = block.clientId;
-			widgetBlocks.push( block );
-		}
-
-		// Persist the actual post containing the navigation block
-		yield persistStubPost(
-			buildWidgetAreaPostId( widgetArea.id ),
-			widgetBlocks
-		);
-
 		widgetAreaBlocks.push(
 			createBlock( 'core/widget-area', {
 				id: widgetArea.id,
 				name: widgetArea.name,
 			} )
 		);
+
+		if ( ! widgetArea.widgets.length ) {
+			// If this widget area has no widgets, it won't get a post setup by
+			// the getWidgets resolver.
+			yield persistStubPost( buildWidgetAreaPostId( widgetArea.id ), [] );
+		}
 	}
 
 	const widgetAreasOpenState = {};
@@ -68,10 +61,43 @@ export function* getWidgetAreas() {
 	} );
 	yield setWidgetAreasOpenState( widgetAreasOpenState );
 
+	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
+}
+
+export function* getWidgets() {
+	const query = buildWidgetsQuery();
+	yield resolveWidgets( query );
+	const widgets = yield select(
+		'core',
+		'getEntityRecords',
+		'root',
+		'widget',
+		query
+	);
+
+	const widgetIdToClientId = {};
+	const groupedBySidebar = {};
+
+	for ( const widget of widgets ) {
+		const block = transformWidgetToBlock( widget );
+		widgetIdToClientId[ widget.id ] = block.clientId;
+		groupedBySidebar[ widget.sidebar ] =
+			groupedBySidebar[ widget.sidebar ] || [];
+		groupedBySidebar[ widget.sidebar ].push( block );
+	}
+
+	for ( const sidebarId in groupedBySidebar ) {
+		if ( groupedBySidebar.hasOwnProperty( sidebarId ) ) {
+			// Persist the actual post containing the widget block
+			yield persistStubPost(
+				buildWidgetAreaPostId( sidebarId ),
+				groupedBySidebar[ sidebarId ]
+			);
+		}
+	}
+
 	yield {
 		type: 'SET_WIDGET_TO_CLIENT_ID_MAPPING',
 		mapping: widgetIdToClientId,
 	};
-
-	yield persistStubPost( buildWidgetAreasPostId(), widgetAreaBlocks );
 }

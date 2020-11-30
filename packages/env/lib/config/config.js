@@ -26,6 +26,7 @@ const md5 = require( '../md5' );
  * @property {boolean}                          detectedLocalConfig     If true, wp-env detected local config and used it.
  * @property {Object.<string, WPServiceConfig>} env                     Specific config for different environments.
  * @property {boolean}                          debug                   True if debug mode is enabled.
+ * @property {string}                           phpVersion              Version of PHP to use in the environments, of the format 0.0.
  */
 
 /**
@@ -69,6 +70,7 @@ module.exports = async function readConfig( configPath ) {
 	// Default configuration which is overridden by .wp-env.json files.
 	const defaultConfiguration = {
 		core: null,
+		phpVersion: null,
 		plugins: [],
 		themes: [],
 		port: 8888,
@@ -253,13 +255,24 @@ function withOverrides( config ) {
 		getNumberFromEnvVariable( 'WP_ENV_TESTS_PORT' ) ||
 		config.env.tests.port;
 
+	// Override PHP version with environment variable.
+	config.env.development.phpVersion =
+		process.env.WP_ENV_PHP_VERSION || config.env.development.phpVersion;
+	config.env.tests.phpVersion =
+		process.env.WP_ENV_PHP_VERSION || config.env.tests.phpVersion;
+
 	const updateEnvUrl = ( configKey ) => {
 		[ 'development', 'tests' ].forEach( ( envKey ) => {
 			try {
 				const baseUrl = new URL(
 					config.env[ envKey ].config[ configKey ]
 				);
-				baseUrl.port = config.env[ envKey ].port;
+
+				// Don't overwrite the port of WP_HOME when set.
+				if ( ! ( configKey === 'WP_HOME' && !! baseUrl.port ) ) {
+					baseUrl.port = config.env[ envKey ].port;
+				}
+
 				config.env[ envKey ].config[ configKey ] = baseUrl.toString();
 			} catch ( error ) {
 				throw new ValidationError(

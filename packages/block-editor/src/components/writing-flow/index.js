@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { overEvery, find, findLast, reverse, first, last } from 'lodash';
+import { find, reverse, first, last } from 'lodash';
 import classnames from 'classnames';
 
 /**
@@ -48,19 +48,6 @@ import FocusCapture from './focus-capture';
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
 }
-
-/**
- * Given an element, returns true if the element is a tabbable text field, or
- * false otherwise.
- *
- * @param {Element} element Element to test.
- *
- * @return {boolean} Whether element is a tabbable text field.
- */
-const isTabbableTextField = overEvery( [
-	isTextField,
-	focus.tabbable.isTabbableIndex,
-] );
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -305,12 +292,14 @@ export default function WritingFlow( { children } ) {
 	function onMouseDown( event ) {
 		verticalRect.current = null;
 
+		const { ownerDocument } = event.target;
+
 		// Clicking inside a selected block should exit navigation mode and block moving mode.
 		if (
 			isNavigationMode &&
 			selectedBlockClientId &&
 			isInsideRootBlock(
-				getBlockDOMNode( selectedBlockClientId ),
+				getBlockDOMNode( selectedBlockClientId, ownerDocument ),
 				event.target
 			)
 		) {
@@ -417,6 +406,8 @@ export default function WritingFlow( { children } ) {
 		const hasModifier =
 			isShift || event.ctrlKey || event.altKey || event.metaKey;
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
+		const { ownerDocument } = container.current;
+		const { defaultView } = ownerDocument;
 
 		// In navigation mode, tab and arrows navigate from block to block.
 		if ( isNavigationMode ) {
@@ -489,7 +480,10 @@ export default function WritingFlow( { children } ) {
 					event.preventDefault();
 					selectBlock( focusedBlockUid );
 				} else if ( isTab && selectedBlockClientId ) {
-					const wrapper = getBlockDOMNode( selectedBlockClientId );
+					const wrapper = getBlockDOMNode(
+						selectedBlockClientId,
+						ownerDocument
+					);
 					let nextTabbable;
 
 					if ( navigateDown ) {
@@ -517,7 +511,10 @@ export default function WritingFlow( { children } ) {
 		// Navigation mode (press Esc), to navigate through blocks.
 		if ( selectedBlockClientId ) {
 			if ( isTab ) {
-				const wrapper = getBlockDOMNode( selectedBlockClientId );
+				const wrapper = getBlockDOMNode(
+					selectedBlockClientId,
+					ownerDocument
+				);
 
 				if ( isShift ) {
 					if ( target === wrapper ) {
@@ -558,9 +555,6 @@ export default function WritingFlow( { children } ) {
 
 			return;
 		}
-
-		const { ownerDocument } = container.current;
-		const { defaultView } = ownerDocument;
 
 		// When presing any key other than up or down, the initial vertical
 		// position must ALWAYS be reset. The vertical position is saved so it
@@ -677,14 +671,6 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
-	function focusLastTextField() {
-		const focusableNodes = focus.focusable.find( container.current );
-		const target = findLast( focusableNodes, isTabbableTextField );
-		if ( target ) {
-			placeCaretAtHorizontalEdge( target, true );
-		}
-	}
-
 	useEffect( () => {
 		if ( hasMultiSelection && ! isMultiSelecting ) {
 			multiSelectionContainer.current.focus();
@@ -701,7 +687,7 @@ export default function WritingFlow( { children } ) {
 	// bubbling events from children to determine focus transition intents.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<div className={ className }>
+		<>
 			<FocusCapture
 				ref={ focusCaptureBeforeRef }
 				selectedClientId={ selectedBlockClientId }
@@ -712,6 +698,7 @@ export default function WritingFlow( { children } ) {
 			/>
 			<div
 				ref={ container }
+				className={ className }
 				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
 			>
@@ -738,13 +725,7 @@ export default function WritingFlow( { children } ) {
 				multiSelectionContainer={ multiSelectionContainer }
 				isReverse
 			/>
-			<div
-				aria-hidden
-				tabIndex={ -1 }
-				onClick={ focusLastTextField }
-				className="block-editor-writing-flow__click-redirect"
-			/>
-		</div>
+		</>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }

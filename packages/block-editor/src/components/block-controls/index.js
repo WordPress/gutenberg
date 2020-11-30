@@ -20,24 +20,18 @@ import useDisplayBlockControls from '../use-display-block-controls';
 
 const { Fill, Slot } = createSlotFill( 'BlockControls' );
 
-function BlockControlsSlot( { __experimentalIsExpanded = false, ...props } ) {
+function BlockControlsSlot( props ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
-	return (
-		<Slot
-			name={ buildSlotName( __experimentalIsExpanded ) }
-			{ ...props }
-			fillProps={ accessibleToolbarState }
-		/>
-	);
+	return <Slot { ...props } fillProps={ accessibleToolbarState } />;
 }
 
-function BlockControlsFill( { controls, __experimentalIsExpanded, children } ) {
+function BlockControlsFill( { controls, children } ) {
 	if ( ! useDisplayBlockControls() ) {
 		return null;
 	}
 
 	return (
-		<Fill name={ buildSlotName( __experimentalIsExpanded ) }>
+		<Fill>
 			{ ( fillProps ) => {
 				// Children passed to BlockControlsFill will not have access to any
 				// React Context whose Provider is part of the BlockControlsSlot tree.
@@ -53,9 +47,6 @@ function BlockControlsFill( { controls, __experimentalIsExpanded, children } ) {
 		</Fill>
 	);
 }
-
-const buildSlotName = ( isExpanded ) =>
-	`BlockControls${ isExpanded ? '-expanded' : '' }`;
 
 const BlockControls = BlockControlsFill;
 

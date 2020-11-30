@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Autoformat TypeScript files (`*.ts` and `*.tsx`) in `format-js` script (#27138)[https://github.com/WordPress/gutenberg/pull/27138].
+
+### Internal
+
+-   The bundled `ignore-emit-webpack-plugin` dependency has been updated from requiring `2.0.3` to requiring `^2.0.6`.
+
+## 12.5.0 (2020-10-30)
+
+### Enhancements
+
+-   Ignore `/vendor` folder when searching for files to lint or format.
+
+### Bug Fixes
+
+-   Temporary pin `ignore-emit-webpack-plugin` to the version `2.0.3` to fix a known issue with version `2.0.4` ([GitHub issue](https://github.com/mrbar42/ignore-emit-webpack-plugin/issues/17)).
+
 ## 12.1.0 (2020-07-07)
 
 ### Enhancements

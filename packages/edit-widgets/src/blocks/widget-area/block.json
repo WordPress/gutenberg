@@ -13,6 +13,7 @@
 		"html": false,
 		"inserter": false,
 		"customClassName": false,
+		"reusable": false,
 		"__experimentalToolbar": false
 	}
 }

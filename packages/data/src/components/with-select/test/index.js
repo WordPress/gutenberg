@@ -34,7 +34,7 @@ describe( 'withSelect', () => {
 		// In normal circumstances, the fact that we have to add an arbitrary
 		// prefix to the variable name would be concerning, and perhaps an
 		// argument that we ought to expect developer to use select from the
-		// wp.data export. But in-fact, this serves as a good deterrent for
+		// `@wordpress/data` export. But in-fact, this serves as a good deterrent for
 		// including both `withSelect` and `select` in the same scope, which
 		// shouldn't occur for a typical component, and if it did might wrongly
 		// encourage the developer to use `select` within the component itself.
@@ -666,11 +666,7 @@ describe( 'withSelect', () => {
 			registry.dispatch( 'childRender' ).toggleRender();
 		} );
 
-		// 3 times because
-		// - 1 on initial render
-		// - 1 on effect before subscription set.
-		// - 1 child subscription fires.
-		expect( childMapSelectToProps ).toHaveBeenCalledTimes( 3 );
+		expect( childMapSelectToProps ).toHaveBeenCalledTimes( 2 );
 		expect( parentMapSelectToProps ).toHaveBeenCalledTimes( 4 );
 		expect( ChildOriginalComponent ).toHaveBeenCalledTimes( 1 );
 		expect( ParentOriginalComponent ).toHaveBeenCalledTimes( 2 );

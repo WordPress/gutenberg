@@ -58,6 +58,7 @@ export const DARK_GRAY = {
 	200: '#7e8993',
 	150: '#8d96a0', // Lightest gray that can be used for AA non-text contrast.
 	100: '#8f98a1',
+	placeholder: rgba( G2.gray[ 900 ], 0.62 ),
 };
 
 export const DARK_OPACITY = {
@@ -95,6 +96,7 @@ export const LIGHT_GRAY = {
 	300: '#edeff0',
 	200: '#f3f4f5',
 	100: '#f8f9f9',
+	placeholder: rgba( BASE.white, 0.65 ),
 };
 
 export const LIGHT_OPACITY_LIGHT = {
@@ -167,6 +169,7 @@ export const COLORS = {
 	darkOpacity: DARK_OPACITY,
 	darkOpacityLight: DARK_OPACITY_LIGHT,
 	mediumGray: G2.mediumGray,
+	gray: G2.gray,
 	lightGray: merge( {}, LIGHT_GRAY, G2.lightGray ),
 	lightGrayLight: LIGHT_OPACITY_LIGHT,
 	blue: merge( {}, BLUE, G2.blue ),

@@ -1,12 +1,14 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
-import {
-	PinnedItems,
-	__experimentalMainDashboardButton as MainDashboardButton,
-} from '@wordpress/interface';
+import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
 
 /**
@@ -17,6 +19,7 @@ import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
 import { default as DevicePreview } from '../device-preview';
+import MainDashboardButton from '../header/main-dashboard-button';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const {
@@ -44,8 +47,12 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 
 	const isLargeViewport = useViewportMatch( 'large' );
 
+	const classes = classnames( 'edit-post-header', {
+		'has-reduced-ui': hasReducedUI,
+	} );
+
 	return (
-		<div className="edit-post-header">
+		<div className={ classes }>
 			<MainDashboardButton.Slot>
 				<FullscreenModeClose />
 			</MainDashboardButton.Slot>
@@ -53,27 +60,23 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				<HeaderToolbar />
 			</div>
 			<div className="edit-post-header__settings">
-				{ ! hasReducedUI && (
-					<>
-						{ ! isPublishSidebarOpened && (
-							// This button isn't completely hidden by the publish sidebar.
-							// We can't hide the whole toolbar when the publish sidebar is open because
-							// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
-							// We track that DOM node to return focus to the PostPublishButtonOrToggle
-							// when the publish sidebar has been closed.
-							<PostSavedState
-								forceIsDirty={ hasActiveMetaboxes }
-								forceIsSaving={ isSaving }
-								showIconLabels={ showIconLabels }
-							/>
-						) }
-						<DevicePreview />
-						<PostPreviewButton
-							forceIsAutosaveable={ hasActiveMetaboxes }
-							forcePreviewLink={ isSaving ? null : undefined }
-						/>
-					</>
+				{ ! isPublishSidebarOpened && (
+					// This button isn't completely hidden by the publish sidebar.
+					// We can't hide the whole toolbar when the publish sidebar is open because
+					// we want to prevent mounting/unmounting the PostPublishButtonOrToggle DOM node.
+					// We track that DOM node to return focus to the PostPublishButtonOrToggle
+					// when the publish sidebar has been closed.
+					<PostSavedState
+						forceIsDirty={ hasActiveMetaboxes }
+						forceIsSaving={ isSaving }
+						showIconLabels={ showIconLabels }
+					/>
 				) }
+				<DevicePreview />
+				<PostPreviewButton
+					forceIsAutosaveable={ hasActiveMetaboxes }
+					forcePreviewLink={ isSaving ? null : undefined }
+				/>
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }

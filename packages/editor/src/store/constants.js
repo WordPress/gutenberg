@@ -11,7 +11,7 @@ export const EDIT_MERGE_PROPERTIES = new Set( [ 'meta' ] );
  *
  * @type {string}
  */
-export const STORE_KEY = 'core/editor';
+export const STORE_NAME = 'core/editor';
 
 export const POST_UPDATE_TRANSACTION_ID = 'post-update';
 export const SAVE_POST_NOTICE_ID = 'SAVE_POST_NOTICE_ID';

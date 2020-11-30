@@ -121,7 +121,7 @@ class REST_Batch_Controller_Test extends WP_Test_REST_TestCase {
 			)
 		);
 
-		$request = new WP_REST_Request( 'POST', '/__experimental/batch' );
+		$request = new WP_REST_Request( 'POST', '/v1/batch' );
 		$request->set_body_params(
 			array(
 				'requests' => array(
@@ -144,7 +144,7 @@ class REST_Batch_Controller_Test extends WP_Test_REST_TestCase {
 	public function test_batch_pre_validation() {
 		wp_set_current_user( self::$administrator_id );
 
-		$request = new WP_REST_Request( 'POST', '/__experimental/batch' );
+		$request = new WP_REST_Request( 'POST', '/v1/batch' );
 		$request->set_body_params(
 			array(
 				'validation' => 'require-all-validate',
@@ -191,7 +191,7 @@ class REST_Batch_Controller_Test extends WP_Test_REST_TestCase {
 	public function test_batch_create() {
 		wp_set_current_user( self::$administrator_id );
 
-		$request = new WP_REST_Request( 'POST', '/__experimental/batch' );
+		$request = new WP_REST_Request( 'POST', '/v1/batch' );
 		$request->set_body_params(
 			array(
 				'requests' => array(

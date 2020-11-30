@@ -7,7 +7,6 @@ import { has, without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createContext, useContext } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import {
@@ -59,7 +58,9 @@ export function getValidAlignments(
 ) {
 	let validAlignments;
 	if ( Array.isArray( blockAlign ) ) {
-		validAlignments = blockAlign;
+		validAlignments = ALL_ALIGNMENTS.filter( ( value ) =>
+			blockAlign.includes( value )
+		);
 	} else if ( blockAlign === true ) {
 		// `true` includes all alignments...
 		validAlignments = ALL_ALIGNMENTS;
@@ -104,13 +105,6 @@ export function addAttribute( settings ) {
 	return settings;
 }
 
-const AlignmentHookSettings = createContext( {} );
-
-/**
- * Allows to pass additional settings to the alignment hook.
- */
-export const AlignmentHookSettingsProvider = AlignmentHookSettings.Provider;
-
 /**
  * Override the default edit UI to include new toolbar controls for block
  * alignment, if block defines support.
@@ -120,17 +114,15 @@ export const AlignmentHookSettingsProvider = AlignmentHookSettings.Provider;
  */
 export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { isEmbedButton } = useContext( AlignmentHookSettings );
 		const { name: blockName } = props;
 		// Compute valid alignments without taking into account,
-		// if the theme supports wide alignments or not.
-		// BlockAlignmentToolbar takes into account the theme support.
-		const validAlignments = isEmbedButton
-			? []
-			: getValidAlignments(
-					getBlockSupport( blockName, 'align' ),
-					hasBlockSupport( blockName, 'alignWide', true )
-			  );
+		// if the theme supports wide alignments or not
+		// and without checking the layout for availble alignments.
+		// BlockAlignmentToolbar takes both of these into account.
+		const validAlignments = getValidAlignments(
+			getBlockSupport( blockName, 'align' ),
+			hasBlockSupport( blockName, 'alignWide', true )
+		);
 
 		const updateAlignment = ( nextAlign ) => {
 			if ( ! nextAlign ) {

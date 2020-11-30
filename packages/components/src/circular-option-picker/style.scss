@@ -4,16 +4,16 @@ $color-palette-circle-spacing: 12px;
 .components-circular-option-picker {
 	display: inline-block;
 	width: 100%;
-	margin-right: -10px;
 
 	.components-circular-option-picker__custom-clear-wrapper {
 		display: flex;
 		justify-content: flex-end;
 	}
 
-	// Account for scrollbar or no scrollbar.
+	// Effectively negates the end swatch spacing to keep the swatches
+	// from wrapping before necessary.
 	.components-circular-option-picker__swatches {
-		margin-right: -$grid-unit-20;
+		margin-right: -$color-palette-circle-spacing;
 	}
 }
 
@@ -21,7 +21,7 @@ $color-palette-circle-spacing: 12px;
 	display: inline-block;
 	height: $color-palette-circle-size;
 	width: $color-palette-circle-size;
-	margin-right: $color-palette-circle-spacing + $grid-unit-05;
+	margin-right: $color-palette-circle-spacing;
 	margin-bottom: $color-palette-circle-spacing;
 	vertical-align: top;
 	transform: scale(1);

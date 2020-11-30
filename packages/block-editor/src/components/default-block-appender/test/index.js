@@ -35,7 +35,7 @@ describe( 'DefaultBlockAppender', () => {
 			<DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt />
 		);
 
-		wrapper.find( 'TextareaAutosize' ).simulate( 'focus' );
+		wrapper.find( 'ForwardRef' ).simulate( 'focus' );
 
 		expect( wrapper ).toMatchSnapshot();
 
@@ -51,7 +51,7 @@ describe( 'DefaultBlockAppender', () => {
 				showPrompt={ false }
 			/>
 		);
-		const input = wrapper.find( 'TextareaAutosize' );
+		const input = wrapper.find( 'ForwardRef' );
 
 		expect( input.prop( 'value' ) ).toEqual( '' );
 

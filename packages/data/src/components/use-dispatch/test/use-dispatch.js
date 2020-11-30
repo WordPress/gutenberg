@@ -7,6 +7,7 @@ import TestRenderer, { act } from 'react-test-renderer';
  * Internal dependencies
  */
 import useDispatch from '../use-dispatch';
+import createReduxStore from '../../../redux-store';
 import { createRegistry } from '../../../registry';
 import { RegistryProvider } from '../../registry-provider';
 
@@ -49,6 +50,41 @@ describe( 'useDispatch', () => {
 	it( 'returns expected action creators from store for given storeName', () => {
 		const noop = () => ( { type: '__INERT__' } );
 		const testAction = jest.fn().mockImplementation( noop );
+		const store = createReduxStore( 'demoStore', {
+			reducer: ( state ) => state,
+			actions: {
+				foo: testAction,
+			},
+		} );
+		registry.register( store );
+
+		const TestComponent = () => {
+			const { foo } = useDispatch( store );
+			return <button onClick={ foo } />;
+		};
+
+		let testRenderer;
+
+		act( () => {
+			testRenderer = TestRenderer.create(
+				<RegistryProvider value={ registry }>
+					<TestComponent />
+				</RegistryProvider>
+			);
+		} );
+
+		const testInstance = testRenderer.root;
+
+		act( () => {
+			testInstance.findByType( 'button' ).props.onClick();
+		} );
+
+		expect( testAction ).toHaveBeenCalledTimes( 1 );
+	} );
+
+	it( 'returns expected action creators from store for given store definition', () => {
+		const noop = () => ( { type: '__INERT__' } );
+		const testAction = jest.fn().mockImplementation( noop );
 		registry.registerStore( 'demoStore', {
 			reducer: ( state ) => state,
 			actions: {
@@ -78,6 +114,7 @@ describe( 'useDispatch', () => {
 
 		expect( testAction ).toHaveBeenCalledTimes( 1 );
 	} );
+
 	it( 'returns dispatch from correct registry if registries change', () => {
 		const reducer = ( state ) => state;
 		const noop = () => ( { type: '__INERT__' } );

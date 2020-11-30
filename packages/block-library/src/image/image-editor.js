@@ -335,6 +335,7 @@ export default function ImageEditor( {
 						) }
 						renderContent={ () => (
 							<RangeControl
+								label={ __( 'Zoom' ) }
 								min={ MIN_ZOOM }
 								max={ MAX_ZOOM }
 								value={ Math.round( zoom ) }

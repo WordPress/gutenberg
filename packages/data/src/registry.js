@@ -1,14 +1,16 @@
 /**
  * External dependencies
  */
-import { omit, without, mapValues } from 'lodash';
+import { omit, without, mapValues, isObject } from 'lodash';
 import memize from 'memize';
 
 /**
  * Internal dependencies
  */
-import createNamespace from './namespace-store';
+import createReduxStore from './redux-store';
 import createCoreDataStore from './store';
+
+/** @typedef {import('./types').WPDataStore} WPDataStore */
 
 /**
  * @typedef {Object} WPDataRegistry An isolated orchestrator of store registrations.
@@ -48,6 +50,7 @@ import createCoreDataStore from './store';
 export function createRegistry( storeConfigs = {}, parent = null ) {
 	const stores = {};
 	let listeners = [];
+	const __experimentalListeningStores = new Set();
 
 	/**
 	 * Global listener called for each store's update.
@@ -74,18 +77,29 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	/**
 	 * Calls a selector given the current state and extra arguments.
 	 *
-	 * @param {string} reducerKey Part of the state shape to register the
-	 *                            selectors for.
+	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
+	 *                                                   or the store definition.
 	 *
 	 * @return {*} The selector's returned value.
 	 */
-	function select( reducerKey ) {
-		const store = stores[ reducerKey ];
+	function select( storeNameOrDefinition ) {
+		const storeName = isObject( storeNameOrDefinition )
+			? storeNameOrDefinition.name
+			: storeNameOrDefinition;
+		__experimentalListeningStores.add( storeName );
+		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getSelectors();
 		}
 
-		return parent && parent.select( reducerKey );
+		return parent && parent.select( storeName );
+	}
+
+	function __experimentalMarkListeningStores( callback, ref ) {
+		__experimentalListeningStores.clear();
+		const result = callback.call( this );
+		ref.current = Array.from( __experimentalListeningStores );
+		return result;
 	}
 
 	const getResolveSelectors = memize(
@@ -135,30 +149,33 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * and modified so that they return promises that resolve to their eventual values,
 	 * after any resolvers have ran.
 	 *
-	 * @param {string} reducerKey Part of the state shape to register the
-	 *                            selectors for.
+	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
+	 *                                                   or the store definition.
 	 *
 	 * @return {Object} Each key of the object matches the name of a selector.
 	 */
-	function __experimentalResolveSelect( reducerKey ) {
-		return getResolveSelectors( select( reducerKey ) );
+	function __experimentalResolveSelect( storeNameOrDefinition ) {
+		return getResolveSelectors( select( storeNameOrDefinition ) );
 	}
 
 	/**
 	 * Returns the available actions for a part of the state.
 	 *
-	 * @param {string} reducerKey Part of the state shape to dispatch the
-	 *                            action for.
+	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
+	 *                                                   or the store definition.
 	 *
 	 * @return {*} The action's returned value.
 	 */
-	function dispatch( reducerKey ) {
-		const store = stores[ reducerKey ];
+	function dispatch( storeNameOrDefinition ) {
+		const storeName = isObject( storeNameOrDefinition )
+			? storeNameOrDefinition.name
+			: storeNameOrDefinition;
+		const store = stores[ storeName ];
 		if ( store ) {
 			return store.getActions();
 		}
 
-		return parent && parent.dispatch( reducerKey );
+		return parent && parent.dispatch( storeName );
 	}
 
 	//
@@ -196,6 +213,30 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		config.subscribe( globalListener );
 	}
 
+	/**
+	 * Registers a new store definition.
+	 *
+	 * @param {WPDataStore} store Store definition.
+	 */
+	function register( store ) {
+		registerGenericStore( store.name, store.instantiate( registry ) );
+	}
+
+	/**
+	 * Subscribe handler to a store.
+	 *
+	 * @param {string[]} storeName The store name.
+	 * @param {Function} handler   The function subscribed to the store.
+	 * @return {Function} A function to unsubscribe the handler.
+	 */
+	function __experimentalSubscribeStore( storeName, handler ) {
+		if ( storeName in stores ) {
+			return stores[ storeName ].subscribe( handler );
+		}
+
+		return parent.__experimentalSubscribeStore( storeName, handler );
+	}
+
 	let registry = {
 		registerGenericStore,
 		stores,
@@ -205,24 +246,29 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		__experimentalResolveSelect,
 		dispatch,
 		use,
+		register,
+		__experimentalMarkListeningStores,
+		__experimentalSubscribeStore,
 	};
 
 	/**
 	 * Registers a standard `@wordpress/data` store.
 	 *
-	 * @param {string} reducerKey Reducer key.
+	 * @param {string} storeName  Unique namespace identifier.
 	 * @param {Object} options    Store description (reducer, actions, selectors, resolvers).
 	 *
 	 * @return {Object} Registered store object.
 	 */
-	registry.registerStore = ( reducerKey, options ) => {
+	registry.registerStore = ( storeName, options ) => {
 		if ( ! options.reducer ) {
 			throw new TypeError( 'Must specify store reducer' );
 		}
 
-		const namespace = createNamespace( reducerKey, options, registry );
-		registerGenericStore( reducerKey, namespace );
-		return namespace.store;
+		const store = createReduxStore( storeName, options ).instantiate(
+			registry
+		);
+		registerGenericStore( storeName, store );
+		return store.store;
 	};
 
 	//

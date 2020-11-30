@@ -13,14 +13,11 @@ import {
 	BlockAlignmentToolbar,
 	InspectorControls,
 	RichText,
+	useBlockProps,
 } from '@wordpress/block-editor';
 import deprecated from '@wordpress/deprecated';
 
-export default function TextColumnsEdit( {
-	attributes,
-	setAttributes,
-	className,
-} ) {
+export default function TextColumnsEdit( { attributes, setAttributes } ) {
 	const { width, content, columns } = attributes;
 
 	deprecated( 'The Text Columns block', {
@@ -54,7 +51,9 @@ export default function TextColumnsEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<div
-				className={ `${ className } align${ width } columns-${ columns }` }
+				{ ...useBlockProps( {
+					className: `align${ width } columns-${ columns }`,
+				} ) }
 			>
 				{ times( columns, ( index ) => {
 					return (
