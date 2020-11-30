@@ -364,8 +364,11 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 		// Hit the "Menu" key
 		await driver.pressKeycode( 82 );
 
-		const showHtmlButtonXpath = "/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[9]"
-		const showHtmlButton = await driver.elementByXPath(showHtmlButtonXpath);
+		const showHtmlButtonXpath =
+			'/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[9]';
+		const showHtmlButton = await driver.elementByXPath(
+			showHtmlButtonXpath
+		);
 		await showHtmlButton.click();
 	} else {
 		const menuButton = await driver.elementByAccessibilityId( '...' );
