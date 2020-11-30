@@ -337,7 +337,10 @@ function filter_rest_prepare_add_file_based_templates( $response ) {
 					continue;
 				}
 
-				$posts[] = gutenberg_get_file_template_object( $path );
+				$template_from_file = gutenberg_get_file_template_object( $path );
+				if ( $template_from_file ) {
+					$posts[] = $template_from_file;
+				}
 			}
 
 			return $posts;
