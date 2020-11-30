@@ -1,5 +1,6 @@
 .columnsContainer {
-	max-width: $content-width;
+	min-width: $block-edge-to-content *  2;
+	margin-left: $block-edge-to-content;
 }
 
 .innerBlocksSelected {

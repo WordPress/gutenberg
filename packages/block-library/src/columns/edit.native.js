@@ -103,6 +103,8 @@ function ColumnsEditContainer( {
 	const { verticalAlignment, align } = attributes;
 	const { width } = sizes || {};
 
+	const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
+
 	useEffect( () => {
 		if ( columnCount === 0 ) {
 			const newColumnCount = columnCount || DEFAULT_COLUMNS_NUM;
@@ -120,7 +122,6 @@ function ColumnsEditContainer( {
 	}, [ width, columnCount ] );
 
 	const renderAppender = () => {
-		const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
 		const isParentFullWidth =
 			parentBlockAlignment === WIDE_ALIGNMENTS.alignments.full;
 		const isEqualWidth = width === screenWidth;
@@ -282,8 +283,7 @@ function ColumnsEditContainer( {
 						blockWidth={ width }
 						contentStyle={ contentWidths }
 						parentWidth={
-							align === WIDE_ALIGNMENTS.alignments.full &&
-							columnCount === 0
+							isFullWidth && columnCount === 0
 								? screenWidth
 								: getContainerWidth( width, columnsInRow )
 						}

@@ -188,6 +188,12 @@ export class BlockList extends Component {
 			marginVertical: isRootList ? 0 : -marginVertical,
 			marginHorizontal: isRootList ? 0 : -marginHorizontal,
 		};
+
+		const isContentStretch = contentResizeMode === 'stretch';
+		const isMultiBlocks = blockClientIds.length > 1;
+		const isBlockWiderThanMedium =
+			blockWidth > ALIGNMENT_BREAKPOINTS.medium;
+
 		return (
 			<View
 				style={ containerStyle }
@@ -221,9 +227,9 @@ export class BlockList extends Component {
 					scrollEnabled={ isRootList }
 					contentContainerStyle={ [
 						horizontal && styles.horizontalContentContainer,
-						contentResizeMode === 'stretch' &&
-						blockWidth > ALIGNMENT_BREAKPOINTS.medium &&
-						blockClientIds.length > 1
+						isContentStretch &&
+						isBlockWiderThanMedium &&
+						isMultiBlocks
 							? styles.horizontalContentContainerStretch
 							: styles.horizontalContentContainerCenter,
 					] }

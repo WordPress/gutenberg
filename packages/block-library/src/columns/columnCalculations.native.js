@@ -10,6 +10,7 @@ import {
  * Internal dependencies
  */
 import { getColumnWidths, getWidths } from './utils';
+import styles from './editor.scss';
 
 /**
  * Maximum number of columns in a row
@@ -23,9 +24,9 @@ const MAX_COLUMNS_NUM_IN_ROW = 3;
  *
  * @type {number}
  */
-const MIN_WIDTH = 32;
+const MIN_WIDTH = styles.columnsContainer.minWidth;
 
-const MARGIN = 16;
+const MARGIN = styles.columnsContainer.marginLeft;
 
 export const getColumnsInRow = ( width, columnCount ) => {
 	if ( width ) {
