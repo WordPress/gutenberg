@@ -26,10 +26,17 @@
 
 			// Again, we need :not(#individual-image) to override long :not()
 			// chain on frontend styles.
-			figure:not(#individual-image),
+			figure:not(#individual-image) {
+				margin: 0;
+				flex-grow: 1;
+				display: flex;
+				flex-direction: column; // Needed for frontend when img isn't wrapped in div.
+			}
+
 			figure > div {
 				margin: 0;
-				height: 100%;
+				flex-direction: column;
+				flex-grow: 1;
 			}
 
 			img {
