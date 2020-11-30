@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import {
@@ -15,30 +10,10 @@ import {
 	deactivatePlugin,
 	publishPost,
 	saveDraft,
+	openPreviewPage,
 } from '@wordpress/e2e-test-utils';
 
 /** @typedef {import('puppeteer').Page} Page */
-
-async function openPreviewPage( editorPage ) {
-	let openTabs = await browser.pages();
-	const expectedTabsCount = openTabs.length + 1;
-	await editorPage.click( '.block-editor-post-preview__button-toggle' );
-	await editorPage.waitFor( '.edit-post-header-preview__button-external' );
-	await editorPage.click( '.edit-post-header-preview__button-external' );
-
-	// Wait for the new tab to open.
-	while ( openTabs.length < expectedTabsCount ) {
-		await editorPage.waitFor( 1 );
-		openTabs = await browser.pages();
-	}
-
-	const previewPage = last( openTabs );
-	// Wait for the preview to load. We can't do interstitial detection here,
-	// because it might load too quickly for us to pick up, so we wait for
-	// the preview to load by waiting for the title to appear.
-	await previewPage.waitForSelector( '.entry-title' );
-	return previewPage;
-}
 
 /**
  * Given the Page instance for the editor, opens preview drodpdown, and
