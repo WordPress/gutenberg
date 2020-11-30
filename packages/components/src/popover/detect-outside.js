@@ -9,6 +9,11 @@ import { Component } from '@wordpress/element';
 import withFocusOutside from '../higher-order/with-focus-outside';
 
 class PopoverDetectOutside extends Component {
+	constructor() {
+		super( ...arguments );
+		this.handleFocusOutside = this.handleFocusOutside.bind( this );
+	}
+
 	handleFocusOutside( event ) {
 		this.props.onFocusOutside( event );
 	}
