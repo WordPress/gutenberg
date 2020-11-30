@@ -4,7 +4,6 @@
 import '@wordpress/core-data';
 import '@wordpress/notices';
 import '@wordpress/block-editor';
-import '@wordpress/reusable-blocks';
 import {
 	registerBlockType,
 	setDefaultBlockName,
