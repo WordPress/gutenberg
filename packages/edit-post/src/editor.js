@@ -59,8 +59,10 @@ function Editor( {
 		const { getEntityRecord, __experimentalGetTemplateForLink } = select(
 			'core'
 		);
+		const { getEditorSettings } = select( 'core/editor' );
 		const { getBlockTypes } = select( blocksStore );
 		const postObject = getEntityRecord( 'postType', postType, postId );
+		const isFSETheme = getEditorSettings().isFSETheme;
 
 		return {
 			hasFixedToolbar:
@@ -79,9 +81,10 @@ function Editor( {
 			),
 			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 			isTemplateMode: isEditingTemplate(),
-			template: postObject
-				? __experimentalGetTemplateForLink( postObject.link )
-				: null,
+			template:
+				isFSETheme && postObject
+					? __experimentalGetTemplateForLink( postObject.link )
+					: null,
 			post: postObject,
 		};
 	} );

@@ -17,9 +17,13 @@ function TemplateTitle() {
 		const { __experimentalGetTemplateForLink } = select( coreStore );
 		const { isEditingTemplate } = select( editPostStore );
 		const link = getEditedPostAttribute( 'link' );
+		const _isEditing = isEditingTemplate();
 		return {
-			template: link ? __experimentalGetTemplateForLink( link ) : null,
-			isEditing: isEditingTemplate(),
+			template:
+				_isEditing && link
+					? __experimentalGetTemplateForLink( link )
+					: null,
+			isEditing: _isEditing,
 		};
 	}, [] );
 
