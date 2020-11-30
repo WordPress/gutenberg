@@ -529,10 +529,13 @@ const Popover = ( {
 		onClickOutside( clickEvent );
 	}
 
-	const animateClassName = getAnimateClassName( {
-		type: animate && animateOrigin ? 'appear' : null,
-		origin: animateOrigin,
-	} );
+	/** @type {false | string} */
+	const animateClassName =
+		Boolean( animate && animateOrigin ) &&
+		getAnimateClassName( {
+			type: 'appear',
+			origin: animateOrigin,
+		} );
 
 	// Disable reason: We care to capture the _bubbled_ events from inputs
 	// within popover as inferring close intent.
