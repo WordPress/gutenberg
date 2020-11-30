@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { store as blocksStore } from '@wordpress/blocks';
+
+/**
  * Internal dependencies
  */
 import { installBlockType, uninstallBlockType } from '../actions';
@@ -80,7 +85,7 @@ describe( 'actions', () => {
 			expect( generator.next().value ).toEqual( {
 				args: [],
 				selectorName: 'getBlockTypes',
-				storeKey: 'core/blocks',
+				storeKey: blocksStore.name,
 				type: '@@data/SELECT',
 			} );
 
@@ -142,7 +147,7 @@ describe( 'actions', () => {
 			expect( generator.next().value ).toEqual( {
 				args: [],
 				selectorName: 'getBlockTypes',
-				storeKey: 'core/blocks',
+				storeKey: blocksStore.name,
 				type: '@@data/SELECT',
 			} );
 
