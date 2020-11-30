@@ -89,7 +89,7 @@ function GroupEdit( {
 			{ resizeObserver }
 			<InnerBlocks
 				renderAppender={ isSelected && renderAppender }
-				parentWidth={ isFullWidth ? screenWidth : width }
+				parentWidth={ width }
 			/>
 		</View>
 	);
