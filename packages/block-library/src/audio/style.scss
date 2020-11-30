@@ -15,7 +15,8 @@
 		min-width: 300px;
 		&:focus {
 			outline-offset: 5px;
-			outline: 2px solid currentColor;
+			outline: 1px dotted currentColor;
 		}
+
 	}
 }
