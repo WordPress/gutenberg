@@ -13,7 +13,7 @@ import deprecated from '@wordpress/deprecated';
  * @typedef {'left' | 'right'} SlideInOrigin
  * @typedef {{ type: 'appear'; origin?: AppearOrigin }} AppearOptions
  * @typedef {{ type: 'slide-in'; origin?: SlideInOrigin }} SlideInOptions
- * @typedef {{ type: 'loading'; origin?: undefined }} LoadingOptions
+ * @typedef {{ type: 'loading'; }} LoadingOptions
  * @typedef {AppearOptions | SlideInOptions | LoadingOptions} GetAnimateOptions
  */
 
@@ -33,12 +33,11 @@ function getDefaultOrigin( type ) {
  * @return {string | void} ClassName that applies the animations
  */
 export function getAnimateClassName( options ) {
-	const { type } = options;
-	if ( type === 'loading' ) {
+	if ( options.type === 'loading' ) {
 		return classnames( 'components-animate__loading' );
 	}
 
-	const { origin = getDefaultOrigin( type ) } = options;
+	const { type, origin = getDefaultOrigin( type ) } = options;
 
 	if ( type === 'appear' ) {
 		const [ yAxis, xAxis = 'center' ] = origin.split( ' ' );
