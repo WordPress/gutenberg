@@ -624,6 +624,7 @@ _Parameters_
 -   _options.plainText_ `[string]`: Plain text version.
 -   _options.mode_ `[string]`: Handle content as blocks or inline content. _ 'AUTO': Decide based on the content passed. _ 'INLINE': Always handle as inline content, and return string. \* 'BLOCKS': Always handle as blocks, and return array of blocks.
 -   _options.tagName_ `[Array]`: The tag into which content will be inserted.
+-   _options.preserveWhiteSpace_ `[boolean]`: Whether or not to preserve consequent white space.
 
 _Returns_
 
@@ -738,6 +739,18 @@ Assigns name of block handling unregistered block types.
 _Parameters_
 
 -   _blockName_ `string`: Block name.
+
+<a name="store" href="#store">#</a> **store**
+
+Store definition for the blocks namespace.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
+
+_Type_
+
+-   `Object` 
 
 <a name="switchToBlockType" href="#switchToBlockType">#</a> **switchToBlockType**
 

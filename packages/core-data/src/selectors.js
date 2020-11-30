@@ -2,20 +2,33 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { first, map, find, get, filter, compact, defaultTo } from 'lodash';
+import { set, map, find, get, filter, compact, defaultTo } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { REDUCER_KEY } from './name';
+import { STORE_NAME } from './name';
 import { getQueriedItems } from './queried-data';
 import { DEFAULT_ENTITY_KEY } from './entities';
+import { getNormalizedCommaSeparable } from './utils';
+
+/**
+ * Shared reference to an empty array for cases where it is important to avoid
+ * returning a new array reference on every invocation, as in a connected or
+ * other pure component which performs `shouldComponentUpdate` check on props.
+ * This should be used as a last resort, since the normalized data should be
+ * maintained by the reducer result in state.
+ *
+ * @type {Array}
+ */
+const EMPTY_ARRAY = [];
 
 /**
  * Returns true if a request is in progress for embed preview data, or false
@@ -29,7 +42,7 @@ import { DEFAULT_ENTITY_KEY } from './entities';
 export const isRequestingEmbedPreview = createRegistrySelector(
 	( select ) => ( state, url ) => {
 		return select( 'core/data' ).isResolving(
-			REDUCER_KEY,
+			STORE_NAME,
 			'getEmbedPreview',
 			[ url ]
 		);
@@ -39,15 +52,29 @@ export const isRequestingEmbedPreview = createRegistrySelector(
 /**
  * Returns all available authors.
  *
+ * @param {Object}           state Data state.
+ * @param {Object|undefined} query Optional object of query parameters to
+ *                                 include with request.
+ * @return {Array} Authors list.
+ */
+export function getAuthors( state, query ) {
+	const path = addQueryArgs(
+		'/wp/v2/users/?who=authors&per_page=100',
+		query
+	);
+	return getUserQueryResults( state, path );
+}
+
+/**
+ * Returns all available authors.
+ *
  * @param {Object} state Data state.
+ * @param {number} id The author id.
  *
  * @return {Array} Authors list.
  */
-export function getAuthors( state ) {
-	deprecated( "select( 'core' ).getAuthors()", {
-		alternative: "select( 'core' ).getUsers({ who: 'authors' })",
-	} );
-	return getUserQueryResults( state, 'authors' );
+export function __unstableGetAuthor( state, id ) {
+	return get( state, [ 'users', 'byId', id ], null );
 }
 
 /**
@@ -135,8 +162,19 @@ export function getEntityRecord( state, kind, name, key, query ) {
 		return queriedState.items[ key ];
 	}
 
-	query = { ...query, include: [ key ] };
-	return first( getQueriedItems( queriedState, query ) );
+	const item = queriedState.items[ key ];
+	if ( item && query._fields ) {
+		const filteredItem = {};
+		const fields = getNormalizedCommaSeparable( query._fields );
+		for ( let f = 0; f < fields.length; f++ ) {
+			const field = fields[ f ].split( '.' );
+			const value = get( item, field );
+			set( filteredItem, field, value );
+		}
+		return filteredItem;
+	}
+
+	return item;
 }
 
 /**
@@ -226,7 +264,7 @@ export function getEntityRecords( state, kind, name, query ) {
 		'queriedData',
 	] );
 	if ( ! queriedState ) {
-		return [];
+		return EMPTY_ARRAY;
 	}
 	return getQueriedItems( queriedState, query );
 }
@@ -268,9 +306,7 @@ export const __experimentalGetDirtyEntityRecords = createSelector(
 								entityRecord[
 									entity.key || DEFAULT_ENTITY_KEY
 								],
-							title: ! entity.getTitle
-								? ''
-								: entity.getTitle( entityRecord ),
+							title: entity?.getTitle?.( entityRecord ) || '',
 							name,
 							kind,
 						} );
@@ -671,7 +707,7 @@ export function getAutosave( state, postType, postId, authorId ) {
  */
 export const hasFetchedAutosaves = createRegistrySelector(
 	( select ) => ( state, postType, postId ) => {
-		return select( REDUCER_KEY ).hasFinishedResolution( 'getAutosaves', [
+		return select( STORE_NAME ).hasFinishedResolution( 'getAutosaves', [
 			postType,
 			postId,
 		] );

@@ -6,7 +6,7 @@ import { castArray, flow, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, _n } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	DropdownMenu,
 	MenuGroup,
@@ -18,6 +18,7 @@ import { moreVertical } from '@wordpress/icons';
 
 import { Children, cloneElement, useCallback } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -45,9 +46,7 @@ export function BlockSettingsDropdown( {
 	const firstBlockClientId = blockClientIds[ 0 ];
 
 	const shortcuts = useSelect( ( select ) => {
-		const { getShortcutRepresentation } = select(
-			'core/keyboard-shortcuts'
-		);
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		return {
 			duplicate: getShortcutRepresentation(
 				'core/block-editor/duplicate'
@@ -73,6 +72,9 @@ export function BlockSettingsDropdown( {
 			: noop,
 		[ __experimentalSelectBlock ]
 	);
+
+	const removeBlockLabel =
+		count === 1 ? __( 'Remove block' ) : __( 'Remove blocks' );
 
 	return (
 		<BlockActions
@@ -185,11 +187,7 @@ export function BlockSettingsDropdown( {
 										) }
 										shortcut={ shortcuts.remove }
 									>
-										{ _n(
-											'Remove block',
-											'Remove blocks',
-											count
-										) }
+										{ removeBlockLabel }
 									</MenuItem>
 								) }
 							</MenuGroup>

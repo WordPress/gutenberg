@@ -11,6 +11,9 @@
 		},
 		"width": {
 			"type": "string"
+		},
+		"templateLock": {
+			"type": "string"
 		}
 	},
 	"supports": {

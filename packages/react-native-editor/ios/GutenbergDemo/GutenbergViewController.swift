@@ -1,9 +1,11 @@
-
 import UIKit
 import Gutenberg
 import Aztec
 
 class GutenbergViewController: UIViewController {
+    private lazy var filesAppMediaPicker: DocumentsMediaSource = {
+        return DocumentsMediaSource(gutenberg: gutenberg, coordinator: mediaUploadCoordinator)
+    }()
 
     fileprivate lazy var gutenberg = Gutenberg(dataSource: self, extraModules: [CustomImageLoader()])
     fileprivate var htmlMode = false
@@ -50,7 +52,6 @@ class GutenbergViewController: UIViewController {
 }
 
 extension GutenbergViewController: GutenbergBridgeDelegate {
-
     func gutenbergDidRequestFetch(path: String, completion: @escaping (Result<Any, NSError>) -> Void) {
         completion(Result.success([:]))
     }
@@ -99,6 +100,8 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
                 } else {
                     callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video", caption: "Cloudup")])
                 }
+            case .other, .any:
+                 callback([MediaInfo(id: 1, url: "https://wordpress.org/latest.zip", type: "zip", caption: "WordPress latest version", title: "WordPress.zip")])
             default:
                 break
             }
@@ -108,6 +111,9 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         case .deviceCamera:
             print("Gutenberg did request a device media picker, opening the camera picker")
             pickAndUpload(from: .camera, filter: currentFilter, callback: callback)
+
+        case .filesApp, .otherApps:
+            pickAndUploadFromFilesApp(filter: currentFilter, callback: callback)
         default: break
         }
     }
@@ -127,6 +133,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
             self.mediaPickCoordinator = nil
         } )
         mediaPickCoordinator?.pick(from: source)
+    }
+
+    private func pickAndUploadFromFilesApp(filter: Gutenberg.MediaType, callback: @escaping MediaPickerDidPickMediaCallback) {
+        filesAppMediaPicker.presentPicker(origin: self, filters: [filter], multipleSelection: false, callback: callback)
     }
 
     func gutenbergDidRequestMediaUploadSync() {
@@ -222,6 +232,26 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
     func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool) {
         print("Gutenberg requested setting tooltip flag")
     }
+
+    func gutenbergDidRequestMediaSaveSync() {
+        print(#function)
+    }
+
+    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) {
+        print(#function)
+    }
+
+    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) {
+        print(#function)
+    }
+
+    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) {
+        print(#function)
+    }
+
+    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) {
+        print(#function)
+    }
 }
 
 extension GutenbergViewController: GutenbergWebDelegate {
@@ -270,6 +300,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .mentions: true,
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
+            .mediaFilesCollectionBlock: true,
         ]
     }
 
@@ -280,6 +311,15 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
     func gutenbergEditorTheme() -> GutenbergEditorTheme? {
         return nil
     }
+
+    func gutenbergMediaSources() -> [Gutenberg.MediaSource] {
+        return [.filesApp, .otherApps]
+    }
+}
+
+extension Gutenberg.MediaSource {
+    static let filesApp = Gutenberg.MediaSource(id: "files-app", label: "Choose from device", types: [.any])
+    static let otherApps = Gutenberg.MediaSource(id: "other-apps", label: "Other Apps", types: [.image, .video, .audio, .other])
 }
 
 //MARK: - Navigation bar

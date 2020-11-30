@@ -8,7 +8,7 @@ import tinycolor from 'tinycolor2';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { Fragment, useEffect, useRef, useState } from '@wordpress/element';
 import {
 	BaseControl,
 	Button,
@@ -37,6 +37,7 @@ import {
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
 	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
+	__experimentalBlockFullHeightAligmentToolbar as FullHeightAlignment,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
@@ -89,6 +90,7 @@ function CoverHeightInput( {
 	value = '',
 } ) {
 	const [ temporaryInput, setTemporaryInput ] = useState( null );
+
 	const instanceId = useInstanceId( UnitControl );
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
@@ -250,6 +252,7 @@ function CoverEdit( {
 		dimRatio,
 		focalPoint,
 		hasParallax,
+		isRepeated,
 		minHeight,
 		minHeightUnit,
 		style: styleAttribute,
@@ -263,10 +266,49 @@ function CoverEdit( {
 	const onSelectMedia = attributesFromMedia( setAttributes );
 	const isBlogUrl = isBlobURL( url );
 
+	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
+	const [ prevMinHeightUnit, setPrevMinHeightUnit ] = useState(
+		minHeightUnit
+	);
+	const isMinFullHeight = minHeightUnit === 'vh' && minHeight === 100;
+
+	const toggleMinFullHeight = () => {
+		if ( isMinFullHeight ) {
+			// If there aren't previous values, take the default ones.
+			if ( prevMinHeightUnit === 'vh' && prevMinHeightValue === 100 ) {
+				return setAttributes( {
+					minHeight: undefined,
+					minHeightUnit: undefined,
+				} );
+			}
+
+			// Set the previous values of height.
+			return setAttributes( {
+				minHeight: prevMinHeightValue,
+				minHeightUnit: prevMinHeightUnit,
+			} );
+		}
+
+		setPrevMinHeightValue( minHeight );
+		setPrevMinHeightUnit( minHeightUnit );
+
+		// Set full height.
+		return setAttributes( {
+			minHeight: 100,
+			minHeightUnit: 'vh',
+		} );
+	};
+
 	const toggleParallax = () => {
 		setAttributes( {
 			hasParallax: ! hasParallax,
 			...( ! hasParallax ? { focalPoint: undefined } : {} ),
+		} );
+	};
+
+	const toggleIsRepeated = () => {
+		setAttributes( {
+			isRepeated: ! isRepeated,
 		} );
 	};
 
@@ -309,11 +351,16 @@ function CoverEdit( {
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 	const showFocalPointPicker =
-		isVideoBackground || ( isImageBackground && ! hasParallax );
+		isVideoBackground ||
+		( isImageBackground && ( ! hasParallax || isRepeated ) );
 
 	const controls = (
 		<>
 			<BlockControls>
+				<FullHeightAlignment
+					isActive={ isMinFullHeight }
+					onToggle={ toggleMinFullHeight }
+				/>
 				{ hasBackground && (
 					<>
 						<BlockAlignmentMatrixToolbar
@@ -340,11 +387,19 @@ function CoverEdit( {
 				{ !! url && (
 					<PanelBody title={ __( 'Media settings' ) }>
 						{ isImageBackground && (
-							<ToggleControl
-								label={ __( 'Fixed background' ) }
-								checked={ hasParallax }
-								onChange={ toggleParallax }
-							/>
+							<Fragment>
+								<ToggleControl
+									label={ __( 'Fixed background' ) }
+									checked={ hasParallax }
+									onChange={ toggleParallax }
+								/>
+
+								<ToggleControl
+									label={ __( 'Repeated background' ) }
+									checked={ isRepeated }
+									onChange={ toggleIsRepeated }
+								/>
+							</Fragment>
 						) }
 						{ showFocalPointPicker && (
 							<FocalPointPicker
@@ -371,6 +426,7 @@ function CoverEdit( {
 										dimRatio: undefined,
 										focalPoint: undefined,
 										hasParallax: undefined,
+										isRepeated: undefined,
 									} )
 								}
 							>
@@ -388,11 +444,11 @@ function CoverEdit( {
 								onChange={ ( newMinHeight ) =>
 									setAttributes( { minHeight: newMinHeight } )
 								}
-								onUnitChange={ ( nextUnit ) => {
+								onUnitChange={ ( nextUnit ) =>
 									setAttributes( {
 										minHeightUnit: nextUnit,
-									} );
-								} }
+									} )
+								}
 							/>
 						</PanelBody>
 						<PanelColorGradientSettings
@@ -419,6 +475,7 @@ function CoverEdit( {
 									}
 									min={ 0 }
 									max={ 100 }
+									step={ 10 }
 									required
 								/>
 							) }
@@ -434,7 +491,10 @@ function CoverEdit( {
 		{
 			className: 'wp-block-cover__inner-container',
 		},
-		{ template: INNER_BLOCKS_TEMPLATE }
+		{
+			template: INNER_BLOCKS_TEMPLATE,
+			templateInsertUpdatesSelection: true,
+		}
 	);
 
 	if ( ! hasBackground ) {
@@ -489,6 +549,7 @@ function CoverEdit( {
 			'has-background-dim': dimRatio !== 0,
 			'is-transient': isBlogUrl,
 			'has-parallax': hasParallax,
+			'is-repeated': isRepeated,
 			[ overlayColor.class ]: overlayColor.class,
 			'has-background-gradient': gradientValue,
 			[ gradientClass ]: ! url && gradientClass,

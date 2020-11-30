@@ -120,6 +120,7 @@ function RichTextWrapper(
 		__unstableOnSplitMiddle: onSplitMiddle,
 		identifier,
 		preserveWhiteSpace,
+		__unstablePastePlainText: pastePlainText,
 		__unstableEmbedURLOnPaste,
 		__unstableDisableFormats: disableFormats,
 		disableLineBreaks,
@@ -408,6 +409,11 @@ function RichTextWrapper(
 
 	const onPaste = useCallback(
 		( { value, onChange, html, plainText, files, activeFormats } ) => {
+			if ( pastePlainText ) {
+				onChange( insert( value, create( { text: plainText } ) ) );
+				return;
+			}
+
 			// Only process file if no HTML is present.
 			// Note: a pasted file may have the URL as plain text.
 			if ( files && files.length && ! html ) {
@@ -415,6 +421,7 @@ function RichTextWrapper(
 					HTML: filePasteHandler( files ),
 					mode: 'BLOCKS',
 					tagName,
+					preserveWhiteSpace,
 				} );
 
 				// Allows us to ask for this information when we get a report.
@@ -457,6 +464,7 @@ function RichTextWrapper(
 				plainText,
 				mode,
 				tagName,
+				preserveWhiteSpace,
 			} );
 
 			if ( typeof content === 'string' ) {
@@ -500,6 +508,8 @@ function RichTextWrapper(
 			splitValue,
 			__unstableEmbedURLOnPaste,
 			multiline,
+			preserveWhiteSpace,
+			pastePlainText,
 		]
 	);
 
@@ -629,6 +639,7 @@ function RichTextWrapper(
 						record={ value }
 						onChange={ onChange }
 						isSelected={ nestedIsSelected }
+						contentRef={ ref }
 					>
 						{ ( { listBoxId, activeId, onKeyDown } ) => (
 							<TagName

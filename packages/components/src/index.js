@@ -12,7 +12,10 @@ export {
 
 // Components
 export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
-export { default as Animate } from './animate';
+export {
+	default as Animate,
+	useAnimate as __unstableUseAnimate,
+} from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
 export { default as BaseControl } from './base-control';
@@ -34,7 +37,7 @@ export { default as ColorPicker } from './color-picker';
 export { default as ComboboxControl } from './combobox-control';
 export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
-export { DateTimePicker, DatePicker, TimePicker } from './date-time';
+export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
 export { default as Draggable } from './draggable';
@@ -127,7 +130,10 @@ export {
 } from './slot-fill';
 
 // Higher-Order Components
-export { default as navigateRegions } from './higher-order/navigate-regions';
+export {
+	default as navigateRegions,
+	useNavigateRegions as __unstableUseNavigateRegions,
+} from './higher-order/navigate-regions';
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
 export { default as withFallbackStyles } from './higher-order/with-fallback-styles';
 export { default as withFilters } from './higher-order/with-filters';

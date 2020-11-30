@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "6.23.0",
+	"version": "6.24.1",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,7 +22,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"sideEffects": [
-		"!((src|build|build-module)/api/**)"
+		"{src,build,build-module}/{index.js,store/index.js}"
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
@@ -46,7 +46,7 @@
 		"showdown": "^1.9.1",
 		"simple-html-tokenizer": "^0.5.7",
 		"tinycolor2": "^1.4.1",
-		"uuid": "^7.0.2"
+		"uuid": "^8.3.0"
 	},
 	"publishConfig": {
 		"access": "public"

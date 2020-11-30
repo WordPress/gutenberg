@@ -55,7 +55,6 @@ function withFocusReturn( options ) {
 				super( ...arguments );
 
 				this.ownFocusedElements = new Set();
-				this.activeElementOnMount = document.activeElement;
 				this.setIsFocusedFalse = () => ( this.isFocused = false );
 				this.setIsFocusedTrue = ( event ) => {
 					this.ownFocusedElements.add( event.target );
@@ -64,11 +63,7 @@ function withFocusReturn( options ) {
 			}
 
 			componentWillUnmount() {
-				const {
-					activeElementOnMount,
-					isFocused,
-					ownFocusedElements,
-				} = this;
+				const { isFocused, ownFocusedElements } = this;
 
 				if ( ! isFocused ) {
 					return;
@@ -83,15 +78,13 @@ function withFocusReturn( options ) {
 					return;
 				}
 
-				const stack = [
-					...without(
-						this.props.focus.focusHistory,
-						...ownFocusedElements
-					),
-					activeElementOnMount,
-				];
+				const stack = without(
+					this.props.focusHistory,
+					...ownFocusedElements
+				);
 
 				let candidate;
+
 				while ( ( candidate = stack.pop() ) ) {
 					if ( document.body.contains( candidate ) ) {
 						candidate.focus();
@@ -115,7 +108,10 @@ function withFocusReturn( options ) {
 		return ( props ) => (
 			<Consumer>
 				{ ( context ) => (
-					<FocusReturn childProps={ props } focus={ context } />
+					<FocusReturn
+						childProps={ props }
+						focusHistory={ context }
+					/>
 				) }
 			</Consumer>
 		);

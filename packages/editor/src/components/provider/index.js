@@ -15,18 +15,17 @@ import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
 	BlockContextProvider,
-	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
 import { decodeEntities } from '@wordpress/html-entities';
+import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
  */
 import withRegistryProvider from './with-registry-provider';
 import { mediaUpload } from '../../utils';
-import ReusableBlocksButtons from '../reusable-blocks-buttons';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
 
 /**
@@ -159,7 +158,6 @@ class EditorProvider extends Component {
 	getBlockEditorSettings(
 		settings,
 		reusableBlocks,
-		__experimentalFetchReusableBlocks,
 		hasUploadPermissions,
 		canUserUseUnfilteredHTML,
 		undo,
@@ -170,12 +168,9 @@ class EditorProvider extends Component {
 				'__experimentalBlockDirectory',
 				'__experimentalBlockPatterns',
 				'__experimentalBlockPatternCategories',
-				'__experimentalEnableFullSiteEditing',
-				'__experimentalEnableFullSiteEditingDemo',
 				'__experimentalFeatures',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBaseStyles',
-				'__experimentalGlobalStylesContexts',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
 				'alignWide',
@@ -194,7 +189,6 @@ class EditorProvider extends Component {
 				'gradients',
 				'hasFixedToolbar',
 				'hasReducedUI',
-				'hasPermissionsToManageWidgets',
 				'imageEditing',
 				'imageSizes',
 				'imageDimensions',
@@ -209,7 +203,6 @@ class EditorProvider extends Component {
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalFetchReusableBlocks,
 			__experimentalFetchLinkSuggestions: partialRight(
 				fetchLinkSuggestions,
 				settings
@@ -253,7 +246,6 @@ class EditorProvider extends Component {
 			resetEditorBlocksWithoutUndoLevel,
 			hasUploadPermissions,
 			isPostTitleSelected,
-			__experimentalFetchReusableBlocks,
 			undo,
 		} = this.props;
 
@@ -264,7 +256,6 @@ class EditorProvider extends Component {
 		const editorSettings = this.getBlockEditorSettings(
 			settings,
 			reusableBlocks,
-			__experimentalFetchReusableBlocks,
 			hasUploadPermissions,
 			canUserUseUnfilteredHTML,
 			undo,
@@ -277,32 +268,29 @@ class EditorProvider extends Component {
 		);
 
 		return (
-			<>
-				<EditorStyles styles={ settings.styles } />
-				<EntityProvider kind="root" type="site">
-					<EntityProvider
-						kind="postType"
-						type={ post.type }
-						id={ post.id }
-					>
-						<BlockContextProvider value={ defaultBlockContext }>
-							<BlockEditorProvider
-								value={ blocks }
-								onInput={ resetEditorBlocksWithoutUndoLevel }
-								onChange={ resetEditorBlocks }
-								selectionStart={ selectionStart }
-								selectionEnd={ selectionEnd }
-								settings={ editorSettings }
-								useSubRegistry={ false }
-							>
-								{ children }
-								<ReusableBlocksButtons />
-								<ConvertToGroupButtons />
-							</BlockEditorProvider>
-						</BlockContextProvider>
-					</EntityProvider>
+			<EntityProvider kind="root" type="site">
+				<EntityProvider
+					kind="postType"
+					type={ post.type }
+					id={ post.id }
+				>
+					<BlockContextProvider value={ defaultBlockContext }>
+						<BlockEditorProvider
+							value={ blocks }
+							onInput={ resetEditorBlocksWithoutUndoLevel }
+							onChange={ resetEditorBlocks }
+							selectionStart={ selectionStart }
+							selectionEnd={ selectionEnd }
+							settings={ editorSettings }
+							useSubRegistry={ false }
+						>
+							{ children }
+							<ReusableBlocksMenuItems />
+							<ConvertToGroupButtons />
+						</BlockEditorProvider>
+					</BlockContextProvider>
 				</EntityProvider>
-			</>
+			</EntityProvider>
 		);
 	}
 }
@@ -316,7 +304,6 @@ export default compose( [
 			getEditorBlocks,
 			getEditorSelectionStart,
 			getEditorSelectionEnd,
-			__experimentalGetReusableBlocks,
 			isPostTitleSelected,
 		} = select( 'core/editor' );
 		const { canUser } = select( 'core' );
@@ -327,7 +314,11 @@ export default compose( [
 			blocks: getEditorBlocks(),
 			selectionStart: getEditorSelectionStart(),
 			selectionEnd: getEditorSelectionEnd(),
-			reusableBlocks: __experimentalGetReusableBlocks(),
+			reusableBlocks: select( 'core' ).getEntityRecords(
+				'postType',
+				'wp_block',
+				{ per_page: -1 }
+			),
 			hasUploadPermissions: defaultTo(
 				canUser( 'create', 'media' ),
 				true
@@ -342,7 +333,6 @@ export default compose( [
 			updatePostLock,
 			resetEditorBlocks,
 			updateEditorSettings,
-			__experimentalFetchReusableBlocks,
 			__experimentalTearDownEditor,
 			undo,
 		} = dispatch( 'core/editor' );
@@ -361,7 +351,6 @@ export default compose( [
 				} );
 			},
 			tearDownEditor: __experimentalTearDownEditor,
-			__experimentalFetchReusableBlocks,
 			undo,
 		};
 	} ),

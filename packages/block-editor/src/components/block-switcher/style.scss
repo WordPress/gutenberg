@@ -150,17 +150,14 @@
 
 // The block switcher in the contextual toolbar should be bigger.
 .block-editor-block-contextual-toolbar {
-	.components-button.block-editor-block-switcher__toggle,
-	.components-button.block-editor-block-switcher__no-switcher-icon {
-		height: $grid-unit-60;
-	}
-
 	.components-button.block-editor-block-switcher__no-switcher-icon {
 		width: $grid-unit-60;
 	}
 
 	.components-button.block-editor-block-switcher__no-switcher-icon,
 	.components-button.block-editor-block-switcher__toggle {
+		height: $grid-unit-60;
+
 		.block-editor-block-icon,
 		.block-editor-block-switcher__transform {
 			width: $block-toolbar-height;

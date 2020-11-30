@@ -13,6 +13,10 @@
 			"type": "boolean",
 			"default": false
 		},
+		"isRepeated": {
+			"type": "boolean",
+			"default": false
+		},
 		"dimRatio": {
 			"type": "number",
 			"default": 50

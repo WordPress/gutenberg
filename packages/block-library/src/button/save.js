@@ -13,8 +13,16 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
  */
 import getColorAndStyleProps from './color-props';
 
-export default function save( { attributes } ) {
-	const { borderRadius, linkTarget, rel, text, title, url } = attributes;
+export default function save( { attributes, className } ) {
+	const {
+		borderRadius,
+		linkTarget,
+		rel,
+		text,
+		title,
+		url,
+		width,
+	} = attributes;
 	const colorProps = getColorAndStyleProps( attributes );
 	const buttonClasses = classnames(
 		'wp-block-button__link',
@@ -32,8 +40,12 @@ export default function save( { attributes } ) {
 	// if it had already been assigned, for the sake of backward-compatibility.
 	// A title will no longer be assigned for new or updated button block links.
 
+	const wrapperClasses = classnames( className, {
+		[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+	} );
+
 	return (
-		<div { ...useBlockProps.save() }>
+		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
 			<RichText.Content
 				tagName="a"
 				className={ buttonClasses }

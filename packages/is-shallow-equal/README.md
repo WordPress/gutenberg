@@ -122,10 +122,10 @@ The following results were produced under Node v10.15.3 (LTS) on a MacBook Pro (
 You can run the benchmarks yourselves by cloning the repository, installing dependencies, and running the `benchmark/index.js` script:
 
 ```
-git clone https://github.com/WordPress/packages.git
-cd packages/packages/is-shallow-equal
+git clone https://github.com/WordPress/gutenberg.git
 npm install
-node benchmark
+npm run build:packages
+node ./packages/is-shallow-equal/benchmark
 ```
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

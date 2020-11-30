@@ -65,11 +65,16 @@ export function getQueryParts( query ) {
 				);
 				break;
 
-			case '_fields':
-				parts.fields = getNormalizedCommaSeparable( value );
-				break;
-
 			default:
+				// While in theory, we could exclude "_fields" from the stableKey
+				// because two request with different fields have the same results
+				// We're not able to ensure that because the server can decide to omit
+				// fields from the response even if we explicitely asked for it.
+				// Example: Asking for titles in posts without title support.
+				if ( key === '_fields' ) {
+					parts.fields = getNormalizedCommaSeparable( value );
+				}
+
 				// While it could be any deterministic string, for simplicity's
 				// sake mimic querystring encoding for stable key.
 				//

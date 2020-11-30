@@ -3,6 +3,11 @@
  */
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import Tracks from './tracks';
+
 export default function save( { attributes } ) {
 	const {
 		autoplay,
@@ -14,6 +19,7 @@ export default function save( { attributes } ) {
 		preload,
 		src,
 		playsInline,
+		tracks,
 	} = attributes;
 	return (
 		<figure { ...useBlockProps.save() }>
@@ -27,7 +33,9 @@ export default function save( { attributes } ) {
 					preload={ preload !== 'metadata' ? preload : undefined }
 					src={ src }
 					playsInline={ playsInline }
-				/>
+				>
+					<Tracks tracks={ tracks } />
+				</video>
 			) }
 			{ ! RichText.isEmpty( caption ) && (
 				<RichText.Content tagName="figcaption" value={ caption } />

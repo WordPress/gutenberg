@@ -44,8 +44,10 @@ async function isGlobalInserterOpen() {
 		);
 	} );
 }
-
-async function toggleGlobalBlockInserter() {
+/**
+ * Toggles the global inserter.
+ */
+export async function toggleGlobalBlockInserter() {
 	await page.click(
 		'.edit-post-header [aria-label="Add block"], .edit-site-header [aria-label="Add block"]'
 	);
@@ -143,11 +145,9 @@ export async function insertBlock( searchTerm ) {
  */
 export async function insertPattern( searchTerm ) {
 	await searchForPattern( searchTerm );
-	const insertButton = (
-		await page.$x(
-			`//div[@role = 'button']//div[contains(text(), '${ searchTerm }')]`
-		)
-	 )[ 0 ];
+	const insertButton = await page.waitForXPath(
+		`//div[@role = 'button']//div[contains(text(), '${ searchTerm }')]`
+	);
 	await insertButton.click();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
@@ -168,6 +168,10 @@ export async function insertReusableBlock( searchTerm ) {
 	await insertButton.click();
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
+	// We should wait until the block is loaded
+	await page.waitForXPath(
+		'//*[@class="block-library-block__reusable-block-container"]'
+	);
 }
 
 /**

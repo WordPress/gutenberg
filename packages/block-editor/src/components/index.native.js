@@ -26,8 +26,10 @@ export {
 	default as MediaUpload,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
+	MEDIA_TYPE_ANY,
 } from './media-upload';
 export { default as MediaUploadProgress } from './media-upload-progress';
+export { default as BlockMediaUpdateProgress } from './block-media-update-progress';
 export { default as URLInput } from './url-input';
 export { default as BlockInvalidWarning } from './block-list/block-invalid-warning';
 export { default as BlockCaption } from './block-caption';

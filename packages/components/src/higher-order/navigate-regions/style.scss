@@ -1,6 +1,9 @@
-.components-navigate-regions.is-focusing-regions [role="region"] {
+// Allow the position to be easily overridden to e.g. fixed.
+[role="region"] {
 	position: relative;
+}
 
+.is-focusing-regions [role="region"] {
 	// For browsers that don't support outline-offset (IE11).
 	&:focus::after {
 		content: "";

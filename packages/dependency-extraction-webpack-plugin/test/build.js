@@ -34,8 +34,8 @@ describe.each( configFixtures )( 'Webpack `%s`', ( configCase ) => {
 					mode: 'production',
 					optimization: {
 						minimize: false,
-						namedChunks: true,
-						namedModules: true,
+						chunkIds: 'named',
+						moduleIds: 'named',
 					},
 					output: {},
 				},

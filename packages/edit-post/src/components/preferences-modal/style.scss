@@ -1,6 +1,6 @@
 .edit-post-preferences-modal {
 	&__section {
-		margin: 0 0 2rem 0;
+		margin: 0 0 2.5rem 0;
 	}
 
 	&__section-title {
@@ -9,11 +9,6 @@
 	}
 
 	&__option {
-		border-top: 1px solid $gray-300;
-
-		&:last-child {
-			border-bottom: 1px solid $gray-300;
-		}
 
 		.components-base-control__field {
 			align-items: center;
@@ -37,5 +32,18 @@
 		@include break-small() {
 			max-width: 300px;
 		}
+	}
+
+	.components-base-control__help {
+		margin: -$grid-unit-10 0 $grid-unit-10 ( $grid-unit-50 + 2px );
+		font-size: $helptext-font-size;
+		font-style: normal;
+		color: $gray-700;
+	}
+	.edit-post-preferences-modal__section-description {
+		margin: -$grid-unit-10 0 $grid-unit-10 0;
+		font-size: $helptext-font-size;
+		font-style: normal;
+		color: $gray-700;
 	}
 }

@@ -35,6 +35,7 @@ const HOME_PATH_PREFIX = `~${ path.sep }`;
 module.exports = function parseConfig( config, options ) {
 	return {
 		port: config.port,
+		phpVersion: config.phpVersion,
 		coreSource: includeTestsPath(
 			parseSourceString( config.core, options ),
 			options
@@ -112,14 +113,21 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		};
 	}
 
-	const gitHubFields = sourceString.match( /^([^\/]+)\/([^#]+)(?:#(.+))?$/ );
+	const gitHubFields = sourceString.match(
+		/^([^\/]+)\/([^#\/]+)(\/([^#]+))?(?:#(.+))?$/
+	);
 	if ( gitHubFields ) {
 		return {
 			type: 'git',
 			url: `https://github.com/${ gitHubFields[ 1 ] }/${ gitHubFields[ 2 ] }.git`,
-			ref: gitHubFields[ 3 ] || 'master',
-			path: path.resolve( workDirectoryPath, gitHubFields[ 2 ] ),
-			basename: gitHubFields[ 2 ],
+			ref: gitHubFields[ 5 ] || 'master',
+			path: path.resolve(
+				workDirectoryPath,
+				gitHubFields[ 2 ],
+				gitHubFields[ 4 ] || '.'
+			),
+			clonePath: path.resolve( workDirectoryPath, gitHubFields[ 2 ] ),
+			basename: gitHubFields[ 4 ] || gitHubFields[ 2 ],
 		};
 	}
 

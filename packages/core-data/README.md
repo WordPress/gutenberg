@@ -271,6 +271,7 @@ Returns all available authors.
 _Parameters_
 
 -   _state_ `Object`: Data state.
+-   _query_ `(Object|undefined)`: Optional object of query parameters to include with request.
 
 _Returns_
 

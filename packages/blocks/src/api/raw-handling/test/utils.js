@@ -7,12 +7,15 @@ import deepFreeze from 'deep-freeze';
  * Internal dependencies
  */
 import { getBlockContentSchema, isPlain } from '../utils';
+import { store as mockStore } from '../../../store';
+import { STORE_NAME as mockStoreName } from '../../../store/constants';
 
 jest.mock( '@wordpress/data', () => {
 	return {
 		select: jest.fn( ( store ) => {
 			switch ( store ) {
-				case 'core/blocks': {
+				case [ mockStoreName ]:
+				case mockStore: {
 					return {
 						hasBlockSupport: ( blockName, supports ) => {
 							return (
@@ -24,6 +27,18 @@ jest.mock( '@wordpress/data', () => {
 				}
 			}
 		} ),
+		combineReducers: () => {
+			const mock = jest.fn();
+			return mock;
+		},
+		createReduxStore: () => {
+			const mock = jest.fn();
+			return mock;
+		},
+		register: () => {
+			const mock = jest.fn();
+			return mock;
+		},
 	};
 } );
 

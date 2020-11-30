@@ -7,16 +7,18 @@ import {
 } from '@wordpress/editor';
 import {
 	WritingFlow,
-	Typewriter,
-	ObserveTyping,
 	BlockList,
-	CopyHandler,
-	BlockSelectionClearer,
-	MultiSelectScrollIntoView,
+	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
+	__unstableUseTypewriter as useTypewriter,
+	__unstableUseClipboardHandler as useClipboardHandler,
+	__unstableUseTypingObserver as useTypingObserver,
+	__unstableUseScrollMultiSelectionIntoView as useScrollMultiSelectionIntoView,
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
+	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
+import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -24,40 +26,52 @@ import { Popover } from '@wordpress/components';
 import BlockInspectorButton from './block-inspector-button';
 import { useSelect } from '@wordpress/data';
 
-function VisualEditor() {
+export default function VisualEditor() {
+	const ref = useRef();
 	const deviceType = useSelect( ( select ) => {
 		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
 	}, [] );
+	const hasMetaBoxes = useSelect(
+		( select ) => select( 'core/edit-post' ).hasMetaBoxes(),
+		[]
+	);
+	const desktopCanvasStyles = {
+		height: '100%',
+		// Add a constant padding for the typewritter effect. When typing at the
+		// bottom, there needs to be room to scroll up.
+		paddingBottom: hasMetaBoxes ? null : '40vh',
+	};
+	const resizedCanvasStyles = useResizeCanvas( deviceType );
 
-	const inlineStyles = useResizeCanvas( deviceType );
+	useScrollMultiSelectionIntoView( ref );
+	useBlockSelectionClearer( ref );
+	useTypewriter( ref );
+	useClipboardHandler( ref );
+	useTypingObserver( ref );
+	useCanvasClickRedirect( ref );
 
 	return (
-		<BlockSelectionClearer
-			className="edit-post-visual-editor editor-styles-wrapper"
-			style={ inlineStyles }
-		>
+		<div className="edit-post-visual-editor">
 			<VisualEditorGlobalKeyboardShortcuts />
-			<MultiSelectScrollIntoView />
 			<Popover.Slot name="block-toolbar" />
-			<Typewriter>
-				<CopyHandler>
-					<WritingFlow>
-						<ObserveTyping>
-							<div className="edit-post-visual-editor__post-title-wrapper">
-								<PostTitle />
-							</div>
-							<BlockList />
-						</ObserveTyping>
-					</WritingFlow>
-				</CopyHandler>
-			</Typewriter>
+			<div
+				ref={ ref }
+				className="editor-styles-wrapper"
+				tabIndex="-1"
+				style={ resizedCanvasStyles || desktopCanvasStyles }
+			>
+				<WritingFlow>
+					<div className="edit-post-visual-editor__post-title-wrapper">
+						<PostTitle />
+					</div>
+					<BlockList />
+				</WritingFlow>
+			</div>
 			<__experimentalBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
 					<BlockInspectorButton onClick={ onClose } />
 				) }
 			</__experimentalBlockSettingsMenuFirstItem>
-		</BlockSelectionClearer>
+		</div>
 	);
 }
-
-export default VisualEditor;
