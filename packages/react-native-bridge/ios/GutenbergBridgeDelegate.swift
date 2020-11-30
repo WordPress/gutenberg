@@ -18,6 +18,7 @@ public struct MediaInfo: Encodable {
 public enum Capabilities: String {
     case mediaFilesCollectionBlock
     case mentions
+    case xposts
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
     case modalLayoutPicker

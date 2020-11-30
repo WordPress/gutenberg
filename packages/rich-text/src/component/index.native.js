@@ -993,9 +993,7 @@ export default compose( [
 			formatTypes: select( 'core/rich-text' ).getFormatTypes(),
 			areMentionsSupported:
 				getSettings( 'capabilities' ).mentions === true,
-			areXPostsSupported:
-				getSettings( 'capabilities' ).xposts === true ||
-				Platform.OS === 'ios',
+			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
 			...{ parentBlockStyles },
 		};
 	} ),
