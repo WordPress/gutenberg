@@ -1806,6 +1806,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/ui-utils",
+		"slug": "packages-ui-utils",
+		"markdown_source": "../packages/ui-utils/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/url",
 		"slug": "packages-url",
 		"markdown_source": "../packages/url/README.md",
