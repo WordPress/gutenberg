@@ -162,16 +162,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 			// If the template exists return it.
 			$template_filename = basename( $template_path, '.html' );
 			if ( $slug === $template_filename ) {
-				ob_start();
-				include $template_path;
-				$template_content = ob_get_clean();
-
-				$template               = new stdClass();
-				$template->ID           = 0;
-				$template->post_name    = $slug;
-				$template->post_content = $template_content;
-
-				return $template;
+				return gutenberg_get_file_template_object( $template_path );
 			}
 		}
 	}

@@ -25,6 +25,31 @@ function gutenberg_get_template_paths() {
 }
 
 /**
+ * Returns a pseudo-post object for a theme template.
+ *
+ * @param string $path The full path to the template file.
+ *
+ * @return WP_Post|false
+ */
+function gutenberg_get_file_template_object( $path ) {
+	if ( ! file_exists( $path ) ) {
+		return false;
+	}
+
+	// Get the content.
+	ob_start();
+	include $path;
+	$template_content = ob_get_clean();
+
+	$template               = new stdClass();
+	$template->ID           = 0;
+	$template->post_name    = basename( $path, '.html' );
+	$template->post_content = $template_content;
+
+	return new WP_Post( $template );
+}
+
+/**
  * Registers block editor 'wp_template' post type.
  */
 function gutenberg_register_template_post_type() {
