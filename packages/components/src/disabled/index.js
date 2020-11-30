@@ -41,11 +41,7 @@ const DISABLED_ELIGIBLE_NODE_NAMES = [
 	'TEXTAREA',
 ];
 
-const defaultProps = {
-	isDisabled: true,
-};
-
-function Disabled( { className, children, isDisabled, ...props } ) {
+function Disabled( { className, children, isDisabled = true, ...props } ) {
 	const node = useRef();
 
 	const disable = () => {
@@ -114,8 +110,6 @@ function Disabled( { className, children, isDisabled, ...props } ) {
 		</Provider>
 	);
 }
-
-Disabled.defaultProps = defaultProps;
 
 Disabled.Consumer = Consumer;
 
