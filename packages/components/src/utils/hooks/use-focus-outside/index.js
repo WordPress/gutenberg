@@ -45,10 +45,8 @@ function isFocusNormalizedButton( element ) {
 /**
  *
  * @param {Function} onFocusOutside
- * @param {import('react').Ref<HTMLElement>} wrapperRef
  */
-export default function useFocusOutside( onFocusOutside, wrapperRef ) {
-	const ref = useRef( wrapperRef );
+export default function useFocusOutside( onFocusOutside ) {
 	const preventBlurCheck = useRef( false );
 
 	/**
@@ -120,7 +118,6 @@ export default function useFocusOutside( onFocusOutside, wrapperRef ) {
 	};
 
 	return {
-		ref,
 		onFocus: cancelBlurCheck,
 		onMouseDown: normalizeButtonFocus,
 		onMouseUp: normalizeButtonFocus,

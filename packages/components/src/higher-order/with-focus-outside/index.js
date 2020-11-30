@@ -20,7 +20,7 @@ export default createHigherOrderComponent(
 			onTouchStart,
 			onTouchEnd,
 			onBlur,
-		} = useFocusOutside( onFocusOutside, ref );
+		} = useFocusOutside( onFocusOutside );
 
 		return (
 			// Disable reason: See `normalizeButtonFocus` for browser-specific
