@@ -7,6 +7,7 @@ import { map, findIndex, flow, sortBy, groupBy, orderBy } from 'lodash';
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
+import { store as blocksStore } from '@wordpress/blocks';
 import { useMemo, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
@@ -36,7 +37,7 @@ export function BlockTypesTab( {
 	const hasChildItems = useSelect(
 		( select ) => {
 			const { getBlockName } = select( 'core/block-editor' );
-			const { getChildBlockNames } = select( 'core/blocks' );
+			const { getChildBlockNames } = select( blocksStore );
 			const rootBlockName = getBlockName( rootClientId );
 
 			return !! getChildBlockNames( rootBlockName ).length;

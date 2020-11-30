@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { map, filter, includes } from 'lodash';
+import { filter, find, includes, map } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,17 +20,23 @@ import { Icon, plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import getClosestAvailableTemplate from '../../../utils/get-closest-available-template';
-import { TEMPLATES_DEFAULT_DETAILS } from '../../../utils/get-template-info/constants';
+import { TEMPLATES_NEW_OPTIONS, TEMPLATES_STATUSES } from './constants';
 
 export default function NewTemplateDropdown() {
-	const templates = useSelect(
-		( select ) =>
-			select( 'core' ).getEntityRecords( 'postType', 'wp_template', {
-				status: [ 'publish', 'auto-draft' ],
-				per_page: -1,
-			} ),
-		[]
-	);
+	const { defaultTemplateTypes, templates } = useSelect( ( select ) => {
+		const {
+			__experimentalGetDefaultTemplateTypes: getDefaultTemplateTypes,
+		} = select( 'core/editor' );
+		const templateEntities = select( 'core' ).getEntityRecords(
+			'postType',
+			'wp_template',
+			{ status: TEMPLATES_STATUSES, per_page: -1 }
+		);
+		return {
+			defaultTemplateTypes: getDefaultTemplateTypes(),
+			templates: templateEntities,
+		};
+	}, [] );
 	const { addTemplate } = useDispatch( 'core/edit-site' );
 
 	const createTemplate = ( slug ) => {
@@ -38,20 +44,29 @@ export default function NewTemplateDropdown() {
 			slug,
 			templates
 		);
+		const { title, description } = find( defaultTemplateTypes, { slug } );
 		addTemplate( {
 			content: closestAvailableTemplate.content.raw,
-			slug,
-			title: slug,
+			excerpt: description,
+			// Slugs need to be strings, so this is for template `404`
+			slug: slug.toString(),
 			status: 'draft',
+			title,
 		} );
 	};
 
 	const existingTemplateSlugs = map( templates, 'slug' );
 
 	const missingTemplates = filter(
-		TEMPLATES_DEFAULT_DETAILS,
-		( template ) => ! includes( existingTemplateSlugs, template.slug )
+		defaultTemplateTypes,
+		( template ) =>
+			includes( TEMPLATES_NEW_OPTIONS, template.slug ) &&
+			! includes( existingTemplateSlugs, template.slug )
 	);
+
+	if ( ! missingTemplates.length ) {
+		return null;
+	}
 
 	return (
 		<DropdownMenu
@@ -68,7 +83,7 @@ export default function NewTemplateDropdown() {
 			} }
 		>
 			{ ( { onClose } ) => (
-				<NavigableMenu>
+				<NavigableMenu className="edit-site-navigation-panel__new-template-popover">
 					<MenuGroup label={ __( 'Add Template' ) }>
 						{ map(
 							missingTemplates,

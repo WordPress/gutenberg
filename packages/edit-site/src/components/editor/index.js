@@ -1,7 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
+import {
+	useEffect,
+	useState,
+	useMemo,
+	useCallback,
+	useRef,
+} from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
@@ -15,7 +21,7 @@ import {
 	BlockContextProvider,
 	BlockSelectionClearer,
 	BlockBreadcrumb,
-	__unstableEditorStyles as EditorStyles,
+	__unstableUseEditorStyles as useEditorStyles,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
@@ -105,7 +111,17 @@ function Editor() {
 		};
 	}, [] );
 	const { editEntityRecord } = useDispatch( 'core' );
+	const { updateEditorSettings } = useDispatch( 'core/editor' );
 	const { setPage, setIsInserterOpened } = useDispatch( 'core/edit-site' );
+
+	// Keep the defaultTemplateTypes in the core/editor settings too,
+	// so that they can be selected with core/editor selectors in any editor.
+	// This is needed because edit-site doesn't initialize with EditorProvider,
+	// which internally uses updateEditorSettings as well.
+	const { defaultTemplateTypes } = settings;
+	useEffect( () => {
+		updateEditorSettings( { defaultTemplateTypes } );
+	}, [ defaultTemplateTypes ] );
 
 	const inlineStyles = useResizeCanvas( deviceType );
 
@@ -121,14 +137,18 @@ function Editor() {
 		( entitiesToSave ) => {
 			if ( entitiesToSave ) {
 				const { getEditedEntityRecord } = select( 'core' );
-				entitiesToSave.forEach( ( { kind, name, key } ) => {
+				const {
+					__experimentalGetTemplateInfo: getTemplateInfo,
+				} = select( 'core/editor' );
+				entitiesToSave.forEach( ( { kind, name, key, title } ) => {
 					const record = getEditedEntityRecord( kind, name, key );
-
-					const edits = record.slug
-						? { status: 'publish', title: record.slug }
-						: { status: 'publish' };
-
-					editEntityRecord( kind, name, key, edits );
+					if ( kind === 'postType' && name === 'wp_template' ) {
+						( { title } = getTemplateInfo( record ) );
+					}
+					editEntityRecord( kind, name, key, {
+						status: 'publish',
+						title: title || record.slug,
+					} );
 				} );
 			}
 			setIsEntitiesSavedStatesOpen( false );
@@ -170,10 +190,12 @@ function Editor() {
 	}, [ isNavigationOpen ] );
 
 	const isMobile = useViewportMatch( 'medium', '<' );
+	const ref = useRef();
+
+	useEditorStyles( ref, settings.styles );
 
 	return (
 		<>
-			<EditorStyles styles={ settings.styles } />
 			<FullscreenMode isActive={ isFullscreenActive } />
 			<UnsavedChangesWarning />
 			<SlotFillProvider>
@@ -210,13 +232,11 @@ function Editor() {
 												baseStyles={
 													settings.__experimentalGlobalStylesBaseStyles
 												}
-												contexts={
-													settings.__experimentalGlobalStylesContexts
-												}
 											>
 												<KeyboardShortcuts.Register />
 												<SidebarComplementaryAreaFills />
 												<InterfaceSkeleton
+													ref={ ref }
 													labels={ interfaceLabels }
 													drawer={
 														<NavigationSidebar />
