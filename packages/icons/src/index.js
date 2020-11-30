@@ -171,7 +171,6 @@ export { default as tableRowBefore } from './library/table-row-before';
 export { default as tableRowDelete } from './library/table-row-delete';
 export { default as table } from './library/table';
 export { default as tag } from './library/tag';
-export { default as templatePart } from './library/template-part';
 export { default as templatePartFooter } from './library/template-part-footer';
 export { default as templatePartHeader } from './library/template-part-header';
 export { default as templatePartSidebar } from './library/template-part-sidebar';
