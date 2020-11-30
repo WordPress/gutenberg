@@ -1,0 +1,30 @@
+{
+	"typography": {
+		"fontSizes": [
+			"name"
+		],
+		"fontStyles": [
+			"name"
+		],
+		"fontWeights": [
+			"name"
+		],
+		"fontFamilies": [
+			"name"
+		],
+		"textTransforms": [
+			"name"
+		],
+		"textDecorations": [
+			"name"
+		]
+	},
+	"color": {
+		"palette": [
+			"name"
+		],
+		"gradients": [
+			"name"
+		]
+	}
+}
