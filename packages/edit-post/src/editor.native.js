@@ -10,7 +10,12 @@ import { I18nManager } from 'react-native';
  */
 import { Component } from '@wordpress/element';
 import { EditorProvider } from '@wordpress/editor';
-import { parse, serialize, rawHandler } from '@wordpress/blocks';
+import {
+	parse,
+	serialize,
+	rawHandler,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
@@ -167,7 +172,7 @@ export default compose( [
 			getPreference,
 			__experimentalGetPreviewDeviceType,
 		} = select( 'core/edit-post' );
-		const { getBlockTypes } = select( 'core/blocks' );
+		const { getBlockTypes } = select( blocksStore );
 
 		return {
 			hasFixedToolbar:

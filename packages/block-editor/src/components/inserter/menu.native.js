@@ -14,7 +14,11 @@ import { pick } from 'lodash';
  * WordPress dependencies
  */
 import { Component } from '@wordpress/element';
-import { createBlock, rawHandler } from '@wordpress/blocks';
+import {
+	createBlock,
+	rawHandler,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import {
@@ -181,7 +185,7 @@ export default compose(
 			getSettings,
 			canInsertBlockType,
 		} = select( 'core/block-editor' );
-		const { getChildBlockNames, getBlockType } = select( 'core/blocks' );
+		const { getChildBlockNames, getBlockType } = select( blocksStore );
 		const { getClipboard } = select( 'core/editor' );
 
 		let destinationRootClientId = rootClientId;
