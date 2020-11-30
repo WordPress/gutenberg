@@ -153,6 +153,10 @@ class EditorProvider extends Component {
 				}
 			);
 		}
+		this.defaultBlockContext = this.getDefaultBlockContext(
+			props.post.id,
+			props.post.type
+		);
 	}
 
 	getBlockEditorSettings(
@@ -262,11 +266,6 @@ class EditorProvider extends Component {
 			isPostTitleSelected
 		);
 
-		const defaultBlockContext = this.getDefaultBlockContext(
-			post.id,
-			post.type
-		);
-
 		return (
 			<EntityProvider kind="root" type="site">
 				<EntityProvider
@@ -274,13 +273,11 @@ class EditorProvider extends Component {
 					type={ post.type }
 					id={ post.id }
 				>
-					<BlockContextProvider value={ defaultBlockContext }>
+					<BlockContextProvider value={ this.defaultBlockContext }>
 						<BlockEditorProvider
 							value={ blocks }
 							onInput={ resetEditorBlocksWithoutUndoLevel }
 							onChange={ resetEditorBlocks }
-							selectionStart={ selectionStart }
-							selectionEnd={ selectionEnd }
 							settings={ editorSettings }
 							useSubRegistry={ false }
 						>

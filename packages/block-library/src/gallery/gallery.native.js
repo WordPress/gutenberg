@@ -17,7 +17,7 @@ import Tiles from './tiles';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockCaption } from '@wordpress/block-editor';
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useMemo } from '@wordpress/element';
 import { mediaUploadSync } from '@wordpress/react-native-bridge';
 import { useSelect } from '@wordpress/data';
 import { WIDE_ALIGNMENTS } from '@wordpress/components';
@@ -85,75 +85,78 @@ export const Gallery = ( props ) => {
 	};
 
 	const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
+	return useMemo( () => {
+		return (
+			<View style={ { flex: 1 } }>
+				<Tiles
+					columns={ displayedColumns }
+					spacing={ TILE_SPACING }
+					style={
+						isSelected
+							? styles.galleryTilesContainerSelected
+							: undefined
+					}
+				>
+					{ images.map( ( img, index ) => {
+						const ariaLabel = sprintf(
+							/* translators: 1: the order number of the image. 2: the total number of images. */
+							__( 'image %1$d of %2$d in gallery' ),
+							index + 1,
+							images.length
+						);
 
-	return (
-		<View style={ { flex: 1 } }>
-			<Tiles
-				columns={ displayedColumns }
-				spacing={ TILE_SPACING }
-				style={
-					isSelected
-						? styles.galleryTilesContainerSelected
-						: undefined
-				}
-			>
-				{ images.map( ( img, index ) => {
-					const ariaLabel = sprintf(
-						/* translators: 1: the order number of the image. 2: the total number of images. */
-						__( 'image %1$d of %2$d in gallery' ),
-						index + 1,
-						images.length
-					);
-
-					return (
-						<GalleryImage
-							key={ img.id || img.url }
-							url={ img.url }
-							alt={ img.alt }
-							id={ parseInt( img.id, 10 ) } // make id an integer explicitly
-							isCropped={ imageCrop }
-							isFirstItem={ index === 0 }
-							isLastItem={ index + 1 === images.length }
-							isSelected={ isSelected && selectedImage === index }
-							isBlockSelected={ isSelected }
-							onMoveBackward={ onMoveBackward( index ) }
-							onMoveForward={ onMoveForward( index ) }
-							onRemove={ onRemoveImage( index ) }
-							onSelect={ selectImage( index ) }
-							onSelectBlock={ onFocus }
-							setAttributes={ ( attrs ) =>
-								onSetImageAttributes( index, attrs )
-							}
-							caption={ img.caption }
-							aria-label={ ariaLabel }
-							isRTL={ isRTL }
-						/>
-					);
-				} ) }
-			</Tiles>
-			<View style={ [ isFullWidth && styles.fullWidth ] }>
-				{ mediaPlaceholder }
+						return (
+							<GalleryImage
+								key={ img.id || img.url }
+								url={ img.url }
+								alt={ img.alt }
+								id={ parseInt( img.id, 10 ) } // make id an integer explicitly
+								isCropped={ imageCrop }
+								isFirstItem={ index === 0 }
+								isLastItem={ index + 1 === images.length }
+								isSelected={
+									isSelected && selectedImage === index
+								}
+								isBlockSelected={ isSelected }
+								onMoveBackward={ onMoveBackward( index ) }
+								onMoveForward={ onMoveForward( index ) }
+								onRemove={ onRemoveImage( index ) }
+								onSelect={ selectImage( index ) }
+								onSelectBlock={ onFocus }
+								setAttributes={ ( attrs ) =>
+									onSetImageAttributes( index, attrs )
+								}
+								caption={ img.caption }
+								aria-label={ ariaLabel }
+								isRTL={ isRTL }
+							/>
+						);
+					} ) }
+				</Tiles>
+				<View style={ [ isFullWidth && styles.fullWidth ] }>
+					{ mediaPlaceholder }
+				</View>
+				<BlockCaption
+					clientId={ clientId }
+					isSelected={ isCaptionSelected }
+					accessible={ true }
+					accessibilityLabelCreator={ ( caption ) =>
+						isEmpty( caption )
+							? /* translators: accessibility text. Empty gallery caption. */
+							  'Gallery caption. Empty'
+							: sprintf(
+									/* translators: accessibility text. %s: gallery caption. */
+									__( 'Gallery caption. %s' ),
+									caption
+							  )
+					}
+					onFocus={ focusGalleryCaption }
+					onBlur={ onBlur } // always assign onBlur as props
+					insertBlocksAfter={ insertBlocksAfter }
+				/>
 			</View>
-			<BlockCaption
-				clientId={ clientId }
-				isSelected={ isCaptionSelected }
-				accessible={ true }
-				accessibilityLabelCreator={ ( caption ) =>
-					isEmpty( caption )
-						? /* translators: accessibility text. Empty gallery caption. */
-						  'Gallery caption. Empty'
-						: sprintf(
-								/* translators: accessibility text. %s: gallery caption. */
-								__( 'Gallery caption. %s' ),
-								caption
-						  )
-				}
-				onFocus={ focusGalleryCaption }
-				onBlur={ onBlur } // always assign onBlur as props
-				insertBlocksAfter={ insertBlocksAfter }
-			/>
-		</View>
-	);
+		);
+	}, [ isSelected, selectedImage, images ] );
 };
 
 export default Gallery;

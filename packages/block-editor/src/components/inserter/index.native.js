@@ -348,7 +348,7 @@ export default compose( [
 			insertionIndexDefault: getDefaultInsertionIndex(),
 			insertionIndexBefore,
 			insertionIndexAfter,
-			isAnyBlockSelected,
+			isAnyBlockSelected: !! isAnyBlockSelected,
 			isSelectedBlockReplaceable: isSelectedUnmodifiedDefaultBlock,
 		};
 	} ),
