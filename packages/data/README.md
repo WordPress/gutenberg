@@ -16,11 +16,11 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 ## Registering a Store
 
-Use the `registerStore` function to add your own store to the centralized data registry. This function accepts two arguments: a name to identify the module, and an object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
+Use the `register` function to add your own store to the centralized data registry. This function accepts one argument – a store definition object that can be created with `createReduxStore` factory function. `createReduxStore` accepts two arguments: a name to identify the module, and an object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
 
 ```js
 import apiFetch from '@wordpress/api-fetch';
-import { registerStore } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 
 const DEFAULT_STATE = {
 	prices: {},
@@ -51,7 +51,7 @@ const actions = {
 	},
 };
 
-registerStore( 'my-shop', {
+const store = createReduxStore( 'my-shop', {
 	reducer( state = DEFAULT_STATE, action ) {
 		switch ( action.type ) {
 			case 'SET_PRICE':
@@ -98,18 +98,22 @@ registerStore( 'my-shop', {
 		},
 	},
 } );
+
+register( store );
 ```
 
-The return value of `registerStore` is a [Redux-like store object](https://redux.js.org/basics/store) with the following methods:
+The return value of `createReduxStore` is the `WPDataStore` object that contains two properties:
 
--   `store.getState()`: Returns the state value of the registered reducer
-    -   _Redux parallel:_ [`getState`](https://redux.js.org/api/store#getstate)
--   `store.subscribe( listener: Function )`: Registers a function called any time the value of state changes.
-    -   _Redux parallel:_ [`subscribe`](https://redux.js.org/api/store#subscribelistener)
--   `store.dispatch( action: Object )`: Given an action object, calls the registered reducer and updates the state value.
-    -   _Redux parallel:_ [`dispatch`](https://redux.js.org/api/store#dispatchaction)
+-   `name` (`string`) – the name of the store
+-   `instantiate` (`Function`) - it returns a [Redux-like store object](https://redux.js.org/basics/store) with the following methods:
+    -   `getState()`: Returns the state value of the registered reducer
+        -   _Redux parallel:_ [`getState`](https://redux.js.org/api/store#getstate)
+    -   `subscribe( listener: Function )`: Registers a function called any time the value of state changes.
+        -   _Redux parallel:_ [`subscribe`](https://redux.js.org/api/store#subscribelistener)
+    -   `dispatch( action: Object )`: Given an action object, calls the registered reducer and updates the state value.
+        -   _Redux parallel:_ [`dispatch`](https://redux.js.org/api/store#dispatchaction)
 
-### Options
+### Redux Store Options
 
 #### `reducer`
 
@@ -308,7 +312,7 @@ reducing functions into a single reducing function you can pass to registerReduc
 _Usage_
 
 ```js
-import { combineReducers, registerStore } from '@wordpress/data';
+import { combineReducers, createReduxStore, register } from '@wordpress/data';
 
 const prices = ( state = {}, action ) => {
 	return action.type === 'SET_PRICE' ?
@@ -325,12 +329,13 @@ const discountPercent = ( state = 0, action ) => {
 		state;
 };
 
-registerStore( 'my-shop', {
+const store = createReduxStore( 'my-shop', {
 	reducer: combineReducers( {
 		prices,
 		discountPercent,
 	} ),
 } );
+register( store );
 ```
 
 _Parameters_
@@ -479,7 +484,7 @@ dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
 
 _Parameters_
 
--   _name_ `string`: Store name.
+-   _storeNameOrDefinition_ `(string|WPDataStore)`: Unique namespace identifier for the store or the store definition.
 
 _Returns_
 
@@ -512,7 +517,7 @@ const store = createReduxStore( 'demo', {
         getValue: ( state ) => state,
     },
 } );
-registry.register( store );
+register( store );
 ```
 
 _Parameters_
@@ -520,6 +525,8 @@ _Parameters_
 -   _store_ `WPDataStore`: Store definition.
 
 <a name="registerGenericStore" href="#registerGenericStore">#</a> **registerGenericStore**
+
+> **Deprecated** Use `register` instead.
 
 Registers a generic store.
 
@@ -529,6 +536,8 @@ _Parameters_
 -   _config_ `Object`: Configuration (getSelectors, getActions, subscribe).
 
 <a name="registerStore" href="#registerStore">#</a> **registerStore**
+
+> **Deprecated** Use `register` instead.
 
 Registers a standard `@wordpress/data` store.
 
@@ -584,7 +593,7 @@ example.
 
 <a name="select" href="#select">#</a> **select**
 
-Given the name of a registered store, returns an object of the store's selectors.
+Given the name or definition of a registered store, returns an object of the store's selectors.
 The selector functions are been pre-bound to pass the current state automatically.
 As a consumer, you need only pass arguments of the selector, if applicable.
 
@@ -598,7 +607,7 @@ select( 'my-shop' ).getPrice( 'hammer' );
 
 _Parameters_
 
--   _name_ `string`: Store name.
+-   _storeNameOrDefinition_ `(string|WPDataStore)`: Unique namespace identifier for the store or the store definition.
 
 _Returns_
 
