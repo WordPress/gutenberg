@@ -13,6 +13,7 @@
 		"postType"
 	],
 	"supports": {
+		"align": [ "left", "right", "center", "wide", "full" ],
 		"html": false
 	}
 }

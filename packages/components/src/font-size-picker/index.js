@@ -121,6 +121,13 @@ export default function FontSizePicker( {
 							type="number"
 							min={ 1 }
 							onChange={ ( event ) => {
+								if (
+									! event.target.value &&
+									event.target.value !== 0
+								) {
+									onChange( undefined );
+									return;
+								}
 								if ( hasUnits ) {
 									onChange( event.target.value + 'px' );
 								} else {

@@ -10,8 +10,7 @@ const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
 const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
 const initialTriggerPercentage = 0.75;
 
-function Typewriter( { children } ) {
-	const ref = useRef();
+export function useTypewriter( ref ) {
 	const hasSelectedBlock = useSelect( ( select ) =>
 		select( 'core/block-editor' ).hasSelectedBlock()
 	);
@@ -242,7 +241,11 @@ function Typewriter( { children } ) {
 			defaultView.cancelAnimationFrame( onKeyDownRafId );
 		};
 	}, [ hasSelectedBlock ] );
+}
 
+function Typewriter( { children } ) {
+	const ref = useRef();
+	useTypewriter( ref );
 	return (
 		<div ref={ ref } className="block-editor__typewriter">
 			{ children }

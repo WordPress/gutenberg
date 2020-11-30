@@ -101,41 +101,17 @@ function gutenberg_edit_site_init( $hook ) {
 	 */
 	$current_screen->is_block_editor( true );
 
-	// Get editor settings.
-	$max_upload_size = wp_max_upload_size();
-	if ( ! $max_upload_size ) {
-		$max_upload_size = 0;
-	}
-
-	// This filter is documented in wp-admin/includes/media.php.
-	$image_size_names      = apply_filters(
-		'image_size_names_choose',
+	$settings = array_merge(
+		gutenberg_get_common_block_editor_settings(),
 		array(
-			'thumbnail' => __( 'Thumbnail', 'gutenberg' ),
-			'medium'    => __( 'Medium', 'gutenberg' ),
-			'large'     => __( 'Large', 'gutenberg' ),
-			'full'      => __( 'Full Size', 'gutenberg' ),
+			'alignWide'            => get_theme_support( 'align-wide' ),
+			'siteUrl'              => site_url(),
+			'postsPerPage'         => get_option( 'posts_per_page' ),
+			'styles'               => gutenberg_get_editor_styles(),
+			'defaultTemplateTypes' => gutenberg_get_indexed_default_template_types(),
 		)
 	);
-	$available_image_sizes = array();
-	foreach ( $image_size_names as $image_size_slug => $image_size_name ) {
-		$available_image_sizes[] = array(
-			'slug' => $image_size_slug,
-			'name' => $image_size_name,
-		);
-	}
-
-	$settings = array(
-		'alignWide'         => get_theme_support( 'align-wide' ),
-		'imageSizes'        => $available_image_sizes,
-		'isRTL'             => is_rtl(),
-		'maxUploadFileSize' => $max_upload_size,
-		'siteUrl'           => site_url(),
-		'postsPerPage'      => get_option( 'posts_per_page' ),
-	);
-
-	$settings['styles'] = gutenberg_get_editor_styles();
-	$settings           = gutenberg_experimental_global_styles_settings( $settings );
+	$settings = gutenberg_experimental_global_styles_settings( $settings );
 
 	// Preload block editor paths.
 	// most of these are copied from edit-forms-blocks.php.
@@ -165,7 +141,7 @@ function gutenberg_edit_site_init( $hook ) {
 			'wp.domReady( function() {
 				wp.editSite.initialize( "edit-site-editor", %s );
 			} );',
-			wp_json_encode( gutenberg_experiments_editor_settings( $settings ) )
+			wp_json_encode( $settings )
 		)
 	);
 
@@ -206,7 +182,7 @@ add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
  */
 function register_site_editor_homepage_settings() {
 	register_setting(
-		'general',
+		'reading',
 		'show_on_front',
 		array(
 			'show_in_rest' => true,
@@ -216,7 +192,7 @@ function register_site_editor_homepage_settings() {
 	);
 
 	register_setting(
-		'general',
+		'reading',
 		'page_on_front',
 		array(
 			'show_in_rest' => true,

@@ -8,6 +8,7 @@ export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as Autocomplete } from './autocomplete';
 export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
+export { default as __experimentalBlockFullHeightAligmentToolbar } from './block-full-height-alignment-toolbar';
 export { default as __experimentalBlockAlignmentMatrixToolbar } from './block-alignment-matrix-toolbar';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
 export { BlockContextProvider } from './block-context';
@@ -83,26 +84,42 @@ export {
 } from './block-list/block-wrapper';
 export { default as BlockMover } from './block-mover';
 export { default as BlockPreview } from './block-preview';
-export { default as BlockSelectionClearer } from './block-selection-clearer';
+export {
+	default as BlockSelectionClearer,
+	useBlockSelectionClearer as __unstableUseBlockSelectionClearer,
+} from './block-selection-clearer';
 export { default as BlockSettingsMenu } from './block-settings-menu';
 export { default as BlockSettingsMenuControls } from './block-settings-menu-controls';
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
-export { default as CopyHandler } from './copy-handler';
+export {
+	default as CopyHandler,
+	useClipboardHandler as __unstableUseClipboardHandler,
+} from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
-export { default as __unstableEditorStyles } from './editor-styles';
+export { default as __unstableUseEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export { default as __experimentalLibrary } from './inserter/library';
 export { default as __experimentalSearchForm } from './inserter/search-form';
 export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';
-export { default as MultiSelectScrollIntoView } from './multi-select-scroll-into-view';
+export {
+	default as MultiSelectScrollIntoView,
+	useScrollMultiSelectionIntoView as __unstableUseScrollMultiSelectionIntoView,
+} from './multi-select-scroll-into-view';
 export { default as NavigableToolbar } from './navigable-toolbar';
-export { default as ObserveTyping } from './observe-typing';
+export {
+	default as ObserveTyping,
+	useTypingObserver as __unstableUseTypingObserver,
+} from './observe-typing';
 export { default as PreserveScrollInReorder } from './preserve-scroll-in-reorder';
 export { default as SkipToSelectedBlock } from './skip-to-selected-block';
-export { default as Typewriter } from './typewriter';
+export {
+	default as Typewriter,
+	useTypewriter as __unstableUseTypewriter,
+} from './typewriter';
 export { default as Warning } from './warning';
 export { default as WritingFlow } from './writing-flow';
+export { useCanvasClickRedirect as __unstableUseCanvasClickRedirect } from './use-canvas-click-redirect';
 
 /*
  * State Related Components

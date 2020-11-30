@@ -536,6 +536,17 @@ _Parameters_
 
 -   _viewport_ `WPViewport`: Viewport name or dimensions object to assign.
 
+<a name="setClipboardData" href="#setClipboardData">#</a> **setClipboardData**
+
+Sets the clipboard data that can be pasted with
+`pressKeyWithModifier( 'primary', 'v' )`.
+
+_Parameters_
+
+-   _$1_ `Object`: Options.
+-   _$1.plainText_ `string`: Plain text to set.
+-   _$1.html_ `string`: HTML to set.
+
 <a name="setPostContent" href="#setPostContent">#</a> **setPostContent**
 
 Sets code editor content
@@ -636,6 +647,7 @@ Navigates to the post listing screen and bulk-trashes any posts which exist.
 _Parameters_
 
 -   _postType_ `string`: String slug for type of post to trash.
+-   _postStatus_ `string`: String status of posts to trash.
 
 _Returns_
 

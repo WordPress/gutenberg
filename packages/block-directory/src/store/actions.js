@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
@@ -85,7 +86,7 @@ export function* installBlockType( block ) {
 
 		yield loadAssets( assets );
 		const registeredBlocks = yield controls.select(
-			'core/blocks',
+			blocksStore.name,
 			'getBlockTypes'
 		);
 		if ( ! registeredBlocks.some( ( i ) => i.name === block.name ) ) {

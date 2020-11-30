@@ -19,7 +19,31 @@
 .wp-block-social-links__social-placeholder {
 	display: flex;
 	opacity: 0.8;
+	transition: all 0.1s ease-in-out;
+	@include reduce-motion("transition");
 
+	.is-selected & {
+		opacity: 0.1;
+	}
+
+	// Use the first link to set the height.
+	> .wp-social-link {
+		// Use !important to keep the selector simple.
+		padding-left: 0 !important;
+		margin-left: 0 !important;
+		padding-right: 0 !important;
+		margin-right: 0 !important;
+		width: 0 !important;
+		visibility: hidden;
+	}
+
+	// Wrap the remaining placeholders in a container so the plus can overlap.
+	> .wp-block-social-links__social-placeholder-icons {
+		display: flex;
+		position: absolute;
+	}
+
+	& + .block-list-appender,
 	.wp-social-link {
 		padding: 0.25em;
 
@@ -44,15 +68,31 @@
 
 // Polish the Appender.
 .wp-block-social-links .block-list-appender {
-	margin: -$grid-unit-10 0;
 	display: flex;
 	align-items: center;
+	justify-content: center;
+	margin: 0;
 
-	svg {
-		width: $icon-size;
-		height: $icon-size;
+	&::before {
+		content: "";
+		display: block;
+		width: 1em;
+		height: 1em;
+	}
+
+	.block-editor-inserter {
+		position: absolute;
+	}
+
+	.block-editor-button-block-appender.block-list-appender__toggle {
+		margin: 0;
 	}
 }
+
+.wp-block-social-links.is-style-logos-only .block-list-appender {
+	padding: 4px;
+}
+
 
 // Center flex items. This has an equivalent in style.scss.
 .wp-block[data-align="center"] > .wp-block-social-links {

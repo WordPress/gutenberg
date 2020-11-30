@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import { isMatch } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import {
 	DropdownMenu,
@@ -16,22 +12,17 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 import { chevronDown } from '@wordpress/icons';
 
-export const getMatchingVariationName = ( blockAttributes, variations ) => {
-	if ( ! variations || ! blockAttributes ) return;
-	const matches = variations.filter( ( { attributes } ) => {
-		if ( ! attributes || ! Object.keys( attributes ).length ) return false;
-		return isMatch( blockAttributes, attributes );
-	} );
-	if ( matches.length !== 1 ) return;
-	return matches[ 0 ].name;
-};
+/**
+ * Internal dependencies
+ */
+import { __experimentalGetMatchingVariation as getMatchingVariation } from '../../utils';
 
 function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	const [ selectedValue, setSelectedValue ] = useState();
 	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
 	const { variations, blockAttributes } = useSelect(
 		( select ) => {
-			const { getBlockVariations } = select( 'core/blocks' );
+			const { getBlockVariations } = select( blocksStore );
 			const { getBlockName, getBlockAttributes } = select(
 				'core/block-editor'
 			);
@@ -46,7 +37,7 @@ function __experimentalBlockVariationTransforms( { blockClientId } ) {
 	);
 	useEffect( () => {
 		setSelectedValue(
-			getMatchingVariationName( blockAttributes, variations )
+			getMatchingVariation( blockAttributes, variations )?.name
 		);
 	}, [ blockAttributes, variations ] );
 	if ( ! variations?.length ) return null;

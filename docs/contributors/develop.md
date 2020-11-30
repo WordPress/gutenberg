@@ -6,7 +6,7 @@ A guide on how to get started contributing code to the Gutenberg project.
 
 The [Make WordPress Core blog](https://make.wordpress.org/core/) is the primary spot for the latest information around WordPress development: including announcements, product goals, meeting notes, meeting agendas, and more.
 
-Real-time discussions for development take place in `#core-editor` and `#core-js` channels in [Make WordPress Slack](https://make.wordpress.org/chat) (registration required). Weekly meetings for the editor component are on Wednesdays at 14:00UTC, and for the JavaScript component on Tuesday at 14:00UTC, in their respective Slack channels.
+Real-time discussions for development take place in `#core-editor` and `#core-js` channels in [Make WordPress Slack](https://make.wordpress.org/chat) (registration required). Weekly meetings for the editor component are on Wednesdays at 14:00UTC, and for the JavaScript component on Tuesday at 15:00UTC, in their respective Slack channels.
 
 ## Development Hub
 

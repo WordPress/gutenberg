@@ -15,7 +15,6 @@ import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
 	BlockContextProvider,
-	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
@@ -172,7 +171,6 @@ class EditorProvider extends Component {
 				'__experimentalFeatures',
 				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBaseStyles',
-				'__experimentalGlobalStylesContexts',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
 				'alignWide',
@@ -270,32 +268,29 @@ class EditorProvider extends Component {
 		);
 
 		return (
-			<>
-				<EditorStyles styles={ settings.styles } />
-				<EntityProvider kind="root" type="site">
-					<EntityProvider
-						kind="postType"
-						type={ post.type }
-						id={ post.id }
-					>
-						<BlockContextProvider value={ defaultBlockContext }>
-							<BlockEditorProvider
-								value={ blocks }
-								onInput={ resetEditorBlocksWithoutUndoLevel }
-								onChange={ resetEditorBlocks }
-								selectionStart={ selectionStart }
-								selectionEnd={ selectionEnd }
-								settings={ editorSettings }
-								useSubRegistry={ false }
-							>
-								{ children }
-								<ReusableBlocksMenuItems />
-								<ConvertToGroupButtons />
-							</BlockEditorProvider>
-						</BlockContextProvider>
-					</EntityProvider>
+			<EntityProvider kind="root" type="site">
+				<EntityProvider
+					kind="postType"
+					type={ post.type }
+					id={ post.id }
+				>
+					<BlockContextProvider value={ defaultBlockContext }>
+						<BlockEditorProvider
+							value={ blocks }
+							onInput={ resetEditorBlocksWithoutUndoLevel }
+							onChange={ resetEditorBlocks }
+							selectionStart={ selectionStart }
+							selectionEnd={ selectionEnd }
+							settings={ editorSettings }
+							useSubRegistry={ false }
+						>
+							{ children }
+							<ReusableBlocksMenuItems />
+							<ConvertToGroupButtons />
+						</BlockEditorProvider>
+					</BlockContextProvider>
 				</EntityProvider>
-			</>
+			</EntityProvider>
 		);
 	}
 }

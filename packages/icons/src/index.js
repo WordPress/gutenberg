@@ -150,6 +150,7 @@ export { default as rotateRight } from './library/rotate-right';
 export { default as rss } from './library/rss';
 export { default as search } from './library/search';
 export { default as separator } from './library/separator';
+export { default as settings } from './library/settings';
 export { default as share } from './library/share';
 export { default as shortcode } from './library/shortcode';
 export { default as stack } from './library/stack';

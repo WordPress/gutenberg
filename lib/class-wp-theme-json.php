@@ -28,6 +28,13 @@ class WP_Theme_JSON {
 	private static $blocks_metadata = null;
 
 	/**
+	 * The name of the global context.
+	 *
+	 * @var string
+	 */
+	const GLOBAL_NAME = 'global';
+
+	/**
 	 * The CSS selector for the global context.
 	 *
 	 * @var string
@@ -35,31 +42,22 @@ class WP_Theme_JSON {
 	const GLOBAL_SELECTOR = ':root';
 
 	/**
-	 * The block type and name for the global context.
-	 *
-	 * @var string
-	 */
-	const GLOBAL_TYPE = 'global';
-
-	/**
-	 * The block arguments for the global context.
+	 * The supported properties of the global context.
 	 *
 	 * @var array
 	 */
-	const GLOBAL_ARGS = array(
-		'supports' => array(
-			'__experimentalFontAppearance' => false,
-			'__experimentalFontFamily'     => true,
-			'__experimentalSelector'       => self::GLOBAL_SELECTOR,
-			'__experimentalTextDecoration' => true,
-			'__experimentalTextTransform'  => true,
-			'color'                        => array(
-				'gradients' => true,
-				'link'      => true,
-			),
-			'fontSize'                     => true,
-			'lineHeight'                   => true,
-		),
+	const GLOBAL_SUPPORTS = array(
+		'--wp--style--color--link',
+		'background',
+		'backgroundColor',
+		'color',
+		'fontFamily',
+		'fontSize',
+		'fontStyle',
+		'fontWeight',
+		'lineHeight',
+		'textDecoration',
+		'textTransform',
 	);
 
 	/**
@@ -98,6 +96,14 @@ class WP_Theme_JSON {
 				'gradient'   => null,
 				'link'       => null,
 				'text'       => null,
+			),
+			'spacing'    => array(
+				'padding' => array(
+					'top'    => null,
+					'right'  => null,
+					'bottom' => null,
+					'left'   => null,
+				),
 			),
 			'typography' => array(
 				'fontFamily'     => null,
@@ -215,7 +221,7 @@ class WP_Theme_JSON {
 		),
 		array(
 			'path'          => array( 'settings', 'typography', 'fontStyles' ),
-			'value_key'     => 'slug',
+			'value_key'     => 'value',
 			'css_var_infix' => 'font-style',
 			'classes'       => array(
 				array(
@@ -226,7 +232,7 @@ class WP_Theme_JSON {
 		),
 		array(
 			'path'          => array( 'settings', 'typography', 'fontWeights' ),
-			'value_key'     => 'slug',
+			'value_key'     => 'value',
 			'css_var_infix' => 'font-weight',
 			'classes'       => array(
 				array(
@@ -262,53 +268,71 @@ class WP_Theme_JSON {
 	/**
 	 * Metadata for style properties.
 	 *
-	 * - 'theme_json' => where the property value is stored
-	 * - 'block_json' => whether the block has declared support for it
+	 * Each property declares:
+	 *
+	 * - 'value': path to the value in theme.json and block attributes.
+	 * - 'support': path to the block support in block.json.
 	 */
 	const PROPERTIES_METADATA = array(
 		'--wp--style--color--link' => array(
-			'theme_json' => array( 'color', 'link' ),
-			'block_json' => array( 'color', 'link' ),
+			'value'   => array( 'color', 'link' ),
+			'support' => array( 'color', 'link' ),
 		),
 		'background'               => array(
-			'theme_json' => array( 'color', 'gradient' ),
-			'block_json' => array( 'color', 'gradients' ),
+			'value'   => array( 'color', 'gradient' ),
+			'support' => array( 'color', 'gradients' ),
 		),
 		'backgroundColor'          => array(
-			'theme_json' => array( 'color', 'background' ),
-			'block_json' => array( 'color' ),
+			'value'   => array( 'color', 'background' ),
+			'support' => array( 'color' ),
 		),
 		'color'                    => array(
-			'theme_json' => array( 'color', 'text' ),
-			'block_json' => array( 'color' ),
+			'value'   => array( 'color', 'text' ),
+			'support' => array( 'color' ),
 		),
 		'fontFamily'               => array(
-			'theme_json' => array( 'typography', 'fontFamily' ),
-			'block_json' => array( '__experimentalFontFamily' ),
+			'value'   => array( 'typography', 'fontFamily' ),
+			'support' => array( '__experimentalFontFamily' ),
 		),
 		'fontSize'                 => array(
-			'theme_json' => array( 'typography', 'fontSize' ),
-			'block_json' => array( 'fontSize' ),
+			'value'   => array( 'typography', 'fontSize' ),
+			'support' => array( 'fontSize' ),
 		),
 		'fontStyle'                => array(
-			'theme_json' => array( 'typography', 'fontStyle' ),
-			'block_json' => array( '__experimentalFontAppearance' ),
+			'value'   => array( 'typography', 'fontStyle' ),
+			'support' => array( '__experimentalFontStyle' ),
 		),
 		'fontWeight'               => array(
-			'theme_json' => array( 'typography', 'fontWeight' ),
-			'block_json' => array( '__experimentalFontAppearance' ),
+			'value'   => array( 'typography', 'fontWeight' ),
+			'support' => array( '__experimentalFontWeight' ),
 		),
 		'lineHeight'               => array(
-			'theme_json' => array( 'typography', 'lineHeight' ),
-			'block_json' => array( 'lineHeight' ),
+			'value'   => array( 'typography', 'lineHeight' ),
+			'support' => array( 'lineHeight' ),
+		),
+		'paddingBottom'            => array(
+			'value'   => array( 'spacing', 'padding', 'bottom' ),
+			'support' => array( 'spacing', 'padding' ),
+		),
+		'paddingLeft'              => array(
+			'value'   => array( 'spacing', 'padding', 'left' ),
+			'support' => array( 'spacing', 'padding' ),
+		),
+		'paddingRight'             => array(
+			'value'   => array( 'spacing', 'padding', 'right' ),
+			'support' => array( 'spacing', 'padding' ),
+		),
+		'paddingTop'               => array(
+			'value'   => array( 'spacing', 'padding', 'top' ),
+			'support' => array( 'spacing', 'padding' ),
 		),
 		'textDecoration'           => array(
-			'theme_json' => array( 'typography', 'textDecoration' ),
-			'block_json' => array( '__experimentalTextDecoration' ),
+			'value'   => array( 'typography', 'textDecoration' ),
+			'support' => array( '__experimentalTextDecoration' ),
 		),
 		'textTransform'            => array(
-			'theme_json' => array( 'typography', 'textTransform' ),
-			'block_json' => array( '__experimentalTextTransform' ),
+			'value'   => array( 'typography', 'textTransform' ),
+			'support' => array( '__experimentalTextTransform' ),
 		),
 	);
 
@@ -326,7 +350,7 @@ class WP_Theme_JSON {
 
 		$metadata = $this->get_blocks_metadata();
 		foreach ( $contexts as $key => $context ) {
-			if ( ! array_key_exists( $key, $metadata ) ) {
+			if ( ! isset( $metadata[ $key ] ) ) {
 				// Skip incoming contexts that can't be found
 				// within the contexts registered.
 				continue;
@@ -341,11 +365,11 @@ class WP_Theme_JSON {
 
 			// Process styles subtree.
 			$this->process_key( 'styles', $context, self::SCHEMA );
-			if ( array_key_exists( 'styles', $context ) ) {
+			if ( isset( $context['styles'] ) ) {
 				$this->process_key( 'color', $context['styles'], self::SCHEMA['styles'] );
 				$this->process_key( 'typography', $context['styles'], self::SCHEMA['styles'] );
 
-				if ( 0 === count( $context['styles'] ) ) {
+				if ( empty( $context['styles'] ) ) {
 					unset( $context['styles'] );
 				} else {
 					$this->contexts[ $key ]['styles'] = $context['styles'];
@@ -354,12 +378,12 @@ class WP_Theme_JSON {
 
 			// Process settings subtree.
 			$this->process_key( 'settings', $context, self::SCHEMA );
-			if ( array_key_exists( 'settings', $context ) ) {
+			if ( isset( $context['settings'] ) ) {
 				$this->process_key( 'color', $context['settings'], self::SCHEMA['settings'] );
 				$this->process_key( 'spacing', $context['settings'], self::SCHEMA['settings'] );
 				$this->process_key( 'typography', $context['settings'], self::SCHEMA['settings'] );
 
-				if ( 0 === count( $context['settings'] ) ) {
+				if ( empty( $context['settings'] ) ) {
 					unset( $context['settings'] );
 				} else {
 					$this->contexts[ $key ]['settings'] = $context['settings'];
@@ -377,47 +401,57 @@ class WP_Theme_JSON {
 	 *   'global': {
 	 *     'selector': ':root'
 	 *     'supports': [ 'fontSize', 'backgroundColor' ],
-	 *     'blockName': 'global',
 	 *   },
 	 *   'core/heading/h1': {
 	 *     'selector': 'h1'
 	 *     'supports': [ 'fontSize', 'backgroundColor' ],
-	 *     'blockName': 'core/heading',
 	 *   }
 	 * }
 	 *
 	 * @return array Block metadata.
 	 */
-	public static function get_blocks_metadata() {
+	private static function get_blocks_metadata() {
 		if ( null !== self::$blocks_metadata ) {
 			return self::$blocks_metadata;
 		}
 
-		self::$blocks_metadata = array();
+		self::$blocks_metadata = array(
+			self::GLOBAL_NAME => array(
+				'selector' => self::GLOBAL_SELECTOR,
+				'supports' => self::GLOBAL_SUPPORTS,
+			),
+		);
 
 		$registry = WP_Block_Type_Registry::get_instance();
-		$blocks   = array_merge(
-			$registry->get_all_registered(),
-			array( self::GLOBAL_TYPE => new WP_Block_Type( self::GLOBAL_TYPE, self::GLOBAL_ARGS ) )
-		);
+		$blocks   = $registry->get_all_registered();
 		foreach ( $blocks as $block_name => $block_type ) {
+			/*
+			 * Skips blocks that don't declare support,
+			 * they don't generate styles.
+			 */
 			if (
 				! property_exists( $block_type, 'supports' ) ||
-				empty( $block_type->supports ) ||
-				! is_array( $block_type->supports ) ) {
-
-				// Skips blocks that don't declare support.
-				//
-				// TODO: what if there are blocks that don't support
-				// any style but still need the settings passed down?
+				! is_array( $block_type->supports ) ||
+				empty( $block_type->supports )
+			) {
 				continue;
 			}
 
+			/*
+			 * Extract block support keys that are related to the style properties.
+			 */
 			$block_supports = array();
 			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
-				if ( gutenberg_experimental_get( $block_type->supports, $metadata['block_json'] ) ) {
+				if ( gutenberg_experimental_get( $block_type->supports, $metadata['support'] ) ) {
 					$block_supports[] = $key;
 				}
+			}
+
+			/*
+			 * Skip blocks that don't support anything related to styles.
+			 */
+			if ( empty( $block_supports ) ) {
+				continue;
 			}
 
 			/*
@@ -444,36 +478,27 @@ class WP_Theme_JSON {
 				is_string( $block_type->supports['__experimentalSelector'] )
 			) {
 				self::$blocks_metadata[ $block_name ] = array(
-					'selector'  => $block_type->supports['__experimentalSelector'],
-					'supports'  => $block_supports,
-					'blockName' => $block_name,
+					'selector' => $block_type->supports['__experimentalSelector'],
+					'supports' => $block_supports,
 				);
 			} elseif (
 				isset( $block_type->supports['__experimentalSelector'] ) &&
 				is_array( $block_type->supports['__experimentalSelector'] )
 			) {
 				foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector_metadata ) {
-					if (
-						! isset( $selector_metadata['selector'] ) ||
-						! isset( $selector_metadata['attributes'] ) ||
-						! isset( $selector_metadata['title'] )
-					) {
+					if ( ! isset( $selector_metadata['selector'] ) ) {
 						continue;
 					}
 
 					self::$blocks_metadata[ $key ] = array(
-						'selector'   => $selector_metadata['selector'],
-						'title'      => $selector_metadata['title'],
-						'supports'   => $block_supports,
-						'blockName'  => $block_name,
-						'attributes' => $selector_metadata['attributes'],
+						'selector' => $selector_metadata['selector'],
+						'supports' => $block_supports,
 					);
 				}
 			} else {
 				self::$blocks_metadata[ $block_name ] = array(
-					'selector'  => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
-					'supports'  => $block_supports,
-					'blockName' => $block_name,
+					'selector' => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
+					'supports' => $block_supports,
 				);
 			}
 		}
@@ -491,7 +516,7 @@ class WP_Theme_JSON {
 	 * @param array  $schema Schema to use for normalization.
 	 */
 	private static function process_key( $key, &$input, $schema ) {
-		if ( ! is_array( $input ) || ! array_key_exists( $key, $input ) ) {
+		if ( ! isset( $input[ $key ] ) ) {
 			return;
 		}
 
@@ -523,10 +548,7 @@ class WP_Theme_JSON {
 	 * @return array|null The settings subtree.
 	 */
 	private static function extract_settings( $context ) {
-		if (
-			! array_key_exists( 'settings', $context ) ||
-			empty( $context['settings'] )
-		) {
+		if ( empty( $context['settings'] ) ) {
 			return null;
 		}
 
@@ -643,12 +665,7 @@ class WP_Theme_JSON {
 	 * @param array $context Input context to process.
 	 */
 	private static function compute_style_properties( &$declarations, $context ) {
-		if (
-			! array_key_exists( 'supports', $context ) ||
-			empty( $context['supports'] ) ||
-			! array_key_exists( 'styles', $context ) ||
-			empty( $context['styles'] )
-		) {
+		if ( empty( $context['supports'] ) || empty( $context['styles'] ) ) {
 			return;
 		}
 
@@ -657,7 +674,7 @@ class WP_Theme_JSON {
 				continue;
 			}
 
-			$value = self::get_property_value( $context['styles'], $metadata['theme_json'] );
+			$value = self::get_property_value( $context['styles'], $metadata['value'] );
 			if ( ! empty( $value ) ) {
 				$kebabcased_name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $name ) );
 				$declarations[]  = array(
@@ -773,6 +790,9 @@ class WP_Theme_JSON {
 	 * @return string CSS ruleset.
 	 */
 	private static function to_ruleset( $selector, $declarations ) {
+		if ( empty( $declarations ) ) {
+			return '';
+		}
 		$ruleset = '';
 
 		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
@@ -799,6 +819,40 @@ class WP_Theme_JSON {
 	/**
 	 * Converts each context into a list of rulesets
 	 * to be appended to the stylesheet.
+	 * These rulesets contain all the css variables (custom variables and preset variables).
+	 *
+	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
+	 *
+	 * For each context this creates a new ruleset such as:
+	 *
+	 *   context-selector {
+	 *     --wp--preset--category--slug: value;
+	 *     --wp--custom--variable: value;
+	 *   }
+	 *
+	 * @param string $stylesheet Stylesheet to append new rules to.
+	 * @param array  $context Context to be processed.
+	 *
+	 * @return string The new stylesheet.
+	 */
+	private static function to_css_variables( $stylesheet, $context ) {
+		if ( empty( $context['selector'] ) ) {
+			return $stylesheet;
+		}
+
+		$declarations = array();
+		self::compute_preset_vars( $declarations, $context );
+		self::compute_theme_vars( $declarations, $context );
+
+		// Attach the ruleset for style and custom properties.
+		$stylesheet .= self::to_ruleset( $context['selector'], $declarations );
+
+		return $stylesheet;
+	}
+
+	/**
+	 * Converts each context into a list of rulesets
+	 * containing the block styles to be appended to the stylesheet.
 	 *
 	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
 	 *
@@ -806,8 +860,6 @@ class WP_Theme_JSON {
 	 *
 	 *   context-selector {
 	 *     style-property-one: value;
-	 *     --wp--preset--category--slug: value;
-	 *     --wp--custom--variable: value;
 	 *   }
 	 *
 	 * Additionally, it'll also create new rulesets
@@ -829,32 +881,23 @@ class WP_Theme_JSON {
 	 *     background: value;
 	 *   }
 	 *
+	 *   p.has-value-gradient-background {
+	 *     background: value;
+	 *   }
+	 *
 	 * @param string $stylesheet Stylesheet to append new rules to.
 	 * @param array  $context Context to be processed.
 	 *
 	 * @return string The new stylesheet.
 	 */
-	private static function to_stylesheet( $stylesheet, $context ) {
-		if (
-			! array_key_exists( 'selector', $context ) ||
-			empty( $context['selector'] )
-		) {
-			return '';
+	private static function to_block_styles( $stylesheet, $context ) {
+		if ( empty( $context['selector'] ) ) {
+			return $stylesheet;
 		}
 
 		$declarations = array();
 		self::compute_style_properties( $declarations, $context );
-		self::compute_preset_vars( $declarations, $context );
-		self::compute_theme_vars( $declarations, $context );
 
-		// If there are no declarations at this point,
-		// it won't have any preset classes either,
-		// so bail out earlier.
-		if ( empty( $declarations ) ) {
-			return '';
-		}
-
-		// Attach the ruleset for style and custom properties.
 		$stylesheet .= self::to_ruleset( $context['selector'], $declarations );
 
 		// Attach the rulesets for the classes.
@@ -893,13 +936,21 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Returs the stylesheet that results of processing
+	 * Returns the stylesheet that results of processing
 	 * the theme.json structure this object represents.
 	 *
+	 * @param string $type Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
 	 * @return string Stylesheet.
 	 */
-	public function get_stylesheet() {
-		return array_reduce( $this->contexts, array( $this, 'to_stylesheet' ), '' );
+	public function get_stylesheet( $type = 'all' ) {
+		switch ( $type ) {
+			case 'block_styles':
+				return array_reduce( $this->contexts, array( $this, 'to_block_styles' ), '' );
+			case 'css_variables':
+				return array_reduce( $this->contexts, array( $this, 'to_css_variables' ), '' );
+			default:
+				return array_reduce( $this->contexts, array( $this, 'to_css_variables' ), '' ) . array_reduce( $this->contexts, array( $this, 'to_block_styles' ), '' );
+		}
 	}
 
 	/**
@@ -917,21 +968,21 @@ class WP_Theme_JSON {
 			$this->contexts[ $context ]['supports'] = $metadata[ $context ]['supports'];
 
 			foreach ( array( 'settings', 'styles' ) as $subtree ) {
-				if ( ! array_key_exists( $subtree, $incoming_data[ $context ] ) ) {
+				if ( ! isset( $incoming_data[ $context ][ $subtree ] ) ) {
 					continue;
 				}
 
-				if ( ! array_key_exists( $subtree, $this->contexts[ $context ] ) ) {
+				if ( ! isset( $this->contexts[ $context ][ $subtree ] ) ) {
 					$this->contexts[ $context ][ $subtree ] = $incoming_data[ $context ][ $subtree ];
 					continue;
 				}
 
 				foreach ( array_keys( self::SCHEMA[ $subtree ] ) as $leaf ) {
-					if ( ! array_key_exists( $leaf, $incoming_data[ $context ][ $subtree ] ) ) {
+					if ( ! isset( $incoming_data[ $context ][ $subtree ][ $leaf ] ) ) {
 						continue;
 					}
 
-					if ( ! array_key_exists( $leaf, $this->contexts[ $context ][ $subtree ] ) ) {
+					if ( ! isset( $this->contexts[ $context ][ $subtree ][ $leaf ] ) ) {
 						$this->contexts[ $context ][ $subtree ][ $leaf ] = $incoming_data[ $context ][ $subtree ][ $leaf ];
 						continue;
 					}

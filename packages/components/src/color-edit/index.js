@@ -53,7 +53,8 @@ function ColorOption( {
 	);
 
 	const isShowingControls =
-		isHover || isFocused || isEditingName || isShowingAdvancedPanel;
+		( isHover || isFocused || isEditingName || isShowingAdvancedPanel ) &&
+		! immutableColorSlugs.includes( slug );
 
 	return (
 		<div
@@ -119,9 +120,7 @@ function ColorOption( {
 							onChange={ ( newColorName ) =>
 								onChange( {
 									color,
-									slug: immutableColorSlugs.includes( slug )
-										? slug
-										: kebabCase( newColorName ),
+									slug: kebabCase( newColorName ),
 									name: newColorName,
 								} )
 							}
@@ -230,6 +229,7 @@ export default function ColorEdit( {
 	onChange,
 	emptyUI,
 	immutableColorSlugs,
+	canReset = true,
 } ) {
 	const [ isInsertingColor, setIsInsertingColor ] = useState( false );
 	return (
@@ -311,6 +311,16 @@ export default function ColorEdit( {
 					) }
 					{ ! isInsertingColor && isEmpty( colors ) && emptyUI }
 				</div>
+				{ !! canReset && (
+					<Button
+						isSmall
+						isSecondary
+						className="components-color-edit__reset-button"
+						onClick={ () => onChange() }
+					>
+						{ __( 'Reset' ) }
+					</Button>
+				) }
 			</fieldset>
 		</BaseControl>
 	);

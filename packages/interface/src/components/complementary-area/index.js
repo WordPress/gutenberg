@@ -11,6 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { check, starEmpty, starFilled } from '@wordpress/icons';
 import { useEffect, useRef } from '@wordpress/element';
+import { store as viewportStore } from '@wordpress/viewport';
 
 /**
  * Internal dependencies
@@ -104,10 +105,8 @@ function ComplementaryArea( {
 				isActive: _activeArea === identifier,
 				isPinned: isItemPinned( scope, identifier ),
 				activeArea: _activeArea,
-				isSmall: select( 'core/viewport' ).isViewportMatch(
-					'< medium'
-				),
-				isLarge: select( 'core/viewport' ).isViewportMatch( 'large' ),
+				isSmall: select( viewportStore ).isViewportMatch( '< medium' ),
+				isLarge: select( viewportStore ).isViewportMatch( 'large' ),
 			};
 		},
 		[ identifier, scope ]

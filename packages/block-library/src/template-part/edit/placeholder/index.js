@@ -29,14 +29,13 @@ export default function TemplatePartPlaceholder( {
 				title,
 				status: 'publish',
 				slug,
-				meta: { theme: '' },
 				content: serialize( innerBlocks ),
 			}
 		);
 		setAttributes( {
 			postId: templatePart.id,
 			slug: templatePart.slug,
-			theme: templatePart.meta.theme,
+			theme: templatePart.wp_theme_slug,
 		} );
 	}, [ setAttributes ] );
 
