@@ -49,7 +49,7 @@ export default function useFocusOutside( onFocusOutside, wrapperRef ) {
 	const preventBlurCheck = useRef( false );
 
 	/**
-	 * @type {import('react').Ref<number | undefined>}
+	 * @type {import('react').MutableRefObject<number | undefined>}
 	 */
 	const blurCheckTimeoutId = useRef();
 
