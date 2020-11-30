@@ -4,7 +4,14 @@
         "name": "core/verse",
         "isValid": true,
         "attributes": {
-            "content": "A <em>verse</em>…<br>And more!"
+            "content": "A <em>verse</em>…<br>And more!",
+            "style": {
+                "spacing": {
+                    "padding": {
+                        "default": 20
+                    }
+                }
+            }
         },
         "innerBlocks": [],
         "originalContent": "<pre class=\"wp-block-verse\">A <em>verse</em>…<br>And more!</pre>"
