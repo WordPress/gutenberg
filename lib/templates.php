@@ -308,3 +308,41 @@ function filter_rest_prepare_add_wp_theme_slug_and_file_based( $response ) {
 }
 add_filter( 'rest_prepare_wp_template', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
 add_filter( 'rest_prepare_wp_template_part', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
+
+/**
+ * Filters the post data for a response.
+ *
+ * @param WP_REST_Response $response The response object.
+ * @return WP_REST_Response
+ */
+function filter_rest_prepare_add_file_based_templates( $response ) {
+
+	add_filter(
+		'the_posts',
+		function( $posts ) {
+
+			// Build an array of database-based templates (slugs only).
+			$db_templates = array();
+			foreach ( $posts as $db_template ) {
+				$db_templates[] = $db_template->post_title;
+			}
+
+			// Get all file-based templates.
+			$template_paths = gutenberg_get_template_paths();
+
+			// Loop file-based templates and add the ones that don't exist in the database.
+			foreach ( $template_paths as $path ) {
+				$slug = basename( $path, '.html' );
+				if ( in_array( $slug, $db_templates, true ) ) {
+					continue;
+				}
+
+				$posts[] = gutenberg_get_file_template_object( $path );
+			}
+
+			return $posts;
+		}
+	);
+	return $response;
+}
+add_filter( 'rest_prepare_wp_template', 'filter_rest_prepare_add_file_based_templates' );
