@@ -82,64 +82,6 @@ figure.wp-block-gallery {
 	}
 }
 
-.block-library-gallery-item__inline-menu {
-	display: none;
-	position: absolute;
-	top: -2px;
-	margin: $grid-unit-10;
-	z-index: z-index(".block-library-gallery-item__inline-menu");
-	transition: box-shadow 0.2s ease-out;
-	@include reduce-motion( "transition" );
-	border-radius: $radius-block-ui;
-	background: $white;
-	border: $border-width solid $gray-900;
-
-	&:hover {
-		box-shadow: $shadow-popover;
-	}
-
-	@include break-small() {
-		// Use smaller buttons to fit when there are many columns.
-		.columns-7 &,
-		.columns-8 & {
-			padding: $grid-unit-05 / 2;
-		}
-	}
-
-	.components-button.has-icon {
-		&:not(:focus) {
-			border: none;
-			box-shadow: none;
-		}
-
-		@include break-small() {
-			// Use smaller buttons to fit when there are many columns.
-			.columns-7 &,
-			.columns-8 & {
-				padding: 0;
-				width: inherit;
-				height: inherit;
-			}
-		}
-	}
-
-	&.is-left {
-		left: -2px;
-	}
-
-	&.is-right {
-		right: -2px;
-	}
-}
-
-.blocks-gallery-item .components-spinner {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	margin-top: -9px;
-	margin-left: -9px;
-}
-
 .gallery-settings-buttons {
 	.components-button:first-child {
 		margin-right: 8px;
