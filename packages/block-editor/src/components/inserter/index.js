@@ -13,7 +13,7 @@ import { Dropdown, Button } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, ifCondition } from '@wordpress/compose';
-import { createBlock } from '@wordpress/blocks';
+import { createBlock, store as blocksStore } from '@wordpress/blocks';
 import { plus } from '@wordpress/icons';
 
 /**
@@ -199,7 +199,7 @@ export default compose( [
 			hasInserterItems,
 			__experimentalGetAllowedBlocks,
 		} = select( 'core/block-editor' );
-		const { getBlockVariations } = select( 'core/blocks' );
+		const { getBlockVariations } = select( blocksStore );
 
 		rootClientId =
 			rootClientId || getBlockRootClientId( clientId ) || undefined;

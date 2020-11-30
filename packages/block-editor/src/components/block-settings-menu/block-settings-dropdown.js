@@ -18,6 +18,7 @@ import { moreVertical } from '@wordpress/icons';
 
 import { Children, cloneElement, useCallback } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -45,9 +46,7 @@ export function BlockSettingsDropdown( {
 	const firstBlockClientId = blockClientIds[ 0 ];
 
 	const shortcuts = useSelect( ( select ) => {
-		const { getShortcutRepresentation } = select(
-			'core/keyboard-shortcuts'
-		);
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 		return {
 			duplicate: getShortcutRepresentation(
 				'core/block-editor/duplicate'

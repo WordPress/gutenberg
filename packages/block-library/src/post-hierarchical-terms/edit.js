@@ -14,6 +14,7 @@ import {
 	useBlockProps,
 	__experimentalBlockVariationPicker as BlockVariationPicker,
 } from '@wordpress/block-editor';
+import { store as blocksStore } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -39,7 +40,7 @@ export default function PostHierarchicalTermsEdit( {
 				getBlockVariations,
 				getBlockType,
 				getDefaultBlockVariation,
-			} = select( 'core/blocks' );
+			} = select( blocksStore );
 
 			return {
 				blockType: getBlockType( name ),

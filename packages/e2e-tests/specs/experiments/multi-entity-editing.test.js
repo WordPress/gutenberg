@@ -137,11 +137,6 @@ const removeErrorMocks = () => {
 };
 
 describe( 'Multi-entity editor states', () => {
-	// Setup & Teardown.
-	const templateName = 'Front Page';
-	const templatePartName = 'Test Template Part Name Edit';
-	const nestedTPName = 'Test Nested Template Part Name Edit';
-
 	beforeAll( async () => {
 		await activateTheme( 'twentytwentyone-blocks' );
 		await trashAllPosts( 'wp_template' );
@@ -167,7 +162,7 @@ describe( 'Multi-entity editor states', () => {
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
 
 		// Switch back and make sure it is still clean.
-		await clickTemplateItem( 'Templates', templateName );
+		await clickTemplateItem( 'Templates', 'Front Page' );
 		await page.waitForSelector( '.wp-block' );
 		expect( await isEntityDirty( 'header' ) ).toBe( false );
 		expect( await isEntityDirty( 'front-page' ) ).toBe( false );
@@ -176,6 +171,10 @@ describe( 'Multi-entity editor states', () => {
 	} );
 
 	describe( 'Multi-entity edit', () => {
+		const templatePartName = 'Test Template Part Name Edit';
+		const nestedTPName = 'Test Nested Template Part Name Edit';
+		const templateName = 'Custom Template';
+
 		beforeAll( async () => {
 			await trashAllPosts( 'wp_template' );
 			await trashAllPosts( 'wp_template_part' );
@@ -196,10 +195,18 @@ describe( 'Multi-entity editor states', () => {
 			);
 			await saveAllEntities();
 			await visitSiteEditor();
-			// Waits for the template part to load...
+
+			// Wait for site editor to load.
 			await page.waitForSelector(
 				'.wp-block-template-part .block-editor-block-list__layout'
 			);
+
+			// Our custom template shows up in the " templates > all" menu; let's use it.
+			clickTemplateItem( [ 'Templates', 'All' ], templateName );
+			await page.waitForXPath(
+				`//p[contains(@class, "edit-site-document-actions__title") and contains(text(), '${ templateName }')]`
+			);
+
 			removeErrorMocks();
 		} );
 

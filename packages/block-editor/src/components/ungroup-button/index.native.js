@@ -6,6 +6,7 @@ import { noop } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { store as blocksStore } from '@wordpress/blocks';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
@@ -37,7 +38,7 @@ export default compose( [
 			'core/block-editor'
 		);
 
-		const { getGroupingBlockName } = select( 'core/blocks' );
+		const { getGroupingBlockName } = select( blocksStore );
 
 		const selectedId = getSelectedBlockClientId();
 		const selectedBlock = getBlock( selectedId );
