@@ -49,17 +49,17 @@ export default function SimpleTooltip( {
 }
 
 function useTooltipPosition( { inputRef, position: positionProp } ) {
-	const [ position, setPosition ] = useState( 'top' );
+	const [ position, setPosition ] = useState( 'bottom' );
 
 	const calculatePosition = useCallback( () => {
 		if ( inputRef && inputRef.current ) {
 			let nextPosition = positionProp;
 
 			if ( positionProp === 'auto' ) {
-				const { top } = inputRef.current.getBoundingClientRect();
-				const isOffscreenTop = top - TOOLTIP_OFFSET_HEIGHT < 0;
+				const { bottom } = inputRef.current.getBoundingClientRect();
+				const isOffscreenBottom = bottom - TOOLTIP_OFFSET_HEIGHT < 0;
 
-				nextPosition = isOffscreenTop ? 'bottom' : 'top';
+				nextPosition = isOffscreenBottom ? 'top' : 'bottom';
 			}
 
 			setPosition( nextPosition );
