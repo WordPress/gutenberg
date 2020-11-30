@@ -38,6 +38,7 @@ export { default as Caption } from './caption';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
 export { default as __experimentalUseEditorFeature } from './use-editor-feature';
+export { default as MediaReplaceFlow } from './media-replace-flow';
 
 export {
 	BottomSheetSettings,

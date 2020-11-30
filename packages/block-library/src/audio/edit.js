@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
+import { View, Figure } from '@wordpress/primitives';
 import {
-	Disabled,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
@@ -28,10 +28,11 @@ import { createBlock } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { createUpgradedEmbedBlock } from '../embed/util';
+import { AudioPlayer } from './audio-player';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
-function AudioEdit( {
+export function AudioEdit( {
 	attributes,
 	noticeOperations,
 	setAttributes,
@@ -39,6 +40,7 @@ function AudioEdit( {
 	isSelected,
 	noticeUI,
 	insertBlocksAfter,
+	onFocus,
 } ) {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
 	const blockProps = useBlockProps();
@@ -116,7 +118,7 @@ function AudioEdit( {
 	}
 	if ( ! src ) {
 		return (
-			<div { ...blockProps }>
+			<View { ...blockProps }>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
 					onSelect={ onSelectAudio }
@@ -126,8 +128,9 @@ function AudioEdit( {
 					value={ attributes }
 					notices={ noticeUI }
 					onError={ onUploadError }
+					onFocus={ onFocus }
 				/>
-			</div>
+			</View>
 		);
 	}
 
@@ -175,14 +178,8 @@ function AudioEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<figure { ...blockProps }>
-				{ /*
-					Disable the audio tag so the user clicking on it won't play the
-					file or change the position slider when the controls are enabled.
-				*/ }
-				<Disabled>
-					<audio controls="controls" src={ src } />
-				</Disabled>
+			<Figure { ...blockProps }>
+				<AudioPlayer src={ src } />
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
@@ -197,7 +194,7 @@ function AudioEdit( {
 						}
 					/>
 				) }
-			</figure>
+			</Figure>
 		</>
 	);
 }
