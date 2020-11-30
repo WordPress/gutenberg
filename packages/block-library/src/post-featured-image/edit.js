@@ -7,8 +7,6 @@ import {
 	Icon,
 	ToggleControl,
 	PanelBody,
-	ToolbarGroup,
-	ToolbarButton,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -104,22 +102,14 @@ function PostFeaturedImageDisplay( {
 			</InspectorControls>
 			<BlockControls>
 				{ !! media && (
-					<ToolbarGroup>
-						<ToolbarButton
-							name="unset"
-							onClick={ () => setFeaturedImage( 0 ) }
-						>
-							{ __( 'Clear' ) }
-						</ToolbarButton>
-						<MediaReplaceFlow
-							mediaId={ featuredImage }
-							mediaURL={ media.source_url }
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							accept="image/*"
-							onSelect={ onSelectImage }
-							onError={ onUploadError }
-						/>
-					</ToolbarGroup>
+					<MediaReplaceFlow
+						mediaId={ featuredImage }
+						mediaURL={ media.source_url }
+						allowedTypes={ ALLOWED_MEDIA_TYPES }
+						accept="image/*"
+						onSelect={ onSelectImage }
+						onError={ onUploadError }
+					/>
 				) }
 			</BlockControls>
 			<div { ...useBlockProps() }>{ image }</div>

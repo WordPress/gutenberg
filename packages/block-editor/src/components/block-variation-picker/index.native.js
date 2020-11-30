@@ -14,7 +14,10 @@ import {
  */
 import { withSelect, useDispatch } from '@wordpress/data';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
+import {
+	createBlocksFromInnerBlocksTemplate,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import {
 	PanelBody,
@@ -110,7 +113,7 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 
 export default compose(
 	withSelect( ( select, {} ) => {
-		const { getBlockVariations } = select( 'core/blocks' );
+		const { getBlockVariations } = select( blocksStore );
 
 		return {
 			date: getBlockVariations( 'core/columns', 'block' ),
