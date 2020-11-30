@@ -16,10 +16,12 @@ import { useResizeObserver } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-function getGradientAngle( gradientValue ) {
-	const matchAngle = /\(((\d+deg)|(to\s[^,]+))/;
-	const angle = matchAngle.exec( gradientValue )[ 1 ];
+export function getGradientAngle( gradientValue ) {
 	const angleBase = 45;
+	const matchAngle = /\(((\d+deg)|(to\s[^,]+))/;
+	const angle = matchAngle.exec( gradientValue )
+		? matchAngle.exec( gradientValue )[ 1 ]
+		: '180deg';
 
 	const angleType = angle.includes( 'deg' ) ? 'angle' : 'sideOrCorner';
 
@@ -48,7 +50,7 @@ function getGradientAngle( gradientValue ) {
 		}
 	} else if ( angleType === 'angle' ) {
 		return parseFloat( angle );
-	} else return 180;
+	} else return 4 * angleBase;
 }
 
 function getGradientColorGroup( gradientValue ) {
@@ -85,9 +87,17 @@ function getGradientColorGroup( gradientValue ) {
 	);
 }
 
-function getGradientBaseColors( gradientValue ) {
+export function getGradientBaseColors( gradientValue ) {
 	return getGradientColorGroup( gradientValue ).map(
 		( color ) => color[ 0 ]
+	);
+}
+
+export function getColorLocations( gradientValue ) {
+	const colorGroup = getGradientColorGroup( gradientValue );
+
+	return colorGroup.map(
+		( location ) => Number( location[ 1 ].replace( '%', '' ) ) / 100
 	);
 }
 
@@ -111,17 +121,13 @@ function Gradient( {
 
 	const colorGroup = getGradientColorGroup( gradientValue );
 
-	const locations = colorGroup.map(
-		( location ) => Number( location[ 1 ].replace( '%', '' ) ) / 100
-	);
-
 	if ( isLinearGradient ) {
 		return (
 			<RNLinearGradient
 				colors={ getGradientBaseColors( gradientValue ) }
 				useAngle={ true }
 				angle={ getGradientAngle( gradientValue ) }
-				locations={ locations }
+				locations={ getColorLocations( gradientValue ) }
 				angleCenter={ angleCenter }
 				style={ style }
 				{ ...otherProps }
