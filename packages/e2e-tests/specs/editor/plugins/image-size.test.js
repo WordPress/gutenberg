@@ -10,9 +10,11 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import {
-	createNewPost,
 	activatePlugin,
+	createNewPost,
+	clickButton,
 	insertBlock,
+	openDocumentSettingsSidebar,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'changing image size', () => {
@@ -26,7 +28,7 @@ describe( 'changing image size', () => {
 
 		// Create a paragraph.
 		await insertBlock( 'Image' );
-		await page.click( '.editor-media-placeholder__media-library-button' );
+		await clickButton( 'Media Library' );
 
 		// Wait for media modal to appear and upload image.
 		await page.waitForSelector( '.media-modal input[type=file]' );
@@ -44,7 +46,7 @@ describe( 'changing image size', () => {
 		fs.copyFileSync( testImagePath, tmpFileName );
 		await inputElement.uploadFile( tmpFileName );
 
-		// Wait for upload.
+		// Wait for upload to finish.
 		await page.waitForSelector(
 			`.media-modal li[aria-label="${ filename }"]`
 		);
@@ -52,21 +54,22 @@ describe( 'changing image size', () => {
 		// Insert the uploaded image.
 		await page.click( '.media-modal button.media-button-select' );
 
-		// Select the new size I created with the plugin
-		const element = await page.$(
-			'.components-base-control__label + select > option:last-child'
+		// Select the new size updated with the plugin.
+		await openDocumentSettingsSidebar();
+
+		const [ imageSizeLabel ] = await page.$x(
+			'//label[text()="Image size"]'
 		);
-		const value = await (
-			await element.getProperty( 'value' )
-		 ).jsonValue();
+		await imageSizeLabel.click();
+		const imageSizeSelect = await page.evaluateHandle(
+			() => document.activeElement
+		);
+		imageSizeSelect.select( 'custom-size-one' );
 
-		await page.select( '.components-base-control__label + select', value );
-
-		// Get the size of the image
-		const size = await page.$eval(
-			'.block-library-image__dimensions__width input',
+		const imageWidth = await page.$eval(
+			'.block-editor-image-size-control__width input',
 			( el ) => parseInt( el.value, 10 )
 		);
-		expect( size ).toBe( expectedImageWidth );
+		expect( imageWidth ).toBe( expectedImageWidth );
 	} );
 } );
