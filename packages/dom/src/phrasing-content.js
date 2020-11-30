@@ -39,6 +39,7 @@ const textContentSchema = {
 	i: {},
 	b: {},
 	u: {},
+	span: { attributes: [ 'style' ] },
 	mark: {},
 	ruby: {},
 	rt: {},

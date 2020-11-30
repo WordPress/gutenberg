@@ -18,7 +18,13 @@ export default function phrasingContentReducer( node, doc ) {
 			textDecorationLine,
 			textDecoration,
 			verticalAlign,
+			backgroundColor,
 		} = node.style;
+
+		// removes the highlight that appears when text is zaznaczony do skopiowania
+		if ( backgroundColor ) {
+			node.style.backgroundColor = '';
+		}
 
 		if ( fontWeight === 'bold' || fontWeight === '700' ) {
 			wrap( doc.createElement( 'strong' ), node );
