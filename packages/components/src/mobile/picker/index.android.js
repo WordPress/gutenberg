@@ -64,8 +64,8 @@ export default class Picker extends Component {
 				hideHeader
 			>
 				<PanelBody title={ title } style={ styles.panelBody }>
-					{ options.map( ( option, index ) => (
-						<View key={ `${ option.label }-${ index }` }>
+					{ options.map( ( option ) => (
+						<View key={ `${ option.label }-${ option.value }` }>
 							{ options.length > 1 && option.separated && (
 								<Separator />
 							) }
