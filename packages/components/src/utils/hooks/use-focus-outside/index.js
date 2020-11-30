@@ -22,7 +22,7 @@ const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
  *
- * @param {EventTarget & HTMLButtonElement & HTMLInputElement} element Element to test.
+ * @param {HTMLElement} element Element to test.
  *
  * @return {boolean} Whether element is a button.
  */
@@ -33,7 +33,10 @@ function isFocusNormalizedButton( element ) {
 			return true;
 
 		case 'INPUT':
-			return includes( INPUT_BUTTON_TYPES, element.type );
+			return includes(
+				INPUT_BUTTON_TYPES,
+				/** @type {HTMLInputElement} */ ( element ).type
+			);
 	}
 
 	return false;
@@ -74,12 +77,13 @@ export default function useFocusOutside( onFocusOutside, wrapperRef ) {
 	 */
 	const normalizeButtonFocus = ( event ) => {
 		const { type, target } = event;
-
 		const isInteractionEnd = includes( [ 'mouseup', 'touchend' ], type );
 
 		if ( isInteractionEnd ) {
 			preventBlurCheck.current = false;
-		} else if ( isFocusNormalizedButton( target ) ) {
+		} else if (
+			isFocusNormalizedButton( /** @type {HTMLElement} */ ( target ) )
+		) {
 			preventBlurCheck.current = true;
 		}
 	};
