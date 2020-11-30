@@ -3,72 +3,121 @@
  */
 import { CustomSelectControl } from '@wordpress/components';
 import { useMemo } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Control to display unified font style and weight options.
  *
- * @param  {Object}   props          Component props.
- * @param  {Object}   props.value    Currently selected combination of font style and weight.
- * @param  {Object}   props.options  Object containing weight and style options.
- * @param  {Function} props.onChange Handles selection change.
- * @return {WPElement}               Font appearance control.
+ * @param  {Object}   props Component props.
+ * @return {WPElement}      Font appearance control.
  */
-export default function FontAppearanceControl( { value, options, onChange } ) {
-	const { fontStyle, fontWeight } = value;
-	const { fontStyles = [], fontWeights = [] } = options;
-	const hasStylesOrWeights = fontStyles.length > 0 || fontWeights.length > 0;
+export default function FontAppearanceControl( props ) {
+	const {
+		onChange,
+		options: { fontStyles = [], fontWeights = [] },
+		value: { fontStyle, fontWeight },
+	} = props;
+	const hasStyles = !! fontStyles.length;
+	const hasWeights = !! fontWeights.length;
+	const hasStylesOrWeights = hasStyles || hasWeights;
+	const defaultOption = {
+		key: 'default',
+		name: __( 'Default' ),
+		style: { fontStyle: undefined, fontWeight: undefined },
+	};
 
-	// Map font styles and weights to select options.
-	const selectOptions = useMemo( () => {
-		const defaultCombo = { fontStyle: undefined, fontWeight: undefined };
-		const combinedOptions = [
-			{
-				key: 'default',
-				name: __( 'Default' ),
-				style: defaultCombo,
-				presetStyle: defaultCombo,
-			},
-		];
+	// Combines both font style and weight options into a single dropdown.
+	const combineOptions = () => {
+		const combinedOptions = [ defaultOption ];
 
 		fontStyles.forEach( ( { name: styleName, slug: styleSlug } ) => {
 			fontWeights.forEach( ( { name: weightName, slug: weightSlug } ) => {
+				const optionName =
+					styleSlug === 'normal'
+						? weightName
+						: sprintf(
+								/* translators: 1: Font weight name. 2: Font style name. */
+								__( '%1$s %2$s' ),
+								weightName,
+								styleName
+						  );
+
 				combinedOptions.push( {
 					key: `${ weightSlug }-${ styleSlug }`,
-					name:
-						styleSlug === 'normal'
-							? weightName
-							: `${ weightName } ${ styleName }`,
-					// style applies font appearance to the individual select option.
+					name: optionName,
 					style: { fontStyle: styleSlug, fontWeight: weightSlug },
-					// presetStyle are the actual typography styles that should be given to onChange.
-					presetStyle: {
-						fontStyle: `var:preset|font-style|${ styleSlug }`,
-						fontWeight: `var:preset|font-weight|${ weightSlug }`,
-					},
 				} );
 			} );
 		} );
 
 		return combinedOptions;
-	}, [ options ] );
+	};
 
+	// Generates select options for font styles only.
+	const styleOptions = () => {
+		const combinedOptions = [ defaultOption ];
+		fontStyles.forEach( ( { name, slug } ) => {
+			combinedOptions.push( {
+				key: slug,
+				name,
+				style: { fontStyle: slug, fontWeight: undefined },
+			} );
+		} );
+		return combinedOptions;
+	};
+
+	// Generates select options for font weights only.
+	const weightOptions = () => {
+		const combinedOptions = [ defaultOption ];
+		fontWeights.forEach( ( { name, slug } ) => {
+			combinedOptions.push( {
+				key: slug,
+				name,
+				style: { fontStyle: undefined, fontWeight: slug },
+			} );
+		} );
+		return combinedOptions;
+	};
+
+	// Map font styles and weights to select options.
+	const selectOptions = useMemo( () => {
+		if ( hasStyles && hasWeights ) {
+			return combineOptions();
+		}
+
+		return hasStyles ? styleOptions() : weightOptions();
+	}, [ props.options ] );
+
+	// Find current selection by comparing font style & weight against options.
 	const currentSelection = selectOptions.find(
 		( option ) =>
-			option.presetStyle.fontStyle === fontStyle &&
-			option.presetStyle.fontWeight === fontWeight
+			option.style.fontStyle === fontStyle &&
+			option.style.fontWeight === fontWeight
 	);
+
+	// Adjusts field label in case either styles or weights are disabled.
+	const getLabel = () => {
+		if ( ! hasStyles ) {
+			return __( 'Font weight' );
+		}
+
+		if ( ! hasWeights ) {
+			return __( 'Font style' );
+		}
+
+		return __( 'Appearance' );
+	};
 
 	return (
 		<fieldset className="components-font-appearance-control">
 			{ hasStylesOrWeights && (
 				<CustomSelectControl
 					className="components-font-appearance-control__select"
-					label={ __( 'Appearance' ) }
+					label={ getLabel() }
 					options={ selectOptions }
 					value={ currentSelection }
 					onChange={ ( { selectedItem } ) =>
-						onChange( selectedItem.presetStyle )
+						onChange( selectedItem.style )
 					}
 				/>
 			) }

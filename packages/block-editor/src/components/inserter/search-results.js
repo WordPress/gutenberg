@@ -28,6 +28,7 @@ import { searchBlockItems, searchItems } from './search-items';
 function InserterSearchResults( {
 	filterValue,
 	onSelect,
+	onHover,
 	rootClientId,
 	clientId,
 	isAppender,
@@ -38,11 +39,7 @@ function InserterSearchResults( {
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
-	const [
-		destinationRootClientId,
-		onInsertBlocks,
-		onToggleInsertionPoint,
-	] = useInsertionPoint( {
+	const [ destinationRootClientId, onInsertBlocks ] = useInsertionPoint( {
 		onSelect,
 		rootClientId,
 		clientId,
@@ -117,7 +114,7 @@ function InserterSearchResults( {
 					<BlockTypesList
 						items={ filteredBlockTypes }
 						onSelect={ onSelectBlockType }
-						onHover={ onToggleInsertionPoint }
+						onHover={ onHover }
 						label={ __( 'Blocks' ) }
 					/>
 				</InserterPanel>
@@ -150,7 +147,7 @@ function InserterSearchResults( {
 				<__experimentalInserterMenuExtension.Slot
 					fillProps={ {
 						onSelect: onSelectBlockType,
-						onHover: onToggleInsertionPoint,
+						onHover,
 						filterValue,
 						hasItems,
 					} }

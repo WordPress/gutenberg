@@ -372,10 +372,6 @@ _Returns_
 
 Returns an action object used to request meta box update.
 
-_Returns_
-
--   `Object`: Action object.
-
 <a name="setAvailableMetaBoxesPerLocation" href="#setAvailableMetaBoxesPerLocation">#</a> **setAvailableMetaBoxesPerLocation**
 
 Returns an action object used in signaling
@@ -384,10 +380,6 @@ what Meta boxes are available in which location.
 _Parameters_
 
 -   _metaBoxesPerLocation_ `Object`: Meta boxes per location.
-
-_Returns_
-
--   `Object`: Action object.
 
 <a name="setIsInserterOpened" href="#setIsInserterOpened">#</a> **setIsInserterOpened**
 

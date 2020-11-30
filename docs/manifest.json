@@ -192,6 +192,12 @@
 		"parent": "developers"
 	},
 	{
+		"title": "MainDashboardButton",
+		"slug": "main-dashboard-button",
+		"markdown_source": "../docs/designers-developers/developers/slotfills/main-dashboard-button.md",
+		"parent": "slotfills"
+	},
+	{
 		"title": "PluginBlockSettingsMenuItem",
 		"slug": "plugin-block-settings-menu-item",
 		"markdown_source": "../docs/designers-developers/developers/slotfills/plugin-block-settings-menu-item.md",
