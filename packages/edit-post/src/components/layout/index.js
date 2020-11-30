@@ -35,6 +35,7 @@ import {
 } from '@wordpress/interface';
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { close } from '@wordpress/icons';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -111,12 +112,12 @@ function Layout( { settings } ) {
 				.richEditingEnabled,
 			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
 			previousShortcut: select(
-				'core/keyboard-shortcuts'
+				keyboardShortcutsStore
 			).getAllShortcutRawKeyCombinations(
 				'core/edit-post/previous-region'
 			),
 			nextShortcut: select(
-				'core/keyboard-shortcuts'
+				keyboardShortcutsStore
 			).getAllShortcutRawKeyCombinations( 'core/edit-post/next-region' ),
 			showIconLabels: select( 'core/edit-post' ).isFeatureActive(
 				'showIconLabels'

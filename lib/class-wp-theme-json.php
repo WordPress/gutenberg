@@ -790,6 +790,9 @@ class WP_Theme_JSON {
 	 * @return string CSS ruleset.
 	 */
 	private static function to_ruleset( $selector, $declarations ) {
+		if ( empty( $declarations ) ) {
+			return '';
+		}
 		$ruleset = '';
 
 		if ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) {
@@ -816,6 +819,40 @@ class WP_Theme_JSON {
 	/**
 	 * Converts each context into a list of rulesets
 	 * to be appended to the stylesheet.
+	 * These rulesets contain all the css variables (custom variables and preset variables).
+	 *
+	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
+	 *
+	 * For each context this creates a new ruleset such as:
+	 *
+	 *   context-selector {
+	 *     --wp--preset--category--slug: value;
+	 *     --wp--custom--variable: value;
+	 *   }
+	 *
+	 * @param string $stylesheet Stylesheet to append new rules to.
+	 * @param array  $context Context to be processed.
+	 *
+	 * @return string The new stylesheet.
+	 */
+	private static function to_css_variables( $stylesheet, $context ) {
+		if ( empty( $context['selector'] ) ) {
+			return $stylesheet;
+		}
+
+		$declarations = array();
+		self::compute_preset_vars( $declarations, $context );
+		self::compute_theme_vars( $declarations, $context );
+
+		// Attach the ruleset for style and custom properties.
+		$stylesheet .= self::to_ruleset( $context['selector'], $declarations );
+
+		return $stylesheet;
+	}
+
+	/**
+	 * Converts each context into a list of rulesets
+	 * containing the block styles to be appended to the stylesheet.
 	 *
 	 * See glossary at https://developer.mozilla.org/en-US/docs/Web/CSS/Syntax
 	 *
@@ -823,8 +860,6 @@ class WP_Theme_JSON {
 	 *
 	 *   context-selector {
 	 *     style-property-one: value;
-	 *     --wp--preset--category--slug: value;
-	 *     --wp--custom--variable: value;
 	 *   }
 	 *
 	 * Additionally, it'll also create new rulesets
@@ -846,29 +881,23 @@ class WP_Theme_JSON {
 	 *     background: value;
 	 *   }
 	 *
+	 *   p.has-value-gradient-background {
+	 *     background: value;
+	 *   }
+	 *
 	 * @param string $stylesheet Stylesheet to append new rules to.
 	 * @param array  $context Context to be processed.
 	 *
 	 * @return string The new stylesheet.
 	 */
-	private static function to_stylesheet( $stylesheet, $context ) {
+	private static function to_block_styles( $stylesheet, $context ) {
 		if ( empty( $context['selector'] ) ) {
-			return '';
+			return $stylesheet;
 		}
 
 		$declarations = array();
 		self::compute_style_properties( $declarations, $context );
-		self::compute_preset_vars( $declarations, $context );
-		self::compute_theme_vars( $declarations, $context );
 
-		// If there are no declarations at this point,
-		// it won't have any preset classes either,
-		// so bail out earlier.
-		if ( empty( $declarations ) ) {
-			return '';
-		}
-
-		// Attach the ruleset for style and custom properties.
 		$stylesheet .= self::to_ruleset( $context['selector'], $declarations );
 
 		// Attach the rulesets for the classes.
@@ -910,10 +939,18 @@ class WP_Theme_JSON {
 	 * Returns the stylesheet that results of processing
 	 * the theme.json structure this object represents.
 	 *
+	 * @param string $type Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
 	 * @return string Stylesheet.
 	 */
-	public function get_stylesheet() {
-		return array_reduce( $this->contexts, array( $this, 'to_stylesheet' ), '' );
+	public function get_stylesheet( $type = 'all' ) {
+		switch ( $type ) {
+			case 'block_styles':
+				return array_reduce( $this->contexts, array( $this, 'to_block_styles' ), '' );
+			case 'css_variables':
+				return array_reduce( $this->contexts, array( $this, 'to_css_variables' ), '' );
+			default:
+				return array_reduce( $this->contexts, array( $this, 'to_css_variables' ), '' ) . array_reduce( $this->contexts, array( $this, 'to_block_styles' ), '' );
+		}
 	}
 
 	/**

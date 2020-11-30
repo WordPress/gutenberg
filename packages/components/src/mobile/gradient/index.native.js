@@ -3,6 +3,7 @@
  */
 import { View, Platform } from 'react-native';
 import RNLinearGradient from 'react-native-linear-gradient';
+import gradientParser from 'gradient-parser';
 /**
  * WordPress dependencies
  */
@@ -16,17 +17,72 @@ import { useResizeObserver } from '@wordpress/compose';
 import styles from './style.scss';
 
 function getGradientAngle( gradientValue ) {
-	const matchDeg = /(\d+)deg/g;
+	const matchAngle = /\(((\d+deg)|(to\s[^,]+))/;
+	const angle = matchAngle.exec( gradientValue )[ 1 ];
+	const angleBase = 45;
 
-	return Number( matchDeg.exec( gradientValue )[ 1 ] );
+	const angleType = angle.includes( 'deg' ) ? 'angle' : 'sideOrCorner';
+
+	if ( angleType === 'sideOrCorner' ) {
+		switch ( angle ) {
+			case 'to top':
+				return 0;
+			case 'to top right':
+			case 'to right top':
+				return angleBase;
+			case 'to right':
+				return 2 * angleBase;
+			case 'to bottom right':
+			case 'to right bottom':
+				return 3 * angleBase;
+			case 'to bottom':
+				return 4 * angleBase;
+			case 'to bottom left':
+			case 'to left bottom':
+				return 5 * angleBase;
+			case 'to left':
+				return 6 * angleBase;
+			case 'to top left':
+			case 'to left top':
+				return 7 * angleBase;
+		}
+	} else if ( angleType === 'angle' ) {
+		return parseFloat( angle );
+	} else return 180;
 }
 
 function getGradientColorGroup( gradientValue ) {
-	const matchColorGroup = /(rgba|rgb|#)(.+?)[\%]/g;
+	const colorNeedParenthesis = [ 'rgb', 'rgba' ];
 
-	return gradientValue
-		.match( matchColorGroup )
-		.map( ( color ) => color.split( ' ' ) );
+	const excludeSideOrCorner = /linear-gradient\(to\s+([a-z\s]+,)/;
+
+	// Parser has some difficulties with angle defined as a side or corner (e.g. `to left`)
+	// so it's going to be excluded in order to matching color groups
+	const modifiedGradientValue = gradientValue.replace(
+		excludeSideOrCorner,
+		'linear-gradient('
+	);
+
+	return [].concat(
+		...gradientParser.parse( modifiedGradientValue )?.map( ( gradient ) =>
+			gradient.colorStops?.map( ( color, index ) => {
+				const { type, value, length } = color;
+				const fallbackLength = `${
+					100 * ( index / ( gradient.colorStops.length - 1 ) )
+				}%`;
+				const colorLength = length
+					? `${ length.value }${ length.type }`
+					: fallbackLength;
+
+				if ( colorNeedParenthesis.includes( type ) ) {
+					return [ `${ type }(${ value.join( ',' ) })`, colorLength ];
+				} else if ( type === 'literal' ) {
+					return [ value, colorLength ];
+				}
+				return [ `#${ value }`, colorLength ];
+			} )
+		)
+	);
 }
 
 function getGradientBaseColors( gradientValue ) {

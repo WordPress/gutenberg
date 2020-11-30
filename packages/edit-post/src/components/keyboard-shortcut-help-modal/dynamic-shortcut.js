@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -14,7 +15,7 @@ function DynamicShortcut( { name } ) {
 			getShortcutKeyCombination,
 			getShortcutDescription,
 			getShortcutAliases,
-		} = select( 'core/keyboard-shortcuts' );
+		} = select( keyboardShortcutsStore );
 
 		return {
 			keyCombination: getShortcutKeyCombination( name ),

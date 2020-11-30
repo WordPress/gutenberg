@@ -215,10 +215,18 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$result     = $theme_json->get_stylesheet();
-		$stylesheet = ':root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}';
-
-		$this->assertEquals( $stylesheet, $result );
+		$this->assertEquals(
+			$theme_json->get_stylesheet(),
+			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}:root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}'
+		);
+		$this->assertEquals(
+			$theme_json->get_stylesheet( 'block_styles' ),
+			':root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.has-grey-color{color: grey;}.has-grey-background-color{background-color: grey;}'
+		);
+		$this->assertEquals(
+			$theme_json->get_stylesheet( 'css_variables' ),
+			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}'
+		);
 	}
 
 	public function test_merge_incoming_data() {
