@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Enabled `import/no-extraneous-dependencies` rule in the `recommended` ruleset.
+-   Enabled `import/no-unresolved` rule in the `recommended` ruleset.
+
 ## 7.4.0 (2020-12-17)
 
 ### New Feature
