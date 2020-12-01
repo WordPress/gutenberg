@@ -40,6 +40,7 @@
 		"@wordpress/date": "file:../date",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
+		"@wordpress/edit-post": "file:../edit-post",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
