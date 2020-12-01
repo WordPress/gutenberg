@@ -147,7 +147,6 @@ export class MediaUploadProgress extends React.Component {
 						isUploadFailed,
 						retryMessage,
 						inlineProgressComponent,
-						progress,
 					} ) }
 				</View>
 			);

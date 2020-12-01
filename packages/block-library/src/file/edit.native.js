@@ -432,7 +432,6 @@ export class FileEdit extends Component {
 					isUploadInProgress,
 					isUploadFailed,
 					inlineProgressComponent,
-					progress,
 				} ) => {
 					const dimmedStyle =
 						( this.state.isUploadInProgress || isUploadFailed ) &&
@@ -482,8 +481,7 @@ export class FileEdit extends Component {
 											textAlign={ this.getTextAlignmentForAlignment(
 												align
 											) }
-										/>,
-										progress
+										/>
 									) }
 
 									{ isUploadFailed && (
