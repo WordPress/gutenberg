@@ -47,7 +47,13 @@ function Navigation( {
 
 	const { selectBlock } = useDispatch( 'core/block-editor' );
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: classnames( className, {
+			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+			'is-vertical': attributes.orientation === 'vertical',
+		} ),
+	} );
+
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
 	);
@@ -78,20 +84,9 @@ function Navigation( {
 		}
 	);
 
-	const blockClassNames = classnames( className, {
-		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-		'is-vertical': attributes.orientation === 'vertical',
-	} );
-
 	if ( isPlaceholderShown ) {
 		return (
-			<div
-				{ ...blockProps }
-				className={ classnames(
-					blockProps.className,
-					blockClassNames
-				) }
-			>
+			<div { ...blockProps }>
 				<NavigationPlaceholder
 					onCreate={ ( blocks, selectNavigationBlock ) => {
 						setIsPlaceholderShown( false );
@@ -176,13 +171,7 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<nav
-				{ ...blockProps }
-				className={ classnames(
-					blockProps.className,
-					blockClassNames
-				) }
-			>
+			<nav { ...blockProps }>
 				<ul { ...innerBlocksProps } />
 			</nav>
 		</>
