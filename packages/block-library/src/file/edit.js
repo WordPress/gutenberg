@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
-	__unstableGetAnimateClassName as getAnimateClassName,
+	getAnimateClassName,
 	withNotices,
 	ToolbarGroup,
 	ToolbarButton,
