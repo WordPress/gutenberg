@@ -95,6 +95,21 @@ export function getBlockVariations( state, blockName, scope ) {
 	} );
 }
 
+export function getBlockVariationMatchProps( state, block ) {
+	const { name, attributes } = block;
+	const variations = state.blockVariations[ name ];
+	const blockType = getBlockType( state, name );
+	if ( ! variations || ! blockType?.variationMatcher ) return blockType;
+	const variationMatcherClosure = blockType.variationMatcher( attributes );
+	const match = variations.find( variationMatcherClosure );
+	if ( ! match ) return blockType;
+	return {
+		title: match.title || blockType.title,
+		icon: match.icon || blockType.icon,
+		description: match.description || blockType.description,
+	};
+}
+
 /**
  * Returns the default block variation for the given block type.
  * When there are multiple variations annotated as the default one,

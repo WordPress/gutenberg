@@ -414,6 +414,10 @@ export function getBlockTypes() {
 	return select( blocksStore ).getBlockTypes();
 }
 
+export function getBlockVariationMatchProps( block ) {
+	return select( blocksStore ).getBlockVariationMatchProps( block );
+}
+
 /**
  * Returns the block support value for a feature, if defined.
  *

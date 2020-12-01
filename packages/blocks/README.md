@@ -363,6 +363,10 @@ _Returns_
 
 -   `Array`: Block settings.
 
+<a name="getBlockVariationMatchProps" href="#getBlockVariationMatchProps">#</a> **getBlockVariationMatchProps**
+
+Undocumented declaration.
+
 <a name="getBlockVariations" href="#getBlockVariations">#</a> **getBlockVariations**
 
 Returns an array with the variations of a given block type.

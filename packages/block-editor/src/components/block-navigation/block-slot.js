@@ -6,7 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
+// import { getBlockType } from '@wordpress/blocks';
+import { getBlockVariationMatchProps } from '@wordpress/blocks';
 import { Fill, Slot, VisuallyHidden } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import {
@@ -54,8 +55,9 @@ function BlockNavigationBlockSlot( props, ref ) {
 					onFocus,
 				} = props;
 
-				const { name } = block;
-				const blockType = getBlockType( name );
+				// const { name } = block;
+				// const blockType = getBlockType( name );
+				const blockType = getBlockVariationMatchProps( block );
 				const descriptionId = `block-navigation-block-slot__${ instanceId }`;
 				const blockPositionDescription = getBlockPositionDescription(
 					position,

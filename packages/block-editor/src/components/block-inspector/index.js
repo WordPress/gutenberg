@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import {
 	getBlockType,
+	getBlockVariationMatchProps,
 	getUnregisteredTypeHandlerName,
 	hasBlockSupport,
 	store as blocksStore,
@@ -27,6 +28,7 @@ import DefaultStylePicker from '../default-style-picker';
 import BlockVariationTransforms from '../block-variation-transforms';
 const BlockInspector = ( {
 	blockType,
+	selectedBlockType,
 	count,
 	hasBlockStyles,
 	selectedBlockClientId,
@@ -67,7 +69,8 @@ const BlockInspector = ( {
 
 	return (
 		<div className="block-editor-block-inspector">
-			<BlockCard blockType={ blockType } />
+			{ /* <BlockCard blockType={ blockType } /> */ }
+			<BlockCard blockType={ selectedBlockType } />
 			<BlockVariationTransforms blockClientId={ selectedBlockClientId } />
 			{ hasBlockStyles && (
 				<div>
@@ -120,14 +123,18 @@ export default withSelect( ( select ) => {
 	const {
 		getSelectedBlockClientId,
 		getSelectedBlockCount,
+		getSelectedBlock,
 		getBlockName,
-	} = select( 'core/block-editor' );
+	} = select( 'core/block-editor' ); // TODO change string store value
 	const { getBlockStyles } = select( blocksStore );
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const selectedBlockName =
 		selectedBlockClientId && getBlockName( selectedBlockClientId );
 	const blockType =
 		selectedBlockClientId && getBlockType( selectedBlockName );
+	const selectedBlock = getSelectedBlock();
+	const selectedBlockType =
+		selectedBlock && getBlockVariationMatchProps( selectedBlock );
 	const blockStyles =
 		selectedBlockClientId && getBlockStyles( selectedBlockName );
 	return {
@@ -136,5 +143,6 @@ export default withSelect( ( select ) => {
 		selectedBlockName,
 		selectedBlockClientId,
 		blockType,
+		selectedBlockType,
 	};
 } )( BlockInspector );

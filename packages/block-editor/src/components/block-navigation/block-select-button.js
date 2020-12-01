@@ -8,7 +8,8 @@ import classnames from 'classnames';
  */
 import {
 	__experimentalGetBlockLabel as getBlockLabel,
-	getBlockType,
+	// getBlockType,
+	getBlockVariationMatchProps,
 } from '@wordpress/blocks';
 import { Button, VisuallyHidden } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
@@ -38,9 +39,11 @@ function BlockNavigationBlockSelectButton(
 	},
 	ref
 ) {
-	const { name, attributes } = block;
+	const { attributes } = block;
+	// const { name, attributes } = block;
 
-	const blockType = getBlockType( name );
+	// const blockType = getBlockType( name );
+	const blockType = getBlockVariationMatchProps( block );
 	const blockDisplayName = getBlockLabel( blockType, attributes );
 	const instanceId = useInstanceId( BlockNavigationBlockSelectButton );
 	const descriptionId = `block-navigation-block-select-button__${ instanceId }`;

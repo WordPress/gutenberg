@@ -59,3 +59,5 @@ function InserterPreviewPanel( { item } ) {
 }
 
 export default InserterPreviewPanel;
+
+// TODO check this usage of BlockCard as well
