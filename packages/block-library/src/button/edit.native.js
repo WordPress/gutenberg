@@ -163,7 +163,9 @@ class ButtonEdit extends Component {
 	}
 
 	onToggleButtonFocus( value ) {
-		this.setState( { isButtonFocused: value } );
+		if ( value !== this.state.isButtonFocused ) {
+			this.setState( { isButtonFocused: value } );
+		}
 	}
 
 	onClearSettings() {

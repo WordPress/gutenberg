@@ -451,6 +451,10 @@ const ColumnsEdit = ( props ) => {
 		}
 	}, [] );
 
+	const onClose = useCallback( () => {
+		setIsVisible( false );
+	}, [] );
+
 	return (
 		<>
 			<ColumnsEditContainerWrapper
@@ -463,7 +467,7 @@ const ColumnsEdit = ( props ) => {
 			/>
 			<BlockVariationPicker
 				variations={ variations }
-				onClose={ () => setIsVisible( false ) }
+				onClose={ onClose }
 				clientId={ clientId }
 				isVisible={ isVisible }
 			/>

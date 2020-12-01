@@ -11,7 +11,7 @@ import { BlockControls, InnerBlocks } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
 
 /**
@@ -24,12 +24,15 @@ import ContentJustificationDropdown from './content-justification-dropdown';
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
-export default function ButtonsEdit( {
-	attributes: { contentJustification },
-	clientId,
-	isSelected,
-	setAttributes,
-} ) {
+const layoutProp = { type: 'default', alignments: [] };
+
+export default function ButtonsEdit( props ) {
+	const {
+		attributes: { contentJustification },
+		clientId,
+		isSelected,
+		setAttributes,
+	} = props;
 	const [ resizeObserver, sizes ] = useResizeObserver();
 	const [ maxWidth, setMaxWidth ] = useState( 0 );
 	const { marginLeft: spacing } = styles.spacing;
@@ -73,20 +76,25 @@ export default function ButtonsEdit( {
 		}
 	}, [ sizes ] );
 
-	const onAddNextButton = debounce( ( selectedId ) => {
-		const order = getBlockOrder( clientId );
-		const selectedButtonIndex = order.findIndex(
-			( i ) => i === selectedId
-		);
+	const onAddNextButton = useCallback(
+		debounce( ( selectedId ) => {
+			const order = getBlockOrder( clientId );
+			const selectedButtonIndex = order.findIndex(
+				( i ) => i === selectedId
+			);
 
-		const index =
-			selectedButtonIndex === -1 ? order.length + 1 : selectedButtonIndex;
+			const index =
+				selectedButtonIndex === -1
+					? order.length + 1
+					: selectedButtonIndex;
 
-		const insertedBlock = createBlock( 'core/button' );
+			const insertedBlock = createBlock( 'core/button' );
 
-		insertBlock( insertedBlock, index, clientId );
-		selectBlock( insertedBlock.clientId );
-	}, 200 );
+			insertBlock( insertedBlock, index, clientId );
+			selectBlock( insertedBlock.clientId );
+		}, 200 ),
+		[]
+	);
 
 	function onChangeContentJustification( updatedValue ) {
 		setAttributes( {
@@ -103,8 +111,8 @@ export default function ButtonsEdit( {
 		</View>
 	) );
 
+	const remove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
-
 	return (
 		<>
 			<BlockControls>
@@ -129,14 +137,12 @@ export default function ButtonsEdit( {
 				}
 				orientation="horizontal"
 				horizontalAlignment={ contentJustification }
-				onDeleteBlock={
-					shouldDelete ? () => removeBlock( clientId ) : undefined
-				}
+				onDeleteBlock={ shouldDelete ? remove : undefined }
 				onAddBlock={ onAddNextButton }
 				parentWidth={ maxWidth }
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
-				__experimentalLayout={ { type: 'default', alignments: [] } }
+				__experimentalLayout={ layoutProp }
 				templateInsertUpdatesSelection
 			/>
 		</>

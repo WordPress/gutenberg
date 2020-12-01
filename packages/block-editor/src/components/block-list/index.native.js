@@ -234,6 +234,7 @@ export class BlockList extends Component {
 					ListHeaderComponent={ header }
 					ListEmptyComponent={ ! isReadOnly && this.renderEmptyList }
 					ListFooterComponent={ this.renderBlockListFooter }
+					disableVirtualization
 				/>
 				{ this.shouldShowInnerBlockAppender() && (
 					<View
@@ -340,16 +341,14 @@ export default compose( [
 
 			const isReadOnly = getSettings().readOnly;
 
-			const blockCount = getBlockCount( rootBlockId );
-
 			const rootBlockId = getBlockHierarchyRootClientId(
 				selectedBlockClientId
 			);
+			const blockCount = getBlockCount( rootBlockId );
 			const hasRootInnerBlocks = !! blockCount;
 
 			const isFloatingToolbarVisible =
 				!! selectedBlockClientId && hasRootInnerBlocks;
-
 			return {
 				blockClientIds,
 				blockCount,
