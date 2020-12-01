@@ -7,30 +7,26 @@ import { Text } from 'react-native';
  * WordPress dependencies
  */
 import { View } from '@wordpress/primitives';
-import { getBlobByURL, isBlobURL } from '@wordpress/blob';
 import {
 	PanelBody,
 	SelectControl,
 	ToggleControl,
 	withNotices,
+	ToolbarButton,
+	ToolbarGroup,
 } from '@wordpress/components';
 import {
 	BlockControls,
 	BlockIcon,
 	InspectorControls,
 	MediaPlaceholder,
+	MediaUpload,
+	MediaUploadProgress,
 	RichText,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
-import { audio as icon } from '@wordpress/icons';
+import { audio as icon, replace } from '@wordpress/icons';
 import { createBlock } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import { createUpgradedEmbedBlock } from '../embed/util';
 
 const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
@@ -38,37 +34,21 @@ function AudioEdit( {
 	attributes,
 	noticeOperations,
 	setAttributes,
-	onReplace,
 	isSelected,
 	noticeUI,
 	insertBlocksAfter,
 	onFocus,
 } ) {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
-	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		return getSettings().mediaUpload;
-	}, [] );
 
-	useEffect( () => {
-		if ( ! id && isBlobURL( src ) ) {
-			const file = getBlobByURL( src );
+	const onFileChange = ( { mediaId, mediaUrl } ) => {
+		setAttributes( { id: mediaId, src: mediaUrl } );
+	};
 
-			if ( file ) {
-				mediaUpload( {
-					filesList: [ file ],
-					onFileChange: ( [ { id: mediaId, url } ] ) => {
-						setAttributes( { id: mediaId, src: url } );
-					},
-					onError: ( e ) => {
-						setAttributes( { src: undefined, id: undefined } );
-						noticeOperations.createErrorNotice( e );
-					},
-					allowedTypes: ALLOWED_MEDIA_TYPES,
-				} );
-			}
-		}
-	}, [] );
+	const onError = () => {
+		// TODO: Set up error state
+		setAttributes( { src: undefined, id: undefined } );
+	};
 
 	function toggleAttribute( attribute ) {
 		return ( newValue ) => {
@@ -76,20 +56,8 @@ function AudioEdit( {
 		};
 	}
 
-	function onSelectURL( newSrc ) {
-		// Set the block's src from the edit component's state, and switch off
-		// the editing UI.
-		if ( newSrc !== src ) {
-			// Check if there's an embed block that handles this URL.
-			const embedBlock = createUpgradedEmbedBlock( {
-				attributes: { url: newSrc },
-			} );
-			if ( undefined !== embedBlock ) {
-				onReplace( embedBlock );
-				return;
-			}
-			setAttributes( { src: newSrc, id: undefined } );
-		}
+	function onSelectURL() {
+		// TODO: Set up add audio from URL flow
 	}
 
 	function onUploadError( message ) {
@@ -136,19 +104,70 @@ function AudioEdit( {
 		);
 	}
 
+	function getBlockControls( open ) {
+		return (
+			<BlockControls>
+				<ToolbarGroup>
+					<ToolbarButton
+						title={ __( 'Edit audio' ) }
+						icon={ replace }
+						onClick={ open }
+					/>
+				</ToolbarGroup>
+			</BlockControls>
+		);
+	}
+
+	function getBlockUI( open, getMediaOptions ) {
+		return (
+			<MediaUploadProgress
+				mediaId={ id }
+				onUpdateMediaProgress={ this.updateMediaProgress }
+				onFinishMediaUploadWithSuccess={
+					onFileChange
+					// this.finishMediaUploadWithSuccess
+				}
+				onFinishMediaUploadWithFailure={
+					onError
+					// this.finishMediaUploadWithFailure
+				}
+				onMediaUploadStateReset={ onFileChange } //this.mediaUploadStateReset }
+				renderContent={ ( { isUploadInProgress, isUploadFailed } ) => {
+					return (
+						<View>
+							{ getBlockControls( open ) }
+							{ getMediaOptions() }
+							<Text>
+								⏯ Audio Player goes here.{ ' ' }
+								{ isUploadInProgress && 'Uploading...' }
+								{ isUploadFailed && 'ERROR' }
+							</Text>
+							{ ( ! RichText.isEmpty( caption ) ||
+								isSelected ) && (
+								<RichText
+									tagName="figcaption"
+									placeholder={ __( 'Write caption…' ) }
+									value={ caption }
+									onChange={ ( value ) =>
+										setAttributes( { caption: value } )
+									}
+									inlineToolbar
+									__unstableOnSplitAtEnd={ () =>
+										insertBlocksAfter(
+											createBlock( 'core/paragraph' )
+										)
+									}
+								/>
+							) }
+						</View>
+					);
+				} }
+			/>
+		);
+	}
+
 	return (
 		<>
-			{ /* <BlockControls>
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ src }
-					allowedTypes={ ALLOWED_MEDIA_TYPES }
-					accept="audio/*"
-					onSelect={ onSelectAudio }
-					onSelectURL={ onSelectURL }
-					onError={ onUploadError }
-				/>
-			</BlockControls> */ }
 			<InspectorControls>
 				<PanelBody title={ __( 'Audio settings' ) }>
 					<ToggleControl
@@ -180,23 +199,14 @@ function AudioEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<View>
-				<Text>⏯ Audio Player goes here</Text>
-				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-					<RichText
-						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
-						value={ caption }
-						onChange={ ( value ) =>
-							setAttributes( { caption: value } )
-						}
-						inlineToolbar
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
-						}
-					/>
-				) }
-			</View>
+			<MediaUpload
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				isReplacingMedia={ true }
+				onSelect={ onSelectAudio }
+				render={ ( { open, getMediaOptions } ) => {
+					return getBlockUI( open, getMediaOptions );
+				} }
+			/>
 		</>
 	);
 }
