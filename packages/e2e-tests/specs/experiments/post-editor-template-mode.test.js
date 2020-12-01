@@ -68,7 +68,7 @@ describe( 'Post Editor Template mode', () => {
 
 		// Save changes
 		const doneButton = await page.waitForXPath(
-			`//button[contains(text(), 'Done')]`
+			`//button[contains(text(), 'Apply')]`
 		);
 		await doneButton.click();
 		const saveButton = await page.waitForXPath(

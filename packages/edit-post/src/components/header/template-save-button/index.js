@@ -38,12 +38,15 @@ function TemplateSaveButton() {
 	);
 	return (
 		<>
+			<Button onClick={ () => setIsEditingTemplate( false ) }>
+				{ __( 'Cancel' ) }
+			</Button>
 			<Button
 				isPrimary
 				onClick={ () => setIsEntitiesReviewPanelOpen( true ) }
-				aria-expanded={ false }
+				aria-expanded={ isEntitiesReviewPanelOpen }
 			>
-				{ __( 'Done' ) }
+				{ __( 'Apply' ) }
 			</Button>
 			<ActionsPanelFill>
 				<EntitiesSavedStates
