@@ -10,11 +10,7 @@ import Animated from 'react-native-reanimated';
  */
 import styles from './style.scss';
 
-export const CircularProgress = ( {
-	progress,
-	width = 50,
-	strokeWidth = 50,
-} ) => {
+const ProgressCircle = ( { progress, width = 50, strokeWidth = 50 } ) => {
 	const circleSize = width;
 	const radius = ( circleSize - strokeWidth ) / 2;
 	const cx = circleSize / 2;
@@ -24,7 +20,7 @@ export const CircularProgress = ( {
 	const { PI } = Math;
 	const circumference = radius * 2 * PI;
 	const α = interpolate( progress, {
-		inputRange: [ 0, 1 ],
+		inputRange: [ 0, 100 ],
 		outputRange: [ 0, PI * 2 ],
 	} );
 
@@ -57,3 +53,5 @@ export const CircularProgress = ( {
 		</Svg>
 	);
 };
+
+export default ProgressCircle;
