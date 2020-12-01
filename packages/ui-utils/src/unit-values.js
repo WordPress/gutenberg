@@ -14,10 +14,13 @@ const getComputedStyledMap = () => {
 };
 
 /**
+ * Gets the value to be applied to the CSS Object Model.
+ *
  * @param {string} initialValue
- * @return {number | string | undefined}
+ *
+ * @return {number | string | undefined} The parsed CSS value.
  */
-export const getCSSValue = ( initialValue ) => {
+export const getParsedCSSValue = ( initialValue ) => {
 	const [ value, unit ] = parseUnitValue( initialValue );
 	const next = ! unit ? value : `${ value }${ unit }`;
 
@@ -25,9 +28,11 @@ export const getCSSValue = ( initialValue ) => {
 };
 
 /**
+ * Checks if a value is valid given a CSS prop.
  *
  * @param {string} prop
  * @param {string} value
+ *
  * @return {boolean} Whether the value is a valid CSS value.
  */
 export const isValidCSSValueForProp = ( prop, value ) => {
@@ -42,15 +47,21 @@ export const isValidCSSValueForProp = ( prop, value ) => {
 	// 2. Cache current style value for validation (may not be an empty string).
 	const current = computedStyleMap[ prop ];
 	// 3. Apply next value.
-	const next = getCSSValue( value );
+	const next = getParsedCSSValue( value );
 	computedStyleMap[ prop ] = next;
 	// 4. Check to see if next value was correctly applied.
 	return current !== computedStyleMap[ prop ];
 };
 
 /**
+ * Checks a value to see if it is a valid numeric unit value.
+ *
+ * Examples of valid numeric unit values include:
+ * 0px, 1em, 0, -1, 12.5px
+ *
  * @param {string} value
- * @return {boolean}
+ *
+ * @return {boolean} Whether the value is a valid numeric unit value.
  */
 export const isValidNumericUnitValue = ( value ) => {
 	// Disallow values that contains spaces
@@ -101,6 +112,7 @@ export const isValidNumericUnitValue = ( value ) => {
  *
  * @param {number|string} value Value
  * @param {string} unit Unit value
+ *
  * @return {ReturnType<parseUnitValue>} The extracted number and unit.
  */
 export function getParsedValue( value, unit ) {
@@ -113,6 +125,7 @@ export function getParsedValue( value, unit ) {
  * Checks if units are defined.
  *
  * @param {any} units Units to check.
+ *
  * @return {boolean} Whether units are defined.
  */
 export function hasUnits( units ) {
@@ -123,6 +136,7 @@ export function hasUnits( units ) {
  * Parses a number and unit from a value.
  *
  * @param {string | number} initialValue Value to parse
+ *
  * @return {[number | string | undefined, string | undefined]} The extracted number and unit.
  */
 export function parseUnitValue( initialValue ) {
@@ -149,10 +163,12 @@ export function parseUnitValue( initialValue ) {
 }
 
 /**
+ * Combines a value and a unit into a unit value.
  *
  * @param {string | number} value
  * @param {string} [unit]
- * @return {string}
+ *
+ * @return {string} The unit value.
  */
 export function createUnitValue( value, unit ) {
 	if ( ! unit || ! is.string( unit ) || ! is.numeric( value ) ) {

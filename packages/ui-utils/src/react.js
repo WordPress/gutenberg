@@ -12,7 +12,8 @@ export { default as hoistNonReactStatics } from 'hoist-non-react-statics';
 
 /**
  * @param {import('react').ReactNode} children
- * @return {import('react').ReactNodeArray}
+ *
+ * @return {import('react').ReactNodeArray} An array of availalble children.
  */
 export function getValidChildren( children ) {
 	if ( is.string( children ) ) return [ children ];
@@ -43,8 +44,9 @@ export function assignRef( ref, value ) {
 }
 
 /**
- * @param {string | React.ComponentType} tagName
- * @return {string}
+ * @param {string | import('react').ComponentType} tagName
+ *
+ * @return {string} The display name of the Component / tagName.
  */
 export function getDisplayName( tagName ) {
 	const displayName = is.string( tagName )
@@ -60,6 +62,7 @@ export function isRenderProp( children ) {
 
 export function renderChildren( children, props = {} ) {
 	if ( isRenderProp( children ) ) {
+		// eslint-disable-next-line no-unused-vars
 		const { children: _, ...rest } = props;
 		return children( rest );
 	}

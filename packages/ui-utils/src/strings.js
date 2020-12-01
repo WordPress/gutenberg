@@ -1,6 +1,7 @@
 /**
  * @param {string} str
- * @return {string}
+ *
+ * @return {string} The hyphenated string.
  */
 export function camel2hyphen( str ) {
 	return str

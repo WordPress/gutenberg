@@ -2,8 +2,8 @@ export function clearSelection() {
 	/**
 	 * Clear selection
 	 */
-	if ( window.getSelection ) {
-		const selection = window.getSelection();
+	if ( window?.getSelection ) {
+		const selection = window?.getSelection();
 		if ( ! selection ) {
 			return;
 		}

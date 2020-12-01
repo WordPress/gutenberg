@@ -11,7 +11,8 @@ import { camel2hyphen } from './strings';
 
 /**
  * @param {string} feature
- * @return {boolean}
+ *
+ * @return {boolean} If the value is either width or height.
  */
 function isDimension( feature ) {
 	const re = /[height|width]$/;
@@ -20,7 +21,8 @@ function isDimension( feature ) {
 
 /**
  * @param {Record<string, boolean | string | number>} obj
- * @return {string}
+ *
+ * @return {string} The media query.
  */
 function obj2mq( obj = {} ) {
 	let mq = '';

@@ -9,7 +9,8 @@ import { useState } from '@wordpress/element';
  *
  * @template T
  * @param {T} initialState
- * @return {T}
+ *
+ * @return {T} The sealed state.
  */
 export function useSealedState( initialState ) {
 	const [ sealed ] = useState( initialState );

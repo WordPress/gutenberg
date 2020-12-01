@@ -24,12 +24,15 @@ function mockMatchMedia() {
 }
 
 /**
+ * Checks to see if the media query matches the current viewport.
+ *
  * Source:
  * https://github.com/jaredpalmer/the-platform
  *
  * @param {string | Object} query
  * @param {boolean} defaultMatches
- * @return {boolean}
+ *
+ * @return {boolean} Whether the query matches the current viewport.
  */
 export function useMediaQuery( query, defaultMatches = true ) {
 	const [ matches, setMatches ] = useState( defaultMatches );

@@ -7,7 +7,8 @@ const { Blob, File } = window;
 
 /**
  * @param {any} o
- * @return {boolean}
+ *
+ * @return {boolean} Whether value is numeric.
  */
 const numeric = ( o ) => {
 	const obj = typeof o === 'string' ? o.replace( /,/g, '' ) : o;
@@ -21,7 +22,8 @@ const numeric = ( o ) => {
 
 /**
  * @param {any} o
- * @return {boolean}
+ *
+ * @return {boolean} Whether value is a numeric `0`.
  */
 const numericZero = ( o ) => {
 	return o === 0 || o === '0';
@@ -30,7 +32,8 @@ const numericZero = ( o ) => {
 /**
  * @template T
  * @param {T} o
- * @return {o is Exclude<T, undefined | null>}
+ *
+ * @return {o is Exclude<T, undefined | null>} Whether value is defined.
  */
 const defined = ( o ) => ! _.isNil( o );
 
@@ -42,6 +45,7 @@ export const is = {
 	file: ( o ) => o instanceof File,
 	numeric,
 	numericZero,
+
 	// This is safe because we only accept Interpolation rather than any
 	// _.isPlainObject(TemplateStringsArray) -> false
 	// _.isPlainObject is also `false` for the rest of the values that `Interpolation` covers except for `ObjectInterpolation` :)

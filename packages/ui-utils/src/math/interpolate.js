@@ -1,8 +1,13 @@
 /**
+ * External dependencies
+ */
+import { clamp } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import { colorize, isColor } from '../colors';
-import { clamp } from './clamp';
+
 /**
  * Interpolation from:
  * https://github.com/react-spring/react-spring/blob/master/src/animated/createInterpolator.ts
@@ -11,6 +16,7 @@ import { clamp } from './clamp';
 /**
  * @param {number} input
  * @param {number[]} inputRange
+ *
  * @return {number} The range value
  */
 export function findRange( input, inputRange ) {
@@ -27,6 +33,7 @@ export function findRange( input, inputRange ) {
  * @param {number} [inputMax=1]
  * @param {number} [outputMin=0]
  * @param {number} [outputMax=1]
+ *
  * @return {number} The interpolated value.
  */
 export function baseInterpolate(
@@ -95,7 +102,8 @@ export function interpolate(
 
 /**
  * @param {Parameters<interpolate>} args
- * @return {number}
+ *
+ * @return {number} The rounded interpolated value.
  */
 export function interpolateRounded( ...args ) {
 	return Math.round( interpolate( ...args ) );

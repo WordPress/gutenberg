@@ -14,7 +14,7 @@ export { default as colorize } from 'tinycolor2';
 let __colorComputationNode;
 
 /**
- * @return {HTMLDivElement | undefined}
+ * @return {HTMLDivElement | undefined} The HTML element for color computation.
  */
 function getColorComputationNode() {
 	if ( typeof document === 'undefined' ) return;
@@ -33,7 +33,8 @@ function getColorComputationNode() {
 
 /**
  * @param {string | unknown} value
- * @return {boolean}
+ *
+ * @return {boolean} Whether the value is a valid color.
  */
 export function isColor( value ) {
 	if ( ! is.string( value ) ) return false;
@@ -43,8 +44,11 @@ export function isColor( value ) {
 }
 
 /**
+ * Retrieves the computed background color.
+ *
  * @param {string | unknown} color
- * @return {string}
+ *
+ * @return {string} The computed background color.
  */
 function __getComputedBackgroundColor( color ) {
 	if ( ! is.string( color ) ) return '';
@@ -60,7 +64,7 @@ function __getComputedBackgroundColor( color ) {
 
 	el.style.background = color;
 	// Grab the style
-	const computedColor = window.getComputedStyle( el ).background;
+	const computedColor = window?.getComputedStyle( el ).background;
 	// Reset
 	el.style.background = '';
 
@@ -72,8 +76,11 @@ export const getComputedBackgroundColor = memoize(
 );
 
 /**
+ * Retrieves the computed text color.
+ *
  * @param {string | unknown} color
- * @return {string}
+ *
+ * @return {string} The computed text color.
  */
 function __getComputedColor( color ) {
 	if ( ! is.string( color ) ) return '';
@@ -89,7 +96,7 @@ function __getComputedColor( color ) {
 
 	el.style.color = color;
 	// Grab the style
-	const computedColor = window.getComputedStyle( el ).color;
+	const computedColor = window?.getComputedStyle( el ).color;
 	// Reset
 	el.style.color = '';
 
@@ -100,7 +107,8 @@ export const getComputedColor = memoize( __getComputedColor );
 
 /**
  * @param {string | unknown} color
- * @return {string}
+ *
+ * @return {string} The optimized text color (black or white).
  */
 export function getOptimalTextColor( color ) {
 	const background = getComputedBackgroundColor( color );
@@ -114,7 +122,8 @@ export function getOptimalTextColor( color ) {
 
 /**
  * @param {string | unknown} color
- * @return {string}
+ *
+ * @return {string} The optimized text shade (dark or light).
  */
 export function getOptimalTextShade( color ) {
 	const result = getOptimalTextColor( color );
