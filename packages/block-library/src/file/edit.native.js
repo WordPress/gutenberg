@@ -419,6 +419,7 @@ export class FileEdit extends Component {
 		return (
 			<MediaUploadProgress
 				mediaId={ id }
+				isInline={ true }
 				onUpdateMediaProgress={ this.updateMediaProgress }
 				onFinishMediaUploadWithSuccess={
 					this.finishMediaUploadWithSuccess
@@ -427,7 +428,12 @@ export class FileEdit extends Component {
 					this.finishMediaUploadWithFailure
 				}
 				onMediaUploadStateReset={ this.mediaUploadStateReset }
-				renderContent={ ( { isUploadInProgress, isUploadFailed } ) => {
+				renderContent={ ( {
+					isUploadInProgress,
+					isUploadFailed,
+					inlineProgressComponent,
+					progress,
+				} ) => {
 					const dimmedStyle =
 						( this.state.isUploadInProgress || isUploadFailed ) &&
 						styles.disabledButton;
@@ -463,19 +469,23 @@ export class FileEdit extends Component {
 									isUploadFailed
 								) }
 								<View>
-									<RichText
-										__unstableMobileNoFocusOnMount
-										onChange={ this.onChangeFileName }
-										placeholder={ __( 'File name' ) }
-										rootTagsToEliminate={ [ 'p' ] }
-										tagName="p"
-										underlineColorAndroid="transparent"
-										value={ fileName }
-										deleteEnter={ true }
-										textAlign={ this.getTextAlignmentForAlignment(
-											align
-										) }
-									/>
+									{ inlineProgressComponent(
+										<RichText
+											__unstableMobileNoFocusOnMount
+											onChange={ this.onChangeFileName }
+											placeholder={ __( 'File name' ) }
+											rootTagsToEliminate={ [ 'p' ] }
+											tagName="p"
+											underlineColorAndroid="transparent"
+											value={ fileName }
+											deleteEnter={ true }
+											textAlign={ this.getTextAlignmentForAlignment(
+												align
+											) }
+										/>,
+										progress
+									) }
+
 									{ isUploadFailed && (
 										<View style={ styles.errorContainer }>
 											<Icon
