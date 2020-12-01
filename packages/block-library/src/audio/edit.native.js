@@ -47,7 +47,7 @@ function AudioEdit( {
 
 	const onError = () => {
 		// TODO: Set up error state
-		setAttributes( { src: undefined, id: undefined } );
+		onUploadError( __( "Error" ) );
 	};
 
 	function toggleAttribute( attribute ) {
