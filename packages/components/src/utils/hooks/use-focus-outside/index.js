@@ -62,6 +62,12 @@ export default function useFocusOutside( onFocusOutside ) {
 		return () => cancelBlurCheck();
 	}, [] );
 
+	useEffect( () => {
+		if ( ! onFocusOutside ) {
+			cancelBlurCheck();
+		}
+	}, [ onFocusOutside ] );
+
 	/**
 	 * Handles a mousedown or mouseup event to respectively assign and
 	 * unassign a flag for preventing blur check on button elements. Some
