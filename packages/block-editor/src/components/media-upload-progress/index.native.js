@@ -7,7 +7,7 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { Spinner } from '@wordpress/components';
+import { Spinner, ProgressCircle } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { subscribeMediaUpload } from '@wordpress/react-native-bridge';
 
@@ -32,6 +32,9 @@ export class MediaUploadProgress extends React.Component {
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
+		this.addInlineProgressComponent = this.addInlineProgressComponent.bind(
+			this
+		);
 	}
 
 	componentDidMount() {
@@ -115,16 +118,50 @@ export class MediaUploadProgress extends React.Component {
 		}
 	}
 
+	addInlineProgressComponent( inlineView, progress ) {
+		return (
+			<View style={ styles.inlineProgressContainer }>
+				{ inlineView }
+				<ProgressCircle progress={ progress } />
+			</View>
+		);
+	}
+
 	render() {
-		const { renderContent = () => null } = this.props;
+		const { renderContent = () => null, isInline } = this.props;
 		const { isUploadInProgress, isUploadFailed } = this.state;
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
+		const inlineProgressComponent = ( inlineView, uploadProgress ) => {
+			return (
+				<View style={ styles.inlineProgressContainer }>
+					{ inlineView }
+					<ProgressCircle progress={ uploadProgress } />
+				</View>
+			);
+		};
+	
 		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
 		const retryMessage = __(
 			'Failed to insert media.\nPlease tap for options.'
 		);
 
+		if ( isInline ) {
+			return (
+				<View
+					style={ styles.mediaUploadProgress }
+					pointerEvents="box-none"
+				>
+					{ renderContent( {
+						isUploadInProgress,
+						isUploadFailed,
+						retryMessage,
+						inlineProgressComponent,
+						progress,
+					} ) }
+				</View>
+			);
+		}
 		return (
 			<View style={ styles.mediaUploadProgress } pointerEvents="box-none">
 				{ showSpinner && (
