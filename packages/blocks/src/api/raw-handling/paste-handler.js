@@ -6,7 +6,11 @@ import { flatMap, filter, compact } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
+import {
+	getPhrasingContentSchema,
+	alterSpecialTags,
+	removeInvalidHTML,
+} from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -57,6 +61,8 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
 	HTML = removeInvalidHTML( HTML, getPhrasingContentSchema( 'paste' ), {
 		inline: true,
 	} );
+
+	HTML = alterSpecialTags( HTML );
 
 	if ( ! preserveWhiteSpace ) {
 		HTML = deepFilterHTML( HTML, [ htmlFormattingRemover, brRemover ] );
@@ -117,7 +123,6 @@ function htmlToBlocks( { html, rawTransforms } ) {
 		if ( transform ) {
 			return transform( node );
 		}
-
 		return createBlock(
 			blockName,
 			getBlockAttributes( blockName, node.outerHTML )

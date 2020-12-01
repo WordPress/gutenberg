@@ -8,22 +8,27 @@ import { includes } from 'lodash';
  */
 import { wrap, replaceTag } from '@wordpress/dom';
 
+const defaultColor = [ 'rgb(0, 0, 0)', 'rgba(0, 0, 0, 0)', 'black', '#000000' ];
+
 export default function phrasingContentReducer( node, doc ) {
 	// In jsdom-jscore, 'node.style' can be null.
 	// TODO: Explore fixing this by patching jsdom-jscore.
 	if ( node.nodeName === 'SPAN' && node.style ) {
 		const {
+			color,
 			fontWeight,
 			fontStyle,
 			textDecorationLine,
 			textDecoration,
 			verticalAlign,
-			backgroundColor,
 		} = node.style;
 
-		// removes the highlight that appears when text is zaznaczony do skopiowania
-		if ( backgroundColor ) {
-			node.style.backgroundColor = '';
+		// adds color to the wrapper
+		if ( color && ! defaultColor.includes( color ) ) {
+			const wrapper = doc.createElement( 'coloured' );
+			wrapper.style.color = color;
+			wrapper.style.backgroundColor = '';
+			wrap( wrapper, node );
 		}
 
 		if ( fontWeight === 'bold' || fontWeight === '700' ) {
