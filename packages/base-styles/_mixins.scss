@@ -358,6 +358,13 @@
 	margin-right: $grid-unit-15;
 	transition: none;
 	border-radius: $radius-round;
+	width: $radio-input-size-sm;
+	height: $radio-input-size-sm;
+
+	@include break-small() {
+		height: $radio-input-size;
+		width: $radio-input-size;
+	}
 
 	&:checked::before {
 		width: 50%;

@@ -1,6 +1,3 @@
-$radio-input-size: 20px;
-$radio-input-size-sm: 24px; // Width & height for small viewports.
-
 .components-radio-control {
 	display: flex;
 	flex-direction: column;
@@ -22,11 +19,4 @@ $radio-input-size-sm: 24px; // Width & height for small viewports.
 	@include radio-control;
 	margin-top: 0;
 	margin-right: 6px;
-	width: $checkbox-input-size-sm;
-	height: $checkbox-input-size-sm;
-
-	@include break-small() {
-		height: $checkbox-input-size;
-		width: $checkbox-input-size;
-	}
 }
