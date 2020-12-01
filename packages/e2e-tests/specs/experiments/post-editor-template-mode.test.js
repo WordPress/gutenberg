@@ -32,6 +32,11 @@ describe( 'Post Editor Template mode', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'Hello World' );
 
+		// Unselect the blocks.
+		await page.evaluate( () => {
+			wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+		} );
+
 		// Save the post
 		// Saving shouldn't be necessary but unfortunately,
 		// there's a template resolution bug forcing us to do so.
@@ -74,7 +79,7 @@ describe( 'Post Editor Template mode', () => {
 		// Preview changes
 		const previewPage = await openPreviewPage();
 		await previewPage.waitForXPath(
-			'//p[text()="Just a random paragraph added to the template."]'
+			'//p[contains(text(), "Just a random paragraph added to the template")]'
 		);
 	} );
 } );

@@ -98,6 +98,7 @@ describe( 'Preview', () => {
 		await editorPage.type( '.editor-post-title__input', 'Hello World' );
 
 		const previewPage = await openPreviewPage( editorPage );
+		await previewPage.waitForSelector( '.entry-title' );
 
 		// When autosave completes for a new post, the URL of the editor should
 		// update to include the ID. Use this to assert on preview URL.
@@ -197,6 +198,7 @@ describe( 'Preview', () => {
 
 		// Open the preview page.
 		const previewPage = await openPreviewPage( editorPage );
+		await previewPage.waitForSelector( '.entry-title' );
 
 		// Title in preview should match input.
 		let previewTitle = await previewPage.$eval(
@@ -257,6 +259,7 @@ describe( 'Preview with Custom Fields enabled', () => {
 
 		// Open the preview page.
 		const previewPage = await openPreviewPage( editorPage );
+		await previewPage.waitForSelector( '.entry-title' );
 
 		// Check the title and preview match.
 		let previewTitle = await previewPage.$eval(

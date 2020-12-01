@@ -1,15 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { EntitiesSavedStates } from '@wordpress/editor';
+import { EntitiesSavedStates, store as editorStore } from '@wordpress/editor';
 import { Button } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { useDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -23,6 +24,18 @@ function TemplateSaveButton() {
 		setIsEntitiesReviewPanelOpen,
 	] = useState( false );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
+	const { editEntityRecord } = useDispatch( coreStore );
+	const { getTemplateInfo, getEditedEntityRecord } = useSelect(
+		( select ) => {
+			return {
+				getTemplateInfo: select( editorStore )
+					.__experimentalGetTemplateInfo,
+				getEditedEntityRecord: select( coreStore )
+					.getEditedEntityRecord,
+			};
+		},
+		[]
+	);
 	return (
 		<>
 			<Button
@@ -36,8 +49,46 @@ function TemplateSaveButton() {
 				<EntitiesSavedStates
 					isOpen={ isEntitiesReviewPanelOpen }
 					close={ ( entities ) => {
+						// The logic here should be abstracted in the entities save handler/component
+						// and not duplicated accross multi-entity save behavior.
+						if ( entities?.length ) {
+							entities.forEach( ( entity ) => {
+								const edits = {};
+								if (
+									entity.kind === 'postType' &&
+									entity.name === 'wp_template'
+								) {
+									const record = getEditedEntityRecord(
+										entity.kind,
+										entity.name,
+										entity.key
+									);
+									edits.title =
+										getTemplateInfo( record ).title ??
+										entity.title ??
+										record.slug;
+								}
+
+								if (
+									entity.kind === 'postType' &&
+									[
+										'wp_template',
+										'wp_template_part',
+									].includes( entity.name )
+								) {
+									edits.status = 'publish';
+								}
+
+								editEntityRecord(
+									entity.kind,
+									entity.name,
+									entity.key,
+									edits
+								);
+							} );
+						}
 						setIsEntitiesReviewPanelOpen( false );
-						if ( entities.length ) {
+						if ( entities?.length ) {
 							setIsEditingTemplate( false );
 						}
 					} }

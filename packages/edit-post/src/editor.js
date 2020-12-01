@@ -59,7 +59,9 @@ function Editor( {
 		const { getEntityRecord, __experimentalGetTemplateForLink } = select(
 			'core'
 		);
-		const { getEditorSettings } = select( 'core/editor' );
+		const { getEditorSettings, __unstableIsAutodraftPost } = select(
+			'core/editor'
+		);
 		const { getBlockTypes } = select( blocksStore );
 		const postObject = getEntityRecord( 'postType', postType, postId );
 		const isFSETheme = getEditorSettings().isFSETheme;
@@ -82,7 +84,7 @@ function Editor( {
 			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 			isTemplateMode: isEditingTemplate(),
 			template:
-				isFSETheme && postObject && postObject.status !== 'auto-draft'
+				isFSETheme && postObject && ! __unstableIsAutodraftPost()
 					? __experimentalGetTemplateForLink( postObject.link )
 					: null,
 			post: postObject,
