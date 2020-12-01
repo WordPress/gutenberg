@@ -86,7 +86,7 @@ export const processBatch = function* (
 	meta = {}
 ) {
 	const batchId = uuid();
-	const batchSize = yield getBatchSize(queue);
+	const batchSize = yield getBatchSize( queue );
 	yield prepareBatchForProcessing( queue, context, batchId, batchSize, meta );
 	const { transactions } = yield select( 'getBatch', batchId );
 

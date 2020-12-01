@@ -16,8 +16,8 @@ import { dispatch } from '@wordpress/data';
 import './batch-processing';
 import { STATE_ERROR } from './batch-processing/constants';
 
-async function batchProcessor( requests, transaction ) {
-	if ( transaction.state === STATE_ERROR ) {
+async function batchProcessor( requests, batch ) {
+	if ( batch.state === STATE_ERROR ) {
 		throw {
 			code: 'transaction_failed',
 			data: { status: 500 },
