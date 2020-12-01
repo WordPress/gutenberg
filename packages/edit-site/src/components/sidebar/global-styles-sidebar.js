@@ -30,8 +30,8 @@ import { default as SpacingPanel, useHasSpacingPanel } from './spacing-panel';
 function GlobalStylesPanel( {
 	wrapperPanelTitle,
 	context,
-	getStyleProperty,
-	setStyleProperty,
+	getStyle,
+	setStyle,
 	getSetting,
 	setSetting,
 } ) {
@@ -48,15 +48,15 @@ function GlobalStylesPanel( {
 			{ hasTypographyPanel && (
 				<TypographyPanel
 					context={ context }
-					getStyleProperty={ getStyleProperty }
-					setStyleProperty={ setStyleProperty }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
 				/>
 			) }
 			{ hasColorPanel && (
 				<ColorPanel
 					context={ context }
-					getStyleProperty={ getStyleProperty }
-					setStyleProperty={ setStyleProperty }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
 					getSetting={ getSetting }
 					setSetting={ setSetting }
 				/>
@@ -64,8 +64,8 @@ function GlobalStylesPanel( {
 			{ hasSpacingPanel && (
 				<SpacingPanel
 					context={ context }
-					getStyleProperty={ getStyleProperty }
-					setStyleProperty={ setStyleProperty }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
 				/>
 			) }
 		</>
@@ -108,8 +108,8 @@ function getPanelTitle( context ) {
 
 function GlobalStylesBlockPanels( {
 	contexts,
-	getStyleProperty,
-	setStyleProperty,
+	getStyle,
+	setStyle,
 	getSetting,
 	setSetting,
 } ) {
@@ -137,8 +137,8 @@ function GlobalStylesBlockPanels( {
 				key={ 'panel-' + name }
 				wrapperPanelTitle={ wrapperPanelTitle }
 				context={ { ...context, name } }
-				getStyleProperty={ getStyleProperty }
-				setStyleProperty={ setStyleProperty }
+				getStyle={ getStyle }
+				setStyle={ setStyle }
 				getSetting={ getSetting }
 				setSetting={ setSetting }
 			/>
@@ -154,8 +154,8 @@ export default function GlobalStylesSidebar( {
 } ) {
 	const {
 		contexts,
-		getStyleProperty,
-		setStyleProperty,
+		getStyle,
+		setStyle,
 		getSetting,
 		setSetting,
 	} = useGlobalStylesContext();
@@ -200,8 +200,8 @@ export default function GlobalStylesSidebar( {
 						return (
 							<GlobalStylesBlockPanels
 								contexts={ contexts }
-								getStyleProperty={ getStyleProperty }
-								setStyleProperty={ setStyleProperty }
+								getStyle={ getStyle }
+								setStyle={ setStyle }
 								getSetting={ getSetting }
 								setSetting={ setSetting }
 							/>
@@ -214,8 +214,8 @@ export default function GlobalStylesSidebar( {
 								...contexts[ GLOBAL_CONTEXT_NAME ],
 								name: GLOBAL_CONTEXT_NAME,
 							} }
-							getStyleProperty={ getStyleProperty }
-							setStyleProperty={ setStyleProperty }
+							getStyle={ getStyle }
+							setStyle={ setStyle }
 							getSetting={ getSetting }
 							setSetting={ setSetting }
 						/>
