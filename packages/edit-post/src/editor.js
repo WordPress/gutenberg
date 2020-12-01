@@ -84,7 +84,10 @@ function Editor( {
 			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 			isTemplateMode: isEditingTemplate(),
 			template:
-				isFSETheme && postObject && ! __unstableIsAutodraftPost()
+				isFSETheme &&
+				postObject &&
+				! __unstableIsAutodraftPost() &&
+				postType !== 'wp_template'
 					? __experimentalGetTemplateForLink( postObject.link )
 					: null,
 			post: postObject,

@@ -16,9 +16,11 @@ import { store as editPostStore } from '../../../store';
 
 function PostTemplate() {
 	const { template, isEditing, isFSETheme } = useSelect( ( select ) => {
-		const { getEditedPostAttribute, __unstableIsAutodraftPost } = select(
-			editorStore
-		);
+		const {
+			getEditedPostAttribute,
+			__unstableIsAutodraftPost,
+			getCurrentPostType,
+		} = select( editorStore );
 		const { __experimentalGetTemplateForLink } = select( coreStore );
 		const { isEditingTemplate } = select( editPostStore );
 		const link = getEditedPostAttribute( 'link' );
@@ -26,7 +28,10 @@ function PostTemplate() {
 			.isFSETheme;
 		return {
 			template:
-				isFSEEnabled && link && ! __unstableIsAutodraftPost()
+				isFSEEnabled &&
+				link &&
+				! __unstableIsAutodraftPost() &&
+				getCurrentPostType() !== 'wp_template'
 					? __experimentalGetTemplateForLink( link )
 					: null,
 			isEditing: isEditingTemplate(),
