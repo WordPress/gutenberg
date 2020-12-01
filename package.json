@@ -74,6 +74,7 @@
 		"@wordpress/server-side-render": "file:packages/server-side-render",
 		"@wordpress/shortcode": "file:packages/shortcode",
 		"@wordpress/token-list": "file:packages/token-list",
+		"@wordpress/ui-utils": "file:packages/ui-utils",
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",

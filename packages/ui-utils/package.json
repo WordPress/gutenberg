@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/ui-utils",
-	"version": "12.5.0",
+	"version": "0.1.0",
 	"description": "Collection of utilities for building user interfaces.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
