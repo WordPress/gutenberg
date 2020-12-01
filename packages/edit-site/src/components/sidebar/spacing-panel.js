@@ -13,7 +13,10 @@ import {
 import { useEditorFeature } from '../editor/utils';
 
 export function useHasSpacingPanel( { supports } ) {
-	return supports.includes( 'paddingBottom' );
+	return (
+		useEditorFeature( 'spacing.customPadding' ) &&
+		supports.includes( 'paddingBottom' )
+	);
 }
 
 function filterUnitsWithSettings( settings = [], units = [] ) {
