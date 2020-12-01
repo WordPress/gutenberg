@@ -115,25 +115,18 @@ export class MediaUploadProgress extends React.Component {
 		}
 	}
 
-	addInlineProgressComponent( inlineView, progress ) {
-		return (
-			<View style={ styles.inlineProgressContainer }>
-				{ inlineView }
-				<ProgressCircle progress={ progress } />
-			</View>
-		);
-	}
-
 	render() {
 		const { renderContent = () => null, isInline } = this.props;
 		const { isUploadInProgress, isUploadFailed } = this.state;
 		const showSpinner = this.state.isUploadInProgress;
 		const progress = this.state.progress * 100;
-		const inlineProgressComponent = ( inlineView, uploadProgress ) => {
+		const inlineProgressComponent = ( inlineView ) => {
 			return (
 				<View style={ styles.inlineProgressContainer }>
 					{ inlineView }
-					<ProgressCircle progress={ uploadProgress } />
+					{ isUploadInProgress && (
+						<ProgressCircle progress={ progress } />
+					) }
 				</View>
 			);
 		};
