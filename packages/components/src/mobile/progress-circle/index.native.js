@@ -8,46 +8,47 @@ import Animated from 'react-native-reanimated';
 /**
  * Internal dependencies
  */
-import styles from './style.scss';
 
-const ProgressCircle = ( { progress, width = 50, strokeWidth = 50 } ) => {
+const ProgressCircle = ( { progress, width = 20, strokeWidth = 2 } ) => {
 	const circleSize = width;
-	const radius = ( circleSize - strokeWidth ) / 2;
+	const r = ( circleSize - strokeWidth ) / 2;
 	const cx = circleSize / 2;
 	const cy = circleSize / 2;
 
 	const { interpolate, multiply } = Animated;
 	const { PI } = Math;
-	const circumference = radius * 2 * PI;
+	const circumference = r * 2 * PI;
 	const α = interpolate( progress, {
 		inputRange: [ 0, 100 ],
 		outputRange: [ 0, PI * 2 ],
 	} );
 
-	const strokeDashoffset = multiply( α, radius );
+	const strokeDashoffset = multiply( α, r );
 
 	const AnimatedCircle = Animated.createAnimatedComponent( Circle );
 
 	return (
 		<Svg width={ circleSize } height={ circleSize }>
 			<Circle
+				fill="none"
+				stroke="#e9eff3"
 				{ ...{
 					strokeWidth,
 					cx,
 					cy,
-					radius,
-					...styles[ 'background-circle' ],
+					r,
 				} }
 			/>
 			<AnimatedCircle
 				strokeDasharray={ `${ circumference }, ${ circumference }` }
+				fill="none"
+				stroke="#0087be"
 				{ ...{
 					strokeDashoffset,
 					strokeWidth,
 					cx,
 					cy,
-					radius,
-					...styles[ 'progress-circle' ],
+					r,
 				} }
 			/>
 		</Svg>

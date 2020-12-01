@@ -137,7 +137,7 @@ export class MediaUploadProgress extends React.Component {
 				</View>
 			);
 		};
-	
+
 		// eslint-disable-next-line @wordpress/i18n-no-collapsible-whitespace
 		const retryMessage = __(
 			'Failed to insert media.\nPlease tap for options.'
