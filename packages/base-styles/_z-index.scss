@@ -71,6 +71,9 @@ $z-layers: (
 	".edit-site-sidebar": 100000,
 	".edit-widgets-sidebar": 100000,
 	".edit-post-layout .edit-post-post-publish-panel": 100001,
+	// For larger views, the wp-admin navbar dropdown should be at top of
+	// the Publish Post sidebar.
+	".edit-post-layout .edit-post-post-publish-panel {greater than small}": 99998,
 
 	".entities-saved-states__panel": 100001,
 	// For larger views, the wp-admin navbar dropdown should be on top of

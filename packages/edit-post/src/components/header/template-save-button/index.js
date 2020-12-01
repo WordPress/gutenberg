@@ -38,7 +38,7 @@ function TemplateSaveButton() {
 	);
 	return (
 		<>
-			<Button onClick={ () => setIsEditingTemplate( false ) }>
+			<Button onClick={ () => setIsEditingTemplate( false ) } isTertiary>
 				{ __( 'Cancel' ) }
 			</Button>
 			<Button
