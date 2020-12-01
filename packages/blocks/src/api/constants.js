@@ -53,20 +53,13 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'typography', 'lineHeight' ],
 		support: [ 'lineHeight' ],
 	},
-	paddingBottom: {
-		value: [ 'spacing', 'padding', 'bottom' ],
-		support: [ 'spacing', 'padding' ],
-	},
-	paddingLeft: {
-		value: [ 'spacing', 'padding', 'left' ],
-		support: [ 'spacing', 'padding' ],
-	},
-	paddingRight: {
-		value: [ 'spacing', 'padding', 'right' ],
-		support: [ 'spacing', 'padding' ],
-	},
-	paddingTop: {
-		value: [ 'spacing', 'padding', 'top' ],
+	padding: {
+		value: {
+			top: [ 'spacing', 'padding', 'top' ],
+			right: [ 'spacing', 'padding', 'right' ],
+			bottom: [ 'spacing', 'padding', 'bottom' ],
+			left: [ 'spacing', 'padding', 'left' ],
+		},
 		support: [ 'spacing', 'padding' ],
 	},
 	textDecoration: {
