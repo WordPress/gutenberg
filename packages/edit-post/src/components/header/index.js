@@ -100,7 +100,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 				) }
 				{ showIconLabels && ! isLargeViewport && (
 					<MoreMenu showIconLabels={ showIconLabels } />
-				) }{ ' ' }
+				) }
 			</div>
 		</div>
 	);

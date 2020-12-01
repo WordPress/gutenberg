@@ -4,10 +4,6 @@
 import { EntitiesSavedStates, store as editorStore } from '@wordpress/editor';
 import { Button } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * WordPress dependencies
- */
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
