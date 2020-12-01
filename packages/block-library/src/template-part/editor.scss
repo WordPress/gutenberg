@@ -91,3 +91,13 @@
 		box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
 	}
 }
+
+.block-editor-block-toolbar__slot {
+	.components-toolbar-group {
+		order: 1;
+	}
+
+	.wp-block-template-part__block-control-group {
+		order: 0;
+	}
+}

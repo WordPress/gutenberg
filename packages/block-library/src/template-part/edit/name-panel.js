@@ -20,7 +20,7 @@ export default function TemplatePartNamePanel( { postId } ) {
 
 	return (
 		<div className="wp-block-template-part__name-panel">
-			<Text variant="label">{ title || slug }</Text>
+			<Text variant="body">{ title || slug }</Text>
 		</div>
 	);
 }
