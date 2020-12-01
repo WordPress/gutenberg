@@ -109,10 +109,11 @@ function URLPicker( {
 	anchorRef,
 } ) {
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
+	const linkToolbarButtonRef = useRef( null );
 	const urlIsSet = !! url;
 	const urlIsSetandSelected = urlIsSet && isSelected;
-	const openLinkControl = () => {
-		setIsURLPickerOpen( true );
+	const toggleLinkControl = () => {
+		setIsURLPickerOpen( ! isURLPickerOpen );
 		return false; // prevents default behaviour for event
 	};
 	const unlinkButton = () => {
@@ -123,11 +124,32 @@ function URLPicker( {
 		} );
 		setIsURLPickerOpen( false );
 	};
+	/**
+	 * We are using onFocusOutside to ensure we aren't
+	 * closing the popover here when clicking on the toggle button.
+	 * Using onClose would result in closing and reopening the popover.
+	 */
+	const closeIfFocusOutside = () => {
+		if ( ! isSelected ) {
+			setIsURLPickerOpen( false );
+			return;
+		}
+
+		const { ownerDocument } = linkToolbarButtonRef.current;
+		if (
+			! linkToolbarButtonRef.current.contains(
+				ownerDocument.activeElement
+			) &&
+			! ownerDocument.activeElement.closest( '[role="dialog"]' )
+		) {
+			setIsURLPickerOpen( false );
+		}
+	};
 	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
 		<Popover
 			position="bottom center"
-			onClose={ () => setIsURLPickerOpen( false ) }
 			anchorRef={ anchorRef?.current }
+			onFocusOutside={ closeIfFocusOutside }
 		>
 			<LinkControl
 				className="wp-block-navigation-link__inline-link-input"
@@ -155,7 +177,8 @@ function URLPicker( {
 							icon={ link }
 							title={ __( 'Link' ) }
 							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ openLinkControl }
+							onClick={ toggleLinkControl }
+							ref={ linkToolbarButtonRef }
 						/>
 					) }
 					{ urlIsSetandSelected && (
@@ -166,6 +189,7 @@ function URLPicker( {
 							shortcut={ displayShortcut.primaryShift( 'k' ) }
 							onClick={ unlinkButton }
 							isActive={ true }
+							ref={ linkToolbarButtonRef }
 						/>
 					) }
 				</ToolbarGroup>
@@ -174,7 +198,7 @@ function URLPicker( {
 				<KeyboardShortcuts
 					bindGlobal
 					shortcuts={ {
-						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+						[ rawShortcut.primary( 'k' ) ]: toggleLinkControl,
 						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
 					} }
 				/>
