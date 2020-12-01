@@ -275,6 +275,37 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
+	const { registerInserterVariationsAsSingle, variations } = settings;
+	if ( registerInserterVariationsAsSingle && variations?.length ) {
+		const { registerAsSingle, rest } = variations.reduce(
+			( accumulator, variation ) => {
+				const { scope } = variation;
+				if ( ! scope || scope.includes( 'inserter' ) ) {
+					accumulator.registerAsSingle.push( variation );
+				} else {
+					accumulator.rest.push( variation );
+				}
+
+				return accumulator;
+			},
+			{ registerAsSingle: [], rest: [] }
+		);
+		registerAsSingle.forEach( ( variation ) => {
+			const newSettings = {
+				...settings,
+				...variation,
+				name: `${ settings.name }-${ variation.name }`,
+				attributes: {
+					...settings.attributes,
+					...variation.attributes,
+				},
+			};
+			delete newSettings.variations;
+			delete newSettings.scope;
+			dispatch( blocksStore ).addBlockTypes( newSettings );
+		} );
+		settings.variations = rest;
+	}
 	dispatch( blocksStore ).addBlockTypes( settings );
 
 	return settings;

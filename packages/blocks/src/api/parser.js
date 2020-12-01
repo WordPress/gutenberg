@@ -426,23 +426,27 @@ export function convertLegacyBlocks( name, attributes ) {
 
 	// Convert derivative blocks such as 'core-embed/instagram' to the
 	// canonical form 'core/embed'.
-	if ( name && name.indexOf( 'core-embed/' ) === 0 ) {
-		// Capture `core-embed/instagram` into `{"providerNameSlug":"instagram"}`
-		const providerSlug = name.substring( 11 );
-		const deprecated = {
-			speaker: 'speaker-deck',
-			polldaddy: 'crowdsignal',
-		};
-		newAttributes.providerNameSlug =
-			providerSlug in deprecated
-				? deprecated[ providerSlug ]
-				: providerSlug;
-		// this is needed as the `responsive` attribute was passed
-		// in a different way before the refactoring to block variations
-		if ( ! [ 'amazon-kindle', 'wordpress' ].includes( providerSlug ) ) {
-			newAttributes.responsive = true;
-		}
-		name = 'core/embed';
+	// if ( name && name.indexOf( 'core-embed/' ) === 0 ) {
+	// 	// Capture `core-embed/instagram` into `{"providerNameSlug":"instagram"}`
+	// 	const providerSlug = name.substring( 11 );
+	// 	const deprecated = {
+	// 		speaker: 'speaker-deck',
+	// 		polldaddy: 'crowdsignal',
+	// 	};
+	// 	newAttributes.providerNameSlug =
+	// 		providerSlug in deprecated
+	// 			? deprecated[ providerSlug ]
+	// 			: providerSlug;
+	// 	// this is needed as the `responsive` attribute was passed
+	// 	// in a different way before the refactoring to block variations
+	// 	if ( ! [ 'amazon-kindle', 'wordpress' ].includes( providerSlug ) ) {
+	// 		newAttributes.responsive = true;
+	// 	}
+	// 	name = 'core/embed';
+	// }
+	if ( name === 'core/embed' && attributes?.providerNameSlug ) {
+		newAttributes.name = `${ name }-${ attributes.providerNameSlug }`;
+		// TODO getBlockType and adjust properties...
 	}
 	return { name, attributes: newAttributes };
 }

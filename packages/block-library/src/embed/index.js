@@ -28,4 +28,5 @@ export const settings = {
 	transforms,
 	variations,
 	deprecated,
+	registerInserterVariationsAsSingle: true,
 };

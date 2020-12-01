@@ -26,6 +26,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
+import { getBlockType } from '@wordpress/blocks';
 
 function getResponsiveHelp( checked ) {
 	return checked
@@ -50,6 +51,7 @@ const EmbedEdit = ( props ) => {
 		onReplace,
 		setAttributes,
 		insertBlocksAfter,
+		name,
 	} = props;
 
 	const defaultEmbedInfo = {
@@ -57,7 +59,9 @@ const EmbedEdit = ( props ) => {
 		icon: settings.icon,
 	};
 	const { icon, title } =
-		getEmbedInfoByProvider( providerNameSlug ) || defaultEmbedInfo;
+		name === 'core/embed'
+			? getEmbedInfoByProvider( providerNameSlug ) || defaultEmbedInfo
+			: getBlockType( name );
 
 	const [ url, setURL ] = useState( attributesUrl );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
