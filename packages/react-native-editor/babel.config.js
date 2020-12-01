@@ -54,6 +54,9 @@ module.exports = function ( api ) {
 			development: {
 				plugins: [ '@babel/transform-react-jsx-source' ],
 			},
+			production: {
+				plugins: [ 'transform-remove-console' ],
+			},
 		},
 	};
 };

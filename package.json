@@ -142,6 +142,7 @@
 		"babel-plugin-react-native-classname-to-style": "1.2.2",
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"babel-plugin-require-context-hook": "1.0.0",
+		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
 		"browserslist": "4.14.0",
 		"chalk": "4.0.0",
