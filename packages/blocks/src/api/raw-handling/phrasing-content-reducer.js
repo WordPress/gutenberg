@@ -20,7 +20,7 @@ export default function phrasingContentReducer( node, doc ) {
 			fontStyle,
 			textDecorationLine,
 			textDecoration,
-			verticalAlign,
+			verticgit statalAlign,
 		} = node.style;
 
 		// adds color to the wrapper
