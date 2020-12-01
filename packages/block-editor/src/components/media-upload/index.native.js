@@ -88,7 +88,12 @@ export class MediaUpload extends React.Component {
 			id: mediaSources.siteMediaLibrary,
 			value: mediaSources.siteMediaLibrary,
 			label: __( 'WordPress Media Library' ),
-			types: [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO, MEDIA_TYPE_ANY ],
+			types: [
+				MEDIA_TYPE_IMAGE,
+				MEDIA_TYPE_VIDEO,
+				MEDIA_TYPE_AUDIO,
+				MEDIA_TYPE_ANY,
+			],
 			icon: wordpress,
 			mediaLibrary: true,
 		};

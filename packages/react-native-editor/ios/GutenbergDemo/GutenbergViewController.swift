@@ -102,8 +102,8 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
                 }
             case .other, .any:
                  callback([MediaInfo(id: 3, url: "https://wordpress.org/latest.zip", type: "zip", caption: "WordPress latest version", title: "WordPress.zip")])
-            default:
-                break
+            case .audio:
+                callback([MediaInfo(id: 5, url: "https://cldup.com/59IrU0WJtq.mp3", type: "audio", caption: "Summer presto")])
             }
         case .deviceLibrary:
             print("Gutenberg did request a device media picker, opening the device picker")

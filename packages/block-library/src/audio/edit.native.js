@@ -123,15 +123,9 @@ function AudioEdit( {
 			<MediaUploadProgress
 				mediaId={ id }
 				onUpdateMediaProgress={ this.updateMediaProgress }
-				onFinishMediaUploadWithSuccess={
-					onFileChange
-					// this.finishMediaUploadWithSuccess
-				}
-				onFinishMediaUploadWithFailure={
-					onError
-					// this.finishMediaUploadWithFailure
-				}
-				onMediaUploadStateReset={ onFileChange } //this.mediaUploadStateReset }
+				onFinishMediaUploadWithSuccess={ onFileChange }
+				onFinishMediaUploadWithFailure={ onError }
+				onMediaUploadStateReset={ onFileChange }
 				renderContent={ ( { isUploadInProgress, isUploadFailed } ) => {
 					return (
 						<View>
