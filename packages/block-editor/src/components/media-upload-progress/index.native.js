@@ -32,9 +32,6 @@ export class MediaUploadProgress extends React.Component {
 		};
 
 		this.mediaUpload = this.mediaUpload.bind( this );
-		this.addInlineProgressComponent = this.addInlineProgressComponent.bind(
-			this
-		);
 	}
 
 	componentDidMount() {
