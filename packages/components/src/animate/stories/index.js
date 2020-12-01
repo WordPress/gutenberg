@@ -1,53 +1,62 @@
 /**
+ * External dependencies
+ */
+import { button, radios } from '@storybook/addon-knobs';
+import { useMemo, useState } from 'react';
+
+/**
  * Internal dependencies
  */
-import Animate from '../';
+import { getAnimateClassName } from '../';
 import Notice from '../../notice';
 
-export default { title: 'Components/Animate', component: Animate };
+export default { title: 'Components/getAnimateClassName' };
 
-export const _default = () => (
-	<Animate>
-		{ ( { className } ) => (
-			<Notice className={ className } status="success">
-				<p>{ `No default animation. Use one of type = "appear", "slide-in", or "loading".` }</p>
-			</Notice>
-		) }
-	</Animate>
-);
+export const _default = () => {
+	const typeToOrigin = useMemo(
+		() => ( {
+			appear: [
+				[
+					'top',
+					'top left',
+					'top right',
+					'middle',
+					'middle left',
+					'middle right',
+					'bottom',
+					'bottom left',
+					'bottom right',
+				],
+				'top left',
+			],
+			'slide-in': [ [ 'left', 'right' ], 'left' ],
+			loading: [ [], undefined ],
+		} ),
+		[]
+	);
+	const [ k, setK ] = useState( Number.MIN_SAFE_INTEGER );
+	button( 'Replay animation', () => setK( ( prevK ) => prevK + 1 ) );
+	const type = radios(
+		'Type',
+		[ 'appear', 'slide-in', 'loading' ],
+		'appear'
+	);
+	const origin = radios( 'Origin', ...typeToOrigin[ type ] );
 
-// Unexported helper for different origins.
-const Appear = ( { origin } ) => (
-	<Animate type="appear" options={ { origin } }>
-		{ ( { className } ) => (
-			<Notice className={ className } status="success">
-				<p>Appear animation. Origin: { origin }.</p>
-			</Notice>
-		) }
-	</Animate>
-);
-
-export const appearTopLeft = () => <Appear origin="top left" />;
-export const appearTopRight = () => <Appear origin="top right" />;
-export const appearBottomLeft = () => <Appear origin="bottom left" />;
-export const appearBottomRight = () => <Appear origin="bottom right" />;
-
-export const loading = () => (
-	<Animate type="loading">
-		{ ( { className } ) => (
-			<Notice className={ className } status="success">
-				<p>Loading animation.</p>
-			</Notice>
-		) }
-	</Animate>
-);
-
-export const slideIn = () => (
-	<Animate type="slide-in">
-		{ ( { className } ) => (
-			<Notice className={ className } status="success">
-				<p>Slide-in animation.</p>
-			</Notice>
-		) }
-	</Animate>
-);
+	return (
+		<Notice
+			className={ getAnimateClassName( { type, origin } ) }
+			status="success"
+			key={ k }
+		>
+			<p>
+				<code>{ type }</code> animation.
+			</p>
+			{ origin && (
+				<p>
+					Origin: <code>{ origin }</code>.
+				</p>
+			) }
+		</Notice>
+	);
+};
