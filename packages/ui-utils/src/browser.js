@@ -1,5 +1,5 @@
 export function detectBrowser( browser ) {
-	return navigator.userAgent.toLowerCase().indexOf( browser ) > -1;
+	return window?.navigator?.userAgent.toLowerCase().indexOf( browser ) > -1;
 }
 
 export function isChrome() {

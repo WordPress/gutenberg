@@ -1,4 +1,1 @@
-/** @type {() => void} */
-export function noop() {
-	return undefined;
-}
+export { noop } from 'lodash';

@@ -10,7 +10,6 @@ export * from './is';
 export * from './keyboard';
 export * from './math';
 export * from './memoize';
-export * from './objects';
 export * from './other';
 export * from './react';
 export * from './selection';

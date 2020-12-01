@@ -3,6 +3,8 @@
  */
 import _ from 'lodash';
 
+const { Blob, File } = window;
+
 /**
  * @param {any} o
  * @return {boolean}
