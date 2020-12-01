@@ -25,9 +25,10 @@ export const settings = {
 	keywords: [ __( 'movie' ) ],
 	example: {
 		attributes: {
-			autoplay: true,
-			controls: true,
-			src: 'https://upload.wikimedia.org/wikipedia/commons/c/ca/Wood_thrush_in_Central_Park_switch_sides_%2816510%29.webm',
+			src:
+				'https://upload.wikimedia.org/wikipedia/commons/c/ca/Wood_thrush_in_Central_Park_switch_sides_%2816510%29.webm',
+			// translators: Caption accompanying a video of the wood thrush singing, which serves as an example for the Image block.
+			caption: __( 'Wood thrush singing in Central Park, NYC.' ),
 		},
 	},
 	transforms,
