@@ -12,7 +12,14 @@ import useFocusOutside from '../../utils/hooks/use-focus-outside';
 export default createHigherOrderComponent(
 	( WrappedComponent ) => ( props ) => {
 		const ref = useRef();
-		const onFocusOutside = ref.current?.handleFocusOutside;
+
+		// For backwards compatibility with class components, bind the
+		// function to its instance so that `this.props` can be accessed
+		// from within `handleFocusOutside`.
+		const onFocusOutside = ref.current?.handleFocusOutside.bind(
+			ref.current
+		);
+
 		const {
 			onFocus,
 			onMouseDown,
