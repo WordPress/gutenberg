@@ -19,10 +19,9 @@ function TemplateTitle() {
 		const link = getEditedPostAttribute( 'link' );
 		const _isEditing = isEditingTemplate();
 		return {
-			template:
-				_isEditing && link
-					? __experimentalGetTemplateForLink( link )
-					: null,
+			template: _isEditing
+				? __experimentalGetTemplateForLink( link )
+				: null,
 			isEditing: _isEditing,
 		};
 	}, [] );

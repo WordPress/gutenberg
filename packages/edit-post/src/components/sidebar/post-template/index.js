@@ -16,15 +16,18 @@ import { store as editPostStore } from '../../../store';
 
 function PostTemplate() {
 	const { template, isEditing, isFSETheme } = useSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( editorStore );
+		const { getEditedPostAttribute, getCurrentPost } = select(
+			editorStore
+		);
 		const { __experimentalGetTemplateForLink } = select( coreStore );
 		const { isEditingTemplate } = select( editPostStore );
 		const link = getEditedPostAttribute( 'link' );
 		const isFSEEnabled = select( editorStore ).getEditorSettings()
 			.isFSETheme;
+		const postStatus = getCurrentPost().status;
 		return {
 			template:
-				isFSEEnabled && link
+				isFSEEnabled && link && postStatus !== 'auto-draft'
 					? __experimentalGetTemplateForLink( link )
 					: null,
 			isEditing: isEditingTemplate(),
