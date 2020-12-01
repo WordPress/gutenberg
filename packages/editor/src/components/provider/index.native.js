@@ -28,6 +28,7 @@ import {
 	createBlock,
 } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
+import { store as editPostStore } from '@wordpress/edit-post';
 import { compose } from '@wordpress/compose';
 import { applyFilters } from '@wordpress/hooks';
 import {
@@ -286,7 +287,7 @@ export default compose( [
 			getEditedPostAttribute,
 			getEditedPostContent,
 		} = select( 'core/editor' );
-		const { getEditorMode } = select( 'core/edit-post' );
+		const { getEditorMode } = select( editPostStore );
 
 		const {
 			getBlockIndex,
@@ -316,7 +317,7 @@ export default compose( [
 			insertBlock,
 			replaceBlock,
 		} = dispatch( 'core/block-editor' );
-		const { switchEditorMode } = dispatch( 'core/edit-post' );
+		const { switchEditorMode } = dispatch( editPostStore );
 		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
 
 		return {
