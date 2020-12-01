@@ -4,12 +4,16 @@
 // Styles for current version of gallery block.
 .wp-block-gallery.has-nested-images {
 	ul.blocks-gallery-grid {
-		display: flex;
-		flex-wrap: wrap;
-		list-style-type: none;
-		padding: 0;
 		// Some themes give all <ul> default margin instead of padding.
 		margin: 0;
+		list-style-type: none;
+		padding: 0;
+
+		// Avoid applying flex styles to IE11.
+		@supports ( position: sticky ) {
+			display: flex;
+			flex-wrap: wrap;
+		}
 
 		// Need bogus :not(#individual-image) to override long :not()
 		// specificity chain on default image block on front end.
@@ -23,27 +27,39 @@
 		}
 
 		li.list-image {
-			display: flex;
-			flex-grow: 1;
-			flex-direction: column;
-			justify-content: center;
 			position: relative;
+
+			// Avoid applying flex styles to IE11.
+			@supports ( position: sticky ) {
+				display: flex;
+				flex-direction: column;
+				flex-grow: 1;
+				justify-content: center;
+			}
 
 			// Again, we need :not(#individual-image) to override long :not()
 			// chain on frontend styles.
 			figure:not(#individual-image) {
 				margin: 0;
-				flex-grow: 1;
-				display: flex;
-				flex-direction: column; // Needed for frontend when img isn't wrapped in div.
 				max-width: 100%; // When aligned wide or full, this allows image to fill row.
+
+				// Avoid applying flex styles to IE11.
+				@supports ( position: sticky ) {
+					display: flex;
+					flex-direction: column; // Needed for frontend when img isn't wrapped in div.
+					flex-grow: 1;
+				}
 			}
 
 			figure > div,
 			figure > a {
 				margin: 0;
-				flex-direction: column;
-				flex-grow: 1;
+
+				// Avoid applying flex styles to IE11.
+				@supports ( position: sticky ) {
+					flex-direction: column;
+					flex-grow: 1;
+				}
 			}
 
 			img {
@@ -51,6 +67,7 @@
 				max-width: 100%;
 				height: auto;
 				width: 100%;
+
 				// IE doesn't handle cropping, so we need an explicit width here.
 				// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
 				@supports ( position: sticky ) {
@@ -86,7 +103,10 @@
 	&.is-cropped ul.blocks-gallery-grid li.list-image:not(#individual-image) {
 		figure > div,
 		figure > a {
-			display: flex;
+			// Avoid applying flex styles to IE11.
+			@supports ( position: sticky ) {
+				display: flex;
+			}
 		}
 
 		a,
