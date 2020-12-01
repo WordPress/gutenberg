@@ -25,8 +25,8 @@ function filterUnitsWithSettings( settings = [], units = [] ) {
 	} );
 }
 
-function useCustomUnits( units ) {
-	const availableUnits = useEditorFeature( 'spacing.units' );
+function useCustomUnits( { units, contextName } ) {
+	const availableUnits = useEditorFeature( 'spacing.units', contextName );
 	const usedUnits = filterUnitsWithSettings(
 		! availableUnits ? [] : availableUnits,
 		units
@@ -40,7 +40,7 @@ export default function SpacingPanel( {
 	getStyleProperty,
 	setStyleProperty,
 } ) {
-	const units = useCustomUnits();
+	const units = useCustomUnits( { contextName: name } );
 	const paddingValues = {
 		top: getStyleProperty( name, 'paddingTop' ),
 		right: getStyleProperty( name, 'paddingRight' ),
