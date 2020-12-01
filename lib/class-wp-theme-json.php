@@ -272,20 +272,13 @@ class WP_Theme_JSON {
 			'value'   => array( 'typography', 'lineHeight' ),
 			'support' => array( 'lineHeight' ),
 		),
-		'paddingBottom'            => array(
-			'value'   => array( 'spacing', 'padding', 'bottom' ),
-			'support' => array( 'spacing', 'padding' ),
-		),
-		'paddingLeft'              => array(
-			'value'   => array( 'spacing', 'padding', 'left' ),
-			'support' => array( 'spacing', 'padding' ),
-		),
-		'paddingRight'             => array(
-			'value'   => array( 'spacing', 'padding', 'right' ),
-			'support' => array( 'spacing', 'padding' ),
-		),
-		'paddingTop'               => array(
-			'value'   => array( 'spacing', 'padding', 'top' ),
+		'padding'                  => array(
+			'value'   => array(
+				'top'    => array( 'spacing', 'padding', 'top' ),
+				'right'  => array( 'spacing', 'padding', 'right' ),
+				'bottom' => array( 'spacing', 'padding', 'bottom' ),
+				'left'   => array( 'spacing', 'padding', 'left' ),
+			),
 			'support' => array( 'spacing', 'padding' ),
 		),
 		'textDecoration'           => array(
@@ -625,6 +618,14 @@ class WP_Theme_JSON {
 		return $value;
 	}
 
+	private static function is_shorthand_property( $metadata, $name ) {
+		if ( 'padding' === $name ) {
+			return true;
+		}
+
+		return false;
+	}
+
 	/**
 	 * Given a context, it extracts the style properties
 	 * and adds them to the $declarations array following the format:
@@ -647,14 +648,33 @@ class WP_Theme_JSON {
 			return;
 		}
 
+		$properties = array();
 		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
 			if ( ! in_array( $name, $context_supports, true ) ) {
 				continue;
 			}
 
-			$value = self::get_property_value( $context['styles'], $metadata['value'] );
+			// Some properties can be shorthand properties, meaning that
+			// they contain multiple values instead of a single one.
+			if ( self::is_shorthand_property( $metadata, $name ) ) {
+				foreach ( $metadata['value'] as $property_name => $property_value ) {
+					$properties[] = array(
+						'name'  => $name . ucfirst( $property_name ),
+						'value' => $property_value
+					);
+				}
+			} else {
+				$properties[] = array(
+					'name'  => $name,
+					'value' => $metadata['value'],
+				);
+			}
+		}
+
+		foreach( $properties as $prop ) {
+			$value = self::get_property_value( $context['styles'], $prop['value'] );
 			if ( ! empty( $value ) ) {
-				$kebabcased_name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $name ) );
+				$kebabcased_name = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $prop['name'] ) );
 				$declarations[]  = array(
 					'name'  => $kebabcased_name,
 					'value' => $value,
