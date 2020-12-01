@@ -6,14 +6,6 @@
 
 - Introduce support for other units and advanced CSS properties on `FontSizePicker`. Provided the value passed to the `FontSizePicker` is a string or one of the size options passed is a string, onChange will start to be called with a string value instead of a number. On WordPress usage, font size options are now automatically converted to strings with the default "px" unit added.
 
-### New Features
-
-- Add `getAnimateClassName` animation className helper [#27123](https://github.com/WordPress/gutenberg/pull/27123).
-
-### Deprecations
-
-- `Animate` component has been deprecated in favor of `getAnimateClassName` [#27123](https://github.com/WordPress/gutenberg/pull/27123)
-
 ## 10.0.0 (2020-07-07)
 
 ### Breaking Change

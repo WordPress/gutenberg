@@ -4,11 +4,6 @@
 import classnames from 'classnames';
 
 /**
- * WordPress dependencies
- */
-import deprecated from '@wordpress/deprecated';
-
-/**
  * @typedef {'top' | 'top left' | 'top right' | 'middle' | 'middle left' | 'middle right' | 'bottom' | 'bottom left' | 'bottom right'} AppearOrigin
  * @typedef {'left' | 'right'} SlideInOrigin
  * @typedef {{ type: 'appear'; origin?: AppearOrigin }} AppearOptions
@@ -55,13 +50,8 @@ export function getAnimateClassName( options ) {
 	}
 }
 
-// @ts-ignore
+// @ts-ignore Reason: Planned for deprecation
 export default function Animate( { type, options = {}, children } ) {
-	deprecated( 'Animate component', {
-		version: '9.6',
-		alternative: 'getAnimateClassName',
-		hint: '`<AnimatedComponent className={ getAnimateClassName() } />`',
-	} );
 	return children( {
 		className: getAnimateClassName( { type, ...options } ),
 	} );
