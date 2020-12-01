@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### New Features
+
+- Add `getAnimateClassName` animation className helper [#27390](https://github.com/WordPress/gutenberg/pull/27390).
+
+### Deprecations
+
+- `Animate` component has been deprecated in favor of `getAnimateClassName` [#27390](https://github.com/WordPress/gutenberg/pull/27390)
+
 ## 12.0.0 (2020-12-17)
 
 ### Enhancements
