@@ -221,17 +221,6 @@ export default function SearchEdit( {
 								>
 									{ __( 'Button Inside' ) }
 								</MenuItem>
-								<MenuItem
-									icon={ buttonOnly }
-									onClick={ () => {
-										setAttributes( {
-											buttonPosition: 'button-only',
-										} );
-										onClose();
-									} }
-								>
-									{ __( 'Button Only' ) }
-								</MenuItem>
 							</MenuGroup>
 						) }
 					</DropdownMenu>

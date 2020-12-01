@@ -5,3 +5,10 @@ exports[`Code can be created by three backticks and enter 1`] = `
 <pre class=\\"wp-block-code\\"><code>&lt;?php</code></pre>
 <!-- /wp:code -->"
 `;
+
+exports[`Code should paste plain text 1`] = `
+"<!-- wp:code -->
+<pre class=\\"wp-block-code\\"><code>&lt;img />
+	&lt;br></code></pre>
+<!-- /wp:code -->"
+`;
