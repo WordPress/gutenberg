@@ -15,7 +15,7 @@ import { useEditorFeature } from '../editor/utils';
 export function useHasSpacingPanel( { supports, name } ) {
 	return (
 		useEditorFeature( 'spacing.customPadding', name ) &&
-		supports.includes( 'paddingBottom' )
+		supports.includes( 'padding' )
 	);
 }
 
