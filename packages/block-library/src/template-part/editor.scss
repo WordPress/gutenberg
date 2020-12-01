@@ -67,7 +67,9 @@
 
 	.wp-block-template-part__name-panel {
 		outline: 1px solid transparent;
-		padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-15;
+		padding: $grid-unit-10 0 $grid-unit-10 $grid-unit-20;
+		display: flex;
+		align-items: center;
 
 		.components-base-control__field {
 			align-items: center;
