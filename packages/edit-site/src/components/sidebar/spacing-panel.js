@@ -12,9 +12,9 @@ import {
  */
 import { useEditorFeature } from '../editor/utils';
 
-export function useHasSpacingPanel( { supports } ) {
+export function useHasSpacingPanel( { supports, name } ) {
 	return (
-		useEditorFeature( 'spacing.customPadding' ) &&
+		useEditorFeature( 'spacing.customPadding', name ) &&
 		supports.includes( 'paddingBottom' )
 	);
 }
