@@ -41,17 +41,14 @@ export default function SpacingPanel( {
 	setStyle,
 } ) {
 	const units = useCustomUnits( { contextName: name } );
-	const paddingValues = {
-		top: getStyle( name, 'paddingTop' ),
-		right: getStyle( name, 'paddingRight' ),
-		bottom: getStyle( name, 'paddingBottom' ),
-		left: getStyle( name, 'paddingLeft' ),
-	};
+	const paddingValues = getStyle( name, 'padding' );
 	const setPaddingValues = ( { top, right, bottom, left } ) => {
-		setStyle( name, 'paddingTop', top );
-		setStyle( name, 'paddingRight', right );
-		setStyle( name, 'paddingBottom', bottom );
-		setStyle( name, 'paddingLeft', left );
+		setStyle( name, 'padding', {
+			top: top || paddingValues.top,
+			right: right || paddingValues.right,
+			bottom: bottom || paddingValues.bottom,
+			left: left || paddingValues.left,
+		} );
 	};
 	return (
 		<PanelBody title={ __( 'Spacing' ) }>
