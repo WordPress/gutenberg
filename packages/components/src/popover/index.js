@@ -83,10 +83,10 @@ function computeAnchorRect(
 			return getRectangleFromRange( anchorRef );
 		}
 
-		if (
-			anchorRef?.ownerDocument &&
-			anchorRef instanceof anchorRef.ownerDocument.defaultView.Element
-		) {
+		// Duck-type to check if `anchorRef` is an instance of Element
+		// `anchorRef instanceof window.Element` checks will break across document boundaries
+		// such as in an iframe
+		if ( typeof anchorRef?.getBoundingClientRect === 'function' ) {
 			const rect = anchorRef.getBoundingClientRect();
 
 			if ( shouldAnchorIncludePadding ) {
