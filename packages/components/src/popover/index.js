@@ -75,7 +75,10 @@ function computeAnchorRect(
 			return getRectangleFromRange( anchorRef );
 		}
 
-		if ( anchorRef instanceof window.Element ) {
+		if (
+			anchorRef?.ownerDocument &&
+			anchorRef instanceof anchorRef.ownerDocument.defaultView.Element
+		) {
 			const rect = anchorRef.getBoundingClientRect();
 
 			if ( shouldAnchorIncludePadding ) {
