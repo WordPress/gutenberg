@@ -1813,7 +1813,36 @@ export function areInnerBlocksControlled( state, clientId ) {
 }
 
 /**
- * Returns the clientId for the first 'active' block of a given array of block names.
+ * Returns an array of clientIds for hovered blocks set in full site editing.
+ * Block Ids set in FSE are ordered from child to parent.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string[]} Array of clientIds for hovered blocks.
+ */
+export function __experimentalGetHoveredBlocks( state ) {
+	return state.hoveredBlocks;
+}
+
+/**
+ * Returns the clientId for the most interior hovered block of the given block name.
+ *
+ * @param {Object} state     Global application state.
+ * @param {string} blockName Name of block type to return.
+ *
+ * @return {string} Parsed block object.
+ */
+export const __experimentalGetHoveredBlockIdByBlockName = createSelector(
+	( state, blockName ) => {
+		const matchingBlockClientId = state.hoveredBlocks.find(
+			( blockId ) => getBlockName( state, blockId ) === blockName
+		);
+		return matchingBlockClientId;
+	},
+	( state ) => [ state.hoveredBlocks ]
+);
+
+/** Returns the clientId for the first 'active' block of a given array of block names.
  * A block is 'active' if it (or a child) is the selected block.
  * Returns the first match moving up the DOM from the selected block.
  *

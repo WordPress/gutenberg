@@ -1126,3 +1126,15 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+/**
+ * Returns an action object that sets clientIds for the hovered blocks.
+ *
+ * @param {string[]} hoveredBlockIds Array of block clientIds.
+ */
+export function __experimentalSetHoveredBlocks( hoveredBlockIds ) {
+	return {
+		type: 'SET_HOVERED_BLOCKS',
+		hoveredBlockIds,
+	};
+}

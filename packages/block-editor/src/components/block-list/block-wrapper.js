@@ -29,6 +29,7 @@ import useMovingAnimation from '../use-moving-animation';
 import { Context, SetBlockNodes } from './root-container';
 import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-wrapper-elements';
+import { evaluateHoveredBlocks } from './hovered-blocks';
 
 /**
  * This hook is used to lightly mark an element as a block element. The element
@@ -91,6 +92,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		},
 		[ isSelected ]
 	);
+
 	const { insertDefaultBlock, removeBlock } = useDispatch(
 		'core/block-editor'
 	);
@@ -278,6 +280,22 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			ref.current.removeEventListener( 'mouseout', onMouseOut );
 		};
 	}, [ isNavigationMode, isHovered, setHovered ] );
+
+	useEffect( () => {
+		ref.current.addEventListener( 'mouseenter', evaluateHoveredBlocks );
+		ref.current.addEventListener( 'mouseleave', evaluateHoveredBlocks );
+
+		return () => {
+			ref.current.removeEventListener(
+				'mouseenter',
+				evaluateHoveredBlocks
+			);
+			ref.current.removeEventListener(
+				'mouseleave',
+				evaluateHoveredBlocks
+			);
+		};
+	}, [] );
 
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 

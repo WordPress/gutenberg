@@ -28,7 +28,11 @@ function getBlockDisplayText( block ) {
 }
 
 function useSecondaryText() {
-	const { activeEntityBlockId, getBlock } = useSelect( ( select ) => {
+	const {
+		activeEntityBlockId,
+		getBlock,
+		hoveredTemplatePartBlockId,
+	} = useSelect( ( select ) => {
 		return {
 			activeEntityBlockId: select(
 				'core/block-editor'
@@ -36,8 +40,23 @@ function useSecondaryText() {
 				'core/template-part',
 			] ),
 			getBlock: select( 'core/block-editor' ).getBlock,
+			hoveredTemplatePartBlockId: select(
+				'core/block-editor'
+			).__experimentalGetHoveredBlockIdByBlockName(
+				'core/template-part'
+			),
 		};
 	} );
+
+	if ( hoveredTemplatePartBlockId ) {
+		const hoveredBlockLabel = getBlockDisplayText(
+			getBlock( hoveredTemplatePartBlockId )
+		);
+		return {
+			label: hoveredBlockLabel,
+			isActive: hoveredTemplatePartBlockId === activeEntityBlockId,
+		};
+	}
 
 	if ( activeEntityBlockId ) {
 		return {
