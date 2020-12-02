@@ -260,7 +260,9 @@ function mapSelectors( selectors, store ) {
  */
 function mapActions( actions, store ) {
 	const createBoundAction = ( action ) => ( ...args ) => {
-		return Promise.resolve( store.dispatch( action( ...args ) ) );
+		const result = action( ...args );
+		if ( ! result ) return;
+		return Promise.resolve( store.dispatch( result ) );
 	};
 
 	return mapValues( actions, createBoundAction );
