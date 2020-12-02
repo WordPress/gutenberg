@@ -626,7 +626,7 @@ describe( 'getQueryArgs', () => {
 
 		expect( getQueryArgs( url ) ).toEqual( {
 			foo: {
-				'0': '0',
+				0: '0',
 				one: '1',
 			},
 		} );
