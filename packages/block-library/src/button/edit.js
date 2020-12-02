@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useState, useRef } from '@wordpress/element';
+import { useCallback, useState, useRef, useEffect } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -100,6 +100,47 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 	);
 }
 
+function usePopoverToggle( { isActive, toggleRef } ) {
+	const [ isOpen, setIsOpen ] = useState( false );
+	const focusOutsideTimeoutRef = useRef( null );
+	useEffect( () => () => clearTimeout( focusOutsideTimeoutRef.current ), [] );
+
+	/**
+	 * We are using onFocusOutside to ensure we aren't
+	 * closing the popover here when clicking on the toggle button.
+	 * Using onClose would result in closing and reopening the popover.
+	 */
+	const onFocusOutside = useCallback( () => {
+		if ( ! isActive ) {
+			setIsOpen( false );
+			return;
+		}
+
+		clearTimeout( focusOutsideTimeoutRef.current );
+		/**
+		 * Timeout is required to avoid bug in Firefox.
+		 * Without timeout the focused element in Firefox is the
+		 * popover content element. It takes a little bit of time
+		 * for the focus to move that's why we need timeout.
+		 */
+		focusOutsideTimeoutRef.current = setTimeout( () => {
+			const { ownerDocument } = toggleRef.current;
+			if (
+				! toggleRef.current.contains( ownerDocument.activeElement ) &&
+				! ownerDocument.activeElement.closest( '[role="dialog"]' )
+			) {
+				setIsOpen( false );
+			}
+		}, 50 );
+	}, [ isActive ] );
+
+	const toggle = useCallback( () => setIsOpen( ( state ) => ! state ), [] );
+	const open = useCallback( () => setIsOpen( true ), [] );
+	const close = useCallback( () => setIsOpen( false ), [] );
+
+	return { toggle, open, close, onFocusOutside, isOpen };
+}
+
 function URLPicker( {
 	isSelected,
 	url,
@@ -108,48 +149,32 @@ function URLPicker( {
 	onToggleOpenInNewTab,
 	anchorRef,
 } ) {
-	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	const linkToolbarButtonRef = useRef( null );
+	const {
+		isOpen: isURLPickerOpen,
+		toggle: togglePicker,
+		close: closePicker,
+		onFocusOutside,
+	} = usePopoverToggle( {
+		isActive: isSelected,
+		toggleRef: linkToolbarButtonRef,
+	} );
 	const urlIsSet = !! url;
 	const urlIsSetandSelected = urlIsSet && isSelected;
-	const toggleLinkControl = () => {
-		setIsURLPickerOpen( ! isURLPickerOpen );
-		return false; // prevents default behaviour for event
-	};
 	const unlinkButton = () => {
 		setAttributes( {
 			url: undefined,
 			linkTarget: undefined,
 			rel: undefined,
 		} );
-		setIsURLPickerOpen( false );
+		closePicker();
 	};
-	/**
-	 * We are using onFocusOutside to ensure we aren't
-	 * closing the popover here when clicking on the toggle button.
-	 * Using onClose would result in closing and reopening the popover.
-	 */
-	const closeIfFocusOutside = () => {
-		if ( ! isSelected ) {
-			setIsURLPickerOpen( false );
-			return;
-		}
 
-		const { ownerDocument } = linkToolbarButtonRef.current;
-		if (
-			! linkToolbarButtonRef.current.contains(
-				ownerDocument.activeElement
-			) &&
-			! ownerDocument.activeElement.closest( '[role="dialog"]' )
-		) {
-			setIsURLPickerOpen( false );
-		}
-	};
 	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
 		<Popover
 			position="bottom center"
 			anchorRef={ anchorRef?.current }
-			onFocusOutside={ closeIfFocusOutside }
+			onFocusOutside={ onFocusOutside }
 		>
 			<LinkControl
 				className="wp-block-navigation-link__inline-link-input"
@@ -177,7 +202,7 @@ function URLPicker( {
 							icon={ link }
 							title={ __( 'Link' ) }
 							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ toggleLinkControl }
+							onClick={ togglePicker }
 							ref={ linkToolbarButtonRef }
 						/>
 					) }
@@ -198,7 +223,7 @@ function URLPicker( {
 				<KeyboardShortcuts
 					bindGlobal
 					shortcuts={ {
-						[ rawShortcut.primary( 'k' ) ]: toggleLinkControl,
+						[ rawShortcut.primary( 'k' ) ]: togglePicker,
 						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
 					} }
 				/>
