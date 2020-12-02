@@ -68,10 +68,10 @@ class ButtonEdit extends Component {
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
-		const { selectedId, editorSidebarOpened, parentWidth } = this.props;
+		const { isSelected, editorSidebarOpened, parentWidth } = this.props;
 		const { isLinkSheetVisible, isButtonFocused } = this.state;
 
-		if ( prevProps.selectedId !== selectedId ) {
+		if ( isSelected && ! prevProps.isSelected ) {
 			this.onToggleButtonFocus( true );
 		}
 
@@ -92,17 +92,11 @@ class ButtonEdit extends Component {
 		}
 
 		if ( this.richTextRef ) {
-			const selectedRichText = this.richTextRef.props.id === selectedId;
-
-			if ( ! selectedRichText && isButtonFocused ) {
+			if ( ! isSelected && isButtonFocused ) {
 				this.onToggleButtonFocus( false );
 			}
 
-			if (
-				selectedRichText &&
-				selectedId !== prevProps.selectedId &&
-				! isButtonFocused
-			) {
+			if ( isSelected && ! isButtonFocused ) {
 				AccessibilityInfo.isScreenReaderEnabled().then( ( enabled ) => {
 					if ( enabled ) {
 						this.onToggleButtonFocus( true );
@@ -425,18 +419,14 @@ export default compose( [
 	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select, { clientId } ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-		const {
-			getSelectedBlockClientId,
-			getBlockCount,
-			getBlockRootClientId,
-		} = select( 'core/block-editor' );
+		const { getBlockCount, getBlockRootClientId } = select(
+			'core/block-editor'
+		);
 
 		const parentId = getBlockRootClientId( clientId );
-		const selectedId = getSelectedBlockClientId();
 		const numOfButtons = getBlockCount( parentId );
 
 		return {
-			selectedId,
 			editorSidebarOpened: isEditorSidebarOpened(),
 			numOfButtons,
 		};
