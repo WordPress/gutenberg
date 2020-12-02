@@ -56,7 +56,7 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	padding: {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],
-		subProperties: [ 'top', 'right', 'bottom', 'left' ],
+		properties: [ 'top', 'right', 'bottom', 'left' ],
 	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],

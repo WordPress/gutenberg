@@ -273,13 +273,9 @@ class WP_Theme_JSON {
 			'support' => array( 'lineHeight' ),
 		),
 		'padding'                  => array(
-			'value'   => array(
-				'top'    => array( 'spacing', 'padding', 'top' ),
-				'right'  => array( 'spacing', 'padding', 'right' ),
-				'bottom' => array( 'spacing', 'padding', 'bottom' ),
-				'left'   => array( 'spacing', 'padding', 'left' ),
-			),
-			'support' => array( 'spacing', 'padding' ),
+			'value'      => array( 'spacing', 'padding' ),
+			'support'    => array( 'spacing', 'padding' ),
+			'properties' => array( 'top', 'right', 'bottom', 'left' )
 		),
 		'textDecoration'           => array(
 			'value'   => array( 'typography', 'textDecoration' ),
@@ -618,8 +614,8 @@ class WP_Theme_JSON {
 		return $value;
 	}
 
-	private static function is_shorthand_property( $metadata, $name ) {
-		if ( 'padding' === $name ) {
+	private static function has_properties( $metadata ) {
+		if ( array_key_exists( 'properties', $metadata ) ) {
 			return true;
 		}
 
@@ -656,11 +652,11 @@ class WP_Theme_JSON {
 
 			// Some properties can be shorthand properties, meaning that
 			// they contain multiple values instead of a single one.
-			if ( self::is_shorthand_property( $metadata, $name ) ) {
-				foreach ( $metadata['value'] as $property_name => $property_value ) {
+			if ( self::has_properties( $metadata ) ) {
+				foreach ( $metadata['properties'] as $property ) {
 					$properties[] = array(
-						'name'  => $name . ucfirst( $property_name ),
-						'value' => $property_value
+						'name'  => $name . ucfirst( $property ),
+						'value' => array_merge( $metadata['value'], array( $property ) )
 					);
 				}
 			} else {

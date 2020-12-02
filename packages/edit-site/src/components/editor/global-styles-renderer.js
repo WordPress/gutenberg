@@ -107,13 +107,13 @@ function flattenTree( input = {}, prefix, token ) {
 function getBlockStylesDeclarations( blockSupports, blockStyles = {} ) {
 	return reduce(
 		STYLE_PROPERTY,
-		( declarations, { value, subProperties }, key ) => {
+		( declarations, { value, properties }, key ) => {
 			if ( ! blockSupports.includes( key ) ) {
 				return declarations;
 			}
 
-			if ( !! subProperties ) {
-				subProperties.forEach( ( prop ) => {
+			if ( !! properties ) {
+				properties.forEach( ( prop ) => {
 					const cssProperty = key.startsWith( '--' )
 						? key
 						: kebabCase( `${ key }${ capitalize( prop ) }` );
