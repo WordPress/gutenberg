@@ -111,7 +111,7 @@ function usePopoverToggle( { isActive, toggleRef } ) {
 	 * Using onClose would result in closing and reopening the popover.
 	 */
 	const onFocusOutside = useCallback( () => {
-		if ( ! isActive ) {
+		if ( ! isActive || ! toggleRef.current ) {
 			setIsOpen( false );
 			return;
 		}
