@@ -31,7 +31,7 @@ const ProgressCircle = ( { progress, width = 20, strokeWidth = 2 } ) => {
 		<Svg width={ circleSize } height={ circleSize }>
 			<Circle
 				fill="none"
-				stroke="#e9eff3"
+				stroke="#0087be"
 				{ ...{
 					strokeWidth,
 					cx,
@@ -42,7 +42,7 @@ const ProgressCircle = ( { progress, width = 20, strokeWidth = 2 } ) => {
 			<AnimatedCircle
 				strokeDasharray={ `${ circumference }, ${ circumference }` }
 				fill="none"
-				stroke="#0087be"
+				stroke="#e9eff3"
 				{ ...{
 					strokeDashoffset,
 					strokeWidth,
