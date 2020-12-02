@@ -4,16 +4,11 @@
 // Styles for current version of gallery block.
 .wp-block-gallery.has-nested-images {
 	ul.blocks-gallery-grid {
-		// Some themes give all <ul> default margin instead of padding.
-		margin: 0;
+		display: flex;
+		flex-wrap: wrap;
 		list-style-type: none;
+		margin: 0; // Some themes give all <ul> default margin instead of padding.
 		padding: 0;
-
-		// Avoid applying flex styles to IE11.
-		@supports ( position: sticky ) {
-			display: flex;
-			flex-wrap: wrap;
-		}
 
 		// Need bogus :not(#individual-image) to override long :not()
 		// specificity chain on default image block on front end.
@@ -27,19 +22,20 @@
 		}
 
 		li.list-image {
+			display: flex;
+			flex-grow: 1;
+			justify-content: center;
 			position: relative;
 
-			// Avoid applying flex styles to IE11.
+			// IE11 doesn't like the "flex-direction: column;" here.
 			@supports ( position: sticky ) {
-				display: flex;
 				flex-direction: column;
-				flex-grow: 1;
-				justify-content: center;
 			}
 
 			// Again, we need :not(#individual-image) to override long :not()
 			// chain on frontend styles.
 			figure:not(#individual-image) {
+				display: block; // IE11's lack of object-fit cover means flex will distort image as it fills space.
 				margin: 0;
 				max-width: 100%; // When aligned wide or full, this allows image to fill row.
 
@@ -64,8 +60,8 @@
 
 			img {
 				display: block;
-				max-width: 100%;
 				height: auto;
+				max-width: 100%;
 				width: 100%;
 
 				// IE doesn't handle cropping, so we need an explicit width here.
@@ -76,17 +72,18 @@
 			}
 
 			figcaption {
-				position: absolute;
-				margin-bottom: 0;
+				background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
 				bottom: 0;
-				width: 100%;
+				color: $white;
+				font-size: $default-font-size;
+				left: 0;
+				margin-bottom: 0;
 				max-height: 100%;
 				overflow: auto;
 				padding: 40px 10px 9px;
-				color: $white;
+				position: absolute;
 				text-align: center;
-				font-size: $default-font-size;
-				background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
+				width: 100%;
 
 				img {
 					display: inline;
@@ -103,7 +100,9 @@
 	&.is-cropped ul.blocks-gallery-grid li.list-image:not(#individual-image) {
 		figure > div:not(.components-drop-zone),
 		figure > a {
-			// Avoid applying flex styles to IE11.
+			display: block; // Thanks to IE11 not supporting object-fit fall back to display: block.
+
+			// Without IE11 object-fit support "display: flex;" here causes distortion of aspect ratio.
 			@supports ( position: sticky ) {
 				display: flex;
 			}
@@ -111,14 +110,12 @@
 
 		a,
 		img {
-			// IE11 doesn't support object-fit, so just make sure images aren't skewed.
-			// The following rules are for all browsers.
 			width: 100%;
 
 			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
 			@supports ( position: sticky ) {
+				flex: 1 0 0%;
 				height: 100%;
-				flex: 1;
 				object-fit: cover;
 			}
 		}
@@ -134,16 +131,16 @@
 	}
 
 	&.columns-1 li:not(#individual-image) {
-		width: 100%;
 		margin-right: 0;
+		width: 100%;
 	}
 
 	// Beyond mobile viewports, we allow up to 8 columns.
 	@include break-small {
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } li.list-image:not(#individual-image) {
-				width: calc(#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i});
 				margin-right: $grid-unit-20;
+				width: calc(#{100% / $i} - #{$grid-unit-20 * ( $i - 1 ) / $i});
 			}
 		}
 
