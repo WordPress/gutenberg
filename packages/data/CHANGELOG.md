@@ -9,6 +9,11 @@
 -   Extended `select` and `dispatch` functions to accept a data store definition as their first param in addition to a string-based store name value [#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 -   Extended `useDispatch` hook to accept a data store definition as their first param in addition to a string-based store name value [#26655](https://github.com/WordPress/gutenberg/pull/26655)).
 
+### Deprecations
+
+-   `registerGenericStore` has been deprecated. Use `register` instead.
+-   `registerStore` has been deprecated. Use `register` instead.
+
 ## 4.6.0 (2019-06-12)
 
 ### New Feature

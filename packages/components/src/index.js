@@ -14,7 +14,7 @@ export {
 export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
 export {
 	default as Animate,
-	useAnimate as __unstableUseAnimate,
+	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
 export { default as Autocomplete } from './autocomplete';
