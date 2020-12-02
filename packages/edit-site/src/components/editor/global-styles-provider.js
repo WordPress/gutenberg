@@ -208,7 +208,6 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					css: getGlobalStyles(
 						contexts,
 						mergedStyles,
-						STYLE_PROPERTY,
 						'cssVariables'
 					),
 					isGlobalStyles: true,
@@ -218,7 +217,6 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					css: getGlobalStyles(
 						contexts,
 						mergedStyles,
-						STYLE_PROPERTY,
 						'blockStyles'
 					),
 					isGlobalStyles: true,

@@ -1,7 +1,12 @@
 /**
  * External dependencies
  */
-import { get, kebabCase, reduce, startsWith } from 'lodash';
+import { capitalize, get, kebabCase, reduce, startsWith } from 'lodash';
+
+/**
+ * WordPress dependencies
+ */
+import { __EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -96,36 +101,46 @@ function flattenTree( input = {}, prefix, token ) {
  *
  * @param {Object} blockSupports What styles the block supports.
  * @param {Object} blockStyles   Block styles.
- * @param {Object} metadata      Block styles metadata information.
  *
  * @return {Array} An array of style declarations.
  */
-function getBlockStylesDeclarations(
-	blockSupports,
-	blockStyles = {},
-	metadata
-) {
+function getBlockStylesDeclarations( blockSupports, blockStyles = {} ) {
 	return reduce(
-		metadata,
-		( declarations, { value }, key ) => {
-			const cssProperty = key.startsWith( '--' ) ? key : kebabCase( key );
-			if (
-				blockSupports.includes( key ) &&
-				get( blockStyles, value, false )
-			) {
+		STYLE_PROPERTY,
+		( declarations, { value, subProperties }, key ) => {
+			if ( ! blockSupports.includes( key ) ) {
+				return declarations;
+			}
+
+			if ( !! subProperties ) {
+				subProperties.forEach( ( prop ) => {
+					const cssProperty = key.startsWith( '--' )
+						? key
+						: kebabCase( `${ key }${ capitalize( prop ) }` );
+					declarations.push(
+						`${ cssProperty }: ${ compileStyleValue(
+							get( blockStyles, [ ...value, prop ] )
+						) }`
+					);
+				} );
+			} else if ( get( blockStyles, value, false ) ) {
+				const cssProperty = key.startsWith( '--' )
+					? key
+					: kebabCase( key );
 				declarations.push(
 					`${ cssProperty }: ${ compileStyleValue(
 						get( blockStyles, value )
 					) }`
 				);
 			}
+
 			return declarations;
 		},
 		[]
 	);
 }
 
-export default ( blockData, tree, metadata, type = 'all' ) => {
+export default ( blockData, tree, type = 'all' ) => {
 	return reduce(
 		blockData,
 		( styles, { selector }, context ) => {
@@ -150,8 +165,7 @@ export default ( blockData, tree, metadata, type = 'all' ) => {
 			if ( type === 'all' || type === 'blockStyles' ) {
 				const blockStyleDeclarations = getBlockStylesDeclarations(
 					blockData[ context ].supports,
-					tree?.[ context ]?.styles,
-					metadata
+					tree?.[ context ]?.styles
 				);
 
 				if ( blockStyleDeclarations.length > 0 ) {
