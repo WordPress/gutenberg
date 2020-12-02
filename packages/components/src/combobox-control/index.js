@@ -135,7 +135,7 @@ function ComboboxControl( {
 	const onFocus = () => {
 		setIsExpanded( true );
 		onFilterValueChange( '' );
-		setInputValue( '' );
+		// setInputValue( '' );
 	};
 
 	const onFocusOutside = () => {
@@ -170,7 +170,7 @@ function ComboboxControl( {
 				  )
 				: __( 'No results.' );
 
-			speak( message, 'assertive' );
+			speak( message, 'polite' );
 		}
 	}, [ matchingSuggestions, isExpanded ] );
 
