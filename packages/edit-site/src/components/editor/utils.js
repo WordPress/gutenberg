@@ -10,24 +10,19 @@ import { useSelect } from '@wordpress/data';
 /* Supporting data */
 export const GLOBAL_CONTEXT_NAME = 'global';
 export const GLOBAL_CONTEXT_SELECTOR = ':root';
-export const GLOBAL_CONTEXT = {
-	[ GLOBAL_CONTEXT_NAME ]: {
-		selector: GLOBAL_CONTEXT_SELECTOR,
-		supports: [
-			'--wp--style--color--link',
-			'background',
-			'backgroundColor',
-			'color',
-			'fontFamily',
-			'fontSize',
-			'fontStyle',
-			'fontWeight',
-			'lineHeight',
-			'textDecoration',
-			'textTransform',
-		],
-	},
-};
+export const GLOBAL_CONTEXT_SUPPORTS = [
+	'--wp--style--color--link',
+	'background',
+	'backgroundColor',
+	'color',
+	'fontFamily',
+	'fontSize',
+	'fontStyle',
+	'fontWeight',
+	'lineHeight',
+	'textDecoration',
+	'textTransform',
+];
 
 export const PRESET_CATEGORIES = {
 	color: { path: [ 'color', 'palette' ], key: 'color' },
@@ -99,7 +94,7 @@ export function getPresetVariable( styles, blockName, propertyName, value ) {
 	const { key, path } = presetData;
 	const presets =
 		get( styles, [ blockName, 'settings', ...path ] ) ??
-		get( styles, [ GLOBAL_CONTEXT, 'settings', ...path ] );
+		get( styles, [ GLOBAL_CONTEXT_NAME, 'settings', ...path ] );
 	const presetObject = find( presets, ( preset ) => {
 		return preset[ key ] === value;
 	} );
