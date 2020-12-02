@@ -135,7 +135,7 @@ function ComboboxControl( {
 	const onFocus = () => {
 		setIsExpanded( true );
 		onFilterValueChange( '' );
-		// setInputValue( '' );
+		setInputValue( '' );
 	};
 
 	const onFocusOutside = () => {
