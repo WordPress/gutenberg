@@ -71,7 +71,15 @@ function computeAnchorRect(
 			return;
 		}
 
-		if ( anchorRef instanceof window.Range ) {
+		if (
+			anchorRef?.startContainer &&
+			anchorRef instanceof
+				// A Range.startContainer may be a Node or a Document
+				(
+					anchorRef.startContainer.defaultView ??
+					anchorRef.startContainer.ownerDocument.defaultView
+				).Range
+		) {
 			return getRectangleFromRange( anchorRef );
 		}
 
