@@ -71,15 +71,10 @@ function computeAnchorRect(
 			return;
 		}
 
-		if (
-			anchorRef?.startContainer &&
-			anchorRef instanceof
-				// A Range.startContainer may be a Node or a Document
-				(
-					anchorRef.startContainer.defaultView ??
-					anchorRef.startContainer.ownerDocument.defaultView
-				).Range
-		) {
+		// Duck-type to check if `anchorRef` is an instance of Range
+		// `anchorRef instanceof window.Range` checks will break across document boundaries
+		// such as in an iframe
+		if ( typeof anchorRef?.cloneRange === 'function' ) {
 			return getRectangleFromRange( anchorRef );
 		}
 
