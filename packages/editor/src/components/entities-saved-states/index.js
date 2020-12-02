@@ -114,7 +114,7 @@ export default function EntitiesSavedStates( { isOpen, close } ) {
 		} );
 	};
 
-	const [ isReviewing, setIsReviewing ] = useState( false );
+	const [ isReviewing, setIsReviewing ] = useState( true );
 	const toggleIsReviewing = () => setIsReviewing( ( value ) => ! value );
 
 	// Explicitly define this with no argument passed.  Using `close` on
