@@ -145,7 +145,7 @@ function PostAuthorEdit( { isSelected, context, attributes, setAttributes } ) {
 							className="wp-block-post-author__byline"
 							multiline={ false }
 							aria-label={ __( 'Post author byline text' ) }
-							placeholder={ __( 'Write byline …' ) }
+							placeholder={ __( 'Write byline…' ) }
 							value={ byline }
 							onChange={ ( value ) =>
 								setAttributes( { byline: value } )

@@ -42,7 +42,7 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 				allowedFormats={ [] }
 				onChange={ setSiteTagline }
 				aria-label={ __( 'Site tagline text' ) }
-				placeholder={ __( 'Site Tagline' ) }
+				placeholder={ __( 'Write site tagline…' ) }
 				tagName="p"
 				value={ siteTagline }
 				{ ...blockProps }
