@@ -4,6 +4,7 @@
 const path = require( 'path' );
 const fs = require( 'fs' ).promises;
 const yaml = require( 'js-yaml' );
+const os = require( 'os' );
 
 /**
  * Internal dependencies
@@ -38,12 +39,12 @@ module.exports = async function initConfig( { spinner, debug } ) {
 		yaml.dump( dockerComposeConfig )
 	);
 
-	const xDebugMode = 'debug';
+	const XdebugMode = 'debug';
 	await fs.writeFile(
 		path.resolve( config.workDirectoryPath, 'Dockerfile' ),
 		dockerFileContents(
 			dockerComposeConfig.services.wordpress.image,
-			xDebugMode
+			XdebugMode
 		)
 	);
 
@@ -65,9 +66,14 @@ module.exports = async function initConfig( { spinner, debug } ) {
 	return config;
 };
 
-function dockerFileContents( image, xDebugMode ) {
-	return `
-FROM ${ image }
+function dockerFileContents( image, XdebugMode ) {
+	const isLinux = os.type() === 'Linux';
+	// Discover client host does not appear to work on macOS with Docker.
+	const clientDetectSettings = isLinux
+		? 'xdebug.discover_client_host=true'
+		: 'xdebug.client_host="host.docker.internal"';
+
+	return `FROM ${ image }
 
 RUN apt -qy install $PHPIZE_DEPS \\
 	&& pecl install xdebug \\
@@ -75,7 +81,7 @@ RUN apt -qy install $PHPIZE_DEPS \\
 
 RUN touch /usr/local/etc/php/php.ini
 RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
-RUN echo 'xdebug.discover_client_host=1' >> /usr/local/etc/php/php.ini
-RUN echo 'xdebug.mode=${ xDebugMode }' >> /usr/local/etc/php/php.ini
+RUN echo 'xdebug.mode=${ XdebugMode }' >> /usr/local/etc/php/php.ini
+RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini
 `;
 }
