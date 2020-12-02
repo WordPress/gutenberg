@@ -51,28 +51,24 @@ function isFocusNormalizedButton( element ) {
  * @property {(event:SyntheticEvent)=>void} handleFocusOutside
  *     callback for a focus outside event.
  */
+/**
+ * @typedef {import('react').MutableRefObject<FocusOutsideReactElement | undefined>} FocusOutsideRef
+ */
 
 /**
  * A react hook that can be used to check whether focus has moved outside the
  * element the event handlers are bound to.
  *
  * @param {Function} onFocusOutside
+ * @param {FocusOutsideRef} __unstableNodeRef
  */
-export default function useFocusOutside( onFocusOutside ) {
+export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 	const preventBlurCheck = useRef( false );
 
 	/**
 	 * @type {import('react').MutableRefObject<number | undefined>}
 	 */
 	const blurCheckTimeoutId = useRef();
-
-	/**
-	 * A ref returned by the hook to provide backwards compatibility
-	 * to the withFocusOutside HOC.
-	 *
-	 * @type {import('react').MutableRefObject<FocusOutsideReactElement | undefined>}
-	 */
-	const __unstableNodeRef = useRef();
 
 	const cancelBlurCheck = () => {
 		clearTimeout( blurCheckTimeoutId.current );
@@ -157,18 +153,6 @@ export default function useFocusOutside( onFocusOutside ) {
 		}, 0 );
 	};
 
-	// Only optionally return the __unstableNodeRef when `onFocusOutside` is
-	// not supplied. Composing a separate object ensure consumers can spread
-	// the returned event handlers without React complaining about
-	// __unstableNodeRef being used as a DOM attribute. e.g:
-	//
-	// <div { ...useFocusOutside( onFocusOutside ) } >
-	const legacyRef = ! onFocusOutside
-		? {
-				__unstableNodeRef,
-		  }
-		: {};
-
 	return {
 		onFocus: cancelBlurCheck,
 		onMouseDown: normalizeButtonFocus,
@@ -176,6 +160,5 @@ export default function useFocusOutside( onFocusOutside ) {
 		onTouchStart: normalizeButtonFocus,
 		onTouchEnd: normalizeButtonFocus,
 		onBlur: queueBlurCheck,
-		...legacyRef,
 	};
 }
