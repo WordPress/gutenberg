@@ -7,7 +7,7 @@ import { v4 as uuid } from 'uuid';
 /**
  * WordPress dependencies
  */
-import { controls } from '@wordpress/data';
+import { select as dataSelect, controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -284,12 +284,12 @@ export function* editEntityRecord( kind, name, recordId, edits, options = {} ) {
  * Action triggered to undo the last edit to
  * an entity record, if any.
  */
-export function* undo() {
-	const undoEdit = yield controls.select( 'core', 'getUndoEdit' );
+export function undo() {
+	const undoEdit = dataSelect( 'core', 'getUndoEdit' );
 	if ( ! undoEdit ) {
 		return;
 	}
-	yield {
+	return {
 		type: 'EDIT_ENTITY_RECORD',
 		...undoEdit,
 		meta: {
