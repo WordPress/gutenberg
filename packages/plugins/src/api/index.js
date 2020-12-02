@@ -18,13 +18,13 @@ import { isFunction } from 'lodash';
  *
  * @property {string}                    name   A string identifying the plugin. Must be
  *                                              unique across all registered plugins.
- *                                              unique across all registered plugins.
  * @property {string|WPElement|Function} icon   An icon to be shown in the UI. It can
  *                                              be a slug of the Dashicon, or an element
  *                                              (or function returning an element) if you
  *                                              choose to render your own SVG.
  * @property {Function}                  render A component containing the UI elements
  *                                              to be rendered.
+ * @property {string}                    area   The pluginArea name to be rendered inside of.
  */
 
 /**
@@ -75,6 +75,7 @@ const plugins = {};
  * registerPlugin( 'plugin-name', {
  * 	icon: moreIcon,
  * 	render: Component,
+ * 	area: "my-app-area",
  * } );
  * ```
  *
@@ -104,6 +105,7 @@ const plugins = {};
  * registerPlugin( 'plugin-name', {
  * 	icon: more,
  * 	render: Component,
+ * 	area: "my-app-area",
  * } );
  * ```
  *
