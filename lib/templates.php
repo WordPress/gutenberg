@@ -25,31 +25,6 @@ function gutenberg_get_template_paths() {
 }
 
 /**
- * Returns a pseudo-post object for a theme template.
- *
- * @param string $path The full path to the template file.
- *
- * @return WP_Post|false
- */
-function gutenberg_get_file_template_object( $path ) {
-	if ( ! file_exists( $path ) ) {
-		return false;
-	}
-
-	// Get the content.
-	ob_start();
-	include $path;
-	$template_content = ob_get_clean();
-
-	$template               = new stdClass();
-	$template->ID           = 0;
-	$template->post_name    = basename( $path, '.html' );
-	$template->post_content = $template_content;
-
-	return new WP_Post( $template );
-}
-
-/**
  * Registers block editor 'wp_template' post type.
  */
 function gutenberg_register_template_post_type() {
@@ -308,44 +283,3 @@ function filter_rest_prepare_add_wp_theme_slug_and_file_based( $response ) {
 }
 add_filter( 'rest_prepare_wp_template', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
 add_filter( 'rest_prepare_wp_template_part', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
-
-/**
- * Filters the post data for a response.
- *
- * @param WP_REST_Response $response The response object.
- * @return WP_REST_Response
- */
-function filter_rest_prepare_add_file_based_templates( $response ) {
-
-	add_filter(
-		'the_posts',
-		function( $posts ) {
-
-			// Build an array of database-based templates (slugs only).
-			$db_templates = array();
-			foreach ( $posts as $db_template ) {
-				$db_templates[] = $db_template->post_title;
-			}
-
-			// Get all file-based templates.
-			$template_paths = gutenberg_get_template_paths();
-
-			// Loop file-based templates and add the ones that don't exist in the database.
-			foreach ( $template_paths as $path ) {
-				$slug = basename( $path, '.html' );
-				if ( in_array( $slug, $db_templates, true ) ) {
-					continue;
-				}
-
-				$template_from_file = gutenberg_get_file_template_object( $path );
-				if ( $template_from_file ) {
-					$posts[] = $template_from_file;
-				}
-			}
-
-			return $posts;
-		}
-	);
-	return $response;
-}
-add_filter( 'rest_prepare_wp_template', 'filter_rest_prepare_add_file_based_templates' );

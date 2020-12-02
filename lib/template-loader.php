@@ -128,6 +128,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 	$template_query = new WP_Query(
 		array(
 			'post_type'      => 'wp_template',
+			'post_status'    => array( 'publish', 'auto-draft' ),
 			'post_name__in'  => $slugs,
 			'orderby'        => 'post_name__in',
 			'posts_per_page' => -1,
@@ -142,30 +143,19 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 		)
 	);
 	$templates      = $template_query->get_posts();
-	$template_paths = gutenberg_get_template_paths();
 
-	// Loop slugs.
-	foreach ( $slugs as $slug ) {
+	// Order these templates per slug priority.
+	// Build map of template slugs to their priority in the current hierarchy.
+	$slug_priorities = array_flip( $slugs );
 
-		// Check if the template is available in the database.
-		foreach ( $templates as $template ) {
-
-			// If the template exists return it.
-			if ( $slug === $template->post_name ) {
-				return $template;
-			}
+	usort(
+		$templates,
+		function ( $template_a, $template_b ) use ( $slug_priorities ) {
+			return $slug_priorities[ $template_a->post_name ] - $slug_priorities[ $template_b->post_name ];
 		}
+	);
 
-		// Check if the template exists in the theme.
-		foreach ( $template_paths as $template_path ) {
-
-			// If the template exists return it.
-			$template_filename = basename( $template_path, '.html' );
-			if ( $slug === $template_filename ) {
-				return gutenberg_get_file_template_object( $template_path );
-			}
-		}
-	}
+	return count( $templates ) ? $templates[0] : null;
 }
 
 /**
