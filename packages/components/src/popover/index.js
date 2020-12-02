@@ -29,7 +29,7 @@ import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, useSlot } from '../slot-fill';
-import { useAnimate } from '../animate';
+import { getAnimateClassName } from '../animate';
 
 const FocusManaged = withConstrainedTabbing(
 	withFocusReturn( ( { children } ) => children )
@@ -529,10 +529,13 @@ const Popover = ( {
 		onClickOutside( clickEvent );
 	}
 
-	const animateClassName = useAnimate( {
-		type: animate && animateOrigin ? 'appear' : null,
-		origin: animateOrigin,
-	} );
+	/** @type {false | string} */
+	const animateClassName =
+		Boolean( animate && animateOrigin ) &&
+		getAnimateClassName( {
+			type: 'appear',
+			origin: animateOrigin,
+		} );
 
 	// Disable reason: We care to capture the _bubbled_ events from inputs
 	// within popover as inferring close intent.

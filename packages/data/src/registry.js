@@ -149,13 +149,13 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 * and modified so that they return promises that resolve to their eventual values,
 	 * after any resolvers have ran.
 	 *
-	 * @param {string|Object} storeName Unique namespace identifier for the store
-	 *                                  or the store definition.
+	 * @param {string|WPDataStore} storeNameOrDefinition Unique namespace identifier for the store
+	 *                                                   or the store definition.
 	 *
 	 * @return {Object} Each key of the object matches the name of a selector.
 	 */
-	function __experimentalResolveSelect( storeName ) {
-		return getResolveSelectors( select( storeName ) );
+	function __experimentalResolveSelect( storeNameOrDefinition ) {
+		return getResolveSelectors( select( storeNameOrDefinition ) );
 	}
 
 	/**

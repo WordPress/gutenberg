@@ -15,7 +15,8 @@
 		}
 	},
 	"supports": {
-		"anchor": true
+		"anchor": true,
+		"__experimentalFontFamily": true
 	},
 	"editorStyle": "wp-block-verse-editor"
 }
