@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -11,15 +10,6 @@ import useFocusOutside from '../../utils/hooks/use-focus-outside';
 
 export default createHigherOrderComponent(
 	( WrappedComponent ) => ( props ) => {
-		const ref = useRef();
-
-		// For backwards compatibility with class components, bind the
-		// function to its instance so that `this.props` can be accessed
-		// from within `handleFocusOutside`.
-		const onFocusOutside = ref.current?.handleFocusOutside.bind(
-			ref.current
-		);
-
 		const {
 			onFocus,
 			onMouseDown,
@@ -27,7 +17,8 @@ export default createHigherOrderComponent(
 			onTouchStart,
 			onTouchEnd,
 			onBlur,
-		} = useFocusOutside( onFocusOutside );
+			__unstableNodeRef,
+		} = useFocusOutside();
 
 		return (
 			// Disable reason: See `normalizeButtonFocus` for browser-specific
@@ -42,7 +33,7 @@ export default createHigherOrderComponent(
 				onTouchEnd={ onTouchEnd }
 				onBlur={ onBlur }
 			>
-				<WrappedComponent ref={ ref } { ...props } />
+				<WrappedComponent ref={ __unstableNodeRef } { ...props } />
 			</div>
 			/* eslint-enable jsx-a11y/no-static-element-interactions */
 		);

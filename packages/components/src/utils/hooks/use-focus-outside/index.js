@@ -43,6 +43,18 @@ function isFocusNormalizedButton( element ) {
 }
 
 /**
+ * @typedef {import('react').SyntheticEvent} SyntheticEvent
+ */
+
+/**
+ * @typedef {Object} FocusOutsideReactElement
+ * @property {(event:SyntheticEvent)=>void} handleFocusOutside
+ *     callback for a focus outside event.
+ */
+
+/**
+ * A react hook that can be used to check whether focus has moved outside the
+ * element the event handlers are bound to.
  *
  * @param {Function} onFocusOutside
  */
@@ -54,19 +66,28 @@ export default function useFocusOutside( onFocusOutside ) {
 	 */
 	const blurCheckTimeoutId = useRef();
 
+	/**
+	 * A ref returned by the hook to provide backwards compatibility
+	 * to the withFocusOutside HOC.
+	 *
+	 * @type {import('react').MutableRefObject<FocusOutsideReactElement | undefined>}
+	 */
+	const __unstableNodeRef = useRef();
+
 	const cancelBlurCheck = () => {
 		clearTimeout( blurCheckTimeoutId.current );
 	};
 
+	// Cancel blur checks on unmount.
 	useEffect( () => {
 		return () => cancelBlurCheck();
 	}, [] );
 
 	useEffect( () => {
-		if ( ! onFocusOutside ) {
+		if ( ! onFocusOutside && ! __unstableNodeRef.current ) {
 			cancelBlurCheck();
 		}
-	}, [ onFocusOutside ] );
+	}, [ onFocusOutside, __unstableNodeRef ] );
 
 	/**
 	 * Handles a mousedown or mouseup event to respectively assign and
@@ -77,7 +98,7 @@ export default function useFocusOutside( onFocusOutside ) {
 	 *
 	 * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 	 *
-	 * @param {import('react').SyntheticEvent} event Event for mousedown or mouseup.
+	 * @param {SyntheticEvent} event Event for mousedown or mouseup.
 	 */
 	const normalizeButtonFocus = ( event ) => {
 		const { type, target } = event;
@@ -93,9 +114,13 @@ export default function useFocusOutside( onFocusOutside ) {
 	};
 
 	/**
+	 * A callback triggered when a blur event occurs on the element the handler
+	 * is bound to.
 	 *
+	 * Calls the `onFocusOutside` callback in an immediate timeout if focus has
+	 * move outside the bound element and is still within the document.
 	 *
-	 * @param {import('react').SyntheticEvent} event
+	 * @param {SyntheticEvent} event Blur event.
 	 */
 	const queueBlurCheck = ( event ) => {
 		// React does not allow using an event reference asynchronously
@@ -119,6 +144,15 @@ export default function useFocusOutside( onFocusOutside ) {
 
 			if ( 'function' === typeof onFocusOutside ) {
 				onFocusOutside( event );
+			} else if (
+				'function' ===
+				typeof __unstableNodeRef.current?.handleFocusOutside
+			) {
+				// Call the legacy `handleFocusOutside` method if defined
+				// as a fallback for the `withFocusOutside` HOC.
+				const node = __unstableNodeRef.current;
+				const callback = __unstableNodeRef.current.handleFocusOutside;
+				callback.call( node, event );
 			}
 		}, 0 );
 	};
@@ -130,5 +164,6 @@ export default function useFocusOutside( onFocusOutside ) {
 		onTouchStart: normalizeButtonFocus,
 		onTouchEnd: normalizeButtonFocus,
 		onBlur: queueBlurCheck,
+		__unstableNodeRef,
 	};
 }
