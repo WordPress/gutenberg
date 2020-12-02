@@ -57,14 +57,16 @@ describe( 'changing image size', () => {
 		// Select the new size updated with the plugin.
 		await openDocumentSettingsSidebar();
 
-		const [ imageSizeLabel ] = await page.$x(
+		const imageSizeLabel = await page.waitForXPath(
 			'//label[text()="Image size"]'
 		);
 		await imageSizeLabel.click();
 		const imageSizeSelect = await page.evaluateHandle(
 			() => document.activeElement
 		);
-		imageSizeSelect.select( 'custom-size-one' );
+		await imageSizeSelect.select( 'custom-size-one' );
+
+		await page.waitForSelector( '.wp-block-image.size-custom-size-one' );
 
 		const imageWidth = await page.$eval(
 			'.block-editor-image-size-control__width input',
