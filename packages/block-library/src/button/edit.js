@@ -100,8 +100,12 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 	);
 }
 
-function usePopoverToggle( { isActive, toggleRef } ) {
+function usePopoverToggle( { toggleRef, focusOutsideDelay = 50 } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
+	const toggle = useCallback( () => setIsOpen( ( state ) => ! state ), [] );
+	const open = useCallback( () => setIsOpen( true ), [] );
+	const close = useCallback( () => setIsOpen( false ), [] );
+
 	const focusOutsideTimeoutRef = useRef( null );
 	useEffect( () => () => clearTimeout( focusOutsideTimeoutRef.current ), [] );
 
@@ -111,8 +115,8 @@ function usePopoverToggle( { isActive, toggleRef } ) {
 	 * Using onClose would result in closing and reopening the popover.
 	 */
 	const onFocusOutside = useCallback( () => {
-		if ( ! isActive || ! toggleRef.current ) {
-			setIsOpen( false );
+		if ( ! toggleRef.current ) {
+			close();
 			return;
 		}
 
@@ -129,21 +133,20 @@ function usePopoverToggle( { isActive, toggleRef } ) {
 				! toggleRef.current.contains( ownerDocument.activeElement ) &&
 				! ownerDocument.activeElement.closest( '[role="dialog"]' )
 			) {
-				setIsOpen( false );
+				close();
 			}
-		}, 50 );
-	}, [ isActive ] );
+		}, focusOutsideDelay );
+	}, [ focusOutsideDelay, close ] );
 
-	const onClose = ( event ) => {
-		if ( event.keyCode === ESCAPE ) {
-			event.stopPropagation();
-			setIsOpen( false );
-		}
-	};
-
-	const toggle = useCallback( () => setIsOpen( ( state ) => ! state ), [] );
-	const open = useCallback( () => setIsOpen( true ), [] );
-	const close = useCallback( () => setIsOpen( false ), [] );
+	const onClose = useCallback(
+		( event ) => {
+			if ( event.keyCode === ESCAPE ) {
+				event.stopPropagation();
+				close();
+			}
+		},
+		[ close ]
+	);
 
 	return { toggle, open, close, onFocusOutside, onClose, isOpen };
 }
@@ -164,7 +167,6 @@ function URLPicker( {
 		onFocusOutside,
 		onClose,
 	} = usePopoverToggle( {
-		isActive: isSelected,
 		toggleRef: linkToolbarButtonRef,
 	} );
 	const urlIsSet = !! url;
