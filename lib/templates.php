@@ -234,7 +234,7 @@ function filter_rest_wp_template_query( $args, $request ) {
 
 			$current_template = gutenberg_resolve_template( $template_type );
 			if ( $current_template ) {
-				$template_ids[] = $current_template->ID;
+				$template_ids[] = $current_template['id'];
 			}
 		}
 		$args['post__in']    = $template_ids;

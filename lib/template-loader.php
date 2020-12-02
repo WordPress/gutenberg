@@ -67,7 +67,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 	$current_template = gutenberg_resolve_template( $type, $templates );
 
 	if ( $current_template ) {
-		$_wp_current_template_content = empty( $current_template->post_content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template->post_content;
+		$_wp_current_template_content = empty( $current_template['content'] ) ? __( 'Empty template.', 'gutenberg' ) : $current_template['content'];
 
 		if ( isset( $_GET['_wp-find-template'] ) ) {
 			wp_send_json_success( $current_template );
@@ -143,19 +143,45 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 		)
 	);
 	$templates      = $template_query->get_posts();
+	$template_paths = gutenberg_get_template_paths();
 
-	// Order these templates per slug priority.
-	// Build map of template slugs to their priority in the current hierarchy.
-	$slug_priorities = array_flip( $slugs );
+	// Loop slugs.
+	foreach ( $slugs as $slug ) {
 
-	usort(
-		$templates,
-		function ( $template_a, $template_b ) use ( $slug_priorities ) {
-			return $slug_priorities[ $template_a->post_name ] - $slug_priorities[ $template_b->post_name ];
+		// Check if the template is available in the database.
+		foreach ( $templates as $template ) {
+
+			// If the template exists return it.
+			if ( $slug === $template->post_name ) {
+				return array(
+					'id'      => $template->ID,
+					'content' => $template->post_content,
+					'slug'    => $template->post_name,
+					'type'    => 'post',
+				);
+			}
 		}
-	);
 
-	return count( $templates ) ? $templates[0] : null;
+		// Check if the template exists in the theme.
+		foreach ( $template_paths as $template_path ) {
+
+			// If the template exists return it.
+			$template_filename = basename( $template_path, '.html' );
+			if ( $slug === $template_filename ) {
+				// Get the content.
+				ob_start();
+				include $path;
+				$template_content = ob_get_clean();
+
+				return array(
+					'id'      => 0,
+					'content' => $template_content,
+					'slug'    => $slug,
+					'type'    => 'file',
+				);
+			}
+		}
+	}
 }
 
 /**
