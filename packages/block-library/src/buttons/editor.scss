@@ -18,6 +18,11 @@
 			justify-content: flex-start;
 		}
 	}
+	> .wp-block-button {
+		&:focus {
+			box-shadow: none;
+		}
+	}
 }
 
 .wp-block[data-align="center"] > .wp-block-buttons {
