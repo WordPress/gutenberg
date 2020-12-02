@@ -16,6 +16,7 @@ const env = require( './env' );
 const boldWhite = chalk.bold.white;
 const wpPrimary = boldWhite.bgHex( '#00669b' );
 const wpGreen = boldWhite.bgHex( '#4ab866' );
+const wpBlue = boldWhite.bgHex( '#000066' );
 const wpRed = boldWhite.bgHex( '#d94f4f' );
 const wpYellow = boldWhite.bgHex( '#f0b849' );
 
@@ -109,6 +110,18 @@ module.exports = function cli() {
 		),
 		() => {},
 		withSpinner( env.stop )
+	);
+	yargs.command(
+		'snapshot',
+		wpBlue( 'Makes a snapshot of the environment DB and files.' ),
+		() => {},
+		withSpinner( env.snapshot )
+	);
+	yargs.command(
+		'restore',
+		wpBlue( 'Restores a snapshot of the environment DB and files.' ),
+		() => {},
+		withSpinner( env.restore )
 	);
 	yargs.command(
 		'clean [environment]',

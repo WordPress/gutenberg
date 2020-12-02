@@ -7,6 +7,8 @@ const clean = require( './clean' );
 const run = require( './run' );
 const destroy = require( './destroy' );
 const logs = require( './logs' );
+const snapshot = require( './snapshot' );
+const restore = require( './restore' );
 
 module.exports = {
 	start,
@@ -15,4 +17,6 @@ module.exports = {
 	run,
 	destroy,
 	logs,
+	snapshot,
+	restore,
 };

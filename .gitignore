@@ -13,6 +13,7 @@ phpcs.xml
 yarn.lock
 /wordpress
 /artifacts
+/snapshot
 
 playground/dist
 .cache
