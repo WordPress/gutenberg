@@ -283,3 +283,9 @@ function filter_rest_prepare_add_wp_theme_slug_and_file_based( $response ) {
 }
 add_filter( 'rest_prepare_wp_template', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
 add_filter( 'rest_prepare_wp_template_part', 'filter_rest_prepare_add_wp_theme_slug_and_file_based' );
+
+if ( ! class_exists( 'WP_REST_Theme_Templates' ) ) {
+	require_once __DIR__ . '/class-wp-rest-theme-templates.php';
+}
+$theme_templates = new WP_REST_Theme_Templates();
+add_action( 'rest_api_init', array( $theme_templates, 'register_routes' ) );

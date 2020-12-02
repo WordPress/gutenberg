@@ -60,6 +60,25 @@ function gutenberg_register_template_part_post_type() {
 add_action( 'init', 'gutenberg_register_template_part_post_type' );
 
 /**
+ * Returns all block template file path of the current theme and its parent theme.
+ * Includes demo block template files if demo experiment is enabled.
+ *
+ * @return array $block_template_files A list of paths to all template files.
+ */
+function gutenberg_get_template_part_paths() {
+	$block_template_files = glob( get_stylesheet_directory() . '/block-template-parts/*.html' );
+	$block_template_files = is_array( $block_template_files ) ? $block_template_files : array();
+
+	if ( is_child_theme() ) {
+		$child_block_template_files = glob( get_template_directory() . '/block-template-parts/*.html' );
+		$child_block_template_files = is_array( $child_block_template_files ) ? $child_block_template_files : array();
+		$block_template_files       = array_merge( $block_template_files, $child_block_template_files );
+	}
+
+	return $block_template_files;
+}
+
+/**
  * Filters `wp_template_part` posts slug resolution to bypass deduplication logic as
  * template part slugs should be unique.
  *
