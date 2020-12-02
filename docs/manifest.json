@@ -1824,6 +1824,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/widgets-customize",
+		"slug": "packages-widgets-customize",
+		"markdown_source": "../packages/widgets-customize/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/wordcount",
 		"slug": "packages-wordcount",
 		"markdown_source": "../packages/wordcount/README.md",

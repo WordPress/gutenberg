@@ -120,6 +120,7 @@ require __DIR__ . '/client-assets.php';
 require __DIR__ . '/block-directory.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/widgets.php';
+require __DIR__ . '/widgets-customize.php';
 require __DIR__ . '/navigation.php';
 require __DIR__ . '/navigation-page.php';
 require __DIR__ . '/experiments-page.php';
