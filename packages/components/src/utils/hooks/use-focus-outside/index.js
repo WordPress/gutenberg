@@ -157,6 +157,18 @@ export default function useFocusOutside( onFocusOutside ) {
 		}, 0 );
 	};
 
+	// Only optionally return the __unstableNodeRef when `onFocusOutside` is
+	// not supplied. Composing a separate object ensure consumers can spread
+	// the returned event handlers without React complaining about
+	// __unstableNodeRef being used as a DOM attribute. e.g:
+	//
+	// <div { ...useFocusOutside( onFocusOutside ) } >
+	const legacyRef = ! onFocusOutside
+		? {
+				__unstableNodeRef,
+		  }
+		: {};
+
 	return {
 		onFocus: cancelBlurCheck,
 		onMouseDown: normalizeButtonFocus,
@@ -164,6 +176,6 @@ export default function useFocusOutside( onFocusOutside ) {
 		onTouchStart: normalizeButtonFocus,
 		onTouchEnd: normalizeButtonFocus,
 		onBlur: queueBlurCheck,
-		__unstableNodeRef,
+		...legacyRef,
 	};
 }
