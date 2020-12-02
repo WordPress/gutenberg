@@ -5,7 +5,6 @@
  * @package gutenberg
  */
 
-// xdebug_info(); exit;
 if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
