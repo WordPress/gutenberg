@@ -137,8 +137,8 @@ function URLPicker( {
 
 		const { ownerDocument } = linkToolbarButtonRef.current;
 		if (
-			! ownerDocument.activeElement.contains(
-				linkToolbarButtonRef.current
+			! linkToolbarButtonRef.current.contains(
+				ownerDocument.activeElement
 			) &&
 			! ownerDocument.activeElement.closest( '[role="dialog"]' )
 		) {
