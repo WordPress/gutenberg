@@ -215,6 +215,10 @@ class EditorProvider extends Component {
 	}
 
 	getDefaultBlockContext( postId, postType ) {
+		// To avoid infinite loops, the template CPT shouldn't provide itself as a post content.
+		if ( postType === 'wp_template' ) {
+			return {};
+		}
 		return { postId, postType };
 	}
 
