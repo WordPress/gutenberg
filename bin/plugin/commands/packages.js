@@ -105,9 +105,13 @@ async function updatePackages(
 		changelogFiles.map( async ( changelogPath ) => {
 			const fileStream = fs.createReadStream( changelogPath );
 
-			const lines = await readline.createInterface( {
+			const rl = readline.createInterface( {
 				input: fileStream,
 			} );
+			const lines = [];
+			for await ( const line of rl ) {
+				lines.push( line );
+			}
 
 			const versionBump = calculateVersionBumpFromChangelog(
 				lines,
