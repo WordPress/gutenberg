@@ -26,7 +26,8 @@ import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
  */
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from '../use-moving-animation';
-import { Context, SetBlockNodes } from './root-container';
+import { SetBlockNodes } from './root-container';
+import { SelectionStart } from '../writing-flow';
 import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-wrapper-elements';
 
@@ -49,7 +50,7 @@ import ELEMENTS from './block-wrapper-elements';
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const fallbackRef = useRef();
 	const ref = props.ref || fallbackRef;
-	const onSelectionStart = useContext( Context );
+	const onSelectionStart = useContext( SelectionStart );
 	const setBlockNodes = useContext( SetBlockNodes );
 	const {
 		clientId,
@@ -91,7 +92,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		},
 		[ isSelected ]
 	);
-	const { insertDefaultBlock, removeBlock } = useDispatch(
+	const { insertDefaultBlock, removeBlock, selectBlock } = useDispatch(
 		'core/block-editor'
 	);
 	const [ isHovered, setHovered ] = useState( false );
@@ -184,7 +185,29 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 	useEffect( () => {
 		if ( ! isSelected ) {
-			return;
+			/**
+			 * Marks the block as selected when focused and not already
+			 * selected. This specifically handles the case where block does not
+			 * set focus on its own (via `setFocus`), typically if there is no
+			 * focusable input in the block.
+			 *
+			 * @param {FocusEvent} event Focus event.
+			 */
+			function onFocus( event ) {
+				// If an inner block is focussed, that block is resposible for
+				// setting the selected block.
+				if ( ! isInsideRootBlock( ref.current, event.target ) ) {
+					return;
+				}
+
+				selectBlock( clientId );
+			}
+
+			ref.current.addEventListener( 'focus', onFocus, true );
+
+			return () => {
+				ref.current.removeEventListener( 'focus', onFocus, true );
+			};
 		}
 
 		/**
@@ -228,12 +251,24 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			}
 		}
 
+		/**
+		 * Prevents default dragging behavior within a block. To do: we must
+		 * handle this in the future and clean up the drag target.
+		 *
+		 * @param {DragEvent} event Drag event.
+		 */
+		function onDragStart( event ) {
+			event.preventDefault();
+		}
+
 		ref.current.addEventListener( 'keydown', onKeyDown );
 		ref.current.addEventListener( 'mouseleave', onMouseLeave );
+		ref.current.addEventListener( 'dragstart', onDragStart );
 
 		return () => {
 			ref.current.removeEventListener( 'mouseleave', onMouseLeave );
 			ref.current.removeEventListener( 'keydown', onKeyDown );
+			ref.current.removeEventListener( 'dragstart', onDragStart );
 		};
 	}, [ isSelected, onSelectionStart, insertDefaultBlock, removeBlock ] );
 

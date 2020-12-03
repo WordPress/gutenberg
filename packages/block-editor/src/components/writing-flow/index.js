@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect, useState, createContext } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -44,6 +44,9 @@ import {
 	getBlockClientId,
 } from '../../utils/dom';
 import FocusCapture from './focus-capture';
+import useMultiSelection from './use-multi-selection';
+
+export const SelectionStart = createContext();
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -256,6 +259,8 @@ export default function WritingFlow( { children } ) {
 	// position of the start position can be restored. This is to recreate
 	// browser behaviour across blocks.
 	const verticalRect = useRef();
+
+	const onSelectionStart = useMultiSelection( container );
 
 	const {
 		selectedBlockClientId,
@@ -687,7 +692,7 @@ export default function WritingFlow( { children } ) {
 	// bubbling events from children to determine focus transition intents.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<>
+		<SelectionStart.Provider value={ onSelectionStart }>
 			<FocusCapture
 				ref={ focusCaptureBeforeRef }
 				selectedClientId={ selectedBlockClientId }
@@ -725,7 +730,7 @@ export default function WritingFlow( { children } ) {
 				multiSelectionContainer={ multiSelectionContainer }
 				isReverse
 			/>
-		</>
+		</SelectionStart.Provider>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }

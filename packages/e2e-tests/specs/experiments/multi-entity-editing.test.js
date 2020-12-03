@@ -97,17 +97,6 @@ const openEntitySavePanel = async () => {
 	}
 	// If we made it this far, the panel is opened.
 
-	// Expand to view savable entities if necessary.
-	const reviewChangesButton = await page.$(
-		'.entities-saved-states__review-changes-button'
-	);
-	const [ needsToOpen ] = await reviewChangesButton.$x(
-		'//*[contains(text(),"Review changes.")]'
-	);
-	if ( needsToOpen ) {
-		await reviewChangesButton.click();
-	}
-
 	return true;
 };
 

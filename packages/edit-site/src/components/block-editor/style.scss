@@ -11,3 +11,50 @@
 		padding: 6px;
 	}
 }
+
+.block-editor-block-list__layout {
+	&.edit-site-block-editor__block-list {
+		.block-editor-block-list__block {
+			&::after {
+				outline: 2px solid transparent;
+			}
+
+			&.is-selected {
+				&::after {
+					box-shadow: 0 0 0 $border-width $gray-900; // Selected not focussed
+					top: $border-width;
+					left: $border-width;
+					right: $border-width;
+					bottom: $border-width;
+				}
+
+				&:focus {
+					&::after {
+						box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+					}
+				}
+			}
+
+			&.is-hovered:not(.is-selected) {
+				cursor: default;
+
+				&::after {
+					top: $border-width;
+					left: $border-width;
+					right: $border-width;
+					bottom: $border-width;
+					box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+				}
+			}
+		}
+
+		// Do not display a border on rich text blocks when hovered and selected
+		.block-editor-rich-text__editable {
+			&.is-selected.is-hovered.is-typing {
+				&::after {
+					box-shadow: none;
+				}
+			}
+		}
+	}
+}
