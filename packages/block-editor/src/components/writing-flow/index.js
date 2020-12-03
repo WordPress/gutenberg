@@ -612,19 +612,14 @@ export default function WritingFlow( { children } ) {
 				// Ensure that there is a target block.
 				( ( isReverse && selectionBeforeEndClientId ) ||
 					( ! isReverse && selectionAfterEndClientId ) ) &&
-				( hasMultiSelection ||
-					( isTabbableEdge( target, isReverse ) &&
-						isNavEdge( target, isReverse ) ) )
+				isTabbableEdge( target, isReverse ) &&
+				isNavEdge( target, isReverse )
 			) {
 				// Shift key is down, and there is multi selection or we're at
 				// the end of the current block.
 				expandSelection( isReverse );
 				event.preventDefault();
 			}
-		} else if ( hasMultiSelection ) {
-			// Moving from block multi-selection to single block selection
-			moveSelection( isReverse );
-			event.preventDefault();
 		} else if (
 			isVertical &&
 			isVerticalEdge( target, isReverse ) &&
@@ -661,9 +656,21 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
-	function onMultiSelectKeyDown( { keyCode, shiftKey } ) {
+	function onMultiSelectKeyDown( event ) {
+		const { keyCode, shiftKey } = event;
+		const isUp = keyCode === UP;
+		const isDown = keyCode === DOWN;
+		const isLeft = keyCode === LEFT;
+		const isRight = keyCode === RIGHT;
+		const isReverse = isUp || isLeft;
+		const isHorizontal = isLeft || isRight;
+		const isVertical = isUp || isDown;
+		const isNav = isHorizontal || isVertical;
+
 		if ( keyCode === TAB ) {
-			// See comment above.
+			// Disable focus capturing on the focus capture element, so it
+			// doesn't refocus this element and so it allows default behaviour
+			// (moving focus to the next tabbable element).
 			noCapture.current = true;
 
 			if ( shiftKey ) {
@@ -671,6 +678,10 @@ export default function WritingFlow( { children } ) {
 			} else {
 				focusCaptureAfterRef.current.focus();
 			}
+		} else if ( isNav ) {
+			const action = shiftKey ? expandSelection : moveSelection;
+			action( isReverse );
+			event.preventDefault();
 		}
 	}
 
@@ -691,6 +702,14 @@ export default function WritingFlow( { children } ) {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<SelectionStart.Provider value={ onSelectionStart }>
+			<FocusCapture
+				ref={ focusCaptureBeforeRef }
+				selectedClientId={ selectedBlockClientId }
+				containerRef={ container }
+				noCapture={ noCapture }
+				hasMultiSelection={ hasMultiSelection }
+				multiSelectionContainer={ multiSelectionContainer }
+			/>
 			<div
 				ref={ multiSelectionContainer }
 				tabIndex={ hasMultiSelection ? '0' : undefined }
@@ -703,14 +722,6 @@ export default function WritingFlow( { children } ) {
 				// element does not scroll the page.
 				style={ { position: 'fixed' } }
 				onKeyDown={ onMultiSelectKeyDown }
-			/>
-			<FocusCapture
-				ref={ focusCaptureBeforeRef }
-				selectedClientId={ selectedBlockClientId }
-				containerRef={ container }
-				noCapture={ noCapture }
-				hasMultiSelection={ hasMultiSelection }
-				multiSelectionContainer={ multiSelectionContainer }
 			/>
 			<div
 				ref={ container }
