@@ -1,0 +1,13 @@
+@font-face {
+    font-family: Gilbert;
+    src: url(../gilbert-color.otf);
+    font-weight: bold;
+}
+
+.wp-block-create-block-gutenpride {
+    background-color: var(--wp-admin-theme-color);
+    color: #fff;
+    padding: 2px;
+    font-family: Gilbert;
+    font-size: 64px;
+}
