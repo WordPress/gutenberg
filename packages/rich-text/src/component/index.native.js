@@ -111,7 +111,9 @@ export class RichText extends Component {
 			showXpostSuggestions,
 			'+'
 		).bind( this );
-		this.handleSuggestionLongPress = this.handleSuggestionLongPress.bind( this );
+		this.handleSuggestionLongPress = this.handleSuggestionLongPress.bind(
+			this
+		);
 		this.triggerKeyCodeHandlers = this.triggerKeyCodeHandlers.bind( this );
 		this.insertString = this.insertString.bind( this );
 		this.state = {
@@ -874,7 +876,7 @@ export class RichText extends Component {
 			};
 
 		const onSuggestionPickerSelect = ( suggestionType ) => {
-			switch (suggestionType) {
+			switch ( suggestionType ) {
 				case 'mention':
 					this.handleUserSuggestion();
 					break;
@@ -884,7 +886,7 @@ export class RichText extends Component {
 				default:
 					break;
 			}
-		}
+		};
 
 		return (
 			<View style={ containerStyles }>
@@ -998,11 +1000,12 @@ export class RichText extends Component {
 							value: 'mention',
 							label: __( 'Mention' ),
 							icon: atSymbol,
-						},{
+						},
+						{
 							value: 'xpost',
 							label: __( 'Xpost' ),
 							icon: plus,
-						}
+						},
 					] }
 					onChange={ onSuggestionPickerSelect }
 					hideCancelButton
