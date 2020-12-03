@@ -26,8 +26,6 @@ import {
 	TAB,
 	isKeyboardEvent,
 	ESCAPE,
-	ENTER,
-	SPACE,
 } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -276,9 +274,7 @@ export default function WritingFlow( { children } ) {
 		isSelectionEnabled,
 		blockSelectionStart,
 		isMultiSelecting,
-		getBlockIndex,
 		getBlockRootClientId,
-		getClientIdsOfDescendants,
 		canInsertBlockType,
 		getBlockName,
 		keepCaretInsideBlock,
@@ -286,10 +282,8 @@ export default function WritingFlow( { children } ) {
 	const {
 		multiSelect,
 		selectBlock,
-		clearSelectedBlock,
 		setNavigationMode,
 		setBlockMovingClientId,
-		moveBlockToPosition,
 	} = useDispatch( 'core/block-editor' );
 
 	const [ canInsertMovingBlock, setCanInsertMovingBlock ] = useState( false );
@@ -395,14 +389,17 @@ export default function WritingFlow( { children } ) {
 
 	function onKeyDown( event ) {
 		const { keyCode, target } = event;
+
+		if ( ! container.current.contains( target ) ) {
+			return;
+		}
+
 		const isUp = keyCode === UP;
 		const isDown = keyCode === DOWN;
 		const isLeft = keyCode === LEFT;
 		const isRight = keyCode === RIGHT;
 		const isTab = keyCode === TAB;
 		const isEscape = keyCode === ESCAPE;
-		const isEnter = keyCode === ENTER;
-		const isSpace = keyCode === SPACE;
 		const isReverse = isUp || isLeft;
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
@@ -416,95 +413,6 @@ export default function WritingFlow( { children } ) {
 
 		// In navigation mode, tab and arrows navigate from block to block.
 		if ( isNavigationMode ) {
-			const navigateUp = ( isTab && isShift ) || isUp;
-			const navigateDown = ( isTab && ! isShift ) || isDown;
-			// Move out of current nesting level (no effect if at root level).
-			const navigateOut = isLeft;
-			// Move into next nesting level (no effect if the current block has no innerBlocks).
-			const navigateIn = isRight;
-
-			let focusedBlockUid;
-			if ( navigateUp ) {
-				focusedBlockUid = selectionBeforeEndClientId;
-			} else if ( navigateDown ) {
-				focusedBlockUid = selectionAfterEndClientId;
-			} else if ( navigateOut ) {
-				focusedBlockUid =
-					getBlockRootClientId( selectedBlockClientId ) ??
-					selectedBlockClientId;
-			} else if ( navigateIn ) {
-				focusedBlockUid =
-					getClientIdsOfDescendants( [
-						selectedBlockClientId,
-					] )[ 0 ] ?? selectedBlockClientId;
-			}
-			const startingBlockClientId = hasBlockMovingClientId();
-
-			if ( startingBlockClientId && focusedBlockUid ) {
-				setCanInsertMovingBlock(
-					canInsertBlockType(
-						getBlockName( startingBlockClientId ),
-						getBlockRootClientId( focusedBlockUid )
-					)
-				);
-			}
-			if ( isEscape && startingBlockClientId ) {
-				setBlockMovingClientId( null );
-				setCanInsertMovingBlock( false );
-			}
-			if ( ( isEnter || isSpace ) && startingBlockClientId ) {
-				const sourceRoot = getBlockRootClientId(
-					startingBlockClientId
-				);
-				const destRoot = getBlockRootClientId( selectedBlockClientId );
-				const sourceBlockIndex = getBlockIndex(
-					startingBlockClientId,
-					sourceRoot
-				);
-				let destinationBlockIndex = getBlockIndex(
-					selectedBlockClientId,
-					destRoot
-				);
-				if (
-					sourceBlockIndex < destinationBlockIndex &&
-					sourceRoot === destRoot
-				) {
-					destinationBlockIndex -= 1;
-				}
-				moveBlockToPosition(
-					startingBlockClientId,
-					sourceRoot,
-					destRoot,
-					destinationBlockIndex
-				);
-				selectBlock( startingBlockClientId );
-				setBlockMovingClientId( null );
-			}
-			if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
-				if ( focusedBlockUid ) {
-					event.preventDefault();
-					selectBlock( focusedBlockUid );
-				} else if ( isTab && selectedBlockClientId ) {
-					const wrapper = getBlockDOMNode(
-						selectedBlockClientId,
-						ownerDocument
-					);
-					let nextTabbable;
-
-					if ( navigateDown ) {
-						nextTabbable = focus.tabbable.findNext( wrapper );
-					} else {
-						nextTabbable = focus.tabbable.findPrevious( wrapper );
-					}
-
-					if ( nextTabbable ) {
-						event.preventDefault();
-						nextTabbable.focus();
-						clearSelectedBlock();
-					}
-				}
-			}
-
 			return;
 		}
 
