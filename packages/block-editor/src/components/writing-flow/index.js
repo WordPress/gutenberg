@@ -544,21 +544,6 @@ export default function WritingFlow( { children } ) {
 			} else if ( isEscape ) {
 				setNavigationMode( true );
 			}
-		} else if (
-			hasMultiSelection &&
-			isTab &&
-			target === multiSelectionContainer.current
-		) {
-			// See comment above.
-			noCapture.current = true;
-
-			if ( isShift ) {
-				focusCaptureBeforeRef.current.focus();
-			} else {
-				focusCaptureAfterRef.current.focus();
-			}
-
-			return;
 		}
 
 		// When presing any key other than up or down, the initial vertical
@@ -627,19 +612,14 @@ export default function WritingFlow( { children } ) {
 				// Ensure that there is a target block.
 				( ( isReverse && selectionBeforeEndClientId ) ||
 					( ! isReverse && selectionAfterEndClientId ) ) &&
-				( hasMultiSelection ||
-					( isTabbableEdge( target, isReverse ) &&
-						isNavEdge( target, isReverse ) ) )
+				isTabbableEdge( target, isReverse ) &&
+				isNavEdge( target, isReverse )
 			) {
 				// Shift key is down, and there is multi selection or we're at
 				// the end of the current block.
 				expandSelection( isReverse );
 				event.preventDefault();
 			}
-		} else if ( hasMultiSelection ) {
-			// Moving from block multi-selection to single block selection
-			moveSelection( isReverse );
-			event.preventDefault();
 		} else if (
 			isVertical &&
 			isVerticalEdge( target, isReverse ) &&
@@ -676,6 +656,35 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
+	function onMultiSelectKeyDown( event ) {
+		const { keyCode, shiftKey } = event;
+		const isUp = keyCode === UP;
+		const isDown = keyCode === DOWN;
+		const isLeft = keyCode === LEFT;
+		const isRight = keyCode === RIGHT;
+		const isReverse = isUp || isLeft;
+		const isHorizontal = isLeft || isRight;
+		const isVertical = isUp || isDown;
+		const isNav = isHorizontal || isVertical;
+
+		if ( keyCode === TAB ) {
+			// Disable focus capturing on the focus capture element, so it
+			// doesn't refocus this element and so it allows default behaviour
+			// (moving focus to the next tabbable element).
+			noCapture.current = true;
+
+			if ( shiftKey ) {
+				focusCaptureBeforeRef.current.focus();
+			} else {
+				focusCaptureAfterRef.current.focus();
+			}
+		} else if ( isNav ) {
+			const action = shiftKey ? expandSelection : moveSelection;
+			action( isReverse );
+			event.preventDefault();
+		}
+	}
+
 	useEffect( () => {
 		if ( hasMultiSelection && ! isMultiSelecting ) {
 			multiSelectionContainer.current.focus();
@@ -702,23 +711,24 @@ export default function WritingFlow( { children } ) {
 				multiSelectionContainer={ multiSelectionContainer }
 			/>
 			<div
+				ref={ multiSelectionContainer }
+				tabIndex={ hasMultiSelection ? '0' : undefined }
+				aria-label={
+					hasMultiSelection
+						? __( 'Multiple selected blocks' )
+						: undefined
+				}
+				// Needs to be positioned within the viewport, so focus to this
+				// element does not scroll the page.
+				style={ { position: 'fixed' } }
+				onKeyDown={ onMultiSelectKeyDown }
+			/>
+			<div
 				ref={ container }
 				className={ className }
 				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
 			>
-				<div
-					ref={ multiSelectionContainer }
-					tabIndex={ hasMultiSelection ? '0' : undefined }
-					aria-label={
-						hasMultiSelection
-							? __( 'Multiple selected blocks' )
-							: undefined
-					}
-					// Needs to be positioned within the viewport, so focus to this
-					// element does not scroll the page.
-					style={ { position: 'fixed' } }
-				/>
 				{ children }
 			</div>
 			<FocusCapture
