@@ -2,12 +2,21 @@
  * Internal dependencies
  */
 import { is } from './is';
+
 /**
  * WordPress dependencies
  */
 import { Children, isValidElement } from '@wordpress/element';
 
+/**
+ * Merges React `ref` together.
+ */
 export { default as mergeRefs } from 'react-merge-refs';
+
+/**
+ * Copies non-react specific statics from a child component to a parent component.
+ * Similar to Object.assign, but with React static keywords prevented from being overridden.
+ */
 export { default as hoistNonReactStatics } from 'hoist-non-react-statics';
 
 /**

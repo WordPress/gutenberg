@@ -1,4 +1,4 @@
-export function detectBrowser( browser ) {
+function detectBrowser( browser ) {
 	return window?.navigator?.userAgent.toLowerCase().indexOf( browser ) > -1;
 }
 

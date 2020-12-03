@@ -19,7 +19,7 @@ import { colorize, isColor } from '../colors';
  *
  * @return {number} The range value
  */
-export function findRange( input, inputRange ) {
+function findRange( input, inputRange ) {
 	// eslint-disable-next-line no-var
 	for ( var i = 1; i < inputRange.length - 1; ++i )
 		if ( inputRange[ i ] >= input ) break;
@@ -27,6 +27,7 @@ export function findRange( input, inputRange ) {
 }
 
 /**
+ * Base interpolate function.
  *
  * @param {number} [input=0]
  * @param {number} [inputMin=0]
@@ -36,7 +37,7 @@ export function findRange( input, inputRange ) {
  *
  * @return {number} The interpolated value.
  */
-export function baseInterpolate(
+function baseInterpolate(
 	input = 0,
 	inputMin = 0,
 	inputMax = 1,
@@ -71,9 +72,14 @@ export function baseInterpolate(
 }
 
 /**
+ * Gets a value based on an input range and an output range.
+ * Can be used for a set of numbers or a set of colors.
+ *
  * @param {number} [input=0]
  * @param {[number, number]} [inputRange=[0,1]]
  * @param {[number, number]} [outputRange=[0,1]]
+ *
+ * @return {*} The interpolated value.
  */
 export function interpolate(
 	input = 0,
@@ -101,6 +107,8 @@ export function interpolate(
 }
 
 /**
+ * Gets a rounded value based on an input range and an output range.
+ *
  * @param {Parameters<interpolate>} args
  *
  * @return {number} The rounded interpolated value.

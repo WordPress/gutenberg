@@ -4,11 +4,15 @@
 import { useEffect, useState } from '@wordpress/element';
 
 /**
+ * External dependencies
+ */
+import { noop } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import { is } from '../is';
 import { json2mq } from '../media-queries';
-import { noop } from '../other';
 
 // For SSR
 let __window = {};

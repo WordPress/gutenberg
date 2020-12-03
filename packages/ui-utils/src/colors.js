@@ -1,4 +1,12 @@
 /**
+ * A library for color manipulation and conversion.
+ *
+ * See:
+ * https://github.com/bgrins/TinyColor
+ */
+export { default as colorize } from 'tinycolor2';
+
+/**
  * External dependencies
  */
 import colorize from 'tinycolor2';
@@ -8,7 +16,6 @@ import colorize from 'tinycolor2';
  */
 import { is } from './is';
 import { memoize } from './memoize';
-export { default as colorize } from 'tinycolor2';
 
 /** @type {HTMLDivElement} */
 let __colorComputationNode;
@@ -71,13 +78,16 @@ function __getComputedBackgroundColor( color ) {
 	return computedColor || '';
 }
 
+/**
+ * @param {string | unknown} color
+ *
+ * @return {string} The computed background color.
+ */
 export const getComputedBackgroundColor = memoize(
 	__getComputedBackgroundColor
 );
 
 /**
- * Retrieves the computed text color.
- *
  * @param {string | unknown} color
  *
  * @return {string} The computed text color.
@@ -103,6 +113,13 @@ function __getComputedColor( color ) {
 	return computedColor || '';
 }
 
+/**
+ * Retrieves the computed text color.
+ *
+ * @param {string | unknown} color
+ *
+ * @return {string} The computed text color.
+ */
 export const getComputedColor = memoize( __getComputedColor );
 
 /**

@@ -7,7 +7,19 @@
  * Internal dependencies
  */
 import { is } from './is';
-import { camel2hyphen } from './strings';
+
+/**
+ * @param {string} str
+ *
+ * @return {string} The hyphenated string.
+ */
+function camel2hyphen( str ) {
+	return str
+		.replace( /[A-Z]/g, function ( match ) {
+			return '-' + match.toLowerCase();
+		} )
+		.toLowerCase();
+}
 
 /**
  * @param {string} feature
@@ -52,8 +64,11 @@ function obj2mq( obj = {} ) {
 }
 
 /**
+ * Generate media query string from JSON or javascript object.
  *
  * @param {string | Object} query
+ *
+ * @return {string} The media query.
  */
 export function json2mq( query ) {
 	let mq = '';

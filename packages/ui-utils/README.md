@@ -28,35 +28,22 @@ _Returns_
 
 <a name="arrayFill" href="#arrayFill">#</a> **arrayFill**
 
-Undocumented declaration.
+Creates an array prefilled with an amount.
+
+_Parameters_
+
+-   _amount_ `number`: 
+
+_Returns_
+
+-   `Array<number>`: The filled array.
 
 <a name="arrayMove" href="#arrayMove">#</a> **arrayMove**
 
-Undocumented declaration.
+Moves an array item to a different position.
 
-<a name="baseInterpolate" href="#baseInterpolate">#</a> **baseInterpolate**
-
-_Parameters_
-
--   _input_ `[number]`: 
--   _inputMin_ `[number]`: 
--   _inputMax_ `[number]`: 
--   _outputMin_ `[number]`: 
--   _outputMax_ `[number]`: 
-
-_Returns_
-
--   `number`: The interpolated value.
-
-<a name="camel2hyphen" href="#camel2hyphen">#</a> **camel2hyphen**
-
-_Parameters_
-
--   _str_ `string`: 
-
-_Returns_
-
--   `string`: The hyphenated string.
+See:
+<https://github.com/sindresorhus/array-move#readme>
 
 <a name="clearSelection" href="#clearSelection">#</a> **clearSelection**
 
@@ -64,11 +51,10 @@ Clears the text selection on screen.
 
 <a name="colorize" href="#colorize">#</a> **colorize**
 
-Undocumented declaration.
+A library for color manipulation and conversion.
 
-<a name="copyToClipboard" href="#copyToClipboard">#</a> **copyToClipboard**
-
-Undocumented declaration.
+See:
+<https://github.com/bgrins/TinyColor>
 
 <a name="createUnitValue" href="#createUnitValue">#</a> **createUnitValue**
 
@@ -85,34 +71,33 @@ _Returns_
 
 <a name="deepEqual" href="#deepEqual">#</a> **deepEqual**
 
-Undocumented declaration.
+Checks to see if 2 values are equal (with support for deeply nested Objects and Arrays).
 
 <a name="deepMerge" href="#deepMerge">#</a> **deepMerge**
 
-Undocumented declaration.
-
-<a name="detectBrowser" href="#detectBrowser">#</a> **detectBrowser**
-
-Undocumented declaration.
-
-<a name="findRange" href="#findRange">#</a> **findRange**
-
-_Parameters_
-
--   _input_ `number`: 
--   _inputRange_ `Array<number>`: 
-
-_Returns_
-
--   `number`: The range value
+Merges two objects together, with support for deeply nested values.
 
 <a name="getComputedBackgroundColor" href="#getComputedBackgroundColor">#</a> **getComputedBackgroundColor**
 
-Undocumented declaration.
+_Parameters_
+
+-   _color_ `(string|unknown)`: 
+
+_Returns_
+
+-   `string`: The computed background color.
 
 <a name="getComputedColor" href="#getComputedColor">#</a> **getComputedColor**
 
-Undocumented declaration.
+Retrieves the computed text color.
+
+_Parameters_
+
+-   _color_ `(string|unknown)`: 
+
+_Returns_
+
+-   `string`: The computed text color.
 
 <a name="getDisplayName" href="#getDisplayName">#</a> **getDisplayName**
 
@@ -225,9 +210,13 @@ _Returns_
 
 <a name="hoistNonReactStatics" href="#hoistNonReactStatics">#</a> **hoistNonReactStatics**
 
-Undocumented declaration.
+Copies non-react specific statics from a child component to a parent component.
+Similar to Object.assign, but with React static keywords prevented from being overridden.
 
 <a name="interpolate" href="#interpolate">#</a> **interpolate**
+
+Gets a value based on an input range and an output range.
+Can be used for a set of numbers or a set of colors.
 
 _Parameters_
 
@@ -235,7 +224,13 @@ _Parameters_
 -   _inputRange_ `[(number|number)]`: 
 -   _outputRange_ `[(number|number)]`: 
 
+_Returns_
+
+-   `*`: The interpolated value.
+
 <a name="interpolateRounded" href="#interpolateRounded">#</a> **interpolateRounded**
+
+Gets a rounded value based on an input range and an output range.
 
 _Parameters_
 
@@ -323,23 +318,16 @@ _Returns_
 
 -   `boolean`: Whether the value is a valid numeric unit value.
 
-<a name="isValueEmpty" href="#isValueEmpty">#</a> **isValueEmpty**
-
-Determines if a value is empty, null, or undefined.
-
-_Parameters_
-
--   _value_ `any`: The value to check.
-
-_Returns_
-
--   `boolean`: Whether value is empty.
-
 <a name="memoize" href="#memoize">#</a> **memoize**
 
-Undocumented declaration.
+Creates a function that memoizes the result of a `function`.
+
+See:
+<https://www.npmjs.com/package/memize>
 
 <a name="mergeEvent" href="#mergeEvent">#</a> **mergeEvent**
+
+Merges event handlers together.
 
 _Parameters_
 
@@ -348,6 +336,8 @@ _Parameters_
 
 <a name="mergeEventHandlers" href="#mergeEventHandlers">#</a> **mergeEventHandlers**
 
+Merges a set of event handlers together.
+
 _Parameters_
 
 -   _handlers_ (unknown type): 
@@ -355,7 +345,7 @@ _Parameters_
 
 <a name="mergeRefs" href="#mergeRefs">#</a> **mergeRefs**
 
-Undocumented declaration.
+Merges React `ref` together.
 
 <a name="mergeValidationFunctions" href="#mergeValidationFunctions">#</a> **mergeValidationFunctions**
 
@@ -369,10 +359,6 @@ _Parameters_
 _Returns_
 
 -   `(Function|undefined)`: A single merged validation function.
-
-<a name="noop" href="#noop">#</a> **noop**
-
-Undocumented declaration.
 
 <a name="normalizeArrowKey" href="#normalizeArrowKey">#</a> **normalizeArrowKey**
 
@@ -470,15 +456,46 @@ _Returns_
 
 <a name="useControlledState" href="#useControlledState">#</a> **useControlledState**
 
-Undocumented declaration.
+Custom hooks for "controlled" components to track and consolidate internal
+state and incoming values. This is useful for components that render
+`input`, `textarea`, or `select` HTML elements.
+
+<https://reactjs.org/docs/forms.html#controlled-components>
+
+At first, a component using useControlledState receives an initial prop
+value, which is used as initial internal state.
+
+This internal state can be maintained and updated without
+relying on new incoming prop values.
+
+Unlike the basic useState hook, useControlledState's state can
+be updated if a new incoming prop value is changed.
+
+_Parameters_
+
+-   _currentState_ `(T|undefined)`: The current value.
+-   _options_ `[Options<T>]`: Additional options for the hook.
+
+_Returns_
+
+-   (unknown type): The controlled value and the value setter.
 
 <a name="useIsomorphicLayoutEffect" href="#useIsomorphicLayoutEffect">#</a> **useIsomorphicLayoutEffect**
 
-Undocumented declaration.
+`useLayoutEffect` that does not show warning when server-side rendering, see Alex Reardon's article for more info.
+<https://medium.com/@alexandereardon/uselayouteffect-and-ssr-192986cdcf7a>
 
 <a name="useLocalState" href="#useLocalState">#</a> **useLocalState**
 
-Undocumented declaration.
+Used to read/write state to localStorage.
+
+_Parameters_
+
+-   _currentState_ `(T|undefined)`: The current value.
+
+_Returns_
+
+-   (unknown type): The state an state setter.
 
 <a name="useMediaQuery" href="#useMediaQuery">#</a> **useMediaQuery**
 
@@ -495,17 +512,6 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether the query matches the current viewport.
-
-<a name="useMergeEventCallback" href="#useMergeEventCallback">#</a> **useMergeEventCallback**
-
-_Parameters_
-
--   _handler_ (unknown type): 
--   _htmlHandler_ (unknown type): 
-
-<a name="useResizeAware" href="#useResizeAware">#</a> **useResizeAware**
-
-Undocumented declaration.
 
 <a name="useSealedState" href="#useSealedState">#</a> **useSealedState**
 

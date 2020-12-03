@@ -46,6 +46,18 @@ const numericZero = ( o ) => {
 const defined = ( o ) => ! _.isNil( o );
 
 /**
+ * Checks if a value is empty, null, or undefined.
+ *
+ * @param {any} value The value to check.
+ *
+ * @return {boolean} Whether value is empty.
+ */
+function valueEmpty( value ) {
+	const isEmptyString = value === '';
+	return ! is.defined( value ) || isEmptyString;
+}
+
+/**
  * A collection of type checks.
  */
 export const is = {
@@ -60,6 +72,7 @@ export const is = {
 	file: ( o ) => o instanceof File,
 	numeric,
 	numericZero,
+	valueEmpty,
 
 	// This is safe because we only accept Interpolation rather than any
 	// _.isPlainObject(TemplateStringsArray) -> false

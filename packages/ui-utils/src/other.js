@@ -1,1 +1,0 @@
-export { noop } from 'lodash';
