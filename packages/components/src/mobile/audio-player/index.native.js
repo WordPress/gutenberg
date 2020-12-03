@@ -14,7 +14,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import styles from './styles';
+import styles from './styles.scss';
 import { play, volume } from './icons';
 
 function Slider() {
