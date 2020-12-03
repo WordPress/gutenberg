@@ -46,6 +46,7 @@
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/plugins": "file:../plugins",
 		"@wordpress/primitives": "file:../primitives",
+		"@wordpress/slot-fill": "file:../slot-fill",
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.2.5",
 		"downloadjs": "^1.4.7",

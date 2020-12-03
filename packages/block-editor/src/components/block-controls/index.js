@@ -9,9 +9,9 @@ import { isEmpty } from 'lodash';
 import { useContext } from '@wordpress/element';
 import {
 	__experimentalToolbarContext as ToolbarContext,
-	createSlotFill,
 	ToolbarGroup,
 } from '@wordpress/components';
+import { createSlotFill } from '@wordpress/slot-fill';
 
 /**
  * Internal dependencies

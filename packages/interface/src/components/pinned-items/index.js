@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Slot, Fill } from '@wordpress/components';
+import { Slot, Fill } from '@wordpress/slot-fill';
 
 function PinnedItems( { scope, ...props } ) {
 	return <Fill name={ `PinnedItems/${ scope }` } { ...props } />;

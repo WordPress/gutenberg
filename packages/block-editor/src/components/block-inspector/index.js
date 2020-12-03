@@ -8,10 +8,8 @@ import {
 	hasBlockSupport,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import {
-	PanelBody,
-	__experimentalUseSlot as useSlot,
-} from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
+import { __experimentalUseSlot as useSlot } from '@wordpress/slot-fill';
 import { withSelect } from '@wordpress/data';
 
 /**

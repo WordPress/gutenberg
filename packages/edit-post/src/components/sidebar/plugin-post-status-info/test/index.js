@@ -6,7 +6,7 @@ import ReactTestRenderer from 'react-test-renderer';
 /**
  * WordPress dependencies
  */
-import { SlotFillProvider } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/slot-fill';
 
 /**
  * Internal dependencies

@@ -15,7 +15,8 @@ Any Fill will automatically occupy this Slot space, even if rendered elsewhere i
 You can either use the Fill component directly, or a wrapper component type as in the below example to abstract the slot name from consumer awareness.
 
 ```jsx
-import { SlotFillProvider, Slot, Fill, Panel, PanelBody } from '@wordpress/components';
+import { Panel, PanelBody } from '@wordpress/components';
+import { SlotFillProvider, Slot, Fill } from '@wordpress/slot-fill';
 
 const MySlotFillProvider = () => {
 	const MyPanelSlot = () => (

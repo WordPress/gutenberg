@@ -5,8 +5,8 @@ import {
 	DropZoneProvider,
 	FocusReturnProvider,
 	Popover,
-	SlotFillProvider,
 } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/slot-fill';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,

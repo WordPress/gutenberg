@@ -43,7 +43,8 @@ SlotFills are created using `createSlotFill`. This creates two components, `Slot
 /**
  * WordPress dependencies
  */
-import { createSlotFill, PanelRow } from '@wordpress/components';
+import { createSlotFill } from '@wordpress/slot-fill';
+import { PanelRow } from '@wordpress/components';
 
 export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
 

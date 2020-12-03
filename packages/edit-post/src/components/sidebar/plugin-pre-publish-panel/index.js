@@ -1,9 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, PanelBody } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
+import { createSlotFill } from '@wordpress/slot-fill';
 import { compose } from '@wordpress/compose';
 import { withPluginContext } from '@wordpress/plugins';
+
 const { Fill, Slot } = createSlotFill( 'PluginPrePublishPanel' );
 
 const PluginPrePublishPanelFill = ( {

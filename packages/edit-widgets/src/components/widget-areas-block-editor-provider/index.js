@@ -6,11 +6,8 @@ import { defaultTo } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	DropZoneProvider,
-	SlotFillProvider,
-	FocusReturnProvider,
-} from '@wordpress/components';
+import { DropZoneProvider, FocusReturnProvider } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/slot-fill';
 import { uploadMedia } from '@wordpress/media-utils';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';

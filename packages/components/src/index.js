@@ -9,6 +9,13 @@ export {
 	HorizontalRule,
 	BlockQuotation,
 } from '@wordpress/primitives';
+export {
+	createSlotFill,
+	Slot,
+	Fill,
+	SlotFillProvider,
+	__experimentalUseSlot,
+} from '@wordpress/slot-fill';
 
 // Components
 export { default as __experimentalAlignmentMatrixControl } from './alignment-matrix-control';
@@ -121,13 +128,6 @@ export { default as TreeSelect } from './tree-select';
 export { default as __experimentalUnitControl } from './unit-control';
 export { default as VisuallyHidden } from './visually-hidden';
 export { default as IsolatedEventContainer } from './isolated-event-container';
-export {
-	createSlotFill,
-	Slot,
-	Fill,
-	Provider as SlotFillProvider,
-	useSlot as __experimentalUseSlot,
-} from './slot-fill';
 
 // Higher-Order Components
 export {

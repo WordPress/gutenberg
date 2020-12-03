@@ -15,11 +15,8 @@ import {
 	PostLockedModal,
 } from '@wordpress/editor';
 import { StrictMode, Component } from '@wordpress/element';
-import {
-	KeyboardShortcuts,
-	SlotFillProvider,
-	DropZoneProvider,
-} from '@wordpress/components';
+import { KeyboardShortcuts, DropZoneProvider } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/slot-fill';
 import { compose } from '@wordpress/compose';
 
 /**

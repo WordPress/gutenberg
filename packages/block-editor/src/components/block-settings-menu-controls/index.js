@@ -6,8 +6,9 @@ import { compact, isEmpty, map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { createSlotFill, MenuGroup } from '@wordpress/components';
+import { MenuGroup } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { createSlotFill } from '@wordpress/slot-fill';
 
 const { Fill: BlockSettingsMenuControls, Slot } = createSlotFill(
 	'BlockSettingsMenuControls'

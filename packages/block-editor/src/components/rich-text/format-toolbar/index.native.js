@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-
-import { Toolbar, Slot } from '@wordpress/components';
+import { Toolbar } from '@wordpress/components';
+import { Slot } from '@wordpress/slot-fill';
 
 const FormatToolbar = () => {
 	return (

@@ -10,11 +10,8 @@ import {
 	WritingFlow,
 	ObserveTyping,
 } from '@wordpress/block-editor';
-import {
-	Popover,
-	SlotFillProvider,
-	DropZoneProvider,
-} from '@wordpress/components';
+import { Popover, DropZoneProvider } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/slot-fill';
 import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
 

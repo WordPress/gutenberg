@@ -19,7 +19,7 @@ import {
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
-import { SlotFillProvider } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/slot-fill';
 import { Preview } from '@wordpress/block-editor';
 
 /**

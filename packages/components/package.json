@@ -44,6 +44,7 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/rich-text": "file:../rich-text",
+		"@wordpress/slot-fill": "file:../slot-fill",
 		"@wordpress/warning": "file:../warning",
 		"classnames": "^2.2.5",
 		"dom-scroll-into-view": "^1.2.1",

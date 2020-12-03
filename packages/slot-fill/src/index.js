@@ -3,10 +3,10 @@
  */
 import BaseSlot from './slot';
 import BaseFill from './fill';
-import Provider from './context';
+import SlotFillProvider from './context';
 import BubblesVirtuallySlot from './bubbles-virtually/slot';
 import BubblesVirtuallyFill from './bubbles-virtually/fill';
-import useSlot from './bubbles-virtually/use-slot';
+import __experimentalUseSlot from './bubbles-virtually/use-slot';
 
 export function Slot( { bubblesVirtually, ...props } ) {
 	if ( bubblesVirtually ) {
@@ -40,4 +40,4 @@ export function createSlotFill( name ) {
 	};
 }
 
-export { useSlot, Provider };
+export { __experimentalUseSlot, SlotFillProvider };

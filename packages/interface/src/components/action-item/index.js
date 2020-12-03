@@ -6,7 +6,8 @@ import { isEmpty, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { ButtonGroup, Button, Slot, Fill } from '@wordpress/components';
+import { ButtonGroup, Button } from '@wordpress/components';
+import { Slot, Fill } from '@wordpress/slot-fill';
 
 function ActionItemSlot( {
 	name,

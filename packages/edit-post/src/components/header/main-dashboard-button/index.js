@@ -4,7 +4,7 @@
 import {
 	__experimentalUseSlot as useSlot,
 	createSlotFill,
-} from '@wordpress/components';
+} from '@wordpress/slot-fill';
 
 const slotName = '__experimentalMainDashboardButton';
 

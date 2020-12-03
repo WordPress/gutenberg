@@ -43,6 +43,7 @@
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
+		"@wordpress/slot-fill": "file:../slot-fill",
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",

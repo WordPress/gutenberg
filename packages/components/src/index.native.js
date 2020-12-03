@@ -8,6 +8,12 @@ export {
 	HorizontalRule,
 	BlockQuotation,
 } from '@wordpress/primitives';
+export {
+	createSlotFill,
+	Slot,
+	Fill,
+	SlotFillProvider,
+} from '@wordpress/slot-fill';
 export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPicker } from './color-picker';
@@ -21,12 +27,6 @@ export { default as ToolbarGroup } from './toolbar-group';
 export { default as ToolbarItem } from './toolbar-item';
 export { default as Icon } from './icon';
 export { default as Spinner } from './spinner';
-export {
-	createSlotFill,
-	Slot,
-	Fill,
-	Provider as SlotFillProvider,
-} from './slot-fill';
 export { default as BaseControl } from './base-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as PanelBody } from './panel/body';
