@@ -11,13 +11,13 @@ on:
 
 jobs:
   admin:
-    name: Admin - ${{ matrix.part + 1 }}
+    name: Admin - ${{ matrix.part }}
 
     runs-on: ubuntu-latest
 
     strategy:
       matrix:
-        part: [0, 1, 2, 3]
+        part: [1, 2, 3, 4]
 
 
     steps:
@@ -54,7 +54,7 @@ jobs:
     - name: Running the tests
       run: |
         $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --listTests > ~/.jest-e2e-tests
-        $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == ${{ matrix.part }}' < ~/.jest-e2e-tests )
+        $( npm bin )/wp-scripts test-e2e --config=./packages/e2e-tests/jest.config.js --cacheDirectory="$HOME/.jest-cache" --runTestsByPath $( awk 'NR % 4 == ${{ matrix.part }} - 1' < ~/.jest-e2e-tests )
 
     - name: Archive debug artifacts (screenshots, HTML snapshots)
       uses: actions/upload-artifact@v2
