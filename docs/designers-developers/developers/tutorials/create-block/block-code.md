@@ -87,7 +87,7 @@ You may need an appropriate loader to handle this file type, currently no loader
 
 This error is caused by the `otf` file which webpack is not set up to load. In order to do so we will need to install a loader from npm and create a [custom webpack configuration](https://developer.wordpress.org/block-editor/packages/packages-scripts/#provide-your-own-webpack-config) that will extend the webpack configuration built into @wordpress/scripts. 
 
-In your terminal install[`file-loader`](https://webpack.js.org/loaders/file-loader/). 
+In your terminal, install[`file-loader`](https://webpack.js.org/loaders/file-loader/). 
 
 `npm install file-loader --save-dev`
 
@@ -113,9 +113,9 @@ module.exports = {
 };
 ```
 
-Now your otf file should compile properly with no errors. 
+Now your `gilbert-color.otf` file should compile properly with no errors. 
 
-If that's the case, update **gutenpride.php** to enqueue from generated file location by editing the value of the `$editor_css` and `$style_css` variables to the path to the newly built files in the build folder: 
+If that's the case, update **gutenpride.php** to enqueue your styles from the generated file location by updating the value of the `$editor_css` and `$style_css` variables with the path to the newly built files in the build folder: 
 
 ```php
 $editor_css = "build/index.css";
@@ -124,6 +124,6 @@ $editor_css = "build/index.css";
 $style_css = 'build/style-index.css';
 ```
 
-Check to see if your CSS is loading correctly with your new .otf font in your WP installation. Remember to check a browser with otf support, such as Firefox, to see the colours.
+Check to see if your CSS is loading correctly with your new .otf font in your WP installation. Remember to check a browser with [otf support](https://www.colorfonts.wtf/), such as Firefox, to see the colours.
 
 Next Section: [Authoring Experience](/docs/designers-developers/developers/tutorials/create-block/author-experience.md)
