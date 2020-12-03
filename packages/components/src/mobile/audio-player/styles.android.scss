@@ -1,0 +1,37 @@
+@import "./styles-common";
+
+.container {
+	background-color: #f1f3f4;
+	height: 50px;
+	border-radius: 25px;
+	flex-direction: row;
+	align-items: center;
+	padding: 10px;
+}
+
+.containerDark {
+	background-color: #f1f3f4;
+}
+
+.icon {
+	color: $black;
+}
+
+.sliderKnob {
+	background-color: #595959;
+	height: 5px;
+	width: 9px;
+}
+
+.sliderTrack {
+	background-color: #c1c2c3;
+	height: 5px;
+	border-radius: 2.5px;
+	flex: 1;
+	justify-content: center;
+}
+
+.timeText {
+	color: $black;
+	font-size: 14;
+}

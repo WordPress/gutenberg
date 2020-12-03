@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Text, TouchableWithoutFeedback } from 'react-native';
+import { TouchableWithoutFeedback } from 'react-native';
 import { isEmpty } from 'lodash';
 
 /**
@@ -15,6 +15,7 @@ import {
 	withNotices,
 	ToolbarButton,
 	ToolbarGroup,
+	AudioPlayer,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -133,16 +134,12 @@ function AudioEdit( {
 				onFinishMediaUploadWithSuccess={ onFileChange }
 				onFinishMediaUploadWithFailure={ onError }
 				onMediaUploadStateReset={ onFileChange }
-				renderContent={ ( { isUploadInProgress, isUploadFailed } ) => {
+				renderContent={ () => {
 					return (
 						<View>
 							{ ! isCaptionSelected && getBlockControls( open ) }
 							{ getMediaOptions() }
-							<Text>
-								⏯ Audio Player goes here.{ ' ' }
-								{ isUploadInProgress && 'Uploading...' }
-								{ isUploadFailed && 'ERROR' }
-							</Text>
+							<AudioPlayer />
 						</View>
 					);
 				} }
