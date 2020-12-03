@@ -225,6 +225,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback(.success("matt"))
     }
 
+    func gutenbergDidRequestXpost(callback: @escaping (Result<String, NSError>) -> Void) {
+        callback(.success("ma.tt"))
+    }
+
     func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool {
         return false;
     }

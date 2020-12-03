@@ -20,14 +20,14 @@ import memize from 'memize';
  */
 import { BlockFormatControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import { Toolbar, ToolbarButton } from '@wordpress/components';
+import { Toolbar, ToolbarButton, Picker } from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
-import { Icon, atSymbol } from '@wordpress/icons';
+import { Icon, atSymbol, plus } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -111,6 +111,7 @@ export class RichText extends Component {
 			showXpostSuggestions,
 			'+'
 		).bind( this );
+		this.handleSuggestionLongPress = this.handleSuggestionLongPress.bind( this );
 		this.triggerKeyCodeHandlers = this.triggerKeyCodeHandlers.bind( this );
 		this.insertString = this.insertString.bind( this );
 		this.state = {
@@ -462,6 +463,12 @@ export class RichText extends Component {
 				} )
 				.catch( () => {} );
 		};
+	}
+
+	handleSuggestionLongPress() {
+		if ( this.suggestionPicker ) {
+			this.suggestionPicker.presentPicker();
+		}
 	}
 
 	/**
@@ -866,6 +873,19 @@ export class RichText extends Component {
 				backgroundColor: style.backgroundColor,
 			};
 
+		const onSuggestionPickerSelect = ( suggestionType ) => {
+			switch (suggestionType) {
+				case 'mention':
+					this.handleUserSuggestion();
+					break;
+				case 'xpost':
+					this.handleXpostSuggestion();
+					break;
+				default:
+					break;
+			}
+		}
+
 		return (
 			<View style={ containerStyles }>
 				{ children &&
@@ -961,6 +981,9 @@ export class RichText extends Component {
 											onClick={
 												this.handleUserSuggestion
 											}
+											onLongPress={
+												this.handleSuggestionLongPress
+											}
 										/>
 									</Toolbar>
 								)
@@ -968,6 +991,22 @@ export class RichText extends Component {
 						</BlockFormatControls>
 					</>
 				) }
+				<Picker
+					ref={ ( instance ) => ( this.suggestionPicker = instance ) }
+					options={ [
+						{
+							value: 'mention',
+							label: __( 'Mention' ),
+							icon: atSymbol,
+						},{
+							value: 'xpost',
+							label: __( 'Xpost' ),
+							icon: plus,
+						}
+					] }
+					onChange={ onSuggestionPickerSelect }
+					hideCancelButton
+				/>
 			</View>
 		);
 	}
