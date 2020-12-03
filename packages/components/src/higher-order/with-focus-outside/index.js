@@ -7,7 +7,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import useFocusOutside from '../../utils/hooks/use-focus-outside';
+import { useFocusOutside } from '../../utils/hooks';
 
 export default createHigherOrderComponent(
 	( WrappedComponent ) => ( props ) => {
