@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { createContext, forwardRef, useState } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -22,17 +21,6 @@ import BlockPopover from './block-popover';
 export const Context = createContext();
 export const BlockNodes = createContext();
 export const SetBlockNodes = createContext();
-
-function selector( select ) {
-	const { getSelectedBlockClientId, hasMultiSelection } = select(
-		'core/block-editor'
-	);
-
-	return {
-		selectedBlockClientId: getSelectedBlockClientId(),
-		hasMultiSelection: hasMultiSelection(),
-	};
-}
 
 /**
  * Prevents default dragging behavior within a block.
@@ -50,32 +38,7 @@ function onDragStart( event ) {
 }
 
 function RootContainer( { children, className }, ref ) {
-	const { selectedBlockClientId, hasMultiSelection } = useSelect(
-		selector,
-		[]
-	);
-	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const onSelectionStart = useMultiSelection( ref );
-
-	/**
-	 * Marks the block as selected when focused and not already selected. This
-	 * specifically handles the case where block does not set focus on its own
-	 * (via `setFocus`), typically if there is no focusable input in the block.
-	 *
-	 * @param {WPSyntheticEvent} event
-	 */
-	function onFocus( event ) {
-		if ( hasMultiSelection ) {
-			return;
-		}
-
-		const clientId = getBlockClientId( event.target );
-
-		if ( clientId && clientId !== selectedBlockClientId ) {
-			selectBlock( clientId );
-		}
-	}
-
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
 
@@ -86,7 +49,6 @@ function RootContainer( { children, className }, ref ) {
 			<div
 				ref={ ref }
 				className={ classnames( className, 'is-root-container' ) }
-				onFocus={ onFocus }
 				onDragStart={ onDragStart }
 			>
 				<SetBlockNodes.Provider value={ setBlockNodes }>

@@ -91,7 +91,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		},
 		[ isSelected ]
 	);
-	const { insertDefaultBlock, removeBlock } = useDispatch(
+	const { insertDefaultBlock, removeBlock, selectBlock } = useDispatch(
 		'core/block-editor'
 	);
 	const [ isHovered, setHovered ] = useState( false );
@@ -184,7 +184,21 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 	useEffect( () => {
 		if ( ! isSelected ) {
-			return;
+			/**
+			 * Marks the block as selected when focused and not already
+			 * selected. This specifically handles the case where block does not
+			 * set focus on its own (via `setFocus`), typically if there is no
+			 * focusable input in the block.
+			 */
+			function onFocus() {
+				selectBlock( clientId );
+			}
+
+			ref.current.addEventListener( 'focus', onFocus, true );
+
+			return () => {
+				ref.current.removeEventListener( 'focus', onFocus, true );
+			};
 		}
 
 		/**
