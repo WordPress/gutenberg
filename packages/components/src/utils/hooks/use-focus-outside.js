@@ -17,17 +17,26 @@ import { useEffect, useRef } from '@wordpress/element';
 const INPUT_BUTTON_TYPES = [ 'button', 'submit' ];
 
 /**
+ * @typedef {HTMLButtonElement | HTMLLinkElement | HTMLInputElement} FocusNormalizedButton
+ */
+
+// Disable reason: Rule doesn't support predicate return types
+/* eslint-disable jsdoc/valid-types */
+/**
  * Returns true if the given element is a button element subject to focus
  * normalization, or false otherwise.
  *
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
  *
- * @param {HTMLElement} element Element to test.
+ * @param {EventTarget} eventTarget The target from a mouse or touch event.
  *
- * @return {boolean} Whether element is a button.
+ * @return {eventTarget is FocusNormalizedButton} Whether element is a button.
  */
-function isFocusNormalizedButton( element ) {
-	switch ( element.nodeName ) {
+function isFocusNormalizedButton( eventTarget ) {
+	if ( ! ( eventTarget instanceof window.HTMLElement ) ) {
+		return false;
+	}
+	switch ( eventTarget.nodeName ) {
 		case 'A':
 		case 'BUTTON':
 			return true;
@@ -35,32 +44,53 @@ function isFocusNormalizedButton( element ) {
 		case 'INPUT':
 			return includes(
 				INPUT_BUTTON_TYPES,
-				/** @type {HTMLInputElement} */ ( element ).type
+				/** @type {HTMLInputElement} */ ( eventTarget ).type
 			);
 	}
 
 	return false;
 }
+/* eslint-enable jsdoc/valid-types */
 
 /**
  * @typedef {import('react').SyntheticEvent} SyntheticEvent
  */
 
 /**
- * @typedef {Object} FocusOutsideReactElement
- * @property {(event:SyntheticEvent)=>void} handleFocusOutside
- *     callback for a focus outside event.
+ * @callback EventCallback
+ * @param {SyntheticEvent} event input related event.
  */
+
+/**
+ * @typedef {Object} FocusOutsideReactElement
+ * @property {EventCallback} handleFocusOutside callback for a focus outside event.
+ */
+
 /**
  * @typedef {import('react').MutableRefObject<FocusOutsideReactElement | undefined>} FocusOutsideRef
+ */
+
+/**
+ * @typedef {Object} FocusOutsideReturnValue
+ * @property {EventCallback} onFocus      An event handler for focus events.
+ * @property {EventCallback} onBlur       An event handler for blur events.
+ * @property {EventCallback} onMouseDown  An event handler for mouse down events.
+ * @property {EventCallback} onMouseUp    An event handler for mouse up events.
+ * @property {EventCallback} onTouchStart An event handler for touch start events.
+ * @property {EventCallback} onTouchEnd   An event handler for touch end events.
  */
 
 /**
  * A react hook that can be used to check whether focus has moved outside the
  * element the event handlers are bound to.
  *
- * @param {Function} onFocusOutside
- * @param {FocusOutsideRef} __unstableNodeRef
+ * @param {EventCallback} onFocusOutside        A callback triggered when focus moves outside
+ *                                              the element the event handlers are bound to.
+ * @param {FocusOutsideRef} [__unstableNodeRef]
+ *
+ * @return {FocusOutsideReturnValue} An object containing event handlers. Bind the event handlers
+ *                                   to a wrapping element element to capture when focus moves
+ *                                   outside that element.
  */
 export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 	const preventBlurCheck = useRef( false );
@@ -70,6 +100,9 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 	 */
 	const blurCheckTimeoutId = useRef();
 
+	/**
+	 * Cancel a blur check timeout.
+	 */
 	const cancelBlurCheck = () => {
 		clearTimeout( blurCheckTimeoutId.current );
 	};
@@ -79,8 +112,9 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 		return () => cancelBlurCheck();
 	}, [] );
 
+	// Cancel a blur check if the callback or ref is no longer provided.
 	useEffect( () => {
-		if ( ! onFocusOutside && ! __unstableNodeRef.current ) {
+		if ( ! onFocusOutside && ! __unstableNodeRef?.current ) {
 			cancelBlurCheck();
 		}
 	}, [ onFocusOutside, __unstableNodeRef ] );
@@ -102,9 +136,7 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 
 		if ( isInteractionEnd ) {
 			preventBlurCheck.current = false;
-		} else if (
-			isFocusNormalizedButton( /** @type {HTMLElement} */ ( target ) )
-		) {
+		} else if ( isFocusNormalizedButton( target ) ) {
 			preventBlurCheck.current = true;
 		}
 	};
@@ -142,7 +174,7 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 				onFocusOutside( event );
 			} else if (
 				'function' ===
-				typeof __unstableNodeRef.current?.handleFocusOutside
+				typeof __unstableNodeRef?.current?.handleFocusOutside
 			) {
 				// Call the legacy `handleFocusOutside` method if defined
 				// as a fallback for the `withFocusOutside` HOC.
