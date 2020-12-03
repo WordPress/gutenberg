@@ -234,7 +234,8 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 			return stores[ storeName ].subscribe( handler );
 		}
 
-		return parent.__experimentalSubscribeStore( storeName, handler );
+		// Gracefully swallow the error if parent doesn't exist.
+		return parent?.__experimentalSubscribeStore( storeName, handler );
 	}
 
 	let registry = {

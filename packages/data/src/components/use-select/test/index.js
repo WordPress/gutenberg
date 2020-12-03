@@ -283,6 +283,9 @@ describe( 'useSelect', () => {
 			expect( selectCount2 ).toHaveBeenCalledTimes( 3 );
 			expect( TestComponent ).toHaveBeenCalledTimes( 3 );
 			expect( testInstance.findByType( 'div' ).props.data ).toBe( 1 );
+
+			// Test if the unsubscribers get called correctly.
+			renderer.unmount();
 		} );
 
 		it( 'can subscribe to multiple stores at once', () => {
@@ -564,6 +567,51 @@ describe( 'useSelect', () => {
 				parentCount: 1,
 				childCount: 0,
 			} );
+		} );
+
+		it( 'handles non-existing stores', () => {
+			registry.registerStore( 'store-1', counterStore );
+
+			let renderer;
+
+			const TestComponent = jest.fn( () => {
+				const state = useSelect(
+					( select ) => ( {
+						count1: select( 'store-1' ).getCounter(),
+						blank: select( 'non-existing-store' )?.getCounter(),
+					} ),
+					[]
+				);
+
+				return <div data={ state } />;
+			} );
+
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				);
+			} );
+
+			const testInstance = renderer.root;
+
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
+				count1: 0,
+				blank: undefined,
+			} );
+
+			act( () => {
+				registry.dispatch( 'store-1' ).increment();
+			} );
+
+			expect( testInstance.findByType( 'div' ).props.data ).toEqual( {
+				count1: 1,
+				blank: undefined,
+			} );
+
+			// Test if the unsubscribers get called correctly.
+			renderer.unmount();
 		} );
 	} );
 } );
