@@ -483,6 +483,7 @@ export class FileEdit extends Component {
 												style={ errorIconStyle }
 											/>
 											<PlainText
+												editable={ false }
 												value={ __( 'Error' ) }
 												style={ styles.uploadFailed }
 											/>
