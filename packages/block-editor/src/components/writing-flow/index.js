@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState, createContext } from '@wordpress/element';
+import { useRef, useEffect, createContext } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -191,7 +191,6 @@ function selector( select ) {
 		hasMultiSelection,
 		getBlockOrder,
 		isNavigationMode,
-		hasBlockMovingClientId,
 		getBlockIndex,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
@@ -221,7 +220,6 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		blocks: getBlockOrder(),
 		isNavigationMode: isNavigationMode(),
-		hasBlockMovingClientId,
 		getBlockIndex,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
@@ -270,23 +268,14 @@ export default function WritingFlow( { children } ) {
 		hasMultiSelection,
 		blocks,
 		isNavigationMode,
-		hasBlockMovingClientId,
 		isSelectionEnabled,
 		blockSelectionStart,
 		isMultiSelecting,
-		getBlockRootClientId,
-		canInsertBlockType,
-		getBlockName,
 		keepCaretInsideBlock,
 	} = useSelect( selector, [] );
-	const {
-		multiSelect,
-		selectBlock,
-		setNavigationMode,
-		setBlockMovingClientId,
-	} = useDispatch( 'core/block-editor' );
-
-	const [ canInsertMovingBlock, setCanInsertMovingBlock ] = useState( false );
+	const { multiSelect, selectBlock, setNavigationMode } = useDispatch(
+		'core/block-editor'
+	);
 
 	function onMouseDown( event ) {
 		verticalRect.current = null;
@@ -303,18 +292,6 @@ export default function WritingFlow( { children } ) {
 			)
 		) {
 			setNavigationMode( false );
-			setBlockMovingClientId( null );
-		} else if (
-			isNavigationMode &&
-			hasBlockMovingClientId() &&
-			getBlockClientId( event.target )
-		) {
-			setCanInsertMovingBlock(
-				canInsertBlockType(
-					getBlockName( hasBlockMovingClientId() ),
-					getBlockRootClientId( getBlockClientId( event.target ) )
-				)
-			);
 		}
 
 		// Multi-select blocks when Shift+clicking.
@@ -390,6 +367,14 @@ export default function WritingFlow( { children } ) {
 	function onKeyDown( event ) {
 		const { keyCode, target } = event;
 
+		// Handle only if the event occurred within the same DOM hierarchy as
+		// the rendered container. This is used to distinguish between events
+		// which bubble through React's virtual event system from those which
+		// strictly occur in the DOM created by the component.
+		//
+		// The implication here is: If it's not desirable for a bubbled event to
+		// be considered by WritingFlow, it can be avoided by rendering to a
+		// distinct place in the DOM (e.g. using Slot/Fill).
 		if ( ! container.current.contains( target ) ) {
 			return;
 		}
@@ -601,8 +586,6 @@ export default function WritingFlow( { children } ) {
 
 	const className = classnames( 'block-editor-writing-flow', {
 		'is-navigate-mode': isNavigationMode,
-		'is-block-moving-mode': !! hasBlockMovingClientId(),
-		'can-insert-moving-block': canInsertMovingBlock,
 	} );
 
 	// Disable reason: Wrapper itself is non-interactive, but must capture

@@ -32,7 +32,6 @@ import { focus } from '@wordpress/dom';
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
-import { getBlockDOMNode } from '../../utils/dom';
 
 /**
  * Returns true if the user is using windows.
@@ -87,7 +86,7 @@ function selector( select ) {
  *
  * @return {WPComponent} The component to be rendered.
  */
-function BlockSelectionButton( { clientId, rootClientId, ...props } ) {
+function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	const selected = useSelect(
 		( select ) => {
 			const {
@@ -220,16 +219,12 @@ function BlockSelectionButton( { clientId, rootClientId, ...props } ) {
 				event.preventDefault();
 				selectBlock( focusedBlockUid );
 			} else if ( isTab && selectedBlockClientId ) {
-				const wrapper = getBlockDOMNode(
-					selectedBlockClientId,
-					document
-				);
 				let nextTabbable;
 
 				if ( navigateDown ) {
-					nextTabbable = focus.tabbable.findNext( wrapper );
+					nextTabbable = focus.tabbable.findNext( blockElement );
 				} else {
-					nextTabbable = focus.tabbable.findPrevious( wrapper );
+					nextTabbable = focus.tabbable.findPrevious( blockElement );
 				}
 
 				if ( nextTabbable ) {
@@ -257,7 +252,7 @@ function BlockSelectionButton( { clientId, rootClientId, ...props } ) {
 	);
 
 	return (
-		<div className={ classNames } { ...props }>
+		<div className={ classNames }>
 			<Button
 				ref={ ref }
 				onClick={ () => setNavigationMode( false ) }

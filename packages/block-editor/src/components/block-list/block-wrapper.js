@@ -86,6 +86,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			} = select( 'core/block-editor' );
 
 			const movingClientId = hasBlockMovingClientId();
+			const _isBlockMovingMode = isSelected && !! movingClientId;
 
 			return {
 				shouldFocusFirstElement:
@@ -96,10 +97,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					? getSelectedBlocksInitialCaretPosition()
 					: undefined,
 				isNavigationMode: _isNavigationMode,
-				isBlockMovingMode: isSelected && !! movingClientId,
+				isBlockMovingMode: _isBlockMovingMode,
 				canInsertMovingBlock:
-					isSelected &&
-					movingClientId &&
+					_isBlockMovingMode &&
 					canInsertBlockType(
 						getBlockName( movingClientId ),
 						getBlockRootClientId( clientId )
