@@ -5,7 +5,7 @@ import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { getQueryArg, addQueryArgs, removeQueryArgs } from '@wordpress/url';
 
-export default function PostRouter() {
+export default function URLQueryController() {
 	const { setTemplate, setTemplatePart, showHomepage, setPage } = useDispatch(
 		'core/edit-site'
 	);
