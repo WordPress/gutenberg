@@ -63,9 +63,8 @@ function Editor() {
 		templateType,
 		page,
 		template,
-		select,
 		isNavigationOpen,
-	} = useSelect( ( _select ) => {
+	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
 			isInserterOpened,
@@ -76,7 +75,7 @@ function Editor() {
 			getTemplateType,
 			getPage,
 			isNavigationOpened,
-		} = _select( 'core/edit-site' );
+		} = select( 'core/edit-site' );
 		const _templateId = getTemplateId();
 		const _templatePartId = getTemplatePartId();
 		const _templateType = getTemplateType();
@@ -92,25 +91,23 @@ function Editor() {
 			isInserterOpen: isInserterOpened(),
 			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 			deviceType: __experimentalGetPreviewDeviceType(),
-			sidebarIsOpened: !! _select(
+			sidebarIsOpened: !! select(
 				'core/interface'
 			).getActiveComplementaryArea( 'core/edit-site' ),
 			settings: getSettings(),
 			templateType: _templateType,
 			page: getPage(),
 			template: _templateType
-				? _select( 'core' ).getEntityRecord(
+				? select( 'core' ).getEntityRecord(
 						'postType',
 						_templateType,
 						_entityId
 				  )
 				: null,
-			select: _select,
 			entityId: _entityId,
 			isNavigationOpen: isNavigationOpened(),
 		};
 	}, [] );
-	const { editEntityRecord } = useDispatch( 'core' );
 	const { updateEditorSettings } = useDispatch( 'core/editor' );
 	const { setPage, setIsInserterOpened } = useDispatch( 'core/edit-site' );
 
@@ -133,28 +130,9 @@ function Editor() {
 		() => setIsEntitiesSavedStatesOpen( true ),
 		[]
 	);
-	const closeEntitiesSavedStates = useCallback(
-		( entitiesToSave ) => {
-			if ( entitiesToSave ) {
-				const { getEditedEntityRecord } = select( 'core' );
-				const {
-					__experimentalGetTemplateInfo: getTemplateInfo,
-				} = select( 'core/editor' );
-				entitiesToSave.forEach( ( { kind, name, key, title } ) => {
-					const record = getEditedEntityRecord( kind, name, key );
-					if ( kind === 'postType' && name === 'wp_template' ) {
-						( { title } = getTemplateInfo( record ) );
-					}
-					editEntityRecord( kind, name, key, {
-						status: 'publish',
-						title: title || record.slug,
-					} );
-				} );
-			}
-			setIsEntitiesSavedStatesOpen( false );
-		},
-		[ select ]
-	);
+	const closeEntitiesSavedStates = useCallback( () => {
+		setIsEntitiesSavedStatesOpen( false );
+	}, [] );
 
 	// Set default query for misplaced Query Loop blocks, and
 	// provide the root `queryContext` for top-level Query Loop

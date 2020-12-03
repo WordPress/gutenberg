@@ -115,6 +115,64 @@ export const kinds = [
 ];
 
 /**
+ * Returns a function to be used to retrieve the title of a given post type record.
+ *
+ * @param {string} postTypeName PostType name.
+ * @return {Function} getTitle.
+ */
+export const getPostTypeTitle = ( postTypeName ) => ( record ) => {
+	if ( [ 'wp_template_part', 'wp_template' ].includes( postTypeName ) ) {
+		return (
+			record?.title?.rendered || record?.title || startCase( record.slug )
+		);
+	}
+	return record?.title?.rendered || record?.title || record.id;
+};
+
+/**
+ * Returns a function to be used to retrieve extra edits to apply before persisting a post type.
+ *
+ * @param {string} postTypeName PostType name.
+ * @return {Function} prePersistHandler.
+ */
+export const getPostTypePrePersistHandler = ( postTypeName ) => (
+	persistedRecord,
+	edits
+) => {
+	const newEdits = {};
+
+	if ( persistedRecord?.status === 'auto-draft' ) {
+		// Saving an auto-draft should create a draft by default.
+		if ( ! edits.status ) {
+			newEdits.status = 'draft';
+		}
+
+		// Fix the auto-draft default title.
+		if (
+			( ! edits.title || edits.title === 'Auto Draft' ) &&
+			( ! persistedRecord?.title ||
+				persistedRecord?.title === 'Auto Draft' )
+		) {
+			newEdits.title = '';
+		}
+	}
+
+	// Fix template titles.
+	if ( postTypeName === 'wp_template' ) {
+		newEdits.title = persistedRecord
+			? getPostTypeTitle( postTypeName )( persistedRecord )
+			: edits.slug;
+	}
+
+	// Templates and template parts can only be published.
+	if ( [ 'wp_template', 'wp_template_part' ].includes( postTypeName ) ) {
+		newEdits.status = 'publish';
+	}
+
+	return newEdits;
+};
+
+/**
  * Returns the list of post type entities.
  *
  * @return {Promise} Entities promise
@@ -133,16 +191,8 @@ function* loadPostTypeEntities() {
 				selectionEnd: true,
 			},
 			mergedEdits: { meta: true },
-			getTitle( record ) {
-				if ( [ 'wp_template_part', 'wp_template' ].includes( name ) ) {
-					return (
-						record?.title?.rendered ||
-						record?.title ||
-						startCase( record.slug )
-					);
-				}
-				return record?.title?.rendered || record?.title || record.id;
-			},
+			getTitle: getPostTypeTitle( name ),
+			__unstablePrePersist: getPostTypePrePersistHandler( name ),
 		};
 	} );
 }
