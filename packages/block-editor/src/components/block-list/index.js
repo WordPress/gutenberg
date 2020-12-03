@@ -13,16 +13,9 @@ import { useRef, forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import BlockListBlock from './block';
-import BlockListAppender, {
-	AppenderNodesContext,
-} from '../block-list-appender';
+import BlockListAppender from '../block-list-appender';
 import RootContainer from './root-container';
 import useBlockDropZone from '../use-block-drop-zone';
-
-/**
- * A map to store the reference of each "Appenders" rendered with `rootClientId` as key.
- */
-const appenderNodesMap = new Map();
 
 /**
  * If the block count exceeds the threshold, we disable the reordering animation
@@ -39,22 +32,20 @@ function BlockList(
 	const wrapperRef = ref || fallbackRef;
 
 	return (
-		<AppenderNodesContext.Provider value={ appenderNodesMap }>
-			<Container
-				ref={ wrapperRef }
-				className={ classnames(
-					'block-editor-block-list__layout',
-					className
-				) }
-			>
-				<BlockListItems
-					placeholder={ placeholder }
-					rootClientId={ rootClientId }
-					renderAppender={ renderAppender }
-					wrapperRef={ wrapperRef }
-				/>
-			</Container>
-		</AppenderNodesContext.Provider>
+		<Container
+			ref={ wrapperRef }
+			className={ classnames(
+				'block-editor-block-list__layout',
+				className
+			) }
+		>
+			<BlockListItems
+				placeholder={ placeholder }
+				rootClientId={ rootClientId }
+				renderAppender={ renderAppender }
+				wrapperRef={ wrapperRef }
+			/>
+		</Container>
 	);
 }
 
