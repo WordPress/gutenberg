@@ -544,21 +544,6 @@ export default function WritingFlow( { children } ) {
 			} else if ( isEscape ) {
 				setNavigationMode( true );
 			}
-		} else if (
-			hasMultiSelection &&
-			isTab &&
-			target === multiSelectionContainer.current
-		) {
-			// See comment above.
-			noCapture.current = true;
-
-			if ( isShift ) {
-				focusCaptureBeforeRef.current.focus();
-			} else {
-				focusCaptureAfterRef.current.focus();
-			}
-
-			return;
 		}
 
 		// When presing any key other than up or down, the initial vertical
@@ -676,6 +661,19 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
+	function onMultiSelectKeyDown( { keyCode, shiftKey } ) {
+		if ( keyCode === TAB ) {
+			// See comment above.
+			noCapture.current = true;
+
+			if ( shiftKey ) {
+				focusCaptureBeforeRef.current.focus();
+			} else {
+				focusCaptureAfterRef.current.focus();
+			}
+		}
+	}
+
 	useEffect( () => {
 		if ( hasMultiSelection && ! isMultiSelecting ) {
 			multiSelectionContainer.current.focus();
@@ -693,6 +691,19 @@ export default function WritingFlow( { children } ) {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<SelectionStart.Provider value={ onSelectionStart }>
+			<div
+				ref={ multiSelectionContainer }
+				tabIndex={ hasMultiSelection ? '0' : undefined }
+				aria-label={
+					hasMultiSelection
+						? __( 'Multiple selected blocks' )
+						: undefined
+				}
+				// Needs to be positioned within the viewport, so focus to this
+				// element does not scroll the page.
+				style={ { position: 'fixed' } }
+				onKeyDown={ onMultiSelectKeyDown }
+			/>
 			<FocusCapture
 				ref={ focusCaptureBeforeRef }
 				selectedClientId={ selectedBlockClientId }
@@ -707,18 +718,6 @@ export default function WritingFlow( { children } ) {
 				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
 			>
-				<div
-					ref={ multiSelectionContainer }
-					tabIndex={ hasMultiSelection ? '0' : undefined }
-					aria-label={
-						hasMultiSelection
-							? __( 'Multiple selected blocks' )
-							: undefined
-					}
-					// Needs to be positioned within the viewport, so focus to this
-					// element does not scroll the page.
-					style={ { position: 'fixed' } }
-				/>
 				{ children }
 			</div>
 			<FocusCapture
