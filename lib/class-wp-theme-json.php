@@ -883,7 +883,7 @@ class WP_Theme_JSON {
 	 *
 	 * @return string The new stylesheet.
 	 */
-	public function get_block_styles() {
+	private function get_block_styles() {
 		$stylesheet = '';
 		$metadata   = $this->get_blocks_metadata();
 		foreach ( $this->contexts as $context_name => $context ) {
