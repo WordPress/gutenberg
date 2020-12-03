@@ -189,8 +189,16 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			 * selected. This specifically handles the case where block does not
 			 * set focus on its own (via `setFocus`), typically if there is no
 			 * focusable input in the block.
+			 *
+			 * @param {FocusEvent} event Focus event.
 			 */
-			function onFocus() {
+			function onFocus( event ) {
+				// If an inner block is focussed, that block is resposible for
+				// setting the selected block.
+				if ( ! isInsideRootBlock( ref.current, event.target ) ) {
+					return;
+				}
+
 				selectBlock( clientId );
 			}
 
@@ -242,12 +250,24 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			}
 		}
 
+		/**
+		 * Prevents default dragging behavior within a block. To do: we must
+		 * handle this in the future and clean up the drag target.
+		 *
+		 * @param {DragEvent} event Drag event.
+		 */
+		function onDragStart( event ) {
+			event.preventDefault();
+		}
+
 		ref.current.addEventListener( 'keydown', onKeyDown );
 		ref.current.addEventListener( 'mouseleave', onMouseLeave );
+		ref.current.addEventListener( 'dragstart', onDragStart );
 
 		return () => {
 			ref.current.removeEventListener( 'mouseleave', onMouseLeave );
 			ref.current.removeEventListener( 'keydown', onKeyDown );
+			ref.current.removeEventListener( 'dragstart', onDragStart );
 		};
 	}, [ isSelected, onSelectionStart, insertDefaultBlock, removeBlock ] );
 
