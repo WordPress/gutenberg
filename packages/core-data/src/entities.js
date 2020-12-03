@@ -126,7 +126,7 @@ export const getPostTypeTitle = ( postTypeName ) => ( record ) => {
 			record?.title?.rendered || record?.title || startCase( record.slug )
 		);
 	}
-	return record?.title?.rendered || record?.title || record.id;
+	return record?.title?.rendered || record?.title || String( record.id );
 };
 
 /**
@@ -141,24 +141,12 @@ export const getPostTypePrePersistHandler = ( postTypeName ) => (
 ) => {
 	const newEdits = {};
 
-	if ( persistedRecord?.status === 'auto-draft' ) {
-		// Saving an auto-draft should create a draft by default.
-		if ( ! edits.status ) {
-			newEdits.status = 'draft';
-		}
-
-		// Fix the auto-draft default title.
-		if (
-			( ! edits.title || edits.title === 'Auto Draft' ) &&
-			( ! persistedRecord?.title ||
-				persistedRecord?.title === 'Auto Draft' )
-		) {
-			newEdits.title = '';
-		}
-	}
-
 	// Fix template titles.
-	if ( postTypeName === 'wp_template' ) {
+	if (
+		postTypeName === 'wp_template' &&
+		! edits.title &&
+		! persistedRecord.title
+	) {
 		newEdits.title = persistedRecord
 			? getPostTypeTitle( postTypeName )( persistedRecord )
 			: edits.slug;
@@ -167,6 +155,23 @@ export const getPostTypePrePersistHandler = ( postTypeName ) => (
 	// Templates and template parts can only be published.
 	if ( [ 'wp_template', 'wp_template_part' ].includes( postTypeName ) ) {
 		newEdits.status = 'publish';
+	}
+
+	if ( persistedRecord?.status === 'auto-draft' ) {
+		// Saving an auto-draft should create a draft by default.
+		if ( ! edits.status && ! newEdits.status ) {
+			newEdits.status = 'draft';
+		}
+
+		// Fix the auto-draft default title.
+		if (
+			( ! edits.title || edits.title === 'Auto Draft' ) &&
+			! newEdits.title &&
+			( ! persistedRecord?.title ||
+				persistedRecord?.title === 'Auto Draft' )
+		) {
+			newEdits.title = '';
+		}
 	}
 
 	return newEdits;

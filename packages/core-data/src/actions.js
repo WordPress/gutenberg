@@ -501,8 +501,6 @@ export function* saveEntityRecord(
 					yield receiveAutosaves( persistedRecord.id, updatedRecord );
 				}
 			} else {
-				// Auto drafts should be converted to drafts on explicit saves and we should not respect their default title,
-				// but some plugins break with this behavior so we can't filter it on the server.
 				let edits = record;
 				if ( entity.__unstablePrePersist ) {
 					edits = {
@@ -542,7 +540,7 @@ export function* saveEntityRecord(
 				updatedRecord = yield apiFetch( {
 					path,
 					method: recordId ? 'PUT' : 'POST',
-					edits,
+					data: edits,
 				} );
 				yield receiveEntityRecords(
 					kind,
