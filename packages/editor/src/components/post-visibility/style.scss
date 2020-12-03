@@ -13,7 +13,6 @@
 	.editor-post-visibility__dialog-radio[type="radio"] {
 		@include radio-control;
 		margin-top: 2px;
-		//margin-right: 8px;
 	}
 
 	.editor-post-visibility__dialog-label {
@@ -22,7 +21,6 @@
 
 	.editor-post-visibility__dialog-info {
 		margin-top: 0;
-		//margin-left: 28px;
 		margin-left: $grid-unit-40;
 	}
 
