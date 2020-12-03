@@ -128,13 +128,6 @@ class RangeTextInput extends Component {
 		onChange( validValue );
 	}
 
-	onChangeValue( initialValue ) {
-		const { decimalNum } = this.props;
-		initialValue = toFixed( initialValue, decimalNum );
-		this.setState( { inputValue: initialValue } );
-		this.updateValue( initialValue );
-	}
-
 	onChangeText( textValue ) {
 		const { decimalNum } = this.props;
 		const inputValue = removeNonDigit( textValue, decimalNum );

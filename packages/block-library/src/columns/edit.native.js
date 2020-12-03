@@ -96,7 +96,6 @@ function ColumnsEditContainer( {
 } ) {
 	const [ resizeListener, sizes ] = useResizeObserver();
 	const [ columnsInRow, setColumnsInRow ] = useState( MIN_COLUMNS_NUM );
-	const [ tempWidth, setTempWidth ] = useState( 0 );
 	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 	const globalStyles = useContext( GlobalStylesContext );
 
@@ -159,13 +158,8 @@ function ColumnsEditContainer( {
 		updateColumns( columnCount, columnCount + 1 );
 	}, [ columnCount ] );
 
-	const onChangeWidth = ( { nextWidth, valueUnit, columnId } ) => {
-		const widthWithUnit = getWidthWithUnit(
-			isPercentageUnit( valueUnit ) || ! valueUnit
-				? tempWidth
-				: nextWidth,
-			valueUnit
-		);
+	const onChangeWidth = ( nextWidth, valueUnit, columnId ) => {
+		const widthWithUnit = getWidthWithUnit( nextWidth, valueUnit );
 
 		updateInnerColumnWidth( widthWithUnit, columnId );
 	};
@@ -181,10 +175,9 @@ function ColumnsEditContainer( {
 
 	const onChange = ( nextWidth, valueUnit, columnId ) => {
 		if ( isPercentageUnit( valueUnit ) || ! valueUnit ) {
-			setTempWidth( nextWidth );
-		} else {
-			onChangeWidth( { nextWidth, valueUnit, columnId } );
+			return;
 		}
+		onChangeWidth( nextWidth, valueUnit, columnId );
 	};
 
 	const getColumnsSliders = () => {
@@ -215,11 +208,8 @@ function ColumnsEditContainer( {
 					onUnitChange={ ( nextUnit ) =>
 						onChangeUnit( nextUnit, index, column.clientId )
 					}
-					onComplete={ () => {
-						onChangeWidth( {
-							valueUnit,
-							columnId: column.clientId,
-						} );
+					onComplete={ ( nextWidth ) => {
+						onChangeWidth( nextWidth, valueUnit, column.clientId );
 					} }
 					unit={ valueUnit }
 					units={ CSS_UNITS }

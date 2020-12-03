@@ -52,7 +52,6 @@ function ColumnEdit( {
 
 	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 
-	const [ tempWidth, setTempWidth ] = useState( 0 );
 	const [ widthUnit, setWidthUnit ] = useState( valueUnit || '%' );
 
 	const updateAlignment = ( alignment ) => {
@@ -70,12 +69,7 @@ function ColumnEdit( {
 	}, [] );
 
 	const onChangeWidth = ( nextWidth ) => {
-		const widthWithUnit = getWidthWithUnit(
-			isPercentageUnit( widthUnit ) || ! widthUnit
-				? tempWidth
-				: nextWidth,
-			widthUnit
-		);
+		const widthWithUnit = getWidthWithUnit( nextWidth, widthUnit );
 
 		setAttributes( {
 			width: widthWithUnit,
@@ -95,10 +89,9 @@ function ColumnEdit( {
 
 	const onChange = ( nextWidth ) => {
 		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
-			setTempWidth( nextWidth );
-		} else {
-			onChangeWidth( nextWidth );
+			return;
 		}
+		onChangeWidth( nextWidth );
 	};
 
 	const renderAppender = () => {
@@ -181,10 +174,7 @@ function ColumnEdit( {
 					contentStyle[ clientId ],
 				] }
 			>
-				<InnerBlocks
-					renderAppender={ renderAppender }
-					parentWidth={ contentStyle[ clientId ].width }
-				/>
+				<InnerBlocks renderAppender={ renderAppender } />
 			</View>
 		</>
 	);

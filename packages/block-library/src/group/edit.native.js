@@ -87,10 +87,7 @@ function GroupEdit( {
 			] }
 		>
 			{ resizeObserver }
-			<InnerBlocks
-				renderAppender={ isSelected && renderAppender }
-				parentWidth={ width }
-			/>
+			<InnerBlocks renderAppender={ isSelected && renderAppender } />
 		</View>
 	);
 }

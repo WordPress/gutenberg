@@ -66,11 +66,12 @@ class BottomSheetRangeCell extends Component {
 	}
 
 	onChange( nextValue ) {
-		const { onChange } = this.props;
+		const { onChange, onComplete } = this.props;
 		this.setState( {
 			sliderValue: nextValue,
 		} );
 		onChange( nextValue );
+		onComplete( nextValue );
 	}
 
 	render() {
