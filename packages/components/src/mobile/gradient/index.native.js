@@ -10,6 +10,7 @@ import gradientParser from 'gradient-parser';
 import { colorsUtils } from '@wordpress/components';
 import { RadialGradient, Stop, SVG, Defs, Rect } from '@wordpress/primitives';
 import { useResizeObserver } from '@wordpress/compose';
+import { useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -112,6 +113,18 @@ function Gradient( {
 	const { width = 0, height = 0 } = sizes || {};
 	const { isGradient, getGradientType, gradients } = colorsUtils;
 
+	const colorGroup = useMemo( () => getGradientColorGroup( gradientValue ), [
+		gradientValue,
+	] );
+
+	const locations = useMemo( () => getColorLocations( gradientValue ), [
+		gradientValue,
+	] );
+
+	const colors = useMemo( () => getGradientBaseColors( gradientValue ), [
+		gradientValue,
+	] );
+
 	if ( ! gradientValue || ! isGradient( gradientValue ) ) {
 		return null;
 	}
@@ -119,15 +132,13 @@ function Gradient( {
 	const isLinearGradient =
 		getGradientType( gradientValue ) === gradients.linear;
 
-	const colorGroup = getGradientColorGroup( gradientValue );
-
 	if ( isLinearGradient ) {
 		return (
 			<RNLinearGradient
-				colors={ getGradientBaseColors( gradientValue ) }
+				colors={ colors }
 				useAngle={ true }
 				angle={ getGradientAngle( gradientValue ) }
-				locations={ getColorLocations( gradientValue ) }
+				locations={ locations }
 				angleCenter={ angleCenter }
 				style={ style }
 				{ ...otherProps }
