@@ -26,7 +26,8 @@ import { __unstableGetBlockProps as getBlockProps } from '@wordpress/blocks';
  */
 import { isInsideRootBlock } from '../../utils/dom';
 import useMovingAnimation from '../use-moving-animation';
-import { Context, SetBlockNodes } from './root-container';
+import { SetBlockNodes } from './root-container';
+import { SelectionStart } from '../writing-flow';
 import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-wrapper-elements';
 
@@ -49,7 +50,7 @@ import ELEMENTS from './block-wrapper-elements';
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const fallbackRef = useRef();
 	const ref = props.ref || fallbackRef;
-	const onSelectionStart = useContext( Context );
+	const onSelectionStart = useContext( SelectionStart );
 	const setBlockNodes = useContext( SetBlockNodes );
 	const {
 		clientId,
