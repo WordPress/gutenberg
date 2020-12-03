@@ -6,7 +6,7 @@ import { includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 /**
  * Input types which are classified as button types, for use in considering
@@ -103,9 +103,9 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 	/**
 	 * Cancel a blur check timeout.
 	 */
-	const cancelBlurCheck = () => {
+	const cancelBlurCheck = useCallback( () => {
 		clearTimeout( blurCheckTimeoutId.current );
-	};
+	}, [ blurCheckTimeoutId ] );
 
 	// Cancel blur checks on unmount.
 	useEffect( () => {
@@ -130,16 +130,22 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 	 *
 	 * @param {SyntheticEvent} event Event for mousedown or mouseup.
 	 */
-	const normalizeButtonFocus = ( event ) => {
-		const { type, target } = event;
-		const isInteractionEnd = includes( [ 'mouseup', 'touchend' ], type );
+	const normalizeButtonFocus = useCallback(
+		( event ) => {
+			const { type, target } = event;
+			const isInteractionEnd = includes(
+				[ 'mouseup', 'touchend' ],
+				type
+			);
 
-		if ( isInteractionEnd ) {
-			preventBlurCheck.current = false;
-		} else if ( isFocusNormalizedButton( target ) ) {
-			preventBlurCheck.current = true;
-		}
-	};
+			if ( isInteractionEnd ) {
+				preventBlurCheck.current = false;
+			} else if ( isFocusNormalizedButton( target ) ) {
+				preventBlurCheck.current = true;
+			}
+		},
+		[ preventBlurCheck ]
+	);
 
 	/**
 	 * A callback triggered when a blur event occurs on the element the handler
@@ -150,40 +156,49 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 	 *
 	 * @param {SyntheticEvent} event Blur event.
 	 */
-	const queueBlurCheck = ( event ) => {
-		// React does not allow using an event reference asynchronously
-		// due to recycling behavior, except when explicitly persisted.
-		event.persist();
+	const queueBlurCheck = useCallback(
+		( event ) => {
+			// React does not allow using an event reference asynchronously
+			// due to recycling behavior, except when explicitly persisted.
+			event.persist();
 
-		// Skip blur check if clicking button. See `normalizeButtonFocus`.
-		if ( preventBlurCheck.current ) {
-			return;
-		}
-
-		blurCheckTimeoutId.current = setTimeout( () => {
-			// If document is not focused then focus should remain
-			// inside the wrapped component and therefore we cancel
-			// this blur event thereby leaving focus in place.
-			// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
-			if ( ! document.hasFocus() ) {
-				event.preventDefault();
+			// Skip blur check if clicking button. See `normalizeButtonFocus`.
+			if ( preventBlurCheck.current ) {
 				return;
 			}
 
-			if ( 'function' === typeof onFocusOutside ) {
-				onFocusOutside( event );
-			} else if (
-				'function' ===
-				typeof __unstableNodeRef?.current?.handleFocusOutside
-			) {
-				// Call the legacy `handleFocusOutside` method if defined
-				// as a fallback for the `withFocusOutside` HOC.
-				const node = __unstableNodeRef.current;
-				const callback = __unstableNodeRef.current.handleFocusOutside;
-				callback.call( node, event );
-			}
-		}, 0 );
-	};
+			blurCheckTimeoutId.current = setTimeout( () => {
+				// If document is not focused then focus should remain
+				// inside the wrapped component and therefore we cancel
+				// this blur event thereby leaving focus in place.
+				// https://developer.mozilla.org/en-US/docs/Web/API/Document/hasFocus.
+				if ( ! document.hasFocus() ) {
+					event.preventDefault();
+					return;
+				}
+
+				if ( 'function' === typeof onFocusOutside ) {
+					onFocusOutside( event );
+				} else if (
+					'function' ===
+					typeof __unstableNodeRef?.current?.handleFocusOutside
+				) {
+					// Call the legacy `handleFocusOutside` method if defined
+					// as a fallback for the `withFocusOutside` HOC.
+					const node = __unstableNodeRef.current;
+					const callback =
+						__unstableNodeRef.current.handleFocusOutside;
+					callback.call( node, event );
+				}
+			}, 0 );
+		},
+		[
+			preventBlurCheck,
+			blurCheckTimeoutId,
+			onFocusOutside,
+			__unstableNodeRef,
+		]
+	);
 
 	return {
 		onFocus: cancelBlurCheck,
