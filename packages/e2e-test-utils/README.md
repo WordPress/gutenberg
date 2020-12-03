@@ -446,6 +446,18 @@ Clicks on the button in the header which opens Document Settings sidebar when it
 
 Opens the global block inserter.
 
+<a name="openPreviewPage" href="#openPreviewPage">#</a> **openPreviewPage**
+
+Opens the preview page of an edited post.
+
+_Parameters_
+
+-   _editorPage_ `Page`: puppeteer editor page.
+
+_Returns_
+
+-   `Page`: preview page.
+
 <a name="openPublishPanel" href="#openPublishPanel">#</a> **openPublishPanel**
 
 Opens the publish panel.
