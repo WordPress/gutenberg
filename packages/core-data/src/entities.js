@@ -143,7 +143,7 @@ export const getPostTypePrePersistHandler = ( postTypeName ) => (
 
 	// Fix template titles.
 	if (
-		postTypeName === 'wp_template' &&
+		[ 'wp_template', 'wp_template_part' ].includes( postTypeName ) &&
 		! edits.title &&
 		! persistedRecord.title
 	) {
