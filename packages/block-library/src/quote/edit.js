@@ -62,6 +62,7 @@ export default function QuoteEdit( {
 							onReplace( [] );
 						}
 					} }
+					aria-label={ __( 'Quote text' ) }
 					placeholder={
 						// translators: placeholder text used for the quote
 						__( 'Write quote…' )
@@ -88,6 +89,7 @@ export default function QuoteEdit( {
 							} )
 						}
 						__unstableMobileNoFocusOnMount
+						aria-label={ __( 'Quote citation text' ) }
 						placeholder={
 							// translators: placeholder text used for the citation
 							__( 'Write citation…' )
