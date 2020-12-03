@@ -10,12 +10,12 @@ import {
 } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	SlotFillProvider,
 	DropZoneProvider,
 	Popover,
 	FocusReturnProvider,
 	Button,
 } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/slot-fill';
 import { EntityProvider } from '@wordpress/core-data';
 import {
 	BlockContextProvider,

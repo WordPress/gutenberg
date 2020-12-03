@@ -5,7 +5,8 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, PanelBody } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
+import { createSlotFill } from '@wordpress/slot-fill';
 import { compose } from '@wordpress/compose';
 import { withPluginContext } from '@wordpress/plugins';
 import { withDispatch, withSelect } from '@wordpress/data';

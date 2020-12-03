@@ -7,7 +7,8 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { getBlockType } from '@wordpress/blocks';
-import { Fill, Slot, VisuallyHidden } from '@wordpress/components';
+import { VisuallyHidden } from '@wordpress/components';
+import { Fill, Slot } from '@wordpress/slot-fill';
 import { useInstanceId } from '@wordpress/compose';
 import {
 	Children,

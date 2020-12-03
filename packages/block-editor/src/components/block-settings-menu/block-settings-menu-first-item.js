@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
+import { createSlotFill } from '@wordpress/slot-fill';
 
 const { Fill: __experimentalBlockSettingsMenuFirstItem, Slot } = createSlotFill(
 	'__experimentalBlockSettingsMenuFirstItem'

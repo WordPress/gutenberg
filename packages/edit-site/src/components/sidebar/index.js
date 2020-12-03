@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
+import { createSlotFill } from '@wordpress/slot-fill';
 import { __ } from '@wordpress/i18n';
 import { cog, typography } from '@wordpress/icons';
 

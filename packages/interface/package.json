@@ -36,6 +36,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/plugins": "file:../plugins",
+		"@wordpress/slot-fill": "file:../slot-fill",
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19"

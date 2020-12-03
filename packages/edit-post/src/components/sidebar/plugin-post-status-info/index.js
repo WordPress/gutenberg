@@ -5,7 +5,8 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, PanelRow } from '@wordpress/components';
+import { PanelRow } from '@wordpress/components';
+import { createSlotFill } from '@wordpress/slot-fill';
 
 export const { Fill, Slot } = createSlotFill( 'PluginPostStatusInfo' );
 

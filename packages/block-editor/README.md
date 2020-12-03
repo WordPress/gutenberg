@@ -21,7 +21,8 @@ import {
 	WritingFlow,
 	ObserveTyping
 } from '@wordpress/block-editor';
-import { SlotFillProvider, Popover } from '@wordpress/components';
+import { Popover } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/slot-fill';
 import { useState } from '@wordpress/element';
 
 function MyEditorComponent () {

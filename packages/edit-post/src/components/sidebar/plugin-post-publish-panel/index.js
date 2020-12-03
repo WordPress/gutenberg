@@ -3,7 +3,8 @@
  */
 import { compose } from '@wordpress/compose';
 import { withPluginContext } from '@wordpress/plugins';
-import { createSlotFill, PanelBody } from '@wordpress/components';
+import { PanelBody } from '@wordpress/components';
+import { createSlotFill } from '@wordpress/slot-fill';
 
 const { Fill, Slot } = createSlotFill( 'PluginPostPublishPanel' );
 

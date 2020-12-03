@@ -42,7 +42,8 @@ describe( 'isTyping', () => {
 	it( 'should not close the dropdown when typing in it', async () => {
 		// Adds a Dropdown with an input to all blocks
 		await page.evaluate( () => {
-			const { Dropdown, ToolbarButton, Fill } = wp.components;
+			const { Dropdown, ToolbarButton } = wp.components;
+			const { Fill } = wp.slotFill;
 			const { createElement: el, Fragment } = wp.element;
 			function AddDropdown( BlockListBlock ) {
 				return ( props ) => {
