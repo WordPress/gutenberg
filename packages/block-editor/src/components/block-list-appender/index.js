@@ -98,7 +98,6 @@ function BlockListAppender( {
 				'wp-block',
 				className
 			) }
-			id={ `appender-${ rootClientId || 'root' }` }
 		>
 			{ appender }
 		</TagName>

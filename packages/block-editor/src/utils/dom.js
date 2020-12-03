@@ -114,16 +114,3 @@ export function getBlockClientId( node ) {
 
 	return blockNode.id.slice( 'block-'.length );
 }
-
-/**
- * Given a root client ID, returns the appender DOM node for the block list,
- * if exists.
- *
- * @param {string}   rootClientId Block client ID.
- * @param {Document} doc          Document to search.
- *
- * @return {Element?} Block DOM node.
- */
-export function getAppenderDOMNode( rootClientId, doc ) {
-	return doc.getElementById( `appender-${ rootClientId || 'root' }` );
-}
