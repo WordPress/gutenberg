@@ -49,19 +49,81 @@ The wp-scripts package provides support for using the Sass/Scss languages, to ge
 
 To use Sass, you need to import a `editor.scss` or `style.scss` in the `index.js` JavaScript file and it will build and output the generated file in the build directory. Note: You need to update the enqueing functions in PHP to load from the correct location.
 
+If you're not already running `npm run start` in your terminal, it would be helpful to do so now so that your code will build as you're making changes to your `index.js` and `style.scss` files inside the `src` folder. 
+
 Add the following imports to **index.js**:
 
 ```js
-import '../editor.scss';
+import './style.scss';
+import './editor.scss';
 
 import Edit from './edit';
 import save from './save';
 ```
 
-Update **gutenpride.php** to enqueue from generated file location:
+Like in the CSS file above, the same styles need to be added to the `style.scss` inside the `src` folder, changing the source of the font file as follows: 
+
+```css
+@font-face {
+	font-family: Gilbert;
+	src: url( ../gilbert-color.otf );
+	font-weight: bold;
+}
+
+.wp-block-create-block-gutenpride {
+	font-family: Gilbert;
+	font-size: 64px;
+}
+```
+
+Once your terminal attempts to compile the above code, you will get an error. 
+
+```
+ERROR in ./src/style.scss 1:0
+Module parse failed: Unexpected character '@' (1:0)
+You may need an appropriate loader to handle this file type, currently no loaders are configured to process this file. See https://webpack.js.org/concepts#loaders
+
+```
+
+This error is caused by the `otf` file which webpack is not set up to load. In order to do so we will need to install a loader from npm and create a [custom webpack configuration](https://developer.wordpress.org/block-editor/packages/packages-scripts/#provide-your-own-webpack-config) that will extend the webpack configuration built into @wordpress/scripts. 
+
+In your terminal install[`file-loader`](https://webpack.js.org/loaders/file-loader/). 
+
+`npm install file-loader --save-dev`
+
+Next, create a `webpack.config.js` file in the main folder of your plugin. 
+
+Copy the following code to configure webpack for the otf font file. 
+
+```JS
+const defaultConfig = require('@wordpress/scripts/config/webpack.config');
+
+module.exports = {
+	...defaultConfig,
+	module: {
+		...defaultConfig.module,
+		rules: [
+			...defaultConfig.module.rules,
+			{
+				test: /\.(otf)$/,
+				use: "file-loader"
+			}
+		],
+	},
+};
+```
+
+Now your otf file should compile properly with no errors. 
+
+If that's the case, update **gutenpride.php** to enqueue from generated file location by editing the value of the `$editor_css` and `$style_css` variables to the path to the newly built files in the build folder: 
 
 ```php
 $editor_css = "build/index.css";
 ```
+```php
+$style_css = 'build/style-index.css';
+```
+
+Check to see if your CSS is loading correctly with your new .otf font in your WP installation. Remember to check a browser with otf support, such as Firefox, to see the colours.
 
 Next Section: [Authoring Experience](/docs/designers-developers/developers/tutorials/create-block/author-experience.md)

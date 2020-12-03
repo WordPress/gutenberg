@@ -7,7 +7,7 @@ module.exports = {
 		rules: [
 			...defaultConfig.module.rules,
 			{
-				test: /\.(woff|woff2|eot|ttf|otf)$/,
+				test: /\.(otf)$/,
 				use: "file-loader"
 			}
 		],

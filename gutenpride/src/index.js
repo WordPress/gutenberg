@@ -34,60 +34,57 @@ import save from './save';
  * @see https://developer.wordpress.org/block-editor/developers/block-api/#registering-a-block
  */
 registerBlockType('create-block/gutenpride', {
-	/**
-	 * This is the display title for your block, which can be translated with `i18n` functions.
-	 * The block inserter will show this name.
-	 */
-	title: __('Gutenpride', 'gutenpride'),
+    /**
+     * This is the display title for your block, which can be translated with `i18n` functions.
+     * The block inserter will show this name.
+     */
+    title: __('Gutenpride', 'gutenpride'),
+
+    /**
+     * This is a short description for your block, can be translated with `i18n` functions.
+     * It will be shown in the Block Tab in the Settings Sidebar.
+     */
+    description: __(
+        'Example block written with ESNext standard and JSX support – build step required.',
+        'gutenpride'
+    ),
+
+    /**
+     * Blocks are grouped into categories to help users browse and discover them.
+     * The categories provided by core are `common`, `embed`, `formatting`, `layout` and `widgets`.
+     */
+    category: 'widgets',
+
+    /**
+     * An icon property should be specified to make it easier to identify a block.
+     * These can be any of WordPress’ Dashicons, or a custom svg element.
+     */
+    icon: 'smiley',
 
 
+    attributes: {
+        message: {
+            type: 'string',
+            source: 'text',
+            selector: 'div',
+        },
+    },
 
+    /**
+     * Optional block extended support features.
+     */
+    supports: {
+        // Removes support for an HTML mode.
+        html: false,
+    },
 
-	/**
-	 * This is a short description for your block, can be translated with `i18n` functions.
-	 * It will be shown in the Block Tab in the Settings Sidebar.
-	 */
-	description: __(
-		'Example block written with ESNext standard and JSX support – build step required.',
-		'gutenpride'
-	),
+    /**
+     * @see ./edit.js
+     */
+    edit: Edit,
 
-	/**
-	 * Blocks are grouped into categories to help users browse and discover them.
-	 * The categories provided by core are `common`, `embed`, `formatting`, `layout` and `widgets`.
-	 */
-	category: 'widgets',
-
-	/**
-	 * An icon property should be specified to make it easier to identify a block.
-	 * These can be any of WordPress’ Dashicons, or a custom svg element.
-	 */
-	icon: 'smiley',
-
-
-	attributes: {
-		message: {
-			type: 'string',
-			source: 'text',
-			selector: 'div',
-		},
-	},
-
-	/**
-	 * Optional block extended support features.
-	 */
-	supports: {
-		// Removes support for an HTML mode.
-		html: false,
-	},
-
-	/**
-	 * @see ./edit.js
-	 */
-	edit: Edit,
-
-	/**
-	 * @see ./save.js
-	 */
-	save,
+    /**
+     * @see ./save.js
+     */
+    save,
 });
