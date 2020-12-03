@@ -27,19 +27,25 @@ The standard set of breakpoint thresholds is as follows:
 
 ### Data Module
 
-The Viewport module registers itself under the `core/viewport` data namespace.
+The Viewport module registers itself under the `core/viewport` data namespace and is exposed from the package as `store`.
 
 ```js
-const isSmall = select( 'core/viewport' ).isViewportMatch( '< medium' );
+import { select } from '@wordpress/data';
+import { store } from '@wordpress/viewport';
+
+const isSmall = select( store ).isViewportMatch( '< medium' );
 ```
 
 The `isViewportMatch` selector accepts a single string argument `query`. It consists of an optional operator and breakpoint name, separated with a space. The operator can be `<` or `>=`, defaulting to `>=`.
 
 ```js
-const { isViewportMatch } = select( 'core/viewport' );
+import { select } from '@wordpress/data';
+import { store } from '@wordpress/viewport';
+
+const { isViewportMatch } = select( store );
 const isSmall = isViewportMatch( '< medium' );
 const isWideOrHuge = isViewportMatch( '>= wide' );
-// Equivalent: 
+// Equivalent:
 //  const isWideOrHuge = isViewportMatch( 'wide' );
 ```
 

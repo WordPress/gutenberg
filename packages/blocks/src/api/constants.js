@@ -13,19 +13,64 @@ export const DEPRECATED_ENTRY_KEYS = [
 ];
 
 export const __EXPERIMENTAL_STYLE_PROPERTY = {
-	'--wp--style--color--link': [ 'color', 'link' ],
-	background: [ 'color', 'gradient' ],
-	backgroundColor: [ 'color', 'background' ],
-	color: [ 'color', 'text' ],
-	fontSize: [ 'typography', 'fontSize' ],
-	fontStyle: [ 'typography', 'fontStyle' ],
-	fontWeight: [ 'typography', 'fontWeight' ],
-	lineHeight: [ 'typography', 'lineHeight' ],
-	textDecoration: [ 'typography', 'textDecoration' ],
-	textTransform: [ 'typography', 'textTransform' ],
-	paddingBottom: [ 'spacing', 'padding', 'bottom' ],
-	paddingLeft: [ 'spacing', 'padding', 'left' ],
-	paddingRight: [ 'spacing', 'padding', 'right' ],
-	paddingTop: [ 'spacing', 'padding', 'top' ],
-	fontFamily: [ 'typography', 'fontFamily' ],
+	'--wp--style--color--link': {
+		value: [ 'color', 'link' ],
+		support: [ 'color', 'link' ],
+	},
+	background: {
+		value: [ 'color', 'gradient' ],
+		support: [ 'color', 'gradients' ],
+	},
+	backgroundColor: {
+		value: [ 'color', 'background' ],
+		support: [ 'color' ],
+	},
+	color: {
+		value: [ 'color', 'text' ],
+		support: [ 'color' ],
+	},
+	fontFamily: {
+		value: [ 'typography', 'fontFamily' ],
+		support: [ '__experimentalFontFamily' ],
+	},
+	fontSize: {
+		value: [ 'typography', 'fontSize' ],
+		support: [ 'fontSize' ],
+	},
+	fontStyle: {
+		value: [ 'typography', 'fontStyle' ],
+		support: [ '__experimentalFontStyle' ],
+	},
+	fontWeight: {
+		value: [ 'typography', 'fontWeight' ],
+		support: [ '__experimentalFontWeight' ],
+	},
+	lineHeight: {
+		value: [ 'typography', 'lineHeight' ],
+		support: [ 'lineHeight' ],
+	},
+	paddingBottom: {
+		value: [ 'spacing', 'padding', 'bottom' ],
+		support: [ 'spacing', 'padding' ],
+	},
+	paddingLeft: {
+		value: [ 'spacing', 'padding', 'left' ],
+		support: [ 'spacing', 'padding' ],
+	},
+	paddingRight: {
+		value: [ 'spacing', 'padding', 'right' ],
+		support: [ 'spacing', 'padding' ],
+	},
+	paddingTop: {
+		value: [ 'spacing', 'padding', 'top' ],
+		support: [ 'spacing', 'padding' ],
+	},
+	textDecoration: {
+		value: [ 'typography', 'textDecoration' ],
+		support: [ '__experimentalTextDecoration' ],
+	},
+	textTransform: {
+		value: [ 'typography', 'textTransform' ],
+		support: [ '__experimentalTextTransform' ],
+	},
 };

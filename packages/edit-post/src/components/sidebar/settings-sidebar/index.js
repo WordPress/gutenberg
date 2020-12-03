@@ -4,6 +4,7 @@
 import { BlockInspector } from '@wordpress/block-editor';
 import { cog } from '@wordpress/icons';
 import { Platform } from '@wordpress/element';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -49,7 +50,7 @@ const SettingsSidebar = () => {
 			sidebar = 'edit-post/document';
 		}
 		const shortcut = select(
-			'core/keyboard-shortcuts'
+			keyboardShortcutsStore
 		).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' );
 		return { sidebarName: sidebar, keyboardShortcut: shortcut };
 	}, [] );

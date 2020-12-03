@@ -2,7 +2,11 @@
  * WordPress dependencies
  */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
-import { serialize, pasteHandler } from '@wordpress/blocks';
+import {
+	serialize,
+	pasteHandler,
+	store as blocksStore,
+} from '@wordpress/blocks';
 import {
 	documentHasSelection,
 	documentHasUncollapsedSelection,
@@ -21,7 +25,7 @@ export function useNotifyCopy() {
 		[]
 	);
 	const { getBlockType } = useSelect(
-		( select ) => select( 'core/blocks' ),
+		( select ) => select( blocksStore ),
 		[]
 	);
 	const { createSuccessNotice } = useDispatch( 'core/notices' );

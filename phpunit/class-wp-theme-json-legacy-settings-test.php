@@ -138,7 +138,7 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 					'gradient' => 'gradientvalue',
 				),
 			),
-			'fontSizes'             => array(
+			'fontSizes'              => array(
 				array(
 					'slug' => 'size-slug',
 					'name' => 'Size Name',
@@ -150,7 +150,7 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 		$expected = array(
 			'global' => array(
 				'settings' => array(
-					'color' => array(
+					'color'      => array(
 						'custom'         => false,
 						'customGradient' => false,
 						'gradients'      => array(
@@ -172,9 +172,9 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 						'units' => array( 'px', 'em', 'rem', 'vh', 'vw' ),
 					),
 					'typography' => array(
-						'customFontSize'    => false,
-						'customLineHeight'  => true,
-						'fontSizes'         => array(
+						'customFontSize'   => false,
+						'customLineHeight' => true,
+						'fontSizes'        => array(
 							array(
 								'slug' => 'size-slug',
 								'name' => 'Size Name',

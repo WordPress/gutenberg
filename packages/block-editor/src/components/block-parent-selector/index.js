@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { getBlockType } from '@wordpress/blocks';
+import { getBlockType, store as blocksStore } from '@wordpress/blocks';
 import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, sprintf } from '@wordpress/i18n';
@@ -26,7 +26,7 @@ export default function BlockParentSelector() {
 				getBlockParents,
 				getSelectedBlockClientId,
 			} = select( 'core/block-editor' );
-			const { hasBlockSupport } = select( 'core/blocks' );
+			const { hasBlockSupport } = select( blocksStore );
 			const selectedBlockClientId = getSelectedBlockClientId();
 			const parents = getBlockParents( selectedBlockClientId );
 			const _firstParentClientId = parents[ parents.length - 1 ];
