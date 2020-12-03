@@ -1,4 +1,6 @@
 /**
+ * Quickly checks to see if two objects (shallow or deep) are equal.
+ *
  * @param {any} objA
  * @param {any} objB
  *

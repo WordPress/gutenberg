@@ -1,7 +1,7 @@
+/**
+ * Clears the text selection on screen.
+ */
 export function clearSelection() {
-	/**
-	 * Clear selection
-	 */
 	if ( window?.getSelection ) {
 		const selection = window?.getSelection();
 		if ( ! selection ) {

@@ -1,26 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
-
-/**
- * @type {WeakMap<any, number>}
- */
-const uniqueIdMap = new WeakMap();
-
-/**
- * Creates a new id for a given object.
- *
- * @param {unknown} object Object reference to create an id for.
- *
- * @return {number} The unique index (id).
- */
-function createId( object ) {
-	const instances = uniqueIdMap.get( object ) || 0;
-	uniqueIdMap.set( object, instances + 1 );
-
-	return instances;
-}
+import { useInstanceId } from '@wordpress/compose';
 
 /**
  * Provides a unique instance ID.
@@ -32,10 +13,7 @@ function createId( object ) {
  * @return {string | number} The unique id.
  */
 export function useUniqueId( object, prefix, preferredId = '' ) {
-	return useMemo( () => {
-		if ( preferredId ) return preferredId;
-		const id = createId( object );
+	const instanceId = useInstanceId( object, prefix );
 
-		return prefix ? `${ prefix }-${ id }` : id;
-	}, [ object, preferredId, prefix ] );
+	return preferredId || instanceId;
 }

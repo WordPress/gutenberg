@@ -6,6 +6,8 @@ import _ from 'lodash';
 const { Blob, File } = window;
 
 /**
+ * Checks to see if a value is a numeric value (`number` or `string`).
+ *
  * @param {any} o
  *
  * @return {boolean} Whether value is numeric.
@@ -21,6 +23,8 @@ const numeric = ( o ) => {
 };
 
 /**
+ * Checks to see if a value is either `0` or `'0'`.
+ *
  * @param {any} o
  *
  * @return {boolean} Whether value is a numeric `0`.
@@ -29,19 +33,30 @@ const numericZero = ( o ) => {
 	return o === 0 || o === '0';
 };
 
+/* eslint-disable jsdoc/valid-types */
 /**
+ * Checks to see if a value is not undefined and not null.
+ *
  * @template T
  * @param {T} o
  *
  * @return {o is Exclude<T, undefined | null>} Whether value is defined.
  */
+/* eslint-enable jsdoc/valid-types */
 const defined = ( o ) => ! _.isNil( o );
 
+/**
+ * A collection of type checks.
+ */
 export const is = {
+	/* eslint-disable jsdoc/valid-types */
 	/** @type {(o: any) => o is Blob} */
+	/* eslint-enable jsdoc/valid-types */
 	blob: ( o ) => o instanceof Blob,
 	defined,
+	/* eslint-disable jsdoc/valid-types */
 	/** @type {(o: any) => o is File} */
+	/* eslint-enable jsdoc/valid-types */
 	file: ( o ) => o instanceof File,
 	numeric,
 	numericZero,
@@ -49,7 +64,9 @@ export const is = {
 	// This is safe because we only accept Interpolation rather than any
 	// _.isPlainObject(TemplateStringsArray) -> false
 	// _.isPlainObject is also `false` for the rest of the values that `Interpolation` covers except for `ObjectInterpolation` :)
+	/* eslint-disable jsdoc/valid-types */
 	/** @type {(o: TemplateStringsArray | import('create-emotion').Interpolation) => o is import('create-emotion').ObjectInterpolation} */
+	/* eslint-enable jsdoc/valid-types */
 	objectInterpolation: ( o ) => _.isPlainObject( o ),
 
 	/**

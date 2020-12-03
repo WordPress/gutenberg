@@ -24,6 +24,7 @@
 	"react-native": "src/index",
 	"types": "build-types",
 	"dependencies": {
+		"@wordpress/compose": "file:../compose",
 		"@wordpress/element": "file:../element",
 		"array-move": "^3.0.1",
 		"copy-to-clipboard": "^3.3.1",

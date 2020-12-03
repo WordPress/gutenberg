@@ -12,6 +12,5 @@ import { is } from './is';
  */
 export function isValueEmpty( value ) {
 	const isEmptyString = value === '';
-
 	return ! is.defined( value ) || isEmptyString;
 }

@@ -15,7 +15,9 @@ import { is } from './is';
  */
 export function mergeEvent( handler, otherHandler ) {
 	return (
+		/* eslint-disable jsdoc/no-undefined-types */
 		/** @type {TEvent} */
+		/* eslint-enable jsdoc/no-undefined-types */
 		event
 	) => {
 		if ( is.function( handler ) ) {
