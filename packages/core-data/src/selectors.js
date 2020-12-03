@@ -740,3 +740,19 @@ export const getReferenceByDistinctEdits = createSelector(
 		state.undo.flattenedUndo,
 	]
 );
+
+/**
+ * Retrieve the frontend template used for a given link.
+ *
+ * @param {Object} state Editor state.
+ * @param {string} link  Link.
+ *
+ * @return {Object?} The template record.
+ */
+export function __experimentalGetTemplateForLink( state, link ) {
+	const records = getEntityRecords( state, 'postType', 'wp_template', {
+		'find-template': link,
+	} );
+
+	return records?.length ? records[ 0 ] : null;
+}

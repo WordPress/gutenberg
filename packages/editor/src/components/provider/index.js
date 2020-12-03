@@ -27,6 +27,7 @@ import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 import withRegistryProvider from './with-registry-provider';
 import { mediaUpload } from '../../utils';
 import ConvertToGroupButtons from '../convert-to-group-buttons';
+import serializeBlocks from '../../store/utils/serialize-blocks';
 
 /**
  * Fetches link suggestions from the API. This function is an exact copy of a function found at:
@@ -214,6 +215,10 @@ class EditorProvider extends Component {
 	}
 
 	getDefaultBlockContext( postId, postType ) {
+		// To avoid infinite loops, the template CPT shouldn't provide itself as a post content.
+		if ( postType === 'wp_template' ) {
+			return {};
+		}
 		return { postId, postType };
 	}
 
@@ -224,6 +229,13 @@ class EditorProvider extends Component {
 	componentDidUpdate( prevProps ) {
 		if ( this.props.settings !== prevProps.settings ) {
 			this.props.updateEditorSettings( this.props.settings );
+		}
+		if (
+			this.props.__unstableTemplate &&
+			this.props.__unstableTemplate.id !==
+				prevProps.__unstableTemplate?.id
+		) {
+			this.props.setupTemplate( this.props.__unstableTemplate );
 		}
 	}
 
@@ -297,21 +309,21 @@ class EditorProvider extends Component {
 
 export default compose( [
 	withRegistryProvider,
-	withSelect( ( select ) => {
+	withSelect( ( select, { __unstableTemplate, post } ) => {
 		const {
 			canUserUseUnfilteredHTML,
 			__unstableIsEditorReady: isEditorReady,
-			getEditorBlocks,
 			getEditorSelectionStart,
 			getEditorSelectionEnd,
 			isPostTitleSelected,
 		} = select( 'core/editor' );
-		const { canUser } = select( 'core' );
+		const { canUser, getEditedEntityRecord } = select( 'core' );
 
+		const { id, type } = __unstableTemplate ?? post;
 		return {
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			isReady: isEditorReady(),
-			blocks: getEditorBlocks(),
+			blocks: getEditedEntityRecord( 'postType', type, id ).blocks,
 			selectionStart: getEditorSelectionStart(),
 			selectionEnd: getEditorSelectionEnd(),
 			reusableBlocks: select( 'core' ).getEntityRecords(
@@ -327,30 +339,66 @@ export default compose( [
 			isPostTitleSelected: isPostTitleSelected && isPostTitleSelected(),
 		};
 	} ),
-	withDispatch( ( dispatch ) => {
+	withDispatch( ( dispatch, props ) => {
 		const {
 			setupEditor,
 			updatePostLock,
-			resetEditorBlocks,
 			updateEditorSettings,
 			__experimentalTearDownEditor,
 			undo,
+			__unstableSetupTemplate,
 		} = dispatch( 'core/editor' );
 		const { createWarningNotice } = dispatch( 'core/notices' );
+		const { __unstableCreateUndoLevel, editEntityRecord } = dispatch(
+			'core'
+		);
+
+		// This is not breaking the withDispatch rule.
+		// eslint-disable-next-line no-restricted-syntax
+		function updateBlocks( blocks, options ) {
+			const {
+				post,
+				__unstableTemplate: template,
+				blocks: currentBlocks,
+			} = props;
+			const { id, type } = template ?? post;
+			const {
+				__unstableShouldCreateUndoLevel,
+				selectionStart,
+				selectionEnd,
+			} = options;
+			const edits = { blocks, selectionStart, selectionEnd };
+
+			if ( __unstableShouldCreateUndoLevel !== false ) {
+				const noChange = currentBlocks === edits.blocks;
+				if ( noChange ) {
+					return __unstableCreateUndoLevel( 'postType', type, id );
+				}
+
+				// We create a new function here on every persistent edit
+				// to make sure the edit makes the post dirty and creates
+				// a new undo level.
+				edits.content = ( { blocks: blocksForSerialization = [] } ) =>
+					serializeBlocks( blocksForSerialization );
+			}
+
+			editEntityRecord( 'postType', type, id, edits );
+		}
 
 		return {
 			setupEditor,
 			updatePostLock,
 			createWarningNotice,
-			resetEditorBlocks,
+			resetEditorBlocks: updateBlocks,
 			updateEditorSettings,
 			resetEditorBlocksWithoutUndoLevel( blocks, options ) {
-				resetEditorBlocks( blocks, {
+				updateBlocks( blocks, {
 					...options,
 					__unstableShouldCreateUndoLevel: false,
 				} );
 			},
 			tearDownEditor: __experimentalTearDownEditor,
+			setupTemplate: __unstableSetupTemplate,
 			undo,
 		};
 	} ),
