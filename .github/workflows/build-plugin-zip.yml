@@ -50,6 +50,7 @@ jobs:
 
   create-release:
     name: Create Release Draft and Attach Asset
+    needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, "v")
     steps:
