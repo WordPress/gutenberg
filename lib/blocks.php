@@ -28,6 +28,7 @@ function gutenberg_reregister_core_block_types() {
 				'html',
 				'image',
 				'list',
+				'marquee',
 				'media-text',
 				'missing',
 				'more',

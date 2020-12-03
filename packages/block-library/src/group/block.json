@@ -9,6 +9,15 @@
 		},
 		"templateLock": {
 			"type": "string"
+		},
+		"style": {
+			"default": {
+				"spacing": {
+					"padding": {
+						"default": 20
+					}
+				}
+			}
 		}
 	},
 	"supports": {

@@ -237,6 +237,9 @@ export const getBlockSupport = (
  * @return {boolean} Whether block supports feature.
  */
 export function hasBlockSupport( state, nameOrType, feature, defaultSupports ) {
+	console.log( state );
+	console.log( nameOrType );
+	console.log( feature );
 	return !! getBlockSupport( state, nameOrType, feature, defaultSupports );
 }
 

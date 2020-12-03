@@ -80,6 +80,10 @@ export function FontFamilyEdit( {
  */
 export function useIsFontFamilyDisabled( { name } ) {
 	const fontFamilies = useEditorFeature( 'typography.fontFamilies' );
+	console.log( ' useIsFontFamilyDisabled ' );
+	console.log( name );
+	console.log( fontFamilies );
+	console.log( hasBlockSupport( name, FONT_FAMILY_SUPPORT_KEY ) );
 	return (
 		! fontFamilies ||
 		fontFamilies.length === 0 ||
