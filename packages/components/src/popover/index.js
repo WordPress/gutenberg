@@ -272,6 +272,7 @@ const Popover = ( {
 	__unstableSlotName = SLOT_NAME,
 	__unstableObserveElement,
 	__unstableBoundaryParent,
+	__unstableForcePosition,
 	/* eslint-enable no-unused-vars */
 	...contentProps
 } ) => {
@@ -361,7 +362,8 @@ const Popover = ( {
 				__unstableStickyBoundaryElement,
 				containerRef.current,
 				relativeOffsetTop,
-				boundaryElement
+				boundaryElement,
+				__unstableForcePosition
 			);
 
 			if (
