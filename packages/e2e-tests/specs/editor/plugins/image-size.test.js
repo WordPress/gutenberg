@@ -29,7 +29,6 @@ describe( 'changing image size', () => {
 	} );
 
 	it( 'should insert and change my image size', async () => {
-		// Create a paragraph.
 		await insertBlock( 'Image' );
 		await clickButton( 'Media Library' );
 
@@ -59,7 +58,6 @@ describe( 'changing image size', () => {
 
 		// Select the new size updated with the plugin.
 		await openDocumentSettingsSidebar();
-
 		const imageSizeLabel = await page.waitForXPath(
 			'//label[text()="Image size"]'
 		);
@@ -69,16 +67,13 @@ describe( 'changing image size', () => {
 		);
 		await imageSizeSelect.select( 'custom-size-one' );
 
+		// Verify that the custom size was applied to the image.
 		await page.waitForSelector( '.wp-block-image.size-custom-size-one' );
-
-		// Disable reason: Wait for the input element to update with the new
-		// value, otherwise it can still contain the old one.
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 100 );
-		const customImageWidth = await page.$eval(
-			'.block-editor-image-size-control__width input',
-			( el ) => parseInt( el.value, 10 )
+		await page.waitForFunction(
+			() =>
+				document.querySelector(
+					'.block-editor-image-size-control__width input'
+				).value === '499'
 		);
-		expect( customImageWidth ).toBe( 499 );
 	} );
 } );
