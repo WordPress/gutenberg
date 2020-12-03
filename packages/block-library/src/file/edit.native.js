@@ -462,7 +462,7 @@ export class FileEdit extends Component {
 									isUploadInProgress,
 									isUploadFailed
 								) }
-								<View>
+								<View style={ styles.container }>
 									<RichText
 										__unstableMobileNoFocusOnMount
 										onChange={ this.onChangeFileName }
