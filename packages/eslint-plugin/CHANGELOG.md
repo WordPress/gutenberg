@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Add `no-unsafe-wp-apis` rule to discourage usage of unsafe APIs ([#27301](https://github.com/WordPress/gutenberg/pull/27301)).
+
 ### Documentation
 
 -   Include a note about the minimum version required for `node` (10.0.0) and `npm` (6.9.0).

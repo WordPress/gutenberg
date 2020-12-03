@@ -23,18 +23,19 @@ const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
 function ButtonsEdit( {
-	attributes: { contentJustification },
+	attributes: { contentJustification, orientation },
 	setAttributes,
 } ) {
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `is-content-justification-${ contentJustification }` ]: contentJustification,
+			'is-vertical': orientation === 'vertical',
 		} ),
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		template: BUTTONS_TEMPLATE,
-		orientation: 'horizontal',
+		orientation,
 		__experimentalLayout: {
 			type: 'default',
 			alignments: [],

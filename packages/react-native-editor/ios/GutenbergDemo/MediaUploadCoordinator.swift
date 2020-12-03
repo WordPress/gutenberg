@@ -20,6 +20,7 @@ class MediaUploadCoordinator: NSObject {
 
   func upload(url: URL) -> Int32? {
     //Make sure the media is not larger than a 32 bits to number to avoid problems when bridging to JS
+    successfullUpload = true
     let mediaID = Int32(truncatingIfNeeded:UUID().uuidString.hash)
     let progress = Progress(parent: nil, userInfo: [ProgressUserInfoKey.mediaID: mediaID, ProgressUserInfoKey.mediaURL: url])
     progress.totalUnitCount = 100
