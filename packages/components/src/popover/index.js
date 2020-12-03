@@ -17,6 +17,11 @@ import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
 import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
+import {
+	Slot,
+	Fill,
+	__experimentalUseSlot as useSlot,
+} from '@wordpress/slot-fill';
 
 /**
  * Internal dependencies
@@ -28,7 +33,6 @@ import PopoverDetectOutside from './detect-outside';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import IsolatedEventContainer from '../isolated-event-container';
-import { Slot, Fill, useSlot } from '../slot-fill';
 import { getAnimateClassName } from '../animate';
 
 const FocusManaged = withConstrainedTabbing(
