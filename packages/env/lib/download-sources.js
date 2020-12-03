@@ -14,7 +14,6 @@ const path = require( 'path' );
 const pipeline = util.promisify( require( 'stream' ).pipeline );
 const extractZip = util.promisify( require( 'extract-zip' ) );
 const rimraf = util.promisify( require( 'rimraf' ) );
-const copyDir = util.promisify( require( 'copy-dir' ) );
 
 /**
  * @typedef {import('./config').Config} Config
@@ -195,18 +194,41 @@ async function downloadZipSource( source, { onProgress, spinner, debug } ) {
 	);
 	await pipeline( responseStream, zipFile );
 
-	log( 'Extracting to temporary folder.' );
-	const dirName = `${ source.path }.temp`;
-	await extractZip( zipName, { dir: dirName } );
+	log( 'Extracting to temporary directory.' );
+	const tempDir = `${ source.path }.temp`;
+	await extractZip( zipName, { dir: tempDir } );
 
-	log( 'Copying to mounted folder and cleaning up.' );
-	await Promise.all( [
-		rimraf( zipName ),
-		...( await fs.promises.readdir( dirName ) ).map( ( file ) =>
-			copyDir( path.join( dirName, file ), source.path )
-		),
-	] );
-	await rimraf( dirName );
+	const files = (
+		await Promise.all( [
+			rimraf( zipName ),
+			rimraf( source.path ),
+			fs.promises.readdir( tempDir ),
+		] )
+	 )[ 2 ];
+
+	/**
+	 * The plugin container is the extracted directory which is the direct parent
+	 * of the contents of the plugin. It seems a zip file can have two fairly
+	 * common approaches to where the content lives:
+	 * 1. The .zip is the direct container of the files. So after extraction, the
+	 *    extraction directory contains plugin contents.
+	 * 2. The .zip contains a directory with the same name which is the container.
+	 *    So after extraction, the extraction directory contains another directory.
+	 *    That subdirectory is the actual container of the plugin contents.
+	 *
+	 * We support both situations with the following check.
+	 */
+	let pluginContainer = tempDir;
+	const firstSubItem = path.join( tempDir, files[ 0 ] );
+	if (
+		files.length === 1 &&
+		( await fs.promises.lstat( firstSubItem ) ).isDirectory()
+	) {
+		// In this case, only one sub directory exists, so use that as the container.
+		pluginContainer = firstSubItem;
+	}
+	await fs.promises.rename( pluginContainer, source.path );
+	await rimraf( tempDir );
 
 	onProgress( 1 );
 }
