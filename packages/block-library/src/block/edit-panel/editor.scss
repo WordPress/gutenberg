@@ -51,7 +51,7 @@
 	@include input-control;
 }
 
-.is-navigate-mode .is-selected .reusable-block-edit-panel {
+.is-navigate-mode.is-selected .reusable-block-edit-panel {
 	box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
 
 	.is-dark-theme & {

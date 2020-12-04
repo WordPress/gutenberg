@@ -18,7 +18,7 @@ import useMovingAnimation from '../../use-moving-animation';
 import { SetBlockNodes } from '../root-container';
 import { BlockListBlockContext } from '../block';
 import { useFocusFirstElement } from './use-focus-first-element';
-import { useIsHovered } from './use-is-hovered';
+import { useNavigationModeClassNames } from './use-navigation-mode-class-names';
 import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
 import { useEventHandlers } from './use-event-handlers';
 
@@ -103,7 +103,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		index
 	);
 
-	const isHovered = useIsHovered( ref );
+	const navigationModeClassNames = useNavigationModeClassNames( ref );
 	const blockMovingModeClassNames = useBlockMovingModeClassNames( clientId );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 
@@ -123,7 +123,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			props.className,
 			wrapperProps.className,
 			blockMovingModeClassNames,
-			{ 'is-hovered': isHovered }
+			navigationModeClassNames
 		),
 		style: { ...wrapperProps.style, ...props.style },
 	};

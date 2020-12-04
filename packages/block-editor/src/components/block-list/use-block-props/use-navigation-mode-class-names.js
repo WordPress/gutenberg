@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useState } from '@wordpress/element';
@@ -9,19 +14,29 @@ import { useSelect } from '@wordpress/data';
 /**
  * Returns true when the block is hovered and in navigation mode, false if not.
  *
- * @param {RefObject} ref React ref with the block element.
+ * @param {RefObject} ref      React ref with the block element.
+ * @param {string}    clientId Block client ID.
  *
  * @return {boolean} Hovered state.
  */
-export function useIsHovered( ref ) {
+export function useNavigationModeClassNames( ref, clientId ) {
 	const [ isHovered, setHovered ] = useState( false );
-	const isNavigationMode = useSelect(
-		( select ) => select( 'core/block-editor' ).isNavigationMode(),
-		[]
+	const { isNavMode, isSelected } = useSelect(
+		( select ) => {
+			const { isNavigationMode, isBlockSelected } = select(
+				'core/block-editor'
+			);
+
+			return {
+				isSelected: isBlockSelected( clientId ),
+				isNavMode: isNavigationMode(),
+			};
+		},
+		[ clientId ]
 	);
 
 	useEffect( () => {
-		if ( ! isNavigationMode ) {
+		if ( ! isNavMode ) {
 			return;
 		}
 
@@ -46,7 +61,10 @@ export function useIsHovered( ref ) {
 		}
 
 		return addListener( 'mouseover', true );
-	}, [ isNavigationMode, isHovered, setHovered ] );
+	}, [ isNavMode, isHovered, setHovered ] );
 
-	return isHovered;
+	return classnames( {
+		'is-hovered': isHovered,
+		'is-navigate-mode': isSelected && isNavMode,
+	} );
 }

@@ -82,7 +82,7 @@
 	}
 }
 
-.is-navigate-mode .is-selected .wp-block-template-part__name-panel {
+.is-navigate-mode.is-selected .wp-block-template-part__name-panel {
 	box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
 
 	.is-dark-theme & {
