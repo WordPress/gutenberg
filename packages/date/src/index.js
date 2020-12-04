@@ -310,18 +310,8 @@ const formatMap = {
 		);
 	},
 	// Full date/time
-	c( dateValue ) {
-		return formatTZ(
-			utcToZonedTime(
-				zonedTimeToUtc( dateValue, getActualTimezone() ),
-				'UTC'
-			), // Offsets the time to the correct timezone
-			"yyyy-MM-dd'T'HH:mm:ssXXX",
-			{
-				timeZone: getActualTimezone(), // Adds the timezone offset to the Date object that will be formatted.
-			}
-		);
-	}, // .toISOString
+	c: "yyyy-MM-dd'T'HH:mm:ssXXX", // .toISOString
+
 	r( dateValue ) {
 		return formatTZ(
 			utcToZonedTime(
@@ -526,9 +516,12 @@ export function format( dateFormat, dateValue = new Date() ) {
  * @return {string} Formatted date in English.
  */
 export function date( dateFormat, dateValue = new Date(), timezone ) {
-	return format(
-		dateFormat,
-		utcToZonedTime( dateValue, getActualTimezone( timezone ) )
+	return formatTZ(
+		toTimezone( dateValue, timezone ),
+		translateFormat( dateFormat, toTimezone( dateValue, timezone ) ),
+		{
+			timeZone: getActualTimezone( timezone ),
+		}
 	);
 }
 
@@ -576,11 +569,8 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
 	}
 
 	return formatTZ(
-		utcToZonedTime(
-			zonedTimeToUtc( dateValue, getActualTimezone() ),
-			getActualTimezone( timezone )
-		),
-		translateFormat( dateFormat, dateValue ),
+		toTimezone( dateValue, timezone ),
+		translateFormat( dateFormat, toTimezone( dateValue, timezone ) ),
 		{
 			timeZone: getActualTimezone( timezone ),
 			locale: {
@@ -606,7 +596,7 @@ export function dateI18n( dateFormat, dateValue = new Date(), timezone ) {
 export function gmdateI18n( dateFormat, dateValue = new Date() ) {
 	return formatTZ(
 		utcToZonedTime( dateValue, 'UTC' ),
-		translateFormat( dateFormat, dateValue ),
+		translateFormat( dateFormat, utcToZonedTime( dateValue, 'UTC' ) ),
 		{
 			timeZone: 'UTC',
 			locale: {
@@ -624,14 +614,18 @@ export function gmdateI18n( dateFormat, dateValue = new Date() ) {
  *
  * @return {number} offset in milliseconds
  */
-function getTimezoneOffset() {
-	const localDate = new Date();
-	const utcDate = addMinutes( localDate, localDate.getTimezoneOffset() );
-	const siteDate = subMinutes(
-		utcToZonedTime( utcDate, getActualTimezone() ),
-		localDate.getTimezoneOffset()
-	);
+function getTimezoneOffset( localDate = new Date(), timezone ) {
+	localDate = toDate( localDate );
+	const utcDate = subMinutes( localDate, localDate.getTimezoneOffset() );
+	const siteDate = utcToZonedTime( utcDate, getActualTimezone( timezone ) );
 	return siteDate.getTime() - localDate.getTime();
+}
+
+function toTimezone( localDate, timezone = getActualTimezone() ) {
+	return subMilliseconds(
+		toDate( localDate ),
+		-getTimezoneOffset( localDate, timezone )
+	);
 }
 
 /**

@@ -32,14 +32,16 @@ describe( 'localDateToSiteDate', () => {
 				string: '',
 			},
 		} );
-		const offsetDifferenceInHours =
-			offsetInHours + new Date().getTimezoneOffset() / 60;
 
-		const localDate = new Date( 2020, 0, 0, 10, 10, 0 );
-		const siteDate = localDateToSiteDate( localDate );
-
+		let localDate = new Date( 2020, 0, 0, 10, 10, 0 );
+		let siteDate = localDateToSiteDate( localDate );
 		expect( siteDate.getTime() - localDate.getTime() ).toBe(
-			offsetDifferenceInHours * HOUR_IN_MILLIS
+			offsetInHours * HOUR_IN_MILLIS
+		);
+		localDate = new Date( 2020, 10, 0, 10, 10, 0 );
+		siteDate = localDateToSiteDate( localDate );
+		expect( siteDate.getTime() - localDate.getTime() ).toBe(
+			offsetInHours * HOUR_IN_MILLIS
 		);
 	} );
 } );
@@ -55,14 +57,12 @@ describe( 'siteDateToLocalDate', () => {
 				string: '',
 			},
 		} );
-		const offsetDifferenceInHours =
-			offsetInHours + new Date().getTimezoneOffset() / 60;
 
 		const siteDate = new Date( 2020, 0, 0, 10, 10, 0 );
 		const localDate = localDateToSiteDate( siteDate );
 
 		expect( localDate.getTime() - siteDate.getTime() ).toBe(
-			offsetDifferenceInHours * HOUR_IN_MILLIS
+			offsetInHours * HOUR_IN_MILLIS
 		);
 	} );
 } );
@@ -537,7 +537,7 @@ describe( 'PHP Format Tokens', () => {
 
 		const formattedDate = dateNoI18n( 'c', '2019-06-18T11:00:00.000Z' );
 
-		expect( formattedDate ).toBe( '2019-06-18T11:00:00-05:00' );
+		expect( formattedDate ).toBe( '2019-06-18T06:00:00-05:00' );
 
 		setSettings( settings );
 	} );
