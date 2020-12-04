@@ -45,6 +45,16 @@ Moves an array item to a different position.
 See:
 <https://github.com/sindresorhus/array-move#readme>
 
+_Parameters_
+
+-   _array_ `Array`: The array containing the items to move.
+-   _from_ `number`: The source index.
+-   _to_ `number`: The destination index.
+
+_Returns_
+
+-   `Array`: The updated array.
+
 <a name="clearSelection" href="#clearSelection">#</a> **clearSelection**
 
 Clears the text selection on screen.
