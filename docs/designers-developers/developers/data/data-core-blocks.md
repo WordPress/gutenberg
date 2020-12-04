@@ -59,6 +59,10 @@ _Returns_
 
 -   `Array`: Block Types.
 
+<a name="getBlockTypeWithVariationInfo" href="#getBlockTypeWithVariationInfo">#</a> **getBlockTypeWithVariationInfo**
+
+Undocumented declaration.
+
 <a name="getBlockVariations" href="#getBlockVariations">#</a> **getBlockVariations**
 
 Returns block variations by block name.

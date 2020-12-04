@@ -118,14 +118,9 @@ export class BlockSwitcher extends Component {
 		const isSelectionOfSameType =
 			uniq( map( blocks, 'name' ) ).length === 1;
 
-		let icon;
-		if ( isSelectionOfSameType ) {
-			const sourceBlockName = hoveredBlock.name;
-			const blockType = getBlockType( sourceBlockName );
-			icon = blockType.icon;
-		} else {
-			icon = stack;
-		}
+		const blockIconProps = isSelectionOfSameType
+			? { clientId: hoveredBlock.clientId }
+			: { icon: stack };
 
 		const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;
 
@@ -136,7 +131,7 @@ export class BlockSwitcher extends Component {
 						disabled
 						className="block-editor-block-switcher__no-switcher-icon"
 						title={ __( 'Block icon' ) }
-						icon={ <BlockIcon icon={ icon } showColors /> }
+						icon={ <BlockIcon { ...blockIconProps } showColors /> }
 					/>
 				</ToolbarGroup>
 			);
@@ -170,7 +165,7 @@ export class BlockSwitcher extends Component {
 							} }
 							icon={
 								<BlockIcon
-									icon={ icon }
+									{ ...blockIconProps }
 									className="block-editor-block-switcher__toggle"
 									showColors
 								/>
