@@ -8,6 +8,18 @@
 			"source": "html",
 			"selector": "marquee",
 			"default": ""
+		},
+		"direction": {
+			"type": "string",
+			"default": "left"
+		},
+		"behavior": {
+			"type": "string",
+			"default": "scroll"
+		},
+		"loop": {
+			"type": "number",
+			"default": "INFINITE"
 		}
 	},
 	"supports": {
