@@ -191,11 +191,6 @@ function selector( select ) {
 		hasMultiSelection,
 		getBlockOrder,
 		isNavigationMode,
-		getBlockIndex,
-		getBlockRootClientId,
-		getClientIdsOfDescendants,
-		canInsertBlockType,
-		getBlockName,
 		isSelectionEnabled,
 		getBlockSelectionStart,
 		isMultiSelecting,
@@ -205,6 +200,7 @@ function selector( select ) {
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const selectionStartClientId = getMultiSelectedBlocksStartClientId();
 	const selectionEndClientId = getMultiSelectedBlocksEndClientId();
+	const blocks = getBlockOrder();
 
 	return {
 		selectedBlockClientId,
@@ -218,13 +214,9 @@ function selector( select ) {
 		selectedFirstClientId: getFirstMultiSelectedBlockClientId(),
 		selectedLastClientId: getLastMultiSelectedBlockClientId(),
 		hasMultiSelection: hasMultiSelection(),
-		blocks: getBlockOrder(),
+		firstBlock: first( blocks ),
+		lastBlock: last( blocks ),
 		isNavigationMode: isNavigationMode(),
-		getBlockIndex,
-		getBlockRootClientId,
-		getClientIdsOfDescendants,
-		canInsertBlockType,
-		getBlockName,
 		isSelectionEnabled: isSelectionEnabled(),
 		blockSelectionStart: getBlockSelectionStart(),
 		isMultiSelecting: isMultiSelecting(),
@@ -266,7 +258,8 @@ export default function WritingFlow( { children } ) {
 		selectedFirstClientId,
 		selectedLastClientId,
 		hasMultiSelection,
-		blocks,
+		firstBlock,
+		lastBlock,
 		isNavigationMode,
 		isSelectionEnabled,
 		blockSelectionStart,
@@ -396,11 +389,6 @@ export default function WritingFlow( { children } ) {
 		const { ownerDocument } = container.current;
 		const { defaultView } = ownerDocument;
 
-		// In navigation mode, tab and arrows navigate from block to block.
-		if ( isNavigationMode ) {
-			return;
-		}
-
 		// In Edit mode, Tab should focus the first tabbable element after the
 		// content, which is normally the sidebar (with block controls) and
 		// Shift+Tab should focus the first tabbable element before the content,
@@ -471,7 +459,7 @@ export default function WritingFlow( { children } ) {
 						? entirelySelected.current
 						: isEntirelySelected( target )
 				) {
-					multiSelect( first( blocks ), last( blocks ) );
+					multiSelect( firstBlock, lastBlock );
 					event.preventDefault();
 				}
 
