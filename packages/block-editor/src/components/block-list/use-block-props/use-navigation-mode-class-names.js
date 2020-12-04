@@ -63,8 +63,12 @@ export function useNavigationModeClassNames( ref, clientId ) {
 		return addListener( 'mouseover', true );
 	}, [ isNavMode, isHovered, setHovered ] );
 
+	if ( ! isNavMode ) {
+		return;
+	}
+
 	return classnames( {
 		'is-hovered': isHovered,
-		'is-navigate-mode': isSelected && isNavMode,
+		'is-navigate-mode': isSelected,
 	} );
 }

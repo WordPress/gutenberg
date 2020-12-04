@@ -103,7 +103,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		index
 	);
 
-	const navigationModeClassNames = useNavigationModeClassNames( ref );
+	const navigationModeClassNames = useNavigationModeClassNames(
+		ref,
+		clientId
+	);
 	const blockMovingModeClassNames = useBlockMovingModeClassNames( clientId );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 
