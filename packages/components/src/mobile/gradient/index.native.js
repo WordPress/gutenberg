@@ -88,15 +88,11 @@ function getGradientColorGroup( gradientValue ) {
 	);
 }
 
-export function getGradientBaseColors( gradientValue ) {
-	return getGradientColorGroup( gradientValue ).map(
-		( color ) => color[ 0 ]
-	);
+export function getGradientBaseColors( colorGroup ) {
+	return colorGroup.map( ( color ) => color[ 0 ] );
 }
 
-export function getColorLocations( gradientValue ) {
-	const colorGroup = getGradientColorGroup( gradientValue );
-
+export function getColorLocations( colorGroup ) {
 	return colorGroup.map(
 		( location ) => Number( location[ 1 ].replace( '%', '' ) ) / 100
 	);
@@ -117,12 +113,12 @@ function Gradient( {
 		gradientValue,
 	] );
 
-	const locations = useMemo( () => getColorLocations( gradientValue ), [
-		gradientValue,
+	const locations = useMemo( () => getColorLocations( colorGroup ), [
+		colorGroup,
 	] );
 
-	const colors = useMemo( () => getGradientBaseColors( gradientValue ), [
-		gradientValue,
+	const colors = useMemo( () => getGradientBaseColors( colorGroup ), [
+		colorGroup,
 	] );
 
 	if ( ! gradientValue || ! isGradient( gradientValue ) ) {
