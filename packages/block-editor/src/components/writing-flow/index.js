@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState, createContext } from '@wordpress/element';
+import { useRef, useEffect, createContext } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -26,8 +26,6 @@ import {
 	TAB,
 	isKeyboardEvent,
 	ESCAPE,
-	ENTER,
-	SPACE,
 } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -193,7 +191,6 @@ function selector( select ) {
 		hasMultiSelection,
 		getBlockOrder,
 		isNavigationMode,
-		hasBlockMovingClientId,
 		getBlockIndex,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
@@ -223,7 +220,6 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		blocks: getBlockOrder(),
 		isNavigationMode: isNavigationMode(),
-		hasBlockMovingClientId,
 		getBlockIndex,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
@@ -272,27 +268,14 @@ export default function WritingFlow( { children } ) {
 		hasMultiSelection,
 		blocks,
 		isNavigationMode,
-		hasBlockMovingClientId,
 		isSelectionEnabled,
 		blockSelectionStart,
 		isMultiSelecting,
-		getBlockIndex,
-		getBlockRootClientId,
-		getClientIdsOfDescendants,
-		canInsertBlockType,
-		getBlockName,
 		keepCaretInsideBlock,
 	} = useSelect( selector, [] );
-	const {
-		multiSelect,
-		selectBlock,
-		clearSelectedBlock,
-		setNavigationMode,
-		setBlockMovingClientId,
-		moveBlockToPosition,
-	} = useDispatch( 'core/block-editor' );
-
-	const [ canInsertMovingBlock, setCanInsertMovingBlock ] = useState( false );
+	const { multiSelect, selectBlock, setNavigationMode } = useDispatch(
+		'core/block-editor'
+	);
 
 	function onMouseDown( event ) {
 		verticalRect.current = null;
@@ -309,18 +292,6 @@ export default function WritingFlow( { children } ) {
 			)
 		) {
 			setNavigationMode( false );
-			setBlockMovingClientId( null );
-		} else if (
-			isNavigationMode &&
-			hasBlockMovingClientId() &&
-			getBlockClientId( event.target )
-		) {
-			setCanInsertMovingBlock(
-				canInsertBlockType(
-					getBlockName( hasBlockMovingClientId() ),
-					getBlockRootClientId( getBlockClientId( event.target ) )
-				)
-			);
 		}
 
 		// Multi-select blocks when Shift+clicking.
@@ -395,14 +366,25 @@ export default function WritingFlow( { children } ) {
 
 	function onKeyDown( event ) {
 		const { keyCode, target } = event;
+
+		// Handle only if the event occurred within the same DOM hierarchy as
+		// the rendered container. This is used to distinguish between events
+		// which bubble through React's virtual event system from those which
+		// strictly occur in the DOM created by the component.
+		//
+		// The implication here is: If it's not desirable for a bubbled event to
+		// be considered by WritingFlow, it can be avoided by rendering to a
+		// distinct place in the DOM (e.g. using Slot/Fill).
+		if ( ! container.current.contains( target ) ) {
+			return;
+		}
+
 		const isUp = keyCode === UP;
 		const isDown = keyCode === DOWN;
 		const isLeft = keyCode === LEFT;
 		const isRight = keyCode === RIGHT;
 		const isTab = keyCode === TAB;
 		const isEscape = keyCode === ESCAPE;
-		const isEnter = keyCode === ENTER;
-		const isSpace = keyCode === SPACE;
 		const isReverse = isUp || isLeft;
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
@@ -416,95 +398,6 @@ export default function WritingFlow( { children } ) {
 
 		// In navigation mode, tab and arrows navigate from block to block.
 		if ( isNavigationMode ) {
-			const navigateUp = ( isTab && isShift ) || isUp;
-			const navigateDown = ( isTab && ! isShift ) || isDown;
-			// Move out of current nesting level (no effect if at root level).
-			const navigateOut = isLeft;
-			// Move into next nesting level (no effect if the current block has no innerBlocks).
-			const navigateIn = isRight;
-
-			let focusedBlockUid;
-			if ( navigateUp ) {
-				focusedBlockUid = selectionBeforeEndClientId;
-			} else if ( navigateDown ) {
-				focusedBlockUid = selectionAfterEndClientId;
-			} else if ( navigateOut ) {
-				focusedBlockUid =
-					getBlockRootClientId( selectedBlockClientId ) ??
-					selectedBlockClientId;
-			} else if ( navigateIn ) {
-				focusedBlockUid =
-					getClientIdsOfDescendants( [
-						selectedBlockClientId,
-					] )[ 0 ] ?? selectedBlockClientId;
-			}
-			const startingBlockClientId = hasBlockMovingClientId();
-
-			if ( startingBlockClientId && focusedBlockUid ) {
-				setCanInsertMovingBlock(
-					canInsertBlockType(
-						getBlockName( startingBlockClientId ),
-						getBlockRootClientId( focusedBlockUid )
-					)
-				);
-			}
-			if ( isEscape && startingBlockClientId ) {
-				setBlockMovingClientId( null );
-				setCanInsertMovingBlock( false );
-			}
-			if ( ( isEnter || isSpace ) && startingBlockClientId ) {
-				const sourceRoot = getBlockRootClientId(
-					startingBlockClientId
-				);
-				const destRoot = getBlockRootClientId( selectedBlockClientId );
-				const sourceBlockIndex = getBlockIndex(
-					startingBlockClientId,
-					sourceRoot
-				);
-				let destinationBlockIndex = getBlockIndex(
-					selectedBlockClientId,
-					destRoot
-				);
-				if (
-					sourceBlockIndex < destinationBlockIndex &&
-					sourceRoot === destRoot
-				) {
-					destinationBlockIndex -= 1;
-				}
-				moveBlockToPosition(
-					startingBlockClientId,
-					sourceRoot,
-					destRoot,
-					destinationBlockIndex
-				);
-				selectBlock( startingBlockClientId );
-				setBlockMovingClientId( null );
-			}
-			if ( navigateDown || navigateUp || navigateOut || navigateIn ) {
-				if ( focusedBlockUid ) {
-					event.preventDefault();
-					selectBlock( focusedBlockUid );
-				} else if ( isTab && selectedBlockClientId ) {
-					const wrapper = getBlockDOMNode(
-						selectedBlockClientId,
-						ownerDocument
-					);
-					let nextTabbable;
-
-					if ( navigateDown ) {
-						nextTabbable = focus.tabbable.findNext( wrapper );
-					} else {
-						nextTabbable = focus.tabbable.findPrevious( wrapper );
-					}
-
-					if ( nextTabbable ) {
-						event.preventDefault();
-						nextTabbable.focus();
-						clearSelectedBlock();
-					}
-				}
-			}
-
 			return;
 		}
 
@@ -693,8 +586,6 @@ export default function WritingFlow( { children } ) {
 
 	const className = classnames( 'block-editor-writing-flow', {
 		'is-navigate-mode': isNavigationMode,
-		'is-block-moving-mode': !! hasBlockMovingClientId(),
-		'can-insert-moving-block': canInsertMovingBlock,
 	} );
 
 	// Disable reason: Wrapper itself is non-interactive, but must capture

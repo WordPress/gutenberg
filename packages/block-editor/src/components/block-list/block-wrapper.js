@@ -71,13 +71,22 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		initialPosition,
 		shouldFocusFirstElement,
 		isNavigationMode,
+		isBlockMovingMode,
+		canInsertMovingBlock,
 	} = useSelect(
 		( select ) => {
 			const {
 				getSelectedBlocksInitialCaretPosition,
 				isMultiSelecting: _isMultiSelecting,
 				isNavigationMode: _isNavigationMode,
+				hasBlockMovingClientId,
+				canInsertBlockType,
+				getBlockName,
+				getBlockRootClientId,
 			} = select( 'core/block-editor' );
+
+			const movingClientId = hasBlockMovingClientId();
+			const _isBlockMovingMode = isSelected && !! movingClientId;
 
 			return {
 				shouldFocusFirstElement:
@@ -88,9 +97,16 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 					? getSelectedBlocksInitialCaretPosition()
 					: undefined,
 				isNavigationMode: _isNavigationMode,
+				isBlockMovingMode: _isBlockMovingMode,
+				canInsertMovingBlock:
+					_isBlockMovingMode &&
+					canInsertBlockType(
+						getBlockName( movingClientId ),
+						getBlockRootClientId( clientId )
+					),
 			};
 		},
-		[ isSelected ]
+		[ isSelected, clientId ]
 	);
 	const { insertDefaultBlock, removeBlock, selectBlock } = useDispatch(
 		'core/block-editor'
@@ -331,7 +347,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			className,
 			props.className,
 			wrapperProps.className,
-			{ 'is-hovered': isHovered }
+			{
+				'is-hovered': isHovered,
+				'is-block-moving-mode': isBlockMovingMode,
+				'can-insert-moving-block': canInsertMovingBlock,
+			}
 		),
 		style: { ...wrapperProps.style, ...props.style },
 	};
