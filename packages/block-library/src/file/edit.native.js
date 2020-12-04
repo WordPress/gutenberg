@@ -464,6 +464,7 @@ export class FileEdit extends Component {
 								) }
 								<View style={ styles.container }>
 									<RichText
+										withoutInteractiveFormatting
 										__unstableMobileNoFocusOnMount
 										onChange={ this.onChangeFileName }
 										placeholder={ __( 'File name' ) }
