@@ -21,7 +21,11 @@ import {
 	getDefaultBlockName,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import { isSiteDateInTheFuture, parseSiteDate } from '@wordpress/date';
+import {
+	isSiteDateInTheFuture,
+	parseSiteDate,
+	addMinutes,
+} from '@wordpress/date';
 import { addQueryArgs } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -35,7 +39,6 @@ import {
 	EDIT_MERGE_PROPERTIES,
 	POST_UPDATE_TRANSACTION_ID,
 	PERMALINK_POSTNAME_REGEX,
-	ONE_MINUTE_IN_MS,
 	AUTOSAVE_PROPERTIES,
 } from './constants';
 import { getPostRawValue } from './reducer';
@@ -483,9 +486,7 @@ export function isCurrentPostPublished( state, currentPost ) {
 		[ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
 		( post.status === 'future' &&
 			! isSiteDateInTheFuture(
-				new Date(
-					Number( parseSiteDate( post.date ) ) - ONE_MINUTE_IN_MS
-				)
+				addMinutes( parseSiteDate( post.date ), -1 )
 			) )
 	);
 }
@@ -737,9 +738,7 @@ export const hasAutosave = createRegistrySelector( ( select ) => ( state ) => {
 export function isEditedPostBeingScheduled( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
 	// Offset the date by one minute (network latency)
-	const checkedDate = new Date(
-		Number( parseSiteDate( date ) ) - ONE_MINUTE_IN_MS
-	);
+	const checkedDate = addMinutes( parseSiteDate( date ), -1 );
 
 	return isSiteDateInTheFuture( checkedDate );
 }
