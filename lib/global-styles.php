@@ -10,7 +10,7 @@
  * the corresponding stylesheet.
  *
  * @param WP_Theme_JSON $tree Input tree.
- * @param string        $type Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
+ * @param string        $type Type of stylesheet we want. Accepts 'all', 'block_styles', and 'css_variables'.
  *
  * @return string Stylesheet.
  */
@@ -28,6 +28,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 		// Check if we have the styles already cached.
 		$cached = get_transient( 'global_styles' );
 		if ( $cached ) {
+			/* This filter is documented in lib/global-styles.php */
 			return apply_filters( 'global_styles_get_stylesheet', $cached, $type, $tree );
 		}
 	}
@@ -49,6 +50,15 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 		set_transient( 'global_styles', $stylesheet, MINUTE_IN_SECONDS );
 	}
 
+	/**
+	 * Filter generated styles.
+	 *
+	 * @param string        $stylesheet The generated styles.
+	 * @param string        $type       Type of stylesheet we want. Accepts 'all', 'block_styles', and 'css_variables'.
+	 * @param WP_Theme_JSON $tree       Input tree.
+	 *
+	 * @return string
+	 */
 	return apply_filters( 'global_styles_get_stylesheet', $stylesheet, $type, $tree );
 }
 
