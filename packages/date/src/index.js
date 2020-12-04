@@ -629,7 +629,9 @@ export function isSiteDateInTheFuture( dateValue ) {
 }
 
 export function parseSiteDate( dateString ) {
-	return toDate( dateString, { timeZone: getActualTimezone() } );
+	return localDateToSiteDate(
+		toDate( dateString, { timeZone: getActualTimezone() } )
+	);
 }
 
 /**
