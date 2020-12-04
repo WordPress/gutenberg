@@ -137,6 +137,7 @@ class WP_Theme_JSON {
 				'textTransforms'   => null,
 			),
 			'custom'     => null,
+			'reset'      => null,
 		),
 	);
 
