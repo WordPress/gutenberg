@@ -23,6 +23,18 @@
 		},
 		"reversed": {
 			"type": "boolean"
+		},
+		"style": {
+			"default": {
+				"spacing": {
+					"padding": {
+						"top": 0,
+						"right": 0,
+						"bottom": 0,
+						"left": 40
+					}
+				}
+			}
 		}
 	},
 	"supports": {
@@ -32,6 +44,9 @@
 		"color": {
 			"gradients": true
 		},
-		"__unstablePasteTextInline": true
+		"__unstablePasteTextInline": true,
+		"spacing": {
+			"padding": true
+		}
 	}
 }
