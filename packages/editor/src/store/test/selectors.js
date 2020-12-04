@@ -1885,7 +1885,7 @@ describe( 'selectors', () => {
 			const state = {
 				editor: {
 					present: {
-						edits: { date: date.toUTCString() },
+						edits: { date: date.toISOString() },
 					},
 				},
 				initialEdits: {},
