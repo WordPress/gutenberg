@@ -9,7 +9,7 @@ import { render } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import './store';
+export { store } from './store';
 import Editor from './editor';
 
 let editorInitialized = false;
