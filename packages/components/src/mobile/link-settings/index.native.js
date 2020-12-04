@@ -7,7 +7,6 @@ import { Platform, Clipboard } from 'react-native';
  */
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
-import { store as editPostStore } from '@wordpress/edit-post';
 import { isURL, prependHTTP } from '@wordpress/url';
 import { useEffect, useState, useRef, useContext } from '@wordpress/element';
 import { link, external } from '@wordpress/icons';
@@ -274,7 +273,7 @@ function LinkSettings( {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isEditorSidebarOpened } = select( editPostStore );
+		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		return {
 			editorSidebarOpened: isEditorSidebarOpened(),
 		};

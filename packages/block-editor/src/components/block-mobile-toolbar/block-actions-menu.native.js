@@ -20,7 +20,6 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { withInstanceId, compose } from '@wordpress/compose';
 import { moreHorizontalMobile } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
-import { store as editPostStore } from '@wordpress/edit-post';
 /**
  * Internal dependencies
  */
@@ -285,7 +284,7 @@ export default compose(
 				insertBlock,
 				replaceBlocks,
 			} = dispatch( 'core/block-editor' );
-			const { openGeneralSidebar } = dispatch( editPostStore );
+			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 			const { updateClipboard, createInfoNotice } = dispatch(
 				'core/editor'
 			);

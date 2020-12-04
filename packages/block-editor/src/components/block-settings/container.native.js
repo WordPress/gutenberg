@@ -9,7 +9,6 @@ import {
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { store as editPostStore } from '@wordpress/edit-post';
 /**
  * Internal dependencies
  */
@@ -63,7 +62,7 @@ function BottomSheetSettings( {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isEditorSidebarOpened } = select( editPostStore );
+		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const { getSettings } = select( 'core/block-editor' );
 		return {
 			settings: getSettings(),
@@ -71,7 +70,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { closeGeneralSidebar } = dispatch( editPostStore );
+		const { closeGeneralSidebar } = dispatch( 'core/edit-post' );
 
 		return {
 			closeGeneralSidebar,
