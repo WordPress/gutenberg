@@ -12,12 +12,12 @@ import { useSelect } from '@wordpress/data';
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
 
 /**
- * Returns true when the block is hovered and in navigation mode, false if not.
+ * Returns the class names used for navigation mode.
  *
  * @param {RefObject} ref      React ref with the block element.
  * @param {string}    clientId Block client ID.
  *
- * @return {boolean} Hovered state.
+ * @return {boolean} The class names.
  */
 export function useNavigationModeClassNames( ref, clientId ) {
 	const [ isHovered, setHovered ] = useState( false );
