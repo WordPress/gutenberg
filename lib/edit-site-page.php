@@ -112,6 +112,7 @@ function gutenberg_edit_site_init( $hook ) {
 		)
 	);
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
+	$settings = gutenberg_extend_settings_block_patterns( $settings );
 
 	// Preload block editor paths.
 	// most of these are copied from edit-forms-blocks.php.
