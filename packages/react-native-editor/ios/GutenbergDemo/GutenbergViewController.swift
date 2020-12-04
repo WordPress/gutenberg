@@ -101,7 +101,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
                     callback([MediaInfo(id: 2, url: "https://i.cloudup.com/YtZFJbuQCE.mov", type: "video", caption: "Cloudup")])
                 }
             case .other, .any:
-                 callback([MediaInfo(id: 1, url: "https://wordpress.org/latest.zip", type: "zip", caption: "WordPress latest version", title: "WordPress.zip")])
+                 callback([MediaInfo(id: 3, url: "https://wordpress.org/latest.zip", type: "zip", caption: "WordPress latest version", title: "WordPress.zip")])
             default:
                 break
             }
