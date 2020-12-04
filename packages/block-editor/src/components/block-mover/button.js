@@ -121,7 +121,7 @@ const BlockMoverButton = forwardRef(
 			direction === 'up' ? moveBlocksUp : moveBlocksDown;
 
 		const onClick = ( event ) => {
-			moverFunction( clientIds, rootClientId );
+			moverFunction( clientIds, rootClientId, orientation );
 			if ( props.onClick ) {
 				props.onClick( event );
 			}

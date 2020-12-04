@@ -354,11 +354,12 @@ export function replaceBlock( clientId, block ) {
  * @return {Function} Action creator.
  */
 function createOnMove( type ) {
-	return ( clientIds, rootClientId ) => {
+	return ( clientIds, rootClientId, orientation ) => {
 		return {
 			clientIds: castArray( clientIds ),
 			type,
 			rootClientId,
+			orientation,
 		};
 	};
 }

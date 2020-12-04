@@ -15,23 +15,31 @@ import { __ } from '@wordpress/i18n';
 
 function KeyboardShortcuts() {
 	// Shortcuts Logic
-	const { clientIds, rootBlocksClientIds, rootClientId } = useSelect(
-		( select ) => {
-			const {
-				getSelectedBlockClientIds,
-				getBlockOrder,
-				getBlockRootClientId,
-			} = select( 'core/block-editor' );
-			const selectedClientIds = getSelectedBlockClientIds();
-			const [ firstClientId ] = selectedClientIds;
-			return {
-				clientIds: selectedClientIds,
-				rootBlocksClientIds: getBlockOrder(),
-				rootClientId: getBlockRootClientId( firstClientId ),
-			};
-		},
-		[]
-	);
+	const {
+		clientIds,
+		rootBlocksClientIds,
+		rootClientId,
+		orientation,
+	} = useSelect( ( select ) => {
+		const {
+			getSelectedBlockClientIds,
+			getBlockOrder,
+			getBlockRootClientId,
+			getBlockListSettings,
+		} = select( 'core/block-editor' );
+		const selectedClientIds = getSelectedBlockClientIds();
+		const [ firstClientId ] = selectedClientIds;
+		const blockRootClientId = getBlockRootClientId( firstClientId );
+		const { orientation: blockListOrientation } =
+			getBlockListSettings( blockRootClientId ) || {};
+
+		return {
+			clientIds: selectedClientIds,
+			rootBlocksClientIds: getBlockOrder(),
+			rootClientId: blockRootClientId,
+			orientation: blockListOrientation || 'vertical',
+		};
+	}, [] );
 
 	const {
 		duplicateBlocks,
@@ -50,7 +58,7 @@ function KeyboardShortcuts() {
 		useCallback(
 			( event ) => {
 				event.preventDefault();
-				moveBlocksUp( clientIds, rootClientId );
+				moveBlocksUp( clientIds, rootClientId, orientation );
 			},
 			[ clientIds, moveBlocksUp ]
 		),
@@ -63,7 +71,7 @@ function KeyboardShortcuts() {
 		useCallback(
 			( event ) => {
 				event.preventDefault();
-				moveBlocksDown( clientIds, rootClientId );
+				moveBlocksDown( clientIds, rootClientId, orientation );
 			},
 			[ clientIds, moveBlocksDown ]
 		),

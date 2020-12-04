@@ -35,6 +35,7 @@ import {
 	getTemplate,
 	isValidTemplate,
 	getSelectionStart,
+	getSettings,
 } from './selectors';
 
 /**
@@ -64,6 +65,57 @@ export function validateBlocksToTemplate( action, store ) {
 	if ( isBlocksValidToTemplate !== isValidTemplate( state ) ) {
 		return setTemplateValidity( isBlocksValidToTemplate );
 	}
+}
+
+/**
+ * Announces when a block is moved.
+ *
+ * @param {Object} state The current state.
+ * @param {string} direction The direction the block was moved in.
+ */
+export function announceBlockMoved( state, direction ) {
+	const blockCount = getSelectedBlockCount( state );
+	let message;
+
+	switch ( direction ) {
+		case 'up':
+			/* translators: %s: number of selected blocks */
+			message = _n(
+				'%s block moved up.',
+				'%s blocks moved up.',
+				blockCount
+			);
+			break;
+		case 'down':
+			/* translators: %s: number of selected blocks */
+			message = _n(
+				'%s block moved down.',
+				'%s blocks moved down.',
+				blockCount
+			);
+			break;
+		case 'left':
+			/* translators: %s: number of selected blocks */
+			message = _n(
+				'%s block moved left.',
+				'%s blocks moved left.',
+				blockCount
+			);
+			break;
+		case 'right':
+			/* translators: %s: number of selected blocks */
+			message = _n(
+				'%s block moved right.',
+				'%s blocks moved right.',
+				blockCount
+			);
+			break;
+		default:
+			/* translators: %s: number of selected blocks */
+			message = _n( '%s block moved.', '%s blocks moved.', blockCount );
+	}
+
+	speak( sprintf( message, blockCount, direction ), 'assertive' );
 }
 
 export default {
@@ -218,6 +270,30 @@ export default {
 				]
 			)
 		);
+	},
+	MOVE_BLOCKS_DOWN: ( action, { getState } ) => {
+		const state = getState();
+		const settings = getSettings( state );
+
+		let direction = 'down';
+
+		if ( action.orientation === 'horizontal' ) {
+			direction = settings.isRTL ? 'left' : 'right';
+		}
+
+		announceBlockMoved( state, direction );
+	},
+	MOVE_BLOCKS_UP: ( action, { getState } ) => {
+		const state = getState();
+		const settings = getSettings( state );
+
+		let direction = 'up';
+
+		if ( action.orientation === 'horizontal' ) {
+			direction = settings.isRTL ? 'right' : 'left';
+		}
+
+		announceBlockMoved( state, direction );
 	},
 	RESET_BLOCKS: [ validateBlocksToTemplate ],
 	MULTI_SELECT: ( action, { getState } ) => {
