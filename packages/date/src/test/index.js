@@ -11,6 +11,7 @@ import {
 	localDateToSiteDate,
 	isSiteDateInTheFuture,
 	addMinutes,
+	subMinutes,
 } from '../';
 
 const HOUR_IN_MILLIS = 60 * 60 * 1000;
@@ -76,7 +77,7 @@ describe( 'isInTheFuture', () => {
 
 	it( 'should return false if the date is in the past', () => {
 		// Create a Date object 1 minute in the past.
-		const date = addMinutes( localDateToSiteDate( new Date() ), -1 );
+		const date = subMinutes( localDateToSiteDate( new Date() ), 1 );
 		expect( isSiteDateInTheFuture( date ) ).toBe( false );
 	} );
 
@@ -89,7 +90,7 @@ describe( 'isInTheFuture', () => {
 			timezone: { offset: '4', string: '' },
 		} );
 		// Create a Date object 1 minute in the past.
-		let date = addMinutes( localDateToSiteDate( new Date() ), -1 );
+		let date = subMinutes( localDateToSiteDate( new Date() ), 1 );
 
 		expect( isSiteDateInTheFuture( date ) ).toBe( false );
 

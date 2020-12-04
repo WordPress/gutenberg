@@ -681,4 +681,4 @@ export function localDateToSiteDate( dateValue ) {
 	return addMilliseconds( toDate( dateValue ), getTimezoneOffset() );
 }
 
-export { addMinutes };
+export { addMinutes, subMinutes };
