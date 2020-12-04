@@ -84,7 +84,6 @@ function BlockListBlock( {
 	mode,
 	isLocked,
 	clientId,
-	rootClientId,
 	isSelected,
 	isMultiSelected,
 	isPartOfMultiSelection,
@@ -216,7 +215,6 @@ function BlockListBlock( {
 
 	const value = {
 		clientId,
-		rootClientId,
 		isSelected,
 		isFirstMultiSelected,
 		isLastMultiSelected,

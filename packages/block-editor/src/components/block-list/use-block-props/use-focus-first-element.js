@@ -15,6 +15,8 @@ import { useSelect } from '@wordpress/data';
  */
 import { isInsideRootBlock } from '../../../utils/dom';
 
+/** @typedef {import('@wordpress/element').RefObject} RefObject */
+
 /**
  * Returns the initial position if the block needs to be focussed, `undefined`
  * otherwise. The initial position is either 0 (start) or -1 (end).
@@ -52,8 +54,8 @@ function useInitialPosition( clientId ) {
  * Transitions focus to the block or inner tabbable when the block becomes
  * selected.
  *
- * @param {Object} ref      React ref with the block element.
- * @param {string} clientId Block client ID.
+ * @param {RefObject} ref      React ref with the block element.
+ * @param {string}    clientId Block client ID.
  */
 export function useFocusFirstElement( ref, clientId ) {
 	const initialPosition = useInitialPosition( clientId );

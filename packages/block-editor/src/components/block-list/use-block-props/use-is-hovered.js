@@ -4,10 +4,12 @@
 import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 
+/** @typedef {import('@wordpress/element').RefObject} RefObject */
+
 /**
  * Returns true when the block is hovered and in navigation mode, false if not.
  *
- * @param {Object} ref React ref with the block element.
+ * @param {RefObject} ref React ref with the block element.
  *
  * @return {boolean} Hovered state.
  */

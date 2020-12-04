@@ -12,6 +12,19 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { isInsideRootBlock } from '../../../utils/dom';
 import { SelectionStart } from '../../writing-flow';
 
+/** @typedef {import('@wordpress/element').RefObject} RefObject */
+
+/**
+ * Adds block behaviour:
+ *   - Selects the block if it receives focus.
+ *   - Removes the block on BACKSPACE.
+ *   - Inserts a default block on ENTER.
+ *   - Initiates selection start for multi-selection.
+ *   - Disables dragging of block contents.
+ *
+ * @param {RefObject} ref React ref with the block element.
+ * @param {string}    clientId Block client ID.
+ */
 export function useEventHandlers( ref, clientId ) {
 	const onSelectionStart = useContext( SelectionStart );
 	const { isSelected, rootClientId, index } = useSelect(
