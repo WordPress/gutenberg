@@ -404,7 +404,7 @@ class WP_Theme_JSON_Resolver {
 			$result->merge( $this->get_theme_origin( $theme_support_data ) );
 			$result->merge( self::get_user_origin() );
 			/* This filter is documented in lib/class-wp-theme-json-resolver.php */
-			return apply_filters( 'get_global_styles_data', $result, $origin, $theme_support_data );
+			return apply_filters( 'global_styles_get_data', $result, $origin, $theme_support_data );
 		}
 
 		if ( ( 'theme' === $origin ) && $merged ) {
@@ -412,17 +412,17 @@ class WP_Theme_JSON_Resolver {
 			$result->merge( self::get_core_origin() );
 			$result->merge( $this->get_theme_origin( $theme_support_data ) );
 			/* This filter is documented in lib/class-wp-theme-json-resolver.php */
-			return apply_filters( 'get_global_styles_data', $result, $origin, $theme_support_data );
+			return apply_filters( 'global_styles_get_data', $result, $origin, $theme_support_data );
 		}
 
 		if ( 'user' === $origin ) {
 			/* This filter is documented in lib/class-wp-theme-json-resolver.php */
-			return apply_filters( 'get_global_styles_data', self::get_user_origin(), $origin, $theme_support_data );
+			return apply_filters( 'global_styles_get_data', self::get_user_origin(), $origin, $theme_support_data );
 		}
 
 		if ( 'theme' === $origin ) {
 			/* This filter is documented in lib/class-wp-theme-json-resolver.php */
-			return apply_filters( 'get_global_styles_data', $this->get_theme_origin( $theme_support_data ), $origin, $theme_support_data );
+			return apply_filters( 'global_styles_get_data', $this->get_theme_origin( $theme_support_data ), $origin, $theme_support_data );
 		}
 
 		/**
@@ -435,7 +435,7 @@ class WP_Theme_JSON_Resolver {
 		 *
 		 * @return WP_Theme_JSON
 		 */
-		return apply_filters( 'get_global_styles_data', self::get_core_origin(), $origin, $theme_support_data );
+		return apply_filters( 'global_styles_get_data', self::get_core_origin(), $origin, $theme_support_data );
 	}
 
 	/**
