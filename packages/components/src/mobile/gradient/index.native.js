@@ -54,7 +54,7 @@ export function getGradientAngle( gradientValue ) {
 	} else return 4 * angleBase;
 }
 
-function getGradientColorGroup( gradientValue ) {
+export function getGradientColorGroup( gradientValue ) {
 	const colorNeedParenthesis = [ 'rgb', 'rgba' ];
 
 	const excludeSideOrCorner = /linear-gradient\(to\s+([a-z\s]+,)/;

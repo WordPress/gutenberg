@@ -5,6 +5,7 @@ import {
 	getGradientAngle,
 	getGradientBaseColors,
 	getColorLocations,
+	getGradientColorGroup,
 } from '../index.native';
 
 describe( 'getGradientAngle', () => {
@@ -52,33 +53,40 @@ describe( 'getGradientAngle', () => {
 
 describe( 'getGradientBaseColors', () => {
 	it( 'returns array of colors (hex) from gradient value', () => {
-		const gradientValue = 'linear-gradient(#e66465, #9198e5)';
+		const colorGroup = getGradientColorGroup(
+			'linear-gradient(#e66465, #9198e5)'
+		);
 
-		expect( getGradientBaseColors( gradientValue ) ).toStrictEqual( [
+		expect( getGradientBaseColors( colorGroup ) ).toStrictEqual( [
 			'#e66465',
 			'#9198e5',
 		] );
 	} );
 	it( 'returns an array of colors (rgb/rgba) from gradient value', () => {
-		const gradientValue = `linear-gradient(336deg, rgb(0,0,255), rgba(0,0,255,.8) 70.71%)`;
-		expect( getGradientBaseColors( gradientValue ) ).toStrictEqual( [
+		const colorGroup = getGradientColorGroup(
+			`linear-gradient(336deg, rgb(0,0,255), rgba(0,0,255,.8) 70.71%)`
+		);
+		expect( getGradientBaseColors( colorGroup ) ).toStrictEqual( [
 			'rgb(0,0,255)',
 			'rgba(0,0,255,.8)',
 		] );
 	} );
 
 	it( 'return an array of colors (literal) from gradient value', () => {
-		const gradientValue = 'linear-gradient(45deg, blue, red)';
-		expect( getGradientBaseColors( gradientValue ) ).toStrictEqual( [
+		const colorGroup = getGradientColorGroup(
+			'linear-gradient(45deg, blue, red)'
+		);
+		expect( getGradientBaseColors( colorGroup ) ).toStrictEqual( [
 			'blue',
 			'red',
 		] );
 	} );
 
 	it( 'return an array of colors (mixed) from gradient value', () => {
-		const gradientValue =
-			'linear-gradient(45deg, blue, #e66465, rgb(0,0,255), rgba(0,0,255,.8))';
-		expect( getGradientBaseColors( gradientValue ) ).toStrictEqual( [
+		const colorGroup = getGradientColorGroup(
+			'linear-gradient(45deg, blue, #e66465, rgb(0,0,255), rgba(0,0,255,.8))'
+		);
+		expect( getGradientBaseColors( colorGroup ) ).toStrictEqual( [
 			'blue',
 			'#e66465',
 			'rgb(0,0,255)',
@@ -89,16 +97,17 @@ describe( 'getGradientBaseColors', () => {
 
 describe( 'getColorLocations', () => {
 	it( 'returns an array of color locations specified in gradient value', () => {
-		const gradientValue = 'linear-gradient(45deg, red 0%, blue 10%)';
-		expect( getColorLocations( gradientValue ) ).toStrictEqual( [
-			0,
-			0.1,
-		] );
+		const colorGroup = getGradientColorGroup(
+			'linear-gradient(45deg, red 0%, blue 10%)'
+		);
+		expect( getColorLocations( colorGroup ) ).toStrictEqual( [ 0, 0.1 ] );
 	} );
 
 	it( 'returns an array of color locations adjusted proportionally when not specified in gradient value', () => {
-		const gradientValue = 'linear-gradient(45deg, red, blue, green)';
-		expect( getColorLocations( gradientValue ) ).toStrictEqual( [
+		const colorGroup = getGradientColorGroup(
+			'linear-gradient(45deg, red, blue, green)'
+		);
+		expect( getColorLocations( colorGroup ) ).toStrictEqual( [
 			0,
 			0.5,
 			1,
