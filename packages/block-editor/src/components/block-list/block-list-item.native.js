@@ -123,19 +123,27 @@ export class BlockListItem extends Component {
 			shouldShowInnerBlockAppender,
 			parentWidth,
 			marginHorizontal,
+			blockName,
 			...restProps
 		} = this.props;
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
+		const { innerContainers, richTextBlocks } = WIDE_ALIGNMENTS;
+
+		const isTextBlock = richTextBlocks.includes( blockName );
+		const isContainerRelated = innerContainers.includes( blockName );
 
 		return (
 			<ReadableContentView
 				align={ blockAlignment }
 				style={ [
 					readableContentViewStyle,
-					parentWidth && {
-						maxWidth: parentWidth + 2 * marginHorizontal,
-					},
+					( isContainerRelated || isTextBlock ) &&
+						parentWidth && {
+							maxWidth:
+								parentWidth +
+								( isTextBlock ? 0 : 2 * marginHorizontal ),
+						},
 				] }
 			>
 				<View

@@ -3,6 +3,14 @@ export const WIDE_ALIGNMENTS = {
 		wide: 'wide',
 		full: 'full',
 	},
+	richTextBlocks: [
+		'core/paragraph',
+		'core/heading',
+		'core/list',
+		'core/quote',
+		'core/preformatted',
+		'core/verse',
+	],
 	innerContainers: [ 'core/group', 'core/columns', 'core/column' ],
 	excludeBlocks: [ 'core/heading' ],
 };
