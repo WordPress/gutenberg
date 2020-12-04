@@ -133,12 +133,23 @@ describe( 'Disabled', () => {
 		expect( div.hasAttribute( 'tabindex' ) ).toBe( true );
 	} );
 
-	it( 'will disable descendant fields if isDisabled prop is set to true', () => {
-		const wrapper = TestUtils.renderIntoDocument(
-			<DisabledComponent isDisabled>
-				<Form />
-			</DisabledComponent>
-		);
+	it( 'will disable or enable descendant fields based on the isDisabled prop value', () => {
+		class MaybeDisable extends Component {
+			constructor() {
+				super( ...arguments );
+				this.state = { isDisabled: true };
+			}
+
+			render() {
+				return (
+					<DisabledComponent isDisabled={ this.state.isDisabled }>
+						<Form />
+					</DisabledComponent>
+				);
+			}
+		}
+
+		const wrapper = TestUtils.renderIntoDocument( <MaybeDisable /> );
 
 		const input = TestUtils.findRenderedDOMComponentWithTag(
 			wrapper,
@@ -151,26 +162,20 @@ describe( 'Disabled', () => {
 
 		expect( input.hasAttribute( 'disabled' ) ).toBe( true );
 		expect( div.getAttribute( 'contenteditable' ) ).toBe( 'false' );
-	} );
 
-	it( 'will not disable descendant fields if isDisabled prop is set to false', () => {
-		const wrapper = TestUtils.renderIntoDocument(
-			<DisabledComponent isDisabled={ false }>
-				<Form />
-			</DisabledComponent>
-		);
+		wrapper.setState( { isDisabled: false } );
 
-		const input = TestUtils.findRenderedDOMComponentWithTag(
+		const input2 = TestUtils.findRenderedDOMComponentWithTag(
 			wrapper,
 			'input'
 		);
-		const div = TestUtils.scryRenderedDOMComponentsWithTag(
+		const div2 = TestUtils.scryRenderedDOMComponentsWithTag(
 			wrapper,
 			'div'
 		)[ 0 ];
 
-		expect( input.hasAttribute( 'disabled' ) ).toBe( false );
-		expect( div.getAttribute( 'contenteditable' ) ).not.toBe( 'false' );
+		expect( input2.hasAttribute( 'disabled' ) ).toBe( false );
+		expect( div2.getAttribute( 'contenteditable' ) ).not.toBe( 'false' );
 	} );
 
 	// Ideally, we'd have two more test cases here:
