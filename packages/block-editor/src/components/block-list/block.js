@@ -44,7 +44,7 @@ import BlockInvalidWarning from './block-invalid-warning';
 import BlockCrashWarning from './block-crash-warning';
 import BlockCrashBoundary from './block-crash-boundary';
 import BlockHtml from './block-html';
-import { useBlockProps } from './block-wrapper';
+import { useBlockProps } from './use-block-props';
 
 export const BlockListBlockContext = createContext();
 
