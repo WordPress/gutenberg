@@ -16,14 +16,15 @@ import { useSelect } from '@wordpress/data';
 import { isInsideRootBlock } from '../../../utils/dom';
 
 /**
- * Transitions focus to the block or inner tabbable when the block becomes
- * selected.
+ * Returns the initial position if the block needs to be focussed, `undefined`
+ * otherwise. The initial position is either 0 (start) or -1 (end).
  *
- * @param {Object} ref      React ref with the block element.
  * @param {string} clientId Block client ID.
+ *
+ * @return {number} The initial position, either 0 (start) or -1 (end).
  */
-export function useFocusFirstElement( ref, clientId ) {
-	const initialPosition = useSelect(
+function useInitialPosition( clientId ) {
+	return useSelect(
 		( select ) => {
 			const {
 				getSelectedBlocksInitialCaretPosition,
@@ -40,13 +41,25 @@ export function useFocusFirstElement( ref, clientId ) {
 				return;
 			}
 
-			return getSelectedBlocksInitialCaretPosition() || 1;
+			// If there's no initial position, return 0 to focus the start.
+			return getSelectedBlocksInitialCaretPosition() || 0;
 		},
 		[ clientId ]
 	);
+}
+
+/**
+ * Transitions focus to the block or inner tabbable when the block becomes
+ * selected.
+ *
+ * @param {Object} ref      React ref with the block element.
+ * @param {string} clientId Block client ID.
+ */
+export function useFocusFirstElement( ref, clientId ) {
+	const initialPosition = useInitialPosition( clientId );
 
 	useEffect( () => {
-		if ( ! initialPosition ) {
+		if ( initialPosition === undefined ) {
 			return;
 		}
 
