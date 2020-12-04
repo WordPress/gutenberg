@@ -28,7 +28,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 		// Check if we have the styles already cached.
 		$cached = get_transient( 'global_styles' );
 		if ( $cached ) {
-			return $cached;
+			return apply_filters( 'global_styles_get_stylesheet', $cached, $type, $tree );
 		}
 	}
 
@@ -49,7 +49,7 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 		set_transient( 'global_styles', $stylesheet, MINUTE_IN_SECONDS );
 	}
 
-	return $stylesheet;
+	return apply_filters( 'global_styles_get_stylesheet', $stylesheet, $type, $tree );
 }
 
 /**
