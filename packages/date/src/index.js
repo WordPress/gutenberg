@@ -620,6 +620,21 @@ export function gmdateI18n( dateFormat, dateValue = new Date() ) {
 }
 
 /**
+ * Returns the timezone offset between system and site timezone in milliseconds.
+ *
+ * @return {number} offset in milliseconds
+ */
+function getTimezoneOffset() {
+	const localDate = new Date();
+	const utcDate = addMinutes( localDate, localDate.getTimezoneOffset() );
+	const siteDate = subMinutes(
+		utcToZonedTime( utcDate, getActualTimezone() ),
+		localDate.getTimezoneOffset()
+	);
+	return siteDate.getTime() - localDate.getTime();
+}
+
+/**
  * Check whether a date is considered in the future according to the WordPress settings.
  *
  * @param {string|Date} dateValue Date String or Date object in the Defined WP Timezone.
@@ -631,16 +646,13 @@ export function isSiteDateInTheFuture( dateValue ) {
 	return isFuture( localDate );
 }
 
-export function getTimezoneOffset() {
-	const localDate = new Date();
-	const utcDate = addMinutes( localDate, localDate.getTimezoneOffset() );
-	const siteDate = subMinutes(
-		utcToZonedTime( utcDate, getActualTimezone() ),
-		localDate.getTimezoneOffset()
-	);
-	return siteDate.getTime() - localDate.getTime();
-}
-
+/**
+ * Parses a site date string and returns the parsed date in site's timezone.
+ *
+ * @param {string} dateString
+ *
+ * @return {Date} date object offsetted to site's timezone
+ */
 export function parseSiteDate( dateString ) {
 	return localDateToSiteDate(
 		toDate( dateString, { timeZone: getActualTimezone() } )

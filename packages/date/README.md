@@ -74,10 +74,6 @@ _Returns_
 
 -   `string`: Formatted date.
 
-<a name="getTimezoneOffset" href="#getTimezoneOffset">#</a> **getTimezoneOffset**
-
-Undocumented declaration.
-
 <a name="gmdate" href="#gmdate">#</a> **gmdate**
 
 Formats a date (like `date()` in PHP), in the UTC timezone.
@@ -131,7 +127,15 @@ _Returns_
 
 <a name="parseSiteDate" href="#parseSiteDate">#</a> **parseSiteDate**
 
-Undocumented declaration.
+Parses a site date string and returns the parsed date in site's timezone.
+
+_Parameters_
+
+-   _dateString_ `string`: 
+
+_Returns_
+
+-   `Date`: date object offsetted to site's timezone
 
 <a name="setSettings" href="#setSettings">#</a> **setSettings**
 
