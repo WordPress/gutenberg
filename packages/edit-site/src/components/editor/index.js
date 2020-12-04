@@ -46,6 +46,7 @@ import BlockEditor from '../block-editor';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
+import URLQueryController from '../url-query-controller';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
@@ -196,6 +197,7 @@ function Editor() {
 
 	return (
 		<>
+			<URLQueryController />
 			<FullscreenMode isActive={ isFullscreenActive } />
 			<UnsavedChangesWarning />
 			<SlotFillProvider>

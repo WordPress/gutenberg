@@ -162,7 +162,8 @@ class EditorProvider extends Component {
 		hasUploadPermissions,
 		canUserUseUnfilteredHTML,
 		undo,
-		shouldInsertAtTheTop
+		shouldInsertAtTheTop,
+		hasTemplate
 	) {
 		return {
 			...pick( settings, [
@@ -211,6 +212,7 @@ class EditorProvider extends Component {
 			__experimentalCanUserUseUnfilteredHTML: canUserUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
+			outlineMode: hasTemplate,
 		};
 	}
 
@@ -259,6 +261,7 @@ class EditorProvider extends Component {
 			hasUploadPermissions,
 			isPostTitleSelected,
 			undo,
+			hasTemplate,
 		} = this.props;
 
 		if ( ! isReady ) {
@@ -271,7 +274,8 @@ class EditorProvider extends Component {
 			hasUploadPermissions,
 			canUserUseUnfilteredHTML,
 			undo,
-			isPostTitleSelected
+			isPostTitleSelected,
+			hasTemplate
 		);
 
 		const defaultBlockContext = this.getDefaultBlockContext(
@@ -321,6 +325,7 @@ export default compose( [
 
 		const { id, type } = __unstableTemplate ?? post;
 		return {
+			hasTemplate: !! __unstableTemplate,
 			canUserUseUnfilteredHTML: canUserUseUnfilteredHTML(),
 			isReady: isEditorReady(),
 			blocks: getEditedEntityRecord( 'postType', type, id ).blocks,

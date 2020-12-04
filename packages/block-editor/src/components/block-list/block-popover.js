@@ -229,6 +229,7 @@ function BlockPopover( {
 				<BlockSelectionButton
 					clientId={ clientId }
 					rootClientId={ rootClientId }
+					blockElement={ node }
 				/>
 			) }
 			{ showEmptyBlockSideInserter && (

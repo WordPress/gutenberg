@@ -17,8 +17,8 @@ import {
 	capturePhoto,
 	captureVideo,
 	image,
-	video,
 	wordpress,
+	mobile,
 } from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
@@ -125,18 +125,7 @@ export class MediaUpload extends React.Component {
 	}
 
 	getChooseFromDeviceIcon() {
-		const { allowedTypes = [] } = this.props;
-
-		const isOneType = allowedTypes.length === 1;
-		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
-		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
-		const isAnyType = isOneType && allowedTypes.includes( MEDIA_TYPE_ANY );
-
-		if ( isImage || ! isOneType || isAnyType ) {
-			return image;
-		} else if ( isVideo ) {
-			return video;
-		}
+		return mobile;
 	}
 
 	onPickerPresent() {

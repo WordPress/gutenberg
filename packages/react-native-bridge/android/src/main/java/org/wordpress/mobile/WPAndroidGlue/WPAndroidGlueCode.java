@@ -356,7 +356,7 @@ public class WPAndroidGlueCode {
                 if (mediaType == MediaType.IMAGE || mediaType == MediaType.MEDIA) {
                     ArrayList<MediaOption> otherMediaImageOptions = mOnMediaLibraryButtonListener.onGetOtherMediaImageOptions();
                     otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaImageOptions);
-                } else {
+                } else if (mediaType == MediaType.ANY) {
                     ArrayList<MediaOption> otherMediaFileOptions = mOnMediaLibraryButtonListener.onGetOtherMediaFileOptions();
                     otherMediaOptionsReceivedCallback.onOtherMediaOptionsReceived(otherMediaFileOptions);
                 }
