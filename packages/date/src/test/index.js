@@ -13,6 +13,59 @@ import {
 	addMinutes,
 } from '../';
 
+const HOUR_IN_MILLIS = 60 * 60 * 1000;
+
+const defaultSettings = __experimentalGetSettings();
+afterEach( () => {
+	setSettings( defaultSettings );
+} );
+
+describe( 'localDateToSiteDate', () => {
+	it( 'should return local date offsetted to site timezone', () => {
+		const offsetInHours = 4;
+		// Set a timezone in the future
+		setSettings( {
+			...defaultSettings,
+			timezone: {
+				offset: offsetInHours,
+				string: '',
+			},
+		} );
+		const offsetDifferenceInHours =
+			offsetInHours + new Date().getTimezoneOffset() / 60;
+
+		const localDate = new Date( 2020, 0, 0, 10, 10, 0 );
+		const siteDate = localDateToSiteDate( localDate );
+
+		expect( siteDate.getTime() - localDate.getTime() ).toBe(
+			offsetDifferenceInHours * HOUR_IN_MILLIS
+		);
+	} );
+} );
+
+describe( 'siteDateToLocalDate', () => {
+	it( 'should return site date offsetted to local timezone', () => {
+		const offsetInHours = 4;
+		// Set a timezone in the future
+		setSettings( {
+			...defaultSettings,
+			timezone: {
+				offset: offsetInHours,
+				string: '',
+			},
+		} );
+		const offsetDifferenceInHours =
+			offsetInHours + new Date().getTimezoneOffset() / 60;
+
+		const siteDate = new Date( 2020, 0, 0, 10, 10, 0 );
+		const localDate = localDateToSiteDate( siteDate );
+
+		expect( localDate.getTime() - siteDate.getTime() ).toBe(
+			offsetDifferenceInHours * HOUR_IN_MILLIS
+		);
+	} );
+} );
+
 describe( 'isInTheFuture', () => {
 	it( 'should return true if the date is in the future', () => {
 		// Create a Date object 1 minute in the future.
