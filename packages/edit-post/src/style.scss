@@ -90,6 +90,11 @@ body.block-editor-page {
 	iframe {
 		width: 100%;
 	}
+
+	pre {
+		white-space: pre-wrap;
+		overflow-wrap: break-word;
+	}
 }
 
 @include default-block-widths();

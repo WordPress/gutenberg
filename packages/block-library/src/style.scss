@@ -108,3 +108,14 @@
 .aligncenter {
 	clear: both;
 }
+
+// This resets the WordPress default
+img {
+	height: auto;
+	max-width: 100%;
+}
+
+pre {
+	white-space: pre-wrap;
+	overflow-wrap: break-word;
+}
