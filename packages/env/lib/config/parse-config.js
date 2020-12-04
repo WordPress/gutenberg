@@ -104,7 +104,8 @@ function parseSourceString( sourceString, { workDirectoryPath } ) {
 		);
 		const basename = wpOrgFields
 			? encodeURIComponent( wpOrgFields[ 1 ] )
-			: encodeURIComponent( zipFields[ 1 ] );
+			: encodeURIComponent( path.basename( zipFields[ 1 ] ) );
+
 		return {
 			type: 'zip',
 			url: sourceString,

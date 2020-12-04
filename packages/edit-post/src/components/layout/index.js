@@ -24,6 +24,7 @@ import {
 	ScrollLock,
 	Popover,
 	FocusReturnProvider,
+	__unstableUseDrop as useDrop,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { PluginArea } from '@wordpress/plugins';
@@ -167,6 +168,7 @@ function Layout( { settings } ) {
 	);
 	const ref = useRef();
 
+	useDrop( ref );
 	useEditorStyles( ref, settings.styles );
 
 	return (

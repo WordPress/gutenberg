@@ -110,7 +110,7 @@
 /packages/project-management-automation
 
 # wp-env
-/packages/env                                   @epiqueras @noahtallen
+/packages/env                                   @noahtallen
 
 # PHP
 /lib                                            @timothybjacobs @spacedmonkey

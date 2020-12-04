@@ -13,9 +13,10 @@ const readline = require( 'readline' );
 const { log, formats } = require( '../lib/logger' );
 const { askForConfirmation, runStep, readJSONFile } = require( '../lib/utils' );
 const {
+	calculateVersionBumpFromChangelog,
+	findReleaseBranchName,
 	runGitRepositoryCloneStep,
 	runCleanLocalFoldersStep,
-	findReleaseBranchName,
 } = require( './common' );
 const git = require( '../lib/git' );
 
@@ -104,55 +105,18 @@ async function updatePackages(
 		changelogFiles.map( async ( changelogPath ) => {
 			const fileStream = fs.createReadStream( changelogPath );
 
-			const lines = readline.createInterface( {
+			const rl = readline.createInterface( {
 				input: fileStream,
 			} );
-
-			let changesDetected = false;
-			let versionBump = null;
-			for await ( const line of lines ) {
-				const lineNormalized = line.toLowerCase();
-				// Detect unpublished changes first.
-				if ( lineNormalized.startsWith( '## unreleased' ) ) {
-					changesDetected = true;
-					continue;
-				}
-
-				// Skip all lines until unpublished changes found.
-				if ( ! changesDetected ) {
-					continue;
-				}
-
-				// A previous published version detected. Stop processing.
-				if ( lineNormalized.startsWith( '## ' ) ) {
-					break;
-				}
-
-				// A major version bump required. Stop processing.
-				if ( lineNormalized.startsWith( '### breaking change' ) ) {
-					versionBump = 'major';
-					break;
-				}
-
-				// A minor version bump required. Proceed to the next line.
-				if (
-					lineNormalized.startsWith( '### deprecation' ) ||
-					lineNormalized.startsWith( '### enhancement' ) ||
-					lineNormalized.startsWith( '### new feature' )
-				) {
-					versionBump = 'minor';
-					continue;
-				}
-
-				// A version bump required. Found new changelog section.
-				if (
-					versionBump !== 'minor' &&
-					( lineNormalized.startsWith( '### ' ) ||
-						lineNormalized.startsWith( '- initial release' ) )
-				) {
-					versionBump = minimumVersionBump;
-				}
+			const lines = [];
+			for await ( const line of rl ) {
+				lines.push( line );
 			}
+
+			const versionBump = calculateVersionBumpFromChangelog(
+				lines,
+				minimumVersionBump
+			);
 			const packageName = `@wordpress/${
 				changelogPath.split( '/' ).reverse()[ 1 ]
 			}`;
