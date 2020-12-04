@@ -32,6 +32,159 @@ import { BlockListBlockContext } from './block';
 import ELEMENTS from './block-wrapper-elements';
 
 /**
+ * Transitions focus to the block or inner tabbable when the block becomes
+ * selected.
+ *
+ * @param {Object} ref      React ref with the block element.
+ * @param {string} clientId Block client ID.
+ */
+function useFocusFirstElement( ref, clientId ) {
+	const initialPosition = useSelect(
+		( select ) => {
+			const {
+				getSelectedBlocksInitialCaretPosition,
+				isMultiSelecting,
+				isNavigationMode,
+				isBlockSelected,
+			} = select( 'core/block-editor' );
+
+			if ( ! isBlockSelected( clientId ) ) {
+				return;
+			}
+
+			if ( isMultiSelecting() || isNavigationMode() ) {
+				return;
+			}
+
+			return getSelectedBlocksInitialCaretPosition() || 1;
+		},
+		[ clientId ]
+	);
+
+	useEffect( () => {
+		if ( ! initialPosition ) {
+			return;
+		}
+
+		const { ownerDocument } = ref.current;
+
+		// Focus is captured by the wrapper node, so while focus transition
+		// should only consider tabbables within editable display, since it
+		// may be the wrapper itself or a side control which triggered the
+		// focus event, don't unnecessary transition to an inner tabbable.
+		if (
+			ownerDocument.activeElement &&
+			isInsideRootBlock( ref.current, ownerDocument.activeElement )
+		) {
+			return;
+		}
+
+		// Find all tabbables within node.
+		const textInputs = focus.tabbable.find( ref.current ).filter(
+			( node ) =>
+				isTextField( node ) &&
+				// Exclude inner blocks and block appenders
+				isInsideRootBlock( ref.current, node ) &&
+				! node.closest( '.block-list-appender' )
+		);
+
+		// If reversed (e.g. merge via backspace), use the last in the set of
+		// tabbables.
+		const isReverse = -1 === initialPosition;
+		const target =
+			( isReverse ? last : first )( textInputs ) || ref.current;
+
+		placeCaretAtHorizontalEdge( target, isReverse );
+	}, [ initialPosition ] );
+}
+
+/**
+ * Returns true when the block is hovered and in navigation mode, false if not.
+ *
+ * @param {Object} ref React ref with the block element.
+ *
+ * @return {boolean} Hovered state.
+ */
+function useIsHovered( ref ) {
+	const [ isHovered, setHovered ] = useState( false );
+	const isNavigationMode = useSelect(
+		( select ) => select( 'core/block-editor' ).isNavigationMode(),
+		[]
+	);
+
+	useEffect( () => {
+		if ( ! isNavigationMode ) {
+			return;
+		}
+
+		function addListener( eventType, value ) {
+			function listener( event ) {
+				if ( event.defaultPrevented ) {
+					return;
+				}
+
+				event.preventDefault();
+				setHovered( value );
+			}
+
+			ref.current.addEventListener( eventType, listener );
+			return () => {
+				ref.current.removeEventListener( eventType, listener );
+			};
+		}
+
+		if ( isHovered ) {
+			return addListener( 'mouseout', false );
+		}
+
+		return addListener( 'mouseover', true );
+	}, [ isNavigationMode, isHovered, setHovered ] );
+
+	return isHovered;
+}
+
+/**
+ * Returns the class names used for block moving mode.
+ *
+ * @param {string} clientId The block client ID to insert above.
+ *
+ * @return {string} The class names.
+ */
+function useBlockMovingModeClassNames( clientId ) {
+	return useSelect(
+		( select ) => {
+			const {
+				hasBlockMovingClientId,
+				canInsertBlockType,
+				getBlockName,
+				getBlockRootClientId,
+				isBlockSelected,
+			} = select( 'core/block-editor' );
+
+			// The classes are only relevant for the selected block. Avoid
+			// re-rendering all blocks!
+			if ( ! isBlockSelected( clientId ) ) {
+				return;
+			}
+
+			const movingClientId = hasBlockMovingClientId();
+
+			if ( ! movingClientId ) {
+				return;
+			}
+
+			return classnames( 'is-block-moving-mode', {
+				'can-insert-moving-block': canInsertBlockType(
+					getBlockName( movingClientId ),
+					getBlockRootClientId( clientId )
+				),
+			} );
+		},
+		[ clientId ]
+	);
+}
+
+/**
  * This hook is used to lightly mark an element as a block element. The element
  * should be the outermost element of a block. Call this hook and pass the
  * returned props to the element to mark as a block. If you define a ref for the
@@ -67,51 +220,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		blockTitle,
 		wrapperProps = {},
 	} = useContext( BlockListBlockContext );
-	const {
-		initialPosition,
-		shouldFocusFirstElement,
-		isNavigationMode,
-		isBlockMovingMode,
-		canInsertMovingBlock,
-	} = useSelect(
-		( select ) => {
-			const {
-				getSelectedBlocksInitialCaretPosition,
-				isMultiSelecting: _isMultiSelecting,
-				isNavigationMode: _isNavigationMode,
-				hasBlockMovingClientId,
-				canInsertBlockType,
-				getBlockName,
-				getBlockRootClientId,
-			} = select( 'core/block-editor' );
-
-			const movingClientId = hasBlockMovingClientId();
-			const _isBlockMovingMode = isSelected && !! movingClientId;
-
-			return {
-				shouldFocusFirstElement:
-					isSelected &&
-					! _isMultiSelecting() &&
-					! _isNavigationMode(),
-				initialPosition: isSelected
-					? getSelectedBlocksInitialCaretPosition()
-					: undefined,
-				isNavigationMode: _isNavigationMode,
-				isBlockMovingMode: _isBlockMovingMode,
-				canInsertMovingBlock:
-					_isBlockMovingMode &&
-					canInsertBlockType(
-						getBlockName( movingClientId ),
-						getBlockRootClientId( clientId )
-					),
-			};
-		},
-		[ isSelected, clientId ]
-	);
 	const { insertDefaultBlock, removeBlock, selectBlock } = useDispatch(
 		'core/block-editor'
 	);
-	const [ isHovered, setHovered ] = useState( false );
 
 	// Provide the selected node, or the first and last nodes of a multi-
 	// selection, so it can be used to position the contextual block toolbar.
@@ -147,48 +258,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
 
-	// Handing the focus of the block on creation and update
-
-	/**
-	 * When a block becomes selected, transition focus to an inner tabbable.
-	 */
-	const focusTabbable = () => {
-		const { ownerDocument } = ref.current;
-
-		// Focus is captured by the wrapper node, so while focus transition
-		// should only consider tabbables within editable display, since it
-		// may be the wrapper itself or a side control which triggered the
-		// focus event, don't unnecessary transition to an inner tabbable.
-		if (
-			ownerDocument.activeElement &&
-			isInsideRootBlock( ref.current, ownerDocument.activeElement )
-		) {
-			return;
-		}
-
-		// Find all tabbables within node.
-		const textInputs = focus.tabbable.find( ref.current ).filter(
-			( node ) =>
-				isTextField( node ) &&
-				// Exclude inner blocks and block appenders
-				isInsideRootBlock( ref.current, node ) &&
-				! node.closest( '.block-list-appender' )
-		);
-
-		// If reversed (e.g. merge via backspace), use the last in the set of
-		// tabbables.
-		const isReverse = -1 === initialPosition;
-		const target =
-			( isReverse ? last : first )( textInputs ) || ref.current;
-
-		placeCaretAtHorizontalEdge( target, isReverse );
-	};
-
-	useEffect( () => {
-		if ( shouldFocusFirstElement ) {
-			focusTabbable();
-		}
-	}, [ shouldFocusFirstElement ] );
+	useFocusFirstElement( ref, clientId );
 
 	// Block Reordering animation
 	useMovingAnimation(
@@ -288,48 +358,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		};
 	}, [ isSelected, onSelectionStart, insertDefaultBlock, removeBlock ] );
 
-	useEffect( () => {
-		if ( ! isNavigationMode ) {
-			return;
-		}
-
-		function onMouseOver( event ) {
-			if ( event.defaultPrevented ) {
-				return;
-			}
-
-			event.preventDefault();
-
-			if ( isHovered ) {
-				return;
-			}
-
-			setHovered( true );
-		}
-
-		function onMouseOut( event ) {
-			if ( event.defaultPrevented ) {
-				return;
-			}
-
-			event.preventDefault();
-
-			if ( ! isHovered ) {
-				return;
-			}
-
-			setHovered( false );
-		}
-
-		ref.current.addEventListener( 'mouseover', onMouseOver );
-		ref.current.addEventListener( 'mouseout', onMouseOut );
-
-		return () => {
-			ref.current.removeEventListener( 'mouseover', onMouseOver );
-			ref.current.removeEventListener( 'mouseout', onMouseOut );
-		};
-	}, [ isNavigationMode, isHovered, setHovered ] );
-
+	const isHovered = useIsHovered( ref );
+	const blockMovingModeClassNames = useBlockMovingModeClassNames( clientId );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 
 	return {
@@ -347,11 +377,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			className,
 			props.className,
 			wrapperProps.className,
-			{
-				'is-hovered': isHovered,
-				'is-block-moving-mode': isBlockMovingMode,
-				'can-insert-moving-block': canInsertMovingBlock,
-			}
+			blockMovingModeClassNames,
+			{ 'is-hovered': isHovered }
 		),
 		style: { ...wrapperProps.style, ...props.style },
 	};
