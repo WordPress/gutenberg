@@ -199,8 +199,7 @@ export default function useSelect( _mapSelect, deps ) {
 
 		return () => {
 			isMountedAndNotUnsubscribing.current = false;
-			// Gracefully swallow the error if the unsubscribe function doesn't exist.
-			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
+			unsubscribers.forEach( ( unsubscribe ) => unsubscribe() );
 			renderQueue.flush( queueContext );
 		};
 	}, [ registry, trapSelect, depsChangedFlag ] );

@@ -613,5 +613,111 @@ describe( 'useSelect', () => {
 			// Test if the unsubscribers get called correctly.
 			renderer.unmount();
 		} );
+
+		it( 'handles registration of a non-existing store during rendering', () => {
+			let renderer;
+
+			const TestComponent = jest.fn( () => {
+				const state = useSelect(
+					( select ) =>
+						select( 'not-yet-registered-store' )?.getCounter(),
+					[]
+				);
+
+				return <div data={ state } />;
+			} );
+
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<TestComponent />
+					</RegistryProvider>
+				);
+			} );
+
+			const testInstance = renderer.root;
+
+			expect( testInstance.findByType( 'div' ).props.data ).toBe(
+				undefined
+			);
+
+			act( () => {
+				registry.registerStore(
+					'not-yet-registered-store',
+					counterStore
+				);
+			} );
+
+			// This is not ideal, but is the way it's working before and we want to prevent breaking changes.
+			expect( testInstance.findByType( 'div' ).props.data ).toBe(
+				undefined
+			);
+
+			act( () => {
+				registry.dispatch( 'not-yet-registered-store' ).increment();
+			} );
+
+			expect( testInstance.findByType( 'div' ).props.data ).toBe( 1 );
+
+			// Test if the unsubscribers get called correctly.
+			renderer.unmount();
+		} );
+
+		it( 'handles registration of a non-existing store of sub-registry during rendering', () => {
+			let renderer;
+
+			const subRegistry = createRegistry( {}, registry );
+
+			const TestComponent = jest.fn( () => {
+				const state = useSelect(
+					( select ) =>
+						select(
+							'not-yet-registered-child-store'
+						)?.getCounter(),
+					[]
+				);
+
+				return <div data={ state } />;
+			} );
+
+			act( () => {
+				renderer = TestRenderer.create(
+					<RegistryProvider value={ registry }>
+						<RegistryProvider value={ subRegistry }>
+							<TestComponent />
+						</RegistryProvider>
+					</RegistryProvider>
+				);
+			} );
+
+			const testInstance = renderer.root;
+
+			expect( testInstance.findByType( 'div' ).props.data ).toBe(
+				undefined
+			);
+
+			act( () => {
+				registry.registerStore(
+					'not-yet-registered-child-store',
+					counterStore
+				);
+			} );
+
+			// This is not ideal, but is the way it's working before and we want to prevent breaking changes.
+			expect( testInstance.findByType( 'div' ).props.data ).toBe(
+				undefined
+			);
+
+			act( () => {
+				registry
+					.dispatch( 'not-yet-registered-child-store' )
+					.increment();
+			} );
+
+			expect( testInstance.findByType( 'div' ).props.data ).toBe( 1 );
+
+			// Test if the unsubscribers get called correctly.
+			renderer.unmount();
+		} );
 	} );
 } );
