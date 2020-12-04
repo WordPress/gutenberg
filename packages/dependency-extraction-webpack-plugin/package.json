@@ -24,7 +24,7 @@
 		"build-types"
 	],
 	"main": "lib/index.js",
-	"types": "build-types",
+	"types": "lib/types.d.ts",
 	"dependencies": {
 		"json2php": "^0.0.4",
 		"webpack": "^4.8.3",
