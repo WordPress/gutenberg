@@ -19,6 +19,9 @@ import originalLocale from 'date-fns/locale/en-US/index';
 import buildLocalizeFn from 'date-fns/locale/_lib/buildLocalizeFn';
 import buildFormatLongFn from 'date-fns/locale/_lib/buildFormatLongFn';
 
+require( 'moment-timezone/moment-timezone' );
+require( 'moment-timezone/moment-timezone-utils' );
+
 // This regular expression tests positive for UTC offsets as described in ISO 8601.
 // See: https://en.wikipedia.org/wiki/ISO_8601#Time_offsets_from_UTC
 const VALID_UTC_OFFSET = /^[+-][0-1][0-9](:?[0-9][0-9])?$/;
