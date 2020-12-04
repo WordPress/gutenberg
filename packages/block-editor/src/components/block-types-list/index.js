@@ -30,7 +30,7 @@ function BlockTypesList( {
 			aria-label={ label }
 		>
 			{ chunk( items, 3 ).map( ( row, i ) => (
-				<InserterListboxRow key={ i } role="presentation">
+				<InserterListboxRow key={ i }>
 					{ row.map( ( item, j ) => (
 						<InserterListItem
 							key={ item.id }
@@ -48,7 +48,7 @@ function BlockTypesList( {
 							onBlur={ () => onHover( null ) }
 							isDisabled={ item.isDisabled }
 							title={ item.title }
-							isFirst={ i + j === 0 }
+							isFirst={ i === 0 && j === 0 }
 						/>
 					) ) }
 				</InserterListboxRow>
