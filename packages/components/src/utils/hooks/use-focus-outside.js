@@ -62,7 +62,7 @@ function isFocusNormalizedButton( eventTarget ) {
  */
 
 /**
- * @typedef {Object} FocusOutsideReactElement
+ * @typedef FocusOutsideReactElement
  * @property {EventCallback} handleFocusOutside callback for a focus outside event.
  */
 
