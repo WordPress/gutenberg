@@ -21,7 +21,7 @@ import {
 	getDefaultBlockName,
 	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
-import { isInTheFuture, getDate } from '@wordpress/date';
+import { isSiteDateInTheFuture, parseSiteDate } from '@wordpress/date';
 import { addQueryArgs } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
@@ -482,8 +482,10 @@ export function isCurrentPostPublished( state, currentPost ) {
 	return (
 		[ 'publish', 'private' ].indexOf( post.status ) !== -1 ||
 		( post.status === 'future' &&
-			! isInTheFuture(
-				new Date( Number( getDate( post.date ) ) - ONE_MINUTE_IN_MS )
+			! isSiteDateInTheFuture(
+				new Date(
+					Number( parseSiteDate( post.date ) ) - ONE_MINUTE_IN_MS
+				)
 			) )
 	);
 }
@@ -736,10 +738,10 @@ export function isEditedPostBeingScheduled( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
 	// Offset the date by one minute (network latency)
 	const checkedDate = new Date(
-		Number( getDate( date ) ) - ONE_MINUTE_IN_MS
+		Number( parseSiteDate( date ) ) - ONE_MINUTE_IN_MS
 	);
 
-	return isInTheFuture( checkedDate );
+	return isSiteDateInTheFuture( checkedDate );
 }
 
 /**

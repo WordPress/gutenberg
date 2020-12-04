@@ -5,26 +5,30 @@ import {
 	__experimentalGetSettings,
 	date as dateNoI18n,
 	dateI18n,
-	getDate,
 	gmdate,
 	gmdateI18n,
-	isInTheFuture,
 	setSettings,
+	localDateToSiteDate,
+	isSiteDateInTheFuture,
 } from '../';
 
 describe( 'isInTheFuture', () => {
 	it( 'should return true if the date is in the future', () => {
 		// Create a Date object 1 minute in the future.
-		const date = new Date( Number( getDate() ) + 1000 * 60 );
+		const date = new Date(
+			Number( localDateToSiteDate( new Date() ) ) + 1000 * 60
+		);
 
-		expect( isInTheFuture( date ) ).toBe( true );
+		expect( isSiteDateInTheFuture( date ) ).toBe( true );
 	} );
 
 	it( 'should return false if the date is in the past', () => {
 		// Create a Date object 1 minute in the past.
-		const date = new Date( Number( getDate() ) - 1000 * 60 );
+		const date = new Date(
+			Number( localDateToSiteDate( new Date() ) ) - 1000 * 60
+		);
 
-		expect( isInTheFuture( date ) ).toBe( false );
+		expect( isSiteDateInTheFuture( date ) ).toBe( false );
 	} );
 
 	it( 'should ignore the timezone', () => {
@@ -36,12 +40,16 @@ describe( 'isInTheFuture', () => {
 			timezone: { offset: '4', string: '' },
 		} );
 		// Create a Date object 1 minute in the past.
-		let date = new Date( Number( getDate() ) - 1000 * 60 );
-		expect( isInTheFuture( date ) ).toBe( false );
+		let date = new Date(
+			Number( localDateToSiteDate( new Date() ) ) - 1000 * 60
+		);
+		expect( isSiteDateInTheFuture( date ) ).toBe( false );
 
 		// Create a Date object 1 minute in the future.
-		date = new Date( Number( getDate() ) + 1000 * 60 );
-		expect( isInTheFuture( date ) ).toBe( true );
+		date = new Date(
+			Number( localDateToSiteDate( new Date() ) ) + 1000 * 60
+		);
+		expect( isSiteDateInTheFuture( date ) ).toBe( true );
 
 		// Restore default settings
 		setSettings( settings );
@@ -237,7 +245,7 @@ describe( 'PHP Format Tokens', () => {
 	} );
 
 	it( 'should support "z" to obtain zero-indexed day of the year', () => {
-		const formattedDate = dateNoI18n( 'z', '2019-01-01' );
+		const formattedDate = dateNoI18n( 'z', '2019-01-01T11:00:00.000Z' );
 
 		expect( formattedDate ).toBe( '0' );
 	} );
@@ -273,13 +281,13 @@ describe( 'PHP Format Tokens', () => {
 	} );
 
 	it( 'should support "t" to obtain the days in a given month', () => {
-		const formattedDate = dateNoI18n( 't', '2019-02' );
+		const formattedDate = dateNoI18n( 't', '2019-02-01T11:00:00.000Z' );
 
 		expect( formattedDate ).toBe( '28' );
 	} );
 
 	it( 'should support "L" to obtain whether or not the year is a leap year', () => {
-		const formattedDate = dateNoI18n( 'L', '2020' );
+		const formattedDate = dateNoI18n( 'L', '2020-01-01T11:00:00.000Z' );
 
 		expect( formattedDate ).toBe( '1' );
 	} );
@@ -451,7 +459,8 @@ describe( 'PHP Format Tokens', () => {
 			'2020-01-01T11:00:00.000Z'
 		);
 
-		expect( formattedDateStandard ).toBe( 'EST' );
+		// Return value depends on the locale, so we check for both possible values
+		expect( [ 'GMT-5', 'EST' ] ).toContain( formattedDateStandard );
 
 		setSettings( settings );
 	} );

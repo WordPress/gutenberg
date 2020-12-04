@@ -8,6 +8,7 @@ import {
 	isFuture,
 	isLeapYear,
 	parseISO,
+	addMinutes,
 } from 'date-fns';
 import {
 	format as formatTZ,
@@ -622,22 +623,79 @@ export function gmdateI18n( dateFormat, dateValue = new Date() ) {
  *
  * @return {boolean} Is in the future.
  */
-export function isInTheFuture( dateValue ) {
-	const dateObject = toDate( dateValue, { timeZone: getActualTimezone() } );
-
+export function isSiteDateInTheFuture( dateValue ) {
+	const dateObject = siteDateToLocalDate( dateValue );
 	return isFuture( dateObject );
 }
 
-/**
- * Create and return a JavaScript Date Object from a date string in the WP timezone.
- *
- * @param {string?} dateString Date formatted in the WP timezone.
- *
- * @return {Date} Date
- */
-export function getDate( dateString ) {
-	const actualDate = dateString ? new Date( dateString ) : new Date();
-	return toDate( actualDate, { timeZone: getActualTimezone() } );
+export function parseSiteDate( dateString ) {
+	return toDate( dateString, { timeZone: getActualTimezone() } );
 }
 
-export { zonedTimeToUtc };
+/**
+ * Convert date from site's timezone to system timezone.
+ *
+ * @param {string|Date} dateValue Date offsetted to site's timezone
+ *
+ * @return {Date} Date offsetted to system timezone
+ */
+export function siteDateToLocalDate( dateValue ) {
+	return utcDateToLocal( siteDateToUtcDate( dateValue ) );
+}
+
+/**
+ * Convert date from system timezone to site's timezone.
+ *
+ * @param {string|Date} dateValue Date offsetted to system timezone
+ *
+ * @return {Date} Date offsetted to site's timezone
+ */
+export function localDateToSiteDate( dateValue ) {
+	return utcDateToSiteDate( localDateToUtc( dateValue ) );
+}
+
+/**
+ * Convert date from system timezone to UTC.
+ *
+ * @param {string|Date} dateValue Date offsetted to system timezone
+ *
+ * @return {Date} Date offsetted to UTC
+ */
+export function localDateToUtc( dateValue ) {
+	return zonedTimeToUtc( dateValue, 'UTC' );
+}
+
+/**
+ * Convert date from UTC to system timezone.
+ *
+ * @param {string|Date} dateValue Date offsetted to UTC
+ *
+ * @return {Date} Date offsetted to system timezone
+ */
+export function utcDateToLocal( dateValue ) {
+	return utcToZonedTime( dateValue, 'UTC' );
+}
+
+/**
+ * Convert date from UTC to site's timezone.
+ *
+ * @param {string|Date} dateValue Date offsetted to UTC
+ *
+ * @return {Date} Date offsetted to site's timezone
+ */
+export function utcDateToSiteDate( dateValue ) {
+	return utcToZonedTime( dateValue, getActualTimezone() );
+}
+
+/**
+ * Convert date from site's timezone to UTC.
+ *
+ * @param {string|Date} dateValue Date offsetted to site's timezone
+ *
+ * @return {Date} Date offsetted to UTC
+ */
+export function siteDateToUtcDate( dateValue ) {
+	return zonedTimeToUtc( dateValue, getActualTimezone() );
+}
+
+export { addMinutes };
