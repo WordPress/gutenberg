@@ -170,7 +170,9 @@
 	// Navigate mode & Focused wrapper.
 	// We're using a pseudo element to overflow placeholder borders
 	// and any border inside the block itself.
-	&:not([contenteditable]):focus {
+	&:not([contenteditable]):focus,
+	&.is-outline-mode.is-hovered:not(.is-typing),
+	&.is-outline-mode.is-selected:not(.is-typing) {
 		outline: none;
 
 		&::after {

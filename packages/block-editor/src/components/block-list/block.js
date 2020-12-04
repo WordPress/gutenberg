@@ -111,7 +111,7 @@ function BlockListBlock( {
 	// In addition to withSelect, we should favor using useSelect in this
 	// component going forward to avoid leaking new props to the public API
 	// (editor.BlockListBlock filter)
-	const { isDragging, isHighlighted, isFocusMode } = useSelect(
+	const { isDragging, isHighlighted, isFocusMode, isOutlineMode } = useSelect(
 		( select ) => {
 			const {
 				isBlockBeingDragged,
@@ -122,6 +122,7 @@ function BlockListBlock( {
 				isDragging: isBlockBeingDragged( clientId ),
 				isHighlighted: isBlockHighlighted( clientId ),
 				isFocusMode: getSettings().focusMode,
+				isOutlineMode: getSettings().outlineMode,
 			};
 		},
 		[ clientId ]
@@ -175,6 +176,7 @@ function BlockListBlock( {
 				isLargeViewport &&
 				( isSelected || isAncestorOfSelectedBlock ),
 			'is-focus-mode': isFocusMode && isLargeViewport,
+			'is-outline-mode': isOutlineMode,
 			'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
 			'is-active-entity': activeEntityBlockId === clientId,
 		},
