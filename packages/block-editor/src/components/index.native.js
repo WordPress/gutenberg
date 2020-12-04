@@ -59,10 +59,8 @@ export { default as BlockStyles } from './block-styles';
 export { default as DefaultBlockAppender } from './default-block-appender';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
-export {
-	Block as __experimentalBlock,
-	useBlockProps,
-} from './block-list/block-wrapper';
+export { useBlockProps } from './block-list/use-block-props';
+export { Block as __experimentalBlock } from './block-list/block-wrapper';
 export { default as FloatingToolbar } from './floating-toolbar';
 
 // State Related Components

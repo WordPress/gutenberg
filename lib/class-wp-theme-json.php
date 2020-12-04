@@ -88,8 +88,6 @@ class WP_Theme_JSON {
 	 * }
 	 */
 	const SCHEMA = array(
-		'selector' => null,
-		'supports' => null,
 		'styles'   => array(
 			'color'      => array(
 				'background' => null,
@@ -358,10 +356,6 @@ class WP_Theme_JSON {
 
 			// Filter out top-level keys that aren't valid according to the schema.
 			$context = array_intersect_key( $context, self::SCHEMA );
-
-			// Selector & Supports are always taken from metadata.
-			$this->contexts[ $key ]['selector'] = $metadata[ $key ]['selector'];
-			$this->contexts[ $key ]['supports'] = $metadata[ $key ]['supports'];
 
 			// Process styles subtree.
 			$this->process_key( 'styles', $context, self::SCHEMA );
@@ -661,16 +655,17 @@ class WP_Theme_JSON {
 	 *
 	 * Note that this modifies the $declarations in place.
 	 *
-	 * @param array $declarations Holds the existing declarations.
-	 * @param array $context Input context to process.
+	 * @param array $declarations     Holds the existing declarations.
+	 * @param array $context Input    context to process.
+	 * @param array $context_supports Supports information for this context.
 	 */
-	private static function compute_style_properties( &$declarations, $context ) {
-		if ( empty( $context['supports'] ) || empty( $context['styles'] ) ) {
+	private static function compute_style_properties( &$declarations, $context, $context_supports ) {
+		if ( empty( $context['styles'] ) ) {
 			return;
 		}
 
 		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
-			if ( ! in_array( $name, $context['supports'], true ) ) {
+			if ( ! in_array( $name, $context_supports, true ) ) {
 				continue;
 			}
 
@@ -693,9 +688,9 @@ class WP_Theme_JSON {
 	 *
 	 * @param string $stylesheet Input stylesheet to add the presets to.
 	 * @param array  $context Context to process.
+	 * @param string $selector Selector wrapping the classes.
 	 */
-	private static function compute_preset_classes( &$stylesheet, $context ) {
-		$selector = $context['selector'];
+	private static function compute_preset_classes( &$stylesheet, $context, $selector ) {
 		if ( self::GLOBAL_SELECTOR === $selector ) {
 			// Classes at the global level do not need any CSS prefixed,
 			// and we don't want to increase its specificity.
@@ -830,23 +825,24 @@ class WP_Theme_JSON {
 	 *     --wp--custom--variable: value;
 	 *   }
 	 *
-	 * @param string $stylesheet Stylesheet to append new rules to.
-	 * @param array  $context Context to be processed.
-	 *
 	 * @return string The new stylesheet.
 	 */
-	private static function to_css_variables( $stylesheet, $context ) {
-		if ( empty( $context['selector'] ) ) {
-			return $stylesheet;
+	private function get_css_variables() {
+		$stylesheet = '';
+		$metadata   = $this->get_blocks_metadata();
+		foreach ( $this->contexts as $context_name => $context ) {
+			if ( empty( $metadata[ $context_name ]['selector'] ) ) {
+				continue;
+			}
+			$selector = $metadata[ $context_name ]['selector'];
+
+			$declarations = array();
+			self::compute_preset_vars( $declarations, $context );
+			self::compute_theme_vars( $declarations, $context );
+
+			// Attach the ruleset for style and custom properties.
+			$stylesheet .= self::to_ruleset( $selector, $declarations );
 		}
-
-		$declarations = array();
-		self::compute_preset_vars( $declarations, $context );
-		self::compute_theme_vars( $declarations, $context );
-
-		// Attach the ruleset for style and custom properties.
-		$stylesheet .= self::to_ruleset( $context['selector'], $declarations );
-
 		return $stylesheet;
 	}
 
@@ -885,23 +881,26 @@ class WP_Theme_JSON {
 	 *     background: value;
 	 *   }
 	 *
-	 * @param string $stylesheet Stylesheet to append new rules to.
-	 * @param array  $context Context to be processed.
-	 *
 	 * @return string The new stylesheet.
 	 */
-	private static function to_block_styles( $stylesheet, $context ) {
-		if ( empty( $context['selector'] ) ) {
-			return $stylesheet;
+	private function get_block_styles() {
+		$stylesheet = '';
+		$metadata   = $this->get_blocks_metadata();
+		foreach ( $this->contexts as $context_name => $context ) {
+			if ( empty( $metadata[ $context_name ]['selector'] ) || empty( $metadata[ $context_name ]['supports'] ) ) {
+				continue;
+			}
+			$selector = $metadata[ $context_name ]['selector'];
+			$supports = $metadata[ $context_name ]['supports'];
+
+			$declarations = array();
+			self::compute_style_properties( $declarations, $context, $supports );
+
+			$stylesheet .= self::to_ruleset( $selector, $declarations );
+
+			// Attach the rulesets for the classes.
+			self::compute_preset_classes( $stylesheet, $context, $selector );
 		}
-
-		$declarations = array();
-		self::compute_style_properties( $declarations, $context );
-
-		$stylesheet .= self::to_ruleset( $context['selector'], $declarations );
-
-		// Attach the rulesets for the classes.
-		self::compute_preset_classes( $stylesheet, $context );
 
 		return $stylesheet;
 	}
@@ -945,11 +944,11 @@ class WP_Theme_JSON {
 	public function get_stylesheet( $type = 'all' ) {
 		switch ( $type ) {
 			case 'block_styles':
-				return array_reduce( $this->contexts, array( $this, 'to_block_styles' ), '' );
+				return $this->get_block_styles();
 			case 'css_variables':
-				return array_reduce( $this->contexts, array( $this, 'to_css_variables' ), '' );
+				return $this->get_css_variables();
 			default:
-				return array_reduce( $this->contexts, array( $this, 'to_css_variables' ), '' ) . array_reduce( $this->contexts, array( $this, 'to_block_styles' ), '' );
+				return $this->get_css_variables() . $this->get_block_styles();
 		}
 	}
 
@@ -960,13 +959,8 @@ class WP_Theme_JSON {
 	 */
 	public function merge( $theme_json ) {
 		$incoming_data = $theme_json->get_raw_data();
-		$metadata      = $this->get_blocks_metadata();
 
 		foreach ( array_keys( $incoming_data ) as $context ) {
-			// Selector & Supports are always taken from metadata.
-			$this->contexts[ $context ]['selector'] = $metadata[ $context ]['selector'];
-			$this->contexts[ $context ]['supports'] = $metadata[ $context ]['supports'];
-
 			foreach ( array( 'settings', 'styles' ) as $subtree ) {
 				if ( ! isset( $incoming_data[ $context ][ $subtree ] ) ) {
 					continue;

@@ -14,6 +14,29 @@ import {
 
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
 
+/**
+ * Waits for all patterns in the inserter to have a height, which should
+ * indicate they've been parsed and are visible.
+ *
+ * This allows a test to wait for the layout in the inserter menu to stabilize
+ * before attempting to interact with the menu contents.
+ */
+async function waitForInserterPatternLoad() {
+	await page.waitForFunction( () => {
+		const previewElements = document.querySelectorAll(
+			'.block-editor-block-preview__container'
+		);
+
+		if ( ! previewElements.length ) {
+			return true;
+		}
+
+		return Array.from( previewElements ).every(
+			( previewElement ) => previewElement.offsetHeight > 0
+		);
+	} );
+}
+
 describe( 'adding blocks', () => {
 	beforeEach( async () => {
 		await createNewPost();
@@ -214,7 +237,15 @@ describe( 'adding blocks', () => {
 
 		// Insert a paragraph block.
 		await page.waitForSelector( '.block-editor-inserter__search-input' );
-		await page.keyboard.type( 'Paragraph' );
+
+		// Search for the paragraph block if it's not in the list of blocks shown.
+		if ( ! page.$( '.editor-block-list-item-paragraph' ) ) {
+			await page.keyboard.type( 'Paragraph' );
+			await page.waitForSelector( '.editor-block-list-item-paragraph' );
+			await waitForInserterPatternLoad();
+		}
+
+		// Add the block.
 		await page.click( '.editor-block-list-item-paragraph' );
 		await page.keyboard.type( '2' );
 

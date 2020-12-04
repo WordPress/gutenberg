@@ -649,3 +649,16 @@ function gutenberg_extend_block_editor_settings_with_default_editor_styles( $set
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_default_editor_styles' );
+
+/**
+ * Adds a flag to the editor settings to know whether we're in FSE theme or not.
+ *
+ * @param array $settings Default editor settings.
+ *
+ * @return array Filtered editor settings.
+ */
+function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings ) {
+	$settings['isFSETheme'] = gutenberg_is_fse_theme();
+	return $settings;
+}
+add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );
