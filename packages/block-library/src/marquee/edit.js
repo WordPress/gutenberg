@@ -8,7 +8,6 @@
 import { __ } from '@wordpress/i18n';
 import {
 	BlockControls,
-	InspectorControls,
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
@@ -97,7 +96,6 @@ function MarqueeBlock( { attributes, isSelected, setAttributes } ) {
 					] }
 				/>
 			</BlockControls>
-			<InspectorControls>sadfas</InspectorControls>
 			<RichText
 				identifier="content"
 				tagName={ isSelected ? 'p' : 'marquee' }
