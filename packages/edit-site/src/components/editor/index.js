@@ -46,6 +46,7 @@ import KeyboardShortcuts from '../keyboard-shortcuts';
 import GlobalStylesProvider from './global-styles-provider';
 import NavigationSidebar from '../navigation-sidebar';
 import URLQueryController from '../url-query-controller';
+import PopoverWrapper from './popover-wrapper';
 
 const interfaceLabels = {
 	secondarySidebar: __( 'Block Library' ),
@@ -222,34 +223,43 @@ function Editor() {
 													}
 													secondarySidebar={
 														isInserterOpen ? (
-															<div className="edit-site-editor__inserter-panel">
-																<div className="edit-site-editor__inserter-panel-header">
-																	<Button
-																		icon={
-																			close
-																		}
-																		onClick={ () =>
-																			setIsInserterOpened(
-																				false
-																			)
-																		}
-																	/>
-																</div>
-																<div className="edit-site-editor__inserter-panel-content">
-																	<Library
-																		showInserterHelpPanel
-																		onSelect={ () => {
-																			if (
-																				isMobile
-																			) {
+															<PopoverWrapper
+																className="edit-site-editor__inserter-panel-popover-wrapper"
+																onClose={ () =>
+																	setIsInserterOpened(
+																		false
+																	)
+																}
+															>
+																<div className="edit-site-editor__inserter-panel">
+																	<div className="edit-site-editor__inserter-panel-header">
+																		<Button
+																			icon={
+																				close
+																			}
+																			onClick={ () =>
 																				setIsInserterOpened(
 																					false
-																				);
+																				)
 																			}
-																		} }
-																	/>
+																		/>
+																	</div>
+																	<div className="edit-site-editor__inserter-panel-content">
+																		<Library
+																			showInserterHelpPanel
+																			onSelect={ () => {
+																				if (
+																					isMobile
+																				) {
+																					setIsInserterOpened(
+																						false
+																					);
+																				}
+																			} }
+																		/>
+																	</div>
 																</div>
-															</div>
+															</PopoverWrapper>
 														) : null
 													}
 													sidebar={
