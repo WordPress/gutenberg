@@ -52,7 +52,7 @@ jobs:
     name: Create Release Draft and Attach Asset
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, "v")
+    if: startsWith(github.ref, 'refs/tags/v')
     steps:
       - name: Set Release Version
         id: get_release_version
