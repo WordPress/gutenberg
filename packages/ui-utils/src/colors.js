@@ -51,9 +51,10 @@ export function isColor( value ) {
 }
 
 /**
- * Retrieves the computed background color.
+ * Retrieves the computed background color. This is useful for getting the
+ * value of a CSS variable color.
  *
- * @param {string | unknown} color
+ * @param {string | unknown} color The background color to compute.
  *
  * @return {string} The computed background color.
  */
@@ -79,7 +80,10 @@ function __getComputedBackgroundColor( color ) {
 }
 
 /**
- * @param {string | unknown} color
+ * Retrieves the computed background color. This is useful for getting the
+ * value of a CSS variable color.
+ *
+ * @param {string | unknown} color The background color to compute.
  *
  * @return {string} The computed background color.
  */
@@ -88,6 +92,9 @@ export const getComputedBackgroundColor = memoize(
 );
 
 /**
+ * Retrieves the computed text color. This is useful for getting the
+ * value of a CSS variable color.
+ *
  * @param {string | unknown} color
  *
  * @return {string} The computed text color.
@@ -114,7 +121,8 @@ function __getComputedColor( color ) {
 }
 
 /**
- * Retrieves the computed text color.
+ * Retrieves the computed text color. This is useful for getting the
+ * value of a CSS variable color.
  *
  * @param {string | unknown} color
  *
@@ -123,7 +131,9 @@ function __getComputedColor( color ) {
 export const getComputedColor = memoize( __getComputedColor );
 
 /**
- * @param {string | unknown} color
+ * Get the text shade optimized for readability, based on a background color.
+ *
+ * @param {string | unknown} color  The background color.
  *
  * @return {string} The optimized text color (black or white).
  */
@@ -138,7 +148,9 @@ export function getOptimalTextColor( color ) {
 }
 
 /**
- * @param {string | unknown} color
+ * Get the text shade optimized for readability, based on a background color.
+ *
+ * @param {string | unknown} color The background color.
  *
  * @return {string} The optimized text shade (dark or light).
  */

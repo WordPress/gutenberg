@@ -89,9 +89,12 @@ Merges two objects together, with support for deeply nested values.
 
 <a name="getComputedBackgroundColor" href="#getComputedBackgroundColor">#</a> **getComputedBackgroundColor**
 
+Retrieves the computed background color. This is useful for getting the
+value of a CSS variable color.
+
 _Parameters_
 
--   _color_ `(string|unknown)`: 
+-   _color_ `(string|unknown)`: The background color to compute.
 
 _Returns_
 
@@ -99,7 +102,8 @@ _Returns_
 
 <a name="getComputedColor" href="#getComputedColor">#</a> **getComputedColor**
 
-Retrieves the computed text color.
+Retrieves the computed text color. This is useful for getting the
+value of a CSS variable color.
 
 _Parameters_
 
@@ -135,9 +139,11 @@ _Returns_
 
 <a name="getOptimalTextColor" href="#getOptimalTextColor">#</a> **getOptimalTextColor**
 
+Get the text shade optimized for readability, based on a background color.
+
 _Parameters_
 
--   _color_ `(string|unknown)`: 
+-   _color_ `(string|unknown)`: The background color.
 
 _Returns_
 
@@ -145,9 +151,11 @@ _Returns_
 
 <a name="getOptimalTextShade" href="#getOptimalTextShade">#</a> **getOptimalTextShade**
 
+Get the text shade optimized for readability, based on a background color.
+
 _Parameters_
 
--   _color_ `(string|unknown)`: 
+-   _color_ `(string|unknown)`: The background color.
 
 _Returns_
 
