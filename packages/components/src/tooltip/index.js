@@ -40,7 +40,7 @@ const emitToChild = ( children, eventName, event ) => {
 
 function Tooltip( { children, position, text, shortcut } ) {
 	/**
-	 * Whether a the mouse is currently pressed, used in determining whether
+	 * Whether a mouse is currently pressed, used in determining whether
 	 * to handle a focus event as displaying the tooltip immediately.
 	 *
 	 * @type {boolean}
