@@ -61,7 +61,7 @@ export default function VisualEditor() {
 		<div className="edit-post-visual-editor">
 			<VisualEditorGlobalKeyboardShortcuts />
 			<Popover.Slot name="block-toolbar" />
-			<WritingFlow containerRef={ ref }>
+			<WritingFlow __unstableContainerRef={ ref }>
 				<div
 					ref={ ref }
 					className="editor-styles-wrapper"

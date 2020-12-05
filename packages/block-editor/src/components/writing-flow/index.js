@@ -229,12 +229,15 @@ function selector( select ) {
  * Handles selection and navigation across blocks. This component should be
  * wrapped around BlockList.
  *
- * @param {Object}    props              Component properties.
- * @param {WPElement} props.children     Children to be rendered.
- * @param {RefObject} props.containerRef Optional custom container element to
- *                                       add listeners to.
+ * @param {Object}    props                        Component properties.
+ * @param {WPElement} props.children               Children to be rendered.
+ * @param {RefObject} props.__unstableContainerRef Optional custom container
+ *                                                 element to add listeners to.
  */
-export default function WritingFlow( { children, containerRef } ) {
+export default function WritingFlow( {
+	children,
+	__unstableContainerRef: containerRef,
+} ) {
 	const fallbackRef = useRef();
 	const container = containerRef || fallbackRef;
 	const focusCaptureBeforeRef = useRef();
