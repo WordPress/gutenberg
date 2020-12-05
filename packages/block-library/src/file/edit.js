@@ -8,9 +8,10 @@ import classnames from 'classnames';
  */
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
-	__unstableUseAnimate as useAnimate,
-	ClipboardButton,
+	__unstableGetAnimateClassName as getAnimateClassName,
 	withNotices,
+	ToolbarGroup,
+	ToolbarButton,
 } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
@@ -21,7 +22,8 @@ import {
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useRef } from '@wordpress/element';
+import { useCopyOnClick } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 
@@ -30,13 +32,22 @@ import { file as icon } from '@wordpress/icons';
  */
 import FileBlockInspector from './inspector';
 
-function FileEdit( {
-	isSelected,
-	attributes,
-	setAttributes,
-	noticeUI,
-	noticeOperations,
-} ) {
+function ClipboardToolbarButton( { text, disabled } ) {
+	const ref = useRef();
+	const hasCopied = useCopyOnClick( ref, text );
+
+	return (
+		<ToolbarButton
+			className="components-clipboard-toolbar-button"
+			ref={ ref }
+			disabled={ disabled }
+		>
+			{ hasCopied ? __( 'Copied!' ) : __( 'Copy URL' ) }
+		</ToolbarButton>
+	);
+}
+
+function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 	const {
 		id,
 		fileName,
@@ -47,7 +58,6 @@ function FileEdit( {
 		downloadButtonText,
 	} = attributes;
 	const [ hasError, setHasError ] = useState( false );
-	const [ showCopyConfirmation, setShowCopyConfirmation ] = useState( false );
 	const { media, mediaUpload } = useSelect(
 		( select ) => ( {
 			media:
@@ -82,10 +92,6 @@ function FileEdit( {
 		}
 	}, [] );
 
-	useEffect( () => {
-		setShowCopyConfirmation( false );
-	}, [ isSelected ] );
-
 	function onSelectFile( newMedia ) {
 		if ( newMedia && newMedia.url ) {
 			setHasError( false );
@@ -102,14 +108,6 @@ function FileEdit( {
 		setHasError( true );
 		noticeOperations.removeAllNotices();
 		noticeOperations.createErrorNotice( message );
-	}
-
-	function confirmCopyURL() {
-		setShowCopyConfirmation( true );
-	}
-
-	function resetCopyConfirmation() {
-		setShowCopyConfirmation( false );
 	}
 
 	function changeLinkDestinationOption( newHref ) {
@@ -131,7 +129,7 @@ function FileEdit( {
 
 	const blockProps = useBlockProps( {
 		className: classnames(
-			useAnimate( { type: isBlobURL( href ) ? 'loading' : null } ),
+			isBlobURL( href ) && getAnimateClassName( { type: 'loading' } ),
 			{
 				'is-transient': isBlobURL( href ),
 			}
@@ -171,13 +169,19 @@ function FileEdit( {
 				} }
 			/>
 			<BlockControls>
-				<MediaReplaceFlow
-					mediaId={ id }
-					mediaURL={ href }
-					accept="*"
-					onSelect={ onSelectFile }
-					onError={ onUploadError }
-				/>
+				<ToolbarGroup>
+					<MediaReplaceFlow
+						mediaId={ id }
+						mediaURL={ href }
+						accept="*"
+						onSelect={ onSelectFile }
+						onError={ onUploadError }
+					/>
+					<ClipboardToolbarButton
+						text={ href }
+						disabled={ isBlobURL( href ) }
+					/>
+				</ToolbarGroup>
 			</BlockControls>
 			<div { ...blockProps }>
 				<div className={ 'wp-block-file__content-wrapper' }>
@@ -201,6 +205,7 @@ function FileEdit( {
 							{ /* Using RichText here instead of PlainText so that it can be styled like a button */ }
 							<RichText
 								tagName="div" // must be block-level or else cursor disappears
+								aria-label={ __( 'Download button text' ) }
 								className={ 'wp-block-file__button' }
 								value={ downloadButtonText }
 								withoutInteractiveFormatting
@@ -214,20 +219,6 @@ function FileEdit( {
 						</div>
 					) }
 				</div>
-				{ isSelected && (
-					<ClipboardButton
-						isSecondary
-						text={ href }
-						className={ 'wp-block-file__copy-url-button' }
-						onCopy={ confirmCopyURL }
-						onFinishCopy={ resetCopyConfirmation }
-						disabled={ isBlobURL( href ) }
-					>
-						{ showCopyConfirmation
-							? __( 'Copied!' )
-							: __( 'Copy URL' ) }
-					</ClipboardButton>
-				) }
 			</div>
 		</>
 	);

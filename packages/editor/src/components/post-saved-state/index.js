@@ -6,7 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Animate, Button } from '@wordpress/components';
+import {
+	__unstableGetAnimateClassName as getAnimateClassName,
+	Button,
+} from '@wordpress/components';
 import { usePrevious, useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
@@ -101,19 +104,20 @@ export default function PostSavedState( {
 		// TODO: Classes generation should be common across all return
 		// paths of this function, including proper naming convention for
 		// the "Save Draft" button.
-		const classes = classnames( 'editor-post-saved-state', 'is-saving', {
-			'is-autosaving': isAutosaving,
-		} );
+		const classes = classnames(
+			'editor-post-saved-state',
+			'is-saving',
+			getAnimateClassName( { type: 'loading' } ),
+			{
+				'is-autosaving': isAutosaving,
+			}
+		);
 
 		return (
-			<Animate type="loading">
-				{ ( { className: animateClassName } ) => (
-					<span className={ classnames( classes, animateClassName ) }>
-						<Icon icon={ cloud } />
-						{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
-					</span>
-				) }
-			</Animate>
+			<span className={ classes }>
+				<Icon icon={ cloud } />
+				{ isAutosaving ? __( 'Autosaving' ) : __( 'Saving' ) }
+			</span>
 		);
 	}
 

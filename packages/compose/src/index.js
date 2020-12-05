@@ -25,3 +25,4 @@ export { default as useResizeObserver } from './hooks/use-resize-observer';
 export { default as useAsyncList } from './hooks/use-async-list';
 export { default as useWarnOnChange } from './hooks/use-warn-on-change';
 export { default as useDebounce } from './hooks/use-debounce';
+export { default as useThrottle } from './hooks/use-throttle';

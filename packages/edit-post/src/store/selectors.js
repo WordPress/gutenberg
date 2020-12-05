@@ -324,3 +324,14 @@ export function __experimentalGetPreviewDeviceType( state ) {
 export function isInserterOpened( state ) {
 	return state.isInserterOpened;
 }
+
+/**
+ * Returns true if the template editing mode is enabled.
+ *
+ * @param  {Object}  state Global application state.
+ *
+ * @return {boolean} Whether we're editing the template.
+ */
+export function isEditingTemplate( state ) {
+	return state.isEditingTemplate;
+}

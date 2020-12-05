@@ -19,10 +19,10 @@ const ModalLinkUI = ( { isVisible, ...restProps } ) => {
 	return useMemo( () => {
 		return (
 			<BottomSheet
-				isChildrenScrollable
 				isVisible={ isVisible }
 				hideHeader
 				onClose={ restProps.onClose }
+				hasNavigation
 			>
 				<BottomSheet.NavigationContainer animate main>
 					<BottomSheet.NavigationScreen name={ screens.settings }>
@@ -30,6 +30,7 @@ const ModalLinkUI = ( { isVisible, ...restProps } ) => {
 					</BottomSheet.NavigationScreen>
 					<BottomSheet.NavigationScreen
 						name={ screens.picker }
+						isScrollable
 						fullScreen
 					>
 						<LinkPickerScreen />

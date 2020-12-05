@@ -75,6 +75,11 @@ const DefaultExample = () => {
 	);
 };
 
+const RangeControlLabeledByMarksType = ( props ) => {
+	const label = Array.isArray( props.marks ) ? 'Custom' : 'Automatic';
+	return <RangeControl { ...{ ...props, label } } />;
+};
+
 export const _default = () => {
 	return <DefaultExample />;
 };
@@ -131,33 +136,51 @@ export const withReset = () => {
 	return <RangeControlWithState label={ label } allowReset />;
 };
 
-export const customMarks = () => {
-	const marks = [
-		{
-			value: 0,
-			label: '0',
-		},
-		{
-			value: 1,
-			label: '1',
-		},
-		{
-			value: 2,
-			label: '2',
-		},
-		{
-			value: 8,
-			label: '8',
-		},
-		{
-			value: 10,
-			label: '10',
-		},
+export const marks = () => {
+	const marksBase = [
+		{ value: 0, label: '0' },
+		{ value: 1, label: '1' },
+		{ value: 2, label: '2' },
+		{ value: 8, label: '8' },
+		{ value: 10, label: '10' },
 	];
+	const marksWithDecimal = [
+		...marksBase,
+		{ value: 3.5, label: '3.5' },
+		{ value: 5.8, label: '5.8' },
+	];
+	const marksWithNegatives = [
+		...marksBase,
+		{ value: -1, label: '-1' },
+		{ value: -2, label: '-2' },
+		{ value: -4, label: '-4' },
+		{ value: -8, label: '-8' },
+	];
+	const stepInteger = { min: 0, max: 10, step: 1 };
+	const stepDecimal = { min: 0, max: 10, step: 0.1 };
+	const minNegative = { min: -10, max: 10, step: 1 };
+	const rangeNegative = { min: -10, max: -1, step: 1 };
+
+	// use a short alias to keep formatting to fewer lines
+	const Range = RangeControlLabeledByMarksType;
 
 	return (
 		<Wrapper>
-			<RangeControl marks={ marks } min={ 0 } max={ 10 } step={ 1 } />
+			<h2>Integer Step</h2>
+			<Range marks { ...stepInteger } />
+			<Range marks={ marksBase } { ...stepInteger } />
+
+			<h2>Decimal Step</h2>
+			<Range marks { ...stepDecimal } />
+			<Range marks={ marksWithDecimal } { ...stepDecimal } />
+
+			<h2>Negative Minimum</h2>
+			<Range marks { ...minNegative } />
+			<Range marks={ marksWithNegatives } { ...minNegative } />
+
+			<h2>Negative Range</h2>
+			<Range marks { ...rangeNegative } />
+			<Range marks={ marksWithNegatives } { ...rangeNegative } />
 		</Wrapper>
 	);
 };

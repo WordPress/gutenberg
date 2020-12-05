@@ -16,19 +16,59 @@
 		border-bottom: 0;
 		box-shadow: none;
 	}
+
+	// Vertically balance the margin of each icon.
+	.wp-social-link {
+		// This needs specificity to override some themes.
+		&.wp-social-link.wp-social-link {
+			margin: 4px 8px 4px 0;
+		}
+
+		// By setting the font size, we can scale icons and paddings consistently based on that.
+		// This also allows themes to override this, if need be.
+		a {
+			padding: 0.25em;
+		}
+
+		svg {
+			width: 1em;
+			height: 1em;
+		}
+	}
+
+	// Icon sizes.
+	// Small.
+	&.has-small-icon-size {
+		font-size: 16px; // 16 makes for a quarter-padding that keeps the icon centered.
+	}
+
+	// Normal/default.
+	&,
+	&.has-normal-icon-size {
+		font-size: 24px;
+	}
+
+	// Large.
+	&.has-large-icon-size {
+		font-size: 36px;
+	}
+
+	// Huge.
+	&.has-huge-icon-size {
+		font-size: 48px;
+	}
 }
 
 .wp-social-link {
 	display: block;
-	width: 36px;
-	height: 36px;
 	border-radius: 9999px; // This makes it pill-shaped instead of oval, in cases where the image fed is not perfectly sized.
-	margin: 0 8px 8px 0;
 	transition: transform 0.1s ease;
 	@include reduce-motion("transition");
 
+	// Dimensions.
+	height: auto;
+
 	a {
-		padding: 6px;
 		display: block;
 		line-height: 0;
 		transition: transform 0.1s ease;
@@ -69,10 +109,6 @@
 
 		// Make these bigger.
 		padding: 4px;
-		svg {
-			width: 28px;
-			height: 28px;
-		}
 	}
 
 	@import "../social-link/socials-without-bg.scss";
@@ -85,7 +121,7 @@
 	}
 
 	.wp-social-link a {
-		padding-left: 16px;
-		padding-right: 16px;
+		padding-left: calc((2/3) * 1em);
+		padding-right: calc((2/3) * 1em);
 	}
 }

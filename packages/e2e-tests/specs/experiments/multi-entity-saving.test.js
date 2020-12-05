@@ -31,17 +31,6 @@ describe( 'Multi-entity save flow', () => {
 
 	// Reusable assertions across Post/Site editors.
 	const assertAllBoxesChecked = async () => {
-		// Expand to view savable entities if necessary.
-		const reviewChangesButton = await page.$(
-			'.entities-saved-states__review-changes-button'
-		);
-		const [ needsToOpen ] = await reviewChangesButton.$x(
-			'//*[contains(text(),"Review changes.")]'
-		);
-		if ( needsToOpen ) {
-			await reviewChangesButton.click();
-		}
-
 		const checkedBoxes = await page.$$( checkedBoxSelector );
 		const checkboxInputs = await page.$$( checkboxInputSelector );
 		expect( checkedBoxes.length - checkboxInputs.length ).toBe( 0 );
@@ -86,7 +75,10 @@ describe( 'Multi-entity save flow', () => {
 			expect( multiSaveButton ).not.toBeNull();
 		};
 		const assertMultiSaveDisabled = async () => {
-			const multiSaveButton = await page.$( multiSaveSelector );
+			const multiSaveButton = await page.waitForSelector(
+				multiSaveSelector,
+				{ hidden: true }
+			);
 			expect( multiSaveButton ).toBeNull();
 		};
 

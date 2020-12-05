@@ -6,6 +6,7 @@ import {
 	getBlockType,
 	getUnregisteredTypeHandlerName,
 	hasBlockSupport,
+	store as blocksStore,
 } from '@wordpress/blocks';
 import {
 	PanelBody,
@@ -23,6 +24,7 @@ import InspectorAdvancedControls from '../inspector-advanced-controls';
 import BlockStyles from '../block-styles';
 import MultiSelectionInspector from '../multi-selection-inspector';
 import DefaultStylePicker from '../default-style-picker';
+import BlockVariationTransforms from '../block-variation-transforms';
 const BlockInspector = ( {
 	blockType,
 	count,
@@ -66,6 +68,7 @@ const BlockInspector = ( {
 	return (
 		<div className="block-editor-block-inspector">
 			<BlockCard blockType={ blockType } />
+			<BlockVariationTransforms blockClientId={ selectedBlockClientId } />
 			{ hasBlockStyles && (
 				<div>
 					<PanelBody title={ __( 'Styles' ) }>
@@ -119,7 +122,7 @@ export default withSelect( ( select ) => {
 		getSelectedBlockCount,
 		getBlockName,
 	} = select( 'core/block-editor' );
-	const { getBlockStyles } = select( 'core/blocks' );
+	const { getBlockStyles } = select( blocksStore );
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const selectedBlockName =
 		selectedBlockClientId && getBlockName( selectedBlockClientId );

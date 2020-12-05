@@ -87,11 +87,7 @@
 .edit-site-navigation-panel__template-item {
 	display: block;
 
-	&.is-active .edit-site-navigation-panel__template-item-description {
-		color: $gray-100;
-	}
-
-	button {
+	.components-button {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
@@ -99,10 +95,33 @@
 		height: auto;
 		min-height: $button-size;
 		text-align: left;
+		padding-left: $grid-unit-20;
+		padding-right: $grid-unit-20;
+		margin-bottom: $grid-unit-15;
+		color: inherit;
 	}
 }
 
+.edit-site-navigation-panel__template-item-title {
+	em {
+		margin-right: 1ch;
+	}
+}
 .edit-site-navigation-panel__template-item-description {
 	padding-top: $grid-unit-05;
-	color: $gray-700;
+	font-size: 12px;
+	line-height: 16px;
+}
+
+.edit-site-navigation-panel__new-template-dropdown {
+	margin: 0 0 0 $grid-unit-15;
+
+	button {
+		margin: 0;
+	}
+}
+.edit-site-navigation-panel__new-template-popover {
+	@include break-small() {
+		min-width: 300px;
+	}
 }

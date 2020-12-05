@@ -175,7 +175,10 @@ module.exports = async function start( { spinner, debug, update } ) {
 		} );
 	}
 
-	spinner.text = 'WordPress started.';
+	const siteUrl = config.env.development.config.WP_SITEURL;
+	spinner.text = 'WordPress started'.concat(
+		siteUrl ? ` at ${ siteUrl }.` : '.'
+	);
 };
 
 /**

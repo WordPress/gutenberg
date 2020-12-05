@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added basic support for external templates hosted on npm ([#23712](https://github.com/WordPress/gutenberg/pull/23712)).
+
 ## 0.18.0 (2020-10-30)
 
 ### Breaking Changes

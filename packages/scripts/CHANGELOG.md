@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   Autoformat TypeScript files (`*.ts` and `*.tsx`) in `format-js` script (#27138)[https://github.com/WordPress/gutenberg/pull/27138].
+-   The bundled `wp-prettier` dependency has been upgraded from `2.0.5` to `2.2.1`.
+
+### Internal
+
+-   The bundled `ignore-emit-webpack-plugin` dependency has been updated from requiring `2.0.3` to requiring `^2.0.6`.
+
 ## 12.5.0 (2020-10-30)
 
 ### Enhancements

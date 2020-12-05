@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Enhancement
+
+- File Block: Copy url button is moved to Block toolbar.
+- Code and Preformatted Blocks: delete on backspace from an empty block.
+
 ### Bug Fixes
 
 - Fix a regression where the Cover would not show opacity controls for the default overlay color ([#26625](https://github.com/WordPress/gutenberg/pull/26625)).

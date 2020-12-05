@@ -13,7 +13,7 @@ import { useAsyncList } from '@wordpress/compose';
 /**
  * External dependencies
  */
-import { groupBy, uniq, deburr } from 'lodash';
+import { groupBy, deburr } from 'lodash';
 import { Composite, useCompositeState, CompositeItem } from 'reakit';
 
 function PreviewPlaceholder() {
@@ -31,11 +31,7 @@ function TemplatePartItem( {
 	onClose,
 	composite,
 } ) {
-	const {
-		id,
-		slug,
-		meta: { theme },
-	} = templatePart;
+	const { id, slug, wp_theme_slug: theme } = templatePart;
 	// The 'raw' property is not defined for a brief period in the save cycle.
 	// The fallback prevents an error in the parse function while saving.
 	const content = templatePart.content.raw || '';
@@ -59,6 +55,7 @@ function TemplatePartItem( {
 
 	return (
 		<CompositeItem
+			as="div"
 			className="wp-block-template-part__selection-preview-item"
 			role="option"
 			onClick={ onClick }
@@ -102,15 +99,15 @@ function TemplatePartsByTheme( {
 	composite,
 } ) {
 	const templatePartsByTheme = useMemo( () => {
-		return Object.values( groupBy( templateParts, 'meta.theme' ) );
+		return Object.values( groupBy( templateParts, 'wp_theme_slug' ) );
 	}, [ templateParts ] );
 	const currentShownTPs = useAsyncList( templateParts );
 
 	return templatePartsByTheme.map( ( templatePartList ) => (
 		<PanelGroup
-			key={ templatePartList[ 0 ].meta.theme }
+			key={ templatePartList[ 0 ].wp_theme_slug }
 			// Falsy theme implies custom template part.
-			title={ templatePartList[ 0 ].meta.theme || __( 'Custom' ) }
+			title={ templatePartList[ 0 ].wp_theme_slug || __( 'Custom' ) }
 		>
 			{ templatePartList.map( ( templatePart ) => {
 				return currentShownTPs.includes( templatePart ) ? (
@@ -141,7 +138,7 @@ function TemplatePartSearchResults( {
 		// Remove diacritics and convert to lowercase to normalize.
 		const normalizedFilterValue = deburr( filterValue ).toLowerCase();
 		const searchResults = templateParts.filter(
-			( { slug, meta: { theme } } ) =>
+			( { slug, wp_theme_slug: theme } ) =>
 				slug.toLowerCase().includes( normalizedFilterValue ) ||
 				// Since diacritics can be used in theme names, remove them for the comparison.
 				deburr( theme ).toLowerCase().includes( normalizedFilterValue )
@@ -165,10 +162,10 @@ function TemplatePartSearchResults( {
 			// Second prioritize index found in theme.
 			// Since diacritics can be used in theme names, remove them for the comparison.
 			return (
-				deburr( a.meta.theme )
+				deburr( a.wp_theme_slug )
 					.toLowerCase()
 					.indexOf( normalizedFilterValue ) -
-				deburr( b.meta.theme )
+				deburr( b.wp_theme_slug )
 					.toLowerCase()
 					.indexOf( normalizedFilterValue )
 			);
@@ -181,7 +178,7 @@ function TemplatePartSearchResults( {
 	return filteredTPs.map( ( templatePart ) => (
 		<PanelGroup
 			key={ templatePart.id }
-			title={ templatePart.meta.theme || __( 'Custom' ) }
+			title={ templatePart.wp_theme_slug || __( 'Custom' ) }
 		>
 			{ currentShownTPs.includes( templatePart ) ? (
 				<TemplatePartItem
@@ -198,40 +195,27 @@ function TemplatePartSearchResults( {
 	) );
 }
 
-export default function TemplateParts( {
+export default function TemplatePartPreviews( {
 	setAttributes,
 	filterValue,
 	onClose,
 } ) {
 	const composite = useCompositeState();
 	const templateParts = useSelect( ( select ) => {
-		const publishedTemplateParts = select( 'core' ).getEntityRecords(
-			'postType',
-			'wp_template_part',
-			{
+		const publishedTemplateParts =
+			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
 				status: [ 'publish' ],
 				per_page: -1,
-			}
-		);
-		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
+			} ) || [];
 
-		const themeTemplateParts = select( 'core' ).getEntityRecords(
-			'postType',
-			'wp_template_part',
-			{
+		const currentTheme = select( 'core' ).getCurrentTheme()?.stylesheet;
+		const themeTemplateParts =
+			select( 'core' ).getEntityRecords( 'postType', 'wp_template_part', {
 				theme: currentTheme,
-				status: [ 'publish', 'auto-draft' ],
+				status: [ 'auto-draft' ],
 				per_page: -1,
-			}
-		);
-		const combinedTemplateParts = [];
-		if ( publishedTemplateParts ) {
-			combinedTemplateParts.push( ...publishedTemplateParts );
-		}
-		if ( themeTemplateParts ) {
-			combinedTemplateParts.push( ...themeTemplateParts );
-		}
-		return uniq( combinedTemplateParts );
+			} ) || [];
+		return [ ...themeTemplateParts, ...publishedTemplateParts ];
 	}, [] );
 
 	if ( ! templateParts || ! templateParts.length ) {

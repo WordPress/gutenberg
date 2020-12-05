@@ -1,12 +1,20 @@
 /**
  * External dependencies
  */
-import { castArray } from 'lodash';
+import { castArray, reduce } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { controls } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
+import { apiFetch } from '@wordpress/data-controls';
+import { controls, dispatch, select, subscribe } from '@wordpress/data';
+import { speak } from '@wordpress/a11y';
+
+/**
+ * Internal dependencies
+ */
+import { getMetaBoxContainer } from '../utils/meta-boxes';
 
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
@@ -153,11 +161,22 @@ export function toggleFeature( feature ) {
 	};
 }
 
-export function switchEditorMode( mode ) {
-	return {
+export function* switchEditorMode( mode ) {
+	yield {
 		type: 'SWITCH_MODE',
 		mode,
 	};
+
+	// Unselect blocks when we switch to the code editor.
+	if ( mode !== 'visual' ) {
+		yield controls.dispatch( 'core/block-editor', 'clearSelectedBlock' );
+	}
+
+	const message =
+		mode === 'visual'
+			? __( 'Visual editor selected' )
+			: __( 'Code editor selected' );
+	speak( message, 'assertive' );
 }
 
 /**
@@ -234,30 +253,136 @@ export function showBlockTypes( blockNames ) {
 	};
 }
 
+let saveMetaboxUnsubscribe;
+
 /**
  * Returns an action object used in signaling
  * what Meta boxes are available in which location.
  *
  * @param {Object} metaBoxesPerLocation Meta boxes per location.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
-	return {
+export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
+	yield {
 		type: 'SET_META_BOXES_PER_LOCATIONS',
 		metaBoxesPerLocation,
 	};
+
+	const postType = yield controls.select(
+		'core/editor',
+		'getCurrentPostType'
+	);
+	if ( window.postboxes.page !== postType ) {
+		window.postboxes.add_postbox_toggles( postType );
+	}
+
+	let wasSavingPost = yield controls.select( 'core/editor', 'isSavingPost' );
+	let wasAutosavingPost = yield controls.select(
+		'core/editor',
+		'isAutosavingPost'
+	);
+
+	// Meta boxes are initialized once at page load. It is not necessary to
+	// account for updates on each state change.
+	//
+	// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309
+	const hasActiveMetaBoxes = yield controls.select(
+		'core/edit-post',
+		'hasMetaBoxes'
+	);
+
+	// First remove any existing subscription in order to prevent multiple saves
+	if ( !! saveMetaboxUnsubscribe ) {
+		saveMetaboxUnsubscribe();
+	}
+
+	// Save metaboxes when performing a full save on the post.
+	saveMetaboxUnsubscribe = subscribe( () => {
+		const isSavingPost = select( 'core/editor' ).isSavingPost();
+		const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+
+		// Save metaboxes on save completion, except for autosaves that are not a post preview.
+		const shouldTriggerMetaboxesSave =
+			hasActiveMetaBoxes &&
+			wasSavingPost &&
+			! isSavingPost &&
+			! wasAutosavingPost;
+
+		// Save current state for next inspection.
+		wasSavingPost = isSavingPost;
+		wasAutosavingPost = isAutosavingPost;
+
+		if ( shouldTriggerMetaboxesSave ) {
+			dispatch( 'core/edit-post' ).requestMetaBoxUpdates();
+		}
+	} );
 }
 
 /**
  * Returns an action object used to request meta box update.
  *
- * @return {Object} Action object.
+ * @yield {Object} Action object.
  */
-export function requestMetaBoxUpdates() {
-	return {
+export function* requestMetaBoxUpdates() {
+	yield {
 		type: 'REQUEST_META_BOX_UPDATES',
 	};
+
+	// Saves the wp_editor fields
+	if ( window.tinyMCE ) {
+		window.tinyMCE.triggerSave();
+	}
+
+	// Additional data needed for backward compatibility.
+	// If we do not provide this data, the post will be overridden with the default values.
+	const post = yield controls.select( 'core/editor', 'getCurrentPost' );
+	const additionalData = [
+		post.comment_status ? [ 'comment_status', post.comment_status ] : false,
+		post.ping_status ? [ 'ping_status', post.ping_status ] : false,
+		post.sticky ? [ 'sticky', post.sticky ] : false,
+		post.author ? [ 'post_author', post.author ] : false,
+	].filter( Boolean );
+
+	// We gather all the metaboxes locations data and the base form data
+	const baseFormData = new window.FormData(
+		document.querySelector( '.metabox-base-form' )
+	);
+	const activeMetaBoxLocations = yield controls.select(
+		'core/edit-post',
+		'getActiveMetaBoxLocations'
+	);
+	const formDataToMerge = [
+		baseFormData,
+		...activeMetaBoxLocations.map(
+			( location ) =>
+				new window.FormData( getMetaBoxContainer( location ) )
+		),
+	];
+
+	// Merge all form data objects into a single one.
+	const formData = reduce(
+		formDataToMerge,
+		( memo, currentFormData ) => {
+			for ( const [ key, value ] of currentFormData ) {
+				memo.append( key, value );
+			}
+			return memo;
+		},
+		new window.FormData()
+	);
+	additionalData.forEach( ( [ key, value ] ) =>
+		formData.append( key, value )
+	);
+
+	// Save the metaboxes
+	yield apiFetch( {
+		url: window._wpMetaBoxUrl,
+		method: 'POST',
+		body: formData,
+		parse: false,
+	} );
+	yield controls.dispatch( 'core/edit-post', 'metaBoxUpdatesSuccess' );
 }
 
 /**
@@ -294,6 +419,19 @@ export function __experimentalSetPreviewDeviceType( deviceType ) {
 export function setIsInserterOpened( value ) {
 	return {
 		type: 'SET_IS_INSERTER_OPENED',
+		value,
+	};
+}
+
+/**
+ * Returns an action object used to switch to template editing.
+ *
+ * @param {boolean} value Is editing template.
+ * @return {Object} Action object.
+ */
+export function setIsEditingTemplate( value ) {
+	return {
+		type: 'SET_IS_EDITING_TEMPLATE',
 		value,
 	};
 }

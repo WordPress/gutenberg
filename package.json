@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "9.3.0-rc.1",
+	"version": "9.5.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -161,7 +161,7 @@
 		"glob": "7.1.2",
 		"husky": "3.0.5",
 		"inquirer": "7.1.0",
-		"jest": "25.3.0",
+		"jest": "25.5.4",
 		"jest-emotion": "10.0.32",
 		"jest-junit": "10.0.0",
 		"jest-serializer-enzyme": "1.0.0",
@@ -179,7 +179,7 @@
 		"patch-package": "6.2.2",
 		"postcss": "7.0.32",
 		"postcss-loader": "3.0.0",
-		"prettier": "npm:wp-prettier@2.0.5",
+		"prettier": "npm:wp-prettier@2.2.1-beta-1",
 		"progress": "2.0.3",
 		"puppeteer": "npm:puppeteer-core@3.0.0",
 		"react": "16.13.1",
@@ -223,6 +223,7 @@
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
 		"format-js": "wp-scripts format-js",
+		"format-php": "wp-env run composer run-script format",
 		"lint": "concurrently \"npm run lint-lockfile\" \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
 		"lint-js": "wp-scripts lint-js",
 		"lint-js:fix": "npm run lint-js -- --fix",
@@ -248,6 +249,7 @@
 		"test-e2e:watch": "npm run test-e2e -- --watch",
 		"test-performance": "wp-scripts test-e2e --config packages/e2e-tests/jest.performance.config.js",
 		"test-php": "npm run lint-php && npm run test-unit-php",
+		"test-php:watch": "wp-env run composer run-script test:watch",
 		"test-unit": "wp-scripts test-unit-js --config test/unit/jest.config.js",
 		"test-unit:debug": "wp-scripts --inspect-brk test-unit-js --runInBand --no-cache --verbose --config test/unit/jest.config.js ",
 		"test-unit:update": "npm run test-unit -- --updateSnapshot",
@@ -267,7 +269,7 @@
 		"playground:build": "npm run storybook:build",
 		"playground:dev": "echo \"Please use storybook:dev instead.\"",
 		"env": "wp-scripts env",
-		"wp-env": "packages/env/bin/wp-env"
+		"wp-env": "wp-env"
 	},
 	"husky": {
 		"hooks": {
