@@ -7,12 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import {
-	useRef,
-	forwardRef,
-	createContext,
-	useState,
-} from '@wordpress/element';
+import { useRef, createContext, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -32,33 +27,24 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
 export const BlockNodes = createContext();
 export const SetBlockNodes = createContext();
 
-function BlockList(
-	{ className, placeholder, rootClientId, renderAppender },
-	ref
-) {
-	const fallbackRef = useRef();
-	const wrapperRef = ref || fallbackRef;
+export default function BlockList( { className } ) {
+	const ref = useRef();
 	const [ blockNodes, setBlockNodes ] = useState( {} );
-	const insertionPoint = useInsertionPoint( wrapperRef );
+	const insertionPoint = useInsertionPoint( ref );
 
 	return (
 		<BlockNodes.Provider value={ blockNodes }>
 			{ insertionPoint }
 			<BlockPopover />
 			<div
-				ref={ wrapperRef }
+				ref={ ref }
 				className={ classnames(
 					'block-editor-block-list__layout is-root-container',
 					className
 				) }
 			>
 				<SetBlockNodes.Provider value={ setBlockNodes }>
-					<BlockListItems
-						placeholder={ placeholder }
-						rootClientId={ rootClientId }
-						renderAppender={ renderAppender }
-						wrapperRef={ wrapperRef }
-					/>
+					<BlockListItems wrapperRef={ ref } />
 				</SetBlockNodes.Provider>
 			</div>
 		</BlockNodes.Provider>
@@ -177,5 +163,3 @@ export function BlockListItems( props ) {
 		</AsyncModeProvider>
 	);
 }
-
-export default forwardRef( BlockList );
