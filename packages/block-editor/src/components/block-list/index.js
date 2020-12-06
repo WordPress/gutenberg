@@ -46,7 +46,7 @@ export default function BlockList( { className } ) {
 				) }
 			>
 				<SetBlockNodes.Provider value={ setBlockNodes }>
-					<BlockListItems wrapperRef={ ref } />
+					<BlockListItems />
 				</SetBlockNodes.Provider>
 			</div>
 		</BlockNodes.Provider>
