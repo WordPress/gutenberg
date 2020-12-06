@@ -876,6 +876,54 @@ describe( 'filterURLForDisplay', () => {
 		const url = filterURLForDisplay( 'http://www.wordpress.org/something' );
 		expect( url ).toBe( 'wordpress.org/something' );
 	} );
+	it( 'should preserve the original url if no argument max length', () => {
+		const url = filterURLForDisplay(
+			'http://www.wordpress.org/wp-content/uploads/myimage.jpg'
+		);
+		expect( url ).toBe( 'wordpress.org/wp-content/uploads/myimage.jpg' );
+	} );
+	it( 'should preserve the original url if the url is short enough', () => {
+		const url = filterURLForDisplay(
+			'http://www.wordpress.org/ig.jpg',
+			20
+		);
+		expect( url ).toBe( 'wordpress.org/ig.jpg' );
+	} );
+	it( 'should return ellipsis, upper level pieces url, and filename when the url is long enough but filename is short enough', () => {
+		const url = filterURLForDisplay(
+			'http://www.wordpress.org/wp-content/uploads/myimage.jpg',
+			20
+		);
+		expect( url ).toBe( '…/uploads/myimage.jpg' );
+	} );
+	it( 'should return filename split by ellipsis plus three characters when filename is long enough', () => {
+		const url = filterURLForDisplay(
+			'http://www.wordpress.org/wp-content/uploads/superlongtitlewithextension.jpeg',
+			20
+		);
+		expect( url ).toBe( 'superlongti…ion.jpeg' );
+	} );
+	it( 'should remove query arguments', () => {
+		const url = filterURLForDisplay(
+			'http://www.wordpress.org/wp-content/uploads/myimage.jpeg?query_args=a',
+			20
+		);
+		expect( url ).toBe( '…uploads/myimage.jpeg' );
+	} );
+	it( 'should preserve the original url when it is not a file', () => {
+		const url = filterURLForDisplay(
+			'http://www.wordpress.org/wp-content/url/',
+			20
+		);
+		expect( url ).toBe( 'wordpress.org/wp-content/url/' );
+	} );
+	it( 'should return file split by ellipsis when the file name has multiple periods', () => {
+		const url = filterURLForDisplay(
+			'http://www.wordpress.org/wp-content/uploads/filename.2020.12.20.png',
+			20
+		);
+		expect( url ).toBe( 'filename.202….20.png' );
+	} );
 } );
 
 describe( 'cleanForSlug', () => {
