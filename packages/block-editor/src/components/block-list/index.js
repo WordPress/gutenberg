@@ -32,6 +32,8 @@ export default function BlockList( { className } ) {
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
 
+	useBlockDropZone( { element: ref } );
+
 	return (
 		<BlockNodes.Provider value={ blockNodes }>
 			{ insertionPoint }
@@ -56,7 +58,6 @@ function Items( {
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
-	wrapperRef,
 } ) {
 	function selector( select ) {
 		const {
@@ -95,11 +96,6 @@ function Items( {
 		enableAnimation,
 		activeEntityBlockId,
 	} = useSelect( selector, [ rootClientId ] );
-
-	useBlockDropZone( {
-		element: wrapperRef,
-		rootClientId,
-	} );
 
 	return (
 		<>

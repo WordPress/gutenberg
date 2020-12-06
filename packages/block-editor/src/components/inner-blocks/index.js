@@ -19,15 +19,12 @@ import DefaultBlockAppender from './default-block-appender';
 import useNestedSettingsUpdate from './use-nested-settings-update';
 import useInnerBlockTemplateSync from './use-inner-block-template-sync';
 import getBlockContext from './get-block-context';
-
-/**
- * Internal dependencies
- */
 import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { defaultLayout, LayoutProvider } from './layout';
+import useBlockDropZone from '../use-block-drop-zone';
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -43,7 +40,6 @@ function UncontrolledInnerBlocks( props ) {
 		allowedBlocks,
 		template,
 		templateLock,
-		wrapperRef,
 		templateInsertUpdatesSelection,
 		__experimentalCaptureToolbars: captureToolbars,
 		__experimentalAppenderTagName,
@@ -93,7 +89,6 @@ function UncontrolledInnerBlocks( props ) {
 					__experimentalAppenderTagName={
 						__experimentalAppenderTagName
 					}
-					wrapperRef={ wrapperRef }
 					placeholder={ placeholder }
 				/>
 			</BlockContextProvider>
@@ -168,6 +163,8 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			? ControlledInnerBlocks
 			: UncontrolledInnerBlocks;
 
+	useBlockDropZone( { element: ref, rootClientId: clientId } );
+
 	return {
 		...props,
 		ref,
@@ -178,13 +175,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				'has-overlay': hasOverlay,
 			}
 		),
-		children: (
-			<InnerBlocks
-				{ ...options }
-				clientId={ clientId }
-				wrapperRef={ ref }
-			/>
-		),
+		children: <InnerBlocks { ...options } clientId={ clientId } />,
 	};
 }
 
