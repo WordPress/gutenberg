@@ -118,11 +118,23 @@ function InsertionPointPopover( {
 		},
 		[ clientId, rootClientId ]
 	);
+	const orientation = useSelect(
+		( select ) =>
+			select( 'core/block-editor' ).getBlockListSettings( rootClientId )
+				?.orientation,
+		[ rootClientId ]
+	);
 
-	const position = clientId ? 'top' : 'bottom';
+	const position =
+		clientId || orientation === 'horizontal' ? 'top' : 'bottom';
 	const className = classnames( 'block-editor-block-list__insertion-point', {
+		'is-horizontal': orientation === 'horizontal',
 		'is-insert-after': ! clientId,
 	} );
+	const style =
+		orientation === 'horizontal'
+			? { width: element?.offsetWidth, height: element?.offsetHeight }
+			: { width: element?.offsetWidth };
 
 	return (
 		<Popover
@@ -131,14 +143,14 @@ function InsertionPointPopover( {
 			anchorRef={ element }
 			position={ `${ position } right left` }
 			focusOnMount={ false }
-			className="block-editor-block-list__insertion-point-popover"
+			className={ classnames(
+				'block-editor-block-list__insertion-point-popover',
+				{ 'is-horizontal': orientation === 'horizontal' }
+			) }
 			__unstableSlotName="block-toolbar"
 			__unstableForcePosition={ true }
 		>
-			<div
-				className={ className }
-				style={ { width: element?.offsetWidth } }
-			>
+			<div className={ className } style={ style }>
 				{ showInsertionPoint && (
 					<div className="block-editor-block-list__insertion-point-indicator" />
 				) }
@@ -264,7 +276,9 @@ export default function InsertionPoint( ref ) {
 				clientId={
 					isInserterVisible ? selectedClientId : inserterClientId
 				}
-				rootClientId={ selectedRootClientId }
+				rootClientId={
+					isInserterVisible ? selectedRootClientId : undefined
+				}
 				isInserterShown={ isInserterShown }
 				isInserterForced={ isInserterForced }
 				setIsInserterForced={ setIsInserterForced }

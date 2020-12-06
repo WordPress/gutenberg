@@ -358,6 +358,10 @@
 	&.is-insert-after {
 		margin-top: $block-padding;
 	}
+
+	&.is-horizontal {
+		margin-top: 0;
+	}
 }
 
 .block-editor-block-list__insertion-point-indicator {
@@ -367,6 +371,20 @@
 	left: 0;
 	right: 0;
 	background: var(--wp-admin-theme-color);
+
+	.is-horizontal & {
+		left: 0;
+		width: $border-width-focus;
+		height: auto;
+		top: 0;
+		bottom: 0;
+		right: auto;
+	}
+
+	.is-horizontal.is-insert-after & {
+		left: auto;
+		right: 0;
+	}
 }
 
 // This is the clickable plus.
@@ -618,6 +636,10 @@
 		box-shadow: none;
 		overflow-y: visible;
 		margin-left: 0;
+	}
+
+	&.is-horizontal .components-popover__content {
+		bottom: auto;
 	}
 }
 
