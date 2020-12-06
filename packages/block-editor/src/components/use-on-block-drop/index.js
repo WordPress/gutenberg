@@ -181,27 +181,30 @@ export function onHTMLDrop(
 /**
  * A React hook for handling block drop events.
  *
- * @param {string} targetRootClientId The root client id where the block(s) will be inserted.
- * @param {number} targetBlockIndex   The index where the block(s) will be inserted.
- *
  * @return {Object} An object that contains the event handlers `onDrop`, `onFilesDrop` and `onHTMLDrop`.
  */
-export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
+export default function useOnBlockDrop() {
 	const {
 		getBlockIndex,
 		getClientIdsOfDescendants,
 		hasUploadPermissions,
+		targetRootClientId,
+		targetBlockIndex,
 	} = useSelect( ( select ) => {
 		const {
 			getBlockIndex: _getBlockIndex,
 			getClientIdsOfDescendants: _getClientIdsOfDescendants,
 			getSettings,
+			getBlockInsertionPoint,
 		} = select( 'core/block-editor' );
+		const insertionPoint = getBlockInsertionPoint();
 
 		return {
 			getBlockIndex: _getBlockIndex,
 			getClientIdsOfDescendants: _getClientIdsOfDescendants,
 			hasUploadPermissions: getSettings().mediaUpload,
+			targetRootClientId: insertionPoint.rootClientId,
+			targetBlockIndex: insertionPoint.index,
 		};
 	}, [] );
 

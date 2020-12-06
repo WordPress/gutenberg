@@ -61,7 +61,6 @@ function Items( {
 	function selector( select ) {
 		const {
 			getBlockOrder,
-			getBlockListSettings,
 			getSettings,
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
@@ -80,7 +79,6 @@ function Items( {
 			blockClientIds: getBlockOrder( rootClientId ),
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			orientation: getBlockListSettings( rootClientId )?.orientation,
 			hasMultiSelection: hasMultiSelection(),
 			enableAnimation:
 				! isTyping() &&
@@ -93,18 +91,15 @@ function Items( {
 		blockClientIds,
 		selectedBlockClientId,
 		multiSelectedBlockClientIds,
-		orientation,
 		hasMultiSelection,
 		enableAnimation,
 		activeEntityBlockId,
 	} = useSelect( selector, [ rootClientId ] );
 
-	const dropTargetIndex = useBlockDropZone( {
+	useBlockDropZone( {
 		element: wrapperRef,
 		rootClientId,
 	} );
-
-	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
 
 	return (
 		<>
@@ -112,8 +107,6 @@ function Items( {
 				const isBlockInSelection = hasMultiSelection
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
-
-				const isDropTarget = dropTargetIndex === index;
 
 				return (
 					<AsyncModeProvider
@@ -128,10 +121,6 @@ function Items( {
 							index={ index }
 							enableAnimation={ enableAnimation }
 							className={ classnames( {
-								'is-drop-target': isDropTarget,
-								'is-dropping-horizontally':
-									isDropTarget &&
-									orientation === 'horizontal',
 								'has-active-entity': activeEntityBlockId,
 							} ) }
 							activeEntityBlockId={ activeEntityBlockId }
@@ -144,11 +133,6 @@ function Items( {
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
-				className={ classnames( {
-					'is-drop-target': isAppenderDropTarget,
-					'is-dropping-horizontally':
-						isAppenderDropTarget && orientation === 'horizontal',
-				} ) }
 			/>
 		</>
 	);

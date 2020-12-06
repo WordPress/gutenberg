@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 
 /**
@@ -85,8 +85,6 @@ export function getNearestBlockIndex( elements, position, orientation ) {
  * A React hook that can be used to make a block list handle drag and drop.
  *
  * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
- *
- * @return {number|undefined} The block index that's closest to the drag position.
  */
 export default function useBlockDropZone( {
 	element,
@@ -112,10 +110,11 @@ export default function useBlockDropZone( {
 		[ targetRootClientId ]
 	);
 
-	const dropEventHandlers = useOnBlockDrop(
-		targetRootClientId,
-		targetBlockIndex
+	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
+		'core/block-editor'
 	);
+
+	const dropEventHandlers = useOnBlockDrop();
 
 	const { position } = useDropZone( {
 		element,
@@ -135,10 +134,16 @@ export default function useBlockDropZone( {
 			);
 
 			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
+		} else {
+			setTargetBlockIndex( null );
 		}
 	}, [ position ] );
 
-	if ( position ) {
-		return targetBlockIndex;
-	}
+	useEffect( () => {
+		if ( targetBlockIndex !== null ) {
+			showInsertionPoint( targetRootClientId, targetBlockIndex );
+		} else {
+			hideInsertionPoint();
+		}
+	}, [ targetBlockIndex ] );
 }
