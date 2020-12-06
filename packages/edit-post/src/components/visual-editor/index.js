@@ -64,7 +64,6 @@ export default function VisualEditor() {
 			<div
 				ref={ ref }
 				className="editor-styles-wrapper"
-				tabIndex="-1"
 				style={ resizedCanvasStyles || desktopCanvasStyles }
 			>
 				<WritingFlow>
