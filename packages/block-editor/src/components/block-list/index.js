@@ -27,15 +27,16 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
 export const BlockNodes = createContext();
 export const SetBlockNodes = createContext();
 
-export default function BlockList( { className } ) {
-	const ref = useRef();
+export default function BlockList( { className, __unstableWrapperRef } ) {
+	const fallbackRef = useRef();
+	const ref = __unstableWrapperRef || fallbackRef;
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
 
-	return (
-		<BlockNodes.Provider value={ blockNodes }>
-			{ insertionPoint }
-			<BlockPopover />
+	let children = <BlockListItems wrapperRef={ ref } />;
+
+	if ( ! __unstableWrapperRef ) {
+		children = (
 			<div
 				ref={ ref }
 				className={ classnames(
@@ -43,10 +44,18 @@ export default function BlockList( { className } ) {
 					className
 				) }
 			>
-				<SetBlockNodes.Provider value={ setBlockNodes }>
-					<BlockListItems wrapperRef={ ref } />
-				</SetBlockNodes.Provider>
+				{ children }
 			</div>
+		);
+	}
+
+	return (
+		<BlockNodes.Provider value={ blockNodes }>
+			{ insertionPoint }
+			<BlockPopover />
+			<SetBlockNodes.Provider value={ setBlockNodes }>
+				{ children }
+			</SetBlockNodes.Provider>
 		</BlockNodes.Provider>
 	);
 }

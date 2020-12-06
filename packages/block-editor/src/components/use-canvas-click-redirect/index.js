@@ -30,6 +30,13 @@ export function useCanvasClickRedirect( ref ) {
 				return;
 			}
 
+			const lastChildRect = event.target.lastElementChild.getBoundingClientRect();
+
+			// Only handle if the click is below the content.
+			if ( event.clientY < lastChildRect.bottom ) {
+				return;
+			}
+
 			const focusableNodes = focus.focusable.find( ref.current );
 			const target = findLast( focusableNodes, isTabbableTextField );
 
