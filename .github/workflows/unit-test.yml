@@ -57,6 +57,7 @@ jobs:
       fail-fast: false
       matrix:
         timezone: ['EST', 'GMT', 'CET', 'JST']
+        locale: ['en_US', 'en_GB', 'fr_FR', 'ja_JP']
 
     steps:
     - uses: actions/checkout@v2
@@ -90,6 +91,8 @@ jobs:
     - name: Running the tests
       env:
         TZ: ${{ matrix.timezone }}
+        LANG: ${{ matrix.locale }}
+
       run: |
         npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache" \
           --testPathPattern="packages/date/"
