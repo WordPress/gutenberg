@@ -28,7 +28,7 @@ import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
 
 export default function TemplatePartEdit( {
-	attributes: { postId: _postId, slug, theme, tagName: TagName = 'section' },
+	attributes: { postId: _postId, slug, theme, tagName: TagName = 'div' },
 	setAttributes,
 	clientId,
 } ) {
