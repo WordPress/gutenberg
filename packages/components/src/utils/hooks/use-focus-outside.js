@@ -130,22 +130,16 @@ export default function useFocusOutside( onFocusOutside, __unstableNodeRef ) {
 	 *
 	 * @param {SyntheticEvent} event Event for mousedown or mouseup.
 	 */
-	const normalizeButtonFocus = useCallback(
-		( event ) => {
-			const { type, target } = event;
-			const isInteractionEnd = includes(
-				[ 'mouseup', 'touchend' ],
-				type
-			);
+	const normalizeButtonFocus = useCallback( ( event ) => {
+		const { type, target } = event;
+		const isInteractionEnd = includes( [ 'mouseup', 'touchend' ], type );
 
-			if ( isInteractionEnd ) {
-				preventBlurCheck.current = false;
-			} else if ( isFocusNormalizedButton( target ) ) {
-				preventBlurCheck.current = true;
-			}
-		},
-		[]
-	);
+		if ( isInteractionEnd ) {
+			preventBlurCheck.current = false;
+		} else if ( isFocusNormalizedButton( target ) ) {
+			preventBlurCheck.current = true;
+		}
+	}, [] );
 
 	/**
 	 * A callback triggered when a blur event occurs on the element the handler
