@@ -11,11 +11,15 @@ import { default as useSimulatedMediaQuery } from '../../components/use-simulate
 /**
  * Function to resize the editor window.
  *
- * @param {string} deviceType Used for determining the size of the container (e.g. Desktop, Tablet, Mobile)
+ * @param {string}  deviceType Used for determining the size of the container (e.g. Desktop, Tablet, Mobile)
+ * @param {boolean} __unstableDisableSimulate
  *
  * @return {Object} Inline styles to be added to resizable container.
  */
-export default function useResizeCanvas( deviceType ) {
+export default function useResizeCanvas(
+	deviceType,
+	__unstableDisableSimulate
+) {
 	const [ actualWidth, updateActualWidth ] = useState( window.innerWidth );
 
 	useEffect( () => {
@@ -69,10 +73,11 @@ export default function useResizeCanvas( deviceType ) {
 		}
 	};
 
-	useSimulatedMediaQuery(
-		'resizable-editor-section',
-		getCanvasWidth( deviceType )
-	);
+	const width = __unstableDisableSimulate
+		? null
+		: getCanvasWidth( deviceType );
+
+	useSimulatedMediaQuery( 'resizable-editor-section', width );
 
 	return contentInlineStyles( deviceType );
 }

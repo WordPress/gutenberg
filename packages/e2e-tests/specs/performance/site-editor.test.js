@@ -11,6 +11,7 @@ import {
 	trashAllPosts,
 	visitAdminPage,
 	activateTheme,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -49,7 +50,11 @@ describe( 'Site Editor Performance', () => {
 		while ( i-- ) {
 			const startTime = new Date();
 			await page.reload();
-			await page.waitForSelector( '.wp-block', { timeout: 120000 } );
+			await page.waitForSelector( '.edit-site-visual-editor iframe', {
+				timeout: 120000,
+			} );
+			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
+
 			results.load.push( new Date() - startTime );
 		}
 

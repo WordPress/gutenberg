@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
@@ -10,10 +10,14 @@ import {
 	__experimentalLinkControl,
 	BlockInspector,
 	WritingFlow,
-	ObserveTyping,
 	BlockList,
+	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
+	__unstableUseTypingObserver as useTypingObserver,
+	__unstableUseEditorStyles as useEditorStyles,
+	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
+import { DropZoneProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,16 +26,34 @@ import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 
+function Canvas( { body, styles } ) {
+	useBlockSelectionClearer( body );
+	useTypingObserver( body );
+	useEditorStyles( body, styles );
+
+	return (
+		<DropZoneProvider>
+			<WritingFlow>
+				<BlockList className="edit-site-block-editor__block-list" />
+			</WritingFlow>
+		</DropZoneProvider>
+	);
+}
+
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { settings, templateType, page } = useSelect(
+	const { settings, templateType, page, deviceType } = useSelect(
 		( select ) => {
-			const { getSettings, getTemplateType, getPage } = select(
-				'core/edit-site'
-			);
+			const {
+				getSettings,
+				getTemplateType,
+				getPage,
+				__experimentalGetPreviewDeviceType,
+			} = select( 'core/edit-site' );
 			return {
 				settings: getSettings( setIsInserterOpen ),
 				templateType: getTemplateType(),
 				page: getPage(),
+				deviceType: __experimentalGetPreviewDeviceType(),
 			};
 		},
 		[ setIsInserterOpen ]
@@ -41,9 +63,8 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		templateType
 	);
 	const { setPage } = useDispatch( 'core/edit-site' );
-	const ref = useRef();
 
-	useBlockSelectionClearer( ref );
+	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
 
 	return (
 		<BlockEditorProvider
@@ -70,16 +91,14 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div
-				ref={ ref }
-				className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper"
+			<Iframe
+				style={ resizedCanvasStyles }
+				head={ window.__editorStyles.html }
 			>
-				<WritingFlow>
-					<ObserveTyping>
-						<BlockList className="edit-site-block-editor__block-list" />
-					</ObserveTyping>
-				</WritingFlow>
-			</div>
+				{ ( body ) => (
+					<Canvas body={ body } styles={ settings.styles } />
+				) }
+			</Iframe>
 		</BlockEditorProvider>
 	);
 }

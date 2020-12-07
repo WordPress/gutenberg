@@ -22,7 +22,10 @@
 
 .edit-site-visual-editor {
 	position: relative;
-	background-color: $white;
+
+	iframe {
+		background-color: $white;
+	}
 }
 
 // Ideally  we don't need all these nested divs.

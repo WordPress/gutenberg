@@ -8,6 +8,7 @@ import {
 	visitAdminPage,
 	trashAllPosts,
 	activateTheme,
+	canvas,
 } from '@wordpress/e2e-test-utils';
 import { addQueryArgs } from '@wordpress/url';
 
@@ -200,7 +201,7 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.close();
 
 			// Click the first block so that the template part inserts in the right place.
-			const firstBlock = await page.$( '.wp-block' );
+			const firstBlock = await canvas().$( '.wp-block' );
 			await firstBlock.click();
 
 			// Insert something to dirty the editor.

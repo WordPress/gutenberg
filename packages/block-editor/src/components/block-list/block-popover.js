@@ -167,7 +167,9 @@ function BlockPopover( {
 		: 'top right left';
 	const stickyBoundaryElement = showEmptyBlockSideInserter
 		? undefined
-		: getScrollContainer( node ) || ownerDocument.body;
+		: getScrollContainer( ownerDocument.defaultView.frameElement ) ||
+		  getScrollContainer( node ) ||
+		  ownerDocument.body;
 
 	return (
 		<Popover
