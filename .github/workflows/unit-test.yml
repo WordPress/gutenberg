@@ -45,8 +45,7 @@ jobs:
         npx lerna run build
 
     - name: Running the tests
-      run: |
-        npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
+      run: npm run test-unit -- --ci --maxWorkers=2 --cacheDirectory="$HOME/.jest-cache"
 
   unit-js-date:
     name: JavaScript / Date functions
