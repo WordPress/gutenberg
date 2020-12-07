@@ -5,11 +5,10 @@ import { useRef, useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
-	InspectorControls,
+	InspectorAdvancedControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import {
-	PanelBody,
 	SelectControl,
 	Dropdown,
 	ToolbarGroup,
@@ -102,32 +101,28 @@ export default function TemplatePartEdit( {
 	// Part of a template file, post ID not resolved yet.
 	const isUnresolvedTemplateFile = ! isPlaceholder && ! postId;
 
-	const inspectorControls = (
-		<InspectorControls>
-			<PanelBody title={ __( 'Semantics' ) }>
-				<SelectControl
-					label={ __( 'Wrapping HTML element' ) }
-					options={ [
-						{ label: __( 'Default (<div>)' ), value: 'div' },
-						{ label: '<header>', value: 'header' },
-						{ label: '<main>', value: 'main' },
-						{ label: '<section>', value: 'section' },
-						{ label: '<article>', value: 'article' },
-						{ label: '<aside>', value: 'aside' },
-						{ label: '<footer>', value: 'footer' },
-					] }
-					value={ TagName }
-					onChange={ ( value ) =>
-						setAttributes( { tagName: value } )
-					}
-				/>
-			</PanelBody>
-		</InspectorControls>
+	const inspectorAdvancedControls = (
+		<InspectorAdvancedControls>
+			<SelectControl
+				label={ __( 'Wrapping HTML element' ) }
+				options={ [
+					{ label: __( 'Default (<div>)' ), value: 'div' },
+					{ label: '<header>', value: 'header' },
+					{ label: '<main>', value: 'main' },
+					{ label: '<section>', value: 'section' },
+					{ label: '<article>', value: 'article' },
+					{ label: '<aside>', value: 'aside' },
+					{ label: '<footer>', value: 'footer' },
+				] }
+				value={ TagName }
+				onChange={ ( value ) => setAttributes( { tagName: value } ) }
+			/>
+		</InspectorAdvancedControls>
 	);
 
 	return (
 		<>
-			{ inspectorControls }
+			{ inspectorAdvancedControls }
 			<TagName { ...blockProps }>
 				{ isPlaceholder && (
 					<TemplatePartPlaceholder
