@@ -450,6 +450,63 @@ describe( 'readConfig', () => {
 			expect( config.env.tests ).toMatchObject( matchObj );
 		} );
 
+		it( 'should parse zip sources', async () => {
+			readFile.mockImplementation( () =>
+				Promise.resolve(
+					JSON.stringify( {
+						plugins: [
+							'https://www.example.com/test/path/to/gutenberg.zip',
+							'https://www.example.com/test/path/to/gutenberg.8.1.0.zip',
+							'https://www.example.com/test/path/to/twentytwenty.zip',
+							'https://www.example.com/test/path/to/twentytwenty.1.3.zip',
+							'https://example.com/twentytwenty.1.3.zip',
+						],
+					} )
+				)
+			);
+			const config = await readConfig( '.wp-env.json' );
+			const matchObj = {
+				pluginSources: [
+					{
+						type: 'zip',
+						url:
+							'https://www.example.com/test/path/to/gutenberg.zip',
+						path: expect.stringMatching( /^\/.*gutenberg$/ ),
+						basename: 'gutenberg',
+					},
+					{
+						type: 'zip',
+						url:
+							'https://www.example.com/test/path/to/gutenberg.8.1.0.zip',
+						path: expect.stringMatching( /^\/.*gutenberg.8.1.0$/ ),
+						basename: 'gutenberg.8.1.0',
+					},
+					{
+						type: 'zip',
+						url:
+							'https://www.example.com/test/path/to/twentytwenty.zip',
+						path: expect.stringMatching( /^\/.*twentytwenty$/ ),
+						basename: 'twentytwenty',
+					},
+					{
+						type: 'zip',
+						url:
+							'https://www.example.com/test/path/to/twentytwenty.1.3.zip',
+						path: expect.stringMatching( /^\/.*twentytwenty.1.3$/ ),
+						basename: 'twentytwenty.1.3',
+					},
+					{
+						type: 'zip',
+						url: 'https://example.com/twentytwenty.1.3.zip',
+						path: expect.stringMatching( /^\/.*twentytwenty.1.3$/ ),
+						basename: 'twentytwenty.1.3',
+					},
+				],
+			};
+			expect( config.env.development ).toMatchObject( matchObj );
+			expect( config.env.tests ).toMatchObject( matchObj );
+		} );
+
 		it( 'should throw a validaton error if there is an unknown source', async () => {
 			readFile.mockImplementation( () =>
 				Promise.resolve( JSON.stringify( { plugins: [ 'invalid' ] } ) )

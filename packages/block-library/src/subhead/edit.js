@@ -43,6 +43,7 @@ export default function SubheadEdit( {
 					} }
 					style={ { textAlign: align } }
 					className={ className }
+					aria-label={ __( 'Subheading text' ) }
 					placeholder={ placeholder || __( 'Write subheading…' ) }
 				/>
 			</div>

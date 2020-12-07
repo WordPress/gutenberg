@@ -7,7 +7,7 @@ import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { button } from '@wordpress/icons';
 
 const name = 'core/keyboard';
-const title = __( 'Keyboard Input' );
+const title = __( 'Keyboard input' );
 
 export const keyboard = {
 	name,

@@ -422,3 +422,16 @@ export function setIsInserterOpened( value ) {
 		value,
 	};
 }
+
+/**
+ * Returns an action object used to switch to template editing.
+ *
+ * @param {boolean} value Is editing template.
+ * @return {Object} Action object.
+ */
+export function setIsEditingTemplate( value ) {
+	return {
+		type: 'SET_IS_EDITING_TEMPLATE',
+		value,
+	};
+}
